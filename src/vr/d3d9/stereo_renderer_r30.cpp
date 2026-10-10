@@ -13,6 +13,7 @@
 
 #include "stereo_renderer_r29.cpp"
 #include "vr/d3d11/runtime_census.hpp"
+#include "vr/d3d11/live_game_frame_bridge.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -1227,6 +1228,7 @@ namespace OutRunVRStereo
                 InternalPassScope guard;
                 R30ApplyStereoSkyGlow(device);
             }
+            outrun::vr::dx11::live_game_frame::before_game_present(device);
             return R30PresentR29Hook.stdcall<HRESULT>(
                 device, sourceRect, destRect,
                 destWindowOverride, dirtyRegion);
@@ -1236,6 +1238,7 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
         {
+            outrun::vr::dx11::live_game_frame::before_game_reset();
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
             const HRESULT hr =
@@ -3114,9 +3117,164 @@ namespace OutRunVRStereo
             return r29Draw();
         }
 
+
+        // DX11:FIRST_GAME_DRAW_FRAME. Called at the real game-authored R30
+        // entrypoints (before stereo replay). All game draws still execute on
+        // the original D3D9 pipeline, regardless of native diagnostic success.
+        void R30ObserveNativeLinearVB(IDirect3DDevice9* device,
+            D3DPRIMITIVETYPE topology, UINT firstVertex,
+            UINT primitiveCount) noexcept
+        {
+            namespace live = outrun::vr::dx11::live_game_frame;
+            if (!live::diagnostic_enabled() || !device ||
+                topology != D3DPT_TRIANGLELIST ||
+                !primitiveCount || primitiveCount > 512) return;
+            try {
+                IDirect3DVertexBuffer9* vb = nullptr;
+                UINT offset=0, stride=0;
+                if (FAILED(device->GetStreamSource(0, &vb, &offset, &stride)) ||
+                    !vb || stride < 20 || stride > 512) {
+                    if (vb) vb->Release();
+                    return;
+                }
+                const std::uint64_t firstByte =
+                    static_cast<std::uint64_t>(offset) +
+                    static_cast<std::uint64_t>(firstVertex) * stride;
+                const std::uint64_t byteCount =
+                    static_cast<std::uint64_t>(primitiveCount)*3u*stride;
+                D3DVERTEXBUFFER_DESC desc{};
+                std::vector<std::uint8_t> bytes;
+                const bool valid =
+                    SUCCEEDED(vb->GetDesc(&desc)) && firstByte <= desc.Size &&
+                    byteCount <= desc.Size-firstByte && firstByte <= UINT_MAX &&
+                    byteCount <= UINT_MAX &&
+                    R30CopyVertexShadow(vb, static_cast<UINT>(firstByte),
+                                        static_cast<UINT>(byteCount), bytes);
+                vb->Release();
+                if (valid) live::observe_linear(device, topology,
+                                primitiveCount, bytes.data(), stride);
+            } catch (...) { /* Native diagnostic must never alter game HRESULT. */ }
+        }
+
+        void R30ObserveNativeIndexedVB(IDirect3DDevice9* device,
+            D3DPRIMITIVETYPE topology, INT baseVertex,
+            UINT minVertex, UINT numVertices, UINT startIndex,
+            UINT primitiveCount) noexcept
+        {
+            namespace live = outrun::vr::dx11::live_game_frame;
+            if (!live::diagnostic_enabled() || !device ||
+                topology != D3DPT_TRIANGLELIST || !primitiveCount ||
+                primitiveCount > 512 || !numVertices) return;
+            try {
+                IDirect3DVertexBuffer9* vb = nullptr;
+                IDirect3DIndexBuffer9* ib = nullptr;
+                UINT streamOffset=0, stride=0;
+                if (FAILED(device->GetStreamSource(
+                        0, &vb, &streamOffset, &stride)) || !vb ||
+                    FAILED(device->GetIndices(&ib)) || !ib ||
+                    stride < 20 || stride > 512) {
+                    if (ib) ib->Release();
+                    if (vb) vb->Release();
+                    return;
+                }
+                D3DVERTEXBUFFER_DESC vDesc{};
+                D3DINDEXBUFFER_DESC iDesc{};
+                const UINT size = (iDesc.Format == D3DFMT_INDEX16) ? 2u : 4u;
+                // Format comes from the live index owner, never from a probe.
+                bool ok = SUCCEEDED(ib->GetDesc(&iDesc)) &&
+                    SUCCEEDED(vb->GetDesc(&vDesc)) &&
+                    (iDesc.Format == D3DFMT_INDEX16 ||
+                     iDesc.Format == D3DFMT_INDEX32);
+                const UINT indexSize = iDesc.Format == D3DFMT_INDEX16 ? 2u : 4u;
+                const UINT count = primitiveCount*3u;
+                const std::uint64_t start =
+                    static_cast<std::uint64_t>(startIndex)*indexSize;
+                const std::uint64_t bytesCount =
+                    static_cast<std::uint64_t>(count)*indexSize;
+                ok = ok && start <= iDesc.Size && bytesCount <= iDesc.Size-start &&
+                    start <= UINT_MAX && bytesCount <= UINT_MAX;
+                std::vector<std::uint8_t> sourceIndices;
+                if (ok) ok = R30CopyIndexShadow(ib, static_cast<UINT>(start),
+                              static_cast<UINT>(bytesCount), sourceIndices);
+                if (!ok) { ib->Release(); vb->Release(); return; }
+                std::vector<std::uint32_t> indices(count);
+                std::uint64_t low = UINT64_MAX, high = 0;
+                const std::uint64_t declaredEnd =
+                    static_cast<std::uint64_t>(minVertex) + numVertices;
+                for (UINT n=0; n<count; ++n) {
+                    std::uint32_t idx=0;
+                    const auto* pos = sourceIndices.data() +
+                        static_cast<std::size_t>(n)*indexSize;
+                    if (indexSize == 2u) {
+                        std::uint16_t shortIndex=0;
+                        std::memcpy(&shortIndex, pos, 2);
+                        idx = shortIndex;
+                    } else std::memcpy(&idx, pos, 4);
+                    const std::int64_t physical =
+                        static_cast<std::int64_t>(baseVertex)+idx;
+                    if (idx < minVertex || idx >= declaredEnd ||
+                        physical < 0 || physical > UINT_MAX) {
+                        ok = false; break;
+                    }
+                    indices[n] = static_cast<std::uint32_t>(physical);
+                    low = std::min(low, static_cast<std::uint64_t>(physical));
+                    high = std::max(high, static_cast<std::uint64_t>(physical));
+                }
+                std::vector<std::uint8_t> vertices;
+                if (ok && high >= low && high-low+1u <= 1536u) {
+                    const std::uint64_t first =
+                        static_cast<std::uint64_t>(streamOffset)+low*stride;
+                    const std::uint64_t vertexBytes=(high-low+1u)*stride;
+                    ok = first <= vDesc.Size &&
+                         vertexBytes <= vDesc.Size-first &&
+                         first <= UINT_MAX && vertexBytes <= UINT_MAX &&
+                         R30CopyVertexShadow(vb, static_cast<UINT>(first),
+                                             static_cast<UINT>(vertexBytes), vertices);
+                    if (ok) for (auto& i : indices)
+                        i -= static_cast<std::uint32_t>(low);
+                } else ok = false;
+                ib->Release();
+                vb->Release();
+                if (ok) live::observe_indexed(device, topology, primitiveCount,
+                    vertices.data(), stride, static_cast<UINT>(high-low+1u),
+                    indices.data(), count);
+            } catch (...) { /* Preserve D3D9 draw even on allocation failure. */ }
+        }
+
+        void R30ObserveNativeIndexedUP(IDirect3DDevice9* device,
+            D3DPRIMITIVETYPE topology, UINT minVertex, UINT numVertices,
+            UINT primitiveCount, const void* indices, D3DFORMAT format,
+            const void* vertices, UINT stride) noexcept
+        {
+            namespace live = outrun::vr::dx11::live_game_frame;
+            if (!live::diagnostic_enabled() || !device ||
+                topology != D3DPT_TRIANGLELIST || minVertex != 0 ||
+                !numVertices || numVertices > 1536 ||
+                !primitiveCount || primitiveCount > 512 ||
+                !indices || !vertices || stride < 20 || stride > 512 ||
+                (format != D3DFMT_INDEX16 && format != D3DFMT_INDEX32))
+                return;
+            try {
+                const UINT count=primitiveCount*3u;
+                std::vector<std::uint32_t> unpacked(count);
+                const UINT unit=format == D3DFMT_INDEX16 ? 2u : 4u;
+                for (UINT i=0; i<count; ++i) {
+                    const auto* p=static_cast<const std::uint8_t*>(indices)+
+                        static_cast<std::size_t>(i)*unit;
+                    if (unit == 2) {
+                        std::uint16_t x=0; std::memcpy(&x,p,2); unpacked[i]=x;
+                    } else std::memcpy(&unpacked[i],p,4);
+                    if (unpacked[i] >= numVertices) return;
+                }
+                live::observe_indexed(device, topology, primitiveCount,
+                    vertices, stride, numVertices, unpacked.data(), count);
+            } catch (...) { /* Original UP path remains authoritative. */ }
+        }
+
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
+            R30ObserveNativeLinearVB(device, type, startVertex, primitiveCount);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                 device, type, startVertex, primitiveCount);
             if (xyzrhw != E_NOTIMPL)
@@ -3139,6 +3297,8 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
+            R30ObserveNativeIndexedVB(device, type, baseVertexIndex,
+                minVertexIndex, numVertices, startIndex, primitiveCount);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
                 startIndex, primitiveCount);
@@ -3163,6 +3323,9 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,
             UINT primitiveCount, const void* data, UINT stride)
         {
+            if (outrun::vr::dx11::live_game_frame::diagnostic_enabled())
+                outrun::vr::dx11::live_game_frame::observe_linear(
+                    device, type, primitiveCount, data, stride);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
             if (xyzrhw != E_NOTIMPL)
@@ -3186,6 +3349,8 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
+            R30ObserveNativeIndexedUP(device, type, minVertexIndex, numVertices,
+                primitiveCount, indexData, indexFormat, vertexData, stride);
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                 device, type, minVertexIndex, numVertices, primitiveCount,
                 indexData, indexFormat, vertexData, stride);
