@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B361/B362 q212 even r43 source-sized native outline pilot, first 2px fail SHA c787825e932ef2fe2f7623accc8466967bada76b4a8965b30f6964a2aab01b3d (50%-counter collapse), final 1px corrected SHA 0f65a7c2945d55da1d8375336808ac6597cf1132ee59cf21826a3bb6571ada33 337/395=85.3%; 22434 changed RGBA inside r43 ROI, other11 atlas cells exact, old-alpha outside original bbox 5832 ->0, decode0. Producer scoped readability improved but semantic/source family and r44 unfinished -> independent C2 HOLD, C3/user game UNTESTED and official C338 remains REWORK. Source-conditioned PSD/manual vector required if C2 rejects; do NOT repeat Noto glyph+tracking. Evidence localization/graphics/role_B/20261011-B362-Q212-R43-NATIVE-OPEN-COUNTERS/B362_CONTROLLER_PRODUCER_QA.json RUN_KEY=OUTRUN-KOR-B361-B362-Q212-R43-NATIVE-COUNTER-SOURCE-20261011-0330",
     "C372 C2 q060 FIRST independent shared-plate exact-SHA PLATE_PASS manifest 6144f03e... 89391 all SOURCE alpha removed, outside0 and protected siblings untouched, 6 genuine PNG. New lettering remains producer REWORK, IGR044 open, C3/game UNTESTED. localization/graphics/plate_library/reviews/6144f03e47650e55909abcfea820b451afa12e5f489bba2c747ef89334a8309a.json C372-C2-Q060-BEST-TIME-PLATE-20261011",
     "C1 q217 ODD new A231 CLEAN+trial independently reviewed: canonical original SOURCE DDS SHA d3d2d155 and raw-to-PNG mismatch0; 3496 exact glyph-only CLEAN change outside0, 425 opaque original RGB rim restored (START195 GOAL230), alpha unchanged; same source native 2048 DDS; plate scope pixel PASS but blind calibration pending so library HOLD; new distinct trial 8043bd79 inheritance small pale Korean/gold bevel mismatch REWORK; official SHA a4d817 unchanged, C3/game UNTESTED. OUTRUN-KOR-C1-Q217-A231-NEW-CLEAN-TRIAL-INDEPENDENT-20261011-0321",
     "A231 A ODD q217 new trial DDS SHA8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b; canonical source red badge opaque original 425px START195 GOAL230 restored, outside tight original source text bboxes zero RGBA, alpha/hangul glyph unchanged. New shared CLEAN manifest d924332dbb5cb52b72dc0fa31b3d0277135a5d6fcbc35e306ac1bcdde69e1d1c UNREVIEWED requires independent C1 PLATE_PASS. Official q217 source-family C1 REWORK unchanged, new C1/C3/style calibration/real game UNTESTED. RUN_KEY=OUTRUN-KOR-A231-Q217-C1-RED-BADGE-425-PROTECTED-RGB-RESTORE-20261011-0310",
@@ -7016,7 +7017,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10T22:41:00+09:00",
+  "updated_at_kst": "2026-10-11T03:44:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
