@@ -1,0 +1,47 @@
+{
+  "canonical_source": {
+    "sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "revision": "OR2-HD-GUI-v0.25.10a"
+  },
+  "source_clean": {
+    "path": "localization/graphics/role_B/20261010-B348-Q060-BEST-TIME-SOURCE-COMPONENT-PLATE/B348_BEST_TIME_SOURCE_FIRST_PLATE_READABLE.png",
+    "sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48"
+  },
+  "font": {
+    "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "sha256": "faa5f3656a78b2e2d450d27fe8382c778bc2b6bb5ea29c986664a6a435056ceb",
+    "index": 1,
+    "native_ppem": 122,
+    "glyphs": "최고 기록:"
+  },
+  "plate_mask_sha256": "25a898178ea3e4fc08a16adfa35fa8612d8cdd4da274baf244ea67e29c24cca9",
+  "source_face_row_profile": "B353_SOURCE_ENGLISH_PIXEL_MATERIAL_PROFILE.json",
+  "face_gradient": [
+    [
+      247,
+      218,
+      183
+    ],
+    [
+      247,
+      219,
+      171
+    ]
+  ],
+  "effect": {
+    "outline": 3,
+    "shadow_offset": [
+      2,
+      3
+    ],
+    "readable_right_italic_shear": 0.4
+  },
+  "protected_siblings": [
+    "OUTRUN MILES",
+    "HOLLY WOLF",
+    "all other source atlas regions"
+  ],
+  "construction": "Second/final native contour test: Bold 122ppem glyph silhouette, slender 116px individual glyph width, 3px navy contour and 2x3 extrusion, original face row gradient plus high percentile highlights, 0.40 readable lean; fixes B352 too-thin/short Regular and avoids B351 swollen 8px outline",
+  "need_C2_source_slant_homologous_anchors": true,
+  "no_final_candidate_published": true
+}
