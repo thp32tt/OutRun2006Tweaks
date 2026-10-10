@@ -37,8 +37,8 @@ class BatchCompilePolicy(unittest.TestCase):
         for file in ("conversion_dx11.md", "conversion_dx9ex.md"):
             with self.subTest(file=file):
                 content = (ROOT / file).read_text(encoding="utf-8")
-                self.assertIn("BATCH_COMPILE_POLICY=GROUPED", content)
-                self.assertIn("최종 material commit", content)
+                self.assertIn("FEATURE_BASED_DEVELOPMENT", content)
+                self.assertIn("FEATURE_READY", content)
                 self.assertIn("exact-SHA", content)
                 self.assertIn("5분", content)
                 self.assertIn("30분", content)
@@ -46,28 +46,28 @@ class BatchCompilePolicy(unittest.TestCase):
 
     def test_dx11_dispatch_injects_batch_rule(self):
         content = prefix("DX11")
-        self.assertIn("BATCH_COMPILE_POLICY=GROUPED", content)
-        self.assertIn("작은 소스 수정마다", content)
-        self.assertIn("최종 material commit", content)
+        self.assertIn("FEATURE_BASED_DEVELOPMENT", content)
+        self.assertIn("작은 패치 개수/20분 종료 규칙은 폐기", content)
+        self.assertIn("FEATURE_READY", content)
         self.assertIn("exact-SHA", content)
 
     def test_dx9ex_dispatch_injects_batch_rule(self):
         content = prefix("DX9EX")
-        self.assertIn("BATCH_COMPILE_POLICY=GROUPED", content)
-        self.assertIn("5분 컨트롤러 GitHub 체크포인트", content)
+        self.assertIn("FEATURE_BASED_DEVELOPMENT", content)
+        self.assertIn("5분 전후 컨트롤러 브랜치", content)
 
     def test_no_injection_into_localization(self):
-        self.assertNotIn("BATCH_COMPILE_POLICY=GROUPED", prefix("LOCALIZATION_A"))
+        self.assertNotIn("FEATURE_BASED_DEVELOPMENT", prefix("LOCALIZATION_A"))
 
     def test_no_dxvk_reactivation(self):
         content = prefix("DXVK")
-        self.assertNotIn("BATCH_COMPILE_POLICY=GROUPED", content)
+        self.assertNotIn("FEATURE_BASED_DEVELOPMENT", content)
         self.assertIn("DXVK 신규 개발·재개·배포·승격은 동결", content)
 
     def test_every_final_batch_keeps_ci_without_skip(self):
         for lane in ("DX11", "DX9EX"):
             content = prefix(lane)
-            self.assertIn("필수 exact-SHA GitHub Actions 전체 검증", content)
+            self.assertIn("exact-SHA Gate", content)
             self.assertIn("CI-skip 지시어를 넣지 마", content)
             self.assertIn("RUNTIME_VALIDATION=UNTESTED", content)
 
