@@ -7025,7 +7025,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-11T05:32:00+09:00",
+  "updated_at_kst": "2026-10-11T05:56:00+09:00",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -15652,5 +15652,23 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "IGR044": "OPEN",
     "evidence": "localization/graphics/role_C/20261011-C376-C2-Q060-PSD-PLATE-AUTHENTIC/C376_Q060_PSD_SOURCE_ALPHA_CLEAN_PLATE_REVIEW.json"
+  },
+  "c377_c2_q236_b364_first_independent": {
+    "queue_index": 236,
+    "role": "C2",
+    "review_id": "C377-C2-Q236-B364-FIRST-INDEPENDENT-20261011-0556",
+    "candidate_sha256": "ad4f1f81f5708d6d97638f6e2902dbaaef33b93761ef31ad03790325f594fc41",
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "current_official_sha256": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
+    "scope": "ROW05_ONLY",
+    "result": "SCOPED_ROW05_IMPROVED_FAMILY_PILOT_HOLD",
+    "C_PASS": false,
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "changed_rgba": 56558,
+    "changed_outside_target": 0,
+    "source_clean_exact_reauthenticated": false,
+    "whole_atlas_status": "C358_REWORK_REQUIRED",
+    "evidence": "localization/graphics/role_C/20261011-C377-C2-Q236-B364-NATIVE-FAMILY-INDEPENDENT/C377_Q236_B364_C2_SCOPED_HOLD.json"
   }
 }

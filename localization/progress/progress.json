@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11T05:41:00+09:00",
+  "updated_at_kst": "2026-10-11T05:56:00+09:00",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,7 +50,21 @@
       "total": 243
     },
     "graphics_localization": {
-      "latest_c1_odd_q217_a233_20261011": {"review_id":"C1-Q217-A233-FIRST-INDEPENDENT-20261011-0541","queue_index":217,"new_trial_sha256":"84753cf3dd7c5d187b14056e86ef18522ca54536691b1541f335192dcb5618ad","source_sha256":"d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0","full_native_checked":2,"changed_rgba":1352,"outside_rgba":0,"alpha_delta":0,"C1":"REWORK_REQUIRED","C3":"NOT_RUN","official_promoted":0,"game":"UNTESTED","qa":"localization/graphics/role_C/20261011-C1-Q217-A233-NEW-SAVED-STYLE-REWORK/C1_Q217_A233_INDEPENDENT_QA.json"},
+      "latest_c1_odd_q217_a233_20261011": {
+        "review_id": "C1-Q217-A233-FIRST-INDEPENDENT-20261011-0541",
+        "queue_index": 217,
+        "new_trial_sha256": "84753cf3dd7c5d187b14056e86ef18522ca54536691b1541f335192dcb5618ad",
+        "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+        "full_native_checked": 2,
+        "changed_rgba": 1352,
+        "outside_rgba": 0,
+        "alpha_delta": 0,
+        "C1": "REWORK_REQUIRED",
+        "C3": "NOT_RUN",
+        "official_promoted": 0,
+        "game": "UNTESTED",
+        "qa": "localization/graphics/role_C/20261011-C1-Q217-A233-NEW-SAVED-STYLE-REWORK/C1_Q217_A233_INDEPENDENT_QA.json"
+      },
       "b364_q236_row05_family_native_pilot_20261011": {
         "run_key": "OUTRUN-KOR-B364-Q236-ROW05-NATIVE-FAMILY-PILOT-20261011-0541",
         "role": "B",
@@ -12081,5 +12095,23 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "IGR044": "OPEN",
     "evidence": "localization/graphics/role_C/20261011-C376-C2-Q060-PSD-PLATE-AUTHENTIC/C376_Q060_PSD_SOURCE_ALPHA_CLEAN_PLATE_REVIEW.json"
+  },
+  "c377_c2_q236_b364_first_independent": {
+    "queue_index": 236,
+    "role": "C2",
+    "review_id": "C377-C2-Q236-B364-FIRST-INDEPENDENT-20261011-0556",
+    "candidate_sha256": "ad4f1f81f5708d6d97638f6e2902dbaaef33b93761ef31ad03790325f594fc41",
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "current_official_sha256": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
+    "scope": "ROW05_ONLY",
+    "result": "SCOPED_ROW05_IMPROVED_FAMILY_PILOT_HOLD",
+    "C_PASS": false,
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "changed_rgba": 56558,
+    "changed_outside_target": 0,
+    "source_clean_exact_reauthenticated": false,
+    "whole_atlas_status": "C358_REWORK_REQUIRED",
+    "evidence": "localization/graphics/role_C/20261011-C377-C2-Q236-B364-NATIVE-FAMILY-INDEPENDENT/C377_Q236_B364_C2_SCOPED_HOLD.json"
   }
 }

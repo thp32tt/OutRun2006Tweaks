@@ -1,0 +1,62 @@
+{
+  "source_sha256_from_prior_reference": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+  "old_sha256": "9e2069ebe7eda210b2b9a0e39436724efc53932b3af7ba624b918056b24b6337",
+  "new_sha256": "ad4f1f81f5708d6d97638f6e2902dbaaef33b93761ef31ad03790325f594fc41",
+  "header": {
+    "official": {
+      "length": 16777344,
+      "magic": "DDS ",
+      "fourcc": "00000000",
+      "width": 2048,
+      "height": 2048,
+      "mips": 1
+    },
+    "trial": {
+      "length": 16777344,
+      "magic": "DDS ",
+      "fourcc": "00000000",
+      "width": 2048,
+      "height": 2048,
+      "mips": 1
+    }
+  },
+  "header_equal": true,
+  "row05_bbox": [
+    255,
+    1356,
+    1056,
+    1451
+  ],
+  "old_to_trial_rgba_changed": 56558,
+  "alpha_changed": 29512,
+  "outside_target_rgba": 0,
+  "outside_target_alpha": 0,
+  "changed_bbox": [
+    278,
+    1358,
+    1052,
+    1449
+  ],
+  "official_visible_bbox_row05": [
+    313,
+    1360,
+    1052,
+    1447
+  ],
+  "trial_visible_bbox_row05": [
+    278,
+    1358,
+    1052,
+    1449
+  ],
+  "outside_changed_other13": 0,
+  "source_clean_bytes_verified_this_run": false,
+  "runtime_validation": "UNTESTED",
+  "evidence_files": [
+    "C377_Q236_B364_OFFICIAL_TRIAL_NATIVE_GRAY100.png",
+    "C377_Q236_B364_OFFICIAL_TRIAL_WHITE75.png",
+    "C377_Q236_B364_OFFICIAL_TRIAL_BLACK50.png",
+    "C377_Q236_B364_OFFICIAL_TRIAL_RAW100.png",
+    "C377_Q236_B364_TRIAL_NATIVE_ZOOM200.png"
+  ]
+}
