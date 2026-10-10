@@ -6882,7 +6882,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-10 13:50 KST",
+  "updated_at_kst": "2026-10-10 14:19 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -15030,5 +15030,42 @@
       "DX11",
       "DXVK"
     ]
+  },
+  "c1_20261010_q059_persisted_bc3_glyph_face_stipple_rework": {
+    "run_key": "OUTRUN-KOR-C1-Q059-PERSISTED-GLYPH-FACE-20261010-1418",
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 59,
+    "asset_path": "textures/load/spr_sprani_game_cvt_Exst/7CE1CFC5_512x128.dds",
+    "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+    "candidate_sha256": "261108cd26b2a83037162b17de08286ed1ded2634650709370c81c2a353eb83a",
+    "decision": "REWORK_REQUIRED",
+    "reason_codes": [
+      "BC3_KOREAN_GLYPH_FACE_DARK_STIPPLE",
+      "SOURCE_FAMILY_FILL_INTERRUPTION"
+    ],
+    "exact_saved_dds_verified": true,
+    "sha_verified_decoded_regions": 4,
+    "raw_flip_y": "PASS_SCOPE_ONLY",
+    "visual_hard_failure_regions": [
+      "race_rivals",
+      "drift_score",
+      "slipstream_score"
+    ],
+    "remaining_hold_regions": [
+      "next_mission"
+    ],
+    "supporting_heuristic": "Source vs final opaque dark-in-gold pixels: Race 2/17, Drift 1/5, Slipstream 2/27. Heuristic corroboration, not complete mechanical PASS.",
+    "triage_before": "EVIDENCE_ONLY_HOLD",
+    "producer_next": "Material rebuild face/BC3 plus native SOURCE/CLEAN/FINAL, slant, protected, MIPs, separate C1 and C3, JPG and user game.",
+    "qa_report": "localization/graphics/role_C/20261010-C1-Q059-PERSISTED-GLYPH-FACE-DEFECT/C1_Q059_INDEPENDENT_4REGION_VISUAL_REJECT.json",
+    "machine_report": "localization/graphics/role_C/20261010-C1-Q059-PERSISTED-GLYPH-FACE-DEFECT/C1_Q059_EXACT_PERSISTED_FACE_MACHINE.json",
+    "new_dds": 0,
+    "candidate_modified": false,
+    "new_c_pass": 0,
+    "c3": "BLOCKED",
+    "evidence_approved_export": "BLOCKED",
+    "pjr_019": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
