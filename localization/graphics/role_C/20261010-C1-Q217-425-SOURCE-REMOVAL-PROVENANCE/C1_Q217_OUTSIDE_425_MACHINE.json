@@ -1,0 +1,456 @@
+{
+  "current_sha": "a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204",
+  "source_sha": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "clean_sha": "f937fbaa7fa2e055e62c56835b52a28cc6c091640d148487cb54097008035e41",
+  "tight_bboxes": {
+    "start": [
+      803,
+      509,
+      884,
+      532
+    ],
+    "goal": [
+      1343,
+      771,
+      1420,
+      795
+    ]
+  },
+  "source_clean_changed_total": 3921,
+  "source_final_changed_total": 3940,
+  "clean_final_changed_total": 1141,
+  "source_final_tight_outside_changed": 425,
+  "source_clean_outside_tight": 425,
+  "clean_final_outside_tight": 0,
+  "outside_diff_alpha_changed": 0,
+  "outside_delta_equals_source_clean": 425,
+  "outside_alpha_0_both": 0,
+  "components_count": 11,
+  "components_top": [
+    {
+      "region": "goal",
+      "count": 137,
+      "bbox": [
+        1420,
+        771,
+        1428,
+        793
+      ],
+      "dist_min": 1,
+      "dist_max": 8,
+      "mean_source_rgb": [
+        219,
+        62.6,
+        112.4
+      ],
+      "mean_final_rgb": [
+        229.7,
+        9.8,
+        61.8
+      ],
+      "mean_clean_rgb": [
+        229.7,
+        9.8,
+        61.8
+      ],
+      "alpha_source_unique": [
+        255
+      ],
+      "alpha_final_unique": [
+        255
+      ],
+      "s_vs_clean_identical": false,
+      "clean_vs_final_identical": true
+    },
+    {
+      "region": "start",
+      "count": 82,
+      "bbox": [
+        801,
+        530,
+        881,
+        533
+      ],
+      "dist_min": 1,
+      "dist_max": 2.24,
+      "mean_source_rgb": [
+        229.7,
+        3.6,
+        34.1
+      ],
+      "mean_final_rgb": [
+        231,
+        2.9,
+        34.1
+      ],
+      "mean_clean_rgb": [
+        231,
+        2.9,
+        34.1
+      ],
+      "alpha_source_unique": [
+        255
+      ],
+      "alpha_final_unique": [
+        255
+      ],
+      "s_vs_clean_identical": false,
+      "clean_vs_final_identical": true
+    },
+    {
+      "region": "start",
+      "count": 54,
+      "bbox": [
+        879,
+        508,
+        889,
+        524
+      ],
+      "dist_min": 1,
+      "dist_max": 5.1,
+      "mean_source_rgb": [
+        234.6,
+        93.2,
+        85.1
+      ],
+      "mean_final_rgb": [
+        231.2,
+        37.8,
+        40.1
+      ],
+      "mean_clean_rgb": [
+        231.2,
+        37.8,
+        40.1
+      ],
+      "alpha_source_unique": [
+        255
+      ],
+      "alpha_final_unique": [
+        255
+      ],
+      "s_vs_clean_identical": false,
+      "clean_vs_final_identical": true
+    },
+    {
+      "region": "start",
+      "count": 46,
+      "bbox": [
+        814,
+        508,
+        860,
+        509
+      ],
+      "dist_min": 1,
+      "dist_max": 1,
+      "mean_source_rgb": [
+        231,
+        16.9,
+        31
+      ],
+      "mean_final_rgb": [
+        231,
+        16,
+        33
+      ],
+      "mean_clean_rgb": [
+        231,
+        16,
+        33
+      ],
+      "alpha_source_unique": [
+        255
+      ],
+      "alpha_final_unique": [
+        255
+      ],
+      "s_vs_clean_identical": false,
+      "clean_vs_final_identical": true
+    },
+    {
+      "region": "goal",
+      "count": 35,
+      "bbox": [
+        1340,
+        786,
+        1357,
+        796
+      ],
+      "dist_min": 1,
+      "dist_max": 3.16,
+      "mean_source_rgb": [
+        235.6,
+        7.5,
+        52.1
+      ],
+      "mean_final_rgb": [
+        238.6,
+        1.5,
+        48.7
+      ],
+      "mean_clean_rgb": [
+        238.6,
+        1.5,
+        48.7
+      ],
+      "alpha_source_unique": [
+        255
+      ],
+      "alpha_final_unique": [
+        255
+      ],
+      "s_vs_clean_identical": false,
+      "clean_vs_final_identical": true
+    },
+    {
+      "region": "goal",
+      "count": 25,
+      "bbox": [
+        1358,
+        795,
+        1383,
+        796
+      ],
+      "dist_min": 1,
+      "dist_max": 1,
+      "mean_source_rgb": [
+        239,
+        0,
+        48.8
+      ],
+      "mean_final_rgb": [
+        239,
+        0,
+        45
+      ],
+      "mean_clean_rgb": [
+        239,
+        0,
+        45
+      ],
+      "alpha_source_unique": [
+        255
+      ],
+      "alpha_final_unique": [
+        255
+      ],
+      "s_vs_clean_identical": false,
+      "clean_vs_final_identical": true
+    },
+    {
+      "region": "goal",
+      "count": 15,
+      "bbox": [
+        1404,
+        795,
+        1419,
+        796
+      ],
+      "dist_min": 1,
+      "dist_max": 1,
+      "mean_source_rgb": [
+        235.7,
+        3.6,
+        45.9
+      ],
+      "mean_final_rgb": [
+        239,
+        0,
+        45
+      ],
+      "mean_clean_rgb": [
+        239,
+        0,
+        45
+      ],
+      "alpha_source_unique": [
+        255
+      ],
+      "alpha_final_unique": [
+        255
+      ],
+      "s_vs_clean_identical": false,
+      "clean_vs_final_identical": true
+    },
+    {
+      "region": "goal",
+      "count": 14,
+      "bbox": [
+        1384,
+        795,
+        1398,
+        796
+      ],
+      "dist_min": 1,
+      "dist_max": 1,
+      "mean_source_rgb": [
+        239,
+        0,
+        47
+      ],
+      "mean_final_rgb": [
+        239,
+        0,
+        45
+      ],
+      "mean_clean_rgb": [
+        239,
+        0,
+        45
+      ],
+      "alpha_source_unique": [
+        255
+      ],
+      "alpha_final_unique": [
+        255
+      ],
+      "s_vs_clean_identical": false,
+      "clean_vs_final_identical": true
+    },
+    {
+      "region": "start",
+      "count": 11,
+      "bbox": [
+        864,
+        508,
+        875,
+        509
+      ],
+      "dist_min": 1,
+      "dist_max": 1,
+      "mean_source_rgb": [
+        231,
+        16.1,
+        29
+      ],
+      "mean_final_rgb": [
+        231,
+        16,
+        33
+      ],
+      "mean_clean_rgb": [
+        231,
+        16,
+        33
+      ],
+      "alpha_source_unique": [
+        255
+      ],
+      "alpha_final_unique": [
+        255
+      ],
+      "s_vs_clean_identical": false,
+      "clean_vs_final_identical": true
+    },
+    {
+      "region": "goal",
+      "count": 4,
+      "bbox": [
+        1399,
+        795,
+        1403,
+        796
+      ],
+      "dist_min": 1,
+      "dist_max": 1,
+      "mean_source_rgb": [
+        239,
+        0,
+        49
+      ],
+      "mean_final_rgb": [
+        239,
+        0,
+        45
+      ],
+      "mean_clean_rgb": [
+        239,
+        0,
+        45
+      ],
+      "alpha_source_unique": [
+        255
+      ],
+      "alpha_final_unique": [
+        255
+      ],
+      "s_vs_clean_identical": false,
+      "clean_vs_final_identical": true
+    },
+    {
+      "region": "start",
+      "count": 2,
+      "bbox": [
+        811,
+        508,
+        813,
+        509
+      ],
+      "dist_min": 1,
+      "dist_max": 1,
+      "mean_source_rgb": [
+        231,
+        12,
+        33
+      ],
+      "mean_final_rgb": [
+        231,
+        16,
+        33
+      ],
+      "mean_clean_rgb": [
+        231,
+        16,
+        33
+      ],
+      "alpha_source_unique": [
+        255
+      ],
+      "alpha_final_unique": [
+        255
+      ],
+      "s_vs_clean_identical": false,
+      "clean_vs_final_identical": true
+    }
+  ],
+  "pieces_group_counts": {
+    "goal": 6,
+    "start": 5
+  },
+  "evidence": [
+    {
+      "path": "start_425_SOURCE_CLEAN_FINAL_ZOOM3.png",
+      "sha256": "0fc550cbe619414e8f240c2775b9d1eb3c6ca15874a64015013a8f2d38bbae88",
+      "bytes": 23256
+    },
+    {
+      "path": "goal_425_SOURCE_CLEAN_FINAL_ZOOM3.png",
+      "sha256": "af7b801151c3cb112ae6b910b76e1a5df29f7b6b332b8cac75810b07ed6b014b",
+      "bytes": 24802
+    }
+  ],
+  "role": "C1",
+  "shard": "ODD",
+  "queue_index": 217,
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-C1-Q217-BOUNDARY-425-CLASSIFICATION-20261010-1547",
+  "review_scope": "Existing C348 SHA and 425 outside-tight effect pixels, new independent connected-component isolation, exact per-component RGB/alpha provenance, edge distance and SOURCE/CLEAN/FINAL overlay",
+  "classification": "SOURCE_TO_CLEAN_PLATE_EDIT_ONLY_NOT_CLEAN_TO_KOREAN_COMPOSITION",
+  "inference_bounds": "11 connected visible opaque components, START 195 px in 5 clusters, GOAL 230 px in 6 clusters. Each outside-glyph pixel is exact CLEAN==FINAL and SOURCE!=CLEAN; max distance 8px from narrow source label rectangles; no altered alpha. This identifies stage of change, not whether the changed opaque red-badge border belongs to text glow vs protected artwork.",
+  "C1_decision": "HOLD_STRICT_RECHECK",
+  "independent_C_pass": false,
+  "C3_pass": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "files": [
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/start_425_SOURCE_CLEAN_FINAL_ZOOM3.png",
+      "sha256": "0fc550cbe619414e8f240c2775b9d1eb3c6ca15874a64015013a8f2d38bbae88",
+      "bytes": 23256
+    },
+    {
+      "path": "localization/graphics/role_C/20261010-C1-Q217-425-SOURCE-REMOVAL-PROVENANCE/goal_425_SOURCE_CLEAN_FINAL_ZOOM3.png",
+      "sha256": "af7b801151c3cb112ae6b910b76e1a5df29f7b6b332b8cac75810b07ed6b014b",
+      "bytes": 24802
+    }
+  ]
+}
