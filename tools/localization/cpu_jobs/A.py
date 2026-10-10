@@ -1,208 +1,227 @@
 #!/usr/bin/env python3
-"""A231 q217: restore canonical opaque red badge pixels lost by the A189 CLEAN.
-Producer works only inside the 425 C1-authenticated OUTSIDE-GLYPH pixels;
-Korean glyph faces are byte-identical to A189. Make immutable shared CLEAN
-and source removal mask, and an unpromoted exact DDS for independent C1.
+"""A232 q217: SOURCE-SAMPLED depth-layer native Korean lettering trial.
+C1 rejected previous A231 trial's pale flat Korean; source-protected rim and
+plate were restored pixel-exact. Do NOT replicate rejected NanumSquareRound
+flat font method: draw a NEW NotoCJK-native mask, then source-sample top lip,
+face, inset and bottom extrusion, bounded by exact original text cells.
+Shared plate C1 HOLD: exploratory trial only; do not falsely promote/PASS.
 """
 import hashlib,io,json,os,subprocess,sys
 from pathlib import Path
-import numpy as np
-from PIL import Image,ImageDraw
-assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions"
-assert os.environ.get("OUTRUN_CPU_ROLE")=="A"
-root=Path.cwd()
 sys.dont_write_bytecode=True
-sys.path.insert(0,str(root/"tools/localization"))
-import plate_library as pl
-run="20261011-A231-Q217-SOURCE-RED-RIM-RESTORE"
+import numpy as np
+from PIL import Image,ImageDraw,ImageFont
+from scipy.ndimage import binary_dilation,binary_erosion,distance_transform_edt
+root=Path.cwd()
+assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions" and os.environ.get("OUTRUN_CPU_ROLE")=="A"
+run="20261011-A232-Q217-SOURCE-SAMPLED-NATIVE-GOLD-DEPTH"
 out=root/"localization/graphics/role_A"/run
 out.mkdir(parents=True,exist_ok=True)
 sha=lambda b:hashlib.sha256(b).hexdigest()
-dump=lambda x,p: (out/p).write_text(json.dumps(x,ensure_ascii=False,indent=2)+"\n")
-tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","217"],text=True,capture_output=True)
-assert tri.returncode==0,(tri.returncode,tri.stderr)
-d=json.loads(tri.stdout)
-assert d["assets"][0]["index"]==217,d
-dump({"cmd":"python tools/localization/rework_triage.py --index 217","json":d},"A231_TRIAGE.json")
-c1=json.loads((root/"localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_CONTROLLER_REWORK.json").read_text())
-m=json.loads((root/"localization/graphics/role_C/20261011-C1-Q217-PROTECTED-RED-BADGE-425/C1_Q217_MACHINE_425_RED_BADGE.json").read_text())
-assert c1["QA_decision"]=="REWORK_REQUIRED" and c1["reason_code"]=="PROTECTED_OPAQUE_RED_BADGE_OUTER_ART_RGB_RECOLOR"
-assert m["measurements"]["outside_english_tight_bbox_changes_rgba"]==425
-assert m["measurements"]["outside_source_clean_rgba"]==425
-assert m["measurements"]["outside_clean_final_rgba"]==0
-source_sha="d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0"
-candidate_sha="a4d817db51c31ba6e7d22121add4dfee8bc151cdb229a6091c5ea324bca78204"
-clean_sha="f937fbaa7fa2e055e62c56835b52a28cc6c091640d148487cb54097008035e41"
-base=root/"localization/graphics/role_A/20261008-A189-Q217-SOURCE-GOLD-ITALIC"
-source_png=base/"A189_SOURCE_READABLE.png"
-clean_png=base/"A189_CLEAN_PLATE.png"
-assert sha(clean_png.read_bytes())==clean_sha
-with Image.open(source_png) as im:src=np.array(im.convert("RGBA"),dtype=np.uint8)
-with Image.open(clean_png) as im:old_clean=np.array(im.convert("RGBA"),dtype=np.uint8)
-current_path=root/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/D1039D6F_512x512.dds"
-old_data=current_path.read_bytes()
-assert sha(old_data)==candidate_sha and old_data[:4]==b"DDS "
-assert len(old_data)==128+2048*2048*4
-with Image.open(io.BytesIO(old_data)) as im:cur=np.array(im.convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM),dtype=np.uint8)
-assert cur.shape==old_clean.shape==src.shape==(2048,2048,4)
-# Shared plate lookup is deliberately empty for q217; do not reuse q060.
-matches=list((root/"localization/graphics/plate_library/entries").glob("*.json"))
-for pp in matches:
-  plate=pl.load(root,pp)
-  assert not(plate["queue_index"]==217 and plate["source_sha256"]==source_sha and
-    plate["region_id"]=="START_GOAL" and plate["orientation"]=="readable_flip_y"),"Existing q217 CLEAN: reuse rather than remake"
-row=[]
-outside_all=np.zeros((2048,2048),dtype=bool)
-inside_all=np.zeros((2048,2048),dtype=bool)
-diffSC=np.any(src!=old_clean,axis=2)
-diffSF=np.any(src!=cur,axis=2)
-diffCF=np.any(old_clean!=cur,axis=2)
-for item in m["measurements"]["per_label"]:
- name=item["id"]
- x0,y0,x1,y1=item["source_bbox"]
- bx0,by0,bx1,by1=item["check_bbox"]
- roi=np.zeros((2048,2048),dtype=bool)
- roi[by0:by1,bx0:bx1]=True
- interior=np.zeros((2048,2048),dtype=bool)
- interior[y0:y1,x0:x1]=True
- outside=roi&~interior&diffSC
- assert int(outside.sum())==item["outside_changed"],(name,int(outside.sum()),item["outside_changed"])
- assert not np.any(outside&outside_all)
- assert not np.any(outside&diffCF),name
- assert np.array_equal(diffSC[outside],diffSF[outside])
- assert np.all(src[:,:,3][outside]==255) and np.all(cur[:,:,3][outside]==255),name
- outside_all|=outside
- inside_all|=interior
- row.append({"region":name,"source_bbox":[x0,y0,x1,y1],
-             "scope_bbox":[bx0,by0,bx1,by1],"new_restored_pixels":int(outside.sum()),
-             "restored_changed_alpha":0})
-assert int(outside_all.sum())==425
-assert int((diffSC&~inside_all).sum())==425,"Unexpected plate source changes beyond the 425 sanctioned pixels"
-assert int((diffCF&~inside_all).sum())==0,"New glyph effect outside original bbox needs separate classification"
-new_clean=old_clean.copy();new_clean[outside_all]=src[outside_all]
-new_final=cur.copy();new_final[outside_all]=src[outside_all]
-assert int(np.count_nonzero(np.any(src!=new_clean,axis=2)&~inside_all))==0
-assert np.array_equal(new_final[~outside_all],cur[~outside_all])
-assert np.array_equal(new_clean[~outside_all],old_clean[~outside_all])
-assert int(np.count_nonzero(np.any(src!=new_final,axis=2)&~inside_all))==0
-assert np.array_equal(new_clean[outside_all],src[outside_all])
-assert np.array_equal(new_final[outside_all],src[outside_all])
-# Plate means source conditioned to same legitimate original English glyph
-# bboxes only; keep all OTHER source art and exact source red badge rim bytes.
-plate_bytes=io.BytesIO()
-Image.fromarray(new_clean,mode="RGBA").save(plate_bytes,format="PNG")
-plate_bytes=plate_bytes.getvalue()
-new_plate_path=out/"A231_CLEAN_FULL_NATIVE_READABLE.png"
-new_plate_path.write_bytes(plate_bytes)
-removal=(np.any(src!=new_clean,axis=2).astype(np.uint8)*255)
-assert np.count_nonzero(removal)>0 and np.count_nonzero(removal[~inside_all])==0
-mask=Image.fromarray(removal,mode="L")
-mask_buf=io.BytesIO();mask.save(mask_buf,format="PNG")
-mask_path=out/"A231_AUTHORED_ORIGINAL_GLYPH_ONLY_MASK_NATIVE.png"
-mask_path.write_bytes(mask_buf.getvalue())
-Image.fromarray(outside_all.astype(np.uint8)*255,mode="L").save(out/"A231_RESTORED_425_PROTECTED_MASK_NATIVE.png")
-# Identify exact DDS raw component order; wrong-packing must abort publication.
-def raw_offset(y,x):return 128+((2047-y)*2048+x)*4
-probes=[(int(y),int(x)) for y,x in list(zip(*np.nonzero(outside_all)))[:12]]
-test_order=None
-for ordering in ("RGBA","BGRA","ARGB","ABGR"):
- def ordered(pixel):return bytes(pixel["RGBA".index(ch)] for ch in ordering)
- if all(old_data[raw_offset(y,x):raw_offset(y,x)+4]==ordered(cur[y,x]) for y,x in probes):
-  test_order=ordering;break
-assert test_order is not None,"Unknown DDS channel packing; refuse byte patch"
-after=bytearray(old_data)
-yy,xx=np.nonzero(outside_all)
-for y,x in zip(yy,xx):
- pix=src[y,x];start=raw_offset(int(y),int(x))
- after[start:start+4]=bytes(int(pix["RGBA".index(ch)]) for ch in test_order)
-after=bytes(after)
-assert after[:128]==old_data[:128] and len(after)==len(old_data) and sha(after)!=candidate_sha
-trialpath=out/"A231_Q217_RED_RIM_RESTORED_UNPROMOTED.dds"
-trialpath.write_bytes(after)
-with Image.open(trialpath) as im:redecoded=np.array(im.convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
-assert np.array_equal(redecoded,new_final),"Persisted DDS mismatched intended RGBA"
-origraw=np.frombuffer(old_data[128:],np.uint8).reshape(2048,2048,4)
-newraw=np.frombuffer(after[128:],np.uint8).reshape(2048,2048,4)
-changeRaw=np.any(origraw!=newraw,axis=2)
-assert np.array_equal(changeRaw,outside_all[::-1])
-assert int(changeRaw.sum())==425
-assert np.array_equal(new_final[:,:,3],cur[:,:,3]),"alpha changed unexpectedly"
-# Native and practical full-glyph/source-red plate proofs. All source changes
-# outside text bboxes are fully restored before potentially new lettering.
-def opaque(image,bg):
- color=Image.new("RGBA",image.size,bg+(255,))
- return Image.alpha_composite(color,image).convert("RGB")
-evidence=[]
-for i,item in enumerate(row):
- name=item["region"]; x0,y0,x1,y1=item["scope_bbox"]
- imgs=[Image.fromarray(im[y0:y1,x0:x1],"RGBA") for im in (src,old_clean,new_clean,cur,new_final)]
- for bgname,bg in [("GRAY",(110,110,110)),("BLACK",(0,0,0)),("WHITE",(255,255,255))]:
+def dump(x,p):(out/p).write_text(json.dumps(x,ensure_ascii=False,indent=2)+"\n")
+t=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","217"],text=True,capture_output=True)
+assert t.returncode==0 and '"index": 217' in t.stdout
+dump({"exit":t.returncode,"stdout":t.stdout[-6000:]},"A232_TRIAGE.json")
+manifest_path=root/"localization/graphics/plate_library/entries/d924332dbb5cb52b72dc0fa31b3d0277135a5d6fcbc35e306ac1bcdde69e1d1c.json"
+m=json.loads(manifest_path.read_text())
+assert m["queue_index"]==217 and m["source_sha256"]=="d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0"
+c1_review_path=root/"localization/graphics/plate_library/reviews/d924332dbb5cb52b72dc0fa31b3d0277135a5d6fcbc35e306ac1bcdde69e1d1c.json"
+r=json.loads(c1_review_path.read_text())
+assert r["status"]=="HOLD" and r["reviewer"]=="C1", "Do not reuse as approved CLEAN"
+oldQ=json.loads((root/"localization/graphics/role_C/20261011-C1-Q217-A231-INDEPENDENT/C1_Q217_A231_INDEPENDENT_QA.json").read_text())
+assert oldQ["fresh_C1_trial_decision"]=="REWORK_REQUIRED_INHERITED_SOURCE_STYLE_WIDTH"
+source_path=root/"localization/graphics/role_A/20261008-A189-Q217-SOURCE-GOLD-ITALIC/A189_SOURCE_READABLE.png"
+clean_path=root/m["clean"]["path"]
+source_bytes=source_path.read_bytes();clean_bytes=clean_path.read_bytes()
+assert sha(clean_bytes)==m["clean"]["sha256"]
+src=np.array(Image.open(io.BytesIO(source_bytes)).convert("RGBA"))
+cln=np.array(Image.open(io.BytesIO(clean_bytes)).convert("RGBA"))
+assert src.shape==cln.shape==(2048,2048,4)
+old_path=root/"localization/graphics/role_A/20261011-A231-Q217-SOURCE-RED-RIM-RESTORE/A231_Q217_RED_RIM_RESTORED_UNPROMOTED.dds"
+old_bytes=old_path.read_bytes()
+assert sha(old_bytes)=="8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b"
+assert old_bytes[:4]==b"DDS " and len(old_bytes)==128+2048*2048*4
+old_arr=np.array(Image.open(io.BytesIO(old_bytes)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
+assert old_arr.shape==cln.shape
+# Use the checked previous A189 source rectangles, not expanded badge hulls.
+rects=[
+ {"id":"start","english":"START","korean":"출발","bbox":(803,509,884,532),"font_px":20},
+ {"id":"goal","english":"GOAL","korean":"골","bbox":(1343,771,1420,795),"font_px":21},
+]
+font_path=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc")
+assert font_path.is_file()
+font_sha=sha(font_path.read_bytes())
+allowed=np.zeros((2048,2048),bool)
+for q in rects:
+ x0,y0,x1,y1=q["bbox"];allowed[y0:y1,x0:x1]=True
+assert int(np.count_nonzero(np.any(src!=cln,axis=2)&~allowed))==0, "Reused CLEAN outside original English glyphs changed"
+# Re-render the two labels from scratch. Unlike previous generic color corrections,
+# source-native English pixels define the different depth-material strata and
+# outline, with top-down sampled face gradient.
+result=cln.copy()
+records=[];layers=[]
+scale=4
+for q in rects:
+ x0,y0,x1,y1=q["bbox"];W,H=x1-x0,y1-y0
+ src_rgb=src[y0:y1,x0:x1,:3]
+ src_changed=np.any(src[y0:y1,x0:x1]!=cln[y0:y1,x0:x1],axis=2)
+ sR=src_rgb[:,:,0].astype(int);sG=src_rgb[:,:,1].astype(int);sB=src_rgb[:,:,2].astype(int)
+ # Source cream/gold face; excludes saturated crimson badge background.
+ english_face=(sR>200)&(sG>115)&(sB>65)&(sG>sB*1.04)&src_changed
+ assert int(english_face.sum())>120,(q["id"],int(english_face.sum()))
+ face_sample=src_rgb[english_face].astype(np.float64)
+ y_sample=np.indices((H,W))[0][english_face]
+ def robust_color(sel,default):
+  vals=face_sample[sel]
+  if len(vals)<10:vals=face_sample
+  return np.clip(np.percentile(vals,55,axis=0),0,255).astype(np.uint8)
+ bright=robust_color(y_sample<=max(2,int(H*.31)),[255,241,202])
+ middle=robust_color((y_sample>H*.30)&(y_sample<H*.71),[252,210,143])
+ low=robust_color(y_sample>=int(H*.68),[247,135,82])
+ # Force depth from SOURCE palettes, not arbitrary generic P1 flat coloring.
+ # Top cream lip, warm beveled face, copper/red lower extrusion.
+ font=ImageFont.truetype(str(font_path),q["font_px"]*scale)
+ try:
+  assert all(font.getmask(k).getbbox() is not None for k in q["korean"])
+ except Exception as ex: raise AssertionError("Missing Korean font glyph") from ex
+ canvas=Image.new("L",(W*scale,H*scale),0);d=ImageDraw.Draw(canvas)
+ bb=d.textbbox((0,0),q["korean"],font=font,anchor="lt",stroke_width=0)
+ txw,tyh=bb[2]-bb[0],bb[3]-bb[1]
+ # Adaptive horizontal size/center: actual font glyph 2 char vs 5 Latin is
+ # allowed shorter, but must occupy plausible native title height.
+ x=max(0,(W*scale-txw)//2-bb[0])
+ y=max(0,(H*scale-tyh)//2-bb[1])
+ d.text((x,y),q["korean"],font=font,fill=255,anchor="lt")
+ # Source is genuinely right-italic. Native 0.26 derives prior A189 sampled
+ # source right-lean 0.28; top glyph leaning right in readable coordinates.
+ shear=.28
+ canvas=canvas.transform(canvas.size,Image.Transform.AFFINE,
+    (1,-shear,-0.28*H*scale,0,1,0),resample=Image.Resampling.BICUBIC)
+ alpha=np.array(canvas.resize((W,H),Image.Resampling.LANCZOS))
+ binary=alpha>=55
+ yy,xx=np.nonzero(binary)
+ assert len(xx)>100,(q["id"],len(xx))
+ glyphbox=[int(xx.min()),int(yy.min()),int(xx.max()+1),int(yy.max()+1)]
+ # If text touches source 1px ceiling, use native canonical rescale once, not
+ # enlarging any low-resolution previous Hangul pixels.
+ margin=[glyphbox[0],W-glyphbox[2],glyphbox[1],H-glyphbox[3]]
+ assert all(m>=1 for m in margin),(q["id"],margin)
+ # Source-family material is built by topology of newly native-rendered Hangul,
+ # not a flat tinted Korean glyph: orange/red 1px offset extrusion, cream face
+ # with near-edge warm bevel, near-white upper highlight, darker bottom inset.
+ core=binary
+ extrusion=np.zeros_like(core)
+ extrusion[1:,1:] |= core[:-1,:-1]
+ extrusion[2:,1:] |= core[:-2,:-1]
+ outline=binary_dilation(core,iterations=1)&~core
+ inside_edge=core&~binary_erosion(core,iterations=1)
+ # Build masks constrained to exact source text bbox + 1px inward margin.
+ guard=np.zeros_like(core);guard[1:H-1,1:W-1]=True
+ active=(core|extrusion|outline)&guard
+ patch=cln[y0:y1,x0:x1].copy()
+ R=patch[:,:,:3].astype(np.float64)
+ alphaN=np.clip(alpha.astype(np.float64)/255,0,1)
+ mask_ex=(extrusion&~core&guard).astype(float)*.92
+ mask_out=(outline&guard).astype(float)*.72
+ red_edge=np.array([max(164,int(low[0])*.80),max(35,int(low[1])*.42),max(20,int(low[2])*.47)],dtype=np.float64)
+ # No change outside active; source-native red backdrop always underlying.
+ for mm,col in [(mask_ex,red_edge),(mask_out,low.astype(float)*.87)]:
+  R=R*(1-mm[:,:,None])+col[None,None,:]*mm[:,:,None]
+ inside_y=np.arange(H)[:,None].astype(float)/(H-1)
+ grad=np.empty((H,3),float)
+ for k in range(H):
+  t=k/max(1,H-1)
+  if t<.25: c=bright
+  elif t<.67: c=(1-(t-.25)/.42)*bright+((t-.25)/.42)*middle
+  else: c=(1-(t-.67)/.33)*middle+((t-.67)/.33)*low
+  grad[k]=c
+ col=np.repeat(grad[:,None,:],W,axis=1)
+ # Clear top ridge inside face with sampled source highlight; keep the
+ # source-derived gradient and a lower bevel inside the glyph.
+ lip=(inside_edge&core&(np.arange(H)[:,None]<int(.30*H)))
+ bevel=(inside_edge&core&(np.arange(H)[:,None]>=int(.67*H)))
+ col[lip]=np.clip(bright.astype(float)*1.06,0,255)
+ col[bevel]=low
+ R=R*(1-alphaN[:,:,None])+col*alphaN[:,:,None]
+ patch[:,:,:3]=np.uint8(np.clip(np.round(R),0,255))
+ # NOTE original red badge fully opaque inside the title, so alpha retained.
+ patch[:,:,3]=cln[y0:y1,x0:x1,3]
+ result[y0:y1,x0:x1]=patch
+ records.append({"id":q["id"],"original_text":q["english"],"korean":q["korean"],
+  "original_bbox":list(q["bbox"]),"source_natural_bbox_size":[W,H],
+  "new_ko_bbox_readable":[x0+glyphbox[0],y0+glyphbox[1],x0+glyphbox[2],y0+glyphbox[3]],
+  "new_ko_margin":margin,"font_px":q["font_px"],"font_sha256":font_sha,
+  "source_english_face_sampled_pixels":int(english_face.sum()),
+  "source_palette_upper":bright.tolist(),"source_palette_middle":middle.tolist(),"source_palette_bottom":low.tolist(),
+  "layers":["source-color rim ORIGINAL CLEAN","source-sampled dark 1px extrusion","native outline","source-sampled copper bottom bevel","source-sampled cream face","bright source top ridge"],
+  "source_italic_readable_shear":shear,"new_effect_mask_pixels":int(active.sum())})
+ layers.append({"id":q["id"],"x0":x0,"y0":y0,"x1":x1,"y1":y1,"mask":active})
+# Safeguard full-atlas source, alpha, and candidate snapshots.
+delta_old=np.any(result!=old_arr,axis=2)
+assert int((delta_old&~allowed).sum())==0,"Existing protected atlas changed"
+delta_clean=np.any(result!=cln,axis=2)
+assert int((delta_clean&~allowed).sum())==0,"New lettering outside source glyph boxes"
+assert np.array_equal(result[:,:,3],cln[:,:,3])
+assert np.array_equal(result[~allowed],src[~allowed]),"Source red rim/protected art not exact"
+# Re-encode from previous DDS, patch exact 4B bytes only in original text rects;
+# old file DDS packing was independently q217 verified as RGBA.
+data=bytearray(old_bytes)
+for q in rects:
+ x0,y0,x1,y1=q["bbox"]
+ for y in range(y0,y1):
+  start=128+((2047-y)*2048+x0)*4
+  data[start:start+(x1-x0)*4]=result[y,x0:x1].tobytes()
+bytes_final=bytes(data)
+assert bytes_final[:128]==old_bytes[:128] and len(bytes_final)==len(old_bytes)
+out_file=out/"A232_Q217_SOURCE_SAMPLED_GOLD_DEPTH_UNPROMOTED.dds"
+out_file.write_bytes(bytes_final)
+decoded=np.array(Image.open(out_file).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
+assert np.array_equal(decoded,result),"Saved DDS RGB mismatch"
+assert sha(bytes_final)!=sha(old_bytes)
+# Source exact protection check stronger than previous-only:
+assert int((np.any(decoded!=src,axis=2)&~allowed).sum())==0
+# Producer inspection contact sheets; never promote same method on pixel metrics
+# before viewing 100/75/50. Unapproved clean cannot be called C1 PASS.
+src_img=Image.fromarray(src,"RGBA");cln_img=Image.fromarray(cln,"RGBA")
+prior_img=Image.fromarray(old_arr,"RGBA");new_img=Image.fromarray(decoded,"RGBA")
+for q in rects:
+ x0,y0,x1,y1=q["bbox"]
+ R=[max(0,x0-10),max(0,y0-8),min(2048,x1+10),min(2048,y1+8)]
+ tiles=[o.crop(tuple(R)) for o in (src_img,cln_img,prior_img,new_img)]
+ for bgname,bg in [("GRAY",(100,100,100)),("BLACK",(0,0,0)),("WHITE",(255,255,255))]:
   for pct in (100,75,50):
-   tiles=[opaque(im,bg) for im in imgs]
-   if pct!=100:tiles=[v.resize((round(v.width*pct/100),round(v.height*pct/100)),Image.Resampling.LANCZOS) for v in tiles]
-   w,h=tiles[0].size
-   canvas=Image.new("RGB",(w*5,h+23),bg)
-   d=ImageDraw.Draw(canvas)
-   for j,(title,v) in enumerate(zip(("EN_SOURCE","OLD_CLEAN","RESTORED_CLEAN","OLD_KO","NEW_KO"),tiles)):
-    canvas.paste(v,(j*w,23))
-    d.text((j*w+1,3),title,fill="black" if bgname=="WHITE" else "white")
-   path=out/f"A231_{name}_{bgname}_{pct}.png"
-   canvas.save(path)
-   evidence.append(str(path.relative_to(root)))
- Image.fromarray(new_final[y0:y1,x0:x1],"RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/f"A231_{name}_RAW.png")
-# Assert exact removal mask includes ONLY source bbox; source->clean changes are
-# isolated text effects, not broad rectangular red badge recoloring.
-qa={
- "run":"A231","run_key":"OUTRUN-KOR-A231-Q217-C1-RED-BADGE-425-PROTECTED-RGB-RESTORE-20261011-0310",
- "role":"A","queue_index":217,"source_sha256":source_sha,
- "source_png_sha256":sha(source_png.read_bytes()),
- "previous_official_sha256":candidate_sha,
- "prior_clean_sha256":clean_sha,
- "new_clean_sha256":sha(plate_bytes),"new_trial_sha256":sha(after),
- "canonical_source":"Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
- "native_format":"2048x2048 RGBA32 mip1, raw mirror_y",
- "raw_channel_order":test_order,
- "rows":row,"source_opaque_protected_pixels_restored":425,
- "source_clean_rgba_outside_both_original_text_boxes":0,
- "source_final_rgba_outside_both_original_text_boxes":0,
- "prior_official_to_trial_changed_rgba":425,
- "prior_official_to_trial_changed_alpha":0,
- "prior_official_to_trial_changed_other_atlas":0,
- "redecoded_rgba_exact":True,"DDS_header_exact":True,
- "source_red_rim_restored_from_original_bytes":True,
- "korean_rendering_preserved_exact_unchanged":True,
- "clean_bounded_removal_pixels":int(np.count_nonzero(removal)),
- "clean_plate_stage":"P1_BOUNDED_SOURCE_CONDITIONED_MACHINE_PASS_VISUAL_REVIEW_REQUIRED",
- "producer_optical":"PENDING_CONTROLLER_FIRSTHAND",
- "independent_C1":"PENDING","C3":"NOT_RUN","USER_GAME":"NOT_TESTED",
- "official_candidate_updated":False,"new_trial_dds_count":1,
- "RUNTIME_VALIDATION":"UNTESTED","evidence":evidence,
- "excluded":["VR","FFB","DX11","DXVK"]
-}
-dump(qa,"A231_MACHINE_QA.json")
-# Immutable reusable CLEAN is production input only. Store no fabricated
-# C1 PLATE_PASS; actual C1 must independently inspect the manifest and bytes.
-ev=out/"A231_MACHINE_QA.json"
-evidence_ref={"path":ev.relative_to(root).as_posix(),"sha256":sha(ev.read_bytes())}
-clean_ref=pl.put(root,plate_bytes,".png")
-mask_ref=pl.put(root,mask_buf.getvalue(),".png")
-manifest={
- "schema":pl.VERSION,"queue_index":217,"region_id":"START_GOAL",
- "source_sha256":source_sha,"orientation":"readable_flip_y",
- "size":[2048,2048],"background":"opaque_red_badge",
- "source_task_id":qa["run_key"],
- "provenance_commit":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
- "producer_evidence":evidence_ref,"clean":clean_ref,"removal":mask_ref,
- "scope":"START/GOAL only, source-exact rim restoration 425, trial only; no independent C1 review/approval"
-}
-manifest_sha=sha(pl.canonical(manifest))
-entry=root/"localization/graphics/plate_library/entries"/(manifest_sha+".json")
-pl.immutable(entry,json.dumps(manifest,ensure_ascii=False,indent=2).encode()+b"\n")
-pl.load(root,entry)
-dump({"manifest_sha256":manifest_sha,"entry":str(entry.relative_to(root)),
-      "plate_C1":"UNREVIEWED","candidate_C1":"UNREVIEWED",
-      "source_exact_protected_rgb_restored":425,"trial":str(trialpath.relative_to(root)),
-      "trial_sha256":sha(after)},"A231_PUBLISH_RESULT.json")
-print(json.dumps({"A231":"NEW_Q217_RED_RIM_TRIAL","restored":425,
- "trial_sha":sha(after),"new_plate_manifest":manifest_sha,"approval":"HOLD_C1",
- "official_promoted":0}))
+   panels=[]
+   for im in tiles:
+    filled=Image.alpha_composite(Image.new("RGBA",im.size,bg+(255,)),im).convert("RGB")
+    if pct!=100:filled=filled.resize((int(filled.width*pct/100),int(filled.height*pct/100)),Image.Resampling.LANCZOS)
+    panels.append(filled)
+   w,h=panels[0].size;sheet=Image.new("RGB",(4*w,h+22),bg);d=ImageDraw.Draw(sheet)
+   for i,(label,panel) in enumerate(zip(("SOURCE","CLEAN","A231_FAILED","A232_NEW"),panels)):
+    sheet.paste(panel,(i*w,22));d.text((i*w+1,3),label,fill="black" if bgname=="WHITE" else "white")
+   sheet.save(out/f"A232_{q['id']}_{bgname}_{pct}.png")
+ new_img.crop(tuple(R)).transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/f"A232_{q['id']}_RAW.png")
+ # Source-conditioned silhouette and effects preview (transparent L mask).
+ layer=next(a for a in layers if a["id"]==q["id"])
+ crop=np.any(decoded[y0:y1,x0:x1,:3]!=cln[y0:y1,x0:x1,:3],axis=2).astype(np.uint8)*255
+ Image.fromarray(crop,"L").save(out/f"A232_{q['id']}_EFFECT_MASK_NATIVE.png")
+report={
+ "run":"A232","run_key":"OUTRUN-KOR-A232-Q217-SOURCE-SAMPLED-GOLD-DEPTH-NEW-FAMILY-20261011-0505",
+ "role":"A","index":217,"method_change":"replace rejected A189/A231 NanumSquareRound flat gold letter pass by independently Noto CJK native glyph mask + source-sampled face-top/highlight/midface/warm depth/outline/extrusion; existing source-conditioned CLEAN and verified rim unchanged",
+ "source_sha256":m["source_sha256"],"source_png_sha256":sha(source_bytes),
+ "plate_manifest_sha256":"d924332dbb5cb52b72dc0fa31b3d0277135a5d6fcbc35e306ac1bcdde69e1d1c",
+ "clean_sha256":sha(clean_bytes),"plate_C1_status":r["status"],
+ "prior_A231_trial_sha256":sha(old_bytes),"new_trial_sha256":sha(bytes_final),
+ "new_trial_path":str(out_file.relative_to(root)),
+ "font_path":str(font_path),"font_sha256":font_sha,"glyph_coverage":"ALL_VERIFIED",
+ "regions":records,"old_to_new_changed_rgba":int(delta_old.sum()),
+ "source_to_new_outside_original_bboxes":0,"old_to_new_outside_original_bboxes":0,
+ "clean_to_new_outside_original_bboxes":0,"source_red_rim_protected_exact":True,
+ "all_alpha_unchanged":True,"header_and_mip_preserved":True,"native":[2048,2048],
+ "persisted_decode_equal_exact":True,"independent_C1":"NOT_RUN_NEW_BYTES",
+ "producer_self_visual":"PENDING_CONTROLLER_DIRECT_VIEW_NO_PASS",
+ "official_updated":False,"new_unpromoted_dds":1,"C3":"NOT_RUN",
+ "RUNTIME_VALIDATION":"UNTESTED","VR_FFB_DX11_DXVK":False,
+ "next_action":"Producer inspect source-native original face vs new saved Korean on BGW 100/75/50/RAW; if still small/wrong family, fail closed and use extracted PSD/native vector hand glyph instead of more Noto recolors"}
+dump(report,"A232_MACHINE_QA.json")
+print(json.dumps({"run":"A232","new_sha":sha(bytes_final),"changed":int(delta_old.sum()),
+ "source_red_protected":True,"trial_only":True},ensure_ascii=False))
