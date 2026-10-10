@@ -111,5 +111,13 @@
     "FFB",
     "DX11",
     "DXVK"
-  ]
+  ],
+  "post_task_cleanup": {
+    "execution_backend": "GITHUB_ACTIONS_EPHEMERAL_RUNNER",
+    "result": "HOSTED_WORKSPACE_DISCARDED_AFTER_JOB",
+    "transient_local_worktree_created": false,
+    "N100_used": false,
+    "protected_published_evidence_preserved": true,
+    "workflow_run_id": 38034823172
+  }
 }
