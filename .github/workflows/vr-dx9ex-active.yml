@@ -49,6 +49,7 @@ on:
       - 'tools/verify_vr_hook_graph.py'
       - 'tools/verify_vr_refactor_contract.py'
       - 'tools/verify_vr_r84_focus_inventory.py'
+      - 'tools/verify_vr_r29_effect_cache_generation.py'
       - 'tools/verify_vr_r30_support_api_seam.py'
       - 'tools/verify_vr_r32_runtime_support_seam.py'
       - 'tools/verify_vr_r31_support_api_seam.py'
@@ -158,6 +159,7 @@ jobs:
             'tools/verify_vr_hook_graph.py',
             'tools/verify_vr_refactor_contract.py',
             'tools/verify_vr_r84_focus_inventory.py',
+            'tools/verify_vr_r29_effect_cache_generation.py',
             'tools/verify_vr_r30_support_api_seam.py',
             'tools/verify_vr_r32_runtime_support_seam.py',
             'tools/verify_vr_r31_support_api_seam.py',

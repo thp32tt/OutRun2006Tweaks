@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00590",
+  "production_id": "CONVERSION-DX9EX-00590",
+  "lane": "DX9EX",
+  "slot": "C",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "CONVERSION-DX9EX-00590",
+  "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00590",
+  "feature_status": "FEATURE_READY",
+  "work_key": "DX9EX:R29:STATEBLOCK_EFFECT_CACHE_GENERATION",
+  "base_sha": "9e393cfdc2865e580c0cb2e16b364017afd3b1da",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00590]",
+  "feature_acceptance": {
+    "implementation_complete": true,
+    "targeted_checks": [
+      "In-memory source RED/GREEN static contract PASS",
+      "6 targeted negative source mutations rejected",
+      "Python regression verifier wired into DX9Ex Active Gate; runner execution pending"
+    ],
+    "integration_contract": "R29 effect cache and telemetry reuse only if R22/R31 StateBlock events are reliable, global Apply generation matches, Present epoch and age match. All 5 live render-state getters are bracketed by global generation; setters do not revive fields from before Apply; unsafe reads fail closed to legacy R13."
+  },
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "tools/verify_vr_r29_effect_cache_generation.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00590.json"
+  ],
+  "automation_validation": "PENDING_CONTROLLER_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "status": "FEATURE_READY_AWAIT_CONTROLLER_FAST_FORWARD_AND_EXACT_SHA_GATES",
+  "hmd_test": "NOT_RUN",
+  "ffb_release": "v0.2",
+  "ffb_source_changed": false,
+  "dxvk_status": "FROZEN",
+  "r84_convergence": "INCOMPLETE_R30_R29_TU_SPLIT",
+  "feature_final_promotion": "CONTROLLER_FAST_FORWARD_AFTER_READY",
+  "baseline_sha": "fcd18ddd89f6dd40a8246fcf8591f086811149f1"
+}

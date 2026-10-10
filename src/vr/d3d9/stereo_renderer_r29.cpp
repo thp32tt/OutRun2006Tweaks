@@ -14,6 +14,7 @@
 // a third mono replay.
 
 #include "stereo_renderer_r26.cpp"
+#include "../state/state_block_tracker.hpp"
 #include "vr/game/render_semantics.hpp"\n
 namespace OutRunVRRenderer
 {
@@ -45,6 +46,7 @@ namespace OutRunVRStereo
             bool valid = false;
             std::uint64_t presentEpoch = 0;
             std::uint64_t drawSerial = 0;
+            std::uint64_t applyGeneration = 0;
         };
 
         thread_local R29EffectState R29Effect{};
@@ -58,6 +60,22 @@ namespace OutRunVRStereo
         bool R29FirstZeroDisparityLogged = false;
         bool R29FirstSafetyFallbackLogged = false;
 
+
+        // StateBlock::Apply can update render state without SetRenderState and
+        // can run on another thread; the effect cache is only thread-local.
+        bool R29EffectCacheCurrent() noexcept
+        {
+            if (!OutRunVR::State::StateBlockTracker::Reliable())
+                return false;
+            if (R29Effect.applyGeneration !=
+                OutRunVR::State::StateBlockTracker::ApplyGeneration())
+                return false;
+            return R29Effect.valid &&
+                R29Effect.presentEpoch == PresentEpoch &&
+                TopLevelDrawSerial() >= R29Effect.drawSerial &&
+                TopLevelDrawSerial() - R29Effect.drawSerial < 64;
+        }
+
         void R29ArmMonoSafety(std::uint64_t extraPresents = 2) noexcept
         {
             const std::uint64_t target = PresentEpoch + extraPresents;
@@ -70,14 +88,12 @@ namespace OutRunVRStereo
             if (!device)
                 return false;
 
-            // SetRenderState updates the cache synchronously. One live refresh
-            // per Present plus a sparse 64-draw bound covers StateBlock::Apply,
-            // which can bypass the setter hook, without four getters per draw.
-            if (R29Effect.valid && R29Effect.presentEpoch == PresentEpoch &&
-                TopLevelDrawSerial() >= R29Effect.drawSerial &&
-                TopLevelDrawSerial() - R29Effect.drawSerial < 64)
+            // Age alone cannot prove safety after an untracked Apply.
+            if (R29EffectCacheCurrent())
                 return true;
 
+            const auto applyGenerationBefore =
+                OutRunVR::State::StateBlockTracker::ApplyGeneration();
             DWORD alphaBlend = FALSE;
             DWORD alphaTest = FALSE;
             DWORD zWrite = TRUE;
@@ -94,6 +110,14 @@ namespace OutRunVRStereo
                 R29Effect.valid = false;
                 return false;
             }
+            // A concurrent Apply between five independent live reads can
+            // produce a torn policy. Let existing conservative R13 handle it.
+            if (OutRunVR::State::StateBlockTracker::ApplyGeneration() !=
+                applyGenerationBefore)
+            {
+                R29Effect.valid = false;
+                return false;
+            }
 
             R29Effect.alphaBlend = alphaBlend;
             R29Effect.alphaTest = alphaTest;
@@ -103,6 +127,7 @@ namespace OutRunVRStereo
             R29Effect.valid = true;
             R29Effect.presentEpoch = PresentEpoch;
             R29Effect.drawSerial = TopLevelDrawSerial();
+            R29Effect.applyGeneration = applyGenerationBefore;
             ++R29EffectStateSyncs;
             return true;
         }
@@ -426,6 +451,12 @@ namespace OutRunVRStereo
             if (FAILED(hr) || !IsGameDevice(device) || InternalStereoPass)
                 return hr;
 
+            // A setter cannot revalidate OTHER fields cached before Apply.
+            if (R29Effect.valid &&
+                R29Effect.applyGeneration !=
+                    OutRunVR::State::StateBlockTracker::ApplyGeneration())
+                R29Effect.valid = false;
+
             switch (state)
             {
             case D3DRS_ALPHABLENDENABLE:
@@ -601,10 +632,7 @@ namespace OutRunVRStereo
         R29EffectTelemetrySnapshot& out) noexcept
     {
         out = {};
-        if (!R29Effect.valid ||
-            R29Effect.presentEpoch != PresentEpoch ||
-            TopLevelDrawSerial() < R29Effect.drawSerial ||
-            TopLevelDrawSerial() - R29Effect.drawSerial >= 64)
+        if (!R29EffectCacheCurrent())
             return false;
 
         out.alphaBlend = R29Effect.alphaBlend;
