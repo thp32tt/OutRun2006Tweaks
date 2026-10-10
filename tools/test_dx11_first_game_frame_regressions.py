@@ -94,7 +94,43 @@ def main() -> None:
         slot = (slot + 1) % min(population, 64)
     assert chosen == [0, 1, 2, 0, 1, 2, 0, 1]
     assert "s.probeSlot = 0;" in bridge  # Reset and failure rollback
-    print("DX11 live game diagnostic sampling/lifetime/fallback regression PASS (static only)")
+
+    # UpdateSurface requires identical source/destination formats, no MSAA,
+    # and an entirely in-bounds rectangle. The game's backbuffer can be X8.
+    def safe_inset_copy(code: str) -> bool:
+        start = code.find("void before_game_present(")
+        end = code.find("void before_game_reset(", start)
+        if start < 0 or end <= start:
+            return False
+        section = code[start:end]
+        return all(token in section for token in (
+            "bb.Width >= kWidth + 8u",
+            "bb.Height >= kHeight + 8u",
+            "bb.MultiSampleType == D3DMULTISAMPLE_NONE",
+            "bb.Format == D3DFMT_A8R8G8B8",
+            "bb.Format == D3DFMT_X8R8G8B8",
+            "kWidth, kHeight, bb.Format, D3DPOOL_SYSTEMMEM",
+            "game->UpdateSurface(",
+        ))
+
+    assert safe_inset_copy(bridge), (
+        "native inset copy must match the actual D3D9 backbuffer and stay in bounds"
+    )
+    for vulnerable, replacement in (
+        ("kWidth, kHeight, bb.Format, D3DPOOL_SYSTEMMEM",
+         "kWidth, kHeight, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM"),
+        ("bb.MultiSampleType == D3DMULTISAMPLE_NONE",
+         "bb.MultiSampleType != D3DMULTISAMPLE_NONE"),
+        ("bb.Width >= kWidth + 8u", "bb.Width >= kWidth"),
+        ("bb.Height >= kHeight + 8u", "bb.Height >= kHeight"),
+        ("bb.Format == D3DFMT_X8R8G8B8",
+         "bb.Format == D3DFMT_A2R10G10B10"),
+    ):
+        mutated = bridge.replace(vulnerable, replacement, 1)
+        assert mutated != bridge and not safe_inset_copy(mutated), (
+            "inset copy safety negative control did not detect " + vulnerable
+        )
+    print("DX11 live game diagnostic sampling/lifetime/fallback/inset regression PASS (static only)")
 
 
 if __name__ == "__main__":

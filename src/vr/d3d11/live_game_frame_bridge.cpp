@@ -306,9 +306,12 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
                     if (SUCCEEDED(game->GetBackBuffer(0,0,D3DBACKBUFFER_TYPE_MONO,
                                                     back.GetAddressOf())) && back &&
                         SUCCEEDED(back->GetDesc(&bb)) &&
-                        bb.Width >= kWidth && bb.Height >= kHeight &&
+                        bb.Width >= kWidth + 8u && bb.Height >= kHeight + 8u &&
+                        bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
+                        (bb.Format == D3DFMT_A8R8G8B8 ||
+                         bb.Format == D3DFMT_X8R8G8B8) &&
                         SUCCEEDED(game->CreateOffscreenPlainSurface(
-                            kWidth, kHeight, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM,
+                            kWidth, kHeight, bb.Format, D3DPOOL_SYSTEMMEM,
                             sys.GetAddressOf(), nullptr)) && sys) {
                         D3DLOCKED_RECT lockRect{};
                         if (SUCCEEDED(sys->LockRect(&lockRect, nullptr, 0))) {
