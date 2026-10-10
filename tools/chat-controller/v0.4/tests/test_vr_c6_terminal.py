@@ -15,8 +15,8 @@ SOURCE = pathlib.Path(__file__).resolve().parents[1] / "src-vr-v2" / "controller
 def isolated_function(name, extra=None):
     tree = ast.parse(SOURCE.read_text(encoding="utf-8"))
     fn = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == name)
-    globals_ = {"re": re, **(extra or {})}
-    exec(compile(ast.Module(body=[fn], type_ignores=[]), str(SOURCE), "exec"), globals_)
+    globals_ = {"re": re, "datetime": datetime.datetime, "Optional": __import__("typing").Optional, **(extra or {})}
+    exec(compile(ast.Module(body=[n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name.startswith("vr_")] + [fn], type_ignores=[]), str(SOURCE), "exec"), globals_)
     return globals_[name]
 
 

@@ -430,8 +430,8 @@ class VRV2DX9ExTests(unittest.TestCase):
         tree = ast.parse(SOURCE)
         fn = next(n for n in tree.body
                   if isinstance(n, ast.FunctionDef) and n.name == 'conversion_terminal_verdict')
-        ns = {}
-        exec(compile(ast.Module(body=[fn], type_ignores=[]), '<terminal-verdict>', 'exec'), ns)
+        ns = {'re': re, 'Optional': Optional, 'datetime': datetime}
+        exec(compile(ast.Module(body=[n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name.startswith('vr_')] + [fn], type_ignores=[]), '<terminal-verdict>', 'exec'), ns)
         verdict = ns['conversion_terminal_verdict']
         sha = 'a' * 40
         active = {'task_id': 'CONVERSION-DX11-00454', 'branch': 'vr-dx11-native-r71'}
@@ -441,7 +441,7 @@ class VRV2DX9ExTests(unittest.TestCase):
                   'automation_validation': 'PASS', 'validation_bearing_result_sha': sha}
         self.assertEqual(verdict(record, active, run), (True, 'C6_EXACT_SHA_VERIFIED'))
         uncompleted = dict(record, status='IN_PROGRESS')
-        self.assertEqual(verdict(uncompleted, active, run)[1], 'C6_NOT_COMPLETE')
+        self.assertEqual(verdict(uncompleted, active, run)[1], 'TERMINAL_STATUS_NOT_COMPLETE')
         failed = dict(record, automation_validation='PENDING')
         self.assertEqual(verdict(failed, active, run)[1], 'AUTOMATION_VALIDATION_NOT_PASS')
         mismatch = dict(record, validation_bearing_result_sha='b' * 40)
@@ -475,7 +475,7 @@ class VRV2DX9ExTests(unittest.TestCase):
                 'validation_bearing_result_sha': 'a' * 40,
             }),
         }
-        exec(compile(ast.Module(body=[fn], type_ignores=[]), '<canonical-binding>', 'exec'), ns)
+        exec(compile(ast.Module(body=[n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name.startswith('vr_')] + [fn], type_ignores=[]), '<canonical-binding>', 'exec'), ns)
         task = {'task_id': 'CONVERSION-DX11-00455',
                 'branch': 'vr-dx11-native-r71', 'phase': 'WAIT_ACTIONS',
                 'result_sha': 'b' * 40, 'gate_run': {'id': 111},
@@ -551,7 +551,7 @@ class VRV2DX9ExTests(unittest.TestCase):
         self.assertIn("동결(FROZEN)", (ROOT / "conversion_dxvk.md").read_text())
         self.assertNotIn("CONVERSION_DXVK_DEFERRED", compose)
         self.assertIn('QUEUE_RESULT_GRACE_SECONDS: "600"', compose)
-        self.assertIn('QUEUE_NEXT_TASK_DELAY_SECONDS: "180"', compose)
+        self.assertIn('QUEUE_NEXT_TASK_DELAY_SECONDS: "0"', compose)
         self.assertIn("실기 HMD/게임 화면 테스트가 없다는 이유로", SOURCE)
         self.assertIn("1000/5000회 반복", SOURCE)
         self.assertIn("실기 테스트가 필요한 항목은", (ROOT / "conversion_dx11.md").read_text())
@@ -578,3 +578,4 @@ class VRV2DX9ExTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+

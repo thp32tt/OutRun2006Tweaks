@@ -33,7 +33,7 @@ jobs:
           cat tools/chat-controller/v0.4/src-vr-v2/controller.py.part* > /tmp/controller-vr-v2.py
           python3 -m py_compile /tmp/controller-vr-v2.py
           bash -n tools/chat-controller/v0.4/entrypoint.vr.sh
-          python3 tools/chat-controller/v0.4/tests/test_vr_v2_dx9ex.py -v
+          python3 -m unittest discover -s tools/chat-controller/v0.4/tests -p "test_vr_*.py" -v
 
       - name: Separate legacy localization implementation regression tests
         run: python3 tests/test_localization_execution.py
@@ -41,7 +41,7 @@ jobs:
       - name: Check undefined Python names
         run: |
           python3 -m pip install --disable-pip-version-check --quiet pyflakes
-          pyflakes /tmp/controller.py | tee /tmp/pyflakes.txt || true
+          pyflakes /tmp/controller.py /tmp/controller-vr-v2.py | tee /tmp/pyflakes.txt || true
           if grep -q 'undefined name' /tmp/pyflakes.txt; then exit 1; fi
 
       - name: Validate unchanged Portainer compose interfaces
@@ -75,3 +75,4 @@ jobs:
           for name in ('conversion_dx11.md', 'conversion_dxvk.md', 'conversion_dx9ex.md'):
               assert (root / name).stat().st_size
           PY
+

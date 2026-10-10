@@ -1,6 +1,7 @@
 """Verify DX11/DX9Ex grouped-compile policy survives controller prompt generation."""
 import ast
 import json
+import re
 from pathlib import Path
 import unittest
 
@@ -24,7 +25,7 @@ def prefix(lane):
             "queue_wave_id": "",
             "queue_qa_batch": [],
         },
-        "json": json,
+        "json": json, "re": re,
         "MAX_TASK_ATTEMPTS": 3,
         "LOCALIZATION_EXECUTION_POLICY": "LOCALIZATION_EXECUTION_POLICY_ONLY",
     }

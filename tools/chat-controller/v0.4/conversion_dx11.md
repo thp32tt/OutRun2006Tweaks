@@ -1,9 +1,9 @@
 OutRun 2006 DX11 전환 자동 작업을 진행해줘.
 
 [2026-10-10 20:39 KST 사용자 최신 개발방향 — DX11_FIRST_PLAYABLE_GAME_FRAME / 00537 이후 신규 작업부터]
-목표는 더 많은 Rxxx 테스트·독립 WARP 프로브를 만드는 것이 아니라, 실제 OutRun 2006 게임이 네이티브 DX11로 그린 화면을 보이고 이후 조작 가능한 상태로 만드는 것이다. 기능 단위로 개발하고 완성 시 한 번 통합 검증한다. 00536 이전 미완료 TASK는 기존 소유권을 존중하고 무리하게 새 작업으로 갈아타지 마.
+목표는 더 많은 Rxxx 테스트·독립 WARP 프로브를 만드는 것이 아니라, 실제 OutRun 2006 게임이 네이티브 DX11로 그린 화면을 보이고 이후 조작 가능한 상태로 만드는 것이다. 기능 단위로 개발하고 완성 시 한 번 통합 검증한다. 기존 TASK는 원격 완료 기록과 통합 검증 SHA를 먼저 확인하여 종료/수리하고 같은 결과를 반복하지 마.
 
-0순위 R175 TEXCOORD6 VS/PS varying 색상 불일치를 실제 실패한 CI 단계와 소스/셰이더 연결에서 해결한다. 기존 작업자 CONVERSION-DX11-00477의 claim·lease·work_key를 원격으로 먼저 조회하고, 명시적 해제 또는 fencing된 소유권 이관 증거 없이는 그 파일을 중복 수정하지 마. 소유권 이관이 불가능하면 막힌 R175를 근거와 함께 유지하되, 충돌하지 않는 live game Draw 연결 작업으로 진행하고 임의로 R175 검사/게이트를 우회하지 마.
+R175는 최신 CI에서 해결 여부를 먼저 확인하고 해결됐다면 반복하지 않는다. 미해결일 때만 TEXCOORD6 VS/PS varying 색상 불일치를 실제 실패한 CI 단계와 소스/셰이더 연결에서 해결한다. 기존 작업자 CONVERSION-DX11-00477의 claim·lease·work_key를 원격으로 먼저 조회하고, 명시적 해제 또는 fencing된 소유권 이관 증거 없이는 그 파일을 중복 수정하지 마. 소유권 이관이 불가능하면 막힌 R175를 근거와 함께 유지하되, 충돌하지 않는 live game Draw 연결 작업으로 진행하고 임의로 R175 검사/게이트를 우회하지 마.
 
 다음 최우선 기능은 'FIRST_GAME_DRAW_FRAME'이다. 게임에서 실제 발생한 D3D9 Draw/DrawIndexed 한 건을 캡처하고, 라이브 resource/vertex/index/shader/target 소유권을 D3D11 명령에 연결하여, fail-closed 진단 opt-in에서 눈으로 확인 가능한 게임 프레임 경로까지 완성한다. 미지원 draw는 DX9Ex로 폴백한다. 단순 테스트 도형의 WARP GPU 픽셀 PASS는 이 기능의 완료가 아니다. NativeDrawPathActive의 일반 사용자 기본값은 계속 false이며 실기/시각 동등성 증거 없이는 배포 모드 활성화·성공 선언하지 마.
 
@@ -12,10 +12,14 @@ FIRST_GAME_DRAW_FRAME 이후 메뉴/차량선택/실제 주행 화면 → 입력
 새 TASK_ID>=CONVERSION-DX11-00537부터 docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json의 gameplay_delivery_target을 필수로 지정한다. R175 작업은 R175_CI_UNBLOCK+소유권 이관 증거, 게임 드로우 통합은 FIRST_GAME_DRAW_FRAME+실제 D3D9_CALLSITE→D3D11_NATIVE_DRAW→VISIBLE_FRAME_OUTPUT 단계·안전한 DX9Ex fallback·실기 검증 계획을 기록한다. 기능을 끝내기 전 신규 TASK나 전체 빌드 반복을 만들지 마. 실제 화면을 테스트 못 했다면 FRAME_PATH_CODE_COMPLETE와 RUNTIME_VALIDATION=UNTESTED를 구분해 기록한다.
 
 
-[2026-10-10 최신 사용자 확정 — FEATURE_BASED_DEVELOPMENT]
-20분/2~5개 사소한 수정 묶음 정책은 폐기한다. 작업 단위는 작은 패치가 아니라 하나의 완결된 기능이다. 기본 1~3시간 규모를 상정하되 시간·커밋 수로 완료 여부를 판단하거나 쪼개지 마. 기능 정의는 미완료인 최우선 실제 문제·구현 경로·완료 조건·변경 대상·부정 회귀로 명확히 한정한다. 조사만 하고 끝내거나 이미 해결된 패치를 재검토하는 신규 TASK_ID를 만들지 마.
-컨트롤러가 준 FEATURE_ID와 FEATURE_BRANCH(보통 vr-feature/<lane>/<task-id>)를 확인해. 기능 미완료 중에는 컨트롤러 체크포인트 브랜치에 소스 패치를 저장하고 FEATURE_BRANCH 및 TARGET_BRANCH에는 중간 push하지 마. 기능 개발 중 변경은 5분마다 소스 패치로 보존하고 최종 기능 완성 시 FEATURE_BRANCH에 결합해. 5분 간격으로 실제 변경 패치와 남은 TODO를 GitHub 컨트롤러 체크포인트에 보존하고, 30분 채팅 롤오버에서는 같은 FEATURE_ID/TASK_ID와 브랜치를 계속 사용해. 점수·완료를 중간 커밋마다 증가시키지 마.
-전체 컴파일/Win32-WARP/패키징/GitHub Actions를 중간 수정마다 하지 말고 문법·변경부 관련 경량 정적·필요한 targeted 테스트만 수행해. 단, 위험한 ABI/훅/메모리 문제가 발생하면 관련 빌드를 조기에 시행할 수 있다. 기능 통합 소스가 완성되고 targeted 테스트가 준비되면 FEATURE_BRANCH의 docs/automation/runs/<TASK_ID>.json에 task_id/target_branch/feature_id/feature_branch/work_key/feature_status=FEATURE_READY/feature_acceptance={implementation_complete:true,targeted_checks:[검증 명세],integration_contract:연결된 실질 기능·안전 회귀 계약}/runtime_validation=UNTESTED를 남겨. 그 최종 기능 커밋의 메시지에 [AUTO:TASK_ID]를 단 한 번 넣되 CI skip을 넣지 마. 컨트롤러가 최종 기능 브랜치와 target 최신 HEAD의 fast-forward·실제 소스 diff·명시적 기능 완료 증거를 검사하여 TARGET_BRANCH로 게시하고 해당 SHA에서 전체 CI를 한 번 실행한다.
+FEATURE_BASED_DEVELOPMENT
+[2026-10-10 기능 전달 계약 v1 — 기존의 중간 push 금지·한 번만 제출·미세 작업 종료 규칙 대체]
+FEATURE_CONTRACT가 이번 작업의 기능 목표/완료 조건이다. 계약이 지정된 실행은 아래의 과거 작업 번호별 목표나 우선순위 목록으로 목표를 다시 선택하지 않는다. 계약이 없는 기존 active task는 기존 범위를 끝낸다. 대기 중에는 같은 기능의 독립적인 미완료 항목만 진행하고 다른 기능은 컨트롤러가 발급한다. feature_id는 기능에 고정되며 TASK_ID/retry/rollover와 별도로 유지한다. 목표를 자잘한 guard/probe/카운터 작업으로 바꾸지 마.
+중간 소스/테스트는 FEATURE_BRANCH에 누적 커밋한다. 5분 체크포인트는 그 SHA와 미완료 acceptance ID, 원인과 다음 행동을 참조한다. TARGET_BRANCH는 컨트롤러만 갱신한다. 30분 롤오버는 같은 기능·TASK_ID의 실제 코드에서 이어간다.
+개발 중 변경 관련 정적검사·targeted 테스트·필요한 컴파일은 허용한다. 기능 후보 완성 후 exact-SHA 전체 Gate를 수행하며, 실패 수리 후 변경된 SHA 재빌드도 허용한다. 최초 제출에는 실제 소스 구현이 필요하지만 같은 기능의 검증 코드/테스트/workflow 수리만으로도 재제출 가능하다. 불필요한 C++ 변경을 만들지 마.
+FEATURE_READY는 중간 상태다. feature_acceptance와 함께 acceptance_results에 모든 계약 ID/status=PASS/evidence_paths/validation_command를 기록하고 지정된 ci_step의 실제 검사를 Actions에 연결한다. 필수 gate/job/step SUCCESS와 artifact_prefix에 맞는 실행 가능한 테스트 패키지가 모두 있어야 BUILD_VERIFIED다. 패키지에는 게임/host 바이너리, 설정, exact-SHA manifest, 로그 수집기를 포함한다. 실패·skip·누락을 PASS로 바꾸지 마.
+C6: status=COMPLETE_BUILD_VERIFIED, checkpoint=C6_STATE, automation_validation=PASS_EXACT_SHA, validation_bearing_result_sha=검증 SHA. material_result_sha·acceptance_results를 보존하고 실기 미수행은 RUNTIME_VALIDATION=UNTESTED. 최초 제출 및 동일 기능의 수리 커밋에 [AUTO:TASK_ID]를 넣되 CI skip을 쓰지 마. 검증 후 C6 bookkeeping은 CI와 분리한다. 점수/기능 완료는 중간 커밋·롤오버마다 가산하지 않는다.
+
 TARGET_BRANCH의 Actions가 완료되기 전에는 FEATURE_READY가 PASS가 아니다. 실제 CI 실패 시 실패한 원인만 같은 FEATURE_BRANCH에서 수리하고 변경된 최종 SHA를 다시 제출해. 실패한 동일 SHA를 검증·재시도 반복하지 마. CI PASS 뒤 C6 결과만 별도 bookkeeping 커밋으로 기입하고 필수 검증을 재실행하지 마. HMD 실기 미수행은 언제나 RUNTIME_VALIDATION=UNTESTED.
 DX11 A와 DX9Ex C는 서로 독립, DXVK B는 FROZEN. 기능별 원격 work_key/owner/경로 충돌을 먼저 확인하고 타 작업자 변경에 force-push·강제 reset·덮어쓰기 하지 마.
 
@@ -32,4 +36,4 @@ TARGET_BRANCH는 vr-dx11-native-r71이다. 기존 검증된 VR 기준은 참조�
 
 
 [VR 체크포인트 정책]
-5분마다 컨트롤러 브랜치 체크포인트를 저장하고, 실제 중간 소스/테스트는 FEATURE_BRANCH에 보존한다. 대상 게임 브랜치는 기능 완료 시 컨트롤러만 갱신한다. 장시간 작업을 30분마다 같은 TASK_ID로 새 대화에서 이어간다. 먼저 chat-controller-downloads 브랜치 tools/chat-controller/checkpoints/vr/<TASK_ID>/ 최신 파일, 대상 브랜치 HEAD, run 기록을 확인하고 완료한 수정은 반복하지 마. 작업 결과로 확인된 material commit에만 [AUTO:TASK_ID] 최종 결과 표식을 붙여. 기록만 남긴 경우 구현 완료로 주장하지 마.
+5분마다 컨트롤러 브랜치 체크포인트를 저장하고, 실제 중간 소스/테스트는 FEATURE_BRANCH에 보존한다. 대상 게임 브랜치는 기능 완료 시 컨트롤러만 갱신한다. 장시간 작업을 30분마다 같은 TASK_ID로 새 대화에서 이어간다. 먼저 chat-controller-downloads 브랜치 tools/chat-controller/checkpoints/vr/<TASK_ID>/ 최신 파일, 대상 브랜치 HEAD, run 기록을 확인하고 완료한 수정은 반복하지 마. 최종 제출과 동일 기능의 실질 수리 커밋에 [AUTO:TASK_ID] 표식을 붙여. 기록만 남긴 경우 구현 완료로 주장하지 마.

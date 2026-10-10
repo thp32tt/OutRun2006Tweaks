@@ -1,3 +1,17 @@
+## 2026-10-10 VR 기능 전달 수정 배포
+
+- 대상: `chat-controller-downloads`, VR `Dockerfile.portainer-vr` 및 기존 VR compose. 기존 볼륨/인증/큐를 유지하고 최신 소스로 이미지를 **다시 빌드하여 재배포**한다. 단순 컨테이너 재시작은 이미지에 COPY된 Python/프롬프트를 갱신하지 않는다.
+- 배포는 사용자가 수행한다. 코드 커밋/CI 성공은 실행 중 컨트롤러 교체 증거가 아니다.
+- 상태 페이지 Runtime의 `controller_delivery_policy=2026-10-10-delivery-v1`을 확인한다.
+- DX11 00536: 명시적 후속 통합 SHA/Actions와 material→integration→target ancestry를 재검증해 정규화한다. 원래 material SHA와 실패 이력은 보존한다. 기록이 불일치하면 완료를 강제하지 않는다.
+- DX9Ex 00590: 같은 TASK의 실패 결과를 포함한 기능 브랜치에서는 검증 스크립트/테스트/workflow 수리만으로 재제출할 수 있다. 무관한 소스 수정은 필요 없다.
+- 신규 발급은 GitHub `tools/chat-controller/v0.4/feature_backlog.json`의 구체적인 기능 계약을 사용한다. 기존 active task는 재발급/리셋하지 않는다. 새 기능은 지정 CI gate/job/acceptance step과 테스트 artifact까지 있어야 완료한다.
+- `failure_class`와 `terminal_verification`, `integration_validation`, `delivery_evidence`를 함께 확인한다. UI 오류, CI 실패/취소, 결과 기록 문제와 실기 대기는 서로 다른 상태다.
+- `FEATURE_READY`는 중간 상태다. CI가 성공했는데 C6 기록만 없으면 같은 작업에 기록 수리를 요청하며 40분 경과만으로 실패·신규 기능을 만들지 않는다.
+- 기능 큐 소진/선행 의존성 미완료는 `feature_backlog_wait`로 표시한다. 자잘한 임의 신규 작업은 만들지 않는다. 승인된 다음 기능을 backlog에 추가하거나 기존 차단 원인을 해소한다.
+- 로컬 검증: `python3 -m unittest discover -s tools/chat-controller/v0.4/tests -p 'test_*.py'`. GitHub `Chat Controller Selftest`는 VR 전체 회귀검사와 조립본 undefined-name 검사도 수행한다.
+- 게임/HMD 검증은 별도이며 `RUNTIME_VALIDATION=UNTESTED`를 유지한다.
+
 # OutRun Chat Controller v0.4 — Portainer deployment
 
 ## Architecture
@@ -307,3 +321,4 @@ After a controlled redeploy, confirm login, saved chat restoration, active
 TASK_ID stability and the runtime recovery counters. The mock regression
 suite is `python tests/test_tab_health_contract.py` from the `v0.4` folder;
 it does **not** replace a real Chrome renderer-crash test.
+

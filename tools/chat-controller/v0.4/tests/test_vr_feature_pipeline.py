@@ -24,7 +24,7 @@ def function(name, part=3, extra=None):
     fn = next(n for n in ast_tree.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == name)
     scope = {"re": re, "Optional": typing.Optional, "datetime": datetime.datetime,
              **(extra or {})}
-    exec(compile(ast.Module(body=[fn], type_ignores=[]), str(path), "exec"), scope)
+    exec(compile(ast.Module(body=[n for n in ast_tree.body if isinstance(n, ast.FunctionDef) and n.name.startswith("vr_")] + [fn], type_ignores=[]), str(path), "exec"), scope)
     return scope[name]
 
 

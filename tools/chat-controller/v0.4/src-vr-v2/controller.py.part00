@@ -1132,7 +1132,7 @@ def queue_dynamic_prefix() -> str:
         lines += [
             "2026-10-08 사용자 최신 결정: DXVK 신규 개발·재개·배포·승격은 동결, DX11 네이티브 전환 완료를 최우선으로 한다. DX11 업무에서 DXVK로 이동하지 마.",
             "실기 HMD/게임 화면 테스트가 없다는 이유로 C0~C6 소스 개발을 중단하지 마. HMD 전용 결론/백엔드 승격만 NEED_HMD_TEST 또는 BLOCKED_RUNTIME으로 주차해.",
-            "그 즉시 같은 브랜치의 다음 독립 실행 가능한 구현 항목을 선택해 실제 소스/검증 도구를 수정하고, 관련 정적 검증 1회 + exact-SHA CI를 수행해. 동일 소스의 HUD 1000/5000회 반복, 기존 PASS 재검사, 문서/해시/상태 커밋만으로 C2를 완료하지 마.",
+            "같은 FEATURE_ID의 미완료 구현 항목을 이어가. 실기만 남으면 BUILD_VERIFIED와 NEED_HMD_TEST를 분리하고 새 기능 선정은 컨트롤러에 맡겨. 동일 소스의 HUD 1000/5000회 반복, 기존 PASS 재검사, 문서/해시/상태 커밋만으로 C2를 완료하지 마.",
             "다른 작업자와 같은 work_key/파일/Task를 중복 수정하지 말고 원격 claim/HEAD를 확인해. 이미 진행 중인 CI는 새 상태 커밋으로 취소하지 마.",
             "배포/실기 PASS는 실제 Quest3/VDXR 검증 이후에만 선언해. 완료한 C0~C6+정확한 GitHub Gate가 확인되면 기존 TASK_ID를 재실행하지 말고 다음 독립 항목을 진행해.",
         ]
@@ -1141,17 +1141,22 @@ def queue_dynamic_prefix() -> str:
             "FEATURE_BASED_DEVELOPMENT=ON: 작은 패치 개수/20분 종료 규칙은 폐기. "
             "기능 하나(1~3시간 이상 가능)를 C0 조사→C1 구현 범위 확정→C2 전체 경로 구현→경량 국소검사→"
             "FEATURE_READY→최종 exact-SHA Gate→C6로 완성해. 기능이 안 끝났으면 시간 경과·작은 커밋 때문에 종료하지 마.",
-            "중간 변경은 5분 전후 컨트롤러 브랜치 TASK_ID별 source patch와 진도 체크포인트로 저장하고, FEATURE_BRANCH에는 완료한 기능을 한 번에 결합해. "
-            "TARGET_BRANCH에는 새 구현을 미리 올리지 말고, 기능 수용 기준을 모두 충족한 후에만 "
-            "컨트롤러의 원자적 fast-forward 프로모션을 허용한다. "
-            "완성 전의 feature branch push 자체를 피하고 문법/경량 정적·"
-            "필요한 targeted test만 실행해. 위험한 훅/ABI 결함의 조기 검증은 예외.",
-            "기능 구현 완료 시 checkpoint source patch를 FEATURE_BRANCH에 모두 결합하고, 그 브랜치 docs/automation/runs/TASK_ID.json에 "
-            "feature_id, feature_branch, feature_status=FEATURE_READY, work_key, target_branch, "
-            "feature_acceptance={implementation_complete:true,targeted_checks:[...],integration_contract:'...'} "
-            "필드를 기록하고 FEATURE_BRANCH 최신 최종 material commit 메시지에 [AUTO:TASK_ID]를 붙여. "
-            "후속 대상 브랜치 게시와 전체 CI는 컨트롤러가 한다. Gate가 PASS일 때만 C6 최종 결과를 "
-            "별도 기록하고 HMD 미검증은 RUNTIME_VALIDATION=UNTESTED로 유지.",
+            "중간 소스는 FEATURE_BRANCH에 커밋해 보존해. 5분 전후 컨트롤러 브랜치 체크포인트에는 "
+            "그 SHA·미완료 acceptance ID·정확한 다음 행동만 기록해. TARGET_BRANCH는 컨트롤러만 갱신한다.",
+            "변경 관련 정적 검사·targeted 테스트·필요한 컴파일은 개발 중 수행해. 기능 완성 후보에서 "
+            "전체 exact-SHA Gate를 실행하며 실패 수리 후 새 SHA의 재빌드는 허용한다.",
+            "FEATURE_CONTRACT의 기능 목표·work_key·acceptance_items를 변경하거나 작은 하위 작업으로 대체하지 마. "
+            "docs/automation/runs/TASK_ID.json에 feature_id, feature_branch, target_branch, work_key, "
+            "feature_status=FEATURE_READY, feature_acceptance={implementation_complete:true,targeted_checks:[...],integration_contract:'...'}, "
+            "acceptance_results=[{id,status:'PASS',evidence_paths:[실제 파일],validation_command:실행 명령}]를 모두 기록해. "
+            "각 acceptance item의 ci_step 이름으로 실제 관련 검사를 실행하는 GitHub Actions step을 연결하고 "
+            "required_gates 및 artifact_prefix의 테스트 패키지(게임/host 바이너리·실행 설정·SHA manifest·로그 수집기)를 제공해. "
+            "echo/문자열 존재 확인만으로 기능 검사를 대체하지 마. 컨트롤러는 step SUCCESS와 artifact를 원격 확인한다.",
+            "최종 제출과 같은 기능의 수리 커밋에는 [AUTO:TASK_ID]를 넣고 CI skip을 넣지 마. "
+            "동일 기능의 CI 수리에는 tests/tools/workflow 변경만 허용되므로 무관한 C++ 수정은 하지 마. "
+            "C6는 status=COMPLETE_BUILD_VERIFIED, checkpoint=C6_STATE, automation_validation=PASS_EXACT_SHA와 "
+            "정확한 validation_bearing_result_sha를 쓰고 material_result_sha·acceptance_results를 보존해. "
+            "실기 미수행은 RUNTIME_VALIDATION=UNTESTED다.",
             "30분 대화 롤오버와 retry는 동일 FEATURE_ID/FEATURE_BRANCH/원래 TASK_ID 및 controller-source-checkpoint로 "
             "실제 진행 중인 구현 단계를 이어받는다. FEATURE_READY 이전에 개발 완료라고 보고하지 마.",
         ]
@@ -1160,6 +1165,7 @@ def queue_dynamic_prefix() -> str:
         if feature_branch:
             lines += [
                 "FEATURE_ID=" + feature_id,
+                "FEATURE_CONTRACT=" + json.dumps(runtime.get("queue_feature_contract") or {}, ensure_ascii=False),
                 "FEATURE_BRANCH=" + feature_branch,
                 "FEATURE_MODE=IMPLEMENT_ON_FEATURE_BRANCH_ONLY",
                 "FEATURE_FINAL_PROMOTION=CONTROLLER_FAST_FORWARD_AFTER_READY",
@@ -1170,7 +1176,7 @@ def queue_dynamic_prefix() -> str:
                 "DX11_DIRECTION=FIRST_VISIBLE_GAME_FRAME: 신생 Rxxx WARP 픽셀/guard/probe 전용 작업을 중지한다. "
                 "작은 테스트 확장이 아니라 실제 OutRun D3D9 Draw 호출→라이브 resource/shader→D3D11 Draw→"
                 "실제 게임 프레임 출력 기능 하나를 완성해. 같은 FEATURE_ID를 계속 유지한다.",
-                "DX11_GATE_BLOCKER=R175: TEXCOORD6 셰이더 varying 색상 오류를 코드로 해결하는 것이 0순위다. "
+                "DX11_GATE_BLOCKER=R175: 먼저 최신 GitHub CI에서 해결 여부를 확인해. 이미 해결됐으면 재작업하지 말고 지정된 실게임 기능을 진행해. 미해결이면 실제 원인 수정이 우선이다. "
                 "단 CONVERSION-DX11-00477 기존 claim/lease가 여전히 소유 중이면 중복 수정 금지. "
                 "원격으로 명시적 해제·fencing된 takeover를 확인한 경우에만 해당 work_key를 건드리고, "
                 "아니면 독립된 live game draw integration을 구현하되 R175 CI를 우회하지 마.",

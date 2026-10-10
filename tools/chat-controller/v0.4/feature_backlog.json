@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "policy_version": "2026-10-10-delivery-v1",
+  "runtime_policy": "BUILD_VERIFIED is not HMD/gameplay PASS; default native activation remains false",
+  "features": [
+    {
+      "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+      "lane": "DX11",
+      "work_key": "DX11:FIRST_GAME_DRAW_FRAME",
+      "goal": "실제 게임 D3D9 Draw에서 D3D11 출력까지 연결하고 진단 opt-in 테스트 빌드를 제공한다. WARP 전용 프로브는 완료가 아니다.",
+      "depends_on": [],
+      "acceptance_items": [
+        {
+          "id": "DX11-LIVE-CALLSITE",
+          "expected": "Game-authored Draw/DrawIndexed captures live resources with lifetime/reset ownership",
+          "paths": [
+            "src/vr/"
+          ],
+          "ci_step": "Feature acceptance: DX11-LIVE-CALLSITE"
+        },
+        {
+          "id": "DX11-NATIVE-DRAW",
+          "expected": "Live resources, shaders and supported state issue native Draw/DrawIndexed",
+          "paths": [
+            "src/vr/"
+          ],
+          "ci_step": "Feature acceptance: DX11-NATIVE-DRAW"
+        },
+        {
+          "id": "DX11-VISIBLE-FRAME",
+          "expected": "Native draw target reaches game-visible diagnostic frame output",
+          "paths": [
+            "src/vr/",
+            "vrhost/"
+          ],
+          "ci_step": "Feature acceptance: DX11-VISIBLE-FRAME"
+        },
+        {
+          "id": "DX11-SAFE-RETURN",
+          "expected": "Unsupported state falls back; input-safe return and default-off diagnostic guard",
+          "paths": [
+            "src/",
+            "vrhost/"
+          ],
+          "ci_step": "Feature acceptance: DX11-SAFE-RETURN"
+        },
+        {
+          "id": "DX11-TEST-BUNDLE",
+          "expected": "Build real game/host binaries, selector, SHA manifest and log collector",
+          "paths": [
+            "tools/",
+            ".github/workflows/"
+          ],
+          "ci_step": "Feature acceptance: DX11-TEST-BUNDLE"
+        }
+      ],
+      "required_gates": [
+        {
+          "name": "Backend Conversion Gate",
+          "jobs": [
+            "validate",
+            "DX11 readiness smoke probes"
+          ]
+        },
+        {
+          "name": "Build",
+          "jobs": []
+        },
+        {
+          "name": "OpenXR VR architecture",
+          "jobs": []
+        }
+      ],
+      "artifact_prefix": "feature-dx11-first-game-frame-"
+    },
+    {
+      "feature_id": "DX11:MENU_TO_RACE_FRAME",
+      "lane": "DX11",
+      "work_key": "DX11:MENU_TO_RACE_FRAME",
+      "goal": "동일 네이티브 경로로 메뉴·차량선택·주행과 입력까지 연결한 실기 테스트 빌드를 제공한다.",
+      "depends_on": [
+        "DX11:FIRST_GAME_DRAW_FRAME"
+      ],
+      "acceptance_items": [
+        {
+          "id": "DX11-MENU-RACE",
+          "expected": "Menu/vehicle/race render transitions use live native frame path",
+          "paths": [
+            "src/vr/"
+          ],
+          "ci_step": "Feature acceptance: DX11-MENU-RACE"
+        },
+        {
+          "id": "DX11-INPUT-RECOVERY",
+          "expected": "Input, reset and return-to-menu survive native route and fallback",
+          "paths": [
+            "src/"
+          ],
+          "ci_step": "Feature acceptance: DX11-INPUT-RECOVERY"
+        },
+        {
+          "id": "DX11-MENU-RACE-BUNDLE",
+          "expected": "Build reproducible menu-to-race test candidate and collector",
+          "paths": [
+            "tools/",
+            ".github/workflows/"
+          ],
+          "ci_step": "Feature acceptance: DX11-MENU-RACE-BUNDLE"
+        }
+      ],
+      "required_gates": [
+        {
+          "name": "Backend Conversion Gate",
+          "jobs": [
+            "validate",
+            "DX11 readiness smoke probes"
+          ]
+        },
+        {
+          "name": "Build",
+          "jobs": []
+        },
+        {
+          "name": "OpenXR VR architecture",
+          "jobs": []
+        }
+      ],
+      "artifact_prefix": "feature-dx11-menu-race-"
+    },
+    {
+      "feature_id": "DX9EX:R84_RENDERER_GRAPH",
+      "lane": "DX9EX",
+      "work_key": "DX9EX:R84_RENDERER_GRAPH",
+      "goal": "R33→R32→R31→R30→R29 전체 구조 분리, 명시 ABI와 CMake 일치, 전체 Win32/host 링크를 완성한다.",
+      "depends_on": [],
+      "acceptance_items": [
+        {
+          "id": "R84-OWNERS",
+          "expected": "All remaining R33/R32/R31/R30/R29 independent translation-unit owners",
+          "paths": [
+            "src/vr/d3d9/"
+          ],
+          "ci_step": "Feature acceptance: R84-OWNERS"
+        },
+        {
+          "id": "R84-ABI",
+          "expected": "Explicit interfaces remove textual cpp ownership and private-symbol leakage",
+          "paths": [
+            "src/vr/d3d9/"
+          ],
+          "ci_step": "Feature acceptance: R84-ABI"
+        },
+        {
+          "id": "R84-BUILD-GRAPH",
+          "expected": "cmake.toml and generated CMakeLists ownership agree; no stale HEADER_FILE_ONLY",
+          "paths": [
+            "cmake.toml",
+            "CMakeLists.txt"
+          ],
+          "ci_step": "Feature acceptance: R84-BUILD-GRAPH"
+        },
+        {
+          "id": "R84-REGRESSION",
+          "expected": "Focused producer/consumer and protected baseline regressions execute",
+          "paths": [
+            "tools/",
+            "tests/"
+          ],
+          "ci_step": "Feature acceptance: R84-REGRESSION"
+        },
+        {
+          "id": "R84-TEST-BUNDLE",
+          "expected": "Complete host/game/full-chain binaries plus manifest and collector",
+          "paths": [
+            "tools/",
+            ".github/workflows/"
+          ],
+          "ci_step": "Feature acceptance: R84-TEST-BUNDLE"
+        }
+      ],
+      "required_gates": [
+        {
+          "name": "DX9Ex Active Validation",
+          "jobs": [
+            "policy",
+            "host",
+            "game",
+            "full-chain-compile",
+            "package"
+          ]
+        },
+        {
+          "name": "Domain Isolation Guard",
+          "jobs": [
+            "domain-isolation"
+          ]
+        }
+      ],
+      "artifact_prefix": "feature-dx9ex-r84-"
+    }
+  ]
+}
