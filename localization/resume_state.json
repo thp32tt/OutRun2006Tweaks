@@ -14890,5 +14890,38 @@
     "worker_run": 38022895710,
     "qa_path": "localization/graphics/role_A/20261010-A223-Q103-SOURCE-45PX-HEIGHT-REPAIR/A223_CONTROLLER_SELF_QA.json",
     "updated_at_kst": "2026-10-10 13:10 KST"
+  },
+  "c1_20261010_q103_a223_new_sha_weight_tracking_rework": {
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 103,
+    "run_key": "OUTRUN-KOR-C1-Q103-A223-NEW-SHA-OPTICAL-REJECT-20261010-1311",
+    "candidate_kind": "A223_UNPROMOTED",
+    "trial_sha256": "a36359f1d7f030ef25345ffc9437ccb6e71654690edc7de322f0285d68a531b9",
+    "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+    "old_official_sha256": "9702957a9c6498877433bb6ff2e112647445d271ddce27bb3e37f3a076c8b1ed",
+    "clean_sha256": "26983cf3634e6608994e5e402081dfa2d816e06945e2ca0cb6ea12e3b2f1a942",
+    "new_actual_glyph_wh": [
+      284,
+      45
+    ],
+    "english_glyph_wh": [
+      354,
+      45
+    ],
+    "height_overflow": 0,
+    "official_trial_changed_rgba": 10548,
+    "protected_changed": 0,
+    "changed_outside_original": 0,
+    "decision": "REWORK_REQUIRED",
+    "reason_code": "SOURCE_FAMILY_OPTICAL_WEIGHT_TRACKING_MISMATCH",
+    "C1_PASS": false,
+    "C3": "BLOCKED",
+    "APPROVAL": false,
+    "trial_promoted": false,
+    "new_C1_DDS": 0,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "machine_report": "localization/graphics/role_C/20261010-C1-Q103-A223-WEIGHT-TRACKING-REJECT/Q103_A223_C1_MACHINE.json",
+    "qa_report": "localization/graphics/role_C/20261010-C1-Q103-A223-WEIGHT-TRACKING-REJECT/Q103_A223_C1_REWORK.json"
   }
 }
