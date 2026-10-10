@@ -1,0 +1,153 @@
+{
+  "source_to_clean_changed_rgba": 3496,
+  "source_to_clean_rgba_outside_original_two_bboxes": 0,
+  "clean_to_new_rgba_outside_two_bboxes": 0,
+  "A231_to_A233_rgba_total": 1352,
+  "A231_to_A233_alpha_changed": 0,
+  "A231_to_A233_changed_outside_two_bboxes": 0,
+  "A231_to_A233_alpha_changed_outside": 0,
+  "source_to_clean_alpha_changed": 0,
+  "DDS_header_equal": true,
+  "raw_flip_y_exact": true,
+  "start_raw_flipy_mismatch_pixels": 0,
+  "goal_raw_flipy_mismatch_pixels": 0,
+  "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "clean_sha256": "015e07de95d6fbb38a82525714115ab841e51d82d55677217645bcb5e34064e9",
+  "previous_sha256": "8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b",
+  "candidate_sha256": "84753cf3dd7c5d187b14056e86ef18522ca54536691b1541f335192dcb5618ad",
+  "native": [
+    2048,
+    2048
+  ],
+  "regions": {
+    "start": {
+      "source_bbox": [
+        803,
+        509,
+        884,
+        532
+      ],
+      "source_english_alpha_nonzero": 1863,
+      "clean_alpha_nonzero_in_english_bbox": 1863,
+      "new_alpha_nonzero_in_english_bbox": 1863,
+      "previous_to_new_rgba_changed": 838,
+      "previous_to_new_alpha_changed": 0,
+      "source_to_clean_changed_in_bbox": 1744,
+      "clean_to_new_changed_in_bbox": 731
+    },
+    "goal": {
+      "source_bbox": [
+        1343,
+        771,
+        1420,
+        795
+      ],
+      "source_english_alpha_nonzero": 1848,
+      "clean_alpha_nonzero_in_english_bbox": 1848,
+      "new_alpha_nonzero_in_english_bbox": 1848,
+      "previous_to_new_rgba_changed": 514,
+      "previous_to_new_alpha_changed": 0,
+      "source_to_clean_changed_in_bbox": 1752,
+      "clean_to_new_changed_in_bbox": 425
+    }
+  },
+  "visual_evidence": {
+    "C1_Q217_goal_BLACK_100.png": {
+      "sha256": "547f8f78c74525dc71f8b1dc432c2f6722eca9e3864cfae6e9496bb35498575f",
+      "bytes": 9847
+    },
+    "C1_Q217_goal_BLACK_50.png": {
+      "sha256": "9d169350a3cb54b05b9c7c17a13fa20d3eebc749e46150dc19470f5e86567f28",
+      "bytes": 7700
+    },
+    "C1_Q217_goal_BLACK_75.png": {
+      "sha256": "d552643dba7ec6bd26d914e74b3c2b4a9b51893a1bbf17d56fc957e9020a3852",
+      "bytes": 18194
+    },
+    "C1_Q217_goal_CHANGE_MASK_4X.png": {
+      "sha256": "1e216ebaf302e6ba3d49185b3c6fd7173d09b3245eac3473925c4e2559b97390",
+      "bytes": 660
+    },
+    "C1_Q217_goal_GRAY_100.png": {
+      "sha256": "e056f90c206defeb37ea4f155d79af3a64d470f72bbfd1f919222d2c2c0f3f53",
+      "bytes": 10065
+    },
+    "C1_Q217_goal_GRAY_4X.png": {
+      "sha256": "463662a29e81c93bf3bfd22c7eddd8c786815d58444864e901e1f0085b7573e0",
+      "bytes": 15998
+    },
+    "C1_Q217_goal_GRAY_50.png": {
+      "sha256": "1a6abd32da710b1e61cd4c3f6b8112576d1c1cfc8285eab4130d10fa69fd3d50",
+      "bytes": 7962
+    },
+    "C1_Q217_goal_GRAY_75.png": {
+      "sha256": "0f77e48e1759ec0fc286b15624fa5b4aef60138d6fc9343156d1e7d8f99eb027",
+      "bytes": 18672
+    },
+    "C1_Q217_goal_RAW_100.png": {
+      "sha256": "e26dbec872394f24d592747e128c1a0d85a4d93a5a247d6bc0338892f13e843c",
+      "bytes": 10445
+    },
+    "C1_Q217_goal_WHITE_100.png": {
+      "sha256": "43dc9e356067d33317651f95578d7b4df6093f2b74e930cc8fdf301da34f0687",
+      "bytes": 9990
+    },
+    "C1_Q217_goal_WHITE_50.png": {
+      "sha256": "5a23e9f1fcbd1da41dbbade53e0e770f7374b179651ceb91468d9f3af26d9b42",
+      "bytes": 7755
+    },
+    "C1_Q217_goal_WHITE_75.png": {
+      "sha256": "d9da9e765d0fa30085388f4557bd63c13358c0d732a762965339f1a641a7b208",
+      "bytes": 18162
+    },
+    "C1_Q217_start_BLACK_100.png": {
+      "sha256": "ae9217e6b0304d88b364f5678e75f3a47c3004e52f7b478e9def58e8b8be8db0",
+      "bytes": 10849
+    },
+    "C1_Q217_start_BLACK_50.png": {
+      "sha256": "7e291e6563a0e979114a00bdbcb084ce3b2b2f33a840418787861e629e67a8da",
+      "bytes": 7434
+    },
+    "C1_Q217_start_BLACK_75.png": {
+      "sha256": "ee01ad4fc1d03cf2f8dcc8b7b000558f0cff9327a7f3dee162566b2f72daadfb",
+      "bytes": 15853
+    },
+    "C1_Q217_start_CHANGE_MASK_4X.png": {
+      "sha256": "879df0c73b6e8cce2674b4b3328088f2d754d1ca96bfab18aa3a503261de35bf",
+      "bytes": 668
+    },
+    "C1_Q217_start_GRAY_100.png": {
+      "sha256": "fc864080d8857c96e081e079a318c26fd03b5c423d64c14eb8dbeda73646009b",
+      "bytes": 11058
+    },
+    "C1_Q217_start_GRAY_4X.png": {
+      "sha256": "ce0a3eb2c22e1ec41bf520eb55cb94657c3cb471192e1acd07beb6962312645d",
+      "bytes": 17507
+    },
+    "C1_Q217_start_GRAY_50.png": {
+      "sha256": "bffb933e9dc554e0cff1cc88906bddd5c8a55384efaa2294f2a851cef829ade9",
+      "bytes": 7563
+    },
+    "C1_Q217_start_GRAY_75.png": {
+      "sha256": "5769982e210cf47be328a059b6b98d0e4977e783ddcbda2c906586d81c42fcef",
+      "bytes": 16170
+    },
+    "C1_Q217_start_RAW_100.png": {
+      "sha256": "a735421c17f89256f3ad4c88ecaeebf9e6dcc0fbee64d7eed9339fbea4278c76",
+      "bytes": 11300
+    },
+    "C1_Q217_start_WHITE_100.png": {
+      "sha256": "4ba9a4e4e3ea8d3719f119af789f2fa348796215d2a8a590b9d35624e226ab26",
+      "bytes": 10986
+    },
+    "C1_Q217_start_WHITE_50.png": {
+      "sha256": "548d00380d5374849f5ff28a2b0ab69ef062fd55dd4e2af26435ec8b5193c40e",
+      "bytes": 7471
+    },
+    "C1_Q217_start_WHITE_75.png": {
+      "sha256": "2ad0298cc57cd721dce1f5a429a89de209ff0b6faf4b28d1738dbfb0747d805b",
+      "bytes": 15890
+    }
+  },
+  "note": "Independently verified exact full DDS SOURCE/A231/A233, plate PNG CLEAN, decoded native stored pixels and both RAW/FLIP-Y. Source-to-CLEAN and final changes outside source bboxes measured independently."
+}
