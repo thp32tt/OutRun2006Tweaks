@@ -414,6 +414,45 @@ int main() {
     require(samplePixelEquals(255,0,0),
             "R215 real WARP restores full-eye red pixel");
 
+    // R215: same-size depth view over mip 1 of a 64x64 resource is a
+    // legitimate D3D11 OM attachment but not a dedicated 32x32 eye owner.
+    // R214 sees an exact DSV *object* and admits this aliased resource.
+    D3D11_TEXTURE2D_DESC mipDepthDesc=depthDesc;
+    mipDepthDesc.Width=64;
+    mipDepthDesc.Height=64;
+    mipDepthDesc.MipLevels=2;
+    ComPtr<ID3D11Texture2D> mipDepth;
+    require(SUCCEEDED(dev->CreateTexture2D(
+                &mipDepthDesc,nullptr,mipDepth.GetAddressOf())),
+            "R215 create nonbase mip depth texture");
+    D3D11_DEPTH_STENCIL_VIEW_DESC mipViewDesc{};
+    mipViewDesc.Format=DXGI_FORMAT_D32_FLOAT;
+    mipViewDesc.ViewDimension=D3D11_DSV_DIMENSION_TEXTURE2D;
+    mipViewDesc.Texture2D.MipSlice=1;
+    ComPtr<ID3D11DepthStencilView> mipDsv;
+    require(SUCCEEDED(dev->CreateDepthStencilView(
+                mipDepth.Get(),&mipViewDesc,mipDsv.GetAddressOf())),
+            "R215 create nonbase mip depth view");
+    ctx->OMSetRenderTargets(1,&rawRTV,mipDsv.Get());
+    require(outrun::vr::dx11::verified_linear_opaque_single_eye_draw_ready(
+                vb,ctx.Get(),0,3,generation,version,
+                layout.Get(),vs.Get(),ps.Get(),rtv.Get(),
+                mipDsv.Get(),depthState.Get()),
+            "R215 R214 admits nonbase depth mip view");
+    require(!outrun::vr::dx11::verified_linear_sealed_opaque_eye_draw_ready(
+                vb,ctx.Get(),0,3,generation,version,32,32,
+                DXGI_FORMAT_R8G8B8A8_UNORM,
+                layout.Get(),vs.Get(),ps.Get(),rtv.Get(),
+                mipDsv.Get(),depthState.Get(),rs.Get()),
+            "R215 reject nonbase depth mip view");
+    ctx->ClearDepthStencilView(mipDsv.Get(),D3D11_CLEAR_DEPTH,1.f,0);
+    ctx->ClearRenderTargetView(rtv.Get(),clear);
+    ctx->Draw(3,0);
+    require(samplePixelEquals(255,0,0),
+            "R215 real WARP nonbase depth mip renders red");
+    ctx->OMSetRenderTargets(1,&rawRTV,ownDsv.Get());
+    require(sealedEyeReady(), "R215 original depth eye recovered");
+
 
     require(!outrun::vr::dx11::verified_linear_depth_om_identity_ready(
             vb,ctx.Get(),0,3,generation,version,

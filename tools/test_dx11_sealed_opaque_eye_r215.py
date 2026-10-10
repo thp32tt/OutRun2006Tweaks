@@ -15,6 +15,12 @@ guards = (
     "!verified_linear_opaque_single_eye_draw_ready(",
     "liveRaster.Get() != expectedRaster",
     "rasterDevice.Get() != liveDevice.Get()",
+    "depthView.ViewDimension != D3D11_DSV_DIMENSION_TEXTURE2D",
+    "depthView.Texture2D.MipSlice != 0",
+    "depthDesc.Width != width || depthDesc.Height != height",
+    "depthDesc.MipLevels != 1 || depthDesc.ArraySize != 1",
+    "depthDesc.SampleDesc.Count != 1",
+    "depthDesc.BindFlags & D3D11_BIND_DEPTH_STENCIL",
     "desc.CullMode == D3D11_CULL_NONE",
     "!desc.ScissorEnable && desc.DepthClipEnable",
 )
@@ -33,9 +39,13 @@ for phrase in (
     "R215 reject foreign raster owner",
     "R215 exact raster object restored",
     "R215 real WARP restores full-eye red pixel",
+    "R215 R214 admits nonbase depth mip view",
+    "R215 reject nonbase depth mip view",
+    "R215 real WARP nonbase depth mip renders red",
+    "R215 original depth eye recovered",
 ):
     assert phrase in probe, "missing R215 real WARP negative/restore evidence: " + phrase
 step = "python tools/test_dx11_sealed_opaque_eye_r215.py"
 assert workflow.count(step) == 1, "R215 must run exactly once in full conversion Gate"
 assert workflow.index(step) < workflow.index("Build DX11 linear VB/IB mirror R183 WARP probe")
-print("R215 sealed opaque eye: PASS; eight guard mutants and real WARP probes wired")
+print("R215 sealed opaque eye: PASS; fourteen guard mutants and real WARP probes wired")

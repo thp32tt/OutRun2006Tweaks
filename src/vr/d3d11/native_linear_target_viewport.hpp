@@ -92,6 +92,26 @@ namespace outrun::vr::dx11 {
             expectedRtv, expectedDsv, expectedDepthState))
         return false;
 
+    // R215 depth surface: an exact DSV object may still target mip 1 of
+    // a larger texture. Seal the *resource* as a dedicated full-eye surface,
+    // not just a compatible view with a matching OM object identity.
+    D3D11_DEPTH_STENCIL_VIEW_DESC depthView{};
+    expectedDsv->GetDesc(&depthView);
+    if (depthView.ViewDimension != D3D11_DSV_DIMENSION_TEXTURE2D ||
+        depthView.Texture2D.MipSlice != 0) return false;
+    Microsoft::WRL::ComPtr<ID3D11Resource> depthResource;
+    expectedDsv->GetResource(depthResource.GetAddressOf());
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> depthTexture;
+    if (!depthResource || FAILED(depthResource.As(&depthTexture)) ||
+        !depthTexture) return false;
+    D3D11_TEXTURE2D_DESC depthDesc{};
+    depthTexture->GetDesc(&depthDesc);
+    if (depthDesc.Width != width || depthDesc.Height != height ||
+        depthDesc.MipLevels != 1 || depthDesc.ArraySize != 1 ||
+        depthDesc.SampleDesc.Count != 1 ||
+        depthDesc.SampleDesc.Quality != 0 ||
+        !(depthDesc.BindFlags & D3D11_BIND_DEPTH_STENCIL)) return false;
+
     Microsoft::WRL::ComPtr<ID3D11RasterizerState> liveRaster;
     context->RSGetState(liveRaster.GetAddressOf());
     if (liveRaster.Get() != expectedRaster) return false;
