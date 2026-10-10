@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-10 16:22 KST",
+  "updated_at_kst": "2026-10-10 16:38 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,6 +50,33 @@
       "total": 243
     },
     "graphics_localization": {
+      "latest_b_q060_original_face_trial": {
+        "index": 60,
+        "role": "B",
+        "run": "B351",
+        "run_key": "OUTRUN-KOR-B351-Q060-SOURCE-PERROW-ORIGINAL-FACE-NATIVE-20261010-1635",
+        "backend": "GITHUB_ACTIONS",
+        "workflow_run": 38034823172,
+        "trial_persisted_sha256": "ab53447285cbd73e8fe7b138d8b39b49e3076d253c55d4c08e294476051c00cd",
+        "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+        "new_distinct_trial_dds": 1,
+        "new_official_promoted_dds": 0,
+        "original_face_pixels_sampled": 46849,
+        "source_face_row_count": 113,
+        "original_navy_pixels_sampled": 33028,
+        "original_source_width": 849,
+        "new_effect_width": 771,
+        "new_rgba_changed": 97359,
+        "changed_outside_roi": 0,
+        "persisted_decode_mismatch": 0,
+        "producer_visual_result": "REJECT_HEAVY_BROAD_HANGUL_AND_INSUFFICIENT_SOURCE_RACING_ITALIC",
+        "official_state": "C342_C2_REWORK_REQUIRED_UNCHANGED",
+        "fresh_C2": "NOT_RUN",
+        "C3": "BLOCKED",
+        "IGR044": "OPEN_USER_INGAME_FAIL",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "qa": "localization/graphics/role_B/20261010-B351-Q060-ENGLISH-PERROW-MATERIAL-PILOT/B351_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
+      },
       "latest_b_q060_contour_trial": {
         "index": 60,
         "role": "B",
