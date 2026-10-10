@@ -1447,19 +1447,6 @@ async def localization_parallel_cycle(context: BrowserContext, pages: dict[str, 
         return
 
     # Advance existing tasks; dispatch is controlled by the A/B -> C barrier.
-    # Dispatch missing enabled workers before advancing existing workers. A slow
-    # DX11 reconciliation must not starve the independent DX9Ex C worker.
-    # The dispatch planner still enforces the global two-worker WIP limit.
-    if not CONVERSION_ONLY_SLOT and not rate_limit_active(load_registry(datetime.now(TZ)), datetime.now(TZ)):
-        for lane_key in conversion_dispatch_plan(
-            active_by_lane,
-            CONVERSION_ACTIVE_LIMIT,
-            CONVERSION_DX11_ENABLED,
-            CONVERSION_DXVK_ENABLED,
-            CONVERSION_DX9EX_ENABLED,
-        ):
-            await conversion_send_lane_task(context, pages, q, lane_key)
-
     for lane_key in ("A", "B", "C"):
         if lane_key in active_by_lane:
             await localization_process_lane(context, pages, q, lane_key)
@@ -2206,6 +2193,19 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             })
         q["frozen_lane_tasks"] = frozen[-100:]
         save_queue_state(q)
+
+    # Dispatch missing enabled workers before advancing existing workers. A slow
+    # DX11 reconciliation must not starve the independent DX9Ex C worker.
+    # The dispatch planner still enforces the global two-worker WIP limit.
+    if not CONVERSION_ONLY_SLOT and not rate_limit_active(load_registry(datetime.now(TZ)), datetime.now(TZ)):
+        for lane_key in conversion_dispatch_plan(
+            active_by_lane,
+            CONVERSION_ACTIVE_LIMIT,
+            CONVERSION_DX11_ENABLED,
+            CONVERSION_DXVK_ENABLED,
+            CONVERSION_DX9EX_ENABLED,
+        ):
+            await conversion_send_lane_task(context, pages, q, lane_key)
 
     for lane_key in ("A", "B", "C"):
         if lane_key in active_by_lane:
