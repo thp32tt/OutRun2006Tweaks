@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B356/B357 q212 2026-10-10 19:47 KST TWO new native P1 mode-title DDS saved SHA db72a9b5 and 6d0098dc, r44 source ratio 54.1%->95.7%, r43 71.9%; official unchanged, B357 semantic qualifier/C2 HOLD, IGR029 OPEN, RUNTIME_VALIDATION=UNTESTED. RUN_KEY=OUTRUN-KOR-B356-B357-Q212-P1-NEW-SOURCE-MODE-TRIALS-20261010-1947.",
     "C2 2026-10-10 B355 q154 independent SHA 4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87 visually rejected for original-family counter/stem anatomy; official C356 REWORK unchanged. No current QA approval/real-game closure. OUTRUN-KOR-C2-Q154-B355-NEW-SHA-INDEPENDENT-VISUAL-20261010-1935.",
     "C1 q101 A226 new SHA ea145aa5 independent saved-DDS 2/2 glyph source bbox, protected external RGBA/alpha 0, 1246x210 PNG saved byte-exact, 13 BLACK/GRAY/WHITE 100/75/50 + RAW evidence; HOLD until independently SHA-pinned full English source, blind controls and source-specific italic anchors; official remains REWORK; C3/game UNTESTED. OUTRUN-KOR-C1-Q101-A226-EXACT-SAVED-PROTECTED-20261010-1920.",
     "C1 q237 2026-10-10 18:55 KST candidate SHA39f66e75 unchanged: 9/9 exact SOURCE/CLEAN/FINAL alpha bboxes, source-region-exterior RGBA/alpha=0, 15 genuine lossless native BGW/RAW/FLIP-Y evidence refs. HOLD pending blind calibration/style all9 cross-background and independent C3; real game UNTESTED. OUTRUN-KOR-C1-Q237-NATIVE-9REGION-BGW-20261010-1855.",
@@ -355,6 +356,42 @@
       "localization/graphics/role_B/20261010-B355-Q154-HISTORIC-NATIVE-COUNTER-INTERPOLATION/B355_CONTROLLER_PRODUCER_VISUAL_REJECT.json"
     ]
   },
+  "b356_b357_q212_source_mode_native_two_trials_20261010": {
+    "role": "B",
+    "queue_index": 212,
+    "priority": "P1_IGR029_USER_INGAME",
+    "run_key": "OUTRUN-KOR-B356-B357-Q212-P1-NEW-SOURCE-MODE-TRIALS-20261010-1947",
+    "triage": "MATERIAL_REWORK",
+    "canonical_source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "C158_full_clean_SHA_reference": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+    "unchanged_official_sha256": "e22ad5c46e81489123467783176dba1a040e0d2a36b6e6820349a9fcd87e9fea",
+    "B356_new_saved_trial_SHA": "db72a9b52bf6b86c0dfbc9181b17542aa81e21fe4fa8161769b0f657f4532d35",
+    "B357_new_saved_trial_SHA": "6d0098dcad41b0c430961f3d754455018cc59e0dea2f6d108a9d5c1180a5d88d",
+    "new_distinct_saved_trial_DDS": 2,
+    "promoted_DDS": 0,
+    "B356_r44_source_width_ratio": 0.5407,
+    "B357_r44_source_width_ratio": 0.9569,
+    "B357_r43_source_width_ratio": 0.719,
+    "B356_visual": "REWORK_REQUIRED_OUTRUN_TITLE_UNDERFILL",
+    "B357_visual": "SCOPED_SOURCE_HIERARCHY_IMPROVEMENT_HOLD_SEMANTICS_INDEPENDENT_C2",
+    "outside_atlas_other_ten_changed_pixels": [
+      0,
+      0
+    ],
+    "decoded_mismatch": [
+      0,
+      0
+    ],
+    "stage": "C1_AND_C2_AND_C3_NOT_REVIEWED_NEW_SHA",
+    "official_C2": "C338_REWORK_REQUIRED_UNCHANGED",
+    "C3": "BLOCKED",
+    "user_IGR029": "OPEN_USER_INGAME_FAIL",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "backend": "GITHUB_ACTIONS_TO_MATERIALIZE_REQUIRED_PINNED_REMOTE_LARGE_ASSETS_CHATGPT_LOCAL_VISUAL_REVIEW",
+    "B356_QA": "localization/graphics/role_B/20261010-B356-Q212-NATIVE-SOURCE-MODE-FAMILY/B356_CONTROLLER_QA.json",
+    "B357_QA": "localization/graphics/role_B/20261010-B357-Q212-NATIVE-SOURCE-MODE-FAMILY/B357_CONTROLLER_PRODUCER_QA.json",
+    "next": "C2 source-relative alpha/height/semantic word choice on B357 scoped two regions; full production manifest before any official hd_candidates update; existing C338 official remains unchanged."
+  },
   "prototype_history": {
     "branch": "korean-localization-prototype",
     "k1_ci_run_id": 35981045694,
@@ -420,7 +457,7 @@
     "batch52_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "batch53_fallback_reconcile_report": "localization/graphics/BATCH53_FALLBACK_RECONCILE_REPORT.json",
     "strict_qa_reset": {
-      "updated_at_kst": "2026-10-10 18:47:00 KST",
+      "updated_at_kst": "2026-10-10 19:47:00 KST",
       "report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
       "package_assets_scanned": 32,
       "rework_required": 24,
