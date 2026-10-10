@@ -17,16 +17,16 @@
     "tools/test_dx11_linear_predication_r230.py",
     ".github/workflows/backend-conversion-gate.yml"
   ],
-  "status": "WAITING_CI",
-  "checkpoint": "C4_REPAIR_COMMIT",
-  "terminal": false,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA_GATE",
+  "status": "BLOCKED_DEPENDENCY_R175",
+  "checkpoint": "C6_STATE",
+  "terminal": true,
+  "material_result_sha": "3b459bb74aed04db87765ee55c0c3d78db816517",
+  "validation_bearing_result_sha": "3b459bb74aed04db87765ee55c0c3d78db816517",
+  "automation_validation": "FAIL",
   "runtime_validation": "UNTESTED",
   "native_gameplay_activation": false,
   "hmd_test_performed": false,
-  "static_validation": "PASS_R221_10_AND_R230_5_MUTANTS_SCOPED",
+  "static_validation": "PASS_R221_10_AND_R230_5_MUTANTS_EXACT_SHA",
   "changed_files": [
     "src/vr/d3d11/native_linear_uav_eye_guard.hpp",
     "tools/dx11_linear_buffer_mirror_probe.cpp",
@@ -39,16 +39,17 @@
     "C0": "PASS recovered branch/checkpoint/00526 terminal",
     "C1": "PASS independent R230 linear predication owned-eye path",
     "C2": "PASS production C++ readiness fence and non-indexed WARP GPU restoration probe",
-    "C3": "INITIAL_GATE_FAIL R221 old full-file deletion test falsely matched R230 composition; run 38037301902 Win32 SUCCESS; focused R221 owner-scoped mutation test PASS; new exact-SHA Gate pending",
-    "C4": "R230 first material 4b3f8715; R221 static scope repair pending CAS",
-    "C5": "NOT_REQUIRED",
-    "C6": "PENDING"
+    "C3": "SCOPED_PASS exact 3b459bb7 Win32 validate, R221/R230 static and real R183 WARP Draw/PIXEL; FULL_GATE_FAIL inherited independent R175 constant buffer probe",
+    "C4": "PASS original material 4b3f8715 and scoped R221 mutation repair 3b459bb7 both [AUTO:CONVERSION-DX11-00527], no CI skip",
+    "C5": "NOT_REQUIRED; native gameplay Draw remains dormant; no HMD package",
+    "C6": "BLOCKED_DEPENDENCY_R175 Gate failure on exact SHA; record material 3b459bb7 separately from later state commit, runtime UNTESTED, score +0"
   },
   "blockers": [
-    "Existing independently owned R175 constant-buffer WARP mismatch may block full Gate."
+    "Full Backend Conversion Gate 38037881328 FAIL only at inherited, independently owned R175 TEXCOORD6 varying mismatch. Do not bypass.",
+    "Quest 3 / VDXR not tested; gameplay native Draw remains dormant."
   ],
   "score_change": 0,
-  "resume_cursor": "EXACT_SHA_CI_POLL",
+  "resume_cursor": "TERMINAL_BLOCKED_INDEPENDENT_R175_OWNER",
   "initial_material_sha": "4b3f87156894e8ff8ff37f01f17575b67e53dc10",
   "evidence": {
     "initial_gate": {
@@ -59,8 +60,48 @@
       "failed_step": "Verify R221 linear OM UAV isolation",
       "failure_class": "R221_FALSE_DUPLICATE_ON_R230_COMPOSED_CALLER"
     },
-    "focused_repair": "R221 mutator scope only; native R230 C++/WARP untouched."
+    "focused_repair": "R221 mutator scope only; native R230 C++/WARP untouched.",
+    "final_gate": {
+      "id": 38037881328,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38037881328",
+      "head_sha": "3b459bb74aed04db87765ee55c0c3d78db816517",
+      "status": "completed",
+      "conclusion": "failure",
+      "validate_job_id": 114172015732,
+      "validate": "success",
+      "smoke_job_id": 114172871380,
+      "smoke": "failure",
+      "r221_static": "success",
+      "r230_static": "success",
+      "r183_warp_build": "success",
+      "r183_warp_run": "success",
+      "failed_step": "Run DX11 constant buffer probe",
+      "failure_class": "R175_GENERIC_VARYING_MISMATCH",
+      "observed_bgra": [
+        128,
+        0,
+        16,
+        255
+      ],
+      "expected_bgra": [
+        224,
+        128,
+        32,
+        255
+      ],
+      "runtime": "UNTESTED"
+    }
   },
   "repair_commits": 1,
-  "gate_repair_count": 1
+  "gate_repair_count": 1,
+  "result_sha": "3b459bb74aed04db87765ee55c0c3d78db816517",
+  "scoped_automation_validation": "PASS_R221_R230_R183_SOURCE_WARP_WIN32",
+  "last_real_activity_at": "2026-10-10T08:34:57Z",
+  "last_activity_evidence": "Exact SHA 3b459bb7 Win32 SUCCESS, R221/R230 static SUCCESS and native R183 WARP build/run SUCCESS, R175 independent constant-buffer WARP failure",
+  "timestamp_kst": "2026-10-10 17:36 KST",
+  "score_run_key": "CONVERSION-DX11-00527",
+  "score_previous_confirmed": 1088,
+  "score_new_confirmed": 1088,
+  "known_blocker": "R175 TEXCOORD6 independent constant-buffer BGRA [128,0,16,255] vs expected [224,128,32,255], owner CONVERSION-DX11-00477; no R230 defect shown.",
+  "next_action": "Do not rerun 00527 or score it. Repair separately owned R175 under its existing fenced work_key; continue native DX11 with next independent TASK_ID after claim release. Game/HMD verification still required for activation."
 }
