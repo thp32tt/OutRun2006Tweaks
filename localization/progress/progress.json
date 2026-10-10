@@ -10969,8 +10969,8 @@
     "source_clean_diff": 61787,
     "clean_final_diff": 28442,
     "source_final_diff": 66385,
-    "views_persisted": 18,
-    "views_unpublished_white75": 9,
+    "views_persisted": 27,
+    "views_unpublished_white75": 0,
     "reason": "New SOURCE-CLEAN stage authenticated but C blind known-defect calibration, paired glyph readable slant, source-family and within-cell protected mask and white75 publication absent; do not promote C/C3 PASS",
     "qa": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_CONTROLLER_C1_HOLD.json",
     "machine": "localization/graphics/role_C/20261010-C1-Q225-INDEPENDENT-PLATE-ALPHA-NATIVE/C1_Q225_STRICT_PLATE_MACHINE.json",
@@ -10978,6 +10978,12 @@
     "C_PASS": false,
     "C3": "BLOCKED",
     "APPROVAL": "BLOCKED",
-    "RUNTIME_VALIDATION": "UNTESTED"
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "all_views_source_clean_final_published": true,
+    "views_by_presentation": {
+      "gray100": 9,
+      "black50": 9,
+      "white75": 9
+    }
   }
 }
