@@ -1,0 +1,36 @@
+{
+  "schema": 2,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "chatgpt2_material_inflight_claim",
+  "task_id": "CONVERSION-DX11-00524",
+  "production_id": "CONVERSION-DX11-00524",
+  "event_id": "CONVERSION-DX11-00524-E001",
+  "lane": "DX11",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00524",
+  "owner_epoch": 1,
+  "work_key": "DX11:R227:INDEXED_EYE_COLOR_RTV_ONLY_BACKING",
+  "conflict_keys": [
+    "src/vr/d3d11/native_indexed_target_viewport.hpp:R227",
+    "tools/dx11_viewport_draw_probe_r187.cpp:R227",
+    "tools/test_dx11_viewport_draw_r187.py:R227"
+  ],
+  "target_branch": "vr-dx11-native-r71",
+  "base_sha": "05ebb4e2cf3aba9767128851229241961f03ce2c",
+  "material_result_sha": "efdcf1a91615a7c8f010d803d2351693a3c0fd2a",
+  "validation_bearing_result_sha": "efdcf1a91615a7c8f010d803d2351693a3c0fd2a",
+  "ci_run_id": 38032871336,
+  "ci_status": "in_progress",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "checkpoint": "C3_WAIT_EXACT_SHA_CI",
+  "completed": [
+    "C0",
+    "C1",
+    "C2",
+    "C4"
+  ],
+  "local_static": "PASS 13 scoped negative source mutations",
+  "next_action": "Reconcile existing exact-SHA Backend Conversion Gate #38032871336; do not redispatch/rebuild/recommit this material. Afterwards persist game docs/automation/runs/CONVERSION-DX11-00524.json on separate bookkeeping commit without cancelling CI.",
+  "no_duplicate_same_task": true,
+  "latest_observed_controller_event": "CONVERSION-DX11-00524-E002"
+}
