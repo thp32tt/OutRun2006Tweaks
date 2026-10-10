@@ -15,7 +15,7 @@ def verify(text: str) -> None:
         "r84-baseline-game": ("r84-win32",),
         "r84-bundle": ("r84-win32", "r84-host", "r84-baseline-game"),
     }
-    headers = list(re.finditer(r"^  (r84-[a-z-]+):\s*$", text, re.M))
+    headers = list(re.finditer(r"^  (r84-[a-z0-9-]+):\s*$", text, re.M))
     blocks = {
         m.group(1): text[m.end():headers[i + 1].start()
                          if i + 1 < len(headers) else len(text)]
