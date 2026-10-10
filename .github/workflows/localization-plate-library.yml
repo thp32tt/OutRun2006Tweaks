@@ -1,0 +1,37 @@
+name: Localization Plate Library
+on:
+  push:
+    branches: [korean-localization-recovery-20260928]
+    paths:
+      - 'tools/localization/plate_library.py'
+      - 'tools/localization/test_plate_library.py'
+      - 'tools/localization/extract_psd_plate.py'
+      - 'tools/localization/test_extract_psd_plate.py'
+      - 'tools/localization/controller_prompts/**'
+      - 'tools/localization/deploy_plate_controller.py'
+      - 'localization/graphics/plate_library/**'
+      - 'docker/localization-production/**'
+      - '.github/workflows/localization-plate-library.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reusable-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r docker/localization-production/requirements.txt
+      - run: python -m unittest discover -s tools/localization -p 'test*plate*.py' -v
+      - name: Verify actual stored q060 bytes and immutable history
+        env:
+          BASE_SHA: ${{ github.event.before }}
+        run: python tools/localization/plate_library.py audit --base "$BASE_SHA"
+      - name: Build portable production helper
+        run: docker build -f docker/localization-production/Dockerfile -t outrun-plate:${{ github.sha }} .
+      - name: Execute same helper in Docker
+        run: docker run --rm -v "$PWD:/repo:ro" outrun-plate:${{ github.sha }} audit

@@ -1,0 +1,27 @@
+{
+  "schema": "clean-plate-library-v1",
+  "queue_index": 60,
+  "region_id": "BEST_TIME",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "orientation": "readable_flip_y",
+  "size": [
+    4096,
+    2048
+  ],
+  "background": "transparent",
+  "source_task_id": "OUTRUN-KOR-B348-Q060-P0-SOURCE-COMPONENT-PLATE-20261010-1230",
+  "provenance_commit": "75e7e6ca14f2e59ec674bc58c6aa465ab1e4f2f9",
+  "producer_evidence": {
+    "path": "localization/graphics/role_B/20261010-B348-Q060-BEST-TIME-SOURCE-COMPONENT-PLATE/B348_CONTROLLER_P1_VISUAL_QA.json",
+    "sha256": "107d025e09bed0bda7cb8577ad5948c58abd8387c7352ab994ad85c6b03d0d02"
+  },
+  "clean": {
+    "path": "localization/graphics/plate_library/objects/a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48.png",
+    "sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48"
+  },
+  "removal": {
+    "path": "localization/graphics/plate_library/objects/25a898178ea3e4fc08a16adfa35fa8612d8cdd4da274baf244ea67e29c24cca9.png",
+    "sha256": "25a898178ea3e4fc08a16adfa35fa8612d8cdd4da274baf244ea67e29c24cca9"
+  },
+  "scope": "BEST TIME only; other labels unchanged; IGR044 OPEN; no final DDS approval"
+}

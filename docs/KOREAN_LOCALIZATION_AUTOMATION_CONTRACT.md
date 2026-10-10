@@ -1,5 +1,13 @@
 # Korean Localization Automation Contract
 
+## Shared PSD/CLEAN engine — 2026-10-11
+
+A/B and C1/C2/C3 MUST apply `docs/KOREAN_LOCALIZATION_PLATE_LIBRARY.md`.
+Lookup exact reusable plates before reconstruction; qualify PSD layers against the
+canonical DDS, bind C plate review independently, and retain final DDS/C3/game gates.
+The library and controller prompts are production inputs, not a new queue.
+
+
 ## Production reset: qualify the method before multiplying candidates — 2026-10-09
 
 Read and apply `docs/KOREAN_LOCALIZATION_PRODUCTION_RESET.md` before A/B production

@@ -75,5 +75,18 @@
   "user_ingame_review": "docs/KOREAN_LOCALIZATION_INGAME_REVIEW_20261009.md",
   "approval_veto": "Current user in-game defect OPEN or REWORK/HOLD/FAIL => no current approval or preview distribution; actual user retest required.",
   "source_refresh": "Every task fetches latest GitHub contract, queue, backlog, QA pipeline and evidence rules before selection and verifies latest HEAD before commit.",
-  "policy_note": "Schema 1 metadata records effective temporary schedule. GitHub contract is authoritative; Docker prompt only routes slots."
+  "policy_note": "Schema 1 metadata records effective temporary schedule. GitHub contract is authoritative; Docker prompt only routes slots.",
+  "shared_production_inputs": {
+    "contract": "docs/KOREAN_LOCALIZATION_PLATE_LIBRARY.md",
+    "library": "localization/graphics/plate_library",
+    "entrypoint": "tools/localization/plate_library.py",
+    "psd_extractor": "tools/localization/extract_psd_plate.py",
+    "reuse_key": [
+      "queue_index",
+      "source_sha256",
+      "region_id",
+      "orientation"
+    ],
+    "new_dds_approval_inherited": false
+  }
 }
