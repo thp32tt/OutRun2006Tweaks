@@ -31,6 +31,8 @@ on:
       - 'tools/Start-OutRunVRPacing.ps1'
       - 'tools/Collect-OutRunVRFramePacing.ps1'
       - 'tools/Collect-OutRunVREyeExtent.ps1'
+      - 'tools/Start-OutRunVRNativeGeometry.ps1'
+      - 'tools/Collect-OutRunVRNativeGeometry.ps1'
       - 'CMakeLists.txt'
       - 'cmake.toml'
       - 'OutRun2006Tweaks.ini'
@@ -214,7 +216,7 @@ jobs:
         shell: pwsh
         run: |
           cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
-          cmake --build build-host --config Release --target outrun-vr-host outrun-vr-eye-extent-smoke outrun-vr-frame-pacing-smoke outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
+          cmake --build build-host --config Release --target outrun-vr-host outrun-vr-eye-extent-smoke outrun-vr-native-geometry-smoke outrun-vr-frame-pacing-smoke outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
           if (-not (Test-Path build-host/bin/outrun-vr-host.exe)) { throw 'DX9Ex OpenXR host missing' }
       - name: Run deterministic no-HMD host smoke tests
         shell: pwsh
@@ -258,6 +260,11 @@ jobs:
         run: |
           & ./build-host/bin/outrun-vr-eye-extent-smoke.exe --reset
           if ($LASTEXITCODE -ne 0) { throw 'XR-EYE-RESET failed' }
+      - name: 'Feature acceptance: XR-NATIVE-RASTER'
+        shell: pwsh
+        run: |
+          & ./build-host/bin/outrun-vr-native-geometry-smoke.exe
+          if ($LASTEXITCODE -ne 0) { throw 'XR-NATIVE-RASTER failed' }
       - name: Stage host
         shell: pwsh
         run: |
@@ -359,7 +366,7 @@ jobs:
           Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
           # Keep one GUI launcher. The slot selector invokes the PowerShell
           # test runner directly; duplicate batch entrypoints are not needed.
-          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1')) {
+          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1','Start-OutRunVRNativeGeometry.ps1','Collect-OutRunVRNativeGeometry.ps1')) {
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
@@ -377,6 +384,10 @@ jobs:
             '   설정 후 실제 게임 실행 파일은 OR2006C2C.EXE입니다.'
             '5. After the game closes, its diagnostic ZIP is auto-collected.'
             '6. For tonight HUD tests, choose B HUD (HUD_SCREEN) in the selector.'
+            'XR NATIVE GAME GEOMETRY OPT-IN: Start-OutRunVRNativeGeometry.ps1'
+            'Native D3D9Ex RASTER uses actual game high-resolution backbuffer; no desktop upscaling.'
+            'If host starts after game startup, change graphics settings to trigger GAME-initiated ResetEx.'
+            'Use Collect-OutRunVRNativeGeometry.ps1 to verify source pixels. HMD UNTESTED.'
             'XR EYE EXTENT: actual OpenXR allocated per-eye extent, not desktop pixels.'
             'After game exit run Collect-OutRunVREyeExtent.ps1 to compare shared texture allocation.'
             'Quest3/VDXR visual quality is UNTESTED.'
@@ -414,6 +425,9 @@ jobs:
             UserRuntimeVerified = $false
             XrEyeExtentPolicy = 'OPENXR_ALLOCATED_COMMON_EYE_EXTENT'
             XrEyeExtentHmdVerified = $false
+            NativeGameRasterDefault = 'OFF'
+            NativeGameRasterEnableWith = 'Start-OutRunVRNativeGeometry.ps1'
+            NativeGameRasterRuntimeVisualVerified = $false
             FramePacingDiagnosticsDefault = 'OFF'
             FramePacingEnableWith = 'Start-OutRunVRPacing.ps1'
           }
@@ -432,7 +446,7 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1','SHA256SUMS.txt','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md')) {
+          foreach ($file in @('OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1','Start-OutRunVRNativeGeometry.ps1','Collect-OutRunVRNativeGeometry.ps1','SHA256SUMS.txt','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
           }
           # Exactly one usable CMD entrypoint, no unused BAT/CMD scripts.
@@ -492,7 +506,7 @@ jobs:
               $inputs.FramePacingDiagnosticsDefault -ne 'OFF') {
             throw "PACING-BUNDLE manifest mismatch"
           }
-          foreach ($helper in @('Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1')) {
+          foreach ($helper in @('Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1','Start-OutRunVRNativeGeometry.ps1','Collect-OutRunVRNativeGeometry.ps1')) {
             $tokens = $null; $errors = $null
             [void][System.Management.Automation.Language.Parser]::ParseFile(
               (Resolve-Path (Join-Path verify $helper)), [ref]$tokens, [ref]$errors)
@@ -516,13 +530,52 @@ jobs:
               $report.HmdRuntimeVerified -or $report.NativeFpsVerified) {
             throw "PACING-BUNDLE executable collector regression failed"
           }
+      - name: 'Feature acceptance: XR-NATIVE-BUNDLE'
+        shell: pwsh
+        run: |
+          $inputs = Get-Content verify/BUILD_INPUTS.json -Raw | ConvertFrom-Json
+          if ($inputs.NativeGameRasterDefault -ne 'OFF' -or
+              $inputs.NativeGameRasterRuntimeVisualVerified -or
+              $inputs.NativeGameRasterEnableWith -ne 'Start-OutRunVRNativeGeometry.ps1') {
+            throw 'XR-NATIVE-BUNDLE opt-in manifest mismatch'
+          }
+          foreach ($script in @('Start-OutRunVRNativeGeometry.ps1','Collect-OutRunVRNativeGeometry.ps1')) {
+            $path = Join-Path verify $script
+            if (-not (Test-Path $path)) { throw "Missing native script: $script" }
+            $tokens=$null; $errors=$null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path $path),[ref]$tokens,[ref]$errors)
+            if ($errors.Count -gt 0) { throw "Invalid native script: $script" }
+          }
+          $root = Join-Path $env:RUNNER_TEMP 'dx9ex-native-raster'
+          $out = Join-Path $root 'report'
+          New-Item -Force -ItemType Directory $root | Out-Null
+          Set-Content (Join-Path $root 'outrun-vr-eye-extent.log') 'XR_EYE_EXTENT_V1 allocated=2124x2284 recommended0=2124x2284 recommended1=2124x2284 scale=1'
+          Set-Content (Join-Path $root 'OutRun2006Tweaks-native.log') 'VR native eye geometry: game D3D9Ex backbuffer RASTER source 5456x2284 >= XR eye 2124x2284'
+          & ./verify/Collect-OutRunVRNativeGeometry.ps1 -Root $root -Output $out
+          $good = Get-Content (Join-Path $out 'native-geometry-summary.json') -Raw | ConvertFrom-Json
+          if (-not $good.GameNativeRasterObserved -or
+              -not $good.GameRasterAtLeastXrPixels -or $good.RuntimeHmdVisualVerified) {
+            throw 'XR-NATIVE-BUNDLE positive fixture regression'
+          }
+          Set-Content (Join-Path $root 'OutRun2006Tweaks-native.log') 'VR native eye geometry: game D3D9Ex backbuffer RASTER source 1920x1080 >= XR eye 2124x2284'
+          & ./verify/Collect-OutRunVRNativeGeometry.ps1 -Root $root -Output $out
+          $bad = Get-Content (Join-Path $out 'native-geometry-summary.json') -Raw | ConvertFrom-Json
+          if ($bad.GameRasterAtLeastXrPixels -or -not $bad.GameNativeRasterObserved) {
+            throw 'XR-NATIVE-BUNDLE failed to detect upscaled-only source'
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: feature-dx9ex-native-raster-${{ github.sha }}
+          path: package/
+          if-no-files-found: error
       - name: 'Feature acceptance: XR-EYE-BUNDLE'
         shell: pwsh
         run: |
           foreach ($file in @('backends/d3d9/dinput8.dll',
               'backends/d3d9/outrun-vr-host.exe','backends/d3d9/SOURCE_SHA.txt',
               'BUILD_INPUTS.json','SHA256SUMS.txt','Collect-OutRunVRLogs.ps1',
-              'Collect-OutRunVREyeExtent.ps1')) {
+              'Collect-OutRunVREyeExtent.ps1','Start-OutRunVRNativeGeometry.ps1','Collect-OutRunVRNativeGeometry.ps1')) {
             if (-not (Test-Path (Join-Path verify $file))) {
               throw "XR-EYE-BUNDLE missing $file"
             }

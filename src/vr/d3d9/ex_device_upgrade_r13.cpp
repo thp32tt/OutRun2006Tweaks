@@ -240,11 +240,39 @@ namespace OutRunVRD3D9ExUpgradeR13
         if (FAILED(qi) || !deviceEx)
             return false;
 
+        const D3DPRESENT_PARAMETERS originalParams = *params;
+        D3DCAPS9 caps{};
+        OutRunVR::NativeGeometry::Decision nativeGeometry{};
+        if (SUCCEEDED(deviceEx->GetDeviceCaps(&caps)))
+            nativeGeometry = OutRunVR::NativeGeometry::TryApplyPresentation(
+                params, caps);
         D3DDISPLAYMODEEX fullscreen{};
         D3DDISPLAYMODEEX* fullscreenPtr =
             OutRunVRD3D9ExUpgrade::BuildFullscreenMode(
                 deviceEx, params, fullscreen);
         result = deviceEx->ResetEx(params, fullscreenPtr);
+        if (FAILED(result) && nativeGeometry.applied)
+        {
+            *params = originalParams;
+            fullscreenPtr = OutRunVRD3D9ExUpgrade::BuildFullscreenMode(
+                deviceEx, params, fullscreen);
+            result = deviceEx->ResetEx(params, fullscreenPtr);
+            spdlog::warn(
+                "VR native eye geometry: ResetEx oversize rejected; "
+                "game-requested {}x{} fallback hr=0x{:08X}",
+                originalParams.BackBufferWidth, originalParams.BackBufferHeight,
+                static_cast<unsigned>(result));
+        }
+        if (SUCCEEDED(result) && nativeGeometry.applied &&
+            params->BackBufferWidth == nativeGeometry.allocated.width &&
+            params->BackBufferHeight == nativeGeometry.allocated.height)
+        {
+            spdlog::info(
+                "VR native eye geometry: game-initiated ResetEx allocated "
+                "RASTER {}x{} >= XR eye {}x{}; HMD UNTESTED",
+                params->BackBufferWidth, params->BackBufferHeight,
+                nativeGeometry.xrEye.width, nativeGeometry.xrEye.height);
+        }
         deviceEx->Release();
         if (SUCCEEDED(result))
         {
