@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 11:42 KST",
+  "updated_at_kst": "2026-10-11 11:47 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -12672,5 +12672,40 @@
     "current_policy_APPROVAL": false,
     "RUNTIME_VALIDATION": "UNTESTED",
     "report": "localization/graphics/role_C/20261011-C2-Q012-C3-NEW-POLICY-OPTICAL/C2_Q012_C3_NEW_POLICY_REWORK.json"
+  },
+  "c1_20261011_q161_a237_r11_first_saved_independent": {
+    "at_kst": "2026-10-11 11:47 KST",
+    "role": "C1",
+    "shard": "ODD",
+    "queue_index": 161,
+    "run_key": "OUTRUN-KOR-C1-Q161-A237-R11-FIRST-INDEPENDENT-20261011-1140",
+    "result": "REWORK_REQUIRED_UNPROMOTED",
+    "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+    "trial_sha256": "fd1273493b52c39da0f858ca956d402e86b0b2f04f17987ca2cbf1878a2c68d0",
+    "prior_sha256": "8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e",
+    "official_sha256": "8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65",
+    "source_R11_wh": [
+      296,
+      54
+    ],
+    "trial_R11_wh": [
+      180,
+      48
+    ],
+    "new_A218_A237_rgba_changed": 11552,
+    "alpha_changed": 5930,
+    "outside_original_R11_RGBA": 0,
+    "outside_original_R11_alpha": 0,
+    "clean_R11_remaining_alpha": 0,
+    "reviewed_only": [
+      "R11_AQUARIUS"
+    ],
+    "other37_not_newly_approved": true,
+    "new_independent_C_PASS": 0,
+    "new_DDS_promoted": 0,
+    "C3": "NOT_RUN",
+    "APPROVALS": "NOT_CREATED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261011-C1-Q161-A237-FIRST-INDEPENDENT-SAVED-NATIVE/C1_Q161_A237_INDEPENDENT_C1_VISUAL_REWORK.json"
   }
 }
