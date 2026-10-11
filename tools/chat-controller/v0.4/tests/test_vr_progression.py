@@ -44,6 +44,102 @@ class Progression(unittest.TestCase):
             SOURCE,
         )
 
+    def test_dx9ex_ai_promoted_c6_recovers_changed_paths_from_ancestry(self):
+        ns = self.ns
+        contract = copy.deepcopy(self.backlog['features'][3])
+        base, candidate = 'a'*40, 'b'*40
+        source = ['src/vr/ipc/xr_eye_extent.hpp',
+                  'src/vr/d3d9/stereo_renderer_r7.inc',
+                  'tools/Collect-OutRunVREyeExtent.ps1']
+        ns['GITHUB_REPO'] = 'example/repo'
+        ns['github_api_json'] = lambda url: {
+            'behind_by': 0, 'ahead_by': 2,
+            'files': [{'filename': p} for p in source]
+        }
+        active = dict(task_id='DX9EX-TEST', branch='vr-d3d9ex-focus',
+                      feature_contract=contract, feature_base_sha=base,
+                      delivery_evidence={'sha': candidate})
+        record = dict(task_id='DX9EX-TEST', target_branch='vr-d3d9ex-focus',
+                      feature_id=contract['feature_id'], work_key=contract['work_key'],
+                      checkpoint='C6_STATE', status='COMPLETE_BUILD_VERIFIED',
+                      automation_validation='PASS_EXACT_SHA',
+                      validation_bearing_result_sha=candidate,
+                      acceptance_results=[
+                          {'id': item['id'], 'status': 'PASS_FEATURE_CI',
+                           'evidence_paths': [source[0] if item['id'] == 'XR-EYE-SIZING'
+                                              else source[1] if item['id'] == 'XR-EYE-RESET'
+                                              else source[2]],
+                           'validation_command': 'CI on exact candidate'}
+                          for item in contract['acceptance_items']
+                      ])
+        gate = dict(head_sha=candidate, status='completed', conclusion='success')
+        self.assertEqual(ns['conversion_terminal_verdict'](record, active, gate),
+                         (True, 'C6_EXACT_SHA_VERIFIED'))
+        self.assertEqual(active['feature_changed_paths'], source)
+        # Reject a divergent or unverifiable material ancestry.
+        active.pop('feature_changed_paths')
+        ns['github_api_json'] = lambda _: {
+            'behind_by': 1, 'ahead_by': 1,
+            'files': [{'filename': p} for p in source]
+        }
+        self.assertEqual(ns['conversion_terminal_verdict'](record, active, gate)[0], False)
+
+    def test_durable_dx11_c6_repairs_historical_blocked_dependency_only_after_ci(self):
+        ns = self.ns
+        contract = copy.deepcopy(self.backlog['features'][0])
+        head, candidate, base = 'c'*40, 'b'*40, 'a'*40
+        task_id = 'CONVERSION-DX11-00537'
+        feature_id = contract['feature_id']
+        q = dict(
+            active_by_lane={},
+            completed=[],
+            blocked=[dict(task_id=task_id, feature_id=feature_id,
+                          branch='vr-dx11-native-r71', feature_base_sha=base,
+                          failure_context='OLD_FAILED_CI', phase='DONE')],
+            feature_outcomes={feature_id: {'terminal': 'BLOCKED', 'task_id': task_id}})
+        ns['GITHUB_REPO'] = 'example/repo'
+        ns['github_branch_head'] = lambda _: head
+        evidence = ['src/vr/d3d11/live_game_frame_bridge.cpp',
+                    'tools/package_dx11_first_game_frame.py']
+        ns['github_api_json'] = lambda url: ({
+            'behind_by': 0, 'ahead_by': 1,
+            'files': [{'filename': p} for p in evidence],
+        } if '/compare/' in url else {})
+        ns['github_task_record'] = lambda h, ident: dict(
+            task_id=ident, target_branch='vr-dx11-native-r71',
+            feature_id=feature_id, work_key=contract['work_key'],
+            status='COMPLETE_DX11_FIRST_GAME_FRAME_DIAGNOSTIC_CI_RUNTIME_UNTESTED',
+            checkpoint='C6_RESULT', automation_validation='PASS_EXACT_SHA',
+            validation_bearing_result_sha=candidate,
+            acceptance_results=[
+                dict(id=item['id'], status='PASS_FEATURE_CI',
+                     evidence_paths=[evidence[1] if item['id'] == 'DX11-TEST-BUNDLE'
+                                     else evidence[0]],
+                     validation_command='exact-SHA tested')
+                for item in contract['acceptance_items']])
+        ns['github_gate_run'] = lambda *a, **kw: dict(
+            head_sha=candidate, status='completed', conclusion='success')
+        ns['save_queue_state'] = lambda _: None
+        def delivered(active, sha):
+            active['delivery_evidence'] = {'sha': sha}
+            return True, 'PASS'
+        ns['github_feature_delivery_evidence'] = delivered
+        self.assertTrue(ns['vr_reconcile_durable_blocked_outcomes'](self.backlog, 'DX11', q))
+        self.assertEqual(q['feature_outcomes'][feature_id]['terminal'], 'PASS')
+        self.assertEqual(q['completed'][-1]['task_id'], task_id)
+        self.assertFalse(q['blocked'])
+        self.assertEqual(ns['vr_select_feature'](self.backlog, 'DX11', q)['feature_id'],
+                         'DX11:MENU_TO_RACE_FRAME')
+        # CI failures may never silently repair a historical BLOCKED task.
+        q['feature_outcomes'][feature_id]['terminal'] = 'BLOCKED'
+        q['blocked'] = [dict(task_id=task_id, feature_id=feature_id,
+                             branch='vr-dx11-native-r71', feature_base_sha=base)]
+        q['completed'] = []
+        q['vr_blocked_outcome_recheck_at'] = {}
+        ns['github_feature_delivery_evidence'] = lambda active, sha: (False, 'NO_CI')
+        self.assertFalse(ns['vr_reconcile_durable_blocked_outcomes'](self.backlog, 'DX11', q))
+        self.assertEqual(q['feature_outcomes'][feature_id]['terminal'], 'BLOCKED')
+
     def test_dx11_existing_runtime_untested_acceptance_schema(self):
         contract = copy.deepcopy(self.backlog['features'][0])
         results = []
