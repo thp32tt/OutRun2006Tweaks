@@ -864,98 +864,11 @@ namespace
             return status;
         }
 
-        bool gameRegionChanged = false;
-        auto intersectsGame = [&](const RECT& rect) noexcept
-        {
-            RECT intersection{};
-            return status.fullGameClientVisible &&
-                IntersectRect(&intersection, &rect, &gameRect) != FALSE &&
-                intersection.right > intersection.left &&
-                intersection.bottom > intersection.top;
-        };
-
-        UINT dirtyBytes = 0;
-        HRESULT dirtyHr =
-            c.duplication_->GetFrameDirtyRects(
-                0, nullptr, &dirtyBytes);
-        if ((dirtyHr == DXGI_ERROR_MORE_DATA ||
-             SUCCEEDED(dirtyHr)) &&
-            dirtyBytes >= sizeof(RECT))
-        {
-            try
-            {
-                std::vector<RECT> dirty(
-                    (dirtyBytes + sizeof(RECT) - 1) /
-                    sizeof(RECT));
-                UINT actual = dirtyBytes;
-                if (SUCCEEDED(c.duplication_->GetFrameDirtyRects(
-                        static_cast<UINT>(
-                            dirty.size() * sizeof(RECT)),
-                        dirty.data(), &actual)))
-                {
-                    const UINT count = std::min<UINT>(
-                        static_cast<UINT>(dirty.size()),
-                        actual / sizeof(RECT));
-                    for (UINT i = 0; i < count; ++i)
-                    {
-                        if (intersectsGame(dirty[i]))
-                        {
-                            gameRegionChanged = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            catch (...) {}
-        }
-
-        if (!gameRegionChanged)
-        {
-            UINT moveBytes = 0;
-            HRESULT moveHr =
-                c.duplication_->GetFrameMoveRects(
-                    0, nullptr, &moveBytes);
-            if ((moveHr == DXGI_ERROR_MORE_DATA ||
-                 SUCCEEDED(moveHr)) &&
-                moveBytes >= sizeof(DXGI_OUTDUPL_MOVE_RECT))
-            {
-                try
-                {
-                    std::vector<DXGI_OUTDUPL_MOVE_RECT> moves(
-                        (moveBytes +
-                         sizeof(DXGI_OUTDUPL_MOVE_RECT) - 1) /
-                        sizeof(DXGI_OUTDUPL_MOVE_RECT));
-                    UINT actual = moveBytes;
-                    if (SUCCEEDED(
-                            c.duplication_->GetFrameMoveRects(
-                                static_cast<UINT>(
-                                    moves.size() *
-                                    sizeof(DXGI_OUTDUPL_MOVE_RECT)),
-                                moves.data(), &actual)))
-                    {
-                        const UINT count = std::min<UINT>(
-                            static_cast<UINT>(moves.size()),
-                            actual /
-                            sizeof(DXGI_OUTDUPL_MOVE_RECT));
-                        for (UINT i = 0; i < count; ++i)
-                        {
-                            if (intersectsGame(
-                                    moves[i].DestinationRect))
-                            {
-                                gameRegionChanged = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-                catch (...) {}
-            }
-        }
-
-        if (!gameRegionChanged &&
-            status.fullGameClientVisible &&
-            fi.AccumulatedFrames > 1)
-            gameRegionChanged = true;
+        // DXGI dirty/move metadata is output-global and advisory. R35.3
+        // already selects a classic SBS frame by completed Frame.v2 history,
+        // LastPresentTime and QPC skew, then rechecks that exact frame.
+        // Avoid two DXGI metadata round-trips and per-frame heap allocations
+        // in the 72 Hz XR capture path; neither metadata list gates stereo.
 
         ID3D11Texture2D* texture = nullptr;
         const HRESULT qi = resource->QueryInterface(
@@ -996,7 +909,6 @@ namespace
                 c.lastCapturePresentQpc_;
             status.lastPresentQpcLow =
                 c.lastCapturePresentQpcLow_;
-            status.gameRegionChanged = gameRegionChanged;
             status.accumulatedFrames = fi.AccumulatedFrames;
             OutRunVrSbsCaptureOverride::PublishProductionCapture(
                 c.source_, c.outputDesktop_, c.targetMonitor_,
@@ -2551,11 +2463,10 @@ int main(int argc, char** argv)
                             candidateCaptureQpc = capture.lastPresentQpc;
 
                             // LastPresentTime is output-global. Require the
-                            // complete OutRun client to be visible and require a
-                            // dirty/move update that intersects that client.
-                            // Then correlate against the four-entry Frame.v2
-                            // history and choose the closest game Present at or
-                            // before the captured output frame.
+                            // complete OutRun client to be visible, then use
+                            // the four-entry stable Frame.v2 history/QPC skew
+                            // to identify the actual completed game Present.
+                            // Dirty/move metadata cannot establish ownership.
                             const std::int64_t maxSkewTicks =
                                 qpcFrequency.QuadPart > 0
                                 ? qpcFrequency.QuadPart / 10 // 100 ms
@@ -2610,9 +2521,6 @@ int main(int argc, char** argv)
                                 else if (!capture.fullGameClientVisible)
                                     candidateRejectReason =
                                         "sbs-client-clipped";
-                                else if (!capture.gameRegionChanged)
-                                    candidateRejectReason =
-                                        "desktop-update-outside-game";
                                 else
                                     candidateRejectReason =
                                         "capture-frame-history-miss";
