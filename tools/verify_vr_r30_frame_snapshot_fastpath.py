@@ -63,7 +63,7 @@ def verify(text):
         "rightHr = R29OwnerCallOriginalSetRenderTarget(")
     sky = block(text, "R30ApplyStereoSkyGlow")
     assert "R30SkyGlowSceneCaptureEpoch != frame.presentEpoch" in sky
-    assert "R30SkyGlow.factor > 1" in sky
+    assert "R30SkyGlow.factor > 1;" in sky
     assert "stateBlock->Apply()" in sky
     scene = block(text, "R30CaptureSkyGlowSceneBeforeHud")
     assert "R30SkyGlowSceneCaptureEpoch == frame.presentEpoch" in scene
@@ -101,7 +101,7 @@ if __name__ == "__main__":
          "R29OwnerRestoreRightPassState", "R29OwnerNoRestore"),
         ("R30ApplyStereoSkyGlow",
          "R30SkyGlowSceneCaptureEpoch != frame.presentEpoch", "true"),
-        ("R30ApplyStereoSkyGlow", "R30SkyGlow.factor > 1", "false"),
+        ("R30ApplyStereoSkyGlow", "R30SkyGlow.factor > 1;", "false;"),
     )
     for name, good, bad in negatives:
         try:
