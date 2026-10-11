@@ -94,6 +94,7 @@ on:
       - 'tools/verify_vr_session_direct_hold_lifetime.py'
       - 'tools/verify_vr_direct_hold_desc_fastpath.py'
       - 'tools/verify_vr_capture_metadata_fastpath.py'
+      - 'tools/verify_vr_r28_active_frame_pacing.py'
       - 'tools/verify_vr_desktop_capture_reuse.py'
       - 'tools/verify_vr_theater_capture_once.py'
       - 'vrhost/src/runtime/theater_capture_reuse.hpp'
