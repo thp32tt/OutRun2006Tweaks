@@ -246,21 +246,18 @@ namespace OutRunVRStereo
                     state.enabled)))
                 return false;
 
-            HRESULT hr = ClearHook.stdcall<HRESULT>(device, 0u, nullptr,
-                D3DCLEAR_ZBUFFER, 0, R23DepthClearZ, 0);
+            // D3D9 supports simultaneous depth/stencil clear on a D24S8
+            // surface. A single Clear submits one GPU operation per private
+            // eye instead of two when the verified stencil baseline is safe.
+            // Keep depth-only behavior for non-stencil/unsafe baselines.
+            const bool clearStencil = stencilSafe && SurfaceHasStencil(depth);
+            const DWORD clearFlags = D3DCLEAR_ZBUFFER |
+                (clearStencil ? D3DCLEAR_STENCIL : 0u);
+            const HRESULT hr = ClearHook.stdcall<HRESULT>(device, 0u, nullptr,
+                clearFlags, 0, R23DepthClearZ,
+                clearStencil ? R23StencilClearValue : 0u);
             ++R23RecoveryVrSurfaceWrites;
-            if (FAILED(hr))
-                return false;
-
-            if (SurfaceHasStencil(depth) && stencilSafe)
-            {
-                hr = ClearHook.stdcall<HRESULT>(device, 0u, nullptr,
-                    D3DCLEAR_STENCIL, 0, 1.0f, R23StencilClearValue);
-                ++R23RecoveryVrSurfaceWrites;
-                if (FAILED(hr))
-                    return false;
-            }
-            return true;
+            return SUCCEEDED(hr);
         }
 
         bool R23InitializeStereoFromAuthoritativeBaseline(
