@@ -36,7 +36,14 @@
       "queue_indexes": [
         92
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/1A43E9D9/1A43E9D9_512x64.psd",
+          "source_sha256": "ee000ce057b58891a62ecfe419ac50fd798a6d660bf5a2bb47a6870f798b8923",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "1F5FE6E9",
@@ -56,7 +63,14 @@
       "queue_indexes": [
         15
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/20389D70/20389D70_512x256.psd",
+          "source_sha256": "eb3ee5b4e813dd0469746ebe04740e88cce867920a35c81c80f03c1f6184be71",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "23DDB6EC",
@@ -76,7 +90,18 @@
       "queue_indexes": [
         135
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/2B0863D6/2B0863D6_512x64.psd",
+          "source_sha256": "cf4e75aa86b730322456d5bdfdf5d74a4028f2cda1a15008e3c61f21989972f8",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/2B0863D6/fc60ed58_2B0863D6_512x64.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
     },
     {
       "texture_hash": "2DA43E41",
@@ -116,7 +141,14 @@
       "queue_indexes": [
         140
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/31C58963/31C58963_512x256-v01.psd",
+          "source_sha256": "eb9ad0f04f22a5ea00a4d6ce7ea90dbb6618c5d02871be341a83a75d122d100f",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "31C58963",
@@ -186,7 +218,14 @@
       "queue_indexes": [
         147
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/39BCA907/39BCA907_512x256-v02-rankings.psd",
+          "source_sha256": "93c8e7e8120dc71ed858dac7e712915d3aff48295d9d6a090907eb127030bbb0",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "411827E",
@@ -216,7 +255,14 @@
       "queue_indexes": [
         98
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/42E618FD/42E618FD_512x32.psd",
+          "source_sha256": "e1444b1bc64bf03a3ede344c8ad85b9c947cd9c63e75b5cf3fb28ef59e29042a",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "42E618FD",
@@ -236,7 +282,14 @@
       "queue_indexes": [
         89
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/43B07A77/43B07A77_512x64.psd",
+          "source_sha256": "d2a54d9b7a237e510466dcb3c37a6198bf6b1f737cdaef22131f7f85aadb4dc5",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "455717B2",
@@ -286,7 +339,14 @@
       "queue_indexes": [
         99
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/4F68708E/4F68708E_512x64.psd",
+          "source_sha256": "b16da54d9aee12014b7e732cb345b27410f964332fd575a86597b2d65d7906ba",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "53CE39D5",
@@ -376,7 +436,14 @@
       "queue_indexes": [
         104
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/62BEBF33/62BEBF33_512x64.psd",
+          "source_sha256": "eefb1c6a234e49e16789fd9fb2307f200cea84f3b8e6423e50d029eced60249b",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "638F38C0",
@@ -416,7 +483,18 @@
       "queue_indexes": [
         176
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/75C3586A/75C3586A_512x512.psd",
+          "source_sha256": "792370acb2c535e6ee077c5a5b10a23bea5c8c38a1f762da6af00a9882046890",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/75C3586A/9d9cb060_75C3586A_512x512.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
     },
     {
       "texture_hash": "788CE557",
@@ -466,7 +544,14 @@
       "queue_indexes": [
         182
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/7D747BED/7D747BED_512x128.psd",
+          "source_sha256": "58a3504fe3602b9ba943813b693cb1456a1093b02b91b3f4137aba1b9104e978",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "8215FD25",
@@ -486,7 +571,14 @@
       "queue_indexes": [
         107
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/841E796B/841E796B_512x128.psd",
+          "source_sha256": "9331393520f55930ffa9b60ecee4f4ae5fb514400a1b5d31f875e101b45c370f",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "8C259C68",
@@ -496,7 +588,18 @@
       "queue_indexes": [
         188
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/8C259C68/8C259C68_512x512.psd",
+          "source_sha256": "41aa999f764109eec5a4d3153077bd9b1bd084214bd8701187cbc80eb09d132b",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/8C259C68/e1b1b75f_8C259C68_512x512.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
     },
     {
       "texture_hash": "A05BF610",
@@ -516,7 +619,18 @@
       "queue_indexes": [
         60
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/A064FDFC/A064FDFC_1024x512-v02.psd",
+          "source_sha256": "cb03eb03f6515da0453c0e70d316a89955fa6da9690833354b869145c97a8024",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/A064FDFC/872dd766_A064FDFC_1024x512-v02.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
     },
     {
       "texture_hash": "A82266FC",
@@ -546,7 +660,13 @@
       "queue_indexes": [
         205
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/source_psd_upstream/ACF61D7C/ef8c36f0_ACF61D7C_1024x512-v02.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
     },
     {
       "texture_hash": "AD720950",
@@ -556,7 +676,14 @@
       "queue_indexes": [
         47
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/AD720950/AD720950_1024x256.psd",
+          "source_sha256": "53292beece6e09aba049a2c36a6e4bf43e445393250a7334502f17ab05fc3c66",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "B1696633",
@@ -586,7 +713,18 @@
       "queue_indexes": [
         212
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/BA0147DA/BA0147DA_512x512.psd",
+          "source_sha256": "be5095d2598a831461e2e345c8fd2cead0cdd8de00ea7481256f0494c671d736",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/BA0147DA/28117e7e_BA0147DA_512x512.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
     },
     {
       "texture_hash": "BF3EE5C6",
@@ -596,7 +734,18 @@
       "queue_indexes": [
         49
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/BF3EE5C6/BF3EE5C6_512x512.psd",
+          "source_sha256": "7efc2461045eea5623282e3bab2e8ede8b6d71933cde7ba43d3b9c8bc92b51a2",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/BF3EE5C6/498540db_BF3EE5C6_512x512.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
     },
     {
       "texture_hash": "C05E67EF",
@@ -606,7 +755,14 @@
       "queue_indexes": [
         215
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/C05E67EF/C05E67EF_128x64-v02-rankings.psd",
+          "source_sha256": "3da2f0b0489143666ade6f5addf33337da0ee21a7a142c13ef642999145f413b",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "C075FB49",
@@ -676,7 +832,14 @@
       "queue_indexes": [
         112
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/D41D0B1/D41D0B1_512x64.psd",
+          "source_sha256": "a7b9afc8cc9b4884f4d86015d489ea830076af0da63423191796b84141de0440",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "DCC7B488",
@@ -686,7 +849,14 @@
       "queue_indexes": [
         32
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/DCC7B488/DCC7B488_512x256.psd",
+          "source_sha256": "5d90681d0ca9d2343026c063f5de31dd06702dc4c58878e32c95ef0311bbd883",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "E3C455FA",
@@ -706,7 +876,14 @@
       "queue_indexes": [
         116
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/E3FD08BE/E3FD08BE_512x64.psd",
+          "source_sha256": "3406257ce04ed7af0ef554496095236587133df445fb695aa305ac6703800185",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "E596B7AC",
@@ -716,7 +893,18 @@
       "queue_indexes": [
         227
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/E596B7AC/E596B7AC_512x512.psd",
+          "source_sha256": "560e794deeaa1f0293241885f4bd4ffe1677285a8623a129ca6ebac149963e29",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/E596B7AC/def27174_E596B7AC_512x512.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
     },
     {
       "texture_hash": "E95DA5",
@@ -726,7 +914,18 @@
       "queue_indexes": [
         230
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/E95DA5/E95DA5_512x256.psd",
+          "source_sha256": "7c10141cd63e39a61e83dd12d18b99194e252cf25a7b2d1150caa4109fca4043",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        },
+        {
+          "path": "localization/graphics/source_psd_upstream/E95DA5/0ca28fa2_E95DA5_512x256.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
     },
     {
       "texture_hash": "E989E3B7",
@@ -756,7 +955,14 @@
       "queue_indexes": [
         119
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/F6811E94/F6811E94_512x64.psd",
+          "source_sha256": "7050d00f3c621b580076be1e65fd75ab5751638dbf6a5b1530b2799556126b87",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "FA7BBB13",
@@ -796,7 +1002,14 @@
       "queue_indexes": [
         121
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/plate_library/upstream_psd/FD90AA9/FD90AA9_1024x1024.psd",
+          "source_sha256": "0b5f7d32ea66b4d6546775af7759b927b8b26f1a5e768dd99adf80a02f95e081",
+          "verified": "ORIGINAL_GIT_BLOB_AND_SHA256"
+        }
+      ]
     },
     {
       "texture_hash": "FD90AA9",
@@ -806,7 +1019,13 @@
       "queue_indexes": [
         121
       ],
-      "copied_into_branch": false
+      "copied_into_branch": true,
+      "current_copies": [
+        {
+          "path": "localization/graphics/source_psd_upstream/FD90AA9/68e32365_FD90AA9_1024x1024.psd",
+          "verified": "ORIGINAL_GIT_BLOB"
+        }
+      ]
     },
     {
       "texture_hash": "FF2462BB",
@@ -818,5 +1037,9 @@
       ],
       "copied_into_branch": false
     }
-  ]
+  ],
+  "copied_unique_source_files": 27,
+  "copied_distinct_texture_hashes": 26,
+  "copy_status": "SOURCE_PSD_BYTES_ONLY_LAYER_AND_CANONICAL_GAME_DDS_VALIDATION_SEPARATE",
+  "last_verified_at_kst": "2026-10-11 20:47 KST"
 }
