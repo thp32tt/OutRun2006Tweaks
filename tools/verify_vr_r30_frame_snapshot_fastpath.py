@@ -75,12 +75,14 @@ if __name__ == "__main__":
     verify(src)
     # Target each destructive mutation to the function actually being checked.
     # A global first match may hit an earlier SkyGlow path instead and pass.
+    # Replace every matching occurrence inside the selected function: the
+    # SkyGlow branch has multiple independent factor>1 consumers.
     def mutate_function(src, name, good, bad):
         anchor = src.index(name + "(")
         scope_start = src.index("{", anchor)
         scope = block(src, name)
         assert good in scope, (name, good)
-        return (src[:scope_start] + scope.replace(good, bad, 1) +
+        return (src[:scope_start] + scope.replace(good, bad) +
                 src[scope_start + len(scope):])
 
     negatives = (
