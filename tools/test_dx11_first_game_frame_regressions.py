@@ -249,7 +249,7 @@ def main() -> None:
         )
         required_vertices = (
             "const UINT diffuseOffset = pretransformed ? 16u : 12u;",
-            "stride < diffuseOffset + 4u",
+            "stride < diffuseOffset + (capture.enabled ? 12u : 4u)",
             "std::memcpy(xyz, data, diffuseOffset)",
             "std::memcpy(&diffuse, data + diffuseOffset",
             "next[col] += clip[row] * matrix.m[row][col];",
@@ -271,7 +271,7 @@ def main() -> None:
          "lighting && vertexBlend != D3DVBF_DISABLE"),
         ("next[col] += clip[row] * matrix.m[row][col];",
          "next[col] += clip[row] * matrix.m[col][row];"),
-        ("stride < diffuseOffset + 4u", "stride < 20u"),
+        ("stride < diffuseOffset + (capture.enabled ? 12u : 4u)", "stride < 20u"),
         ("clip[3] <= 0.0f", "clip[3] < 0.0f"),
     ):
         changed = bridge.replace(good, bad, 1)
