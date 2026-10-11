@@ -1522,7 +1522,7 @@ def main() -> None:
     # becomes DX11 constant-buffer w -> native shader/Draw/diagnostic inset.
     # Source + CPU proof; no live gamepad, HMD or in-game pixel evidence.
     factor_links = (
-        "op == D3DTOP_BLENDFACTORALPHA &&",
+        "const bool blendFactorAlpha = op == D3DTOP_BLENDFACTORALPHA &&",
         "alphaOp == D3DTOP_BLENDFACTORALPHA;",
         "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)",
         "blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;",
