@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 09:20 KST",
+  "updated_at_kst": "2026-10-11 09:30 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -12472,5 +12472,24 @@
     "approved_dds": 0,
     "candidate_unchanged": true,
     "qa": "localization/graphics/role_C/20261011-C385-C1-Q035-A196-SOURCE-FAMILY-OPTICAL-REWORK/C385_Q035_INDEPENDENT_C1_REWORK.json"
+  },
+  "c2_q212_psd_source_independent_20261011_0930": {
+    "review_id": "C2-Q212-PSD-LAYER-INDEPENDENT-SOURCE-20261011-0930",
+    "queue_index": 212,
+    "shard": "EVEN",
+    "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+    "psd_sha256": "be5095d2598a831461e2e345c8fd2cead0cdd8de00ea7481256f0494c671d736",
+    "full_native_rgba_difference_pixels": 0,
+    "pixels_compared": 4194304,
+    "source_provenance": "PASS_EXACT",
+    "title_clean": "HOLD",
+    "prior_candidate_C2": "C373 B362 already REWORK",
+    "repeat_sha_C_PASS": false,
+    "official_candidate_unchanged": true,
+    "new_DDS": 0,
+    "C_approved": 0,
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261011-C2-Q212-PSD-SOURCE-LAYER-INDEPENDENT/C2_Q212_PSD_SOURCE_LAYER_INDEPENDENT_QA.json"
   }
 }
