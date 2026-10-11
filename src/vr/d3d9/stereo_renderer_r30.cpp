@@ -3974,8 +3974,11 @@ namespace OutRunVRStereo
     bool R30SupportTryGetDirectTransportSourceSurfaces(
         R30SupportDirectTransportSourceSurfaces& out) noexcept
     {
-        out.left = R29OwnerCaptureFrameSnapshot().backBuffer;
-        out.right = R29OwnerCaptureFrameSnapshot().rightEyeSurface;
+        // Publish one coherent owner view instead of assembling two separate
+        // frame snapshots while resolving a DirectGPU transport slot.
+        const auto frame = R29OwnerCaptureFrameSnapshot();
+        out.left = frame.backBuffer;
+        out.right = frame.rightEyeSurface;
         return out.left != nullptr && out.right != nullptr;
     }
 
@@ -3997,17 +4000,17 @@ namespace OutRunVRStereo
 
     IDirect3DSurface9* R30SupportBorrowedTrackedDepthStencil() noexcept
     {
-        return R29OwnerCaptureFrameSnapshot().trackedDepthStencil;
+        return R29OwnerBorrowTrackedDepthStencil();
     }
 
     IDirect3DSurface9* R30SupportBorrowedRightEyeSurface() noexcept
     {
-        return R29OwnerCaptureFrameSnapshot().rightEyeSurface;
+        return R29OwnerBorrowRightEyeSurface();
     }
 
     IDirect3DSurface9* R30SupportBorrowedRightEyeDepth() noexcept
     {
-        return R29OwnerCaptureFrameSnapshot().rightEyeDepth;
+        return R29OwnerBorrowRightEyeDepth();
     }
 
     bool R30SupportEnsureStereoResources(IDirect3DDevice9* device) noexcept

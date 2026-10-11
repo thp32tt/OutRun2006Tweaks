@@ -812,6 +812,21 @@ namespace OutRunVRStereo
         return TrackedRenderTarget;
     }
 
+    IDirect3DSurface9* R29OwnerBorrowTrackedDepthStencil() noexcept
+    {
+        return TrackedDepthStencil;
+    }
+
+    IDirect3DSurface9* R29OwnerBorrowRightEyeSurface() noexcept
+    {
+        return RightEyeSurface;
+    }
+
+    IDirect3DSurface9* R29OwnerBorrowRightEyeDepth() noexcept
+    {
+        return RightEyeDepth;
+    }
+
     void R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(IDirect3DDevice9* device) noexcept
     {
         InvalidateRightDepthStencilIfLeftMayWrite(device);

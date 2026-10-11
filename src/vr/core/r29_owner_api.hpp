@@ -68,6 +68,11 @@ namespace OutRunVRStereo
     void R29OwnerNoteStereoDrawWithoutMonoBackup() noexcept;
     void R29OwnerUndoStereoDrawCount() noexcept;
     IDirect3DSurface9* R29OwnerBorrowTrackedRenderTarget() noexcept;
+    // Borrow lower-owned eye/depth surfaces without assembling a full frame
+    // snapshot on each R33 stereo draw. No AddRef or ownership transfer.
+    IDirect3DSurface9* R29OwnerBorrowTrackedDepthStencil() noexcept;
+    IDirect3DSurface9* R29OwnerBorrowRightEyeSurface() noexcept;
+    IDirect3DSurface9* R29OwnerBorrowRightEyeDepth() noexcept;
     void R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(IDirect3DDevice9* device) noexcept;
     void R29OwnerNoteRestoreFailure(const char* site) noexcept;
     // Lower-owned original-hook and frame-failure services.
