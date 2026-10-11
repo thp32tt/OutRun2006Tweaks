@@ -258,7 +258,7 @@ def main() -> None:
         )
         return (all(x in state for x in required_state)
                 and all(x in vertices for x in required_vertices)
-                and "supported_game_state(game, vp, pretransformed, transforms, capture)" in observe
+                and "supported_game_state(game, vp, pretransformed, transforms, capture, output)" in observe
                 and "pretransformed, transforms, capture, vertices)" in observe)
 
     assert object_space_draw_safe(bridge)

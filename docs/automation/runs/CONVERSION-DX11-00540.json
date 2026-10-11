@@ -59,10 +59,18 @@
     "C0_RECOVER": "PASS latest connected GitHub branch and 00539 C6; distinct alpha-output work key",
     "C1_REVIEW": "PASS existing TEX1 select/mip0 and alpha output unsupported; choose real game state->PS/OM integration",
     "C2_IMPLEMENT": "PASS alpha capture, DX11 shader constant/OM state and destructive source regression",
-    "C3_VALIDATE": "PENDING exact-sha GitHub Actions",
-    "C4_COMMIT": "PENDING",
+    "C3_VALIDATE": "Initial SHA 98f672f9 Build 38134614640 failed static regression signature test (old supported_game_state call before added OutputCapture); corrected static test, exact-SHA validation pending.",
+    "C4_COMMIT": "Material C++/test SHA 98f672f9; follow-up test signature repair commit pending",
     "C5_PACKAGE": "NOT_REQUIRED no runtime promotion",
     "C6_STATE": "PENDING"
   },
-  "next_action": "Verify GitHub Actions exact result SHA; record C6 separately after gates, keep runtime UNTESTED."
+  "next_action": "Verify GitHub Actions exact result SHA; record C6 separately after gates, keep runtime UNTESTED.",
+  "validation_history": [
+    {
+      "sha": "98f672f9e0e7ab6def0288ce3c984df35b07d115",
+      "build_run_id": 38134614640,
+      "result": "FAIL_STATIC_STALE_TEST_SIGNATURE",
+      "note": "C++ not yet compiled; source acceptance static test expectation needs OutputCapture argument"
+    }
+  ]
 }
