@@ -106,6 +106,10 @@ foreach($dip in [regex]::Matches($gameLog,$r28DipPattern)){
         Draws=[int64]$dip.Groups[4].Value
         FrameSerial=[int64]$dip.Groups[5].Value
         Band=$(if($dip.Groups[6].Success){$dip.Groups[6].Value}else{'LEGACY_UNKNOWN'})
+        PrepMs=$(if($dip.Value -match 'prepMs=([0-9.]+)'){[double]::Parse($Matches[1],[Globalization.CultureInfo]::InvariantCulture)}else{$null})
+        ThreadCpuMs=$(if($dip.Value -match 'threadCpuMs=([0-9.]+)'){[double]::Parse($Matches[1],[Globalization.CultureInfo]::InvariantCulture)}else{$null})
+        NonCpuMs=$(if($dip.Value -match 'nonCpuMs=([0-9.]+)'){[double]::Parse($Matches[1],[Globalization.CultureInfo]::InvariantCulture)}else{$null})
+        CpuKnown=$(if($dip.Value -match 'cpuKnown=([01])'){[int]$Matches[1]}else{$null})
     }
 }
 if($r28DipRows.Count -gt 0){
@@ -125,6 +129,45 @@ foreach($w in $r28PacingRows){
     $r28Over33 += [int64]$w.Groups[11].Value
     $r28MaxSourceMs = [math]::Max($r28MaxSourceMs,
         [double]::Parse($w.Groups[6].Value,[Globalization.CultureInfo]::InvariantCulture))
+}
+# Paired, 5-second render-thread CPU/wall-time diagnostics from R28.
+# This summary does not claim to measure GPU occupancy or precise fence waits.
+$r28CpuPattern='VR R28 CPU WINDOW 5s: frames=(\d+) cpuSamples=(\d+) avgPrepMs=([0-9.]+) maxPrepMs=([0-9.]+) avgThreadCpuMs=([0-9.]+) maxThreadCpuMs=([0-9.]+) avgNonCpuMs=([0-9.]+) maxNonCpuMs=([0-9.]+) slowCpuDominant=(\d+) slowNonCpuDominant=(\d+) slowMixed=(\d+) slowNoCpuSample=(\d+)'
+$r28CpuRows=@()
+foreach($cpu in [regex]::Matches($gameLog,$r28CpuPattern)){
+    $r28CpuRows += [pscustomobject]@{
+        Frames=[int64]$cpu.Groups[1].Value
+        CpuSamples=[int64]$cpu.Groups[2].Value
+        AvgPrepMs=[double]::Parse($cpu.Groups[3].Value,[Globalization.CultureInfo]::InvariantCulture)
+        MaxPrepMs=[double]::Parse($cpu.Groups[4].Value,[Globalization.CultureInfo]::InvariantCulture)
+        AvgThreadCpuMs=[double]::Parse($cpu.Groups[5].Value,[Globalization.CultureInfo]::InvariantCulture)
+        MaxThreadCpuMs=[double]::Parse($cpu.Groups[6].Value,[Globalization.CultureInfo]::InvariantCulture)
+        AvgNonCpuMs=[double]::Parse($cpu.Groups[7].Value,[Globalization.CultureInfo]::InvariantCulture)
+        MaxNonCpuMs=[double]::Parse($cpu.Groups[8].Value,[Globalization.CultureInfo]::InvariantCulture)
+        SlowCpuDominant=[int64]$cpu.Groups[9].Value
+        SlowNonCpuDominant=[int64]$cpu.Groups[10].Value
+        SlowMixed=[int64]$cpu.Groups[11].Value
+        SlowNoCpuSample=[int64]$cpu.Groups[12].Value
+    }
+}
+$r28SlowCpuDominant=0
+$r28SlowNonCpuDominant=0
+$r28SlowMixed=0
+$r28SlowNoCpuSample=0
+$r28MaxPrepMs=0.0
+$r28MaxThreadCpuMs=0.0
+$r28MaxNonCpuMs=0.0
+foreach($cpu in $r28CpuRows){
+    $r28SlowCpuDominant += $cpu.SlowCpuDominant
+    $r28SlowNonCpuDominant += $cpu.SlowNonCpuDominant
+    $r28SlowMixed += $cpu.SlowMixed
+    $r28SlowNoCpuSample += $cpu.SlowNoCpuSample
+    $r28MaxPrepMs=[math]::Max($r28MaxPrepMs,$cpu.MaxPrepMs)
+    $r28MaxThreadCpuMs=[math]::Max($r28MaxThreadCpuMs,$cpu.MaxThreadCpuMs)
+    $r28MaxNonCpuMs=[math]::Max($r28MaxNonCpuMs,$cpu.MaxNonCpuMs)
+}
+if($r28CpuRows.Count -gt 0){
+    $r28CpuRows|Export-Csv (Join-Path $SessionDir 'R28_CPU_BREAKDOWN_5S.csv') -NoTypeInformation -Encoding UTF8
 }
 $perfSpikeCount=$perfSpikeRows.Count + $r28DipRows.Count
 $perfSpikeMaxFrameUs=0
@@ -294,6 +337,14 @@ $result=[ordered]@{
     R28ActiveOver25ms=$r28Over25
     R28ActiveOver33ms=$r28Over33
     R28ActiveMaxSourceFrameMs=$r28MaxSourceMs
+    R28CpuDiagnosticWindows=$r28CpuRows.Count
+    R28SlowCpuDominantFrames=$r28SlowCpuDominant
+    R28SlowNonCpuDominantFrames=$r28SlowNonCpuDominant
+    R28SlowMixedFrames=$r28SlowMixed
+    R28SlowNoCpuSampleFrames=$r28SlowNoCpuSample
+    R28MaxPrepMs=$r28MaxPrepMs
+    R28MaxThreadCpuMs=$r28MaxThreadCpuMs
+    R28MaxNonCpuMs=$r28MaxNonCpuMs
     PerfSpikeCount=$perfSpikeCount
     PerfSpikeMaxFrameUs=$perfSpikeMaxFrameUs
     PerfSpikeMaxDraws=$perfSpikeMaxDraws
@@ -342,6 +393,14 @@ $lines=@(
     "r28ActiveOver25ms=$r28Over25"
     "r28ActiveOver33ms=$r28Over33"
     ("r28ActiveMaxSourceFrameMs="+('{0:F3}' -f $r28MaxSourceMs))
+    "r28CpuDiagnosticWindows=$($r28CpuRows.Count)"
+    "r28SlowCpuDominantFrames=$r28SlowCpuDominant"
+    "r28SlowNonCpuDominantFrames=$r28SlowNonCpuDominant"
+    "r28SlowMixedFrames=$r28SlowMixed"
+    "r28SlowNoCpuSampleFrames=$r28SlowNoCpuSample"
+    ("r28MaxPrepMs="+('{0:F3}' -f $r28MaxPrepMs))
+    ("r28MaxThreadCpuMs="+('{0:F3}' -f $r28MaxThreadCpuMs))
+    ("r28MaxNonCpuMs="+('{0:F3}' -f $r28MaxNonCpuMs))
     "perfSpikeCount=$perfSpikeCount"
     "perfSpikeMaxFrameUs=$perfSpikeMaxFrameUs"
     "perfSpikeMaxDraws=$perfSpikeMaxDraws"

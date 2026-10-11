@@ -89,6 +89,21 @@ namespace OutRunVRStereo
             std::uint64_t over33333 = 0;
             std::uint64_t peakDraws = 0;
             std::uint64_t peakDrawsAtDip = 0;
+            // Wall clock "prep" is work after the preceding Present returned
+            // until the next Present begins, including waits and game logic.
+            // GetThreadTimes measures render-thread CPU (kernel+user); the
+            // residual is non-CPU time, NOT proof of a GPU fence or XR stall.
+            std::uint64_t cpuSamples = 0;
+            double prepMsTotal = 0.0;
+            double maxPrepMs = 0.0;
+            double threadCpuMsTotal = 0.0;
+            double maxThreadCpuMs = 0.0;
+            double nonCpuMsTotal = 0.0;
+            double maxNonCpuMs = 0.0;
+            std::uint64_t slowCpuDominant = 0;
+            std::uint64_t slowNonCpuDominant = 0;
+            std::uint64_t slowMixed = 0;
+            std::uint64_t slowNoCpuSample = 0;
             ULONGLONG startedMs = 0;
         };
         thread_local R28ActivePacingWindow R28Pacing{};
@@ -96,6 +111,18 @@ namespace OutRunVRStereo
         thread_local std::uint64_t R28PreviousDrawSerial = 0;
         thread_local ULONGLONG R28LastDipLogMs = 0;
         thread_local std::uint8_t R28LastDipLogTier = 0;
+        thread_local std::uint64_t R28PreviousThreadCpu100ns = 0;
+        thread_local bool R28PreviousThreadCpuValid = false;
+
+        std::uint64_t R28ThreadCpuTime100ns(
+            const FILETIME& kernel, const FILETIME& user) noexcept
+        {
+            const auto toTicks = [](const FILETIME& time) noexcept {
+                return (static_cast<std::uint64_t>(time.dwHighDateTime) << 32)
+                    | time.dwLowDateTime;
+            };
+            return toTicks(kernel) + toTicks(user);
+        }
 
         void R28RecordActiveFramePacing(
             const LARGE_INTEGER& begin, const LARGE_INTEGER& end) noexcept
@@ -110,6 +137,22 @@ namespace OutRunVRStereo
             R28PreviousDrawSerial = serial;
             const LONGLONG previous = R28PreviousPresentEndQpc;
             R28PreviousPresentEndQpc = end.QuadPart;
+
+            // One inexpensive OS render-thread CPU sample per Present.
+            // Compare successive samples only from this same thread (TLS).
+            // The measurement includes gameplay, driver calls and Present.
+            FILETIME creation{}, exitTime{}, kernel{}, user{};
+            const bool cpuReadOk = GetThreadTimes(GetCurrentThread(),
+                &creation, &exitTime, &kernel, &user) != FALSE;
+            const auto cpuTotal = cpuReadOk
+                ? R28ThreadCpuTime100ns(kernel, user) : 0;
+            const bool cpuDeltaOk = cpuReadOk &&
+                R28PreviousThreadCpuValid &&
+                cpuTotal >= R28PreviousThreadCpu100ns;
+            const auto cpuDelta = cpuDeltaOk
+                ? cpuTotal - R28PreviousThreadCpu100ns : 0;
+            R28PreviousThreadCpu100ns = cpuTotal;
+            R28PreviousThreadCpuValid = cpuReadOk;
             if (previous <= 0 || end.QuadPart <= previous)
                 return;
 
@@ -123,6 +166,17 @@ namespace OutRunVRStereo
                 return;
             const auto frameUs = static_cast<std::uint64_t>(elapsedMs * 1000.0);
             const auto presentUs = static_cast<std::uint64_t>(presentMs * 1000.0);
+            const double prepMs = begin.QuadPart >= previous
+                ? static_cast<double>(begin.QuadPart - previous) *
+                    1000.0 / hz : 0.0;
+            const double rawCpuMs = static_cast<double>(cpuDelta) / 10000.0;
+            // GetThreadTimes has OS-dependent sampling granularity. Reject
+            // physically impossible deltas instead of misclassifying them.
+            const bool cpuKnown = cpuDeltaOk &&
+                rawCpuMs <= elapsedMs * 1.15;
+            const double threadCpuMs = cpuKnown ? rawCpuMs : 0.0;
+            const double nonCpuMs = cpuKnown
+                ? (std::max)(0.0, elapsedMs - threadCpuMs) : 0.0;
             auto& w = R28Pacing;
             const ULONGLONG nowMs = GetTickCount64();
             if (!w.startedMs)
@@ -132,6 +186,25 @@ namespace OutRunVRStereo
             w.maxUs = (std::max)(w.maxUs, frameUs);
             w.maxPresentUs = (std::max)(w.maxPresentUs, presentUs);
             w.peakDraws = (std::max)(w.peakDraws, draws);
+            w.prepMsTotal += prepMs;
+            w.maxPrepMs = (std::max)(w.maxPrepMs, prepMs);
+            if (cpuKnown)
+            {
+                ++w.cpuSamples;
+                w.threadCpuMsTotal += threadCpuMs;
+                w.maxThreadCpuMs = (std::max)(w.maxThreadCpuMs, threadCpuMs);
+                w.nonCpuMsTotal += nonCpuMs;
+                w.maxNonCpuMs = (std::max)(w.maxNonCpuMs, nonCpuMs);
+            }
+            if (elapsedMs >= (1000.0 / 50.0))
+            {
+                if (!cpuKnown) ++w.slowNoCpuSample;
+                else if (threadCpuMs >= elapsedMs * 0.70)
+                    ++w.slowCpuDominant;
+                else if (nonCpuMs >= elapsedMs * 0.50)
+                    ++w.slowNonCpuDominant;
+                else ++w.slowMixed;
+            }
             if (w.sampled < w.sampleUs.size())
                 w.sampleUs[w.sampled++] = static_cast<std::uint32_t>(frameUs);
             // Exact 60/50 FPS durations avoid integer microsecond truncation.
@@ -164,9 +237,11 @@ namespace OutRunVRStereo
                     "NONE", "BELOW60", "BELOW50", "BELOW40", "BELOW30"
                 };
                 spdlog::warn(
-                    "VR R28 FRAME DIP: frameMs={:.3f} presentMs={:.3f} estimateFps={:.1f} draws={} frameSerial={} band={} marker=R28_ACTIVE",
+                    "VR R28 FRAME DIP: frameMs={:.3f} presentMs={:.3f} estimateFps={:.1f} draws={} frameSerial={} band={} prepMs={:.3f} threadCpuMs={:.3f} nonCpuMs={:.3f} cpuKnown={} renderTid={} marker=R28_ACTIVE",
                     elapsedMs, presentMs, 1000.0 / elapsedMs,
-                    draws, serial, DipBands[dipTier]);
+                    draws, serial, DipBands[dipTier], prepMs,
+                    threadCpuMs, nonCpuMs, cpuKnown ? 1 : 0,
+                    GetCurrentThreadId());
             }
 
             if (nowMs - w.startedMs < 5000)
@@ -192,6 +267,19 @@ namespace OutRunVRStereo
                 w.maxPresentUs / 1000.0,
                 w.over16667, w.over20000, w.over25000, w.over33333,
                 w.peakDraws, w.peakDrawsAtDip);
+            spdlog::info(
+                "VR R28 CPU WINDOW 5s: frames={} cpuSamples={} avgPrepMs={:.3f} maxPrepMs={:.3f} avgThreadCpuMs={:.3f} maxThreadCpuMs={:.3f} avgNonCpuMs={:.3f} maxNonCpuMs={:.3f} slowCpuDominant={} slowNonCpuDominant={} slowMixed={} slowNoCpuSample={}",
+                w.frames, w.cpuSamples,
+                w.frames ? w.prepMsTotal / static_cast<double>(w.frames) : 0.0,
+                w.maxPrepMs,
+                w.cpuSamples ? w.threadCpuMsTotal /
+                    static_cast<double>(w.cpuSamples) : 0.0,
+                w.maxThreadCpuMs,
+                w.cpuSamples ? w.nonCpuMsTotal /
+                    static_cast<double>(w.cpuSamples) : 0.0,
+                w.maxNonCpuMs,
+                w.slowCpuDominant, w.slowNonCpuDominant,
+                w.slowMixed, w.slowNoCpuSample);
             w = {};
         }
 
