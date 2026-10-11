@@ -174,6 +174,11 @@ def run(repo: Path, manifest: Path) -> dict:
     repo=repo.resolve()
     raw=json.loads(manifest.read_text(encoding="utf-8"))
     role, index = validate_role(raw)
+    requests_dir = (repo / f"localization/graphics/role_{role}/imagegen_requests").resolve()
+    if not manifest.resolve().is_relative_to(requests_dir):
+        raise ValueError(f"Manifest must remain under role_{role}/imagegen_requests")
+    if not (repo / raw["generated"]["path"]).resolve().is_relative_to(requests_dir):
+        raise ValueError(f"Generated PNG must remain under role_{role}/imagegen_requests")
     if raw.get("generator",{}).get("provider") not in ("chatgpt-image-generator","chatgpt-image-plugin"):
         raise ValueError("Only actual B/C1 image-generator output may enter this lane")
     if not raw["generator"].get("generation_id") or not raw["generator"].get("prompt"):
