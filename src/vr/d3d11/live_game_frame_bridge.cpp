@@ -1,5 +1,6 @@
 #include "live_game_frame_bridge.hpp"
 #include "native_backend.hpp"
+#include "packed_texture_16bit.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -485,6 +486,11 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     const bool compressed = info.Format == D3DFMT_DXT1 ||
                             info.Format == D3DFMT_DXT3 ||
                             info.Format == D3DFMT_DXT5;
+    // Expand game-authored 16-bit packed texels into an immutable BGRA8
+    // diagnostic SRV. D3D9 owns the source and continues its own Draw.
+    const bool packed16 = info.Format == D3DFMT_R5G6B5 ||
+                          info.Format == D3DFMT_A1R5G5B5 ||
+                          info.Format == D3DFMT_A4R4G4B4;
     DXGI_FORMAT nativeFormat = DXGI_FORMAT_UNKNOWN;
     UINT rowBytes = 0, rows = 0;
     if (compressed) {
@@ -502,6 +508,11 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         rowBytes = info.Width * 4u;
         rows = info.Height;
         nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    } else if (packed16) {
+        // D3D9 LockRect is 2 bytes/pixel, whereas DX11 BGRA8 upload is 4.
+        rowBytes = info.Width * 2u;
+        rows = info.Height;
+        nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
     } else {
         return false;
     }
@@ -512,12 +523,24 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     bool ok = false;
     if (locked.pBits && locked.Pitch > 0 &&
         static_cast<UINT>(locked.Pitch) >= rowBytes) {
-        std::vector<std::uint8_t> pixels(static_cast<std::size_t>(rowBytes) * rows);
+        const UINT uploadRowBytes = packed16 ? info.Width * 4u : rowBytes;
+        const std::size_t sourceByteCount = static_cast<std::size_t>(rowBytes) * rows;
+        std::vector<std::uint8_t> pixels(
+            packed16 ? static_cast<std::size_t>(uploadRowBytes) * rows : sourceByteCount);
+        const auto layout = info.Format == D3DFMT_R5G6B5 ?
+            packed_texture16::Layout::rgb565 : info.Format == D3DFMT_A1R5G5B5 ?
+            packed_texture16::Layout::argb1555 : packed_texture16::Layout::argb4444;
         for (UINT y = 0; y < rows; ++y) {
             const auto* source = static_cast<const std::uint8_t*>(locked.pBits) +
                                  static_cast<std::size_t>(y) * locked.Pitch;
-            std::memcpy(pixels.data() + static_cast<std::size_t>(y) * rowBytes,
-                        source, rowBytes);
+            if (packed16) {
+                packed_texture16::unpack_row(
+                    source, pixels.data() + static_cast<std::size_t>(y) * uploadRowBytes,
+                    info.Width, layout);
+            } else {
+                std::memcpy(pixels.data() + static_cast<std::size_t>(y) * rowBytes,
+                            source, rowBytes);
+            }
         }
         // D3DFMT_X8R8G8B8 alpha is undefined in D3D9; the native
         // texture-only and modulate pixel shaders must sample opaque alpha.
@@ -534,6 +557,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         D3D11_SUBRESOURCE_DATA initial{};
         initial.pSysMem = pixels.data();
         initial.SysMemPitch = rowBytes;
+        if (packed16) initial.SysMemPitch = uploadRowBytes;
         ComPtr<ID3D11Texture2D> texture;
         if (SUCCEEDED(dev->CreateTexture2D(&desc, &initial, texture.GetAddressOf())) &&
             SUCCEEDED(dev->CreateShaderResourceView(texture.Get(), nullptr,

@@ -668,7 +668,69 @@ def main() -> None:
     for width, height in ((1, 4), (4, 1), (6, 8), (8, 6), (0, 4)):
         assert not (width > 0 and height > 0 and width % 4 == 0 and height % 4 == 0)
 
-    print("DX11 live diagnostic TEX1/DXT/alpha/scissor/COLORWRITE Draw/fallback regression PASS (static only)")
+    # Real D3D9 16-bit game texture -> BGRA8 decode -> live D3D11
+    # SRV/sampler -> native Draw/DrawIndexed. DXT remains BC-compressed.
+    packed_header = (ROOT / "src/vr/d3d11/packed_texture_16bit.hpp").read_text()
+    packed_probe = (ROOT / "tools/dx11_packed_texture_16bit_probe.cpp").read_text()
+    def packed16_connected(code: str, helper: str) -> bool:
+        producer = code[code.find("bool mirror_texture("):code.find("bool submit(")]
+        consumer = code[code.find("bool submit("):code.find("void observe(")]
+        return '#include "packed_texture_16bit.hpp"' in code and all(x in producer for x in (
+            "info.Format == D3DFMT_R5G6B5",
+            "info.Format == D3DFMT_A1R5G5B5",
+            "info.Format == D3DFMT_A4R4G4B4",
+            "rowBytes = info.Width * 2u;",
+            "const UINT uploadRowBytes = packed16 ? info.Width * 4u : rowBytes;",
+            "static_cast<UINT>(locked.Pitch) >= rowBytes",
+            "packed_texture16::unpack_row(",
+            "if (packed16) initial.SysMemPitch = uploadRowBytes;",
+            "dev->CreateShaderResourceView(",
+            "capture.texture->UnlockRect(0);",
+        )) and all(x in helper for x in (
+            "case Layout::rgb565:",
+            "case Layout::argb1555:",
+            "case Layout::argb4444:",
+            "(value & 0x8000u) ? 255u : 0u",
+            "source[x * 2u + 1u]",
+            "bgra[x * 4u + 3u] = pixel.a;",
+        )) and all(x in consumer for x in (
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
+            "ctx->PSSetShaderResources(0, 1, &boundView)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+        ))
+    assert packed16_connected(bridge, packed_header)
+    assert "static_assert(unpack(0x8421u, Layout::argb4444).a == 136u);" in packed_probe
+    for original, invalid in (
+        ("info.Format == D3DFMT_R5G6B5", "info.Format == D3DFMT_DXT2"),
+        ("info.Format == D3DFMT_A1R5G5B5", "info.Format == D3DFMT_DXT2"),
+        ("info.Format == D3DFMT_A4R4G4B4", "info.Format == D3DFMT_DXT2"),
+        ("rowBytes = info.Width * 2u;", "rowBytes = info.Width * 4u;"),
+        ("packed_texture16::unpack_row(", "/* no 16-bit conversion */("),
+        ("if (packed16) initial.SysMemPitch = uploadRowBytes;", "/* wrong upload pitch */"),
+    ):
+        broken = bridge.replace(original, invalid, 1)
+        assert broken != bridge and not packed16_connected(broken, packed_header), (
+            "16-bit source-to-SRV Draw mutation escaped: " + original
+        )
+    for original, invalid in (
+        ("case Layout::rgb565:", "case Layout::argb565:"),
+        ("case Layout::argb1555:", "case Layout::argb5551:"),
+        ("case Layout::argb4444:", "case Layout::argb8888:"),
+        ("(value & 0x8000u) ? 255u : 0u", "255u"),
+        ("source[x * 2u + 1u]", "source[x * 4u + 1u]"),
+        ("bgra[x * 4u + 3u] = pixel.a;", "bgra[x * 4u + 3u] = 255u;"),
+    ):
+        broken = packed_header.replace(original, invalid, 1)
+        assert broken != packed_header and not packed16_connected(bridge, broken), (
+            "16-bit texel decode mutation escaped: " + original
+        )
+    for width, expected in ((1, (2, 4)), (256, (512, 1024)), (1024, (2048, 4096))):
+        source_row_bytes, upload_row_bytes = width * 2, width * 4
+        assert (source_row_bytes, upload_row_bytes) == expected
+        assert source_row_bytes <= upload_row_bytes
+
+    print("DX11 live diagnostic TEX1/DXT/packed16/alpha/scissor/COLORWRITE Draw/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":

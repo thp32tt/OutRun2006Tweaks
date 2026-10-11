@@ -1,0 +1,84 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00544",
+  "production_id": "CONVERSION-DX11-00544",
+  "event_id": "CONVERSION-DX11-00544-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00544",
+  "attempt": "1/3",
+  "work_key": "DX11:MENU_RACE_PACKED16_TEXTURE_BGRA_SRV",
+  "base_sha": "fbc91fccbabdd2fa4e0d7e264743c0b109cf0703",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Observe game-authored fixed-function D3D9 textured Draw/DrawIndexed and LockRect R5G6B5/A1R5G5B5/A4R4G4B4 level-0 source",
+      "Expand each 16-bit little-endian source texel RGB/alpha to BGRA8 using source 2B pitch and 4B output pitch",
+      "Upload immutable DX11 texture and bind SRV+sampler into existing native Draw/DrawIndexed and visible desktop inset with DX9Ex/input fallback"
+    ],
+    "batch_components": [
+      "Pure C++ bit-accurate 565/1555/4444 pixel decoder and portable CPU fixture",
+      "Live D3D9 LockRect 16-bit format admission and pitch-separated D3D11 BGRA8 SRV/Draw",
+      "Source/consumer linkage regression and destructive mutations"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Local GNU C++17 portable decoder probe and six constexpr checks PASS; full Windows exact SHA Gate PENDING; no game/HMD screenshot.",
+      "negative_regression": "Python source test validates each D3D9 format, separate 16-bit/32-bit pitches, DX11 SRV Draw routing, and 12 destructive mutations; CI pending.",
+      "component_integration": "D3D9 game Texture9->LockRect 16-bit source -> BGRA8 decoder -> immutable CreateTexture2D -> CreateShaderResourceView -> PSSetShaderResources -> Draw/DrawIndexed -> diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_PACKED16_TEXTURE_BGRA_SRV",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:PACKED16",
+      "src/vr/d3d11/packed_texture_16bit.hpp",
+      "tools/test_dx11_first_game_frame_regressions.py:PACKED16"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_PACKED16_LOCKRECT",
+      "D3D11_BGRA8_TEXTURE_SRV",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and CPU decoder tested; exact SHA Windows Gate PENDING; live game menu/vehicle/race pixels and gamepad Quest3/VDXR UNTESTED",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only; never override NativeDrawPathActive=false or the original D3D9 Draw/gamepad; fail closed for other formats/pools/locks"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/packed_texture_16bit.hpp",
+    "tools/dx11_packed_texture_16bit_probe.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00544.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS latest branch HEAD fbc91fccbabdd2fa4e0d7e264743c0b109cf0703 and 00543 C6 exact SHA; 00544 absent",
+    "C1_REVIEW": "PASS independent 16-bit game texture source gap, R175 ownership unchanged",
+    "C2_IMPLEMENT": "PASS packed source format, decoder, BGRA8 SRV Draw integration with D3D9 fallback",
+    "C3_VALIDATE": "Portable CPU probe PASS; source destructive mutation tests and Windows exact SHA CI PENDING",
+    "C4_COMMIT": "material result commit publishing as an atomic multi-file update",
+    "C5_PACKAGE": "NOT_REQUIRED; opt-in desktop diagnostic, no game release claim",
+    "C6_STATE": "PENDING exact SHA Gate; no HMD game test"
+  },
+  "acceptance_results": {
+    "DX11-LIVE-CALLSITE": "PASS_SOURCE",
+    "DX11-NATIVE-DRAW": "PASS_SOURCE",
+    "DX11-VISIBLE-FRAME": "NEED_GAME_TEST",
+    "DX11-SAFE-RETURN": "PASS_SOURCE",
+    "REAL_GAME_OR_QUEST3_RENDERING": "UNTESTED"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "feature_status": "SOURCE_INTEGRATED__CI_PENDING_HMD_UNTESTED",
+  "runtime_evidence": "No actual gamepad/Quest3 VDXR or game frame test; DX9Ex rendering and input always authoritative.",
+  "next_action": "Verify exact material SHA GitHub Actions; only then write separate C6 bookkeeping [skip ci] and score if newly earned; otherwise repair failed Gate. Continue programmable shader/default-pool integration next independent task.",
+  "controller_runtime_adoption": "NOT_VERIFIED"
+}
