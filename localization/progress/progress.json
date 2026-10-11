@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 15:46 KST",
+  "updated_at_kst": "2026-10-11 15:50 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -13252,5 +13252,22 @@
     "new_approval": 0,
     "runtime_validation": "UNTESTED",
     "evidence": "localization/graphics/role_C/20261011-C2-Q104-STRICT-NATIVE-SOURCE-FAMILY/C2_Q104_INDEPENDENT_STRICT_NATIVE_STYLE_REWORK.json"
+  },
+  "c2_q116_first_strict_20261011_1550": {
+    "review_id": "C2-EVEN-Q116-FIRST-NATIVE-FAMILY-OPTICAL-20261011-1550",
+    "queue_index": 116,
+    "decision": "REWORK_REQUIRED",
+    "source_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+    "candidate_sha256": "7e42aaa0f8aec535008bb816ec3660e075ce87c56a4ae44170c3340d1a32a6dc",
+    "candidate_unchanged": true,
+    "previous_C263_C3": "INVALIDATED_NEW_SOURCE_FAMILY_VISUAL_FAIL",
+    "new_C3": "NOT_RUN",
+    "calibration": "HOLD",
+    "clean_plate": "HOLD",
+    "new_dds": 0,
+    "new_approval": 0,
+    "user_actual_game": "UNTESTED",
+    "runtime_validation": "UNTESTED",
+    "evidence": "localization/graphics/role_C/20261011-C2-Q116-SOURCE-FAMILY-STRICT/C2_Q116_FIRST_STRICT_SOURCE_FAMILY_REWORK.json"
   }
 }
