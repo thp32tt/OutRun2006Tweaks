@@ -68,11 +68,11 @@ class TestBImageGen(unittest.TestCase):
             with self.assertRaises(ValueError):
                 b.dds_rgba_read(bad)
 
-    def test_end_to_end_synthetic_saved_dds_no_approval(self):
+    def _synthetic_saved_dds(self, role, index):
         # Small synthetic Atlas A/B source, no real game/semantic PASS claim.
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp)
-            folder=root/"localization/graphics/role_B/imagegen_requests"
+            folder=root/f"localization/graphics/role_{role}/imagegen_requests"
             folder.mkdir(parents=True)
             C2=root/"localization/graphics/plate_library/reviews"
             C2.mkdir(parents=True)
@@ -108,7 +108,7 @@ class TestBImageGen(unittest.TestCase):
             rfile=C2/"approval.json"
             rfile.write_text(json.dumps(review))
             manifest={
-              "schema":b.SCHEMA,"role":"B","queue_index":60,"target_text":"최고 기록:",
+              "schema":b.SCHEMA if role=="B" else b.C1_SCHEMA,"role":role,"queue_index":index,"target_text":"최고 기록:",
               "generator":{"provider":"chatgpt-image-generator",
                            "generation_id":"synthetic-test-only-not-real",
                            "prompt":"synthetic fixture only"},
@@ -118,7 +118,7 @@ class TestBImageGen(unittest.TestCase):
               "plate_review":{"status":"PLATE_PASS","ref":ref(rfile)},
               "source_bbox":[10,5,52,19],"placement_bbox":[12,6,50,18],
               "replace_roi":[8,4,54,20],"fit_mode":"contain",
-              "output_dir":"localization/graphics/role_B/imagegen_trials/test-fixture"
+              "output_dir":f"localization/graphics/role_{role}/imagegen_trials/test-fixture"
             }
             mfile=folder/"trial.json"
             mfile.write_text(json.dumps(manifest))
@@ -128,9 +128,22 @@ class TestBImageGen(unittest.TestCase):
             self.assertEqual(stats["persisted_roundtrip_mismatch"],0)
             self.assertNotEqual(stats["official_sha256"],stats["saved_trial_sha256"])
             dest=root/manifest["output_dir"]
-            self.assertTrue((dest/"B_IMAGEGEN_060_UNAPPROVED.dds").exists())
-            self.assertTrue((dest/"B_IMAGEGEN_060_SOURCE_CLEAN_OFFICIAL_GENERATED_RAW_100.png").exists())
+            self.assertTrue((dest/f"{role}_IMAGEGEN_{index:03d}_UNAPPROVED.dds").exists())
+            self.assertTrue((dest/f"{role}_IMAGEGEN_{index:03d}_SOURCE_CLEAN_OFFICIAL_GENERATED_RAW_100.png").exists())
             self.assertEqual(stats["C2"],"NOT_RUN")
+
+    def test_end_to_end_synthetic_saved_dds_no_approval(self):
+        self._synthetic_saved_dds("B", 60)
+        self._synthetic_saved_dds("C1", 62)
+
+    def test_distinct_b_c1_shard_guards(self):
+        self.assertEqual(b.validate_role({"role":"B","schema":b.SCHEMA,"queue_index":60}),("B",60))
+        self.assertEqual(b.validate_role({"role":"C1","schema":b.C1_SCHEMA,"queue_index":62}),("C1",62))
+        for role,schema,index in [("B",b.SCHEMA,62),("C1",b.C1_SCHEMA,60),
+                                  ("C1",b.C1_SCHEMA,61),("C1",b.SCHEMA,62),
+                                  ("B",b.SCHEMA,True),("A",b.SCHEMA,60)]:
+            with self.assertRaises(ValueError):
+                b.validate_role({"role":role,"schema":schema,"queue_index":index})
 
     def test_file_contact_lossless(self):
         src=np.zeros((32,64,4),np.uint8)

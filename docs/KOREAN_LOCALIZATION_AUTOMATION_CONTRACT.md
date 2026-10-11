@@ -1,13 +1,13 @@
 # Korean Localization Automation Contract
 
-## B-only image generation production override — 2026-10-11
-
-**Latest user decision:** A stays on the existing native font/vector/manual lane unchanged. B exclusively uses ChatGPT's image generation tool for NEW Korean title/text artwork, then deterministic transparent-PNG fit/CLEAN/DDS/QA. B MUST read `docs/KOREAN_LOCALIZATION_B_IMAGEGEN_LANE.md` and its latest input/provenance rules BEFORE any B production. This B-specific rule overrides earlier A+B font/vector directions and Production Reset's background-only AI-image limitation **for B alone**; it does NOT relax original/CLEAN/0-overflow/self-visual/C2/C3/game or source-family style gates. B must not pretend GitHub Actions or Pillow can invoke the ChatGPT plugin; the ChatGPT B conversation must actually call it. On tool failure record INPUT_MISSING/IMAGEGEN_UNAVAILABLE, don't silently fall back to fonts, empty DDS, or fake approvals. Preserve the current even-shard/IGR P0 priority, six-slot schedule, B-only provenance, unique artifact hashes, and metric comparisons to untouched A. B's CPU slot processes only SHA-bound uploaded ImageGen inputs and never manufactures generator results.
+## B+C1 ImageGen production override — 2026-10-11 (latest user decision)
+A remains the existing odd-index font/vector/manual production lane. B and C1 are independent **ChatGPT real image-generation production + producer self-QA** lanes, NOT final-QA-only workers. B takes *new* even queue indexes where index % 4 == 0; C1 takes *new* even indexes where index % 4 == 2. Existing in-flight explicit assignments are preserved and must not be overwritten: skip any candidate already actively owned by another lane at the latest Git HEAD; preserve P0/P1 explicit lane owners until safely transferred with recorded evidence. C2 alone independently reviews ALL odd/even A/B/C1 products, special unindexed C work, CLEAN/plate and final QA; C3 and actual user game tests remain separate. This replaces all earlier C1=odd QA/C2=even QA statements and all B-only imagegen restrictions in older sections of this contract and other documents.
+B and C1 MUST read `docs/KOREAN_LOCALIZATION_B_IMAGEGEN_LANE.md` and call the real ChatGPT image generator for actual transparent Korean text PNG. A is NOT changed. The same exact-source/CLEAN/plate-review/0-pixel-overflow/native DDS/visual/source-style evidence guards apply to both. ImageGen is not available inside plain GitHub Actions or Pillow, and cannot be fabricated or silently replaced by font/vector fallback. On missing tool/output/upload, record truthful IMAGEGEN_UNAVAILABLE/OUTPUT_MISSING without false production or approval. Use the existing asset_queue.csv (no new job queue); C1 writes under role_C1 with schema outrun-c1-imagegen-v1. C2 provides independent PLATE_PASS and final evaluation for all three producers; producers NEVER self-approve C2/C3/game. Keep A :00, C1 :10/:40, C2 :20/:50 and B :30 until user explicitly changes the schedule.
 
 
 ## Separated lettering engine — 2026-10-11
 
-Apply `docs/KOREAN_LOCALIZATION_LETTERING_ENGINE.md` for new lettering. Review native glyph geometry before effects, preserve separate face/effect layers and compose through `compose_lettering.py`. Newly published production DDS require a SHA-bound `lettering_recipe` in the final manifest; the existing changed-candidate gate verifies the actual composition. Producer geometry readiness is not C/C3/game approval. Keep existing scheduling and ownership.
+Apply `docs/KOREAN_LOCALIZATION_LETTERING_ENGINE.md` for A's native/vector lettering only; B/C1 real ImageGen production takes priority for their new text. Review native glyph geometry before effects, preserve separate face/effect layers and compose through `compose_lettering.py`. Newly published production DDS require a SHA-bound `lettering_recipe` in the final manifest; the existing changed-candidate gate verifies the actual composition. Producer geometry readiness is not C/C3/game approval. Keep existing scheduling and ownership.
 
 ## Shared PSD/CLEAN engine — 2026-10-11
 
@@ -19,8 +19,8 @@ The library and controller prompts are production inputs, not a new queue.
 
 ## Production reset: qualify the method before multiplying candidates — 2026-10-09
 
-Read and apply `docs/KOREAN_LOCALIZATION_PRODUCTION_RESET.md` before A/B production
-and fresh C review. Its stage prerequisites override throughput/same-invocation
+Read and apply `docs/KOREAN_LOCALIZATION_PRODUCTION_RESET.md` before A/B/C1 production
+and fresh C2 review. Its stage prerequisites override throughput/same-invocation
 recommendations when they conflict: one unqualified family pilot at a time,
 source-derived CLEAN before lettering, pinned reusable font/effect recipes,
 readable-coordinate slant anchors, and exact persisted-DDS mechanical checks.
@@ -128,29 +128,27 @@ checks, source-size/bbox ceiling, zero overlap, exact orientation and C/C3 gates
   recurrence, final evidence approvals and user in-game closures separately.
   Repeated same-SHA inspection and new evidence alone do not count as new DDS.
 
-Roles and scheduling remain unchanged: A/B do production/self-QA; C1/C2
-review their shards independently, C3 is additional strict QA, and only the
-user's actual-game evidence can close a user-reported in-game regression.
+Current roles: A/B/C1 do production/self-QA; C2 performs independent final QA across all producer shards. C3 remains additional strict QA, and only the user's actual-game evidence can close a user-reported in-game regression.
 
 ## Rework convergence selection guard — 2026-10-08
 
-Before each A/B production selection and C1/C2 evidence selection, read `docs/KOREAN_LOCALIZATION_REWORK_CONVERGENCE.md`, refresh the Git queue, and run `python tools/localization/rework_triage.py --index N` on the selected asset. Use `--require-safe-rerender` before ordinary same-method DDS rerender attempts; a nonzero result prevents blind rerender, not genuine corrective reconstruction. Do not use this read-only triage as visual QA or approval.
+Before each A/B/C1 production selection and C2 evidence selection, read `docs/KOREAN_LOCALIZATION_REWORK_CONVERGENCE.md`, refresh the Git queue, and run `python tools/localization/rework_triage.py --index N` on the selected asset. Use `--require-safe-rerender` before ordinary same-method DDS rerender attempts; a nonzero result prevents blind rerender, not genuine corrective reconstruction. Do not use this read-only triage as visual QA or approval.
 
 - `EVIDENCE_ONLY_HOLD` / `FRESH_C_REVIEW` / `VALIDATION_ONLY`: preserve the current candidate bytes, gather the missing independent evidence or actual-game retest, and do not use A/B throughput to reproduce an unchanged DDS without a newly verified pixel defect.
 - `MATERIAL_REWORK`: repair the specific confirmed visual failure against the canonical native English source and measured UI-family style.
 - `METHOD_CHANGE_REQUIRED`: repeated independently evidenced source-family rejection requires a documented new reconstruction method and source-derived font/plate/style reference before producer PASS. Do not retry the same width/stretch, slant or flat-effect method. Initial evidence: q219 in `localization/graphics/REWORK_ESCALATIONS.json`. Any new escalation must cite genuine C review decisions and cannot be inferred from a test fixture.
 - `PRESERVE_ORIGINAL`: keep the preserved original without producing a replacement DDS.
 
-Do not reopen a current approved candidate merely to migrate evidence. New pixel evidence outranks prior numeric PASS; missing approval evidence remains HOLD rather than auto-REWORK. Measure produced DDS, current-evidence approvals, P0/P1 regressions, user acceptance and actual in-game closures separately. No changes to the six-launch A/B/C1/C2 schedule, parity ownership, exact-SHA C/C3, or RUNTIME_VALIDATION semantics.
+Do not reopen a current approved candidate merely to migrate evidence. New pixel evidence outranks prior numeric PASS; missing approval evidence remains HOLD rather than auto-REWORK. Measure produced DDS, current-evidence approvals, P0/P1 regressions, user acceptance and actual in-game closures separately. Keep the six-launch schedule, updated distinct A/B/C1 production shards, exact-SHA C2/C3 and RUNTIME_VALIDATION semantics.
 
 ## Evidence enforcement override — 2026-10-08
 
 Read `docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md` before selection. Its evidence gate
 supersedes legacy note-token approval and any conflicting throughput/export wording.
-Keep six launches/hour and existing A/B/C1/C2 ownership. Up to three C assets is a
+Keep six launches/hour and the updated A/B/C1 production + C2 QA ownership. Up to three C2 QA assets is a
 ceiling, not a quota. Start with known-defect calibration and current regressions;
 q154 gray-menu glyph-weight/counter-space is HOLD for C2 native-DDS recheck.
-A/B establish source-derived family references while repairing owned regressions.
+A/B/C1 establish source-derived family references while repairing owned regressions.
 C and C3 must record separate per-region observations; all localized PRE_INGAME
 exports require validated `role_C/APPROVALS/qNNN.json` evidence. Missing evidence
 means HOLD for export, not automatic DDS regeneration. Do not copy test fixtures
@@ -244,42 +242,35 @@ On any of those commands, first fetch the latest `korean-localization-recovery-2
 - B (:10 / :40): PRODUCTION LANE B + self-QA. B is no longer review-only. Create/rework actual localization assets continuously from B's queue shard, including promoting positively identified `zoom_review` text assets into production. Run the same zero-pixel-overflow QA and immediately fix failures in the same run.
 - C (:20 / :50): CROSS-LANE FINAL QA + approval + Git synchronization. Revalidate new/changed A and B results plus approval candidates. Only exact containment PASS results may advance. C may immediately perform small corrective rework it discovers and revalidate it; larger failures return to `REWORK_REQUIRED` for the next A/B production cycle.
 
-### Temporary C-backlog relief mode
-- This is a temporary scheduler override requested on 2026-10-07. The normal dual-production schedule above remains the baseline plan and MUST be restored when backlog relief ends.
-- Keep total scheduled launches at six per hour: A at :00, C1 at :10, C2 at :20, B at :30, C1 at :40, C2 at :50.
-- C1 and C2 are both full C-role final-QA lanes; all existing C quality, approval, JPG-export, C3, Git synchronization, and runtime-validation rules remain unchanged.
-- To prevent duplicate review, C1 owns ODD numeric `asset_queue.csv` indexes plus unindexed runtime/name-entry/special C work; C2 owns EVEN numeric indexes.
-- **Batch size:** each C1/C2 invocation may process up to **3 eligible assets** from its own shard, only after completing all required evidence for each. Three is a ceiling, not a quota. A PASS, REWORK_REQUIRED, or HOLD_STRICT_RECHECK decision with persisted evidence counts as one processed asset. Continue only while a full independent inspection fits the available budget; persist a partial batch rather than abbreviating QA.
-- Apply the normal C priority independently for every batch slot: new/changed A/B candidate and user/in-game/JPG regression revalidation first; only use C3_STRICT_AUDIT to fill remaining batch slots when no fresh/pending C target remains in that shard.
-- Refresh branch HEAD and queue state **before selecting every asset in the batch** and again immediately before the batch commit/push. If a selected asset changed remotely, skip it and refill that slot from the refreshed queue rather than repeating or overwriting work.
-- A visual/machine FAIL on one asset does **not** normally end the batch: persist that asset as REWORK_REQUIRED/HOLD with evidence, then continue to the next eligible same-shard asset. Stop early only when a required corrective rework is too large/risky for C, a runtime/runner-specific dependency blocks safe continuation, or Git conflict/state drift makes further adjudication unsafe.
-- Keep per-asset machine/controller evidence and queue/state entries distinct even when three assets share one commit. WORKLOG/STATUS must identify every asset handled in the batch plus `TEMP_BACKLOG_RELIEF=C1|C2` and the shard.
-- During this mode neither C lane steals the other lane's indexed shard. If its fresh/pending C shard is empty, that lane may perform C3_STRICT_AUDIT only within its own shard. C1 alone may take unindexed special C work.
-- This mode changes scheduling capacity only. It does not change candidate PASS semantics, in-game closure rules, queue authority, or A/B ownership rules.
-- Exit target: when fresh/pending C backlog is approximately 20 items or fewer, or when the user explicitly ends backlog relief, restore the normal A/B/C schedule above.
+### Current production-first four-slot scheduler
+- Keep exactly six launches per hour: A :00, C1 :10/:40, C2 :20/:50, B :30.
+- A = odd index font/vector/manual producer; B = new even index % 4 == 0 real ImageGen producer; C1 = new even index % 4 == 2 real ImageGen producer. Producer self-QA is not independent C approval.
+- C2 = **only independent C final-QA lane** for all odd/even candidate indexes from A/B/C1 and unindexed special C tasks. Batch cap is three fully evidenced items per invocation, not a quota. Prioritize user P0/P1, fresh/changed material, plate/CLEAN/actual DDS quality; repeated same-SHA evidence without change is not production or new approval.
+- Every role refreshes actual branch HEAD/asset_queue and active in-flight owner before selection and immediately before commit. Never overwrite another producer's trial, queue update or already-persisted evidence. C2 may inspect all indexes but must not represent a self-reviewed producer as independently approved.
+- Keep the previous B-owned in-flight jobs, explicit active P0/P1 assignments and durable SHA-bound proof with their current owners; deterministic mod-4 division applies to new unclaimed even work. A keeps its existing odd ownership unchanged. No automatic work stealing across active claims. Idle roles may select their next unclaimed actionable item within their assigned shard, never inflate QA-only activity into production.
+- Strict C2/C3/user playtest, unapproved trial isolation, QA evidence retention, real PNG generation IDs, and RUNTIME_VALIDATION=UNTESTED are preserved. This user-directed mode remains active until explicitly changed; older temporary-backlog auto-restore thresholds do not apply.
 
+## A/B/C1 production shard and anti-duplication
+- Source of truth: stable numeric `index` from the **existing** `localization/graphics/asset_queue.csv`; no controller-specific queue state machine.
+- A primary shard: odd indexes and existing explicit A ownership.
+- B primary shard: unclaimed even indexes where `index % 4 == 0`; preserve older B-owned in-flight even items including index % 4 == 2 until legitimately completed/transferred.
+- C1 primary shard: unclaimed even indexes where `index % 4 == 2` with real ImageGen. C1 never changes in-flight B-owned assets or odd A-owned assets.
+- Producer selection order is user-owned P0/P1 assigned to that lane, then direct material REWORK, RENDER_READY, ONE_STAGE_TO_RENDER and only then PREFLIGHT. Select actual image-generation-capable work first and produce visible trial DDS and SHA-bound artifacts whenever all inputs and tools exist.
+- Producer already holding an item must complete/persist or explicitly release ownership before another producer can take it. Each producer re-reads HEAD immediately before selection and commit; if another lane changed the item, skip/reconcile rather than overwrite. If no valid work is available, record the actual blocking dependency, not repeated generic review.
+- C2 reviews all producer shards and unindexed C special tasks; independently binds SOURCE/CLEAN/PLATE_PASS/candidate exact SHA. Do not mark C2 or C3 passed on behalf of the producer.
 
-## A/B work sharding and anti-duplication
-- Use the stable numeric `index` column in `localization/graphics/asset_queue.csv` to avoid A/B producing the same DDS.
-- A primary shard: rows with an ODD numeric `index`.
-- B primary shard: rows with an EVEN numeric `index`.
-- Within the shard, apply the candidate-completion-first readiness order below before generic queue-category order. Do not choose unrelated preflight work while a directly repairable or renderable candidate exists.
-- A/B must refresh branch HEAD and queue state immediately before selecting work and again before commit. If an item is already completed or changed by the other role, skip it rather than redo it.
-- A/B must not wait for the other lane merely because that lane owns a different index parity. When a primary shard has no actionable production work, the role may work-steal the oldest actionable item from the other shard only after refreshing Git and confirming that item has no newer production result/state change in the current cycle. Record `work_stolen_from_lane` in the role report.
-- B must not re-QA all of A's output as its default job; C owns cross-lane final QA. B should maximize new production throughput.
-- C does not use parity sharding and reviews both lanes.
 
 ## Candidate-completion-first production
 This recovery branch restores the production methodology without restoring the later queue/state-machine architecture. The purpose is to convert accepted preparation evidence into actual Korean DDS candidates instead of accumulating masks, work orders or preflight-only commits.
 
 ### Readiness tiers
-Classify unfinished A/B work from current Git evidence:
+Classify unfinished A/B/C1 work from current Git evidence:
 1. **RENDER_READY** — exact canonical source, removal/protected geometry, verified CLEAN_PLATE and safe lettering region are known, with no unresolved semantic blocker. Missing baseline/slant/style measurement is not a reason to stop; measure it and render in the same invocation.
 2. **ONE_STAGE_TO_RENDER** — one deterministic preparation stage remains before RENDER_READY. Complete that stage and continue through Korean rendering in the same invocation whenever the inputs are safe.
 3. **PREFLIGHT_ONLY** — source identity, semantic binding, effect geometry or another prerequisite still requires broader investigation before candidate construction can safely begin.
 
 ### Mandatory producer order
-A/B select work in this order:
+A/B/C1 select work in this order:
 1. assigned active P0 rows from `localization/graphics/INGAME_REWORK_BACKLOG.csv`;
 2. assigned active P1 rows from that backlog;
 3. directly repairable C-returned `REWORK_REQUIRED`;
@@ -291,7 +282,7 @@ A/B select work in this order:
 When a RENDER_READY or ONE_STAGE_TO_RENDER item exists, do not open unrelated preflight/work-order work merely to record progress.
 
 ### Same-invocation completion rule
-- No artificial task boundary is allowed after the last deterministic prerequisite becomes ready. If the current A/B run creates or verifies the final source/mask/CLEAN_PLATE/safe-bbox/style prerequisite, continue in the same run through Korean render, DDS encode, decoded-final self-QA and candidate persistence.
+- No artificial task boundary is allowed after the last deterministic prerequisite becomes ready. If the current A/B/C1 run creates or verifies the final source/mask/CLEAN_PLATE/safe-bbox/style prerequisite, continue in the same run through Korean render, DDS encode, decoded-final self-QA and candidate persistence.
 - The normal production path is: exact canonical HD source -> verified CLEAN_PLATE -> source typography/baseline/slant measurement -> native-resolution Korean render -> measure/refit loop -> exact DDS encode -> decoded-final static self-QA -> English-source-vs-Korean-candidate evidence.
 - If baseline/slant/style is the only missing information, measure it and render in the same task; do not create a separate successful preflight-only result.
 - If the first ready asset becomes fail-closed during rendering, record the precise blocker and try the next ready item in the same shard before opening new preflight work.

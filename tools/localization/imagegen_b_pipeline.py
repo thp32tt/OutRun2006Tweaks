@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """B-only ImageGen PNG -> exact CLEAN -> unpromoted DDS and saved-byte QA.
 
-The native ChatGPT image generator runs in the B conversation, NOT in GitHub
+The native ChatGPT image generator runs in each B or C1 conversation, NOT in GitHub
 Actions. This deterministic consumer refuses absent/unverified generator pixels
 instead of silently replacing them with fonts/vectors or fabricated "AI" art.
 """
@@ -20,6 +20,17 @@ import numpy as np
 from PIL import Image
 
 SCHEMA = "outrun-b-imagegen-v1"
+C1_SCHEMA = "outrun-c1-imagegen-v1"
+
+
+def validate_role(raw: dict) -> tuple[str, int]:
+    role, index = raw.get("role"), raw.get("queue_index")
+    schemas = {"B": SCHEMA, "C1": C1_SCHEMA}
+    if role not in schemas or raw.get("schema") != schemas.get(role) or type(index) is not int or index < 0:
+        raise ValueError("B/C1 actual ImageGen requires exact role, schema and numeric index")
+    if (role == "B" and index % 4 != 0) or (role == "C1" and index % 4 != 2):
+        raise ValueError("New B/C1 work must use distinct even index % 4 shards; preserve legacy B in-flight outside new work")
+    return role, index
 MAX_INPUT_BYTES = 75 * 1024 * 1024
 DS = Image.Resampling.LANCZOS
 
@@ -162,10 +173,9 @@ def save_contact(path: Path, items: list[np.ndarray], rect, gray: int, percent: 
 def run(repo: Path, manifest: Path) -> dict:
     repo=repo.resolve()
     raw=json.loads(manifest.read_text(encoding="utf-8"))
-    if raw.get("schema")!=SCHEMA or raw.get("role")!="B" or raw.get("queue_index",-1)%2:
-        raise ValueError("B only: even-index request and exact schema required")
+    role, index = validate_role(raw)
     if raw.get("generator",{}).get("provider") not in ("chatgpt-image-generator","chatgpt-image-plugin"):
-        raise ValueError("Only actual B image-generator output may enter this lane")
+        raise ValueError("Only actual B/C1 image-generator output may enter this lane")
     if not raw["generator"].get("generation_id") or not raw["generator"].get("prompt"):
         raise ValueError("No generator invocation/prompt provenance; HOLD")
     if not isinstance(raw.get("target_text"),str) or not raw["target_text"].strip():
@@ -247,10 +257,10 @@ def run(repo: Path, manifest: Path) -> dict:
     if digest(dds)==digest(O0):
         raise ValueError("No materially changed DDS")
     outdir=(repo/raw["output_dir"]).resolve()
-    if not outdir.is_relative_to((repo/"localization/graphics/role_B").resolve()):
-        raise ValueError("Output must remain under role_B")
+    if not outdir.is_relative_to((repo/f"localization/graphics/role_{role}").resolve()):
+        raise ValueError(f"Output must remain under role_{role}")
     outdir.mkdir(parents=True,exist_ok=True)
-    name="B_IMAGEGEN_"+str(raw["queue_index"]).zfill(3)
+    name=f"{role}_IMAGEGEN_"+str(index).zfill(3)
     (outdir/(name+"_UNAPPROVED.dds")).write_bytes(dds)
     Image.fromarray(placed[::-1].copy(),"RGBA").save(outdir/(name+"_LETTERING_RAW.png"))
     evidence=[]
@@ -259,7 +269,7 @@ def run(repo: Path, manifest: Path) -> dict:
         save_contact(outdir/fn,[S,C,O,N],roi,gray,percent,orient=="RAW")
         evidence.append({"path":str((outdir/fn).relative_to(repo)),"sha256":digest((outdir/fn).read_bytes())})
     info={
-      "schema":SCHEMA,"queue_index":raw["queue_index"],"lane":"B","producer_method":"CHATGPT_IMAGEGEN_ONLY",
+      "schema":raw["schema"],"queue_index":index,"lane":role,"producer_method":"CHATGPT_IMAGEGEN_ONLY",
       "generation_provenance":raw["generator"],"manifest_sha256":digest(manifest.read_bytes()),
       "official_sha256":digest(O0),"source_sha256":digest(S0),"clean_sha256":digest(C0),
       "generated_sha256":digest(P0),"saved_trial_sha256":digest(dds),
@@ -284,7 +294,7 @@ def main() -> None:
     try:
         print(json.dumps(run(Path(a.repo),Path(a.manifest)),ensure_ascii=False,indent=2))
     except (KeyError,IndexError,ValueError,OSError,TypeError) as e:
-        p.exit(2,"B_IMAGEGEN_HOLD: "+str(e)+"\n")
+        p.exit(2,"IMAGEGEN_HOLD: "+str(e)+"\n")
 
 
 if __name__=="__main__":

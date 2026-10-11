@@ -1,10 +1,7 @@
-OutRun 한글화 C2 실행 — 짝수 자산 독립 QA 및 별도 C3 엄격 검수
+OutRun 한글화 C2 실행 — A/B/C1 모든 제작 자산의 유일한 독립 최종 QA
 
 저장소 thp32tt/OutRun2006Tweaks, 브랜치 korean-localization-recovery-20260928.
-최신 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md 및 docs/KOREAN_LOCALIZATION_PLATE_LIBRARY.md부터 읽고 현재 Git 작업을 이어서 실제 실행해.
-공통 plate_library를 원본 SHA·영역·방향으로 조회하고 기존 플레이트를 재분리하지 마. A/B는 독립 승인된 플레이트를 prepare로 확인하여 기존 자산별 렌더 레시피에 사용해. C1/C2는 저장된 SOURCE/CLEAN 및 새 한글/persisted DDS를 독립 검수하고 플레이트 승인과 최종 C/C3 승인을 분리해.
-한글 글꼴·윤곽·기울기·입체감이 실패하면 해당 제작 단계를 고치고 정상 배경을 다시 만들지 마. 계열 대표의 독립 C 통과 전 확산 금지.
-기존 소유권·실게임 OPEN·10단계 QA를 유지하고 실제 변경만 같은 브랜치에 commit/push 후 원격 SHA를 확인해. VR/FFB/DX11/DXVK는 수정하지 마. 계획/상태 설명만으로 끝내지 마.
-
-새 제작에는 docs/KOREAN_LOCALIZATION_LETTERING_ENGINE.md를 적용해. 작은 글자는 native, 큰 제목은 벡터 윤곽, 금속은 분리 효과 경로를 사용해. A/B는 효과 없는 형태를 먼저 실제 검토하고 face/effect를 compose_lettering.py로 합성해. 새 공식 DDS final manifest에 lettering_recipe SHA를 연결해. C는 producer GEOMETRY_READY를 승인으로 간주하지 말고 글자면/윤곽 비율·자소 공간·원본 계열을 독립 검수해. 기존 최신 계약을 매 실행 읽으므로 이 변경은 컨트롤러 재시작 없이 다음 실행부터 적용한다.
-
+최신 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md, docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md, docs/KOREAN_LOCALIZATION_PLATE_LIBRARY.md, 최신 queue/INGAME_REWORK_BACKLOG부터 확인해.
+C1은 B와 같은 **이미지 생성 생산자**로 전환됐다. C2는 홀수/짝수 구분 없이 A(홀수), B(even %4=0 신규), C1(even %4=2 신규), 기존 B 진행 중인 모든 짝수 및 인덱스 없는 특별 C 작업의 독립 QA와 PLATE_PASS를 담당한다. 이미 저장된 최신 SOURCE/CLEAN/생성 PNG/저장 DDS에서 1회 최대 3개의 실제 검증 가능한 항목을 검토해. 실제 사용자 게임 결함 P0/P1, 최신 미검증 DDS, PLATE/CLEAN부터 우선한다.
+정본 오타·가짜 획·폰트 계열·원본 RAW/FLIPY 비교, 잘못된 CLEAN, source bbox 1픽셀 침범, 타 UI 손상, mip/투명층을 실제 파일 기준으로 확인하고 증거/정확 SHA를 저장해. 숫자 PASS만으로 승인하지 마. 기존 SHA의 동일 근거 재검수만 되풀이하지 말고 신규 생성 문제를 구체적으로 생산자에게 REWORK로 반환해. C3/사용자 실게임 검증은 별개이며 아직 미검증이면 RUNTIME_VALIDATION=UNTESTED.
+새 승인·반려 증거 및 queue/resume/progress/WORKLOG를 같은 브랜치에 commit/push하고 원격 HEAD 확인해. VR/FFB/DX11/DXVK, 신규 큐/컨트롤러 TASK_ID 도입 금지.

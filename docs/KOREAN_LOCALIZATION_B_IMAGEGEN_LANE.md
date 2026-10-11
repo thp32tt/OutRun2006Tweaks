@@ -1,4 +1,11 @@
-# B 전용 ChatGPT 이미지 생성 생산 레인 — 2026-10-11
+# B·C1 ChatGPT 이미지 생성 생산 레인 — 2026-10-11
+
+## 2026-10-11 C1 imagegen extension (current; overrides historic B-only wording)
+
+B and C1 share the **same real ChatGPT ImageGen -> transparent RGBA PNG -> SHA-bound CLEAN/plate -> saved unapproved DDS -> producer self-QA workflow**. A remains the existing native/manual lane. On NEW unclaimed even indexes, B selects index % 4 == 0 and C1 selects index % 4 == 2. Never overwrite pre-existing explicit B in-flight ownership on an index % 4 == 2 or an assigned game-regression P0/P1. C2 is the sole independent PLATE_PASS / final QA reviewer for **all** A/B/C1 candidates (odd and even); C3 and user game review stay independent.
+C1 uses `schema=outrun-c1-imagegen-v1`, `role=C1`, real generation provenance, and stores PNG+manifest under `localization/graphics/role_C1/imagegen_requests/` and trial under `role_C1/imagegen_trials/`. B retains `schema=outrun-b-imagegen-v1`, `role=B`, `role_B` paths. The existing `tools/localization/imagegen_b_pipeline.py` strictly validates both schemas, producer roles, mod-4 indexes, and correct output folder and prefixes. The original q060 B manifest below remains an example for B only; a C1 manifest must change schema, role, index, input/output folders, and actual SHA-bound evidence.
+The historic B-only paragraphs below describe the common manufacturing procedure but not exclusive ownership. Any wording limiting real ImageGen to B alone, C1 to QA, or C2 to even QA is superseded here. Missing generator and binary-upload support is not a fallback excuse for fabricated outputs.
+
 
 ## 운영 결정과 적용 우선순위
 
