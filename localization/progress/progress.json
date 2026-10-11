@@ -14098,5 +14098,26 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "official_promoted": 0,
     "evidence": "localization/graphics/role_C/20261012-C2-Q205-P0-NEW-ENGLISH-REFERENCE-B306-INDEPENDENT/C2_Q205_P0_ENGLISH_GLYPH_INPUT_AND_B306_INDEPENDENT_SCOPED_QA.json"
+  },
+  "c2_20261012_q137_p0_six_first_independent": {
+    "run_key": "OUTRUN-C2-20261012-Q137-P0-SIX-REGION-INDEPENDENT-PIXEL",
+    "role": "C2",
+    "priority": "P0",
+    "index": 137,
+    "user_regression": "IGR-041",
+    "candidate_sha256": "cdd4a34879b7dce582db643c8e4f9494ef8cb19d533634aef23eb4ecfd186a92",
+    "result": "C2_SCOPED_STATIC_PASS_6_TEXT_REGIONS",
+    "scope": "six source text bboxes only; source-clean, clean-final, source-final; RAW/FLIPY; native/selected practical scales",
+    "visible_source_clean_rgba_changed": 107239,
+    "visible_clean_saved_rgba_changed": 106016,
+    "visible_source_saved_rgba_changed": 140100,
+    "changed_rgba_outside_six_text_bboxes": 0,
+    "dds_new_saved": 0,
+    "full_current_policy_approval": false,
+    "C3": "NOT_RUN",
+    "user_IGR041": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "official_promoted": 0,
+    "evidence": "localization/graphics/role_C/20261012-C2-Q137-P0-SIX-REGION-FIRST-INDEPENDENT/C2_Q137_P0_SIX_REGION_INDEPENDENT_QA.json"
   }
 }
