@@ -62,7 +62,7 @@
     "C3_VALIDATE": "PASS exact SHA 0921aeb6: Backend Gate 38134705685, Build 38134708868, OpenXR 38134708864, Fast 38134705681 all SUCCESS; live OutRun game/Quest3 UNTESTED.",
     "C4_COMMIT": "PASS non-force material C++ implementation 98f672f9 and regression signature repair 0921aeb6 (validation-bearing), both [AUTO:CONVERSION-DX11-00540], no CI-skip.",
     "C5_PACKAGE": "NOT_REQUIRED: diagnostic source code only, runtime promotion forbidden and no HMD evidence.",
-    "C6_STATE": "PASS_EXACT_SHA for 0921aeb6, separate [skip ci] bookkeeping without a new validation-bearing SHA or CI rerun."
+    "C6_STATE": "PASS_EXACT_SHA original 0921aeb6. Core gates and HUD Inspector SUCCESS at exact SHA; C6 separate [skip ci] bookkeeping, scoreboard RUN_KEY once, no new material result/HMD evidence or extra score."
   },
   "next_action": "New independent DX11 task for remaining menu/race draw states such as alpha channel modulation, sprite scissor, alternate texture mirror formats, or programmable shaders, without redoing 00540; Quest3/VDXR needs hardware verification.",
   "validation_history": [
@@ -122,8 +122,9 @@
       "run_id": 38134708869,
       "name": "OutRun EXE HUD Inspector CI",
       "head_sha": "0921aeb6d45d582d6c2ae7376731ca09d2da4bc6",
-      "conclusion": "IN_PROGRESS_AT_C6",
-      "note": "Optional unrelated HUD inspector not used to claim actual game/HMD parity."
+      "conclusion": "SUCCESS",
+      "static_exe_analysis": "SUCCESS",
+      "build_hud_inspector": "SUCCESS"
     }
   },
   "acceptance_results": {
@@ -142,6 +143,9 @@
     "expected_previous": 973,
     "delta": 1,
     "expected_total": 974,
-    "confirmed_in_repo": "PENDING_SEPARATE_SCORE_COMMIT"
+    "confirmed_in_repo": "VERIFIED_REMOTE_ONCE",
+    "commit_sha": "3d9de2a6c1906a957dcfeb30a89a5957d2ff3c15",
+    "previous": 973,
+    "total": 974
   }
 }
