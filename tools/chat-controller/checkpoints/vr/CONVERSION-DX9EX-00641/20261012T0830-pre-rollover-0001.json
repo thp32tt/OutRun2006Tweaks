@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "controller_build": "2026-10-11-resume-v3",
+  "purpose": "pre_rollover",
+  "captured_at_kst": "2026-10-12T08:32:24.569964+09:00",
+  "controller_branch": "chat-controller-downloads",
+  "game_branch_head": "518796eaaef616ec61bef6f47131b94a25d31b03",
+  "record": {
+    "task_id": "CONVERSION-DX9EX-00641",
+    "production_id": "CONVERSION-DX9EX-00641",
+    "event_id": "CONVERSION-DX9EX-00641-E003",
+    "event_type": "retry",
+    "lane": "DX9EX",
+    "slot": "C",
+    "branch": "vr-d3d9ex-focus",
+    "base_sha": "beebe5667de8d10250792731a658e33ec6abaee6",
+    "result_sha": "beebe5667de8d10250792731a658e33ec6abaee6",
+    "result_message": null,
+    "phase": "WAIT_ACTIONS",
+    "status": "WAIT_ACTIONS",
+    "terminal": null,
+    "attempt": 2,
+    "retry_count": 2,
+    "rollover_count": 0,
+    "chat_rollovers": 0,
+    "sent_at": "2026-10-12T08:06:24.407684+09:00",
+    "last_hash": null,
+    "last_hash_changed_at": "2026-10-12T08:06:24.407684+09:00",
+    "last_gate_poll_at": "2026-10-12T08:32:07.409052+09:00",
+    "wait_actions_started_at": "2026-10-12T08:06:38.951748+09:00",
+    "failure_context": null,
+    "last_gate_status": "completed:cancelled",
+    "feature_id": null,
+    "feature_branch": null,
+    "feature_stage": "LEGACY",
+    "feature_goal": null,
+    "feature_contract": null,
+    "failure_class": "CI_CANCELLED_RECONCILE",
+    "cancelled_gate_reruns": [
+      "38183001651:1"
+    ],
+    "feature_base_sha": null,
+    "feature_last_head": null,
+    "retry_failed_sha": "632c41b0a9d1377a3468574c2cf8d42131e6e003"
+  },
+  "recovery": {
+    "first_action": "Read current game branch HEAD, docs/automation/runs TASK_ID, and existing result material before editing",
+    "do_not_duplicate": true,
+    "runtime_validation": "UNTESTED unless real HMD tested",
+    "note": "A 5-minute controller snapshot is not a game-source commit or evidence that unfinished model reasoning was saved"
+  }
+}
