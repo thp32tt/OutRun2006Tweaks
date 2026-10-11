@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 14:16 KST",
+  "updated_at_kst": "2026-10-11 14:29 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -853,6 +853,23 @@
           "localization/graphics/role_C/20261011-C392-C2-EVEN-Q028-Q030-SOURCE-MORPHOLOGY/C392_Q028_C2_C3_STRICT_REWORK.json",
           "localization/graphics/role_C/20261011-C392-C2-EVEN-Q028-Q030-SOURCE-MORPHOLOGY/C392_Q030_C2_C3_STRICT_REWORK.json"
         ]
+      },
+      "c393_c2_q048_source_streak_strict_rework": {
+        "run_key": "OUTRUN-KOR-C393-C2-Q048-NEW-STREAK-AND-MORPHOLOGY-20261011-1430",
+        "role": "C2",
+        "shard": "EVEN",
+        "queue_index": 48,
+        "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+        "candidate_sha256": "259153b91e330479a4d975037013c77d339ffe3a2781461ebe118bfc04e28824",
+        "result": "REWORK_REQUIRED",
+        "source_effect_outside_text_bbox_changed_rgba": 415,
+        "source_effect_outside_text_bbox_changed_alpha": 415,
+        "previous_C3": "INVALIDATED",
+        "new_C3": "NOT_RUN",
+        "user_IGR009": "OPEN",
+        "runtime_validation": "UNTESTED",
+        "official_DDS_promoted": 0,
+        "evidence": "localization/graphics/role_C/20261011-C393-C2-Q048-SOURCE-STREAK-INDEPENDENT/C393_Q048_C2_STRICT_REWORK.json"
       }
     },
     "runtime_text_trace": {
