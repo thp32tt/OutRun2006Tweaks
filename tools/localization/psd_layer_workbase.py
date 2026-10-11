@@ -95,6 +95,32 @@ def run(args) -> dict:
         "RUNTIME_VALIDATION": "UNTESTED",
     }
     args.output.mkdir(parents=True, exist_ok=True)
+    if args.command == "separate":
+        all_nodes = {id(layer): p for p, layer in layers}
+        outputs = {}
+        outputs["english_original_full.png"] = save_once(
+            full_canvas(psd), args.output / "english_original_full.png")
+        folder = args.output / "separated_layers"
+        folder.mkdir(exist_ok=True)
+        for p, layer in layers:
+            if layer.is_group():
+                continue
+            # A selected leaf requires its ancestor groups to remain compositable.
+            selected = lambda node, leaf=p: node.is_visible() and (
+                all_nodes.get(id(node), "") == leaf
+                or leaf.startswith(all_nodes.get(id(node), "") + "/")
+            )
+            image = full_canvas(psd, selected)
+            file_name = "layer_" + p.replace("/", "_") + ".png"
+            outputs["separated_layers/" + file_name] = save_once(
+                image, folder / file_name)
+        output["output_sha256"] = outputs
+        output["layer_split_status"] = "EXTRACTED_UNCLASSIFIED"
+        output["warning"] = (
+            "Original English composite and individual layers were exported. "
+            "No CLEAN or English-layer classification until named layer paths "
+            "are independently reviewed against the exact canonical DDS."
+        )
     if args.command == "export":
         english = parse_paths(args.english_layers)
         if not english:
@@ -136,7 +162,9 @@ def run(args) -> dict:
             "Compare with exact SHA-pinned canonical DDS at native RAW/readable orientation, "
             "check protected art and residue, then obtain independent C2 PLATE_PASS."
         )
-    manifest = args.output / ("psd_layer_export.json" if args.command == "export" else "psd_layer_inventory.json")
+    manifest = args.output / ("psd_layer_export.json" if args.command == "export" else (
+        "psd_layer_separated.json" if args.command == "separate" else "psd_layer_inventory.json"
+    ))
     if manifest.exists():
         raise FileExistsError(f"Refusing to overwrite: {manifest}")
     manifest.write_text(json.dumps(output, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -146,7 +174,7 @@ def run(args) -> dict:
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     sub = ap.add_subparsers(dest="command", required=True)
-    for command in ("inventory", "export"):
+    for command in ("inventory", "separate", "export"):
         p = sub.add_parser(command)
         p.add_argument("--psd", required=True, type=Path)
         p.add_argument("--psd-sha256", default="")
