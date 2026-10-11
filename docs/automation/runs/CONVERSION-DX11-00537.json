@@ -2,8 +2,8 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00537",
   "production_id": "CONVERSION-DX11-00537",
-  "event_id": "CONVERSION-DX11-00537-E016",
-  "event_type": "retry",
+  "event_id": "CONVERSION-DX11-00537-E032",
+  "event_type": "rollover",
   "attempt": "3/3",
   "lane": "DX11",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00537",
@@ -78,9 +78,9 @@
   },
   "visible_frame_acceptance": "Real game-authored draw native pixel difference + game-visible UpdateSurface inset + game/Quest3 verification separately; not satisfied by WARP fixture",
   "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 exact explicit environment opt-in; NativeDrawPathActive remains false; all original D3D9 calls/returns preserved; unsupported state/empty pixels/failed D3D11/readback silently uses DX9Ex",
-  "feature_status": "FEATURE_READY",
-  "status": "FEATURE_READY_PENDING_CONTROLLER_TARGET_EXACT_BUNDLE",
-  "checkpoint": "C4_REPAIR_CANDIDATE",
+  "feature_status": "PROMOTED_TO_TARGET",
+  "status": "COMPLETE_DX11_FIRST_GAME_FRAME_DIAGNOSTIC_CI_RUNTIME_UNTESTED",
+  "checkpoint": "C6_RESULT",
   "feature_acceptance": {
     "implementation_complete": true,
     "targeted_checks": [
@@ -92,69 +92,70 @@
       "Feature 2cf69905 exact-HEAD Git tree matches PR merge 0e35569972; Build 38085544687 and OpenXR 38085544613 SUCCESS; five acceptance steps PASS; HUD Inspector 38085544668 SUCCESS; artifact 11682327338 SHA checks and x86/x64 PE assertions.",
       "Target exact-SHA 937f6bf484528ac5cf7570ace518cabc3247be93 Backend Conversion Gate #38092238784: validate SUCCESS; DX11 readiness smoke probes SUCCESS, including Win32 build. Earlier failed #38092172360 policy record was repaired by target commit 937f6bf4.",
       "Target exact-SHA 937f6bf484528ac5cf7570ace518cabc3247be93 Build #38092242550 SUCCESS and OpenXR VR architecture #38092242555 SUCCESS; no Quest3 or game runtime inference.",
-      "Feature diagnostic ZIP at earlier code-equivalent feature HEAD 0ef33aec08289977917abc6ae0d7c49004e105de: OpenXR run #38091030477 artifact 11684087168 (feature-dx11-first-game-frame-0ef33aec08289977917abc6ae0d7c49004e105de); target OpenXR #38092242555 skipped diagnostic-bundle job; do not claim exact target SHA ZIP."
+      "Feature diagnostic ZIP at earlier code-equivalent feature HEAD 0ef33aec08289977917abc6ae0d7c49004e105de: OpenXR run #38091030477 artifact 11684087168 (feature-dx11-first-game-frame-0ef33aec08289977917abc6ae0d7c49004e105de); target OpenXR #38092242555 skipped diagnostic-bundle job; do not claim exact target SHA ZIP.",
+      "C6 promoted exact material f3c378701a56b431015f2efe2a1f3d07bf313e44: Backend Conversion Gate #38110257960 SUCCESS (validate + DX11 readiness smoke); Build #38110260563 SUCCESS; OpenXR #38110258005 SUCCESS including x86/x64 and DX11-TEST-BUNDLE; artifact 11690543475; game/HMD UNTESTED."
     ],
     "integration_contract": "GAME_AUTHORED_D3D9_DRAW→D3D11_NATIVE_DRAW→D3D9_BACKBUFFER_DIAGNOSTIC_INSET (source/build/package PASS; runtime pixel/inset UNTESTED)",
-    "runtime_evidence": "UNTESTED: no physical OR2006C2C.EXE pixels/inset/input/Quest3 VDXR execution",
-    "ready_scope": "DIAGNOSTIC_OPT_IN_TEST_BUNDLE_ONLY_NOT_PRODUCTION_NATIVE_GAMEPLAY"
+    "runtime_evidence": "UNTESTED: actual OR2006C2C.EXE native pixels/diagnostic inset/input and Quest3 VDXR not performed",
+    "ready_scope": "PROMOTED_OPT_IN_DIAGNOSTIC_SOURCE_BUILD_TEST_BUNDLE_ONLY_NOT_FULL_NATIVE_GAMEPLAY"
   },
   "acceptance_results": [
     {
       "id": "DX11-LIVE-CALLSITE",
-      "status": "PASS",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d9/stereo_renderer_r30.cpp",
-        "src/vr/d3d11/live_game_frame_bridge.hpp"
+        "src/vr/d3d11/live_game_frame_bridge.cpp"
       ],
-      "validation_command": "GitHub Actions Build #38092242550 on target 937f6bf484528ac5cf7570ace518cabc3247be93 : Feature acceptance: DX11-LIVE-CALLSITE (source/Win32 CI verification; game/HMD runtime UNTESTED).",
-      "validation_level": "SOURCE_CONTRACT_PLUS_WIN32_COMPILATION_NOT_LIVE_GPU",
+      "validation_command": "GitHub Actions Build #38110260563 exact target material SHA f3c378701a56b431015f2efe2a1f3d07bf313e44; Feature acceptance: DX11-LIVE-CALLSITE SUCCESS (static source and Win32 Release compilation only; live game/Quest3 UNTESTED).",
+      "validation_level": "SOURCE_CONTRACT_AND_WIN32_COMPILATION_NOT_LIVE_GPU",
       "runtime_observation": "UNTESTED",
       "pre_c6_status": "PASS_EXACT_SHA_STATIC_SOURCE_AND_BUILD__RUNTIME_UNTESTED"
     },
     {
       "id": "DX11-NATIVE-DRAW",
-      "status": "PASS",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp"
       ],
-      "validation_command": "GitHub Actions Build #38092242550 on target 937f6bf484528ac5cf7570ace518cabc3247be93 : Feature acceptance: DX11-NATIVE-DRAW (source/Win32 CI verification; game/HMD runtime UNTESTED).",
-      "validation_level": "SOURCE_CONTRACT_PLUS_WIN32_COMPILATION_NOT_LIVE_GPU",
+      "validation_command": "GitHub Actions Build #38110260563 exact target material SHA f3c378701a56b431015f2efe2a1f3d07bf313e44; Feature acceptance: DX11-NATIVE-DRAW SUCCESS (static source and Win32 Release compilation only; live game/Quest3 UNTESTED).",
+      "validation_level": "SOURCE_CONTRACT_AND_WIN32_COMPILATION_NOT_LIVE_GPU",
       "runtime_observation": "UNTESTED",
       "pre_c6_status": "PASS_EXACT_SHA_STATIC_SOURCE_AND_BUILD__RUNTIME_UNTESTED"
     },
     {
       "id": "DX11-VISIBLE-FRAME",
-      "status": "PASS",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp",
         "src/vr/d3d9/stereo_renderer_r30.cpp"
       ],
-      "validation_command": "GitHub Actions Build #38092242550 on target 937f6bf484528ac5cf7570ace518cabc3247be93 : Feature acceptance: DX11-VISIBLE-FRAME (source/Win32 CI verification; game/HMD runtime UNTESTED).",
-      "validation_level": "SOURCE_CONTRACT_PLUS_WIN32_COMPILATION_NOT_LIVE_GPU",
+      "validation_command": "GitHub Actions Build #38110260563 exact target material SHA f3c378701a56b431015f2efe2a1f3d07bf313e44; Feature acceptance: DX11-VISIBLE-FRAME SUCCESS (static source and Win32 Release compilation only; live game/Quest3 UNTESTED).",
+      "validation_level": "SOURCE_CONTRACT_AND_WIN32_COMPILATION_NOT_LIVE_GPU",
       "runtime_observation": "UNTESTED",
       "pre_c6_status": "PASS_EXACT_SHA_STATIC_SOURCE_AND_BUILD__RUNTIME_UNTESTED"
     },
     {
       "id": "DX11-SAFE-RETURN",
-      "status": "PASS",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         "src/vr/d3d11/live_game_frame_bridge.cpp"
       ],
-      "validation_command": "GitHub Actions Build #38092242550 on target 937f6bf484528ac5cf7570ace518cabc3247be93 : Feature acceptance: DX11-SAFE-RETURN (source/Win32 CI verification; game/HMD runtime UNTESTED).",
-      "validation_level": "SOURCE_CONTRACT_PLUS_WIN32_COMPILATION_NOT_LIVE_GPU",
+      "validation_command": "GitHub Actions Build #38110260563 exact target material SHA f3c378701a56b431015f2efe2a1f3d07bf313e44; Feature acceptance: DX11-SAFE-RETURN SUCCESS (static source and Win32 Release compilation only; live game/Quest3 UNTESTED).",
+      "validation_level": "SOURCE_CONTRACT_AND_WIN32_COMPILATION_NOT_LIVE_GPU",
       "runtime_observation": "UNTESTED",
       "pre_c6_status": "PASS_EXACT_SHA_STATIC_SOURCE_AND_BUILD__RUNTIME_UNTESTED"
     },
     {
       "id": "DX11-TEST-BUNDLE",
-      "status": "PASS_FEATURE_EXACT_SHA__TARGET_EXACT_SHA_PENDING",
+      "status": "PASS_FEATURE_CI",
       "evidence_paths": [
         ".github/workflows/vr-openxr.yml",
         "tools/package_dx11_first_game_frame.py",
         "tools/test_package_dx11_first_game_frame.py"
       ],
-      "validation_command": "Feature exact HEAD 0d2e35c4: OpenXR VR architecture #38093092342 DX11 FIRST_GAME_DRAW_FRAME diagnostic bundle job SUCCESS; Verify opt-in package negatives SUCCESS; Feature acceptance: DX11-TEST-BUNDLE SUCCESS; artifact 11685380058 (feature-dx11-first-game-frame-0d2e35c4d690585b8182b27fd16cf2322b1021d7). TARGET 937f6bf4 does not yet include this workflow repair.",
-      "validation_level": "CI_BUILD_X86_X64_PLUS_SHA_PACKAGE_ON_FEATURE_EXACT_SHA_NOT_TARGET_OR_LIVE_GPU",
+      "validation_command": "GitHub Actions OpenXR VR architecture #38110258005 exact target material SHA f3c378701a56b431015f2efe2a1f3d07bf313e44; Verify opt-in package negatives SUCCESS; Feature acceptance: DX11-TEST-BUNDLE SUCCESS; artifact #11690543475, SHA256 artifact digest 0c74aa0271cf7f676f3f9d9bc6fc29983aa2cadb58d66b369bd14c62dc90e44f.",
+      "validation_level": "CI_X86_X64_REAL_BINARY_SHA_MANIFEST_NOT_HARDWARE",
       "runtime_observation": "UNTESTED",
       "pre_c6_status": "PASS_EXACT_SHA_BINARY_PACKAGE"
     }
@@ -177,89 +178,69 @@
     }
   ],
   "artifact_prefix": "feature-dx11-first-game-frame-",
-  "material_result_sha": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
-  "validation_bearing_result_sha": "937f6bf484528ac5cf7570ace518cabc3247be93",
-  "result_sha": "937f6bf484528ac5cf7570ace518cabc3247be93",
-  "automation_validation": "FEATURE_HEAD_EXACT_SHA_ALL_5_ACCEPTANCE_CI_PASS__TARGET_EXACT_SHA_PENDING",
+  "material_result_sha": "f3c378701a56b431015f2efe2a1f3d07bf313e44",
+  "validation_bearing_result_sha": "f3c378701a56b431015f2efe2a1f3d07bf313e44",
+  "result_sha": "f3c378701a56b431015f2efe2a1f3d07bf313e44",
+  "automation_validation": "PASS_TARGET_EXACT_MATERIAL_SHA_ALL_REQUIRED_GATES_AND_BUNDLE",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "native_draw_path_production_default": false,
   "source_stage": "SOURCE_BUILD_BUNDLE_VERIFIED__GAME_PIXEL_AND_HMD_UNTESTED",
   "last_real_activity_evidence": "Feature HEAD 0d2e35c4: Build #38093092203 SUCCESS (four named acceptance steps); OpenXR #38093092342 SUCCESS (DX11-TEST-BUNDLE named step + artifact 11685380058); compare vs TARGET 937f6bf4 shows workflow and run-record only, no C++ delta; target exact SHA remains unverified for bundle.",
-  "blocker": "TARGET_EXACT_SHA_DX11_TEST_BUNDLE_PENDING_CONTROLLER_ONLY_PROMOTION (feature-head CI already PASS)",
-  "resume_cursor": "FEATURE_READY_AWAIT_CONTROLLER_PROMOTION_BACKEND_GATE_AND_USER_GAME_TEST",
-  "next_action": "Controller ONLY: verify current lease/ownership, promote feature workflow fix from 0d2e35c4 to vr-dx11-native-r71, then check exact promoted target SHA OpenXR DX11-TEST-BUNDLE step + artifact and required gates. Game pixels, control inputs and Quest3/VDXR remain UNTESTED.",
+  "blocker": null,
+  "resume_cursor": "C6_COMPLETE_DIAGNOSTIC_SCOPE__RUNTIME_EVIDENCE_PENDING",
+  "next_action": "No repeat 00537 static gates or controller approval. Continue independent DX11 development in a new owned feature; for this opt-in test ZIP, user separately tests OR2006C2C game pixels, input, desktop inset, Quest3 VDXR. Never claim full native gameplay from synthetic/WARP/source evidence.",
   "score_change": 0,
   "validation_gates": {
     "build": {
       "workflow": "Build",
-      "run_id": 38092242550,
-      "head_sha": "937f6bf484528ac5cf7570ace518cabc3247be93",
+      "run_id": 38110260563,
+      "head_sha": "f3c378701a56b431015f2efe2a1f3d07bf313e44",
       "conclusion": "SUCCESS",
-      "scope": "TARGET_EXACT_SHA"
+      "scope": "TARGET_EXACT_VALIDATION_BEARING_SHA",
+      "feature_acceptance": [
+        "DX11-LIVE-CALLSITE",
+        "DX11-NATIVE-DRAW",
+        "DX11-VISIBLE-FRAME",
+        "DX11-SAFE-RETURN"
+      ]
     },
     "openxr": {
       "workflow": "OpenXR VR architecture",
-      "run_id": 38092242555,
-      "head_sha": "937f6bf484528ac5cf7570ace518cabc3247be93",
+      "run_id": 38110258005,
+      "head_sha": "f3c378701a56b431015f2efe2a1f3d07bf313e44",
       "conclusion": "SUCCESS",
-      "scope": "TARGET_EXACT_SHA_GAME_HOST_BUILDS_BUNDLE_SKIPPED"
+      "scope": "TARGET_EXACT_VALIDATION_BEARING_SHA",
+      "bundle_job": "SUCCESS",
+      "bundle_acceptance": "SUCCESS",
+      "artifact_id": 11690543475
     },
     "backend_conversion": {
       "workflow": "Backend Conversion Gate",
-      "run_id": 38092238784,
-      "head_sha": "937f6bf484528ac5cf7570ace518cabc3247be93",
+      "run_id": 38110257960,
+      "head_sha": "f3c378701a56b431015f2efe2a1f3d07bf313e44",
       "conclusion": "SUCCESS",
       "jobs": {
         "validate": "SUCCESS",
         "DX11 readiness smoke probes": "SUCCESS"
       },
-      "scope": "TARGET_EXACT_SHA"
-    },
-    "hud_inspector": {
-      "workflow": "OutRun EXE HUD Inspector CI",
-      "run_id": 38085544668,
-      "head_sha": "2cf69905c2adc4ebd495c373f1a67d64fbe32417",
-      "conclusion": "SUCCESS"
-    },
-    "feature_exact_head": {
-      "commit": "0d2e35c4d690585b8182b27fd16cf2322b1021d7",
-      "build": {
-        "run_id": 38093092203,
-        "conclusion": "SUCCESS",
-        "feature_acceptance": [
-          "DX11-LIVE-CALLSITE",
-          "DX11-NATIVE-DRAW",
-          "DX11-VISIBLE-FRAME",
-          "DX11-SAFE-RETURN"
-        ],
-        "source_only_not_runtime": true
-      },
-      "openxr": {
-        "run_id": 38093092342,
-        "conclusion": "SUCCESS",
-        "bundle_job": "SUCCESS",
-        "bundle_acceptance_step": "SUCCESS",
-        "artifact_id": 11685380058,
-        "artifact_name": "feature-dx11-first-game-frame-0d2e35c4d690585b8182b27fd16cf2322b1021d7"
-      },
-      "target_exact_sha_bundle": "PENDING_CONTROLLER_PROMOTION",
-      "runtime_validation": "UNTESTED"
+      "scope": "TARGET_EXACT_VALIDATION_BEARING_SHA"
     }
   },
   "test_bundle": {
-    "artifact_id": 11678470577,
-    "artifact_name": "feature-dx11-first-game-frame-4c9ccac8dd75956531a37e630fb9552f9e467a52",
-    "zip_sha256": "2b0e43c67ea7bbf39d42768554d0eb60feca1630efd9ab8357afc4252a27ef5f",
-    "game_dinput8_sha256": "b60579300034f2a03079c0ea1804b51b17dbc479ad15dd3ba3c43f82b1a3d2de",
-    "host_sha256": "5ec1f907b0aac32cb5e5f170118dd7d4e39ad52667170d667f1086c6239408da",
-    "build_source_sha": "ace79c52e876635d6be5c0b59a71bc459ac3f7a8",
-    "feature_head_sha": "4c9ccac8dd75956531a37e630fb9552f9e467a52",
-    "build_source_is_feature_head": false,
-    "source_trees_identical": true,
-    "source_tree_sha": "4ea3bfabd13985a0b81f9bd37c133af644234fef",
-    "artifact_digest_sha256": "3e5e7afcc62b74b9e5c52fcfa0e32c5fbcfc8a7d14fed9dbbed426595e05bf2d",
-    "artifact_size_bytes": 2790273,
+    "artifact_id": 11690543475,
+    "artifact_name": "feature-dx11-first-game-frame-f3c378701a56b431015f2efe2a1f3d07bf313e44",
+    "artifact_digest_sha256": "0c74aa0271cf7f676f3f9d9bc6fc29983aa2cadb58d66b369bd14c62dc90e44f",
+    "artifact_size_bytes": 2790971,
+    "build_source_sha": "f3c378701a56b431015f2efe2a1f3d07bf313e44",
+    "feature_head_sha": "f3c378701a56b431015f2efe2a1f3d07bf313e44",
+    "build_source_is_feature_head": true,
+    "ci_run_id": 38110258005,
+    "has_real_x86_game_dll": true,
+    "has_real_x64_openxr_host": true,
+    "session_selectors": "CONTROL and DIAGNOSTIC",
+    "sha256_manifest": true,
+    "log_collector": true,
     "runtime_validation": "UNTESTED"
   },
   "pipeline": {
@@ -269,7 +250,7 @@
     "C3_VALIDATE": "PASS exact material 4c9ccac8dd75956531a37e630fb9552f9e467a52: Build 38074993048 SUCCESS (four named source acceptances and Win32); OpenXR 38074993038 SUCCESS (all game/host/bundle). PR merge tree 4ea3bfabd13985a0b81f9bd37c133af644234fef identical to feature. No live game/HMD.",
     "C4_COMMIT": "PASS material 4c9ccac8dd75956531a37e630fb9552f9e467a52 contains [AUTO:CONVERSION-DX11-00537]; TARGET unchanged, PR #114 open/mergeable.",
     "C5_PACKAGE": "PASS artifact 11678470577, actual ZIP SHA256 2b0e43c67ea7bbf39d42768554d0eb60feca1630efd9ab8357afc4252a27ef5f, verified x86 game and x64 host hashes; native game/HMD UNTESTED.",
-    "C6_STATE": "FEATURE_READY (diagnostic opt-in only); controller promotion + target Backend Gate pending; hardware/game validation UNTESTED, same task score +0."
+    "C6_STATE": "PASS: AI fast-forward promotion feature f3c378701a56b431015f2efe2a1f3d07bf313e44 to TARGET, behind=0 lease expected_sha 937f6bf4 force=false. Exact material SHA Backend/Build/OpenXR all SUCCESS and target native diagnostic ZIP #11690543475. No live game/HMD claim; score 00537 already awarded once, +0."
   },
   "rollover_6": {
     "event_id": "CONVERSION-DX11-00537-E005",
@@ -817,7 +798,7 @@
     "source_changes_this_rollover": false,
     "score_change": 0
   },
-  "summary": "FIRST_GAME_DRAW_FRAME diagnostic opt-in source integrated into TARGET; mandatory GitHub Backend/Build/OpenXR exact-SHA gates PASS. Real OR2006C2C.exe GPU pixels/inset/input and Quest3 VDXR UNTESTED.",
+  "summary": "DX11 FIRST_GAME_DRAW_FRAME live game-authored D3D9 Draw->native D3D11 diagnostic inset vertical slice fast-forward promoted. All mandatory target exact material SHA gates PASS, x86 game+x64 host real diagnostic bundle built; default DX9Ex and input-safe fallback preserved. Runtime pixels/controls/Quest3 HMD UNTESTED. Independent R175 ownership unchanged.",
   "retry_2": {
     "task_id": "CONVERSION-DX11-00537",
     "event_id": "CONVERSION-DX11-00537-E015",
@@ -1006,5 +987,20 @@
     "material_change_this_rollover": false,
     "score_change": 0,
     "no_target_branch_write": true
+  },
+  "c6_completion": {
+    "event_id": "CONVERSION-DX11-00537-E032",
+    "material_sha": "f3c378701a56b431015f2efe2a1f3d07bf313e44",
+    "source_promotion": "FAST_FORWARD_EXPECTED_SHA_NO_FORCE",
+    "source_ci": "SUCCESS",
+    "target_backend_gate_run": 38110257960,
+    "target_build_run": 38110260563,
+    "target_openxr_run": 38110258005,
+    "target_bundle_artifact": 11690543475,
+    "mandatory_ci_status": "SUCCESS",
+    "runtime_validation": "UNTESTED",
+    "scope": "DIAGNOSTIC_OPT_IN_NOT_PRODUCTION_PLAYABILITY",
+    "score_change": 0,
+    "note": "C6 record itself is a documentation-only follow-up commit after verified material SHA, not a newly validated gameplay binary."
   }
 }
