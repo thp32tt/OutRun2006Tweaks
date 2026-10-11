@@ -95,6 +95,10 @@ VR_FORCE_ROLLOVER_SECONDS = max(300, int(os.getenv("VR_FORCE_ROLLOVER_SECONDS", 
 VR_UNCONDITIONAL_RESUME_SECONDS = max(VR_FORCE_ROLLOVER_SECONDS, int(os.getenv("VR_UNCONDITIONAL_RESUME_SECONDS", "2400")))
 VR_CHECKPOINT_ENABLED = os.getenv("VR_CHECKPOINT_ENABLED", "true").lower() == "true"
 VR_CHECKPOINT_BRANCH = os.getenv("VR_CHECKPOINT_BRANCH", "chat-controller-downloads").strip()
+# Continuous developer dispatch is deliberately independent of completed/blocked
+# feature queues. TASK_ID remains audit identity, never a dispatch prerequisite.
+VR_CONTINUOUS_30M_ENABLED = os.getenv("VR_CONTINUOUS_30M_ENABLED", "false").lower() == "true"
+VR_CONTINUOUS_INTERVAL_SECONDS = max(300, int(os.getenv("VR_CONTINUOUS_INTERVAL_SECONDS", "1800")))
 
 MAX_CHAT_ROLLOVERS_PER_TASK = max(0, int(os.getenv("MAX_CHAT_ROLLOVERS_PER_TASK", "1")))
 CHAT_ROTATE_COMPLETED_TASKS = max(0, int(os.getenv("CHAT_ROTATE_COMPLETED_TASKS", "5")))
@@ -266,7 +270,9 @@ class Registry:
     last_global_send_slot: Optional[str] = None
 
 runtime = {
-    "controller_build": "2026-10-11-resume-v3",
+    "controller_build": "2026-10-11-continuous-v4",
+    "vr_continuous_30m_enabled": VR_CONTINUOUS_30M_ENABLED,
+    "vr_continuous_interval_seconds": VR_CONTINUOUS_INTERVAL_SECONDS,
     "started_at": datetime.now(TZ).isoformat(),
     "auto_send": AUTO_SEND,
     "auto_send_requested": AUTO_SEND_REQUESTED,
@@ -1129,6 +1135,13 @@ def queue_dynamic_prefix() -> str:
         "자동 검증과 실기 검증을 분리해 기록해. 실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED 로 명시하고 정상 동작을 확정하지 마.",
         "작업 종료 시 마지막에 TASK_ID, RESULT_SHA, AUTOMATION_VALIDATION, RUNTIME_VALIDATION을 각각 한 줄로 출력해.",
     ]
+    if VR_CONTINUOUS_30M_ENABLED and lane in {"DX11", "DX9EX"}:
+        lines += [
+            "CONTINUOUS_DEVELOPMENT=ON. TASK_ID는 커밋·이력·점수 중복 방지 식별자일 뿐이며 이전 TASK 완료/C6, FEATURE_CONTRACT, backlog 상태는 다음 개발 착수의 선행 조건이 아니다.",
+            "매 30분 독립 새 채팅 개발 배정. GitHub 최신 HEAD와 기존 작업·실패를 확인한 후 이미 완료된 구현을 반복하지 말고 실제 미완료 코드와 회귀를 바로 수정해.",
+            "이전 대화/태스크가 미완료여도 다른 구현 가능한 코드 영역을 먼저 작업해. 동일 파일 충돌은 회피하고, 강제 Git push/CI-skip을 하지 마.",
+            "HMD 테스트를 못 했으면 RUNTIME_VALIDATION=UNTESTED로 남기되 새로운 게임 코드 개발을 멈추지 마.",
+        ]
     if lane in {"DX11", "DXVK", "DX9EX"}:
         lines += [
             "2026-10-08 사용자 최신 결정: DXVK 신규 개발·재개·배포·승격은 동결, DX11 네이티브 전환 완료를 최우선으로 한다. DX11 업무에서 DXVK로 이동하지 마.",
@@ -1137,7 +1150,7 @@ def queue_dynamic_prefix() -> str:
             "다른 작업자와 같은 work_key/파일/Task를 중복 수정하지 말고 원격 claim/HEAD를 확인해. 이미 진행 중인 CI는 새 상태 커밋으로 취소하지 마.",
             "배포/실기 PASS는 실제 Quest3/VDXR 검증 이후에만 선언해. 완료한 C0~C6+정확한 GitHub Gate가 확인되면 기존 TASK_ID를 재실행하지 말고 다음 독립 항목을 진행해.",
         ]
-    if lane in {"DX11", "DX9EX"}:
+    if lane in {"DX11", "DX9EX"} and not VR_CONTINUOUS_30M_ENABLED:
         lines += [
             "FEATURE_BASED_DEVELOPMENT=ON: 작은 패치 개수/20분 종료 규칙은 폐기. "
             "기능 하나(1~3시간 이상 가능)를 C0 조사→C1 구현 범위 확정→C2 전체 경로 구현→경량 국소검사→"
@@ -1171,7 +1184,7 @@ def queue_dynamic_prefix() -> str:
                 "FEATURE_MODE=IMPLEMENT_ON_FEATURE_BRANCH_ONLY",
                 "FEATURE_FINAL_PROMOTION=AI_SELF_VERIFIED_EXPECTED_SHA_FAST_FORWARD",
             ]
-    if lane == "DX11" and re.fullmatch(r"CONVERSION-DX11-[0-9]{5,}", task_id):
+    if lane == "DX11" and not VR_CONTINUOUS_30M_ENABLED and re.fullmatch(r"CONVERSION-DX11-[0-9]{5,}", task_id):
         if int(task_id.rsplit("-", 1)[-1]) >= 537:
             lines += [
                 "DX11_DIRECTION=FIRST_VISIBLE_GAME_FRAME: 신생 Rxxx WARP 픽셀/guard/probe 전용 작업을 중지한다. "
