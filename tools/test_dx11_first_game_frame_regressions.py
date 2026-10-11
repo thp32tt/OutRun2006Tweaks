@@ -2218,6 +2218,96 @@ def main() -> None:
             assert result[3] != texel[3] * diffuse[3]
     print("DX11 RGB blend with independent saturating ADD alpha Draw PASS (static only)")
 
+
+    # 00571: real game stage-0 blend RGB with independent SUBTRACT alpha
+    # producer -> compiled PS -> native Draw/DrawIndexed -> opt-in visible inset.
+    # Static negative mutations and CPU arithmetic are not Quest3/VDXR evidence.
+    def subtract_alpha_path_connected(source: str) -> bool:
+        intake = source[source.find("bool supported_game_state("):source.find("bool translate_vertices(")]
+        dispatch = source[source.find("bool submit("):source.find("void observe(")]
+        for token in (
+            "blendTextureSubtractAlpha || blendDiffuseSubtractAlpha ||",
+            "!blendTextureSubtractAlpha && !blendDiffuseSubtractAlpha &&",
+            "alphaNeedsDiffuse && !alphaArg2Diffuse",
+            "alphaArg1 != D3DTA_TEXTURE",
+        ):
+            if token not in intake: return False
+        for token in (
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+            "game->UpdateSurface(",
+            'GetEnvironmentVariableW(L"OUTRUN_DX11_FIRST_GAME_FRAME"',
+        ):
+            if token not in source: return False
+        if "ctx->PSSetShader(" not in dispatch: return False
+        for rgb in ("Texture", "Diffuse"):
+            flag = f"blend{rgb}SubtractAlpha"
+            shader = f"PSTextureBlend{rgb}SubtractAlpha"
+            factor = "t.a" if rgb == "Texture" else "v.diffuse.a"
+            links = (
+                f"const bool {flag} = op == D3DTOP_BLEND{rgb.upper()}ALPHA &&",
+                "alphaOp == D3DTOP_SUBTRACT;",
+                f"bool {flag} = false;",
+                f"capture.{flag} = {flag};",
+                f"float4 {shader}(VOut v) : SV_Target {{",
+                f"float4 c = float4(lerp(v.diffuse.rgb, t.rgb, {factor}), saturate(t.a - v.diffuse.a));",
+                f'compile("{shader}", "ps_4_0", blend{rgb}SubtractCode)',
+                f"s.{flag}Ps.GetAddressOf()",
+                f"s.{flag}Ps &&",
+                f"capture.{flag} ? s.{flag}Ps.Get() :",
+            )
+            if not all(x in source for x in links): return False
+            if source.count(f"s.{flag}Ps.Reset();") != 2: return False
+            if f"capture.{flag} ? s.{flag}Ps.Get() :" not in dispatch: return False
+        return True
+
+    assert subtract_alpha_path_connected(bridge)
+    for rgb in ("Texture", "Diffuse"):
+        flag = f"blend{rgb}SubtractAlpha"
+        shader = f"PSTextureBlend{rgb}SubtractAlpha"
+        factor = "t.a" if rgb == "Texture" else "v.diffuse.a"
+        for token in (
+            f"const bool {flag} = op == D3DTOP_BLEND{rgb.upper()}ALPHA &&",
+            f"capture.{flag} = {flag};",
+            f"float4 {shader}(VOut v) : SV_Target {{",
+            f"float4 c = float4(lerp(v.diffuse.rgb, t.rgb, {factor}), saturate(t.a - v.diffuse.a));",
+            f'compile("{shader}", "ps_4_0", blend{rgb}SubtractCode)',
+            f"s.{flag}Ps.GetAddressOf()",
+            f"capture.{flag} ? s.{flag}Ps.Get() :",
+        ):
+            mutated = bridge.replace(token, "/* 00571 disconnected */", 1)
+            assert mutated != bridge and not subtract_alpha_path_connected(mutated), token
+    # D3D9: BLENDDIFFUSEALPHA=12, BLENDTEXTUREALPHA=13, SUBTRACT=10.
+    # Reject wrong order, unknown ops, color argument modifiers and alpha modifiers.
+    for rgb_op, alpha_op, arg1, arg2, accepted in (
+        (12, 10, "texture", "current", True),
+        (13, 10, "texture", "diffuse", True),
+        (12, 10, "texture", "texture", False),
+        (13, 10, "diffuse", "diffuse", False),
+        (12, 10, "texture|complement", "diffuse", False),
+        (13, 10, "texture", "diffuse|complement", False),
+        (12, 7, "texture", "diffuse", False),
+        (13, 4, "texture", "current", False),
+        (14, 10, "texture", "diffuse", False),
+    ):
+        admitted = rgb_op in (12, 13) and alpha_op == 10 and (
+            arg1 == "texture" and arg2 in ("diffuse", "current"))
+        assert admitted is accepted
+    for texel, diffuse in (
+        ((.9, .2, .5, .85), (.1, .8, .3, .25)),
+        ((.15, .75, .95, .1), (.8, .1, .4, .7)),
+        ((.6, .3, .2, .4), (.5, .4, .9, .4)),
+    ):
+        for factor in (texel[3], diffuse[3]):
+            rgba = (tuple((1-factor)*d + factor*t
+                          for t, d in zip(texel[:3], diffuse[:3])) +
+                    (max(0.0, texel[3]-diffuse[3]),))
+            assert all(0.0 <= x <= 1.0 for x in rgba)
+            assert rgba[3] == max(0.0, texel[3]-diffuse[3])
+            assert rgba[3] != min(1.0, texel[3]+diffuse[3])
+    print("DX11 blend RGB / independent SUBTRACT alpha native Draw PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
