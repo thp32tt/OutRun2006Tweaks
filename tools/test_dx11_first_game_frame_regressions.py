@@ -974,7 +974,7 @@ def main() -> None:
             "std::memcpy(candidate.uv5, data + layout.texcoordOffset + 40u, 8u)",
             "std::memcpy(candidate.uv6, data + layout.texcoordOffset + 48u, 8u)",
             "std::memcpy(candidate.uv7, data + layout.texcoordOffset + 56u, 8u)",
-        )) and all(x in probe for x in (
+        )) and hdr.count("layout.texcoordCount > 8u") == 2 and all(x in probe for x in (
             "kGameFvfXyzRhw | kGameFvfTex8",
             "game_fvf_select_uv(sample, layout, 7u, chosen)",
             "!game_fvf_decode_vertex(&eight, 79u",
