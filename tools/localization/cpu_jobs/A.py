@@ -1,227 +1,258 @@
 #!/usr/bin/env python3
-"""A237: q161 R11 source-derived approved CLEAN + separated native glyph engine.
-Single new unpromoted BC3 trial. Other 37 cells keep A218 bytes exactly.
+"""A238: q121 P0 material rework with manually authored source-conditioned Hangul geometry.
+
+A235/A235R C1 optical reject: weak white face (40.7% source) and
+oversized navy rim. This does NOT rescale/recolor/reuse the rejected
+Hangul raster; it authors four syllables as individual editable stroke
+graphs, renders once at exact source-native resolution, then separates
+geometry, rim, shallow extrusion and face before composing a distinct
+unpromoted DDS. Whole atlas/C1/C3/game stay unapproved.
 """
-import os,sys,io,json,hashlib,struct,csv,subprocess,platform
+import csv, hashlib, io, json, os, subprocess, sys
 from pathlib import Path
-from PIL import Image,ImageDraw,ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageChops
 import numpy as np
-assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions"
-assert os.environ.get("OUTRUN_CPU_ROLE")=="A"
+assert os.environ.get("OUTRUN_CPU_WORKER") == "github-actions"
+assert os.environ.get("OUTRUN_CPU_ROLE") == "A"
 sys.dont_write_bytecode=True
-root=Path.cwd()
-sys.path.insert(0,str(root))
-sys.path.insert(0,str(root/"tools/localization"))
-from tools.localization.plate_library import resolve,verify_source,review
+ROOT=Path.cwd()
+sys.path.insert(0,str(ROOT))
+sys.path.insert(0,str(ROOT/"tools/localization"))
 from compose_lettering import compose
-RUN="OUTRUN-KOR-A237-Q161-R11-NATIVE-NANUM-SEPARATED-GLYPH-20261011-0900"
-folder="localization/graphics/role_A/20261011-A237-Q161-R11-NANUM-SEPARATED-GLYPH"
-out=root/folder;out.mkdir(parents=True,exist_ok=True)
+RUN="OUTRUN-KOR-A238-Q121-MANUAL-FOUR-GLYPH-WHITE-FACE-20261011-1200"
+OUT=ROOT/"localization/graphics/role_A/20261011-A238-Q121-MANUAL-SOURCE-GLYPH"
+OUT.mkdir(parents=True,exist_ok=True)
+SRC=ROOT/"localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
+BASE=ROOT/"localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds"
+EXPECTED_SRC="f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e"
+EXPECTED_OFFICIAL="38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844"
+X0,Y0,X1,Y1=(3490,391,3722,440)
+W,H=X1-X0,Y1-Y0
 def sha(b):return hashlib.sha256(b).hexdigest()
-def savej(n,d):(out/n).write_text(json.dumps(d,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
-def savepng(n,im):
- p=out/n;im.save(p,format="PNG");return {"path":str(p.relative_to(root)),"sha256":sha(p.read_bytes())}
-def ref(p):return {"path":str(p.relative_to(root)),"sha256":sha(p.read_bytes())}
-tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","161"],capture_output=True,text=True)
-savej("A237_REWORK_TRIAGE.json",{"returncode":tri.returncode,"stdout":tri.stdout[-6000:],"stderr":tri.stderr[-1500:]})
-assert tri.returncode==0,"triage preflight fails closed"
-with (root/"localization/graphics/asset_queue.csv").open(encoding="utf-8-sig",newline="") as f:
- row=next(v for v in csv.DictReader(f) if v["index"]=="161")
-assert row["action"]=="localize_text" and "plate_pass" in row["artwork_status"]
-srcrel="localization/graphics/role_A/20261011-A236-Q161-THREE-SOURCE-AUTHENTICATED-CLEAN/A236_CANONICAL_ENGLISH_SOURCE_EXACT.dds"
-source_path=root/srcrel
-srcbytes=source_path.read_bytes()
-assert sha(srcbytes)=="a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d"
-manifestsha="caf59675820b65b4ded62b05e463bfb66c77878a4ba24a4f9ff810e36ff2b9f8"
-manifest,plate=resolve(root,161,sha(srcbytes),"AQUARIUS_SOUTH_KOREA_ITALY_CELLS_11_16_24","readable_flip_y",manifestsha)
-assert manifest.stem==manifestsha and review(root,manifest,plate)["status"]=="PLATE_PASS"
-assert verify_source(root,plate,source_path)["outside_removal_rgba"]==0
-clean=Image.open(root/plate["clean"]["path"]).convert("RGBA")
-clean_arr=np.array(clean)
-x0,y0,x1,y1=717,1671,1013,1725
-assert not clean_arr[y0:y1,x0:x1,3].any(),"English residue in certified CLEAN"
-# Native font family material change from C349's wide-gap Noto Black.
-# Do not fall back silently, or resize previous Korean pixels.
-subprocess.run(["sudo","apt-get","install","-qq","-y","fonts-nanum"],check=True,
-               stdout=subprocess.DEVNULL)
-fontdir=Path("/usr/share/fonts/truetype/nanum")
-matches=sorted(fontdir.glob("*ExtraBold*.ttf"))
-if not matches:
- matches=sorted(fontdir.glob("*Bold*.ttf"))
-assert matches,"Requested native Nanum bold/extra-bold font unavailable"
-fontpath=matches[0]
-fontbytes=fontpath.read_bytes();font_sha=sha(fontbytes)
-font=ImageFont.truetype(str(fontpath),52)
-text="물병자리"
-# Source original block bbox 296 x 54, font face itself limited to <=50px
-# height and positive 1px margins. Width natural; NO squish/stretch/upsampling.
-scratch=Image.new("L",(500,100),0)
-dr=ImageDraw.Draw(scratch)
-dr.text((8,5),text,font=font,fill=255,stroke_width=0)
-bb=scratch.getbbox()
-assert bb and bb[2]-bb[0]<=280 and bb[3]-bb[1]<=49,(bb,text)
-glyph=scratch.crop(bb)
-assert glyph.width>=130 and glyph.height>=37,(glyph.width,glyph.height)
-# Center within safe 4x4 BC3 blocks, not within a foreign rectangle.
-safe=[720,1672,1012,1724]
-place_x=safe[0]+(safe[2]-safe[0]-glyph.width)//2
-place_y=safe[1]+(safe[3]-safe[1]-glyph.height)//2
-assert place_x>718 and place_y>1671 and place_x+glyph.width<1012 and place_y+glyph.height<1725
-readable=Image.new("L",(2048,2048),0)
-readable.paste(glyph,(place_x,place_y))
-# Fixed 8 alpha levels exact to BC3 alpha palette [255,218,182,146,109,73,36,0].
-palette=np.array([0,36,73,109,146,182,218,255],dtype=np.uint8)
-pix=np.array(readable,dtype=np.uint8)
-ix=np.abs(pix.astype(np.int16)[...,None]-palette[None,None,:].astype(np.int16)).argmin(axis=2)
-quantized=palette[ix]
-assert np.any(quantized>0)
-readable=Image.fromarray(quantized,"L")
-raw_geo=readable.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-geo_ref=savepng("A237_GEOMETRY_RAW_NATIVE_L.png",raw_geo)
-face=Image.new("RGBA",(2048,2048),(60,71,74,0))
-face.putalpha(raw_geo)
-face_ref=savepng("A237_FACE_RAW_NATIVE_RGBA.png",face)
-# Geometry comparison evidence: canonical readable English vs geometry
-source_image=Image.open(io.BytesIO(srcbytes)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-src_crop=source_image.crop((x0,y0,x1,y1))
-geo_crop=readable.crop((x0,y0,x1,y1))
-for n,bgcol in (("GRAY",(100,100,100)),("BLACK",(0,0,0)),("WHITE",(255,255,255))):
- f1=Image.alpha_composite(Image.new("RGBA",src_crop.size,bgcol+(255,)),src_crop).convert("RGB")
- f2=Image.alpha_composite(Image.new("RGBA",geo_crop.size,bgcol+(255,)),Image.merge("RGBA",(*[Image.new("L",geo_crop.size,col) for col in (60,71,74)],geo_crop))).convert("RGB")
+def ref(p):return {"path":str(p.relative_to(ROOT)),"sha256":sha(p.read_bytes())}
+def writej(name,value):
+ p=OUT/name
+ p.write_text(json.dumps(value,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
+ return ref(p)
+def png(name,img):
+ p=OUT/name;img.save(p,format="PNG");return ref(p)
+with (ROOT/"localization/graphics/asset_queue.csv").open(encoding="utf-8-sig",newline="") as f:
+ row=next(x for x in csv.DictReader(f) if x["index"]=="121")
+assert row["action"]=="localize_text" and ("rework" in row["artwork_status"].lower() or "hold" in row["artwork_status"].lower())
+tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","121"],capture_output=True,text=True)
+writej("A238_TRIAGE.json",{"returncode":tri.returncode,"stdout":tri.stdout[-6500:],"stderr":tri.stderr[-1500:],
+ "action":"MANUAL_MATERIAL_REWORK_NOT_SAFE_SAME_METHOD_RERENDER"})
+assert tri.returncode==0
+source_bytes=SRC.read_bytes()
+old_bytes=BASE.read_bytes()
+assert sha(source_bytes)==EXPECTED_SRC
+assert sha(old_bytes)==EXPECTED_OFFICIAL
+assert source_bytes[:128]==old_bytes[:128]
+assert len(old_bytes)==128+4096*4096*4
+src=Image.open(io.BytesIO(source_bytes)).convert("RGBA")
+old=Image.open(io.BytesIO(old_bytes)).convert("RGBA")
+assert src.size==old.size==(4096,4096)
+# Confirm direct raw RGBA byte serialization matches the stored DDS exactly.
+assert old.tobytes()==old_bytes[128:],"DDS channel order/strides differ; fail closed"
+source_readable=src.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+official_readable=old.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+english=source_readable.crop((X0,Y0,X1,Y1))
+previous=official_readable.crop((X0,Y0,X1,Y1))
+# P1: actual English transparent-sprite source. C1 A235R independently
+# confirmed this same SOURCE ROI -> fully transparent CLEAN alpha0.
+clean=Image.new("RGBA",(W,H),(0,111,159,0))
+assert not clean.getchannel("A").getbbox()
+assert english.getchannel("A").getbbox() is not None
+png("A238_SOURCE_ENGLISH_NATIVE.png",english)
+png("A238_PLATE_ONLY_NATIVE.png",clean)
+# P2: direct per-syllable manual stroke topology. No fonts or Korean
+# bitmap sampling. One 4x vector AA rasterization into the true native
+# 232x49 source footprint. The 0.10 source-rightlean vector is measured
+# from optical English G ~+4.94px/46px, with trial top+bottom anchors
+# disclosed as optical, not independently homologous.
+AA=4
+layer=Image.new("L",(W*AA,H*AA),0)
+d=ImageDraw.Draw(layer)
+def draw_line(points,stroke=7.0):
+ pp=[(round(a*AA),round(b*AA)) for a,b in points]
+ width=round(stroke*AA)
+ d.line(pp,fill=255,width=width,joint="curve")
+ for px,py in (pp[0],pp[-1]):
+  rad=width//2
+  d.ellipse((px-rad,py-rad,px+rad,py+rad),fill=255)
+def stroke(ox,pts,width=7.0):
+ # Height-authored strokes: ~2px min and ~3px lower safety margin.
+ transformed=[(ox+x+(44-y)*.10, 2+y*.93) for x,y in pts]
+ draw_line(transformed,width)
+# 가: ㄱ + ㅏ; source-conditioned broad strokes and round corners.
+stroke(8,[(1,7),(22,7),(22,37)],8)
+stroke(8,[(34,6),(34,37)],7.5)
+stroke(8,[(23,23),(34,23)],7)
+# 속: ㅅ + ㅗ + ㄱ, explicit syllable components.
+stroke(61,[(19,6),(5,19)],7.5)
+stroke(61,[(19,6),(34,19)],7.5)
+stroke(61,[(6,23),(35,23)],7)
+stroke(61,[(20,23),(20,29)],6)
+stroke(61,[(6,34),(35,34),(35,40)],7)
+# 페: ㅍ + ㅔ; retains separate counters, not a stretched font raster.
+stroke(122,[(2,7),(20,7)],7)
+stroke(122,[(7,8),(7,26)],7)
+stroke(122,[(18,8),(18,26)],7)
+stroke(122,[(2,26),(20,26)],7)
+stroke(122,[(2,37),(20,37)],7)
+stroke(122,[(31,5),(31,40)],7)
+stroke(122,[(21,19),(31,19)],6)
+stroke(122,[(41,5),(41,40)],7)
+# 달: ㄷ + ㅏ + ㄹ, composed in native coordinates.
+stroke(180,[(2,7),(21,7)],7)
+stroke(180,[(2,7),(2,21),(21,21)],7)
+stroke(180,[(34,5),(34,23)],7)
+stroke(180,[(22,14),(34,14)],7)
+stroke(180,[(3,30),(34,30)],7)
+stroke(180,[(34,30),(34,39),(3,39)],7)
+face_a=layer.resize((W,H),Image.Resampling.LANCZOS)
+face_np=np.asarray(face_a)
+ink=(face_np>0)
+box=face_a.getbbox()
+assert box is not None and box[0]>=2 and box[1]>=1 and box[2]<=W-2 and box[3]<=H-2,box
+face_count=int(np.count_nonzero(face_np>=240))
+assert face_count>=2700,("source white face 3504px, unacceptable optical underfill",face_count)
+# Authentic source's near-white, dark family target is recorded from C1,
+# and validated by actual new native pixels rather than producer prose.
+rim_a=ImageChops.subtract(face_a.filter(ImageFilter.MaxFilter(3)),face_a)
+shade_a=ImageChops.subtract(ImageChops.offset(face_a,0,1),face_a)
+# Allocate native readable ROI geometry, then mirror to persisted DDS RAW.
+def raw_full_alpha(alpha):
+ im=Image.new("L",(4096,4096),0)
+ im.paste(alpha,(X0,Y0))
+ return im.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+geo=raw_full_alpha(face_a)
+rimg=raw_full_alpha(rim_a)
+shade=raw_full_alpha(shade_a)
+geo_ref=png("A238_GEOMETRY_RAW_L.png",geo)
+def rgba(rgb,alpha):
+ im=Image.new("RGBA",alpha.size,rgb+(0,))
+ im.putalpha(alpha);return im
+face_ref=png("A238_FACE_RAW.png",rgba((255,255,255),geo))
+rim_ref=png("A238_RIM_RAW.png",rgba((0,17,24),rimg))
+shade_ref=png("A238_EXTRUSION_RAW.png",rgba((0,58,91),shade))
+# Geometry-only review must not be mislabeled C or production PASS.
+def on_background(im,rgb):
+ return Image.alpha_composite(Image.new("RGBA",im.size,rgb+(255,)),im).convert("RGB")
+for bgname,col in [("GRAY",(100,100,100)),("BLACK",(0,0,0)),("WHITE",(255,255,255))]:
+ src_rgb=on_background(english,col)
+ face_rgb=on_background(rgba((255,255,255),face_a),col)
  for pct in (100,75,50):
-  if pct!=100:
-   w=int(round((x1-x0)*pct/100));h=int(round((y1-y0)*pct/100))
-   a=f1.resize((w,h),Image.Resampling.LANCZOS)
-   b=f2.resize((w,h),Image.Resampling.LANCZOS)
-  else:a=f1;b=f2
-  card=Image.new("RGB",(a.width*2,a.height+18),bgcol)
-  card.paste(a,(0,18));card.paste(b,(a.width,18))
-  d=ImageDraw.Draw(card)
-  d.text((2,2),"SOURCE",fill="black" if n=="WHITE" else "white")
-  d.text((a.width+2,2),"NATIVE GEO",fill="black" if n=="WHITE" else "white")
-  card.save(out/f"A237_SOURCE_GEOMETRY_{n}_{pct}.png")
-evidence=ref(out/"A237_SOURCE_GEOMETRY_GRAY_100.png")
-geomrecipe={"engine":"pillow-native-font","font_path":str(fontpath),
- "font_sha256":font_sha,"font_family":"NanumGothic native bold","font_size":52,
- "font_license":"Nanum OFL; distribution is not included in this repository",
- "text":text,"original_source_bbox":[x0,y0,x1,y1],
- "source_face_color":[60,71,74],"crop_bbox":list(bb),"rendered_size":[glyph.width,glyph.height],
- "readable_paste_xy":[place_x,place_y],"bc3_palette":palette.tolist(),
- "pixel_orientation":"native_raw_mirror_y","source_provenance":srcrel,
- "method_change":"Nanum native vector instead of rejected A218 Noto Black, source clean C1 approved; no previous glyph bitmap upscale"}
-savej("A237_GEOMETRY_RENDERER.json",geomrecipe)
-geometry_review={"status":"GEOMETRY_READY","reviewer":"A","route":"native_small",
- "source_sha256":sha(srcbytes),"geometry_sha256":geo_ref["sha256"],
- "observations":{"stroke":"Native Nanum Bold dark face; no Noto Black preserved raster; 100% source still more condensed and heavy, so whole-family match HOLD.",
- "counterspace":"Hangul counters visibly nonempty at native 100 and 50 on black/gray; anti-alias steps quantized to true BC3 discrete alpha.",
- "proportions":f"Original 296x54 source box, new actual native glyph {glyph.width}x{glyph.height}, within original bbox with positive pixel margin. No old Korean resize.",
- "slant":"Source R11 upright flat dark uppercase; new Hangul upright, no arbitrary shear.",
- "readability":"At gray 100/black 50 one glyph phrase is distinguishable; source-family hierarchy remains independent review HOLD."},
- "evidence":[evidence,ref(out/"A237_SOURCE_GEOMETRY_BLACK_50.png")],
- "not_c_pass":True}
-savej("A237_GEOMETRY_REVIEW.json",geometry_review)
-recipe={"version":"separated-lettering-v1","coordinates":"native_raw","route":"native_small",
- "source":ref(source_path),"geometry":geo_ref,
- "geometry_recipe":ref(out/"A237_GEOMETRY_RENDERER.json"),
- "geometry_review":ref(out/"A237_GEOMETRY_REVIEW.json"),
- "layers":[{"role":"face","input":face_ref}]}
-savej("lettering_recipe.json",recipe)
-lettering,cm=compose(root,recipe)
-assert np.array_equal(np.array(lettering)[:,:,3],np.array(raw_geo)),"face alpha mismatch"
-lettering_ref=savepng("A237_LETTERING_COMPOSED_RAW.png",lettering)
-# Preserve original q161 official DDS and existing A218 trial; only rewrite
-# BC3 R11 blocks strictly inside original English bbox.
-a218=root/"localization/graphics/role_A/20261010-A218-Q161-C344-THREE-GLYPH-FACE-REPAIR/A218_Q161_C344_THREE_FACE_REWORK_TRIAL.dds"
-a218raw=a218.read_bytes()
-assert sha(a218raw)=="8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e"
-official=root/"localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/55B57CDE_512x512.dds"
-assert sha(official.read_bytes())=="8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65"
-assert a218raw[:128]==srcbytes[:128] and len(a218raw)==128+2048*2048
-# Fixed original RGB565 source dark face. The existing A218 method provides
-# lossless preservation of 37 unrelated target blocks.
-b=bytearray(a218raw)
-r,g,blue=60,71,74
-rgb565=((r>>3)<<11)|((g>>2)<<5)|(blue>>3)
-rgbpart=struct.pack("<HHI",rgb565,rgb565,0)
-alpha_vals=[255,0,218,182,146,109,73,36]
-def enc(block):
- ids=[min(range(8),key=lambda k:abs(int(v)-alpha_vals[k])) for v in block]
- bits=sum(i<<(3*n) for n,i in enumerate(ids))
- return bytes([255,0])+bits.to_bytes(6,"little")+rgbpart
-geo=np.array(raw_geo,dtype=np.uint8)
-assert geo.shape==(2048,2048)
-# R11 safe block-bounded writable area readable x720..1011/y1672..1723
-# corresponds in RAW y=324..375 (2048 -1724.. 2048-1672).
-changes=0
-for y in range(324,376,4):
- for x in range(720,1012,4):
-  of=128+((y//4)*512+x//4)*16
-  compressed=enc(geo[y:y+4,x:x+4].reshape(16).tolist())
-  if b[of:of+16]!=compressed:
-   changes+=1;b[of:of+16]=compressed
-assert changes>0
-assert b[:128]==a218raw[:128] and len(b)==len(a218raw)
-candidate=out/"A237_Q161_R11_UNPROMOTED_SOURCE_GLYPH.dds"
-candidate.write_bytes(b)
-newsha=sha(b)
-assert newsha not in {sha(a218raw),sha(official.read_bytes())}
-saved=Image.open(candidate).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM)
-saved_arr=np.array(saved,dtype=np.uint8)
-old_arr=np.array(Image.open(a218).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
-roi=np.zeros((2048,2048),dtype=bool)
-roi[y0:y1,x0:x1]=True
-delta=np.any(saved_arr!=old_arr,axis=2)
-outside=int(np.count_nonzero(delta&~roi))
-assert outside==0,("protected atlas change",outside)
-assert np.any(delta)
-# Check actual NEW glyph is visible, old strokes do not survive cleared safe
-# region outside redesigned face (BC3 alpha stays truly zero).
-final_crop=saved_arr[y0:y1,x0:x1]
-final_alpha=(final_crop[:,:,3]>0)
-intended=np.array(readable)[y0:y1,x0:x1]>0
-extraneous=int(np.count_nonzero(final_alpha&~intended))
-missing=int(np.count_nonzero(intended&~final_alpha))
-assert extraneous==0 and missing==0,(extraneous,missing)
-bb_saved=Image.fromarray((final_alpha*255).astype(np.uint8),"L").getbbox()
-assert bb_saved
-assert bb_saved[0]>0 and bb_saved[1]>0 and bb_saved[2]<(x1-x0) and bb_saved[3]<(y1-y0)
-# BGW comparative persisted DDS and RAW crop, source + A218 + NEW
-for n,bgcol in (("GRAY",(100,100,100)),("BLACK",(0,0,0)),("WHITE",(255,255,255))):
- imgs=[]
- for img in (source_image,Image.open(a218).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM),saved):
-  crop=img.crop((x0,y0,x1,y1))
-  imgs.append(Image.alpha_composite(Image.new("RGBA",crop.size,bgcol+(255,)),crop).convert("RGB"))
- for percent in (100,75,50):
-  tiles=[]
-  for im in imgs:
-   if percent==100:tiles.append(im)
-   else:tiles.append(im.resize((int(round(im.width*percent/100)),int(round(im.height*percent/100))),Image.Resampling.LANCZOS))
-  w,h=tiles[0].size
-  sheet=Image.new("RGB",(3*w,h+20),bgcol);dd=ImageDraw.Draw(sheet)
-  for j,(im,name) in enumerate(zip(tiles,("SOURCE","A218 TRIAL","A237 SAVED"))):
-   sheet.paste(im,(j*w,20));dd.text((j*w+2,2),name,fill="black" if n=="WHITE" else "white")
-  sheet.save(out/f"A237_COMPARE_{n}_{percent}.png")
-saved.crop((x0,y0,x1,y1)).transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(out/"A237_SAVED_R11_ACTUAL_RAW.png")
-# Report fail-close: native review only, no claim font/source visual match or C1 PASS
-report={"role":"A","run_key":RUN,"index":161,"cell":"R11_AQUARIUS_TO_물병자리",
- "canonical_source_sha256":sha(srcbytes),"c1_approved_plate_manifest":manifestsha,
- "plate_sha256":plate["clean"]["sha256"],"prior_trial_sha256":sha(a218raw),
- "official_sha256":sha(official.read_bytes()),"new_trial_sha256":newsha,
- "new_trial_path":str(candidate.relative_to(root)),"codec":"BC3/DXT5",
- "native":[2048,2048],"source_original_bbox":[x0,y0,x1,y1],
- "glyph_bbox_local":list(bb_saved),"native_glyph_wh":[glyph.width,glyph.height],
- "changed_blocks":changes,"changed_rgba_pixels":int(delta.sum()),"outside_region_changes":outside,
- "source_remaining_alpha_in_clean":0,"decoder_exact_glyph_silhouette":extraneous==0 and missing==0,
- "other_37_cells_unchanged":True,"font_sha256":font_sha,
- "lettering_recipe":ref(out/"lettering_recipe.json"),
- "composed_lettering_sha256":lettering_ref["sha256"],
- "geometry_ready":"A_PRODUCER_GEOMETRY_READY_SCOPED",
- "producer_decision":"SCOPED_TRIAL_REQUIRES_CONTROLLER_NATIVE_FIRST_LOOK",
- "whole_atlas":"REWORK_REQUIRED_UNPROMOTED",
- "C1":"NOT_RUN_NEW_SHA","C3":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED",
- "game_retest":"NOT_RUN","new_official_dds":0,
- "root_cause":"C349 source hierarchy underfill in old A218; A237 new native glyph geometry/face family, cannot infer visual PASS from numeric scope",
- "backend":"GitHub runner: canonical BC3 unavailable to local container (DNS disabled)",
- "next":"Independent first-look producer optical verdict; record HOLD if source hierarchy deviates. New C1 only for distinct saved SHA."}
-savej("A237_MACHINE_AND_PRODUCER_HANDOFF.json",report)
-print(json.dumps({"A237":"NEW_UNPROMOTED_DDS","sha":newsha,"bbox":bb_saved,"outside":outside,"blocks":changes}))
+  size=(max(1,round(W*pct/100)),max(1,round(H*pct/100)))
+  e=src_rgb.resize(size,Image.Resampling.LANCZOS) if pct!=100 else src_rgb
+  k=face_rgb.resize(size,Image.Resampling.LANCZOS) if pct!=100 else face_rgb
+  card=Image.new("RGB",(size[0]*2,size[1]+18),col)
+  card.paste(e,(0,18));card.paste(k,(size[0],18))
+  dr=ImageDraw.Draw(card);fg=(0,0,0) if bgname=="WHITE" else (255,255,255)
+  dr.text((2,2),"ORIGINAL SOURCE",fill=fg)
+  dr.text((size[0]+2,2),"HAND VECTOR ONLY",fill=fg)
+  png(f"A238_GEOMETRY_{bgname}_{pct}.png",card)
+geomrecipe=writej("A238_GEOMETRY_RECIPE.json",{
+ "engine":"manual-native-polylines-v1","source":"Gas Pedal",
+ "target":"가속 페달","syllable_sequence":["가","속","페","달"],
+ "source_effect_bbox":[X0,Y0,X1,Y1],
+ "method_change":"four manually authored stroke graphs and independent fontless native contour geometry; not A235/A235R regular Noto resizing/painting",
+ "supersample_once":AA,"source_right_lean_proxy":4.94/46,
+ "top_minus_bottom_shear_per_px":0.10,
+ "source_C1_white_pixels_proxy":3504,"source_C1_dark_pixels_proxy":1518,
+ "trial_near_opaque_face_pixels":face_count,"local_face_bbox":list(box),
+ "stroke_primitives":22,"rim":"native 1px morphology separate",
+ "extrusion":"native 1px lower offset separate",
+ "RUNTIME_VALIDATION":"UNTESTED"})
+geomreview=writej("A238_GEOMETRY_REVIEW.json",{
+ "status":"GEOMETRY_READY","reviewer":"A","route":"vector_title",
+ "source_sha256":EXPECTED_SRC,"geometry_sha256":geo_ref["sha256"],
+ "observations":{
+   "stroke":"Four fontless manual rounded per-stroke glyph graphs; white native face coverage %dpx versus independently C1-recorded source 3504px; no thin Noto Regular face."%face_count,
+   "counterspace":"At first construction the native 100/75/50 flat layers retain clear syllable separation and component counters; final persisted material review remains independent.",
+   "proportions":"Actual 232x49 original source effect ROI; manual glyph rectangle %s with positive edges; no forced old-Korean image scaling."%(list(box),),
+   "slant":"Manual top shift 0.10*(44-y) in readable coordinates, English G proxy +4.94/46; not a homologous per-glyph slant certification.",
+   "readability":"Manual vector white silhouettes separately reviewed as geometric construction only; C1/C3 and in-game pending."},
+ "evidence":[ref(OUT/"A238_GEOMETRY_GRAY_100.png"),ref(OUT/"A238_GEOMETRY_BLACK_50.png")]})
+recipe={
+ "version":"separated-lettering-v1","coordinates":"native_raw","route":"vector_title",
+ "source":ref(SRC),"geometry":geo_ref,
+ "geometry_recipe":geomrecipe,"geometry_review":geomreview,
+ "layers":[{"role":"extrusion","input":shade_ref},
+           {"role":"rim","input":rim_ref},
+           {"role":"face","input":face_ref}]
+}
+writej("lettering_recipe.json",recipe)
+composed,detail=compose(ROOT,recipe)
+png("A238_COMPOSED_RAW.png",composed)
+# P3: persisted official DDS remains unchanged; only one targeted ROI
+# in a separately named trial may be replaced. 29 other regions byte exact.
+raw_arr=np.frombuffer(old_bytes,dtype=np.uint8,offset=128).reshape(4096,4096,4).copy()
+new_piece=np.array(composed.crop((X0,4096-Y1,X1,4096-Y0)).convert("RGBA"),dtype=np.uint8)
+assert new_piece.shape==(H,W,4)
+new_a=new_piece[:,:,3]
+nb=Image.fromarray(new_a).getbbox()
+assert nb is not None and nb[0]>0 and nb[1]>0 and nb[2]<W and nb[3]<H,nb
+# Transparent-source plate is restored before every Korean glyph (no opaque patch).
+raw_arr[4096-Y1:4096-Y0,X0:X1,:]=new_piece
+new_bytes=old_bytes[:128]+raw_arr.tobytes()
+result=OUT/"A238_Q121_MANUAL_SOURCE_FAMILY_UNPROMOTED.dds"
+result.write_bytes(new_bytes)
+new_sha=sha(new_bytes)
+assert new_sha!=EXPECTED_OFFICIAL
+assert new_bytes[:128]==old_bytes[:128] and len(new_bytes)==len(old_bytes)
+decoded=Image.open(result).convert("RGBA")
+assert decoded.tobytes()==new_bytes[128:],"persisted DDS RGBA decode mismatch"
+new_readable=decoded.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+target=new_readable.crop((X0,Y0,X1,Y1))
+png("A238_FINAL_PERSISTED_NATIVE.png",target)
+png("A238_FINAL_PERSISTED_RAW.png",decoded.crop((X0,4096-Y1,X1,4096-Y0)))
+real=np.array(target)
+rgba_delta=int(np.count_nonzero(np.any(np.array(previous)!=real,axis=2)))
+assert rgba_delta>0
+# Outside target exact raw byte comparison; source/hud shared atlas shield.
+assert new_bytes[128:128+(4096-Y1)*4096*4]==old_bytes[128:128+(4096-Y1)*4096*4]
+assert new_bytes[128+(4096-Y0)*4096*4:]==old_bytes[128+(4096-Y0)*4096*4:]
+before_raw=np.frombuffer(old_bytes,dtype=np.uint8,offset=128).reshape(4096,4096,4)
+changed=np.any(raw_arr!=before_raw,axis=2)
+roi=np.zeros((4096,4096),dtype=bool)
+roi[4096-Y1:4096-Y0,X0:X1]=True
+outside=int(np.count_nonzero(changed&~roi))
+assert outside==0
+assert int(np.count_nonzero(real[:,:,3]>0))>0
+# Non-text plate pixels outside ROI must remain untouched.
+for bgname,col in [("GRAY",(100,100,100)),("BLACK",(0,0,0)),("WHITE",(255,255,255))]:
+ imgs=[on_background(i,col) for i in [english,clean,previous,target]]
+ for pct in (100,75,50):
+  size=(max(1,round(W*pct/100)),max(1,round(H*pct/100)))
+  row=[i.resize(size,Image.Resampling.LANCZOS) if pct!=100 else i for i in imgs]
+  card=Image.new("RGB",(size[0]*4,size[1]+18),col)
+  for n,i in enumerate(row):card.paste(i,(size[0]*n,18))
+  dr=ImageDraw.Draw(card);fg=(0,0,0) if bgname=="WHITE" else (255,255,255)
+  for n,label in enumerate(("SOURCE","CLEAN","OFFICIAL","A238")):
+   dr.text((size[0]*n+2,2),label,fill=fg)
+  png(f"A238_PERSISTED_{bgname}_{pct}.png",card)
+writej("A238_DDS_MACHINE_AND_HANDOFF.json",{
+ "run_key":RUN,"role":"A","index":121,"priority":"P0",
+ "source_sha256":EXPECTED_SRC,"official_sha256":EXPECTED_OFFICIAL,
+ "new_trial_sha256":new_sha,"trial_path":ref(result)["path"],
+ "source_family":"smooth broad white right-italic/navy shadow",
+ "method":"per-syllable manual stroke graph + separated face/rim/shallow extrusion",
+ "local_effect_bbox":list(nb),"source_effect_bbox":[0,0,W,H],
+ "manual_face_opaque_pixels":face_count,"original_C1_white_face_proxy":3504,
+ "changed_RGBA_pixels_inside_roi":rgba_delta,"changed_outside_roi":outside,
+ "other_29_cells_exact":True,"saved_rgba_roundtrip_mismatch":0,
+ "native_dimensions":[4096,4096],"mip_count":1,"format":"RGBA32",
+ "source_to_clean":"native transparent source-alpha reset, no English face/effect pixels",
+ "raw_orientation":"Y_MIRRORED","letters":"가속 페달",
+ "producer":"UNPROMOTED_PENDING_ACTUAL_PERSISTED_OPTICAL_REVIEW",
+ "C1":"NOT_RUN_A238","C3":"NOT_RUN","user_IGR":["IGR-030","IGR-031","IGR-040"],
+ "RUNTIME_VALIDATION":"UNTESTED","new_DDS_trials":1,"promoted_official_DDS":0,
+ "plate":"SCOPED_SOURCE_NATIVE_NOT_WHOLE_ATLAS_C1_APPROVAL",
+ "geometry":"GEOMETRY_READY_NOT_FINAL_APPROVAL",
+ "backend":"github-actions-ubuntu-latest",
+ "anti_duplicate":"new hand stroke contours; original+A235R remain unchanged",
+ "next":"Controller inspect persisted PNG native/75/50 BGW and RAW versus source; C1 must independently review new SHA before C3. Never close user P0 without newer actual game."})
+print(json.dumps({"run":RUN,"index":121,"source":EXPECTED_SRC,"official":EXPECTED_OFFICIAL,
+ "trial":new_sha,"inside_change":rgba_delta,"outside_change":outside,
+ "manual_face_px":face_count,"result":"NEW_UNPROMOTED_SCOPED_Q121_MATERIAL_TRIAL"}))
