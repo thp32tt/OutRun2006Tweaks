@@ -205,7 +205,10 @@ def premul_fit(rgba: np.ndarray, limit_w: int, limit_h: int, mode: str) -> np.nd
     elif mode == "width_priority":
         # Production gate preserves max source bbox but lets source italic width
         # run up to the full safe width without repeated low-res upscaling.
-        new_w, new_h = limit_w, limit_h
+        # Keep the visible letter proportions intact. The old independent
+        # width/height stretch distorted Hangul counters and italic strokes.
+        ratio = min(limit_w / cw, limit_h / ch)
+        new_w, new_h = max(1, round(cw * ratio)), max(1, round(ch * ratio))
     else:
         raise ValueError("fit_mode must be contain or width_priority")
     alpha = crop[:, :, 3].astype(np.float32) / 255.0
