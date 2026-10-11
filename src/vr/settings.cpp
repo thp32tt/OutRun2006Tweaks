@@ -207,17 +207,15 @@ namespace OutRunVR
 		{
 			if (!Settings::VREnabled || !Settings::VRAutoLaunchHost)
 				return 0;
-			bool launched = false;
-			for (int attempt = 0; attempt < 40; ++attempt)
-			{
-				if (!VRHostProcessRunning() && !launched)
-				{
-					launched = VRLaunchHostOnce();
-					if (launched)
-						return 0;
-				}
-				Sleep(500);
-			}
+            for (int attempt = 0; attempt < 40; ++attempt)
+            {
+                // Prewarmed host is ready; never spin the retry thread for 20s.
+                if (VRHostProcessRunning())
+                    return 0;
+                if (VRLaunchHostOnce())
+                    return 0;
+                Sleep(500);
+            }
 			if (!VRHostProcessRunning())
 				spdlog::warn("VR AUTO HOST: no host process became available during the startup retry window");
 			return 0;

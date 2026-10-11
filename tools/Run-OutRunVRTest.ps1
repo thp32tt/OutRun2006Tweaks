@@ -264,6 +264,21 @@ if ($gpuCaptureRequested) {
     }
 }
 
+# Begin XR host initialization concurrently with the 2D game's startup.
+# No waiting for headset/host readiness and no extra delay to the game.
+if ($backend -eq 'd3d9') {
+    $xrHost = Join-Path $root 'outrun-vr-host.exe'
+    if ((Test-Path -LiteralPath $xrHost) -and
+        -not (Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue)) {
+        try {
+            $null = Start-Process -FilePath $xrHost -WorkingDirectory $root -WindowStyle Hidden -PassThru -ErrorAction Stop
+            Write-Host 'OpenXR host prewarm launched asynchronously.'
+        } catch {
+            Write-Warning "OpenXR prewarm unavailable: $($_.Exception.Message)"
+        }
+    }
+}
+
 try{
     $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
     $p.WaitForExit()

@@ -844,40 +844,29 @@ namespace
         if (!Settings::VRAutoRenderResolution || !Settings::VRPreferD3D9Ex)
             return;
 
-        // The 64-bit OpenXR host is the sole runtime resolution authority.
-        // Launch it before waiting, independent of hook registration order.
+        // Never wait for XR enumeration while loading the 2D game/menu.
+        // The Direct3D9Ex CreateDevice boundary performs a second, synchronous
+        // but nonblocking eye-extent read if the host is ready by then.
         OutRunVR::RequestVRHostStartup();
         OutRunVR::IpcV3::HostStateReader reader;
         OutRunVR::IpcV3::HostState host{};
-        const bool executablePresent =
-            std::filesystem::exists(Module::ExePath.parent_path() / "outrun-vr-host.exe");
-        // Host can now publish eye extent before the game window exists.
-        // Allow OpenXR runtime initialization, but keep a bounded safe fallback.
-        const DWORD deadline = GetTickCount() + (executablePresent ? 12000u : 0u);
-        do
+        if (reader.Read(host) && host.hostPid != 0 &&
+            (host.flags & OutRunVR::IpcV3::HostAlive) != 0)
         {
-            if (reader.Read(host) && host.hostPid != 0 &&
-                (host.flags & OutRunVR::IpcV3::HostAlive) != 0)
+            const auto extent = OutRunVR::EyeExtent::ResolveStartup(
+                {host.recommendedWidth[0], host.recommendedHeight[0]},
+                {host.recommendedWidth[1], host.recommendedHeight[1]});
+            if (OutRunVR::EyeExtent::Valid(extent))
             {
-                const auto extent = OutRunVR::EyeExtent::ResolveStartup(
-                    {host.recommendedWidth[0], host.recommendedHeight[0]},
-                    {host.recommendedWidth[1], host.recommendedHeight[1]});
-                if (OutRunVR::EyeExtent::Valid(extent))
-                {
-                    Game::screen_resolution->x = static_cast<int>(extent.width);
-                    Game::screen_resolution->y = static_cast<int>(extent.height);
-                    *Game::D3DWindowed = 1;
-                    spdlog::info("VR EYE RESOLUTION: VDXR/OpenXR allocated eye {}x{}, PC mirror independent",
-                        extent.width, extent.height);
-                    return;
-                }
+                Game::screen_resolution->x = static_cast<int>(extent.width);
+                Game::screen_resolution->y = static_cast<int>(extent.height);
+                *Game::D3DWindowed = 1;
+                spdlog::info("VR EYE RESOLUTION: nonblocking XR eye extent {}x{} at config",
+                    extent.width, extent.height);
+                return;
             }
-            if (!executablePresent || static_cast<std::int32_t>(GetTickCount() - deadline) >= 0)
-                break;
-            Sleep(50);
-        } while (true);
-        spdlog::warn(
-            "VR EYE RESOLUTION: host extent unavailable/invalid before D3D9 creation; keeping game {}x{} (no unsafe late resize)",
+        }
+        spdlog::info("VR EYE RESOLUTION: XR extent pending; no startup wait, source {}x{} until CreateDevice",
             Game::screen_resolution->x, Game::screen_resolution->y);
     }
 }
