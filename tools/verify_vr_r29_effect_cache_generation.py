@@ -33,6 +33,8 @@ def contract(s):
     sync = body(s, "bool R29SyncEffectState(")
     setter = body(s, "HRESULT __stdcall SetRenderStateDestR29(")
     telemetry = body(s, "inline bool TryGetEffectTelemetrySnapshot(")
+    depth_owner = body(s, "bool R29OwnerLeftDrawMayWriteDepth(")
+    stereo = body(s, "HRESULT R29DirectTwoEye(")
     return all((
         "StateBlockTracker::Reliable()" in cache,
         "StateBlockTracker::Recording()" in cache,
@@ -62,6 +64,16 @@ def contract(s):
         setter.find("StateBlockTracker::Recording()") < setter.find("switch (state)"),
         "if (false)" not in cache and "if (false)" not in sync,
         "if (false)" not in setter and "if (false)" not in telemetry,
+        "if (R29EffectCacheCurrent() &&" in depth_owner,
+        "R29Effect.zEnable == D3DZB_FALSE" in depth_owner,
+        "R29Effect.zWrite == FALSE" in depth_owner,
+        "return false;" in depth_owner,
+        "return LeftDrawMayWriteDepth(device);" in depth_owner,
+        depth_owner.find("R29EffectCacheCurrent()") <
+            depth_owner.find("return false;") <
+            depth_owner.find("return LeftDrawMayWriteDepth(device);"),
+        "R29OwnerLeftDrawMayWriteDepth(device)" in stereo,
+        "LeftDrawMayWriteStencil(device)" in stereo,
         "R29Effect.applyGeneration = 0;" not in sync,
         "R29Effect.recordingGeneration = 0;" not in sync,
         "R29Effect.valid && false" not in s,
@@ -107,6 +119,16 @@ mutations = [
      "R29Effect.recordingGeneration ==\n                     OutRunVR::State::StateBlockTracker::RecordingGeneration()"),
     ("telemetry", "if (!R29EffectCacheCurrent())\n            return false;",
      "if (false)\n            return false;"),
+    ("depth cache trust", "if (R29EffectCacheCurrent() &&\n            (R29Effect.zEnable",
+     "if (false &&\n            (R29Effect.zEnable"),
+    ("depth test disables write", "R29Effect.zEnable == D3DZB_FALSE",
+     "R29Effect.zEnable != D3DZB_FALSE"),
+    ("depth write mask", "R29Effect.zWrite == FALSE",
+     "R29Effect.zWrite != FALSE"),
+    ("depth conservative fallback", "return LeftDrawMayWriteDepth(device);",
+     "return false;"),
+    ("direct stereo depth owner", "if (R29OwnerLeftDrawMayWriteDepth(device) ||",
+     "if (LeftDrawMayWriteDepth(device) ||"),
 ]
 for name, before, after in mutations:
     if src.count(before) != 1:
@@ -116,4 +138,4 @@ for name, before, after in mutations:
 if errors:
     print("FAIL " + ", ".join(errors), file=sys.stderr)
     sys.exit(1)
-print("PASS R29 single-Present effect cache, Begin/End/Apply fences and 14 negative mutations")
+print("PASS R29 single-Present effect cache, Begin/End/Apply fences and 19 negative mutations")

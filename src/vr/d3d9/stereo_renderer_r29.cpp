@@ -208,7 +208,7 @@ namespace OutRunVRStereo
             // mono history. R9 must therefore never restore a stale/incomplete
             // safety RT if a later hazard poisons the same Present.
 
-            if (LeftDrawMayWriteDepth(device) ||
+            if (R29OwnerLeftDrawMayWriteDepth(device) ||
                 LeftDrawMayWriteStencil(device))
                 R9NoteMainDepthContentWrite();
 
@@ -784,6 +784,15 @@ namespace OutRunVRStereo
 
     bool R29OwnerLeftDrawMayWriteDepth(IDirect3DDevice9* device) noexcept
     {
+        // This cache is authoritative only when R22/R31 track every setter,
+        // StateBlock Apply/recording and the current Present generation.
+        // A proven disabled depth test OR write mask cannot mutate depth.
+        // All uncertain, recording or stale states still take the original
+        // conservative D3D9 render-state reader.
+        if (R29EffectCacheCurrent() &&
+            (R29Effect.zEnable == D3DZB_FALSE ||
+             R29Effect.zWrite == FALSE))
+            return false;
         return LeftDrawMayWriteDepth(device);
     }
 
