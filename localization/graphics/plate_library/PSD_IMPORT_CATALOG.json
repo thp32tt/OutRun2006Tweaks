@@ -1,6 +1,6 @@
 {
   "schema": "outrun-psd-mirror-catalog-v1",
-  "status": "COPY_WORKFLOW_NOT_YET_VERIFIED",
+  "status": "PRIORITY_01_COPIED_SOURCE_VERIFIED",
   "upstream_repo": "Sonic-TV/OR2006Sprites",
   "upstream_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
   "upstream_psd_count": 184,
@@ -10,7 +10,11 @@
   "selected_batch_01": {
     "count": 10,
     "total_bytes": 132176274,
-    "policy": "Selected P0/P1 and small recurring work PSDs; no claim of English/CLEAN equivalence"
+    "policy": "Selected P0/P1 and small recurring work PSDs; no claim of English/CLEAN equivalence",
+    "verified_at_kst": "2026-10-11 20:45 KST",
+    "workflow_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38136463576",
+    "verified_remote_head": "656b3db6eb6a482e708e65ed37eb4e0ea61eaa81",
+    "copy_verification": "10/10 exact Git blob SHA matches; source PSD only"
   },
   "redistribution_note": "Upstream did not advertise a repository-level LICENSE at the pinned commit. Preserve source attribution; assess third-party/game asset rights before external redistribution.",
   "entries": [
@@ -26,7 +30,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -40,7 +45,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -54,7 +60,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -68,7 +75,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -82,7 +90,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -96,7 +105,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -110,7 +120,8 @@
       "batch": "priority_01",
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "COPIED_SOURCE_VERIFIED"
     },
     {
       "queue_indices": [
@@ -124,7 +135,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -138,7 +150,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -152,7 +165,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -166,7 +180,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -180,7 +195,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -194,7 +210,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -208,7 +225,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -222,7 +240,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -236,7 +255,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -250,7 +270,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -264,7 +285,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -278,7 +300,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -292,7 +315,8 @@
       "batch": "priority_01",
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "COPIED_SOURCE_VERIFIED"
     },
     {
       "queue_indices": [
@@ -306,7 +330,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -320,7 +345,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -334,7 +360,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -348,7 +375,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -362,7 +390,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -376,7 +405,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -390,7 +420,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -404,7 +435,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -418,7 +450,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -432,7 +465,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -446,7 +480,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -460,7 +495,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -474,7 +510,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -488,7 +525,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -502,7 +540,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -516,7 +555,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -530,7 +570,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -544,7 +585,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -558,7 +600,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -572,7 +615,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -586,7 +630,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -600,7 +645,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -614,7 +660,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -628,7 +675,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -642,7 +690,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -656,7 +705,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -670,7 +720,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -684,7 +735,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -698,7 +750,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -712,7 +765,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -726,7 +780,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -740,7 +795,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -754,7 +810,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -768,7 +825,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -782,7 +840,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -796,7 +855,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -810,7 +870,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -824,7 +885,8 @@
       "batch": "priority_01",
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "COPIED_SOURCE_VERIFIED"
     },
     {
       "queue_indices": [
@@ -838,7 +900,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -852,7 +915,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -866,7 +930,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -880,7 +945,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -894,7 +960,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -908,7 +975,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -922,7 +990,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -936,7 +1005,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -950,7 +1020,8 @@
       "batch": "priority_01",
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "COPIED_SOURCE_VERIFIED"
     },
     {
       "queue_indices": [
@@ -964,7 +1035,8 @@
       "batch": "priority_01",
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "COPIED_SOURCE_VERIFIED"
     },
     {
       "queue_indices": [
@@ -978,7 +1050,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -992,7 +1065,8 @@
       "batch": "priority_01",
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "COPIED_SOURCE_VERIFIED"
     },
     {
       "queue_indices": [
@@ -1006,7 +1080,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -1020,7 +1095,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -1034,7 +1110,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -1048,7 +1125,8 @@
       "batch": "priority_01",
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "COPIED_SOURCE_VERIFIED"
     },
     {
       "queue_indices": [
@@ -1062,7 +1140,8 @@
       "batch": "priority_01",
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "COPIED_SOURCE_VERIFIED"
     },
     {
       "queue_indices": [
@@ -1076,7 +1155,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -1090,7 +1170,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -1104,7 +1185,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     },
     {
       "queue_indices": [
@@ -1118,7 +1200,8 @@
       "batch": "priority_01",
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "COPIED_SOURCE_VERIFIED"
     },
     {
       "queue_indices": [
@@ -1132,7 +1215,8 @@
       "batch": "priority_01",
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "COPIED_SOURCE_VERIFIED"
     },
     {
       "queue_indices": [
@@ -1146,7 +1230,8 @@
       "batch": null,
       "source_type": "community_psd_not_canonical_game_dds",
       "layer_status": "UNINSPECTED",
-      "clean_status": "NOT_APPROVED"
+      "clean_status": "NOT_APPROVED",
+      "copy_status": "CATALOG_ONLY_NOT_COPIED"
     }
   ]
 }
