@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00596",
+  "production_id": "CONVERSION-DX9EX-00596",
+  "event_id": "CONVERSION-DX9EX-00596-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "feature_id": "DX9EX:R35_CADENCE_DISPLAY_TIME_RECOVERY",
+  "work_key": "DX9EX:R35_CADENCE_DISPLAY_TIME_RECOVERY",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "d2129912c5f395579bae0cc1ecacd66087813808",
+  "material_result_sha": "55f18991f6e60dbde143b7d3493775a5d1766e0e",
+  "result_sha": "55f18991f6e60dbde143b7d3493775a5d1766e0e",
+  "validation_bearing_result_sha": "55f18991f6e60dbde143b7d3493775a5d1766e0e",
+  "material_commits": [
+    "3892048b115a8f662cfcfb1c2856a1f4f25a9f6d",
+    "55f18991f6e60dbde143b7d3493775a5d1766e0e"
+  ],
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_acceptance": {
+    "implementation_complete": true,
+    "symptom": "R35 DX9Ex host cadence IssueIfDue used an unbounded per-game-period do/while increment to catch up predictedDisplayTime after a long OpenXR suspend, causing millions of CPU iterations or overflow/hang; a restarted XR time epoch could also defer all future requests.",
+    "acceptance_items": [
+      {
+        "id": "XR-DEADLINE-RECOVERY-O1",
+        "status": "PASS",
+        "evidence_paths": [
+          "vrhost/src/runtime/cadence_schedule.hpp",
+          "vrhost/src/main_r23.cpp"
+        ],
+        "details": "O(1) missed-period calculation instead of unbounded loop; preserve normal 90/60 XR/game fractional cadence and early-tick suppression."
+      },
+      {
+        "id": "XR-EPOCH-AND-OVERFLOW-FAIL-CLOSED",
+        "status": "PASS",
+        "evidence_paths": [
+          "vrhost/src/runtime/cadence_schedule.hpp",
+          "vrhost/tests/cadence_schedule_smoke.cpp"
+        ],
+        "details": "Rebase only after >1s backward predictedDisplayTime discontinuity; reject invalid timing and avoid int64 XrTime overflow. Native/host source functionality unchanged elsewhere."
+      },
+      {
+        "id": "CI-REGRESSION-RUN-INTEGRATED",
+        "status": "PASS",
+        "evidence_paths": [
+          "vrhost/CMakeLists.txt",
+          ".github/workflows/vr-dx9ex-active.yml",
+          "vrhost/tests/cadence_schedule_smoke.cpp"
+        ],
+        "details": "Windows x64 host job actually compiles and executes cadence-schedule-smoke.exe; exact-SHA job log `CADENCE-SCHEDULE PASS: 90/60 phase, pause, XR epoch reset, overflow`. Linux g++ C++20 UBSan matching policy fixture passed."
+      },
+      {
+        "id": "SAME-SHA-GATES",
+        "status": "PASS",
+        "details": "DX9Ex Active 5 jobs, Domain Isolation, Full Source Impact 3 jobs all SUCCESS on exact SHA 55f18991f6e60dbde143b7d3493775a5d1766e0e."
+      }
+    ],
+    "protected_paths": "Only DX9Ex R35 host scheduler/helper/test and Active CI workflow changed. DX11/DXVK/localization/FFB and existing World Stereo/SkyGlow/HUD preserved; no Quest 3 optical/fps claim."
+  },
+  "exact_sha_validation": {
+    "target_sha": "55f18991f6e60dbde143b7d3493775a5d1766e0e",
+    "dx9ex_active_run_id": 38133932784,
+    "dx9ex_active_jobs": [
+      "policy",
+      "host",
+      "game",
+      "full-chain-compile",
+      "package"
+    ],
+    "domain_isolation_run_id": 38133932815,
+    "full_source_impact_run_id": 38133932843,
+    "all_conclusion": "SUCCESS",
+    "host_smoke_step": "Run deterministic no-HMD host smoke tests; CADENCE-SCHEDULE PASS: 90/60 phase, pause, XR epoch reset, overflow",
+    "package_artifact": "OutRun2-VR-DX9EX-ACTIVE-55f18991f6e60dbde143b7d3493775a5d1766e0e",
+    "package_artifact_id": 11700307256,
+    "host_artifact_id": 11700530803,
+    "game_artifact_id": 11700830471
+  },
+  "runtime_validation_note": "Quest 3/VDXR game-HMD session not executed for exact SHA 55f18991f6e60dbde143b7d3493775a5d1766e0e; performance/recenter/stereo subjective results remain UNTESTED.",
+  "controller_next_action": "Do not redispatch, rerun or re-score this TASK_ID; assign next independent DX9Ex source feature at next dispatch. Keep DXVK frozen."
+}
