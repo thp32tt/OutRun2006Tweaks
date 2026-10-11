@@ -1,4 +1,8 @@
 #define WIN32_LEAN_AND_MEAN
+// XR eye extent math uses std::min/std::max; block Win32 macro substitution.
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <Windows.h>
 #include <shellapi.h>
 #include "hook_mgr.hpp"
