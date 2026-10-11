@@ -1,0 +1,103 @@
+{
+  "task_id": "CONVERSION-DX9EX-00592",
+  "production_id": "CONVERSION-DX9EX-00592",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:FRAME_PACING_DIAGNOSTICS",
+  "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00592",
+  "work_key": "DX9EX:FRAME_PACING_DIAGNOSTICS",
+  "material_result_sha": "e9431196afdbf02288d24545eb1a5f637801cb25",
+  "acceptance_results": [
+    {
+      "id": "PACING-STAGES",
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/ipc/frame_pacing_diagnostics.hpp",
+        "src/vr/game/outrun_renderer.cpp",
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        "src/vr/d3d9/stereo_renderer.cpp",
+        "vrhost/src/main_r23.cpp",
+        "vrhost/tests/frame_pacing_diagnostics_smoke.cpp"
+      ],
+      "validation_command": "OUTRUN_VR_PACING_DIAGNOSTICS=1 build-host/bin/outrun-vr-frame-pacing-smoke.exe --stages",
+      "ci_step": "Feature acceptance: PACING-STAGES",
+      "preflight_run_id": 38101786536
+    },
+    {
+      "id": "PACING-REGRESSION",
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/ipc/frame_pacing_diagnostics.hpp",
+        "vrhost/tests/frame_pacing_diagnostics_smoke.cpp",
+        "vrhost/CMakeLists.txt"
+      ],
+      "validation_command": "build-host/bin/outrun-vr-frame-pacing-smoke.exe --regression (without OUTRUN_VR_PACING_DIAGNOSTICS)",
+      "ci_step": "Feature acceptance: PACING-REGRESSION",
+      "preflight_run_id": 38101786536
+    },
+    {
+      "id": "PACING-BUNDLE",
+      "status": "PASS",
+      "evidence_paths": [
+        ".github/workflows/vr-dx9ex-active.yml",
+        "tools/Start-OutRunVRPacing.ps1",
+        "tools/Collect-OutRunVRFramePacing.ps1",
+        "tools/Collect-OutRunVRLogs.ps1",
+        "vrhost/src/main_r23.cpp"
+      ],
+      "validation_command": "GitHub Actions: DX9Ex Active Validation / package / Feature acceptance: PACING-BUNDLE",
+      "ci_step": "Feature acceptance: PACING-BUNDLE",
+      "preflight_run_id": 38101786536
+    }
+  ],
+  "feature_acceptance": {
+    "implementation_complete": true,
+    "targeted_checks": [
+      {
+        "ci_step": "Feature acceptance: PACING-STAGES",
+        "result": "SUCCESS",
+        "preflight_run_id": 38101786536
+      },
+      {
+        "ci_step": "Feature acceptance: PACING-REGRESSION",
+        "result": "SUCCESS",
+        "preflight_run_id": 38101786536
+      },
+      {
+        "ci_step": "Feature acceptance: PACING-BUNDLE",
+        "result": "SUCCESS",
+        "preflight_run_id": 38101786536
+      }
+    ],
+    "integration_contract": "The opt-in game BeginScene/Present QPC fields, immutable frame ID/run generation and host verified-bundle actual XR submission identity are correlated only for diagnostics. Default-disabled instrumentation never selects frames or changes D3D9Ex/host GPU ACK, OpenXR ordering, synchronization or rendering ownership. Cached XR submissions do not count as new game frames. Missing/invalid timings are -1; QPC CPU durations are not native FPS evidence. Controller alone fast-forwards TARGET_BRANCH after the final feature candidate has passed preflight, then checks exact target SHA gate jobs/steps and downloadable game/host/collector artifact before C6."
+  },
+  "schema_version": 1,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "validation_bearing_result_sha": "ea890461b445f01903e690fc6fc4c13622292079",
+  "controller_terminal": true,
+  "delivery_evidence": {
+    "sha": "ea890461b445f01903e690fc6fc4c13622292079",
+    "gates": [
+      {
+        "workflow": "DX9Ex Active Validation",
+        "sha": "ea890461b445f01903e690fc6fc4c13622292079",
+        "run_id": 38102179453
+      },
+      {
+        "workflow": "Domain Isolation Guard",
+        "sha": "ea890461b445f01903e690fc6fc4c13622292079",
+        "run_id": 38102179485
+      }
+    ],
+    "artifact_id": 11688490913,
+    "artifact_name": "feature-dx9ex-pacing-ea890461b445f01903e690fc6fc4c13622292079",
+    "artifact_digest": "sha256:afca6a06b57df7997bebf7c33cf24d6fb73016cb7588b8e104a8c8928de3d8fc",
+    "acceptance_steps": [
+      "Feature acceptance: PACING-STAGES",
+      "Feature acceptance: PACING-REGRESSION",
+      "Feature acceptance: PACING-BUNDLE"
+    ]
+  }
+}
