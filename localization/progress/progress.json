@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-12 01:10+ KST",
+  "updated_at_kst": "2026-10-12 01:30 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,6 +50,7 @@
       "total": 243
     },
     "graphics_localization": {
+      "c2_q121_a248_new_p0_independent_native_20261012_0130": {"role":"C2","queue_index":121,"scope":"A248_RANK20_GAS_PEDAL_ONLY","candidate_sha256":"eb9eeadbf1fec2be2976c9d3c579e119e1431e55fc83859878f3501469c09512","source_sha256":"f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e","static_scoped":"PASS_COSMETIC_VARIANCE_ACCEPTED","whole_asset_C2":"HOLD","c3":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED","official_new_dds":0,"user_game":"OPEN_P0","report":"localization/graphics/role_C/20261012-C2-Q121-A248-P0-NEW-SAVED-FIRST-INDEPENDENT/C2_Q121_A248_INDEPENDENT_SCOPED_QA.json"},
       "c1_q102_20261011_1820_real_imagegen_source_style_hold": {
         "role": "C1",
         "index": 102,
