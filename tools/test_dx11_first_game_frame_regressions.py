@@ -2588,7 +2588,8 @@ def main() -> None:
             alpha = min(1.0, multiplier * ta * da)
             rgb = tuple(d * (1 - f) + t * f for t, d in zip((0.2, 0.9, 0.4), (0.7, 0.1, 0.8)))
             assert all(0 <= c <= 1 for c in (*rgb, alpha))
-            if ta == 0.8: assert alpha == 1.0
+            if ta == 0.8 and multiplier == 2: assert abs(alpha - 0.96) < 1e-9
+            if ta == 0.8 and multiplier == 4: assert alpha == 1.0
             if ta == 0.1: assert alpha < 1.0
     print("DX11 independent MODULATE2X/4X alpha game native Draw PASS (static only)")
 
