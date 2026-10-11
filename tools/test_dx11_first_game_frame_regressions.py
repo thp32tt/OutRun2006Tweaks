@@ -1579,6 +1579,76 @@ def main() -> None:
             assert all(min(d, t) < o < max(d, t) for d, t, o in zip(diffuse, texel, output))
     print("DX11 stage0 BLENDFACTORALPHA live native Draw PASS (static only)")
 
+
+    # 00563: game stage0 factor-driven RGB with separately selected TEXTURE
+    # or MODULATE(TEXTURE,DIFFUSE) alpha; native shaders/Draw and failure edges.
+    mixed_factor_links = (
+        "blendFactorTextureAlpha = op == D3DTOP_BLENDFACTORALPHA",
+        "alphaOp == D3DTOP_SELECTARG1;",
+        "blendFactorModulateAlpha = op == D3DTOP_BLENDFACTORALPHA",
+        "alphaOp == D3DTOP_MODULATE;",
+        "blendFactorAlpha || blendFactorTextureAlpha || blendFactorModulateAlpha",
+        "!blendFactorTextureAlpha && !blendFactorModulateAlpha &&",
+        "rgbNeedsDiffuse = blendFactorTextureAlpha || blendFactorModulateAlpha",
+        "alphaNeedsDiffuse = blendFactorModulateAlpha",
+        "capture.blendFactorTextureAlpha = blendFactorTextureAlpha;",
+        "capture.blendFactorModulateAlpha = blendFactorModulateAlpha;",
+        "bool blendFactorTextureAlpha = false;",
+        "bool blendFactorModulateAlpha = false;",
+        "float4 PSTextureBlendFactorTextureAlpha(VOut v) : SV_Target {",
+        "float4 PSTextureBlendFactorModulateAlpha(VOut v) : SV_Target {",
+        "float4 c = float4(lerp(v.diffuse.rgb, t.rgb, alphaParams.w), t.a);",
+        "float4 c = float4(lerp(v.diffuse.rgb, t.rgb, alphaParams.w), t.a * v.diffuse.a);",
+        'compile("PSTextureBlendFactorTextureAlpha", "ps_4_0", blendFactorTextureCode)',
+        'compile("PSTextureBlendFactorModulateAlpha", "ps_4_0", blendFactorModulateCode)',
+        "s.blendFactorTextureAlphaPs.GetAddressOf()",
+        "s.blendFactorModulateAlphaPs.GetAddressOf()",
+        "s.blendFactorTextureAlphaPs.Reset();",
+        "s.blendFactorModulateAlphaPs.Reset();",
+        "s.blendFactorTextureAlphaPs && s.blendFactorModulateAlphaPs &&",
+        "capture.blendFactorTextureAlpha ? s.blendFactorTextureAlphaPs.Get() :",
+        "capture.blendFactorModulateAlpha ? s.blendFactorModulateAlphaPs.Get() :",
+        "ctx->DrawIndexed(indexCount, 0, 0);",
+        "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+    )
+    def mixed_factor_integrated(code: str) -> bool:
+        gate = code[code.find("bool supported_game_state("):
+                    code.find("bool translate_vertices(")]
+        draw = code[code.find("bool submit("):code.find("void observe(")]
+        return (all(token in code for token in mixed_factor_links) and
+                code.count("s.blendFactorTextureAlphaPs.Reset();") == 2 and
+                code.count("s.blendFactorModulateAlphaPs.Reset();") == 2 and
+                "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)" in gate and
+                "ctx->PSSetShader(capture.blendTextureAlpha ?" in draw)
+    assert mixed_factor_integrated(bridge)
+    for token in mixed_factor_links[:-2]:
+        broken = bridge.replace(token, "/* disconnect 00563 producer/consumer */")
+        assert broken != bridge and not mixed_factor_integrated(broken), token
+    # D3DTOP enum: SELECTARG1=2, MODULATE=4, BLENDFACTORALPHA=14.
+    for color, alpha, expected in (
+        (14, 2, True), (14, 4, True), (14, 14, True),
+        (14, 3, False), (14, 7, False), (14, 13, False),
+        (2, 4, False), (4, 14, False)):
+        assert ((color == 14 and alpha in (2, 4, 14))) == expected
+    for factor_byte in (0, 128, 255):
+        factor = factor_byte / 255.0
+        texel, diffuse = (0.2, 0.9, 0.4, 0.8), (0.9, 0.1, 0.7, 0.25)
+        rgb = tuple((1-factor)*d + factor*t
+                    for d,t in zip(diffuse[:3], texel[:3]))
+        if factor_byte == 0:
+            assert rgb == diffuse[:3]
+        elif factor_byte == 255:
+            assert rgb == texel[:3]
+        else:
+            assert all(min(d,t) < c < max(d,t)
+                       for d,t,c in zip(diffuse[:3], texel[:3], rgb))
+        texture_alpha = (*rgb, texel[3])
+        modulate_alpha = (*rgb, texel[3]*diffuse[3])
+        assert texture_alpha[:3] == modulate_alpha[:3]
+        assert abs(texture_alpha[3] - 0.8) < 1e-7
+        assert abs(modulate_alpha[3] - 0.2) < 1e-7
+    print("DX11 mixed factor RGB/independent alpha native Draw PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 

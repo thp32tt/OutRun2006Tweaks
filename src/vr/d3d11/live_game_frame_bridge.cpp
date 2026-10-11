@@ -108,6 +108,18 @@ float4 PSTextureBlendFactorAlpha(VOut v) : SV_Target {
     float4 c = lerp(v.diffuse, t, alphaParams.w);
     AlphaGate(c.a); return c;
 }
+// D3D9 stage0 factor-blended RGB with separately selected texture alpha.
+float4 PSTextureBlendFactorTextureAlpha(VOut v) : SV_Target {
+    float4 t = gameTexture.Sample(gameSampler, v.uv);
+    float4 c = float4(lerp(v.diffuse.rgb, t.rgb, alphaParams.w), t.a);
+    AlphaGate(c.a); return c;
+}
+// D3D9 stage0 factor-blended RGB with independent MODULATE alpha.
+float4 PSTextureBlendFactorModulateAlpha(VOut v) : SV_Target {
+    float4 t = gameTexture.Sample(gameSampler, v.uv);
+    float4 c = float4(lerp(v.diffuse.rgb, t.rgb, alphaParams.w), t.a * v.diffuse.a);
+    AlphaGate(c.a); return c;
+}
 // Exact D3D9 fixed-function ADDSMOOTH: Arg1 + Arg2*(1-Arg1) for RGBA.
 float4 PSTextureAddSmooth(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
@@ -138,6 +150,8 @@ struct TextureCapture {
     bool blendTextureAlpha = false;
     bool blendDiffuseAlpha = false;
     bool blendFactorAlpha = false;
+    bool blendFactorTextureAlpha = false;
+    bool blendFactorModulateAlpha = false;
     float blendFactorAlphaValue = 0.0f;
     UINT coordIndex = 0;
     Microsoft::WRL::ComPtr<IDirect3DTexture9> texture;
@@ -182,6 +196,8 @@ struct State {
     ComPtr<ID3D11PixelShader> blendTextureAlphaPs;
     ComPtr<ID3D11PixelShader> blendDiffuseAlphaPs;
     ComPtr<ID3D11PixelShader> blendFactorAlphaPs;
+    ComPtr<ID3D11PixelShader> blendFactorTextureAlphaPs;
+    ComPtr<ID3D11PixelShader> blendFactorModulateAlphaPs;
     ComPtr<ID3D11InputLayout> layout;
     ComPtr<ID3D11RasterizerState> raster;
     ComPtr<ID3D11RasterizerState> scissorRaster;
@@ -229,11 +245,12 @@ bool ensure_pipeline(State& s) noexcept {
     if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.additivePs && s.subtractPs && s.addSmoothPs && s.modulate2xPs && s.modulate4xPs && s.mixedTextureAlphaPs && s.mixedDiffuseAlphaPs &&
         s.mixedAddTextureAlphaPs && s.mixedAddDiffuseAlphaPs &&
         s.blendTextureAlphaPs && s.blendDiffuseAlphaPs && s.blendFactorAlphaPs &&
+        s.blendFactorTextureAlphaPs && s.blendFactorModulateAlphaPs &&
         s.layout && s.raster && s.scissorRaster && s.alphaBlend &&
         s.alphaConstants && readbackReady)
         return true;
     s.backend.shutdown();
-    s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset(); s.modulate2xPs.Reset(); s.modulate4xPs.Reset(); s.mixedTextureAlphaPs.Reset(); s.mixedDiffuseAlphaPs.Reset(); s.mixedAddTextureAlphaPs.Reset(); s.mixedAddDiffuseAlphaPs.Reset(); s.blendTextureAlphaPs.Reset(); s.blendDiffuseAlphaPs.Reset(); s.blendFactorAlphaPs.Reset();
+    s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset(); s.modulate2xPs.Reset(); s.modulate4xPs.Reset(); s.mixedTextureAlphaPs.Reset(); s.mixedDiffuseAlphaPs.Reset(); s.mixedAddTextureAlphaPs.Reset(); s.mixedAddDiffuseAlphaPs.Reset(); s.blendTextureAlphaPs.Reset(); s.blendDiffuseAlphaPs.Reset(); s.blendFactorAlphaPs.Reset(); s.blendFactorTextureAlphaPs.Reset(); s.blendFactorModulateAlphaPs.Reset();
     s.layout.Reset(); s.raster.Reset(); s.scissorRaster.Reset();
     s.alphaBlend.Reset(); s.alphaConstants.Reset();
     for (auto& item : s.readbacks) {
@@ -248,7 +265,7 @@ bool ensure_pipeline(State& s) noexcept {
     cfg.color_format = DXGI_FORMAT_B8G8R8A8_UNORM;
     if (!s.backend.initialize(cfg)) return false;
     auto* dev = s.backend.device();
-    ComPtr<ID3DBlob> vcode, pcode, sampledCode, textureOnlyCode, additiveCode, subtractCode, addSmoothCode, modulate2xCode, modulate4xCode, mixedTextureCode, mixedDiffuseCode, mixedAddTextureCode, mixedAddDiffuseCode, blendTextureCode, blendDiffuseCode, blendFactorCode;
+    ComPtr<ID3DBlob> vcode, pcode, sampledCode, textureOnlyCode, additiveCode, subtractCode, addSmoothCode, modulate2xCode, modulate4xCode, mixedTextureCode, mixedDiffuseCode, mixedAddTextureCode, mixedAddDiffuseCode, blendTextureCode, blendDiffuseCode, blendFactorCode, blendFactorTextureCode, blendFactorModulateCode;
     if (!compile("VS", "vs_4_0", vcode) ||
         !compile("PS", "ps_4_0", pcode) ||
         !compile("PSTextured", "ps_4_0", sampledCode) ||
@@ -265,6 +282,8 @@ bool ensure_pipeline(State& s) noexcept {
         !compile("PSTextureBlendTextureAlpha", "ps_4_0", blendTextureCode) ||
         !compile("PSTextureBlendDiffuseAlpha", "ps_4_0", blendDiffuseCode) ||
         !compile("PSTextureBlendFactorAlpha", "ps_4_0", blendFactorCode) ||
+        !compile("PSTextureBlendFactorTextureAlpha", "ps_4_0", blendFactorTextureCode) ||
+        !compile("PSTextureBlendFactorModulateAlpha", "ps_4_0", blendFactorModulateCode) ||
         FAILED(dev->CreateVertexShader(vcode->GetBufferPointer(), vcode->GetBufferSize(),
                                       nullptr, s.vs.GetAddressOf())) ||
         FAILED(dev->CreatePixelShader(pcode->GetBufferPointer(), pcode->GetBufferSize(),
@@ -296,7 +315,11 @@ bool ensure_pipeline(State& s) noexcept {
         FAILED(dev->CreatePixelShader(blendDiffuseCode->GetBufferPointer(), blendDiffuseCode->GetBufferSize(),
                                      nullptr, s.blendDiffuseAlphaPs.GetAddressOf())) ||
         FAILED(dev->CreatePixelShader(blendFactorCode->GetBufferPointer(), blendFactorCode->GetBufferSize(),
-                                     nullptr, s.blendFactorAlphaPs.GetAddressOf())))
+                                     nullptr, s.blendFactorAlphaPs.GetAddressOf())) ||
+        FAILED(dev->CreatePixelShader(blendFactorTextureCode->GetBufferPointer(), blendFactorTextureCode->GetBufferSize(),
+                                     nullptr, s.blendFactorTextureAlphaPs.GetAddressOf())) ||
+        FAILED(dev->CreatePixelShader(blendFactorModulateCode->GetBufferPointer(), blendFactorModulateCode->GetBufferSize(),
+                                     nullptr, s.blendFactorModulateAlphaPs.GetAddressOf())))
         return false;
     const D3D11_INPUT_ELEMENT_DESC elements[] = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,
@@ -522,8 +545,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // coordinates, gamma reads and mip/anisotropic paths we do not emulate.
         const bool blendFactorAlpha = op == D3DTOP_BLENDFACTORALPHA &&
                                       alphaOp == D3DTOP_BLENDFACTORALPHA;
+        // Admit only the exact two mixed-alpha variants, never arbitrary ops.
+        const bool blendFactorTextureAlpha = op == D3DTOP_BLENDFACTORALPHA &&
+                                             alphaOp == D3DTOP_SELECTARG1;
+        const bool blendFactorModulateAlpha = op == D3DTOP_BLENDFACTORALPHA &&
+                                              alphaOp == D3DTOP_MODULATE;
         DWORD textureFactor = 0;
-        if (blendFactorAlpha &&
+        if ((blendFactorAlpha || blendFactorTextureAlpha || blendFactorModulateAlpha) &&
             FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))
             return false;
         const bool modulate = op == D3DTOP_MODULATE && alphaOp == D3DTOP_MODULATE;
@@ -552,16 +580,19 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         if (!layout.hasDiffuse && !selectTexture) return false;
         // Validate the chosen alpha input independently from RGB. Inactive
         // alpha stage operands are ignored; active modifier bits remain denied.
-        const bool rgbNeedsDiffuse = modulate || additive || subtract || addSmooth || modulate2x || modulate4x ||
+        const bool rgbNeedsDiffuse = blendFactorTextureAlpha || blendFactorModulateAlpha ||
+                                     modulate || additive || subtract || addSmooth || modulate2x || modulate4x ||
                                      mixedTextureAlpha || mixedDiffuseAlpha ||
                                      mixedAddTextureAlpha || mixedAddDiffuseAlpha ||
                                      blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;
-        const bool alphaNeedsDiffuse = modulate || additive || subtract || addSmooth || modulate2x || modulate4x ||
+        const bool alphaNeedsDiffuse = blendFactorModulateAlpha ||
+                                       modulate || additive || subtract || addSmooth || modulate2x || modulate4x ||
                                        mixedDiffuseAlpha || mixedAddDiffuseAlpha ||
                                        blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;
         if ((!modulate && !selectTexture && !additive && !subtract && !modulate2x && !modulate4x &&
              !mixedTextureAlpha && !mixedDiffuseAlpha &&
              !mixedAddTextureAlpha && !mixedAddDiffuseAlpha && !addSmooth &&
+             !blendFactorTextureAlpha && !blendFactorModulateAlpha &&
              !blendTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha) || arg != D3DTA_TEXTURE ||
             (!mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE) ||
             (rgbNeedsDiffuse && !arg2Diffuse) ||
@@ -590,6 +621,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.blendTextureAlpha = blendTextureAlpha;
         capture.blendDiffuseAlpha = blendDiffuseAlpha;
         capture.blendFactorAlpha = blendFactorAlpha;
+        capture.blendFactorTextureAlpha = blendFactorTextureAlpha;
+        capture.blendFactorModulateAlpha = blendFactorModulateAlpha;
         capture.blendFactorAlphaValue = static_cast<float>((textureFactor >> 24u) & 0xffu) / 255.0f;
         capture.coordIndex = coordIndex;
     }
@@ -923,6 +956,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     ctx->PSSetShader(capture.blendTextureAlpha ? s.blendTextureAlphaPs.Get() :
                      capture.blendDiffuseAlpha ? s.blendDiffuseAlphaPs.Get() :
                      capture.blendFactorAlpha ? s.blendFactorAlphaPs.Get() :
+                     capture.blendFactorTextureAlpha ? s.blendFactorTextureAlphaPs.Get() :
+                     capture.blendFactorModulateAlpha ? s.blendFactorModulateAlphaPs.Get() :
                      !capture.enabled ? s.ps.Get() :
                      (capture.addSmooth ? s.addSmoothPs.Get() :
                      (capture.subtract ? s.subtractPs.Get() :
@@ -1174,7 +1209,7 @@ void before_game_reset() noexcept {
     s.raster.Reset(); s.scissorRaster.Reset(); s.layout.Reset();
     s.alphaBlend.Reset(); s.alphaConstants.Reset();
     for (auto& masked : s.maskedBlends) masked.Reset();
-    s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset(); s.modulate2xPs.Reset(); s.modulate4xPs.Reset(); s.mixedTextureAlphaPs.Reset(); s.mixedDiffuseAlphaPs.Reset(); s.mixedAddTextureAlphaPs.Reset(); s.mixedAddDiffuseAlphaPs.Reset(); s.blendTextureAlphaPs.Reset(); s.blendDiffuseAlphaPs.Reset(); s.blendFactorAlphaPs.Reset(); s.vs.Reset();
+    s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset(); s.modulate2xPs.Reset(); s.modulate4xPs.Reset(); s.mixedTextureAlphaPs.Reset(); s.mixedDiffuseAlphaPs.Reset(); s.mixedAddTextureAlphaPs.Reset(); s.mixedAddDiffuseAlphaPs.Reset(); s.blendTextureAlphaPs.Reset(); s.blendDiffuseAlphaPs.Reset(); s.blendFactorAlphaPs.Reset(); s.blendFactorTextureAlphaPs.Reset(); s.blendFactorModulateAlphaPs.Reset(); s.vs.Reset();
     s.backend.shutdown();
 }
 } // namespace outrun::vr::dx11::live_game_frame
