@@ -1,8 +1,15 @@
+[2026-10-11 AI 자율 검증·승격 정책 — 사용자 최신 지시, 이하 controller-only 문구보다 우선]
+- AI는 기능 구현→타깃 테스트→오류 수리→exact-SHA GitHub CI 증거 확인→안전한 브랜치 승격→대상 SHA 필수 게이트 확인→C6 완료 기록을 직접 수행한다. 컨트롤러는 별도 승인을 하지 않고 작업자 lease/중복·롤오버·새 TASK_ID 배정·실패 복구만 관찰한다.
+- 소유권 충돌·타인 작업은 금지한다. 승격 전 원격 feature/target 최신 HEAD와 compare를 재조회하고 feature가 target의 직계 후손(behind=0, ahead>0)이며 작업의 material commit과 정해진 acceptance/Win32-host/bundle 증거가 있을 때만 GitHub 비강제 fast-forward update_ref(force=false, expected_sha=재조회한 대상 SHA)를 사용한다. GitHub에서 갱신이 거부되면 force-push하지 말고 소유권/재베이스 여부를 해결한다.
+- 승격 결과의 TARGET_BRANCH SHA를 다시 조회하고 그 정확한 SHA의 각 required workflow·필수 jobs·acceptance steps·아티팩트 성공을 확인한다. 필수 CI 실패 시 동일 FEATURE_ID/TASK_ID의 실패 지점만 소스/검증 코드로 고쳐 재검증한다. 성공하지 않았거나 실기 미실행이면 COMPLETE_BUILD_VERIFIED·HMD PASS를 주장하지 않는다.
+- 이미 목표 SHA가 target에 통합되어 required gates가 통과했다면 컨트롤러 승인/동일 SHA 재검사/중복 커밋을 하지 않는다. C6/run 기록 정합성을 확인하고 컨트롤러는 QUEUE_NEXT_TASK_DELAY_SECONDS=0으로 다음 독립 FEATURE_ID를 자동 배정한다. 사용자가 요구한 다음 기능을 허가 대기로 세우지 않는다. 업무가 할당되지 않았을 때는 새 TASK_ID를 임의로 중복 만들지 않는다.
+- 도구 미노출/정책상 불가로 AI 직접 Git ref 반영이 불가능한 경우에만 정확한 오류와 feature/target SHA를 기록해 복구 대상으로 남긴다. CI/ownership/rollback gate는 유지하며 자동 승인 절차를 무조건 건너뛰라는 뜻이 아니다.
+
 [2026-10-11 실행 전환 규칙 — 아래 역사적 우선순위보다 우선]
 - 이번 FEATURE_CONTRACT의 미완료 acceptance만 구현한다. 복구/검토는 1회 후 실제 코드·테스트 수리로 이어간다. 같은 SHA의 PASS 재검사, 상태만 추가한 커밋, 완료 재보고는 작업 성과가 아니다.
-- FEATURE_READY는 한 번 제출한다. 이후 컨트롤러의 승격/필수 CI/C6 대기 때문에 READY 기록을 다시 커밋하거나 전체 CI를 재실행하지 않는다. FEATURE_BLOCKER가 있으면 정확한 schema/실패 원인만 수정한다.
+- FEATURE_READY는 한 번만 남긴다. 이후 승인 대기를 반복하지 않고 AI가 GitHub exact-SHA 검증·안전 승격·최종 필수 게이트·C6까지 수행한다. 같은 SHA를 재검사하지 않으며 FEATURE_BLOCKER가 있으면 실제 실패만 수리한다.
 - acceptance_results.status는 PASS 또는 PASS_FEATURE_CI를 사용하고 runtime_validation=UNTESTED는 별도로 기록한다. 각 evidence_paths는 해당 계약에서 허용한 실제 변경 파일을 사용한다.
-- 컨트롤러가 같은 SHA의 필수 Gate·acceptance step·실제 패키지를 검증한 뒤 tools/chat-controller/results/vr/<TASK_ID>-<SHA>.json에 C6를 기록하고 다음 FEATURE_ID를 선택한다. 게임 브랜치에 완료 기록을 반복 커밋하지 않는다.
+- AI가 GitHub에서 최종 대상 SHA의 Gate·step·패키지를 확인하고 C6를 기록한다. 컨트롤러는 해당 결과를 관찰하고 다음 기능을 자동 배정한다. 게임 브랜치에 완료 기록을 반복 커밋하지 않는다.
 - 실기 테스트만 대기하는 항목은 실기 승격만 보류한다. 기존 완료 기능을 다시 열지 않는다. DXVK 동결 및 보호 기준은 유지한다. FFB는 확정된 통합 회귀 이외 신규 작업을 하지 않는다.
 
 OutRun 2006 DX11 전환 자동 작업을 진행해줘.
@@ -22,7 +29,7 @@ FIRST_GAME_DRAW_FRAME 이후 메뉴/차량선택/실제 주행 화면 → 입력
 FEATURE_BASED_DEVELOPMENT
 [2026-10-10 기능 전달 계약 v1 — 기존의 중간 push 금지·한 번만 제출·미세 작업 종료 규칙 대체]
 FEATURE_CONTRACT가 이번 작업의 기능 목표/완료 조건이다. 계약이 지정된 실행은 아래의 과거 작업 번호별 목표나 우선순위 목록으로 목표를 다시 선택하지 않는다. 계약이 없는 기존 active task는 기존 범위를 끝낸다. 대기 중에는 같은 기능의 독립적인 미완료 항목만 진행하고 다른 기능은 컨트롤러가 발급한다. feature_id는 기능에 고정되며 TASK_ID/retry/rollover와 별도로 유지한다. 목표를 자잘한 guard/probe/카운터 작업으로 바꾸지 마.
-중간 소스/테스트는 FEATURE_BRANCH에 누적 커밋한다. 5분 체크포인트는 그 SHA와 미완료 acceptance ID, 원인과 다음 행동을 참조한다. TARGET_BRANCH는 컨트롤러만 갱신한다. 30분 롤오버는 같은 기능·TASK_ID의 실제 코드에서 이어간다.
+중간 소스/테스트는 FEATURE_BRANCH에 누적 커밋한다. 5분 체크포인트는 SHA와 미완료 acceptance ID, 원인과 다음 행동을 참조한다. 검증을 마친 AI가 안전한 비강제 expected-SHA GitHub 갱신으로 TARGET_BRANCH에 직접 승격한다. 컨트롤러는 별도 승인을 하지 않는다. 30분 롤오버는 같은 기능·TASK_ID에서 이어간다.
 개발 중 변경 관련 정적검사·targeted 테스트·필요한 컴파일은 허용한다. 기능 후보 완성 후 exact-SHA 전체 Gate를 수행하며, 실패 수리 후 변경된 SHA 재빌드도 허용한다. 최초 제출에는 실제 소스 구현이 필요하지만 같은 기능의 검증 코드/테스트/workflow 수리만으로도 재제출 가능하다. 불필요한 C++ 변경을 만들지 마.
 FEATURE_READY는 중간 상태다. feature_acceptance와 함께 acceptance_results에 모든 계약 ID/status=PASS/evidence_paths/validation_command를 기록하고 지정된 ci_step의 실제 검사를 Actions에 연결한다. 필수 gate/job/step SUCCESS와 artifact_prefix에 맞는 실행 가능한 테스트 패키지가 모두 있어야 BUILD_VERIFIED다. 패키지에는 게임/host 바이너리, 설정, exact-SHA manifest, 로그 수집기를 포함한다. 실패·skip·누락을 PASS로 바꾸지 마.
 C6: status=COMPLETE_BUILD_VERIFIED, checkpoint=C6_STATE, automation_validation=PASS_EXACT_SHA, validation_bearing_result_sha=검증 SHA. material_result_sha·acceptance_results를 보존하고 실기 미수행은 RUNTIME_VALIDATION=UNTESTED. 최초 제출 및 동일 기능의 수리 커밋에 [AUTO:TASK_ID]를 넣되 CI skip을 쓰지 마. 검증 후 C6 bookkeeping은 CI와 분리한다. 점수/기능 완료는 중간 커밋·롤오버마다 가산하지 않는다.
