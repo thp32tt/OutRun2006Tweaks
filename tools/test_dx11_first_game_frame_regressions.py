@@ -271,8 +271,8 @@ def main() -> None:
         observe = code[code.find("void observe("):
                        code.find("} // namespace", code.find("void observe("))]
         required_state = (
-            "D3DFVF_XYZRHW | D3DFVF_DIFFUSE",
-            "D3DFVF_XYZ | D3DFVF_DIFFUSE",
+            "if (!game_fvf_layout(fvf, layout)) return false;",
+            "capture.enabled = layout.textured;",
             "GetRenderState(D3DRS_CLIPPLANEENABLE, &clipPlanes)",
             "GetRenderState(D3DRS_LIGHTING, &lighting)",
             "GetRenderState(D3DRS_VERTEXBLEND, &vertexBlend)",
@@ -282,30 +282,30 @@ def main() -> None:
             "GetTransform(D3DTS_PROJECTION, &transforms[2])",
         )
         required_vertices = (
-            "const UINT diffuseOffset = pretransformed ? 16u : 12u;",
-            "stride < diffuseOffset + (capture.enabled ? 12u : 4u)",
-            "std::memcpy(xyz, data, diffuseOffset)",
-            "std::memcpy(&diffuse, data + diffuseOffset",
+            "stride < layout.minStride",
+            "if (!game_fvf_decode_vertex(data, stride, layout, decoded))",
+            "const DWORD diffuse = decoded.diffuse;",
+            "output[i].uv[0] = decoded.uv[0];",
             "next[col] += clip[row] * matrix.m[row][col];",
             "clip[3] <= 0.0f",
             "std::copy(clip.begin(), clip.end(), v.clip);",
         )
         return (all(x in state for x in required_state)
                 and all(x in vertices for x in required_vertices)
-                and "supported_game_state(game, vp, pretransformed, transforms, capture, output)" in observe
-                and "pretransformed, transforms, capture, vertices)" in observe)
+                and "supported_game_state(game, vp, layout, transforms, capture, output)" in observe
+                and "layout, transforms, capture, vertices)" in observe)
 
     assert object_space_draw_safe(bridge)
     for good, bad in (
-        ("D3DFVF_XYZ | D3DFVF_DIFFUSE",
-         "D3DFVF_XYZRHW | D3DFVF_DIFFUSE"),
+        ("if (!game_fvf_layout(fvf, layout)) return false;",
+         "if (false) return false;"),
         ("GetTransform(D3DTS_WORLD, &transforms[0])",
          "GetTransform(D3DTS_VIEW, &transforms[0])"),
         ("lighting || vertexBlend != D3DVBF_DISABLE",
          "lighting && vertexBlend != D3DVBF_DISABLE"),
         ("next[col] += clip[row] * matrix.m[row][col];",
          "next[col] += clip[row] * matrix.m[col][row];"),
-        ("stride < diffuseOffset + (capture.enabled ? 12u : 4u)", "stride < 20u"),
+        ("stride < layout.minStride", "stride < 20u"),
         ("clip[3] <= 0.0f", "clip[3] < 0.0f"),
     ):
         changed = bridge.replace(good, bad, 1)
@@ -345,8 +345,9 @@ def main() -> None:
         submit = code[code.find("bool submit("):
                       code.find("void observe(")]
         return all(x in state for x in (
-            "pretransformed = (fvf == rhw || fvf == (rhw | D3DFVF_TEX1));",
-            "fvf == (rhw | D3DFVF_TEX1)", "fvf == (xyz | D3DFVF_TEX1)",
+            "if (!game_fvf_layout(fvf, layout)) return false;",
+            "capture.enabled = layout.textured;",
+            "if (!layout.hasDiffuse && !selectTexture) return false;",
             "GetTexture(0, tex.GetAddressOf())",
             "tex.As(&capture.texture)",
             "const bool modulate = op == D3DTOP_MODULATE && alphaOp == D3DTOP_MODULATE;",
@@ -377,7 +378,9 @@ def main() -> None:
         ))
     assert texture_path_complete(bridge)
     for old, bad in (
-        ("fvf == (rhw | D3DFVF_TEX1)", "fvf == rhw"),
+        ("capture.enabled = layout.textured;", "capture.enabled = false;"),
+        ("if (!layout.hasDiffuse && !selectTexture) return false;",
+         "if (layout.hasDiffuse && !selectTexture) return false;"),
         ("const bool modulate = op == D3DTOP_MODULATE && alphaOp == D3DTOP_MODULATE;",
          "const bool modulate = op == D3DTOP_MODULATE || alphaOp == D3DTOP_MODULATE;"),
         ("const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;",
