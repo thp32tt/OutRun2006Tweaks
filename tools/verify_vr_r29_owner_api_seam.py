@@ -170,8 +170,11 @@ def check(r29: str, r30: str, header: str) -> None:
         assert forwarder == delegate, f"R30 physical hook facade retargeted: {facade}"
     assert "R30ScopedInternalPass" in r30
     assert "R29OwnerExchangeInternalStereoPass(previous_)" in r30
-    assert "R29OwnerCaptureFrameSnapshot().backBuffer" in r30
-    assert "R29OwnerCaptureFrameSnapshot().rightEyeSurface" in r30
+    source_surfaces = body(r30, "R30SupportTryGetDirectTransportSourceSurfaces(")
+    assert source_surfaces.count("R29OwnerCaptureFrameSnapshot()") == 1
+    assert "const auto frame = R29OwnerCaptureFrameSnapshot();" in source_surfaces
+    assert "out.left = frame.backBuffer;" in source_surfaces
+    assert "out.right = frame.rightEyeSurface;" in source_surfaces
     assert "R29OwnerCaptureFrameSnapshot().presentEpoch" in r30
     assert '#include "../core/r29_owner_api.hpp"' in r29
     assert '#include "../core/r29_owner_api.hpp"' in r30

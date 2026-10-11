@@ -259,8 +259,9 @@ if modern:
         "R30SupportDirectTransportResourcesReady()": ("return R29OwnerDirectTransportResourcesReady();",),
         "R30SupportEnsureDirectTransportResources(": ("return R29OwnerEnsureDirectTransportResources(device);",),
         "R30SupportTryGetDirectTransportSourceSurfaces(": (
-            "out.left = R29OwnerCaptureFrameSnapshot().backBuffer;",
-            "out.right = R29OwnerCaptureFrameSnapshot().rightEyeSurface;",
+            "const auto frame = R29OwnerCaptureFrameSnapshot();",
+            "out.left = frame.backBuffer;",
+            "out.right = frame.rightEyeSurface;",
             "return out.left != nullptr && out.right != nullptr;",
         ),
         "R30SupportReleaseDirectAckState()": ("R29OwnerReleaseDirectAckState();",),
