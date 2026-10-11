@@ -23,5 +23,13 @@ int main() {
     assert(p.b == 17 && p.g == 0 && p.r == 255 && p.a == 0);
     auto q = unpack(0x8000u, Layout::argb1555);
     assert(q.a == 255 && q.r == 0 && q.g == 0 && q.b == 0);
+    std::array<std::uint8_t, 4> argb1555{};
+    const std::array<std::uint8_t, 2> transparentRed{0x00, 0x7c};
+    unpack_row(transparentRed.data(), argb1555.data(), 1, Layout::argb1555);
+    assert((argb1555 == std::array<std::uint8_t, 4>{0, 0, 255, 0}));
+    std::array<std::uint8_t, 4> argb4444{};
+    const std::array<std::uint8_t, 2> translucentRed{0x00, 0x8f};
+    unpack_row(translucentRed.data(), argb4444.data(), 1, Layout::argb4444);
+    assert((argb4444 == std::array<std::uint8_t, 4>{0, 0, 255, 136}));
     return 0;
 }

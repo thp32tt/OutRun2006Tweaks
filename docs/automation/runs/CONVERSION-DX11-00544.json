@@ -28,18 +28,20 @@
     "batch_components": [
       "Pure C++ bit-accurate 565/1555/4444 pixel decoder and portable CPU fixture",
       "Live D3D9 LockRect 16-bit format admission and pitch-separated D3D11 BGRA8 SRV/Draw",
-      "Source/consumer linkage regression and destructive mutations"
+      "Source/consumer linkage regression and destructive mutations",
+      "CPU texel layout-dispatch hoisted out of the per-pixel loop; GNU C++17 optimized red/alpha fixtures PASS"
     ],
     "acceptance_proof": {
-      "positive_probe": "Local GNU C++17 portable decoder probe and six constexpr checks PASS; full Windows exact SHA Gate PENDING; no game/HMD screenshot.",
-      "negative_regression": "Python source test validates each D3D9 format, separate 16-bit/32-bit pitches, DX11 SRV Draw routing, and 12 destructive mutations; CI pending.",
+      "positive_probe": "Portable GNU C++17 -O2 -Wall -Wextra -Werror decoder/row-dispatch CPU probe PASS; full Windows exact-SHA Gate pending, HMD/game pixels untested.",
+      "negative_regression": "Original exact e915ce1 Win32 SAFE-RETURN source-mutation test exposed a test oracle bug. Scoped predicate assertion patched at e6e4f768; multiple formats plus per-row alpha CPU probes PASS. Final SHA Gate pending.",
       "component_integration": "D3D9 game Texture9->LockRect 16-bit source -> BGRA8 decoder -> immutable CreateTexture2D -> CreateShaderResourceView -> PSSetShaderResources -> Draw/DrawIndexed -> diagnostic inset"
     },
     "conflict_keys": [
       "DX11:MENU_RACE_PACKED16_TEXTURE_BGRA_SRV",
       "src/vr/d3d11/live_game_frame_bridge.cpp:PACKED16",
       "src/vr/d3d11/packed_texture_16bit.hpp",
-      "tools/test_dx11_first_game_frame_regressions.py:PACKED16"
+      "tools/test_dx11_first_game_frame_regressions.py:PACKED16",
+      "src/vr/d3d11/packed_texture_16bit.hpp:DISPATCH_ONCE"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
@@ -63,8 +65,8 @@
     "C0_RECOVER": "PASS latest branch HEAD fbc91fccbabdd2fa4e0d7e264743c0b109cf0703 and 00543 C6 exact SHA; 00544 absent",
     "C1_REVIEW": "PASS independent 16-bit game texture source gap, R175 ownership unchanged",
     "C2_IMPLEMENT": "PASS packed source format, decoder, BGRA8 SRV Draw integration with D3D9 fallback",
-    "C3_VALIDATE": "Portable CPU probe PASS; source destructive mutation tests and Windows exact SHA CI PENDING",
-    "C4_COMMIT": "material result commit publishing as an atomic multi-file update",
+    "C3_VALIDATE": "Original e915ce1 Windows Feature SAFE-RETURN FAIL due duplicate format enum in oracle; actual regression test repaired at e6e4f768. New optimized dispatch host GNU C++17 -O2 probe PASS; final exact SHA CI PENDING.",
+    "C4_COMMIT": "Actual 16-bit renderer material e915ce1; material negative test fix e6e4f768; optimizing decoder dispatch in this source commit. Await final material exact GitHub Gate.",
     "C5_PACKAGE": "NOT_REQUIRED; opt-in desktop diagnostic, no game release claim",
     "C6_STATE": "PENDING exact SHA Gate; no HMD game test"
   },
@@ -79,6 +81,6 @@
   "validation_bearing_result_sha": null,
   "feature_status": "SOURCE_INTEGRATED__CI_PENDING_HMD_UNTESTED",
   "runtime_evidence": "No actual gamepad/Quest3 VDXR or game frame test; DX9Ex rendering and input always authoritative.",
-  "next_action": "Verify exact material SHA GitHub Actions; only then write separate C6 bookkeeping [skip ci] and score if newly earned; otherwise repair failed Gate. Continue programmable shader/default-pool integration next independent task.",
+  "next_action": "Wait for exact validation-bearing SHA Gate and Windows source-acceptance success; repair if failed; only then issue separate C6 checkpoint [skip ci]. RUNTIME_VALIDATION remains UNTESTED.",
   "controller_runtime_adoption": "NOT_VERIFIED"
 }

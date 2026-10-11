@@ -35,8 +35,12 @@ constexpr Bgra8 unpack(std::uint16_t value, Layout layout) noexcept {
     return {0, 0, 0, 0};
 }
 
-inline void unpack_row(const std::uint8_t* source, std::uint8_t* bgra,
-                       unsigned width, Layout layout) noexcept {
+// Dispatch texture layout once per row, never once per texel. Menu/race
+// artwork can contain many sprites; a runtime switch in every sample would
+// make the CPU->SRV diagnostic copy needlessly expensive.
+template <Layout layout>
+inline void unpack_row_typed(const std::uint8_t* source, std::uint8_t* bgra,
+                             unsigned width) noexcept {
     for (unsigned x = 0; x < width; ++x) {
         const std::uint16_t texel = static_cast<std::uint16_t>(source[x * 2u]) |
                                     (static_cast<std::uint16_t>(source[x * 2u + 1u]) << 8u);
@@ -45,6 +49,16 @@ inline void unpack_row(const std::uint8_t* source, std::uint8_t* bgra,
         bgra[x * 4u + 1u] = pixel.g;
         bgra[x * 4u + 2u] = pixel.r;
         bgra[x * 4u + 3u] = pixel.a;
+    }
+}
+inline void unpack_row(const std::uint8_t* source, std::uint8_t* bgra,
+                       unsigned width, Layout layout) noexcept {
+    if (layout == Layout::rgb565) {
+        unpack_row_typed<Layout::rgb565>(source, bgra, width);
+    } else if (layout == Layout::argb1555) {
+        unpack_row_typed<Layout::argb1555>(source, bgra, width);
+    } else {
+        unpack_row_typed<Layout::argb4444>(source, bgra, width);
     }
 }
 } // namespace outrun::vr::dx11::live_game_frame::packed_texture16
