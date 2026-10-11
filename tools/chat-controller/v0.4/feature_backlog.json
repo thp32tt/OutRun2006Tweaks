@@ -204,8 +204,15 @@
       "work_key": "DX9EX:XR_RECOMMENDED_EYE_EXTENT",
       "goal": "OpenXR 권장 per-eye 크기를 실제 렌더 타깃/viewport/swapchain에 일관되게 적용하고 Reset·실패 폴백과 테스트 빌드를 완성한다. 기존 구현을 재조사만 하지 말고 미완료 연결·회귀를 구현한다.",
       "depends_on": [
-        "DX9EX:R84_RENDERER_GRAPH"
+        "DX9EX:FRAME_PACING_DIAGNOSTICS"
       ],
+      "r84_precondition_evidence": {
+        "verified_owner_sha": "c8cde7d627e8c35a2de60548101c90524ef116d9",
+        "current_target_descends_from_owner": true,
+        "exact_sha_dx9ex_active_run": 38100885230,
+        "exact_sha_domain_isolation_run": 38100885233,
+        "reason": "Already integrated and exact-SHA build verified in GitHub; stale controller R84 BLOCKED outcome misclassifies target-workflow step naming. Preserve historic incident; do not turn an unverified feature into PASS."
+      },
       "acceptance_items": [
         {
           "id": "XR-EYE-SIZING",
