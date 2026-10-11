@@ -19,6 +19,7 @@ COPY src-vr-v2/controller.py.part* /tmp/controller-parts/
 RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.py && python -m py_compile /opt/outrun/app/controller.py && rm -rf /tmp/controller-parts
 
 COPY entrypoint.vr.sh /opt/outrun/entrypoint.sh
+COPY vr-runtime-watchdog.sh /opt/outrun/vr-runtime-watchdog.sh
 COPY bootstrap_review.override.md /opt/outrun/prompts/bootstrap_review.md
 COPY continue_review.override.md /opt/outrun/prompts/continue_review.md
 COPY watchdog_resume.override.md /opt/outrun/prompts/watchdog_resume.md
@@ -34,5 +35,5 @@ COPY conversion_dx11.md /opt/outrun/prompts/conversion_dx11.md
 COPY conversion_dxvk.md /opt/outrun/prompts/conversion_dxvk.md
 COPY conversion_dx9ex.md /opt/outrun/prompts/conversion_dx9ex.md
 
-RUN chmod +x /opt/outrun/entrypoint.sh
+RUN chmod +x /opt/outrun/entrypoint.sh /opt/outrun/vr-runtime-watchdog.sh
 ENTRYPOINT ["/usr/bin/tini","--","/opt/outrun/entrypoint.sh"]
