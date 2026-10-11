@@ -386,6 +386,16 @@ namespace OutRunVRStereo
                 !R30SupportStereoBaselineSeeded())
                 return lowerDraw();
 
+            // Reuse R29's cached effect state only if its StateBlock Apply
+            // generation, Present epoch and draw-serial window are trustworthy.
+            // This avoids repeated D3D9 GetRenderState calls in R33's frequent
+            // R29 fallback path; stale shadows keep the original live-read
+            // and zero-disparity failure behavior.
+            R30SupportEffectTelemetrySnapshot shadow{};
+            if (OutRunVR::State::StateBlockTracker::Reliable() &&
+                R30SupportTryGetEffectTelemetrySnapshot(shadow))
+                return lowerDraw();
+
             OutRunVR::D3D9::LiveEffectRenderStateSnapshot snapshot{};
             if (R32ReadEffectSnapshot(device, snapshot))
                 return lowerDraw();
