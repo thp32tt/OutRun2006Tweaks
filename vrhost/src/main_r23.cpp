@@ -365,7 +365,8 @@ namespace
     }
 
     bool R23StageDirectHold(StereoCompositor& c,
-        const OutRunVR::SharedRenderFrameState& frame)
+        const OutRunVR::SharedRenderFrameState& frame,
+        const D3D11_TEXTURE2D_DESC& validatedDesc)
     {
         const std::uint32_t slot =
             frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
@@ -376,18 +377,11 @@ namespace
             !c.directRight_[slot])
             return false;
 
-        D3D11_TEXTURE2D_DESC left{};
-        D3D11_TEXTURE2D_DESC right{};
-        c.directLeft_[slot]->GetDesc(&left);
-        c.directRight_[slot]->GetDesc(&right);
-        if (!left.Width || !left.Height || left.Width != right.Width ||
-            left.Height != right.Height || left.MipLevels != right.MipLevels ||
-            left.ArraySize != right.ArraySize || left.Format != right.Format ||
-            left.SampleDesc.Count != 1 || right.SampleDesc.Count != 1 ||
-            left.Width != frame.backbufferWidth ||
-            left.Height != frame.backbufferHeight)
-            return false;
-
+        // R23ValidateDirectResourceSize already fetched both D3D11 descriptors
+        // after PrepareDirectStereoSource. Reuse that validated snapshot here
+        // instead of making two more per-frame COM GetDesc calls in the hot path.
+        // The candidate frame is checked for stability before entering commit.
+        const auto& left = validatedDesc;
         const bool recreate =
             !R23DirectHold.eye[0] || !R23DirectHold.eye[1] ||
             !R23DirectHold.srv[0] || !R23DirectHold.srv[1] ||
@@ -1057,7 +1051,8 @@ namespace
     }
 
     bool R23ValidateDirectResourceSize(StereoCompositor& c,
-        const OutRunVR::SharedRenderFrameState& frame)
+        const OutRunVR::SharedRenderFrameState& frame,
+        D3D11_TEXTURE2D_DESC& validatedDesc)
     {
         const std::uint32_t slot = frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
         const std::uint32_t width = frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
@@ -1067,8 +1062,18 @@ namespace
             !c.directLeft_[slot] || !c.directRight_[slot]) return false;
         D3D11_TEXTURE2D_DESC l{}, r{};
         c.directLeft_[slot]->GetDesc(&l); c.directRight_[slot]->GetDesc(&r);
-        return l.Width == width && l.Height == height && r.Width == width && r.Height == height &&
-            l.Format == r.Format && l.SampleDesc.Count == 1 && r.SampleDesc.Count == 1;
+        // A single pair of descriptor reads now validates and supplies the
+        // dimensions/format for the subsequent host-owned DirectGPU hold copy.
+        // Keep the old staging checks on mip/array parity fail-closed.
+        const bool valid =
+            l.Width == width && l.Height == height &&
+            r.Width == width && r.Height == height &&
+            l.MipLevels == r.MipLevels && l.ArraySize == r.ArraySize &&
+            l.Format == r.Format &&
+            l.SampleDesc.Count == 1 && r.SampleDesc.Count == 1;
+        if (valid)
+            validatedDesc = l;
+        return valid;
     }
 
     void R23InvalidateDirect(StereoCompositor& c)
@@ -1091,9 +1096,10 @@ namespace
     bool R23CommitDirectAfterValidation(StereoCompositor& c,
         const OutRunVR::SharedRenderFrameState& frame)
     {
+        D3D11_TEXTURE2D_DESC validatedDesc{};
         if (!c.PrepareDirectStereoSource(frame) ||
-            !R23ValidateDirectResourceSize(c, frame) ||
-            !R23StageDirectHold(c, frame))
+            !R23ValidateDirectResourceSize(c, frame, validatedDesc) ||
+            !R23StageDirectHold(c, frame, validatedDesc))
         {
             R23InvalidateDirect(c);
             return false;
