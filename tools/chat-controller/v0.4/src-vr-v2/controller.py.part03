@@ -67,6 +67,13 @@ VR_FEATURE_DEVELOPMENT_ENABLED = os.environ.get(
 ).strip().lower() in {"1", "true", "yes", "on"}
 VR_FEATURE_POLL_SECONDS = max(30, int(os.environ.get("VR_FEATURE_POLL_SECONDS", "60")))
 VR_FEATURE_C6_REMINDER_SECONDS = max(60, int(os.environ.get("VR_FEATURE_C6_REMINDER_SECONDS", "90")))
+# In autonomous mode, the AI worker publishes its reviewed feature with a
+# non-forced, expected-SHA GitHub lease. The controller only observes the
+# target commit, checks required Actions, and schedules the next feature.
+# Legacy controller promotion remains available as an explicit rollback mode.
+VR_FEATURE_PROMOTION_MODE = os.environ.get(
+    "VR_FEATURE_PROMOTION_MODE", "ai"
+).strip().lower()
 
 
 def vr_feature_branch_name(lane: str, task_id: str) -> str:
@@ -2571,7 +2578,13 @@ async def conversion_process_lane(
     q: dict,
     lane_key: str,
 ) -> None:
-    """Advance an existing lane; production deployment dispatches DX11 only."""
+    """Advance a lane without AI-worker approval.
+
+    The AI pushes a reviewed feature with a GitHub expected-SHA lease. Its
+    target material commit is discovered above (github_find_task_commit), then
+    exact-SHA Actions are observed before C6 and next-task dispatch. Only the
+    explicit legacy promotion mode writes target refs from this controller.
+    """
     active = q.get("active_by_lane", {}).get(lane_key)
     if not active or active.get("phase") == "DONE":
         return
@@ -2614,7 +2627,7 @@ async def conversion_process_lane(
                 save_queue_state(q)
                 return
 
-            if active.get("feature_branch"):
+            if active.get("feature_branch") and VR_FEATURE_PROMOTION_MODE == "controller":
                 try:
                     if await asyncio.to_thread(github_feature_promote_ready, active, now):
                         save_queue_state(q)
