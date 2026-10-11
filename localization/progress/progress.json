@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 18:47 KST",
+  "updated_at_kst": "2026-10-11 19:12 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1277,6 +1277,20 @@
         "RUNTIME_VALIDATION": "UNTESTED",
         "IGR044": "OPEN_USER_INGAME_FAIL",
         "evidence": "localization/graphics/role_B/imagegen_requests/q060_B373_SOURCE_CROP_IMAGEGEN_P2_STYLE_HOLD_20261011.json"
+      },
+      "a243_q193_15cont_pilot": {
+        "role": "A",
+        "index": 193,
+        "run_key": "OUTRUN-KOR-A243-Q193-15CONT-NATIVE-SOURCE-CLEAN-PILOT-20261011-1900",
+        "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+        "official_unchanged_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+        "new_unpromoted_trial_sha256": "79a831d6d6d9351a442e766e16617d79720f32085640bbf874bcc11d1928799f",
+        "new_saved_trial_dds": 1,
+        "official_dds_changed": 0,
+        "producer_firsthand": "SCOPED_NATIVE_BGW_RAW_PASS",
+        "independent_C2": "PENDING",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED"
       }
     },
     "runtime_text_trace": {
