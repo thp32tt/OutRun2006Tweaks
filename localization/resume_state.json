@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "2026-10-11 17:11 KST A241 A q121 ODD P0 new native saved unpromoted trial SHA dba8745f3cadac8bc35b2ad1d19862d57c3207cb368ac626df0e4aa287ba1659 exact source-canonical trailing colon restored with 2 dots 36/36px. Source-style still FAIL at 100/75/50 RAW original smooth racing italic vs angular joined Hangul and tightly packed 페달. New candidate different prior A240 4be07b63e3bc1bee32d5f5192e95c24f9e709512c03e7074e679a93551cd6936 alpha XOR1459 RGBA4814; official-to-new changed9558 RGBA entirely inside source ROI outside0 other29 exact decode0. OFFICIAL 38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844 unchanged; C2 and C3 NOT_RUN for new bytes; IGR030/031/040 user in-game OPEN and RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_A/20261011-A241-Q121-PUNCTUATION-TRACKING-REFIT/A241_CONTROLLER_PERSISTED_VISUAL_QA.json. RUN_KEY=OUTRUN-KOR-A241-Q121-P0-COLON-TRACKING-20261011-1700",
     "B372 B EVEN P0 q060 real ChatGPT ImageGen independent transparent gold Hangul + punctuation 2113x744 full PNG SHA 5d521fa3feab5e0bc49a448cdc13f99841e454050c793385bfcb57aeb9b6c01c, generation ded987dd-a97c-4342-bcd8-48e06ad3a9f9. New output is NOT duplicate B371: displays two diagonal slab-like punctuation marks unlike original small rounded colon, source aspect 6.34 vs generated 4.94, naive contain 620/849 width/height ratios source optical mismatch. P2 REWORK_REQUIRED_UNPROMOTED, no SHA-bound source PNG in GitHub yet/no consumer DDS, official SHA d81d0d14 unchanged, canonical SOURCE 6a33c730 and C2 PLATE_PASS CLEAN a03687d4 unchanged. 2 dashboard attempts rejected. P3 DDS0, C2/C3 NOT_RUN, IGR044 OPEN, RUNTIME_VALIDATION=UNTESTED. Next do not repeat dashboard: generate correct rounded punctuation + width with real ImageGen, upload actual transparent binary before consumer. Evidence localization/graphics/role_B/imagegen_requests/q060_B372_SOURCE_STYLE_PUNCT_HOLD_20261011.json RUN_KEY=OUTRUN-KOR-B372-Q060-REAL-IMAGEGEN-SOURCE-STYLE-PUNCT-HOLD-20261011-1630",
     "C1 q119 2026-10-11 16:18 KST new native 50pct SOURCE_FAMILY optical hierarchy defect on same C297-halo-hold SHA; producer METHOD_CHANGE curved racing-font glyph style + CLEAN, independent C2/C3 and user game remain. localization/graphics/role_C/20261011-C1-Q119-NEW-NATIVE-FAMILY-HIERARCHY-FAIL/C1_Q119_SOURCE_FAMILY_OPTICAL_REWORK.json. RUN_KEY=OUTRUN-KOR-C1-Q119-NEW-OPTICAL-HIERARCHY-20261011-1617",
     "C1 ODD q121 new A240 saved first independent QA: missing colon and angular racing italic fail; retain official, producer repair punctuation/source typography, independent C2 then separate C3 and IGR030/031/040 user re-test. localization/graphics/role_C/20261011-C1-Q121-A240-FIRST-SAVED-INDEPENDENT/C1_Q121_A240_INDEPENDENT_OPTICAL_REWORK.json. RUN_KEY=OUTRUN-KOR-C1-Q121-A240-NEW-SHA-PUNCTUATION-STYLE-20261011-1540",
@@ -7060,7 +7061,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-11 16:18 KST",
+  "updated_at_kst": "2026-10-11 17:11 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
