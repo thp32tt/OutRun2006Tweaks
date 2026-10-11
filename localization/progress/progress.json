@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 12:14 KST",
+  "updated_at_kst": "2026-10-11 12:18 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -12811,5 +12811,28 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_B/20261011-B368-Q060-HAND-VECTOR-ITALIC-GLYPH-GEOMETRY/B368_CONTROLLER_SAVED_VISUAL_QA.json",
     "workflow": 38106462427
+  },
+  "c1_20261011_q193_six_inherited_native_optical_rework": {
+    "run_key": "OUTRUN-KOR-C1-Q193-SIX-INHERITED-SOURCE-FAMILY-20261011-1210",
+    "queue_index": 193,
+    "shard": "C1 ODD",
+    "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "candidate_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+    "scope": "six inherited Goal E/D/C/B,15Cont,Online; not C341 Goal A",
+    "result": "REWORK_REQUIRED_SOURCE_FAMILY_LOWRES",
+    "source_family_width_ratio_range": [
+      0.3953,
+      0.5167
+    ],
+    "plate": "A208 clean matches inherited final Korean in six regions; PLATE_ONLY not approved",
+    "report": "localization/graphics/role_C/20261011-C1-Q193-SIX-INHERITED-SOURCE-FAMILY/C1_Q193_SIX_INHERITED_C1_REWORK.json",
+    "new_DDS": 0,
+    "approved": 0,
+    "C3": "NOT_RUN",
+    "runtime_validation": "UNTESTED",
+    "user_ingame_reports": "IGR003/019/033 OPEN",
+    "source": "SHA authenticated native persisted DDS with C1 six cells first visual review",
+    "numeric": "6/6 candidate bbox within canonical source but six visual source-family failures",
+    "cleanup": "only task scratch after verified remote publish"
   }
 }
