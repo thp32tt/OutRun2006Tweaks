@@ -9,14 +9,14 @@
   "target_branch": "vr-d3d9ex-focus",
   "work_key": "DX9EX:R84_RENDERER_GRAPH",
   "feature_status": "FEATURE_READY",
-  "status": "IN_PROGRESS",
-  "checkpoint": "FEATURE_READY_PENDING_CONTROLLER_EXACT_SHA",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "target_head_at_dispatch": "2254210c85f6a94e8b48ed02aeac2fd5166a8d4f",
   "last_implemented_source_sha": "8b9a179a8506be368443514fd8c219e0ec10796d",
-  "validation_bearing_result_sha": "8b9a179a8506be368443514fd8c219e0ec10796d",
-  "material_result_sha": "8b9a179a8506be368443514fd8c219e0ec10796d",
+  "validation_bearing_result_sha": "074768c96c410f0268c084450b0aa8bced38b6c3",
+  "material_result_sha": "074768c96c410f0268c084450b0aa8bced38b6c3",
   "feature_contract": {
     "feature_id": "DX9EX:R84_RENDERER_GRAPH",
     "lane": "DX9EX",
@@ -214,12 +214,9 @@
     }
   ],
   "outstanding": [
-    "Controller-only fast-forward promotion from target e7ed9937de4fc4ed8fd9e18cc82d7d105b598881 to R84 verified feature state (current feature source c6cd06cafb0f6bc396d4841186d139985f3d8ae7); require a fresh GitHub compare/lease before mutation.",
-    "DX9Ex Active Validation exact final TARGET SHA all five jobs SUCCESS: PENDING_CONTROLLER",
-    "Domain Isolation Guard exact same final TARGET SHA SUCCESS: PENDING_CONTROLLER",
-    "Quest3/VDXR RUNTIME_VALIDATION=UNTESTED"
+    "Quest3/VDXR runtime/HUD/FPS/FFB acceptance remains UNTESTED; R84 source and build are DONE."
   ],
-  "next_action": "FEATURE_READY (R84 five acceptance PASS) submitted with exact R84 workflow #38095865437 on c6cd06cafb0f6bc396d4841186d139985f3d8ae7. Controller only: re-fetch target/feature, verify ancestry and non-overlap, advance vr-d3d9ex-focus via fast-forward lease, then run DX9Ex Active Validation and Domain Isolation Guard on identical integrated TARGET SHA. Do not mark DONE_BUILD_VERIFIED / score +1 without material target commit and gates. RUNTIME_VALIDATION=UNTESTED.",
+  "next_action": "R84 source/build closure complete on exact SHA 074768c9. Do not redispatch TASK_ID 00591; resume independent P0 HUD/optics, P2 XR eye and P3 FPS tasks.",
   "feature_last_head": "c6cd06cafb0f6bc396d4841186d139985f3d8ae7",
   "checkpoint_history": [
     {
@@ -418,5 +415,17 @@
     "failed_target_run_sha": "0887504dfe9e5689d4bf6ee849dbae9af7693f59",
     "finding": "Old target failed legacy R30 private-owner refactor guard; the verified feature uses R84 migrated R29 physical-owner guard and matching regression preflight. Stale checkpoint blocker R84-OWNERS is not valid for verified feature HEAD.",
     "source_runtime_validation": "UNTESTED"
+  },
+  "target_feature_status": "DONE_BUILD_VERIFIED",
+  "target_closeout": {
+    "status": "SUPERSEDED_BY_DX9EX_FOCUS",
+    "exact_source_sha": "074768c96c410f0268c084450b0aa8bced38b6c3",
+    "active_validation_run_id": 38135749653,
+    "domain_isolation_run_id": 38135749604,
+    "full_source_impact_run_id": 38135749550,
+    "r84_win32_artifact_id": 11701023307,
+    "safe_package_artifact_id": 11701106196,
+    "runtime_validation": "UNTESTED",
+    "score_delta": 0
   }
 }
