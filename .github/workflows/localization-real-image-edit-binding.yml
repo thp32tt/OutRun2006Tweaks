@@ -40,8 +40,7 @@ jobs:
         run: python tools/localization/imagegen_source_edit_bridge.py --repo . --dry-run --request localization/graphics/role_B/imagegen_requests/q092_B_OPENAI_EDIT_SOURCE_REQUEST.json
 
   live-remote-multipart-edit:
-    # Exactly one controlled push probe; future pushes cannot auto-spend.
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.event.head_commit.message, 'B-C1-IMAGE-ATTACHMENT-ONESHOT-C1-20261012'))
+    if: github.event_name == 'workflow_dispatch'
     needs: [preflight-and-multipart-tests]
     runs-on: ubuntu-latest
     permissions:
@@ -69,7 +68,6 @@ jobs:
         shell: bash
         run: |
           case "${{ inputs.pilot }}" in
-            "") REQUEST="localization/graphics/role_C1/imagegen_requests/q102_C1_OPENAI_EDIT_SOURCE_REQUEST.json";;
             C1_q102) REQUEST="localization/graphics/role_C1/imagegen_requests/q102_C1_OPENAI_EDIT_SOURCE_REQUEST.json";;
             B_q092) REQUEST="localization/graphics/role_B/imagegen_requests/q092_B_OPENAI_EDIT_SOURCE_REQUEST.json";;
             *) echo "::error::Unknown pilot"; exit 2;;
