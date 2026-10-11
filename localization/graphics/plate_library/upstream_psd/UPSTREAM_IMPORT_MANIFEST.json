@@ -1,0 +1,121 @@
+{
+  "schema": "outrun-pinned-psd-import-v1",
+  "origin": "Sonic-TV/OR2006Sprites",
+  "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "rights": "No repository-wide LICENSE observed upstream; preserve attribution, review external redistribution terms",
+  "files": [
+    {
+      "texture_hash": "2B0863D6",
+      "queue_indexes": [
+        135
+      ],
+      "file": "localization/graphics/plate_library/upstream_psd/2B0863D6/2B0863D6_512x64.psd",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/2B0863D6_v02/2B0863D6_512x64.psd",
+      "source_blob_sha": "fc60ed582ccdeab322ab24ffd87bea7d89c98087",
+      "sha256": "cf4e75aa86b730322456d5bdfdf5d74a4028f2cda1a15008e3c61f21989972f8",
+      "size_bytes": 601382,
+      "source": "Sonic-TV/OR2006Sprites",
+      "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+      "review_state": "EXTERNAL_PSD_UNQUALIFIED",
+      "canonical_dds_match": "NOT_TESTED",
+      "C2_PLATE_PASS": false
+    },
+    {
+      "texture_hash": "8C259C68",
+      "queue_indexes": [
+        188
+      ],
+      "file": "localization/graphics/plate_library/upstream_psd/8C259C68/8C259C68_512x512.psd",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/8C259C68_v02/8C259C68_512x512.psd",
+      "source_blob_sha": "e1b1b75f40136d17c108746a9ba5eafcd06fc62f",
+      "sha256": "41aa999f764109eec5a4d3153077bd9b1bd084214bd8701187cbc80eb09d132b",
+      "size_bytes": 1773904,
+      "source": "Sonic-TV/OR2006Sprites",
+      "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+      "review_state": "EXTERNAL_PSD_UNQUALIFIED",
+      "canonical_dds_match": "NOT_TESTED",
+      "C2_PLATE_PASS": false
+    },
+    {
+      "texture_hash": "A064FDFC",
+      "queue_indexes": [
+        60
+      ],
+      "file": "localization/graphics/plate_library/upstream_psd/A064FDFC/A064FDFC_1024x512-v02.psd",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Button Prompts/v02/related/spr_sprani_game_cvt_Exst/A064FDFC_1024x512-v02.psd",
+      "source_blob_sha": "872dd7661e5ff659170b0eabdd2ca9bb5d13cfee",
+      "sha256": "cb03eb03f6515da0453c0e70d316a89955fa6da9690833354b869145c97a8024",
+      "size_bytes": 44136566,
+      "source": "Sonic-TV/OR2006Sprites",
+      "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+      "review_state": "EXTERNAL_PSD_UNQUALIFIED",
+      "canonical_dds_match": "NOT_TESTED",
+      "C2_PLATE_PASS": false
+    },
+    {
+      "texture_hash": "BA0147DA",
+      "queue_indexes": [
+        212
+      ],
+      "file": "localization/graphics/plate_library/upstream_psd/BA0147DA/BA0147DA_512x512.psd",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/BA0147DA_v02/BA0147DA_512x512.psd",
+      "source_blob_sha": "28117e7e18fbdd95b9c26a6aefd79d5d1af85383",
+      "sha256": "be5095d2598a831461e2e345c8fd2cead0cdd8de00ea7481256f0494c671d736",
+      "size_bytes": 7838153,
+      "source": "Sonic-TV/OR2006Sprites",
+      "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+      "review_state": "EXTERNAL_PSD_UNQUALIFIED",
+      "canonical_dds_match": "NOT_TESTED",
+      "C2_PLATE_PASS": false
+    },
+    {
+      "texture_hash": "BF3EE5C6",
+      "queue_indexes": [
+        49
+      ],
+      "file": "localization/graphics/plate_library/upstream_psd/BF3EE5C6/BF3EE5C6_512x512.psd",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/BF3EE5C6_v02/BF3EE5C6_512x512.psd",
+      "source_blob_sha": "498540db2fec8bb4f6528ef41c3af79ad6f4d22f",
+      "sha256": "7efc2461045eea5623282e3bab2e8ede8b6d71933cde7ba43d3b9c8bc92b51a2",
+      "size_bytes": 9339228,
+      "source": "Sonic-TV/OR2006Sprites",
+      "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+      "review_state": "EXTERNAL_PSD_UNQUALIFIED",
+      "canonical_dds_match": "NOT_TESTED",
+      "C2_PLATE_PASS": false
+    },
+    {
+      "texture_hash": "E95DA5",
+      "queue_indexes": [
+        230
+      ],
+      "file": "localization/graphics/plate_library/upstream_psd/E95DA5/E95DA5_512x256.psd",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/E95DA5_v02/E95DA5_512x256.psd",
+      "source_blob_sha": "0ca28fa2ee93985682f2a4a19d8a66551ca388f7",
+      "sha256": "7c10141cd63e39a61e83dd12d18b99194e252cf25a7b2d1150caa4109fca4043",
+      "size_bytes": 2596632,
+      "source": "Sonic-TV/OR2006Sprites",
+      "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+      "review_state": "EXTERNAL_PSD_UNQUALIFIED",
+      "canonical_dds_match": "NOT_TESTED",
+      "C2_PLATE_PASS": false
+    },
+    {
+      "texture_hash": "FD90AA9",
+      "queue_indexes": [
+        121
+      ],
+      "file": "localization/graphics/plate_library/upstream_psd/FD90AA9/FD90AA9_1024x1024.psd",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/OutRun2SP Mode UI/spr_sprani_selector_cvt_Exst/v01/FD90AA9_1024x1024.psd",
+      "source_blob_sha": "33ab6d90ea8e9c9cb75125aaff1efa3d4e4e299d",
+      "sha256": "0b5f7d32ea66b4d6546775af7759b927b8b26f1a5e768dd99adf80a02f95e081",
+      "size_bytes": 27273462,
+      "source": "Sonic-TV/OR2006Sprites",
+      "source_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+      "review_state": "EXTERNAL_PSD_UNQUALIFIED",
+      "canonical_dds_match": "NOT_TESTED",
+      "C2_PLATE_PASS": false
+    }
+  ],
+  "qa_state": "SOURCES_ONLY_NOT_CLEAN_OR_DDS_APPROVAL"
+}
