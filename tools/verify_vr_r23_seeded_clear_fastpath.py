@@ -24,7 +24,7 @@ def verify(src: str) -> None:
     guard = pos("if (seededStereo &&")
     stateblock = pos("IsTrackedStateBlockReliable() &&")
     shadow = pos("GetTrackedRasterShadow().Valid()")
-    fastreturn = pos("return R23ClearR22Hook.stdcall<HRESULT>(")
+    fastreturn = body.index("return R23ClearR22Hook.stdcall<HRESULT>(", shadow)
     endif = pos("#endif")
     capture = pos("const bool stateOk = R23CaptureActualGameState(")
     fallback = pos("if (seededStereo)\n")
@@ -57,7 +57,8 @@ if __name__ == "__main__":
     )
     for good, bad in mutations:
         assert good in clear_body(src), f"missing mutation anchor {good!r}"
-        mutant = src.replace(good, bad, 1)
+        clear = clear_body(src)
+        mutant = src.replace(clear, clear.replace(good, bad, 1), 1)
         try:
             verify(mutant)
         except (AssertionError, ValueError):
