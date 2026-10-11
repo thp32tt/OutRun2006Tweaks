@@ -401,14 +401,33 @@ namespace OutRunVRStereo
                 return R23ClearR22Hook.stdcall<HRESULT>(
                     device, count, rects, flags, color, z, stencil);
 
+            // R22 replay already validates the game raster for every seeded
+            // eye clear. Once Apply/setter coverage and the tracked shadow are
+            // reliable, an additional forced R23 D3D9 live raster capture
+            // performs three redundant device queries per game clear.
+            // Untrusted/invalid coverage and diagnostic live-compare retain
+            // the original conservative sample for stereo safety.
+            const bool seededStereo =
+                R9StereoSeeded &&
+                OutRunVR::RuntimeEligibility::MayInjectStereo();
+#if !defined(OUTRUN_VR_FORCE_LIVE_RASTER_COMPARE)
+            if (seededStereo &&
+                IsTrackedStateBlockReliable() &&
+                GetTrackedRasterShadow().Valid())
+            {
+                return R23ClearR22Hook.stdcall<HRESULT>(
+                    device, count, rects, flags, color, z, stencil);
+            }
+#endif
+
             OutRunVR::State::D3D9RasterSnapshot actual{};
             const bool stateOk = R23CaptureActualGameState(
                 device, actual, "Clear", true);
 
-            // Once the authoritative seed is already open, keep the validated
-            // R22/R20/R9 replay path for subsequent clears in the same Present.
-            if (R9StereoSeeded &&
-                OutRunVR::RuntimeEligibility::MayInjectStereo())
+            // The authoritative first seed/recovery still requires the live
+            // full-color/depth baseline. Seeded clears with untrusted state
+            // keep their historical live capture before entering R22.
+            if (seededStereo)
             {
                 return R23ClearR22Hook.stdcall<HRESULT>(
                     device, count, rects, flags, color, z, stencil);

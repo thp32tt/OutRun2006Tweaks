@@ -56,6 +56,7 @@ on:
       - 'tools/verify_vr_r13_effect_state_read_fastpath.py'
       - 'tools/verify_vr_r27_effect_fastpath.py'
       - 'tools/verify_vr_r23_host_fresh_fastpath.py'
+      - 'tools/verify_vr_r23_seeded_clear_fastpath.py'
       - 'tools/verify_vr_r7_stencil_format_cache.py'
       - 'tools/verify_vr_r32_shadow_fallback_fastpath.py'
       - 'tools/verify_vr_r30_support_api_seam.py'
@@ -195,6 +196,7 @@ jobs:
             'tools/verify_vr_r13_effect_state_read_fastpath.py',
             'tools/verify_vr_r27_effect_fastpath.py',
             'tools/verify_vr_r23_host_fresh_fastpath.py',
+            'tools/verify_vr_r23_seeded_clear_fastpath.py',
             'tools/verify_vr_r7_stencil_format_cache.py',
             'tools/verify_vr_r32_shadow_fallback_fastpath.py',
             'tools/verify_vr_r30_support_api_seam.py',
