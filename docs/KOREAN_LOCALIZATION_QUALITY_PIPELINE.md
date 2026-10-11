@@ -1,5 +1,14 @@
 # Korean Localization Quality Pipeline
 
+## 2026-10-11 전 레인 글자별 크기 검수 규칙 (최신 사용자 지시)
+
+**적용 대상:** A/B/C1 제작·자체 QA, C2 독립 최종 QA, C3 엄격 QA, CLEAN 이후 렌더·저장 DDS 시각검수, PRE_INGAME 및 재작업 판정 전부. 원문과 번역의 언어/글자 수가 다르다는 이유로 한글 문장 전체 가로세로 비율·폭 점유율·영문 픽셀 면적/실루엣 일치율이 다르게 나온다는 것은 **반려 사유가 아니다**. 이 지시가 과거의 "undersized/underfill/원문 길이·폭에 비례/가능한 크게" 문구보다 우선한다. 자세한 단일 정본은 `docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md`.
+
+**판정:** 원문 개별 텍스트/줄의 정확한 글자+효과 bbox를 넘는 한글 픽셀은 1px도 허용하지 않는다. 그 안에서는 한글이 원문보다 더 좁거나 작아도 허용하고, 원문 총 문장 길이나 글자 개수/캔버스 비율을 맞추기 위해 확대하거나 가로 늘이지 않는다. 비교 대상은 실제 한글 **글자 하나하나**의 네이티브 높이/획 굵기/받침·내부 공간/윤곽·효과·가독성과 UI 계열의 대표 원문 글자 크기·위계이다. 영문과 한글 글자 수가 달라 1:1 대응시킬 수 없으므로 'n번째 영문 글자 = n번째 한글 글자' 강제 매칭도 금지한다. 번역이 더 짧은 **그 사실 자체는 PASS** 처리한다.
+
+**반려 가능 조건:** 원문 bbox 초과, 겹침·보호 아트 변경·잘림, 한글 오탈자/획 손상/실제 읽히지 않음, 명백한 서체·기울기·효과 오류는 각각 구체적 원인과 실제 픽셀 증거가 있을 때만 FAIL. 기존 `UNDERFILL`/`SOURCE_WIDTH_RATIO`/`WIDTH_RATIO`/`WHOLE_SENTENCE_ASPECT`만 근거인 REWORK는 현행 글자별 시각검수에서 **크기 조건 PASS로 재분류**하고 나머지 QA 통과를 확인한 뒤 정상 C2/C3 경로로 진행한다. 미검수 자료를 근거 없이 전체 승인으로 바꾸거나 사용자 실게임 OPEN을 닫지 않는다. `RUNTIME_VALIDATION=UNTESTED` 유지.
+
+
 ## B image-generated lettering — 2026-10-11
 
 B 신규 텍스트 그래픽은 글꼴/벡터 생성 대신 **실제 ChatGPT ImageGen 결과**를 SHA-bound 투명 PNG로 받아 `tools/localization/imagegen_b_pipeline.py`로 처리한다. 자세한 규칙은 `docs/KOREAN_LOCALIZATION_B_IMAGEGEN_LANE.md`. 이미지 생성 역시 기존 10단계/8항목, English/CLEAN 독립 플레이트 검사, source 글자 경계 1px 규칙, 유해한 가짜 획/오탈자/중복 자소/콜론, 다운샘플 50%, 보호영역, RAW/FLIP-Y, 저장 DDS 디코딩, 독립 C2/C3 및 새 사용자 실게임 검증 대상이다. 기계적 0픽셀 PASS만으로 생산/최종 승인 불가. A는 기존 로직 그대로. 생산량 비교는 A/B 각각 첫 C PASS까지의 시간과 PASS/REWORK를 별도 계산하며, ChatGPT 이미지 생성 도구를 실제 사용할 수 없는 B 세션은 입력 없음/HOLD를 기록한다.
@@ -34,7 +43,7 @@ CLEAN without Korean; 2. plate/gradient/alpha continuity; 3. no added
 rectangular composite trace; 4. native Hangul contour/counter-space and
 no prior low-res raster upscale/font fallback; 5. persisted DDS codec,
 block, mip and glyph-edge integrity; 6. readability at 100/75/50%;
-7. original source family stroke, width/height and *per-line* hierarchy;
+7. original source-family individual glyph stroke/height and *per-line* hierarchy (not phrase-width/aspect equality);
 8. readable top-minus-bottom slant and perspective from measured anchors;
 9. source effect-bbox ceiling and positive separation where possible;
 10. zero clipping or overlap between letters, dynamic Stage 2, rank,
@@ -228,7 +237,7 @@ For every REWORK asset, enforce the following checks **in this order while regen
 
 1. **English removal / plate restoration:** after removing the English/source lettering and its effects, the plate/background must be fully reconstructed before any Korean lettering is drawn. Source-shaped residue, blur, patch boxes, seams, donor boundaries, damaged artwork or alpha discontinuities are FAIL.
 2. **Source-matching slant direction:** at readable orientation, the Korean lettering must lean in the same visual direction as the English source. Preserve the source raw-DDS transform separately; do not infer visual lean from a shear-sign variable.
-3. **No undersized lettering:** within the hard source-bbox size ceiling, use a source-faithful scale that remains immediately readable and is not unnecessarily smaller than the English source. A materially undersized Korean result is FAIL even when containment passes. Never enlarge beyond the exact source glyph/effect bbox to solve readability.
+3. **Per-glyph readability with smaller translated text allowed:** the Korean word/line may be much narrower or smaller than the English phrase due to glyph count and language structure. Inspect each actual Hangul glyph at native/75/50, accepting smaller readable glyphs with intact strokes/counters. Reject only evidenced individual-glyph unreadability/damage, not sentence width/height/aspect/occupancy differences. Never enlarge beyond the exact source glyph/effect bbox.
 4. **Source-faithful weight/effects:** stroke weight, outline, shadow/glow and related effects must match the source family and must not be excessive. Heavy outline/shadow that harms legibility or changes the source style is FAIL.
 5. **No clipped pixels:** no Hangul stroke, outline, shadow, glow, antialias fringe or transformed glyph pixel may be cut off or truncated.
 6. **Protected-art clearance:** Korean glyph/effect pixels must not intrude into protected graphics, vehicles, vehicle/model names, icons, frames, boxes, numbers, portraits, neighboring atlas content or other preserved artwork.
@@ -342,7 +351,7 @@ The following checks are mandatory in producer self-QA and independent C readabl
 
 - **Plate/background source-footprint restoration:** wherever English/source text previously covered a plate, badge, speech bubble, gradient or textured UI surface, the reconstructed plate must be visually continuous. Haze, blur, dirty source-shaped residue, luminance patches, donor seams, softened plate detail, leftover outline/shadow silhouettes, or a visibly different patch are FAIL even when a residue counter is zero.
 - **Readable slant direction:** compare source and Korean at readable orientation. If the source leans right, Korean must lean right. Left-leaning replacement of a right-italic source is FAIL. Direction is judged visually from top-vs-bottom horizontal displacement, not from a transform parameter sign.
-- **Text scale and hierarchy:** Korean may not be visibly undersized relative to the corresponding source family. Fit as large as safely possible while staying strictly within the exact source glyph/effect bbox. Large rank/header labels must retain source-like visual hierarchy rather than becoming small captions.
+- **Text size and hierarchy (per-glyph):** a Korean phrase/line can be narrower, shorter and visibly smaller than its English original. Compare individual native Hangul glyph height/stroke/counter and legibility with representative source-family glyphs, not whole-sentence width/aspect; retain meaningful rank/header vs caption hierarchy without imposing a minimum sentence width. Keep every pixel within the exact source glyph/effect bbox.
 - **Readable weight/effect ceiling:** excessive boldness, outline thickness, shadow, internal shading, glow or gradient that makes Hangul materially harder to read than the source is FAIL. Source fidelity does not justify reduced legibility.
 - **No clipping:** fill, outline, shadow, glow and transformed glyph strokes must all remain intact. Any visible cutoff, including bottom-outline or italic-end clipping, is FAIL.
 - **No protected-region intrusion:** Korean text/effects may not intrude into vehicle graphics, names, portraits, plates, icons, neighboring cells or other protected artwork. A text box that touches/overwrites protected content is FAIL even if the source bbox mask check was numerically permissive.
@@ -368,7 +377,7 @@ For the same candidate SHA, inspect:
 1. **Readable slant/perspective direction:** visually match the English source direction and approximate magnitude. Opposite-direction shear, accidental upright rendering, excessive shear, or inconsistent line directions FAIL.
 2. **Clean plate integrity:** before judging Korean lettering, verify the English/source lettering was actually removed and the underlying plate/background was naturally reconstructed. Residue, ghosting, blur, smeared texture, patch rectangles, seams, damaged graphics, wrong donor texture or alpha discontinuity FAIL.
 3. **Source typography similarity:** compare family impression, condensed/wide proportion, weight, stroke shape, round/square character, relative cap-height equivalent, alignment, baseline, per-line hierarchy, spacing, gradient/fill, outline, shadow/glow and depth. A visibly different generic font treatment FAIL even if every pixel is contained.
-4. **Non-undersized readable scale:** the Korean result must be immediately readable and visually proportionate to the English source without exceeding the exact original glyph/effect bbox. Excessively small or weak lettering FAIL.
+4. **Readable individual glyphs:** the translated phrase may use less width/height, with smaller characters permitted when their Hangul contours, strokes and counterspaces are genuinely legible at native/practical scales. Never fail solely for English/Korean sentence-size, glyph-count or aspect-ratio differences. Reject separately evidenced illegible/damaged individual glyphs or any source bbox overflow.
 5. **Glyph quality:** broken Hangul, missing/clipped strokes, jagged nearest-neighbor enlargement, mixed-resolution text, malformed syllables, clipped outline/shadow/glow or damaged antialias fringes FAIL.
 6. **Protected-art and neighbor clearance:** enforce the existing zero-overlap rule at pixel level. Any localized/effect pixel touching prohibited vehicle/character/name/icon/box/frame/neighbor/preserved-art content is FAIL.
 7. **Placement and hierarchy:** source-faithful horizontal/vertical anchor, baseline, line spacing, line-size hierarchy and relationship to the plate are mandatory. A contained but visibly displaced composition FAILS.
@@ -402,7 +411,7 @@ This gate closes false negatives that survive source/CLEAN/FINAL static review b
 
 ### UI-family style-profile gate
 - Every localized graphics asset MUST be assigned to a source UI family or explicitly marked standalone.
-- For a shared family, record/reuse a source-derived style profile covering font-family impression, width/height proportion, weight, readable slant/perspective direction, baseline/alignment, fill/gradient family, outline thickness, shadow/glow direction and relative text hierarchy.
+- For a shared family, record/reuse a source-derived style profile covering individual glyph height/stroke/proportion (NOT phrase width/height), readable slant/perspective, baseline/alignment, fill/gradient, outline, shadow/glow and meaningful line hierarchy. Language-dependent full-text width/aspect differences are diagnostic only, never a failure.
 - C must compare each candidate against both its English source and already accepted members of the same family. A candidate that is individually contained but visibly looks like a different font/resolution/effect family is FAIL.
 - Do not impose arbitrary global numeric tolerances where the source family intentionally varies; the source family is the reference.
 

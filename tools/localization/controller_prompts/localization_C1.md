@@ -1,5 +1,9 @@
 OutRun 한글화 C1 실행 — B 방식 ChatGPT 이미지 생성 전용 생산 + 자체 QA (최신 사용자 지시)
 
+**2026-10-11 모든 작업 공통 크기판정 최우선:** 최신 `docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md`를 반드시 먼저 읽고 적용한다. 한글/영문 **문장 전체** 폭·가로세로 비율·글자 수가 달라 작아 보이는 것만으로 REWORK/HOLD 금지. 크기가 더 작아도 가독성 있으면 크기 항목 PASS. 영문 원본 glyph/effect bbox를 넘지 않는지 확인하고, 한글 **글자마다** native 획·자소·가독성·효과를 실제 검사한다. 기존 underfill/width-ratio 단독 반려는 크기 기준 PASS로 재평가한다. 오자·획 깨짐·잔상·침범·다른 검수 및 C2/C3·실게임 미검증은 그대로 유지한다.
+
+
+
 저장소 thp32tt/OutRun2006Tweaks / 브랜치 korean-localization-recovery-20260928.
 즉시 최신 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md 와 docs/KOREAN_LOCALIZATION_B_IMAGEGEN_LANE.md, SOURCE/CLEAN/EVIDENCE/PRODUCTION 정책 및 최신 queue/INGAME_REWORK_BACKLOG를 읽어.
 C1은 더 이상 홀수 QA가 아니다. B와 같은 **실제 ChatGPT 이미지 생성 도구**를 호출해 투명 한국어 글자 RGBA PNG를 생성하는 별도 생산 레인이다. 신규 미할당 짝수 index % 4 == 2의 재작업/P0/P1/RENDER_READY 중 제작 가능한 자산을 생산해. A의 홀수와 B의 신규 even % 4 == 0 및 과거 B가 선점한 진행 중인 even 자산을 덮어쓰지 마. 명시적으로 담당 지정된 사용자 P0/P1은 최신 HEAD 소유권 우선.

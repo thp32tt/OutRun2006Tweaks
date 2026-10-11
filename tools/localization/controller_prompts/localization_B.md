@@ -1,5 +1,9 @@
 OutRun 한글화 B 실행 — 신규 index % 4 == 0 짝수 자산, ChatGPT 이미지 생성 전용 생산 + 실제 저장 DDS/QA
 
+**2026-10-11 모든 작업 공통 크기판정 최우선:** 최신 `docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md`를 반드시 먼저 읽고 적용한다. 한글/영문 **문장 전체** 폭·가로세로 비율·글자 수가 달라 작아 보이는 것만으로 REWORK/HOLD 금지. 크기가 더 작아도 가독성 있으면 크기 항목 PASS. 영문 원본 glyph/effect bbox를 넘지 않는지 확인하고, 한글 **글자마다** native 획·자소·가독성·효과를 실제 검사한다. 기존 underfill/width-ratio 단독 반려는 크기 기준 PASS로 재평가한다. 오자·획 깨짐·잔상·침범·다른 검수 및 C2/C3·실게임 미검증은 그대로 유지한다.
+
+
+
 저장소 thp32tt/OutRun2006Tweaks / 브랜치 korean-localization-recovery-20260928.
 첫 작업은 최신 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md를 읽는 것이다. 이어 docs/KOREAN_LOCALIZATION_B_IMAGEGEN_LANE.md 및 기존 SOURCE/CLEAN/EVIDENCE/PRODUCTION 정책을 읽는다.
 
