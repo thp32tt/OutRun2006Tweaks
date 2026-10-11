@@ -355,9 +355,9 @@ def main() -> None:
             "const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;",
             "const bool arg2Diffuse = arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT;",
             "const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT;",
-            "(!modulate && !selectTexture && !additive) || arg != D3DTA_TEXTURE",
+            "(!modulate && !selectTexture && !additive && !subtract) || arg != D3DTA_TEXTURE",
             "alphaArg1 != D3DTA_TEXTURE",
-            "((modulate || additive) && (!arg2Diffuse || !alphaArg2Diffuse))",
+            "((modulate || additive || subtract) && (!arg2Diffuse || !alphaArg2Diffuse))",
             "capture.selectTexture = selectTexture;",
             "capture.additive = additive;",
             "coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb",
@@ -390,9 +390,9 @@ def main() -> None:
          "const bool modulate = op == D3DTOP_MODULATE || alphaOp == D3DTOP_MODULATE;"),
         ("const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;",
          "const bool selectTexture = op == D3DTOP_SELECTARG1 || alphaOp == D3DTOP_SELECTARG1;"),
-        ("(!modulate && !selectTexture && !additive) || arg != D3DTA_TEXTURE",
+        ("(!modulate && !selectTexture && !additive && !subtract) || arg != D3DTA_TEXTURE",
          "(!modulate && !selectTexture) && arg != D3DTA_TEXTURE"),
-        ("((modulate || additive) && (!arg2Diffuse || !alphaArg2Diffuse))",
+        ("((modulate || additive || subtract) && (!arg2Diffuse || !alphaArg2Diffuse))",
          "(modulate && (arg2 != D3DTA_DIFFUSE && alphaArg2 != D3DTA_DIFFUSE))"),
         ("capture.selectTexture = selectTexture;", "capture.selectTexture = false;"),
         ("capture.additive = additive;", "capture.additive = false;"),
@@ -424,11 +424,14 @@ def main() -> None:
     assert "if (!capture.enabled && (op != D3DTOP_SELECTARG1 || arg != D3DTA_DIFFUSE))" in bridge
     # RGB and alpha must use the *same* supported operation: rejecting mixed
     # SELECTARG1/MODULATE keeps the original game draw authoritative.
-    MODULATE, SELECTARG1, ADD = 4, 2, 7
+    MODULATE, SELECTARG1, ADD, SUBTRACT = 4, 2, 7, 10
     for color_op, alpha_op, supported in (
         (MODULATE, MODULATE, True),
         (SELECTARG1, SELECTARG1, True),
         (ADD, ADD, True),
+        (SUBTRACT, SUBTRACT, True),
+        (SUBTRACT, ADD, False),
+        (ADD, SUBTRACT, False),
         (MODULATE, ADD, False),
         (ADD, SELECTARG1, False),
         (MODULATE, SELECTARG1, False),
@@ -437,7 +440,8 @@ def main() -> None:
     ):
         admitted = ((color_op == MODULATE and alpha_op == MODULATE)
                     or (color_op == SELECTARG1 and alpha_op == SELECTARG1)
-                    or (color_op == ADD and alpha_op == ADD))
+                    or (color_op == ADD and alpha_op == ADD)
+                    or (color_op == SUBTRACT and alpha_op == SUBTRACT))
         assert admitted == supported
 
 
@@ -447,7 +451,7 @@ def main() -> None:
         "float4 PSTextureAdd(VOut v) : SV_Target { float4 c = saturate(gameTexture.Sample(gameSampler, v.uv) + v.diffuse); AlphaGate(c.a); return c; }",
         '!compile("PSTextureAdd", "ps_4_0", additiveCode)',
         "s.additivePs.Reset();",
-        "s.sampledPs && s.textureOnlyPs && s.additivePs &&",
+        "s.sampledPs && s.textureOnlyPs && s.additivePs && s.subtractPs &&",
         "capture.additive ? s.additivePs.Get() : s.sampledPs.Get()",
         "const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;",
         "capture.additive = additive;",
@@ -456,6 +460,34 @@ def main() -> None:
     for token in required_add:
         mutated = bridge.replace(token, "/* ADD disconnected */", 1)
         assert mutated != bridge and token not in mutated
+    # 00554 SUBTRACT: source D3D9 -> RGBA native PS -> Draw/DrawIndexed.
+    # Mutations reject disconnected shader, alpha or operand gate changes.
+    subtract_link = (
+        "const bool subtract = op == D3DTOP_SUBTRACT && alphaOp == D3DTOP_SUBTRACT;",
+        "(!modulate && !selectTexture && !additive && !subtract) || arg != D3DTA_TEXTURE",
+        "((modulate || additive || subtract) && (!arg2Diffuse || !alphaArg2Diffuse))",
+        "capture.subtract = subtract;",
+        "bool subtract = false;",
+        "float4 PSTextureSubtract(VOut v) : SV_Target { float4 c = saturate(gameTexture.Sample(gameSampler, v.uv) - v.diffuse); AlphaGate(c.a); return c; }",
+        '!compile("PSTextureSubtract", "ps_4_0", subtractCode)',
+        "s.subtractPs.Reset();", "s.additivePs && s.subtractPs &&",
+        "s.subtractPs.GetAddressOf()", "capture.subtract ? s.subtractPs.Get() :",
+        "ctx->DrawIndexed(indexCount, 0, 0);",
+        "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+    )
+    assert all(x in bridge for x in subtract_link)
+    for token in subtract_link[:-2]:
+        mutant = bridge.replace(token, "/* DISCONNECTED */", 1)
+        assert mutant != bridge and token not in mutant
+    for texel, diffuse, expected in (
+        ((0.8, 0.1, 0.9, 0.7), (0.2, 0.5, 0.1, 0.2), (0.6, 0.0, 0.8, 0.5)),
+        ((0.0, 1.0, 0.3, 0.0), (0.8, 0.0, 0.9, 1.0), (0.0, 1.0, 0.0, 0.0)),
+    ):
+        got = tuple(max(0.0, min(1.0, x - y)) for x, y in zip(texel, diffuse))
+        assert all(abs(x - y) < 1e-6 for x, y in zip(got, expected))
+        assert got != tuple(min(1.0, x + y) for x, y in zip(texel, diffuse))
+    print("DX11 stage0 SUBTRACT native Draw RGBA PASS (static only)")
+
     # Stage-0 CURRENT is DIFFUSE (but not at a later texture stage).
     # Operand modifier bits must still be refused rather than silently masked.
     DIFFUSE, CURRENT, TEXTURE, COMPLEMENT = 0, 1, 2, 0x10

@@ -62,6 +62,8 @@ float4 PSTextured(VOut v) : SV_Target { float4 c = gameTexture.Sample(gameSample
 float4 PSTextureOnly(VOut v) : SV_Target { float4 c = gameTexture.Sample(gameSampler, v.uv); AlphaGate(c.a); return c; }
 // D3DTOP_ADD saturates both RGB and alpha before alpha comparison.
 float4 PSTextureAdd(VOut v) : SV_Target { float4 c = saturate(gameTexture.Sample(gameSampler, v.uv) + v.diffuse); AlphaGate(c.a); return c; }
+// D3DTOP_SUBTRACT saturates Arg1(TEXTURE) - Arg2(DIFFUSE/CURRENT) in RGBA.
+float4 PSTextureSubtract(VOut v) : SV_Target { float4 c = saturate(gameTexture.Sample(gameSampler, v.uv) - v.diffuse); AlphaGate(c.a); return c; }
 )";
 struct NativeVertex {
     float clip[4];
@@ -75,6 +77,7 @@ struct TextureCapture {
     bool enabled = false;
     bool selectTexture = false;
     bool additive = false;
+    bool subtract = false;
     UINT coordIndex = 0;
     Microsoft::WRL::ComPtr<IDirect3DTexture9> texture;
     D3DTEXTUREADDRESS addressU = D3DTADDRESS_CLAMP;
@@ -106,6 +109,7 @@ struct State {
     ComPtr<ID3D11PixelShader> sampledPs;
     ComPtr<ID3D11PixelShader> textureOnlyPs;
     ComPtr<ID3D11PixelShader> additivePs;
+    ComPtr<ID3D11PixelShader> subtractPs;
     ComPtr<ID3D11InputLayout> layout;
     ComPtr<ID3D11RasterizerState> raster;
     ComPtr<ID3D11RasterizerState> scissorRaster;
@@ -150,12 +154,12 @@ bool compile(const char* entry, const char* profile, ComPtr<ID3DBlob>& blob) noe
 bool ensure_pipeline(State& s) noexcept {
     const bool readbackReady = std::all_of(s.readbacks.begin(), s.readbacks.end(),
         [](const ReadbackSlot& item) { return item.staging && item.fence; });
-    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.additivePs &&
+    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.additivePs && s.subtractPs &&
         s.layout && s.raster && s.scissorRaster && s.alphaBlend &&
         s.alphaConstants && readbackReady)
         return true;
     s.backend.shutdown();
-    s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.additivePs.Reset();
+    s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset();
     s.layout.Reset(); s.raster.Reset(); s.scissorRaster.Reset();
     s.alphaBlend.Reset(); s.alphaConstants.Reset();
     for (auto& item : s.readbacks) {
@@ -170,12 +174,13 @@ bool ensure_pipeline(State& s) noexcept {
     cfg.color_format = DXGI_FORMAT_B8G8R8A8_UNORM;
     if (!s.backend.initialize(cfg)) return false;
     auto* dev = s.backend.device();
-    ComPtr<ID3DBlob> vcode, pcode, sampledCode, textureOnlyCode, additiveCode;
+    ComPtr<ID3DBlob> vcode, pcode, sampledCode, textureOnlyCode, additiveCode, subtractCode;
     if (!compile("VS", "vs_4_0", vcode) ||
         !compile("PS", "ps_4_0", pcode) ||
         !compile("PSTextured", "ps_4_0", sampledCode) ||
         !compile("PSTextureOnly", "ps_4_0", textureOnlyCode) ||
         !compile("PSTextureAdd", "ps_4_0", additiveCode) ||
+        !compile("PSTextureSubtract", "ps_4_0", subtractCode) ||
         FAILED(dev->CreateVertexShader(vcode->GetBufferPointer(), vcode->GetBufferSize(),
                                       nullptr, s.vs.GetAddressOf())) ||
         FAILED(dev->CreatePixelShader(pcode->GetBufferPointer(), pcode->GetBufferSize(),
@@ -185,7 +190,9 @@ bool ensure_pipeline(State& s) noexcept {
         FAILED(dev->CreatePixelShader(textureOnlyCode->GetBufferPointer(), textureOnlyCode->GetBufferSize(),
                                      nullptr, s.textureOnlyPs.GetAddressOf())) ||
         FAILED(dev->CreatePixelShader(additiveCode->GetBufferPointer(), additiveCode->GetBufferSize(),
-                                     nullptr, s.additivePs.GetAddressOf())))
+                                     nullptr, s.additivePs.GetAddressOf())) ||
+        FAILED(dev->CreatePixelShader(subtractCode->GetBufferPointer(), subtractCode->GetBufferSize(),
+                                     nullptr, s.subtractPs.GetAddressOf())))
         return false;
     const D3D11_INPUT_ELEMENT_DESC elements[] = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,
@@ -413,6 +420,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;
         // RGB and alpha must both use ADD(TEXTURE, DIFFUSE).
         const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;
+        // Mixed RGB/alpha operations remain DX9Ex; operand order stays exact.
+        const bool subtract = op == D3DTOP_SUBTRACT && alphaOp == D3DTOP_SUBTRACT;
         // On D3D9 fixed-function stage 0, CURRENT resolves to vertex DIFFUSE.
         // Reject operand modifiers; later stages are disabled by the gate.
         const bool arg2Diffuse = arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT;
@@ -422,9 +431,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         if (!layout.hasDiffuse && !selectTexture) return false;
         // Preserve exact RGB/alpha semantics. Mixed operations are not yet
         // mirrored; inactive ARG2 is irrelevant for SELECTARG1.
-        if ((!modulate && !selectTexture && !additive) || arg != D3DTA_TEXTURE ||
+        if ((!modulate && !selectTexture && !additive && !subtract) || arg != D3DTA_TEXTURE ||
             alphaArg1 != D3DTA_TEXTURE ||
-            ((modulate || additive) && (!arg2Diffuse || !alphaArg2Diffuse)) ||
+            ((modulate || additive || subtract) && (!arg2Diffuse || !alphaArg2Diffuse)) ||
             coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb ||
             (addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP) ||
             (addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP) ||
@@ -436,6 +445,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.filter = static_cast<D3DTEXTUREFILTERTYPE>(mag);
         capture.selectTexture = selectTexture;
         capture.additive = additive;
+        capture.subtract = subtract;
         capture.coordIndex = coordIndex;
     }
     // Custom clip planes are not implemented by the native shader. The
@@ -726,8 +736,9 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     ctx->RSSetState(output.scissor ? s.scissorRaster.Get() : s.raster.Get());
     ctx->VSSetShader(s.vs.Get(), nullptr, 0);
     ctx->PSSetShader(!capture.enabled ? s.ps.Get() :
+                     (capture.subtract ? s.subtractPs.Get() :
                      (capture.selectTexture ? s.textureOnlyPs.Get() :
-                      capture.additive ? s.additivePs.Get() : s.sampledPs.Get()), nullptr, 0);
+                      capture.additive ? s.additivePs.Get() : s.sampledPs.Get())), nullptr, 0);
     ID3D11ShaderResourceView* boundView = sampledView.Get();
     ID3D11SamplerState* boundSampler = sampledSampler.Get();
     ctx->PSSetShaderResources(0, 1, &boundView);
