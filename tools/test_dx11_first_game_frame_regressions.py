@@ -285,7 +285,7 @@ def main() -> None:
             "stride < layout.minStride",
             "if (!game_fvf_decode_vertex(data, stride, layout, decoded))",
             "const DWORD diffuse = decoded.diffuse;",
-            "output[i].uv[0] = decoded.uv[0];",
+            "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
             "next[col] += clip[row] * matrix.m[row][col];",
             "clip[3] <= 0.0f",
             "std::copy(clip.begin(), clip.end(), v.clip);",
@@ -356,7 +356,8 @@ def main() -> None:
             "alphaArg1 != D3DTA_TEXTURE",
             "(modulate && (arg2 != D3DTA_DIFFUSE || alphaArg2 != D3DTA_DIFFUSE))",
             "capture.selectTexture = selectTexture;",
-            "coordIndex != 0 || transformFlags != D3DTTFF_DISABLE || srgb",
+            "coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb",
+            "capture.coordIndex = coordIndex;",
             "min != mag || mip != D3DTEXF_NONE",
             "nextColorOp != D3DTOP_DISABLE",
         )) and all(x in mirror for x in (
@@ -853,7 +854,7 @@ def main() -> None:
             "if (!layout.hasDiffuse && !selectTexture) return false;",
             "if (!game_fvf_decode_vertex(data, stride, layout, decoded))",
             "const DWORD diffuse = decoded.diffuse;",
-            "output[i].uv[0] = decoded.uv[0];",
+            "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
         )) and all(v in observe for v in (
             "supported_game_state(game, vp, layout, transforms, capture, output)",
             "layout, transforms, capture, vertices)",
@@ -868,7 +869,44 @@ def main() -> None:
         mutated = bridge.replace(good, bad, 1)
         assert mutated != bridge and not fvf_connected(mutated)
 
-    print("DX11 live diagnostic TEX1/no-DIFFUSE/DXT/packed16/strip/fan/alpha/scissor/COLORWRITE Draw/fallback regression PASS (static only)")
+    # TEX2 second-UV selection is part of the same native D3D9->D3D11 path.
+    def tex2_connected(code: str, header: str, probe: str) -> bool:
+        return all(x in code for x in (
+            "kGameFvfTex2 == D3DFVF_TEX2",
+            "coordIndex >= layout.texcoordCount",
+            "capture.coordIndex = coordIndex;",
+            "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
+            "nextColorOp != D3DTOP_DISABLE",
+        )) and all(x in header for x in (
+            "texcoordBits > kGameFvfTex2",
+            "layout.minStride != layout.texcoordOffset + layout.texcoordCount * 8u",
+            "std::memcpy(candidate.uv1, data + layout.texcoordOffset + 8u, 8u)",
+            "coordIndex >= layout.texcoordCount",
+        )) and all(x in probe for x in (
+            "kGameFvfXyzRhw | kGameFvfTex2",
+            "game_fvf_select_uv(sample, layout, 1u, chosen)",
+            "!game_fvf_decode_vertex(&twice, 31u",
+            "!game_fvf_select_uv(sample, layout, 2u, chosen)",
+        ))
+    assert tex2_connected(bridge, layout_source, probe_source)
+    for good, bad in (
+        ("coordIndex >= layout.texcoordCount", "coordIndex > layout.texcoordCount"),
+        ("capture.coordIndex = coordIndex;", "capture.coordIndex = 0;"),
+        ("game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
+         "game_fvf_select_uv(decoded, layout, 0u, output[i].uv)"),
+    ):
+        broken = bridge.replace(good, bad, 1)
+        assert broken != bridge and not tex2_connected(broken, layout_source, probe_source)
+    for good, bad in (
+        ("texcoordBits > kGameFvfTex2", "texcoordBits > 0x0f00u"),
+        ("layout.minStride != layout.texcoordOffset + layout.texcoordCount * 8u",
+         "layout.minStride != layout.texcoordOffset + 8u"),
+        ("std::memcpy(candidate.uv1, data + layout.texcoordOffset + 8u, 8u)",
+         "std::memcpy(candidate.uv1, data + layout.texcoordOffset, 8u)"),
+    ):
+        broken = layout_source.replace(good, bad, 1)
+        assert broken != layout_source and not tex2_connected(bridge, broken, probe_source)
+    print("DX11 TEX2 live dual-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":

@@ -21,6 +21,8 @@ namespace {
 using Microsoft::WRL::ComPtr;
 static_assert(kGameFvfXyz == D3DFVF_XYZ && kGameFvfXyzRhw == D3DFVF_XYZRHW &&
               kGameFvfDiffuse == D3DFVF_DIFFUSE && kGameFvfTex1 == D3DFVF_TEX1 &&
+              kGameFvfTex2 == D3DFVF_TEX2 &&
+              kGameFvfTexCountMask == D3DFVF_TEXCOUNT_MASK &&
               kGameFvfPositionMask == D3DFVF_POSITION_MASK,
               "Portable FVF constants must match the D3D9 SDK");
 constexpr UINT kWidth = 256;
@@ -65,6 +67,7 @@ struct NativeVertex {
 struct TextureCapture {
     bool enabled = false;
     bool selectTexture = false;
+    UINT coordIndex = 0;
     Microsoft::WRL::ComPtr<IDirect3DTexture9> texture;
     D3DTEXTUREADDRESS addressU = D3DTADDRESS_CLAMP;
     D3DTEXTUREADDRESS addressV = D3DTADDRESS_CLAMP;
@@ -396,7 +399,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         if ((!modulate && !selectTexture) || arg != D3DTA_TEXTURE ||
             alphaArg1 != D3DTA_TEXTURE ||
             (modulate && (arg2 != D3DTA_DIFFUSE || alphaArg2 != D3DTA_DIFFUSE)) ||
-            coordIndex != 0 || transformFlags != D3DTTFF_DISABLE || srgb ||
+            coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb ||
             (addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP) ||
             (addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP) ||
             (mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR) ||
@@ -406,6 +409,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.addressV = static_cast<D3DTEXTUREADDRESS>(addressV);
         capture.filter = static_cast<D3DTEXTUREFILTERTYPE>(mag);
         capture.selectTexture = selectTexture;
+        capture.coordIndex = coordIndex;
     }
     // Custom clip planes are not implemented by the native shader. The
     // object-space path must also reject D3D9 lighting and vertex blending.
@@ -444,8 +448,10 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
             return false;
         const float* xyz = decoded.position;
         const DWORD diffuse = decoded.diffuse;
-        output[i].uv[0] = decoded.uv[0];
-        output[i].uv[1] = decoded.uv[1];
+        // TEX2 may select UV1; TEX1 must never alias an absent UV slot.
+        if (capture.enabled &&
+            !game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv))
+            return false;
         if (capture.enabled && (!std::isfinite(output[i].uv[0]) ||
                                 !std::isfinite(output[i].uv[1]))) return false;
         if (!std::isfinite(xyz[0]) || !std::isfinite(xyz[1]) ||
