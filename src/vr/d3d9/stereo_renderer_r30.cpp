@@ -978,6 +978,10 @@ namespace OutRunVRStereo
             bool fixedConfigured = false;
             bool blendConfigured = false;
             bool additive = false;
+            // The private eye passes are consecutive inside one Present;
+            // neither the game nor a StateBlock::Apply can interleave.
+            bool depthDetached = false;
+            IDirect3DPixelShader9* activePixelShader = nullptr;
         };
 
         bool R30DrawSkyGlowPass(IDirect3DDevice9* device,
@@ -992,9 +996,17 @@ namespace OutRunVRStereo
                 !width || !height)
                 return false;
 
-            if (FAILED(device->SetRenderTarget(0, target)) ||
-                FAILED(device->SetDepthStencilSurface(nullptr)))
+            if (FAILED(device->SetRenderTarget(0, target)))
                 return false;
+            // Each private pass changes the RT, not the depth binding. Detach
+            // once per Present instead of repeating a driver call for every
+            // bright/blur/composite pass. The caller restores game depth last.
+            if (!passState.depthDetached)
+            {
+                if (FAILED(device->SetDepthStencilSurface(nullptr)))
+                    return false;
+                passState.depthDetached = true;
+            }
 
             D3DVIEWPORT9 viewport{};
             viewport.Width = width;
@@ -1033,7 +1045,15 @@ namespace OutRunVRStereo
                 device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
                 passState.fixedConfigured = true;
             }
-            device->SetPixelShader(shader);
+            // Horizontal and optional vertical blur use the same shader.
+            // Keep shader identity only until the caller applies the saved
+            // game StateBlock; never cache across Present/Reset.
+            if (passState.activePixelShader != shader)
+            {
+                if (FAILED(device->SetPixelShader(shader)))
+                    return false;
+                passState.activePixelShader = shader;
+            }
             device->SetTexture(0, source);
             if (!passState.blendConfigured || passState.additive != additive)
             {

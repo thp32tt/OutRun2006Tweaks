@@ -21,6 +21,12 @@ def check(text):
         "R30SkyGlowPassState passState{};",
         "device, passState,",
         "if (!passState.fixedConfigured)",
+        "bool depthDetached = false;",
+        "IDirect3DPixelShader9* activePixelShader = nullptr;",
+        "if (!passState.depthDetached)",
+        "passState.depthDetached = true;",
+        "if (passState.activePixelShader != shader)",
+        "passState.activePixelShader = shader;",
         "if (!passState.blendConfigured || passState.additive != additive)",
         "passState.additive = additive;",
         "passState.blendConfigured = true;",
@@ -39,7 +45,12 @@ def check(text):
     assert "R30SkyGlow.reducedSurface[eye]" in capture
     assert "R30SkyGlow.reducedSurface[eye]" in apply
     assert "R30SkyGlow.tempSurface[eye]" in apply
-    assert "passState.fixedConfigured = true;" in pass_fn.split("device->SetPixelShader(shader);", 1)[0]
+    assert "passState.fixedConfigured = true;" in pass_fn.split("if (passState.activePixelShader != shader)", 1)[0]
+    assert pass_fn.index("device->SetRenderTarget(0, target)") < pass_fn.index("if (!passState.depthDetached)")
+    assert "FAILED(device->SetDepthStencilSurface(nullptr))" in pass_fn
+    assert "FAILED(device->SetPixelShader(shader))" in pass_fn
+    assert "R30SkyGlowPassState passState{};" in apply
+    assert "device->SetTexture(0, nullptr);" in pass_fn, "avoid RT/SRV feedback hazard"
     assert "D3DRS_SRCBLEND, D3DBLEND_ONE" in pass_fn
     assert "D3DCOLORWRITEENABLE_ALPHA" in pass_fn
     assert "device->SetViewport(&viewport)" in pass_fn, "eye target's viewport must be set per pass"
@@ -55,6 +66,12 @@ mutations = (
     ("missing post state restoration", "stateBlock->Apply()"),
     ("drop right-eye blur source", "compositeSource = R30SkyGlow.temp[eye];"),
     ("skip per-pass viewport", "device->SetViewport(&viewport)"),
+    ("depth state no longer cached", "if (!passState.depthDetached)"),
+    ("depth detach never committed", "passState.depthDetached = true;"),
+    ("shader cache bypass", "if (passState.activePixelShader != shader)"),
+    ("shader cache never committed", "passState.activePixelShader = shader;"),
+    ("depth HRESULT ignored", "FAILED(device->SetDepthStencilSurface(nullptr))"),
+    ("shader HRESULT ignored", "FAILED(device->SetPixelShader(shader))"),
 )
 for label, token in mutations:
     if token not in source:
@@ -65,4 +82,4 @@ for label, token in mutations:
     except (AssertionError, IndexError):
         continue
     raise AssertionError("mutation survived: " + label)
-print("PASS R30 SkyGlow pooled surfaces, per-Present fixed state and 7 destructive regressions")
+print("PASS R30 SkyGlow per-Present depth/shader coalescing and 13 destructive regressions")
