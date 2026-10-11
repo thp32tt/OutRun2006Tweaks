@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B369 q060 P3 source-derived palette, heavy native contour, separated material layers; unpromoted DDS."""
+"""B369 q060 P3 retry after correcting non-equivalent P2-vs-P3 binary-silhouette threshold; unpromoted DDS."""
 import os,runpy,sys
 os.environ["PYTHONDONTWRITEBYTECODE"]="1"
 sys.dont_write_bytecode=True
