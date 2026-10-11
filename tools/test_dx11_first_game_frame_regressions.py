@@ -2129,6 +2129,95 @@ def main() -> None:
             assert alpha != texel[3] and alpha != diffuse[3]
     print("DX11 blend RGB + independent MODULATE alpha live Draw PASS (static only)")
 
+
+    # 00570: BLENDTEXTUREALPHA/BLENDDIFFUSEALPHA RGB and independent ADD alpha
+    # native D3D11 Draw/DrawIndexed diagnostic path; static/CPU, not runtime proof.
+    def blend_add_alpha_connected(source: str) -> bool:
+        intake = source[source.find("bool supported_game_state("):source.find("bool translate_vertices(")]
+        dispatch = source[source.find("bool submit("):source.find("void observe(")]
+        common = (
+            "GetTextureStageState(0, D3DTSS_COLOROP, &op)",
+            "GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)",
+            "GetTextureStageState(0, D3DTSS_ALPHAARG1, &alphaArg1)",
+            "GetTextureStageState(0, D3DTSS_ALPHAARG2, &alphaArg2)",
+            "blendTextureAddAlpha || blendDiffuseAddAlpha ||",
+            "!blendTextureAddAlpha && !blendDiffuseAddAlpha &&",
+            "alphaNeedsDiffuse && !alphaArg2Diffuse",
+            "alphaArg1 != D3DTA_TEXTURE",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+            "game->UpdateSurface(",
+            "OUTRUN_DX11_FIRST_GAME_FRAME",
+        )
+        if not all(token in source for token in common): return False
+        if "blendTextureAddAlpha || blendDiffuseAddAlpha ||" not in intake: return False
+        if "!blendTextureAddAlpha && !blendDiffuseAddAlpha &&" not in intake: return False
+        if "ctx->PSSetShader(" not in dispatch: return False
+        for rgb in ("Texture", "Diffuse"):
+            flag = f"blend{rgb}AddAlpha"
+            shader = f"PSTextureBlend{rgb}AddAlpha"
+            factor = "t.a" if rgb == "Texture" else "v.diffuse.a"
+            links = (
+                f"const bool {flag} = op == D3DTOP_BLEND{rgb.upper()}ALPHA &&",
+                "alphaOp == D3DTOP_ADD;",
+                f"bool {flag} = false;",
+                f"capture.{flag} = {flag};",
+                f"float4 {shader}(VOut v) : SV_Target {{",
+                f"float4 c = float4(lerp(v.diffuse.rgb, t.rgb, {factor}), saturate(t.a + v.diffuse.a));",
+                "AlphaGate(c.a); return c;",
+                f'compile("{shader}", "ps_4_0", blend{rgb}AddCode)',
+                f"s.{flag}Ps.GetAddressOf()",
+                f"s.{flag}Ps &&",
+                f"capture.{flag} ? s.{flag}Ps.Get() :",
+            )
+            if not all(token in source for token in links): return False
+            if source.count(f"s.{flag}Ps.Reset();") != 2: return False
+            if f"capture.{flag} ? s.{flag}Ps.Get() :" not in dispatch: return False
+        return True
+
+    assert blend_add_alpha_connected(bridge)
+    for rgb in ("Texture", "Diffuse"):
+        flag = f"blend{rgb}AddAlpha"
+        shader = f"PSTextureBlend{rgb}AddAlpha"
+        for token in (
+            f"const bool {flag} = op == D3DTOP_BLEND{rgb.upper()}ALPHA &&",
+            f"capture.{flag} = {flag};",
+            f"float4 {shader}(VOut v) : SV_Target {{",
+            f'compile("{shader}", "ps_4_0", blend{rgb}AddCode)',
+            f"s.{flag}Ps.GetAddressOf()",
+            f"s.{flag}Ps &&",
+            f"capture.{flag} ? s.{flag}Ps.Get() :",
+        ):
+            mutant = bridge.replace(token, "/* 00570 broken producer-consumer link */", 1)
+            assert mutant != bridge and not blend_add_alpha_connected(mutant), token
+    # Exact D3D9 fixed-function enum and operand admission; modifiers fail closed.
+    for color_op, alpha_op, arg1, arg2, allowed in (
+        (12, 7, "texture", "current", True),
+        (13, 7, "texture", "diffuse", True),
+        (12, 7, "texture", "texture", False),
+        (13, 7, "diffuse", "diffuse", False),
+        (12, 4, "texture", "diffuse", False),
+        (13, 2, "texture", "diffuse", False),
+        (14, 7, "texture", "diffuse", False),
+    ):
+        match = (color_op in (12, 13) and alpha_op == 7 and
+                 arg1 == "texture" and arg2 in ("diffuse", "current"))
+        assert match is allowed
+    # D3D9 saturates additive alpha before test; RGB retains its blend factor.
+    for texel, diffuse in (
+        ((.95, .1, .7, .9), (.05, .8, .3, .6)),
+        ((.2, .8, .4, .1), (.8, .2, .9, .4)),
+    ):
+        for factor in (texel[3], diffuse[3]):
+            result = (tuple((1-factor)*d + factor*x
+                            for x, d in zip(texel[:3], diffuse[:3])) +
+                      (min(1.0, texel[3] + diffuse[3]),))
+            assert all(0 <= x <= 1 for x in result)
+            assert result[3] == min(1.0, texel[3] + diffuse[3])
+            assert result[3] != texel[3] * diffuse[3]
+    print("DX11 RGB blend with independent saturating ADD alpha Draw PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
