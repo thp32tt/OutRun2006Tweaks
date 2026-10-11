@@ -59,6 +59,8 @@ on:
       - 'tools/verify_vr_r23_host_fresh_fastpath.py'
       - 'tools/verify_vr_r23_seeded_clear_fastpath.py'
       - 'tools/verify_vr_r23_stencil_clear_batch.py'
+      - 'tools/verify_vr_gpu_water_profiler.py'
+      - 'src/vr/d3d9/gpu_water_profiler.hpp'
       - 'tools/verify_vr_r7_stencil_format_cache.py'
       - 'tools/verify_vr_r32_shadow_fallback_fastpath.py'
       - 'tools/verify_vr_r30_support_api_seam.py'
@@ -200,6 +202,7 @@ jobs:
             'tools/verify_vr_r23_host_fresh_fastpath.py',
             'tools/verify_vr_r23_seeded_clear_fastpath.py',
             'tools/verify_vr_r23_stencil_clear_batch.py',
+            'tools/verify_vr_gpu_water_profiler.py',
             'tools/verify_vr_r7_stencil_format_cache.py',
             'tools/verify_vr_r32_shadow_fallback_fastpath.py',
             'tools/verify_vr_r30_support_api_seam.py',
