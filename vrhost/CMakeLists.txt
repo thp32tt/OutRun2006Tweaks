@@ -160,6 +160,8 @@ target_include_directories(outrun-vr-frame-pacing-smoke PRIVATE
 
 add_executable(outrun-vr-cadence-presented-wait-smoke tests/cadence_presented_wait_smoke.cpp)
 
+add_executable(outrun-vr-cadence-schedule-smoke tests/cadence_schedule_smoke.cpp)
+
 add_executable(outrun-vr-eye-extent-smoke tests/xr_eye_extent_smoke.cpp)
 target_include_directories(outrun-vr-eye-extent-smoke PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/../src"
@@ -180,6 +182,7 @@ foreach(target
     outrun-vr-r32-policy-smoke
     outrun-vr-frame-pacing-smoke
     outrun-vr-cadence-presented-wait-smoke
+    outrun-vr-cadence-schedule-smoke
     outrun-vr-eye-extent-smoke)
     set_target_properties(${target} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin"

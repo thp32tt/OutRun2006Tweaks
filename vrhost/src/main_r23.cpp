@@ -36,6 +36,7 @@
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
 #include "runtime/cadence_presented_wait.hpp"
+#include "runtime/cadence_schedule.hpp"
 #include "vr/ipc/cadence_v1.hpp"
 #include "vr/ipc/frame_pacing_diagnostics.hpp"
 
@@ -1568,16 +1569,12 @@ namespace
                 const XrTime targetPeriod = static_cast<XrTime>(
                     std::llround(1000000000.0 /
                         static_cast<double>(activeRenderHz_)));
-                if (nextRequestDisplayTime_ == 0)
-                    nextRequestDisplayTime_ = frame.predictedDisplayTime;
-
-                if (frame.predictedDisplayTime < nextRequestDisplayTime_)
+                const auto decision = OutRunVR::CadenceSchedule::Advance(
+                    frame.predictedDisplayTime, targetPeriod,
+                    nextRequestDisplayTime_);
+                nextRequestDisplayTime_ = decision.nextDisplayTime;
+                if (!decision.issue)
                     return { requestId_, false };
-
-                do
-                {
-                    nextRequestDisplayTime_ += targetPeriod;
-                } while (nextRequestDisplayTime_ <= frame.predictedDisplayTime);
             }
 
             if (++requestId_ == 0)
