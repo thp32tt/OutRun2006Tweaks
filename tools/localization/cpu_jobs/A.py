@@ -51,7 +51,7 @@ if not matches:
 assert matches,"Requested native Nanum bold/extra-bold font unavailable"
 fontpath=matches[0]
 fontbytes=fontpath.read_bytes();font_sha=sha(fontbytes)
-font=ImageFont.truetype(str(fontpath),54)
+font=ImageFont.truetype(str(fontpath),52)
 text="물병자리"
 # Source original block bbox 296 x 54, font face itself limited to <=50px
 # height and positive 1px margins. Width natural; NO squish/stretch/upsampling.
@@ -102,7 +102,7 @@ for n,bgcol in (("GRAY",(100,100,100)),("BLACK",(0,0,0)),("WHITE",(255,255,255))
   card.save(out/f"A237_SOURCE_GEOMETRY_{n}_{pct}.png")
 evidence=ref(out/"A237_SOURCE_GEOMETRY_GRAY_100.png")
 geomrecipe={"engine":"pillow-native-font","font_path":str(fontpath),
- "font_sha256":font_sha,"font_family":"NanumGothic native bold","font_size":54,
+ "font_sha256":font_sha,"font_family":"NanumGothic native bold","font_size":52,
  "font_license":"Nanum OFL; distribution is not included in this repository",
  "text":text,"original_source_bbox":[x0,y0,x1,y1],
  "source_face_color":[60,71,74],"crop_bbox":list(bb),"rendered_size":[glyph.width,glyph.height],
