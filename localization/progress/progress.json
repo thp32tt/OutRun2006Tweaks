@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 21:12 KST",
+  "updated_at_kst": "2026-10-11 21:10 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1380,6 +1380,27 @@
         "PJR_AND_IGR": "IGR003_IGR019_IGR033_OPEN",
         "RUNTIME_VALIDATION": "UNTESTED",
         "qa_file": "localization/graphics/role_A/20261011-A245-Q193-ONLINE-CLEAN-REAL-GLYPH/A245_CONTROLLER_FIRSTHAND_VISUAL_QA.json"
+      },
+      "c1_q102_second_label_wrong_target_2110_20261011": {
+        "role": "C1",
+        "queue_index": 102,
+        "run_key": "OUTRUN-KOR-C1-Q102-SECOND-LABEL-WRONG-TARGET-20261011-2110",
+        "expected_second_label": "15코스 연속",
+        "source_english": "15 Continuous Course",
+        "source_reference_sha256": "78a5f16f379684fd964d607c339683d8d0b07f1b0f6bb268017efdc51e695c80",
+        "source_reference_binary_published": false,
+        "real_generation_id": "830bb7e6-1fc4-4e2c-9e43-924b0da93041",
+        "actual_png_sha256": "c9168abacab1e9c7025b61fac8ed1d6abf2f004bb85934c6f88f66eea75c3386",
+        "actual_text": "타임어택 모드",
+        "raw_png_published_to_github": false,
+        "producer_status": "FAIL_WRONG_LABEL_SOURCE_STYLE_DECORATION",
+        "new_valid_png": 0,
+        "new_trial_dds": 0,
+        "official_dds_changed": 0,
+        "C2": "NOT_RUN",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "evidence": "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2110_SECOND_LABEL_WRONG_IMAGEGEN_HOLD.json"
       }
     },
     "runtime_text_trace": {
