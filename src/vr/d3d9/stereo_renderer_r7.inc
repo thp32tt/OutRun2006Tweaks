@@ -146,6 +146,27 @@ namespace OutRunVRStereo
 		bool DirectTransportResourcesReady = false;
         OutRunVR::EyeExtent::Generation DirectEyeExtentGeneration{};
 		bool DirectInteropVerified = false;
+        // D3D9Ex device adapter identity and caps are immutable until device
+        // replacement. Do not re-query COM for each DirectGPU Present.
+        struct DirectTransportDeviceFacts
+        {
+            IDirect3DDevice9* device = nullptr; // non-owning; reset clears it
+            LUID gameAdapterLuid{};
+            UINT maxTextureWidth = 0;
+            UINT maxTextureHeight = 0;
+            bool adapterLuidKnown = false;
+            bool textureLimitsKnown = false;
+        };
+        DirectTransportDeviceFacts DirectTransportFacts{};
+
+        void BindDirectTransportFacts(IDirect3DDevice9* device) noexcept
+        {
+            if (DirectTransportFacts.device != device)
+            {
+                DirectTransportFacts = {};
+                DirectTransportFacts.device = device;
+            }
+        }
 
 		D3DSURFACE_DESC BackBufferDesc{};
 		bool StereoResourcesReady = false;
@@ -1167,6 +1188,8 @@ namespace OutRunVRStereo
 		{
 			// A Reset can recycle a COM address for a different depth format.
 			TrackedStencilFormatKnown = false;
+            // Reset/ResetEx may reuse a COM address for another device.
+            DirectTransportFacts = {};
 			StereoResourcesReady=false;
 			RetireDirectTransportFramePublications();
 			DirectTransportResourcesReady=false;
@@ -1187,9 +1210,45 @@ namespace OutRunVRStereo
 		bool WaitForEventQuery(IDirect3DQuery9* query,ULONGLONG timeoutMs){if(!query)return false;const ULONGLONG deadline=GetTickCount64()+timeoutMs;for(;;){const HRESULT ready=query->GetData(nullptr,0,D3DGETDATA_FLUSH);if(ready==S_OK)return true;if(ready!=S_FALSE)return false;if(GetTickCount64()>=deadline)return false;Sleep(0);}}
 
 		bool QueryGameAdapterLuid(IDirect3DDevice9* device,LUID& luid)
-		{
-			IDirect3DDevice9Ex*deviceEx=nullptr;if(!device||FAILED(device->QueryInterface(__uuidof(IDirect3DDevice9Ex),reinterpret_cast<void**>(&deviceEx)))||!deviceEx){if(!FirstD3D9ExUnavailableLogged){FirstD3D9ExUnavailableLogged=true;spdlog::warn("VR direct transport: game device is not D3D9Ex; zero-copy disabled, SBS/Desktop Duplication remains active");}return false;}D3DDEVICE_CREATION_PARAMETERS cp{};IDirect3D9*base=nullptr;IDirect3D9Ex*d3dEx=nullptr;const bool ok=SUCCEEDED(deviceEx->GetCreationParameters(&cp))&&SUCCEEDED(deviceEx->GetDirect3D(&base))&&base&&SUCCEEDED(base->QueryInterface(__uuidof(IDirect3D9Ex),reinterpret_cast<void**>(&d3dEx)))&&d3dEx&&SUCCEEDED(d3dEx->GetAdapterLUID(cp.AdapterOrdinal,&luid));ReleaseCom(d3dEx);ReleaseCom(base);ReleaseCom(deviceEx);return ok;
-		}
+        {
+            if (!device) return false;
+            BindDirectTransportFacts(device);
+            if (DirectTransportFacts.adapterLuidKnown)
+            {
+                luid = DirectTransportFacts.gameAdapterLuid;
+                return true;
+            }
+            IDirect3DDevice9Ex* deviceEx = nullptr;
+            if (FAILED(device->QueryInterface(__uuidof(IDirect3DDevice9Ex),
+                    reinterpret_cast<void**>(&deviceEx))) || !deviceEx)
+            {
+                if (!FirstD3D9ExUnavailableLogged)
+                {
+                    FirstD3D9ExUnavailableLogged = true;
+                    spdlog::warn("VR direct transport: game device is not D3D9Ex; zero-copy disabled, SBS/Desktop Duplication remains active");
+                }
+                return false;
+            }
+            D3DDEVICE_CREATION_PARAMETERS cp{};
+            IDirect3D9* base = nullptr;
+            IDirect3D9Ex* d3dEx = nullptr;
+            const bool ok =
+                SUCCEEDED(deviceEx->GetCreationParameters(&cp)) &&
+                SUCCEEDED(deviceEx->GetDirect3D(&base)) && base &&
+                SUCCEEDED(base->QueryInterface(__uuidof(IDirect3D9Ex),
+                    reinterpret_cast<void**>(&d3dEx))) && d3dEx &&
+                SUCCEEDED(d3dEx->GetAdapterLUID(cp.AdapterOrdinal, &luid));
+            ReleaseCom(d3dEx);
+            ReleaseCom(base);
+            ReleaseCom(deviceEx);
+            // Never cache failed queries; retry only the unresolved part.
+            if (ok)
+            {
+                DirectTransportFacts.gameAdapterLuid = luid;
+                DirectTransportFacts.adapterLuidKnown = true;
+            }
+            return ok;
+        }
 		bool EnsureDirectInteropProbe(IDirect3DDevice9* device)
 		{
 			if(!HostDirectTransportSupported()||!EnsureSharedState()||(SharedState->flags&OutRunVR::HostAdapterLuidValid)==0)return false;LUID gameLuid{};if(!QueryGameAdapterLuid(device,gameLuid))return false;InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientAdapterLuidLow),static_cast<LONG>(gameLuid.LowPart));InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientAdapterLuidHigh),static_cast<LONG>(gameLuid.HighPart));const bool adapterMatches=SharedState->hostAdapterLuidLow==gameLuid.LowPart&&SharedState->hostAdapterLuidHigh==static_cast<std::uint32_t>(gameLuid.HighPart);if(!adapterMatches){if(!FirstAdapterMismatchLogged){FirstAdapterMismatchLogged=true;spdlog::warn("VR direct transport: OpenXR D3D11 adapter LUID does not match the game D3D9Ex adapter; forcing SBS fallback");}return false;}if(DirectInteropProbeToken&&SharedState->hostInteropProbeAckToken==DirectInteropProbeToken){DirectInteropVerified=true;if(!FirstInteropVerifiedLogged){FirstInteropVerifiedLogged=true;spdlog::info("VR direct transport: D3D9Ex -> D3D11 shared-resource probe verified on the OpenXR adapter");}return true;}if(!DirectInteropProbeTexture){HANDLE handle=nullptr;if(FAILED(device->CreateTexture(1,1,1,D3DUSAGE_RENDERTARGET,D3DFMT_A8R8G8B8,D3DPOOL_DEFAULT,&DirectInteropProbeTexture,&handle))||!DirectInteropProbeTexture||!handle||FAILED(DirectInteropProbeTexture->GetSurfaceLevel(0,&DirectInteropProbeSurface))||FAILED(device->ColorFill(DirectInteropProbeSurface,nullptr,D3DCOLOR_ARGB(0xFF,0x7B,0x7B,0x7B)))||FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT,&DirectInteropProbeFence))||!DirectInteropProbeFence||FAILED(DirectInteropProbeFence->Issue(D3DISSUE_END))||!WaitForEventQuery(DirectInteropProbeFence,50)){++DirectInteropProbeFailures;ReleaseDirectInteropProbe();return false;}DirectInteropProbeHandle=handle;DirectInteropProbeToken=static_cast<std::uint32_t>(GetTickCount())^GetCurrentProcessId()^0x4F525652u;if(!DirectInteropProbeToken)DirectInteropProbeToken=1;InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->hostInteropProbeAckToken),0);InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeHandle),static_cast<LONG>(reinterpret_cast<std::uintptr_t>(DirectInteropProbeHandle)));InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeToken),static_cast<LONG>(DirectInteropProbeToken));}return false;
@@ -1227,10 +1286,18 @@ namespace OutRunVRStereo
                 // Retain current valid allocation on transient seqlock contention.
                 published = {DirectTransportWidth, DirectTransportHeight};
             }
-            D3DCAPS9 caps{};
-            if (FAILED(device->GetDeviceCaps(&caps))) return false;
+            BindDirectTransportFacts(device);
+            if (!DirectTransportFacts.textureLimitsKnown)
+            {
+                D3DCAPS9 caps{};
+                if (FAILED(device->GetDeviceCaps(&caps))) return false;
+                DirectTransportFacts.maxTextureWidth = caps.MaxTextureWidth;
+                DirectTransportFacts.maxTextureHeight = caps.MaxTextureHeight;
+                DirectTransportFacts.textureLimitsKnown = true;
+            }
             const auto exact = OutRunVR::EyeExtent::ResolveGame(
-                published, {caps.MaxTextureWidth, caps.MaxTextureHeight});
+                published, {DirectTransportFacts.maxTextureWidth,
+                            DirectTransportFacts.maxTextureHeight});
             if (!OutRunVR::EyeExtent::Valid(exact)) return false;
             width = exact.width;
             height = exact.height;
