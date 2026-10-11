@@ -670,9 +670,16 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     D3DSURFACE_DESC info{};
     if (FAILED(capture.texture->GetLevelDesc(0, &info)) ||
         info.Width == 0 || info.Height == 0 ||
-        info.Width > 1024 || info.Height > 1024 ||
-        info.Pool == D3DPOOL_DEFAULT)
+        info.Width > 1024 || info.Height > 1024)
         return false;
+    // Game-authored DEFAULT render-target textures may be mirrored through an
+    // exact-format D3D9 RT readback. Ordinary DEFAULT textures are still
+    // GPU-only and must never be treated as lockable CPU memory.
+    const bool gpuRenderTarget = info.Pool == D3DPOOL_DEFAULT &&
+        (info.Usage & D3DUSAGE_RENDERTARGET) != 0u &&
+        (info.Format == D3DFMT_A8R8G8B8 ||
+         info.Format == D3DFMT_X8R8G8B8);
+    if (info.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;
 
     // Both the producer's LockRect rows and D3D11's immutable subresource
     // pitch are in *compressed block bytes* for DXT. A BGRA pitch for BCn
@@ -711,9 +718,33 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         return false;
     }
 
+    // The source texture and its owning game device remain authoritative.
+    // GetRenderTargetData is only legal for non-MSAA render targets; no
+    // StretchRect, format conversion or D3D9 state mutation is permitted.
+    // A failed readback leaves the original game Draw/Present untouched.
+    ComPtr<IDirect3DSurface9> readbackSurface;
+    if (gpuRenderTarget) {
+        ComPtr<IDirect3DSurface9> sourceSurface;
+        ComPtr<IDirect3DDevice9> gameDevice;
+        D3DSURFACE_DESC sourceDesc{};
+        if (FAILED(capture.texture->GetSurfaceLevel(0, sourceSurface.GetAddressOf())) ||
+            FAILED(sourceSurface->GetDesc(&sourceDesc)) ||
+            sourceDesc.MultiSampleType != D3DMULTISAMPLE_NONE ||
+            sourceDesc.Width != info.Width || sourceDesc.Height != info.Height ||
+            sourceDesc.Format != info.Format ||
+            !(sourceDesc.Usage & D3DUSAGE_RENDERTARGET) ||
+            FAILED(capture.texture->GetDevice(gameDevice.GetAddressOf())) ||
+            FAILED(gameDevice->CreateOffscreenPlainSurface(
+                info.Width, info.Height, info.Format, D3DPOOL_SYSTEMMEM,
+                readbackSurface.GetAddressOf(), nullptr)) ||
+            FAILED(gameDevice->GetRenderTargetData(sourceSurface.Get(), readbackSurface.Get())))
+            return false;
+    }
     D3DLOCKED_RECT locked{};
-    if (FAILED(capture.texture->LockRect(0, &locked, nullptr, D3DLOCK_READONLY)))
-        return false;
+    const HRESULT lockResult = gpuRenderTarget ?
+        readbackSurface->LockRect(&locked, nullptr, D3DLOCK_READONLY) :
+        capture.texture->LockRect(0, &locked, nullptr, D3DLOCK_READONLY);
+    if (FAILED(lockResult)) return false;
     bool ok = false;
     if (locked.pBits && locked.Pitch > 0 &&
         static_cast<UINT>(locked.Pitch) >= rowBytes) {
@@ -773,7 +804,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             ok = SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));
         }
     }
-    capture.texture->UnlockRect(0);
+    if (gpuRenderTarget) readbackSurface->UnlockRect();
+    else capture.texture->UnlockRect(0);
     return ok;
 }
 

@@ -365,7 +365,7 @@ def main() -> None:
             "min != mag || mip != D3DTEXF_NONE",
             "nextColorOp != D3DTOP_DISABLE",
         )) and all(x in mirror for x in (
-            "info.Pool == D3DPOOL_DEFAULT",
+            "if (info.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
             "GetLevelCount() == 0",
             "D3DFMT_A8R8G8B8", "D3DFMT_X8R8G8B8",
             "LockRect(0, &locked, nullptr, D3DLOCK_READONLY)",
@@ -402,7 +402,8 @@ def main() -> None:
          "const bool arg2Diffuse = arg2 == D3DTA_DIFFUSE;"),
         ("const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT;",
          "const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE;"),
-        ("info.Pool == D3DPOOL_DEFAULT", "info.Pool == D3DPOOL_SYSTEMMEM"),
+        ("if (info.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
+         "if (info.Pool == D3DPOOL_SYSTEMMEM && !gpuRenderTarget) return false;"),
         ("GetLevelCount() == 0", "GetLevelCount() != 1"),
         ("state.MaxLOD = 0.0f;", "state.MaxLOD = D3D11_FLOAT32_MAX;"),
         ("capture.texture->UnlockRect(0)", "/* missing texture unlock */"),
@@ -1384,6 +1385,68 @@ def main() -> None:
     ):
         assert (color_op == 11 and alpha_op == 11) == permitted
     print("DX11 stage0 ADDSMOOTH source-to-game-native-Draw PASS (static only)")
+
+
+    # 00560: Real game D3D9 DEFAULT render-target texture level 0 ->
+    # exact-format, non-MSAA GetRenderTargetData -> CPU BGRA snapshot ->
+    # existing D3D11 SRV/sampler -> actual native Draw/DrawIndexed/inset.
+    # Non-render-target DEFAULT, compressed DEFAULT and MSAA fail closed.
+    rt_tokens = (
+        "const bool gpuRenderTarget = info.Pool == D3DPOOL_DEFAULT &&",
+        "(info.Usage & D3DUSAGE_RENDERTARGET) != 0u",
+        "info.Format == D3DFMT_A8R8G8B8",
+        "info.Format == D3DFMT_X8R8G8B8",
+        "if (info.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
+        "capture.texture->GetSurfaceLevel(0, sourceSurface.GetAddressOf())",
+        "sourceDesc.MultiSampleType != D3DMULTISAMPLE_NONE",
+        "sourceDesc.Width != info.Width || sourceDesc.Height != info.Height",
+        "sourceDesc.Format != info.Format",
+        "!(sourceDesc.Usage & D3DUSAGE_RENDERTARGET)",
+        "capture.texture->GetDevice(gameDevice.GetAddressOf())",
+        "gameDevice->CreateOffscreenPlainSurface(",
+        "info.Width, info.Height, info.Format, D3DPOOL_SYSTEMMEM,",
+        "gameDevice->GetRenderTargetData(sourceSurface.Get(), readbackSurface.Get())",
+        "readbackSurface->LockRect(&locked, nullptr, D3DLOCK_READONLY)",
+        "capture.texture->LockRect(0, &locked, nullptr, D3DLOCK_READONLY)",
+        "if (gpuRenderTarget) readbackSurface->UnlockRect();",
+        "else capture.texture->UnlockRect(0);",
+        "desc.Usage = D3D11_USAGE_IMMUTABLE;",
+        "dev->CreateShaderResourceView(texture.Get(), nullptr,",
+    )
+    def rt_game_native_connected(code: str) -> bool:
+        mirror = code[code.find("bool mirror_texture("):code.find("bool submit(")]
+        draw = code[code.find("bool submit("):code.find("void observe(")]
+        return (all(token in mirror for token in rt_tokens)
+                and "if (FAILED(lockResult)) return false;" in mirror
+                and "static_cast<UINT>(locked.Pitch) >= rowBytes" in mirror
+                and "mirror_texture(dev, capture, sampledView, sampledSampler)" in draw
+                and "ctx->PSSetShaderResources(0, 1, &boundView)" in draw
+                and "ctx->DrawIndexed(indexCount, 0, 0);" in draw
+                and "ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in draw)
+    assert rt_game_native_connected(bridge)
+    for token in rt_tokens:
+        mutant = bridge.replace(token, "/* disconnected 00560 RT producer */", 1)
+        assert mutant != bridge and not rt_game_native_connected(mutant), token
+    for pool, usage_rt, fmt, expected in (
+        ("DEFAULT", True, "A8R8G8B8", True),
+        ("DEFAULT", True, "X8R8G8B8", True),
+        ("DEFAULT", False, "A8R8G8B8", False),
+        ("DEFAULT", True, "DXT1", False),
+        ("DEFAULT", True, "A1R5G5B5", False),
+        ("MANAGED", True, "A8R8G8B8", False),
+    ):
+        gpu_rt = pool == "DEFAULT" and usage_rt and fmt in ("A8R8G8B8", "X8R8G8B8")
+        assert gpu_rt is expected
+    # Reject even a permitted DEFAULT RT without exact format and non-MSAA
+    # surface metadata. The GPU readback is diagnostic opt-in, not an HMD PASS.
+    for msaa, matching_size, matching_format, source_rt in (
+        (False, True, True, True), (True, True, True, True),
+        (False, False, True, True), (False, True, False, True),
+        (False, True, True, False),
+    ):
+        allowed = not msaa and matching_size and matching_format and source_rt
+        assert allowed is (not msaa and matching_size and matching_format and source_rt)
+    print("DX11 live DEFAULT render-target texture to native Draw regression PASS (static only)")
 
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
