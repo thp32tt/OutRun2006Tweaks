@@ -11,9 +11,9 @@
   "policy_blob_sha": "7d4daeef8bad52982674da7cba08692bfca211e8",
   "material_result_sha": "e9431196afdbf02288d24545eb1a5f637801cb25",
   "feature_status": "FEATURE_READY",
-  "checkpoint": "FEATURE_READY_PENDING_CONTROLLER_EXACT_SHA",
-  "status": "PENDING_CONTROLLER_PROMOTION",
-  "automation_validation": "PENDING_TARGET_EXACT_SHA",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "feature_acceptance": {
     "implementation_complete": true,
@@ -108,5 +108,30 @@
     "scope": "PR_PREFLIGHT_ONLY_NOT_TARGET_EXACT_SHA"
   },
   "runtime_validation_note": "Quest3/VDXR HMD has not been exercised; no claim of 72/90/120 native FPS or frame-rate improvement.",
-  "controller_next_action": "On final FEATURE_BRANCH candidate, rerun/inspect preflight after collector smoke enhancement. Fast-forward TARGET_BRANCH only if ownership/claim and ancestry permit. Verify DX9Ex Active (policy,host,game,full-chain-compile,package), Domain Isolation (domain-isolation), PACING-STAGES/REGRESSION/BUNDLE steps and feature-dx9ex-pacing-<targetSha> artifact all SUCCESS on the identical TARGET SHA. Then write C6 COMPLETE_BUILD_VERIFIED, automation_validation=PASS_EXACT_SHA, validation_bearing_result_sha=<exact target SHA>, preserve material_result_sha and acceptance_results; RUNTIME_VALIDATION=UNTESTED."
+  "controller_next_action": "Promote this bookkeeping-only C6 record to TARGET_BRANCH without treating its commit as a new validation-bearing material SHA. Preserve validation_bearing_result_sha=ea890461b445f01903e690fc6fc4c13622292079; do not rerun completed gates or award a second TASK_ID score.",
+  "validation_bearing_result_sha": "ea890461b445f01903e690fc6fc4c13622292079",
+  "exact_sha_validation": {
+    "target_branch": "vr-d3d9ex-focus",
+    "source_sha": "ea890461b445f01903e690fc6fc4c13622292079",
+    "dx9ex_active_run_id": 38102179453,
+    "dx9ex_active_conclusion": "SUCCESS",
+    "dx9ex_jobs": [
+      "policy",
+      "host",
+      "game",
+      "full-chain-compile",
+      "package"
+    ],
+    "domain_isolation_run_id": 38102179485,
+    "domain_isolation_conclusion": "SUCCESS",
+    "domain_job": "domain-isolation",
+    "acceptance_steps": [
+      "Feature acceptance: PACING-STAGES",
+      "Feature acceptance: PACING-REGRESSION",
+      "Feature acceptance: PACING-BUNDLE"
+    ],
+    "artifact_name": "feature-dx9ex-pacing-ea890461b445f01903e690fc6fc4c13622292079",
+    "runtime_validation": "UNTESTED",
+    "note": "Source and package validated at exact target commit; no Quest3/VDXR gameplay measurement."
+  }
 }
