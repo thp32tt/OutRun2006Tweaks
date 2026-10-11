@@ -168,6 +168,7 @@ def validate_shadow_copy_cache(source):
     assert "R30ShadowCopyCache vertexCopy;" in source
     assert "R30ShadowCopyCache indexCopy;" in source
     assert "R30ShadowPtr entry;" in source
+    assert source.count("R30ShadowCopyCache& cache)") == 2
     for fn in (begin, finish, vb_unlock, ib_unlock):
         assert "++entry->revision;" in fn
     assert "entry->valid.clear();" in begin
@@ -176,7 +177,6 @@ def validate_shadow_copy_cache(source):
     assert finish.count("++entry->revision;") >= 3  # success, exception, failure
     for fn in (vb_copy, ib_copy):
         for required in (
-            "R30ShadowCopyCache& cache",
             "std::lock_guard<std::mutex> lock(entry->mutex)",
             "!R30RangeValid(entry->valid, offset, offset + size)",
             "cache.entry == entry",
@@ -192,6 +192,7 @@ def validate_shadow_copy_cache(source):
             "cache.entry.reset();",
         ):
             assert required in fn, required
+        assert fn.count("cache.entry.reset();") >= 3
         assert fn.index("!R30RangeValid") < fn.index("cache.entry == entry")
         assert fn.index("cache.revision == entry->revision") < fn.index("std::memcpy")
         assert fn.index("std::memcpy") < fn.index("cache.revision = entry->revision;")
@@ -215,6 +216,8 @@ def test_shadow_copy_cache_mutations(source):
         ("entry->valid.clear();\n                ++entry->revision;\n            }\n            return hr;", "entry->valid.clear();\n            }\n            return hr;"),
         ("static_cast<UINT>(indexBytes), scratch.indexSource,\n                    scratch.indexCopy))",
          "static_cast<UINT>(indexBytes), scratch.indexSource,\n                    scratch.vertexCopy))"),
+        ("cache.entry.reset();\n                ++R30ShadowReadMisses;",
+         "++R30ShadowReadMisses;"),
     )
     for index, (needle, changed) in enumerate(changes, 1):
         assert needle in source, (index, needle)
@@ -257,7 +260,7 @@ def main():
             pass
         else:
             raise AssertionError("mutation survived: " + needle)
-    print("PASS R30 VB/IB descriptor, range and revision-keyed shadow copy cache; 11 descriptor + 8 range + 12 cache negative mutations")
+    print("PASS R30 VB/IB descriptor, range and revision-keyed shadow copy cache; 11 descriptor + 8 range + 13 cache negative mutations")
 
 
 if __name__ == "__main__":

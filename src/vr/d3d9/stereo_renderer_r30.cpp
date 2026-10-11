@@ -413,6 +413,9 @@ namespace OutRunVRStereo
         {
             if (!entry)
             {
+                // Drop old scratch ownership if the buffer registry no longer
+                // provides a live shadow (e.g. Release/Reset).
+                cache.entry.reset();
                 ++R30ShadowReadMisses;
                 return false;
             }
@@ -421,6 +424,9 @@ namespace OutRunVRStereo
                 entry->bytes.size() != entry->size ||
                 !R30RangeValid(entry->valid, offset, offset + size))
             {
+                // A DISCARD or failed Unlock must not pin stale shadow bytes
+                // in the thread-local scratch until some later valid draw.
+                cache.entry.reset();
                 ++R30ShadowReadMisses;
                 if (!R30FirstShadowMissLogged)
                 {
@@ -465,6 +471,9 @@ namespace OutRunVRStereo
         {
             if (!entry)
             {
+                // Drop old scratch ownership if the buffer registry no longer
+                // provides a live shadow (e.g. Release/Reset).
+                cache.entry.reset();
                 ++R30ShadowReadMisses;
                 return false;
             }
@@ -473,6 +482,9 @@ namespace OutRunVRStereo
                 entry->bytes.size() != entry->size ||
                 !R30RangeValid(entry->valid, offset, offset + size))
             {
+                // A DISCARD or failed Unlock must not pin stale shadow bytes
+                // in the thread-local scratch until some later valid draw.
+                cache.entry.reset();
                 ++R30ShadowReadMisses;
                 return false;
             }
