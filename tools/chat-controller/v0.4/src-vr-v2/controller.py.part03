@@ -1111,6 +1111,11 @@ def hold_unconfirmed_chat(q: dict, active: dict, reason: str) -> None:
         )
 
 
+def vr_rollover_must_wait_for_owner(owner_busy_or_missing: bool, hard_40m: bool) -> bool:
+    """Do not let a stale busy renderer defeat the 40-minute recovery deadline."""
+    return bool(owner_busy_or_missing and not hard_40m)
+
+
 async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], active: dict, reason: str) -> bool:
     """Rollover on confirmed UI failure or a VR 30-minute forced interval."""
     if not CONVERSATION_ROLLOVER_ENABLED:
@@ -1173,7 +1178,7 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
         owner_busy_or_missing = (
             old_page is None or old_page.is_closed() or await detect_busy(old_page)
         )
-        if owner_busy_or_missing and not hard_40m:
+        if vr_rollover_must_wait_for_owner(owner_busy_or_missing, hard_40m):
             active["rollover_pending_reason"] = reason
             write_runtime(status="conversation_rollover_owner_wait",
                           last_action=f"{active['task_id']}: retain owner until idle is confirmed",
