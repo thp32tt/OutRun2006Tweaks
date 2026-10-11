@@ -228,6 +228,28 @@ class FeatureModeTests(unittest.TestCase):
             self.assertIn("FEATURE_READY", prompt)
             self.assertIn("체크포인트", prompt)
 
+    def test_autonomous_ai_promotion_without_controller_approval(self):
+        part0 = (PARTS / "controller.py.part00").read_text(encoding="utf-8")
+        part3 = (PARTS / "controller.py.part03").read_text(encoding="utf-8")
+        compose = (ROOT / "docker-compose.portainer-vr.yml").read_text(encoding="utf-8")
+        self.assertIn('VR_FEATURE_PROMOTION_MODE: "ai"', compose)
+        self.assertIn('VR_FEATURE_PROMOTION_MODE", "ai"', part3)
+        self.assertIn('and VR_FEATURE_PROMOTION_MODE == "controller":', part3)
+        self.assertIn("FEATURE_FINAL_PROMOTION=AI_SELF_VERIFIED_EXPECTED_SHA_FAST_FORWARD", part0)
+        self.assertNotIn("FEATURE_FINAL_PROMOTION=CONTROLLER_FAST_FORWARD_AFTER_READY", part0)
+        # Source-level gate: the worker's material target commit must be
+        # discovered before any (disabled-by-default) legacy controller push.
+        section = part3.split("async def conversion_process_lane(", 1)[1]
+        observed = section.index('task_commit = github_find_task_commit(active["branch"], active["task_id"])')
+        legacy_promotion = section.index('and VR_FEATURE_PROMOTION_MODE == "controller":')
+        self.assertLess(observed, legacy_promotion)
+        for prompt_name in ("conversion_dx9ex.md", "conversion_dx11.md"):
+            prompt = (ROOT / prompt_name).read_text(encoding="utf-8")
+            self.assertIn("AI 자율 검증·승격 정책", prompt)
+            self.assertIn("expected_sha", prompt)
+            self.assertIn("force=false", prompt)
+            self.assertIn("컨트롤러는 별도 승인을 하지 않는다", prompt)
+
     def test_compose_and_legacy_dedup(self):
         compose = (ROOT / "docker-compose.portainer-vr.yml").read_text(encoding="utf-8")
         part3 = (PARTS / "controller.py.part03").read_text(encoding="utf-8")
