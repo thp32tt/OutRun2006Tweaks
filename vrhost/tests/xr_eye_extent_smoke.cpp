@@ -1,4 +1,5 @@
 #include "vr/ipc/xr_eye_extent.hpp"
+#include "runtime/fallback_projection_extent.hpp"
 #include <iostream>
 #include <cstdint>
 #include <limits>
@@ -11,6 +12,19 @@ int main(int argc, char** argv)
     const ViewLimits r{{2124,2284},{3072,3000}};
     const Size nominal = ResolveHost(l, r, 1.0f);
     REQUIRE(Equal(nominal, {2124,2284}));
+    // R19 classic-SBS fallback must allocate for both array-swapchain views.
+    using OutRunVrFallbackProjectionExtent::Resolve;
+    const auto fallback = Resolve(2016, 2208, 2124, 2284);
+    REQUIRE(fallback.Valid() && fallback.width == 2124 && fallback.height == 2284);
+    const auto swapped = Resolve(2124, 2284, 2016, 2208);
+    REQUIRE(swapped.Valid() && swapped.width == fallback.width &&
+        swapped.height == fallback.height);
+    const auto mixed = Resolve(1800, 2400, 2000, 2000);
+    REQUIRE(mixed.Valid() && mixed.width == 2000 && mixed.height == 2400);
+    REQUIRE(!Resolve(2016, 2208, 0, 2208).Valid());
+    REQUIRE(!Resolve(-1, 2208, 2016, 2208).Valid());
+    REQUIRE(!Resolve(2016, 2208, 8193, 2208).Valid());
+
     REQUIRE(Equal(ResolveHost(l,r,1.5f), {3072,3000}));
     REQUIRE(Equal(ResolveHost(l,r,0.5f), {1062,1142}));
     REQUIRE(!Valid(ResolveHost({{0,2240},{4096,4096}},r,1)));

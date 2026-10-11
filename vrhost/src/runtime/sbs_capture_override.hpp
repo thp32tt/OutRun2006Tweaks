@@ -20,6 +20,7 @@
 // at or after the complete game's Frame.v2 presentQpc.
 
 #include "openxr_api_compat.hpp"
+#include "fallback_projection_extent.hpp"
 
 #ifdef xrEndFrame
 #undef xrEndFrame
@@ -1023,8 +1024,17 @@ float4 PSMain(VSOut input) : SV_Target
         std::uint32_t height = 1600;
         if (incoming && incoming->viewCount >= 2 && incoming->views)
         {
-            width = std::max(1, incoming->views[0].subImage.imageRect.extent.width);
-            height = std::max(1, incoming->views[0].subImage.imageRect.extent.height);
+            // Both OpenXR array slices share one allocation extent. Derive it
+            // from BOTH views: a larger right eye must never be cropped by a
+            // left-eye-only fallback swapchain.
+            const auto left = incoming->views[0].subImage.imageRect.extent;
+            const auto right = incoming->views[1].subImage.imageRect.extent;
+            const auto common = OutRunVrFallbackProjectionExtent::Resolve(
+                left.width, left.height, right.width, right.height);
+            if (!common.Valid())
+                return false;
+            width = common.width;
+            height = common.height;
         }
         if (!EnsureSwapchain(Projection, session, width, height, 2))
             return false;
