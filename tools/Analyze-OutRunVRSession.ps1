@@ -94,7 +94,34 @@ foreach($spike in [regex]::Matches($gameLog,$perfSpikePattern)){
         FencePolls=$(if($fenceMatch.Success){[int64]$fenceMatch.Groups[2].Value}else{$null})
     }
 }
-$perfSpikeCount=$perfSpikeRows.Count
+# The active R28 lower-Present path emits the guaranteed source-frame
+# fallback diagnostics for CORRECTNESS. Count its throttled events separately
+# from detailed R32 GPU/effect counters; absent optional fields remain zero.
+$r28DipPattern='VR R28 FRAME DIP: frameMs=([0-9.]+) presentMs=([0-9.]+) estimateFps=([0-9.]+) draws=(\d+) frameSerial=(\d+)'
+$r28DipRows=@()
+foreach($dip in [regex]::Matches($gameLog,$r28DipPattern)){
+    $r28DipRows += [pscustomobject]@{
+        FrameMs=[double]::Parse($dip.Groups[1].Value,[Globalization.CultureInfo]::InvariantCulture)
+        PresentMs=[double]::Parse($dip.Groups[2].Value,[Globalization.CultureInfo]::InvariantCulture)
+        Draws=[int64]$dip.Groups[4].Value
+        FrameSerial=[int64]$dip.Groups[5].Value
+    }
+}
+if($r28DipRows.Count -gt 0){
+    $r28DipRows|Export-Csv (Join-Path $SessionDir 'R28_ACTIVE_FRAME_DIPS.csv') -NoTypeInformation -Encoding UTF8
+}
+$r28PacingRows=@([regex]::Matches($gameLog,
+    'VR R28 FRAME WINDOW 5s: frames=(\d+) sampled=(\d+) avgMs=([0-9.]+) p95Ms=([0-9.]+) p99Ms=([0-9.]+) maxMs=([0-9.]+) presentMaxMs=([0-9.]+) over16ms=(\d+) over25ms=(\d+) over33ms=(\d+) drawPeak=(\d+) drawPeakAtDip=(\d+)'))
+$r28Over25=0
+$r28Over33=0
+$r28MaxSourceMs=0.0
+foreach($w in $r28PacingRows){
+    $r28Over25 += [int64]$w.Groups[9].Value
+    $r28Over33 += [int64]$w.Groups[10].Value
+    $r28MaxSourceMs = [math]::Max($r28MaxSourceMs,
+        [double]::Parse($w.Groups[6].Value,[Globalization.CultureInfo]::InvariantCulture))
+}
+$perfSpikeCount=$perfSpikeRows.Count + $r28DipRows.Count
 $perfSpikeMaxFrameUs=0
 $perfSpikeMaxDraws=0
 $perfSpikeMaxPrimitives=0
@@ -102,7 +129,7 @@ $perfSpikeMaxParticleLikeDraws=0
 $perfSpikeMaxParticleLikePrimitives=0
 $perfSpikeMaxFenceWaitUs=0
 $perfSpikeFenceTelemetryAvailable=$false
-if($perfSpikeCount -gt 0){
+if($perfSpikeRows.Count -gt 0){
     $perfSpikeMaxFrameUs=($perfSpikeRows|Measure-Object FrameUs -Maximum).Maximum
     $perfSpikeMaxDraws=($perfSpikeRows|Measure-Object Draws -Maximum).Maximum
     $perfSpikeMaxPrimitives=($perfSpikeRows|Measure-Object Primitives -Maximum).Maximum
@@ -121,6 +148,13 @@ if($perfSpikeCount -gt 0){
 # zero R32 FRAME SPIKE rows. Compare R28's observed per-window max against
 # the headset's reported refresh budget; do not mistake zero R32 samples for
 # zero real render stalls.
+if($r28DipRows.Count -gt 0){
+    $perfSpikeMaxFrameUs=[math]::Max([int64]$perfSpikeMaxFrameUs,
+        [int64](1000 * ($r28DipRows|Measure-Object FrameMs -Maximum).Maximum))
+    $perfSpikeMaxDraws=[math]::Max([int64]$perfSpikeMaxDraws,
+        [int64]($r28DipRows|Measure-Object Draws -Maximum).Maximum)
+}
+
 $presentLatencyRows=@()
 $xrBudgetMs=16.6667
 $reportedXrHz=0.0
@@ -249,6 +283,10 @@ $result=[ordered]@{
     R28PresentSampleWindows=$presentLatencyRows.Count
     R28PresentOverBudgetWindows=$presentOverBudgetWindows
     R28PresentMaxMs=$presentLatencyMaxMs
+    R28ActivePacingWindows=$r28PacingRows.Count
+    R28ActiveOver25ms=$r28Over25
+    R28ActiveOver33ms=$r28Over33
+    R28ActiveMaxSourceFrameMs=$r28MaxSourceMs
     PerfSpikeCount=$perfSpikeCount
     PerfSpikeMaxFrameUs=$perfSpikeMaxFrameUs
     PerfSpikeMaxDraws=$perfSpikeMaxDraws
@@ -291,6 +329,10 @@ $lines=@(
     "r28PresentSampleWindows=$($presentLatencyRows.Count)"
     "r28PresentOverBudgetWindows=$presentOverBudgetWindows"
     ("r28PresentMaxMs="+('{0:F3}' -f $presentLatencyMaxMs))
+    "r28ActivePacingWindows=$($r28PacingRows.Count)"
+    "r28ActiveOver25ms=$r28Over25"
+    "r28ActiveOver33ms=$r28Over33"
+    ("r28ActiveMaxSourceFrameMs="+('{0:F3}' -f $r28MaxSourceMs))
     "perfSpikeCount=$perfSpikeCount"
     "perfSpikeMaxFrameUs=$perfSpikeMaxFrameUs"
     "perfSpikeMaxDraws=$perfSpikeMaxDraws"

@@ -11,6 +11,9 @@
 // MRT hazards, query tracking failures, fixed-function draws, projection changes,
 // unknown WVPs, and constant mismatches remain fail-closed through R13/R23/R9.
 
+#include <algorithm>
+#include <array>
+#include <cstdint>
 #include "stereo_renderer_r23.cpp"
 #include "shader_fingerprint_gpl.hpp"
 #include "../game/render_semantics.hpp"
@@ -67,6 +70,113 @@ namespace OutRunVRStereo
         std::uint64_t R27PerfLastDrawSerial = 0;
         std::uint64_t R27PerfLastPresentSamples = 0;
         std::uint64_t R46ShaderFingerprintPairs = 0;
+
+        // R28 is the confirmed active Present producer in Quest/VDXR runtime
+        // logs even when upper R32 frame-spike hooks did not emit samples.
+        // Per-thread bounded fixed-storage data avoids dynamic allocations on
+        // the source/game render thread during crowded-stage frame drops.
+        struct R28ActivePacingWindow
+        {
+            std::array<std::uint32_t, 640> sampleUs{};
+            std::size_t sampled = 0;
+            std::uint64_t frames = 0;
+            std::uint64_t sumUs = 0;
+            std::uint64_t maxUs = 0;
+            std::uint64_t maxPresentUs = 0;
+            std::uint64_t over16667 = 0;
+            std::uint64_t over25000 = 0;
+            std::uint64_t over33333 = 0;
+            std::uint64_t peakDraws = 0;
+            std::uint64_t peakDrawsAtDip = 0;
+            ULONGLONG startedMs = 0;
+        };
+        thread_local R28ActivePacingWindow R28Pacing{};
+        thread_local LONGLONG R28PreviousPresentEndQpc = 0;
+        thread_local std::uint64_t R28PreviousDrawSerial = 0;
+        thread_local ULONGLONG R28LastDipLogMs = 0;
+
+        void R28RecordActiveFramePacing(
+            const LARGE_INTEGER& begin, const LARGE_INTEGER& end) noexcept
+        {
+            // Include CORRECTNESS sessions: the user may only test once, and
+            // performance-profile-specific flags were disabled in that run.
+            if (!Settings::VRTelemetry || R27PerfFrequency.QuadPart <= 0)
+                return;
+            const std::uint64_t serial = TopLevelDrawSerial();
+            const std::uint64_t draws = serial >= R28PreviousDrawSerial
+                ? serial - R28PreviousDrawSerial : 0;
+            R28PreviousDrawSerial = serial;
+            const LONGLONG previous = R28PreviousPresentEndQpc;
+            R28PreviousPresentEndQpc = end.QuadPart;
+            if (previous <= 0 || end.QuadPart <= previous)
+                return;
+
+            const double hz = static_cast<double>(R27PerfFrequency.QuadPart);
+            const double elapsedMs = static_cast<double>(
+                end.QuadPart - previous) * 1000.0 / hz;
+            const double presentMs = static_cast<double>(
+                end.QuadPart - begin.QuadPart) * 1000.0 / hz;
+            if (!(elapsedMs > 0.0) || elapsedMs > 30000.0 ||
+                !(presentMs >= 0.0))
+                return;
+            const auto frameUs = static_cast<std::uint64_t>(elapsedMs * 1000.0);
+            const auto presentUs = static_cast<std::uint64_t>(presentMs * 1000.0);
+            auto& w = R28Pacing;
+            const ULONGLONG nowMs = GetTickCount64();
+            if (!w.startedMs)
+                w.startedMs = nowMs;
+            ++w.frames;
+            w.sumUs += frameUs;
+            w.maxUs = (std::max)(w.maxUs, frameUs);
+            w.maxPresentUs = (std::max)(w.maxPresentUs, presentUs);
+            w.peakDraws = (std::max)(w.peakDraws, draws);
+            if (w.sampled < w.sampleUs.size())
+                w.sampleUs[w.sampled++] = static_cast<std::uint32_t>(frameUs);
+            if (frameUs >= 16667) ++w.over16667;
+            if (frameUs >= 25000)
+            {
+                ++w.over25000;
+                w.peakDrawsAtDip = (std::max)(w.peakDrawsAtDip, draws);
+            }
+            if (frameUs >= 33333) ++w.over33333;
+
+            // Only one detail row per second; logging every 30-FPS frame
+            // could itself aggravate a densely populated scene.
+            if (frameUs >= 25000 &&
+                (R28LastDipLogMs == 0 || nowMs - R28LastDipLogMs >= 1000))
+            {
+                R28LastDipLogMs = nowMs;
+                spdlog::warn(
+                    "VR R28 FRAME DIP: frameMs={:.3f} presentMs={:.3f} estimateFps={:.1f} draws={} frameSerial={} marker=R28_ACTIVE",
+                    elapsedMs, presentMs, 1000.0 / elapsedMs,
+                    draws, serial);
+            }
+
+            if (nowMs - w.startedMs < 5000)
+                return;
+            // P95/P99 represent source Present-end intervals, NOT HMD
+            // compositor/reprojection FPS or GPU-execution duration.
+            std::array<std::uint32_t, 640> sorted = w.sampleUs;
+            std::sort(sorted.begin(), sorted.begin() + w.sampled);
+            const auto percentile = [&](std::size_t pct) noexcept {
+                if (!w.sampled) return std::uint32_t{0};
+                const std::size_t index =
+                    (w.sampled * pct + 99) / 100 - 1;
+                return sorted[(std::min)(index, w.sampled - 1)];
+            };
+            spdlog::info(
+                "VR R28 FRAME WINDOW 5s: frames={} sampled={} avgMs={:.3f} p95Ms={:.3f} p99Ms={:.3f} maxMs={:.3f} presentMaxMs={:.3f} over16ms={} over25ms={} over33ms={} drawPeak={} drawPeakAtDip={}",
+                w.frames, w.sampled,
+                w.frames ? static_cast<double>(w.sumUs) /
+                    static_cast<double>(w.frames) / 1000.0 : 0.0,
+                percentile(95) / 1000.0,
+                percentile(99) / 1000.0,
+                w.maxUs / 1000.0,
+                w.maxPresentUs / 1000.0,
+                w.over16667, w.over25000, w.over33333,
+                w.peakDraws, w.peakDrawsAtDip);
+            w = {};
+        }
 
         void R46TraceShaderFingerprint(IDirect3DDevice9* device,
             const R13EffectSnapshot& effect) noexcept
@@ -568,6 +678,8 @@ namespace OutRunVRStereo
                 if (ms > R27PresentMaxMs) R27PresentMaxMs = ms;
                 ++R27PresentSamples;
             }
+
+            R28RecordActiveFramePacing(begin, end);
 
             if (Settings::VRTelemetry)
             {
