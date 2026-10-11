@@ -27,6 +27,7 @@ def prefix(lane):
         },
         "json": json, "re": re,
         "MAX_TASK_ATTEMPTS": 3,
+        "VR_CONTINUOUS_30M_ENABLED": False,  # legacy contract-specific test context
         "LOCALIZATION_EXECUTION_POLICY": "LOCALIZATION_EXECUTION_POLICY_ONLY",
     }
     exec(compile(ast.Module(body=[fn], type_ignores=[]), str(file), "exec"), context)
