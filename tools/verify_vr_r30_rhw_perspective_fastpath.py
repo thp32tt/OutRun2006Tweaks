@@ -21,9 +21,10 @@ def valid(code: str) -> bool:
         gate = code.index("            const bool rhwPerspectiveFastPath =")
         full = code.index("            if (state.worldEffect && state.fullWorldReprojection &&")
         predicate = code[gate:code.index("            auto selected =", gate)]
+        basis = code[det:gate]
         full_body = code[full:code.index("                if (fullDrawOk && selectedVertices != 0)", full)]
         return (hoist < det < gate < loop and
-                "rhwBase._11 * rhwBase._22 - rhwBase._21 * rhwBase._12" in predicate and
+                "rhwBase._11 * rhwBase._22 - rhwBase._21 * rhwBase._12" in basis and
                 all(x in predicate for x in (
                     "state.worldEffect && state.fullWorldReprojection &&",
                     "allowFullReprojection &&",
