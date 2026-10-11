@@ -3,7 +3,12 @@ param(
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
     [string]$TestProfile = 'CORRECTNESS',
     [ValidateSet('OFF','ON')]
-    [string]$GpuDiagnostics = 'OFF'
+    [string]$GpuDiagnostics = 'OFF',
+    [ValidateSet('DEFAULT','ON','OFF')][string]$GpuLabTransparency = 'DEFAULT',
+    [ValidateSet('DEFAULT','512','1024')][string]$GpuLabReflection = 'DEFAULT',
+    [ValidateSet('DEFAULT','0','4')][string]$GpuLabSkyGlow = 'DEFAULT',
+    [ValidateSet('DEFAULT','ON','OFF')][string]$GpuLabCulling = 'DEFAULT',
+    [ValidateSet('NONE','WATERFRONT','SAND_SPRAY','DENSE_BUILDINGS','OTHER')][string]$GpuLabScene = 'NONE'
 )
 
 $ErrorActionPreference='Stop'
@@ -112,6 +117,21 @@ if($backend -eq 'd3d9'){
     }
 }
 
+# GPU lab arguments are supported only by the separate DX9Ex diagnostic GUI.
+$gpuLabValues=@($GpuLabTransparency,$GpuLabReflection,$GpuLabSkyGlow,$GpuLabCulling)
+$gpuLabActive=@($gpuLabValues|Where-Object{$_ -ne 'DEFAULT'}).Count -gt 0
+if($gpuLabActive){
+    if($backend -ne 'd3d9' -or $GpuDiagnostics -ne 'ON' -or
+        @($gpuLabValues|Where-Object{$_ -eq 'DEFAULT'}).Count -gt 0){
+        throw 'GPU lab requires DX9Ex, GPU Diagnostics ON and four explicit quality settings.'
+    }
+    $helper=Join-Path $root 'OutRunVR-GPU-Lab-Settings.ps1'
+    if(!(Test-Path -LiteralPath $helper)){throw 'GPU lab settings helper missing'}
+    . $helper
+    $gameArgs=@(Set-OutRunVRGpuLabArguments -BaseArgs $gameArgs `
+        -Transparency $GpuLabTransparency -Reflection $GpuLabReflection `
+        -SkyGlow $GpuLabSkyGlow -StageCulling $GpuLabCulling)
+}
 if($backend -ne '2d'){
     $gameArgs += '-HudInspector=true'
 }
@@ -149,6 +169,11 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "backend=$backend"
     "profile=$TestProfile"
     "gpuDiagnostics=$GpuDiagnostics"
+    "gpuLabTransparency=$GpuLabTransparency"
+    "gpuLabReflection=$GpuLabReflection"
+    "gpuLabSkyGlow=$GpuLabSkyGlow"
+    "gpuLabCulling=$GpuLabCulling"
+    "gpuLabScene=$GpuLabScene"
     "forceVrDisabled=$($backend -eq '2d')"
     "arguments=$($gameArgs -join ' ')"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8

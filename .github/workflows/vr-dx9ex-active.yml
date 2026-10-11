@@ -40,6 +40,10 @@ on:
       - 'docs/VR_AUTODEV_STATE.json'
       - 'docs/DX9EX_AUTODEV_PRIORITY_20261010.md' # Actual P0/P1 authority; policy guard must re-run on updates.
       - 'tools/OutRunVR-TestProfiles.ps1'
+      - 'tools/OutRunVR-GPU-Lab.ps1'
+      - 'tools/OutRunVR-GPU-Lab.cmd'
+      - 'tools/OutRunVR-GPU-Lab-Settings.ps1'
+      - 'tools/Test-OutRunVRGpuLab.ps1'
       - 'tools/Test-OutRunVRTestPolicy.ps1'
       - 'docs/VR_PROBLEM_HISTORY.md'
       - 'docs/VR_BINARY_CONTRACT.json'
@@ -169,6 +173,9 @@ jobs:
             }
           }
           & ./tools/Test-OutRunVRAnalysisContract.ps1
+      - name: Verify separate GPU lab GUI and A/B override semantics
+        shell: pwsh
+        run: ./tools/Test-OutRunVRGpuLab.ps1
       - name: Verify runtime-test minimization policy
         shell: pwsh
         run: ./tools/Test-OutRunVRTestPolicy.ps1
@@ -658,6 +665,69 @@ jobs:
           if ($bad.GameDirectEyeSizeMatchesXr -or -not $bad.GameDirectEyeAllocationObserved) {
             throw 'XR-EYE-BUNDLE mismatch detection failed'
           }
+      - name: Assemble separate GUI GPU measurement ZIP
+        shell: pwsh
+        run: |
+          $short = $env:GITHUB_SHA.Substring(0,12)
+          $dir = 'gpu-measurement'
+          Copy-Item package $dir -Recurse
+          Remove-Item (Join-Path $dir 'OutRunVR-Slot-Selector.cmd') -Force
+          foreach ($file in @('OutRunVR-GPU-Lab.cmd','OutRunVR-GPU-Lab.ps1','OutRunVR-GPU-Lab-Settings.ps1')) {
+            Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
+          }
+          Copy-Item docs/VR_GPU_LAB_TEST_BUILD.md (Join-Path $dir 'GPU_LAB_GUIDE.md')
+          @(
+            'OUTRUN DX9EX VR - GPU MEASUREMENT SPECIAL BUILD'
+            ''
+            'Extract ZIP into original OR2006C2C.EXE folder.'
+            'Double click OutRunVR-GPU-Lab.cmd, the ONLY GUI launcher.'
+            'Choose A/B/C/D/E or any alpha/reflect/SkyGlow/culling combinations.'
+            'Tag waterfront/sand spray/buildings and click GPU 측정 시작 / 게임 실행.'
+            'After the game exits upload OutRun2_VR_ANALYZE_*.zip.'
+            'No environment-variable entry required. HMD runtime UNTESTED.'
+          ) | Set-Content (Join-Path $dir 'START_HERE_실행방법.txt') -Encoding UTF8
+          [ordered]@{
+            ArtifactKind = 'SEPARATE_GPU_DIAGNOSTIC_ZIP'
+            SourceSha = $env:GITHUB_SHA
+            GuiEntryPoint = 'OutRunVR-GPU-Lab.cmd'
+            DefaultGpuDiagnostics = 'ON_WHILE_MEASURING'
+            OriginalDailyZipUnchanged = $true
+            RuntimeValidation = 'UNTESTED'
+          } | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'GPU_LAB_BUILD.json') -Encoding UTF8
+          Remove-Item (Join-Path $dir 'SHA256SUMS.txt')
+          Get-ChildItem $dir -Recurse -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
+            "$($_.Hash)  $($_.Path.Substring((Resolve-Path $dir).Path.Length + 1))"
+          } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
+          $zip = "OutRun2_VR_GPU_DIAGNOSTIC_${short}.zip"
+          Compress-Archive -Path (Join-Path $dir '*') -DestinationPath $zip -Force
+          Expand-Archive $zip verify-gpu-lab
+          $launchers=@(Get-ChildItem verify-gpu-lab -Recurse -File | Where-Object { $_.Extension -in @('.cmd','.bat') })
+          if($launchers.Count -ne 1 -or $launchers[0].Name -ne 'OutRunVR-GPU-Lab.cmd'){
+            throw "Separate GUI ZIP must have exactly one CMD entrypoint: $($launchers.Name -join ',')"
+          }
+          foreach($file in @('OutRunVR-GPU-Lab.ps1','OutRunVR-GPU-Lab-Settings.ps1',
+              'GPU_LAB_BUILD.json','GPU_LAB_GUIDE.md','Run-OutRunVRTest.ps1',
+              'Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1',
+              'backends/d3d9/dinput8.dll','backends/d3d9/outrun-vr-host.exe',
+              'backends/d3d9/SOURCE_SHA.txt','SHA256SUMS.txt')){
+            if(!(Test-Path (Join-Path 'verify-gpu-lab' $file))){throw "Missing GPU lab payload: $file"}
+          }
+          if((Get-Content verify-gpu-lab/backends/d3d9/SOURCE_SHA.txt -Raw).Trim() -ne $env:GITHUB_SHA){
+            throw 'GPU lab exact-SHA payload mismatch'
+          }
+          $meta=Get-Content verify-gpu-lab/GPU_LAB_BUILD.json -Raw | ConvertFrom-Json
+          if($meta.SourceSha -ne $env:GITHUB_SHA -or $meta.RuntimeValidation -ne 'UNTESTED'){
+            throw 'GPU lab metadata mismatch'
+          }
+          $bad=@(Get-ChildItem verify-gpu-lab -Recurse -File | Where-Object {
+              $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe')})
+          if($bad.Count){throw "Unexpected provider in GPU lab package: $($bad.Name -join ',')"}
+          Get-FileHash $zip -Algorithm SHA256 | Format-List
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-GPU-DIAGNOSTIC-${{ github.sha }}
+          path: OutRun2_VR_GPU_DIAGNOSTIC_*.zip
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
           name: feature-dx9ex-eye-extent-${{ github.sha }}
