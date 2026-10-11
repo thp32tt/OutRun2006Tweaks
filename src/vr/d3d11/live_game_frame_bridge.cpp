@@ -32,6 +32,7 @@ SamplerState gameSampler : register(s0);
 VOut VS(VIn v) { VOut o; o.clip = v.clip; o.diffuse = v.diffuse; o.uv = v.uv; return o; }
 float4 PS(VOut v) : SV_Target { return v.diffuse; }
 float4 PSTextured(VOut v) : SV_Target { return gameTexture.Sample(gameSampler, v.uv) * v.diffuse; }
+float4 PSTextureOnly(VOut v) : SV_Target { return gameTexture.Sample(gameSampler, v.uv); }
 )";
 struct NativeVertex {
     float clip[4];
@@ -43,6 +44,7 @@ struct NativeVertex {
 // draws. Any unmirrored texture, sampler, alpha or stage state fails closed.
 struct TextureCapture {
     bool enabled = false;
+    bool selectTexture = false;
     Microsoft::WRL::ComPtr<IDirect3DTexture9> texture;
     D3DTEXTUREADDRESS addressU = D3DTADDRESS_CLAMP;
     D3DTEXTUREADDRESS addressV = D3DTADDRESS_CLAMP;
@@ -55,6 +57,7 @@ struct State {
     ComPtr<ID3D11VertexShader> vs;
     ComPtr<ID3D11PixelShader> ps;
     ComPtr<ID3D11PixelShader> sampledPs;
+    ComPtr<ID3D11PixelShader> textureOnlyPs;
     ComPtr<ID3D11InputLayout> layout;
     ComPtr<ID3D11RasterizerState> raster;
     ComPtr<ID3D11Texture2D> staging;
@@ -87,26 +90,29 @@ bool compile(const char* entry, const char* profile, ComPtr<ID3DBlob>& blob) noe
 }
 
 bool ensure_pipeline(State& s) noexcept {
-    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.layout && s.raster && s.staging)
+    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.layout && s.raster && s.staging)
         return true;
     s.backend.shutdown();
-    s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.layout.Reset(); s.raster.Reset(); s.staging.Reset();
+    s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.layout.Reset(); s.raster.Reset(); s.staging.Reset();
     NativeBackendConfig cfg{};
     cfg.width = kWidth;
     cfg.height = kHeight;
     cfg.color_format = DXGI_FORMAT_B8G8R8A8_UNORM;
     if (!s.backend.initialize(cfg)) return false;
     auto* dev = s.backend.device();
-    ComPtr<ID3DBlob> vcode, pcode, sampledCode;
+    ComPtr<ID3DBlob> vcode, pcode, sampledCode, textureOnlyCode;
     if (!compile("VS", "vs_4_0", vcode) ||
         !compile("PS", "ps_4_0", pcode) ||
         !compile("PSTextured", "ps_4_0", sampledCode) ||
+        !compile("PSTextureOnly", "ps_4_0", textureOnlyCode) ||
         FAILED(dev->CreateVertexShader(vcode->GetBufferPointer(), vcode->GetBufferSize(),
                                       nullptr, s.vs.GetAddressOf())) ||
         FAILED(dev->CreatePixelShader(pcode->GetBufferPointer(), pcode->GetBufferSize(),
                                      nullptr, s.ps.GetAddressOf())) ||
         FAILED(dev->CreatePixelShader(sampledCode->GetBufferPointer(), sampledCode->GetBufferSize(),
-                                     nullptr, s.sampledPs.GetAddressOf())))
+                                     nullptr, s.sampledPs.GetAddressOf())) ||
+        FAILED(dev->CreatePixelShader(textureOnlyCode->GetBufferPointer(), textureOnlyCode->GetBufferSize(),
+                                     nullptr, s.textureOnlyPs.GetAddressOf())))
         return false;
     const D3D11_INPUT_ELEMENT_DESC elements[] = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,
@@ -226,9 +232,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             return false;
         // Reject complement/alpha-replicate modifiers, projected or displaced
         // coordinates, gamma reads and mip/anisotropic paths we do not emulate.
-        if (op != D3DTOP_MODULATE || arg != D3DTA_TEXTURE ||
-            arg2 != D3DTA_DIFFUSE || alphaOp != D3DTOP_MODULATE ||
-            alphaArg1 != D3DTA_TEXTURE || alphaArg2 != D3DTA_DIFFUSE ||
+        const bool modulate = op == D3DTOP_MODULATE && alphaOp == D3DTOP_MODULATE;
+        const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;
+        // Preserve exact RGB/alpha semantics. Mixed operations are not yet
+        // mirrored; inactive ARG2 is irrelevant for SELECTARG1.
+        if ((!modulate && !selectTexture) || arg != D3DTA_TEXTURE ||
+            alphaArg1 != D3DTA_TEXTURE ||
+            (modulate && (arg2 != D3DTA_DIFFUSE || alphaArg2 != D3DTA_DIFFUSE)) ||
             coordIndex != 0 || transformFlags != D3DTTFF_DISABLE || srgb ||
             (addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP) ||
             (addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP) ||
@@ -238,6 +248,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.addressU = static_cast<D3DTEXTUREADDRESS>(addressU);
         capture.addressV = static_cast<D3DTEXTUREADDRESS>(addressV);
         capture.filter = static_cast<D3DTEXTUREFILTERTYPE>(mag);
+        capture.selectTexture = selectTexture;
     }
     // Custom clip planes are not implemented by the native shader. The
     // object-space path must also reject D3D9 lighting and vertex blending.
@@ -336,7 +347,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     ComPtr<ID3D11ShaderResourceView>& view,
                     ComPtr<ID3D11SamplerState>& sampler) noexcept {
     if (!dev || !capture.enabled || !capture.texture ||
-        capture.texture->GetLevelCount() != 1) return false;
+        capture.texture->GetLevelCount() == 0) return false;
     D3DSURFACE_DESC info{};
     if (FAILED(capture.texture->GetLevelDesc(0, &info)) ||
         info.Width == 0 || info.Height == 0 ||
@@ -380,7 +391,10 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             state.AddressV = capture.addressV == D3DTADDRESS_WRAP ?
                 D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
             state.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-            state.MaxLOD = D3D11_FLOAT32_MAX;
+            // D3DSAMP_MIPFILTER=NONE always reads mip 0 even when the
+            // source texture contains more mips; never sample unmirrored levels.
+            state.MinLOD = 0.0f;
+            state.MaxLOD = 0.0f;
             state.MaxAnisotropy = 1;
             state.ComparisonFunc = D3D11_COMPARISON_NEVER;
             ok = SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));
@@ -426,7 +440,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     if (ib) ctx->IASetIndexBuffer(ib.Get(), DXGI_FORMAT_R32_UINT, 0);
     ctx->RSSetState(s.raster.Get());
     ctx->VSSetShader(s.vs.Get(), nullptr, 0);
-    ctx->PSSetShader(capture.enabled ? s.sampledPs.Get() : s.ps.Get(), nullptr, 0);
+    ctx->PSSetShader(!capture.enabled ? s.ps.Get() :
+                     (capture.selectTexture ? s.textureOnlyPs.Get() : s.sampledPs.Get()), nullptr, 0);
     ID3D11ShaderResourceView* boundView = sampledView.Get();
     ID3D11SamplerState* boundSampler = sampledSampler.Get();
     ctx->PSSetShaderResources(0, 1, &boundView);
@@ -596,7 +611,7 @@ void before_game_reset() noexcept {
     s.eligibleThisFrame = 0;
     s.probeSlot = 0;
     s.staging.Reset(); s.raster.Reset(); s.layout.Reset();
-    s.ps.Reset(); s.sampledPs.Reset(); s.vs.Reset();
+    s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.vs.Reset();
     s.backend.shutdown();
 }
 } // namespace outrun::vr::dx11::live_game_frame
