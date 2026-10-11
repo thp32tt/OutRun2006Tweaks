@@ -153,7 +153,30 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git add -A             localization/graphics/hd_candidates             localization/graphics/role_A             localization/graphics/role_B             localization/graphics/role_C1             localization/graphics/role_C             localization/graphics/plate_library/objects             localization/graphics/plate_library/entries             localization/graphics/worker_results 2>/dev/null || true
+          # Stage existing output directories individually. One optional missing
+          # directory must never invalidate staging of all generated DDS files.
+          output_dirs=(
+            localization/graphics/hd_candidates
+            localization/graphics/role_A
+            localization/graphics/role_B
+            localization/graphics/role_C1
+            localization/graphics/role_C
+            localization/graphics/plate_library/objects
+            localization/graphics/plate_library/entries
+            localization/graphics/worker_results
+          )
+          for p in "${output_dirs[@]}"; do
+            if [ -d "$p" ] || git ls-files --error-unmatch "$p" >/dev/null 2>&1; then
+              git add -A -- "$p"
+            fi
+          done
+          # Do not silently call generated outputs "no output" if staging broke.
+          unstaged_generated=$(git ls-files --others --exclude-standard -- "${output_dirs[@]}")
+          if [ -n "$unstaged_generated" ]; then
+            echo "::error::Generated files left unstaged:"
+            printf '%s\n' "$unstaged_generated"
+            exit 1
+          fi
           if git diff --cached --quiet; then
             echo "Worker produced no repository output."
             exit 0
