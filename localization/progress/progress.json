@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 14:56 KST",
+  "updated_at_kst": "2026-10-11 15:15 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -892,6 +892,20 @@
         "RUNTIME_VALIDATION": "UNTESTED",
         "ingame_user_regression": "IGR044_OPEN",
         "qa_path": "localization/graphics/role_B/imagegen_requests/q060_B370_OUTPUT_INVALID_20261011.json"
+      },
+      "c1_q101_auth_source_optical_20261011": {
+        "run_key": "OUTRUN-KOR-C1-Q101-A226-AUTH-SOURCE-NEW-MORPHOLOGY-20261011-1512",
+        "index": 101,
+        "current_same_sha_rework": true,
+        "new_DDS": 0,
+        "source_sha_authenticated": true,
+        "official_unchanged": true,
+        "C1": "SCOPED_VISUAL_REWORK",
+        "C2": "NOT_RUN",
+        "C3": "NOT_RUN",
+        "game": "UNTESTED",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "evidence": "localization/graphics/role_C/20261011-C1-Q101-A226-AUTHENTICATED-OPTICAL-REWORK/C1_Q101_A226_SOURCE_AUTHENTICATED_OPTICAL_REWORK.json"
       }
     },
     "runtime_text_trace": {

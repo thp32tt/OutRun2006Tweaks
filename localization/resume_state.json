@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C1 q101 2026-10-11 15:15 KST: upstream original source DDS SHA reauthenticated and previously undocumented glyph morphology failure on existing A226 SHA; reconstruct source-like curved lettering; independent C2 + separate C3 + user-game. Evidence localization/graphics/role_C/20261011-C1-Q101-A226-AUTHENTICATED-OPTICAL-REWORK/C1_Q101_A226_SOURCE_AUTHENTICATED_OPTICAL_REWORK.json.",
     "B370 EVEN q060 P0 REAL ChatGPT ImageGen two attempted generation IDs ed382f3e-0a6c-48e7-a0c4-59c174ed1cc7 and 36dfaa1d-f582-41b7-8b2c-22cef293b70e produced full infographic dashboards, NOT isolated transparent glyph layer; latter omits colon. Exact SOURCE 6a33c730, C2 PLATE_PASS CLEAN a03687d4 reused, official d81d0d14 and independent C2-rejected B369 5b42316d unchanged. OUTPUT_INVALID_HOLD: no qualified transparent PNG, no new saved DDS, official promote0, C2/C3 not run, IGR044 remains OPEN_USER_INGAME_FAIL, RUNTIME_VALIDATION=UNTESTED. Do NOT treat illustrative model metadata as CI or infer a DDS SHA. Retry only with fundamentally different verified image-only generator input, never old B font/vector fallback. QA localization/graphics/role_B/imagegen_requests/q060_B370_OUTPUT_INVALID_20261011.json. RUN_KEY=OUTRUN-KOR-B370-Q060-IMAGEGEN-OUTPUT-FAIL-CLOSED-20261011-1430",
     "C393 C2 q048 strict source effect REWORK on unchanged exact 259153b91e330479a4d975037013c77d339ffe3a2781461ebe118bfc04e28824: left cyan speed stripe 415 pixels lost SOURCE->CLEAN/current outside original glyph bbox, source italic-family mismatch. Replace producer plate and native lettering, new C2/C3 + IGR009 actual game UNTESTED. localization/graphics/role_C/20261011-C393-C2-Q048-SOURCE-STREAK-INDEPENDENT/C393_Q048_C2_STRICT_REWORK.json RUN_KEY=OUTRUN-KOR-C393-C2-Q048-NEW-STREAK-AND-MORPHOLOGY-20261011-1430",
     "C392 EVEN q028/q030 stricter current-policy C2/C3 native optical REWORK on unchanged C246-passed source family, q028 1ced3cfa2042d7b0d0b708e3521a7043bd7528b0347ddbe38b2b7ee51a4c0d3a, q030 fa294ef9bcd4e96db8848da3846cea7d90fd6668e1a30d6957f6e1c881f4a547; HOLD q028 CLEAN C175 noncanonical; producer must make source-rounded italic typography/material and valid plate before fresh exact SHA C2+C3, user JPG/actual game UNTESTED. Evidence localization/graphics/role_C/20261011-C392-C2-EVEN-Q028-Q030-SOURCE-MORPHOLOGY/C392_Q028_C2_C3_STRICT_REWORK.json and localization/graphics/role_C/20261011-C392-C2-EVEN-Q028-Q030-SOURCE-MORPHOLOGY/C392_Q030_C2_C3_STRICT_REWORK.json RUN_KEY=OUTRUN-KOR-C392-C2-Q028-Q030-STRICT-MORPHOLOGY-20261011-1405",
@@ -7054,7 +7055,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-11 14:16 KST",
+  "updated_at_kst": "2026-10-11 15:15 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -16267,5 +16268,25 @@
     "source_clean": "HOLD",
     "runtime_validation": "UNTESTED",
     "evidence": "localization/graphics/role_C/20261011-C2-Q102-NATIVE-ORPHAN-FRINGE/C2_Q102_INDEPENDENT_NATIVE_ORPHAN_REWORK.json"
+  },
+  "c1_20261011_q101_a226_authenticated_optical_rework": {
+    "queue_index": 101,
+    "shard": "ODD_ONLY_C1_SCOPED",
+    "run_key": "OUTRUN-KOR-C1-Q101-A226-AUTH-SOURCE-NEW-MORPHOLOGY-20261011-1512",
+    "existing_sha_no_new_candidate": "ea145aa51bdadd676bb7275c2d254bdc9562b72e3b7905867bc9c13ff3160d06",
+    "original_sha_authenticated": "a29d70ffef85c74c67f78752b4dcc83cc4055220313952536081441a54f6b1aa",
+    "official_unchanged": "939ac217127fc958f78524c021d2c735ffbc9af5d80af0d65bb04a226dbf3cdb",
+    "result": "SCOPED_VISUAL_REWORK_REQUIRED_GLYPH_MORPHOLOGY",
+    "new_visual_failure_on_same_sha": true,
+    "outside_delta_rgba": 0,
+    "outside_delta_alpha": 0,
+    "lossless_png_count": 4,
+    "qa": "localization/graphics/role_C/20261011-C1-Q101-A226-AUTHENTICATED-OPTICAL-REWORK/C1_Q101_A226_SOURCE_AUTHENTICATED_OPTICAL_REWORK.json",
+    "independent_C2": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "user_ingame": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "new_DDS": 0,
+    "approval": 0
   }
 }
