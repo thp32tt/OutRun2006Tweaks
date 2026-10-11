@@ -13,6 +13,7 @@
 // new current-frame full color/depth baseline are both proven.
 
 #include "stereo_renderer_r22.cpp"
+#include <cstddef>
 
 namespace OutRunVRStereo
 {
@@ -569,11 +570,17 @@ namespace OutRunVRStereo
         const char* R23DiagnoseHostFreshness(std::int64_t& ageMs) noexcept
         {
             ageMs = -1;
-            if (!SharedState || SharedState->magic != OutRunVR::SharedMagic ||
-                SharedState->protocolVersion != OutRunVR::SharedProtocolVersion ||
-                SharedState->structSize != sizeof(OutRunVR::SharedPoseState))
+            if (!SharedState)
                 return "mapping-or-header";
 
+            // Present needs only the host identity, renderable flags and QPC
+            // timestamp. All are in the fixed 40-byte prefix; copying the
+            // full 280-byte pose (including FOV and unused runtime text)
+            // every frame causes needless shared-cacheline traffic.
+            constexpr std::size_t R23HostFreshSnapshotBytes =
+                offsetof(OutRunVR::SharedPoseState, orientation);
+            static_assert(R23HostFreshSnapshotBytes == 40u,
+                "host freshness prefix layout changed");
             OutRunVR::SharedPoseState snap{};
             bool stable = false;
             for (int attempt = 0; attempt < 4; ++attempt)
@@ -581,7 +588,7 @@ namespace OutRunVRStereo
                 const std::uint32_t before = SharedState->sequence;
                 if (before & 1u) continue;
                 MemoryBarrier();
-                std::memcpy(&snap, SharedState, sizeof(snap));
+                std::memcpy(&snap, SharedState, R23HostFreshSnapshotBytes);
                 MemoryBarrier();
                 const std::uint32_t after = SharedState->sequence;
                 if (before == after && !(after & 1u))
@@ -591,19 +598,31 @@ namespace OutRunVRStereo
                 }
             }
             if (!stable) return "seqlock-busy";
+            // Validate the header from the same coherent seqlock snapshot,
+            // not from unsequenced reads immediately before copying it.
+            if (snap.magic != OutRunVR::SharedMagic ||
+                snap.protocolVersion != OutRunVR::SharedProtocolVersion ||
+                snap.structSize != sizeof(OutRunVR::SharedPoseState))
+                return "mapping-or-header";
             if (!snap.hostPid) return "host-pid-missing";
             if ((snap.flags & OutRunVR::HostAlive) == 0) return "host-alive-off";
             if ((snap.flags & OutRunVR::SessionVisible) == 0) return "session-visible-off";
             if ((snap.flags & OutRunVR::HostShouldRender) == 0) return "should-render-off";
             if (snap.sampleQpc <= 0) return "qpc-invalid";
 
-            LARGE_INTEGER now{}, frequency{};
+            // QPC frequency is invariant over a Windows boot. Cache this
+            // kernel query rather than repeating it for every game Present.
+            static const LONGLONG frequency = []() noexcept {
+                LARGE_INTEGER value{};
+                return QueryPerformanceFrequency(&value) != FALSE
+                    ? value.QuadPart : 0;
+            }();
+            LARGE_INTEGER now{};
             if (!QueryPerformanceCounter(&now) ||
-                !QueryPerformanceFrequency(&frequency) ||
-                frequency.QuadPart <= 0 || now.QuadPart < snap.sampleQpc)
+                frequency <= 0 || now.QuadPart < snap.sampleQpc)
                 return "qpc-invalid";
             ageMs = ((now.QuadPart - snap.sampleQpc) * 1000) /
-                frequency.QuadPart;
+                frequency;
             if (ageMs > OutRunVR::RuntimeEligibility::HostStaleMs)
                 return "sample-stale";
             return "fresh";
