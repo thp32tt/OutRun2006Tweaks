@@ -1658,7 +1658,7 @@ def main() -> None:
         "alphaOp == D3DTOP_SELECTARG2;",
         "blendFactorAddAlpha = op == D3DTOP_BLENDFACTORALPHA &&",
         "alphaOp == D3DTOP_ADD;",
-        "blendFactorDiffuseAlpha || blendFactorAddAlpha) &&",
+        "blendFactorDiffuseAlpha || blendFactorAddAlpha ||\n             blendFactorSubtractAlpha || blendFactorAddSmoothAlpha) &&",
         "!blendFactorDiffuseAlpha && !blendFactorAddAlpha &&",
         "blendFactorDiffuseAlpha || blendFactorAddAlpha ||",
         "(!blendFactorDiffuseAlpha &&",
@@ -2471,20 +2471,20 @@ def main() -> None:
             mutant = bridge[:begin] + body.replace(token, "/* bad 00573 math */", 1) + bridge[end:]
             assert not factor_independent_alpha_connected(mutant), token
 
-    # Factor=14, SUBTRACT=10, ADDSMOOTH=9; source alpha Arg1=TEXTURE,
+    # BLENDFACTORALPHA=14, SUBTRACT=10, ADDSMOOTH=11; source alpha Arg1=TEXTURE,
     # Arg2=DIFFUSE/CURRENT only. Nonfactor and modifier inputs fail closed.
     for color_op, alpha_op, arg1, arg2, expected in (
         (14, 10, "texture", "diffuse", True),
-        (14, 9, "texture", "current", True),
+        (14, 11, "texture", "current", True),
         (14, 10, "diffuse", "diffuse", False),
-        (14, 9, "texture", "texture", False),
-        (14, 9, "texture|complement", "diffuse", False),
+        (14, 11, "texture", "texture", False),
+        (14, 11, "texture|complement", "diffuse", False),
         (14, 10, "texture", "diffuse|complement", False),
         (14, 7, "texture", "diffuse", False),
         (13, 9, "texture", "diffuse", False),
         (12, 10, "texture", "diffuse", False),
     ):
-        admitted = (color_op == 14 and alpha_op in (9, 10) and
+        admitted = (color_op == 14 and alpha_op in (10, 11) and
                     arg1 == "texture" and arg2 in ("diffuse", "current"))
         assert admitted is expected
     for ta, da, factor in ((.9, .2, 0.), (.1, .8, .5), (.3, .4, 1.), (0., 1., .75)):
