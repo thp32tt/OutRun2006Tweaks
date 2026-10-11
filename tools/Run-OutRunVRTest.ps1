@@ -1,7 +1,9 @@
 param(
     [string]$GameExe = 'OR2006C2C.EXE',
     [ValidateSet('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE','STAGE_DIAGNOSTIC','A_BASELINE','B_CULLING','C_CULLING_NO_SSAA','D_CULLING_NO_SSAA_R512')]
-    [string]$TestProfile = 'CORRECTNESS'
+    [string]$TestProfile = 'CORRECTNESS',
+    [ValidateSet('OFF','ON')]
+    [string]$GpuDiagnostics = 'OFF'
 )
 
 $ErrorActionPreference='Stop'
@@ -146,6 +148,7 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
 @(
     "backend=$backend"
     "profile=$TestProfile"
+    "gpuDiagnostics=$GpuDiagnostics"
     "forceVrDisabled=$($backend -eq '2d')"
     "arguments=$($gameArgs -join ' ')"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
@@ -156,6 +159,8 @@ $oldVkDisable = $env:VK_LOADER_LAYERS_DISABLE
 $oldVkInstanceLayers = $env:VK_INSTANCE_LAYERS
 $oldVkDebug = $env:VK_LOADER_DEBUG
 $oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
+$oldGpuProfiling = $env:OUTRUN_VR_GPU_PROFILE
+$oldPacingDiagnostics = $env:OUTRUN_VR_PACING_DIAGNOSTICS
 $oldTestProfile = $env:OUTRUN_VR_TEST_PROFILE
 $oldPerformanceProfile = $env:OUTRUN_VR_PERFORMANCE_PROFILE
 $oldShaderFingerprint = $env:OUTRUN_VR_SHADER_FINGERPRINT
@@ -226,6 +231,16 @@ if($dxvkMode){
     }
 }
 
+# The shipped slot selector uses one optional checkbox, never a required
+# manually entered environment variable. OFF is the safe gameplay default.
+# ON enables nonblocking D3D9 GPU timestamps + XR/CPU pacing + nvidia-smi.
+if ($GpuDiagnostics -eq 'ON' -and $backend -ne 'd3d9') {
+    throw 'GPU detailed profiling is supported only by the DX9Ex game backend.'
+}
+$gpuDiagnosticActive = ($backend -eq 'd3d9' -and $GpuDiagnostics -eq 'ON')
+$env:OUTRUN_VR_GPU_PROFILE = if ($gpuDiagnosticActive) { '1' } else { $null }
+if ($gpuDiagnosticActive) { $env:OUTRUN_VR_PACING_DIAGNOSTICS = '1' }
+Write-Host "GPU detailed diagnostics: $GpuDiagnostics (D3D9 timestamps / pacing / whole-GPU sampler)"
 # Opt-in whole-GPU telemetry accompanies the QPC pacing session. The external
 # nvidia-smi process samples NVIDIA's driver once per second and does not run
 # any D3D9/OpenXR hooks or block the game process.
@@ -364,10 +379,14 @@ try{
             CsvName = if ($gpuSampleCount -gt 0) { 'outrun-vr-gpu-utilization.csv' } else { $null }
             Scope = 'WHOLE_NVIDIA_GPU_INCLUDING_GAME_HOST_COMPOSITOR_ENCODER'
             GPUFrameTimeMeasured = $false
+            D3D9TimestampQueryRequested = $gpuDiagnosticActive
+            D3D9TimestampLogMarker = if ($gpuDiagnosticActive) { 'VR GPU WATER 5s' } else { $null }
             HmdRuntimeVerified = $false
         } | ConvertTo-Json -Depth 3 |
             Set-Content (Join-Path $sessionRoot 'gpu-utilization-status.json') -Encoding UTF8
     }
+    $env:OUTRUN_VR_GPU_PROFILE=$oldGpuProfiling
+    $env:OUTRUN_VR_PACING_DIAGNOSTICS=$oldPacingDiagnostics
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
     $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile

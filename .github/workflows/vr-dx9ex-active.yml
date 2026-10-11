@@ -465,7 +465,10 @@ jobs:
             'Quest3/VDXR visual quality is UNTESTED.'
             'OPTIONAL PACING: run Start-OutRunVRPacing.ps1 instead of the usual selector.'
             'After game exit use Collect-OutRunVRFramePacing.ps1 for CSV and SHA summary.'
-            'This is CPU/QPC instrumentation; no Quest3 native FPS conclusion.'
+            'GPU 상세 진단: 슬롯 선택기에서 GPU 상세 진단 체크 (기본 OFF, DX9Ex 전용).'
+            'GPU timestamps + sampled alpha/depth/stencil/PS + XR/QPC + optional nvidia-smi usage.'
+            'GPU measurement overhead requires OFF/ON A/B; HMD runtime UNTESTED.'
+            'This is CPU/QPC instrumentation when only PACING launcher is used; no Quest3 native FPS conclusion.'
             '   For the lens centre and projected rank markers choose C FLARE / WORLD.'
             '   게임 종료 후 진단 로그 ZIP이 자동 생성됩니다.'
             ''
@@ -499,6 +502,9 @@ jobs:
             XrEyeExtentHmdVerified = $false
             FramePacingDiagnosticsDefault = 'OFF'
             FramePacingEnableWith = 'Start-OutRunVRPacing.ps1'
+            GpuDiagnosticsDefault = 'OFF'
+            GpuDiagnosticsMode = 'SLOT_SELECTOR_CHECKBOX'
+            GpuDiagnosticsIncludes = @('D3D9_GPU_TIMESTAMP','SPARSE_ALPHA_DEPTH_STENCIL','GPU_WHOLE_1S_NVIDIA_SMI','XR_CPU_QPC')
           }
           $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'BUILD_INPUTS.json') -Encoding UTF8
           $bad = Get-ChildItem $dir -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
@@ -546,6 +552,16 @@ jobs:
           if ($legacyState.VariantId -ne 'C_FLARE') { throw "legacy VariantId mapped incorrectly: $($legacyState.VariantId)" }
           if ($legacyState.Backend -ne 'd3d9') { throw "legacy VariantId changed backend unexpectedly: $($legacyState.Backend)" }
           $runnerText = Get-Content (Join-Path verify 'Run-OutRunVRTest.ps1') -Raw
+          $guiText = Get-Content (Join-Path verify 'OutRunVR-Slot-Selector.ps1') -Raw
+          $inputPolicy = Get-Content (Join-Path verify 'BUILD_INPUTS.json') -Raw | ConvertFrom-Json
+          if ($inputPolicy.GpuDiagnosticsDefault -ne 'OFF' -or
+              $inputPolicy.GpuDiagnosticsMode -ne 'SLOT_SELECTOR_CHECKBOX') { throw 'GPU diagnostics manifest gate failed' }
+          foreach ($token in @('GpuDiagnostics','OUTRUN_VR_GPU_PROFILE','OUTRUN_VR_PACING_DIAGNOSTICS','D3D9TimestampQueryRequested','gpu-utilization-status.json')) {
+            if ($runnerText -notlike "*$token*") { throw "GPU diagnostics runner marker missing $token" }
+          }
+          foreach ($token in @('GPU 상세 진단','-GpuDiagnostics','$gpuCheck.Checked')) {
+            if ($guiText -notlike "*$token*") { throw "GPU diagnostics selector marker missing $token" }
+          }
           if ($runnerText -match '-VariantId\s+\$variant\s+-VariantId') { throw 'runner still passes VariantId twice' }
 
           $bad = Get-ChildItem verify -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }

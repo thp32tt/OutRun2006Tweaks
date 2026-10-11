@@ -38,14 +38,16 @@ function Prepare-Slot([string]$slot){
 function Start-Slot([string]$slot){
     Prepare-Slot $slot
     $cfg=$slots[$slot]
-    $args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$runner,'-TestProfile',$cfg.Profile)
+    $gpuSetting = if ($gpuCheck.Checked) { 'ON' } else { 'OFF' }
+    if ($gpuSetting -eq 'ON' -and $cfg.Backend -ne 'd3d9') { throw 'GPU detailed profiling is DX9Ex-only.' }
+    $args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$runner,'-TestProfile',$cfg.Profile,'-GpuDiagnostics',$gpuSetting)
     Start-Process powershell -ArgumentList $args -WorkingDirectory $root -WindowStyle Hidden
 }
 
 $form=New-Object System.Windows.Forms.Form
 $form.Text='OutRun VR Slot Selector V2'
 $form.StartPosition='CenterScreen'
-$form.ClientSize=New-Object System.Drawing.Size(620,720)
+$form.ClientSize=New-Object System.Drawing.Size(620,795)
 $form.FormBorderStyle='FixedDialog'
 $form.MaximizeBox=$false
 
@@ -146,20 +148,28 @@ $($cfg.Help)
     $y+=58
 }
 
+$gpuCheck=New-Object System.Windows.Forms.CheckBox
+$gpuCheck.Text='GPU 상세 진단 (타임스탬프 + 투명/깊이 + VR 페이싱 + NVIDIA GPU 사용률)'
+$gpuCheck.Checked=$false
+$gpuCheck.AutoSize=$false
+$gpuCheck.Size=New-Object System.Drawing.Size(570,30)
+$gpuCheck.Location=New-Object System.Drawing.Point(35,555)
+$form.Controls.Add($gpuCheck)
+
 $helpBox=New-Object System.Windows.Forms.TextBox
 $helpBox.Multiline=$true
 $helpBox.ReadOnly=$true
 $helpBox.ScrollBars='Vertical'
 $helpBox.Size=New-Object System.Drawing.Size(550,92)
-$helpBox.Location=New-Object System.Drawing.Point(35,560)
-$helpBox.Text='권장: CURRENT_FOCUS -> A_CONTROL -> D_PERF -> B_HUD -> C_FLARE. G_COCKPIT은 별도 카메라 실험입니다. E_DXVK_SAFE는 현재 SBS fallback이 확인되어 진단용입니다.'
+$helpBox.Location=New-Object System.Drawing.Point(35,595)
+$helpBox.Text='권장: D PERFORMANCE + GPU 상세 진단 체크 → 물가/모래/건물 동일 구간 측정. 기본 OFF. DX9Ex 전용이며 로그 ZIP 자동 수집. 기존 A/B 옵션은 반투명 SSAA와 반사 해상도 비교에 사용.'
 $form.Controls.Add($helpBox)
 
 $note=New-Object System.Windows.Forms.Label
 $note.Text='게임 종료 후 collector가 자동 실행되어 OutRun2_VR_ANALYZE_<slot>_<profile>_<session>.zip 을 만듭니다.'
 $note.AutoSize=$false
 $note.Size=New-Object System.Drawing.Size(550,40)
-$note.Location=New-Object System.Drawing.Point(35,665)
+$note.Location=New-Object System.Drawing.Point(35,710)
 $form.Controls.Add($note)
 
 [void]$form.ShowDialog()

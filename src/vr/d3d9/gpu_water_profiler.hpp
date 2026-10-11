@@ -15,6 +15,7 @@ struct Slot {
     IDirect3DQuery9 *disjoint=nullptr,*freq=nullptr,*begin=nullptr,*end=nullptr,*sampleBegin=nullptr,*sampleEnd=nullptr;
     bool pending=false,sampleSet=false,blend=false;
     unsigned draws=0, samples=0, blendSamples=0, alphaTestSamples=0, pick=0;
+    unsigned noDepthWriteSamples=0, depthDisabledSamples=0, stencilSamples=0, pixelShaderSamples=0, fixedFunctionSamples=0;
     void release() noexcept {
         for(IDirect3DQuery9** q : {&disjoint,&freq,&begin,&end,&sampleBegin,&sampleEnd}) {
             if(*q) { (*q)->Release(); *q=nullptr; }
@@ -41,6 +42,7 @@ class Meter {
     IDirect3DDevice9* game_=nullptr; // borrowed; invalidated before Reset
     unsigned next_=0,lastDraws_=1024;
     std::uint64_t frame_=0, samples_=0, alpha_=0, alphaTest_=0, frames_=0, dropped_=0, invalid_=0, timedBlend_=0, timedOpaque_=0;
+    std::uint64_t noDepthWrite_=0, depthDisabled_=0, stencil_=0, pixelShader_=0, fixedFunction_=0;
     double sumFrame_=0,maxFrame_=0,sumBlend_=0,sumOpaque_=0;
     ULONGLONG logAt_=0;
     bool unsupported_=false,skip_=false;
@@ -64,6 +66,9 @@ class Meter {
             const double ms=double(b-a)*1000.0/double(f);
             ++frames_; sumFrame_+=ms; if(ms>maxFrame_) maxFrame_=ms;
             samples_+=s.samples; alpha_+=s.blendSamples; alphaTest_+=s.alphaTestSamples;
+            noDepthWrite_+=s.noDepthWriteSamples; depthDisabled_+=s.depthDisabledSamples;
+            stencil_+=s.stencilSamples; pixelShader_+=s.pixelShaderSamples;
+            fixedFunction_+=s.fixedFunctionSamples;
             if(s.sampleSet) {
                 const double drawMs=double(y-x)*1000.0/double(f);
                 if(s.blend){++timedBlend_;sumBlend_+=drawMs;}else{++timedOpaque_;sumOpaque_+=drawMs;}
@@ -74,11 +79,13 @@ class Meter {
         ULONGLONG now=GetTickCount64();
         if(!logAt_) { logAt_=now; return; }
         if(now-logAt_<5000) return;
-        spdlog::info("VR GPU WATER 5s: gpuIntervals={} gpuSpanAvgMs={:.3f} gpuSpanMaxMs={:.3f} sampledBlendDrawAvgMs={:.4f} sampledOpaqueDrawAvgMs={:.4f} blendDraws={} opaqueDraws={} stateSamples={} alphaBlendSamples={} alphaTestSamples={} dropped={} invalid={} waterAttribution=UNPROVEN",
+        spdlog::info("VR GPU WATER 5s: gpuIntervals={} gpuSpanAvgMs={:.3f} gpuSpanMaxMs={:.3f} sampledBlendDrawAvgMs={:.4f} sampledOpaqueDrawAvgMs={:.4f} blendDraws={} opaqueDraws={} stateSamples={} alphaBlendSamples={} alphaTestSamples={} noZWriteSamples={} zDisabledSamples={} stencilSamples={} programmablePsSamples={} fixedFnPsSamples={} dropped={} invalid={} waterAttribution=UNPROVEN",
             frames_,frames_?sumFrame_/frames_:0.0,maxFrame_,
             timedBlend_?sumBlend_/timedBlend_:0.0,timedOpaque_?sumOpaque_/timedOpaque_:0.0,
-            timedBlend_,timedOpaque_,samples_,alpha_,alphaTest_,dropped_,invalid_);
+            timedBlend_,timedOpaque_,samples_,alpha_,alphaTest_,
+            noDepthWrite_,depthDisabled_,stencil_,pixelShader_,fixedFunction_,dropped_,invalid_);
         samples_=alpha_=alphaTest_=frames_=dropped_=invalid_=timedBlend_=timedOpaque_=0;
+        noDepthWrite_=depthDisabled_=stencil_=pixelShader_=fixedFunction_=0;
         sumFrame_=maxFrame_=sumBlend_=sumOpaque_=0; logAt_=now;
     }
 public:
@@ -99,6 +106,8 @@ public:
                 return false;
             }
             s.draws=s.samples=s.blendSamples=s.alphaTestSamples=0;
+            s.noDepthWriteSamples=s.depthDisabledSamples=s.stencilSamples=0;
+            s.pixelShaderSamples=s.fixedFunctionSamples=0;
             s.sampleSet=false;
             s.pick=static_cast<unsigned>((frame_*997u+13u)%lastDraws_);
             if(FAILED(s.disjoint->Issue(D3DISSUE_BEGIN))||FAILED(s.begin->Issue(D3DISSUE_END))) {
@@ -114,7 +123,20 @@ public:
         DWORD alpha=FALSE,test=FALSE;
         const bool valid=SUCCEEDED(d->GetRenderState(D3DRS_ALPHABLENDENABLE,&alpha)) &&
                          SUCCEEDED(d->GetRenderState(D3DRS_ALPHATESTENABLE,&test));
-        if(sample&&valid) { ++s.samples; s.blendSamples+=(alpha!=FALSE); s.alphaTestSamples+=(test!=FALSE); }
+        if(sample&&valid) {
+            ++s.samples; s.blendSamples+=(alpha!=FALSE); s.alphaTestSamples+=(test!=FALSE);
+            DWORD zWrite=TRUE,zEnable=D3DZB_TRUE,stencil=FALSE;
+            if(SUCCEEDED(d->GetRenderState(D3DRS_ZWRITEENABLE,&zWrite))) s.noDepthWriteSamples+=(zWrite==FALSE);
+            if(SUCCEEDED(d->GetRenderState(D3DRS_ZENABLE,&zEnable))) s.depthDisabledSamples+=(zEnable==D3DZB_FALSE);
+            if(SUCCEEDED(d->GetRenderState(D3DRS_STENCILENABLE,&stencil))) s.stencilSamples+=(stencil!=FALSE);
+            if((i&63u)==0) { // lower-rate shader sample: GetPixelShader AddRef must be released
+                IDirect3DPixelShader9* ps=nullptr;
+                if(SUCCEEDED(d->GetPixelShader(&ps))) {
+                    if(ps) { ++s.pixelShaderSamples; ps->Release(); }
+                    else ++s.fixedFunctionSamples;
+                }
+            }
+        }
         if(!time||!valid||FAILED(s.sampleBegin->Issue(D3DISSUE_END))) return false;
         s.sampleSet=true; s.blend=alpha!=FALSE; return true;
     }
