@@ -2,7 +2,9 @@ name: Inspect Copied English PSD Workbases
 on:
   push:
     branches: [korean-localization-recovery-20260928]
-    paths: ['localization/graphics/plate_library/upstream_psd/**']
+    paths:
+      - 'localization/graphics/plate_library/upstream_psd/**'
+      - '.github/workflows/psd-workbase-inspect.yml'
   workflow_dispatch:
 permissions:
   contents: read
