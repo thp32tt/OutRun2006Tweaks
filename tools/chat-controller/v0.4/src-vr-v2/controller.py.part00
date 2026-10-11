@@ -266,7 +266,7 @@ class Registry:
     last_global_send_slot: Optional[str] = None
 
 runtime = {
-    "controller_build": "2026-10-11-progress-v2",
+    "controller_build": "2026-10-11-resume-v3",
     "started_at": datetime.now(TZ).isoformat(),
     "auto_send": AUTO_SEND,
     "auto_send_requested": AUTO_SEND_REQUESTED,
