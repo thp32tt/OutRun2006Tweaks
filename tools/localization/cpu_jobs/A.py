@@ -68,10 +68,19 @@ for name,(x0,y0,x1,y1) in AREAS.items():
  # The prior A196 SOURCE->CLEAN plate is established, and the original
  # source itself includes colored background art. Never blank the ROI to black.
  # Compare existing border pixels to prove plate color continuity before use.
- border=np.ones((h,w),dtype=bool)
- border[6:-6,6:-6]=False
- diff=np.abs(cleanROI[border].astype(np.int16)-oldROI[border].astype(np.int16))
- guard(float(np.mean(diff[:,:3]))<8.0,"clean plate background color differs from old saved (possible channel-order)")
+ # Compare four SOURCE-BACKGROUND-only corner patches, not the full border:
+ # old Korean glyph antialias occupies top/bottom edges and is expected to differ.
+ corners=np.zeros((h,w),dtype=bool)
+ corners[:8,:8]=True;corners[:8,-8:]=True
+ corners[-8:,:8]=True;corners[-8:,-8:]=True
+ swizzled=cleanROI[:,:,[2,1,0,3]]
+ err_rgba=float(np.mean(np.abs(cleanROI[corners,:3].astype(np.int16)-oldROI[corners,:3].astype(np.int16))))
+ err_bgra=float(np.mean(np.abs(swizzled[corners,:3].astype(np.int16)-oldROI[corners,:3].astype(np.int16))))
+ used_channel_swap=err_bgra+0.5<err_rgba
+ if used_channel_swap: cleanROI=swizzled.copy()
+ corner_error=min(err_rgba,err_bgra)
+ guard(corner_error<9.0,"pinned plate background corner colors incompatible with unchanged saved image")
+ diff=np.abs(cleanROI[corners].astype(np.int16)-oldROI[corners].astype(np.int16))
  font=ImageFont.truetype(str(FONT),60*SS,index=1)
  draft=Image.new("L",(500*SS,120*SS))
  ImageDraw.Draw(draft).text((10*SS,5*SS),"종합 랭킹",font=font,fill=255)
@@ -119,7 +128,7 @@ for name,(x0,y0,x1,y1) in AREAS.items():
  rows.append({"id":name,"original_bbox":[x0,y0,x1,y1],"saved_new_bbox":[x0+localbbox[0],y0+localbbox[1],x0+localbbox[2],y0+localbbox[3]],
               "margin_ltrb":margin,"source_face":"white + dark copper-brown outline","new_face":"near-white + dark copper-brown",
               "right_italic_source_approx":0.38,"new_pixels_inside":int(np.count_nonzero(np.any(rendered!=oldROI,axis=2))),
-              "source_clean_bg_difference_mean":float(np.mean(diff[:,:3]))})
+              "source_clean_bg_difference_mean":corner_error,"source_clean_png_BGR_channel_swapped":used_channel_swap})
 all_delta=np.any(T!=O,axis=2)
 outside=int(np.count_nonzero(all_delta&~edits))
 guard(outside==0,"new candidate modifies protected pixels outside two English ROI boxes")
