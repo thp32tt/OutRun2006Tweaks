@@ -53,7 +53,24 @@ def check(text):
     assert "device->SetTexture(0, nullptr);" in pass_fn, "avoid RT/SRV feedback hazard"
     assert "D3DRS_SRCBLEND, D3DBLEND_ONE" in pass_fn
     assert "D3DCOLORWRITEENABLE_ALPHA" in pass_fn
-    assert "device->SetViewport(&viewport)" in pass_fn, "eye target's viewport must be set per pass"
+    # D3D9 resets the viewport on RT0 change. Skip the redundant driver
+    # setter only for allocated reduced/temp surfaces with matching extent.
+    # Unknown/full-eye compositor surfaces retain their explicit viewport.
+    for fragment in (
+        "target == R30SkyGlow.reducedSurface[0]",
+        "target == R30SkyGlow.reducedSurface[1]",
+        "target == R30SkyGlow.tempSurface[0]",
+        "target == R30SkyGlow.tempSurface[1]",
+        "width == R30SkyGlow.glowWidth &&",
+        "height == R30SkyGlow.glowHeight;",
+        "if (!knownReducedTarget)",
+    ):
+        need(fragment, "SkyGlow viewport fastpath guard required: " + fragment)
+    assert (pass_fn.index("const bool knownReducedTarget =") <
+            pass_fn.index("if (!knownReducedTarget)") <
+            pass_fn.index("D3DVIEWPORT9 viewport{};") <
+            pass_fn.index("device->SetViewport(&viewport)")), "guard viewport fallback after RT bind"
+    assert pass_fn.count("device->SetViewport(&viewport)") == 1, "unexpected duplicate viewport setters"
     assert "R30SkyGlow.factor > 1" in apply, "do not change protected vertical blur policy"
     assert "compositeSource = R30SkyGlow.temp[eye];" in apply, "vertical blur source lost"
 
@@ -65,7 +82,14 @@ mutations = (
     ("missing blend transition", "if (!passState.blendConfigured || passState.additive != additive)"),
     ("missing post state restoration", "stateBlock->Apply()"),
     ("drop right-eye blur source", "compositeSource = R30SkyGlow.temp[eye];"),
-    ("skip per-pass viewport", "device->SetViewport(&viewport)"),
+    ("remove compositor viewport fallback", "device->SetViewport(&viewport)"),
+    ("unguard compositor viewport", "if (!knownReducedTarget)"),
+    ("wrong reduced eye0 identity", "target == R30SkyGlow.reducedSurface[0]"),
+    ("wrong reduced eye1 identity", "target == R30SkyGlow.reducedSurface[1]"),
+    ("wrong temp eye0 identity", "target == R30SkyGlow.tempSurface[0]"),
+    ("wrong temp eye1 identity", "target == R30SkyGlow.tempSurface[1]"),
+    ("ignore reduced width mismatch", "width == R30SkyGlow.glowWidth &&"),
+    ("ignore reduced height mismatch", "height == R30SkyGlow.glowHeight;"),
     ("depth state no longer cached", "if (!passState.depthDetached)"),
     ("depth detach never committed", "passState.depthDetached = true;"),
     ("shader cache bypass", "if (passState.activePixelShader != shader)"),
@@ -82,4 +106,4 @@ for label, token in mutations:
     except (AssertionError, IndexError):
         continue
     raise AssertionError("mutation survived: " + label)
-print("PASS R30 SkyGlow per-Present depth/shader coalescing and 13 destructive regressions")
+print("PASS R30 SkyGlow per-Present depth/shader/viewport coalescing and 20 destructive regressions")

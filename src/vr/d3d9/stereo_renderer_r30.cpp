@@ -1009,13 +1009,29 @@ namespace OutRunVRStereo
                 passState.depthDetached = true;
             }
 
-            D3DVIEWPORT9 viewport{};
-            viewport.Width = width;
-            viewport.Height = height;
-            viewport.MinZ = 0.0f;
-            viewport.MaxZ = 1.0f;
-            if (FAILED(device->SetViewport(&viewport)))
-                return false;
+            // D3D9 SetRenderTarget resets the viewport to the full target.
+            // These cached reduced/temporary surfaces have the exact extent
+            // requested by the blur/bright passes, so their explicit viewport
+            // setter was a redundant driver call on every eye and every frame.
+            // Keep the original explicit viewport for eye composites/unknown
+            // surfaces, which may not have the same dimensions as the caller.
+            const bool knownReducedTarget =
+                (target == R30SkyGlow.reducedSurface[0] ||
+                 target == R30SkyGlow.reducedSurface[1] ||
+                 target == R30SkyGlow.tempSurface[0] ||
+                 target == R30SkyGlow.tempSurface[1]) &&
+                width == R30SkyGlow.glowWidth &&
+                height == R30SkyGlow.glowHeight;
+            if (!knownReducedTarget)
+            {
+                D3DVIEWPORT9 viewport{};
+                viewport.Width = width;
+                viewport.Height = height;
+                viewport.MinZ = 0.0f;
+                viewport.MaxZ = 1.0f;
+                if (FAILED(device->SetViewport(&viewport)))
+                    return false;
+            }
 
             const R30GlowVertex v[4]{
                 { -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f },
