@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B375 2026-10-11 20:30 KST EVEN existing B P0 q060 ImageGen real generation 452d8880-03b1-4909-bf1e-5cdfc1e7e504 correctly generated exact '최고 기록:' transparent RGBA original SHA b00868d0fa7fd83e6d4689e5563f7b5ced93801faa23f04885b9c48ff542b903, native resized local-only 573x125 SHA 3a542625426b2c896b8bcf7f04c589e7450893295048be1a4144582a0a8b00ab. No GitHub image binary transfer, no persisted DDS, no imagegen manifest consumer; source-style P2 HOLD awaiting native exact saved comparison. Existing source/C2 CLEAN and official q060 d81d0d14 unchanged. Worker B.py fixed to ignore nonrequest attempt JSON. IGR044 OPEN, C2/C3/ingame UNTESTED. Evidence localization/graphics/role_B/imagegen_requests/q060_B375_IMAGEGEN_TRUE_GLYPH_SOURCE_STYLE_HOLD_20261011.json RUN_KEY=OUTRUN-KOR-B375-Q060-REAL-IMAGEGEN-TRANSPARENT-GLYPH-20261011-2030",
     "C2 2026-10-11 20:26 KST q012 NEW A244 trial SHA 4f18c54903fce5ad2bb1ca0f65e9b9e90664d7d5ee887df7eb2aa8a32c534633 independent SOURCE exact/candidate decoded source/CLEAN/lettering/native DDS RAW/FLIPY 84228 changed inside0 outside; trial scoped pixel/plate/glyph PASS but C2 whole HOLD pending original italic/bevel blind calibration/plate library/C3, PJR001/game OPEN, RUNTIME_VALIDATION=UNTESTED. localization/graphics/role_C/20261011-C2-Q012-A244-NEW-SAVED-DDS-INDEPENDENT/C2_Q012_A244_INDEPENDENT_HOLD.json RUN_KEY=OUTRUN-KOR-C2-Q012-A244-NEW-SHA-PIXEL-PLATE-20261011-2020",
     "C1 2026-10-11 20:17 KST q102 exact English source-only 900x120 `Time Attack Mode` examined and two genuine ImageGen calls produced *wrong* unrelated text: ce465302-3d95-480a-b947-dfec8129e8cd SHA4870bc4080ec (아웃런 2006 logo) and ccf6141f-0fe6-4ad5-b087-d8f03c0f2c76 SHA1781c21443f0 (아웃런 logo), 1536x1024 RGBA; correct 타임 어택 모드 absent. Producer FAIL, generated PNG unpublished (local-only), valid transparent Korean glyph 0, native DXT5 imagegen consumer unsupported and CLEAN C2 PLATE_PASS absent, trial DDS0, official DDS changed0. C2/C3 NOT_RUN, user game/RUNTIME_VALIDATION=UNTESTED, previous q102 REWORK preserved; no reattempt same failed method. Evidence localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2010_WRONG_LABEL_IMAGEGEN_HOLD.json; RUN_KEY=OUTRUN-KOR-C1-Q102-IMAGEGEN-WRONG-LABEL-20261011-2010",
     "A244 2026-10-11 20:09 KST A explicit P0 q012 C388 first native rounding/bevel material method-change produced genuinely new saved trial DDS SHA 4f18c54903fce5ad2bb1ca0f65e9b9e90664d7d5ee887df7eb2aa8a32c534633 vs official 1df64df712f990ee5d92c53998269604ff7b9fc4ccdff8913d648f18aa604013 UNCHANGED. Native BGRA 1024x256, 84228 changed RGBA inside canonical x4 English source bbox [32,80,992,216] and zero outside, canonical source SHA42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352, true transparent CLEAN. Firsthand source/old/CLEAN/glyph/SAVED visible GRAY/BLACK/WHITE 100/75/50 and RAW producer scoped PASS for real 계/속 strokes/받침/?, source bevel optical fidelity requires C2. Width disparity not QA defect per 2026-10-11 glyph scale. New trial 1 / official DDS 0. Independent C2/C3, PJR001 user JPG and actual-game still OPEN; RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_A/20261011-A244-Q012-ROUNDED-SOURCE-BEVEL-TRIAL/A244_CONTROLLER_FIRSTHAND_VISUAL_QA.json; worker 38134295289 SUCCESS. RUN_KEY=OUTRUN-KOR-A244-Q012-C388-ROUND-BEVEL-NATIVE-20261011-2000",
@@ -16402,5 +16403,21 @@
     "blind_calibration": "HOLD",
     "runtime_validation": "UNTESTED",
     "evidence": "localization/graphics/role_C/20261011-C2-Q044-STRICT-NATIVE-SOURCE-FAMILY/C2_Q044_NEW_SOURCE_FAMILY_REWORK.json"
+  },
+  "b375_q060_real_imagegen_transparent_glyph_20261011": {
+    "role": "B",
+    "index": 60,
+    "target": "최고 기록:",
+    "generation_id": "452d8880-03b1-4909-bf1e-5cdfc1e7e504",
+    "raw_generated_sha256": "b00868d0fa7fd83e6d4689e5563f7b5ced93801faa23f04885b9c48ff542b903",
+    "local_derived_sha256": "3a542625426b2c896b8bcf7f04c589e7450893295048be1a4144582a0a8b00ab",
+    "producer_stage": "SOURCE_FAMILY_HOLD_LOCAL_ONLY",
+    "generated_png_remote": false,
+    "new_dds": 0,
+    "official_promotion": 0,
+    "C2": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "run_key": "OUTRUN-KOR-B375-Q060-REAL-IMAGEGEN-TRANSPARENT-GLYPH-20261011-2030"
   }
 }
