@@ -78,6 +78,23 @@ def dds_rgba_read(data: bytes) -> np.ndarray:
         return np.asarray(im.convert("RGBA"))[::-1].copy()
 
 
+def dds_rgba_encode(template: bytes, readable: np.ndarray) -> bytes:
+    """Persist in ORIGINAL DDS byte channel ordering; never assume RGBA/BGRA."""
+    masks = struct.unpack_from("<IIII", template, 92)
+    positions=[]
+    for mask in masks:
+        if mask not in (0x000000FF,0x0000FF00,0x00FF0000,0xFF000000):
+            raise ValueError("Non-byte-aligned DDS channel mask; HOLD")
+        positions.append((mask.bit_length()-8)//8)
+    if sorted(positions)!=[0,1,2,3]:
+        raise ValueError("Missing/duplicate DDS color channels; HOLD")
+    raw=readable[::-1]
+    payload=np.empty(raw.shape,dtype=np.uint8)
+    for component,position in enumerate(positions):
+        payload[:,:,position]=raw[:,:,component]
+    return template[:128]+payload.tobytes()
+
+
 def png_rgba(data: bytes) -> np.ndarray:
     with Image.open(io.BytesIO(data)) as im:
         if im.format != "PNG" or im.mode != "RGBA":
@@ -224,7 +241,7 @@ def run(repo: Path, manifest: Path) -> dict:
     contamination=np.any(N[y0:y1,x0:x1]!=C[y0:y1,x0:x1],axis=2)&~out_effect[y0:y1,x0:x1]
     if np.any(contamination):
         raise ValueError("Clean-to-final changed outside new text alpha")
-    dds=O0[:128]+N[::-1].tobytes()
+    dds=dds_rgba_encode(O0,N)
     if not np.array_equal(dds_rgba_read(dds),N):
         raise ValueError("Persisted DDS RAW/readable mismatch")
     if digest(dds)==digest(O0):
