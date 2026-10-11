@@ -14064,5 +14064,39 @@
     "QA": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_CONTROLLER_FIRSTHAND_SAVED_QA.json",
     "recipe": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_SHA_BOUND_LETTERING_RECIPE.json"
   },
-  "c2_20261012_q035_a250_first_independent": {"run_key":"OUTRUN-C2-20261012-Q035-A250-FIRST-PERSISTED-PIXEL-INDEPENDENT","queue_index":35,"result":"C2_STATIC_PASS_SCOPED_TWO_TOTAL_RANK_LABELS","candidate_sha256":"5ac62e3ef33ff39277fcef5bd7b00cc36c99666ccd01ac0f5a022e22e37b2369","independent_changed_clean_to_saved_inside":23080,"independent_changed_clean_to_saved_outside":0,"source_clean_outer_halo_legacy_bbox_diff":14182,"source_clean_changed_outside_two_full_original_effect_footprints":0,"new_saved_dds":0,"official_promoted":0,"full_policy_approval":false,"C3":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED","evidence":"localization/graphics/role_C/20261012-C2-Q035-A250-FIRST-INDEPENDENT/C2_Q035_A250_FIRST_INDEPENDENT_QA.json"}
+  "c2_20261012_q035_a250_first_independent": {
+    "run_key": "OUTRUN-C2-20261012-Q035-A250-FIRST-PERSISTED-PIXEL-INDEPENDENT",
+    "queue_index": 35,
+    "result": "C2_STATIC_PASS_SCOPED_TWO_TOTAL_RANK_LABELS",
+    "candidate_sha256": "5ac62e3ef33ff39277fcef5bd7b00cc36c99666ccd01ac0f5a022e22e37b2369",
+    "independent_changed_clean_to_saved_inside": 23080,
+    "independent_changed_clean_to_saved_outside": 0,
+    "source_clean_outer_halo_legacy_bbox_diff": 14182,
+    "source_clean_changed_outside_two_full_original_effect_footprints": 0,
+    "new_saved_dds": 0,
+    "official_promoted": 0,
+    "full_policy_approval": false,
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "evidence": "localization/graphics/role_C/20261012-C2-Q035-A250-FIRST-INDEPENDENT/C2_Q035_A250_FIRST_INDEPENDENT_QA.json"
+  },
+  "c2_20261012_q205_p0_english_source_and_b306_first_independent": {
+    "run_key": "OUTRUN-C2-20261012-Q205-P0-ENGLISH-REFERENCE-B306-FIRST-C2-PIXEL",
+    "index": 205,
+    "role": "C2",
+    "priority": "P0",
+    "candidate_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+    "result": "C2_STATIC_PASS_SCOPED_OPTIONS_RANKINGS_ONLY",
+    "english_only_reference_input_qa": "PASS_SOURCE_VISIBLE_PIXEL_EXACT",
+    "prior_to_candidate_changed_rgba_total": 25528,
+    "prior_to_candidate_outside_two_title_bboxes": 0,
+    "C2_whole_atlas": "HOLD_EVIDENCE_OTHER_21_CELLS",
+    "new_saved_dds": 0,
+    "C3": "NOT_RUN",
+    "imagegen_attached_source": "UNVERIFIED",
+    "user_game": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "official_promoted": 0,
+    "evidence": "localization/graphics/role_C/20261012-C2-Q205-P0-NEW-ENGLISH-REFERENCE-B306-INDEPENDENT/C2_Q205_P0_ENGLISH_GLYPH_INPUT_AND_B306_INDEPENDENT_SCOPED_QA.json"
+  }
 }
