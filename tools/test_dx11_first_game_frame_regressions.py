@@ -315,37 +315,52 @@ def main() -> None:
             "fvf == (rhw | D3DFVF_TEX1)", "fvf == (xyz | D3DFVF_TEX1)",
             "GetTexture(0, tex.GetAddressOf())",
             "tex.As(&capture.texture)",
-            "op != D3DTOP_MODULATE || arg != D3DTA_TEXTURE",
-            "alphaOp != D3DTOP_MODULATE",
+            "const bool modulate = op == D3DTOP_MODULATE && alphaOp == D3DTOP_MODULATE;",
+            "const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;",
+            "(!modulate && !selectTexture) || arg != D3DTA_TEXTURE",
+            "alphaArg1 != D3DTA_TEXTURE",
+            "(modulate && (arg2 != D3DTA_DIFFUSE || alphaArg2 != D3DTA_DIFFUSE))",
+            "capture.selectTexture = selectTexture;",
             "coordIndex != 0 || transformFlags != D3DTTFF_DISABLE || srgb",
             "min != mag || mip != D3DTEXF_NONE",
             "nextColorOp != D3DTOP_DISABLE",
         )) and all(x in mirror for x in (
             "info.Pool == D3DPOOL_DEFAULT",
-            "GetLevelCount() != 1",
+            "GetLevelCount() == 0",
             "D3DFMT_A8R8G8B8", "D3DFMT_X8R8G8B8",
             "LockRect(0, &locked, nullptr, D3DLOCK_READONLY)",
             "capture.texture->UnlockRect(0)",
             "dev->CreateTexture2D(", "dev->CreateShaderResourceView(",
             "state.ComparisonFunc = D3D11_COMPARISON_NEVER",
+            "state.MinLOD = 0.0f;", "state.MaxLOD = 0.0f;",
             "dev->CreateSamplerState(",
         )) and all(x in submit for x in (
             "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "ctx->PSSetShaderResources(0, 1, &boundView)",
             "ctx->PSSetSamplers(0, 1, &boundSampler)",
             "s.sampledPs.Get()",
+            "capture.selectTexture ? s.textureOnlyPs.Get() : s.sampledPs.Get()",
         ))
     assert texture_path_complete(bridge)
     for old, bad in (
         ("fvf == (rhw | D3DFVF_TEX1)", "fvf == rhw"),
-        ("op != D3DTOP_MODULATE || arg != D3DTA_TEXTURE",
-         "op != D3DTOP_MODULATE || arg == D3DTA_TEXTURE"),
-        ("alphaOp != D3DTOP_MODULATE", "alphaOp == D3DTOP_MODULATE"),
+        ("const bool modulate = op == D3DTOP_MODULATE && alphaOp == D3DTOP_MODULATE;",
+         "const bool modulate = op == D3DTOP_MODULATE || alphaOp == D3DTOP_MODULATE;"),
+        ("const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;",
+         "const bool selectTexture = op == D3DTOP_SELECTARG1 || alphaOp == D3DTOP_SELECTARG1;"),
+        ("(!modulate && !selectTexture) || arg != D3DTA_TEXTURE",
+         "(!modulate && !selectTexture) && arg != D3DTA_TEXTURE"),
+        ("(modulate && (arg2 != D3DTA_DIFFUSE || alphaArg2 != D3DTA_DIFFUSE))",
+         "(modulate && (arg2 != D3DTA_DIFFUSE && alphaArg2 != D3DTA_DIFFUSE))"),
+        ("capture.selectTexture = selectTexture;", "capture.selectTexture = false;"),
         ("info.Pool == D3DPOOL_DEFAULT", "info.Pool == D3DPOOL_SYSTEMMEM"),
-        ("GetLevelCount() != 1", "GetLevelCount() == 1"),
+        ("GetLevelCount() == 0", "GetLevelCount() != 1"),
+        ("state.MaxLOD = 0.0f;", "state.MaxLOD = D3D11_FLOAT32_MAX;"),
         ("capture.texture->UnlockRect(0)", "/* missing texture unlock */"),
         ("ctx->PSSetShaderResources(0, 1, &boundView)",
          "/* no native shader texture binding */"),
+        ("capture.selectTexture ? s.textureOnlyPs.Get() : s.sampledPs.Get()",
+         "s.sampledPs.Get()"),
     ):
         mutated = bridge.replace(old, bad, 1)
         assert mutated != bridge and not texture_path_complete(mutated), (
@@ -354,9 +369,25 @@ def main() -> None:
     assert "xyz[2] * w" in bridge and "v.clip[3] = w;" in bridge
     assert "float2 uv : TEXCOORD0" in bridge
     assert "gameTexture.Sample(gameSampler, v.uv) * v.diffuse" in bridge
+    assert "float4 PSTextureOnly(VOut v) : SV_Target { return gameTexture.Sample(gameSampler, v.uv); }" in bridge
+    assert '!compile("PSTextureOnly", "ps_4_0", textureOnlyCode)' in bridge
+    assert "s.textureOnlyPs.Reset();" in bridge
     assert "if (!capture.enabled && (op != D3DTOP_SELECTARG1 || arg != D3DTA_DIFFUSE))" in bridge
+    # RGB and alpha must use the *same* supported operation: rejecting mixed
+    # SELECTARG1/MODULATE keeps the original game draw authoritative.
+    MODULATE, SELECTARG1 = 4, 2
+    for color_op, alpha_op, supported in (
+        (MODULATE, MODULATE, True),
+        (SELECTARG1, SELECTARG1, True),
+        (MODULATE, SELECTARG1, False),
+        (SELECTARG1, MODULATE, False),
+        (0, 0, False),
+    ):
+        admitted = ((color_op == MODULATE and alpha_op == MODULATE)
+                    or (color_op == SELECTARG1 and alpha_op == SELECTARG1))
+        assert admitted == supported
 
-    print("DX11 live game diagnostic sampling/lifetime/fallback/inset/textured draw regression PASS (static only)")
+    print("DX11 live game diagnostic TEX1 select/modulate, mip0 mirror, draw/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":
