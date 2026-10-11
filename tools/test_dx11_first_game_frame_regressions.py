@@ -1774,6 +1774,77 @@ def main() -> None:
         assert texture_alpha != diffuse_alpha
     print("DX11 ADDSMOOTH mixed-alpha game native Draw PASS (static only)")
 
+
+    # 00566 — game D3D9 independent alpha on MODULATE2X/4X RGB.
+    # These are source+CPU controls, never Quest3/VDXR runtime evidence.
+    scaled_alpha_variants = (
+        ("2", "Texture", "t.a", "1"),
+        ("2", "Diffuse", "v.diffuse.a", "2"),
+        ("4", "Texture", "t.a", "1"),
+        ("4", "Diffuse", "v.diffuse.a", "2"),
+    )
+    def scaled_alpha_linked(code: str) -> bool:
+        intake = code[code.find("bool supported_game_state("):code.find("bool translate_vertices(")]
+        submit = code[code.find("bool submit("):code.find("void observe(")]
+        required = (
+            "GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)",
+            "!modulate2xTextureAlpha && !modulate2xDiffuseAlpha",
+            "!modulate4xTextureAlpha && !modulate4xDiffuseAlpha",
+            "!modulate2xDiffuseAlpha && !modulate4xDiffuseAlpha",
+            "modulate2xDiffuseAlpha || modulate4xDiffuseAlpha",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+        )
+        if not all(v in code for v in required):
+            return False
+        for scale, source, alpha, selector in scaled_alpha_variants:
+            stem = f"modulate{scale}x{source}Alpha"
+            shader = f"PSTextureModulate{scale}X{source}Alpha"
+            cache = f"s.{stem}Ps"
+            bc = f"modulate{scale}x{source}Code"
+            for evidence in (
+                f"bool {stem} = false;",
+                f"ComPtr<ID3D11PixelShader> {stem}Ps;",
+                f"const bool {stem} = op == D3DTOP_MODULATE{scale}X && alphaOp == D3DTOP_SELECTARG{selector};",
+                f"capture.{stem} = {stem};",
+                f"float4 {shader}(VOut v) : SV_Target {{",
+                f"float4 c = float4(saturate({scale}.0f * t.rgb * v.diffuse.rgb), {alpha});",
+                f'compile("{shader}", "ps_4_0", {bc})',
+                f"{cache}.GetAddressOf()",
+                f"{cache} &&",
+                f"capture.{stem} ? {cache}.Get() :",
+            ):
+                if evidence not in code: return False
+            if code.count(f"{cache}.Reset();") != 2: return False
+        return "alphaArg2Diffuse" in intake and "ctx->PSSetShader(" in submit
+    assert scaled_alpha_linked(bridge)
+    for scale, source, alpha, selector in scaled_alpha_variants:
+        stem = f"modulate{scale}x{source}Alpha"
+        for token in (
+            f"capture.{stem} = {stem};",
+            f"capture.{stem} ? s.{stem}Ps.Get() :",
+            f'compile("PSTextureModulate{scale}X{source}Alpha", "ps_4_0", modulate{scale}x{source}Code)',
+            f"float4 c = float4(saturate({scale}.0f * t.rgb * v.diffuse.rgb), {alpha});",
+        ):
+            mutant = bridge.replace(token, "/* disconnected 00566 flow */", 1)
+            assert mutant != bridge and not scaled_alpha_linked(mutant), token
+    for color, alpha, allowed in (
+        (5, 2, True), (5, 3, True), (6, 2, True), (6, 3, True),
+        (5, 4, False), (6, 7, False), (4, 2, False), (7, 3, False)
+    ):
+        assert (color in (5, 6) and alpha in (2, 3)) is allowed
+    for tex, diffuse in (
+        ((0.15, 0.7, 0.9, 0.2), (0.8, 0.6, 0.8, 0.9)),
+        ((0.8, 0.3, 0.1, 0.8), (0.9, 0.6, 0.5, 0.1))
+    ):
+        for factor in (2, 4):
+            rgb = tuple(min(1.0, factor * t * d) for t,d in zip(tex[:3], diffuse[:3]))
+            assert (*rgb, tex[3])[:3] == (*rgb, diffuse[3])[:3]
+            assert (*rgb, tex[3])[3] != (*rgb, diffuse[3])[3]
+            assert all(0.0 <= value <= 1.0 for value in rgb)
+    print("DX11 MODULATE2X/4X independent alpha native Draw PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
