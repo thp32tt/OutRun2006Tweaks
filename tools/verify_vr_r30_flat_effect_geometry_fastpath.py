@@ -11,8 +11,11 @@ SOURCE = Path(__file__).resolve().parents[1] / "src/vr/d3d9/stereo_renderer_r30.
 
 
 def validate(source: str) -> None:
-    cache = source.split("struct R30FlatEffectGeometryCache", 1)[1].split(
-        "bool R30BuildScreenSpaceEyeConstants", 1)[0]
+    # Isolate only the new cache helper. The older eye-affine HUD cache
+    # also has a poseSequence key and must never satisfy this assertion.
+    cache = source.split(
+        "const R30FlatEffectGeometryCache* R30PrepareFlatEffectGeometry", 1
+    )[1].split("bool R30BuildScreenSpaceEyeConstants", 1)[0]
     draw = source.split("bool R30BuildScreenSpaceEyeConstants", 1)[1].split(
         "template <typename ActualDraw>", 1)[0]
     hud = source.split("HRESULT R30TryScreenSpaceFovDraw", 1)[1].split(
