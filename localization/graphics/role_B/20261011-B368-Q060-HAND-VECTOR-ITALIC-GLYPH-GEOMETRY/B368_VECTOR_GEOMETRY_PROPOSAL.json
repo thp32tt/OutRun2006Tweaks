@@ -9,7 +9,7 @@
   "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
   "official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
   "rejected_prior_B367_sha256": "52d97f845b7b3e588ebe5136cd299882001d509320fd4f8cc910270f314142d9",
-  "geometry_sha256": "f048794fbd985bba52d85e9d247871bf516658bc3bcfd25386e58d232e26f221",
+  "geometry_sha256": "e558662b08b4d256e0bcb047e1c51fa2ba26ce1cfae19ef69fda8befee057175",
   "source_raw_png_sha256": "ac0957d2b63a8d83851830ea1315e671efcc3771c92b78c786d50bee0be23907",
   "original_effect_bbox": [
     2179,
@@ -20,10 +20,10 @@
   "new_geometry_bbox": [
     2215,
     346,
-    2997,
+    2999,
     464
   ],
-  "new_shape_vs_B367_binary_symmetric_difference_pixels": 3104007,
+  "new_shape_vs_B367_binary_symmetric_difference_pixels": 34374,
   "native_ppem": "hand-authored 4x AA stroke paths -> exactly one native L downsample",
   "font": "NONE_HAND_AUTHORED",
   "glyph_inventory": [
@@ -55,19 +55,19 @@
   "evidence": [
     {
       "path": "localization/graphics/role_B/20261011-B368-Q060-HAND-VECTOR-ITALIC-GLYPH-GEOMETRY/B368_SOURCE_CLEAN_OFFICIAL_B367_MANUAL_GEOMETRY_FLIPY_BG128_100.png",
-      "sha256": "0e0cf10e128e706970a9cac425df9501efac05fadbd1f72e8839565cabe05264"
+      "sha256": "bfa2140deb196a622364e87471523953f247a3c42d183c9d95f6765d7bf0aa7a"
     },
     {
       "path": "localization/graphics/role_B/20261011-B368-Q060-HAND-VECTOR-ITALIC-GLYPH-GEOMETRY/B368_SOURCE_CLEAN_OFFICIAL_B367_MANUAL_GEOMETRY_FLIPY_BG255_75.png",
-      "sha256": "fd052bfa452ccee78420d32174a2649487ba71d43b51e5a6e8d8994b39ff9b84"
+      "sha256": "e3c35bb7e51bf58016837ed18c28866a0e70ed912a97b858205ab90c1cb3624d"
     },
     {
       "path": "localization/graphics/role_B/20261011-B368-Q060-HAND-VECTOR-ITALIC-GLYPH-GEOMETRY/B368_SOURCE_CLEAN_OFFICIAL_B367_MANUAL_GEOMETRY_FLIPY_BG0_50.png",
-      "sha256": "493bc61d70900cd3d184c1cb3f23421d6ebb19a04ffa2f1e11dad299ccf707e7"
+      "sha256": "5f655b92f6b5cf57dc083c4bd8bb4c349aa2d51017d8b68fd6acca92d675e6ba"
     },
     {
       "path": "localization/graphics/role_B/20261011-B368-Q060-HAND-VECTOR-ITALIC-GLYPH-GEOMETRY/B368_SOURCE_CLEAN_OFFICIAL_B367_MANUAL_GEOMETRY_RAW_BG128_100.png",
-      "sha256": "1a5024e4b4d59d0a3db34467bdbf8156a8177d7bce6bf4b098e2eb2349b6cd45"
+      "sha256": "4a17557b843281cd50b3bbf4097af8d7788a47de1b7276ac7cbc7223822c2dc8"
     }
   ],
   "producer_next": "Controller must inspect shape and counters at native/50/RAW before constructing separate face/rim/extrusion/highlight and encoding saved DDS."
