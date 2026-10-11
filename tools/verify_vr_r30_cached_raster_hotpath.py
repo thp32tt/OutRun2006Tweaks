@@ -61,6 +61,18 @@ def check(r29, api, r30):
             return False
         if "(!R29OwnerTryGetTrackedViewport(state.viewport) &&" not in xyz:
             return False
+        # The XYZRHW world-vs-HUD depth discriminator must reuse the
+        # coherent R29 effect state, but never trust an invalidated snapshot.
+        depthUse = xyz.index("R29OwnerTryGetEffectTelemetrySnapshot(depthEffect)")
+        depthFallback = xyz.index("if (!haveCachedDepth &&")
+        if not depthUse < depthFallback < xyz.index(
+                "state.depthTestEnabled = zEnable != D3DZB_FALSE"):
+            return False
+        if not all(term in xyz for term in (
+            "haveCachedDepth",
+            "? depthEffect.zEnable : D3DZB_FALSE",
+            "FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable))")):
+            return False
         return True
     except ValueError:
         return False
@@ -93,11 +105,23 @@ def main():
         (r29, api, r30.replace(
             "!R29OwnerTryGetTrackedViewport(state.viewport)",
             "false", 1)),
+        (r29, api, r30.replace(
+            "R29OwnerTryGetEffectTelemetrySnapshot(depthEffect)",
+            "false", 1)),
+        (r29, api, r30.replace(
+            "? depthEffect.zEnable : D3DZB_FALSE",
+            "? D3DZB_FALSE : D3DZB_FALSE", 1)),
+        (r29, api, r30.replace(
+            "if (!haveCachedDepth &&",
+            "if (false &&", 1)),
+        (r29, api, r30.replace(
+            "FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)))",
+            "false)", 1)),
     )
     for i, candidate in enumerate(changes, 1):
         assert candidate != (r29, api, r30), f"mutation {i} not applied"
         assert not check(*candidate), f"mutation {i} escaped"
-    print("PASS DX9Ex R30 cached raster hotpath + 7 destructive regressions")
+    print("PASS DX9Ex R30 cached raster hotpath + 11 destructive regressions")
 
 
 if __name__ == "__main__":

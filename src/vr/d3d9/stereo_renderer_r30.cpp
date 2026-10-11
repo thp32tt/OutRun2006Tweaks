@@ -1742,8 +1742,17 @@ namespace OutRunVRStereo
                 state.viewport.MaxZ <= state.viewport.MinZ)
                 return false;
 
-            DWORD zEnable = D3DZB_FALSE;
-            if (FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)))
+            // R29's verified setter/StateBlock effect snapshot is the same
+            // state used by stereo depth guards. Avoid one synchronous D3D9
+            // driver read per XYZRHW draw while that snapshot is coherent.
+            // On any cache-coverage/generation loss, preserve the live read.
+            R29OwnerEffectTelemetrySnapshot depthEffect{};
+            const bool haveCachedDepth =
+                R29OwnerTryGetEffectTelemetrySnapshot(depthEffect);
+            DWORD zEnable = haveCachedDepth
+                ? depthEffect.zEnable : D3DZB_FALSE;
+            if (!haveCachedDepth &&
+                FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)))
                 return false;
             state.depthTestEnabled = zEnable != D3DZB_FALSE;
 
