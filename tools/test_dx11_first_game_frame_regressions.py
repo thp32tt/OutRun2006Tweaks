@@ -352,10 +352,12 @@ def main() -> None:
             "tex.As(&capture.texture)",
             "const bool modulate = op == D3DTOP_MODULATE && alphaOp == D3DTOP_MODULATE;",
             "const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;",
-            "(!modulate && !selectTexture) || arg != D3DTA_TEXTURE",
+            "const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;",
+            "(!modulate && !selectTexture && !additive) || arg != D3DTA_TEXTURE",
             "alphaArg1 != D3DTA_TEXTURE",
-            "(modulate && (arg2 != D3DTA_DIFFUSE || alphaArg2 != D3DTA_DIFFUSE))",
+            "((modulate || additive) && (arg2 != D3DTA_DIFFUSE || alphaArg2 != D3DTA_DIFFUSE))",
             "capture.selectTexture = selectTexture;",
+            "capture.additive = additive;",
             "coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb",
             "capture.coordIndex = coordIndex;",
             "min != mag || mip != D3DTEXF_NONE",
@@ -375,7 +377,7 @@ def main() -> None:
             "ctx->PSSetShaderResources(0, 1, &boundView)",
             "ctx->PSSetSamplers(0, 1, &boundSampler)",
             "s.sampledPs.Get()",
-            "capture.selectTexture ? s.textureOnlyPs.Get() : s.sampledPs.Get()",
+            "capture.selectTexture ? s.textureOnlyPs.Get() :\n                      capture.additive ? s.additivePs.Get() : s.sampledPs.Get()",
         ))
     assert texture_path_complete(bridge)
     for old, bad in (
@@ -386,18 +388,21 @@ def main() -> None:
          "const bool modulate = op == D3DTOP_MODULATE || alphaOp == D3DTOP_MODULATE;"),
         ("const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;",
          "const bool selectTexture = op == D3DTOP_SELECTARG1 || alphaOp == D3DTOP_SELECTARG1;"),
-        ("(!modulate && !selectTexture) || arg != D3DTA_TEXTURE",
+        ("(!modulate && !selectTexture && !additive) || arg != D3DTA_TEXTURE",
          "(!modulate && !selectTexture) && arg != D3DTA_TEXTURE"),
-        ("(modulate && (arg2 != D3DTA_DIFFUSE || alphaArg2 != D3DTA_DIFFUSE))",
+        ("((modulate || additive) && (arg2 != D3DTA_DIFFUSE || alphaArg2 != D3DTA_DIFFUSE))",
          "(modulate && (arg2 != D3DTA_DIFFUSE && alphaArg2 != D3DTA_DIFFUSE))"),
         ("capture.selectTexture = selectTexture;", "capture.selectTexture = false;"),
+        ("capture.additive = additive;", "capture.additive = false;"),
+        ("const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;",
+         "const bool additive = op == D3DTOP_ADD || alphaOp == D3DTOP_ADD;"),
         ("info.Pool == D3DPOOL_DEFAULT", "info.Pool == D3DPOOL_SYSTEMMEM"),
         ("GetLevelCount() == 0", "GetLevelCount() != 1"),
         ("state.MaxLOD = 0.0f;", "state.MaxLOD = D3D11_FLOAT32_MAX;"),
         ("capture.texture->UnlockRect(0)", "/* missing texture unlock */"),
         ("ctx->PSSetShaderResources(0, 1, &boundView)",
          "/* no native shader texture binding */"),
-        ("capture.selectTexture ? s.textureOnlyPs.Get() : s.sampledPs.Get()",
+        ("capture.selectTexture ? s.textureOnlyPs.Get() :\n                      capture.additive ? s.additivePs.Get() : s.sampledPs.Get()",
          "s.sampledPs.Get()"),
     ):
         mutated = bridge.replace(old, bad, 1)
@@ -413,18 +418,44 @@ def main() -> None:
     assert "if (!capture.enabled && (op != D3DTOP_SELECTARG1 || arg != D3DTA_DIFFUSE))" in bridge
     # RGB and alpha must use the *same* supported operation: rejecting mixed
     # SELECTARG1/MODULATE keeps the original game draw authoritative.
-    MODULATE, SELECTARG1 = 4, 2
+    MODULATE, SELECTARG1, ADD = 4, 2, 7
     for color_op, alpha_op, supported in (
         (MODULATE, MODULATE, True),
         (SELECTARG1, SELECTARG1, True),
+        (ADD, ADD, True),
+        (MODULATE, ADD, False),
+        (ADD, SELECTARG1, False),
         (MODULATE, SELECTARG1, False),
         (SELECTARG1, MODULATE, False),
         (0, 0, False),
     ):
         admitted = ((color_op == MODULATE and alpha_op == MODULATE)
-                    or (color_op == SELECTARG1 and alpha_op == SELECTARG1))
+                    or (color_op == SELECTARG1 and alpha_op == SELECTARG1)
+                    or (color_op == ADD and alpha_op == ADD))
         assert admitted == supported
 
+
+    # 00553 positive/negative linkage: real game stage0 ADD dispatches a
+    # saturating RGBA pixel shader. No actual HMD/desktop pixels are inferred.
+    required_add = (
+        "float4 PSTextureAdd(VOut v) : SV_Target { float4 c = saturate(gameTexture.Sample(gameSampler, v.uv) + v.diffuse); AlphaGate(c.a); return c; }",
+        '!compile("PSTextureAdd", "ps_4_0", additiveCode)',
+        "s.additivePs.Reset();",
+        "s.sampledPs && s.textureOnlyPs && s.additivePs &&",
+        "capture.additive ? s.additivePs.Get() : s.sampledPs.Get()",
+        "const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;",
+        "capture.additive = additive;",
+    )
+    assert all(token in bridge for token in required_add)
+    for token in required_add:
+        mutated = bridge.replace(token, "/* ADD disconnected */", 1)
+        assert mutated != bridge and token not in mutated
+    for texel, diffuse, expected in (
+        ((0.8, 0.1, 0.5, 0.75), (0.4, 0.6, 0.7, 0.5), (1.0, 0.7, 1.0, 1.0)),
+        ((0.0, 0.2, 0.0, 0.0), (0.2, 0.0, 0.7, 0.5), (0.2, 0.2, 0.7, 0.5)),
+    ):
+        actual = tuple(min(1.0, t + d) for t, d in zip(texel, diffuse))
+        assert all(abs(a - b) < 1e-6 for a, b in zip(actual, expected))
 
     # Menu/race sprite alpha is now an actual D3D9-state -> PS/OM pipeline
     # integration. These destructive source mutations reject accidental native

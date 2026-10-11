@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00553",
+  "production_id": "CONVERSION-DX11-00553",
+  "event_id": "CONVERSION-DX11-00553-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00553",
+  "attempt": "1/3",
+  "work_key": "DX11:MENU_RACE_STAGE0_ADD_RGBA_NATIVE_SHADER",
+  "base_sha": "33bb900e26af82779815e61a37544208876e923a",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Game D3D9 FVF TEX1..8 and ADD stage0",
+      "D3D11 saturated ADD RGBA shader, lifecycle and draw dispatch",
+      "Opt-in diagnostic inset, original DX9Ex gamepad/Draw fallback"
+    ],
+    "batch_components": [
+      "C++ state admission and alpha/texture arguments",
+      "C++ native pixel shader compile/resource/Draw binding",
+      "Python positive and destructive negative mutations including saturating RGBA vectors"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "PENDING_EXACT_SHA",
+      "negative_regression": "PENDING_EXACT_SHA",
+      "component_integration": "Real D3D9 stage ADD -> D3D11 shader/SRV -> Draw/DrawIndexed -> diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_STAGE0_ADD_RGBA_NATIVE_SHADER",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:STAGE0_ADD"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "STAGE0_ADD",
+      "D3D11_NATIVE_DRAW",
+      "PRESENT_INSET"
+    ],
+    "visible_frame_acceptance": "CI/build required, HMD/game pixels untested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only; original D3D9 always draws; mixed ops fail closed"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00553.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "33bb900e26af82779815e61a37544208876e923a",
+    "C1_REVIEW": "00552 complete; unmapped D3DTOP_ADD game stage",
+    "C2_IMPLEMENT": "Shader+state+dispatch+regression implementation",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING"
+  },
+  "feature_status": "SOURCE_INTEGRATED_CI_PENDING",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "next_action": "Check exact SHA actions and record separate C6, Quest3 UNTESTED"
+}
