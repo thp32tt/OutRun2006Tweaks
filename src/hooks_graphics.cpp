@@ -1822,7 +1822,7 @@ class VSyncOverride : public Hook
             spdlog::info("VR DX9Ex AA: Off, independent of 2D game AA");
             return;
         }
-        if (vrMode != 1 && vrMode != 2)
+        if (vrMode != 1 && vrMode != 2 && vrMode != 4)
         {
             spdlog::warn("VR DX9Ex AA: invalid level {}, using Off", vrMode);
             return;
@@ -1847,14 +1847,19 @@ class VSyncOverride : public Hook
 			colorFormat = mode.Format;
 		}
 
-        // 2x never escalates to 4x. The 4x option may fall back to 2x.
+        // 2x never escalates. 4x may fall back to 2x. 8x is
+        // opt-in and tries 8x -> 4x -> 2x; unsupported modes fail closed.
+        // Preserve mode 3 as "Use Game AA" for existing user INI files.
 		const D3DMULTISAMPLE_TYPE candidates[] = {
+            D3DMULTISAMPLE_8_SAMPLES,
 			D3DMULTISAMPLE_4_SAMPLES,
 			D3DMULTISAMPLE_2_SAMPLES
 		};
 		for (const auto sampleType : candidates)
 		{
             if (vrMode == 1 && sampleType != D3DMULTISAMPLE_2_SAMPLES)
+                continue;
+            if (vrMode == 2 && sampleType == D3DMULTISAMPLE_8_SAMPLES)
                 continue;
 			DWORD colorQuality = 0;
 			if (FAILED(Game::D3D()->CheckDeviceMultiSampleType(

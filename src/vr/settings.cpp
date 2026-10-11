@@ -34,8 +34,8 @@ namespace Settings
     // VR quality is independent of the original game's [DX] ANTIALIASING.
     // D3D9Ex MSAA buffer allocations only change after a game restart.
     Setting<int> VRAntiAliasing{ "VR", "AntiAliasing", 2,
-        "VR-only MSAA level: Off minimizes GPU load, 2x/4x are optional, and Use Game AA restores the 2D AA request. Restart required.",
-        { "Off (fastest)", "2x MSAA", "4x MSAA (fallback 2x)", "Use Game/2D AA" } };
+        "VR-only MSAA level: Off/2x/4x or optional 8x (fallback 4x/2x); 8x may worsen crowded-stage GPU frame drops. Use Game AA restores 2D request. Restart required.",
+        { "Off (fastest)", "2x MSAA", "4x MSAA (fallback 2x)", "Use Game/2D AA", "8x MSAA (fallback 4x/2x; costly)" } };
     Setting<bool> VRTransparencySupersampling{ "VR", "TransparencySupersampling", false,
         "Enable extra NVIDIA transparency SSAA in VR (costly). Off by default; the original 2D Graphics setting is unchanged. Restart required." };
     Setting<bool> VRAutoRenderResolution{ "VR", "AutoRenderResolution", true,

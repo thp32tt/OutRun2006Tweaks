@@ -6,6 +6,7 @@ source = (ROOT / "src/hooks_graphics.cpp").read_text(encoding="utf-8")
 required = (
     '"OUTRUN_VR_BACKEND"',
     'lstrcmpiA(backend, "d3d9") == 0',
+    'D3DMULTISAMPLE_8_SAMPLES',
     'D3DMULTISAMPLE_4_SAMPLES',
     'D3DMULTISAMPLE_2_SAMPLES',
     'CheckDeviceMultiSampleType',
@@ -14,6 +15,8 @@ required = (
     'params.MultiSampleType = D3DMULTISAMPLE_NONE;',
     'const int vrMode = Settings::VRAntiAliasing.get();',
     'if (vrMode == 3)',
+    'vrMode != 1 && vrMode != 2 && vrMode != 4',
+    'vrMode == 2 && sampleType == D3DMULTISAMPLE_8_SAMPLES',
     'if (vrMode == 0)',
     'vrMode == 1 && sampleType != D3DMULTISAMPLE_2_SAMPLES',
     'using Off (not game 2D AA)',
@@ -28,8 +31,14 @@ if missing:
 block_start = source.index("static void ConfigureReferenceVRMSAA()")
 block_end = source.index("static void destination(safetyhook::Context& ctx)", block_start)
 block = source[block_start:block_end]
-if block.index("D3DMULTISAMPLE_4_SAMPLES") > block.index("D3DMULTISAMPLE_2_SAMPLES"):
-    raise SystemExit("DX9Ex MSAA policy must try 4x before 2x")
+if not (block.index("D3DMULTISAMPLE_8_SAMPLES") <
+        block.index("D3DMULTISAMPLE_4_SAMPLES") <
+        block.index("D3DMULTISAMPLE_2_SAMPLES")):
+    raise SystemExit("DX9Ex MSAA candidates must descend 8x->4x->2x")
+if block.index('if (vrMode == 3)') >= block.index('const D3DMULTISAMPLE_TYPE candidates[]'):
+    raise SystemExit("Legacy mode 3 must still be Use Game/2D AA")
+if 'if (vrMode == 2 && sampleType == D3DMULTISAMPLE_8_SAMPLES)' not in block:
+    raise SystemExit("4x must not silently become 8x")
 if 'lstrcmpiA(backend, "d3d9") == 0' not in source:
     raise SystemExit("DX9Ex MSAA policy must be isolated to the d3d9 backend")
 if "D3DSWAPEFFECT_DISCARD" not in block:
@@ -49,7 +58,7 @@ overlay = (ROOT / "src/overlay/settings_ui.cpp").read_text(encoding="utf-8")
 ini = (ROOT / "OutRun2006Tweaks.ini").read_text(encoding="utf-8")
 for marker in (
     '"VR", "AntiAliasing", 2',
-    '"Off (fastest)", "2x MSAA", "4x MSAA (fallback 2x)", "Use Game/2D AA"',
+    '"Off (fastest)", "2x MSAA", "4x MSAA (fallback 2x)", "Use Game/2D AA", "8x MSAA (fallback 4x/2x; costly)"',
     '"VR", "TransparencySupersampling", false',
     "Settings::VRAntiAliasing.needs_restart();",
     "Settings::VRTransparencySupersampling.needs_restart();",
@@ -75,10 +84,11 @@ if block.index("if (vrMode == 3)") > block.index("params.MultiSampleType = D3DMU
 if block.index("if (vrMode == 0)") > block.index("CheckDeviceMultiSampleType"):
     raise SystemExit("Off must avoid costly multisample capability checks")
 
-# Four negative mutations ensure these are functional gates, not just menu labels.
+# Five negative mutations ensure functional gates, not just menu labels.
 negative_mutations = [
     ('params.MultiSampleType = D3DMULTISAMPLE_NONE;', '/* removed off override */'),
     ('vrMode == 1 && sampleType != D3DMULTISAMPLE_2_SAMPLES', 'false'),
+    ('vrMode == 2 && sampleType == D3DMULTISAMPLE_8_SAMPLES', 'false'),
     ('if (vrMode == 3)', 'if (vrMode == 5)'),
     ('!activeNativeVr || Settings::VRTransparencySupersampling', 'true'),
 ]
@@ -89,6 +99,7 @@ for before, after in negative_mutations:
     witness = before not in changed and (
         before in required or
         before in ('if (vrMode == 3)', 'vrMode == 1 && sampleType != D3DMULTISAMPLE_2_SAMPLES',
+                   'vrMode == 2 && sampleType == D3DMULTISAMPLE_8_SAMPLES',
                    '!activeNativeVr || Settings::VRTransparencySupersampling')
     )
     if not witness: raise SystemExit(f"negative mutation not detected: {before}")
@@ -108,4 +119,9 @@ if "-WindowStyle Hidden" not in selector or "FormWindowState]::Minimized" not in
     raise SystemExit("Game launch must not leave PowerShell or selector in foreground")
 if '"VR", "MirrorFitDesktop", true' not in settings or "MirrorFitDesktop = true" not in ini:
     raise SystemExit("Monitor-fit VR mirror default missing")
-print("DX9Ex F11 VR AA 4x default/2x/Off/Game + write isolation/cursor/window: PASS (4 negative mutations)")
+# Default and legacy saved mode remain unchanged while 8x is opt-in.
+if "AntiAliasing = 2" not in ini or 'if (vrMode == 3)' not in block:
+    raise SystemExit("8x option regressed default or legacy Game AA mode")
+if '4=8x MSAA' not in ini or '8x MSAA (fallback 4x/2x; costly)' not in settings:
+    raise SystemExit("8x setting not documented in INI/F11")
+print("DX9Ex F11 VR AA 8x opt-in -> 4x/2x fallback, 4x default, legacy Game AA preserved: PASS (5 negative mutations)")
