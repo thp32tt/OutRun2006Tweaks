@@ -536,11 +536,19 @@ require_order(
     "bool ackSnapshotRead = false;",
     "bool ackSnapshotValid = false;",
     "for (std::uint32_t offset = 0;",
-    "R30SupportPollDirectTransportSlotProducer(index)",
+    "if (candidate.published && candidate.frameId)",
     "if (!ackSnapshotRead)",
     "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
     "ackSnapshotRead = true;",
-    "The host completed this exact published frame. Retire the",
+    "if (!ackSnapshotValid ||",
+    "!R30SupportFrameIdAtOrAfter(gpuCompleted, candidate.frameId)",
+    "ackBlocked = true;",
+    "R30SupportPollDirectTransportSlotProducer(index)",
+    "if (ready == S_FALSE)",
+    "if (FAILED(ready))",
+    "R32DirectCopyPathRejected = true;",
+    "// Both the host's exact-frame ACK and the producer EVENT",
+    "R30SupportRetireDirectTransportSlotPublication(index);",
     "selected = index;",
     "if (selected >= OutRunVR::RenderFrameRingSize)",
     "R30SupportNoteDirectTransportRingBackpressure();",
@@ -550,7 +558,7 @@ require_order(
     "R30SupportMarkDirectTransportSlotPending(selected, frameId);",
     "R30SupportSetActiveDirectTransportSlot(selected);",
 )
-ack_retire_marker = "The host completed this exact published frame. Retire the"
+ack_retire_marker = "// Both the host's exact-frame ACK and the producer EVENT"
 ack_retire_pos = resolve_direct_r32.find(ack_retire_marker)
 if ack_retire_pos < 0:
     fail("R32 ACK-completed publication retirement marker missing")
@@ -629,7 +637,7 @@ require(
     "if (!ackSnapshotRead)",
     "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
     "ackSnapshotRead = true;",
-    "const bool ackValid = ackSnapshotValid;",
+    "const std::uint32_t gpuCompleted = ackSnapshotValid",
     "ackSnapshot.completedFrameId[index]",
 )
 if resolve_direct_r32.count("R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)") != 1:
