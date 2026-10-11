@@ -127,6 +127,14 @@ class EvidenceGateTest(unittest.TestCase):
         backlog.write_text("queue_index,status\n154,OPEN_USER_INGAME_FAIL\n", encoding="utf-8")
         self.assertIn("active user in-game regression blocks approval", self.check())
 
+    def test_open_ingame_status_with_suffix_still_vetoes_approval(self):
+        backlog = self.root / "localization/graphics/INGAME_REWORK_BACKLOG.csv"
+        backlog.parent.mkdir(parents=True, exist_ok=True)
+        backlog.write_text(
+            "queue_index,status\\n154,OPEN_USER_INGAME_FAIL_C388_REWORK_PENDING\\n".replace("\\n", "\n"),
+            encoding="utf-8")
+        self.assertIn("active user in-game regression blocks approval", self.check())
+
     def test_other_open_ingame_index_does_not_block_this_candidate(self):
         backlog = self.root / "localization/graphics/INGAME_REWORK_BACKLOG.csv"
         backlog.parent.mkdir(parents=True, exist_ok=True)
