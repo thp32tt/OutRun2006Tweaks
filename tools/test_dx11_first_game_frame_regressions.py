@@ -2593,6 +2593,10 @@ def main() -> None:
             if ta == 0.1: assert alpha < 1.0
     print("DX11 independent MODULATE2X/4X alpha game native Draw PASS (static only)")
 
+    # 00575 game Draw -> four scaled-alpha PS variants -> DrawIndexed/Draw -> inset.
+    from test_dx11_scaled_blend_alpha_00575 import run as run_00575
+    run_00575()
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
