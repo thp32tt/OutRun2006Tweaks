@@ -2,20 +2,20 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00591",
   "production_id": "CONVERSION-DX9EX-00591",
-  "event_id": "CONVERSION-DX9EX-00591-E001",
+  "event_id": "CONVERSION-DX9EX-00591-E025",
   "lane": "DX9EX",
   "feature_id": "DX9EX:R84_RENDERER_GRAPH",
   "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00591",
   "target_branch": "vr-d3d9ex-focus",
   "work_key": "DX9EX:R84_RENDERER_GRAPH",
   "feature_status": "FEATURE_READY",
-  "status": "IN_PROGRESS",
-  "checkpoint": "FEATURE_READY_PENDING_CONTROLLER_EXACT_SHA",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "target_head_at_dispatch": "2254210c85f6a94e8b48ed02aeac2fd5166a8d4f",
   "last_implemented_source_sha": "8b9a179a8506be368443514fd8c219e0ec10796d",
-  "validation_bearing_result_sha": "8b9a179a8506be368443514fd8c219e0ec10796d",
+  "validation_bearing_result_sha": "c8cde7d627e8c35a2de60548101c90524ef116d9",
   "material_result_sha": "8b9a179a8506be368443514fd8c219e0ec10796d",
   "feature_contract": {
     "feature_id": "DX9EX:R84_RENDERER_GRAPH",
@@ -105,12 +105,12 @@
       "At feature merge material SHA 8b9a179a8506be368443514fd8c219e0ec10796d, exact-SHA R84 feature Actions #38074313696 SUCCESS: R84-OWNERS/ABI/BUILD-GRAPH/REGRESSION/TEST-BUNDLE steps, Win32 split link, x64 host smokes, R26 baseline, 5.14 MB test ZIP #11677543821. 04:00 controller checkpoint blocker R84-OWNERS is stale.",
       "2026-10-11 E021 remote verification: feature exact source SHA c6cd06ca, workflow #38095865437 all five jobs SUCCESS. R84 owner, ABI, CMake graph, regression, bundle acceptance explicit step success; four artifacts published including full-chain and x64 host. No new C++ changes required."
     ],
-    "integration_contract": "All five R84 feature acceptance IDs PASS on exact feature source SHA c6cd06cafb0f6bc396d4841186d139985f3d8ae7 (Actions #38095865437, all five jobs SUCCESS). Feature is 9 commits ahead of current target e7ed9937de4fc4ed8fd9e18cc82d7d105b598881, 0 behind as of E021. Feature promotion reserved to controller; no target branch write made by feature worker. Mandatory DX9Ex Active Validation (policy/host/game/full-chain-compile/package) and Domain Isolation Guard (domain-isolation) must PASS on identical final target SHA before DONE_BUILD_VERIFIED. Quest3/VDXR runtime UNTESTED."
+    "integration_contract": "R29/R30/R31/R32/R33 independent TU and ABI, CMake graph, protected regressions, full x86 game/x64 host/baseline ZIP and collector all validated on feature/target exact SHA c8cde7d627e8c35a2de60548101c90524ef116d9. R84 workflow #38097607152 all acceptance jobs SUCCESS; DX9Ex Active #38100885230 five required jobs SUCCESS; Domain Isolation #38100885233 one required job SUCCESS. Artifact feature-dx9ex-r84-c8cde7d627e8c35a2de60548101c90524ef116d9 #11686762725 published. HMD UNTESTED."
   },
   "acceptance_results": [
     {
       "id": "R84-OWNERS",
-      "status": "PASS_FEATURE_CI",
+      "status": "PASS",
       "evidence_paths": [
         "src/vr/d3d9/stereo_renderer_r29.cpp",
         "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -118,45 +118,45 @@
         "src/vr/d3d9/stereo_renderer_r32.cpp",
         "src/vr/d3d9/stereo_renderer_r33.cpp"
       ],
-      "validation_command": "R84 exact-SHA feature workflow #38095865437 on c6cd06cafb0f6bc396d4841186d139985f3d8ae7: R84-OWNERS matching acceptance step SUCCESS; complete five-job pipeline SUCCESS."
+      "validation_command": "R84 exact-SHA feature workflow #38095865437 on c6cd06cafb0f6bc396d4841186d139985f3d8ae7: R84-OWNERS matching acceptance step SUCCESS; complete five-job pipeline SUCCESS. Final integration: R84 integrated feature workflow #38097607152 on c8cde7d627e8c35a2de60548101c90524ef116d9: all five acceptance steps SUCCESS; DX9Ex Active #38100885230: policy/host/game/full-chain-compile/package SUCCESS; Domain Isolation #38100885233: domain-isolation SUCCESS on same SHA."
     },
     {
       "id": "R84-ABI",
-      "status": "PASS_FEATURE_CI",
+      "status": "PASS",
       "evidence_paths": [
         "src/vr/core/r29_owner_api.hpp",
         "tools/verify_vr_r29_owner_api_seam.py",
         "tools/verify_vr_r30_support_api_seam.py"
       ],
-      "validation_command": "R84 exact-SHA feature workflow #38095865437 on c6cd06cafb0f6bc396d4841186d139985f3d8ae7: R84-ABI matching acceptance step SUCCESS; complete five-job pipeline SUCCESS."
+      "validation_command": "R84 exact-SHA feature workflow #38095865437 on c6cd06cafb0f6bc396d4841186d139985f3d8ae7: R84-ABI matching acceptance step SUCCESS; complete five-job pipeline SUCCESS. Final integration: R84 integrated feature workflow #38097607152 on c8cde7d627e8c35a2de60548101c90524ef116d9: all five acceptance steps SUCCESS; DX9Ex Active #38100885230: policy/host/game/full-chain-compile/package SUCCESS; Domain Isolation #38100885233: domain-isolation SUCCESS on same SHA."
     },
     {
       "id": "R84-BUILD-GRAPH",
-      "status": "PASS_FEATURE_CI",
+      "status": "PASS",
       "evidence_paths": [
         "cmake.toml",
         "CMakeLists.txt"
       ],
-      "validation_command": "R84 exact-SHA feature workflow #38095865437 on c6cd06cafb0f6bc396d4841186d139985f3d8ae7: R84-BUILD-GRAPH matching acceptance step SUCCESS; complete five-job pipeline SUCCESS."
+      "validation_command": "R84 exact-SHA feature workflow #38095865437 on c6cd06cafb0f6bc396d4841186d139985f3d8ae7: R84-BUILD-GRAPH matching acceptance step SUCCESS; complete five-job pipeline SUCCESS. Final integration: R84 integrated feature workflow #38097607152 on c8cde7d627e8c35a2de60548101c90524ef116d9: all five acceptance steps SUCCESS; DX9Ex Active #38100885230: policy/host/game/full-chain-compile/package SUCCESS; Domain Isolation #38100885233: domain-isolation SUCCESS on same SHA."
     },
     {
       "id": "R84-REGRESSION",
-      "status": "PASS_FEATURE_CI",
+      "status": "PASS",
       "evidence_paths": [
         "tools/verify_vr_r29_owner_api_seam.py",
         "tools/verify_vr_r30_support_api_seam.py",
         ".github/workflows/vr-r84-feature-00591.yml"
       ],
-      "validation_command": "R84 exact-SHA feature workflow #38095865437 on c6cd06cafb0f6bc396d4841186d139985f3d8ae7: R84-REGRESSION matching acceptance step SUCCESS; complete five-job pipeline SUCCESS."
+      "validation_command": "R84 exact-SHA feature workflow #38095865437 on c6cd06cafb0f6bc396d4841186d139985f3d8ae7: R84-REGRESSION matching acceptance step SUCCESS; complete five-job pipeline SUCCESS. Final integration: R84 integrated feature workflow #38097607152 on c8cde7d627e8c35a2de60548101c90524ef116d9: all five acceptance steps SUCCESS; DX9Ex Active #38100885230: policy/host/game/full-chain-compile/package SUCCESS; Domain Isolation #38100885233: domain-isolation SUCCESS on same SHA."
     },
     {
       "id": "R84-TEST-BUNDLE",
-      "status": "PASS_FEATURE_CI",
+      "status": "PASS",
       "evidence_paths": [
         "tools/verify_vr_r84_feature_bundle.py",
         ".github/workflows/vr-r84-feature-00591.yml"
       ],
-      "validation_command": "R84 exact-SHA feature workflow #38095865437 on c6cd06cafb0f6bc396d4841186d139985f3d8ae7: R84-TEST-BUNDLE matching acceptance step SUCCESS; complete five-job pipeline SUCCESS."
+      "validation_command": "R84 exact-SHA feature workflow #38095865437 on c6cd06cafb0f6bc396d4841186d139985f3d8ae7: R84-TEST-BUNDLE matching acceptance step SUCCESS; complete five-job pipeline SUCCESS. Final integration: R84 integrated feature workflow #38097607152 on c8cde7d627e8c35a2de60548101c90524ef116d9: all five acceptance steps SUCCESS; DX9Ex Active #38100885230: policy/host/game/full-chain-compile/package SUCCESS; Domain Isolation #38100885233: domain-isolation SUCCESS on same SHA."
     }
   ],
   "dev_ci_history": [
@@ -214,12 +214,9 @@
     }
   ],
   "outstanding": [
-    "Controller-only fast-forward promotion from target e7ed9937de4fc4ed8fd9e18cc82d7d105b598881 to R84 verified feature state (current feature source c6cd06cafb0f6bc396d4841186d139985f3d8ae7); require a fresh GitHub compare/lease before mutation.",
-    "DX9Ex Active Validation exact final TARGET SHA all five jobs SUCCESS: PENDING_CONTROLLER",
-    "Domain Isolation Guard exact same final TARGET SHA SUCCESS: PENDING_CONTROLLER",
-    "Quest3/VDXR RUNTIME_VALIDATION=UNTESTED"
+    "Quest3 / VDXR runtime optical and performance validation not performed: RUNTIME_VALIDATION=UNTESTED"
   ],
-  "next_action": "FEATURE_READY (R84 five acceptance PASS) submitted with exact R84 workflow #38095865437 on c6cd06cafb0f6bc396d4841186d139985f3d8ae7. Controller only: re-fetch target/feature, verify ancestry and non-overlap, advance vr-d3d9ex-focus via fast-forward lease, then run DX9Ex Active Validation and Domain Isolation Guard on identical integrated TARGET SHA. Do not mark DONE_BUILD_VERIFIED / score +1 without material target commit and gates. RUNTIME_VALIDATION=UNTESTED.",
+  "next_action": "C6 BUILD_VERIFIED recorded in feature branch only; controller may persist this bookkeeping result on target without re-running already-successful exact-SHA gates, must preserve validation_bearing_result_sha=c8cde7d627e8c35a2de60548101c90524ef116d9 and refrain from re-dispatching TASK_ID=CONVERSION-DX9EX-00591. Issue next independent DX9Ex feature when appropriate. Quest3/VDXR UNTESTED.",
   "feature_last_head": "c6cd06cafb0f6bc396d4841186d139985f3d8ae7",
   "checkpoint_history": [
     {
@@ -358,6 +355,19 @@
       "required_target_gates": "PENDING_CONTROLLER_EXACT_SHA",
       "verified_target_head": "e7ed9937de4fc4ed8fd9e18cc82d7d105b598881",
       "score_delta": 0
+    },
+    {
+      "at_kst": "2026-10-11T10:15:45+09:00",
+      "event_id": "CONVERSION-DX9EX-00591-E025",
+      "event_type": "retry",
+      "feature_sha": "c8cde7d627e8c35a2de60548101c90524ef116d9",
+      "incomplete_acceptance_ids": [],
+      "next_action": "C6 recorded on feature branch; controller bookkeeping to target only, then new independent task",
+      "runtime_validation": "UNTESTED",
+      "feature_ci_run_id": 38097607152,
+      "required_gate_dx9ex_active_run_id": 38100885230,
+      "required_gate_domain_run_id": 38100885233,
+      "automation_validation": "PASS_EXACT_SHA"
     }
   ],
   "concurrent_target_status": {
@@ -418,5 +428,52 @@
     "failed_target_run_sha": "0887504dfe9e5689d4bf6ee849dbae9af7693f59",
     "finding": "Old target failed legacy R30 private-owner refactor guard; the verified feature uses R84 migrated R29 physical-owner guard and matching regression preflight. Stale checkpoint blocker R84-OWNERS is not valid for verified feature HEAD.",
     "source_runtime_validation": "UNTESTED"
-  }
+  },
+  "result_sha": "c8cde7d627e8c35a2de60548101c90524ef116d9",
+  "result_message": "R84 owner graph completed and exact-SHA target gates passed; Quest3/VDXR runtime not tested.",
+  "event_type": "retry",
+  "required_gate_results": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38100885230,
+      "sha": "c8cde7d627e8c35a2de60548101c90524ef116d9",
+      "status": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "host": "SUCCESS",
+        "game": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      },
+      "artifact_ids": [
+        11688220776,
+        11688110798,
+        11687617707
+      ]
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38100885233,
+      "sha": "c8cde7d627e8c35a2de60548101c90524ef116d9",
+      "status": "SUCCESS",
+      "jobs": {
+        "domain-isolation": "SUCCESS"
+      }
+    },
+    {
+      "name": "R84 feature integrated Win32 x64 host and bundle",
+      "run_id": 38097607152,
+      "sha": "c8cde7d627e8c35a2de60548101c90524ef116d9",
+      "status": "SUCCESS",
+      "jobs": {
+        "r84-local": "SUCCESS",
+        "r84-win32": "SUCCESS",
+        "r84-host": "SUCCESS",
+        "r84-baseline-game": "SUCCESS",
+        "r84-bundle": "SUCCESS"
+      },
+      "artifact_id": 11686762725,
+      "artifact_name": "feature-dx9ex-r84-c8cde7d627e8c35a2de60548101c90524ef116d9"
+    }
+  ]
 }
