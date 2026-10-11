@@ -749,15 +749,16 @@ namespace OutRunVRStereo
 
         bool R30EnsureSkyGlowResources(IDirect3DDevice9* device)
         {
-            if (!device || !R29OwnerCaptureFrameSnapshot().width || !R29OwnerCaptureFrameSnapshot().height)
+            const auto frame = R29OwnerCaptureFrameSnapshot();
+            if (!device || !frame.width || !frame.height)
                 return false;
             const int factor =
                 std::clamp(Settings::SkyGlowFactor.get(), 1, 16);
             const UINT glowWidth = std::max<UINT>(
-                160u, R29OwnerCaptureFrameSnapshot().width /
+                160u, frame.width /
                     static_cast<UINT>(factor));
             const UINT glowHeight = std::max<UINT>(
-                120u, R29OwnerCaptureFrameSnapshot().height /
+                120u, frame.height /
                     static_cast<UINT>(factor));
 
             if (R30SkyGlow.reduced[0] && R30SkyGlow.reduced[1] &&
@@ -766,8 +767,8 @@ namespace OutRunVRStereo
                 R30SkyGlow.tempSurface[0] && R30SkyGlow.tempSurface[1] &&
                 R30SkyGlow.bright && R30SkyGlow.blur &&
                 R30SkyGlow.composite &&
-                R30SkyGlow.eyeWidth == R29OwnerCaptureFrameSnapshot().width &&
-                R30SkyGlow.eyeHeight == R29OwnerCaptureFrameSnapshot().height &&
+                R30SkyGlow.eyeWidth == frame.width &&
+                R30SkyGlow.eyeHeight == frame.height &&
                 R30SkyGlow.glowWidth == glowWidth &&
                 R30SkyGlow.glowHeight == glowHeight &&
                 R30SkyGlow.factor == factor)
@@ -860,8 +861,8 @@ namespace OutRunVRStereo
                 }
             }
 
-            R30SkyGlow.eyeWidth = R29OwnerCaptureFrameSnapshot().width;
-            R30SkyGlow.eyeHeight = R29OwnerCaptureFrameSnapshot().height;
+            R30SkyGlow.eyeWidth = frame.width;
+            R30SkyGlow.eyeHeight = frame.height;
             R30SkyGlow.glowWidth = glowWidth;
             R30SkyGlow.glowHeight = glowHeight;
             R30SkyGlow.factor = factor;
@@ -973,19 +974,20 @@ namespace OutRunVRStereo
         bool R30CaptureSkyGlowSceneBeforeHud(
             IDirect3DDevice9* device)
         {
+            const auto frame = R29OwnerCaptureFrameSnapshot();
             if (!device || Settings::SkyGlowFactor <= 0 ||
-                !R29OwnerCaptureFrameSnapshot().hadWorldStereo || !R29OwnerCaptureFrameSnapshot().hadDuplicatedDraw ||
-                R29OwnerCaptureFrameSnapshot().rightDrawFailed || R29OwnerCaptureFrameSnapshot().stereoIncomplete ||
-                !R29OwnerCaptureFrameSnapshot().backBuffer || !R29OwnerCaptureFrameSnapshot().rightEyeSurface)
+                !frame.hadWorldStereo || !frame.hadDuplicatedDraw ||
+                frame.rightDrawFailed || frame.stereoIncomplete ||
+                !frame.backBuffer || !frame.rightEyeSurface)
                 return false;
 
-            if (R30SkyGlowSceneCaptureEpoch == R29OwnerCaptureFrameSnapshot().presentEpoch)
+            if (R30SkyGlowSceneCaptureEpoch == frame.presentEpoch)
                 return true;
             if (!R30EnsureSkyGlowResources(device))
                 return false;
 
             IDirect3DSurface9* eyeSurface[2]{
-                R29OwnerCaptureFrameSnapshot().backBuffer, R29OwnerCaptureFrameSnapshot().rightEyeSurface
+                frame.backBuffer, frame.rightEyeSurface
             };
             bool ok = true;
             for (int eye = 0; eye < 2 && ok; ++eye)
@@ -997,17 +999,18 @@ namespace OutRunVRStereo
                     nullptr, D3DTEXF_LINEAR));
             }
             if (ok)
-                R30SkyGlowSceneCaptureEpoch = R29OwnerCaptureFrameSnapshot().presentEpoch;
+                R30SkyGlowSceneCaptureEpoch = frame.presentEpoch;
             return ok;
         }
 
         bool R30ApplyStereoSkyGlow(IDirect3DDevice9* device)
         {
+            const auto frame = R29OwnerCaptureFrameSnapshot();
             if (!device || Settings::SkyGlowFactor <= 0 ||
-                !R29OwnerStereoWanted() || !R29OwnerCaptureFrameSnapshot().hadWorldStereo ||
-                !R29OwnerCaptureFrameSnapshot().hadDuplicatedDraw || R29OwnerCaptureFrameSnapshot().rightDrawFailed ||
-                R29OwnerCaptureFrameSnapshot().stereoIncomplete || !R29OwnerCaptureFrameSnapshot().backBuffer ||
-                !R29OwnerCaptureFrameSnapshot().rightEyeSurface)
+                !R29OwnerStereoWanted() || !frame.hadWorldStereo ||
+                !frame.hadDuplicatedDraw || frame.rightDrawFailed ||
+                frame.stereoIncomplete || !frame.backBuffer ||
+                !frame.rightEyeSurface)
                 return true;
 
             if (!R30EnsureSkyGlowResources(device))
@@ -1044,7 +1047,7 @@ namespace OutRunVRStereo
             // render state can be reused after StateBlock::Apply/Reset.
             R30SkyGlowPassState passState{};
             IDirect3DSurface9* eyeSurface[2]{
-                R29OwnerCaptureFrameSnapshot().backBuffer, R29OwnerCaptureFrameSnapshot().rightEyeSurface
+                frame.backBuffer, frame.rightEyeSurface
             };
             for (int eye = 0; eye < 2 && ok; ++eye)
             {
@@ -1056,7 +1059,7 @@ namespace OutRunVRStereo
                     break;
                 }
 
-                if (R30SkyGlowSceneCaptureEpoch != R29OwnerCaptureFrameSnapshot().presentEpoch)
+                if (R30SkyGlowSceneCaptureEpoch != frame.presentEpoch)
                 {
                     ok = SUCCEEDED(device->StretchRect(
                         eyeSurface[eye], nullptr, reduced, nullptr,
@@ -1124,8 +1127,8 @@ namespace OutRunVRStereo
                 if (ok)
                     ok = R30DrawSkyGlowPass(
                         device, passState, eyeSurface[eye],
-                        R29OwnerCaptureFrameSnapshot().width,
-                        R29OwnerCaptureFrameSnapshot().height,
+                        frame.width,
+                        frame.height,
                         compositeSource,
                         R30SkyGlow.composite, composite, true);
 
@@ -1244,12 +1247,13 @@ namespace OutRunVRStereo
         float R30HudAspectCompensation(
             const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
         {
-            if (!R29OwnerCaptureFrameSnapshot().width || !R29OwnerCaptureFrameSnapshot().height)
+            const auto frame = R29OwnerCaptureFrameSnapshot();
+            if (!frame.width || !frame.height)
                 return 1.0f;
 
             const float sourceAspect =
-                static_cast<float>(R29OwnerCaptureFrameSnapshot().width) /
-                static_cast<float>(R29OwnerCaptureFrameSnapshot().height);
+                static_cast<float>(frame.width) /
+                static_cast<float>(frame.height);
 
             // R35.4: SharedPoseState already carries the runtime's actual
             // recommended per-eye render-target size. That pixel aspect is the
@@ -1710,14 +1714,19 @@ namespace OutRunVRStereo
             if (!state.worldEffect)
                 return true;
 
-            if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil &&
-                (!R29OwnerCaptureFrameSnapshot().rightDepthSynchronized || !R29OwnerCaptureFrameSnapshot().rightStencilSynchronized))
+            auto frame = R29OwnerCaptureFrameSnapshot();
+            if (frame.trackedDepthStencil &&
+                (!frame.rightDepthSynchronized || !frame.rightStencilSynchronized))
+            {
                 R29OwnerTryBootstrapRightDepth(device);
-            if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil &&
-                !R29OwnerCaptureFrameSnapshot().rightDepthSynchronized && R29OwnerDepthTestActive(device))
+                // Resample synchronization bits after bootstrap.
+                frame = R29OwnerCaptureFrameSnapshot();
+            }
+            if (frame.trackedDepthStencil &&
+                !frame.rightDepthSynchronized && R29OwnerDepthTestActive(device))
                 return false;
-            if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil &&
-                !R29OwnerCaptureFrameSnapshot().rightStencilSynchronized && R29OwnerStencilTestActive(device))
+            if (frame.trackedDepthStencil &&
+                !frame.rightStencilSynchronized && R29OwnerStencilTestActive(device))
                 return false;
 
             if (!haveBaseProjection)
@@ -2240,8 +2249,10 @@ namespace OutRunVRStereo
                 return leftHr;
             }
 
+            // Capture after the left-eye draw; reuse one coherent R29 owner view.
+            const auto frame = R29OwnerCaptureFrameSnapshot();
             IDirect3DSurface9* savedRt = R29OwnerBorrowTrackedRenderTarget();
-            IDirect3DSurface9* savedDepth = R29OwnerCaptureFrameSnapshot().trackedDepthStencil;
+            IDirect3DSurface9* savedDepth = frame.trackedDepthStencil;
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
@@ -2249,10 +2260,10 @@ namespace OutRunVRStereo
             {
                 R30ScopedInternalPass guard;
                 rightHr = R29OwnerCallOriginalSetRenderTarget(
-                    device, 0u, R29OwnerCaptureFrameSnapshot().rightEyeSurface);
+                    device, 0u, frame.rightEyeSurface);
                 if (SUCCEEDED(rightHr))
                     rightHr = R29OwnerCallOriginalSetDepthStencilSurface(
-                        device, R29OwnerCaptureFrameSnapshot().trackedDepthStencil ? R29OwnerCaptureFrameSnapshot().rightEyeDepth : nullptr);
+                        device, frame.trackedDepthStencil ? frame.rightEyeDepth : nullptr);
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&state.viewport);
                 if (SUCCEEDED(rightHr))
@@ -2998,13 +3009,18 @@ namespace OutRunVRStereo
             if (!R29OwnerEnsureStereoResources(device))
                 return E_NOTIMPL;
 
-            if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil &&
-                (!R29OwnerCaptureFrameSnapshot().rightDepthSynchronized || !R29OwnerCaptureFrameSnapshot().rightStencilSynchronized))
+            auto frame = R29OwnerCaptureFrameSnapshot();
+            if (frame.trackedDepthStencil &&
+                (!frame.rightDepthSynchronized || !frame.rightStencilSynchronized))
+            {
                 R29OwnerTryBootstrapRightDepth(device);
-            if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil && !R29OwnerCaptureFrameSnapshot().rightDepthSynchronized &&
+                // Resample synchronization bits after bootstrap.
+                frame = R29OwnerCaptureFrameSnapshot();
+            }
+            if (frame.trackedDepthStencil && !frame.rightDepthSynchronized &&
                 R29OwnerDepthTestActive(device))
                 return E_NOTIMPL;
-            if (R29OwnerCaptureFrameSnapshot().trackedDepthStencil && !R29OwnerCaptureFrameSnapshot().rightStencilSynchronized &&
+            if (frame.trackedDepthStencil && !frame.rightStencilSynchronized &&
                 R29OwnerStencilTestActive(device))
                 return E_NOTIMPL;
 
@@ -3015,8 +3031,8 @@ namespace OutRunVRStereo
 
             // If perspective world geometry already established this Present's
             // pose sequence, screen-space correction must use that exact packet.
-            if (R29OwnerCaptureFrameSnapshot().poseSequence != 0 &&
-                R29OwnerCaptureFrameSnapshot().poseSequence != stereo.poseSequence)
+            if (frame.poseSequence != 0 &&
+                frame.poseSequence != stereo.poseSequence)
                 return E_NOTIMPL;
 
             float original[16]{};
@@ -3094,8 +3110,10 @@ namespace OutRunVRStereo
                 return leftHr;
             }
 
+            // Game left-eye draw may update tracked surfaces.
+            frame = R29OwnerCaptureFrameSnapshot();
             IDirect3DSurface9* savedRt = R29OwnerBorrowTrackedRenderTarget();
-            IDirect3DSurface9* savedDepth = R29OwnerCaptureFrameSnapshot().trackedDepthStencil;
+            IDirect3DSurface9* savedDepth = frame.trackedDepthStencil;
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
@@ -3103,11 +3121,11 @@ namespace OutRunVRStereo
             {
                 R30ScopedInternalPass guard;
                 rightHr = R29OwnerCallOriginalSetRenderTarget(
-                    device, 0u, R29OwnerCaptureFrameSnapshot().rightEyeSurface);
+                    device, 0u, frame.rightEyeSurface);
                 if (SUCCEEDED(rightHr))
                 {
                     rightHr = R29OwnerCallOriginalSetDepthStencilSurface(
-                        device, R29OwnerCaptureFrameSnapshot().trackedDepthStencil ? R29OwnerCaptureFrameSnapshot().rightEyeDepth : nullptr);
+                        device, frame.trackedDepthStencil ? frame.rightEyeDepth : nullptr);
                 }
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
