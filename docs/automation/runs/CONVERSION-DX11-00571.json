@@ -11,9 +11,9 @@
   "base_sha": "c96b890d102c19f930af1179927a7bac079f9955",
   "work_key": "DX11:MENU_RACE_BLEND_RGB_SUBTRACT_ALPHA_NATIVE_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "AWAITING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -56,16 +56,46 @@
     "tools/test_dx11_first_game_frame_regressions.py",
     "docs/automation/runs/CONVERSION-DX11-00571.json"
   ],
-  "feature_status": "BUILD_PENDING_NEED_HMD_TEST",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
   "pipeline": {
     "C0_RECOVER": "GitHub exact branch c96b890d102c19f930af1179927a7bac079f9955, 00570 C6 verified",
     "C1_REVIEW": "Blend RGB + independent SUBTRACT alpha unsupported in native PS",
     "C2_IMPLEMENT": "Game capture, two PS, Draw/Indexed, 14 negative mutations",
-    "C3_VALIDATE": "Local source-link pattern assertions passed; exact-SHA GitHub CI pending",
+    "C3_VALIDATE": "GitHub CI SUCCESS for exact material SHA 82fdfa6ab3cb00edbe2771cb3de4f85902f53b56; previously triggered workflows confirmed successful; Quest3/VDXR/gamepad runtime untested",
     "C4_COMMIT": "Atomic C++/test/run material commit without CI skip",
     "C5_PACKAGE": "NOT_REQUIRED diagnostic-only",
-    "C6_STATE": "Pending exact SHA verification, HMD untested"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA for 82fdfa6ab3cb00edbe2771cb3de4f85902f53b56; separate bookkeeping [skip ci]; Quest3/VDXR/gamepad UNTESTED"
   },
-  "next_action": "Check exact result SHA GitHub CI, separate C6 bookkeeping only after PASS; do not duplicate scoring.",
-  "state_persisted": true
+  "next_action": "Exact-SHA GitHub CI verified; no retry or duplicate scoring. Quest3/VDXR/gamepad HMD runtime test remains outstanding.",
+  "state_persisted": true,
+  "validation_bearing_result_sha": "82fdfa6ab3cb00edbe2771cb3de4f85902f53b56",
+  "material_result_sha": "82fdfa6ab3cb00edbe2771cb3de4f85902f53b56",
+  "result_sha": "82fdfa6ab3cb00edbe2771cb3de4f85902f53b56",
+  "c6_recovery_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "validation_evidence": {
+    "exact_sha": "82fdfa6ab3cb00edbe2771cb3de4f85902f53b56",
+    "github_workflow_runs_observed": [
+      {
+        "run_id": 38179090587,
+        "name": "OpenXR VR architecture",
+        "conclusion": "success"
+      },
+      {
+        "run_id": 38179090657,
+        "name": "OutRun EXE HUD Inspector CI",
+        "conclusion": "success"
+      },
+      {
+        "run_id": 38179090551,
+        "name": "Build",
+        "conclusion": "success"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  }
 }
