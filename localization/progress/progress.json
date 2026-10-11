@@ -14119,5 +14119,32 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "official_promoted": 0,
     "evidence": "localization/graphics/role_C/20261012-C2-Q137-P0-SIX-REGION-FIRST-INDEPENDENT/C2_Q137_P0_SIX_REGION_INDEPENDENT_QA.json"
+  },
+  "c2_20261012_q092_new_psd_english_source_reference": {
+    "run_key": "OUTRUN-C2-20261012-Q092-PSD-ENGLISH-REF-FIRST-SOURCE-PIXEL-QA",
+    "queue_index": 92,
+    "priority": "SOURCE_REFERENCE_QA",
+    "role": "C2",
+    "result": "PSD_STYLE_REFERENCE_SCOPED_PASS_CANONICAL_PIXEL_IDENTITY_HOLD",
+    "reference_english_rows": 2,
+    "ref_source_alpha_jaccard": [
+      0.997113,
+      0.997449
+    ],
+    "ref_source_visible_rgba_mismatch": [
+      36646,
+      57290
+    ],
+    "source_clean_changed_rgba": 174225,
+    "clean_saved_changed_rgba": 141733,
+    "changed_rgba_outside_two_original_bboxes": 0,
+    "clean_plate": "C2_PLATE_ONLY_SCOPED_PASS",
+    "old_candidate_c2_status": "REWORK_REQUIRED_UNCHANGED",
+    "new_korean_dds": 0,
+    "official_promoted": 0,
+    "imagegen_media_bound": false,
+    "C3": "BLOCKED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "evidence": "localization/graphics/role_C/20261012-C2-Q092-PSD-REFERENCE-FIRST-INDEPENDENT/C2_Q092_PSD_REFERENCE_FIRST_INDEPENDENT_QA.json"
   }
 }
