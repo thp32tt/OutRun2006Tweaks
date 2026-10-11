@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-12 02:20 KST",
+  "updated_at_kst": "2026-10-12 02:50 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1532,6 +1532,23 @@
         "new_dds": 0,
         "official_promoted": 0,
         "report": "localization/graphics/role_C/20261012-C2-Q193-A249-SHOWROOM-FIRST-PLATE/C2_Q193_A249_SHOWROOM_FIRST_INDEPENDENT_QA.json"
+      },
+      "c2_q104_psd_input_clean_first_20261012": {
+        "queue_index": 104,
+        "role": "C2",
+        "review": "NEW_SOURCE_PSD_CLEAN_MATERIAL_ONLY",
+        "canonical_source_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+        "psd_english_sha256": "6d88374aeba9bf40716e3c6549fe6cd7943ee5361b1cc21721ae89cb9b12f787",
+        "clean_sha256": "0d3f46b6719366d5b337491117c585274b1e4d9d7fdc2a00cbc2c42b002437cd",
+        "unchanged_candidate_sha256": "c84a2703d0a22b36384e07ce72d4e761e651a1a23219cd78153b4a0aff022505",
+        "plate": "VISIBLE_CLEAN_PASS_STRICT_OUTSIDE_RGBA_HOLD",
+        "source_imagegen_binding": "NOT_BOUND",
+        "whole_asset_C2": "REWORK_UNCHANGED",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "new_dds": 0,
+        "official_promoted": 0,
+        "report": "localization/graphics/role_C/20261012-C2-Q104-PSD-SOURCE-PLATE-PREFLIGHT/C2_Q104_PSD_SOURCE_CLEAN_INDEPENDENT_HOLD.json"
       }
     },
     "runtime_text_trace": {
