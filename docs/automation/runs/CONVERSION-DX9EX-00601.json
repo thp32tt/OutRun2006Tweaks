@@ -1,0 +1,110 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00601",
+  "production_id": "CONVERSION-DX9EX-00601",
+  "event_id": "CONVERSION-DX9EX-00601-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "feature_id": "DX9EX:R23_POINTER_ONLY_DESKTOP_CAPTURE_COPY_ELISION",
+  "work_key": "DX9EX:R23_POINTER_ONLY_DESKTOP_CAPTURE_COPY_ELISION",
+  "target_branch": "vr-d3d9ex-focus",
+  "material_result_sha": "30bdb4c337c915267e4878c068fb962b8994cfdf",
+  "result_sha": "4340259ed155575e7329c4d31f1265a27bc9482a",
+  "validation_bearing_result_sha": "4340259ed155575e7329c4d31f1265a27bc9482a",
+  "material_commits": [
+    "aa376a4dfa1a58eedadb8e11e20dfc6e5a36bcc9",
+    "415a46799c4681edfa3da08242e33fb047e205d0",
+    "e8604b399edf40f4bf37d0a49400216fed0a9145",
+    "30bdb4c337c915267e4878c068fb962b8994cfdf"
+  ],
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Skip full output GPU CopyResource on DXGI pointer-only duplication events without losing the last desktop frame, changing completed Frame.v2 stereo QPC correlation, or regressing output rebind, gameplay, FFB, and existing HUD behaviors.",
+    "acceptance": "Only skip when previous duplication/output unchanged, captured pixel source and SRV exist, AccumulatedFrames==0 and LastPresentTime==0; release acquired resource/frame and retain normal copy for real Presents, first capture and recovery.",
+    "runtime_metrics": "Quest3/VDXR live 72Hz FPS and p95/p99 frame timing not sampled. No measured FPS claim."
+  },
+  "acceptance_results": [
+    {
+      "item": "POINTER_ONLY_GPU_COPY_ELISION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "vrhost/src/main_r23.cpp early exit before texture QueryInterface/CopyResource with output/frame/source gate and preserved resource+frame release; policy in runtime/desktop_capture_reuse.hpp"
+    },
+    {
+      "item": "FOCUSED_NEGATIVE_REGRESSION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Active policy passes desktop capture reuse 6 negative mutations, and original capture metadata guard 3 negative mutations; preserved full-copy and Frame.v2 checks"
+    },
+    {
+      "item": "WIN32_GAME_HOST_FULL_CHAIN_PACKAGE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "GitHub DX9Ex Active Validation #38140005842 all policy, game, host, full-chain-compile and package jobs SUCCESS"
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "GitHub Domain Isolation Guard #38140005859 SUCCESS"
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "GitHub DX9Ex Full Source Impact Review #38140005850 3/3 source-cross-domain, msvc-analyze-openxr-host, msvc-analyze-active-game SUCCESS"
+    },
+    {
+      "item": "QUEST3_VDXR_RUNTIME_AND_FPS",
+      "status": "UNTESTED",
+      "evidence": "Quest3/VDXR exact binary gameplay/visual and 72Hz frame-time/FPS measurement not executed"
+    }
+  ],
+  "exact_sha_validation": {
+    "target_sha": "4340259ed155575e7329c4d31f1265a27bc9482a",
+    "all_conclusion": "SUCCESS",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38140005842,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "4340259ed155575e7329c4d31f1265a27bc9482a",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38140005842"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38140005859,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "4340259ed155575e7329c4d31f1265a27bc9482a",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38140005859"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38140005850,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "4340259ed155575e7329c4d31f1265a27bc9482a",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38140005850"
+      }
+    ],
+    "source": "Connected GitHub exact-SHA API; later unrelated F11 VR AA commits 3a0d630a and 4340259e are descendants of the DX9Ex 00601 material changes, not additional 00601 scoreable work"
+  },
+  "material_change_evidence": {
+    "commit_message": "[AUTO:CONVERSION-DX9EX-00601] Skip unchanged DXGI pointer-only frames before desktop GPU copy",
+    "changed_paths": [
+      "vrhost/src/main_r23.cpp",
+      "vrhost/src/runtime/desktop_capture_reuse.hpp",
+      "tools/verify_vr_desktop_capture_reuse.py",
+      ".github/workflows/vr-dx9ex-active.yml",
+      "tools/verify_vr_capture_metadata_fastpath.py",
+      "src/hooks_misc.cpp"
+    ],
+    "primary_material_commit_sha": "aa376a4dfa1a58eedadb8e11e20dfc6e5a36bcc9",
+    "final_task_specific_material_commit_sha": "30bdb4c337c915267e4878c068fb962b8994cfdf",
+    "verification_head_note": "Validated at descendant 4340259e (which also contains separately owned F11 VR AA commits)."
+  },
+  "runtime_validation_note": "RUNTIME_VALIDATION=UNTESTED: Quest 3/VDXR real-game FPS p95/p99, 72Hz performance impact, HUD/flare/gameplay acceptance remain pending; no HMD PASS inferred.",
+  "controller_next_action": "Do not redispatch or rescore 00601 after C6. Assign a new distinct unresolved DX9Ex performance task; preserve dx11 priority, DXVK frozen."
+}
