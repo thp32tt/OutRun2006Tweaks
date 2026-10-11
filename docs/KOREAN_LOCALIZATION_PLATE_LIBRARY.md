@@ -66,8 +66,10 @@ PSD-first processing order:
 
 The pinned catalog includes initial matches for queue indexes 49, 51, 46, 135, 188,
 212, and 230. Their hashes are **matches by texture identifier only**, not promises
-that all seven contain separate English or true CLEAN. q060/q102 currently have no
-verified exact PSD entry; do not pretend they do.
+that all seven contain separate English or true CLEAN. q060 now has a copied SHA-verified community PSD source candidate in the expanded mirror,
+but its layers/plate have NOT been independently qualified against the exact game DDS.
+q102 still has no matching copied PSD source entry. Do not equate an asset-hash match
+with an approved exact English source or CLEAN.
 
 `PSD Layer Source Pilot` GitHub Actions performs an actual q135 source/layer
 separation and q49 layer inventory. This pilot produces **EXTRACTED_UNCLASSIFIED**
