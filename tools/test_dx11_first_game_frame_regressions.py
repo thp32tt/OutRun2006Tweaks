@@ -355,9 +355,9 @@ def main() -> None:
             "const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;",
             "const bool arg2Diffuse = arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT;",
             "const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT;",
-            "(!modulate && !selectTexture && !additive && !subtract) || arg != D3DTA_TEXTURE",
+            "(!modulate && !selectTexture && !additive && !subtract && !modulate2x && !modulate4x) || arg != D3DTA_TEXTURE",
             "alphaArg1 != D3DTA_TEXTURE",
-            "((modulate || additive || subtract) && (!arg2Diffuse || !alphaArg2Diffuse))",
+            "((modulate || additive || subtract || modulate2x || modulate4x) && (!arg2Diffuse || !alphaArg2Diffuse))",
             "capture.selectTexture = selectTexture;",
             "capture.additive = additive;",
             "coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb",
@@ -390,9 +390,9 @@ def main() -> None:
          "const bool modulate = op == D3DTOP_MODULATE || alphaOp == D3DTOP_MODULATE;"),
         ("const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;",
          "const bool selectTexture = op == D3DTOP_SELECTARG1 || alphaOp == D3DTOP_SELECTARG1;"),
-        ("(!modulate && !selectTexture && !additive && !subtract) || arg != D3DTA_TEXTURE",
+        ("(!modulate && !selectTexture && !additive && !subtract && !modulate2x && !modulate4x) || arg != D3DTA_TEXTURE",
          "(!modulate && !selectTexture) && arg != D3DTA_TEXTURE"),
-        ("((modulate || additive || subtract) && (!arg2Diffuse || !alphaArg2Diffuse))",
+        ("((modulate || additive || subtract || modulate2x || modulate4x) && (!arg2Diffuse || !alphaArg2Diffuse))",
          "(modulate && (arg2 != D3DTA_DIFFUSE && alphaArg2 != D3DTA_DIFFUSE))"),
         ("capture.selectTexture = selectTexture;", "capture.selectTexture = false;"),
         ("capture.additive = additive;", "capture.additive = false;"),
@@ -424,9 +424,14 @@ def main() -> None:
     assert "if (!capture.enabled && (op != D3DTOP_SELECTARG1 || arg != D3DTA_DIFFUSE))" in bridge
     # RGB and alpha must use the *same* supported operation: rejecting mixed
     # SELECTARG1/MODULATE keeps the original game draw authoritative.
-    MODULATE, SELECTARG1, ADD, SUBTRACT = 4, 2, 7, 10
+    MODULATE, MODULATE2X, MODULATE4X, SELECTARG1, ADD, SUBTRACT = 4, 5, 6, 2, 7, 10
     for color_op, alpha_op, supported in (
         (MODULATE, MODULATE, True),
+        (MODULATE2X, MODULATE2X, True),
+        (MODULATE4X, MODULATE4X, True),
+        (MODULATE2X, MODULATE, False),
+        (MODULATE4X, MODULATE2X, False),
+        (MODULATE, MODULATE4X, False),
         (SELECTARG1, SELECTARG1, True),
         (ADD, ADD, True),
         (SUBTRACT, SUBTRACT, True),
@@ -439,11 +444,49 @@ def main() -> None:
         (0, 0, False),
     ):
         admitted = ((color_op == MODULATE and alpha_op == MODULATE)
+                    or (color_op == MODULATE2X and alpha_op == MODULATE2X)
+                    or (color_op == MODULATE4X and alpha_op == MODULATE4X)
                     or (color_op == SELECTARG1 and alpha_op == SELECTARG1)
                     or (color_op == ADD and alpha_op == ADD)
                     or (color_op == SUBTRACT and alpha_op == SUBTRACT))
         assert admitted == supported
 
+
+
+    # 00555 live game D3D9 state -> DX11 dedicated RGBA HLSL -> indexed/linear draw.
+    # Destructive disconnect mutations and CPU reference vectors; HMD UNTESTED.
+    scaled_links = (
+        "const bool modulate2x = op == D3DTOP_MODULATE2X && alphaOp == D3DTOP_MODULATE2X;",
+        "const bool modulate4x = op == D3DTOP_MODULATE4X && alphaOp == D3DTOP_MODULATE4X;",
+        "capture.modulate2x = modulate2x;", "capture.modulate4x = modulate4x;",
+        "bool modulate2x = false;", "bool modulate4x = false;",
+        "float4 PSTextureModulate2X(VOut v) : SV_Target { float4 c = saturate(2.0f * gameTexture.Sample(gameSampler, v.uv) * v.diffuse); AlphaGate(c.a); return c; }",
+        "float4 PSTextureModulate4X(VOut v) : SV_Target { float4 c = saturate(4.0f * gameTexture.Sample(gameSampler, v.uv) * v.diffuse); AlphaGate(c.a); return c; }",
+        '!compile("PSTextureModulate2X", "ps_4_0", modulate2xCode)',
+        '!compile("PSTextureModulate4X", "ps_4_0", modulate4xCode)',
+        "s.modulate2xPs.GetAddressOf()", "s.modulate4xPs.GetAddressOf()",
+        "s.modulate2xPs.Reset();", "s.modulate4xPs.Reset();",
+        "capture.modulate2x ? s.modulate2xPs.Get() :",
+        "capture.modulate4x ? s.modulate4xPs.Get() :",
+        "(!modulate && !selectTexture && !additive && !subtract && !modulate2x && !modulate4x)",
+        "((modulate || additive || subtract || modulate2x || modulate4x) && (!arg2Diffuse || !alphaArg2Diffuse))",
+        "ctx->DrawIndexed(indexCount, 0, 0);",
+        "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+    )
+    assert all(x in bridge for x in scaled_links)
+    for token in scaled_links[:-2]:
+        mutant = bridge.replace(token, "/* disconnected scaled source/consumer */", 1)
+        assert mutant != bridge and token not in mutant
+    for factor, texel, diffuse, expected in (
+        (2, (0.4, 0.2, 0.1, 0.7), (0.5, 0.5, 0.5, 0.5),
+         (0.4, 0.2, 0.1, 0.7)),
+        (4, (0.8, 0.3, 0.1, 0.75), (0.5, 0.5, 0.5, 0.5),
+         (1.0, 0.6, 0.2, 1.0)),
+    ):
+        actual = tuple(min(1.0, factor * x * y) for x, y in zip(texel, diffuse))
+        assert all(abs(a - b) < 1e-6 for a, b in zip(actual, expected))
+        assert actual != tuple(min(1.0, x * y) for x, y in zip(texel, diffuse))
+    print("DX11 stage0 MODULATE2X/4X source-to-native Draw PASS (static only)")
 
     # 00553 positive/negative linkage: real game stage0 ADD dispatches a
     # saturating RGBA pixel shader. No actual HMD/desktop pixels are inferred.
@@ -464,8 +507,8 @@ def main() -> None:
     # Mutations reject disconnected shader, alpha or operand gate changes.
     subtract_link = (
         "const bool subtract = op == D3DTOP_SUBTRACT && alphaOp == D3DTOP_SUBTRACT;",
-        "(!modulate && !selectTexture && !additive && !subtract) || arg != D3DTA_TEXTURE",
-        "((modulate || additive || subtract) && (!arg2Diffuse || !alphaArg2Diffuse))",
+        "(!modulate && !selectTexture && !additive && !subtract && !modulate2x && !modulate4x) || arg != D3DTA_TEXTURE",
+        "((modulate || additive || subtract || modulate2x || modulate4x) && (!arg2Diffuse || !alphaArg2Diffuse))",
         "capture.subtract = subtract;",
         "bool subtract = false;",
         "float4 PSTextureSubtract(VOut v) : SV_Target { float4 c = saturate(gameTexture.Sample(gameSampler, v.uv) - v.diffuse); AlphaGate(c.a); return c; }",
