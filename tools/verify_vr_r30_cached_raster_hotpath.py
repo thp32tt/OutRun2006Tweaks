@@ -24,6 +24,8 @@ def body(text, signature):
 
 
 def check(r29, api, r30):
+    if '#include "../state/state_block_tracker.hpp"' not in r30.splitlines():
+        return False
     try:
         local = body(r29, "inline bool TryGetEffectTelemetrySnapshot(")
         bridge = body(r29, "bool R29OwnerTryGetEffectTelemetrySnapshot(")
@@ -157,11 +159,14 @@ def main():
         (r29, api, r30.replace(
             "R29OwnerCurrentVertexShaderIdentity() != 0",
             "false", 1)),
+        (r29, api, r30.replace(
+            '#include "../state/state_block_tracker.hpp"',
+            '// removed explicit StateBlockTracker include', 1)),
     )
     for i, candidate in enumerate(changes, 1):
         assert candidate != (r29, api, r30), f"mutation {i} not applied"
         assert not check(*candidate), f"mutation {i} escaped"
-    print("PASS DX9Ex R30 cached raster hotpath + 16 destructive regressions")
+    print("PASS DX9Ex R30 cached raster hotpath + 17 destructive regressions")
 
 
 if __name__ == "__main__":

@@ -19,6 +19,7 @@
 #endif
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
+#include "../state/state_block_tracker.hpp"
 #include "vr_pass_policy.hpp"
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
