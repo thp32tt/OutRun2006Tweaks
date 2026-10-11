@@ -61,8 +61,8 @@ jobs:
                   raise RuntimeError(f"Exact-source DDS decode failed: {p}: {ex}")
               rawname=out/"RAW"/f"{label}_EN_RAW.png"
               viewname=out/"VIEW_FLIPY"/f"{label}_EN_VIEW_FLIPY.png"
-              rgba.save(rawname,format="PNG",compress_level=6)
-              rgba.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(viewname,format="PNG",compress_level=6)
+              rgba.save(rawname,format="PNG",compress_level=1)
+              rgba.transpose(Image.Transpose.FLIP_TOP_BOTTOM).save(viewname,format="PNG",compress_level=1)
               found.append({"queue_index":idx,"asset":r["path"],"status":r["artwork_status"],"source_dds_sha256":h,"source_width":rgba.width,"source_height":rgba.height,"raw_png":str(rawname.relative_to(out)),"raw_png_sha256":hashlib.sha256(rawname.read_bytes()).hexdigest(),"view_flipy_png":str(viewname.relative_to(out)),"view_flipy_sha256":hashlib.sha256(viewname.read_bytes()).hexdigest()})
               t=rgba.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
               t.thumbnail((550,330))
