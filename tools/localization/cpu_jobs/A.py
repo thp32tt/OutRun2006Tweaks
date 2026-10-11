@@ -82,7 +82,7 @@ def draw_line(points,stroke=7.0):
   d.ellipse((px-rad,py-rad,px+rad,py+rad),fill=255)
 def stroke(ox,pts,width=7.0):
  # Height-authored strokes: ~2px min and ~3px lower safety margin.
- transformed=[(ox+x+(44-y)*.10, 2+y*.93) for x,y in pts]
+ transformed=[(ox+x+(44-y)*.10, 3+y*.93) for x,y in pts]
  draw_line(transformed,width)
 # 가: ㄱ + ㅏ; source-conditioned broad strokes and round corners.
 stroke(8,[(1,7),(22,7),(22,37)],8)
