@@ -244,6 +244,43 @@ def save_contact(path: Path, items: list[np.ndarray], rect, gray: int, percent: 
     canvas.save(path)
 
 
+def require_bound_english_reference(repo: Path, raw: dict) -> dict:
+    """Fail closed unless English RGBA and the tool-input receipt are SHA-bound.
+
+    A producer-authored receipt is not independent proof of ImageGen attachment.
+    C2 still independently checks actual inputs and visible generated pixels.
+    """
+    binding = raw.get("source_media_binding")
+    if not isinstance(binding, dict):
+        raise ValueError("SOURCE_REFERENCE_NOT_BOUND: missing English media binding")
+    english_ref = binding.get("english_reference")
+    receipt_ref = binding.get("tool_request_receipt")
+    if not isinstance(english_ref, dict) or not isinstance(receipt_ref, dict):
+        raise ValueError("SOURCE_REFERENCE_NOT_BOUND: missing SHA-bound reference/receipt")
+    try:
+        english = bound(repo, english_ref)
+        png_rgba(english)
+        receipt = json.loads(bound(repo, receipt_ref))
+    except (KeyError, TypeError, OSError, ValueError) as exc:
+        raise ValueError("SOURCE_REFERENCE_NOT_BOUND: invalid English PNG or receipt") from exc
+    if not isinstance(receipt, dict) or (
+        receipt.get("tool") != "image_gen.text2im"
+        or receipt.get("media_attached") is not True
+        or receipt.get("source_image_sha256") != english_ref.get("sha256")
+        or receipt.get("generation_id") != raw.get("generator", {}).get("generation_id")
+        or receipt.get("target_text") != raw.get("target_text")
+        or receipt.get("image_input_field") not in ("referenced_image_ids", "tool_image_input")
+        or not isinstance(receipt.get("input_reference_id"), str)
+        or not receipt["input_reference_id"].strip()
+    ):
+        raise ValueError("SOURCE_REFERENCE_NOT_BOUND: tool-image attachment not evidenced")
+    return {
+        "english_reference_sha256": english_ref["sha256"],
+        "tool_request_receipt_sha256": receipt_ref["sha256"],
+        "binding_status": "DECLARED_TOOL_INPUT_RECEIPT_PRESENT_C2_VERIFICATION_REQUIRED",
+    }
+
+
 def run(repo: Path, manifest: Path) -> dict:
     repo=repo.resolve()
     raw=json.loads(manifest.read_text(encoding="utf-8"))
@@ -259,6 +296,7 @@ def run(repo: Path, manifest: Path) -> dict:
         raise ValueError("No generator invocation/prompt provenance; HOLD")
     if not isinstance(raw.get("target_text"),str) or not raw["target_text"].strip():
         raise ValueError("No exact Korean source-text transcription")
+    source_media_evidence = require_bound_english_reference(repo, raw)
     S0=bound(repo,raw["source"])
     O0=bound(repo,raw["official"])
     C0=bound(repo,raw["clean"])
@@ -363,7 +401,8 @@ def run(repo: Path, manifest: Path) -> dict:
         evidence.append({"path":str((outdir/fn).relative_to(repo)),"sha256":digest((outdir/fn).read_bytes())})
     info={
       "schema":raw["schema"],"queue_index":index,"lane":role,"producer_method":"CHATGPT_IMAGEGEN_ONLY",
-      "generation_provenance":raw["generator"],"manifest_sha256":digest(manifest.read_bytes()),
+      "generation_provenance":raw["generator"],"source_media_evidence":source_media_evidence,
+      "manifest_sha256":digest(manifest.read_bytes()),
       "official_sha256":digest(O0),"source_sha256":digest(S0),"clean_sha256":digest(C0),
       "generated_sha256":digest(P0),"saved_trial_sha256":digest(dds),
       "dds_format":fmt,"saved_lossy_mismatch_pixels_within_bbox":mismatches,
