@@ -8,11 +8,11 @@
   "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00593",
   "target_branch": "vr-d3d9ex-focus",
   "feature_status": "FEATURE_READY",
-  "status": "FEATURE_READY_PENDING_TARGET_EXACT_SHA",
-  "checkpoint": "FEATURE_READY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "policy_blob_sha": "e8a7c70cf99fd89429173dbbe37a98160dcf528d",
   "material_result_sha": "34b38fe5eee501145a97c1f807273ec5ebbc94a8",
-  "automation_validation": "PENDING_TARGET_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "feature_acceptance": {
     "implementation_complete": true,
@@ -93,5 +93,31 @@
     "conclusion": "SUCCESS",
     "scope": "PR_SYNTHETIC_MERGE_CI_NOT_TARGET_EXACT_SHA"
   },
-  "next_action": "After this FEATURE_READY commit passes feature CI, compare feature HEAD and target HEAD (behind=0,ahead>0), nonforce expected-SHA fast-forward TARGET; verify target SHA DX9Ex Active and Domain gates and exact artifact; commit separate C6 bookkeeping preserving validation-bearing SHA. Never assert HMD PASS."
+  "next_action": "After this FEATURE_READY commit passes feature CI, compare feature HEAD and target HEAD (behind=0,ahead>0), nonforce expected-SHA fast-forward TARGET; verify target SHA DX9Ex Active and Domain gates and exact artifact; commit separate C6 bookkeeping preserving validation-bearing SHA. Never assert HMD PASS.",
+  "validation_bearing_result_sha": "b02590720fd9f387218af541a71071516c8168db",
+  "exact_sha_validation": {
+    "target_branch": "vr-d3d9ex-focus",
+    "head_sha": "b02590720fd9f387218af541a71071516c8168db",
+    "run_id": 38111291417,
+    "domain_run_id": 38111291405,
+    "dx9ex_jobs": [
+      "policy",
+      "host",
+      "game",
+      "full-chain-compile",
+      "package"
+    ],
+    "domain_job": "domain-isolation",
+    "acceptance_steps": [
+      "Feature acceptance: XR-EYE-SIZING",
+      "Feature acceptance: XR-EYE-RESET",
+      "Feature acceptance: XR-EYE-BUNDLE"
+    ],
+    "artifact_name": "feature-dx9ex-eye-extent-b02590720fd9f387218af541a71071516c8168db",
+    "conclusion": "SUCCESS",
+    "runtime_validation": "UNTESTED",
+    "note": "No Quest3/VDXR headset measurements; safe source/host/build integration only."
+  },
+  "controller_terminal": true,
+  "controller_next_action": "Do not rerun 00593; schedule next independent feature with QUEUE_NEXT_TASK_DELAY_SECONDS=0. Keep validation_bearing_result_sha pinned when bookkeeping HEAD changes."
 }
