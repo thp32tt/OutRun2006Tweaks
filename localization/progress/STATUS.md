@@ -1,3 +1,4 @@
+- 2026-10-11 13:32 KST C391 C2 q060 B369 first actual saved SHA 5b42316d777eb08c41f97e665b38e510c1df1820ecd74d78402efead26daddee independent QA REWORK style; changed outside scope0; original C342 REWORK/IGR044 OPEN, C3/game UNTESTED. [Evidence](localization/graphics/role_C/20261011-C391-C2-Q060-B369-INDEPENDENT-SAVED/C391_Q060_B369_C2_INDEPENDENT_REWORK.json). RUN_KEY=OUTRUN-KOR-C391-C2-Q060-B369-FIRST-INDEPENDENT-SAVED-20261011-1330
 ## 2026-10-11 13:15 KST — B 전용 ChatGPT ImageGen 생산 전환 (A 기존 방식 유지)
 
 - RUN_KEY=`OUTRUN-KOR-B-IMAGEGEN-LANE-POLICY-20261011-1315`. 사용자 명시 결정: A 홀수 기존 native font/vector/manual 방식 **완전 유지**, B 짝수 **ChatGPT 이미지 생성 도구로 한글 텍스트 그래픽 생성** 전용. 기존 C2/C3/실게임 QA, P0/P1/IGR OPEN, 단일 queue, 6회 스케줄을 변경하지 않음. 계약 우선순위/RESET AI-image background-only 예외(B만)/Lettering B override/Quality Pipeline/Controller Commands와 Docker에 반영될 GitHub source prompt `localization_B.md`를 변경. A 프롬프트/`A.py`는 수정하지 않음.

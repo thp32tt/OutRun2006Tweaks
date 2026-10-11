@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 13:17 KST",
+  "updated_at_kst": "2026-10-11 13:32 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -810,6 +810,23 @@
         ],
         "qa": "localization/graphics/role_A/20261011-A239-Q121-OBLIQUE-ROUNDED-VECTOR/A239_CONTROLLER_PERSISTED_VISUAL_QA.json",
         "GH_CPU_run_id": 38110544667
+      },
+      "c391_c2_q060_b369_first_independent": {
+        "run_key": "OUTRUN-KOR-C391-C2-Q060-B369-FIRST-INDEPENDENT-SAVED-20261011-1330",
+        "shard": "EVEN",
+        "asset_index": 60,
+        "persisted_sha256": "5b42316d777eb08c41f97e665b38e510c1df1820ecd74d78402efead26daddee",
+        "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+        "decision": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY",
+        "machine": {
+          "changed_vs_b368": 51595,
+          "changed_outside_bbox": 0,
+          "source_clean_removed": 89391
+        },
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "official_promotions": 0,
+        "evidence": "localization/graphics/role_C/20261011-C391-C2-Q060-B369-INDEPENDENT-SAVED/C391_Q060_B369_C2_INDEPENDENT_REWORK.json"
       }
     },
     "runtime_text_trace": {
