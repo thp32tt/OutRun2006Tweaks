@@ -39,9 +39,40 @@ def check(text: str) -> None:
     assert "R32ReviewRunLowerFailClosed(device," in dispatch, "R29 fallback removed"
 
 
+
+def check_resync_single_flush(text: str) -> None:
+    """Guarded stereo draws flush once; bypasses retain the old recovery gate."""
+    guard = text.split("HRESULT R33GuardStereoRasterState(", 1)[1].split(
+        "void R33InvalidateDepthStencilCache()", 1
+    )[0]
+    dispatch = text.split("HRESULT R33Dispatch(", 1)[1].split(
+        "HRESULT __stdcall DrawPrimitiveDestR33(", 1
+    )[0]
+    assert guard.count("StateBlockRecovery::FlushPendingResync(device);") == 1
+    assert dispatch.count("StateBlockRecovery::FlushPendingResync(device);") == 1
+    assert "return drawCall(false);" in guard, "raster bypass must signal no flush"
+    assert "return drawCall(true);" in guard, "active raster guard must signal flushed"
+    assert guard.index("FlushPendingResync(device);") < guard.index(
+        "R32ReviewRunRasterReplayGuard("), "resync must precede raster snapshot"
+    assert re.search(
+        r"if\s*\(!resyncAlreadyFlushed\s*&&\s*"
+        r"!OutRunVR::State::StateBlockTracker::Recording\(\)\)",
+        dispatch
+    ), "dispatch must preserve fallback StateBlock recovery"
+    assert len(re.findall(r"auto call = \[&\]\(bool resyncAlreadyFlushed\)", text)) == 4, (
+        "all four primitive entrypoints must carry the guard decision"
+    )
+    assert len(re.findall(
+        r"R33Dispatch\(device, actual, lower,\s*\"R33/[^\"]+\",\s*"
+        r"resyncAlreadyFlushed\)", text
+    )) == 4, "every physical draw must forward the recovery flag"
+
+
+
 def main() -> None:
     src = SOURCE.read_text(encoding="utf-8")
     check(src)
+    check_resync_single_flush(src)
     mutants = [
         src.replace("R33TryHud(device, screenKind,", "R33TryHud(device, R32ReviewScreenSpaceKind::None,", 1),
         src.replace("if (screenKind != R32ReviewScreenSpaceKind::None)",
@@ -58,7 +89,19 @@ def main() -> None:
         except AssertionError:
             continue
         raise AssertionError(f"regression mutation {i} was not rejected")
-    print("PASS R33 single HUD classification, world/fallback preservation, 3 negative mutations")
+    resync_mutants = [
+        src.replace("return drawCall(false);", "return drawCall(true);", 1),
+        src.replace("return drawCall(true);", "return drawCall(false);", 1),
+        src.replace("if (!resyncAlreadyFlushed &&", "if (", 1),
+        src.replace("resyncAlreadyFlushed);", "false);", 1),
+    ]
+    for i, mutant in enumerate(resync_mutants, 1):
+        try:
+            check_resync_single_flush(mutant)
+        except (AssertionError, ValueError):
+            continue
+        raise AssertionError(f"resync regression mutation {i} was not rejected")
+    print("PASS R33 single classification + one active resync, bypass recovery, 7 negative mutations")
 
 
 if __name__ == "__main__":

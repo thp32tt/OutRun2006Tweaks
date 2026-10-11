@@ -167,9 +167,12 @@ namespace OutRunVRStereo
                 OutRunVR::State::StateBlockTracker::Recording() ||
                 !R32ReviewStereoWanted() || !R32ReviewTargetIsBackBuffer())
             {
-                return drawCall();
+                return drawCall(false);
             }
 
+            // The guarded route flushes recovery once before taking a raster
+            // snapshot. Pass that fact to R33Dispatch instead of repeating two
+            // atomic recovery loads for every active stereo primitive.
             OutRunVR::State::StateBlockRecovery::FlushPendingResync(device);
             auto onGuardActive = [&]() noexcept {
                 ++R33RasterGuardDraws;
@@ -181,7 +184,7 @@ namespace OutRunVRStereo
                 }
             };
             return R32ReviewRunRasterReplayGuard(
-                device, site, std::forward<DrawCall>(drawCall),
+                device, site, [&]() noexcept { return drawCall(true); },
                 onGuardActive);
         }
 
@@ -709,9 +712,13 @@ namespace OutRunVRStereo
         template <typename ActualDraw, typename LowerR29Draw>
         HRESULT R33Dispatch(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, LowerR29Draw&& lowerR29Draw,
-            const char* site) noexcept
+            const char* site, bool resyncAlreadyFlushed) noexcept
         {
-            if (!OutRunVR::State::StateBlockTracker::Recording())
+            // Only the early raster-guard bypass reaches this path without an
+            // earlier flush; keep StateBlock recovery there, including when
+            // stereo is disabled, without paying for a duplicate active flush.
+            if (!resyncAlreadyFlushed &&
+                !OutRunVR::State::StateBlockTracker::Recording())
                 OutRunVR::State::StateBlockRecovery::FlushPendingResync(device);
             const bool telemetry = R33TelemetryEnabled();
             if (telemetry)
@@ -758,7 +765,7 @@ namespace OutRunVRStereo
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
             R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, false);
-            auto call = [&]() {
+            auto call = [&](bool resyncAlreadyFlushed) {
                 const HRESULT xyzrhw = R32ReviewTryXyzrhwPrimitiveVB(
                     device, type, startVertex, primitiveCount);
                 if (xyzrhw != E_NOTIMPL)
@@ -772,7 +779,7 @@ namespace OutRunVRStereo
                     return R32ReviewCallLowerDrawPrimitive(
                         device, type, startVertex, primitiveCount);
                 };
-                return R33Dispatch(device, actual, lower, "R33/DrawPrimitive");
+                return R33Dispatch(device, actual, lower, "R33/DrawPrimitive", resyncAlreadyFlushed);
             };
             return R33GuardStereoRasterState(
                 device, call, "R33/DrawPrimitive/raster-state");
@@ -784,7 +791,7 @@ namespace OutRunVRStereo
             UINT startIndex, UINT primitiveCount)
         {
             R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, false);
-            auto call = [&]() {
+            auto call = [&](bool resyncAlreadyFlushed) {
                 const HRESULT xyzrhw = R32ReviewTryXyzrhwIndexedPrimitiveVB(
                     device, type, baseVertexIndex, minVertexIndex,
                     numVertices, startIndex, primitiveCount);
@@ -802,7 +809,7 @@ namespace OutRunVRStereo
                         startIndex, primitiveCount);
                 };
                 return R33Dispatch(device, actual, lower,
-                    "R33/DrawIndexedPrimitive");
+                    "R33/DrawIndexedPrimitive", resyncAlreadyFlushed);
             };
             return R33GuardStereoRasterState(
                 device, call, "R33/DrawIndexedPrimitive/raster-state");
@@ -813,7 +820,7 @@ namespace OutRunVRStereo
             UINT stride)
         {
             R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, true);
-            auto call = [&]() {
+            auto call = [&](bool resyncAlreadyFlushed) {
                 const HRESULT xyzrhw = R32ReviewTryXyzrhwPrimitiveUP(
                     device, type, primitiveCount, data, stride);
                 if (xyzrhw != E_NOTIMPL)
@@ -827,7 +834,7 @@ namespace OutRunVRStereo
                     return R32ReviewCallLowerDrawPrimitiveUP(
                         device, type, primitiveCount, data, stride);
                 };
-                return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP");
+                return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP", resyncAlreadyFlushed);
             };
             return R33GuardStereoRasterState(
                 device, call, "R33/DrawPrimitiveUP/raster-state");
@@ -840,7 +847,7 @@ namespace OutRunVRStereo
             const void* vertexData, UINT stride)
         {
             R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, true);
-            auto call = [&]() {
+            auto call = [&](bool resyncAlreadyFlushed) {
                 const HRESULT xyzrhw = R32ReviewTryXyzrhwIndexedPrimitiveUP(
                     device, type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride);
@@ -858,7 +865,7 @@ namespace OutRunVRStereo
                         indexData, indexFormat, vertexData, stride);
                 };
                 return R33Dispatch(device, actual, lower,
-                    "R33/DrawIndexedPrimitiveUP");
+                    "R33/DrawIndexedPrimitiveUP", resyncAlreadyFlushed);
             };
             return R33GuardStereoRasterState(
                 device, call, "R33/DrawIndexedPrimitiveUP/raster-state");
