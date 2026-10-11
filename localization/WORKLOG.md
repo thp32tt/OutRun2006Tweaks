@@ -1,3 +1,7 @@
+## 2026-10-12 02:20+ KST — B q104 실제 PSD 한 글자 레이어 원본 추출, 생성 입력 연결 HOLD
+
+- RUN_KEY=OUTRUN-KOR-B-Q104-PSD-GLYPH-INPUT-PREP-20261012-0220. B 담당 index104 REWORK q104: GitHub 미러 원본 606606B PSD Git blob `e1879720c2...` / SHA256 `eefb1c6a...` 직접 검증. PSD native2048x256에는 **'OutRun Mode' 단일 영어 글자 레이어**만 있으며 alpha bbox [392,52,1357,201]. 이 한 줄만 실파일 RGBA 965x149 PNG SHA256 `6d88374a...`로 분리하고 PSD만 기준의 완전 투명 CLEAN 제안 PNG SHA256 `0d3f46b6...`를 보존. localization/graphics/role_B/source_references/q104_20261012/B_Q104_PSD_SOURCE_IMAGEGEN_INPUT_HOLD.json에 정확한 경로·해시·원본 C2 소스 SHA와 UI 스타일 계열·검수 HOLD 근거 기록. 이 파일들은 폰트/벡터로 한글을 가짜 제작한 것이 아니며 구 Source-only 작업이다. ImageGen에 원본 입력이 **실제 첨부되었다는 검증이 불가능**하므로 2026-10-12 최신 계약상 SOURCE_REFERENCE_NOT_BOUND로 생성 호출하지 않음. 기존 DDS SHA `c84a2703...`·큐 C2 REWORK·C3/실게임 OPEN 유지. 신규 한글 PNG 0, 신규 DDS 0, C2 PLATE_PASS 0, RUNTIME_VALIDATION=UNTESTED.
+
 ## 2026-10-12 02:09 KST — A249 q193 SHOWROOM source CLEAN and saved Korean layer actually separated
 
 - RUN_KEY=OUTRUN-KOR-A249-Q193-SHOWROOM-SOURCE-CLEAN-20261012-0200. Latest q193 A role P1 C2 HOLD: one **previously unreviewed SHOWROOM** body text cell (original English SHOWROOM → 쇼룸) source ROI native readable [1205,957,1594,1011]. Authenticated canonical source SHA `d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451`, original official `9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3` and current saved A246 trial `980662036fcdd75b0676890acc496c27e9322bc3c95999b8bfea3d2ee81c4b8f` preserved. No re-render of accepted/previous A247 three regions, no DDS reproduced.
