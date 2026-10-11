@@ -675,3 +675,53 @@ if host_cmake.find("r32_direct_submit.hpp") < \
     raise SystemExit("R32 direct submit must be final xrEndFrame owner after R26")
 
 print("R32-R34 + R15 D3D9Ex compatibility/Present verification passed")
+
+
+# R32 DirectGPU P0: ACK ownership blocks producer GPU EVENT polling. This
+# verifies the shipping hot path and five negative mutations, not just comments.
+def verify_direct_ack_before_event(source: str) -> None:
+    resolve = source.split("bool R32ResolveDirectTransport(", 1)[1].split(
+        "void R32InvalidateResetCaches()", 1)[0]
+    scan = resolve.split("for (std::uint32_t offset", 1)[1].split(
+        "if (selected >= OutRunVR::RenderFrameRingSize)", 1)[0]
+    markers = (
+        "if (candidate.published && candidate.frameId)",
+        "R30SupportTryGetGpuCompletionSnapshot(ackSnapshot)",
+        "!R30SupportFrameIdAtOrAfter(gpuCompleted, candidate.frameId)",
+        "ackBlocked = true;\n                        continue;",
+        "R30SupportPollDirectTransportSlotProducer(index)",
+        "if (ready == S_FALSE)",
+        "if (FAILED(ready))",
+        "R32DirectCopyPathRejected = true;",
+        "R30SupportRetireDirectTransportSlotPublication(index)",
+        "selected = index;",
+    )
+    # ACK rejection must skip GPU query, while ACK success MUST still await
+    # producer completion (including S_FALSE/error) before retirement/copy.
+    locations = [scan.index(marker) for marker in markers]
+    assert locations == sorted(locations), "R32 ACK-first/event-before-retire order"
+    assert scan.count("R30SupportPollDirectTransportSlotProducer(index)") == 1
+    assert scan.count("R30SupportRetireDirectTransportSlotPublication(index)") == 1
+    assert scan.count("if (candidate.published && candidate.frameId)") == 2
+    assert "if (!ackSnapshotValid ||" in scan
+    assert "R32DirectCopyRejectHr = ready;" in scan
+
+
+verify_direct_ack_before_event(r32)
+direct_negative_mutations = (
+    r32.replace("ackBlocked = true;\n                        continue;",
+                "ackBlocked = true;", 1),
+    r32.replace("R30SupportPollDirectTransportSlotProducer(index)", "S_OK", 1),
+    r32.replace("if (FAILED(ready))", "if (false)", 1),
+    r32.replace("R30SupportRetireDirectTransportSlotPublication(index)",
+                "/* no retire */", 1),
+    r32.replace("if (!ackSnapshotValid ||", "if (false &&", 1),
+)
+for number, bad in enumerate(direct_negative_mutations):
+    assert bad != r32, f"R32 DirectGPU mutation {number} not applied"
+    try:
+        verify_direct_ack_before_event(bad)
+    except (AssertionError, ValueError, IndexError):
+        continue
+    raise AssertionError(f"R32 DirectGPU mutation {number} escaped")
+print("R32 DirectGPU ACK-first GPU-query skip PASS (5 negative mutations)")

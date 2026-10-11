@@ -489,10 +489,35 @@ namespace OutRunVRStereo
                 const R30SupportDirectTransportSlotPublication candidate =
                     R30SupportGetDirectTransportSlotPublication(index);
 
-                // DirectTransportFrameReadyAfterPresent() may leave an
-                // unpublished slot quarantined on S_FALSE. Reclaim it only
-                // after the same EVENT proves completion; a query error keeps
-                // the whole DirectGPU path fail-closed.
+                // A published slot belongs to the host until its per-slot GPU
+                // completion ACK. Check that ownership before querying its
+                // producer EVENT: even a completed EVENT cannot make an
+                // unacknowledged published slot writable, and polling every
+                // busy slot adds needless D3D9 GetData work under host load.
+                if (candidate.published && candidate.frameId)
+                {
+                    // R13 owns mapping/rebind policy behind the R30 facade.
+                    // Read one whole-ring ACK snapshot for this resolve scan.
+                    if (!ackSnapshotRead)
+                    {
+                        ackSnapshotValid =
+                            R30SupportTryGetGpuCompletionSnapshot(ackSnapshot);
+                        ackSnapshotRead = true;
+                    }
+
+                    const std::uint32_t gpuCompleted = ackSnapshotValid
+                        ? ackSnapshot.completedFrameId[index] : 0;
+                    if (!ackSnapshotValid ||
+                        !R30SupportFrameIdAtOrAfter(gpuCompleted, candidate.frameId))
+                    {
+                        ackBlocked = true;
+                        continue;
+                    }
+                }
+
+                // An ACKed published slot, or an unpublished slot quarantined
+                // by S_FALSE after Present, still needs producer EVENT proof
+                // before being reused. A hard query error remains fail-closed.
                 const HRESULT ready =
                     R30SupportPollDirectTransportSlotProducer(index);
                 if (ready == S_FALSE)
@@ -509,31 +534,9 @@ namespace OutRunVRStereo
 
                 if (candidate.published && candidate.frameId)
                 {
-                    // R13 still owns ACK mapping/rebind policy behind the R30
-                    // support facade. It performs at most one bounded stale-mapping reopen/retry,
-                    // so this final owner samples that whole-ring state exactly
-                    // once per resolve scan and reuses it for every candidate.
-                    if (!ackSnapshotRead)
-                    {
-                        ackSnapshotValid =
-                            R30SupportTryGetGpuCompletionSnapshot(ackSnapshot);
-                        ackSnapshotRead = true;
-                    }
-
-                    const bool ackValid = ackSnapshotValid;
-                    const std::uint32_t gpuCompleted = ackValid
-                        ? ackSnapshot.completedFrameId[index] : 0;
-
-                    if (!ackValid ||
-                        !R30SupportFrameIdAtOrAfter(gpuCompleted, candidate.frameId))
-                    {
-                        ackBlocked = true;
-                        continue;
-                    }
-
-                    // The host completed this exact published frame. Retire the
-                    // old publication before writing new eye pixels into the
-                    // shared textures.
+                    // Both the host's exact-frame ACK and the producer EVENT
+                    // now permit retiring the old publication. Preserve the
+                    // shared-eye immutability rule before either eye copy.
                     R30SupportRetireDirectTransportSlotPublication(index);
                 }
 
