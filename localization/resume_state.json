@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C2 NEXT: first independent full q035 A250 new native stored DDS SHA 5ac62e3ef33ff39277fcef5bd7b00cc36c99666ccd01ac0f5a022e22e37b2369, inspect two new source-right-italic Total Rank→종합 랭킹 saved labels at native/75/50/RAW, BGRA palette, source/CLEAN effect 14182 pixels outside former tight bboxes, current official cc8df5b4 unchanged. A producer self-QA scoped only, C3 and real game NOT_RUN, RUNTIME_VALIDATION=UNTESTED. RUN_KEY=OUTRUN-KOR-A250-Q035-TOTAL-RANK-ITALIC-NATIVE-20261012-0300",
     "C2 2026-10-12 q104 B PSD English-only source & proposed CLEAN FIRST independent evidence: canonical SOURCE SHA f0a84915, B PSD glyph SHA 6d88374a, proposed empty-clean SHA 0d3f46b, current Korean saved DDS SHA c84a2703 UNCHANGED. Native BC3 2048x256 mip1 RAW mirrorY/FLIPY. English source 118098 alpha vs PSD118401, support intersection/union 118098/118401 (99.744%), 303 extra PSD alpha, 67241 RGBA pixel mismatch despite near visual source-style match: not falsely pixel-exact. Proposed EMPTY CLEAN alpha0 / RGBA0 visibly clean on gray/white/black but removes 380503 source nonzero alpha0-RGB pixels OUTSIDE original source bbox [392,52,1357,201], so STRICT RGBA source-derived PLATE=HOLD for raw outside preservation (not visible protected art corruption). Current unchanged prior-rejected saved DDS source->candidate outside bbox RGBA15571 also all alpha0; source->saved alpha outside0; saved angular Korean already C2 REWORK and not reassessed as new production. IMAGEGEN_SOURCE_REFERENCE_NOT_BOUND; C2_FULL/HARD_APPROVAL no, C3 NOT_RUN, RUNTIME_VALIDATION=UNTESTED, DDS0. Need source-derived region-preserving CLEAN and attached English-only reference. Evidence localization/graphics/role_C/20261012-C2-Q104-PSD-SOURCE-PLATE-PREFLIGHT/C2_Q104_PSD_SOURCE_CLEAN_INDEPENDENT_HOLD.json.",
     "C2 2026-10-12 A249 SHOWROOM first independent scope: canonical source DDS SHA d308bf05, A249 new transparent CLEAN SHA 594c8817, unchanged persisted trial A246 DDS SHA 98066203; original SHOWROOM alpha 11379 removed CLEAN alpha0 (SOURCE→CLEAN RGBA 11379); extracted existing 쇼룸 layer SHA fa5ef471 matches saved native 389x54 crop RGBA mismatch0; CLEAN→saved changed 2634; original bbox [1205,957,1594,1011], saved bbox [1207,959,1302,1009], margins L2/T2/R292/B2; changes outside ROI source bbox RGBA0, neighboring OUTRUN artwork unchanged, 1244 neighboring alpha pixels preserved source/saved equally introduced0. Native 100 gray/75 white/50 black, DDS RAW/FLIPY and mips1 independently inspected. SHOWROOM_ONLY_SOURCE_CLEAN_SAVED_SCOPED_STATIC_QA_PASS; q193 WHOLE C2 HOLD, C3 NOT_RUN, game IGR003/019/033 OPEN, RUNTIME_VALIDATION=UNTESTED, new DDS0, official promotion0. Evidence localization/graphics/role_C/20261012-C2-Q193-A249-SHOWROOM-FIRST-PLATE/C2_Q193_A249_SHOWROOM_FIRST_INDEPENDENT_QA.json.",
     "A249 2026-10-12 02:09 KST new q193 SHOWROOM original English→CLEAN 11379 pixels/alpha residue0/outside0, saved Korean 쇼룸 layer alpha2634 preserved exact current A246 SHA98066203, producer gray100/white75/black50/RAW reviewed; C2 must independently inspect NEW SHOWROOM scoped stage, then reconcile 13 regions before whole q193 final; C3, IGR003/019/033 new real-game screenshot pending, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261012-A249-Q193-SHOWROOM-SOURCE-CLEAN/A249_CONTROLLER_FIRSTHAND_SCOPED_QA.json. RUN_KEY=OUTRUN-KOR-A249-Q193-SHOWROOM-SOURCE-CLEAN-20261012-0200",
@@ -16552,5 +16553,80 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa_file": "localization/graphics/role_A/20261012-A249-Q193-SHOWROOM-SOURCE-CLEAN/A249_CONTROLLER_FIRSTHAND_SCOPED_QA.json",
     "action_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38158179765"
+  },
+  "a250_20261012_q035_two_native_italic_labels_new_dds": {
+    "run_key": "OUTRUN-KOR-A250-Q035-TOTAL-RANK-ITALIC-NATIVE-20261012-0300",
+    "role": "A",
+    "queue_index": 35,
+    "asset": "E989E3B7",
+    "priority": "P2_SOURCE_FAMILY_REWORK",
+    "at_kst": "2026-10-12 03:18 KST",
+    "production": "ONE_NEW_4096x4096_NATIVE_Q035_TWO_TOTAL_RANK_ITALIC_TRIAL_DDS",
+    "source_upstream_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+    "official_prior_sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
+    "saved_new_unpromoted_sha256": "5ac62e3ef33ff39277fcef5bd7b00cc36c99666ccd01ac0f5a022e22e37b2369",
+    "superseded_same_task_trial_sha256": "b4c412979dc382b0bf82211eb438c57c8948c821be9c66f5c1a5d8d161d59624",
+    "native": [
+      4096,
+      4096
+    ],
+    "format": "RGBA32",
+    "mip_count": 1,
+    "new_saved_DDS_task_count": 1,
+    "official_promoted": 0,
+    "pixels_changed_vs_official": 37825,
+    "changed_rgba_outside_two_original_source_bboxes": 0,
+    "saved_dds_roundtrip_mismatch": 0,
+    "regions": [
+      {
+        "id": "pink",
+        "original": [
+          609,
+          357,
+          1113,
+          429
+        ],
+        "new": [
+          737,
+          360,
+          985,
+          426
+        ],
+        "margins": [
+          128,
+          3,
+          128,
+          3
+        ]
+      },
+      {
+        "id": "green",
+        "original": [
+          2273,
+          370,
+          2778,
+          442
+        ],
+        "new": [
+          2402,
+          373,
+          2649,
+          439
+        ],
+        "margins": [
+          129,
+          3,
+          129,
+          3
+        ]
+      }
+    ],
+    "new_C2": "NOT_RUN_EXACT_SAVED_SHA",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "remaining": "C2 independently qualify source-to-CLEAN 14182 effect halo outside tight text bboxes and inspect exact new material style and protected artwork; C3/actual game thereafter",
+    "worker": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38162887506",
+    "QA": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_CONTROLLER_FIRSTHAND_SAVED_QA.json",
+    "recipe": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_SHA_BOUND_LETTERING_RECIPE.json"
   }
 }
