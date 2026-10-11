@@ -40,7 +40,7 @@ def verify(text):
         assert "auto frame = R29OwnerCaptureFrameSnapshot();" in part, name
         assert "R29OwnerCaptureFrameSnapshot()." not in part, name
         assert part.index("R29OwnerTryBootstrapRightDepth(device);") < part.index(
-            "frame = R29OwnerCaptureFrameSnapshot();"), name
+            "                frame = R29OwnerCaptureFrameSnapshot();"), name
         for token in ("frame.trackedDepthStencil", "frame.rightDepthSynchronized",
                       "frame.rightStencilSynchronized", "R29OwnerDepthTestActive(device)",
                       "R29OwnerStencilTestActive(device)"):
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         ("frame.rightEyeSurface", "nullptr"),
         ("frame.rightEyeDepth", "nullptr"),
         ("frame.trackedDepthStencil", "nullptr"),
-        ("frame = R29OwnerCaptureFrameSnapshot();", "// no bootstrap refresh"),
+        ("                frame = R29OwnerCaptureFrameSnapshot();", "                // no bootstrap refresh"),
         ("R29OwnerTryBootstrapRightDepth(device);", "// no bootstrap"),
         ("R29OwnerRestoreRightPassState", "R29OwnerNoRestore"),
         ("R30SkyGlowSceneCaptureEpoch != frame.presentEpoch", "true"),
