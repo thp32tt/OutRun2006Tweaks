@@ -30,7 +30,7 @@
       "C++ positive/negative and Python destructive regression"
     ],
     "acceptance_proof": {
-      "positive_probe": "Exact SHA 1079669c68b6dbccb0a768166816b3db0739fd48: Backend Gate #38152222429 validate+readiness smoke SUCCESS; Windows Release Build #38152226869 SUCCESS; DX11 Fast #38152222455 SUCCESS; OpenXR #38152226868 SUCCESS. Actual game/HMD pixels UNTESTED.",
+      "positive_probe": "Exact SHA 1079669c68b6dbccb0a768166816b3db0739fd48: Backend Gate #38152222429 validate+readiness smoke SUCCESS; Windows Release Build #38152226869 SUCCESS; DX11 Fast #38152222455 SUCCESS; OpenXR #38152226868 SUCCESS. Actual game/HMD pixels UNTESTED. HUD Inspector #38152226855 SUCCESS at exact SHA.",
       "negative_regression": "TEX9, unsupported UV dimension, short stride, corrupted offset, missing UV index fail closed; destructive test mutations.",
       "component_integration": "Game D3D9 draw FVF TEX5..8 -> vertex decode -> selected stage0 UV 4..7 -> native D3D11 Draw/DrawIndexed -> diagnostic Present inset. Exact-SHA CI confirms compilation/probe but does not prove actual pixels."
     },
@@ -60,10 +60,10 @@
     "C0_RECOVER": "2b938a44d2caac9dfea75cb6948c08c78bf4aeee; 00551 C6 complete",
     "C1_REVIEW": "TEX5..8 FVF gap, disjoint new work key, R175 unchanged",
     "C2_IMPLEMENT": "FVF8 layout/bridge C++ plus tests implemented",
-    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Conversion Gate #38152222429 validate and DX11 readiness smoke probes SUCCESS; Win32 Release Build #38152226869 SUCCESS; DX11 Fast #38152222455 SUCCESS; OpenXR #38152226868 SUCCESS. HUD Inspector #38152226855 in progress at C6, not treated as PASS. Hardware and game pixels UNTESTED.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Conversion Gate #38152222429 validate and DX11 readiness smoke probes SUCCESS; Win32 Release Build #38152226869 SUCCESS; DX11 Fast #38152222455 SUCCESS; OpenXR #38152226868 SUCCESS. HUD Inspector #38152226855 SUCCESS at exact SHA. Hardware/game visuals UNTESTED.",
     "C4_COMMIT": "PASS: real TEX5..8 source material d56f539744f3466907da1501b2f9b1dfbf92ca52 and same-task destructive regression repair; validation-bearing 1079669c68b6dbccb0a768166816b3db0739fd48; no CI-skip.",
     "C5_PACKAGE": "NOT_REQUIRED diagnostic only",
-    "C6_STATE": "PASS_EXACT_SHA BUILD_VERIFIED; HMD Quest3/VDXR UNTESTED; DX9Ex/gamepad original preserved; no gameplay promotion."
+    "C6_STATE": "PASS_EXACT_SHA: Backend Gate, Win32, DX11 Fast, OpenXR and HUD Inspector SUCCESS at validation-bearing SHA; Quest3/VDXR RUNTIME_VALIDATION=UNTESTED; original D3D9 input and fallback unchanged."
   },
   "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
   "runtime_evidence": "No Quest3/VDXR game or HMD test performed",
@@ -106,8 +106,8 @@
     },
     "hud_inspector": {
       "run_id": 38152226855,
-      "status_at_check": "IN_PROGRESS",
-      "conclusion_at_check": null
+      "status": "SUCCESS",
+      "head_sha": "1079669c68b6dbccb0a768166816b3db0739fd48"
     },
     "runtime": {
       "status": "UNTESTED",
