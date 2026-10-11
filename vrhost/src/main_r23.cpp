@@ -35,6 +35,7 @@
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
 #include "vr/ipc/cadence_v1.hpp"
+#include "vr/ipc/frame_pacing_diagnostics.hpp"
 
 #ifndef OUTRUN_VR_BUILD_SHA
 #define OUTRUN_VR_BUILD_SHA "unknown"
@@ -2031,6 +2032,20 @@ int main(int argc, char** argv)
             std::ios::out | std::ios::trunc);
         LARGE_INTEGER qpcFrequency{};
         QueryPerformanceFrequency(&qpcFrequency);
+        // Opt-in only: no frame-selection, render ownership, or GPU ACK changes.
+        OutRunVR::Pacing::Buffer pacingBuffer;
+        std::ofstream pacingLog;
+        if (OutRunVR::Pacing::Enabled())
+        {
+            pacingLog.open("outrun-vr-frame-pacing.csv",
+                std::ios::out | std::ios::trunc);
+            if (pacingLog)
+                pacingLog << "xrTick,gameRunGeneration,gameFrameId,cached,"
+                          << "gameRenderCpuMs,gamePresentCpuMs,gamePresentToHostMs,"
+                          << "hostCaptureCpuMs,hostCopyCpuMs,hostRenderCpuMs,"
+                          << "xrWaitFrameMs,xrEndFrameMs\n";
+        }
+        std::uint64_t pacingXrTick = 0;
         ULONGLONG lastPipelineTelemetryMs = 0;
         R23PipelineWindow pipelineWindow;
         const XrEnvironmentBlendMode blend = ChooseBlendMode(instance, system);
@@ -2936,6 +2951,54 @@ int main(int argc, char** argv)
             pipelineWindow.Note(candidateRejectReason,
                 actualFinalLayerKind, candidateCaptureMs,
                 candidateCommitCopyMs, frameRenderMs, endFrameMs);
+            // Only the frame confirmed by the xrEndFrame interception is joined.
+            // A stale newest candidate is never described as XR-submitted.
+            if (pacingLog.is_open())
+            {
+                ++pacingXrTick;
+                OutRunVrR23VerifiedBundle::Snapshot submitted{};
+                const bool haveSubmitted =
+                    OutRunVrR23VerifiedBundle::Read(submitted);
+                if (actualSubmittedLayer && actualSubmittedFrameId &&
+                    haveSubmitted && submitted.frameId == actualSubmittedFrameId &&
+                    submitted.frame.frameId == actualSubmittedFrameId)
+                {
+                    const auto& frame = submitted.frame;
+                    OutRunVR::Pacing::Sample sample{};
+                    sample.xrTick = pacingXrTick;
+                    sample.frameId = actualSubmittedFrameId;
+                    sample.runGeneration = frame.reserved[
+                        OutRunVR::RenderFrameRunGenerationIndex];
+                    sample.cached = !frameFreshProjection;
+                    sample.gameRenderMs = OutRunVR::Pacing::DurationMs(
+                        OutRunVR::Pacing::ReadQpc(frame, OutRunVR::Pacing::BeginLo),
+                        frame.presentQpc, qpcFrequency.QuadPart);
+                    sample.gamePresentMs = OutRunVR::Pacing::DurationMs(
+                        frame.presentQpc,
+                        OutRunVR::Pacing::ReadQpc(frame, OutRunVR::Pacing::PublishLo),
+                        qpcFrequency.QuadPart);
+                    if (!sample.cached &&
+                        candidateGameFrameId == actualSubmittedFrameId)
+                    {
+                        sample.presentToConsumeMs = candidateConsumeAgeMs;
+                        sample.hostCaptureMs = candidateCaptureMs;
+                        sample.hostCopyMs = candidateCommitCopyMs;
+                    }
+                    sample.hostRenderMs = frameRenderMs;
+                    sample.xrWaitMs = xrWaitFrameMs;
+                    sample.xrEndMs = endFrameMs;
+                    pacingBuffer.Push(sample);
+                }
+                if (pacingBuffer.Size() >= 64)
+                    pacingBuffer.Drain([&](const OutRunVR::Pacing::Sample& s) {
+                        pacingLog << s.xrTick << ',' << s.runGeneration << ','
+                            << s.frameId << ',' << (s.cached ? 1 : 0) << ','
+                            << s.gameRenderMs << ',' << s.gamePresentMs << ','
+                            << s.presentToConsumeMs << ',' << s.hostCaptureMs << ','
+                            << s.hostCopyMs << ',' << s.hostRenderMs << ','
+                            << s.xrWaitMs << ',' << s.xrEndMs << '\n';
+                    });
+            }
 
             const ULONGLONG pipelineNowMs = GetTickCount64();
             if (lastPipelineTelemetryMs == 0 ||
@@ -3004,6 +3067,20 @@ int main(int argc, char** argv)
             timings.MaybeLog();
         }
 
+        if (pacingLog.is_open())
+        {
+            pacingBuffer.Drain([&](const OutRunVR::Pacing::Sample& s) {
+                pacingLog << s.xrTick << ',' << s.runGeneration << ','
+                    << s.frameId << ',' << (s.cached ? 1 : 0) << ','
+                    << s.gameRenderMs << ',' << s.gamePresentMs << ','
+                    << s.presentToConsumeMs << ',' << s.hostCaptureMs << ','
+                    << s.hostCopyMs << ',' << s.hostRenderMs << ','
+                    << s.xrWaitMs << ',' << s.xrEndMs << '\n';
+            });
+            std::cout << "[PACING] linked XR submissions; bufferDrops="
+                      << pacingBuffer.Dropped()
+                      << "; no native FPS claim; HMD UNTESTED\n";
+        }
         OutRunVrR23VerifiedBundle::Invalidate();
         compositor.Shutdown();
         if (viewSpace != XR_NULL_HANDLE) xrDestroySpace(viewSpace);
