@@ -1,0 +1,104 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00607",
+  "production_id": "CONVERSION-DX9EX-00607",
+  "event_id": "CONVERSION-DX9EX-00607-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:STATEBLOCK_RESYNC_IDLE_DRAW_FASTPATH",
+  "work_key": "DX9EX:STATEBLOCK_RESYNC_IDLE_DRAW_FASTPATH",
+  "material_result_sha": "50d71dfbc8b9b9def4a339e284d05656d3fb967a",
+  "result_sha": "f338851fae0776acdc6422d3b3bcce7c033fea6e",
+  "validation_bearing_result_sha": "f338851fae0776acdc6422d3b3bcce7c033fea6e",
+  "material_commits": [
+    "50d71dfbc8b9b9def4a339e284d05656d3fb967a",
+    "f338851fae0776acdc6422d3b3bcce7c033fea6e"
+  ],
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Reduce R33/R31 per-primitive StateBlock recovery callback atomic reads when no resync is queued in stereo rendering, without suppressing fail-closed paths.",
+    "acceptance": "Short-circuit idle configured-provider callback loads, continue full pending resync and callback-less fail-closed recovery, preserve Clear/Configure ordering, pass five-mutant Python negative checker, Win32 game/host/full-chain/package and Domain isolation exact-SHA gates.",
+    "runtime_metrics": "Quest3/VDXR frame time/FPS p95/p99 not measured; callback-load reduction is structural only and must not be reported as a quantified FPS gain."
+  },
+  "acceptance_results": [
+    {
+      "item": "STATEBLOCK_IDLE_FASTPATH",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "StateBlockTracker::HasPendingResync() thread-local predicate gates StateBlockRecovery::FlushPendingResync() only when provider pair published ready; all queued/missing-provider paths retain previous resync and fail-closed logic."
+    },
+    {
+      "item": "NEGATIVE_MUTATION_REGRESSION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "tools/verify_vr_state_block_resync_fastpath.py 5 negative mutations included in DX9Ex Active policy. First SHA 50d71df CI policy failure due to ValueError handling in the verifier; repaired on SHA f338851."
+    },
+    {
+      "item": "WIN32_GAME_HOST_R29_R33_FULL_CHAIN_PACKAGE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Active Validation #38147928203 policy, game, host, full-chain-compile, package all SUCCESS for f338851."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Domain Isolation Guard #38147928221 SUCCESS for f338851."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_MATERIAL_SHA",
+      "evidence": "DX9Ex Full Source Impact Review #38147847041 game MSVC-analyze, host MSVC-analyze, cross-domain all SUCCESS for initial material-source SHA 50d71df; f338851 only repairs regression test exception classification and keeps C++ source identical."
+    },
+    {
+      "item": "QUEST3_VDXR_RUNTIME_FPS",
+      "status": "UNTESTED",
+      "evidence": "No HMD/gameplay hardware timing measurements or visual promotion were carried out."
+    }
+  ],
+  "exact_sha_validation": {
+    "target_sha": "f338851fae0776acdc6422d3b3bcce7c033fea6e",
+    "all_conclusion": "SUCCESS",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38147928203,
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "f338851fae0776acdc6422d3b3bcce7c033fea6e",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38147928203"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38147928221,
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "f338851fae0776acdc6422d3b3bcce7c033fea6e",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38147928221"
+      }
+    ],
+    "supplemental_source_impact": {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38147847041,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "50d71dfbc8b9b9def4a339e284d05656d3fb967a"
+    }
+  },
+  "material_change_evidence": {
+    "source_paths": [
+      "src/vr/state/state_block_recovery.hpp",
+      "src/vr/state/state_block_tracker.hpp"
+    ],
+    "validation_paths": [
+      "tools/verify_vr_state_block_resync_fastpath.py",
+      ".github/workflows/vr-dx9ex-active.yml"
+    ]
+  },
+  "runtime_validation_note": "RUNTIME_VALIDATION=UNTESTED; real Quest3/VDXR FPS, visual, frame pacing and HMD acceptance not confirmed.",
+  "controller_next_action": "Do not re-dispatch or rescore CONVERSION-DX9EX-00607. Choose a new independent performance hotspot from latest GitHub HEAD. Preserve DX11 priority, DXVK freeze and baseline."
+}
