@@ -22,6 +22,8 @@ def block(src, name):
 def verify(text):
     for name in (
         "R30EnsureSkyGlowResources",
+        "PresentDestR30",
+        "R30PrepareXyzrhwState",
         "R30CaptureSkyGlowSceneBeforeHud",
         "R30ApplyStereoSkyGlow",
         "R30HudAspectCompensation",
@@ -51,6 +53,7 @@ def verify(text):
                       "frame.trackedDepthStencil", "R29OwnerRestoreRightPassState"):
             assert token in part, (name, token)
     xyz = block(text, "R30ExecuteXyzrhwStereo")
+    assert "IDirect3DSurface9* savedDepth = frame.trackedDepthStencil;" in xyz
     assert xyz.index("const HRESULT leftHr = leftDraw();") < xyz.index(
         "const auto frame = R29OwnerCaptureFrameSnapshot();") < xyz.index(
         "rightHr = R29OwnerCallOriginalSetRenderTarget(")
@@ -72,9 +75,11 @@ if __name__ == "__main__":
     verify(src)
     negatives = (
         ("const auto frame = R29OwnerCaptureFrameSnapshot();", "const auto frame = {};"),
-        ("frame.rightEyeSurface", "nullptr"),
-        ("frame.rightEyeDepth", "nullptr"),
-        ("frame.trackedDepthStencil", "nullptr"),
+        ("device, 0u, frame.rightEyeSurface)", "device, 0u, nullptr)"),
+        ("device, frame.trackedDepthStencil ? frame.rightEyeDepth : nullptr)",
+         "device, nullptr)"),
+        ("IDirect3DSurface9* savedDepth = frame.trackedDepthStencil;",
+         "IDirect3DSurface9* savedDepth = nullptr;"),
         ("                frame = R29OwnerCaptureFrameSnapshot();", "                // no bootstrap refresh"),
         ("R29OwnerTryBootstrapRightDepth(device);", "// no bootstrap"),
         ("R29OwnerRestoreRightPassState", "R29OwnerNoRestore"),
@@ -85,7 +90,7 @@ if __name__ == "__main__":
         assert good in src, good
         try:
             verify(src.replace(good, bad, 1))
-        except AssertionError:
+        except (AssertionError, ValueError):
             pass
         else:
             raise AssertionError("destructive mutation survived: " + good)

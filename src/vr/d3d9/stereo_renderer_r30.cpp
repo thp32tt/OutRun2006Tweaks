@@ -1211,11 +1211,13 @@ namespace OutRunVRStereo
             const RECT* destRect, HWND destWindowOverride,
             const RGNDATA* dirtyRegion)
         {
+            // One phase-stable R29 view avoids redundant cross-TU POD assembly.
+            const auto frame = R29OwnerCaptureFrameSnapshot();
             R30MaybeLogTelemetry();
             if (Settings::SkyGlowFactor > 0 &&
-                R29OwnerStereoWanted() && R29OwnerCaptureFrameSnapshot().hadWorldStereo &&
-                R29OwnerCaptureFrameSnapshot().hadDuplicatedDraw &&
-                !R29OwnerCaptureFrameSnapshot().rightDrawFailed && !R29OwnerCaptureFrameSnapshot().stereoIncomplete)
+                R29OwnerStereoWanted() && frame.hadWorldStereo &&
+                frame.hadDuplicatedDraw &&
+                !frame.rightDrawFailed && !frame.stereoIncomplete)
             {
                 R30ScopedInternalPass guard;
                 R30ApplyStereoSkyGlow(device);
@@ -1617,10 +1619,12 @@ namespace OutRunVRStereo
                 return false;
             state.depthTestEnabled = zEnable != D3DZB_FALSE;
 
+            // One phase-stable R29 view avoids redundant cross-TU POD assembly.
+            const auto frame = R29OwnerCaptureFrameSnapshot();
             if (!OutRunVRRenderer::GetLatchedStereoFrame(state.stereo) ||
                 state.stereo.poseSequence == 0 ||
-                (R29OwnerCaptureFrameSnapshot().poseSequence != 0 &&
-                 R29OwnerCaptureFrameSnapshot().poseSequence != state.stereo.poseSequence) ||
+                (frame.poseSequence != 0 &&
+                 frame.poseSequence != state.stereo.poseSequence) ||
                 !R30BuildEyeAffine(state.stereo,
                     state.eyeScale, state.eyeOffset))
                 return false;
