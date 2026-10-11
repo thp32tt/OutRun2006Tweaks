@@ -5,6 +5,34 @@ library, not another asset queue or a replacement for the ten-stage QA pipeline.
 A keeps odd assets, B even; C1/C2 independently review their respective parity and
 C3 separately reviews exact final bytes. The six-launch schedule is unchanged.
 
+## 2026-10-11 expanded upstream PSD mirror
+
+The entire pinned upstream git tree has **184 PSDs**, of which **81 distinct PSD files
+match 65 current queue texture hashes** (original and alternate revisions both included).
+The complete source mapping, original upstream Git blob SHA/byte count, and target local
+paths are in `localization/graphics/plate_library/PSD_IMPORT_CATALOG.json`.
+The full matching set is about 1.84 GB; do not blindly import unrelated media,
+multiple revisions or copyright-unverified content as runtime assets.
+
+**Local-first input rule:** before fetching remote or rebuilding CLEAN, check
+`localization/graphics/source_psd_upstream/<texture-hash>/` for matching PSDs
+whose Git blob SHA is listed in the catalog. These are source *inputs*, not game
+overrides. They remain unchanged; use `psd_layer_workbase.py separate` to
+create the full English PSD reference and all layers, then explicitly select
+English glyph/effect layers to derive CLEAN candidates. Source-vs-canonical DDS
+pixel fidelity and independent C2 approval still gate their use.
+
+The `Localization PSD Source Mirror` workflow imports a selected priority
+batch into **this exact branch**, verifies Git SHA and size, then checks the
+remote committed blob. Its first selected set is q060, q121, q049, q205,
+q227, q212, q135, q230, q188, q176. Only claim each imported source
+after the GitHub remote blob is confirmed. Additional catalog entries do not
+constitute copied PSDs and still require a deliberate import batch.
+
+The community upstream does not advertise a repository-level license, so
+preserve exact upstream origins, credits and distinguish the source mirror
+from any external distribution or publicly endorsed license grant.
+
 ## 2026-10-11 PSD-first source workbase — latest user request
 
 Before manually erasing English from an HD DDS, look up a **matching native texture hash** in
