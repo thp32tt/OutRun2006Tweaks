@@ -58,7 +58,7 @@
     "C0_RECOVER": "GitHub HEAD 0743849c9fd9dd30bb060ba5309120056922a413 and AGENTS/policy/00559 C6 checked",
     "C1_REVIEW": "DEFAULT GPU-backed game RT sources rejected before D3D11 native Draw even when safe RT readback possible",
     "C2_IMPLEMENT": "Source D3D9 render-target GetRTData exact B8G8R8A8 snapshot -> existing D3D11 SRV native draw and destructive regression",
-    "C3_VALIDATE": "PASS_EXACT_SHA 05546c433e56d72fc966c45424cfbf5fd8df671c: Backend Gate #38163791658 2/2 SUCCESS; Win32 Release Build #38163796456 SUCCESS; OpenXR architecture #38163796491 SUCCESS; DX11 Fast Structural #38163791732 SUCCESS. HUD static EXE analysis #38163796394 IN_PROGRESS at checkpoint; runtime/gamepad/HMD UNTESTED.",
+    "C3_VALIDATE": "PASS_EXACT_SHA 05546c433e56d72fc966c45424cfbf5fd8df671c: Backend Gate #38163791658 2/2 SUCCESS; Win32 Release Build #38163796456 SUCCESS; OpenXR architecture #38163796491 SUCCESS; DX11 Fast Structural #38163791732 SUCCESS. HUD Inspector #38163796394 SUCCESS (late CI completion, same exact SHA); runtime/gamepad/HMD UNTESTED.",
     "C4_COMMIT": "C++/test/run material 95c4493cf5574d3c8410b36b469c803d744a897f non-skip; two source-test regression corrections, exact validation-bearing 05546c433e56d72fc966c45424cfbf5fd8df671c non-skip; C6 separate [skip ci].",
     "C5_PACKAGE": "NOT_REQUIRED opt-in diagnostic without actual game/HMD parity",
     "C6_STATE": "COMPLETE_BUILD_VERIFIED/PASS_EXACT_SHA at 05546c433e56d72fc966c45424cfbf5fd8df671c; original DX9Ex game Draw/Present/input retained; Quest3/VDXR/menu/vehicle/race visual+gamepad NEED_HMD_TEST."
@@ -81,7 +81,7 @@
     "build": "SUCCESS",
     "openxr_vr_architecture": "SUCCESS",
     "dx11_fast_structural": "SUCCESS",
-    "hud_inspector": "IN_PROGRESS",
+    "hud_inspector": "SUCCESS",
     "exact_sha": "05546c433e56d72fc966c45424cfbf5fd8df671c"
   },
   "state_persisted": true,
@@ -112,7 +112,7 @@
       {
         "run_id": 38163796394,
         "name": "OutRun EXE HUD Inspector CI",
-        "status": "IN_PROGRESS"
+        "status": "SUCCESS"
       }
     ],
     "runtime": {
