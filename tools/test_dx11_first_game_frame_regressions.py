@@ -930,7 +930,7 @@ def main() -> None:
             "layout.texcoordCount > 4u",
             "std::memcpy(candidate.uv3, data + layout.texcoordOffset + 24u, 8u)",
             "coordIndex == 2u ? sample.uv2 : sample.uv3",
-        )) and all(x in probe for x in (
+        )) and header.count("layout.texcoordCount > 4u") == 2 and all(x in probe for x in (
             "kGameFvfXyzRhw | kGameFvfTex4",
             "game_fvf_select_uv(sample, layout, 3u, chosen)",
             "!game_fvf_decode_vertex(&four, 47u",
