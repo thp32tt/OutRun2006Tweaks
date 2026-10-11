@@ -69,6 +69,8 @@ struct OutputCapture {
     D3DCMPFUNC alphaFunc = D3DCMP_ALWAYS;
     bool scissor = false;
     D3D11_RECT nativeScissor{};
+    // Only source RGB-visible masks are eligible for the diagnostic inset.
+    std::uint8_t colorWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 };
 
 struct State {
@@ -82,6 +84,8 @@ struct State {
     ComPtr<ID3D11RasterizerState> raster;
     ComPtr<ID3D11RasterizerState> scissorRaster;
     ComPtr<ID3D11BlendState> alphaBlend;
+    // Cached by source mask and alpha-blend mode; no per-frame state churn.
+    std::array<ComPtr<ID3D11BlendState>, 32> maskedBlends{};
     ComPtr<ID3D11Buffer> alphaConstants;
     ComPtr<ID3D11Texture2D> staging;
     bool pending = false;
@@ -117,6 +121,7 @@ bool ensure_pipeline(State& s) noexcept {
         return true;
     s.backend.shutdown();
     s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.layout.Reset(); s.raster.Reset(); s.scissorRaster.Reset(); s.alphaBlend.Reset(); s.alphaConstants.Reset(); s.staging.Reset();
+    for (auto& masked : s.maskedBlends) masked.Reset();
     NativeBackendConfig cfg{};
     cfg.width = kWidth;
     cfg.height = kHeight;
@@ -229,12 +234,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
     DWORD blend=TRUE, alpha=TRUE, stencil=TRUE, depth=TRUE, clip=TRUE;
     DWORD fog=TRUE, scissor=TRUE;
     DWORD colorMask=0, cullMode=0, fillMode=0;
-    // A D3D11 solid, no-cull diagnostic triangle must not produce pixels
-    // which the original D3D9 color-write mask, cull or fill state discards.
-    // Keep this first native slice conservative instead of falsely reporting
-    // game-visible parity. Unsupported states retain the original DX9Ex draw.
-    // The native diffuse shader does not implement D3D9 fog. Scissoring is
-    // mirrored via RSSetScissorRects after clipping to the source viewport.
+    // Keep the diagnostic raster conservative: no cull/fill/fog translation.
+    // The source color-write channels are mirrored into the D3D11 OM blend
+    // descriptor, never converted to an all-channel write by accident.
+    // Scissoring is mirrored via RSSetScissorRects.
     if (FAILED(game->GetRenderState(D3DRS_ALPHABLENDENABLE, &blend)) ||
         FAILED(game->GetRenderState(D3DRS_ALPHATESTENABLE, &alpha)) ||
         FAILED(game->GetRenderState(D3DRS_STENCILENABLE, &stencil)) ||
@@ -246,10 +249,20 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cullMode)) ||
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fillMode)) ||
         stencil || depth || !clip || fog ||
-        colorMask != (D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
-                      D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA) ||
         cullMode != D3DCULL_NONE || fillMode != D3DFILL_SOLID)
         return false;
+    const DWORD legalMask = D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
+                            D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA;
+    const DWORD visibleMask = D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
+                              D3DCOLORWRITEENABLE_BLUE;
+    // Zero, alpha-only and unknown bits cannot produce trustworthy RGB inset
+    // evidence. D3D9 still draws those game primitives without interception.
+    if ((colorMask & ~legalMask) || !(colorMask & visibleMask)) return false;
+    output.colorWriteMask = static_cast<std::uint8_t>(
+        ((colorMask & D3DCOLORWRITEENABLE_RED) ? D3D11_COLOR_WRITE_ENABLE_RED : 0u) |
+        ((colorMask & D3DCOLORWRITEENABLE_GREEN) ? D3D11_COLOR_WRITE_ENABLE_GREEN : 0u) |
+        ((colorMask & D3DCOLORWRITEENABLE_BLUE) ? D3D11_COLOR_WRITE_ENABLE_BLUE : 0u) |
+        ((colorMask & D3DCOLORWRITEENABLE_ALPHA) ? D3D11_COLOR_WRITE_ENABLE_ALPHA : 0u));
     if (scissor) {
         RECT gameScissor{};
         if (FAILED(game->GetScissorRect(&gameScissor)) ||
@@ -548,9 +561,30 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         static_cast<float>(output.alphaRef),
         static_cast<float>(output.alphaFunc), 0.0f
     };
+    // D3D11 default OM state writes all channels. Even when blending is off,
+    // a partial D3D9 COLORWRITEENABLE requires a real blend-state object.
+    // Copy the validated alpha blend descriptor rather than approximating
+    // its RGB/alpha factors in a second path.
+    ComPtr<ID3D11BlendState>* maskedBlend = nullptr;
+    if (output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+        const UINT slot = (output.alphaBlend ? 16u : 0u) + output.colorWriteMask;
+        if (slot >= s.maskedBlends.size()) return false;
+        auto& cached = s.maskedBlends[slot];
+        if (!cached) {
+            D3D11_BLEND_DESC maskDesc{};
+            if (output.alphaBlend) s.alphaBlend->GetDesc(&maskDesc);
+            maskDesc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            if (FAILED(dev->CreateBlendState(&maskDesc, cached.GetAddressOf())))
+                return false;
+        }
+        maskedBlend = &cached;
+    }
     ctx->UpdateSubresource(s.alphaConstants.Get(), 0, nullptr, alphaParams, 0, 0);
     s.backend.begin_frame(kBackground);
-    ctx->OMSetBlendState(output.alphaBlend ? s.alphaBlend.Get() : nullptr, nullptr, 0xffffffffu);
+    if (maskedBlend)
+        ctx->OMSetBlendState(maskedBlend->Get(), nullptr, 0xffffffffu);
+    else
+        ctx->OMSetBlendState(output.alphaBlend ? s.alphaBlend.Get() : nullptr, nullptr, 0xffffffffu);
     ID3D11Buffer* alphaBuffer = s.alphaConstants.Get();
     ctx->PSSetConstantBuffers(0, 1, &alphaBuffer);
     const UINT stride = sizeof(NativeVertex), offset = 0;
@@ -737,6 +771,7 @@ void before_game_reset() noexcept {
     s.eligibleThisFrame = 0;
     s.probeSlot = 0;
     s.staging.Reset(); s.raster.Reset(); s.scissorRaster.Reset(); s.layout.Reset(); s.alphaBlend.Reset(); s.alphaConstants.Reset();
+    for (auto& masked : s.maskedBlends) masked.Reset();
     s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.vs.Reset();
     s.backend.shutdown();
 }

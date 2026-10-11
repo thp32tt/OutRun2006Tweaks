@@ -1,0 +1,78 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00542",
+  "production_id": "CONVERSION-DX11-00542",
+  "event_id": "CONVERSION-DX11-00542-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00542",
+  "attempt": "1/3",
+  "work_key": "DX11:MENU_RACE_COLORWRITE_MASK_OM",
+  "base_sha": "88c1ad2cc0e14f2a7bded09f8ba00e319211e24d",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT_CI_PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Read live game D3D9 D3DRS_COLORWRITEENABLE on eligible menu/vehicle/race Draw/DrawIndexed",
+      "Explicitly translate enabled D3D9 RGB/alpha channels into native OM blend RenderTargetWriteMask with alpha blend/no-blend distinct lazy cache",
+      "Submit same game-authored geometry to native Draw/DrawIndexed and copy isolated opt-in desktop inset; original D3D9 Draw and input always preserved"
+    ],
+    "batch_components": [
+      "C++ D3D9 source color-mask legality and explicit DX11 channel translation",
+      "C++ D3D11 cached OM mask/blend binding for live indexed and non-indexed Draw, with reset lifecycle",
+      "Python mutation-negative source integration regression and mask admissibility checks"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Static producer-to-native-consumer check implemented, exact-SHA GitHub CI pending; no GPU/game runtime evidence",
+      "negative_regression": "Python destructive mutations cover zero/alpha-only/unknown masks, channel swizzle, alpha blend mode cache key and native OM bypass",
+      "component_integration": "Game GetRenderState COLORWRITEENABLE -> OutputCapture -> keyed D3D11 BlendState RenderTargetWriteMask -> OMSetBlendState -> live native Draw/DrawIndexed -> diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_COLORWRITE_MASK_OM",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:COLORWRITE_MASK_OM",
+      "tools/test_dx11_first_game_frame_regressions.py:COLORWRITE_MASK"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI source/Win32 evidence required; actual source menu/vehicle/race colored pixels, gamepad and Quest3/VDXR parity untested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only, native gameplay inactive; invisible, unknown and invalid mask states fail closed, original DX9Ex game Draw/input remains authoritative."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00542.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD 88c1ad2, AGENTS, DX11 policy, 00541 C6 and owner conflicts inspected",
+    "C1_REVIEW": "PASS selected disjoint COLORWRITE mask integration beyond previous 00541 scissor and 00540 alpha; R175 still owned/blocked",
+    "C2_IMPLEMENT": "PASS C++ source mask to real native D3D11 OM state and CPU/static negative tests",
+    "C3_VALIDATE": "LOCAL JS static preflight and mask truth table PASS; GitHub exact-SHA CI PENDING",
+    "C4_COMMIT": "PENDING single atomic nonforce material commit with task marker",
+    "C5_PACKAGE": "NOT_REQUIRED experimental opt-in desktop diagnostic only; native gameplay remains disabled",
+    "C6_STATE": "PENDING GitHub exact-SHA CI; HMD remains UNTESTED"
+  },
+  "acceptance_results": {
+    "DX11-LIVE-CALLSITE": "SOURCE_CONNECTED_PENDING_CI",
+    "DX11-NATIVE-DRAW": "SOURCE_CONNECTED_PENDING_CI",
+    "DX11-VISIBLE-FRAME": "SOURCE_CONNECTED_PENDING_CI",
+    "DX11-SAFE-RETURN": "SOURCE_CONNECTED_PENDING_CI",
+    "REAL_GAME_OR_QUEST3_RENDERING": "UNTESTED"
+  },
+  "next_action": "Check exact material SHA GitHub Gate and Win32 Build, then C6 bookkeeping on separate [skip ci] commit; if Gate FAIL repair same substantive C++ regression first. New work should expand programmable Draw coverage, not recheck this mask.",
+  "runtime_evidence": "No OutRun live game/menu/input or Quest3 VDXR runtime execution in this task",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null
+}

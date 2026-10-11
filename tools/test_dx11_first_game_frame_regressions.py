@@ -128,8 +128,8 @@ def main() -> None:
             "untranslated game-state negative control missed: " + bad
         )
 
-    # An offscreen game triangle, a masked target, or wireframe source
-    # must not be counted as a D3D9-equivalent D3D11 colored frame.
+    # An offscreen triangle, invisible (alpha-only) mask, or wireframe source
+    # must not be counted as a D3D9-equivalent native colored frame.
     # Fail closed: keep the original D3D9 draw and input path intact.
     def exact_raster_output_gate(code: str) -> bool:
         start = code.find("bool supported_game_state(")
@@ -141,8 +141,9 @@ def main() -> None:
             "GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)",
             "GetRenderState(D3DRS_CULLMODE, &cullMode)",
             "GetRenderState(D3DRS_FILLMODE, &fillMode)",
-            "colorMask != (D3DCOLORWRITEENABLE_RED |",
-            "D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA)",
+            "const DWORD legalMask = D3DCOLORWRITEENABLE_RED |",
+            "const DWORD visibleMask = D3DCOLORWRITEENABLE_RED |",
+            "if ((colorMask & ~legalMask) || !(colorMask & visibleMask)) return false;",
             "cullMode != D3DCULL_NONE",
             "fillMode != D3DFILL_SOLID",
         ))
@@ -155,8 +156,8 @@ def main() -> None:
          "GetRenderState(D3DRS_CULLMODE, &fillMode)"),
         ("GetRenderState(D3DRS_FILLMODE, &fillMode)",
          "GetRenderState(D3DRS_FILLMODE, &colorMask)"),
-        ("colorMask != (D3DCOLORWRITEENABLE_RED |",
-         "colorMask == (D3DCOLORWRITEENABLE_RED |"),
+        ("if ((colorMask & ~legalMask) || !(colorMask & visibleMask)) return false;",
+         "if (false) return false;"),
         ("cullMode != D3DCULL_NONE", "cullMode == D3DCULL_NONE"),
         ("fillMode != D3DFILL_SOLID", "fillMode == D3DFILL_SOLID"),
     ):
@@ -545,7 +546,63 @@ def main() -> None:
     assert scale_clip((100, 50, 800, 600), (101, 51, 102, 52)) is None
     assert scale_clip((100, 50, 800, 600), (500, 50, 400, 70)) is None
 
-    print("DX11 live game diagnostic TEX1/alpha/scissor Draw/fallback regression PASS (static only)")
+    # D3D9 channel flags are mapped explicitly to D3D11 OM write flags;
+    # a default all-write OM state must never bypass a partial source mask.
+    # Verify producer validation, lazy native state selection and reset together.
+    def color_mask_path_complete(code: str) -> bool:
+        producer = code[code.find("bool supported_game_state("):
+                        code.find("bool translate_vertices(")]
+        consumer = code[code.find("bool submit("):code.find("void observe(")]
+        return all(x in producer for x in (
+            "GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)",
+            "if ((colorMask & ~legalMask) || !(colorMask & visibleMask)) return false;",
+            "output.colorWriteMask = static_cast<std::uint8_t>(",
+            "D3DCOLORWRITEENABLE_RED) ? D3D11_COLOR_WRITE_ENABLE_RED",
+            "D3DCOLORWRITEENABLE_GREEN) ? D3D11_COLOR_WRITE_ENABLE_GREEN",
+            "D3DCOLORWRITEENABLE_BLUE) ? D3D11_COLOR_WRITE_ENABLE_BLUE",
+            "D3DCOLORWRITEENABLE_ALPHA) ? D3D11_COLOR_WRITE_ENABLE_ALPHA",
+        )) and all(x in consumer for x in (
+            "if (output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL)",
+            "(output.alphaBlend ? 16u : 0u) + output.colorWriteMask",
+            "if (output.alphaBlend) s.alphaBlend->GetDesc(&maskDesc);",
+            "maskDesc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;",
+            "dev->CreateBlendState(&maskDesc, cached.GetAddressOf())",
+            "ctx->OMSetBlendState(maskedBlend->Get(), nullptr, 0xffffffffu);",
+            "ctx->OMSetBlendState(output.alphaBlend ? s.alphaBlend.Get() : nullptr",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+        )) and code.count("for (auto& masked : s.maskedBlends) masked.Reset();") == 2
+
+    assert color_mask_path_complete(bridge)
+    for old, broken in (
+        ("!(colorMask & visibleMask)", "false"),
+        ("colorMask & ~legalMask", "colorMask & legalMask"),
+        ("D3DCOLORWRITEENABLE_GREEN) ? D3D11_COLOR_WRITE_ENABLE_GREEN",
+         "D3DCOLORWRITEENABLE_GREEN) ? D3D11_COLOR_WRITE_ENABLE_RED"),
+        ("if (output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL)",
+         "if (false)"),
+        ("(output.alphaBlend ? 16u : 0u) + output.colorWriteMask",
+         "output.colorWriteMask"),
+        ("if (output.alphaBlend) s.alphaBlend->GetDesc(&maskDesc);",
+         "/* alpha blend factors discarded */"),
+        ("maskDesc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;",
+         "maskDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;"),
+        ("ctx->OMSetBlendState(maskedBlend->Get(), nullptr, 0xffffffffu);",
+         "/* masked OM binding omitted */"),
+    ):
+        mutated = bridge.replace(old, broken, 1)
+        assert mutated != bridge and not color_mask_path_complete(mutated), (
+            "color mask game-source -> native OM mutation escaped: " + old
+        )
+    RED, GREEN, BLUE, ALPHA = 1, 2, 4, 8
+    for mask in range(32):
+        eligible = (mask & ~(RED | GREEN | BLUE | ALPHA)) == 0 and bool(mask & (RED | GREEN | BLUE))
+        assert eligible == (mask in range(1, 16) and mask != ALPHA)
+        if eligible:
+            native_mask = sum(channel for channel in (RED, GREEN, BLUE, ALPHA) if mask & channel)
+            assert native_mask == mask
+            assert ((16 if (mask & ALPHA) else 0) + mask) < 32
+    print("DX11 live diagnostic TEX1/alpha/scissor/COLORWRITE Draw/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":
