@@ -84,10 +84,13 @@ stroke([(x+11,14),(x+127,14),(x+127,35),(x+15,35),(x+15,60),(x+128,60)],15)
 stroke([(x+73,62),(x+73,84)],16)
 stroke([(x+7,87),(x+143,87)],17)
 stroke([(x+16,106),(x+128,106),(x+128,117)],17)
-# Colon as protected semantics punctuation, not an altered brand/music graphic.
-x=780
-stroke([(x,50),(x+1,52)],13)
-stroke([(x,99),(x+1,100)],13)
+# Colon as two actual visible native circles; short PIL thick lines produce
+# 1px slashes rather than dots when length < stroke width (B368 P2 first look).
+def punctuation_dot(x,y,r=8):
+ px,py=point(x,y)
+ draw.ellipse((px-r*SS,py-r*SS,px+r*SS,py+r*SS),fill=255)
+punctuation_dot(780,53)
+punctuation_dot(780,100)
 glyph=np.asarray(line.resize((W,H),Image.Resampling.LANCZOS))
 glyph=np.where(glyph<4,0,glyph).astype(np.uint8)
 assert glyph.shape==(H,W)
@@ -101,7 +104,11 @@ bbox=[int(yx0[1]),int(yx0[0]),int(yx1[1]),int(yx1[0])]
 assert bbox[0]>=SOURCE_BBOX[0] and bbox[1]>=SOURCE_BBOX[1] and bbox[2]<=SOURCE_BBOX[2] and bbox[3]<=SOURCE_BBOX[3],bbox
 # Materially new topology proof: compare alpha masks independently before effects.
 prior=T[:,:,3]
-different=int(np.count_nonzero((g>0)!=(prior>0)))
+# Restrict geometry novelty to the source text itself; inherited official
+# atlas neighbors would otherwise create a false 3-million-pixel delta.
+source_scope=np.zeros(g.shape,bool)
+source_scope[SOURCE_BBOX[1]:SOURCE_BBOX[3],SOURCE_BBOX[0]:SOURCE_BBOX[2]]=True
+different=int(np.count_nonzero(((g>0)!=(prior>0)) & source_scope))
 assert different>18000,("NOT_DISTINCT_FROM_B367",different)
 # source native RAW and proposed new alpha RAW are pinned for common compose.
 Image.fromarray(S[::-1].copy(),"RGBA").save(P/"SOURCE_NATIVE_RAW_RGBA.png")
