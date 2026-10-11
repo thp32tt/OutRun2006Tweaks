@@ -140,6 +140,7 @@ def vr_terminal_status(value: str) -> bool:
         "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
         "COMPLETE_CI_VERIFIED_RUNTIME_UNTESTED", "PASS", "DONE",
         "COMPLETE_R239_SCOPED_POST_R175_GATE_RECOVERED",
+        "COMPLETE_DX11_FIRST_GAME_FRAME_DIAGNOSTIC_CI_RUNTIME_UNTESTED",
     }
 
 
@@ -343,6 +344,131 @@ def vr_feature_ci_evidence_verdict(active: dict, feature_sha: str, record: dict)
     return True, "FEATURE_CI_EXACT_SHA_VERIFIED"
 
 
+def vr_recover_feature_changed_paths(active: dict, validation_sha: str) -> list:
+    """Recover lost promotion diff from GitHub ancestry, not the C6 record.
+
+    AI-promoted target refs never passed github_feature_promote_ready(), so
+    feature_changed_paths was absent in the persisted queue. A verified exact
+    material SHA still needs source-path evidence before C6 acceptance.
+    """
+    paths = active.get("feature_changed_paths")
+    if isinstance(paths, list) and paths:
+        return paths
+    base = str(active.get("feature_base_sha") or "")
+    if not all(re.fullmatch(r"[0-9a-f]{40}", value) for value in (base, validation_sha)):
+        return []
+    try:
+        diff = github_api_json(f"/repos/{GITHUB_REPO}/compare/{base}...{validation_sha}")
+    except Exception as exc:
+        log.warning("VR changed-path recovery deferred task=%s: %r", active.get("task_id"), exc)
+        return []
+    if (diff.get("behind_by") != 0 or int(diff.get("ahead_by") or 0) <= 0
+            or diff.get("too_large") or not isinstance(diff.get("files"), list)):
+        return []
+    paths = [row.get("filename") for row in diff["files"]
+             if isinstance(row, dict) and isinstance(row.get("filename"), str)]
+    if not paths:
+        return []
+    active["feature_changed_paths"] = paths
+    return paths
+
+
+def vr_reconcile_durable_blocked_outcomes(backlog: dict, lane: str, q: dict) -> bool:
+    """Unblock dependent milestones only from independently verified C6 + CI.
+
+    Historical failures stay auditable. Never treat a successful workflow
+    alone, a stale CHECKPOINT, or a GitHub HEAD change as a feature PASS.
+    Throttle remote rechecks; they are not new production/retry events.
+    """
+    if backlog.get("schema_version") != 1:
+        return False
+    now = datetime.now(TZ)
+    outcomes = q.setdefault("feature_outcomes", {})
+    checked = q.setdefault("vr_blocked_outcome_recheck_at", {})
+    updated = False
+    for contract in backlog.get("features", []):
+        feature_id = contract.get("feature_id")
+        if contract.get("lane") != lane:
+            continue
+        outcome = outcomes.get(feature_id) or {}
+        if outcome.get("terminal") != "BLOCKED":
+            continue
+        task_id = str(outcome.get("task_id") or "")
+        record_row = next((row for row in q.get("blocked", [])
+                           if isinstance(row, dict) and row.get("task_id") == task_id
+                           and row.get("feature_id") == feature_id), None)
+        if not record_row or any(
+                item.get("task_id") == task_id
+                for item in (q.get("active_by_lane") or {}).values()
+                if isinstance(item, dict)):
+            continue
+        last = _parse_iso(checked.get(feature_id))
+        if last and (now - last).total_seconds() < 300:
+            continue
+        checked[feature_id] = now.isoformat()
+        # Persist the throttle even when remote verification fails.
+        save_queue_state(q)
+        try:
+            active = dict(record_row)
+            active["feature_contract"] = contract
+            target_branch = active.get("branch")
+            head = github_branch_head(target_branch)
+            record = github_task_record(head, task_id) if head else None
+            if not isinstance(record, dict):
+                continue
+            if (record.get("task_id") != task_id
+                    or record.get("feature_id") != feature_id
+                    or record.get("target_branch") != target_branch):
+                continue
+            validation_sha = str(record.get("validation_bearing_result_sha") or "").lower()
+            if not re.fullmatch(r"[0-9a-f]{40}", validation_sha):
+                continue
+            # A history rewrite or forked SHA must never promote a stale PASS.
+            ancestry = github_api_json(
+                f"/repos/{GITHUB_REPO}/compare/{validation_sha}...{head}"
+            )
+            if ancestry.get("behind_by") != 0:
+                continue
+            active["result_sha"] = validation_sha
+            primary_gate = contract["required_gates"][0]["name"]
+            run = github_gate_run(target_branch, validation_sha, primary_gate, force_discovery=True)
+            if not run or run.get("status") != "completed" or run.get("conclusion") != "success":
+                continue
+            delivered, _ = github_feature_delivery_evidence(active, validation_sha)
+            if not delivered:
+                continue
+            verified, verdict = conversion_terminal_verdict(record, active, run)
+            if not verified:
+                log.warning("Blocked C6 recovery held task=%s reason=%s", task_id, verdict)
+                continue
+        except Exception as exc:
+            log.warning("Blocked C6 recovery deferred task=%s: %r", task_id, exc)
+            continue
+        active.update(phase="DONE", terminal="PASS", feature_stage="COMPLETE",
+                      automation_validation="PASS", runtime_validation="UNTESTED",
+                      recovered_from_outdated_blocked=True,
+                      recovered_at=now.isoformat(), terminal_verification=verdict,
+                      failure_context="", completed_at=now.isoformat())
+        outcomes[feature_id] = {
+            "terminal": "PASS", "task_id": task_id, "validation_sha": validation_sha,
+            "delivery_evidence": active.get("delivery_evidence"),
+            "runtime_validation": "UNTESTED", "recovered_from_blocked": True,
+        }
+        q["blocked"] = [r for r in q.get("blocked", []) if r.get("task_id") != task_id]
+        if not any(r.get("task_id") == task_id for r in q.get("completed", [])):
+            q["completed"] = (q.get("completed", []) + [active])[-100:]
+        q.setdefault("recovered_blocked_audit", []).append({
+            "task_id": task_id, "previous_failure": record_row.get("failure_context"),
+            "result_sha": validation_sha, "recovered_at": now.isoformat(),
+            "reason": "EXACT_SHA_C6_ALL_GATES_AND_ARTIFACT_VERIFIED",
+        })
+        q["recovered_blocked_audit"] = q["recovered_blocked_audit"][-100:]
+        updated = True
+        log.warning("Recovered historical blocked feature task=%s sha=%s", task_id, validation_sha)
+        save_queue_state(q)
+    return updated
+
+
 def vr_select_feature(backlog: dict, lane: str, q: dict) -> Optional[dict]:
     """Select a finite pre-defined deliverable, never invent a per-commit feature."""
     if backlog.get("schema_version") != 1 or lane not in {"DX11", "DX9EX"}:
@@ -380,6 +506,9 @@ def github_feature_contract(lane: str, q: dict) -> Optional[dict]:
         f"/repos/{GITHUB_REPO}/contents/{path}?ref={urllib.parse.quote(VR_CHECKPOINT_BRANCH, safe='')}"
     )
     backlog = json.loads(base64.b64decode(obj["content"]).decode("utf-8"))
+    # Repair outdated BLOCKED bookkeeping only when the exact material SHA
+    # has since acquired a durable C6 record and all required remote gates.
+    vr_reconcile_durable_blocked_outcomes(backlog, lane, q)
     selected = vr_select_feature(backlog, lane, q)
     if selected:
         selected = dict(selected, policy_blob_sha=obj["sha"])
@@ -794,7 +923,7 @@ def conversion_terminal_verdict(record: dict, active: dict, gate_run: dict) -> t
 
     c6_complete = (
         record.get("controller_terminal") is True
-        or str(record.get("checkpoint") or "").upper() == "C6_STATE"
+        or str(record.get("checkpoint") or "").upper() in {"C6_STATE", "C6_RESULT"}
         or c6_pass(pipeline.get("C6_STATE"))
         or c6_pass(pipeline.get("C6_RESULT"))
     )
@@ -819,7 +948,8 @@ def conversion_terminal_verdict(record: dict, active: dict, gate_run: dict) -> t
     if gate_run.get("status") != "completed" or gate_run.get("conclusion") != "success":
         return False, "EXACT_GATE_NOT_SUCCESS"
     if active.get("feature_contract"):
-        ok, reason = vr_acceptance_verdict(active, record, active.get("feature_changed_paths") or [])
+        changed_paths = active.get("feature_changed_paths") or vr_recover_feature_changed_paths(active, exact_sha)
+        ok, reason = vr_acceptance_verdict(active, record, changed_paths)
         if not ok:
             return False, reason
         if (active.get("delivery_evidence") or {}).get("sha") != exact_sha:
