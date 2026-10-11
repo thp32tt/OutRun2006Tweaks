@@ -382,6 +382,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             state.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
             state.MaxLOD = D3D11_FLOAT32_MAX;
             state.MaxAnisotropy = 1;
+            state.ComparisonFunc = D3D11_COMPARISON_NEVER;
             ok = SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));
         }
     }

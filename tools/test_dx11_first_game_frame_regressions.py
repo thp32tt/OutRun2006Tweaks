@@ -311,6 +311,7 @@ def main() -> None:
         submit = code[code.find("bool submit("):
                       code.find("void observe(")]
         return all(x in state for x in (
+            "pretransformed = (fvf == rhw || fvf == (rhw | D3DFVF_TEX1));",
             "fvf == (rhw | D3DFVF_TEX1)", "fvf == (xyz | D3DFVF_TEX1)",
             "GetTexture(0, tex.GetAddressOf())",
             "tex.As(&capture.texture)",
@@ -326,6 +327,7 @@ def main() -> None:
             "LockRect(0, &locked, nullptr, D3DLOCK_READONLY)",
             "capture.texture->UnlockRect(0)",
             "dev->CreateTexture2D(", "dev->CreateShaderResourceView(",
+            "state.ComparisonFunc = D3D11_COMPARISON_NEVER",
             "dev->CreateSamplerState(",
         )) and all(x in submit for x in (
             "mirror_texture(dev, capture, sampledView, sampledSampler)",
