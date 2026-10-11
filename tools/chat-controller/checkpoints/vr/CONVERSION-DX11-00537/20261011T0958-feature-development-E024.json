@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "feature_development_checkpoint",
+  "captured_at_kst": "2026-10-11T09:58:01+09:00",
+  "source": "ChatGPT2 feature worker after E024 rollover",
+  "controller_branch": "chat-controller-downloads",
+  "record": {
+    "task_id": "CONVERSION-DX11-00537",
+    "production_id": "CONVERSION-DX11-00537",
+    "event_id": "CONVERSION-DX11-00537-E024",
+    "event_type": "rollover",
+    "lane": "DX11",
+    "slot": "A",
+    "branch": "vr-dx11-native-r71",
+    "base_sha": "937f6bf484528ac5cf7570ace518cabc3247be93",
+    "attempt": 3,
+    "retry_count_unchanged": true,
+    "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+    "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+    "feature_stage": "FEATURE_READY_PENDING_EXACT_SHA_REVALIDATION",
+    "feature_head_sha": "f3c378701a56b431015f2efe2a1f3d07bf313e44",
+    "feature_commits": [
+      "a020dfe78e2b28450ad3cb6e4678b0af5999ff46",
+      "f3c378701a56b431015f2efe2a1f3d07bf313e44"
+    ],
+    "open_pr": 115,
+    "open_pr_draft": true,
+    "acceptance_pending": [
+      "DX11-TEST-BUNDLE@feature:f3c37870 CI completion",
+      "DX11-TEST-BUNDLE@target after controller-only promotion",
+      "Backend Conversion Gate/Build/OpenXR exact target SHA recheck",
+      "Physical game/HMD/controls runtime UNTESTED"
+    ],
+    "ci_in_progress": {
+      "build": 38100121233,
+      "openxr": 38100121198
+    },
+    "next_action": "Confirm feature HEAD f3c37870 Build/OpenXR named acceptance and diagnostic ZIP artifact; controller-only promotion of PR #115 after ownership check; exact target-SHA Backend Conversion Gate and diagnostic bundle; report actual game/HMD as UNTESTED.",
+    "runtime_validation": "UNTESTED",
+    "score_change": 0
+  },
+  "notes": [
+    "Only packaging and test files changed in E024. Default-off DX9Ex and original game input/D3D9 flow retained.",
+    "Do not promote target from feature worker or increment ATTEMPT due to rollover. Same TASK_ID, no duplicate points."
+  ]
+}
