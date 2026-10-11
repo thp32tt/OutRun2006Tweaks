@@ -76,7 +76,7 @@ recipe={"version":"separated-lettering-v1","coordinates":"native_raw","route":"v
  "layers":[{"role":"face","input":refs["face"]}]}
 recipe_path=P/"B366_LETTERING_RECIPE.json"
 recipe_path.write_text(json.dumps(recipe,ensure_ascii=False,indent=2)+"\n")
-sys.path.insert(0,str(Path("tools/localization").resolve()))
+sys.dont_write_bytecode=True  # Keep CPU worker output in role_B only; no __pycache__ outside boundary.\nsys.path.insert(0,str(Path("tools/localization").resolve()))
 from compose_lettering import compose
 lettering,comp=compose(R,recipe)
 lettering_path=P/"B366_COMPOSED_LETTERING_RAW_RGBA.png"
