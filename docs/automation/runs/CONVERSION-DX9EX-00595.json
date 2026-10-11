@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00595",
+  "production_id": "CONVERSION-DX9EX-00595",
+  "event_id": "CONVERSION-DX9EX-00595-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "feature_id": "DX9EX:R19_ASYMMETRIC_FALLBACK_EYE_EXTENT",
+  "work_key": "DX9EX:R19_ASYMMETRIC_FALLBACK_EYE_EXTENT",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "e4c3226750ccafb5aba91083a6a0ce427afcf99c",
+  "material_result_sha": "0f5b59ee75e3445781e62e183e29f305b75fcaa0",
+  "result_sha": "0f5b59ee75e3445781e62e183e29f305b75fcaa0",
+  "validation_bearing_result_sha": "0f5b59ee75e3445781e62e183e29f305b75fcaa0",
+  "material_commits": [
+    "22003bd8b5f999fe8e2a30763e40b155331b1dcb",
+    "0f5b59ee75e3445781e62e183e29f305b75fcaa0"
+  ],
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_acceptance": {
+    "implementation_complete": true,
+    "symptom": "R19 classic SBS OpenXR projection fallback created a shared 2-slice swapchain from only the LEFT incoming view rectangle; an asymmetric larger right eye could exceed the selected allocation.",
+    "acceptance_items": [
+      {
+        "id": "COMMON-FALLBACK-EYE-EXTENT",
+        "status": "PASS",
+        "evidence_paths": [
+          "vrhost/src/runtime/fallback_projection_extent.hpp",
+          "vrhost/src/runtime/sbs_capture_override.hpp"
+        ],
+        "details": "Allocate common array swapchain extent from both left/right views; preserve legacy 1600x1600 fallback when no two-eye rectangle is available."
+      },
+      {
+        "id": "MALFORMED-RECT-FAIL-CLOSED",
+        "status": "PASS",
+        "evidence_paths": [
+          "vrhost/src/runtime/fallback_projection_extent.hpp",
+          "vrhost/tests/xr_eye_extent_smoke.cpp"
+        ],
+        "details": "Reject zero/negative/oversized (over 8192) XR view rectangles before swapchain creation; keep color, HUD, SkyGlow, direct GPU path unchanged."
+      },
+      {
+        "id": "SMOKE-INTEGRATION-AND-REPAIR",
+        "status": "PASS",
+        "evidence_paths": [
+          "vrhost/tests/xr_eye_extent_smoke.cpp",
+          "vrhost/CMakeLists.txt"
+        ],
+        "details": "Linux C++20 isolated helper smoke passes; initial candidate 22003bd8 failed x64 host smoke compilation with C1083 missing header search path; material repair 0f5b59e adds vrhost/src include root, exact-SHA host build and smoke both SUCCESS."
+      },
+      {
+        "id": "SAME-SHA-GATES",
+        "status": "PASS",
+        "details": "DX9Ex Active 5 jobs, Domain Isolation, Full Source Impact 3 jobs all SUCCESS on exact SHA 0f5b59ee75e3445781e62e183e29f305b75fcaa0."
+      }
+    ],
+    "protected_paths": "No DX11, DXVK, localization, FFB or game stereo shader/pose/HUD modification; no HMD optical or FPS claim."
+  },
+  "exact_sha_validation": {
+    "target_sha": "0f5b59ee75e3445781e62e183e29f305b75fcaa0",
+    "dx9ex_active_run_id": 38132844513,
+    "dx9ex_active_jobs": [
+      "policy",
+      "host",
+      "game",
+      "full-chain-compile",
+      "package"
+    ],
+    "domain_isolation_run_id": 38132844516,
+    "full_source_impact_run_id": 38132844502,
+    "all_conclusion": "SUCCESS",
+    "host_smoke_step": "Run deterministic no-HMD host smoke tests; XR-EYE-SIZING; XR-EYE-RESET",
+    "package_artifact": "OutRun2-VR-DX9EX-ACTIVE-0f5b59ee75e3445781e62e183e29f305b75fcaa0",
+    "package_artifact_id": 11699713210,
+    "host_artifact_id": 11700016154,
+    "game_artifact_id": 11700200964
+  },
+  "runtime_validation_note": "Quest3/VDXR game/HMD session not performed for this exact build. Do not claim visual/fps/stereo optical result without later user hardware evidence.",
+  "controller_next_action": "Do not replay or award score again for this TASK_ID; begin another independent DX9Ex source feature at next independent dispatch. DXVK remains frozen."
+}
