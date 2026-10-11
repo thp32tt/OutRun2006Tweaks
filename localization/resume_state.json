@@ -16031,5 +16031,27 @@
     "IGR044": "OPEN",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_B/20261011-B367-Q060-SOURCE-CONDITIONED-CONTINUOUS-METAL-PILOT/B367_CONTROLLER_NATIVE_VISUAL_QA.json"
+  },
+  "c387_c2_20261011_q060_b367_exact_new_source_family": {
+    "review_id": "C387-C2-Q060-B367-FIRST-INDEPENDENT-SAVED-FACE-SHAPE-20261011",
+    "queue_index": 60,
+    "role": "C2",
+    "shard": "EVEN",
+    "new_candidate_sha256": "52d97f845b7b3e588ebe5136cd299882001d509320fd4f8cc910270f314142d9",
+    "prior_B360_sha256": "930222103b57a3ecf6b1ea1eca86a8a639809e8ad80020313c14a9adce13bb1d",
+    "official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "C2_decision": "REWORK_REQUIRED_UNPROMOTED_SAVED_B367_SOURCE_FAMILY_GEOMETRY_FLAT_DEPTH",
+    "same_alpha_B360_B367": true,
+    "RBG_material_pixels_changed": 30749,
+    "alpha_changed": 0,
+    "current_official_C342_rework": true,
+    "new_DDS": 0,
+    "C2_APPROVAL": false,
+    "C3": "NOT_RUN",
+    "USER_INGAME": "UNTESTED",
+    "IGR044": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261011-C2-Q060-B367-EXACT-SAVED-INDEPENDENT/C387_Q060_C2_B367_INDEPENDENT_REWORK.json"
   }
 }
