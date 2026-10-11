@@ -605,8 +605,11 @@ def main() -> None:
         "capture.additive = additive;",
     )
     assert all(token in bridge for token in required_add)
+    # The PS exists across both pipeline recreation and D3D9 Reset; disconnect
+    # BOTH lifetime owners rather than the first occurrence only.
+    assert bridge.count("s.additivePs.Reset();") == 2
     for token in required_add:
-        mutated = bridge.replace(token, "/* ADD disconnected */", 1)
+        mutated = bridge.replace(token, "/* ADD disconnected */")
         assert mutated != bridge and token not in mutated
     # 00554 SUBTRACT: source D3D9 -> RGBA native PS -> Draw/DrawIndexed.
     # Mutations reject disconnected shader, alpha or operand gate changes.
@@ -624,8 +627,9 @@ def main() -> None:
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
     )
     assert all(x in bridge for x in subtract_link)
+    assert bridge.count("s.subtractPs.Reset();") == 2
     for token in subtract_link[:-2]:
-        mutant = bridge.replace(token, "/* DISCONNECTED */", 1)
+        mutant = bridge.replace(token, "/* DISCONNECTED */")
         assert mutant != bridge and token not in mutant
     for texel, diffuse, expected in (
         ((0.8, 0.1, 0.9, 0.7), (0.2, 0.5, 0.1, 0.2), (0.6, 0.0, 0.8, 0.5)),

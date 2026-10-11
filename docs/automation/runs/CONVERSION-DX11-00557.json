@@ -58,8 +58,8 @@
     "C0_RECOVER": "GitHub branch/policy/00556 sealed work inspected; new independent stage0 ADD work key",
     "C1_REVIEW": "COLOROP ADD combined with ALPHAOP SELECTARG1/SELECTARG2 absent; unsupported pairs previously excluded",
     "C2_IMPLEMENT": "Live C++ source state, two native HLSL shaders, object ownership/dispatch and Python negative controls",
-    "C3_VALIDATE": "Pending exact SHA CI and Build. HMD/game UNTESTED.",
-    "C4_COMMIT": "Material source and regression commit, no skip ci",
+    "C3_VALIDATE": "Initial material SHA Build #38159830378 FAILED at preexisting ADD/SUBTRACT single-hit reset mutation fixture (line 610); new validation-bearing SHA repairs both negative fixture loops without touching C++ or reducing negative assertions; GitHub CI pending.",
+    "C4_COMMIT": "C++ material SHA ac7cb567ed080dc8d0a25255b8843659976b530e; next test regression repair becomes validation-bearing SHA (no skip ci).",
     "C5_PACKAGE": "NOT_REQUIRED: diagnostic path opt-in; no release/promote",
     "C6_STATE": "PENDING exact GitHub Actions; seal separately only if green"
   },
@@ -68,6 +68,8 @@
   "state_persisted": true,
   "feature_contract": {
     "scope": "Game stage0 ADD RGB + independently selected TEXTURE/DIFFUSE alpha through native D3D11 live Draw",
-    "runtime_acceptance": "NEED_HMD_TEST"
-  }
+    "runtime_acceptance": "NEED_HMD_TEST",
+    "source_material_sha": "ac7cb567ed080dc8d0a25255b8843659976b530e"
+  },
+  "material_result_sha": "ac7cb567ed080dc8d0a25255b8843659976b530e"
 }
