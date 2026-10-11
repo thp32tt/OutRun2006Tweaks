@@ -31,6 +31,13 @@ namespace Settings
 		"Automatically applies renderer-side tracking whenever outrun-vr-host.exe is supplying a valid pose." };
 	Setting<bool> VRAutoLaunchHost{ "VR", "AutoLaunchHost", true,
 		"Starts outrun-vr-host.exe from the game directory when VR is enabled. A short retry window also covers fast game restarts where the previous host is still shutting down." };
+    // VR quality is independent of the original game's [DX] ANTIALIASING.
+    // D3D9Ex MSAA buffer allocations only change after a game restart.
+    Setting<int> VRAntiAliasing{ "VR", "AntiAliasing", 0,
+        "VR-only MSAA level: Off minimizes GPU load, 2x/4x are optional, and Use Game AA restores the 2D AA request. Restart required.",
+        { "Off (fastest)", "2x MSAA", "4x MSAA (fallback 2x)", "Use Game/2D AA" } };
+    Setting<bool> VRTransparencySupersampling{ "VR", "TransparencySupersampling", false,
+        "Enable extra NVIDIA transparency SSAA in VR (costly). Off by default; the original 2D Graphics setting is unchanged. Restart required." };
     Setting<bool> VRAutoRenderResolution{ "VR", "AutoRenderResolution", true,
         "At launch, match the actual VDXR/OpenXR allocated per-eye render extent (not desktop or 2x eye width). "
         "Manual RenderWidth/RenderHeight take precedence; when host startup fails, use existing game resolution." };
@@ -243,6 +250,8 @@ namespace OutRunVR
 		void declare_settings() override
 		{
 			Settings::VRAutoLaunchHost.needs_restart();
+            Settings::VRAntiAliasing.needs_restart();
+            Settings::VRTransparencySupersampling.needs_restart();
             Settings::VRAutoRenderResolution.needs_restart();
 			Settings::VRMirrorFitDesktop.needs_restart();
 			Settings::VRDisableDesktopVsync.needs_restart();

@@ -24,6 +24,8 @@ namespace Settings
 	extern Setting<bool> VRTelemetry;
 	extern Setting<bool> VRMirrorFitDesktop;
     extern Setting<bool> VRAutoRenderResolution;
+    extern Setting<int> VRAntiAliasing;
+    extern Setting<bool> VRTransparencySupersampling;
 	extern Setting<int> VRRenderWidth;
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
@@ -1584,12 +1586,16 @@ public:
 
 	bool validate() override
 	{
-		return Settings::TransparencySupersampling;
+        // Preserve the original 2D setting; avoid heavy SSAA in VR unless
+        // separately opted in from F11's VR section.
+        return Settings::TransparencySupersampling &&
+            (!Settings::VREnabled || Settings::VRTransparencySupersampling);
 	}
 
 	void declare_settings() override
 	{
 		Settings::TransparencySupersampling.needs_restart();
+        Settings::VRTransparencySupersampling.needs_restart();
 	}
 
 	bool apply() override
@@ -1791,14 +1797,35 @@ class VSyncOverride : public Hook
 			!Game::D3D() || !Game::D3DPresentParams || !Game::D3DAdapterNum)
 			return;
 
-		auto& params = *Game::D3DPresentParams;
-		if (params.SwapEffect != D3DSWAPEFFECT_DISCARD)
-		{
-			spdlog::warn(
-				"VR DX9Ex AA: explicit MSAA skipped because SwapEffect={} is not DISCARD",
-				static_cast<int>(params.SwapEffect));
-			return;
-		}
+        auto& params = *Game::D3DPresentParams;
+        const int vrMode = Settings::VRAntiAliasing.get();
+        if (vrMode == 3)
+        {
+            // Keep 2D's AA selection unchanged only in explicit Game AA mode.
+            spdlog::info("VR DX9Ex AA: using original game/2D type={} quality={}",
+                static_cast<int>(params.MultiSampleType), params.MultiSampleQuality);
+            return;
+        }
+        // VR-only modes must not inherit an expensive game NONMASKABLE request.
+        // This does not change Game::D3DAntialiasing or saved 2D configuration.
+        params.MultiSampleType = D3DMULTISAMPLE_NONE;
+        params.MultiSampleQuality = 0;
+        if (vrMode == 0)
+        {
+            spdlog::info("VR DX9Ex AA: Off, independent of 2D game AA");
+            return;
+        }
+        if (vrMode != 1 && vrMode != 2)
+        {
+            spdlog::warn("VR DX9Ex AA: invalid level {}, using Off", vrMode);
+            return;
+        }
+        if (params.SwapEffect != D3DSWAPEFFECT_DISCARD)
+        {
+            spdlog::warn("VR DX9Ex AA: swap effect {} disallows MSAA; using Off",
+                static_cast<int>(params.SwapEffect));
+            return;
+        }
 
 		const UINT adapter = static_cast<UINT>(*Game::D3DAdapterNum);
 		D3DFORMAT colorFormat = params.BackBufferFormat;
@@ -1807,18 +1834,21 @@ class VSyncOverride : public Hook
 			D3DDISPLAYMODE mode{};
 			if (FAILED(Game::D3D()->GetAdapterDisplayMode(adapter, &mode)))
 			{
-				spdlog::warn("VR DX9Ex AA: adapter display format unavailable; keeping game AA");
+				spdlog::warn("VR DX9Ex AA: display format unavailable; using Off");
 				return;
 			}
 			colorFormat = mode.Format;
 		}
 
+        // 2x never escalates to 4x. The 4x option may fall back to 2x.
 		const D3DMULTISAMPLE_TYPE candidates[] = {
 			D3DMULTISAMPLE_4_SAMPLES,
 			D3DMULTISAMPLE_2_SAMPLES
 		};
 		for (const auto sampleType : candidates)
 		{
+            if (vrMode == 1 && sampleType != D3DMULTISAMPLE_2_SAMPLES)
+                continue;
 			DWORD colorQuality = 0;
 			if (FAILED(Game::D3D()->CheckDeviceMultiSampleType(
 					adapter, D3DDEVTYPE_HAL, colorFormat, params.Windowed,
@@ -1837,9 +1867,8 @@ class VSyncOverride : public Hook
 			}
 
 			params.MultiSampleType = sampleType;
-			const DWORD commonQuality =
-				colorQuality < depthQuality ? colorQuality : depthQuality;
-			params.MultiSampleQuality = commonQuality - 1;
+            // Index zero avoids forcing an adapter's maximum quality tier.
+			params.MultiSampleQuality = 0;
 			spdlog::info(
 				"VR DX9Ex AA: explicit {}x MSAA selected quality={} (colorLevels={} depthLevels={}); replaces ambiguous NONMASKABLE game AA",
 				static_cast<int>(sampleType), params.MultiSampleQuality,
@@ -1847,9 +1876,7 @@ class VSyncOverride : public Hook
 			return;
 		}
 
-		spdlog::warn(
-			"VR DX9Ex AA: explicit 4x/2x MSAA unsupported; keeping game AA type={} quality={}",
-			static_cast<int>(params.MultiSampleType), params.MultiSampleQuality);
+		spdlog::warn("VR DX9Ex AA: selected MSAA unsupported; using Off (not game 2D AA)");
 	}
 
 	static void destination(safetyhook::Context& ctx)
@@ -1894,6 +1921,7 @@ public:
 	void declare_settings() override
 	{
 		Settings::VSync.needs_restart();
+        Settings::VRAntiAliasing.needs_restart();
 	}
 
 	bool apply() override

@@ -10,7 +10,14 @@ required = (
     'D3DMULTISAMPLE_2_SAMPLES',
     'CheckDeviceMultiSampleType',
     'params.MultiSampleType = sampleType',
-    'params.MultiSampleQuality =',
+    'params.MultiSampleQuality = 0',
+    'params.MultiSampleType = D3DMULTISAMPLE_NONE;',
+    'const int vrMode = Settings::VRAntiAliasing.get();',
+    'if (vrMode == 3)',
+    'if (vrMode == 0)',
+    'vrMode == 1 && sampleType != D3DMULTISAMPLE_2_SAMPLES',
+    'using Off (not game 2D AA)',
+
     'explicit {}x MSAA selected',
     'replaces ambiguous NONMASKABLE game AA',
 )
@@ -36,4 +43,52 @@ if "IsNativeD3D9ReferenceLaunch()" not in validate_block:
         "DX9Ex explicit MSAA hook must install even when CORRECTNESS keeps default VSync"
     )
 
-print("DX9Ex explicit 4x->2x MSAA policy: PASS")
+# F11 auto-registers named VR int settings as a Combo and marks restart.
+settings = (ROOT / "src/vr/settings.cpp").read_text(encoding="utf-8")
+overlay = (ROOT / "src/overlay/settings_ui.cpp").read_text(encoding="utf-8")
+ini = (ROOT / "OutRun2006Tweaks.ini").read_text(encoding="utf-8")
+for marker in (
+    '"VR", "AntiAliasing", 0',
+    '"Off (fastest)", "2x MSAA", "4x MSAA (fallback 2x)", "Use Game/2D AA"',
+    '"VR", "TransparencySupersampling", false',
+    "Settings::VRAntiAliasing.needs_restart();",
+    "Settings::VRTransparencySupersampling.needs_restart();",
+):
+    if marker not in settings and marker not in source:
+        raise SystemExit(f"F11 VR AA setting missing: {marker}")
+for marker in (
+    "ImGui::Combo(label.c_str(), value->ptr(), names.data(), int(names.size()))",
+    "draw_restart_notice()",
+    "Settings::write(Module::UserIniPath)",
+):
+    if marker not in overlay:
+        raise SystemExit(f"F11 persistence/restart missing: {marker}")
+for marker in ("AntiAliasing = 0", "TransparencySupersampling = false"):
+    if marker not in ini[ini.index("[VR]"):ini.index("[WheelFFB]")]:
+        raise SystemExit(f"VR config default missing: {marker}")
+if ("return Settings::TransparencySupersampling &&" not in source or
+    "!Settings::VREnabled || Settings::VRTransparencySupersampling" not in source):
+    raise SystemExit("2D/VR transparency AA isolation missing")
+if block.index("if (vrMode == 3)") > block.index("params.MultiSampleType = D3DMULTISAMPLE_NONE"):
+    raise SystemExit("Use Game AA must bypass VR override")
+if block.index("if (vrMode == 0)") > block.index("CheckDeviceMultiSampleType"):
+    raise SystemExit("Off must avoid costly multisample capability checks")
+
+# Four negative mutations ensure these are functional gates, not just menu labels.
+negative_mutations = [
+    ('params.MultiSampleType = D3DMULTISAMPLE_NONE;', '/* removed off override */'),
+    ('vrMode == 1 && sampleType != D3DMULTISAMPLE_2_SAMPLES', 'false'),
+    ('if (vrMode == 3)', 'if (vrMode == 5)'),
+    ('!Settings::VREnabled || Settings::VRTransparencySupersampling', 'true'),
+]
+for before, after in negative_mutations:
+    if before not in source: raise SystemExit(f"negative seed missing: {before}")
+    changed = source.replace(before, after, 1)
+    # Mutation must break one of the listed invariants.
+    witness = before not in changed and (
+        before in required or
+        before in ('if (vrMode == 3)', 'vrMode == 1 && sampleType != D3DMULTISAMPLE_2_SAMPLES',
+                   '!Settings::VREnabled || Settings::VRTransparencySupersampling')
+    )
+    if not witness: raise SystemExit(f"negative mutation not detected: {before}")
+print("DX9Ex F11 VR AA Off/2x/4x/Game + VR SSAA off: PASS (4 negative mutations)")
