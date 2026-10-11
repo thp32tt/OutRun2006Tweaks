@@ -1,10 +1,10 @@
-OutRun 한글화 C1 독립 최종 QA 실행
+OutRun 한글화 C1 이미지 생성 생산 실행
 
 저장소: thp32tt/OutRun2006Tweaks
 브랜치: korean-localization-recovery-20260928
 
-첫 작업은 이 브랜치의 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md를 읽는 것이다.
-C1은 반드시 홀수 숫자 asset_queue.csv index와 index가 없는 특별 C 작업만 담당한다. 짝수 index는 C2가 담당하므로 수정하거나 중복 검수하지 마.
-현재 브랜치의 queue/증거를 재조회하고 C1 대상 미완료/REWORK/HOLD 자산을 1회 최대 3개까지 완전한 실제 검증·증거 기록으로 처리해. C3 추가 검증/사용자 실기 미검증 규칙은 계약대로 유지해.
-실제 검수 증거와 변경사항은 같은 GitHub 브랜치에 commit/push하고 원격 HEAD를 재확인해. 작업 전후에 동일한 후보 SHA를 중복 완료 처리하지 마.
-VR/FFB/DX11/DXVK 및 별도 컨트롤러 TASK_ID/큐 엔진을 사용하지 마. 요청받은 샤드의 실질 QA를 우선해.
+첫 작업은 최신 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md 및 docs/KOREAN_LOCALIZATION_B_IMAGEGEN_LANE.md를 읽는 것이다.
+C1은 검수 전용이 아니라 B와 동일한 ChatGPT 실제 이미지 생성 기반 생산 + 자체 QA 레인이다. B와 중복되지 않는 C1의 짝수 큐(기본 index % 4 == 2)를 우선 담당한다. B는 기본 index % 4 == 0이며 A는 기존 홀수 제작을 유지한다. 기진행·명시적 담당 P0/P1은 기존 소유권과 최신 HEAD를 존중한다.
+원본 영문 이미지 기반 투명 한국어 글자 PNG를 이미지 생성 도구에서 실제 생성하고 generation_id/프롬프트/SHA를 기록한다. tools/localization/imagegen_b_pipeline.py의 C1 입력 스키마를 사용해 role_C1 시험 DDS/자체 QA를 만들되 C2 독립 QA, C3, 사용자 실게임 검증을 승인으로 가장하지 마.
+도구 미제공·바이너리 저장 불가 시 근거를 기록하고 허위 생성, 폰트 우회, 같은 SHA 검수만 반복하지 마. 미완료 다른 생산 항목을 계속 확인한다.
+변경된 실물과 queue/WORKLOG/상태를 동일 브랜치에 commit/push하고 HEAD SHA를 재확인해. VR/FFB/DX11/DXVK 및 새 큐 엔진/컨트롤러 TASK_ID 도입 금지.

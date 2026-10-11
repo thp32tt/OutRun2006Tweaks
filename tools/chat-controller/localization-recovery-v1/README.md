@@ -13,11 +13,11 @@ The controller started from the stable historical snapshot. Recovery-specific ch
 ## Schedule
 
 - :00 — A production/self-QA
-- :10 / :40 — C1 independent final QA (odd queue indexes and unindexed special C work)
-- :20 / :50 — C2 independent final QA (even queue indexes)
-- :30 — B production/self-QA
+- :10 / :40 — C1 ChatGPT ImageGen production/self-QA (new even indexes % 4 == 2)
+- :20 / :50 — C2 independent final QA (all A/B/C1 candidate indexes and unindexed special C work)
+- :30 — B ChatGPT ImageGen production/self-QA (new even indexes % 4 == 0)
 
-The six-launch-per-hour mapping follows the latest recovery localization contract. Four independent tabs (A/B/C1/C2) are persisted; prior C history is migrated to C1 without clearing its URL or counts. A/B use the original production prompts; C1/C2 share C quality requirements but never review each other's parity shard. Each slot starts a new ChatGPT conversation after 5 successful sends, deferred while busy. The original task/event-ID and queue engines are **not** imported. The scheduled-send watchdog remains OFF by default; AUTO_SEND remains OFF by default until the user enables it.
+The six-launch-per-hour mapping follows the latest recovery localization contract. Four independent tabs (A/B/C1/C2) are persisted; prior C history is migrated to C1 without clearing its URL or counts. A retains native/manual production; B and C1 use real ChatGPT ImageGen production with separate even-index shards; C2 alone provides independent QA for all production lanes. Existing assigned/in-flight work is not overwritten. Each slot starts a new ChatGPT conversation after 5 successful sends, deferred while busy. The original task/event-ID and queue engines are **not** imported. The scheduled-send watchdog remains OFF by default; AUTO_SEND remains OFF by default until the user enables it.
 
 ## Portainer
 
