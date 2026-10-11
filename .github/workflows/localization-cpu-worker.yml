@@ -83,7 +83,10 @@ jobs:
           # A/C old job routing remains exact; B also consumes committed genuine
           # ChatGPT ImageGen input manifests/PNG, never invokes generator in CI.
           awk '/^tools\/localization\/cpu_jobs\/[ABC]\.py$/' /tmp/localization_cpu_changed_inputs.txt > /tmp/localization_cpu_jobs.txt
-          if grep -qE '^localization/graphics/role_B/imagegen_requests/.*\.(json|png)
+          if grep -qE '^localization/graphics/role_B/imagegen_requests/.*\.(json|png)$' /tmp/localization_cpu_changed_inputs.txt; then
+            echo 'tools/localization/cpu_jobs/B.py' >> /tmp/localization_cpu_jobs.txt
+          fi
+          sort -u /tmp/localization_cpu_jobs.txt -o /tmp/localization_cpu_jobs.txt
           if [ -s /tmp/localization_cpu_jobs.txt ]; then
             echo "has_jobs=true" >> "$GITHUB_OUTPUT"
             cat /tmp/localization_cpu_jobs.txt
