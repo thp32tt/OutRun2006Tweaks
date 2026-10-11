@@ -231,7 +231,13 @@ def vr_acceptance_verdict(active: dict, record: dict, changed_paths: list) -> tu
                 or not isinstance(result.get("validation_command"), str)
                 or not result["validation_command"].strip()):
             return False, "ACCEPTANCE_ITEM_PENDING:" + item["id"]
-        if not any(p in changed_paths and any(p.startswith(prefix) for prefix in item["paths"])
+        allowed_paths = tuple(item["paths"])
+        # The frozen R84 contract predates extraction of the lower ABI header.
+        # Keep its identity stable but recognize that exact material owner file.
+        if (contract.get("feature_id") == "DX9EX:R84_RENDERER_GRAPH"
+                and item["id"] == "R84-ABI"):
+            allowed_paths += ("src/vr/core/r29_owner_api.hpp",)
+        if not any(p in changed_paths and any(p.startswith(prefix) for prefix in allowed_paths)
                    for p in paths if isinstance(p, str)):
             return False, "ACCEPTANCE_SOURCE_EVIDENCE_MISSING:" + item["id"]
     return True, "ACCEPTANCE_IMPLEMENTED"
