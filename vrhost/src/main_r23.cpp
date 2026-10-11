@@ -19,6 +19,7 @@
 #include <openxr/openxr_platform.h>
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
@@ -34,6 +35,7 @@
 #include "vr_shared.hpp"
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
+#include "runtime/cadence_presented_wait.hpp"
 #include "vr/ipc/cadence_v1.hpp"
 #include "vr/ipc/frame_pacing_diagnostics.hpp"
 
@@ -1586,6 +1588,10 @@ namespace
             LARGE_INTEGER now{};
             QueryPerformanceCounter(&now);
             requestQpc_ = now.QuadPart;
+            // A prior frame's late auto-reset completion must not wake this
+            // new request; reset before the new ID is made visible to the game.
+            if (mode_ >= 2)
+                ResetEvent(presentedEvent_);
             Publish();
             SetEvent(requestEvent_);
             ++intervalRequests_;
@@ -1613,7 +1619,25 @@ namespace
             LARGE_INTEGER start{}, end{}, frequency{};
             QueryPerformanceCounter(&start);
             QueryPerformanceFrequency(&frequency);
-            WaitForSingleObject(presentedEvent_, budgetMs);
+            // The event has no request ID and may signal for an older frame.
+            // Keep waiting only within this frame's original deadline, and
+            // accept exclusively the sequence-validated matching client ID.
+            const bool matched = OutRunVR::CadenceWait::AwaitPresented(
+                budgetMs,
+                [this, &client, request]() noexcept {
+                    return ReadClient(client) &&
+                        client.presentedRequestId == request.id;
+                },
+                [this](std::uint32_t remainingMs) noexcept {
+                    return WaitForSingleObject(
+                        presentedEvent_, remainingMs) == WAIT_OBJECT_0;
+                },
+                []() noexcept -> std::uint64_t {
+                    using namespace std::chrono;
+                    return static_cast<std::uint64_t>(
+                        duration_cast<milliseconds>(
+                            steady_clock::now().time_since_epoch()).count());
+                });
             QueryPerformanceCounter(&end);
             const double waitedMs =
                 frequency.QuadPart > 0 && end.QuadPart >= start.QuadPart
@@ -1626,11 +1650,10 @@ namespace
             intervalSerialWaitMaxMs_ =
                 std::max(intervalSerialWaitMaxMs_, waitedMs);
 
-            if (!ReadClient(client) ||
-                client.presentedRequestId != request.id)
-                ++intervalSerialTimeouts_;
-            else
+            if (matched)
                 ++intervalSerializedMatches_;
+            else
+                ++intervalSerialTimeouts_;
             return waitedMs;
         }
 
