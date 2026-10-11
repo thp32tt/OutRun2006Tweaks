@@ -784,15 +784,20 @@ namespace OutRunVRStereo
 
     bool R29OwnerLeftDrawMayWriteDepth(IDirect3DDevice9* device) noexcept
     {
-        // This cache is authoritative only when R22/R31 track every setter,
-        // StateBlock Apply/recording and the current Present generation.
-        // A proven disabled depth test OR write mask cannot mutate depth.
-        // All uncertain, recording or stale states still take the original
-        // conservative D3D9 render-state reader.
-        if (R29EffectCacheCurrent() &&
-            (R29Effect.zEnable == D3DZB_FALSE ||
-             R29Effect.zWrite == FALSE))
+        // R22/R31 cached setters and StateBlock Apply/recording fences make
+        // both the positive and negative depth-write predicates authoritative
+        // for the current Present. Opaque world draws no longer need two
+        // GetRenderState calls per draw while that cache remains coherent.
+        // A missing depth attachment can never be written.
+        if (!device || !TrackedDepthStencil)
             return false;
+        if (R29EffectCacheCurrent())
+        {
+            return R29Effect.zEnable != D3DZB_FALSE &&
+                R29Effect.zWrite != FALSE;
+        }
+        // Recording, lost hook coverage, a stale generation or an absent
+        // effect snapshot still uses the original conservative live reader.
         return LeftDrawMayWriteDepth(device);
     }
 
