@@ -1,5 +1,6 @@
 #include "live_game_frame_bridge.hpp"
 #include "live_game_primitive_span.hpp"
+#include "live_game_fvf_layout.hpp"
 #include "native_backend.hpp"
 #include "packed_texture_16bit.hpp"
 
@@ -18,6 +19,10 @@
 namespace outrun::vr::dx11::live_game_frame {
 namespace {
 using Microsoft::WRL::ComPtr;
+static_assert(kGameFvfXyz == D3DFVF_XYZ && kGameFvfXyzRhw == D3DFVF_XYZRHW &&
+              kGameFvfDiffuse == D3DFVF_DIFFUSE && kGameFvfTex1 == D3DFVF_TEX1 &&
+              kGameFvfPositionMask == D3DFVF_POSITION_MASK,
+              "Portable FVF constants must match the D3D9 SDK");
 constexpr UINT kWidth = 256;
 constexpr UINT kHeight = 144;
 constexpr UINT kMaxVertices = 1536;
@@ -228,7 +233,7 @@ bool ensure_pipeline(State& s) noexcept {
 // Read the current game device, not a WARP fixture's manufactured state.
 // COM getters AddRef; local ComPtrs always release before reset/return.
 bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
-                          bool& pretransformed,
+                          GameFvfLayout& layout,
                           std::array<D3DMATRIX, 3>& transforms,
                           TextureCapture& capture, OutputCapture& output) noexcept {
     if (!game || FAILED(game->GetViewport(&viewport)) ||
@@ -236,16 +241,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         return false;
     DWORD fvf = 0;
     if (FAILED(game->GetFVF(&fvf))) return false;
-    // Real game fixed-function geometry: admit both pretransformed HUD/sprite
-    // vertices and unlit object-space diffuse vertices. Other FVF layouts
-    // (textures, normals, weights, shader declarations) remain DX9Ex-owned.
-    const DWORD rhw = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
-    const DWORD xyz = D3DFVF_XYZ | D3DFVF_DIFFUSE;
-    pretransformed = (fvf == rhw || fvf == (rhw | D3DFVF_TEX1));
-    capture.enabled = fvf == (rhw | D3DFVF_TEX1) ||
-                      fvf == (xyz | D3DFVF_TEX1);
-    if (!pretransformed && fvf != xyz && fvf != (xyz | D3DFVF_TEX1))
-        return false;
+    // Use the live game's exact FVF byte layout; avoid reading UV as
+    // diffuse when a menu/sprite TEX1 vertex omits D3DFVF_DIFFUSE.
+    if (!game_fvf_layout(fvf, layout)) return false;
+    capture.enabled = layout.textured;
     ComPtr<IDirect3DVertexShader9> vs;
     ComPtr<IDirect3DPixelShader9> ps;
     ComPtr<IDirect3DBaseTexture9> tex;
@@ -389,6 +388,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // coordinates, gamma reads and mip/anisotropic paths we do not emulate.
         const bool modulate = op == D3DTOP_MODULATE && alphaOp == D3DTOP_MODULATE;
         const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;
+        // A missing DIFFUSE slot may supply a material color under MODULATE.
+        // Only texture selection is provably independent of that color.
+        if (!layout.hasDiffuse && !selectTexture) return false;
         // Preserve exact RGB/alpha semantics. Mixed operations are not yet
         // mirrored; inactive ARG2 is irrelevant for SELECTARG1.
         if ((!modulate && !selectTexture) || arg != D3DTA_TEXTURE ||
@@ -411,7 +413,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
     if (FAILED(game->GetRenderState(D3DRS_CLIPPLANEENABLE, &clipPlanes)) ||
         clipPlanes != 0u)
         return false;
-    if (!pretransformed) {
+    if (!layout.pretransformed) {
         DWORD lighting = TRUE, vertexBlend = ~0u;
         if (FAILED(game->GetRenderState(D3DRS_LIGHTING, &lighting)) ||
             FAILED(game->GetRenderState(D3DRS_VERTEXBLEND, &vertexBlend)) ||
@@ -425,36 +427,33 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
 }
 
 bool translate_vertices(const void* input, UINT count, UINT stride,
-                        const D3DVIEWPORT9& vp, bool pretransformed,
+                        const D3DVIEWPORT9& vp, const GameFvfLayout& layout,
                         const std::array<D3DMATRIX, 3>& transforms,
                         const TextureCapture& capture,
                         std::vector<NativeVertex>& output) {
-    const UINT diffuseOffset = pretransformed ? 16u : 12u;
-    if (!input || stride < diffuseOffset + (capture.enabled ? 12u : 4u) || stride > 512u ||
-        count == 0 || count > kMaxVertices)
+    if (!input || stride < layout.minStride || stride > 512u ||
+        count == 0 || count > kMaxVertices ||
+        capture.enabled != layout.textured)
         return false;
     output.resize(count);
     const auto* src = static_cast<const std::uint8_t*>(input);
     for (UINT i = 0; i < count; ++i) {
-        float xyz[4]{0.0f, 0.0f, 0.0f, 1.0f};
-        DWORD diffuse = 0;
+        GameFvfSample decoded{};
         const auto* data = src + static_cast<std::size_t>(i) * stride;
-        std::memcpy(xyz, data, diffuseOffset);
-        std::memcpy(&diffuse, data + diffuseOffset, sizeof(diffuse));
-        if (capture.enabled) {
-            std::memcpy(output[i].uv, data + diffuseOffset + 4u,
-                        sizeof(output[i].uv));
-            if (!std::isfinite(output[i].uv[0]) ||
-                !std::isfinite(output[i].uv[1])) return false;
-        } else {
-            output[i].uv[0] = output[i].uv[1] = 0.0f;
-        }
+        if (!game_fvf_decode_vertex(data, stride, layout, decoded))
+            return false;
+        const float* xyz = decoded.position;
+        const DWORD diffuse = decoded.diffuse;
+        output[i].uv[0] = decoded.uv[0];
+        output[i].uv[1] = decoded.uv[1];
+        if (capture.enabled && (!std::isfinite(output[i].uv[0]) ||
+                                !std::isfinite(output[i].uv[1]))) return false;
         if (!std::isfinite(xyz[0]) || !std::isfinite(xyz[1]) ||
             !std::isfinite(xyz[2]) ||
-            (pretransformed && (!std::isfinite(xyz[3]) || xyz[3] <= 0.0f)))
+            (layout.pretransformed && (!std::isfinite(xyz[3]) || xyz[3] <= 0.0f)))
             return false;
         NativeVertex& v = output[i];
-        if (pretransformed) {
+        if (layout.pretransformed) {
             // D3D9 XYZRHW stores reciprocal homogeneous W. Preserve it for
             // perspective-correct UV interpolation instead of treating a menu
             // sprite with non-uniform RHW as an affine D3D11 triangle.
@@ -723,11 +722,11 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         std::lock_guard<std::mutex> lock(s.mutex);
         ++s.observed;
         D3DVIEWPORT9 vp{};
-        bool pretransformed = true;
+        GameFvfLayout layout{};
         std::array<D3DMATRIX, 3> transforms{};
         TextureCapture capture{};
         OutputCapture output{};
-        if (!supported_game_state(game, vp, pretransformed, transforms, capture, output)) return;
+        if (!supported_game_state(game, vp, layout, transforms, capture, output)) return;
         // Count every admitted state, including calls after this frame's one
         // native draw. Use that bounded population to rotate the next frame's
         // probe rather than sampling its same first triangle indefinitely.
@@ -740,7 +739,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         if (!indexCount && vertexCount != expectedElements) return;
         std::vector<NativeVertex> vertices;
         if (!translate_vertices(bytes, vertexCount, stride, vp,
-                                pretransformed, transforms, capture, vertices))
+                                layout, transforms, capture, vertices))
             return;
         if (indices) {
             for (UINT i=0; i<indexCount; ++i)

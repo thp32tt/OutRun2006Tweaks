@@ -826,7 +826,46 @@ def main() -> None:
         mutated = hooks.replace("topology != D3DPT_TRIANGLEFAN", "topology == D3DPT_TRIANGLEFAN", 1)
         assert mutated != hooks and mutated.count("topology != D3DPT_TRIANGLEFAN") == 2
 
-    print("DX11 live diagnostic TEX1/DXT/packed16/strip/fan/alpha/scissor/COLORWRITE Draw/fallback regression PASS (static only)")
+    # 00547: D3D9 TEX1 source with no DIFFUSE has a shorter UV offset.
+    # Verify live bridge admission, native decode and fail-closed mutations.
+    layout_source = (ROOT / "src/vr/d3d11/live_game_fvf_layout.hpp").read_text(encoding="utf-8")
+    probe_source = (ROOT / "tools/dx11_game_fvf_layout_probe.cpp").read_text(encoding="utf-8")
+    for token in ("game_fvf_layout(", "game_fvf_decode_vertex(",
+                  "layout.texcoordOffset", "diffuse = 0xffffffffu",
+                  "stride < layout.minStride", "sample = candidate;"):
+        assert token in layout_source, token
+    for token in ("kGameFvfXyzRhw | kGameFvfTex1", "kGameFvfXyz | kGameFvfTex1",
+                  "game_fvf_decode_vertex(&rhwUv", "game_fvf_decode_vertex(&xyzUv",
+                  "assert(!game_fvf_decode_vertex(&rhwUv, 23"):
+        assert token in probe_source, token
+
+    def fvf_connected(code: str) -> bool:
+        a = code.index("bool supported_game_state(")
+        z = code.index("// Snapshot a live game texture", a)
+        body = code[a:z]
+        observe = code[code.index("void observe(IDirect3DDevice9* game", z):]
+        return all(v in body for v in (
+            "if (!game_fvf_layout(fvf, layout)) return false;",
+            "capture.enabled = layout.textured;",
+            "if (!layout.hasDiffuse && !selectTexture) return false;",
+            "if (!game_fvf_decode_vertex(data, stride, layout, decoded))",
+            "const DWORD diffuse = decoded.diffuse;",
+            "output[i].uv[0] = decoded.uv[0];",
+        )) and all(v in observe for v in (
+            "supported_game_state(game, vp, layout, transforms, capture, output)",
+            "layout, transforms, capture, vertices)",
+        ))
+    assert fvf_connected(bridge)
+    for good,bad in (
+        ("if (!game_fvf_layout(fvf, layout)) return false;", "if (true) return false;"),
+        ("if (!layout.hasDiffuse && !selectTexture) return false;",
+         "if (layout.hasDiffuse && !selectTexture) return false;"),
+        ("if (!game_fvf_decode_vertex(data, stride, layout, decoded))", "if (false)"),
+    ):
+        mutated = bridge.replace(good, bad, 1)
+        assert mutated != bridge and not fvf_connected(mutated)
+
+    print("DX11 live diagnostic TEX1/no-DIFFUSE/DXT/packed16/strip/fan/alpha/scissor/COLORWRITE Draw/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":
