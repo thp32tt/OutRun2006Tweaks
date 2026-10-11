@@ -73,25 +73,40 @@ def verify(text):
 if __name__ == "__main__":
     src = SRC.read_text(encoding="utf-8")
     verify(src)
+    # Target each destructive mutation to the function actually being checked.
+    # A global first match may hit an earlier SkyGlow path instead and pass.
+    def mutate_function(src, name, good, bad):
+        anchor = src.index(name + "(")
+        scope_start = src.index("{", anchor)
+        scope = block(src, name)
+        assert good in scope, (name, good)
+        return (src[:scope_start] + scope.replace(good, bad, 1) +
+                src[scope_start + len(scope):])
+
     negatives = (
-        ("const auto frame = R29OwnerCaptureFrameSnapshot();", "const auto frame = {};"),
-        ("device, 0u, frame.rightEyeSurface)", "device, 0u, nullptr)"),
-        ("device, frame.trackedDepthStencil ? frame.rightEyeDepth : nullptr)",
-         "device, nullptr)"),
-        ("IDirect3DSurface9* savedDepth = frame.trackedDepthStencil;",
-         "IDirect3DSurface9* savedDepth = nullptr;"),
-        ("                frame = R29OwnerCaptureFrameSnapshot();", "                // no bootstrap refresh"),
-        ("R29OwnerTryBootstrapRightDepth(device);", "// no bootstrap"),
-        ("R29OwnerRestoreRightPassState", "R29OwnerNoRestore"),
-        ("R30SkyGlowSceneCaptureEpoch != frame.presentEpoch", "true"),
-        ("R30SkyGlow.factor > 1", "false"),
+        ("R30EnsureSkyGlowResources",
+         "const auto frame = R29OwnerCaptureFrameSnapshot();",
+         "const auto frame = {};"),
+        ("R30ExecuteXyzrhwStereo", "frame.rightEyeSurface", "nullptr"),
+        ("R30ExecuteXyzrhwStereo", "frame.rightEyeDepth", "nullptr"),
+        ("R30ExecuteXyzrhwStereo", "frame.trackedDepthStencil", "nullptr"),
+        ("R30ConfigureXyzrhwWorldEffect",
+         "                frame = R29OwnerCaptureFrameSnapshot();",
+         "                // no bootstrap refresh"),
+        ("R30ConfigureXyzrhwWorldEffect",
+         "R29OwnerTryBootstrapRightDepth(device);", "// no bootstrap"),
+        ("R30ExecuteXyzrhwStereo",
+         "R29OwnerRestoreRightPassState", "R29OwnerNoRestore"),
+        ("R30ApplyStereoSkyGlow",
+         "R30SkyGlowSceneCaptureEpoch != frame.presentEpoch", "true"),
+        ("R30ApplyStereoSkyGlow", "R30SkyGlow.factor > 1", "false"),
     )
-    for good, bad in negatives:
-        assert good in src, good
+    for name, good, bad in negatives:
         try:
-            verify(src.replace(good, bad, 1))
+            verify(mutate_function(src, name, good, bad))
         except (AssertionError, ValueError):
             pass
         else:
-            raise AssertionError("destructive mutation survived: " + good)
+            raise AssertionError(
+                "destructive mutation survived: " + name + " / " + good)
     print("PASS R30 frame snapshot reuse and %d negative mutations" % len(negatives))
