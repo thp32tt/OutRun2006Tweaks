@@ -72,6 +72,46 @@ class TestBImageGen(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "SOURCE_REFERENCE_NOT_BOUND"):
                 b.require_bound_english_reference(root, raw)
 
+    def test_openai_edit_multipart_sha_receipt_bound_to_real_output(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            folder = root / "localization/graphics/role_C1/imagegen_requests"
+            folder.mkdir(parents=True)
+            source = folder / "english.png"
+            source.write_bytes(self.make_png())
+            generated = folder / "korean.png"
+            generated.write_bytes(self.make_png())
+            def ref(p):
+                return {"path": str(p.relative_to(root)), "sha256": b.digest(p.read_bytes())}
+            receipt = folder / "api_receipt.json"
+            receipt.write_text(json.dumps({
+                "tool": "openai.images.edit", "media_attached": True,
+                "image_input_field": "multipart_image",
+                "input_reference_id": "req-test-image-edit",
+                "openai_request_id": "req-test-image-edit",
+                "actual_api_response_received": True,
+                "source_image_sha256": ref(source)["sha256"],
+                "result_sha256": ref(generated)["sha256"],
+                "generation_id": "req-test-image-edit",
+                "target_text": "타임 어택 모드",
+            }))
+            manifest = {
+                "target_text": "타임 어택 모드",
+                "generator": {"provider": "openai-images-edit",
+                              "generation_id": "req-test-image-edit"},
+                "generated": ref(generated),
+                "source_media_binding": {
+                    "english_reference": ref(source),
+                    "tool_request_receipt": ref(receipt),
+                },
+            }
+            self.assertEqual(
+                "DECLARED_TOOL_INPUT_RECEIPT_PRESENT_C2_VERIFICATION_REQUIRED",
+                b.require_bound_english_reference(root, manifest)["binding_status"])
+            manifest["generated"]["sha256"] = "0" * 64
+            with self.assertRaisesRegex(ValueError, "SOURCE_REFERENCE_NOT_BOUND"):
+                b.require_bound_english_reference(root, manifest)
+
     def test_alpha_fit_preserves_nonzero_bounds(self):
         a=b.png_rgba(self.make_png())
         z=b.premul_fit(a,75,18,"contain")
