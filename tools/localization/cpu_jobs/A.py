@@ -92,7 +92,7 @@ png("A245_TRUE_CLEAN_ONLINE_READABLE_NATIVE.png",clean.crop(CELL))
 png("A245_TRUE_CLEAN_FULL_RAW.png",clean.transpose(Image.Transpose.FLIP_TOP_BOTTOM))
 # P2: 4x anti-aliased real Korean font *without horizontal stretch*.
 AA=4
-FONT_SIZE=37
+FONT_SIZE=36
 font=ImageFont.truetype(str(FONT),FONT_SIZE*AA,index=FONT_INDEX)
 canvas=Image.new("L",(330*AA,80*AA),0)
 ImageDraw.Draw(canvas).text((3*AA,0),TARGET,font=font,fill=255)
