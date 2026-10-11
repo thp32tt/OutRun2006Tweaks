@@ -1586,10 +1586,17 @@ public:
 
 	bool validate() override
 	{
-        // Preserve the original 2D setting; avoid heavy SSAA in VR unless
-        // separately opted in from F11's VR section.
+        // VR.Enabled defaults to true even for plain 2D launches. Do not
+        // suppress the original 2D graphics setting unless the selected
+        // backend is actually the native DX9Ex VR reference.
+        char backend[32]{};
+        const DWORD length = GetEnvironmentVariableA(
+            "OUTRUN_VR_BACKEND", backend, static_cast<DWORD>(std::size(backend)));
+        const bool activeNativeVr = Settings::VREnabled &&
+            length > 0 && length < std::size(backend) &&
+            lstrcmpiA(backend, "d3d9") == 0;
         return Settings::TransparencySupersampling &&
-            (!Settings::VREnabled || Settings::VRTransparencySupersampling);
+            (!activeNativeVr || Settings::VRTransparencySupersampling);
 	}
 
 	void declare_settings() override

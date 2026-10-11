@@ -67,7 +67,8 @@ for marker in ("AntiAliasing = 0", "TransparencySupersampling = false"):
     if marker not in ini[ini.index("[VR]"):ini.index("[WheelFFB]")]:
         raise SystemExit(f"VR config default missing: {marker}")
 if ("return Settings::TransparencySupersampling &&" not in source or
-    "!Settings::VREnabled || Settings::VRTransparencySupersampling" not in source):
+    "!activeNativeVr || Settings::VRTransparencySupersampling" not in source or
+    'lstrcmpiA(backend, "d3d9") == 0' not in source):
     raise SystemExit("2D/VR transparency AA isolation missing")
 if block.index("if (vrMode == 3)") > block.index("params.MultiSampleType = D3DMULTISAMPLE_NONE"):
     raise SystemExit("Use Game AA must bypass VR override")
@@ -79,7 +80,7 @@ negative_mutations = [
     ('params.MultiSampleType = D3DMULTISAMPLE_NONE;', '/* removed off override */'),
     ('vrMode == 1 && sampleType != D3DMULTISAMPLE_2_SAMPLES', 'false'),
     ('if (vrMode == 3)', 'if (vrMode == 5)'),
-    ('!Settings::VREnabled || Settings::VRTransparencySupersampling', 'true'),
+    ('!activeNativeVr || Settings::VRTransparencySupersampling', 'true'),
 ]
 for before, after in negative_mutations:
     if before not in source: raise SystemExit(f"negative seed missing: {before}")
@@ -88,7 +89,7 @@ for before, after in negative_mutations:
     witness = before not in changed and (
         before in required or
         before in ('if (vrMode == 3)', 'vrMode == 1 && sampleType != D3DMULTISAMPLE_2_SAMPLES',
-                   '!Settings::VREnabled || Settings::VRTransparencySupersampling')
+                   '!activeNativeVr || Settings::VRTransparencySupersampling')
     )
     if not witness: raise SystemExit(f"negative mutation not detected: {before}")
 print("DX9Ex F11 VR AA Off/2x/4x/Game + VR SSAA off: PASS (4 negative mutations)")
