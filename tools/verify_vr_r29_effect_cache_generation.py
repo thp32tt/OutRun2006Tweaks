@@ -74,6 +74,7 @@ def contract(s):
             depth_owner.find("return LeftDrawMayWriteDepth(device);"),
         "R29OwnerLeftDrawMayWriteDepth(device)" in stereo,
         "LeftDrawMayWriteStencil(device)" in stereo,
+        "if (R29OwnerLeftDrawMayWriteDepth(device) ||" in stereo,
         "R29Effect.applyGeneration = 0;" not in sync,
         "R29Effect.recordingGeneration = 0;" not in sync,
         "R29Effect.valid && false" not in s,
@@ -129,6 +130,9 @@ mutations = [
      "return false;"),
     ("direct stereo depth owner", "if (R29OwnerLeftDrawMayWriteDepth(device) ||",
      "if (LeftDrawMayWriteDepth(device) ||"),
+    ("depth or stencil serial safety",
+     "if (R29OwnerLeftDrawMayWriteDepth(device) ||",
+     "if (R29OwnerLeftDrawMayWriteDepth(device) &&"),
 ]
 for name, before, after in mutations:
     if src.count(before) != 1:
@@ -138,4 +142,4 @@ for name, before, after in mutations:
 if errors:
     print("FAIL " + ", ".join(errors), file=sys.stderr)
     sys.exit(1)
-print("PASS R29 single-Present effect cache, Begin/End/Apply fences and 19 negative mutations")
+print("PASS R29 single-Present effect cache, Begin/End/Apply fences and 20 negative mutations")
