@@ -437,7 +437,8 @@ def main() -> None:
         (SUBTRACT, ADD, False),
         (ADD, SUBTRACT, False),
         (MODULATE, ADD, False),
-        (ADD, SELECTARG1, False),
+        (ADD, SELECTARG1, True),
+        (ADD, SELECTARG2, True),
         (MODULATE, SELECTARG1, True),
         (MODULATE, SELECTARG2, True),
         (SELECTARG1, MODULATE, False),
@@ -449,7 +450,8 @@ def main() -> None:
                     or (color_op == SELECTARG1 and alpha_op == SELECTARG1)
                     or (color_op == ADD and alpha_op == ADD)
                     or (color_op == SUBTRACT and alpha_op == SUBTRACT)
-                    or (color_op == MODULATE and alpha_op in (SELECTARG1, SELECTARG2)))
+                    or (color_op == MODULATE and alpha_op in (SELECTARG1, SELECTARG2))
+                    or (color_op == ADD and alpha_op in (SELECTARG1, SELECTARG2)))
         assert admitted == supported
 
 
@@ -503,7 +505,7 @@ def main() -> None:
         "bool mixedDiffuseAlpha = false;",
         "rgbNeedsDiffuse && !arg2Diffuse",
         "alphaNeedsDiffuse && !alphaArg2Diffuse",
-        "(!mixedDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE)",
+        "(!mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE)",
         "float4 c = float4(t.rgb * v.diffuse.rgb, t.a);",
         "float4 c = float4(t.rgb * v.diffuse.rgb, v.diffuse.a);",
         '!compile("PSTextureModulateTextureAlpha", "ps_4_0", mixedTextureCode)',
@@ -540,6 +542,56 @@ def main() -> None:
         assert ((op == SELECTARG1 and a1 == 2) or (
             op == SELECTARG2 and a2 in (0, 1))) == allowed
     print("DX11 mixed alpha live Draw source integration PASS (static only)")
+
+
+    # 00557 live game D3D9 ADD RGB + independent alpha sources into
+    # D3D11 native linear/indexed Draw. Source regressions, NOT HMD proof.
+    add_alpha_links = (
+        "const bool mixedAddTextureAlpha = op == D3DTOP_ADD && alphaOp == D3DTOP_SELECTARG1;",
+        "const bool mixedAddDiffuseAlpha = op == D3DTOP_ADD && alphaOp == D3DTOP_SELECTARG2;",
+        "bool mixedAddTextureAlpha = false;",
+        "bool mixedAddDiffuseAlpha = false;",
+        "mixedAddTextureAlpha || mixedAddDiffuseAlpha;",
+        "mixedDiffuseAlpha || mixedAddDiffuseAlpha;",
+        "!mixedAddTextureAlpha && !mixedAddDiffuseAlpha) || arg != D3DTA_TEXTURE",
+        "(!mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE)",
+        "capture.mixedAddTextureAlpha = mixedAddTextureAlpha;",
+        "capture.mixedAddDiffuseAlpha = mixedAddDiffuseAlpha;",
+        "float4 c = float4(saturate(t.rgb + v.diffuse.rgb), t.a);",
+        "float4 c = float4(saturate(t.rgb + v.diffuse.rgb), v.diffuse.a);",
+        '!compile("PSTextureAddTextureAlpha", "ps_4_0", mixedAddTextureCode)',
+        '!compile("PSTextureAddDiffuseAlpha", "ps_4_0", mixedAddDiffuseCode)',
+        "s.mixedAddTextureAlphaPs.GetAddressOf()",
+        "s.mixedAddDiffuseAlphaPs.GetAddressOf()",
+        "s.mixedAddTextureAlphaPs.Reset();",
+        "s.mixedAddDiffuseAlphaPs.Reset();",
+        "s.mixedAddTextureAlphaPs && s.mixedAddDiffuseAlphaPs",
+        "capture.mixedAddTextureAlpha ? s.mixedAddTextureAlphaPs.Get() :",
+        "capture.mixedAddDiffuseAlpha ? s.mixedAddDiffuseAlphaPs.Get() :",
+        "ctx->DrawIndexed(indexCount, 0, 0);",
+        "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+    )
+    assert all(token in bridge for token in add_alpha_links), "mixed ADD/alpha pipeline disconnected"
+    for token in add_alpha_links[:-2]:
+        mutant = bridge.replace(token, "/* detached mixed ADD alpha */")
+        assert mutant != bridge and token not in mutant, "missed ADD alpha mutation: " + token
+    for texel, diffuse, expected_t, expected_d in (
+        ((0.8, 0.3, 0.9, 0.9), (0.5, 0.4, 0.3, 0.2),
+         (1.0, 0.7, 1.0, 0.9), (1.0, 0.7, 1.0, 0.2)),
+        ((0.1, 0.8, 0.05, 0.1), (0.2, 0.9, 0.2, 0.95),
+         (0.3, 1.0, 0.25, 0.1), (0.3, 1.0, 0.25, 0.95)),
+    ):
+        rgb = tuple(min(1.0, t + d) for t, d in zip(texel[:3], diffuse[:3]))
+        assert all(abs(a - b) < 1e-6 for a, b in zip((*rgb, texel[3]), expected_t))
+        assert all(abs(a - b) < 1e-6 for a, b in zip((*rgb, diffuse[3]), expected_d))
+        assert expected_t[3] != expected_d[3]
+    for color_op, alpha_op, expected in (
+        (ADD, SELECTARG1, True), (ADD, SELECTARG2, True),
+        (MODULATE, SELECTARG1, False), (SUBTRACT, SELECTARG2, False),
+        (ADD, MODULATE, False), (ADD, SUBTRACT, False),
+    ):
+        assert (color_op == ADD and alpha_op in (SELECTARG1, SELECTARG2)) == expected
+    print("DX11 stage0 ADD with separate alpha native Draw connected PASS (static only)")
 
     # 00553 positive/negative linkage: real game stage0 ADD dispatches a
     # saturating RGBA pixel shader. No actual HMD/desktop pixels are inferred.
