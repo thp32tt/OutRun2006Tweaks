@@ -1,3 +1,7 @@
+## Final closeout — 2026-10-11 (supersedes ACTIVE plan below)
+
+**R84 production convergence: SUPERSEDED_BY_DX9EX_FOCUS / COMPLETE_BUILD_VERIFIED.** One stable TASK_ID `CONVERSION-DX9EX-00591` delivered full R29–R33 independent translation units and explicit interfaces; Win32 compile/link and x64 host, protected safe game, package, policy and domain all passed on target SHA `074768c96c410f0268c084450b0aa8bced38b6c3`. Exact GitHub DX9Ex Active #38135749653, Domain Isolation #38135749604, Full Source Impact #38135749550 each SUCCESS. Separate R84 x86 DLL artifact #11701023307; unchanged safe package #11701106196. Quest3/VDXR runtime UNTESTED. No further structural R84 tasks, score duplicates, or misleading ACTIVE status. Remaining P0 HUD/optics and performance work proceeds separately.
+
 # DX9Ex R84 -> Production Convergence Plan
 
 ## 2026-10-10 user override: one R84 functional acceptance unit (ACTIVE)
