@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 20:09 KST",
+  "updated_at_kst": "2026-10-11 20:17 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1308,6 +1308,35 @@
         "C3": "NOT_RUN",
         "user_game": "PJR001_OPEN",
         "RUNTIME_VALIDATION": "UNTESTED"
+      },
+      "c1_q102_imagegen_wrong_target_2010_20261011": {
+        "role": "C1",
+        "index": 102,
+        "method": "real_chatgpt_imagegen",
+        "producer_qa": "FAIL_WRONG_TARGET_TEXT",
+        "source_crop_verified_sha256": "da6bc1f532fa6c35cbf8d207bfd5d3baf49ccaef81717419edff5738da97a868",
+        "requested_text": "타임 어택 모드",
+        "attempted_generation_ids": [
+          "ce465302-3d95-480a-b947-dfec8129e8cd",
+          "ccf6141f-0fe6-4ad5-b087-d8f03c0f2c76"
+        ],
+        "actual_output_sha256": [
+          "4870bc4080ec37d0af7ea6d570feacb8ece57a6085bf2c2304b733a95ecf9cd3",
+          "1781c21443f05753d424a3335a9788a70b83d0bb36fd693d3c087808dd8dae56"
+        ],
+        "wrong_text": [
+          "아웃런 2006",
+          "아웃런"
+        ],
+        "valid_target_png_count": 0,
+        "raw_png_committed_to_github": 0,
+        "trial_dds_new": 0,
+        "official_dds_promoted": 0,
+        "pipeline_native_bc3_dxt5_supported": false,
+        "C2": "NOT_RUN",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "evidence": "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2010_WRONG_LABEL_IMAGEGEN_HOLD.json"
       }
     },
     "runtime_text_trace": {
