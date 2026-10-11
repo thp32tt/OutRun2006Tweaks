@@ -114,7 +114,7 @@ class ProtectLoginData : public Hook
 					throw std::runtime_error("CryptUnprotectData = false");
 				else
 				{
-					std::memcpy(outputData, outputBlob.pbData, min(int(outputBlob.cbData), dataLength));
+					std::memcpy(outputData, outputBlob.pbData, (std::min)(int(outputBlob.cbData), dataLength));
 					LocalFree(outputBlob.pbData);
 					return true;
 				}
