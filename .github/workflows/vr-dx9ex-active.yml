@@ -58,6 +58,7 @@ on:
       - 'tools/verify_vr_r30_eye_affine_fastpath.py'
       - 'tools/verify_vr_r30_flat_effect_geometry_fastpath.py'
       - 'tools/verify_vr_r30_hud_contain_draw_fastpath.py'
+      - 'tools/verify_vr_r30_hud_present_cache.py'
       - 'tools/verify_vr_r30_shadow_descriptor_fastpath.py'
       - 'tools/verify_vr_r30_skyglow_fastpath.py'
       - 'tools/verify_vr_r32_runtime_support_seam.py'
@@ -186,6 +187,7 @@ jobs:
             'tools/verify_vr_r30_eye_affine_fastpath.py',
             'tools/verify_vr_r30_flat_effect_geometry_fastpath.py',
             'tools/verify_vr_r30_hud_contain_draw_fastpath.py',
+            'tools/verify_vr_r30_hud_present_cache.py',
             'tools/verify_vr_r30_shadow_descriptor_fastpath.py',
             'tools/verify_vr_r30_skyglow_fastpath.py',
             'tools/verify_vr_r32_runtime_support_seam.py',

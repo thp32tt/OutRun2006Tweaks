@@ -671,6 +671,22 @@ namespace OutRunVRStereo
             UINT glowHeight = 0;
             int factor = 0;
         };
+        // Per-Present CPU cache: a latched OpenXR eye aspect is invariant
+        // across many HUD draw calls, not just across their vertices.
+        struct R30HudContainCache
+        {
+            bool valid = false;
+            std::uint64_t presentEpoch = 0;
+            std::uint32_t poseSequence = 0;
+            UINT sourceWidth = 0;
+            UINT sourceHeight = 0;
+            float userScale = 0.0f;
+            float eyeFov[8]{};
+            float scaleX = 1.0f;
+            float scaleY = 1.0f;
+        };
+        thread_local R30HudContainCache R30HudContain{};
+
         R30SkyGlowResources R30SkyGlow{};
         std::uint64_t R30SkyGlowFrames = 0;
         std::uint64_t R30SkyGlowFailures = 0;
@@ -1213,6 +1229,7 @@ namespace OutRunVRStereo
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
             R30FlatEffectGeometry = {};
+            R30HudContain = {};
             return R30ResetR29Hook.stdcall<HRESULT>(device, params);
         }
 
@@ -1299,16 +1316,49 @@ namespace OutRunVRStereo
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
             float& scaleX, float& scaleY) noexcept
         {
+            const auto frame = R29OwnerCaptureFrameSnapshot();
             const float userScale = R30HudScaleValue();
+            const float fov[8]{
+                stereo.eyeFov[0].angleLeft,
+                stereo.eyeFov[0].angleRight,
+                stereo.eyeFov[0].angleUp,
+                stereo.eyeFov[0].angleDown,
+                stereo.eyeFov[1].angleLeft,
+                stereo.eyeFov[1].angleRight,
+                stereo.eyeFov[1].angleUp,
+                stereo.eyeFov[1].angleDown
+            };
+            bool canCache = frame.presentEpoch != 0 &&
+                frame.width != 0 && frame.height != 0 &&
+                std::isfinite(userScale);
+            for (float angle : fov)
+                canCache = canCache && std::isfinite(angle);
+
+            bool fovMatches = true;
+            for (int i = 0; i < 8; ++i)
+                fovMatches = fovMatches &&
+                    (R30HudContain.eyeFov[i] == fov[i]);
+            if (canCache && R30HudContain.valid &&
+                R30HudContain.presentEpoch == frame.presentEpoch &&
+                R30HudContain.poseSequence == stereo.poseSequence &&
+                R30HudContain.sourceWidth == frame.width &&
+                R30HudContain.sourceHeight == frame.height &&
+                R30HudContain.userScale == userScale &&
+                fovMatches)
+            {
+                scaleX = R30HudContain.scaleX;
+                scaleY = R30HudContain.scaleY;
+                return;
+            }
+
+            // Untrusted startup, nonfinite FOV or resized frame cannot reuse
+            // previous eye extent. The next Present always samples XR again.
+            R30HudContain.valid = false;
             const float sourceOverTarget =
                 R30HudAspectCompensation(stereo);
 
-            // "Contain" the original desktop HUD canvas inside one eye before
-            // applying the user scale. The old "cover" mapping multiplied X by
-            // source/target aspect; on 3440x1440 -> Quest eye targets that could
-            // make HudScale=0.55 wider than the visible eye and push rank/time
-            // elements off-screen. Contain preserves sprite pixel aspect while
-            // guaranteeing the whole common-centre HUD stays inside the eye.
+            // The existing contain math is unchanged: eye offset, Z/RHW,
+            // source HUD geometry and SkyGlow are outside this CPU fastpath.
             if (sourceOverTarget >= 1.0f)
             {
                 scaleX = userScale;
@@ -1319,6 +1369,20 @@ namespace OutRunVRStereo
                 scaleX = userScale * sourceOverTarget;
                 scaleY = userScale;
             }
+            if (!canCache || !std::isfinite(scaleX) ||
+                !std::isfinite(scaleY))
+                return;
+
+            R30HudContain.presentEpoch = frame.presentEpoch;
+            R30HudContain.poseSequence = stereo.poseSequence;
+            R30HudContain.sourceWidth = frame.width;
+            R30HudContain.sourceHeight = frame.height;
+            R30HudContain.userScale = userScale;
+            for (int i = 0; i < 8; ++i)
+                R30HudContain.eyeFov[i] = fov[i];
+            R30HudContain.scaleX = scaleX;
+            R30HudContain.scaleY = scaleY;
+            R30HudContain.valid = true;
         }
 
         bool R30TransformHudScissor(
