@@ -2043,6 +2043,92 @@ def main() -> None:
                 assert rgba[:3] == rgb and rgba[3] == selected_alpha
     print("DX11 RGB blend + SELECTARG alpha game-native Draw PASS (static only)")
 
+
+    # 00569: live game blend RGB factor and independent MODULATE alpha.
+    # Verify intake, native HLSL, PS lifetime/selection and native Draw/inset.
+    # Source mutation and CPU math are not GPU/game/Quest3 validation.
+    def blend_modulate_alpha_connected(code: str) -> bool:
+        intake = code[code.find("bool supported_game_state("):code.find("bool translate_vertices(")]
+        submission = code[code.find("bool submit("):code.find("void observe(")]
+        common = (
+            "GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)",
+            "GetTextureStageState(0, D3DTSS_ALPHAARG1, &alphaArg1)",
+            "GetTextureStageState(0, D3DTSS_ALPHAARG2, &alphaArg2)",
+            "blendTextureModulateAlpha || blendDiffuseModulateAlpha ||",
+            "!blendTextureModulateAlpha && !blendDiffuseModulateAlpha &&",
+            "alphaNeedsDiffuse && !alphaArg2Diffuse",
+            "alphaArg1 != D3DTA_TEXTURE",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+            "game->UpdateSurface(",
+        )
+        if not all(token in code for token in common):
+            return False
+        if not all(token in intake for token in (
+            "blendTextureModulateAlpha || blendDiffuseModulateAlpha ||",
+            "!blendTextureModulateAlpha && !blendDiffuseModulateAlpha &&",
+            "alphaNeedsDiffuse && !alphaArg2Diffuse",
+        )): return False
+        if "ctx->PSSetShader(" not in submission: return False
+        for source in ("Texture", "Diffuse"):
+            flag = f"blend{source}ModulateAlpha"
+            shader = f"PSTextureBlend{source}ModulateAlpha"
+            rgba = (f"float4 c = float4(lerp(v.diffuse.rgb, t.rgb, "
+                    f"{'t.a' if source == 'Texture' else 'v.diffuse.a'}), t.a * v.diffuse.a);")
+            links = (
+                f"const bool {flag} = op == D3DTOP_BLEND{source.upper()}ALPHA &&",
+                "alphaOp == D3DTOP_MODULATE;",
+                f"bool {flag} = false;",
+                f"capture.{flag} = {flag};",
+                f"float4 {shader}(VOut v) : SV_Target {{",
+                rgba,
+                f'compile("{shader}", "ps_4_0", blend{source}ModulateCode)',
+                f"s.{flag}Ps.GetAddressOf()",
+                f"s.{flag}Ps &&",
+                f"capture.{flag} ? s.{flag}Ps.Get() :",
+            )
+            if not all(token in code for token in links): return False
+            if code.count(f"s.{flag}Ps.Reset();") != 2: return False
+        return True
+    assert blend_modulate_alpha_connected(bridge)
+    for source in ("Texture", "Diffuse"):
+        flag = f"blend{source}ModulateAlpha"
+        shader = f"PSTextureBlend{source}ModulateAlpha"
+        for token in (
+            f"capture.{flag} = {flag};",
+            f'compile("{shader}", "ps_4_0", blend{source}ModulateCode)',
+            f"capture.{flag} ? s.{flag}Ps.Get() :",
+            f"float4 {shader}(VOut v) : SV_Target {{",
+            f"const bool {flag} = op == D3DTOP_BLEND{source.upper()}ALPHA &&",
+        ):
+            mutant = bridge.replace(token, "/* 00569 link broken */", 1)
+            assert mutant != bridge and not blend_modulate_alpha_connected(mutant), token
+    # D3DTOP_BLENDTEXTUREALPHA=13, BLENDDIFFUSEALPHA=12, MODULATE=4.
+    for rgb_op, alpha_op, a1, a2, expected in (
+        (12, 4, "texture", "diffuse", True),
+        (13, 4, "texture", "current", True),
+        (12, 4, "diffuse", "diffuse", False),
+        (13, 4, "texture", "texture", False),
+        (12, 7, "texture", "diffuse", False),
+        (13, 3, "texture", "diffuse", False),
+        (14, 4, "texture", "diffuse", False),
+    ):
+        admitted = (rgb_op in (12, 13) and alpha_op == 4 and
+                    a1 == "texture" and a2 in ("diffuse", "current"))
+        assert admitted is expected
+    for texel, diffuse in (
+        ((.8, .1, .9, .7), (.2, .6, .1, .3)),
+        ((.1, .8, .3, .15), (.9, .2, .5, .95)),
+    ):
+        for factor in (texel[3], diffuse[3]):
+            rgb = tuple((1-factor)*d + factor*t
+                        for t, d in zip(texel[:3], diffuse[:3]))
+            alpha = texel[3] * diffuse[3]
+            assert all(0 <= c <= 1 for c in (*rgb, alpha))
+            assert alpha != texel[3] and alpha != diffuse[3]
+    print("DX11 blend RGB + independent MODULATE alpha live Draw PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
