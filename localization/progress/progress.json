@@ -13758,5 +13758,30 @@
     "blind_calibration": "HOLD",
     "runtime_validation": "UNTESTED",
     "evidence": "localization/graphics/role_C/20261011-C2-Q044-STRICT-NATIVE-SOURCE-FAMILY/C2_Q044_NEW_SOURCE_FAMILY_REWORK.json"
+  },
+  "a247_20261012_q193_three_source_clean": {
+    "role": "A",
+    "queue_index": 193,
+    "checkpoint": "A247_THREE_INHERITED_SOURCE_CLEAN_SCOPED_PASS",
+    "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "unchanged_candidate_sha256": "980662036fcdd75b0676890acc496c27e9322bc3c95999b8bfea3d2ee81c4b8f",
+    "official_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+    "new_clean_regions": 3,
+    "source_clean_changed_pixels": 55717,
+    "clean_outside": 0,
+    "clean_alpha_inside": 0,
+    "new_saved_dds": 0,
+    "official_promoted": 0,
+    "producer_self_qa": "PASS_SCOPED_CLEAN_ONLY",
+    "c2": "PENDING_INDEPENDENT_NEW_PLATE_AND_FULL_FINAL",
+    "c3": "NOT_RUN",
+    "runtime_validation": "UNTESTED",
+    "open_ingame": [
+      "IGR003",
+      "IGR019",
+      "IGR033"
+    ],
+    "qa": "localization/graphics/role_A/20261012-A247-Q193-THREE-SOURCE-CLEAN-RECONSTRUCTION/A247_CONTROLLER_SCOPED_PLATE_VISUAL_QA.json",
+    "run_key": "OUTRUN-KOR-A247-Q193-C2-THREE-MISSING-CLEAN-20261012-0000"
   }
 }
