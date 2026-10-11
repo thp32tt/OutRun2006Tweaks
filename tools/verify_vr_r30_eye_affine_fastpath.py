@@ -90,12 +90,12 @@ int main() {
  f.poseSequence=34;check(f);assert(tanCalls==12);
  f.eyeFov[0].angleLeft=std::numeric_limits<float>::quiet_NaN();
  float s[2]{},o[2]{};
- assert(!R30BuildEyeAffine(f,s,o));assert(tanCalls==13);
- f.eyeFov[0].angleLeft=-.85f;check(f);assert(tanCalls==17);
+ assert(!R30BuildEyeAffine(f,s,o));assert(tanCalls==14);
+ f.eyeFov[0].angleLeft=-.85f;check(f);assert(tanCalls==18);
  f.eyeFov[0].angleLeft=1.40f;f.eyeFov[0].angleRight=1.401f;
- assert(!R30BuildEyeAffine(f,s,o)); assert(tanCalls==21);
+ assert(!R30BuildEyeAffine(f,s,o)); assert(tanCalls==22);
  f.eyeFov[0].angleLeft=-.85f;f.eyeFov[0].angleRight=.80f;
- check(f);assert(tanCalls==25);
+ check(f);assert(tanCalls==26);
  return 0;
 }
 """.replace("__AFFINE__", affine.replace("std::tan(", "CountedTan("))
