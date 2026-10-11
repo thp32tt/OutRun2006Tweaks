@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 12:18 KST",
+  "updated_at_kst": "2026-10-11 12:33 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -707,6 +707,22 @@
         "source_qa": "localization/graphics/role_A/20261011-A238-Q121-MANUAL-SOURCE-GLYPH/A238_CONTROLLER_PERSISTED_VISUAL_QA.json",
         "backend": "github-actions-ubuntu-latest",
         "GH_CPU_run_id": 38107463542
+      },
+      "c390_c2_q026_strict_rework": {
+        "run_key": "OUTRUN-KOR-C390-C2-Q026-STRICT-SOURCE-FAMILY-PLATE-20261011-1230",
+        "role": "C2",
+        "queue_index": 26,
+        "candidate_sha256": "2dfc6214ce2383ef01f2739baeff04890d5ff78330b192fcee0d864f6caff719",
+        "original_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+        "C3": "C3_STRICT_REWORK_REQUIRED",
+        "machine_outside_rgba": 0,
+        "source_clean_changed_pixels": 80451,
+        "clean_final_changed_pixels": 61043,
+        "evidence": "localization/graphics/role_C/20261011-C390-C2-Q026-STRICT-OPTICAL-REOPEN/C390_Q026_C2_C3_STRICT_REWORK.json",
+        "official_promoted_dds": 0,
+        "new_dds": 0,
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "user_game": "NOT_RUN"
       }
     },
     "runtime_text_trace": {
