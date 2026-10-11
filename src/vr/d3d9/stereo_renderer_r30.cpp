@@ -646,6 +646,11 @@ namespace OutRunVRStereo
 
         void R30RollbackBufferShadowHooks() noexcept
         {
+            // Serialize teardown with the slow install path; a later retry
+            // must not observe the previously published ready flags.
+            std::lock_guard<std::mutex> hookInstallLock(R30ShadowHookMutex);
+            R30VertexBufferHooksReady.store(false, std::memory_order_release);
+            R30IndexBufferHooksReady.store(false, std::memory_order_release);
             // Unhook entry points before dropping registry ownership. Any draw
             // holding a COM reference also holds a shared_ptr acquired from the
             // registry, so clearing the maps cannot invalidate an in-flight

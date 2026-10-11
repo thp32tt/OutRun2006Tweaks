@@ -24,6 +24,10 @@ def func(src, kind):
 
 def check(src, wf):
     assert "#include <atomic>" in src
+    rollback = src.split("void R30RollbackBufferShadowHooks() noexcept", 1)[1].split("\n        }", 1)[0]
+    assert rollback.index("std::lock_guard<std::mutex> hookInstallLock(R30ShadowHookMutex)") < rollback.index("R30VertexBufferHooksReady.store(false, std::memory_order_release)")
+    for kind in ("Vertex", "Index"):
+        assert rollback.index(f"R30{kind}BufferHooksReady.store(false, std::memory_order_release)") < rollback.index(f"R30{kind}BufferLockHook = {{}};")
     assert wf.count(f"'{PATH}'") == 2, "CI path and policy runner must both include guard"
     for kind in ("Vertex", "Index"):
         atom = f"R30{kind}BufferHooksReady"
@@ -53,6 +57,10 @@ def mutations(src, wf):
         src.replace("R30VertexBufferHooksReady.store(true, std::memory_order_release);",
                     "// removed publish", 1),
         src.replace("if (!R30IndexBufferReleaseHook)", "if (false)", 1),
+        src.replace("R30IndexBufferHooksReady.store(false, std::memory_order_release);",
+                    "// missing reset of the index ready flag", 1),
+        src.replace("std::lock_guard<std::mutex> hookInstallLock(R30ShadowHookMutex);",
+                    "// teardown without install serialization", 1),
     ]
     for index, altered in enumerate(variants, 1):
         try:
@@ -67,4 +75,4 @@ if __name__ == "__main__":
     workflow = WORKFLOW.read_text(encoding="utf-8")
     check(source, workflow)
     mutations(source, workflow)
-    print("PASS: R30 VB/IB installation fastpath and 5 negative mutations")
+    print("PASS: R30 VB/IB installation fastpath and 7 negative mutations")
