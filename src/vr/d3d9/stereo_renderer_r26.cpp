@@ -593,6 +593,14 @@ namespace OutRunVRStereo
         HRESULT R27GuardWorldEffect(IDirect3DDevice9* device,
             R9Draw&& r9Draw, LegacyR13Draw&& legacyR13Draw)
         {
+            // R27's per-eye world policy cannot apply outside seeded game
+            // backbuffer stereo. Avoid five effect-state reads on mono/aux draws.
+            // Explicit shader tracing must still see every original draw.
+            if (!OutRunVR::GplShaderFingerprint::TraceEnabled() &&
+                (!IsGameDevice(device) || InternalStereoPass ||
+                 !TargetIsBackBuffer() || !StereoWanted() || !R9StereoSeeded))
+                return legacyR13Draw();
+
             const R13EffectSnapshot effect = R13CaptureDrawTimeEffect(device);
             R46TraceShaderFingerprint(device, effect);
             auto legacyWithSnapshot = [&]() {
