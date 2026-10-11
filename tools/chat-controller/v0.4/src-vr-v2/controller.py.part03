@@ -227,7 +227,7 @@ def vr_acceptance_verdict(active: dict, record: dict, changed_paths: list) -> tu
     for item in contract.get("acceptance_items", []):
         result = indexed.get(item["id"], {})
         paths = result.get("evidence_paths")
-        if (result.get("status") != "PASS" or not isinstance(paths, list) or not paths
+        if (result.get("status") not in {"PASS", "PASS_FEATURE_CI"} or not isinstance(paths, list) or not paths
                 or not isinstance(result.get("validation_command"), str)
                 or not result["validation_command"].strip()):
             return False, "ACCEPTANCE_ITEM_PENDING:" + item["id"]
@@ -235,6 +235,88 @@ def vr_acceptance_verdict(active: dict, record: dict, changed_paths: list) -> tu
                    for p in paths if isinstance(p, str)):
             return False, "ACCEPTANCE_SOURCE_EVIDENCE_MISSING:" + item["id"]
     return True, "ACCEPTANCE_IMPLEMENTED"
+
+
+def vr_feature_ci_evidence_verdict(active: dict, feature_sha: str, record: dict) -> tuple[bool, str]:
+    """Require real exact-SHA feature CI before accepting PASS_FEATURE_CI claims.
+
+    Feature CI is not a substitute for mandatory target-branch Active/Domain
+    gates. Those still run only after the controller fast-forwards the target.
+    """
+    results = record.get("acceptance_results") or []
+    if not any(isinstance(x, dict) and x.get("status") == "PASS_FEATURE_CI" for x in results):
+        return True, "NO_FEATURE_CI_CLAIMS"
+
+    contract = active.get("feature_contract") or {}
+    # Only registered CI contracts may promote CI-backed acceptance.
+    workflows = {
+        "DX9EX:R84_RENDERER_GRAPH": (
+            "R84 feature integrated Win32 x64 host and bundle",
+            {"r84-local", "r84-win32", "r84-host", "r84-baseline-game", "r84-bundle"},
+        ),
+    }
+    specification = workflows.get(contract.get("feature_id"))
+    if not specification:
+        return False, "FEATURE_CI_WORKFLOW_UNREGISTERED"
+    workflow_name, required_jobs = specification
+    run = github_gate_run(active["feature_branch"], feature_sha, workflow_name,
+                          force_discovery=True)
+    if not run or any((
+        run.get("head_sha") != feature_sha,
+        run.get("name") != workflow_name,
+        run.get("status") != "completed",
+        run.get("conclusion") != "success",
+    )):
+        return False, "FEATURE_CI_EXACT_SHA_NOT_SUCCESS"
+
+    jobs = []
+    page = 1
+    while True:
+        batch = github_api_json(
+            f"/repos/{GITHUB_REPO}/actions/runs/{run['id']}/jobs?per_page=100&page={page}"
+        ).get("jobs") or []
+        jobs.extend(batch)
+        if len(batch) < 100:
+            break
+        page += 1
+    successful_jobs = {job.get("name"): job for job in jobs
+                       if job.get("status") == "completed" and job.get("conclusion") == "success"}
+    if not required_jobs.issubset(successful_jobs):
+        return False, "FEATURE_CI_REQUIRED_JOB_NOT_SUCCESS"
+    successful_steps = [
+        step.get("name", "")
+        for job in successful_jobs.values()
+        for step in job.get("steps", [])
+        if step.get("status") == "completed" and step.get("conclusion") == "success"
+    ]
+    for item in contract.get("acceptance_items", []):
+        prefix = item["ci_step"]
+        if not any(name == prefix or name.startswith(prefix + " - ") for name in successful_steps):
+            return False, "FEATURE_CI_ACCEPTANCE_STEP_MISSING:" + item["id"]
+
+    artifacts = []
+    page = 1
+    while True:
+        batch = github_api_json(
+            f"/repos/{GITHUB_REPO}/actions/runs/{run['id']}/artifacts?per_page=100&page={page}"
+        ).get("artifacts") or []
+        artifacts.extend(batch)
+        if len(batch) < 100:
+            break
+        page += 1
+    prefix = contract.get("artifact_prefix") or ""
+    if not prefix or not any(
+        artifact.get("name", "").startswith(prefix + feature_sha)
+        and not artifact.get("expired")
+        and artifact.get("size_in_bytes", 0) > 0
+        and (artifact.get("workflow_run") or {}).get("head_sha", feature_sha) == feature_sha
+        for artifact in artifacts
+    ):
+        return False, "FEATURE_CI_EXACT_SHA_TEST_BUNDLE_MISSING"
+    active["feature_ci_evidence"] = {
+        "sha": feature_sha, "run_id": run["id"], "workflow": workflow_name,
+    }
+    return True, "FEATURE_CI_EXACT_SHA_VERIFIED"
 
 
 def vr_select_feature(backlog: dict, lane: str, q: dict) -> Optional[dict]:
@@ -427,6 +509,10 @@ def github_feature_promote_ready(active: dict, now: datetime) -> bool:
         active, record, [x.get("filename") for x in cumulative.get("files", [])]
     )
     if not accepted:
+        active["feature_blocker"] = reason
+        return False
+    ci_verified, reason = vr_feature_ci_evidence_verdict(active, feature_head, record)
+    if not ci_verified:
         active["feature_blocker"] = reason
         return False
 
