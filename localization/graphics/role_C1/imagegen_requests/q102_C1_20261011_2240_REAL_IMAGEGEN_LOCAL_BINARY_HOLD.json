@@ -45,9 +45,12 @@
     ],
     "nonzero_alpha_pixels": 496821,
     "transparent_pixels": 1075707,
-    "github_binary_uploaded": false,
-    "github_binary_blob_sha": null,
-    "note": "This exact original PNG is available in ChatGPT sandbox only. No SHA-matched GitHub binary was written. The text report is not the binary output."
+    "github_binary_uploaded": true,
+    "github_binary_blob_sha": "f0e5b9ef4ce796849c2963327e29a4e057da8c47",
+    "note": "Exact 711618-byte original ChatGPT ImageGen PNG transferred via temporary Google Drive and committed to this branch. Fresh GitHub fetch_file(base64) is byte-for-byte identical to transfer source; Git blob SHA1 is separate from locally calculated PNG SHA256. Neither upload nor matching bytes constitutes source-styled or plate/DDS QA.",
+    "path": "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2240_GEN_95eed5de.png",
+    "github_commit": "10642e1c4e9dd21213f37853813091999756a07e",
+    "github_binary_exact_transfer_base64_match": true
   },
   "producer_self_qa": {
     "status": "HOLD_SOURCE_CONDITIONING_AND_CLEAN_PLATE",
@@ -69,11 +72,13 @@
     "trial_dds": 0,
     "official_dds": 0,
     "c2_pass": 0,
-    "c3_pass": 0
+    "c3_pass": 0,
+    "real_png_binary_committed": 1,
+    "production_qualified_korean_layer_png": 0
   },
   "next_steps": [
-    "Transfer exact source PNG bytes to the same GitHub branch and verify SHA256.",
-    "Obtain independent C2 PLATE_PASS bound to exact canonical SOURCE/CLEAN/removal-mask hashes.",
-    "Only then run tools/localization/imagegen_b_pipeline.py with outrun-c1-imagegen-v1 manifest and producer visual/self QA."
+    "Use the committed exact original ImageGen PNG and verify source-glyph fidelity against canonical reference, with human review of glyphs and effects.",
+    "Obtain independent C2 PLATE_PASS bound to exact source/CLEAN/removal-mask hashes.",
+    "Then run tools/localization/imagegen_b_pipeline.py with outrun-c1-imagegen-v1 schema, verify saved DDS native/RAW/FLIPY and producer self-QA; leave C2 final/C3/user tests independent."
   ]
 }
