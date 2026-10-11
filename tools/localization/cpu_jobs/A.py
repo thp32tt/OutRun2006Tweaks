@@ -66,23 +66,23 @@ guard(np.array_equal(O[:y0],P[:y0]),"old A241 changed upstream atlas")
 # shear in readable orientation. Separate navy rim and white face.
 SCALE=4
 cw,ch=x1-x0,y1-y0
-font=ImageFont.truetype(str(FONT),38*S,index=1)
-canvas=Image.new("L",(380*S,100*S))
-ImageDraw.Draw(canvas).text((12*S,0),TEXT,font=font,fill=255)
+font=ImageFont.truetype(str(FONT),38*SCALE,index=1)
+canvas=Image.new("L",(380*SCALE,100*SCALE))
+ImageDraw.Draw(canvas).text((12*SCALE,0),TEXT,font=font,fill=255)
 bb=canvas.getbbox();guard(bb is not None,"no font glyphs")
 plain=canvas.crop(bb)
 shear=0.28
-affine_w=plain.width+round(plain.height*shear)+4*S
+affine_w=plain.width+round(plain.height*shear)+4*SCALE
 lean=plain.transform((affine_w,plain.height),Image.Transform.AFFINE,
                       (1,shear,-round(plain.height*shear),0,1,0),
                       resample=Image.Resampling.BICUBIC)
 bb=lean.getbbox();guard(bb is not None,"affine lost glyphs")
 lean=lean.crop(bb)
-guard(lean.width<=(cw-10)*S and lean.height<=(ch-8)*S,"native glyph must fit strict bbox and margins")
-face_mask=Image.new("L",(cw*S,ch*S))
-ax=6*S
-ay=(ch*S-lean.height)//2
-guard(ay>=4*S and (ch*S-ay-lean.height)>=4*S,"effect inset fail")
+guard(lean.width<=(cw-10)*SCALE and lean.height<=(ch-8)*SCALE,"native glyph must fit strict bbox and margins")
+face_mask=Image.new("L",(cw*SCALE,ch*SCALE))
+ax=6*SCALE
+ay=(ch*SCALE-lean.height)//2
+guard(ay>=4*SCALE and (ch*SCALE-ay-lean.height)>=4*SCALE,"effect inset fail")
 face_mask.paste(lean,(ax,ay))
 # Curved anti-aliased font glyph topology with a rounded, not squared,
 # source-family navy keyline. No rectangle or invented external artwork.
