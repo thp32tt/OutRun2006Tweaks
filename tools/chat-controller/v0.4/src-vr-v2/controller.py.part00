@@ -1143,7 +1143,7 @@ def queue_dynamic_prefix() -> str:
             "기능 하나(1~3시간 이상 가능)를 C0 조사→C1 구현 범위 확정→C2 전체 경로 구현→경량 국소검사→"
             "FEATURE_READY→최종 exact-SHA Gate→C6로 완성해. 기능이 안 끝났으면 시간 경과·작은 커밋 때문에 종료하지 마.",
             "중간 소스는 FEATURE_BRANCH에 커밋해 보존해. 5분 전후 컨트롤러 브랜치 체크포인트에는 "
-            "그 SHA·미완료 acceptance ID·정확한 다음 행동만 기록해. TARGET_BRANCH는 컨트롤러만 갱신한다.",
+            "그 SHA·미완료 acceptance ID·정확한 다음 행동만 기록해. AI는 통합 feature CI 이후 GitHub expected-SHA 비강제 fast-forward로 TARGET_BRANCH를 직접 승격하고, 컨트롤러는 관찰/배정만 한다.",
             "변경 관련 정적 검사·targeted 테스트·필요한 컴파일은 개발 중 수행해. 기능 완성 후보에서 "
             "전체 exact-SHA Gate를 실행하며 실패 수리 후 새 SHA의 재빌드는 허용한다.",
             "FEATURE_CONTRACT의 기능 목표·work_key·acceptance_items를 변경하거나 작은 하위 작업으로 대체하지 마. "
@@ -1152,7 +1152,7 @@ def queue_dynamic_prefix() -> str:
             "acceptance_results=[{id,status:'PASS',evidence_paths:[실제 파일],validation_command:실행 명령}]를 모두 기록해. "
             "각 acceptance item의 ci_step 이름으로 실제 관련 검사를 실행하는 GitHub Actions step을 연결하고 "
             "required_gates 및 artifact_prefix의 테스트 패키지(게임/host 바이너리·실행 설정·SHA manifest·로그 수집기)를 제공해. "
-            "echo/문자열 존재 확인만으로 기능 검사를 대체하지 마. 컨트롤러는 step SUCCESS와 artifact를 원격 확인한다.",
+            "echo/문자열 존재 확인만으로 기능 검사를 대체하지 마. AI가 기능·최종 TARGET exact-SHA step SUCCESS와 artifact를 검증하고 컨트롤러도 결과를 수동 승인 없이 관찰한다.",
             "최종 제출과 같은 기능의 수리 커밋에는 [AUTO:TASK_ID]를 넣고 CI skip을 넣지 마. "
             "동일 기능의 CI 수리에는 tests/tools/workflow 변경만 허용되므로 무관한 C++ 수정은 하지 마. "
             "C6는 status=COMPLETE_BUILD_VERIFIED, checkpoint=C6_STATE, automation_validation=PASS_EXACT_SHA와 "
@@ -1169,7 +1169,7 @@ def queue_dynamic_prefix() -> str:
                 "FEATURE_CONTRACT=" + json.dumps(runtime.get("queue_feature_contract") or {}, ensure_ascii=False),
                 "FEATURE_BRANCH=" + feature_branch,
                 "FEATURE_MODE=IMPLEMENT_ON_FEATURE_BRANCH_ONLY",
-                "FEATURE_FINAL_PROMOTION=CONTROLLER_FAST_FORWARD_AFTER_READY",
+                "FEATURE_FINAL_PROMOTION=AI_SELF_VERIFIED_EXPECTED_SHA_FAST_FORWARD",
             ]
     if lane == "DX11" and re.fullmatch(r"CONVERSION-DX11-[0-9]{5,}", task_id):
         if int(task_id.rsplit("-", 1)[-1]) >= 537:
