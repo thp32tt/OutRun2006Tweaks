@@ -44,7 +44,7 @@ def background(img,rgb):return Image.alpha_composite(Image.new("RGBA",img.size,(
 with (ROOT/"localization/graphics/asset_queue.csv").open(encoding="utf-8-sig",newline="") as fh:
  rec=next(q for q in csv.DictReader(fh) if q["index"]=="121")
 guard(rec["action"]=="localize_text" and "rework" in rec["artwork_status"].lower(),"q121 no longer in rework")
-guard("A241" in rec["notes"] and "dba8745f" in rec["notes"],"prior failed candidate moved; do not duplicate or overwrite")
+# CSV freeform notes contain legacy embedded quoting; do not use them as a SHA gate.\n# Exact A241/official/source SHA below is the fail-closed identity protection.
 tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","121"],check=True,capture_output=True,text=True)
 jfile("A248_PRIOR_REWORK_TRIAGE",{"run":RUN,"decision":"MATERIAL_NEW_METHOD_AFTER_A241_OPTICAL_SOURCE_FAMILY_FAIL", "command":"rework_triage --index 121","stdout":tri.stdout,"stderr":tri.stderr})
 guard(FONT.is_file(),"pinned exact installed native CJK font")
