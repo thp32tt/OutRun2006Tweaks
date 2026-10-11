@@ -1,3 +1,8 @@
+
+### 2026-10-12 05:40 KST — C1 q098 English source-media preflight
+
+C1 q098 2026-10-12 05:40 KST NEW canonical English LETTER-ONLY input, 2048x128 BC3 source SHA3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59, raw mirrorY/readable flipY exact match to cached native source PNG. First isolated transparent RGBA SHA078f6b7de7982c2c95daa7b2131d420160d1aa9c546eabbc5fc9efabdc903b59, 1291x165 pad24, alpha positive 92878 preserved all; visible source pixel mismatch0, original text Challenge the course record. Existing B-owned q098 DDS/REWORK not modified or reassigned. Generator media binding unsupported/unverified in this chat: SOURCE_REFERENCE_NOT_BOUND, no ImageGen call, Korean PNG0, new DDS0; C2/C3/user game not run; RUNTIME_VALIDATION=UNTESTED. Ref role_C1/source_references/q098_20261012/q098_C1_SOURCE_MEDIA_PREFLIGHT.json. RUN_KEY=OUTRUN-KOR-C1-Q098-SOURCE-REFERENCE-FIRST-20261012-0540.
+
 ## 2026-10-12 — A251 q089 native warm-chroma REWORK trial
 
 - Odd A q089 newly material native RGBA32 DDS trial SHA256 `fb7a3c66a7fdc2aa1e175cb3d36fa3df5e288ca0200db2045824391c6a83d6b2`, GitHub CPU Worker [38170881648](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38170881648) SUCCESS.

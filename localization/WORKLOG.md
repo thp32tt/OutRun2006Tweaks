@@ -1,3 +1,8 @@
+
+### 2026-10-12 — C1 q098 first exact-source letter-only English reference (not ImageGen output)
+
+C1 q098 2026-10-12 05:40 KST NEW canonical English LETTER-ONLY input, 2048x128 BC3 source SHA3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59, raw mirrorY/readable flipY exact match to cached native source PNG. First isolated transparent RGBA SHA078f6b7de7982c2c95daa7b2131d420160d1aa9c546eabbc5fc9efabdc903b59, 1291x165 pad24, alpha positive 92878 preserved all; visible source pixel mismatch0, original text Challenge the course record. Existing B-owned q098 DDS/REWORK not modified or reassigned. Generator media binding unsupported/unverified in this chat: SOURCE_REFERENCE_NOT_BOUND, no ImageGen call, Korean PNG0, new DDS0; C2/C3/user game not run; RUNTIME_VALIDATION=UNTESTED. Ref role_C1/source_references/q098_20261012/q098_C1_SOURCE_MEDIA_PREFLIGHT.json. RUN_KEY=OUTRUN-KOR-C1-Q098-SOURCE-REFERENCE-FIRST-20261012-0540.
+
 ## 2026-10-12 — A251 q089 warm-source gradient native DDS rework trial
 
 A lane processed current odd q089 independently confirmed C3 source-chroma failure (not another q193/q035 review). Authenticated canonical English Game Over DDS SHA `906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175`, exact original transparent CLEAN `0d3f46b6719366d5b337491117c585274b1e4d9d7fdc2a00cbc2c42b002437cd`, previous official Korean `741a05cb632e85a4fea783e51bb2f98678c0510f8b34fc7a73cc39c898c0749c`. C3 observed old Korean pale face unlike English yellow-orange/purple bevel; changed actual native Korean color geometry with source-verified palette anchors, not a forced width stretch.
