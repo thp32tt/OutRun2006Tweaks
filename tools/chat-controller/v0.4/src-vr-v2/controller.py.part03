@@ -1040,7 +1040,7 @@ def vr_checkpoint_payload(active: dict, now: datetime, purpose: str, branch_head
             details[key] = None
     return {
         "schema": 1, "kind": "vr_queue_checkpoint",
-        "controller_build": "2026-10-11-progress-v2",
+        "controller_build": "2026-10-11-resume-v3",
         "purpose": purpose, "captured_at_kst": now.isoformat(),
         "controller_branch": VR_CHECKPOINT_BRANCH,
         "game_branch_head": branch_head,
