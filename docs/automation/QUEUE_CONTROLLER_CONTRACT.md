@@ -1,3 +1,7 @@
+## R84 closed / no repeat dispatch — 2026-10-11 (active override)
+
+Feature `DX9EX:R84_RENDERER_GRAPH` task `CONVERSION-DX9EX-00591` is DONE_BUILD_VERIFIED at target exact material SHA `074768c96c410f0268c084450b0aa8bced38b6c3`. DX9Ex Active #38135749653 (five jobs including full R29–R33 independent Win32 compile/link), Domain #38135749604, and Full Source Impact #38135749550 SUCCESS. The run record status is COMPLETE_BUILD_VERIFIED and `VR_AUTODEV_STATE.json` records SUPERSEDED_BY_DX9EX_FOCUS. A stale queue entry marked READY, or an older section below describing incomplete R84, cannot re-open this already completed feature without new concrete regression evidence. Do not assign duplicate R84 work or score again. Quest3 runtime remains UNTESTED; next independent work is P0 optics/HUD, P2 per-eye and P3 measured FPS.
+
 # Queue Controller Automation Contract
 
 ## DX9Ex feature-scoped dispatch and terminal gates — 2026-10-10 21:40 KST (ACTIVE)
