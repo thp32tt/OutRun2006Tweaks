@@ -30,6 +30,7 @@ on:
       - 'vrhost/**'
       - 'tools/Start-OutRunVRPacing.ps1'
       - 'tools/Collect-OutRunVRFramePacing.ps1'
+      - 'tools/Collect-OutRunVREyeExtent.ps1'
       - 'CMakeLists.txt'
       - 'cmake.toml'
       - 'OutRun2006Tweaks.ini'
@@ -213,7 +214,7 @@ jobs:
         shell: pwsh
         run: |
           cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
-          cmake --build build-host --config Release --target outrun-vr-host outrun-vr-frame-pacing-smoke outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
+          cmake --build build-host --config Release --target outrun-vr-host outrun-vr-eye-extent-smoke outrun-vr-frame-pacing-smoke outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
           if (-not (Test-Path build-host/bin/outrun-vr-host.exe)) { throw 'DX9Ex OpenXR host missing' }
       - name: Run deterministic no-HMD host smoke tests
         shell: pwsh
@@ -247,6 +248,16 @@ jobs:
           Remove-Item Env:OUTRUN_VR_PACING_DIAGNOSTICS -ErrorAction SilentlyContinue
           & ./build-host/bin/outrun-vr-frame-pacing-smoke.exe --regression
           if ($LASTEXITCODE -ne 0) { throw "PACING-REGRESSION failed" }
+      - name: 'Feature acceptance: XR-EYE-SIZING'
+        shell: pwsh
+        run: |
+          & ./build-host/bin/outrun-vr-eye-extent-smoke.exe --sizing
+          if ($LASTEXITCODE -ne 0) { throw 'XR-EYE-SIZING failed' }
+      - name: 'Feature acceptance: XR-EYE-RESET'
+        shell: pwsh
+        run: |
+          & ./build-host/bin/outrun-vr-eye-extent-smoke.exe --reset
+          if ($LASTEXITCODE -ne 0) { throw 'XR-EYE-RESET failed' }
       - name: Stage host
         shell: pwsh
         run: |
@@ -348,7 +359,7 @@ jobs:
           Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
           # Keep one GUI launcher. The slot selector invokes the PowerShell
           # test runner directly; duplicate batch entrypoints are not needed.
-          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1')) {
+          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1')) {
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
@@ -366,6 +377,9 @@ jobs:
             '   설정 후 실제 게임 실행 파일은 OR2006C2C.EXE입니다.'
             '5. After the game closes, its diagnostic ZIP is auto-collected.'
             '6. For tonight HUD tests, choose B HUD (HUD_SCREEN) in the selector.'
+            'XR EYE EXTENT: actual OpenXR allocated per-eye extent, not desktop pixels.'
+            'After game exit run Collect-OutRunVREyeExtent.ps1 to compare shared texture allocation.'
+            'Quest3/VDXR visual quality is UNTESTED.'
             'OPTIONAL PACING: run Start-OutRunVRPacing.ps1 instead of the usual selector.'
             'After game exit use Collect-OutRunVRFramePacing.ps1 for CSV and SHA summary.'
             'This is CPU/QPC instrumentation; no Quest3 native FPS conclusion.'
@@ -398,6 +412,8 @@ jobs:
             RecommendedHudProfile = 'HUD_SCREEN'
             RecommendedLensAndMarkerProfile = 'HUD_WORLD'
             UserRuntimeVerified = $false
+            XrEyeExtentPolicy = 'OPENXR_ALLOCATED_COMMON_EYE_EXTENT'
+            XrEyeExtentHmdVerified = $false
             FramePacingDiagnosticsDefault = 'OFF'
             FramePacingEnableWith = 'Start-OutRunVRPacing.ps1'
           }
@@ -416,7 +432,7 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','SHA256SUMS.txt','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md')) {
+          foreach ($file in @('OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1','SHA256SUMS.txt','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
           }
           # Exactly one usable CMD entrypoint, no unused BAT/CMD scripts.
@@ -476,7 +492,7 @@ jobs:
               $inputs.FramePacingDiagnosticsDefault -ne 'OFF') {
             throw "PACING-BUNDLE manifest mismatch"
           }
-          foreach ($helper in @('Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1')) {
+          foreach ($helper in @('Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1')) {
             $tokens = $null; $errors = $null
             [void][System.Management.Automation.Language.Parser]::ParseFile(
               (Resolve-Path (Join-Path verify $helper)), [ref]$tokens, [ref]$errors)
@@ -500,6 +516,50 @@ jobs:
               $report.HmdRuntimeVerified -or $report.NativeFpsVerified) {
             throw "PACING-BUNDLE executable collector regression failed"
           }
+      - name: 'Feature acceptance: XR-EYE-BUNDLE'
+        shell: pwsh
+        run: |
+          foreach ($file in @('backends/d3d9/dinput8.dll',
+              'backends/d3d9/outrun-vr-host.exe','backends/d3d9/SOURCE_SHA.txt',
+              'BUILD_INPUTS.json','SHA256SUMS.txt','Collect-OutRunVRLogs.ps1',
+              'Collect-OutRunVREyeExtent.ps1')) {
+            if (-not (Test-Path (Join-Path verify $file))) {
+              throw "XR-EYE-BUNDLE missing $file"
+            }
+          }
+          $sha = (Get-Content verify/backends/d3d9/SOURCE_SHA.txt -Raw).Trim()
+          $inputs = Get-Content verify/BUILD_INPUTS.json -Raw | ConvertFrom-Json
+          if ($sha -ne $env:GITHUB_SHA -or $inputs.IntegrationSha -ne $env:GITHUB_SHA -or
+              $inputs.XrEyeExtentPolicy -ne 'OPENXR_ALLOCATED_COMMON_EYE_EXTENT' -or
+              $inputs.XrEyeExtentHmdVerified) { throw 'XR-EYE-BUNDLE SHA/policy mismatch' }
+          $tokens=$null; $errors=$null
+          [void][System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path verify/Collect-OutRunVREyeExtent.ps1),[ref]$tokens,[ref]$errors)
+          if ($errors.Count -gt 0) { throw 'XR-EYE-BUNDLE collector parsing failed' }
+          $root = Join-Path $env:RUNNER_TEMP 'xr-eye-regression'
+          $out = Join-Path $root 'out'
+          New-Item -ItemType Directory -Force (Join-Path $root 'backends/d3d9') | Out-Null
+          Set-Content (Join-Path $root 'backends/d3d9/SOURCE_SHA.txt') $env:GITHUB_SHA
+          Set-Content (Join-Path $root 'outrun-vr-eye-extent.log') 'XR_EYE_EXTENT_V1 allocated=2124x2284 recommended0=2016x2240 recommended1=2124x2284 scale=1 hmd_verification=UNTESTED'
+          Set-Content (Join-Path $root 'OutRun2006Tweaks-test.log') 'VR stereo: verified 4-slot D3D9Ex shared eye ring ready 2124x2284 from desktop 3440x1440'
+          & ./verify/Collect-OutRunVREyeExtent.ps1 -Root $root -Output $out
+          $good = Get-Content (Join-Path $out 'eye-extent-summary.json') -Raw | ConvertFrom-Json
+          if ($good.SourceSha -ne $env:GITHUB_SHA -or
+              $good.XrSwapchainEyeWidth -ne 2124 -or $good.XrSwapchainEyeHeight -ne 2284 -or
+              -not $good.GameDirectEyeSizeMatchesXr -or $good.HmdRuntimeVerified) {
+            throw 'XR-EYE-BUNDLE positive fixture failed'
+          }
+          Set-Content (Join-Path $root 'OutRun2006Tweaks-test.log') 'VR stereo: verified 4-slot D3D9Ex shared eye ring ready 2048x2048 from desktop 3440x1440'
+          & ./verify/Collect-OutRunVREyeExtent.ps1 -Root $root -Output $out
+          $bad = Get-Content (Join-Path $out 'eye-extent-summary.json') -Raw | ConvertFrom-Json
+          if ($bad.GameDirectEyeSizeMatchesXr -or -not $bad.GameDirectEyeAllocationObserved) {
+            throw 'XR-EYE-BUNDLE mismatch detection failed'
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: feature-dx9ex-eye-extent-${{ github.sha }}
+          path: package/
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
           name: feature-dx9ex-pacing-${{ github.sha }}
