@@ -16,7 +16,7 @@
   "prior_official_sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
   "new_unpromoted_dds": {
     "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_Q035_TWO_NATIVE_ITALIC_TOTAL_RANK_UNPROMOTED.dds",
-    "sha256": "b4c412979dc382b0bf82211eb438c57c8948c821be9c66f5c1a5d8d161d59624"
+    "sha256": "5ac62e3ef33ff39277fcef5bd7b00cc36c99666ccd01ac0f5a022e22e37b2369"
   },
   "new_DDS_count": 1,
   "official_promoted": 0,
@@ -51,7 +51,7 @@
         3
       ],
       "source_face": "white + dark copper-brown outline",
-      "new_face": "near-white + dark copper-brown",
+      "new_face": "near-white + dark copper-brown (BGRA stored bytes + readable preview corrected)",
       "right_italic_source_approx": 0.38,
       "new_pixels_inside": 18923,
       "source_clean_bg_difference_mean": 0.0,
@@ -78,7 +78,7 @@
         3
       ],
       "source_face": "white + dark copper-brown outline",
-      "new_face": "near-white + dark copper-brown",
+      "new_face": "near-white + dark copper-brown (BGRA stored bytes + readable preview corrected)",
       "right_italic_source_approx": 0.38,
       "new_pixels_inside": 18902,
       "source_clean_bg_difference_mean": 0.0,
@@ -104,31 +104,31 @@
     },
     "pink_RIM": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_pink_RIM_NATIVE.png",
-      "sha256": "3b3ef8a92a29ccbbf1be044b0e888d2d13c3d792ffeda1802e1c4812fa644aa7"
+      "sha256": "45e4cfbcc298bc372896b93ffe234bcaf2d56d76329dcc5f92abba98cdc3bcd8"
     },
     "pink_LETTER": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_pink_LETTER_NATIVE.png",
-      "sha256": "3bebac11210b3ae787475beb0f882c231560b851840fa403d361582a72a47e58"
+      "sha256": "dc3fc46dca4a67d3ab2fcc15ea72d3990c1f24be57372f1e7484a922510ae54c"
     },
     "pink_NEW_COMPOSED": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_pink_NEW_COMPOSED_NATIVE.png",
-      "sha256": "0382857d9dd9d7600caeac9a93c193a282ce5c784fbfe4947bc6ec992de8f785"
+      "sha256": "0f6e4023fd95fef7ddf1740a45a8bb1a2d91168a8803552c5dad3aec3ce51fce"
     },
     "pink_NEW_RAW": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_pink_NEW_RAW.png",
-      "sha256": "cd7a4a3a7c2cf4f7910114cea7e99ef1c1885aa7eabcf39ed2834099cc2f35d1"
+      "sha256": "93a5fef80ff18781ae3665b0d32c93ac0fcfcb0cb599ca756b696ca65888f42f"
     },
     "pink_GRAY100": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_pink_GRAY100_SOURCE_CLEAN_OLD_NEW.png",
-      "sha256": "5dc1280bbcb749afb11b31f4b2e336a362554ae140897dc940a0564dab449ceb"
+      "sha256": "628f1c66021612b67c3994028a5f1c0e1ad19c98758f9fa2248e32fc47fa27d0"
     },
     "pink_WHITE75": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_pink_WHITE75_SOURCE_CLEAN_OLD_NEW.png",
-      "sha256": "8398544bb92ca4efbcc1b9e914c882af105d1b9b20e77f5ba264e667a419fe05"
+      "sha256": "d073c34a3d29f78c8a805f2866a6bfc3ff1f56121d5048ef6ea8135f29680bf2"
     },
     "pink_BLACK50": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_pink_BLACK50_SOURCE_CLEAN_OLD_NEW.png",
-      "sha256": "0fbb25023fdc48238b654ea1c2a816c0e0e0f7fc97c3ba9378f03ac844d3dc59"
+      "sha256": "e8e2284e7b2a2a06255c866a8ae708c3dc9161a7b6cbc784f8a11471a1e7240d"
     },
     "green_SOURCE": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_green_SOURCE_NATIVE.png",
@@ -148,31 +148,31 @@
     },
     "green_RIM": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_green_RIM_NATIVE.png",
-      "sha256": "b99a808253ca0590fa8df025d5e7a5413285f4260e45a5ff56cd7ae06ea950bd"
+      "sha256": "adcedc146a27394488fcb5996eb86086ff646dc450ffd2485d4ac9aa53a14a7c"
     },
     "green_LETTER": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_green_LETTER_NATIVE.png",
-      "sha256": "461508980c762c1bc3b56d19958c250edf0282f4f51c79960fe2ca601587b8ef"
+      "sha256": "47c7eb90a825105bcfb36231179f664b3f58b1a4c6dc4224fe23f48653f378c0"
     },
     "green_NEW_COMPOSED": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_green_NEW_COMPOSED_NATIVE.png",
-      "sha256": "674397531ec926913ca318d3e70f06f5d5cab7a7ecf42da80bb64c62d9dd94e0"
+      "sha256": "05d9ff183c028f8bf4ad0d0c001b1e53c98a2cfdbf2cf10d3401afee0a2f898a"
     },
     "green_NEW_RAW": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_green_NEW_RAW.png",
-      "sha256": "8c56781b0cd6f8b16abd4432a55759d1bbc04f6e075b76ab021ab0c78a468ba9"
+      "sha256": "aedb675fd747ff09932bdb67ec9ea29d61b1bba314aab077b36372356258b1c1"
     },
     "green_GRAY100": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_green_GRAY100_SOURCE_CLEAN_OLD_NEW.png",
-      "sha256": "1d1a5ae351b129465db5774f585fe9a8d9949a45511b8f815b302efdac70dc71"
+      "sha256": "1a9af6a0dd7c5d43453ec3955ef779d675c635eb2bad1bcb77b5cbba928b8fe2"
     },
     "green_WHITE75": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_green_WHITE75_SOURCE_CLEAN_OLD_NEW.png",
-      "sha256": "4581f9a93fe90b2be8782947fb2a3244f5575b19801c145f2e255a7e6094da84"
+      "sha256": "30b21a0a778a3cb2c8d703c9f365141dfb95b494f4960b0085723a9ce9db004c"
     },
     "green_BLACK50": {
       "path": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_green_BLACK50_SOURCE_CLEAN_OLD_NEW.png",
-      "sha256": "17074d0fdfceeef933a9cf8fa7e1f56fffb6c776168b5e0a60987bcbd2c46cf7"
+      "sha256": "647f20410faa8d5138be2a10f24978e5ee3582c48a14ac02a8761f888c3a8991"
     }
   },
   "producer_machine": "PASS_SCOPED_PENDING_CONTROLLER_FIRSTHAND_VISUAL",
