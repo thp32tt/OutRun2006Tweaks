@@ -2308,6 +2308,72 @@ def main() -> None:
             assert rgba[3] != min(1.0, texel[3]+diffuse[3])
     print("DX11 blend RGB / independent SUBTRACT alpha native Draw PASS (static only)")
 
+
+    # 00572: live D3D9 BLEND RGB with independent ADDSMOOTH alpha -> native PS
+    # -> Draw/DrawIndexed -> visible opt-in inset. Static, not Quest3 proof.
+    def smooth_path(code: str) -> bool:
+        gate = code[code.find("bool supported_game_state("):code.find("bool translate_vertices(")]
+        draw = code[code.find("bool submit("):code.find("void observe(")]
+        if not all(x in gate for x in (
+            "blendTextureAddSmoothAlpha || blendDiffuseAddSmoothAlpha ||",
+            "!blendTextureAddSmoothAlpha && !blendDiffuseAddSmoothAlpha &&",
+            "alphaNeedsDiffuse && !alphaArg2Diffuse", "alphaArg1 != D3DTA_TEXTURE",
+        )): return False
+        if not all(x in code for x in (
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+            "game->UpdateSurface(", 'GetEnvironmentVariableW(L"OUTRUN_DX11_FIRST_GAME_FRAME"',
+        )): return False
+        for rgb in ("Texture", "Diffuse"):
+            flag, pixel = f"blend{rgb}AddSmoothAlpha", f"PSTextureBlend{rgb}AddSmoothAlpha"
+            factor = "t.a" if rgb == "Texture" else "v.diffuse.a"
+            links = (
+                f"const bool {flag} = op == D3DTOP_BLEND{rgb.upper()}ALPHA &&",
+                "alphaOp == D3DTOP_ADDSMOOTH;", f"bool {flag} = false;",
+                f"capture.{flag} = {flag};",
+                f"float4 {pixel}(VOut v) : SV_Target {{",
+                f"float4 c = float4(lerp(v.diffuse.rgb, t.rgb, {factor}),",
+                "saturate(t.a + v.diffuse.a * (1.0f - t.a)))",
+                f'compile("{pixel}", "ps_4_0", blend{rgb}AddSmoothCode)',
+                f"s.{flag}Ps.GetAddressOf()", f"s.{flag}Ps &&",
+                f"capture.{flag} ? s.{flag}Ps.Get() :",
+            )
+            if not all(x in code for x in links): return False
+            if code.count(f"s.{flag}Ps.Reset();") != 2: return False
+            if f"capture.{flag} ? s.{flag}Ps.Get() :" not in draw: return False
+        return True
+
+    assert smooth_path(bridge)
+    for rgb in ("Texture", "Diffuse"):
+        flag, pixel = f"blend{rgb}AddSmoothAlpha", f"PSTextureBlend{rgb}AddSmoothAlpha"
+        factor = "t.a" if rgb == "Texture" else "v.diffuse.a"
+        for token in (
+            f"const bool {flag} = op == D3DTOP_BLEND{rgb.upper()}ALPHA &&",
+            f"capture.{flag} = {flag};", f"float4 {pixel}(VOut v) : SV_Target {{",
+            f"float4 c = float4(lerp(v.diffuse.rgb, t.rgb, {factor}),",
+            f'compile("{pixel}", "ps_4_0", blend{rgb}AddSmoothCode)',
+            f"s.{flag}Ps.GetAddressOf()", f"capture.{flag} ? s.{flag}Ps.Get() :",
+        ):
+            mutant = bridge.replace(token, "/* broken 00572 */", 1)
+            assert mutant != bridge and not smooth_path(mutant), token
+    # D3DTOP_ADDSMOOTH=9; BLENDDIFFUSEALPHA=12/BLENDTEXTUREALPHA=13.
+    for rgb, alpha, arg1, arg2, accepted in (
+        (12, 9, "texture", "current", True), (13, 9, "texture", "diffuse", True),
+        (12, 9, "texture", "texture", False), (13, 9, "diffuse", "diffuse", False),
+        (12, 9, "texture|complement", "diffuse", False),
+        (13, 9, "texture", "diffuse|complement", False),
+        (12, 7, "texture", "diffuse", False), (13, 10, "texture", "current", False),
+        (14, 9, "texture", "diffuse", False),
+    ):
+        assert (rgb in (12, 13) and alpha == 9 and arg1 == "texture" and
+                arg2 in ("diffuse", "current")) is accepted
+    for tex, diff in ((.85, .25), (.1, .7), (.4, .4), (0., 1.)):
+        alpha = min(1., tex + diff * (1. - tex))
+        assert 0. <= alpha <= 1.
+        assert abs(alpha - tex*diff) > 0.00001
+    print("DX11 independent ADDSMOOTH alpha native Draw regression PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
