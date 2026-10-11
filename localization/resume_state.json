@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C1 ODD q111 fully verified original 17-region DDS/CLEAN persisted 4 lower original-source residue/protected-art FAIL; repair source-clean and re-render A161 new SHA, then C1/C3/game. C1_Q111_INDEPENDENT_FULL17_VISUAL_REWORK.json",
     "B366 2026-10-11 q176 even newly saved manually source-conditioned Hangul four syllables plus 8928 EXACT original source numeral4 visible pixel retention, distinct from B365 font-swapping C379 failure. Unapproved DDS sha ec35b79ce4baa72485f3446559a16dcdc040a2a3f99b99f38c641b549e0e15c5; original 8ba40915/CLEAN29e77ca7/official494d42c0 unchanged; width959 vs source980, height150 vs155; changed112299 inside only outside0 sibling3 unchanged, persisted decode0, common compose_lettering SHA-bound P2 source/geometry/face. Producer scoped visual improved but manual stacked stroke style C2 HOLD, C3/game UNTESTED. QA localization/graphics/role_B/20261011-B366-Q176-SOURCE-NUMERAL-MANUAL-STROKES/B366_CONTROLLER_PERSISTED_QA.json. RUN_KEY=OUTRUN-KOR-B366-Q176-SOURCE-NUMERAL-MANUAL-VECTOR-20261011-0930",
     "C385 C1 ODD q035 A196 exact source/CLEAN/current dual Total Rank optical native QA fails strong source-italic family, current Korean square and 327px vs source504/505px; SHA unchanged; CLEAN PNG BGRA channel order corrected. C1 REWORK_REQUIRED, C3 NOT_RUN, user-game UNTESTED, approved DDS0. localization/graphics/role_C/20261011-C385-C1-Q035-A196-SOURCE-FAMILY-OPTICAL-REWORK/C385_Q035_INDEPENDENT_C1_REWORK.json",
     "A237 ODD q161 NEW source-derived R11 물병자리 native Nanum separated lettering via compose_lettering.py, C1 PLATE_PASS manifest caf59675820b65b4ded62b05e463bfb66c77878a4ba24a4f9ff810e36ff2b9f8 reused (no CLEAN regen), 2048² BC3/DXT5 persisted trial SHA fd1273493b52c39da0f858ca956d402e86b0b2f04f17987ca2cbf1878a2c68d0 vs earlier A218 8000601a official 8ded8565 unchanged. R11 source [717,1671,1013,1725] width296 height54, new native ink width180 height48 vs old A218 width189, changed11552 decoded RGBA pixels/936 BC3 blocks only inside R11, others37 exact, alpha silhouette after saved decode match, English residue in clean0. Actual Gray100 Black50 White75 RAW saved DDS comparison: Hangul legible but visually smaller/weaker than original and old A218, source-family hierarchy/style FAIL=>producer REWORK_REQUIRED_UNPROMOTED, no official DDS, independent C1 NEW SHA/C3 NOT_RUN, game UNTESTED. Alternate native Nanum contour did not solve underfill; do not repeat simple width/scale; manual source-conditioned glyph topology required. QA localization/graphics/role_A/20261011-A237-Q161-R11-NANUM-SEPARATED-GLYPH/A237_CONTROLLER_SAVED_DDS_VISUAL_REWORK.json; run OUTRUN-KOR-A237-Q161-R11-NATIVE-NANUM-SEPARATED-GLYPH-20261011-0900.",
@@ -505,7 +506,7 @@
     "batch52_d_preflight_report": "localization/graphics/BATCH52_D_PREFLIGHT_REVALIDATION_REPORT.json",
     "batch53_fallback_reconcile_report": "localization/graphics/BATCH53_FALLBACK_RECONCILE_REPORT.json",
     "strict_qa_reset": {
-      "updated_at_kst": "2026-10-11 09:20 KST",
+      "updated_at_kst": "2026-10-11 09:55 KST",
       "report": "localization/graphics/BATCH53_FULL32_STRICT_RESET_REPORT.json",
       "package_assets_scanned": 32,
       "rework_required": 24,
@@ -15916,5 +15917,36 @@
     "C3": "NOT_RUN",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261011-C2-Q212-PSD-SOURCE-LAYER-INDEPENDENT/C2_Q212_PSD_SOURCE_LAYER_INDEPENDENT_QA.json"
+  },
+  "c1_20261011_q111_full17_independent_plate_fail": {
+    "review_id": "C1-Q111-17-NATIVE-PLATE-NEW-SCOPE-20261011-0941",
+    "run_key": "OUTRUN-KOR-C1-Q111-SEVENTEEN-NATIVE-PLATE-FAIL-20261011-0941",
+    "role": "C1",
+    "index": 111,
+    "shard": "ODD",
+    "source_sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+    "candidate_sha256": "3e0507cba9e267388edcabb3168e40f5bd847294fe82eb79e948aa89540dc394",
+    "result": "REWORK_REQUIRED",
+    "new_independent_coverage": "17/17 native visual including 13 not inspected in C309",
+    "failed_regions": [
+      "original_course_desc",
+      "random",
+      "tuned_setting",
+      "normal_setting"
+    ],
+    "clean_plate_color_class_pixels": {
+      "dark_brown": 70948,
+      "white": 8700
+    },
+    "source_to_clean_changed_RGBA": 432291,
+    "clean_to_final_changed_RGBA": 364044,
+    "changes_outside17": 0,
+    "lossless_pngs": 110,
+    "evidence_zip_sha256": "6a173ba2395eb5bbf1dd847bac57613562630c563affb2487cd7b183ded198b0",
+    "candidate_unchanged": true,
+    "approval": false,
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261011-C1-Q111-17REGION-CLEAN-COMPOSITE-REWORK/C1_Q111_INDEPENDENT_FULL17_VISUAL_REWORK.json"
   }
 }
