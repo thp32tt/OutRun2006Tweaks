@@ -67,9 +67,97 @@ def validate(source):
     assert "rebased, ibShadow->indexFormat," in draw_ib
 
 
+
+def validate_range_fastpath(source):
+    merge = body(source, "void R30MergeValidRange(")
+    read = body(source, "bool R30RangeValid(")
+    assert "std::lower_bound(ranges.begin(), ranges.end(), begin," in merge
+    assert "std::lower_bound(ranges.begin(), ranges.end(), begin," in read
+    for part in (merge, read):
+        assert "return range.end < position;" in part
+    for part in (
+        "if (begin >= end)",
+        "if (first == ranges.end() || first->begin > end)",
+        "ranges.insert(first, { begin, end });",
+        "first->begin = (std::min)(first->begin, begin);",
+        "first->end = (std::max)(first->end, end);",
+        "while (last != ranges.end() && last->begin <= first->end)",
+        "first->end = (std::max)(first->end, last->end);",
+        "ranges.erase(first + 1, last);",
+    ):
+        assert part in merge, part
+    assert "return first != ranges.end() &&" in read
+    assert "first->begin <= begin && first->end >= end;" in read
+    assert "ranges.erase(it)" not in merge
+    assert "for (const auto& range : ranges)" not in read
+
+
+def exercise_range_model():
+    # Differential, deterministic interval coverage model including adjacency,
+    # duplicate writes, reverse writes and a wide bridging write.
+    def add(ranges, begin, end):
+        if begin >= end:
+            return
+        first = next((i for i, (a, b) in enumerate(ranges) if b >= begin), len(ranges))
+        if first == len(ranges) or ranges[first][0] > end:
+            ranges.insert(first, [begin, end])
+            return
+        ranges[first][0] = min(ranges[first][0], begin)
+        ranges[first][1] = max(ranges[first][1], end)
+        last = first + 1
+        while last < len(ranges) and ranges[last][0] <= ranges[first][1]:
+            ranges[first][1] = max(ranges[first][1], ranges[last][1])
+            last += 1
+        del ranges[first + 1:last]
+
+    for seed in range(96):
+        ranges = []
+        covered = set()
+        for i in range(90):
+            begin = (seed * 211 + i * 71 + (i * i * 13)) % 1024
+            end = min(1024, begin + ((seed * 19 + i * 31) % 80))
+            add(ranges, begin, end)
+            covered.update(range(begin, end))
+            assert all(0 <= a < b <= 1024 for a, b in ranges)
+            assert all(ranges[j][1] < ranges[j + 1][0]
+                       for j in range(len(ranges) - 1))
+            for check_begin in range(0, 1024, 13):
+                check_end = min(1024, check_begin + 1 + (seed + i) % 21)
+                found = any(a <= check_begin and b >= check_end for a, b in ranges)
+                expected = all(x in covered for x in range(check_begin, check_end))
+                assert found == expected, (seed, i, check_begin)
+        add(ranges, 0, 1024)
+        assert ranges == [[0, 1024]]
+
+
+def test_range_mutations(source):
+    mutations = (
+        ("return range.end < position;", "return range.end <= position;"),
+        ("first->begin > end", "first->begin >= end"),
+        ("ranges.insert(first, { begin, end });", "ranges.insert(first, { begin, begin });"),
+        ("first->begin = (std::min)(first->begin, begin);", "first->begin = begin;"),
+        ("first->end = (std::max)(first->end, end);", "first->end = end;"),
+        ("last->begin <= first->end", "last->begin < first->end"),
+        ("ranges.erase(first + 1, last);", "ranges.erase(first + 1, first + 1);"),
+        ("first->end >= end", "first->end < end"),
+    )
+    for needle, replacement in mutations:
+        assert needle in source, needle
+        mutant = source.replace(needle, replacement, 1)
+        try:
+            validate_range_fastpath(mutant)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("range mutation survived: " + needle)
+
+
 def main():
     source = SOURCE.read_text(encoding="utf-8")
     validate(source)
+    validate_range_fastpath(source)
+    exercise_range_model()
+    test_range_mutations(source)
     mutations = (
         ("if (!vbShadow)", "if (false)"),
         ("firstByte > vbShadow->size", "false"),
@@ -92,7 +180,7 @@ def main():
             pass
         else:
             raise AssertionError("mutation survived: " + needle)
-    print("PASS R30 immutable VB/IB shadow descriptor fastpath; 11 negative mutations")
+    print("PASS R30 immutable VB/IB shadow descriptor fastpath; 11 descriptor + 8 range negative mutations; 8640 interval writes")
 
 
 if __name__ == "__main__":

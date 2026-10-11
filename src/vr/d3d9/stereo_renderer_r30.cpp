@@ -223,17 +223,32 @@ namespace OutRunVRStereo
         {
             if (begin >= end)
                 return;
-            R30ByteRange merged{ begin, end };
-            auto it = ranges.begin();
-            while (it != ranges.end() && it->end < merged.begin)
-                ++it;
-            while (it != ranges.end() && it->begin <= merged.end)
+
+            // Partial dynamic VB/IB locks can generate many disjoint ranges.
+            // Locate the first touching interval in O(log n) and merge the
+            // entire overlapping span in place. The old erase-per-interval
+            // loop repeatedly shifted the vector tail for every range it
+            // consumed, producing quadratic work on heavily streamed buffers.
+            auto first = std::lower_bound(ranges.begin(), ranges.end(), begin,
+                [](const R30ByteRange& range, UINT position) noexcept {
+                    return range.end < position;
+                });
+            if (first == ranges.end() || first->begin > end)
             {
-                merged.begin = std::min(merged.begin, it->begin);
-                merged.end = std::max(merged.end, it->end);
-                it = ranges.erase(it);
+                ranges.insert(first, { begin, end });
+                return;
             }
-            ranges.insert(it, merged);
+
+            first->begin = (std::min)(first->begin, begin);
+            first->end = (std::max)(first->end, end);
+            auto last = first + 1;
+            while (last != ranges.end() && last->begin <= first->end)
+            {
+                first->end = (std::max)(first->end, last->end);
+                ++last;
+            }
+            // Erase one contiguous tail, not each overlapping interval.
+            ranges.erase(first + 1, last);
         }
 
         bool R30RangeValid(const std::vector<R30ByteRange>& ranges,
@@ -241,14 +256,14 @@ namespace OutRunVRStereo
         {
             if (begin >= end)
                 return false;
-            for (const auto& range : ranges)
-            {
-                if (range.begin <= begin && range.end >= end)
-                    return true;
-                if (range.begin > begin)
-                    break;
-            }
-            return false;
+            // The merge writer maintains ascending, disjoint intervals; avoid
+            // a full linear scan on every stereo VB/IB draw-time shadow read.
+            const auto first = std::lower_bound(ranges.begin(), ranges.end(), begin,
+                [](const R30ByteRange& range, UINT position) noexcept {
+                    return range.end < position;
+                });
+            return first != ranges.end() &&
+                first->begin <= begin && first->end >= end;
         }
 
         R30ShadowPtr R30FindVertexShadow(IDirect3DVertexBuffer9* buffer)
