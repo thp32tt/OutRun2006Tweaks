@@ -59,7 +59,7 @@ def main() -> None:
     for i, (tm, rm) in enumerate(mutations, 1):
         try:
             check(tm, rm)
-        except AssertionError:
+        except (AssertionError, ValueError):
             continue
         raise AssertionError(f"negative mutation {i} incorrectly passed")
     print("PASS StateBlock resync idle fast path; pending/configure/Clear fail-closed; 5 negative mutations")
