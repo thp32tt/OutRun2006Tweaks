@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
 assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
-H=lambda z:hashlib.sha256(z).hexdigest()
+digest=lambda z:hashlib.sha256(z).hexdigest()
 G=Path("localization/graphics")
 P=G/"role_B/20261011-B368-Q060-HAND-VECTOR-ITALIC-GLYPH-GEOMETRY"
 P.mkdir(parents=True,exist_ok=True)
@@ -24,7 +24,7 @@ clean_sha="a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48"
 masksha="25a898178ea3e4fc08a16adfa35fa8612d8cdd4da274baf244ea67e29c24cca9"
 def read(path,sha):
  d=Path(path).read_bytes()
- assert H(d)==sha,(path,H(d),sha)
+ assert digest(d)==sha,(path,digest(d),sha)
  return d
 official=read(G/"hd_candidates"/asset,offsha)
 old=read(G/"role_B/20261011-B367-Q060-SOURCE-CONDITIONED-CONTINUOUS-METAL-PILOT/B367_Q060_SMOOTH_METAL_UNAPPROVED.dds",oldsha)
@@ -33,7 +33,7 @@ mask_data=read(G/"plate_library/objects"/(masksha+".png"),masksha)
 url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds"
 with urllib.request.urlopen(url, timeout=90) as fh:
  english=fh.read()
-assert H(english)==srcsha and len(english)==len(official)==len(old)==33554560
+assert digest(english)==srcsha and len(english)==len(official)==len(old)==33554560
 assert english[:128]==official[:128]==old[:128]
 tri=json.loads(subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","60"],capture_output=True,text=True,check=True).stdout)["assets"][0]
 assert tri["next_action"]=="METHOD_CHANGE_REQUIRED",tri
@@ -130,15 +130,15 @@ for orient,bg,pct in [("FLIPY",128,100),("FLIPY",255,75),("FLIPY",0,50),("RAW",1
  for i,v in enumerate(views):contact.paste(v,(i*(w+15),0))
  name=f"B368_SOURCE_CLEAN_OFFICIAL_B367_MANUAL_GEOMETRY_{orient}_BG{bg}_{pct}.png"
  contact.save(P/name)
- proof.append({"path":str(P/name),"sha256":H((P/name).read_bytes())})
+ proof.append({"path":str(P/name),"sha256":digest((P/name).read_bytes())})
 anchor_top=point(143,18)
 anchor_bottom=point(143,111)
 manifest={
  "run":"B368","producer_role":"B","queue_index":60,"stage":"P2_MANUAL_VECTOR_GEOMETRY_ONLY",
  "status":"GEOMETRY_REVIEW_PENDING_CONTROLLER","P1":"C372_INDEPENDENT_PLATE_PASS_REUSED",
  "source_sha256":srcsha,"clean_sha256":clean_sha,"official_sha256":offsha,"rejected_prior_B367_sha256":oldsha,
- "geometry_sha256":H((P/"B368_GEOMETRY_NATIVE_RAW_ALPHA.png").read_bytes()),
- "source_raw_png_sha256":H((P/"SOURCE_NATIVE_RAW_RGBA.png").read_bytes()),
+ "geometry_sha256":digest((P/"B368_GEOMETRY_NATIVE_RAW_ALPHA.png").read_bytes()),
+ "source_raw_png_sha256":digest((P/"SOURCE_NATIVE_RAW_RGBA.png").read_bytes()),
  "original_effect_bbox":SOURCE_BBOX,"new_geometry_bbox":bbox,
  "new_shape_vs_B367_binary_symmetric_difference_pixels":different,
  "native_ppem":"hand-authored 4x AA stroke paths -> exactly one native L downsample",
