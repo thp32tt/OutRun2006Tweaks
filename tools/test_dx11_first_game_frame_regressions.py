@@ -1394,8 +1394,7 @@ def main() -> None:
     rt_tokens = (
         "const bool gpuRenderTarget = info.Pool == D3DPOOL_DEFAULT &&",
         "(info.Usage & D3DUSAGE_RENDERTARGET) != 0u",
-        "(info.Format == D3DFMT_A8R8G8B8 ||",
-        "info.Format == D3DFMT_X8R8G8B8);",
+        "(info.Format == D3DFMT_A8R8G8B8 ||\n         info.Format == D3DFMT_X8R8G8B8);",
         "if (info.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
         "capture.texture->GetSurfaceLevel(0, sourceSurface.GetAddressOf())",
         "sourceDesc.MultiSampleType != D3DMULTISAMPLE_NONE",
