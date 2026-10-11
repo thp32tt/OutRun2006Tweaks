@@ -90,6 +90,7 @@ on:
       - 'tools/verify_vr_dx9ex_reset_transport_contract.py'
       - 'tools/verify_vr_session_direct_hold_lifetime.py'
       - 'tools/verify_vr_capture_metadata_fastpath.py'
+      - 'tools/verify_vr_desktop_capture_reuse.py'
       - 'tools/verify_vr_final_submission_contract.py'
       - 'docs/VR_REFACTOR_STATE.json'
       - 'tools/Test-VRRegressionKnowledge.ps1'
@@ -197,6 +198,7 @@ jobs:
             'tools/verify_vr_dx9ex_reset_transport_contract.py',
             'tools/verify_vr_session_direct_hold_lifetime.py',
             'tools/verify_vr_capture_metadata_fastpath.py',
+            'tools/verify_vr_desktop_capture_reuse.py',
             'tools/verify_vr_final_submission_contract.py'
           )
           foreach ($verifier in $verifiers) {

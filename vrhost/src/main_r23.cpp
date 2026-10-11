@@ -35,6 +35,7 @@
 #include "vr_shared.hpp"
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
+#include "runtime/desktop_capture_reuse.hpp"
 #include "runtime/cadence_presented_wait.hpp"
 #include "runtime/cadence_schedule.hpp"
 #include "vr/ipc/cadence_v1.hpp"
@@ -837,6 +838,10 @@ namespace
         status.fullGameClientVisible =
             c.GetGameClientOutputRect(gameRect);
 
+        // Only an already-bound duplication can reuse a previously copied
+        // desktop surface. A newly reopened duplication must produce its first
+        // image normally even if its first event only reports pointer movement.
+        const bool outputUnchanged = c.duplication_ != nullptr;
         if (!c.duplication_ && !c.RecreateDuplication(false))
             return status;
 
@@ -861,6 +866,23 @@ namespace
                 c.BindCaptureOutput(false);
             }
             status.available = c.haveFrame_;
+            return status;
+        }
+
+        // Pointer-only DXGI events contain no desktop pixel updates.
+        // Reuse the previously copied source instead of queuing a full-output
+        // CopyResource and a redundant pixel probe. Do not infer freshness
+        // from pointer movement or publish new classic SBS frame authority.
+        // Release both acquired objects on this early-return path.
+        if (OutRunVrDesktopCaptureReuse::CanSkipUnchangedPointerFrame(
+                outputUnchanged, c.haveFrame_, c.sourceSrv_ != nullptr,
+                fi.AccumulatedFrames, fi.LastPresentTime.QuadPart))
+        {
+            resource->Release();
+            c.duplication_->ReleaseFrame();
+            status.available = true;
+            status.fresh = false;
+            status.accumulatedFrames = 0;
             return status;
         }
 
