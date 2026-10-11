@@ -1,0 +1,23 @@
+{
+  "task_id": "CONVERSION-DX9EX-00592",
+  "production_id": "CONVERSION-DX9EX-00592",
+  "event_id": "CONVERSION-DX9EX-00592-E001",
+  "feature_id": "DX9EX:FRAME_PACING_DIAGNOSTICS",
+  "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00592",
+  "target_branch": "vr-d3d9ex-focus",
+  "work_key": "DX9EX:FRAME_PACING_DIAGNOSTICS",
+  "base_sha": "c8cde7d627e8c35a2de60548101c90524ef116d9",
+  "feature_status": "IMPLEMENTING",
+  "checkpoint": "C2_SOURCE_AND_TESTS",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "acceptance_results": [
+    {"id":"PACING-STAGES","status":"PENDING_CI","evidence_paths":["src/vr/ipc/frame_pacing_diagnostics.hpp","src/vr/game/outrun_renderer.cpp","src/vr/d3d9/stereo_renderer_r7.inc","vrhost/src/main_r23.cpp"],"validation_command":"build-host/bin/outrun-vr-frame-pacing-smoke.exe --stages"},
+    {"id":"PACING-REGRESSION","status":"PENDING_CI","evidence_paths":["vrhost/tests/frame_pacing_diagnostics_smoke.cpp","vrhost/CMakeLists.txt"],"validation_command":"build-host/bin/outrun-vr-frame-pacing-smoke.exe --regression"},
+    {"id":"PACING-BUNDLE","status":"PENDING_CI","evidence_paths":[".github/workflows/vr-dx9ex-active.yml","tools/Collect-OutRunVRFramePacing.ps1","tools/Collect-OutRunVRLogs.ps1"],"validation_command":"DX9Ex Active Validation / package / Feature acceptance: PACING-BUNDLE"}
+  ],
+  "required_gates": ["DX9Ex Active Validation: policy,host,game,full-chain-compile,package", "Domain Isolation Guard: domain-isolation"],
+  "artifact_prefix": "feature-dx9ex-pacing-",
+  "runtime_validation_note": "No Quest3/VDXR measurement; CSV CPU/QPC, not proven native FPS.",
+  "next_action": "Validate source+workflow and host smoke on exact candidate SHA, repair failures; controller must promote FEATURE_READY commit to TARGET_BRANCH then verify target exact-SHA gates and artifact before C6."
+}

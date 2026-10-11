@@ -28,6 +28,8 @@ on:
       - 'src/hooks_exceptions.cpp'
       - 'src/hooks_textures.cpp'
       - 'vrhost/**'
+      - 'tools/Start-OutRunVRPacing.ps1'
+      - 'tools/Collect-OutRunVRFramePacing.ps1'
       - 'CMakeLists.txt'
       - 'cmake.toml'
       - 'OutRun2006Tweaks.ini'
@@ -211,7 +213,7 @@ jobs:
         shell: pwsh
         run: |
           cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
-          cmake --build build-host --config Release --target outrun-vr-host outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
+          cmake --build build-host --config Release --target outrun-vr-host outrun-vr-frame-pacing-smoke outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
           if (-not (Test-Path build-host/bin/outrun-vr-host.exe)) { throw 'DX9Ex OpenXR host missing' }
       - name: Run deterministic no-HMD host smoke tests
         shell: pwsh
@@ -232,6 +234,19 @@ jobs:
             & $testPath
             if ($LASTEXITCODE -ne 0) { throw "host smoke failed ($LASTEXITCODE): $test" }
           }
+      - name: 'Feature acceptance: PACING-STAGES'
+        shell: pwsh
+        run: |
+          $env:OUTRUN_VR_PACING_DIAGNOSTICS = '1'
+          & ./build-host/bin/outrun-vr-frame-pacing-smoke.exe --stages
+          if ($LASTEXITCODE -ne 0) { throw "PACING-STAGES regression failed" }
+          Remove-Item Env:OUTRUN_VR_PACING_DIAGNOSTICS -ErrorAction SilentlyContinue
+      - name: 'Feature acceptance: PACING-REGRESSION'
+        shell: pwsh
+        run: |
+          Remove-Item Env:OUTRUN_VR_PACING_DIAGNOSTICS -ErrorAction SilentlyContinue
+          & ./build-host/bin/outrun-vr-frame-pacing-smoke.exe --regression
+          if ($LASTEXITCODE -ne 0) { throw "PACING-REGRESSION failed" }
       - name: Stage host
         shell: pwsh
         run: |
@@ -333,7 +348,7 @@ jobs:
           Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
           # Keep one GUI launcher. The slot selector invokes the PowerShell
           # test runner directly; duplicate batch entrypoints are not needed.
-          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd')) {
+          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1')) {
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
@@ -351,6 +366,9 @@ jobs:
             '   설정 후 실제 게임 실행 파일은 OR2006C2C.EXE입니다.'
             '5. After the game closes, its diagnostic ZIP is auto-collected.'
             '6. For tonight HUD tests, choose B HUD (HUD_SCREEN) in the selector.'
+            'OPTIONAL PACING: run Start-OutRunVRPacing.ps1 instead of the usual selector.'
+            'After game exit use Collect-OutRunVRFramePacing.ps1 for CSV and SHA summary.'
+            'This is CPU/QPC instrumentation; no Quest3 native FPS conclusion.'
             '   For the lens centre and projected rank markers choose C FLARE / WORLD.'
             '   게임 종료 후 진단 로그 ZIP이 자동 생성됩니다.'
             ''
@@ -380,6 +398,8 @@ jobs:
             RecommendedHudProfile = 'HUD_SCREEN'
             RecommendedLensAndMarkerProfile = 'HUD_WORLD'
             UserRuntimeVerified = $false
+            FramePacingDiagnosticsDefault = 'OFF'
+            FramePacingEnableWith = 'Start-OutRunVRPacing.ps1'
           }
           $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'BUILD_INPUTS.json') -Encoding UTF8
           $bad = Get-ChildItem $dir -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
@@ -396,7 +416,7 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md')) {
+          foreach ($file in @('OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','SHA256SUMS.txt','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
           }
           # Exactly one usable CMD entrypoint, no unused BAT/CMD scripts.
@@ -431,6 +451,42 @@ jobs:
 
           $bad = Get-ChildItem verify -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
           if ($bad) { throw 'active package contains forbidden backend payload' }
+      - name: 'Feature acceptance: PACING-BUNDLE'
+        shell: pwsh
+        run: |
+          $base = 'verify'
+          foreach ($file in @(
+            'backends/d3d9/dinput8.dll',
+            'backends/d3d9/outrun-vr-host.exe',
+            'backends/d3d9/SOURCE_SHA.txt',
+            'SHA256SUMS.txt',
+            'BUILD_INPUTS.json',
+            'Start-OutRunVRPacing.ps1',
+            'Collect-OutRunVRFramePacing.ps1',
+            'Collect-OutRunVRLogs.ps1'
+          )) {
+            if (-not (Test-Path (Join-Path $base $file))) {
+              throw "PACING-BUNDLE missing $file"
+            }
+          }
+          $sha = (Get-Content verify/backends/d3d9/SOURCE_SHA.txt -Raw).Trim()
+          if ($sha -ne $env:GITHUB_SHA) { throw "PACING-BUNDLE exact SHA mismatch" }
+          $inputs = Get-Content verify/BUILD_INPUTS.json -Raw | ConvertFrom-Json
+          if ($inputs.IntegrationSha -ne $env:GITHUB_SHA -or
+              $inputs.FramePacingDiagnosticsDefault -ne 'OFF') {
+            throw "PACING-BUNDLE manifest mismatch"
+          }
+          foreach ($helper in @('Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1')) {
+            $tokens = $null; $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path (Join-Path verify $helper)), [ref]$tokens, [ref]$errors)
+            if ($errors.Count -ne 0) { throw "Invalid pacing helper: $helper" }
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: feature-dx9ex-pacing-${{ github.sha }}
+          path: package/
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
           name: OutRun2-VR-DX9EX-ACTIVE-${{ github.sha }}

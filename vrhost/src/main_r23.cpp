@@ -2958,7 +2958,7 @@ int main(int argc, char** argv)
                 ++pacingXrTick;
                 OutRunVrR23VerifiedBundle::Snapshot submitted{};
                 const bool haveSubmitted =
-                    OutRunVrR23VerifiedBundle::Read(submitted);
+                    OutRunVrR23VerifiedBundle::ReadFresh(submitted);
                 if (actualSubmittedLayer && actualSubmittedFrameId &&
                     haveSubmitted && submitted.frameId == actualSubmittedFrameId &&
                     submitted.frame.frameId == actualSubmittedFrameId)

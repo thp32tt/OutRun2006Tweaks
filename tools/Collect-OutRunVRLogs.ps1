@@ -8,6 +8,7 @@ $patterns=@(
     'OutRun2006Tweaks-xstmap*.csv',
     'outrun-vr-host*.log',
     'outrun-vr-host-pipeline*.log',
+    'outrun-vr-frame-pacing*.csv',
     'outrun-vr-watchdog*.log',
     'backend*.log',
     'OR2006C2C_d3d9.log',
