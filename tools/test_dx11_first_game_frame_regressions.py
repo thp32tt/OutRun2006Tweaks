@@ -2529,6 +2529,11 @@ def main() -> None:
                 f"capture.{flag} ? s.{flag}Ps.Get() :",
             ):
                 if token not in source: return False
+            # Match the alpha operation inside THIS flag's predicate. A
+            # different variant using the correct enum cannot mask a bad one.
+            pred = gate.find(f"const bool {flag} = op == D3DTOP_BLENDFACTORALPHA &&")
+            if pred < 0 or f"alphaOp == D3DTOP_MODULATE{mode};" not in gate[pred:pred + 160]:
+                return False
             if f"capture.{flag} ? s.{flag}Ps.Get() :" not in draw: return False
             if source.count(f"s.{flag}Ps.Reset();") != 2: return False
             for token in ("lerp(v.diffuse.rgb, t.rgb, alphaParams.w)",
@@ -2550,6 +2555,13 @@ def main() -> None:
         ):
             mutant = bridge.replace(token, "/* sever scaled-alpha native link */", 1)
             assert mutant != bridge and not scaled_factor_alpha_connected(mutant), token
+        # A swapped D3DTOP is rejected even if another shader remains valid.
+        predicate = f"const bool {flag} = op == D3DTOP_BLENDFACTORALPHA &&"
+        offset = bridge.find(predicate)
+        exact = f"alphaOp == D3DTOP_MODULATE{mode};"
+        assert offset >= 0 and exact in bridge[offset:offset + 160]
+        mutant = bridge[:offset] + bridge[offset:].replace(exact, "alphaOp == D3DTOP_ADD;", 1)
+        assert not scaled_factor_alpha_connected(mutant), exact
         start = bridge.find(f"float4 {shader}(VOut v) : SV_Target {{")
         end = bridge.find("\n}", start)
         body = bridge[start:end]

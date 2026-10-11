@@ -11,7 +11,7 @@
   "base_sha": "8bd07c7a552ced4ea160fd73d1a07c90d79ad879",
   "work_key": "DX11:MENU_RACE_BLENDFACTOR_RGB_MODULATE2X4X_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "CI_PENDING",
+  "status": "CI_PENDING_REPAIRED",
   "checkpoint": "C4_COMMIT",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
@@ -39,10 +39,10 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
-      "GAME_D3D9_DRAW",
+      "LIVE_D3D9_CALLSITE",
       "FACTOR_RGB_SCALED_ALPHA",
-      "NATIVE_DRAW",
-      "DIAGNOSTIC_INSET"
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "BUILD_VERIFIED_NEED_HMD_TEST; actual game/HMD/input UNTESTED",
     "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only, original D3D9 input/draw/present maintained"
@@ -55,8 +55,8 @@
     "C0_RECOVER": "GitHub HEAD 8bd07c7a552ced4ea160fd73d1a07c90d79ad879",
     "C1_REVIEW": "Missing scaled independent alpha D3D9 state variants",
     "C2_IMPLEMENT": "C++ HLSL/Draw implementation and destructive regressions",
-    "C3_VALIDATE": "Pending mandatory exact-SHA Gates",
-    "C4_COMMIT": "Validation bearing source and regression, no CI skip",
+    "C3_VALIDATE": "Repair DX11 Fast allocation path required stages; strengthen exact alpha-operation predicate negative regression; rerun all Gates at new SHA",
+    "C4_COMMIT": "Validation-bearing source commit 095be67a; policy acceptance/test repair new exact-SHA commit (no CI skip)",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING"
   },
