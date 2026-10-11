@@ -86,6 +86,39 @@ actual GitHub platform fork**.
 A/B/C1 CLEAN plates and final DDS, odd/even/special; the older C1-odd/C2-even
 wording below is superseded. Do not treat legacy C1 PLATE_PASS as fresh C2 approval.
 
+## Local GitHub PSD copy takes precedence — 2026-10-11
+
+The user's requested upstream binary copy has been performed. The authoritative
+source catalog is `localization/graphics/plate_library/PSD_UPSTREAM_FULL_INDEX.json`:
+81 candidate PSD files corresponding by texture ID to 65 queue texture hashes.
+At the current import checkpoint, **27 distinct original PSD file revisions cover
+26 texture hashes** in the branch across two SHA-verified copy locations:
+`localization/graphics/plate_library/upstream_psd/` and
+`localization/graphics/source_psd_upstream/`.
+The remaining indexed external sources are not claimed as copied.
+
+All producer lanes MUST first resolve a matching PSD from these **local GitHub files**,
+verify its upstream source Git blob SHA against the catalog, and inspect its layer
+structure. Reuse an existing verified local copy rather than redownloading/creating
+duplicates from another source directory. If the canonical DDS has a different
+effect, plate, or visible English text than the PSD, qualify exact source relationship
+first and use the canonical game DDS for pixel-level truth. Copying a PSD is **not**
+a PLATE_PASS or permission to promote it to a game DDS. For missing local copies,
+use the catalog's pinned upstream commit to fetch by exact source path and Git SHA;
+do not use unversioned upstream HEAD.
+
+q060 (`A064FDFC`) has a **real, locally copied 44MB PSD** containing 81
+inventoried layers. q121 has 78 inventoried layers, q049 56, q212 76,
+q230 69. Their English/CLEAN classification and C2 exact native-DDS comparison
+remain outstanding. The live layer-inventory GitHub Action proof is run
+`38136649946`. Existing q135 per-layer isolation test remains run
+`38135847589` and is an unapproved trial CLEAN, not full approval.
+
+Upstream repository rights are not defined by a repository-wide LICENSE at the
+inspected commit. Preserve upstream attribution and verify redistribution rights
+before releasing third-party PSD bytes in public patch packages; game test builds
+must not accidentally bundle editable sources.
+
 ## Reuse before reconstruction
 
 At the beginning of A/B work, inspect `localization/graphics/plate_library/entries`.
