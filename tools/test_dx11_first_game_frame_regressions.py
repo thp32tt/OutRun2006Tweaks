@@ -706,11 +706,16 @@ def main() -> None:
     packed_probe = (ROOT / "tools/dx11_packed_texture_16bit_probe.cpp").read_text()
     def packed16_connected(code: str, helper: str) -> bool:
         producer = code[code.find("bool mirror_texture("):code.find("bool submit(")]
+        # Distinguish format admission from later decoder layout selection:
+        # a mutation to the admission predicates must not pass merely because
+        # an identical D3DFMT token survives in the decoder selector.
+        admission = producer[producer.find("const bool packed16 ="):producer.find("DXGI_FORMAT nativeFormat")]
         consumer = code[code.find("bool submit("):code.find("void observe(")]
-        return '#include "packed_texture_16bit.hpp"' in code and all(x in producer for x in (
+        return '#include "packed_texture_16bit.hpp"' in code and all(x in admission for x in (
             "info.Format == D3DFMT_R5G6B5",
             "info.Format == D3DFMT_A1R5G5B5",
             "info.Format == D3DFMT_A4R4G4B4",
+        )) and all(x in producer for x in (
             "rowBytes = info.Width * 2u;",
             "const UINT uploadRowBytes = packed16 ? info.Width * 4u : rowBytes;",
             "static_cast<UINT>(locked.Pitch) >= rowBytes",
