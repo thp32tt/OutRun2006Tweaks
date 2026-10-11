@@ -1840,6 +1840,14 @@ namespace OutRunVRStereo
                     out.data() + static_cast<std::size_t>(i) * stride);
             };
 
+            // The HUD contain calculation can read eye extent and fall back
+            // to multiple FOV tan() calls. It is invariant across all vertices
+            // in this latched draw; calculate it once, not per HUD vertex.
+            float hudScaleX = 1.0f;
+            float hudScaleY = 1.0f;
+            if (!state.worldEffect)
+                R30HudContainScale(state.stereo, hudScaleX, hudScaleY);
+
             if (state.worldEffect && state.fullWorldReprojection &&
                 allowFullReprojection)
             {
@@ -2093,10 +2101,6 @@ namespace OutRunVRStereo
                     // circular gauges vertically elongated on both SBS and HMD.
                     // Keep one uniform user scale on X/Y and retain only the
                     // per-eye asymmetric-FOV centre offset for convergence.
-                    float hudScaleX = 1.0f;
-                    float hudScaleY = 1.0f;
-                    R30HudContainScale(
-                        state.stereo, hudScaleX, hudScaleY);
                     correctedX =
                         hudScaleX * state.eyeScale[eye] * ndcX + state.eyeOffset[eye];
                     correctedY = hudScaleY * ndcY;
