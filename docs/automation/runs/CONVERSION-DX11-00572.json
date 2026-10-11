@@ -56,16 +56,23 @@
     "tools/test_dx11_first_game_frame_regressions.py",
     "docs/automation/runs/CONVERSION-DX11-00572.json"
   ],
-  "feature_status": "BUILD_PENDING_NEED_HMD_TEST",
+  "feature_status": "BUILD_REVALIDATION_PENDING_NEED_HMD_TEST",
   "pipeline": {
     "C0_RECOVER": "GitHub HEAD 73be29dc2d2571fe31b76786c09bacc7dfd31a88 and completed 00571 C6; R175 ownership preserved",
     "C1_REVIEW": "Missing stage0 BLEND RGB/ADDSMOOTH alpha native integration",
     "C2_IMPLEMENT": "Two source PS, game capture and D3D11 Draw/DrawIndexed/lifecycle with negative tests",
-    "C3_VALIDATE": "Local exact source invariant preflight PASS; mandatory GitHub Actions pending",
-    "C4_COMMIT": "One non-CI-skip material commit source+test+record",
+    "C3_VALIDATE": "FAILED exact Build #38180437561 at regression destructive-mutation false green: identical RGB expression in other shaders; repaired targeted shader-function scoped validation. New exact-SHA CI pending.",
+    "C4_COMMIT": "Source material SHA f64af4b7... created; follow-up genuine regression test repair commit without CI-skip",
     "C5_PACKAGE": "NOT_REQUIRED opt-in diagnostic only",
     "C6_STATE": "PENDING_EXACT_SHA; runtime UNTESTED"
   },
-  "next_action": "Review exact material SHA mandatory GitHub Gates and finalize separate C6 bookkeeping on SUCCESS.",
-  "state_persisted": true
+  "next_action": "Validate repaired exact-SHA GitHub Actions after initial 00572 test falsely matched an existing RGB shader. If all required Gates succeed, separate C6 bookkeeping.",
+  "state_persisted": true,
+  "validation_evidence": {
+    "initial_material_sha": "f64af4b7ddaf3c0395ee2508c4a194757e584dc9",
+    "failed_workflow_run_id": 38180437561,
+    "failed_step": "Feature acceptance DX11-SAFE-RETURN",
+    "failed_assertion": "Unscoped mutation token duplicated by pre-existing RGB blend shader; function-local negative test required",
+    "runtime_status": "UNTESTED"
+  }
 }

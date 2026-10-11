@@ -2340,6 +2340,17 @@ def main() -> None:
                 f"capture.{flag} ? s.{flag}Ps.Get() :",
             )
             if not all(x in code for x in links): return False
+            # RGB math and alpha arithmetic must be checked inside THIS
+            # shader body, not via matching another variant's identical RGB.
+            begin = code.find(f"float4 {pixel}(VOut v) : SV_Target {{")
+            end = code.find("\n}", begin)
+            if begin < 0 or end < begin: return False
+            body = code[begin:end]
+            if not all(x in body for x in (
+                f"float4 c = float4(lerp(v.diffuse.rgb, t.rgb, {factor}),",
+                "saturate(t.a + v.diffuse.a * (1.0f - t.a)))",
+                "AlphaGate(c.a); return c;",
+            )): return False
             if code.count(f"s.{flag}Ps.Reset();") != 2: return False
             if f"capture.{flag} ? s.{flag}Ps.Get() :" not in draw: return False
         return True
@@ -2355,7 +2366,19 @@ def main() -> None:
             f'compile("{pixel}", "ps_4_0", blend{rgb}AddSmoothCode)',
             f"s.{flag}Ps.GetAddressOf()", f"capture.{flag} ? s.{flag}Ps.Get() :",
         ):
-            mutant = bridge.replace(token, "/* broken 00572 */", 1)
+            if token.startswith("float4 c = float4(lerp("):
+                # Several earlier variants share the RGB expression. Destroy
+                # the selected shader, not an unrelated source occurrence.
+                begin = bridge.find(f"float4 {pixel}(VOut v) : SV_Target {{")
+                end = bridge.find("\n}", begin)
+                assert begin >= 0 and end > begin
+                local = bridge[begin:end]
+                assert token in local
+                mutant = (bridge[:begin] +
+                          local.replace(token, "/* broken 00572 math */", 1) +
+                          bridge[end:])
+            else:
+                mutant = bridge.replace(token, "/* broken 00572 */", 1)
             assert mutant != bridge and not smooth_path(mutant), token
     # D3DTOP_ADDSMOOTH=9; BLENDDIFFUSEALPHA=12/BLENDTEXTUREALPHA=13.
     for rgb, alpha, arg1, arg2, accepted in (
