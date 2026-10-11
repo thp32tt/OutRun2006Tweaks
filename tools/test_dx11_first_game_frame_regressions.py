@@ -878,7 +878,7 @@ def main() -> None:
             "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
             "nextColorOp != D3DTOP_DISABLE",
         )) and all(x in header for x in (
-            "texcoordBits > kGameFvfTex2",
+            "texcoordBits > kGameFvfTex3",
             "layout.minStride != layout.texcoordOffset + layout.texcoordCount * 8u",
             "std::memcpy(candidate.uv1, data + layout.texcoordOffset + 8u, 8u)",
             "coordIndex >= layout.texcoordCount",
@@ -898,7 +898,7 @@ def main() -> None:
         broken = bridge.replace(good, bad, 1)
         assert broken != bridge and not tex2_connected(broken, layout_source, probe_source)
     for good, bad in (
-        ("texcoordBits > kGameFvfTex2", "texcoordBits > 0x0f00u"),
+        ("texcoordBits > kGameFvfTex3", "texcoordBits > 0x0f00u"),
         ("layout.minStride != layout.texcoordOffset + layout.texcoordCount * 8u",
          "layout.minStride != layout.texcoordOffset + 8u"),
         ("std::memcpy(candidate.uv1, data + layout.texcoordOffset + 8u, 8u)",
@@ -906,7 +906,18 @@ def main() -> None:
     ):
         broken = layout_source.replace(good, bad, 1)
         assert broken != layout_source and not tex2_connected(bridge, broken, probe_source)
-    print("DX11 TEX2 live dual-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
+    # TEX3 live-stream third UV remains linked to native Draw and index2.
+    assert "kGameFvfTex3 == D3DFVF_TEX3" in bridge
+    assert "std::memcpy(candidate.uv2, data + layout.texcoordOffset + 16u, 8u)" in layout_source
+    assert "coordIndex == 1u ? sample.uv1 : sample.uv2" in layout_source
+    assert "assert(!game_fvf_decode_vertex(&three, 39u" in probe_source
+    assert "assert(!game_fvf_select_uv(sample, layout, 3u, chosen))" in probe_source
+    changed = layout_source.replace(
+        "std::memcpy(candidate.uv2, data + layout.texcoordOffset + 16u, 8u)",
+        "std::memcpy(candidate.uv2, data + layout.texcoordOffset + 8u, 8u)", 1)
+    assert changed != layout_source
+    assert "std::memcpy(candidate.uv2, data + layout.texcoordOffset + 16u, 8u)" not in changed
+    print("DX11 TEX2/TEX3 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":

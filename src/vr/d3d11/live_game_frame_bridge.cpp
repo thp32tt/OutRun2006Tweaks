@@ -21,7 +21,7 @@ namespace {
 using Microsoft::WRL::ComPtr;
 static_assert(kGameFvfXyz == D3DFVF_XYZ && kGameFvfXyzRhw == D3DFVF_XYZRHW &&
               kGameFvfDiffuse == D3DFVF_DIFFUSE && kGameFvfTex1 == D3DFVF_TEX1 &&
-              kGameFvfTex2 == D3DFVF_TEX2 &&
+              kGameFvfTex2 == D3DFVF_TEX2 && kGameFvfTex3 == D3DFVF_TEX3 &&
               kGameFvfTexCountMask == D3DFVF_TEXCOUNT_MASK &&
               kGameFvfPositionMask == D3DFVF_POSITION_MASK,
               "Portable FVF constants must match the D3D9 SDK");
@@ -448,7 +448,7 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
             return false;
         const float* xyz = decoded.position;
         const DWORD diffuse = decoded.diffuse;
-        // TEX2 may select UV1; TEX1 must never alias an absent UV slot.
+        // TEX2 can select UV1 and TEX3 can select UV2; absent slots fail closed.
         if (capture.enabled &&
             !game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv))
             return false;
