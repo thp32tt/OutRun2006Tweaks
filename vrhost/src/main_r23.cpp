@@ -1143,6 +1143,16 @@ namespace
         R23InvalidateDirectHold();
     }
 
+    // XR STOPPING ends the GPU-frame ownership epoch even if the game and its
+    // shared D3D9Ex textures are still alive. Release only the two host-owned
+    // hold copies, never the producer ring or an in-flight producer fence.
+    // READY must stage fresh eyes before directFrameValid_ can become true.
+    void R23RetireSessionDirectGpu(StereoCompositor& c) noexcept
+    {
+        R23InvalidateDirect(c);
+        R23ReleaseDirectHoldResources();
+    }
+
     bool R23CommitDirectAfterValidation(StereoCompositor& c,
         const OutRunVR::SharedRenderFrameState& frame)
     {
@@ -1163,6 +1173,9 @@ namespace
     {
         c.directFrameValid_ = false;
         if (!c.CommitStereoSource()) return false;
+        // A valid classic SBS source must never inherit DirectGPU hold identity.
+        // Keep allocated hold textures for a cheap transient fallback/recovery.
+        R23InvalidateDirectHold();
         c.stereoSourceValid_ = true;
         return true;
     }
@@ -2149,6 +2162,7 @@ int main(int argc, char** argv)
                         menuProjectionAnchorValid = false;
                         refreshMenuAnchorAfterLocate = true;
                         compositor.ReferenceSpaceChanged();
+                        R23RetireSessionDirectGpu(compositor);
                         OutRunVrR23VerifiedBundle::Invalidate();
                         OutRunVR::SharedRenderFrameState rf{};
                         if (renderFrames.Read(rf)) lastProcessedStereoFrame = rf.frameId;
