@@ -3133,7 +3133,7 @@ namespace OutRunVRStereo
                 IDirect3DVertexBuffer9* vb = nullptr;
                 UINT offset=0, stride=0;
                 if (FAILED(device->GetStreamSource(0, &vb, &offset, &stride)) ||
-                    !vb || stride < 20 || stride > 512) {
+                    !vb || stride < 16 || stride > 512) {
                     if (vb) vb->Release();
                     return;
                 }
@@ -3172,7 +3172,7 @@ namespace OutRunVRStereo
                 if (FAILED(device->GetStreamSource(
                         0, &vb, &streamOffset, &stride)) || !vb ||
                     FAILED(device->GetIndices(&ib)) || !ib ||
-                    stride < 20 || stride > 512) {
+                    stride < 16 || stride > 512) {
                     if (ib) ib->Release();
                     if (vb) vb->Release();
                     return;
@@ -3250,7 +3250,7 @@ namespace OutRunVRStereo
                 topology != D3DPT_TRIANGLELIST || minVertex != 0 ||
                 !numVertices || numVertices > 1536 ||
                 !primitiveCount || primitiveCount > 512 ||
-                !indices || !vertices || stride < 20 || stride > 512 ||
+                !indices || !vertices || stride < 16 || stride > 512 ||
                 (format != D3DFMT_INDEX16 && format != D3DFMT_INDEX32))
                 return;
             try {
