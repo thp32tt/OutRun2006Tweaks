@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 10:56 KST",
+  "updated_at_kst": "2026-10-11 11:42 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -12658,5 +12658,19 @@
     "IGR044": "OPEN",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261011-C2-Q060-B367-EXACT-SAVED-INDEPENDENT/C387_Q060_C2_B367_INDEPENDENT_REWORK.json"
+  },
+  "c388_c2_q012_newpolicy_c3_optical_reopen": {
+    "review_id": "C388-C2-Q012-C3-NEW-POLICY-MORPHOLOGY-20261011",
+    "role": "C2",
+    "queue_index": 12,
+    "shard": "EVEN",
+    "source_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+    "candidate_sha256": "1df64df712f990ee5d92c53998269604ff7b9fc4ccdff8913d648f18aa604013",
+    "C237_C3_PASS_SUPERSEDED": true,
+    "decision": "C3_STRICT_REWORK_REQUIRED",
+    "new_DDS": 0,
+    "current_policy_APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "report": "localization/graphics/role_C/20261011-C2-Q012-C3-NEW-POLICY-OPTICAL/C2_Q012_C3_NEW_POLICY_REWORK.json"
   }
 }
