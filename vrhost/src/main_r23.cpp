@@ -36,6 +36,7 @@
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
 #include "runtime/desktop_capture_reuse.hpp"
+#include "runtime/theater_capture_reuse.hpp"
 #include "runtime/cadence_presented_wait.hpp"
 #include "runtime/cadence_schedule.hpp"
 #include "vr/ipc/cadence_v1.hpp"
@@ -2285,6 +2286,9 @@ int main(int argc, char** argv)
                 if (presentation == OutRunVR::PresentationGameplay)
                 {
                     bool productionCaptureAttempted = false;
+                    // Keep the classic result available if stereo validation
+                    // fails and we recover with a mono layer this XR tick.
+                    CaptureStatus capturedForTheater{};
                     bool newStereoCommitted = false;
                     bool pendingBundlePublish = false;
                     OutRunVR::SharedRenderFrameState pendingBundleFrame{};
@@ -2482,6 +2486,7 @@ int main(int argc, char** argv)
                         {
                             productionCaptureAttempted = true;
                             capture = R23Capture(compositor, 2);
+                            capturedForTheater = capture;
                             candidateCaptureQpc = capture.lastPresentQpc;
 
                             // LastPresentTime is output-global. Require the
@@ -2787,8 +2792,17 @@ int main(int argc, char** argv)
                     else if (!layerReady)
                     {
                         LARGE_INTEGER cs{}, ce{}; QueryPerformanceCounter(&cs);
+                        // A classic candidate may already have copied fresh
+                        // desktop pixels this tick. Reuse them instead of
+                        // reacquiring the full DXGI output; stale, pointer-only
+                        // or absent captures retain the bounded retry path.
                         const CaptureStatus fallbackCapture =
-                            R23RefreshTheaterFallbackCapture(compositor);
+                            OutRunVrTheaterCaptureReuse::MayReuseCapture(
+                                productionCaptureAttempted,
+                                capturedForTheater.available,
+                                capturedForTheater.fresh)
+                            ? capturedForTheater
+                            : R23RefreshTheaterFallbackCapture(compositor);
                         QueryPerformanceCounter(&ce); timings.capture.Add(timings.Ms(cs, ce));
 
                         LARGE_INTEGER frs{}, fre{}; QueryPerformanceCounter(&frs);
