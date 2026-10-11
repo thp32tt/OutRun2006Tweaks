@@ -31,6 +31,21 @@ def pe_machine(blob):
     return struct.unpack_from("<H", blob, at+4)[0]
 
 
+def session_labeled_runner(runner):
+    """Label packaged control/diagnostic log ZIPs without touching the shared runner."""
+    anchor = b"$variant = ($variantLine -split '=',2)[1].Trim()"
+    if runner.count(anchor) != 1:
+        raise ValueError("DX9Ex log collector variant anchor changed")
+    suffix = (
+        b"\n$dx11TestCase = $env:OUTRUN_DX11_TEST_CASE\n"
+        b"if ($dx11TestCase -ne 'CONTROL' -and "
+        b"$dx11TestCase -ne 'DIAGNOSTIC') { "
+        b"throw 'DX11 test session selector missing or invalid' }\n"
+        b'$variant = "${variant}-${dx11TestCase}"'
+    )
+    return runner.replace(anchor, anchor + suffix, 1)
+
+
 def construct(game, host, ini, lods, runner, build_sha, feature_sha):
     if pe_machine(game) != 0x14c or len(game) < 1000000 or MARKER not in game:
         raise ValueError("missing valid x86 game DLL with native diagnostic")
@@ -46,6 +61,8 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
         return ("\r\n".join((
             "@echo off", "setlocal", 'cd /d "%~dp0"',
             'set "OUTRUN_DX11_FIRST_GAME_FRAME=' + value + '"',
+            'set "OUTRUN_DX11_TEST_CASE=' +
+            ("DIAGNOSTIC" if opt_in else "CONTROL") + '"',
             'powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Run-DX9ExFocusTest.ps1"',
             "exit /b %ERRORLEVEL%", ""
         ))).encode("ascii")
@@ -58,7 +75,7 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
     return {
         "dinput8.dll": game, "outrun-vr-host.exe": host,
         "OutRun2006Tweaks.ini": ini, "OutRun2006Tweaks.lods.ini": lods,
-        "Run-DX9ExFocusTest.ps1": runner,
+        "Run-DX9ExFocusTest.ps1": session_labeled_runner(runner),
         "RUN_DX11_FIRST_GAME_FRAME.cmd": launcher(True),
         "RUN_DX9EX_CONTROL.cmd": launcher(False),
         "DX9EX_VARIANT.txt": ("variant=DX11_FIRST_GAME_FRAME_DIAGNOSTIC\n"
@@ -73,7 +90,10 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
             "Both launchers call Run-DX9ExFocusTest.ps1 and automatically collect\n"
             "the session log archive in DX9EX_LOGS. Compare both archives.\n"
             "Look for game_tri_draws, native_draws, desktop_insets counters.\n"
-            "Only untextured XYZRHW+DIFFUSE triangles are admitted.\n"
+            "Eligible subset: untextured/unlit XYZ+DIFFUSE (object-space)\n"
+            "or XYZRHW+DIFFUSE (pretransformed) triangle lists.\n"
+            "Unsupported states preserve the DX9Ex draw and input path.\n"
+            "Separate log ZIPs end in -CONTROL or -DIAGNOSTIC.\n"
             "An inset does not prove HMD rendering or full native gameplay.\n"
             "Runtime validation remains UNTESTED; do not promote this build.\n"
         ).encode("utf-8"),
