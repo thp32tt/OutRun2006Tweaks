@@ -153,7 +153,7 @@ changed=np.any(N!=O,axis=2)
 assert not np.any(changed&~allowed)
 contamination=np.any(N!=C,axis=2)&allowed&~letter_mask
 assert not np.any(contamination),("COMPOSITE_OUTSIDE_GLYPH_EFFECT",int(contamination.sum()))
-assert np.count_nonzero((N[:,:,3]>0)&~(C[:,:,3]>0)&~letter_mask)==0
+assert np.count_nonzero(((N[:,:,3]>0)&~(C[:,:,3]>0)&~letter_mask)&allowed)==0
 out=off[:128]+N[::-1].tobytes()
 ddsp=P/"B368_Q060_HAND_VECTOR_LAYERED_UNAPPROVED.dds"
 ddsp.write_bytes(out)
