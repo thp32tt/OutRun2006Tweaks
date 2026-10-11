@@ -94,10 +94,65 @@ class DeliveryContractTests(unittest.TestCase):
                       acceptance_results=[dict(id="draw", status="PASS", evidence_paths=["src/vr/draw.cpp"],
                                                validation_command="python tools/check_draw.py")])
         self.assertTrue(f(active, record, ["src/vr/draw.cpp"])[0])
+        ci_backed = copy.deepcopy(record)
+        ci_backed["acceptance_results"][0]["status"] = "PASS_FEATURE_CI"
+        self.assertTrue(f(active, ci_backed, ["src/vr/draw.cpp"])[0])
         self.assertFalse(f(active, dict(record, acceptance_results=[]), ["src/vr/draw.cpp"])[0])
         self.assertFalse(f(active, record, ["docs/progress.md"])[0])
         bad = copy.deepcopy(record); bad["acceptance_results"][0]["status"] = "PENDING"
         self.assertFalse(f(active, bad, ["src/vr/draw.cpp"])[0])
+
+    def test_r84_ci_backed_acceptance_needs_exact_feature_run_jobs_steps_and_bundle(self):
+        step_ids = ["R84-OWNERS", "R84-ABI", "R84-BUILD-GRAPH",
+                    "R84-REGRESSION", "R84-TEST-BUNDLE"]
+        contract = dict(feature_id="DX9EX:R84_RENDERER_GRAPH",
+                        artifact_prefix="feature-dx9ex-r84-",
+                        acceptance_items=[dict(id=item, ci_step="Feature acceptance: " + item)
+                                          for item in step_ids])
+        active = dict(feature_branch="vr-d3d9ex-review-feature-dx9ex-00591",
+                      feature_contract=contract)
+        record = dict(acceptance_results=[dict(id=item, status="PASS_FEATURE_CI")
+                                          for item in step_ids])
+        names = ["r84-local", "r84-win32", "r84-host", "r84-baseline-game", "r84-bundle"]
+        run = dict(id=171, name="R84 feature integrated Win32 x64 host and bundle",
+                   head_sha=A, status="completed", conclusion="success")
+        jobs = [dict(name=name, status="completed", conclusion="success", steps=[])
+                for name in names]
+        jobs[0]["steps"] = [
+            dict(name="Feature acceptance: " + item + " - verified", status="completed",
+                 conclusion="success") for item in step_ids
+        ]
+        artifacts = [dict(name="feature-dx9ex-r84-" + A, expired=False,
+                          size_in_bytes=12000, workflow_run=dict(head_sha=A))]
+        api = Mock(side_effect=lambda url: dict(
+            jobs=copy.deepcopy(jobs)) if "/jobs?" in url else dict(
+            artifacts=copy.deepcopy(artifacts)))
+        gate = Mock(return_value=run)
+        ns = functions(dict(github_gate_run=gate, github_api_json=api))
+        verdict = self.required(ns, "vr_feature_ci_evidence_verdict")
+        self.assertEqual(verdict(active, A, record), (True, "FEATURE_CI_EXACT_SHA_VERIFIED"))
+        self.assertEqual(active["feature_ci_evidence"]["sha"], A)
+        gate.assert_called_with(active["feature_branch"], A, run["name"], force_discovery=True)
+
+        # A passing run for a different commit must never promote this feature.
+        gate.return_value = dict(run, head_sha=B)
+        self.assertEqual(verdict(active, A, record)[1], "FEATURE_CI_EXACT_SHA_NOT_SUCCESS")
+        gate.return_value = run
+        jobs[0]["steps"].pop()
+        self.assertEqual(verdict(active, A, record)[1],
+                         "FEATURE_CI_ACCEPTANCE_STEP_MISSING:R84-TEST-BUNDLE")
+        jobs[0]["steps"].append(dict(name="Feature acceptance: R84-TEST-BUNDLE - verified",
+                                      status="completed", conclusion="success"))
+        jobs[-1]["conclusion"] = "skipped"
+        self.assertEqual(verdict(active, A, record)[1], "FEATURE_CI_REQUIRED_JOB_NOT_SUCCESS")
+        jobs[-1]["conclusion"] = "success"
+        artifacts[0]["name"] = "feature-dx9ex-r84-" + B
+        self.assertEqual(verdict(active, A, record)[1],
+                         "FEATURE_CI_EXACT_SHA_TEST_BUNDLE_MISSING")
+        # A status label alone is insufficient even if recorded by a ready worker.
+        self.assertEqual(verdict(dict(active, feature_contract=dict(
+            contract, feature_id="UNREGISTERED")), A, record)[1],
+                         "FEATURE_CI_WORKFLOW_UNREGISTERED")
 
     def test_feature_selection_never_reissues_same_completed_or_blocked_outcome(self):
         f = self.required(functions(), "vr_select_feature")
