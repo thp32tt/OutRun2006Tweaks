@@ -1086,6 +1086,20 @@ namespace
             ChooseSwapchainFormat();
             CreateProjectionSwapchain();
             CreateTheaterSwapchain();
+            // Actual XR array-slice extent, not guessed desktop coordinates.
+            {
+                std::ofstream eyeLog("outrun-vr-eye-extent.log",
+                    std::ios::out | std::ios::trunc);
+                if (eyeLog)
+                    eyeLog << "XR_EYE_EXTENT_V1 allocated="
+                           << projection_.width << "x" << projection_.height
+                           << " recommended0=" << configs_[0].recommendedImageRectWidth
+                           << "x" << configs_[0].recommendedImageRectHeight
+                           << " recommended1=" << configs_[1].recommendedImageRectWidth
+                           << "x" << configs_[1].recommendedImageRectHeight
+                           << " scale=" << renderScale_
+                           << " hmd_verification=UNTESTED\n";
+            }
             std::cout << "OpenXR true stereo ready: runtime recommended "
                 << std::max(configs_[0].recommendedImageRectWidth, configs_[1].recommendedImageRectWidth) << "x"
                 << std::max(configs_[0].recommendedImageRectHeight, configs_[1].recommendedImageRectHeight)
