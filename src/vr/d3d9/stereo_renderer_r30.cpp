@@ -26,6 +26,7 @@
 #include <spdlog/spdlog.h>
 #include <d3dcompiler.h>
 #include <algorithm>
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
@@ -175,6 +176,10 @@ namespace OutRunVRStereo
         using R30ShadowPtr = std::shared_ptr<R30BufferShadow>;
         std::mutex R30ShadowRegistryMutex;
         std::mutex R30ShadowHookMutex;
+        // Published once all three hooks are installed: steady VB/IB draws
+        // need no install mutex, while partial installs still retry under lock.
+        std::atomic<bool> R30VertexBufferHooksReady{false};
+        std::atomic<bool> R30IndexBufferHooksReady{false};
         std::unordered_map<IDirect3DVertexBuffer9*, R30ShadowPtr>
             R30VertexShadows;
         std::unordered_map<IDirect3DIndexBuffer9*, R30ShadowPtr>
@@ -534,7 +539,13 @@ namespace OutRunVRStereo
         {
             if (!buffer)
                 return false;
+            // acquire observes fully initialized hook objects, never a
+            // partially installed group; failure paths retain locked retry.
+            if (R30VertexBufferHooksReady.load(std::memory_order_acquire))
+                return true;
             std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
+            if (R30VertexBufferHooksReady.load(std::memory_order_relaxed))
+                return true;
             auto** vtable = *reinterpret_cast<void***>(buffer);
             if (!R30VertexBufferLockHook)
                 R30VertexBufferLockHook = safetyhook::create_inline(
@@ -548,15 +559,24 @@ namespace OutRunVRStereo
                 R30VertexBufferReleaseHook = safetyhook::create_inline(
                     vtable[R30BufferReleaseVtableIndex],
                     R30VertexBufferReleaseDest);
-            return R30VertexBufferLockHook &&
+            const bool installed = R30VertexBufferLockHook &&
                 R30VertexBufferUnlockHook && R30VertexBufferReleaseHook;
+            if (installed)
+                R30VertexBufferHooksReady.store(true, std::memory_order_release);
+            return installed;
         }
 
         bool R30EnsureIndexBufferHooks(IDirect3DIndexBuffer9* buffer)
         {
             if (!buffer)
                 return false;
+            // acquire observes fully initialized hook objects, never a
+            // partially installed group; failure paths retain locked retry.
+            if (R30IndexBufferHooksReady.load(std::memory_order_acquire))
+                return true;
             std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
+            if (R30IndexBufferHooksReady.load(std::memory_order_relaxed))
+                return true;
             auto** vtable = *reinterpret_cast<void***>(buffer);
             if (!R30IndexBufferLockHook)
                 R30IndexBufferLockHook = safetyhook::create_inline(
@@ -570,8 +590,11 @@ namespace OutRunVRStereo
                 R30IndexBufferReleaseHook = safetyhook::create_inline(
                     vtable[R30BufferReleaseVtableIndex],
                     R30IndexBufferReleaseDest);
-            return R30IndexBufferLockHook &&
+            const bool installed = R30IndexBufferLockHook &&
                 R30IndexBufferUnlockHook && R30IndexBufferReleaseHook;
+            if (installed)
+                R30IndexBufferHooksReady.store(true, std::memory_order_release);
+            return installed;
         }
 
         HRESULT __stdcall R30CreateVertexBufferDest(
