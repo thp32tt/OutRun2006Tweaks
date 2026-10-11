@@ -105,9 +105,32 @@ class Progression(unittest.TestCase):
             return True
         self.ns.update(asyncio=asyncio, load_registry=lambda _:Registry(), slot_page=page, github_branch_head=lambda _:self.sha,
                        github_task_record=lambda *_:None, github_find_task_commit=lambda *_:{'sha':'b'*40,'message':'old task marker'},
-                       github_feature_promote_ready=promote, save_queue_state=lambda _:None, write_runtime=lambda **_:None)
+                       github_feature_promote_ready=promote, VR_FEATURE_PROMOTION_MODE='controller',
+                       save_queue_state=lambda _:None, write_runtime=lambda **_:None)
         asyncio.run(self.ns['conversion_process_lane'](None, {}, q, 'C'))
         self.assertEqual(seen, ['promote'])
+        self.assertEqual(active['result_sha'], self.sha)
+
+    def test_ai_self_promoted_target_enters_actions_without_controller_push(self):
+        active = dict(phase='WAIT_CHAT', slot='C', branch='target',
+                      task_id='task', feature_branch='feature')
+        q = {'active_by_lane': {'C': active}}
+        class Slot: name = 'C'
+        class Registry: slots = [Slot()]
+        async def page(*_): return object()
+        self.ns.update(
+            asyncio=asyncio, VR_FEATURE_PROMOTION_MODE='ai',
+            load_registry=lambda _: Registry(), slot_page=page,
+            github_branch_head=lambda _: self.sha,
+            github_task_record=lambda *_: None,
+            github_find_task_commit=lambda *_: {'sha': self.sha,
+                                                  'message': '[AUTO:task] implemented'},
+            github_feature_promote_ready=lambda *args: self.fail("controller must not promote"),
+            save_queue_state=lambda _: None,
+            write_runtime=lambda **_: None,
+        )
+        asyncio.run(self.ns['conversion_process_lane'](None, {}, q, 'C'))
+        self.assertEqual(active['phase'], 'WAIT_ACTIONS')
         self.assertEqual(active['result_sha'], self.sha)
 
     def test_c6_is_persisted_without_another_review_chat(self):
