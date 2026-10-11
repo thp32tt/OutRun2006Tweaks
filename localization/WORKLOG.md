@@ -1,3 +1,11 @@
+## 2026-10-11 17:42 KST — C1 ImageGen q102 exact-text FAIL, no DDS candidate
+
+- C1 new real ImageGen invocation on q102 source English 'Time Attack Mode' / requested '타임 어택 모드' (canonical source DDS SHA256 `17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121`; source-vs-current preview `Q102_FLIPY_GRAY100.png`).
+- Actual tool output gen ID `30fd56f3-c262-4700-bd91-5b68942de90d`, saved local PNG SHA256 `f2d386c1342d400b299e04ff532219fbb584ade19995247ad5625e55c222722b`, dimensions 2048×768 RGBA. Pixels are a blue START/스타트 comparison graphic, wrong phrase/style, not isolated transparent text. Tool prompt metadata empty: do not invent internal exact prompt. Separate failed output from previous q102 attempts 17:10, no repeat completion.
+- C1 producer QA **FAIL_WRONG_TARGET_TEXT_AND_IMAGE_LAYOUT**; PNG intentionally not published as valid C1 manifest, no imagegen_b_pipeline consumer DDS, no official DDS changes and 0 new saved trial DDS. Existing C2 q102 `REWORK_REQUIRED_DETACHED_EFFECT_FRAGMENTS` and original SHA `d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db` remain. No C2/C3/user-game approval; `RUNTIME_VALIDATION=UNTESTED`.
+- C1 shard selection rechecked: user P0/P1 q026/q030/q106 owned A/A/B; q098/q154/q214/q230 preserve legacy B in-flight ownership; remaining assets current C/C3/pass, original-preserved or pending user game, not eligible new producer DDS. No queue-engine, controller ID, VR/FFB/DX11/DXVK changes.
+- [Real ImageGen generation/producer HOLD evidence](localization/graphics/role_C1/imagegen_requests/q102_20261011_1742_IMAGEGEN_WRONG_TARGET_HOLD.json). Local preview `/mnt/data/a_wide_split_comparison_image_with_a_black_backgro.png` is not a GitHub-published production image.
+
 ## 2026-10-11 17:19 KST — C1 q102 actual ImageGen attempted, two wrong-text outputs rejected (NO DDS)
 
 - Source: C2 exact q102 2048×256 DXT5 English original SHA `17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121`, current official `d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db`; C2's 2026-10-11 14:56 native glyph-fragment REWORK remains authoritative. C1 shard q102 index%4=2; prior B212/A179 history preserved (no producer-ownership takeover or new approval).
