@@ -276,7 +276,7 @@ def main() -> None:
             "GetRenderState(D3DRS_CLIPPLANEENABLE, &clipPlanes)",
             "GetRenderState(D3DRS_LIGHTING, &lighting)",
             "GetRenderState(D3DRS_VERTEXBLEND, &vertexBlend)",
-            "lighting || vertexBlend != D3DVBF_DISABLE",
+            "            lighting || vertexBlend != D3DVBF_DISABLE",
             "GetTransform(D3DTS_WORLD, &transforms[0])",
             "GetTransform(D3DTS_VIEW, &transforms[1])",
             "GetTransform(D3DTS_PROJECTION, &transforms[2])",
