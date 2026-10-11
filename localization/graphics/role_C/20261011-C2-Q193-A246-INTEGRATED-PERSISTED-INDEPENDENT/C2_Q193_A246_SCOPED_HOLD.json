@@ -7,7 +7,7 @@
   "review_id": "C2-Q193-A246-FIRST-INDEPENDENT-COMBINED-SAVED-NATIVE-20261011-2235",
   "date_kst": "2026-10-11 22:35 KST",
   "reviewer": "ChatGPT C2 single actual reviewer",
-  "pixels_before_producer_verdict": true,
+  "pixels_before_producer_verdict": false,
   "producer_run": "A246",
   "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
   "official_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
@@ -41,7 +41,7 @@
     "clean_plus_goal_glyph_vs_combined_trial_delta": 11757,
     "delta_explanation": "11,757 pixels correspond exactly to inherited 15cont (6,938) + online (4,819) outside new four Goal cells; official-vs-trial total 33,979; outside all six zero",
     "clean_english_residue": "No visible English ghost in inspected new Goal Korean crops",
-    "independent_visual_first_look": "Original English, prior fragmented old Korean, derived empty plate, and actual persisted new glyph face viewed for six; new goals and inherited labels readable on gray 100 and black 50; B RAW/FLIPY viewed",
+    "independent_visual_first_look": "Producer A246 report was already consulted; separate independent actual source/official/trial native and 50% pixel review was performed afterward. Not a blinded first look, thus blind calibration and full asset C2 PASS remain blocked.",
     "calibration": "NOT_DONE (blocks full current-policy PASS)"
   },
   "regions": [
@@ -255,14 +255,15 @@
   "evidence_note": "Combined contacts use independent SOURCE/OFFICIAL/SAVED decoding, plus independently derived zero-alpha CLEAN view. Separate independently loaded actual A246 CLEAN/LETTERING RAW checked numerically for four Goals; derived contacts are NOT claimed as original authored clean provenance.",
   "machine_file": "localization/graphics/role_C/20261011-C2-Q193-A246-INTEGRATED-PERSISTED-INDEPENDENT/C2_MACHINE.json",
   "stage_file": "localization/graphics/role_C/20261011-C2-Q193-A246-INTEGRATED-PERSISTED-INDEPENDENT/C2_STAGES.json",
-  "decision": "SCOPED_6CELL_NATIVE_PIXELS_VISUAL_PASS__WHOLE_ATLAS_HOLD_STRICT_RECHECK",
+  "decision": "SCOPED_6CELL_NATIVE_PIXELS_VISUAL_RECHECK__WHOLE_ATLAS_HOLD_STRICT_RECHECK",
   "full_asset_C2_PASS": false,
   "blockers": [
     "Other seven q193 atlas cells and Goal A issue not comprehensively independently re-evaluated",
     "Blind calibrated C2 control set absent",
     "Complete per-segment ORIGINAL/CLEAN/LAYER/FINAL 100/75/50/BGW/RAW views and source-family anchor references not certified",
     "No current qa_evidence_gate APPROVALS/q193.json",
-    "C3 and user ingame tests not executed"
+    "C3 and user ingame tests not executed",
+    "Producer verdict was read before independent visual first look; cannot assert pixels_before_producer_verdict=true"
   ],
   "official_queue_state": "PRESERVE_EXISTING_REWORK_HOLD",
   "C3": "NOT_RUN",
@@ -279,5 +280,6 @@
     "FFB",
     "DX11",
     "DXVK"
-  ]
+  ],
+  "producer_record_seen_before_independent_pixel_inspection": true
 }
