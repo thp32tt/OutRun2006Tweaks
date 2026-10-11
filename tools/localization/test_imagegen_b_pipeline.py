@@ -139,6 +139,7 @@ class TestBImageGen(unittest.TestCase):
     def test_distinct_b_c1_shard_guards(self):
         self.assertEqual(b.validate_role({"role":"B","schema":b.SCHEMA,"queue_index":60}),("B",60))
         self.assertEqual(b.validate_role({"role":"C1","schema":b.C1_SCHEMA,"queue_index":62}),("C1",62))
+        self.assertEqual(b.validate_role({"role":"B","schema":b.SCHEMA,"queue_index":62,"legacy_b_inflight":True}),("B",62))
         for role,schema,index in [("B",b.SCHEMA,62),("C1",b.C1_SCHEMA,60),
                                   ("C1",b.C1_SCHEMA,61),("C1",b.SCHEMA,62),
                                   ("B",b.SCHEMA,True),("A",b.SCHEMA,60)]:

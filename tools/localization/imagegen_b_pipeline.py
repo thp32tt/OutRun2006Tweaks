@@ -28,8 +28,13 @@ def validate_role(raw: dict) -> tuple[str, int]:
     schemas = {"B": SCHEMA, "C1": C1_SCHEMA}
     if role not in schemas or raw.get("schema") != schemas.get(role) or type(index) is not int or index < 0:
         raise ValueError("B/C1 actual ImageGen requires exact role, schema and numeric index")
-    if (role == "B" and index % 4 != 0) or (role == "C1" and index % 4 != 2):
-        raise ValueError("New B/C1 work must use distinct even index % 4 shards; preserve legacy B in-flight outside new work")
+    # Existing B in-flight even index % 4 == 2 remains executable only when
+    # explicitly declared, instead of silently reassigned to C1 after cutover.
+    if role == "B" and index % 4 == 2 and raw.get("legacy_b_inflight") is not True:
+        raise ValueError("B even % 4 == 2 requires explicit pre-cutover in-flight ownership")
+    if (role == "B" and index % 2) or (role == "C1" and index % 4 != 2):
+        raise ValueError("New B/C1 work must use distinct even shards")
+
     return role, index
 MAX_INPUT_BYTES = 75 * 1024 * 1024
 DS = Image.Resampling.LANCZOS
