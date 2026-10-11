@@ -1971,6 +1971,78 @@ def main() -> None:
         assert 0.0 <= alpha <= 1.0 and alpha != texture[3] and alpha != diffuse[3]
     print("DX11 SUBTRACT RGB/modulated alpha native Draw PASS (static only)")
 
+
+    # 00568: native RGB factor blends with independently selected alpha.
+    # Source-to-native game Draw/inset and CPU evidence only; HMD UNTESTED.
+    def blend_alpha_connected(code: str) -> bool:
+        entry = code[code.find("bool supported_game_state("):code.find("bool translate_vertices(")]
+        dispatch = code[code.find("bool submit("):code.find("void observe(")]
+        if not all(x in entry for x in (
+            "!blendTextureSelectedDiffuseAlpha && !blendDiffuseSelectedDiffuseAlpha",
+            "alphaNeedsDiffuse && !alphaArg2Diffuse")):
+            return False
+        for rgb in ("Texture", "Diffuse"):
+            for alpha, sel in (("Texture", 1), ("Diffuse", 2)):
+                flag = f"blend{rgb}Selected{alpha}Alpha"
+                pixel = f"PSTextureBlend{rgb}Selected{alpha}Alpha"
+                links = (
+                    f"const bool {flag} = op == D3DTOP_BLEND{rgb.upper()}ALPHA && alphaOp == D3DTOP_SELECTARG{sel};",
+                    f"bool {flag} = false;",
+                    f"capture.{flag} = {flag};",
+                    f"float4 {pixel}(VOut v) : SV_Target {{",
+                    f'compile("{pixel}", "ps_4_0", {flag}Code)',
+                    f"s.{flag}Ps.GetAddressOf()",
+                    f"s.{flag}Ps.Reset();",
+                    f"s.{flag}Ps &&",
+                    f"capture.{flag} ? s.{flag}Ps.Get() :",
+                )
+                if not all(x in code for x in links):
+                    return False
+        return ("ctx->DrawIndexed(indexCount, 0, 0);" in dispatch
+                and "ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in dispatch
+                and "game->UpdateSurface(" in code
+                and "OUTRUN_DX11_FIRST_GAME_FRAME" in code)
+    assert blend_alpha_connected(bridge)
+    for rgb in ("Texture", "Diffuse"):
+        for alpha, sel in (("Texture", 1), ("Diffuse", 2)):
+            flag = f"blend{rgb}Selected{alpha}Alpha"
+            pixel = f"PSTextureBlend{rgb}Selected{alpha}Alpha"
+            for x in (
+                f"const bool {flag} = op == D3DTOP_BLEND{rgb.upper()}ALPHA && alphaOp == D3DTOP_SELECTARG{sel};",
+                f"capture.{flag} = {flag};",
+                f'compile("{pixel}", "ps_4_0", {flag}Code)',
+                f"capture.{flag} ? s.{flag}Ps.Get() :",
+            ):
+                mutant = bridge.replace(x, "/* removed native game Draw link */", 1)
+                assert mutant != bridge and not blend_alpha_connected(mutant), x
+    # Fixed-function D3D9 enums: BLENDDIFFUSEALPHA=12, BLENDTEXTUREALPHA=13.
+    for rgb_op, alpha_op, arg1, arg2, allowed in (
+        (12, 2, "texture", "ignored", True),
+        (12, 3, "ignored", "current", True),
+        (13, 2, "texture", "ignored", True),
+        (13, 3, "ignored", "diffuse", True),
+        (12, 3, "ignored", "texture", False),
+        (13, 2, "diffuse", "ignored", False),
+        (12, 4, "texture", "diffuse", False),
+        (13, 12, "texture", "diffuse", False),
+    ):
+        exact = rgb_op in (12, 13) and (
+            (alpha_op == 2 and arg1 == "texture") or
+            (alpha_op == 3 and arg2 in ("diffuse", "current")))
+        assert exact is allowed
+    for texel, diffuse in (
+        ((.9, .2, .5, .85), (.1, .8, .3, .25)),
+        ((.15, .75, .95, .1), (.8, .1, .4, .7)),
+    ):
+        for rgb_factor in (texel[3], diffuse[3]):
+            rgb = tuple((1-rgb_factor)*d + rgb_factor*t
+                        for t, d in zip(texel[:3], diffuse[:3]))
+            for selected_alpha in (texel[3], diffuse[3]):
+                rgba = (*rgb, selected_alpha)
+                assert all(0 <= x <= 1 for x in rgba)
+                assert rgba[:3] == rgb and rgba[3] == selected_alpha
+    print("DX11 RGB blend + SELECTARG alpha game-native Draw PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
