@@ -97,7 +97,7 @@ foreach($spike in [regex]::Matches($gameLog,$perfSpikePattern)){
 # The active R28 lower-Present path emits the guaranteed source-frame
 # fallback diagnostics for CORRECTNESS. Count its throttled events separately
 # from detailed R32 GPU/effect counters; absent optional fields remain zero.
-$r28DipPattern='VR R28 FRAME DIP: frameMs=([0-9.]+) presentMs=([0-9.]+) estimateFps=([0-9.]+) draws=(\d+) frameSerial=(\d+)'
+$r28DipPattern='VR R28 FRAME DIP: frameMs=([0-9.]+) presentMs=([0-9.]+) estimateFps=([0-9.]+) draws=(\d+) frameSerial=(\d+)(?: band=(BELOW(?:60|50|40|30)))?'
 $r28DipRows=@()
 foreach($dip in [regex]::Matches($gameLog,$r28DipPattern)){
     $r28DipRows += [pscustomobject]@{
@@ -105,19 +105,24 @@ foreach($dip in [regex]::Matches($gameLog,$r28DipPattern)){
         PresentMs=[double]::Parse($dip.Groups[2].Value,[Globalization.CultureInfo]::InvariantCulture)
         Draws=[int64]$dip.Groups[4].Value
         FrameSerial=[int64]$dip.Groups[5].Value
+        Band=$(if($dip.Groups[6].Success){$dip.Groups[6].Value}else{'LEGACY_UNKNOWN'})
     }
 }
 if($r28DipRows.Count -gt 0){
     $r28DipRows|Export-Csv (Join-Path $SessionDir 'R28_ACTIVE_FRAME_DIPS.csv') -NoTypeInformation -Encoding UTF8
 }
 $r28PacingRows=@([regex]::Matches($gameLog,
-    'VR R28 FRAME WINDOW 5s: frames=(\d+) sampled=(\d+) avgMs=([0-9.]+) p95Ms=([0-9.]+) p99Ms=([0-9.]+) maxMs=([0-9.]+) presentMaxMs=([0-9.]+) over16ms=(\d+) over25ms=(\d+) over33ms=(\d+) drawPeak=(\d+) drawPeakAtDip=(\d+)'))
+    'VR R28 FRAME WINDOW 5s: frames=(\d+) sampled=(\d+) avgMs=([0-9.]+) p95Ms=([0-9.]+) p99Ms=([0-9.]+) maxMs=([0-9.]+) presentMaxMs=([0-9.]+) over16ms=(\d+)(?: over20ms=(\d+))? over25ms=(\d+) over33ms=(\d+) drawPeak=(\d+) drawPeakAtDip=(\d+)'))
+$r28Below60=0
+$r28Below50=0
 $r28Over25=0
 $r28Over33=0
 $r28MaxSourceMs=0.0
 foreach($w in $r28PacingRows){
-    $r28Over25 += [int64]$w.Groups[9].Value
-    $r28Over33 += [int64]$w.Groups[10].Value
+    $r28Below60 += [int64]$w.Groups[8].Value
+    if($w.Groups[9].Success){$r28Below50 += [int64]$w.Groups[9].Value}
+    $r28Over25 += [int64]$w.Groups[10].Value
+    $r28Over33 += [int64]$w.Groups[11].Value
     $r28MaxSourceMs = [math]::Max($r28MaxSourceMs,
         [double]::Parse($w.Groups[6].Value,[Globalization.CultureInfo]::InvariantCulture))
 }
@@ -284,6 +289,8 @@ $result=[ordered]@{
     R28PresentOverBudgetWindows=$presentOverBudgetWindows
     R28PresentMaxMs=$presentLatencyMaxMs
     R28ActivePacingWindows=$r28PacingRows.Count
+    R28ActiveBelow60FpsFrames=$r28Below60
+    R28ActiveBelow50FpsFrames=$r28Below50
     R28ActiveOver25ms=$r28Over25
     R28ActiveOver33ms=$r28Over33
     R28ActiveMaxSourceFrameMs=$r28MaxSourceMs
@@ -330,6 +337,8 @@ $lines=@(
     "r28PresentOverBudgetWindows=$presentOverBudgetWindows"
     ("r28PresentMaxMs="+('{0:F3}' -f $presentLatencyMaxMs))
     "r28ActivePacingWindows=$($r28PacingRows.Count)"
+    "r28ActiveBelow60FpsFrames=$r28Below60"
+    "r28ActiveBelow50FpsFrames=$r28Below50"
     "r28ActiveOver25ms=$r28Over25"
     "r28ActiveOver33ms=$r28Over33"
     ("r28ActiveMaxSourceFrameMs="+('{0:F3}' -f $r28MaxSourceMs))

@@ -83,7 +83,8 @@ namespace OutRunVRStereo
             std::uint64_t sumUs = 0;
             std::uint64_t maxUs = 0;
             std::uint64_t maxPresentUs = 0;
-            std::uint64_t over16667 = 0;
+            std::uint64_t over16667 = 0; // <=60 FPS
+            std::uint64_t over20000 = 0; // <=50 FPS
             std::uint64_t over25000 = 0;
             std::uint64_t over33333 = 0;
             std::uint64_t peakDraws = 0;
@@ -94,6 +95,7 @@ namespace OutRunVRStereo
         thread_local LONGLONG R28PreviousPresentEndQpc = 0;
         thread_local std::uint64_t R28PreviousDrawSerial = 0;
         thread_local ULONGLONG R28LastDipLogMs = 0;
+        thread_local std::uint8_t R28LastDipLogTier = 0;
 
         void R28RecordActiveFramePacing(
             const LARGE_INTEGER& begin, const LARGE_INTEGER& end) noexcept
@@ -132,7 +134,9 @@ namespace OutRunVRStereo
             w.peakDraws = (std::max)(w.peakDraws, draws);
             if (w.sampled < w.sampleUs.size())
                 w.sampleUs[w.sampled++] = static_cast<std::uint32_t>(frameUs);
-            if (frameUs >= 16667) ++w.over16667;
+            // Exact 60/50 FPS durations avoid integer microsecond truncation.
+            if (elapsedMs >= (1000.0 / 60.0)) ++w.over16667;
+            if (elapsedMs >= (1000.0 / 50.0)) ++w.over20000;
             if (frameUs >= 25000)
             {
                 ++w.over25000;
@@ -140,16 +144,29 @@ namespace OutRunVRStereo
             }
             if (frameUs >= 33333) ++w.over33333;
 
-            // Only one detail row per second; logging every 30-FPS frame
-            // could itself aggravate a densely populated scene.
-            if (frameUs >= 25000 &&
-                (R28LastDipLogMs == 0 || nowMs - R28LastDipLogMs >= 1000))
+            // 60/50/40/30 FPS thresholds. A more severe dip may log
+            // immediately even if a milder 60-FPS warning just used its slot.
+            // All qualifying frames are counted above (not log-throttled).
+            const std::uint8_t dipTier = frameUs >= 33333 ? 4
+                : frameUs >= 25000 ? 3
+                : elapsedMs >= (1000.0 / 50.0) ? 2
+                : elapsedMs >= (1000.0 / 60.0) ? 1 : 0;
+            const bool dipCooldownExpired = R28LastDipLogMs == 0 ||
+                nowMs - R28LastDipLogMs >= 1000;
+            if (dipCooldownExpired)
+                R28LastDipLogTier = 0;
+            if (dipTier != 0 &&
+                (dipCooldownExpired || dipTier > R28LastDipLogTier))
             {
                 R28LastDipLogMs = nowMs;
+                R28LastDipLogTier = dipTier;
+                static constexpr const char* DipBands[]{
+                    "NONE", "BELOW60", "BELOW50", "BELOW40", "BELOW30"
+                };
                 spdlog::warn(
-                    "VR R28 FRAME DIP: frameMs={:.3f} presentMs={:.3f} estimateFps={:.1f} draws={} frameSerial={} marker=R28_ACTIVE",
+                    "VR R28 FRAME DIP: frameMs={:.3f} presentMs={:.3f} estimateFps={:.1f} draws={} frameSerial={} band={} marker=R28_ACTIVE",
                     elapsedMs, presentMs, 1000.0 / elapsedMs,
-                    draws, serial);
+                    draws, serial, DipBands[dipTier]);
             }
 
             if (nowMs - w.startedMs < 5000)
@@ -165,7 +182,7 @@ namespace OutRunVRStereo
                 return sorted[(std::min)(index, w.sampled - 1)];
             };
             spdlog::info(
-                "VR R28 FRAME WINDOW 5s: frames={} sampled={} avgMs={:.3f} p95Ms={:.3f} p99Ms={:.3f} maxMs={:.3f} presentMaxMs={:.3f} over16ms={} over25ms={} over33ms={} drawPeak={} drawPeakAtDip={}",
+                "VR R28 FRAME WINDOW 5s: frames={} sampled={} avgMs={:.3f} p95Ms={:.3f} p99Ms={:.3f} maxMs={:.3f} presentMaxMs={:.3f} over16ms={} over20ms={} over25ms={} over33ms={} drawPeak={} drawPeakAtDip={}",
                 w.frames, w.sampled,
                 w.frames ? static_cast<double>(w.sumUs) /
                     static_cast<double>(w.frames) / 1000.0 : 0.0,
@@ -173,7 +190,7 @@ namespace OutRunVRStereo
                 percentile(99) / 1000.0,
                 w.maxUs / 1000.0,
                 w.maxPresentUs / 1000.0,
-                w.over16667, w.over25000, w.over33333,
+                w.over16667, w.over20000, w.over25000, w.over33333,
                 w.peakDraws, w.peakDrawsAtDip);
             w = {};
         }
