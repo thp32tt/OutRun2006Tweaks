@@ -34,6 +34,16 @@ class Progression(unittest.TestCase):
         self.backlog = json.loads((ROOT / 'feature_backlog.json').read_text())
         self.contract = copy.deepcopy(self.backlog['features'][2])
 
+    def test_40m_busy_chat_must_not_block_resume(self):
+        verdict = self.ns['vr_rollover_must_wait_for_owner']
+        self.assertTrue(verdict(True, False))   # 30m: keep existing owner
+        self.assertFalse(verdict(True, True))   # 40m: force new chat
+        self.assertFalse(verdict(False, False)) # idle: safe to rotate
+        self.assertIn(
+            'if vr_rollover_must_wait_for_owner(owner_busy_or_missing, hard_40m):',
+            SOURCE,
+        )
+
     def test_dx11_existing_runtime_untested_acceptance_schema(self):
         contract = copy.deepcopy(self.backlog['features'][0])
         results = []
