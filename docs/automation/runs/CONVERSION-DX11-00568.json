@@ -11,9 +11,9 @@
   "base_sha": "641bfa9168158670fce49d5c2872e19e23229814",
   "work_key": "DX11:MENU_RACE_BLEND_RGB_SELECTED_ALPHA_NATIVE_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "SOURCE_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -60,12 +60,58 @@
     "C0_RECOVER": "Authenticated GitHub head 641bfa9168158670fce49d5c2872e19e23229814, distinct from 00567 SUBTRACT feature",
     "C1_REVIEW": "Two blend factor RGB ops lack independently selected stage0 alpha variants",
     "C2_IMPLEMENT": "4 live capture->shader->D3D11 Draw pipelines, 16 destructive tests",
-    "C3_VALIDATE": "JS source-link assertions passed, exact SHA Actions pending",
-    "C4_COMMIT": "Material C++ and regression + record with no CI-skip",
+    "C3_VALIDATE": "PASS_EXACT_SHA 181e87806713b151bf1436a3ee9237c15a9d3c92: Backend #38175816279; DX11 Fast #38175816269; Build #38175820734; OpenXR #38175820716; HUD #38175820705 — all SUCCESS",
+    "C4_COMMIT": "Material 6f750d441d4b39a52135f79a598d9d7cb9221b19 with exact repair/validation-bearing 181e87806713b151bf1436a3ee9237c15a9d3c92, both [AUTO:CONVERSION-DX11-00568], no CI skip",
     "C5_PACKAGE": "NOT_REQUIRED diagnostic opt-in",
-    "C6_STATE": "PENDING exact-SHA Actions; game/HMD untested"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; full exact-SHA five mandatory Gate families PASS; Quest3/VDXR/menu/vehicle/race/gamepad untested; separate bookkeeping commit with [skip ci]"
   },
-  "feature_status": "SOURCE_INTEGRATED_NEED_HMD_TEST",
-  "next_action": "Inspect five exact-SHA Actions gate families; write separate C6 bookkeeping if PASS; quest3 test still needed",
-  "state_persisted": true
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_action": "New independent DX11 native menu/race render-input integration item; do not retry 00568. Quest3/VDXR/gamepad and gameplay parity NEED_HMD_TEST; DXVK frozen.",
+  "state_persisted": true,
+  "material_result_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92",
+  "validation_bearing_result_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92",
+  "result_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92",
+  "initial_material_sha": "6f750d441d4b39a52135f79a598d9d7cb9221b19",
+  "repair_result_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92",
+  "validation_evidence": {
+    "exact_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92",
+    "github_actions": [
+      {
+        "name": "backend",
+        "run_id": 38175816279,
+        "conclusion": "success",
+        "head_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92"
+      },
+      {
+        "name": "fast",
+        "run_id": 38175816269,
+        "conclusion": "success",
+        "head_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92"
+      },
+      {
+        "name": "build",
+        "run_id": 38175820734,
+        "conclusion": "success",
+        "head_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92"
+      },
+      {
+        "name": "openxr",
+        "run_id": 38175820716,
+        "conclusion": "success",
+        "head_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92"
+      },
+      {
+        "name": "hud",
+        "run_id": 38175820705,
+        "conclusion": "success",
+        "head_sha": "181e87806713b151bf1436a3ee9237c15a9d3c92"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  }
 }
