@@ -27,8 +27,16 @@ def verify(text: str) -> None:
                    "std::vector<RECT>", "std::vector<DXGI_OUTDUPL_MOVE_RECT>"):
         if banned in capture:
             raise ValueError(f"DXGI metadata/heap work on capture hot path: {banned}")
-    require_order(capture, (
-        "c.duplication_->AcquireNextFrame(waitMs, &fi, &resource)",
+    # An unchanged pointer-only DXGI event now exits after releasing the
+    # acquired frame, before QueryInterface/CopyResource. Validate the real
+    # pixel-copy branch independently, without mistaking that earlier release
+    # for the mandatory release after CopyResource.
+    acquire_at = capture.find(
+        "c.duplication_->AcquireNextFrame(waitMs, &fi, &resource)")
+    query_at = capture.find("resource->QueryInterface(")
+    if acquire_at < 0 or query_at <= acquire_at:
+        raise ValueError("DXGI acquire must precede pixel resource query")
+    require_order(capture[query_at:], (
         "resource->QueryInterface(",
         "c.context_->CopyResource(c.source_, texture)",
         "c.duplication_->ReleaseFrame()",
