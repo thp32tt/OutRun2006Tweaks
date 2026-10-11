@@ -152,12 +152,89 @@ def test_range_mutations(source):
             raise AssertionError("range mutation survived: " + needle)
 
 
+
+def validate_shadow_copy_cache(source):
+    """Same-entry/same-generation byte-range reuse; writes must invalidate."""
+    begin = body(source, "void R30BeginObservedLock(")
+    finish = body(source, "void R30FinishObservedLock(")
+    vb_unlock = body(source, "HRESULT __stdcall R30VertexBufferUnlockDest(")
+    ib_unlock = body(source, "HRESULT __stdcall R30IndexBufferUnlockDest(")
+    vb_copy = body(source, "bool R30CopyVertexShadow(")
+    ib_copy = body(source, "bool R30CopyIndexShadow(")
+    primitive = body(source, "HRESULT R30TryXyzrhwPrimitiveVB(")
+    indexed = body(source, "HRESULT R30TryXyzrhwIndexedPrimitiveVB(")
+
+    assert "std::uint64_t revision = 1;" in source
+    assert "R30ShadowCopyCache vertexCopy;" in source
+    assert "R30ShadowCopyCache indexCopy;" in source
+    assert "R30ShadowPtr entry;" in source
+    for fn in (begin, finish, vb_unlock, ib_unlock):
+        assert "++entry->revision;" in fn
+    assert "entry->valid.clear();" in begin
+    assert "entry->valid.clear();" in vb_unlock
+    assert "entry->valid.clear();" in ib_unlock
+    assert finish.count("++entry->revision;") >= 3  # success, exception, failure
+    for fn in (vb_copy, ib_copy):
+        for required in (
+            "R30ShadowCopyCache& cache",
+            "std::lock_guard<std::mutex> lock(entry->mutex)",
+            "!R30RangeValid(entry->valid, offset, offset + size)",
+            "cache.entry == entry",
+            "cache.offset == offset",
+            "cache.size == size",
+            "cache.revision == entry->revision",
+            "out.size() == size",
+            "std::memcpy(out.data(), entry->bytes.data() + offset, size)",
+            "cache.entry = entry;",
+            "cache.offset = offset;",
+            "cache.size = size;",
+            "cache.revision = entry->revision;",
+            "cache.entry.reset();",
+        ):
+            assert required in fn, required
+        assert fn.index("!R30RangeValid") < fn.index("cache.entry == entry")
+        assert fn.index("cache.revision == entry->revision") < fn.index("std::memcpy")
+        assert fn.index("std::memcpy") < fn.index("cache.revision = entry->revision;")
+    assert "scratch.source,\n                    scratch.vertexCopy))" in primitive
+    assert "scratch.source,\n                    scratch.vertexCopy))" in indexed
+    assert "scratch.indexSource,\n                    scratch.indexCopy))" in indexed
+
+
+def test_shadow_copy_cache_mutations(source):
+    changes = (
+        ("cache.entry == entry", "cache.entry != entry"),
+        ("cache.offset == offset", "cache.offset != offset"),
+        ("cache.size == size", "cache.size != size"),
+        ("cache.revision == entry->revision", "cache.revision == cache.revision"),
+        ("out.size() == size", "out.size() != size"),
+        ("cache.entry = entry;", "cache.entry.reset();"),
+        ("cache.revision = entry->revision;", "cache.revision = 0;"),
+        ("std::memcpy(out.data(), entry->bytes.data() + offset, size)", "// missing CPU shadow refresh"),
+        ("++entry->revision;\n                ++R30ShadowDiscardInvalidations;", "++R30ShadowDiscardInvalidations;"),
+        ("++entry->revision;\n                    ++R30ShadowWrites;", "++R30ShadowWrites;"),
+        ("entry->valid.clear();\n                ++entry->revision;\n            }\n            return hr;", "entry->valid.clear();\n            }\n            return hr;"),
+        ("static_cast<UINT>(indexBytes), scratch.indexSource,\n                    scratch.indexCopy))",
+         "static_cast<UINT>(indexBytes), scratch.indexSource,\n                    scratch.vertexCopy))"),
+    )
+    for index, (needle, changed) in enumerate(changes, 1):
+        assert needle in source, (index, needle)
+        altered = source.replace(needle, changed, 1)
+        try:
+            validate_shadow_copy_cache(altered)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("copy-cache mutation survived: " + str(index))
+
+
 def main():
     source = SOURCE.read_text(encoding="utf-8")
     validate(source)
     validate_range_fastpath(source)
     exercise_range_model()
     test_range_mutations(source)
+    validate_shadow_copy_cache(source)
+    test_shadow_copy_cache_mutations(source)
     mutations = (
         ("if (!vbShadow)", "if (false)"),
         ("firstByte > vbShadow->size", "false"),
@@ -180,7 +257,7 @@ def main():
             pass
         else:
             raise AssertionError("mutation survived: " + needle)
-    print("PASS R30 immutable VB/IB shadow descriptor fastpath; 11 descriptor + 8 range negative mutations; 8640 interval writes")
+    print("PASS R30 VB/IB descriptor, range and revision-keyed shadow copy cache; 11 descriptor + 8 range + 12 cache negative mutations")
 
 
 if __name__ == "__main__":

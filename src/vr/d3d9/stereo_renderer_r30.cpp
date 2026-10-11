@@ -166,6 +166,10 @@ namespace OutRunVRStereo
             D3DFORMAT indexFormat = D3DFMT_UNKNOWN;
             std::vector<std::uint8_t> bytes;
             std::vector<R30ByteRange> valid;
+            // Incremented while holding mutex whenever known shadow contents or
+            // coverage change. Draw scratch copies are reusable only for this
+            // exact generation and byte range.
+            std::uint64_t revision = 1;
             void* lockPtr = nullptr;
             UINT lockOffset = 0;
             UINT lockSize = 0;
@@ -190,8 +194,20 @@ namespace OutRunVRStereo
         std::uint64_t R30ShadowDiscardInvalidations = 0;
         bool R30FirstShadowMissLogged = false;
 
+        struct R30ShadowCopyCache
+        {
+            // Hold the entry alive: a released COM buffer can recycle its raw
+            // pointer; a new registry entry must never match an old copy.
+            R30ShadowPtr entry;
+            UINT offset = 0;
+            UINT size = 0;
+            std::uint64_t revision = 0;
+        };
+
         struct R30ScratchBuffers
         {
+            R30ShadowCopyCache vertexCopy;
+            R30ShadowCopyCache indexCopy;
             std::vector<std::uint8_t> source;
             std::vector<std::uint8_t> indexSource;
             std::vector<std::uint8_t> left;
@@ -346,6 +362,7 @@ namespace OutRunVRStereo
             if (entry->writeLock && (flags & D3DLOCK_DISCARD))
             {
                 entry->valid.clear();
+                ++entry->revision;
                 ++R30ShadowDiscardInvalidations;
             }
         }
@@ -368,17 +385,20 @@ namespace OutRunVRStereo
                         entry->lockPtr, entry->lockSize);
                     R30MergeValidRange(entry->valid, entry->lockOffset,
                         entry->lockOffset + entry->lockSize);
+                    ++entry->revision;
                     ++R30ShadowWrites;
                 }
                 catch (...)
                 {
                     entry->bytes.clear();
                     entry->valid.clear();
+                    ++entry->revision;
                 }
             }
             else if (!unlockSucceeded && entry->writeLock)
             {
                 entry->valid.clear();
+                ++entry->revision;
             }
             entry->lockPtr = nullptr;
             entry->lockOffset = 0;
@@ -388,7 +408,8 @@ namespace OutRunVRStereo
         }
 
         bool R30CopyVertexShadow(const R30ShadowPtr& entry,
-            UINT offset, UINT size, std::vector<std::uint8_t>& out)
+            UINT offset, UINT size, std::vector<std::uint8_t>& out,
+            R30ShadowCopyCache& cache)
         {
             if (!entry)
             {
@@ -409,6 +430,17 @@ namespace OutRunVRStereo
                 }
                 return false;
             }
+            // Repeated fixed-geometry draws used to copy the same complete VB/IB
+            // byte span again, even if its observed Lock/Unlock generation had
+            // not changed. Range/coverage validation stays under the writer
+            // mutex, but a stable scratch snapshot needs no second memcpy.
+            if (cache.entry == entry &&
+                cache.offset == offset && cache.size == size &&
+                cache.revision == entry->revision && out.size() == size)
+            {
+                ++R30ShadowReadHits;
+                return true;
+            }
             try
             {
                 out.resize(size);
@@ -416,14 +448,20 @@ namespace OutRunVRStereo
             }
             catch (...)
             {
+                cache.entry.reset();
                 return false;
             }
+            cache.entry = entry;
+            cache.offset = offset;
+            cache.size = size;
+            cache.revision = entry->revision;
             ++R30ShadowReadHits;
             return true;
         }
 
         bool R30CopyIndexShadow(const R30ShadowPtr& entry,
-            UINT offset, UINT size, std::vector<std::uint8_t>& out)
+            UINT offset, UINT size, std::vector<std::uint8_t>& out,
+            R30ShadowCopyCache& cache)
         {
             if (!entry)
             {
@@ -438,6 +476,17 @@ namespace OutRunVRStereo
                 ++R30ShadowReadMisses;
                 return false;
             }
+            // Repeated fixed-geometry draws used to copy the same complete VB/IB
+            // byte span again, even if its observed Lock/Unlock generation had
+            // not changed. Range/coverage validation stays under the writer
+            // mutex, but a stable scratch snapshot needs no second memcpy.
+            if (cache.entry == entry &&
+                cache.offset == offset && cache.size == size &&
+                cache.revision == entry->revision && out.size() == size)
+            {
+                ++R30ShadowReadHits;
+                return true;
+            }
             try
             {
                 out.resize(size);
@@ -445,8 +494,13 @@ namespace OutRunVRStereo
             }
             catch (...)
             {
+                cache.entry.reset();
                 return false;
             }
+            cache.entry = entry;
+            cache.offset = offset;
+            cache.size = size;
+            cache.revision = entry->revision;
             ++R30ShadowReadHits;
             return true;
         }
@@ -477,6 +531,7 @@ namespace OutRunVRStereo
             {
                 std::lock_guard<std::mutex> lock(entry->mutex);
                 entry->valid.clear();
+                ++entry->revision;
             }
             return hr;
         }
@@ -518,6 +573,7 @@ namespace OutRunVRStereo
             {
                 std::lock_guard<std::mutex> lock(entry->mutex);
                 entry->valid.clear();
+                ++entry->revision;
             }
             return hr;
         }
@@ -2557,7 +2613,8 @@ namespace OutRunVRStereo
             auto& scratch = *lease.buffers;
             if (!R30CopyVertexShadow(vbShadow,
                     static_cast<UINT>(firstByte),
-                    static_cast<UINT>(byteCount), scratch.source))
+                    static_cast<UINT>(byteCount), scratch.source,
+                    scratch.vertexCopy))
             {
                 vb->Release();
                 ++R30XyzrhwFallbacks;
@@ -2668,7 +2725,8 @@ namespace OutRunVRStereo
             auto& scratch = *lease.buffers;
             if (!R30CopyIndexShadow(ibShadow,
                     static_cast<UINT>(firstIndexByte),
-                    static_cast<UINT>(indexBytes), scratch.indexSource))
+                    static_cast<UINT>(indexBytes), scratch.indexSource,
+                    scratch.indexCopy))
             {
                 ib->Release();
                 vb->Release();
@@ -2743,7 +2801,8 @@ namespace OutRunVRStereo
 
             if (!R30CopyVertexShadow(vbShadow,
                     static_cast<UINT>(firstVertexByte),
-                    static_cast<UINT>(vertexBytes), scratch.source))
+                    static_cast<UINT>(vertexBytes), scratch.source,
+                    scratch.vertexCopy))
             {
                 ib->Release();
                 vb->Release();
