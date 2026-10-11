@@ -1,145 +1,143 @@
 #!/usr/bin/env python3
-"""B365 q176: new geometric NanumGothic flat-block face pilot, FLAGMAN4 only.
-
-C371 independently rejected the B346 native Noto Bold stroke method for
-underweight source-family red type; this pilot changes the typeface itself and
-keeps the rest of the atlas byte-identical, pending C2 family qualification.
+"""B366 q176 P2 manual stroke-graph Hangul geometry; source numeral 4 preserved.
+Stage 1: geometry + 4-way lossless preview only. Geometry must be inspected by
+the controller before a GEOMETRY_READY review and persisted unapproved DDS.
 """
-import hashlib,io,json,os,struct,subprocess,sys,urllib.request
+import io,os,hashlib,json,sys,urllib.request,subprocess
 from pathlib import Path
 import numpy as np
-from PIL import Image,ImageDraw,ImageFont
-from fontTools.ttLib import TTFont
-
-assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions"
-assert os.getenv("OUTRUN_CPU_ROLE")=="B"
-sha=lambda b:hashlib.sha256(b).hexdigest()
+from PIL import Image,ImageDraw
+assert os.environ.get("OUTRUN_CPU_WORKER")=="github-actions" and os.environ.get("OUTRUN_CPU_ROLE")=="B"
+H=lambda b:hashlib.sha256(b).hexdigest()
 G=Path("localization/graphics")
-O=G/"role_B/20261011-B365-Q176-NANUM-GEOMETRIC-RED-PILOT"
-O.mkdir(parents=True,exist_ok=True)
-Q=176
-SOURCE_SHA="8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708"
+OUT=G/"role_B/20261011-B366-Q176-SOURCE-NUMERAL-MANUAL-STROKES"
+OUT.mkdir(parents=True,exist_ok=True)
+ASSET="textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds"
+SRC_SHA="8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708"
 CLEAN_SHA="29e77ca7391022eff23b84a197a41c123938f3aa03a6fb7c69a783d0ce0b6ebe"
 OFFICIAL_SHA="494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407"
-asset="textures/load/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds"
-old=(G/"hd_candidates"/asset).read_bytes()
-assert sha(old)==OFFICIAL_SHA,("CONCURRENT_OFFICIAL_CHANGED",sha(old))
-tri=json.loads(subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","176"],capture_output=True,text=True,check=True).stdout)["assets"][0]
+old=(G/"hd_candidates"/ASSET).read_bytes()
+assert H(old)==OFFICIAL_SHA,("OFFICIAL_CONCURRENT_CHANGE",H(old))
+tri=json.loads(subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","176"],text=True,capture_output=True,check=True).stdout)["assets"][0]
 assert tri["next_action"] in ("MATERIAL_REWORK","METHOD_CHANGE_REQUIRED"),tri
-lib=subprocess.run([sys.executable,"tools/localization/plate_library.py","inspect","--index","176",
-"--source-sha",SOURCE_SHA,"--region","flagman4","--orientation","readable_flip_y"],capture_output=True,text=True)
-assert lib.returncode!=0 or "PLATE_PASS" in lib.stdout,("LIBRARY_UNAPPROVED",lib.stdout[-700:])
-source_url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds"
-with urllib.request.urlopen(source_url,timeout=90) as rr:sb=rr.read()
-assert sha(sb)==SOURCE_SHA,("SOURCE_NOT_CANONICAL",sha(sb))
-assert len(sb)==len(old)==16777344 and sb[:128]==old[:128], "HEADER_SIZE_MISMATCH"
-clean_path=G/"role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT/B346_P1_CLEAN_SOURCE_ONLY.png"
-cp=clean_path.read_bytes()
-assert sha(cp)==CLEAN_SHA,("CLEAN_NOT_EXACT",sha(cp))
-def decode(b):
-    return np.array(Image.open(io.BytesIO(b)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
-src=decode(sb);prev=decode(old)
-clean=np.array(Image.open(io.BytesIO(cp)).convert("RGBA"))
-assert src.shape==prev.shape==clean.shape==(2048,2048,4)
-# Exact originally printed source pixels (before any new lettering).
-bb=(8,49,988,204)
-x0,y0,x1,y1=bb
-assert np.count_nonzero(clean[y0:y1,x0:x1,3])==0
-srcink=src[y0:y1,x0:x1]
-ink=np.median(srcink[srcink[:,:,3]>=200,:3],axis=0).round().astype(np.uint8)
-assert tuple(ink)==(186,0,0),("SOURCE_RED_FAMILY_CHANGED",ink.tolist())
-# Source family red BLOCK characters require new native face topology; no
-# previously rejected Noto Bold stroke/dilation trial may be reused.
-fontpath=Path("/usr/share/fonts/truetype/nanum/NanumGothicBold.ttf")
-if not fontpath.is_file():
-    subprocess.run(["sudo","apt-get","install","-y","--no-install-recommends","fonts-nanum"],check=True)
-assert fontpath.is_file(),"NANUM_NATIVE_FACE_NOT_INSTALLED"
-fb=fontpath.read_bytes()
-ft=TTFont(str(fontpath),lazy=True)
-chars="플래그맨 4"
-cmap=ft.getBestCmap()
-assert all(ord(c) in cmap for c in chars if c!=" "),"FAMILY_FONT_GLYPH_FALLBACK_FORBIDDEN"
-# Direct final-size FreeType vector raster. No bitmap scaling or synthetic
-# outline. Choose largest height <= original face ceiling with positive margin.
-fits=[]
-for ppem in range(120,176):
-    font=ImageFont.truetype(str(fontpath),ppem,layout_engine=ImageFont.Layout.BASIC)
-    im=Image.new("L",(1300,230),0)
-    d=ImageDraw.Draw(im)
-    d.text((16,15),chars,font=font,fill=255)
-    ob=im.getbbox()
-    if ob is None:continue
-    w,h=ob[2]-ob[0],ob[3]-ob[1]
-    if w<=(x1-x0-10) and h<=(y1-y0-10):
-        fits.append((abs(h-145),-h,ppem,im,ob))
-assert fits,"SOURCE_FAMILY_SIZE_CEILING_FAIL"
-fits.sort(key=lambda x:x[:3])
-_,_,ppem,layer,ob=fits[0]
-layer=layer.crop(ob);lw,lh=layer.size
-px=x0+6;py=y0+(y1-y0-lh)//2
-assert px+lw<=x1-4 and py>=y0+4 and py+lh<=y1-4
-# SOURCE->CLEAN is audited separately. Retain all other 3 labels exactly
-# from the saved official candidate; composite glyph-only over transparent.
-result=prev.copy()
-result[y0:y1,x0:x1]=clean[y0:y1,x0:x1]
-mask=np.asarray(layer,dtype=np.uint8)
-roi=result[py:py+lh,px:px+lw]
-roi[:,:,:3]=ink
-roi[:,:,3]=mask
-a=np.zeros((2048,2048),bool);a[y0:y1,x0:x1]=True
-delta=np.any(result!=prev,axis=2)
-assert int(np.count_nonzero(delta&~a))==0,"PROTECTED_ART_CHANGED"
-alpha_yx=np.argwhere(result[y0:y1,x0:x1,3]>0)
-assert len(alpha_yx)>0
-miny,minx=alpha_yx.min(axis=0);maxy,maxx=alpha_yx.max(axis=0)+1
-bbox=[x0+int(minx),y0+int(miny),x0+int(maxx),y0+int(maxy)]
-assert bbox[0]>x0 and bbox[1]>y0 and bbox[2]<x1 and bbox[3]<y1,("OVERFLOW",bbox)
-# Commit only experiment bytes to role_B (NOT hd_candidates).
-assert struct.unpack_from("<IIII",old,92)==(0xff,0xff00,0xff0000,0xff000000), "SOURCE_RGBA_CHANNEL_MASK_CHANGED"
-raw=old[:128]+result[::-1].tobytes()
-saved=O/"B365_Q176_FLAGMAN_NANUM_UNAPPROVED.dds"
-saved.write_bytes(raw)
-actual=decode(saved.read_bytes())
-assert saved.read_bytes()[:128]==old[:128] and np.array_equal(actual,result),"PERSISTED_MISMATCH"
-assert sha(raw)!=OFFICIAL_SHA
-assert np.count_nonzero(np.any(actual!=prev,axis=2)&~a)==0
-# SOURCE vs CLEAN must have zero changes outside canonical union of 4
-# authored source regions (C371 exact evidence), and this pilot must not touch
-# three sibling Korean labels or original ??? route art.
-source_union=np.zeros((2048,2048),bool)
-for b in [(8,49,988,204),(9,213,542,364),(0,374,838,532),(905,372,1745,532)]:
-    l,t,r,bottom=b;source_union[t:bottom,l:r]=True
-assert np.count_nonzero(np.any(src!=clean,axis=2)&~source_union)==0
-comparisons=[]
-for orientation in ["FLIPY","RAW"]:
-    for bg,pct in ([(128,100),(0,75),(255,50)] if orientation=="FLIPY" else [(128,100)]):
-        arrays=[src,clean,prev,actual]
-        if orientation=="RAW":arrays=[v[::-1] for v in arrays]
-        yy0,yy1=(y0-3,y1+3) if orientation=="FLIPY" else (2048-y1-3,2048-y0+3)
-        imgs=[]
-        for arr in arrays:
-            z=Image.fromarray(arr[yy0:yy1,x0-3:x1+3].copy(),"RGBA")
-            back=Image.new("RGBA",z.size,(bg,bg,bg,255));back.alpha_composite(z)
-            img=back.convert("RGB")
-            if pct!=100:img=img.resize((img.width*pct//100,img.height*pct//100),Image.Resampling.LANCZOS)
-            imgs.append(img)
-        w,h=imgs[0].size;sheet=Image.new("RGB",(w*4+30,h),(bg,bg,bg))
-        for i,img in enumerate(imgs):sheet.paste(img,(i*(w+10),0))
-        fn=f"B365_SOURCE_CLEAN_OFFICIAL_NANUM_{orientation}_BG{bg}_{pct}.png"
-        sheet.save(O/fn);comparisons.append(fn)
-Image.fromarray(np.where(delta,255,0).astype("uint8"),"L").save(O/"B365_CHANGED_MASK_NATIVE.png")
-report={"run":"B365","role":"B","index":176,"candidate":"UNAPPROVED_SINGLE_FLAGMAN_ROW","source_sha256":SOURCE_SHA,"clean_sha256":CLEAN_SHA,
-"official_sha256_unchanged":OFFICIAL_SHA,"trial_sha256":sha(raw),"font_sha256":sha(fb),"font_license":"Ubuntu fonts-nanum packaged open licensed font",
-"font":str(fontpath),"font_glyph_coverage":"ALL_VERIFIED","native_ppem":ppem,"renderer":"Pillow FreeType BASIC native no outline no postscale",
-"method_change":"Replace Noto CJK Bold synthetic 1-3px stroke family with authentic NanumGothicBold native geometric glyph contours and exact red source ink; preserve each glyph counter",
-"bbox_original":list(bb),"bbox_trial":bbox,"native_wh":[2048,2048],"dds":"RGBA32_MIP1_RAW_MIRROR_Y",
-"changed_rgba":int(delta.sum()),"outside_region":0,"roundtrip_difference":0,"other_three_labels_unchanged":True,
-"plate_qa":"SOURCE_PINNED_AND_CLEAN_ALPHA_ZERO_FLAGMAN","producer_visual":"PENDING_FIRSTHAND_NATIVE",
-"family_gate":"C2_NEW_PILOT_PENDING","whole_atlas":"C343_REWORK_UNCHANGED","C3":"NOT_RUN",
-"RUNTIME_VALIDATION":"UNTESTED","official_promoted":0,"new_trial":1,"evidence":comparisons,"excluded":["VR","FFB","DX11","DXVK"]}
-(O/"B365_MACHINE.json").write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n")
-(O/"recipe.json").write_text(json.dumps({"source":SOURCE_SHA,"clean":CLEAN_SHA,"trial":sha(raw),
-"renderer":"Pillow native OpenType Sans NanumGothicBold","font":str(fontpath),"font_sha":sha(fb),
-"font_size":ppem,"glyph":"플래그맨 4","source_bbox":list(bb),"new_bbox":bbox,
-"color_source":ink.tolist(),"orientation":"RAW_MIRROR_Y","no_font_raster_rescale":True},indent=2,ensure_ascii=False)+"\n")
-print(json.dumps({"run":"B365","trial_sha":sha(raw),"font":sha(fb),"bbox":bbox,"changed":int(delta.sum()),"outside":0}),flush=True)
+url="https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/75C3586A_512x512.dds"
+with urllib.request.urlopen(url,timeout=90) as fh:source=fh.read()
+assert H(source)==SRC_SHA and len(source)==len(old)==16777344 and source[:128]==old[:128]
+cp=(G/"role_B/20261010-B346-Q176-SOURCE-HEAVY-RED-FONT-PILOT/B346_P1_CLEAN_SOURCE_ONLY.png").read_bytes()
+assert H(cp)==CLEAN_SHA
+def dec(b):
+ return np.array(Image.open(io.BytesIO(b)).convert("RGBA").transpose(Image.Transpose.FLIP_TOP_BOTTOM))
+src=dec(source);off=dec(old);clean=np.array(Image.open(io.BytesIO(cp)).convert("RGBA"))
+assert src.shape==off.shape==clean.shape==(2048,2048,4)
+x0,y0,x1,y1=(8,49,988,204)
+assert int(np.count_nonzero(clean[y0:y1,x0:x1,3]))==0
+# Source-authentic integer symbol, retained rather than retyped. Find its
+# RIGHTMOST opaque original source component after the last word-gap.
+row=(src[y0:y1,x0:x1,3]>32)
+col=np.count_nonzero(row,axis=0)
+runs=[];start=None
+for i,count in enumerate(col):
+ if count and start is None:start=i
+ if start is not None and (not count or i==len(col)-1):
+  end=i if not count else i+1
+  runs.append([start,end])
+  start=None
+candidates=[(a,b) for a,b in runs if a>650 and 45<=(b-a)<=160]
+assert candidates,("SOURCE_DIGIT_ISOLATION_FAIL",runs)
+nl,nr=candidates[-1]
+assert nl>780 and nr<=980,("SOURCE_NUMERAL_NOT_FINAL",nl,nr)
+number=np.zeros_like(src)
+number[y0:y1,x0+nl:x0+nr]=src[y0:y1,x0+nl:x0+nr]
+assert int(np.count_nonzero(number[:,:,3]))>1500
+# Fully handcrafted native stroke graph. FOUR Hangul syllables are *not* from
+# a previous font raster. Source-conditioned 150px uppercase stroke frame.
+# Strokes and counter-spaces individually authored; no bitmap upscale, font
+# swap, random shear, morphology or blind global width fitting.
+S=3
+W=790
+glyph=Image.new("L",(W*S,155*S),0)
+d=ImageDraw.Draw(glyph)
+def polygon(points):d.polygon([(round(x*S),round(y*S)) for x,y in points],fill=255)
+def rect(x,y,w,h):polygon([(x,y),(x+w,y),(x+w,y+h),(x,y+h)])
+# 플 — top ㅍ, native horizontal vowel and lower ㄹ, square-source family.
+X=10
+rect(X+12,9,152,21);rect(X+33,34,21,38);rect(X+123,34,21,38)
+rect(X+12,66,152,21);rect(X+12,91,152,19)
+rect(X+12,112,23,30);rect(X+12,122,151,20)
+# 래 — open ㄹ terminals, two independent vowels ㅐ.
+X=210
+rect(X+4,10,93,19);rect(X+77,15,20,43);rect(X+4,53,93,18)
+rect(X+4,53,18,46);rect(X+4,86,93,18);rect(X+77,86,18,39)
+rect(X+4,112,93,18)
+rect(X+113,8,21,133);rect(X+137,52,36,18);rect(X+152,9,20,132)
+# 그 — square heavy ㄱ and baseline ㅡ.
+X=410
+rect(X+4,9,152,23);rect(X+132,20,23,77);rect(X+4,116,152,23)
+# 맨 — open ㅁ counter, ㅐ and native wide ㄴ.
+X=600
+rect(X+6,10,103,18);rect(X+6,10,20,75);rect(X+90,10,19,75)
+rect(X+6,67,103,18)
+rect(X+124,8,20,94);rect(X+146,39,31,19);rect(X+167,8,18,94)
+rect(X+8,104,21,35);rect(X+8,121,169,18)
+# Single explicitly documented 3x vector anti-alias raster-downsample.
+mask=np.asarray(glyph.resize((W,155),Image.Resampling.LANCZOS))
+mask=np.where(mask<4,0,mask).astype(np.uint8)
+assert not np.any(mask[:,nl-4:]),("GLYPH_INTO_SOURCE_NUMBER",nl)
+N=off.copy()
+N[y0:y1,x0:x1]=clean[y0:y1,x0:x1]
+roi=N[y0:y1,x0:x0+W]
+rgb=np.array([186,0,0],dtype=np.uint8)
+roi[mask>0,:3]=rgb;roi[:,:,3]=mask
+# Number must keep the SOURCE pixels exactly, including original red face
+# and antialias, rather than stretching newly drawn Korean/numeral font.
+N[y0:y1,x0+nl:x0+nr]=number[y0:y1,x0+nl:x0+nr]
+assert np.array_equal(N[y0:y1,x0+nl:x0+nr],src[y0:y1,x0+nl:x0+nr])
+change=np.any(N!=off,axis=2)
+allowed=np.zeros((2048,2048),bool);allowed[y0:y1,x0:x1]=True
+assert int(np.count_nonzero(change&~allowed))==0
+ink=np.argwhere(N[y0:y1,x0:x1,3]>0)
+ymin,xmin=ink.min(axis=0);ymax,xmax=ink.max(axis=0)+1
+bbox=[int(x0+xmin),int(y0+ymin),int(x0+xmax),int(y0+ymax)]
+assert bbox[0]>x0 and bbox[1]>y0 and bbox[2]<=x1 and bbox[3]<y1,("SOURCE_GLYPH_CEILING",bbox)
+# Source must be exact native RAW geometry. Direct repo-bound letter input
+# created for later compose_lettering verification after controller first look.
+Image.fromarray(src[::-1].copy(),"RGBA").save(OUT/"SOURCE_RAW_RGBA.png")
+geometry=N[:,:,3].copy()
+geometry[~allowed]=0
+geometry=geometry[::-1].copy()
+Image.fromarray(geometry,"L").save(OUT/"GEOMETRY_RAW_ALPHA.png")
+face=np.zeros_like(src)
+face[y0:y1,x0:x1]=N[y0:y1,x0:x1]
+Image.fromarray(face[::-1].copy(),"RGBA").save(OUT/"FACE_RAW_RGBA.png")
+# Preview source/CLEAN/official/trial in readable and RAW BEFORE promoting
+# geometry review, with no pretense that controller has already seen it.
+evidence=[]
+for orient in ["FLIPY","RAW"]:
+ for bg,pct in ([(128,100),(255,75),(0,50)] if orient=="FLIPY" else [(128,100)]):
+  imgs=[]
+  for image in ([src,clean,off,N] if orient=="FLIPY" else [v[::-1] for v in [src,clean,off,N]]):
+   yy0,yy1=(y0-4,y1+4) if orient=="FLIPY" else (2048-y1-4,2048-y0+4)
+   crop=Image.fromarray(image[yy0:yy1,x0-4:x1+4].copy(),"RGBA")
+   back=Image.new("RGBA",crop.size,(bg,bg,bg,255));back.alpha_composite(crop)
+   view=back.convert("RGB")
+   if pct!=100:view=view.resize((view.width*pct//100,view.height*pct//100),Image.Resampling.LANCZOS)
+   imgs.append(view)
+  w,h=imgs[0].size
+  montage=Image.new("RGB",(w*4+30,h),(bg,bg,bg))
+  for i,im in enumerate(imgs):montage.paste(im,(i*(w+10),0))
+  name=f"B366_SOURCE_CLEAN_OLD_MANUAL_{orient}_BG{bg}_{pct}.png"
+  montage.save(OUT/name);evidence.append(name)
+qa={"run":"B366","role":"B","index":176,"stage":"P2_GEOMETRY_PROPOSED_NO_DDS_YET",
+"source_sha256":SRC_SHA,"clean_sha256":CLEAN_SHA,"official_sha256":OFFICIAL_SHA,
+"source_number_component_relative":[nl,nr],"source_number_preserved_pixels":int(np.count_nonzero(number[:,:,3])),
+"source_bbox":[x0,y0,x1,y1],"new_bbox":bbox,
+"changed_inside_source_bbox":int(change.sum()),"outside":0,"other3":"EXACT_UNCHANGED",
+"method":"Manual native 3x stroke graphs for 4 Hangul syllables with exact original source numeral 4; one explicit LANCZOS AA to 2048 native; no prior Hangul bitmap",
+"route":"vector_title","geometry_status":"PENDING_CONTROLLER_VISUAL_REVIEW","C2":"NOT_RUN","C3":"NOT_RUN","game":"UNTESTED",
+"dds_created":0,"evidence":evidence,"excluded":["VR","FFB","DX11","DXVK"]}
+(OUT/"B366_GEOMETRY_PROPOSAL.json").write_text(json.dumps(qa,ensure_ascii=False,indent=2)+"\n")
+(OUT/"B366_MANUAL_STROKE_GRAPH.json").write_text(json.dumps({"version":"manual-stroke-graph-v1","glyph":"플래그맨 4","vector_native":True,
+"stroke_coordinates_native":True,"antialias":"Pillow LANCZOS x3 once","editable_script":"tools/localization/cpu_jobs/B.py",
+"source_numeric_original_is_preserved":True,"source_revision":"Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+"glyph_bbox":bbox,"source_reference_sha256":SRC_SHA},ensure_ascii=False,indent=2)+"\n")
+print(json.dumps(qa,ensure_ascii=False),flush=True)
