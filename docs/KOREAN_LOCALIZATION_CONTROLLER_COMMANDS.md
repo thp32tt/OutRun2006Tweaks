@@ -1,5 +1,10 @@
 # Korean Localization Controller Commands
 
+## 2026-10-11 B ImageGen lane override (GitHub authoritative; user deploys Docker)
+
+Docker `:30` B 명령은 그대로 `OutRun 한글화 B 실행`이다. 그러나 GitHub 최신 계약/프롬프트를 읽으면 B는 **ChatGPT 이미지 생성 도구**를 사용해 투명 PNG를 만든 후 `imagegen_b_pipeline.py`로 DDS/QA를 진행한다. A `:00` 폰트/벡터 방식 및 C1/C2 일정은 변경 없다. Docker가 모델/이미지 생성 플러그인을 직접 제공하는 게 아니라 Docker가 **ChatGPT 프로젝트에 작업을 의뢰**한다. 도구 미제공/바이너리 업로드 불가 시 상태를 HOLD로 기록하고 font fallback 금지. `tools/localization/controller_prompts/localization_B.md` 및 `docs/KOREAN_LOCALIZATION_B_IMAGEGEN_LANE.md`를 함께 배포/참조한다. 사용자가 재배포하기 전에는 현재 컨테이너가 새 프롬프트를 가졌다고 주장하지 않는다.
+
+
 > Recovery branch only. Keep scheduled prompts short; all workflow rules stay in this Git branch.
 
 The controller should keep its scheduled prompt minimal. Workflow logic lives in Git.
