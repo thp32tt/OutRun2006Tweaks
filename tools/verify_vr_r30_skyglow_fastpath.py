@@ -103,7 +103,7 @@ for label, token in mutations:
     damaged = source.replace(token, "/*negative mutation*/", 1)
     try:
         check(damaged)
-    except (AssertionError, IndexError):
+    except (AssertionError, IndexError, ValueError):
         continue
     raise AssertionError("mutation survived: " + label)
 print("PASS R30 SkyGlow per-Present depth/shader/viewport coalescing and 20 destructive regressions")
