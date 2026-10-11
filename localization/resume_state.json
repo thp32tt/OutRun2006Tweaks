@@ -16373,5 +16373,23 @@
     "C3": "NOT_RUN",
     "user_game": "UNTESTED",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "c2_q044_native_source_family_20261011_1640": {
+    "review_id": "C2-Q044-NEW-NATIVE-STYLE-PLATE-20261011-1640",
+    "queue_index": 44,
+    "decision": "REWORK_REQUIRED",
+    "source_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+    "candidate_sha256": "2250de2b7fbe1578750c422c05bd5f3b5785a0bd5006a4afcfb4cbc26ebbe620",
+    "clean_sha256": "fd80f7f626c39ecd9e5e11fe9a8044ffeff7258a84a432fa3038e850a80f2bf2",
+    "same_sha_prior_C249_C3_invalidated": true,
+    "machine_plate": "SCOPED_P1_PASS",
+    "machine_composite": "SCOPED_BOUNDARY_PASS_12_OF_12",
+    "visual_style": "FAIL_STAGE_RIVAL_ROUNDED_RACING_FAMILY",
+    "new_dds": 0,
+    "new_current_evidence_approval": 0,
+    "new_c3": "NOT_RUN",
+    "blind_calibration": "HOLD",
+    "runtime_validation": "UNTESTED",
+    "evidence": "localization/graphics/role_C/20261011-C2-Q044-STRICT-NATIVE-SOURCE-FAMILY/C2_Q044_NEW_SOURCE_FAMILY_REWORK.json"
   }
 }
