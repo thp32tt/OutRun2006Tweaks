@@ -75,6 +75,12 @@ def check(r29, api, r30):
             return False
         if live_fallback.count("GetVertexShader(") != 1:
             return False
+        # A disabled Release in a comment still contains the bare token.
+        # Require the COM reference to be released by an executable line.
+        if "shader->Release();" not in [
+                line.strip() for line in live_fallback.splitlines()
+                if not line.lstrip().startswith("//")]:
+            return False
         start = xyz.index("R29OwnerEnsureStereoResources(device)")
         fallback_vp = xyz.index("FAILED(device->GetViewport(&state.viewport))")
         if not start < xyz.index("!R29OwnerTryGetTrackedViewport(state.viewport)") < fallback_vp:
