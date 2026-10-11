@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 09:30 KST",
+  "updated_at_kst": "2026-10-11 09:52 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,6 +50,38 @@
       "total": 243
     },
     "graphics_localization": {
+      "b366_q176_source_original_digit_manual_vector_saved_20261011": {
+        "run_key": "OUTRUN-KOR-B366-Q176-SOURCE-NUMERAL-MANUAL-VECTOR-20261011-0930",
+        "role": "B",
+        "index": 176,
+        "scope": "ONE_FLAGMAN4_OF_FOUR",
+        "method": "source_faithful_original_numeric4_manual_hangul_vector_graph_separated_lettering",
+        "original_source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+        "authored_clean_sha256": "29e77ca7391022eff23b84a197a41c123938f3aa03a6fb7c69a783d0ce0b6ebe",
+        "official_unchanged_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+        "new_saved_unapproved_trial_sha256": "ec35b79ce4baa72485f3446559a16dcdc040a2a3f99b99f38c641b549e0e15c5",
+        "protected_original_4_visible_pixels": 8928,
+        "source_width": 980,
+        "trial_width": 959,
+        "source_height": 155,
+        "trial_height": 150,
+        "changed_rgba_pixels": 112299,
+        "outside_source_bbox": 0,
+        "protected_3_siblings": "EXACT_UNCHANGED",
+        "saved_dds_roundtrip_mismatch": 0,
+        "format": "RGBA32_2048x2048_mip1_RAW_MIRROR_Y",
+        "manual_vector_source": "tools/localization/recipes/B366_q176_manual_stroke_graph.py",
+        "lettering_recipe": "localization/graphics/role_B/20261011-B366-Q176-SOURCE-NUMERAL-MANUAL-STROKES/B366_LETTERING_RECIPE.json",
+        "new_trial_dds_count": 1,
+        "official_promoted_count": 0,
+        "producer_qa": "SCOPED_SOURCE_HIERARCHY_IMPROVED_HOLD_SOURCE_FAMILY_MORPHOLOGY_C2",
+        "C2": "NOT_RUN_B366",
+        "C3": "BLOCKED",
+        "user_game": "UNTESTED",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "GH_CPU_run_id": 38099585805,
+        "qa": "localization/graphics/role_B/20261011-B366-Q176-SOURCE-NUMERAL-MANUAL-STROKES/B366_CONTROLLER_PERSISTED_QA.json"
+      },
       "latest_a237_q161_native_nanum_trial_20261011": {
         "run_key": "OUTRUN-KOR-A237-Q161-R11-NATIVE-NANUM-SEPARATED-GLYPH-20261011-0900",
         "role": "A",
