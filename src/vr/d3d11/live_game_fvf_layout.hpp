@@ -11,6 +11,7 @@ constexpr std::uint32_t kGameFvfDiffuse = 0x040u;
 constexpr std::uint32_t kGameFvfTex1 = 0x100u;
 constexpr std::uint32_t kGameFvfTex2 = 0x200u;
 constexpr std::uint32_t kGameFvfTex3 = 0x300u;
+constexpr std::uint32_t kGameFvfTex4 = 0x400u;
 constexpr std::uint32_t kGameFvfTexCountMask = 0x0f00u;
 constexpr std::uint32_t kGameFvfPositionMask = 0x400eu;
 struct GameFvfLayout {
@@ -26,9 +27,9 @@ struct GameFvfLayout {
 constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcept {
     const std::uint32_t position = fvf & kGameFvfPositionMask;
     const std::uint32_t texcoordBits = fvf & kGameFvfTexCountMask;
-    // TEX4+ or non-default coordinate dimensions require a different decoder.
+    // TEX5+ or non-default coordinate dimensions require a different decoder.
     if ((position != kGameFvfXyz && position != kGameFvfXyzRhw) ||
-        texcoordBits > kGameFvfTex3 ||
+        texcoordBits > kGameFvfTex4 ||
         (fvf & ~(kGameFvfXyz | kGameFvfXyzRhw |
                  kGameFvfDiffuse | kGameFvfTexCountMask)) != 0u)
         return false;
@@ -52,6 +53,7 @@ struct GameFvfSample {
     float uv[2] = {0.f, 0.f};
     float uv1[2] = {0.f, 0.f};
     float uv2[2] = {0.f, 0.f};
+    float uv3[2] = {0.f, 0.f};
 };
 // Decode the actual VB/UP slot offsets without reading UV as missing diffuse.
 // A bad layout or stride must leave output untouched.
@@ -62,7 +64,7 @@ inline bool game_fvf_decode_vertex(const void* bytes, std::uint32_t stride,
         layout.positionBytes != (layout.pretransformed ? 16u : 12u) ||
         layout.texcoordOffset != layout.positionBytes +
                                  (layout.hasDiffuse ? 4u : 0u) ||
-        layout.texcoordCount > 3u ||
+        layout.texcoordCount > 4u ||
         layout.textured != (layout.texcoordCount != 0u) ||
         layout.minStride != layout.texcoordOffset + layout.texcoordCount * 8u ||
         stride < layout.minStride)
@@ -78,19 +80,22 @@ inline bool game_fvf_decode_vertex(const void* bytes, std::uint32_t stride,
         std::memcpy(candidate.uv1, data + layout.texcoordOffset + 8u, 8u);
     if (layout.texcoordCount >= 3u)
         std::memcpy(candidate.uv2, data + layout.texcoordOffset + 16u, 8u);
+    if (layout.texcoordCount >= 4u)
+        std::memcpy(candidate.uv3, data + layout.texcoordOffset + 24u, 8u);
     sample = candidate;
     return true;
 }
-// Select the game stage-0 UV set; reject absent UV1/UV2.
+// Select the game stage-0 UV set; reject absent UV1/UV2/UV3.
 inline bool game_fvf_select_uv(const GameFvfSample& sample,
                                const GameFvfLayout& layout,
                                std::uint32_t coordIndex,
                                float (&uv)[2]) noexcept {
-    if (layout.texcoordCount == 0u || layout.texcoordCount > 3u ||
+    if (layout.texcoordCount == 0u || layout.texcoordCount > 4u ||
         coordIndex >= layout.texcoordCount)
         return false;
     const float* source = coordIndex == 0u ? sample.uv :
-                          coordIndex == 1u ? sample.uv1 : sample.uv2;
+                          coordIndex == 1u ? sample.uv1 :
+                          coordIndex == 2u ? sample.uv2 : sample.uv3;
     std::memcpy(uv, source, sizeof(sample.uv));
     return true;
 }

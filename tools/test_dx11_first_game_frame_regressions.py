@@ -878,7 +878,7 @@ def main() -> None:
             "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
             "nextColorOp != D3DTOP_DISABLE",
         )) and all(x in header for x in (
-            "texcoordBits > kGameFvfTex3",
+            "texcoordBits > kGameFvfTex4",
             "layout.minStride != layout.texcoordOffset + layout.texcoordCount * 8u",
             "std::memcpy(candidate.uv1, data + layout.texcoordOffset + 8u, 8u)",
             "coordIndex >= layout.texcoordCount",
@@ -898,7 +898,7 @@ def main() -> None:
         broken = bridge.replace(good, bad, 1)
         assert broken != bridge and not tex2_connected(broken, layout_source, probe_source)
     for good, bad in (
-        ("texcoordBits > kGameFvfTex3", "texcoordBits > 0x0f00u"),
+        ("texcoordBits > kGameFvfTex4", "texcoordBits > 0x0f00u"),
         ("layout.minStride != layout.texcoordOffset + layout.texcoordCount * 8u",
          "layout.minStride != layout.texcoordOffset + 8u"),
         ("std::memcpy(candidate.uv1, data + layout.texcoordOffset + 8u, 8u)",
@@ -909,7 +909,7 @@ def main() -> None:
     # TEX3 live-stream third UV remains linked to native Draw and index2.
     assert "kGameFvfTex3 == D3DFVF_TEX3" in bridge
     assert "std::memcpy(candidate.uv2, data + layout.texcoordOffset + 16u, 8u)" in layout_source
-    assert "coordIndex == 1u ? sample.uv1 : sample.uv2" in layout_source
+    assert "coordIndex == 2u ? sample.uv2 : sample.uv3" in layout_source
     assert "assert(!game_fvf_decode_vertex(&three, 39u" in probe_source
     assert "assert(!game_fvf_select_uv(sample, layout, 3u, chosen))" in probe_source
     changed = layout_source.replace(
@@ -917,7 +917,44 @@ def main() -> None:
         "std::memcpy(candidate.uv2, data + layout.texcoordOffset + 8u, 8u)", 1)
     assert changed != layout_source
     assert "std::memcpy(candidate.uv2, data + layout.texcoordOffset + 16u, 8u)" not in changed
-    print("DX11 TEX2/TEX3 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
+    # TEX4 UV3 must be visible to native Draw/DrawIndexed while D3D9 runs.
+    def tex4_connected(code: str, header: str, probe: str) -> bool:
+        return all(x in code for x in (
+            "kGameFvfTex4 == D3DFVF_TEX4",
+            "coordIndex >= layout.texcoordCount",
+            "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+        )) and all(x in header for x in (
+            "texcoordBits > kGameFvfTex4",
+            "layout.texcoordCount > 4u",
+            "std::memcpy(candidate.uv3, data + layout.texcoordOffset + 24u, 8u)",
+            "coordIndex == 2u ? sample.uv2 : sample.uv3",
+        )) and all(x in probe for x in (
+            "kGameFvfXyzRhw | kGameFvfTex4",
+            "game_fvf_select_uv(sample, layout, 3u, chosen)",
+            "!game_fvf_decode_vertex(&four, 47u",
+            "!game_fvf_select_uv(sample, layout, 4u, chosen)",
+            "!game_fvf_layout(kGameFvfXyzRhw | 0x500u",
+        ))
+    assert tex4_connected(bridge, layout_source, probe_source)
+    for old, wrong in (
+        ("kGameFvfTex4 == D3DFVF_TEX4", "kGameFvfTex4 == D3DFVF_TEX3"),
+        ("coordIndex >= layout.texcoordCount", "coordIndex > layout.texcoordCount"),
+    ):
+        broken = bridge.replace(old, wrong, 1)
+        assert broken != bridge and not tex4_connected(broken, layout_source, probe_source)
+    for old, wrong in (
+        ("texcoordBits > kGameFvfTex4", "texcoordBits > 0x0f00u"),
+        ("layout.texcoordCount > 4u", "layout.texcoordCount > 5u"),
+        ("std::memcpy(candidate.uv3, data + layout.texcoordOffset + 24u, 8u)",
+         "std::memcpy(candidate.uv3, data + layout.texcoordOffset + 16u, 8u)"),
+        ("coordIndex == 2u ? sample.uv2 : sample.uv3",
+         "coordIndex == 2u ? sample.uv3 : sample.uv2"),
+    ):
+        broken = layout_source.replace(old, wrong, 1)
+        assert broken != layout_source and not tex4_connected(bridge, broken, probe_source)
+    print("DX11 TEX2/TEX3/TEX4 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":
