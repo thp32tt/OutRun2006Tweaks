@@ -192,7 +192,7 @@ class TestBC3ImageGenBridge(unittest.TestCase):
         self.assertEqual(len(changed),8)
         for i in changed:
             bx,by=i%16,i//16
-            self.assertTrue(4<=bx<8 and 4<=by<6)
+            self.assertTrue(4<=bx<8 and 10<=by<12)  # DDS RAW is vertically inverted
 
     def test_bc3_full_pipeline_b_and_c1_unapproved(self):
         for role,index in (("B",60),("C1",102)):
