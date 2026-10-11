@@ -93,9 +93,9 @@ int main() {
  assert(!R30BuildEyeAffine(f,s,o));assert(tanCalls==14);
  f.eyeFov[0].angleLeft=-.85f;check(f);assert(tanCalls==18);
  f.eyeFov[0].angleLeft=1.40f;f.eyeFov[0].angleRight=1.401f;
- assert(!R30BuildEyeAffine(f,s,o)); assert(tanCalls==22);
+ assert(!R30BuildEyeAffine(f,s,o)); assert(tanCalls==20);
  f.eyeFov[0].angleLeft=-.85f;f.eyeFov[0].angleRight=.80f;
- check(f);assert(tanCalls==26);
+ check(f);assert(tanCalls==24);
  return 0;
 }
 """.replace("__AFFINE__", affine.replace("std::tan(", "CountedTan("))
