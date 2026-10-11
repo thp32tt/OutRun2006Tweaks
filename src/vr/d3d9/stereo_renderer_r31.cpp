@@ -65,6 +65,8 @@ namespace OutRunVRStereo
             decltype(OutRunVRRenderer::LatchedStereoFrame::eyeOffset) eyeOffset{};
             decltype(OutRunVRRenderer::LatchedStereoFrame::eyeFov) eyeFov{};
             D3DMATRIX eyeTail[2]{};
+            // Cache projection-compensated eye transforms across world draws.
+            D3DMATRIX composedEyeTail[2]{};
         };
         R31EyeTailCache R31EyeCache{};
 
@@ -288,6 +290,10 @@ namespace OutRunVRStereo
                 next.eyeTail[eye] = R30SupportMultiplyMatrix(eyeInverse, eyeProjection);
                 if (!R30SupportMatrixFinite(next.eyeTail[eye]))
                     return false;
+                next.composedEyeTail[eye] = R30SupportMultiplyMatrix(
+                    inverseProjection, next.eyeTail[eye]);
+                if (!R30SupportMatrixFinite(next.composedEyeTail[eye]))
+                    return false;
             }
             next.valid = true;
             R31EyeCache = next;
@@ -360,15 +366,13 @@ namespace OutRunVRStereo
             D3DMATRIX uploadedT{};
             std::memcpy(&uploadedT, originalWvp, sizeof(uploadedT));
             const D3DMATRIX currentWvp = R30SupportTransposeMatrix(uploadedT);
-            const D3DMATRIX correctedWorldView = R30SupportMultiplyMatrix(
-                currentWvp, R31EyeCache.inverseProjection);
-            if (!R30SupportMatrixFinite(correctedWorldView))
-                return false;
-
+            // Reassociate projection correction on the cache miss rather
+            // than recomputing the shared 4x4 product on every world draw.
+            // The verified/live original WVP upload remains unchanged.
             for (int eye = 0; eye < 2; ++eye)
             {
                 const D3DMATRIX eyeWvp = R30SupportMultiplyMatrix(
-                    correctedWorldView, R31EyeCache.eyeTail[eye]);
+                    currentWvp, R31EyeCache.composedEyeTail[eye]);
                 if (!R30SupportMatrixFinite(eyeWvp))
                     return false;
                 const D3DMATRIX eyeWvpT = R30SupportTransposeMatrix(eyeWvp);

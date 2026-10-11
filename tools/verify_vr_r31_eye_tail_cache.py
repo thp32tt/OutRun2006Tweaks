@@ -45,11 +45,21 @@ def violations(source: str) -> list[str]:
         errors.append("inverseProjection: missing cache-miss inverse calculation")
     if "next.inverseProjection = inverseProjection;" not in fill:
         errors.append("inverseProjection: missing cache-miss snapshot")
+    if "D3DMATRIX composedEyeTail[2]{};" not in cache:
+        errors.append("composedEyeTail: cache storage missing")
+    if "next.composedEyeTail[eye] = R30SupportMultiplyMatrix(\n                    inverseProjection, next.eyeTail[eye]);" not in prepare:
+        errors.append("composedEyeTail: cache-miss composition missing")
+    if "if (!R30SupportMatrixFinite(next.composedEyeTail[eye]))" not in prepare:
+        errors.append("composedEyeTail: nonfinite cache publish possible")
     caller = body(source, "bool R31BuildFastWorldConstants(")
     if "R30SupportGetInverseProjection(" in caller:
         errors.append("inverseProjection: caller performs per-draw inversion")
     if "R31PrepareEyeTailCache(stereo, projection)" not in caller:
         errors.append("inverseProjection: caller does not use cached inverse")
+    if "currentWvp, R31EyeCache.composedEyeTail[eye]);" not in caller:
+        errors.append("composedEyeTail: per-draw path still runs a third multiply")
+    if "correctedWorldView" in caller:
+        errors.append("composedEyeTail: legacy per-draw inverse multiplication remains")
     if "R31EyeCache = next;" not in prepare or "if (!R30SupportMatrixFinite(next.eyeTail[eye]))" not in prepare:
         errors.append("transactional finite validation/publish lost")
     reset = body(source, "inline void R31ResetFastPathState()")
@@ -75,6 +85,9 @@ def main() -> None:
         "R31ProjectionMatches(R31EyeCache.projection, projection)",
         "R30SupportGetInverseProjection(projection, inverseProjection)",
         "next.inverseProjection = inverseProjection;",
+        "next.composedEyeTail[eye] = R30SupportMultiplyMatrix(",
+        "if (!R30SupportMatrixFinite(next.composedEyeTail[eye]))",
+        "currentWvp, R31EyeCache.composedEyeTail[eye]);",
     )
     for marker in negative_markers:
         if source.count(marker) != 1 or not violations(source.replace(marker, "MUTATED", 1)):

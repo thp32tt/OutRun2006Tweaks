@@ -31,7 +31,7 @@ def violations(source: str) -> list[str]:
         "std::memcpy(draw.originalConstants, originalWvp, sizeof(verified));",
         "std::memcpy(&uploadedT, originalWvp, sizeof(uploadedT));",
         "const D3DMATRIX currentWvp = R30SupportTransposeMatrix(uploadedT);",
-        "const D3DMATRIX correctedWorldView = R30SupportMultiplyMatrix(\n                currentWvp, R31EyeCache.inverseProjection);",
+        "const D3DMATRIX eyeWvp = R30SupportMultiplyMatrix(\n                    currentWvp, R31EyeCache.composedEyeTail[eye]);",
     )
     missing = [item for item in required if body.count(item) != 1]
     if missing:
@@ -65,6 +65,7 @@ def main() -> None:
         ("std::memcpy(&uploadedT, originalWvp, sizeof(uploadedT));",
          "std::memcpy(&uploadedT, verified, sizeof(uploadedT));"),
         ("liveValidated = true;", "liveValidated = false;"),
+        ("R31EyeCache.composedEyeTail[eye]", "R31EyeCache.eyeTail[eye]"),
     )
     for before, after in mutations:
         if source.count(before) != 1 or not violations(source.replace(before, after, 1)):
