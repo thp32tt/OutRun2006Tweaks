@@ -41,6 +41,44 @@ int main()
     // A gap exactly at the backward reset threshold keeps the old phase.
     REQUIRE(!Advance(100, period, 100 + 1'000'000'000).issue);
 
+    // Regression: XR STOPPING/READY may restart its display-time epoch near
+    // the old deadline (<1s), or return at a different headset refresh rate.
+    // Keeping the previous schedule incorrectly suppresses first game renders.
+    OutRunVR::CadenceSchedule::SessionEpoch epoch{};
+    epoch.nextRequestDisplayTime = due.nextDisplayTime;
+    epoch.activeRenderHz = 90.0f;
+    epoch.pendingRenderHz = 72.0f;
+    epoch.pendingRenderHzSamples = 19;
+    epoch.actualXrHz = 89.9;
+    epoch.actualDisplayPeriodMs = 11.1;
+    epoch.lastLoggedXrHz = 90.0;
+    REQUIRE(!epoch.OnRunningTransition(true, true));
+    REQUIRE(epoch.nextRequestDisplayTime == due.nextDisplayTime &&
+        epoch.pendingRenderHzSamples == 19);
+    const auto staleResume = Advance(10'018'000'000, period,
+        epoch.nextRequestDisplayTime);
+    REQUIRE(!staleResume.issue); // pre-fix: suppresses first frame
+    REQUIRE(epoch.OnRunningTransition(true, false));
+    REQUIRE(epoch.nextRequestDisplayTime == 0 &&
+        epoch.activeRenderHz == 0.0f &&
+        epoch.pendingRenderHz == 0.0f &&
+        epoch.pendingRenderHzSamples == 0 &&
+        epoch.actualXrHz == 0.0 &&
+        epoch.actualDisplayPeriodMs == 0.0 &&
+        epoch.lastLoggedXrHz == 0.0);
+    // 15ms backwards is below the old 1s discontinuity threshold, yet the
+    // resumed first frame must be due rather than waiting for the old phase.
+    const auto resumed = Advance(10'018'000'000, period,
+        epoch.nextRequestDisplayTime);
+    REQUIRE(resumed.issue && resumed.nextDisplayTime == 10'034'666'667);
+    epoch.nextRequestDisplayTime = resumed.nextDisplayTime;
+    REQUIRE(!epoch.OnRunningTransition(false, false));
+    REQUIRE(epoch.nextRequestDisplayTime == resumed.nextDisplayTime);
+    REQUIRE(epoch.OnRunningTransition(false, true));
+    REQUIRE(epoch.nextRequestDisplayTime == 0);
+    // Fresh refresh sampling may select a new 72Hz mode, not inherit 90Hz.
+    REQUIRE(epoch.activeRenderHz == 0.0f && epoch.actualXrHz == 0.0);
+
     std::cout << "CADENCE-SCHEDULE PASS: 90/60 phase, pause, XR epoch reset, overflow\n";
     return 0;
 }

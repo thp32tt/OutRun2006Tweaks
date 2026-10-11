@@ -1463,11 +1463,15 @@ namespace
 
         bool Enabled() const noexcept { return mode_ != 0 && enabled_; }
         int Mode() const noexcept { return mode_; }
-        float TargetHz() const noexcept { return activeRenderHz_; }
+        float TargetHz() const noexcept { return sessionEpoch_.activeRenderHz; }
         std::uint32_t TimeoutMs() const noexcept { return timeoutMs_; }
 
         void SetRunning(bool running) noexcept
         {
+            // Session stop/restart invalidates both XR display-time phase and
+            // the previous runtime's refresh estimate. Leave requestId_
+            // monotonic so late game completions cannot match a new request.
+            sessionEpoch_.OnRunningTransition(running_, running);
             running_ = running;
             enabled_ = mode_ != 0;
             Publish();
@@ -1496,45 +1500,45 @@ namespace
         {
             float desired = configuredTargetHz_ > 0.0f
                 ? configuredTargetHz_
-                : QuantizeRuntimeHz(actualXrHz_);
+                : QuantizeRuntimeHz(sessionEpoch_.actualXrHz);
             desired = std::min(desired, maxRenderHz_);
             if (desired <= 0.0f || !std::isfinite(desired))
                 return;
 
-            if (activeRenderHz_ <= 0.0f)
+            if (sessionEpoch_.activeRenderHz <= 0.0f)
             {
-                activeRenderHz_ = desired;
-                nextRequestDisplayTime_ = 0;
+                sessionEpoch_.activeRenderHz = desired;
+                sessionEpoch_.nextRequestDisplayTime = 0;
                 return;
             }
 
-            if (std::fabs(activeRenderHz_ - desired) < 0.5f)
+            if (std::fabs(sessionEpoch_.activeRenderHz - desired) < 0.5f)
             {
-                pendingRenderHz_ = 0.0f;
-                pendingRenderHzSamples_ = 0;
+                sessionEpoch_.pendingRenderHz = 0.0f;
+                sessionEpoch_.pendingRenderHzSamples = 0;
                 return;
             }
 
-            if (std::fabs(pendingRenderHz_ - desired) < 0.5f)
-                ++pendingRenderHzSamples_;
+            if (std::fabs(sessionEpoch_.pendingRenderHz - desired) < 0.5f)
+                ++sessionEpoch_.pendingRenderHzSamples;
             else
             {
-                pendingRenderHz_ = desired;
-                pendingRenderHzSamples_ = 1;
+                sessionEpoch_.pendingRenderHz = desired;
+                sessionEpoch_.pendingRenderHzSamples = 1;
             }
 
             // About a quarter second at common Quest rates. This filters
             // xrWaitFrame period noise but still follows a deliberate VD
             // 72/80/90/120 Hz mode switch quickly.
-            if (pendingRenderHzSamples_ >= 20)
+            if (sessionEpoch_.pendingRenderHzSamples >= 20)
             {
-                activeRenderHz_ = pendingRenderHz_;
-                pendingRenderHz_ = 0.0f;
-                pendingRenderHzSamples_ = 0;
-                nextRequestDisplayTime_ = 0;
+                sessionEpoch_.activeRenderHz = sessionEpoch_.pendingRenderHz;
+                sessionEpoch_.pendingRenderHz = 0.0f;
+                sessionEpoch_.pendingRenderHzSamples = 0;
+                sessionEpoch_.nextRequestDisplayTime = 0;
                 std::cout
-                    << "[R36 cadence] activeRenderHz=" << activeRenderHz_
-                    << " actualXrHz=" << actualXrHz_
+                    << "[R36 cadence] activeRenderHz=" << sessionEpoch_.activeRenderHz
+                    << " actualXrHz=" << sessionEpoch_.actualXrHz
                     << " maxRenderHz=" << maxRenderHz_
                     << " policy="
                     << (configuredTargetHz_ > 0.0f ? "fixed" : "auto-native")
@@ -1551,28 +1555,28 @@ namespace
             if (!Enabled() || !running_ ||
                 frame.predictedDisplayPeriod <= 0 ||
                 frame.predictedDisplayTime <= 0 ||
-                activeRenderHz_ <= 0.0f)
+                sessionEpoch_.activeRenderHz <= 0.0f)
                 return { requestId_, false };
 
             // In Auto mode, if the cap permits the runtime's native mode,
             // release exactly one game render per xrWaitFrame. This avoids
             // 60->90 3:2 cadence and the accumulated rounding drift of an
             // independently generated target timeline.
-            const float nativeHz = QuantizeRuntimeHz(actualXrHz_);
+            const float nativeHz = QuantizeRuntimeHz(sessionEpoch_.actualXrHz);
             const bool nativeOneToOne =
                 configuredTargetHz_ <= 0.0f &&
                 maxRenderHz_ + 0.5f >= nativeHz &&
-                std::fabs(activeRenderHz_ - nativeHz) < 0.5f;
+                std::fabs(sessionEpoch_.activeRenderHz - nativeHz) < 0.5f;
 
             if (!nativeOneToOne)
             {
                 const XrTime targetPeriod = static_cast<XrTime>(
                     std::llround(1000000000.0 /
-                        static_cast<double>(activeRenderHz_)));
+                        static_cast<double>(sessionEpoch_.activeRenderHz)));
                 const auto decision = OutRunVR::CadenceSchedule::Advance(
                     frame.predictedDisplayTime, targetPeriod,
-                    nextRequestDisplayTime_);
-                nextRequestDisplayTime_ = decision.nextDisplayTime;
+                    sessionEpoch_.nextRequestDisplayTime);
+                sessionEpoch_.nextRequestDisplayTime = decision.nextDisplayTime;
                 if (!decision.issue)
                     return { requestId_, false };
             }
@@ -1679,8 +1683,8 @@ namespace
         {
             OutRunVR::CadenceV1::ClientState client{};
             const bool haveClient = ReadClient(client);
-            const double ratio = activeRenderHz_ > 0.0f
-                ? actualXrHz_ / static_cast<double>(activeRenderHz_) : 0.0;
+            const double ratio = sessionEpoch_.activeRenderHz > 0.0f
+                ? sessionEpoch_.actualXrHz / static_cast<double>(sessionEpoch_.activeRenderHz) : 0.0;
             const double nearestInteger = std::round(ratio);
             const bool integerCadence = ratio >= 1.0 &&
                 nearestInteger >= 1.0 &&
@@ -1688,10 +1692,10 @@ namespace
             out << " cadence={mode:" << mode_
                 << ",configuredTargetHz:" << configuredTargetHz_
                 << ",maxRenderHz:" << maxRenderHz_
-                << ",activeRenderHz:" << activeRenderHz_
+                << ",activeRenderHz:" << sessionEpoch_.activeRenderHz
                 << ",requestedRefreshHz:" << requestedRefreshHz_
-                << ",actualXrHz:" << actualXrHz_
-                << ",xrPeriodMs:" << actualDisplayPeriodMs_
+                << ",actualXrHz:" << sessionEpoch_.actualXrHz
+                << ",xrPeriodMs:" << sessionEpoch_.actualDisplayPeriodMs
                 << ",xrGameRatio:" << ratio
                 << ",ratioKind:" << (integerCadence ? "integer" : "fractional")
                 << ",xr:" << intervalXrFrames_
@@ -1749,30 +1753,30 @@ namespace
                 hz < 30.0 || hz > 180.0)
                 return;
 
-            actualDisplayPeriodMs_ = periodMs;
+            sessionEpoch_.actualDisplayPeriodMs = periodMs;
             // Small EWMA filters occasional runtime period noise without hiding
             // a real 72/80/90/120 Hz mode switch.
-            actualXrHz_ = actualXrHz_ > 0.0
-                ? actualXrHz_ * 0.90 + hz * 0.10
+            sessionEpoch_.actualXrHz = sessionEpoch_.actualXrHz > 0.0
+                ? sessionEpoch_.actualXrHz * 0.90 + hz * 0.10
                 : hz;
 
-            if (lastLoggedXrHz_ <= 0.0 ||
-                std::fabs(actualXrHz_ - lastLoggedXrHz_) >= 0.75)
+            if (sessionEpoch_.lastLoggedXrHz <= 0.0 ||
+                std::fabs(sessionEpoch_.actualXrHz - sessionEpoch_.lastLoggedXrHz) >= 0.75)
             {
-                lastLoggedXrHz_ = actualXrHz_;
-                const double ratio = activeRenderHz_ > 0.0f
-                    ? actualXrHz_ / static_cast<double>(activeRenderHz_) : 0.0;
+                sessionEpoch_.lastLoggedXrHz = sessionEpoch_.actualXrHz;
+                const double ratio = sessionEpoch_.activeRenderHz > 0.0f
+                    ? sessionEpoch_.actualXrHz / static_cast<double>(sessionEpoch_.activeRenderHz) : 0.0;
                 const double nearestInteger = std::round(ratio);
                 const bool integerCadence = ratio >= 1.0 &&
                     nearestInteger >= 1.0 &&
                     std::fabs(ratio - nearestInteger) <= 0.02;
                 std::cout
-                    << "[R35 refresh] actualXrHz=" << actualXrHz_
-                    << " displayPeriodMs=" << actualDisplayPeriodMs_
+                    << "[R35 refresh] actualXrHz=" << sessionEpoch_.actualXrHz
+                    << " displayPeriodMs=" << sessionEpoch_.actualDisplayPeriodMs
                     << " requestedOverrideHz=" << requestedRefreshHz_
                     << " configuredTargetHz=" << configuredTargetHz_
                     << " maxRenderHz=" << maxRenderHz_
-                    << " activeRenderHz=" << activeRenderHz_
+                    << " activeRenderHz=" << sessionEpoch_.activeRenderHz
                     << " ratio=" << ratio
                     << " ratioKind="
                     << (integerCadence ? "integer" : "fractional")
@@ -1802,7 +1806,7 @@ namespace
             host_->requestId = requestId_;
             host_->poseSequence = poseSequence_;
             host_->targetHzMilli = static_cast<std::uint32_t>(
-                std::lround(std::max(0.0f, activeRenderHz_) * 1000.0f));
+                std::lround(std::max(0.0f, sessionEpoch_.activeRenderHz) * 1000.0f));
             host_->timeoutMs = timeoutMs_;
             host_->requestQpc = requestQpc_;
             host_->predictedDisplayTime = predictedDisplayTime_;
@@ -1860,16 +1864,11 @@ namespace
         int mode_ = 0;
         float configuredTargetHz_ = 0.0f;
         float maxRenderHz_ = 120.0f;
-        float activeRenderHz_ = 0.0f;
-        float pendingRenderHz_ = 0.0f;
-        std::uint32_t pendingRenderHzSamples_ = 0;
         std::uint32_t timeoutMs_ = 35;
         float requestedRefreshHz_ = 0.0f;
-        double actualXrHz_ = 0.0;
-        double actualDisplayPeriodMs_ = 0.0;
-        double lastLoggedXrHz_ = 0.0;
         bool enabled_ = false;
         bool running_ = false;
+        OutRunVR::CadenceSchedule::SessionEpoch sessionEpoch_{};
         HANDLE hostMapping_ = nullptr;
         OutRunVR::CadenceV1::HostState* host_ = nullptr;
         HANDLE clientMapping_ = nullptr;
@@ -1881,7 +1880,6 @@ namespace
         std::int64_t requestQpc_ = 0;
         XrTime predictedDisplayTime_ = 0;
         XrDuration predictedDisplayPeriod_ = 0;
-        XrTime nextRequestDisplayTime_ = 0;
 
         std::uint64_t intervalXrFrames_ = 0;
         std::uint64_t intervalRequests_ = 0;

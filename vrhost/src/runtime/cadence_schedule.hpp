@@ -8,6 +8,29 @@
 
 namespace OutRunVR::CadenceSchedule
 {
+    // The display deadline, refresh EWMA and target-rate debounce belong to
+    // one OpenXR session. Carrying them across STOPPING -> READY can discard
+    // the first game presents, especially when the runtime changes Hz/epoch.
+    struct SessionEpoch
+    {
+        std::int64_t nextRequestDisplayTime{};
+        float activeRenderHz{};
+        float pendingRenderHz{};
+        std::uint32_t pendingRenderHzSamples{};
+        double actualXrHz{};
+        double actualDisplayPeriodMs{};
+        double lastLoggedXrHz{};
+
+        constexpr bool OnRunningTransition(bool previouslyRunning,
+            bool running) noexcept
+        {
+            if (previouslyRunning == running)
+                return false;
+            *this = {};
+            return true;
+        }
+    };
+
     struct Decision
     {
         std::int64_t nextDisplayTime{};
