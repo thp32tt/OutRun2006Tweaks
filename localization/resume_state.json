@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C384 C2 EVEN q236 exact B80 SOURCE CLEAN all14 P1 independently PASS, 502626 glyph alpha cleared mask and protected outside0, but final official C358 REWORK 14-row typography still blocked; no repeat B364 C377. Evidence localization/graphics/role_C/20261011-C384-C2-Q236-B80-14ROW-INDEPENDENT-SOURCE-CLEAN/C384_Q236_C2_INDEPENDENT_14ROW_PLATE_QA.json; C3/game UNTESTED.",
     "C383 C1 ODD q099 original/source current exact SHA persisted RAW/FLIPY two-line 100/75/50/zoom source-family independent visual REWORK_REQUIRED, source narrow italic vs blocky/weakly italic Korean. No DDS changed. C3/approval/real-game NOT_RUN, RUNTIME_VALIDATION=UNTESTED, localization/graphics/role_C/20261011-C383-C1-Q099-NATIVE-STYLE-VISUAL-REWORK/C383_Q099_CONTROLLER_C1_VISUAL_REWORK.json",
     "C382 C2 q060 PSD source plate 48 CPU bilinear sample cases 0 visible output differences, yet RGB 89343 noncanonical. Real game/composite HOLD, source-family method-change required. localization/graphics/role_C/20261011-C382-C2-Q060-PSD-TRANSPARENT-RGB-BILINEAR/C382_Q060_INDEPENDENT_PLATE_FILTER_QA.json",
     "C1 2026-10-11 08:19 KST ODD q161 NEW A236 P1 SOURCE/CLEAN immutable PLATE first independent SHA-verified review; canonical ORIGINAL BC3/DXT5 DDS a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d SHA-authenticated 2048² mip1 actual decoded RAW/FLIPY exact readable SOURCE PNG 0 mismatches; CLEAN object 60f5b09266bad5f517c06cdd23b02576ec493b5149fc03dea59ee8d1843f1720 / binary mask dee1f143543cf510968aaf8b1e20d9844327b8b6f9ec4456758544e2410d6320 authenticated. Mask 43827 pixels exactly three English SOURCE regions R11 AQUARIUS/R16 SOUTH KOREA/R24 ITALY; SOURCE->CLEAN RGBA29650/alpha23886 changed only mask, outside 0/0; all23886 source-visible alpha removed and CLEAN residual0; other35 cells exact; source region removed glyph visible gray100 white75 black50 and native RAW in 12 new SHA-bound lossless PNG. Independent PLATE_PASS_SCOPED_3_OF_38, manifest caf59675820b65b4ded62b05e463bfb66c77878a4ba24a4f9ff810e36ff2b9f8 q161, localization/graphics/plate_library/reviews/caf59675820b65b4ded62b05e463bfb66c77878a4ba24a4f9ff810e36ff2b9f8.json. Existing OFFICIAL 8ded856536184ab0a91e2ee014e8dcfaa5f8e21a5400a4891f459e4a195dda65 remains C344 REWORK_REQUIRED, old A218 trial 8000601ead8b2858b36f8078b92898405b9621ca5b03b553918df8acdf38e05e C349 HOLD is NOT re-reviewed or re-scored, Korean DDS produced/approved0; remaining35 and source-family typography unresolved, C3/APPROVAL/USER_GAME NOT_RUN RUNTIME_VALIDATION=UNTESTED. Independent QA localization/graphics/role_C/20261011-C1-Q161-A236-INDEPENDENT-P1-CLEAN/C1_Q161_A236_INDEPENDENT_PLATE_QA.json; RUN_KEY=OUTRUN-KOR-C1-Q161-A236-INDEPENDENT-SOURCE-CLEAN-P1-20261011-0810.",
@@ -7038,7 +7039,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-11 08:25 KST",
+  "updated_at_kst": "2026-10-11 09:01 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -15851,5 +15852,27 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "execution_backend": "GitHub+N100 MCP fallback exact binary DDS decode",
     "qa_report": "localization/graphics/role_C/20261011-C383-C1-Q099-NATIVE-STYLE-VISUAL-REWORK/C383_Q099_CONTROLLER_C1_VISUAL_REWORK.json"
+  },
+  "c384_c2_q236_b80_p1_full14_20261011": {
+    "review_id": "C384-C2-Q236-B80-ALL14-PLATE-FIRST-INDEPENDENT-20261011",
+    "role": "C2",
+    "queue_index": 236,
+    "stage": "P1_SOURCE_CLEAN_INDEPENDENT_FULL14",
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "clean_sha256": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7",
+    "source_alpha_removed_pixels": 502626,
+    "changed_outside_source_mask": 0,
+    "changed_protected": 0,
+    "source_dds_readable_png_mismatch": 0,
+    "full14_clean_residue_alpha": 0,
+    "stage_result": "SCOPED_PASS_P1_14_OF_14",
+    "official_status": "C358_REWORK_REQUIRED_UNCHANGED",
+    "B364_trial": "C377_ROW05_HOLD_UNCHANGED",
+    "candidate_sha_reapproved": false,
+    "full_C_PASS": false,
+    "APPROVAL": false,
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261011-C384-C2-Q236-B80-14ROW-INDEPENDENT-SOURCE-CLEAN/C384_Q236_C2_INDEPENDENT_14ROW_PLATE_QA.json"
   }
 }

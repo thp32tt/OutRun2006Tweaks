@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 08:47 KST",
+  "updated_at_kst": "2026-10-11 09:01 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -12403,5 +12403,27 @@
     "RUNTIME_VALIDATION": "UNTESTED",
     "execution_backend": "GitHub+N100 MCP fallback exact binary DDS decode",
     "qa_report": "localization/graphics/role_C/20261011-C383-C1-Q099-NATIVE-STYLE-VISUAL-REWORK/C383_Q099_CONTROLLER_C1_VISUAL_REWORK.json"
+  },
+  "c384_c2_q236_b80_p1_full14_20261011": {
+    "review_id": "C384-C2-Q236-B80-ALL14-PLATE-FIRST-INDEPENDENT-20261011",
+    "role": "C2",
+    "queue_index": 236,
+    "stage": "P1_SOURCE_CLEAN_INDEPENDENT_FULL14",
+    "source_sha256": "a1c7f7d6ca5d2440076e49477cefecbf5084b4188072f3427ff13e5da24bc518",
+    "clean_sha256": "c202f55e0de29e98d48e182f50cff8a94bcaa32bafc14c884644868db6552af7",
+    "source_alpha_removed_pixels": 502626,
+    "changed_outside_source_mask": 0,
+    "changed_protected": 0,
+    "source_dds_readable_png_mismatch": 0,
+    "full14_clean_residue_alpha": 0,
+    "stage_result": "SCOPED_PASS_P1_14_OF_14",
+    "official_status": "C358_REWORK_REQUIRED_UNCHANGED",
+    "B364_trial": "C377_ROW05_HOLD_UNCHANGED",
+    "candidate_sha_reapproved": false,
+    "full_C_PASS": false,
+    "APPROVAL": false,
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261011-C384-C2-Q236-B80-14ROW-INDEPENDENT-SOURCE-CLEAN/C384_Q236_C2_INDEPENDENT_14ROW_PLATE_QA.json"
   }
 }
