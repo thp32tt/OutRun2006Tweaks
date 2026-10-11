@@ -1,3 +1,7 @@
+## 2026-10-12 06:42 KST — B q116 real canonical source clean and English lettering
+
+- RUN_KEY=OUTRUN-KOR-B-Q116-CANONICAL-SOURCE-CLEAN-20261012-0630. B-owned q116 REWORK `E3FD08BE`. Exact SOURCE BC3 524416B SHA `ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845`, verified mirror PSD SHA `3406257ce04ed7af0ef554496095236587133df445fb695aa305ac6703800185` (699662B, Git blob `55935a5e...`) contains `Decompressed Image` + `Heart Attack Mode` layers. Source / PSD composite differs at 87364 pixels ALL inside text effect bbox [393,54,1628,200], outside0, so PSD not substituted for exact source. New genuine native CLEAN RGBA32 PNG SHA `460330537679b3a49d30773b86a4df40ecf06cb1e9aa6bc0b41e2d264901d808` removes 152208 source alpha-positive pixels, outside allowed ROI RGBA0, native remaining alpha-positive 0; full original mask and English text-only PNG with24px transparent margin SHA `475cddcd3634364da8f5780de5b86c7a909464f9975f15ea5687f07fac708ce9` and lossless PSD/source/CLEAN plus native 100/75/50 comparison files archived under `localization/graphics/role_B/20261012-B-Q116-CANONICAL-SOURCE-CLEAN`. Independent C2 PLATE_PASS pending; actual ChatGPT image-generator media attachment not verified, `SOURCE_REFERENCE_NOT_BOUND`: no generator call, no Korean PNG, DDS0, no existing candidate changes. Previous q116 C2 REWORK & new C3/user-game outstanding, RUNTIME_VALIDATION=UNTESTED.
+
 
 ### 2026-10-12 — C1 q098 genuine PSD v02 English leaf source imported
 

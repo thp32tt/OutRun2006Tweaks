@@ -1,3 +1,4 @@
+- **2026-10-12 06:42 KST B q116:** NEW real exact canonical SOURCE 2048x256 derived CLEAN+source alpha mask+transparent English-only text PNG, native100/75/50 comparisons; source-alpha152208 cleared, RGBA outside ROI0, PSD not canonical due 87364 inside pixel mismatches. SOURCE_REFERENCE_NOT_BOUND ImageGen hard stop, no actual Korean image or DDS; official q116 unchanged C2 REWORK; C2 plate/C3/game not run. `localization/graphics/role_B/20261012-B-Q116-CANONICAL-SOURCE-CLEAN/B_Q116_SOURCE_CLEAN_PRODUCER_QA.json` RUN_KEY=OUTRUN-KOR-B-Q116-CANONICAL-SOURCE-CLEAN-20261012-0630; RUNTIME_VALIDATION=UNTESTED.
 
 ### 2026-10-12 C1 q098 PSD v02 English lettering source
 
