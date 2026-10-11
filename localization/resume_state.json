@@ -15948,5 +15948,24 @@
     "C3": "NOT_RUN",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261011-C1-Q111-17REGION-CLEAN-COMPOSITE-REWORK/C1_Q111_INDEPENDENT_FULL17_VISUAL_REWORK.json"
+  },
+  "c386_c2_q176_b366_first_independent_saved_20261011": {
+    "review_id": "C386-C2-Q176-B366-INDEPENDENT-PERSISTED-SOURCE-STYLE-20261011",
+    "shard": "EVEN",
+    "queue_index": 176,
+    "producer_candidate_sha256": "ec35b79ce4baa72485f3446559a16dcdc040a2a3f99b99f38c641b549e0e15c5",
+    "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+    "official_unchanged_sha256": "494d42c09c58241405dd14de74ca976b5432d84eb250d4bceb5684e97fbad407",
+    "prior_rejected_C379_B365_sha256": "13e0c5418209c4686984302366dfeef4fbd5fac2b4aba23357f56674c7ad38e7",
+    "decision": "REWORK_REQUIRED_UNPROMOTED_VISUAL_SOURCE_FAMILY_BLOCK_STROKE",
+    "changed_official_to_B366_rgba": 112299,
+    "changed_outside_original_roi": 0,
+    "number4_visible_source_exact": 8928,
+    "current_official_status": "C343_REWORK_REQUIRED",
+    "C2_final_pass": false,
+    "C3": "NOT_RUN",
+    "APPROVAL": false,
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_C/20261011-C2-Q176-B366-MANUAL-NATIVE-INDEPENDENT/C386_Q176_C2_INDEPENDENT_REWORK.json"
   }
 }
