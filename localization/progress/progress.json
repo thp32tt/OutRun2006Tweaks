@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 12:47 KST",
+  "updated_at_kst": "2026-10-11 13:13 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -761,6 +761,55 @@
         "RUNTIME_VALIDATION": "UNTESTED",
         "qa": "localization/graphics/role_B/20261011-B369-Q060-SOURCE-CONDITIONED-HEAVY-CONTOURS/B369_CONTROLLER_SAVED_VISUAL_QA.json",
         "worker_run_id": 38109144572
+      },
+      "latest_a239_q121_source_curved_italic_20261011": {
+        "run_key": "OUTRUN-KOR-A239-Q121-P0-SOURCE-SLANT-CURVE-20261011-1300",
+        "role": "A",
+        "index": 121,
+        "priority": "P0",
+        "backend": "GitHub Actions ubuntu-latest",
+        "original_source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+        "unchanged_official_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+        "previous_C1_rejected_sha256": "78806f6df21a9f7c5a6d155db57c52221f22bad58dd3611c6d9778327b79e66a",
+        "new_unpromoted_sha256": "e31117743295950fad5216a428b0c105fff35bfeeb0709da85f9f96f8151544a",
+        "new_trial_count": 1,
+        "official_promotion_count": 0,
+        "method": "per-stroke authored source-racing-oblique curve-reconstructed Hangul; separated native geometry, navy rim, shallow extrusion, white face",
+        "native": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mips": 1,
+        "ROI": [
+          3490,
+          391,
+          3722,
+          440
+        ],
+        "saved_alpha_bbox_raw_local": [
+          7,
+          1,
+          228,
+          48
+        ],
+        "alpha_silhouette_xor_against_A238": 785,
+        "changed_rgba_inside": 9785,
+        "changed_rgba_outside": 0,
+        "protected_other29": "BYTE_EXACT",
+        "saved_dds_roundtrip_mismatch": 0,
+        "optical_producer": "HOLD_SOURCE_STYLE_NOT_APPROVED",
+        "C1": "NOT_RUN_NEW_A239",
+        "C3": "NOT_RUN",
+        "user_game": "UNTESTED",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "ingame_issues": [
+          "IGR-030",
+          "IGR-031",
+          "IGR-040"
+        ],
+        "qa": "localization/graphics/role_A/20261011-A239-Q121-OBLIQUE-ROUNDED-VECTOR/A239_CONTROLLER_PERSISTED_VISUAL_QA.json",
+        "GH_CPU_run_id": 38110544667
       }
     },
     "runtime_text_trace": {
