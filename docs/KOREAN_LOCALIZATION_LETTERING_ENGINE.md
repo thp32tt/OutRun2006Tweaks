@@ -1,5 +1,10 @@
 # 글자 형태와 효과를 분리하는 제작 구조 — 2026-10-11
 
+## 2026-10-11 B-only ImageGen route
+
+아래 폰트/벡터/기하·face 분리 요구는 **A 기존 작업과 해당 엔진을 사용하는 기존 후보**에 그대로 적용한다. B의 **새 글자 생성은** `docs/KOREAN_LOCALIZATION_B_IMAGEGEN_LANE.md` 우선: ChatGPT 생성 투명 PNG의 실제 SHA·생성 ID·원본 참조를 보존하고 단일 premultiplied-alpha 축소로 CLEAN에 합성한다. B에서 이미 생성된 그래픽을 다시 글꼴/수제 벡터로 제작하지 않는다. 새 공식 DDS 게시 전에는 기존 생산 픽셀 게이트 및 C/C3/실기 독립 승인 요건이 그대로 남는다. B 시범 생성 자체는 lettering_recipe 자동 PASS가 아니다.
+
+
 기존 A/B/C1/C2/C3, 단일 큐, 스케줄, CLEAN 라이브러리를 유지한다.
 변경 지점은 P2 글자 제작과 새 공식 DDS의 게시 검사다. 기존 바이트의 승인을
 이 문서만으로 취소하거나 같은 DDS를 다시 만들지 않는다.
