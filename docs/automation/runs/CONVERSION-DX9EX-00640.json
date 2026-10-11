@@ -1,0 +1,64 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00640",
+  "production_id": "CONVERSION-DX9EX-00640",
+  "event_id": "CONVERSION-DX9EX-00640-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R23_PRIVATE_EYE_DEPTH_STENCIL_CLEAR_BATCH",
+  "work_key": "DX9EX_R23_DEPTH_STENCIL_CLEAR_BATCH_00640",
+  "initial_material_sha": "d3ad2ab7e6cd769665904eb4847831b7d59a8ae5",
+  "material_result_sha": "d3ad2ab7e6cd769665904eb4847831b7d59a8ae5",
+  "material_commits": [
+    "d3ad2ab7e6cd769665904eb4847831b7d59a8ae5"
+  ],
+  "verifier_repair_commits": [],
+  "result_sha": "d3ad2ab7e6cd769665904eb4847831b7d59a8ae5",
+  "validation_bearing_result_sha": "d3ad2ab7e6cd769665904eb4847831b7d59a8ae5",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Reduce duplicate D3D9 depth/stencil GPU Clear submissions when R23 initializes verified right-eye and mono private depth surfaces.",
+    "acceptance": "One combined D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL per compatible stencil-safe eye; preserve stencil-unsafe/non-stencil depth-only fallback, game raster state restoration, clear-write counts and rollback baseline; 11 negative mutations + exact SHA DX9Ex Active 5/5, Domain and Full Source Impact 3/3.",
+    "runtime_metrics": "Quest3/VDXR native GPU/CPU frametime, p95/p99 and actual FPS delta not measured."
+  },
+  "acceptance_results": [
+    {
+      "item": "R23_PRIVATE_DEPTH_STENCIL_GPU_CLEAR_BATCH",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Actual C++ stereo_renderer_r23.cpp on d3ad2ab7e6cd769665904eb4847831b7d59a8ae5 merges two depth/stencil GPU clears into one when stencilSafe and SurfaceHasStencil(depth); depth-only otherwise; restores game state after right-eye and mono replay."
+    },
+    {
+      "item": "NEGATIVE_REGRESSIONS",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Active policy job #38182133592 ran verify_vr_r23_stencil_clear_batch.py: PASS 11 destructive mutations."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Run #38182133592 completed 5/5 SUCCESS on d3ad2ab7e6cd769665904eb4847831b7d59a8ae5 (policy/host/game/full-chain-compile/package)."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Run #38182133595 SUCCESS on d3ad2ab7e6cd769665904eb4847831b7d59a8ae5."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Run #38182133608 3/3 SUCCESS on d3ad2ab7e6cd769665904eb4847831b7d59a8ae5."
+    },
+    {
+      "item": "QUEST3_VDXR_HARDWARE",
+      "status": "UNTESTED",
+      "evidence": "No direct Quest3/VDXR headset/gameplay stereo capture or FPS measurement performed."
+    }
+  ],
+  "notes": "C++ material and validation-bearing SHA are identical. C6 [skip ci] bookkeeping is an independent following commit; do not treat it as result SHA or an additional scored achievement. DX11/DXVK/localization unmodified."
+}
