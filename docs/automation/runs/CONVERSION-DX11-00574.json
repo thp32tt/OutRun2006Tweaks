@@ -11,7 +11,7 @@
   "base_sha": "8bd07c7a552ced4ea160fd73d1a07c90d79ad879",
   "work_key": "DX11:MENU_RACE_BLENDFACTOR_RGB_MODULATE2X4X_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "CI_PENDING_REPAIRED",
+  "status": "CI_PENDING_REPAIR_2",
   "checkpoint": "C4_COMMIT",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
@@ -55,7 +55,7 @@
     "C0_RECOVER": "GitHub HEAD 8bd07c7a552ced4ea160fd73d1a07c90d79ad879",
     "C1_REVIEW": "Missing scaled independent alpha D3D9 state variants",
     "C2_IMPLEMENT": "C++ HLSL/Draw implementation and destructive regressions",
-    "C3_VALIDATE": "Repair DX11 Fast allocation path required stages; strengthen exact alpha-operation predicate negative regression; rerun all Gates at new SHA",
+    "C3_VALIDATE": "Initial 095be67 DX11 Fast failed allocation path; 05deea7 DX11 Fast PASS, Build DX11-SAFE-RETURN failed stale 00564 allowed-factor integration test. Updated test to keep destructive sentinel for expanded real C++ eligibility. New mandatory exact SHA pending.",
     "C4_COMMIT": "Validation-bearing source commit 095be67a; policy acceptance/test repair new exact-SHA commit (no CI skip)",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING"
