@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-12 01:03 KST",
+  "updated_at_kst": "2026-10-12 01:10+ KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -13825,5 +13825,27 @@
     "runtime_validation": "UNTESTED",
     "material_commit": "d728c290d70d571e9d8ae7d0dc3e534294c1f4f3",
     "evidence": "localization/graphics/role_C1/imagegen_trials/q102_C1_20261012_0010_2line/C1_Q102_PRODUCER_SELF_QA.json"
+  },
+  "c1_20261012_0110_q102_imagegen_binding_hold": {
+    "role": "C1",
+    "queue_index": 102,
+    "run_key": "OUTRUN-KOR-C1-Q102-IMAGEGEN-SOURCE-BINDING-TRIAL-20261012-0110",
+    "recorded_at_kst": "2026-10-12 01:10+ KST",
+    "actual_imagegen_id": "f0d5c1cb-eeaf-4baa-bfd1-1ecec28cb633",
+    "generated_png_sha256": "a5edb26dcd52631bd33207b128a0621ac7bdc75ac8ad1d00e0eb3703d9336081",
+    "generated_png_bytes": 746597,
+    "generated_png_published": true,
+    "material_commit": "7610026c3e462e5d2a30b257fde3a04208cf42ca",
+    "new_raw_imagegen_png": 1,
+    "source_media_attached_to_imagegen": "UNVERIFIED_EDIT_OP_NULL",
+    "producer_qualified_glyphs": 0,
+    "new_saved_dds": 0,
+    "official_promoted": 0,
+    "old_scoped_C2_pass_dds_sha256": "88f90ce751c33275d8eefaa4891688e025ba7400c8c624cb94afeeb407f3afed",
+    "C2_final": "HOLD_EVIDENCE_OLD_SHA_UNCHANGED",
+    "C3": "NOT_RUN",
+    "user_game": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "evidence": "localization/graphics/role_C1/imagegen_requests/q102_C1_20261012_0110_GEN_f0d5c1cb_SELF_QA_HOLD.json"
   }
 }
