@@ -1,5 +1,8 @@
 OutRun 한글화 C1 이미지 생성 생산 실행
 
+모든 제작/QA 역할에 최신 `docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md` 필수 적용: 영문과 한글의 글자 수·문장 전체 폭/높이/가로세로 비율/underfill 차이만으로 반려 금지. 번역이 짧거나 글자가 조금 작아도 개별 한글 글자의 native·75·50% 획/내부 공간/가독성이 정상이면 크기 PASS. 원문 glyph/effect bbox 1px 초과는 FAIL. 기존 underfill 단독 반려는 크기 기준 PASS로 재심사하되 오자/보호 아트/실기/C2/C3는 허위 승인 금지.
+
+
 저장소: thp32tt/OutRun2006Tweaks
 브랜치: korean-localization-recovery-20260928
 

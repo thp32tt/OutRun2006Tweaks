@@ -10,6 +10,10 @@ Purpose: run the compact 2026-09-28 localization workflow on a fresh ChatGPT acc
 
 The controller started from the stable historical snapshot. Recovery-specific changes are kept minimal: isolated packaging/prompts plus deterministic A/B/C1/C2 schedule mapping; no queue or state-machine expansion is added.
 
+## Glyph-by-glyph scale review (2026-10-11)
+
+A/B/C1 production/self-QA, C2 independent QA and subsequent C3 strict checks all follow the GitHub branch canonical `docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md`. Translation-dependent whole-sentence width/height/aspect/glyph-count differences are not defects. Smaller legible Korean glyphs and shorter translated phrases PASS size criterion. Each glyph still needs intact strokes/counters/readability at native/75/50, and any 1px original source glyph/effect bbox growth remains FAIL; remaining independent QA, C3 and actual in-game status are not bypassed. The new Git policy takes effect on reading latest contract; use user-rebuilt Docker image only to refresh the bundled short prompts.
+
 ## Schedule
 
 - :00 — A production/self-QA
