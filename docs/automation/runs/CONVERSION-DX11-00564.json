@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00564",
+  "production_id": "CONVERSION-DX11-00564",
+  "event_id": "CONVERSION-DX11-00564-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00564",
+  "base_sha": "819355a60f5190ae74a7285c3ad33fecacee5de6",
+  "work_key": "DX11:MENU_RACE_FACTOR_RGB_DIFFUSE_ADD_ALPHA_NATIVE_DRAW",
+  "status": "AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Actual game D3D9 BLENDFACTORALPHA RGB and SELECTARG2/ADD alpha",
+      "D3D9 texture factor and operand validation to HLSL PS shader bytecode",
+      "D3D11 Draw/DrawIndexed and opt-in diagnostic inset without gamepad/DX9Ex disruption"
+    ],
+    "batch_components": [
+      "D3D9 actual source state capture/validation",
+      "D3D11 HLSL shader compilation/lifetime/dispatch",
+      "Python destructive source linkage+RGBA numerical regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real-game Draw fixed-function independent alpha routed to native PS",
+      "negative_regression": "D3D9 unsupported ops fail closed; destructively severed producer/shader links fail",
+      "component_integration": "Game GetTextureStageState/TextureFactor -> DX11 PS -> native Draw/DrawIndexed -> inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_FACTOR_RGB_DIFFUSE_ADD_ALPHA_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:FACTOR_RGB_DIFFUSE_ADD_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "FACTOR_RGB_INDEPENDENT_ALPHA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NEED_HMD_TEST Quest3/VDXR/menu/vehicle/race/gamepad",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in; original D3D9 Draw/Present/input authoritative"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00564.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub latest HEAD, AGENTS policy, task 00563 reviewed",
+    "C1_REVIEW": "Missing independently selected stage0 diffuse alpha and ADD alpha with factor RGB",
+    "C2_IMPLEMENT": "D3D9 state producer, new native HLSL PS, Draw/DrawIndexed dispatch and negative tests",
+    "C3_VALIDATE": "PENDING exact-SHA GitHub Actions",
+    "C4_COMMIT": "Source+test material, CI-skip forbidden",
+    "C5_PACKAGE": "NOT_REQUIRED opt-in diagnostic",
+    "C6_STATE": "PENDING; runtime game/Quest3/VDXR/gamepad UNTESTED"
+  },
+  "runtime_evidence": "No Quest3, VDXR, in-game visuals or gamepad test performed",
+  "feature_status": "SOURCE_INTEGRATED_AWAITING_CI_NEED_HMD_TEST",
+  "next_action": "Inspect exact material SHA Gates; separate C6 bookkeeping after success",
+  "state_persisted": true
+}
