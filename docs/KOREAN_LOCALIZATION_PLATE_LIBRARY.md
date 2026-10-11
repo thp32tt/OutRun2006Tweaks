@@ -5,6 +5,57 @@ library, not another asset queue or a replacement for the ten-stage QA pipeline.
 A keeps odd assets, B even; C1/C2 independently review their respective parity and
 C3 separately reviews exact final bytes. The six-launch schedule is unchanged.
 
+## 2026-10-11 PSD-first source workbase — latest user request
+
+Before manually erasing English from an HD DDS, look up a **matching native texture hash** in
+`localization/graphics/plate_library/PSD_UPSTREAM_SOURCES.json`. The initial pinned working
+source is `Sonic-TV/OR2006Sprites` at commit
+`3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6`.
+Fetch **only the needed PSD** at this commit (do not consume unpinned upstream HEAD),
+verify the original Git blob SHA and actual PSD SHA256, then run
+`tools/localization/psd_layer_workbase.py inventory` followed by `separate`.
+
+PSD-first processing order:
+1. Inventory all original PSD groups/layers and create **an independent full-canvas PNG per layer**.
+2. Preserve the source `english_original_full.png` and source English typography/effects
+   references; review layers to identify exactly which contain source English glyphs,
+   outline, and shadow. Layer names/kinds may be misleading or English may be baked.
+3. Use `export --english-layers INDEX,INDEX` to produce both
+   `clean_plate_candidate.png` (all other layers) and
+   `english_letter_layers.png` (isolated selected English/effects), never editing
+   the originals. Check hidden/clipped/adjustment effects manually when needed.
+4. Compare source PSD full composite and extracted CLEAN to the **exact pinned canonical
+   English game DDS**, at native 100/75/50, RAW/readable orientation, ROI, protected art,
+   effects and 1-pixel boundaries. A community PSD remake is **not** assumed pixel-
+   equivalent to the canonical DDS and cannot silently replace it.
+5. If the PSD faithfully supplies a reusable CLEAN and English reference, publish it
+   with precise origin/SHA/layer paths in the existing `plate_library`; C2 independently
+   reviews SOURCE vs CLEAN and writes `PLATE_PASS` before A/B/C1 lettering. A/B/C1 may
+   not self-approve. C3/actual user in-game QA remain separate.
+6. Reconstruct CLEAN from English DDS pixels **only when** there is no matching useful
+   PSD layer or the PSD candidate fails canonical checks; record the reason.
+   Do not destroy older independently approved source-aligned CLEAN objects.
+
+The pinned catalog includes initial matches for queue indexes 49, 51, 46, 135, 188,
+212, and 230. Their hashes are **matches by texture identifier only**, not promises
+that all seven contain separate English or true CLEAN. q060/q102 currently have no
+verified exact PSD entry; do not pretend they do.
+
+`PSD Layer Source Pilot` GitHub Actions performs an actual q135 source/layer
+separation and q49 layer inventory. This pilot produces **EXTRACTED_UNCLASSIFIED**
+materials for inspection, never C2 approval or a game-ready DDS. Existing
+`extract_psd_plate.py` is kept for explicitly selected single-layer extraction.
+
+The upstream repository did not advertise a repository-level license at inspection.
+Maintain upstream authorship and source links; review reuse/redistribution rights.
+The current connected GitHub action set has no dedicated remote `fork` mutation,
+so pinned upstream checkout and derivative working outputs are **not presented as an
+actual GitHub platform fork**.
+
+**C2 ownership correction (2026-10-11):** C2 alone independently reviews all
+A/B/C1 CLEAN plates and final DDS, odd/even/special; the older C1-odd/C2-even
+wording below is superseded. Do not treat legacy C1 PLATE_PASS as fresh C2 approval.
+
 ## Reuse before reconstruction
 
 At the beginning of A/B work, inspect `localization/graphics/plate_library/entries`.
