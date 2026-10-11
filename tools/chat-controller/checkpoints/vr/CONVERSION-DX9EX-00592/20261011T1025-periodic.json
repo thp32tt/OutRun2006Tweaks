@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "purpose": "periodic",
+  "captured_at_kst": "2026-10-11T10:25:02.218095+09:00",
+  "controller_branch": "chat-controller-downloads",
+  "game_branch_head": "c8cde7d627e8c35a2de60548101c90524ef116d9",
+  "record": {
+    "task_id": "CONVERSION-DX9EX-00592",
+    "production_id": "CONVERSION-DX9EX-00592",
+    "event_id": "CONVERSION-DX9EX-00592-E002",
+    "event_type": "retry",
+    "lane": "DX9EX",
+    "slot": "C",
+    "branch": "vr-d3d9ex-focus",
+    "base_sha": "c8cde7d627e8c35a2de60548101c90524ef116d9",
+    "result_sha": null,
+    "phase": "WAIT_CHAT",
+    "status": "WAIT_CHAT",
+    "terminal": null,
+    "attempt": 1,
+    "retry_count": 1,
+    "rollover_count": 0,
+    "chat_rollovers": 0,
+    "sent_at": "2026-10-11T10:17:00.583136+09:00",
+    "last_hash": null,
+    "last_hash_changed_at": "2026-10-11T10:17:00.583136+09:00",
+    "last_gate_poll_at": null,
+    "failure_context": null,
+    "feature_id": "DX9EX:FRAME_PACING_DIAGNOSTICS",
+    "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00592",
+    "feature_stage": "IMPLEMENTING",
+    "feature_goal": "게임 렌더·공유 전송·host 대기·OpenXR 제출 시간을 프레임 ID로 연결하는 저비용 진단과 로그 수집 빌드를 완성한다. 기존 계측의 누락 연결만 구현하고 실기 측정 없이 120FPS 달성을 선언하지 않는다.",
+    "feature_contract": {
+      "feature_id": "DX9EX:FRAME_PACING_DIAGNOSTICS",
+      "lane": "DX9EX",
+      "work_key": "DX9EX:FRAME_PACING_DIAGNOSTICS",
+      "goal": "게임 렌더·공유 전송·host 대기·OpenXR 제출 시간을 프레임 ID로 연결하는 저비용 진단과 로그 수집 빌드를 완성한다. 기존 계측의 누락 연결만 구현하고 실기 측정 없이 120FPS 달성을 선언하지 않는다.",
+      "depends_on": [],
+      "acceptance_items": [
+        {
+          "id": "PACING-STAGES",
+          "expected": "Correlate game/render/transport/host/XR timings with frame identity; bounded low-overhead disabled-by-default diagnostics",
+          "paths": [
+            "src/vr/",
+            "vrhost/"
+          ],
+          "ci_step": "Feature acceptance: PACING-STAGES"
+        },
+        {
+          "id": "PACING-REGRESSION",
+          "expected": "Test disabled path, invalid durations, stale IDs and bounded buffer overflow without changing render/sync ownership",
+          "paths": [
+            "tests/",
+            "tools/",
+            "vrhost/"
+          ],
+          "ci_step": "Feature acceptance: PACING-REGRESSION"
+        },
+        {
+          "id": "PACING-BUNDLE",
+          "expected": "Build exact-SHA host/game and collector with phase timing output; no synthetic FPS success claims",
+          "paths": [
+            "tools/",
+            ".github/workflows/"
+          ],
+          "ci_step": "Feature acceptance: PACING-BUNDLE"
+        }
+      ],
+      "required_gates": [
+        {
+          "name": "DX9Ex Active Validation",
+          "jobs": [
+            "policy",
+            "host",
+            "game",
+            "full-chain-compile",
+            "package"
+          ]
+        },
+        {
+          "name": "Domain Isolation Guard",
+          "jobs": [
+            "domain-isolation"
+          ]
+        }
+      ],
+      "artifact_prefix": "feature-dx9ex-pacing-",
+      "policy_blob_sha": "7d4daeef8bad52982674da7cba08692bfca211e8"
+    },
+    "feature_base_sha": "c8cde7d627e8c35a2de60548101c90524ef116d9",
+    "feature_last_head": "e9431196afdbf02288d24545eb1a5f637801cb25",
+    "feature_last_real_activity_at": "2026-10-11T10:23:37.900589+09:00"
+  },
+  "recovery": {
+    "first_action": "Read current game branch HEAD, docs/automation/runs TASK_ID, and existing result material before editing",
+    "do_not_duplicate": true,
+    "runtime_validation": "UNTESTED unless real HMD tested",
+    "note": "A 5-minute controller snapshot is not a game-source commit or evidence that unfinished model reasoning was saved"
+  }
+}
