@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 20:17 KST",
+  "updated_at_kst": "2026-10-11 20:43 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1337,6 +1337,32 @@
         "C3": "NOT_RUN",
         "RUNTIME_VALIDATION": "UNTESTED",
         "evidence": "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2010_WRONG_LABEL_IMAGEGEN_HOLD.json"
+      },
+      "c1_q102_imagegen_extraneous_art_2043_20261011": {
+        "role": "C1",
+        "queue_index": 102,
+        "run_key": "OUTRUN-KOR-C1-Q102-IMAGEGEN-DECORATION-20261011-2043",
+        "method": "REAL_CHATGPT_IMAGEGEN",
+        "generator_ids": [
+          "b0ebd54c-d741-4e91-80da-c3ded9efa8b9",
+          "5eba823d-071a-4180-bb6c-08948fc8c736"
+        ],
+        "generated_sha256": [
+          "5b8a82d5f44c8ec3ba87f66c57207b4a2a89189259e58da3aab69d9abfdcc0f7",
+          "dfa771789254925cf2ffc4081c450d758a8a582b4c2f69665e885e4d4999e34b"
+        ],
+        "original_source_crop_sha256": "da6bc1f532fa6c35cbf8d207bfd5d3baf49ccaef81717419edff5738da97a868",
+        "target_text": "타임 어택 모드",
+        "producer_self_qa": "FAIL_EXTRANEOUS_ART_SOURCE_STYLE",
+        "raw_generated_pngs_local_only": 2,
+        "published_valid_glyph_png": 0,
+        "new_trial_dds": 0,
+        "official_dds_changed": 0,
+        "source_reference_actually_attached_to_generator": "NOT_VERIFIED",
+        "C2": "NOT_RUN",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "evidence": "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2043_IMAGEGEN_EXTRANEOUS_ART_HOLD.json"
       }
     },
     "runtime_text_trace": {
