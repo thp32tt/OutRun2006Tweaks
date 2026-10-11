@@ -246,15 +246,13 @@ namespace OutRunVRStereo
 
         bool R31PrepareEyeTailCache(
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
-            const D3DMATRIX& projection,
-            const D3DMATRIX& inverseProjection) noexcept
+            const D3DMATRIX& projection) noexcept
         {
             const float worldScale = R30SupportWorldScale();
             if (R31EyeCache.valid &&
                 R31EyeCache.poseSequence == stereo.poseSequence &&
                 R31EyeCache.worldScale == worldScale &&
                 R31ProjectionMatches(R31EyeCache.projection, projection) &&
-                R31ProjectionMatches(R31EyeCache.inverseProjection, inverseProjection) &&
                 std::memcmp(R31EyeCache.eyeOrientation, stereo.eyeOrientation,
                     sizeof(stereo.eyeOrientation)) == 0 &&
                 std::memcmp(R31EyeCache.eyeOffset, stereo.eyeOffset,
@@ -263,7 +261,14 @@ namespace OutRunVRStereo
                     sizeof(stereo.eyeFov)) == 0)
                 return true;
 
+            // The inverse depends only on the exact verified projection. Avoid
+            // inverting a 4x4 matrix for every crowd/particle world draw when
+            // the pose, eye geometry, scale and projection cache key is stable.
+            // On inversion failure, leave the last valid cache untouched.
             R31EyeTailCache next{};
+            D3DMATRIX inverseProjection{};
+            if (!R30SupportGetInverseProjection(projection, inverseProjection))
+                return false;
             next.poseSequence = stereo.poseSequence;
             next.worldScale = worldScale;
             next.projection = projection;
@@ -334,7 +339,6 @@ namespace OutRunVRStereo
             }
 
             D3DMATRIX projection{};
-            D3DMATRIX inverseProjection{};
             float verifiedProjection[16]{};
             std::uint32_t projectionGeneration = 0;
             std::uint32_t projectionPoseSequence = 0;
@@ -346,8 +350,7 @@ namespace OutRunVRStereo
                 return false;
             std::memcpy(&projection, verifiedProjection, sizeof(projection));
             if (!R30SupportMatrixFinite(projection) ||
-                !R30SupportGetInverseProjection(projection, inverseProjection) ||
-                !R31PrepareEyeTailCache(stereo, projection, inverseProjection))
+                !R31PrepareEyeTailCache(stereo, projection))
                 return false;
 
             // A successful live WVP sample may differ within the verified epsilon.

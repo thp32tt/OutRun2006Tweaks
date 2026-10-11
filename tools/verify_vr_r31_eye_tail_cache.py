@@ -35,8 +35,21 @@ def violations(source: str) -> list[str]:
             errors.append(member + ": invalid comparison extent")
         if f"std::memcpy(next.{member}, stereo.{member}," not in fill:
             errors.append(member + ": missing cache-miss capture")
-    if "R31ProjectionMatches(R31EyeCache.inverseProjection, inverseProjection)" not in key:
-        errors.append("inverseProjection: missing cache-hit comparison")
+    # Inversion is now cache-miss-only; projection equality is the key.
+    # The old inverse equality check required a needless inversion per draw.
+    if "R31ProjectionMatches(R31EyeCache.projection, projection)" not in key:
+        errors.append("projection: missing exact cache-hit comparison")
+    if "R30SupportGetInverseProjection(" in key:
+        errors.append("inverseProjection: recomputed before cache-hit return")
+    if "R30SupportGetInverseProjection(projection, inverseProjection)" not in fill:
+        errors.append("inverseProjection: missing cache-miss inverse calculation")
+    if "next.inverseProjection = inverseProjection;" not in fill:
+        errors.append("inverseProjection: missing cache-miss snapshot")
+    caller = body(source, "bool R31BuildFastWorldConstants(")
+    if "R30SupportGetInverseProjection(" in caller:
+        errors.append("inverseProjection: caller performs per-draw inversion")
+    if "R31PrepareEyeTailCache(stereo, projection)" not in caller:
+        errors.append("inverseProjection: caller does not use cached inverse")
     if "R31EyeCache = next;" not in prepare or "if (!R30SupportMatrixFinite(next.eyeTail[eye]))" not in prepare:
         errors.append("transactional finite validation/publish lost")
     reset = body(source, "inline void R31ResetFastPathState()")
@@ -59,7 +72,9 @@ def main() -> None:
         "std::memcpy(next.eyeOrientation, stereo.eyeOrientation,",
         "std::memcpy(next.eyeOffset, stereo.eyeOffset,",
         "std::memcpy(next.eyeFov, stereo.eyeFov,",
-        "R31ProjectionMatches(R31EyeCache.inverseProjection, inverseProjection)",
+        "R31ProjectionMatches(R31EyeCache.projection, projection)",
+        "R30SupportGetInverseProjection(projection, inverseProjection)",
+        "next.inverseProjection = inverseProjection;",
     )
     for marker in negative_markers:
         if source.count(marker) != 1 or not violations(source.replace(marker, "MUTATED", 1)):
