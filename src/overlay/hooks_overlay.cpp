@@ -306,7 +306,7 @@ class WndprocHook : public Hook
 		// restore a visible pointer even after an activation/focus transition.
 		if (overlayActive && msg == WM_SETCURSOR && LOWORD(lParam) == HTCLIENT)
 		{
-			SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+			SetCursor(LoadCursorA(nullptr, IDC_ARROW));
 			return TRUE;
 		}
 		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))

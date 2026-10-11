@@ -102,7 +102,7 @@ for marker in ("commandLineOverrides.insert(setting);",
     if marker not in settings_core: raise SystemExit("CLI override persistence isolation missing: " + marker)
 if 'Settings::DisableSettingsWrite = true;' in bootstrap:
     raise SystemExit("Launch CLI still globally disables F11 INI persistence")
-for marker in ("WM_SETCURSOR", "LoadCursorW(nullptr, IDC_ARROW)", "LOWORD(wParam) != WA_INACTIVE"):
+for marker in ("WM_SETCURSOR", "LoadCursorA(nullptr, IDC_ARROW)", "LOWORD(wParam) != WA_INACTIVE"):
     if marker not in wndproc: raise SystemExit("F11 mouse pointer/focus fix missing: " + marker)
 if "-WindowStyle Hidden" not in selector or "FormWindowState]::Minimized" not in selector:
     raise SystemExit("Game launch must not leave PowerShell or selector in foreground")
