@@ -1,0 +1,110 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00609",
+  "production_id": "CONVERSION-DX9EX-00609",
+  "event_id": "CONVERSION-DX9EX-00609-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:R31_STEREO_EYE_TAIL_COMPOSITION_FASTPATH",
+  "work_key": "DX9EX:R31_STEREO_EYE_TAIL_COMPOSITION_FASTPATH",
+  "material_result_sha": "cfa84912b001e0573cb34f3bd553e34ca90e99db",
+  "result_sha": "cfa84912b001e0573cb34f3bd553e34ca90e99db",
+  "validation_bearing_result_sha": "cfa84912b001e0573cb34f3bd553e34ca90e99db",
+  "material_commits": [
+    "cfa84912b001e0573cb34f3bd553e34ca90e99db"
+  ],
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Reduce per-world-draw R31 CPU matrix work in beach/dense draw scenes without disabling visual passes, altering verified original c64..c67 state or removing Reset/device-loss protection.",
+    "acceptance": "Precompute inverseProjection*eyeTail for two eyes on exact pose/projection/eye FOV/world-scale cache misses. Reject nonfinite composed tails, retain sampled-live WVP source and original constant restoration, pass R31 destructive regression, Win32 x86 game/full chain, x64 host, package, domain and full-source impact exact SHA.",
+    "runtime_metrics": "No Quest3/VDXR HMD frametime or FPS confirmation; source-level three-to-two matrix multiplication count per R31 eligible world draw only."
+  },
+  "acceptance_results": [
+    {
+      "item": "R31_COMPOSED_EYE_TAIL",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "R31BuildFastWorldConstants now uses currentWvp times previously computed R31EyeCache.composedEyeTail[eye], avoiding one 4x4 product on each fast-world draw. Cache miss precomputes inverseProjection*eyeTail for both eyes."
+    },
+    {
+      "item": "R31_CACHE_NEGATIVE_MUTATIONS",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "R31 existing eye-tail and sampled-live WVP verifier extended with composed-tail cache-miss, finite and restore source checks; DX9Ex policy job PASS."
+    },
+    {
+      "item": "FLOAT32_NUMERIC_EQUIVALENCE",
+      "status": "PASS_LOCAL_NUMERIC_FIXTURE",
+      "evidence": "128 synthetic Float32 matrix triples max absolute matrix element delta 2.384185791015625e-7 for (WVP*inverseP)*eyeTail vs WVP*(inverseP*eyeTail); separate 2000 perspective/translation samples max abs 0.000244140625. Not a hardware optical PASS."
+    },
+    {
+      "item": "DX9EX_ACTIVE_GAME_HOST_FULLCHAIN_PACKAGE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Active Validation #38150269774 policy/game/host/full-chain-compile/package five jobs success."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Domain Isolation Guard #38150269755 success."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Full Source Impact Review #38150269846 game/host MSVC analyze and cross-domain all success."
+    },
+    {
+      "item": "QUEST3_VDXR_FRAME_PACING_AND_VISUALS",
+      "status": "UNTESTED",
+      "evidence": "No physical Quest3/VDXR gameplay or p95/p99 FPS/photometric HMD test for exact new SHA."
+    }
+  ],
+  "exact_sha_validation": {
+    "target_sha": "cfa84912b001e0573cb34f3bd553e34ca90e99db",
+    "all_conclusion": "SUCCESS",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38150269774,
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "cfa84912b001e0573cb34f3bd553e34ca90e99db",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38150269774"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38150269755,
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "cfa84912b001e0573cb34f3bd553e34ca90e99db",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38150269755"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38150269846,
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "cfa84912b001e0573cb34f3bd553e34ca90e99db",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38150269846"
+      }
+    ]
+  },
+  "material_change_evidence": {
+    "source_paths": [
+      "src/vr/d3d9/stereo_renderer_r31.cpp"
+    ],
+    "validation_paths": [
+      "tools/verify_vr_r31_eye_tail_cache.py",
+      "tools/verify_vr_r31_live_wvp_consistency.py"
+    ]
+  },
+  "runtime_validation_note": "RUNTIME_VALIDATION=UNTESTED; no physical Quest3/VDXR gameplay/visual/p95-p99 FPS measurement; source-level operation count only.",
+  "completed_kst": "2026-10-12T00:20:32+09:00",
+  "controller_next_action": "Do not redispatch/re-score this TASK_ID; continue independent P0 measured frame-time and stereo performance work on next scheduler dispatch; DX11 global priority, DXVK frozen."
+}
