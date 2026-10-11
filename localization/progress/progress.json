@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 12:33 KST",
+  "updated_at_kst": "2026-10-11 12:46 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -723,6 +723,44 @@
         "new_dds": 0,
         "RUNTIME_VALIDATION": "UNTESTED",
         "user_game": "NOT_RUN"
+      },
+      "b369_q060_source_contour_metal_trial_20261011": {
+        "run_key": "OUTRUN-KOR-B369-Q060-SOURCE-CONTOUR-HEAVY-20261011-1230",
+        "role": "B",
+        "index": 60,
+        "priority": "P0",
+        "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+        "reused_clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+        "previous_rejected_B368_sha256": "11e081c7f3c12bd13cf100995ec533ce78a557ac97eb1135ff84fc1e0a2d5a6b",
+        "new_persisted_unpromoted_sha256": "5b42316d777eb08c41f97e665b38e510c1df1820ecd74d78402efead26daddee",
+        "official_unchanged_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+        "method": "source-conditioned manual native heavy contour and wedges plus English sampled separate metallic face/rim/extrusion",
+        "p2_geometry_alpha_delta": 10457,
+        "p3_saved_alpha_delta": 5119,
+        "original_bbox": [
+          2179,
+          340,
+          3028,
+          474
+        ],
+        "saved_effect_bbox": [
+          2215,
+          342,
+          3003,
+          473
+        ],
+        "persisted_saved_roundtrip_error": 0,
+        "changed_outside_declared_roi_rgba": 0,
+        "clean_final_outside_effect_rgba": 0,
+        "producer_qa": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY",
+        "official_promotions": 0,
+        "new_trial_dds_count": 1,
+        "C2": "NOT_RUN_B369",
+        "C3": "NOT_RUN",
+        "user_ingame": "IGR044_OPEN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "qa": "localization/graphics/role_B/20261011-B369-Q060-SOURCE-CONDITIONED-HEAVY-CONTOURS/B369_CONTROLLER_SAVED_VISUAL_QA.json",
+        "worker_run_id": 38109144572
       }
     },
     "runtime_text_trace": {
