@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 10:00 KST",
+  "updated_at_kst": "2026-10-11 10:27 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -12573,5 +12573,27 @@
     "APPROVAL": false,
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261011-C2-Q176-B366-MANUAL-NATIVE-INDEPENDENT/C386_Q176_C2_INDEPENDENT_REWORK.json"
+  },
+  "c2_20261011_q060_b360_new_saved_independent": {
+    "review_id": "C2-Q060-B360-SAVED-FIRST-INDEPENDENT-20261011-1027",
+    "queue_index": 60,
+    "shard": "EVEN",
+    "saved_candidate_sha256": "930222103b57a3ecf6b1ea1eca86a8a639809e8ad80020313c14a9adce13bb1d",
+    "independently_verified": true,
+    "prior_C2_sha_different": true,
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+    "official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "status": "REWORK_REQUIRED_UNPROMOTED_B360_SOURCE_FAMILY_HORIZONTAL_BANDING",
+    "official_status": "C342_REWORK_REQUIRED_UNCHANGED",
+    "original_outside_changed": 9027,
+    "old_overspill_alpha_removed": 6357,
+    "new_overspill_alpha": 0,
+    "C2_PASS": false,
+    "C3": "NOT_RUN",
+    "APPROVAL": false,
+    "USER_GAME": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "QA": "localization/graphics/role_C/20261011-C2-Q060-B360-SAVED-NATIVE-INDEPENDENT/C2_Q060_B360_INDEPENDENT_REWORK.json"
   }
 }
