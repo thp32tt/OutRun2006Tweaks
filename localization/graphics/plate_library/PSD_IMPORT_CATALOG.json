@@ -762,11 +762,11 @@
       "github_blob_sha": "1e376029dffd4ee9ecb1d517d1870d64e7102873",
       "bytes": 2067761,
       "local_path": "localization/graphics/source_psd_upstream/42E618FD/1e376029_42E618FD_512x32.psd",
-      "batch": null,
+      "batch": "c1_20261012_q098_source_media",
       "source_type": "community_psd_not_canonical_game_dds",
-      "layer_status": "UNINSPECTED",
+      "layer_status": "PSD_LEAF_TEXT_FACE_EFFECT_SPLIT_REFERENCE_ONLY",
       "clean_status": "NOT_APPROVED",
-      "copy_status": "CATALOG_ONLY_NOT_COPIED"
+      "copy_status": "COPIED_SOURCE_VERIFIED"
     },
     {
       "queue_indices": [
