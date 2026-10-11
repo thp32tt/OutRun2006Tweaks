@@ -47,6 +47,13 @@ jobs:
             --psd _psd_source_pilot/q49.psd \
             --upstream-commit 3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6 \
             --output _psd_source_pilot/q49_inventory
+      - name: Generate q135 tentative CLEAN and English lettering from named PSD layers
+        run: |
+          python tools/localization/psd_layer_workbase.py export \
+            --psd _psd_source_pilot/q135.psd \
+            --english-layers 1/1/1/0/1/1,1/1/1/1/0 \
+            --upstream-commit 3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6 \
+            --output _psd_source_pilot/q135_candidate
       - name: Verify extracted manifests and summarize layer structure
         run: |
           python - <<'PY'
@@ -64,6 +71,12 @@ jobs:
           assert info['layer_split_status'] == 'EXTRACTED_UNCLASSIFIED'
           assert info['C2_PLATE_PASS'] is False
           assert len(info['output_sha256']) >= 2
+          trial = json.loads(Path('_psd_source_pilot/q135_candidate/psd_layer_export.json').read_text())
+          assert trial['clean_plate_status'] == 'EXTRACTED_UNVERIFIED'
+          assert trial['english_layer_paths'] == ['1/1/1/0/1/1', '1/1/1/1/0']
+          assert trial['C2_PLATE_PASS'] is False
+          assert len(trial['output_sha256']) == 3
+          print('q135 CLEAN candidate+English source split:', trial['output_sha256'])
           print('PASS: actual PSD layers separated; CLEAN approval remains FALSE')
           PY
       - name: Upload temporary source inspection package
@@ -72,5 +85,6 @@ jobs:
           name: psd-layer-source-pilot
           path: |
             _psd_source_pilot/q135_layers/
+            _psd_source_pilot/q135_candidate/
             _psd_source_pilot/q49_inventory/
           retention-days: 3
