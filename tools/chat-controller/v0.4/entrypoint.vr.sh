@@ -95,4 +95,7 @@ done
 
 echo "$(date -Is) starting VR controller" >>/logs/controller-startup.log
 touch /tmp/controller-started
+# A separate process detects a frozen scheduler even when the threaded /status
+# endpoint and Docker healthcheck still report HTTP 200.
+/opt/outrun/vr-runtime-watchdog.sh "$MAIN_PID" &
 exec python -m app.controller
