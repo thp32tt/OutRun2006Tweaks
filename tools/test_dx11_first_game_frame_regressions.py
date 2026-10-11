@@ -2397,6 +2397,104 @@ def main() -> None:
         assert abs(alpha - tex*diff) > 0.00001
     print("DX11 independent ADDSMOOTH alpha native Draw regression PASS (static only)")
 
+
+    # 00573: game-authored BLENDFACTORALPHA RGB and independently SUBTRACT /
+    # ADDSMOOTH alpha must both cross intake -> PS compile/lifetime -> native
+    # Draw/DrawIndexed -> opt-in inset without modifying DX9Ex game/input.
+    def factor_independent_alpha_connected(source: str) -> bool:
+        gate = source[source.find("bool supported_game_state("):source.find("bool translate_vertices(")]
+        draw = source[source.find("bool submit("):source.find("void observe(")]
+        shared = (
+            "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)",
+            "blendFactorSubtractAlpha || blendFactorAddSmoothAlpha",
+            "!blendFactorSubtractAlpha && !blendFactorAddSmoothAlpha &&",
+            "alphaNeedsDiffuse && !alphaArg2Diffuse",
+            "alphaArg1 != D3DTA_TEXTURE",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
+            "game->UpdateSurface(",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+        )
+        if not all(x in source for x in shared): return False
+        if not all(x in gate for x in shared[:5]): return False
+        for operation, alpha_math in (
+            ("Subtract", "saturate(t.a - v.diffuse.a)"),
+            ("AddSmooth", "saturate(t.a + v.diffuse.a * (1.0f - t.a))"),
+        ):
+            flag = f"blendFactor{operation}Alpha"
+            shader = f"PSTextureBlendFactor{operation}Alpha"
+            start = source.find(f"float4 {shader}(VOut v) : SV_Target {{")
+            end = source.find("\n}", start)
+            if start < 0 or end < start: return False
+            body = source[start:end]
+            required = (
+                f"bool {flag} = false;",
+                f"const bool {flag} = op == D3DTOP_BLENDFACTORALPHA &&",
+                f"capture.{flag} = {flag};",
+                f"float4 {shader}(VOut v) : SV_Target {{",
+                f'compile("{shader}", "ps_4_0", blendFactor{operation}Code)',
+                f"s.{flag}Ps &&",
+                f"s.{flag}Ps.GetAddressOf()",
+                f"capture.{flag} ? s.{flag}Ps.Get() :",
+            )
+            if not all(x in source for x in required): return False
+            if source.count(f"s.{flag}Ps.Reset();") != 2: return False
+            if f"capture.{flag} ? s.{flag}Ps.Get() :" not in draw: return False
+            if not all(x in body for x in (
+                "lerp(v.diffuse.rgb, t.rgb, alphaParams.w)",
+                alpha_math, "AlphaGate(c.a); return c;",
+            )): return False
+        return True
+
+    assert factor_independent_alpha_connected(bridge)
+    for operation, alpha_math in (
+        ("Subtract", "saturate(t.a - v.diffuse.a)"),
+        ("AddSmooth", "saturate(t.a + v.diffuse.a * (1.0f - t.a))"),
+    ):
+        flag = f"blendFactor{operation}Alpha"
+        shader = f"PSTextureBlendFactor{operation}Alpha"
+        tokens = (
+            f"const bool {flag} = op == D3DTOP_BLENDFACTORALPHA &&",
+            f"capture.{flag} = {flag};",
+            f'compile("{shader}", "ps_4_0", blendFactor{operation}Code)',
+            f"s.{flag}Ps.GetAddressOf()",
+            f"capture.{flag} ? s.{flag}Ps.Get() :",
+        )
+        for token in tokens:
+            mutant = bridge.replace(token, "/* sever 00573 native link */", 1)
+            assert mutant != bridge and not factor_independent_alpha_connected(mutant), token
+        begin = bridge.find(f"float4 {shader}(VOut v) : SV_Target {{")
+        end = bridge.find("\n}", begin)
+        body = bridge[begin:end]
+        for token in ("lerp(v.diffuse.rgb, t.rgb, alphaParams.w)", alpha_math):
+            assert token in body
+            mutant = bridge[:begin] + body.replace(token, "/* bad 00573 math */", 1) + bridge[end:]
+            assert not factor_independent_alpha_connected(mutant), token
+
+    # Factor=14, SUBTRACT=10, ADDSMOOTH=9; source alpha Arg1=TEXTURE,
+    # Arg2=DIFFUSE/CURRENT only. Nonfactor and modifier inputs fail closed.
+    for color_op, alpha_op, arg1, arg2, expected in (
+        (14, 10, "texture", "diffuse", True),
+        (14, 9, "texture", "current", True),
+        (14, 10, "diffuse", "diffuse", False),
+        (14, 9, "texture", "texture", False),
+        (14, 9, "texture|complement", "diffuse", False),
+        (14, 10, "texture", "diffuse|complement", False),
+        (14, 7, "texture", "diffuse", False),
+        (13, 9, "texture", "diffuse", False),
+        (12, 10, "texture", "diffuse", False),
+    ):
+        admitted = (color_op == 14 and alpha_op in (9, 10) and
+                    arg1 == "texture" and arg2 in ("diffuse", "current"))
+        assert admitted is expected
+    for ta, da, factor in ((.9, .2, 0.), (.1, .8, .5), (.3, .4, 1.), (0., 1., .75)):
+        for alpha_op in ("subtract", "add_smooth"):
+            out = max(0., ta-da) if alpha_op == "subtract" else min(1., ta + da*(1.-ta))
+            rgb = tuple(d*(1.-factor)+t*factor for t,d in zip((.2,.8,.5),(.7,.1,.3)))
+            assert all(0. <= c <= 1. for c in (*rgb, out))
+            assert abs(out - (ta*factor + da*(1.-factor))) > 0.00001 or (ta,da)==(0.,1.)
+    print("DX11 factor RGB + SUBTRACT/ADDSMOOTH alpha native Draw PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
