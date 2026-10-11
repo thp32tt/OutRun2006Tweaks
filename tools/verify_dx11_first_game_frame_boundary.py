@@ -26,11 +26,25 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "explicit opt-in must be exact; diagnostics disabled by default")
     require("if (!diagnostic_enabled() || !game" in code,
             "both real game call and opt-in must be checked before observation")
-    require("D3DFVF_XYZRHW | D3DFVF_DIFFUSE" in code and
+    # The previous literal FVF whitelist was replaced by an exact layout
+    # decoder. Verify the new producer and its texture-only consumer together,
+    # rather than accepting an obsolete D3DFVF_XYZRHW|DIFFUSE token.
+    fvf = (ROOT / "src/vr/d3d11/live_game_fvf_layout.hpp").read_text(
+        encoding="utf-8")
+    require("if (!game_fvf_layout(fvf, layout)) return false;" in code and
+            "capture.enabled = layout.textured;" in code and
+            "if (!layout.hasDiffuse && !selectTexture) return false;" in code and
+            "if (!game_fvf_decode_vertex(data, stride, layout, decoded))" in code and
+            "kGameFvfPositionMask == D3DFVF_POSITION_MASK" in code and
             "GetVertexShader(vs.GetAddressOf())" in code and
             "GetPixelShader(ps.GetAddressOf())" in code and
             "GetTexture(0, tex.GetAddressOf())" in code,
             "unsupported live D3D9 shader/texture states must be rejected")
+    require("const std::uint32_t position = fvf & kGameFvfPositionMask;" in fvf and
+            "if (!candidate.textured && !candidate.hasDiffuse) return false;" in fvf and
+            "stride < layout.minStride" in fvf and
+            "sample = candidate;" in fvf,
+            "live FVF decoder must reject unsupported formats and short strides")
     require("GetRenderState(D3DRS_ALPHABLENDENABLE" in code and
             "GetRenderState(D3DRS_ZENABLE" in code,
             "blended/depth state must be rejected")
