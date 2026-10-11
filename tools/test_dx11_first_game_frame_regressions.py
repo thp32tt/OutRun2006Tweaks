@@ -258,8 +258,8 @@ def main() -> None:
         )
         return (all(x in state for x in required_state)
                 and all(x in vertices for x in required_vertices)
-                and "supported_game_state(game, vp, pretransformed, transforms)" in observe
-                and "pretransformed, transforms, vertices)" in observe)
+                and "supported_game_state(game, vp, pretransformed, transforms, capture)" in observe
+                and "pretransformed, transforms, capture, vertices)" in observe)
 
     assert object_space_draw_safe(bridge)
     for good, bad in (
@@ -300,7 +300,61 @@ def main() -> None:
                   for col in range(4)]
     assert vector == [12.0, 27.0, 56.0, 1.0]
 
-    print("DX11 live game diagnostic sampling/lifetime/fallback/inset regression PASS (static only)")
+    # Texture-backed menu/vehicle/race subset must connect live game D3D9
+    # TEX1 FVF + stage/sampler + LockRect snapshot to D3D11 SRV/PS/Draw.
+    # Mutation controls check that unsupported state still returns to D3D9.
+    def texture_path_complete(code: str) -> bool:
+        state = code[code.find("bool supported_game_state("):
+                     code.find("bool translate_vertices(")]
+        mirror = code[code.find("bool mirror_texture("):
+                      code.find("bool submit(")]
+        submit = code[code.find("bool submit("):
+                      code.find("void observe(")]
+        return all(x in state for x in (
+            "fvf == (rhw | D3DFVF_TEX1)", "fvf == (xyz | D3DFVF_TEX1)",
+            "GetTexture(0, tex.GetAddressOf())",
+            "tex.As(&capture.texture)",
+            "op != D3DTOP_MODULATE || arg != D3DTA_TEXTURE",
+            "alphaOp != D3DTOP_MODULATE",
+            "coordIndex != 0 || transformFlags != D3DTTFF_DISABLE || srgb",
+            "min != mag || mip != D3DTEXF_NONE",
+            "nextColorOp != D3DTOP_DISABLE",
+        )) and all(x in mirror for x in (
+            "info.Pool == D3DPOOL_DEFAULT",
+            "GetLevelCount() != 1",
+            "D3DFMT_A8R8G8B8", "D3DFMT_X8R8G8B8",
+            "LockRect(0, &locked, nullptr, D3DLOCK_READONLY)",
+            "capture.texture->UnlockRect(0)",
+            "dev->CreateTexture2D(", "dev->CreateShaderResourceView(",
+            "dev->CreateSamplerState(",
+        )) and all(x in submit for x in (
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
+            "ctx->PSSetShaderResources(0, 1, &boundView)",
+            "ctx->PSSetSamplers(0, 1, &boundSampler)",
+            "s.sampledPs.Get()",
+        ))
+    assert texture_path_complete(bridge)
+    for old, bad in (
+        ("fvf == (rhw | D3DFVF_TEX1)", "fvf == rhw"),
+        ("op != D3DTOP_MODULATE || arg != D3DTA_TEXTURE",
+         "op != D3DTOP_MODULATE || arg == D3DTA_TEXTURE"),
+        ("alphaOp != D3DTOP_MODULATE", "alphaOp == D3DTOP_MODULATE"),
+        ("info.Pool == D3DPOOL_DEFAULT", "info.Pool == D3DPOOL_SYSTEMMEM"),
+        ("GetLevelCount() != 1", "GetLevelCount() == 1"),
+        ("capture.texture->UnlockRect(0)", "/* missing texture unlock */"),
+        ("ctx->PSSetShaderResources(0, 1, &boundView)",
+         "/* no native shader texture binding */"),
+    ):
+        mutated = bridge.replace(old, bad, 1)
+        assert mutated != bridge and not texture_path_complete(mutated), (
+            "texture-stage native-D3D11 negative mutation escaped: " + old
+        )
+    assert "xyz[2] * w" in bridge and "v.clip[3] = w;" in bridge
+    assert "float2 uv : TEXCOORD0" in bridge
+    assert "gameTexture.Sample(gameSampler, v.uv) * v.diffuse" in bridge
+    assert "if (!capture.enabled && (op != D3DTOP_SELECTARG1 || arg != D3DTA_DIFFUSE))" in bridge
+
+    print("DX11 live game diagnostic sampling/lifetime/fallback/inset/textured draw regression PASS (static only)")
 
 
 if __name__ == "__main__":

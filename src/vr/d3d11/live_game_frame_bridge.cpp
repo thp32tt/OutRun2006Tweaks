@@ -25,14 +25,28 @@ constexpr UINT kMaxIndices = 1536;
 constexpr UINT kProbeSlots = 64;
 constexpr std::array<float, 4> kBackground{0.035f, 0.035f, 0.08f, 1.0f};
 constexpr char kShader[] = R"(
-struct VIn { float4 clip : POSITION; float4 diffuse : COLOR0; };
-struct VOut { float4 clip : SV_Position; float4 diffuse : COLOR0; };
-VOut VS(VIn v) { VOut o; o.clip = v.clip; o.diffuse = v.diffuse; return o; }
+struct VIn { float4 clip : POSITION; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; };
+struct VOut { float4 clip : SV_Position; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; };
+Texture2D gameTexture : register(t0);
+SamplerState gameSampler : register(s0);
+VOut VS(VIn v) { VOut o; o.clip = v.clip; o.diffuse = v.diffuse; o.uv = v.uv; return o; }
 float4 PS(VOut v) : SV_Target { return v.diffuse; }
+float4 PSTextured(VOut v) : SV_Target { return gameTexture.Sample(gameSampler, v.uv) * v.diffuse; }
 )";
 struct NativeVertex {
     float clip[4];
     float diffuse[4];
+    float uv[2];
+};
+
+// Narrow fixed-function stage-0 textured subset for real game menu/vehicle/race
+// draws. Any unmirrored texture, sampler, alpha or stage state fails closed.
+struct TextureCapture {
+    bool enabled = false;
+    Microsoft::WRL::ComPtr<IDirect3DTexture9> texture;
+    D3DTEXTUREADDRESS addressU = D3DTADDRESS_CLAMP;
+    D3DTEXTUREADDRESS addressV = D3DTADDRESS_CLAMP;
+    D3DTEXTUREFILTERTYPE filter = D3DTEXF_POINT;
 };
 
 struct State {
@@ -40,6 +54,7 @@ struct State {
     NativeBackend backend;
     ComPtr<ID3D11VertexShader> vs;
     ComPtr<ID3D11PixelShader> ps;
+    ComPtr<ID3D11PixelShader> sampledPs;
     ComPtr<ID3D11InputLayout> layout;
     ComPtr<ID3D11RasterizerState> raster;
     ComPtr<ID3D11Texture2D> staging;
@@ -72,31 +87,36 @@ bool compile(const char* entry, const char* profile, ComPtr<ID3DBlob>& blob) noe
 }
 
 bool ensure_pipeline(State& s) noexcept {
-    if (s.backend.ready() && s.vs && s.ps && s.layout && s.raster && s.staging)
+    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.layout && s.raster && s.staging)
         return true;
     s.backend.shutdown();
-    s.vs.Reset(); s.ps.Reset(); s.layout.Reset(); s.raster.Reset(); s.staging.Reset();
+    s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.layout.Reset(); s.raster.Reset(); s.staging.Reset();
     NativeBackendConfig cfg{};
     cfg.width = kWidth;
     cfg.height = kHeight;
     cfg.color_format = DXGI_FORMAT_B8G8R8A8_UNORM;
     if (!s.backend.initialize(cfg)) return false;
     auto* dev = s.backend.device();
-    ComPtr<ID3DBlob> vcode, pcode;
+    ComPtr<ID3DBlob> vcode, pcode, sampledCode;
     if (!compile("VS", "vs_4_0", vcode) ||
         !compile("PS", "ps_4_0", pcode) ||
+        !compile("PSTextured", "ps_4_0", sampledCode) ||
         FAILED(dev->CreateVertexShader(vcode->GetBufferPointer(), vcode->GetBufferSize(),
                                       nullptr, s.vs.GetAddressOf())) ||
         FAILED(dev->CreatePixelShader(pcode->GetBufferPointer(), pcode->GetBufferSize(),
-                                     nullptr, s.ps.GetAddressOf())))
+                                     nullptr, s.ps.GetAddressOf())) ||
+        FAILED(dev->CreatePixelShader(sampledCode->GetBufferPointer(), sampledCode->GetBufferSize(),
+                                     nullptr, s.sampledPs.GetAddressOf())))
         return false;
     const D3D11_INPUT_ELEMENT_DESC elements[] = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0,
          D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16,
+         D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 32,
          D3D11_INPUT_PER_VERTEX_DATA, 0}
     };
-    if (FAILED(dev->CreateInputLayout(elements, 2,
+    if (FAILED(dev->CreateInputLayout(elements, 3,
         vcode->GetBufferPointer(), vcode->GetBufferSize(), s.layout.GetAddressOf())))
         return false;
     D3D11_RASTERIZER_DESC raster{};
@@ -118,7 +138,8 @@ bool ensure_pipeline(State& s) noexcept {
 // COM getters AddRef; local ComPtrs always release before reset/return.
 bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                           bool& pretransformed,
-                          std::array<D3DMATRIX, 3>& transforms) noexcept {
+                          std::array<D3DMATRIX, 3>& transforms,
+                          TextureCapture& capture) noexcept {
     if (!game || FAILED(game->GetViewport(&viewport)) ||
         viewport.Width == 0 || viewport.Height == 0)
         return false;
@@ -127,20 +148,30 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
     // Real game fixed-function geometry: admit both pretransformed HUD/sprite
     // vertices and unlit object-space diffuse vertices. Other FVF layouts
     // (textures, normals, weights, shader declarations) remain DX9Ex-owned.
-    pretransformed = (fvf == (D3DFVF_XYZRHW | D3DFVF_DIFFUSE));
-    if (!pretransformed && fvf != (D3DFVF_XYZ | D3DFVF_DIFFUSE))
+    const DWORD rhw = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
+    const DWORD xyz = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+    pretransformed = (fvf == rhw || fvf == (rhw | D3DFVF_TEX1));
+    capture.enabled = fvf == (rhw | D3DFVF_TEX1) ||
+                      fvf == (xyz | D3DFVF_TEX1);
+    if (!pretransformed && fvf != xyz && fvf != (xyz | D3DFVF_TEX1))
         return false;
     ComPtr<IDirect3DVertexShader9> vs;
     ComPtr<IDirect3DPixelShader9> ps;
     ComPtr<IDirect3DBaseTexture9> tex;
     if (FAILED(game->GetVertexShader(vs.GetAddressOf())) || vs ||
         FAILED(game->GetPixelShader(ps.GetAddressOf())) || ps ||
-        FAILED(game->GetTexture(0, tex.GetAddressOf())) || tex)
+        FAILED(game->GetTexture(0, tex.GetAddressOf())))
         return false;
 
-    // This very first vertical slice covers only untextured, unblended,
-    // no-depth pretransformed diffuse triangles. Every other real game draw
-    // proceeds exclusively through DX9Ex. No visual parity claim for others.
+    // Only unblended, no-depth FVF diffuse or TEX1/modulate fixed-function
+    // triangles are mirrored. The original D3D9 call always executes.
+    if (capture.enabled) {
+        if (!tex || tex->GetType() != D3DRTYPE_TEXTURE ||
+            FAILED(tex.As(&capture.texture))) return false;
+    } else if (tex) {
+        // No texture source is consumed by the diffuse-only shader.
+        return false;
+    }
     DWORD blend=TRUE, alpha=TRUE, stencil=TRUE, depth=TRUE, clip=TRUE;
     DWORD fog=TRUE, scissor=TRUE;
     DWORD colorMask=0, cullMode=0, fillMode=0;
@@ -172,9 +203,42 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
     if (FAILED(game->GetTextureStageState(0, D3DTSS_COLOROP, &op)) ||
         FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG1, &arg)) ||
         FAILED(game->GetTextureStageState(1, D3DTSS_COLOROP, &nextColorOp)) ||
-        op != D3DTOP_SELECTARG1 || arg != D3DTA_DIFFUSE ||
         nextColorOp != D3DTOP_DISABLE)
         return false;
+    if (!capture.enabled && (op != D3DTOP_SELECTARG1 || arg != D3DTA_DIFFUSE))
+        return false;
+    if (capture.enabled) {
+        DWORD arg2=0, alphaOp=0, alphaArg1=0, alphaArg2=0;
+        DWORD coordIndex=~0u, transformFlags=~0u;
+        DWORD addressU=0, addressV=0, mag=0, min=0, mip=0, srgb=1;
+        if (FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG2, &arg2)) ||
+            FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)) ||
+            FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAARG1, &alphaArg1)) ||
+            FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAARG2, &alphaArg2)) ||
+            FAILED(game->GetTextureStageState(0, D3DTSS_TEXCOORDINDEX, &coordIndex)) ||
+            FAILED(game->GetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, &transformFlags)) ||
+            FAILED(game->GetSamplerState(0, D3DSAMP_ADDRESSU, &addressU)) ||
+            FAILED(game->GetSamplerState(0, D3DSAMP_ADDRESSV, &addressV)) ||
+            FAILED(game->GetSamplerState(0, D3DSAMP_MAGFILTER, &mag)) ||
+            FAILED(game->GetSamplerState(0, D3DSAMP_MINFILTER, &min)) ||
+            FAILED(game->GetSamplerState(0, D3DSAMP_MIPFILTER, &mip)) ||
+            FAILED(game->GetSamplerState(0, D3DSAMP_SRGBTEXTURE, &srgb)))
+            return false;
+        // Reject complement/alpha-replicate modifiers, projected or displaced
+        // coordinates, gamma reads and mip/anisotropic paths we do not emulate.
+        if (op != D3DTOP_MODULATE || arg != D3DTA_TEXTURE ||
+            arg2 != D3DTA_DIFFUSE || alphaOp != D3DTOP_MODULATE ||
+            alphaArg1 != D3DTA_TEXTURE || alphaArg2 != D3DTA_DIFFUSE ||
+            coordIndex != 0 || transformFlags != D3DTTFF_DISABLE || srgb ||
+            (addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP) ||
+            (addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP) ||
+            (mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR) ||
+            min != mag || mip != D3DTEXF_NONE)
+            return false;
+        capture.addressU = static_cast<D3DTEXTUREADDRESS>(addressU);
+        capture.addressV = static_cast<D3DTEXTUREADDRESS>(addressV);
+        capture.filter = static_cast<D3DTEXTUREFILTERTYPE>(mag);
+    }
     // Custom clip planes are not implemented by the native shader. The
     // object-space path must also reject D3D9 lighting and vertex blending.
     DWORD clipPlanes = ~0u;
@@ -197,9 +261,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
 bool translate_vertices(const void* input, UINT count, UINT stride,
                         const D3DVIEWPORT9& vp, bool pretransformed,
                         const std::array<D3DMATRIX, 3>& transforms,
+                        const TextureCapture& capture,
                         std::vector<NativeVertex>& output) {
     const UINT diffuseOffset = pretransformed ? 16u : 12u;
-    if (!input || stride < diffuseOffset + 4u || stride > 512u ||
+    if (!input || stride < diffuseOffset + (capture.enabled ? 12u : 4u) || stride > 512u ||
         count == 0 || count > kMaxVertices)
         return false;
     output.resize(count);
@@ -210,18 +275,31 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
         const auto* data = src + static_cast<std::size_t>(i) * stride;
         std::memcpy(xyz, data, diffuseOffset);
         std::memcpy(&diffuse, data + diffuseOffset, sizeof(diffuse));
+        if (capture.enabled) {
+            std::memcpy(output[i].uv, data + diffuseOffset + 4u,
+                        sizeof(output[i].uv));
+            if (!std::isfinite(output[i].uv[0]) ||
+                !std::isfinite(output[i].uv[1])) return false;
+        } else {
+            output[i].uv[0] = output[i].uv[1] = 0.0f;
+        }
         if (!std::isfinite(xyz[0]) || !std::isfinite(xyz[1]) ||
             !std::isfinite(xyz[2]) ||
             (pretransformed && (!std::isfinite(xyz[3]) || xyz[3] <= 0.0f)))
             return false;
         NativeVertex& v = output[i];
         if (pretransformed) {
-            v.clip[0] = 2.0f * (xyz[0] - static_cast<float>(vp.X)) /
-                        static_cast<float>(vp.Width) - 1.0f;
-            v.clip[1] = 1.0f - 2.0f * (xyz[1] - static_cast<float>(vp.Y)) /
-                        static_cast<float>(vp.Height);
-            v.clip[2] = xyz[2];
-            v.clip[3] = 1.0f;
+            // D3D9 XYZRHW stores reciprocal homogeneous W. Preserve it for
+            // perspective-correct UV interpolation instead of treating a menu
+            // sprite with non-uniform RHW as an affine D3D11 triangle.
+            const float w = 1.0f / xyz[3];
+            if (!std::isfinite(w) || w <= 0.0f) return false;
+            v.clip[0] = (2.0f * (xyz[0] - static_cast<float>(vp.X)) /
+                        static_cast<float>(vp.Width) - 1.0f) * w;
+            v.clip[1] = (1.0f - 2.0f * (xyz[1] - static_cast<float>(vp.Y)) /
+                        static_cast<float>(vp.Height)) * w;
+            v.clip[2] = xyz[2] * w;
+            v.clip[3] = w;
         } else {
             // D3D9 fixed-function uses row vectors: position * World * View *
             // Projection. The result is D3D11 clip space as well (z in [0,w]).
@@ -252,12 +330,76 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
     return true;
 }
 
+// Copy only accessible, uncompressed 32-bit game texture level 0. Default
+// pool GPU-only resources are not forcibly read back; failure preserves D3D9.
+bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
+                    ComPtr<ID3D11ShaderResourceView>& view,
+                    ComPtr<ID3D11SamplerState>& sampler) noexcept {
+    if (!dev || !capture.enabled || !capture.texture ||
+        capture.texture->GetLevelCount() != 1) return false;
+    D3DSURFACE_DESC info{};
+    if (FAILED(capture.texture->GetLevelDesc(0, &info)) ||
+        info.Width == 0 || info.Height == 0 ||
+        info.Width > 1024 || info.Height > 1024 ||
+        (info.Format != D3DFMT_A8R8G8B8 && info.Format != D3DFMT_X8R8G8B8) ||
+        info.Pool == D3DPOOL_DEFAULT)
+        return false;
+    D3DLOCKED_RECT locked{};
+    if (FAILED(capture.texture->LockRect(0, &locked, nullptr, D3DLOCK_READONLY)))
+        return false;
+    bool ok = false;
+    if (locked.pBits && locked.Pitch >= static_cast<INT>(info.Width * 4u)) {
+        std::vector<std::uint32_t> pixels(static_cast<std::size_t>(info.Width) * info.Height);
+        for (UINT y=0; y<info.Height; ++y) {
+            const auto* row = static_cast<const std::uint8_t*>(locked.pBits) +
+                              static_cast<std::size_t>(y) * locked.Pitch;
+            std::memcpy(pixels.data() + static_cast<std::size_t>(y) * info.Width,
+                        row, info.Width * 4u);
+        }
+        if (info.Format == D3DFMT_X8R8G8B8)
+            for (auto& pixel : pixels) pixel |= 0xff000000u;
+        D3D11_TEXTURE2D_DESC desc{};
+        desc.Width = info.Width; desc.Height = info.Height;
+        desc.MipLevels = 1; desc.ArraySize = 1;
+        desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        desc.SampleDesc.Count = 1;
+        desc.Usage = D3D11_USAGE_IMMUTABLE;
+        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        D3D11_SUBRESOURCE_DATA initial{};
+        initial.pSysMem = pixels.data();
+        initial.SysMemPitch = info.Width * 4u;
+        ComPtr<ID3D11Texture2D> texture;
+        if (SUCCEEDED(dev->CreateTexture2D(&desc, &initial, texture.GetAddressOf())) &&
+            SUCCEEDED(dev->CreateShaderResourceView(texture.Get(), nullptr,
+                                                   view.GetAddressOf()))) {
+            D3D11_SAMPLER_DESC state{};
+            state.Filter = capture.filter == D3DTEXF_LINEAR ?
+                D3D11_FILTER_MIN_MAG_MIP_LINEAR : D3D11_FILTER_MIN_MAG_MIP_POINT;
+            state.AddressU = capture.addressU == D3DTADDRESS_WRAP ?
+                D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
+            state.AddressV = capture.addressV == D3DTADDRESS_WRAP ?
+                D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
+            state.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+            state.MaxLOD = D3D11_FLOAT32_MAX;
+            state.MaxAnisotropy = 1;
+            ok = SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));
+        }
+    }
+    capture.texture->UnlockRect(0);
+    return ok;
+}
+
 bool submit(State& s, const std::vector<NativeVertex>& vertices,
-            const std::uint32_t* indices, UINT indexCount) noexcept {
+            const std::uint32_t* indices, UINT indexCount,
+            const TextureCapture& capture) noexcept {
     if (!ensure_pipeline(s)) return false;
     auto* dev = s.backend.device();
     auto* ctx = s.backend.context();
     if (!dev || !ctx) return false;
+    ComPtr<ID3D11ShaderResourceView> sampledView;
+    ComPtr<ID3D11SamplerState> sampledSampler;
+    if (capture.enabled &&
+        !mirror_texture(dev, capture, sampledView, sampledSampler)) return false;
     D3D11_BUFFER_DESC bd{};
     bd.ByteWidth = static_cast<UINT>(vertices.size() * sizeof(NativeVertex));
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -283,7 +425,11 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     if (ib) ctx->IASetIndexBuffer(ib.Get(), DXGI_FORMAT_R32_UINT, 0);
     ctx->RSSetState(s.raster.Get());
     ctx->VSSetShader(s.vs.Get(), nullptr, 0);
-    ctx->PSSetShader(s.ps.Get(), nullptr, 0);
+    ctx->PSSetShader(capture.enabled ? s.sampledPs.Get() : s.ps.Get(), nullptr, 0);
+    ID3D11ShaderResourceView* boundView = sampledView.Get();
+    ID3D11SamplerState* boundSampler = sampledSampler.Get();
+    ctx->PSSetShaderResources(0, 1, &boundView);
+    ctx->PSSetSamplers(0, 1, &boundSampler);
     if (ib) ctx->DrawIndexed(indexCount, 0, 0);
     else ctx->Draw(static_cast<UINT>(vertices.size()), 0);
     ctx->Flush();
@@ -305,7 +451,8 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         D3DVIEWPORT9 vp{};
         bool pretransformed = true;
         std::array<D3DMATRIX, 3> transforms{};
-        if (!supported_game_state(game, vp, pretransformed, transforms)) return;
+        TextureCapture capture{};
+        if (!supported_game_state(game, vp, pretransformed, transforms, capture)) return;
         // Count every admitted state, including calls after this frame's one
         // native draw. Use that bounded population to rotate the next frame's
         // probe rather than sampling its same first triangle indefinitely.
@@ -318,14 +465,14 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         if (!indexCount && vertexCount != primitives * 3) return;
         std::vector<NativeVertex> vertices;
         if (!translate_vertices(bytes, vertexCount, stride, vp,
-                                pretransformed, transforms, vertices))
+                                pretransformed, transforms, capture, vertices))
             return;
         if (indices) {
             for (UINT i=0; i<indexCount; ++i)
                 if (indices[i] >= vertexCount) return;
         }
         s.attempted = true;
-        if (!submit(s, vertices, indices, indexCount)) ++s.failed;
+        if (!submit(s, vertices, indices, indexCount, capture)) ++s.failed;
     } catch (...) {
         // Never interrupt the game's real draw or input on diagnostic failure.
     }
@@ -448,7 +595,7 @@ void before_game_reset() noexcept {
     s.eligibleThisFrame = 0;
     s.probeSlot = 0;
     s.staging.Reset(); s.raster.Reset(); s.layout.Reset();
-    s.ps.Reset(); s.vs.Reset();
+    s.ps.Reset(); s.sampledPs.Reset(); s.vs.Reset();
     s.backend.shutdown();
 }
 } // namespace outrun::vr::dx11::live_game_frame
