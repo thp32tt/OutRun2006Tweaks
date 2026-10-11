@@ -2422,6 +2422,8 @@ async def conversion_send_lane_task(
     pages: dict[str, Page],
     q: dict,
     slot_name: str,
+    *,
+    force_fresh_chat: bool = False,
 ) -> bool:
     """Dispatch one conversion lane without blocking the other conversion lanes."""
     now = datetime.now(TZ)
@@ -2450,7 +2452,7 @@ async def conversion_send_lane_task(
         return False
 
     contract = None
-    if VR_FEATURE_DEVELOPMENT_ENABLED and target["lane"] in {"DX11", "DX9EX"}:
+    if VR_FEATURE_DEVELOPMENT_ENABLED and not VR_CONTINUOUS_30M_ENABLED and target["lane"] in {"DX11", "DX9EX"}:
         try:
             contract = github_feature_contract(target["lane"], q)
         except Exception as exc:
@@ -2461,7 +2463,8 @@ async def conversion_send_lane_task(
                           last_action=f"{target['lane']}: no unowned, dependency-ready feature; no filler task allocated")
             return False
 
-    page = await slot_page(context, pages, slot)
+    page = (await replace_with_fresh_slot_page(context, pages, slot)
+            if force_fresh_chat else await slot_page(context, pages, slot))
     if slot.url and not is_project_scoped_chat_url(slot.url):
         slot.url = None
         save_registry(reg)
@@ -2528,7 +2531,7 @@ async def conversion_send_lane_task(
     }
     event = append_task_event(reg, draft, "dispatch")
     feature_branch = None
-    if VR_FEATURE_DEVELOPMENT_ENABLED and target["lane"] in {"DX11", "DX9EX"}:
+    if VR_FEATURE_DEVELOPMENT_ENABLED and not VR_CONTINUOUS_30M_ENABLED and target["lane"] in {"DX11", "DX9EX"}:
         try:
             feature_branch = await asyncio.to_thread(
                 github_create_feature_branch, target["lane"], production_id, base_sha
@@ -2555,13 +2558,17 @@ async def conversion_send_lane_task(
     runtime["queue_failure_context"] = ""
     runtime["queue_qa_batch"] = []
 
-    if not await ensure_thinking_level(page) and STRICT_THINKING_LEVEL:
+    thinking_verified = await ensure_thinking_level(page)
+    if not thinking_verified and STRICT_THINKING_LEVEL and not VR_CONTINUOUS_30M_ENABLED:
         write_runtime(
             status="thinking_level_blocked",
             last_action=f"Conversion lane {slot_name}: {PREFERRED_THINKING_LEVEL} not verified",
             queue=q,
         )
         return False
+    if not thinking_verified and VR_CONTINUOUS_30M_ENABLED:
+        write_runtime(vr_continuous_thinking_unverified=True,
+                      last_action="Proceeding with development despite unverified model picker")
 
     result = await send_message(page, prompt_for_slot(slot, "parallel"))
     if result != "sent":
@@ -3163,6 +3170,112 @@ def conversion_dispatch_plan(
     )[:available]
 
 
+def vr_continuous_dispatch_due(q: dict, slot_name: str, now: datetime) -> bool:
+    """30m timer is independent of feature outcomes, C6 and stuck chat state."""
+    if slot_name not in {"A", "C"}:
+        return False
+    if not q.get("active_by_lane", {}).get(slot_name):
+        return True  # Release from C6 or restart triggers immediate new work.
+    stamp = (q.get("vr_continuous_last_dispatch_at") or {}).get(slot_name)
+    stamp = stamp or q["active_by_lane"][slot_name].get("sent_at")
+    parsed = _parse_iso(stamp)
+    return not parsed or (now - parsed).total_seconds() >= VR_CONTINUOUS_INTERVAL_SECONDS
+
+
+async def vr_continuous_conversion_cycle(context: BrowserContext, pages: dict, q: dict, now: datetime) -> None:
+    """Dispatch A and C each <=30m of successful send, regardless of old C6.
+
+    Keep old in-flight identities as superseded snapshots; never convert an
+    unverified task to a fake PASS. A failed send leaves the existing owner
+    intact and is retried at the next 15-second scheduler poll. DXVK stays off.
+    """
+    active_by_lane = q.setdefault("active_by_lane", {})
+    enabled = (("A", CONVERSION_DX11_ENABLED), ("C", CONVERSION_DX9EX_ENABLED))
+    for lane_key, allowed in enabled:
+        if not allowed or (CONVERSION_ONLY_SLOT and lane_key != CONVERSION_ONLY_SLOT):
+            continue
+        now = datetime.now(TZ)
+        if not vr_continuous_dispatch_due(q, lane_key, now):
+            continue
+        old = active_by_lane.get(lane_key)
+        # Every cycle uses a fresh project chat: a hung old rendering tab is not
+        # allowed to block the next developer. Preserve the old queue locally.
+        if old and old.get("phase") != "DONE":
+            save_queue_state(q)
+            try:
+                await vr_persist_checkpoint(q, old, now, "pre_rollover")
+            except Exception as exc:
+                log.warning("Continuous preemption checkpoint failed task=%s: %r",
+                            old.get("task_id"), exc)
+        try:
+            sent = await conversion_send_lane_task(
+                context, pages, q, lane_key, force_fresh_chat=True
+            )
+        except Exception as exc:
+            log.warning("Continuous dispatch failed lane=%s: %r", lane_key, exc)
+            write_runtime(
+                status="vr_continuous_dispatch_error",
+                last_action=f"{lane_key}: {type(exc).__name__}; automatic retry next poll",
+            )
+            continue
+        if not sent:
+            # Old queue owner was not overwritten. Retry without consuming ID.
+            write_runtime(
+                status="vr_continuous_dispatch_retry",
+                last_action=f"{lane_key}: fresh chat not sent; will retry automatically",
+            )
+            continue
+        new = active_by_lane.get(lane_key)
+        dispatched_at = (new or {}).get("sent_at") or datetime.now(TZ).isoformat()
+        q.setdefault("vr_continuous_last_dispatch_at", {})[lane_key] = dispatched_at
+        if old and old.get("task_id") != (new or {}).get("task_id"):
+            history = q.setdefault("vr_continuous_superseded", [])
+            history.append({
+                "task_id": old.get("task_id"),
+                "lane": old.get("lane"), "phase": old.get("phase"),
+                "result_sha": old.get("result_sha"),
+                "chat_url": None,  # Don't export private chat URLs to GitHub.
+                "superseded_at": dispatched_at,
+                "reason": "30_MINUTE_CONTINUOUS_DISPATCH",
+                "validation": "UNVERIFIED_UNLESS_C6_EXISTS",
+            })
+            q["vr_continuous_superseded"] = history[-100:]
+        save_queue_state(q)
+        write_runtime(
+            status="vr_continuous_dispatched",
+            last_action=f"{lane_key}: {(new or {}).get('task_id')} dispatched at 30m cadence",
+            vr_continuous_last_dispatch=q["vr_continuous_last_dispatch_at"],
+        )
+
+    # A stalled CI validation or response cannot block independent dispatch.
+    for lane_key, allowed in enabled:
+        if not allowed or (CONVERSION_ONLY_SLOT and lane_key != CONVERSION_ONLY_SLOT):
+            continue
+        active = active_by_lane.get(lane_key)
+        if not active:
+            continue
+        try:
+            await conversion_process_lane(context, pages, q, lane_key)
+        except Exception as exc:
+            log.warning("Continuous lane processing deferred lane=%s: %r", lane_key, exc)
+            write_runtime(
+                status="vr_continuous_lane_processing_error",
+                last_action=f"{lane_key}: {type(exc).__name__}; timer remains active",
+            )
+        active = active_by_lane.get(lane_key)
+        if active and active.get("phase") == "DONE":
+            active_by_lane.pop(lane_key, None)
+    save_queue_state(q)
+    write_runtime(
+        status="vr_continuous_running",
+        last_action="30m independent A(DX11)+C(DX9Ex); B(DXVK) frozen; active: " +
+            ", ".join(f"{key}={x.get('task_id')}:{x.get('phase')}"
+                      for key, x in sorted(active_by_lane.items())),
+        vr_continuous_last_dispatch=q.get("vr_continuous_last_dispatch_at", {}),
+        queue=q,
+    )
+
+
 async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Page]):
     """Develop native DX11 and stabilize DX9Ex concurrently; freeze DXVK."""
     now = datetime.now(TZ)
@@ -3229,6 +3342,10 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
             })
         q["frozen_lane_tasks"] = frozen[-100:]
         save_queue_state(q)
+
+    if VR_CONTINUOUS_30M_ENABLED:
+        await vr_continuous_conversion_cycle(context, pages, q, datetime.now(TZ))
+        return
 
     # Dispatch missing enabled workers before advancing existing workers. A slow
     # DX11 reconciliation must not starve the independent DX9Ex C worker.
