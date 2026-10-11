@@ -163,6 +163,7 @@ add_executable(outrun-vr-cadence-presented-wait-smoke tests/cadence_presented_wa
 add_executable(outrun-vr-eye-extent-smoke tests/xr_eye_extent_smoke.cpp)
 target_include_directories(outrun-vr-eye-extent-smoke PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/../src"
+    "${CMAKE_CURRENT_LIST_DIR}/src"
 )
 
 foreach(target
