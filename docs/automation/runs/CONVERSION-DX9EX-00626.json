@@ -1,0 +1,95 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00626",
+  "production_id": "CONVERSION-DX9EX-00626",
+  "event_id": "CONVERSION-DX9EX-00626-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:R30_BUFFER_HOOK_INSTALL_LOCK_ELISION",
+  "work_key": "DX9EX:R30_BUFFER_HOOK_INSTALL_LOCK_ELISION",
+  "material_result_sha": "7496b1895411ac1d0740dc2eba6d8883b0fb1bc6",
+  "material_commits": [
+    "66b77b5b2ac7f9371f726c6ef49bec1b140d256d",
+    "7496b1895411ac1d0740dc2eba6d8883b0fb1bc6"
+  ],
+  "result_sha": "7496b1895411ac1d0740dc2eba6d8883b0fb1bc6",
+  "validation_bearing_result_sha": "7496b1895411ac1d0740dc2eba6d8883b0fb1bc6",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Remove redundant R30 per-draw VB/IB hook-install mutex acquisition during high-workload XYZRHW stereo draws, preserving partial-install retries and teardown semantics.",
+    "acceptance": "Complete three-hook publication per vertex/index buffer only with release/acquire; fast path must precede hook mutex; installation failure locked retry and rollback clear flags; 7 destructive mutations in policy; exact SHA DX9Ex Active 5/5, Domain Isolation 1/1 and Full Source Impact 3/3 SUCCESS.",
+    "runtime_metrics": "Quest3/VDXR FPS, per-draw mutex contention, p95/p99 and HMD visual acceptance were not measured."
+  },
+  "acceptance_results": [
+    {
+      "item": "R30_VERTEX_AND_INDEX_BUFFER_INSTALL_FASTPATH",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Atomic ready flags published after successful VB/IB Lock/Unlock/Release group, with acquire fast path avoiding install mutex on subsequent draws."
+    },
+    {
+      "item": "R30_PARTIAL_INSTALL_AND_ROLLBACK",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Incomplete hooks retry under lock; rollback synchronizes with install path and clears ready flags before teardown."
+    },
+    {
+      "item": "SEVEN_DESTRUCTIVE_MUTATIONS",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "tools/verify_vr_r30_buffer_hook_install_fastpath.py validates 7 source mutation failures in DX9Ex Active policy step."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Active Validation run #38168945270 5 jobs policy/game/full-chain-compile/host/package SUCCESS."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Domain Isolation Guard #38168945299 SUCCESS."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Full Source Impact Review #38168945258 3 jobs source-cross-domain/game MSVC/host MSVC SUCCESS."
+    },
+    {
+      "item": "QUEST3_VDXR_FPS_VISUAL",
+      "status": "UNTESTED",
+      "evidence": "No matching Quest3/VDXR runtime session or frame-time measurement."
+    }
+  ],
+  "exact_sha_validation": {
+    "target_sha": "7496b1895411ac1d0740dc2eba6d8883b0fb1bc6",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38168945270,
+        "head_sha": "7496b1895411ac1d0740dc2eba6d8883b0fb1bc6",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38168945299,
+        "head_sha": "7496b1895411ac1d0740dc2eba6d8883b0fb1bc6",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38168945258,
+        "head_sha": "7496b1895411ac1d0740dc2eba6d8883b0fb1bc6",
+        "conclusion": "success",
+        "status": "completed"
+      }
+    ]
+  },
+  "runtime_validation_note": "RUNTIME_VALIDATION=UNTESTED; build and policy success do not prove Quest3/VDXR FPS or headset optics.",
+  "controller_next_action": "Next independent DX9Ex performance feature on a separate work_key; do not redispatch or rescore CONVERSION-DX9EX-00626."
+}
