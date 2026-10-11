@@ -55,6 +55,26 @@ def check(r29, api, r30):
             "D3DRS_ZENABLE", "D3DRS_ALPHABLENDENABLE",
             "D3DRS_ALPHATESTENABLE", "FAILED(device->GetRenderState(")):
             return False
+        # R29's shader identity is valid only while the shared R33
+        # StateBlock setter/Apply coverage remains reliable. Avoid the
+        # per-draw D3D9 getter on that path, never on unreliable coverage.
+        shader_gate = xyz.index(
+            "if (!OutRunVR::State::StateBlockTracker::Reliable())")
+        shader_live = xyz.index("FAILED(device->GetVertexShader(&shader))")
+        fvf_gate = xyz.index("DWORD fvf = 0;")
+        if not (xyz.index("R29OwnerCurrentVertexShaderIdentity() != 0")
+                < shader_gate < shader_live < fvf_gate):
+            return False
+        live_fallback = xyz[shader_gate:fvf_gate]
+        if not all(term in live_fallback for term in (
+            "IDirect3DVertexShader9* shader = nullptr;",
+            "if (FAILED(device->GetVertexShader(&shader)))",
+            "if (shader)",
+            "shader->Release();",
+            "return false;")):
+            return False
+        if live_fallback.count("GetVertexShader(") != 1:
+            return False
         start = xyz.index("R29OwnerEnsureStereoResources(device)")
         fallback_vp = xyz.index("FAILED(device->GetViewport(&state.viewport))")
         if not start < xyz.index("!R29OwnerTryGetTrackedViewport(state.viewport)") < fallback_vp:
@@ -117,11 +137,25 @@ def main():
         (r29, api, r30.replace(
             "FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)))",
             "false)", 1)),
+        (r29, api, r30.replace(
+            "if (!OutRunVR::State::StateBlockTracker::Reliable())",
+            "if (false)", 1)),
+        (r29, api, r30.replace(
+            "if (!OutRunVR::State::StateBlockTracker::Reliable())",
+            "if (true)", 1)),
+        (r29, api, r30.replace(
+            "if (FAILED(device->GetVertexShader(&shader)))",
+            "if (false)", 1)),
+        (r29, api, r30.replace(
+            "shader->Release();", "// shader->Release();", 1)),
+        (r29, api, r30.replace(
+            "R29OwnerCurrentVertexShaderIdentity() != 0",
+            "false", 1)),
     )
     for i, candidate in enumerate(changes, 1):
         assert candidate != (r29, api, r30), f"mutation {i} not applied"
         assert not check(*candidate), f"mutation {i} escaped"
-    print("PASS DX9Ex R30 cached raster hotpath + 11 destructive regressions")
+    print("PASS DX9Ex R30 cached raster hotpath + 16 destructive regressions")
 
 
 if __name__ == "__main__":

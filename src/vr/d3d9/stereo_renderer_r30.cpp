@@ -1716,13 +1716,21 @@ namespace OutRunVRStereo
                 R29OwnerCurrentVertexShaderIdentity() != 0)
                 return false;
 
-            IDirect3DVertexShader9* shader = nullptr;
-            if (FAILED(device->GetVertexShader(&shader)))
-                return false;
-            if (shader)
+            // R33's final dispatcher and R29's setter/StateBlock shader
+            // epoch agree when StateBlock coverage is reliable. Re-querying
+            // GetVertexShader on every XYZRHW HUD/particle draw then stalls
+            // the D3D9 driver without adding evidence. On coverage loss,
+            // keep the original live null-shader check and fail closed.
+            if (!OutRunVR::State::StateBlockTracker::Reliable())
             {
-                shader->Release();
-                return false;
+                IDirect3DVertexShader9* shader = nullptr;
+                if (FAILED(device->GetVertexShader(&shader)))
+                    return false;
+                if (shader)
+                {
+                    shader->Release();
+                    return false;
+                }
             }
 
             DWORD fvf = 0;
