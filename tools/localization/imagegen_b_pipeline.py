@@ -267,16 +267,28 @@ def require_bound_english_reference(repo: Path, raw: dict) -> dict:
     except (KeyError, TypeError, OSError, ValueError) as exc:
         raise ValueError("SOURCE_REFERENCE_NOT_BOUND: invalid English PNG or receipt") from exc
     if not isinstance(receipt, dict) or (
-        receipt.get("tool") != "image_gen.text2im"
-        or receipt.get("media_attached") is not True
+        receipt.get("media_attached") is not True
         or receipt.get("source_image_sha256") != english_ref.get("sha256")
         or receipt.get("generation_id") != raw.get("generator", {}).get("generation_id")
         or receipt.get("target_text") != raw.get("target_text")
-        or receipt.get("image_input_field") not in ("referenced_image_ids", "tool_image_input")
         or not isinstance(receipt.get("input_reference_id"), str)
         or not receipt["input_reference_id"].strip()
     ):
         raise ValueError("SOURCE_REFERENCE_NOT_BOUND: tool-image attachment not evidenced")
+    if receipt.get("tool") == "openai.images.edit":
+        # Actual multipart file input with a server-issued response header.
+        # A claimed attachment in a chat-visible tool result is not enough.
+        if (raw.get("generator", {}).get("provider") != "openai-images-edit"
+            or receipt.get("image_input_field") != "multipart_image"
+            or receipt.get("openai_request_id") != receipt["input_reference_id"]
+            or receipt.get("actual_api_response_received") is not True
+            or receipt.get("result_sha256") != raw.get("generated", {}).get("sha256")):
+            raise ValueError("SOURCE_REFERENCE_NOT_BOUND: API multipart receipt/output mismatch")
+    elif receipt.get("tool") == "image_gen.text2im":
+        if receipt.get("image_input_field") not in ("referenced_image_ids", "tool_image_input"):
+            raise ValueError("SOURCE_REFERENCE_NOT_BOUND: no real ChatGPT tool input")
+    else:
+        raise ValueError("SOURCE_REFERENCE_NOT_BOUND: unknown image generation mechanism")
     return {
         "english_reference_sha256": english_ref["sha256"],
         "tool_request_receipt_sha256": receipt_ref["sha256"],
@@ -293,7 +305,7 @@ def run(repo: Path, manifest: Path) -> dict:
         raise ValueError(f"Manifest must remain under role_{role}/imagegen_requests")
     if not (repo / raw["generated"]["path"]).resolve().is_relative_to(requests_dir):
         raise ValueError(f"Generated PNG must remain under role_{role}/imagegen_requests")
-    if raw.get("generator",{}).get("provider") not in ("chatgpt-image-generator","chatgpt-image-plugin"):
+    if raw.get("generator",{}).get("provider") not in ("chatgpt-image-generator","chatgpt-image-plugin","openai-images-edit"):
         raise ValueError("Only actual B/C1 image-generator output may enter this lane")
     if not raw["generator"].get("generation_id") or not raw["generator"].get("prompt"):
         raise ValueError("No generator invocation/prompt provenance; HOLD")
