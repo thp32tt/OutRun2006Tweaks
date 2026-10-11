@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 15:50 KST",
+  "updated_at_kst": "2026-10-11 16:18 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1005,6 +1005,20 @@
         "RUNTIME_VALIDATION": "UNTESTED",
         "official_promoted": 0,
         "qa": "localization/graphics/role_C/20261011-C1-Q121-A240-FIRST-SAVED-INDEPENDENT/C1_Q121_A240_INDEPENDENT_OPTICAL_REWORK.json"
+      },
+      "c1_q119_new_native_family_20261011": {
+        "run_key": "OUTRUN-KOR-C1-Q119-NEW-OPTICAL-HIERARCHY-20261011-1617",
+        "index": 119,
+        "existing_candidate_same_sha": true,
+        "substantive_new_optical_fail": true,
+        "source_candidate_width_ratio": 0.4818,
+        "C1": "REWORK_REQUIRED_SOURCE_FAMILY_AND_VISUAL_HIERARCHY",
+        "independent_C2": "NOT_RUN",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "new_candidate_DDS": 0,
+        "official_promoted_DDS": 0,
+        "QA": "localization/graphics/role_C/20261011-C1-Q119-NEW-NATIVE-FAMILY-HIERARCHY-FAIL/C1_Q119_SOURCE_FAMILY_OPTICAL_REWORK.json"
       }
     },
     "runtime_text_trace": {
