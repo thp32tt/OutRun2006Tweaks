@@ -1168,13 +1168,27 @@ async def queue_rollover_chat(context: BrowserContext, pages: dict[str, Page], a
 
     old_page = pages.get(slot.name)
     if vr_forced:
-        # A timer cannot transfer ownership while the old worker is generating.
-        if old_page is None or old_page.is_closed() or await detect_busy(old_page):
+        # At 30m preserve the active worker; by the explicit 40m ceiling a
+        # permanently busy/crashed renderer must not block this lane forever.
+        owner_busy_or_missing = (
+            old_page is None or old_page.is_closed() or await detect_busy(old_page)
+        )
+        if owner_busy_or_missing and not hard_40m:
             active["rollover_pending_reason"] = reason
             write_runtime(status="conversation_rollover_owner_wait",
                           last_action=f"{active['task_id']}: retain owner until idle is confirmed",
                           queue=active)
             return False
+        if owner_busy_or_missing and hard_40m:
+            # The next worker must reconcile GitHub HEAD and existing C6 first.
+            # Keep TASK_ID stable; the old chat may still finish independently.
+            active["forced_owner_recovery_at"] = datetime.now(TZ).isoformat()
+            active["forced_owner_recovery_reason"] = "40m busy/missing chat owner"
+            write_runtime(
+                status="vr_40m_forced_owner_recovery",
+                last_action=f"{active['task_id']}: 40m ceiling overrides stale UI busy state",
+                queue=active,
+            )
         active.pop("rollover_pending_reason", None)
     old_url = slot.url or (old_page.url if old_page and not old_page.is_closed() else None)
     previous = list(active.get("previous_chat_urls", []))
