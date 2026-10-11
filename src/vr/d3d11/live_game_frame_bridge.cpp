@@ -413,6 +413,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;
         // RGB and alpha must both use ADD(TEXTURE, DIFFUSE).
         const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;
+        // On D3D9 fixed-function stage 0, CURRENT resolves to vertex DIFFUSE.
+        // Reject operand modifiers; later stages are disabled by the gate.
+        const bool arg2Diffuse = arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT;
+        const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT;
         // A missing DIFFUSE slot may supply a material color under MODULATE.
         // Only texture selection is provably independent of that color.
         if (!layout.hasDiffuse && !selectTexture) return false;
@@ -420,7 +424,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // mirrored; inactive ARG2 is irrelevant for SELECTARG1.
         if ((!modulate && !selectTexture && !additive) || arg != D3DTA_TEXTURE ||
             alphaArg1 != D3DTA_TEXTURE ||
-            ((modulate || additive) && (arg2 != D3DTA_DIFFUSE || alphaArg2 != D3DTA_DIFFUSE)) ||
+            ((modulate || additive) && (!arg2Diffuse || !alphaArg2Diffuse)) ||
             coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb ||
             (addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP) ||
             (addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP) ||

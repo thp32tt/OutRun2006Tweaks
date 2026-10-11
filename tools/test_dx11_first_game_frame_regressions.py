@@ -353,9 +353,11 @@ def main() -> None:
             "const bool modulate = op == D3DTOP_MODULATE && alphaOp == D3DTOP_MODULATE;",
             "const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;",
             "const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;",
+            "const bool arg2Diffuse = arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT;",
+            "const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT;",
             "(!modulate && !selectTexture && !additive) || arg != D3DTA_TEXTURE",
             "alphaArg1 != D3DTA_TEXTURE",
-            "((modulate || additive) && (arg2 != D3DTA_DIFFUSE || alphaArg2 != D3DTA_DIFFUSE))",
+            "((modulate || additive) && (!arg2Diffuse || !alphaArg2Diffuse))",
             "capture.selectTexture = selectTexture;",
             "capture.additive = additive;",
             "coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb",
@@ -390,12 +392,16 @@ def main() -> None:
          "const bool selectTexture = op == D3DTOP_SELECTARG1 || alphaOp == D3DTOP_SELECTARG1;"),
         ("(!modulate && !selectTexture && !additive) || arg != D3DTA_TEXTURE",
          "(!modulate && !selectTexture) && arg != D3DTA_TEXTURE"),
-        ("((modulate || additive) && (arg2 != D3DTA_DIFFUSE || alphaArg2 != D3DTA_DIFFUSE))",
+        ("((modulate || additive) && (!arg2Diffuse || !alphaArg2Diffuse))",
          "(modulate && (arg2 != D3DTA_DIFFUSE && alphaArg2 != D3DTA_DIFFUSE))"),
         ("capture.selectTexture = selectTexture;", "capture.selectTexture = false;"),
         ("capture.additive = additive;", "capture.additive = false;"),
         ("const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;",
          "const bool additive = op == D3DTOP_ADD || alphaOp == D3DTOP_ADD;"),
+        ("const bool arg2Diffuse = arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT;",
+         "const bool arg2Diffuse = arg2 == D3DTA_DIFFUSE;"),
+        ("const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT;",
+         "const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE;"),
         ("info.Pool == D3DPOOL_DEFAULT", "info.Pool == D3DPOOL_SYSTEMMEM"),
         ("GetLevelCount() == 0", "GetLevelCount() != 1"),
         ("state.MaxLOD = 0.0f;", "state.MaxLOD = D3D11_FLOAT32_MAX;"),
@@ -450,6 +456,12 @@ def main() -> None:
     for token in required_add:
         mutated = bridge.replace(token, "/* ADD disconnected */", 1)
         assert mutated != bridge and token not in mutated
+    # Stage-0 CURRENT is DIFFUSE (but not at a later texture stage).
+    # Operand modifier bits must still be refused rather than silently masked.
+    DIFFUSE, CURRENT, TEXTURE, COMPLEMENT = 0, 1, 2, 0x10
+    for second_arg in (DIFFUSE, CURRENT, TEXTURE, CURRENT | COMPLEMENT):
+        allowed = second_arg == DIFFUSE or second_arg == CURRENT
+        assert allowed == (second_arg in (0, 1))
     for texel, diffuse, expected in (
         ((0.8, 0.1, 0.5, 0.75), (0.4, 0.6, 0.7, 0.5), (1.0, 0.7, 1.0, 1.0)),
         ((0.0, 0.2, 0.0, 0.0), (0.2, 0.0, 0.7, 0.5), (0.2, 0.2, 0.7, 0.5)),

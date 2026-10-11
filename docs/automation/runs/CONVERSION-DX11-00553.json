@@ -20,18 +20,19 @@
     "milestone_id": "menu_to_race_native_frame",
     "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
     "integration_path": [
-      "Game D3D9 FVF TEX1..8 and ADD stage0",
+      "Game D3D9 stage0 ADD/TEXTURE+DIFFUSE or CURRENT alias, identical RGB/alpha",
       "D3D11 saturated ADD RGBA shader, lifecycle and draw dispatch",
       "Opt-in diagnostic inset, original DX9Ex gamepad/Draw fallback"
     ],
     "batch_components": [
       "C++ state admission and alpha/texture arguments",
       "C++ native pixel shader compile/resource/Draw binding",
-      "Python positive and destructive negative mutations including saturating RGBA vectors"
+      "Python positive and destructive negative mutations including saturating RGBA vectors",
+      "Stage0 CURRENT resolves to DIFFUSE for ADD/MODULATE without masking modifiers"
     ],
     "acceptance_proof": {
       "positive_probe": "PENDING_EXACT_SHA",
-      "negative_regression": "PENDING_EXACT_SHA",
+      "negative_regression": "Added SOURCE mutants for incorrect ADD op, missing shader lifecycle, invalid alias/current color and alpha argument",
       "component_integration": "Real D3D9 stage ADD -> D3D11 shader/SRV -> Draw/DrawIndexed -> diagnostic inset"
     },
     "conflict_keys": [
@@ -41,9 +42,9 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
-      "STAGE0_ADD",
+      "STAGE0_ADD_RGBA_AND_CURRENT_ALIAS",
       "D3D11_NATIVE_DRAW",
-      "PRESENT_INSET"
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "CI/build required, HMD/game pixels untested",
     "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only; original D3D9 always draws; mixed ops fail closed"
@@ -55,9 +56,9 @@
   ],
   "pipeline": {
     "C0_RECOVER": "33bb900e26af82779815e61a37544208876e923a",
-    "C1_REVIEW": "00552 complete; unmapped D3DTOP_ADD game stage",
-    "C2_IMPLEMENT": "Shader+state+dispatch+regression implementation",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C1_REVIEW": "Known D3D9 stage0 ADD gap; CI run 38153632432 revealed run-schema path identity error; D3DTA_CURRENT stage0 alias missing",
+    "C2_IMPLEMENT": "ADD PS with live Draw dispatch, alpha validation, stage0 CURRENT semantic parity; positive+negative regression.",
+    "C3_VALIDATE": "FIRST MATERIAL SHA 7c2153c... failed policy due to stage labels; corrected, new exact-SHA gate pending.",
     "C4_COMMIT": "PENDING",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING"
