@@ -1,6 +1,35 @@
 {
   "schema_version": 132,
   "branch": "korean-localization-recovery-20260928",
+  "a254_q175_native_chrome_new_trial_20261012": {
+    "role": "A",
+    "queue_index": 175,
+    "run_key": "OUTRUN-KOR-A254-Q175-P1-REAL-GLYPH-SOURCE-METAL-20261012-0800",
+    "priority": "P1",
+    "status": "NEW_UNPROMOTED_DDS_PRODUCER_SCOPED_PASS_PENDING_C2",
+    "original_source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+    "prior_rejected_trial_sha256": "a5e921ab2563a1ec6a3a1954a247a07d0a9adb9e101c4d73682600476e39323c",
+    "new_saved_dds_sha256": "d5789dc2eb173ad670eb0a5e80ec9e5cd174a66485d4afb3c05dc8571fce5855",
+    "new_saved_dds_path": "localization/graphics/role_A/20261012-A254-Q175-NATIVE-CHROME-GLYPH/A254_Q175_REAL_HANGUL_METALLIC_UNPROMOTED.dds",
+    "native_size": [
+      2048,
+      1024
+    ],
+    "format": "BGRA32",
+    "mips": 1,
+    "changed_rgba_pixels": 93589,
+    "changed_outside_source_bbox": 0,
+    "roundtrip_mismatch": 0,
+    "producer_QA": "SCOPED_PASS_COSMETIC_VARIANCE_ACCEPTED_BY_PRODUCER",
+    "qa_path": "localization/graphics/role_A/20261012-A254-Q175-NATIVE-CHROME-GLYPH/A254_CONTROLLER_FIRSTHAND_VISUAL_QA.json",
+    "worker_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38182999125",
+    "new_trial_dds_count": 1,
+    "official_promoted_count": 0,
+    "C2": "PENDING_FRESH_SHA",
+    "C3": "NOT_RUN",
+    "user_game": "IGR032_OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
   "a253_q103_source_italic_native_20261012": {
     "role": "A",
     "queue_index": 103,
