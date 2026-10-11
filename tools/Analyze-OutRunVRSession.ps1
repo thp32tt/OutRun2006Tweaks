@@ -97,7 +97,7 @@ foreach($spike in [regex]::Matches($gameLog,$perfSpikePattern)){
 # The active R28 lower-Present path emits the guaranteed source-frame
 # fallback diagnostics for CORRECTNESS. Count its throttled events separately
 # from detailed R32 GPU/effect counters; absent optional fields remain zero.
-$r28DipPattern='VR R28 FRAME DIP: frameMs=([0-9.]+) presentMs=([0-9.]+) estimateFps=([0-9.]+) draws=(\d+) frameSerial=(\d+)(?: band=(BELOW(?:60|50|40|30)))?'
+$r28DipPattern='VR R28 FRAME DIP: frameMs=([0-9.]+) presentMs=([0-9.]+) estimateFps=([0-9.]+) draws=(\d+) frameSerial=(\d+)(?: band=(BELOW(?:60|50|40|30)))?[^\r\n]*'
 $r28DipRows=@()
 foreach($dip in [regex]::Matches($gameLog,$r28DipPattern)){
     $r28DipRows += [pscustomobject]@{

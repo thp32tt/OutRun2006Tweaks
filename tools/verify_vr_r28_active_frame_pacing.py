@@ -53,6 +53,9 @@ for marker in ("R28RecordActiveFramePacing(begin, end);",
     mutation = source.replace(marker, "/* removed measurement */", 1)
     if marker in mutation:
         raise SystemExit(f"negative mutation did not remove {marker}")
+# The match value must extend past frameSerial/band to capture CPU timings.
+if ")?[^\\r\\n]*'" not in analyzer:
+    raise SystemExit("R28 dip regex truncates CPU breakdown fields")
 if "const double prepMs = begin.QuadPart >= previous" not in source:
     raise SystemExit("Pre-Present wall work is not measured against previous Present end")
 if "R28PreviousThreadCpuValid = cpuReadOk;" not in source:
