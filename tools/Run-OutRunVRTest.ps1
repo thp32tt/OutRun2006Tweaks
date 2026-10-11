@@ -264,9 +264,8 @@ if ($gpuCaptureRequested) {
     }
 }
 
-# Prewarm the XR host without making the game wait for the runtime.
-# Match the exact env policy that VRLaunchHostOnce would pass when launching
-# itself: otherwise prewarming could silently change DirectGPU/cadence behavior.
+# Prewarm OpenXR without waiting for the host to become ready.
+# Use the same configuration environment as VRLaunchHostOnce in the game.
 if ($backend -eq 'd3d9') {
     $xrHost = Join-Path $root 'outrun-vr-host.exe'
     if ((Test-Path -LiteralPath $xrHost) -and
@@ -274,89 +273,7 @@ if ($backend -eq 'd3d9') {
         $vrValues = @{}
         $inVr = $false
         foreach ($line in (Get-Content (Join-Path $root 'OutRun2006Tweaks.ini') -ErrorAction SilentlyContinue)) {
-            if ($line -match '^\s*\[([^]]+)\]\s*
-try{
-    $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
-    $p.WaitForExit()
-} finally {
-    # Stop only the sampler started by this run, never a user's other nvidia-smi.
-    if ($gpuCaptureRequested) {
-        $samplerExitedEarly = $false
-        if ($gpuSampler) {
-            try {
-                $samplerExitedEarly = $gpuSampler.HasExited
-                if (-not $samplerExitedEarly) {
-                    Stop-Process -Id $gpuSampler.Id -ErrorAction Stop
-                    [void]$gpuSampler.WaitForExit(5000)
-                }
-            } catch {
-                $gpuCaptureStatus = 'STOP_FAILED'
-                Write-Warning "GPU sampler shutdown failed: $($_.Exception.Message)"
-            } finally {
-                $gpuSampler.Dispose()
-            }
-        }
-        $gpuSampleCount = 0
-        if (Test-Path -LiteralPath $gpuCsv) {
-            # nvidia-smi emits one header followed by sampled data rows.
-            $gpuLines = @(Get-Content -LiteralPath $gpuCsv -ErrorAction SilentlyContinue)
-            $gpuSampleCount = @($gpuLines | Where-Object {
-                $_ -and $_ -notmatch '^\s*timestamp\s*,'
-            }).Count
-        }
-        if ($gpuCaptureStatus -eq 'SAMPLING') {
-            if ($samplerExitedEarly) {
-                $gpuCaptureStatus = 'SAMPLER_EXITED_EARLY'
-            } elseif ($gpuSampleCount -gt 0) {
-                $gpuCaptureStatus = 'CAPTURED'
-            } else {
-                $gpuCaptureStatus = 'NO_SAMPLES'
-            }
-        }
-        [ordered]@{
-            SchemaVersion = 1
-            Status = $gpuCaptureStatus
-            SessionId = [string]$state.SessionId
-            StartedUtc = $gpuCaptureStartedUtc
-            FinishedUtc = (Get-Date).ToUniversalTime().ToString('o')
-            SamplingSeconds = 1
-            SampleCount = $gpuSampleCount
-            CsvName = if ($gpuSampleCount -gt 0) { 'outrun-vr-gpu-utilization.csv' } else { $null }
-            Scope = 'WHOLE_NVIDIA_GPU_INCLUDING_GAME_HOST_COMPOSITOR_ENCODER'
-            GPUFrameTimeMeasured = $false
-            HmdRuntimeVerified = $false
-        } | ConvertTo-Json -Depth 3 |
-            Set-Content (Join-Path $sessionRoot 'gpu-utilization-status.json') -Encoding UTF8
-    }
-    $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
-    $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
-    $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile
-    $env:OUTRUN_VR_SHADER_FINGERPRINT=$oldShaderFingerprint
-    $env:OUTRUN_VR_EXE_SEMANTICS_VERIFIED=$oldExeSemanticsVerified
-    foreach($key in $identityKeys){
-        [Environment]::SetEnvironmentVariable($key,$oldIdentity[$key],'Process')
-    }
-    if($dxvkMode){
-        $env:VK_LOADER_LAYERS_DISABLE=$oldVkDisable
-        $env:VK_INSTANCE_LAYERS=$oldVkInstanceLayers
-        $env:VK_LOADER_DEBUG=$oldVkDebug
-    }
-}
-
-$deadline=(Get-Date).AddSeconds(15)
-do{
-    $hostProc=Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue
-    if(!$hostProc){break}
-    Start-Sleep -Milliseconds 500
-}while((Get-Date) -lt $deadline)
-
-if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
-    Write-Warning 'outrun-vr-host.exe is still running. Close it, then run: powershell -NoProfile -ExecutionPolicy Bypass -File .\Collect-OutRunVRLogs.ps1 . No logs were deleted.'
-    exit 2
-}
-
-& $collector
-if($LASTEXITCODE -and $LASTEXITCODE -ne 0){exit $LASTEXITCODE}) {
+            if ($line -match '^\s*\[([^]]+)\]\s*$') {
                 $inVr = ($matches[1] -ieq 'VR')
             } elseif ($inVr -and $line -match '^\s*([A-Za-z0-9]+)\s*=\s*([^#;\r\n]+)') {
                 $vrValues[$matches[1]] = $matches[2].Trim()
