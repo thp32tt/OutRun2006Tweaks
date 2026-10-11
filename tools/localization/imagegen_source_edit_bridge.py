@@ -84,6 +84,14 @@ def preflight(repo, request):
 def run(repo, request, api_client=None):
     repo = Path(repo).resolve()
     path, original_bytes, source = preflight(repo, request)
+    output_dir = (repo / request["output_dir"]).resolve()
+    basename = request["request_key"]
+    out_png = output_dir / (basename + "_RAW_UNREVIEWED.png")
+    receipt_path = output_dir / (basename + "_TOOL_INPUT_RECEIPT.json")
+    result_path = output_dir / (basename + "_OUTPUT_MANIFEST.json")
+    # Check before any billable request, not only after generation.
+    if any(p.exists() for p in (out_png, receipt_path, result_path)):
+        raise FileExistsError("request_key output exists: do not duplicate same generation")
     if api_client is None:
         if not os.environ.get("OPENAI_API_KEY"):
             raise RuntimeError("SOURCE_ATTACHMENT_API_CREDENTIAL_MISSING: no API call, no receipt")
@@ -120,12 +128,7 @@ def run(repo, request, api_client=None):
             raise RuntimeError("IMAGEGEN_OUTPUT_MISSING_ALPHA")
         output_size = list(im.size)
         output_visible_bbox = list(alpha.getbbox() or ())
-    output_dir = (repo / request["output_dir"]).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-    basename = request["request_key"]
-    out_png = output_dir / (basename + "_RAW_UNREVIEWED.png")
-    receipt_path = output_dir / (basename + "_TOOL_INPUT_RECEIPT.json")
-    result_path = output_dir / (basename + "_OUTPUT_MANIFEST.json")
     # Never overwrite even unreviewed artifacts: retries need new request keys.
     if any(p.exists() for p in (out_png, receipt_path, result_path)):
         raise FileExistsError("request_key output exists: do not duplicate same generation")
