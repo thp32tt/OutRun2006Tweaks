@@ -355,7 +355,7 @@ def main() -> None:
             "const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;",
             "const bool arg2Diffuse = arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT;",
             "const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT;",
-            "(!modulate && !selectTexture && !additive && !subtract && !modulate2x && || arg != D3DTA_TEXTURE",
+            "(!modulate && !selectTexture && !additive && !subtract && !modulate2x &&",
             "alphaArg1 != D3DTA_TEXTURE",
             "(rgbNeedsDiffuse && !arg2Diffuse)",
             "capture.selectTexture = selectTexture;",
@@ -390,7 +390,7 @@ def main() -> None:
          "const bool modulate = op == D3DTOP_MODULATE || alphaOp == D3DTOP_MODULATE;"),
         ("const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;",
          "const bool selectTexture = op == D3DTOP_SELECTARG1 || alphaOp == D3DTOP_SELECTARG1;"),
-        ("(!modulate && !selectTexture && !additive && !subtract && !modulate2x && || arg != D3DTA_TEXTURE",
+        ("(!modulate && !selectTexture && !additive && !subtract && !modulate2x &&",
          "(!modulate && !selectTexture) && arg != D3DTA_TEXTURE"),
         ("(rgbNeedsDiffuse && !arg2Diffuse)",
          "(modulate && (arg2 != D3DTA_DIFFUSE && alphaArg2 != D3DTA_DIFFUSE))"),
@@ -560,7 +560,7 @@ def main() -> None:
     # Mutations reject disconnected shader, alpha or operand gate changes.
     subtract_link = (
         "const bool subtract = op == D3DTOP_SUBTRACT && alphaOp == D3DTOP_SUBTRACT;",
-        "(!modulate && !selectTexture && !additive && !subtract && !modulate2x && || arg != D3DTA_TEXTURE",
+        "(!modulate && !selectTexture && !additive && !subtract && !modulate2x &&",
         "(rgbNeedsDiffuse && !arg2Diffuse)",
         "capture.subtract = subtract;",
         "bool subtract = false;",
