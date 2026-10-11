@@ -227,7 +227,9 @@ def vr_acceptance_verdict(active: dict, record: dict, changed_paths: list) -> tu
     for item in contract.get("acceptance_items", []):
         result = indexed.get(item["id"], {})
         paths = result.get("evidence_paths")
-        if (result.get("status") not in {"PASS", "PASS_FEATURE_CI"} or not isinstance(paths, list) or not paths
+        if (result.get("status") not in {"PASS", "PASS_FEATURE_CI",
+                "PASS_EXACT_SHA_STATIC_SOURCE_AND_BUILD__RUNTIME_UNTESTED",
+                "PASS_EXACT_SHA_BINARY_PACKAGE"} or not isinstance(paths, list) or not paths
                 or not isinstance(result.get("validation_command"), str)
                 or not result["validation_command"].strip()):
             return False, "ACCEPTANCE_ITEM_PENDING:" + item["id"]
@@ -237,6 +239,9 @@ def vr_acceptance_verdict(active: dict, record: dict, changed_paths: list) -> tu
         if (contract.get("feature_id") == "DX9EX:R84_RENDERER_GRAPH"
                 and item["id"] == "R84-ABI"):
             allowed_paths += ("src/vr/core/r29_owner_api.hpp",)
+        if (contract.get("feature_id") == "DX11:FIRST_GAME_DRAW_FRAME"
+                and item["id"] == "DX11-TEST-BUNDLE"):
+            allowed_paths += ("CMakeLists.txt",)
         if not any(p in changed_paths and any(p.startswith(prefix) for prefix in allowed_paths)
                    for p in paths if isinstance(p, str)):
             return False, "ACCEPTANCE_SOURCE_EVIDENCE_MISSING:" + item["id"]
@@ -267,12 +272,15 @@ def vr_feature_ci_evidence_verdict(active: dict, feature_sha: str, record: dict)
     workflow_name, required_jobs = specification
     run = github_gate_run(active["feature_branch"], feature_sha, workflow_name,
                           force_discovery=True)
+    active["feature_ci_run"] = run
     if not run or any((
         run.get("head_sha") != feature_sha,
         run.get("name") != workflow_name,
         run.get("status") != "completed",
         run.get("conclusion") != "success",
     )):
+        if run and run.get("status") == "completed" and run.get("conclusion") != "success":
+            return False, "FEATURE_CI_FAILED:" + str(run.get("conclusion"))
         return False, "FEATURE_CI_EXACT_SHA_NOT_SUCCESS"
 
     jobs = []
@@ -311,16 +319,19 @@ def vr_feature_ci_evidence_verdict(active: dict, feature_sha: str, record: dict)
             break
         page += 1
     prefix = contract.get("artifact_prefix") or ""
-    if not prefix or not any(
+    package = next((artifact for artifact in artifacts if (
         artifact.get("name", "").startswith(prefix + feature_sha)
         and not artifact.get("expired")
         and artifact.get("size_in_bytes", 0) > 0
         and (artifact.get("workflow_run") or {}).get("head_sha", feature_sha) == feature_sha
-        for artifact in artifacts
-    ):
+    )), None) if prefix else None
+    if not package:
         return False, "FEATURE_CI_EXACT_SHA_TEST_BUNDLE_MISSING"
     active["feature_ci_evidence"] = {
         "sha": feature_sha, "run_id": run["id"], "workflow": workflow_name,
+        "artifact_id": package["id"], "artifact_name": package["name"],
+        "artifact_digest": package.get("digest"),
+        "acceptance_steps": [x["ci_step"] for x in contract.get("acceptance_items", [])],
     }
     return True, "FEATURE_CI_EXACT_SHA_VERIFIED"
 
@@ -405,10 +416,22 @@ def github_feature_delivery_evidence(active: dict, sha: str) -> tuple[bool, str]
             if len(batch) < 100:
                 break
             page += 1
+    if contract.get("feature_id") == "DX9EX:R84_RENDERER_GRAPH":
+        # Re-read exact-SHA feature CI, including real jobs/steps/ZIP. Target
+        # Active + Domain gates above remain mandatory and cannot be replaced.
+        ok, reason = vr_feature_ci_evidence_verdict(
+            active, sha, {"acceptance_results": [{"status": "PASS_FEATURE_CI"}]})
+        if not ok:
+            return False, reason
+        proof = active["feature_ci_evidence"]
+        step_names.update(proof["acceptance_steps"])
+        artifacts.append({"id": proof["artifact_id"], "name": proof["artifact_name"],
+                          "digest": proof.get("artifact_digest")})
+        evidence.append({"workflow": proof["workflow"], "sha": sha, "run_id": proof["run_id"]})
     for item in contract["acceptance_items"]:
-        if item["ci_step"] not in step_names:
+        if not any(name == item["ci_step"] or name.startswith(item["ci_step"] + " - ") for name in step_names):
             return False, "ACCEPTANCE_CI_STEP_MISSING:" + item["id"]
-    package = next((x for x in artifacts if x.get("name", "").startswith(contract["artifact_prefix"])), None)
+    package = next((x for x in artifacts if x.get("name", "").startswith(contract["artifact_prefix"] + sha)), None)
     if not package:
         return False, "FEATURE_TEST_PACKAGE_MISSING"
     active["delivery_evidence"] = {"sha": sha, "gates": evidence,
@@ -483,6 +506,7 @@ def github_feature_promote_ready(active: dict, now: datetime) -> bool:
         active["feature_stage"] = "IMPLEMENTING"
         return False
     active["feature_stage"] = "FEATURE_READY"
+    active.setdefault("feature_ready_wait_started_at", now.isoformat())
     active["feature_work_key"] = record["work_key"]
     msg = github_commit_message(feature_head)
     if not msg or f"[AUTO:{active['task_id']}]" not in msg:
@@ -629,7 +653,7 @@ def github_stale_event_guard(active: dict, trigger: str) -> bool:
             )
             return True
 
-        if task_commit and task_commit.get("sha") and not repair_send and (
+        if task_commit and task_commit.get("sha") and not repair_send and not active.get("feature_branch") and (
         task_commit.get("sha") != active.get("retry_failed_sha")
     ):
             active["result_sha"] = task_commit["sha"]
@@ -687,6 +711,9 @@ def queue_rollover_prompt(active: dict) -> str:
         "변경 관련 정적검사·targeted 테스트·필요한 컴파일을 수행하고 기능 완성 후 FEATURE_READY를 제출해. 같은 기능 CI 수리는 tools/tests/workflow만 바뀌어도 가능하며 불필요한 C++ 변경을 만들지 마.",
 
         "이미 완료된 작업은 반복하지 말고 완료되지 않은 부분부터 계속 진행해.",
+        "검토/복구는 미완료 지점 확인 1회로 끝내고 즉시 구현 또는 실제 실패 수리를 수행해. 같은 SHA의 PASS 재검증·상태만 바꾼 커밋·완료 재보고는 진행이 아니다.",
+        "FEATURE_READY가 원격에 있으면 완료 보고를 다시 커밋하지 마. FEATURE_BLOCKER의 정확한 원인만 수리하고, 컨트롤러 소유 승격/최종 CI/C6 대기는 컨트롤러가 처리한다. 새 SHA를 만들려고 불필요한 소스를 바꾸지 마.",
+        "READY 제출 형식: acceptance_results의 status는 PASS 또는 PASS_FEATURE_CI, evidence_paths는 계약의 실제 변경 파일, validation_command는 실행한 검사를 기록해. 하드웨어 결과는 별도 runtime_validation=UNTESTED로 유지해.",
         "CHECKPOINT_BRANCH=" + VR_CHECKPOINT_BRANCH,
         "CHECKPOINT_PATH=" + str(active.get("vr_checkpoint_last_path") or ""),
         "CHECKPOINT_MODE=" + str(active.get("vr_checkpoint_fallback") or "GITHUB_VERIFIED"),
@@ -696,7 +723,7 @@ def queue_rollover_prompt(active: dict) -> str:
         "GitHub 기록과 대조하여 기존 작업의 미완료 범위만 수행하고, 이전 채팅의 미확정 실행과 소스 소유권이 충돌하지 않는지 확인해. 미커밋 내부 사고는 복구된 것으로 간주하지 마.",
         source_policy,
         "실기 테스트를 하지 않았다면 RUNTIME_VALIDATION=UNTESTED를 유지해.",
-        "실제 변경 또는 검토 기록을 Git에 남기고 결과 커밋 메시지에 정확히 [AUTO:" + active["task_id"] + "] 를 포함해.",
+        "미완료 구현/실패 수리를 실제 소스·테스트 변경으로 진행하고 결과 커밋 메시지에 정확히 [AUTO:" + active["task_id"] + "] 를 포함해.",
     ]
     if CONTROLLER_MODE == "conversion":
         lines = [GAME_MOD_CONTEXT, ""] + lines
@@ -793,6 +820,53 @@ def conversion_terminal_verdict(record: dict, active: dict, gate_run: dict) -> t
     return True, "C6_EXACT_SHA_VERIFIED"
 
 
+def vr_finalize_verified_feature(active: dict, record: dict, gate_run: dict) -> Optional[dict]:
+    """Controller owns C6 after remote acceptance/gates/package verification.
+
+    Persist on the controller branch so recording a PASS cannot change the
+    candidate SHA, retrigger its build or require another review-only chat.
+    Never infer feature implementation from a generic successful workflow.
+    """
+    if not active.get("feature_contract") or not isinstance(record, dict):
+        return None
+    if (record.get("feature_status") != "FEATURE_READY"
+            or (record.get("feature_acceptance") or {}).get("implementation_complete") is not True):
+        return None
+    sha = str(active.get("result_sha") or "")
+    result = {key: record.get(key) for key in (
+        "task_id", "production_id", "target_branch", "feature_id", "feature_branch",
+        "work_key", "material_result_sha", "acceptance_results", "feature_acceptance")}
+    result.update(schema_version=1, status="COMPLETE_BUILD_VERIFIED", checkpoint="C6_STATE",
+                  automation_validation="PASS_EXACT_SHA", runtime_validation="UNTESTED",
+                  validation_bearing_result_sha=sha, controller_terminal=True,
+                  delivery_evidence=active.get("delivery_evidence"))
+    valid, _ = conversion_terminal_verdict(result, active, gate_run)
+    if not valid:
+        return None
+    task_id = str(active.get("task_id") or "")
+    if not re.fullmatch(r"[A-Za-z0-9_-]{1,100}", task_id):
+        return None
+    path = f"tools/chat-controller/results/vr/{task_id}-{sha}.json"
+    endpoint = f"/repos/{GITHUB_REPO}/contents/{path}"
+    try:
+        github_feature_mutate("PUT", endpoint, {
+            "branch": VR_CHECKPOINT_BRANCH,
+            "message": f"chore(vr-controller): finalize verified feature {task_id}",
+            "content": base64.b64encode((json.dumps(result, ensure_ascii=False, indent=2) + "\n").encode()).decode(),
+        })
+    except urllib.error.HTTPError as exc:
+        if exc.code not in (409, 422):
+            raise
+    # Verify idempotent replay as well as fresh creation. An existing unrelated
+    # object is NOT proof of completion, and a failed save never releases lane.
+    stored = github_api_json(endpoint + "?ref=" + urllib.parse.quote(VR_CHECKPOINT_BRANCH, safe=""))
+    saved = json.loads(base64.b64decode(stored["content"]).decode("utf-8"))
+    if saved != result:
+        raise RuntimeError("CONTROLLER_C6_READBACK_MISMATCH")
+    active["controller_result_path"] = path
+    return result
+
+
 def vr_checkpoint_path(active: dict, now: datetime, purpose: str = "periodic") -> str:
     """Five-minute immutable GitHub checkpoint on the controller branch, NOT the game branch."""
     bucket_minute = now.minute - (now.minute % 5)
@@ -816,6 +890,7 @@ def vr_checkpoint_payload(active: dict, now: datetime, purpose: str, branch_head
         "runtime_validation", "last_liveness_reason", "chat_liveness",
         "feature_id", "feature_branch", "feature_stage", "feature_goal",
         "feature_contract", "feature_changed_paths", "integration_validation", "delivery_evidence", "failure_class",
+        "controller_result_path", "resume_cursor",
         "cancelled_gate_reruns", "rollover_pending_reason",
         "feature_base_sha", "feature_last_head", "feature_last_real_activity_at",
         "feature_work_key", "feature_blocker", "feature_promoted_at",
@@ -828,6 +903,7 @@ def vr_checkpoint_payload(active: dict, now: datetime, purpose: str, branch_head
             details[key] = None
     return {
         "schema": 1, "kind": "vr_queue_checkpoint",
+        "controller_build": "2026-10-11-progress-v2",
         "purpose": purpose, "captured_at_kst": now.isoformat(),
         "controller_branch": VR_CHECKPOINT_BRANCH,
         "game_branch_head": branch_head,
@@ -2459,6 +2535,36 @@ async def conversion_request_feature_c6(
     return True
 
 
+async def conversion_repair_ready_blocker(context, pages, active: dict) -> bool:
+    """A stable finished reply with a real READY blocker must not roll forever.
+
+    Called only after the UI is idle/stable and result grace has elapsed.
+    Running CI is not a failure; schema/ancestry/failed CI repairs are bounded.
+    """
+    reason = str(active.get("feature_blocker") or "")
+    if not active.get("feature_branch") or active.get("feature_stage") != "FEATURE_READY":
+        return False
+    repairable = reason.startswith(("ACCEPTANCE_", "FEATURE_CONTRACT_", "FEATURE_REBASE_",
+        "FEATURE_SOURCE_", "FEATURE_REPAIR_", "FINAL_FEATURE_", "TARGET_MOVED_",
+        "FEATURE_CI_FAILED:", "FEATURE_CI_REQUIRED_JOB_", "FEATURE_CI_ACCEPTANCE_STEP_",
+        "FEATURE_CI_EXACT_SHA_TEST_BUNDLE_", "FEATURE_CI_WORKFLOW_UNREGISTERED"))
+    if reason == "FEATURE_CI_EXACT_SHA_NOT_SUCCESS" and not active.get("feature_ci_run"):
+        since = _parse_iso(active.get("feature_ready_wait_started_at"))
+        repairable = bool(since and (datetime.now(TZ) - since).total_seconds() >= WAIT_ACTIONS_NO_RUN_TIMEOUT_SECONDS)
+    if not repairable:
+        return False
+    active["failure_class"] = "FEATURE_READY_REPAIR"
+    if active.get("attempt", 1) >= MAX_TASK_ATTEMPTS:
+        active.update(phase="BLOCKED", failure_context="FEATURE_READY_REPAIR_EXHAUSTED:" + reason)
+        return True
+    previous = active.get("attempt", 1)
+    active["attempt"] = previous + 1
+    if await queue_send_retry(context, pages, active, reason):
+        return True
+    active["attempt"] = previous
+    return False
+
+
 async def conversion_process_lane(
     context: BrowserContext,
     pages: dict[str, Page],
@@ -2493,7 +2599,8 @@ async def conversion_process_lane(
                               last_gate_poll_at=None, wait_actions_started_at=now.isoformat())
                 save_queue_state(q)
                 return
-            task_commit = github_find_task_commit(active["branch"], active["task_id"])
+            task_commit = (None if active.get("feature_branch") else
+                           github_find_task_commit(active["branch"], active["task_id"]))
             if task_commit and task_commit.get("sha") == active.get("retry_failed_sha"):
                 task_commit = None
             if task_commit:
@@ -2561,12 +2668,16 @@ async def conversion_process_lane(
             if (now - changed_at).total_seconds() < QUEUE_STABLE_SECONDS:
                 return
 
-            task_commit = github_find_task_commit(active["branch"], active["task_id"])
+            task_commit = (None if active.get("feature_branch") else
+                           github_find_task_commit(active["branch"], active["task_id"]))
             if task_commit and task_commit.get("sha") == active.get("retry_failed_sha"):
                 task_commit = None
             if not task_commit:
                 sent_at = _parse_iso(active.get("sent_at")) or now
                 if (now - sent_at).total_seconds() < QUEUE_RESULT_GRACE_SECONDS:
+                    return
+                if await conversion_repair_ready_blocker(context, pages, active):
+                    save_queue_state(q)
                     return
                 hold_unconfirmed_chat(
                     q, active,
@@ -2680,6 +2791,17 @@ async def conversion_process_lane(
                                 active["attempt"] -= 1
                         else:
                             active.update(phase="BLOCKED", failure_context=delivery_reason)
+                    save_queue_state(q)
+                    return
+                # The controller has independently read all required remote CI,
+                # acceptance steps and the exact-SHA artifact. Close C6 itself;
+                # do not ask an expensive worker to re-review the same result.
+                try:
+                    finalized = vr_finalize_verified_feature(active, record, run)
+                    if finalized is not None:
+                        record = finalized
+                except Exception as exc:
+                    active["terminal_verification"] = "CONTROLLER_C6_SAVE_FAILED:" + type(exc).__name__
                     save_queue_state(q)
                     return
                 verified, reason = conversion_terminal_verdict(record, active, run)
@@ -2957,9 +3079,9 @@ async def conversion_parallel_cycle(context: BrowserContext, pages: dict[str, Pa
     for lane_key in ("A", "B", "C"):
         if lane_key in active_by_lane:
             active = active_by_lane[lane_key]
-            if lane_key in ("A", "C") and await vr_checkpoint_and_rollover(context, pages, q, active, now):
-                continue
             await conversion_process_lane(context, pages, q, lane_key)
+            if lane_key in ("A", "C") and active.get("phase") != "DONE":
+                await vr_checkpoint_and_rollover(context, pages, q, active, now)
 
     for lane_key in list(active_by_lane):
         task = active_by_lane.get(lane_key)
@@ -3276,6 +3398,11 @@ async def queue_cycle(context: BrowserContext, pages: dict[str, Page]):
 def refresh_wait_actions_task_binding(task: dict, force_refresh: bool = False) -> Optional[str]:
     """Rebind persisted WAIT_ACTIONS to the newest durable commit for the same TASK_ID."""
     if task.get("phase") != "WAIT_ACTIONS":
+        return None
+    # Promotion pins the candidate. A newer review/C6 marker is not new source
+    # and must not restart CI. Retry explicitly clears/replaces the pin.
+    if task.get("feature_branch") and task.get("feature_promoted_at") and task.get("result_sha"):
+        task["startup_reconcile_pending"] = False
         return None
     branch = str(task.get("branch") or "").strip()
     task_id = str(task.get("task_id") or "").strip()
@@ -3875,3 +4002,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

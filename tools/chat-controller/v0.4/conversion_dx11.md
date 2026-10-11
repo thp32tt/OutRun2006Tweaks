@@ -1,3 +1,10 @@
+[2026-10-11 실행 전환 규칙 — 아래 역사적 우선순위보다 우선]
+- 이번 FEATURE_CONTRACT의 미완료 acceptance만 구현한다. 복구/검토는 1회 후 실제 코드·테스트 수리로 이어간다. 같은 SHA의 PASS 재검사, 상태만 추가한 커밋, 완료 재보고는 작업 성과가 아니다.
+- FEATURE_READY는 한 번 제출한다. 이후 컨트롤러의 승격/필수 CI/C6 대기 때문에 READY 기록을 다시 커밋하거나 전체 CI를 재실행하지 않는다. FEATURE_BLOCKER가 있으면 정확한 schema/실패 원인만 수정한다.
+- acceptance_results.status는 PASS 또는 PASS_FEATURE_CI를 사용하고 runtime_validation=UNTESTED는 별도로 기록한다. 각 evidence_paths는 해당 계약에서 허용한 실제 변경 파일을 사용한다.
+- 컨트롤러가 같은 SHA의 필수 Gate·acceptance step·실제 패키지를 검증한 뒤 tools/chat-controller/results/vr/<TASK_ID>-<SHA>.json에 C6를 기록하고 다음 FEATURE_ID를 선택한다. 게임 브랜치에 완료 기록을 반복 커밋하지 않는다.
+- 실기 테스트만 대기하는 항목은 실기 승격만 보류한다. 기존 완료 기능을 다시 열지 않는다. DXVK 동결 및 보호 기준은 유지한다. FFB는 확정된 통합 회귀 이외 신규 작업을 하지 않는다.
+
 OutRun 2006 DX11 전환 자동 작업을 진행해줘.
 
 [2026-10-10 20:39 KST 사용자 최신 개발방향 — DX11_FIRST_PLAYABLE_GAME_FRAME / 00537 이후 신규 작업부터]
@@ -37,3 +44,4 @@ TARGET_BRANCH는 vr-dx11-native-r71이다. 기존 검증된 VR 기준은 참조�
 
 [VR 체크포인트 정책]
 5분마다 컨트롤러 브랜치 체크포인트를 저장하고, 실제 중간 소스/테스트는 FEATURE_BRANCH에 보존한다. 대상 게임 브랜치는 기능 완료 시 컨트롤러만 갱신한다. 장시간 작업을 30분마다 같은 TASK_ID로 새 대화에서 이어간다. 먼저 chat-controller-downloads 브랜치 tools/chat-controller/checkpoints/vr/<TASK_ID>/ 최신 파일, 대상 브랜치 HEAD, run 기록을 확인하고 완료한 수정은 반복하지 마. 최종 제출과 동일 기능의 실질 수리 커밋에 [AUTO:TASK_ID] 표식을 붙여. 기록만 남긴 경우 구현 완료로 주장하지 마.
+

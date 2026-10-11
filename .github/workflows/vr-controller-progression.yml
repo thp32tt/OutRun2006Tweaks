@@ -1,0 +1,34 @@
+name: VR controller progression regression
+on:
+  push:
+    branches: [chat-controller-downloads]
+    paths:
+      - 'tools/chat-controller/v0.4/src-vr-v2/**'
+      - 'tools/chat-controller/v0.4/tests/test_vr_progression.py'
+      - 'tools/chat-controller/v0.4/tests/test_vr_feature_pipeline.py'
+      - 'tools/chat-controller/v0.4/feature_backlog.json'
+      - 'tools/chat-controller/v0.4/conversion_dx11.md'
+      - 'tools/chat-controller/v0.4/conversion_dx9ex.md'
+      - '.github/workflows/vr-controller-progression.yml'
+permissions:
+  contents: read
+jobs:
+  progression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Regression for repeated review and feature completion
+        run: python3 tools/chat-controller/v0.4/tests/test_vr_progression.py
+      - name: Existing feature promotion and branch protection
+        run: python3 tools/chat-controller/v0.4/tests/test_vr_feature_pipeline.py
+      - name: Compile assembled Docker controller
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          parts = Path('tools/chat-controller/v0.4/src-vr-v2')
+          source = ''.join(p.read_text() for p in sorted(parts.glob('controller.py.part*')))
+          compile(source, 'controller.py', 'exec')
+          PY

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "policy_version": "2026-10-10-delivery-v1",
+  "policy_version": "2026-10-11-progress-v2",
   "runtime_policy": "BUILD_VERIFIED is not HMD/gameplay PASS; default native activation remains false",
   "features": [
     {
@@ -197,6 +197,121 @@
         }
       ],
       "artifact_prefix": "feature-dx9ex-r84-"
+    },
+    {
+      "feature_id": "DX9EX:XR_RECOMMENDED_EYE_EXTENT",
+      "lane": "DX9EX",
+      "work_key": "DX9EX:XR_RECOMMENDED_EYE_EXTENT",
+      "goal": "OpenXR 권장 per-eye 크기를 실제 렌더 타깃/viewport/swapchain에 일관되게 적용하고 Reset·실패 폴백과 테스트 빌드를 완성한다. 기존 구현을 재조사만 하지 말고 미완료 연결·회귀를 구현한다.",
+      "depends_on": [
+        "DX9EX:R84_RENDERER_GRAPH"
+      ],
+      "acceptance_items": [
+        {
+          "id": "XR-EYE-SIZING",
+          "expected": "Use runtime recommended per-eye extent with validated limits and consistent IPC/RT/viewport ownership",
+          "paths": [
+            "src/vr/",
+            "vrhost/"
+          ],
+          "ci_step": "Feature acceptance: XR-EYE-SIZING"
+        },
+        {
+          "id": "XR-EYE-RESET",
+          "expected": "Exercise extent changes, Reset/device loss, allocation failure and safe fallback without changing protected visual semantics",
+          "paths": [
+            "src/vr/",
+            "vrhost/",
+            "tests/",
+            "tools/"
+          ],
+          "ci_step": "Feature acceptance: XR-EYE-RESET"
+        },
+        {
+          "id": "XR-EYE-BUNDLE",
+          "expected": "Build exact-SHA host/game package and collector; Quest3 runtime remains UNTESTED",
+          "paths": [
+            "tools/",
+            ".github/workflows/"
+          ],
+          "ci_step": "Feature acceptance: XR-EYE-BUNDLE"
+        }
+      ],
+      "required_gates": [
+        {
+          "name": "DX9Ex Active Validation",
+          "jobs": [
+            "policy",
+            "host",
+            "game",
+            "full-chain-compile",
+            "package"
+          ]
+        },
+        {
+          "name": "Domain Isolation Guard",
+          "jobs": [
+            "domain-isolation"
+          ]
+        }
+      ],
+      "artifact_prefix": "feature-dx9ex-eye-extent-"
+    },
+    {
+      "feature_id": "DX9EX:FRAME_PACING_DIAGNOSTICS",
+      "lane": "DX9EX",
+      "work_key": "DX9EX:FRAME_PACING_DIAGNOSTICS",
+      "goal": "게임 렌더·공유 전송·host 대기·OpenXR 제출 시간을 프레임 ID로 연결하는 저비용 진단과 로그 수집 빌드를 완성한다. 기존 계측의 누락 연결만 구현하고 실기 측정 없이 120FPS 달성을 선언하지 않는다.",
+      "depends_on": [],
+      "acceptance_items": [
+        {
+          "id": "PACING-STAGES",
+          "expected": "Correlate game/render/transport/host/XR timings with frame identity; bounded low-overhead disabled-by-default diagnostics",
+          "paths": [
+            "src/vr/",
+            "vrhost/"
+          ],
+          "ci_step": "Feature acceptance: PACING-STAGES"
+        },
+        {
+          "id": "PACING-REGRESSION",
+          "expected": "Test disabled path, invalid durations, stale IDs and bounded buffer overflow without changing render/sync ownership",
+          "paths": [
+            "tests/",
+            "tools/",
+            "vrhost/"
+          ],
+          "ci_step": "Feature acceptance: PACING-REGRESSION"
+        },
+        {
+          "id": "PACING-BUNDLE",
+          "expected": "Build exact-SHA host/game and collector with phase timing output; no synthetic FPS success claims",
+          "paths": [
+            "tools/",
+            ".github/workflows/"
+          ],
+          "ci_step": "Feature acceptance: PACING-BUNDLE"
+        }
+      ],
+      "required_gates": [
+        {
+          "name": "DX9Ex Active Validation",
+          "jobs": [
+            "policy",
+            "host",
+            "game",
+            "full-chain-compile",
+            "package"
+          ]
+        },
+        {
+          "name": "Domain Isolation Guard",
+          "jobs": [
+            "domain-isolation"
+          ]
+        }
+      ],
+      "artifact_prefix": "feature-dx9ex-pacing-"
     }
   ]
 }
