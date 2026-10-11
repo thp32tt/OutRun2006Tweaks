@@ -2495,6 +2495,91 @@ def main() -> None:
             assert abs(out - (ta*factor + da*(1.-factor))) > 0.00001 or (ta,da)==(0.,1.)
     print("DX11 factor RGB + SUBTRACT/ADDSMOOTH alpha native Draw PASS (static only)")
 
+
+    # 00574: D3D9 factor RGB with separately MODULATE2X/4X alpha reaches
+    # game-origin native Draw and DrawIndexed; opt-in does not replace DX9Ex.
+    def scaled_factor_alpha_connected(source: str) -> bool:
+        gate = source[source.find("bool supported_game_state("):source.find("bool translate_vertices(")]
+        draw = source[source.find("bool submit("):source.find("void observe(")]
+        for token in (
+            "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)",
+            "blendFactorModulate2XAlpha || blendFactorModulate4XAlpha",
+            "!blendFactorModulate2XAlpha && !blendFactorModulate4XAlpha &&",
+            "alphaNeedsDiffuse && !alphaArg2Diffuse", "alphaArg1 != D3DTA_TEXTURE",
+        ):
+            if token not in gate: return False
+        for token in ("ctx->DrawIndexed(indexCount, 0, 0);",
+                      "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+                      "mirror_texture(dev, capture, sampledView, sampledSampler)"):
+            if token not in draw: return False
+        for mode, scale in (("2X", "2.0f"), ("4X", "4.0f")):
+            flag = f"blendFactorModulate{mode}Alpha"
+            shader = f"PSTextureBlendFactorModulate{mode}Alpha"
+            start = source.find(f"float4 {shader}(VOut v) : SV_Target {{")
+            end = source.find("\n}", start)
+            if start == -1 or end == -1: return False
+            body = source[start:end]
+            for token in (
+                f"bool {flag} = false;",
+                f"const bool {flag} = op == D3DTOP_BLENDFACTORALPHA &&",
+                f"alphaOp == D3DTOP_MODULATE{mode};",
+                f"capture.{flag} = {flag};",
+                f'compile("{shader}", "ps_4_0", blendFactorModulate{mode}Code)',
+                f"s.{flag}Ps &&", f"s.{flag}Ps.GetAddressOf()",
+                f"capture.{flag} ? s.{flag}Ps.Get() :",
+            ):
+                if token not in source: return False
+            if f"capture.{flag} ? s.{flag}Ps.Get() :" not in draw: return False
+            if source.count(f"s.{flag}Ps.Reset();") != 2: return False
+            for token in ("lerp(v.diffuse.rgb, t.rgb, alphaParams.w)",
+                          f"saturate({scale} * t.a * v.diffuse.a)",
+                          "AlphaGate(c.a); return c;"):
+                if token not in body: return False
+        return True
+
+    assert scaled_factor_alpha_connected(bridge)
+    for mode, scale in (("2X", "2.0f"), ("4X", "4.0f")):
+        flag = f"blendFactorModulate{mode}Alpha"
+        shader = f"PSTextureBlendFactorModulate{mode}Alpha"
+        for token in (
+            f"const bool {flag} = op == D3DTOP_BLENDFACTORALPHA &&",
+            f"capture.{flag} = {flag};",
+            f'compile("{shader}", "ps_4_0", blendFactorModulate{mode}Code)',
+            f"s.{flag}Ps.GetAddressOf()",
+            f"capture.{flag} ? s.{flag}Ps.Get() :",
+        ):
+            mutant = bridge.replace(token, "/* sever scaled-alpha native link */", 1)
+            assert mutant != bridge and not scaled_factor_alpha_connected(mutant), token
+        start = bridge.find(f"float4 {shader}(VOut v) : SV_Target {{")
+        end = bridge.find("\n}", start)
+        body = bridge[start:end]
+        for token in ("lerp(v.diffuse.rgb, t.rgb, alphaParams.w)",
+                      f"saturate({scale} * t.a * v.diffuse.a)"):
+            assert token in body
+            mutant = bridge[:start] + body.replace(token, "/* bad alpha/rgb */", 1) + bridge[end:]
+            assert not scaled_factor_alpha_connected(mutant), token
+    # D3DTOP BLENDFACTORALPHA=14, MODULATE2X=5, MODULATE4X=6.
+    for rgb_op, alpha_op, arg1, arg2, valid in (
+        (14, 5, "texture", "diffuse", True),
+        (14, 6, "texture", "current", True),
+        (14, 5, "diffuse", "diffuse", False),
+        (14, 6, "texture", "texture", False),
+        (14, 5, "texture|complement", "diffuse", False),
+        (14, 6, "texture", "diffuse|complement", False),
+        (13, 5, "texture", "diffuse", False),
+        (14, 4, "texture", "diffuse", False),
+    ):
+        admitted = rgb_op == 14 and alpha_op in (5, 6) and arg1 == "texture" and arg2 in ("diffuse", "current")
+        assert admitted is valid
+    for ta, da, f in ((0.8, 0.6, 0.25), (0.1, 0.1, 0.5), (0.4, 0.5, 0.75)):
+        for multiplier in (2, 4):
+            alpha = min(1.0, multiplier * ta * da)
+            rgb = tuple(d * (1 - f) + t * f for t, d in zip((0.2, 0.9, 0.4), (0.7, 0.1, 0.8)))
+            assert all(0 <= c <= 1 for c in (*rgb, alpha))
+            if ta == 0.8: assert alpha == 1.0
+            if ta == 0.1: assert alpha < 1.0
+    print("DX11 independent MODULATE2X/4X alpha game native Draw PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 

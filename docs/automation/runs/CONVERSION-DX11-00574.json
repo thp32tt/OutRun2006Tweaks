@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00574",
+  "production_id": "CONVERSION-DX11-00574",
+  "event_id": "CONVERSION-DX11-00574-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00574",
+  "base_sha": "8bd07c7a552ced4ea160fd73d1a07c90d79ad879",
+  "work_key": "DX11:MENU_RACE_BLENDFACTOR_RGB_MODULATE2X4X_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "real D3D9 stage0 BLENDFACTORALPHA+scaled independent alpha capture",
+      "D3D11 compiled HLSL PS->Draw/DrawIndexed->opt-in readback"
+    ],
+    "batch_components": [
+      "state capture/operand validation and native shader",
+      "shader lifetime/draw selection and regression mutants"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "stage0 modulate2x/modulate4x alpha admitted with factor RGB",
+      "negative_regression": "10 source-link mutants and four body math mutants plus 8 operand cases",
+      "component_integration": "game Draw->D3D11 PS->native Draw/DrawIndexed->diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_BLENDFACTOR_RGB_MODULATE2X4X_ALPHA",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:BLENDFACTOR_SCALED_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "GAME_D3D9_DRAW",
+      "FACTOR_RGB_SCALED_ALPHA",
+      "NATIVE_DRAW",
+      "DIAGNOSTIC_INSET"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED_NEED_HMD_TEST; actual game/HMD/input UNTESTED",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only, original D3D9 input/draw/present maintained"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD 8bd07c7a552ced4ea160fd73d1a07c90d79ad879",
+    "C1_REVIEW": "Missing scaled independent alpha D3D9 state variants",
+    "C2_IMPLEMENT": "C++ HLSL/Draw implementation and destructive regressions",
+    "C3_VALIDATE": "Pending mandatory exact-SHA Gates",
+    "C4_COMMIT": "Validation bearing source and regression, no CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING"
+  },
+  "next_action": "Observe GitHub Actions exact SHA then separate C6; Quest3/VDXR and gamepad remain UNTESTED"
+}
