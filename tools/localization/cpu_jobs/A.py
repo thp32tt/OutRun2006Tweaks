@@ -198,10 +198,10 @@ geomreview=writej("A241_GEOMETRY_REVIEW.json",{
  "status":"GEOMETRY_READY","reviewer":"A","route":"vector_title",
  "source_sha256":EXPECTED_SRC,"geometry_sha256":geo_ref["sha256"],
  "observations":{
-   "stroke":Four manually rebased native glyph graphs plus exact source-canonical colon:; white native face coverage %dpx versus independently C1-recorded source 3504px; no thin Noto Regular face."%face_count,
+   "stroke":"Four manually rebased native glyph graphs plus exact source-canonical trailing colon, saved native face coverage %dpx versus source 3504px; no font fallback."%face_count,
    "counterspace":"At first construction the native 100/75/50 flat layers retain clear syllable separation and component counters; final persisted material review remains independent.",
    "proportions":"Actual 232x49 original source effect ROI; manual glyph rectangle %s with positive edges; no forced old-Korean image scaling."%(list(box),),
-   "slant":A241 source-reading italic optical control retained; glyph baseline/spacing reauthored to free native punctuation footprint. No homologous source-dx numeric PASS; C2 review pending.",
+   "slant":"A241 source-reading italic optical control retained; glyph baseline/spacing reauthored to free native punctuation footprint. No homologous source-dx numeric PASS; C2 review pending.",
    "readability":"Manual vector white silhouettes separately reviewed as geometric construction only; C1/C3 and in-game pending."},
  "evidence":[ref(OUT/"A241_GEOMETRY_GRAY_100.png"),ref(OUT/"A241_GEOMETRY_BLACK_50.png")]})
 recipe={
