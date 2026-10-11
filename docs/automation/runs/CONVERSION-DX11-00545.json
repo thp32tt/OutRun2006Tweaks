@@ -10,9 +10,9 @@
   "attempt": "1/3",
   "work_key": "DX11:MENU_RACE_REAL_D3D9_TRIANGLESTRIP",
   "base_sha": "dfa7c54f8464ee8aa5297632f25154945d92e636",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "native_gameplay_activation": false,
@@ -31,8 +31,8 @@
       "Native D3D11 topology and live bridge source/index count consumer with static regression mutations"
     ],
     "acceptance_proof": {
-      "positive_probe": "Local GNU C++17 -O2 portable list/strip count and overflow/zero test PASS; exact GitHub full gate pending",
-      "negative_regression": "Fail closed for out-of-bounds / unsupported topology and count mismatch; source-level destructive mutations integrated; GPU/HMD UNTESTED",
+      "positive_probe": "GitHub exact material SHA 154b77eb: Backend Conversion Gate #38141597089 validate + DX11 readiness smoke SUCCESS; Win32 Build #38141601508 SUCCESS; OpenXR #38141601512/#38141597049 SUCCESS; DX11 Fast #38141597102 SUCCESS; HUD Inspector #38141601505 SUCCESS. HMD/game pixels UNTESTED.",
+      "negative_regression": "Source mutation regression and live D3D9 VB/IB/UP count guard: strip P+2 vs triangle list 3P; checked in exact SHA Win32 Build; no gamepad interception or native activation. No Quest3/VDXR runtime proof.",
       "component_integration": "game-authored D3D9 list/strip VB/IB/UP -> byte-accurate source element count -> native D3D11 list/strip IA -> Draw/DrawIndexed -> opt-in diagnostic inset; DX9Ex game draw/input preserved"
     },
     "conflict_keys": [
@@ -64,19 +64,55 @@
     "C0_RECOVER": "PASS GitHub HEAD dfa7c54f8464ee8aa5297632f25154945d92e636 and 00544 C6; prior texture work not repeated",
     "C1_REVIEW": "PASS missing triangle-strip VB/IB/UP path and native IA; R175 owner not touched",
     "C2_IMPLEMENT": "PASS live game triangle strip source snapshot and native Draw/DrawIndexed topology",
-    "C3_VALIDATE": "GNU C++17 portable source element count probe PASS; GitHub exact-SHA CI pending",
-    "C4_COMMIT": "Material GitHub source commit with exact AUTO marker, non-skip; SHA set after commit",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Win32 Build #38141601508, Backend Gate #38141597089 2 jobs, OpenXR architecture #38141601512, DX11 Fast #38141597102 all SUCCESS on material 154b77ebd801cef0f53a10126e7cbd08b02f1eae; HMD/game pixels UNTESTED",
+    "C4_COMMIT": "PASS material 154b77ebd801cef0f53a10126e7cbd08b02f1eae [AUTO:CONVERSION-DX11-00545] no CI skip; separate C6 bookkeeping [skip ci] after exact Gate",
     "C5_PACKAGE": "NOT_REQUIRED, diagnostic experiment only",
-    "C6_STATE": "PENDING_GITHUB_EXACT_SHA; NEED_HMD_TEST for real game pixels"
+    "C6_STATE": "PASS_EXACT_SHA, COMPLETE_BUILD_VERIFIED; real game menu/vehicle/race and Quest3/VDXR HMD and gamepad proof NEED_HMD_TEST. No production backend promotion."
   },
   "acceptance_results": {
-    "DX11-LIVE-CALLSITE": "SOURCE_CONNECTED",
-    "DX11-NATIVE-DRAW": "SOURCE_CONNECTED",
+    "DX11-LIVE-CALLSITE": "PASS_SOURCE_EXACT_SHA_BUILD",
+    "DX11-NATIVE-DRAW": "PASS_SOURCE_EXACT_SHA_BUILD",
     "DX11-VISIBLE-FRAME": "NEED_GAME_TEST",
-    "DX11-SAFE-RETURN": "ORIGINAL_D3D9_PRESERVED",
+    "DX11-SAFE-RETURN": "PASS_SOURCE_EXACT_SHA_BUILD",
     "REAL_GAME_OR_QUEST3_RENDERING": "UNTESTED"
   },
   "runtime_evidence": "No HMD or actual game test; gamepad input remains D3D9-owned",
-  "next_action": "Check required GitHub Actions Gate at material SHA, fix any failing source and separately record C6; no DXVK work.",
-  "controller_runtime_adoption": "NOT_VERIFIED"
+  "next_action": "Controller assigns new non-conflicting DX11 menu-to-race native integration task, preserving this exact SHA. Quest3/VDXR real-game pixels/gamepad remain NEED_HMD_TEST; DXVK frozen.",
+  "controller_runtime_adoption": "NOT_VERIFIED",
+  "material_result_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+  "validation_bearing_result_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+  "result_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "state_persisted": true,
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "run_id": 38141597089,
+      "head_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+      "conclusion": "success",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ]
+    },
+    "win32_build": {
+      "run_id": 38141601508,
+      "head_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+      "conclusion": "success"
+    },
+    "openxr": {
+      "run_id": 38141601512,
+      "head_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+      "conclusion": "success"
+    },
+    "dx11_fast": {
+      "run_id": 38141597102,
+      "head_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38141601505,
+      "head_sha": "154b77ebd801cef0f53a10126e7cbd08b02f1eae",
+      "conclusion": "success"
+    }
+  }
 }
