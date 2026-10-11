@@ -1,0 +1,125 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00612",
+  "production_id": "CONVERSION-DX9EX-00612",
+  "event_id": "CONVERSION-DX9EX-00612-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:R30_SKYGLOW_POSTPROCESS_FASTPATH",
+  "work_key": "DX9EX:R30_SKYGLOW_POSTPROCESS_FASTPATH",
+  "material_result_sha": "08d47172e9cc632997cb970d053f4c5357ba05f2",
+  "result_sha": "3f29f1612e4b051b71f06c6df6b0b46b51dd949b",
+  "validation_bearing_result_sha": "3f29f1612e4b051b71f06c6df6b0b46b51dd949b",
+  "material_commits": [
+    "08d47172e9cc632997cb970d053f4c5357ba05f2",
+    "2b2a9d89da0a6896246941a2eeb95ffffa5eecf8"
+  ],
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Reduce GPU-driver API/COM overhead in R30 stereo SkyGlow fullscreen post-processing without reducing image quality or changing protected left/right world/HUD behavior.",
+    "acceptance": "Cache four D3D9 texture level-zero COM render-target interfaces until resize/Reset; share invariant FVF/VS/sampler/depth render state within one Present only, change additive blend state on mode transition; retain per-pass RT/depth/viewport/shader/texture/constants, world pre-HUD capture, both eye paths, horizontal and opt-in vertical blur and additive composite; release surfaces before textures, restore StateBlock/RT/depth/viewport; source negative mutation and Win32 policy/game/host/full-chain/package exact-SHA gates; Domain Guard success. Hardware FPS/optics remain untested.",
+    "runtime_metrics": "Source static optimization only: per-frame GetSurfaceLevel calls removed (4 across capture/apply when both paths run), redundant fullscreen pass SetFVF/SetSamplerState/SetRenderState reduced to initial pass and additive transition. No measured Quest3/VDXR FPS, GPU utilization, p95/p99, optical parity."
+  },
+  "acceptance_results": [
+    {
+      "item": "SKYGLOW_LEVEL_ZERO_COM_SURFACE_LIFETIME",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "R30EnsureSkyGlowResources acquires 4 surfaces once; R30CaptureSkyGlowSceneBeforeHud and R30ApplyStereoSkyGlow use pinned surfaces, never GetSurfaceLevel per Present; Reset/reallocation releases surfaces before textures."
+    },
+    {
+      "item": "PER_PRESENT_D3D9_INVARIANT_STATE_FASTPATH",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "R30SkyGlowPassState local to each R30ApplyStereoSkyGlow invocation; fixed sampler/FVF/depth states configured once, blend transition on additive change; target, depth, viewport, shader, texture, constants per pass; StateBlock Apply after all passes."
+    },
+    {
+      "item": "SKYGLOW_STEREO_OPTICAL_REGRESSION_GUARDS",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Preserves pre-HUD snapshot, both eye extraction, optional two-step blur, final temp composite source, additive RGB-only destination and original shader coefficients; zero HMD optical claim."
+    },
+    {
+      "item": "NEGATIVE_MUTATIONS",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "tools/verify_vr_r30_skyglow_fastpath.py 7 destructive tests, wired to DX9Ex Active policy. Initial SHA 08d failed due to incorrect verifier constant spelling; repaired at own follow-up SHA 2b2; descendant 3f policy SUCCESS."
+    },
+    {
+      "item": "DX9EX_ACTIVE_GAME_HOST_FULLCHAIN_PACKAGE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Active Validation #38153967458 attempt 2 at 3f29f161: policy, host, Win32 game, independent R29-R33 full-chain and package all SUCCESS."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Domain Isolation Guard #38153967577 SUCCESS at 3f29f161; original material SHA Domain #38153608982 SUCCESS."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_MATERIAL_SHA",
+      "evidence": "DX9Ex Full Source Impact Review #38153609004 at original game C++ material SHA 08d47172: MSVC active-game analysis, x64 host analysis, source-cross-domain 3/3 SUCCESS. Final descendant 3f does not have its own Full Source Impact run."
+    },
+    {
+      "item": "QUEST3_VDXR_FPS_AND_OPTICS",
+      "status": "UNTESTED",
+      "evidence": "No direct Quest3/VDXR headset/game screen/real frame-time test."
+    }
+  ],
+  "exact_sha_validation": {
+    "target_sha": "3f29f1612e4b051b71f06c6df6b0b46b51dd949b",
+    "all_conclusion": "SUCCESS",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38153967458,
+        "run_attempt": 2,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "3f29f1612e4b051b71f06c6df6b0b46b51dd949b",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38153967458"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38153967577,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "3f29f1612e4b051b71f06c6df6b0b46b51dd949b",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38153967577"
+      }
+    ]
+  },
+  "material_sha_source_impact": {
+    "target_sha": "08d47172e9cc632997cb970d053f4c5357ba05f2",
+    "name": "DX9Ex Full Source Impact Review",
+    "run_id": 38153609004,
+    "status": "completed",
+    "conclusion": "success",
+    "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38153609004"
+  },
+  "validation_provenance": {
+    "source_material_sha": "08d47172e9cc632997cb970d053f4c5357ba05f2",
+    "task_repair_sha": "2b2a9d89da0a6896246941a2eeb95ffffa5eecf8",
+    "descendant_validation_sha": "3f29f1612e4b051b71f06c6df6b0b46b51dd949b",
+    "descendant_nonowned_commit": "3f29f1612e4b051b71f06c6df6b0b46b51dd949b",
+    "descendant_nonowned_changed_paths": [
+      "tools/Collect-OutRunVRLogs.ps1",
+      "tools/Run-OutRunVRTest.ps1"
+    ],
+    "note": "Concurrent unrelated GPU utilization telemetry PowerShell update was fast-forwarded after task repair and triggered a validation rerun. Verified no changes to task C++ source, regression verifier or DX9Ex workflow between 2b2 and 3f. This task makes no claim or award for other worker's independent telemetry material."
+  },
+  "material_change_evidence": {
+    "source_paths": [
+      "src/vr/d3d9/stereo_renderer_r30.cpp"
+    ],
+    "validation_paths": [
+      "tools/verify_vr_r30_skyglow_fastpath.py",
+      ".github/workflows/vr-dx9ex-active.yml"
+    ]
+  },
+  "runtime_validation_note": "RUNTIME_VALIDATION=UNTESTED. Quest3/VDXR HMD optics/FPS not measured; CI BUILD_VERIFIED not hardware PASS.",
+  "completed_kst": "2026-10-12T01:13:01+09:00",
+  "controller_next_action": "Do not redispatch or double-score CONVERSION-DX9EX-00612; continue independent P0 measured GPU/VR frame-time optimization, preserve DX11 global first and DXVK frozen."
+}
