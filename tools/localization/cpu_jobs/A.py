@@ -93,7 +93,7 @@ def stroke(ox,pts,width=7.0):
  """Individual hand-authored stroke graph is natively curved and pressure-rendered."""
  curve=catmull_rom(pts,7)
  n=max(1,len(curve)-1)
- sampled=[(ox+x-5+(44-y)*.32,3+y*.88) for x,y in curve]
+ sampled=[(ox+x-5+(44-y)*.32,4+y*.84) for x,y in curve]
  for i in range(len(sampled)-1):
   u=i/n
   pressure=width+0.35*(1-abs(2*u-1))
@@ -185,7 +185,7 @@ geomrecipe=writej("A240_GEOMETRY_RECIPE.json",{
  "top_minus_bottom_edited_manual_stroke_dx_per_y":0.32,
  "source_C1_white_pixels_proxy":3504,"source_C1_dark_pixels_proxy":1518,
  "trial_near_opaque_face_pixels":face_count,"local_face_bbox":list(box),
- "stroke_primitives":22,"spline_type":"Catmull-Rom native cubic segments_per_span_7","pressure_added_midstroke_px":0.35,"rim":"native 1px morphology separate",
+ "stroke_primitives":22,"spline_type":"Catmull-Rom native cubic segments_per_span_7","pressure_added_midstroke_px":0.35,"source_bbox_effect_guard_native":"face(9,2,228,44); rim+extrusion union(8,1,229,45) local safe","rim":"native 1px morphology separate",
  "extrusion":"native 1px lower offset separate",
  "RUNTIME_VALIDATION":"UNTESTED"})
 geomreview=writej("A240_GEOMETRY_REVIEW.json",{
