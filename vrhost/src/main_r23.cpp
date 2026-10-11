@@ -68,6 +68,20 @@
 namespace
 {
     constexpr ULONGLONG R23PixelIntervalMs = 5000;
+    // Opt-in only: staging copies and Map polling are diagnostic GPU work.
+    // A fixed process-start decision avoids environment queries per XR tick.
+    bool R23PixelDiagnosticsEnabled() noexcept
+    {
+        static const bool enabled = []() noexcept {
+            const char* value = std::getenv("OUTRUN_VR_R23_PIXEL_PROBE");
+            return value != nullptr &&
+                (std::strcmp(value, "1") == 0 ||
+                 std::strcmp(value, "true") == 0 ||
+                 std::strcmp(value, "TRUE") == 0);
+        }();
+        return enabled;
+    }
+
     constexpr UINT R23SourceSamples = 8;
     constexpr DWORD R23TheaterRefreshWaitMs = 2;
     constexpr ULONGLONG R23TheaterRefreshLogIntervalMs = 5000;
@@ -688,6 +702,7 @@ namespace
 
         void TryConsume(ID3D11DeviceContext* context)
         {
+            if (!R23PixelDiagnosticsEnabled()) return;
             ConsumeSource(context);
             ConsumeProjection(context);
             ConsumeTheater(context);
@@ -695,6 +710,7 @@ namespace
 
         void NoteFinalSubmission()
         {
+            if (!R23PixelDiagnosticsEnabled()) return;
             const bool submitted =
                 OutRunVrR23RuntimeHardening::LastSubmittedLayer.load(std::memory_order_acquire);
             const std::uint32_t frameId =
@@ -718,6 +734,7 @@ namespace
 
         void ScheduleSource(StereoCompositor& c)
         {
+            if (!R23PixelDiagnosticsEnabled()) return;
             const ULONGLONG now = GetTickCount64();
             if (sourcePending || now - lastSourceScheduleMs < R23PixelIntervalMs ||
                 !c.source_ || !c.device_ || !c.context_) return;
@@ -750,6 +767,7 @@ namespace
 
         void ScheduleProjection(StereoCompositor& c, std::uint32_t image)
         {
+            if (!R23PixelDiagnosticsEnabled()) return;
             const ULONGLONG now = GetTickCount64();
             if (projectionPending || now - lastProjectionScheduleMs < R23PixelIntervalMs ||
                 image >= c.projection_.images.size() || !c.device_ || !c.context_) return;
@@ -784,6 +802,7 @@ namespace
 
         void ScheduleTheater(StereoCompositor& c, std::uint32_t image)
         {
+            if (!R23PixelDiagnosticsEnabled()) return;
             const ULONGLONG now = GetTickCount64();
             if (theaterPending || now - lastTheaterScheduleMs < R23PixelIntervalMs ||
                 image >= c.theater_.images.size() || !c.device_ || !c.context_) return;
