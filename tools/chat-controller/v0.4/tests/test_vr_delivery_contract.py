@@ -141,7 +141,7 @@ class DeliveryContractTests(unittest.TestCase):
             dict(name="Feature acceptance: " + item + " - verified", status="completed",
                  conclusion="success") for item in step_ids
         ]
-        artifacts = [dict(name="feature-dx9ex-r84-" + A, expired=False,
+        artifacts = [dict(id=171, name="feature-dx9ex-r84-" + A, expired=False,
                           size_in_bytes=12000, workflow_run=dict(head_sha=A))]
         api = Mock(side_effect=lambda url: dict(
             jobs=copy.deepcopy(jobs)) if "/jobs?" in url else dict(
