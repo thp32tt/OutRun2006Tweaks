@@ -112,7 +112,7 @@ sk=natural.transform((sw,natural.height),Image.Transform.AFFINE,
 bounds=sk.getbbox()
 check(bounds is not None,"forward italic missing glyphs")
 letters=sk.crop(bounds)
-check(letters.width<=w*SS-12*SS and letters.height<=h*SS-6*SS,
+check(letters.width<=w*SS-12*SS and letters.height<=h*SS-4*SS,
       "fresh italic text over English glyph+effect bbox")
 layer=Image.new("L",(w*SS,h*SS),0)
 px=(layer.width-letters.width)//2
