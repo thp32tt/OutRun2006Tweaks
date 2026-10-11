@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "vr_shared.hpp"
+#include "vr/ipc/xr_eye_extent.hpp"
 #include "stereo_shader.hpp"
 
 namespace
@@ -432,6 +433,15 @@ namespace
             if (++referenceGeneration_ == 0) referenceGeneration_ = 1;
         }
 
+        void SetAllocatedEyeExtent(OutRunVR::EyeExtent::Size extent)
+        {
+            // Called after XR swapchain creation, before the first pose publish.
+            // The game must allocate the exact same extent, not an unscaled hint.
+            if (!OutRunVR::EyeExtent::Valid(extent))
+                throw std::runtime_error("invalid allocated OpenXR eye extent");
+            allocatedEyeExtent_ = extent;
+        }
+
         OutRunVR::ClientPresentationMode Presentation() const
         {
             if (!HeaderValid()) return OutRunVR::PresentationTheater;
@@ -567,8 +577,10 @@ namespace
             state_->reserved[OutRunVR::HostReferenceSpaceGenerationIndex] = referenceGeneration_;
             for (std::uint32_t eye = 0; eye < 2; ++eye)
             {
-                state_->recommendedWidth[eye] = configs[eye].recommendedImageRectWidth;
-                state_->recommendedHeight[eye] = configs[eye].recommendedImageRectHeight;
+                // The two array-slice render targets share an exact common extent.
+                // Keep the existing Frame.v2/SharedPoseState layout unchanged.
+                state_->recommendedWidth[eye] = allocatedEyeExtent_.width;
+                state_->recommendedHeight[eye] = allocatedEyeExtent_.height;
                 if (eye < viewCount)
                 {
                     state_->eyeFov[eye] = {
@@ -651,6 +663,7 @@ namespace
         bool owns_ = false;
         std::uint32_t referenceGeneration_ = 1;
         LUID adapterLuid_{};
+        OutRunVR::EyeExtent::Size allocatedEyeExtent_{};
         std::uint32_t interopVerifiedToken_ = 0;
         bool interopVerifiedLogged_ = false;
     };
@@ -1038,6 +1051,11 @@ namespace
             ReleaseCom(context_);
             ReleaseCom(device_);
             if (gameProcess_) CloseHandle(gameProcess_);
+        }
+
+        OutRunVR::EyeExtent::Size AllocatedEyeExtent() const noexcept
+        {
+            return { projection_.width, projection_.height };
         }
 
         bool GameAlive() const
@@ -1826,12 +1844,20 @@ namespace
 
         void CreateProjectionSwapchain()
         {
-            const std::uint32_t recommendedW = std::max(configs_[0].recommendedImageRectWidth, configs_[1].recommendedImageRectWidth);
-            const std::uint32_t recommendedH = std::max(configs_[0].recommendedImageRectHeight, configs_[1].recommendedImageRectHeight);
-            const std::uint32_t maxW = std::max(configs_[0].maxImageRectWidth, configs_[1].maxImageRectWidth);
-            const std::uint32_t maxH = std::max(configs_[0].maxImageRectHeight, configs_[1].maxImageRectHeight);
-            projection_.width = std::clamp(static_cast<std::uint32_t>(std::lround(recommendedW * renderScale_)), 1u, maxW);
-            projection_.height = std::clamp(static_cast<std::uint32_t>(std::lround(recommendedH * renderScale_)), 1u, maxH);
+            const auto extent = OutRunVR::EyeExtent::ResolveHost(
+                { {configs_[0].recommendedImageRectWidth,
+                   configs_[0].recommendedImageRectHeight},
+                  {configs_[0].maxImageRectWidth,
+                   configs_[0].maxImageRectHeight} },
+                { {configs_[1].recommendedImageRectWidth,
+                   configs_[1].recommendedImageRectHeight},
+                  {configs_[1].maxImageRectWidth,
+                   configs_[1].maxImageRectHeight} },
+                renderScale_);
+            if (!OutRunVR::EyeExtent::Valid(extent))
+                throw std::runtime_error("OpenXR returned invalid per-eye extent");
+            projection_.width = extent.width;
+            projection_.height = extent.height;
             projection_.arraySize=2;
             projection_.format = swapFormat_;
             CreateSwapchain(projection_);
@@ -1839,10 +1865,9 @@ namespace
 
         void CreateTheaterSwapchain()
         {
-            theater_.width = std::max(configs_[0].recommendedImageRectWidth,
-                configs_[1].recommendedImageRectWidth);
-            theater_.height = std::max(configs_[0].recommendedImageRectHeight,
-                configs_[1].recommendedImageRectHeight);
+            // The same validated extent must be legal for both eye configurations.
+            theater_.width = projection_.width;
+            theater_.height = projection_.height;
             theater_.arraySize = 1;
             theater_.format = swapFormat_;
             CreateSwapchain(theater_);
@@ -2453,7 +2478,7 @@ int main(int argc, char** argv)
             "xrEnumerateViewConfigurationViews list");
         std::array<XrViewConfigurationView, 2> configs{ cv[0], cv[1] };
 
-        SharedWriter shared(req.adapterLuid);RenderFrameReader renderFrames;StereoCompositor compositor(session,d3d.device,d3d.context,gameWindow,configs,directTransportEnabled,directTransportOnly,disableDesktopDuplication,renderScale);compositor.Initialize();ViewHistory viewHistory;HostTimings timings;
+        SharedWriter shared(req.adapterLuid);RenderFrameReader renderFrames;StereoCompositor compositor(session,d3d.device,d3d.context,gameWindow,configs,directTransportEnabled,directTransportOnly,disableDesktopDuplication,renderScale);compositor.Initialize();shared.SetAllocatedEyeExtent(compositor.AllocatedEyeExtent());ViewHistory viewHistory;HostTimings timings;
         const XrEnvironmentBlendMode blend = ChooseBlendMode(instance, system);
 
         bool running = false, quit = false, exitRequested = false;

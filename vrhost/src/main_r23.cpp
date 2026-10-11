@@ -2026,6 +2026,7 @@ int main(int argc, char** argv)
             configs, directTransportEnabled, directTransportOnly,
             disableDesktopDuplication, renderScale);
         compositor.Initialize();
+        shared.SetAllocatedEyeExtent(compositor.AllocatedEyeExtent());
         ViewHistory viewHistory;
         HostTimings timings;
         std::ofstream pipelineLog("outrun-vr-host-pipeline.log",

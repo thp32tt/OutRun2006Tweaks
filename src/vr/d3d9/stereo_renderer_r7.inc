@@ -18,6 +18,7 @@
 #include "game_addrs.hpp"
 #include "vr_shared.hpp"
 #include "vr/ipc/frame_pacing_diagnostics.hpp"
+#include "vr/ipc/xr_eye_extent.hpp"
 
 // True-stereo D3D9 renderer.
 //
@@ -1160,36 +1161,54 @@ namespace OutRunVRStereo
 			if(!HostDirectTransportSupported()||!EnsureSharedState()||(SharedState->flags&OutRunVR::HostAdapterLuidValid)==0)return false;LUID gameLuid{};if(!QueryGameAdapterLuid(device,gameLuid))return false;InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientAdapterLuidLow),static_cast<LONG>(gameLuid.LowPart));InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientAdapterLuidHigh),static_cast<LONG>(gameLuid.HighPart));const bool adapterMatches=SharedState->hostAdapterLuidLow==gameLuid.LowPart&&SharedState->hostAdapterLuidHigh==static_cast<std::uint32_t>(gameLuid.HighPart);if(!adapterMatches){if(!FirstAdapterMismatchLogged){FirstAdapterMismatchLogged=true;spdlog::warn("VR direct transport: OpenXR D3D11 adapter LUID does not match the game D3D9Ex adapter; forcing SBS fallback");}return false;}if(DirectInteropProbeToken&&SharedState->hostInteropProbeAckToken==DirectInteropProbeToken){DirectInteropVerified=true;if(!FirstInteropVerifiedLogged){FirstInteropVerifiedLogged=true;spdlog::info("VR direct transport: D3D9Ex -> D3D11 shared-resource probe verified on the OpenXR adapter");}return true;}if(!DirectInteropProbeTexture){HANDLE handle=nullptr;if(FAILED(device->CreateTexture(1,1,1,D3DUSAGE_RENDERTARGET,D3DFMT_A8R8G8B8,D3DPOOL_DEFAULT,&DirectInteropProbeTexture,&handle))||!DirectInteropProbeTexture||!handle||FAILED(DirectInteropProbeTexture->GetSurfaceLevel(0,&DirectInteropProbeSurface))||FAILED(device->ColorFill(DirectInteropProbeSurface,nullptr,D3DCOLOR_ARGB(0xFF,0x7B,0x7B,0x7B)))||FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT,&DirectInteropProbeFence))||!DirectInteropProbeFence||FAILED(DirectInteropProbeFence->Issue(D3DISSUE_END))||!WaitForEventQuery(DirectInteropProbeFence,50)){++DirectInteropProbeFailures;ReleaseDirectInteropProbe();return false;}DirectInteropProbeHandle=handle;DirectInteropProbeToken=static_cast<std::uint32_t>(GetTickCount())^GetCurrentProcessId()^0x4F525652u;if(!DirectInteropProbeToken)DirectInteropProbeToken=1;InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->hostInteropProbeAckToken),0);InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeHandle),static_cast<LONG>(reinterpret_cast<std::uintptr_t>(DirectInteropProbeHandle)));InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientInteropProbeToken),static_cast<LONG>(DirectInteropProbeToken));}return false;
 		}
 		void ReleaseDirectTransportSlots(){RetireDirectTransportFramePublications();DirectTransportResourcesReady=false;DirectTransportWidth=0;DirectTransportHeight=0;ReleaseDirectTransportSlotObjects();}
-		void DirectTransportTargetSize(IDirect3DDevice9* device,UINT& width,UINT& height)
-		{
-			// Once a DirectGPU eye size is active, keep it as the fallback for an
-			// unstable seqlock read. Falling back to the desktop backbuffer for one
-			// read used to recreate the whole 4-slot ring 2124x2284 <-> 3440x1440.
-			width=DirectTransportWidth?DirectTransportWidth:BackBufferDesc.Width;
-			height=DirectTransportHeight?DirectTransportHeight:BackBufferDesc.Height;
-			if(SharedState&&SharedState->magic==OutRunVR::SharedMagic&&SharedState->protocolVersion==OutRunVR::SharedProtocolVersion&&SharedState->structSize==sizeof(OutRunVR::SharedPoseState))
-			{
-				for(int attempt=0;attempt<4;++attempt)
-				{
-					const std::uint32_t before=SharedState->sequence;if(before&1u)continue;MemoryBarrier();
-					const UINT w0=SharedState->recommendedWidth[0],w1=SharedState->recommendedWidth[1];
-					const UINT h0=SharedState->recommendedHeight[0],h1=SharedState->recommendedHeight[1];MemoryBarrier();
-					const std::uint32_t after=SharedState->sequence;if(before!=after||(after&1u))continue;
-					const UINT recommendedW=w0>w1?w0:w1;const UINT recommendedH=h0>h1?h0:h1;
-					if(recommendedW&&recommendedH){width=recommendedW;height=recommendedH;}
-					break;
-				}
-			}
-			D3DCAPS9 caps{};if(device&&SUCCEEDED(device->GetDeviceCaps(&caps))){if(caps.MaxTextureWidth&&width>caps.MaxTextureWidth)width=caps.MaxTextureWidth;if(caps.MaxTextureHeight&&height>caps.MaxTextureHeight)height=caps.MaxTextureHeight;}
-			if(!width)width=BackBufferDesc.Width?BackBufferDesc.Width:1u;if(!height)height=BackBufferDesc.Height?BackBufferDesc.Height:1u;
-		}
+		bool DirectTransportTargetSize(IDirect3DDevice9* device,UINT& width,UINT& height)
+        {
+            width = 0; height = 0;
+            if (!device || !SharedState || SharedState->magic != OutRunVR::SharedMagic ||
+                SharedState->protocolVersion != OutRunVR::SharedProtocolVersion ||
+                SharedState->structSize != sizeof(OutRunVR::SharedPoseState))
+                return false;
+            OutRunVR::EyeExtent::Size published{};
+            bool stable = false;
+            for (int attempt = 0; attempt < 4; ++attempt)
+            {
+                const std::uint32_t before = SharedState->sequence;
+                if (before & 1u) continue;
+                MemoryBarrier();
+                const auto w0 = SharedState->recommendedWidth[0];
+                const auto h0 = SharedState->recommendedHeight[0];
+                const auto w1 = SharedState->recommendedWidth[1];
+                const auto h1 = SharedState->recommendedHeight[1];
+                MemoryBarrier();
+                const std::uint32_t after = SharedState->sequence;
+                if (before != after || (after & 1u)) continue;
+                // Host must publish both equal array-slice extents atomically.
+                if (w0 != w1 || h0 != h1) return false;
+                published = {w0, h0};
+                stable = true;
+                break;
+            }
+            if (!stable)
+            {
+                // Retain current valid allocation on transient seqlock contention.
+                published = {DirectTransportWidth, DirectTransportHeight};
+            }
+            D3DCAPS9 caps{};
+            if (FAILED(device->GetDeviceCaps(&caps))) return false;
+            const auto exact = OutRunVR::EyeExtent::ResolveGame(
+                published, {caps.MaxTextureWidth, caps.MaxTextureHeight});
+            if (!OutRunVR::EyeExtent::Valid(exact)) return false;
+            width = exact.width;
+            height = exact.height;
+            return true;
+        }
 		HRESULT StretchDirectEye(IDirect3DDevice9* device,IDirect3DSurface9* source,IDirect3DSurface9* target)
 		{
 			if(!device||!source||!target)return D3DERR_INVALIDCALL;HRESULT hr=device->StretchRect(source,nullptr,target,nullptr,D3DTEXF_LINEAR);if(FAILED(hr))hr=device->StretchRect(source,nullptr,target,nullptr,D3DTEXF_NONE);return hr;
 		}
 		bool EnsureDirectTransportResources(IDirect3DDevice9* device)
 		{
-			if(!device||!BackBufferDesc.Width||!BackBufferDesc.Height||!EnsureRenderFrameState()||!EnsureDirectInteropProbe(device))return false;UINT targetWidth=0,targetHeight=0;DirectTransportTargetSize(device,targetWidth,targetHeight);if(DirectTransportResourcesReady&&DirectTransportWidth==targetWidth&&DirectTransportHeight==targetHeight)return true;if(DirectTransportResourcesReady)ReleaseDirectTransportSlots();DirectTransportFormat=ChooseDirectTransportFormat(BackBufferDesc.Format);if(!CanConvertForDirectTransport(device,BackBufferDesc.Format,DirectTransportFormat))return false;for(auto&slot:DirectTransportSlots){HANDLE leftHandle=nullptr,rightHandle=nullptr;const HRESULT leftHr=device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.leftTexture,&leftHandle);const HRESULT rightHr=SUCCEEDED(leftHr)?device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.rightTexture,&rightHandle):E_FAIL;if(FAILED(leftHr)||FAILED(rightHr)||!leftHandle||!rightHandle||FAILED(slot.leftTexture->GetSurfaceLevel(0,&slot.leftSurface))||FAILED(slot.rightTexture->GetSurfaceLevel(0,&slot.rightSurface))||FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT,&slot.fence))||!slot.fence){ReleaseDirectTransportSlots();return false;}slot.leftHandle=leftHandle;slot.rightHandle=rightHandle;}DirectTransportWidth=targetWidth;DirectTransportHeight=targetHeight;if(!DirectTransportGeneration)DirectTransportGeneration=RenderFrameRunGeneration;if(++DirectTransportGeneration==0)++DirectTransportGeneration;DirectTransportResourcesReady=true;spdlog::info("VR stereo: verified 4-slot D3D9Ex shared eye ring ready {}x{} from desktop {}x{} (VDXR/OpenXR recommended) format={} generation={}",DirectTransportWidth,DirectTransportHeight,BackBufferDesc.Width,BackBufferDesc.Height,static_cast<int>(DirectTransportFormat),DirectTransportGeneration);return true;
+			if(!device||!BackBufferDesc.Width||!BackBufferDesc.Height||!EnsureRenderFrameState()||!EnsureDirectInteropProbe(device))return false;UINT targetWidth=0,targetHeight=0;if(!DirectTransportTargetSize(device,targetWidth,targetHeight))return false;if(DirectTransportResourcesReady&&DirectTransportWidth==targetWidth&&DirectTransportHeight==targetHeight)return true;if(DirectTransportResourcesReady)ReleaseDirectTransportSlots();DirectTransportFormat=ChooseDirectTransportFormat(BackBufferDesc.Format);if(!CanConvertForDirectTransport(device,BackBufferDesc.Format,DirectTransportFormat))return false;for(auto&slot:DirectTransportSlots){HANDLE leftHandle=nullptr,rightHandle=nullptr;const HRESULT leftHr=device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.leftTexture,&leftHandle);const HRESULT rightHr=SUCCEEDED(leftHr)?device->CreateTexture(targetWidth,targetHeight,1,D3DUSAGE_RENDERTARGET,DirectTransportFormat,D3DPOOL_DEFAULT,&slot.rightTexture,&rightHandle):E_FAIL;if(FAILED(leftHr)||FAILED(rightHr)||!leftHandle||!rightHandle||FAILED(slot.leftTexture->GetSurfaceLevel(0,&slot.leftSurface))||FAILED(slot.rightTexture->GetSurfaceLevel(0,&slot.rightSurface))||FAILED(device->CreateQuery(D3DQUERYTYPE_EVENT,&slot.fence))||!slot.fence){ReleaseDirectTransportSlots();return false;}slot.leftHandle=leftHandle;slot.rightHandle=rightHandle;}DirectTransportWidth=targetWidth;DirectTransportHeight=targetHeight;if(!DirectTransportGeneration)DirectTransportGeneration=RenderFrameRunGeneration;if(++DirectTransportGeneration==0)++DirectTransportGeneration;DirectTransportResourcesReady=true;spdlog::info("VR stereo: verified 4-slot D3D9Ex shared eye ring ready {}x{} from desktop {}x{} (VDXR/OpenXR recommended) format={} generation={}",DirectTransportWidth,DirectTransportHeight,BackBufferDesc.Width,BackBufferDesc.Height,static_cast<int>(DirectTransportFormat),DirectTransportGeneration);return true;
 		}
 		bool ResolveDirectTransport(IDirect3DDevice9* device,std::uint32_t frameId)
 		{
