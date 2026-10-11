@@ -1,5 +1,12 @@
 # End-to-end Korean localization playtest and consumer-coverage gate
 
+## 2026-10-11 QA 수렴·실게임 시험 분리 정책 (최신 사용자 결정)
+
+**모든 생산/검수 레인 공통 적용:** [KOREAN_LOCALIZATION_QA_THROUGHPUT_POLICY.md](KOREAN_LOCALIZATION_QA_THROUGHPUT_POLICY.md)를 최신 QA 판정의 정본으로 먼저 읽는다. 기존 문서에서 **경미한 원본 서체/효과 차이, 완벽하지 않은 금속 광택, 미세한 각도·자간 차이, 과거 미관만의 HOLD**를 자동 재작업으로 표시하던 지시는 이 정책으로 대체한다. C2는 저장 DDS에서 실제 읽히는 글자·보호 픽셀·CLEAN·RAW/FLIP-Y를 독립 확인하고, 구체적 시각 결함이 없으면 `COSMETIC_VARIANCE_ACCEPTED`와 정적 QA PASS를 검토한다. 없는 결함을 추측하거나 같은 SHA를 반복 재생산하지 않는다.
+
+**하드 게이트 유지:** 오자/가짜 자소/잘림/가독성 불량/원문 효과 bbox 1px 침범/다른 UI 충돌/영어 잔상/플레이트 손상/저장 DDS 압축 훼손/사용자 실게임 FAIL은 계속 차단한다. `TEST_ONLY_ELIGIBLE` 및 `C3_LIGHT_REVIEW_TEST_ONLY`는 격리 시험용 판단이며 `C2_PASS`, `C3_STRICT_PASS`, `qa_evidence_gate.py` 승인·배포, 실게임 PASS를 자동 생성하지 않는다. 고위험 P0/P1 및 공유 HUD는 C3 엄격검수를 유지하고, 사용자가 실제 게임에서 확인하기 전 `RUNTIME_VALIDATION=UNTESTED` 및 OPEN을 유지한다. 기존 A/B/C1/C2 역할·작업 소유권·일정은 불변.
+
+
 ## 2026-10-11 per-glyph size decision for all review stages
 
 Apply `docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md` in producer, C2, C3, screenshot/preview and real game review. English/Korean entire-sentence width/aspect or different character count alone is not a user-visible defect; shorter/smaller readable Korean is permitted. Reject actual individual-glyph illegibility, real UI misplacement or exact English text bbox overflow, not translation length variance. Keep actual game evidence mandatory for user-reported regressions.
