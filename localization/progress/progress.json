@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 20:43 KST",
+  "updated_at_kst": "2026-10-11 21:12 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1363,6 +1363,23 @@
         "C3": "NOT_RUN",
         "RUNTIME_VALIDATION": "UNTESTED",
         "evidence": "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2043_IMAGEGEN_EXTRANEOUS_ART_HOLD.json"
+      },
+      "a245_q193_online_native_source_clean": {
+        "role": "A",
+        "index": 193,
+        "run_key": "OUTRUN-KOR-A245-Q193-ONLINE-SOURCE-NATIVE-20261011-2100",
+        "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+        "official_unchanged_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+        "new_trial_sha256": "107648ca5628048ea4813a2c65385ad72ab002815ed25a8dda236e66eb1dd9e7",
+        "new_saved_trial_dds": 1,
+        "promoted_dds": 0,
+        "outside_non_target_pixels_changed": 0,
+        "producer_native_pixel_qa": "PASS_SCOPED_BGW_100_75_50_RAW",
+        "C2": "PENDING_NEW_EXACT_SHA",
+        "C3": "NOT_RUN",
+        "PJR_AND_IGR": "IGR003_IGR019_IGR033_OPEN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "qa_file": "localization/graphics/role_A/20261011-A245-Q193-ONLINE-CLEAN-REAL-GLYPH/A245_CONTROLLER_FIRSTHAND_VISUAL_QA.json"
       }
     },
     "runtime_text_trace": {
