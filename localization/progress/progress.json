@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 16:18 KST",
+  "updated_at_kst": "2026-10-11 16:41 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1019,6 +1019,45 @@
         "new_candidate_DDS": 0,
         "official_promoted_DDS": 0,
         "QA": "localization/graphics/role_C/20261011-C1-Q119-NEW-NATIVE-FAMILY-HIERARCHY-FAIL/C1_Q119_SOURCE_FAMILY_OPTICAL_REWORK.json"
+      },
+      "b372_q060_real_imagegen_p2_optical_punct_hold_20261011": {
+        "run_key": "OUTRUN-KOR-B372-Q060-REAL-IMAGEGEN-SOURCE-STYLE-PUNCT-HOLD-20261011-1630",
+        "role": "B",
+        "index": 60,
+        "priority": "P0",
+        "method": "real_chatgpt_imagegen_png_transparent_source_native_p2",
+        "real_generator_calls": 3,
+        "isolated_generation_id": "ded987dd-a97c-4342-bcd8-48e06ad3a9f9",
+        "isolated_rgba_source_sha256": "5d521fa3feab5e0bc49a448cdc13f99841e454050c793385bfcb57aeb9b6c01c",
+        "isolated_source_size": [
+          2113,
+          744
+        ],
+        "source_visible_bbox": [
+          41,
+          175,
+          2048,
+          581
+        ],
+        "source_english_bbox": [
+          2179,
+          340,
+          3028,
+          474
+        ],
+        "generator_colon_style": "wrong_diagonal_slab_punctuation_not_source_round_dots",
+        "generated_png_in_github": false,
+        "source_original_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+        "reused_c2_approved_clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+        "official_sha256_unchanged": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+        "producer_qa": "REWORK_REQUIRED_UNPROMOTED_P2_SOURCE_FAMILY_AND_PUNCTUATION",
+        "new_candidate_dds": 0,
+        "official_promotions": 0,
+        "C2": "NOT_RUN",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "IGR044": "OPEN",
+        "qa": "localization/graphics/role_B/imagegen_requests/q060_B372_SOURCE_STYLE_PUNCT_HOLD_20261011.json"
       }
     },
     "runtime_text_trace": {
