@@ -1,3 +1,9 @@
+# 2026-10-11 R84 completed source/build gate (top precedence)
+
+- R84 one-feature task `CONVERSION-DX9EX-00591` is **COMPLETE_BUILD_VERIFIED**, closeout `SUPERSEDED_BY_DX9EX_FOCUS`. Exact target source SHA `074768c96c410f0268c084450b0aa8bced38b6c3` passed full independent R29–R33 Win32 compile/link, host, game, package, DX9Ex Active #38135749653, Domain Isolation #38135749604, and Full Source Impact #38135749550.
+- Prior paragraphs describing R84 as outstanding/ACTIVE are historical, not executable. Do not schedule additional R84 seam reviews, duplicate #00591, or count new points for this already scored task. See `docs/automation/runs/CONVERSION-DX9EX-00591.json` and `docs/VR_AUTODEV_STATE.json` for C6 closeout; continue independent P0 optics/HUD, P2 XR per-eye and P3 measured FPS.
+- The R84 x86 test artifact (#11701023307) is separate from the preserved R26 safe package (#11701106196). Quest3/VDXR RUNTIME_VALIDATION=UNTESTED until exact headset evidence; no automatic runtime promotion.
+
 # DX9Ex functional-feature completion gate — 2026-10-10 21:40 KST (top precedence)
 
 - **User directive: work and debug by COMPLETE FUNCTION, not one tiny change per finished work item.** Applies to autonomous C DX9Ex and controller dispatch. Read `docs/DX9EX_AUTODEV_PRIORITY_20261010.md` and `docs/automation/QUEUE_CONTROLLER_CONTRACT.md` latest active feature-scoped sections at every dispatch. These override older single-seam/small-task terminal practices.
