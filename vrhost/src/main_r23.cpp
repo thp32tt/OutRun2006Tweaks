@@ -1882,8 +1882,8 @@ int main(int argc, char** argv)
             static_cast<std::uint32_t>(std::clamp(
                 R35ReadEnvFloat("OUTRUN_VR_CADENCE_TIMEOUT_MS", 35.0f),
                 5.0f, 100.0f));
-        HWND gameWindow = WaitForGameWindow();
-        DWORD gamePid = 0; GetWindowThreadProcessId(gameWindow, &gamePid);
+        // Window acquisition is deferred until the XR per-eye extent has been
+        // published. Waiting here would deadlock game config and host startup.
 
         if (!HasExtension(XR_KHR_D3D11_ENABLE_EXTENSION_NAME))
             throw std::runtime_error("runtime lacks XR_KHR_D3D11_enable");
@@ -1990,7 +1990,33 @@ int main(int argc, char** argv)
             "xrEnumerateViewConfigurationViews list");
         std::array<XrViewConfigurationView, 2> configs{ cv[0], cv[1] };
 
+        // Use the same per-eye allocation policy as StereoCompositor's
+        // CreateProjectionSwapchain. This publishes the exact expected extent
+        // before the game creates its D3D9 window; a later mismatch fails closed.
+        const auto startupEyeExtent = OutRunVR::EyeExtent::ResolveHost(
+            { {configs[0].recommendedImageRectWidth,
+               configs[0].recommendedImageRectHeight},
+              {configs[0].maxImageRectWidth,
+               configs[0].maxImageRectHeight} },
+            { {configs[1].recommendedImageRectWidth,
+               configs[1].recommendedImageRectHeight},
+              {configs[1].maxImageRectWidth,
+               configs[1].maxImageRectHeight} },
+            renderScale);
+        if (!OutRunVR::EyeExtent::Valid(
+                OutRunVR::EyeExtent::ResolveStartup(
+                    startupEyeExtent, startupEyeExtent)))
+            throw std::runtime_error("XR startup eye extent invalid for D3D9Ex");
+
         SharedWriter shared(req.adapterLuid);
+        shared.PublishStartupEyeExtent(startupEyeExtent);
+        std::cout << "XR startup: published VDXR allocated eye "
+                  << startupEyeExtent.width << 'x' << startupEyeExtent.height
+                  << " before D3D9 window creation.\\n";
+        HWND gameWindow = WaitForGameWindow();
+        DWORD gamePid = 0;
+        GetWindowThreadProcessId(gameWindow, &gamePid);
+
         R35CadenceHost cadence(cadenceMode, cadenceTargetHz,
             cadenceMaxHz, cadenceTimeoutMs, targetRefreshRateHz);
         RenderFrameReader renderFrames;
@@ -1998,7 +2024,12 @@ int main(int argc, char** argv)
             configs, directTransportEnabled, directTransportOnly,
             disableDesktopDuplication, renderScale);
         compositor.Initialize();
-        shared.SetAllocatedEyeExtent(compositor.AllocatedEyeExtent());
+        const auto allocatedEyeExtent = compositor.AllocatedEyeExtent();
+        if (!OutRunVR::EyeExtent::Equal(
+                allocatedEyeExtent, startupEyeExtent))
+            throw std::runtime_error(
+                "XR swapchain allocation changed since startup prepublication");
+        shared.SetAllocatedEyeExtent(allocatedEyeExtent);
         ViewHistory viewHistory;
         HostTimings timings;
         std::ofstream pipelineLog("outrun-vr-host-pipeline.log",

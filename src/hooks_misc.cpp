@@ -851,7 +851,9 @@ namespace
         OutRunVR::IpcV3::HostState host{};
         const bool executablePresent =
             std::filesystem::exists(Module::ExePath.parent_path() / "outrun-vr-host.exe");
-        const DWORD deadline = GetTickCount() + (executablePresent ? 5000u : 0u);
+        // Host can now publish eye extent before the game window exists.
+        // Allow OpenXR runtime initialization, but keep a bounded safe fallback.
+        const DWORD deadline = GetTickCount() + (executablePresent ? 12000u : 0u);
         do
         {
             if (reader.Read(host) && host.hostPid != 0 &&

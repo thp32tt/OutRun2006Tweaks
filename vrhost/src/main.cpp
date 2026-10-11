@@ -443,6 +443,30 @@ namespace
             allocatedEyeExtent_ = extent;
         }
 
+        // The game reads HostState.v3 during its config hook before it creates
+        // a D3D9 window. R23 can publish the XR-specified allocation here,
+        // *before* waiting for that window. The v3 shadow copies this seqlocked
+        // V2 snapshot, without promoting an uninitialized pose to valid.
+        void PublishStartupEyeExtent(OutRunVR::EyeExtent::Size extent)
+        {
+            SetAllocatedEyeExtent(extent);
+            LARGE_INTEGER qpc{};
+            QueryPerformanceCounter(&qpc);
+            Begin();
+            state_->hostPid = GetCurrentProcessId();
+            state_->flags = OutRunVR::HostAlive | OutRunVR::HostAdapterLuidValid;
+            state_->sampleQpc = qpc.QuadPart;
+            ++state_->heartbeat;
+            state_->reserved[OutRunVR::HostReferenceSpaceGenerationIndex] =
+                referenceGeneration_;
+            for (std::uint32_t eye = 0; eye < 2; ++eye)
+            {
+                state_->recommendedWidth[eye] = extent.width;
+                state_->recommendedHeight[eye] = extent.height;
+            }
+            End();
+        }
+
         OutRunVR::ClientPresentationMode Presentation() const
         {
             if (!HeaderValid()) return OutRunVR::PresentationTheater;
