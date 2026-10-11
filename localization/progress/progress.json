@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 15:25 KST",
+  "updated_at_kst": "2026-10-11 15:26 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -13191,5 +13191,22 @@
     "source_clean": "HOLD",
     "runtime_validation": "UNTESTED",
     "evidence": "localization/graphics/role_C/20261011-C2-Q102-NATIVE-ORPHAN-FRINGE/C2_Q102_INDEPENDENT_NATIVE_ORPHAN_REWORK.json"
+  },
+  "c2_q104_20261011_1526": {
+    "review_id": "C2-Q104-SAVED-SOURCE-FAMILY-FIRST-STRICT-20261011-1526",
+    "queue_index": 104,
+    "shard": "EVEN",
+    "source_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+    "candidate_sha256": "c84a2703d0a22b36384e07ce72d4e761e651a1a23219cd78153b4a0aff022505",
+    "candidate_unchanged": true,
+    "decision": "REWORK_REQUIRED",
+    "prior_c263_c3_pass": "SUPERSEDED_SAME_SHA_NEW_OPTICAL_DEFECT",
+    "plate_only": "HOLD_NO_VERIFIED_CLEAN",
+    "composite_only": "HOLD_NO_EXACT_CLEAN",
+    "new_c3": "NOT_RUN",
+    "new_dds": 0,
+    "new_approval": 0,
+    "runtime_validation": "UNTESTED",
+    "evidence": "localization/graphics/role_C/20261011-C2-Q104-STRICT-NATIVE-SOURCE-FAMILY/C2_Q104_INDEPENDENT_STRICT_NATIVE_STYLE_REWORK.json"
   }
 }
