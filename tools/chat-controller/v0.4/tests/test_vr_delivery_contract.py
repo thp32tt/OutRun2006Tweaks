@@ -184,7 +184,7 @@ class DeliveryContractTests(unittest.TestCase):
         self.assertIsNone(f(backlog, "DX11", {"active_by_lane":{"A":dict(one, phase="WAIT_CHAT")}}))
         self.assertIsNone(f(backlog, "DXVK", {}))
 
-    def test_forced_rollover_preserves_busy_or_unobservable_owner(self):
+    def test_30min_rollover_preserves_busy_or_unobservable_owner(self):
         slot = SimpleNamespace(name="A", url="https://chatgpt.com/c/old")
         ns = functions(dict(CONVERSATION_ROLLOVER_ENABLED=True, CONTROLLER_MODE="conversion",
                             CONVERSATION_ROLLOVER_MIN_SECONDS=0, MAX_CHAT_ROLLOVERS_PER_TASK=0,
@@ -196,8 +196,8 @@ class DeliveryContractTests(unittest.TestCase):
         page = Mock(); page.is_closed.return_value = False
         for pages in ({"A": page}, {}):
             active = dict(task_id="CONVERSION-DX11-00537", slot="A")
-            self.assertFalse(asyncio.run(ns["queue_rollover_chat"](None, pages, active, "VR_FORCED_40_MINUTE_RESUME")))
-            self.assertEqual(active["rollover_pending_reason"], "VR_FORCED_40_MINUTE_RESUME")
+            self.assertFalse(asyncio.run(ns["queue_rollover_chat"](None, pages, active, "VR_FORCED_30_MINUTE_ROLLOVER")))
+            self.assertEqual(active["rollover_pending_reason"], "VR_FORCED_30_MINUTE_ROLLOVER")
         ns["replace_with_fresh_slot_page"].assert_not_called()
 
     def test_required_jobs_skipped_or_missing_cannot_complete_feature(self):
