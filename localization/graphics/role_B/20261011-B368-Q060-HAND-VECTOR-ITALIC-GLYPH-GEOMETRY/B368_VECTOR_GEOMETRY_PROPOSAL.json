@@ -1,0 +1,74 @@
+{
+  "run": "B368",
+  "producer_role": "B",
+  "queue_index": 60,
+  "stage": "P2_MANUAL_VECTOR_GEOMETRY_ONLY",
+  "status": "GEOMETRY_REVIEW_PENDING_CONTROLLER",
+  "P1": "C372_INDEPENDENT_PLATE_PASS_REUSED",
+  "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+  "official_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+  "rejected_prior_B367_sha256": "52d97f845b7b3e588ebe5136cd299882001d509320fd4f8cc910270f314142d9",
+  "geometry_sha256": "f048794fbd985bba52d85e9d247871bf516658bc3bcfd25386e58d232e26f221",
+  "source_raw_png_sha256": "ac0957d2b63a8d83851830ea1315e671efcc3771c92b78c786d50bee0be23907",
+  "original_effect_bbox": [
+    2179,
+    340,
+    3028,
+    474
+  ],
+  "new_geometry_bbox": [
+    2215,
+    346,
+    2997,
+    464
+  ],
+  "new_shape_vs_B367_binary_symmetric_difference_pixels": 3104007,
+  "native_ppem": "hand-authored 4x AA stroke paths -> exactly one native L downsample",
+  "font": "NONE_HAND_AUTHORED",
+  "glyph_inventory": [
+    "최",
+    "고",
+    "기",
+    "록",
+    ":"
+  ],
+  "source_B_stem_top_minus_bottom_slope": 0.3421,
+  "manual_Korean_reference_stem_top_minus_bottom_normalized_slope": 0.31,
+  "anchor_top_native_S4": [
+    702,
+    72
+  ],
+  "anchor_bottom_native_S4": [
+    587,
+    444
+  ],
+  "source_bounding_ceiling": "PASS",
+  "P2_firsthand_controller_visual": "NOT_YET_REVIEWED",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "USER_GAME": "NOT_RUN_IGR044_OPEN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "official_dds_promoted": 0,
+  "new_dds": 0,
+  "preview_is_only_flat_unlit_ink": true,
+  "evidence": [
+    {
+      "path": "localization/graphics/role_B/20261011-B368-Q060-HAND-VECTOR-ITALIC-GLYPH-GEOMETRY/B368_SOURCE_CLEAN_OFFICIAL_B367_MANUAL_GEOMETRY_FLIPY_BG128_100.png",
+      "sha256": "0e0cf10e128e706970a9cac425df9501efac05fadbd1f72e8839565cabe05264"
+    },
+    {
+      "path": "localization/graphics/role_B/20261011-B368-Q060-HAND-VECTOR-ITALIC-GLYPH-GEOMETRY/B368_SOURCE_CLEAN_OFFICIAL_B367_MANUAL_GEOMETRY_FLIPY_BG255_75.png",
+      "sha256": "fd052bfa452ccee78420d32174a2649487ba71d43b51e5a6e8d8994b39ff9b84"
+    },
+    {
+      "path": "localization/graphics/role_B/20261011-B368-Q060-HAND-VECTOR-ITALIC-GLYPH-GEOMETRY/B368_SOURCE_CLEAN_OFFICIAL_B367_MANUAL_GEOMETRY_FLIPY_BG0_50.png",
+      "sha256": "493bc61d70900cd3d184c1cb3f23421d6ebb19a04ffa2f1e11dad299ccf707e7"
+    },
+    {
+      "path": "localization/graphics/role_B/20261011-B368-Q060-HAND-VECTOR-ITALIC-GLYPH-GEOMETRY/B368_SOURCE_CLEAN_OFFICIAL_B367_MANUAL_GEOMETRY_RAW_BG128_100.png",
+      "sha256": "1a5024e4b4d59d0a3db34467bdbf8156a8177d7bce6bf4b098e2eb2349b6cd45"
+    }
+  ],
+  "producer_next": "Controller must inspect shape and counters at native/50/RAW before constructing separate face/rim/extrusion/highlight and encoding saved DDS."
+}
