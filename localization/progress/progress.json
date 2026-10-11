@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 22:09 KST",
+  "updated_at_kst": "2026-10-11 22:11 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1443,6 +1443,39 @@
         "C3": "PENDING",
         "user_game": "IGR003_019_033_OPEN",
         "RUNTIME_VALIDATION": "UNTESTED"
+      },
+      "c1_q102_canonical_source_rgba_2211_20261011": {
+        "role": "C1",
+        "queue_index": 102,
+        "run_key": "OUTRUN-KOR-C1-Q102-CANONICAL-RGBA-20261011-2211",
+        "source_origin": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+        "canonical_source_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+        "new_github_binary_paths": [
+          "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2211_CANONICAL_ENGLISH_FULL_READABLE_RGBA.png",
+          "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2211_CANONICAL_ENGLISH_LINE1_RGBA.png",
+          "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2211_CANONICAL_ENGLISH_LINE2_RGBA.png"
+        ],
+        "new_source_images_persisted": 3,
+        "new_source_png_sha256": [
+          "7c51a7422a5bee5449045081a1fe3c03b0771da716ed53e3ee46cea6244592b6",
+          "218a08ff667199e019a47e6a372168b9f9423a2776e9a6ce8c8742955b7109f0",
+          "73aecc0166949a5018ac94759b74392726aebb577972c9e5067347be35f9e142"
+        ],
+        "imagegen_attempt_real": "ecc9b9e7-3622-4fac-9062-c0006ef9d863",
+        "generated_png_sha256": "9a3409061986be645229b5ea2a1171b95801929fdc2b79f1f74578be609c698e",
+        "correct_target": "15코스 연속",
+        "wrong_output": "타임 어택 모드",
+        "producer_QA": "FAIL_WRONG_TARGET_TEXT_AND_SOURCE_STYLE",
+        "valid_generated_hangul_png": 0,
+        "latest_BC3_pipeline_supported": true,
+        "q102_independent_plate_pass": false,
+        "new_trial_dds": 0,
+        "official_dds_changes": 0,
+        "C2": "NOT_RUN",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "evidence": "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2211_CANONICAL_SOURCE_RGBA_IMAGEGEN_FAILURE.json",
+        "binary_commit": "854c38907c9b6d98f9465c6c2323283f406d5dc2"
       }
     },
     "runtime_text_trace": {
