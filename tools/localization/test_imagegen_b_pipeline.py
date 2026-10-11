@@ -15,6 +15,26 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 import imagegen_b_pipeline as b
 
 
+
+def synthetic_media_binding(root, requests_dir, ref, generation_id, target_text):
+    """Synthetic fixture only; never real generator attachment evidence."""
+    png = requests_dir / "synthetic_english.png"
+    im = Image.new("RGBA", (48, 20), (0, 0, 0, 0))
+    for x in range(4, 43):
+        for y in range(4, 17):
+            im.putpixel((x, y), (255, 170, 50, 255))
+    im.save(png)
+    receipt = requests_dir / "synthetic_tool_input_receipt.json"
+    receipt.write_text(json.dumps({
+        "tool": "image_gen.text2im", "media_attached": True,
+        "source_image_sha256": ref(png)["sha256"],
+        "generation_id": generation_id, "target_text": target_text,
+        "image_input_field": "referenced_image_ids",
+        "input_reference_id": "SYNTHETIC_FIXTURE_NOT_REAL",
+    }))
+    return {"english_reference": ref(png), "tool_request_receipt": ref(receipt)}
+
+
 class TestBImageGen(unittest.TestCase):
     def make_png(self, mode="RGBA"):
         im=Image.new(mode,(180,50),(0,0,0,0) if mode=="RGBA" else (0,0,0))
@@ -25,6 +45,32 @@ class TestBImageGen(unittest.TestCase):
         bio=io.BytesIO()
         im.save(bio,format="PNG")
         return bio.getvalue()
+
+    def test_generator_unbound_source_hard_stop(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            req = root / "imagegen_requests"
+            req.mkdir()
+            def ref(path):
+                return {"path": str(path.relative_to(root)),
+                        "sha256": b.digest(path.read_bytes())}
+            raw = {"generator": {"generation_id": "synthetic-test-only-not-real"},
+                   "target_text": "최고 기록:"}
+            with self.assertRaisesRegex(ValueError, "SOURCE_REFERENCE_NOT_BOUND"):
+                b.require_bound_english_reference(root, raw)
+            binding = synthetic_media_binding(root,req,ref,"synthetic-test-only-not-real","최고 기록:")
+            raw["source_media_binding"] = binding
+            ok = b.require_bound_english_reference(root, raw)
+            self.assertEqual(ok["binding_status"],
+                             "DECLARED_TOOL_INPUT_RECEIPT_PRESENT_C2_VERIFICATION_REQUIRED")
+            raw["generator"]["generation_id"] = "wrong-id"
+            with self.assertRaisesRegex(ValueError, "SOURCE_REFERENCE_NOT_BOUND"):
+                b.require_bound_english_reference(root, raw)
+            raw["generator"]["generation_id"] = "synthetic-test-only-not-real"
+            raw["source_media_binding"] = {
+                **binding, "english_reference": {**binding["english_reference"], "sha256":"0"*64}}
+            with self.assertRaisesRegex(ValueError, "SOURCE_REFERENCE_NOT_BOUND"):
+                b.require_bound_english_reference(root, raw)
 
     def test_alpha_fit_preserves_nonzero_bounds(self):
         a=b.png_rgba(self.make_png())
@@ -115,6 +161,7 @@ class TestBImageGen(unittest.TestCase):
               "source":ref(sourcefile),"official":ref(sourcefile),
               "clean":ref(clean_file),"removal_mask":ref(mask_file),
               "generated":ref(genfile),
+              "source_media_binding":synthetic_media_binding(root,folder,ref,"synthetic-test-only-not-real","최고 기록:"),
               "plate_review":{"status":"PLATE_PASS","ref":ref(rfile)},
               "source_bbox":[10,5,52,19],"placement_bbox":[12,6,50,18],
               "replace_roi":[8,4,54,20],"fit_mode":"contain",
@@ -224,6 +271,7 @@ class TestBC3ImageGenBridge(unittest.TestCase):
                     "prompt":"SYNTHETIC FIXTURE ONLY"},
                     "source":ref(src),"official":ref(src),"clean":ref(c),
                     "removal_mask":ref(m),"generated":ref(g),
+                    "source_media_binding":synthetic_media_binding(root,req,ref,"TEST-ONLY-NO-REAL-IMAGEGEN","합성 시험"),
                     "plate_review":{"status":"PLATE_PASS","ref":ref(r)},
                     "source_bbox":[8,8,40,32],"placement_bbox":[12,12,36,28],
                     "replace_roi":[8,8,40,32],"output_dir":
