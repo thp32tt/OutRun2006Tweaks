@@ -954,6 +954,51 @@ def main() -> None:
     ):
         broken = layout_source.replace(old, wrong, 1)
         assert broken != layout_source and not tex4_connected(bridge, broken, probe_source)
+    # 00551: ensure actual D3D9 FVF NORMAL/SPECULAR bytes reach the
+    # native frame, while non-exact D3D9 specular lighting is rejected.
+    def object_fvf_integrated(src: str, header: str, probe: str) -> bool:
+        return all(x in src for x in (
+            "kGameFvfNormal == D3DFVF_NORMAL",
+            "kGameFvfSpecular == D3DFVF_SPECULAR",
+            "GetRenderState(D3DRS_SPECULARENABLE, &specularEnabled)",
+            "specularEnabled)",
+            "lighting || vertexBlend != D3DVBF_DISABLE",
+            "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+        )) and all(x in header for x in (
+            "candidate.normalBytes = candidate.hasNormal ? 12u : 0u;",
+            "candidate.diffuseOffset = candidate.positionBytes + candidate.normalBytes;",
+            "layout.diffuseOffset != layout.positionBytes + layout.normalBytes",
+            "data + layout.diffuseOffset, 4u",
+            "(position == kGameFvfXyzRhw && hasNormal)",
+        )) and all(x in probe for x in (
+            "struct WorldNormalSpecUv2",
+            "layout.texcoordOffset == 32u && layout.minStride == 48u",
+            "sample.diffuse == 0xff123456u",
+            "!game_fvf_decode_vertex(&world, 47u",
+            "corrupted.diffuseOffset -= 12u",
+            "corrupted.texcoordOffset -= 4u",
+        ))
+    assert object_fvf_integrated(bridge, layout_source, probe_source)
+    for old, bad in (
+        ("GetRenderState(D3DRS_SPECULARENABLE, &specularEnabled)",
+         "GetRenderState(D3DRS_ALPHABLENDENABLE, &specularEnabled)"),
+        ("lighting || vertexBlend != D3DVBF_DISABLE",
+         "!lighting || vertexBlend != D3DVBF_DISABLE"),
+    ):
+        mutant = bridge.replace(old, bad, 1)
+        assert mutant != bridge and not object_fvf_integrated(mutant, layout_source, probe_source)
+    for old, bad in (
+        ("candidate.diffuseOffset = candidate.positionBytes + candidate.normalBytes;",
+         "candidate.diffuseOffset = candidate.positionBytes;"),
+        ("data + layout.diffuseOffset, 4u", "data + layout.positionBytes, 4u"),
+        ("(position == kGameFvfXyzRhw && hasNormal)",
+         "(position == kGameFvfXyz && hasNormal)"),
+    ):
+        mutant = layout_source.replace(old, bad, 1)
+        assert mutant != layout_source and not object_fvf_integrated(bridge, mutant, probe_source)
+    print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2/TEX3/TEX4 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
 

@@ -21,6 +21,8 @@ namespace {
 using Microsoft::WRL::ComPtr;
 static_assert(kGameFvfXyz == D3DFVF_XYZ && kGameFvfXyzRhw == D3DFVF_XYZRHW &&
               kGameFvfDiffuse == D3DFVF_DIFFUSE && kGameFvfTex1 == D3DFVF_TEX1 &&
+              kGameFvfNormal == D3DFVF_NORMAL &&
+              kGameFvfSpecular == D3DFVF_SPECULAR &&
               kGameFvfTex2 == D3DFVF_TEX2 && kGameFvfTex3 == D3DFVF_TEX3 &&
               kGameFvfTex4 == D3DFVF_TEX4 &&
               kGameFvfTexCountMask == D3DFVF_TEXCOUNT_MASK &&
@@ -249,6 +251,14 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
     // diffuse when a menu/sprite TEX1 vertex omits D3DFVF_DIFFUSE.
     if (!game_fvf_layout(fvf, layout)) return false;
     capture.enabled = layout.textured;
+    // Native VS has no additive specular interpolant. Object-space NORMAL
+    // is valid only when D3DRS_LIGHTING is disabled below.
+    if (layout.hasSpecular) {
+        DWORD specularEnabled = TRUE;
+        if (FAILED(game->GetRenderState(D3DRS_SPECULARENABLE, &specularEnabled)) ||
+            specularEnabled)
+            return false;
+    }
     ComPtr<IDirect3DVertexShader9> vs;
     ComPtr<IDirect3DPixelShader9> ps;
     ComPtr<IDirect3DBaseTexture9> tex;

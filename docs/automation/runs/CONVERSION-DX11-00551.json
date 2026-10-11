@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00551",
+  "production_id": "CONVERSION-DX11-00551",
+  "event_id": "CONVERSION-DX11-00551-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00551",
+  "attempt": "1/3",
+  "work_key": "DX11:MENU_RACE_NORMAL_SPECULAR_FVF",
+  "base_sha": "91628172a43535331cedc9731d150bf2a92830d6",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Game-authored D3D9 NORMAL/SPECULAR FVF bytes",
+      "Source state gating plus FVF stride, diffuse and indexed UV decode",
+      "Existing D3D11 Draw/DrawIndexed -> visible diagnostic Present"
+    ],
+    "batch_components": [
+      "C++ FVF layout and strict decoder extension",
+      "Live D3D9 source SPECULARENABLE safety gate and SDK FVF mapping",
+      "C++ functional probe and destructive Python regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Live D3D9 XYZ NORMAL SPECULAR DIFFUSE TEX2 decoder and native draw bridge, C++/Python CI pending",
+      "negative_regression": "Invalid RHW normal, corrupt offset, short stride, specular-enabled source fail closed",
+      "component_integration": "Game D3D9 hook -> FVF decode -> UV and diffuse binding -> D3D11 native Draw/DrawIndexed -> inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_NORMAL_SPECULAR_FVF",
+      "src/vr/d3d11/live_game_fvf_layout.hpp:NORMAL_SPECULAR",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:SPECULAR"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "NORMAL_SPECULAR_FVF_SNAPSHOT",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source only, runtime pixels/menu/race/gamepad/Quest3 NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in diagnostic; original D3D9 game draw/input/Present unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_layout.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_fvf_layout_probe.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00551.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS 91628172a43535331cedc9731d150bf2a92830d6",
+    "C1_REVIEW": "FVF optional NORMAL/SPECULAR gap; R175 owner untouched",
+    "C2_IMPLEMENT": "PASS decoder, live bridge, C++ probe, negative regression",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "PENDING CAS",
+    "C5_PACKAGE": "NOT_REQUIRED diagnostic only",
+    "C6_STATE": "PENDING CI"
+  },
+  "feature_status": "SOURCE_INTEGRATED_BUILD_PENDING_NEED_HMD_TEST",
+  "next_action": "Confirm exact SHA GitHub Actions, then separate C6 checkpoint after success.",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null
+}

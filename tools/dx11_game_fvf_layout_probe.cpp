@@ -9,7 +9,7 @@ int main() {
     assert(layout.minStride == original.minStride);
     assert(!game_fvf_layout(kGameFvfXyz, layout));
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfXyz | kGameFvfTex1, layout));
-    assert(!game_fvf_layout(kGameFvfXyz | kGameFvfTex1 | 0x010u, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfNormal | kGameFvfTex1, layout));
     assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1, layout));
     assert(layout.pretransformed && layout.textured && !layout.hasDiffuse);
     assert(layout.positionBytes == 16 && layout.texcoordOffset == 16 && layout.minStride == 24);
@@ -111,6 +111,48 @@ int main() {
     assert(sample.diffuse == 0xff102030u && sample.uv3[0] == .7f);
     assert(game_fvf_select_uv(sample, layout, 3u, chosen));
     assert(chosen[0] == .7f && chosen[1] == .8f);
+    // OutRun object-space world FVF: NORMAL before DIFFUSE/SPECULAR/TEX2.
+    assert(game_fvf_layout(kGameFvfXyz | kGameFvfNormal |
+                           kGameFvfDiffuse | kGameFvfSpecular | kGameFvfTex2, layout));
+    assert(layout.hasNormal && layout.hasSpecular && layout.hasDiffuse);
+    assert(layout.normalBytes == 12u && layout.diffuseOffset == 24u);
+    assert(layout.texcoordOffset == 32u && layout.minStride == 48u);
+    struct WorldNormalSpecUv2 {
+        float x,y,z,nx,ny,nz; std::uint32_t diffuse,specular;
+        float u0,v0,u1,v1;
+    };
+    WorldNormalSpecUv2 world{1,2,3,0,0,1,0xff123456u,0xffabcdefu,.1f,.2f,.6f,.8f};
+    assert(sizeof(world) == 48u);
+    assert(game_fvf_decode_vertex(&world, sizeof(world), layout, sample));
+    assert(sample.position[2] == 3.f && sample.diffuse == 0xff123456u);
+    assert(game_fvf_select_uv(sample, layout, 1u, chosen));
+    assert(chosen[0] == .6f && chosen[1] == .8f);
+    const auto safeWorld = sample;
+    assert(!game_fvf_decode_vertex(&world, 47u, layout, sample));
+    assert(sample.diffuse == safeWorld.diffuse && sample.uv1[1] == safeWorld.uv1[1]);
+    auto corrupted = layout;
+    corrupted.diffuseOffset -= 12u;
+    assert(!game_fvf_decode_vertex(&world, sizeof(world), corrupted, sample));
+    assert(sample.diffuse == safeWorld.diffuse);
+    corrupted = layout;
+    corrupted.texcoordOffset -= 4u;
+    assert(!game_fvf_decode_vertex(&world, sizeof(world), corrupted, sample));
+    assert(sample.uv1[1] == safeWorld.uv1[1]);
+    assert(!game_fvf_select_uv(sample, layout, 2u, chosen));
+    // No diffuse: texture-only mode must skip SPECULAR and select the true UV.
+    assert(game_fvf_layout(kGameFvfXyz | kGameFvfNormal |
+                           kGameFvfSpecular | kGameFvfTex1, layout));
+    assert(!layout.hasDiffuse && layout.hasSpecular);
+    assert(layout.diffuseOffset == 24u && layout.texcoordOffset == 28u);
+    assert(layout.minStride == 36u);
+    struct WorldSpecUv {float x,y,z,nx,ny,nz; std::uint32_t spec; float u,v;};
+    WorldSpecUv texturedWorld{1,2,3,0,1,0,0x12345678u,.2f,.9f};
+    assert(game_fvf_decode_vertex(&texturedWorld, sizeof(texturedWorld), layout, sample));
+    assert(sample.diffuse == 0xffffffffu);
+    assert(game_fvf_select_uv(sample, layout, 0u, chosen));
+    assert(chosen[0] == .2f && chosen[1] == .9f);
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfNormal |
+                            kGameFvfSpecular | kGameFvfTex1, layout));
     assert(game_fvf_layout(kGameFvfXyz | kGameFvfDiffuse, layout));
     assert(!layout.textured && layout.minStride == 16);
     return 0;

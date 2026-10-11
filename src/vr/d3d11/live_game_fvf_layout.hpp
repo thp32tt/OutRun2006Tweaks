@@ -7,7 +7,9 @@ namespace outrun::vr::dx11::live_game_frame {
 // D3D9 FVF constants verified against d3d9types.h by live bridge.
 constexpr std::uint32_t kGameFvfXyz = 0x002u;
 constexpr std::uint32_t kGameFvfXyzRhw = 0x004u;
+constexpr std::uint32_t kGameFvfNormal = 0x010u;
 constexpr std::uint32_t kGameFvfDiffuse = 0x040u;
+constexpr std::uint32_t kGameFvfSpecular = 0x080u;
 constexpr std::uint32_t kGameFvfTex1 = 0x100u;
 constexpr std::uint32_t kGameFvfTex2 = 0x200u;
 constexpr std::uint32_t kGameFvfTex3 = 0x300u;
@@ -18,6 +20,10 @@ struct GameFvfLayout {
     bool pretransformed = false;
     bool textured = false;
     bool hasDiffuse = false;
+    bool hasNormal = false;
+    bool hasSpecular = false;
+    std::uint32_t normalBytes = 0;
+    std::uint32_t diffuseOffset = 0;
     std::uint32_t texcoordCount = 0;
     std::uint32_t positionBytes = 0;
     std::uint32_t texcoordOffset = 0;
@@ -27,21 +33,30 @@ struct GameFvfLayout {
 constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcept {
     const std::uint32_t position = fvf & kGameFvfPositionMask;
     const std::uint32_t texcoordBits = fvf & kGameFvfTexCountMask;
-    // TEX5+ or non-default coordinate dimensions require a different decoder.
+    // TEX5+ and nondefault UV dimensions still need a different decoder.
+    // NORMAL and SPECULAR are byte fields preceding texcoords.
+    const bool hasNormal = (fvf & kGameFvfNormal) != 0u;
     if ((position != kGameFvfXyz && position != kGameFvfXyzRhw) ||
+        (position == kGameFvfXyzRhw && hasNormal) ||
         texcoordBits > kGameFvfTex4 ||
-        (fvf & ~(kGameFvfXyz | kGameFvfXyzRhw |
-                 kGameFvfDiffuse | kGameFvfTexCountMask)) != 0u)
+        (fvf & ~(kGameFvfXyz | kGameFvfXyzRhw | kGameFvfNormal |
+                 kGameFvfDiffuse | kGameFvfSpecular |
+                 kGameFvfTexCountMask)) != 0u)
         return false;
     GameFvfLayout candidate{};
     candidate.pretransformed = position == kGameFvfXyzRhw;
     candidate.texcoordCount = texcoordBits >> 8u;
     candidate.textured = candidate.texcoordCount != 0u;
     candidate.hasDiffuse = (fvf & kGameFvfDiffuse) != 0u;
+    candidate.hasNormal = hasNormal;
+    candidate.hasSpecular = (fvf & kGameFvfSpecular) != 0u;
     if (!candidate.textured && !candidate.hasDiffuse) return false;
     candidate.positionBytes = candidate.pretransformed ? 16u : 12u;
-    candidate.texcoordOffset = candidate.positionBytes +
-                               (candidate.hasDiffuse ? 4u : 0u);
+    candidate.normalBytes = candidate.hasNormal ? 12u : 0u;
+    candidate.diffuseOffset = candidate.positionBytes + candidate.normalBytes;
+    candidate.texcoordOffset = candidate.diffuseOffset +
+                               (candidate.hasDiffuse ? 4u : 0u) +
+                               (candidate.hasSpecular ? 4u : 0u);
     candidate.minStride = candidate.texcoordOffset +
                           candidate.texcoordCount * 8u;
     layout = candidate;
@@ -62,8 +77,12 @@ inline bool game_fvf_decode_vertex(const void* bytes, std::uint32_t stride,
                                    GameFvfSample& sample) noexcept {
     if (!bytes || (layout.positionBytes != 12u && layout.positionBytes != 16u) ||
         layout.positionBytes != (layout.pretransformed ? 16u : 12u) ||
-        layout.texcoordOffset != layout.positionBytes +
-                                 (layout.hasDiffuse ? 4u : 0u) ||
+        (layout.pretransformed && layout.hasNormal) ||
+        layout.normalBytes != (layout.hasNormal ? 12u : 0u) ||
+        layout.diffuseOffset != layout.positionBytes + layout.normalBytes ||
+        layout.texcoordOffset != layout.diffuseOffset +
+                                 (layout.hasDiffuse ? 4u : 0u) +
+                                 (layout.hasSpecular ? 4u : 0u) ||
         layout.texcoordCount > 4u ||
         layout.textured != (layout.texcoordCount != 0u) ||
         layout.minStride != layout.texcoordOffset + layout.texcoordCount * 8u ||
@@ -73,7 +92,7 @@ inline bool game_fvf_decode_vertex(const void* bytes, std::uint32_t stride,
     const auto* data = static_cast<const std::uint8_t*>(bytes);
     std::memcpy(candidate.position, data, layout.positionBytes);
     if (layout.hasDiffuse)
-        std::memcpy(&candidate.diffuse, data + layout.positionBytes, 4u);
+        std::memcpy(&candidate.diffuse, data + layout.diffuseOffset, 4u);
     if (layout.texcoordCount >= 1u)
         std::memcpy(candidate.uv, data + layout.texcoordOffset, 8u);
     if (layout.texcoordCount >= 2u)
