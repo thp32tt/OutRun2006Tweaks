@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Fail-closed R29 effect-cache contract across StateBlock Apply generations."""
+"""R29 effect-cache hot-path and StateBlock generation regression gate.
+
+A reliable R22/R31 setter+Apply+recording coverage permits reuse for one
+Present without repeated five-field GetRenderState after every 64 draws.
+Never reuse across a Present, recording, lost coverage, Apply/Begin/End or
+a reversed draw serial. Destructive mutations must break the contract.
+"""
 from pathlib import Path
 import sys
 
@@ -10,56 +16,95 @@ r31 = (root / "src/vr/d3d9/stereo_renderer_r31.cpp").read_text(encoding="utf-8")
 
 def body(s, key):
     pos = s.find(key)
-    if pos < 0: return ""
+    if pos < 0:
+        return ""
     start = s.find("{", pos)
-    if start < 0: return ""
+    if start < 0:
+        return ""
     level = 0
     for i in range(start, len(s)):
         level += (s[i] == "{") - (s[i] == "}")
-        if level == 0: return s[start:i+1]
+        if level == 0:
+            return s[start:i + 1]
     return ""
 
 def contract(s):
     cache = body(s, "bool R29EffectCacheCurrent() noexcept")
     sync = body(s, "bool R29SyncEffectState(")
     setter = body(s, "HRESULT __stdcall SetRenderStateDestR29(")
-    tel = body(s, "inline bool TryGetEffectTelemetrySnapshot(")
+    telemetry = body(s, "inline bool TryGetEffectTelemetrySnapshot(")
     return all((
         "StateBlockTracker::Reliable()" in cache,
-        "StateBlockTracker::ApplyGeneration()" in cache,
+        "StateBlockTracker::Recording()" in cache,
         "R29Effect.applyGeneration !=" in cache,
+        "R29Effect.recordingGeneration !=" in cache,
+        "StateBlockTracker::ApplyGeneration()" in cache,
+        "StateBlockTracker::RecordingGeneration()" in cache,
         "R29Effect.presentEpoch == PresentEpoch" in cache,
-        "TopLevelDrawSerial() - R29Effect.drawSerial < 64" in cache,
+        "TopLevelDrawSerial() >= R29Effect.drawSerial" in cache,
+        "TopLevelDrawSerial() - R29Effect.drawSerial < 64" not in cache,
         "R29EffectCacheCurrent()" in sync,
+        "if (!device || OutRunVR::State::StateBlockTracker::Recording())" in sync,
         "const auto applyGenerationBefore =" in sync,
+        "const auto recordingGenerationBefore =" in sync,
         "StateBlockTracker::ApplyGeneration() !=" in sync,
+        "StateBlockTracker::RecordingGeneration() !=" in sync,
+        "StateBlockTracker::Recording())" in sync,
         "R29Effect.applyGeneration = applyGenerationBefore;" in sync,
+        "R29Effect.recordingGeneration = recordingGenerationBefore;" in sync,
         "R29Effect.valid = false;" in sync,
+        "StateBlockTracker::Recording()" in setter,
         "R29Effect.applyGeneration !=" in setter,
-        "if (!R29EffectCacheCurrent())" in tel,
-        sync.find("applyGenerationBefore") < sync.find("device->GetRenderState(")
-            < sync.find("StateBlockTracker::ApplyGeneration() !="),
-        setter.find("R29Effect.applyGeneration !=") < setter.find("switch (state)"),
-        "if (false && R29Effect.applyGeneration !=" not in s,
-        "R29Effect.valid && false &&" not in s,
-        "R29Effect.applyGeneration = 0;" not in s,
-        "if (false)" not in cache and "if (false)" not in sync and "if (false)" not in tel,
+        "R29Effect.recordingGeneration !=" in setter,
+        "if (!R29EffectCacheCurrent())" in telemetry,
+        sync.find("recordingGenerationBefore") < sync.find("device->GetRenderState(")
+            < sync.find("StateBlockTracker::RecordingGeneration() !="),
+        setter.find("StateBlockTracker::Recording()") < setter.find("switch (state)"),
+        "if (false)" not in cache and "if (false)" not in sync,
+        "if (false)" not in setter and "if (false)" not in telemetry,
+        "R29Effect.applyGeneration = 0;" not in sync,
+        "R29Effect.recordingGeneration = 0;" not in sync,
+        "R29Effect.valid && false" not in s,
     ))
 
 errors = []
 if not contract(src):
-    errors.append("R29 effect-cache generation/read fencing contract")
-if "void R31OnStateBlockApply(" not in r31 or "StateBlockTracker::NoteApply();" not in r31:
-    errors.append("R31 StateBlock Apply generation producer")
-if "static bool Reliable() noexcept" not in tracker or "static std::uint64_t ApplyGeneration()" not in tracker:
+    errors.append("R29 effect-cache time-window/generation contract")
+if "void R31OnStateBlockBegin(" not in r31 or "void R31OnStateBlockEnd(" not in r31 or (
+        "StateBlockTracker::NoteRecording();" not in r31 or
+        "StateBlockTracker::NoteApply();" not in r31):
+    errors.append("R31 Begin/End/Apply generation producers")
+if not all(k in tracker for k in (
+        "static bool Reliable() noexcept",
+        "static bool Recording() noexcept",
+        "static std::uint64_t RecordingGeneration()",
+        "static std::uint64_t ApplyGeneration()")):
     errors.append("shared generation/coverage tracker")
+
 mutations = [
-    ("reliability", "if (!OutRunVR::State::StateBlockTracker::Reliable())", "if (false)"),
+    ("reliability", "if (OutRunVR::State::StateBlockTracker::Recording() ||\n                !OutRunVR::State::StateBlockTracker::Reliable())",
+     "if (OutRunVR::State::StateBlockTracker::Recording() ||\n                false)"),
+    ("recording cache", "if (OutRunVR::State::StateBlockTracker::Recording() ||\n", "if (false ||\n"),
     ("apply generation", "if (R29Effect.applyGeneration !=", "if (false && R29Effect.applyGeneration !="),
-    ("torn read", "if (OutRunVR::State::StateBlockTracker::ApplyGeneration() !=\n                applyGenerationBefore)", "if (false)"),
-    ("stale setter", "if (R29Effect.valid &&\n                R29Effect.applyGeneration !=", "if (R29Effect.valid && false &&\n                R29Effect.applyGeneration !="),
-    ("telemetry", "if (!R29EffectCacheCurrent())\n            return false;", "if (false)\n            return false;"),
-    ("stamp", "R29Effect.applyGeneration = applyGenerationBefore;", "R29Effect.applyGeneration = 0;"),
+    ("record generation", "R29Effect.recordingGeneration !=", "R29Effect.recordingGeneration =="),
+    ("present fence", "R29Effect.presentEpoch == PresentEpoch", "R29Effect.presentEpoch != PresentEpoch"),
+    ("draw monotonicity", "TopLevelDrawSerial() >= R29Effect.drawSerial", "TopLevelDrawSerial() < R29Effect.drawSerial"),
+    ("no periodic getter", "TopLevelDrawSerial() >= R29Effect.drawSerial;",
+     "TopLevelDrawSerial() >= R29Effect.drawSerial &&\n                TopLevelDrawSerial() - R29Effect.drawSerial < 64;"),
+    ("recording entry", "if (!device || OutRunVR::State::StateBlockTracker::Recording())",
+     "if (!device || false)"),
+    ("recording stamp", "R29Effect.recordingGeneration = recordingGenerationBefore;",
+     "R29Effect.recordingGeneration = 0;"),
+    ("apply stamp", "R29Effect.applyGeneration = applyGenerationBefore;",
+     "R29Effect.applyGeneration = 0;"),
+    ("record torn read", "StateBlockTracker::RecordingGeneration() !=\n                    recordingGenerationBefore",
+     "StateBlockTracker::RecordingGeneration() ==\n                    recordingGenerationBefore"),
+    ("recording setter", "if (OutRunVR::State::StateBlockTracker::Recording())\n            {\n                R29Effect.valid = false;\n                return hr;",
+     "if (false)\n            {\n                R29Effect.valid = false;\n                return hr;"),
+    ("stale setter", "R29Effect.recordingGeneration !=\n                     OutRunVR::State::StateBlockTracker::RecordingGeneration()",
+     "R29Effect.recordingGeneration ==\n                     OutRunVR::State::StateBlockTracker::RecordingGeneration()"),
+    ("telemetry", "if (!R29EffectCacheCurrent())\n            return false;",
+     "if (false)\n            return false;"),
 ]
 for name, before, after in mutations:
     if src.count(before) != 1:
@@ -69,4 +114,4 @@ for name, before, after in mutations:
 if errors:
     print("FAIL " + ", ".join(errors), file=sys.stderr)
     sys.exit(1)
-print("PASS R29 cross-thread Apply generation and 6 negative mutations")
+print("PASS R29 single-Present effect cache, Begin/End/Apply fences and 14 negative mutations")

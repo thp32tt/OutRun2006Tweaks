@@ -48,6 +48,7 @@ namespace OutRunVRStereo
             std::uint64_t presentEpoch = 0;
             std::uint64_t drawSerial = 0;
             std::uint64_t applyGeneration = 0;
+            std::uint64_t recordingGeneration = 0;
         };
 
         thread_local R29EffectState R29Effect{};
@@ -66,15 +67,23 @@ namespace OutRunVRStereo
         // can run on another thread; the effect cache is only thread-local.
         bool R29EffectCacheCurrent() noexcept
         {
-            if (!OutRunVR::State::StateBlockTracker::Reliable())
+            // R31/R22 intercept both Apply and Begin/End recording. While
+            // coverage remains proven, tracked setters keep the five effect
+            // fields current for the whole Present; a 64-draw timeout caused
+            // five unnecessary D3D9 getters in busy geometry/particle scenes.
+            // Retain the Present boundary, monotonic draw serial, and both
+            // generation fences. A lost hook still fails closed to live reads.
+            if (OutRunVR::State::StateBlockTracker::Recording() ||
+                !OutRunVR::State::StateBlockTracker::Reliable())
                 return false;
             if (R29Effect.applyGeneration !=
-                OutRunVR::State::StateBlockTracker::ApplyGeneration())
+                    OutRunVR::State::StateBlockTracker::ApplyGeneration() ||
+                R29Effect.recordingGeneration !=
+                    OutRunVR::State::StateBlockTracker::RecordingGeneration())
                 return false;
             return R29Effect.valid &&
                 R29Effect.presentEpoch == PresentEpoch &&
-                TopLevelDrawSerial() >= R29Effect.drawSerial &&
-                TopLevelDrawSerial() - R29Effect.drawSerial < 64;
+                TopLevelDrawSerial() >= R29Effect.drawSerial;
         }
 
         void R29ArmMonoSafety(std::uint64_t extraPresents = 2) noexcept
@@ -86,15 +95,19 @@ namespace OutRunVRStereo
 
         bool R29SyncEffectState(IDirect3DDevice9* device) noexcept
         {
-            if (!device)
+            if (!device || OutRunVR::State::StateBlockTracker::Recording())
                 return false;
 
+            // A recording block may capture setters without immediately
+            // changing live device state. Never sample a cache during it.
             // Age alone cannot prove safety after an untracked Apply.
             if (R29EffectCacheCurrent())
                 return true;
 
             const auto applyGenerationBefore =
                 OutRunVR::State::StateBlockTracker::ApplyGeneration();
+            const auto recordingGenerationBefore =
+                OutRunVR::State::StateBlockTracker::RecordingGeneration();
             DWORD alphaBlend = FALSE;
             DWORD alphaTest = FALSE;
             DWORD zWrite = TRUE;
@@ -114,7 +127,10 @@ namespace OutRunVRStereo
             // A concurrent Apply between five independent live reads can
             // produce a torn policy. Let existing conservative R13 handle it.
             if (OutRunVR::State::StateBlockTracker::ApplyGeneration() !=
-                applyGenerationBefore)
+                    applyGenerationBefore ||
+                OutRunVR::State::StateBlockTracker::RecordingGeneration() !=
+                    recordingGenerationBefore ||
+                OutRunVR::State::StateBlockTracker::Recording())
             {
                 R29Effect.valid = false;
                 return false;
@@ -129,6 +145,7 @@ namespace OutRunVRStereo
             R29Effect.presentEpoch = PresentEpoch;
             R29Effect.drawSerial = TopLevelDrawSerial();
             R29Effect.applyGeneration = applyGenerationBefore;
+            R29Effect.recordingGeneration = recordingGenerationBefore;
             ++R29EffectStateSyncs;
             return true;
         }
@@ -452,10 +469,21 @@ namespace OutRunVRStereo
             if (FAILED(hr) || !IsGameDevice(device) || InternalStereoPass)
                 return hr;
 
-            // A setter cannot revalidate OTHER fields cached before Apply.
+            // StateBlock recording setters may not update live device state.
+            // Begin/End also advances R31's generation and invalidates the
+            // older five-field snapshot even if no Apply follows.
+            if (OutRunVR::State::StateBlockTracker::Recording())
+            {
+                R29Effect.valid = false;
+                return hr;
+            }
+            // A setter cannot revalidate OTHER fields cached before Apply
+            // or Begin/End; it may only update a still-current snapshot.
             if (R29Effect.valid &&
-                R29Effect.applyGeneration !=
-                    OutRunVR::State::StateBlockTracker::ApplyGeneration())
+                (R29Effect.applyGeneration !=
+                     OutRunVR::State::StateBlockTracker::ApplyGeneration() ||
+                 R29Effect.recordingGeneration !=
+                     OutRunVR::State::StateBlockTracker::RecordingGeneration()))
                 R29Effect.valid = false;
 
             switch (state)
