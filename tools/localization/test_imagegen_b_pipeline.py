@@ -83,7 +83,15 @@ class TestBImageGen(unittest.TestCase):
     def test_width_priority_fit(self):
         a=b.png_rgba(self.make_png())
         z=b.premul_fit(a,75,18,"width_priority")
-        self.assertEqual(z.shape,(18,75,4))
+        # Original alpha bbox is 150x30. Output must stay 5:1.
+        self.assertEqual(z.shape,(15,75,4))
+        self.assertEqual(z.shape[:2],b.premul_fit(a,75,18,"contain").shape[:2])
+
+    def test_width_priority_height_ceiling_without_warp(self):
+        a=b.png_rgba(self.make_png())
+        z=b.premul_fit(a,150,12,"width_priority")
+        self.assertEqual(z.shape,(12,60,4))
+        self.assertGreater(int(np.count_nonzero(z[:,:,3])),0)
 
     def test_missing_true_alpha_rejected(self):
         a=Image.new("RGBA",(40,20),(255,190,0,255))
