@@ -28,6 +28,11 @@ if not manifests:
 new = []
 for mf in manifests:
     rec = json.loads(mf.read_text(encoding="utf-8"))
+    # imagegen_requests also keeps immutable, fail-closed generation attempts.
+    # They are QA evidence, not runnable PNG-to-DDS manifests; skip them.
+    if rec.get("schema") != "outrun-b-imagegen-v1":
+        print("B_IMAGEGEN_SKIP_ATTEMPT_EVIDENCE", str(mf))
+        continue
     path = Path(rec.get("output_dir", ""))
     if not path.as_posix().startswith("localization/graphics/role_B/imagegen_trials/"):
         raise ValueError("ImageGen output_dir must be a scoped role_B imagegen_trials dir")
