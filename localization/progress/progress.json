@@ -14063,5 +14063,6 @@
     "worker": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38162887506",
     "QA": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_CONTROLLER_FIRSTHAND_SAVED_QA.json",
     "recipe": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_SHA_BOUND_LETTERING_RECIPE.json"
-  }
+  },
+  "c2_20261012_q035_a250_first_independent": {"run_key":"OUTRUN-C2-20261012-Q035-A250-FIRST-PERSISTED-PIXEL-INDEPENDENT","queue_index":35,"result":"C2_STATIC_PASS_SCOPED_TWO_TOTAL_RANK_LABELS","candidate_sha256":"5ac62e3ef33ff39277fcef5bd7b00cc36c99666ccd01ac0f5a022e22e37b2369","independent_changed_clean_to_saved_inside":23080,"independent_changed_clean_to_saved_outside":0,"source_clean_outer_halo_legacy_bbox_diff":14182,"source_clean_changed_outside_two_full_original_effect_footprints":0,"new_saved_dds":0,"official_promoted":0,"full_policy_approval":false,"C3":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED","evidence":"localization/graphics/role_C/20261012-C2-Q035-A250-FIRST-INDEPENDENT/C2_Q035_A250_FIRST_INDEPENDENT_QA.json"}
 }
