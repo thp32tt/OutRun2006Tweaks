@@ -21,6 +21,22 @@ C1 uses `schema=outrun-c1-imagegen-v1`, `role=C1`, real generation provenance, a
 The historic B-only paragraphs below describe the common manufacturing procedure but not exclusive ownership. Any wording limiting real ImageGen to B alone, C1 to QA, or C2 to even QA is superseded here. Missing generator and binary-upload support is not a fallback excuse for fabricated outputs.
 
 
+
+## 2026-10-11 검증된 PNG→DDS 바이너리 전송 및 BC3/DXT5 처리
+
+**상태:** 변환 코드와 합성 픽셀 기반 B/C1 코덱 테스트는 검증 완료. 모델이 실제 생성한 제품용 PNG가 GitHub에 커밋되는 구간은 생성물마다 별도 확인해야 한다. A 제작 로직, C2 PLATE_PASS/C2/C3/실게임 승인 조건은 불변.
+
+1. ChatGPT 실제 ImageGen 출력의 원본 **PNG 바이너리**, SHA-256, generation_id, 원문 이미지, 정확한 프롬프트, 생성 문구를 보관한다. 생성 ID만 있고 파일이 없으면 OUTPUT_MISSING이다.
+2. 연결된 GitHub create_blob 도구에서 실제 PNG의 base64를 encoding=base64로 등록한 후 최신 브랜치 HEAD를 기준으로 create_tree/create_commit/update_ref (non-force)를 사용해 role_B/imagegen_requests/ 또는 role_C1/imagegen_requests/ 아래 정확한 파일 경로로 커밋한다. 동시 A/B/C 수정이 있으면 HEAD를 새로 읽고 재기반한다. 확인된 시험 업로드: **가짜 한글 생산이 아닌 156바이트 합성 투명 PNG**, Git blob SHA f0b9e7ff2c64d802b688cebcd42d4172a63622ef (트리 미연결 상태).
+3. 커밋 후 PINNED GitHub raw 다운로드 등의 승인된 방법으로 **원본 PNG SHA-256과 완전 동일한 바이트**를 확인한다. Git blob SHA-1과 PNG SHA-256은 다른 값이다. GitHub fetch_blob 도구의 PNG UTF-8 디코딩 오류만으로 blob 업로드 실패라고 결론 내리지 않는다.
+4. ChatGPT 로컬 PNG가 GitHub 도구에 직접 노출되지 않으면 검증된 바이너리 파일 전달 경로를 이용한다. 필요시 MCP N100로 실제 파일을 체크섬 포함 분할 전송한 다음 read_binary_base64→GitHub create_blob 처리한다. **양단 SHA 검증 없는 경로는 성공으로 보고하지 않는다.** 전송 불가면 OUTPUT_MISSING/HOLD 상태를 유지하고 임의 이미지나 테스트 PNG를 실제 생성 결과로 대체하지 않는다.
+5. exact SHA SOURCE·official DDS·CLEAN·removal mask·생성 PNG·C2 plate review와 bboxes를 manifest에 바인딩해 다음을 실행한다.
+
+    python tools/localization/imagegen_b_pipeline.py --repo . --manifest PATH
+
+6. 파이프라인은 **단일 mip RGBA32 및 BC3/DXT5**를 지원한다. BC3는 수정된 4×4 블록만 재압축하고 미수정 원본 블록과 DDS 128바이트 헤더를 바이트 보존한다. 다른 코덱/mip 체인은 HOLD한다. **저장된 DDS를 다시 디코딩해** 원문 효과 bbox 및 patch ROI 바깥 변경을 1픽셀도 허용하지 않는다. BC3는 압축 손실이 있으므로 저장본과 압축 전 결과 차이를 보고하고 실물 시각검수한다. 비교 패널도 저장 DDS를 디코드한 픽셀로 만든다. 출력은 role_B/C1 _UNAPPROVED.dds만 생성하며 독립 검수·게임 테스트는 자동 승인하지 않는다.
+7. 회귀 테스트: python -m unittest tools/localization/test_imagegen_b_pipeline.py — **합성 RGBA32/BC3 B/C1 경로 포함 12/12 PASS (2026-10-11)**. 이 결과는 생성 PNG가 실제 한글로 올바르게 쓰였거나 게임이 표시한 증거가 아니다.
+
 ## 운영 결정과 적용 우선순위
 
 사용자의 최신 지시에 따라 **A는 기존 폰트/벡터/수작업 제작 방식을 그대로 유지**한다.
