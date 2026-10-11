@@ -1,0 +1,103 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00632",
+  "production_id": "CONVERSION-DX9EX-00632",
+  "event_id": "CONVERSION-DX9EX-00632-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R29_EFFECT_DEPTH_WRITE_FASTPATH",
+  "work_key": "DX9EX_R29_EFFECT_DEPTH_WRITE_00632",
+  "material_result_sha": "5c3c1589d29cf96eb0561cd1c5cb508166f465db",
+  "material_commits": [
+    "5c3c1589d29cf96eb0561cd1c5cb508166f465db",
+    "5e31448c53d8ed9466446e5c821bf308e8a67626",
+    "1de0378e73e78e00fb97c453972b2834eec71d0f"
+  ],
+  "result_sha": "1de0378e73e78e00fb97c453972b2834eec71d0f",
+  "validation_bearing_result_sha": "1de0378e73e78e00fb97c453972b2834eec71d0f",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Reduce R29/R30 per-stereo-draw depth-write render-state reads when the proven R29 effect state cache says depth testing OR writes are disabled, retaining conservative fallback for all untrusted states.",
+    "acceptance": "Use StateBlock Apply/recording and Present generation-bounded cache; route both R29 direct and R30 owner callers; preserve independent depth/stencil union, fallback, HUD/SkyGlow/stereo/input/FFB; test 20 negative mutations, repair actual architecture-verifier failure, pass exact-SHA Active and Domain plus source material impact.",
+    "runtime_metrics": "No measured Quest3/VDXR FPS, p95/p99, GPU/CPU load or visual/FFB hardware acceptance."
+  },
+  "acceptance_results": [
+    {
+      "item": "R29_DEPTH_WRITE_FASTPATH",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Material C++ commit 5c3c1589 skips two tracked depth-state reads only when reliable R29 cache proves disabled depth test or z-write; all stale/recording/unknown states use old lower reader."
+    },
+    {
+      "item": "DIRECT_R29_AND_R30_OWNER_ROUTES",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "R29 direct two-eye path delegates to exported R29OwnerLeftDrawMayWriteDepth, as already used by R30 stereo draw paths; stencil-write check stays independent OR."
+    },
+    {
+      "item": "DESTRUCTIVE_REGRESSION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "tools/verify_vr_r29_effect_cache_generation.py now has 20 destructive regression mutations, including cache-trust loss, depth test, z-write, conservative fallback, direct owner route and depth-or-stencil union."
+    },
+    {
+      "item": "FAILED_ARCH_VERIFIER_REPAIRED",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "First exact-SHA DX9Ex Active #38174648057 failed in verify_vr_r29_owner_api_seam.py because an early R29 caller matched before the owner definition. Fix 5e31448c resolves actual bool owner definition, preserving mutation checks; revised contract is validated on final SHA."
+    },
+    {
+      "item": "DX9EX_ACTIVE_VALIDATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Active #38174816475 completed success on exact 1de0378e; policy/host/game/full-chain-compile/package 5/5 success."
+    },
+    {
+      "item": "DOMAIN_ISOLATION_GUARD",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Domain Isolation Guard #38174816478 completed success on exact 1de0378e."
+    },
+    {
+      "item": "DX9EX_FULL_SOURCE_IMPACT_REVIEW",
+      "status": "PASS_SOURCE_MATERIAL_SHA",
+      "evidence": "Full Source Impact #38174648027 completed success 3/3 on original C++ material SHA 5c3c1589; later two commits changed only Python regression/verifier scripts."
+    },
+    {
+      "item": "QUEST3_VDXR_FPS_AND_VISUAL",
+      "status": "UNTESTED",
+      "evidence": "No actual Quest3/VDXR gameplay/optical or FPS measurement for this result."
+    }
+  ],
+  "exact_sha_validation": {
+    "target_sha": "1de0378e73e78e00fb97c453972b2834eec71d0f",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38174816475,
+        "head_sha": "1de0378e73e78e00fb97c453972b2834eec71d0f",
+        "status": "completed",
+        "conclusion": "success",
+        "jobs": "policy/host/game/full-chain-compile/package SUCCESS"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38174816478,
+        "head_sha": "1de0378e73e78e00fb97c453972b2834eec71d0f",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "source_material_workflow": {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38174648027,
+      "head_sha": "5c3c1589d29cf96eb0561cd1c5cb508166f465db",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "msvc-analyze-openxr-host/source-cross-domain/msvc-analyze-active-game SUCCESS"
+    }
+  },
+  "runtime_validation_note": "RUNTIME_VALIDATION=UNTESTED: no Quest3/VDXR HMD/game screen, FPS/p95/p99 or device acceptance. Exact-SHA CI verifies source and build only.",
+  "controller_next_action": "C6 COMPLETE_BUILD_VERIFIED. Do not replay or rescore 00632; assign distinct DX9Ex source feature at next dispatch. DXVK remains FROZEN."
+}
