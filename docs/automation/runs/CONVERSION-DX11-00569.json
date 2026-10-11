@@ -11,9 +11,9 @@
   "base_sha": "d8addd995d5b8e39ee81b9dc30aba315d8b97faa",
   "work_key": "DX11:MENU_RACE_BLEND_RGB_MODULATE_ALPHA_NATIVE_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "MATERIAL_COMMITTED_AWAITING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -56,16 +56,71 @@
     "tools/test_dx11_first_game_frame_regressions.py",
     "docs/automation/runs/CONVERSION-DX11-00569.json"
   ],
-  "feature_status": "BUILD_PENDING_NEED_HMD_TEST",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
   "pipeline": {
     "C0_RECOVER": "Read exact GitHub branch HEAD and 00568 C6, no duplicate work",
     "C1_REVIEW": "Independent MODULATE alpha missing for both texture/diffuse BLEND RGB options",
     "C2_IMPLEMENT": "D3D9 intake, HLSL, D3D11 shader lifecycle, Draw dispatch, 10 destructive mutation tests",
-    "C3_VALIDATE": "GitHub Actions exact-SHA gate requested by material commit; not yet verified",
-    "C4_COMMIT": "Single material git tree update without CI-skip",
+    "C3_VALIDATE": "Exact SHA dd470a65694d210c53893d226765bd638700e90f: Backend #38176878708; DX11 Fast #38176878700; Build #38176881607; OpenXR #38176881697/#38176878702; HUD #38176881612; all SUCCESS",
+    "C4_COMMIT": "Material validation-bearing source SHA dd470a65694d210c53893d226765bd638700e90f [AUTO:CONVERSION-DX11-00569], no CI skip.",
     "C5_PACKAGE": "NOT_REQUIRED opt-in diagnostic",
-    "C6_STATE": "PENDING_EXACT_SHA; HMD/gamepad UNTESTED"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; PASS_EXACT_SHA; bookkeeping-only separate [skip ci] commit; runtime Quest3/VDXR/gamepad UNTESTED"
   },
-  "next_action": "Verify exact material SHA mandatory GitHub Gates, only then separate C6 bookkeeping (skip ci). HMD/gamepad needs user test.",
-  "state_persisted": true
+  "next_action": "CONVERSION-DX11-00569 exact SHA gates complete; start next independent DX11 native menu/race work_key; Quest3/VDXR/gamepad NEED_HMD_TEST.",
+  "state_persisted": true,
+  "validation_bearing_result_sha": "dd470a65694d210c53893d226765bd638700e90f",
+  "material_result_sha": "dd470a65694d210c53893d226765bd638700e90f",
+  "result_sha": "dd470a65694d210c53893d226765bd638700e90f",
+  "validation_evidence": {
+    "exact_sha": "dd470a65694d210c53893d226765bd638700e90f",
+    "github_actions": [
+      {
+        "name": "backend",
+        "run_id": 38176878708,
+        "conclusion": "success",
+        "head_sha": "dd470a65694d210c53893d226765bd638700e90f"
+      },
+      {
+        "name": "fast",
+        "run_id": 38176878700,
+        "conclusion": "success",
+        "head_sha": "dd470a65694d210c53893d226765bd638700e90f"
+      },
+      {
+        "name": "build",
+        "run_id": 38176881607,
+        "conclusion": "success",
+        "head_sha": "dd470a65694d210c53893d226765bd638700e90f"
+      },
+      {
+        "name": "openxr",
+        "run_id": 38176881697,
+        "conclusion": "success",
+        "head_sha": "dd470a65694d210c53893d226765bd638700e90f"
+      },
+      {
+        "name": "openxr",
+        "run_id": 38176878702,
+        "conclusion": "success",
+        "head_sha": "dd470a65694d210c53893d226765bd638700e90f"
+      },
+      {
+        "name": "hud",
+        "run_id": 38176881612,
+        "conclusion": "success",
+        "head_sha": "dd470a65694d210c53893d226765bd638700e90f"
+      }
+    ],
+    "static_cpu": {
+      "source_graph": "PASS",
+      "negative_mutations": 10,
+      "numerical_rgba_cases": 4
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  }
 }
