@@ -1552,7 +1552,8 @@ def main() -> None:
                 "static_cast<float>(output.alphaFunc), capture.blendFactorAlphaValue" in submit and
                 "ctx->PSSetShader(capture.blendTextureAlpha ?" in submit and
                 "capture.blendFactorAlpha ? s.blendFactorAlphaPs.Get() :" in submit and
-                code.count("s.blendFactorAlphaPs.Reset();") == 2)
+                code.count("s.blendFactorAlphaPs.Reset();") == 2 and
+                code.count("blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;") == 2)
     assert factor_connected(bridge)
     for token in factor_links[:-2]:
         mutant = bridge.replace(token, "/* disconnected 00562 factor link */", 1)
