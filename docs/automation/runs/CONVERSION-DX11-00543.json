@@ -1,0 +1,80 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00543",
+  "production_id": "CONVERSION-DX11-00543",
+  "event_id": "CONVERSION-DX11-00543-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00543",
+  "attempt": "1/3",
+  "work_key": "DX11:MENU_RACE_DXT_TEXTURE_BC_SRV",
+  "base_sha": "19ca590f61dc0635480c50750253c4d0de3301c8",
+  "status": "MATERIAL_COMMITTED__CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Capture game-authored D3D9 TEX1 fixed-function Draw and read supported managed/system-memory DXT1/3/5 level-0 blocks through live LockRect",
+      "Copy exact source compressed block rows into immutable DX11 BC1/BC2/BC3 resources and bind native SRV/sampler to real Draw/DrawIndexed",
+      "Continue opt-in desktop inset and protected original D3D9 render/input fallback when source locked pixels, format, dimension or device creation fails"
+    ],
+    "batch_components": [
+      "C++ D3D9 DXT source format and block-row lifetime/ownership capture",
+      "C++ D3D11 compressed texture resource/SRV producer wired into existing native textured Draw/DrawIndexed",
+      "Python negative mutation and block pitch/data size regression checks"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "PENDING exact-sha CI; source DXT1/3/5->BC1/2/3 producer->native PS/Draw linked; game/HMD pixel UNTESTED",
+      "negative_regression": "Source regression covers BC formats/row pitch, illegal compressed dimensions and default-pool fail-closed; CI pending",
+      "component_integration": "Live game texture LockRect block rows -> DXGI BC texture CreateTexture2D -> CreateShaderResourceView -> PSSetShaderResources -> Draw/DrawIndexed -> desktop inset with original game Draw untouched"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_DXT_TEXTURE_BC_SRV",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:DXT_BC_TEXTURE_SRV",
+      "tools/test_dx11_first_game_frame_regressions.py:DXT_BC"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_DXT_LOCKRECT",
+      "D3D11_BC_TEXTURE_SRV",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and CI pending; actual OutRun menu/vehicle/race compressed texture pixels, gamepad and Quest3 VDXR UNTESTED",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only; NativeDrawPathActive=false; no DX9Ex or input override; unsupported GPU/default-pool or unsupported DXT geometry returns false"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00543.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS branch HEAD and latest 00542 C6, AGENTS.md, DX11 autodev policy; 00543 not found",
+    "C1_REVIEW": "PASS choose disjoint DXT1/3/5 compressed live game TEX1 source to BC SRV Draw integration; no R175 ownership transfer",
+    "C2_IMPLEMENT": "PASS mirror compressed DXT1/3/5 blocks to DXGI BC1/2/3 native textured Draw, negative mutation regression",
+    "C3_VALIDATE": "STATIC CONTRACT PREPARED; GitHub exact SHA gate pending",
+    "C4_COMMIT": "PUBLISHING real game C++ + regression + task record (no CI-skip)",
+    "C5_PACKAGE": "NOT_REQUIRED; HMD/game runtime test and package pending",
+    "C6_STATE": "PENDING exact SHA CI outcome"
+  },
+  "acceptance_results": {
+    "DX11-LIVE-CALLSITE": "SOURCE_INTEGRATED",
+    "DX11-NATIVE-DRAW": "SOURCE_INTEGRATED",
+    "DX11-VISIBLE-FRAME": "SOURCE_INTEGRATED",
+    "DX11-SAFE-RETURN": "SOURCE_INTEGRATED",
+    "REAL_GAME_OR_QUEST3_RENDERING": "UNTESTED"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "feature_status": "SOURCE_INTEGRATED__CI_PENDING",
+  "runtime_evidence": "No actual gamepad/Quest3 VDXR/game runtime test performed. Legacy D3D9 render/input retained.",
+  "next_action": "Verify exact material SHA Windows Gate. On success C6 bookkeeping and scoreboard once; then expand game programmable shader path."
+}

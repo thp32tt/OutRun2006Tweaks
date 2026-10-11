@@ -464,8 +464,9 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
     return true;
 }
 
-// Copy only accessible, uncompressed 32-bit game texture level 0. Default
-// pool GPU-only resources are not forcibly read back; failure preserves D3D9.
+// Snapshot a live game texture's level 0 into a D3D11 sampleable resource.
+// Managed/system-memory DXT1/3/5 are copied as BC1/2/3 blocks, not decoded
+// or reinterpreted as BGRA pixels. Unsupported or GPU-only sources remain DX9Ex.
 bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     ComPtr<ID3D11ShaderResourceView>& view,
                     ComPtr<ID3D11SamplerState>& sampler) noexcept {
@@ -475,33 +476,64 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     if (FAILED(capture.texture->GetLevelDesc(0, &info)) ||
         info.Width == 0 || info.Height == 0 ||
         info.Width > 1024 || info.Height > 1024 ||
-        (info.Format != D3DFMT_A8R8G8B8 && info.Format != D3DFMT_X8R8G8B8) ||
         info.Pool == D3DPOOL_DEFAULT)
         return false;
+
+    // Both the producer's LockRect rows and D3D11's immutable subresource
+    // pitch are in *compressed block bytes* for DXT. A BGRA pitch for BCn
+    // silently corrupts the sampled menu/vehicle artwork.
+    const bool compressed = info.Format == D3DFMT_DXT1 ||
+                            info.Format == D3DFMT_DXT3 ||
+                            info.Format == D3DFMT_DXT5;
+    DXGI_FORMAT nativeFormat = DXGI_FORMAT_UNKNOWN;
+    UINT rowBytes = 0, rows = 0;
+    if (compressed) {
+        // Level-0 BC resources must have full 4x4 blocks. Reject tiny or
+        // partial blocks rather than relying on device-specific acceptance.
+        if ((info.Width & 3u) || (info.Height & 3u)) return false;
+        const UINT bytesPerBlock = info.Format == D3DFMT_DXT1 ? 8u : 16u;
+        rowBytes = (info.Width / 4u) * bytesPerBlock;
+        rows = info.Height / 4u;
+        nativeFormat = info.Format == D3DFMT_DXT1 ? DXGI_FORMAT_BC1_UNORM :
+                       info.Format == D3DFMT_DXT3 ? DXGI_FORMAT_BC2_UNORM :
+                                                    DXGI_FORMAT_BC3_UNORM;
+    } else if (info.Format == D3DFMT_A8R8G8B8 ||
+               info.Format == D3DFMT_X8R8G8B8) {
+        rowBytes = info.Width * 4u;
+        rows = info.Height;
+        nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    } else {
+        return false;
+    }
+
     D3DLOCKED_RECT locked{};
     if (FAILED(capture.texture->LockRect(0, &locked, nullptr, D3DLOCK_READONLY)))
         return false;
     bool ok = false;
-    if (locked.pBits && locked.Pitch >= static_cast<INT>(info.Width * 4u)) {
-        std::vector<std::uint32_t> pixels(static_cast<std::size_t>(info.Width) * info.Height);
-        for (UINT y=0; y<info.Height; ++y) {
-            const auto* row = static_cast<const std::uint8_t*>(locked.pBits) +
-                              static_cast<std::size_t>(y) * locked.Pitch;
-            std::memcpy(pixels.data() + static_cast<std::size_t>(y) * info.Width,
-                        row, info.Width * 4u);
+    if (locked.pBits && locked.Pitch > 0 &&
+        static_cast<UINT>(locked.Pitch) >= rowBytes) {
+        std::vector<std::uint8_t> pixels(static_cast<std::size_t>(rowBytes) * rows);
+        for (UINT y = 0; y < rows; ++y) {
+            const auto* source = static_cast<const std::uint8_t*>(locked.pBits) +
+                                 static_cast<std::size_t>(y) * locked.Pitch;
+            std::memcpy(pixels.data() + static_cast<std::size_t>(y) * rowBytes,
+                        source, rowBytes);
         }
+        // D3DFMT_X8R8G8B8 alpha is undefined in D3D9; the native
+        // texture-only and modulate pixel shaders must sample opaque alpha.
         if (info.Format == D3DFMT_X8R8G8B8)
-            for (auto& pixel : pixels) pixel |= 0xff000000u;
+            for (std::size_t x = 3; x < pixels.size(); x += 4)
+                pixels[x] = 0xffu;
         D3D11_TEXTURE2D_DESC desc{};
         desc.Width = info.Width; desc.Height = info.Height;
         desc.MipLevels = 1; desc.ArraySize = 1;
-        desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+        desc.Format = nativeFormat;
         desc.SampleDesc.Count = 1;
         desc.Usage = D3D11_USAGE_IMMUTABLE;
         desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
         D3D11_SUBRESOURCE_DATA initial{};
         initial.pSysMem = pixels.data();
-        initial.SysMemPitch = info.Width * 4u;
+        initial.SysMemPitch = rowBytes;
         ComPtr<ID3D11Texture2D> texture;
         if (SUCCEEDED(dev->CreateTexture2D(&desc, &initial, texture.GetAddressOf())) &&
             SUCCEEDED(dev->CreateShaderResourceView(texture.Get(), nullptr,

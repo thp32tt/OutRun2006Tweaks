@@ -605,7 +605,70 @@ def main() -> None:
             native_mask = sum(channel for channel in (RED, GREEN, BLUE, ALPHA) if mask & channel)
             assert native_mask == mask
             assert ((16 if (mask & ALPHA) else 0) + mask) < 32
-    print("DX11 live diagnostic TEX1/alpha/scissor/COLORWRITE Draw/fallback regression PASS (static only)")
+    # Live fixed-function DXT textures must use compressed block pitches and
+    # bind BC1/2/3 SRVs to the existing native textured Draw path. This is
+    # source/CPU contract evidence, not a game/WARP pixel or HMD validation.
+    def dxt_native_draw_connected(source: str) -> bool:
+        producer = source[source.find("bool mirror_texture("):source.find("bool submit(")]
+        draw = source[source.find("bool submit("):source.find("void observe(")]
+        return all(token in producer for token in (
+            "info.Format == D3DFMT_DXT1",
+            "info.Format == D3DFMT_DXT3",
+            "info.Format == D3DFMT_DXT5",
+            "if ((info.Width & 3u) || (info.Height & 3u)) return false;",
+            "const UINT bytesPerBlock = info.Format == D3DFMT_DXT1 ? 8u : 16u;",
+            "rowBytes = (info.Width / 4u) * bytesPerBlock;",
+            "rows = info.Height / 4u;",
+            "DXGI_FORMAT_BC1_UNORM",
+            "DXGI_FORMAT_BC2_UNORM",
+            "DXGI_FORMAT_BC3_UNORM",
+            "info.Pool == D3DPOOL_DEFAULT",
+            "locked.Pitch > 0",
+            "static_cast<UINT>(locked.Pitch) >= rowBytes",
+            "static_cast<std::size_t>(rowBytes) * rows",
+            "static_cast<std::size_t>(y) * locked.Pitch",
+            "static_cast<std::size_t>(y) * rowBytes",
+            "initial.SysMemPitch = rowBytes;",
+            "desc.Format = nativeFormat;",
+            "capture.texture->UnlockRect(0);",
+            "dev->CreateShaderResourceView(",
+        )) and all(token in draw for token in (
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
+            "ctx->PSSetShaderResources(0, 1, &boundView)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+        ))
+    assert dxt_native_draw_connected(bridge)
+    for source, wrong in (
+        ("info.Format == D3DFMT_DXT1", "info.Format == D3DFMT_DXT2"),
+        ("info.Format == D3DFMT_DXT3", "info.Format == D3DFMT_DXT2"),
+        ("info.Format == D3DFMT_DXT5", "info.Format == D3DFMT_DXT4"),
+        ("if ((info.Width & 3u) || (info.Height & 3u)) return false;",
+         "if (false) return false;"),
+        ("rowBytes = (info.Width / 4u) * bytesPerBlock;",
+         "rowBytes = info.Width * 4u;"),
+        ("rows = info.Height / 4u;", "rows = info.Height;"),
+        ("static_cast<UINT>(locked.Pitch) >= rowBytes",
+         "static_cast<UINT>(locked.Pitch) > 0"),
+        ("initial.SysMemPitch = rowBytes;", "initial.SysMemPitch = info.Width * 4u;"),
+        ("desc.Format = nativeFormat;", "desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;"),
+    ):
+        broken = bridge.replace(source, wrong, 1)
+        assert broken != bridge and not dxt_native_draw_connected(broken), (
+            "DXT game texture -> BC SRV Draw mutation escaped: " + source
+        )
+    for width, height, bytes_per_block, expected in (
+        (4, 4, 8, (8, 1)), (256, 128, 8, (512, 32)),
+        (4, 4, 16, (16, 1)), (128, 64, 16, (512, 16)),
+    ):
+        row_bytes = (width // 4) * bytes_per_block
+        rows = height // 4
+        assert (row_bytes, rows) == expected
+        assert row_bytes * rows == (width * height // 16) * bytes_per_block
+    for width, height in ((1, 4), (4, 1), (6, 8), (8, 6), (0, 4)):
+        assert not (width > 0 and height > 0 and width % 4 == 0 and height % 4 == 0)
+
+    print("DX11 live diagnostic TEX1/DXT/alpha/scissor/COLORWRITE Draw/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":
