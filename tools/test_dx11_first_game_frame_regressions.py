@@ -1718,6 +1718,62 @@ def main() -> None:
             assert rgb == texel[:3]
     print("DX11 factor RGB + diffuse/add alpha native Draw PASS (static only)")
 
+    # 00565: live D3D9 ADDSMOOTH RGB plus independent texture/diffuse alpha.
+    # Source linkage and CPU reference only; no runtime Quest3/gamepad proof.
+    smooth_mixed_links = (
+        "const bool addSmoothTextureAlpha = op == D3DTOP_ADDSMOOTH && alphaOp == D3DTOP_SELECTARG1;",
+        "const bool addSmoothDiffuseAlpha = op == D3DTOP_ADDSMOOTH && alphaOp == D3DTOP_SELECTARG2;",
+        "!addSmoothTextureAlpha && !addSmoothDiffuseAlpha &&",
+        "!blendFactorDiffuseAlpha && !addSmoothDiffuseAlpha &&",
+        "addSmoothTextureAlpha || addSmoothDiffuseAlpha ||",
+        "capture.addSmoothTextureAlpha = addSmoothTextureAlpha;",
+        "capture.addSmoothDiffuseAlpha = addSmoothDiffuseAlpha;",
+        "bool addSmoothTextureAlpha = false;",
+        "bool addSmoothDiffuseAlpha = false;",
+        "float4 PSTextureAddSmoothTextureAlpha(VOut v) : SV_Target {",
+        "float4 PSTextureAddSmoothDiffuseAlpha(VOut v) : SV_Target {",
+        "float4 c = float4(saturate(t.rgb + v.diffuse.rgb * (1.0f - t.rgb)), t.a);",
+        "float4 c = float4(saturate(t.rgb + v.diffuse.rgb * (1.0f - t.rgb)), v.diffuse.a);",
+        'compile("PSTextureAddSmoothTextureAlpha", "ps_4_0", smoothTextureCode)',
+        'compile("PSTextureAddSmoothDiffuseAlpha", "ps_4_0", smoothDiffuseCode)',
+        "s.addSmoothTextureAlphaPs.GetAddressOf()",
+        "s.addSmoothDiffuseAlphaPs.GetAddressOf()",
+        "s.addSmoothTextureAlphaPs && s.addSmoothDiffuseAlphaPs &&",
+        "capture.addSmoothTextureAlpha ? s.addSmoothTextureAlphaPs.Get() :",
+        "capture.addSmoothDiffuseAlpha ? s.addSmoothDiffuseAlphaPs.Get() :",
+        "ctx->DrawIndexed(indexCount, 0, 0);",
+        "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+    )
+    def smooth_mixed_connected(code: str) -> bool:
+        intake = code[code.find("bool supported_game_state("):code.find("bool translate_vertices(")]
+        draw = code[code.find("bool submit("):code.find("void observe(")]
+        return (all(tok in code for tok in smooth_mixed_links) and
+                code.count("s.addSmoothTextureAlphaPs.Reset();") == 2 and
+                code.count("s.addSmoothDiffuseAlphaPs.Reset();") == 2 and
+                "GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)" in intake and
+                "alphaArg2Diffuse" in intake and
+                "mirror_texture(dev, capture, sampledView, sampledSampler)" in draw)
+    assert smooth_mixed_connected(bridge)
+    for link in smooth_mixed_links[:-2]:
+        damaged = bridge.replace(link, "/* detached stage0 native flow */")
+        assert damaged != bridge and not smooth_mixed_connected(damaged), link
+    # D3DTOP enum: ADDSMOOTH=11, SELECTARG1=2, SELECTARG2=3.
+    for rgb_op, alpha_op, accepted in (
+        (11, 2, True), (11, 3, True), (11, 11, False),
+        (11, 4, False), (11, 7, False), (4, 2, False), (7, 3, False)):
+        assert (rgb_op == 11 and alpha_op in (2, 3)) is accepted
+    for tcol, dcol in (
+        ((0.2, 0.6, 0.0, 0.8), (0.7, 0.2, 0.75, 0.3)),
+        ((1.0, 0.0, 0.85, 0.15), (0.25, 0.9, 0.4, 0.7))):
+        rgb = tuple(min(1.0, t + d*(1.0-t)) for t, d in zip(tcol[:3], dcol[:3]))
+        texture_alpha = (*rgb, tcol[3])
+        diffuse_alpha = (*rgb, dcol[3])
+        assert texture_alpha[:3] == diffuse_alpha[:3]
+        assert texture_alpha[3] == tcol[3]
+        assert diffuse_alpha[3] == dcol[3]
+        assert texture_alpha != diffuse_alpha
+    print("DX11 ADDSMOOTH mixed-alpha game native Draw PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
