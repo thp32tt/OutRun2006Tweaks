@@ -1,0 +1,62 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00636",
+  "production_id": "CONVERSION-DX9EX-00636",
+  "event_id": "CONVERSION-DX9EX-00636-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R23_SEEDED_CLEAR_RASTER_GETTER_FASTPATH",
+  "work_key": "DX9EX_R23_SEEDED_CLEAR_RASTER_GETTER_FASTPATH_00636",
+  "material_result_sha": "adb75fe665908c8bb1ba11451cb2bc8cca9683ca",
+  "material_commits": [
+    "adb75fe665908c8bb1ba11451cb2bc8cca9683ca"
+  ],
+  "result_sha": "d11e7967ce642d9719dd626a29289b7ff3d2fdba",
+  "validation_bearing_result_sha": "d11e7967ce642d9719dd626a29289b7ff3d2fdba",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Remove redundant forced D3D9 GetViewport/GetScissorRect/GetRenderState queries on already-seeded R23 Clear when R22 StateBlock Apply/setter coverage and tracked raster shadow are reliable.",
+    "acceptance": "Protect first-seed authoritative LIVE raster baseline, host/recovery and invalid/untrusted fallback, forced-live diagnostic mode, and R22 replay ownership; eight destructive regression mutations; Win32 game/host/full-chain package, exact-SHA DX9Ex Active and Domain Isolation success.",
+    "runtime_metrics": "No Quest3/VDXR display or headset FPS/p95/p99 measurements; 72Hz remains an unconfirmed runtime target."
+  },
+  "acceptance_results": [
+    {
+      "item": "R23_SEEDED_CLEAR_RASTER_GETTER_FASTPATH",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Original C++ material adb75fe665908c8bb1ba11451cb2bc8cca9683ca omits three forced D3D9 getter roundtrips for only reliable already-seeded Clear; raw LIVE capture and existing R22 replay preserved for other branches."
+    },
+    {
+      "item": "NEGATIVE_MUTATIONS",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Corrected source-scoped eight destructive mutations at d11e7967ce642d9719dd626a29289b7ff3d2fdba PASS DX9Ex Active policy #38178476095. Initial verifier failure #38178374504 repaired within same TASK_ID."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "GitHub Actions #38178476095 at exact d11e7967ce642d9719dd626a29289b7ff3d2fdba: policy/host/game/full-chain-compile/package SUCCESS 5/5."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "GitHub Actions #38178476067 at exact d11e7967ce642d9719dd626a29289b7ff3d2fdba: SUCCESS."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_MATERIAL_SHA",
+      "evidence": "Original material C++ SHA adb75fe665908c8bb1ba11451cb2bc8cca9683ca GitHub Actions #38178374462: source-cross-domain, msvc-analyze-active-game, msvc-analyze-openxr-host SUCCESS 3/3. Later validation SHA changes only Python regression verifier."
+    },
+    {
+      "item": "QUEST3_VDXR_GAMEPLAY",
+      "status": "UNTESTED",
+      "evidence": "No physical Quest3/VDXR gameplay, optical screenshot, frame-pacing/FPS capture or measured performance delta."
+    }
+  ],
+  "notes": "C6 bookkeeping [skip ci] is separate from the material source and validation-bearing SHA; do not score this bookkeeping itself. Do not claim hardware runtime PASS."
+}
