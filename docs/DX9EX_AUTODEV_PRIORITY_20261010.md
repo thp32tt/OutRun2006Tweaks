@@ -1,3 +1,7 @@
+## R84 completed — 2026-10-11 (overrides older pending work)
+
+R84 feature `CONVERSION-DX9EX-00591` is **COMPLETE_BUILD_VERIFIED / SUPERSEDED_BY_DX9EX_FOCUS**, not an outstanding source/build task. Full R29–R33 independent Win32 build/link, x64 host, safe game and package passed exact-SHA `074768c96c410f0268c084450b0aa8bced38b6c3`: DX9Ex Active #38135749653, Domain #38135749604, Full Impact #38135749550. The separate R84 x86 artifact is #11701023307; safe R26 package #11701106196. Quest3/VDXR runtime remains **UNTESTED**. Do not redispatch or rescore 00591. Continue P0 optics/HUD, P2 XR sizing and P3 measured performance. Earlier R84 ACTIVE/PENDING passages below are historical.
+
 # DX9Ex VR defect-first execution policy — 2026-10-10
 
 Status: latest explicit user priority override. This file supersedes conflicting priorities in AGENTS.md and older DX9Ex queue/controller contracts; retain safety, branch isolation and baseline protections. Docker controller runtime deployment must be verified separately.
