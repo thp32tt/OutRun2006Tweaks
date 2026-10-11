@@ -72,7 +72,22 @@ def negative_mutations(source: str) -> int:
     count = 0
     for needle, replacement in mutations:
         assert needle in source, needle
-        changed = source.replace(needle, replacement, 1)
+        # There is an earlier, independent HUD FOV cache and an XYZRHW
+        # SkyGlow capture. A negative mutation must target THIS new feature,
+        # otherwise a different path changes while the faulty code survives.
+        if needle.startswith(("cache.", "std::memcmp(")):
+            scope = source.index(
+                "const R30FlatEffectGeometryCache* R30PrepareFlatEffectGeometry")
+        elif needle in (
+            "R29OwnerTryGetTrackedViewport(savedViewport)",
+            "R30CaptureSkyGlowSceneBeforeHud(device)",
+        ):
+            scope = source.index("HRESULT R30TryScreenSpaceFovDraw")
+        else:
+            scope = 0
+        location = source.find(needle, scope)
+        assert location >= 0, f"Scoped mutation missing: {needle}"
+        changed = source[:location] + replacement + source[location + len(needle):]
         try:
             validate(changed)
         except AssertionError:
