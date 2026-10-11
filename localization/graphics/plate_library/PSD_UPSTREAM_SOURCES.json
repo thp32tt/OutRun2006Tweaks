@@ -12,10 +12,12 @@
       "psd_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/BF3EE5C6_v02/BF3EE5C6_512x512.psd",
       "git_blob_sha": "498540db2fec8bb4f6528ef41c3af79ad6f4d22f",
       "bytes": 9339228,
-      "layer_map": "UNINSPECTED",
+      "layer_map": "INVENTORIED_PENDING_EXPLICIT_SPLIT",
       "clean_plate": "NOT_EXTRACTED",
       "english_original": "NOT_EXTRACTED",
-      "current_C2_plate_approval": false
+      "current_C2_plate_approval": false,
+      "psd_sha256": "7efc2461045eea5623282e3bab2e8ede8b6d71933cde7ba43d3b9c8bc92b51a2",
+      "layer_count": 56
     },
     {
       "queue_index": 212,
@@ -34,10 +36,12 @@
       "psd_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/2B0863D6_v02/2B0863D6_512x64.psd",
       "git_blob_sha": "fc60ed582ccdeab322ab24ffd87bea7d89c98087",
       "bytes": 601382,
-      "layer_map": "UNINSPECTED",
+      "layer_map": "EXTRACTED_UNCLASSIFIED",
       "clean_plate": "NOT_EXTRACTED",
-      "english_original": "NOT_EXTRACTED",
-      "current_C2_plate_approval": false
+      "english_original": "SOURCE_ENGLISH_PSD_COMPOSITE_EXTRACTED_UNVERIFIED",
+      "current_C2_plate_approval": false,
+      "psd_sha256": "cf4e75aa86b730322456d5bdfdf5d74a4028f2cda1a15008e3c61f21989972f8",
+      "layer_count": 35
     },
     {
       "queue_index": 188,
@@ -83,5 +87,7 @@
       "english_original": "NOT_EXTRACTED",
       "current_C2_plate_approval": false
     }
-  ]
+  ],
+  "test_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38135620210",
+  "test_run_result": "SUCCESS_2026-10-11_SHA_PINNED_SOURCE_AND_LAYER_SEPARATION_ONLY"
 }
