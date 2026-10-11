@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00562",
+  "production_id": "CONVERSION-DX11-00562",
+  "event_id": "CONVERSION-DX11-00562-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00562",
+  "base_sha": "5b255499f297a8084ba18670de7e28cb7633c4d1",
+  "work_key": "DX11:MENU_RACE_STAGE0_BLENDFACTORALPHA_NATIVE_DRAW",
+  "status": "SOURCE_COMMITTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Actual OutRun game D3D9 stage0 BLENDFACTORALPHA and D3DRS_TEXTUREFACTOR 8-bit alpha",
+      "Exact normalized texture-factor alpha into D3D11 constant buffer w and dedicated native PS",
+      "Native Draw/DrawIndexed opt-in present inset with authoritative original D3D9 input/draw/present"
+    ],
+    "batch_components": [
+      "C++ game state capture and factor-alpha conversion",
+      "C++ D3D11 shader compilation/lifetime, constant buffer binding, native draw dispatch",
+      "Python destructive producer-consumer regressions, CPU RGBA and mismatched-op negatives"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3D9 factor byte -> w constant -> PS lerp RGBA -> native Draw",
+      "negative_regression": "Mismatched color/alpha ops rejected; destructive producer/consumer link removals fail; factor 0/255/128 numeric vectors",
+      "component_integration": "Game GetRenderState -> capture -> AlphaParams -> HLSL PS -> native draw -> opt-in inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_STAGE0_BLENDFACTORALPHA_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:STAGE0_BLENDFACTORALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "STAGE0_BLENDFACTORALPHA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NEED_HMD_TEST Quest3/VDXR/menu-vehicle-race and gamepad",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only; original game D3D9 Draw/Present/input remains authoritative"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00562.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD / AGENTS / policy / 00561 exact CI inspected; 00562 absent",
+    "C1_REVIEW": "Stage0 blend factor alpha not admitted despite matching native shader/CB route; distinct from 00561 MIN/MAG filters",
+    "C2_IMPLEMENT": "Real D3D9 TFACTOR alpha capture, exact HLSL factor blender, native Draw with negative source link and CPU vectors",
+    "C3_VALIDATE": "PENDING_GITHUB_EXACT_SHA",
+    "C4_COMMIT": "Validation-bearing source/test/run atomic material commit; no CI-skip",
+    "C5_PACKAGE": "NOT_REQUIRED: opt-in diagnostic, not runtime promoted",
+    "C6_STATE": "PENDING_EXACT_SHA; Quest3/VDXR/gamepad UNTESTED"
+  },
+  "feature_status": "SOURCE_IMPLEMENTED_CI_PENDING_NEED_HMD_TEST",
+  "runtime_evidence": "No in-game frame or Quest3/VDXR/gamepad test",
+  "next_action": "Observe exact-SHA GitHub Actions. Record verified C6 only after all mandatory Gates pass; do not claim hardware parity.",
+  "state_persisted": true
+}

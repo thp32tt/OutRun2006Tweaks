@@ -1282,7 +1282,7 @@ def main() -> None:
     blend_links = (
         "const bool blendTextureAlpha = op == D3DTOP_BLENDTEXTUREALPHA && alphaOp == D3DTOP_BLENDTEXTUREALPHA;",
         "const bool blendDiffuseAlpha = op == D3DTOP_BLENDDIFFUSEALPHA && alphaOp == D3DTOP_BLENDDIFFUSEALPHA;",
-        "blendTextureAlpha || blendDiffuseAlpha;",
+        "blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;",
         "blendTextureAlpha && !blendDiffuseAlpha) || arg != D3DTA_TEXTURE ||",
         "capture.blendTextureAlpha = blendTextureAlpha;",
         "capture.blendDiffuseAlpha = blendDiffuseAlpha;",
@@ -1310,7 +1310,7 @@ def main() -> None:
     submit_section = bridge[bridge.find("bool submit("):
                             bridge.find("void observe(")]
     assert all(link in bridge for link in blend_links if "blendTextureAlpha && !blendDiffuseAlpha)" not in link)
-    assert "!blendTextureAlpha && !blendDiffuseAlpha) || arg != D3DTA_TEXTURE ||" in state_section
+    assert "!blendTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha) || arg != D3DTA_TEXTURE ||" in state_section
     assert "arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT" in state_section
     assert "alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT" in state_section
     assert "alphaArg1 != D3DTA_TEXTURE" in state_section
@@ -1516,6 +1516,67 @@ def main() -> None:
                     native = mip_point_map[min_filter, mag_filter]
                     assert ("D3D11_FILTER_" + native) in bridge
     print("DX11 game MIN/MAG mixed filtering -> native sampler/Draw PASS (static only)")
+
+
+    # 00562: actual game D3D9 stage0 BLENDFACTORALPHA/TFACTOR alpha
+    # becomes DX11 constant-buffer w -> native shader/Draw/diagnostic inset.
+    # Source + CPU proof; no live gamepad, HMD or in-game pixel evidence.
+    factor_links = (
+        "op == D3DTOP_BLENDFACTORALPHA &&",
+        "alphaOp == D3DTOP_BLENDFACTORALPHA;",
+        "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)",
+        "blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;",
+        "!blendTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha)",
+        "capture.blendFactorAlpha = blendFactorAlpha;",
+        "capture.blendFactorAlphaValue = static_cast<float>((textureFactor >> 24u) & 0xffu) / 255.0f;",
+        "bool blendFactorAlpha = false;",
+        "float blendFactorAlphaValue = 0.0f;",
+        "float4 PSTextureBlendFactorAlpha(VOut v) : SV_Target {",
+        "float4 c = lerp(v.diffuse, t, alphaParams.w);",
+        'compile("PSTextureBlendFactorAlpha", "ps_4_0", blendFactorCode)',
+        "s.blendFactorAlphaPs.GetAddressOf()",
+        "s.blendFactorAlphaPs.Reset();",
+        "s.blendFactorAlphaPs &&",
+        "capture.blendFactorAlphaValue",
+        "capture.blendFactorAlpha ? s.blendFactorAlphaPs.Get() :",
+        "ctx->PSSetConstantBuffers(0, 1, &alphaBuffer);",
+        "ctx->DrawIndexed(indexCount, 0, 0);",
+        "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+    )
+    def factor_connected(code: str) -> bool:
+        intake = code[code.find("bool supported_game_state("):
+                      code.find("bool translate_vertices(")]
+        submit = code[code.find("bool submit("):code.find("void observe(")]
+        return (all(token in code for token in factor_links) and
+                "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)" in intake and
+                "static_cast<float>(output.alphaFunc), capture.blendFactorAlphaValue" in submit and
+                "ctx->PSSetShader(capture.blendTextureAlpha ?" in submit and
+                "capture.blendFactorAlpha ? s.blendFactorAlphaPs.Get() :" in submit and
+                code.count("s.blendFactorAlphaPs.Reset();") == 2)
+    assert factor_connected(bridge)
+    for token in factor_links[:-2]:
+        mutant = bridge.replace(token, "/* disconnected 00562 factor link */", 1)
+        assert mutant != bridge and not factor_connected(mutant), token
+    for color_op, alpha_op, accepted in (
+        (14, 14, True), (14, 13, False), (13, 14, False),
+        (14, 7, False), (7, 14, False), (0, 14, False),
+    ):
+        # D3DTOP_BLENDFACTORALPHA is D3DTOP enum value 14.
+        assert (color_op == 14 and alpha_op == 14) is accepted
+    for argb, texel, diffuse in (
+        (0x00010203, (0.1, 0.4, 0.7, 0.2), (0.9, 0.8, 0.1, 0.6)),
+        (0xff010203, (0.1, 0.4, 0.7, 0.2), (0.9, 0.8, 0.1, 0.6)),
+        (0x80010203, (0.1, 0.4, 0.7, 0.2), (0.9, 0.8, 0.1, 0.6)),
+    ):
+        factor = ((argb >> 24) & 0xff) / 255.0
+        output = tuple((1.0 - factor) * d + factor * t for d, t in zip(diffuse, texel))
+        if argb == 0x00010203:
+            assert output == diffuse
+        elif argb == 0xff010203:
+            assert output == texel
+        else:
+            assert all(min(d, t) < o < max(d, t) for d, t, o in zip(diffuse, texel, output))
+    print("DX11 stage0 BLENDFACTORALPHA live native Draw PASS (static only)")
 
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
