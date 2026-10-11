@@ -16,8 +16,9 @@ CORE = ROOT / "src/vr/core"
 def body(source: str, signature: str) -> str:
     # A lower-owner method can now be called from an earlier R29 hotpath.
     # Resolve the actual definition, not the first forward call site.
-    if signature == "R29OwnerLeftDrawMayWriteDepth(":
-        signature = "bool R29OwnerLeftDrawMayWriteDepth("
+    if signature in ("R29OwnerLeftDrawMayWriteDepth(",
+                     "R29OwnerLeftDrawMayWriteStencil("):
+        signature = "bool " + signature
     pos = source.find(signature)
     if pos < 0:
         raise AssertionError(f"definition missing: {signature}")
