@@ -24,6 +24,8 @@ constexpr UINT kMaxIndices = 1536;
 // Rotate among eligible game Draws so an off-screen first Draw cannot starve
 // later visible candidates. Exactly one native submission is allowed per Present.
 constexpr UINT kProbeSlots = 64;
+constexpr UINT kReadbackSlots = 3; // GPU event-fenced frame copies
+
 constexpr std::array<float, 4> kBackground{0.035f, 0.035f, 0.08f, 1.0f};
 constexpr char kShader[] = R"(
 struct VIn { float4 clip : POSITION; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; };
@@ -74,6 +76,11 @@ struct OutputCapture {
     std::uint8_t colorWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 };
 
+struct ReadbackSlot {
+    ComPtr<ID3D11Texture2D> staging;
+    ComPtr<ID3D11Query> fence;
+    bool busy = false;
+};
 struct State {
     std::mutex mutex;
     NativeBackend backend;
@@ -88,7 +95,12 @@ struct State {
     // Cached by source mask and alpha-blend mode; no per-frame state churn.
     std::array<ComPtr<ID3D11BlendState>, 32> maskedBlends{};
     ComPtr<ID3D11Buffer> alphaConstants;
-    ComPtr<ID3D11Texture2D> staging;
+    std::array<ReadbackSlot, kReadbackSlots> readbacks{};
+    UINT readSlot = 0;
+    UINT writeSlot = 0;
+    UINT droppedCopies = 0;
+    ComPtr<IDirect3DSurface9> insetSurface;
+    D3DFORMAT insetFormat = D3DFMT_UNKNOWN;
     bool pending = false;
     bool attempted = false;
     bool logged = false;
@@ -118,10 +130,21 @@ bool compile(const char* entry, const char* profile, ComPtr<ID3DBlob>& blob) noe
 }
 
 bool ensure_pipeline(State& s) noexcept {
-    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.layout && s.raster && s.scissorRaster && s.alphaBlend && s.alphaConstants && s.staging)
+    const bool readbackReady = std::all_of(s.readbacks.begin(), s.readbacks.end(),
+        [](const ReadbackSlot& item) { return item.staging && item.fence; });
+    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.textureOnlyPs &&
+        s.layout && s.raster && s.scissorRaster && s.alphaBlend &&
+        s.alphaConstants && readbackReady)
         return true;
     s.backend.shutdown();
-    s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.layout.Reset(); s.raster.Reset(); s.scissorRaster.Reset(); s.alphaBlend.Reset(); s.alphaConstants.Reset(); s.staging.Reset();
+    s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset();
+    s.layout.Reset(); s.raster.Reset(); s.scissorRaster.Reset();
+    s.alphaBlend.Reset(); s.alphaConstants.Reset();
+    for (auto& item : s.readbacks) {
+        item.staging.Reset(); item.fence.Reset(); item.busy = false;
+    }
+    s.readSlot = s.writeSlot = 0;
+    s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
     for (auto& masked : s.maskedBlends) masked.Reset();
     NativeBackendConfig cfg{};
     cfg.width = kWidth;
@@ -191,7 +214,14 @@ bool ensure_pipeline(State& s) noexcept {
     desc.BindFlags = 0;
     desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
     desc.MiscFlags = 0;
-    return SUCCEEDED(dev->CreateTexture2D(&desc, nullptr, s.staging.GetAddressOf()));
+    D3D11_QUERY_DESC query{};
+    query.Query = D3D11_QUERY_EVENT;
+    for (auto& item : s.readbacks) {
+        if (FAILED(dev->CreateTexture2D(&desc, nullptr, item.staging.GetAddressOf())) ||
+            FAILED(dev->CreateQuery(&query, item.fence.GetAddressOf())))
+            return false;
+    }
+    return true;
 }
 
 // Read the current game device, not a WARP fixture's manufactured state.
@@ -667,7 +697,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     ctx->PSSetSamplers(0, 1, &boundSampler);
     if (ib) ctx->DrawIndexed(indexCount, 0, 0);
     else ctx->Draw(static_cast<UINT>(vertices.size()), 0);
-    ctx->Flush();
+    // GPU submission is paired with the queued readback at Present.
     s.pending = true;
     ++s.issued;
     return true;
@@ -738,62 +768,101 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
     try {
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
-        if (s.pending && s.backend.ready() && s.staging) {
+        if (s.backend.ready() && s.backend.context()) {
             auto* ctx = s.backend.context();
-            ctx->CopyResource(s.staging.Get(), s.backend.color_texture());
-            D3D11_MAPPED_SUBRESOURCE mapped{};
-            if (SUCCEEDED(ctx->Map(s.staging.Get(), 0, D3D11_MAP_READ, 0, &mapped))) {
-                UINT changedPixels = 0;
-                for (UINT y=0; y<kHeight; ++y) {
-                    const auto* row = static_cast<const std::uint8_t*>(mapped.pData) +
-                                      static_cast<std::size_t>(y) * mapped.RowPitch;
-                    for (UINT x=0; x<kWidth; ++x) {
-                        const auto* p = row + 4*x;
-                        // Background is BGRA=(~20,~9,~9,255). A generated
-                        // test clear alone must never count as a drawn frame.
-                        if (std::abs(int(p[0])-20) > 3 ||
-                            std::abs(int(p[1])-9) > 3 ||
-                            std::abs(int(p[2])-9) > 3) ++changedPixels;
-                    }
-                }
-                if (changedPixels) {
-                    ComPtr<IDirect3DSurface9> sys, back;
-                    D3DSURFACE_DESC bb{};
-                    if (SUCCEEDED(game->GetBackBuffer(0,0,D3DBACKBUFFER_TYPE_MONO,
-                                                    back.GetAddressOf())) && back &&
-                        SUCCEEDED(back->GetDesc(&bb)) &&
-                        bb.Width >= kWidth + 8u && bb.Height >= kHeight + 8u &&
-                        bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
-                        (bb.Format == D3DFMT_A8R8G8B8 ||
-                         bb.Format == D3DFMT_X8R8G8B8) &&
-                        SUCCEEDED(game->CreateOffscreenPlainSurface(
-                            kWidth, kHeight, bb.Format, D3DPOOL_SYSTEMMEM,
-                            sys.GetAddressOf(), nullptr)) && sys) {
-                        D3DLOCKED_RECT lockRect{};
-                        if (SUCCEEDED(sys->LockRect(&lockRect, nullptr, 0))) {
-                            for (UINT y=0; y<kHeight; ++y)
-                                std::memcpy(static_cast<std::uint8_t*>(lockRect.pBits) +
-                                            static_cast<std::size_t>(y)*lockRect.Pitch,
-                                            static_cast<const std::uint8_t*>(mapped.pData) +
-                                            static_cast<std::size_t>(y)*mapped.RowPitch,
-                                            kWidth*4);
-                            sys->UnlockRect();
-                            POINT destination{static_cast<LONG>(bb.Width-kWidth-8), 8};
-                            if (SUCCEEDED(game->UpdateSurface(
-                                sys.Get(), nullptr, back.Get(), &destination))) {
-                                ++s.visible;
-                                if (!s.logged) {
-                                    spdlog::info("DX11 FIRST_GAME_DRAW_FRAME diagnostic: game-origin FVF draw issued on native D3D11 and {} pixels changed; {}x{} desktop inset; source game Draw and input untouched; Quest3 UNTESTED",
-                                        changedPixels, kWidth, kHeight);
-                                    s.logged = true;
+            // Poll the oldest GPU fence without implicit flushing or CPU waits.
+            auto& oldest = s.readbacks[s.readSlot];
+            if (oldest.busy) {
+                const HRESULT ready = ctx->GetData(
+                    oldest.fence.Get(), nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
+                if (ready == S_OK) {
+                    D3D11_MAPPED_SUBRESOURCE mapped{};
+                    const HRESULT mapStatus = ctx->Map(oldest.staging.Get(), 0,
+                        D3D11_MAP_READ, D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped);
+                    if (SUCCEEDED(mapStatus)) {
+                        UINT changedPixels = 0;
+                        for (UINT y = 0; y < kHeight; ++y) {
+                            const auto* row = static_cast<const std::uint8_t*>(mapped.pData) +
+                                static_cast<std::size_t>(y) * mapped.RowPitch;
+                            for (UINT x = 0; x < kWidth; ++x) {
+                                const auto* p = row + 4 * x;
+                                if (std::abs(int(p[0])-20) > 3 ||
+                                    std::abs(int(p[1])-9) > 3 ||
+                                    std::abs(int(p[2])-9) > 3) ++changedPixels;
+                            }
+                        }
+                        if (changedPixels) {
+                            ComPtr<IDirect3DSurface9> back;
+                            D3DSURFACE_DESC bb{};
+                            if (SUCCEEDED(game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,
+                                                             back.GetAddressOf())) && back &&
+                                SUCCEEDED(back->GetDesc(&bb)) &&
+                                bb.Width >= kWidth + 8u && bb.Height >= kHeight + 8u &&
+                                bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
+                                (bb.Format == D3DFMT_A8R8G8B8 ||
+                                 bb.Format == D3DFMT_X8R8G8B8)) {
+                                // Cache CPU upload memory; invalidate on format/Reset.
+                                if (!s.insetSurface || s.insetFormat != bb.Format) {
+                                    s.insetSurface.Reset();
+                                    s.insetFormat = D3DFMT_UNKNOWN;
+                                    if (SUCCEEDED(game->CreateOffscreenPlainSurface(
+                                            kWidth, kHeight, bb.Format, D3DPOOL_SYSTEMMEM,
+                                            s.insetSurface.GetAddressOf(), nullptr)))
+                                        s.insetFormat = bb.Format;
                                 }
+                                D3DLOCKED_RECT lockRect{};
+                                if (s.insetSurface && s.insetFormat == bb.Format &&
+                                    SUCCEEDED(s.insetSurface->LockRect(&lockRect, nullptr, 0))) {
+                                    for (UINT y = 0; y < kHeight; ++y)
+                                        std::memcpy(
+                                            static_cast<std::uint8_t*>(lockRect.pBits) +
+                                                static_cast<std::size_t>(y)*lockRect.Pitch,
+                                            static_cast<const std::uint8_t*>(mapped.pData) +
+                                                static_cast<std::size_t>(y)*mapped.RowPitch,
+                                            kWidth*4);
+                                    s.insetSurface->UnlockRect();
+                                    POINT destination{static_cast<LONG>(bb.Width-kWidth-8), 8};
+                                    if (SUCCEEDED(game->UpdateSurface(
+                                            s.insetSurface.Get(), nullptr, back.Get(), &destination))) {
+                                        ++s.visible;
+                                        if (!s.logged) {
+                                            spdlog::info("DX11 FIRST_GAME_DRAW_FRAME async game-origin FVF native Draw: {} changed pixels, {}x{} desktop inset; original D3D9 draw/input untouched; Quest3 UNTESTED",
+                                                changedPixels, kWidth, kHeight);
+                                            s.logged = true;
+                                        }
+                                    } else ++s.failed;
+                                } else ++s.failed;
                             } else ++s.failed;
-                        } else ++s.failed;
-                    } else ++s.failed;
+                        }
+                        ctx->Unmap(oldest.staging.Get(), 0);
+                        oldest.busy = false;
+                        s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
+                    } else if (mapStatus != DXGI_ERROR_WAS_STILL_DRAWING) {
+                        ++s.failed;
+                        oldest.busy = false;
+                        s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
+                    }
+                } else if (FAILED(ready)) {
+                    ++s.failed;
+                    oldest.busy = false;
+                    s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
                 }
-                ctx->Unmap(s.staging.Get(), 0);
-            } else ++s.failed;
-        }
+            }
+            if (s.pending) {
+                auto& next = s.readbacks[s.writeSlot];
+                if (!next.busy) {
+                    ctx->CopyResource(next.staging.Get(), s.backend.color_texture());
+                    ctx->End(next.fence.Get());
+                    // A single GPU submit per diagnostic frame; never a blocking Map.
+                    ctx->Flush();
+                    next.busy = true;
+                    s.writeSlot = (s.writeSlot + 1u) % kReadbackSlots;
+                } else {
+                    // Ring saturation is diagnostic-only: drop instead of stalling D3D9.
+                    ++s.droppedCopies;
+                }
+            }
+        } else if (s.pending) ++s.failed;
         s.pending = false;
         s.attempted = false;
         const UINT window = (std::min)(s.eligibleThisFrame, kProbeSlots);
@@ -830,7 +899,13 @@ void before_game_reset() noexcept {
     s.attempted = false;
     s.eligibleThisFrame = 0;
     s.probeSlot = 0;
-    s.staging.Reset(); s.raster.Reset(); s.scissorRaster.Reset(); s.layout.Reset(); s.alphaBlend.Reset(); s.alphaConstants.Reset();
+    for (auto& item : s.readbacks) {
+        item.staging.Reset(); item.fence.Reset(); item.busy = false;
+    }
+    s.readSlot = s.writeSlot = 0;
+    s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
+    s.raster.Reset(); s.scissorRaster.Reset(); s.layout.Reset();
+    s.alphaBlend.Reset(); s.alphaConstants.Reset();
     for (auto& masked : s.maskedBlends) masked.Reset();
     s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.vs.Reset();
     s.backend.shutdown();
