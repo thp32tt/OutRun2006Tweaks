@@ -1,5 +1,10 @@
 # Korean Localization Automation Contract
 
+## B-only image generation production override — 2026-10-11
+
+**Latest user decision:** A stays on the existing native font/vector/manual lane unchanged. B exclusively uses ChatGPT's image generation tool for NEW Korean title/text artwork, then deterministic transparent-PNG fit/CLEAN/DDS/QA. B MUST read `docs/KOREAN_LOCALIZATION_B_IMAGEGEN_LANE.md` and its latest input/provenance rules BEFORE any B production. This B-specific rule overrides earlier A+B font/vector directions and Production Reset's background-only AI-image limitation **for B alone**; it does NOT relax original/CLEAN/0-overflow/self-visual/C2/C3/game or source-family style gates. B must not pretend GitHub Actions or Pillow can invoke the ChatGPT plugin; the ChatGPT B conversation must actually call it. On tool failure record INPUT_MISSING/IMAGEGEN_UNAVAILABLE, don't silently fall back to fonts, empty DDS, or fake approvals. Preserve the current even-shard/IGR P0 priority, six-slot schedule, B-only provenance, unique artifact hashes, and metric comparisons to untouched A. B's CPU slot processes only SHA-bound uploaded ImageGen inputs and never manufactures generator results.
+
+
 ## Separated lettering engine — 2026-10-11
 
 Apply `docs/KOREAN_LOCALIZATION_LETTERING_ENGINE.md` for new lettering. Review native glyph geometry before effects, preserve separate face/effect layers and compose through `compose_lettering.py`. Newly published production DDS require a SHA-bound `lettering_recipe` in the final manifest; the existing changed-candidate gate verifies the actual composition. Producer geometry readiness is not C/C3/game approval. Keep existing scheduling and ownership.
