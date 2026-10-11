@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B368 P3: compose source-conditioned face/rim/extrusion/highlight over approved CLEAN, saved DDS trial only."""
+"""B368 P3 actual scoped-alpha retry: compose source-conditioned face/rim/extrusion/highlight over approved CLEAN, saved DDS trial only."""
 import os,runpy
 os.environ["PYTHONDONTWRITEBYTECODE"]="1"
 assert os.getenv("OUTRUN_CPU_WORKER")=="github-actions" and os.getenv("OUTRUN_CPU_ROLE")=="B"
