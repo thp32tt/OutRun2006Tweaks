@@ -2686,6 +2686,10 @@ def main() -> None:
             if ta == 0.1: assert alpha < 1.0
     print("DX11 independent MODULATE2X/4X alpha game native Draw PASS (static only)")
 
+    # 00577 actual-game textured SELECTARG2 RGB with independent alpha.
+    from test_dx11_select_diffuse_mixed_alpha_00577 import run as run_00577
+    run_00577()
+
     # 00575 game Draw -> four scaled-alpha PS variants -> DrawIndexed/Draw -> inset.
     from test_dx11_scaled_blend_alpha_00575 import run as run_00575
     run_00575()
