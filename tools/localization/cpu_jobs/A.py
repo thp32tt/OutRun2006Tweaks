@@ -190,4 +190,4 @@ report={
  "proof":proof,"excluded":["VR","FFB","DX11","DXVK"]
 }
 save_json("A253_MACHINE_AND_HANDOFF",report)
-print(json.dumps({"new_sha":ref(out)["sha256"],"changed":int(delta.sum()),"margins":margin,"font_px":fs},ensure_ascii=False),flush=True)
+print(json.dumps({"new_sha":ref(out)["sha256"],"changed":int(delta.sum()),"margins":margin,"font_px":65},ensure_ascii=False),flush=True)
