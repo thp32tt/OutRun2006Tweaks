@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "A249 2026-10-12 02:09 KST new q193 SHOWROOM original English→CLEAN 11379 pixels/alpha residue0/outside0, saved Korean 쇼룸 layer alpha2634 preserved exact current A246 SHA98066203, producer gray100/white75/black50/RAW reviewed; C2 must independently inspect NEW SHOWROOM scoped stage, then reconcile 13 regions before whole q193 final; C3, IGR003/019/033 new real-game screenshot pending, RUNTIME_VALIDATION=UNTESTED. QA localization/graphics/role_A/20261012-A249-Q193-SHOWROOM-SOURCE-CLEAN/A249_CONTROLLER_FIRSTHAND_SCOPED_QA.json. RUN_KEY=OUTRUN-KOR-A249-Q193-SHOWROOM-SOURCE-CLEAN-20261012-0200",
     "C2 2026-10-12 02:01 KST q193 two *previously unreviewed* rank-help regions first independent persisted-DDS static QA. A206-clean actual SHA be61cd8a61d750a1ea5e4b131c8e31c5b8725c0cb6308b717757c7d716ae5089 and exact original source SHA d308bf05; unchanged A246 saved trial SHA 98066203. OutRun2SP arcade original English 25334 alpha removed CLEAN0, saved Korean 23801 alpha; OutRun single-player original English 26312 removed CLEAN0, saved Korean 23559 alpha. Exact SOURCE->CLEAN and CLEAN->persisted changed RGBA outside each original effect bbox=0, final new alpha overflow0, native100/white75/black50 and RAW/FLIPY independently observed, intact readable translation, 2px min margin. Region-only STATIC_QA_PASS and PLATE_PASS, full q193 C2 HOLD (SHOWROOM/complete stage and calibration pending), C3 NOT_RUN, user IGR003/019/033 OPEN, RUNTIME_VALIDATION=UNTESTED, C2 new DDS0, producer SHA unchanged. QA localization/graphics/role_C/20261012-C2-Q193-TWO-UNREVIEWED-RANK-HELP/C2_Q193_TWO_HELP_FIRST_INDEPENDENT_SCOPED_QA.json.",
     "C2 2026-10-12 01:30 KST first independent A248 q121 P0 saved trial SHA eb9eeadbf1fec2be2976c9d3c579e119e1431e55fc83859878f3501469c09512: source SHA f7847db9, official SHA38d5c2c3, exact stored glyph SHA501940e5. Native 4096x4096 RGBA32 mip1, readable source Gas Pedal : -> saved 가속 페달: native/75/50/RAW/FLIPY legible and no fake strokes. SOURCE->CLEAN visible English removed (6334 original alpha, CLEAN0), source-clean RGBA delta 11368 includes 5034 hidden zero-alpha RGB, not asserted as full raw RGB0; saved glyph matches layer pixel-exact0 mismatch. Original bbox [3490,391,3722,440] saved [3491,393,3661,438]; margin L1/T2/R61/B2 high-risk. Official->trial changed RGBA9662 and outside original bbox0/other29 unchanged. C2 RANK20_ONLY PLATE_PASS_SCOPED and visual STATIC_QA_SCOPED_PASS_COSMETIC_VARIANCE_ACCEPTED; WHOLE_Q121_C2=HOLD, current official unchanged, C3 NOT_RUN, IGR018/030/031/040 OPEN, RUNTIME_VALIDATION=UNTESTED, C2 new DDS0, producer previously created trial1. Evidence localization/graphics/role_C/20261012-C2-Q121-A248-P0-NEW-SAVED-FIRST-INDEPENDENT/C2_Q121_A248_INDEPENDENT_SCOPED_QA.json.",
     "C1 2026-10-12 01:10 KST generated actual q102 first-row Korean \"타임 어택 모드\" ImageGen gen f0d5c1cb-eeaf-4baa-bfd1-1ecec28cb633, RGBA2172x724 bytes746597 SHA a5edb26dcd52631bd33207b128a0621ac7bdc75ac8ad1d00e0eb3703d9336081, source English crop SHA218a08ff displayed. Real generated PNG physically published GitHub commit 7610026c3e462e5d2a30b257fde3a04208cf42ca and original vs remote b64 exact verified. NEW output is HOLD_NO_CONFIRMED_IMAGEGEN_SOURCE_ATTACHMENT because edit_op=null; existing C2-scoped reviewed q102 native saved trial SHA88f90ce75 remains untouched, no blind rerender, C2 full asset HOLD_EVIDENCE / C3 & user game NOT_RUN RUNTIME_VALIDATION=UNTESTED. Need imagegen tool explicit real source media binding; do not count this PNG as source-approved Korean lettering or new DDS. Evidence localization/graphics/role_C1/imagegen_requests/q102_C1_20261012_0110_GEN_f0d5c1cb_SELF_QA_HOLD.json. RUN_KEY=OUTRUN-KOR-C1-Q102-IMAGEGEN-SOURCE-BINDING-TRIAL-20261012-0110",
@@ -16507,5 +16508,47 @@
     "runtime_validation": "UNTESTED",
     "QA": "localization/graphics/role_A/20261012-A248-Q121-NATIVE-ITALIC-FONT-NEW-METHOD/A248_CONTROLLER_FIRSTHAND_SAVED_DDS_SELF_QA.json",
     "GH_actions": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38154623179"
+  },
+  "a249_20261012_q193_showroom_new_clean_stage": {
+    "role": "A",
+    "queue_index": 193,
+    "priority": "P1",
+    "run_key": "OUTRUN-KOR-A249-Q193-SHOWROOM-SOURCE-CLEAN-20261012-0200",
+    "at_kst": "2026-10-12 02:09 KST",
+    "status": "SCOPED_SOURCE_TO_TRANSPARENT_CLEAN_AND_SAVED_EXISTING_KOREAN_LAYER_PRODUCER_PASS",
+    "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+    "official_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+    "unchanged_saved_A246_sha256": "980662036fcdd75b0676890acc496c27e9322bc3c95999b8bfea3d2ee81c4b8f",
+    "source_bbox_readable": [
+      1205,
+      957,
+      1594,
+      1011
+    ],
+    "source_english": "SHOWROOM",
+    "korean": "쇼룸",
+    "cleaned_source_alpha_pixels": 11379,
+    "clean_alpha_residue": 0,
+    "changed_outside_source_roi": 0,
+    "existing_saved_korean_alpha_pixels": 2634,
+    "positive_margins_ltrb": [
+      2,
+      2,
+      292,
+      2
+    ],
+    "new_saved_DDS": 0,
+    "official_promoted": 0,
+    "producer_scoped_self_qa": "PASS_WITH_VISUAL_BG_100_75_50_AND_RAW",
+    "whole_q193_C2": "HOLD_PENDING_INDEPENDENT_SHOWROOM_PLUS_13SEGMENT_RECONCILIATION",
+    "C3": "NOT_RUN",
+    "user_game_IGR": [
+      "IGR003",
+      "IGR019",
+      "IGR033"
+    ],
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa_file": "localization/graphics/role_A/20261012-A249-Q193-SHOWROOM-SOURCE-CLEAN/A249_CONTROLLER_FIRSTHAND_SCOPED_QA.json",
+    "action_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38158179765"
   }
 }
