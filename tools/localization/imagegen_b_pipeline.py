@@ -359,7 +359,7 @@ def run(repo: Path, manifest: Path) -> dict:
     evidence=[]
     for orient,gray,percent in [("FLIPY",128,100),("FLIPY",255,75),("FLIPY",0,50),("RAW",128,100)]:
         fn=name+"_SOURCE_CLEAN_OFFICIAL_GENERATED_"+orient+"_"+str(percent)+".png"
-        save_contact(outdir/fn,[S,C,O,N],roi,gray,percent,orient=="RAW")
+        save_contact(outdir/fn,[S,C,O,saved],roi,gray,percent,orient=="RAW")
         evidence.append({"path":str((outdir/fn).relative_to(repo)),"sha256":digest((outdir/fn).read_bytes())})
     info={
       "schema":raw["schema"],"queue_index":index,"lane":role,"producer_method":"CHATGPT_IMAGEGEN_ONLY",
