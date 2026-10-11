@@ -337,7 +337,7 @@ jobs:
       - name: Stage exact-SHA R84 independently linked x86 game
         shell: pwsh
         run: |
-          $dll = Get-ChildItem build-full-chain -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\\\bin\\\\' } | Select-Object -First 1
+          $dll = Get-ChildItem build-full-chain -Recurse -File -Filter dinput8.dll | Select-Object -First 1
           if (-not $dll) { throw 'R84 independent full-chain DLL missing' }
           New-Item -ItemType Directory -Force stage-r84-chain | Out-Null
           Copy-Item $dll.FullName stage-r84-chain/dinput8.dll
