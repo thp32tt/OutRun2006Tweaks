@@ -56,6 +56,10 @@ services:
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
       SCHEDULE_MINUTES: "10,30,50"
       CHAT_SLOTS: "3"
+      # Recover a frozen scheduler independently of the HTTP /status healthcheck.
+      VR_RUNTIME_WATCHDOG_CHECK_SECONDS: "30"
+      VR_RUNTIME_WATCHDOG_STALE_SECONDS: "720"
+      VR_RUNTIME_WATCHDOG_STARTUP_GRACE_SECONDS: "300"
       RECYCLE_ENABLED: "true"
       RECYCLE_INTERVAL_MINUTES: "180"
       RECYCLE_MEMORY_PERCENT: "70"
