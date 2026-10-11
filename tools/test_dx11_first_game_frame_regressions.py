@@ -553,7 +553,7 @@ def main() -> None:
         "bool mixedAddDiffuseAlpha = false;",
         "mixedAddTextureAlpha || mixedAddDiffuseAlpha;",
         "mixedDiffuseAlpha || mixedAddDiffuseAlpha;",
-        "!mixedAddTextureAlpha && !mixedAddDiffuseAlpha) || arg != D3DTA_TEXTURE",
+        "!mixedAddTextureAlpha && !mixedAddDiffuseAlpha &&",
         "(!mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE)",
         "capture.mixedAddTextureAlpha = mixedAddTextureAlpha;",
         "capture.mixedAddDiffuseAlpha = mixedAddDiffuseAlpha;",
@@ -1271,6 +1271,74 @@ def main() -> None:
     ):
         mutant = layout_source.replace(old, bad, 1)
         assert mutant != layout_source and not object_fvf_integrated(bridge, mutant, probe_source)
+
+    # 00558: real game-authored D3D9 stage0 BLENDTEXTUREALPHA /
+    # BLENDDIFFUSEALPHA -> owned native PS -> Draw/DrawIndexed -> opt-in inset.
+    # Checks source-to-consumer links, shader/reset lifecycle and fail-closed
+    # dispatch; this does not assert runtime menu/gamepad/Quest3 parity.
+    blend_links = (
+        "const bool blendTextureAlpha = op == D3DTOP_BLENDTEXTUREALPHA && alphaOp == D3DTOP_BLENDTEXTUREALPHA;",
+        "const bool blendDiffuseAlpha = op == D3DTOP_BLENDDIFFUSEALPHA && alphaOp == D3DTOP_BLENDDIFFUSEALPHA;",
+        "blendTextureAlpha || blendDiffuseAlpha;",
+        "blendTextureAlpha && !blendDiffuseAlpha) || arg != D3DTA_TEXTURE ||",
+        "capture.blendTextureAlpha = blendTextureAlpha;",
+        "capture.blendDiffuseAlpha = blendDiffuseAlpha;",
+        "bool blendTextureAlpha = false;",
+        "bool blendDiffuseAlpha = false;",
+        "float4 c = lerp(v.diffuse, t, t.a);",
+        "float4 c = lerp(v.diffuse, t, v.diffuse.a);",
+        'compile("PSTextureBlendTextureAlpha", "ps_4_0", blendTextureCode)',
+        'compile("PSTextureBlendDiffuseAlpha", "ps_4_0", blendDiffuseCode)',
+        "s.blendTextureAlphaPs.GetAddressOf()",
+        "s.blendDiffuseAlphaPs.GetAddressOf()",
+        "s.blendTextureAlphaPs.Reset();",
+        "s.blendDiffuseAlphaPs.Reset();",
+        "s.blendTextureAlphaPs && s.blendDiffuseAlphaPs",
+        "capture.blendTextureAlpha ? s.blendTextureAlphaPs.Get() :",
+        "capture.blendDiffuseAlpha ? s.blendDiffuseAlphaPs.Get() :",
+        "ctx->DrawIndexed(indexCount, 0, 0);",
+        "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+    )
+    # Exact whitelist includes the pair *only* with equal color+alpha op.
+    state_section = bridge[bridge.find("bool supported_game_state("):
+                           bridge.find("bool translate_vertices(")]
+    shader_section = bridge[bridge.find("constexpr char kShader[]"):
+                            bridge.find(')";', bridge.find("constexpr char kShader[]"))]
+    submit_section = bridge[bridge.find("bool submit("):
+                            bridge.find("void observe(")]
+    assert all(link in bridge for link in blend_links if "blendTextureAlpha && !blendDiffuseAlpha)" not in link)
+    assert "!blendTextureAlpha && !blendDiffuseAlpha) || arg != D3DTA_TEXTURE ||" in state_section
+    assert "arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT" in state_section
+    assert "alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT" in state_section
+    assert "alphaArg1 != D3DTA_TEXTURE" in state_section
+    assert "AlphaGate(c.a); return c;" in shader_section
+    assert "mirror_texture(dev, capture, sampledView, sampledSampler)" in submit_section
+    assert "ctx->PSSetShader(capture.blendTextureAlpha ?" in submit_section
+    for link in blend_links[:-2]:
+        if "blendTextureAlpha && !blendDiffuseAlpha)" in link:
+            continue
+        mutated = bridge.replace(link, "/* removed 00558 stage0 blend link */")
+        assert mutated != bridge and link not in mutated
+    # Exact D3DTOP values: BLENDDIFFUSEALPHA=12, BLENDTEXTUREALPHA=13.
+    for color_op, alpha_op, accepted in (
+        (12, 12, True), (13, 13, True),
+        (12, 13, False), (13, 12, False),
+        (13, 7, False), (7, 13, False), (0, 0, False),
+    ):
+        assert ((color_op == 12 and alpha_op == 12) or
+                (color_op == 13 and alpha_op == 13)) == accepted
+    for texel, diffuse in (
+        ((0.2, 0.8, 0.5, 0.9), (0.8, 0.5, 0.4, 0.25)),
+        ((1.0, 0.0, 0.3, 0.05), (0.1, 0.7, 0.5, 0.95)),
+    ):
+        for use_texture_factor in (False, True):
+            a = texel[3] if use_texture_factor else diffuse[3]
+            result = tuple((1-a)*d + a*t for d, t in zip(diffuse, texel))
+            assert all(0.0 <= c <= 1.0 for c in result)
+            assert abs(result[3] - ((1-a)*diffuse[3] + a*texel[3])) < 1e-7
+            assert result != texel and result != diffuse
+    print("DX11 stage0 texture/diffuse alpha blend live native draw PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 

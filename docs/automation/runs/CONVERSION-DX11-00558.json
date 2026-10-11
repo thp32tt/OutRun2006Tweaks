@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00558",
+  "production_id": "CONVERSION-DX11-00558",
+  "event_id": "CONVERSION-DX11-00558-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00558",
+  "work_key": "DX11:MENU_RACE_STAGE0_TEXTURE_DIFFUSE_ALPHA_BLEND_NATIVE_DRAW",
+  "base_sha": "df99bcf0461cccc35de6d97d9f2bf10377769df3",
+  "status": "MATERIAL_COMMITTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Game D3D9 stage0 BLENDTEXTUREALPHA or BLENDDIFFUSEALPHA GetTextureStageState and original Draw",
+      "D3D11 shader compilation/lifetime and real game-source Draw or DrawIndexed",
+      "Opt-in game-visible diagnostic inset via existing readback and D3D9 Present; original controller input/game Draw fallback unchanged"
+    ],
+    "batch_components": [
+      "C++ live D3D9 stage0 exact color/alpha admission and texture/diffuse input",
+      "C++ HLSL PS creation lifecycle and native Draw dispatch",
+      "Python source disconnection negative controls and RGBA numeric vectors"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Live GetTextureStageState -> PS -> Draw or DrawIndexed static integration with CPU blend math fixtures",
+      "negative_regression": "Mismatched blend ops, modified arg sources, unmirrored source states remain DX9Ex-only; source mutation checks",
+      "component_integration": "D3D9 game-authored stage0 texel and per-vertex diffuse -> native shader -> GPU Draw -> bounded opt-in readback/inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_STAGE0_TEXTURE_DIFFUSE_ALPHA_BLEND_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:STAGE0_BLEND_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "STAGE0_TEXTURE_DIFFUSE_ALPHA_BLEND",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Quest3/VDXR menu/vehicle/race/gamepad NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only; original D3D9 Draw/Present/input authoritative"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00558.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "GitHub exact branch HEAD df99bcf0461cccc35de6d97d9f2bf10377769df3, AGENTS.md/policy/00557 C6 inspected",
+    "C1_REVIEW": "Stage0 texture/diffuse-alpha blend was absent from live game native shader subset; opt-in only",
+    "C2_IMPLEMENT": "Two HLSL PS + D3D9 op capture + D3D11 lifecycle and native dispatch + negative regression and numeric checks",
+    "C3_VALIDATE": "Static source link and RGBA reference preflight; exact-SHA GitHub Actions PENDING",
+    "C4_COMMIT": "Atomic source+test+record material commit; no CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED: opt-in diagnostic and runtime visual/gamepad/HMD tests not performed",
+    "C6_STATE": "PENDING GitHub exact SHA gate; do not claim runtime PASS"
+  },
+  "runtime_evidence": "No actual game, Quest3/VDXR, controller input or GPU parity evidence",
+  "feature_status": "SOURCE_INTEGRATED_NEED_BUILD_AND_HMD_TEST",
+  "next_action": "Poll mandatory GitHub exact-SHA Gate for validation-bearing commit. If PASS, separate bookkeeping [skip ci] C6 record; do not reimplement under 00558."
+}
