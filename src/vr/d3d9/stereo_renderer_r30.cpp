@@ -624,6 +624,10 @@ namespace OutRunVRStereo
         {
             IDirect3DTexture9* reduced[2]{};
             IDirect3DTexture9* temp[2]{};
+            // Keep level-zero render-target interfaces for the resource lifetime;
+            // GetSurfaceLevel on both eyes every Present adds avoidable COM calls.
+            IDirect3DSurface9* reducedSurface[2]{};
+            IDirect3DSurface9* tempSurface[2]{};
             IDirect3DPixelShader9* bright = nullptr;
             IDirect3DPixelShader9* blur = nullptr;
             IDirect3DPixelShader9* composite = nullptr;
@@ -644,6 +648,9 @@ namespace OutRunVRStereo
         {
             for (int eye = 0; eye < 2; ++eye)
             {
+                // Release borrowed level-zero surfaces before their textures.
+                R30ReleaseCom(R30SkyGlow.reducedSurface[eye]);
+                R30ReleaseCom(R30SkyGlow.tempSurface[eye]);
                 R30ReleaseCom(R30SkyGlow.reduced[eye]);
                 R30ReleaseCom(R30SkyGlow.temp[eye]);
             }
@@ -705,6 +712,8 @@ namespace OutRunVRStereo
 
             if (R30SkyGlow.reduced[0] && R30SkyGlow.reduced[1] &&
                 R30SkyGlow.temp[0] && R30SkyGlow.temp[1] &&
+                R30SkyGlow.reducedSurface[0] && R30SkyGlow.reducedSurface[1] &&
+                R30SkyGlow.tempSurface[0] && R30SkyGlow.tempSurface[1] &&
                 R30SkyGlow.bright && R30SkyGlow.blur &&
                 R30SkyGlow.composite &&
                 R30SkyGlow.eyeWidth == R29OwnerCaptureFrameSnapshot().width &&
@@ -785,6 +794,22 @@ namespace OutRunVRStereo
                 return false;
             }
 
+            // Resolve the 4 level-zero COM surfaces only on allocation/resize.
+            // The same interfaces are valid until ReleaseSkyGlowResources/Reset.
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                if (FAILED(R30SkyGlow.reduced[eye]->GetSurfaceLevel(
+                        0, &R30SkyGlow.reducedSurface[eye])) ||
+                    !R30SkyGlow.reducedSurface[eye] ||
+                    FAILED(R30SkyGlow.temp[eye]->GetSurfaceLevel(
+                        0, &R30SkyGlow.tempSurface[eye])) ||
+                    !R30SkyGlow.tempSurface[eye])
+                {
+                    R30ReleaseSkyGlowResources();
+                    return false;
+                }
+            }
+
             R30SkyGlow.eyeWidth = R29OwnerCaptureFrameSnapshot().width;
             R30SkyGlow.eyeHeight = R29OwnerCaptureFrameSnapshot().height;
             R30SkyGlow.glowWidth = glowWidth;
@@ -799,7 +824,17 @@ namespace OutRunVRStereo
             float u, v;
         };
 
+        struct R30SkyGlowPassState
+        {
+            // Scoped to a single Present under R30ScopedInternalPass; no game
+            // draw/state block runs between our private fullscreen passes.
+            bool fixedConfigured = false;
+            bool blendConfigured = false;
+            bool additive = false;
+        };
+
         bool R30DrawSkyGlowPass(IDirect3DDevice9* device,
+            R30SkyGlowPassState& passState,
             IDirect3DSurface9* target, UINT width, UINT height,
             IDirect3DTexture9* source,
             IDirect3DPixelShader9* shader,
@@ -833,38 +868,50 @@ namespace OutRunVRStereo
                     0.0f, 1.0f, 1.0f, 1.0f }
             };
 
-            device->SetVertexShader(nullptr);
-            device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+            // Eight or more stereo post passes share the same fixed sampler,
+            // FVF and depth state. Only target/viewport, shader, texture,
+            // constants and blend mode vary. Never cache across Presents.
+            if (!passState.fixedConfigured)
+            {
+                device->SetVertexShader(nullptr);
+                device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+                device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+                device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+                device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+                device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+                device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+                device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+                device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+                device->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+                device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+                passState.fixedConfigured = true;
+            }
             device->SetPixelShader(shader);
             device->SetTexture(0, source);
-            device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-            device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-            device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
-            device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-            device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-            device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
-            device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-            device->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-            device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-            device->SetRenderState(D3DRS_ALPHABLENDENABLE,
-                additive ? TRUE : FALSE);
-            if (additive)
+            if (!passState.blendConfigured || passState.additive != additive)
             {
-                device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
-                device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-                device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-                device->SetRenderState(D3DRS_COLORWRITEENABLE,
-                    D3DCOLORWRITEENABLE_RED |
-                    D3DCOLORWRITEENABLE_GREEN |
-                    D3DCOLORWRITEENABLE_BLUE);
-            }
-            else
-            {
-                device->SetRenderState(D3DRS_COLORWRITEENABLE,
-                    D3DCOLORWRITEENABLE_RED |
-                    D3DCOLORWRITEENABLE_GREEN |
-                    D3DCOLORWRITEENABLE_BLUE |
-                    D3DCOLORWRITEENABLE_ALPHA);
+                device->SetRenderState(D3DRS_ALPHABLENDENABLE,
+                    additive ? TRUE : FALSE);
+                if (additive)
+                {
+                    device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+                    device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+                    device->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+                    device->SetRenderState(D3DRS_COLORWRITEENABLE,
+                        D3DCOLORWRITEENABLE_RED |
+                        D3DCOLORWRITEENABLE_GREEN |
+                        D3DCOLORWRITEENABLE_BLUE);
+                }
+                else
+                {
+                    device->SetRenderState(D3DRS_COLORWRITEENABLE,
+                        D3DCOLORWRITEENABLE_RED |
+                        D3DCOLORWRITEENABLE_GREEN |
+                        D3DCOLORWRITEENABLE_BLUE |
+                        D3DCOLORWRITEENABLE_ALPHA);
+                }
+                passState.additive = additive;
+                passState.blendConfigured = true;
             }
             device->SetPixelShaderConstantF(0, constant, 1);
             const HRESULT hr = device->DrawPrimitiveUP(
@@ -893,17 +940,11 @@ namespace OutRunVRStereo
             bool ok = true;
             for (int eye = 0; eye < 2 && ok; ++eye)
             {
-                IDirect3DSurface9* reduced = nullptr;
-                if (FAILED(R30SkyGlow.reduced[eye]->GetSurfaceLevel(
-                        0, &reduced)) || !reduced)
-                {
-                    ok = false;
-                    break;
-                }
+                if (!R30SkyGlow.reducedSurface[eye])
+                    return false;
                 ok = SUCCEEDED(device->StretchRect(
-                    eyeSurface[eye], nullptr, reduced, nullptr,
-                    D3DTEXF_LINEAR));
-                reduced->Release();
+                    eyeSurface[eye], nullptr, R30SkyGlow.reducedSurface[eye],
+                    nullptr, D3DTEXF_LINEAR));
             }
             if (ok)
                 R30SkyGlowSceneCaptureEpoch = R29OwnerCaptureFrameSnapshot().presentEpoch;
@@ -949,20 +990,18 @@ namespace OutRunVRStereo
             }
 
             bool ok = true;
+            // The cache is private to this single Present, so no stale game
+            // render state can be reused after StateBlock::Apply/Reset.
+            R30SkyGlowPassState passState{};
             IDirect3DSurface9* eyeSurface[2]{
                 R29OwnerCaptureFrameSnapshot().backBuffer, R29OwnerCaptureFrameSnapshot().rightEyeSurface
             };
             for (int eye = 0; eye < 2 && ok; ++eye)
             {
-                IDirect3DSurface9* reduced = nullptr;
-                IDirect3DSurface9* temp = nullptr;
-                if (FAILED(R30SkyGlow.reduced[eye]->GetSurfaceLevel(
-                        0, &reduced)) || !reduced ||
-                    FAILED(R30SkyGlow.temp[eye]->GetSurfaceLevel(
-                        0, &temp)) || !temp)
+                IDirect3DSurface9* reduced = R30SkyGlow.reducedSurface[eye];
+                IDirect3DSurface9* temp = R30SkyGlow.tempSurface[eye];
+                if (!reduced || !temp)
                 {
-                    if (temp) temp->Release();
-                    if (reduced) reduced->Release();
                     ok = false;
                     break;
                 }
@@ -980,7 +1019,7 @@ namespace OutRunVRStereo
                     // Clear is needed. Clearing here before rebinding the RT
                     // would clear the game's current eye backbuffer.
                     ok = R30DrawSkyGlowPass(
-                        device, temp,
+                        device, passState, temp,
                         R30SkyGlow.glowWidth,
                         R30SkyGlow.glowHeight,
                         R30SkyGlow.reduced[eye],
@@ -994,7 +1033,7 @@ namespace OutRunVRStereo
                 };
                 if (ok)
                     ok = R30DrawSkyGlowPass(
-                        device, reduced,
+                        device, passState, reduced,
                         R30SkyGlow.glowWidth,
                         R30SkyGlow.glowHeight,
                         R30SkyGlow.temp[eye],
@@ -1022,7 +1061,7 @@ namespace OutRunVRStereo
                     };
                     if (ok)
                         ok = R30DrawSkyGlowPass(
-                            device, temp,
+                            device, passState, temp,
                             R30SkyGlow.glowWidth,
                             R30SkyGlow.glowHeight,
                             R30SkyGlow.reduced[eye],
@@ -1034,14 +1073,12 @@ namespace OutRunVRStereo
                 const float composite[4]{ 0.38f, 0, 0, 0 };
                 if (ok)
                     ok = R30DrawSkyGlowPass(
-                        device, eyeSurface[eye],
+                        device, passState, eyeSurface[eye],
                         R29OwnerCaptureFrameSnapshot().width,
                         R29OwnerCaptureFrameSnapshot().height,
                         compositeSource,
                         R30SkyGlow.composite, composite, true);
 
-                temp->Release();
-                reduced->Release();
             }
 
             // Apply the captured pipeline state first, then explicitly restore
