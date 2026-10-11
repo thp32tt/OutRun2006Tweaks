@@ -223,7 +223,7 @@ namespace OutRunVRStereo
             if (!R30SupportTelemetryEnabled())
             {
                 R32FrameWorkloadCounters = {};
-                R32LastPresentEndQpc = presentEndQpc;
+                R32LastPresentEndQpc = 0;
                 return;
             }
 
@@ -747,23 +747,35 @@ namespace OutRunVRStereo
             LowerPresent&& lowerPresent) noexcept
         {
             const bool gameDevice = R30SupportIsGameDevice(device);
-            const R32StereoWorkloadSnapshot stereo =
-                gameDevice ? R32CaptureStereoWorkload()
-                           : R32StereoWorkloadSnapshot{};
+            const bool samplePerf = gameDevice && R30SupportTelemetryEnabled();
+            R32StereoWorkloadSnapshot stereo{};
             LARGE_INTEGER presentStart{};
-            if (gameDevice && R30SupportTelemetryEnabled())
+            if (samplePerf)
+            {
+                // Route snapshots are diagnostic-only; avoid cross-TU reads
+                // while telemetry is disabled on the gameplay Present path.
+                stereo = R32CaptureStereoWorkload();
                 QueryPerformanceCounter(&presentStart);
+            }
 
             const HRESULT hr = lowerPresent();
 
             if (gameDevice)
             {
-                LARGE_INTEGER presentEnd{};
-                if (R30SupportTelemetryEnabled())
+                if (samplePerf)
+                {
+                    LARGE_INTEGER presentEnd{};
                     QueryPerformanceCounter(&presentEnd);
-                R32FinalizeFramePerf(
-                    presentStart.QuadPart, presentEnd.QuadPart, stereo);
-                R32LogPerfWindow();
+                    R32FinalizeFramePerf(
+                        presentStart.QuadPart, presentEnd.QuadPart, stereo);
+                    R32LogPerfWindow();
+                }
+                else
+                {
+                    // A disabled interval cannot seed the next enabled sample.
+                    R32FrameWorkloadCounters = {};
+                    R32LastPresentEndQpc = 0;
+                }
             }
             return hr;
         }

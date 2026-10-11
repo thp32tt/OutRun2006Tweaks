@@ -87,29 +87,44 @@ namespace OutRunVRStereo
 
         inline void R31TelemetryNoteFastWorld() noexcept
         {
-            ++R31FastWorldDraws;
-            ++R31Frame.fastWorld;
+            if (R30SupportTelemetryEnabled())
+            {
+                ++R31FastWorldDraws;
+                ++R31Frame.fastWorld;
+            }
         }
 
         inline void R31TelemetryNoteHud() noexcept
         {
-            ++R31HudDraws;
-            ++R31Frame.hud;
+            if (R30SupportTelemetryEnabled())
+            {
+                ++R31HudDraws;
+                ++R31Frame.hud;
+            }
         }
 
         inline void R31TelemetryNoteFallback() noexcept
         {
-            ++R31Frame.fallback;
+            if (R30SupportTelemetryEnabled())
+            {
+                ++R31Frame.fallback;
+            }
         }
 
         inline void R31TelemetryNoteUnstable() noexcept
         {
-            ++R31Frame.unstable;
+            if (R30SupportTelemetryEnabled())
+            {
+                ++R31Frame.unstable;
+            }
         }
 
         inline void R31TelemetryNoteFragile() noexcept
         {
-            ++R31Frame.fragile;
+            if (R30SupportTelemetryEnabled())
+            {
+                ++R31Frame.fragile;
+            }
         }
 
         inline R31FramePerf R31TelemetryFrameSnapshot() noexcept
@@ -211,6 +226,18 @@ namespace OutRunVRStereo
         {
             if (!R30SupportIsGameDevice(device) || R30SupportInternalStereoPassActive())
                 return;
+            // No per-draw route classification/diagnostic writes during normal
+            // gameplay. Discard any previously sampled performance window on
+            // the first disabled draw to prevent mixed telemetry epochs.
+            if (!R30SupportTelemetryEnabled())
+            {
+                if (R31Frame.epoch != 0)
+                {
+                    R31Frame = {};
+                    R31Window = {};
+                }
+                return;
+            }
             if (R31Frame.epoch != R30SupportPresentEpoch())
             {
                 R31FinalizePerfFrame();
