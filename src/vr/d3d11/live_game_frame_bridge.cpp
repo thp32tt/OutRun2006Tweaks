@@ -29,10 +29,21 @@ struct VIn { float4 clip : POSITION; float4 diffuse : COLOR0; float2 uv : TEXCOO
 struct VOut { float4 clip : SV_Position; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; };
 Texture2D gameTexture : register(t0);
 SamplerState gameSampler : register(s0);
+cbuffer AlphaParams : register(b0) { float4 alphaParams; };
+// D3D9 alpha reference compares 8-bit post-texture alpha, not a raw
+// floating-point value. Only the explicitly admitted compare funcs are used.
+void AlphaGate(float alpha) {
+    if (alphaParams.x > 0.5f) {
+        float value = floor(saturate(alpha) * 255.0f + 0.5f);
+        bool pass = (alphaParams.z == 5.0f && value > alphaParams.y) ||
+                    (alphaParams.z == 7.0f && value >= alphaParams.y);
+        clip(pass ? 1.0f : -1.0f);
+    }
+}
 VOut VS(VIn v) { VOut o; o.clip = v.clip; o.diffuse = v.diffuse; o.uv = v.uv; return o; }
-float4 PS(VOut v) : SV_Target { return v.diffuse; }
-float4 PSTextured(VOut v) : SV_Target { return gameTexture.Sample(gameSampler, v.uv) * v.diffuse; }
-float4 PSTextureOnly(VOut v) : SV_Target { return gameTexture.Sample(gameSampler, v.uv); }
+float4 PS(VOut v) : SV_Target { float4 c = v.diffuse; AlphaGate(c.a); return c; }
+float4 PSTextured(VOut v) : SV_Target { float4 c = gameTexture.Sample(gameSampler, v.uv) * v.diffuse; AlphaGate(c.a); return c; }
+float4 PSTextureOnly(VOut v) : SV_Target { float4 c = gameTexture.Sample(gameSampler, v.uv); AlphaGate(c.a); return c; }
 )";
 struct NativeVertex {
     float clip[4];
@@ -51,6 +62,13 @@ struct TextureCapture {
     D3DTEXTUREFILTERTYPE filter = D3DTEXF_POINT;
 };
 
+struct OutputCapture {
+    bool alphaBlend = false;
+    bool alphaTest = false;
+    DWORD alphaRef = 0;
+    D3DCMPFUNC alphaFunc = D3DCMP_ALWAYS;
+};
+
 struct State {
     std::mutex mutex;
     NativeBackend backend;
@@ -60,6 +78,8 @@ struct State {
     ComPtr<ID3D11PixelShader> textureOnlyPs;
     ComPtr<ID3D11InputLayout> layout;
     ComPtr<ID3D11RasterizerState> raster;
+    ComPtr<ID3D11BlendState> alphaBlend;
+    ComPtr<ID3D11Buffer> alphaConstants;
     ComPtr<ID3D11Texture2D> staging;
     bool pending = false;
     bool attempted = false;
@@ -90,10 +110,10 @@ bool compile(const char* entry, const char* profile, ComPtr<ID3DBlob>& blob) noe
 }
 
 bool ensure_pipeline(State& s) noexcept {
-    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.layout && s.raster && s.staging)
+    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.layout && s.raster && s.alphaBlend && s.alphaConstants && s.staging)
         return true;
     s.backend.shutdown();
-    s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.layout.Reset(); s.raster.Reset(); s.staging.Reset();
+    s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.layout.Reset(); s.raster.Reset(); s.alphaBlend.Reset(); s.alphaConstants.Reset(); s.staging.Reset();
     NativeBackendConfig cfg{};
     cfg.width = kWidth;
     cfg.height = kHeight;
@@ -131,6 +151,26 @@ bool ensure_pipeline(State& s) noexcept {
     raster.DepthClipEnable = TRUE;
     if (FAILED(dev->CreateRasterizerState(&raster, s.raster.GetAddressOf())))
         return false;
+    // Narrow D3D9 SRCALPHA/INVSRCALPHA/ADD, with the same factors
+    // for destination alpha. This is a diagnostic target, not the game RT.
+    D3D11_BLEND_DESC blend{};
+    auto& target = blend.RenderTarget[0];
+    target.BlendEnable = TRUE;
+    target.SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    target.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    target.BlendOp = D3D11_BLEND_OP_ADD;
+    target.SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
+    target.DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+    target.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    target.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    if (FAILED(dev->CreateBlendState(&blend, s.alphaBlend.GetAddressOf())))
+        return false;
+    D3D11_BUFFER_DESC constants{};
+    constants.ByteWidth = sizeof(float) * 4u;
+    constants.Usage = D3D11_USAGE_DEFAULT;
+    constants.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    if (FAILED(dev->CreateBuffer(&constants, nullptr, s.alphaConstants.GetAddressOf())))
+        return false;
     D3D11_TEXTURE2D_DESC desc{};
     s.backend.color_texture()->GetDesc(&desc);
     desc.Usage = D3D11_USAGE_STAGING;
@@ -145,7 +185,7 @@ bool ensure_pipeline(State& s) noexcept {
 bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                           bool& pretransformed,
                           std::array<D3DMATRIX, 3>& transforms,
-                          TextureCapture& capture) noexcept {
+                          TextureCapture& capture, OutputCapture& output) noexcept {
     if (!game || FAILED(game->GetViewport(&viewport)) ||
         viewport.Width == 0 || viewport.Height == 0)
         return false;
@@ -197,11 +237,35 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cullMode)) ||
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fillMode)) ||
-        blend || alpha || stencil || depth || !clip || fog || scissor ||
+        stencil || depth || !clip || fog || scissor ||
         colorMask != (D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
                       D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA) ||
         cullMode != D3DCULL_NONE || fillMode != D3DFILL_SOLID)
         return false;
+    // D3D9 sprite/menu draw states. Reject alternate blend factors,
+    // separate alpha, or alpha compare functions before any native draw.
+    if (blend) {
+        DWORD src = 0, dst = 0, blendOp = 0, separate = TRUE;
+        if (FAILED(game->GetRenderState(D3DRS_SRCBLEND, &src)) ||
+            FAILED(game->GetRenderState(D3DRS_DESTBLEND, &dst)) ||
+            FAILED(game->GetRenderState(D3DRS_BLENDOP, &blendOp)) ||
+            FAILED(game->GetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, &separate)) ||
+            src != D3DBLEND_SRCALPHA || dst != D3DBLEND_INVSRCALPHA ||
+            blendOp != D3DBLENDOP_ADD || separate)
+            return false;
+        output.alphaBlend = true;
+    }
+    if (alpha) {
+        DWORD func = 0, reference = ~0u;
+        if (FAILED(game->GetRenderState(D3DRS_ALPHAFUNC, &func)) ||
+            FAILED(game->GetRenderState(D3DRS_ALPHAREF, &reference)) ||
+            (func != D3DCMP_GREATER && func != D3DCMP_GREATEREQUAL) ||
+            reference > 255u)
+            return false;
+        output.alphaTest = true;
+        output.alphaFunc = static_cast<D3DCMPFUNC>(func);
+        output.alphaRef = reference;
+    }
     DWORD op=0, arg=0, nextColorOp=0;
     // A later fixed-function texture stage can still change the result even
     // when stage 0 selects DIFFUSE. Reject it rather than mislabel an altered
@@ -406,7 +470,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
 
 bool submit(State& s, const std::vector<NativeVertex>& vertices,
             const std::uint32_t* indices, UINT indexCount,
-            const TextureCapture& capture) noexcept {
+            const TextureCapture& capture, const OutputCapture& output) noexcept {
     if (!ensure_pipeline(s)) return false;
     auto* dev = s.backend.device();
     auto* ctx = s.backend.context();
@@ -431,7 +495,18 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         if (FAILED(dev->CreateBuffer(&bd, &initial, ib.GetAddressOf()))) return false;
     }
 
+    // Pixel shader alpha test and OM alpha blend are bound to this same
+    // source draw; unsupported D3D9 combinations were rejected above.
+    const float alphaParams[4] = {
+        output.alphaTest ? 1.0f : 0.0f,
+        static_cast<float>(output.alphaRef),
+        static_cast<float>(output.alphaFunc), 0.0f
+    };
+    ctx->UpdateSubresource(s.alphaConstants.Get(), 0, nullptr, alphaParams, 0, 0);
     s.backend.begin_frame(kBackground);
+    ctx->OMSetBlendState(output.alphaBlend ? s.alphaBlend.Get() : nullptr, nullptr, 0xffffffffu);
+    ID3D11Buffer* alphaBuffer = s.alphaConstants.Get();
+    ctx->PSSetConstantBuffers(0, 1, &alphaBuffer);
     const UINT stride = sizeof(NativeVertex), offset = 0;
     ID3D11Buffer* boundVB = vb.Get();
     ctx->IASetInputLayout(s.layout.Get());
@@ -468,7 +543,8 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         bool pretransformed = true;
         std::array<D3DMATRIX, 3> transforms{};
         TextureCapture capture{};
-        if (!supported_game_state(game, vp, pretransformed, transforms, capture)) return;
+        OutputCapture output{};
+        if (!supported_game_state(game, vp, pretransformed, transforms, capture, output)) return;
         // Count every admitted state, including calls after this frame's one
         // native draw. Use that bounded population to rotate the next frame's
         // probe rather than sampling its same first triangle indefinitely.
@@ -488,7 +564,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 if (indices[i] >= vertexCount) return;
         }
         s.attempted = true;
-        if (!submit(s, vertices, indices, indexCount, capture)) ++s.failed;
+        if (!submit(s, vertices, indices, indexCount, capture, output)) ++s.failed;
     } catch (...) {
         // Never interrupt the game's real draw or input on diagnostic failure.
     }
@@ -610,7 +686,7 @@ void before_game_reset() noexcept {
     s.attempted = false;
     s.eligibleThisFrame = 0;
     s.probeSlot = 0;
-    s.staging.Reset(); s.raster.Reset(); s.layout.Reset();
+    s.staging.Reset(); s.raster.Reset(); s.layout.Reset(); s.alphaBlend.Reset(); s.alphaConstants.Reset();
     s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.vs.Reset();
     s.backend.shutdown();
 }

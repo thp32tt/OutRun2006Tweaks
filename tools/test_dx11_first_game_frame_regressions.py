@@ -369,7 +369,7 @@ def main() -> None:
     assert "xyz[2] * w" in bridge and "v.clip[3] = w;" in bridge
     assert "float2 uv : TEXCOORD0" in bridge
     assert "gameTexture.Sample(gameSampler, v.uv) * v.diffuse" in bridge
-    assert "float4 PSTextureOnly(VOut v) : SV_Target { return gameTexture.Sample(gameSampler, v.uv); }" in bridge
+    assert "float4 PSTextureOnly(VOut v) : SV_Target { float4 c = gameTexture.Sample(gameSampler, v.uv); AlphaGate(c.a); return c; }" in bridge
     assert '!compile("PSTextureOnly", "ps_4_0", textureOnlyCode)' in bridge
     assert "s.textureOnlyPs.Reset();" in bridge
     assert "if (!capture.enabled && (op != D3DTOP_SELECTARG1 || arg != D3DTA_DIFFUSE))" in bridge
@@ -387,7 +387,86 @@ def main() -> None:
                     or (color_op == SELECTARG1 and alpha_op == SELECTARG1))
         assert admitted == supported
 
-    print("DX11 live game diagnostic TEX1 select/modulate, mip0 mirror, draw/fallback regression PASS (static only)")
+
+    # Menu/race sprite alpha is now an actual D3D9-state -> PS/OM pipeline
+    # integration. These destructive source mutations reject accidental native
+    # admission of unsupported blending or an omitted alpha clip/bind.
+    def alpha_path_complete(code: str) -> bool:
+        state = code[code.find("bool supported_game_state("):
+                     code.find("bool translate_vertices(")]
+        pipeline = code[code.find("bool ensure_pipeline("):
+                        code.find("bool supported_game_state(")]
+        submit = code[code.find("bool submit("):
+                      code.find("void observe(")]
+        shader = code[code.find("constexpr char kShader[]"):
+                      code.find(')";', code.find("constexpr char kShader[]"))]
+        return (all(x in state for x in (
+            "GetRenderState(D3DRS_ALPHABLENDENABLE, &blend)",
+            "GetRenderState(D3DRS_ALPHATESTENABLE, &alpha)",
+            "GetRenderState(D3DRS_SRCBLEND, &src)",
+            "GetRenderState(D3DRS_DESTBLEND, &dst)",
+            "GetRenderState(D3DRS_BLENDOP, &blendOp)",
+            "GetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, &separate)",
+            "src != D3DBLEND_SRCALPHA || dst != D3DBLEND_INVSRCALPHA",
+            "blendOp != D3DBLENDOP_ADD || separate",
+            "GetRenderState(D3DRS_ALPHAFUNC, &func)",
+            "GetRenderState(D3DRS_ALPHAREF, &reference)",
+            "(func != D3DCMP_GREATER && func != D3DCMP_GREATEREQUAL)",
+            "reference > 255u",
+            "output.alphaBlend = true;", "output.alphaTest = true;",
+        )) and all(x in pipeline for x in (
+            "target.BlendEnable = TRUE;",
+            "target.SrcBlend = D3D11_BLEND_SRC_ALPHA;",
+            "target.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;",
+            "target.SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;",
+            "target.DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;",
+            "dev->CreateBlendState(&blend, s.alphaBlend.GetAddressOf())",
+            "dev->CreateBuffer(&constants, nullptr, s.alphaConstants.GetAddressOf())",
+        )) and all(x in submit for x in (
+            "ctx->UpdateSubresource(s.alphaConstants.Get(), 0, nullptr, alphaParams, 0, 0)",
+            "ctx->OMSetBlendState(output.alphaBlend ? s.alphaBlend.Get() : nullptr",
+            "ctx->PSSetConstantBuffers(0, 1, &alphaBuffer)",
+        )) and all(x in shader for x in (
+            "cbuffer AlphaParams : register(b0)",
+            "floor(saturate(alpha) * 255.0f + 0.5f)",
+            "alphaParams.z == 5.0f && value > alphaParams.y",
+            "alphaParams.z == 7.0f && value >= alphaParams.y",
+            "clip(pass ? 1.0f : -1.0f)",
+            "AlphaGate(c.a);",
+        )))
+
+    assert alpha_path_complete(bridge)
+    for original, broken in (
+        ("src != D3DBLEND_SRCALPHA || dst != D3DBLEND_INVSRCALPHA",
+         "src != D3DBLEND_SRCALPHA && dst != D3DBLEND_INVSRCALPHA"),
+        ("blendOp != D3DBLENDOP_ADD || separate",
+         "blendOp != D3DBLENDOP_ADD && separate"),
+        ("(func != D3DCMP_GREATER && func != D3DCMP_GREATEREQUAL)",
+         "(func != D3DCMP_GREATER || func != D3DCMP_GREATEREQUAL)"),
+        ("reference > 255u", "reference > 256u"),
+        ("target.SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;",
+         "target.SrcBlendAlpha = D3D11_BLEND_ONE;"),
+        ("ctx->PSSetConstantBuffers(0, 1, &alphaBuffer)",
+         "/* unbound alpha constants */"),
+        ("ctx->OMSetBlendState(output.alphaBlend ? s.alphaBlend.Get() : nullptr",
+         "ctx->OMSetBlendState(nullptr"),
+        ("clip(pass ? 1.0f : -1.0f)", "/* alpha test omitted */"),
+    ):
+        changed = bridge.replace(original, broken, 1)
+        assert changed != bridge and not alpha_path_complete(changed), (
+            "alpha sprite source->D3D11 integration mutation escaped: " + original
+        )
+    # D3D9 compare is on an 8-bit alpha after texturing. Test boundaries for
+    # both admitted funcs; no GPU color or menu parity claimed here.
+    def passes(alpha_byte: int, ref: int, func: int) -> bool:
+        return (func == 5 and alpha_byte > ref) or (
+            func == 7 and alpha_byte >= ref)
+    assert not passes(127, 128, 5)
+    assert passes(129, 128, 5)
+    assert not passes(127, 128, 7)
+    assert passes(128, 128, 7)
+
+    print("DX11 live game diagnostic TEX1, alpha blend/test, draw/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":
