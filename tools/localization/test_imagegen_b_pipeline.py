@@ -160,5 +160,92 @@ class TestBImageGen(unittest.TestCase):
             self.assertTrue(p2.exists())
 
 
+
+class TestBC3ImageGenBridge(unittest.TestCase):
+    """Synthetic pixels exercise real DXT5 on-disk bytes, not ImageGen provenance."""
+
+    @staticmethod
+    def blank_dds():
+        h=bytearray(128)
+        h[:4]=b"DDS "
+        struct.pack_into("<I",h,4,124)
+        struct.pack_into("<I",h,8,0x0002100F)
+        struct.pack_into("<II",h,12,64,64)
+        struct.pack_into("<I",h,20,4096)
+        struct.pack_into("<I",h,28,1)
+        struct.pack_into("<I",h,76,32)
+        struct.pack_into("<I",h,80,4)
+        h[84:88]=b"DXT5"
+        struct.pack_into("<I",h,108,0x1000)
+        return bytes(h)+b._bc3_block(np.zeros((4,4,4),np.uint8))*256
+
+    def test_bc3_touched_blocks_only(self):
+        original=self.blank_dds()
+        rgba=b.dds_rgba_read(original)
+        rgba[16:24,16:32]=[250,175,50,255]
+        new=b.dds_rgba_encode(original,rgba)
+        self.assertEqual(new[:128],original[:128])
+        self.assertEqual(len(new),len(original))
+        self.assertEqual(b.dds_format(new),(64,64,"BC3_DXT5"))
+        self.assertGreater(int(b.dds_rgba_read(new)[16:24,16:32,3].sum()),0)
+        changed=[i for i in range(256) if original[128+i*16:144+i*16]!=new[128+i*16:144+i*16]]
+        self.assertEqual(len(changed),8)
+        for i in changed:
+            bx,by=i%16,i//16
+            self.assertTrue(4<=bx<8 and 4<=by<6)
+
+    def test_bc3_full_pipeline_b_and_c1_unapproved(self):
+        for role,index in (("B",60),("C1",102)):
+            with self.subTest(role=role),tempfile.TemporaryDirectory() as tmp:
+                root=Path(tmp)
+                req=root/f"localization/graphics/role_{role}/imagegen_requests"
+                req.mkdir(parents=True)
+                original=b.dds_rgba_read(self.blank_dds())
+                original[16:24,16:32]=[255,130,30,255]
+                canonical=b.dds_rgba_encode(self.blank_dds(),original)
+                S=b.dds_rgba_read(canonical)
+                clean=S.copy();clean[16:24,16:32]=0
+                mask=np.zeros((64,64),np.uint8)
+                mask[16:24,16:32]=255
+                generated=np.zeros((24,80,4),np.uint8)
+                generated[5:19,5:75]=[255,200,50,255]
+                src=root/"source.dds";src.write_bytes(canonical)
+                c=root/"clean.png";Image.fromarray(clean,"RGBA").save(c)
+                m=root/"removal.png";Image.fromarray(mask,"L").save(m)
+                g=req/"synthetic.png";Image.fromarray(generated,"RGBA").save(g)
+                r=root/"C2_review.json"
+                def ref(p):return {"path":str(p.relative_to(root)),"sha256":b.digest(p.read_bytes())}
+                r.write_text(json.dumps({"status":"PLATE_PASS","reviewer":"C2",
+                    "source_sha256":ref(src)["sha256"],"clean_sha256":ref(c)["sha256"],
+                    "removal_sha256":ref(m)["sha256"]}))
+                mf={"schema":b.SCHEMA if role=="B" else b.C1_SCHEMA,"role":role,
+                    "queue_index":index,"target_text":"합성 시험","generator":{
+                    "provider":"chatgpt-image-generator","generation_id":"TEST-ONLY-NO-REAL-IMAGEGEN",
+                    "prompt":"SYNTHETIC FIXTURE ONLY"},
+                    "source":ref(src),"official":ref(src),"clean":ref(c),
+                    "removal_mask":ref(m),"generated":ref(g),
+                    "plate_review":{"status":"PLATE_PASS","ref":ref(r)},
+                    "source_bbox":[8,8,40,32],"placement_bbox":[12,12,36,28],
+                    "replace_roi":[8,8,40,32],"output_dir":
+                    f"localization/graphics/role_{role}/imagegen_trials/unit-bc3"}
+                manifest=req/"synthetic.json";manifest.write_text(json.dumps(mf))
+                stats=b.run(root,manifest)
+                self.assertEqual(stats["dds_format"],"BC3_DXT5")
+                self.assertEqual(stats["saved_protected_pixels_changed"],0)
+                self.assertEqual(stats["saved_outside_roi_pixels_changed"],0)
+                self.assertEqual(stats["official_promoted"],0)
+                self.assertEqual(stats["C2"],"NOT_RUN")
+                f=root/mf["output_dir"]/f"{role}_IMAGEGEN_{index:03d}_UNAPPROVED.dds"
+                self.assertEqual(b.digest(f.read_bytes()),stats["saved_trial_sha256"])
+                self.assertEqual(canonical[:128],f.read_bytes()[:128])
+                self.assertEqual(b.dds_format(f.read_bytes())[2],"BC3_DXT5")
+
+    def test_unsupported_bc3_mips_rejected(self):
+        d=self.blank_dds()+b"extra"
+        with self.assertRaisesRegex(ValueError,"payload"):
+            b.dds_rgba_read(d)
+
+
+
 if __name__=="__main__":
     unittest.main()
