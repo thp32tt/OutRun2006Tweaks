@@ -18,6 +18,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
+          filter: blob:none
+          sparse-checkout: |
+            localization/graphics/asset_queue.csv
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load
+          sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
