@@ -9,6 +9,10 @@
 #include <WinSock2.h>
 #include <fstream>
 #include <wincrypt.h>
+#include "vr/ipc/host_state_v3_reader.hpp"
+#include "vr/ipc/xr_eye_extent.hpp"
+
+namespace OutRunVR { void RequestVRHostStartup() noexcept; }
 
 namespace Settings
 {
@@ -49,6 +53,9 @@ namespace Settings
     extern Setting<bool> VREnabled;
     extern Setting<int> VRRenderWidth;
     extern Setting<int> VRRenderHeight;
+    extern Setting<bool> VRAutoRenderResolution;
+    extern Setting<bool> VRPreferD3D9Ex;
+    extern Setting<bool> VRAutoLaunchHost;
 }
 
 class ProtectLoginData : public Hook
@@ -808,6 +815,67 @@ public:
 };
 RestoreJPClarissa RestoreJPClarissa::instance;
 
+namespace
+{
+    void ApplyVrEyeResolutionAfterConfig(bool commandLineResolution) noexcept
+    {
+        if (!Settings::VREnabled)
+            return;
+        const int manualW = Settings::VRRenderWidth;
+        const int manualH = Settings::VRRenderHeight;
+        const bool manualRequested = manualW > 0 || manualH > 0;
+        if (commandLineResolution)
+            return; // Explicit -width/-height always wins.
+        if (manualRequested)
+        {
+            if (manualW >= 640 && manualH >= 480 &&
+                static_cast<std::int64_t>(manualW) * manualH <= 16777216LL)
+            {
+                Game::screen_resolution->x = manualW;
+                Game::screen_resolution->y = manualH;
+                spdlog::info("VR EYE RESOLUTION: manual {}x{} after game config", manualW, manualH);
+            }
+            return; // Invalid manual values do not silently activate auto.
+        }
+        if (!Settings::VRAutoRenderResolution || !Settings::VRPreferD3D9Ex)
+            return;
+
+        // The 64-bit OpenXR host is the sole runtime resolution authority.
+        // Launch it before waiting, independent of hook registration order.
+        OutRunVR::RequestVRHostStartup();
+        OutRunVR::IpcV3::HostStateReader reader;
+        OutRunVR::IpcV3::HostState host{};
+        const bool executablePresent =
+            std::filesystem::exists(Module::ExePath.parent_path() / "outrun-vr-host.exe");
+        const DWORD deadline = GetTickCount() + (executablePresent ? 5000u : 0u);
+        do
+        {
+            if (reader.Read(host) && host.hostPid != 0 &&
+                (host.flags & OutRunVR::IpcV3::HostAlive) != 0)
+            {
+                const auto extent = OutRunVR::EyeExtent::ResolveStartup(
+                    {host.recommendedWidth[0], host.recommendedHeight[0]},
+                    {host.recommendedWidth[1], host.recommendedHeight[1]});
+                if (OutRunVR::EyeExtent::Valid(extent))
+                {
+                    Game::screen_resolution->x = static_cast<int>(extent.width);
+                    Game::screen_resolution->y = static_cast<int>(extent.height);
+                    *Game::D3DWindowed = 1;
+                    spdlog::info("VR EYE RESOLUTION: VDXR/OpenXR allocated eye {}x{}, PC mirror independent",
+                        extent.width, extent.height);
+                    return;
+                }
+            }
+            if (!executablePresent || static_cast<std::int32_t>(GetTickCount() - deadline) >= 0)
+                break;
+            Sleep(50);
+        } while (true);
+        spdlog::warn(
+            "VR EYE RESOLUTION: host extent unavailable/invalid before D3D9 creation; keeping game {}x{} (no unsafe late resize)",
+            Game::screen_resolution->x, Game::screen_resolution->y);
+    }
+}
+
 class CommandLineArguments : public Hook
 {
 	const static int Win32_CfgRead_Addr = 0xE4D0;
@@ -822,16 +890,26 @@ class CommandLineArguments : public Hook
 		int argc;
 		LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
 		if (!argv)
+        {
+            ApplyVrEyeResolutionAfterConfig(false);
 			return;
+        }
 
+        bool hasCommandLineResolution = false;
 		for (int i = 1; i < argc; ++i)
 		{
 			try
 			{
 				if (!wcsicmp(argv[i], L"-width") && i + 1 < argc)
-					Game::screen_resolution->x = std::stol(argv[++i], 0, 0);
+                {
+                    Game::screen_resolution->x = std::stol(argv[++i], 0, 0);
+                    hasCommandLineResolution = true;
+                }
 				else if (!wcsicmp(argv[i], L"-height") && i + 1 < argc)
-					Game::screen_resolution->y = std::stol(argv[++i], 0, 0);
+                {
+                    Game::screen_resolution->y = std::stol(argv[++i], 0, 0);
+                    hasCommandLineResolution = true;
+                }
 				else if ((!wcsicmp(argv[i], L"-antialiasing") || !wcsicmp(argv[i], L"-aa")) && i + 1 < argc)
 					*Game::D3DAntialiasing = std::stol(argv[++i], 0, 0); // TODO: clamp to valid AA options
 				else if (!wcsicmp(argv[i], L"-window") || !wcsicmp(argv[i], L"-windowed") || !wcsicmp(argv[i], L"-w"))
@@ -847,6 +925,7 @@ class CommandLineArguments : public Hook
 		}
 
 		LocalFree(argv);
+        ApplyVrEyeResolutionAfterConfig(hasCommandLineResolution);
 	}
 
 public:

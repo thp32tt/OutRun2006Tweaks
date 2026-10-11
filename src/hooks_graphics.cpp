@@ -23,6 +23,7 @@ namespace Settings
 	extern Setting<bool> VRStereo;
 	extern Setting<bool> VRTelemetry;
 	extern Setting<bool> VRMirrorFitDesktop;
+    extern Setting<bool> VRAutoRenderResolution;
 	extern Setting<int> VRRenderWidth;
 	extern Setting<int> VRRenderHeight;
 	extern Setting<bool> VRDisableDesktopVsync;
@@ -1630,7 +1631,7 @@ class WindowedBorderless : public Hook
             static_cast<std::int64_t>(static_cast<int>(Settings::VRRenderWidth)) *
                 static_cast<int>(Settings::VRRenderHeight) <= 16777216LL;
         if (Settings::VREnabled &&
-            (Settings::VRMirrorFitDesktop || vrInternalOverride))
+            (Settings::VRMirrorFitDesktop || vrInternalOverride || Settings::VRAutoRenderResolution))
 		{
 			MONITORINFO monitorInfo{};
 			monitorInfo.cbSize = sizeof(monitorInfo);

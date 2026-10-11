@@ -5,6 +5,7 @@
 
 #include <filesystem>
 #include <string>
+#include <atomic>
 
 #include <spdlog/spdlog.h>
 
@@ -30,6 +31,9 @@ namespace Settings
 		"Automatically applies renderer-side tracking whenever outrun-vr-host.exe is supplying a valid pose." };
 	Setting<bool> VRAutoLaunchHost{ "VR", "AutoLaunchHost", true,
 		"Starts outrun-vr-host.exe from the game directory when VR is enabled. A short retry window also covers fast game restarts where the previous host is still shutting down." };
+    Setting<bool> VRAutoRenderResolution{ "VR", "AutoRenderResolution", true,
+        "At launch, match the actual VDXR/OpenXR allocated per-eye render extent (not desktop or 2x eye width). "
+        "Manual RenderWidth/RenderHeight take precedence; when host startup fails, use existing game resolution." };
 	// Optional explicit internal render resolution independent of the PC monitor.
     // Auto (0/0) retains the original desktop-sized behavior. The x64 host
     // starts later than GameDefaultConfigOverride, so do NOT mistake a desktop
@@ -213,6 +217,24 @@ namespace OutRunVR
 		}
 	}
 
+    void RequestVRHostStartup() noexcept
+    {
+        if (!Settings::VREnabled || !Settings::VRAutoLaunchHost)
+            return;
+        static std::atomic<bool> queued{false};
+        bool expected = false;
+        if (!queued.compare_exchange_strong(expected, true))
+            return;
+        HANDLE thread = CreateThread(nullptr, 0, VRAutoLaunchHostThread, nullptr, 0, nullptr);
+        if (thread)
+            CloseHandle(thread);
+        else
+        {
+            queued.store(false);
+            spdlog::warn("VR AUTO HOST: failed to create startup helper thread error={}", GetLastError());
+        }
+    }
+
 	class VRSettingsHook : public Hook
 	{
 	public:
@@ -221,6 +243,7 @@ namespace OutRunVR
 		void declare_settings() override
 		{
 			Settings::VRAutoLaunchHost.needs_restart();
+            Settings::VRAutoRenderResolution.needs_restart();
 			Settings::VRMirrorFitDesktop.needs_restart();
 			Settings::VRDisableDesktopVsync.needs_restart();
 			Settings::VRPreferD3D9Ex.needs_restart();
@@ -243,14 +266,7 @@ namespace OutRunVR
 				Settings::VRFrameCadenceMode.get(),
 				Settings::VRFrameCadenceTargetHz.get(),
 				Settings::VRFrameCadenceMaxHz.get());
-			if (Settings::VREnabled && Settings::VRAutoLaunchHost)
-			{
-				HANDLE thread = CreateThread(nullptr, 0, VRAutoLaunchHostThread, nullptr, 0, nullptr);
-				if (thread)
-					CloseHandle(thread);
-				else
-					spdlog::warn("VR AUTO HOST: failed to create startup helper thread error={}", GetLastError());
-			}
+            RequestVRHostStartup();
 			return true;
 		}
 

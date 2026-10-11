@@ -43,6 +43,18 @@ namespace OutRunVR::EyeExtent
             return {};
         return published;
     }
+    inline Size ResolveStartup(Size left, Size right) noexcept
+    {
+        // Game D3D9Ex uses one per-eye target, never two widths side by side.
+        // Host already publishes its allocated common swapchain extent.
+        // If host generations disagree, refuse to resize the game at startup.
+        if (!Valid(left) || !Equal(left, right) ||
+            left.width < 640u || left.height < 480u ||
+            left.width > 8192u || left.height > 8192u ||
+            static_cast<std::uint64_t>(left.width) * left.height > 16777216ull)
+            return {};
+        return left;
+    }
     class Generation
     {
         Size active_{};
