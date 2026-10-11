@@ -2063,6 +2063,22 @@ namespace OutRunVRStereo
                 !std::isfinite(depthSpan) || depthSpan <= 1.0e-6f)
                 return false;
 
+            // The base-projection shape and XY determinant are invariant for
+            // this draw (and for both eyes). Particle-heavy scenes used to
+            // recompute all five guards and the determinant per vertex.
+            // Preserve the inverse-projection fallback on unusual matrices.
+            const D3DMATRIX& rhwBase = state.baseProjection;
+            const float rhwDet =
+                rhwBase._11 * rhwBase._22 - rhwBase._21 * rhwBase._12;
+            const bool rhwPerspectiveFastPath =
+                state.worldEffect && state.fullWorldReprojection &&
+                allowFullReprojection &&
+                std::fabs(rhwBase._14) <= 1.0e-5f &&
+                std::fabs(rhwBase._24) <= 1.0e-5f &&
+                std::fabs(rhwBase._34) > 1.0e-5f &&
+                std::isfinite(rhwDet) &&
+                std::fabs(rhwDet) > 1.0e-6f;
+
             auto selected = [&](UINT i) noexcept
             {
                 return !usedMask || (*usedMask)[i] != 0;
@@ -2128,10 +2144,8 @@ namespace OutRunVRStereo
                     // This avoids depending on the particle's biased/clamped
                     // screen Z, which is exactly what caused smoke/decal draws
                     // to fall back to the approximate affine path.
-                    const D3DMATRIX& bp = state.baseProjection;
-                    if (std::fabs(bp._14) <= 1.0e-5f &&
-                        std::fabs(bp._24) <= 1.0e-5f &&
-                        std::fabs(bp._34) > 1.0e-5f)
+                    const D3DMATRIX& bp = rhwBase;
+                    if (rhwPerspectiveFastPath)
                     {
                         const float viewZ =
                             (clipW - bp._44) / bp._34;
@@ -2139,20 +2153,16 @@ namespace OutRunVRStereo
                             clipX - viewZ * bp._31 - bp._41;
                         const float rhsY =
                             clipY - viewZ * bp._32 - bp._42;
-                        const float det =
-                            bp._11 * bp._22 - bp._21 * bp._12;
                         if (std::isfinite(viewZ) &&
                             std::isfinite(rhsX) &&
-                            std::isfinite(rhsY) &&
-                            std::isfinite(det) &&
-                            std::fabs(det) > 1.0e-6f)
+                            std::isfinite(rhsY))
                         {
                             const float viewX =
                                 (rhsX * bp._22 -
-                                 bp._21 * rhsY) / det;
+                                 bp._21 * rhsY) / rhwDet;
                             const float viewY =
                                 (bp._11 * rhsY -
-                                 rhsX * bp._12) / det;
+                                 rhsX * bp._12) / rhwDet;
                             if (std::isfinite(viewX) &&
                                 std::isfinite(viewY))
                             {
