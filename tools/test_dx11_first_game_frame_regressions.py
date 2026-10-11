@@ -225,6 +225,81 @@ def main() -> None:
         assert mutated != bridge and not safe_inset_copy(mutated), (
             "inset copy safety negative control did not detect " + vulnerable
         )
+    # New live D3D9 object-space path: do not require pretransformed
+    # XYZRHW for every game-authored triangle. All unlit XYZ+DIFFUSE
+    # positions must pass through the actual World/View/Projection state.
+    # This is source/CPU math verification, not a game or GPU claim.
+    def object_space_draw_safe(code: str) -> bool:
+        state = code[code.find("bool supported_game_state("):
+                     code.find("bool translate_vertices(")]
+        vertices = code[code.find("bool translate_vertices("):
+                        code.find("bool submit(")]
+        observe = code[code.find("void observe("):
+                       code.find("} // namespace", code.find("void observe("))]
+        required_state = (
+            "D3DFVF_XYZRHW | D3DFVF_DIFFUSE",
+            "D3DFVF_XYZ | D3DFVF_DIFFUSE",
+            "GetRenderState(D3DRS_CLIPPLANEENABLE, &clipPlanes)",
+            "GetRenderState(D3DRS_LIGHTING, &lighting)",
+            "GetRenderState(D3DRS_VERTEXBLEND, &vertexBlend)",
+            "lighting || vertexBlend != D3DVBF_DISABLE",
+            "GetTransform(D3DTS_WORLD, &transforms[0])",
+            "GetTransform(D3DTS_VIEW, &transforms[1])",
+            "GetTransform(D3DTS_PROJECTION, &transforms[2])",
+        )
+        required_vertices = (
+            "const UINT diffuseOffset = pretransformed ? 16u : 12u;",
+            "stride < diffuseOffset + 4u",
+            "std::memcpy(xyz, data, diffuseOffset)",
+            "std::memcpy(&diffuse, data + diffuseOffset",
+            "next[col] += clip[row] * matrix.m[row][col];",
+            "clip[3] <= 0.0f",
+            "std::copy(clip.begin(), clip.end(), v.clip);",
+        )
+        return (all(x in state for x in required_state)
+                and all(x in vertices for x in required_vertices)
+                and "supported_game_state(game, vp, pretransformed, transforms)" in observe
+                and "pretransformed, transforms, vertices)" in observe)
+
+    assert object_space_draw_safe(bridge)
+    for good, bad in (
+        ("D3DFVF_XYZ | D3DFVF_DIFFUSE",
+         "D3DFVF_XYZRHW | D3DFVF_DIFFUSE"),
+        ("GetTransform(D3DTS_WORLD, &transforms[0])",
+         "GetTransform(D3DTS_VIEW, &transforms[0])"),
+        ("lighting || vertexBlend != D3DVBF_DISABLE",
+         "lighting && vertexBlend != D3DVBF_DISABLE"),
+        ("next[col] += clip[row] * matrix.m[row][col];",
+         "next[col] += clip[row] * matrix.m[col][row];"),
+        ("stride < diffuseOffset + 4u", "stride < 20u"),
+        ("clip[3] <= 0.0f", "clip[3] < 0.0f"),
+    ):
+        changed = bridge.replace(good, bad, 1)
+        assert changed != bridge and not object_space_draw_safe(changed), (
+            "object-space native geometry negative mutation escaped: " + good
+        )
+    # Observe both buffer and UP input families: a 16-byte XYZ+DIFFUSE
+    # source cannot be captured behind an old 20-byte-only stride gate.
+    for path in RENDERERS:
+        source = path.read_text(encoding="utf-8")
+        start = source.find("void R30ObserveNativeLinearVB(")
+        end = source.find("HRESULT __stdcall DrawPrimitiveDestR30(", start)
+        assert start >= 0 and end > start
+        observed = source[start:end]
+        assert observed.count("stride < 16") == 3
+        assert "stride < 20" not in observed
+        invalid = observed.replace("stride < 16", "stride < 20", 1)
+        assert invalid != observed and invalid.count("stride < 16") != 3
+    # Row-vector WVP order: object (1,2,3), translated by (5,7,11),
+    # then scaled by (2,3,4) gives (12,27,56,1).
+    vector = [1.0, 2.0, 3.0, 1.0]
+    translation = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[5,7,11,1]]
+    scale = [[2,0,0,0],[0,3,0,0],[0,0,4,0],[0,0,0,1]]
+    for matrix in (translation, [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]], scale):
+        vector = [sum(vector[row]*matrix[row][col] for row in range(4))
+                  for col in range(4)]
+    assert vector == [12.0, 27.0, 56.0, 1.0]
+
     print("DX11 live game diagnostic sampling/lifetime/fallback/inset regression PASS (static only)")
 
 
