@@ -50,6 +50,7 @@
       "total": 243
     },
     "graphics_localization": {
+      "c1_q102_imagegen_actual_wrong_text_hold_20261011": {"role":"C1","queue_index":102,"attempts":2,"generator":"chatgpt-image-generator","generation_ids":["a1a79e5c-a472-41a1-88cd-c30a29af9057","485a19e8-779a-46b5-a325-c0a98708b760"],"method":"REAL_IMAGEGEN_ATTEMPT","producer_status":"FAIL_WRONG_TEXT","png_saved_locally_only":2,"png_published":0,"new_dds":0,"official_changed":0,"C2":"NOT_RUN_ON_NEW_BYTES","C3":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED","report":"localization/graphics/role_C1/imagegen_requests/q102_20261011_1710_IMAGEGEN_HOLD.json","prior_current_rework":"C2_DETACHED_WHITE_FRAGMENT_REWORK","date_kst":"2026-10-11 17:19 KST"},
       "b366_q176_source_original_digit_manual_vector_saved_20261011": {
         "run_key": "OUTRUN-KOR-B366-Q176-SOURCE-NUMERAL-MANUAL-VECTOR-20261011-0930",
         "role": "B",
