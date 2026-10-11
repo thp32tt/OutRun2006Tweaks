@@ -1,3 +1,9 @@
+## 2026-10-12 C1 q102 real English source-only PNG 2 — ImageGen media input HOLD
+
+- New actual canonical glyph reference RGBA PNG inputs: role_C1/source_references/q102_20261012/LINE1 SHA256 affc027f5d9dd73b5a095cbd59f28945ba8aa999bb2f8d22e6f8a148483fcc7d (50,688 bytes), LINE2 SHA256 b14e85c8ba5e51d2efc37102269c28332799d1a61e291780550a9bb30fc39045 (55,780 bytes); 24px transparent border, original visible pixel mismatch 0/0, remote SHA verified.
+- SOURCE_REFERENCE_NOT_BOUND: actual attached ImageGen English crop not verified, **do not call**. Real Korean generated PNG 0, new DDS 0, official 0; C2 clean PLATE_PASS remains previous and full C2 HOLD, C3 NOT_RUN, game RUNTIME_VALIDATION=UNTESTED. Prior candidate unchanged.
+- Manifest: `localization/graphics/role_C1/source_references/q102_20261012/q102_C1_SOURCE_MEDIA_PREFLIGHT.json`; A/B ownership and completed C3 assets preserved.
+
 ## 2026-10-12 03:40 KST — C1 q102 source attachment blocked; deterministic guard tested
 
 - SOURCE_REFERENCE_NOT_BOUND (no verified actual ImageGen English PNG attachment): generator not called, new Korean PNG 0, trial DDS 0, official DDS 0. Canonical English source and C2 PLATE_PASS already exist; older q102 trial SHA 88f90ce751c3... not regenerated.
