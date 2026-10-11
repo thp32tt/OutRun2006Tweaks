@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 11:57 KST",
+  "updated_at_kst": "2026-10-11 12:07 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -644,6 +644,20 @@
         "QA": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_CONTROLLER_SLANT_QA.json",
         "machine": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_Q101_SOURCE_SLANT_MACHINE.json",
         "figure": "localization/graphics/role_A/20261010-A227-Q101-FIRSTGLYPH-SOURCE-SLANT/A227_Q101_FIRSTGLYPH_SOURCE_SLOPE.png"
+      },
+      "c2_20261011_q060_b368_independent_saved_rework": {
+        "run_key": "OUTRUN-KOR-C2-Q060-B368-FIRST-SAVED-SOURCE-FAMILY-20261011-1205",
+        "queue_index": 60,
+        "role": "C2",
+        "candidate_sha256": "11e081c7f3c12bd13cf100995ec533ce78a557ac97eb1135ff84fc1e0a2d5a6b",
+        "original_source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+        "official_unchanged_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+        "proof": "localization/graphics/role_C/20261011-C2-Q060-B368-INDEPENDENT-NATIVE-1205/C2_Q060_B368_INDEPENDENT_REWORK.json",
+        "decision": "REWORK_REQUIRED_UNPROMOTED",
+        "official_promoted_dds": 0,
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "IGR044": "OPEN"
       }
     },
     "runtime_text_trace": {

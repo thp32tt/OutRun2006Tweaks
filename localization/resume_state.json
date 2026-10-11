@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "2026-10-11 12:07 KST C2 q060 B368 NEW SHA 11e081c7f3c1 independent native+RAW+100/75/50 optical REWORK; official C342 REWORK/IGR044 OPEN retained; localization/graphics/role_C/20261011-C2-Q060-B368-INDEPENDENT-NATIVE-1205/C2_Q060_B368_INDEPENDENT_REWORK.json; no C3/game/approval. RUN_KEY=OUTRUN-KOR-C2-Q060-B368-FIRST-SAVED-SOURCE-FAMILY-20261011-1205",
     "C1 2026-10-11 q161 A237 R11 first new saved SHA source-family native optical REWORK, official unchanged, C3 NOT_RUN, game UNTESTED; localization/graphics/role_C/20261011-C1-Q161-A237-FIRST-INDEPENDENT-SAVED-NATIVE/C1_Q161_A237_INDEPENDENT_C1_VISUAL_REWORK.json",
     "B368 EVEN q060 manual Hangul vector DDS SHA11e081c7 distinct 33,004 alpha pixels from rejected B367; producer native100/75/50 RAW FAIL source thick beveled racing family despite mechanical zero and C372 CLEAN reuse. Official C342 REWORK and IGR044 OPEN. Do not repeat B360/B367/B368 same thin/flat geometry/palette. Next source-authored condensed weight and beveled contours, then fully qualified producer saved DDS, independent C2/C3 and NEW user in-game retest. RUN_KEY=OUTRUN-KOR-B368-Q060-MANUAL-SOURCE-GLYPH-GEOMETRY-20261011-1130",
     "C1 ODD q111 fully verified original 17-region DDS/CLEAN persisted 4 lower original-source residue/protected-art FAIL; repair source-clean and re-render A161 new SHA, then C1/C3/game. C1_Q111_INDEPENDENT_FULL17_VISUAL_REWORK.json",
