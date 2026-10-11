@@ -362,7 +362,9 @@ def main() -> None:
             "capture.additive = additive;",
             "coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb",
             "capture.coordIndex = coordIndex;",
-            "min != mag || mip != D3DTEXF_NONE",
+            "(min != D3DTEXF_POINT && min != D3DTEXF_LINEAR)",
+            "(mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR)",
+            "mip != D3DTEXF_NONE",
             "nextColorOp != D3DTOP_DISABLE",
         )) and all(x in mirror for x in (
             "if (info.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
@@ -1448,6 +1450,72 @@ def main() -> None:
         allowed = not msaa and matching_size and matching_format and source_rt
         assert allowed is expected
     print("DX11 live DEFAULT render-target texture to native Draw regression PASS (static only)")
+
+
+    # 00561: Live menu/vehicle/race D3D9 stage-0 MIN/MAG independent
+    # point/linear filters now reach an exact D3D11 MIP_POINT sampler,
+    # then the existing real-game SRV/PS/Draw/visible diagnostic inset.
+    # Runtime visuals, gamepad and Quest3 have not been exercised here.
+    def mixed_filter_draw_connected(code: str) -> bool:
+        admission = code[code.find("bool supported_game_state("):code.find("bool translate_vertices(")]
+        mirror = code[code.find("bool mirror_texture("):code.find("bool submit(")]
+        submit = code[code.find("bool submit("):code.find("void observe(")]
+        return all(token in admission for token in (
+            "GetSamplerState(0, D3DSAMP_MAGFILTER, &mag)",
+            "GetSamplerState(0, D3DSAMP_MINFILTER, &min)",
+            "(min != D3DTEXF_POINT && min != D3DTEXF_LINEAR)",
+            "(mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR)",
+            "mip != D3DTEXF_NONE",
+            "capture.minFilter = static_cast<D3DTEXTUREFILTERTYPE>(min);",
+            "capture.magFilter = static_cast<D3DTEXTUREFILTERTYPE>(mag);",
+        )) and all(token in mirror for token in (
+            "state.Filter = capture.minFilter == D3DTEXF_LINEAR ?",
+            "(capture.magFilter == D3DTEXF_LINEAR ?",
+            "D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT :",
+            "D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT) :",
+            "D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :",
+            "D3D11_FILTER_MIN_MAG_MIP_POINT);",
+            "state.MinLOD = 0.0f;",
+            "state.MaxLOD = 0.0f;",
+            "dev->CreateSamplerState(&state, sampler.GetAddressOf())",
+        )) and all(token in submit for token in (
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
+            "ctx->PSSetSamplers(0, 1, &boundSampler)",
+            "ctx->PSSetShaderResources(0, 1, &boundView)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+        ))
+    assert mixed_filter_draw_connected(bridge)
+    for token in (
+        "GetSamplerState(0, D3DSAMP_MINFILTER, &min)",
+        "capture.minFilter = static_cast<D3DTEXTUREFILTERTYPE>(min);",
+        "capture.magFilter = static_cast<D3DTEXTUREFILTERTYPE>(mag);",
+        "D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT) :",
+        "D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :",
+        "state.MinLOD = 0.0f;",
+        "ctx->PSSetSamplers(0, 1, &boundSampler)",
+    ):
+        broken = bridge.replace(token, "/* disconnected 00561 filter link */", 1)
+        assert broken != bridge and not mixed_filter_draw_connected(broken), token
+    # Reference D3D11_FILTER mapping for all four supported D3D9 pairs;
+    # unsupported anisotropic filters and mip sampling still fail closed.
+    mip_point_map = {
+        ("POINT", "POINT"): "MIN_MAG_MIP_POINT",
+        ("POINT", "LINEAR"): "MIN_POINT_MAG_LINEAR_MIP_POINT",
+        ("LINEAR", "POINT"): "MIN_LINEAR_MAG_MIP_POINT",
+        ("LINEAR", "LINEAR"): "MIN_MAG_LINEAR_MIP_POINT",
+    }
+    for min_filter in ("POINT", "LINEAR", "ANISOTROPIC"):
+        for mag_filter in ("POINT", "LINEAR", "ANISOTROPIC"):
+            for mip_filter in ("NONE", "POINT", "LINEAR"):
+                allowed = min_filter in ("POINT", "LINEAR") and mag_filter in (
+                    "POINT", "LINEAR") and mip_filter == "NONE"
+                assert allowed == ((min_filter, mag_filter) in mip_point_map
+                                   and mip_filter == "NONE")
+                if allowed:
+                    native = mip_point_map[min_filter, mag_filter]
+                    assert ("D3D11_FILTER_" + native) in bridge
+    print("DX11 game MIN/MAG mixed filtering -> native sampler/Draw PASS (static only)")
 
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")

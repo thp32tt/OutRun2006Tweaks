@@ -134,7 +134,8 @@ struct TextureCapture {
     Microsoft::WRL::ComPtr<IDirect3DTexture9> texture;
     D3DTEXTUREADDRESS addressU = D3DTADDRESS_CLAMP;
     D3DTEXTUREADDRESS addressV = D3DTADDRESS_CLAMP;
-    D3DTEXTUREFILTERTYPE filter = D3DTEXF_POINT;
+    D3DTEXTUREFILTERTYPE minFilter = D3DTEXF_POINT;
+    D3DTEXTUREFILTERTYPE magFilter = D3DTEXF_POINT;
 };
 
 struct OutputCapture {
@@ -550,11 +551,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             (addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP) ||
             (addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP) ||
             (mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR) ||
-            min != mag || mip != D3DTEXF_NONE)
+            (min != D3DTEXF_POINT && min != D3DTEXF_LINEAR) ||
+            mip != D3DTEXF_NONE)
             return false;
         capture.addressU = static_cast<D3DTEXTUREADDRESS>(addressU);
         capture.addressV = static_cast<D3DTEXTUREADDRESS>(addressV);
-        capture.filter = static_cast<D3DTEXTUREFILTERTYPE>(mag);
+        capture.minFilter = static_cast<D3DTEXTUREFILTERTYPE>(min);
+        capture.magFilter = static_cast<D3DTEXTUREFILTERTYPE>(mag);
         capture.selectTexture = selectTexture;
         capture.additive = additive;
         capture.subtract = subtract;
@@ -788,8 +791,16 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             SUCCEEDED(dev->CreateShaderResourceView(texture.Get(), nullptr,
                                                    view.GetAddressOf()))) {
             D3D11_SAMPLER_DESC state{};
-            state.Filter = capture.filter == D3DTEXF_LINEAR ?
-                D3D11_FILTER_MIN_MAG_MIP_LINEAR : D3D11_FILTER_MIN_MAG_MIP_POINT;
+            // D3D9 permits independent MIN and MAG point/linear filters.
+            // MIPFILTER=NONE fixes LOD to level 0, so only MIP_POINT modes
+            // are exact; do not collapse mixed source filters to one mode.
+            state.Filter = capture.minFilter == D3DTEXF_LINEAR ?
+                (capture.magFilter == D3DTEXF_LINEAR ?
+                    D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT :
+                    D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT) :
+                (capture.magFilter == D3DTEXF_LINEAR ?
+                    D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :
+                    D3D11_FILTER_MIN_MAG_MIP_POINT);
             state.AddressU = capture.addressU == D3DTADDRESS_WRAP ?
                 D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
             state.AddressV = capture.addressV == D3DTADDRESS_WRAP ?
