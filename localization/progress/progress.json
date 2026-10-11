@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 15:15 KST",
+  "updated_at_kst": "2026-10-11 15:25 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -906,6 +906,61 @@
         "game": "UNTESTED",
         "RUNTIME_VALIDATION": "UNTESTED",
         "evidence": "localization/graphics/role_C/20261011-C1-Q101-A226-AUTHENTICATED-OPTICAL-REWORK/C1_Q101_A226_SOURCE_AUTHENTICATED_OPTICAL_REWORK.json"
+      },
+      "latest_a240_q121_native_spline_pressure_20261011": {
+        "run_key": "OUTRUN-KOR-A240-Q121-P0-CURVED-PRESSURE-STROKES-20261011-1500",
+        "role": "A",
+        "queue_index": 121,
+        "priority": "P0",
+        "method": "fontless source-conditioned cubic Catmull-Rom native hand vector spline with per-point varying pressure; separated face/rim/extrusion via compose_lettering",
+        "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+        "official_unchanged_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+        "prior_rejected_sha256": "e31117743295950fad5216a428b0c105fff35bfeeb0709da85f9f96f8151544a",
+        "new_saved_unpromoted_sha256": "4be07b63e3bc1bee32d5f5192e95c24f9e709512c03e7074e679a93551cd6936",
+        "active_dds_new_trial_count": 1,
+        "official_promoted_count": 0,
+        "format": "RGBA32 mip1 RAW Y mirror",
+        "native": [
+          4096,
+          4096
+        ],
+        "source_roi": [
+          3490,
+          391,
+          3722,
+          440
+        ],
+        "new_saved_raw_effect_local": [
+          8,
+          4,
+          229,
+          48
+        ],
+        "margins": [
+          8,
+          4,
+          3,
+          1
+        ],
+        "changed_native_rgba_vs_prior": 5797,
+        "alpha_shape_xor_vs_prior": 738,
+        "saved_rgba_changed_vs_official_inside": 9630,
+        "changed_outside": 0,
+        "other_29_cells_byte_exact": true,
+        "source_nearwhite_proxy": 3504,
+        "new_manual_face_opaque": 3386,
+        "roundtrip_mismatch": 0,
+        "native100_white75_black50_raw_first_hand_visual": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY_OPTICAL",
+        "C2": "NOT_RUN_NEW_A240_SHA",
+        "C3": "BLOCKED",
+        "ingame_issues": [
+          "IGR-030",
+          "IGR-031",
+          "IGR-040"
+        ],
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "worker_run_id": 38117535326,
+        "qa_path": "localization/graphics/role_A/20261011-A240-Q121-SPLINE-PRESSURE-LETTERING/A240_CONTROLLER_SAVED_DDS_VISUAL_QA.json"
       }
     },
     "runtime_text_trace": {
