@@ -14146,5 +14146,25 @@
     "C3": "BLOCKED",
     "RUNTIME_VALIDATION": "UNTESTED",
     "evidence": "localization/graphics/role_C/20261012-C2-Q092-PSD-REFERENCE-FIRST-INDEPENDENT/C2_Q092_PSD_REFERENCE_FIRST_INDEPENDENT_QA.json"
+  },
+  "c2_20261012_q089_a251_new_chroma_first_independent": {
+    "run_key": "OUTRUN-C2-20261012-Q089-A251-NEW-CHROMA-FIRST-INDEPENDENT",
+    "role": "C2",
+    "queue_index": 89,
+    "candidate_sha256": "fb7a3c66a7fdc2aa1e175cb3d36fa3df5e288ca0200db2045824391c6a83d6b2",
+    "new_candidate_SHA_first_C2_independent": true,
+    "result": "C2_SCOPED_STATIC_PASS_CHROMA_PLATE_PROTECTED_ONLY",
+    "full_C2": "HOLD_PREVIOUS_C3_DIMENSIONAL_BEVEL_REWORK",
+    "source_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+    "clean_sha256": "0d3f46b6719366d5b337491117c585274b1e4d9d7fdc2a00cbc2c42b002437cd",
+    "source_clean_changed_rgba": 233748,
+    "clean_final_changed_rgba": 183204,
+    "prior_to_new_changed_rgba": 104749,
+    "changed_outside_original_effect_bbox": 0,
+    "new_korean_dds_by_C2": 0,
+    "official_promoted": 0,
+    "C3": "NOT_RUN_NEW_SHA",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "report": "localization/graphics/role_C/20261012-C2-Q089-A251-FIRST-INDEPENDENT/C2_Q089_A251_FIRST_INDEPENDENT_QA.json"
   }
 }
