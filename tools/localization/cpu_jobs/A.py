@@ -76,7 +76,7 @@ from PIL import ImageFont
 FONT_PATH=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc")
 assert FONT_PATH.is_file()
 FONT_SHA=sha(FONT_PATH.read_bytes())
-font=ImageFont.truetype(str(FONT_PATH),43*AA,index=1)
+font=ImageFont.truetype(str(FONT_PATH),41*AA,index=1)
 canvas=Image.new("L",(320*AA,80*AA),0)
 draw=ImageDraw.Draw(canvas)
 offset=0.
@@ -144,7 +144,7 @@ geomrecipe=writej("A242_GEOMETRY_RECIPE.json",{
  "top_minus_bottom_edited_manual_stroke_dx_per_y":0.32,
  "source_C1_white_pixels_proxy":3504,"source_C1_dark_pixels_proxy":1518,
  "trial_near_opaque_face_pixels":face_count,"local_face_bbox":list(box),"source_exact_colon_recovered":True,"font_sha256":FONT_SHA,
- "font_sha256":FONT_SHA,"font_path":str(FONT_PATH),"font_index":1,"font_size_native":43,"tracking_native":4,"optical_right_lean":0.22,"source_colon":True,"rim":"native morphology",
+ "font_sha256":FONT_SHA,"font_path":str(FONT_PATH),"font_index":1,"font_size_native":41,"tracking_native":4,"optical_right_lean":0.22,"source_colon":True,"rim":"native morphology",
  "extrusion":"native 1px lower offset separate",
  "RUNTIME_VALIDATION":"UNTESTED"})
 geomreview=writej("A242_GEOMETRY_REVIEW.json",{
@@ -205,11 +205,11 @@ assert outside==0
 assert int(np.count_nonzero(real[:,:,3]>0))>0
 # Punctuation guard from the ACTUAL decoded persisted DDS, not pre-save PNG.
 colon_crop=np.asarray(target.getchannel("A"),dtype=np.uint8)
-colon_top=int(np.count_nonzero(colon_crop[13:23,212:225]>220))
-colon_low=int(np.count_nonzero(colon_crop[30:41,208:223]>220))
+colon_top=int(np.count_nonzero(colon_crop[17:24,201:217]>220))
+colon_low=int(np.count_nonzero(colon_crop[33:41,198:214]>220))
 assert colon_top>=7 and colon_low>=7,("saved Korean punctuation missing",colon_top,colon_low)
 # Blank separating row proves two actual independent dots, not a stray line.
-assert int(np.count_nonzero(colon_crop[26:30,212:230]>220))==0,"colon dot overlap"
+assert int(np.count_nonzero(colon_crop[26:31,201:220]>220))==0,"colon dot overlap"
 
 # Non-text plate pixels outside ROI must remain untouched.
 for bgname,col in [("GRAY",(100,100,100)),("BLACK",(0,0,0)),("WHITE",(255,255,255))]:
