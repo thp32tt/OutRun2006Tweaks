@@ -67,6 +67,8 @@ struct OutputCapture {
     bool alphaTest = false;
     DWORD alphaRef = 0;
     D3DCMPFUNC alphaFunc = D3DCMP_ALWAYS;
+    bool scissor = false;
+    D3D11_RECT nativeScissor{};
 };
 
 struct State {
@@ -78,6 +80,7 @@ struct State {
     ComPtr<ID3D11PixelShader> textureOnlyPs;
     ComPtr<ID3D11InputLayout> layout;
     ComPtr<ID3D11RasterizerState> raster;
+    ComPtr<ID3D11RasterizerState> scissorRaster;
     ComPtr<ID3D11BlendState> alphaBlend;
     ComPtr<ID3D11Buffer> alphaConstants;
     ComPtr<ID3D11Texture2D> staging;
@@ -110,10 +113,10 @@ bool compile(const char* entry, const char* profile, ComPtr<ID3DBlob>& blob) noe
 }
 
 bool ensure_pipeline(State& s) noexcept {
-    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.layout && s.raster && s.alphaBlend && s.alphaConstants && s.staging)
+    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.layout && s.raster && s.scissorRaster && s.alphaBlend && s.alphaConstants && s.staging)
         return true;
     s.backend.shutdown();
-    s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.layout.Reset(); s.raster.Reset(); s.alphaBlend.Reset(); s.alphaConstants.Reset(); s.staging.Reset();
+    s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.layout.Reset(); s.raster.Reset(); s.scissorRaster.Reset(); s.alphaBlend.Reset(); s.alphaConstants.Reset(); s.staging.Reset();
     NativeBackendConfig cfg{};
     cfg.width = kWidth;
     cfg.height = kHeight;
@@ -150,6 +153,11 @@ bool ensure_pipeline(State& s) noexcept {
     raster.CullMode = D3D11_CULL_NONE;
     raster.DepthClipEnable = TRUE;
     if (FAILED(dev->CreateRasterizerState(&raster, s.raster.GetAddressOf())))
+        return false;
+    // Source D3D9 SCISSORTESTENABLE is a rasterization operation, not a
+    // texture-stage effect. A separate RS state preserves the uncut path.
+    raster.ScissorEnable = TRUE;
+    if (FAILED(dev->CreateRasterizerState(&raster, s.scissorRaster.GetAddressOf())))
         return false;
     // Narrow D3D9 SRCALPHA/INVSRCALPHA/ADD, with the same factors
     // for destination alpha. This is a diagnostic target, not the game RT.
@@ -225,8 +233,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
     // which the original D3D9 color-write mask, cull or fill state discards.
     // Keep this first native slice conservative instead of falsely reporting
     // game-visible parity. Unsupported states retain the original DX9Ex draw.
-    // The native diffuse shader does not implement D3D9 fog or scissor
-    // clipping. Reject those states rather than showing a false color match.
+    // The native diffuse shader does not implement D3D9 fog. Scissoring is
+    // mirrored via RSSetScissorRects after clipping to the source viewport.
     if (FAILED(game->GetRenderState(D3DRS_ALPHABLENDENABLE, &blend)) ||
         FAILED(game->GetRenderState(D3DRS_ALPHATESTENABLE, &alpha)) ||
         FAILED(game->GetRenderState(D3DRS_STENCILENABLE, &stencil)) ||
@@ -237,11 +245,49 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cullMode)) ||
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fillMode)) ||
-        stencil || depth || !clip || fog || scissor ||
+        stencil || depth || !clip || fog ||
         colorMask != (D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
                       D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA) ||
         cullMode != D3DCULL_NONE || fillMode != D3DFILL_SOLID)
         return false;
+    if (scissor) {
+        RECT gameScissor{};
+        if (FAILED(game->GetScissorRect(&gameScissor)) ||
+            gameScissor.right <= gameScissor.left ||
+            gameScissor.bottom <= gameScissor.top)
+            return false;
+        // D3D9 scissor is in source render-target pixel coordinates; native
+        // vertices are remapped from source viewport to the 256x144 inset.
+        // Intersect in signed 64-bit space so viewport X+Width cannot wrap.
+        const std::int64_t left = (std::max)(
+            static_cast<std::int64_t>(gameScissor.left),
+            static_cast<std::int64_t>(viewport.X));
+        const std::int64_t top = (std::max)(
+            static_cast<std::int64_t>(gameScissor.top),
+            static_cast<std::int64_t>(viewport.Y));
+        const std::int64_t right = (std::min)(
+            static_cast<std::int64_t>(gameScissor.right),
+            static_cast<std::int64_t>(viewport.X) + viewport.Width);
+        const std::int64_t bottom = (std::min)(
+            static_cast<std::int64_t>(gameScissor.bottom),
+            static_cast<std::int64_t>(viewport.Y) + viewport.Height);
+        if (right <= left || bottom <= top) return false;
+        // Clip inwards during diagnostic downsampling. A larger native
+        // rectangle would draw pixels the original source scissor excluded.
+        // This is conservative pixel sampling, not D3D9 screen parity proof.
+        const LONG nativeLeft = static_cast<LONG>(std::ceil(
+            static_cast<double>(left - viewport.X) * kWidth / viewport.Width));
+        const LONG nativeTop = static_cast<LONG>(std::ceil(
+            static_cast<double>(top - viewport.Y) * kHeight / viewport.Height));
+        const LONG nativeRight = static_cast<LONG>(std::floor(
+            static_cast<double>(right - viewport.X) * kWidth / viewport.Width));
+        const LONG nativeBottom = static_cast<LONG>(std::floor(
+            static_cast<double>(bottom - viewport.Y) * kHeight / viewport.Height));
+        if (nativeRight <= nativeLeft || nativeBottom <= nativeTop)
+            return false;
+        output.scissor = true;
+        output.nativeScissor = {nativeLeft, nativeTop, nativeRight, nativeBottom};
+    }
     // D3D9 sprite/menu draw states. Reject alternate blend factors,
     // separate alpha, or alpha compare functions before any native draw.
     if (blend) {
@@ -513,7 +559,11 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     ctx->IASetVertexBuffers(0, 1, &boundVB, &stride, &offset);
     if (ib) ctx->IASetIndexBuffer(ib.Get(), DXGI_FORMAT_R32_UINT, 0);
-    ctx->RSSetState(s.raster.Get());
+    const D3D11_RECT fullScissor{0, 0, static_cast<LONG>(kWidth),
+                                  static_cast<LONG>(kHeight)};
+    const D3D11_RECT& rect = output.scissor ? output.nativeScissor : fullScissor;
+    ctx->RSSetScissorRects(1, &rect);
+    ctx->RSSetState(output.scissor ? s.scissorRaster.Get() : s.raster.Get());
     ctx->VSSetShader(s.vs.Get(), nullptr, 0);
     ctx->PSSetShader(!capture.enabled ? s.ps.Get() :
                      (capture.selectTexture ? s.textureOnlyPs.Get() : s.sampledPs.Get()), nullptr, 0);
@@ -686,7 +736,7 @@ void before_game_reset() noexcept {
     s.attempted = false;
     s.eligibleThisFrame = 0;
     s.probeSlot = 0;
-    s.staging.Reset(); s.raster.Reset(); s.layout.Reset(); s.alphaBlend.Reset(); s.alphaConstants.Reset();
+    s.staging.Reset(); s.raster.Reset(); s.scissorRaster.Reset(); s.layout.Reset(); s.alphaBlend.Reset(); s.alphaConstants.Reset();
     s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.vs.Reset();
     s.backend.shutdown();
 }

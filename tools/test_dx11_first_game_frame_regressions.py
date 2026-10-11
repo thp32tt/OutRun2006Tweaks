@@ -97,7 +97,7 @@ def main() -> None:
 
     # Fixed-function modifiers (COMPLEMENT/ALPHAREPLICATE) change the
     # stage-0 color even when the SELECTMASK bits still equal DIFFUSE.
-    # Fog and scissor also cannot be reproduced by this narrow native shader.
+    # Fog stays unsupported; scissor is mapped in a separate native raster path.
     # Static negative controls are not live-device parity evidence.
     def exact_diffuse_state_gate(code: str) -> bool:
         start = code.find("bool supported_game_state(")
@@ -109,7 +109,7 @@ def main() -> None:
             "arg != D3DTA_DIFFUSE",
             "GetRenderState(D3DRS_FOGENABLE, &fog)",
             "GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
-            "|| fog || scissor",
+            "stencil || depth || !clip || fog ||",
         ))
 
     assert exact_diffuse_state_gate(bridge)
@@ -120,7 +120,8 @@ def main() -> None:
          "GetRenderState(D3DRS_FOGENABLE, &clip)"),
         ("GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
          "GetRenderState(D3DRS_SCISSORTESTENABLE, &clip)"),
-        ("|| fog || scissor", "|| fog"),
+        ("stencil || depth || !clip || fog ||",
+         "stencil || depth || !clip || scissor ||"),
     ):
         mutated = bridge.replace(bad, replacement, 1)
         assert mutated != bridge and not exact_diffuse_state_gate(mutated), (
@@ -466,7 +467,79 @@ def main() -> None:
     assert not passes(127, 128, 7)
     assert passes(128, 128, 7)
 
-    print("DX11 live game diagnostic TEX1, alpha blend/test, draw/fallback regression PASS (static only)")
+
+    # Actual D3D9 GetScissorRect -> signed viewport intersection ->
+    # conservative inset rectangle -> D3D11 RSSetScissorRects integration.
+    # This checks both the producer and the native consumer; source-only,
+    # never a claim of real GPU/menu/HMD clipping parity.
+    def live_scissor_path_complete(code: str) -> bool:
+        state = code[code.find("bool supported_game_state("):
+                     code.find("bool translate_vertices(")]
+        pipeline = code[code.find("bool ensure_pipeline("):
+                        code.find("bool supported_game_state(")]
+        submit = code[code.find("bool submit("):
+                      code.find("void observe(")]
+        return all(x in state for x in (
+            "GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
+            "if (scissor) {",
+            "GetScissorRect(&gameScissor)",
+            "gameScissor.right <= gameScissor.left",
+            "gameScissor.bottom <= gameScissor.top",
+            "static_cast<std::int64_t>(viewport.X) + viewport.Width",
+            "static_cast<std::int64_t>(viewport.Y) + viewport.Height",
+            "if (right <= left || bottom <= top) return false;",
+            "std::ceil(", "std::floor(",
+            "if (nativeRight <= nativeLeft || nativeBottom <= nativeTop)",
+            "output.scissor = true;",
+            "output.nativeScissor = {nativeLeft, nativeTop, nativeRight, nativeBottom};",
+        )) and all(x in pipeline for x in (
+            "raster.ScissorEnable = TRUE;",
+            "dev->CreateRasterizerState(&raster, s.scissorRaster.GetAddressOf())",
+        )) and all(x in submit for x in (
+            "const D3D11_RECT& rect = output.scissor ? output.nativeScissor : fullScissor;",
+            "ctx->RSSetScissorRects(1, &rect);",
+            "ctx->RSSetState(output.scissor ? s.scissorRaster.Get() : s.raster.Get());",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+        )) and "s.scissorRaster.Reset();" in code
+
+    assert live_scissor_path_complete(bridge)
+    for old, bad in (
+        ("GetScissorRect(&gameScissor)", "/* source scissor ignored */"),
+        ("gameScissor.right <= gameScissor.left", "gameScissor.right < gameScissor.left"),
+        ("static_cast<std::int64_t>(viewport.X) + viewport.Width", "viewport.X + viewport.Width"),
+        ("if (right <= left || bottom <= top) return false;", "/* out of bounds admitted */"),
+        ("std::ceil(", "std::floor("),
+        ("if (nativeRight <= nativeLeft || nativeBottom <= nativeTop)", "if (false)"),
+        ("raster.ScissorEnable = TRUE;", "raster.ScissorEnable = FALSE;"),
+        ("ctx->RSSetScissorRects(1, &rect);", "/* omitted native clipping */"),
+        ("output.scissor ? s.scissorRaster.Get() : s.raster.Get()", "s.raster.Get()"),
+    ):
+        broken = bridge.replace(old, bad, 1)
+        assert broken != bridge and not live_scissor_path_complete(broken), (
+            "live scissor integration mutation escaped: " + old
+        )
+    # Source viewport origin 100,50 and extent 800x600. An inset clip must
+    # never expand the source scissor when scaling down to 256x144.
+    from math import ceil, floor
+    def scale_clip(vp, rect):
+        x, y, width, height = vp
+        l, t, r, b = rect
+        l, t = max(l, x), max(t, y)
+        r, b = min(r, x + width), min(b, y + height)
+        if r <= l or b <= t:
+            return None
+        mapped = (ceil((l-x)*256/width), ceil((t-y)*144/height),
+                  floor((r-x)*256/width), floor((b-y)*144/height))
+        return mapped if mapped[2] > mapped[0] and mapped[3] > mapped[1] else None
+
+    assert scale_clip((100, 50, 800, 600), (200, 100, 600, 500)) == (32, 12, 160, 108)
+    assert scale_clip((100, 50, 800, 600), (0, 0, 1000, 1000)) == (0, 0, 256, 144)
+    assert scale_clip((100, 50, 800, 600), (0, 0, 99, 49)) is None
+    assert scale_clip((100, 50, 800, 600), (101, 51, 102, 52)) is None
+    assert scale_clip((100, 50, 800, 600), (500, 50, 400, 70)) is None
+
+    print("DX11 live game diagnostic TEX1/alpha/scissor Draw/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":
