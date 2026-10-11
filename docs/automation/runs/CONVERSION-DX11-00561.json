@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00561",
   "base_sha": "612a6bf3dffd63596de726a7e42df833ac9a063b",
   "work_key": "DX11:MENU_RACE_STAGE0_INDEPENDENT_MIN_MAG_FILTER_NATIVE_DRAW",
-  "status": "VALIDATION_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "native_gameplay_activation": false,
@@ -58,12 +58,73 @@
     "C0_RECOVER": "Read GitHub latest branch, AGENTS.md, DX11 policy, 00551-00560 work keys and last exact verified SHA",
     "C1_REVIEW": "Source D3D9 supports independently specified POINT/LINEAR MIN and MAG but diagnostic rejected min!=mag despite four exact D3D11 modes",
     "C2_IMPLEMENT": "Capture independent D3D9 min/mag and bind all four matching D3D11 MIP_POINT samplers; retain existing live game draw, SRV and fallback",
-    "C3_VALIDATE": "Source mutation and reference-pair checks authored; full GitHub exact SHA CI pending",
-    "C4_COMMIT": "Non-skip material change with C++ implementation and Python regression",
+    "C3_VALIDATE": "PASS_EXACT_SHA 76470ff58620d3654a6535a6a841d16dc851d1b0: Backend Conversion Gate #38164977498 SUCCESS (validate + readiness smoke); Win32 Release Build #38164982199 SUCCESS; DX11 Fast Structural #38164977407 SUCCESS; OpenXR #38164977400/#38164982217 SUCCESS; OutRun HUD Inspector #38164982221 SUCCESS; new D3D9 MIN/MAG source-to-Draw regression included in Build; hardware UNTESTED.",
+    "C4_COMMIT": "Non-skipped validation-bearing C++/regression/run material commit 76470ff58620d3654a6535a6a841d16dc851d1b0; separate C6 checkpoint bookkeeping after exact Gate success.",
     "C5_PACKAGE": "NOT_REQUIRED before real HMD/game visuals",
-    "C6_STATE": "Pending exact-SHA GitHub Actions. Do not claim BUILD_VERIFIED before CI success"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED, PASS_EXACT_SHA exact 76470ff58620d3654a6535a6a841d16dc851d1b0; source code implemented, game menu/race/Quest3/VDXR/gamepad NEED_HMD_TEST; original DX9Ex Draw/Present/input fallback preserved."
   },
-  "runtime_evidence": "No Quest3/VDXR/game menu/vehicle/race/gamepad testing",
-  "next_action": "Inspect mandatory GitHub CI on validation-bearing material SHA; C6 separate bookkeeping only after exact success; Quest3/VDXR remains NEED_HMD_TEST",
-  "feature_status": "SOURCE_IMPLEMENTED_NEED_CI_AND_HMD_TEST"
+  "runtime_evidence": "No physical Quest3/VDXR, game menu/vehicle/race visual or controller evidence; no runtime success claim.",
+  "next_action": "C6 closed; do not rerun/rescore this TASK_ID. Controller should allocate next independent remaining DX11 game draw/input feature; hardware Quest3/VDXR/gamepad NEED_HMD_TEST.",
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "validation_bearing_result_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+  "material_result_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+  "result_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+  "state_persisted": true,
+  "feature_contract": {
+    "scope": "Real game D3D9 MIN/MAG independent POINT/LINEAR sampler pairs -> native D3D11 exact MIP_POINT SRV/PS/Draw/DrawIndexed diagnostic inset",
+    "source_material_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+    "validation_bearing_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+    "runtime_acceptance": "Quest3/VDXR menu/vehicle/race/gamepad NEED_HMD_TEST"
+  },
+  "acceptance_results": {
+    "source_and_negative_regression": "Independent MIN/MAG four pair exact mapping and source-to-sampler/Draw destructive mutations; out-of-scope filters/mip fail closed",
+    "backend_conversion_gate": "SUCCESS",
+    "build": "SUCCESS",
+    "openxr_vr_architecture": "SUCCESS",
+    "dx11_fast_structural": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "exact_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+    "runtime_validation": "UNTESTED"
+  },
+  "validation_evidence": {
+    "exact_sha": "76470ff58620d3654a6535a6a841d16dc851d1b0",
+    "github_actions": [
+      {
+        "run_id": 38164977498,
+        "name": "Backend Conversion Gate",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38164982199,
+        "name": "Build",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38164977407,
+        "name": "DX11 Fast Structural Checks",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38164977400,
+        "name": "OpenXR VR architecture",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38164982217,
+        "name": "OpenXR VR architecture",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38164982221,
+        "name": "OutRun EXE HUD Inspector CI",
+        "status": "SUCCESS"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  }
 }
