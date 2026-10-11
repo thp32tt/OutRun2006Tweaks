@@ -16,7 +16,7 @@
     "5658d5ed6115163ffc415fe80420d4a7f0b86aed"
   ],
   "feature_status": "DONE_BUILD_VERIFIED",
-  "checkpoint": "C6_RESULT",
+  "checkpoint": "C6_STATE",
   "status": "COMPLETE_BUILD_VERIFIED",
   "controller_terminal": true,
   "automation_validation": "PASS_EXACT_SHA",
