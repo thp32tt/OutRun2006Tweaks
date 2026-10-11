@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 12:46 KST",
+  "updated_at_kst": "2026-10-11 12:47 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -12888,5 +12888,31 @@
     "source": "SHA authenticated native persisted DDS with C1 six cells first visual review",
     "numeric": "6/6 candidate bbox within canonical source but six visual source-family failures",
     "cleanup": "only task scratch after verified remote publish"
+  },
+  "c1_20261011_q121_a238_first_independent_italic_rework": {
+    "run_key": "OUTRUN-KOR-C1-Q121-A238-INDEPENDENT-MANUAL-ITALIC-20261011",
+    "queue_index": 121,
+    "shard": "ODD C1",
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "new_unpromoted_sha256": "78806f6df21a9f7c5a6d155db57c52221f22bad58dd3611c6d9778327b79e66a",
+    "result": "REWORK_REQUIRED_SOURCE_FAMILY_ITALIC_MORPHOLOGY",
+    "white_face_original": 3674,
+    "white_face_trial": 3551,
+    "protected_changed_outside_roi": 0,
+    "report": "localization/graphics/role_C/20261011-C1-Q121-A238-INDEPENDENT-ITALIC-OPTICAL/C1_Q121_A238_INDEPENDENT_QA.json",
+    "official_changed": false,
+    "plate": "DIAGNOSTIC_ROI_ONLY_NOT_PLATE_LIBRARY_PASS",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "unclosed_user": [
+      "IGR030",
+      "IGR031",
+      "IGR040"
+    ],
+    "producer_saved_dds": "MATERIAL_NEW_A238_TRIAL_ONLY",
+    "new_dds_by_C1": 0,
+    "new_C_PASS": 0,
+    "current_evidence_approval": 0,
+    "actual_game_approval": 0
   }
 }
