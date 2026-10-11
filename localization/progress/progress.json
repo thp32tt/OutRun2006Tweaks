@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 09:01 KST",
+  "updated_at_kst": "2026-10-11 09:20 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -12452,5 +12452,25 @@
     "C3": "NOT_RUN",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261011-C384-C2-Q236-B80-14ROW-INDEPENDENT-SOURCE-CLEAN/C384_Q236_C2_INDEPENDENT_14ROW_PLATE_QA.json"
+  },
+  "c385_c1_q035_a196_native_optical_rework": {
+    "queue_index": 35,
+    "shard": "C1_ODD",
+    "run_key": "OUTRUN-KOR-C1-Q035-A196-NATIVE-OPTICAL-REWORK-20261011",
+    "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+    "candidate_sha256": "cc8df5b4bd44d1251dd4703b109ec4e9c45e16cef62a9af53719215c78eb0254",
+    "result": "REWORK_REQUIRED",
+    "reason_codes": [
+      "SOURCE_FAMILY_ITALIC_STYLE_MISMATCH",
+      "SOURCE_FAMILY_WIDTH_HIERARCHY_UNDERFILL"
+    ],
+    "exact_source_clean_outside_legacy_bboxes": 14182,
+    "exact_clean_final_outside_legacy_bboxes": 0,
+    "visible_pngs": 14,
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "approved_dds": 0,
+    "candidate_unchanged": true,
+    "qa": "localization/graphics/role_C/20261011-C385-C1-Q035-A196-SOURCE-FAMILY-OPTICAL-REWORK/C385_Q035_INDEPENDENT_C1_REWORK.json"
   }
 }
