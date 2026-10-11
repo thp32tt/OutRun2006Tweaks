@@ -116,7 +116,12 @@ def negative_mono_aux_fastpath(src: str) -> None:
         ("return R32ReviewRunLowerFailClosed(device,",
          "return R32ReviewCallRawDrawPrimitive(device,"),
         ("R32ReviewDiscardUnreliableDrawCaches();", "/* removed */"),
-        ("R32ReviewNoteDispatchFallback();", "/* removed */"),
+        ("R32ReviewDiscardUnreliableDrawCaches();\n"
+         "                if (telemetry)\n"
+         "                    R32ReviewNoteDispatchFallback();",
+         "R32ReviewDiscardUnreliableDrawCaches();\n"
+         "                if (telemetry)\n"
+         "                    /* removed */"),
         ("if (!resyncAlreadyFlushed)\n                return fallbackToR29();",
          "if (!resyncAlreadyFlushed)\n                return actualDraw();"),
         ("return fallbackToR29();\n        }\n\n        HRESULT" ,
