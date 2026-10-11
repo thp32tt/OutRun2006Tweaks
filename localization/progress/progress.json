@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 22:11 KST",
+  "updated_at_kst": "2026-10-12 00:32 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -13783,5 +13783,33 @@
     ],
     "qa": "localization/graphics/role_A/20261012-A247-Q193-THREE-SOURCE-CLEAN-RECONSTRUCTION/A247_CONTROLLER_SCOPED_PLATE_VISUAL_QA.json",
     "run_key": "OUTRUN-KOR-A247-Q193-C2-THREE-MISSING-CLEAN-20261012-0000"
+  },
+  "c1_20261012_q102_real_imagegen_native_bc3": {
+    "role": "C1",
+    "queue_index": 102,
+    "run_key": "OUTRUN-KOR-C1-Q102-TWOLINE-IMAGEGEN-BC3-20261012-0010",
+    "started_at_kst": "2026-10-12 00:10 KST",
+    "produced_at_kst": "2026-10-12 00:32 KST",
+    "source_dds_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+    "official_unchanged_sha256": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db",
+    "independent_clean_plate": "C2_PLATE_PASS_ONLY_e0fa905a092182f703c3e5853e04d87b849d297cc0cf18ea8052fa5a71e23a57",
+    "generator_id_new": "c3300ff4-5247-4e03-916b-3adc873b15e3",
+    "generator_id_prior_reused": "95eed5de-0b71-4dee-8e4e-aa105a4b0b30",
+    "generated_derived_png_sha256": "f4b1ad98a1779dca5bc279479a2e3e772ba48f57038f52c763445fb911223a9e",
+    "saved_unapproved_trial_dds_sha256": "88f90ce751c33275d8eefaa4891688e025ba7400c8c624cb94afeeb407f3afed",
+    "codec": "BC3_DXT5",
+    "new_actual_generated_png_count": 1,
+    "new_saved_trial_dds_count": 1,
+    "official_promoted_dds_count": 0,
+    "protected_changed_outside_effect_bbox_pixels": 0,
+    "changed_outside_roi_pixels": 0,
+    "producer_self_qa": "SCOPED_NATIVE_VISUAL_AND_PIXEL_PASS_UNAPPROVED",
+    "generator_source_attachment": "UNVERIFIED",
+    "C2_final": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "user_game": "NOT_RUN",
+    "runtime_validation": "UNTESTED",
+    "material_commit": "d728c290d70d571e9d8ae7d0dc3e534294c1f4f3",
+    "evidence": "localization/graphics/role_C1/imagegen_trials/q102_C1_20261012_0010_2line/C1_Q102_PRODUCER_SELF_QA.json"
   }
 }
