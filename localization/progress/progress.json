@@ -12595,5 +12595,46 @@
     "USER_GAME": "UNTESTED",
     "RUNTIME_VALIDATION": "UNTESTED",
     "QA": "localization/graphics/role_C/20261011-C2-Q060-B360-SAVED-NATIVE-INDEPENDENT/C2_Q060_B360_INDEPENDENT_REWORK.json"
+  },
+  "b367_20261011_q060_saved_unpromoted_optical_rework": {
+    "run_key": "OUTRUN-KOR-B367-Q060-SMOOTH-SEPARATED-METAL-FIRST-SAVED-20261011-1030",
+    "role": "B",
+    "queue_index": 60,
+    "priority": "P0",
+    "regression": "IGR-044",
+    "backend": "GITHUB_ACTIONS_CPU_WORKER",
+    "workflow_run": 38102408802,
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+    "official_unchanged_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "new_unpromoted_trial_sha256": "52d97f845b7b3e588ebe5136cd299882001d509320fd4f8cc910270f314142d9",
+    "new_trial_dds": 1,
+    "official_promoted": 0,
+    "source_clean_removed_pixels": 89391,
+    "source_clean_residue_alpha": 0,
+    "source_clean_outside_rgba": 0,
+    "official_to_trial_changed_rgba": 93196,
+    "changed_outside_declared_roi": 0,
+    "persisted_roundtrip_mismatch": 0,
+    "source_bbox": [
+      2179,
+      340,
+      3028,
+      474
+    ],
+    "trial_bbox": [
+      2221,
+      342,
+      3024,
+      472
+    ],
+    "producer_verdict": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY_VISUAL_FAIL",
+    "why": "rejected B360 horizontal bands reduced; saved B367 flat/square Hangul still unlike canonical racing italic metallic source typography",
+    "next": "manual source-conditioned Hangul vector glyph contours and independent metallic layer modeling; no same-B360-geometry relight retry",
+    "C2": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "IGR044": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261011-B367-Q060-SOURCE-CONDITIONED-CONTINUOUS-METAL-PILOT/B367_CONTROLLER_NATIVE_VISUAL_QA.json"
   }
 }
