@@ -1910,6 +1910,67 @@ def main() -> None:
         assert (*rgb, tex[3])[3] != (*rgb, diffuse[3])[3]
     print("DX11 SUBTRACT mixed alpha native Draw PASS (static only)")
 
+
+    # 00567 retry: Actual game stage-0 SUBTRACT RGB and MODULATE alpha must
+    # propagate across state admission, HLSL, native Draw and visible inset.
+    def linked_subtract_modulate(code: str) -> bool:
+        intake = code[code.find("bool supported_game_state("):code.find("bool translate_vertices(")]
+        submit = code[code.find("bool submit("):code.find("void observe(")]
+        required = (
+            "const bool subtractModulateAlpha = op == D3DTOP_SUBTRACT && alphaOp == D3DTOP_MODULATE;",
+            "!subtractTextureAlpha && !subtractDiffuseAlpha && !subtractModulateAlpha &&",
+            "subtractTextureAlpha || subtractDiffuseAlpha || subtractModulateAlpha ||",
+            "addSmoothDiffuseAlpha || subtractDiffuseAlpha || subtractModulateAlpha ||",
+            "capture.subtractModulateAlpha = subtractModulateAlpha;",
+            "float4 PSTextureSubtractModulateAlpha(VOut v) : SV_Target {",
+            "float4 c = float4(saturate(t.rgb - v.diffuse.rgb), t.a * v.diffuse.a);",
+            'compile("PSTextureSubtractModulateAlpha", "ps_4_0", subtractModulateCode)',
+            "s.subtractModulateAlphaPs.GetAddressOf()",
+            "s.subtractModulateAlphaPs &&",
+            "capture.subtractModulateAlpha ? s.subtractModulateAlphaPs.Get() :",
+            "GetTextureStageState(0, D3DTSS_ALPHAARG1, &alphaArg1)",
+            "GetTextureStageState(0, D3DTSS_ALPHAARG2, &alphaArg2)",
+            "alphaArg1 != D3DTA_TEXTURE",
+            "alphaNeedsDiffuse && !alphaArg2Diffuse",
+        )
+        return (all(token in code for token in required) and
+                "ctx->PSSetShader(" in submit and
+                "ctx->DrawIndexed(indexCount, 0, 0);" in submit and
+                "ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in submit and
+                code.count("s.subtractModulateAlphaPs.Reset();") == 2 and
+                "alphaNeedsDiffuse && !alphaArg2Diffuse" in intake)
+    assert linked_subtract_modulate(bridge)
+    for token in (
+        "capture.subtractModulateAlpha = subtractModulateAlpha;",
+        "capture.subtractModulateAlpha ? s.subtractModulateAlphaPs.Get() :",
+        'compile("PSTextureSubtractModulateAlpha", "ps_4_0", subtractModulateCode)',
+        "float4 c = float4(saturate(t.rgb - v.diffuse.rgb), t.a * v.diffuse.a);",
+        "const bool subtractModulateAlpha = op == D3DTOP_SUBTRACT && alphaOp == D3DTOP_MODULATE;",
+        "addSmoothDiffuseAlpha || subtractDiffuseAlpha || subtractModulateAlpha ||",
+    ):
+        broken = bridge.replace(token, "/* 00567 modulate-alpha link removed */", 1)
+        assert broken != bridge and not linked_subtract_modulate(broken), token
+    # D3DTOP_SUBTRACT=10; MODULATE=4. Unsupported ALPHAARG inputs fail closed.
+    for color_op, alpha_op, a1, a2, admitted in (
+        (10, 4, "texture", "diffuse", True),
+        (10, 4, "texture", "current", True),
+        (10, 4, "diffuse", "texture", False),
+        (10, 4, "texture", "texture", False),
+        (10, 7, "texture", "diffuse", False),
+        (7, 4, "texture", "diffuse", False),
+    ):
+        assert ((color_op == 10 and alpha_op == 4 and
+                 a1 == "texture" and a2 in ("diffuse", "current")) is admitted)
+    for texture, diffuse in (
+        ((0.8, 0.1, 0.9, 0.5), (0.3, 0.7, 0.1, 0.8)),
+        ((0.2, 0.6, 0.1, 0.9), (0.5, 0.2, 0.9, 0.2)),
+    ):
+        rgb = tuple(max(0.0, t - d) for t, d in zip(texture[:3], diffuse[:3]))
+        alpha = texture[3] * diffuse[3]
+        assert all(0.0 <= component <= 1.0 for component in rgb)
+        assert 0.0 <= alpha <= 1.0 and alpha != texture[3] and alpha != diffuse[3]
+    print("DX11 SUBTRACT RGB/modulated alpha native Draw PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
