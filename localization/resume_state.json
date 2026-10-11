@@ -7050,7 +7050,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-11 12:47 KST",
+  "updated_at_kst": "2026-10-11 13:17 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -16190,5 +16190,28 @@
       "IGR031",
       "IGR040"
     ]
+  },
+  "c1_20261011_q089_c3_optical_reopen": {
+    "run_key": "OUTRUN-KOR-C1-Q089-C3-OPTICAL-CHROMA-20261011-1310",
+    "review_id": "C3-Q089-NEW-SOURCE-CHROMA-20261011",
+    "shard": "C1 ODD",
+    "queue_index": 89,
+    "source_sha256": "906a17ef9534bcb43d8296ae1d2ac339a53910f7113b954a52475368ab9b4175",
+    "candidate_sha256": "741a05cb632e85a4fea783e51bb2f98678c0510f8b34fc7a73cc39c898c0749c",
+    "prior_C3": "C268 historical PASS superseded for same saved candidate",
+    "result": "REWORK_REQUIRED_SOURCE_GRADIENT_PURPLE_BEVEL_AND_LETTERFACE",
+    "color_proxy": {
+      "saturated_orange_source": 14246,
+      "saturated_orange_final": 8,
+      "purple_source": 21075,
+      "purple_final": 4321
+    },
+    "source_clean_scope": "SOURCE→CLEAN and CLEAN→FINAL zero outside source bbox, CLEAN alpha0",
+    "new_dds": 0,
+    "new_C_PASS": 0,
+    "C3_STRICT_PASS": 0,
+    "game": "UNTESTED",
+    "runtime_validation": "UNTESTED",
+    "report": "localization/graphics/role_C/20261011-C1-Q089-C3-SOURCE-CHROMA-REOPEN/C1_Q089_C3_STRICT_REWORK.json"
   }
 }
