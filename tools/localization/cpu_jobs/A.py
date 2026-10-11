@@ -125,6 +125,11 @@ raw_mask=layer.resize((w,h),Image.Resampling.LANCZOS)
 expanded=raw_mask.filter(ImageFilter.MaxFilter(3))
 mask=Image.blend(raw_mask,expanded,0.30)
 outline=ImageChops.subtract(expanded,raw_mask)
+# High-resolution Lanczos introduces faint 1px ringing at native crop border.
+# Discard only that fringe, leaving at least 1px of source effect safety margin.
+for antialias in (mask,outline):
+ ImageDraw.Draw(antialias).line([(0,0),(w-1,0)],fill=0)
+ ImageDraw.Draw(antialias).line([(0,h-1),(w-1,h-1)],fill=0)
 rim=Image.new("RGBA",(w,h),(119,114,69,0))
 rim.putalpha(outline.point(lambda a:int(a*0.25)))
 face=Image.new("RGBA",(w,h),(143,137,84,0))
