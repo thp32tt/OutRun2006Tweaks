@@ -106,6 +106,27 @@ namespace OutRunVRStereo
         bool R30FirstXyzrhwBilateralFallbackLogged = false;
 
 
+        // Flat perspective screen-space effects reuse the same headset/base
+        // projection and head pose for many particle/overlay draws. The per-
+        // draw stock WVP is still unique, so cache only the independent geometry.
+        // Preserve the original matrix multiplication order (and its rounding).
+        struct R30FlatEffectGeometryCache
+        {
+            bool valid = false;
+            std::uint32_t poseSequence = 0;
+            float worldScale = 0.0f;
+            D3DMATRIX baseProjection{};
+            D3DMATRIX headInverse{};
+            decltype(OutRunVRRenderer::LatchedStereoFrame::eyeOrientation) eyeOrientation{};
+            decltype(OutRunVRRenderer::LatchedStereoFrame::eyeOffset) eyeOffset{};
+            decltype(OutRunVRRenderer::LatchedStereoFrame::eyeFov) eyeFov{};
+            D3DMATRIX inverseBaseProjection{};
+            D3DMATRIX eyeInverse[2]{};
+            D3DMATRIX eyeProjection[2]{};
+            float planeNdcZ = 0.0f;
+        };
+        thread_local R30FlatEffectGeometryCache R30FlatEffectGeometry{};
+
         // R30.6 CPU shadows for XYZRHW vertex/index buffers.
         //
         // The old VB/IB conversion path called Lock(READONLY) from inside Draw,
@@ -1178,6 +1199,7 @@ namespace OutRunVRStereo
         {
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
+            R30FlatEffectGeometry = {};
             return R30ResetR29Hook.stdcall<HRESULT>(device, params);
         }
 
@@ -2698,6 +2720,82 @@ namespace OutRunVRStereo
             return hr;
         }
 
+        // Called on every eligible FlatPerspectiveEffect draw. The cache key
+        // includes pose, full per-eye geometry, world scale/depth and both actual
+        // projection matrices, so a recenter or reset cannot reuse stale optics.
+        // A failed/NaN packet invalidates prior results rather than replaying them.
+        const R30FlatEffectGeometryCache* R30PrepareFlatEffectGeometry(
+            const OutRunVRRenderer::LatchedStereoFrame& stereo,
+            const D3DMATRIX& baseProjection,
+            const D3DMATRIX& headInverse) noexcept
+        {
+            auto& cache = R30FlatEffectGeometry;
+            const float worldScale =
+                Settings::VRWorldScale * Settings::VRStereoDepth;
+            if (cache.valid && cache.poseSequence == stereo.poseSequence &&
+                cache.worldScale == worldScale &&
+                std::memcmp(&cache.baseProjection, &baseProjection,
+                    sizeof(baseProjection)) == 0 &&
+                std::memcmp(&cache.headInverse, &headInverse,
+                    sizeof(headInverse)) == 0 &&
+                std::memcmp(cache.eyeOrientation, stereo.eyeOrientation,
+                    sizeof(stereo.eyeOrientation)) == 0 &&
+                std::memcmp(cache.eyeOffset, stereo.eyeOffset,
+                    sizeof(stereo.eyeOffset)) == 0 &&
+                std::memcmp(cache.eyeFov, stereo.eyeFov,
+                    sizeof(stereo.eyeFov)) == 0)
+                return &cache;
+
+            cache.valid = false;
+            if (!R29OwnerMatrixFinite(baseProjection) ||
+                !R29OwnerMatrixFinite(headInverse) ||
+                !std::isfinite(worldScale))
+                return nullptr;
+
+            R30FlatEffectGeometryCache next{};
+            next.poseSequence = stereo.poseSequence;
+            next.worldScale = worldScale;
+            next.baseProjection = baseProjection;
+            next.headInverse = headInverse;
+            std::memcpy(next.eyeOrientation, stereo.eyeOrientation,
+                sizeof(stereo.eyeOrientation));
+            std::memcpy(next.eyeOffset, stereo.eyeOffset,
+                sizeof(stereo.eyeOffset));
+            std::memcpy(next.eyeFov, stereo.eyeFov, sizeof(stereo.eyeFov));
+            if (!R29OwnerInvertMatrix(baseProjection, next.inverseBaseProjection))
+                return nullptr;
+
+            constexpr float OverlayPlaneViewZ = -2.50f;
+            const float planeClipW =
+                OverlayPlaneViewZ * baseProjection._34 + baseProjection._44;
+            const float planeClipZ =
+                OverlayPlaneViewZ * baseProjection._33 + baseProjection._43;
+            if (!std::isfinite(planeClipW) || !std::isfinite(planeClipZ) ||
+                planeClipW <= 1.0e-4f)
+                return nullptr;
+            next.planeNdcZ = planeClipZ / planeClipW;
+            if (!std::isfinite(next.planeNdcZ))
+                return nullptr;
+
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                const D3DMATRIX eyePose =
+                    R29OwnerMatrixFromQuaternionTranslation(
+                        stereo.eyeOrientation[eye], stereo.eyeOffset[eye],
+                        worldScale);
+                next.eyeInverse[eye] = R29OwnerInverseRigid(eyePose);
+                next.eyeProjection[eye] = R29OwnerProjectionFromFov(
+                    baseProjection, stereo.eyeFov[eye]);
+                if (!R29OwnerMatrixFinite(next.eyeInverse[eye]) ||
+                    !R29OwnerMatrixFinite(next.eyeProjection[eye]))
+                    return nullptr;
+            }
+
+            next.valid = true; // publish only after both eyes are valid
+            cache = next;
+            return &cache;
+        }
+
         bool R30BuildScreenSpaceEyeConstants(
             IDirect3DDevice9* device,
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
@@ -2728,72 +2826,41 @@ namespace OutRunVRStereo
                 float headRaw[16]{};
                 std::uint32_t headPoseSequence = 0;
                 D3DMATRIX baseProjection{};
-                D3DMATRIX inverseBaseProjection{};
                 D3DMATRIX headInverse{};
                 if (!OutRunVRRenderer::GetRendererBaseProjection(baseRaw) ||
                     !OutRunVRRenderer::GetLatchedHeadInverse(
                         headRaw, headPoseSequence) ||
                     headPoseSequence != stereo.poseSequence)
                     return false;
-                std::memcpy(&baseProjection, baseRaw,
-                    sizeof(baseProjection));
-                std::memcpy(&headInverse, headRaw,
-                    sizeof(headInverse));
-                if (!R29OwnerMatrixFinite(baseProjection) ||
-                    !R29OwnerMatrixFinite(headInverse) ||
-                    !R29OwnerInvertMatrix(baseProjection, inverseBaseProjection))
+                std::memcpy(&baseProjection, baseRaw, sizeof(baseProjection));
+                std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+                const auto* geometry = R30PrepareFlatEffectGeometry(
+                    stereo, baseProjection, headInverse);
+                if (!geometry)
                     return false;
 
-                // Turn a screen-space alpha overlay into a finite common view
-                // plane before applying the same head/eye transforms as world
-                // geometry. Keeping x/w and y/w while replacing z/w with a
-                // constant preserves the game's original 2D placement at
-                // recenter, but adds real IPD convergence and world locking.
-                constexpr float OverlayPlaneViewZ = -2.50f;
-                const float planeClipW =
-                    OverlayPlaneViewZ * baseProjection._34 +
-                    baseProjection._44;
-                const float planeClipZ =
-                    OverlayPlaneViewZ * baseProjection._33 +
-                    baseProjection._43;
-                if (!std::isfinite(planeClipW) ||
-                    !std::isfinite(planeClipZ) ||
-                    planeClipW <= 1.0e-4f)
-                    return false;
-                const float planeNdcZ = planeClipZ / planeClipW;
-                if (!std::isfinite(planeNdcZ))
-                    return false;
-
+                // Preserve the game's x/w, y/w and original multiply order.
+                // Only input-independent inverse, eye pose and FOV work move to
+                // cache misses; every draw still uses its own live stock WVP.
                 D3DMATRIX depthReset = R29OwnerIdentityMatrix();
                 depthReset._33 = 0.0f;
-                depthReset._43 = planeNdcZ;
+                depthReset._43 = geometry->planeNdcZ;
                 const D3DMATRIX commonViewPlane =
                     R29OwnerMultiplyMatrix(
                         R29OwnerMultiplyMatrix(stockWvp, depthReset),
-                        inverseBaseProjection);
+                        geometry->inverseBaseProjection);
                 if (!R29OwnerMatrixFinite(commonViewPlane))
                     return false;
 
                 for (int eye = 0; eye < 2; ++eye)
                 {
-                    const D3DMATRIX eyePose =
-                        R29OwnerMatrixFromQuaternionTranslation(
-                            stereo.eyeOrientation[eye],
-                            stereo.eyeOffset[eye],
-                            Settings::VRWorldScale *
-                                Settings::VRStereoDepth);
-                    const D3DMATRIX eyeInverse =
-                        R29OwnerInverseRigid(eyePose);
-                    const D3DMATRIX eyeProjection =
-                        R29OwnerProjectionFromFov(
-                            baseProjection, stereo.eyeFov[eye]);
                     const D3DMATRIX corrected =
                         R29OwnerMultiplyMatrix(
                             R29OwnerMultiplyMatrix(
                                 R29OwnerMultiplyMatrix(
                                     commonViewPlane, headInverse),
-                                eyeInverse),
-                            eyeProjection);
+                                geometry->eyeInverse[eye]),
+                            geometry->eyeProjection[eye]);
                     if (!R29OwnerMatrixFinite(corrected))
                         return false;
                     const D3DMATRIX correctedT =
@@ -2883,23 +2950,14 @@ namespace OutRunVRStereo
             }
 
             D3DVIEWPORT9 savedViewport{};
-            if (FAILED(device->GetViewport(&savedViewport)))
+            if (!R29OwnerTryGetTrackedViewport(savedViewport) &&
+                FAILED(device->GetViewport(&savedViewport)))
                 return E_NOTIMPL;
 
-            DWORD scissorEnabled = FALSE;
-            RECT savedScissor{};
-            const bool haveScissorState =
-                SUCCEEDED(device->GetRenderState(
-                    D3DRS_SCISSORTESTENABLE, &scissorEnabled));
-            const bool haveScissor =
-                haveScissorState && scissorEnabled != FALSE &&
-                SUCCEEDED(device->GetScissorRect(&savedScissor));
-            RECT eyeScissor[2]{};
-            // Runtime evidence on 7081b389 showed the per-eye scissor remap
-            // corrupts otherwise stable HUD placement. Keep the pre-regression
-            // common-centre HUD mapping until sprite-specific semantics are
-            // proven; never remap the game's scissor rectangles per eye here.
-            const bool transformScissor = false;
+            // Runtime evidence on 7081b389 ruled out per-eye scissor
+            // remapping. Keep the original game's scissor state untouched:
+            // reading it on every HUD draw causes unnecessary D3D9 driver
+            // queries. No SetScissorRect is performed by this path.
 
             // Capture the completed world eyes before the first recognized HUD
             // draw. Present then extracts glow from this snapshot, so bright HUD
@@ -2937,29 +2995,8 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
-            if (transformScissor)
-            {
-                R30ScopedInternalPass guard;
-                if (FAILED(device->SetScissorRect(&eyeScissor[0])))
-                {
-                    R29OwnerSetWvpOneRegisterAtATime(device, original);
-                    ++R30ScreenSpaceFallbacks;
-                    return E_NOTIMPL;
-                }
-            }
-
             const HRESULT leftHr = actualDraw();
 
-            if (transformScissor)
-            {
-                R30ScopedInternalPass guard;
-                if (FAILED(device->SetScissorRect(&savedScissor)))
-                {
-                    R29OwnerReportStereoFailure(OutRunVR::StereoFailureRestoreFailed,
-                        "R30/HUD-left-scissor", E_FAIL);
-                    R29OwnerArmMonoSafety();
-                }
-            }
             if (FAILED(leftHr))
             {
                 bool restored = false;
@@ -2992,8 +3029,6 @@ namespace OutRunVRStereo
                 }
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
-                if (SUCCEEDED(rightHr) && transformScissor)
-                    rightHr = device->SetScissorRect(&eyeScissor[1]);
                 if (SUCCEEDED(rightHr) &&
                     !R29OwnerSetWvpOneRegisterAtATime(device, eyeConstants[1]))
                 {
@@ -3008,12 +3043,6 @@ namespace OutRunVRStereo
                 }
                 restoreOk = R29OwnerRestoreRightPassState(device, savedRt, savedDepth,
                     savedViewport, original, true);
-                if (transformScissor &&
-                    FAILED(device->SetScissorRect(&savedScissor)))
-                {
-                    restoreOk = false;
-                    R29OwnerNoteRestoreFailure("R30/HUD-right-scissor-restore");
-                }
             }
 
             R29OwnerRecordHudStereoDuplicate();
