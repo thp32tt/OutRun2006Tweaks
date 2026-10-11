@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 12:07 KST",
+  "updated_at_kst": "2026-10-11 12:14 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -658,6 +658,55 @@
         "C3": "NOT_RUN",
         "RUNTIME_VALIDATION": "UNTESTED",
         "IGR044": "OPEN"
+      },
+      "latest_a238_q121_p0_manual_source_glyph_20261011": {
+        "run_key": "OUTRUN-KOR-A238-Q121-MANUAL-FOUR-GLYPH-WHITE-FACE-20261011-1200",
+        "role": "A",
+        "index": 121,
+        "scope": "GAS_PEDAL_ONE_OF_30",
+        "canonical_source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+        "official_unchanged_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+        "unpromoted_saved_sha256": "78806f6df21a9f7c5a6d155db57c52221f22bad58dd3611c6d9778327b79e66a",
+        "new_material_dds_trial_count": 1,
+        "official_promoted_dds_count": 0,
+        "method": "manual Hangul stroke graph, geometry/face/rim/extrusion separate compose_lettering",
+        "source_original_white_face_proxy": 3504,
+        "previous_A235R_white_face_proxy": 1426,
+        "new_A238_native_white_face_proxy": 3370,
+        "source_native": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32 mip1 RAW mirror Y",
+        "source_roi": [
+          3490,
+          391,
+          3722,
+          440
+        ],
+        "saved_raw_effect_bbox_local": [
+          5,
+          1,
+          225,
+          48
+        ],
+        "changed_inside": 9798,
+        "changed_outside": 0,
+        "protected_29_regions": "BYTE_EXACT",
+        "saved_dds_decode_mismatch": 0,
+        "native_gray100_white75_black50_RAW_review": "SCOPED_VISUAL_HOLD_SOURCE_ITALIC_STYLE",
+        "producer": "UNPROMOTED_PENDING_SOURCE_STYLE_INDEPENDENT_RECHECK",
+        "C1": "NOT_RUN_NEW_SHA",
+        "C3": "NOT_RUN",
+        "user_reports": [
+          "IGR-030",
+          "IGR-031",
+          "IGR-040"
+        ],
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "source_qa": "localization/graphics/role_A/20261011-A238-Q121-MANUAL-SOURCE-GLYPH/A238_CONTROLLER_PERSISTED_VISUAL_QA.json",
+        "backend": "github-actions-ubuntu-latest",
+        "GH_CPU_run_id": 38107463542
       }
     },
     "runtime_text_trace": {
