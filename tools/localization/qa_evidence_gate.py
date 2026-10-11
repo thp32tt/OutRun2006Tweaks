@@ -73,7 +73,7 @@ def verify_approval(repo, row, candidate_sha, source_sha=None, candidate_image=N
         if backlog.is_file():
             with backlog.open(encoding="utf-8-sig", newline="") as handle:
                 for report in csv.DictReader(handle):
-                    if (report.get("status", "").strip() == "OPEN_USER_INGAME_FAIL"
+                    if (report.get("status", "").strip().startswith("OPEN_USER_INGAME_FAIL")
                             and report.get("queue_index", "").lstrip("\ufeff").strip() == str(idx)):
                         raise ValueError("active user in-game regression blocks approval")
         path = repo / APPROVALS / f"q{idx:03d}.json"
