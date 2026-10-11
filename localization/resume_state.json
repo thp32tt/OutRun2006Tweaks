@@ -8,7 +8,7 @@
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
     "C1 2026-10-11 q161 A237 R11 first new saved SHA source-family native optical REWORK, official unchanged, C3 NOT_RUN, game UNTESTED; localization/graphics/role_C/20261011-C1-Q161-A237-FIRST-INDEPENDENT-SAVED-NATIVE/C1_Q161_A237_INDEPENDENT_C1_VISUAL_REWORK.json",
-    "B367 P0 q060 new saved SHA 52d97f845b7b3e58 fails source-metal geometry visual; C342 official remains REWORK and IGR044 OPEN. Stop same B360 geometry/relight loop. Next must manually reconstruct source-racing Han glyph topology with separate metallic face/extrusion, then C2/C3 and NEW game retest. RUN_KEY=OUTRUN-KOR-B367-Q060-SMOOTH-SEPARATED-METAL-FIRST-SAVED-20261011-1030",
+    "B368 EVEN q060 manual Hangul vector DDS SHA11e081c7 distinct 33,004 alpha pixels from rejected B367; producer native100/75/50 RAW FAIL source thick beveled racing family despite mechanical zero and C372 CLEAN reuse. Official C342 REWORK and IGR044 OPEN. Do not repeat B360/B367/B368 same thin/flat geometry/palette. Next source-authored condensed weight and beveled contours, then fully qualified producer saved DDS, independent C2/C3 and NEW user in-game retest. RUN_KEY=OUTRUN-KOR-B368-Q060-MANUAL-SOURCE-GLYPH-GEOMETRY-20261011-1130",
     "C1 ODD q111 fully verified original 17-region DDS/CLEAN persisted 4 lower original-source residue/protected-art FAIL; repair source-clean and re-render A161 new SHA, then C1/C3/game. C1_Q111_INDEPENDENT_FULL17_VISUAL_REWORK.json",
     "B366 2026-10-11 q176 even newly saved manually source-conditioned Hangul four syllables plus 8928 EXACT original source numeral4 visible pixel retention, distinct from B365 font-swapping C379 failure. Unapproved DDS sha ec35b79ce4baa72485f3446559a16dcdc040a2a3f99b99f38c641b549e0e15c5; original 8ba40915/CLEAN29e77ca7/official494d42c0 unchanged; width959 vs source980, height150 vs155; changed112299 inside only outside0 sibling3 unchanged, persisted decode0, common compose_lettering SHA-bound P2 source/geometry/face. Producer scoped visual improved but manual stacked stroke style C2 HOLD, C3/game UNTESTED. QA localization/graphics/role_B/20261011-B366-Q176-SOURCE-NUMERAL-MANUAL-STROKES/B366_CONTROLLER_PERSISTED_QA.json. RUN_KEY=OUTRUN-KOR-B366-Q176-SOURCE-NUMERAL-MANUAL-VECTOR-20261011-0930",
     "C385 C1 ODD q035 A196 exact source/CLEAN/current dual Total Rank optical native QA fails strong source-italic family, current Korean square and 327px vs source504/505px; SHA unchanged; CLEAN PNG BGRA channel order corrected. C1 REWORK_REQUIRED, C3 NOT_RUN, user-game UNTESTED, approved DDS0. localization/graphics/role_C/20261011-C385-C1-Q035-A196-SOURCE-FAMILY-OPTICAL-REWORK/C385_Q035_INDEPENDENT_C1_REWORK.json",
@@ -16103,5 +16103,46 @@
     "APPROVALS": "NOT_CREATED",
     "RUNTIME_VALIDATION": "UNTESTED",
     "qa": "localization/graphics/role_C/20261011-C1-Q161-A237-FIRST-INDEPENDENT-SAVED-NATIVE/C1_Q161_A237_INDEPENDENT_C1_VISUAL_REWORK.json"
+  },
+  "b368_20261011_q060_new_manual_native_pilot_visual_rework": {
+    "run_key": "OUTRUN-KOR-B368-Q060-MANUAL-SOURCE-GLYPH-GEOMETRY-20261011-1130",
+    "role": "B",
+    "index": 60,
+    "owner_parity": "EVEN",
+    "priority": "P0",
+    "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+    "official_unchanged_sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+    "prior_rejected_B367_sha256": "52d97f845b7b3e588ebe5136cd299882001d509320fd4f8cc910270f314142d9",
+    "new_saved_trial_sha256": "11e081c7f3c12bd13cf100995ec533ce78a557ac97eb1135ff84fc1e0a2d5a6b",
+    "method": "manual source-conditioned native Hangul jamo vector topology -> review geometry before distinct face/rim/extrusion/shadow/highlight via compose_lettering",
+    "change_vs_prior_silhouette_px": 33004,
+    "source_clean_removed_pixels": 89391,
+    "saved_rgba_roundtrip_mismatch": 0,
+    "official_to_trial_changed_rgba": 95569,
+    "outside_besttime_roi_changed_rgba": 0,
+    "clean_to_final_outside_effect_rgba": 0,
+    "original_effect_bbox": [
+      2179,
+      340,
+      3028,
+      474
+    ],
+    "new_saved_effect_bbox": [
+      2214,
+      343,
+      3004,
+      472
+    ],
+    "producer_verdict": "REWORK_REQUIRED_UNPROMOTED_SOURCE_FAMILY_WEIGHT_DEPTH",
+    "why": "firsthand source-vs-saved native100/white75/black50/RAW shows new disconnected thin manual Hangul visually unlike original broad beveled racing italic",
+    "new_trial_dds": 1,
+    "official_promoted_dds": 0,
+    "independent_C2": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "IGR044": "OPEN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_B/20261011-B368-Q060-HAND-VECTOR-ITALIC-GLYPH-GEOMETRY/B368_CONTROLLER_SAVED_VISUAL_QA.json",
+    "workflow": 38106462427
   }
 }
