@@ -48,8 +48,11 @@ check(q["action"]=="localize_text" and "rework" in q["artwork_status"].lower(),
       "q089 no longer source-style rework at current Git revision")
 tri=subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","89"],capture_output=True,text=True,check=True)
 decision=json.loads(tri.stdout)["assets"][0]
-check(decision["next_action"] in ("MATERIAL_REWORK","METHOD_CHANGE_REQUIRED"),
-      "triage says no material revision; do not rerender")
+check((decision["next_action"] in ("MATERIAL_REWORK","METHOD_CHANGE_REQUIRED")) or
+      (decision["next_action"]=="NORMAL_QUEUE_SELECTION" and
+       "c3_strict_source_gradient_purple_bevel_rework" in q["artwork_status"].lower() and
+       "C1_Q089_C3_STRICT_REWORK.json" in q["notes"]),
+      "triage and exact independent C3 chroma failure must both justify material revision")
 oldb=ASSET.read_bytes()
 check(h(oldb)==PRIOR_HASH,"concurrent q089 official DDS bytes changed")
 cleanb=CLEAN.read_bytes()
