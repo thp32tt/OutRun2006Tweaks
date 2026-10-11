@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 17:11 KST",
+  "updated_at_kst": "2026-10-11 18:29 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -50,9 +50,73 @@
       "total": 243
     },
     "graphics_localization": {
-      "c1_q102_20261011_1820_real_imagegen_source_style_hold": {"role":"C1","index":102,"method":"real_chatgpt_imagegen","generator_ids":["dcc077dc-a49d-41b1-bae1-8a1fe1b3afc1","708f8fd9-65f3-4d4c-bd31-84f2d41b9e99"],"exact_glyph_output":2,"raw_generated_png_published":0,"source_only_crop_png_published":1,"source_style_result":"REWORK_REQUIRED","native_format":"BC3_DXT5","imagegen_pipeline_supports_native_format":false,"new_trial_dds":0,"official_dds_changed":0,"C2":"NOT_RUN","C3":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED","evidence":"localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_1812_IMAGEGEN_SOURCE_STYLE_HOLD.json"},
-      "c1_q102_imagegen_wrong_target_1742_20261011": {"queue_index":102,"role":"C1","method":"CHATGPT_REAL_IMAGEGEN","timestamp_kst":"2026-10-11 17:42 KST","generation_id":"30fd56f3-c262-4700-bd91-5b68942de90d","local_png_sha256":"f2d386c1342d400b299e04ff532219fbb584ade19995247ad5625e55c222722b","requested_text":"타임 어택 모드","actual_text":"START / 스타트","png_mode":"RGBA","png_native_size":[2048,768],"producer_qa":"FAIL_WRONG_TARGET_TEXT_AND_IMAGE_LAYOUT","generated_png_published":0,"trial_dds":0,"official_dds_promoted":0,"C2":"NOT_RUN","C3":"NOT_RUN","USER_GAME":"UNTESTED","RUNTIME_VALIDATION":"UNTESTED","report":"localization/graphics/role_C1/imagegen_requests/q102_20261011_1742_IMAGEGEN_WRONG_TARGET_HOLD.json"},
-      "c1_q102_imagegen_actual_wrong_text_hold_20261011": {"role":"C1","queue_index":102,"attempts":2,"generator":"chatgpt-image-generator","generation_ids":["a1a79e5c-a472-41a1-88cd-c30a29af9057","485a19e8-779a-46b5-a325-c0a98708b760"],"method":"REAL_IMAGEGEN_ATTEMPT","producer_status":"FAIL_WRONG_TEXT","png_saved_locally_only":2,"png_published":0,"new_dds":0,"official_changed":0,"C2":"NOT_RUN_ON_NEW_BYTES","C3":"NOT_RUN","RUNTIME_VALIDATION":"UNTESTED","report":"localization/graphics/role_C1/imagegen_requests/q102_20261011_1710_IMAGEGEN_HOLD.json","prior_current_rework":"C2_DETACHED_WHITE_FRAGMENT_REWORK","date_kst":"2026-10-11 17:19 KST"},
+      "c1_q102_20261011_1820_real_imagegen_source_style_hold": {
+        "role": "C1",
+        "index": 102,
+        "method": "real_chatgpt_imagegen",
+        "generator_ids": [
+          "dcc077dc-a49d-41b1-bae1-8a1fe1b3afc1",
+          "708f8fd9-65f3-4d4c-bd31-84f2d41b9e99"
+        ],
+        "exact_glyph_output": 2,
+        "raw_generated_png_published": 0,
+        "source_only_crop_png_published": 1,
+        "source_style_result": "REWORK_REQUIRED",
+        "native_format": "BC3_DXT5",
+        "imagegen_pipeline_supports_native_format": false,
+        "new_trial_dds": 0,
+        "official_dds_changed": 0,
+        "C2": "NOT_RUN",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "evidence": "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_1812_IMAGEGEN_SOURCE_STYLE_HOLD.json"
+      },
+      "c1_q102_imagegen_wrong_target_1742_20261011": {
+        "queue_index": 102,
+        "role": "C1",
+        "method": "CHATGPT_REAL_IMAGEGEN",
+        "timestamp_kst": "2026-10-11 17:42 KST",
+        "generation_id": "30fd56f3-c262-4700-bd91-5b68942de90d",
+        "local_png_sha256": "f2d386c1342d400b299e04ff532219fbb584ade19995247ad5625e55c222722b",
+        "requested_text": "타임 어택 모드",
+        "actual_text": "START / 스타트",
+        "png_mode": "RGBA",
+        "png_native_size": [
+          2048,
+          768
+        ],
+        "producer_qa": "FAIL_WRONG_TARGET_TEXT_AND_IMAGE_LAYOUT",
+        "generated_png_published": 0,
+        "trial_dds": 0,
+        "official_dds_promoted": 0,
+        "C2": "NOT_RUN",
+        "C3": "NOT_RUN",
+        "USER_GAME": "UNTESTED",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "report": "localization/graphics/role_C1/imagegen_requests/q102_20261011_1742_IMAGEGEN_WRONG_TARGET_HOLD.json"
+      },
+      "c1_q102_imagegen_actual_wrong_text_hold_20261011": {
+        "role": "C1",
+        "queue_index": 102,
+        "attempts": 2,
+        "generator": "chatgpt-image-generator",
+        "generation_ids": [
+          "a1a79e5c-a472-41a1-88cd-c30a29af9057",
+          "485a19e8-779a-46b5-a325-c0a98708b760"
+        ],
+        "method": "REAL_IMAGEGEN_ATTEMPT",
+        "producer_status": "FAIL_WRONG_TEXT",
+        "png_saved_locally_only": 2,
+        "png_published": 0,
+        "new_dds": 0,
+        "official_changed": 0,
+        "C2": "NOT_RUN_ON_NEW_BYTES",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "report": "localization/graphics/role_C1/imagegen_requests/q102_20261011_1710_IMAGEGEN_HOLD.json",
+        "prior_current_rework": "C2_DETACHED_WHITE_FRAGMENT_REWORK",
+        "date_kst": "2026-10-11 17:19 KST"
+      },
       "b366_q176_source_original_digit_manual_vector_saved_20261011": {
         "run_key": "OUTRUN-KOR-B366-Q176-SOURCE-NUMERAL-MANUAL-VECTOR-20261011-0930",
         "role": "B",
@@ -1109,6 +1173,66 @@
           "IGR-040"
         ],
         "qa": "localization/graphics/role_A/20261011-A241-Q121-PUNCTUATION-TRACKING-REFIT/A241_CONTROLLER_PERSISTED_VISUAL_QA.json"
+      },
+      "latest_a242_q121_bold_native_italic_20261011": {
+        "run_key": "OUTRUN-KOR-A242-Q121-P0-BOLD-ITALIC-NATIVE-FONT-20261011-1800",
+        "role": "A",
+        "queue_index": 121,
+        "priority": "P0",
+        "source_text": "Gas Pedal :",
+        "new_korean": "가속 페달:",
+        "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+        "official_unchanged_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+        "prior_A241_unpromoted_sha256": "dba8745f3cadac8bc35b2ad1d19862d57c3207cb368ac626df0e4aa287ba1659",
+        "new_saved_sha256": "3a4f71ce3fc9628192d56c971c69f5c8cf8ff3bb18b53bf991e0c8e27d238b4d",
+        "new_dds_produced": 1,
+        "promoted_official_dds": 0,
+        "native": [
+          4096,
+          4096
+        ],
+        "format": "RGBA32",
+        "mips": 1,
+        "source_region": [
+          3490,
+          391,
+          3722,
+          440
+        ],
+        "persisted_bbox_local": [
+          17,
+          1,
+          215,
+          48
+        ],
+        "margin_ltrb": [
+          17,
+          1,
+          17,
+          1
+        ],
+        "saved_face_nearopaque_px": 3226,
+        "source_face_proxy_px": 3504,
+        "A241_A242_alpha_shape_xor": 2320,
+        "A241_A242_rgba_delta": 6715,
+        "official_trial_rgba_changed_inside": 9351,
+        "official_trial_changed_outside": 0,
+        "other29_official_cells_unchanged": true,
+        "dds_decode_mismatch": 0,
+        "method": "Noto Sans CJK KR Bold licensed native text outlines, font index1, 41px source-fit, tracking4, optical right lean, 1px face dilation, separated SHA-bound rim/extrusion/face",
+        "producer_qa": "HOLD_STRICT_RECHECK_SOURCE_ITALIC_FONT_EQUIVALENCE",
+        "C2": "NOT_RUN_NEW_SHA",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "user_ingame_issues": [
+          "IGR-030",
+          "IGR-031",
+          "IGR-040"
+        ],
+        "official": "UNCHANGED",
+        "qa_path": "localization/graphics/role_A/20261011-A242-Q121-BOLD-ITALIC-NATIVE-FONT/A242_CONTROLLER_SAVED_VISUAL_QA.json",
+        "backend": "GitHub Actions Ubuntu",
+        "successful_run_id": 38128069313
       }
     },
     "runtime_text_trace": {
