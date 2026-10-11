@@ -50,6 +50,10 @@ namespace OutRunVRStereo
         thread_local R22ScissorSnapshot R22ShadowState{};
         thread_local std::uint32_t R22InternalReplayDepth = 0;
         thread_local bool R22InternalViewportTouched = false;
+        // Tracks mutations inside a draw replay that actually require the final
+        // scissor restore; untouched mono/fallback draws can avoid two D3D9
+        // render-state submissions without weakening the right-eye path.
+        thread_local bool R22InternalRasterTouched = false;
 
         std::uint64_t R22DepthClearEpoch = 0;
         std::uint64_t R22DepthClearDrawSerial = 0;
@@ -157,6 +161,10 @@ namespace OutRunVRStereo
             {
                 if (IsGameDevice(device))
                 {
+                    // StateBlock::Apply bypasses tracked render-state setters.
+                    // Preserve the outer replay's original scissor restore.
+                    if (SUCCEEDED(hr) && R22InternalReplayDepth)
+                        R22InternalRasterTouched = true;
                     if (SUCCEEDED(hr))
                         R22InvalidateAfterStateBlockApply(device);
                     OutRunVR::State::StateBlockEvents::NotifyApply(device, hr);
@@ -338,6 +346,7 @@ namespace OutRunVRStereo
                 if (outer)
                 {
                     R22InternalViewportTouched = false;
+                    R22InternalRasterTouched = false;
                     stateValid = R22SnapshotShadowedGameState(device, R22GameScissor);
                 }
                 else
@@ -366,8 +375,14 @@ namespace OutRunVRStereo
                         {
                             restored = false;
                         }
-                        if (!R22ApplyGameScissor(device, R22GameScissor))
-                            restored = false;
+                        // Every stereo viewport switch is still restored. Only a
+                        // draw that neither switched viewport nor changed the
+                        // scissor state can skip redundant state submissions.
+                        if (R22InternalViewportTouched || R22InternalRasterTouched)
+                        {
+                            if (!R22ApplyGameScissor(device, R22GameScissor))
+                                restored = false;
+                        }
                     }
                     if (!restored)
                     {
@@ -422,6 +437,8 @@ namespace OutRunVRStereo
             const RECT* rect)
         {
             const HRESULT hr = R22SetScissorRectHook.stdcall<HRESULT>(device, rect);
+            if (SUCCEEDED(hr) && R22InternalReplayDepth && IsGameDevice(device))
+                R22InternalRasterTouched = true;
             if (SUCCEEDED(hr) && IsGameDevice(device) && !InternalStereoPass && rect)
             {
                 R22ShadowState.rect = *rect;
@@ -434,6 +451,9 @@ namespace OutRunVRStereo
             D3DRENDERSTATETYPE state, DWORD value)
         {
             const HRESULT hr = R22SetRenderStateHook.stdcall<HRESULT>(device, state, value);
+            if (SUCCEEDED(hr) && R22InternalReplayDepth &&
+                state == D3DRS_SCISSORTESTENABLE && IsGameDevice(device))
+                R22InternalRasterTouched = true;
             if (SUCCEEDED(hr) && IsGameDevice(device) && !InternalStereoPass &&
                 state == D3DRS_SCISSORTESTENABLE)
             {
