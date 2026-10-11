@@ -2,6 +2,7 @@
 #define NOMINMAX
 #include <Windows.h>
 #include <d3d9.h>
+#include <shellapi.h>
 
 #include <algorithm>
 #include <atomic>
@@ -17,10 +18,17 @@
 
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
+#include "game_addrs.hpp"
+#include "vr/ipc/host_state_v3_reader.hpp"
+#include "vr/ipc/xr_eye_extent.hpp"
 
 namespace Settings
 {
     extern Setting<bool> VRPreferD3D9Ex;
+    extern Setting<bool> VREnabled;
+    extern Setting<bool> VRAutoRenderResolution;
+    extern Setting<int> VRRenderWidth;
+    extern Setting<int> VRRenderHeight;
 }
 
 namespace OutRunVRD3D9ExUpgrade
@@ -38,6 +46,60 @@ namespace OutRunVRD3D9ExUpgrade
         constexpr std::size_t CreateCubeTextureVtableIndex = 25;
         constexpr std::size_t CreateVertexBufferVtableIndex = 26;
         constexpr std::size_t CreateIndexBufferVtableIndex = 27;
+
+        // No OpenXR calls or waits on the D3D9 thread. Both VDXR view
+        // slices must agree before choosing the real render source size.
+        bool GameResolutionExplicitOnCommandLine() noexcept
+        {
+            int argc = 0;
+            LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+            if (!argv)
+                return true;
+            bool explicitResolution = false;
+            for (int i = 1; i < argc; ++i)
+            {
+                if (_wcsicmp(argv[i], L"-width") == 0 ||
+                    _wcsicmp(argv[i], L"-height") == 0)
+                {
+                    explicitResolution = true;
+                    break;
+                }
+            }
+            LocalFree(argv);
+            return explicitResolution;
+        }
+
+        OutRunVR::EyeExtent::Size ReadyXrEyeSizeAtCreateDevice(
+            IDirect3D9Ex* ex, UINT adapter, D3DDEVTYPE type,
+            const D3DPRESENT_PARAMETERS& params) noexcept
+        {
+            if (!ex || !Settings::VREnabled ||
+                !Settings::VRPreferD3D9Ex || !Settings::VRAutoRenderResolution ||
+                Settings::VRRenderWidth > 0 || Settings::VRRenderHeight > 0 ||
+                !params.Windowed || GameResolutionExplicitOnCommandLine())
+                return {};
+
+            OutRunVR::IpcV3::HostStateReader reader;
+            OutRunVR::IpcV3::HostState host{};
+            if (!reader.Read(host) || host.hostPid == 0 ||
+                (host.flags & OutRunVR::IpcV3::HostAlive) == 0)
+                return {};
+            HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, host.hostPid);
+            if (!process)
+                return {};
+            const DWORD status = WaitForSingleObject(process, 0);
+            CloseHandle(process);
+            if (status != WAIT_TIMEOUT)
+                return {};
+            const auto extent = OutRunVR::EyeExtent::ResolveStartup(
+                {host.recommendedWidth[0], host.recommendedHeight[0]},
+                {host.recommendedWidth[1], host.recommendedHeight[1]});
+            D3DCAPS9 caps{};
+            if (FAILED(ex->GetDeviceCaps(adapter, type, &caps)))
+                return {};
+            return OutRunVR::EyeExtent::ResolveGame(
+                extent, {caps.MaxTextureWidth, caps.MaxTextureHeight});
+        }
 
         Direct3DCreate9Fn OriginalDirect3DCreate9 = nullptr;
         std::atomic<bool> FirstUpgradeLogged{false};
@@ -704,10 +766,22 @@ namespace OutRunVRD3D9ExUpgrade
                 if (!device || !params) return D3DERR_INVALIDCALL;
                 *device = nullptr;
 
+                // The VR host can become ready between game INI parsing and
+                // device creation. A zero-wait check here can still allocate
+                // the actual 3D game source at the XR eye resolution.
+                const auto xrSize = ReadyXrEyeSizeAtCreateDevice(
+                    ex_, adapter, type, *params);
+                const bool bindVrSource = OutRunVR::EyeExtent::Valid(xrSize);
+
                 // D3DPRESENT_PARAMETERS is an in/out contract. Preserve the
                 // game's original request so a failed Ex attempt cannot poison
                 // the classic fallback with mutated presentation values.
                 const D3DPRESENT_PARAMETERS originalParams = *params;
+                if (bindVrSource)
+                {
+                    params->BackBufferWidth = xrSize.width;
+                    params->BackBufferHeight = xrSize.height;
+                }
                 auto classicFallback = [&]() -> HRESULT
                 {
                     *params = originalParams;
@@ -790,6 +864,22 @@ namespace OutRunVRD3D9ExUpgrade
                     }
 
                     *device = static_cast<IDirect3DDevice9*>(deviceEx);
+                    if (bindVrSource)
+                    {
+                        Game::screen_resolution->x = static_cast<int>(xrSize.width);
+                        Game::screen_resolution->y = static_cast<int>(xrSize.height);
+                        spdlog::info(
+                            "VR EYE RESOLUTION: 3D D3D9Ex render SOURCE uses XR eye {}x{} (previous 2D {}x{}) without waiting",
+                            xrSize.width, xrSize.height,
+                            originalParams.BackBufferWidth,
+                            originalParams.BackBufferHeight);
+                    }
+                    else if (Settings::VREnabled && Settings::VRAutoRenderResolution)
+                    {
+                        spdlog::info(
+                            "VR EYE RESOLUTION: XR eye not available at CreateDevice or explicitly overridden; 3D SOURCE keeps {}x{} (VR transport may scale, no startup wait)",
+                            params->BackBufferWidth, params->BackBufferHeight);
+                    }
                     UpdateCompatPresentationState(*device, params);
                     if (!FirstUpgradeLogged.exchange(true))
                     {
