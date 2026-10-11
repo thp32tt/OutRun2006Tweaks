@@ -66,6 +66,7 @@ on:
       - 'tools/verify_vr_r32_r31_tu_split.py'
       - 'tools/verify_vr_r32_review_api_seam.py'
       - 'tools/verify_vr_r33_r32_tu_split.py'
+      - 'tools/verify_vr_r33_single_classification.py'
       - 'src/vr/core/r30_support_api.hpp'
       - 'src/vr/core/r31_support_api.hpp'
       - 'src/vr/core/r32_review_api.hpp'
@@ -183,6 +184,7 @@ jobs:
             'tools/verify_vr_r32_r31_tu_split.py',
             'tools/verify_vr_r32_review_api_seam.py',
             'tools/verify_vr_r33_r32_tu_split.py',
+            'tools/verify_vr_r33_single_classification.py',
             'tools/verify_vr_sumo_replay_semantics.py',
             'tools/verify_vr_hud_cadence_restore.py',
             'tools/verify_vr_producer_provenance.py',

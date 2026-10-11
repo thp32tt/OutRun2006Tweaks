@@ -548,10 +548,12 @@ namespace OutRunVRStereo
 
         template <typename ActualDraw>
         R32ReviewOwnedResult R33TryHud(IDirect3DDevice9* device,
+            R32ReviewScreenSpaceKind screenKind,
             ActualDraw&& actualDraw, const char* site)
         {
-            const R32ReviewScreenSpaceKind screenKind =
-                R32ReviewClassifyScreenSpacePass(device);
+            // R33Dispatch has already classified this draw. Reclassifying
+            // a flat-perspective HUD here repeats up to three D3D9 render-state
+            // queries on the per-primitive hot path without changing routing.
             if (OutRunVR::State::StateBlockTracker::Recording() || !R32ReviewStableStereoBase(device) ||
                 screenKind == R32ReviewScreenSpaceKind::None)
                 return {};
@@ -722,9 +724,14 @@ namespace OutRunVRStereo
                 return actualDraw();
             }
 
-            if (R32ReviewClassifyScreenSpacePass(device) != R32ReviewScreenSpaceKind::None)
+            // Classify exactly once for the physical draw. Flat-perspective
+            // effects may require three GetRenderState calls; do not repeat
+            // that work inside R33TryHud after choosing the HUD route.
+            const R32ReviewScreenSpaceKind screenKind =
+                R32ReviewClassifyScreenSpacePass(device);
+            if (screenKind != R32ReviewScreenSpaceKind::None)
             {
-                const auto hud = R33TryHud(device,
+                const auto hud = R33TryHud(device, screenKind,
                     std::forward<ActualDraw>(actualDraw), site);
                 if (hud.handled)
                     return hud.hr;
