@@ -110,8 +110,7 @@ def review(root, path, m):
     if not state_path.exists():
         raise ValueError('HOLD: independent plate review absent; inspect stored plate, do not rebuild it')
     r = json.loads(state_path.read_text())
-    lane = 'C1' if m['queue_index'] % 2 else 'C2'
-    if r.get('manifest_sha256') != identity or r.get('reviewer') != lane or r.get('status') != 'PLATE_PASS':
+    # Current contract (2026-10-11): C2 alone independently approves PSD/CLEAN\n    # plates from A/B/C1, regardless of queue parity. Preserve historical C1\n    # evidence as history, never treat it as a new C2 PLATE_PASS.\n    lane = 'C2'\n    if r.get('manifest_sha256') != identity or r.get('reviewer') != lane or r.get('status') != 'PLATE_PASS':
         raise ValueError('HOLD: stale, revoked, wrong-shard or failed plate review')
     if not r.get('observations') or not r.get('evidence'):
         raise ValueError('HOLD: independent visual evidence missing')
