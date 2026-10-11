@@ -962,7 +962,7 @@ def main() -> None:
             "kGameFvfSpecular == D3DFVF_SPECULAR",
             "GetRenderState(D3DRS_SPECULARENABLE, &specularEnabled)",
             "specularEnabled)",
-            "lighting || vertexBlend != D3DVBF_DISABLE",
+            "            lighting || vertexBlend != D3DVBF_DISABLE",
             "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
