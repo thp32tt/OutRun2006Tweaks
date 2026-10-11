@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 18:29 KST",
+  "updated_at_kst": "2026-10-11 18:49 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1233,6 +1233,50 @@
         "qa_path": "localization/graphics/role_A/20261011-A242-Q121-BOLD-ITALIC-NATIVE-FONT/A242_CONTROLLER_SAVED_VISUAL_QA.json",
         "backend": "GitHub Actions Ubuntu",
         "successful_run_id": 38128069313
+      },
+      "b373_q060_source_only_imagegen_native_p2_hold_20261011": {
+        "run_key": "OUTRUN-KOR-B373-Q060-SOURCECROP-REAL-IMAGEGEN-P2-20261011-1830",
+        "role": "B",
+        "queue_index": 60,
+        "priority": "P0",
+        "original_source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+        "new_github_source_only_readable_png": {
+          "path": "localization/graphics/role_B/imagegen_requests/q060_english_source_only_readable_native_20261011.png",
+          "sha256": "cbb6736b83dd5fb5ee96bf5360074b405e454fd6d46b59e63d6c44826881554a",
+          "remote_verified": true
+        },
+        "source_only_crop_native": [
+          2173,
+          334,
+          3034,
+          480
+        ],
+        "source_only_size": [
+          861,
+          146
+        ],
+        "real_imagegen_attempt_count": 3,
+        "real_single_layer_genids": [
+          "3af9c1a8-63e7-40b4-9aeb-b60ca57b4b6e",
+          "fcc82acd-bcc6-4451-834e-4ffdec457ccd"
+        ],
+        "best_original_generator_sha256": "0d67d594ff488d073f611338ef934fb4d50dcc790e81cec7a1c352b044ff52f8",
+        "original_generator_binary_in_repo": false,
+        "source_aspect": 6.33582,
+        "generated_alpha_aspect": 4.33263,
+        "preview_contain_native_size": [
+          542,
+          125
+        ],
+        "width_coverage_percent": 63.84,
+        "producer_qa": "REWORK_REQUIRED_UNPROMOTED_P2_SOURCE_FAMILY_WIDTH",
+        "trial_dds_count": 0,
+        "official_promotions": 0,
+        "independent_C2": "NOT_RUN",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "IGR044": "OPEN_USER_INGAME_FAIL",
+        "evidence": "localization/graphics/role_B/imagegen_requests/q060_B373_SOURCE_CROP_IMAGEGEN_P2_STYLE_HOLD_20261011.json"
       }
     },
     "runtime_text_trace": {
