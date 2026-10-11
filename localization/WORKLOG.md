@@ -1,3 +1,11 @@
+## 2026-10-11 — Shared B/C1 ImageGen prompt authoring policy
+
+- TASK_ID: OUTRUN-KOR-IMAGEGEN-PROMPT-GUIDE-20261011-1741; lane: shared policy; attempt: 1; base HEAD: 8e1e8364ceb56c86d550ab050470c27340773c30.
+- User requested reusable guidance for all images. Added asset-specific specification/reference preparation, exact text, prompt template, multi-label handling, tool alpha settings, failure-specific edits and exact call provenance. Linked from mandatory contract and B/C1 lane guide.
+- Evidence: B370/B371/B372 q060 and C1 q102 existing attempt reports; root cause remains unproven where original calls are absent.
+- Validation: document links/content checked; docs-only change. No queue/candidate/ownership/approval changes. New ImageGen experiment NOT_RUN; CI NOT_RUN; RUNTIME_VALIDATION=UNTESTED. Result SHA is the commit containing this TASK_ID (verify remote branch after publication).
+- Next production action: latest owner lane selects its pending asset, reads shared guide, prepares readable source-only crop and records exact prompt/tool inputs before its real ImageGen call.
+
 ## 2026-10-11 17:42 KST — C1 ImageGen q102 exact-text FAIL, no DDS candidate
 
 - C1 new real ImageGen invocation on q102 source English 'Time Attack Mode' / requested '타임 어택 모드' (canonical source DDS SHA256 `17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121`; source-vs-current preview `Q102_FLIPY_GRAY100.png`).

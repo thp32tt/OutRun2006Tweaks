@@ -1,5 +1,10 @@
 # B·C1 ChatGPT 이미지 생성 생산 레인 — 2026-10-11
 
+## ImageGen prompt authoring — 2026-10-11
+
+B and C1 MUST read and apply `docs/KOREAN_LOCALIZATION_IMAGEGEN_PROMPT_GUIDE.md` before each new/edit image-generation call. Build an asset-specific visual specification from the exact readable source crop; separate generator instructions from QA/commit metadata, preserve exact call inputs, and use failure-specific revisions. This is prompt policy, not a new queue or QA approval. A, ownership, CLEAN prerequisites and independent C2/C3/game gates remain unchanged.
+
+
 ## 2026-10-11 C1 imagegen extension (current; overrides historic B-only wording)
 
 B and C1 share the **same real ChatGPT ImageGen -> transparent RGBA PNG -> SHA-bound CLEAN/plate -> saved unapproved DDS -> producer self-QA workflow**. A remains the existing native/manual lane. On NEW unclaimed even indexes, B selects index % 4 == 0 and C1 selects index % 4 == 2. Never overwrite pre-existing explicit B in-flight ownership on an index % 4 == 2 or an assigned game-regression P0/P1. For a pre-existing B-owned even index % 4 == 2 continuation only, the B request manifest must carry `legacy_b_inflight: true` after checking current Git ownership; new unclaimed B requests cannot use this marker. The consumer fails closed on missing marker. C2 is the sole independent PLATE_PASS / final QA reviewer for **all** A/B/C1 candidates (odd and even); C3 and user game review stay independent.
