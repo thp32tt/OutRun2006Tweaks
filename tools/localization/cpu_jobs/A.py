@@ -290,6 +290,12 @@ writej("A240_DDS_MACHINE_AND_HANDOFF.json",{
  "backend":"github-actions-ubuntu-latest",
  "anti_duplicate":"actual saved A239 SHA pinned, native spline contours + pressure silhouette delta, original and A239 preserved",
  "next":"Producer inspect exact persisted native/50/RAW; independent C2 now owns QA of new A240 SHA, C3 and new user in-game retest only after valid optical source morphology. Existing C1 A239 FAIL retained."})
+# Publish retry guard: all first-party actual output bytes must exist before
+# the repaired Actions staging job attempts a Git commit. The earlier build
+# had computed output correctly but the old single git-add command swallowed
+# a missing optional directory pathspec and published no A240 artifacts.
+assert result.is_file() and len(list(OUT.glob("A240_*.png")))>=20
+assert (OUT/"lettering_recipe.json").is_file()
 print(json.dumps({"run":RUN,"index":121,"source":EXPECTED_SRC,"official":EXPECTED_OFFICIAL,
  "trial":new_sha,"inside_change":rgba_delta,"outside_change":outside,
  "manual_face_px":face_count,"result":"NEW_UNPROMOTED_SCOPED_Q121_MATERIAL_TRIAL"}))
