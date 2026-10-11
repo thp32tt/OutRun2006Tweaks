@@ -731,6 +731,22 @@ namespace OutRunVRStereo
                 return actualDraw();
             }
 
+            // The raster guard has already rejected mono/non-game, auxiliary
+            // targets and StateBlock recording. A false flush flag after the
+            // recording case means this draw cannot enter a stereo route.
+            // Keep the lower R29 fail-closed policy and semantic ownership,
+            // but avoid its redundant R33 screen-pass classification (which
+            // may perform live D3D9 render-state reads per primitive).
+            auto fallbackToR29 = [&]() -> HRESULT {
+                R32ReviewDiscardUnreliableDrawCaches();
+                if (telemetry)
+                    R32ReviewNoteDispatchFallback();
+                return R32ReviewRunLowerFailClosed(device,
+                    std::forward<LowerR29Draw>(lowerR29Draw));
+            };
+            if (!resyncAlreadyFlushed)
+                return fallbackToR29();
+
             // Classify exactly once for the physical draw. Flat-perspective
             // effects may require three GetRenderState calls; do not repeat
             // that work inside R33TryHud after choosing the HUD route.
@@ -751,14 +767,9 @@ namespace OutRunVRStereo
                     return fast.hr;
             }
 
-            // Preserve R31's fail-closed boundary when StateBlock tracking
-            // is unreliable. Otherwise stale R29 effect/shadow caches can
-            // reclassify a draw that R33 already rejected using live state.
-            R32ReviewDiscardUnreliableDrawCaches();
-            if (telemetry)
-                R32ReviewNoteDispatchFallback();
-            return R32ReviewRunLowerFailClosed(device,
-                std::forward<LowerR29Draw>(lowerR29Draw));
+            // Preserve the same lower R29 fail-closed policy when neither
+            // HUD nor world stereo owns this otherwise eligible draw.
+            return fallbackToR29();
         }
 
         HRESULT __stdcall DrawPrimitiveDestR33(IDirect3DDevice9* device,

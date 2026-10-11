@@ -69,10 +69,67 @@ def check_resync_single_flush(text: str) -> None:
 
 
 
+def check_mono_aux_fastpath(text: str) -> None:
+    """Mono/aux draws reuse the raster decision before any R33 classification."""
+    guard = text.split("HRESULT R33GuardStereoRasterState(", 1)[1].split(
+        "void R33InvalidateDepthStencilCache()", 1)[0]
+    dispatch = text.split("HRESULT R33Dispatch(", 1)[1].split(
+        "HRESULT __stdcall DrawPrimitiveDestR33(", 1)[0]
+    assert guard.index("if (!device") < guard.index("return drawCall(false);")
+    for exclusion in (
+        "!R32ReviewIsGameDevice(device)", "R32ReviewInternalStereoPass()",
+        "StateBlockTracker::Recording()", "!R32ReviewStereoWanted()",
+        "!R32ReviewTargetIsBackBuffer()",
+    ):
+        assert exclusion in guard, f"raster bypass lost {exclusion}"
+
+    fallback = re.search(
+        r"auto fallbackToR29 = \\[&\\]\\(\\) -> HRESULT \\{(.*?)\\n\\s*\\};",
+        dispatch, re.S)
+    assert fallback, "R29 shared fail-closed fallback missing"
+    body = fallback.group(1)
+    assert "R32ReviewDiscardUnreliableDrawCaches();" in body
+    assert "if (telemetry)" in body and "R32ReviewNoteDispatchFallback();" in body
+    assert "R32ReviewRunLowerFailClosed(device," in body
+    assert "std::forward<LowerR29Draw>(lowerR29Draw)" in body
+    bypass = "if (!resyncAlreadyFlushed)\\n                return fallbackToR29();"
+    assert bypass in dispatch, "mono/aux still pays for R33 classification"
+    assert dispatch.index("StateBlockTracker::Recording()") < dispatch.index(bypass)
+    assert dispatch.index(bypass) < dispatch.index("R32ReviewClassifyScreenSpacePass(device)")
+    assert dispatch.rfind("return fallbackToR29();") > dispatch.index(
+        "R33TryFastWorld(device,"), "stereo fallback must use identical R29 policy"
+
+
+def negative_mono_aux_fastpath(src: str) -> None:
+    mutations = [
+        src.replace("if (!resyncAlreadyFlushed)\\n                return fallbackToR29();",
+                    "if (false)\\n                return fallbackToR29();", 1),
+        src.replace("if (!resyncAlreadyFlushed)\\n                return fallbackToR29();",
+                    "if (resyncAlreadyFlushed)\\n                return fallbackToR29();", 1),
+        src.replace("return R32ReviewRunLowerFailClosed(device,",
+                    "return R32ReviewCallRawDrawPrimitive(device,", 1),
+        src.replace("R32ReviewDiscardUnreliableDrawCaches();", "/* removed */", 1),
+        src.replace("R32ReviewNoteDispatchFallback();", "/* removed */", 1),
+        src.replace("return fallbackToR29();\\n\\n            // Classify exactly once",
+                    "return actualDraw();\\n\\n            // Classify exactly once", 1),
+        src.replace("return fallbackToR29();\\n        }\\n\\n        HRESULT __stdcall DrawPrimitiveDestR33(",
+                    "return actualDraw();\\n        }\\n\\n        HRESULT __stdcall DrawPrimitiveDestR33(", 1),
+    ]
+    for index, mutant in enumerate(mutations, 1):
+        assert mutant != src, f"mutation fixture {index} did not alter source"
+        try:
+            check_mono_aux_fastpath(mutant)
+        except (AssertionError, ValueError):
+            continue
+        raise AssertionError(f"mono/aux negative mutation {index} escaped")
+
+
 def main() -> None:
     src = SOURCE.read_text(encoding="utf-8")
     check(src)
     check_resync_single_flush(src)
+    check_mono_aux_fastpath(src)
+    negative_mono_aux_fastpath(src)
     mutants = [
         src.replace("R33TryHud(device, screenKind,", "R33TryHud(device, R32ReviewScreenSpaceKind::None,", 1),
         src.replace("if (screenKind != R32ReviewScreenSpaceKind::None)",
@@ -101,7 +158,7 @@ def main() -> None:
         except (AssertionError, ValueError):
             continue
         raise AssertionError(f"resync regression mutation {i} was not rejected")
-    print("PASS R33 single classification + one active resync, bypass recovery, 7 negative mutations")
+    print("PASS R33 single classification, mono/aux R29 bypass, one active resync, 14 negative mutations")
 
 
 if __name__ == "__main__":
