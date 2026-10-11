@@ -105,6 +105,9 @@ namespace OutRunVRStereo
 		IDirect3DSurface9* BackBuffer = nullptr;
 		IDirect3DSurface9* TrackedRenderTarget = nullptr;
 		IDirect3DSurface9* TrackedDepthStencil = nullptr;
+		// Immutable for the lifetime of this retained D3D9 surface.
+		bool TrackedStencilFormatKnown = false;
+		bool TrackedStencilFormatHasStencil = false;
 		IDirect3DSurface9* RightEyeSurface = nullptr;
 		IDirect3DSurface9* RightEyeDepth = nullptr;
 		IDirect3DTexture9* LeftResolveTexture = nullptr;
@@ -1057,7 +1060,23 @@ namespace OutRunVRStereo
 		{
 			switch (format) { case D3DFMT_D15S1: case D3DFMT_D24S8: case D3DFMT_D24X4S4: case D3DFMT_D24FS8: return true; default: return false; }
 		}
-		bool SurfaceHasStencil(IDirect3DSurface9* surface) { if (!surface) return false; D3DSURFACE_DESC desc{}; return SUCCEEDED(surface->GetDesc(&desc)) && FormatHasStencil(desc.Format); }
+		bool SurfaceHasStencil(IDirect3DSurface9* surface)
+		{
+			if (!surface) return false;
+			// Every repeated stereo draw shares the tracked depth surface. Skip
+			// its COM GetDesc after the first successful format probe only.
+			if (surface == TrackedDepthStencil && TrackedStencilFormatKnown)
+				return TrackedStencilFormatHasStencil;
+			D3DSURFACE_DESC desc{};
+			if (FAILED(surface->GetDesc(&desc))) return false;
+			const bool hasStencil = FormatHasStencil(desc.Format);
+			if (surface == TrackedDepthStencil)
+			{
+				TrackedStencilFormatHasStencil = hasStencil;
+				TrackedStencilFormatKnown = true;
+			}
+			return hasStencil;
+		}
 		bool DepthTestActive(IDirect3DDevice9* device) { if (!device || !TrackedDepthStencil) return false; DWORD enabled=D3DZB_TRUE; if (!ReadTrackedRenderState(device,D3DRS_ZENABLE,enabled)) return true; return enabled!=D3DZB_FALSE; }
 		bool StencilTestActive(IDirect3DDevice9* device) { if (!device || !SurfaceHasStencil(TrackedDepthStencil)) return false; DWORD enabled=FALSE; if (!ReadTrackedRenderState(device,D3DRS_STENCILENABLE,enabled)) return true; return enabled!=FALSE; }
 		bool LeftDrawMayWriteDepth(IDirect3DDevice9* device) { if(!device||!TrackedDepthStencil)return false;DWORD zEnable=D3DZB_TRUE,zWrite=TRUE;if(!ReadTrackedRenderState(device,D3DRS_ZENABLE,zEnable)||!ReadTrackedRenderState(device,D3DRS_ZWRITEENABLE,zWrite))return true;return zEnable!=D3DZB_FALSE&&zWrite!=FALSE; }
@@ -1146,6 +1165,8 @@ namespace OutRunVRStereo
 
 		void ReleaseStereoResources()
 		{
+			// A Reset can recycle a COM address for a different depth format.
+			TrackedStencilFormatKnown = false;
 			StereoResourcesReady=false;
 			RetireDirectTransportFramePublications();
 			DirectTransportResourcesReady=false;
@@ -1438,6 +1459,7 @@ namespace OutRunVRStereo
 			if(!InternalStereoPass&&IsGameDevice(device)&&SUCCEEDED(hr))
 			{
 				const bool changed=TrackedDepthStencil!=surface;
+				if(changed) TrackedStencilFormatKnown=false;
 				ReplaceSurfaceRef(TrackedDepthStencil,surface);
 				if(changed&&StereoResourcesReady&&TargetIsBackBuffer())
 				{
