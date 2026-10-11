@@ -612,9 +612,9 @@ def main() -> None:
         producer = source[source.find("bool mirror_texture("):source.find("bool submit(")]
         draw = source[source.find("bool submit("):source.find("void observe(")]
         return all(token in producer for token in (
-            "info.Format == D3DFMT_DXT1",
-            "info.Format == D3DFMT_DXT3",
-            "info.Format == D3DFMT_DXT5",
+            "const bool compressed = info.Format == D3DFMT_DXT1 ||",
+            "info.Format == D3DFMT_DXT3 ||",
+            "info.Format == D3DFMT_DXT5;",
             "if ((info.Width & 3u) || (info.Height & 3u)) return false;",
             "const UINT bytesPerBlock = info.Format == D3DFMT_DXT1 ? 8u : 16u;",
             "rowBytes = (info.Width / 4u) * bytesPerBlock;",
