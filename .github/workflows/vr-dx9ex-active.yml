@@ -53,6 +53,7 @@ on:
       - 'tools/verify_vr_refactor_contract.py'
       - 'tools/verify_vr_r84_focus_inventory.py'
       - 'tools/verify_vr_r29_effect_cache_generation.py'
+      - 'tools/verify_vr_r13_effect_state_read_fastpath.py'
       - 'tools/verify_vr_r32_shadow_fallback_fastpath.py'
       - 'tools/verify_vr_r30_support_api_seam.py'
       - 'tools/verify_vr_r30_eye_affine_fastpath.py'
@@ -182,6 +183,7 @@ jobs:
             'tools/verify_vr_r29_owner_api_seam.py',
             'tools/verify_vr_r84_feature_bundle.py',
             'tools/verify_vr_r29_effect_cache_generation.py',
+            'tools/verify_vr_r13_effect_state_read_fastpath.py',
             'tools/verify_vr_r32_shadow_fallback_fastpath.py',
             'tools/verify_vr_r30_support_api_seam.py',
             'tools/verify_vr_r30_eye_affine_fastpath.py',

@@ -19,6 +19,7 @@
 #include "vr_shared.hpp"
 #include "vr/ipc/frame_pacing_diagnostics.hpp"
 #include "vr/ipc/xr_eye_extent.hpp"
+#include "vr/state/state_block_tracker.hpp"
 
 // True-stereo D3D9 renderer.
 //
@@ -923,7 +924,16 @@ namespace OutRunVRStereo
 			if (TrackedRenderStateValid[index])
 			{
 				auto& reads = TrackedRenderStateReads[index];
-				if (++reads < 16)
+				// R13's effect draw guard reads five tracked states per draw.
+				// A proven R22/R31 setter + StateBlock Apply/recording chain
+				// invalidates these values at every mutating boundary: repeated
+				// 16-draw D3D9 GetRenderState probes are then pure driver churn.
+				// Preserve periodic live sampling whenever coverage is lost,
+				// recording is underway or an internal eye pass is active.
+				const bool trusted = OutRunVR::State::StateBlockTracker::Reliable() &&
+					!OutRunVR::State::StateBlockTracker::Recording() &&
+					!InternalStereoPass;
+				if (trusted || ++reads < 16)
 				{
 					++TrackedRenderStateCacheHits;
 					out = TrackedRenderStateValue[index];
