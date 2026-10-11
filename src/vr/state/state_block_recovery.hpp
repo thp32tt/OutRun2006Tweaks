@@ -19,14 +19,21 @@ namespace OutRunVR::State
         static void Configure(ResynchronizeShaderEpochFn resynchronizeShaderEpoch,
             PrimeShadowStateFn primeShadowState) noexcept
         {
+            // Publish readiness only after both callbacks are installed.
+            // Unconfigured and partially configured paths stay fail-closed.
+            ProvidersConfigured().store(false, std::memory_order_release);
             ResynchronizeShaderEpoch().store(
                 resynchronizeShaderEpoch, std::memory_order_release);
             PrimeShadowState().store(
                 primeShadowState, std::memory_order_release);
+            ProvidersConfigured().store(
+                resynchronizeShaderEpoch != nullptr && primeShadowState != nullptr,
+                std::memory_order_release);
         }
 
         static void Clear() noexcept
         {
+            ProvidersConfigured().store(false, std::memory_order_release);
             ResynchronizeShaderEpoch().store(nullptr, std::memory_order_release);
             PrimeShadowState().store(nullptr, std::memory_order_release);
             StateBlockTracker::MarkCoverageLost();
@@ -36,6 +43,15 @@ namespace OutRunVR::State
         static void FlushPendingResync(IDirect3DDevice9* device) noexcept
         {
             if (!device)
+                return;
+
+            // Normal stereo draw: no StateBlock Apply/coverage recovery is
+            // pending. Avoid two acquire-loads and the callback check at each
+            // of the R33/R31 per-primitive recovery boundaries. If providers
+            // are missing, use the original fail-closed path even without a
+            // pending request; queued recovery always executes as before.
+            if (!StateBlockTracker::HasPendingResync() &&
+                ProvidersConfigured().load(std::memory_order_acquire))
                 return;
 
             const auto resynchronizeShaderEpoch =
@@ -63,6 +79,12 @@ namespace OutRunVR::State
         }
 
     private:
+        static std::atomic<bool>& ProvidersConfigured() noexcept
+        {
+            static std::atomic<bool> ready{false};
+            return ready;
+        }
+
         static std::atomic<ResynchronizeShaderEpochFn>&
         ResynchronizeShaderEpoch() noexcept
         {

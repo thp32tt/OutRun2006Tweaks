@@ -57,6 +57,12 @@ namespace OutRunVR::State
         {
             ResyncPending() = true;
         }
+        // Per-draw R33/R31 recovery probes must not load both callback atomics
+        // when this render thread has no StateBlock recovery work queued.
+        static bool HasPendingResync() noexcept
+        {
+            return ResyncPending();
+        }
         static bool ConsumeResync() noexcept
         {
             bool& pending = ResyncPending();
