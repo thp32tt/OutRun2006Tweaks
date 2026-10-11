@@ -11,11 +11,11 @@
   "feature_id": "DX11:MENU_TO_RACE_NATIVE_FRAME",
   "work_key": "DX11:MENU_RACE_TEXTURED_FVF_MODULATE",
   "base_sha": "e19370c963dae6d528b626055295631f460f9d2f",
-  "status": "COMPLETE_EXACT_SHA_CI_BUILD_VERIFIED_NEED_HMD_TEST",
-  "checkpoint": "C6_RESULT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
-  "automation_validation": "PASS_EXACT_SHA_BACKEND_BUILD_OPENXR_AND_FAST",
+  "automation_validation": "PASS_EXACT_SHA",
   "development_strategy": {
     "work_class": "integration",
     "milestone_id": "menu_to_race_native_frame",
@@ -59,7 +59,7 @@
     "1bd83df56645c77166bbe68fd66fc4bafa40e917",
     "8604808257135ff162f181bdf10b4f8aa20de60e"
   ],
-  "validation_bearing_result_sha": "d7617065f68b610c500a82b7211c1e0572cff8de",
+  "validation_bearing_result_sha": "4785e068792ffcf07754fec86cefd63cf82a4f40",
   "score_change": 1,
   "validation_gates": {
     "backend_conversion": {
@@ -104,7 +104,8 @@
     "C3_VALIDATE": "PASS same exact SHA d7617065: Backend Gate 38131814063; Build 38131817041; OpenXR 38131817073; DX11 Fast 38131814015; no HMD/game execution.",
     "C4_COMMIT": "PASS code source 1bd83df5, test followup 86048082, final material validation-bearing d7617065 with exact [AUTO:CONVERSION-DX11-00538] no CI skip and non-force.",
     "C5_PACKAGE": "NOT_REQUIRED this source integration; first-game-frame older 00537 ZIP does not certify new TEX1 runtime.",
-    "C6_RESULT": "PASS exact-sha mandatory gates, record completed separately; BUILD_VERIFIED/NEED_HMD_TEST. Scoreboard AI2 verified previous 969 +1 =970 RUN_KEY=CONVERSION-DX11-00538."
+    "C6_RESULT": "PASS exact-sha mandatory gates, record completed separately; BUILD_VERIFIED/NEED_HMD_TEST. Scoreboard AI2 verified previous 969 +1 =970 RUN_KEY=CONVERSION-DX11-00538.",
+    "C6_STATE": "PASS_EXACT_SHA for 4785e068792ffcf07754fec86cefd63cf82a4f40; material_result_sha d7617065f68b610c500a82b7211c1e0572cff8de preserved; hold TERMINAL_STATUS_NOT_COMPLETE resolved as COMPLETE_BUILD_VERIFIED; runtime UNTESTED. No new CI or score."
   },
   "scoreboard": {
     "repo": "thp32tt/ai-dev-lab",
@@ -117,5 +118,35 @@
   },
   "blocker": null,
   "source_stage": "BUILD_VERIFIED__RUNTIME_HMD_GAME_NOT_TESTED",
-  "runtime_evidence": "No OR2006C2C EXE desktop game pixels, input or Quest3 VDXR were observed; keep NativeDrawPathActive disabled and production fallback DX9Ex"
+  "runtime_evidence": "No OR2006C2C EXE desktop game pixels, input or Quest3 VDXR were observed; keep NativeDrawPathActive disabled and production fallback DX9Ex",
+  "c6_recovery_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_exact_sha_validation": {
+    "head_sha": "4785e068792ffcf07754fec86cefd63cf82a4f40",
+    "result": "PASS_EXACT_SHA",
+    "source_material_sha": "d7617065f68b610c500a82b7211c1e0572cff8de",
+    "gates": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 38132492512,
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "Build",
+        "run_id": 38132495548,
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38132495608,
+        "conclusion": "SUCCESS"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 38132492495,
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "note": "C6 bookkeeping only. No source modification, build rerun, CI rerun, HMD execution, or score change."
+  }
 }
