@@ -928,5 +928,83 @@
     "review_result": "Stale acceptance-vs-target-SHA evidence distinction corrected. Do not issue duplicate C++ source work or claim production DX11 gameplay.",
     "runtime_validation": "UNTESTED",
     "score_change": 0
+  },
+  "rollover_18": {
+    "event_id": "CONVERSION-DX11-00537-E023",
+    "event_type": "rollover",
+    "chat_rollover": 18,
+    "attempt": "3/3",
+    "attempt_incremented": false,
+    "checkpoint": {
+      "branch": "chat-controller-downloads",
+      "path": "tools/chat-controller/checkpoints/vr/CONVERSION-DX11-00537/20261011T0920-periodic.json",
+      "verified": true,
+      "captured_at_kst": "2026-10-11T09:20:15+09:00",
+      "checkpoint_older_than_feature_head": false
+    },
+    "github_heads": {
+      "target_branch": "vr-dx11-native-r71",
+      "target_sha": "937f6bf484528ac5cf7570ace518cabc3247be93",
+      "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+      "feature_sha": "106bca9991791696466705885f6a041fee5c8378",
+      "feature_ahead_by": 4,
+      "feature_behind_by": 0
+    },
+    "scope": "C0/C1/C3/C6 evidence-based review of exact feature-head CI and remaining controller-owned target bundle admission; no redundant source implementation",
+    "feature_ci": {
+      "build": {
+        "run_id": 38096657184,
+        "head_sha": "106bca9991791696466705885f6a041fee5c8378",
+        "conclusion": "SUCCESS",
+        "steps": [
+          "DX11-LIVE-CALLSITE",
+          "DX11-NATIVE-DRAW",
+          "DX11-VISIBLE-FRAME",
+          "DX11-SAFE-RETURN"
+        ],
+        "win32_release": "SUCCESS"
+      },
+      "openxr": {
+        "run_id": 38096657169,
+        "head_sha": "106bca9991791696466705885f6a041fee5c8378",
+        "conclusion": "SUCCESS",
+        "bundle_job": "SUCCESS",
+        "step": "Feature acceptance: DX11-TEST-BUNDLE SUCCESS",
+        "test_bundle_artifact_id": 11686655889,
+        "artifact_name": "feature-dx11-first-game-frame-106bca9991791696466705885f6a041fee5c8378",
+        "host_x64": "SUCCESS",
+        "game_x86_variants": "SUCCESS"
+      },
+      "target": {
+        "head_sha": "937f6bf484528ac5cf7570ace518cabc3247be93",
+        "backend_gate_run_id": 38092238784,
+        "backend_gate": "SUCCESS",
+        "build_run_id": 38092242550,
+        "build": "SUCCESS",
+        "openxr_run_id": 38092242555,
+        "openxr": "SUCCESS_BUT_BUNDLE_JOB_SKIPPED"
+      }
+    },
+    "scope_review": {
+      "pr_114": "Merged older feature source into target; latest bundle CI fix remains on feature branch only",
+      "changed_paths_vs_target": [
+        ".github/workflows/vr-openxr.yml",
+        "tools/test_package_dx11_first_game_frame.py",
+        "docs/automation/runs/CONVERSION-DX11-00537.json"
+      ],
+      "r175": "CONVERSION-DX11-00477 COMPLETE_R175_SOURCE_WARP_PARITY; owner code not changed",
+      "fallback": "DX9Ex default, explicit OUTRUN_DX11_FIRST_GAME_FRAME=1, fail-closed and input-safe as existing tests assert",
+      "incomplete_acceptance_ids_on_feature": [],
+      "pending_target_acceptance_ids": [
+        "DX11-TEST-BUNDLE"
+      ],
+      "native_gameplay_production_verified": false
+    },
+    "next_action": "Controller-owned lease recheck and promotion of current feature workflow/test changes to TARGET; verify target exact-head DX11-TEST-BUNDLE step/artifact and required gates. Capture actual OR2006 gameplay pixels/insets/input and Quest3/VDXR separately.",
+    "runtime_validation": "UNTESTED",
+    "hmd_test_performed": false,
+    "material_change_this_rollover": false,
+    "score_change": 0,
+    "no_target_branch_write": true
   }
 }
