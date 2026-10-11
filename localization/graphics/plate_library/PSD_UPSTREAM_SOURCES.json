@@ -37,11 +37,21 @@
       "git_blob_sha": "fc60ed582ccdeab322ab24ffd87bea7d89c98087",
       "bytes": 601382,
       "layer_map": "EXTRACTED_UNCLASSIFIED",
-      "clean_plate": "NOT_EXTRACTED",
-      "english_original": "SOURCE_ENGLISH_PSD_COMPOSITE_EXTRACTED_UNVERIFIED",
+      "clean_plate": "EXTRACTED_UNVERIFIED_IN_WORKFLOW_ARTIFACT",
+      "english_original": "EXTRACTED_UNVERIFIED_IN_WORKFLOW_ARTIFACT",
       "current_C2_plate_approval": false,
       "psd_sha256": "cf4e75aa86b730322456d5bdfdf5d74a4028f2cda1a15008e3c61f21989972f8",
-      "layer_count": 35
+      "layer_count": 35,
+      "selected_english_layer_paths": [
+        "1/1/1/0/1/1",
+        "1/1/1/1/0"
+      ],
+      "workbase_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38135847589",
+      "output_png_sha256": {
+        "english_original_full": "e3b799c9553c4d2a8c97580097b3fbee17ba2b18c50b9247eb738aa0cc7b7ee3",
+        "clean_plate_candidate": "bafc3fc43fe9c2676b8ec35299b6d0faeeb1731cd635d55acee4b021eee39770",
+        "english_letter_layers": "754b3cd8557abf566a52ba31562e09d522f983e4a8a776af2eaa93e0aed1f188"
+      }
     },
     {
       "queue_index": 188,
@@ -89,5 +99,7 @@
     }
   ],
   "test_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38135620210",
-  "test_run_result": "SUCCESS_2026-10-11_SHA_PINNED_SOURCE_AND_LAYER_SEPARATION_ONLY"
+  "test_run_result": "SUCCESS_2026-10-11_SHA_PINNED_SOURCE_AND_LAYER_SEPARATION_ONLY",
+  "second_test_run": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38135847589",
+  "second_test_run_result": "SUCCESS_PSD_ENGLISH_CLEAN_CANDIDATE_SPLIT_NOT_C2_APPROVED"
 }
