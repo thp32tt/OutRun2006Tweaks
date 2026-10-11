@@ -1,0 +1,114 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00603",
+  "production_id": "CONVERSION-DX9EX-00603",
+  "event_id": "CONVERSION-DX9EX-00603-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "feature_id": "DX9EX:R33_SINGLE_SCREEN_CLASSIFICATION",
+  "work_key": "DX9EX:R33_SINGLE_SCREEN_CLASSIFICATION",
+  "target_branch": "vr-d3d9ex-focus",
+  "material_result_sha": "6e47fcabfa96bfb921cd018ffcb13ed0492e5f3b",
+  "result_sha": "6e47fcabfa96bfb921cd018ffcb13ed0492e5f3b",
+  "validation_bearing_result_sha": "6e47fcabfa96bfb921cd018ffcb13ed0492e5f3b",
+  "material_commits": [
+    "6e47fcabfa96bfb921cd018ffcb13ed0492e5f3b"
+  ],
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Eliminate duplicated screen-space HUD/flat-perspective classification within one R33 physical draw, avoiding repeated projection lookup and up to three extra D3D9 GetRenderState calls while keeping stereo/world routing unchanged.",
+    "acceptance": "R33 dispatch classifies exactly once, forwards identical enum to HUD, preserves None/world and R29 fail-closed fallback; strict negative mutation regression and full Win32 game plus independent R29-R33 build pass.",
+    "runtime_metrics": "Quest3/VDXR CPU/GPU frame-time p95/p99 and FPS unmeasured; this removes redundant calls but does not establish a measured FPS gain."
+  },
+  "acceptance_results": [
+    {
+      "item": "R33_SINGLE_SCREEN_CLASSIFICATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "R33Dispatch caches one R32ReviewClassifyScreenSpacePass result and R33TryHud accepts that enum; second classification removed."
+    },
+    {
+      "item": "NEGATIVE_MUTATION_REGRESSION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "tools/verify_vr_r33_single_classification.py and three negative routing/classification mutations run in DX9Ex Active policy SUCCESS."
+    },
+    {
+      "item": "WIN32_GAME_HOST_R29_R33_FULL_CHAIN_PACKAGE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Active Validation #38141868724 all jobs SUCCESS."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Domain Isolation Guard #38141868716 SUCCESS."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Full Source Impact Review #38141868702 SUCCESS."
+    },
+    {
+      "item": "EXE_HUD_INSPECTOR",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "OutRun EXE HUD Inspector CI #38141868714 SUCCESS."
+    },
+    {
+      "item": "QUEST3_VDXR_CPU_GPU_FPS",
+      "status": "UNTESTED",
+      "evidence": "No headset render or actual frame-time measurements were performed."
+    }
+  ],
+  "exact_sha_validation": {
+    "target_sha": "6e47fcabfa96bfb921cd018ffcb13ed0492e5f3b",
+    "all_conclusion": "SUCCESS",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38141868724,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "6e47fcabfa96bfb921cd018ffcb13ed0492e5f3b",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38141868724"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38141868716,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "6e47fcabfa96bfb921cd018ffcb13ed0492e5f3b",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38141868716"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38141868702,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "6e47fcabfa96bfb921cd018ffcb13ed0492e5f3b",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38141868702"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38141868714,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "6e47fcabfa96bfb921cd018ffcb13ed0492e5f3b",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38141868714"
+      }
+    ],
+    "source": "Connected GitHub Actions exact SHA"
+  },
+  "material_change_evidence": {
+    "commit_message": "[AUTO:CONVERSION-DX9EX-00603] Remove duplicate R33 HUD screen-pass classification",
+    "changed_paths": [
+      "src/vr/d3d9/stereo_renderer_r33.cpp",
+      "tools/verify_vr_r33_single_classification.py",
+      ".github/workflows/vr-dx9ex-active.yml"
+    ]
+  },
+  "runtime_validation_note": "RUNTIME_VALIDATION=UNTESTED; Quest 3/VDXR visual correctness, 72Hz FPS and p95/p99 have not been verified.",
+  "controller_next_action": "00603 DONE_BUILD_VERIFIED; do not redispatch or rescore. Assign another independent DX9Ex P0 measurable frame-time bottleneck. DX11 remains global priority; DXVK frozen."
+}
