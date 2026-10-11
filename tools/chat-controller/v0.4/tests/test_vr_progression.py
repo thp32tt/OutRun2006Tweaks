@@ -52,6 +52,7 @@ class Progression(unittest.TestCase):
                   'src/vr/d3d9/stereo_renderer_r7.inc',
                   'tools/Collect-OutRunVREyeExtent.ps1']
         ns['GITHUB_REPO'] = 'example/repo'
+        ns['log'] = __import__('logging').getLogger('vr-progression-test')
         ns['github_api_json'] = lambda url: {
             'behind_by': 0, 'ahead_by': 2,
             'files': [{'filename': p} for p in source]
@@ -98,6 +99,7 @@ class Progression(unittest.TestCase):
                           failure_context='OLD_FAILED_CI', phase='DONE')],
             feature_outcomes={feature_id: {'terminal': 'BLOCKED', 'task_id': task_id}})
         ns['GITHUB_REPO'] = 'example/repo'
+        ns['log'] = __import__('logging').getLogger('vr-progression-test')
         ns['github_branch_head'] = lambda _: head
         evidence = ['src/vr/d3d11/live_game_frame_bridge.cpp',
                     'tools/package_dx11_first_game_frame.py']
