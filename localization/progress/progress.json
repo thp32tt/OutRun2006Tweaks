@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 21:10 KST",
+  "updated_at_kst": "2026-10-11 21:47 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1401,6 +1401,30 @@
         "C3": "NOT_RUN",
         "RUNTIME_VALIDATION": "UNTESTED",
         "evidence": "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2110_SECOND_LABEL_WRONG_IMAGEGEN_HOLD.json"
+      },
+      "c1_q102_new_english_second_source_crop_2140_20261011": {
+        "role": "C1",
+        "queue_index": 102,
+        "run_key": "OUTRUN-KOR-C1-Q102-ENGLISH-SOURCE-SECOND-CROP-20261011-2140",
+        "new_material": "actual GitHub committed English source-only second row PNG",
+        "source_reference": "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2140_ENGLISH_SECOND_ROW_SOURCE_ONLY.png",
+        "source_sha256": "78a5f16f379684fd964d607c339683d8d0b07f1b0f6bb268017efdc51e695c80",
+        "source_git_blob_sha": "a31215e72bc689f8907547aca5d57c549ea4407b",
+        "source_material_commit": "e01cc34181e354d72b1eb14ea56f21ae60b82e96",
+        "source_provenance": "C2 exact English comparison gray background crop, source style reference ONLY",
+        "target": "타임 어택 모드",
+        "second_target": "15코스 연속",
+        "generator_id": "c2a423c8-5dfc-46d2-be65-bf460cffeb85",
+        "generated_png_sha256": "6882dfd652d01bff1b17bbde3e7fa9109468b2a734fcc8d6eb1adcdb23f82561",
+        "generated_png_github_published": false,
+        "source_style_selfqa": "FAIL_SOURCE_STYLE_AND_FOREIGN_DECORATION",
+        "new_valid_korean_png_count": 0,
+        "new_trial_dds_count": 0,
+        "official_dds_promoted_count": 0,
+        "C2": "NOT_RUN",
+        "C3": "NOT_RUN",
+        "RUNTIME_VALIDATION": "UNTESTED",
+        "qa": "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2140_SOURCE_CROP_IMAGEGEN_STYLE_FAIL.json"
       }
     },
     "runtime_text_trace": {
