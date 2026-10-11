@@ -44,6 +44,9 @@ namespace OutRunVRStereo
             DWORD zWrite = TRUE;
             DWORD zEnable = D3DZB_TRUE;
             DWORD cullMode = D3DCULL_CCW;
+            // The overwhelmingly common disabled-stencil case can avoid
+            // up to nine tracked D3D9 state reads for each stereo draw.
+            DWORD stencilEnable = FALSE;
             bool valid = false;
             std::uint64_t presentEpoch = 0;
             std::uint64_t drawSerial = 0;
@@ -113,13 +116,16 @@ namespace OutRunVRStereo
             DWORD zWrite = TRUE;
             DWORD zEnable = D3DZB_TRUE;
             DWORD cullMode = D3DCULL_CCW;
+            DWORD stencilEnable = FALSE;
             if (FAILED(device->GetRenderState(
                     D3DRS_ALPHABLENDENABLE, &alphaBlend)) ||
                 FAILED(device->GetRenderState(
                     D3DRS_ALPHATESTENABLE, &alphaTest)) ||
                 FAILED(device->GetRenderState(D3DRS_ZWRITEENABLE, &zWrite)) ||
                 FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)) ||
-                FAILED(device->GetRenderState(D3DRS_CULLMODE, &cullMode)))
+                FAILED(device->GetRenderState(D3DRS_CULLMODE, &cullMode)) ||
+                FAILED(device->GetRenderState(
+                    D3DRS_STENCILENABLE, &stencilEnable)))
             {
                 R29Effect.valid = false;
                 return false;
@@ -141,6 +147,7 @@ namespace OutRunVRStereo
             R29Effect.zWrite = zWrite;
             R29Effect.zEnable = zEnable;
             R29Effect.cullMode = cullMode;
+            R29Effect.stencilEnable = stencilEnable;
             R29Effect.valid = true;
             R29Effect.presentEpoch = PresentEpoch;
             R29Effect.drawSerial = TopLevelDrawSerial();
@@ -209,7 +216,7 @@ namespace OutRunVRStereo
             // safety RT if a later hazard poisons the same Present.
 
             if (R29OwnerLeftDrawMayWriteDepth(device) ||
-                LeftDrawMayWriteStencil(device))
+                R29OwnerLeftDrawMayWriteStencil(device))
                 R9NoteMainDepthContentWrite();
 
             std::uintptr_t savedIdentity = 0;
@@ -502,6 +509,9 @@ namespace OutRunVRStereo
                 break;
             case D3DRS_CULLMODE:
                 R29Effect.cullMode = value;
+                break;
+            case D3DRS_STENCILENABLE:
+                R29Effect.stencilEnable = value;
                 break;
             default:
                 return hr;
@@ -803,6 +813,13 @@ namespace OutRunVRStereo
 
     bool R29OwnerLeftDrawMayWriteStencil(IDirect3DDevice9* device) noexcept
     {
+        if (!device || !TrackedDepthStencil)
+            return false;
+        // Only a reliable, same-Present state snapshot may prove that the
+        // stencil test is disabled. For enabled or uncertain stencil state,
+        // preserve the full write-mask/op/two-sided fail-closed reader.
+        if (R29EffectCacheCurrent() && R29Effect.stencilEnable == FALSE)
+            return false;
         return LeftDrawMayWriteStencil(device);
     }
 

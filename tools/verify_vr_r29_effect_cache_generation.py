@@ -34,6 +34,8 @@ def contract(s):
     setter = body(s, "HRESULT __stdcall SetRenderStateDestR29(")
     telemetry = body(s, "inline bool TryGetEffectTelemetrySnapshot(")
     depth_owner = body(s, "bool R29OwnerLeftDrawMayWriteDepth(")
+    stencil_owner = body(s, "bool R29OwnerLeftDrawMayWriteStencil(")
+    effect_state = body(s, "struct R29EffectState")
     stereo = body(s, "HRESULT R29DirectTwoEye(")
     return all((
         "StateBlockTracker::Reliable()" in cache,
@@ -70,12 +72,23 @@ def contract(s):
         "R29Effect.zWrite != FALSE;" in depth_owner,
         "return false;" in depth_owner,
         "return LeftDrawMayWriteDepth(device);" in depth_owner,
+        "DWORD stencilEnable = FALSE;" in effect_state,
+        "D3DRS_STENCILENABLE, &stencilEnable" in sync,
+        "R29Effect.stencilEnable = stencilEnable;" in sync,
+        "case D3DRS_STENCILENABLE:" in setter,
+        "R29Effect.stencilEnable = value;" in setter,
+        "if (!device || !TrackedDepthStencil)" in stencil_owner,
+        "if (R29EffectCacheCurrent() && R29Effect.stencilEnable == FALSE)" in stencil_owner,
+        "return false;" in stencil_owner,
+        "return LeftDrawMayWriteStencil(device);" in stencil_owner,
+        stencil_owner.find("R29EffectCacheCurrent()") < stencil_owner.find("return LeftDrawMayWriteStencil(device);"),
+        "R29OwnerLeftDrawMayWriteStencil(device)" in stereo,
         depth_owner.find("if (!device || !TrackedDepthStencil)") <
             depth_owner.find("if (R29EffectCacheCurrent())") <
             depth_owner.find("return R29Effect.zEnable != D3DZB_FALSE &&") <
             depth_owner.find("return LeftDrawMayWriteDepth(device);"),
         "R29OwnerLeftDrawMayWriteDepth(device)" in stereo,
-        "LeftDrawMayWriteStencil(device)" in stereo,
+        "R29OwnerLeftDrawMayWriteStencil(device)" in stereo,
         "if (R29OwnerLeftDrawMayWriteDepth(device) ||" in stereo,
         "R29Effect.applyGeneration = 0;" not in sync,
         "R29Effect.recordingGeneration = 0;" not in sync,
@@ -139,6 +152,22 @@ mutations = [
     ("depth or stencil serial safety",
      "if (R29OwnerLeftDrawMayWriteDepth(device) ||",
      "if (R29OwnerLeftDrawMayWriteDepth(device) &&"),
+    ("stencil getter", "D3DRS_STENCILENABLE, &stencilEnable", "D3DRS_CULLMODE, &stencilEnable"),
+    ("stencil synced value", "R29Effect.stencilEnable = stencilEnable;", "R29Effect.stencilEnable = FALSE;"),
+    ("stencil setter", "case D3DRS_STENCILENABLE:", "case D3DRS_SCISSORTESTENABLE:"),
+    ("stencil setter value", "R29Effect.stencilEnable = value;", "R29Effect.stencilEnable = FALSE;"),
+    ("stencil cached only if reliable",
+     "if (R29EffectCacheCurrent() && R29Effect.stencilEnable == FALSE)",
+     "if (R29Effect.stencilEnable == FALSE)"),
+    ("stencil disabled predicate",
+     "R29Effect.stencilEnable == FALSE)", "R29Effect.stencilEnable != FALSE)"),
+    ("stencil conservative fallback",
+     "return LeftDrawMayWriteStencil(device);", "return false;"),
+    ("stencil no depth",
+     "if (!device || !TrackedDepthStencil)\n            return false;\n        // Only a reliable",
+     "if (false)\n            return false;\n        // Only a reliable"),
+    ("stencil direct stereo owner",
+     "R29OwnerLeftDrawMayWriteStencil(device))", "LeftDrawMayWriteStencil(device))"),
 ]
 for name, before, after in mutations:
     if src.count(before) != 1:
@@ -148,4 +177,4 @@ for name, before, after in mutations:
 if errors:
     print("FAIL " + ", ".join(errors), file=sys.stderr)
     sys.exit(1)
-print(f"PASS R29 single-Present effect cache, positive/negative depth-write fastpath, and {len(mutations)} negative mutations")
+print(f"PASS R29 single-Present effect cache, positive/negative depth-write fastpath, stencil-disabled write fastpath, and {len(mutations)} negative mutations")
