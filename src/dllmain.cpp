@@ -107,9 +107,9 @@ void Plugin_Init()
 		LocalFree(argv);
 		if (changed)
 		{
-			// Prevent command-line overrides from being written back to ini
-			spdlog::warn("Command-line overrides are in use, disabling INI writes.");
-			Settings::DisableSettingsWrite = true;
+			// F11 changes must persist; Settings::write excludes every launch-only
+			// command-line override rather than disabling the entire user INI.
+			spdlog::info("Command-line overrides active: unrelated F11 settings remain writable; overridden keys excluded.");
 		} 
 	}
 

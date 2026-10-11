@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <format>
 #include <stdexcept>
+#include <unordered_set>
 
 #include <spdlog/spdlog.h>
 
@@ -18,6 +19,9 @@ extern void CDSwitcher_ReadIni(const std::filesystem::path& iniPath); // hooks_a
 
 namespace Settings
 {
+	// Persist F11 changes even under a VR launch profile, without leaking
+	// temporary -Key=Value test overrides into OutRun2006Tweaks.user.ini.
+	static std::unordered_set<const SettingBase*> commandLineOverrides;
 	std::vector<SettingBase*>& SettingBase::registry()
 	{
 		static std::vector<SettingBase*> settings;
@@ -270,6 +274,7 @@ namespace Settings
 					if (setting->set_from_string(valueUtf8))
 					{
 						spdlog::warn("Setting overridden from command line: {}={}", keyUtf8, valueUtf8);
+						commandLineOverrides.insert(setting);
 
 						changed = true;
 					}
@@ -306,7 +311,7 @@ namespace Settings
 
 		int numWritten = 0;
 		for (const SettingBase* setting : sorted_settings())
-			if (setting->write(ini))
+			if (commandLineOverrides.find(setting) == commandLineOverrides.end() && setting->write(ini))
 				numWritten++;
 
 		inih::INIWriter writer;

@@ -39,7 +39,7 @@ function Start-Slot([string]$slot){
     Prepare-Slot $slot
     $cfg=$slots[$slot]
     $args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$runner,'-TestProfile',$cfg.Profile)
-    Start-Process powershell -ArgumentList $args -WorkingDirectory $root
+    Start-Process powershell -ArgumentList $args -WorkingDirectory $root -WindowStyle Hidden
 }
 
 $form=New-Object System.Windows.Forms.Form
@@ -127,9 +127,12 @@ $($cfg.Help)
     $run.Enabled=$btn.Enabled
     $run.Add_Click({
         try{
+            # Do not keep the selector or the PowerShell console above the game.
+            $form.WindowState=[System.Windows.Forms.FormWindowState]::Minimized
             Start-Slot ([string]$this.Tag)
             Refresh-Status
         }catch{
+            $form.WindowState=[System.Windows.Forms.FormWindowState]::Normal
             [System.Windows.Forms.MessageBox]::Show($_.Exception.Message,'실행 실패')|Out-Null
         }
     })

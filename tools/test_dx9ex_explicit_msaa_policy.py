@@ -48,7 +48,7 @@ settings = (ROOT / "src/vr/settings.cpp").read_text(encoding="utf-8")
 overlay = (ROOT / "src/overlay/settings_ui.cpp").read_text(encoding="utf-8")
 ini = (ROOT / "OutRun2006Tweaks.ini").read_text(encoding="utf-8")
 for marker in (
-    '"VR", "AntiAliasing", 0',
+    '"VR", "AntiAliasing", 2',
     '"Off (fastest)", "2x MSAA", "4x MSAA (fallback 2x)", "Use Game/2D AA"',
     '"VR", "TransparencySupersampling", false',
     "Settings::VRAntiAliasing.needs_restart();",
@@ -63,7 +63,7 @@ for marker in (
 ):
     if marker not in overlay:
         raise SystemExit(f"F11 persistence/restart missing: {marker}")
-for marker in ("AntiAliasing = 0", "TransparencySupersampling = false"):
+for marker in ("AntiAliasing = 2", "TransparencySupersampling = false"):
     if marker not in ini[ini.index("[VR]"):ini.index("[WheelFFB]")]:
         raise SystemExit(f"VR config default missing: {marker}")
 if ("return Settings::TransparencySupersampling &&" not in source or
@@ -92,4 +92,20 @@ for before, after in negative_mutations:
                    '!activeNativeVr || Settings::VRTransparencySupersampling')
     )
     if not witness: raise SystemExit(f"negative mutation not detected: {before}")
-print("DX9Ex F11 VR AA Off/2x/4x/Game + VR SSAA off: PASS (4 negative mutations)")
+# Regression for F11 setting persistence under DX9Ex launch profile overrides.
+settings_core = (ROOT / "src/settings.cpp").read_text(encoding="utf-8")
+bootstrap = (ROOT / "src/dllmain.cpp").read_text(encoding="utf-8")
+wndproc = (ROOT / "src/overlay/hooks_overlay.cpp").read_text(encoding="utf-8")
+selector = (ROOT / "tools/OutRunVR-Slot-Selector.ps1").read_text(encoding="utf-8")
+for marker in ("commandLineOverrides.insert(setting);",
+               "commandLineOverrides.find(setting) == commandLineOverrides.end() && setting->write(ini)"):
+    if marker not in settings_core: raise SystemExit("CLI override persistence isolation missing: " + marker)
+if 'Settings::DisableSettingsWrite = true;' in bootstrap:
+    raise SystemExit("Launch CLI still globally disables F11 INI persistence")
+for marker in ("WM_SETCURSOR", "LoadCursorW(nullptr, IDC_ARROW)", "LOWORD(wParam) != WA_INACTIVE"):
+    if marker not in wndproc: raise SystemExit("F11 mouse pointer/focus fix missing: " + marker)
+if "-WindowStyle Hidden" not in selector or "FormWindowState]::Minimized" not in selector:
+    raise SystemExit("Game launch must not leave PowerShell or selector in foreground")
+if '"VR", "MirrorFitDesktop", true' not in settings or "MirrorFitDesktop = true" not in ini:
+    raise SystemExit("Monitor-fit VR mirror default missing")
+print("DX9Ex F11 VR AA 4x default/2x/Off/Game + write isolation/cursor/window: PASS (4 negative mutations)")

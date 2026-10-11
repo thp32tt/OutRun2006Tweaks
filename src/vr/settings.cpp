@@ -33,7 +33,7 @@ namespace Settings
 		"Starts outrun-vr-host.exe from the game directory when VR is enabled. A short retry window also covers fast game restarts where the previous host is still shutting down." };
     // VR quality is independent of the original game's [DX] ANTIALIASING.
     // D3D9Ex MSAA buffer allocations only change after a game restart.
-    Setting<int> VRAntiAliasing{ "VR", "AntiAliasing", 0,
+    Setting<int> VRAntiAliasing{ "VR", "AntiAliasing", 2,
         "VR-only MSAA level: Off minimizes GPU load, 2x/4x are optional, and Use Game AA restores the 2D AA request. Restart required.",
         { "Off (fastest)", "2x MSAA", "4x MSAA (fallback 2x)", "Use Game/2D AA" } };
     Setting<bool> VRTransparencySupersampling{ "VR", "TransparencySupersampling", false,
@@ -49,7 +49,7 @@ namespace Settings
         "Optional game/eye render width. 0 = use original desktop default; set with RenderHeight. Higher resolution increases GPU load.", Range<int>{ 0, 8192 } };
     Setting<int> VRRenderHeight{ "VR", "RenderHeight", 0,
         "Optional game/eye render height. 0 = use original desktop default; set with RenderWidth. Not an OpenXR runtime autodetection.", Range<int>{ 0, 8192 } };
-    Setting<bool> VRMirrorFitDesktop{ "VR", "MirrorFitDesktop", false,
+    Setting<bool> VRMirrorFitDesktop{ "VR", "MirrorFitDesktop", true,
 		"Fits the borderless PC mirror window to the current monitor even when the internal game backbuffer is larger. The VR render resolution is unchanged." };
 	Setting<bool> VRDisableDesktopVsync{ "VR", "DisableDesktopVsync", true,
 		"Uses immediate D3D9 presentation while VR is enabled so the game source is not hard-capped by the desktop VSync setting before the OpenXR host captures it." };

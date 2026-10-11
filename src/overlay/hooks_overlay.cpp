@@ -302,12 +302,19 @@ class WndprocHook : public Hook
 	inline static SafetyHookInline dest_orig = {};
 	static LRESULT __stdcall destination(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
+		// The gameplay window hides its cursor, but the F11 ImGui shell must
+		// restore a visible pointer even after an activation/focus transition.
+		if (overlayActive && msg == WM_SETCURSOR && LOWORD(lParam) == HTCLIENT)
+		{
+			SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+			return TRUE;
+		}
 		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
 			return 1;
 
 		if (Settings::WindowedHideMouseCursor && !overlayActive)
 		{
-			if (msg == WM_SETFOCUS || (msg == WM_ACTIVATE && lParam != WA_INACTIVE))
+			if (msg == WM_SETFOCUS || (msg == WM_ACTIVATE && LOWORD(wParam) != WA_INACTIVE))
 			{
 				ShowCursor(false);
 			}
