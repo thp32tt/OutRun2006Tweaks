@@ -60,7 +60,7 @@ def main() -> None:
         "indices[i] >= vertexCount",
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
-        "ctx->CopyResource(s.staging.Get(), s.backend.color_texture());",
+        "ctx->CopyResource(next.staging.Get(), s.backend.color_texture());",
         "game->UpdateSurface(",
         "s.observed, s.issued, s.visible, s.failed, s.presents",
         "s.backend.shutdown();",
@@ -227,6 +227,38 @@ def main() -> None:
         assert mutated != bridge and not safe_inset_copy(mutated), (
             "inset copy safety negative control did not detect " + vulnerable
         )
+    # Detect synchronous GPU copies and accidental per-present D3D9 uploads.
+    # This source-level control does not claim actual HMD performance proof.
+    def deferred_inset_contract(code: str) -> bool:
+        start = code.find("constexpr UINT kReadbackSlots = 3;")
+        end = code.find("void before_game_reset(")
+        if start < 0 or end <= start:
+            return False
+        section = code[start:end]
+        return all(x in section for x in (
+            "D3D11_QUERY_EVENT",
+            "D3D11_ASYNC_GETDATA_DONOTFLUSH",
+            "D3D11_MAP_FLAG_DO_NOT_WAIT",
+            "ctx->End(next.fence.Get());",
+            "if (!next.busy)",
+            "++s.droppedCopies;",
+            "s.insetFormat != bb.Format",
+            "s.insetSurface.GetAddressOf(), nullptr",
+        )) and "ctx->Flush();\\n    s.pending = true;" not in section
+
+    assert deferred_inset_contract(bridge)
+    for original, wrong in (
+        ("D3D11_ASYNC_GETDATA_DONOTFLUSH", "0u"),
+        ("D3D11_MAP_FLAG_DO_NOT_WAIT", "0u"),
+        ("ctx->End(next.fence.Get());", "// no GPU completion fence"),
+        ("if (!next.busy)", "if (next.busy)"),
+        ("s.insetFormat != bb.Format", "s.insetFormat == bb.Format"),
+    ):
+        mutated = bridge.replace(original, wrong, 1)
+        assert mutated != bridge and not deferred_inset_contract(mutated), (
+            "deferred readback negative mutation passed unexpectedly: " + original
+        )
+
     # New live D3D9 object-space path: do not require pretransformed
     # XYZRHW for every game-authored triangle. All unlit XYZ+DIFFUSE
     # positions must pass through the actual World/View/Projection state.
