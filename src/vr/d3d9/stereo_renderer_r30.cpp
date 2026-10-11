@@ -1342,10 +1342,39 @@ namespace OutRunVRStereo
             return R30ScreenSpaceKind::None;
         }
 
+        // Only the OpenXR pose/FOV signature affects this affine. Hundreds of
+        // UI/XYZRHW draws in one frame otherwise repeat four tan() calls each.
+        // Exact float-key comparison deliberately misses on NaN/FOV changes.
+        struct R30EyeAffineCache
+        {
+            bool valid = false;
+            std::uint32_t poseSequence = 0;
+            float angleLeft[2]{};
+            float angleRight[2]{};
+            float eyeScale[2]{};
+            float eyeOffset[2]{};
+        };
+
         bool R30BuildEyeAffine(
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
             float eyeScale[2], float eyeOffset[2]) noexcept
         {
+            static thread_local R30EyeAffineCache cache{};
+            if (cache.valid && cache.poseSequence == stereo.poseSequence &&
+                cache.angleLeft[0] == stereo.eyeFov[0].angleLeft &&
+                cache.angleRight[0] == stereo.eyeFov[0].angleRight &&
+                cache.angleLeft[1] == stereo.eyeFov[1].angleLeft &&
+                cache.angleRight[1] == stereo.eyeFov[1].angleRight)
+            {
+                eyeScale[0] = cache.eyeScale[0];
+                eyeScale[1] = cache.eyeScale[1];
+                eyeOffset[0] = cache.eyeOffset[0];
+                eyeOffset[1] = cache.eyeOffset[1];
+                return true;
+            }
+
+            // Do not retain an old success after an invalid/nonfinite packet.
+            cache.valid = false;
             float tanLeft[2]{};
             float tanRight[2]{};
             float width[2]{};
@@ -1379,6 +1408,16 @@ namespace OutRunVRStereo
                 eyeScale[eye] = scale;
                 eyeOffset[eye] = offset;
             }
+
+            cache.poseSequence = stereo.poseSequence;
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                cache.angleLeft[eye] = stereo.eyeFov[eye].angleLeft;
+                cache.angleRight[eye] = stereo.eyeFov[eye].angleRight;
+                cache.eyeScale[eye] = eyeScale[eye];
+                cache.eyeOffset[eye] = eyeOffset[eye];
+            }
+            cache.valid = true; // publish only after BOTH eyes pass all gates
             return true;
         }
 
