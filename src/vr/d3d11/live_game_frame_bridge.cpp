@@ -116,13 +116,19 @@ bool ensure_pipeline(State& s) noexcept {
 
 // Read the current game device, not a WARP fixture's manufactured state.
 // COM getters AddRef; local ComPtrs always release before reset/return.
-bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport) noexcept {
+bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
+                          bool& pretransformed,
+                          std::array<D3DMATRIX, 3>& transforms) noexcept {
     if (!game || FAILED(game->GetViewport(&viewport)) ||
         viewport.Width == 0 || viewport.Height == 0)
         return false;
     DWORD fvf = 0;
-    if (FAILED(game->GetFVF(&fvf)) ||
-        fvf != (D3DFVF_XYZRHW | D3DFVF_DIFFUSE))
+    if (FAILED(game->GetFVF(&fvf))) return false;
+    // Real game fixed-function geometry: admit both pretransformed HUD/sprite
+    // vertices and unlit object-space diffuse vertices. Other FVF layouts
+    // (textures, normals, weights, shader declarations) remain DX9Ex-owned.
+    pretransformed = (fvf == (D3DFVF_XYZRHW | D3DFVF_DIFFUSE));
+    if (!pretransformed && fvf != (D3DFVF_XYZ | D3DFVF_DIFFUSE))
         return false;
     ComPtr<IDirect3DVertexShader9> vs;
     ComPtr<IDirect3DPixelShader9> ps;
@@ -169,32 +175,75 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport) noexce
         op != D3DTOP_SELECTARG1 || arg != D3DTA_DIFFUSE ||
         nextColorOp != D3DTOP_DISABLE)
         return false;
+    // Custom clip planes are not implemented by the native shader. The
+    // object-space path must also reject D3D9 lighting and vertex blending.
+    DWORD clipPlanes = ~0u;
+    if (FAILED(game->GetRenderState(D3DRS_CLIPPLANEENABLE, &clipPlanes)) ||
+        clipPlanes != 0u)
+        return false;
+    if (!pretransformed) {
+        DWORD lighting = TRUE, vertexBlend = ~0u;
+        if (FAILED(game->GetRenderState(D3DRS_LIGHTING, &lighting)) ||
+            FAILED(game->GetRenderState(D3DRS_VERTEXBLEND, &vertexBlend)) ||
+            lighting || vertexBlend != D3DVBF_DISABLE ||
+            FAILED(game->GetTransform(D3DTS_WORLD, &transforms[0])) ||
+            FAILED(game->GetTransform(D3DTS_VIEW, &transforms[1])) ||
+            FAILED(game->GetTransform(D3DTS_PROJECTION, &transforms[2])))
+            return false;
+    }
     return true;
 }
 
 bool translate_vertices(const void* input, UINT count, UINT stride,
-                        const D3DVIEWPORT9& vp,
+                        const D3DVIEWPORT9& vp, bool pretransformed,
+                        const std::array<D3DMATRIX, 3>& transforms,
                         std::vector<NativeVertex>& output) {
-    if (!input || stride < 20 || stride > 512 || count == 0 || count > kMaxVertices)
+    const UINT diffuseOffset = pretransformed ? 16u : 12u;
+    if (!input || stride < diffuseOffset + 4u || stride > 512u ||
+        count == 0 || count > kMaxVertices)
         return false;
     output.resize(count);
     const auto* src = static_cast<const std::uint8_t*>(input);
     for (UINT i = 0; i < count; ++i) {
-        float xyzw[4]{};
+        float xyz[4]{0.0f, 0.0f, 0.0f, 1.0f};
         DWORD diffuse = 0;
-        std::memcpy(xyzw, src + static_cast<std::size_t>(i) * stride, sizeof(xyzw));
-        std::memcpy(&diffuse, src + static_cast<std::size_t>(i) * stride + 16, 4);
-        if (!std::isfinite(xyzw[0]) || !std::isfinite(xyzw[1]) ||
-            !std::isfinite(xyzw[2]) || !std::isfinite(xyzw[3]) ||
-            xyzw[3] <= 0.0f)
+        const auto* data = src + static_cast<std::size_t>(i) * stride;
+        std::memcpy(xyz, data, diffuseOffset);
+        std::memcpy(&diffuse, data + diffuseOffset, sizeof(diffuse));
+        if (!std::isfinite(xyz[0]) || !std::isfinite(xyz[1]) ||
+            !std::isfinite(xyz[2]) ||
+            (pretransformed && (!std::isfinite(xyz[3]) || xyz[3] <= 0.0f)))
             return false;
         NativeVertex& v = output[i];
-        v.clip[0] = 2.0f * (xyzw[0] - static_cast<float>(vp.X)) /
-                    static_cast<float>(vp.Width) - 1.0f;
-        v.clip[1] = 1.0f - 2.0f * (xyzw[1] - static_cast<float>(vp.Y)) /
-                    static_cast<float>(vp.Height);
-        v.clip[2] = xyzw[2];
-        v.clip[3] = 1.0f;
+        if (pretransformed) {
+            v.clip[0] = 2.0f * (xyz[0] - static_cast<float>(vp.X)) /
+                        static_cast<float>(vp.Width) - 1.0f;
+            v.clip[1] = 1.0f - 2.0f * (xyz[1] - static_cast<float>(vp.Y)) /
+                        static_cast<float>(vp.Height);
+            v.clip[2] = xyz[2];
+            v.clip[3] = 1.0f;
+        } else {
+            // D3D9 fixed-function uses row vectors: position * World * View *
+            // Projection. The result is D3D11 clip space as well (z in [0,w]).
+            // Reject nonfinite/behind-camera vertices instead of fabricating
+            // a positive GPU pixel while the real game draw is clipped.
+            std::array<float, 4> clip{xyz[0], xyz[1], xyz[2], 1.0f};
+            for (const auto& matrix : transforms) {
+                std::array<float, 4> next{};
+                for (UINT col = 0; col < 4; ++col)
+                    for (UINT row = 0; row < 4; ++row)
+                        next[col] += clip[row] * matrix.m[row][col];
+                clip = next;
+            }
+            if (!std::isfinite(clip[0]) || !std::isfinite(clip[1]) ||
+                !std::isfinite(clip[2]) || !std::isfinite(clip[3]) ||
+                clip[3] <= 0.0f)
+                return false;
+            std::copy(clip.begin(), clip.end(), v.clip);
+        }
+        if (!std::isfinite(v.clip[0]) || !std::isfinite(v.clip[1]) ||
+            !std::isfinite(v.clip[2]))
+            return false;
         v.diffuse[0] = static_cast<float>((diffuse >> 16) & 255) / 255.0f;
         v.diffuse[1] = static_cast<float>((diffuse >> 8) & 255) / 255.0f;
         v.diffuse[2] = static_cast<float>(diffuse & 255) / 255.0f;
@@ -254,7 +303,9 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         std::lock_guard<std::mutex> lock(s.mutex);
         ++s.observed;
         D3DVIEWPORT9 vp{};
-        if (!supported_game_state(game, vp)) return;
+        bool pretransformed = true;
+        std::array<D3DMATRIX, 3> transforms{};
+        if (!supported_game_state(game, vp, pretransformed, transforms)) return;
         // Count every admitted state, including calls after this frame's one
         // native draw. Use that bounded population to rotate the next frame's
         // probe rather than sampling its same first triangle indefinitely.
@@ -266,7 +317,8 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             return;
         if (!indexCount && vertexCount != primitives * 3) return;
         std::vector<NativeVertex> vertices;
-        if (!translate_vertices(bytes, vertexCount, stride, vp, vertices))
+        if (!translate_vertices(bytes, vertexCount, stride, vp,
+                                pretransformed, transforms, vertices))
             return;
         if (indices) {
             for (UINT i=0; i<indexCount; ++i)
