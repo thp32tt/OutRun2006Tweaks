@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "updatedUtc": "2026-10-09T04:31:00Z",
+  "updatedUtc": "2026-10-11T11:41:00Z",
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
   "phase": "DX9Ex C ACTIVE P0-P3 alongside first-priority DX11 Native A; R84 P1 only; HMD runtime acceptance distinct",
-  "checkpoint": "R84_PORT_SEAMS_PENDING",
+  "checkpoint": "R84_SUPERSEDED_BY_DX9EX_FOCUS",
   "policy": {
     "primaryBackend": "DX9Ex C ACTIVE parallel to first-priority DX11 A; DXVK B FROZEN. C priority P0 unresolved optics/HUD + P1 finite R84 (non-overlapping work keys) -> P2 XR per-eye -> P3 measured native performance; FFB v0.2 frozen.",
     "blockedBackends": [
@@ -145,7 +145,7 @@
       "precondition": "DX9EX-R84-CONVERGENCE-CLOSEOUT-001 DONE before ARCH-V3-GATE-001 may advance live migration."
     },
     "r84ProductionConvergence": {
-      "status": "ACTIVE_SEAMS_PENDING_TU_CMAKE_CLOSEOUT",
+      "status": "SUPERSEDED_BY_DX9EX_FOCUS",
       "plan": "docs/VR_DX9EX_R84_PRODUCTION_CONVERGENCE.md",
       "canonicalBranch": "vr-d3d9ex-focus",
       "canonicalHeadAtPlan": "bd32098ce0be130aa3a64ca2d507275bf08ab69f",
@@ -165,11 +165,12 @@
         "LOWER_PRESENT_RESET_DIRECTGPU_FACADES",
         "CMAKE_TEXTUAL_INCLUDE_CLEANUP"
       ],
-      "closeoutState": "NOT_COMPLETE_PENDING_TU_CMAKE",
+      "closeoutState": "SUPERSEDED_BY_DX9EX_FOCUS",
       "gate0Status": "DONE",
       "inventoryStatus": "DONE",
       "gate0ValidationSha": "cd94b8751540fce0a493374fc3e841dd8475aa32",
-      "inventoryValidationSha": "4df538077584ed56c43ff5af0c89ca0c1257674e"
+      "inventoryValidationSha": "4df538077584ed56c43ff5af0c89ca0c1257674e",
+      "validationBearingResultSha": "074768c96c410f0268c084450b0aa8bced38b6c3"
     },
     "executionAuthority": {
       "effective": "2026-10-10",
@@ -225,7 +226,7 @@
     "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
     "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
   ],
-  "nextAction": "C P0 unresolved optics/HUD and finite R84 structural work continue in parallel only with independent active claims; FFB v0.2 frozen. After R84 exact-SHA Active+Domain/full-chain green, continue P2 XR per-eye and P3 measured native performance. HMD gates only runtime acceptance/live IPC v3; A DX11 remains active, B DXVK frozen.",
+  "nextAction": "R84 full independent R29-R33 Win32 source/build complete. Do not redispatch 00591. Continue P0 HUD/optics, P2 XR per-eye, P3 measured FPS. HMD runtime UNTESTED.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",
