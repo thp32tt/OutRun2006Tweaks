@@ -4,8 +4,8 @@
   "upstream_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
   "discovery": "GITHUB_FULL_TREE_34110_ITEMS",
   "total_psd_in_upstream": 184,
-  "matching_psd_files": 79,
-  "matching_distinct_hashes": 63,
+  "matching_psd_files": 81,
+  "matching_distinct_hashes": 65,
   "license_statement": "Upstream README offers working sources but no repository-wide LICENSE found; retain attribution and independently confirm permission before broader redistribution.",
   "files": [
     {
@@ -439,6 +439,16 @@
       "copied_into_branch": false
     },
     {
+      "texture_hash": "798A1E",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Polaroids/798A1E_1024x256.psd",
+      "git_blob_sha": "023b51fe7326dabfe530666f6d35f5a0744f06e5",
+      "size_bytes": 9224213,
+      "queue_indexes": [
+        178
+      ],
+      "copied_into_branch": false
+    },
+    {
       "texture_hash": "7ABD5110",
       "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Polaroids/7ABD5110_1024x256.psd",
       "git_blob_sha": "580c46c3a2786cc17d3c31d458e600c59345a9d5",
@@ -705,6 +715,16 @@
       "size_bytes": 3729525,
       "queue_indexes": [
         227
+      ],
+      "copied_into_branch": false
+    },
+    {
+      "texture_hash": "E95DA5",
+      "source_path": "PSDs, XCFs, SVGs, and other Working Source Assets/Sumo UI/Various/E95DA5_v02/E95DA5_512x256.psd",
+      "git_blob_sha": "0ca28fa2ee93985682f2a4a19d8a66551ca388f7",
+      "size_bytes": 2596632,
+      "queue_indexes": [
+        230
       ],
       "copied_into_branch": false
     },
