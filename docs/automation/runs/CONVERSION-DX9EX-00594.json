@@ -1,0 +1,81 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00594",
+  "production_id": "CONVERSION-DX9EX-00594",
+  "event_id": "CONVERSION-DX9EX-00594-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "feature_id": "DX9EX:CADENCE_PRESENTED_EVENT_FRESHNESS",
+  "work_key": "DX9EX:CADENCE_PRESENTED_EVENT_FRESHNESS",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "a08f9d3a70de5cb51f5b915da20d50ac100dc6d4",
+  "material_result_sha": "bbda64903a4ca4bf07248da41f636df9894db1c9",
+  "result_sha": "bbda64903a4ca4bf07248da41f636df9894db1c9",
+  "validation_bearing_result_sha": "bbda64903a4ca4bf07248da41f636df9894db1c9",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_acceptance": {
+    "implementation_complete": true,
+    "symptom": "Mode-2 OpenXR cadence serial presentation could consume a prior frame's auto-reset completion event and prematurely stop waiting for the current request.",
+    "acceptance_items": [
+      {
+        "id": "EVENT-FRESHNESS",
+        "status": "PASS",
+        "evidence_paths": [
+          "vrhost/src/main_r23.cpp",
+          "vrhost/src/runtime/cadence_presented_wait.hpp"
+        ],
+        "details": "Clear presented event before publishing a new request; only sequence-valid client presentedRequestId equality accepts completion."
+      },
+      {
+        "id": "DEADLINE-BOUND-WAIT",
+        "status": "PASS",
+        "evidence_paths": [
+          "vrhost/src/runtime/cadence_presented_wait.hpp"
+        ],
+        "details": "After stale signals re-wait within one original absolute deadline; terminate on timeout/invalid wait and recheck client once on boundary."
+      },
+      {
+        "id": "NO-HMD-REGRESSION",
+        "status": "PASS",
+        "evidence_paths": [
+          "vrhost/tests/cadence_presented_wait_smoke.cpp",
+          "vrhost/CMakeLists.txt",
+          ".github/workflows/vr-dx9ex-active.yml"
+        ],
+        "details": "No-HMD deterministic stale signal, finite budget, ready-now, wait-timeout boundary tests; local Linux g++ C++20 GREEN, old one-wait negative mutation RED; exact SHA x64 host build/smoke SUCCESS."
+      },
+      {
+        "id": "SAME-SHA-GATES",
+        "status": "PASS",
+        "details": "Exact SHA DX9Ex Active (policy,host,game,full-chain-compile,package), Domain Isolation and Full Source Impact all SUCCESS."
+      }
+    ],
+    "protected_paths": "R84 C++ renderer TU files, game stereo/FFB, DX11, DXVK and localization unmodified; no game-time, pose, GPU ACK or OpenXR cadence rate policy changed."
+  },
+  "exact_sha_validation": {
+    "target_sha": "bbda64903a4ca4bf07248da41f636df9894db1c9",
+    "dx9ex_active_run_id": 38131779672,
+    "dx9ex_active_jobs": [
+      "policy",
+      "host",
+      "game",
+      "full-chain-compile",
+      "package"
+    ],
+    "domain_isolation_run_id": 38131779558,
+    "full_source_impact_run_id": 38131779565,
+    "all_conclusion": "SUCCESS",
+    "host_smoke_step": "Run deterministic no-HMD host smoke tests",
+    "package_artifact": "OutRun2-VR-DX9EX-ACTIVE-bbda64903a4ca4bf07248da41f636df9894db1c9",
+    "package_artifact_id": 11698279969,
+    "host_artifact_id": 11699855753,
+    "game_artifact_id": 11699486814
+  },
+  "runtime_validation_note": "No Quest3/VDXR HMD/game session; no claim of increased native FPS, improved optics or hardware-level pass.",
+  "controller_next_action": "Do not rerun same TASK_ID for score. Schedule next independent DX9Ex source feature after checking latest target HEAD/active claims; DXVK frozen."
+}
