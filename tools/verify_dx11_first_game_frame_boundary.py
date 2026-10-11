@@ -37,11 +37,21 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     require("type != D3DPT_TRIANGLELIST" in code and
             "idx" not in "" and "indices[i] >= vertexCount" in code,
             "non-triangle or invalid indices must be rejected")
+    # Validate the complete source-to-inset chain. A bounded, fenced,
+    # nonblocking copy is stricter than the old synchronous staging Map:
+    # no CPU wait, no unread-slot overwrite, and checked RGB pixel evidence.
     require("s.backend.begin_frame(kBackground);" in code and
-            "ctx->CopyResource(s.staging.Get(), s.backend.color_texture())" in code and
-            "ctx->Map(s.staging.Get(), 0, D3D11_MAP_READ" in code and
-            "changedPixels" in code and "game->UpdateSurface(" in code,
-            "native frame must reach checked visible desktop output")
+            "ctx->CopyResource(next.staging.Get(), s.backend.color_texture())" in code and
+            "ctx->End(next.fence.Get());" in code and
+            "D3D11_QUERY_EVENT" in code and
+            "D3D11_ASYNC_GETDATA_DONOTFLUSH" in code and
+            "D3D11_MAP_FLAG_DO_NOT_WAIT" in code and
+            "if (!next.busy)" in code and
+            "s.readSlot = (s.readSlot + 1u) % kReadbackSlots;" in code and
+            "changedPixels" in code and
+            "game->UpdateSurface(" in code and
+            "s.insetFormat != bb.Format" in code,
+            "native frame must reach checked nonblocking desktop output")
     require("void before_game_reset()" in code and "s.backend.shutdown();" in code,
             "reset must invalidate native device owner")
     require("ctx->IASetVertexBuffers" in code and
