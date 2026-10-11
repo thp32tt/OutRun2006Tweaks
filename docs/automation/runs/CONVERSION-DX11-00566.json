@@ -11,7 +11,7 @@
   "base_sha": "909c29212aef41403150297d1c2202e1a6a1d7e4",
   "work_key": "DX11:MENU_RACE_MODULATE2X4X_INDEPENDENT_ALPHA_NATIVE_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "COMPLETE_BUILD_VERIFIED_NEED_HMD_TEST",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
