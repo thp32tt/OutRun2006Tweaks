@@ -4402,9 +4402,11 @@ namespace OutRunVRStereo
             UINT nativeElements = 0;
             if (!live::diagnostic_enabled() || !device ||
                 (topology != D3DPT_TRIANGLELIST &&
-                 topology != D3DPT_TRIANGLESTRIP) ||
+                 topology != D3DPT_TRIANGLESTRIP &&
+                  topology != D3DPT_TRIANGLEFAN) ||
                 !live::game_primitive_element_count(
-                    topology == D3DPT_TRIANGLESTRIP, primitiveCount,
+                    (topology == D3DPT_TRIANGLESTRIP ||
+                      topology == D3DPT_TRIANGLEFAN), primitiveCount,
                     nativeElements)) return;
             try {
                 IDirect3DVertexBuffer9* vb = nullptr;
@@ -4442,9 +4444,11 @@ namespace OutRunVRStereo
             UINT nativeElements = 0;
             if (!live::diagnostic_enabled() || !device ||
                 (topology != D3DPT_TRIANGLELIST &&
-                 topology != D3DPT_TRIANGLESTRIP) ||
+                 topology != D3DPT_TRIANGLESTRIP &&
+                  topology != D3DPT_TRIANGLEFAN) ||
                 !live::game_primitive_element_count(
-                    topology == D3DPT_TRIANGLESTRIP, primitiveCount,
+                    (topology == D3DPT_TRIANGLESTRIP ||
+                      topology == D3DPT_TRIANGLEFAN), primitiveCount,
                     nativeElements) || !numVertices) return;
             try {
                 IDirect3DVertexBuffer9* vb = nullptr;
@@ -4530,10 +4534,12 @@ namespace OutRunVRStereo
             UINT nativeElements = 0;
             if (!live::diagnostic_enabled() || !device ||
                 (topology != D3DPT_TRIANGLELIST &&
-                 topology != D3DPT_TRIANGLESTRIP) || minVertex != 0 ||
+                 topology != D3DPT_TRIANGLESTRIP &&
+                  topology != D3DPT_TRIANGLEFAN) || minVertex != 0 ||
                 !numVertices || numVertices > 1536 ||
                 !live::game_primitive_element_count(
-                    topology == D3DPT_TRIANGLESTRIP, primitiveCount,
+                    (topology == D3DPT_TRIANGLESTRIP ||
+                      topology == D3DPT_TRIANGLEFAN), primitiveCount,
                     nativeElements) ||
                 !indices || !vertices || stride < 16 || stride > 512 ||
                 (format != D3DFMT_INDEX16 && format != D3DFMT_INDEX32))

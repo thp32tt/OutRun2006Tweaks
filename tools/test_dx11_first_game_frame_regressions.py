@@ -807,7 +807,26 @@ def main() -> None:
         changed = bridge.replace(token, "BROKEN_NATIVE_STRIP", 1)
         assert changed != bridge and token not in changed
 
-    print("DX11 live diagnostic TEX1/DXT/packed16/strip/alpha/scissor/COLORWRITE Draw/fallback regression PASS (static only)")
+    # 00546: D3D9 real-fan producers -> bounded source -> native indexed Draw.
+    fan_header = (ROOT / "src/vr/d3d11/live_game_primitive_span.hpp").read_text(encoding="utf-8")
+    fan_probe = (ROOT / "tools/dx11_game_primitive_span_probe.cpp").read_text(encoding="utf-8")
+    for token in ("game_fan_to_triangle_list", "result.push_back(center);",
+                  "result.push_back(b);", "result.push_back(c);", "triangles.swap(result);"):
+        assert token in fan_header
+    for token in ("type != D3DPT_TRIANGLEFAN", "type == D3DPT_TRIANGLEFAN",
+                  "fanTriangles.data()", "D3DPT_TRIANGLELIST, capture, output"):
+        assert token in bridge
+    assert "fan == preserved" in fan_probe
+    for source in producers:
+        a = source.index("void R30ObserveNativeLinearVB(")
+        z = source.index("HRESULT __stdcall DrawPrimitiveDestR30(", a)
+        hooks = source[a:z]
+        assert hooks.count("topology != D3DPT_TRIANGLEFAN") == 3
+        assert hooks.count("topology == D3DPT_TRIANGLEFAN") == 3
+        mutated = hooks.replace("topology != D3DPT_TRIANGLEFAN", "topology == D3DPT_TRIANGLEFAN", 1)
+        assert mutated != hooks and mutated.count("topology != D3DPT_TRIANGLEFAN") == 2
+
+    print("DX11 live diagnostic TEX1/DXT/packed16/strip/fan/alpha/scissor/COLORWRITE Draw/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":

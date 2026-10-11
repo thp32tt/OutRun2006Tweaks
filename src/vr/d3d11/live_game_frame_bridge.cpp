@@ -712,8 +712,10 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
              const std::uint32_t* indices, UINT indexCount) noexcept {
     UINT expectedElements = 0;
     if (!diagnostic_enabled() || !game ||
-        (type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP) ||
-        !game_primitive_element_count(type == D3DPT_TRIANGLESTRIP,
+        (type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP &&
+         type != D3DPT_TRIANGLEFAN) ||
+        !game_primitive_element_count(type == D3DPT_TRIANGLESTRIP ||
+                                       type == D3DPT_TRIANGLEFAN,
                                       primitives, expectedElements))
         return;
     try {
@@ -744,8 +746,22 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             for (UINT i=0; i<indexCount; ++i)
                 if (indices[i] >= vertexCount) return;
         }
-        s.attempted = true;
-        if (!submit(s, vertices, indices, indexCount, type, capture, output)) ++s.failed;
+        if (type == D3DPT_TRIANGLEFAN) {
+            // Real game VB/IB/UP data, rebased by R30. No fixture substitution.
+            std::vector<std::uint32_t> fanTriangles;
+            if (!game_fan_to_triangle_list(primitives, indices, indexCount,
+                                           vertexCount, fanTriangles))
+                return;
+            s.attempted = true;
+            if (!submit(s, vertices, fanTriangles.data(),
+                        static_cast<UINT>(fanTriangles.size()),
+                        D3DPT_TRIANGLELIST, capture, output))
+                ++s.failed;
+        } else {
+            s.attempted = true;
+            if (!submit(s, vertices, indices, indexCount, type, capture, output))
+                ++s.failed;
+        }
     } catch (...) {
         // Never interrupt the game's real draw or input on diagnostic failure.
     }
@@ -760,8 +776,10 @@ bool diagnostic_enabled() noexcept {
 void observe_linear(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
                     UINT primitives, const void* vertices, UINT stride) noexcept {
     UINT nativeElements = 0;
-    if ((type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP) ||
-        !game_primitive_element_count(type == D3DPT_TRIANGLESTRIP,
+    if ((type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP &&
+         type != D3DPT_TRIANGLEFAN) ||
+        !game_primitive_element_count(type == D3DPT_TRIANGLESTRIP ||
+                                       type == D3DPT_TRIANGLEFAN,
                                       primitives, nativeElements)) return;
     observe(game, type, primitives, vertices, stride, nativeElements, nullptr, 0);
 }
