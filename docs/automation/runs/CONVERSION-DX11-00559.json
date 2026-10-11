@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00559",
+  "production_id": "CONVERSION-DX11-00559",
+  "event_id": "CONVERSION-DX11-00559-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00559",
+  "base_sha": "fddee48b454fb68b6f39a5b9b0f6568e075e06b3",
+  "work_key": "DX11:MENU_RACE_STAGE0_ADDSMOOTH_RGBA_NATIVE_DRAW",
+  "status": "AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Actual game D3D9 stage0 ADDSMOOTH color/alpha and original game Draw",
+      "D3D11 owned HLSL shader and native linear/indexed draw",
+      "Existing opt-in desktop inset readback with original game Draw/input fallback"
+    ],
+    "batch_components": [
+      "C++ game stage0 exact state capture",
+      "C++ D3D11 shader/PS lifecycle and draw",
+      "Python destructive source regressions and CPU RGBA reference"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3D9 state+texture/diffuse->HLSL->real native draw connected",
+      "negative_regression": "D3D9 mismatched ops excluded; destructive link removal rejects",
+      "component_integration": "Live game texture and vertex data to native shader draw/diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_STAGE0_ADDSMOOTH_RGBA_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:STAGE0_ADDSMOOTH"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "STAGE0_ADDSMOOTH_RGBA",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "NEED_HMD_TEST Quest3/VDXR/gamepad",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only; original DX9Ex D3D9 Draw/Present/input authoritative"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00559.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Latest GitHub fddee48b454fb68b6f39a5b9b0f6568e075e06b3, policy/AGENTS/00558 complete inspected",
+    "C1_REVIEW": "Stage0 ADDSMOOTH missing from existing real Draw path; select separate work_key",
+    "C2_IMPLEMENT": "Implement ADDSMOOTH RGBA HLSL and D3D9 admission/native dispatch with negative source and CPU vectors",
+    "C3_VALIDATE": "Local source-link checks PASS; full GitHub exact SHA Gate PENDING; HMD UNTESTED",
+    "C4_COMMIT": "Material source/test and run record committed without CI-skip",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "feature_status": "SOURCE_INTEGRATED_PENDING_CI_NEED_HMD_TEST",
+  "runtime_evidence": "No in-game frame, Quest3/VDXR, gamepad test; UNTESTED",
+  "next_action": "Check exact material SHA Github Actions; update C6 without changing validation-bearing SHA only if required; no score until proven",
+  "state_persisted": true
+}

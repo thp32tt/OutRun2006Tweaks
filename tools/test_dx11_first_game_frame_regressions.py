@@ -1339,6 +1339,52 @@ def main() -> None:
             assert result != texel and result != diffuse
     print("DX11 stage0 texture/diffuse alpha blend live native draw PASS (static only)")
 
+
+    # 00559 ADDSMOOTH D3D9 stage0 color+alpha -> real native linear/indexed Draw.
+    # Static source+CPU proof only; runtime menu/gamepad/HMD parity is untested.
+    smooth_links = (
+        "const bool addSmooth = op == D3DTOP_ADDSMOOTH && alphaOp == D3DTOP_ADDSMOOTH;",
+        "bool addSmooth = false;",
+        "!mixedAddTextureAlpha && !mixedAddDiffuseAlpha && !addSmooth &&",
+        "modulate || additive || subtract || addSmooth || modulate2x",
+        "capture.addSmooth = addSmooth;",
+        "float4 PSTextureAddSmooth(VOut v) : SV_Target {",
+        "float4 c = saturate(t + v.diffuse * (1.0f - t));",
+        '!compile("PSTextureAddSmooth", "ps_4_0", addSmoothCode)',
+        "s.addSmoothPs.GetAddressOf()",
+        "s.addSmoothPs.Reset();",
+        "s.addSmoothPs && s.modulate2xPs",
+        "capture.addSmooth ? s.addSmoothPs.Get() :",
+        "mirror_texture(dev, capture, sampledView, sampledSampler)",
+        "ctx->DrawIndexed(indexCount, 0, 0);",
+        "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+    )
+    def smooth_connected(code: str) -> bool:
+        state = code[code.find("bool supported_game_state("):
+                     code.find("bool translate_vertices(")]
+        submit = code[code.find("bool submit("):code.find("void observe(")]
+        return (all(link in code for link in smooth_links)
+                and "const bool addSmooth = op == D3DTOP_ADDSMOOTH && alphaOp == D3DTOP_ADDSMOOTH;" in state
+                and "capture.addSmooth ? s.addSmoothPs.Get() :" in submit
+                and code.count("s.addSmoothPs.Reset();") == 2)
+    assert smooth_connected(bridge)
+    for link in smooth_links[:-2]:
+        mutant = bridge.replace(link, "/* disconnected 00559 */")
+        assert mutant != bridge and not smooth_connected(mutant), "ADDSMOOTH disconnected: " + link
+    for texel, diffuse, expected in (
+        ((0.2, 0.5, 0.0, 0.9), (0.8, 0.4, 0.75, 0.25), (0.84, 0.7, 0.75, 0.925)),
+        ((1.0, 0.0, 0.75, 0.1), (0.25, 0.8, 0.6, 0.9), (1.0, 0.8, 0.9, 0.91)),
+    ):
+        actual = tuple(min(1.0, t + d * (1.0 - t)) for t, d in zip(texel, diffuse))
+        assert all(abs(a-b) < 1e-6 for a, b in zip(actual, expected))
+        assert actual != texel and actual != diffuse
+    for color_op, alpha_op, permitted in (
+        (11, 11, True), (11, 7, False), (7, 11, False),
+        (11, 10, False), (10, 11, False), (0, 11, False),
+    ):
+        assert (color_op == 11 and alpha_op == 11) == permitted
+    print("DX11 stage0 ADDSMOOTH source-to-game-native-Draw PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
