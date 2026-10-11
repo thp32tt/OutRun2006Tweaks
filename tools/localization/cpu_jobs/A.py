@@ -31,6 +31,10 @@ def png(name,pic):
 def jsonfile(name,obj):
  p=DEST/(name+".json");p.write_text(json.dumps(obj,ensure_ascii=False,indent=2)+"\n",encoding="utf-8");return ref(p)
 def pic(a):return Image.fromarray(a.astype(np.uint8),"RGBA")
+def display_source_order(im):
+ # Readable QA view only: correct legacy archived BGRA-channel-order pixels.
+ a=np.asarray(im)
+ return Image.fromarray(a[:,:,[2,1,0,3]],"RGBA")
 def bg(im,color):return Image.alpha_composite(Image.new("RGBA",im.size,(*color,255)),im).convert("RGB")
 def decode(b):
  guard(b[:4]==b"DDS " and len(b)==128+W*H*4,"source DDS not 4096x4096 RGBA")
@@ -100,7 +104,9 @@ for name,(x0,y0,x1,y1) in AREAS.items():
  edge=layer.filter(ImageFilter.MaxFilter(13)) # 2px rounded dark rim
  # True separate visible white face, dark copper-brown source line and shadow.
  face=Image.new("RGBA",layer.size,(251,250,247,0));face.putalpha(layer)
- rim=Image.new("RGBA",layer.size,(61,20,12,0));rim.putalpha(edge)
+ # The archived source/CLEAN PNG and DDS are stored BGRA-channel-order
+ # despite DDS header RGBA masks; use channel-swapped source-brown bytes.
+ rim=Image.new("RGBA",layer.size,(12,20,61,0));rim.putalpha(edge)
  letter=Image.alpha_composite(rim,face).resize((w,h),Image.Resampling.LANCZOS)
  faceNative=face.resize((w,h),Image.Resampling.LANCZOS)
  rimNative=rim.resize((w,h),Image.Resampling.LANCZOS)
@@ -122,11 +128,11 @@ for name,(x0,y0,x1,y1) in AREAS.items():
   ww=max(1,round(w*pct/100));hh=max(1,round(h*pct/100))
   card=Image.new("RGB",(ww*4,hh),color)
   for i,k in enumerate(("SOURCE","CLEAN","OLD_SAVED","NEW_COMPOSED")):
-   tile=bg(panels[k],color).resize((ww,hh),Image.Resampling.LANCZOS)
+   tile=bg(display_source_order(panels[k]),color).resize((ww,hh),Image.Resampling.LANCZOS)
    card.paste(tile,(ww*i,0))
   proof[name+"_"+label]=png("A250_"+name+"_"+label+"_SOURCE_CLEAN_OLD_NEW",card)
  rows.append({"id":name,"original_bbox":[x0,y0,x1,y1],"saved_new_bbox":[x0+localbbox[0],y0+localbbox[1],x0+localbbox[2],y0+localbbox[3]],
-              "margin_ltrb":margin,"source_face":"white + dark copper-brown outline","new_face":"near-white + dark copper-brown",
+              "margin_ltrb":margin,"source_face":"white + dark copper-brown outline","new_face":"near-white + dark copper-brown (BGRA stored bytes + readable preview corrected)",
               "right_italic_source_approx":0.38,"new_pixels_inside":int(np.count_nonzero(np.any(rendered!=oldROI,axis=2))),
               "source_clean_bg_difference_mean":corner_error,"source_clean_png_BGR_channel_swapped":used_channel_swap})
 all_delta=np.any(T!=O,axis=2)
