@@ -41,7 +41,7 @@ def check(text):
     assert "R30SkyGlow.tempSurface[eye]" in apply
     assert "passState.fixedConfigured = true;" in pass_fn.split("device->SetPixelShader(shader);", 1)[0]
     assert "D3DRS_SRCBLEND, D3DBLEND_ONE" in pass_fn
-    assert "D3DRS_COLORWRITEENABLE_ALPHA" in pass_fn
+    assert "D3DCOLORWRITEENABLE_ALPHA" in pass_fn
     assert "device->SetViewport(&viewport)" in pass_fn, "eye target's viewport must be set per pass"
     assert "R30SkyGlow.factor > 1" in apply, "do not change protected vertical blur policy"
     assert "compositeSource = R30SkyGlow.temp[eye];" in apply, "vertical blur source lost"
