@@ -30,6 +30,9 @@ namespace OutRunVrD3D9ExDirectPassthrough
         std::uint32_t width = 0;
         std::uint32_t height = 0;
         DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+        // Immutable resource metadata validated when the shared handles are opened.
+        // Reuse it for subsequent frames instead of a per-frame COM GetDesc call.
+        D3D11_TEXTURE2D_DESC validatedDesc{};
         ID3D11Texture2D* eye[2]{};
     };
 
@@ -163,6 +166,9 @@ namespace OutRunVrD3D9ExDirectPassthrough
             return false;
         }
 
+        // Publish the descriptor only after *both* eyes passed the declared
+        // extent/format/sample checks. R32ReleaseSharedSlot clears it on eviction.
+        cache.validatedDesc = desc[0];
         cache.generation = generation;
         cache.runGeneration = runGeneration;
         cache.gamePid = gamePid;
@@ -225,9 +231,9 @@ namespace OutRunVrD3D9ExDirectPassthrough
         if (!R32OpenSharedSlot(frame, source) || !source)
             return false;
 
-        D3D11_TEXTURE2D_DESC desc{};
-        source->eye[0]->GetDesc(&desc);
-        if (!R32EnsureInactiveEyes(desc))
+        // OpenSharedSlot already validated this immutable D3D11 descriptor
+        // against both producer eyes. Slot identity covers reset/reopen changes.
+        if (!R32EnsureInactiveEyes(source->validatedDesc))
             return false;
 
         OutRunVrFinalTest::Context->CopyResource(

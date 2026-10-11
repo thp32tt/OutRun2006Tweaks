@@ -107,6 +107,7 @@ on:
       - 'tools/verify_vr_dx9ex_reset_transport_contract.py'
       - 'tools/verify_vr_session_direct_hold_lifetime.py'
       - 'tools/verify_vr_direct_hold_desc_fastpath.py'
+      - 'tools/verify_vr_r32_shared_descriptor_cache.py'
       - 'tools/verify_vr_capture_metadata_fastpath.py'
       - 'tools/verify_vr_r28_active_frame_pacing.py'
       - 'tools/verify_vr_desktop_capture_reuse.py'
@@ -236,6 +237,7 @@ jobs:
             'tools/verify_vr_dx9ex_reset_transport_contract.py',
             'tools/verify_vr_session_direct_hold_lifetime.py',
             'tools/verify_vr_direct_hold_desc_fastpath.py',
+            'tools/verify_vr_r32_shared_descriptor_cache.py',
             'tools/verify_vr_capture_metadata_fastpath.py',
             'tools/verify_vr_r28_active_frame_pacing.py',
             'tools/verify_vr_desktop_capture_reuse.py',
