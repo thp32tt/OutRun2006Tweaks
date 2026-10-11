@@ -14,7 +14,7 @@ paths are in `localization/graphics/plate_library/PSD_IMPORT_CATALOG.json`.
 The full matching set is about 1.84 GB; do not blindly import unrelated media,
 multiple revisions or copyright-unverified content as runtime assets.
 
-**Local-first input rule:** before fetching remote or rebuilding CLEAN, check
+**Local-first input rule:** run `python tools/localization/psd_source_lookup.py --index N` and use only `COPIED_SOURCE_VERIFIED` entries. Before fetching remote or rebuilding CLEAN, check
 `localization/graphics/source_psd_upstream/<texture-hash>/` for matching PSDs
 whose Git blob SHA is listed in the catalog. These are source *inputs*, not game
 overrides. They remain unchanged; use `psd_layer_workbase.py separate` to
