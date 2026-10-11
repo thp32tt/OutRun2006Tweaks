@@ -98,7 +98,11 @@ assert int(np.count_nonzero(change&~allowed))==0
 ink=np.argwhere(N[y0:y1,x0:x1,3]>0)
 ymin,xmin=ink.min(axis=0);ymax,xmax=ink.max(axis=0)+1
 bbox=[int(x0+xmin),int(y0+ymin),int(x0+xmax),int(y0+ymax)]
-assert bbox[0]>x0 and bbox[1]>y0 and bbox[2]<=x1 and bbox[3]<y1,("SOURCE_GLYPH_CEILING",bbox)
+# The original numeral touches the English effect bbox right/bottom edge.
+# Preserving those EXACT source pixels is permitted; only NEW Hangul must have
+# positive margins, never enlarge by 1px beyond the canonical English bound.
+assert bbox[0]>x0 and bbox[1]>y0 and bbox[2]<=x1 and bbox[3]<=y1,("SOURCE_GLYPH_CEILING",bbox)
+assert np.count_nonzero(mask[-2:,:])==0 and np.count_nonzero(mask[:2,:])==0
 # Source must be exact native RAW geometry. Direct repo-bound letter input
 # created for later compose_lettering verification after controller first look.
 Image.fromarray(src[::-1].copy(),"RGBA").save(OUT/"SOURCE_RAW_RGBA.png")
