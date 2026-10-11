@@ -7,6 +7,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "C1 ODD q121 new A240 saved first independent QA: missing colon and angular racing italic fail; retain official, producer repair punctuation/source typography, independent C2 then separate C3 and IGR030/031/040 user re-test. localization/graphics/role_C/20261011-C1-Q121-A240-FIRST-SAVED-INDEPENDENT/C1_Q121_A240_INDEPENDENT_OPTICAL_REWORK.json. RUN_KEY=OUTRUN-KOR-C1-Q121-A240-NEW-SHA-PUNCTUATION-STYLE-20261011-1540",
     "B371 q060 B ImageGen first image-only metallic Hangul '최고 기록' generation (real id 21d3292f-99ef-4758-8b29-2c8a957138f3; genuine RGBA 2172x724 SHA 73bcb721f0384911e221427589c39bda99b6cb98ad1d2aaa50f8764cfb722736), but mandatory final ':' missing; FAIL_EXACT_TEXT, NOT complete '최고 기록:'. Earlier B371 imagegen attempts were dashboards. Only transient local image/crop SHA b76c2aa...; no valid GitHub binary/manifest or DDS, official q060 d81d0d14 unchanged; CLEAN C372 PLATE_PASS a03687d4 reused; IGR044 OPEN, C2/C3 NOT_RUN, RUNTIME_VALIDATION=UNTESTED. Next use materially new imagegen input forcing exact punctuation plus GitHub upload, not font/vector fallback or invented approval. QA localization/graphics/role_B/imagegen_requests/q060_B371_IMAGEGEN_SCOPED_HANGUL_MISSING_COLON_20261011.json RUN_KEY=OUTRUN-KOR-B371-Q060-IMAGEGEN-PUNCTUATION-HOLD-20261011-1530",
     "A240 2026-10-11 15:25 KST ODD P0 q121 NEW persisted Catmull-Rom spline/pressure 4-jamo image trial SHA 4be07b63e3bc1bee32d5f5192e95c24f9e709512c03e7074e679a93551cd6936 distinct A239 e3111774, official q121 38d5c2c3 unchanged. Exact original f7847db9; producer direct lossless saved BGW native/practical50 RAW scoped optical REWORK due still-not-matching smooth racing-font topology. Saved diff vs A239 RGBA5797/alpha silhouette738, changed official->trial ROI9630 outside0 other29 exact, decode0, margin RAW [8,4,3,1]. C2 first independent review not done, C3 blocked; IGR030/031/040 OPEN and user real-game UNTESTED. Earlier failed/publish-empty attempts same RUN_KEY and +0; only worker38117535326 produced published trial. QA localization/graphics/role_A/20261011-A240-Q121-SPLINE-PRESSURE-LETTERING/A240_CONTROLLER_SAVED_DDS_VISUAL_QA.json. RUN_KEY=OUTRUN-KOR-A240-Q121-P0-CURVED-PRESSURE-STROKES-20261011-1500",
     "C1 q101 2026-10-11 15:15 KST: upstream original source DDS SHA reauthenticated and previously undocumented glyph morphology failure on existing A226 SHA; reconstruct source-like curved lettering; independent C2 + separate C3 + user-game. Evidence localization/graphics/role_C/20261011-C1-Q101-A226-AUTHENTICATED-OPTICAL-REWORK/C1_Q101_A226_SOURCE_AUTHENTICATED_OPTICAL_REWORK.json.",
@@ -7057,7 +7058,7 @@
     "next_safe_work": "independent C QA of B209/A143 assumptions, then package and NEW actual-game name-entry/reload/display test",
     "forbidden_domains_touched": []
   },
-  "updated_at_kst": "2026-10-11 15:15 KST",
+  "updated_at_kst": "2026-10-11 15:46 KST",
   "a144_user_jpg_rework": {
     "run": "20261006-A-USERJPG144-CLEANUP",
     "completed_at_kst": "2026-10-06 22:31 KST",
@@ -16307,5 +16308,27 @@
     "new_approval": 0,
     "runtime_validation": "UNTESTED",
     "evidence": "localization/graphics/role_C/20261011-C2-Q104-STRICT-NATIVE-SOURCE-FAMILY/C2_Q104_INDEPENDENT_STRICT_NATIVE_STYLE_REWORK.json"
+  },
+  "c1_20261011_q121_a240_first_saved_independent": {
+    "index": 121,
+    "role": "C1",
+    "shard": "ODD_ONLY",
+    "run_key": "OUTRUN-KOR-C1-Q121-A240-NEW-SHA-PUNCTUATION-STYLE-20261011-1540",
+    "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+    "prior_sha256": "e31117743295950fad5216a428b0c105fff35bfeeb0709da85f9f96f8151544a",
+    "new_sha256": "4be07b63e3bc1bee32d5f5192e95c24f9e709512c03e7074e679a93551cd6936",
+    "official_unchanged": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+    "finding": "REWORK_REQUIRED_SOURCE_MORPHOLOGY_AND_MISSING_SOURCE_COLON",
+    "first_new_qa_A240": true,
+    "full_atlas_changed_outside_rgba": 0,
+    "full_atlas_changed_outside_alpha": 0,
+    "sha_bound_lossless_PNG_count": 4,
+    "C2": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "user_game": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "QA": "localization/graphics/role_C/20261011-C1-Q121-A240-FIRST-SAVED-INDEPENDENT/C1_Q121_A240_INDEPENDENT_OPTICAL_REWORK.json",
+    "production_DDS_added": 0,
+    "approval": 0
   }
 }
