@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "kind": "vr_queue_checkpoint",
+  "controller_build": "2026-10-11-progress-v2",
+  "purpose": "periodic",
+  "captured_at_kst": "2026-10-11T13:00:50.244176+09:00",
+  "controller_branch": "chat-controller-downloads",
+  "game_branch_head": "ea890461b445f01903e690fc6fc4c13622292079",
+  "record": {
+    "task_id": "CONVERSION-DX9EX-00593",
+    "production_id": "CONVERSION-DX9EX-00593",
+    "event_id": "CONVERSION-DX9EX-00593-E001",
+    "event_type": "dispatch",
+    "lane": "DX9EX",
+    "slot": "C",
+    "branch": "vr-d3d9ex-focus",
+    "base_sha": "ea890461b445f01903e690fc6fc4c13622292079",
+    "result_sha": null,
+    "phase": "WAIT_CHAT",
+    "status": "WAIT_CHAT",
+    "terminal": null,
+    "attempt": 1,
+    "retry_count": 0,
+    "rollover_count": 0,
+    "chat_rollovers": 0,
+    "sent_at": "2026-10-11T12:55:35.447934+09:00",
+    "last_hash": null,
+    "last_hash_changed_at": "2026-10-11T12:55:35.447934+09:00",
+    "last_gate_poll_at": null,
+    "failure_context": null,
+    "feature_id": "DX9EX:XR_RECOMMENDED_EYE_EXTENT",
+    "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00593",
+    "feature_stage": "IMPLEMENTING",
+    "feature_goal": "OpenXR 권장 per-eye 크기를 실제 렌더 타깃/viewport/swapchain에 일관되게 적용하고 Reset·실패 폴백과 테스트 빌드를 완성한다. 기존 구현을 재조사만 하지 말고 미완료 연결·회귀를 구현한다.",
+    "feature_contract": {
+      "feature_id": "DX9EX:XR_RECOMMENDED_EYE_EXTENT",
+      "lane": "DX9EX",
+      "work_key": "DX9EX:XR_RECOMMENDED_EYE_EXTENT",
+      "goal": "OpenXR 권장 per-eye 크기를 실제 렌더 타깃/viewport/swapchain에 일관되게 적용하고 Reset·실패 폴백과 테스트 빌드를 완성한다. 기존 구현을 재조사만 하지 말고 미완료 연결·회귀를 구현한다.",
+      "depends_on": [
+        "DX9EX:FRAME_PACING_DIAGNOSTICS"
+      ],
+      "r84_precondition_evidence": {
+        "verified_owner_sha": "c8cde7d627e8c35a2de60548101c90524ef116d9",
+        "current_target_descends_from_owner": true,
+        "exact_sha_dx9ex_active_run": 38100885230,
+        "exact_sha_domain_isolation_run": 38100885233,
+        "reason": "Already integrated and exact-SHA build verified in GitHub; stale controller R84 BLOCKED outcome misclassifies target-workflow step naming. Preserve historic incident; do not turn an unverified feature into PASS."
+      },
+      "acceptance_items": [
+        {
+          "id": "XR-EYE-SIZING",
+          "expected": "Use runtime recommended per-eye extent with validated limits and consistent IPC/RT/viewport ownership",
+          "paths": [
+            "src/vr/",
+            "vrhost/"
+          ],
+          "ci_step": "Feature acceptance: XR-EYE-SIZING"
+        },
+        {
+          "id": "XR-EYE-RESET",
+          "expected": "Exercise extent changes, Reset/device loss, allocation failure and safe fallback without changing protected visual semantics",
+          "paths": [
+            "src/vr/",
+            "vrhost/",
+            "tests/",
+            "tools/"
+          ],
+          "ci_step": "Feature acceptance: XR-EYE-RESET"
+        },
+        {
+          "id": "XR-EYE-BUNDLE",
+          "expected": "Build exact-SHA host/game package and collector; Quest3 runtime remains UNTESTED",
+          "paths": [
+            "tools/",
+            ".github/workflows/"
+          ],
+          "ci_step": "Feature acceptance: XR-EYE-BUNDLE"
+        }
+      ],
+      "required_gates": [
+        {
+          "name": "DX9Ex Active Validation",
+          "jobs": [
+            "policy",
+            "host",
+            "game",
+            "full-chain-compile",
+            "package"
+          ]
+        },
+        {
+          "name": "Domain Isolation Guard",
+          "jobs": [
+            "domain-isolation"
+          ]
+        }
+      ],
+      "artifact_prefix": "feature-dx9ex-eye-extent-",
+      "policy_blob_sha": "e8a7c70cf99fd89429173dbbe37a98160dcf528d"
+    },
+    "feature_base_sha": "ea890461b445f01903e690fc6fc4c13622292079",
+    "feature_last_head": "ea890461b445f01903e690fc6fc4c13622292079"
+  },
+  "recovery": {
+    "first_action": "Read current game branch HEAD, docs/automation/runs TASK_ID, and existing result material before editing",
+    "do_not_duplicate": true,
+    "runtime_validation": "UNTESTED unless real HMD tested",
+    "note": "A 5-minute controller snapshot is not a game-source commit or evidence that unfinished model reasoning was saved"
+  }
+}
