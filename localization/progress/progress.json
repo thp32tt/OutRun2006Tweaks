@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-11 21:47 KST",
+  "updated_at_kst": "2026-10-11 22:09 KST",
   "branch": "korean-localization-recovery-20260928",
   "base": {
     "repository": "emoose/OutRun2006Tweaks",
@@ -1425,6 +1425,24 @@
         "C3": "NOT_RUN",
         "RUNTIME_VALIDATION": "UNTESTED",
         "qa": "localization/graphics/role_C1/imagegen_requests/q102_C1_20261011_2140_SOURCE_CROP_IMAGEGEN_STYLE_FAIL.json"
+      },
+      "a246_q193_six_cell_trial": {
+        "run_key": "OUTRUN-KOR-A246-Q193-GOAL-BCDE-SIX-CELL-INTEGRATION-20261011-2200",
+        "role": "A",
+        "queue_index": 193,
+        "new_saved_trial_dds": 1,
+        "official_promoted_dds": 0,
+        "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+        "official_sha256": "9ea15d130693dd99bcd0ffa445b4799132665c5c93728c1c11783c94ba25b0f3",
+        "new_integrated_trial_sha256": "980662036fcdd75b0676890acc496c27e9322bc3c95999b8bfea3d2ee81c4b8f",
+        "four_new_goal_cells": true,
+        "two_prior_C2_scoped_cells_integrated": true,
+        "change_outside_original_cells": 0,
+        "producer_visual": "SCOPED_PASS_NATIVE_BGW_100_75_50_AND_RAW",
+        "independent_C2": "PENDING_NEW_SHA",
+        "C3": "PENDING",
+        "user_game": "IGR003_019_033_OPEN",
+        "RUNTIME_VALIDATION": "UNTESTED"
       }
     },
     "runtime_text_trace": {
