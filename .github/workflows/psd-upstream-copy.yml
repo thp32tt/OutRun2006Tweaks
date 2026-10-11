@@ -36,6 +36,24 @@ jobs:
               '2B0863D6', # Actual 35-layer source q135
               '8C259C68', # Text & help q188
               'E95DA5',   # Showroom choices q230
+              'C05E67EF', # small rankings text
+              '62BEBF33', # small UI
+              'E3FD08BE', # small UI
+              'F6811E94', # small UI
+              '31C58963', # press start variant
+              '1A43E9D9', # small UI
+              '39BCA907', # ranking UI
+              '20389D70', # general UI
+              '43B07A77', # route mode title
+              '7D747BED', # sumo UI
+              'D41D0B1',  # small labels
+              '42E618FD', # selector title
+              '4F68708E', # small UI
+              '841E796B', # mode selector
+              'DCC7B488', # flagman text
+              'E596B7AC', # sumo UI
+              'AD720950', # menu elements
+              '75C3586A', # menu element
           }
           selected = []
           for h in sorted(priority):
@@ -99,7 +117,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Already imported: no duplicate commit"; exit 0
           fi
-          git commit -m "assets(localization): vendor seven pinned PSD English workbase sources"
+          git commit -m "assets(localization): vendor SHA-pinned upstream PSD English workbase sources"
           for attempt in 1 2 3 4 5; do
             if git push origin HEAD:korean-localization-recovery-20260928; then
               echo "SOURCE_IMPORT_PUSH_VERIFIED attempt=$attempt"
