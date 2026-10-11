@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00557",
   "work_key": "DX11:MENU_RACE_STAGE0_ADD_SELECTED_ALPHA_NATIVE_DRAW",
   "base_sha": "f3af89893aa62e7c2950d933e593ce2f18c87fde",
-  "status": "AWAIT_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "native_gameplay_activation": false,
@@ -58,18 +58,68 @@
     "C0_RECOVER": "GitHub branch/policy/00556 sealed work inspected; new independent stage0 ADD work key",
     "C1_REVIEW": "COLOROP ADD combined with ALPHAOP SELECTARG1/SELECTARG2 absent; unsupported pairs previously excluded",
     "C2_IMPLEMENT": "Live C++ source state, two native HLSL shaders, object ownership/dispatch and Python negative controls",
-    "C3_VALIDATE": "Initial material SHA Build #38159830378 FAILED at preexisting ADD/SUBTRACT single-hit reset mutation fixture (line 610); new validation-bearing SHA repairs both negative fixture loops without touching C++ or reducing negative assertions; GitHub CI pending.",
-    "C4_COMMIT": "C++ material SHA ac7cb567ed080dc8d0a25255b8843659976b530e; next test regression repair becomes validation-bearing SHA (no skip ci).",
-    "C5_PACKAGE": "NOT_REQUIRED: diagnostic path opt-in; no release/promote",
-    "C6_STATE": "PENDING exact GitHub Actions; seal separately only if green"
+    "C3_VALIDATE": "PASS_EXACT_SHA 3f524ac23413bcdda7c00637b64cc939301368bc: Backend Conversion Gate #38159992527 (validate + DX11 readiness smoke) SUCCESS; Build #38159995834 SUCCESS; OpenXR #38159995933 SUCCESS; HUD #38159995967 SUCCESS; DX11 Fast #38159992549 SUCCESS. First material SHA Build #38159830378 failed at legacy ADD/SUB reset mutation; validation-bearing test fix corrected it. HMD/gamepad UNTESTED.",
+    "C4_COMMIT": "Material source SHA ac7cb567ed080dc8d0a25255b8843659976b530e; same TASK exact validation-bearing test/record fix SHA 3f524ac23413bcdda7c00637b64cc939301368bc; both non-skip. Separate C6 bookkeeping has [skip ci], is not a new validation-bearing result.",
+    "C5_PACKAGE": "NOT_REQUIRED: diagnostic opt-in native path remains disabled by default and real Quest 3/VDXR frame/menu/vehicle/race parity not verified.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED/PASS_EXACT_SHA on 3f524ac23413bcdda7c00637b64cc939301368bc, 5 exact-SHA GitHub Actions workflows SUCCESS; original D3D9 Draw/input unchanged; RUNTIME_VALIDATION=UNTESTED; gameplay upgrade NEED_HMD_TEST."
   },
-  "runtime_evidence": "Quest3/VDXR/menu/vehicle/race/gamepad not tested",
-  "next_action": "Read exact commit CI, repair if failed, then C6 bookkeeping separate [skip ci]",
+  "runtime_evidence": "No actual game/HMD/Quest3/VDXR/gamepad test; not a visual, input or runtime PASS.",
+  "next_action": "Task complete at exact SHA. Do not rerun/rescore 00557. New independent DX11 native integration feature may start; Quest3/VDXR menu/vehicle/race game frames and gamepad remain NEED_HMD_TEST.",
   "state_persisted": true,
   "feature_contract": {
     "scope": "Game stage0 ADD RGB + independently selected TEXTURE/DIFFUSE alpha through native D3D11 live Draw",
-    "runtime_acceptance": "NEED_HMD_TEST",
-    "source_material_sha": "ac7cb567ed080dc8d0a25255b8843659976b530e"
+    "runtime_acceptance": "Quest3/VDXR menu/vehicle/race/native inset/gamepad NEED_HMD_TEST",
+    "source_material_sha": "ac7cb567ed080dc8d0a25255b8843659976b530e",
+    "validation_bearing_sha": "3f524ac23413bcdda7c00637b64cc939301368bc"
   },
-  "material_result_sha": "ac7cb567ed080dc8d0a25255b8843659976b530e"
+  "material_result_sha": "ac7cb567ed080dc8d0a25255b8843659976b530e",
+  "validation_bearing_result_sha": "3f524ac23413bcdda7c00637b64cc939301368bc",
+  "result_sha": "3f524ac23413bcdda7c00637b64cc939301368bc",
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "acceptance_results": {
+    "source_and_negative_regression": "D3D9 RGB ADD + alpha SELECTARG1/2 -> owned D3D11 PS/Draw both indexed and linear; Python destructive disconnections and numeric RGBA tests pass within exact-SHA Build/Gate; reset lifecycle expanded",
+    "backend_conversion_gate": "SUCCESS",
+    "build": "SUCCESS",
+    "openxr_vr_architecture": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "dx11_fast_structural": "SUCCESS",
+    "runtime_validation": "UNTESTED",
+    "exact_sha": "3f524ac23413bcdda7c00637b64cc939301368bc"
+  },
+  "validation_evidence": {
+    "exact_sha": "3f524ac23413bcdda7c00637b64cc939301368bc",
+    "github_actions": [
+      {
+        "run_id": 38159992527,
+        "name": "Backend Conversion Gate",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38159995834,
+        "name": "Build",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38159995933,
+        "name": "OpenXR VR architecture",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38159995967,
+        "name": "OutRun EXE HUD Inspector CI",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38159992549,
+        "name": "DX11 Fast Structural Checks",
+        "status": "SUCCESS"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  }
 }
