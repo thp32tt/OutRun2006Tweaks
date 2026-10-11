@@ -226,10 +226,97 @@ if($dxvkMode){
     }
 }
 
+# Opt-in whole-GPU telemetry accompanies the QPC pacing session. The external
+# nvidia-smi process samples NVIDIA's driver once per second and does not run
+# any D3D9/OpenXR hooks or block the game process.
+$gpuCaptureRequested = ($backend -eq 'd3d9' -and $env:OUTRUN_VR_PACING_DIAGNOSTICS -eq '1')
+$gpuCaptureStatus = 'NOT_REQUESTED'
+$gpuCaptureStartedUtc = $null
+$gpuSampler = $null
+$gpuCsv = Join-Path $sessionRoot 'outrun-vr-gpu-utilization.csv'
+if ($gpuCaptureRequested) {
+    $gpuCaptureStatus = 'NVIDIA_SMI_UNAVAILABLE'
+    $smiCommand = Get-Command 'nvidia-smi.exe' -CommandType Application -ErrorAction SilentlyContinue
+    $smiPath = if ($smiCommand) { $smiCommand.Source } else { $null }
+    if (-not $smiPath -and $env:ProgramFiles) {
+        $candidate = Join-Path $env:ProgramFiles 'NVIDIA Corporation\NVSMI\nvidia-smi.exe'
+        if (Test-Path -LiteralPath $candidate) { $smiPath = $candidate }
+    }
+    if ($smiPath) {
+        # Quote the filename inside ArgumentList: installation paths can contain spaces.
+        $smiArguments = @(
+            '--query-gpu=timestamp,index,utilization.gpu,utilization.memory,memory.used,temperature.gpu',
+            '--format=csv',
+            '--loop=1',
+            ('--filename="{0}"' -f $gpuCsv)
+        )
+        try {
+            $gpuCaptureStartedUtc = (Get-Date).ToUniversalTime().ToString('o')
+            $gpuSampler = Start-Process -FilePath $smiPath -ArgumentList $smiArguments -PassThru -WindowStyle Hidden -ErrorAction Stop
+            $gpuCaptureStatus = 'SAMPLING'
+            Write-Host "GPU sampling: $gpuCsv (NVIDIA whole-GPU, 1 second)"
+        } catch {
+            $gpuCaptureStatus = 'START_FAILED'
+            Write-Warning "GPU telemetry unavailable; game continues normally: $($_.Exception.Message)"
+        }
+    } else {
+        Write-Warning 'nvidia-smi.exe not found; GPU utilization cannot be recorded on this PC.'
+    }
+}
+
 try{
     $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
     $p.WaitForExit()
 } finally {
+    # Stop only the sampler started by this run, never a user's other nvidia-smi.
+    if ($gpuCaptureRequested) {
+        $samplerExitedEarly = $false
+        if ($gpuSampler) {
+            try {
+                $samplerExitedEarly = $gpuSampler.HasExited
+                if (-not $samplerExitedEarly) {
+                    Stop-Process -Id $gpuSampler.Id -ErrorAction Stop
+                    [void]$gpuSampler.WaitForExit(5000)
+                }
+            } catch {
+                $gpuCaptureStatus = 'STOP_FAILED'
+                Write-Warning "GPU sampler shutdown failed: $($_.Exception.Message)"
+            } finally {
+                $gpuSampler.Dispose()
+            }
+        }
+        $gpuSampleCount = 0
+        if (Test-Path -LiteralPath $gpuCsv) {
+            # nvidia-smi emits one header followed by sampled data rows.
+            $gpuLines = @(Get-Content -LiteralPath $gpuCsv -ErrorAction SilentlyContinue)
+            $gpuSampleCount = @($gpuLines | Where-Object {
+                $_ -and $_ -notmatch '^\s*timestamp\s*,'
+            }).Count
+        }
+        if ($gpuCaptureStatus -eq 'SAMPLING') {
+            if ($samplerExitedEarly) {
+                $gpuCaptureStatus = 'SAMPLER_EXITED_EARLY'
+            } elseif ($gpuSampleCount -gt 0) {
+                $gpuCaptureStatus = 'CAPTURED'
+            } else {
+                $gpuCaptureStatus = 'NO_SAMPLES'
+            }
+        }
+        [ordered]@{
+            SchemaVersion = 1
+            Status = $gpuCaptureStatus
+            SessionId = [string]$state.SessionId
+            StartedUtc = $gpuCaptureStartedUtc
+            FinishedUtc = (Get-Date).ToUniversalTime().ToString('o')
+            SamplingSeconds = 1
+            SampleCount = $gpuSampleCount
+            CsvName = if ($gpuSampleCount -gt 0) { 'outrun-vr-gpu-utilization.csv' } else { $null }
+            Scope = 'WHOLE_NVIDIA_GPU_INCLUDING_GAME_HOST_COMPOSITOR_ENCODER'
+            GPUFrameTimeMeasured = $false
+            HmdRuntimeVerified = $false
+        } | ConvertTo-Json -Depth 3 |
+            Set-Content (Join-Path $sessionRoot 'gpu-utilization-status.json') -Encoding UTF8
+    }
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled
     $env:OUTRUN_VR_TEST_PROFILE=$oldTestProfile
     $env:OUTRUN_VR_PERFORMANCE_PROFILE=$oldPerformanceProfile

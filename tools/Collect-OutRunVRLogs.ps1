@@ -113,6 +113,13 @@ $dest=Join-Path $base "$variant/$profile/$session"
 New-Item -ItemType Directory -Force $dest|Out-Null
 
 $copied=@()
+# GPU telemetry is written directly into this session folder by the runner,
+# so the existing analysis ZIP seals it without duplicating or moving the CSV.
+foreach ($gpuEvidenceName in @('outrun-vr-gpu-utilization.csv','gpu-utilization-status.json')) {
+    if (Test-Path -LiteralPath (Join-Path $dest $gpuEvidenceName)) {
+        $copied += $gpuEvidenceName
+    }
+}
 $sourceFiles=Get-SessionFiles
 foreach($file in $sourceFiles){
     if($file.LastWriteTimeUtc -lt $startedUtc){continue}
