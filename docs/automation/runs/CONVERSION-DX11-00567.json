@@ -1,0 +1,71 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00567",
+  "production_id": "CONVERSION-DX11-00567",
+  "event_id": "CONVERSION-DX11-00567-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00567",
+  "base_sha": "4a4c6405abb510aedec0d87d0ed689e86eb903c9",
+  "work_key": "DX11:MENU_RACE_SUBTRACT_INDEPENDENT_ALPHA_NATIVE_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "SOURCE_COMMITTED_WAIT_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "D3D9 live GetTextureStageState RGB SUBTRACT and chosen alpha",
+      "HLSL PS native Draw/DrawIndexed via diagnostic native output and visible inset",
+      "Original DX9Ex input/game Present preserved"
+    ],
+    "batch_components": [
+      "C++ D3D9 stage0 state capture and fail-closed operation admission",
+      "C++ shader compile/create/recreation/Draw dispatch",
+      "Python per-link destructive mutation and CPU RGBA tests"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Live SUBTRACT RGB with SELECTARG1/2 alpha admitted to native Draw",
+      "negative_regression": "Disconnect each shader/dispatch/capture edge; unsupported D3D9 op pairs rejected",
+      "component_integration": "D3D9 live draw capture -> PS -> D3D11 Draw/DrawIndexed -> diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_SUBTRACT_INDEPENDENT_ALPHA_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:SUBTRACT_SELECTED_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "SUBTRACT_SELECTED_ALPHA",
+      "D3D11_NATIVE_DRAW",
+      "DIAGNOSTIC_VISIBLE_INSET"
+    ],
+    "visible_frame_acceptance": "Pending build; real menu/race/gamepad/Quest3 NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in only, DX9Ex input/Draw/Present authoritative"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00567.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "Authenticated HEAD 4a4c6405abb510aedec0d87d0ed689e86eb903c9, policy, AGENTS, 00566 reviewed",
+    "C1_REVIEW": "SUBTRACT RGB and SELECTARG1/2 alpha rejected, shader dispatch absent",
+    "C2_IMPLEMENT": "Two HLSL native PS, D3D9 capture, device reset and Draw/DrawIndexed, negative mutations",
+    "C3_VALIDATE": "Pending GitHub Actions exact SHA",
+    "C4_COMMIT": "Material pending creation, no CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED opt-in diagnostic",
+    "C6_STATE": "Pending exact-SHA gate; HMD UNTESTED"
+  },
+  "feature_status": "SOURCE_INTEGRATED_PENDING_CI_NEED_HMD_TEST",
+  "next_action": "Verify exact SHA GitHub Actions, C6 separate bookkeeping after PASS",
+  "state_persisted": true
+}

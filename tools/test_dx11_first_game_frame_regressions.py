@@ -1845,6 +1845,71 @@ def main() -> None:
             assert all(0.0 <= value <= 1.0 for value in rgb)
     print("DX11 MODULATE2X/4X independent alpha native Draw PASS (static only)")
 
+
+    # 00567: D3D9 SUBTRACT RGB with independent texture or diffuse alpha.
+    # Negative-mutation integration evidence; not hardware/Quest3 evidence.
+    subtract_mixed = (("Texture", "1", "t.a"), ("Diffuse", "2", "v.diffuse.a"))
+    def linked_subtract(code: str) -> bool:
+        intake = code[code.find("bool supported_game_state("):code.find("bool translate_vertices(")]
+        submit = code[code.find("bool submit("):code.find("void observe(")]
+        if not all(x in intake for x in (
+            "GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)",
+            "!subtractTextureAlpha && !subtractDiffuseAlpha &&",
+            "subtractTextureAlpha || subtractDiffuseAlpha ||",
+            "!subtractDiffuseAlpha &&",
+            "alphaArg2Diffuse",
+            "capture.subtractTextureAlpha = subtractTextureAlpha;",
+            "capture.subtractDiffuseAlpha = subtractDiffuseAlpha;",
+        )): return False
+        if not all(x in submit for x in (
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
+            "ctx->PSSetShader(",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+        )): return False
+        for source, arg, alpha in subtract_mixed:
+            stem = f"subtract{source}Alpha"
+            shader = f"PSTextureSubtract{source}Alpha"
+            cache = f"s.{stem}Ps"
+            if not all(x in code for x in (
+                f"bool {stem} = false;",
+                f"ComPtr<ID3D11PixelShader> {stem}Ps;",
+                f"const bool {stem} = op == D3DTOP_SUBTRACT && alphaOp == D3DTOP_SELECTARG{arg};",
+                f"capture.{stem} = {stem};",
+                f"float4 {shader}(VOut v) : SV_Target {{",
+                f"float4 c = float4(saturate(t.rgb - v.diffuse.rgb), {alpha});",
+                f'compile("{shader}", "ps_4_0", subtract{source}Code)',
+                f"{cache}.GetAddressOf()",
+                f"{cache} &&",
+                f"capture.{stem} ? {cache}.Get() :",
+            )): return False
+            if code.count(f"{cache}.Reset();") != 2: return False
+        return True
+    assert linked_subtract(bridge)
+    for source, arg, alpha in subtract_mixed:
+        stem = f"subtract{source}Alpha"
+        for token in (
+            f"capture.{stem} = {stem};",
+            f"capture.{stem} ? s.{stem}Ps.Get() :",
+            f'compile("PSTextureSubtract{source}Alpha", "ps_4_0", subtract{source}Code)',
+            f"float4 c = float4(saturate(t.rgb - v.diffuse.rgb), {alpha});",
+        ):
+            mutant = bridge.replace(token, "/* disconnected 00567 */", 1)
+            assert mutant != bridge and not linked_subtract(mutant), token
+    # SUBTRACT=10, SELECTARG1=2, SELECTARG2=3.
+    for c, a, admitted in (
+        (10, 2, True), (10, 3, True), (10, 10, False),
+        (10, 7, False), (10, 4, False), (7, 2, False), (4, 3, False)):
+        assert (c == 10 and a in (2, 3)) is admitted
+    for tex, diffuse in (
+        ((0.1, 0.9, 0.6, 0.8), (0.7, 0.2, 0.4, 0.25)),
+        ((0.9, 0.05, 0.3, 0.1), (0.2, 0.8, 0.9, 0.7))):
+        rgb = tuple(max(0.0, t - d) for t, d in zip(tex[:3], diffuse[:3]))
+        assert all(0 <= v <= 1 for v in rgb)
+        assert (*rgb, tex[3])[:3] == (*rgb, diffuse[3])[:3]
+        assert (*rgb, tex[3])[3] != (*rgb, diffuse[3])[3]
+    print("DX11 SUBTRACT mixed alpha native Draw PASS (static only)")
+
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
