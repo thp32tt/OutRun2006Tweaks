@@ -222,6 +222,7 @@ namespace OutRunVRStereo
         DWORD alphaBlend = FALSE;
         DWORD alphaTest = FALSE;
         DWORD zWrite = TRUE;
+        DWORD zEnable = D3DZB_TRUE;
     };
     bool R29OwnerTryGetEffectTelemetrySnapshot(
         R29OwnerEffectTelemetrySnapshot& out) noexcept;

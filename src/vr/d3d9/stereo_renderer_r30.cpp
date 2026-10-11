@@ -1468,14 +1468,22 @@ namespace OutRunVRStereo
                 OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
                 return R30ScreenSpaceKind::None;
 
-            DWORD zEnable = D3DZB_TRUE;
-            DWORD alphaBlend = FALSE;
-            DWORD alphaTest = FALSE;
-            if (FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)) ||
-                FAILED(device->GetRenderState(
-                    D3DRS_ALPHABLENDENABLE, &alphaBlend)) ||
-                FAILED(device->GetRenderState(
-                    D3DRS_ALPHATESTENABLE, &alphaTest)))
+            // R29 already snapshots these exact game render states under
+            // proven StateBlock Apply/recording coverage. Avoid repeating three
+            // synchronous D3D9 driver queries for every perspective UI draw.
+            // A stale/unreliable cache deliberately falls back to live state.
+            R29OwnerEffectTelemetrySnapshot effect{};
+            const bool haveCachedEffect =
+                R29OwnerTryGetEffectTelemetrySnapshot(effect);
+            DWORD zEnable = haveCachedEffect ? effect.zEnable : D3DZB_TRUE;
+            DWORD alphaBlend = haveCachedEffect ? effect.alphaBlend : FALSE;
+            DWORD alphaTest = haveCachedEffect ? effect.alphaTest : FALSE;
+            if (!haveCachedEffect &&
+                (FAILED(device->GetRenderState(D3DRS_ZENABLE, &zEnable)) ||
+                 FAILED(device->GetRenderState(
+                     D3DRS_ALPHABLENDENABLE, &alphaBlend)) ||
+                 FAILED(device->GetRenderState(
+                     D3DRS_ALPHATESTENABLE, &alphaTest))))
                 return R30ScreenSpaceKind::None;
 
             if (zEnable == D3DZB_FALSE &&
@@ -1607,7 +1615,11 @@ namespace OutRunVRStereo
                 return false;
 
             if (!R29OwnerEnsureStereoResources(device) ||
-                FAILED(device->GetViewport(&state.viewport)) ||
+                // The tracked viewport is maintained by the same R23/R31
+                // setter+StateBlock recovery owner as the R30 screen-space
+                // replay guard. Query D3D9 only when that shadow is unavailable.
+                (!R29OwnerTryGetTrackedViewport(state.viewport) &&
+                 FAILED(device->GetViewport(&state.viewport))) ||
                 state.viewport.Width == 0 || state.viewport.Height == 0 ||
                 !std::isfinite(state.viewport.MinZ) ||
                 !std::isfinite(state.viewport.MaxZ) ||

@@ -655,6 +655,7 @@ namespace OutRunVRStereo
         DWORD alphaBlend = FALSE;
         DWORD alphaTest = FALSE;
         DWORD zWrite = TRUE;
+        DWORD zEnable = D3DZB_TRUE;
     };
 
     inline bool TryGetEffectTelemetrySnapshot(
@@ -667,6 +668,7 @@ namespace OutRunVRStereo
         out.alphaBlend = R29Effect.alphaBlend;
         out.alphaTest = R29Effect.alphaTest;
         out.zWrite = R29Effect.zWrite;
+        out.zEnable = R29Effect.zEnable;
         return true;
     }
 
@@ -1294,6 +1296,7 @@ namespace OutRunVRStereo
         out.alphaBlend = lower.alphaBlend;
         out.alphaTest = lower.alphaTest;
         out.zWrite = lower.zWrite;
+        out.zEnable = lower.zEnable;
         return true;
     }
     bool R29OwnerValidateVerifiedWvp(
