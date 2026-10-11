@@ -14187,5 +14187,24 @@
     "C3": "NOT_RUN_NEW_SHA",
     "RUNTIME_VALIDATION": "UNTESTED",
     "report": "localization/graphics/role_C/20261012-C2-Q089-A251-FIRST-INDEPENDENT/C2_Q089_A251_FIRST_INDEPENDENT_QA.json"
+  },
+  "b407_q048_cyan_streak_20261012": {
+    "role": "B",
+    "run_key": "OUTRUN-KOR-B-Q048-P1-CANONICAL-STREAK-RESTORE-20261012-0730",
+    "queue_index": 48,
+    "status": "NEW_UNPROMOTED_DDS_SCOPED_SOURCE_ART_FIX_PENDING_C2_AND_GLYPH_REWORK",
+    "dds_sha256": "b17750c7bee787be04bd62d553e2cbe8f08c82ffaffdd272dd673fb3cd92c8a7",
+    "source_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+    "official_sha256": "259153b91e330479a4d975037013c77d339ffe3a2781461ebe118bfc04e28824",
+    "protected_streak_pixels_restored": 415,
+    "clean_sha256": "099a23f372463f74de4310581db6c00a2955dcb8787e5938bb03a30095c658d0",
+    "prior_C393_italic_morphology_REWORK": true,
+    "new_korean_ImageGen_png": 0,
+    "dds_created": 1,
+    "official_promoted": false,
+    "C2": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "evidence": "localization/graphics/role_B/20261012-B407-Q048-STREAK-RESTORE/B407_Q048_STREAK_RESTORE_PRODUCER_QA.json"
   }
 }

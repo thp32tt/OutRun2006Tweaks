@@ -1,3 +1,4 @@
+- **2026-10-12 07:38 KST B407 q048 P1 cyan source streak repaired, new unpromoted saved DDS** `b17750c7bee787be04bd62d553e2cbe8f08c82ffaffdd272dd673fb3cd92c8a7`: 2048² RGBA32, 415 exact source streak pixels restored from left [830,1740,889,1810], old 4→419 alpha pixels, original/Korean title and all other atlas bytes0 changed; original official `259153b91e330479` unchanged. New corrected CLEAN/mask/100/75/50 QA `localization/graphics/role_B/20261012-B407-Q048-STREAK-RESTORE`; C393 italic morphology REWORK and user IGR009 OPEN; no new Korean generated PNG, ImageGen media still unverified, C2/C3/game untested, RUNTIME_VALIDATION=UNTESTED. RUN_KEY=OUTRUN-KOR-B-Q048-P1-CANONICAL-STREAK-RESTORE-20261012-0730.
 
 ### 2026-10-12 — C1 q230 two source-only English PSD-derived glyph PNG
 
