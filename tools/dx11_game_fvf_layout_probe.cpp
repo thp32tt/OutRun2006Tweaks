@@ -5,7 +5,7 @@ using namespace outrun::vr::dx11::live_game_frame;
 int main() {
     GameFvfLayout layout{};
     const auto original = layout;
-    assert(!game_fvf_layout(kGameFvfXyz | kGameFvfTex3 | 0x400u, layout));
+    assert(!game_fvf_layout(kGameFvfXyz | kGameFvfTex3 | 0x900u, layout));
     assert(layout.minStride == original.minStride);
     assert(!game_fvf_layout(kGameFvfXyz, layout));
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfXyz | kGameFvfTex1, layout));
@@ -76,7 +76,7 @@ int main() {
     assert(sample.uv2[0] == thirdGood.uv2[0]);
     assert(!game_fvf_select_uv(sample, layout, 3u, chosen));
     assert(chosen[0] == .1f);
-    assert(!game_fvf_layout(kGameFvfXyzRhw | 0x500u, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | 0x900u, layout));
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 | 0x10000u, layout));
     assert(game_fvf_layout(kGameFvfXyz | kGameFvfDiffuse | kGameFvfTex3, layout));
     assert(layout.texcoordOffset == 16u && layout.minStride == 40u);
@@ -101,7 +101,7 @@ int main() {
     assert(sample.uv3[0] == fourthGood.uv3[0]);
     assert(!game_fvf_select_uv(sample, layout, 4u, chosen));
     assert(chosen[0] == .5f && chosen[1] == .6f);
-    assert(!game_fvf_layout(kGameFvfXyzRhw | 0x500u, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | 0x900u, layout));
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 | 0x00010000u, layout));
     assert(game_fvf_layout(kGameFvfXyz | kGameFvfDiffuse | kGameFvfTex4, layout));
     assert(layout.texcoordOffset == 16u && layout.minStride == 48u);
@@ -111,6 +111,50 @@ int main() {
     assert(sample.diffuse == 0xff102030u && sample.uv3[0] == .7f);
     assert(game_fvf_select_uv(sample, layout, 3u, chosen));
     assert(chosen[0] == .7f && chosen[1] == .8f);
+
+    // Live D3D9 TEX5..TEX8 is used by the same native Draw/DrawIndexed path.
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex8, layout));
+    assert(layout.texcoordCount == 8u && layout.minStride == 80u);
+    struct RhwUv8 {float x,y,z,rhw; float uv[8][2];};
+    RhwUv8 eight{10,20,.5f,1,
+        {{.1f,.2f},{.2f,.3f},{.3f,.4f},{.4f,.5f},
+         {.5f,.6f},{.6f,.7f},{.7f,.8f},{.85f,.95f}}};
+    assert(sizeof(eight) == 80u);
+    assert(game_fvf_decode_vertex(&eight, sizeof(eight), layout, sample));
+    assert(game_fvf_select_uv(sample, layout, 4u, chosen));
+    assert(chosen[0] == .5f && chosen[1] == .6f);
+    assert(game_fvf_select_uv(sample, layout, 5u, chosen));
+    assert(chosen[0] == .6f && chosen[1] == .7f);
+    assert(game_fvf_select_uv(sample, layout, 6u, chosen));
+    assert(chosen[0] == .7f && chosen[1] == .8f);
+    assert(game_fvf_select_uv(sample, layout, 7u, chosen));
+    assert(chosen[0] == .85f && chosen[1] == .95f);
+    const auto eightSaved = sample;
+    assert(!game_fvf_decode_vertex(&eight, 79u, layout, sample));
+    assert(sample.uv7[1] == eightSaved.uv7[1]);
+    assert(!game_fvf_select_uv(sample, layout, 8u, chosen));
+    assert(chosen[0] == .85f && chosen[1] == .95f);
+    auto badEight = layout;
+    badEight.texcoordOffset -= 8u;
+    assert(!game_fvf_decode_vertex(&eight, sizeof(eight), badEight, sample));
+    assert(sample.uv7[1] == eightSaved.uv7[1]);
+    assert(!game_fvf_layout(kGameFvfXyzRhw | 0x900u, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex8 | 0x00010000u, layout));
+    assert(game_fvf_layout(kGameFvfXyz | kGameFvfNormal |
+                           kGameFvfDiffuse | kGameFvfSpecular | kGameFvfTex5, layout));
+    assert(layout.texcoordCount == 5u && layout.texcoordOffset == 32u &&
+           layout.minStride == 72u);
+    struct WorldUv5 {
+        float x,y,z,nx,ny,nz; std::uint32_t diffuse,specular; float uv[5][2];
+    };
+    WorldUv5 world5{1,2,3,0,1,0,0xff010203u,0xff040506u,
+                    {{.1f,.2f},{.2f,.3f},{.3f,.4f},{.4f,.5f},{.55f,.65f}}};
+    assert(sizeof(world5) == 72u);
+    assert(game_fvf_decode_vertex(&world5, sizeof(world5), layout, sample));
+    assert(sample.diffuse == 0xff010203u);
+    assert(game_fvf_select_uv(sample, layout, 4u, chosen));
+    assert(chosen[0] == .55f && chosen[1] == .65f);
+    assert(!game_fvf_select_uv(sample, layout, 5u, chosen));
     // OutRun object-space world FVF: NORMAL before DIFFUSE/SPECULAR/TEX2.
     assert(game_fvf_layout(kGameFvfXyz | kGameFvfNormal |
                            kGameFvfDiffuse | kGameFvfSpecular | kGameFvfTex2, layout));

@@ -25,6 +25,8 @@ static_assert(kGameFvfXyz == D3DFVF_XYZ && kGameFvfXyzRhw == D3DFVF_XYZRHW &&
               kGameFvfSpecular == D3DFVF_SPECULAR &&
               kGameFvfTex2 == D3DFVF_TEX2 && kGameFvfTex3 == D3DFVF_TEX3 &&
               kGameFvfTex4 == D3DFVF_TEX4 &&
+              kGameFvfTex5 == D3DFVF_TEX5 && kGameFvfTex6 == D3DFVF_TEX6 &&
+              kGameFvfTex7 == D3DFVF_TEX7 && kGameFvfTex8 == D3DFVF_TEX8 &&
               kGameFvfTexCountMask == D3DFVF_TEXCOUNT_MASK &&
               kGameFvfPositionMask == D3DFVF_POSITION_MASK,
               "Portable FVF constants must match the D3D9 SDK");
@@ -459,7 +461,7 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
             return false;
         const float* xyz = decoded.position;
         const DWORD diffuse = decoded.diffuse;
-        // TEX2/3/4 select UV1/2/3 from game bytes; absent slots fail closed.
+        // TEX2..8 select UV1..7 from game bytes; absent slots fail closed.
         if (capture.enabled &&
             !game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv))
             return false;

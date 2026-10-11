@@ -878,7 +878,7 @@ def main() -> None:
             "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
             "nextColorOp != D3DTOP_DISABLE",
         )) and all(x in header for x in (
-            "texcoordBits > kGameFvfTex4",
+            "texcoordBits > kGameFvfTex8",
             "layout.minStride != layout.texcoordOffset + layout.texcoordCount * 8u",
             "std::memcpy(candidate.uv1, data + layout.texcoordOffset + 8u, 8u)",
             "coordIndex >= layout.texcoordCount",
@@ -898,7 +898,7 @@ def main() -> None:
         broken = bridge.replace(good, bad, 1)
         assert broken != bridge and not tex2_connected(broken, layout_source, probe_source)
     for good, bad in (
-        ("texcoordBits > kGameFvfTex4", "texcoordBits > 0x0f00u"),
+        ("texcoordBits > kGameFvfTex8", "texcoordBits > 0x0f00u"),
         ("layout.minStride != layout.texcoordOffset + layout.texcoordCount * 8u",
          "layout.minStride != layout.texcoordOffset + 8u"),
         ("std::memcpy(candidate.uv1, data + layout.texcoordOffset + 8u, 8u)",
@@ -909,7 +909,7 @@ def main() -> None:
     # TEX3 live-stream third UV remains linked to native Draw and index2.
     assert "kGameFvfTex3 == D3DFVF_TEX3" in bridge
     assert "std::memcpy(candidate.uv2, data + layout.texcoordOffset + 16u, 8u)" in layout_source
-    assert "coordIndex == 2u ? sample.uv2 : sample.uv3" in layout_source
+    assert "coordIndex == 3u ? sample.uv3 :" in layout_source
     assert "assert(!game_fvf_decode_vertex(&three, 39u" in probe_source
     assert "assert(!game_fvf_select_uv(sample, layout, 3u, chosen))" in probe_source
     changed = layout_source.replace(
@@ -926,16 +926,16 @@ def main() -> None:
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
         )) and all(x in header for x in (
-            "texcoordBits > kGameFvfTex4",
-            "layout.texcoordCount > 4u",
+            "texcoordBits > kGameFvfTex8",
+            "layout.texcoordCount > 8u",
             "std::memcpy(candidate.uv3, data + layout.texcoordOffset + 24u, 8u)",
-            "coordIndex == 2u ? sample.uv2 : sample.uv3",
-        )) and header.count("layout.texcoordCount > 4u") == 2 and all(x in probe for x in (
+            "coordIndex == 3u ? sample.uv3 :",
+        )) and header.count("layout.texcoordCount > 8u") == 2 and all(x in probe for x in (
             "kGameFvfXyzRhw | kGameFvfTex4",
             "game_fvf_select_uv(sample, layout, 3u, chosen)",
             "!game_fvf_decode_vertex(&four, 47u",
             "!game_fvf_select_uv(sample, layout, 4u, chosen)",
-            "!game_fvf_layout(kGameFvfXyzRhw | 0x500u",
+            "!game_fvf_layout(kGameFvfXyzRhw | 0x900u",
         ))
     assert tex4_connected(bridge, layout_source, probe_source)
     for old, wrong in (
@@ -945,15 +945,61 @@ def main() -> None:
         broken = bridge.replace(old, wrong, 1)
         assert broken != bridge and not tex4_connected(broken, layout_source, probe_source)
     for old, wrong in (
-        ("texcoordBits > kGameFvfTex4", "texcoordBits > 0x0f00u"),
-        ("layout.texcoordCount > 4u", "layout.texcoordCount > 5u"),
+        ("texcoordBits > kGameFvfTex8", "texcoordBits > 0x0f00u"),
+        ("layout.texcoordCount > 8u", "layout.texcoordCount > 9u"),
         ("std::memcpy(candidate.uv3, data + layout.texcoordOffset + 24u, 8u)",
          "std::memcpy(candidate.uv3, data + layout.texcoordOffset + 16u, 8u)"),
-        ("coordIndex == 2u ? sample.uv2 : sample.uv3",
-         "coordIndex == 2u ? sample.uv3 : sample.uv2"),
+        ("coordIndex == 3u ? sample.uv3 :",
+         "coordIndex == 3u ? sample.uv2 :"),
     ):
         broken = layout_source.replace(old, wrong, 1)
         assert broken != layout_source and not tex4_connected(bridge, broken, probe_source)
+
+    # 00552: D3D9 TEX5..8 UV4..7 -> stage0 -> native D3D11 Draw/DrawIndexed.
+    def tex8_connected(src: str, hdr: str, probe: str) -> bool:
+        return all(x in src for x in (
+            "kGameFvfTex5 == D3DFVF_TEX5",
+            "kGameFvfTex6 == D3DFVF_TEX6",
+            "kGameFvfTex7 == D3DFVF_TEX7",
+            "kGameFvfTex8 == D3DFVF_TEX8",
+            "coordIndex >= layout.texcoordCount",
+            "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+        )) and all(x in hdr for x in (
+            "texcoordBits > kGameFvfTex8",
+            "layout.texcoordCount > 8u",
+            "coordIndex == 6u ? sample.uv6 : sample.uv7",
+            "std::memcpy(candidate.uv4, data + layout.texcoordOffset + 32u, 8u)",
+            "std::memcpy(candidate.uv5, data + layout.texcoordOffset + 40u, 8u)",
+            "std::memcpy(candidate.uv6, data + layout.texcoordOffset + 48u, 8u)",
+            "std::memcpy(candidate.uv7, data + layout.texcoordOffset + 56u, 8u)",
+        )) and all(x in probe for x in (
+            "kGameFvfXyzRhw | kGameFvfTex8",
+            "game_fvf_select_uv(sample, layout, 7u, chosen)",
+            "!game_fvf_decode_vertex(&eight, 79u",
+            "!game_fvf_select_uv(sample, layout, 8u, chosen)",
+            "badEight.texcoordOffset -= 8u",
+            "kGameFvfTex5, layout",
+        ))
+    assert tex8_connected(bridge, layout_source, probe_source)
+    for old, wrong in (
+        ("kGameFvfTex8 == D3DFVF_TEX8", "kGameFvfTex8 == D3DFVF_TEX7"),
+        ("coordIndex >= layout.texcoordCount", "coordIndex > layout.texcoordCount"),
+    ):
+        mutant = bridge.replace(old, wrong, 1)
+        assert mutant != bridge and not tex8_connected(mutant, layout_source, probe_source)
+    for old, wrong in (
+        ("texcoordBits > kGameFvfTex8", "texcoordBits > 0x0f00u"),
+        ("layout.texcoordCount > 8u", "layout.texcoordCount > 9u"),
+        ("std::memcpy(candidate.uv7, data + layout.texcoordOffset + 56u, 8u)",
+         "std::memcpy(candidate.uv7, data + layout.texcoordOffset + 48u, 8u)"),
+        ("coordIndex == 6u ? sample.uv6 : sample.uv7",
+         "coordIndex == 6u ? sample.uv7 : sample.uv6"),
+    ):
+        mutant = layout_source.replace(old, wrong, 1)
+        assert mutant != layout_source and not tex8_connected(bridge, mutant, probe_source)
+    print("DX11 TEX5..TEX8 native game Draw regression PASS (static only)")
     # 00551: ensure actual D3D9 FVF NORMAL/SPECULAR bytes reach the
     # native frame, while non-exact D3D9 specular lighting is rejected.
     def object_fvf_integrated(src: str, header: str, probe: str) -> bool:
@@ -999,7 +1045,7 @@ def main() -> None:
         mutant = layout_source.replace(old, bad, 1)
         assert mutant != layout_source and not object_fvf_integrated(bridge, mutant, probe_source)
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
-    print("DX11 TEX2/TEX3/TEX4 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
+    print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":
