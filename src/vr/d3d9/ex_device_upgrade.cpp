@@ -17,6 +17,7 @@
 
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
+#include "vr/ipc/native_geometry_presentation_win32.hpp"
 
 namespace Settings
 {
@@ -772,9 +773,39 @@ namespace OutRunVRD3D9ExUpgrade
                     fullscreenPtr = &fullscreen;
                 }
 
+                // The *game* must rasterize geometry at XR eye resolution.
+                // A larger shared copy texture alone merely upscales pixels.
+                D3DCAPS9 caps{};
+                OutRunVR::NativeGeometry::Decision nativeGeometry{};
+                if (ex_ && SUCCEEDED(ex_->GetDeviceCaps(adapter, type, &caps)))
+                    nativeGeometry = OutRunVR::NativeGeometry::TryApplyPresentation(params, caps);
                 IDirect3DDevice9Ex* deviceEx = nullptr;
                 HRESULT hr = ex_ ? ex_->CreateDeviceEx(adapter, type, focusWindow, behaviorFlags,
                     params, fullscreenPtr, &deviceEx) : E_FAIL;
+                if (FAILED(hr) && nativeGeometry.applied)
+                {
+                    // Never strand the user's original game settings because
+                    // a high-resolution windowed backbuffer was rejected.
+                    *params = originalParams;
+                    if (deviceEx) { deviceEx->Release(); deviceEx = nullptr; }
+                    hr = ex_->CreateDeviceEx(adapter, type, focusWindow,
+                        behaviorFlags, params, fullscreenPtr, &deviceEx);
+                    spdlog::warn(
+                        "VR native eye geometry: oversized CreateDeviceEx rejected; "
+                        "original {}x{} retry hr=0x{:08X}",
+                        originalParams.BackBufferWidth, originalParams.BackBufferHeight,
+                        static_cast<unsigned>(hr));
+                }
+                if (SUCCEEDED(hr) && nativeGeometry.applied &&
+                    params->BackBufferWidth == nativeGeometry.allocated.width &&
+                    params->BackBufferHeight == nativeGeometry.allocated.height)
+                {
+                    spdlog::info(
+                        "VR native eye geometry: game D3D9Ex backbuffer RASTER source "
+                        "{}x{} >= XR eye {}x{}; windowed opt-in, HMD UNTESTED",
+                        params->BackBufferWidth, params->BackBufferHeight,
+                        nativeGeometry.xrEye.width, nativeGeometry.xrEye.height);
+                }
                 if (SUCCEEDED(hr) && deviceEx)
                 {
                     if (!InstallManagedResourceCompat(deviceEx))
