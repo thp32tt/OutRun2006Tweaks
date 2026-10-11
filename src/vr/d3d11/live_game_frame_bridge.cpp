@@ -883,8 +883,31 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         FAILED(game->GetTextureStageState(1, D3DTSS_COLOROP, &nextColorOp)) ||
         nextColorOp != D3DTOP_DISABLE)
         return false;
-    if (!capture.enabled && (op != D3DTOP_SELECTARG1 || arg != D3DTA_DIFFUSE))
-        return false;
+    if (!capture.enabled) {
+        // D3D9 stage 0 CURRENT is the incoming vertex DIFFUSE. An untextured
+        // menu/sprite Draw can select that color from ARG1 or ARG2, with its
+        // alpha independently selected. The native PS reads only v.diffuse;
+        // reject any other RGB/alpha source or modifier rather than display
+        // a misleading inset (the original D3D9 Draw is never intercepted).
+        DWORD arg2 = 0, alphaOp = 0, alphaArg1 = 0, alphaArg2 = 0;
+        if (!layout.hasDiffuse ||
+            FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG2, &arg2)) ||
+            FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)) ||
+            FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAARG1, &alphaArg1)) ||
+            FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAARG2, &alphaArg2)))
+            return false;
+        const bool rgbDiffuse =
+            (op == D3DTOP_SELECTARG1 &&
+             (arg == D3DTA_DIFFUSE || arg == D3DTA_CURRENT)) ||
+            (op == D3DTOP_SELECTARG2 &&
+             (arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT));
+        const bool alphaDiffuse =
+            (alphaOp == D3DTOP_SELECTARG1 &&
+             (alphaArg1 == D3DTA_DIFFUSE || alphaArg1 == D3DTA_CURRENT)) ||
+            (alphaOp == D3DTOP_SELECTARG2 &&
+             (alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT));
+        if (!rgbDiffuse || !alphaDiffuse) return false;
+    }
     if (capture.enabled) {
         DWORD arg2=0, alphaOp=0, alphaArg1=0, alphaArg2=0;
         DWORD coordIndex=~0u, transformFlags=~0u;

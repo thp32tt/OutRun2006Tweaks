@@ -106,7 +106,9 @@ def main() -> None:
             return False
         section = code[start:end]
         return all(token in section for token in (
-            "arg != D3DTA_DIFFUSE",
+            "const bool rgbDiffuse =",
+            "const bool alphaDiffuse =",
+            "if (!rgbDiffuse || !alphaDiffuse) return false;",
             "GetRenderState(D3DRS_FOGENABLE, &fog)",
             "GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
             "stencil || depth || !clip || fog ||",
@@ -114,8 +116,8 @@ def main() -> None:
 
     assert exact_diffuse_state_gate(bridge)
     for bad, replacement in (
-        ("arg != D3DTA_DIFFUSE",
-         "(arg & D3DTA_SELECTMASK) != D3DTA_DIFFUSE"),
+        ("if (!rgbDiffuse || !alphaDiffuse) return false;",
+         "if (!rgbDiffuse && !alphaDiffuse) return false;"),
         ("GetRenderState(D3DRS_FOGENABLE, &fog)",
          "GetRenderState(D3DRS_FOGENABLE, &clip)"),
         ("GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
@@ -424,7 +426,98 @@ def main() -> None:
     assert "float4 PSTextureOnly(VOut v) : SV_Target { float4 c = gameTexture.Sample(gameSampler, v.uv); AlphaGate(c.a); return c; }" in bridge
     assert '!compile("PSTextureOnly", "ps_4_0", textureOnlyCode)' in bridge
     assert "s.textureOnlyPs.Reset();" in bridge
-    assert "if (!capture.enabled && (op != D3DTOP_SELECTARG1 || arg != D3DTA_DIFFUSE))" in bridge
+    # Real untextured FVF DIFFUSE menu/sprite draws may select RGB and alpha
+    # independently via stage-0 ARG1/ARG2. The native PS returns v.diffuse,
+    # so BOTH channels must resolve exactly to vertex diffuse/current.
+    # This extends live Draw/DrawIndexed admission, not a WARP-only probe.
+    def untextured_diffuse_linked(code: str) -> bool:
+        start = code.find("    if (!capture.enabled) {", code.find("bool supported_game_state("))
+        end = code.find("    if (capture.enabled) {", start)
+        if start < 0 or end <= start:
+            return False
+        gate = code[start:end]
+        predicates = (
+            "if (!layout.hasDiffuse ||",
+            "GetTextureStageState(0, D3DTSS_COLORARG2, &arg2)",
+            "GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)",
+            "GetTextureStageState(0, D3DTSS_ALPHAARG1, &alphaArg1)",
+            "GetTextureStageState(0, D3DTSS_ALPHAARG2, &alphaArg2)",
+            "(op == D3DTOP_SELECTARG1 &&",
+            "(arg == D3DTA_DIFFUSE || arg == D3DTA_CURRENT)",
+            "(op == D3DTOP_SELECTARG2 &&",
+            "(arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT)",
+            "(alphaOp == D3DTOP_SELECTARG1 &&",
+            "(alphaArg1 == D3DTA_DIFFUSE || alphaArg1 == D3DTA_CURRENT)",
+            "(alphaOp == D3DTOP_SELECTARG2 &&",
+            "(alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT)",
+            "if (!rgbDiffuse || !alphaDiffuse) return false;",
+        )
+        return all(p in gate for p in predicates) and (
+            "float4 PS(VOut v) : SV_Target { float4 c = v.diffuse;" in code
+            and "ctx->DrawIndexed(indexCount, 0, 0);" in code
+            and "ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in code
+        )
+
+    assert untextured_diffuse_linked(bridge)
+    untextured_mutations = (
+        ("if (!layout.hasDiffuse ||", "if (false ||"),
+        ("D3DTSS_COLORARG2, &arg2)", "D3DTSS_COLORARG2, &alphaArg2)"),
+        ("D3DTSS_ALPHAOP, &alphaOp)", "D3DTSS_ALPHAOP, &arg2)"),
+        ("D3DTSS_ALPHAARG1, &alphaArg1)", "D3DTSS_ALPHAARG1, &arg2)"),
+        ("D3DTSS_ALPHAARG2, &alphaArg2)", "D3DTSS_ALPHAARG2, &arg2)"),
+        ("op == D3DTOP_SELECTARG1 &&", "op == D3DTOP_MODULATE &&"),
+        ("arg == D3DTA_DIFFUSE || arg == D3DTA_CURRENT", "arg == D3DTA_TEXTURE || arg == D3DTA_CURRENT"),
+        ("op == D3DTOP_SELECTARG2 &&", "op == D3DTOP_MODULATE &&"),
+        ("arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT", "arg2 == D3DTA_TEXTURE || arg2 == D3DTA_CURRENT"),
+        ("alphaOp == D3DTOP_SELECTARG1 &&", "alphaOp == D3DTOP_MODULATE &&"),
+        ("alphaArg1 == D3DTA_DIFFUSE || alphaArg1 == D3DTA_CURRENT", "alphaArg1 == D3DTA_TEXTURE || alphaArg1 == D3DTA_CURRENT"),
+        ("alphaOp == D3DTOP_SELECTARG2 &&", "alphaOp == D3DTOP_MODULATE &&"),
+        ("alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT", "alphaArg2 == D3DTA_TEXTURE || alphaArg2 == D3DTA_CURRENT"),
+        ("if (!rgbDiffuse || !alphaDiffuse) return false;", "if (!rgbDiffuse && !alphaDiffuse) return false;"),
+    )
+    for original, altered in untextured_mutations:
+        # Mutate the local admission clause only: the textured stage has
+        # its own correctly independent source getters.
+        start = bridge.index("    if (!capture.enabled) {", bridge.index("bool supported_game_state("))
+        end = bridge.index("    if (capture.enabled) {", start)
+        gate = bridge[start:end]
+        assert original in gate
+        mutant = bridge[:start] + gate.replace(original, altered, 1) + bridge[end:]
+        assert not untextured_diffuse_linked(mutant), (
+            "untextured stage-0 RGB/alpha native regression escaped: " + original
+        )
+
+    # Source D3DTOP numeric SELECTARG1/2, texture vs diffuse/current and
+    # modifier inputs: both independently selected channels must agree.
+    SELECTARG1, SELECTARG2, MODULATE = 2, 3, 4
+    DIFFUSE, CURRENT, TEXTURE, COMPLEMENT = 0, 1, 2, 0x10
+    def accepted(op: int, arg1: int, arg2: int,
+                 alpha_op: int, alpha_arg1: int, alpha_arg2: int,
+                 has_diffuse: bool) -> bool:
+        rgb = ((op == SELECTARG1 and arg1 in (DIFFUSE, CURRENT))
+               or (op == SELECTARG2 and arg2 in (DIFFUSE, CURRENT)))
+        a = ((alpha_op == SELECTARG1 and alpha_arg1 in (DIFFUSE, CURRENT))
+             or (alpha_op == SELECTARG2 and alpha_arg2 in (DIFFUSE, CURRENT)))
+        return has_diffuse and rgb and a
+
+    for rgb_select in (SELECTARG1, SELECTARG2):
+        for a_select in (SELECTARG1, SELECTARG2):
+            for source in (DIFFUSE, CURRENT):
+                args = (source, TEXTURE) if rgb_select == SELECTARG1 else (TEXTURE, source)
+                alpha_args = (source, TEXTURE) if a_select == SELECTARG1 else (TEXTURE, source)
+                assert accepted(rgb_select, *args, a_select, *alpha_args, True)
+                assert not accepted(rgb_select, *args, a_select, *alpha_args, False)
+                for invalid_op in (MODULATE,):
+                    assert not accepted(invalid_op, *args, a_select, *alpha_args, True)
+                    assert not accepted(rgb_select, *args, invalid_op, *alpha_args, True)
+                bad_args = (TEXTURE, TEXTURE)
+                assert not accepted(rgb_select, *bad_args, a_select, *alpha_args, True)
+                assert not accepted(rgb_select, *args, a_select, *bad_args, True)
+                assert not accepted(rgb_select, COMPLEMENT | source, TEXTURE,
+                                    a_select, *alpha_args, True)
+                assert not accepted(rgb_select, *args, a_select,
+                                    COMPLEMENT | source, TEXTURE, True)
+
     # RGB MODULATE with separately selected alpha is an exact admitted subset.
     MODULATE, MODULATE2X, MODULATE4X, SELECTARG1, ADD, SUBTRACT, SELECTARG2 = 4, 5, 6, 2, 7, 10, 3
     for color_op, alpha_op, supported in (
