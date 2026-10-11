@@ -2612,8 +2612,13 @@ async def conversion_process_lane(
                               last_gate_poll_at=None, wait_actions_started_at=now.isoformat())
                 save_queue_state(q)
                 return
-            task_commit = (None if active.get("feature_branch") else
-                           github_find_task_commit(active["branch"], active["task_id"]))
+            task_commit = github_find_task_commit(active["branch"], active["task_id"])
+            if active.get("feature_branch"):
+                # In AI mode, old task markers on target must never masquerade
+                # as this task's self-promoted feature result.
+                feature_tip = github_branch_head(active["feature_branch"])
+                if not feature_tip or head != feature_tip or not task_commit or task_commit.get("sha") != head:
+                    task_commit = None
             if task_commit and task_commit.get("sha") == active.get("retry_failed_sha"):
                 task_commit = None
             if task_commit:
