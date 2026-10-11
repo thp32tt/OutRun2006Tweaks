@@ -29,6 +29,12 @@ namespace OutRunVR::Ipc
     template <typename T>
     bool StableRead(const T* shared, T& out, int attempts = 6) noexcept
     {
+        // The destination may be a caller-owned alias of the mapped source.
+        // Reject it before zeroing on failure or copying a successful read:
+        // either write would corrupt the producer's live seqlock state.
+        if (shared == &out)
+            return false;
+
         if (!shared || attempts <= 0)
         {
             out = T{};

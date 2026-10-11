@@ -35,6 +35,35 @@ int main()
     Host::HostStateV3Writer writer(luidLow, luidHigh);
     IpcV3::HostStateReader reader;
 
+    // The generic seqlock reader must never write through a source alias.
+    // Even invalid-attempt failure must not zero the live shared record.
+    IpcV3::HostState aliasSource{};
+    IpcV3::InitializeWireState(aliasSource);
+    aliasSource.sequence = 2;
+    aliasSource.hostPid = 4242;
+    aliasSource.poseId = 0xABCDEF01ull;
+    if (!Check(!Ipc::StableRead(&aliasSource, aliasSource) &&
+        aliasSource.sequence == 2 && aliasSource.hostPid == 4242 &&
+        aliasSource.poseId == 0xABCDEF01ull,
+        "aliased seqlock read modified producer memory"))
+        return 22;
+    if (!Check(!Ipc::StableRead(&aliasSource, aliasSource, 0) &&
+        aliasSource.sequence == 2 && aliasSource.hostPid == 4242 &&
+        aliasSource.poseId == 0xABCDEF01ull,
+        "invalid-attempt aliased read cleared producer memory"))
+        return 23;
+    IpcV3::HostState independentCopy{};
+    if (!Check(Ipc::StableRead(&aliasSource, independentCopy) &&
+        independentCopy.poseId == aliasSource.poseId &&
+        independentCopy.hostPid == aliasSource.hostPid,
+        "independent stable snapshot unexpectedly rejected"))
+        return 24;
+    independentCopy = aliasSource;
+    if (!Check(!Ipc::StableRead(&aliasSource, independentCopy, 0) &&
+        independentCopy.structSize == 0 && independentCopy.poseId == 0,
+        "failed independent read exposed previous pose"))
+        return 25;
+
     IpcV3::HostState first{};
     IpcV3::InitializeWireState(first);
     first.flags = IpcV3::HostAlive |
