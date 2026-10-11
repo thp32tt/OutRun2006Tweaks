@@ -5,6 +5,11 @@ on:
     paths:
       - 'tools/chat-controller/v0.4/src-vr-v2/**'
       - 'tools/chat-controller/v0.4/tests/test_vr_progression.py'
+      - 'tools/chat-controller/v0.4/tests/test_vr_runtime_watchdog.py'
+      - 'tools/chat-controller/v0.4/vr-runtime-watchdog.sh'
+      - 'tools/chat-controller/v0.4/entrypoint.vr.sh'
+      - 'tools/chat-controller/v0.4/Dockerfile.portainer-vr'
+      - 'tools/chat-controller/v0.4/docker-compose.portainer-vr.yml'
       - 'tools/chat-controller/v0.4/tests/test_vr_feature_pipeline.py'
       - 'tools/chat-controller/v0.4/feature_backlog.json'
       - 'tools/chat-controller/v0.4/conversion_dx11.md'
@@ -24,6 +29,12 @@ jobs:
         run: python3 tools/chat-controller/v0.4/tests/test_vr_progression.py
       - name: Existing feature promotion and branch protection
         run: python3 tools/chat-controller/v0.4/tests/test_vr_feature_pipeline.py
+      - name: Shell syntax of independent VR watchdog and entrypoint
+        run: |
+          bash -n tools/chat-controller/v0.4/vr-runtime-watchdog.sh
+          bash -n tools/chat-controller/v0.4/entrypoint.vr.sh
+      - name: Functional VR event-loop watchdog regression
+        run: python3 -m unittest discover -s tools/chat-controller/v0.4/tests -p test_vr_runtime_watchdog.py -v
       - name: Compile assembled Docker controller
         run: |
           python3 - <<'PY'
