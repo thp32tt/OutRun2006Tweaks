@@ -475,7 +475,10 @@ def main() -> None:
     )
     assert all(x in bridge for x in scaled_links)
     for token in scaled_links[:-2]:
-        mutant = bridge.replace(token, "/* disconnected scaled source/consumer */", 1)
+        # Reset occurs in both pipeline recovery and game Reset. Remove every
+        # occurrence for this destructive control; a single removal leaves the
+        # other valid occurrence and creates a false test failure.
+        mutant = bridge.replace(token, "/* disconnected scaled source/consumer */")
         assert mutant != bridge and token not in mutant
     for factor, texel, diffuse, expected in (
         (2, (0.4, 0.2, 0.1, 0.7), (0.5, 0.5, 0.5, 0.5),
