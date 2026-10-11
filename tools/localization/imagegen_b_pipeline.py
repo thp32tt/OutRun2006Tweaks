@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B-only ImageGen PNG -> exact CLEAN -> unpromoted DDS and saved-byte QA.
+"""B/C1 ImageGen PNG -> exact CLEAN -> unpromoted RGBA32/BC3 DDS QA.
 
 The native ChatGPT image generator runs in each B or C1 conversation, NOT in GitHub
 Actions. This deterministic consumer refuses absent/unverified generator pixels
@@ -77,38 +77,107 @@ def bbox(raw: object, width: int, height: int) -> tuple[int, int, int, int]:
     return x0, y0, x1, y1
 
 
-def dds_rgba_read(data: bytes) -> np.ndarray:
+def dds_format(data: bytes) -> tuple[int, int, str]:
+    """Strict single-mip DDS: keep the original header and codec unchanged."""
     if len(data) < 128 or data[:4] != b"DDS ":
         raise ValueError("Not a DDS")
-    h = struct.unpack_from("<I", data, 12)[0]
-    w = struct.unpack_from("<I", data, 16)[0]
+    h, w = struct.unpack_from("<II", data, 12)
     mip = struct.unpack_from("<I", data, 28)[0]
-    bpp = struct.unpack_from("<I", data, 88)[0]
-    if w < 1 or h < 1 or w*h > 16_777_216 or mip not in (0, 1) or bpp != 32:
-        raise ValueError("Unsupported DDS size/mips/bpp for exact RGBA32 replacement")
-    if len(data) != 128 + w*h*4 or data[84:88] != bytes(4):
-        raise ValueError("Compressed/extra payload DDS not supported; HOLD")
+    fourcc = data[84:88]
+    if not (w > 0 and h > 0 and w*h <= 16_777_216 and mip in (0, 1)):
+        raise ValueError("Unsupported DDS dimensions/mip chain; HOLD")
+    if fourcc == b"DXT5":
+        if w % 4 or h % 4:
+            raise ValueError("Non-block-aligned BC3 dimensions; HOLD")
+        if len(data) != 128 + (w//4)*(h//4)*16:
+            raise ValueError("BC3 payload/mip mismatch; HOLD")
+        return w, h, "BC3_DXT5"
+    if fourcc == bytes(4) and struct.unpack_from("<I", data, 88)[0] == 32:
+        if len(data) != 128 + w*h*4:
+            raise ValueError("RGBA32 payload/mip mismatch; HOLD")
+        return w, h, "RGBA32"
+    raise ValueError("Only single-mip RGBA32 or BC3/DXT5 supported; HOLD")
+
+
+def dds_rgba_read(data: bytes) -> np.ndarray:
+    w, h, _ = dds_format(data)
     with Image.open(io.BytesIO(data)) as im:
         if im.size != (w, h):
             raise ValueError("Unexpected DDS decoded dimensions")
         return np.asarray(im.convert("RGBA"))[::-1].copy()
 
 
+def _bc3_block(raw_rgba: np.ndarray) -> bytes:
+    """Deterministic BC3 block encoder. Re-encode ONLY touched 4x4 blocks."""
+    px = raw_rgba.reshape(16, 4).astype(np.int32)
+    alpha = px[:, 3]
+    a0, a1 = int(alpha.max()), int(alpha.min())
+    if a0 > a1:
+        ap = [a0, a1] + [((7-i)*a0+i*a1)//7 for i in range(1, 7)]
+    else:
+        ap = [a0, a1, 0, 0, 0, 0, 0, 0]
+    ai = np.argmin(abs(alpha[:, None]-np.asarray(ap)[None, :]), axis=1)
+    alpha_indices = sum(int(v) << (3*i) for i, v in enumerate(ai))
+    alpha_payload = bytes((a0, a1)) + alpha_indices.to_bytes(6, "little")
+
+    active = px[alpha > 0, :3]
+    if not len(active):
+        active = px[:, :3]
+    lo, hi = active.min(axis=0), active.max(axis=0)
+    def rgb565(v: np.ndarray) -> int:
+        return ((int(v[0])*31+127)//255 << 11 |
+                (int(v[1])*63+127)//255 << 5 |
+                (int(v[2])*31+127)//255)
+    c0, c1 = rgb565(hi), rgb565(lo)
+    if c0 < c1:
+        c0, c1 = c1, c0
+    def expand(c: int) -> np.ndarray:
+        r = (c >> 11) & 31
+        g = (c >> 5) & 63
+        b = c & 31
+        return np.asarray([(r << 3) | (r >> 2),
+                           (g << 2) | (g >> 4),
+                           (b << 3) | (b >> 2)], dtype=np.int32)
+    p0, p1 = expand(c0), expand(c1)
+    pal = np.stack((p0, p1, (2*p0+p1)//3, (p0+2*p1)//3))
+    err = np.sum((px[:, None, :3]-pal[None, :, :])**2, axis=2)
+    ci = np.argmin(err, axis=1)
+    color_indices = sum(int(v) << (2*i) for i, v in enumerate(ci))
+    return alpha_payload + struct.pack("<HHI", c0, c1, color_indices)
+
+
 def dds_rgba_encode(template: bytes, readable: np.ndarray) -> bytes:
-    """Persist in ORIGINAL DDS byte channel ordering; never assume RGBA/BGRA."""
+    """Preserve exact BC3 blocks outside edits, original masks/codec/header."""
+    w, h, fmt = dds_format(template)
+    if readable.shape != (h, w, 4) or readable.dtype != np.uint8:
+        raise ValueError("Candidate dimensions or pixel type mismatch")
+    raw = readable[::-1]
+    if fmt == "BC3_DXT5":
+        old = dds_rgba_read(template)[::-1]
+        payload = bytearray(template[128:])
+        blocks_per_row = w // 4
+        for y in range(0, h, 4):
+            for x in range(0, w, 4):
+                new_block = raw[y:y+4, x:x+4]
+                if np.array_equal(old[y:y+4, x:x+4], new_block):
+                    continue
+                at = ((y//4)*blocks_per_row+x//4)*16
+                payload[at:at+16] = _bc3_block(new_block)
+        return template[:128] + bytes(payload)
+
     masks = struct.unpack_from("<IIII", template, 92)
-    positions=[]
+    positions = []
     for mask in masks:
-        if mask not in (0x000000FF,0x0000FF00,0x00FF0000,0xFF000000):
+        if mask not in (0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000):
             raise ValueError("Non-byte-aligned DDS channel mask; HOLD")
         positions.append((mask.bit_length()-8)//8)
-    if sorted(positions)!=[0,1,2,3]:
+    if sorted(positions) != [0, 1, 2, 3]:
         raise ValueError("Missing/duplicate DDS color channels; HOLD")
-    raw=readable[::-1]
-    payload=np.empty(raw.shape,dtype=np.uint8)
-    for component,position in enumerate(positions):
-        payload[:,:,position]=raw[:,:,component]
-    return template[:128]+payload.tobytes()
+    payload = np.empty(raw.shape, dtype=np.uint8)
+    for component, position in enumerate(positions):
+        payload[:, :, position] = raw[:, :, component]
+    return template[:128] + payload.tobytes()
+
 
 
 def png_rgba(data: bytes) -> np.ndarray:
@@ -262,8 +331,22 @@ def run(repo: Path, manifest: Path) -> dict:
     if np.any(contamination):
         raise ValueError("Clean-to-final changed outside new text alpha")
     dds=dds_rgba_encode(O0,N)
-    if not np.array_equal(dds_rgba_read(dds),N):
+    saved=dds_rgba_read(dds)
+    _, _, fmt=dds_format(O0)
+    mismatches=int(np.count_nonzero(np.any(saved!=N,axis=2)))
+    if fmt=="RGBA32" and mismatches:
         raise ValueError("Persisted DDS RAW/readable mismatch")
+    # BC3 is lossy. Inspect SAVED pixels, not just the pre-encode image;
+    # even a single compressed 4x4 block contaminating protected art is HOLD.
+    changed_saved=np.any(saved!=O,axis=2)
+    protected=np.ones((h,w),dtype=bool)
+    protected[r[1]:r[3],r[0]:r[2]]=False
+    protected_count=int(np.count_nonzero(changed_saved & protected))
+    roi_protected=np.ones((h,w),dtype=bool)
+    roi_protected[y0:y1,x0:x1]=False
+    roi_changed=int(np.count_nonzero(changed_saved & roi_protected))
+    if protected_count or roi_changed:
+        raise ValueError(f"Saved {fmt} changes protected pixels: source_bbox={protected_count}, outside_roi={roi_changed}; HOLD")
     if digest(dds)==digest(O0):
         raise ValueError("No materially changed DDS")
     outdir=(repo/raw["output_dir"]).resolve()
@@ -283,6 +366,8 @@ def run(repo: Path, manifest: Path) -> dict:
       "generation_provenance":raw["generator"],"manifest_sha256":digest(manifest.read_bytes()),
       "official_sha256":digest(O0),"source_sha256":digest(S0),"clean_sha256":digest(C0),
       "generated_sha256":digest(P0),"saved_trial_sha256":digest(dds),
+      "dds_format":fmt,"saved_lossy_mismatch_pixels_within_bbox":mismatches,
+      "saved_protected_pixels_changed":protected_count,"saved_outside_roi_pixels_changed":roi_changed,
       "fit_mode":raw.get("fit_mode","contain"),"new_effect_bbox":list(eff),
       "source_effect_bbox":list(source_effect),"roi":list(roi),
       "outside_roi_changed_pixels":0,"generated_effect_outside_bbox_pixels":0,
