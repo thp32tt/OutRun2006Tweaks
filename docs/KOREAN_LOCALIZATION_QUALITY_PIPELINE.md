@@ -1,5 +1,10 @@
 # Korean Localization Quality Pipeline
 
+## B image-generated lettering — 2026-10-11
+
+B 신규 텍스트 그래픽은 글꼴/벡터 생성 대신 **실제 ChatGPT ImageGen 결과**를 SHA-bound 투명 PNG로 받아 `tools/localization/imagegen_b_pipeline.py`로 처리한다. 자세한 규칙은 `docs/KOREAN_LOCALIZATION_B_IMAGEGEN_LANE.md`. 이미지 생성 역시 기존 10단계/8항목, English/CLEAN 독립 플레이트 검사, source 글자 경계 1px 규칙, 유해한 가짜 획/오탈자/중복 자소/콜론, 다운샘플 50%, 보호영역, RAW/FLIP-Y, 저장 DDS 디코딩, 독립 C2/C3 및 새 사용자 실게임 검증 대상이다. 기계적 0픽셀 PASS만으로 생산/최종 승인 불가. A는 기존 로직 그대로. 생산량 비교는 A/B 각각 첫 C PASS까지의 시간과 PASS/REWORK를 별도 계산하며, ChatGPT 이미지 생성 도구를 실제 사용할 수 없는 B 세션은 입력 없음/HOLD를 기록한다.
+
+
 ## Production reset: qualify the method before multiplying candidates — 2026-10-09
 
 Read and apply `docs/KOREAN_LOCALIZATION_PRODUCTION_RESET.md` before A/B production
