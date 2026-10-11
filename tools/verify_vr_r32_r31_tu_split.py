@@ -47,7 +47,7 @@ for label, body in (("CMakeLists.txt", cmake), ("cmake.toml", cmkr)):
     if "Combined R33/R32/R31/R30 ownership" not in body:
         errors.append(f"{label} lacks integrated TU ownership constraint")
 
-for feature in ("OUTRUN_VR_REFACTOR_SPLIT_R33_R32", "OUTRUN_VR_REFACTOR_SPLIT_R32_R31", "OUTRUN_VR_REFACTOR_SPLIT_R31_R30"):
+for feature in ("OUTRUN_VR_REFACTOR_SPLIT_R33_R32", "OUTRUN_VR_REFACTOR_SPLIT_R32_R31", "OUTRUN_VR_REFACTOR_SPLIT_R31_R30", "OUTRUN_VR_REFACTOR_SPLIT_R30_R29"):
     if "-D" + feature + "=ON" not in workflow:
         errors.append(f"canonical Win32 full-chain gate does not enable {feature}")
 if "'tools/verify_vr_r32_r31_tu_split.py'" not in workflow:
