@@ -84,7 +84,7 @@ def check_mono_aux_fastpath(text: str) -> None:
         assert exclusion in guard, f"raster bypass lost {exclusion}"
 
     fallback = re.search(
-        r"auto fallbackToR29 = \\[&\\]\\(\\) -> HRESULT \\{(.*?)\\n\\s*\\};",
+        r"auto fallbackToR29 = \[&\]\(\) -> HRESULT \{(.*?)\n\s*\};",
         dispatch, re.S)
     assert fallback, "R29 shared fail-closed fallback missing"
     body = fallback.group(1)
@@ -92,7 +92,7 @@ def check_mono_aux_fastpath(text: str) -> None:
     assert "if (telemetry)" in body and "R32ReviewNoteDispatchFallback();" in body
     assert "R32ReviewRunLowerFailClosed(device," in body
     assert "std::forward<LowerR29Draw>(lowerR29Draw)" in body
-    bypass = "if (!resyncAlreadyFlushed)\\n                return fallbackToR29();"
+    bypass = "if (!resyncAlreadyFlushed)\n                return fallbackToR29();"
     assert bypass in dispatch, "mono/aux still pays for R33 classification"
     assert dispatch.index("StateBlockTracker::Recording()") < dispatch.index(bypass)
     assert dispatch.index(bypass) < dispatch.index("R32ReviewClassifyScreenSpacePass(device)")
@@ -100,22 +100,35 @@ def check_mono_aux_fastpath(text: str) -> None:
         "R33TryFastWorld(device,"), "stereo fallback must use identical R29 policy"
 
 
+def mutate_dispatch(src: str, before: str, after: str) -> str:
+    head, tail = src.split("HRESULT R33Dispatch(", 1)
+    body, end = tail.split("HRESULT __stdcall DrawPrimitiveDestR33(", 1)
+    assert before in body, f"mutation anchor missing: {before!r}"
+    return (head + "HRESULT R33Dispatch(" + body.replace(before, after, 1)
+            + "HRESULT __stdcall DrawPrimitiveDestR33(" + end)
+
+
 def negative_mono_aux_fastpath(src: str) -> None:
-    mutations = [
-        src.replace("if (!resyncAlreadyFlushed)\\n                return fallbackToR29();",
-                    "if (false)\\n                return fallbackToR29();", 1),
-        src.replace("if (!resyncAlreadyFlushed)\\n                return fallbackToR29();",
-                    "if (resyncAlreadyFlushed)\\n                return fallbackToR29();", 1),
-        src.replace("return R32ReviewRunLowerFailClosed(device,",
-                    "return R32ReviewCallRawDrawPrimitive(device,", 1),
-        src.replace("R32ReviewDiscardUnreliableDrawCaches();", "/* removed */", 1),
-        src.replace("R32ReviewNoteDispatchFallback();", "/* removed */", 1),
-        src.replace("return fallbackToR29();\\n\\n            // Classify exactly once",
-                    "return actualDraw();\\n\\n            // Classify exactly once", 1),
-        src.replace("return fallbackToR29();\\n        }\\n\\n        HRESULT __stdcall DrawPrimitiveDestR33(",
-                    "return actualDraw();\\n        }\\n\\n        HRESULT __stdcall DrawPrimitiveDestR33(", 1),
+    bypass = "if (!resyncAlreadyFlushed)\n                return fallbackToR29();"
+    cases = [
+        (bypass, "if (false)\n                return fallbackToR29();"),
+        (bypass, "if (resyncAlreadyFlushed)\n                return fallbackToR29();"),
+        ("return R32ReviewRunLowerFailClosed(device,",
+         "return R32ReviewCallRawDrawPrimitive(device,"),
+        ("R32ReviewDiscardUnreliableDrawCaches();", "/* removed */"),
+        ("R32ReviewNoteDispatchFallback();", "/* removed */"),
+        ("if (!resyncAlreadyFlushed)\n                return fallbackToR29();",
+         "if (!resyncAlreadyFlushed)\n                return actualDraw();"),
+        ("return fallbackToR29();\n        }\n\n        HRESULT" ,
+         "return actualDraw();\n        }\n\n        HRESULT"),
     ]
-    for index, mutant in enumerate(mutations, 1):
+    # Last mutation spans the dispatch function boundary: handle separately.
+    for index, (before, after) in enumerate(cases, 1):
+        if index == len(cases):
+            assert before in src
+            mutant = src.replace(before, after, 1)
+        else:
+            mutant = mutate_dispatch(src, before, after)
         assert mutant != src, f"mutation fixture {index} did not alter source"
         try:
             check_mono_aux_fastpath(mutant)
