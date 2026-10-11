@@ -1,3 +1,7 @@
+## 2026-10-12 B/C1 input correction (latest user request)
+
+Before every B/C1 real ImageGen call, **require actual attached English lettering-only transparent RGBA media**, separately cropped from SHA-verified mirrored PSD letter/effect layers or, when not separable, isolated native PSD transparent composite / canonical DDS glyph-only ROI. A full game image, UI screenshot, menu screenshot, multi-label sheet, generator prompt alone, file path or a different tool's image display is **not** valid generator input. Preflight shall record reference file SHA/ROI/PSD source and actual attachment evidence, otherwise `SOURCE_REFERENCE_NOT_BOUND` HOLD and **no generation call**. Full game/menu/car outputs are `NON_GLYPH_SCENE_OUTPUT` and do not count as Korean lettering or DDS. See `docs/KOREAN_LOCALIZATION_IMAGEGEN_PROMPT_GUIDE.md`; keep C2 PLATE_PASS, native DDS, protected pixels, C3 and in-game unchanged. q092 English-only PSD source reference under `role_B/source_references/q092_20261012` is prepared but not C2-approved or proven bound to the generator.
+
 # Korean Localization Automation Contract
 
 ## 2026-10-11 QA 수렴·실게임 시험 분리 정책 (최신 사용자 결정)

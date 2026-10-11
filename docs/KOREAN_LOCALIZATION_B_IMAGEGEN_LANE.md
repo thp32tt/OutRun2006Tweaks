@@ -1,3 +1,7 @@
+## 2026-10-12 letter-only source binding override (B+C1; user correction)
+
+**PRE-GENERATION HARD STOP:** Follow the six-stage source-media binding rule in `docs/KOREAN_LOCALIZATION_IMAGEGEN_PROMPT_GUIDE.md`. An actual SHA-pinned, cropped, transparent English glyph/effect PNG from PSD (preferred) or canonical DDS (fallback) MUST be visibly provided as real image input to ImageGen, and the attachment path/binding proven before calling. GitHub paths, crop screenshots in a different tool response, prompt descriptions or `edit_op=null` metadata do not prove generator attachment. If unverified, record `SOURCE_REFERENCE_NOT_BOUND`, do not call and do not fabricate Korean output. Discard full-scene/vehicle/menu outputs as `NON_GLYPH_SCENE_OUTPUT`; no DDS or self-PASS. Reference-only PSD composite isolation is not Photoshop leaf-layer separation/C2 PLATE_PASS. Existing B/C1 owners, A manual production, C2/C3/game gates unchanged.
+
 # B·C1 ChatGPT 이미지 생성 생산 레인 — 2026-10-11
 
 ## 2026-10-11 QA 수렴·실게임 시험 분리 정책 (최신 사용자 결정)
