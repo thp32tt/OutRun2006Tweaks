@@ -1,3 +1,10 @@
+## 2026-10-11 22:44 KST — C1 q102 actual ImageGen lettering, local binary HOLD (not DDS)
+
+- `RUN_KEY=OUTRUN-KOR-C1-Q102-15CONTINUOUS-IMAGEGEN-LOCAL-20261011-2240`. New real ChatGPT ImageGen gen `95eed5de-0b71-4dee-8e4e-aa105a4b0b30` produced transparent 2172×724 RGBA `15코스 연속` lettering PNG, 711,618 bytes, original local SHA256 `d409c4eba2d50866e24ad7818f4d3cad0bd998b82b78d938bc1ab3a3a8033531`. Real generator metadata prompt was empty; human invocation text retained in detailed report.
+- Canonical English source `15 Continuous Course` has already been verified/published from q102 DDS; however it was **not independently attached/bound to this generation call**. No precise source-style acceptance or composition containment claim. Local RGBA alpha: 0..255, visible bbox [17,9,2088,690]; code checked real saved PNG, not DDS.
+- **Fail-closed:** exact original PNG GitHub transfer not completed, C2 SHA-bound CLEAN/PLATE_PASS absent, so the `outrun-c1-imagegen-v1` DDS consumer is not run. Valid remote product PNG **0**, new trial DDS **0**, official DDS **0**, producer state `HOLD_SOURCE_CONDITIONING_AND_CLEAN_PLATE`, C2/C3/user-game **NOT_RUN**, `RUNTIME_VALIDATION=UNTESTED`. Prior C2 q102 REWORK remains; no duplicate same-SHA completion.
+- Evidence: [C1 q102 ImageGen attempt](graphics/role_C1/imagegen_requests/q102_C1_20261011_2240_REAL_IMAGEGEN_LOCAL_BINARY_HOLD.json). GitHub connector stored honest metadata only; original PNG available as ChatGPT local generated attachment for this turn.
+
 ## 2026-10-11 22:11 KST — C1 q102 exact canonical English RGBA source 3 PNG published / ImageGen lettering FAIL
 
 - Authenticated pinned Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6 q102 English original Release/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds Git blob 12a935df311634cb64ff01bddce2b7a1165a2ccc SHA256 17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121 against C2 original. Actual BC3/DXT5 2048x256, mip1; decoded RAW and mirrored to readable source preserving original RGBA and alpha, not a reconstructed CLEAN. English source has native navy effects at row edges; no unproven cleanup or PASS.
