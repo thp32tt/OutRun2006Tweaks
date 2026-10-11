@@ -1,3 +1,11 @@
+# 2026-10-11 USER OVERRIDE — DX9Ex measured performance FIRST
+
+- **Effective for every new C dispatch:** P0 is actual CPU/GPU frame-time and FPS optimization, not minor safety guards, lifecycle/edge-case hardening, repetitive reviews, or refactor for its own sake. Defer small defensive issues unless a demonstrated crash, data corruption, build failure or direct FPS regression blocks performance work.
+- **Performance targets:** start with stable **72 Hz / 13.89 ms per frame**, then reduce p95/p99 frame-time and progress toward 90/120 Hz only with measured Quest3/VDXR evidence. Prioritize observed over-budget Present windows in dense buildings, beach/sand and particle-heavy scenes.
+- **Concrete source work:** find the dominant measured workload using existing R23/R28/R35 frame-pacing data; reduce redundant stereo draw/state churn, D3D9Ex DirectGPU per-eye copy cost, Desktop Duplication capture, unnecessary XR projection passes and GPU sync stalls. Implement actual hot-path changes and focused performance regression checks; do not generate another instrumentation-only or safety-only feature instead.
+- **Secondary:** actionable confirmed HUD/flare/rank/+TIME/GOAL optical faults (P1), then opt-in performance-beneficial per-eye render sizing (P2). Small safety/cleanup work is P3 DEFERRED. Preserve protected SkyGlow, HUD, stereo and FFB without reducing visual quality to fake FPS. R84, 00598 and 00599 are completed, not redispatch candidates.
+- DX11 Native A remains overall first-priority on its branch; DXVK B stays frozen. CI PASS does not establish hardware FPS. GitHub is authoritative; controller must load this override at dispatch. GitHub doc commit alone is not evidence that live Docker was reloaded.
+
 # 2026-10-11 R84 completed source/build gate (top precedence)
 
 - R84 one-feature task `CONVERSION-DX9EX-00591` is **COMPLETE_BUILD_VERIFIED**, closeout `SUPERSEDED_BY_DX9EX_FOCUS`. Exact target source SHA `074768c96c410f0268c084450b0aa8bced38b6c3` passed full independent R29–R33 Win32 compile/link, host, game, package, DX9Ex Active #38135749653, Domain Isolation #38135749604, and Full Source Impact #38135749550.
