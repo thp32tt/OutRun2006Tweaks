@@ -65,6 +65,7 @@ def contract(s):
         "R29Effect.applyGeneration = 0;" not in sync,
         "R29Effect.recordingGeneration = 0;" not in sync,
         "R29Effect.valid && false" not in s,
+        "if (false && R29Effect.applyGeneration" not in cache,
     ))
 
 errors = []
@@ -86,7 +87,8 @@ mutations = [
      "if (OutRunVR::State::StateBlockTracker::Recording() ||\n                false)"),
     ("recording cache", "if (OutRunVR::State::StateBlockTracker::Recording() ||\n", "if (false ||\n"),
     ("apply generation", "if (R29Effect.applyGeneration !=", "if (false && R29Effect.applyGeneration !="),
-    ("record generation", "R29Effect.recordingGeneration !=", "R29Effect.recordingGeneration =="),
+    ("record generation", "R29Effect.recordingGeneration !=\n                    OutRunVR::State::StateBlockTracker::RecordingGeneration()",
+     "R29Effect.recordingGeneration ==\n                    OutRunVR::State::StateBlockTracker::RecordingGeneration()"),
     ("present fence", "R29Effect.presentEpoch == PresentEpoch", "R29Effect.presentEpoch != PresentEpoch"),
     ("draw monotonicity", "TopLevelDrawSerial() >= R29Effect.drawSerial", "TopLevelDrawSerial() < R29Effect.drawSerial"),
     ("no periodic getter", "TopLevelDrawSerial() >= R29Effect.drawSerial;",
