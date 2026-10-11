@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00563",
   "base_sha": "e1c80afc4388c28f013ff5e9b29fff3415e12f0f",
   "work_key": "DX11:MENU_RACE_FACTOR_RGB_INDEPENDENT_ALPHA_NATIVE_DRAW",
-  "status": "SOURCE_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "native_gameplay_activation": false,
@@ -58,13 +58,74 @@
     "C0_RECOVER": "GitHub HEAD AGENTS policy and 00562 exact CI examined",
     "C1_REVIEW": "Independent texture/modulate alpha rejected on real D3D9 RGB factor route",
     "C2_IMPLEMENT": "Actual D3D9 capture -> two D3D11 HLSL shaders -> native Draw dispatch; destructive regressions",
-    "C3_VALIDATE": "JS source linkage checks PASS; exact SHA GitHub Actions pending",
-    "C4_COMMIT": "Atomic C++/Python/run record material commit without CI skip",
+    "C3_VALIDATE": "PASS_EXACT_SHA 8474793e270602de16f792a7e1310bf58f27ed5a: Backend Conversion Gate #38168221987 validate+readiness SUCCESS, Build #38168224832 SUCCESS, DX11 Fast #38168222066 SUCCESS, OpenXR #38168224870 SUCCESS, HUD #38168224856 SUCCESS. Original 61bc67ea exact Win32 00562 negative regression failed due duplicate token; 8474793e same-task unique-anchor repair. Runtime Quest3/VDXR/gamepad UNTESTED.",
+    "C4_COMMIT": "C++/Python/task material 61bc67ea4aeee78644bfb096df2864bcfc465671; same-task regression fix 8474793e270602de16f792a7e1310bf58f27ed5a. Neither uses CI skip. C6 bookkeeping separate [skip ci] after Gates.",
     "C5_PACKAGE": "NOT_REQUIRED opt-in diagnostic only",
-    "C6_STATE": "PENDING_EXACT_SHA; runtime HMD/gamepad UNTESTED"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED/PASS_EXACT_SHA at 8474793e270602de16f792a7e1310bf58f27ed5a. Original game D3D9 Draw/Present/input authoritative; Quest3/VDXR/menu/vehicle/race visual+gamepad NEED_HMD_TEST."
   },
-  "feature_status": "SOURCE_IMPLEMENTED_CI_PENDING_NEED_HMD_TEST",
-  "runtime_evidence": "No HMD/game runtime/Quest3/gamepad tests",
-  "next_action": "Watch exact-SHA CI, separate PASS_EXACT_SHA C6 checkpoint after all mandatory Gates pass",
-  "state_persisted": true
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "runtime_evidence": "GitHub Actions only; no game, Quest3/VDXR or gamepad runtime validation.",
+  "next_action": "C6 sealed for 00563; new independent DX11 live menu-to-race feature may be allocated, do not retry/rescore 00563. HMD visual/gamepad NEED_HMD_TEST.",
+  "state_persisted": true,
+  "material_result_sha": "61bc67ea4aeee78644bfb096df2864bcfc465671",
+  "validation_bearing_result_sha": "8474793e270602de16f792a7e1310bf58f27ed5a",
+  "result_sha": "8474793e270602de16f792a7e1310bf58f27ed5a",
+  "acceptance_results": {
+    "source_and_negative_regression": "Real game RGB D3DTOP_BLENDFACTORALPHA + independent alpha SELECTARG1 or MODULATE -> two owned D3D11 PS -> native Draw/DrawIndexed; CPU RGBA and destructive producer-consumer tests",
+    "backend_conversion_gate": "SUCCESS",
+    "build": "SUCCESS",
+    "dx11_fast_structural": "SUCCESS",
+    "openxr_vr_architecture": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "exact_sha": "8474793e270602de16f792a7e1310bf58f27ed5a",
+    "runtime_validation": "UNTESTED"
+  },
+  "validation_evidence": {
+    "exact_sha": "8474793e270602de16f792a7e1310bf58f27ed5a",
+    "github_actions": [
+      {
+        "run_id": 38168224832,
+        "name": "Build",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38168224856,
+        "name": "OutRun EXE HUD Inspector CI",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38168224870,
+        "name": "OpenXR VR architecture",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38168222066,
+        "name": "DX11 Fast Structural Checks",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38168221987,
+        "name": "Backend Conversion Gate",
+        "status": "SUCCESS"
+      }
+    ],
+    "original_source_sha": "61bc67ea4aeee78644bfb096df2864bcfc465671",
+    "initial_failed_run": {
+      "sha": "61bc67ea4aeee78644bfb096df2864bcfc465671",
+      "run_id": 38168129382,
+      "reason": "00562 prior negative string token was duplicated after new valid factor variants; same-task unique-token test fix at validation SHA"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  },
+  "feature_contract": {
+    "scope": "Actual game D3D9 stage0 factor-driven RGB with independent texture alpha or texture*diffuse alpha routed to owned HLSL shaders and native Draw/DrawIndexed opt-in inset; original game D3D9 Draw/Present/input retained",
+    "source_material_sha": "61bc67ea4aeee78644bfb096df2864bcfc465671",
+    "validation_bearing_sha": "8474793e270602de16f792a7e1310bf58f27ed5a",
+    "runtime_acceptance": "Quest3/VDXR/menu/vehicle/race visual and gamepad NEED_HMD_TEST"
+  }
 }
