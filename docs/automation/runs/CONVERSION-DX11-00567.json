@@ -11,9 +11,9 @@
   "base_sha": "4a4c6405abb510aedec0d87d0ed689e86eb903c9",
   "work_key": "DX11:MENU_RACE_SUBTRACT_INDEPENDENT_ALPHA_NATIVE_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "SOURCE_COMMITTED_WAIT_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -61,13 +61,13 @@
     "C0_RECOVER": "Retry #2: exact failed Backend Conversion Gate #38174105827 at 239fbf272945bed349276bc42c3ee6cbd92218d7",
     "C1_REVIEW": "Gate's VISIBLE_FRAME_OUTPUT token absent; same FEATURE adds stage-0 SUBTRACT RGB with MODULATE alpha",
     "C2_IMPLEMENT": "Native C++ HLSL PS, state capture, operand validation, pipeline lifecycle/dispatch plus destructive/CPU tests",
-    "C3_VALIDATE": "Source-link preflight and CI full exact-SHA gate pending",
-    "C4_COMMIT": "Material result, no CI skip; exact SHA determined on publication",
-    "C5_PACKAGE": "NOT_REQUIRED opt-in diagnostic",
-    "C6_STATE": "Pending full exact-SHA GitHub Gate; HMD and gamepad UNTESTED"
+    "C3_VALIDATE": "Exact validation-bearing e33af6e71ec658a8214e4296bdb3ac889cbe00f8 Backend Conversion Gate #38174460369, DX11 Fast #38174460395, Win32 Build #38174463800, OpenXR #38174463830, HUD #38174463818 SUCCESS",
+    "C4_COMMIT": "Material e33af6e71ec658a8214e4296bdb3ac889cbe00f8 [AUTO:CONVERSION-DX11-00567] (no CI-skip)",
+    "C5_PACKAGE": "NOT_REQUIRED diagnostic only; CI build artifact on exact SHA",
+    "C6_STATE": "PASS_EXACT_SHA build verified, real game/Quest3/VDXR/gamepad NEED_HMD_TEST; bookkeeping in separate [skip ci] commit"
   },
-  "feature_status": "SOURCE_INTEGRATED_PENDING_CI_NEED_HMD_TEST",
-  "next_action": "Check new validation-bearing SHA Actions; C6 separate bookkeeping only after full Gate succeeds",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_action": "Next independent DX11 FEATURE_ID for menu/vehicle/race native path after controller assignment; Quest3+VDXR/gamepad opt-in visual acceptance NEED_HMD_TEST",
   "state_persisted": true,
   "failure_context": {
     "failed_gate_run_id": 38174105827,
@@ -75,5 +75,36 @@
     "failed_step": "Verify DX11 integration-first auto-development acceptance",
     "error": "gameplay path must connect real D3D9 callsite through native Draw to visible frame output",
     "repair": "Required VISIBLE_FRAME_OUTPUT after D3D11_NATIVE_DRAW; native RGB SUBTRACT + MODULATE alpha implementation"
+  },
+  "validation_bearing_result_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8",
+  "material_result_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8",
+  "evidence": {
+    "backend_conversion_gate": {
+      "run_id": 38174460369,
+      "conclusion": "success",
+      "head_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8"
+    },
+    "dx11_fast": {
+      "run_id": 38174460395,
+      "conclusion": "success",
+      "head_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8"
+    },
+    "win32_build": {
+      "run_id": 38174463800,
+      "conclusion": "success",
+      "head_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8"
+    },
+    "openxr": {
+      "run_id": 38174463830,
+      "conclusion": "success",
+      "head_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8"
+    },
+    "hud_inspector": {
+      "run_id": 38174463818,
+      "conclusion": "success",
+      "head_sha": "e33af6e71ec658a8214e4296bdb3ac889cbe00f8"
+    },
+    "runtime_quest3": "UNTESTED",
+    "runtime_gamepad": "UNTESTED"
   }
 }
