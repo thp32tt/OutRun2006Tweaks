@@ -1,5 +1,10 @@
 # End-to-end Korean localization playtest and consumer-coverage gate
 
+## 2026-10-11 per-glyph size decision for all review stages
+
+Apply `docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md` in producer, C2, C3, screenshot/preview and real game review. English/Korean entire-sentence width/aspect or different character count alone is not a user-visible defect; shorter/smaller readable Korean is permitted. Reject actual individual-glyph illegibility, real UI misplacement or exact English text bbox overflow, not translation length variance. Keep actual game evidence mandatory for user-reported regressions.
+
+
 > Adopted 2026-10-09 from a selective review of [mcpads/create-retro-game-kr-patch](https://github.com/mcpads/create-retro-game-kr-patch) stable `main`, version 3.4.0 (2026-10-08). Reference: `skills/create-kr-patch/SKILL.md`, `references/strategy/runtime-assets.md`, `references/strategy/graphics-text.md`, `references/strategy/build-and-verify.md`, `references/strategy/name-entry.md`, and `references/conventions/project-conventions.md`. Original project: MIT. This is an OutRun-specific adaptation, not an import of the external plugin.
 
 ## Scope and authority

@@ -1,5 +1,10 @@
 # Korean Localization Controller Commands
 
+## Mandatory per-glyph review for every role — 2026-10-11
+
+Every A/B/C1 production/self-QA, C2 independent review and C3 audit reads `docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md`. Different English/Korean glyph counts, sentence width/height, aspect ratio, underfill, or occupancy are NOT failures. Smaller but individually readable Korean glyphs pass size; retain strict 1px no-overflow/no-overlap and other quality, evidence and actual-user-game requirements. Reevaluate historic underfill-only REWORK on actual stored candidate bytes before blocking publication. These are Git policies; scheduled dispatch need not be changed.
+
+
 ## 2026-10-11 production-first B+C1 imagegen routing (user decision)
 A :00 stays original odd-index native/vector production. B :30 remains real ChatGPT imagegen producer (new even indexes % 4 == 0); C1 :10/:40 changes from QA to real imagegen producer (new even indexes % 4 == 2). C2 :20/:50 becomes the **single independent final-QA lane for all A/B/C1 indexes and unindexed special C work**. Existing in-flight producer ownership and active assigned P0/P1 are preserved. C2/C3/game gates are unchanged; producing a PNG/DDS trial never equals approval.
 GitHub `docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md` is the authoritative workflow. `docs/KOREAN_LOCALIZATION_B_IMAGEGEN_LANE.md` defines the shared real generator and SHA/provenance rules. Docker slot prompts route jobs, and the user's Docker rebuild/redeploy is required to load changed bundled prompts. No new task/queue engine is added.

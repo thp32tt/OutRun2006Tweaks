@@ -94,5 +94,15 @@
       "orientation"
     ],
     "new_dds_approval_inherited": false
-  }
+  },
+  "glyph_scale_policy": "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+  "glyph_scale_applies_to": [
+    "A",
+    "B",
+    "C1",
+    "C2",
+    "C3",
+    "PRE_INGAME"
+  ],
+  "glyph_scale_rule": "whole_sentence_width_height_aspect_and_letter_count_are_non_blocking; inspect_each_hangul_glyph_readability_and_strict_source_bbox_ceiling"
 }

@@ -16,7 +16,7 @@ OUTPUT_REL = Path("localization/graphics/role_C/PRE_INGAME_JPG_REVIEW")
 VISUAL_REVIEW_CHECKLIST = [
     "plate_restoration_no_haze_or_source_residue",
     "readable_slant_direction_matches_source",
-    "text_scale_and_hierarchy_not_visibly_undersized",
+    "per_glyph_legibility_and_source_bbox_not_whole_sentence_ratio",
     "weight_outline_shadow_shading_remain_readable",
     "no_fill_outline_shadow_or_italic_end_clipping",
     "no_vehicle_name_icon_plate_or_neighbor_intrusion",
@@ -379,7 +379,7 @@ def main():
         "- If no proven English source can be aligned to the candidate, export fails closed.\n"
         "- User visual rejection overrides prior C static PASS and reopens the asset for A/B rework before in-game testing.\n"
         "- High-risk candidates are omitted until their current candidate SHA is explicitly recorded with C3_STRICT_PASS. See manifest.json mandatory_c3_blocked.\n"
-        "- C visual checklist: clean plate/source-footprint restoration; source-direction slant; source-relative scale/hierarchy; readable weight/effects; zero clipping; zero protected-art intrusion; no untranslated visible localizable labels.\n"
+        "- C visual checklist: clean plate/source-footprint restoration; source-direction slant; EACH Hangul glyph native/75/50 stroke, counter and legibility; shorter Korean sentences and smaller readable glyphs PASS size (no whole-phrase width/aspect minimum); exact English effect-bbox size ceiling; readable weight/effects; zero clipping; zero protected-art intrusion; no untranslated labels.\n"
         "- JPG is an overview only; authoritative QA uses native/zoom/practical/RAW and black/white/gray PNG region evidence.\n"
         "- Report defects by queue index + asset key + candidate SHA; leading JPG numbers may change.\n",
         encoding="utf-8",
