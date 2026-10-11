@@ -102,6 +102,25 @@ class DeliveryContractTests(unittest.TestCase):
         bad = copy.deepcopy(record); bad["acceptance_results"][0]["status"] = "PENDING"
         self.assertFalse(f(active, bad, ["src/vr/draw.cpp"])[0])
 
+    def test_r84_frozen_abi_contract_accepts_real_owner_header_but_not_unrelated_file(self):
+        fn = self.required(functions(), "vr_acceptance_verdict")
+        contract = dict(feature_id="DX9EX:R84_RENDERER_GRAPH",
+                        work_key="DX9EX:R84_RENDERER_GRAPH",
+                        acceptance_items=[
+                            dict(id="R84-ABI", paths=["src/vr/d3d9/"])])
+        active = dict(feature_contract=contract)
+        record = dict(feature_id=contract["feature_id"], work_key=contract["work_key"],
+                      acceptance_results=[dict(
+                          id="R84-ABI", status="PASS_FEATURE_CI",
+                          evidence_paths=["src/vr/core/r29_owner_api.hpp",
+                                          "tools/verify_vr_r29_owner_api_seam.py"],
+                          validation_command="R84 exact-SHA feature CI SUCCESS")])
+        self.assertTrue(fn(active, record, ["src/vr/core/r29_owner_api.hpp"])[0])
+        self.assertFalse(fn(active, record, ["tools/verify_vr_r29_owner_api_seam.py"])[0])
+        wrong = copy.deepcopy(record)
+        wrong["acceptance_results"][0]["evidence_paths"] = ["src/vr/core/unrelated.hpp"]
+        self.assertFalse(fn(active, wrong, ["src/vr/core/unrelated.hpp"])[0])
+
     def test_r84_ci_backed_acceptance_needs_exact_feature_run_jobs_steps_and_bundle(self):
         step_ids = ["R84-OWNERS", "R84-ABI", "R84-BUILD-GRAPH",
                     "R84-REGRESSION", "R84-TEST-BUNDLE"]
