@@ -1394,8 +1394,8 @@ def main() -> None:
     rt_tokens = (
         "const bool gpuRenderTarget = info.Pool == D3DPOOL_DEFAULT &&",
         "(info.Usage & D3DUSAGE_RENDERTARGET) != 0u",
-        "info.Format == D3DFMT_A8R8G8B8",
-        "info.Format == D3DFMT_X8R8G8B8",
+        "(info.Format == D3DFMT_A8R8G8B8 ||",
+        "info.Format == D3DFMT_X8R8G8B8);",
         "if (info.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
         "capture.texture->GetSurfaceLevel(0, sourceSurface.GetAddressOf())",
         "sourceDesc.MultiSampleType != D3DMULTISAMPLE_NONE",
@@ -1439,13 +1439,15 @@ def main() -> None:
         assert gpu_rt is expected
     # Reject even a permitted DEFAULT RT without exact format and non-MSAA
     # surface metadata. The GPU readback is diagnostic opt-in, not an HMD PASS.
-    for msaa, matching_size, matching_format, source_rt in (
-        (False, True, True, True), (True, True, True, True),
-        (False, False, True, True), (False, True, False, True),
-        (False, True, True, False),
+    for msaa, matching_size, matching_format, source_rt, expected in (
+        (False, True, True, True, True),
+        (True, True, True, True, False),
+        (False, False, True, True, False),
+        (False, True, False, True, False),
+        (False, True, True, False, False),
     ):
         allowed = not msaa and matching_size and matching_format and source_rt
-        assert allowed is (not msaa and matching_size and matching_format and source_rt)
+        assert allowed is expected
     print("DX11 live DEFAULT render-target texture to native Draw regression PASS (static only)")
 
     print("DX11 object-space NORMAL/SPECULAR native draw regression PASS (static only)")
