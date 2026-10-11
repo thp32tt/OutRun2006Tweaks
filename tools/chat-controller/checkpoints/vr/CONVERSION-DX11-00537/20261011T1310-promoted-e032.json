@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "kind": "dx11_promotion_resume_checkpoint",
+  "task_id": "CONVERSION-DX11-00537",
+  "event_id": "CONVERSION-DX11-00537-E032",
+  "event_type": "rollover",
+  "lane": "DX11",
+  "attempt": "3/3",
+  "chat_rollover": 25,
+  "feature_id": "DX11:FIRST_GAME_DRAW_FRAME",
+  "target_branch": "vr-dx11-native-r71",
+  "feature_branch": "vr-d3d9ex-review-feature-dx11-00537",
+  "pre_promotion_target_sha": "937f6bf484528ac5cf7570ace518cabc3247be93",
+  "promoted_target_sha": "f3c378701a56b431015f2efe2a1f3d07bf313e44",
+  "source_promotion": "GitHub compare behind_by=0, ahead_by=11; update_ref expected_sha=937f6bf484528ac5cf7570ace518cabc3247be93 force=false success; target remote SHA rechecked",
+  "feature_ci": {
+    "build": {
+      "id": 38100121233,
+      "conclusion": "SUCCESS",
+      "steps": [
+        "DX11-LIVE-CALLSITE",
+        "DX11-NATIVE-DRAW",
+        "DX11-VISIBLE-FRAME",
+        "DX11-SAFE-RETURN"
+      ]
+    },
+    "openxr": {
+      "id": 38100121198,
+      "conclusion": "SUCCESS",
+      "step": "DX11-TEST-BUNDLE"
+    },
+    "artifact_id": 11687886277
+  },
+  "target_ci": {
+    "build": {
+      "id": 38110260563,
+      "conclusion": "SUCCESS"
+    },
+    "openxr": {
+      "id": 38110258005,
+      "conclusion": "SUCCESS",
+      "bundle_artifact_id": 11690543475,
+      "bundle_artifact_sha256": "0c74aa0271cf7f676f3f9d9bc6fc29983aa2cadb58d66b369bd14c62dc90e44f"
+    },
+    "backend": {
+      "id": 38110257960,
+      "validate": "SUCCESS",
+      "dx11_readiness_smoke": "IN_PROGRESS"
+    }
+  },
+  "runtime_validation": "UNTESTED",
+  "opt_in_only": true,
+  "native_gameplay_production_default": false,
+  "incomplete": [
+    "Target Backend Conversion Gate DX11 readiness smoke probes final conclusion",
+    "C6 docs/automation/runs/CONVERSION-DX11-00537.json exact target CI result, only after gate final SUCCESS"
+  ],
+  "next_action": "Read exact-SHA Backend Conversion Gate 38110257960 smoke result. If success, close C6 on target without relaunching done acceptance work; keep runtime UNTESTED. If failure, repair only actual failure in same TASK_ID. Target CI result-bearing SHA is f3c37870; do not count same TASK_ID score twice.",
+  "score_change": 0
+}
