@@ -1,3 +1,9 @@
+## 2026-10-12 — A251 q089 native warm-chroma REWORK trial
+
+- Odd A q089 newly material native RGBA32 DDS trial SHA256 `fb7a3c66a7fdc2aa1e175cb3d36fa3df5e288ca0200db2045824391c6a83d6b2`, GitHub CPU Worker [38170881648](https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38170881648) SUCCESS.
+- Exact old official `741a05cb632e85a4fea783e51bb2f98678c0510f8b34fc7a73cc39c898c0749c` unchanged; new trial only. Canonical English/CLEAN SHA pinned, source-palette-inspired orange and purple, 104749 changed RGBA inside bbox, alpha0 changes, protected bbox external0, lossless saved DDS roundtrip0.
+- Scoped producer GRAY100/BLACK50 direct visual shows materially restored warmer Korean color; original organic bevel/source-style differences remain. C2/C3 final and user game **NOT_RUN**. Current queue q089 **REWORK**, not approval; `RUNTIME_VALIDATION=UNTESTED`. See `role_A/20261012-A251-Q089-SOURCE-CHROMA-NATIVE/A251_CONTROLLER_FIRSTHAND_SAVED_VISUAL_QA.json`. RUN_KEY=OUTRUN-KOR-A251-Q089-C383-SOURCE-CHROMA-MATERIAL-20261012-0500.
+
 ## 2026-10-12 C1 q102 real English source-only PNG 2 — ImageGen media input HOLD
 
 - New actual canonical glyph reference RGBA PNG inputs: role_C1/source_references/q102_20261012/LINE1 SHA256 affc027f5d9dd73b5a095cbd59f28945ba8aa999bb2f8d22e6f8a148483fcc7d (50,688 bytes), LINE2 SHA256 b14e85c8ba5e51d2efc37102269c28332799d1a61e291780550a9bb30fc39045 (55,780 bytes); 24px transparent border, original visible pixel mismatch 0/0, remote SHA verified.
