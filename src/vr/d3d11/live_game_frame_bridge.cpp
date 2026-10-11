@@ -572,7 +572,11 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         auto& cached = s.maskedBlends[slot];
         if (!cached) {
             D3D11_BLEND_DESC maskDesc{};
-            if (output.alphaBlend) s.alphaBlend->GetDesc(&maskDesc);
+            // Copy known-valid D3D11 blend factors even for opaque masks.
+            // A zero-initialized BLEND_DESC has invalid factor/op enumerants
+            // on devices that validate disabled-blend fields as well.
+            s.alphaBlend->GetDesc(&maskDesc);
+            maskDesc.RenderTarget[0].BlendEnable = output.alphaBlend ? TRUE : FALSE;
             maskDesc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
             if (FAILED(dev->CreateBlendState(&maskDesc, cached.GetAddressOf())))
                 return false;

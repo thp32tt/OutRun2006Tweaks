@@ -32,7 +32,7 @@
     ],
     "acceptance_proof": {
       "positive_probe": "Static producer-to-native-consumer check implemented, exact-SHA GitHub CI pending; no GPU/game runtime evidence",
-      "negative_regression": "Python destructive mutations cover zero/alpha-only/unknown masks, channel swizzle, alpha blend mode cache key and native OM bypass",
+      "negative_regression": "Python destructive mutations cover zero/alpha-only/unknown masks, channel swizzle, alpha blend mode cache key and native OM bypass; opaque partial-mask descriptor must preserve valid src/dst/op enumerants despite disabled blend",
       "component_integration": "Game GetRenderState COLORWRITEENABLE -> OutputCapture -> keyed D3D11 BlendState RenderTargetWriteMask -> OMSetBlendState -> live native Draw/DrawIndexed -> diagnostic inset"
     },
     "conflict_keys": [
@@ -57,8 +57,8 @@
   "pipeline": {
     "C0_RECOVER": "PASS GitHub HEAD 88c1ad2, AGENTS, DX11 policy, 00541 C6 and owner conflicts inspected",
     "C1_REVIEW": "PASS selected disjoint COLORWRITE mask integration beyond previous 00541 scissor and 00540 alpha; R175 still owned/blocked",
-    "C2_IMPLEMENT": "PASS C++ source mask to real native D3D11 OM state and CPU/static negative tests",
-    "C3_VALIDATE": "LOCAL JS static preflight and mask truth table PASS; GitHub exact-SHA CI PENDING",
+    "C2_IMPLEMENT": "PASS C++ source mask to real native D3D11 OM state and CPU/static negative tests; opaque masked D3D11 BlendState valid factors preserved",
+    "C3_VALIDATE": "First SHA 52526a5 exact CI running; targeted static additional descriptor validation added for next validation-bearing source SHA; final Gate PENDING",
     "C4_COMMIT": "PENDING single atomic nonforce material commit with task marker",
     "C5_PACKAGE": "NOT_REQUIRED experimental opt-in desktop diagnostic only; native gameplay remains disabled",
     "C6_STATE": "PENDING GitHub exact-SHA CI; HMD remains UNTESTED"
@@ -70,7 +70,7 @@
     "DX11-SAFE-RETURN": "SOURCE_CONNECTED_PENDING_CI",
     "REAL_GAME_OR_QUEST3_RENDERING": "UNTESTED"
   },
-  "next_action": "Check exact material SHA GitHub Gate and Win32 Build, then C6 bookkeeping on separate [skip ci] commit; if Gate FAIL repair same substantive C++ regression first. New work should expand programmable Draw coverage, not recheck this mask.",
+  "next_action": "Publish prepared opaque-mask BlendState repair only after first SHA CI settles (avoid cancel-in-progress); verify exact final SHA GitHub Gate/Win32 Build; separately C6 [skip ci]; HMD UNTESTED.",
   "runtime_evidence": "No OutRun live game/menu/input or Quest3 VDXR runtime execution in this task",
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
