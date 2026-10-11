@@ -367,10 +367,9 @@ namespace OutRunVRStereo
             entry->writeLock = false;
         }
 
-        bool R30CopyVertexShadow(IDirect3DVertexBuffer9* buffer,
+        bool R30CopyVertexShadow(const R30ShadowPtr& entry,
             UINT offset, UINT size, std::vector<std::uint8_t>& out)
         {
-            const auto entry = R30FindVertexShadow(buffer);
             if (!entry)
             {
                 ++R30ShadowReadMisses;
@@ -403,10 +402,9 @@ namespace OutRunVRStereo
             return true;
         }
 
-        bool R30CopyIndexShadow(IDirect3DIndexBuffer9* buffer,
+        bool R30CopyIndexShadow(const R30ShadowPtr& entry,
             UINT offset, UINT size, std::vector<std::uint8_t>& out)
         {
-            const auto entry = R30FindIndexShadow(buffer);
             if (!entry)
             {
                 ++R30ShadowReadMisses;
@@ -2391,16 +2389,21 @@ namespace OutRunVRStereo
             }
 
             R30EnsureVertexBufferHooks(vb);
-            R30EnsureVertexShadow(vb);
-
-            D3DVERTEXBUFFER_DESC desc{};
+            // D3D9 buffer descriptors are immutable while their COM objects live.
+            // Reuse the registered shadow metadata instead of a GetDesc per draw.
+            const auto vbShadow = R30EnsureVertexShadow(vb);
+            if (!vbShadow)
+            {
+                vb->Release();
+                return E_NOTIMPL;
+            }
             const std::uint64_t firstByte =
                 static_cast<std::uint64_t>(streamOffset) +
                 static_cast<std::uint64_t>(startVertex) * stride;
             const std::uint64_t byteCount =
                 static_cast<std::uint64_t>(vertexCount) * stride;
-            if (FAILED(vb->GetDesc(&desc)) || firstByte > desc.Size ||
-                byteCount > desc.Size - firstByte ||
+            if (firstByte > vbShadow->size ||
+                byteCount > vbShadow->size - firstByte ||
                 firstByte > UINT_MAX || byteCount > UINT_MAX)
             {
                 vb->Release();
@@ -2414,7 +2417,7 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
             auto& scratch = *lease.buffers;
-            if (!R30CopyVertexShadow(vb,
+            if (!R30CopyVertexShadow(vbShadow,
                     static_cast<UINT>(firstByte),
                     static_cast<UINT>(byteCount), scratch.source))
             {
@@ -2492,26 +2495,24 @@ namespace OutRunVRStereo
 
             R30EnsureVertexBufferHooks(vb);
             R30EnsureIndexBufferHooks(ib);
-            R30EnsureVertexShadow(vb);
-            R30EnsureIndexShadow(ib);
-
-            D3DINDEXBUFFER_DESC ibDesc{};
-            if (FAILED(ib->GetDesc(&ibDesc)) ||
-                (ibDesc.Format != D3DFMT_INDEX16 &&
-                 ibDesc.Format != D3DFMT_INDEX32))
+            const auto vbShadow = R30EnsureVertexShadow(vb);
+            const auto ibShadow = R30EnsureIndexShadow(ib);
+            if (!vbShadow || !ibShadow ||
+                (ibShadow->indexFormat != D3DFMT_INDEX16 &&
+                 ibShadow->indexFormat != D3DFMT_INDEX32))
             {
                 ib->Release();
                 vb->Release();
                 return E_NOTIMPL;
             }
             const UINT indexSize =
-                ibDesc.Format == D3DFMT_INDEX16 ? 2u : 4u;
+                ibShadow->indexFormat == D3DFMT_INDEX16 ? 2u : 4u;
             const std::uint64_t firstIndexByte =
                 static_cast<std::uint64_t>(startIndex) * indexSize;
             const std::uint64_t indexBytes =
                 static_cast<std::uint64_t>(indexCount) * indexSize;
-            if (firstIndexByte > ibDesc.Size ||
-                indexBytes > ibDesc.Size - firstIndexByte ||
+            if (firstIndexByte > ibShadow->size ||
+                indexBytes > ibShadow->size - firstIndexByte ||
                 firstIndexByte > UINT_MAX || indexBytes > UINT_MAX)
             {
                 ib->Release();
@@ -2527,7 +2528,7 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
             auto& scratch = *lease.buffers;
-            if (!R30CopyIndexShadow(ib,
+            if (!R30CopyIndexShadow(ibShadow,
                     static_cast<UINT>(firstIndexByte),
                     static_cast<UINT>(indexBytes), scratch.indexSource))
             {
@@ -2553,7 +2554,7 @@ namespace OutRunVRStereo
             for (UINT i = 0; i < indexCount; ++i)
             {
                 const std::uint32_t raw =
-                    ibDesc.Format == D3DFMT_INDEX16
+                    ibShadow->indexFormat == D3DFMT_INDEX16
                     ? static_cast<const std::uint16_t*>(
                         static_cast<const void*>(scratch.indexSource.data()))[i]
                     : static_cast<const std::uint32_t*>(
@@ -2588,15 +2589,13 @@ namespace OutRunVRStereo
             }
             const UINT vertexCount = static_cast<UINT>(vertexCount64);
 
-            D3DVERTEXBUFFER_DESC vbDesc{};
             const std::uint64_t firstVertexByte =
                 static_cast<std::uint64_t>(streamOffset) +
                 static_cast<std::uint64_t>(minPhysical) * stride;
             const std::uint64_t vertexBytes =
                 static_cast<std::uint64_t>(vertexCount) * stride;
-            if (FAILED(vb->GetDesc(&vbDesc)) ||
-                firstVertexByte > vbDesc.Size ||
-                vertexBytes > vbDesc.Size - firstVertexByte ||
+            if (firstVertexByte > vbShadow->size ||
+                vertexBytes > vbShadow->size - firstVertexByte ||
                 firstVertexByte > UINT_MAX || vertexBytes > UINT_MAX)
             {
                 ib->Release();
@@ -2604,7 +2603,7 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
-            if (!R30CopyVertexShadow(vb,
+            if (!R30CopyVertexShadow(vbShadow,
                     static_cast<UINT>(firstVertexByte),
                     static_cast<UINT>(vertexBytes), scratch.source))
             {
@@ -2652,7 +2651,7 @@ namespace OutRunVRStereo
             }
 
             const void* rebased = nullptr;
-            if (ibDesc.Format == D3DFMT_INDEX16)
+            if (ibShadow->indexFormat == D3DFMT_INDEX16)
             {
                 try { scratch.indices16.resize(indexCount); }
                 catch (...) {
@@ -2693,12 +2692,12 @@ namespace OutRunVRStereo
             auto leftDraw = [&]() {
                 return R29OwnerCallRawDrawIndexedPrimitiveUP(
                     device, type, 0u, vertexCount, primitiveCount,
-                    rebased, ibDesc.Format, scratch.left.data(), stride);
+                    rebased, ibShadow->indexFormat, scratch.left.data(), stride);
             };
             auto rightDraw = [&]() {
                 return R29OwnerCallRawDrawIndexedPrimitiveUP(
                     device, type, 0u, vertexCount, primitiveCount,
-                    rebased, ibDesc.Format, scratch.right.data(), stride);
+                    rebased, ibShadow->indexFormat, scratch.right.data(), stride);
             };
             const HRESULT hr = R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
