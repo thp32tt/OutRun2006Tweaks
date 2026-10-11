@@ -58,13 +58,19 @@
     "C0_RECOVER": "GitHub latest HEAD, AGENTS policy, task 00563 reviewed",
     "C1_REVIEW": "Missing independently selected stage0 diffuse alpha and ADD alpha with factor RGB",
     "C2_IMPLEMENT": "D3D9 state producer, new native HLSL PS, Draw/DrawIndexed dispatch and negative tests",
-    "C3_VALIDATE": "PENDING exact-SHA GitHub Actions",
-    "C4_COMMIT": "Source+test material, CI-skip forbidden",
+    "C3_VALIDATE": "Initial source 6a9b43be Build #38169254725 failed old 00556 exact-substring acceptance, not a C++ compiler failure. Repair preserves original unique exact token while narrowing SELECTARG2 exemption, and destructive mutation removes all repeated tokens. New exact-SHA CI pending.",
+    "C4_COMMIT": "Initial material 6a9b43be; same-task C++ gate expression and Python mutation regression repair, no CI-skip. Await final exact SHA.",
     "C5_PACKAGE": "NOT_REQUIRED opt-in diagnostic",
     "C6_STATE": "PENDING; runtime game/Quest3/VDXR/gamepad UNTESTED"
   },
   "runtime_evidence": "No Quest3, VDXR, in-game visuals or gamepad test performed",
   "feature_status": "SOURCE_INTEGRATED_AWAITING_CI_NEED_HMD_TEST",
   "next_action": "Inspect exact material SHA Gates; separate C6 bookkeeping after success",
-  "state_persisted": true
+  "state_persisted": true,
+  "initial_failed_validation": {
+    "sha": "6a9b43be9341f6b7697cb66407a1cd4f9d0524ed",
+    "run_id": 38169254725,
+    "failed_step": "Feature acceptance: DX11-SAFE-RETURN",
+    "cause": "Legacy mixed-alpha source test expected original parenthesized gate. New independent-alpha test also needed all-occurrence negative mutation."
+  }
 }

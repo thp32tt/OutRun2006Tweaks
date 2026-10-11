@@ -627,8 +627,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
              !blendFactorTextureAlpha && !blendFactorModulateAlpha &&
               !blendFactorDiffuseAlpha && !blendFactorAddAlpha &&
              !blendTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha) || arg != D3DTA_TEXTURE ||
-            (!mixedDiffuseAlpha && !mixedAddDiffuseAlpha &&
-              !blendFactorDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE) ||
+            (!blendFactorDiffuseAlpha &&
+              (!mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE)) ||
             (rgbNeedsDiffuse && !arg2Diffuse) ||
             (alphaNeedsDiffuse && !alphaArg2Diffuse) ||
             coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb ||

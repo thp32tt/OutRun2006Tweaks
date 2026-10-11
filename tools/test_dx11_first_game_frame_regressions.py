@@ -1661,7 +1661,7 @@ def main() -> None:
         "blendFactorDiffuseAlpha || blendFactorAddAlpha) &&",
         "!blendFactorDiffuseAlpha && !blendFactorAddAlpha &&",
         "blendFactorDiffuseAlpha || blendFactorAddAlpha ||",
-        "!blendFactorDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE)",
+        "(!blendFactorDiffuseAlpha &&",
         "capture.blendFactorDiffuseAlpha = blendFactorDiffuseAlpha;",
         "capture.blendFactorAddAlpha = blendFactorAddAlpha;",
         "bool blendFactorDiffuseAlpha = false;",
@@ -1695,7 +1695,7 @@ def main() -> None:
                 "capture.blendFactorAddAlpha ? s.blendFactorAddAlphaPs.Get() :" in draw)
     assert independent_factor_connected(bridge)
     for token in independent_factor_links[:-3]:
-        damaged = bridge.replace(token, "/* 00564 deleted integration */", 1)
+        damaged = bridge.replace(token, "/* 00564 deleted integration */")
         assert damaged != bridge and not independent_factor_connected(damaged), token
     # D3DTOP: SELECTARG2=3, ADD=7, BLENDFACTORALPHA=14.
     for color, alpha, expected in (
