@@ -42,6 +42,8 @@ def verify(source: str) -> None:
         "reads = 0;") < block.index(
         "device->GetRenderState(state, &live)")
     assert "if (trusted || ++reads < 16)" in block
+    cache_hit = block.split("if (trusted || ++reads < 16)", 1)[1].split("reads = 0;", 1)[0]
+    assert "out = TrackedRenderStateValue[index];" in cache_hit
     assert "if (!device || index >= TrackedRenderStateValue.size())" in block
     assert "if (FAILED(device->GetRenderState(state, &live)))" in block
 
