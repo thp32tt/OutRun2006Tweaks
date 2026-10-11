@@ -180,6 +180,10 @@ if r7.count("RetireDirectTransportFramePublications();") != 2:
     fail("DirectGPU Frame.v2 retirement must be owned by both stereo-resource and direct-slot teardown wrappers")
 
 release = body(r7, "void ReleaseStereoResources()")
+require(release, "XR eye extent reset invalidates allocation",
+        "DirectTransportWidth=0;DirectTransportHeight=0;",
+        "DirectEyeExtentGeneration.Reset();")
+
 require(
     release,
     "D3D9 reset resource release",
@@ -233,6 +237,9 @@ forbid(
 )
 
 release_slots = body(r7, "void ReleaseDirectTransportSlots()")
+require(release_slots, "XR eye extent resize invalidates generation",
+        "DirectEyeExtentGeneration.Reset();")
+
 require_order(
     release_slots,
     "DirectGPU slot publication retirement and metadata reset",
@@ -258,7 +265,9 @@ ensure = body(r7, "bool EnsureDirectTransportResources(IDirect3DDevice9* device)
 require(
     ensure,
     "DirectGPU ring recreation",
-    "if(DirectTransportResourcesReady&&DirectTransportWidth==targetWidth&&DirectTransportHeight==targetHeight)return true",
+    "if(DirectTransportResourcesReady&&DirectEyeExtentGeneration.Matches({targetWidth,targetHeight})&&DirectTransportWidth==targetWidth&&DirectTransportHeight==targetHeight)return true",
+    "if(!DirectTransportTargetSize(device,targetWidth,targetHeight))return false",
+    "DirectEyeExtentGeneration.Commit({targetWidth,targetHeight});",
     "if(DirectTransportResourcesReady)ReleaseDirectTransportSlots()",
     "if(!DirectTransportGeneration)DirectTransportGeneration=RenderFrameRunGeneration",
     "if(++DirectTransportGeneration==0)++DirectTransportGeneration",
