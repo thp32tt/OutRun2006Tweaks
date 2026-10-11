@@ -767,7 +767,47 @@ def main() -> None:
         assert (source_row_bytes, upload_row_bytes) == expected
         assert source_row_bytes <= upload_row_bytes
 
-    print("DX11 live diagnostic TEX1/DXT/packed16/alpha/scissor/COLORWRITE Draw/fallback regression PASS (static only)")
+
+    # 00545: game-created VB/IB/UP triangle strips reach native Draw/DrawIndexed
+    # with P+2 source elements (not P*3). The unmodified D3D9 call remains
+    # authoritative for unsupported state and for all gamepad input.
+    producers = [path.read_text(encoding="utf-8") for path in RENDERERS]
+    for source in producers:
+        start = source.find("void R30ObserveNativeLinearVB(")
+        end = source.find("HRESULT __stdcall DrawPrimitiveDestR30(", start)
+        assert start >= 0 and end > start
+        entrypoints = source[start:end]
+        assert entrypoints.count("topology != D3DPT_TRIANGLESTRIP") == 3
+        assert entrypoints.count("live::game_primitive_element_count(") == 3
+        assert "static_cast<std::uint64_t>(nativeElements)*stride" in entrypoints
+        assert "const UINT count = nativeElements;" in entrypoints
+        assert "const UINT count=nativeElements;" in entrypoints
+        disabled = entrypoints.replace(
+            "topology != D3DPT_TRIANGLESTRIP", "topology == D3DPT_TRIANGLESTRIP", 1)
+        assert disabled != entrypoints and (
+            disabled.count("topology != D3DPT_TRIANGLESTRIP") != 3)
+
+    strip_tokens = (
+        '#include "live_game_primitive_span.hpp"',
+        "type != D3DPT_TRIANGLESTRIP",
+        "type == D3DPT_TRIANGLESTRIP",
+        "indexCount != expectedElements",
+        "vertexCount != expectedElements",
+        "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP",
+        "submit(s, vertices, indices, indexCount, type, capture, output)",
+        "ctx->DrawIndexed(indexCount, 0, 0);",
+        "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+    )
+    assert all(t in bridge for t in strip_tokens)
+    for token in (
+        "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP",
+        "indexCount != expectedElements",
+        "vertexCount != expectedElements",
+    ):
+        changed = bridge.replace(token, "BROKEN_NATIVE_STRIP", 1)
+        assert changed != bridge and token not in changed
+
+    print("DX11 live diagnostic TEX1/DXT/packed16/strip/alpha/scissor/COLORWRITE Draw/fallback regression PASS (static only)")
 
 
 if __name__ == "__main__":

@@ -14,6 +14,7 @@
 #include "stereo_renderer_r29.cpp"
 #include "vr/d3d11/runtime_census.hpp"
 #include "vr/d3d11/live_game_frame_bridge.hpp"
+#include "vr/d3d11/live_game_primitive_span.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
 #include <memory>
@@ -3126,9 +3127,13 @@ namespace OutRunVRStereo
             UINT primitiveCount) noexcept
         {
             namespace live = outrun::vr::dx11::live_game_frame;
+            UINT nativeElements = 0;
             if (!live::diagnostic_enabled() || !device ||
-                topology != D3DPT_TRIANGLELIST ||
-                !primitiveCount || primitiveCount > 512) return;
+                (topology != D3DPT_TRIANGLELIST &&
+                 topology != D3DPT_TRIANGLESTRIP) ||
+                !live::game_primitive_element_count(
+                    topology == D3DPT_TRIANGLESTRIP, primitiveCount,
+                    nativeElements)) return;
             try {
                 IDirect3DVertexBuffer9* vb = nullptr;
                 UINT offset=0, stride=0;
@@ -3141,7 +3146,7 @@ namespace OutRunVRStereo
                     static_cast<std::uint64_t>(offset) +
                     static_cast<std::uint64_t>(firstVertex) * stride;
                 const std::uint64_t byteCount =
-                    static_cast<std::uint64_t>(primitiveCount)*3u*stride;
+                    static_cast<std::uint64_t>(nativeElements)*stride;
                 D3DVERTEXBUFFER_DESC desc{};
                 std::vector<std::uint8_t> bytes;
                 const bool valid =
@@ -3162,9 +3167,13 @@ namespace OutRunVRStereo
             UINT primitiveCount) noexcept
         {
             namespace live = outrun::vr::dx11::live_game_frame;
+            UINT nativeElements = 0;
             if (!live::diagnostic_enabled() || !device ||
-                topology != D3DPT_TRIANGLELIST || !primitiveCount ||
-                primitiveCount > 512 || !numVertices) return;
+                (topology != D3DPT_TRIANGLELIST &&
+                 topology != D3DPT_TRIANGLESTRIP) ||
+                !live::game_primitive_element_count(
+                    topology == D3DPT_TRIANGLESTRIP, primitiveCount,
+                    nativeElements) || !numVertices) return;
             try {
                 IDirect3DVertexBuffer9* vb = nullptr;
                 IDirect3DIndexBuffer9* ib = nullptr;
@@ -3185,7 +3194,7 @@ namespace OutRunVRStereo
                     (iDesc.Format == D3DFMT_INDEX16 ||
                      iDesc.Format == D3DFMT_INDEX32);
                 const UINT indexSize = iDesc.Format == D3DFMT_INDEX16 ? 2u : 4u;
-                const UINT count = primitiveCount*3u;
+                const UINT count = nativeElements;
                 const std::uint64_t start =
                     static_cast<std::uint64_t>(startIndex)*indexSize;
                 const std::uint64_t bytesCount =
@@ -3246,15 +3255,19 @@ namespace OutRunVRStereo
             const void* vertices, UINT stride) noexcept
         {
             namespace live = outrun::vr::dx11::live_game_frame;
+            UINT nativeElements = 0;
             if (!live::diagnostic_enabled() || !device ||
-                topology != D3DPT_TRIANGLELIST || minVertex != 0 ||
+                (topology != D3DPT_TRIANGLELIST &&
+                 topology != D3DPT_TRIANGLESTRIP) || minVertex != 0 ||
                 !numVertices || numVertices > 1536 ||
-                !primitiveCount || primitiveCount > 512 ||
+                !live::game_primitive_element_count(
+                    topology == D3DPT_TRIANGLESTRIP, primitiveCount,
+                    nativeElements) ||
                 !indices || !vertices || stride < 16 || stride > 512 ||
                 (format != D3DFMT_INDEX16 && format != D3DFMT_INDEX32))
                 return;
             try {
-                const UINT count=primitiveCount*3u;
+                const UINT count=nativeElements;
                 std::vector<std::uint32_t> unpacked(count);
                 const UINT unit=format == D3DFMT_INDEX16 ? 2u : 4u;
                 for (UINT i=0; i<count; ++i) {

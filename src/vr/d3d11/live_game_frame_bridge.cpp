@@ -1,4 +1,5 @@
 #include "live_game_frame_bridge.hpp"
+#include "live_game_primitive_span.hpp"
 #include "native_backend.hpp"
 #include "packed_texture_16bit.hpp"
 
@@ -615,7 +616,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
 
 bool submit(State& s, const std::vector<NativeVertex>& vertices,
             const std::uint32_t* indices, UINT indexCount,
-            const TextureCapture& capture, const OutputCapture& output) noexcept {
+            D3DPRIMITIVETYPE topology, const TextureCapture& capture,
+            const OutputCapture& output) noexcept {
     if (!ensure_pipeline(s)) return false;
     auto* dev = s.backend.device();
     auto* ctx = s.backend.context();
@@ -680,7 +682,9 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     const UINT stride = sizeof(NativeVertex), offset = 0;
     ID3D11Buffer* boundVB = vb.Get();
     ctx->IASetInputLayout(s.layout.Get());
-    ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    ctx->IASetPrimitiveTopology(topology == D3DPT_TRIANGLESTRIP ?
+        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP :
+        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     ctx->IASetVertexBuffers(0, 1, &boundVB, &stride, &offset);
     if (ib) ctx->IASetIndexBuffer(ib.Get(), DXGI_FORMAT_R32_UINT, 0);
     const D3D11_RECT fullScissor{0, 0, static_cast<LONG>(kWidth),
@@ -706,8 +710,11 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
 void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
              const void* bytes, UINT stride, UINT vertexCount,
              const std::uint32_t* indices, UINT indexCount) noexcept {
-    if (!diagnostic_enabled() || !game || type != D3DPT_TRIANGLELIST ||
-        primitives == 0 || primitives > kMaxVertices / 3)
+    UINT expectedElements = 0;
+    if (!diagnostic_enabled() || !game ||
+        (type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP) ||
+        !game_primitive_element_count(type == D3DPT_TRIANGLESTRIP,
+                                      primitives, expectedElements))
         return;
     try {
         State& s = state();
@@ -725,10 +732,10 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         const UINT candidateOrdinal = s.eligibleThisFrame++;
         ++s.eligible;
         if (s.attempted || candidateOrdinal != s.probeSlot) return;
-        if (indexCount && (!indices || indexCount != primitives * 3 ||
+        if (indexCount && (!indices || indexCount != expectedElements ||
                            vertexCount > kMaxVertices))
             return;
-        if (!indexCount && vertexCount != primitives * 3) return;
+        if (!indexCount && vertexCount != expectedElements) return;
         std::vector<NativeVertex> vertices;
         if (!translate_vertices(bytes, vertexCount, stride, vp,
                                 pretransformed, transforms, capture, vertices))
@@ -738,7 +745,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 if (indices[i] >= vertexCount) return;
         }
         s.attempted = true;
-        if (!submit(s, vertices, indices, indexCount, capture, output)) ++s.failed;
+        if (!submit(s, vertices, indices, indexCount, type, capture, output)) ++s.failed;
     } catch (...) {
         // Never interrupt the game's real draw or input on diagnostic failure.
     }
@@ -752,8 +759,11 @@ bool diagnostic_enabled() noexcept {
 
 void observe_linear(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
                     UINT primitives, const void* vertices, UINT stride) noexcept {
-    if (!primitives || primitives > kMaxVertices / 3) return;
-    observe(game, type, primitives, vertices, stride, primitives * 3, nullptr, 0);
+    UINT nativeElements = 0;
+    if ((type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP) ||
+        !game_primitive_element_count(type == D3DPT_TRIANGLESTRIP,
+                                      primitives, nativeElements)) return;
+    observe(game, type, primitives, vertices, stride, nativeElements, nullptr, 0);
 }
 
 void observe_indexed(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
