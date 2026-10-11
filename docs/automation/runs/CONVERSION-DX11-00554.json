@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00554",
   "work_key": "DX11:MENU_RACE_STAGE0_SUBTRACT_RGBA_NATIVE_DRAW",
   "base_sha": "bea76495da713fa385cf67d651c204069d481c0d",
-  "status": "AWAIT_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "native_gameplay_activation": false,
@@ -58,16 +58,42 @@
     "C0_RECOVER": "HEAD bea76495da713fa385cf67d651c204069d481c0d; 00553 already complete.",
     "C1_REVIEW": "Missing stage0 SUBTRACT native game path; unique source/feature scope.",
     "C2_IMPLEMENT": "Live state admission, HLSL subtraction PS, lifecycle and Draw dispatch, positive/negative regression.",
-    "C3_VALIDATE": "Static linkage prechecked; GitHub exact SHA CI pending.",
-    "C4_COMMIT": "Material source commit (SHA to be sealed separately).",
+    "C3_VALIDATE": "PASS_EXACT_SHA: commit d0c1987a43bbb618cbb6c6d993c2442ba82a5616; GitHub Build #38155206182, OpenXR VR architecture #38155206208, HUD Inspector #38155206194 all SUCCESS. Runtime/HMD UNTESTED.",
+    "C4_COMMIT": "PASS: material result and exact-SHA CI validation d0c1987a43bbb618cbb6c6d993c2442ba82a5616; C6 bookkeeping-only [skip ci] separated.",
     "C5_PACKAGE": "NOT_REQUIRED: opt-in diagnostic only.",
-    "C6_STATE": "PENDING_EXACT_SHA_CI"
+    "C6_STATE": "PASS_EXACT_SHA BUILD_VERIFIED; RUNTIME_VALIDATION=UNTESTED; source unchanged and no CI rerun."
   },
-  "material_result_sha": "PENDING_SHA",
-  "validation_bearing_result_sha": "PENDING_SHA",
-  "result_sha": "PENDING_SHA",
-  "feature_status": "SOURCE_INTEGRATED_AWAIT_EXACT_SHA_CI",
-  "next_action": "Collect exact SHA Gate and on SUCCESS seal C6 in bookkeeping [skip ci] commit; HMD/runtime NEED_HMD_TEST.",
+  "material_result_sha": "d0c1987a43bbb618cbb6c6d993c2442ba82a5616",
+  "validation_bearing_result_sha": "d0c1987a43bbb618cbb6c6d993c2442ba82a5616",
+  "result_sha": "d0c1987a43bbb618cbb6c6d993c2442ba82a5616",
+  "feature_status": "SOURCE_INTEGRATED_BUILD_VERIFIED_NEED_HMD_TEST",
+  "next_action": "Terminal automation BUILD_VERIFIED recorded. Independent DX11 features may proceed; Quest3/VDXR native pixels, gamepad, menu/vehicle/race NEED_HMD_TEST. Do not re-score or re-run C6.",
   "runtime_evidence": "HMD, game pixels, gamepad not executed",
-  "state_persisted": true
+  "state_persisted": true,
+  "validation_evidence": {
+    "exact_sha": "d0c1987a43bbb618cbb6c6d993c2442ba82a5616",
+    "github_actions": [
+      {
+        "run_id": 38155206182,
+        "name": "Build",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38155206208,
+        "name": "OpenXR VR architecture",
+        "status": "SUCCESS"
+      },
+      {
+        "run_id": 38155206194,
+        "name": "OutRun EXE HUD Inspector CI",
+        "status": "SUCCESS"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    }
+  }
 }
