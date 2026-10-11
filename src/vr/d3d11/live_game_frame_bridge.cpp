@@ -770,12 +770,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         if (!layout.hasDiffuse && !selectTexture) return false;
         // Validate the chosen alpha input independently from RGB. Inactive
         // alpha stage operands are ignored; active modifier bits remain denied.
-        const bool rgbNeedsDiffuse = blendTextureSelectedTextureAlpha ||
-                                     blendTextureSelectedDiffuseAlpha ||
-                                     blendDiffuseSelectedTextureAlpha ||
-                                     blendDiffuseSelectedDiffuseAlpha ||
-                                     blendFactorTextureAlpha || blendFactorModulateAlpha ||
+        const bool rgbNeedsDiffuse = blendFactorTextureAlpha || blendFactorModulateAlpha ||
                                      blendFactorDiffuseAlpha || blendFactorAddAlpha ||
+                                     blendTextureSelectedTextureAlpha || blendTextureSelectedDiffuseAlpha ||
+                                     blendDiffuseSelectedTextureAlpha || blendDiffuseSelectedDiffuseAlpha ||
                                      addSmoothTextureAlpha || addSmoothDiffuseAlpha ||
                                      modulate || additive || subtract || addSmooth || modulate2x || modulate4x ||
                                      modulate2xTextureAlpha || modulate2xDiffuseAlpha || modulate4xTextureAlpha || modulate4xDiffuseAlpha ||
@@ -783,9 +781,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                                      mixedAddTextureAlpha || mixedAddDiffuseAlpha ||
                                      subtractTextureAlpha || subtractDiffuseAlpha || subtractModulateAlpha ||
                                      blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;
-        const bool alphaNeedsDiffuse = blendTextureSelectedDiffuseAlpha || blendDiffuseSelectedDiffuseAlpha ||
-                                        blendFactorModulateAlpha ||
+        const bool alphaNeedsDiffuse = blendFactorModulateAlpha ||
                                         blendFactorDiffuseAlpha || blendFactorAddAlpha ||
+                                        blendTextureSelectedDiffuseAlpha || blendDiffuseSelectedDiffuseAlpha ||
                                         addSmoothDiffuseAlpha || subtractDiffuseAlpha || subtractModulateAlpha ||
                                        modulate || additive || subtract || addSmooth || modulate2x || modulate4x ||
                                        modulate2xDiffuseAlpha || modulate4xDiffuseAlpha ||
