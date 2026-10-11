@@ -18,6 +18,7 @@
 #include "vr_shared.hpp"
 #include "vr/ipc/host_pose_v3.hpp"
 #include "vr/ipc/cadence_v1.hpp"
+#include "vr/ipc/frame_pacing_diagnostics.hpp"
 #include "vr/game/render_semantics.hpp"
 
 // Authoritative renderer-side OpenXR head-pose injector for OutRun 2006.
@@ -1602,6 +1603,12 @@ namespace OutRunVRRenderer
 			if (SUCCEEDED(result))
 			{
 				++BeginSceneCalls;
+				if (OutRunVR::Pacing::Enabled())
+				{
+					LARGE_INTEGER begin{};
+					QueryPerformanceCounter(&begin);
+					OutRunVR::Pacing::GameBegin(begin.QuadPart);
+				}
 				if (!PresentPoseLocked)
 				{
 					LatchFramePose();

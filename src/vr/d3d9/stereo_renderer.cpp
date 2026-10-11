@@ -806,6 +806,7 @@ namespace OutRunVRStereo
 			}
 
 			OutRunVRRenderer::NotifyGamePresent();
+			OutRunVR::Pacing::GamePresentComplete();
 			FrameHadDuplicatedDraw = false;
 			FrameHadWorldStereo = false;
 			FrameRightDrawFailed = false;
