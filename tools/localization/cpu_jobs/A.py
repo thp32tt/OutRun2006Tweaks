@@ -65,11 +65,11 @@ check(C.shape==(105,454,4) and SOURCE_CROPPED.shape==C.shape,
       "source/CLEAN reference exact crop dimensions changed")
 # Locate the original A224 source reference precisely within the canonical DDS.
 # Never guess or hand-align a cropped clean plate before compositing.
-checks=[(3,3),(15,15),(80,18),(220,17),(400,18),(30,50),(120,50),(280,50),(420,50),(22,88),(180,90),(430,90)]
+checks=[(3,3),(15,15),(18,80),(17,220),(18,400),(50,30),(50,120),(50,280),(50,420),(88,22),(90,180),(90,430)]
 best=(1e9,None,None,None)
 for swapped in (False,True):
- for oy in range(1930,1979):
-  for ox in range(1350,1411):
+ for oy in range(1920,H-C.shape[0]+1):
+  for ox in range(1335,1420):
    mismatch=0
    for sy,sx in checks:
     a=S[oy+sy,ox+sx]
