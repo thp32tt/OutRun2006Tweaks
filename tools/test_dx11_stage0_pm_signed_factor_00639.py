@@ -30,7 +30,7 @@ graph = (
     "!blendTextureAlphaPMSignedFactorAlpha &&",
     "capture.blendTextureAlphaPMSignedFactorAlpha = blendTextureAlphaPMSignedFactorAlpha;",
     "capture.blendTextureAlphaPMSigned2XFactorAlpha =\n            blendTextureAlphaPMSignedFactorAlpha && alphaOp == D3DTOP_ADDSIGNED2X;",
-    "alphaArg2 == (D3DTA_TFACTOR | D3DTA_COMPLEMENT))\n            capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;",
+    "if (blendTextureAlphaPMSignedFactorAlpha &&\n            alphaArg2 == (D3DTA_TFACTOR | D3DTA_COMPLEMENT))\n            capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;",
     'compile("PSTextureBlendTextureAlphaPMSignedFactorAlpha", "ps_4_0", blendTexturePmSignedFactorCode)',
     'compile("PSTextureBlendTextureAlphaPMSigned2XFactorAlpha", "ps_4_0", blendTexturePmSigned2XFactorCode)',
     "s.blendTextureAlphaPmSignedFactorAlphaPs.GetAddressOf()",
