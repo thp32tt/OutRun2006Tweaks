@@ -33,7 +33,7 @@ def linked(s):
         len(body)==2 and all(x in s for x in TOKENS) and s.count("s.blendTextureAlphaPmFactorAlphaPs.Reset();")==2 and all(x in body[1].split("}",1)[0] for x in (
         "float4 t = gameTexture.Sample(gameSampler, v.uv);",
         "float4 c = float4(saturate(t.rgb + v.diffuse.rgb * (1.0f - t.a)), alphaParams.w);",
-        "AlphaGate(c.a); return c;"))
+        "AlphaGate(c.a); return c;")))
 def main():
     s=S.read_text(encoding="utf-8")
     assert linked(s)
