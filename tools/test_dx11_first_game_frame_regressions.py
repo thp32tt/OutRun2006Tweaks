@@ -1616,7 +1616,8 @@ def main() -> None:
             "candidate.texcoord3DMask = texcoord3DMask;",
             "format == 2u || (stage >= (texcoordBits >> 8u) && format != 0u)",
             "4u * game_fvf_texcoord3d_count(candidate.texcoord3DMask)",
-            "offset += (layout.texcoord3DMask & (1u << slot)) ? 12u : bytesToCopy;",
+            "if (layout.texcoord3DMask & (1u << slot))",
+            "offset += 12u;",
         )) and all(x in fixture for x in (
             "struct Menu3DUv", "struct Race3DMixed",
             "assert(layout.texcoord3DMask == 0x80u && layout.minStride == 80u);",
@@ -1630,8 +1631,8 @@ def main() -> None:
          "if (false && layout.texcoord3DMask != 0u) return false;"),
         ("candidate.texcoord3DMask = texcoord3DMask;",
          "candidate.texcoord3DMask = 0u;"),
-        ("offset += (layout.texcoord3DMask & (1u << slot)) ? 12u : bytesToCopy;",
-         "offset += bytesToCopy;"),
+        ("if (layout.texcoord3DMask & (1u << slot))",
+         "if (false)"),
         ("assert(layout.texcoord3DMask == 0x80u && layout.minStride == 80u);",
          "assert(layout.texcoord3DMask == 0x80u);"),
     ):
