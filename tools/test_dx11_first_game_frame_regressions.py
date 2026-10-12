@@ -1951,8 +1951,8 @@ def main() -> None:
         "const bool blendFactorAlpha = op == D3DTOP_BLENDFACTORALPHA &&",
         "alphaOp == D3DTOP_BLENDFACTORALPHA;",
         "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)",
-        "blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;",
-        "!blendTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha)",
+        "blendTextureAlpha || blendTextureAlphaPM || blendTextureAlphaPMTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;",
+        "!blendTextureAlpha && !blendTextureAlphaPM && !blendTextureAlphaPMTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha)",
         "capture.blendFactorAlpha = blendFactorAlpha;",
         "capture.blendFactorAlphaValue = static_cast<float>((textureFactor >> 24u) & 0xffu) / 255.0f;",
         "bool blendFactorAlpha = false;",
@@ -1986,7 +1986,7 @@ def main() -> None:
                 "ctx->PSSetShader(capture.selectDiffuseTextureAlpha ?" in submit and
                 "capture.blendFactorAlpha ? s.blendFactorAlphaPs.Get() :" in submit and
                 code.count("s.blendFactorAlphaPs.Reset();") == 2 and
-                code.count("blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;") == 2)
+                code.count("blendTextureAlpha || blendTextureAlphaPM || blendTextureAlphaPMTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;") == 2)
     assert factor_connected(bridge)
     for token in factor_links[:-2]:
         mutant = bridge.replace(token, "/* disconnected 00562 factor link */", 1)
