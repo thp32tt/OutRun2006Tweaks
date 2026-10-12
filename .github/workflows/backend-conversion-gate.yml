@@ -177,6 +177,8 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh
         run: python tools/test_dx11_native_tex_transform_00595.py
+      - name: DX11 real-game additive blend 00596
+        run: python tools/test_dx11_native_game_blends_00596.py
 
       - name: Verify DX11 source graph
         shell: pwsh
