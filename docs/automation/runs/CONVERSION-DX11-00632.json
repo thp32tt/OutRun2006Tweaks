@@ -53,19 +53,39 @@
     "tools/test_dx11_stage0_pm_inverse_texture_alpha_00632.py",
     ".github/workflows/dx11-fast-structural.yml",
     ".github/workflows/backend-conversion-gate.yml",
-    "docs/automation/runs/CONVERSION-DX11-00632.json"
+    "docs/automation/runs/CONVERSION-DX11-00632.json",
+    "tools/test_dx11_selectarg_tfactor_input_00587.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
   ],
   "pipeline": {
     "C0_RECOVER": "PASS HEAD and 00631 policy/claim",
     "C1_REVIEW": "PASS unsupported complemented alpha observed in native selector code",
     "C2_IMPLEMENT": "PASS C++ live capture, HLSL compile/native Draw, negative numeric tests",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING non-force GitHub CAS",
+    "C3_VALIDATE": "FAIL on original material SHA: 00587 source-graph test and SAFE-RETURN legacy string; correction committed; revalidation pending exact SHA",
+    "C4_COMMIT": "Original source material 20ff6e576f2fb2e5ed6be22ef7aa5dbeb6e0ebe4; repair commit pending non-force CAS",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING CI; HMD/gamepad UNTESTED"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Check exact-SHA GitHub Actions, fix real failures without weakening gate. HMD NEED_HMD_TEST."
+  "next_action": "Check exact-SHA GitHub Actions, fix real failures without weakening gate. HMD NEED_HMD_TEST.",
+  "failure_recovery": {
+    "first_material_sha": "20ff6e576f2fb2e5ed6be22ef7aa5dbeb6e0ebe4",
+    "first_failures": [
+      {
+        "workflow": "Backend Conversion Gate",
+        "run_id": 38305113776,
+        "step": "Verify DX11 native SELECTARG TFACTOR alpha 00587",
+        "cause": "test matched previous source-graph suffix without new strict inverse-alpha carveout"
+      },
+      {
+        "workflow": "Build",
+        "run_id": 38305118002,
+        "step": "Feature acceptance: DX11-SAFE-RETURN",
+        "cause": "test retained old source-graph suffix in first-frame regression"
+      }
+    ],
+    "repair": "Update exact required conjunct in legacy destructive source-graph tests; retain all original predicates, negative mutations and numeric evidence"
+  }
 }
