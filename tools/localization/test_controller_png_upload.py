@@ -56,6 +56,14 @@ class BindingTests(unittest.TestCase):
         self.write_manifest()
         self.assertEqual(load_binding("A", self.root)[1], "PNG_SHA_MISMATCH")
 
+    def test_corrupted_png_crc_is_rejected(self):
+        bad = bytearray((self.root / "inputs" / "hd.png").read_bytes())
+        bad[34] ^= 1
+        (self.root / "inputs" / "hd.png").write_bytes(bad)
+        self.manifest["png_sha256"] = hashlib.sha256(bad).hexdigest()
+        self.write_manifest()
+        self.assertEqual(load_binding("A", self.root)[1], "INVALID_PNG_CRC")
+
     def test_invalid_role_and_path_fails_closed(self):
         self.manifest["role"] = "B"
         self.write_manifest()
@@ -113,6 +121,9 @@ class DummyLocator:
         self.uploads = []
 
     async def count(self):
+        return self.number
+
+    async def evaluate_all(self, expression):
         return self.number
 
     @property
