@@ -33,9 +33,12 @@ def violations(source: str) -> list[str]:
     def require(ok: bool, label: str) -> None:
         if not ok:
             errors.append(label)
+    # Primary fields must exist independently of same-named fields in
+    # Recent. Mutating the primary must not pass through the alternate.
+    primary = cache.split("struct Recent", 1)[0]
     for marker in ("bool valid = false;", "float originalWvp[16]{};",
                    "float eyeConstants[2][16]{};"):
-        require(marker in cache, "cache storage " + marker)
+        require(marker in primary, "primary cache storage " + marker)
     for marker in (
         "GetLastVerifiedWvp(",
         "poseSequence != stereo.poseSequence",

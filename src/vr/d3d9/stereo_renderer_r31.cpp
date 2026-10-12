@@ -465,7 +465,7 @@ namespace OutRunVRStereo
             // Neither eye may be published before both are finite.
             // On first miss after any external invalidation, discard the
             // entire previous-key set; otherwise retain the prior primary.
-            // This is strictly bounded (three entries) and draw-thread local.
+            // This is bounded (three entries) with no draw-path allocation.
             if (R31WorldCache.valid)
             {
                 auto& previous = R31WorldCache.recent[R31WorldCache.nextRecent];
