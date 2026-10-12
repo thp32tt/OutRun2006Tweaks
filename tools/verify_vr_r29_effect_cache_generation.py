@@ -36,9 +36,30 @@ def contract(s):
     depth_owner = body(s, "bool R29OwnerLeftDrawMayWriteDepth(")
     stencil_owner = body(s, "bool R29OwnerLeftDrawMayWriteStencil(")
     effect_state = body(s, "struct R29EffectState")
+    policy_refresh = body(s, "void R29RefreshFragilePolicy() noexcept")
+    fragile_draw = body(s, "bool R29FragileEffectCached(")
     stereo = body(s, "HRESULT R29DirectTwoEye(")
     world = body(s, "HRESULT R29GuardStableDraw(")
     return all((
+        # CPU hot path: once a reliable live six-field snapshot has been
+        # synchronized, derived alpha/depth/cull stereo policy is memoized
+        # until a tracked policy setter changes it. A StateBlock generation
+        # mismatch still forces a fresh live read and policy recomputation.
+        "bool fragileWorld = true;" in effect_state,
+        "OutRunVR::PassPolicy::ClassifyEffectStereo(" in policy_refresh,
+        "R29Effect.alphaBlend != FALSE," in policy_refresh,
+        "R29Effect.alphaTest != FALSE," in policy_refresh,
+        "R29Effect.zWrite != FALSE," in policy_refresh,
+        "R29Effect.zEnable != D3DZB_FALSE," in policy_refresh,
+        "R29Effect.cullMode == D3DCULL_NONE" in policy_refresh,
+        "R29Effect.fragileWorld =" in policy_refresh,
+        "!OutRunVR::PassPolicy::AllowsEffectWorldStereo(policy)" in policy_refresh,
+        "R29Effect.stencilEnable = stencilEnable;\n            R29RefreshFragilePolicy();" in sync,
+        "if (state != D3DRS_STENCILENABLE)\n                    R29RefreshFragilePolicy();" in setter,
+        "fragile = R29Effect.fragileWorld;" in fragile_draw,
+        "ClassifyEffectStereo(" not in fragile_draw,
+        fragile_draw.find("if (!R29SyncEffectState(device))") <
+            fragile_draw.find("fragile = R29Effect.fragileWorld;"),
         "StateBlockTracker::Reliable()" in cache,
         "StateBlockTracker::Recording()" in cache,
         "R29Effect.applyGeneration !=" in cache,
@@ -188,6 +209,23 @@ mutations = [
     ("stencil direct stereo owner",
      "R29OwnerLeftDrawMayWriteStencil(device))", "LeftDrawMayWriteStencil(device))"),
 ]
+# Derived-policy caching must fail closed for stale/missing updates, and the
+# stereo classifier itself must stay identical to the original draw policy.
+mutations += [
+    ("policy cache flag", "bool fragileWorld = true;", "bool fragileWorld = false;"),
+    ("live resync policy", "R29Effect.stencilEnable = stencilEnable;\n            R29RefreshFragilePolicy();",
+     "R29Effect.stencilEnable = stencilEnable;"),
+    ("setter policy refresh", "if (state != D3DRS_STENCILENABLE)\n                    R29RefreshFragilePolicy();",
+     "if (false)\n                    R29RefreshFragilePolicy();"),
+    ("draw cached value", "fragile = R29Effect.fragileWorld;", "fragile = true;"),
+    ("classify alpha state", "R29Effect.alphaBlend != FALSE,", "R29Effect.alphaBlend == FALSE,"),
+    ("classify alpha test", "R29Effect.alphaTest != FALSE,", "R29Effect.alphaTest == FALSE,"),
+    ("classify zwrite", "R29Effect.zWrite != FALSE,", "R29Effect.zWrite == FALSE,"),
+    ("classify zenable", "R29Effect.zEnable != D3DZB_FALSE,", "R29Effect.zEnable == D3DZB_FALSE,"),
+    ("classify cullmode", "R29Effect.cullMode == D3DCULL_NONE", "R29Effect.cullMode != D3DCULL_NONE"),
+    ("classify allow", "!OutRunVR::PassPolicy::AllowsEffectWorldStereo(policy)",
+     "OutRunVR::PassPolicy::AllowsEffectWorldStereo(policy)"),
+]
 # The hotpath's exact guards must reject disabled HUD vetoes, lost
 # one-probe fencing, and reintroduced unconditional duplicated reads.
 mutations += [
@@ -239,4 +277,4 @@ for name, before, after in mutations:
 if errors:
     print("FAIL " + ", ".join(errors), file=sys.stderr)
     sys.exit(1)
-print(f"PASS R29 single-Present effect cache, positive/negative depth-write fastpath, stencil-disabled write fastpath, and {len(mutations)} negative mutations plus 16 semantic/effect branch combinations")
+print(f"PASS R29 memoized alpha/depth/cull stereo policy, generation-fenced effect cache, depth/stencil safety, and {len(mutations)} negative mutations plus 16 semantic/effect branch combinations")

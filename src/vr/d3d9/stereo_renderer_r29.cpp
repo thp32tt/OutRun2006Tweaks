@@ -47,6 +47,9 @@ namespace OutRunVRStereo
             // The overwhelmingly common disabled-stencil case can avoid
             // up to nine tracked D3D9 state reads for each stereo draw.
             DWORD stencilEnable = FALSE;
+            // Derived once at live sync or a tracked policy-state transition.
+            // Rechecking ClassifyEffectStereo for every draw is unnecessary.
+            bool fragileWorld = true;
             bool valid = false;
             std::uint64_t presentEpoch = 0;
             std::uint64_t drawSerial = 0;
@@ -55,6 +58,22 @@ namespace OutRunVRStereo
         };
 
         thread_local R29EffectState R29Effect{};
+
+        void R29RefreshFragilePolicy() noexcept
+        {
+            // Same R13 effect policy as the draw-time path, but computed only
+            // when the six-field live snapshot is synchronized or a relevant
+            // tracked setter changes it. StateBlock generation fences remain
+            // authoritative for any subsequent draw.
+            const auto policy = OutRunVR::PassPolicy::ClassifyEffectStereo(
+                R29Effect.alphaBlend != FALSE,
+                R29Effect.alphaTest != FALSE,
+                R29Effect.zWrite != FALSE,
+                R29Effect.zEnable != D3DZB_FALSE,
+                R29Effect.cullMode == D3DCULL_NONE);
+            R29Effect.fragileWorld =
+                !OutRunVR::PassPolicy::AllowsEffectWorldStereo(policy);
+        }
         std::uint64_t R29StableTwoEyeDraws = 0;
         std::uint64_t R29ZeroDisparityTwoEyeDraws = 0;
         std::uint64_t R29SafetyFallbackDraws = 0;
@@ -148,6 +167,7 @@ namespace OutRunVRStereo
             R29Effect.zEnable = zEnable;
             R29Effect.cullMode = cullMode;
             R29Effect.stencilEnable = stencilEnable;
+            R29RefreshFragilePolicy();
             R29Effect.valid = true;
             R29Effect.presentEpoch = PresentEpoch;
             R29Effect.drawSerial = TopLevelDrawSerial();
@@ -164,13 +184,7 @@ namespace OutRunVRStereo
             if (!R29SyncEffectState(device))
                 return false;
 
-            const auto policy = OutRunVR::PassPolicy::ClassifyEffectStereo(
-                R29Effect.alphaBlend != FALSE,
-                R29Effect.alphaTest != FALSE,
-                R29Effect.zWrite != FALSE,
-                R29Effect.zEnable != D3DZB_FALSE,
-                R29Effect.cullMode == D3DCULL_NONE);
-            fragile = !OutRunVR::PassPolicy::AllowsEffectWorldStereo(policy);
+            fragile = R29Effect.fragileWorld;
             return true;
         }
 
@@ -527,6 +541,10 @@ namespace OutRunVRStereo
             // keep it authoritative without any draw-time D3D getter.
             if (R29Effect.valid)
             {
+                // Stencil enable affects depth/stencil ownership, not this
+                // R13 alpha/depth/cull stereo classification.
+                if (state != D3DRS_STENCILENABLE)
+                    R29RefreshFragilePolicy();
                 R29Effect.presentEpoch = PresentEpoch;
                 R29Effect.drawSerial = TopLevelDrawSerial();
             }
