@@ -24,7 +24,7 @@ def connected(s: str) -> bool:
         return False
     if gate.count("!selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha") != 3:
         return False
-    if "((alphaNeedsDiffuse && !alphaArg2Diffuse) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha)" not in gate:
+    if "(((alphaNeedsDiffuse && !alphaArg2Diffuse) && !alphaArg2UnusedOnSelectArg1) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha)" not in gate:
         return False
     if not all(token in draw for token in (
         "static_cast<float>(output.alphaFunc), capture.blendFactorAlphaValue",
@@ -85,7 +85,7 @@ def main() -> None:
         ("ctx->DrawIndexed(indexCount, 0, 0);", "ctx->DrawIndexed(0, 0, 0);"),
         ("ctx->PSSetConstantBuffers(0, 1, &alphaBuffer);",
          "ctx->PSSetConstantBuffers(0, 0, &alphaBuffer);"),
-        ("((alphaNeedsDiffuse && !alphaArg2Diffuse) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha)",
+        ("(((alphaNeedsDiffuse && !alphaArg2Diffuse) && !alphaArg2UnusedOnSelectArg1) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha)",
          "(alphaNeedsDiffuse && !alphaArg2Diffuse)"),
         ("capture.selectDiffuseTfactorArg2Alpha ? s.selectDiffuseTfactorAlphaPs.Get() :\n                      capture.selectDiffuseDiffuseAlpha",
          "capture.selectDiffuseDiffuseAlpha ? s.ps.Get() :\n                      capture.selectDiffuseTfactorArg2Alpha"),

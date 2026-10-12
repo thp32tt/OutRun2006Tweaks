@@ -52,7 +52,9 @@
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tools/test_dx11_first_game_frame_regressions.py",
     "tools/test_dx11_stage0_pm_diffuse_00618.py",
-    "tools/test_dx11_stage0_premultiplied_00617.py"
+    "tools/test_dx11_stage0_premultiplied_00617.py",
+    "tools/test_dx11_selectarg_tfactor_input_00587.py",
+    "tools/test_dx11_selectarg_tfactor_arg2_00588.py"
   ],
   "native_gameplay_activation": false,
   "hmd_test_performed": false,
@@ -60,7 +62,7 @@
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Check subsequent validation-bearing repair exact SHA for Backend, Build, DX11 Fast, OpenXR and HUD. Preserve HMD/gamepad UNTESTED; no gameplay promotion.",
+  "next_action": "Validate this exact SHA's mandatory Gates. Runtime/HMD and gamepad UNTESTED. Other task/branch activity must not be disturbed.",
   "failure_context": {
     "backend_gate_run": 38270537945,
     "backend_gate": "FAIL: missing canonical LIVE_D3D9_CALLSITE/D3D11_NATIVE_DRAW/VISIBLE_FRAME_OUTPUT path",
@@ -71,6 +73,10 @@
     "followup_backend_gate_run": 38271400561,
     "followup_backend_gate": "FAIL: 00582 legacy static matcher requires parenthesized alphaNeedsDiffuse AND ALPHAARG2 condition; preserve test compatibility without changing semantics",
     "followup_build_run": 38271406713,
-    "followup_build": "FAIL: 00617 negative mutation falsely passed because 00618 helper duplicated former header token; scope check to intended helper"
+    "followup_build": "FAIL: 00617 negative mutation falsely passed because 00618 helper duplicated former header token; scope check to intended helper",
+    "followup2_backend_gate_run": 38271777677,
+    "followup2_backend_gate": "FAIL 00587 expected obsolete ALPHAARG1 condition string without 00618 PMDiffuse exemption",
+    "followup2_build_run": 38271782698,
+    "followup2_build": "FAIL old 00558 shader-completeness string missing new PMDiffuse PS and outdated allowlist string"
   }
 }

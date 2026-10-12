@@ -1721,7 +1721,7 @@ def main() -> None:
         "s.blendDiffuseAlphaPs.GetAddressOf()",
         "s.blendTextureAlphaPs.Reset();",
         "s.blendDiffuseAlphaPs.Reset();",
-        "s.blendTextureAlphaPs && s.blendTextureAlphaPmPs && s.blendTextureAlphaPmTextureAlphaPs && s.blendDiffuseAlphaPs",
+        "s.blendTextureAlphaPs && s.blendTextureAlphaPmPs && s.blendTextureAlphaPmTextureAlphaPs && s.blendTextureAlphaPmDiffuseAlphaPs && s.blendDiffuseAlphaPs",
         "capture.blendTextureAlpha ? s.blendTextureAlphaPs.Get() :",
         "capture.blendDiffuseAlpha ? s.blendDiffuseAlphaPs.Get() :",
         "ctx->DrawIndexed(indexCount, 0, 0);",
@@ -1736,7 +1736,8 @@ def main() -> None:
                             bridge.find("void observe(")]
     assert all(link in bridge for link in blend_links if "blendTextureAlpha && !blendDiffuseAlpha)" not in link)
     # Verify both prior game alpha-blend pairs while requiring the PM-safe gate.
-    assert "!blendTextureAlpha && !blendTextureAlphaPM && !blendTextureAlphaPMTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha) || arg != D3DTA_TEXTURE ||" in state_section
+    assert "!blendTextureAlpha && !blendTextureAlphaPM && !blendTextureAlphaPMTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha" not in state_section
+    assert "!blendTextureAlphaPMDiffuseAlpha && !blendTextureAlpha && !blendTextureAlphaPM && !blendTextureAlphaPMTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha) || arg != D3DTA_TEXTURE ||" in state_section
     assert "const bool blendTextureAlpha = op == D3DTOP_BLENDTEXTUREALPHA && alphaOp == D3DTOP_BLENDTEXTUREALPHA;" in state_section
     assert "const bool blendDiffuseAlpha = op == D3DTOP_BLENDDIFFUSEALPHA && alphaOp == D3DTOP_BLENDDIFFUSEALPHA;" in state_section
     assert "arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT" in state_section
