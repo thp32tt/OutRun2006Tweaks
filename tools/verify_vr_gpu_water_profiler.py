@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Opt-in GPU profiling static acceptance, including seven destructive mutants."""
+"""Opt-in GPU profiling static acceptance, including nine destructive mutants."""
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 hdr=(root/'src/vr/d3d9/gpu_water_profiler.hpp').read_text(encoding='utf-8')
@@ -12,7 +12,9 @@ tokens=['OUTRUN_VR_GPU_PROFILE','std::strcmp(v,"1")==0','D3DQUERYTYPE_TIMESTAMPD
 'gpuSpanP50Ms','gpuSpanP95Ms','gpuSpanP99Ms','gpuSpanSampleCount',
 'gpuSpanOverflow','OUTRUN_VR_GPU_SCENE','std::sort(gpuSpans_.begin()','zDisabledSamples',
 'D3DRS_ZWRITEENABLE','D3DRS_ZENABLE','D3DRS_STENCILENABLE',
-'programmablePsSamples','fixedFnPsSamples','d->GetPixelShader(&ps)','ps->Release()']
+'programmablePsSamples','fixedFnPsSamples','d->GetPixelShader(&ps)','ps->Release()',
+'renderTargetSamples','offscreenRtSamples','multisampleRtSamples',
+'d->GetRenderTarget(0,&target)','target->Release()','target->GetDesc(&desc)']
 def good(x): return all(t in x for t in tokens) and 'D3DGETDATA_FLUSH' not in x
 assert good(hdr),[t for t in tokens if t not in hdr]
 assert hdr.count('CreateQuery(D3DQUERYTYPE_TIMESTAMP,')==4
@@ -27,7 +29,9 @@ for old,new in [
 ('D3DRS_ALPHABLENDENABLE','D3DRS_FILLMODE'),
 ('D3DRS_ZWRITEENABLE','D3DRS_FILLMODE'),
 ('ps->Release()','/* ref leaked */'),
+('target->Release()','/* render-target COM ref leaked */'),
+('d->GetRenderTarget(0,&target)','/* no RT classification */'),
 ('std::strcmp(v,"1")==0','true'),
 ('if(s.pending) { ++dropped_; skip_=true; return false; }','if(s.pending) { s.pending=false; }')]:
     assert not good(hdr.replace(old,new,1)),old
-print('PASS GPU timing opt-in, nonblocking reads, alpha census, draw/reset/present wiring, 7 mutants')
+print('PASS GPU timing opt-in, nonblocking reads, alpha census, draw/reset/present wiring, 9 mutants')

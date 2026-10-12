@@ -18,6 +18,7 @@ struct Slot {
     bool pending=false,sampleSet=false,blend=false;
     unsigned draws=0, samples=0, blendSamples=0, alphaTestSamples=0, pick=0;
     unsigned noDepthWriteSamples=0, depthDisabledSamples=0, stencilSamples=0, pixelShaderSamples=0, fixedFunctionSamples=0;
+    unsigned rtSamples=0, offscreenRtSamples=0, multisampleRtSamples=0;
     void release() noexcept {
         for(IDirect3DQuery9** q : {&disjoint,&freq,&begin,&end,&sampleBegin,&sampleEnd}) {
             if(*q) { (*q)->Release(); *q=nullptr; }
@@ -45,6 +46,8 @@ class Meter {
     unsigned next_=0,lastDraws_=1024;
     std::uint64_t frame_=0, samples_=0, alpha_=0, alphaTest_=0, frames_=0, dropped_=0, invalid_=0, timedBlend_=0, timedOpaque_=0;
     std::uint64_t noDepthWrite_=0, depthDisabled_=0, stencil_=0, pixelShader_=0, fixedFunction_=0;
+    std::uint64_t rtSamples_=0, offscreenRtSamples_=0, multisampleRtSamples_=0;
+    UINT referenceWidth_=0, referenceHeight_=0;
     double sumFrame_=0,maxFrame_=0,sumBlend_=0,sumOpaque_=0;
     // No GPU stalls and no per-frame heap allocation: window-only sorting.
     std::array<double,1024> gpuSpans_{};
@@ -76,6 +79,8 @@ class Meter {
             noDepthWrite_+=s.noDepthWriteSamples; depthDisabled_+=s.depthDisabledSamples;
             stencil_+=s.stencilSamples; pixelShader_+=s.pixelShaderSamples;
             fixedFunction_+=s.fixedFunctionSamples;
+            rtSamples_+=s.rtSamples; offscreenRtSamples_+=s.offscreenRtSamples;
+            multisampleRtSamples_+=s.multisampleRtSamples;
             if(s.sampleSet) {
                 const double drawMs=double(y-x)*1000.0/double(f);
                 if(s.blend){++timedBlend_;sumBlend_+=drawMs;}else{++timedOpaque_;sumOpaque_+=drawMs;}
@@ -94,15 +99,17 @@ class Meter {
             return gpuSpans_[(std::max)(size_t{1},n)-1];
         };
         const char* scene=std::getenv("OUTRUN_VR_GPU_SCENE");
-        spdlog::info("VR GPU WATER 5s: scene={} gpuIntervals={} gpuSpanAvgMs={:.3f} gpuSpanP50Ms={:.3f} gpuSpanP95Ms={:.3f} gpuSpanP99Ms={:.3f} gpuSpanMaxMs={:.3f} gpuSpanSampleCount={} gpuSpanOverflow={} sampledBlendDrawAvgMs={:.4f} sampledOpaqueDrawAvgMs={:.4f} blendDraws={} opaqueDraws={} stateSamples={} alphaBlendSamples={} alphaTestSamples={} noZWriteSamples={} zDisabledSamples={} stencilSamples={} programmablePsSamples={} fixedFnPsSamples={} dropped={} invalid={} waterAttribution=UNPROVEN",
+        spdlog::info("VR GPU WATER 5s: scene={} gpuIntervals={} gpuSpanAvgMs={:.3f} gpuSpanP50Ms={:.3f} gpuSpanP95Ms={:.3f} gpuSpanP99Ms={:.3f} gpuSpanMaxMs={:.3f} gpuSpanSampleCount={} gpuSpanOverflow={} sampledBlendDrawAvgMs={:.4f} sampledOpaqueDrawAvgMs={:.4f} blendDraws={} opaqueDraws={} stateSamples={} alphaBlendSamples={} alphaTestSamples={} noZWriteSamples={} zDisabledSamples={} stencilSamples={} programmablePsSamples={} fixedFnPsSamples={} renderTargetSamples={} offscreenRtSamples={} multisampleRtSamples={} dropped={} invalid={} waterAttribution=UNPROVEN",
             scene?scene:"NONE",frames_,frames_?sumFrame_/frames_:0.0,
             percentile(0.50),percentile(0.95),percentile(0.99),maxFrame_,
             gpuSpanCount_,gpuSpanOverflow_,
             timedBlend_?sumBlend_/timedBlend_:0.0,timedOpaque_?sumOpaque_/timedOpaque_:0.0,
             timedBlend_,timedOpaque_,samples_,alpha_,alphaTest_,
-            noDepthWrite_,depthDisabled_,stencil_,pixelShader_,fixedFunction_,dropped_,invalid_);
+            noDepthWrite_,depthDisabled_,stencil_,pixelShader_,fixedFunction_,
+            rtSamples_,offscreenRtSamples_,multisampleRtSamples_,dropped_,invalid_);
         samples_=alpha_=alphaTest_=frames_=dropped_=invalid_=timedBlend_=timedOpaque_=0;
         noDepthWrite_=depthDisabled_=stencil_=pixelShader_=fixedFunction_=0;
+        rtSamples_=offscreenRtSamples_=multisampleRtSamples_=0;
         sumFrame_=maxFrame_=sumBlend_=sumOpaque_=0;
         gpuSpanCount_=gpuSpanOverflow_=0; logAt_=now;
     }
@@ -110,6 +117,7 @@ public:
     void reset() noexcept {
         active_=nullptr; for(Slot& s:ring_) s.release();
         game_=nullptr; unsupported_=skip_=false;
+        referenceWidth_=referenceHeight_=0;
     }
     bool beforeDraw(IDirect3DDevice9* d,UINT /*primitives*/) noexcept {
         if(!Enabled()||!d||unsupported_||skip_) return false;
@@ -126,6 +134,7 @@ public:
             s.draws=s.samples=s.blendSamples=s.alphaTestSamples=0;
             s.noDepthWriteSamples=s.depthDisabledSamples=s.stencilSamples=0;
             s.pixelShaderSamples=s.fixedFunctionSamples=0;
+            s.rtSamples=s.offscreenRtSamples=s.multisampleRtSamples=0;
             s.sampleSet=false;
             s.pick=static_cast<unsigned>((frame_*997u+13u)%lastDraws_);
             if(FAILED(s.disjoint->Issue(D3DISSUE_BEGIN))||FAILED(s.begin->Issue(D3DISSUE_END))) {
@@ -147,6 +156,26 @@ public:
             if(SUCCEEDED(d->GetRenderState(D3DRS_ZWRITEENABLE,&zWrite))) s.noDepthWriteSamples+=(zWrite==FALSE);
             if(SUCCEEDED(d->GetRenderState(D3DRS_ZENABLE,&zEnable))) s.depthDisabledSamples+=(zEnable==D3DZB_FALSE);
             if(SUCCEEDED(d->GetRenderState(D3DRS_STENCILENABLE,&stencil))) s.stencilSamples+=(stencil!=FALSE);
+            if((i&63u)==0) {
+                // Sparse RT census distinguishes main-eye-sized and smaller
+                // offscreen effects. Dimensions alone cannot prove a water pass.
+                // COM GetRenderTarget AddRef must be balanced in every branch.
+                IDirect3DSurface9* target=nullptr;
+                if(SUCCEEDED(d->GetRenderTarget(0,&target)) && target){
+                    D3DSURFACE_DESC desc{};
+                    if(SUCCEEDED(target->GetDesc(&desc))){
+                        ++s.rtSamples;
+                        if(!referenceWidth_ || !referenceHeight_){
+                            referenceWidth_=desc.Width;
+                            referenceHeight_=desc.Height;
+                        }
+                        s.offscreenRtSamples+=
+                            (desc.Width < referenceWidth_ || desc.Height < referenceHeight_);
+                        s.multisampleRtSamples+=(desc.MultiSampleType != D3DMULTISAMPLE_NONE);
+                    }
+                    target->Release();
+                }
+            }
             if((i&63u)==0) { // lower-rate shader sample: GetPixelShader AddRef must be released
                 IDirect3DPixelShader9* ps=nullptr;
                 if(SUCCEEDED(d->GetPixelShader(&ps))) {
