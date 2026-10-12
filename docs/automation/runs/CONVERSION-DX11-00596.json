@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00596",
   "work_key": "DX11:MENU_RACE_NATIVE_ADDITIVE_OM",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "C4_MATERIAL_COMMITTED_CI_PENDING",
+  "status": "C3_CI_REPAIR_IN_PROGRESS",
   "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "RECHECK_REQUIRED",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -46,7 +46,7 @@
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
-      "VISIBLE_FRAME_DIAGNOSTIC"
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "Quest3/VDXR menu-to-race untested",
     "activation_guard_and_fallback": "exact opt-in; original game D3D9 Draw/Present/gamepad never replaced"
@@ -61,5 +61,6 @@
     "status": "NOT_REQUIRED"
   },
   "next_action": "Verify exact SHA mandatory GitHub Gate and Windows build, then C6; hardware still UNTESTED",
-  "runtime_evidence": null
+  "runtime_evidence": null,
+  "ci_failure_repair": "Initial exact-SHA Backend/Fast Gate failed because staged path used VISIBLE_FRAME_DIAGNOSTIC instead of VISIBLE_FRAME_OUTPUT. Fixed acceptance stage label; no weakening."
 }
