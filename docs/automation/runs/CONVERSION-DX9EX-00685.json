@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00685",
+  "production_id": "CONVERSION-DX9EX-00685",
+  "event_id": "CONVERSION-DX9EX-00685-C6",
+  "event_type": "C6_RESULT_ONLY",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "hold_reason": "RUN_RECORD_NOT_FOUND",
+  "hold_resolution": "C6_RECORD_CREATED_FROM_EXISTING_GITHUB_MATERIAL_AND_EXACT_SHA_CI",
+  "base_sha": "6db5ed5523d98b451188896babfcfc282fe6648c",
+  "material_result_sha": "de7cf8f51800bbccbb195bd4446b0a619f5582e7",
+  "source_material_sha": "de7cf8f51800bbccbb195bd4446b0a619f5582e7",
+  "material_commits": [
+    "de7cf8f51800bbccbb195bd4446b0a619f5582e7",
+    "26fb7caad9c27556d97b66c1a6d2f61e6ac590b5",
+    "da066bd85b57a0e0759f2fffb805983d534e67c2"
+  ],
+  "result_sha": "da066bd85b57a0e0759f2fffb805983d534e67c2",
+  "validation_bearing_result_sha": "da066bd85b57a0e0759f2fffb805983d534e67c2",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r32_review.py"
+  ],
+  "feature_contract": {
+    "goal": "Reduce R32 DirectGPU overhead by skipping redundant interop rebind and moving borrowed eye-source capture after generation-aware rejected-copy checks.",
+    "acceptance": "Probe ready interop identity once, immediately invalidate stale host generations, preserve revalidation/fence/ACK scanning and safe fallback, and pin source ordering plus seven destructive mutations and eight interop scenarios. Exact-SHA DX9Ex Active, Domain Isolation, and Full Source Impact CI must pass.",
+    "source": "Recovered from CONVERSION-DX9EX-00685 material/repair commit messages because the specified run record was absent at C6."
+  },
+  "acceptance_results": {
+    "r32_directgpu_probe_and_copy_contract": "PASS_POLICY_EXACT_SHA",
+    "destructive_mutation_and_interop_scenario_contract": "PASS_POLICY_EXACT_SHA",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_3_OF_3_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38242515943,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "da066bd85b57a0e0759f2fffb805983d534e67c2",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "game": "success",
+        "host": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38242515988,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "da066bd85b57a0e0759f2fffb805983d534e67c2",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    {
+      "id": 38242516012,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "da066bd85b57a0e0759f2fffb805983d534e67c2",
+      "conclusion": "success",
+      "jobs": {
+        "source-cross-domain": "success",
+        "msvc-analyze-openxr-host": "success",
+        "msvc-analyze-active-game": "success"
+      }
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "Quest3/VDXR headset and gameplay runtime verification were not performed. Exact-SHA CI success is build/static evidence, not runtime, binocular visual, wheel/input, FPS or frame-time proof.",
+  "score_credit_key": "CONVERSION-DX9EX-00685",
+  "score_change": 0,
+  "score_status": "C6_BOOKKEEPING_ONLY_NO_DUPLICATE_CREDIT",
+  "notes": "C6 RESULT ONLY. The prior run record was not found on the target branch; material SHA, change paths and feature contract were reconstructed from existing GitHub commits, and acceptance results from successful exact-SHA CI. This new standalone [skip ci] commit is not validation-bearing; no source edits, rebuild, CI rerun, scoreboard write or duplicated score."
+}
