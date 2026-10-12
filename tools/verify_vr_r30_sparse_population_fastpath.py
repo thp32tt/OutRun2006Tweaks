@@ -37,7 +37,10 @@ def valid(code):
             "std::count_if(",
             "static_cast<std::size_t>(selectedCount) * 4u <= vertexCount")):
             return False
-    if "usedMask, knownUsedCount, touched))" not in stereo:
+    # Both the original world-seed path and the new fused projection path
+    # must consume the validated touched-count contract. A mutation of the
+    # first matching callsite may no longer pass by matching the second one.
+    if stereo.count("usedMask, knownUsedCount, touched))") != 2:
         return False
     # Live C++ touched-copy branch must be behind sparse cardinality and
     # preserve the historical contiguous-mask scan as a safe fallback.
