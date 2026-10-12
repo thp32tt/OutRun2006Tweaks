@@ -116,12 +116,12 @@ def projected_depth_signature_contract(source: str) -> None:
         "const UINT sampleLimit = vertexCount < 512u ? vertexCount : 512u;",
         "if ((sampled & 15u) == 0u)",
         "const UINT remaining = sampleLimit - sampled;",
-        "valid >= 3u &&",
+        "if (valid >= 3u &&\n                        valid * 2u >= sampled + remaining &&",
         "valid * 2u >= sampled + remaining &&",
         "projected * 4u >= (valid + remaining) * 3u",
         "(valid + remaining) * 2u < sampled + remaining ||",
         "(projected + remaining) * 4u <",
-        "(valid + remaining) * 3u",
+        "(projected + remaining) * 4u <\n                            (valid + remaining) * 3u)",
     )
     assert all(s in code for s in bound_guards), "R30 immutable-count early exit lost"
     assert code.index("if ((sampled & 15u) == 0u)") > code.index(
