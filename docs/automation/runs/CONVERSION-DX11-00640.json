@@ -2,18 +2,18 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00640",
   "production_id": "CONVERSION-DX11-00640",
-  "event_id": "CONVERSION-DX11-00640-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX11-00640-E004",
+  "event_type": "retry",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "1/3",
+  "attempt": "3/3",
   "owner_id": "ChatGPT2",
   "work_key": "DX11:PM_FACTOR_ADD_ADDSMOOTH",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "ae075ee852d221593ba1c02eda579856c1a89e39",
-  "status": "AWAITING_EXACT_SHA_GATES",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -59,13 +59,41 @@
     "C0_RECOVER": "head and prior 00639 checked",
     "C1_REVIEW": "Disjoint ADD/ADDSMOOTH native path",
     "C2_IMPLEMENT": "GAME_CODE_AND_REGRESSION",
-    "C3_VALIDATE": "PENDING_EXACT_SHA_CI",
-    "C4_COMMIT": "MATERIAL",
+    "C3_VALIDATE": "EXACT_SHA_ALL_MANDATORY_GATES_SUCCESS",
+    "C4_COMMIT": "MATERIAL_RESULT_SHA:b2d87633a6bd5009870bf8a935a00c1268c84b79",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING"
+    "C6_STATE": "DONE"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Exact SHA Gate then optionally checkpoint; RUNTIME_VALIDATION=UNTESTED"
+  "next_action": "NEED_HMD_TEST for real Quest3/VDXR game/menu/gamepad proof; controller selects next independent DX11 feature, do not repeat 00640",
+  "result_sha": "b2d87633a6bd5009870bf8a935a00c1268c84b79",
+  "validation_bearing_sha": "b2d87633a6bd5009870bf8a935a00c1268c84b79",
+  "git_actions": {
+    "backend_conversion_gate": {
+      "run_id": 38321006237,
+      "conclusion": "success"
+    },
+    "dx11_fast_structural": {
+      "run_id": 38321006141,
+      "conclusion": "success"
+    },
+    "windows_build": {
+      "run_id": 38321010530,
+      "conclusion": "success"
+    },
+    "openxr_architecture": {
+      "run_id": 38321010597,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38321010696,
+      "conclusion": "success"
+    },
+    "vr_pc_fast_test_build": {
+      "run_id": 38321006166,
+      "conclusion": "skipped"
+    }
+  }
 }
