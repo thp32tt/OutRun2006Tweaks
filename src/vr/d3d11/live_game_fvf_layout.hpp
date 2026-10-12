@@ -99,28 +99,28 @@ constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcep
     if ((position != kGameFvfXyz && position != kGameFvfXyzRhw) ||
         (position == kGameFvfXyzRhw && hasNormal) ||
         texcoordBits > kGameFvfTex8 ||
-        (firstTexcoordFormat != 0u && !firstTexcoord1D &&
+        ((firstTexcoordFormat != 0u && !firstTexcoord1D) &&
          !(texcoord3DMask & (1u << 0u))) ||
         (firstTexcoord1D && texcoordBits == 0u) ||
-        (secondTexcoordFormat != 0u && !secondTexcoord1D &&
+        ((secondTexcoordFormat != 0u && !secondTexcoord1D) &&
          !(texcoord3DMask & (1u << 1u))) ||
         (secondTexcoord1D && texcoordBits < kGameFvfTex2) ||
-        (thirdTexcoordFormat != 0u && !thirdTexcoord1D &&
+        ((thirdTexcoordFormat != 0u && !thirdTexcoord1D) &&
          !(texcoord3DMask & (1u << 2u))) ||
         (thirdTexcoord1D && texcoordBits < kGameFvfTex3) ||
-        (fourthTexcoordFormat != 0u && !fourthTexcoord1D &&
+        ((fourthTexcoordFormat != 0u && !fourthTexcoord1D) &&
          !(texcoord3DMask & (1u << 3u))) ||
         (fourthTexcoord1D && texcoordBits < kGameFvfTex4) ||
-        (fifthTexcoordFormat != 0u && !fifthTexcoord1D &&
+        ((fifthTexcoordFormat != 0u && !fifthTexcoord1D) &&
          !(texcoord3DMask & (1u << 4u))) ||
         (fifthTexcoord1D && texcoordBits < kGameFvfTex5) ||
-        (sixthTexcoordFormat != 0u && !sixthTexcoord1D &&
+        ((sixthTexcoordFormat != 0u && !sixthTexcoord1D) &&
          !(texcoord3DMask & (1u << 5u))) ||
         (sixthTexcoord1D && texcoordBits < kGameFvfTex6) ||
-        (seventhTexcoordFormat != 0u && !seventhTexcoord1D &&
+        ((seventhTexcoordFormat != 0u && !seventhTexcoord1D) &&
          !(texcoord3DMask & (1u << 6u))) ||
         (seventhTexcoord1D && texcoordBits < kGameFvfTex7) ||
-        (eighthTexcoordFormat != 0u && !eighthTexcoord1D &&
+        ((eighthTexcoordFormat != 0u && !eighthTexcoord1D) &&
          !(texcoord3DMask & (1u << 7u))) ||
         (eighthTexcoord1D && texcoordBits < kGameFvfTex8) ||
         (fvf & ~(kGameFvfXyz | kGameFvfXyzRhw | kGameFvfNormal | kGameFvfPsize |
