@@ -151,7 +151,8 @@ def fused_world_contract(source: str) -> None:
             "(clipW - bp._44) * inv34;",
             "(rhsX * bp._22 - bp._21 * rhsY) * invDet;",
             "(bp._11 * rhsY - rhsX * bp._12) * invDet;",
-            "for (int eye = 0; eye < 2; ++eye)",
+            "float eyeTailOrigin[2][4]{};\n            for (int eye = 0; eye < 2; ++eye)",
+            "std::uint32_t depthPreservesThisVertex = 0;\n                for (int eye = 0; eye < 2; ++eye)",
             "state.eyeTail[eye].m[row][col]",
             "clipEye[3] <= 1.0e-6f",
             "if (fullZ >= 0.0f && fullZ <= 1.0f)",
@@ -179,6 +180,8 @@ def fused_world_contract(source: str) -> None:
         ("(rhsX * bp._22 - bp._21 * rhsY) * invDet;", "rhsX;"),
         ("(bp._11 * rhsY - rhsX * bp._12) * invDet;", "rhsY;"),
         ("for (int eye = 0; eye < 2; ++eye)", "for (int eye = 0; eye < 1; ++eye)"),
+        ("std::uint32_t depthPreservesThisVertex = 0;\n                for (int eye = 0; eye < 2; ++eye)",
+         "std::uint32_t depthPreservesThisVertex = 0;\n                for (int eye = 0; eye < 1; ++eye)"),
         ("clipEye[3] <= 1.0e-6f", "false"),
         ("projected[eye][2] = z;", "projected[eye][2] = 0.0f;"),
         ("projected[eye][3] = invEyeW;", "projected[eye][3] = 1.0f;"),
@@ -227,7 +230,7 @@ def fused_world_contract(source: str) -> None:
             independent = restore()
             assert all(math.isclose(p, q, rel_tol=1e-12, abs_tol=1e-12)
                        for p, q in zip(shared, independent))
-    print("PASS R30 fused binocular world reprojection; 18 negative mutations, 6000 projection samples")
+    print("PASS R30 fused binocular world reprojection; 19 negative mutations, 6000 projection samples")
 
 
 
