@@ -1604,6 +1604,48 @@ def main() -> None:
             assert mutant != layout_source and not tail_u_native_linked(bridge, mutant, probe_source)
     print("DX11 TEXCOORDSIZE1(4..7) packed live native Draw regression PASS (static only)")
 
+    # 00614: FVF TEXCOORDSIZE3 game Draw -> 12-byte source UV -> native
+    # float2 sampling, preserving next slots and rejecting COUNT2 transforms.
+    def float3_uv_native_linked(src: str, hdr: str, fixture: str) -> bool:
+        return all(x in src for x in (
+            "kGameFvfTexcoordSize3_7 == D3DFVF_TEXCOORDSIZE3(7)",
+            "if (transformUv && layout.texcoord3DMask != 0u) return false;",
+            "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+        )) and all(x in hdr for x in (
+            "candidate.texcoord3DMask = texcoord3DMask;",
+            "format == 2u || (stage >= (texcoordBits >> 8u) && format != 0u)",
+            "4u * game_fvf_texcoord3d_count(candidate.texcoord3DMask)",
+            "offset += (layout.texcoord3DMask & (1u << slot)) ? 12u : bytesToCopy;",
+        )) and all(x in fixture for x in (
+            "struct Menu3DUv", "struct Race3DMixed",
+            "assert(layout.texcoord3DMask == 0x80u && layout.minStride == 80u);",
+            "!game_fvf_decode_vertex(&menu3D, 43u",
+            "!game_fvf_decode_vertex(&race3D, 79u",
+            "corrupted3D.texcoord3DMask = 0u;",
+        ))
+    assert float3_uv_native_linked(bridge, layout_source, probe_source)
+    for old, wrong in (
+        ("if (transformUv && layout.texcoord3DMask != 0u) return false;",
+         "if (false && layout.texcoord3DMask != 0u) return false;"),
+        ("candidate.texcoord3DMask = texcoord3DMask;",
+         "candidate.texcoord3DMask = 0u;"),
+        ("offset += (layout.texcoord3DMask & (1u << slot)) ? 12u : bytesToCopy;",
+         "offset += bytesToCopy;"),
+        ("assert(layout.texcoord3DMask == 0x80u && layout.minStride == 80u);",
+         "assert(layout.texcoord3DMask == 0x80u);"),
+    ):
+        if old in bridge:
+            mutant = bridge.replace(old, wrong, 1)
+            assert not float3_uv_native_linked(mutant, layout_source, probe_source)
+        elif old in layout_source:
+            mutant = layout_source.replace(old, wrong, 1)
+            assert not float3_uv_native_linked(bridge, mutant, probe_source)
+        else:
+            mutant = probe_source.replace(old, wrong, 1)
+            assert not float3_uv_native_linked(bridge, layout_source, mutant)
+    print("DX11 packed float3 UV native Draw integration regression PASS (static only)")
+
     # 00558: real game-authored D3D9 stage0 BLENDTEXTUREALPHA /
     # BLENDDIFFUSEALPHA -> owned native PS -> Draw/DrawIndexed -> opt-in inset.
     # Checks source-to-consumer links, shader/reset lifecycle and fail-closed
