@@ -11,9 +11,9 @@
   "work_key": "DX11:PM_RGB_COMPLEMENT_VERTEX_ALPHA_DUAL_ARG",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "2f68ea473e208d1ac31edfe89bf6673e0114cdd6",
-  "status": "AWAITING_GITHUB_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -53,19 +53,69 @@
     "tools/test_dx11_stage0_pm_inverse_diffuse_00634.py",
     ".github/workflows/dx11-fast-structural.yml",
     ".github/workflows/backend-conversion-gate.yml",
-    "docs/automation/runs/CONVERSION-DX11-00634.json"
+    "docs/automation/runs/CONVERSION-DX11-00634.json",
+    "tools/test_dx11_stage0_pm_factor_arg2_00630.py",
+    "tools/test_dx11_stage0_pm_inverse_texture_alpha_00632.py",
+    "tools/test_dx11_selectarg_tfactor_input_00587.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
   ],
   "pipeline": {
     "C0_RECOVER": "PASS remote HEAD",
     "C1_REVIEW": "PASS source gap",
     "C2_IMPLEMENT": "PASS native code",
-    "C3_VALIDATE": "PENDING exact SHA GitHub CI",
-    "C4_COMMIT": "IN_PROGRESS",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend #38310822593, DX11 Fast #38310822632, Win32 Build #38310827427, OpenXR #38310827508, HUD #38310827501 all SUCCESS at bc9d8ec3d8e374e16832d4743a4079a824807aed",
+    "C4_COMMIT": "PASS: C++ material 363136519eb4b814ba03edc48adb94d0727968c9; source-guard repair 1b8244c7a18e32b81becdd78238479177dd93fa0, 6c642202c53671721c147caea52f002532789216; final validation-bearing bc9d8ec3d8e374e16832d4743a4079a824807aed (no CI-skip)",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING"
+    "C6_STATE": "PASS_EXACT_SHA; source/build verified, hardware menu/vehicle/race/gamepad/Quest3/VDXR UNTESTED"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Review exact-SHA CI, repair failures; runtime HMD and gamepad NEED_HMD_TEST"
+  "next_action": "Independent new DX11 work may start without rerunning 00634/C6. Quest3/VDXR live menu/vehicle/race/frame and gamepad parity NEED_HMD_TEST. DXVK remains frozen.",
+  "material_result_sha": "363136519eb4b814ba03edc48adb94d0727968c9",
+  "material_implementation_sha": "363136519eb4b814ba03edc48adb94d0727968c9",
+  "validation_bearing_result_sha": "bc9d8ec3d8e374e16832d4743a4079a824807aed",
+  "result_sha": "bc9d8ec3d8e374e16832d4743a4079a824807aed",
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 38310822593,
+      "conclusion": "SUCCESS",
+      "head_sha": "bc9d8ec3d8e374e16832d4743a4079a824807aed"
+    },
+    "dx11_fast": {
+      "run_id": 38310822632,
+      "conclusion": "SUCCESS",
+      "head_sha": "bc9d8ec3d8e374e16832d4743a4079a824807aed"
+    },
+    "win32_build": {
+      "run_id": 38310827427,
+      "conclusion": "SUCCESS",
+      "head_sha": "bc9d8ec3d8e374e16832d4743a4079a824807aed"
+    },
+    "openxr_architecture": {
+      "run_id": 38310827508,
+      "conclusion": "SUCCESS",
+      "head_sha": "bc9d8ec3d8e374e16832d4743a4079a824807aed"
+    },
+    "hud_inspector": {
+      "run_id": 38310827501,
+      "conclusion": "SUCCESS",
+      "head_sha": "bc9d8ec3d8e374e16832d4743a4079a824807aed"
+    }
+  },
+  "failure_recovery": {
+    "first_material_sha": "363136519eb4b814ba03edc48adb94d0727968c9",
+    "first_fast_failed_run_id": 38310304744,
+    "first_build_failed_run_id": 38310308367,
+    "second_backend_failed_run_id": 38310427444,
+    "second_build_failed_run_id": 38310434388,
+    "third_build_failed_run_id": 38310595263,
+    "cause": "Legacy source graph and SAFE-RETURN tests used brittle exact adjacent text around active alpha source denylist and native PS readiness; original destructive assertions retained and extended.",
+    "repair_commits": [
+      "1b8244c7a18e32b81becdd78238479177dd93fa0",
+      "6c642202c53671721c147caea52f002532789216",
+      "bc9d8ec3d8e374e16832d4743a4079a824807aed"
+    ],
+    "repair_status": "PASS_EXACT_SHA"
+  }
 }
