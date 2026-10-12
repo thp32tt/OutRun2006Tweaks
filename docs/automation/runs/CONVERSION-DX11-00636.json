@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00636",
+  "production_id": "CONVERSION-DX11-00636",
+  "event_id": "CONVERSION-DX11-00636-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:PM_RGB_MODULATE_TEXTURE_TFACTOR_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "7593311a86fa8fc424f6a799b2bda2ed50cf9d3d",
+  "status": "IMPLEMENTED_AWAIT_EXACT_SHA_GATE",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Game-authored D3D9 stage-0 PM RGB / alpha MODULATE(TEXTURE,TFACTOR) state capture",
+      "D3DRS_TEXTUREFACTOR alpha read and native D3D11 PS byte-normalized constant",
+      "Native HLSL compile, PS binding, Draw/DrawIndexed diagnostic frame; game falls back to D3D9"
+    ],
+    "batch_components": [
+      "D3D9 game render state exact admission + factor capture + fallback",
+      "Native pixel shader, owner/compile/lifetime, Draw selection",
+      "Destructive source connectivity and 32768-case numeric regression in Fast/Backend CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Exact D3D9 PM RGB and independent texture-alpha times live TFACTOR high-byte on both native draw variants",
+      "negative_regression": "Swapped operands/modified factor/unsupported alpha operation do not admit; mutation kills shader/capture/native graph",
+      "component_integration": "Captured D3D9 stage state -> texture factor -> PS constant -> HLSL -> native Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:PM_RGB_MODULATE_TEXTURE_TFACTOR_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source + CI only; no captured game menu/vehicle selection/race frame or Quest3 gameplay parity",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME explicit diagnostic; untouched gamepad hooks and protected D3D9 fallback"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_modulate_factor_00636.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00636.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: 00635 active on remote, disjoint PM TFACTOR modulation path not previously present",
+    "C1_REVIEW": "PASS: exact RGB PM plus alpha TFACTOR modulation missing; existing PM factor SELECT outputs a different alpha",
+    "C2_IMPLEMENT": "C++/HLSL source, TFACTOR capture, PS pipeline and Draw binding staged",
+    "C3_VALIDATE": "PENDING exact commit CI and negative source + numeric tests",
+    "C4_COMMIT": "PENDING material SHA; no CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED: dormant opt-in diagnostic only, no user-facing binary promotion",
+    "C6_STATE": "PENDING exact-SHA results"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No native gameplay promotion; Quest3/VDXR testing pending"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "next_action": "Run exact-SHA Backend Conversion Gate, DX11 Fast, Windows Build and OpenXR/HUD workflows; C6 bookkeeping after verification. Do not claim runtime PASS; leave menu-to-race HMD/gamepad NEED_HMD_TEST."
+}
