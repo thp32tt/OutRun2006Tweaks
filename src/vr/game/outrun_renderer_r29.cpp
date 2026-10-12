@@ -92,6 +92,11 @@ namespace OutRunVRRenderer
             const std::uint64_t wvpFirst = OutRunWvpRegister;
             const std::uint64_t wvpLast =
                 OutRunWvpRegister + OutRunWvpRegisterCount;
+            // Only intersecting partial writes enter this hot path. With
+            // intersection, the caller's prefix/suffix and the four WVP
+            // registers fill the complete widened envelope, without gaps.
+            if (requestLast <= wvpFirst || requestFirst >= wvpLast)
+                return false;
             const std::uint64_t first = std::min(requestFirst, wvpFirst);
             const std::uint64_t last = std::max(requestLast, wvpLast);
             const std::uint64_t maxRegisterPlusOne =
@@ -103,9 +108,8 @@ namespace OutRunVRRenderer
 
             envelopeStart = static_cast<UINT>(first);
             envelopeCount = static_cast<UINT>(last - first);
-            std::memset(envelopeData, 0,
-                sizeof(float) * envelopeCount * 4);
-
+            // No memset: every register in the envelope is overwritten by
+            // the stock WVP block and the request prefix/suffix below.
             // Rebuild c64..c67 from the generation-local stock shadow, then
             // preserve every register in the caller's original range outside
             // that block. A single widened D3D call retains the base renderer's
@@ -257,7 +261,7 @@ namespace OutRunVRRenderer
 
                 UINT envelopeStart = 0;
                 UINT envelopeCount = 0;
-                float envelopeData[256 * 4]{};
+                float envelopeData[256 * 4];
                 if (!R29BuildCoherentUploadEnvelope(startRegister,
                         constantData, vector4fCount, envelopeStart,
                         envelopeCount, envelopeData))
