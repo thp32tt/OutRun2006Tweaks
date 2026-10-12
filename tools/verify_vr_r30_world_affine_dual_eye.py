@@ -16,9 +16,13 @@ WF = ROOT / ".github/workflows/vr-dx9ex-active.yml"
 
 def verify_source(source):
     start = source.index("bool R30TransformWorldAffineStereo(")
-    end = source.index("bool R30TransformXyzrhwStereo(", start)
+    # This helper precedes the shared seeding and per-eye fallback code.
+    # Bound its single-walk assertions to the helper itself, not every
+    # subsequently declared R30 world/fused routine.
+    end = source.index("bool R30SeedWorldXyzrhwBuffers(", start)
     body = source[start:end]
-    stereo = source[end:source.index("template <typename LeftDraw", end)]
+    stereo_start = source.index("bool R30TransformXyzrhwStereo(", end)
+    stereo = source[stereo_start:source.index("template <typename LeftDraw", stereo_start)]
     for term in (
         "!state.worldEffect || state.fullWorldReprojection",
         "left.size() != bytes || right.size() != bytes",
