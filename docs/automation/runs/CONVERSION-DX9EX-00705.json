@@ -10,6 +10,7 @@
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
   "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
   "status": "COMPLETE_BUILD_VERIFIED",
   "feature_status": "DONE_BUILD_VERIFIED",
   "controller_terminal": true,
