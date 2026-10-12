@@ -30,6 +30,9 @@ def contract(source):
         "usedMask->size() < vertexCount",
         "vertexCount >= 64u",
         "std::count_if(",
+        "UINT knownUsedCount = UINT_MAX",
+        "knownUsedCount <= vertexCount",
+        "static_cast<std::size_t>(knownUsedCount)",
         "selectedCount) * 4u <= vertexCount",
         "std::memcpy(left.data() + offset,",
         "std::memcpy(right->data() + offset,",
@@ -37,7 +40,7 @@ def contract(source):
         "std::memcpy(right->data(), source, bytes);",
     )
     required_caller = (
-        "source, vertexCount, stride, left, &right, usedMask)",
+        "left, &right,\n                    usedMask, knownUsedCount))",
         "state, 0, left, usedMask, true, leftFull, true)",
         "state, 1, right, usedMask, true, rightFull, true)",
         "state, 0, left, usedMask, false, ignored, false)",
@@ -49,15 +52,15 @@ def contract(source):
             and "if (out.size() != bytes)" in body
             and "out, nullptr, usedMask)" in body
             and "std::count_if(" not in body
-            and caller.index("source, vertexCount, stride, left, &right, usedMask)")
+            and caller.index("left, &right,\n                    usedMask, knownUsedCount))")
             < caller.index("bool leftFull = false;")
             and caller.index("bool leftFull = false;") < fallback)
 
 
 assert contract(SOURCE), "world indexed two-eye seed + fallback contract lost"
 mutations = [
-    ("no shared seed", "source, vertexCount, stride, left, &right, usedMask)",
-     "source, vertexCount, stride, left, nullptr, usedMask)"),
+    ("no shared seed", "left, &right,\n                    usedMask, knownUsedCount))",
+     "left, nullptr,\n                    usedMask, knownUsedCount))"),
     ("no right sparse copy", "std::memcpy(right->data() + offset,",
      "std::memcpy(left.data() + offset,"),
     ("no right dense copy", "std::memcpy(right->data(), source, bytes);",
