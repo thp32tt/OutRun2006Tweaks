@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00597",
   "work_key": "DX11:MENU_RACE_NATIVE_PREMULTIPLIED_OM",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -61,6 +61,72 @@
     "status": "NOT_REQUIRED",
     "reason": "No HMD-tested distribution for diagnostic-only native inset"
   },
-  "next_action": "Obtain exact-SHA GitHub Gate; runtime remains UNTESTED until Quest3/VDXR evidence.",
-  "runtime_evidence": null
+  "next_action": "Quest3/VDXR real menu, vehicle selection, race, gamepad and diagnostic inset parity still NEED_HMD_TEST; never infer full native gameplay activation. Next independent DX11 code task assigned by controller; 00597 is complete.",
+  "runtime_evidence": null,
+  "material_result_sha": "c0c9abf67e71533cde88c5b6362f74a14cadf8ad",
+  "validation_bearing_result_sha": "72556f5935d96c8e26d40b97552822bb11e24374",
+  "validation_bearing_sha": "72556f5935d96c8e26d40b97552822bb11e24374",
+  "result_sha": "72556f5935d96c8e26d40b97552822bb11e24374",
+  "c6_basis_head_sha": "72556f5935d96c8e26d40b97552822bb11e24374",
+  "validation_source_repair_shas": [
+    "b85eb3a90a96d14a2762a65132cdfc3523916480",
+    "72556f5935d96c8e26d40b97552822bb11e24374"
+  ],
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38216955825,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "72556f5935d96c8e26d40b97552822bb11e24374"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38216959979,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "72556f5935d96c8e26d40b97552822bb11e24374"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38216955724,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "72556f5935d96c8e26d40b97552822bb11e24374"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38216959978,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "72556f5935d96c8e26d40b97552822bb11e24374"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38216959957,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "72556f5935d96c8e26d40b97552822bb11e24374"
+    }
+  ],
+  "evidence": {
+    "backend_gate_run": 38216955825,
+    "backend_gate_conclusion": "success",
+    "windows_build_run": 38216959979,
+    "windows_build_conclusion": "success",
+    "dx11_fast_run": 38216955724,
+    "dx11_fast_conclusion": "success",
+    "openxr_run": 38216959978,
+    "openxr_conclusion": "success",
+    "hud_run": 38216959957,
+    "hud_conclusion": "success",
+    "result_sha": "72556f5935d96c8e26d40b97552822bb11e24374"
+  },
+  "local_validation": [
+    "Live D3D9 ONE/INVSRCALPHA -> native premultiplied D3D11 OM Draw/DrawIndexed code material, masked OM and safe DX9Ex opt-in preserved",
+    "15 destructive source mutations and 8481 numeric blend cases executed through GitHub Backend validate",
+    "Legacy 00596 additive source-mutation duplicate factor guard fixed; 00597 premultiplied duplicated reset guard fixed",
+    "Exact-SHA Backend validate+readiness, Windows Build, DX11 Fast, OpenXR, HUD all SUCCESS"
+  ],
+  "ci_failure_repair": "Initial c0c9abf Gate 00596 legacy additive destructive mutation failed when new valid ONE factor duplicated. b85eb3a guarded both occurrences. New 00597 reset mutation likewise guarded both lifecycle reset occurrences at 72556f59. Final exact-SHA five required workflows all SUCCESS."
 }
