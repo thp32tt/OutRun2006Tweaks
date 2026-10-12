@@ -2024,6 +2024,13 @@ namespace OutRunVRStereo
             UINT sampled = 0;
             UINT valid = 0;
             UINT projected = 0;
+            // A frame's smoke/sand VB can contain hundreds of homogeneous
+            // projected vertices. The classifier only needs the final two
+            // ratios; bound their possible future values and stop once neither
+            // HUD nor world classification can change. Count selected vertices
+            // only (indexed usedMask may skip holes). Check in 16-sample blocks
+            // so the bound arithmetic does not cost more than the depth work.
+            const UINT sampleLimit = vertexCount < 512u ? vertexCount : 512u;
             for (UINT i = 0; i < vertexCount && sampled < 512u; ++i)
             {
                 if (usedMask &&
@@ -2072,6 +2079,25 @@ namespace OutRunVRStereo
                 // the white position text was incorrectly promoted to 3D.
                 if (std::fabs(rhw - 1.0f) > 0.02f && depthDelta <= 0.10f)
                     ++projected;
+
+                if ((sampled & 15u) == 0u)
+                {
+                    // Up to 'remaining' additional selected samples can still
+                    // be visited. A guaranteed world result survives the
+                    // worst case (all invalid for depth ratio, all valid HUD
+                    // for projection ratio). A guaranteed HUD result survives
+                    // the best case (all remaining valid/world). The bounds
+                    // also hold for sparse indexed masks and early loop end.
+                    const UINT remaining = sampleLimit - sampled;
+                    if (valid >= 3u &&
+                        valid * 2u >= sampled + remaining &&
+                        projected * 4u >= (valid + remaining) * 3u)
+                        return true;
+                    if ((valid + remaining) * 2u < sampled + remaining ||
+                        (projected + remaining) * 4u <
+                            (valid + remaining) * 3u)
+                        return false;
+                }
             }
 
             return sampled >= 3u && valid >= 3u && valid * 2u >= sampled && projected * 4u >= valid * 3u;
