@@ -69,7 +69,10 @@ def projected_depth_signature_contract(source: str) -> None:
         "bool R30ConfigureXyzrhwWorldEffect(", 1)[0]
     def valid(s: str) -> bool:
         start = s.index("const float projectionDepthScale =")
-        loop = s.index("for (UINT i = 0; i < vertexCount && sampled < 512u; ++i)")
+        # R30's <=512 sparse touched traversal is an equivalent bounded
+        # classifier. Keep the projection/depth arithmetic checks on the
+        # actual visit loop rather than requiring the retired dense syntax.
+        loop = s.index("for (UINT visit = 0; visit < visitCount && sampled < 512u; ++visit)")
         slow = s.index("if (!projectionDepthFast || !std::isfinite(depthDelta) ||")
         return (start < loop < slow
             and "projection._33 / projection._34;" in s[:loop]
@@ -87,7 +90,10 @@ def projected_depth_signature_contract(source: str) -> None:
             and "std::fabs(rhw - 1.0f) > 0.02f && depthDelta <= 0.10f" in s
             and "sampled >= 3u && valid >= 3u && valid * 2u >= sampled" in s
             and "projected * 4u >= valid * 3u" in s
-            and "if (usedMask &&" in s)
+            and "if (usedMask &&" in s
+            and "const UINT i = fastTouched ? (*touched)[visit] : visit;" in s[loop:slow]
+            and "if (index >= vertexCount || (*usedMask)[index] == 0)" in s[:loop]
+            and "fastTouched = false;" in s[:loop])
     assert valid(code), "R30 projected world/particle depth fastpath contract lost"
     mutations = (
         ("projection._33 / projection._34;", "projection._33 / projection._44;"),
