@@ -1,0 +1,71 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00662",
+  "production_id": "CONVERSION-DX9EX-00662",
+  "event_id": "CONVERSION-DX9EX-00662-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R30_XYZRHW_SPARSE_INDEXED_VERTEX_COPY",
+  "work_key": "DX9EX:R30_XYZRHW_SPARSE_INDEXED_VERTEX_COPY",
+  "base_sha": "a9fa7358a9527961c31b5fa161bc52585a58fc59",
+  "initial_material_sha": "0633a1dafb52d1539851bc2cd1164b2a74942786",
+  "material_result_sha": "0633a1dafb52d1539851bc2cd1164b2a74942786",
+  "material_commits": [
+    "0633a1dafb52d1539851bc2cd1164b2a74942786"
+  ],
+  "result_sha": "0633a1dafb52d1539851bc2cd1164b2a74942786",
+  "validation_bearing_result_sha": "0633a1dafb52d1539851bc2cd1164b2a74942786",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Reduce CPU memory bandwidth spent duplicating unreferenced indexed XYZRHW smoke/sand/decal vertex spans for both eyes without changing referenced vertices or stereo fallback semantics.",
+    "acceptance": "For indexed masks with at least 64 vertices and at most 25% referenced, copy only contiguous referenced runs. Preserve full memcpy for unindexed/dense draws and source-wide memcpy on atomic full-reprojection fallback; both eye transforms must continue to visit all referenced vertices. Regression verifier and complete x86 source/link gates must pass.",
+    "runtime_metrics": "No real Quest3/VDXR frame time measurements; a source-level reduction in copy bytes is not a proven FPS gain."
+  },
+  "acceptance_results": [
+    {
+      "item": "SPARSE_INDEXED_CPU_COPY",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "src/vr/d3d9/stereo_renderer_r30.cpp selects sparse indexed-mask runs at <=25% coverage with >=64 vertex span; dense and unindexed whole-span copies unchanged."
+    },
+    {
+      "item": "FULL_REPROJECTION_ATOMIC_FALLBACK",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "The original full-source memcpy in a failed full-reprojection path and both-eye fallback remain; no modifications to semantic classification, SkyGlow, input/FFB or transport."
+    },
+    {
+      "item": "FOCUSED_REGRESSION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "tools/verify_vr_r30_eye_tail_hotpath.py adds sparse-copy structural guard, parity for 120 cases, and checks original whole-span rollback; policy job #114664279161 SUCCESS."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38204305933 policy/host/game/full-chain/package 5/5 SUCCESS exact 0633a1dafb52d1539851bc2cd1164b2a74942786"
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38204305949 SUCCESS exact 0633a1dafb52d1539851bc2cd1164b2a74942786"
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38204305955 MSVC game/host/source-cross-domain 3/3 SUCCESS exact 0633a1dafb52d1539851bc2cd1164b2a74942786"
+    },
+    {
+      "item": "QUEST3_VDXR_RUNTIME",
+      "status": "UNTESTED",
+      "evidence": "No Quest3/VDXR headset or exact-build gameplay test; actual p95/p99 frame-time and optical correctness unproven."
+    }
+  ],
+  "package_artifact_id": 11726598135,
+  "package_artifact_digest": "sha256:a2e2469b68be93307ac1b97f81b67c345a63c85a203448dcb73150442da0de1e",
+  "notes": "C6 checkpoint is a separate [skip ci] bookkeeping commit. CI result SHA remains material_result_sha. HMD UNTESTED and DXVK FROZEN. No secondary score for bookkeeping."
+}
