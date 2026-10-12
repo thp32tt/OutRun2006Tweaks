@@ -2689,6 +2689,10 @@ def main() -> None:
             if ta == 0.1: assert alpha < 1.0
     print("DX11 independent MODULATE2X/4X alpha game native Draw PASS (static only)")
 
+    # 00579 game-authored texture RGB with ADD/SUBTRACT alpha native PS.
+    from test_dx11_select_texture_alpha_arithmetic_00579 import run as run_00579
+    run_00579()
+
     # 00578 actual game SELECTARG1 texture RGB and independent fade alpha.
     from test_dx11_select_texture_mixed_alpha_00578 import main as run_00578
     run_00578()
