@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00594",
   "work_key": "DX11:MENU_RACE_NATIVE_BORDER_COLOR",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -61,5 +61,64 @@
     "status": "NOT_REQUIRED",
     "reason": "No HMD-approved binary"
   },
-  "next_action": "Verify exact material SHA GitHub Actions then separate C6; RUNTIME_VALIDATION=UNTESTED"
+  "next_action": "BUILD_VERIFIED / NEED_HMD_TEST: validate native diagnostic inset in Quest3/VDXR menu, vehicle selection, race and gamepad. Do not promote without game/HMD evidence. Next independent DX11 work may start; DXVK remains frozen.",
+  "material_result_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+  "validation_bearing_result_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+  "result_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+  "c6_basis_head_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38210988820,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+      "event": "push"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38210994274,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+      "event": "pull_request"
+    },
+    {
+      "workflow": "OpenXR VR architecture (push)",
+      "run_id": 38210988780,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+      "event": "push"
+    },
+    {
+      "workflow": "OpenXR VR architecture (PR)",
+      "run_id": 38210994343,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+      "event": "pull_request"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38210988774,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+      "event": "push"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38210994825,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "bfd5f4d1b13d3ece6476324ff387a100e6f13ee7",
+      "event": "pull_request"
+    }
+  ],
+  "local_validation": [
+    "00594 BORDER/ARGB live-capture -> native PS sampler guarded Draw/DrawIndexed; 20 negative mutations, 384 channel examples, 700 U/V combinations",
+    "Existing 00591 address regression, 00589..00593 mip tests and full CI successful"
+  ],
+  "runtime_evidence": null
 }
