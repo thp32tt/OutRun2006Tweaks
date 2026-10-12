@@ -80,10 +80,18 @@ def validate_hud_pair_structure(source: str) -> None:
     ):
         assert required in part, required
     assert part.count("R30HudContainScale(") == 1
-    assert part.count("for (UINT i = 0; i < vertexCount; ++i)") == 1
+    # The original dense traversal is still selected for unindexed/unknown
+    # masks; sparse indexed batches now use their producer-verified touched
+    # list. Both routes must share the same one-pass binocular affine math.
+    visit = "for (UINT visit = 0; visit < hudVisitCount; ++visit)"
+    assert part.count(visit) == 1
+    assert "sparseHudTouched ? knownUsedCount : vertexCount" in part
+    assert "const UINT i = sparseHudTouched ? (*touched)[visit] : visit;" in part
+    assert "if (i >= vertexCount ||" in part
+    assert "(sparseHudTouched && !(*usedMask)[i]))" in part
     assert "for (int eye = 0; eye < 2; ++eye)" not in part
-    assert part.index("const float eyeBiasX[2]") < part.index("for (UINT i")
-    assert part.index("const float hudBiasY") < part.index("for (UINT i")
+    assert part.index("const float eyeBiasX[2]") < part.index(visit)
+    assert part.index("const float hudBiasY") < part.index(visit)
     assert "if (leftFull != rightFull)" in source
 
 
