@@ -2,6 +2,7 @@
 """00600: game-authored D3D9 alpha-test state through live native DX11 Draw."""
 from pathlib import Path
 import operator
+import re
 
 SOURCE = Path(__file__).resolve().parents[1] / "src/vr/d3d11/live_game_frame_bridge.cpp"
 
@@ -39,7 +40,7 @@ def linked(s):
         and "clip(pass ? 1.0f : -1.0f);" in shader
         and "alphaParams.x > 0.5f" in shader
         and "alphaParams.z == 1.0f" not in shader  # NEVER never passes
-        and all(producer.count(case) == 1 for case in GUARDS)
+        and all(len(re.findall(re.escape(case) + r"\b", producer)) == 1 for case in GUARDS)
         and "GetRenderState(D3DRS_ALPHAFUNC, &func)" in producer
         and "GetRenderState(D3DRS_ALPHAREF, &reference)" in producer
         and "reference > 255u" in producer
