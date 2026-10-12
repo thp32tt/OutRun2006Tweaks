@@ -46,11 +46,11 @@ def validate(source: str) -> None:
 
 
 def validate_hud_pair(source: str) -> None:
-    """Non-indexed HUD uses one traversal; indexed and world use old bilateral path."""
+    """Indexed and non-indexed screen HUD use one traversal; world remains bilateral."""
     pair = source.split("bool R30TransformXyzrhwStereo(", 1)[1].split(
         "template <typename LeftDraw", 1
     )[0]
-    fast = pair.split("if (!state.worldEffect && !usedMask)", 1)[1].split(
+    fast = pair.split("if (!state.worldEffect)", 1)[1].split(
         "bool leftFull = false;", 1
     )[0]
     for required in (
@@ -76,8 +76,25 @@ def validate_hud_pair(source: str) -> None:
     assert fast.count("R30HudContainScale(") == 1
     assert fast.count("for (UINT i = 0; i < vertexCount; ++i)") == 1
     assert fast.index("const float ndcScaleX") < fast.index("for (UINT i")
-    assert pair.index("if (!state.worldEffect && !usedMask)") < pair.index("bool leftFull = false;")
+    assert pair.index("if (!state.worldEffect)") < pair.index("bool leftFull = false;")
     assert "if (leftFull != rightFull)" in pair
+
+    # Both eyes share the indexed coverage fence, sparse copy and vertex scan.
+    for required in (
+        "(usedMask && usedMask->size() < vertexCount)",
+        "if (usedMask && vertexCount >= 64u)",
+        "usedMask->begin() + vertexCount",
+        "static_cast<std::size_t>(selectedCount) * 4u <= vertexCount",
+        "while (cursor < vertexCount && !(*usedMask)[cursor])",
+        "while (cursor < vertexCount && (*usedMask)[cursor])",
+        "std::memcpy(left.data() + offset,",
+        "std::memcpy(right.data() + offset,",
+        "if (!sparseCopied)",
+        "if (usedMask && !(*usedMask)[i])",
+    ):
+        assert required in fast, "indexed HUD fused contract: " + required
+    assert fast.index("usedMask->size() < vertexCount") < fast.index("left.resize(bytes)")
+    assert fast.index("if (usedMask && !(*usedMask)[i])") < fast.index("!std::isfinite(src[2])")
 
     # Old and paired algebraic order are identical: repeated HUD containment
     # and per-eye vertex traversal are unnecessary, but eye disparity is not.
@@ -104,13 +121,30 @@ def validate_hud_pair(source: str) -> None:
             assert math.isclose(old_x, new_x, rel_tol=0, abs_tol=1e-10)
             assert old_y == new_y
 
+    # Negative indexed mutations must be rejected even if the non-indexed
+    # original still passes its numeric regression.
+    for before, after in (
+        ("(usedMask && usedMask->size() < vertexCount)", "false"),
+        ("if (usedMask && !(*usedMask)[i])", "if (false)"),
+        ("if (!sparseCopied)", "if (false)"),
+        ("std::memcpy(right.data() + offset,", "std::memcpy(left.data() + offset,"),
+    ):
+        assert fast.count(before) == 1, before
+        bad = source.replace(fast, fast.replace(before, after, 1), 1)
+        try:
+            validate_hud_pair_structure(bad)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("indexed HUD mutation survived: " + before)
+
     # Limit destructive mutations to the new HUD fast branch. The guard
     # condition precedes `fast`, and similarly named assignments exist in
     # R30TransformXyzrhwVertices before the paired path.
     fast_branch = pair.split("bool leftFull = false;", 1)[0]
     assert source.count(fast_branch) == 1
     for before, after in (
-        ("if (!state.worldEffect && !usedMask)", "if (!state.worldEffect)"),
+        ("if (!state.worldEffect)", "if (true)"),
         ("dst[1] = transformedY;", "dst[1] = src[1];"),
         ("hudScaleX * state.eyeScale[1]", "hudScaleX * state.eyeScale[0]"),
         ("eyeScaleX[eye] * ndcX + state.eyeOffset[eye]", "eyeScaleX[eye] * ndcX"),
@@ -134,12 +168,19 @@ def validate_hud_pair_structure(source: str) -> None:
     )[0]
     fast_branch = pair.split("bool leftFull = false;", 1)[0]
     for required in (
-        "if (!state.worldEffect && !usedMask)",
+        "if (!state.worldEffect)",
         "dst[1] = transformedY;",
         "hudScaleX * state.eyeScale[1]",
         "eyeScaleX[eye] * ndcX + state.eyeOffset[eye]",
         "!std::isfinite(src[2]) || !std::isfinite(src[3])",
         "bytes > 4u * 1024u * 1024u",
+    ):
+        assert required in fast_branch, required
+    for required in (
+        "(usedMask && usedMask->size() < vertexCount)",
+        "if (usedMask && !(*usedMask)[i])",
+        "if (!sparseCopied)",
+        "std::memcpy(right.data() + offset,",
     ):
         assert required in fast_branch, required
 

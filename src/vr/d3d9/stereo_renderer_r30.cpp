@@ -2506,18 +2506,17 @@ namespace OutRunVRStereo
             std::vector<std::uint8_t>& right,
             const std::vector<std::uint8_t>* usedMask = nullptr) noexcept
         {
-            // Ordinary (non-indexed) screen HUD draws require no 3D reprojection.
-            // Both eyes read the same XYZRHW source and preserve Z/RHW, UV and
-            // colours. Transform them together: one source walk, one viewport
-            // conversion and one contain/FOV lookup rather than one per eye.
-            // Sparse indexed/world particles retain their proven fallback.
-            if (!state.worldEffect && !usedMask)
+            // Fuse both non-indexed and indexed ScreenHud eyes in one CPU walk.
+            // Preserve Z/RHW, UV, color and the original asymmetric FOV math;
+            // world/particle reprojection stays on the bilateral fallback.
+            if (!state.worldEffect)
             {
                 if (!source || !vertexCount || stride < sizeof(float) * 4)
                     return false;
                 const std::size_t bytes =
                     static_cast<std::size_t>(vertexCount) * stride;
-                if (!bytes || bytes > 4u * 1024u * 1024u)
+                if (!bytes || bytes > 4u * 1024u * 1024u ||
+                    (usedMask && usedMask->size() < vertexCount))
                     return false;
                 const float x0 = static_cast<float>(state.viewport.X);
                 const float y0 = static_cast<float>(state.viewport.Y);
@@ -2537,8 +2536,49 @@ namespace OutRunVRStereo
                 {
                     return false;
                 }
-                std::memcpy(left.data(), source, bytes);
-                std::memcpy(right.data(), source, bytes);
+                // Sparse indexed HUD reads only referenced vertices. Avoid
+                // two full-span copies on lightly used VB/IB regions; both
+                // eyes share one reference mask and one contiguous-run scan.
+                bool sparseCopied = false;
+                if (usedMask && vertexCount >= 64u)
+                {
+                    const auto selectedCount = std::count_if(
+                        usedMask->begin(), usedMask->begin() + vertexCount,
+                        [](std::uint8_t selected) noexcept {
+                            return selected != 0;
+                        });
+                    if (static_cast<std::size_t>(selectedCount) * 4u <= vertexCount)
+                    {
+                        const auto* srcBytes =
+                            static_cast<const std::uint8_t*>(source);
+                        UINT cursor = 0;
+                        while (cursor < vertexCount)
+                        {
+                            while (cursor < vertexCount && !(*usedMask)[cursor])
+                                ++cursor;
+                            const UINT begin = cursor;
+                            while (cursor < vertexCount && (*usedMask)[cursor])
+                                ++cursor;
+                            if (begin != cursor)
+                            {
+                                const std::size_t offset =
+                                    static_cast<std::size_t>(begin) * stride;
+                                const std::size_t runBytes =
+                                    static_cast<std::size_t>(cursor - begin) * stride;
+                                std::memcpy(left.data() + offset,
+                                    srcBytes + offset, runBytes);
+                                std::memcpy(right.data() + offset,
+                                    srcBytes + offset, runBytes);
+                            }
+                        }
+                        sparseCopied = true;
+                    }
+                }
+                if (!sparseCopied)
+                {
+                    std::memcpy(left.data(), source, bytes);
+                    std::memcpy(right.data(), source, bytes);
+                }
                 float hudScaleX = 1.0f;
                 float hudScaleY = 1.0f;
                 R30HudContainScale(state.stereo, hudScaleX, hudScaleY);
@@ -2550,6 +2590,8 @@ namespace OutRunVRStereo
                 };
                 for (UINT i = 0; i < vertexCount; ++i)
                 {
+                    if (usedMask && !(*usedMask)[i])
+                        continue;
                     const std::size_t offset =
                         static_cast<std::size_t>(i) * stride;
                     const auto* src = reinterpret_cast<const float*>(
