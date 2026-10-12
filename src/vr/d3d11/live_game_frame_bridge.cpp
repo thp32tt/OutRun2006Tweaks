@@ -1,6 +1,7 @@
 #include "live_game_frame_bridge.hpp"
 #include "live_game_primitive_span.hpp"
 #include "live_game_fvf_layout.hpp"
+#include "live_game_stage0_blend.hpp"
 #include "native_backend.hpp"
 #include "packed_texture_16bit.hpp"
 
@@ -20,6 +21,9 @@
 namespace outrun::vr::dx11::live_game_frame {
 namespace {
 using Microsoft::WRL::ComPtr;
+static_assert(kGameStage0BlendDiffuseAlpha == D3DTOP_BLENDDIFFUSEALPHA &&
+              kGameStage0BlendCurrentAlpha == D3DTOP_BLENDCURRENTALPHA,
+              "Portable stage0 blend op constants must match the D3D9 SDK");
 static_assert(kGameFvfXyz == D3DFVF_XYZ && kGameFvfXyzRhw == D3DFVF_XYZRHW &&
               kGameFvfDiffuse == D3DFVF_DIFFUSE && kGameFvfTex1 == D3DFVF_TEX1 &&
               kGameFvfNormal == D3DFVF_NORMAL &&
@@ -1501,6 +1505,17 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         const bool validMipBias = std::isfinite(decodedMipBias) &&
                                  decodedMipBias >= kMinMipLodBias &&
                                  decodedMipBias <= kMaxMipLodBias;
+        // Fixed-function stage 0 CURRENT is the incoming vertex DIFFUSE.
+        // With stage 1 disabled and RESULTARG=CURRENT (enforced above),
+        // BLENDCURRENTALPHA is pixel-identical to the already supported
+        // BLENDDIFFUSEALPHA native shaders. Normalize color and alpha
+        // independently before the existing operand/variant/fallback gate.
+        // In other stages or without game-authored diffuse, fail closed.
+        const bool stage0CurrentIsDiffuse =
+            layout.hasDiffuse && nextColorOp == D3DTOP_DISABLE &&
+            resultArg == D3DTA_CURRENT;
+        op = canonical_game_stage0_blend_alpha_op(op, stage0CurrentIsDiffuse);
+        alphaOp = canonical_game_stage0_blend_alpha_op(alphaOp, stage0CurrentIsDiffuse);
         // Full CPU-readable mip chain required; aniso and invalid inputs
         // retain the original D3D9 Draw path without native promotion.
         // Reject complement/alpha-replicate modifiers and projected coordinates.

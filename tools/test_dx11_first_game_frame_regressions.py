@@ -1691,6 +1691,10 @@ def main() -> None:
             assert mutant != probe_source and not float4_uv_native_linked(bridge, layout_source, mutant)
     print("DX11 packed float4 UV native menu/race Draw regression PASS (static only)")
 
+    # 00616: real game stage0 CURRENT alpha shares validated DIFFUSE alpha PS.
+    from test_dx11_stage0_current_alpha_00616 import main as run_00616
+    run_00616()
+
     # 00558: real game-authored D3D9 stage0 BLENDTEXTUREALPHA /
     # BLENDDIFFUSEALPHA -> owned native PS -> Draw/DrawIndexed -> opt-in inset.
     # Checks source-to-consumer links, shader/reset lifecycle and fail-closed
