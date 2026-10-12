@@ -1404,8 +1404,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             (rgbNeedsDiffuse && !arg2Diffuse) ||
             ((alphaNeedsDiffuse && !alphaArg2Diffuse) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha) ||
             coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb ||
-            (addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP) ||
-            (addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP) ||
+            (addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP &&
+             addressU != D3DTADDRESS_MIRROR && addressU != D3DTADDRESS_MIRRORONCE) ||
+            (addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP &&
+             addressV != D3DTADDRESS_MIRROR && addressV != D3DTADDRESS_MIRRORONCE) ||
             (mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR) ||
             (min != D3DTEXF_POINT && min != D3DTEXF_LINEAR) ||
             ((mip != D3DTEXF_NONE && mip != D3DTEXF_POINT) && mip != D3DTEXF_LINEAR) ||
@@ -1731,10 +1733,21 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                 D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR :
                 D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR);
     }
-    state.AddressU = capture.addressU == D3DTADDRESS_WRAP ?
-        D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
-    state.AddressV = capture.addressV == D3DTADDRESS_WRAP ?
-        D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
+    // D3D9 game/menu UVs may reflect outside [0,1]. Preserve their
+    // addressing semantics through the native pixel sampler; never silently
+    // clamp an unknown D3D9 state, which would mislabel a diagnostic frame.
+    const auto translateAddress = [](D3DTEXTUREADDRESS address) noexcept {
+        switch (address) {
+        case D3DTADDRESS_WRAP: return D3D11_TEXTURE_ADDRESS_WRAP;
+        case D3DTADDRESS_CLAMP: return D3D11_TEXTURE_ADDRESS_CLAMP;
+        case D3DTADDRESS_MIRROR: return D3D11_TEXTURE_ADDRESS_MIRROR;
+        case D3DTADDRESS_MIRRORONCE: return D3D11_TEXTURE_ADDRESS_MIRROR_ONCE;
+        default: return static_cast<D3D11_TEXTURE_ADDRESS_MODE>(0);
+        }
+    };
+    state.AddressU = translateAddress(capture.addressU);
+    state.AddressV = translateAddress(capture.addressV);
+    if (!state.AddressU || !state.AddressV) return false;
     state.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
     state.MinLOD = 0.0f;
     state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;

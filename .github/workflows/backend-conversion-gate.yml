@@ -153,6 +153,11 @@ jobs:
         shell: pwsh
         run: python tools/test_dx11_native_mip_linear_00590.py
 
+      - name: Verify DX11 game reflected UV sampler 00591
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_native_address_mirror_00591.py
+
       - name: Verify DX11 source graph
         shell: pwsh
         run: python tools/verify_dx11_source_graph.py
