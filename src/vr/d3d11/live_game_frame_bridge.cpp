@@ -1327,9 +1327,12 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // Newly supported complement pairs use different but exact ADD-only
         // OM descriptors. Keep original legacy allowlist text intact so
         // older destructive mutations still exercise their own factors.
-        if (inverseDestMultiply || inverseSourceMultiply ||
-            destAlphaCrossfade || reverseDestAlphaCrossfade) {
-            // Admitted above only when separate alpha is off and op is ADD.
+        if (inverseDestMultiply || inverseSourceMultiply) {
+            // Original 00606 allowlist remains independent, preserving its
+            // per-pair negative regression checks and original D3D9 fallback.
+        } else if (destAlphaCrossfade || reverseDestAlphaCrossfade) {
+            // Both dest-alpha crossfades were attested as ADD/non-separate
+            // above and use their own forward/reverse native OM descriptors.
         } else if (!premultipliedAlpha && !multiply &&
             !sourceAlphaCopy && !sourceReplace &&
             !inverseAlphaCopy && !inverseAlphaAdd &&
