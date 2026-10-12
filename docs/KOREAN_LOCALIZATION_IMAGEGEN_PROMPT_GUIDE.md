@@ -1,3 +1,9 @@
+## 2026-10-12 USER OVERRIDE: A/B HD original DDS→READABLE PNG→native ChatGPT ImageGen; C1 batch QA; NO C2 TAB
+
+**APPLY FIRST**: docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md. This later user policy supersedes older A native font/vector production, B/C1 mod4 generation split, C1 production, C2 active independent QA/tab/schedule and single-glyph-only input restrictions. A owns odd HD-source ImageGen; B owns even HD-source ImageGen; C1 performs independent lightweight batch QA for 4–8 saved DDS candidates per run, no generation; C2 is retired (historic evidence preserved, no tab). Actual HD DDS READABLE PNG upload in ChatGPT message is mandatory, not just a GitHub display. Restore original UI cell coordinates and preserved nontext pixels, original DDS format/mips/orientation. FAIL unreadable/misspelled Hangul, UI cell overflow/clipping/collisions, protected damage and corrupted saved DDS; ACCEPT minor style/space differences. Do not fake legacy C2 approval or actual user game pass; unresolved legacy approval gate needs explicit migration. RUNTIME_VALIDATION=UNTESTED unless tested.
+
+---
+
 
 ## 2026-10-12 ImageGen English-letter-only input binding — user correction (HARD STOP)
 

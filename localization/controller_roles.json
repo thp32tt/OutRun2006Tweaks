@@ -1,108 +1,75 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "branch": "korean-localization-recovery-20260928",
   "contract": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+  "active_policy": "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md",
   "command_map": {
     "A": "OutRun 한글화 A 실행",
     "B": "OutRun 한글화 B 실행",
-    "C": "OutRun 한글화 C 실행",
-    "C1": "OutRun 한글화 C1 실행",
-    "C2": "OutRun 한글화 C2 실행"
+    "C1": "OutRun 한글화 C1 실행"
   },
+  "controller_tab_order": [
+    "A",
+    "B",
+    "C1"
+  ],
+  "excluded_tabs": [
+    "C2"
+  ],
   "schedule": {
     "A": ":00",
+    "B": ":30",
     "C1": [
       ":10",
       ":40"
-    ],
-    "C2": [
-      ":20",
-      ":50"
-    ],
-    "B": ":30"
+    ]
   },
   "lanes": {
     "A": {
-      "mode": "production+self_qa",
-      "primary_index_parity": "odd"
+      "mode": "hd_source_dds_png_chatgpt_native_imagegen_production_and_self_qa",
+      "primary_index_parity": "odd",
+      "independent_qa_owner": "C1"
     },
     "B": {
-      "mode": "production+self_qa",
-      "primary_index_parity": "even_mod4_0_new_unclaimed"
-    },
-    "C": {
-      "mode": "cross_lane_final_qa+approval",
-      "primary_index_parity": "all"
+      "mode": "hd_source_dds_png_chatgpt_native_imagegen_production_and_self_qa",
+      "primary_index_parity": "even_existing_owner_respected",
+      "independent_qa_owner": "C1"
     },
     "C1": {
-      "mode": "chatgpt_imagegen_production+self_qa",
-      "primary_index_parity": "even_mod4_2_new_unclaimed",
-      "includes_unindexed_special": false,
-      "docker_slot": "C",
-      "output_prefix": "localization/graphics/role_C1/imagegen_requests",
-      "independent_qa_owner": "C2"
-    },
-    "C2": {
-      "mode": "all_producer_independent_final_qa+independent_c3",
+      "mode": "batch_independent_lightweight_qa_only",
       "primary_index_parity": "all",
-      "includes_unindexed_special": true,
-      "docker_slot": "D",
+      "batch_min": 4,
+      "batch_max": 8,
+      "allow_smaller_batch_when_fewer_pending": true,
+      "docker_slot": "C",
       "producer_sources": [
         "A",
-        "B",
-        "C1"
-      ]
+        "B"
+      ],
+      "image_generation_enabled": false,
+      "new_dds_production_enabled": false
     }
   },
-  "queue_source": "localization/graphics/asset_queue.csv",
-  "priorities": [
-    "OPEN_USER_INGAME_FAIL_P0",
-    "OPEN_USER_INGAME_FAIL_P1",
-    "REWORK_REQUIRED",
-    "C_CHANGED_NEW_CANDIDATE",
-    "HOLD_STRICT_RECHECK_FOR_EVIDENCE",
-    "unfinished_localize_text",
-    "zoom_review_localizable_text",
-    "C3_STRICT_AUDIT_IF_NO_FRESH_C",
-    "other_pending"
-  ],
-  "zero_pixel_overflow": true,
-  "missing_evidence_status": "HOLD_STRICT_RECHECK",
-  "controller_prompt_policy": "Keep prompts minimal; workflow rules live in Git. Do not duplicate contract logic in Docker or ChatGPT Project instructions.",
-  "work_steal": {
-    "enabled": false,
-    "reason": "Avoid concurrent producer overlap during B/C1 ImageGen split; existing explicit owners remain authoritative."
+  "legacy_C2": {
+    "status": "DISABLED_NO_TAB_NO_SCHEDULE",
+    "historical_evidence": "READ_ONLY",
+    "new_pass_allowed": false
   },
-  "controller_mode": "production_first_imagegen_B_C1",
-  "controller_policy_source": "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+  "queue_source": "localization/graphics/asset_queue.csv",
   "user_ingame_backlog": "localization/graphics/INGAME_REWORK_BACKLOG.csv",
   "quality_pipeline": "docs/KOREAN_LOCALIZATION_QUALITY_PIPELINE.md",
   "evidence_gate": "docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md",
-  "user_ingame_review": "docs/KOREAN_LOCALIZATION_INGAME_REVIEW_20261009.md",
-  "approval_veto": "Current user in-game defect OPEN or REWORK/HOLD/FAIL => no current approval or preview distribution; actual user retest required.",
-  "source_refresh": "Every task fetches latest GitHub contract, queue, backlog, QA pipeline and evidence rules before selection and verifies latest HEAD before commit.",
-  "policy_note": "2026-10-11 latest user decision: A native/manual odd; B + C1 real ImageGen distinct unclaimed even mod4 shards; C2 independent QA for all. Preserve in-flight and assigned P0/P1 ownership. GitHub contract authoritative.",
-  "shared_production_inputs": {
-    "contract": "docs/KOREAN_LOCALIZATION_PLATE_LIBRARY.md",
-    "library": "localization/graphics/plate_library",
-    "entrypoint": "tools/localization/plate_library.py",
-    "psd_extractor": "tools/localization/extract_psd_plate.py",
-    "reuse_key": [
-      "queue_index",
-      "source_sha256",
-      "region_id",
-      "orientation"
-    ],
-    "new_dds_approval_inherited": false
-  },
-  "glyph_scale_policy": "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
-  "glyph_scale_applies_to": [
-    "A",
-    "B",
-    "C1",
-    "C2",
-    "C3",
-    "PRE_INGAME"
-  ],
-  "glyph_scale_rule": "whole_sentence_width_height_aspect_and_letter_count_are_non_blocking; inspect_each_hangul_glyph_readability_and_strict_source_bbox_ceiling"
+  "source": "canonical_HD_DDS_READABLE_PNG_actual_uploaded_into_ChatGPT_ImageGen",
+  "fit": "original_HD_UI_cell_ROI_preserve_aspect_and_protected_original_pixels",
+  "zero_pixel_overflow": true,
+  "zero_pixel_overflow_scope": "actual_HD_UI_cell_and_adjacent_protected_art_not_exact_english_glyph_bbox",
+  "qa_policy": "block_critical_display_defects_allow_cosmetic_variance",
+  "RUNTIME_VALIDATION": "UNTESTED_unless_game_run",
+  "approval_veto": "Do not forge historic C2 PASS; migrate legacy evidence code explicitly before official promotion",
+  "historical_signoffs": "C2/C3 records preserved not new work",
+  "controller_mode": "A_B_native_ChatGPT_ImageGen_C1_batch_QA_no_C2",
+  "source_refresh": "Always read latest HEAD/contract/HD policy/queue and verify remote HEAD",
+  "work_steal": {
+    "enabled": false
+  }
 }
