@@ -1,3 +1,17 @@
+## 2026-10-12 13:33 KST 재시작 정책 — 현행 규칙 우선
+
+현행 정본은 `docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md`와
+`localization/controller_roles.json`이다. A/B=HD 원본 기반 내장 이미지 생성,
+C1=4~8개 독립 QA, C2=폐지. 전체 atlas 입력 허용, 혼합 방향은 sprite별 정방향 ROI.
+검수 경계는 검증된 실제 UI cell/UV 안전영역이며 옛 영문 효과 bbox 상한은 대체한다.
+**도커 배포·재시작·자동 전송 활성화·게임 패치 배포는 사용자가 수동 실행한다.**
+아래 과거 지시 중 A 폰트 생산/C1 생산/C2 신규 승인/유료 API 자동 대체/옛 bbox 규칙은
+역사적 참고일 뿐 실행 지시가 아니다. 원본 보호·CLEAN·한글 정확성·저장 DDS 무결성·
+실게임 불량 OPEN은 유지한다. 기존 코드의 C2/lettering_recipe gate를 우회하지 않는다.
+새 C1 판정은 별도 기록하며 미이관 consumer는 TEST_ONLY/HOLD로 명시한다.
+
+---
+
 # 한글화 공통 글자별 크기·번역 길이 검수 정책
 
 ## 2026-10-11 QA 수렴·실게임 시험 분리 정책 (최신 사용자 결정)

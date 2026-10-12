@@ -1,3 +1,17 @@
+## 2026-10-12 13:33 KST 재시작 정책 — 현행 규칙 우선
+
+현행 정본은 `docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md`와
+`localization/controller_roles.json`이다. A/B=HD 원본 기반 내장 이미지 생성,
+C1=4~8개 독립 QA, C2=폐지. 전체 atlas 입력 허용, 혼합 방향은 sprite별 정방향 ROI.
+검수 경계는 검증된 실제 UI cell/UV 안전영역이며 옛 영문 효과 bbox 상한은 대체한다.
+**도커 배포·재시작·자동 전송 활성화·게임 패치 배포는 사용자가 수동 실행한다.**
+아래 과거 지시 중 A 폰트 생산/C1 생산/C2 신규 승인/유료 API 자동 대체/옛 bbox 규칙은
+역사적 참고일 뿐 실행 지시가 아니다. 원본 보호·CLEAN·한글 정확성·저장 DDS 무결성·
+실게임 불량 OPEN은 유지한다. 기존 코드의 C2/lettering_recipe gate를 우회하지 않는다.
+새 C1 판정은 별도 기록하며 미이관 consumer는 TEST_ONLY/HOLD로 명시한다.
+
+---
+
 ## 2026-10-12 USER OVERRIDE: A/B HD original DDS→READABLE PNG→native ChatGPT ImageGen; C1 batch QA; NO C2 TAB
 
 **APPLY FIRST**: docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md. This later user policy supersedes older A native font/vector production, B/C1 mod4 generation split, C1 production, C2 active independent QA/tab/schedule and single-glyph-only input restrictions. A owns odd HD-source ImageGen; B owns even HD-source ImageGen; C1 performs independent lightweight batch QA for 4–8 saved DDS candidates per run, no generation; C2 is retired (historic evidence preserved, no tab). Actual HD DDS READABLE PNG upload in ChatGPT message is mandatory, not just a GitHub display. Restore original UI cell coordinates and preserved nontext pixels, original DDS format/mips/orientation. FAIL unreadable/misspelled Hangul, UI cell overflow/clipping/collisions, protected damage and corrupted saved DDS; ACCEPT minor style/space differences. Do not fake legacy C2 approval or actual user game pass; unresolved legacy approval gate needs explicit migration. RUNTIME_VALIDATION=UNTESTED unless tested.
@@ -424,4 +438,5 @@ C3 MUST compare the canonical English source, verified clean plate, and current 
 - Use `C3_STRICT_PASS` only when all ordered visual checks and the existing numeric/containment gates pass for the same candidate SHA.
 - C3_STRICT_PASS is **not** runtime validation and does not close any user in-game backlog. Keep `RUNTIME_VALIDATION=UNTESTED` or the existing pending-in-game state until an actual game retest exists.
 - Record candidate SHA, canonical source SHA/provenance, clean-plate evidence, prior C-pass provenance, FLIP-Y+RAW review evidence, C3 result and failure reason in the C role report/WORKLOG. Third-stage PASS is QA hardening, not a new production completion and must not be counted as a newly produced DDS.
+
 
