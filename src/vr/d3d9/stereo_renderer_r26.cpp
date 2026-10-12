@@ -593,14 +593,26 @@ namespace OutRunVRStereo
         HRESULT R27GuardWorldEffect(IDirect3DDevice9* device,
             R9Draw&& r9Draw, LegacyR13Draw&& legacyR13Draw)
         {
-            // R27's per-eye world policy cannot apply outside seeded game
-            // backbuffer stereo. Avoid five effect-state reads on mono/aux draws.
-            // Explicit shader tracing must still see every original draw.
-            if (!OutRunVR::GplShaderFingerprint::TraceEnabled() &&
+            // Avoid live R13 effect-state reads on the verified-world path:
+            // R28's WVP/projection/pose proof is independent of those reads.
+            // Preserve original pre-draw capture when GPL shader tracing is on.
+            const bool traceShaderFingerprint =
+                OutRunVR::GplShaderFingerprint::TraceEnabled();
+            if (!traceShaderFingerprint &&
                 (!IsGameDevice(device) || InternalStereoPass ||
                  !TargetIsBackBuffer() || !StereoWanted() || !R9StereoSeeded))
                 return legacyR13Draw();
 
+            if (!traceShaderFingerprint)
+            {
+                const HRESULT rebound = R28RunWithVerifiedWorldEpoch(
+                    device, std::forward<R9Draw>(r9Draw));
+                if (rebound != E_NOTIMPL)
+                    return rebound;
+            }
+
+            // A failed R28 proof has not submitted a draw. The conservative
+            // R13 fallback still snapshots effect state exactly once.
             const R13EffectSnapshot effect = R13CaptureDrawTimeEffect(device);
             R46TraceShaderFingerprint(device, effect);
             auto legacyWithSnapshot = [&]() {
@@ -608,15 +620,15 @@ namespace OutRunVRStereo
                 return legacyR13Draw();
             };
 
-            // Positive renderer evidence outranks ZENABLE. OutRun disables Z
-            // for legitimate perspective sky/cloud and some billboard passes;
-            // forcing those to zero-disparity made them follow the headset.
-            // R28 proves c64..c67, projection, pose generation and perspective
-            // semantics before allowing the world path.
-            const HRESULT rebound = R28RunWithVerifiedWorldEpoch(
-                device, std::forward<R9Draw>(r9Draw));
-            if (rebound != E_NOTIMPL)
-                return rebound;
+            // Tracing requires its original before-draw effect snapshot.
+            // Run R28 here only in that opt-in diagnostic mode.
+            if (traceShaderFingerprint)
+            {
+                const HRESULT rebound = R28RunWithVerifiedWorldEpoch(
+                    device, std::forward<R9Draw>(r9Draw));
+                if (rebound != E_NOTIMPL)
+                    return rebound;
+            }
 
             // Screen-space veto remains conservative: unknown state fails closed.
             // Only the positively verified-world path above may bypass it.
