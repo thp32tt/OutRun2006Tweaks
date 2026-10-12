@@ -364,30 +364,36 @@ namespace OutRunVRStereo
             }
 
             const auto semanticScope = OutRunVR::GameSemantic::EffectiveScope();
-            if (OutRunVR::GameSemantic::ForceZeroDisparity(semanticScope))
+            const bool forceZeroDisparity =
+                OutRunVR::GameSemantic::ForceZeroDisparity(semanticScope);
+            // R27's no-snapshot overload calls R13CaptureDrawTimeEffect
+            // (several live D3D9 GetRenderState reads). The original
+            // corroborated-world path could perform the same failed probe
+            // twice in one draw. Nothing mutates device state between them.
+            bool worldGateChecked = false;
+            if (forceZeroDisparity)
             {
-                // Exact original-game post-process ownership beats a generic
-                // perspective-looking signature, but only after all stable
-                // main-backbuffer/depth safety gates above have passed.
+                // Exact post-process/ScreenHud ownership is an explicit veto;
+                // do not let the generic depth-effect retry override it.
                 fragile = true;
             }
-            else if (OutRunVR::GameSemantic::CorroboratesWorld(semanticScope) &&
-                R27ShouldBypassLegacyZeroDisparity(device))
+            else if (OutRunVR::GameSemantic::CorroboratesWorld(semanticScope))
             {
-                // Particle/attached-world semantics are corroborating evidence,
-                // never sole authority: the proven R27 WVP gate must agree.
-                fragile = false;
-                ++R29FragileWorldRetries;
+                worldGateChecked = true;
+                if (R27ShouldBypassLegacyZeroDisparity(device))
+                {
+                    // Still require the proven R27 world gate. A failed
+                    // candidate must not retry identical live state reads.
+                    fragile = false;
+                    ++R29FragileWorldRetries;
+                }
             }
 
-            // R29 originally forced every depth-disabled two-sided alpha draw
-            // to zero disparity here. That is too broad for OutRun: smoke,
-            // skid/decal billboards and the white floating position glyphs can
-            // be alpha/depth-disabled while still carrying the verified world
-            // WVP. Let the proven R27 gate try the unmasked R7 classifier first.
-            // If the WVP is not actually verified, R7 still fails closed to
-            // NonWorld/stock constants, so screen HUD remains safe.
-            if (fragile && R27ShouldBypassLegacyZeroDisparity(device))
+            // Depth-disabled world smoke/sand may still carry a verified WVP.
+            // For untagged draws, retain exactly one conservative R27 probe;
+            // forced-zero semantic draws never enter this world fallback.
+            if (fragile && !forceZeroDisparity && !worldGateChecked &&
+                R27ShouldBypassLegacyZeroDisparity(device))
             {
                 fragile = false;
                 ++R29FragileWorldRetries;

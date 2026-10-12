@@ -37,6 +37,7 @@ def contract(s):
     stencil_owner = body(s, "bool R29OwnerLeftDrawMayWriteStencil(")
     effect_state = body(s, "struct R29EffectState")
     stereo = body(s, "HRESULT R29DirectTwoEye(")
+    world = body(s, "HRESULT R29GuardStableDraw(")
     return all((
         "StateBlockTracker::Reliable()" in cache,
         "StateBlockTracker::Recording()" in cache,
@@ -47,6 +48,21 @@ def contract(s):
         "R29Effect.presentEpoch == PresentEpoch" in cache,
         "TopLevelDrawSerial() >= R29Effect.drawSerial" in cache,
         "TopLevelDrawSerial() - R29Effect.drawSerial < 64" not in cache,
+        # Hot world-effect draws issue at most one expensive R13 live
+        # snapshot, while exact HUD/post-process ownership always vetoes
+        # even a generic R27 world classification.
+        "const bool forceZeroDisparity =" in world,
+        "OutRunVR::GameSemantic::ForceZeroDisparity(semanticScope);" in world,
+        "bool worldGateChecked = false;" in world,
+        "else if (OutRunVR::GameSemantic::CorroboratesWorld(semanticScope))" in world,
+        "worldGateChecked = true;" in world,
+        "if (R27ShouldBypassLegacyZeroDisparity(device))" in world,
+        "if (fragile && !forceZeroDisparity && !worldGateChecked &&" in world,
+        world.count("R27ShouldBypassLegacyZeroDisparity(device)") == 2,
+        world.index("bool worldGateChecked = false;") <
+            world.index("worldGateChecked = true;") <
+            world.index("if (fragile && !forceZeroDisparity && !worldGateChecked &&"),
+        "R29DirectTwoEye(device" in world,
         "R29EffectCacheCurrent()" in sync,
         "if (!device || OutRunVR::State::StateBlockTracker::Recording())" in sync,
         "const auto applyGenerationBefore =" in sync,
@@ -170,6 +186,49 @@ mutations = [
     ("stencil direct stereo owner",
      "R29OwnerLeftDrawMayWriteStencil(device))", "LeftDrawMayWriteStencil(device))"),
 ]
+# The hotpath's exact guards must reject disabled HUD vetoes, lost
+# one-probe fencing, and reintroduced unconditional duplicated reads.
+mutations += [
+    ("R29 forced post-process veto",
+     "if (fragile && !forceZeroDisparity && !worldGateChecked &&",
+     "if (fragile && !worldGateChecked &&"),
+    ("R29 duplicate-world probe",
+     "if (fragile && !forceZeroDisparity && !worldGateChecked &&",
+     "if (fragile && !forceZeroDisparity &&"),
+    ("R29 missing probe stamp",
+     "worldGateChecked = true;", "worldGateChecked = false;"),
+    ("R29 missing semantic gate",
+     "else if (OutRunVR::GameSemantic::CorroboratesWorld(semanticScope))",
+     "else if (true)"),
+    ("R29 missing exact semantic veto",
+     "OutRunVR::GameSemantic::ForceZeroDisparity(semanticScope);",
+     "false;"),
+]
+# Model each semantic/effect branch: corroborated world must never query
+# twice; explicit ForceZero beats generic world evidence; untagged fragile
+# candidates are probed once and may graduate only on positive R27 proof.
+for fragile_initial in (False, True):
+    for forced in (False, True):
+        for corroborated in (False, True):
+            for world_proof in (False, True):
+                fragile = fragile_initial
+                probes = 0
+                checked = False
+                if forced:
+                    fragile = True
+                elif corroborated:
+                    checked = True
+                    probes += 1
+                    if world_proof:
+                        fragile = False
+                if fragile and not forced and not checked:
+                    probes += 1
+                    if world_proof:
+                        fragile = False
+                assert probes <= 1
+                assert not forced or (fragile and probes == 0)
+                assert not (corroborated and not forced) or probes == 1
+
 for name, before, after in mutations:
     if src.count(before) != 1:
         errors.append("bad mutation fixture: " + name)
@@ -178,4 +237,4 @@ for name, before, after in mutations:
 if errors:
     print("FAIL " + ", ".join(errors), file=sys.stderr)
     sys.exit(1)
-print(f"PASS R29 single-Present effect cache, positive/negative depth-write fastpath, stencil-disabled write fastpath, and {len(mutations)} negative mutations")
+print(f"PASS R29 single-Present effect cache, positive/negative depth-write fastpath, stencil-disabled write fastpath, and {len(mutations)} negative mutations plus 16 semantic/effect branch combinations")
