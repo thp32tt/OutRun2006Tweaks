@@ -36,6 +36,7 @@
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
 #include "runtime/desktop_capture_reuse.hpp"
+#include "runtime/direct_hold_frame_reuse.hpp"
 #include "runtime/theater_capture_reuse.hpp"
 #include "runtime/cadence_presented_wait.hpp"
 #include "runtime/cadence_schedule.hpp"
@@ -328,6 +329,7 @@ namespace
         UINT arraySize = 0;
         std::uint32_t frameId = 0;
         std::uint32_t generation = 0;
+        OutRunVrDirectHoldReuse::FrameKey copiedFrame{};
         bool valid = false;
 
         ~R23DirectHoldState()
@@ -370,6 +372,8 @@ namespace
             descriptor = {};
     }
 
+    std::uint64_t R23HoldCopyPairs = 0;
+    std::uint64_t R23HoldCopyReuseHits = 0;
     bool R23FirstDirectHoldLogged = false;
     bool R36FirstDirectBootstrapLogged = false;
     std::array<std::uint32_t, OutRunVR::RenderFrameRingSize>
@@ -398,6 +402,7 @@ namespace
         R23DirectHold.arraySize = 0;
         R23DirectHold.frameId = 0;
         R23DirectHold.generation = 0;
+        R23DirectHold.copiedFrame = {};
         R23DirectHold.valid = false;
     }
 
@@ -405,6 +410,7 @@ namespace
     {
         R23DirectHold.frameId = 0;
         R23DirectHold.generation = 0;
+        R23DirectHold.copiedFrame = {};
         R23DirectHold.valid = false;
     }
 
@@ -463,11 +469,33 @@ namespace
             R23DirectHold.format = left.Format;
         }
 
+        // A projection retry of the exact same immutable producer frame must
+        // not queue a second pair of full-eye GPU copies. This is only valid
+        // while the hold textures and BOTH shared source objects are unchanged;
+        // Reset, re-open, another slot/run, or a changed frame must copy anew.
+        const OutRunVrDirectHoldReuse::FrameKey incoming{
+            frame.frameId, slot, generation,
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex],
+            frame.clientPid,
+            frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex],
+            frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex],
+            reinterpret_cast<std::uintptr_t>(c.directLeft_[slot]),
+            reinterpret_cast<std::uintptr_t>(c.directRight_[slot])
+        };
+        if (!recreate && OutRunVrDirectHoldReuse::CanReuse(
+                R23DirectHold.valid, R23DirectHold.copiedFrame, incoming))
+        {
+            ++R23HoldCopyReuseHits;
+            return true;
+        }
+
         // Immediate-context ordering guarantees that both copies execute before
         // the following projection draw samples this host-owned pair. The R32
         // EVENT fence then covers the copy + projection work before producer ACK.
         c.context_->CopyResource(R23DirectHold.eye[0], c.directLeft_[slot]);
         c.context_->CopyResource(R23DirectHold.eye[1], c.directRight_[slot]);
+        ++R23HoldCopyPairs;
+        R23DirectHold.copiedFrame = incoming;
         R23DirectHold.frameId = frame.frameId;
         R23DirectHold.generation = generation;
         R23DirectHold.valid = true;
