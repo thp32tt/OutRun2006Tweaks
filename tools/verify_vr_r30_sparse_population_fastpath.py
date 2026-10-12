@@ -134,7 +134,16 @@ def main():
     )
     for old, new in mutations:
         assert old in code
-        assert not valid(code.replace(old, new, 1)), old
+        if old == "UINT knownUsedCount = 0;":
+            # The decode-cache structure also contains a field with this
+            # initializer. Mutate the UP draw's live counter, not metadata.
+            start = code.index("HRESULT R30TryXyzrhwIndexedPrimitiveUP(")
+            end = code.index("HRESULT R30TryXyzrhwPrimitiveVB(", start)
+            assert old in code[start:end]
+            mutant = code[:start] + code[start:end].replace(old, new, 1) + code[end:]
+        else:
+            mutant = code.replace(old, new, 1)
+        assert not valid(mutant), old
     rng = random.Random(694)
     cases = 0
     for stride in (16, 20, 32, 48):
