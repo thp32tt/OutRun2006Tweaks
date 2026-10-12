@@ -128,6 +128,11 @@ jobs:
         shell: pwsh
         run: python tools/test_dx11_selectarg_blend_texture_alpha_00585.py
 
+      - name: Verify DX11 live SELECTARG BLENDDIFFUSEALPHA 00586
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_selectarg_blend_diffuse_alpha_00586.py
+
       - name: Verify DX11 source graph
         shell: pwsh
         run: python tools/verify_dx11_source_graph.py
