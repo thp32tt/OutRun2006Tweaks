@@ -11,9 +11,9 @@
   "work_key": "DX11:PM_RGB_COMPLEMENT_TEXTURE_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "9f5859c1f6e399e80397f59a10ea7296c46047ea",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -61,15 +61,15 @@
     "C0_RECOVER": "PASS HEAD and 00631 policy/claim",
     "C1_REVIEW": "PASS unsupported complemented alpha observed in native selector code",
     "C2_IMPLEMENT": "PASS C++ live capture, HLSL compile/native Draw, negative numeric tests",
-    "C3_VALIDATE": "FAIL on original material SHA: 00587 source-graph test and SAFE-RETURN legacy string; correction committed; revalidation pending exact SHA",
-    "C4_COMMIT": "Original source material 20ff6e576f2fb2e5ed6be22ef7aa5dbeb6e0ebe4; repair commit pending non-force CAS",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend #38305353595, DX11 Fast #38305353584, Windows Build #38305358160, OpenXR #38305358153 and HUD #38305358168 ALL SUCCESS on 81b5c4130e11507585390b87bbf9e4febd82a5b3",
+    "C4_COMMIT": "PASS: original material 20ff6e576f2fb2e5ed6be22ef7aa5dbeb6e0ebe4; repaired source regression exact-SHA validation-bearing 81b5c4130e11507585390b87bbf9e4febd82a5b3",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING CI; HMD/gamepad UNTESTED"
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED; runtime Quest3/VDXR/menu/race/gamepad UNTESTED"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Check exact-SHA GitHub Actions, fix real failures without weakening gate. HMD NEED_HMD_TEST.",
+  "next_action": "Completed 5/5 exact-SHA CI. Controller may allocate NEXT independent DX11 source feature; this task must not be rerun or rescored. Quest3/VDXR game screen, menu/vehicle/race, gamepad and safe fallback NEED_HMD_TEST.",
   "failure_recovery": {
     "first_material_sha": "20ff6e576f2fb2e5ed6be22ef7aa5dbeb6e0ebe4",
     "first_failures": [
@@ -87,5 +87,31 @@
       }
     ],
     "repair": "Update exact required conjunct in legacy destructive source-graph tests; retain all original predicates, negative mutations and numeric evidence"
+  },
+  "material_result_sha": "20ff6e576f2fb2e5ed6be22ef7aa5dbeb6e0ebe4",
+  "material_implementation_sha": "20ff6e576f2fb2e5ed6be22ef7aa5dbeb6e0ebe4",
+  "validation_bearing_result_sha": "81b5c4130e11507585390b87bbf9e4febd82a5b3",
+  "result_sha": "81b5c4130e11507585390b87bbf9e4febd82a5b3",
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 38305353595,
+      "conclusion": "SUCCESS"
+    },
+    "dx11_fast": {
+      "run_id": 38305353584,
+      "conclusion": "SUCCESS"
+    },
+    "win32_build": {
+      "run_id": 38305358160,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "run_id": 38305358153,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38305358168,
+      "conclusion": "SUCCESS"
+    }
   }
 }
