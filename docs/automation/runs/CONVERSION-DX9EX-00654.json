@@ -1,0 +1,62 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00654",
+  "production_id": "CONVERSION-DX9EX-00654",
+  "event_id": "CONVERSION-DX9EX-00654-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R23_DIRECTGPU_SLOT_DESCRIPTOR_VALIDATION_CACHE",
+  "initial_material_sha": "1b42ebb9ffb096f27724d93fcdb50fa43e05fab2",
+  "material_result_sha": "1b42ebb9ffb096f27724d93fcdb50fa43e05fab2",
+  "material_commits": [
+    "1b42ebb9ffb096f27724d93fcdb50fa43e05fab2"
+  ],
+  "result_sha": "1b42ebb9ffb096f27724d93fcdb50fa43e05fab2",
+  "validation_bearing_result_sha": "1b42ebb9ffb096f27724d93fcdb50fa43e05fab2",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Eliminate redundant per-frame D3D11 GetDesc calls for already validated DirectGPU eye slot textures on the OpenXR host hot path without weakening stereo-copy/ACK invariants.",
+    "acceptance": "Cache two-eye validated descriptor only after successful live checks, match both COM texture pointers, shared handles, transport/run generation, PID, extent and declared compositor format; invalidate on transport failure/session retire; retain stage order and add destructive-regression tests; pass exact-SHA DX9Ex Active, Domain Isolation and Full Source Impact.",
+    "runtime_metrics": "Quest3/VDXR FPS, p95/p99 frame timing and visual correctness require headset measurements, not inferred from CI."
+  },
+  "acceptance_results": [
+    {
+      "item": "R23_DIRECTGPU_DESCRIPTOR_CACHE_MATERIAL",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "C++ material SHA 1b42ebb9ffb096f27724d93fcdb50fa43e05fab2 modifies vrhost/src/main_r23.cpp: 2 GetDesc on first/new identity, 0 on trusted slot cache hit, invalidation on frame/transport identity changes, host-owned eye copies intact."
+    },
+    {
+      "item": "DIRECTGPU_DESC_REGRESSION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Existing tools/verify_vr_direct_hold_desc_fastpath.py expanded from 5 to 13 destructive mutations; DX9Ex policy test SUCCESS on exact SHA."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38196208467 policy/host/game/full-chain-compile/package 5/5 SUCCESS."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38196208420 SUCCESS."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38196208445 3/3 SUCCESS."
+    },
+    {
+      "item": "QUEST3_VDXR_RUNTIME",
+      "status": "UNTESTED",
+      "evidence": "No actual Quest3/VDXR gameplay or frame-time capture. Runtime promotion and FPS claims withheld."
+    }
+  ],
+  "notes": "C6 [skip ci] bookkeeping is independent of source/validation commit; do not re-run completed CI or award points for bookkeeping. DX11/DXVK/Localization branches untouched."
+}
