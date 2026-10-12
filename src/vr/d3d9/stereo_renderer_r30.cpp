@@ -2100,6 +2100,15 @@ namespace OutRunVRStereo
                 std::isfinite(rhwDet) &&
                 std::fabs(rhwDet) > 1.0e-6f;
 
+            // Projection ratios and viewport depth span remain invariant across
+            // this draw's referenced smoke/sand/decal vertices. Preserve the
+            // perspective-shape/finite guards and unusual-matrix fallback.
+            const float invRhw34 = rhwPerspectiveFastPath
+                ? 1.0f / rhwBase._34 : 0.0f;
+            const float invRhwDet = rhwPerspectiveFastPath
+                ? 1.0f / rhwDet : 0.0f;
+            const float invDepthSpan = 1.0f / depthSpan;
+
             auto selected = [&](UINT i) noexcept
             {
                 return !usedMask || (*usedMask)[i] != 0;
@@ -2168,7 +2177,7 @@ namespace OutRunVRStereo
                     if (rhwPerspectiveFastPath)
                     {
                         const float viewZ =
-                            (clipW - bp._44) / bp._34;
+                            (clipW - bp._44) * invRhw34;
                         const float rhsX =
                             clipX - viewZ * bp._31 - bp._41;
                         const float rhsY =
@@ -2179,10 +2188,10 @@ namespace OutRunVRStereo
                         {
                             const float viewX =
                                 (rhsX * bp._22 -
-                                 bp._21 * rhsY) / rhwDet;
+                                 bp._21 * rhsY) * invRhwDet;
                             const float viewY =
                                 (bp._11 * rhsY -
-                                 rhsX * bp._12) / rhwDet;
+                                 rhsX * bp._12) * invRhwDet;
                             if (std::isfinite(viewX) &&
                                 std::isfinite(viewY))
                             {
@@ -2200,7 +2209,7 @@ namespace OutRunVRStereo
                     if (!restored)
                     {
                         const float ndcZ =
-                            (screenZ - minZ) / depthSpan;
+                            (screenZ - minZ) * invDepthSpan;
                         if (!std::isfinite(ndcZ) ||
                             ndcZ < -0.25f || ndcZ > 1.25f)
                         {

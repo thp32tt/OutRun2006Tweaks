@@ -23,6 +23,7 @@ def valid(code: str) -> bool:
         predicate = code[gate:code.index("            auto selected =", gate)]
         basis = code[det:gate]
         full_body = code[full:code.index("                if (fullDrawOk && selectedVertices != 0)", full)]
+        ratios = code[gate:code.index("            auto selected =", gate)]
         return (hoist < det < gate < loop and
                 "rhwBase._11 * rhwBase._22 - rhwBase._21 * rhwBase._12" in basis and
                 all(x in predicate for x in (
@@ -33,8 +34,15 @@ def valid(code: str) -> bool:
                     "std::fabs(rhwBase._34) > 1.0e-5f",
                     "std::isfinite(rhwDet)",
                     "std::fabs(rhwDet) > 1.0e-6f")) and
+                "const float invRhw34 = rhwPerspectiveFastPath" in ratios and
+                "? 1.0f / rhwBase._34 : 0.0f;" in ratios and
+                "const float invRhwDet = rhwPerspectiveFastPath" in ratios and
+                "? 1.0f / rhwDet : 0.0f;" in ratios and
+                "const float invDepthSpan = 1.0f / depthSpan;" in ratios and
                 "if (rhwPerspectiveFastPath)" in full_body and
-                full_body.count("/ rhwDet;") == 2 and
+                "(clipW - bp._44) * invRhw34;" in full_body and
+                full_body.count("* invRhwDet;") == 2 and
+                "(screenZ - minZ) * invDepthSpan;" in full_body and
                 "std::isfinite(viewZ)" in full_body and
                 "std::isfinite(rhsX)" in full_body and
                 "std::isfinite(rhsY)" in full_body and
@@ -64,8 +72,16 @@ def main() -> None:
         ("std::isfinite(rhwDet)", "true"),
         ("std::fabs(rhwDet) > 1.0e-6f", "true"),
         ("if (rhwPerspectiveFastPath)", "if (true)"),
-        ("(rhsX * bp._22 -\n                                 bp._21 * rhsY) / rhwDet;",
+        ("(rhsX * bp._22 -\n                                 bp._21 * rhsY) * invRhwDet;",
          "(rhsX * bp._22 -\n                                 bp._21 * rhsY) / 1.0f;"),
+        ("(clipW - bp._44) * invRhw34;",
+         "(clipW - bp._44) / bp._34;"),
+        ("(screenZ - minZ) * invDepthSpan;",
+         "(screenZ - minZ) / depthSpan;"),
+        ("? 1.0f / rhwBase._34 : 0.0f;", "? 1.0f;"),
+        ("? 1.0f / rhwDet : 0.0f;", "? 1.0f;"),
+        ("const float invDepthSpan = 1.0f / depthSpan;",
+         "const float invDepthSpan = 1.0f;"),
         ("state.inverseBaseProjection.m[row][col]", "0.0f"),
         ("if (!restored)", "if (false)"),
         ("const D3DMATRIX& rhwBase = state.baseProjection;", "// removed"),
@@ -81,7 +97,7 @@ def main() -> None:
     for keep in ("if (leftFull != rightFull)", "state, 0, left, usedMask, false, ignored)",
                  "state, 1, right, usedMask, false, ignored)"):
         assert keep in stereo, "bilateral fallback altered"
-    print("PASS R30 per-draw RHW perspective hotpath; 12 destructive mutations")
+    print("PASS R30 per-draw RHW perspective hotpath; 17 destructive mutations")
 
 
 if __name__ == "__main__":
