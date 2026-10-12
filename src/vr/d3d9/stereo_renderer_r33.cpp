@@ -587,7 +587,7 @@ namespace OutRunVRStereo
                     device, 0u, R32ReviewRightEyeSurface());
                 if (SUCCEEDED(rightHr) && !depthlessPass)
                     rightHr = R32ReviewSetDepthStencilSurface(
-                        device, R32ReviewTrackedDepthStencil() ? R32ReviewRightEyeDepth() : nullptr);
+                        device, savedDepth ? R32ReviewRightEyeDepth() : nullptr);
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) &&
@@ -752,7 +752,7 @@ namespace OutRunVRStereo
                     device, 0u, R32ReviewRightEyeSurface());
                 if (SUCCEEDED(rightHr) && !depthlessPass)
                     rightHr = R32ReviewSetDepthStencilSurface(
-                        device, R32ReviewTrackedDepthStencil() ? R32ReviewRightEyeDepth() : nullptr);
+                        device, savedDepth ? R32ReviewRightEyeDepth() : nullptr);
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) &&

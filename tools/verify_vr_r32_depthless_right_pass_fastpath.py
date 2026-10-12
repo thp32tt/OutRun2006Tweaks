@@ -36,6 +36,13 @@ def verify(r32, r33, api):
         assert scope.index(guard) < scope.index("rightHr = device->SetViewport(")
         assert scope.index("R32ReviewRestoreRightPassState(") > scope.index(guard)
         assert "true, depthlessPass);" in scope
+        # One authoritative post-left-draw attachment snapshot feeds right-eye
+        # bind, depthless decision and restore: no second cross-TU lookup per
+        # stereo primitive, including HUD/fast-world.
+        assert scope.count("R32ReviewTrackedDepthStencil()") == 1
+        assert "IDirect3DSurface9* savedDepth = R32ReviewTrackedDepthStencil();" in scope
+        assert "savedDepth ? R32ReviewRightEyeDepth() : nullptr" in scope
+        assert "R32ReviewTrackedDepthStencil() ? R32ReviewRightEyeDepth() : nullptr" not in scope
         # A failed right-eye bind never claims depthless success. A null
         # left attachment with unreliable StateBlocks must take both setters.
         for is_null, reliable, must_set in (
@@ -56,6 +63,10 @@ def main():
         (r32, r33.replace("if (SUCCEEDED(rightHr) && !depthlessPass)",
                           "if (SUCCEEDED(rightHr))", 1), api),
         (r32, r33.replace("true, depthlessPass);", "true, false);", 1), api),
+        (r32, r33.replace("savedDepth ? R32ReviewRightEyeDepth() : nullptr",
+                           "R32ReviewTrackedDepthStencil() ? R32ReviewRightEyeDepth() : nullptr", 1), api),
+        (r32, r33.replace("savedDepth ? R32ReviewRightEyeDepth() : nullptr",
+                           "R32ReviewTrackedDepthStencil() ? R32ReviewRightEyeDepth() : nullptr", 1), api),
         (r32.replace("if (!depthlessPass)", "if (false)", 1), r33, api),
         (r32.replace("originalConstants, restoreWvp, depthlessPass",
                      "originalConstants, restoreWvp, false", 1), r33, api),
