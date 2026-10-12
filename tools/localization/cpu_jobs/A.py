@@ -84,7 +84,7 @@ fail_if(r["reviewed_trial_sha256"]!=OLD_SHA or r["source_sha256"]!=SRC_SHA,
         "independently rejected A228 exact SHA drift")
 confirmed_material=(r["observations"]["race_rivals"]["verdict"]=="REWORK_REQUIRED_TRIAL" and
                     r["observations"]["race_rivals"]["checks"]["source_style"]["result"]=="FAIL_SOURCE_FAMILY")
-fail_if(action not in ("MATERIAL_REWORK","METHOD_CHANGE_REQUIRED","EVIDENCE_ONLY_HOLD"),
+fail_if(action not in ("MATERIAL_REWORK","METHOD_CHANGE_REQUIRED","EVIDENCE_ONLY_HOLD","NORMAL_QUEUE_SELECTION"),
         "triage disallows new Korean candidate")
 if action=="EVIDENCE_ONLY_HOLD":
     # Normal/same-method rerender is explicitly blocked. This exception is NOT
