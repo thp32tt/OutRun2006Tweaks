@@ -10,10 +10,10 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00611",
   "work_key": "DX11:LIVE_FVF_TEXCOORDSIZE1_STAGE1",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_COMMIT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "runtime_validation": "UNTESTED",
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS_EXACT_SHA",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "native_gameplay_activation": false,
@@ -58,10 +58,72 @@
     "tools/dx11_game_fvf_layout_probe.cpp",
     "tools/test_dx11_first_game_frame_regressions.py"
   ],
-  "result_sha": null,
+  "result_sha": "23caba898d3902c42c96d5da78503b80a0eca953",
   "packaging": {
     "status": "NOT_REQUIRED",
     "reason": "Diagnostic code, no runtime package admission"
   },
-  "next_action": "Inspect exact-SHA five required Gates; repair errors, then seal C6; HMD/gamepad runtime untested"
+  "next_action": "Next independent DX11 task: expand unowned real game native menu/vehicle/race draw coverage or XR frame handoff; do not repeat already BUILD_VERIFIED 00611. Quest3/VDXR/gamepad parity requires NEED_HMD_TEST before promotion.",
+  "material_commit": "2c21136cb9696b7b0875e5f8e204156ed017ea98",
+  "validation_bearing_sha": "23caba898d3902c42c96d5da78503b80a0eca953",
+  "validation_bearing_result_sha": "23caba898d3902c42c96d5da78503b80a0eca953",
+  "source_repair_commit": "23caba898d3902c42c96d5da78503b80a0eca953",
+  "validation_runs": [
+    {
+      "name": "Build",
+      "run_id": 38248864631,
+      "conclusion": "success",
+      "head_sha": "23caba898d3902c42c96d5da78503b80a0eca953",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38248864631"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38248864617,
+      "conclusion": "success",
+      "head_sha": "23caba898d3902c42c96d5da78503b80a0eca953",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38248864617"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38248864691,
+      "conclusion": "success",
+      "head_sha": "23caba898d3902c42c96d5da78503b80a0eca953",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38248864691"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38248854691,
+      "conclusion": "success",
+      "head_sha": "23caba898d3902c42c96d5da78503b80a0eca953",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38248854691"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38248854757,
+      "conclusion": "success",
+      "head_sha": "23caba898d3902c42c96d5da78503b80a0eca953",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38248854757"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38248854577,
+      "conclusion": "success",
+      "head_sha": "23caba898d3902c42c96d5da78503b80a0eca953",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38248854577"
+    }
+  ],
+  "skipped_workflows": [
+    {
+      "name": "VR PC Fast Test Build",
+      "run_id": 38248854726,
+      "conclusion": "skipped"
+    }
+  ],
+  "ci_summary": "Exact-SHA Backend gate validate/readiness smoke, Win32 Build, DX11 Fast Structural Checks, OpenXR push+PR, HUD Inspector ALL SUCCESS on 23caba898d39. VR PC fast build skipped by policy. Real OutRun menu/race, Quest3/VDXR and gamepad not run.",
+  "c6_bookkeeping": {
+    "scope": "C6_RESULT_ONLY",
+    "validation_sha": "23caba898d3902c42c96d5da78503b80a0eca953",
+    "ci_policy": "SKIP_CI",
+    "reason": "All exact-SHA mandatory GitHub Actions already passed; separate documentation commit must not cancel them."
+  }
 }
