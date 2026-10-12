@@ -109,6 +109,73 @@ def projected_depth_signature_contract(source: str) -> None:
         assert needle in code, f"depth signature mutation {number} absent"
         assert not valid(code.replace(needle, replacement, 1)), (
             f"depth signature mutation {number} escaped")
+    # The 16-sample early decision must not change the complete world/HUD
+    # threshold, including sparse selected-index streams (sampleLimit can be
+    # much greater than the number of actually visited selected vertices).
+    bound_guards = (
+        "const UINT sampleLimit = vertexCount < 512u ? vertexCount : 512u;",
+        "if ((sampled & 15u) == 0u)",
+        "const UINT remaining = sampleLimit - sampled;",
+        "valid >= 3u &&",
+        "valid * 2u >= sampled + remaining &&",
+        "projected * 4u >= (valid + remaining) * 3u",
+        "(valid + remaining) * 2u < sampled + remaining ||",
+        "(projected + remaining) * 4u <",
+        "(valid + remaining) * 3u",
+    )
+    assert all(s in code for s in bound_guards), "R30 immutable-count early exit lost"
+    assert code.index("if ((sampled & 15u) == 0u)") > code.index(
+        "if (std::fabs(rhw - 1.0f) > 0.02f && depthDelta <= 0.10f)"
+    )
+    for i, guard in enumerate(bound_guards):
+        assert not all(s in code.replace(guard, "", 1) for s in bound_guards), (
+            f"R30 immutable-count negative mutation {i} escaped"
+        )
+
+    def classify(samples: list[int], limit: int, fast: bool) -> tuple[bool, int]:
+        visited = depth_valid = world_projected = 0
+        for kind in samples:
+            visited += 1
+            if kind < 0:
+                continue
+            depth_valid += 1
+            if kind > 0:
+                world_projected += 1
+            if fast and (visited & 15) == 0:
+                left = limit - visited
+                if (depth_valid >= 3
+                    and depth_valid * 2 >= visited + left
+                    and world_projected * 4 >= (depth_valid + left) * 3):
+                    return True, visited
+                if ((depth_valid + left) * 2 < visited + left
+                    or (world_projected + left) * 4 <
+                        (depth_valid + left) * 3):
+                    return False, visited
+        return (visited >= 3 and depth_valid >= 3
+                and depth_valid * 2 >= visited
+                and world_projected * 4 >= depth_valid * 3), visited
+
+    accept = [1] * 512
+    reject = [0] * 512
+    assert classify(accept, 512, True) == (True, 384)
+    assert classify(reject, 512, True)[0] is False
+    assert classify(reject, 512, True)[1] < 512
+    import itertools
+    # At most 3^5 short streams, plus mixed 512-vertex, sparse and truncated
+    # masks: compare every shortcut against the original final-count rule.
+    for n in range(6):
+        for seq in itertools.product((-1, 0, 1), repeat=n):
+            assert classify(seq, n, True)[0] == classify(seq, n, False)[0]
+    bound_rng = random.Random(710)
+    for i in range(4000):
+        length = bound_rng.randrange(513)
+        kinds = [bound_rng.choice((-1, 0, 1)) for _ in range(length)]
+        limit = bound_rng.randrange(length, 513)
+        assert classify(kinds, limit, True)[0] == classify(kinds, limit, False)[0], (
+            f"R30 projected-depth immutable bound mismatch at sample {i}"
+        )
+    print("PASS R30 depth signature immutable early exit, 9 destructive guards, 4000 sparse/mixed streams")
+
     f32 = lambda x: struct.unpack("<f", struct.pack("<f", x))[0]
     rng = random.Random(669)
     for _ in range(12000):
