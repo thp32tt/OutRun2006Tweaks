@@ -16,7 +16,7 @@ def connected(s: str) -> bool:
         "GetSamplerState(0, D3DSAMP_MAXMIPLEVEL, &maxMip)",
         "GetSamplerState(0, D3DSAMP_MIPFILTER, &mip)",
         "GetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, &mipBias)",
-        "(mip == D3DTEXF_NONE && maxMip != 0u) || mipBias != 0u",
+        "(mip == D3DTEXF_NONE && (maxMip != 0u || decodedMipBias != 0.0f)) || !validMipBias",
         "capture.maxMipLevel = maxMip;",
         "capture.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(mip)",
     )
@@ -65,7 +65,7 @@ def main() -> None:
         ("DWORD maxMipLevel = 0u;", "DWORD maxMipLevel = ~0u;"),
         ("GetSamplerState(0, D3DSAMP_MAXMIPLEVEL, &maxMip)", "GetSamplerState(0, D3DSAMP_MAXMIPLEVEL, &mipBias)"),
         ("GetSamplerState(0, D3DSAMP_MIPFILTER, &mip)", "GetSamplerState(0, D3DSAMP_MIPFILTER, &mag)"),
-        ("(mip == D3DTEXF_NONE && maxMip != 0u) || mipBias != 0u", "mipBias != 0u"),
+        ("(mip == D3DTEXF_NONE && (maxMip != 0u || decodedMipBias != 0.0f)) || !validMipBias", "mipBias != 0u"),
         ("if (usesMips && capture.maxMipLevel >= sourceLevels) return false;", "if (false) return false;"),
         ("state.MinLOD = usesMips ? static_cast<float>(capture.maxMipLevel) : 0.0f;", "state.MinLOD = 0.0f;"),
         ("state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;", "state.MaxLOD = 0.0f;"),

@@ -17,7 +17,7 @@ def wired(s: str) -> bool:
         "GetSamplerState(0, D3DSAMP_MAXMIPLEVEL, &maxMip)",
         "GetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, &mipBias)",
         "(mip != D3DTEXF_NONE && mip != D3DTEXF_POINT)",
-        "(mip == D3DTEXF_NONE && maxMip != 0u) || mipBias != 0u",
+        "(mip == D3DTEXF_NONE && (maxMip != 0u || decodedMipBias != 0.0f)) || !validMipBias",
         "capture.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(mip)",
     ]
     required_mirror = [
@@ -40,7 +40,7 @@ def wired(s: str) -> bool:
         "desc.MipLevels = levels; desc.ArraySize = 1;",
         "dev->CreateTexture2D(&desc, initial.data(), texture.GetAddressOf())",
         "state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;",
-        "state.MipLODBias = 0.0f;",
+        "state.MipLODBias = usesMips ? capture.mipLodBias : 0.0f;",
     ]
     return (all(p in gate for p in required_gate) and
             all(p in mirror for p in required_mirror) and
@@ -57,7 +57,7 @@ def main() -> None:
     assert wired(s), "game mip chain -> DX11 PS -> Draw/DrawIndexed not connected"
     mutations = [
         ("(mip != D3DTEXF_NONE && mip != D3DTEXF_POINT)", "mip != D3DTEXF_NONE"),
-        ("(mip == D3DTEXF_NONE && maxMip != 0u) || mipBias != 0u", "maxMip > 16u && mipBias != 0u"),
+        ("(mip == D3DTEXF_NONE && (maxMip != 0u || decodedMipBias != 0.0f)) || !validMipBias", "maxMip > 16u && mipBias != 0u"),
         ("capture.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(mip)", "capture.mipFilter = D3DTEXF_NONE"),
         ("const UINT levels = usesMips ? sourceLevels : 1u;", "const UINT levels = 1u;"),
         ("usesMips && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)", "false && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)"),

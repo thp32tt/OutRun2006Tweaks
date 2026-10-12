@@ -39,6 +39,9 @@ constexpr UINT kMaxIndices = 1536;
 // later visible candidates. Exactly one native submission is allowed per Present.
 constexpr UINT kProbeSlots = 64;
 constexpr UINT kReadbackSlots = 3; // GPU event-fenced frame copies
+// D3D11 sampler range: reject rather than clamp unsupported D3D9 LOD offsets.
+constexpr float kMinMipLodBias = -16.0f;
+constexpr float kMaxMipLodBias = 15.99f;
 
 constexpr std::array<float, 4> kBackground{0.035f, 0.035f, 0.08f, 1.0f};
 constexpr char kShader[] = R"(
@@ -538,6 +541,7 @@ struct TextureCapture {
     D3DTEXTUREFILTERTYPE magFilter = D3DTEXF_POINT;
     D3DTEXTUREFILTERTYPE mipFilter = D3DTEXF_NONE;
     DWORD maxMipLevel = 0u;  // D3D9's most detailed permitted mip for MIN sampling.
+    float mipLodBias = 0.0f; // Signed game-authored MIPMAPLODBIAS (IEEE-754).
 };
 
 struct OutputCapture {
@@ -1178,9 +1182,16 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             FAILED(game->GetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, &mipBias)) ||
             FAILED(game->GetSamplerState(0, D3DSAMP_SRGBTEXTURE, &srgb)))
             return false;
-        // Mirror game-selected MAXMIPLEVEL only with point/linear mip filters.
-        // MIPMAPLODBIAS and anisotropy remain fail-closed on original DX9Ex;
-        // a source mip-chain level is validated before allocating native resources.
+        // DWORD MIPMAPLODBIAS contains IEEE-754 bits; numeric conversion loses
+        // the game's fractional/negative offset. Validate before native capture.
+        float decodedMipBias = 0.0f;
+        static_assert(sizeof(decodedMipBias) == sizeof(mipBias));
+        std::memcpy(&decodedMipBias, &mipBias, sizeof(decodedMipBias));
+        const bool validMipBias = std::isfinite(decodedMipBias) &&
+                                 decodedMipBias >= kMinMipLodBias &&
+                                 decodedMipBias <= kMaxMipLodBias;
+        // Full CPU-readable mip chain required; aniso and invalid inputs
+        // retain the original D3D9 Draw path without native promotion.
         // Reject complement/alpha-replicate modifiers and projected coordinates.
         const bool blendTextureModulateAlpha = op == D3DTOP_BLENDTEXTUREALPHA &&
                                                 alphaOp == D3DTOP_MODULATE;
@@ -1412,10 +1423,11 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             (mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR) ||
             (min != D3DTEXF_POINT && min != D3DTEXF_LINEAR) ||
             ((mip != D3DTEXF_NONE && mip != D3DTEXF_POINT) && mip != D3DTEXF_LINEAR) ||
-            (mip == D3DTEXF_NONE && maxMip != 0u) || mipBias != 0u)
+            (mip == D3DTEXF_NONE && (maxMip != 0u || decodedMipBias != 0.0f)) || !validMipBias)
             return false;
         capture.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(mip);
         capture.maxMipLevel = maxMip;
+        capture.mipLodBias = decodedMipBias;
         capture.addressU = static_cast<D3DTEXTUREADDRESS>(addressU);
         capture.addressV = static_cast<D3DTEXTUREADDRESS>(addressV);
         capture.minFilter = static_cast<D3DTEXTUREFILTERTYPE>(min);
@@ -1753,11 +1765,16 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     state.AddressV = translateAddress(capture.addressV);
     if (!state.AddressU || !state.AddressV) return false;
     state.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    // Recheck captured source state before CreateSamplerState; no silent
+    // D3D11 driver clamp or NaN/Inf propagation in the diagnostic image.
+    if (!std::isfinite(capture.mipLodBias) ||
+        capture.mipLodBias < kMinMipLodBias || capture.mipLodBias > kMaxMipLodBias ||
+        (!usesMips && capture.mipLodBias != 0.0f)) return false;
     // D3D9 MAXMIPLEVEL discards finer (lower-indexed) mip levels.
     // D3D11 MinLOD clamps to that same source level; all levels are mirrored.
     state.MinLOD = usesMips ? static_cast<float>(capture.maxMipLevel) : 0.0f;
     state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;
-    state.MipLODBias = 0.0f;
+    state.MipLODBias = usesMips ? capture.mipLodBias : 0.0f;
     state.MaxAnisotropy = 1;
     state.ComparisonFunc = D3D11_COMPARISON_NEVER;
     return SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));

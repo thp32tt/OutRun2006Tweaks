@@ -163,6 +163,11 @@ jobs:
         shell: pwsh
         run: python tools/test_dx11_native_maxmiplevel_00592.py
 
+      - name: Verify DX11 live game signed mip bias 00593
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_native_mip_lod_bias_00593.py
+
       - name: Verify DX11 source graph
         shell: pwsh
         run: python tools/verify_dx11_source_graph.py
