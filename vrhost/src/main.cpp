@@ -28,6 +28,7 @@
 #include "vr/ipc/xr_eye_extent.hpp"
 #include "stereo_shader.hpp"
 #include "runtime/projection_blit_upload.hpp"
+#include "runtime/menu_projection_pair.hpp"
 #include "runtime/projection_pair_pipeline.hpp"
 
 namespace
@@ -1480,12 +1481,19 @@ namespace
         bool RenderMenuPlaneTo(
             ID3D11RenderTargetView* rtv, std::uint32_t w, std::uint32_t h,
             const UvRect& uv, ID3D11ShaderResourceView* sourceSrv,
-            DXGI_FORMAT sourceFormat, const float clip[4][4])
+            DXGI_FORMAT sourceFormat, const float clip[4][4],
+            bool reuseMenuPairState = false)
         {
             if (!rtv || !sourceSrv || !constantBuffer_ ||
                 !menuConstantBuffer_ || !menuVs_)
                 return false;
 
+            // The right eye of the current LOCAL-fixed menu pair uses exactly
+            // the same UV, HDR transform and 4x4 clip rectangle. The left draw
+            // succeeded and no context operation has intervened, so neither
+            // dynamic buffer needs a second DISCARD Map/Unmap.
+            if (!reuseMenuPairState)
+            {
             D3D11_MAPPED_SUBRESOURCE map{};
             if (FAILED(context_->Map(
                     constantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &map)))
@@ -1508,23 +1516,32 @@ namespace
             auto* menu = static_cast<MenuPlaneParams*>(map.pData);
             std::memcpy(menu->clip, clip, sizeof(menu->clip));
             context_->Unmap(menuConstantBuffer_, 0);
+            }
 
+            if (!reuseMenuPairState)
+            {
             D3D11_VIEWPORT vp{};
             vp.Width = static_cast<float>(w);
             vp.Height = static_cast<float>(h);
             vp.MaxDepth = 1.f;
             context_->RSSetViewports(1, &vp);
+            }
 
             const float black[4]{ 0.f, 0.f, 0.f, 1.f };
             context_->ClearRenderTargetView(rtv, black);
             context_->OMSetRenderTargets(1, &rtv, nullptr);
-            context_->IASetPrimitiveTopology(
-                D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-            context_->VSSetShader(menuVs_, nullptr, 0);
-            context_->VSSetConstantBuffers(1, 1, &menuConstantBuffer_);
-            context_->PSSetShader(ps_, nullptr, 0);
+            if (!reuseMenuPairState)
+            {
+                context_->IASetPrimitiveTopology(
+                    D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+                context_->VSSetShader(menuVs_, nullptr, 0);
+                context_->VSSetConstantBuffers(1, 1, &menuConstantBuffer_);
+                context_->PSSetShader(ps_, nullptr, 0);
+                context_->PSSetSamplers(0, 1, &sampler_);
+            }
+            // The RTV and SRV were unbound after eye 0. Always bind both for
+            // eye 1, clear its target and submit its own draw.
             context_->PSSetShaderResources(0, 1, &sourceSrv);
-            context_->PSSetSamplers(0, 1, &sampler_);
             context_->PSSetConstantBuffers(0, 1, &constantBuffer_);
             context_->Draw(4, 0);
 

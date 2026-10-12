@@ -1369,12 +1369,23 @@ namespace
         std::uint32_t image = 0;
         c.Acquire(c.projection_, image);
         bool ok = image < c.projection_.rtvs.size();
-        for (int eye = 0; eye < 2 && ok; ++eye)
+        if (ok)
         {
-            ok = c.RenderMenuPlaneTo(
-                c.projection_.rtvs[image][eye],
+            const bool leftOk = c.RenderMenuPlaneTo(
+                c.projection_.rtvs[image][0],
                 c.projection_.width, c.projection_.height,
                 whole, c.sourceSrv_, c.sourceFormat_, clip);
+            // Both eyes share the exact same world-locked LOCAL menu clip,
+            // source and UV. Keep the old full-bind fallback if eye 0 failed.
+            const auto secondEye = OutRunVrMenuPair::PlanSecondEye(
+                leftOk, true, true, 0, 1,
+                c.projection_.width, c.projection_.height,
+                c.projection_.width, c.projection_.height);
+            ok = leftOk && c.RenderMenuPlaneTo(
+                c.projection_.rtvs[image][1],
+                c.projection_.width, c.projection_.height,
+                whole, c.sourceSrv_, c.sourceFormat_, clip,
+                secondEye.reuseUniformsAndPipeline);
         }
         if (ok) R23Pixels.ScheduleProjection(c, image);
         c.Release(c.projection_);

@@ -1,5 +1,6 @@
 #include "runtime/projection_blit_upload.hpp"
 #include "runtime/projection_pair_pipeline.hpp"
+#include "runtime/menu_projection_pair.hpp"
 #include <cstdint>
 #include <limits>
 using namespace OutRunVrProjectionBlit;
@@ -47,5 +48,15 @@ int main()
     EXPECT(!CanReuseCommonPipeline(true, 0, 1, 3440, 1440, 3440, 1080));
     EXPECT(!CanReuseCommonPipeline(true, 0, 1, 0, 1440, 0, 1440));
     EXPECT(!CanReuseCommonPipeline(true, 0, 1, 3440, 0, 3440, 0));
+    // R23 LOCAL-fixed menu uses an identical clip and source for both eyes.
+    // A failed first submission or discontinuity must not skip rebind/upload.
+    using OutRunVrMenuPair::PlanSecondEye;
+    EXPECT(PlanSecondEye(true, true, true, 0, 1, 2064, 2208, 2064, 2208).reuseUniformsAndPipeline);
+    EXPECT(!PlanSecondEye(false, true, true, 0, 1, 2064, 2208, 2064, 2208).reuseUniformsAndPipeline);
+    EXPECT(!PlanSecondEye(true, false, true, 0, 1, 2064, 2208, 2064, 2208).reuseUniformsAndPipeline);
+    EXPECT(!PlanSecondEye(true, true, false, 0, 1, 2064, 2208, 2064, 2208).reuseUniformsAndPipeline);
+    EXPECT(!PlanSecondEye(true, true, true, 1, 0, 2064, 2208, 2064, 2208).reuseUniformsAndPipeline);
+    EXPECT(!PlanSecondEye(true, true, true, 0, 1, 2064, 2208, 2063, 2208).reuseUniformsAndPipeline);
+    EXPECT(!PlanSecondEye(true, true, true, 0, 1, 2064, 2208, 2064, 0).reuseUniformsAndPipeline);
     return 0;
 }
