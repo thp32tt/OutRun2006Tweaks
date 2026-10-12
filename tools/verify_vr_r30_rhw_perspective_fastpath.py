@@ -236,7 +236,7 @@ def fused_world_contract(source: str) -> None:
             "for (UINT i = 0; i < modifiedVertexEnd; ++i)",
             "const bool sparseTouched = usedMask && touched &&",
             "knownUsedCount > 0u && knownUsedCount == touched->size()",
-            "knownUsedCount <= vertexCount / 8u;",
+            "knownUsedCount <= vertexCount / 4u;",
             "const UINT visitCount = sparseTouched ? knownUsedCount : vertexCount;",
             "const UINT i = sparseTouched ? (*touched)[visit] : visit;",
             "(sparseTouched && !(*usedMask)[i])",
@@ -279,7 +279,7 @@ def fused_world_contract(source: str) -> None:
         )
     for needle, broken in (
         ("knownUsedCount == touched->size()", "true"),
-        ("knownUsedCount <= vertexCount / 8u", "true"),
+        ("knownUsedCount <= vertexCount / 4u", "true"),
         ("const UINT i = sparseTouched ? (*touched)[visit] : visit;",
          "const UINT i = visit;"),
         ("(sparseTouched && !(*usedMask)[i])", "false"),
@@ -306,7 +306,7 @@ def fused_world_contract(source: str) -> None:
         chosen = set(used)
         assert [i for i in range(span) if mask[i]] == sorted(chosen)
         assert set(used) == chosen
-        sparse = (len(used) <= span // 8)
+        sparse = (len(used) <= span // 4)
         dense_visited = [i for i in range(span) if mask[i]]
         sparse_visited = list(used) if sparse else dense_visited
         assert sorted(sparse_visited) == dense_visited
