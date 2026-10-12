@@ -45,16 +45,26 @@ def valid(code):
         ("UP", up, "scratch.used[raw] = 1;"),
         ("VB", vb, "scratch.used[static_cast<std::size_t>(local)] = 1;"),
     ):
+        # VB's unchanged-index cache carries the exact cardinality from
+        # the previous validated index decode. UP still counts from zero.
+        count_init = ("UINT knownUsedCount = 0;" if name == "UP" else
+                      "UINT knownUsedCount = cachedDecode ? decoded.knownUsedCount : 0;")
         if not all(x in segment for x in (
-                "UINT knownUsedCount = 0;", "++knownUsedCount;", marker,
+                count_init, "++knownUsedCount;", marker,
                 "&scratch.used, knownUsedCount))",
                 "scratch.used.assign(vertexCount, 0);")):
             return False
-        if not (segment.index("scratch.used.assign(vertexCount, 0);")
-                < segment.index("UINT knownUsedCount = 0;")
+        if not (segment.index(count_init)
+                < segment.index("scratch.used.assign(vertexCount, 0);")
                 < segment.index("++knownUsedCount;")
                 < segment.index(marker)
-                < segment.index("&scratch.used, knownUsedCount))")):
+                < segment.index("&scratch.used, knownUsedCount))"):
+            return False
+        if name == "VB" and not all(x in segment for x in (
+                "if (!cachedDecode)",
+                "decoded.revision == scratch.indexCopy.revision",
+                "next.knownUsedCount = knownUsedCount;",
+                "next.valid = true;")):
             return False
         guard = ("if (!scratch.used[raw])" if name == "UP"
                  else "if (!scratch.used[static_cast<std::size_t>(local)])")
