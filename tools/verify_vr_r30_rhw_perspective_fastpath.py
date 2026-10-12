@@ -164,7 +164,7 @@ def fused_world_contract(source: str) -> None:
             "std::memcpy(left.data() + offset, bytes + offset,",
             "std::memcpy(right.data() + offset, bytes + offset,",
             "return false;",
-        )) and s.count("const float viewZ =") == 1
+        )) and s.count("const float viewZ =") == 1 and s.count("if (usedMask && !(*usedMask)[i])") == 2
 
     assert intact(block), "R30 fused world projection safety contract lost"
     for before, after in (
