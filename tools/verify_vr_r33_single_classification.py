@@ -75,13 +75,20 @@ def check_mono_aux_fastpath(text: str) -> None:
         "void R33InvalidateDepthStencilCache()", 1)[0]
     dispatch = text.split("HRESULT R33Dispatch(", 1)[1].split(
         "HRESULT __stdcall DrawPrimitiveDestR33(", 1)[0]
-    assert guard.index("if (!device") < guard.index("return drawCall(false);")
-    for exclusion in (
-        "!R32ReviewIsGameDevice(device)", "R32ReviewInternalStereoPass()",
+    # R33 computes game-device and internal-pass eligibility only once.
+    # Keep source-level evidence for their equivalence and the fail-closed
+    # bypass, instead of requiring an obsolete duplicate device check.
+    for required in (
+        "const bool gameDevice = device && R32ReviewIsGameDevice(device);",
+        "const bool internalPass = gameDevice && R32ReviewInternalStereoPass();",
+        "(gameDevice && !internalPass)",
+        "if (!gameDevice || internalPass ||",
         "StateBlockTracker::Recording()", "!R32ReviewStereoWanted()",
         "!R32ReviewTargetIsBackBuffer()",
     ):
-        assert exclusion in guard, f"raster bypass lost {exclusion}"
+        assert required in guard, f"raster bypass lost {required}"
+    assert guard.index("if (!gameDevice || internalPass ||") < guard.index(
+        "return drawCall(false);")
 
     fallback = re.search(
         r"auto fallbackToR29 = \[&\]\(\) -> HRESULT \{(.*?)\n\s*\};",
@@ -280,6 +287,20 @@ def main() -> None:
     negative_gpu_profiler_fastpath(src)
     negative_mono_aux_fastpath(src)
     negative_write_flag_cache(src)
+    for i, mutant in enumerate((
+        src.replace("device && R32ReviewIsGameDevice(device)",
+                    "device != nullptr", 1),
+        src.replace("gameDevice && R32ReviewInternalStereoPass()",
+                    "false", 1),
+        src.replace("if (!gameDevice || internalPass ||",
+                    "if (false || false ||", 1),
+    ), 1):
+        assert mutant != src, f"cached guard mutation {i} not applied"
+        try:
+            check_mono_aux_fastpath(mutant)
+        except (AssertionError, ValueError):
+            continue
+        raise AssertionError(f"cached guard negative mutation {i} escaped")
     mutants = [
         src.replace("R33TryHud(device, screenKind,", "R33TryHud(device, R32ReviewScreenSpaceKind::None,", 1),
         src.replace("if (screenKind != R32ReviewScreenSpaceKind::None)",

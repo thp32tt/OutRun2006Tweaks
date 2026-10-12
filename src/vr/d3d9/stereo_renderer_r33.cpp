@@ -843,7 +843,7 @@ namespace OutRunVRStereo
             auto call = [&](bool resyncAlreadyFlushed) {
                 // The outer raster guard already rejected non-game, aux RT,
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
-                // would reject those same draws in R29StableStereoBase;
+                // would reject those same draws in the lower R29 stable-stereo gate;
                 // bypass its cross-TU checks on the large mono/aux workload.
                 const HRESULT xyzrhw = resyncAlreadyFlushed
                     ? R32ReviewTryXyzrhwPrimitiveVB(
@@ -880,7 +880,7 @@ namespace OutRunVRStereo
             auto call = [&](bool resyncAlreadyFlushed) {
                 // The outer raster guard already rejected non-game, aux RT,
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
-                // would reject those same draws in R29StableStereoBase;
+                // would reject those same draws in the lower R29 stable-stereo gate;
                 // bypass its cross-TU checks on the large mono/aux workload.
                 const HRESULT xyzrhw = resyncAlreadyFlushed
                     ? R32ReviewTryXyzrhwIndexedPrimitiveVB(
@@ -920,7 +920,7 @@ namespace OutRunVRStereo
             auto call = [&](bool resyncAlreadyFlushed) {
                 // The outer raster guard already rejected non-game, aux RT,
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
-                // would reject those same draws in R29StableStereoBase;
+                // would reject those same draws in the lower R29 stable-stereo gate;
                 // bypass its cross-TU checks on the large mono/aux workload.
                 const HRESULT xyzrhw = resyncAlreadyFlushed
                     ? R32ReviewTryXyzrhwPrimitiveUP(
@@ -958,7 +958,7 @@ namespace OutRunVRStereo
             auto call = [&](bool resyncAlreadyFlushed) {
                 // The outer raster guard already rejected non-game, aux RT,
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
-                // would reject those same draws in R29StableStereoBase;
+                // would reject those same draws in the lower R29 stable-stereo gate;
                 // bypass its cross-TU checks on the large mono/aux workload.
                 const HRESULT xyzrhw = resyncAlreadyFlushed
                     ? R32ReviewTryXyzrhwIndexedPrimitiveUP(
