@@ -124,6 +124,7 @@
     "scope": "C6_RESULT_ONLY",
     "validation_sha": "23caba898d3902c42c96d5da78503b80a0eca953",
     "ci_policy": "SKIP_CI",
-    "reason": "All exact-SHA mandatory GitHub Actions already passed; separate documentation commit must not cancel them."
+    "reason": "All exact-SHA mandatory GitHub Actions already passed; separate documentation commit must not cancel them.",
+    "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
   }
 }
