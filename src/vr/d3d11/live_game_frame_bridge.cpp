@@ -1841,6 +1841,16 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         const bool blendTextureAlphaPMFactorArg2Alpha =
             op == D3DTOP_BLENDTEXTUREALPHAPM &&
             alphaOp == D3DTOP_SELECTARG2 && alphaArg2 == D3DTA_TFACTOR;
+        // D3D9 complement belongs to the active alpha operand, never to
+        // the sampled texture-alpha used by premultiplied RGB blending.
+        const bool blendTextureAlphaPMInverseFactorArg1Alpha =
+            op == D3DTOP_BLENDTEXTUREALPHAPM &&
+            alphaOp == D3DTOP_SELECTARG1 &&
+            alphaArg1 == (D3DTA_TFACTOR | D3DTA_COMPLEMENT);
+        const bool blendTextureAlphaPMInverseFactorArg2Alpha =
+            op == D3DTOP_BLENDTEXTUREALPHAPM &&
+            alphaOp == D3DTOP_SELECTARG2 &&
+            alphaArg2 == (D3DTA_TFACTOR | D3DTA_COMPLEMENT);
         // Game SELECTARG1 reads ALPHAARG1 only; unmodified vertex DIFFUSE
         // and stage-0 CURRENT use the existing native PM/diffuse-alpha PS.
         // Inactive ALPHAARG2 must not affect this operation.
@@ -1937,6 +1947,12 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
               blendTextureAlphaPMFactorArg2Alpha) &&
             FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))
             return false;
+        // These disjoint complemented-factor selectors must fetch the actual
+        // game constant; failure leaves the draw on the D3D9 fallback path.
+        if ((blendTextureAlphaPMInverseFactorArg1Alpha ||
+             blendTextureAlphaPMInverseFactorArg2Alpha) &&
+            FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))
+            return false;
         // RGB and alpha must both use ADD(TEXTURE, DIFFUSE).
         const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;
         // Mixed RGB/alpha operations remain DX9Ex; operand order stays exact.
@@ -1975,7 +1991,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // On D3D9 fixed-function stage 0, CURRENT resolves to vertex DIFFUSE.
         // Reject operand modifiers; later stages are disabled by the gate.
         const bool arg2Diffuse = arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT;
-        const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT;
+        const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT ||
+            blendTextureAlphaPMInverseFactorArg2Alpha; // exact SELECTARG2 factor exception
         // SELECTARG1 reads ALPHAARG1 only. D3D9 ALPHAARG2 is inactive and
         // must not spuriously reject a valid PM RGB + texture-alpha Draw.
         const bool alphaArg2UnusedOnSelectArg1 = alphaOp == D3DTOP_SELECTARG1;
@@ -2004,7 +2021,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                                      mixedTextureAlpha || mixedDiffuseAlpha ||
                                      mixedAddTextureAlpha || mixedAddDiffuseAlpha ||
                                      subtractTextureAlpha || subtractDiffuseAlpha || subtractModulateAlpha ||
-                                     blendTextureAlphaPMFactorAlpha || blendTextureAlphaPMDiffuseArg1Alpha || blendTextureAlphaPMDiffuseAlpha || blendTextureAlphaPMModulateAlpha || blendTextureAlphaPMAddAlpha || blendTextureAlphaPMSubtractAlpha || blendTextureAlphaPMModulate2XAlpha || blendTextureAlphaPMModulate4XAlpha || blendTextureAlphaPMAddSignedAlpha || blendTextureAlphaPMAddSigned2XAlpha || blendTextureAlphaPMBlendTextureAlpha || blendTextureAlphaPMAddSmoothAlpha || blendTextureAlphaPMBlendDiffuseAlpha || blendTextureAlphaPMBlendFactorAlpha || blendTextureAlphaPMInverseTextureAlpha || blendTextureAlphaPMInverseDiffuseAlpha ||
+                                     blendTextureAlphaPMFactorAlpha || blendTextureAlphaPMInverseFactorArg1Alpha || blendTextureAlphaPMInverseFactorArg2Alpha || blendTextureAlphaPMDiffuseArg1Alpha || blendTextureAlphaPMDiffuseAlpha || blendTextureAlphaPMModulateAlpha || blendTextureAlphaPMAddAlpha || blendTextureAlphaPMSubtractAlpha || blendTextureAlphaPMModulate2XAlpha || blendTextureAlphaPMModulate4XAlpha || blendTextureAlphaPMAddSignedAlpha || blendTextureAlphaPMAddSigned2XAlpha || blendTextureAlphaPMBlendTextureAlpha || blendTextureAlphaPMAddSmoothAlpha || blendTextureAlphaPMBlendDiffuseAlpha || blendTextureAlphaPMBlendFactorAlpha || blendTextureAlphaPMInverseTextureAlpha || blendTextureAlphaPMInverseDiffuseAlpha ||
                                      blendTextureAlpha || blendTextureAlphaPM || blendTextureAlphaPMTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;
         const bool alphaNeedsDiffuse = selectDiffuseDiffuseAlpha || selectDiffuseModulateAlpha || selectTextureBlendTextureAlpha || selectDiffuseBlendTextureAlpha || selectTextureBlendDiffuseAlpha || selectDiffuseBlendDiffuseAlpha ||
                                            selectTextureFactorAlpha || selectDiffuseFactorAlpha ||
@@ -2050,13 +2067,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
               !blendTextureAddAlpha && !blendDiffuseAddAlpha &&
               !blendTextureSubtractAlpha && !blendDiffuseSubtractAlpha &&
                !blendTextureAddSmoothAlpha && !blendDiffuseAddSmoothAlpha &&
-             !blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMInverseDiffuseAlpha && !blendTextureAlphaPMFactorAlpha && !blendTextureAlphaPMDiffuseArg1Alpha && !blendTextureAlphaPMModulateAlpha && !blendTextureAlphaPMAddAlpha && !blendTextureAlphaPMSubtractAlpha && !blendTextureAlphaPMModulate2XAlpha && !blendTextureAlphaPMModulate4XAlpha && !blendTextureAlphaPMAddSignedAlpha && !blendTextureAlphaPMAddSigned2XAlpha && !blendTextureAlphaPMBlendTextureAlpha && !blendTextureAlphaPMAddSmoothAlpha && !blendTextureAlphaPMBlendDiffuseAlpha && !blendTextureAlphaPMBlendFactorAlpha &&
+             !blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMInverseDiffuseAlpha && !blendTextureAlphaPMFactorAlpha && !blendTextureAlphaPMInverseFactorArg1Alpha && !blendTextureAlphaPMInverseFactorArg2Alpha && !blendTextureAlphaPMDiffuseArg1Alpha && !blendTextureAlphaPMModulateAlpha && !blendTextureAlphaPMAddAlpha && !blendTextureAlphaPMSubtractAlpha && !blendTextureAlphaPMModulate2XAlpha && !blendTextureAlphaPMModulate4XAlpha && !blendTextureAlphaPMAddSignedAlpha && !blendTextureAlphaPMAddSigned2XAlpha && !blendTextureAlphaPMBlendTextureAlpha && !blendTextureAlphaPMAddSmoothAlpha && !blendTextureAlphaPMBlendDiffuseAlpha && !blendTextureAlphaPMBlendFactorAlpha &&
              !blendTextureAlphaPMDiffuseAlpha && !blendTextureAlpha && !blendTextureAlphaPM && !blendTextureAlphaPMTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha) || arg != D3DTA_TEXTURE ||
             (!selectTextureDiffuseAlpha && (!blendFactorDiffuseAlpha && !addSmoothDiffuseAlpha &&
               !subtractDiffuseAlpha &&
               !modulate2xDiffuseAlpha && !modulate4xDiffuseAlpha &&
               (!subtractDiffuseAlpha && !blendTextureSelectedDiffuseAlpha && !blendDiffuseSelectedDiffuseAlpha &&
-               ((!selectDiffuseDiffuseAlpha && !mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE && !blendTextureAlphaPMDiffuseAlpha && !blendTextureAlphaPMDiffuseArg1Alpha && !blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMInverseDiffuseArg1Alpha) && !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha &&
+               ((!selectDiffuseDiffuseAlpha && !mixedDiffuseAlpha && !mixedAddDiffuseAlpha && !blendTextureAlphaPMInverseFactorArg1Alpha && !blendTextureAlphaPMInverseFactorArg2Alpha && alphaArg1 != D3DTA_TEXTURE && !blendTextureAlphaPMDiffuseAlpha && !blendTextureAlphaPMDiffuseArg1Alpha && !blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMInverseDiffuseArg1Alpha) && !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha &&
                !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha && !blendTextureAlphaPMFactorAlpha)))) ||
             (rgbNeedsDiffuse && !arg2Diffuse) ||
             ((((alphaNeedsDiffuse && !alphaArg2Diffuse) && !alphaArg2UnusedOnSelectArg1) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha &&
@@ -2138,10 +2155,20 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         if (blendTextureAlphaPMDiffuseArg1Alpha)
             capture.blendTextureAlphaPMDiffuseAlpha = true;
         capture.blendTextureAlphaPMFactorAlpha = blendTextureAlphaPMFactorAlpha;
+        // SELECTARG1 complemented factor shares the compiled native PM/factor
+        // shader, with alpha inversion applied to its constant below.
+        if (blendTextureAlphaPMInverseFactorArg1Alpha)
+            capture.blendTextureAlphaPMFactorAlpha = true;
         // The SELECTARG2 diffuse selector is structurally shared; override
         // it only for verified factor-alpha, before native shader selection.
         // Unknown/modified ALPHAARG2 still fails the original guard.
         if (blendTextureAlphaPMFactorArg2Alpha) {
+            capture.blendTextureAlphaPMDiffuseAlpha = false;
+            capture.blendTextureAlphaPMFactorAlpha = true;
+        }
+        // SELECTARG2 complemented factor is not vertex alpha. Override the
+        // generic PM diffuse shader before the native Draw/DrawIndexed bind.
+        if (blendTextureAlphaPMInverseFactorArg2Alpha) {
             capture.blendTextureAlphaPMDiffuseAlpha = false;
             capture.blendTextureAlphaPMFactorAlpha = true;
         }
@@ -2196,6 +2223,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.blendFactorModulate2XAlpha = blendFactorModulate2XAlpha;
         capture.blendFactorModulate4XAlpha = blendFactorModulate4XAlpha;
         capture.blendFactorAlphaValue = static_cast<float>((textureFactor >> 24u) & 0xffu) / 255.0f;
+        if (blendTextureAlphaPMInverseFactorArg1Alpha || blendTextureAlphaPMInverseFactorArg2Alpha)
+            capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;
         capture.coordIndex = coordIndex;
         capture.transformUv = transformUv;
         if (transformUv) capture.uvTransform = uvTransform;
