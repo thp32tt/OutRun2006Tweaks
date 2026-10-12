@@ -1514,6 +1514,51 @@ def main() -> None:
             assert mutant != layout_source and not third_u_native_linked(bridge, mutant, probe_source)
     print("DX11 TEXCOORDSIZE1(2) packed native Draw regression PASS (static only)")
 
+    # 00612 retry: fourth U-only game stream reaches stage0 selected UV and
+    # cannot borrow the later UV4 pair. Run C++ layout fixture in the Build gate.
+    def fourth_u_native_linked(src: str, hdr: str, fixture: str) -> bool:
+        return all(x in src for x in (
+            "kGameFvfTexcoordSize1_3 == D3DFVF_TEXCOORDSIZE1(3)",
+            "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+        )) and all(x in hdr for x in (
+            "kGameFvfTexcoordSize1_3 = 0x00c00000u;",
+            "(fourthTexcoord1D && texcoordBits < kGameFvfTex4)",
+            "candidate.fourthTexcoord1D = fourthTexcoord1D;",
+            "(layout.fourthTexcoord1D && layout.texcoordCount < 4u)",
+            "(layout.fourthTexcoord1D ? 4u : 0u)",
+            "(slot == 3u && layout.fourthTexcoord1D)",
+        )) and all(x in fixture for x in (
+            "struct VehicleFourthU", "struct RaceFourthPacked",
+            "struct MenuFourPackedU",
+            "chosen[0] == .875f && chosen[1] == 0.f",
+            "chosen[0] == .8f && chosen[1] == .9f",
+            "!game_fvf_decode_vertex(&vehicleFourth, 43u",
+            "!game_fvf_decode_vertex(&raceFourth, 63u",
+            "corruptFourth.fourthTexcoord1D = false;",
+        ))
+    assert fourth_u_native_linked(bridge, layout_source, probe_source)
+    for old, wrong in (
+        ("kGameFvfTexcoordSize1_3 == D3DFVF_TEXCOORDSIZE1(3)",
+         "kGameFvfTexcoordSize1_3 != D3DFVF_TEXCOORDSIZE1(3)"),
+        ("candidate.fourthTexcoord1D = fourthTexcoord1D;",
+         "candidate.fourthTexcoord1D = false;"),
+        ("(fourthTexcoord1D && texcoordBits < kGameFvfTex4)",
+         "(fourthTexcoord1D && texcoordBits < kGameFvfTex3)"),
+        ("(layout.fourthTexcoord1D ? 4u : 0u)",
+         "(layout.fourthTexcoord1D ? 0u : 0u)"),
+        ("(slot == 3u && layout.fourthTexcoord1D)",
+         "(slot == 2u && layout.fourthTexcoord1D)"),
+    ):
+        if old in bridge:
+            mutant = bridge.replace(old, wrong, 1)
+            assert mutant != bridge and not fourth_u_native_linked(mutant, layout_source, probe_source)
+        else:
+            mutant = layout_source.replace(old, wrong, 1)
+            assert mutant != layout_source and not fourth_u_native_linked(bridge, mutant, probe_source)
+    print("DX11 TEXCOORDSIZE1(3) packed native Draw regression PASS (static only)")
+
+
     # 00558: real game-authored D3D9 stage0 BLENDTEXTUREALPHA /
     # BLENDDIFFUSEALPHA -> owned native PS -> Draw/DrawIndexed -> opt-in inset.
     # Checks source-to-consumer links, shader/reset lifecycle and fail-closed

@@ -366,5 +366,52 @@ int main() {
     corruptThird = layout;
     corruptThird.texcoordCount = 2u;
     assert(!game_fvf_decode_vertex(&raceThird, sizeof(raceThird), corruptThird, sample));
+    // 00612 retry: game-authored TEXCOORDSIZE1(3) is a packed fourth U-only
+    // slot, and its missing V must not consume the fifth UV pair.
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 |
+                            kGameFvfTexcoordSize1_3, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 | 0x00400000u, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 | 0x00800000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 |
+                           kGameFvfTexcoordSize1_3, layout));
+    assert(layout.fourthTexcoord1D && layout.minStride == 44u);
+    struct VehicleFourthU { float x,y,z,rhw,u0,v0,u1,v1,u2,v2,u3; };
+    VehicleFourthU vehicleFourth{1,2,.4f,1.f,.1f,.2f,.3f,.4f,.5f,.6f,.875f};
+    assert(sizeof(vehicleFourth) == 44u);
+    assert(game_fvf_decode_vertex(&vehicleFourth, sizeof(vehicleFourth), layout, sample));
+    assert(game_fvf_select_uv(sample, layout, 3u, chosen));
+    assert(chosen[0] == .875f && chosen[1] == 0.f);
+    const auto goodFourth = sample;
+    assert(!game_fvf_decode_vertex(&vehicleFourth, 43u, layout, sample));
+    assert(sample.uv3[0] == goodFourth.uv3[0]);
+    auto corruptFourth = layout;
+    corruptFourth.fourthTexcoord1D = false;
+    assert(!game_fvf_decode_vertex(&vehicleFourth, sizeof(vehicleFourth), corruptFourth, sample));
+    assert(sample.uv3[0] == goodFourth.uv3[0]);
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 |
+                           kGameFvfTexcoordSize1_0 | kGameFvfTexcoordSize1_1 |
+                           kGameFvfTexcoordSize1_2 | kGameFvfTexcoordSize1_3, layout));
+    assert(layout.minStride == 32u);
+    struct MenuFourPackedU { float x,y,z,rhw,u0,u1,u2,u3; };
+    MenuFourPackedU menuFour{1,2,.4f,1.f,.1f,.2f,.3f,.75f};
+    assert(sizeof(menuFour) == 32u);
+    assert(game_fvf_decode_vertex(&menuFour, sizeof(menuFour), layout, sample));
+    assert(game_fvf_select_uv(sample, layout, 3u, chosen));
+    assert(chosen[0] == .75f && chosen[1] == 0.f);
+    assert(game_fvf_layout(kGameFvfXyz | kGameFvfNormal | kGameFvfDiffuse |
+                           kGameFvfTex5 | kGameFvfTexcoordSize1_3, layout));
+    assert(layout.texcoordOffset == 28u && layout.minStride == 64u);
+    struct RaceFourthPacked { float x,y,z,nx,ny,nz; std::uint32_t color;
+                              float u0,v0,u1,v1,u2,v2,u3,u4,v4; };
+    RaceFourthPacked raceFourth{1,2,3,0,1,0,0xffaabbccu,
+                               .1f,.2f,.3f,.4f,.5f,.6f,.7f,.8f,.9f};
+    assert(sizeof(raceFourth) == 64u);
+    assert(game_fvf_decode_vertex(&raceFourth, sizeof(raceFourth), layout, sample));
+    assert(game_fvf_select_uv(sample, layout, 3u, chosen));
+    assert(chosen[0] == .7f && chosen[1] == 0.f);
+    assert(game_fvf_select_uv(sample, layout, 4u, chosen));
+    assert(chosen[0] == .8f && chosen[1] == .9f);
+    assert(!game_fvf_decode_vertex(&raceFourth, 63u, layout, sample));
+    assert(sample.uv4[1] == .9f);
     return 0;
 }

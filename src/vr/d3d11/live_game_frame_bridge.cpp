@@ -33,7 +33,8 @@ static_assert(kGameFvfXyz == D3DFVF_XYZ && kGameFvfXyzRhw == D3DFVF_XYZRHW &&
               kGameFvfPositionMask == D3DFVF_POSITION_MASK &&
               kGameFvfTexcoordSize1_0 == D3DFVF_TEXCOORDSIZE1(0) &&
                kGameFvfTexcoordSize1_1 == D3DFVF_TEXCOORDSIZE1(1) &&
-               kGameFvfTexcoordSize1_2 == D3DFVF_TEXCOORDSIZE1(2),
+               kGameFvfTexcoordSize1_2 == D3DFVF_TEXCOORDSIZE1(2) &&
+               kGameFvfTexcoordSize1_3 == D3DFVF_TEXCOORDSIZE1(3),
               "Portable FVF constants must match the D3D9 SDK");
 constexpr UINT kWidth = 256;
 constexpr UINT kHeight = 144;
@@ -1847,7 +1848,7 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
             return false;
         const float* xyz = decoded.position;
         const DWORD diffuse = decoded.diffuse;
-        // TEXCOORDSIZE1(0/1/2) U-only streams get V=0; later UV sets
+        // TEXCOORDSIZE1(0/1/2/3) U-only streams get V=0; later UV sets
         // retain packed game byte offsets through native Draw/DrawIndexed.
         // TEX2..8 select UV1..7 from game bytes; absent slots fail closed.
         if (capture.enabled &&
