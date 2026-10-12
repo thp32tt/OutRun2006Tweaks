@@ -65,6 +65,8 @@ def patch(source):
             log.error("PNG composer attachment not proven role=%s status=%s",
                       png_binding["role"], status)
             return "SOURCE_REFERENCE_NOT_BOUND:" + status
+    if png_binding is not None:
+        message += "\\n\\nUPLOAD_TASK_ID=" + png_binding["task_id"] + " (추적용 ID이며 이미지에 표시하지 마세요)"
     box = await first_visible(page, INPUT_SELECTORS)''',
         "composer-attachment-send",
     )
@@ -94,8 +96,33 @@ def patch(source):
         send_result = await send_message(page, prompt)
     if send_result == "sent" and png_binding is not None:
         mark_sent(png_binding)
+    elif send_result == "SEND_UNVERIFIED" and png_binding is not None:
+        # Preserve uncertain turn as a hold, never automatically duplicate it.
+        mark_sent(png_binding, status="SUBMISSION_UNVERIFIED_DO_NOT_AUTO_RETRY")
     if send_result != "sent":''',
         "scheduled-attachment",
+    )
+    source = replace_once(
+        source,
+        '        await page.wait_for_timeout(1500)\\n        return "sent"',
+        '''        await page.wait_for_timeout(1500)
+        if png_binding is not None:
+            # Do not mistake a preview + Enter keypress for server receipt.
+            try:
+                await page.wait_for_function(
+                    """task_id => {
+                      const draft = document.querySelector('#prompt-textarea');
+                      const draft_text = (draft?.innerText || draft?.textContent || '');
+                      const body_text = document.body?.innerText || '';
+                      return body_text.includes(task_id) && !draft_text.includes(task_id);
+                    }""",
+                    arg=png_binding["task_id"],
+                    timeout=30000,
+                )
+            except Exception:
+                return "SEND_UNVERIFIED"
+        return "sent"''',
+        "post-send-confirmation",
     )
     # The import must be part of controller code itself; no executable startup
     # shell monkey-patching and no separate daemon.
