@@ -2390,10 +2390,12 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.blendTextureAlphaPMAddSignedAlpha = blendTextureAlphaPMAddSignedAlpha;
         capture.blendTextureAlphaPMAddSigned2XAlpha = blendTextureAlphaPMAddSigned2XAlpha;
         capture.blendTextureAlphaPMBlendTextureAlpha = blendTextureAlphaPMBlendTextureAlpha;
-        // Both weights resolve to stage0 vertex diffuse alpha; retain the
-        // existing compiled native shader and Draw/DrawIndexed path.
-        capture.blendTextureAlphaPMBlendDiffuseAlpha =
-            blendTextureAlphaPMBlendDiffuseAlpha || blendTextureAlphaPMBlendCurrentDiffuseAlpha;
+        // Preserve the 00628 base selector and its source regression graph.
+        capture.blendTextureAlphaPMBlendDiffuseAlpha = blendTextureAlphaPMBlendDiffuseAlpha;
+        // 00642: stage0 CURRENT weights are the same vertex diffuse alpha.
+        // Alias only this new, exact predicate to the existing native shader.
+        if (blendTextureAlphaPMBlendCurrentDiffuseAlpha)
+            capture.blendTextureAlphaPMBlendDiffuseAlpha = true;
         capture.blendTextureAlphaPMBlendCurrentFactorAlpha = blendTextureAlphaPMBlendCurrentFactorAlpha;
         capture.blendTextureAlphaPMBlendFactorAlpha = blendTextureAlphaPMBlendFactorAlpha;
         capture.blendTextureAlphaPMAddSmoothAlpha = blendTextureAlphaPMAddSmoothAlpha;

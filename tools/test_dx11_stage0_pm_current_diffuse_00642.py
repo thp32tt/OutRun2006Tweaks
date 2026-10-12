@@ -8,8 +8,8 @@ predicate = """const bool blendTextureAlphaPMBlendCurrentDiffuseAlpha =
             alphaOp == D3DTOP_BLENDCURRENTALPHA &&
             alphaArg1 == D3DTA_TEXTURE &&
             (alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT);"""
-alias = """capture.blendTextureAlphaPMBlendDiffuseAlpha =
-            blendTextureAlphaPMBlendDiffuseAlpha || blendTextureAlphaPMBlendCurrentDiffuseAlpha;"""
+alias = """if (blendTextureAlphaPMBlendCurrentDiffuseAlpha)
+            capture.blendTextureAlphaPMBlendDiffuseAlpha = true;"""
 shader = """float4 PSTextureBlendTextureAlphaPMBlendDiffuseAlpha(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
     float4 c = float4(saturate(t.rgb + v.diffuse.rgb * (1.0f - t.a)),
