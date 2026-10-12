@@ -2,17 +2,17 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00602",
   "production_id": "CONVERSION-DX11-00602",
-  "event_id": "CONVERSION-DX11-00602-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00602-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00602",
   "work_key": "DX11:MENU_RACE_SRCALPHA_ZERO",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "C4_MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "C6_COMPLETED_EXACT_SHA",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -54,11 +54,45 @@
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tools/test_dx11_native_srcalpha_zero_00602.py",
     ".github/workflows/backend-conversion-gate.yml",
-    "docs/automation/runs/CONVERSION-DX11-00602.json"
+    "docs/automation/runs/CONVERSION-DX11-00602.json",
+    "tools/test_dx11_native_multiply_00598.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
   ],
   "packaging": {
     "status": "NOT_REQUIRED",
-    "reason": "Diagnostic-only implementation, no hardware-qualified release"
+    "reason": "Diagnostic opt-in only; no real Quest3/VDXR game/input validation or release"
   },
-  "next_action": "Examine exact-SHA GitHub gates and repair real failures; Quest3/VDXR gamepad test pending"
+  "next_action": "Independent later DX11 work may continue; current 00602 exact-SHA CI verified. Quest3/VDXR visual/gamepad outcome remains NEED_HMD_TEST.",
+  "validation_bearing_result_sha": "1900c2f7fe247446f47380e8cd3e867d3d02d7eb",
+  "result_sha": "1900c2f7fe247446f47380e8cd3e867d3d02d7eb",
+  "material_commit_sha": "fca94958e1d652d0bbd787d3486ad5b31701d26a",
+  "repair_commits": [
+    "33ed79b5cd204b4a28174ca16ac2c9ea24cf2081",
+    "1900c2f7fe247446f47380e8cd3e867d3d02d7eb"
+  ],
+  "automation_gates": {
+    "backend_conversion_gate": {
+      "id": 38227963330,
+      "status": "SUCCESS",
+      "validate": "SUCCESS",
+      "readiness_smoke": "SUCCESS"
+    },
+    "build": {
+      "id": 38227970912,
+      "status": "SUCCESS"
+    },
+    "dx11_fast_structural_checks": {
+      "id": 38227963430,
+      "status": "SUCCESS"
+    },
+    "openxr_vr_architecture": {
+      "id": 38227970879,
+      "status": "SUCCESS"
+    },
+    "outrun_exe_hud_inspector": {
+      "id": 38227970869,
+      "status": "SUCCESS"
+    }
+  },
+  "failure_repair_summary": "38227415941 00598 global ZERO-factor mutation accidentally targeted newly added SRCALPHA/ZERO; 38227793655 00602 Python loop shadowed C++ source string with float. Scoped multiply OM proof and renamed numeric channel variables without relaxing guards."
 }
