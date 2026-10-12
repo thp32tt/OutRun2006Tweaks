@@ -1843,6 +1843,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             op == D3DTOP_BLENDTEXTUREALPHAPM &&
             alphaOp == D3DTOP_SELECTARG1 &&
             alphaArg1 == (D3DTA_TEXTURE | D3DTA_COMPLEMENT);
+        // SELECTARG2 consumes ALPHAARG2, never the inactive ALPHAARG1.
+        // Keep the unmodified sampled alpha for PM RGB weighting, but emit
+        // complemented sampled alpha through the already compiled native PS.
+        const bool blendTextureAlphaPMInverseTextureArg2Alpha =
+            op == D3DTOP_BLENDTEXTUREALPHAPM &&
+            alphaOp == D3DTOP_SELECTARG2 &&
+            alphaArg2 == (D3DTA_TEXTURE | D3DTA_COMPLEMENT);
         // Reject other alpha operand modifiers, TFACTOR and reverse ordering.
         const bool blendTextureAlphaPMModulateAlpha = op == D3DTOP_BLENDTEXTUREALPHAPM &&
             alphaOp == D3DTOP_MODULATE && alphaArg1 == D3DTA_TEXTURE &&
@@ -2026,7 +2033,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha && !blendTextureAlphaPMFactorAlpha)))) ||
             (rgbNeedsDiffuse && !arg2Diffuse) ||
             (((alphaNeedsDiffuse && !alphaArg2Diffuse) && !alphaArg2UnusedOnSelectArg1) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha &&
-              !blendTextureAlphaPMFactorArg2Alpha) ||
+              !blendTextureAlphaPMFactorArg2Alpha &&
+              !blendTextureAlphaPMInverseTextureArg2Alpha) ||
             coordIndex >= layout.texcoordCount ||
             (transformFlags != D3DTTFF_DISABLE && transformFlags != D3DTTFF_COUNT2) || srgb ||
             ((addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP &&
@@ -2108,6 +2116,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         if (blendTextureAlphaPMFactorArg2Alpha) {
             capture.blendTextureAlphaPMDiffuseAlpha = false;
             capture.blendTextureAlphaPMFactorAlpha = true;
+        }
+        // SELECTARG2 with exact complemented TEXTURE alpha is not diffuse
+        // alpha; override the default PM SELECTARG2 selector before PS bind.
+        // Unsupported alpha modifiers still fail closed to the D3D9 Draw.
+        if (blendTextureAlphaPMInverseTextureArg2Alpha) {
+            capture.blendTextureAlphaPMDiffuseAlpha = false;
+            capture.blendTextureAlphaPMInverseTextureAlpha = true;
         }
         capture.blendTextureAlphaPMModulateAlpha = blendTextureAlphaPMModulateAlpha;
         capture.blendTextureAlphaPMAddAlpha = blendTextureAlphaPMAddAlpha;

@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00633",
+  "production_id": "CONVERSION-DX11-00633",
+  "event_id": "CONVERSION-DX11-00633-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:PM_RGB_SELECTARG2_COMPLEMENTED_TEXTURE_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "30f5f26f170934e62aa9b0d207af958f90162a0b",
+  "status": "IMPLEMENTED_AWAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Real D3D9 stage0 PM RGB/SELECTARG2 complemented texture-alpha capture",
+      "Exact capture override to compiled native D3D11 inverted-alpha PS and Draw/DrawIndexed",
+      "Unsupported combinations keep original DX9Ex/gamepad path"
+    ],
+    "batch_components": [
+      "Live source operand admission and negative fallback",
+      "Captured pixel shader selection and D3D11 binding",
+      "Destructive source and 256 numerical cases in Backend/Fast CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "PM RGB uses original sampled texture-alpha; output alpha is 1-texture-alpha",
+      "negative_regression": "Wrong selector/modifier/guard/PS/Draw fails new destructive regression",
+      "component_integration": "GetTextureStageState -> TextureCapture -> HLSL native PS -> guarded Draw/DrawIndexed diagnostic frame"
+    },
+    "conflict_keys": [
+      "DX11:PM_RGB_SELECTARG2_COMPLEMENTED_TEXTURE_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI source only; real Quest3/VDXR/menu/vehicle/race game frames not tested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME explicit opt-in; unsupported states and gamepad retain DX9Ex"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_inverse_arg2_00633.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00633.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS source/policy/00632 GitHub HEAD",
+    "C1_REVIEW": "PASS previously unhandled SELECTARG2 complemented texture-alpha",
+    "C2_IMPLEMENT": "PASS actual C++ capture/native PS routing and destructive regression",
+    "C3_VALIDATE": "PENDING exact-SHA GitHub Gate",
+    "C4_COMMIT": "PENDING remote material publication",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING CI; HMD/gamepad UNTESTED"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Check CI on material RESULT_SHA; repair actual regressions; separately record C6 only on full PASS",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null
+}
