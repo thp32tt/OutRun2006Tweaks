@@ -88,12 +88,15 @@ def valid(code):
     vb_contract = (
         "UINT knownUsedCount = cachedDecode ? decoded.knownUsedCount : 0;",
         "scratch.used.assign(vertexCount, 0);",
+        "scratch.vbTouched.size() == decoded.knownUsedCount",
+        "scratch.vbTouched.clear();",
+        "scratch.vbTouched.push_back(",
         "if (!scratch.used[static_cast<std::size_t>(local)])",
         "++knownUsedCount;",
         "scratch.used[static_cast<std::size_t>(local)] = 1;",
         "next.knownUsedCount = knownUsedCount;",
         "next.valid = true;",
-        "&scratch.used, knownUsedCount))",
+        "&scratch.used, knownUsedCount, &scratch.vbTouched))",
     )
     if not all(t in vb for t in vb_contract):
         return False
@@ -168,7 +171,12 @@ def main():
         ("if (!scratch.used[static_cast<std::size_t>(local)])",
          "if (scratch.used[static_cast<std::size_t>(local)])"),
         ("&scratch.upUsed, knownUsedCount, &scratch.upTouched))", "&scratch.upUsed))"),
-        ("&scratch.used, knownUsedCount))", "&scratch.used))"),
+        ("scratch.vbTouched.size() == decoded.knownUsedCount",
+         "scratch.vbTouched.size() != decoded.knownUsedCount"),
+        ("scratch.vbTouched.clear();", "scratch.vbTouched.reserve(0);"),
+        ("scratch.vbTouched.push_back(", "scratch.vbTouched.pop_back("),
+        ("&scratch.used, knownUsedCount, &scratch.vbTouched))",
+         "&scratch.used, knownUsedCount, nullptr))"),
         ("knownUsedCount <= vertexCount", "knownUsedCount > vertexCount"),
         ("static_cast<std::size_t>(knownUsedCount)",
          "static_cast<std::size_t>(vertexCount)"),
