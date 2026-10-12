@@ -1841,6 +1841,21 @@ namespace OutRunVRStereo
                 std::fabs(projection._23) > 1.0e-4f)
                 return false;
 
+            // Hoist the perspective-Z relation once per draw: 
+            // ( (1/rhw - P44) / P34 * P33 + P43 ) * rhw
+            // = P33/P34 + rhw * (P43 - P44 * P33/P34).
+            // Projected smoke/sand may touch 512 vertices per draw; avoid
+            // two floating-point divisions for each selected vertex.
+            const float projectionDepthScale =
+                projection._33 / projection._34;
+            const float projectionDepthOffset =
+                projection._43 - projection._44 * projectionDepthScale;
+            const float inverseDepthSpan = 1.0f / depthSpan;
+            const bool projectionDepthFast =
+                std::isfinite(projectionDepthScale) &&
+                std::isfinite(projectionDepthOffset) &&
+                std::isfinite(inverseDepthSpan);
+
             UINT sampled = 0;
             UINT valid = 0;
             UINT projected = 0;
@@ -1859,14 +1874,28 @@ namespace OutRunVRStereo
                     rhw <= 1.0e-6f || rhw >= 1000.0f)
                     continue;
 
-                const float clipW = 1.0f / rhw;
-                const float viewZ =
-                    (clipW - projection._44) / projection._34;
-                const float clipZ =
-                    viewZ * projection._33 + projection._43;
-                const float expectedNdcZ = clipZ / clipW;
-                const float actualNdcZ =
-                    (z - state.viewport.MinZ) / depthSpan;
+                float expectedNdcZ = projectionDepthScale +
+                    projectionDepthOffset * rhw;
+                float actualNdcZ =
+                    (z - state.viewport.MinZ) * inverseDepthSpan;
+                float depthDelta = std::fabs(expectedNdcZ - actualNdcZ);
+                // Preserve the original division order on non-finite
+                // projections or near the HUD/world decision boundary.
+                // A small float-roundoff shift must not turn a score glyph
+                // into a stereo world particle (or reject valid geometry).
+                if (!projectionDepthFast || !std::isfinite(depthDelta) ||
+                    std::fabs(depthDelta - 0.10f) <= 0.0005f)
+                {
+                    const float clipW = 1.0f / rhw;
+                    const float viewZ =
+                        (clipW - projection._44) / projection._34;
+                    const float clipZ =
+                        viewZ * projection._33 + projection._43;
+                    expectedNdcZ = clipZ / clipW;
+                    actualNdcZ =
+                        (z - state.viewport.MinZ) / depthSpan;
+                    depthDelta = std::fabs(expectedNdcZ - actualNdcZ);
+                }
                 if (!std::isfinite(expectedNdcZ) ||
                     !std::isfinite(actualNdcZ))
                     continue;
@@ -1876,8 +1905,7 @@ namespace OutRunVRStereo
                 // projection relation between screen-Z and RHW. HUD glyphs can
                 // use arbitrary RHW for sorting/scaling, which was the reason
                 // the white position text was incorrectly promoted to 3D.
-                if (std::fabs(rhw - 1.0f) > 0.02f &&
-                    std::fabs(expectedNdcZ - actualNdcZ) <= 0.10f)
+                if (std::fabs(rhw - 1.0f) > 0.02f && depthDelta <= 0.10f)
                     ++projected;
             }
 

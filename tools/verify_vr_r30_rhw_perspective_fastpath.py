@@ -56,11 +56,84 @@ def valid(code: str) -> bool:
         return False
 
 
+
+def projected_depth_signature_contract(source: str) -> None:
+    """No per-particle divides on the common path; preserve HUD/world guards."""
+    import math
+    import random
+    import struct
+
+    code = source.split("bool R30XyzrhwHasProjectedDepthSignature(", 1)[1].split(
+        "bool R30ConfigureXyzrhwWorldEffect(", 1)[0]
+    def valid(s: str) -> bool:
+        start = s.index("const float projectionDepthScale =")
+        loop = s.index("for (UINT i = 0; i < vertexCount && sampled < 512u; ++i)")
+        slow = s.index("if (!projectionDepthFast || !std::isfinite(depthDelta) ||")
+        return (start < loop < slow
+            and "projection._33 / projection._34;" in s[:loop]
+            and "projection._43 - projection._44 * projectionDepthScale;" in s[:loop]
+            and "const float inverseDepthSpan = 1.0f / depthSpan;" in s[:loop]
+            and "std::isfinite(projectionDepthScale)" in s[:loop]
+            and "std::isfinite(projectionDepthOffset)" in s[:loop]
+            and "std::isfinite(inverseDepthSpan)" in s[:loop]
+            and "projectionDepthOffset * rhw;" in s[loop:slow]
+            and "(z - state.viewport.MinZ) * inverseDepthSpan;" in s[loop:slow]
+            and "std::fabs(depthDelta - 0.10f) <= 0.0005f" in s[slow:]
+            and "const float clipW = 1.0f / rhw;" in s[slow:]
+            and "expectedNdcZ = clipZ / clipW;" in s[slow:]
+            and "(z - state.viewport.MinZ) / depthSpan;" in s[slow:]
+            and "std::fabs(rhw - 1.0f) > 0.02f && depthDelta <= 0.10f" in s
+            and "sampled >= 3u && valid >= 3u && valid * 2u >= sampled" in s
+            and "projected * 4u >= valid * 3u" in s
+            and "if (usedMask &&" in s)
+    assert valid(code), "R30 projected world/particle depth fastpath contract lost"
+    mutations = (
+        ("projection._33 / projection._34;", "projection._33 / projection._44;"),
+        ("projection._43 - projection._44 * projectionDepthScale;",
+         "projection._43 + projection._44 * projectionDepthScale;"),
+        ("projectionDepthOffset * rhw;", "projectionDepthOffset / rhw;"),
+        ("(z - state.viewport.MinZ) * inverseDepthSpan;",
+         "(z - state.viewport.MinZ) / inverseDepthSpan;"),
+        ("std::isfinite(projectionDepthScale)", "true"),
+        ("std::isfinite(projectionDepthOffset)", "true"),
+        ("std::isfinite(inverseDepthSpan)", "true"),
+        ("std::fabs(depthDelta - 0.10f) <= 0.0005f", "false"),
+        ("expectedNdcZ = clipZ / clipW;", "expectedNdcZ = clipZ;"),
+        ("std::fabs(rhw - 1.0f) > 0.02f && depthDelta <= 0.10f",
+         "depthDelta <= 0.10f"),
+        ("projected * 4u >= valid * 3u", "projected >= 0u"),
+    )
+    for number, (needle, replacement) in enumerate(mutations, 1):
+        assert needle in code, f"depth signature mutation {number} absent"
+        assert not valid(code.replace(needle, replacement, 1)), (
+            f"depth signature mutation {number} escaped")
+    f32 = lambda x: struct.unpack("<f", struct.pack("<f", x))[0]
+    rng = random.Random(669)
+    for _ in range(12000):
+        p34 = f32(rng.choice((-1.0, 1.0)))
+        p33 = f32(rng.uniform(0.8, 1.2))
+        p43 = f32(rng.uniform(-2.0, 2.0))
+        p44 = f32(rng.uniform(-0.15, 0.15))
+        rhw = f32(rng.uniform(0.001, 10.0))
+        clip_w = f32(1.0 / rhw)
+        view_z = f32(f32(clip_w - p44) / p34)
+        clip_z = f32(f32(view_z * p33) + p43)
+        old_expected = f32(clip_z / clip_w)
+        coeff = f32(p33 / p34)
+        slope = f32(p43 - f32(p44 * coeff))
+        fast_expected = f32(coeff + f32(slope * rhw))
+        assert math.isfinite(old_expected) and math.isfinite(fast_expected)
+        assert abs(old_expected - fast_expected) <= (
+            0.00005 * max(1.0, abs(old_expected)))
+    print(f"PASS R30 projected-depth hotpath, {len(mutations)} destructive mutations, 12000 float32 cases")
+
+
 def main() -> None:
     source = SOURCE.read_text(encoding="utf-8")
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert workflow.count("tools/verify_vr_r30_rhw_perspective_fastpath.py") == 2
     code = transform_body(source)
+    projected_depth_signature_contract(source)
     assert valid(code), "R30 RHW basis must be computed once before vertex loops"
     mutations = (
         ("state.worldEffect && state.fullWorldReprojection &&",
