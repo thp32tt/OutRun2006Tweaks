@@ -1644,7 +1644,7 @@ def main() -> None:
         # SELECTARG RGB variants that intentionally share its ALPHAOP.
         original_factor_pair = (
             "const bool blendFactorAlpha = op == D3DTOP_BLENDFACTORALPHA &&\n"
-            "                                       alphaOp == D3DTOP_BLENDFACTORALPHA;"
+            "                                      alphaOp == D3DTOP_BLENDFACTORALPHA;"
         )
         return (all(token in code for token in factor_links) and
                 original_factor_pair in intake and
