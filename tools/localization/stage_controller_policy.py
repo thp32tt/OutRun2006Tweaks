@@ -11,7 +11,8 @@ def configure(compose, revision):
     if not re.fullmatch(r'[0-9a-f]{40}', revision):
         raise ValueError('Exact Git commit required')
     result = deepcopy(compose)
-    service = result['services'][NAME]
+    service = deepcopy(result['services'][NAME])
+    result['services'][NAME] = service
     image = service.get('image')
     if image and not str(image).startswith(IMAGE_PREFIX):
         raise ValueError('Unexpected existing image mapping; manual reconcile required')

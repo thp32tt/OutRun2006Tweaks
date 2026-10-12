@@ -84,6 +84,12 @@ class PolicyTests(unittest.TestCase):
         self.compose['services'][NAME]['image']='foreign:tag'
         with self.assertRaises(ValueError): configure(self.compose,'c'*40)
 
+    def test_shared_service_anchor_does_not_modify_other_service(self):
+        self.compose['services']['unrelated']=self.compose['services'][NAME]
+        result=configure(self.compose,'c'*40)
+        self.assertEqual(result['services']['unrelated'],self.compose['services'][NAME])
+        self.assertEqual(result['services'][NAME]['environment']['AUTO_SEND'],'false')
+
     def test_shared_environment_anchor_does_not_modify_other_service(self):
         original=self.compose['services'][NAME]['environment']
         self.compose['services']['unrelated']['environment']=original
