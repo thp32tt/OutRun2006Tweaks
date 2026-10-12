@@ -841,10 +841,12 @@ namespace OutRunVRStereo
                 };
                 return R33Dispatch(device, actual, lower, "R33/DrawPrimitive", resyncAlreadyFlushed);
             };
-            const bool gpuTimed = GpuWaterProbe::instance().beforeDraw(device, primitiveCount);
+            const bool gpuTimed = GpuWaterProbe::Enabled() &&
+                GpuWaterProbe::instance().beforeDraw(device, primitiveCount);
             const HRESULT hr = R33GuardStereoRasterState(
                 device, call, "R33/DrawPrimitive/raster-state");
-            GpuWaterProbe::instance().afterDraw(gpuTimed);
+            if (gpuTimed)
+                GpuWaterProbe::instance().afterDraw(true);
             return hr;
         }
 
@@ -874,10 +876,12 @@ namespace OutRunVRStereo
                 return R33Dispatch(device, actual, lower,
                     "R33/DrawIndexedPrimitive", resyncAlreadyFlushed);
             };
-            const bool gpuTimed = GpuWaterProbe::instance().beforeDraw(device, primitiveCount);
+            const bool gpuTimed = GpuWaterProbe::Enabled() &&
+                GpuWaterProbe::instance().beforeDraw(device, primitiveCount);
             const HRESULT hr = R33GuardStereoRasterState(
                 device, call, "R33/DrawIndexedPrimitive/raster-state");
-            GpuWaterProbe::instance().afterDraw(gpuTimed);
+            if (gpuTimed)
+                GpuWaterProbe::instance().afterDraw(true);
             return hr;
         }
 
@@ -902,10 +906,12 @@ namespace OutRunVRStereo
                 };
                 return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP", resyncAlreadyFlushed);
             };
-            const bool gpuTimed = GpuWaterProbe::instance().beforeDraw(device, primitiveCount);
+            const bool gpuTimed = GpuWaterProbe::Enabled() &&
+                GpuWaterProbe::instance().beforeDraw(device, primitiveCount);
             const HRESULT hr = R33GuardStereoRasterState(
                 device, call, "R33/DrawPrimitiveUP/raster-state");
-            GpuWaterProbe::instance().afterDraw(gpuTimed);
+            if (gpuTimed)
+                GpuWaterProbe::instance().afterDraw(true);
             return hr;
         }
 
@@ -936,10 +942,12 @@ namespace OutRunVRStereo
                 return R33Dispatch(device, actual, lower,
                     "R33/DrawIndexedPrimitiveUP", resyncAlreadyFlushed);
             };
-            const bool gpuTimed = GpuWaterProbe::instance().beforeDraw(device, primitiveCount);
+            const bool gpuTimed = GpuWaterProbe::Enabled() &&
+                GpuWaterProbe::instance().beforeDraw(device, primitiveCount);
             const HRESULT hr = R33GuardStereoRasterState(
                 device, call, "R33/DrawIndexedPrimitiveUP/raster-state");
-            GpuWaterProbe::instance().afterDraw(gpuTimed);
+            if (gpuTimed)
+                GpuWaterProbe::instance().afterDraw(true);
             return hr;
         }
 
@@ -1051,7 +1059,7 @@ namespace OutRunVRStereo
                 }
             }
 
-            if (device && R32ReviewIsGameDevice(device))
+            if (device && R32ReviewIsGameDevice(device) && GpuWaterProbe::Enabled())
                 GpuWaterProbe::instance().beforePresent(device);
             const bool blocked = R32ReviewIsGameDevice(device) &&
                 R33ResetReplayBlocked.load(std::memory_order_acquire);
@@ -1065,7 +1073,8 @@ namespace OutRunVRStereo
                 });
             if (device && R32ReviewIsGameDevice(device))
             {
-                GpuWaterProbe::instance().afterPresent(device);
+                if (GpuWaterProbe::Enabled())
+                    GpuWaterProbe::instance().afterPresent(device);
                 R33LogPerfWindow();
             }
 

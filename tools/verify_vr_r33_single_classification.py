@@ -221,12 +221,63 @@ def negative_write_flag_cache(src: str) -> None:
             continue
         raise AssertionError(f"R33 cached-write negative mutation {i} escaped")
 
+
+def check_gpu_profiler_disabled_fastpath(src: str) -> None:
+    """GPU timestamp opt-out must not enter the Meter singleton on any draw."""
+    before = ("const bool gpuTimed = GpuWaterProbe::Enabled() &&\n"
+              "                GpuWaterProbe::instance().beforeDraw(device, primitiveCount);")
+    after = ("if (gpuTimed)\n"
+             "                GpuWaterProbe::instance().afterDraw(true);")
+    for name in ("DrawPrimitiveDestR33", "DrawIndexedPrimitiveDestR33",
+                 "DrawPrimitiveUPDestR33", "DrawIndexedPrimitiveUPDestR33"):
+        body = src.split("HRESULT __stdcall " + name + "(", 1)[1].split(
+            "HRESULT __stdcall ", 1)[0]
+        assert body.count(before) == 1, name + ": disabled Meter still entered"
+        assert body.count(after) == 1, name + ": sparse sample completion lost"
+        assert body.index(before) < body.index("R33GuardStereoRasterState(")
+        assert body.index(after) > body.index("R33GuardStereoRasterState(")
+        assert "GpuWaterProbe::instance().afterDraw(gpuTimed)" not in body
+    present = src.split("HRESULT __stdcall PresentDestR33(", 1)[1]
+    assert ("if (device && R32ReviewIsGameDevice(device) && "
+            "GpuWaterProbe::Enabled())\n"
+            "                GpuWaterProbe::instance().beforePresent(device);") in present
+    assert ("if (GpuWaterProbe::Enabled())\n"
+            "                    GpuWaterProbe::instance().afterPresent(device);") in present
+    assert "R33LogPerfWindow();" in present, "normal R33 telemetry lost"
+    assert "GpuWaterProbe::instance().reset();" in present, "lost-device reset lost"
+
+
+def negative_gpu_profiler_fastpath(src: str) -> None:
+    mutations = (
+        ("GpuWaterProbe::Enabled() &&\n", "true &&\n"),
+        ("GpuWaterProbe::Enabled() &&\n", "GpuWaterProbe::Enabled() ||\n"),
+        ("if (gpuTimed)\n", "if (true)\n"),
+        ("GpuWaterProbe::instance().afterDraw(true);",
+         "GpuWaterProbe::instance().afterDraw(gpuTimed);"),
+        ("if (GpuWaterProbe::Enabled())\n"
+         "                    GpuWaterProbe::instance().afterPresent(device);",
+         "GpuWaterProbe::instance().afterPresent(device);"),
+        ("R32ReviewIsGameDevice(device) && GpuWaterProbe::Enabled())",
+         "R32ReviewIsGameDevice(device))"),
+    )
+    for i, (before, after) in enumerate(mutations, 1):
+        assert before in src, f"GPU profiler negative fixture {i} missing"
+        mutant = src.replace(before, after, 1)
+        try:
+            check_gpu_profiler_disabled_fastpath(mutant)
+        except (AssertionError, IndexError, ValueError):
+            continue
+        raise AssertionError(f"GPU profiler negative mutation {i} survived")
+
+
 def main() -> None:
     src = SOURCE.read_text(encoding="utf-8")
     check(src)
     check_resync_single_flush(src)
     check_mono_aux_fastpath(src)
     check_write_flags_cached(src)
+    check_gpu_profiler_disabled_fastpath(src)
+    negative_gpu_profiler_fastpath(src)
     negative_mono_aux_fastpath(src)
     negative_write_flag_cache(src)
     mutants = [
@@ -257,7 +308,7 @@ def main() -> None:
         except (AssertionError, ValueError):
             continue
         raise AssertionError(f"resync regression mutation {i} was not rejected")
-    print("PASS R33 classification/resync plus cached depth-stencil write flags (24 negative mutations)")
+    print("PASS R33 classification/resync plus cached depth-stencil write flags (30 negative mutations)")
 
 
 if __name__ == "__main__":
