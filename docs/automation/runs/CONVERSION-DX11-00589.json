@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00589",
   "work_key": "DX11:MENU_RACE_NATIVE_POINT_MIP_CHAIN",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "IMPLEMENTED_AWAITING_EXACT_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "native_gameplay_activation": false,
   "hmd_test_performed": false,
@@ -59,5 +59,55 @@
     "status": "NOT_REQUIRED",
     "reason": "No Quest3/VDXR runtime candidate promotion"
   },
-  "next_action": "Inspect exact-SHA mandatory GitHub Actions, then C6 bookkeeping only after all exact-SHA Gates succeed. Runtime NEED_HMD_TEST; DXVK frozen."
+  "next_action": "Quest3/VDXR game/menu/vehicle/race visual, gamepad and frame-timing runtime parity NEED_HMD_TEST; no native gameplay promotion; independent DX11 development continues; DXVK frozen.",
+  "material_result_sha": "1a65b85214bd7a9a8d4e39ca4aac7608c0e768bb",
+  "validation_bearing_result_sha": "391bcb62d144513c6ffe7dc65160d5237443124a",
+  "result_sha": "391bcb62d144513c6ffe7dc65160d5237443124a",
+  "c6_basis_head_sha": "391bcb62d144513c6ffe7dc65160d5237443124a",
+  "repair_shas": [
+    "391bcb62d144513c6ffe7dc65160d5237443124a"
+  ],
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38204257683,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "391bcb62d144513c6ffe7dc65160d5237443124a"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38204261590,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "391bcb62d144513c6ffe7dc65160d5237443124a"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38204257717,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "391bcb62d144513c6ffe7dc65160d5237443124a"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38204261556,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "391bcb62d144513c6ffe7dc65160d5237443124a"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38204261505,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "391bcb62d144513c6ffe7dc65160d5237443124a"
+    }
+  ],
+  "local_validation": [
+    "Live game D3D9 MIP_POINT stage0 sampler -> per-level CPU-readable source texture -> exact BGRA8/packed16/BC1-3 pitch -> D3D11 immutable multi-mip SRV and MIP_POINT sampler -> existing Draw/DrawIndexed.",
+    "Source regression mutation tests including old FIRST_GAME_DRAW_FRAME acceptance updated and positive Windows build.",
+    "Exact-SHA Backend Conversion Gate, Build, DX11 Fast Structural, OpenXR architecture, EXE HUD Inspector all SUCCESS."
+  ],
+  "runtime_evidence": null
 }
