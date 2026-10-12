@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00590",
+  "production_id": "CONVERSION-DX11-00590",
+  "event_id": "CONVERSION-DX11-00590-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00590",
+  "work_key": "DX11:MENU_RACE_NATIVE_TRILINEAR_MIP_CHAIN",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live D3D9 stage0 MIP_LINEAR sampler admitted for game-authored Draw",
+      "Capture complete D3D9 texture chain in D3D11 immutable resource/SRV",
+      "D3D11 four trilinear/mixed MIN MAG MIP filters bound to live PS Draw",
+      "Guarded diagnostic 256x144 inset with DX9Ex Draw and input retained"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp stage0+SRV+native sampler+Draw",
+      "tools/test_dx11_native_mip_linear_00590.py (eight variants, 19 mutations)",
+      ".github/workflows/backend-conversion-gate.yml validation hook"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Admit game D3D9 mip-linear source and preserve four D3D11 native mip-linear filters with full level uploads",
+      "negative_regression": "19 destructive mutations; reject unsupported LOD/bias, autogen, anisotropic, multilevel GPU targets and preserve prior 00589 point chain",
+      "component_integration": "Game-authored D3D9 draw sampler -> CPU mip copy -> D3D11 SRV/filter -> native PS Draw/DrawIndexed -> inset"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_NATIVE_TRILINEAR_MIP_CHAIN",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:MIP_LINEAR_FILTER"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Exact-SHA CI source and build only; Quest3/VDXR game/runtime NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Opt-in diagnostic inset only; game input/DX9Ex Present/Draw always execute; gameplay activation disabled"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_mip_linear_00590.py",
+    ".github/workflows/backend-conversion-gate.yml"
+  ],
+  "base_head_sha": "1da76fc0d594edac83aca57338479b4294f37356",
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No runtime-validated HMD package"
+  },
+  "next_action": "Run exact SHA backend+Build+DX11+OpenXR+HUD Gate; HMD remains UNTESTED",
+  "runtime_evidence": null
+}

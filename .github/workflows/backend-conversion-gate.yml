@@ -148,6 +148,11 @@ jobs:
         shell: pwsh
         run: python tools/test_dx11_native_mip_chain_00589.py
 
+      - name: Verify DX11 live D3D9 mip-linear Draw 00590
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_native_mip_linear_00590.py
+
       - name: Verify DX11 source graph
         shell: pwsh
         run: python tools/verify_dx11_source_graph.py

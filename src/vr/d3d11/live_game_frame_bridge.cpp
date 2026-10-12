@@ -1179,7 +1179,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             return false;
         // MIP_POINT is supported with a fully mirrored CPU-readable mip chain.
         // Reject nonzero source LOD bias/MaxMipLevel until those controls are
-        // translated. MIP_LINEAR and anisotropy remain on the original DX9Ex path.
+        // translated. Anisotropy remains on the original DX9Ex path; MIP_LINEAR copies all levels.
         // Reject complement/alpha-replicate modifiers and projected coordinates.
         const bool blendTextureModulateAlpha = op == D3DTOP_BLENDTEXTUREALPHA &&
                                                 alphaOp == D3DTOP_MODULATE;
@@ -1408,7 +1408,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             (addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP) ||
             (mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR) ||
             (min != D3DTEXF_POINT && min != D3DTEXF_LINEAR) ||
-            (mip != D3DTEXF_NONE && mip != D3DTEXF_POINT) ||
+            ((mip != D3DTEXF_NONE && mip != D3DTEXF_POINT) && mip != D3DTEXF_LINEAR) ||
             maxMip != 0u || mipBias != 0u)
             return false;
         capture.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(mip);
@@ -1581,7 +1581,7 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
 }
 
 // Snapshot a live game texture into a D3D11 sampleable resource. When the
-// source asks for MIP_POINT, upload *every* readable mip rather than binding
+// source asks for MIP_POINT or MIP_LINEAR, upload every readable mip rather than binding
 // level 0 and silently changing the game's minification result. All error
 // paths preserve the original D3D9 Draw/Present/gamepad behavior.
 bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
@@ -1599,7 +1599,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         (base.Format == D3DFMT_A8R8G8B8 ||
          base.Format == D3DFMT_X8R8G8B8);
     if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;
-    const bool usesMips = capture.mipFilter == D3DTEXF_POINT;
+    const bool usesMips = capture.mipFilter == D3DTEXF_POINT ||
+                          capture.mipFilter == D3DTEXF_LINEAR;
     // AUTOGENMIPMAP exposes one level to LockRect even though the D3D9
     // sampler consumes generated levels. Never claim those mips were copied.
     if (usesMips && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)) return false;
@@ -1710,7 +1711,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         FAILED(dev->CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())))
         return false;
     D3D11_SAMPLER_DESC state{};
-    // Independent D3D9 MIN/MAG filtering with mip point selection. For
+    // Independent D3D9 MIN/MAG filtering with point or linear mip selection. For
     // MIPFILTER=NONE force LOD 0 even if the source has additional mips.
     state.Filter = capture.minFilter == D3DTEXF_LINEAR ?
         (capture.magFilter == D3DTEXF_LINEAR ?
@@ -1719,6 +1720,17 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         (capture.magFilter == D3DTEXF_LINEAR ?
             D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :
             D3D11_FILTER_MIN_MAG_MIP_POINT);
+    // Preserve trilinear and mixed MIN/MAG sampling for game textures:
+    // DX9Ex uses two adjacent mip levels when MIPFILTER is LINEAR.
+    if (capture.mipFilter == D3DTEXF_LINEAR) {
+        state.Filter = capture.minFilter == D3DTEXF_LINEAR ?
+            (capture.magFilter == D3DTEXF_LINEAR ?
+                D3D11_FILTER_MIN_MAG_MIP_LINEAR :
+                D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR) :
+            (capture.magFilter == D3DTEXF_LINEAR ?
+                D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_LINEAR :
+                D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR);
+    }
     state.AddressU = capture.addressU == D3DTADDRESS_WRAP ?
         D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
     state.AddressV = capture.addressV == D3DTADDRESS_WRAP ?
