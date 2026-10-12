@@ -72,11 +72,17 @@ def valid(text):
         return False
     if "depthSignature" in up:
         return False  # untracked UP caller must never borrow VB memo
+    # The indexed-UP path now passes only a validated sparse touched list;
+    # it must still not pass any cached shadow-signature identity.
+    if "&scratch.upUsed, nullptr, nullptr, nullptr,\n" not in up or (
+            "&scratch.upTouched))" not in up):
+        return False
     return (
         "state, nullptr, &scratch.vertexCopy,\n"
         "                    nullptr, &scratch.depthSignature)" in nonindexed and
         "state, &scratch.used, &scratch.vertexCopy,\n"
-        "                    &scratch.indexCopy, &scratch.depthSignature)" in indexed
+        "                    &scratch.indexCopy, &scratch.depthSignature,\n"
+        "                    &scratch.vbTouched)" in indexed
     )
 
 
