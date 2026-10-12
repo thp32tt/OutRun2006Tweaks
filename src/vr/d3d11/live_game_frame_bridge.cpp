@@ -495,7 +495,7 @@ float4 PSTextureBlendTextureAlphaPMAddSigned2XAlpha(VOut v) : SV_Target {
 float4 PSTextureBlendTextureAlphaPMModulateFactorAlpha(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
     float4 c = float4(saturate(t.rgb + v.diffuse.rgb * (1.0f - t.a)),
-                      t.a * alphaParams.w);
+                      saturate(t.a * alphaParams.w));
     AlphaGate(c.a); return c;
 }
 float4 PSTextureBlendTextureAlphaPMSelectFactorAlpha(VOut v) : SV_Target {
@@ -1870,6 +1870,18 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             alphaOp == D3DTOP_MODULATE &&
             alphaArg1 == D3DTA_TEXTURE &&
             alphaArg2 == (D3DTA_TFACTOR | D3DTA_COMPLEMENT);
+        // Scaled D3D9 alpha factors: 2X/4X multiply TEXTURE alpha and live
+        // TFACTOR alpha; saturation occurs before AlphaGate and OM blending.
+        // RGB remains premultiplied by the original *unscaled* texture alpha.
+        const bool blendTextureAlphaPMScaledFactorAlpha =
+            op == D3DTOP_BLENDTEXTUREALPHAPM &&
+            (alphaOp == D3DTOP_MODULATE2X || alphaOp == D3DTOP_MODULATE4X) &&
+            alphaArg1 == D3DTA_TEXTURE && alphaArg2 == D3DTA_TFACTOR;
+        const bool blendTextureAlphaPMScaledInverseFactorAlpha =
+            op == D3DTOP_BLENDTEXTUREALPHAPM &&
+            (alphaOp == D3DTOP_MODULATE2X || alphaOp == D3DTOP_MODULATE4X) &&
+            alphaArg1 == D3DTA_TEXTURE &&
+            alphaArg2 == (D3DTA_TFACTOR | D3DTA_COMPLEMENT);
         // D3D9 complement belongs to the active alpha operand, never to
         // the sampled texture-alpha used by premultiplied RGB blending.
         const bool blendTextureAlphaPMInverseFactorArg1Alpha =
@@ -1986,6 +1998,12 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         if (blendTextureAlphaPMModulateInverseFactorAlpha &&
             FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))
             return false;
+        // The scaled factors are game state, not the default capture value.
+        // No native Draw/DrawIndexed occurs if this read fails.
+        if ((blendTextureAlphaPMScaledFactorAlpha ||
+             blendTextureAlphaPMScaledInverseFactorAlpha) &&
+            FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))
+            return false;
         // These disjoint complemented-factor selectors must fetch the actual
         // game constant; failure leaves the draw on the D3D9 fallback path.
         if ((blendTextureAlphaPMInverseFactorArg1Alpha ||
@@ -2040,6 +2058,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // source polarity separately without accepting other RGB modifiers.
         if (blendTextureAlphaPMModulateFactorAlpha && !arg2Diffuse) return false;
         if (blendTextureAlphaPMModulateInverseFactorAlpha && !arg2Diffuse) return false;
+        if ((blendTextureAlphaPMScaledFactorAlpha ||
+             blendTextureAlphaPMScaledInverseFactorAlpha) && !arg2Diffuse) return false;
         // A missing DIFFUSE slot may supply a material color under MODULATE.
         // Only texture selection is provably independent of that color.
         if (!layout.hasDiffuse && !selectTexture) return false;
@@ -2112,6 +2132,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
               !blendTextureSubtractAlpha && !blendDiffuseSubtractAlpha &&
                !blendTextureAddSmoothAlpha && !blendDiffuseAddSmoothAlpha &&
              !blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMInverseDiffuseAlpha && !blendTextureAlphaPMFactorAlpha && !blendTextureAlphaPMInverseFactorArg1Alpha && !blendTextureAlphaPMInverseFactorArg2Alpha && !blendTextureAlphaPMDiffuseArg1Alpha && !blendTextureAlphaPMModulateAlpha && !blendTextureAlphaPMAddAlpha && !blendTextureAlphaPMSubtractAlpha && !blendTextureAlphaPMModulate2XAlpha && !blendTextureAlphaPMModulate4XAlpha && !blendTextureAlphaPMAddSignedAlpha && !blendTextureAlphaPMAddSigned2XAlpha && !blendTextureAlphaPMBlendTextureAlpha && !blendTextureAlphaPMAddSmoothAlpha && !blendTextureAlphaPMBlendDiffuseAlpha && !blendTextureAlphaPMBlendFactorAlpha &&
+              !blendTextureAlphaPMScaledFactorAlpha &&
+              !blendTextureAlphaPMScaledInverseFactorAlpha &&
               !blendTextureAlphaPMModulateInverseFactorAlpha &&
               !blendTextureAlphaPMModulateFactorAlpha &&
              !blendTextureAlphaPMDiffuseAlpha && !blendTextureAlpha && !blendTextureAlphaPM && !blendTextureAlphaPMTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha) || arg != D3DTA_TEXTURE ||
@@ -2204,6 +2226,11 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.blendTextureAlphaPMModulateFactorAlpha = blendTextureAlphaPMModulateFactorAlpha;
         if (blendTextureAlphaPMModulateInverseFactorAlpha)
             capture.blendTextureAlphaPMModulateFactorAlpha = true;
+        // Share the native PM RGB shader with a scaled saturating alpha
+        // constant, keeping the original DX9Ex game Draw and input unmodified.
+        if (blendTextureAlphaPMScaledFactorAlpha ||
+            blendTextureAlphaPMScaledInverseFactorAlpha)
+            capture.blendTextureAlphaPMModulateFactorAlpha = true;
         // SELECTARG1 complemented factor shares the compiled native PM/factor
         // shader, with alpha inversion applied to its constant below.
         if (blendTextureAlphaPMInverseFactorArg1Alpha)
@@ -2274,8 +2301,15 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.blendFactorAlphaValue = static_cast<float>((textureFactor >> 24u) & 0xffu) / 255.0f;
         if (blendTextureAlphaPMInverseFactorArg1Alpha || blendTextureAlphaPMInverseFactorArg2Alpha)
             capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;
-        if (blendTextureAlphaPMModulateInverseFactorAlpha)
+        if (blendTextureAlphaPMModulateInverseFactorAlpha ||
+            blendTextureAlphaPMScaledInverseFactorAlpha)
             capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;
+        // A D3D11 PS constant can exceed 1 here; the pixel shader must
+        // saturate the final TEXTURE.a * scaled factor before alpha test.
+        if (blendTextureAlphaPMScaledFactorAlpha ||
+            blendTextureAlphaPMScaledInverseFactorAlpha)
+            capture.blendFactorAlphaValue *=
+                alphaOp == D3DTOP_MODULATE2X ? 2.0f : 4.0f;
         capture.coordIndex = coordIndex;
         capture.transformUv = transformUv;
         if (transformUv) capture.uvTransform = uvTransform;
