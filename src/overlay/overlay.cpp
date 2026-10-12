@@ -64,8 +64,8 @@ void Overlay::render_shell()
 	// unchanged; VR uses a centered size only when the window appears.
 	const float vrDensity = std::clamp(VrFontMultiplier, 1.0f, 3.0f);
 	const ImVec2 windowSize(
-		min(1130.f * vrDensity, std::max(64.f, content.width - 40.f)),
-		min(600.f * vrDensity, std::max(64.f, content.height - 40.f)));
+		(std::min)(1130.f * vrDensity, (std::max)(64.f, content.width - 40.f)),
+		(std::min)(600.f * vrDensity, (std::max)(64.f, content.height - 40.f)));
 	const ImGuiCond initialPlacement = vrDensity > 1.0f
 		? ImGuiCond_Appearing : ImGuiCond_FirstUseEver;
 
