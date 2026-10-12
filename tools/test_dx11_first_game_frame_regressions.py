@@ -1952,7 +1952,9 @@ def main() -> None:
     factor_links = (
         "const bool blendFactorAlpha = op == D3DTOP_BLENDFACTORALPHA &&",
         "alphaOp == D3DTOP_BLENDFACTORALPHA;",
-        "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)",
+        ("blendTextureAlphaPMFactorArg2Alpha) &&\n"
+         "            FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))\n"
+         "            return false;"),
         "blendTextureAlpha || blendTextureAlphaPM || blendTextureAlphaPMTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;",
         "!blendTextureAlpha && !blendTextureAlphaPM && !blendTextureAlphaPMTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha)",
         "capture.blendFactorAlpha = blendFactorAlpha;",
@@ -1983,7 +1985,7 @@ def main() -> None:
         )
         return (all(token in code for token in factor_links) and
                 original_factor_pair in intake and
-                "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)" in intake and
+                factor_links[2] in intake and
                 "static_cast<float>(output.alphaFunc), capture.blendFactorAlphaValue" in submit and
                 "ctx->PSSetShader(capture.selectDiffuseTextureAlpha ?" in submit and
                 "capture.blendFactorAlpha ? s.blendFactorAlphaPs.Get() :" in submit and
