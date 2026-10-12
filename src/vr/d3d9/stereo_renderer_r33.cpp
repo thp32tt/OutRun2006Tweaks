@@ -413,15 +413,25 @@ namespace OutRunVRStereo
             if (!R33DepthStencilState.valid)
                 return hr;
 
+            // A repeated successful game state setter already matches the
+            // tracked snapshot. Avoid re-evaluating depth/stencil write flags
+            // on dense-scene state churn; changed values still invalidate
+            // partial stencil snapshots and refresh the derived predicates.
             switch (state)
             {
             case D3DRS_ZENABLE:
+                if (R33DepthStencilState.zEnable == value)
+                    return hr;
                 R33DepthStencilState.zEnable = value;
                 break;
             case D3DRS_ZWRITEENABLE:
+                if (R33DepthStencilState.zWrite == value)
+                    return hr;
                 R33DepthStencilState.zWrite = value;
                 break;
             case D3DRS_STENCILENABLE:
+                if (R33DepthStencilState.stencilEnable == value)
+                    return hr;
                 // A disabled snapshot did not read stencil ops. Resample
                 // before the next draw if stencil is switched back on.
                 if (R33DepthStencilState.stencilEnable == FALSE && value != FALSE)
@@ -429,6 +439,8 @@ namespace OutRunVRStereo
                 R33DepthStencilState.stencilEnable = value;
                 break;
             case D3DRS_STENCILWRITEMASK:
+                if (R33DepthStencilState.stencilWriteMask == value)
+                    return hr;
                 // A zero-mask snapshot omitted ops as well; re-read them
                 // before the next eligible stencil-writing draw.
                 if (R33DepthStencilState.stencilWriteMask == 0 && value != 0)
@@ -436,24 +448,38 @@ namespace OutRunVRStereo
                 R33DepthStencilState.stencilWriteMask = value;
                 break;
             case D3DRS_STENCILFAIL:
+                if (R33DepthStencilState.stencilFail == value)
+                    return hr;
                 R33DepthStencilState.stencilFail = value;
                 break;
             case D3DRS_STENCILZFAIL:
+                if (R33DepthStencilState.stencilZFail == value)
+                    return hr;
                 R33DepthStencilState.stencilZFail = value;
                 break;
             case D3DRS_STENCILPASS:
+                if (R33DepthStencilState.stencilPass == value)
+                    return hr;
                 R33DepthStencilState.stencilPass = value;
                 break;
             case D3DRS_TWOSIDEDSTENCILMODE:
+                if (R33DepthStencilState.twoSided == value)
+                    return hr;
                 R33DepthStencilState.twoSided = value;
                 break;
             case D3DRS_CCW_STENCILFAIL:
+                if (R33DepthStencilState.ccwStencilFail == value)
+                    return hr;
                 R33DepthStencilState.ccwStencilFail = value;
                 break;
             case D3DRS_CCW_STENCILZFAIL:
+                if (R33DepthStencilState.ccwStencilZFail == value)
+                    return hr;
                 R33DepthStencilState.ccwStencilZFail = value;
                 break;
             case D3DRS_CCW_STENCILPASS:
+                if (R33DepthStencilState.ccwStencilPass == value)
+                    return hr;
                 R33DepthStencilState.ccwStencilPass = value;
                 break;
             default:

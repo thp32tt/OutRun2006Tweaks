@@ -73,6 +73,29 @@ def verify(src: str) -> None:
             r"R33DepthStencilState\." + previous + r" = value;"
         )
         assert re.search(pattern, setter, re.S), "stale snapshot re-enable accepted: " + field
+    # Per-state no-op setters must avoid the 9-field flag recalculation,
+    # without suppressing changed-state stencil re-enable invalidation.
+    unchanged_fields = (
+        ("D3DRS_ZENABLE", "zEnable"),
+        ("D3DRS_ZWRITEENABLE", "zWrite"),
+        ("D3DRS_STENCILENABLE", "stencilEnable"),
+        ("D3DRS_STENCILWRITEMASK", "stencilWriteMask"),
+        ("D3DRS_STENCILFAIL", "stencilFail"),
+        ("D3DRS_STENCILZFAIL", "stencilZFail"),
+        ("D3DRS_STENCILPASS", "stencilPass"),
+        ("D3DRS_TWOSIDEDSTENCILMODE", "twoSided"),
+        ("D3DRS_CCW_STENCILFAIL", "ccwStencilFail"),
+        ("D3DRS_CCW_STENCILZFAIL", "ccwStencilZFail"),
+        ("D3DRS_CCW_STENCILPASS", "ccwStencilPass"),
+    )
+    for state, field in unchanged_fields:
+        case = setter.split("case " + state + ":", 1)[1].split("case ", 1)[0]
+        guard = f"if (R33DepthStencilState.{field} == value)\\n                    return hr;"
+        assert guard.replace("\\\\n", "\\n") in case, "unchanged-state fast exit missing: " + state
+        assert case.index("return hr;") < case.index("R33DepthStencilState." + field + " = value;"), (
+            "unchanged setter must not refresh state: " + state
+        )
+    assert setter.count("R33RefreshWriteFlags(R33DepthStencilState);") == 1
     assert "R33RefreshWriteFlags(R33DepthStencilState);" in setter
     assert "R33DepthStencilState.stateBlockApplies ==" in current
     assert "StateBlockTracker::ApplyGeneration()" in current
@@ -95,6 +118,19 @@ def main() -> None:
         ("missing_tracked_publish", "            next.valid = true;\n            R33RefreshWriteFlags(next);",
          "            R33RefreshWriteFlags(next);"),
     ]
+    mutations.extend((
+        ("unchanged_zEnable", "if (R33DepthStencilState.zEnable == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
+        ("unchanged_zWrite", "if (R33DepthStencilState.zWrite == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
+        ("unchanged_stencilEnable", "if (R33DepthStencilState.stencilEnable == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
+        ("unchanged_stencilWriteMask", "if (R33DepthStencilState.stencilWriteMask == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
+        ("unchanged_stencilFail", "if (R33DepthStencilState.stencilFail == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
+        ("unchanged_stencilZFail", "if (R33DepthStencilState.stencilZFail == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
+        ("unchanged_stencilPass", "if (R33DepthStencilState.stencilPass == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
+        ("unchanged_twoSided", "if (R33DepthStencilState.twoSided == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
+        ("unchanged_ccwStencilFail", "if (R33DepthStencilState.ccwStencilFail == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
+        ("unchanged_ccwStencilZFail", "if (R33DepthStencilState.ccwStencilZFail == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
+        ("unchanged_ccwStencilPass", "if (R33DepthStencilState.ccwStencilPass == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
+    ))
     for name, old, new in mutations:
         assert old in src, "mutation anchor missing: " + name
         mutant = src.replace(old, new, 1)
