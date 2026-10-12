@@ -11,7 +11,7 @@ shader = "float4 PSTextureBlendTextureAlphaPMSelectInverseTextureAlpha(VOut v) :
 pixel = "float4 c = float4(saturate(t.rgb + v.diffuse.rgb * (1.0f - t.a)), 1.0f - t.a);"
 links = (predicate, shader, pixel, "bool blendTextureAlphaPMInverseTextureAlpha = false;",
          "blendTextureAlphaPMBlendFactorAlpha || blendTextureAlphaPMInverseTextureAlpha ||",
-         "!blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMFactorAlpha",
+         "!blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMInverseDiffuseAlpha && !blendTextureAlphaPMFactorAlpha",
          "alphaArg1 != D3DTA_TEXTURE && !blendTextureAlphaPMDiffuseAlpha && !blendTextureAlphaPMDiffuseArg1Alpha && !blendTextureAlphaPMInverseTextureAlpha",
          "capture.blendTextureAlphaPMInverseTextureAlpha = blendTextureAlphaPMInverseTextureAlpha;",
          'compile("PSTextureBlendTextureAlphaPMSelectInverseTextureAlpha", "ps_4_0", blendTexturePmInverseTextureAlphaCode)',

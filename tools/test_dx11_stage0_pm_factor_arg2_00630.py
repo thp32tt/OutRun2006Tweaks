@@ -13,7 +13,7 @@ factor_read = ("selectTextureFactorAlpha || selectDiffuseFactorAlpha ||\n"
                "            FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor))")
 guard = ("&& !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha &&\n"
          "              !blendTextureAlphaPMFactorArg2Alpha &&\n"
-         "              !blendTextureAlphaPMInverseTextureArg2Alpha) ||")
+         "              !blendTextureAlphaPMInverseTextureArg2Alpha) && !blendTextureAlphaPMInverseDiffuseArg2Alpha) ||")
 override = ("if (blendTextureAlphaPMFactorArg2Alpha) {\n"
             "            capture.blendTextureAlphaPMDiffuseAlpha = false;\n"
             "            capture.blendTextureAlphaPMFactorAlpha = true;\n"
