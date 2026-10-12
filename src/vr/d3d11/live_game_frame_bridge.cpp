@@ -1292,8 +1292,12 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // alpha. Directional subtract cannot borrow the source/dest OM slots.
         if ((inverseDestMultiply || inverseSourceMultiply) &&
             blendOp != D3DBLENDOP_ADD) return false;
-        if (!premultipliedAlpha && !multiply &&
-            !inverseDestMultiply && !inverseSourceMultiply &&
+        // Newly supported complement pairs use different but exact ADD-only
+        // OM descriptors. Keep original legacy allowlist text intact so
+        // older destructive mutations still exercise their own factors.
+        if (inverseDestMultiply || inverseSourceMultiply) {
+            // Admitted above only when separate alpha is off and op is ADD.
+        } else if (!premultipliedAlpha && !multiply &&
             !sourceAlphaCopy && !sourceReplace &&
             !inverseAlphaCopy && !inverseAlphaAdd &&
             (src != D3DBLEND_SRCALPHA || dst != D3DBLEND_INVSRCALPHA) &&
