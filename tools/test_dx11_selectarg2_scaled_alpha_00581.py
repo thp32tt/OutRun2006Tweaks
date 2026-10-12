@@ -29,10 +29,13 @@ def connected(src):
             return False
         code = src.split(f"float4 {shader}(VOut v) : SV_Target {{", 1)[-1].split("\n}", 1)[0]
         if f"float4 c = float4(v.diffuse.rgb, saturate({scale} * t.a * v.diffuse.a));" not in code or "AlphaGate(c.a); return c;" not in code: return False
-    return "if (!diagnostic_enabled() || !game)" in src and all(x in draw for x in (
+    return ("constexpr char kScaledAlphaShader[] = R\"(" in src and
+            "static const std::string shaderSource = std::string(kShader) + kScaledAlphaShader;" in src and
+            "D3DCompile(shaderSource.data(), shaderSource.size()," in src and
+            "if (!diagnostic_enabled() || !game)" in src and all(x in draw for x in (
         "ctx->PSSetShaderResources(0, 1, &boundView)",
         "ctx->DrawIndexed(indexCount, 0, 0);", "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
-    ))
+    )))
 def main():
     src = SRC.read_text(encoding="utf-8")
     assert connected(src), "00581 game native SELECTARG2 scaled-alpha disconnected"
@@ -68,6 +71,15 @@ def main():
             assert 0. <= a <= 1.
             if tex==.9 and diffuse==.8: assert a==1.
             if tex==.1 and diffuse==.9: assert a<1.
-    assert negatives == 19, negatives
-    print("00581 SELECTARG2 native scaled alpha: 19 destructive mutations PASS; HMD UNTESTED")
+    for old, bad in (
+        ("static const std::string shaderSource = std::string(kShader) + kScaledAlphaShader;",
+         "static const std::string shaderSource = std::string(kShader);"),
+        ("D3DCompile(shaderSource.data(), shaderSource.size(),",
+         "D3DCompile(kShader, sizeof(kShader) - 1,"),
+    ):
+        mutant = src.replace(old, bad, 1)
+        assert mutant != src and not connected(mutant), old
+        negatives += 1
+    assert negatives == 21, negatives
+    print("00581 SELECTARG2 native scaled alpha: 21 destructive mutations PASS; HMD UNTESTED")
 if __name__ == "__main__": main()

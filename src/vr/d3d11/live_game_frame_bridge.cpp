@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <cstring>
 #include <mutex>
+#include <string>
 #include <vector>
 #include <spdlog/spdlog.h>
 
@@ -95,19 +96,6 @@ float4 PSTextureSelectDiffuseSubtractAlpha(VOut v) : SV_Target {
     AlphaGate(c.a); return c;
 }
 // Stage0 SELECTARG2 RGB consumes DIFFUSE/CURRENT but alpha may use texture.
-// Stage0 SELECTARG2 uses DIFFUSE/CURRENT RGB while alpha independently
-// MODULATE2X/4X multiplies texture/vertex alpha, saturating before AlphaGate.
-float4 PSTextureSelectDiffuseModulate2XAlpha(VOut v) : SV_Target {
-    float4 t = gameTexture.Sample(gameSampler, v.uv);
-    float4 c = float4(v.diffuse.rgb, saturate(2.0f * t.a * v.diffuse.a));
-    AlphaGate(c.a); return c;
-}
-float4 PSTextureSelectDiffuseModulate4XAlpha(VOut v) : SV_Target {
-    float4 t = gameTexture.Sample(gameSampler, v.uv);
-    float4 c = float4(v.diffuse.rgb, saturate(4.0f * t.a * v.diffuse.a));
-    AlphaGate(c.a); return c;
-}
-
 float4 PSTextureSelectDiffuseTextureAlpha(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
     float4 c = float4(v.diffuse.rgb, t.a);
@@ -376,6 +364,23 @@ float4 PSTextureAddSmooth(VOut v) : SV_Target {
     AlphaGate(c.a); return c;
 }
 )";
+// Keep both source literals below MSVC C2026 per-literal size limits.
+// The native pixel shaders compile from their concatenation once per pipeline.
+constexpr char kScaledAlphaShader[] = R"(
+// Stage0 SELECTARG2 uses DIFFUSE/CURRENT RGB while alpha independently
+// MODULATE2X/4X multiplies texture/vertex alpha, saturating before AlphaGate.
+float4 PSTextureSelectDiffuseModulate2XAlpha(VOut v) : SV_Target {
+    float4 t = gameTexture.Sample(gameSampler, v.uv);
+    float4 c = float4(v.diffuse.rgb, saturate(2.0f * t.a * v.diffuse.a));
+    AlphaGate(c.a); return c;
+}
+float4 PSTextureSelectDiffuseModulate4XAlpha(VOut v) : SV_Target {
+    float4 t = gameTexture.Sample(gameSampler, v.uv);
+    float4 c = float4(v.diffuse.rgb, saturate(4.0f * t.a * v.diffuse.a));
+    AlphaGate(c.a); return c;
+}
+
+)";
 struct NativeVertex {
     float clip[4];
     float diffuse[4];
@@ -566,7 +571,8 @@ bool env_opt_in() noexcept {
 
 bool compile(const char* entry, const char* profile, ComPtr<ID3DBlob>& blob) noexcept {
     ComPtr<ID3DBlob> errors;
-    return SUCCEEDED(D3DCompile(kShader, sizeof(kShader) - 1, "live_game_frame",
+    static const std::string shaderSource = std::string(kShader) + kScaledAlphaShader;
+    return SUCCEEDED(D3DCompile(shaderSource.data(), shaderSource.size(), "live_game_frame",
         nullptr, nullptr, entry, profile, D3DCOMPILE_ENABLE_STRICTNESS,
         0, blob.GetAddressOf(), errors.GetAddressOf())) && blob;
 }
