@@ -1728,7 +1728,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                 D3D11_FILTER_MIN_MAG_MIP_LINEAR :
                 D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR) :
             (capture.magFilter == D3DTEXF_LINEAR ?
-                D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_LINEAR :
+                D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR :
                 D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR);
     }
     state.AddressU = capture.addressU == D3DTADDRESS_WRAP ?

@@ -32,7 +32,7 @@ def connected(s: str) -> bool:
         "if (capture.mipFilter == D3DTEXF_LINEAR) {",
         "D3D11_FILTER_MIN_MAG_MIP_LINEAR",
         "D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR",
-        "D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_LINEAR",
+        "D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR",
         "D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR",
         "state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;"
     ]
@@ -46,7 +46,7 @@ def sampler(min_linear: bool, mag_linear: bool, mip_linear: bool) -> str:
     suffix = "LINEAR" if mip_linear else "POINT"
     combinations = {
         (False, False): "MIN_MAG_POINT_MIP_LINEAR" if mip_linear else "MIN_MAG_MIP_POINT",
-        (False, True): "MIN_POINT_MAG_LINEAR_MIP_" + suffix,
+        (False, True): "MIN_POINT_MAG_MIP_LINEAR" if mip_linear else "MIN_POINT_MAG_LINEAR_MIP_POINT",
         (True, False): "MIN_LINEAR_MAG_POINT_MIP_LINEAR" if mip_linear else "MIN_LINEAR_MAG_MIP_POINT",
         (True, True): "MIN_MAG_MIP_LINEAR" if mip_linear else "MIN_MAG_LINEAR_MIP_POINT"
     }
@@ -61,7 +61,7 @@ def main() -> None:
         ("if (capture.mipFilter == D3DTEXF_LINEAR) {", "if (false) {"),
         ("D3D11_FILTER_MIN_MAG_MIP_LINEAR", "D3D11_FILTER_MIN_MAG_MIP_POINT"),
         ("D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR", "D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT"),
-        ("D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_LINEAR", "D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT"),
+        ("D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR", "D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT"),
         ("D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR", "D3D11_FILTER_MIN_MAG_MIP_POINT"),
         ("usesMips && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)", "false && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)"),
         ("usesMips && capture.texture->GetLOD() != 0u", "false && capture.texture->GetLOD() != 0u"),
