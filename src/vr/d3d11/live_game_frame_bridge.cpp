@@ -50,14 +50,9 @@ struct VOut { float4 clip : SV_Position; float4 diffuse : COLOR0; float2 uv : TE
 Texture2D gameTexture : register(t0);
 SamplerState gameSampler : register(s0);
 cbuffer AlphaParams : register(b0) { float4 alphaParams; };
-// D3D9 alpha reference compares 8-bit post-texture alpha, not a raw
-// floating-point value. Only the explicitly admitted compare funcs are used.
 void AlphaGate(float alpha) {
     if (alphaParams.x > 0.5f) {
         float value = floor(saturate(alpha) * 255.0f + 0.5f);
-        // D3DCMP_NEVER (1) deliberately has no passing case.
-        // Quantize first: all eight D3D9 ALPHAFUNC values compare bytes,
-        // never the interpolated floating point source alpha directly.
         bool pass = (alphaParams.z == 2.0f && value < alphaParams.y) ||
                     (alphaParams.z == 3.0f && value == alphaParams.y) ||
                     (alphaParams.z == 4.0f && value <= alphaParams.y) ||
@@ -221,9 +216,6 @@ float4 PSTextureBlendDiffuseSelectedDiffuseAlpha(VOut v) : SV_Target {
     float4 c = float4(rgb, v.diffuse.a);
     AlphaGate(c.a); return c;
 }
-// Real D3D9 stage-0 factor blend RGB with independently MODULATEd alpha.
-// The factor for RGB is the texture or interpolated diffuse alpha; the
-// output alpha must still multiply both operands before the D3D9 alpha test.
 float4 PSTextureBlendTextureModulateAlpha(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
     float4 c = float4(lerp(v.diffuse.rgb, t.rgb, t.a), t.a * v.diffuse.a);

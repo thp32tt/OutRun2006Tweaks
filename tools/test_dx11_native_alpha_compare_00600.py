@@ -35,7 +35,8 @@ def linked(s):
     consumer = section(s, "bool submit(", "void observe(")
     observer = section(s, "void observe(", "} // namespace")
     return (
-        all(shader.count(case) == 1 for case in HLSL_CASES)
+        len(shader.encode("utf-8")) < 16380  # MSVC C2026 raw string limit
+        and all(shader.count(case) == 1 for case in HLSL_CASES)
         and 'float value = floor(saturate(alpha) * 255.0f + 0.5f);' in shader
         and "clip(pass ? 1.0f : -1.0f);" in shader
         and "alphaParams.x > 0.5f" in shader
