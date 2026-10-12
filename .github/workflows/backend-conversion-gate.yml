@@ -104,6 +104,8 @@ jobs:
         run: python tools/test_dx11_stage0_pm_inverse_modulate_factor_00637.py
       - name: DX11 PM scaled factor native Draw regression 00638
         run: python tools/test_dx11_stage0_pm_scaled_factor_00638.py
+      - name: DX11 PM signed factor native Draw regression 00639
+        run: python tools/test_dx11_stage0_pm_signed_factor_00639.py
 
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'
