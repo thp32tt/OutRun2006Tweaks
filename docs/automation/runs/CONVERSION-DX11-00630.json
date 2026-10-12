@@ -11,8 +11,8 @@
   "work_key": "DX11:LIVE_PM_RGB_SELECTARG2_TFACTOR_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "623a5cc3198b6fa4ac9481298894c47ce7e34700",
-  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
-  "checkpoint": "C6_RESULT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
@@ -64,7 +64,7 @@
     "C3_VALIDATE": "PASS_EXACT_SHA: Backend #38300625576, Fast #38300625443, Build #38300631713, OpenXR #38300632065, HUD #38300631646 SUCCESS",
     "C4_COMMIT": "PASS: final validation-bearing material result d3b9c1475a0f820c795d6e8f8401a79b0b895141",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "BUILD_VERIFIED; NEED_HMD_TEST; RUNTIME_VALIDATION=UNTESTED"
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED at validation-bearing d3b9c1475a0f820c795d6e8f8401a79b0b895141; GitHub CI SUCCESS; RUNTIME_VALIDATION=UNTESTED; HMD test not performed"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
