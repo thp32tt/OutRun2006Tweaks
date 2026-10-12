@@ -542,6 +542,11 @@ namespace OutRunVRStereo
 
             IDirect3DSurface9* savedRt = R32ReviewTrackedRenderTarget();
             IDirect3DSurface9* savedDepth = R32ReviewTrackedDepthStencil();
+            // Reliable StateBlock/setter tracking proves that neither eye has
+            // a depth attachment. Do not submit null depth bindings twice per
+            // primitive; unreliable tracking retains the full restore path.
+            const bool depthlessPass = savedDepth == nullptr &&
+                OutRunVR::State::StateBlockTracker::Reliable();
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
@@ -550,7 +555,7 @@ namespace OutRunVRStereo
                 R32ReviewInternalStereoPassScope guard;
                 rightHr = R32ReviewSetRenderTarget(
                     device, 0u, R32ReviewRightEyeSurface());
-                if (SUCCEEDED(rightHr))
+                if (SUCCEEDED(rightHr) && !depthlessPass)
                     rightHr = R32ReviewSetDepthStencilSurface(
                         device, R32ReviewTrackedDepthStencil() ? R32ReviewRightEyeDepth() : nullptr);
                 if (SUCCEEDED(rightHr))
@@ -569,7 +574,7 @@ namespace OutRunVRStereo
                 }
                 restoreOk = R32ReviewRestoreRightPassState(
                     device, savedRt, savedDepth, savedViewport,
-                    draw.originalConstants, true);
+                    draw.originalConstants, true, depthlessPass);
             }
 
             R32ReviewRecordWorldStereoDuplicate(
@@ -703,6 +708,11 @@ namespace OutRunVRStereo
 
             IDirect3DSurface9* savedRt = R32ReviewTrackedRenderTarget();
             IDirect3DSurface9* savedDepth = R32ReviewTrackedDepthStencil();
+            // Reliable StateBlock/setter tracking proves that neither eye has
+            // a depth attachment. Do not submit null depth bindings twice per
+            // primitive; unreliable tracking retains the full restore path.
+            const bool depthlessPass = savedDepth == nullptr &&
+                OutRunVR::State::StateBlockTracker::Reliable();
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
@@ -711,7 +721,7 @@ namespace OutRunVRStereo
                 R32ReviewInternalStereoPassScope guard;
                 rightHr = R32ReviewSetRenderTarget(
                     device, 0u, R32ReviewRightEyeSurface());
-                if (SUCCEEDED(rightHr))
+                if (SUCCEEDED(rightHr) && !depthlessPass)
                     rightHr = R32ReviewSetDepthStencilSurface(
                         device, R32ReviewTrackedDepthStencil() ? R32ReviewRightEyeDepth() : nullptr);
                 if (SUCCEEDED(rightHr))
@@ -729,7 +739,7 @@ namespace OutRunVRStereo
                     rightHr = actualDraw();
                 }
                 restoreOk = R32ReviewRestoreRightPassState(
-                    device, savedRt, savedDepth, savedViewport, original, true);
+                    device, savedRt, savedDepth, savedViewport, original, true, depthlessPass);
             }
 
             R32ReviewRecordHudStereoDuplicate();

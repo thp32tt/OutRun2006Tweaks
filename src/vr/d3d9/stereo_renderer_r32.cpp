@@ -363,15 +363,22 @@ namespace OutRunVRStereo
         bool R32RestoreRightPassState(IDirect3DDevice9* device,
             IDirect3DSurface9* savedRt, IDirect3DSurface9* savedDepth,
             const D3DVIEWPORT9& savedViewport,
-            const float* originalConstants, bool restoreWvp) noexcept
+            const float* originalConstants, bool restoreWvp,
+            bool depthlessPass) noexcept
         {
             bool ok = true;
             if (savedRt && FAILED(R30SupportCallOriginalSetRenderTarget(
                     device, 0u, savedRt)))
                 ok = false;
-            const HRESULT depthHr = R30SupportCallOriginalSetDepthStencilSurface(
-                device, savedDepth);
-            if (FAILED(depthHr)) ok = false;
+            // On the proven depthless path the tracked original and right-eye
+            // bindings are both null. Draw calls cannot bind depth, so do not
+            // submit another SetDepthStencilSurface(nullptr) on each stereo draw.
+            if (!depthlessPass)
+            {
+                const HRESULT depthHr = R30SupportCallOriginalSetDepthStencilSurface(
+                    device, savedDepth);
+                if (FAILED(depthHr)) ok = false;
+            }
             if (FAILED(device->SetViewport(&savedViewport))) ok = false;
             if (restoreWvp && !R32SetWvpBatch(device, originalConstants)) ok = false;
             return ok;
@@ -808,11 +815,11 @@ namespace OutRunVRStereo
         IDirect3DSurface9* savedDepth,
         const D3DVIEWPORT9& savedViewport,
         const float* originalConstants,
-        bool restoreWvp) noexcept
+        bool restoreWvp, bool depthlessPass) noexcept
     {
         return R32RestoreRightPassState(
             device, savedRt, savedDepth, savedViewport,
-            originalConstants, restoreWvp);
+            originalConstants, restoreWvp, depthlessPass);
     }
 
     void R32ReviewObserveFrameWorkload(

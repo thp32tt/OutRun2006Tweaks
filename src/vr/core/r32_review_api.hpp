@@ -44,7 +44,8 @@ namespace OutRunVRStereo
         IDirect3DSurface9* savedDepth,
         const D3DVIEWPORT9& savedViewport,
         const float* originalConstants,
-        bool restoreWvp) noexcept;
+        bool restoreWvp,
+        bool depthlessPass) noexcept;
     void R32ReviewObserveFrameWorkload(
         IDirect3DDevice9* device,
         D3DPRIMITIVETYPE type,
