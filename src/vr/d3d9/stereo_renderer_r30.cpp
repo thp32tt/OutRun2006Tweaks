@@ -2979,7 +2979,9 @@ namespace OutRunVRStereo
             const R30XyzrhwState& state,
             std::vector<std::uint8_t>& left,
             std::vector<std::uint8_t>& right,
-            const std::vector<std::uint8_t>* usedMask) noexcept
+            const std::vector<std::uint8_t>* usedMask,
+            UINT knownUsedCount,
+            const std::vector<std::uint32_t>* touched) noexcept
         {
             if (!state.worldEffect || !state.fullWorldReprojection)
                 return false;
@@ -3019,9 +3021,24 @@ namespace OutRunVRStereo
             UINT referenced = 0;
             std::uint64_t depthPreserves = 0;
             bool allValid = true;
-
-            for (UINT i = 0; i < vertexCount; ++i)
+            // Indexed UP and revision-fenced VB decoders already produce an
+            // ordered, unique list of exactly the selected mask bits. On
+            // sparse smoke/sand batches, skip the potentially huge untouched
+            // min..max vertex span in the fused two-eye projection itself.
+            // Non-indexed, untrusted or dense inputs retain the original walk.
+            const bool sparseTouched = usedMask && touched &&
+                knownUsedCount > 0u && knownUsedCount == touched->size() &&
+                knownUsedCount <= vertexCount / 8u;
+            const UINT visitCount = sparseTouched ? knownUsedCount : vertexCount;
+            for (UINT visit = 0; visit < visitCount; ++visit)
             {
+                const UINT i = sparseTouched ? (*touched)[visit] : visit;
+                if (i >= vertexCount ||
+                    (sparseTouched && !(*usedMask)[i]))
+                {
+                    allValid = false;
+                    break;
+                }
                 if (usedMask && !(*usedMask)[i])
                     continue;
                 const std::size_t offset = static_cast<std::size_t>(i) * stride;
@@ -3125,15 +3142,36 @@ namespace OutRunVRStereo
             // A partial fast candidate must be fully undone before the
             // original per-eye inverse-projection/affine fallback runs. Only
             // XYZRHW headers were written; UV/color and sparse holes remain.
-            for (UINT i = 0; i < modifiedVertexEnd; ++i)
+            // Sparse indices arrive in arbitrary draw order: a last-visited
+            // index is NOT the highest mutated index, so walk that same list
+            // rather than using modifiedVertexEnd as a rollback boundary.
+            if (sparseTouched)
             {
-                if (usedMask && !(*usedMask)[i])
-                    continue;
-                const std::size_t offset = static_cast<std::size_t>(i) * stride;
-                std::memcpy(left.data() + offset, bytes + offset,
-                    4u * sizeof(float));
-                std::memcpy(right.data() + offset, bytes + offset,
-                    4u * sizeof(float));
+                for (const std::uint32_t i : *touched)
+                {
+                    if (i >= vertexCount || !(*usedMask)[i])
+                        break;
+                    const std::size_t offset =
+                        static_cast<std::size_t>(i) * stride;
+                    std::memcpy(left.data() + offset, bytes + offset,
+                        4u * sizeof(float));
+                    std::memcpy(right.data() + offset, bytes + offset,
+                        4u * sizeof(float));
+                }
+            }
+            else
+            {
+                for (UINT i = 0; i < modifiedVertexEnd; ++i)
+                {
+                    if (usedMask && !(*usedMask)[i])
+                        continue;
+                    const std::size_t offset =
+                        static_cast<std::size_t>(i) * stride;
+                    std::memcpy(left.data() + offset, bytes + offset,
+                        4u * sizeof(float));
+                    std::memcpy(right.data() + offset, bytes + offset,
+                        4u * sizeof(float));
+                }
             }
             return false;
         }
@@ -3299,7 +3337,8 @@ namespace OutRunVRStereo
             // reconstruction pass. Unusual/rejected input still takes the
             // original independent-eye route and bilateral safety fallback.
             if (R30TryFusedWorldXyzrhwProjection(
-                    source, vertexCount, stride, state, left, right, usedMask))
+                    source, vertexCount, stride, state, left, right,
+                    usedMask, knownUsedCount, touched))
                 return true;
 
             bool leftFull = false;

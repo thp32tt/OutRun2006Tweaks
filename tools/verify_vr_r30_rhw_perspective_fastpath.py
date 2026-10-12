@@ -228,6 +228,14 @@ def fused_world_contract(source: str) -> None:
             "R30XyzrhwDepthPreserveFallbacks += depthPreserves;",
             "if (allValid && referenced != 0)",
             "for (UINT i = 0; i < modifiedVertexEnd; ++i)",
+            "const bool sparseTouched = usedMask && touched &&",
+            "knownUsedCount > 0u && knownUsedCount == touched->size()",
+            "knownUsedCount <= vertexCount / 8u;",
+            "const UINT visitCount = sparseTouched ? knownUsedCount : vertexCount;",
+            "const UINT i = sparseTouched ? (*touched)[visit] : visit;",
+            "(sparseTouched && !(*usedMask)[i])",
+            "for (const std::uint32_t i : *touched)",
+            "if (i >= vertexCount || !(*usedMask)[i])",
             "if (usedMask && !(*usedMask)[i])",
             "std::memcpy(left.data() + offset, bytes + offset,",
             "std::memcpy(right.data() + offset, bytes + offset,",
@@ -263,6 +271,55 @@ def fused_world_contract(source: str) -> None:
         assert not intact(block.replace(before, after, 1)), (
             f"fused mutation escaped: {before}"
         )
+    for needle, broken in (
+        ("knownUsedCount == touched->size()", "true"),
+        ("knownUsedCount <= vertexCount / 8u", "true"),
+        ("const UINT i = sparseTouched ? (*touched)[visit] : visit;",
+         "const UINT i = visit;"),
+        ("(sparseTouched && !(*usedMask)[i])", "false"),
+        ("for (const std::uint32_t i : *touched)", "for (const std::uint32_t i : {})"),
+        ("if (i >= vertexCount || !(*usedMask)[i])", "if (false)"),
+    ):
+        assert needle in block and not intact(block.replace(needle, broken, 1)), (
+            f"R30 sparse fused projection mutant escaped: {needle}"
+        )
+    assert "usedMask, knownUsedCount, touched))" in stereo
+
+    # Compare dense scan against the unique producer-index traversal across
+    # sparse, dense, out-of-order and partial-reprojection rejection streams.
+    # Rollback must restore ALL written headers even if touched indices are
+    # not in ascending order.
+    import random
+    rng_sparse = random.Random(711)
+    for sample in range(3500):
+        span = rng_sparse.randrange(1, 1025)
+        used = rng_sparse.sample(range(span), rng_sparse.randrange(1, span + 1))
+        mask = bytearray(span)
+        for i in used:
+            mask[i] = 1
+        chosen = set(used)
+        assert [i for i in range(span) if mask[i]] == sorted(chosen)
+        assert set(used) == chosen
+        sparse = (len(used) <= span // 8)
+        dense_visited = [i for i in range(span) if mask[i]]
+        sparse_visited = list(used) if sparse else dense_visited
+        assert sorted(sparse_visited) == dense_visited
+        original = [("unmodified", "uv", "color") for _ in range(span)]
+        outputs = original.copy()
+        reject_at = rng_sparse.randrange(len(sparse_visited))
+        for i in sparse_visited[:reject_at]:
+            outputs[i] = ("eye", "uv", "color")
+        if sparse:
+            for i in used:
+                outputs[i] = original[i]
+        else:
+            boundary = (max(sparse_visited[:reject_at]) + 1) if reject_at else 0
+            for i in range(boundary):
+                if mask[i]:
+                    outputs[i] = original[i]
+        assert outputs == original, ("rollback mismatch", sample)
+    print("PASS R30 sparse fused world traversal and rollback, 6 mutations, 3500 masks")
+
     assert "R30TryFusedWorldXyzrhwProjection(" in stereo
     assert stereo.index("R30SeedWorldXyzrhwBuffers(") < stereo.index(
         "R30TryFusedWorldXyzrhwProjection(") < stereo.index(
