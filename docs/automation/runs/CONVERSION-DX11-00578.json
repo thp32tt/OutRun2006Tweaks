@@ -59,7 +59,7 @@
     "C0_RECOVER": "GitHub a2441e36412bc1f5d298f4e5e1bf0c1e23e8cbc6; 00577 exact-SHA passed",
     "C1_REVIEW": "Two missing texture-RGB independent alpha paths",
     "C2_IMPLEMENT": "Live capture and HLSL/native Draw chain",
-    "C3_VALIDATE": "00578 scoped JS static PASS; Build 38187661803 FAIL legacy readiness anchor at regression line 703; repaired exact source anchor and wired 00578 destructive regressions; new exact-SHA Actions pending",
+    "C3_VALIDATE": "Build #38187773655 FAIL inherited factor mixed-alpha anchor line 1792; fixed nested operand bypass preserving legacy (+ 00578 own test anchor); exact-SHA Actions recheck pending",
     "C4_COMMIT": "Atomic three-file no-skip material commit",
     "C5_PACKAGE": "NOT_REQUIRED diagnostic",
     "C6_STATE": "PENDING_EXACT_SHA"

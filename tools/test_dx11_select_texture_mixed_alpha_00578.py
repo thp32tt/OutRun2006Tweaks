@@ -20,7 +20,7 @@ def connected(s):
         if f'!compile("{shader}", "ps_4_0",' not in pipe or f"s.{owner}.GetAddressOf())) ||" not in pipe: return False
         block = s.split(f"float4 {shader}(VOut v) : SV_Target {{", 1)[-1].split("\n}", 1)[0]
         if f"float4 c = float4(t.rgb, {alpha});" not in block or "AlphaGate(c.a);" not in block: return False
-    return all(x in gate for x in ("selectTextureDiffuseAlpha || selectTextureModulateAlpha ||", "!selectTextureDiffuseAlpha && !blendFactorDiffuseAlpha", "(alphaNeedsDiffuse && !alphaArg2Diffuse)", "arg != D3DTA_TEXTURE", "coordIndex >= layout.texcoordCount")) and all(x in draw for x in ("ctx->PSSetShaderResources(0, 1, &boundView)", "ctx->DrawIndexed(indexCount, 0, 0);", "ctx->Draw(static_cast<UINT>(vertices.size()), 0);")) and "if (!diagnostic_enabled() || !game)" in s
+    return all(x in gate for x in ("selectTextureDiffuseAlpha || selectTextureModulateAlpha ||", "!selectTextureDiffuseAlpha && (!blendFactorDiffuseAlpha", "(alphaNeedsDiffuse && !alphaArg2Diffuse)", "arg != D3DTA_TEXTURE", "coordIndex >= layout.texcoordCount")) and all(x in draw for x in ("ctx->PSSetShaderResources(0, 1, &boundView)", "ctx->DrawIndexed(indexCount, 0, 0);", "ctx->Draw(static_cast<UINT>(vertices.size()), 0);")) and "if (!diagnostic_enabled() || !game)" in s
 def main():
     s = SRC.read_text(encoding="utf8")
     assert connected(s), "native texture independent alpha disconnected"
@@ -33,7 +33,7 @@ def main():
         ("float4 c = float4(t.rgb, t.a * v.diffuse.a);", "float4 c = float4(t.rgb, t.a);"),
         ("s.selectTextureDiffuseAlphaPs.Reset();", ""),
         ("s.selectTextureModulateAlphaPs.Reset();", ""),
-        ("!selectTextureDiffuseAlpha && !blendFactorDiffuseAlpha", "!blendFactorDiffuseAlpha"),
+        ("!selectTextureDiffuseAlpha && (!blendFactorDiffuseAlpha", "!blendFactorDiffuseAlpha"),
         ("selectTextureDiffuseAlpha || selectTextureModulateAlpha ||", "selectTextureDiffuseAlpha ||"),
         ('!compile("PSTextureSelectTextureDiffuseAlpha", "ps_4_0",', '!compile("PS", "ps_4_0",'),
         ('!compile("PSTextureSelectTextureModulateAlpha", "ps_4_0",', '!compile("PS", "ps_4_0",'),
