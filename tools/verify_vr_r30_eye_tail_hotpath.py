@@ -57,8 +57,9 @@ def verify(source: str):
         assert required in vertices, f"world particle or fallback guard lost: {required}"
     # Dense and unindexed draws must preserve the original full source,
     # while sparse indexed draws copy only referenced contiguous runs before
-    # either full or affine per-eye transform. The rejected full projection
-    # still restores the entire original buffer before affine fallback.
+    # either full or affine per-eye transform. A failed full projection now
+    # restores only the previously modified XYZRHW headers; copying the full
+    # span a second time would defeat this hot-path optimization.
     for required in (
         "if (usedMask && vertexCount >= 64u)",
         "usedMask->begin() + vertexCount",
@@ -74,7 +75,27 @@ def verify(source: str):
     assert vertices.index("if (!sparseCopied)") < vertices.index("const float x0")
     assert vertices.index("const float x0") < vertices.index(
         "if (state.worldEffect && state.fullWorldReprojection &&")
-    assert vertices.count("std::memcpy(out.data(), source, bytes);") == 2
+    assert vertices.count("std::memcpy(out.data(), source, bytes);") == 1
+    # A late full-reprojection failure must roll back ALL already-written
+    # referenced XYZRHW values before the affine pass reads them. Preserve
+    # untouched UV/color bytes and sparse unused gaps, not a second full copy.
+    for required in (
+        "UINT modifiedVertexEnd = 0;",
+        "modifiedVertexEnd = i + 1u;",
+        "for (UINT i = 0; i < modifiedVertexEnd; ++i)",
+        "if (selected(i))\n                        std::memcpy(outputVertex(i), sourceVertex(i),",
+        "4u * sizeof(float));",
+    ):
+        assert required in vertices, f"reprojection partial rollback lost: {required}"
+    assert vertices.index("modifiedVertexEnd = i + 1u;") < vertices.index(
+        "if (fullDrawOk && selectedVertices != 0)") < vertices.index(
+        "for (UINT i = 0; i < modifiedVertexEnd; ++i)") < vertices.index(
+        "const float ndcX = (x - x0)")
+    assert "if (leftFull &&" in stereo and "if (rightFull &&" in stereo
+    assert stereo.index("if (leftFull &&") < stereo.index(
+        "state, 0, left, usedMask, false, ignored)")
+    assert stereo.index("if (rightFull &&") < stereo.index(
+        "state, 1, right, usedMask, false, ignored)")
     # CPU-projected smoke/skid/decal geometry is constant within a latched
     # pose/projection/scale, while depth evidence and viewport stay per draw.
     assert "thread_local R30XyzrhwWorldGeometryCache R30XyzrhwWorldGeometry{};" in state
@@ -186,10 +207,23 @@ def sparse_copy_parity():
                     b = source[i * stride:(i + 1) * stride]
                     assert a == b if selected or not sparse else a == bytes(
                         [sentinel] * stride)
-                # Bilateral reprojection failure resets the full span.
-                if sparse:
-                    out[:] = source
-                assert out == source
+                # Only referenced XYZRHW headers are written by the full
+                # reprojector. Model a rejection after 0, half, or all of
+                # those writes; selective rollback must equal the legacy
+                # re-copy for the affine reader, including sparse gaps.
+                selected = [i for i, v in enumerate(mask) if v]
+                original_copy = out[:]
+                for success_count in (0, len(selected) // 2, len(selected)):
+                    changed = out[:]
+                    for i in selected[:success_count]:
+                        start = i * stride
+                        changed[start:start + 16] = bytes([0xA5] * 16)
+                    modified_end = selected[success_count - 1] + 1 if success_count else 0
+                    for i in range(modified_end):
+                        if mask[i]:
+                            start = i * stride
+                            changed[start:start + 16] = source[start:start + 16]
+                    assert changed == original_copy
                 cases += 1
     return cases
 
@@ -212,6 +246,14 @@ def main():
         ("state.inverseBaseProjection.m[row][col]", "0.0f"),
         ("if (leftFull != rightFull)", "if (false)"),
         ("state.parallaxPerRhwX[eye] * rhw", "0.0f"),
+        ("modifiedVertexEnd = i + 1u;", "modifiedVertexEnd = 0;"),
+        ("for (UINT i = 0; i < modifiedVertexEnd; ++i)",
+         "for (UINT i = 0; i < 0; ++i)"),
+        ("if (selected(i))\n                        std::memcpy(outputVertex(i), sourceVertex(i),",
+         "if (!selected(i))\n                        std::memcpy(outputVertex(i), sourceVertex(i),"),
+        ("4u * sizeof(float));", "2u * sizeof(float));"),
+        ("if (leftFull &&", "if (false &&"),
+        ("if (rightFull &&", "if (false &&"),
     )
     for i, (before, after) in enumerate(mutations, 1):
         assert before in source, f"mutation {i} is ineffective"
@@ -257,7 +299,7 @@ def main():
         raise AssertionError(f"XYZRHW cache destructive mutation {i} escaped")
     assert sparse_copy_parity() == 120
     math_parity()
-    print(f"PASS R30 particle stereo composed eye-tail/geometry cache: {len(mutations) + len(geometry_mutations) + 1} destructive mutations and 300 matrix parity cases")
+    print(f"PASS R30 particle stereo eye-tail/geometry cache + partial rollback: {len(mutations) + len(geometry_mutations) + 1} destructive mutations, 120 sparse rollback models, and 300 matrix parity cases")
 
 
 if __name__ == "__main__":
