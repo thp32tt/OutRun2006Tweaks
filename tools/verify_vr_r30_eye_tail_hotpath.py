@@ -27,6 +27,8 @@ def sections(source: str):
 
 def verify(source: str):
     state, configure, vertices, stereo = sections(source)
+    seed = source.split("bool R30SeedWorldXyzrhwBuffers(", 1)[1].split(
+        "bool R30TransformXyzrhwVertices(", 1)[0]
     assert "D3DMATRIX eyeTail[2]{};" in state
     for required in (
         "state.eyeInverse[eye] = R29OwnerInverseRigid(eyePose);",
@@ -51,7 +53,7 @@ def verify(source: str):
         "const float invEyeW = 1.0f / clipEye[3];",
         "dst[2] = transformedZ;",
         "dst[3] = invEyeW;",
-        "std::memcpy(out.data(), source, bytes);",
+        "else if (!R30SeedWorldXyzrhwBuffers(",
         "state.parallaxPerRhwX[eye] * rhw",
     ):
         assert required in vertices, f"world particle or fallback guard lost: {required}"
@@ -67,15 +69,18 @@ def verify(source: str):
         "while (cursor < vertexCount && !(*usedMask)[cursor])",
         "while (cursor < vertexCount && (*usedMask)[cursor])",
         "static_cast<std::size_t>(cursor - begin) * stride",
-        "std::memcpy(out.data() + offset,",
+        "std::memcpy(left.data() + offset,",
+        "std::memcpy(right->data() + offset,",
         "if (!sparseCopied)",
-        "std::memcpy(out.data(), source, bytes);",
+        "std::memcpy(left.data(), source, bytes);",
+        "std::memcpy(right->data(), source, bytes);",
     ):
-        assert required in vertices, f"sparse indexed source-copy guard lost: {required}"
-    assert vertices.index("if (!sparseCopied)") < vertices.index("const float x0")
+        assert required in seed, f"sparse indexed two-eye seed guard lost: {required}"
+    assert seed.index("if (!sparseCopied)") < seed.index("return true;")
+    assert vertices.index("if (preseeded)") < vertices.index("const float x0")
     assert vertices.index("const float x0") < vertices.index(
         "if (state.worldEffect && state.fullWorldReprojection &&")
-    assert vertices.count("std::memcpy(out.data(), source, bytes);") == 1
+    assert vertices.count("else if (!R30SeedWorldXyzrhwBuffers(") == 1
     # A late full-reprojection failure must roll back ALL already-written
     # referenced XYZRHW values before the affine pass reads them. Preserve
     # untouched UV/color bytes and sparse unused gaps, not a second full copy.
@@ -94,9 +99,9 @@ def verify(source: str):
             "for (UINT i = 0; i < modifiedVertexEnd; ++i)"))
     assert "if (leftFull &&" in stereo and "if (rightFull &&" in stereo
     assert stereo.index("if (leftFull &&") < stereo.index(
-        "state, 0, left, usedMask, false, ignored)")
+        "state, 0, left, usedMask, false, ignored, false)")
     assert stereo.index("if (rightFull &&") < stereo.index(
-        "state, 1, right, usedMask, false, ignored)")
+        "state, 1, right, usedMask, false, ignored, false)")
     # CPU-projected smoke/skid/decal geometry is constant within a latched
     # pose/projection/scale, while depth evidence and viewport stay per draw.
     assert "thread_local R30XyzrhwWorldGeometryCache R30XyzrhwWorldGeometry{};" in state
@@ -140,8 +145,8 @@ def verify(source: str):
         "clipEye[3] <= 1.0e-6f")
     for required in (
         "if (leftFull != rightFull)",
-        "state, 0, left, usedMask, false, ignored)",
-        "state, 1, right, usedMask, false, ignored)",
+        "state, 0, left, usedMask, false, ignored, false)",
+        "state, 1, right, usedMask, false, ignored, false)",
     ):
         assert required in stereo, "bilateral fallback must not be removed"
 

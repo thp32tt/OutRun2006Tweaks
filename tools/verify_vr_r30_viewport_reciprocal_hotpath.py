@@ -32,13 +32,14 @@ def valid(code: str) -> bool:
             and "((x - x0) / width)" not in code
             and "((y - y0) / height)" not in code
             and "depthSpan <= 1.0e-6f" in code[guard:scale_x]
-            and "std::memcpy(out.data(), source, bytes);" in code
+            and "else if (!R30SeedWorldXyzrhwBuffers(" in code
+            and "if (preseeded)" in code
             and "if (!restored)" in code
             and "state.inverseBaseProjection.m[row][col]" in code
             and "state.eyeTail[eye].m[row][col]" in code
             and "clipEye[3] <= 1.0e-6f" in code
             and "if (fullDrawOk && selectedVertices != 0)" in code
-            and code.count("std::memcpy(out.data(), source, bytes);") == 1
+            and code.count("else if (!R30SeedWorldXyzrhwBuffers(") == 1
             and "std::memcpy(outputVertex(i), sourceVertex(i)," in code[rollback:second]
             and "4u * sizeof(float));" in code[rollback:second]
             and "state.parallaxPerRhwX[eye] * rhw" in code)
@@ -100,8 +101,8 @@ def main() -> None:
     stereo = source.split("bool R30TransformXyzrhwStereo(", 1)[1].split(
         "template <typename LeftDraw", 1)[0]
     assert "if (leftFull != rightFull)" in stereo
-    assert "state, 0, left, usedMask, false, ignored)" in stereo
-    assert "state, 1, right, usedMask, false, ignored)" in stereo
+    assert "state, 0, left, usedMask, false, ignored, false)" in stereo
+    assert "state, 1, right, usedMask, false, ignored, false)" in stereo
     float32_viewport_parity()
     print(f"PASS R30 XYZRHW viewport reciprocal hotpath: {len(mutations)} negative mutations")
 
