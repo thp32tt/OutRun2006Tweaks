@@ -2729,5 +2729,30 @@ def main() -> None:
     print("DX11 TEX2..TEX8 multi-UV native Draw/DrawIndexed/fallback regression PASS (static only)")
 
 
+    # R240: the opt-in real D3D9 IndexedUP hook must forward nonzero
+    # MinVertexIndex through the native DrawIndexed diagnostic bridge.
+    # Static mutation tests are not Quest3 / game-frame runtime proof.
+    for renderer in RENDERERS:
+        hook = renderer.read_text(encoding="utf-8")
+        start = hook.find("void R30ObserveNativeIndexedUP(")
+        end = hook.find("HRESULT __stdcall DrawPrimitiveDestR30(", start)
+        assert start >= 0 and end > start, "game IndexedUP hook not located"
+        region = hook[start:end]
+        required = (
+            "minVertex > 1536u - numVertices",
+            "unpacked[i] < minVertex ||",
+            "unpacked[i] - minVertex >= numVertices",
+            "unpacked[i] -= minVertex;",
+            "static_cast<std::size_t>(minVertex) * stride",
+            "firstVertex, stride, numVertices, unpacked.data(), count",
+        )
+        assert all(token in region for token in required), "missing live IndexedUP vertex window"
+        assert "minVertex != 0" not in region, "nonzero source window silently discarded"
+        for token in required:
+            damaged = region.replace(token, "", 1)
+            assert damaged != region and not all(x in damaged for x in required), (
+                "live IndexedUP destructive mutation escaped: " + token
+            )
+
 if __name__ == "__main__":
     main()

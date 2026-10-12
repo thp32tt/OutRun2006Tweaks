@@ -20,11 +20,14 @@ public:
         std::uint64_t vertexVersion, std::uint64_t indexVersion) noexcept {
         reset(); // Failed recapture must revoke old IA bindings.
         if (type != D3DPT_TRIANGLESTRIP || !device || !vertices || !indices ||
-            minVertexIndex != 0 || !numVertices || !primitiveCount ||
+            !numVertices || !primitiveCount ||
             !vertexStride || !generation || !vertexVersion || !indexVersion ||
             (indexFormat != D3DFMT_INDEX16 && indexFormat != D3DFMT_INDEX32) ||
             primitiveCount > (std::numeric_limits<UINT>::max)() / 3u)
             return false;
+        if (minVertexIndex > (std::numeric_limits<UINT>::max)() - numVertices)
+            return false;
+        const UINT endVertex = minVertexIndex + numVertices;
         const UINT width = indexFormat == D3DFMT_INDEX16 ? 2u : 4u;
         const UINT inputCount = primitiveCount + 2u;
         const UINT triangleIndices = primitiveCount * 3u;
@@ -45,7 +48,8 @@ public:
             std::memcpy(&b, source + static_cast<std::size_t>(i + 1u) * width, width);
             std::memcpy(&c, source + static_cast<std::size_t>(i + 2u) * width, width);
             if (i & 1u) std::swap(a, b); // D3D9 strip alternating winding.
-            if (a >= numVertices || b >= numVertices || c >= numVertices)
+            if (a < minVertexIndex || b < minVertexIndex || c < minVertexIndex ||
+                a >= endVertex || b >= endVertex || c >= endVertex)
                 return false;
             auto* dest = expanded.get() + static_cast<std::size_t>(i) * 3u * width;
             std::memcpy(dest, &a, width);
@@ -56,7 +60,8 @@ public:
         // single-eye pipeline preflight. Expanded UP bytes die after upload.
         return owned_.capture(
             device, vertices, readableVertexBytes, expanded.get(), expandedBytes,
-            D3DPT_TRIANGLELIST, 0, numVertices, primitiveCount, indexFormat,
+            D3DPT_TRIANGLELIST, minVertexIndex, numVertices, primitiveCount,
+            indexFormat,
             vertexStride, generation, vertexVersion, indexVersion);
     }
 

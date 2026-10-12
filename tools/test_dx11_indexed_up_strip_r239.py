@@ -10,15 +10,17 @@ c = (root / "CMakeLists.txt").read_text(encoding="utf-8")
 guards = (
     "reset(); // Failed recapture",
     "type != D3DPT_TRIANGLESTRIP",
-    "minVertexIndex != 0",
+    "minVertexIndex > (std::numeric_limits<UINT>::max)() - numVertices",
+    "const UINT endVertex = minVertexIndex + numVertices",
     "primitiveCount > (std::numeric_limits<UINT>::max)() / 3u",
     "inputCount > (std::numeric_limits<UINT>::max)() / width",
     "triangleIndices > (std::numeric_limits<UINT>::max)() / width",
     "readableIndexBytes < inputCount * width",
     "new (std::nothrow) std::uint8_t[expandedBytes]",
     "if (i & 1u) std::swap(a, b);",
-    "if (a >= numVertices || b >= numVertices || c >= numVertices)",
-    "D3DPT_TRIANGLELIST, 0, numVertices, primitiveCount",
+    "a < minVertexIndex || b < minVertexIndex || c < minVertexIndex ||",
+    "a >= endVertex || b >= endVertex || c >= endVertex",
+    "D3DPT_TRIANGLELIST, minVertexIndex, numVertices, primitiveCount",
     "return owned_.bind_and_verify(context, generation, vertexVersion,",
 )
 def valid(src): return all(g in src for g in guards)
@@ -28,7 +30,9 @@ for guard in guards:
 assert "->Draw(" not in h and "->DrawIndexed(" not in h, "gameplay draw was enabled"
 for phrase in (
     "reject null transient indices", "reject short strip index span",
-    "reject unsupported list topology", "reject nonzero MinVertexIndex",
+    "reject unsupported list topology", "reject nonzero MinVertexIndex without referenced span",
+    "reject shifted strip index below window", "reject shifted strip index above window",
+    "INDEX16 nonzero MinVertexIndex strip -> GPU pixels",
     "reject count overflow", "reject out of range index",
     "two triangles expanded into six indices", "reject stale generation",
     "reject stale vertex version", "reject stale index version",

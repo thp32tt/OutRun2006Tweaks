@@ -4535,8 +4535,9 @@ namespace OutRunVRStereo
             if (!live::diagnostic_enabled() || !device ||
                 (topology != D3DPT_TRIANGLELIST &&
                  topology != D3DPT_TRIANGLESTRIP &&
-                  topology != D3DPT_TRIANGLEFAN) || minVertex != 0 ||
+                  topology != D3DPT_TRIANGLEFAN) ||
                 !numVertices || numVertices > 1536 ||
+                minVertex > 1536u - numVertices ||
                 !live::game_primitive_element_count(
                     (topology == D3DPT_TRIANGLESTRIP ||
                       topology == D3DPT_TRIANGLEFAN), primitiveCount,
@@ -4554,10 +4555,16 @@ namespace OutRunVRStereo
                     if (unit == 2) {
                         std::uint16_t x=0; std::memcpy(&x,p,2); unpacked[i]=x;
                     } else std::memcpy(&unpacked[i],p,4);
-                    if (unpacked[i] >= numVertices) return;
+                    // D3D9's UP indices are absolute; the native VB begins
+                    // at MinVertexIndex, so rebase every supplied index.
+                    if (unpacked[i] < minVertex ||
+                        unpacked[i] - minVertex >= numVertices) return;
+                    unpacked[i] -= minVertex;
                 }
+                const auto* firstVertex = static_cast<const std::uint8_t*>(vertices) +
+                    static_cast<std::size_t>(minVertex) * stride;
                 live::observe_indexed(device, topology, primitiveCount,
-                    vertices, stride, numVertices, unpacked.data(), count);
+                    firstVertex, stride, numVertices, unpacked.data(), count);
             } catch (...) { /* Original UP path remains authoritative. */ }
         }
 

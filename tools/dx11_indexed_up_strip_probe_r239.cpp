@@ -84,7 +84,7 @@ int main() {
     require(!capture16(strip16,sizeof(strip16),D3DPT_TRIANGLELIST,2),
             "reject unsupported list topology");
     require(!capture16(strip16,sizeof(strip16),D3DPT_TRIANGLESTRIP,2,1),
-            "reject nonzero MinVertexIndex");
+            "reject nonzero MinVertexIndex without referenced span");
     require(!capture16(strip16,sizeof(strip16),D3DPT_TRIANGLESTRIP,
                        0xffffffffu), "reject count overflow");
     std::uint16_t invalid[]={0,1,2,9};
@@ -144,6 +144,27 @@ int main() {
         ibVersion+2,32,32,DXGI_FORMAT_R8G8B8A8_UNORM,
         layout.Get(),vs.Get(),ps.Get(),rtv.Get()), "INDEX32 IA");
     drawAndCheck("INDEX32 both strip triangles -> GPU red, corner black");
-    std::cout << "R239 D3D9 strip -> native immutable IA -> WARP pixel PASS\n";
+    Vertex shifted[]={{3.f,3.f},{-.8f,-.8f},{-.8f,.8f},{.8f,-.8f},{.8f,.8f}};
+    std::uint16_t shiftedIdx[]={1,2,3,4};
+    std::uint16_t below[]={0,2,3,4}, above[]={1,2,3,5};
+    require(!batch.capture(device.Get(),shifted,sizeof(shifted),below,sizeof(below),
+        D3DPT_TRIANGLESTRIP,1,4,2,D3DFMT_INDEX16,sizeof(Vertex),
+        generation,vbVersion+3,ibVersion+3),
+        "reject shifted strip index below window");
+    require(!batch.capture(device.Get(),shifted,sizeof(shifted),above,sizeof(above),
+        D3DPT_TRIANGLESTRIP,1,4,2,D3DFMT_INDEX16,sizeof(Vertex),
+        generation,vbVersion+3,ibVersion+3),
+        "reject shifted strip index above window");
+    require(batch.capture(device.Get(),shifted,sizeof(shifted),
+        shiftedIdx,sizeof(shiftedIdx),D3DPT_TRIANGLESTRIP,1,4,2,
+        D3DFMT_INDEX16,sizeof(Vertex),generation,vbVersion+3,ibVersion+3),
+        "capture shifted strip INDEX16");
+    for(auto& v:shifted) v={3.f,3.f};
+    for(auto& i:shiftedIdx) i=9;
+    require(batch.bind_and_verify(context.Get(),generation,vbVersion+3,
+        ibVersion+3,32,32,DXGI_FORMAT_R8G8B8A8_UNORM,
+        layout.Get(),vs.Get(),ps.Get(),rtv.Get()),"shifted strip IA");
+    drawAndCheck("INDEX16 nonzero MinVertexIndex strip -> GPU pixels");
+    std::cout << "R239/R240 D3D9 strip -> native IA -> WARP pixel PASS\n";
     return 0;
 }

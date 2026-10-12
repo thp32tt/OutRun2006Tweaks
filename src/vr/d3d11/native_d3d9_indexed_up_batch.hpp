@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <cstring>
 #include <limits>
+#include <memory>
+#include <new>
 
 namespace outrun::vr::dx11 {
 class NativeD3D9IndexedUPBatch final {
@@ -19,10 +21,10 @@ public:
         UINT vertexStride, std::uint64_t generation,
         std::uint64_t vertexVersion, std::uint64_t indexVersion) noexcept {
         reset(); // Failed replacement cannot leave an old batch draw-ready.
-        // The first implementation only admits zero-based UP index windows;
-        // nonzero MinVertexIndex needs separately proven D3D9 pointer semantics.
+        // D3D9 UP indices refer to a [MinVertexIndex, MinVertexIndex+NumVertices)
+        // vertex window. Copy that exact window and rebase for native IA.
         if (!device || !vertices || !indices ||
-            primitiveType != D3DPT_TRIANGLELIST || minVertexIndex != 0 ||
+            primitiveType != D3DPT_TRIANGLELIST ||
             !numVertices || !primitiveCount || !vertexStride ||
             !generation || !vertexVersion || !indexVersion ||
             (indexFormat != D3DFMT_INDEX16 && indexFormat != D3DFMT_INDEX32) ||
@@ -30,30 +32,48 @@ public:
             return false;
         const UINT indexCount = primitiveCount * 3u;
         const UINT indexStride = indexFormat == D3DFMT_INDEX16 ? 2u : 4u;
-        if (numVertices > (std::numeric_limits<UINT>::max)() / vertexStride ||
+        if (minVertexIndex > (std::numeric_limits<UINT>::max)() - numVertices)
+            return false;
+        const UINT endVertex = minVertexIndex + numVertices;
+        if (endVertex > (std::numeric_limits<UINT>::max)() / vertexStride ||
             indexCount > (std::numeric_limits<UINT>::max)() / indexStride)
             return false;
         const UINT vertexBytes = numVertices * vertexStride;
+        const UINT requiredVertexBytes = endVertex * vertexStride;
         const UINT indexBytes = indexCount * indexStride;
-        if (readableVertexBytes < vertexBytes || readableIndexBytes < indexBytes)
+        if (readableVertexBytes < requiredVertexBytes ||
+            readableIndexBytes < indexBytes)
             return false;
         // D3D9 UP pointers are transient. Validate every index before handing
         // the exact source span to immutable native DEFAULT buffers.
         const auto* source = static_cast<const std::uint8_t*>(indices);
+        std::unique_ptr<std::uint8_t[]> rebased;
+        if (minVertexIndex != 0u) {
+            rebased.reset(new (std::nothrow) std::uint8_t[indexBytes]);
+            if (!rebased) return false;
+        }
         for (UINT n = 0; n < indexCount; ++n) {
             UINT value = 0;
-            std::memcpy(&value, source + static_cast<std::size_t>(n) * indexStride,
-                        indexStride);
-            if (value >= numVertices) return false;
+            const std::size_t offset = static_cast<std::size_t>(n) * indexStride;
+            std::memcpy(&value, source + offset, indexStride);
+            if (value < minVertexIndex || value - minVertexIndex >= numVertices)
+                return false;
+            if (rebased) {
+                const UINT local = value - minVertexIndex;
+                std::memcpy(rebased.get() + offset, &local, indexStride);
+            }
         }
+        const auto* window = static_cast<const std::uint8_t*>(vertices) +
+                             static_cast<std::size_t>(minVertexIndex) * vertexStride;
         if (!vertex_.initialize(device, ResourceRole::Vertex,
                                 D3DPOOL_DEFAULT, D3DUSAGE_WRITEONLY,
-                                D3DFMT_UNKNOWN, vertices, vertexBytes,
+                                D3DFMT_UNKNOWN, window, vertexBytes,
                                 vertexStride, generation, vertexVersion))
             return false;
         if (!index_.initialize(device, ResourceRole::Index,
                                D3DPOOL_DEFAULT, D3DUSAGE_WRITEONLY,
-                               indexFormat, indices, indexBytes, 0u,
+                               indexFormat, rebased ? rebased.get() : indices,
+                               indexBytes, 0u,
                                generation, indexVersion)) {
             reset();
             return false;

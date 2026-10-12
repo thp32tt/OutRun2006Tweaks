@@ -100,7 +100,7 @@ int main() {
             "reject unsupported topology");
     require(!capture(points,sizeof(points),order,sizeof(order),
                      D3DPT_TRIANGLELIST,1,3,1,D3DFMT_INDEX16,sizeof(Vertex)),
-            "reject unproven nonzero MinVertexIndex");
+            "reject nonzero MinVertexIndex without referenced span");
     require(!capture(points,sizeof(points),order,sizeof(order),
                      D3DPT_TRIANGLELIST,0,3,0,D3DFMT_INDEX16,sizeof(Vertex)),
             "reject empty primitives");
@@ -173,6 +173,32 @@ int main() {
                        center[2]==0 && center[3]==255;
     ctx->Unmap(staging.Get(),0);
     require(wideRed, "INDEX32 indexed UP native GPU pixel");
-    std::cout<<"R238 D3D9 indexed UP immutable VB/IB -> WARP pixels: PASS\n";
+    Vertex shifted[]={{3.f,3.f},{-.8f,-.8f},{0.f,.8f},{.8f,-.8f}};
+    std::uint16_t shiftedIdx[]={1,2,3};
+    std::uint16_t below[]={0,2,3}, above[]={1,2,4};
+    require(!capture(shifted,sizeof(shifted),below,sizeof(below),
+        D3DPT_TRIANGLELIST,1,3,1,D3DFMT_INDEX16,sizeof(Vertex)),
+        "reject shifted index below window");
+    require(!capture(shifted,sizeof(shifted),above,sizeof(above),
+        D3DPT_TRIANGLELIST,1,3,1,D3DFMT_INDEX16,sizeof(Vertex)),
+        "reject shifted index above window");
+    require(capture(shifted,sizeof(shifted),shiftedIdx,sizeof(shiftedIdx),
+        D3DPT_TRIANGLELIST,1,3,1,D3DFMT_INDEX16,sizeof(Vertex)),
+        "capture shifted INDEX16");
+    for(auto& v:shifted) v={3.f,3.f};
+    for(auto& i:shiftedIdx) i=9;
+    require(ready(generation,vbVer,ibVer,ps.Get()),"shifted IA");
+    ctx->ClearRenderTargetView(rtv.Get(),black);
+    ctx->DrawIndexed(up.index_count(),0,0);
+    ctx->CopyResource(staging.Get(),color.Get());
+    require(SUCCEEDED(ctx->Map(staging.Get(),0,D3D11_MAP_READ,0,&map)) &&
+        map.pData,"map shifted INDEX16");
+    bytes=static_cast<const std::uint8_t*>(map.pData);
+    center=bytes+16*map.RowPitch+16*4;
+    const bool shiftedRed=center[0]==255 && center[1]==0 &&
+                          center[2]==0 && center[3]==255;
+    ctx->Unmap(staging.Get(),0);
+    require(shiftedRed,"INDEX16 MinVertexIndex shift native GPU pixel");
+    std::cout<<"R238/R240 D3D9 indexed UP -> WARP pixels: PASS\n";
     return 0;
 }
