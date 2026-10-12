@@ -52,16 +52,17 @@
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tools/test_dx11_select_texture_mixed_alpha_00578.py",
-    "docs/automation/runs/CONVERSION-DX11-00578.json"
+    "docs/automation/runs/CONVERSION-DX11-00578.json",
+    "tools/test_dx11_first_game_frame_regressions.py"
   ],
   "pipeline": {
     "C0_RECOVER": "GitHub a2441e36412bc1f5d298f4e5e1bf0c1e23e8cbc6; 00577 exact-SHA passed",
     "C1_REVIEW": "Two missing texture-RGB independent alpha paths",
     "C2_IMPLEMENT": "Live capture and HLSL/native Draw chain",
-    "C3_VALIDATE": "Static integration check PASS; GitHub CI pending; Quest3/VDXR/gamepad UNTESTED",
+    "C3_VALIDATE": "00578 scoped JS static PASS; Build 38187661803 FAIL legacy readiness anchor at regression line 703; repaired exact source anchor and wired 00578 destructive regressions; new exact-SHA Actions pending",
     "C4_COMMIT": "Atomic three-file no-skip material commit",
     "C5_PACKAGE": "NOT_REQUIRED diagnostic",
     "C6_STATE": "PENDING_EXACT_SHA"
   },
-  "next_action": "Verify exact-SHA mandatory Actions; C6 bookkeeping only after success; runtime UNTESTED; DXVK frozen."
+  "next_action": "Check new exact validation-bearing SHA five mandatory GitHub Actions. Quest3/VDXR and gamepad remain UNTESTED."
 }

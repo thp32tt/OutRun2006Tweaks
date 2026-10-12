@@ -526,7 +526,7 @@ bool compile(const char* entry, const char* profile, ComPtr<ID3DBlob>& blob) noe
 bool ensure_pipeline(State& s) noexcept {
     const bool readbackReady = std::all_of(s.readbacks.begin(), s.readbacks.end(),
         [](const ReadbackSlot& item) { return item.staging && item.fence; });
-    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.selectDiffuseTextureAlphaPs && s.selectDiffuseModulateAlphaPs && s.selectTextureDiffuseAlphaPs && s.selectTextureModulateAlphaPs && s.additivePs && s.subtractPs &&
+    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.selectDiffuseTextureAlphaPs && s.selectDiffuseModulateAlphaPs && s.additivePs && s.subtractPs && s.selectTextureDiffuseAlphaPs && s.selectTextureModulateAlphaPs &&
         s.subtractTextureAlphaPs && s.subtractDiffuseAlphaPs && s.subtractModulateAlphaPs && s.addSmoothPs && s.modulate2xPs && s.modulate4xPs &&
         s.modulate2xTextureAlphaPs &&
         s.modulate2xDiffuseAlphaPs &&
