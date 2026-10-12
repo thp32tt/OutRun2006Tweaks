@@ -238,11 +238,29 @@ namespace OutRunVRStereo
             bool valid = false;
         };
 
+        // One-entry depth-classification memo for immutable CPU shadow spans.
+        // Only VB draws can use it: UP pointers have no tracked write generation.
+        // The IB identity also fences the referenced-index mask for indexed VB.
+        struct R30XyzrhwDepthSignatureCache
+        {
+            bool valid = false;
+            R30ShadowCopyCache vertex;
+            R30ShadowCopyCache index;
+            bool indexed = false;
+            UINT vertexCount = 0;
+            UINT stride = 0;
+            float minZ = 0.0f;
+            float maxZ = 0.0f;
+            D3DMATRIX projection{};
+            bool projectedDepth = false;
+        };
+
         struct R30ScratchBuffers
         {
             R30ShadowCopyCache vertexCopy;
             R30ShadowCopyCache indexCopy;
             R30IndexDecodeCache indexDecode;
+            R30XyzrhwDepthSignatureCache depthSignature;
             std::vector<std::uint8_t> source;
             std::vector<std::uint8_t> indexSource;
             std::vector<std::uint8_t> left;
@@ -1978,7 +1996,10 @@ namespace OutRunVRStereo
         bool R30ConfigureXyzrhwWorldEffect(
             IDirect3DDevice9* device, const void* source,
             UINT vertexCount, UINT stride, R30XyzrhwState& state,
-            const std::vector<std::uint8_t>* usedMask = nullptr) noexcept
+            const std::vector<std::uint8_t>* usedMask = nullptr,
+            const R30ShadowCopyCache* vertexCopy = nullptr,
+            const R30ShadowCopyCache* indexCopy = nullptr,
+            R30XyzrhwDepthSignatureCache* signatureCache = nullptr) noexcept
         {
             float projectionRaw[16]{};
             D3DMATRIX baseProjection{};
@@ -1987,11 +2008,56 @@ namespace OutRunVRStereo
             if (haveBaseProjection)
                 std::memcpy(&baseProjection, projectionRaw, sizeof(baseProjection));
 
-            state.rhwDepthEvidence =
-                haveBaseProjection &&
-                R30XyzrhwHasProjectedDepthSignature(
-                    source, vertexCount, stride, state,
-                    baseProjection, usedMask);
+            // Smoke/sand can redraw a static VB/IB span many times without a
+            // single game write. Copy caches already pin those exact revisions;
+            // reuse only the depth classifier, NEVER per-draw stereo/RT state.
+            // A changed base projection or viewport depth mapping forces a
+            // fresh classification, even when the vertex bytes are unchanged.
+            const bool indexed = usedMask != nullptr;
+            const bool canMemoize = haveBaseProjection && signatureCache &&
+                vertexCopy && vertexCopy->entry &&
+                (!indexed || (indexCopy && indexCopy->entry));
+            const auto sameCopy = [](const R30ShadowCopyCache& a,
+                const R30ShadowCopyCache& b) noexcept {
+                return a.entry == b.entry && a.revision == b.revision &&
+                    a.offset == b.offset && a.size == b.size;
+            };
+            const bool memoHit = canMemoize && signatureCache->valid &&
+                signatureCache->indexed == indexed &&
+                signatureCache->vertexCount == vertexCount &&
+                signatureCache->stride == stride &&
+                signatureCache->minZ == state.viewport.MinZ &&
+                signatureCache->maxZ == state.viewport.MaxZ &&
+                sameCopy(signatureCache->vertex, *vertexCopy) &&
+                (!indexed || sameCopy(signatureCache->index, *indexCopy)) &&
+                std::memcmp(&signatureCache->projection, &baseProjection,
+                    sizeof(baseProjection)) == 0;
+            if (memoHit)
+            {
+                state.rhwDepthEvidence = signatureCache->projectedDepth;
+            }
+            else
+            {
+                state.rhwDepthEvidence = haveBaseProjection &&
+                    R30XyzrhwHasProjectedDepthSignature(
+                        source, vertexCount, stride, state,
+                        baseProjection, usedMask);
+                if (canMemoize)
+                {
+                    signatureCache->valid = false;
+                    signatureCache->vertex = *vertexCopy;
+                    signatureCache->index = indexed
+                        ? *indexCopy : R30ShadowCopyCache{};
+                    signatureCache->indexed = indexed;
+                    signatureCache->vertexCount = vertexCount;
+                    signatureCache->stride = stride;
+                    signatureCache->minZ = state.viewport.MinZ;
+                    signatureCache->maxZ = state.viewport.MaxZ;
+                    signatureCache->projection = baseProjection;
+                    signatureCache->projectedDepth = state.rhwDepthEvidence;
+                    signatureCache->valid = true;
+                }
+            }
 
             // OutRun can disable Z after CPU-projecting smoke/skid/decal
             // billboards. The strengthened Z/RHW relation is the world-space
@@ -3424,7 +3490,8 @@ namespace OutRunVRStereo
 
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, scratch.source.data(), vertexCount,
-                    stride, state) ||
+                    stride, state, nullptr, &scratch.vertexCopy,
+                    nullptr, &scratch.depthSignature) ||
                 !R30TransformXyzrhwStereo(
                     scratch.source.data(), vertexCount, stride, state,
                     scratch.left, scratch.right))
@@ -3685,7 +3752,8 @@ namespace OutRunVRStereo
 
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, scratch.source.data(), vertexCount,
-                    stride, state, &scratch.used) ||
+                    stride, state, &scratch.used, &scratch.vertexCopy,
+                    &scratch.indexCopy, &scratch.depthSignature) ||
                 !R30TransformXyzrhwStereo(
                     scratch.source.data(), vertexCount, stride, state,
                     scratch.left, scratch.right,
