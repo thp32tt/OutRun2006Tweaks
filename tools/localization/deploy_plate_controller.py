@@ -67,7 +67,9 @@ print(json.dumps({{'compose':(b/{SUBDIR!r}/'docker-compose.yml').read_text(),'en
     sources += [policy_path, root / 'docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md',
                 root / 'tools/localization/build_imagegen_prompt.py',
                 root / 'tools/localization/deploy_plate_controller.py',
-                root / 'tools/localization/stage_controller_policy.py']
+                root / 'tools/localization/stage_controller_policy.py',
+                root / 'tools/localization/controller_png_attach.py',
+                root / 'tools/localization/patch_controller_png_upload.py']
     for source in sources:
         relative = source.relative_to(root).as_posix()
         committed = run(['git', '-C', str(root), 'show', revision + ':' + relative])
@@ -92,7 +94,9 @@ print(json.dumps({{'compose':(b/{SUBDIR!r}/'docker-compose.yml').read_text(),'en
             (b / 'imagegen_prompts' / template.name).write_bytes(template.read_bytes())
         (b / 'build_imagegen_prompt.py').write_bytes((root / 'tools/localization/build_imagegen_prompt.py').read_bytes())
         (b / 'HD_IMAGEGEN_POLICY.md').write_bytes((root / 'docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md').read_bytes())
-        (b / 'Dockerfile').write_text('FROM ' + BASE + '\nRUN rm -f /opt/outrun/prompts/localization_C2.md\nCOPY localization_*.md /opt/outrun/prompts/\nCOPY production_revision /opt/outrun/production_revision\nCOPY controller_roles.json HD_IMAGEGEN_POLICY.md build_imagegen_prompt.py /opt/outrun/\nCOPY imagegen_prompts /opt/outrun/imagegen_prompts/\n')
+        (b / 'controller_png_attach.py').write_bytes((root / 'tools/localization/controller_png_attach.py').read_bytes())
+        (b / 'patch_controller_png_upload.py').write_bytes((root / 'tools/localization/patch_controller_png_upload.py').read_bytes())
+        (b / 'Dockerfile').write_text('FROM ' + BASE + '\nRUN rm -f /opt/outrun/prompts/localization_C2.md\nCOPY controller_png_attach.py /opt/outrun/app/controller_png_attach.py\nCOPY patch_controller_png_upload.py /opt/outrun/patch_controller_png_upload.py\nRUN python /opt/outrun/patch_controller_png_upload.py /opt/outrun/app/controller.py\nCOPY localization_*.md /opt/outrun/prompts/\nCOPY production_revision /opt/outrun/production_revision\nCOPY controller_roles.json HD_IMAGEGEN_POLICY.md build_imagegen_prompt.py /opt/outrun/\nCOPY imagegen_prompts /opt/outrun/imagegen_prompts/\n')
         run(['docker', 'build', '-t', image, str(b)], timeout=120)
     # Save prompt source in the existing Portainer build context for future rebuilds.
     encoded = json.dumps({name: (prompt_dir / ('localization_C1.md' if name == 'localization_C.md' else name)).read_text() for name in hashes})
