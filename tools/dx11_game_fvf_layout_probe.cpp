@@ -49,7 +49,7 @@ int main() {
     assert(!game_fvf_select_uv(sample, layout, 2u, chosen));
     assert(chosen[0] == .1f && chosen[1] == .2f);
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 | 0x400u, layout));
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 | 0x00010000u, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 | 0x00020000u, layout));
     assert(game_fvf_layout(kGameFvfXyz | kGameFvfDiffuse | kGameFvfTex2, layout));
     assert(layout.texcoordOffset == 16u && layout.minStride == 32u);
     struct XyzColorUv2 {float x,y,z; std::uint32_t color; float u0,v0,u1,v1;};
@@ -77,7 +77,7 @@ int main() {
     assert(!game_fvf_select_uv(sample, layout, 3u, chosen));
     assert(chosen[0] == .1f);
     assert(!game_fvf_layout(kGameFvfXyzRhw | 0x900u, layout));
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 | 0x10000u, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 | 0x20000u, layout));
     assert(game_fvf_layout(kGameFvfXyz | kGameFvfDiffuse | kGameFvfTex3, layout));
     assert(layout.texcoordOffset == 16u && layout.minStride == 40u);
     struct XyzColorUv3 {float x,y,z; std::uint32_t color; float u0,v0,u1,v1,u2,v2;};
@@ -102,7 +102,7 @@ int main() {
     assert(!game_fvf_select_uv(sample, layout, 4u, chosen));
     assert(chosen[0] == .5f && chosen[1] == .6f);
     assert(!game_fvf_layout(kGameFvfXyzRhw | 0x900u, layout));
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 | 0x00010000u, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 | 0x00020000u, layout));
     assert(game_fvf_layout(kGameFvfXyz | kGameFvfDiffuse | kGameFvfTex4, layout));
     assert(layout.texcoordOffset == 16u && layout.minStride == 48u);
     struct XyzColorUv4 {float x,y,z; std::uint32_t color; float u0,v0,u1,v1,u2,v2,u3,v3;};
@@ -466,5 +466,45 @@ int main() {
     assert(chosen[0] == .85f && chosen[1] == .95f);
     assert(!game_fvf_decode_vertex(&raceTail, 87u, layout, sample));
     assert(sample.uv7[1] == .95f);
+    // 00614: real menu/vehicle/race FVF float3 UV captures must advance
+    // each subsequent slot by 12 source bytes, not the native float2 8.
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 |
+                           kGameFvfTexcoordSize3_0, layout));
+    assert(layout.texcoord3DMask == 1u && layout.minStride == 44u);
+    struct Menu3DUv { float x,y,z,rhw,u0,v0,w0,u1,v1,u2,v2; };
+    Menu3DUv menu3D{1,2,.4f,1.f,.1f,.2f,777.f,.3f,.4f,.85f,.95f};
+    assert(sizeof(menu3D) == 44u);
+    assert(game_fvf_decode_vertex(&menu3D, sizeof(menu3D), layout, sample));
+    assert(game_fvf_select_uv(sample, layout, 0u, chosen));
+    assert(chosen[0] == .1f && chosen[1] == .2f);
+    assert(game_fvf_select_uv(sample, layout, 2u, chosen));
+    assert(chosen[0] == .85f && chosen[1] == .95f);
+    const auto valid3D = sample;
+    assert(!game_fvf_decode_vertex(&menu3D, 43u, layout, sample));
+    assert(sample.uv2[1] == valid3D.uv2[1]);
+    auto corrupted3D = layout;
+    corrupted3D.texcoord3DMask = 0u;
+    assert(!game_fvf_decode_vertex(&menu3D, sizeof(menu3D), corrupted3D, sample));
+    assert(sample.uv2[0] == valid3D.uv2[0]);
+
+    // Mixed packed stage4 U-only + stage7 float3 with live TEXCOORDINDEX=7.
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex8 |
+                           kGameFvfTexcoordSize1_4 | kGameFvfTexcoordSize3_7, layout));
+    assert(layout.texcoord3DMask == 0x80u && layout.minStride == 80u);
+    struct Race3DMixed { float x,y,z,rhw,u0,v0,u1,v1,u2,v2,u3,v3,
+                               u4,u5,v5,u6,v6,u7,v7,w7; };
+    Race3DMixed race3D{1,2,.4f,1.f,.1f,.2f,.3f,.4f,.5f,.6f,.7f,.8f,
+                       .9f,.15f,.25f,.35f,.45f,.85f,.95f,888.f};
+    assert(sizeof(race3D) == 80u);
+    assert(game_fvf_decode_vertex(&race3D, sizeof(race3D), layout, sample));
+    assert(game_fvf_select_uv(sample, layout, 4u, chosen));
+    assert(chosen[0] == .9f && chosen[1] == 0.f);
+    assert(game_fvf_select_uv(sample, layout, 7u, chosen));
+    assert(chosen[0] == .85f && chosen[1] == .95f);
+    assert(!game_fvf_decode_vertex(&race3D, 79u, layout, sample));
+    assert(sample.uv7[1] == .95f);
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex8 | 0x80000000u, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex7 |
+                            kGameFvfTexcoordSize3_7, layout));
     return 0;
 }
