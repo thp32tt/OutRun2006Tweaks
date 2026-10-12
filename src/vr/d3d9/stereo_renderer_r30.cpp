@@ -2245,6 +2245,9 @@ namespace OutRunVRStereo
             {
                 bool fullDrawOk = true;
                 UINT selectedVertices = 0;
+                // A rejected full projection needs to restore only the
+                // XYZRHW headers already overwritten, not the entire VB span.
+                UINT modifiedVertexEnd = 0;
                 for (UINT i = 0; i < vertexCount; ++i)
                 {
                     if (!selected(i))
@@ -2420,6 +2423,7 @@ namespace OutRunVRStereo
                     dst[1] = transformedY;
                     dst[2] = transformedZ;
                     dst[3] = invEyeW;
+                    modifiedVertexEnd = i + 1u;
                 }
 
                 if (fullDrawOk && selectedVertices != 0)
@@ -2435,7 +2439,17 @@ namespace OutRunVRStereo
                     spdlog::info(
                         "VR R30.6 XYZRHW WORLD: full reprojection rejected for a referenced vertex; this eye candidate is discarded before bilateral fallback selection");
                 }
-                std::memcpy(out.data(), source, bytes);
+                // The initial full or sparse copy already preserved all
+                // colour/UV/other vertex attributes. Full reprojection only
+                // modified the four XYZRHW floats of referenced vertices;
+                // restore that prefix up to the last successful write, then
+                // run the original affine fallback on both eyes as before.
+                for (UINT i = 0; i < modifiedVertexEnd; ++i)
+                {
+                    if (selected(i))
+                        std::memcpy(outputVertex(i), sourceVertex(i),
+                            4u * sizeof(float));
+                }
             }
 
             for (UINT i = 0; i < vertexCount; ++i)
@@ -2640,9 +2654,17 @@ namespace OutRunVRStereo
                     spdlog::info(
                         "VR R30.6 XYZRHW WORLD: one eye rejected full reprojection; both eyes are forced onto the same affine fallback policy");
                 }
+                // A rejected eye has already completed its own affine
+                // fallback inside R30TransformXyzrhwVertices. Only rerun the
+                // eye that *succeeded* at full reprojection: both outputs then
+                // share the same conservative affine policy without a third
+                // traversal/copy of the eye that already fell back.
                 bool ignored = false;
-                if (!R30TransformXyzrhwVertices(source, vertexCount, stride,
-                        state, 0, left, usedMask, false, ignored) ||
+                if (leftFull &&
+                    !R30TransformXyzrhwVertices(source, vertexCount, stride,
+                        state, 0, left, usedMask, false, ignored))
+                    return false;
+                if (rightFull &&
                     !R30TransformXyzrhwVertices(source, vertexCount, stride,
                         state, 1, right, usedMask, false, ignored))
                     return false;
