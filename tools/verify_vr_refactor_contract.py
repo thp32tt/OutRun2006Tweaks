@@ -1166,7 +1166,7 @@ def r33_readiness_facade_ok(src: str) -> bool:
         return False
     if not (helper.index(initial) < helper.index(boot_condition)
             < helper.index(bootstrap) < helper.index(after_boot)
-            < helper.index(depth_resample) < helper.index(stencil_resample)
+            < helper.rindex(depth_resample) < helper.rindex(stencil_resample)
             < helper.index(depth_veto) < helper.index(stencil_veto)):
         return False
     for route in (world, hud):
