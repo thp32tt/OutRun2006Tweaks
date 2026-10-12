@@ -1760,7 +1760,7 @@ def main() -> None:
         "alphaOp == D3DTOP_SELECTARG2;",
         "blendFactorAddAlpha = op == D3DTOP_BLENDFACTORALPHA &&",
         "alphaOp == D3DTOP_ADD;",
-        "blendFactorDiffuseAlpha || blendFactorAddAlpha ||\n             blendFactorSubtractAlpha || blendFactorAddSmoothAlpha ||\n             blendFactorModulate2XAlpha || blendFactorModulate4XAlpha) &&",
+        "blendFactorDiffuseAlpha || blendFactorAddAlpha ||\n             blendFactorSubtractAlpha || blendFactorAddSmoothAlpha ||\n             blendFactorModulate2XAlpha || blendFactorModulate4XAlpha ||\n              selectTextureFactorAlpha || selectDiffuseFactorAlpha) &&",
         "!blendFactorDiffuseAlpha && !blendFactorAddAlpha &&",
         "blendFactorDiffuseAlpha || blendFactorAddAlpha ||",
         "(!blendFactorDiffuseAlpha &&",
