@@ -2295,7 +2295,8 @@ namespace OutRunVRStereo
             const void* source, UINT vertexCount, UINT stride,
             std::vector<std::uint8_t>& left,
             std::vector<std::uint8_t>* right,
-            const std::vector<std::uint8_t>* usedMask) noexcept
+            const std::vector<std::uint8_t>* usedMask,
+            UINT knownUsedCount = UINT_MAX) noexcept
         {
             if (!source || !vertexCount || stride < sizeof(float) * 4)
                 return false;
@@ -2319,9 +2320,15 @@ namespace OutRunVRStereo
             bool sparseCopied = false;
             if (usedMask && vertexCount >= 64u)
             {
-                const auto selectedCount = std::count_if(
-                    usedMask->begin(), usedMask->begin() + vertexCount,
-                    [](std::uint8_t used) noexcept { return used != 0; });
+                // Indexed callers already counted distinct references while
+                // building this mask. Avoid a second full VB-span pass
+                // for sparse particle geometry; retain the original scan
+                // for callers without an authoritative cardinality.
+                const std::size_t selectedCount = knownUsedCount <= vertexCount
+                    ? static_cast<std::size_t>(knownUsedCount)
+                    : static_cast<std::size_t>(std::count_if(
+                        usedMask->begin(), usedMask->begin() + vertexCount,
+                        [](std::uint8_t used) noexcept { return used != 0; }));
                 if (static_cast<std::size_t>(selectedCount) * 4u <= vertexCount)
                 {
                     UINT cursor = 0;
@@ -2888,7 +2895,8 @@ namespace OutRunVRStereo
             const R30XyzrhwState& state,
             std::vector<std::uint8_t>& left,
             std::vector<std::uint8_t>& right,
-            const std::vector<std::uint8_t>* usedMask = nullptr) noexcept
+            const std::vector<std::uint8_t>* usedMask = nullptr,
+            UINT knownUsedCount = UINT_MAX) noexcept
         {
             // Fuse both non-indexed and indexed ScreenHud eyes in one CPU walk.
             // Preserve Z/RHW, UV, color and the original asymmetric FOV math;
@@ -2926,11 +2934,13 @@ namespace OutRunVRStereo
                 bool sparseCopied = false;
                 if (usedMask && vertexCount >= 64u)
                 {
-                    const auto selectedCount = std::count_if(
-                        usedMask->begin(), usedMask->begin() + vertexCount,
-                        [](std::uint8_t selected) noexcept {
-                            return selected != 0;
-                        });
+                    const std::size_t selectedCount = knownUsedCount <= vertexCount
+                        ? static_cast<std::size_t>(knownUsedCount)
+                        : static_cast<std::size_t>(std::count_if(
+                            usedMask->begin(), usedMask->begin() + vertexCount,
+                            [](std::uint8_t selected) noexcept {
+                                return selected != 0;
+                            }));
                     if (static_cast<std::size_t>(selectedCount) * 4u <= vertexCount)
                     {
                         const auto* srcBytes =
@@ -3020,7 +3030,8 @@ namespace OutRunVRStereo
             // one sparse-mask population count and one contiguous-run scan
             // seeds both eye scratch buffers before per-eye projection work.
             if (!R30SeedWorldXyzrhwBuffers(
-                    source, vertexCount, stride, left, &right, usedMask))
+                    source, vertexCount, stride, left, &right,
+                    usedMask, knownUsedCount))
                 return false;
 
             // The conservative affine-only world route can share input math
@@ -3259,6 +3270,10 @@ namespace OutRunVRStereo
             {
                 return E_NOTIMPL;
             }
+            // Count only first references while writing the used-mask.
+            // Both eyes can then choose sparse copying without recounting
+            // the entire potentially large vertex span.
+            UINT knownUsedCount = 0;
             for (UINT i = 0; i < indexCount; ++i)
             {
                 const std::uint32_t raw =
@@ -3267,7 +3282,11 @@ namespace OutRunVRStereo
                     : static_cast<const std::uint32_t*>(indexData)[i];
                 if (raw >= vertexCount)
                     return E_NOTIMPL;
-                scratch.used[raw] = 1;
+                if (!scratch.used[raw])
+                {
+                    ++knownUsedCount;
+                    scratch.used[raw] = 1;
+                }
             }
 
             if (!R30ConfigureXyzrhwWorldEffect(
@@ -3280,7 +3299,8 @@ namespace OutRunVRStereo
 
             if (!R30TransformXyzrhwStereo(
                     vertexData, vertexCount, stride, state,
-                    scratch.left, scratch.right, &scratch.used))
+                    scratch.left, scratch.right,
+                    &scratch.used, knownUsedCount))
             {
                 ++R30XyzrhwFallbacks;
                 return E_NOTIMPL;
@@ -3567,6 +3587,7 @@ namespace OutRunVRStereo
             const void* rebased = index16
                 ? static_cast<const void*>(scratch.indices16.data())
                 : static_cast<const void*>(scratch.indices32.data());
+            UINT knownUsedCount = 0;
             for (UINT i = 0; i < indexCount; ++i)
             {
                 // The signed base cancels when converting to the local
@@ -3584,7 +3605,11 @@ namespace OutRunVRStereo
                     vb->Release();
                     return E_NOTIMPL;
                 }
-                scratch.used[static_cast<std::size_t>(local)] = 1;
+                if (!scratch.used[static_cast<std::size_t>(local)])
+                {
+                    ++knownUsedCount;
+                    scratch.used[static_cast<std::size_t>(local)] = 1;
+                }
                 if (index16)
                     scratch.indices16[i] = static_cast<std::uint16_t>(local);
                 else
@@ -3596,7 +3621,8 @@ namespace OutRunVRStereo
                     stride, state, &scratch.used) ||
                 !R30TransformXyzrhwStereo(
                     scratch.source.data(), vertexCount, stride, state,
-                    scratch.left, scratch.right, &scratch.used))
+                    scratch.left, scratch.right,
+                    &scratch.used, knownUsedCount))
             {
                 ib->Release();
                 vb->Release();
