@@ -65,10 +65,19 @@ def violations(source: str) -> list[str]:
         "struct Recent",
         "Recent recent[3]{};",
         "unsigned nextRecent = 0;",
+        "unsigned hotRecent = 0;",
     ):
         require(marker in cache, "bounded alternate cache " + marker)
     for marker in (
-        "if (R31WorldCache.valid)\n            {\n                for (const auto& previous : R31WorldCache.recent)",
+        "if (R31WorldCache.valid)\n            {",
+        "for (const auto& previous : R31WorldCache.recent)",
+        "const auto& hot = R31WorldCache.recent[R31WorldCache.hotRecent];",
+        "if (hot.valid &&",
+        "std::memcmp(hot.originalWvp, originalWvp,",
+        "std::memcpy(draw.eyeConstants, hot.eyeConstants,",
+        "if (&previous == &hot)",
+        "R31WorldCache.hotRecent = static_cast<unsigned>(",
+        "R31WorldCache.hotRecent = 0;",
         "if (previous.valid &&",
         "std::memcmp(previous.originalWvp, originalWvp,",
         "std::memcpy(draw.eyeConstants, previous.eyeConstants,",
@@ -105,7 +114,7 @@ def violations(source: str) -> list[str]:
                 build.index("R31WorldCache.valid = true;"), "two-eye finite before publish")
     except ValueError:
         errors.append("mandatory validation/publish ordering anchor absent")
-    require(build.count("draw.poseSequence = stereo.poseSequence;") == 3,
+    require(build.count("draw.poseSequence = stereo.poseSequence;") == 4,
             "all three fast-return paths use the current pose")
     require("R31EyeCache = next;" in prepare and
             "R31WorldCache.valid = false;" in prepare and
@@ -192,6 +201,45 @@ def numeric_interleaved_test() -> None:
     print(f"PASS four-way interleaved world WVP: hits={hits}, misses={misses}, tail-invalidations={invalidations}")
 
 
+
+def numeric_hot_recent_hint_test() -> None:
+    """An interleaved repeated alternate must use exact keys with less search."""
+    keys = [struct.pack("<16f", *(float(i * 20 + j) for j in range(16)))
+            for i in range(4)]
+    primary, recent, hot = keys[0], keys[1:], 0
+    baseline_checks = hinted_checks = 0
+    for n in range(1800):
+        key = keys[3] if n % 12 not in (0, 1) else keys[1 + (n % 2)]
+        # Historical primary + sequential three-entry lookup.
+        baseline_checks += 1
+        baseline_hit = key == primary
+        if not baseline_hit:
+            for candidate in recent:
+                baseline_checks += 1
+                if candidate == key:
+                    baseline_hit = True
+                    break
+        hinted_checks += 1
+        hinted_hit = key == primary
+        if not hinted_hit:
+            hinted_checks += 1
+            hinted_hit = recent[hot] == key
+            if not hinted_hit:
+                for i, candidate in enumerate(recent):
+                    if i == hot:
+                        continue
+                    hinted_checks += 1
+                    if candidate == key:
+                        hot = i
+                        hinted_hit = True
+                        break
+        assert baseline_hit and hinted_hit
+    assert hinted_checks * 5 < baseline_checks * 4, (
+        hinted_checks, baseline_checks)
+    print(f"PASS R31 recent-hot exact WVP hint: {baseline_checks} -> "
+          f"{hinted_checks} key comparisons on interleaved world draws")
+
+
 def zero_copy_bridge_violations(api: str, r32: str, r33: str) -> list[str]:
     """R31 verified eye matrices reach R33 unchanged; the pose is borrowed."""
     errors = []
@@ -264,6 +312,14 @@ def main() -> None:
         assert violations(source.replace(section, section.replace(marker, "BROKEN", 1), 1))
     for marker in (
         "Recent recent[3]{};",
+        "unsigned hotRecent = 0;",
+        "const auto& hot = R31WorldCache.recent[R31WorldCache.hotRecent];",
+        "if (hot.valid &&",
+        "std::memcmp(hot.originalWvp, originalWvp,",
+        "std::memcpy(draw.eyeConstants, hot.eyeConstants,",
+        "if (&previous == &hot)",
+        "R31WorldCache.hotRecent = static_cast<unsigned>(",
+        "R31WorldCache.hotRecent = 0;",
         "if (previous.valid &&",
         "std::memcmp(previous.originalWvp, originalWvp,",
         "std::memcpy(draw.eyeConstants, previous.eyeConstants,",
@@ -277,6 +333,7 @@ def main() -> None:
         assert violations(source.replace(marker, "BROKEN", 1)), marker
     numeric_test()
     numeric_interleaved_test()
+    numeric_hot_recent_hint_test()
     zero_copy_bridge_test()
     print(f"PASS R31 WVP hotpath: {len(markers) + 13} negative mutations")
 

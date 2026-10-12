@@ -89,6 +89,9 @@ namespace OutRunVRStereo
             };
             Recent recent[3]{};
             unsigned nextRecent = 0;
+            // Most recently reused alternate: avoid three 64-byte key
+            // comparisons on recurrent interleaved high-draw scenes.
+            unsigned hotRecent = 0;
         };
         R31WorldWvpCache R31WorldCache{};
 
@@ -436,12 +439,30 @@ namespace OutRunVRStereo
             // clear that flag, so stale eye transforms never become hits.
             if (R31WorldCache.valid)
             {
+                // The last alternate hit is common when scenery/particles
+                // revisit a shader WVP between many draws of one primary.
+                // Only exact 64-byte equality may reuse both eye products.
+                const auto& hot = R31WorldCache.recent[R31WorldCache.hotRecent];
+                if (hot.valid &&
+                    std::memcmp(hot.originalWvp, originalWvp,
+                        sizeof(draw.originalConstants)) == 0)
+                {
+                    std::memcpy(draw.eyeConstants, hot.eyeConstants,
+                        sizeof(draw.eyeConstants));
+                    draw.poseSequence = stereo.poseSequence;
+                    return true;
+                }
                 for (const auto& previous : R31WorldCache.recent)
                 {
+                    // Already compared above, including the empty-slot case.
+                    if (&previous == &hot)
+                        continue;
                     if (previous.valid &&
                         std::memcmp(previous.originalWvp, originalWvp,
                             sizeof(draw.originalConstants)) == 0)
                     {
+                        R31WorldCache.hotRecent = static_cast<unsigned>(
+                            &previous - R31WorldCache.recent);
                         std::memcpy(draw.eyeConstants, previous.eyeConstants,
                             sizeof(draw.eyeConstants));
                         draw.poseSequence = stereo.poseSequence;
@@ -485,6 +506,7 @@ namespace OutRunVRStereo
                 for (auto& previous : R31WorldCache.recent)
                     previous.valid = false;
                 R31WorldCache.nextRecent = 0;
+                R31WorldCache.hotRecent = 0;
             }
             std::memcpy(R31WorldCache.originalWvp, originalWvp,
                 sizeof(R31WorldCache.originalWvp));
