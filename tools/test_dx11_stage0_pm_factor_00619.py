@@ -6,7 +6,9 @@ S=Path(__file__).resolve().parents[1]/"src/vr/d3d11/live_game_frame_bridge.cpp"
 TOKENS=(
     "const bool blendTextureAlphaPMFactorAlpha =",
     "alphaOp == D3DTOP_SELECTARG1 && alphaArg1 == D3DTA_TFACTOR;",
-    "blendTextureAlphaPMFactorAlpha || blendFactorDiffuseAlpha",
+    # Both independently captured TFACTOR select and factor-weighted alpha must
+    # remain explicitly present in the live texture-factor read predicate.
+    "blendTextureAlphaPMFactorAlpha || blendTextureAlphaPMBlendFactorAlpha || blendFactorDiffuseAlpha",
     "blendTextureAlphaPMFactorAlpha || blendTextureAlphaPMDiffuseAlpha ||",
     "!blendTextureAlphaPMFactorAlpha &&",
     "!selectDiffuseTfactorArg2Alpha && !blendTextureAlphaPMFactorAlpha",
