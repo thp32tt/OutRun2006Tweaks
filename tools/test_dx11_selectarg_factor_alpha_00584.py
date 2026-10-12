@@ -59,8 +59,15 @@ def linked(s):
     return True
 
 def mutate(s,a,b):
-    assert s.count(a)==1, (a,s.count(a))
-    return s.replace(a,b,1)
+    occurrences = s.count(a)
+    # 00635 added a second independently guarded TFACTOR read for
+    # complemented PM alpha. Mutate both sites to ensure that no valid
+    # factor source remains, while leaving other mutations uniquely scoped.
+    if a == "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)":
+        assert occurrences >= 1, (a, occurrences)
+        return s.replace(a, b)
+    assert occurrences == 1, (a, occurrences)
+    return s.replace(a, b, 1)
 
 def main():
     s=P.read_text(encoding="utf-8")
@@ -94,7 +101,7 @@ def main():
     for flag, op, _, _ in V:
         declaration = ("        const bool " + flag + " = op == D3DTOP_" + op +
                        " &&\n                                      alphaOp == D3DTOP_BLENDFACTORALPHA;\n")
-        assert s.count(declaration) == 1 and s.count(factor_guard_end) == 1
+        assert s.count(declaration) == 1 and s.count(factor_guard_end) >= 1
         mutant = s.replace(declaration, "", 1).replace(
             factor_guard_end, factor_guard_end + declaration, 1)
         assert not linked(mutant), flag + " declaration-before-use"

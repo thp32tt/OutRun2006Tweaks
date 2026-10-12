@@ -9,7 +9,7 @@ TOKENS=(
     # Both independently captured TFACTOR select and factor-weighted alpha must
     # remain explicitly present in the live texture-factor read predicate.
     "blendTextureAlphaPMFactorAlpha || blendTextureAlphaPMBlendFactorAlpha || blendFactorDiffuseAlpha",
-    "blendTextureAlphaPMFactorAlpha || blendTextureAlphaPMDiffuseArg1Alpha || blendTextureAlphaPMDiffuseAlpha ||",
+    "blendTextureAlphaPMFactorAlpha || blendTextureAlphaPMInverseFactorArg1Alpha || blendTextureAlphaPMInverseFactorArg2Alpha || blendTextureAlphaPMDiffuseArg1Alpha || blendTextureAlphaPMDiffuseAlpha ||",
     "!blendTextureAlphaPMFactorAlpha &&",
     "!selectDiffuseTfactorArg2Alpha && !blendTextureAlphaPMFactorAlpha",
     "capture.blendTextureAlphaPMFactorAlpha = blendTextureAlphaPMFactorAlpha;",
