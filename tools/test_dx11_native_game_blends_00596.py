@@ -58,6 +58,8 @@ def linked(code):
     return (code.count("for (auto& masked : s.maskedBlends) masked.Reset();") == 2
             and additive.count("target.SrcBlend = D3D11_BLEND_ONE;") == 1
             and additive.count("target.SrcBlendAlpha = D3D11_BLEND_ONE;") == 1
+            and additive.count("target.DestBlend = D3D11_BLEND_ONE;") == 1
+            and additive.count("target.DestBlendAlpha = D3D11_BLEND_ONE;") == 1
             and "return optedIn;" in code)
 
 def main():
