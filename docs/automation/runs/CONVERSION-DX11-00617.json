@@ -1,0 +1,55 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00617",
+  "production_id": "CONVERSION-DX11-00617",
+  "event_id": "CONVERSION-DX11-00617-E001",
+  "event_type": "dispatch",
+  "target_branch": "vr-dx11-native-r71",
+  "lane": "DX11",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_STAGE0_PREMULTIPLIED_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "82bc978cf2fd339681d290f477c49a87baac05ee",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA_GATE",
+  "runtime_validation": "UNTESTED",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "D3D9 game stage0 state",
+      "D3D11 PM pixel shader",
+      "native Draw/DrawIndexed",
+      "opt-in frame"
+    ],
+    "batch_components": [
+      "new native PM RGBA shader",
+      "live state/shader/Draw integration",
+      "destructive regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "PM numeric formula and C++ source link",
+      "negative_regression": "eight destructive mutations, missing-source denial",
+      "component_integration": "game-created D3D9 draw into opt-in native PS; fallback unchanged"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_STAGE0_PREMULTIPLIED_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_stage0_blend.hpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "tools/test_dx11_stage0_premultiplied_00617.py"
+  ],
+  "native_gameplay_activation": false,
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Validate exact result SHA Gate/Build/Fast/OpenXR/HUD; HMD follow-up only for runtime."
+}

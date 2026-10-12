@@ -1694,6 +1694,9 @@ def main() -> None:
     # 00616: real game stage0 CURRENT alpha shares validated DIFFUSE alpha PS.
     from test_dx11_stage0_current_alpha_00616 import main as run_00616
     run_00616()
+    # 00617: native Draw with D3D9 premultiplied texture alpha.
+    from test_dx11_stage0_premultiplied_00617 import main as run_00617
+    run_00617()
 
     # 00558: real game-authored D3D9 stage0 BLENDTEXTUREALPHA /
     # BLENDDIFFUSEALPHA -> owned native PS -> Draw/DrawIndexed -> opt-in inset.
