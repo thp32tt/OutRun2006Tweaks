@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00600",
   "work_key": "DX11:MENU_RACE_ALPHA_COMPARE8",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "C4_MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "C6_BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -58,9 +58,57 @@
   ],
   "packaging": {
     "status": "NOT_REQUIRED",
-    "reason": "Opt-in diagnostic only; no Quest3 runtime proof"
+    "reason": "Opt-in diagnostic; actual Quest3/VDXR gameplay and controller parity not tested"
   },
-  "next_action": "Check exact-SHA mandatory CI, repair actual failures; separate C6 afterwards",
-  "validation_bearing_result_sha": null,
-  "result_sha": null
+  "next_action": "Controller assigns next independent menu-to-race native Draw integration; do not repeat 00600, pending actual Quest3/VDXR visual/menu/gamepad parity",
+  "validation_bearing_result_sha": "d2c6933379f23fe10167ebae6f6688b4926cfd3b",
+  "result_sha": "d2c6933379f23fe10167ebae6f6688b4926cfd3b",
+  "material_commit_sha": "f0f5f35dc9e3c8de7db9d0cfed45ff05af627a23",
+  "repair_commit_shas": [
+    "ed479b0a327d364f565c4cbaadbce14eb92e6475",
+    "d2c6933379f23fe10167ebae6f6688b4926cfd3b"
+  ],
+  "verified_ci": {
+    "backend_conversion_gate": {
+      "id": 38222574083,
+      "conclusion": "success",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ]
+    },
+    "build": {
+      "id": 38222580177,
+      "conclusion": "success"
+    },
+    "dx11_fast_structural": {
+      "id": 38222574095,
+      "conclusion": "success"
+    },
+    "openxr_architecture_push": {
+      "id": 38222574105,
+      "conclusion": "success"
+    },
+    "openxr_architecture_pr": {
+      "id": 38222580178,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "id": 38222580188,
+      "conclusion": "success"
+    },
+    "vr_pc_fast": {
+      "id": 38222574195,
+      "conclusion": "skipped",
+      "required": false
+    }
+  },
+  "defect_repaired": {
+    "signature": "MSVC C2026 HLSL raw string too big at live_game_frame_bridge.cpp line 374",
+    "original_raw_chars": 16499,
+    "repaired_raw_chars": 15920,
+    "repaired_in_sha": "d2c6933379f23fe10167ebae6f6688b4926cfd3b",
+    "source_semantics": "all eight D3DCMPFUNC preserved"
+  },
+  "validation_notes": "Windows GitHub Actions compile/static/readiness SUCCESS at exact result SHA only; NOT actual gameplay or HMD PASS"
 }
