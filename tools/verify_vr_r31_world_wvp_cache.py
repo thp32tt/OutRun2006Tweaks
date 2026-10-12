@@ -191,6 +191,48 @@ def numeric_interleaved_test() -> None:
     assert hits > 1700 and misses > 50 and invalidations > 10
     print(f"PASS four-way interleaved world WVP: hits={hits}, misses={misses}, tail-invalidations={invalidations}")
 
+
+def zero_copy_bridge_violations(api: str, r32: str, r33: str) -> list[str]:
+    """R31 verified eye matrices reach R33 unchanged; the pose is borrowed."""
+    errors = []
+    if '#include "../core/r31_support_api.hpp"' not in api:
+        errors.append("R32 must include the R31 payload ABI")
+    if "using R32ReviewFastWorldConstants = R31SupportFastWorldConstants;" not in api:
+        errors.append("R32 must reuse R31 world constants storage")
+    if "LatchedStereoFrame stereoFrame" in api:
+        errors.append("per-draw stereo pose duplication restored")
+    bridge = body(r32, "bool R32ReviewBuildFastWorldConstants(")
+    if "return R31SupportBuildFastWorldConstants(d, s, out);" not in bridge:
+        errors.append("R32 is no longer direct zero-copy forwarding")
+    if "std::memcpy(" in bridge or "R31SupportFastWorldConstants draw" in bridge:
+        errors.append("second intermediate WVP array was reintroduced")
+    world = body(r33, "R32ReviewOwnedResult R33TryFastWorld(")
+    if "R32ReviewBuildFastWorldConstants(device, stereo, draw)" not in world:
+        errors.append("world constants no longer use verified producer")
+    if "draw.poseSequence, stereo);" not in world or "draw.stereoFrame" in world:
+        errors.append("R33 no longer uses its existing latched frame")
+    return errors
+
+
+def zero_copy_bridge_test() -> None:
+    api = (ROOT / "src/vr/core/r32_review_api.hpp").read_text(encoding="utf-8")
+    r32 = (ROOT / "src/vr/d3d9/stereo_renderer_r32.cpp").read_text(encoding="utf-8")
+    r33 = (ROOT / "src/vr/d3d9/stereo_renderer_r33.cpp").read_text(encoding="utf-8")
+    assert not zero_copy_bridge_violations(api, r32, r33)
+    mutation_cases = (
+        (0, '#include "../core/r31_support_api.hpp"'),
+        (0, "using R32ReviewFastWorldConstants = R31SupportFastWorldConstants;"),
+        (1, "return R31SupportBuildFastWorldConstants(d, s, out);"),
+        (2, "R32ReviewBuildFastWorldConstants(device, stereo, draw)"),
+        (2, "draw.poseSequence, stereo);"),
+    )
+    for index, marker in mutation_cases:
+        sources = [api, r32, r33]
+        assert sources[index].count(marker) == 1, marker
+        sources[index] = sources[index].replace(marker, "BROKEN", 1)
+        assert zero_copy_bridge_violations(*sources), marker
+    print("PASS zero-copy R31/R32/R33 and original pose; five destructive mutations")
+
 def main() -> None:
     source = SOURCE.read_text(encoding="utf-8")
     workflow = WORKFLOW.read_text(encoding="utf-8")
@@ -235,6 +277,7 @@ def main() -> None:
         assert violations(source.replace(marker, "BROKEN", 1)), marker
     numeric_test()
     numeric_interleaved_test()
+    zero_copy_bridge_test()
     print(f"PASS R31 WVP hotpath: {len(markers) + 13} negative mutations")
 
 
