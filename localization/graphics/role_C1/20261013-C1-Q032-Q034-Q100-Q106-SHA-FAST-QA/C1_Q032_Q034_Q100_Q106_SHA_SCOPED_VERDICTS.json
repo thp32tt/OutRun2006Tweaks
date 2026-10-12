@@ -1,0 +1,370 @@
+{
+  "schema": "outrun-C1-fast-independent-4-saved-DDS-source-clean-final-sha-v3",
+  "RUN_KEY": "C1-Q032-Q034-Q100-Q106-20261013-0310",
+  "role": "C1",
+  "reviewer": "ChatGPT AI 1",
+  "at_kst": "2026-10-13",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "head_before": "9257a0a92d9cfa7d0a561641d9a12231153ed987",
+  "required_policy_sha": {
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md": "44754d4d95bcde9a457c9127d1102fc2ea69b0da",
+    "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md": "5ae6007b45073af8f3fd14122de523476730be61"
+  },
+  "scope": "ONE FOUR-ASSET BOARD; SOURCE DDS RAW + SOURCE READABLE + SHA CLEAN where available + decoded SAVED DDS RAW + FLIPY + 75% + 50% display simulations. Mixed sprite transforms not independently authenticated by game runtime.",
+  "board": "C1_Q032_Q034_Q100_Q106_SOURCE_READABLE_CLEAN_SAVED_RAW_FLIPY_75_50.jpg",
+  "board_sha256": "3b0678fc8e1786e4c2fadc6294399c31bb05ef0aba352cd274b457333b8ee972",
+  "scale_notice": "Panels correctly render resized 75% and 50% without re-upscaling, but are display previews, not measured game sampling dimensions or game UV proof.",
+  "all_results_test_only": true,
+  "whole_dds_promoted_count": 0,
+  "no_new_C2_token": true,
+  "old_C2_tokens": "HISTORICAL_ONLY_NEVER_REISSUED",
+  "new_images_created": 0,
+  "dds_created": 0,
+  "C3": "NOT_RUN",
+  "runtime_validation": "UNTESTED",
+  "results": [
+    {
+      "q": 32,
+      "producer": "B236",
+      "source_dds": {
+        "path": "spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+        "upstream": "Sonic-TV/OR2006Sprites pinned Release",
+        "sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+        "header": {
+          "width": 2048,
+          "height": 1024,
+          "mips": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "flags": 65,
+          "rgbbits": 32
+        }
+      },
+      "SOURCE_CLEAN": {
+        "sha256": null,
+        "artifact": null,
+        "orientation": "CROP_OR_NO_FILE",
+        "changed_source_clean_readable": null,
+        "changed_outside_source_effect_bboxes": null,
+        "unbound_clean": true,
+        "verdict": "HOLD"
+      },
+      "FINAL_DDS": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+        "sha256": "2bb9d21e95a99da036657da5d696982d5ee44875c91cd798dbcb7b99830757e8",
+        "header": {
+          "width": 2048,
+          "height": 1024,
+          "mips": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "flags": 65,
+          "rgbbits": 32
+        },
+        "first128_equal": true,
+        "changed_readable_rgba_pixels": 38214,
+        "changed_readable_bbox": [
+          546,
+          163,
+          1065,
+          248
+        ],
+        "changed_outside_producer_source_effect_bboxes_rgba_pixels": 550,
+        "changed_outside_producer_source_effect_bboxes_coords": [
+          546,
+          163,
+          1065,
+          245
+        ],
+        "alpha_changed_outside_producer_bboxes_pixels": 536,
+        "verdict": "HOLD"
+      },
+      "coverage": {
+        "strings": [
+          "Total Rank → 종합 랭킹"
+        ],
+        "localized_regions_reviewed": 1,
+        "untranslated_in_reviewed_scope": 0,
+        "untranslated_whole_atlas": "UNKNOWN",
+        "remaining": "no further targeted labels verified; whole atlas untranslated count UNKNOWN",
+        "raw_compare_roi": [
+          500,
+          747,
+          1110,
+          899
+        ],
+        "readable_compare_roi": [
+          500,
+          125,
+          1110,
+          277
+        ]
+      },
+      "unproven_difference_coordinates": [
+        546,
+        163,
+        1065,
+        245
+      ],
+      "confirmed_hard_defect_coordinates": null,
+      "release_qualifier": "Exact CLEAN png content/sha not independently recovered. Source/FINAL differences extend 550 RGBA pixels (536 alpha) 1px beyond producer-reported glyph/effect bbox; actual UI cell/UV not proven. This is unproven overflow, not a confirmed hard defect.",
+      "decision": "HOLD",
+      "full_atlas_status": "HOLD",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "q": 34,
+      "producer": "B236",
+      "source_dds": {
+        "path": "spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+        "upstream": "Sonic-TV/OR2006Sprites pinned Release",
+        "sha256": "3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
+        "header": {
+          "width": 4096,
+          "height": 2048,
+          "mips": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "flags": 65,
+          "rgbbits": 32
+        }
+      },
+      "SOURCE_CLEAN": {
+        "sha256": null,
+        "artifact": null,
+        "orientation": "CROP_OR_NO_FILE",
+        "changed_source_clean_readable": null,
+        "changed_outside_source_effect_bboxes": null,
+        "unbound_clean": true,
+        "verdict": "HOLD"
+      },
+      "FINAL_DDS": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+        "sha256": "a23761d1160933d968347c87ca40496b9f8e8257a102f865b2047df2a8d92763",
+        "header": {
+          "width": 4096,
+          "height": 2048,
+          "mips": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "flags": 65,
+          "rgbbits": 32
+        },
+        "first128_equal": true,
+        "changed_readable_rgba_pixels": 40570,
+        "changed_readable_bbox": [
+          2027,
+          1179,
+          2551,
+          1276
+        ],
+        "changed_outside_producer_source_effect_bboxes_rgba_pixels": 0,
+        "changed_outside_producer_source_effect_bboxes_coords": null,
+        "alpha_changed_outside_producer_bboxes_pixels": 0,
+        "verdict": "HOLD"
+      },
+      "coverage": {
+        "strings": [
+          "Total Rank → 종합 랭킹"
+        ],
+        "localized_regions_reviewed": 1,
+        "untranslated_in_reviewed_scope": 0,
+        "untranslated_whole_atlas": "UNKNOWN",
+        "remaining": "nonreviewed atlas content UNKNOWN",
+        "raw_compare_roi": [
+          1970,
+          728,
+          2620,
+          913
+        ],
+        "readable_compare_roi": [
+          1970,
+          1135,
+          2620,
+          1320
+        ]
+      },
+      "unproven_difference_coordinates": null,
+      "confirmed_hard_defect_coordinates": null,
+      "release_qualifier": "Exact SOURCE→CLEAN bytes not pinned; producer evidence not substitutable by a new C1 result. Source-to-FINAL changed pixels outside single source bbox=0; does not independently verify CLEAN/protected areas.",
+      "decision": "HOLD",
+      "full_atlas_status": "HOLD",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "q": 100,
+      "producer": "B233",
+      "source_dds": {
+        "path": "spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+        "upstream": "Sonic-TV/OR2006Sprites pinned Release",
+        "sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+        "header": {
+          "width": 2048,
+          "height": 2048,
+          "mips": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "flags": 65,
+          "rgbbits": 32
+        }
+      },
+      "SOURCE_CLEAN": {
+        "sha256": "1aa25b53265d518b9ce4538c9c522ea1e7ba42408e7bb51c7b7826841fed31d0",
+        "artifact": "localization/graphics/role_B/20261005-B-PRODUCTION30/53CE39D5_HD_CLEAN_PLATE.png",
+        "orientation": "READABLE",
+        "changed_source_clean_readable": 127313,
+        "changed_outside_source_effect_bboxes": 0,
+        "unbound_clean": false,
+        "verdict": "SCOPED_PASS_SHA_BOUND"
+      },
+      "FINAL_DDS": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/53CE39D5_512x512.dds",
+        "sha256": "7235731a2add8e947476cd22b971e5b57a7de390ae134609f4254a2f493a557d",
+        "header": {
+          "width": 2048,
+          "height": 2048,
+          "mips": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "flags": 65,
+          "rgbbits": 32
+        },
+        "first128_equal": true,
+        "changed_readable_rgba_pixels": 155218,
+        "changed_readable_bbox": [
+          30,
+          12,
+          1814,
+          1995
+        ],
+        "changed_outside_producer_source_effect_bboxes_rgba_pixels": 0,
+        "changed_outside_producer_source_effect_bboxes_coords": null,
+        "alpha_changed_outside_producer_bboxes_pixels": 0,
+        "verdict": "C1_STATIC_PASS"
+      },
+      "coverage": {
+        "strings": [
+          "Time Attack Mode OutRun2 → 타임 어택 / 모드 / 아웃런2 (3)",
+          "Heart Attack Mode OutRun2 → 하트 어택 / 모드 / 아웃런2 (3)",
+          "OutRun Mode OutRun2 → 아웃런 / 모드 / 아웃런2 (3)"
+        ],
+        "localized_regions_reviewed": 9,
+        "untranslated_in_reviewed_scope": 0,
+        "untranslated_whole_atlas": "UNKNOWN",
+        "remaining": "10/19 recognized source regions outside the three inspected cards NOT independently inspected in this run; whole atlas untranslated count UNKNOWN",
+        "raw_compare_roi": [
+          0,
+          178,
+          1200,
+          458
+        ],
+        "readable_compare_roi": [
+          0,
+          1590,
+          1200,
+          1870
+        ]
+      },
+      "unproven_difference_coordinates": null,
+      "confirmed_hard_defect_coordinates": null,
+      "release_qualifier": "C1_STATIC_PASS applies to 9 scoped lines only, never whole DDS; previous C2 evidence is historic only, legacy C2 consumer and user-game test remain blockers.",
+      "decision": "C1_STATIC_PASS",
+      "full_atlas_status": "HOLD",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "q": 106,
+      "producer": "B202",
+      "source_dds": {
+        "path": "spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+        "upstream": "Sonic-TV/OR2006Sprites pinned Release",
+        "sha256": "4e486f35ca8982266f7f52e4d45aca20a12a2a4fe2a62fee9083db72c7454f9b",
+        "header": {
+          "width": 2048,
+          "height": 1024,
+          "mips": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "flags": 65,
+          "rgbbits": 32
+        }
+      },
+      "SOURCE_CLEAN": {
+        "sha256": "76db22cd2865fa2fcc9ecc7871e77772e47adc7a9c96057a12a3b363ddc71995",
+        "artifact": "localization/graphics/role_B/20261006-B-USERREWORK202-788CE557-SLANT/788CE557_CLEAN_PLATE.png",
+        "orientation": "READABLE",
+        "changed_source_clean_readable": 115850,
+        "changed_outside_source_effect_bboxes": 0,
+        "unbound_clean": false,
+        "verdict": "SCOPED_PASS_SHA_BOUND"
+      },
+      "FINAL_DDS": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+        "sha256": "a9c10f0000cb915baee2c73cba586ada6f7103be20a6add5aedafda2f219f482",
+        "header": {
+          "width": 2048,
+          "height": 1024,
+          "mips": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "flags": 65,
+          "rgbbits": 32
+        },
+        "first128_equal": true,
+        "changed_readable_rgba_pixels": 144282,
+        "changed_readable_bbox": [
+          3,
+          92,
+          1819,
+          320
+        ],
+        "changed_outside_producer_source_effect_bboxes_rgba_pixels": 0,
+        "changed_outside_producer_source_effect_bboxes_coords": null,
+        "alpha_changed_outside_producer_bboxes_pixels": 0,
+        "verdict": "C1_STATIC_PASS"
+      },
+      "coverage": {
+        "strings": [
+          "For Experts → 상급자용",
+          "Transmission (black) → 변속기",
+          "Transmission (white) → 변속기",
+          "Music Change → 음악 변경",
+          "Time remaining : → 남은 시간:"
+        ],
+        "localized_regions_reviewed": 5,
+        "untranslated_in_reviewed_scope": 0,
+        "untranslated_whole_atlas": "UNKNOWN",
+        "remaining": "5/5 manifest localized regions inspected; unrelated and preserved art excluded from untranslated counting, entire DDS release NOT approved",
+        "raw_compare_roi": [
+          0,
+          679,
+          1860,
+          959
+        ],
+        "readable_compare_roi": [
+          0,
+          65,
+          1860,
+          345
+        ]
+      },
+      "unproven_difference_coordinates": null,
+      "confirmed_hard_defect_coordinates": null,
+      "release_qualifier": "P0 IGR-017 / multi-style shared selector retained mandatory C3/user in-game retest. Protected 255-mask exact SHA a875dc33a738da025f8570ac72d1480390792826d939208f5d8abc0486c4b996 confirms zero changed pixels of 1,852,498 protected pixels.",
+      "decision": "C1_STATIC_PASS",
+      "full_atlas_status": "HOLD",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    }
+  ],
+  "qa_notes": [
+    "source-effect-bbox is not automatically verified in-game cell; q032 1px fringe is only a hold pending real UV",
+    "q034 missing SHA-bound CLEAN despite original/final header intact",
+    "q100 C1_STATIC_PASS scoped 9/19, other 10 unexamined",
+    "q106 5/5 manifest strings readable; protected mask bytes verified against original and final, changes protected=0",
+    "Static scoped pass is not C2, C3, user in-game success, official release or whole DDS clearance",
+    "Never infer uninspected blank pixels are available UI cell areas"
+  ],
+  "deploy_manual_only": true,
+  "forbidden_mutations": [
+    "asset_queue.csv",
+    "resume_state.json",
+    "Docker/Portainer",
+    "AUTO_SEND",
+    "game install",
+    "formal release",
+    "VR/FFB/DX11/DXVK"
+  ]
+}
