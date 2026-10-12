@@ -89,6 +89,8 @@ def load_registry():
 async def send_message(page: Page, message: str) -> str:
     """Insert and send a prompt, returning the exact stage result for diagnostics."""
     box = await first_visible(page, INPUT_SELECTORS)
+        await page.wait_for_timeout(1500)
+        return "sent"
 async def watchdog():
         prompt = prompt_for_slot(slot, "watchdog")
         send_result = await send_message(page, prompt)
