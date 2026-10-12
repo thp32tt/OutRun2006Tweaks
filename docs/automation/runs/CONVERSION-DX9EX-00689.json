@@ -7,7 +7,7 @@
   "lane": "DX9EX",
   "branch": "vr-d3d9ex-focus",
   "target_branch": "vr-d3d9ex-focus",
-  "feature_id": "R30_HUD_BINOCULAR_AFFINE_HOTPATH",
+  "feature_id": null,
   "stage": "C6_RESULT",
   "checkpoint": "C6_STATE",
   "status": "COMPLETE_BUILD_VERIFIED",
@@ -88,5 +88,6 @@
   "scoreboard_previous": 1130,
   "scoreboard_delta": 1,
   "scoreboard_cumulative": 1131,
-  "notes": "C6 result-only bookkeeping, separate [skip ci] documentation commit; Gate result is immutable material SHA; no second score credit."
+  "notes": "C6 result-only bookkeeping, separate [skip ci] documentation commit; Gate result is immutable material SHA; no second score credit.",
+  "hold_reason": "RUN_RECORD_NOT_FOUND"
 }
