@@ -102,8 +102,8 @@ def violations(source: str) -> list[str]:
                 build.index("R31WorldCache.valid = true;"), "two-eye finite before publish")
     except ValueError:
         errors.append("mandatory validation/publish ordering anchor absent")
-    require(build.count("draw.poseSequence = stereo.poseSequence;") == 2,
-            "cache hit uses current pose")
+    require(build.count("draw.poseSequence = stereo.poseSequence;") == 3,
+            "all three fast-return paths use the current pose")
     require("R31EyeCache = next;" in prepare and
             "R31WorldCache.valid = false;" in prepare and
             prepare.index("R31EyeCache = next;") <
