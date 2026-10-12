@@ -46,7 +46,16 @@ def verify(src: str) -> None:
         at = nxt
     assert read.count("device->GetRenderState(") == 11, "unexpected D3D9 readback coverage"
     assert read.count("R33InvalidateDepthStencilCache();") == 4, "read-failure fail-closed path lost"
-    assert read.index("next.valid = true;") > read.rfind("return false;"), "publish before read validation"
+    # An untracked depth target legitimately publishes an early empty-state cache.
+    # Check the *tracked* read path independently, after every failed getter
+    # and fail-closed return, rather than comparing its returns with that early
+    # fast-path publication.
+    assert read.count("next.valid = true;") == 2, "empty/tracked publication count changed"
+    tracked = read.split("if (FAILED(device->GetRenderState(D3DRS_ZENABLE", 1)[1]
+    assert tracked.count("next.valid = true;") == 1, "tracked publication missing or duplicated"
+    assert tracked.rfind("next.valid = true;") > tracked.rfind("return false;"), (
+        "tracked cache published before read validation"
+    )
     assert "s.stencilEnable != FALSE &&" in flags
     assert "s.stencilWriteMask != 0 &&" in flags
     assert "s.stencilWritesIfPresent &&" in src, "format-gated stencil write result lost"
@@ -83,6 +92,8 @@ def main() -> None:
         ("missing_depth_read", "D3DRS_ZWRITEENABLE, &next.zWrite", "D3DRS_ZENABLE, &next.zWrite"),
         ("no_fail_closed", "R33InvalidateDepthStencilCache();\n                    return false;", "return false;"),
         ("lost_format_gate", "s.stencilWritesIfPresent &&", "true &&"),
+        ("missing_tracked_publish", "            next.valid = true;\n            R33RefreshWriteFlags(next);",
+         "            R33RefreshWriteFlags(next);"),
     ]
     for name, old, new in mutations:
         assert old in src, "mutation anchor missing: " + name
@@ -92,7 +103,24 @@ def main() -> None:
         except (AssertionError, ValueError):
             continue
         raise AssertionError("undetected negative mutation: " + name)
-    print(f"PASS R33 disabled/zero-mask stencil readback short circuit and {len(mutations)} negative mutations")
+    # Move (rather than delete) the tracked publish ahead of the stencil reads.
+    # There are still two publications; only their ordering is broken. The
+    # verifier must distinguish this from the legitimate untracked early return.
+    early = src.replace(
+        "            next.valid = true;\n            R33RefreshWriteFlags(next);",
+        "            R33RefreshWriteFlags(next);", 1
+    ).replace(
+        "            if (R32ReviewMainDepthHasStencil())",
+        "            next.valid = true;\n            if (R32ReviewMainDepthHasStencil())", 1
+    )
+    assert early != src, "premature tracked publication mutation anchor missing"
+    try:
+        verify(early)
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("undetected premature tracked-cache publication")
+    print(f"PASS R33 disabled/zero-mask stencil readback and {len(mutations) + 1} negative mutations")
 
 
 if __name__ == "__main__":
