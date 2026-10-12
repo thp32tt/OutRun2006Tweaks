@@ -1333,6 +1333,7 @@ def main() -> None:
     def object_fvf_integrated(src: str, header: str, probe: str) -> bool:
         return all(x in src for x in (
             "kGameFvfNormal == D3DFVF_NORMAL",
+            "kGameFvfPsize == D3DFVF_PSIZE",
             "kGameFvfSpecular == D3DFVF_SPECULAR",
             "GetRenderState(D3DRS_SPECULARENABLE, &specularEnabled)",
             "specularEnabled)",
@@ -1342,8 +1343,10 @@ def main() -> None:
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
         )) and all(x in header for x in (
             "candidate.normalBytes = candidate.hasNormal ? 12u : 0u;",
-            "candidate.diffuseOffset = candidate.positionBytes + candidate.normalBytes;",
-            "layout.diffuseOffset != layout.positionBytes + layout.normalBytes",
+            "candidate.pointSizeBytes = candidate.hasPointSize ? 4u : 0u;",
+            "candidate.diffuseOffset = candidate.positionBytes + candidate.normalBytes +",
+            "layout.pointSizeBytes != (layout.hasPointSize ? 4u : 0u)",
+            "layout.diffuseOffset != layout.positionBytes + layout.normalBytes +",
             "data + layout.diffuseOffset, 4u",
             "(position == kGameFvfXyzRhw && hasNormal)",
         )) and all(x in probe for x in (
@@ -1351,6 +1354,17 @@ def main() -> None:
             "layout.texcoordOffset == 32u && layout.minStride == 48u",
             "sample.diffuse == 0xff123456u",
             "!game_fvf_decode_vertex(&world, 47u",
+            "struct WorldPoint",
+            "layout.diffuseOffset == 28u",
+            "sample.diffuse == 0xff223344u",
+            "!game_fvf_decode_vertex(&worldPoint, 51u",
+            "invalidPoint.pointSizeBytes = 0u",
+            "struct MenuPoint",
+            "layout.diffuseOffset == 20u",
+            "sample.diffuse == 0xff112233u",
+            "!game_fvf_decode_vertex(&menuPoint, 31u",
+            "struct MenuPointUv",
+            "!game_fvf_layout(kGameFvfXyzRhw | kGameFvfNormal |",
             "corrupted.diffuseOffset -= 12u",
             "corrupted.texcoordOffset -= 4u",
         ))
@@ -1360,12 +1374,18 @@ def main() -> None:
          "GetRenderState(D3DRS_ALPHABLENDENABLE, &specularEnabled)"),
         ("lighting || vertexBlend != D3DVBF_DISABLE",
          "!lighting || vertexBlend != D3DVBF_DISABLE"),
+        ("kGameFvfPsize == D3DFVF_PSIZE",
+         "kGameFvfPsize != D3DFVF_PSIZE"),
     ):
         mutant = bridge.replace(old, bad, 1)
         assert mutant != bridge and not object_fvf_integrated(mutant, layout_source, probe_source)
     for old, bad in (
-        ("candidate.diffuseOffset = candidate.positionBytes + candidate.normalBytes;",
-         "candidate.diffuseOffset = candidate.positionBytes;"),
+        ("candidate.diffuseOffset = candidate.positionBytes + candidate.normalBytes +",
+         "candidate.diffuseOffset = candidate.positionBytes +"),
+        ("candidate.pointSizeBytes = candidate.hasPointSize ? 4u : 0u;",
+         "candidate.pointSizeBytes = 0u;"),
+        ("layout.pointSizeBytes != (layout.hasPointSize ? 4u : 0u)",
+         "false"),
         ("data + layout.diffuseOffset, 4u", "data + layout.positionBytes, 4u"),
         ("(position == kGameFvfXyzRhw && hasNormal)",
          "(position == kGameFvfXyz && hasNormal)"),
