@@ -40,10 +40,9 @@ def connected(s: str) -> bool:
         "ctx->PSSetSamplers(0, 1, &boundSampler);",
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
-        "return optedIn;",
-        "void before_game_present(",
     )
-    return (all(x in capture for x in ("DWORD maxMipLevel = 0u;",))
+    return (all(x in s for x in ("return optedIn;", "void before_game_present("))
+            and all(x in capture for x in ("DWORD maxMipLevel = 0u;",))
             and all(x in gate for x in g)
             and all(x in mirror for x in m)
             and all(x in draw for x in d))
