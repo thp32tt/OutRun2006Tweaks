@@ -11,9 +11,9 @@
   "work_key": "DX11:PM_FACTOR_ADD_ADDSMOOTH",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "ae075ee852d221593ba1c02eda579856c1a89e39",
-  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
-  "checkpoint": "C6_RESULT",
-  "automation_validation": "PASS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -95,5 +95,6 @@
       "run_id": 38321006166,
       "conclusion": "skipped"
     }
-  }
+  },
+  "validation_bearing_result_sha": "b2d87633a6bd5009870bf8a935a00c1268c84b79"
 }
