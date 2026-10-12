@@ -99,10 +99,16 @@ def patch(source):
     )
     # The import must be part of controller code itself; no executable startup
     # shell monkey-patching and no separate daemon.
-    source = 'from app.controller_png_attach import load_binding, attach_png, mark_sent\n' + source
-    # Respect any future __future__ imports in the base image.
-    if "from __future__ import " in source:
-        raise ValueError("base controller has future imports; move import below them")
+    import_line = 'from app.controller_png_attach import load_binding, attach_png, mark_sent\n'
+    lines = source.splitlines(keepends=True)
+    future_imports = [i for i, line in enumerate(lines)
+                      if line.startswith("from __future__ import ")]
+    if future_imports:
+        lines.insert(max(future_imports) + 1, import_line)
+        source = "".join(lines)
+    else:
+        # With a module docstring, an import before it is valid Python too.
+        source = import_line + source
     ast.parse(source)
     return source
 
