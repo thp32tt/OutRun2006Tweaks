@@ -1720,6 +1720,10 @@ namespace OutRunVRStereo
             D3DMATRIX inverseBaseProjection{};
             D3DMATRIX eyeProjection[2]{};
             D3DMATRIX eyeInverse[2]{};
+            // OutRun's CPU-projected smoke/decal vertices use the same
+            // eyeInverse * eyeProjection for every referenced vertex. Cache
+            // that complete row-vector tail once per draw/eye.
+            D3DMATRIX eyeTail[2]{};
             bool fullWorldReprojection = false;
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
@@ -1946,6 +1950,10 @@ namespace OutRunVRStereo
                 state.eyeProjection[eye] =
                     R29OwnerProjectionFromFov(baseProjection,
                         state.stereo.eyeFov[eye]);
+                // Precompose the two eye-space matrices outside both vertex
+                // loops. Row-vector order must remain inverse then projection.
+                state.eyeTail[eye] = R29OwnerMultiplyMatrix(
+                    state.eyeInverse[eye], state.eyeProjection[eye]);
 
                 // Preserve a conservative affine fallback for vertices whose
                 // clip reconstruction is unsafe. Its parallax uses the old
@@ -1989,6 +1997,7 @@ namespace OutRunVRStereo
                     !std::isfinite(state.parallaxPerRhwY[eye]) ||
                     !R29OwnerMatrixFinite(state.eyeProjection[eye]) ||
                     !R29OwnerMatrixFinite(state.eyeInverse[eye]) ||
+                    !R29OwnerMatrixFinite(state.eyeTail[eye]) ||
                     state.worldScaleX[eye] < 0.20f ||
                     state.worldScaleX[eye] > 5.0f ||
                     state.worldScaleY[eye] < 0.20f ||
@@ -2217,20 +2226,16 @@ namespace OutRunVRStereo
                         restoredView[3] = 1.0f;
                     }
 
-                    // Match the normal world path exactly: the reconstructed
-                    // game-view point receives the same rigid eyeInverse that
-                    // BuildEyeConstants/fixed-function world draws use.
-                    float eyeView[4]{};
-                    for (int col = 0; col < 4; ++col)
-                        for (int row = 0; row < 4; ++row)
-                            eyeView[col] += restoredView[row] *
-                                state.eyeInverse[eye].m[row][col];
-
+                    // Both eyes use the exact row-vector composition:
+                    // game-view * eyeInverse * eyeProjection. Precomposing
+                    // the matrix per draw removes one full 4x4 multiply for
+                    // every particle vertex, while retaining all clip-W,
+                    // Z/RHW, atomic and bilateral fallback checks below.
                     float clipEye[4]{};
                     for (int col = 0; col < 4; ++col)
                         for (int row = 0; row < 4; ++row)
-                            clipEye[col] += eyeView[row] *
-                                state.eyeProjection[eye].m[row][col];
+                            clipEye[col] += restoredView[row] *
+                                state.eyeTail[eye].m[row][col];
 
                     // D3D9 perspective clip-W must stay in front of the eye.
                     // abs(W) would accept a point behind the camera and mirror
