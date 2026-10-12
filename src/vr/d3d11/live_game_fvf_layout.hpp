@@ -21,8 +21,9 @@ constexpr std::uint32_t kGameFvfTex7 = 0x700u;
 constexpr std::uint32_t kGameFvfTex8 = 0x800u;
 constexpr std::uint32_t kGameFvfTexCountMask = 0x0f00u;
 constexpr std::uint32_t kGameFvfPositionMask = 0x400eu;
-// Only FVF TEXCOORDSIZE1(0) is additionally supported: U only.
+// Native UV handles float2 and U-only TEXCOORDSIZE1(0/1); not float3/4.
 constexpr std::uint32_t kGameFvfTexcoordSize1_0 = 0x00030000u;
+constexpr std::uint32_t kGameFvfTexcoordSize1_1 = 0x000c0000u;
 struct GameFvfLayout {
     bool pretransformed = false;
     bool textured = false;
@@ -31,6 +32,7 @@ struct GameFvfLayout {
     bool hasPointSize = false;
     bool hasSpecular = false;
     bool firstTexcoord1D = false;
+    bool secondTexcoord1D = false;
     std::uint32_t normalBytes = 0;
     std::uint32_t pointSizeBytes = 0;
     std::uint32_t diffuseOffset = 0;
@@ -45,6 +47,8 @@ constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcep
     const std::uint32_t texcoordBits = fvf & kGameFvfTexCountMask;
     const std::uint32_t firstTexcoordFormat = fvf & kGameFvfTexcoordSize1_0;
     const bool firstTexcoord1D = firstTexcoordFormat == kGameFvfTexcoordSize1_0;
+    const std::uint32_t secondTexcoordFormat = fvf & kGameFvfTexcoordSize1_1;
+    const bool secondTexcoord1D = secondTexcoordFormat == kGameFvfTexcoordSize1_1;
     // D3D9 supports eight 2-float UV sets; TEX9+ or nondefault coordinate
     // dimensions require another decoder and remain on the D3D9 path.
     // NORMAL and SPECULAR are byte fields preceding texcoords.
@@ -55,9 +59,12 @@ constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcep
         texcoordBits > kGameFvfTex8 ||
         (firstTexcoordFormat != 0u && !firstTexcoord1D) ||
         (firstTexcoord1D && texcoordBits == 0u) ||
+        (secondTexcoordFormat != 0u && !secondTexcoord1D) ||
+        (secondTexcoord1D && texcoordBits < kGameFvfTex2) ||
         (fvf & ~(kGameFvfXyz | kGameFvfXyzRhw | kGameFvfNormal | kGameFvfPsize |
                  kGameFvfDiffuse | kGameFvfSpecular |
-                 kGameFvfTexCountMask | kGameFvfTexcoordSize1_0)) != 0u)
+                 kGameFvfTexCountMask | kGameFvfTexcoordSize1_0 |
+                 kGameFvfTexcoordSize1_1)) != 0u)
         return false;
     GameFvfLayout candidate{};
     candidate.pretransformed = position == kGameFvfXyzRhw;
@@ -68,6 +75,7 @@ constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcep
     candidate.hasPointSize = hasPointSize;
     candidate.hasSpecular = (fvf & kGameFvfSpecular) != 0u;
     candidate.firstTexcoord1D = firstTexcoord1D;
+    candidate.secondTexcoord1D = secondTexcoord1D;
     if (!candidate.textured && !candidate.hasDiffuse) return false;
     candidate.positionBytes = candidate.pretransformed ? 16u : 12u;
     candidate.normalBytes = candidate.hasNormal ? 12u : 0u;
@@ -81,7 +89,8 @@ constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcep
                                (candidate.hasSpecular ? 4u : 0u);
     candidate.minStride = candidate.texcoordOffset +
                           candidate.texcoordCount * 8u -
-                          (candidate.firstTexcoord1D ? 4u : 0u);
+                          (candidate.firstTexcoord1D ? 4u : 0u) -
+                          (candidate.secondTexcoord1D ? 4u : 0u);
     layout = candidate;
     return true;
 }
@@ -115,8 +124,10 @@ inline bool game_fvf_decode_vertex(const void* bytes, std::uint32_t stride,
         layout.texcoordCount > 8u ||
         layout.textured != (layout.texcoordCount != 0u) ||
         (layout.firstTexcoord1D && layout.texcoordCount == 0u) ||
+        (layout.secondTexcoord1D && layout.texcoordCount < 2u) ||
         layout.minStride != layout.texcoordOffset + layout.texcoordCount * 8u -
-                            (layout.firstTexcoord1D ? 4u : 0u) ||
+                            (layout.firstTexcoord1D ? 4u : 0u) -
+                            (layout.secondTexcoord1D ? 4u : 0u) ||
         stride < layout.minStride)
         return false;
     GameFvfSample candidate{};
@@ -127,8 +138,26 @@ inline bool game_fvf_decode_vertex(const void* bytes, std::uint32_t stride,
     if (layout.texcoordCount >= 1u)
         std::memcpy(candidate.uv, data + layout.texcoordOffset,
                     layout.firstTexcoord1D ? 4u : 8u);
+    // UV1 U-only must not borrow the first float of UV2 as its missing V.
+    if (layout.secondTexcoord1D) {
+        const std::uint32_t secondOffset = layout.texcoordOffset +
+                                            (layout.firstTexcoord1D ? 4u : 8u);
+        std::memcpy(candidate.uv1, data + secondOffset, 4u);
+        const std::uint32_t later = secondOffset + 4u;
+        if (layout.texcoordCount >= 3u)
+            std::memcpy(candidate.uv2, data + later, 8u);
+        if (layout.texcoordCount >= 4u)
+            std::memcpy(candidate.uv3, data + later + 8u, 8u);
+        if (layout.texcoordCount >= 5u)
+            std::memcpy(candidate.uv4, data + later + 16u, 8u);
+        if (layout.texcoordCount >= 6u)
+            std::memcpy(candidate.uv5, data + later + 24u, 8u);
+        if (layout.texcoordCount >= 7u)
+            std::memcpy(candidate.uv6, data + later + 32u, 8u);
+        if (layout.texcoordCount >= 8u)
+            std::memcpy(candidate.uv7, data + later + 40u, 8u);
     // Missing V defaults to zero; packed later UV sets begin four bytes earlier.
-    if (layout.firstTexcoord1D) {
+    } else if (layout.firstTexcoord1D) {
         if (layout.texcoordCount >= 2u)
             std::memcpy(candidate.uv1, data + layout.texcoordOffset + 4u, 8u);
         if (layout.texcoordCount >= 3u)

@@ -1432,6 +1432,42 @@ def main() -> None:
         assert damaged != layout_source and not one_dim_fvf_linked(bridge, damaged, probe_source)
     print("DX11 live TEXCOORDSIZE1(0) native menu/vehicle draw PASS (static only)")
 
+    # 00611: linked stage1 1D native UV feed and destructive mutations.
+    def second_u_native_linked(src: str, hdr: str, fixture: str) -> bool:
+        return all(x in src for x in (
+            "kGameFvfTexcoordSize1_1 == D3DFVF_TEXCOORDSIZE1(1)",
+            "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+        )) and all(x in hdr for x in (
+            "kGameFvfTexcoordSize1_1 = 0x000c0000u;",
+            "(secondTexcoord1D && texcoordBits < kGameFvfTex2)",
+            "candidate.secondTexcoord1D = secondTexcoord1D;",
+            "std::memcpy(candidate.uv1, data + secondOffset, 4u);",
+            "const std::uint32_t later = secondOffset + 4u;",
+            "std::memcpy(candidate.uv2, data + later, 8u);",
+        )) and all(x in fixture for x in (
+            "struct VehicleSecondU", "struct RaceMixedUV",
+            "chosen[0] == .875f && chosen[1] == 0.f",
+            "chosen[0] == .6f && chosen[1] == .8f",
+            "!game_fvf_decode_vertex(&vehicleSecond, 27u",
+            "badSecond.secondTexcoord1D = false;",
+            "0x00040000u, layout", "0x00080000u, layout",
+        ))
+    assert second_u_native_linked(bridge, layout_source, probe_source)
+    for old, wrong in (
+        ("kGameFvfTexcoordSize1_1 == D3DFVF_TEXCOORDSIZE1(1)", "kGameFvfTexcoordSize1_1 != D3DFVF_TEXCOORDSIZE1(1)"),
+        ("candidate.secondTexcoord1D = secondTexcoord1D;", "candidate.secondTexcoord1D = false;"),
+        ("std::memcpy(candidate.uv1, data + secondOffset, 4u);", "std::memcpy(candidate.uv1, data + secondOffset, 8u);"),
+        ("const std::uint32_t later = secondOffset + 4u;", "const std::uint32_t later = secondOffset + 8u;"),
+    ):
+        if old in bridge:
+            mutant = bridge.replace(old, wrong, 1)
+            assert mutant != bridge and not second_u_native_linked(mutant, layout_source, probe_source)
+        else:
+            mutant = layout_source.replace(old, wrong, 1)
+            assert mutant != layout_source and not second_u_native_linked(bridge, mutant, probe_source)
+    print("DX11 TEXCOORDSIZE1(1) game-native UV1 Draw PASS (static only)")
+
     # 00558: real game-authored D3D9 stage0 BLENDTEXTUREALPHA /
     # BLENDDIFFUSEALPHA -> owned native PS -> Draw/DrawIndexed -> opt-in inset.
     # Checks source-to-consumer links, shader/reset lifecycle and fail-closed

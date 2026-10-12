@@ -280,5 +280,45 @@ int main() {
     corruptDimension.firstTexcoord1D = false;
     assert(!game_fvf_decode_vertex(&vehicleUv, sizeof(vehicleUv), corruptDimension, sample));
     assert(sample.uv1[1] == vehicleSaved.uv1[1]);
+    // 00611: game-authored UV1 U-only feeds TEXCOORDINDEX=1 native Draw.
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1 |
+                            kGameFvfTexcoordSize1_1, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 | 0x00040000u, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 | 0x00080000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 |
+                           kGameFvfTexcoordSize1_1, layout));
+    assert(!layout.firstTexcoord1D && layout.secondTexcoord1D);
+    assert(layout.minStride == 28u);
+    struct VehicleSecondU {float x,y,z,rhw,u0,v0,u1;};
+    VehicleSecondU vehicleSecond{1,2,.4f,1.f,.125f,.25f,.875f};
+    assert(sizeof(vehicleSecond) == 28u);
+    assert(game_fvf_decode_vertex(&vehicleSecond, sizeof(vehicleSecond), layout, sample));
+    assert(game_fvf_select_uv(sample, layout, 1u, chosen));
+    assert(chosen[0] == .875f && chosen[1] == 0.f);
+    const auto secondSaved = sample;
+    assert(!game_fvf_decode_vertex(&vehicleSecond, 27u, layout, sample));
+    assert(sample.uv1[0] == secondSaved.uv1[0]);
+    auto badSecond = layout;
+    badSecond.secondTexcoord1D = false;
+    assert(!game_fvf_decode_vertex(&vehicleSecond, sizeof(vehicleSecond), badSecond, sample));
+    assert(sample.uv1[0] == secondSaved.uv1[0]);
+    assert(game_fvf_layout(kGameFvfXyz | kGameFvfNormal | kGameFvfDiffuse |
+                           kGameFvfTex3 | kGameFvfTexcoordSize1_0 |
+                           kGameFvfTexcoordSize1_1, layout));
+    assert(layout.firstTexcoord1D && layout.secondTexcoord1D);
+    assert(layout.texcoordOffset == 28u && layout.minStride == 44u);
+    struct RaceMixedUV {float x,y,z,nx,ny,nz;std::uint32_t color;float u0,u1,u2,v2;};
+    RaceMixedUV raceMixed{1,2,3,0,0,1,0xff123456u,.2f,.4f,.6f,.8f};
+    assert(sizeof(raceMixed) == 44u);
+    assert(game_fvf_decode_vertex(&raceMixed, sizeof(raceMixed), layout, sample));
+    assert(game_fvf_select_uv(sample, layout, 0u, chosen));
+    assert(chosen[0] == .2f && chosen[1] == 0.f);
+    assert(game_fvf_select_uv(sample, layout, 1u, chosen));
+    assert(chosen[0] == .4f && chosen[1] == 0.f);
+    assert(game_fvf_select_uv(sample, layout, 2u, chosen));
+    assert(chosen[0] == .6f && chosen[1] == .8f);
+    const auto raceSaved = sample;
+    assert(!game_fvf_decode_vertex(&raceMixed, 43u, layout, sample));
+    assert(sample.uv2[0] == raceSaved.uv2[0]);
     return 0;
 }
