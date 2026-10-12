@@ -229,7 +229,6 @@ namespace OutRunVRStereo
             std::vector<std::uint8_t> left;
             std::vector<std::uint8_t> right;
             std::vector<std::uint8_t> used;
-            std::vector<std::uint32_t> physical;
             std::vector<std::uint16_t> indices16;
             std::vector<std::uint32_t> indices32;
             bool busy = false;
@@ -3481,41 +3480,29 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
-            try
-            {
-                scratch.physical.resize(indexCount);
-            }
-            catch (...)
-            {
-                ib->Release();
-                vb->Release();
-                return E_NOTIMPL;
-            }
-
-            std::int64_t minPhysical = INT64_MAX;
-            std::int64_t maxPhysical = INT64_MIN;
+            // The already-shadowed index source needs no intermediate
+            // physical-index vector. The signed base offset is monotonic:
+            // proving both 64-bit endpoints validates every physical index.
+            const bool index16 = ibShadow->indexFormat == D3DFMT_INDEX16;
+            const auto* raw16 = index16
+                ? reinterpret_cast<const std::uint16_t*>(
+                    scratch.indexSource.data()) : nullptr;
+            const auto* raw32 = !index16
+                ? reinterpret_cast<const std::uint32_t*>(
+                    scratch.indexSource.data()) : nullptr;
+            std::uint32_t minRaw = UINT_MAX;
+            std::uint32_t maxRaw = 0;
             for (UINT i = 0; i < indexCount; ++i)
             {
-                const std::uint32_t raw =
-                    ibShadow->indexFormat == D3DFMT_INDEX16
-                    ? static_cast<const std::uint16_t*>(
-                        static_cast<const void*>(scratch.indexSource.data()))[i]
-                    : static_cast<const std::uint32_t*>(
-                        static_cast<const void*>(scratch.indexSource.data()))[i];
-                const std::int64_t p =
-                    static_cast<std::int64_t>(baseVertexIndex) + raw;
-                if (p < 0 || p > UINT_MAX)
-                {
-                    ib->Release();
-                    vb->Release();
-                    return E_NOTIMPL;
-                }
-                scratch.physical[i] = static_cast<std::uint32_t>(p);
-                minPhysical = std::min(minPhysical, p);
-                maxPhysical = std::max(maxPhysical, p);
+                const std::uint32_t raw = index16 ? raw16[i] : raw32[i];
+                minRaw = (std::min)(minRaw, raw);
+                maxRaw = (std::max)(maxRaw, raw);
             }
-
-            if (minPhysical == INT64_MAX || maxPhysical < minPhysical)
+            const std::int64_t minPhysical =
+                static_cast<std::int64_t>(baseVertexIndex) + minRaw;
+            const std::int64_t maxPhysical =
+                static_cast<std::int64_t>(baseVertexIndex) + maxRaw;
+            if (minPhysical < 0 || maxPhysical > UINT_MAX)
             {
                 ib->Release();
                 vb->Release();
@@ -3523,7 +3510,7 @@ namespace OutRunVRStereo
             }
 
             const std::uint64_t vertexCount64 =
-                static_cast<std::uint64_t>(maxPhysical - minPhysical) + 1u;
+                static_cast<std::uint64_t>(maxRaw) - minRaw + 1u;
             if (!vertexCount64 || vertexCount64 > 262144u)
             {
                 ib->Release();
@@ -3560,9 +3547,8 @@ namespace OutRunVRStereo
             // The first index pass has already validated physical addresses
             // and discovered the contiguous source-vertex span. Mark used
             // vertices and rebase both index formats in the same second pass:
-            // the old separate rebasing loop walked every particle index a
-            // third time and touched the same scratch.physical cache lines.
-            const bool index16 = ibShadow->indexFormat == D3DFMT_INDEX16;
+            // the original third rebasing loop is still absent. No physical
+            // scratch write/read or signed base addition is needed here.
             try
             {
                 scratch.used.assign(vertexCount, 0);
@@ -3583,9 +3569,11 @@ namespace OutRunVRStereo
                 : static_cast<const void*>(scratch.indices32.data());
             for (UINT i = 0; i < indexCount; ++i)
             {
+                // The signed base cancels when converting to the local
+                // vertex span, so subtract the minimum raw index directly.
+                const std::uint32_t raw = index16 ? raw16[i] : raw32[i];
                 const std::uint64_t local =
-                    scratch.physical[i] -
-                    static_cast<std::uint64_t>(minPhysical);
+                    static_cast<std::uint64_t>(raw) - minRaw;
                 // Reject unsafe 16-bit rebasing *before* attempting either
                 // stereo eye. Never truncate when the physical span is wider
                 // than a UINT16 index can describe.

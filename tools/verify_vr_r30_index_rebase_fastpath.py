@@ -16,11 +16,18 @@ def indexed_body(source):
 def valid(body):
     required = (
         "const bool index16 = ibShadow->indexFormat == D3DFMT_INDEX16;",
-        "scratch.physical[i] = static_cast<std::uint32_t>(p);",
+        "const auto* raw16 = index16",
+        "const auto* raw32 = !index16",
+        "minRaw = (std::min)(minRaw, raw);",
+        "maxRaw = (std::max)(maxRaw, raw);",
+        "static_cast<std::int64_t>(baseVertexIndex) + minRaw;",
+        "static_cast<std::int64_t>(baseVertexIndex) + maxRaw;",
+        "if (minPhysical < 0 || maxPhysical > UINT_MAX)",
+        "static_cast<std::uint64_t>(maxRaw) - minRaw + 1u;",
         "scratch.used.assign(vertexCount, 0);",
         "scratch.indices16.resize(indexCount);",
         "scratch.indices32.resize(indexCount);",
-        "scratch.physical[i] -",
+        "static_cast<std::uint64_t>(raw) - minRaw;",
         "if (local >= vertexCount ||",
         "(index16 && local > 0xFFFFu)",
         "scratch.used[static_cast<std::size_t>(local)] = 1;",
@@ -32,23 +39,18 @@ def valid(body):
     )
     if any(token not in body for token in required):
         return False
-    if body.count("for (UINT i = 0; i < indexCount; ++i)") != 2:
+    if "scratch.physical" in body or body.count("for (UINT i = 0; i < indexCount; ++i)") != 2:
         return False
-    first = body.index("scratch.physical[i] =")
-    prepare = body.index("scratch.used.assign(vertexCount, 0);")
-    second = body.index("scratch.physical[i] -")
+    first = body.index("minRaw = (std::min)(minRaw, raw);")
+    bound = body.index("if (minPhysical < 0 || maxPhysical > UINT_MAX)")
+    setup = body.index("scratch.used.assign(vertexCount, 0);")
+    second = body.index("static_cast<std::uint64_t>(raw) - minRaw;")
     mark = body.index("scratch.used[static_cast<std::size_t>(local)] = 1;")
-    output16 = body.index("scratch.indices16[i] = static_cast<std::uint16_t>(local);")
-    output32 = body.index("scratch.indices32[i] = static_cast<std::uint32_t>(local);")
-    transform = body.index("R30ConfigureXyzrhwWorldEffect(")
-    leftdraw = body.index("auto leftDraw = [&]()")
-    return (
-        first < prepare < second < mark < output16 < output32 < transform < leftdraw
-        and 0 <= body.find("if (p < 0 || p > UINT_MAX)") < first
-        and body.index("const UINT vertexCount = static_cast<UINT>(vertexCount64);") < prepare
-        and "if (vertexCount64 > 65535u)" not in body
-        and "scratch.indices16[i] = static_cast<std::uint16_t>(scratch.physical[i]);" not in body
-    )
+    i16 = body.index("scratch.indices16[i] = static_cast<std::uint16_t>(local);")
+    i32 = body.index("scratch.indices32[i] = static_cast<std::uint32_t>(local);")
+    effect = body.index("R30ConfigureXyzrhwWorldEffect(")
+    draw = body.index("auto leftDraw = [&]()")
+    return first < bound < setup < second < mark < i16 < i32 < effect < draw
 
 
 def old_reference(raw, base, index16):
@@ -69,23 +71,19 @@ def old_reference(raw, base, index16):
 
 
 def optimized_model(raw, base, index16):
-    physical = []
-    minimum, maximum = (1 << 63) - 1, -(1 << 63)
-    for value in raw:
-        p = base + value
-        if p < 0 or p > 0xFFFFFFFF:
-            return None
-        physical.append(p)
-        minimum, maximum = min(minimum, p), max(maximum, p)
-    if not physical:
+    if not raw:
         return None
-    size = maximum - minimum + 1
+    min_raw, max_raw = min(raw), max(raw)
+    minimum, maximum = base + min_raw, base + max_raw
+    if minimum < 0 or maximum > 0xFFFFFFFF:
+        return None
+    size = max_raw - min_raw + 1
     if size > 262144:
         return None
     used = [0] * size
     rebased = [0] * len(raw)
-    for i, p in enumerate(physical):
-        local = p - minimum
+    for i, value in enumerate(raw):
+        local = value - min_raw
         if local >= size or (index16 and local > 0xFFFF):
             return None
         used[local] = 1
@@ -97,15 +95,25 @@ def main():
     code = SOURCE.read_text(encoding="utf-8")
     workflow = WORKFLOW.read_text(encoding="utf-8")
     body = indexed_body(code)
-    assert valid(body), "two-pass indexed draw / fallback contract broken"
+    assert valid(body), "scratch-free indexed draw / fallback contract broken"
     assert workflow.count("tools/verify_vr_r30_index_rebase_fastpath.py") == 2
+    assert "std::vector<std::uint32_t> physical;" not in code
     mutations = (
         ("const bool index16 = ibShadow->indexFormat == D3DFMT_INDEX16;",
          "const bool index16 = false;"),
-        ("scratch.physical[i] = static_cast<std::uint32_t>(p);",
-         "scratch.physical[i] = 0;"),
+        ("minRaw = (std::min)(minRaw, raw);", "minRaw = 0;"),
+        ("maxRaw = (std::max)(maxRaw, raw);", "maxRaw = 0;"),
+        ("static_cast<std::int64_t>(baseVertexIndex) + minRaw;",
+         "static_cast<std::int64_t>(baseVertexIndex);"),
+        ("static_cast<std::int64_t>(baseVertexIndex) + maxRaw;",
+         "static_cast<std::int64_t>(baseVertexIndex);"),
+        ("if (minPhysical < 0 || maxPhysical > UINT_MAX)", "if (false)"),
+        ("static_cast<std::uint64_t>(maxRaw) - minRaw + 1u;",
+         "static_cast<std::uint64_t>(maxRaw) + 1u;"),
         ("scratch.indices16.resize(indexCount);", "scratch.indices16.clear();"),
         ("scratch.indices32.resize(indexCount);", "scratch.indices32.clear();"),
+        ("static_cast<std::uint64_t>(raw) - minRaw;",
+         "static_cast<std::uint64_t>(raw);"),
         ("if (local >= vertexCount ||", "if (false ||"),
         ("(index16 && local > 0xFFFFu)", "(false && local > 0xFFFFu)"),
         ("scratch.used[static_cast<std::size_t>(local)] = 1;",
@@ -116,7 +124,6 @@ def main():
          "scratch.indices32[i] = 0;"),
         ("R30ConfigureXyzrhwWorldEffect(", "false /* broken effect */ ("),
         ("R30TransformXyzrhwStereo(", "false /* broken stereo */ ("),
-        ("if (p < 0 || p > UINT_MAX)", "if (false)"),
     )
     for original, mutant in mutations:
         assert original in body, original
@@ -139,7 +146,7 @@ def main():
         [0, 65535], 0, True)
     assert optimized_model([0, 65536], 0, False) == old_reference(
         [0, 65536], 0, False)
-    print(f"PASS R30 indexed XYZRHW two-pass rebase: {cases + 3} model cases, "
+    print(f"PASS R30 indexed XYZRHW scratch-free rebase: {cases + 3} model cases, "
           f"{len(mutations)} negative mutations")
 
 
