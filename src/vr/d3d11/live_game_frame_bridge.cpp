@@ -2035,6 +2035,15 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             alphaArg1 == D3DTA_TEXTURE &&
             (alphaArg2 == D3DTA_TFACTOR ||
              alphaArg2 == (D3DTA_TFACTOR | D3DTA_COMPLEMENT));
+        // Stage0 CURRENT-weighted alpha with DIFFUSE/CURRENT as ARG2:
+        // CURRENT resolves to the vertex diffuse color at stage 0. Reuse
+        // the numerically identical BLENDDIFFUSEALPHA native PS, but never
+        // admit altered operands or silently fall through to TFACTOR.
+        const bool blendTextureAlphaPMBlendCurrentDiffuseAlpha =
+            op == D3DTOP_BLENDTEXTUREALPHAPM &&
+            alphaOp == D3DTOP_BLENDCURRENTALPHA &&
+            alphaArg1 == D3DTA_TEXTURE &&
+            (alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT);
         // Only unmodified texture and vertex operands are admitted.
         const bool blendTextureAlphaPMBlendDiffuseAlpha = op == D3DTOP_BLENDTEXTUREALPHAPM &&
             alphaOp == D3DTOP_BLENDDIFFUSEALPHA && alphaArg1 == D3DTA_TEXTURE &&
@@ -2163,6 +2172,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
              blendTextureAlphaPMAddSmoothFactorAlpha) && !arg2Diffuse) return false;
         if (blendTextureAlphaPMSignedFactorAlpha && !arg2Diffuse) return false;
         if (blendTextureAlphaPMBlendCurrentFactorAlpha && !arg2Diffuse) return false;
+        if (blendTextureAlphaPMBlendCurrentDiffuseAlpha && !arg2Diffuse) return false;
         // A missing DIFFUSE slot may supply a material color under MODULATE.
         // Only texture selection is provably independent of that color.
         if (!layout.hasDiffuse && !selectTexture) return false;
@@ -2188,7 +2198,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                                      mixedTextureAlpha || mixedDiffuseAlpha ||
                                      mixedAddTextureAlpha || mixedAddDiffuseAlpha ||
                                      subtractTextureAlpha || subtractDiffuseAlpha || subtractModulateAlpha ||
-                                     blendTextureAlphaPMFactorAlpha || blendTextureAlphaPMInverseFactorArg1Alpha || blendTextureAlphaPMInverseFactorArg2Alpha || blendTextureAlphaPMDiffuseArg1Alpha || blendTextureAlphaPMDiffuseAlpha || blendTextureAlphaPMModulateAlpha || blendTextureAlphaPMAddAlpha || blendTextureAlphaPMSubtractAlpha || blendTextureAlphaPMModulate2XAlpha || blendTextureAlphaPMModulate4XAlpha || blendTextureAlphaPMAddSignedAlpha || blendTextureAlphaPMAddSigned2XAlpha || blendTextureAlphaPMBlendTextureAlpha || blendTextureAlphaPMAddSmoothAlpha || blendTextureAlphaPMBlendDiffuseAlpha || blendTextureAlphaPMBlendCurrentFactorAlpha || blendTextureAlphaPMBlendFactorAlpha || blendTextureAlphaPMInverseTextureAlpha || blendTextureAlphaPMInverseDiffuseAlpha ||
+                                     blendTextureAlphaPMFactorAlpha || blendTextureAlphaPMInverseFactorArg1Alpha || blendTextureAlphaPMInverseFactorArg2Alpha || blendTextureAlphaPMDiffuseArg1Alpha || blendTextureAlphaPMDiffuseAlpha || blendTextureAlphaPMModulateAlpha || blendTextureAlphaPMAddAlpha || blendTextureAlphaPMSubtractAlpha || blendTextureAlphaPMModulate2XAlpha || blendTextureAlphaPMModulate4XAlpha || blendTextureAlphaPMAddSignedAlpha || blendTextureAlphaPMAddSigned2XAlpha || blendTextureAlphaPMBlendTextureAlpha || blendTextureAlphaPMAddSmoothAlpha || blendTextureAlphaPMBlendDiffuseAlpha || blendTextureAlphaPMBlendCurrentDiffuseAlpha || blendTextureAlphaPMBlendCurrentFactorAlpha || blendTextureAlphaPMBlendFactorAlpha || blendTextureAlphaPMInverseTextureAlpha || blendTextureAlphaPMInverseDiffuseAlpha ||
                                      blendTextureAlpha || blendTextureAlphaPM || blendTextureAlphaPMTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;
         const bool alphaNeedsDiffuse = selectDiffuseDiffuseAlpha || selectDiffuseModulateAlpha || selectTextureBlendTextureAlpha || selectDiffuseBlendTextureAlpha || selectTextureBlendDiffuseAlpha || selectDiffuseBlendDiffuseAlpha ||
                                            selectTextureFactorAlpha || selectDiffuseFactorAlpha ||
@@ -2209,7 +2219,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                                        modulate || additive || subtract || addSmooth || modulate2x || modulate4x ||
                                        modulate2xDiffuseAlpha || modulate4xDiffuseAlpha ||
                                        mixedDiffuseAlpha || mixedAddDiffuseAlpha ||
-                                       blendTextureAlphaPMDiffuseArg1Alpha || blendTextureAlphaPMDiffuseAlpha || blendTextureAlphaPMModulateAlpha || blendTextureAlphaPMAddAlpha || blendTextureAlphaPMSubtractAlpha || blendTextureAlphaPMModulate2XAlpha || blendTextureAlphaPMModulate4XAlpha || blendTextureAlphaPMAddSignedAlpha || blendTextureAlphaPMAddSigned2XAlpha || blendTextureAlphaPMBlendTextureAlpha || blendTextureAlphaPMAddSmoothAlpha || blendTextureAlphaPMBlendDiffuseAlpha || blendTextureAlphaPMBlendFactorAlpha || blendTextureAlphaPMInverseTextureAlpha || blendTextureAlphaPMInverseDiffuseAlpha ||
+                                       blendTextureAlphaPMDiffuseArg1Alpha || blendTextureAlphaPMDiffuseAlpha || blendTextureAlphaPMModulateAlpha || blendTextureAlphaPMAddAlpha || blendTextureAlphaPMSubtractAlpha || blendTextureAlphaPMModulate2XAlpha || blendTextureAlphaPMModulate4XAlpha || blendTextureAlphaPMAddSignedAlpha || blendTextureAlphaPMAddSigned2XAlpha || blendTextureAlphaPMBlendTextureAlpha || blendTextureAlphaPMAddSmoothAlpha || blendTextureAlphaPMBlendDiffuseAlpha || blendTextureAlphaPMBlendCurrentDiffuseAlpha || blendTextureAlphaPMBlendFactorAlpha || blendTextureAlphaPMInverseTextureAlpha || blendTextureAlphaPMInverseDiffuseAlpha ||
                                      blendTextureAlpha || blendTextureAlphaPM || blendTextureAlphaPMTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;
         if ((!modulate && !selectTexture && !selectDiffuseTextureAlpha && !selectDiffuseDiffuseAlpha &&
                !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha &&
@@ -2234,7 +2244,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
               !blendTextureAddAlpha && !blendDiffuseAddAlpha &&
               !blendTextureSubtractAlpha && !blendDiffuseSubtractAlpha &&
                !blendTextureAddSmoothAlpha && !blendDiffuseAddSmoothAlpha &&
-             !blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMInverseDiffuseAlpha && !blendTextureAlphaPMFactorAlpha && !blendTextureAlphaPMInverseFactorArg1Alpha && !blendTextureAlphaPMInverseFactorArg2Alpha && !blendTextureAlphaPMDiffuseArg1Alpha && !blendTextureAlphaPMModulateAlpha && !blendTextureAlphaPMAddAlpha && !blendTextureAlphaPMSubtractAlpha && !blendTextureAlphaPMModulate2XAlpha && !blendTextureAlphaPMModulate4XAlpha && !blendTextureAlphaPMAddSignedAlpha && !blendTextureAlphaPMAddSigned2XAlpha && !blendTextureAlphaPMBlendTextureAlpha && !blendTextureAlphaPMAddSmoothAlpha && !blendTextureAlphaPMBlendDiffuseAlpha && !blendTextureAlphaPMBlendCurrentFactorAlpha && !blendTextureAlphaPMBlendFactorAlpha &&
+             !blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMInverseDiffuseAlpha && !blendTextureAlphaPMFactorAlpha && !blendTextureAlphaPMInverseFactorArg1Alpha && !blendTextureAlphaPMInverseFactorArg2Alpha && !blendTextureAlphaPMDiffuseArg1Alpha && !blendTextureAlphaPMModulateAlpha && !blendTextureAlphaPMAddAlpha && !blendTextureAlphaPMSubtractAlpha && !blendTextureAlphaPMModulate2XAlpha && !blendTextureAlphaPMModulate4XAlpha && !blendTextureAlphaPMAddSignedAlpha && !blendTextureAlphaPMAddSigned2XAlpha && !blendTextureAlphaPMBlendTextureAlpha && !blendTextureAlphaPMAddSmoothAlpha && !blendTextureAlphaPMBlendDiffuseAlpha && !blendTextureAlphaPMBlendCurrentFactorAlpha && !blendTextureAlphaPMBlendCurrentDiffuseAlpha && !blendTextureAlphaPMBlendFactorAlpha &&
               !blendTextureAlphaPMAddFactorAlpha &&
               !blendTextureAlphaPMAddSmoothFactorAlpha &&
               !blendTextureAlphaPMSignedFactorAlpha &&
@@ -2380,7 +2390,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.blendTextureAlphaPMAddSignedAlpha = blendTextureAlphaPMAddSignedAlpha;
         capture.blendTextureAlphaPMAddSigned2XAlpha = blendTextureAlphaPMAddSigned2XAlpha;
         capture.blendTextureAlphaPMBlendTextureAlpha = blendTextureAlphaPMBlendTextureAlpha;
-        capture.blendTextureAlphaPMBlendDiffuseAlpha = blendTextureAlphaPMBlendDiffuseAlpha;
+        // Both weights resolve to stage0 vertex diffuse alpha; retain the
+        // existing compiled native shader and Draw/DrawIndexed path.
+        capture.blendTextureAlphaPMBlendDiffuseAlpha =
+            blendTextureAlphaPMBlendDiffuseAlpha || blendTextureAlphaPMBlendCurrentDiffuseAlpha;
         capture.blendTextureAlphaPMBlendCurrentFactorAlpha = blendTextureAlphaPMBlendCurrentFactorAlpha;
         capture.blendTextureAlphaPMBlendFactorAlpha = blendTextureAlphaPMBlendFactorAlpha;
         capture.blendTextureAlphaPMAddSmoothAlpha = blendTextureAlphaPMAddSmoothAlpha;

@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00642",
+  "production_id": "CONVERSION-DX11-00642",
+  "event_id": "CONVERSION-DX11-00642-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:PM_CURRENT_DIFFUSE_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "033e26066e3afbee7ff24fb771a774d4d7ac1cb8",
+  "status": "AWAIT_EXACT_SHA_GATES",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "D3D9 live stage0 PM RGB with BLENDCURRENTALPHA and exact unmodified DIFFUSE/CURRENT ARG2",
+      "Native D3D11 PS alias to verified BLENDDIFFUSEALPHA shader; game-authored Draw/DrawIndexed; original DX9Ex preserved"
+    ],
+    "batch_components": [
+      "C++ fail-closed state capture, shader selection and native Draw integration",
+      "131072-case positive numeric plus source graph/operand-mutation negative regression, registered in fast and full GitHub gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Stage0 CURRENT=DIFFUSE; alpha=lerp(diffuse.a, texture.a, diffuse.a) for either DIFFUSE or CURRENT ARG2",
+      "negative_regression": "Reject complemented, swapped, missing/changed texture source or wrong alpha op; 00641 TFACTOR remains disjoint",
+      "component_integration": "Real GetTextureStageState -> supported_game_state -> shader alias -> native PS -> D3D11 Draw and DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:PM_CURRENT_DIFFUSE_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and numeric regression only; game menu/race, gamepad, Quest3/VDXR not tested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only; all D3D9 game draw and gamepad preserved"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_current_diffuse_00642.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00642.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: HEAD and AGENTS/policy/00641 checked",
+    "C1_REVIEW": "PASS: missing stage0 PM BLENDCURRENTALPHA with DIFFUSE/CURRENT argument",
+    "C2_IMPLEMENT": "PASS: new fail-closed C++ predicate and existing equivalent native shader dispatch",
+    "C3_VALIDATE": "LOCAL_STATIC_AND_NUMERIC_PASS; GitHub exact-SHA pending",
+    "C4_COMMIT": "PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No user-verified in-game/HMD proof"
+  },
+  "next_action": "Wait for exact-SHA GitHub Actions Gate; repair only concrete CI failures, then record C6 in separate [skip ci] bookkeeping without changing the validation-bearing SHA."
+}

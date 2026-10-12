@@ -60,6 +60,7 @@ jobs:
           python tools/test_dx11_stage0_pm_signed_factor_00639.py
           python tools/test_dx11_stage0_pm_add_factor_00640.py
           python tools/test_dx11_stage0_pm_current_factor_00641.py
+          python tools/test_dx11_stage0_pm_current_diffuse_00642.py
       - name: Verify source graph and dormant runtime activation
         run: |
           python tools/verify_dx11_source_graph.py

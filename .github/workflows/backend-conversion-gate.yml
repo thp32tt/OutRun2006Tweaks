@@ -113,6 +113,8 @@ jobs:
         run: python tools/test_dx11_stage0_pm_add_factor_00640.py
       - name: DX11 PM CURRENT/TFACTOR alpha native Draw 00641
         run: python tools/test_dx11_stage0_pm_current_factor_00641.py
+      - name: DX11 PM CURRENT/DIFFUSE alpha native Draw 00642
+        run: python tools/test_dx11_stage0_pm_current_diffuse_00642.py
 
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'
