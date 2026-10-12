@@ -1,0 +1,356 @@
+{
+  "schema": "outrun-C1-fast-independent-SHA-pinned-batch-v4",
+  "task_id": "OUTRUN-KOR-C1-20261013-0540-Q098-Q193-Q212-Q217",
+  "date_kst": "2026-10-13",
+  "reviewer": "ChatGPT C1 (QA_ONLY_NOT_PRODUCER)",
+  "branch": "korean-localization-recovery-20260928",
+  "policy": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md"
+  ],
+  "selection": "Four distinct saved DDS trial SHA from A/B, not present as C1 candidate SHA in previous C1 QA records. No prior C1-created DDS self-approval. q060 B376 excluded because exact SHA already in 20261012 C1 batch.",
+  "scope": "Source HD DDS SHA and raw header, independently byte-verified CLEAN PNG SHA, persisted exact DDS SHA, SOURCE RAW/READABLE, CLEAN, FINAL RAW/FLIPY, nominal 75% and 50% image-scale proxies, enlarged edge readings. Actual UI sprite/UV and game sampling were NOT tested.",
+  "comparison": {
+    "contact_jpg": "localization/graphics/role_C1/20261013-C1-Q098-Q193-Q212-Q217-INDEPENDENT-SCOPED/C1_Q098_Q193_Q212_Q217_BATCH_7WAY.jpg",
+    "contact_sha256": "5316034aa9fdec11a427799b6037795b162891a192cbd8b97026f7386fb1f812",
+    "contact_rows": [
+      "q098 B330R",
+      "q193 A245",
+      "q212 B361",
+      "q217 A232 (START and GOAL two zoom sections)"
+    ],
+    "additional_zoom": "localization/graphics/role_C1/20261013-C1-Q098-Q193-Q212-Q217-INDEPENDENT-SCOPED/C1_Q217_STROKE_DEFECT_ZOOM.jpg",
+    "additional_zoom_sha256": "d78ed36eaf6a85815e3902fbdfb6515aea76cf8dc5198eb0e232c39fe1f956bc",
+    "scale_note": "75% and 50% are static nearest visual practical-size proxies, not actual game capture"
+  },
+  "candidates": [
+    {
+      "index": 98,
+      "producer": "B330R",
+      "translated": "Challenge the course record. → 코스 기록에 도전하세요.",
+      "source_dds_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+      "source_path": "OR2-HD-GUI v0.25.10a original mirrored HD 42E618FD_512x32.dds; SHA-authenticated cached original",
+      "clean_png_sha256": "c04e242730a30eb85342e780ebec11c3b852eff7993c92790760bc3218c1d11e",
+      "clean_path": "SHA-authenticated original/source derived readable full clean PNG, same SHA previously independent C1 reviewed",
+      "final_dds_sha256": "fbc143a931e6ae7739765be10ceb8aa09722b6de54862297310c6bd487895ef4",
+      "final_path": "localization/graphics/role_B/20261009-B330-Q098-ENGLISH-FLANK-REMOVAL/B330R_Q098_ENGLISH_RGB_ALPHA_CLEARED_UNAPPROVED.dds",
+      "header": {
+        "native": [
+          2048,
+          128
+        ],
+        "format": "DXT5/BC3",
+        "mips": 1,
+        "exact_source_final_header": true,
+        "raw_flipy": "SOURCE and FINAL readable by FLIPY"
+      },
+      "source_clean_gate": {
+        "status": "SCOPED_SHA_REUSE_AND_PIXEL_RECHECK",
+        "source_clean_sha_pair_pinned": true,
+        "changed_rgba_in_roi": 119268,
+        "changed_outside_source_effect_bbox_in_roi": 26345,
+        "interpretation": "SOURCE/CLEAN hidden-RGB data differ outside glyph bbox; cannot infer visible protective damage from non-alpha RGB"
+      },
+      "final_dds_gate": {
+        "status": "HOLD_BC_BOUNDARY_BLOCKS",
+        "source_final_rgba_changed_outside_source_effect_bbox": 4329,
+        "visible_rgba_changed_outside": 0,
+        "alpha_changed_outside": 0,
+        "hidden_rgb_changed_when_both_alpha0": 4329,
+        "source_to_final_changed_bc3_blocks": 8894,
+        "modified_blocks_not_fully_inside_reported_glyph_bbox": 680,
+        "unproved_bc_boundary_bbox_readable": [
+          428,
+          4,
+          1676,
+          124
+        ]
+      },
+      "inspected_bboxes": [
+        [
+          431,
+          6,
+          1674,
+          123
+        ]
+      ],
+      "inspected_text_count": 1,
+      "untranslated_in_inspected_scope": 0,
+      "uninspected_atlas_translations": "UNKNOWN",
+      "readability": "PASS_SCOPED_NATIVE75_50",
+      "confirmed_hard_defect_coords": [],
+      "evidence_gap_coords": [
+        [
+          428,
+          4,
+          1676,
+          124
+        ]
+      ],
+      "verdict": "HOLD",
+      "verdict_reason": "Saved Hangul legible and alpha/visible pixels unchanged outside original source bbox; strict BC3 block boundary proof is unavailable for 680 changed blocks extending beyond that bbox. No invented BC tolerances or claimed protected-asset PASS.",
+      "full_DDS": "TEST_ONLY/HOLD"
+    },
+    {
+      "index": 193,
+      "producer": "A245",
+      "translated": "ONLINE → 온라인",
+      "source_dds_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "source_path": "canonical OR2-HD-GUI 97E863AD_512x256.dds cached; matches producer and prior source exact SHA",
+      "clean_png_sha256": "5544eac9a0ab15ba792ed6105223aaffe381b71c541d140116e276d1a63bb462",
+      "clean_path": "localization/graphics/role_A/20261011-A245-Q193-ONLINE-CLEAN-REAL-GLYPH/A245_TRUE_CLEAN_FULL_RAW.png",
+      "final_dds_sha256": "107648ca5628048ea4813a2c65385ad72ab002815ed25a8dda236e66eb1dd9e7",
+      "final_path": "localization/graphics/role_A/20261011-A245-Q193-ONLINE-CLEAN-REAL-GLYPH/A245_Q193_ONLINE_TRUE_CLEAN_NATIVE_TRIAL_UNPROMOTED.dds",
+      "header": {
+        "native": [
+          2048,
+          1024
+        ],
+        "format": "RGBA32",
+        "mips": 1,
+        "exact_source_final_header": true,
+        "raw_flipy": "SOURCE/FINAL RAW mirror_y, CLEAN original RAW, normalized to READABLE"
+      },
+      "source_clean_gate": {
+        "status": "SCOPED_SOURCE_CLEAN_PASS",
+        "source_clean_sha_pair_pinned": true,
+        "changed_rgba_in_roi": 3660,
+        "changed_outside_original_source_effect_bbox": 0
+      },
+      "final_dds_gate": {
+        "status": "SCOPED_PIXEL_PASS_READABILITY_HOLD",
+        "clean_final_changed_in_roi": 2139,
+        "clean_final_changed_outside_original_source_effect_bbox": 0,
+        "source_final_changed_in_roi": 4521,
+        "source_final_changed_outside_original_source_effect_bbox": 0
+      },
+      "inspected_bboxes": [
+        [
+          1660,
+          156,
+          1832,
+          194
+        ]
+      ],
+      "inspected_text_count": 1,
+      "untranslated_in_inspected_scope": 0,
+      "uninspected_atlas_translations": "UNKNOWN",
+      "readability": "ON_WHITE_AND_GRAY128_READABLE; LOW_CONTRAST_ON_GRAY64_AND_DARK_NATIVE_GAME_BACKGROUND_NOT_PROVEN",
+      "confirmed_hard_defect_coords": [],
+      "evidence_gap_coords": [
+        [
+          1663,
+          158,
+          1758,
+          192
+        ]
+      ],
+      "verdict": "HOLD",
+      "verdict_reason": "Even original English lettering uses very dark tone. Korean syllables legible on light test backdrops but very low contrast on dark UI gray; no grounded runtime background/cell contrast evidence to authorize a readable-in-game pass. Small text/underfill is not a failure.",
+      "full_DDS": "TEST_ONLY/HOLD"
+    },
+    {
+      "index": 212,
+      "producer": "B361",
+      "translated": "PROFESSIONAL → 프로페셔널 모드",
+      "source_dds_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "source_path": "canonical OR2-HD-GUI BA0147DA_512x512.dds SHA-verified source cache",
+      "clean_png_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+      "clean_path": "localization/graphics/role_C/20261005-C158-BA0147DA/C158_VERIFIED_CLEAN_PLATE.png",
+      "final_dds_sha256": "c787825e932ef2fe2f7623accc8466967bada76b4a8965b30f6964a2aab01b3d",
+      "final_path": "localization/graphics/role_B/20261011-B361-Q212-R43-SOURCE-OUTLINE-PILOT/B361_Q212_R43_SOURCE_OUTLINE_UNAPPROVED.dds",
+      "header": {
+        "native": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "mips": 1,
+        "exact_source_final_header": true,
+        "raw_flipy": "SOURCE/FINAL RAW mirror_y, CLEAN normalized as READABLE by lower observed diff (orientation not independent UV proof)"
+      },
+      "source_clean_gate": {
+        "status": "HOLD_SCOPED_NEIGHBOR_SOURCE_CLEAN_BINDING",
+        "source_clean_sha_pair_pinned": true,
+        "source_clean_changed_in_roi": 13753,
+        "source_clean_outside_single_glyph_bbox": 3600,
+        "unverified_adjacent_bbox": [
+          222,
+          386,
+          638,
+          404
+        ]
+      },
+      "final_dds_gate": {
+        "status": "HOLD_NEIGHBOR_PIXEL_CHANGE",
+        "clean_final_changed_in_roi": 18272,
+        "clean_final_outside_single_glyph_bbox": 11115,
+        "source_final_changed_in_roi": 20951,
+        "source_final_outside_single_glyph_bbox": 11115,
+        "official_vs_final_changed_in_roi": 17387,
+        "official_vs_final_outside_single_glyph_bbox": 8303,
+        "official_vs_final_alpha_changed_outside_single_glyph_bbox": 1732,
+        "official_vs_final_outside_change_bbox": [
+          178,
+          341,
+          638,
+          404
+        ]
+      },
+      "inspected_bboxes": [
+        [
+          240,
+          341,
+          637,
+          386
+        ]
+      ],
+      "inspected_text_count": 1,
+      "untranslated_in_inspected_scope": 0,
+      "uninspected_atlas_translations": "At least 11 other shared UI cell regions not independently cleared",
+      "readability": "Korean 프로페셔널 모드 legible at native/75/50; slight style variance allowed",
+      "confirmed_hard_defect_coords": [],
+      "evidence_gap_coords": [
+        [
+          178,
+          341,
+          638,
+          404
+        ]
+      ],
+      "verdict": "HOLD",
+      "verdict_reason": "Measured region includes modifications beyond original English glyph bbox and possible neighboring R44 content. Without exact actual sprite/UV cell proof, do not infer those are safe simply because no obvious visual overlap in screenshot. These may include inherited localizations; do not mislabel as proven protected damage.",
+      "full_DDS": "TEST_ONLY/HOLD",
+      "user_issue": "IGR029 OPEN"
+    },
+    {
+      "index": 217,
+      "producer": "A232",
+      "translated": "START → 출발; GOAL → 골",
+      "source_dds_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+      "source_path": "canonical OR2-HD-GUI D1039D6F_512x512.dds SHA-verified source cache",
+      "clean_png_sha256": "015e07de95d6fbb38a82525714115ab841e51d82d55677217645bcb5e34064e9",
+      "clean_path": "localization/graphics/role_A/20261011-A231-Q217-SOURCE-RED-RIM-RESTORE/A231_CLEAN_FULL_NATIVE_READABLE.png",
+      "final_dds_sha256": "3a9739b923625526e53ba32634459a85d12d208e6a9625ae4b01891d94ed0a53",
+      "final_path": "localization/graphics/role_A/20261011-A232-Q217-SOURCE-SAMPLED-NATIVE-GOLD-DEPTH/A232_Q217_SOURCE_SAMPLED_GOLD_DEPTH_UNPROMOTED.dds",
+      "header": {
+        "native": [
+          2048,
+          2048
+        ],
+        "format": "RGBA32",
+        "mips": 1,
+        "exact_source_final_header": true,
+        "raw_flipy": "SOURCE and FINAL RAW mirror_y; readable FLIPY confirmed"
+      },
+      "source_clean_gate": {
+        "status": "SCOPED_SOURCE_CLEAN_GEOMETRY_PASS",
+        "source_clean_sha_pair_pinned": true,
+        "regions": [
+          {
+            "english": "START",
+            "source_clean_changed_rgba": 1744,
+            "outside_source_effect_bbox_rgba": 0
+          },
+          {
+            "english": "GOAL",
+            "source_clean_changed_rgba": 1752,
+            "outside_source_effect_bbox_rgba": 0
+          }
+        ]
+      },
+      "final_dds_gate": {
+        "status": "HARD_VISUAL_REWORK",
+        "regions": [
+          {
+            "translation": "출발",
+            "clean_final_changed_rgba": 723,
+            "source_final_changed_rgba": 1764,
+            "outside_original_effect_bbox": 0,
+            "defect_bbox_readable": [
+              835,
+              511,
+              872,
+              530
+            ]
+          },
+          {
+            "translation": "골",
+            "clean_final_changed_rgba": 422,
+            "source_final_changed_rgba": 1767,
+            "outside_original_effect_bbox": 0,
+            "defect_bbox_readable": [
+              1382,
+              773,
+              1401,
+              793
+            ]
+          }
+        ],
+        "protected_art": "Within inspected ROI no source-effect-outside pixel changes; red badge and surroundings appear preserved"
+      },
+      "inspected_bboxes": [
+        [
+          803,
+          509,
+          884,
+          532
+        ],
+        [
+          1343,
+          771,
+          1420,
+          795
+        ]
+      ],
+      "inspected_text_count": 2,
+      "untranslated_in_inspected_scope": 0,
+      "uninspected_atlas_translations": "UNKNOWN",
+      "readability": "FAIL native/75/50: stacked horizontal faceted strokes, crowded counters, broken Hangul syllable identity; 4x nearest source/saved zoom confirms",
+      "confirmed_hard_defect_coords": [
+        [
+          835,
+          511,
+          872,
+          530
+        ],
+        [
+          1382,
+          773,
+          1401,
+          793
+        ]
+      ],
+      "verdict": "REWORK",
+      "verdict_reason": "Visible overlapping jagged/striped glyph strokes and collapsed internal spaces make 출발/골 illegible at practical usage size. Preserve source red badge art and remake only isolated glyph/effect layer; this is an actual hard legibility defect, not cosmetic gold/italic size variance.",
+      "full_DDS": "TEST_ONLY/HOLD"
+    }
+  ],
+  "summary": {
+    "candidate_count": 4,
+    "unique_q_indices": 4,
+    "unique_candidate_sha": 4,
+    "source_sha_verified": 4,
+    "clean_sha_verified": 4,
+    "final_saved_dds_sha_verified": 4,
+    "inspected_translatable_texts": 5,
+    "observed_untranslated_texts_in_inspected_scope": 0,
+    "remaining_untranslated_texts_in_uninspected_full_atlases": "UNKNOWN",
+    "C1_STATIC_PASS": 0,
+    "HOLD": 3,
+    "REWORK": 1,
+    "whole_atlas_pass": 0,
+    "release_promotions": 0,
+    "p0_p1_and_HUD": "C3_AND_USER_RETEST_REQUIRED",
+    "runtime_validation": "UNTESTED",
+    "new_dds": 0,
+    "new_korean_png": 0,
+    "new_C2_approval_tokens": 0,
+    "Docker": "NOT_CHANGED",
+    "Portainer": "NOT_CHANGED",
+    "AUTO_SEND": "NOT_TOUCHED",
+    "queue_reset": false,
+    "VR_FFB_DX11_DXVK": "EXCLUDED"
+  },
+  "release_gate": "TEST_ONLY/HOLD because historical C2-based consumers not fully migrated; no C2 token manufactured."
+}
