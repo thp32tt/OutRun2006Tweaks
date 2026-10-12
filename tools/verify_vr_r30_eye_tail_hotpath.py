@@ -55,6 +55,26 @@ def verify(source: str):
         "state.parallaxPerRhwX[eye] * rhw",
     ):
         assert required in vertices, f"world particle or fallback guard lost: {required}"
+    # Dense and unindexed draws must preserve the original full source,
+    # while sparse indexed draws copy only referenced contiguous runs before
+    # either full or affine per-eye transform. The rejected full projection
+    # still restores the entire original buffer before affine fallback.
+    for required in (
+        "if (usedMask && vertexCount >= 64u)",
+        "usedMask->begin() + vertexCount",
+        "static_cast<std::size_t>(selectedCount) * 4u <= vertexCount",
+        "while (cursor < vertexCount && !(*usedMask)[cursor])",
+        "while (cursor < vertexCount && (*usedMask)[cursor])",
+        "static_cast<std::size_t>(cursor - begin) * stride",
+        "std::memcpy(out.data() + offset,",
+        "if (!sparseCopied)",
+        "std::memcpy(out.data(), source, bytes);",
+    ):
+        assert required in vertices, f"sparse indexed source-copy guard lost: {required}"
+    assert vertices.index("if (!sparseCopied)") < vertices.index("const float x0")
+    assert vertices.index("const float x0") < vertices.index(
+        "if (state.worldEffect && state.fullWorldReprojection &&")
+    assert vertices.count("std::memcpy(out.data(), source, bytes);") == 2
     # CPU-projected smoke/skid/decal geometry is constant within a latched
     # pose/projection/scale, while depth evidence and viewport stay per draw.
     assert "thread_local R30XyzrhwWorldGeometryCache R30XyzrhwWorldGeometry{};" in state
@@ -136,6 +156,44 @@ def math_parity():
                 "eye inverse/projection order or floating-point parity changed", a, b)
 
 
+def sparse_copy_parity():
+    """Model indexed-up copy semantics for dense/sparse/empty selections."""
+    rng = random.Random(662)
+    cases = 0
+    for vertices in (1, 63, 64, 65, 128, 1024):
+        for stride in (16, 24, 32, 64):
+            for coverage in (0., .05, .25, .5, 1.):
+                source = bytes(rng.randrange(256) for _ in range(vertices * stride))
+                mask = [int(rng.random() < coverage) for _ in range(vertices)]
+                sentinel = 173
+                out = bytearray([sentinel] * len(source))
+                sparse = vertices >= 64 and sum(mask) * 4 <= vertices
+                if sparse:
+                    cursor = 0
+                    while cursor < vertices:
+                        while cursor < vertices and not mask[cursor]:
+                            cursor += 1
+                        begin = cursor
+                        while cursor < vertices and mask[cursor]:
+                            cursor += 1
+                        if begin != cursor:
+                            out[begin * stride:cursor * stride] = source[
+                                begin * stride:cursor * stride]
+                else:
+                    out[:] = source
+                for i, selected in enumerate(mask):
+                    a = out[i * stride:(i + 1) * stride]
+                    b = source[i * stride:(i + 1) * stride]
+                    assert a == b if selected or not sparse else a == bytes(
+                        [sentinel] * stride)
+                # Bilateral reprojection failure resets the full span.
+                if sparse:
+                    out[:] = source
+                assert out == source
+                cases += 1
+    return cases
+
+
 def main():
     source = SOURCE.read_text(encoding="utf-8")
     workflow = WORKFLOW.read_text(encoding="utf-8")
@@ -197,6 +255,7 @@ def main():
         except (AssertionError, ValueError, IndexError):
             continue
         raise AssertionError(f"XYZRHW cache destructive mutation {i} escaped")
+    assert sparse_copy_parity() == 120
     math_parity()
     print(f"PASS R30 particle stereo composed eye-tail/geometry cache: {len(mutations) + len(geometry_mutations) + 1} destructive mutations and 300 matrix parity cases")
 

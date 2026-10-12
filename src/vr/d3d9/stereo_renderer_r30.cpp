@@ -2135,7 +2135,44 @@ namespace OutRunVRStereo
             {
                 return false;
             }
-            std::memcpy(out.data(), source, bytes);
+            // Indexed particle/decal draws can reference only a small fraction
+            // of a wide vertex span. Avoid two whole-span CPU copies (one per
+            // eye) in that sparse case: D3D9 indexed UP draws read only vertices
+            // reached by their validated/rebased indices. Preserve the dense
+            // memcpy path and the atomic full-reprojection fallback below.
+            bool sparseCopied = false;
+            if (usedMask && vertexCount >= 64u)
+            {
+                const auto selectedCount = std::count_if(
+                    usedMask->begin(), usedMask->begin() + vertexCount,
+                    [](std::uint8_t used) noexcept { return used != 0; });
+                if (static_cast<std::size_t>(selectedCount) * 4u <= vertexCount)
+                {
+                    const auto* srcBytes =
+                        static_cast<const std::uint8_t*>(source);
+                    UINT cursor = 0;
+                    while (cursor < vertexCount)
+                    {
+                        while (cursor < vertexCount && !(*usedMask)[cursor])
+                            ++cursor;
+                        const UINT begin = cursor;
+                        while (cursor < vertexCount && (*usedMask)[cursor])
+                            ++cursor;
+                        if (begin != cursor)
+                        {
+                            const std::size_t offset =
+                                static_cast<std::size_t>(begin) * stride;
+                            const std::size_t runBytes =
+                                static_cast<std::size_t>(cursor - begin) * stride;
+                            std::memcpy(out.data() + offset,
+                                srcBytes + offset, runBytes);
+                        }
+                    }
+                    sparseCopied = true;
+                }
+            }
+            if (!sparseCopied)
+                std::memcpy(out.data(), source, bytes);
 
             const float x0 = static_cast<float>(state.viewport.X);
             const float y0 = static_cast<float>(state.viewport.Y);
