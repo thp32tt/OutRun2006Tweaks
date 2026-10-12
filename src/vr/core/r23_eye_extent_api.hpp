@@ -1,0 +1,10 @@
+#pragma once
+// Common R23 stereo owner includes both production-safe R26 and newer R29.
+// Overlay borrows only validated eye dimensions, not transport ownership.
+#include <cstdint>
+
+namespace OutRunVRStereo
+{
+    bool R23TryGetPublishedEyeExtent(std::uint32_t eye,
+        std::uint32_t& width, std::uint32_t& height) noexcept;
+}

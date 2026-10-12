@@ -13,6 +13,7 @@
 // new current-frame full color/depth baseline are both proven.
 
 #include "stereo_renderer_r22.cpp"
+#include "../core/r23_eye_extent_api.hpp"
 #include <cstddef>
 
 namespace OutRunVRStereo
@@ -935,5 +936,27 @@ namespace OutRunVRStereo
     std::uint64_t GetTopLevelDrawSerial() noexcept
     {
         return TopLevelDrawSerial();
+    }
+
+    // F11 is compiled even in the default R26 safe-draw comparison, where
+    // the R29 owner translation unit does not exist. Both chains include R23.
+    // Export only two published sizes, never a shared-memory pointer or owner.
+    bool R23TryGetPublishedEyeExtent(std::uint32_t eye,
+        std::uint32_t& width, std::uint32_t& height) noexcept
+    {
+        width = 0;
+        height = 0;
+        if (eye >= 2 || !SharedState ||
+            SharedState->magic != OutRunVR::SharedMagic ||
+            SharedState->protocolVersion != OutRunVR::SharedProtocolVersion ||
+            SharedState->structSize != sizeof(OutRunVR::SharedPoseState))
+            return false;
+        const auto w = SharedState->recommendedWidth[eye];
+        const auto h = SharedState->recommendedHeight[eye];
+        if (w < 640u || h < 480u || w > 8192u || h > 8192u)
+            return false;
+        width = w;
+        height = h;
+        return true;
     }
 }

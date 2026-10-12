@@ -9,7 +9,7 @@
 #include <backends/imgui_impl_dx9.h>
 #include "overlay.hpp"
 #include "vr/game/render_semantics.hpp"
-#include "vr/core/r29_owner_api.hpp"
+#include "vr/core/r23_eye_extent_api.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -217,8 +217,8 @@ class D3DHooks : public Hook
 				Game::screen_resolution->y > 0)
 			{
 				std::uint32_t lw = 0, lh = 0, rw = 0, rh = 0;
-				if (OutRunVRStereo::R29OwnerRecommendedEyeExtent(0, lw, lh) &&
-					OutRunVRStereo::R29OwnerRecommendedEyeExtent(1, rw, rh) &&
+				if (OutRunVRStereo::R23TryGetPublishedEyeExtent(0, lw, lh) &&
+					OutRunVRStereo::R23TryGetPublishedEyeExtent(1, rw, rh) &&
 					lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u)
 				{
 					const float sourceAspect = static_cast<float>(

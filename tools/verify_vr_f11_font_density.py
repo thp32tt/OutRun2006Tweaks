@@ -7,6 +7,8 @@ ROOT = Path(__file__).resolve().parents[1]
 HOOK = ROOT / "src/overlay/hooks_overlay.cpp"
 FONT = ROOT / "src/overlay/overlay.cpp"
 HEADER = ROOT / "src/overlay/overlay.hpp"
+COMMON = ROOT / "src/vr/d3d9/stereo_renderer_r23.cpp"
+EYE_API = ROOT / "src/vr/core/r23_eye_extent_api.hpp"
 
 def check(hook: str, font: str, header: str) -> None:
     # Pin actual owning scopes. Searching whole files misses destructive
@@ -24,8 +26,8 @@ def check(hook: str, font: str, header: str) -> None:
     for target, needles in (
         (density_guard, (
             "overlayActive && Game::is_vr_gameplay_presentation()",
-            "R29OwnerRecommendedEyeExtent(0, lw, lh)",
-            "R29OwnerRecommendedEyeExtent(1, rw, rh)",
+            "R23TryGetPublishedEyeExtent(0, lw, lh)",
+            "R23TryGetPublishedEyeExtent(1, rw, rh)",
             "lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u",
             "std::isfinite(factor) && factor > 0.0f",
             "std::ceil(factor * 4.0f) * 0.25f, 1.0f, 3.0f",
@@ -64,6 +66,16 @@ def main():
     hook, font, header = (p.read_text(encoding="utf-8")
                           for p in (HOOK, FONT, HEADER))
     check(hook, font, header)
+    # Default R26 and new R29 compile separate final TUs but share R23.
+    common = COMMON.read_text(encoding="utf-8")
+    api = EYE_API.read_text(encoding="utf-8")
+    assert '#include "vr/core/r23_eye_extent_api.hpp"' in hook
+    assert "R29OwnerRecommendedEyeExtent" not in hook
+    assert "R23TryGetPublishedEyeExtent(" in common
+    assert "bool R23TryGetPublishedEyeExtent(" in api
+    assert "SharedState->structSize != sizeof(OutRunVR::SharedPoseState)" in common
+    assert "SharedState->recommendedWidth[eye]" in common
+    assert "SharedState->recommendedHeight[eye]" in common
     # Desktop 4:3 is unmodified; wide/portrait XR needs sharp larger glyphs.
     assert factor(1024, 768, 1024, 768) == 1.0
     assert factor(1920, 1080, 2496, 2688) == 2.0
@@ -74,7 +86,7 @@ def main():
     mutations = (
         (hook, "overlayActive && Game::is_vr_gameplay_presentation()",
          "overlayActive || Game::is_vr_gameplay_presentation()", font, header),
-        (hook, "R29OwnerRecommendedEyeExtent(1, rw, rh)",
+        (hook, "R23TryGetPublishedEyeExtent(1, rw, rh)",
          "true", font, header),
         (hook, "Overlay::FontsDirty = true;",
          "Overlay::FontsDirty = false;", font, header),
