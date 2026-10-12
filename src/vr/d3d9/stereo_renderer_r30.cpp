@@ -2901,9 +2901,19 @@ namespace OutRunVRStereo
                 return E_NOTIMPL;
             }
 
+            // The first index pass has already validated physical addresses
+            // and discovered the contiguous source-vertex span. Mark used
+            // vertices and rebase both index formats in the same second pass:
+            // the old separate rebasing loop walked every particle index a
+            // third time and touched the same scratch.physical cache lines.
+            const bool index16 = ibShadow->indexFormat == D3DFMT_INDEX16;
             try
             {
                 scratch.used.assign(vertexCount, 0);
+                if (index16)
+                    scratch.indices16.resize(indexCount);
+                else
+                    scratch.indices32.resize(indexCount);
             }
             catch (...)
             {
@@ -2911,18 +2921,30 @@ namespace OutRunVRStereo
                 vb->Release();
                 return E_NOTIMPL;
             }
+
+            const void* rebased = index16
+                ? static_cast<const void*>(scratch.indices16.data())
+                : static_cast<const void*>(scratch.indices32.data());
             for (UINT i = 0; i < indexCount; ++i)
             {
                 const std::uint64_t local =
                     scratch.physical[i] -
                     static_cast<std::uint64_t>(minPhysical);
-                if (local >= vertexCount)
+                // Reject unsafe 16-bit rebasing *before* attempting either
+                // stereo eye. Never truncate when the physical span is wider
+                // than a UINT16 index can describe.
+                if (local >= vertexCount ||
+                    (index16 && local > 0xFFFFu))
                 {
                     ib->Release();
                     vb->Release();
                     return E_NOTIMPL;
                 }
                 scratch.used[static_cast<std::size_t>(local)] = 1;
+                if (index16)
+                    scratch.indices16[i] = static_cast<std::uint16_t>(local);
+                else
+                    scratch.indices32[i] = static_cast<std::uint32_t>(local);
             }
 
             if (!R30ConfigureXyzrhwWorldEffect(
@@ -2936,45 +2958,6 @@ namespace OutRunVRStereo
                 vb->Release();
                 ++R30XyzrhwFallbacks;
                 return E_NOTIMPL;
-            }
-
-            const void* rebased = nullptr;
-            if (ibShadow->indexFormat == D3DFMT_INDEX16)
-            {
-                try { scratch.indices16.resize(indexCount); }
-                catch (...) {
-                    ib->Release();
-                    vb->Release();
-                    return E_NOTIMPL;
-                }
-                for (UINT i = 0; i < indexCount; ++i)
-                {
-                    const std::uint64_t v =
-                        scratch.physical[i] -
-                        static_cast<std::uint64_t>(minPhysical);
-                    if (v > 0xFFFFu)
-                    {
-                        ib->Release();
-                        vb->Release();
-                        return E_NOTIMPL;
-                    }
-                    scratch.indices16[i] = static_cast<std::uint16_t>(v);
-                }
-                rebased = scratch.indices16.data();
-            }
-            else
-            {
-                try { scratch.indices32.resize(indexCount); }
-                catch (...) {
-                    ib->Release();
-                    vb->Release();
-                    return E_NOTIMPL;
-                }
-                for (UINT i = 0; i < indexCount; ++i)
-                    scratch.indices32[i] =
-                        scratch.physical[i] -
-                        static_cast<std::uint32_t>(minPhysical);
-                rebased = scratch.indices32.data();
             }
 
             auto leftDraw = [&]() {
