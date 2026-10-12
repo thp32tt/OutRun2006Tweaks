@@ -21,7 +21,7 @@ must_connect = (
     "!blendTextureAlphaPMModulateInverseFactorAlpha &&",
     "capture.blendTextureAlphaPMModulateFactorAlpha = blendTextureAlphaPMModulateFactorAlpha;",
     "if (blendTextureAlphaPMModulateInverseFactorAlpha)\n            capture.blendTextureAlphaPMModulateFactorAlpha = true;",
-    "if (blendTextureAlphaPMModulateInverseFactorAlpha)\n            capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;",
+    "if (blendTextureAlphaPMModulateInverseFactorAlpha ||\n            blendTextureAlphaPMScaledInverseFactorAlpha)\n            capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;",
     "float4 PSTextureBlendTextureAlphaPMModulateFactorAlpha(VOut v) : SV_Target {",
     "t.a * alphaParams.w",
     "capture.blendTextureAlphaPMModulateFactorAlpha ? s.blendTextureAlphaPmModulateFactorAlphaPs.Get() :",
