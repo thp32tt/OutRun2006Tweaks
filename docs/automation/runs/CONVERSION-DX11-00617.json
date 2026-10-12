@@ -64,9 +64,9 @@
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Run exact-SHA Backend Conversion Gate, Build, Fast Structural, OpenXR and HUD on corrected PM shader source; no HMD.",
+  "next_action": "Exact-SHA Gate/Build/Fast/OpenXR/HUD from corrected 00558 and 00617 checks.",
   "retry_repair": {
-    "reason": "Correct exact-SHA Windows failures: two new PM shader definitions exceeded MSVC 16KB kShader raw literal; relocate to pre-existing concatenated HLSL literal. Repair tuple arity in destructive regression.",
-    "previous_sha": "c5b98fe11b7908067daabea1d4795b7a28fc043d"
+    "previous_sha": "7afaafb5f5c8db87371d4a422351dbbac462e7df",
+    "reason": "Expand earlier 00558 two-blend-only regression source matcher to PM-aware gate without removing original positive/destructive pair evidence."
   }
 }

@@ -1705,7 +1705,7 @@ def main() -> None:
     blend_links = (
         "const bool blendTextureAlpha = op == D3DTOP_BLENDTEXTUREALPHA && alphaOp == D3DTOP_BLENDTEXTUREALPHA;",
         "const bool blendDiffuseAlpha = op == D3DTOP_BLENDDIFFUSEALPHA && alphaOp == D3DTOP_BLENDDIFFUSEALPHA;",
-        "blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;",
+        "blendTextureAlpha || blendTextureAlphaPM || blendTextureAlphaPMTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;",
         "blendTextureAlpha && !blendDiffuseAlpha) || arg != D3DTA_TEXTURE ||",
         "capture.blendTextureAlpha = blendTextureAlpha;",
         "capture.blendDiffuseAlpha = blendDiffuseAlpha;",
@@ -1719,7 +1719,7 @@ def main() -> None:
         "s.blendDiffuseAlphaPs.GetAddressOf()",
         "s.blendTextureAlphaPs.Reset();",
         "s.blendDiffuseAlphaPs.Reset();",
-        "s.blendTextureAlphaPs && s.blendDiffuseAlphaPs",
+        "s.blendTextureAlphaPs && s.blendTextureAlphaPmPs && s.blendTextureAlphaPmTextureAlphaPs && s.blendDiffuseAlphaPs",
         "capture.blendTextureAlpha ? s.blendTextureAlphaPs.Get() :",
         "capture.blendDiffuseAlpha ? s.blendDiffuseAlphaPs.Get() :",
         "ctx->DrawIndexed(indexCount, 0, 0);",
@@ -1733,7 +1733,10 @@ def main() -> None:
     submit_section = bridge[bridge.find("bool submit("):
                             bridge.find("void observe(")]
     assert all(link in bridge for link in blend_links if "blendTextureAlpha && !blendDiffuseAlpha)" not in link)
-    assert "!blendTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha) || arg != D3DTA_TEXTURE ||" in state_section
+    # Verify both prior game alpha-blend pairs while requiring the PM-safe gate.
+    assert "!blendTextureAlpha && !blendTextureAlphaPM && !blendTextureAlphaPMTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha) || arg != D3DTA_TEXTURE ||" in state_section
+    assert "const bool blendTextureAlpha = op == D3DTOP_BLENDTEXTUREALPHA && alphaOp == D3DTOP_BLENDTEXTUREALPHA;" in state_section
+    assert "const bool blendDiffuseAlpha = op == D3DTOP_BLENDDIFFUSEALPHA && alphaOp == D3DTOP_BLENDDIFFUSEALPHA;" in state_section
     assert "arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT" in state_section
     assert "alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT" in state_section
     assert "alphaArg1 != D3DTA_TEXTURE" in state_section
