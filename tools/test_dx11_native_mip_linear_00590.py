@@ -14,7 +14,7 @@ def connected(s: str) -> bool:
     a = [
         "GetSamplerState(0, D3DSAMP_MIPFILTER, &mip)",
         "((mip != D3DTEXF_NONE && mip != D3DTEXF_POINT) && mip != D3DTEXF_LINEAR)",
-        "maxMip != 0u || mipBias != 0u",
+        "(mip == D3DTEXF_NONE && maxMip != 0u) || mipBias != 0u",
         "capture.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(mip)",
         "GetSamplerState(0, D3DSAMP_SRGBTEXTURE, &srgb)"
     ]

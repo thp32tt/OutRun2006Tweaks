@@ -20,7 +20,7 @@ def wired(s: str) -> bool:
         "addressV != D3DTADDRESS_MIRROR && addressV != D3DTADDRESS_MIRRORONCE)",
         "capture.addressU = static_cast<D3DTEXTUREADDRESS>(addressU);",
         "capture.addressV = static_cast<D3DTEXTUREADDRESS>(addressV);",
-        "maxMip != 0u || mipBias != 0u",
+        "(mip == D3DTEXF_NONE && maxMip != 0u) || mipBias != 0u",
         "srgb ||",
     ]
     sampler_required = [
