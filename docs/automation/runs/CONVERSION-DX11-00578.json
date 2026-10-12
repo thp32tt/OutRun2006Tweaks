@@ -11,9 +11,9 @@
   "base_sha": "a2441e36412bc1f5d298f4e5e1bf0c1e23e8cbc6",
   "work_key": "DX11:MENU_RACE_TEXTURE_SELECTARG1_INDEPENDENT_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "MATERIAL_COMMITTED_GATE_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "native_gameplay_activation": false,
   "hmd_test_performed": false,
@@ -59,10 +59,58 @@
     "C0_RECOVER": "GitHub a2441e36412bc1f5d298f4e5e1bf0c1e23e8cbc6; 00577 exact-SHA passed",
     "C1_REVIEW": "Two missing texture-RGB independent alpha paths",
     "C2_IMPLEMENT": "Live capture and HLSL/native Draw chain",
-    "C3_VALIDATE": "Build #38187773655 FAIL inherited factor mixed-alpha anchor line 1792; fixed nested operand bypass preserving legacy (+ 00578 own test anchor); exact-SHA Actions recheck pending",
-    "C4_COMMIT": "Atomic three-file no-skip material commit",
+    "C3_VALIDATE": "Five mandatory exact-SHA Actions SUCCESS at 2a1d03a74d2dc692abd330d9139959e72d3cdaba; Build executed new 00578 destructive regressions; Quest3/VDXR/in-game/gamepad UNTESTED",
+    "C4_COMMIT": "C++ initial material e712805fec74941f2aa1946580c84fcebf2535d8; validation-bearing repair 2a1d03a74d2dc692abd330d9139959e72d3cdaba (no CI skip); subsequent C6 [skip ci] documentation only",
     "C5_PACKAGE": "NOT_REQUIRED diagnostic",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "Exact-SHA PASS_EXACT_SHA; source and tests BUILD_VERIFIED; HMD/gamepad UNTESTED; no native gameplay promotion; no score for bookkeeping"
   },
-  "next_action": "Check new exact validation-bearing SHA five mandatory GitHub Actions. Quest3/VDXR and gamepad remain UNTESTED."
+  "next_action": "Controller select next independent live-game DX11 drawing feature; 00578 complete build-verified only, Quest3/VDXR/gamepad and in-game visuals remain NEED_HMD_TEST; DXVK frozen.",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "material_result_sha": "e712805fec74941f2aa1946580c84fcebf2535d8",
+  "validation_bearing_result_sha": "2a1d03a74d2dc692abd330d9139959e72d3cdaba",
+  "result_sha": "2a1d03a74d2dc692abd330d9139959e72d3cdaba",
+  "validation_evidence": {
+    "exact_sha": "2a1d03a74d2dc692abd330d9139959e72d3cdaba",
+    "github_workflow_runs_observed": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 38187873482,
+        "conclusion": "success",
+        "head_sha": "2a1d03a74d2dc692abd330d9139959e72d3cdaba"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 38187873494,
+        "conclusion": "success",
+        "head_sha": "2a1d03a74d2dc692abd330d9139959e72d3cdaba"
+      },
+      {
+        "name": "Build",
+        "run_id": 38187876172,
+        "conclusion": "success",
+        "head_sha": "2a1d03a74d2dc692abd330d9139959e72d3cdaba"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38187876173,
+        "conclusion": "success",
+        "head_sha": "2a1d03a74d2dc692abd330d9139959e72d3cdaba"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38187876161,
+        "conclusion": "success",
+        "head_sha": "2a1d03a74d2dc692abd330d9139959e72d3cdaba"
+      }
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "hmd": false,
+      "in_game": false,
+      "gamepad": false
+    },
+    "feature_acceptance": "source/build/CI verified only; live diagnostic visible-inset gameplay/Quest3/VDXR evidence not claimed"
+  },
+  "state_persisted": true,
+  "updated_utc": "2026-10-12T00:36:06.845Z"
 }
