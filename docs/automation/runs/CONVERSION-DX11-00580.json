@@ -11,9 +11,9 @@
   "base_sha": "2bbbaf6a4dbe984e29252fb4819857134044390c",
   "work_key": "DX11:MENU_RACE_SELECTARG2_ARITH_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "native_gameplay_activation": false,
   "hmd_test_performed": false,
@@ -53,5 +53,33 @@
     "tools/test_dx11_selectarg2_arithmetic_alpha_00580.py",
     "docs/automation/runs/CONVERSION-DX11-00580.json"
   ],
-  "next_action": "Run exact-SHA mandatory Gate, DX11 Fast, Build, OpenXR checks; separate C6 only after verified success; runtime HMD/gamepad test pending."
+  "next_action": "Controller: do not retry 00580. Next independent DX11 native gameplay feature may proceed. Quest3/VDXR/menu/race/gamepad parity remains NEED_HMD_TEST; no backend promotion.",
+  "material_result_sha": "42915747e667543960806cde51ef1cf9fa560b8f",
+  "validation_bearing_result_sha": "e04b591b6ff56f5c9d45a14d1874a0b3846ab789",
+  "evidence": {
+    "backend_gate_run_id": 38190299060,
+    "backend_gate_conclusion": "success",
+    "backend_gate_jobs": "validate and DX11 readiness smoke succeeded",
+    "dx11_fast_run_id": 38190299066,
+    "dx11_fast_conclusion": "success",
+    "build_run_id": 38190301546,
+    "build_conclusion": "success",
+    "build_feature_acceptance": "DX11 LIVE-CALLSITE/NATIVE-DRAW/VISIBLE-FRAME/SAFE-RETURN success; new 17 destructive mutation controls invoked",
+    "openxr_run_ids": [
+      38190301543
+    ],
+    "openxr_conclusions": [
+      "success"
+    ],
+    "hud_inspector_run_id": 38190301531,
+    "hud_inspector_conclusion": "success",
+    "vr_pc_fast_test_build_run_id": 38190299086,
+    "vr_pc_fast_test_build_conclusion": "skipped (not mandatory)",
+    "original_material_sha": "42915747e667543960806cde51ef1cf9fa560b8f",
+    "repair_validation_sha": "e04b591b6ff56f5c9d45a14d1874a0b3846ab789",
+    "hmd_game_quest3_vdxr_test": "not performed",
+    "gamepad_test": "not performed",
+    "runtime_validation": "UNTESTED",
+    "notes": "CI/source-build success is not live gameplay visual, FPS, Quest3/VDXR, or gamepad evidence."
+  }
 }
