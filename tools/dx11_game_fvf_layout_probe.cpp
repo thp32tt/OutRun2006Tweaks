@@ -413,5 +413,58 @@ int main() {
     assert(chosen[0] == .8f && chosen[1] == .9f);
     assert(!game_fvf_decode_vertex(&raceFourth, 63u, layout, sample));
     assert(sample.uv4[1] == .9f);
+
+    // 00613: MENU / VEHICLE / RACE game FVF TEX5..8 tail slots are
+    // packed U-only. The live capture coordIndex can select all eight UVs.
+    for (std::uint32_t slot = 4u; slot < 8u; ++slot) {
+        const std::uint32_t sizeFlag = kGameFvfTexcoordSize1_4 << (2u * (slot - 4u));
+        const std::uint32_t texCount = (slot + 1u) << 8u;
+        assert(!game_fvf_layout(kGameFvfXyzRhw | (texCount - kGameFvfTex1) |
+                                sizeFlag, layout));
+        assert(!game_fvf_layout(kGameFvfXyzRhw | texCount |
+                                (sizeFlag & ~(1u << (16u + 2u * slot))), layout));
+        assert(game_fvf_layout(kGameFvfXyzRhw | texCount | sizeFlag, layout));
+        assert(layout.minStride == 16u + 8u * (slot + 1u) - 4u);
+    }
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex8 |
+                           kGameFvfTexcoordSize1_4 | kGameFvfTexcoordSize1_5 |
+                           kGameFvfTexcoordSize1_6 | kGameFvfTexcoordSize1_7, layout));
+    assert(layout.minStride == 64u);
+    struct MenuTailPackedU { float x,y,z,rhw, u0,v0,u1,v1,u2,v2,u3,v3, u4,u5,u6,u7; };
+    MenuTailPackedU menuTail{1,2,.4f,1.f,.1f,.2f,.3f,.4f,.5f,.6f,.7f,.8f,
+                             .41f,.52f,.63f,.74f};
+    assert(sizeof(menuTail) == 64u);
+    assert(game_fvf_decode_vertex(&menuTail, sizeof(menuTail), layout, sample));
+    for (std::uint32_t slot = 4u; slot < 8u; ++slot) {
+        assert(game_fvf_select_uv(sample, layout, slot, chosen));
+        assert(chosen[1] == 0.f);
+    }
+    assert(game_fvf_select_uv(sample, layout, 7u, chosen));
+    assert(chosen[0] == .74f && chosen[1] == 0.f);
+    const auto goodTail = sample;
+    assert(!game_fvf_decode_vertex(&menuTail, 63u, layout, sample));
+    assert(sample.uv7[0] == goodTail.uv7[0]);
+    auto corruptTail = layout;
+    corruptTail.eighthTexcoord1D = false;
+    assert(!game_fvf_decode_vertex(&menuTail, sizeof(menuTail), corruptTail, sample));
+    assert(sample.uv7[0] == goodTail.uv7[0]);
+
+    // U-only stage4 must not shift later stage5..7 float2, including the
+    // actually selected stage7 UV. Normal/diffuse bytes precede UV capture.
+    assert(game_fvf_layout(kGameFvfXyz | kGameFvfNormal | kGameFvfDiffuse |
+                           kGameFvfTex8 | kGameFvfTexcoordSize1_4, layout));
+    assert(layout.minStride == 28u + 8u * 8u - 4u);
+    struct RaceTailMixed { float x,y,z,nx,ny,nz; std::uint32_t color;
+                           float u0,v0,u1,v1,u2,v2,u3,v3,u4,u5,v5,u6,v6,u7,v7; };
+    RaceTailMixed raceTail{1,2,3,0,1,0,0xffaabbccu,.1f,.2f,.3f,.4f,.5f,.6f,
+                           .7f,.8f,.9f,.15f,.25f,.35f,.45f,.85f,.95f};
+    assert(sizeof(raceTail) == 88u);
+    assert(game_fvf_decode_vertex(&raceTail, sizeof(raceTail), layout, sample));
+    assert(game_fvf_select_uv(sample, layout, 4u, chosen));
+    assert(chosen[0] == .9f && chosen[1] == 0.f);
+    assert(game_fvf_select_uv(sample, layout, 7u, chosen));
+    assert(chosen[0] == .85f && chosen[1] == .95f);
+    assert(!game_fvf_decode_vertex(&raceTail, 87u, layout, sample));
+    assert(sample.uv7[1] == .95f);
     return 0;
 }

@@ -1559,6 +1559,51 @@ def main() -> None:
     print("DX11 TEXCOORDSIZE1(3) packed native Draw regression PASS (static only)")
 
 
+
+    # 00613: real GetFVF -> tail TEXCOORDSIZE1(4..7) packed bytes ->
+    # stage-indexed UV -> native Draw/DrawIndexed, not standalone WARP.
+    def tail_u_native_linked(src: str, hdr: str, fixture: str) -> bool:
+        return all(x in src for x in (
+            "kGameFvfTexcoordSize1_7 == D3DFVF_TEXCOORDSIZE1(7)",
+            "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+        )) and all(x in hdr for x in (
+            "kGameFvfTexcoordSize1_4 = 0x03000000u;",
+            "kGameFvfTexcoordSize1_7 = 0xc0000000u;",
+            "(eighthTexcoord1D && texcoordBits < kGameFvfTex8)",
+            "candidate.eighthTexcoord1D = eighthTexcoord1D;",
+            "(layout.eighthTexcoord1D ? 4u : 0u)",
+            "(slot == 7u && layout.eighthTexcoord1D)",
+            "layout.fifthTexcoord1D || layout.sixthTexcoord1D ||",
+        )) and all(x in fixture for x in (
+            "struct MenuTailPackedU", "struct RaceTailMixed",
+            "chosen[0] == .74f && chosen[1] == 0.f",
+            "chosen[0] == .85f && chosen[1] == .95f",
+            "!game_fvf_decode_vertex(&menuTail, 63u",
+            "!game_fvf_decode_vertex(&raceTail, 87u",
+            "corruptTail.eighthTexcoord1D = false;",
+        ))
+    assert tail_u_native_linked(bridge, layout_source, probe_source)
+    for old, wrong in (
+        ("kGameFvfTexcoordSize1_7 == D3DFVF_TEXCOORDSIZE1(7)",
+         "kGameFvfTexcoordSize1_7 != D3DFVF_TEXCOORDSIZE1(7)"),
+        ("(eighthTexcoord1D && texcoordBits < kGameFvfTex8)",
+         "(eighthTexcoord1D && texcoordBits < kGameFvfTex7)"),
+        ("candidate.eighthTexcoord1D = eighthTexcoord1D;",
+         "candidate.eighthTexcoord1D = false;"),
+        ("(layout.eighthTexcoord1D ? 4u : 0u)",
+         "(layout.eighthTexcoord1D ? 0u : 0u)"),
+        ("(slot == 7u && layout.eighthTexcoord1D)",
+         "(slot == 6u && layout.eighthTexcoord1D)"),
+    ):
+        if old in bridge:
+            mutant = bridge.replace(old, wrong, 1)
+            assert mutant != bridge and not tail_u_native_linked(mutant, layout_source, probe_source)
+        else:
+            mutant = layout_source.replace(old, wrong, 1)
+            assert mutant != layout_source and not tail_u_native_linked(bridge, mutant, probe_source)
+    print("DX11 TEXCOORDSIZE1(4..7) packed live native Draw regression PASS (static only)")
+
     # 00558: real game-authored D3D9 stage0 BLENDTEXTUREALPHA /
     # BLENDDIFFUSEALPHA -> owned native PS -> Draw/DrawIndexed -> opt-in inset.
     # Checks source-to-consumer links, shader/reset lifecycle and fail-closed
