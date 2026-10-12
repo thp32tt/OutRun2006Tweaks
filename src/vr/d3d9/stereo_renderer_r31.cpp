@@ -317,6 +317,11 @@ namespace OutRunVRStereo
             // inverting a 4x4 matrix for every crowd/particle world draw when
             // the pose, eye geometry, scale and projection cache key is stable.
             // On inversion failure, leave the last valid cache untouched.
+            // A successful exact pose/geometry/projection cache hit already
+            // proved this projection finite. Recheck only on a changed key,
+            // before inversion and any transactional eye-tail publication.
+            if (!R30SupportMatrixFinite(projection))
+                return false;
             R31EyeTailCache next{};
             D3DMATRIX inverseProjection{};
             if (!R30SupportGetInverseProjection(projection, inverseProjection))
@@ -408,8 +413,7 @@ namespace OutRunVRStereo
                 projectionPoseSequence != poseSequence)
                 return false;
             std::memcpy(&projection, verifiedProjection, sizeof(projection));
-            if (!R30SupportMatrixFinite(projection) ||
-                !R31PrepareEyeTailCache(stereo, projection))
+            if (!R31PrepareEyeTailCache(stereo, projection))
                 return false;
 
             // A successful live WVP sample may differ within the verified epsilon.

@@ -56,6 +56,23 @@ def violations(source: str) -> list[str]:
         errors.append("inverseProjection: caller performs per-draw inversion")
     if "R31PrepareEyeTailCache(stereo, projection)" not in caller:
         errors.append("inverseProjection: caller does not use cached inverse")
+    # Busy-stage world draws still fetch the verified projection to bind the
+    # generation, but their unchanged key must not rescan 16 floats for NaN
+    # after R31PrepareEyeTailCache proved that exact projection finite.
+    if "R30SupportMatrixFinite(projection)" in caller:
+        errors.append("projection: redundant finite scan on every world draw")
+    finite_guard = "if (!R30SupportMatrixFinite(projection))"
+    if prepare.count(finite_guard) != 1:
+        errors.append("projection: missing/duplicated cache-miss finite gate")
+    else:
+        try:
+            if not (prepare.index("return true;") <
+                    prepare.index(finite_guard) <
+                    prepare.index("R30SupportGetInverseProjection(") <
+                    prepare.index("R31EyeCache = next;")):
+                errors.append("projection: finite check must precede inversion/publish on cache miss")
+        except ValueError:
+            errors.append("projection: miss-only finite ordering anchor lost")
     if "currentWvp, R31EyeCache.composedEyeTail[eye]);" not in caller:
         errors.append("composedEyeTail: per-draw path still runs a third multiply")
     if "correctedWorldView" in caller:
@@ -84,6 +101,7 @@ def main() -> None:
         "std::memcpy(next.eyeFov, stereo.eyeFov,",
         "R31ProjectionMatches(R31EyeCache.projection, projection)",
         "R30SupportGetInverseProjection(projection, inverseProjection)",
+        "if (!R30SupportMatrixFinite(projection))",
         "next.inverseProjection = inverseProjection;",
         "next.composedEyeTail[eye] = R30SupportMultiplyMatrix(",
         "if (!R30SupportMatrixFinite(next.composedEyeTail[eye]))",
