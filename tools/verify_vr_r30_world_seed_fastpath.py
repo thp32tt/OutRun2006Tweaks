@@ -72,9 +72,20 @@ mutations = [
      "usedMask && usedMask->size() < 0))"),
 ]
 for name, before, after in mutations:
-    assert SOURCE.count(before) == 1, (name, "fixture")
-    assert not contract(SOURCE.replace(before, after, 1)), (
-        name, "escaped destructive mutation")
+    # The sparse density rule is also used by the separate ScreenHud path.
+    # Mutate this feature's producer, not the unrelated HUD implementation.
+    if name in ("no fallback re-seed", "no right fallback",
+                "invalid buffer protection"):
+        assert SOURCE.count(before) == 1, (name, "fixture")
+        damaged = SOURCE.replace(before, after, 1)
+    else:
+        start = SOURCE.index("bool R30SeedWorldXyzrhwBuffers(")
+        end = SOURCE.index("bool R30TransformXyzrhwVertices(", start)
+        section = SOURCE[start:end]
+        assert section.count(before) == 1, (name, "seed fixture")
+        damaged = (SOURCE[:start] + section.replace(before, after, 1)
+                   + SOURCE[end:])
+    assert not contract(damaged), (name, "escaped destructive mutation")
 
 
 def seed(src, stride, mask, left, right):
