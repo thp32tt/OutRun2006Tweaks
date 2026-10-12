@@ -533,6 +533,11 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "R186 indexed Draw WARP probe failed: $LASTEXITCODE" }
 
 
+      # 00607: game-state D3D9 destination-alpha crossfade native OM + destructive tests.
+      - name: Verify 00607 native dest-alpha crossfade
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_native_destalpha_crossfade_00607.py
+
       # 00606: game-authored native Draw/DrawIndexed destination/source complement OM.
       - name: Verify 00606 native inverse-modulation blend and failure mutants
         if: github.ref_name == 'vr-dx11-native-r71'
