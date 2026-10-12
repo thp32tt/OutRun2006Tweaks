@@ -1,0 +1,344 @@
+[
+  {
+    "queue_index": 61,
+    "owner": "B",
+    "relative_path": "textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+    "source": {
+      "git_blob_sha": "aa0e87be65349bca1ddad278f8f336f9511c95f5",
+      "sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+      "size": 67108992
+    },
+    "final": {
+      "git_blob_sha": "0c57868bb7486296ccd39c50d7157ba545aff9b5",
+      "sha256": "df250af92785727f38d176f3b2569c9d6d2b0e7a3f7d296adaa2f5c343b1d71e",
+      "size": 67108992
+    },
+    "source_header": {
+      "width": 4096,
+      "height": 4096,
+      "bpp": 32,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "mipmaps": 1,
+      "header_hex_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f",
+      "pf_masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ]
+    },
+    "final_header": {
+      "width": 4096,
+      "height": 4096,
+      "bpp": 32,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "mipmaps": 1,
+      "header_hex_sha256": "1423e78cee15fd3ff3c64370535b96c9892e47010f24f4f692e4ca6d59faf24f",
+      "pf_masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ]
+    },
+    "dds_header_match": true,
+    "raw_vs_source": {
+      "count": 795351,
+      "alpha_changed": 425798,
+      "bbox_raw": [
+        1030,
+        1267,
+        4076,
+        3098
+      ],
+      "bbox_readable_flipy": [
+        1030,
+        998,
+        4076,
+        2829
+      ]
+    },
+    "comparison_roi_flipy": [
+      995,
+      963,
+      4096,
+      2864
+    ],
+    "comparison_roi_raw": [
+      995,
+      1232,
+      4096,
+      3133
+    ],
+    "clean": null,
+    "clean_reuse_sha": null,
+    "preview_only_not_actual_game_size": true
+  },
+  {
+    "queue_index": 102,
+    "owner": "B",
+    "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+    "source": {
+      "git_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc",
+      "sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+      "size": 524416
+    },
+    "final": {
+      "git_blob_sha": "27c5143929b2069107671b4292552395c60bde61",
+      "sha256": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db",
+      "size": 524416
+    },
+    "source_header": {
+      "width": 2048,
+      "height": 256,
+      "bpp": 0,
+      "fourcc": "DXT5",
+      "mipmaps": 1,
+      "header_hex_sha256": "8d683f2e35a0578e22bd2efbb253dbe19f5443a84ed4742918af3999066f81c2",
+      "pf_masks": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "final_header": {
+      "width": 2048,
+      "height": 256,
+      "bpp": 0,
+      "fourcc": "DXT5",
+      "mipmaps": 1,
+      "header_hex_sha256": "8d683f2e35a0578e22bd2efbb253dbe19f5443a84ed4742918af3999066f81c2",
+      "pf_masks": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "dds_header_match": true,
+    "raw_vs_source": {
+      "count": 216541,
+      "alpha_changed": 133061,
+      "bbox_raw": [
+        380,
+        4,
+        1612,
+        248
+      ],
+      "bbox_readable_flipy": [
+        380,
+        8,
+        1612,
+        252
+      ]
+    },
+    "comparison_roi_flipy": [
+      355,
+      0,
+      1637,
+      256
+    ],
+    "comparison_roi_raw": [
+      355,
+      0,
+      1637,
+      256
+    ],
+    "clean": {
+      "path": "localization/graphics/role_C/20261004-1720-C91/C91_571E78F3_CLEAN_PLATE.png",
+      "sha256": "ae251bdbf52b2a9783ff8eaf56fe4069e432380f389109e7c6e7f31350ccf4d5",
+      "git_blob_sha": "8a0eb96812ba7be9c902a206253cfca735a22b12",
+      "source_clean": {
+        "count": 194236,
+        "alpha_changed": 194236,
+        "bbox_raw": [
+          395,
+          15,
+          1590,
+          245
+        ],
+        "bbox_readable_flipy": [
+          395,
+          11,
+          1590,
+          241
+        ]
+      },
+      "clean_final": {
+        "count": 135163,
+        "alpha_changed": 116357,
+        "bbox_raw": [
+          380,
+          8,
+          1612,
+          252
+        ],
+        "bbox_readable_flipy": [
+          380,
+          4,
+          1612,
+          248
+        ]
+      },
+      "mask_path": "localization/graphics/role_C/20261004-1720-C91/C91_571E78F3_SOURCE_TEXT_MASK.png",
+      "protected_mask_path": "localization/graphics/role_C/20261004-1720-C91/C91_571E78F3_PROTECTED_MASK.png",
+      "source_clean_outside_old_mask_pixels": 0,
+      "source_clean_on_protected_mask_pixels": 0,
+      "source_final_on_protected_mask_pixels": 15427,
+      "source_clean_outside_mask_bbox_readable": null
+    },
+    "clean_reuse_sha": null,
+    "preview_only_not_actual_game_size": true
+  },
+  {
+    "queue_index": 104,
+    "owner": "B",
+    "relative_path": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+    "source": {
+      "git_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6",
+      "sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+      "size": 524416
+    },
+    "final": {
+      "git_blob_sha": "ab927446b52abf1677d331c04be571aa79b48c94",
+      "sha256": "c84a2703d0a22b36384e07ce72d4e761e651a1a23219cd78153b4a0aff022505",
+      "size": 524416
+    },
+    "source_header": {
+      "width": 2048,
+      "height": 256,
+      "bpp": 0,
+      "fourcc": "DXT5",
+      "mipmaps": 1,
+      "header_hex_sha256": "8d683f2e35a0578e22bd2efbb253dbe19f5443a84ed4742918af3999066f81c2",
+      "pf_masks": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "final_header": {
+      "width": 2048,
+      "height": 256,
+      "bpp": 0,
+      "fourcc": "DXT5",
+      "mipmaps": 1,
+      "header_hex_sha256": "8d683f2e35a0578e22bd2efbb253dbe19f5443a84ed4742918af3999066f81c2",
+      "pf_masks": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "dds_header_match": true,
+    "raw_vs_source": {
+      "count": 141675,
+      "alpha_changed": 85601,
+      "bbox_raw": [
+        380,
+        48,
+        1372,
+        212
+      ],
+      "bbox_readable_flipy": [
+        380,
+        44,
+        1372,
+        208
+      ]
+    },
+    "comparison_roi_flipy": [
+      355,
+      19,
+      1397,
+      233
+    ],
+    "comparison_roi_raw": [
+      355,
+      23,
+      1397,
+      237
+    ],
+    "clean": null,
+    "clean_reuse_sha": "505f82b65bd188f2acdb92a024fbd8764e20f47730de69e26a1d6d1b59a20394",
+    "preview_only_not_actual_game_size": true
+  },
+  {
+    "queue_index": 60,
+    "owner": "B",
+    "relative_path": "textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+    "source": {
+      "git_blob_sha": "9c0e3bf47ec433cfc115eacd0836268581f0579e",
+      "sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "size": 33554560
+    },
+    "final": {
+      "git_blob_sha": "e1e0f27a621762dd69086fc4b0e97f6a2ddcda6f",
+      "sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+      "size": 33554560
+    },
+    "source_header": {
+      "width": 4096,
+      "height": 2048,
+      "bpp": 32,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "mipmaps": 1,
+      "header_hex_sha256": "8879e51b5ae7689d58b86a80001060eda7286fbfde07a03702b2f4cfa128df57",
+      "pf_masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ]
+    },
+    "final_header": {
+      "width": 4096,
+      "height": 2048,
+      "bpp": 32,
+      "fourcc": "\u0000\u0000\u0000\u0000",
+      "mipmaps": 1,
+      "header_hex_sha256": "8879e51b5ae7689d58b86a80001060eda7286fbfde07a03702b2f4cfa128df57",
+      "pf_masks": [
+        255,
+        65280,
+        16711680,
+        4278190080
+      ]
+    },
+    "dds_header_match": true,
+    "raw_vs_source": {
+      "count": 1594987,
+      "alpha_changed": 1144683,
+      "bbox_raw": [
+        19,
+        163,
+        4054,
+        1928
+      ],
+      "bbox_readable_flipy": [
+        19,
+        120,
+        4054,
+        1885
+      ]
+    },
+    "comparison_roi_flipy": [
+      0,
+      85,
+      4089,
+      1920
+    ],
+    "comparison_roi_raw": [
+      0,
+      128,
+      4089,
+      1963
+    ],
+    "clean": null,
+    "clean_reuse_sha": null,
+    "preview_only_not_actual_game_size": true
+  }
+]

@@ -1,0 +1,371 @@
+{
+  "schema": "outrun-c1-sha-bound-4asset-fast-qa-v3",
+  "task_id": "OUTRUN-C1-20261013-0010-Q061-Q102-Q104-Q060",
+  "started_kst": "2026-10-13 00:10 KST",
+  "reviewed_at_utc": "2026-10-12T15:25:28.311Z",
+  "base_head": "3a1839461062904b6aeb2623492185556430d00c",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md"
+  ],
+  "comparison": {
+    "path": "localization/graphics/role_C1/20261013-C1-Q061-Q102-Q104-Q060-SHA-FAST-HOLD/C1_Q061_Q102_Q104_Q060_BATCH_SOURCE_READABLE_CLEAN_SAVED_RAW_FLIPY_75_50.jpg",
+    "original_panels": [
+      "SOURCE RAW",
+      "SOURCE READABLE/FLIPY",
+      "CLEAN READABLE where independently bound",
+      "FINAL SAVED DDS RAW",
+      "FINAL SAVED DDS FLIPY",
+      "FINAL at reference resize 75pct",
+      "FINAL at reference resize 50pct"
+    ],
+    "real_game_use_size_verified": false,
+    "description": "source/candidate exact-Git-blob/persisted-DDS comparisons; native source RAW and FLIPY, full source-vs-final delta; compressed DXT5 decoded from persisted bytes"
+  },
+  "machine_evidence": "localization/graphics/role_C1/20261013-C1-Q061-Q102-Q104-Q060-SHA-FAST-HOLD/C1_Q061_Q102_Q104_Q060_INDEPENDENT_PIXEL_MACHINE.json",
+  "source_clean_independence": "q102 independent source->clean full-frame mask metric in linked MACHINE; q104 unchanged source and clean SHA scoped C1 review reused; q061 and q060 no full independent source->clean layer, HOLD",
+  "items": [
+    {
+      "queue_index": 61,
+      "producer": "B",
+      "reviewer": "C1 - QA only",
+      "source": {
+        "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+        "sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+        "git_blob_sha": "aa0e87be65349bca1ddad278f8f336f9511c95f5"
+      },
+      "clean": null,
+      "final_saved_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/C4A2937B_1024x1024.dds",
+        "sha256": "df250af92785727f38d176f3b2569c9d6d2b0e7a3f7d296adaa2f5c343b1d71e",
+        "git_blob_sha": "0c57868bb7486296ccd39c50d7157ba545aff9b5"
+      },
+      "source_clean_check": {
+        "result": "HOLD_NO_SHA_PINNED_VALID_CLEAN",
+        "source_sha256": "821dddc662ca2349aa313f49278d5558c07e29b7a8f5d755e6987a349f0e7dd0",
+        "clean_sha256": null,
+        "reused_independent_review": false,
+        "stage_separate_from_final": true
+      },
+      "final_dds_check": {
+        "result": "HOLD",
+        "source_final_sha_pinned": true,
+        "source_final_header_equal": true,
+        "original_DDS": {
+          "width": 4096,
+          "height": 4096,
+          "mips": 1,
+          "format": "RGBA32"
+        },
+        "persisted_raw_flipy_checked": true,
+        "real_game_used_size_checked": false,
+        "source_final_delta": {
+          "changed_pixels": 795351,
+          "changed_alpha_pixels": 425798,
+          "bbox_raw_xyxy": [
+            1030,
+            1267,
+            4076,
+            3098
+          ],
+          "bbox_readable_flipy_xyxy": [
+            1030,
+            998,
+            4076,
+            2829
+          ]
+        },
+        "proven_game_defect_bbox_xyxy": null,
+        "not_yet_resolved": [
+          "SOURCE_CLEAN_SHA_NOT_ESTABLISHED",
+          "SHARED_SCORE_HUD_UI_CELL_AND_INGAME_OPEN",
+          "FULL_ATLAS_INVENTORY_UNVERIFIED"
+        ],
+        "risk": {
+          "note": "Many localized score/HUD labels visible. Source-clean binding and game/HUD UV sampling are absent; cannot certify untouched protected art."
+        }
+      },
+      "translation_coverage": {
+        "scope": "q-specific saved DDS visually reviewed through full-atlas downsample; q102/104 text crop read at image size (not game tested)",
+        "source_en": null,
+        "korean": null,
+        "visible_labels_count": null,
+        "inspected_untranslated_count": null,
+        "confidence": "multi-label atlas uncounted",
+        "total_translatable_labels": null,
+        "total_untranslated_labels": null,
+        "whole_asset_complete": false
+      },
+      "verdict": "HOLD",
+      "release_gate": "TEST_ONLY_LEGACY_C2_CONSUMER_NOT_MIGRATED",
+      "C2": "RETIRED_NO_NEW_TOKEN",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "queue_index": 102,
+      "producer": "B",
+      "reviewer": "C1 - QA only",
+      "source": {
+        "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+        "sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+        "git_blob_sha": "12a935df311634cb64ff01bddce2b7a1165a2ccc"
+      },
+      "clean": {
+        "path": "localization/graphics/role_C/20261004-1720-C91/C91_571E78F3_CLEAN_PLATE.png",
+        "sha256": "ae251bdbf52b2a9783ff8eaf56fe4069e432380f389109e7c6e7f31350ccf4d5",
+        "git_blob_sha": "8a0eb96812ba7be9c902a206253cfca735a22b12",
+        "check_result": "SOURCE_CLEAN_MASK_SCOPED_PASS",
+        "outside_old_mask_pixels": 0,
+        "on_supplied_protected_mask_pixels": 0
+      },
+      "final_saved_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+        "sha256": "d5ef9adb659e3013d9d3e581d89366a28599f250be1883e13c35c0f88d9338db",
+        "git_blob_sha": "27c5143929b2069107671b4292552395c60bde61"
+      },
+      "source_clean_check": {
+        "result": "SOURCE_CLEAN_MASK_SCOPED_PASS",
+        "source_sha256": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+        "clean_sha256": "ae251bdbf52b2a9783ff8eaf56fe4069e432380f389109e7c6e7f31350ccf4d5",
+        "reused_independent_review": false,
+        "stage_separate_from_final": true
+      },
+      "final_dds_check": {
+        "result": "HOLD",
+        "source_final_sha_pinned": true,
+        "source_final_header_equal": true,
+        "original_DDS": {
+          "width": 2048,
+          "height": 256,
+          "mips": 1,
+          "format": "DXT5/BC3"
+        },
+        "persisted_raw_flipy_checked": true,
+        "real_game_used_size_checked": false,
+        "source_final_delta": {
+          "changed_pixels": 216541,
+          "changed_alpha_pixels": 133061,
+          "bbox_raw_xyxy": [
+            380,
+            4,
+            1612,
+            248
+          ],
+          "bbox_readable_flipy_xyxy": [
+            380,
+            8,
+            1612,
+            252
+          ]
+        },
+        "proven_game_defect_bbox_xyxy": null,
+        "not_yet_resolved": [
+          "INDEPENDENT_REAL_CELL_UV_NOT_VERIFIED",
+          "SOURCE_FINAL_SUPPLIED_PROTECTED_MASK_INTERSECTION_NEEDS_QUALIFICATION"
+        ],
+        "risk": {
+          "note": "Current compressed final changes 15,427 pixels intersect supplied C91 protected mask; mask is not independently verified UI art extent. C91 old cell rectangles exist but are not proven UV mapping; no proven real defect or tolerance assumed.",
+          "measured_affected_bbox_raw": [
+            380,
+            4,
+            1612,
+            248
+          ]
+        }
+      },
+      "translation_coverage": {
+        "scope": "q-specific saved DDS visually reviewed through full-atlas downsample; q102/104 text crop read at image size (not game tested)",
+        "source_en": "Time Attack Mode / 15 Continuous Course",
+        "korean": "타임 어택 모드 / 15코스 연속",
+        "visible_labels_count": 2,
+        "inspected_untranslated_count": 0,
+        "confidence": "visible_crop_only",
+        "total_translatable_labels": null,
+        "total_untranslated_labels": null,
+        "whole_asset_complete": false
+      },
+      "verdict": "HOLD",
+      "release_gate": "TEST_ONLY_LEGACY_C2_CONSUMER_NOT_MIGRATED",
+      "C2": "RETIRED_NO_NEW_TOKEN",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "queue_index": 104,
+      "producer": "B",
+      "reviewer": "C1 - QA only",
+      "source": {
+        "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+        "sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+        "git_blob_sha": "1cc92c914687546fbef9b47dd1134659c2f1f0f6"
+      },
+      "clean": {
+        "sha256": "505f82b65bd188f2acdb92a024fbd8764e20f47730de69e26a1d6d1b59a20394",
+        "check_result": "REUSE_PREVIOUS_C1_SOURCE_CLEAN_SHA_REVIEW_SCOPE_ONLY",
+        "evidence_path": "localization/graphics/role_C1/20261012-C1-Q099-Q104-HD-SAVED-FIRST/C1_Q099_Q104_INDEPENDENT_HDPX_QA.json",
+        "source_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+        "confirmation": "prior q104 C1 scoped SOURCE->CLEAN record, candidate final not re-approved"
+      },
+      "final_saved_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+        "sha256": "c84a2703d0a22b36384e07ce72d4e761e651a1a23219cd78153b4a0aff022505",
+        "git_blob_sha": "ab927446b52abf1677d331c04be571aa79b48c94"
+      },
+      "source_clean_check": {
+        "result": "REUSE_PREVIOUS_C1_SOURCE_CLEAN_SHA_REVIEW_SCOPE_ONLY",
+        "source_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+        "clean_sha256": "505f82b65bd188f2acdb92a024fbd8764e20f47730de69e26a1d6d1b59a20394",
+        "reused_independent_review": true,
+        "stage_separate_from_final": true
+      },
+      "final_dds_check": {
+        "result": "HOLD",
+        "source_final_sha_pinned": true,
+        "source_final_header_equal": true,
+        "original_DDS": {
+          "width": 2048,
+          "height": 256,
+          "mips": 1,
+          "format": "DXT5/BC3"
+        },
+        "persisted_raw_flipy_checked": true,
+        "real_game_used_size_checked": false,
+        "source_final_delta": {
+          "changed_pixels": 141675,
+          "changed_alpha_pixels": 85601,
+          "bbox_raw_xyxy": [
+            380,
+            48,
+            1372,
+            212
+          ],
+          "bbox_readable_flipy_xyxy": [
+            380,
+            44,
+            1372,
+            208
+          ]
+        },
+        "proven_game_defect_bbox_xyxy": null,
+        "not_yet_resolved": [
+          "SOURCE_CLEAN_REVIEW_REUSED_SHA_PINNED",
+          "FINAL_REAL_UI_CELL_UV_NOT_VERIFIED",
+          "DXT5_BLOCK_PROTECTION_CHECK_OPEN"
+        ],
+        "risk": {
+          "note": "Current full saved DXT5 final reviewed independently, no verified UV cell / independently tested BC protection block map. Visual glyph appears legible; whole-cell approval withheld."
+        }
+      },
+      "translation_coverage": {
+        "scope": "q-specific saved DDS visually reviewed through full-atlas downsample; q102/104 text crop read at image size (not game tested)",
+        "source_en": "OutRun Mode",
+        "korean": "아웃런 모드",
+        "visible_labels_count": 1,
+        "inspected_untranslated_count": 0,
+        "confidence": "visible_crop_only",
+        "total_translatable_labels": null,
+        "total_untranslated_labels": null,
+        "whole_asset_complete": false
+      },
+      "verdict": "HOLD",
+      "release_gate": "TEST_ONLY_LEGACY_C2_CONSUMER_NOT_MIGRATED",
+      "C2": "RETIRED_NO_NEW_TOKEN",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "queue_index": 60,
+      "producer": "B",
+      "reviewer": "C1 - QA only",
+      "source": {
+        "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+        "sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+        "git_blob_sha": "9c0e3bf47ec433cfc115eacd0836268581f0579e"
+      },
+      "clean": null,
+      "final_saved_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+        "sha256": "d81d0d144f2c4b8192021f9e0b49c7ad44f753da68d6f5dd66f18fe907d06b01",
+        "git_blob_sha": "e1e0f27a621762dd69086fc4b0e97f6a2ddcda6f"
+      },
+      "source_clean_check": {
+        "result": "HOLD_NO_SHA_PINNED_VALID_CLEAN",
+        "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+        "clean_sha256": null,
+        "reused_independent_review": false,
+        "stage_separate_from_final": true
+      },
+      "final_dds_check": {
+        "result": "HOLD",
+        "source_final_sha_pinned": true,
+        "source_final_header_equal": true,
+        "original_DDS": {
+          "width": 4096,
+          "height": 2048,
+          "mips": 1,
+          "format": "RGBA32"
+        },
+        "persisted_raw_flipy_checked": true,
+        "real_game_used_size_checked": false,
+        "source_final_delta": {
+          "changed_pixels": 1594987,
+          "changed_alpha_pixels": 1144683,
+          "bbox_raw_xyxy": [
+            19,
+            163,
+            4054,
+            1928
+          ],
+          "bbox_readable_flipy_xyxy": [
+            19,
+            120,
+            4054,
+            1885
+          ]
+        },
+        "proven_game_defect_bbox_xyxy": null,
+        "not_yet_resolved": [
+          "SOURCE_CLEAN_SHA_NOT_ESTABLISHED",
+          "SHARED_INGAME_P0_P1_RETEST_OPEN",
+          "FULL_ATLAS_INVENTORY_UNVERIFIED"
+        ],
+        "risk": {
+          "note": "Many localized record labels visible; source-clean binding and high-risk user game retest not independently validated."
+        }
+      },
+      "translation_coverage": {
+        "scope": "q-specific saved DDS visually reviewed through full-atlas downsample; q102/104 text crop read at image size (not game tested)",
+        "source_en": null,
+        "korean": null,
+        "visible_labels_count": null,
+        "inspected_untranslated_count": null,
+        "confidence": "multi-label atlas uncounted",
+        "total_translatable_labels": null,
+        "total_untranslated_labels": null,
+        "whole_asset_complete": false
+      },
+      "verdict": "HOLD",
+      "release_gate": "TEST_ONLY_LEGACY_C2_CONSUMER_NOT_MIGRATED",
+      "C2": "RETIRED_NO_NEW_TOKEN",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    }
+  ],
+  "result_counts": {
+    "total": 4,
+    "C1_STATIC_PASS": 0,
+    "REWORK": 0,
+    "HOLD": 4,
+    "official_promotions": 0,
+    "full_DDS_translation_complete": 0,
+    "whole_DDS_untranslated_counts_verified": 0,
+    "source_clean_scoped_pass": 2
+  },
+  "release_policy": "No historic C2 tokens created. Old qa_evidence_gate.py C2 consumer not migrated; all TEST_ONLY/HOLD; C3/user test still open.",
+  "no_imagegen_or_production": true,
+  "no_queue_reset": true,
+  "no_Docker_Portainer_AutoSend_game_folder_release": true,
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
