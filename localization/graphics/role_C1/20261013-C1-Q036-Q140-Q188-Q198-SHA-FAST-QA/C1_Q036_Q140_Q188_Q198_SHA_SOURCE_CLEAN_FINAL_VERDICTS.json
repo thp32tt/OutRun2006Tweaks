@@ -1,0 +1,349 @@
+{
+  "schema": "outrun-c1-sha-bound-four-actual-hd-saved-dds-scoped-v1",
+  "task_id": "OUTRUN-KOR-C1-20261013-0340-Q036-Q140-Q188-Q198-INDEPENDENT-FAST-QA",
+  "role": "C1",
+  "reviewer": "AI1 ChatGPT",
+  "date": "2026-10-13",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "baseline_head": "584ea9002198467d4ae234399a5711f886de4049",
+  "policy_sha": {
+    "contract": "44754d4d95bcde9a457c9127d1102fc2ea69b0da",
+    "hd_png_fast_qa": "5ae6007b45073af8f3fd14122de523476730be61"
+  },
+  "candidate_count": 4,
+  "actual_production_count": 0,
+  "contact_filename": "C1_Q036_Q140_Q188_Q198_7WAY_INDEPENDENT_HD_DDS_BATCH.jpg",
+  "contact_sha256": "876bcb3a0ed2d10e852523691dddfffa7d6bde00b4e7f0cc5640b80bbc8e0d4f",
+  "compared_views": [
+    "SOURCE_RAW",
+    "SOURCE_READABLE_FLIPY",
+    "CLEAN_SHA_BOUND_if_available",
+    "FINAL_SAVED_DDS_RAW",
+    "FINAL_SAVED_DDS_FLIPY",
+    "FINAL_75_PERCENT_DISPLAY_PROXY",
+    "FINAL_50_PERCENT_DISPLAY_PROXY"
+  ],
+  "proxy_limit": "Practical downsized views are comparisons only: real game UI cell/UV/sampling not established, avoid source-effect-bbox and available-space inferences.",
+  "results": [
+    {
+      "queue_index": 36,
+      "producer": "B236",
+      "source_hd": {
+        "path": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+        "sha256": "cd6f58f1fa187c6ff7813cbb42b5181038712d8142bf575711a30d69e76d2f4a",
+        "header": {
+          "width": 4096,
+          "height": 4096,
+          "mipmaps": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "bits": 32
+        },
+        "provenance": "Sonic-TV/OR2006Sprites SHA-pinned HD original DDS",
+        "source_verified_by_sha256": true
+      },
+      "clean": {
+        "path": null,
+        "sha256": null,
+        "source_to_clean_orientation": "CLEAN_UNBOUND_NO_SHA",
+        "source_clean_outside_authoritative_source_regions": null,
+        "verdict": "HOLD"
+      },
+      "persisted_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_JENN_RANK_Exst/06AB5CEE_1024x1024.dds",
+        "sha256": "7503318fa51afb2578f4d4997567a54c849be1d9ded593f8b4d84453ca4f96e8",
+        "header": {
+          "width": 4096,
+          "height": 4096,
+          "mipmaps": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "bits": 32
+        },
+        "first_128_bytes_equal_to_source": true,
+        "source_to_final_rgba_change_count": 123645,
+        "source_to_final_change_bbox_readable": [
+          594,
+          1622,
+          2785,
+          3329
+        ],
+        "source_to_final_changed_outside_authoritative_source_regions": 0,
+        "source_to_final_alpha_changed_outside_authoritative_source_regions": 0
+      },
+      "review": {
+        "scope": [
+          "Total Rank → 종합 랭킹 (중간 타이틀 1개)"
+        ],
+        "inspected_translated_string_count": 1,
+        "source_localizable_string_count_from_manifest": 3,
+        "not_independently_inspected_string_count": 2,
+        "untranslated_strings_found_in_inspected_scope": 0,
+        "entire_dds_untranslated_count": "UNKNOWN_NOT_FULLY_ENUMERATED",
+        "crop_readable": [
+          540,
+          1590,
+          1180,
+          1765
+        ],
+        "crop_raw": [
+          540,
+          2331,
+          1180,
+          2506
+        ],
+        "verdict": "HOLD"
+      },
+      "confirmed_hard_defect_coordinates": null,
+      "correctness_qualifier": "CLEAN SOURCE→CLEAN exact standalone bytes not available; full asset gate is HOLD. Native/75/50 sample legible, final saved DDS original bbox union outside=0.",
+      "followup": "user pre-ingame scale previously failed and later corrected; user acceptance still required",
+      "asset_release_status": "TEST_ONLY_HOLD",
+      "C3": "NOT_RUN_THIS_PASS",
+      "game_runtime": "UNTESTED"
+    },
+    {
+      "queue_index": 140,
+      "producer": "B224",
+      "source_hd": {
+        "path": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+        "sha256": "ae048d04fef96108f6ee30c41022aedb78083d76386448df5483ae0ccd083dcd",
+        "header": {
+          "width": 2048,
+          "height": 1024,
+          "mipmaps": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "bits": 32
+        },
+        "provenance": "Sonic-TV/OR2006Sprites SHA-pinned HD original DDS",
+        "source_verified_by_sha256": true
+      },
+      "clean": {
+        "path": "localization/graphics/role_C/20261005-C140-31C58963/C140_EXACT_CLEAN_PLATE.png",
+        "sha256": "bc06f011bc393f99737206cb6e8384ae9317e22a0dc29a0ee8dfcf2b23fb6b00",
+        "source_to_clean_orientation": "READABLE",
+        "source_clean_outside_authoritative_source_regions": 0,
+        "verdict": "C1_STATIC_PASS_SCOPED"
+      },
+      "persisted_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/31C58963_512x256.dds",
+        "sha256": "588eb51d554c8adeef850bd53d665ed9f4a4d1c3389b9e67dcdd4be9f4dd635c",
+        "header": {
+          "width": 2048,
+          "height": 1024,
+          "mipmaps": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "bits": 32
+        },
+        "first_128_bytes_equal_to_source": true,
+        "source_to_final_rgba_change_count": 182494,
+        "source_to_final_change_bbox_readable": [
+          7,
+          318,
+          840,
+          1003
+        ],
+        "source_to_final_changed_outside_authoritative_source_regions": 0,
+        "source_to_final_alpha_changed_outside_authoritative_source_regions": 0
+      },
+      "review": {
+        "scope": [
+          "SELECT MODE → 모드 선택"
+        ],
+        "inspected_translated_string_count": 1,
+        "source_localizable_string_count_from_manifest": 6,
+        "not_independently_inspected_string_count": 5,
+        "untranslated_strings_found_in_inspected_scope": 0,
+        "entire_dds_untranslated_count": "UNKNOWN_NOT_FULLY_ENUMERATED",
+        "crop_readable": [
+          0,
+          550,
+          900,
+          722
+        ],
+        "crop_raw": [
+          0,
+          302,
+          900,
+          474
+        ],
+        "verdict": "C1_STATIC_PASS"
+      },
+      "confirmed_hard_defect_coordinates": null,
+      "correctness_qualifier": "SHA-bound whole CLEAN, exact six source text groups (including preserved PRESS from independent C140 original-component evidence), source→clean/source→final RGBA changes outside groups=0. Other five phrases not independently inspected visually in this pass.",
+      "followup": "C3 prior state historical, actual user retest pending",
+      "asset_release_status": "TEST_ONLY_HOLD",
+      "C3": "NOT_RUN_THIS_PASS",
+      "game_runtime": "UNTESTED"
+    },
+    {
+      "queue_index": 188,
+      "producer": "B169",
+      "source_hd": {
+        "path": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+        "sha256": "dfc72a0d66c30257066d56c2b325dca00832ceeda0d07d46443c27b396e0cb38",
+        "header": {
+          "width": 2048,
+          "height": 2048,
+          "mipmaps": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "bits": 32
+        },
+        "provenance": "Sonic-TV/OR2006Sprites SHA-pinned HD original DDS",
+        "source_verified_by_sha256": true
+      },
+      "clean": {
+        "path": "localization/graphics/role_C/20261005-C157-8C259C68/C157_VERIFIED_CLEAN_PLATE.png",
+        "sha256": "859259fa90a6d70e86f788914c36604b05dfee939f740d215486981fa5ff9b49",
+        "source_to_clean_orientation": "READABLE",
+        "source_clean_outside_authoritative_source_regions": 0,
+        "verdict": "C1_STATIC_PASS_SCOPED"
+      },
+      "persisted_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/8C259C68_512x512.dds",
+        "sha256": "9fe3804a70d93277ede4e16ac8073057c6a9d969a893d05cde522d14a1f91b4d",
+        "header": {
+          "width": 2048,
+          "height": 2048,
+          "mipmaps": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "bits": 32
+        },
+        "first_128_bytes_equal_to_source": true,
+        "source_to_final_rgba_change_count": 258404,
+        "source_to_final_change_bbox_readable": [
+          0,
+          1099,
+          1727,
+          1969
+        ],
+        "source_to_final_changed_outside_authoritative_source_regions": 0,
+        "source_to_final_alpha_changed_outside_authoritative_source_regions": 0
+      },
+      "review": {
+        "scope": [
+          "Try to win Hearts by meeting your girlfriend's demands! → 여자친구의 요구를 들어주고 하트를 획득하세요!"
+        ],
+        "inspected_translated_string_count": 1,
+        "source_localizable_string_count_from_manifest": 6,
+        "not_independently_inspected_string_count": 5,
+        "untranslated_strings_found_in_inspected_scope": 0,
+        "entire_dds_untranslated_count": "UNKNOWN_NOT_FULLY_ENUMERATED",
+        "crop_readable": [
+          0,
+          1365,
+          1780,
+          1515
+        ],
+        "crop_raw": [
+          0,
+          533,
+          1780,
+          683
+        ],
+        "verdict": "C1_STATIC_PASS"
+      },
+      "confirmed_hard_defect_coordinates": null,
+      "correctness_qualifier": "SHA-bound CLEAN and all six source region pixel containment=0 outside; older C257 fields named RAW correspond numerically to READABLE source/final changes and were directly checked, not blindly flipped. Only selected help line viewed at this invocation.",
+      "followup": "help/P0-P1 user-game mapping remains OPEN until C3 and user validation",
+      "asset_release_status": "TEST_ONLY_HOLD",
+      "C3": "NOT_RUN_THIS_PASS",
+      "game_runtime": "UNTESTED"
+    },
+    {
+      "queue_index": 198,
+      "producer": "B211",
+      "source_hd": {
+        "path": "https://raw.githubusercontent.com/Sonic-TV/OR2006Sprites/3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6/Release/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+        "sha256": "2729b78176ec648039f5b45baf52b1a78e8586e6233baf9a6be4f351f5b1add4",
+        "header": {
+          "width": 4096,
+          "height": 2048,
+          "mipmaps": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "bits": 32
+        },
+        "provenance": "Sonic-TV/OR2006Sprites SHA-pinned HD original DDS",
+        "source_verified_by_sha256": true
+      },
+      "clean": {
+        "path": "localization/graphics/role_C/20261005-C150-9FC88069/C150_EXACT_CLEAN_PLATE.png",
+        "sha256": "5a6e7fd194e602b4af9fd9cd1a6dbe02aac0c40f06a7540bdab5cab02f8b92bb",
+        "source_to_clean_orientation": "READABLE",
+        "source_clean_outside_authoritative_source_regions": 0,
+        "verdict": "C1_STATIC_PASS_SCOPED"
+      },
+      "persisted_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+        "sha256": "2160e7eef9dd27b028b5adc3df770a508c62891fd21676677365a0f55bee5885",
+        "header": {
+          "width": 4096,
+          "height": 2048,
+          "mipmaps": 1,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "bits": 32
+        },
+        "first_128_bytes_equal_to_source": true,
+        "source_to_final_rgba_change_count": 52284,
+        "source_to_final_change_bbox_readable": [
+          116,
+          43,
+          2624,
+          2036
+        ],
+        "source_to_final_changed_outside_authoritative_source_regions": 0,
+        "source_to_final_alpha_changed_outside_authoritative_source_regions": 0
+      },
+      "review": {
+        "scope": [
+          "RANDOM → 무작위",
+          "RANDOM PLAY → 무작위 게임"
+        ],
+        "inspected_translated_string_count": 2,
+        "source_localizable_string_count_from_manifest": 4,
+        "not_independently_inspected_string_count": 2,
+        "untranslated_strings_found_in_inspected_scope": 0,
+        "entire_dds_untranslated_count": "UNKNOWN_NOT_FULLY_ENUMERATED",
+        "crop_readable": [
+          60,
+          1860,
+          1200,
+          2048
+        ],
+        "crop_raw": [
+          60,
+          0,
+          1200,
+          188
+        ],
+        "verdict": "C1_STATIC_PASS"
+      },
+      "confirmed_hard_defect_coordinates": null,
+      "correctness_qualifier": "SHA-bound clean/final and all 4 source label boxes contain all changed pixels; selected two bottom-row labels viewed at native/75/50; top two INTERMEDIATE labels not independently visually checked.",
+      "followup": "pre-ingame user review / game runtime pending",
+      "asset_release_status": "TEST_ONLY_HOLD",
+      "C3": "NOT_RUN_THIS_PASS",
+      "game_runtime": "UNTESTED"
+    }
+  ],
+  "summary": {
+    "scoped_C1_STATIC_PASS_candidates": 3,
+    "hold_candidates": 1,
+    "verified_reviewed_translated_strings": 5,
+    "inspected_scope_untranslated": 0,
+    "other_translatable_strings_not_visually_checked": 14,
+    "whole_dds_C1_STATIC_PASS": 0,
+    "whole_dds_release_blocked": 4
+  },
+  "guardrails": {
+    "new_C2_tokens": 0,
+    "historic_C2_not_reissued": true,
+    "official_consumer_gate_unmigrated": "TEST_ONLY_HOLD",
+    "new_queue": false,
+    "existing_results_not_reset": true,
+    "Docker_Portainer_or_AUTO_SEND_changed": false,
+    "game_installed": false,
+    "formal_release": false,
+    "VR_FFB_DX11_DXVK_touched": false,
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "annotation": "Historical C2 records are evidence references only; no C2 token issued. The q188 upstream report called pixel bboxes RAW but measured/source-matched coordinates were READABLE; current masks use source-matched coordinates without arbitrary flipping."
+}
