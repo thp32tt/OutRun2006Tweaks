@@ -113,6 +113,11 @@ jobs:
         shell: pwsh
         run: python tools/test_dx11_selectarg_addsmooth_00582.py
 
+      - name: Verify DX11 live SELECTARG scaled alpha 00583
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_selectarg_modulate_scaled_00583.py
+
       - name: Verify DX11 source graph
         shell: pwsh
         run: python tools/verify_dx11_source_graph.py
