@@ -143,7 +143,11 @@ void Overlay::rebuild_fonts()
 	// wanted keeps it sharp at any scale, and leaves ImGui's own scale
 	// multiplier at its default of 1.0.
 	constexpr float BaseFontSize = 13.0f;
-	const float sizePixels = std::floor(BaseFontSize * std::clamp(GlobalFontScale, 0.5f, 5.0f));
+	// Rasterise larger glyphs directly instead of stretching a 13px atlas in
+	// the portrait Quest3 eye. The desktop path always uses multiplier 1.0.
+	const float sizePixels = std::floor(BaseFontSize *
+		std::clamp(GlobalFontScale, 0.5f, 5.0f) *
+		std::clamp(VrFontMultiplier, 1.0f, 3.0f));
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->Clear();

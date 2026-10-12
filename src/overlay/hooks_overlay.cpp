@@ -9,6 +9,10 @@
 #include <backends/imgui_impl_dx9.h>
 #include "overlay.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/core/r29_owner_api.hpp"
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
 
 namespace Settings
 {
@@ -200,6 +204,43 @@ class D3DHooks : public Hook
 
 		if (overlayInited)
 		{
+			// ImGui draws into the desktop-sized D3D9 backbuffer before the
+			// asymmetric portrait XR eye transfer. A source-aspect-sized font
+			// is visually reduced by that transfer. When the F11 shell is open
+			// in actual VR gameplay, create larger glyphs *at rasterisation*;
+			// never bitmap-upscale ImGui's existing font atlas. Keep the game
+			// sprite HUD, menu, native 2D desktop UI and world passes untouched.
+			float vrFontMultiplier = 1.0f;
+			if (overlayActive && Game::is_vr_gameplay_presentation() &&
+				Game::screen_resolution &&
+				Game::screen_resolution->x > 0 &&
+				Game::screen_resolution->y > 0)
+			{
+				std::uint32_t lw = 0, lh = 0, rw = 0, rh = 0;
+				if (OutRunVRStereo::R29OwnerRecommendedEyeExtent(0, lw, lh) &&
+					OutRunVRStereo::R29OwnerRecommendedEyeExtent(1, rw, rh) &&
+					lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u)
+				{
+					const float sourceAspect = static_cast<float>(
+						Game::screen_resolution->x) /
+						static_cast<float>(Game::screen_resolution->y);
+					const float eyeAspect =
+						0.5f * (static_cast<float>(lw) / lh +
+							static_cast<float>(rw) / rh);
+					const float factor = sourceAspect / eyeAspect;
+					if (std::isfinite(factor) && factor > 0.0f)
+						vrFontMultiplier = std::clamp(
+							std::ceil(factor * 4.0f) * 0.25f, 1.0f, 3.0f);
+				}
+			}
+			// Quantised quarter-steps prevent continuous atlas churn when the
+			// OpenXR host updates aspect hints or the window is reset/resized.
+			// Reset and menu/desktop transitions return to the original atlas.
+			if (Overlay::VrFontMultiplier != vrFontMultiplier)
+			{
+				Overlay::VrFontMultiplier = vrFontMultiplier;
+				Overlay::FontsDirty = true;
+			}
 			// A new atlas needs a new font texture. Dropping the device objects
 			// here leaves ImGui_ImplDX9_NewFrame to build them again below, and
 			// happens between frames where changing the atlas is safe.

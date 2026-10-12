@@ -47,6 +47,8 @@ class Overlay
 {
 public:
 	inline static float GlobalFontScale = 2.0f;
+	// Runtime-only VR font density; never persisted to the desktop Overlay.ini.
+	inline static float VrFontMultiplier = 1.0f;
 	inline static float GlobalOpacity = 0.8f;
 
 	enum Themes
