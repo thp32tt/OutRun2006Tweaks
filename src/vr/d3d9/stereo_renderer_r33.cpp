@@ -247,29 +247,52 @@ namespace OutRunVRStereo
 
             if (R32ReviewMainDepthHasStencil())
             {
+                // On the common stencil-disabled draw only the enable bit is
+                // needed. Skip eight synchronous driver getters; the setter
+                // invalidates this partial snapshot before re-enabling stencil.
                 if (FAILED(device->GetRenderState(
-                        D3DRS_STENCILENABLE, &next.stencilEnable)) ||
-                    FAILED(device->GetRenderState(
-                        D3DRS_STENCILWRITEMASK, &next.stencilWriteMask)) ||
-                    FAILED(device->GetRenderState(
-                        D3DRS_STENCILFAIL, &next.stencilFail)) ||
-                    FAILED(device->GetRenderState(
-                        D3DRS_STENCILZFAIL, &next.stencilZFail)) ||
-                    FAILED(device->GetRenderState(
-                        D3DRS_STENCILPASS, &next.stencilPass)) ||
-                    FAILED(device->GetRenderState(
-                        D3DRS_TWOSIDEDSTENCILMODE, &next.twoSided)) ||
-                    FAILED(device->GetRenderState(
-                        D3DRS_CCW_STENCILFAIL, &next.ccwStencilFail)) ||
-                    FAILED(device->GetRenderState(
-                        D3DRS_CCW_STENCILZFAIL, &next.ccwStencilZFail)) ||
-                    FAILED(device->GetRenderState(
-                        D3DRS_CCW_STENCILPASS, &next.ccwStencilPass)))
+                        D3DRS_STENCILENABLE, &next.stencilEnable)))
                 {
                     if (R33TelemetryEnabled())
                         ++R33DepthStencilReadFailures;
                     R33InvalidateDepthStencilCache();
                     return false;
+                }
+                if (next.stencilEnable != FALSE)
+                {
+                    if (FAILED(device->GetRenderState(
+                            D3DRS_STENCILWRITEMASK, &next.stencilWriteMask)))
+                    {
+                        if (R33TelemetryEnabled())
+                            ++R33DepthStencilReadFailures;
+                        R33InvalidateDepthStencilCache();
+                        return false;
+                    }
+                    // A zero write mask likewise makes the seven stencil ops
+                    // irrelevant until the mask transitions to nonzero.
+                    if (next.stencilWriteMask != 0)
+                    {
+                        if (FAILED(device->GetRenderState(
+                                D3DRS_STENCILFAIL, &next.stencilFail)) ||
+                            FAILED(device->GetRenderState(
+                                D3DRS_STENCILZFAIL, &next.stencilZFail)) ||
+                            FAILED(device->GetRenderState(
+                                D3DRS_STENCILPASS, &next.stencilPass)) ||
+                            FAILED(device->GetRenderState(
+                                D3DRS_TWOSIDEDSTENCILMODE, &next.twoSided)) ||
+                            FAILED(device->GetRenderState(
+                                D3DRS_CCW_STENCILFAIL, &next.ccwStencilFail)) ||
+                            FAILED(device->GetRenderState(
+                                D3DRS_CCW_STENCILZFAIL, &next.ccwStencilZFail)) ||
+                            FAILED(device->GetRenderState(
+                                D3DRS_CCW_STENCILPASS, &next.ccwStencilPass)))
+                        {
+                            if (R33TelemetryEnabled())
+                                ++R33DepthStencilReadFailures;
+                            R33InvalidateDepthStencilCache();
+                            return false;
+                        }
+                    }
                 }
             }
 
@@ -368,9 +391,17 @@ namespace OutRunVRStereo
                 R33DepthStencilState.zWrite = value;
                 break;
             case D3DRS_STENCILENABLE:
+                // A disabled snapshot did not read stencil ops. Resample
+                // before the next draw if stencil is switched back on.
+                if (R33DepthStencilState.stencilEnable == FALSE && value != FALSE)
+                    R33InvalidateDepthStencilCache();
                 R33DepthStencilState.stencilEnable = value;
                 break;
             case D3DRS_STENCILWRITEMASK:
+                // A zero-mask snapshot omitted ops as well; re-read them
+                // before the next eligible stencil-writing draw.
+                if (R33DepthStencilState.stencilWriteMask == 0 && value != 0)
+                    R33InvalidateDepthStencilCache();
                 R33DepthStencilState.stencilWriteMask = value;
                 break;
             case D3DRS_STENCILFAIL:
