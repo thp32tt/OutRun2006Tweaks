@@ -1,0 +1,64 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00598",
+  "production_id": "CONVERSION-DX11-00598",
+  "event_id": "CONVERSION-DX11-00598-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00598",
+  "work_key": "DX11:MENU_RACE_MULTIPLY_OM",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "C4_MATERIAL_COMMITTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "5256b8ee8c9c431e55b8e1e4443c683aa2d01dc0",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Live game D3D9 SRCBLEND/DESTBLEND pair and no-separate-alpha state capture",
+      "Exact D3D11 RGB DEST_COLOR/ZERO and alpha DEST_ALPHA/ZERO plus 16 masked OM states",
+      "Live game Draw/DrawIndexed->native diagnostic inset and untouched DX9Ex Present/gamepad"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_native_multiply_00598.py",
+      ".github/workflows/backend-conversion-gate.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "1089 RGBA multiplication comparisons, exact-SHA Windows build/Backend Gate pending",
+      "negative_regression": "17 source mutations plus inherited 00596/00597 blend/Reset regressions",
+      "component_integration": "Actual D3D9 blend state -> D3D11 resource/OM -> live native Draw/DrawIndexed -> diagnostic Present"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_MULTIPLY_OM",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:MULTIPLY_OM"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Quest3/VDXR menu, vehicle select, race and gamepad still NEED_HMD_TEST; diagnostic background cannot prove destination-color parity",
+    "activation_guard_and_fallback": "Only when OUTRUN_DX11_FIRST_GAME_FRAME=1; original D3D9 Draw/Present/input retained"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_multiply_00598.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00598.json"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "Diagnostic blend mode only; no HMD-verified release"
+  },
+  "next_action": "Validate this exact material SHA in GitHub Windows Build, Backend Gate, Fast, OpenXR, HUD. If PASS record C6 separately; HMD remains UNTESTED."
+}
