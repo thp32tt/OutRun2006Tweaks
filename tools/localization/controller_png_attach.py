@@ -128,7 +128,7 @@ async def attach_png(page, binding):
               const nodes=[...document.querySelectorAll(selector)];
               return nodes.filter(n => n.getClientRects().length>0).length > before;
             }""",
-            {"selector": PREVIEW, "before": before}, timeout=15000,
+            arg={"selector": PREVIEW, "before": before}, timeout=15000,
         )
         return "ATTACHED_PREVIEW_CONFIRMED"
     except Exception:
