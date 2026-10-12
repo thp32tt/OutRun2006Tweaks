@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00639",
+  "production_id": "CONVERSION-DX11-00639",
+  "event_id": "CONVERSION-DX11-00639-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:PM_RGB_SIGNED_TFACTOR_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "c15e432e22d6ed69b758834d53237333c773e2b5",
+  "status": "CI_PENDING",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Intercept a game-authored stage0 PM RGB draw with signed/2x alpha from texture and live D3DRS_TEXTUREFACTOR (complement retained)",
+      "Capture exact texture factor + alpha operator and select native signed-factor pixel shader without altering game D3D9 draw or gamepad input",
+      "Compile & bind independent saturating HLSL PS through native D3D11 Draw/DrawIndexed diagnostic target"
+    ],
+    "batch_components": [
+      "D3D9 stage0 signed/2x TFACTOR operation predicates, fail-closed source/factor capture and complemented factor constant",
+      "Native D3D11 signed/2x saturating shaders, pipeline ownership and Draw/DrawIndexed dispatch",
+      "Destructive source graph plus 20480 numeric regressions in both fast/full GitHub Gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3DTOP_ADDSIGNED/ADDSIGNED2X texture plus regular/complemented TFACTOR alpha preserve texture-PM RGB and saturate independently before AlphaGate",
+      "negative_regression": "Reject wrong operand source/order, invalid flags and unreadable factor, preserving original D3D9 draw/input",
+      "component_integration": "GetTextureStageState / GetRenderState -> TextureCapture -> alphaParams.w -> PS signed saturation -> native Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:PM_RGB_SIGNED_TFACTOR_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native diagnostic code and source/numeric regression only; real menu/gamepad/Quest3/VDXR evidence not available.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in only; default DX9Ex input/gameplay fallback unchanged."
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_signed_factor_00639.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00639.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: 00638 C6 and branch HEAD c15e432e confirmed; distinct work key",
+    "C1_REVIEW": "PASS: PM signed alpha with TFACTOR was not admitted",
+    "C2_IMPLEMENT": "IN_PROGRESS: live source and native HLSL connected",
+    "C3_VALIDATE": "PENDING exact-SHA GitHub Actions",
+    "C4_COMMIT": "PENDING final material source commit",
+    "C5_PACKAGE": "NOT_REQUIRED (HMD untested)",
+    "C6_STATE": "PENDING exact-SHA CI"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No runtime acceptance; diagnostic opt-in only"
+  },
+  "next_action": "Complete native C++ implementation then exact-SHA GitHub Gates; retain runtime UNTESTED."
+}
