@@ -60,14 +60,19 @@ def check_readiness_hotpath(src: str) -> None:
                        ("R32ReviewOwnedResult R33TryHud(", "HRESULT R33Dispatch(")):
         route = src.split(start, 1)[1].split(end, 1)[0]
         assert route.count("R33PrepareRightDepthStereo(device)") == 1
+        borrowed = "GetLatchedStereoFrameView()" in route
+        read = ("GetLatchedStereoFrameView()" if borrowed
+                else "GetLatchedStereoFrame(stereo)")
         assert route.index("R32ReviewEnsureStereoResources(device)") < route.index(
-            "R33PrepareRightDepthStereo(device)") < route.index(
-            "GetLatchedStereoFrame(stereo)")
+            "R33PrepareRightDepthStereo(device)") < route.index(read)
         assert "if (!R33PrepareRightDepthStereo(device))\n                return {};" in route
         assert "R32ReviewRightDepthInSync()" not in route
         assert "R32ReviewRightStencilInSync()" not in route
         assert route.count("R32ReviewFrameStereoPoseSequence()") == 1
-        assert "framePoseSequence != stereo.poseSequence" in route
+        assert ("framePoseSequence != stereo->poseSequence" if borrowed
+                else "framePoseSequence != stereo.poseSequence") in route
+        if borrowed:
+            assert "if (!stereo)" in route
 
 
 def negative_readiness_hotpath(src: str) -> None:

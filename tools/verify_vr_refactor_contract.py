@@ -1175,9 +1175,18 @@ def r33_readiness_facade_ok(src: str) -> bool:
                 or "R32ReviewRightDepthInSync()" in route
                 or "R32ReviewRightStencilInSync()" in route):
             return False
+        # R33 accepts the original owned-copy getter or the synchronous
+        # BeginScene-latched read-only view, with identical pose/eligibility veto.
+        borrowed = "GetLatchedStereoFrameView()" in route
+        pose_read = ("GetLatchedStereoFrameView()" if borrowed
+                     else "GetLatchedStereoFrame(stereo)")
+        if borrowed and (
+                "if (!stereo)" not in route
+                or "framePoseSequence != stereo->poseSequence" not in route):
+            return False
         if not (route.index("R32ReviewEnsureStereoResources(device)")
                 < route.index("R33PrepareRightDepthStereo(device)")
-                < route.index("GetLatchedStereoFrame(stereo)")):
+                < route.index(pose_read)):
             return False
     return True
 
