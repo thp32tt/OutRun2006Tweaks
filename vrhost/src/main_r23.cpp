@@ -1274,10 +1274,18 @@ namespace
 
         std::uint32_t image = 0;
         c.Acquire(c.projection_, image);
-        bool ok = c.RenderTo(c.projection_.rtvs[image][0], c.projection_.width,
+        const bool firstEyeOk = c.RenderTo(
+            c.projection_.rtvs[image][0], c.projection_.width,
             c.projection_.height, eyes[0], srv[0], fmt[0], 0);
-        ok = c.RenderTo(c.projection_.rtvs[image][1], c.projection_.width,
-            c.projection_.height, eyes[1], srv[1], fmt[1], 1) && ok;
+        // No graphics-context operations intervene between eye submissions.
+        // If eye 0 failed (including Map), eye 1 uses the full state setup.
+        const bool secondEyeOk = c.RenderTo(
+            c.projection_.rtvs[image][1], c.projection_.width,
+            c.projection_.height, eyes[1], srv[1], fmt[1], 1,
+            OutRunVrProjectionPair::CanReuseCommonPipeline(
+                firstEyeOk, 0, 1, c.projection_.width, c.projection_.height,
+                c.projection_.width, c.projection_.height));
+        const bool ok = firstEyeOk && secondEyeOk;
         if (ok) R23Pixels.ScheduleProjection(c, image);
         c.Release(c.projection_);
         if (!ok) return false;

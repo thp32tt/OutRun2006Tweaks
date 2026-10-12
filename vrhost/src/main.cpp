@@ -28,6 +28,7 @@
 #include "vr/ipc/xr_eye_extent.hpp"
 #include "stereo_shader.hpp"
 #include "runtime/projection_blit_upload.hpp"
+#include "runtime/projection_pair_pipeline.hpp"
 
 namespace
 {
@@ -1447,10 +1448,16 @@ namespace
 
             std::uint32_t image = 0;
             Acquire(projection_, image);
-            bool ok = RenderTo(projection_.rtvs[image][0], projection_.width, projection_.height,
+            const bool firstEyeOk = RenderTo(
+                projection_.rtvs[image][0], projection_.width, projection_.height,
                 eyes[0], eyeSrv[0], eyeFormat[0], 0);
-            ok = RenderTo(projection_.rtvs[image][1], projection_.width, projection_.height,
-                eyes[1], eyeSrv[1], eyeFormat[1], 1) && ok;
+            const bool secondEyeOk = RenderTo(
+                projection_.rtvs[image][1], projection_.width, projection_.height,
+                eyes[1], eyeSrv[1], eyeFormat[1], 1,
+                OutRunVrProjectionPair::CanReuseCommonPipeline(
+                    firstEyeOk, 0, 1, projection_.width, projection_.height,
+                    projection_.width, projection_.height));
+            const bool ok = firstEyeOk && secondEyeOk;
             Release(projection_);
             if (!ok) return false;
 
@@ -2158,9 +2165,15 @@ namespace
 
         bool RenderTo(ID3D11RenderTargetView* rtv, std::uint32_t w, std::uint32_t h,
             const UvRect& uv, ID3D11ShaderResourceView* sourceSrv,
-            DXGI_FORMAT sourceFormat, int projectionEye = -1)
+            DXGI_FORMAT sourceFormat, int projectionEye = -1,
+            bool reusePairPipeline = false)
         {
             if (!rtv || !sourceSrv || !constantBuffer_) return false;
+            // Only the consecutive right-eye projection may reuse common
+            // pipeline state after a successful, same-size left-eye draw.
+            // RTV/SRV/constant-buffer bindings and draw remain per eye.
+            const bool reuseCommonPipeline =
+                reusePairPipeline && projectionEye == 1;
             const OutRunVrProjectionBlit::Key key{
                 uv.w, uv.h, uv.x, uv.y, sdrWhiteScale_,
                 sourceFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ? 1.f : 0.f
@@ -2194,17 +2207,24 @@ namespace
                     cache->MarkUploaded(key);
             }
 
-            D3D11_VIEWPORT vp{};
-            vp.Width = static_cast<float>(w);
-            vp.Height = static_cast<float>(h);
-            vp.MaxDepth = 1.f;
-            context_->RSSetViewports(1, &vp);
+            // Set fixed shaders, sampler, topology and viewport once for an
+            // uninterrupted stereo pair. OMSetRenderTargets/PSSetShaderResources
+            // unbind the previous eye after every draw without invalidating
+            // these five common pipeline settings.
+            if (!reuseCommonPipeline)
+            {
+                D3D11_VIEWPORT vp{};
+                vp.Width = static_cast<float>(w);
+                vp.Height = static_cast<float>(h);
+                vp.MaxDepth = 1.f;
+                context_->RSSetViewports(1, &vp);
+                context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+                context_->VSSetShader(vs_, nullptr, 0);
+                context_->PSSetShader(ps_, nullptr, 0);
+                context_->PSSetSamplers(0, 1, &sampler_);
+            }
             context_->OMSetRenderTargets(1, &rtv, nullptr);
-            context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-            context_->VSSetShader(vs_, nullptr, 0);
-            context_->PSSetShader(ps_, nullptr, 0);
             context_->PSSetShaderResources(0, 1, &sourceSrv);
-            context_->PSSetSamplers(0, 1, &sampler_);
             context_->PSSetConstantBuffers(0, 1, &blitBuffer);
             context_->Draw(3, 0);
             ID3D11ShaderResourceView* nullSrv = nullptr;

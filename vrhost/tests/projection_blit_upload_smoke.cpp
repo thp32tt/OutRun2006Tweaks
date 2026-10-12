@@ -1,4 +1,5 @@
 #include "runtime/projection_blit_upload.hpp"
+#include "runtime/projection_pair_pipeline.hpp"
 #include <cstdint>
 #include <limits>
 using namespace OutRunVrProjectionBlit;
@@ -35,5 +36,16 @@ int main()
     changed.uvOffsetX = std::numeric_limits<float>::quiet_NaN();
     left.MarkUploaded(changed);
     EXPECT(left.NeedsUpload(changed));
+    // Projection-pair optimization is safe only for successful consecutive
+    // left/right eyes at identical nonzero swapchain extents, including Release.
+    using OutRunVrProjectionPair::CanReuseCommonPipeline;
+    EXPECT(CanReuseCommonPipeline(true, 0, 1, 3440, 1440, 3440, 1440));
+    EXPECT(!CanReuseCommonPipeline(false, 0, 1, 3440, 1440, 3440, 1440));
+    EXPECT(!CanReuseCommonPipeline(true, 1, 1, 3440, 1440, 3440, 1440));
+    EXPECT(!CanReuseCommonPipeline(true, 0, 0, 3440, 1440, 3440, 1440));
+    EXPECT(!CanReuseCommonPipeline(true, 0, 1, 3440, 1440, 1920, 1440));
+    EXPECT(!CanReuseCommonPipeline(true, 0, 1, 3440, 1440, 3440, 1080));
+    EXPECT(!CanReuseCommonPipeline(true, 0, 1, 0, 1440, 0, 1440));
+    EXPECT(!CanReuseCommonPipeline(true, 0, 1, 3440, 0, 3440, 0));
     return 0;
 }
