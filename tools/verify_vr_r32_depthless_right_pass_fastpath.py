@@ -51,7 +51,8 @@ def main():
     r32, r33, api = original
     mutations = [
         (r32, r33.replace("savedDepth == nullptr &&", "savedDepth == nullptr ||", 1), api),
-        (r32, r33.replace("StateBlockTracker::Reliable();", "true;", 1), api),
+        (r32, r33.replace("savedDepth == nullptr &&\n                OutRunVR::State::StateBlockTracker::Reliable();",
+                          "savedDepth == nullptr &&\n                true;", 1), api),
         (r32, r33.replace("if (SUCCEEDED(rightHr) && !depthlessPass)",
                           "if (SUCCEEDED(rightHr))", 1), api),
         (r32, r33.replace("true, depthlessPass);", "true, false);", 1), api),
