@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00592",
   "work_key": "DX11:MENU_RACE_NATIVE_MAXMIPLEVEL_LOD",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -52,10 +52,12 @@
   },
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_maxmiplevel_00592.py",
+    "tools/test_dx11_native_mip_chain_00589.py",
     "tools/test_dx11_native_mip_linear_00590.py",
     "tools/test_dx11_native_address_mirror_00591.py",
+    "tools/test_dx11_first_game_frame_regressions.py",
     ".github/workflows/backend-conversion-gate.yml",
-    "tools/test_dx11_native_maxmiplevel_00592.py",
     "docs/automation/runs/CONVERSION-DX11-00592.json"
   ],
   "base_head_sha": "a05616f8cc768aedca569bfc11640838bc34bb13",
@@ -63,5 +65,54 @@
     "status": "NOT_REQUIRED",
     "reason": "No HMD-runtime candidate approval"
   },
-  "runtime_evidence": null
+  "runtime_evidence": null,
+  "material_result_sha": "8e92c45f4651b5d1eb6dabab5e6fa18da315d16c",
+  "validation_bearing_result_sha": "35c53e153d4499183443b743ada849632549319c",
+  "result_sha": "35c53e153d4499183443b743ada849632549319c",
+  "c6_basis_head_sha": "35c53e153d4499183443b743ada849632549319c",
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38208364972,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "35c53e153d4499183443b743ada849632549319c"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38208364929,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "35c53e153d4499183443b743ada849632549319c"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38208367837,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "35c53e153d4499183443b743ada849632549319c"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38208367849,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "35c53e153d4499183443b743ada849632549319c"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38208367813,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "35c53e153d4499183443b743ada849632549319c"
+    }
+  ],
+  "local_validation": [
+    "Game D3D9 MAXMIPLEVEL -> D3D11 sampler MinLOD -> guarded native Draw/DrawIndexed source integration",
+    "11 texture-level boundary ranges, min/mag/mip compatibility; 17 destructive native chain mutations",
+    "Prior 00589/00590/00591 source regressions and first-game-frame negative controls preserved",
+    "Exact-SHA GitHub Backend Conversion Gate validate + DX11 readiness smoke SUCCESS",
+    "Win32 Build, DX11 Fast, OpenXR PR, HUD Inspector all SUCCESS"
+  ],
+  "next_action": "NEED_HMD_TEST: Quest3/VDXR menu/vehicle/race native diagnostic inset image and gamepad validation; native gameplay remains opt-in diagnostic, not promoted; select other distinct incomplete DX11 feature on next independent task"
 }
