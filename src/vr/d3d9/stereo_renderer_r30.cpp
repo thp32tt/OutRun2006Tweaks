@@ -19,6 +19,8 @@
 #endif
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
+#include "../game/render_semantics.hpp"
+#include <cstring>
 #include "../state/state_block_tracker.hpp"
 #include "vr_pass_policy.hpp"
 #include "hook_mgr.hpp"
@@ -46,6 +48,7 @@ namespace Settings
     extern Setting<bool> VRTelemetry;
     extern Setting<float> VRWorldScale;
     extern Setting<float> VRHudScale;
+    extern Setting<bool> VRHudEdgeAnchors;
     extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
     extern Setting<bool> SkyGlowTwoStep;
@@ -1700,6 +1703,68 @@ namespace OutRunVRStereo
             R30HudContain.valid = true;
         }
 
+
+        // Only exact, producer-owned gameplay text may leave the common-centre
+        // containment mapping. The A/B setting defaults off and the broad
+        // ScreenHud/ScreenOverlay2D classifications are NOT enough evidence.
+        struct R30HudEdgeAnchor { float x = 0.0f; float y = 0.0f; };
+        float R30PeripheralAnchor(float ndc, float limit) noexcept
+        {
+            if (!std::isfinite(ndc) || std::fabs(ndc) < 0.40f ||
+                std::fabs(ndc) > 1.20f)
+                return 0.0f;
+            return std::clamp(ndc, -limit, limit);
+        }
+        R30HudEdgeAnchor R30GetExactHudEdgeAnchor(
+            const void* source, UINT count, UINT stride,
+            float x0, float y0, float width, float height,
+            const std::vector<std::uint8_t>* usedMask) noexcept
+        {
+            if (!Settings::VRHudEdgeAnchors.get() ||
+                OutRunVR::GameSemantic::EffectiveScope() !=
+                    OutRunVR::GameSemantic::RenderScope::ScreenHud ||
+                OutRunVR::GameSemantic::CurrentSpriteQueueProducer !=
+                    OutRunVR::GameSemantic::ProducerToken::OutRunHudText ||
+                !source || !count || stride < 4u * sizeof(float) ||
+                !(width > 0.0f && height > 0.0f))
+                return {};
+            float minX = x0 + width, maxX = x0;
+            float minY = y0 + height, maxY = y0;
+            bool seen = false;
+            const auto* bytes = static_cast<const std::uint8_t*>(source);
+            for (UINT i = 0; i < count; ++i)
+            {
+                if (usedMask && !(*usedMask)[i])
+                    continue;
+                float xy[2]{};
+                std::memcpy(xy, bytes + static_cast<std::size_t>(i) * stride,
+                    sizeof(xy));
+                // Invalid/outlying sprite coordinates cannot be used to
+                // infer position. Retain exactly the baseline centred layout.
+                if (!std::isfinite(xy[0]) || !std::isfinite(xy[1]) ||
+                    xy[0] < x0 - width * 0.25f ||
+                    xy[0] > x0 + width * 1.25f ||
+                    xy[1] < y0 - height * 0.25f ||
+                    xy[1] > y0 + height * 1.25f)
+                    return {};
+                minX = (std::min)(minX, xy[0]);
+                maxX = (std::max)(maxX, xy[0]);
+                minY = (std::min)(minY, xy[1]);
+                maxY = (std::max)(maxY, xy[1]);
+                seen = true;
+            }
+            if (!seen)
+                return {};
+            // One source-space group anchor for the entire draw: preserve
+            // relative glyph locations, colour/UV and per-eye disparity.
+            const float cx = minX + 0.5f * (maxX - minX);
+            const float cy = minY + 0.5f * (maxY - minY);
+            return {
+                R30PeripheralAnchor((cx - x0) * (2.0f / width) - 1.0f, 0.82f),
+                R30PeripheralAnchor(1.0f - (cy - y0) * (2.0f / height), 0.78f)
+            };
+        }
+
         bool R30TransformHudScissor(
             const RECT& source, const D3DVIEWPORT9& viewport,
             float scaleX, float scaleY, float offsetX,
@@ -3321,6 +3386,9 @@ namespace OutRunVRStereo
                 // once per draw. This skips repeated NDC conversions and an
                 // eye-conditional branch for every indexed/UP HUD vertex.
                 // Z/RHW, UV, color and sparse source coverage stay unchanged.
+                const R30HudEdgeAnchor exactHudAnchor =
+                    R30GetExactHudEdgeAnchor(source, vertexCount, stride,
+                        x0, y0, width, height, usedMask);
                 const float halfWidth = width * 0.5f;
                 const float halfHeight = height * 0.5f;
                 const float eyeScaleX[2]{
@@ -3335,6 +3403,14 @@ namespace OutRunVRStereo
                 };
                 const float hudBiasY =
                     (1.0f - hudScaleY) * (y0 + halfHeight);
+                // Bias computed once per draw. A zero (default-off) anchor
+                // reproduces the existing centre-convergent mapping.
+                const float edgeLeftBias =
+                    (1.0f - eyeScaleX[0]) * halfWidth * exactHudAnchor.x;
+                const float edgeRightBias =
+                    (1.0f - eyeScaleX[1]) * halfWidth * exactHudAnchor.x;
+                const float edgeYBias =
+                    -(1.0f - hudScaleY) * halfHeight * exactHudAnchor.y;
                 // Indexed-UP and revision-fenced VB/IB builders supply a
                 // unique, mask-complete touched list. On very sparse HUD
                 // spans, visit those references rather than walking every
@@ -3363,11 +3439,11 @@ namespace OutRunVRStereo
                     if (!std::isfinite(src[0]) || !std::isfinite(src[1]) ||
                         !std::isfinite(src[2]) || !std::isfinite(src[3]))
                         return false;
-                    const float transformedY = hudScaleY * src[1] + hudBiasY;
+                    const float transformedY = hudScaleY * src[1] + hudBiasY + edgeYBias;
                     const float transformedLeftX =
-                        eyeScaleX[0] * src[0] + eyeBiasX[0];
+                        eyeScaleX[0] * src[0] + eyeBiasX[0] + edgeLeftBias;
                     const float transformedRightX =
-                        eyeScaleX[1] * src[0] + eyeBiasX[1];
+                        eyeScaleX[1] * src[0] + eyeBiasX[1] + edgeRightBias;
                     if (!std::isfinite(transformedY) ||
                         !std::isfinite(transformedLeftX) ||
                         !std::isfinite(transformedRightX))
