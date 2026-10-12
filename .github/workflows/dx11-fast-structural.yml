@@ -50,6 +50,7 @@ jobs:
           python tools/test_dx11_stage0_pm_blendfactoralpha_00629.py
           python tools/test_dx11_stage0_pm_factor_arg2_00630.py
           python tools/test_dx11_stage0_pm_diffuse_arg1_00631.py
+          python tools/test_dx11_stage0_pm_inverse_texture_alpha_00632.py
       - name: Verify source graph and dormant runtime activation
         run: |
           python tools/verify_dx11_source_graph.py

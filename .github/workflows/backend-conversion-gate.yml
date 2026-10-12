@@ -78,6 +78,8 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh
         run: python tools/test_dx11_stage0_pm_diffuse_arg1_00631.py
+      - name: Verify DX11 PM RGB complemented alpha 00632
+        run: python tools/test_dx11_stage0_pm_inverse_texture_alpha_00632.py
 
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'
