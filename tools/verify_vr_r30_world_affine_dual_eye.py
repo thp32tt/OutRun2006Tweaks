@@ -39,7 +39,7 @@ def verify_source(source):
         "state.worldOffsetY[eye] * halfHeight",
         "affineRhwX[eye] = state.parallaxPerRhwX[eye] * halfWidth;",
         "affineRhwY[eye] = -state.parallaxPerRhwY[eye] * halfHeight;",
-        "if (!std::isfinite(affineBiasX[eye]) ||",
+        "!std::isfinite(affineBiasX[eye]) ||",
         "rhw > 0.0f && rhw < 1000.0f",
         "for (int eye = 0; eye < 2; ++eye)",
         "affineScaleX[eye] * x + affineBiasX[eye]",
@@ -198,7 +198,7 @@ def main():
         ("affineScaleY[eye] = state.worldScaleY[eye];", "affineScaleY[eye] = 1.0f;"),
         ("state.worldOffsetX[eye] * halfWidth", "0.0f * halfWidth"),
         ("state.worldOffsetY[eye] * halfHeight", "0.0f * halfHeight"),
-        ("if (!std::isfinite(affineBiasX[eye]) ||", "if (false ||"),
+        ("!std::isfinite(affineBiasX[eye]) ||", "false ||"),
         ("dst[0] = transformedX;", "dst[0] = x;"),
         ("dst[1] = transformedY;", "dst[1] = y;"),
     )
