@@ -1,41 +1,62 @@
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'OutRunVR-GPU-Lab-Settings.ps1')
-function Assert-Vector([string]$id,[string]$alpha,[string]$refl,[string]$glow,[string]$cull){
-    $in=@('-FramerateLimit=0','-TransparencySupersampling=false','-ReflectionResolution=256',
-          '-SkyGlowFactor=4','-DisableStageCulling=false','-DisableDesktopVsync=true')
-    $out=@(Set-OutRunVRGpuLabArguments -BaseArgs $in -Transparency $alpha -Reflection $refl -SkyGlow $glow -StageCulling $cull)
-    $expected=@{
-        TransparencySupersampling=if($alpha -eq 'ON'){'true'}else{'false'}
-        ReflectionResolution=$refl
-        SkyGlowFactor=$glow
-        DisableStageCulling=if($cull -eq 'ON'){'false'}else{'true'}
+function Assert-Vector([string]$id,[string]$alpha,[string]$refl,[string]$glow,[string]$cull,[string]$aa){
+    $base=@('-TransparencySupersampling=false','-ReflectionResolution=256',
+      '-SkyGlowFactor=4','-DisableStageCulling=false','-AntiAliasing=1',
+      '-FramerateLimit=0','-DisableDesktopVsync=true')
+    $out=@(Set-OutRunVRGpuLabArguments -BaseArgs $base -Transparency $alpha -Reflection $refl -SkyGlow $glow -StageCulling $cull -Msaa $aa)
+    $v=if($alpha -eq 'ON'){'true'}else{'false'}
+    $expected=[ordered]@{
+        'Graphics.TransparencySupersampling'=$v
+        'VR.TransparencySupersampling'=$v
+        'Graphics.ReflectionResolution'=$refl
+        'Graphics.SkyGlowFactor'=$glow
+        'Graphics.DisableStageCulling'=if($cull -eq 'ON'){'false'}else{'true'}
+        'VR.AntiAliasing'=switch($aa){'OFF'{'0'} '2X'{'1'} '4X'{'2'}}
     }
-    foreach($k in $expected.Keys){
-        $matches=@($out|Where-Object {$_ -match "^-$k="})
-        if($matches.Count -ne 1 -or $matches[0] -ne "-$k=$($expected[$k])"){throw "$id $k failed"}
+    foreach($key in $expected.Keys){
+        $match=@($out | Where-Object { $_ -match "^-$([regex]::Escape($key))=" })
+        if($match.Count -ne 1 -or $match[0] -ne "-$key=$($expected[$key])"){
+            throw "$id $key expected once: $($match -join ',')"
+        }
     }
-    if($out -notcontains '-FramerateLimit=0' -or $out -notcontains '-DisableDesktopVsync=true'){throw "$id lost unrelated flag"}
-    Write-Host "PASS GPU lab $id"
+    if($out -contains '-TransparencySupersampling=false' -or
+       $out -contains '-AntiAliasing=1'){throw "$id ambiguous legacy override retained"}
+    if($out -notcontains '-FramerateLimit=0'){throw "$id unrelated flag lost"}
+    Write-Host "PASS $id explicit Graphics+VR SSAA and MSAA"
 }
-Assert-Vector A ON 1024 4 OFF
-Assert-Vector B ON 1024 4 ON
-Assert-Vector C OFF 1024 4 ON
-Assert-Vector D OFF 512 4 ON
-Assert-Vector E ON 1024 0 ON
-try {Set-OutRunVRGpuLabArguments -BaseArgs @() -Transparency ON -Reflection 999 -SkyGlow 4 -StageCulling OFF | Out-Null;throw 'invalid input accepted'} catch {if($_.Exception.Message -eq 'invalid input accepted'){throw}}
+Assert-Vector A ON 1024 4 OFF 4X
+Assert-Vector B ON 1024 4 ON 4X
+Assert-Vector C OFF 1024 4 ON 4X
+Assert-Vector D OFF 512 4 ON 4X
+Assert-Vector E ON 1024 0 ON 4X
+Assert-Vector MSAA2 ON 1024 4 ON 2X
+Assert-Vector MSAAOFF ON 1024 4 ON OFF
+try{Set-OutRunVRGpuLabArguments -BaseArgs @() -Transparency ON -Reflection 999 -SkyGlow 4 -StageCulling OFF | Out-Null;throw 'INVALID_ALLOWED'}catch{if($_.Exception.Message -eq 'INVALID_ALLOWED'){throw}}
 $runner=Get-Content (Join-Path $PSScriptRoot 'Run-OutRunVRTest.ps1') -Raw
 $gui=Get-Content (Join-Path $PSScriptRoot 'OutRunVR-GPU-Lab.ps1') -Raw
-foreach($token in @('GpuLabTransparency','GpuLabReflection','GpuLabSkyGlow','GpuLabCulling',
-    'GpuLabScene','Set-OutRunVRGpuLabArguments','RUN_OVERRIDES.txt','GpuDiagnostics')){
-    if(!$runner.Contains($token)){throw "missing runner token $token"}
+$settings=Get-Content (Join-Path $PSScriptRoot '../src/settings.cpp') -Raw
+$graphics=Get-Content (Join-Path $PSScriptRoot '../src/hooks_graphics.cpp') -Raw
+foreach($token in @('GpuLabTransparency','GpuLabReflection','GpuLabSkyGlow','GpuLabCulling','GpuLabScene',
+  'Set-OutRunVRGpuLabArguments','RUN_OVERRIDES.txt','GpuDiagnostics')){
+    if(!$runner.Contains($token)){throw "Missing runner token $token"}
 }
 foreach($token in @('GPU 측정 시작','Add-Choice','Select-OutRunVRBackend.ps1',
-    'Run-OutRunVRTest.ps1','-GpuDiagnostics','WATERFRONT','SAND_SPRAY','DENSE_BUILDINGS')){
-    if(!$gui.Contains($token)){throw "missing GUI token $token"}
+  'Run-OutRunVRTest.ps1','-GpuDiagnostics','WATERFRONT','SAND_SPRAY','DENSE_BUILDINGS')){
+    if(!$gui.Contains($token)){throw "Missing GUI token $token"}
 }
-foreach($p in @('OutRunVR-GPU-Lab.ps1','Run-OutRunVRTest.ps1','OutRunVR-GPU-Lab-Settings.ps1')){
-    $tokens=$null;$errors=$null
-    [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot $p),[ref]$tokens,[ref]$errors)
-    if($errors.Count){throw "PowerShell parser error $p : $($errors -join '; ')"}
+foreach($token in @("keyUtf8.find('.')",'sectionUtf8 = keyUtf8.substr(0, dot)',
+  '_stricmp(setting->section().data(), sectionUtf8.c_str())')){
+    if(!$settings.Contains($token)){throw "Missing qualified CLI resolver $token"}
 }
-Write-Host 'PASS GPU lab GUI/presets + 5 positive/1 negative vectors + parser'
+foreach($token in @('VR GPU LAB SSAA GATE','VR GPU LAB SSAA DEVICE',
+  'Settings::VRTransparencySupersampling')){
+    if(!$graphics.Contains($token)){throw "Missing actual SSAA runtime gate $token"}
+}
+foreach($file in @('OutRunVR-GPU-Lab.ps1','Run-OutRunVRTest.ps1',
+  'OutRunVR-GPU-Lab-Settings.ps1','Test-OutRunVRGpuLab.ps1')){
+    $t=$null;$e=$null
+    [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot $file),[ref]$t,[ref]$e)
+    if($e.Count){throw "PowerShell syntax failed $file : $($e -join '; ')"}
+}
+Write-Host 'PASS seven vectors + negative invalid + two-gate SSAA source checks'

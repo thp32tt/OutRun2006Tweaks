@@ -1553,8 +1553,16 @@ class TransparencySupersampling : public Hook
 			// (Intel apparently supports the same ATOC switch, but users have reported issues before, unsure if they were on intel)
 			//device->SetRenderState(D3DRS_ADAPTIVETESS_Y, D3DFORMAT(MAKEFOURCC('A', 'T', 'O', 'C')));
 
-			// NVIDIA transparency supersampling
-			device->SetRenderState(D3DRS_ADAPTIVETESS_Y, D3DFORMAT(MAKEFOURCC('S', 'S', 'A', 'A')));
+			// NVIDIA transparency supersampling. Report driver API result rather
+            // than claiming that the actual hardware pixel cost was measured.
+			const HRESULT ssaaHr = device->SetRenderState(
+                D3DRS_ADAPTIVETESS_Y, D3DFORMAT(MAKEFOURCC('S', 'S', 'A', 'A')));
+            char gpuLab[4]{};
+            if (GetEnvironmentVariableA("OUTRUN_VR_GPU_PROFILE", gpuLab,
+                    static_cast<DWORD>(std::size(gpuLab))) == 1 && gpuLab[0] == '1')
+                spdlog::info(
+                    "VR GPU LAB SSAA DEVICE: vendor=NVIDIA hr=0x{:08X} driverAccepted={} hardwareCost=UNTESTED",
+                    static_cast<unsigned int>(ssaaHr), SUCCEEDED(ssaaHr));
 		}
 
 		// TODO: AMD ATOC mode.
@@ -1595,8 +1603,16 @@ public:
         const bool activeNativeVr = Settings::VREnabled &&
             length > 0 && length < std::size(backend) &&
             lstrcmpiA(backend, "d3d9") == 0;
-        return Settings::TransparencySupersampling &&
+        const bool eligible = Settings::TransparencySupersampling &&
             (!activeNativeVr || Settings::VRTransparencySupersampling);
+        char gpuLab[4]{};
+        if (GetEnvironmentVariableA("OUTRUN_VR_GPU_PROFILE", gpuLab,
+                static_cast<DWORD>(std::size(gpuLab))) == 1 && gpuLab[0] == '1')
+            spdlog::info(
+                "VR GPU LAB SSAA GATE: graphics={} vr={} nativeDX9Ex={} eligible={} (device API acceptance tracked separately)",
+                Settings::TransparencySupersampling.get(),
+                Settings::VRTransparencySupersampling.get(), activeNativeVr, eligible);
+        return eligible;
 	}
 
 	void declare_settings() override

@@ -266,14 +266,30 @@ namespace Settings
 
 				WideCharToMultiByte(CP_UTF8, 0, value.data(), int(value.size()), valueUtf8.data(), valueSize, nullptr, nullptr);
 
+				// -VR.TransparencySupersampling and -Graphics.TransparencySupersampling
+				// disambiguate duplicate keys. Unqualified legacy names remain valid.
+				std::string sectionUtf8;
+				const auto dot = keyUtf8.find('.');
+				if (dot != std::string::npos)
+				{
+					sectionUtf8 = keyUtf8.substr(0, dot);
+					keyUtf8.erase(0, dot + 1);
+				}
+				if (keyUtf8.empty() || (dot != std::string::npos && sectionUtf8.empty()))
+					continue;
+
 				for (SettingBase* setting : SettingBase::registry())
 				{
 					if (_stricmp(setting->key().data(), keyUtf8.c_str()) != 0)
 						continue;
+					if (!sectionUtf8.empty() &&
+						_stricmp(setting->section().data(), sectionUtf8.c_str()) != 0)
+						continue;
 
 					if (setting->set_from_string(valueUtf8))
 					{
-						spdlog::warn("Setting overridden from command line: {}={}", keyUtf8, valueUtf8);
+						spdlog::warn("Setting overridden from command line: {}.{}={}",
+							setting->section(), setting->key(), valueUtf8);
 						commandLineOverrides.insert(setting);
 
 						changed = true;
