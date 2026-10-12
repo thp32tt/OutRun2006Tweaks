@@ -285,8 +285,17 @@ def zero_copy_bridge_test() -> None:
     )
     for index, marker in mutation_cases:
         sources = [api, r32, r33]
-        assert sources[index].count(marker) == 1, marker
-        sources[index] = sources[index].replace(marker, "BROKEN", 1)
+        if index == 2:
+            # Both world and HUD routes borrow a pose. Mutate ONLY the
+            # world function; identical HUD anchors are valid and protected
+            # by their own regression gate.
+            world = body(sources[2], "R32ReviewOwnedResult R33TryFastWorld(")
+            assert world.count(marker) == 1, marker
+            sources[2] = sources[2].replace(
+                world, world.replace(marker, "BROKEN", 1), 1)
+        else:
+            assert sources[index].count(marker) == 1, marker
+            sources[index] = sources[index].replace(marker, "BROKEN", 1)
         assert zero_copy_bridge_violations(*sources), marker
     print("PASS zero-copy R31/R32/R33 borrowed pose; eight destructive mutations")
 
