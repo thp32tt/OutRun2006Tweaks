@@ -16,7 +16,7 @@ def connected(s):
           "selectTextureTfactorAlpha || selectDiffuseTfactorAlpha",
           "(!selectDiffuseDiffuseAlpha && !mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE) && !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha",
           "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)",
-          "const bool rgbNeedsDiffuse = selectDiffuseTfactorAlpha ||",
+          "const bool rgbNeedsDiffuse = selectDiffuseTextureAlpha || selectDiffuseDiffuseAlpha || selectDiffuseTfactorAlpha ||",
           "(rgbNeedsDiffuse && !arg2Diffuse)", "nextColorOp != D3DTOP_DISABLE",
           "capture.blendFactorAlphaValue = static_cast<float>((textureFactor >> 24u) & 0xffu) / 255.0f;")): return False
     if not all(x in draw for x in ("static_cast<float>(output.alphaFunc), capture.blendFactorAlphaValue",
@@ -64,7 +64,7 @@ def main():
     for a,b in (
         ("selectTextureTfactorAlpha || selectDiffuseTfactorAlpha","selectTextureTfactorAlpha || false"),
         ("GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)","GetRenderState(D3DRS_ALPHAREF, &textureFactor)"),
-        ("const bool rgbNeedsDiffuse = selectDiffuseTfactorAlpha ||","const bool rgbNeedsDiffuse = false ||"),
+        ("const bool rgbNeedsDiffuse = selectDiffuseTextureAlpha || selectDiffuseDiffuseAlpha || selectDiffuseTfactorAlpha ||","const bool rgbNeedsDiffuse = false ||"),
         ("nextColorOp != D3DTOP_DISABLE","nextColorOp == D3DTOP_DISABLE"),
         ("ctx->DrawIndexed(indexCount, 0, 0);","ctx->DrawIndexed(0, 0, 0);"),
         ("static_cast<float>(output.alphaFunc), capture.blendFactorAlphaValue",

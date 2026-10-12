@@ -1315,7 +1315,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         if (!layout.hasDiffuse && !selectTexture) return false;
         // Validate the chosen alpha input independently from RGB. Inactive
         // alpha stage operands are ignored; active modifier bits remain denied.
-        const bool rgbNeedsDiffuse = selectDiffuseTfactorAlpha || selectDiffuseTextureAlpha || selectDiffuseDiffuseAlpha || selectDiffuseBlendTextureAlpha ||
+        const bool rgbNeedsDiffuse = selectDiffuseTextureAlpha || selectDiffuseDiffuseAlpha || selectDiffuseTfactorAlpha || selectDiffuseBlendTextureAlpha ||
                                      selectDiffuseBlendDiffuseAlpha ||
                                      selectDiffuseFactorAlpha ||
                                      selectDiffuseModulateAlpha || selectDiffuseAddAlpha || selectDiffuseSubtractAlpha || selectDiffuseAddSmoothAlpha || selectDiffuseModulate2XAlpha || selectDiffuseModulate4XAlpha ||
