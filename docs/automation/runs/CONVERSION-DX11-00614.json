@@ -9,9 +9,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00614",
   "work_key": "DX11:LIVE_FVF_TEXCOORDSIZE3_PACKED_NATIVE_UV",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "base_head_sha": "37a7ff72f3999ff7b239b1641008a7db8a4e52e6",
   "development_strategy": {
@@ -60,5 +60,6 @@
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Verify exact-SHA required GitHub gates; repair failure with code if any, keep Quest3/VDXR/gamepad pending."
+  "next_action": "Quest3/VDXR HMD and gamepad runtime validation remains pending; CI is complete at the exact validation-bearing SHA.",
+  "validation_bearing_result_sha": "6daa705adefdaff199aad78ec591d85d3e34be9e"
 }
