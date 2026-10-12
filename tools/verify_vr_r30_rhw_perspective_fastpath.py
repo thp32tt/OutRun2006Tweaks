@@ -130,12 +130,114 @@ def projected_depth_signature_contract(source: str) -> None:
     print(f"PASS R30 projected-depth hotpath, {len(mutations)} destructive mutations, 12000 float32 cases")
 
 
+def fused_world_contract(source: str) -> None:
+    """Retain the exact per-eye fallback while preventing silent fused math regressions."""
+    import random
+    import math
+    block = source.split("bool R30TryFusedWorldXyzrhwProjection(", 1)[1].split(
+        "bool R30TransformXyzrhwStereo(", 1)[0]
+    stereo = source.split("bool R30TransformXyzrhwStereo(", 1)[1].split(
+        "template <typename LeftDraw,", 1)[0]
+
+    def intact(s: str) -> bool:
+        return all(x in s for x in (
+            "state.worldEffect || !state.fullWorldReprojection",
+            "std::fabs(bp._14) > 1.0e-5f",
+            "std::fabs(bp._24) > 1.0e-5f",
+            "std::fabs(bp._34) <= 1.0e-5f",
+            "std::fabs(det) <= 1.0e-6f",
+            "rhw <= 1.0e-6f || rhw >= 1000.0f",
+            "const float clipW = 1.0f / rhw;",
+            "(clipW - bp._44) * inv34;",
+            "(rhsX * bp._22 - bp._21 * rhsY) * invDet;",
+            "(bp._11 * rhsY - rhsX * bp._12) * invDet;",
+            "for (int eye = 0; eye < 2; ++eye)",
+            "state.eyeTail[eye].m[row][col]",
+            "clipEye[3] <= 1.0e-6f",
+            "if (fullZ >= 0.0f && fullZ <= 1.0f)",
+            "projected[eye][2] = z;",
+            "projected[eye][3] = invEyeW;",
+            "R30XyzrhwDepthPreserveFallbacks += depthPreserves;",
+            "if (allValid && referenced != 0)",
+            "for (UINT i = 0; i < modifiedVertexEnd; ++i)",
+            "if (usedMask && !(*usedMask)[i])",
+            "std::memcpy(left.data() + offset, bytes + offset,",
+            "std::memcpy(right.data() + offset, bytes + offset,",
+            "return false;",
+        )) and s.count("const float viewZ =") == 1
+
+    assert intact(block), "R30 fused world projection safety contract lost"
+    for before, after in (
+        ("state.worldEffect || !state.fullWorldReprojection", "false"),
+        ("std::fabs(bp._14) > 1.0e-5f", "false"),
+        ("std::fabs(bp._24) > 1.0e-5f", "false"),
+        ("std::fabs(bp._34) <= 1.0e-5f", "false"),
+        ("std::fabs(det) <= 1.0e-6f", "false"),
+        ("rhw <= 1.0e-6f || rhw >= 1000.0f", "false"),
+        ("const float clipW = 1.0f / rhw;", "const float clipW = rhw;"),
+        ("(clipW - bp._44) * inv34;", "(clipW + bp._44) * inv34;"),
+        ("(rhsX * bp._22 - bp._21 * rhsY) * invDet;", "rhsX;"),
+        ("(bp._11 * rhsY - rhsX * bp._12) * invDet;", "rhsY;"),
+        ("for (int eye = 0; eye < 2; ++eye)", "for (int eye = 0; eye < 1; ++eye)"),
+        ("clipEye[3] <= 1.0e-6f", "false"),
+        ("projected[eye][2] = z;", "projected[eye][2] = 0.0f;"),
+        ("projected[eye][3] = invEyeW;", "projected[eye][3] = 1.0f;"),
+        ("if (allValid && referenced != 0)", "if (true)"),
+        ("for (UINT i = 0; i < modifiedVertexEnd; ++i)",
+         "for (UINT i = 0; i < 0; ++i)"),
+        ("if (usedMask && !(*usedMask)[i])", "if (false)"),
+        ("R30XyzrhwDepthPreserveFallbacks += depthPreserves;",
+         "R30XyzrhwDepthPreserveFallbacks += 0;"),
+    ):
+        assert before in block, f"fused mutation target missing: {before}"
+        assert not intact(block.replace(before, after, 1)), (
+            f"fused mutation escaped: {before}"
+        )
+    assert "R30TryFusedWorldXyzrhwProjection(" in stereo
+    assert stereo.index("R30SeedWorldXyzrhwBuffers(") < stereo.index(
+        "R30TryFusedWorldXyzrhwProjection(") < stereo.index(
+        "bool leftFull = false;")
+    assert "if (leftFull != rightFull)" in stereo
+
+    # Independent-eye vs fused unprojection of a common row-vector game
+    # projection: sample both non-diagonal XY couplings and asymmetry.
+    rng = random.Random(684)
+    for _ in range(6000):
+        a = rng.uniform(0.4, 3.0)
+        b = rng.uniform(-0.2, 0.2)
+        c = rng.uniform(-0.2, 0.2)
+        d = rng.uniform(0.4, 3.0)
+        det = a * d - c * b
+        w34 = rng.choice((-1.0, 1.0))
+        w44 = rng.uniform(-0.1, 0.1)
+        w31, w32 = rng.uniform(-0.3, 0.3), rng.uniform(-0.3, 0.3)
+        w41, w42 = rng.uniform(-0.3, 0.3), rng.uniform(-0.3, 0.3)
+        rhw = rng.uniform(0.015, 3.0)
+        clipw = 1.0 / rhw
+        clipx = rng.uniform(-1.0, 1.0) * clipw
+        clipy = rng.uniform(-1.0, 1.0) * clipw
+        def restore():
+            z = (clipw - w44) / w34
+            rx = clipx - z * w31 - w41
+            ry = clipy - z * w32 - w42
+            return ((rx * d - c * ry) / det,
+                    (a * ry - rx * b) / det, z)
+        shared = restore()
+        for eye in range(2):
+            independent = restore()
+            assert all(math.isclose(p, q, rel_tol=1e-12, abs_tol=1e-12)
+                       for p, q in zip(shared, independent))
+    print("PASS R30 fused binocular world reprojection; 18 negative mutations, 6000 projection samples")
+
+
+
 def main() -> None:
     source = SOURCE.read_text(encoding="utf-8")
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert workflow.count("tools/verify_vr_r30_rhw_perspective_fastpath.py") == 2
     code = transform_body(source)
     projected_depth_signature_contract(source)
+    fused_world_contract(source)
     assert valid(code), "R30 RHW basis must be computed once before vertex loops"
     mutations = (
         ("state.worldEffect && state.fullWorldReprojection &&",

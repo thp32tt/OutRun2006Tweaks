@@ -2622,6 +2622,162 @@ namespace OutRunVRStereo
             return true;
         }
 
+        // R30 high-frequency world smoke/sand path: the original game-space
+        // unprojection is identical for both eyes. Reconstruct it ONCE per
+        // referenced vertex and apply the two already-verified eye tails.
+        // Fall back to the existing independent-eye path for nonstandard
+        // projections, a rejected vertex or an empty index selection.
+        bool R30TryFusedWorldXyzrhwProjection(
+            const void* source, UINT vertexCount, UINT stride,
+            const R30XyzrhwState& state,
+            std::vector<std::uint8_t>& left,
+            std::vector<std::uint8_t>& right,
+            const std::vector<std::uint8_t>* usedMask) noexcept
+        {
+            if (!state.worldEffect || !state.fullWorldReprojection)
+                return false;
+            const D3DMATRIX& bp = state.baseProjection;
+            const float det = bp._11 * bp._22 - bp._21 * bp._12;
+            if (std::fabs(bp._14) > 1.0e-5f ||
+                std::fabs(bp._24) > 1.0e-5f ||
+                std::fabs(bp._34) <= 1.0e-5f ||
+                !std::isfinite(det) || std::fabs(det) <= 1.0e-6f)
+                return false;
+
+            const float x0 = static_cast<float>(state.viewport.X);
+            const float y0 = static_cast<float>(state.viewport.Y);
+            const float width = static_cast<float>(state.viewport.Width);
+            const float height = static_cast<float>(state.viewport.Height);
+            const float minZ = state.viewport.MinZ;
+            const float depthSpan = state.viewport.MaxZ - minZ;
+            if (width <= 0.0f || height <= 0.0f ||
+                !std::isfinite(depthSpan) || depthSpan <= 1.0e-6f)
+                return false;
+            const float ndcScaleX = 2.0f / width;
+            const float ndcScaleY = 2.0f / height;
+            const float inv34 = 1.0f / bp._34;
+            const float invDet = 1.0f / det;
+            const auto* bytes = static_cast<const std::uint8_t*>(source);
+            UINT modifiedVertexEnd = 0;
+            UINT referenced = 0;
+            std::uint64_t depthPreserves = 0;
+            bool allValid = true;
+
+            for (UINT i = 0; i < vertexCount; ++i)
+            {
+                if (usedMask && !(*usedMask)[i])
+                    continue;
+                const std::size_t offset = static_cast<std::size_t>(i) * stride;
+                const auto* src = reinterpret_cast<const float*>(bytes + offset);
+                const float x = src[0];
+                const float y = src[1];
+                const float z = src[2];
+                const float rhw = src[3];
+                if (!std::isfinite(x) || !std::isfinite(y) ||
+                    !std::isfinite(z) || !std::isfinite(rhw) ||
+                    rhw <= 1.0e-6f || rhw >= 1000.0f)
+                {
+                    allValid = false;
+                    break;
+                }
+
+                const float ndcX = (x - x0) * ndcScaleX - 1.0f;
+                const float ndcY = 1.0f - (y - y0) * ndcScaleY;
+                const float clipW = 1.0f / rhw;
+                const float clipX = ndcX * clipW;
+                const float clipY = ndcY * clipW;
+                const float viewZ = (clipW - bp._44) * inv34;
+                const float rhsX = clipX - viewZ * bp._31 - bp._41;
+                const float rhsY = clipY - viewZ * bp._32 - bp._42;
+                const float viewX =
+                    (rhsX * bp._22 - bp._21 * rhsY) * invDet;
+                const float viewY =
+                    (bp._11 * rhsY - rhsX * bp._12) * invDet;
+                if (!std::isfinite(viewX) || !std::isfinite(viewY) ||
+                    !std::isfinite(viewZ) || !std::isfinite(rhsX) ||
+                    !std::isfinite(rhsY))
+                {
+                    allValid = false;
+                    break;
+                }
+                const float restoredView[4]{viewX, viewY, viewZ, 1.0f};
+                float projected[2][4]{};
+                std::uint32_t depthPreservesThisVertex = 0;
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    float clipEye[4]{};
+                    for (int col = 0; col < 4; ++col)
+                        for (int row = 0; row < 4; ++row)
+                            clipEye[col] += restoredView[row] *
+                                state.eyeTail[eye].m[row][col];
+                    if (!std::isfinite(clipEye[0]) ||
+                        !std::isfinite(clipEye[1]) ||
+                        !std::isfinite(clipEye[2]) ||
+                        !std::isfinite(clipEye[3]) ||
+                        clipEye[3] <= 1.0e-6f)
+                    {
+                        allValid = false;
+                        break;
+                    }
+                    const float invEyeW = 1.0f / clipEye[3];
+                    const float fullX = clipEye[0] * invEyeW;
+                    const float fullY = clipEye[1] * invEyeW;
+                    const float fullZ = clipEye[2] * invEyeW;
+                    if (!std::isfinite(fullX) || !std::isfinite(fullY) ||
+                        !std::isfinite(fullZ))
+                    {
+                        allValid = false;
+                        break;
+                    }
+                    projected[eye][0] = x0 + (fullX + 1.0f) * 0.5f * width;
+                    projected[eye][1] = y0 + (1.0f - fullY) * 0.5f * height;
+                    projected[eye][2] = z;
+                    if (fullZ >= 0.0f && fullZ <= 1.0f)
+                        projected[eye][2] = minZ + fullZ * depthSpan;
+                    else
+                        ++depthPreservesThisVertex;
+                    projected[eye][3] = invEyeW;
+                    if (!std::isfinite(projected[eye][0]) ||
+                        !std::isfinite(projected[eye][1]) ||
+                        !std::isfinite(projected[eye][2]))
+                    {
+                        allValid = false;
+                        break;
+                    }
+                }
+                if (!allValid)
+                    break;
+
+                std::memcpy(left.data() + offset, projected[0],
+                    4u * sizeof(float));
+                std::memcpy(right.data() + offset, projected[1],
+                    4u * sizeof(float));
+                depthPreserves += depthPreservesThisVertex;
+                modifiedVertexEnd = i + 1u;
+                ++referenced;
+            }
+
+            if (allValid && referenced != 0)
+            {
+                R30XyzrhwDepthPreserveFallbacks += depthPreserves;
+                return true;
+            }
+            // A partial fast candidate must be fully undone before the
+            // original per-eye inverse-projection/affine fallback runs. Only
+            // XYZRHW headers were written; UV/color and sparse holes remain.
+            for (UINT i = 0; i < modifiedVertexEnd; ++i)
+            {
+                if (usedMask && !(*usedMask)[i])
+                    continue;
+                const std::size_t offset = static_cast<std::size_t>(i) * stride;
+                std::memcpy(left.data() + offset, bytes + offset,
+                    4u * sizeof(float));
+                std::memcpy(right.data() + offset, bytes + offset,
+                    4u * sizeof(float));
+            }
+            return false;
+        }
+
         bool R30TransformXyzrhwStereo(
             const void* source, UINT vertexCount, UINT stride,
             const R30XyzrhwState& state,
@@ -2752,6 +2908,13 @@ namespace OutRunVRStereo
             if (!R30SeedWorldXyzrhwBuffers(
                     source, vertexCount, stride, left, &right, usedMask))
                 return false;
+
+            // Common perspective world draws need only one game-space
+            // reconstruction pass. Unusual/rejected input still takes the
+            // original independent-eye route and bilateral safety fallback.
+            if (R30TryFusedWorldXyzrhwProjection(
+                    source, vertexCount, stride, state, left, right, usedMask))
+                return true;
 
             bool leftFull = false;
             bool rightFull = false;
