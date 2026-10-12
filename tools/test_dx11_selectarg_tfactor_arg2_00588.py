@@ -22,7 +22,9 @@ def connected(s: str) -> bool:
     )
     if not all(token in gate for token in required_gate):
         return False
-    if gate.count("!selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha") != 2:
+    if gate.count("!selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha") != 3:
+        return False
+    if "((alphaNeedsDiffuse && !alphaArg2Diffuse) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha)" not in gate:
         return False
     if not all(token in draw for token in (
         "static_cast<float>(output.alphaFunc), capture.blendFactorAlphaValue",
@@ -42,6 +44,9 @@ def connected(s: str) -> bool:
         if "bool " + name + " = false;" not in s:
             return False
         if "capture." + name + " ? s." + ps + ".Get() :" not in draw:
+            return False
+        legacy = "selectTextureDiffuseAlpha" if mode == "Texture" else "selectDiffuseDiffuseAlpha"
+        if draw.index("capture." + name + " ? s." + ps + ".Get() :") > draw.index("capture." + legacy + " ?"):
             return False
         if 'compile("' + shader + '", "ps_4_0",' not in pipe:
             return False
@@ -80,6 +85,12 @@ def main() -> None:
         ("ctx->DrawIndexed(indexCount, 0, 0);", "ctx->DrawIndexed(0, 0, 0);"),
         ("ctx->PSSetConstantBuffers(0, 1, &alphaBuffer);",
          "ctx->PSSetConstantBuffers(0, 0, &alphaBuffer);"),
+        ("((alphaNeedsDiffuse && !alphaArg2Diffuse) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha)",
+         "(alphaNeedsDiffuse && !alphaArg2Diffuse)"),
+        ("capture.selectDiffuseTfactorArg2Alpha ? s.selectDiffuseTfactorAlphaPs.Get() :\n                      capture.selectDiffuseDiffuseAlpha",
+         "capture.selectDiffuseDiffuseAlpha ? s.ps.Get() :\n                      capture.selectDiffuseTfactorArg2Alpha"),
+        ("capture.selectTextureTfactorArg2Alpha ? s.selectTextureTfactorAlphaPs.Get() :\n                      capture.selectTextureDiffuseAlpha",
+         "capture.selectTextureDiffuseAlpha ? s.selectTextureDiffuseAlphaPs.Get() :\n                      capture.selectTextureTfactorArg2Alpha"),
     ]
     for old, new in mutations:
         assert old in s, old
@@ -91,7 +102,7 @@ def main() -> None:
                 assert admitted(mode, "SELECTARG2", ignored_arg1, "TFACTOR")
                 assert not admitted(mode, "SELECTARG1", ignored_arg1, "TFACTOR")
                 assert not admitted(mode, "SELECTARG2", ignored_arg1, "TEXTURE")
-    print("00588 PASS: 15 negative mutations, 512 factor byte cases, operand regression; runtime UNTESTED")
+    print("00588 PASS: 18 negative mutations, 512 factor byte cases, operand+shader-priority regression; runtime UNTESTED")
 
 if __name__ == "__main__":
     main()

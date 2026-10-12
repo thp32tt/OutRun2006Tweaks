@@ -1396,7 +1396,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                ((!selectDiffuseDiffuseAlpha && !mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE) && !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha &&
                !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha)))) ||
             (rgbNeedsDiffuse && !arg2Diffuse) ||
-            (alphaNeedsDiffuse && !alphaArg2Diffuse) ||
+            ((alphaNeedsDiffuse && !alphaArg2Diffuse) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha) ||
             coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb ||
             (addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP) ||
             (addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP) ||
@@ -1810,6 +1810,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     ctx->RSSetState(output.scissor ? s.scissorRaster.Get() : s.raster.Get());
     ctx->VSSetShader(s.vs.Get(), nullptr, 0);
     ctx->PSSetShader(capture.selectDiffuseTextureAlpha ? s.selectDiffuseTextureAlphaPs.Get() :
+                      capture.selectDiffuseTfactorArg2Alpha ? s.selectDiffuseTfactorAlphaPs.Get() :
                       capture.selectDiffuseDiffuseAlpha ? s.ps.Get() :
                       capture.selectDiffuseModulateAlpha ? s.selectDiffuseModulateAlphaPs.Get() :
                       capture.selectDiffuseAddAlpha ? s.selectDiffuseAddAlphaPs.Get() :
@@ -1817,18 +1818,17 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                       capture.selectDiffuseModulate2XAlpha ? s.selectDiffuseModulate2XAlphaPs.Get() :
                       capture.selectDiffuseModulate4XAlpha ? s.selectDiffuseModulate4XAlphaPs.Get() :
                        capture.selectDiffuseAddSmoothAlpha ? s.selectDiffuseAddSmoothAlphaPs.Get() :
-                        capture.selectDiffuseTfactorArg2Alpha ? s.selectDiffuseTfactorAlphaPs.Get() :
                         capture.selectDiffuseTfactorAlpha ? s.selectDiffuseTfactorAlphaPs.Get() :
                          capture.selectDiffuseFactorAlpha ? s.selectDiffuseFactorAlphaPs.Get() :
                         capture.selectDiffuseBlendTextureAlpha ? s.selectDiffuseBlendTextureAlphaPs.Get() :
-                       capture.selectTextureDiffuseAlpha ? s.selectTextureDiffuseAlphaPs.Get() :
+                       capture.selectTextureTfactorArg2Alpha ? s.selectTextureTfactorAlphaPs.Get() :
+                      capture.selectTextureDiffuseAlpha ? s.selectTextureDiffuseAlphaPs.Get() :
                        capture.selectTextureModulateAlpha ? s.selectTextureModulateAlphaPs.Get() :
                         capture.selectTextureModulate2XAlpha ? s.selectTextureModulate2XAlphaPs.Get() :
                         capture.selectTextureModulate4XAlpha ? s.selectTextureModulate4XAlphaPs.Get() :
                        capture.selectTextureAddAlpha ? s.selectTextureAddAlphaPs.Get() :
                        capture.selectTextureSubtractAlpha ? s.selectTextureSubtractAlphaPs.Get() :
                         capture.selectTextureAddSmoothAlpha ? s.selectTextureAddSmoothAlphaPs.Get() :
-                        capture.selectTextureTfactorArg2Alpha ? s.selectTextureTfactorAlphaPs.Get() :
                         capture.selectTextureTfactorAlpha ? s.selectTextureTfactorAlphaPs.Get() :
                          capture.selectTextureFactorAlpha ? s.selectTextureFactorAlphaPs.Get() :
                         capture.selectTextureBlendTextureAlpha ? s.selectTextureBlendTextureAlphaPs.Get() :
