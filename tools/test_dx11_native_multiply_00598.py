@@ -16,7 +16,7 @@ def connected(s):
     capture = section(s, "bool supported_game_state(", "bool translate_vertices(")
     draw = section(s, "bool submit(", "void observe(")
     multiply_om = section(pipe, "// Multiplicative game overlays:",
-                          "D3D11_BUFFER_DESC constants{}")
+                          "// Menu/vehicle/race complement modulation.")
     return (
         "bool multiplyBlend = false;" in output
         and "ComPtr<ID3D11BlendState> multiplyBlend;" in state
@@ -78,7 +78,7 @@ def main():
         # mutate only the original 00598 multiplicative output-merger state.
         if old.startswith("target."):
             start = s.index("// Multiplicative game overlays:")
-            end = s.index("D3D11_BUFFER_DESC constants{}", start)
+            end = s.index("// Menu/vehicle/race complement modulation.", start)
             block = s[start:end]
             assert old in block, "missing multiplicative OM anchor: " + old
             mutant = s[:start] + block.replace(old, bad, 1) + s[end:]
