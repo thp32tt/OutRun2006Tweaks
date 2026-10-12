@@ -29,7 +29,7 @@ def linked(s):
     predicate=s.split("const bool blendTextureAlphaPMFactorAlpha =",1)
     return (len(predicate)==2 and
         "op == D3DTOP_BLENDTEXTUREALPHAPM &&" in predicate[1].split(";",1)[0] and
-        "alphaOp == D3DTOP_SELECTARG1 && alphaArg1 == D3DTA_TFACTOR;" in predicate[1].split(";",1)[0] and
+        "alphaOp == D3DTOP_SELECTARG1 && alphaArg1 == D3DTA_TFACTOR" in predicate[1].split(";",1)[0] and
         len(body)==2 and all(x in s for x in TOKENS) and s.count("s.blendTextureAlphaPmFactorAlphaPs.Reset();")==2 and all(x in body[1].split("}",1)[0] for x in (
         "float4 t = gameTexture.Sample(gameSampler, v.uv);",
         "float4 c = float4(saturate(t.rgb + v.diffuse.rgb * (1.0f - t.a)), alphaParams.w);",
