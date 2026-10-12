@@ -340,6 +340,36 @@ namespace
         }
     };
     R23DirectHoldState R23DirectHold{};
+
+    // The producer's OpenSharedResource pair is immutable until its slot
+    // identity changes. Cache the descriptor *validation*, never a borrowed
+    // COM reference. Compare both live texture pointers as well as the
+    // handles, transport/run generations and game PID: reset/reopen may reuse
+    // a slot number or even the same numerical shared handle.
+    struct R23DirectSlotDescriptor
+    {
+        ID3D11Texture2D* left = nullptr;
+        ID3D11Texture2D* right = nullptr;
+        std::uint32_t leftHandle = 0;
+        std::uint32_t rightHandle = 0;
+        std::uint32_t generation = 0;
+        std::uint32_t runGeneration = 0;
+        std::uint32_t gamePid = 0;
+        std::uint32_t width = 0;
+        std::uint32_t height = 0;
+        DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+        D3D11_TEXTURE2D_DESC validated{};
+        bool valid = false;
+    };
+    std::array<R23DirectSlotDescriptor, OutRunVR::RenderFrameRingSize>
+        R23DirectSlotDescriptors{};
+
+    void R23InvalidateDirectSlotDescriptors() noexcept
+    {
+        for (auto& descriptor : R23DirectSlotDescriptors)
+            descriptor = {};
+    }
+
     bool R23FirstDirectHoldLogged = false;
     bool R36FirstDirectBootstrapLogged = false;
     std::array<std::uint32_t, OutRunVR::RenderFrameRingSize>
@@ -1076,9 +1106,41 @@ namespace
         const std::uint32_t slot = frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
         const std::uint32_t width = frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
         const std::uint32_t height = frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        const std::uint32_t leftHandle =
+            frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex];
+        const std::uint32_t rightHandle =
+            frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex];
         if (slot >= OutRunVR::RenderFrameRingSize || !width || !height ||
             width != frame.backbufferWidth || height != frame.backbufferHeight ||
-            !c.directLeft_[slot] || !c.directRight_[slot]) return false;
+            !generation || !runGeneration || !frame.clientPid ||
+            !leftHandle || !rightHandle ||
+            !c.directLeft_[slot] || !c.directRight_[slot])
+            return false;
+
+        auto& cached = R23DirectSlotDescriptors[slot];
+        if (cached.valid &&
+            cached.left == c.directLeft_[slot] &&
+            cached.right == c.directRight_[slot] &&
+            cached.leftHandle == leftHandle &&
+            cached.rightHandle == rightHandle &&
+            cached.generation == generation &&
+            cached.runGeneration == runGeneration &&
+            cached.gamePid == frame.clientPid &&
+            cached.width == width && cached.height == height &&
+            cached.format == c.directFormat_[slot])
+        {
+            validatedDesc = cached.validated;
+            return true;
+        }
+
+        // Only an unrecognized producer resource pays the two COM GetDesc
+        // calls. Never retain a failed descriptor or a stale entry after
+        // another game run, shared handle or D3D device resource appears.
+        cached = {};
         D3D11_TEXTURE2D_DESC l{}, r{};
         c.directLeft_[slot]->GetDesc(&l); c.directRight_[slot]->GetDesc(&r);
         // A single pair of descriptor reads now validates and supplies the
@@ -1091,7 +1153,21 @@ namespace
             l.Format == r.Format &&
             l.SampleDesc.Count == 1 && r.SampleDesc.Count == 1;
         if (valid)
+        {
             validatedDesc = l;
+            cached.left = c.directLeft_[slot];
+            cached.right = c.directRight_[slot];
+            cached.leftHandle = leftHandle;
+            cached.rightHandle = rightHandle;
+            cached.generation = generation;
+            cached.runGeneration = runGeneration;
+            cached.gamePid = frame.clientPid;
+            cached.width = width;
+            cached.height = height;
+            cached.format = c.directFormat_[slot];
+            cached.validated = l;
+            cached.valid = true;
+        }
         return valid;
     }
 
@@ -1099,6 +1175,7 @@ namespace
     {
         c.directFrameValid_ = false;
         c.directTransportReady_ = false;
+        R23InvalidateDirectSlotDescriptors();
         R23InvalidateDirectHold();
     }
 

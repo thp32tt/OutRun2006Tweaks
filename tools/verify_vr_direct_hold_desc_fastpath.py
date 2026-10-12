@@ -53,6 +53,37 @@ def verify(code: str) -> None:
     offsets = [commit.index(x) for x in ordered]
     assert offsets == sorted(offsets), "prepare -> validate -> stage order required"
     assert "R23InvalidateDirect(c);" in commit, "failure must invalidate direct path"
+    assert "struct R23DirectSlotDescriptor" in code
+    assert "R23DirectSlotDescriptors[slot]" in validate
+    # Cached descriptor is usable only while the exact producer resource and
+    # transport/run identity are unchanged. Return before any COM GetDesc.
+    checks = (
+        "cached.valid", "cached.left == c.directLeft_[slot]",
+        "cached.right == c.directRight_[slot]",
+        "cached.leftHandle == leftHandle",
+        "cached.rightHandle == rightHandle",
+        "cached.generation == generation",
+        "cached.runGeneration == runGeneration",
+        "cached.gamePid == frame.clientPid",
+        "cached.width == width && cached.height == height",
+        "cached.format == c.directFormat_[slot]",
+        "validatedDesc = cached.validated;",
+        "cached = {};", "cached.validated = l;", "cached.valid = true;",
+        "!generation || !runGeneration || !frame.clientPid",
+        "!leftHandle || !rightHandle",
+    )
+    for token in checks:
+        assert token in validate, f"DirectGPU descriptor identity lost: {token}"
+    assert validate.index("validatedDesc = cached.validated;") < validate.index(
+        "c.directLeft_[slot]->GetDesc(&l)")
+    assert validate.index("cached = {};") < validate.index(
+        "c.directLeft_[slot]->GetDesc(&l)")
+    assert validate.index("cached.valid = true;") > validate.index(
+        "const bool valid =")
+    invalidate = body(code, "void R23InvalidateDirect(")
+    assert "R23InvalidateDirectSlotDescriptors();" in invalidate
+    reset = body(code, "void R23InvalidateDirectSlotDescriptors(")
+    assert "descriptor = {};" in reset
 
 
 verify(source)
@@ -64,6 +95,14 @@ mutants = (
                    "R23StageDirectHold(c, frame)", 1),
     source.replace("const auto& left = validatedDesc;",
                    "const auto& left = validatedDesc;\n        c.directLeft_[slot]->GetDesc(&unused);", 1),
+    source.replace("cached.runGeneration == runGeneration", "true", 1),
+    source.replace("cached.gamePid == frame.clientPid", "true", 1),
+    source.replace("cached.leftHandle == leftHandle", "true", 1),
+    source.replace("cached.right == c.directRight_[slot]", "true", 1),
+    source.replace("cached.valid = true;", "/* never published */", 1),
+    source.replace("cached = {};", "/* invalid cache persists */", 1),
+    source.replace("R23InvalidateDirectSlotDescriptors();", "/* no invalidation */", 1),
+    source.replace("validatedDesc = cached.validated;", "/* wrong cache result */", 1),
 )
 for n, mutant in enumerate(mutants):
     assert mutant != source, f"negative mutation {n} ineffective"
@@ -72,4 +111,4 @@ for n, mutant in enumerate(mutants):
     except (AssertionError, ValueError):
         continue
     raise AssertionError(f"negative mutation {n} escaped")
-print("PASS DX9Ex validated DirectGPU hold desc reuse: 2 reads not 4, 5 mutations")
+print("PASS DX9Ex validated DirectGPU hold desc reuse: 2 reads on resource change, 0 on identity hit, 13 mutations")
