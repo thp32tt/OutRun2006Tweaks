@@ -76,13 +76,28 @@ def model_cases():
                 "full matrix validation cannot be replaced by pair-only finiteness")
 
 
+def mutate_accessor(old, new):
+    # A whole-file replace can mutate GetRendererBaseProjection or older
+    # culling paths instead, giving a false negative regression failure.
+    start_marker = "bool GetRendererProjectionSignature(float& m34, float& m44) noexcept"
+    end_marker = "bool GetLastVerifiedWvp("
+    require(RENDERER.count(start_marker) == 1, "ambiguous projection accessor")
+    start = RENDERER.index(start_marker)
+    end = RENDERER.index(end_marker, start)
+    body = RENDERER[start:end]
+    require(body.count(old) == 1, "mutation target absent or ambiguous: " + old)
+    changed = body.replace(old, new, 1)
+    require(changed != body, "projection mutation did not change accessor")
+    return RENDERER[:start] + changed + RENDERER[end:]
+
+
 def negative_mutations():
-    marker = "m34 = projection._34;"
     for altered in (
-        RENDERER.replace(marker, "m34 = projection._44;", 1),
-        RENDERER.replace("m44 = projection._44;", "m44 = projection._34;", 1),
-        RENDERER.replace("MatrixFinite(projection)", "true", 1),
-        RENDERER.replace("CullingProjectionSaved", "projection", 1),
+        mutate_accessor("m34 = projection._34;", "m34 = projection._44;"),
+        mutate_accessor("m44 = projection._44;", "m44 = projection._34;"),
+        mutate_accessor("MatrixFinite(projection)", "true"),
+        mutate_accessor("projection = CullingProjectionSaved;",
+                        "projection = projection;"),
     ):
         try:
             source_contract(renderer=altered)
