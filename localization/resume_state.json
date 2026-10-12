@@ -16756,5 +16756,42 @@
     "C2": "RETIRED_HISTORICAL_Q104_REWORK_PRESERVED",
     "C3": "NOT_RUN",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a257_q119_hd_readable_imagegen_source_input_20261012": {
+    "role": "A",
+    "queue_index": 119,
+    "run_key": "OUTRUN-KOR-A-HD-IMAGEGEN-Q119-SHA-READABLE-PNG-INPUT-20261012-1500",
+    "date_kst": "2026-10-12 15:00",
+    "source_english_dds_sha256": "2336da3c2d08d1bfb99e3a8612a3fe7d39f9c852d7da433204c8d4a19b49c552",
+    "canonical_source": "Sonic-TV/OR2006Sprites@3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "source_native": [
+      2048,
+      256
+    ],
+    "source_format": "BC3_DXT5",
+    "mips": 1,
+    "readable_transform": "flip_y",
+    "source_english": "Time Attack Mode",
+    "korean_approved": "타임 어택 모드",
+    "input_dir": "localization/graphics/role_A/imagegen_inputs/q119_20261012",
+    "full_png_sha256": "1859e3321eb8050f8eb2b93297a9f979480ea72900586264befdbb42ece987ea",
+    "roi_png_sha256": "0d0b692e5389fb56f538fd0a0434f61dab2be3d0d9bf180adfe6172faa757baf",
+    "original_effect_bbox_readable": [
+      390,
+      54,
+      1632,
+      200
+    ],
+    "status": "SOURCE_REFERENCE_NOT_BOUND__READABLE_PNG_READY_TO_UPLOAD",
+    "imagegen_attempts": 0,
+    "produced_Korean_PNG": 0,
+    "new_trial_dds": 0,
+    "official_promoted": 0,
+    "current_queue_status": "c1_20261011_q119_new_optical_source_family_rework_c2_c3_hold",
+    "independent_C1": "NOT_RUN_NEW_CANDIDATE",
+    "C3": "NOT_RUN",
+    "user_game": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "note": "Source PNG preparation is a newly created handoff input, not a translated output, not a producer pass. Actual source image needs to be attached to ChatGPT user message before native generation. User's strict original effect bbox/underfill condition in prompt; no false approval."
   }
 }
