@@ -87,7 +87,16 @@ mutants = (
 )
 for old, wrong in mutants:
     assert old in SRC, old
-    mutant = SRC.replace(old, wrong, 1)
+    if old.startswith("target."):
+        # Mutate only the new complement OM descriptors. Earlier valid
+        # source-over states have the same INV_SRC_ALPHA alpha factor.
+        begin = SRC.index("// Menu/vehicle/race complement modulation.")
+        end = SRC.index("D3D11_BUFFER_DESC constants{}", begin)
+        block = SRC[begin:end]
+        assert old in block
+        mutant = SRC[:begin] + block.replace(old, wrong, 1) + SRC[end:]
+    else:
+        mutant = SRC.replace(old, wrong, 1)
     assert not connected(mutant), "undetected 00606 destructive regression: " + old
 
 # D3D9 equation and native color/alpha blend factors must agree independently.
