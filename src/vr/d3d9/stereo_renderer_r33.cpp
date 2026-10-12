@@ -161,14 +161,19 @@ namespace OutRunVRStereo
         HRESULT R33GuardStereoRasterState(IDirect3DDevice9* device,
             DrawCall&& drawCall, const char* site) noexcept
         {
+            // The same game-device/internal-pass tests gate both semantic
+            // consumption and stereo routing. Reuse their result for every
+            // primitive instead of repeating the R30/R29 dispatch bridges.
+            const bool gameDevice = device && R32ReviewIsGameDevice(device);
+            const bool internalPass = gameDevice && R32ReviewInternalStereoPass();
             const auto drawSemanticValue =
-                (device && R32ReviewIsGameDevice(device) && !R32ReviewInternalStereoPass())
+                (gameDevice && !internalPass)
                 ? OutRunVR::GameSemantic::ConsumeForDraw()
                 : OutRunVR::GameSemantic::CurrentScope;
             OutRunVR::GameSemantic::ScopedRenderSemantic drawSemantic(
                 drawSemanticValue);
 
-            if (!device || !R32ReviewIsGameDevice(device) || R32ReviewInternalStereoPass() ||
+            if (!gameDevice || internalPass ||
                 OutRunVR::State::StateBlockTracker::Recording() ||
                 !R32ReviewStereoWanted() || !R32ReviewTargetIsBackBuffer())
             {
@@ -836,8 +841,14 @@ namespace OutRunVRStereo
         {
             R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, false);
             auto call = [&](bool resyncAlreadyFlushed) {
-                const HRESULT xyzrhw = R32ReviewTryXyzrhwPrimitiveVB(
-                    device, type, startVertex, primitiveCount);
+                // The outer raster guard already rejected non-game, aux RT,
+                // mono and StateBlock-recording calls. R30PrepareXyzrhwState
+                // would reject those same draws in R29StableStereoBase;
+                // bypass its cross-TU checks on the large mono/aux workload.
+                const HRESULT xyzrhw = resyncAlreadyFlushed
+                    ? R32ReviewTryXyzrhwPrimitiveVB(
+                    device, type, startVertex, primitiveCount)
+                    : E_NOTIMPL;
                 if (xyzrhw != E_NOTIMPL)
                     return xyzrhw;
 
@@ -867,9 +878,15 @@ namespace OutRunVRStereo
         {
             R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, false);
             auto call = [&](bool resyncAlreadyFlushed) {
-                const HRESULT xyzrhw = R32ReviewTryXyzrhwIndexedPrimitiveVB(
+                // The outer raster guard already rejected non-game, aux RT,
+                // mono and StateBlock-recording calls. R30PrepareXyzrhwState
+                // would reject those same draws in R29StableStereoBase;
+                // bypass its cross-TU checks on the large mono/aux workload.
+                const HRESULT xyzrhw = resyncAlreadyFlushed
+                    ? R32ReviewTryXyzrhwIndexedPrimitiveVB(
                     device, type, baseVertexIndex, minVertexIndex,
-                    numVertices, startIndex, primitiveCount);
+                    numVertices, startIndex, primitiveCount)
+                    : E_NOTIMPL;
                 if (xyzrhw != E_NOTIMPL)
                     return xyzrhw;
 
@@ -901,8 +918,14 @@ namespace OutRunVRStereo
         {
             R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, true);
             auto call = [&](bool resyncAlreadyFlushed) {
-                const HRESULT xyzrhw = R32ReviewTryXyzrhwPrimitiveUP(
-                    device, type, primitiveCount, data, stride);
+                // The outer raster guard already rejected non-game, aux RT,
+                // mono and StateBlock-recording calls. R30PrepareXyzrhwState
+                // would reject those same draws in R29StableStereoBase;
+                // bypass its cross-TU checks on the large mono/aux workload.
+                const HRESULT xyzrhw = resyncAlreadyFlushed
+                    ? R32ReviewTryXyzrhwPrimitiveUP(
+                    device, type, primitiveCount, data, stride)
+                    : E_NOTIMPL;
                 if (xyzrhw != E_NOTIMPL)
                     return xyzrhw;
 
@@ -933,9 +956,15 @@ namespace OutRunVRStereo
         {
             R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, true);
             auto call = [&](bool resyncAlreadyFlushed) {
-                const HRESULT xyzrhw = R32ReviewTryXyzrhwIndexedPrimitiveUP(
+                // The outer raster guard already rejected non-game, aux RT,
+                // mono and StateBlock-recording calls. R30PrepareXyzrhwState
+                // would reject those same draws in R29StableStereoBase;
+                // bypass its cross-TU checks on the large mono/aux workload.
+                const HRESULT xyzrhw = resyncAlreadyFlushed
+                    ? R32ReviewTryXyzrhwIndexedPrimitiveUP(
                     device, type, minVertexIndex, numVertices, primitiveCount,
-                    indexData, indexFormat, vertexData, stride);
+                    indexData, indexFormat, vertexData, stride)
+                    : E_NOTIMPL;
                 if (xyzrhw != E_NOTIMPL)
                     return xyzrhw;
 

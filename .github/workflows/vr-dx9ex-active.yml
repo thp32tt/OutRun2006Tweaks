@@ -97,6 +97,7 @@ on:
       - 'tools/verify_vr_r32_review_api_seam.py'
       - 'tools/verify_vr_r33_r32_tu_split.py'
       - 'tools/verify_vr_r33_single_classification.py'
+      - 'tools/verify_vr_r33_mono_bypass_xyzrhw_fastpath.py'
       - 'tools/verify_vr_r33_stencil_snapshot_fastpath.py' # Exact-SHA R33 policy re-runs on test repairs.
       - 'tools/verify_vr_r32_depthless_right_pass_fastpath.py'
       - 'tools/verify_vr_r29_borrowed_surface_fastpath.py'
@@ -250,6 +251,7 @@ jobs:
             'tools/verify_vr_r32_review_api_seam.py',
             'tools/verify_vr_r33_r32_tu_split.py',
             'tools/verify_vr_r33_single_classification.py',
+            'tools/verify_vr_r33_mono_bypass_xyzrhw_fastpath.py',
             'tools/verify_vr_r33_stencil_snapshot_fastpath.py',
             'tools/verify_vr_r32_depthless_right_pass_fastpath.py',
             'tools/verify_vr_r29_borrowed_surface_fastpath.py',
