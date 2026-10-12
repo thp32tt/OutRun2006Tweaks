@@ -34,7 +34,7 @@ def valid(code):
                 "UINT knownUsedCount = UINT_MAX",
                 "knownUsedCount <= vertexCount",
                 "static_cast<std::size_t>(knownUsedCount)",
-                "std::count_if(", "selectedCount * 4u <= vertexCount")):
+                "std::count_if(", "static_cast<std::size_t>(selectedCount) * 4u <= vertexCount")):
             return False
         if segment.index("knownUsedCount <= vertexCount") >= segment.index(
                 "std::count_if("):
@@ -115,8 +115,8 @@ def main():
         ("static_cast<std::size_t>(knownUsedCount)",
          "static_cast<std::size_t>(vertexCount)"),
         ("std::count_if(", "std::count_none("),
-        ("selectedCount * 4u <= vertexCount",
-         "selectedCount * 2u <= vertexCount"),
+        ("static_cast<std::size_t>(selectedCount) * 4u <= vertexCount",
+         "static_cast<std::size_t>(selectedCount) * 2u <= vertexCount"),
         ("usedMask, knownUsedCount))", "usedMask))"),
     )
     for old, new in mutations:
