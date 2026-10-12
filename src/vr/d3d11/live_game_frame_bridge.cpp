@@ -562,6 +562,8 @@ struct OutputCapture {
     bool inverseSourceMultiplyBlend = false; // D3D9 ZERO/INVSRCCOLOR
     bool destAlphaCrossfadeBlend = false; // DESTALPHA / INVDESTALPHA
     bool reverseDestAlphaCrossfadeBlend = false; // INVDESTALPHA / DESTALPHA
+    bool sourceAlphaSaturateCopyBlend = false; // SRCALPHASAT/ZERO
+    bool sourceAlphaSaturateAddBlend = false; // SRCALPHASAT/ONE
     D3D11_BLEND_OP blendOp = D3D11_BLEND_OP_ADD; // Captured D3D9 RGB and alpha operation.
     bool alphaTest = false;
     DWORD alphaRef = 0;
@@ -668,6 +670,8 @@ struct State {
     ComPtr<ID3D11BlendState> inverseSourceMultiplyBlend;
     ComPtr<ID3D11BlendState> destAlphaCrossfadeBlend;
     ComPtr<ID3D11BlendState> reverseDestAlphaCrossfadeBlend;
+    ComPtr<ID3D11BlendState> sourceAlphaSaturateCopyBlend;
+    ComPtr<ID3D11BlendState> sourceAlphaSaturateAddBlend;
     // Opaque/over/additive/source-alpha-add/premultiplied, 16 masks each.
     std::array<ComPtr<ID3D11BlendState>, 80> maskedBlends{};
     // Distinct destination-dependent blend cache; do not alias older mask slots.
@@ -676,6 +680,8 @@ struct State {
     std::array<ComPtr<ID3D11BlendState>, 16> inverseSourceMultiplyMaskedBlends{};
     std::array<ComPtr<ID3D11BlendState>, 16> destAlphaCrossfadeMaskedBlends{};
     std::array<ComPtr<ID3D11BlendState>, 16> reverseDestAlphaCrossfadeMaskedBlends{};
+    std::array<ComPtr<ID3D11BlendState>, 16> sourceAlphaSaturateCopyMaskedBlends{};
+    std::array<ComPtr<ID3D11BlendState>, 16> sourceAlphaSaturateAddMaskedBlends{};
     std::array<ComPtr<ID3D11BlendState>, 16> inverseSourceAlphaMaskedBlends{};
     std::array<ComPtr<ID3D11BlendState>, 16> sourceAlphaCopyMaskedBlends{};
     std::array<ComPtr<ID3D11BlendState>, 16> inverseAlphaCopyMaskedBlends{};
@@ -743,6 +749,7 @@ bool ensure_pipeline(State& s) noexcept {
         s.inverseSourceAlphaBlend && s.multiplyBlend &&
          s.inverseDestMultiplyBlend && s.inverseSourceMultiplyBlend &&
          s.destAlphaCrossfadeBlend && s.reverseDestAlphaCrossfadeBlend &&
+         s.sourceAlphaSaturateCopyBlend && s.sourceAlphaSaturateAddBlend &&
         s.sourceAlphaCopyBlend && s.inverseAlphaCopyBlend &&
         s.inverseAlphaAddBlend && s.sourceReplaceBlend &&
         s.alphaConstants && readbackReady)
@@ -754,7 +761,7 @@ bool ensure_pipeline(State& s) noexcept {
     s.blendFactorModulate2XAlphaPs.Reset(); s.blendFactorModulate4XAlphaPs.Reset();
     s.addSmoothTextureAlphaPs.Reset(); s.addSmoothDiffuseAlphaPs.Reset();
     s.layout.Reset(); s.raster.Reset(); s.scissorRaster.Reset();
-    s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset(); s.inverseSourceAlphaBlend.Reset(); s.sourceAlphaCopyBlend.Reset(); s.inverseAlphaCopyBlend.Reset(); s.inverseAlphaAddBlend.Reset(); s.sourceReplaceBlend.Reset(); s.multiplyBlend.Reset(); s.inverseDestMultiplyBlend.Reset(); s.inverseSourceMultiplyBlend.Reset(); s.destAlphaCrossfadeBlend.Reset(); s.reverseDestAlphaCrossfadeBlend.Reset();
+    s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset(); s.inverseSourceAlphaBlend.Reset(); s.sourceAlphaCopyBlend.Reset(); s.inverseAlphaCopyBlend.Reset(); s.inverseAlphaAddBlend.Reset(); s.sourceReplaceBlend.Reset(); s.multiplyBlend.Reset(); s.inverseDestMultiplyBlend.Reset(); s.inverseSourceMultiplyBlend.Reset(); s.destAlphaCrossfadeBlend.Reset(); s.reverseDestAlphaCrossfadeBlend.Reset(); s.sourceAlphaSaturateCopyBlend.Reset(); s.sourceAlphaSaturateAddBlend.Reset();
     s.alphaConstants.Reset();
     for (auto& item : s.readbacks) {
         item.staging.Reset(); item.fence.Reset(); item.busy = false;
@@ -767,6 +774,8 @@ bool ensure_pipeline(State& s) noexcept {
     for (auto& masked : s.inverseSourceMultiplyMaskedBlends) masked.Reset();
     for (auto& masked : s.destAlphaCrossfadeMaskedBlends) masked.Reset();
     for (auto& masked : s.reverseDestAlphaCrossfadeMaskedBlends) masked.Reset();
+    for (auto& masked : s.sourceAlphaSaturateCopyMaskedBlends) masked.Reset();
+    for (auto& masked : s.sourceAlphaSaturateAddMaskedBlends) masked.Reset();
     for (auto& masked : s.inverseSourceAlphaMaskedBlends) masked.Reset();
     for (auto& masked : s.sourceAlphaCopyMaskedBlends) masked.Reset();
     for (auto& masked : s.inverseAlphaCopyMaskedBlends) masked.Reset();
@@ -1127,6 +1136,21 @@ bool ensure_pipeline(State& s) noexcept {
     target.DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
     if (FAILED(dev->CreateBlendState(&blend, s.reverseDestAlphaCrossfadeBlend.GetAddressOf())))
         return false;
+    // Game D3D9 SRCALPHASAT has RGB factor min(src.a,1-dst.a), while
+    // source ALPHA factor is ONE. SRC_ALPHA_SAT is invalid in SrcBlendAlpha.
+    // Pair-specific descriptors avoid mixing source replacement and additive.
+    target.SrcBlend = D3D11_BLEND_SRC_ALPHA_SAT;
+    target.DestBlend = D3D11_BLEND_ZERO;
+    target.SrcBlendAlpha = D3D11_BLEND_ONE;
+    target.DestBlendAlpha = D3D11_BLEND_ZERO;
+    if (FAILED(dev->CreateBlendState(&blend, s.sourceAlphaSaturateCopyBlend.GetAddressOf())))
+        return false;
+    target.SrcBlend = D3D11_BLEND_SRC_ALPHA_SAT;
+    target.DestBlend = D3D11_BLEND_ONE;
+    target.SrcBlendAlpha = D3D11_BLEND_ONE;
+    target.DestBlendAlpha = D3D11_BLEND_ONE;
+    if (FAILED(dev->CreateBlendState(&blend, s.sourceAlphaSaturateAddBlend.GetAddressOf())))
+        return false;
     D3D11_BUFFER_DESC constants{};
     constants.ByteWidth = sizeof(float) * 4u;
     constants.Usage = D3D11_USAGE_DEFAULT;
@@ -1292,6 +1316,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             src == D3DBLEND_DESTALPHA && dst == D3DBLEND_INVDESTALPHA;
         const bool reverseDestAlphaCrossfade =
             src == D3DBLEND_INVDESTALPHA && dst == D3DBLEND_DESTALPHA;
+        const bool sourceAlphaSaturateCopy =
+            src == D3DBLEND_SRCALPHASAT && dst == D3DBLEND_ZERO;
+        const bool sourceAlphaSaturateAdd =
+            src == D3DBLEND_SRCALPHASAT && dst == D3DBLEND_ONE;
         // D3D9 BOTH* source blend enums set both source and destination
         // factors, ignoring D3DRS_DESTBLEND. BOTHSRCALPHA reuses native
         // SRCALPHA/INVSRCALPHA; BOTHINVSRCALPHA needs inverse-over OM.
@@ -1333,6 +1361,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         } else if (destAlphaCrossfade || reverseDestAlphaCrossfade) {
             // Both dest-alpha crossfades were attested as ADD/non-separate
             // above and use their own forward/reverse native OM descriptors.
+        } else if (sourceAlphaSaturateCopy || sourceAlphaSaturateAdd) {
+            // Unsupported subtract/separate-alpha must remain on original D3D9.
+            if (blendOp != D3DBLENDOP_ADD) return false;
         } else if (!premultipliedAlpha && !multiply &&
             !sourceAlphaCopy && !sourceReplace &&
             !inverseAlphaCopy && !inverseAlphaAdd &&
@@ -1353,6 +1384,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         output.inverseSourceMultiplyBlend = inverseSourceMultiply;
         output.destAlphaCrossfadeBlend = destAlphaCrossfade;
         output.reverseDestAlphaCrossfadeBlend = reverseDestAlphaCrossfade;
+        output.sourceAlphaSaturateCopyBlend = sourceAlphaSaturateCopy;
+        output.sourceAlphaSaturateAddBlend = sourceAlphaSaturateAdd;
         output.blendOp = blendOp == D3DBLENDOP_SUBTRACT ?
             D3D11_BLEND_OP_SUBTRACT :
             blendOp == D3DBLENDOP_REVSUBTRACT ?
@@ -2177,6 +2210,26 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                 return false;
         }
         maskedBlend = &cached;
+    } else if (output.sourceAlphaSaturateCopyBlend &&
+               output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+        auto& cached = s.sourceAlphaSaturateCopyMaskedBlends[output.colorWriteMask];
+        if (!cached) {
+            D3D11_BLEND_DESC desc{};
+            s.sourceAlphaSaturateCopyBlend->GetDesc(&desc);
+            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf()))) return false;
+        }
+        maskedBlend = &cached;
+    } else if (output.sourceAlphaSaturateAddBlend &&
+               output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+        auto& cached = s.sourceAlphaSaturateAddMaskedBlends[output.colorWriteMask];
+        if (!cached) {
+            D3D11_BLEND_DESC desc{};
+            s.sourceAlphaSaturateAddBlend->GetDesc(&desc);
+            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf()))) return false;
+        }
+        maskedBlend = &cached;
     } else if (output.destAlphaCrossfadeBlend &&
                output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
         auto& cached = s.destAlphaCrossfadeMaskedBlends[output.colorWriteMask];
@@ -2296,6 +2349,10 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         ctx->OMSetBlendState(s.inverseDestMultiplyBlend.Get(), nullptr, 0xffffffffu);
     else if (output.inverseSourceMultiplyBlend)
         ctx->OMSetBlendState(s.inverseSourceMultiplyBlend.Get(), nullptr, 0xffffffffu);
+    else if (output.sourceAlphaSaturateCopyBlend)
+        ctx->OMSetBlendState(s.sourceAlphaSaturateCopyBlend.Get(), nullptr, 0xffffffffu);
+    else if (output.sourceAlphaSaturateAddBlend)
+        ctx->OMSetBlendState(s.sourceAlphaSaturateAddBlend.Get(), nullptr, 0xffffffffu);
     else if (output.destAlphaCrossfadeBlend)
         ctx->OMSetBlendState(s.destAlphaCrossfadeBlend.Get(), nullptr, 0xffffffffu);
     else if (output.reverseDestAlphaCrossfadeBlend)
@@ -2636,7 +2693,7 @@ void before_game_reset() noexcept {
     s.readSlot = s.writeSlot = 0;
     s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
     s.raster.Reset(); s.scissorRaster.Reset(); s.layout.Reset();
-    s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset(); s.inverseSourceAlphaBlend.Reset(); s.sourceAlphaCopyBlend.Reset(); s.inverseAlphaCopyBlend.Reset(); s.inverseAlphaAddBlend.Reset(); s.sourceReplaceBlend.Reset(); s.multiplyBlend.Reset(); s.inverseDestMultiplyBlend.Reset(); s.inverseSourceMultiplyBlend.Reset(); s.destAlphaCrossfadeBlend.Reset(); s.reverseDestAlphaCrossfadeBlend.Reset();
+    s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset(); s.inverseSourceAlphaBlend.Reset(); s.sourceAlphaCopyBlend.Reset(); s.inverseAlphaCopyBlend.Reset(); s.inverseAlphaAddBlend.Reset(); s.sourceReplaceBlend.Reset(); s.multiplyBlend.Reset(); s.inverseDestMultiplyBlend.Reset(); s.inverseSourceMultiplyBlend.Reset(); s.destAlphaCrossfadeBlend.Reset(); s.reverseDestAlphaCrossfadeBlend.Reset(); s.sourceAlphaSaturateCopyBlend.Reset(); s.sourceAlphaSaturateAddBlend.Reset();
     s.alphaConstants.Reset();
     for (auto& masked : s.maskedBlends) masked.Reset();
     for (auto& masked : s.multiplyMaskedBlends) masked.Reset();
@@ -2644,6 +2701,8 @@ void before_game_reset() noexcept {
     for (auto& masked : s.inverseSourceMultiplyMaskedBlends) masked.Reset();
     for (auto& masked : s.destAlphaCrossfadeMaskedBlends) masked.Reset();
     for (auto& masked : s.reverseDestAlphaCrossfadeMaskedBlends) masked.Reset();
+    for (auto& masked : s.sourceAlphaSaturateCopyMaskedBlends) masked.Reset();
+    for (auto& masked : s.sourceAlphaSaturateAddMaskedBlends) masked.Reset();
     for (auto& masked : s.inverseSourceAlphaMaskedBlends) masked.Reset();
     for (auto& masked : s.sourceAlphaCopyMaskedBlends) masked.Reset();
     for (auto& masked : s.inverseAlphaCopyMaskedBlends) masked.Reset();

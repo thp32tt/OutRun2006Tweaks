@@ -533,6 +533,11 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "R186 indexed Draw WARP probe failed: $LASTEXITCODE" }
 
 
+      # 00608: real D3D9 game Draw SRCALPHASAT native OM, masks and regression.
+      - name: Verify 00608 game native SRCALPHASAT copy and add
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_native_src_alpha_sat_00608.py
+
       # 00607: game-state D3D9 destination-alpha crossfade native OM + destructive tests.
       - name: Verify 00607 native dest-alpha crossfade
         if: github.ref_name == 'vr-dx11-native-r71'
