@@ -1,0 +1,319 @@
+{
+  "schema_version": "C1_SHA_BOUND_FAST_QA_20261012",
+  "task_id": "OUTRUN-C1-20261012-2340-Q051-057-094-197",
+  "reviewer": "C1 independent QA only, no self-generated C1 samples",
+  "branch": "korean-localization-recovery-20260928",
+  "source_branch_head": "9f04b0d5cd840194c94a077648c0f06dc8c5af6b",
+  "recorded_utc": "2026-10-12T14:56:59.331Z",
+  "comparison": {
+    "path": "localization/graphics/role_C1/20261012-C1-Q051-Q057-Q094-Q197-NEW-FAST-QA/C1_Q051_Q057_Q094_Q197_4_ASSET_7VIEW_CONTACT.jpg",
+    "sha256": "c8ca0da7eb75172c74d2be20687ceb357b620348b9d20295889b5cc3e65b5e7e",
+    "git_blob_sha": "769eb4fee1ed9b02075dc1e161ea6c97131436cc",
+    "views": [
+      "SOURCE_RAW",
+      "SOURCE_FLIPY_READABLE",
+      "CLEAN_READABLE_WHEN_PRESENT",
+      "SAVED_DDS_RAW",
+      "SAVED_DDS_FLIPY",
+      "FINAL_75_PREVIEW",
+      "FINAL_50_PREVIEW"
+    ],
+    "limitations": "Preview percentages are not certified real in-game UV-sampled sizes"
+  },
+  "methods": [
+    "Matched direct local content git blob SHA to current GitHub remote file blob SHA",
+    "SHA256 read-only persisted SOURCE and FINAL DDS plus CLEAN PNG",
+    "DDR header parity, raw bytewise row-chunk change and aligned SOURCE->CLEAN+FINAL->CLEAN mask comparisons",
+    "Original English glyph-effect bbox is not treated as real UI cell; without verified UV/cell record HOLD"
+  ],
+  "assets": [
+    {
+      "queue_index": 51,
+      "producer": "A",
+      "source": {
+        "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+        "sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+        "git_blob_sha": "ed9aab60ed352409459bfbb5612eded1ec89e7a9"
+      },
+      "clean": {
+        "path": "localization/graphics/role_A/20261004-A-RECOVERY01/FF2462BB_CLEAN_PLATE.png",
+        "sha256": "62a58c0b2065981fba16d808e6ab645574fad6a53e6c7da989f1839ed95f8be2"
+      },
+      "final_saved_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+        "sha256": "b1c91a8c0050f0f31523afc055185288f2756e4da02014c9597b69cff25fc129",
+        "git_blob_sha": "d1484bac5b466d5e09cc06654d7a1f13753dea9a"
+      },
+      "dds": {
+        "width": 4096,
+        "height": 2048,
+        "bit_depth": 32,
+        "mips": 1,
+        "source_final_header_match": true
+      },
+      "source_clean_stage": {
+        "reviewer": "C1",
+        "result": "HOLD",
+        "outside_supplied_glyph_mask_changed_pixels": 1291758,
+        "not_full_dds_approval": true
+      },
+      "final_dds_stage": {
+        "result": "HOLD",
+        "source_final_raw_changed_pixels": 1562445,
+        "source_final_raw_bbox_xyxy": [
+          0,
+          482,
+          4076,
+          2044
+        ],
+        "source_final_flipy_changed_bbox_xyxy": [
+          0,
+          4,
+          4076,
+          1566
+        ],
+        "source_final_protected_mask_changed_pixels": 1336477,
+        "final_clean_outside_old_glyph_mask_pixels": 139361,
+        "measured_discrepancy_bbox_flipy_xyxy": [
+          0,
+          4,
+          4076,
+          1566
+        ],
+        "confirmed_real_defect_coordinates": null,
+        "reason": "SOURCE_CLEAN_MASK_SCOPE_CONFLICT",
+        "observation": "1,291,758 SOURCE->CLEAN changed pixels outside supplied old-glyph mask; may reflect incomplete mask, cannot declare protected art altered without actual cell/mask provenance. User pre-ingame #014 still OPEN."
+      },
+      "coverage": {
+        "actual_ui_cell_uv_verified": false,
+        "real_game_used_size_verified": false,
+        "whole_atlas_translation_coverage_verified": false,
+        "untranslated_phrase_count": null,
+        "untranslated_phrase_count_reason": "SOURCE_SEGMENT_INVENTORY_UNAVAILABLE, count cannot truthfully be determined",
+        "scope": "full DDS pixel diff; whole atlas resized contact, not per-glyph full native review"
+      },
+      "status": "HOLD",
+      "release": "TEST_ONLY",
+      "C2": "DISABLED_NO_NEW_TOKEN",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "queue_index": 57,
+      "producer": "A",
+      "source": {
+        "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+        "sha256": "2f2c19db5a9b7eda058ee380396160e42884760c0d0282d2e75254bf08070481",
+        "git_blob_sha": "81c10922293dcdfdc75090c980fb38ee5c3bedd1"
+      },
+      "clean": {
+        "path": "localization/graphics/role_A/20261004-A-RECOVERY09/39229D64_REPAIRED_CLEAN_PLATE.png",
+        "sha256": "87bd0597b53697bf21ac614a7d09d526b595c6546c9cd2a51b320ae95566a35f"
+      },
+      "final_saved_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_game_cvt_Exst/39229D64_1024x1024.dds",
+        "sha256": "d2831fcfd1bb8027fc129ff50e70c90c21094df13765daa3d5fb9c6fda3ae70a",
+        "git_blob_sha": "2cedd006f612c601279b6c971ad941e42da94ad2"
+      },
+      "dds": {
+        "width": 4096,
+        "height": 4096,
+        "bit_depth": 32,
+        "mips": 1,
+        "source_final_header_match": true
+      },
+      "source_clean_stage": {
+        "reviewer": "C1",
+        "result": "MASK_SCOPED_PASS_ONLY",
+        "outside_supplied_glyph_mask_changed_pixels": 0,
+        "not_full_dds_approval": true
+      },
+      "final_dds_stage": {
+        "result": "HOLD",
+        "source_final_raw_changed_pixels": 2459744,
+        "source_final_raw_bbox_xyxy": [
+          128,
+          1997,
+          3998,
+          4091
+        ],
+        "source_final_flipy_changed_bbox_xyxy": [
+          128,
+          5,
+          3998,
+          2099
+        ],
+        "source_final_protected_mask_changed_pixels": 0,
+        "final_clean_outside_old_glyph_mask_pixels": 99402,
+        "measured_discrepancy_bbox_flipy_xyxy": [
+          535,
+          10,
+          3545,
+          2086
+        ],
+        "confirmed_real_defect_coordinates": null,
+        "reason": "UI_CELL_UV_UNVERIFIED",
+        "observation": "SOURCE->CLEAN outside supplied glyph and protected masks 0; final-clean outside old glyph mask 99,402 (not automatically FAIL). Real UI cell missing; user JPG #018 still OPEN."
+      },
+      "coverage": {
+        "actual_ui_cell_uv_verified": false,
+        "real_game_used_size_verified": false,
+        "whole_atlas_translation_coverage_verified": false,
+        "untranslated_phrase_count": null,
+        "untranslated_phrase_count_reason": "SOURCE_SEGMENT_INVENTORY_UNAVAILABLE, count cannot truthfully be determined",
+        "scope": "full DDS pixel diff; whole atlas resized contact, not per-glyph full native review"
+      },
+      "status": "HOLD",
+      "release": "TEST_ONLY",
+      "C2": "DISABLED_NO_NEW_TOKEN",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "queue_index": 94,
+      "producer": "B",
+      "source": {
+        "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+        "sha256": "3e00bfda82c2175b28c1d45d3041f91e34ede6de52b867cd867c1c27d4837099",
+        "git_blob_sha": "7e0e7368ea5ca75112209cc21210b201f6caedaf"
+      },
+      "clean": {
+        "path": "localization/graphics/role_B/20261004-B-RECOVERY05/2DA43E41_CLEAN_PLATE_CANONICAL.png",
+        "sha256": "8bca5809388e7de9a02ed7ec954b858b8d4c930087cedbe0db0b0613f2743238"
+      },
+      "final_saved_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+        "sha256": "c36da00d6fa421180f6017fd188e9de783a35eb57a6dcc4927039c663aeee905",
+        "git_blob_sha": "1150b10e4a19a13cecbda0242fd5ce164681da07"
+      },
+      "dds": {
+        "width": 4096,
+        "height": 4096,
+        "bit_depth": 32,
+        "mips": 1,
+        "source_final_header_match": true
+      },
+      "source_clean_stage": {
+        "reviewer": "C1",
+        "result": "MASK_SCOPED_PASS_ONLY",
+        "outside_supplied_glyph_mask_changed_pixels": 0,
+        "not_full_dds_approval": true
+      },
+      "final_dds_stage": {
+        "result": "HOLD",
+        "source_final_raw_changed_pixels": 1132195,
+        "source_final_raw_bbox_xyxy": [
+          115,
+          2693,
+          4018,
+          3904
+        ],
+        "source_final_flipy_changed_bbox_xyxy": [
+          115,
+          192,
+          4018,
+          1403
+        ],
+        "source_final_protected_mask_changed_pixels": 0,
+        "final_clean_outside_old_glyph_mask_pixels": 718307,
+        "measured_discrepancy_bbox_flipy_xyxy": [
+          115,
+          192,
+          4016,
+          1392
+        ],
+        "confirmed_real_defect_coordinates": null,
+        "reason": "UI_CELL_UV_UNVERIFIED",
+        "observation": "SOURCE->CLEAN outside supplied glyph and protected masks 0; final-clean outside old glyph mask 718,307; real UI cell and inventory not confirmed."
+      },
+      "coverage": {
+        "actual_ui_cell_uv_verified": false,
+        "real_game_used_size_verified": false,
+        "whole_atlas_translation_coverage_verified": false,
+        "untranslated_phrase_count": null,
+        "untranslated_phrase_count_reason": "SOURCE_SEGMENT_INVENTORY_UNAVAILABLE, count cannot truthfully be determined",
+        "scope": "full DDS pixel diff; whole atlas resized contact, not per-glyph full native review"
+      },
+      "status": "HOLD",
+      "release": "TEST_ONLY",
+      "C2": "DISABLED_NO_NEW_TOKEN",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "queue_index": 197,
+      "producer": "A",
+      "source": {
+        "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+        "sha256": "177e3be8f3a8fd4d0482bcf1849cbe333cef6f86486afbc4ca6307ec417c2e05",
+        "git_blob_sha": "b24c9d995524e772486e8f2f8d658dd811e9afbd"
+      },
+      "clean": null,
+      "final_saved_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+        "sha256": "60cfa3ef1257e3bbc50a8c7152aba538837eabd2322c18e098ee7ceb61381fea",
+        "git_blob_sha": "10e940af141b7a6bb3256a86152905ebfff457df"
+      },
+      "dds": {
+        "width": 2048,
+        "height": 2048,
+        "bit_depth": 32,
+        "mips": 1,
+        "source_final_header_match": true
+      },
+      "source_clean_stage": {
+        "reviewer": "C1",
+        "result": "HOLD",
+        "outside_supplied_glyph_mask_changed_pixels": null,
+        "not_full_dds_approval": true
+      },
+      "final_dds_stage": {
+        "result": "HOLD",
+        "source_final_raw_changed_pixels": 62776,
+        "source_final_raw_bbox_xyxy": [
+          25,
+          167,
+          707,
+          778
+        ],
+        "source_final_flipy_changed_bbox_xyxy": [
+          25,
+          1270,
+          707,
+          1881
+        ],
+        "source_final_protected_mask_changed_pixels": null,
+        "final_clean_outside_old_glyph_mask_pixels": null,
+        "measured_discrepancy_bbox_flipy_xyxy": null,
+        "confirmed_real_defect_coordinates": null,
+        "reason": "CLEAN_SHA_MISSING",
+        "observation": "No verified CLEAN layer in reviewed material; SOURCE->CLEAN cannot pass, final RAW/FLIPY are preview-only."
+      },
+      "coverage": {
+        "actual_ui_cell_uv_verified": false,
+        "real_game_used_size_verified": false,
+        "whole_atlas_translation_coverage_verified": false,
+        "untranslated_phrase_count": null,
+        "untranslated_phrase_count_reason": "SOURCE_SEGMENT_INVENTORY_UNAVAILABLE, count cannot truthfully be determined",
+        "scope": "full DDS pixel diff; whole atlas resized contact, not per-glyph full native review"
+      },
+      "status": "HOLD",
+      "release": "TEST_ONLY",
+      "C2": "DISABLED_NO_NEW_TOKEN",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    }
+  ],
+  "totals": {
+    "checked": 4,
+    "C1_STATIC_PASS": 0,
+    "REWORK": 0,
+    "HOLD": 4,
+    "source_clean_scoped_mask_only": 2,
+    "official_dds_approvals": 0,
+    "new_DDS": 0,
+    "queue_writes": 0
+  },
+  "policy": "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md",
+  "handoff": "Verify true UI cell/UV and inventory; q051 reconcile mask scope; q197 supply SHA-pinned clean; keep user P0/P1, shared HUD C3 and game tests OPEN; old C2 token consumer is not migrated, official gate remains HOLD"
+}
