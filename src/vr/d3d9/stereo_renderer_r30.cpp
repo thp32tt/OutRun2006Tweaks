@@ -220,10 +220,29 @@ namespace OutRunVRStereo
             std::uint64_t revision = 0;
         };
 
+        // The indexed VB decoder's output depends only on an immutable
+        // snapshot of the IB byte span, not on the changing base vertex or
+        // current vertex-buffer contents. Preserve the rebased indices and
+        // referenced-vertex mask for repeated static/same-generation draws.
+        struct R30IndexDecodeCache
+        {
+            R30ShadowPtr entry;
+            UINT offset = 0;
+            UINT size = 0;
+            std::uint64_t revision = 0;
+            D3DFORMAT format = D3DFMT_UNKNOWN;
+            std::uint32_t minRaw = 0;
+            std::uint32_t maxRaw = 0;
+            UINT vertexCount = 0;
+            UINT knownUsedCount = 0;
+            bool valid = false;
+        };
+
         struct R30ScratchBuffers
         {
             R30ShadowCopyCache vertexCopy;
             R30ShadowCopyCache indexCopy;
+            R30IndexDecodeCache indexDecode;
             std::vector<std::uint8_t> source;
             std::vector<std::uint8_t> indexSource;
             std::vector<std::uint8_t> left;
@@ -3275,6 +3294,9 @@ namespace OutRunVRStereo
             if (!lease)
                 return E_NOTIMPL;
             auto& scratch = *lease.buffers;
+            // Indexed UP can overwrite the shared mask; VB decoder cache
+            // must not hit until the next exact IB span has rebuilt it.
+            scratch.indexDecode.valid = false;
             try
             {
                 scratch.used.assign(vertexCount, 0);
@@ -3523,13 +3545,31 @@ namespace OutRunVRStereo
             const auto* raw32 = !index16
                 ? reinterpret_cast<const std::uint32_t*>(
                     scratch.indexSource.data()) : nullptr;
-            std::uint32_t minRaw = UINT_MAX;
-            std::uint32_t maxRaw = 0;
-            for (UINT i = 0; i < indexCount; ++i)
+            const auto& decoded = scratch.indexDecode;
+            // R30CopyIndexShadow is generation-validated under the IB lock.
+            // Its exact revision and copied byte span fence this decoded
+            // index cache, including DISCARD, Release and address reuse.
+            // A different VB, base vertex or stream offset may reuse the
+            // local indices, but physical bounds are rechecked below.
+            const bool cachedDecode =
+                decoded.valid && decoded.entry == ibShadow &&
+                decoded.revision == scratch.indexCopy.revision &&
+                decoded.offset == static_cast<UINT>(firstIndexByte) &&
+                decoded.size == static_cast<UINT>(indexBytes) &&
+                decoded.format == ibShadow->indexFormat &&
+                scratch.used.size() == decoded.vertexCount &&
+                (index16 ? scratch.indices16.size() == indexCount
+                         : scratch.indices32.size() == indexCount);
+            std::uint32_t minRaw = cachedDecode ? decoded.minRaw : UINT_MAX;
+            std::uint32_t maxRaw = cachedDecode ? decoded.maxRaw : 0;
+            if (!cachedDecode)
             {
-                const std::uint32_t raw = index16 ? raw16[i] : raw32[i];
-                minRaw = (std::min)(minRaw, raw);
-                maxRaw = (std::max)(maxRaw, raw);
+                for (UINT i = 0; i < indexCount; ++i)
+                {
+                    const std::uint32_t raw = index16 ? raw16[i] : raw32[i];
+                    minRaw = (std::min)(minRaw, raw);
+                    maxRaw = (std::max)(maxRaw, raw);
+                }
             }
             const std::int64_t minPhysical =
                 static_cast<std::int64_t>(baseVertexIndex) + minRaw;
@@ -3578,56 +3618,70 @@ namespace OutRunVRStereo
             }
 
             // The first index pass has already validated physical addresses
-            // and discovered the contiguous source-vertex span. Mark used
-            // vertices and rebase both index formats in the same second pass:
-            // the original third rebasing loop is still absent. No physical
-            // scratch write/read or signed base addition is needed here.
-            try
+            // and discovered the contiguous source-vertex span. On unchanged
+            // IB draws both expensive scans, memset and rebase are skipped.
+            // A miss invalidates the old decoder *before* mutating its mask.
+            UINT knownUsedCount = cachedDecode ? decoded.knownUsedCount : 0;
+            if (!cachedDecode)
             {
-                scratch.used.assign(vertexCount, 0);
-                if (index16)
-                    scratch.indices16.resize(indexCount);
-                else
-                    scratch.indices32.resize(indexCount);
-            }
-            catch (...)
-            {
-                ib->Release();
-                vb->Release();
-                return E_NOTIMPL;
-            }
-
-            const void* rebased = index16
-                ? static_cast<const void*>(scratch.indices16.data())
-                : static_cast<const void*>(scratch.indices32.data());
-            UINT knownUsedCount = 0;
-            for (UINT i = 0; i < indexCount; ++i)
-            {
-                // The signed base cancels when converting to the local
-                // vertex span, so subtract the minimum raw index directly.
-                const std::uint32_t raw = index16 ? raw16[i] : raw32[i];
-                const std::uint64_t local =
-                    static_cast<std::uint64_t>(raw) - minRaw;
-                // Reject unsafe 16-bit rebasing *before* attempting either
-                // stereo eye. Never truncate when the physical span is wider
-                // than a UINT16 index can describe.
-                if (local >= vertexCount ||
-                    (index16 && local > 0xFFFFu))
+                scratch.indexDecode.valid = false;
+                try
+                {
+                    scratch.used.assign(vertexCount, 0);
+                    if (index16)
+                        scratch.indices16.resize(indexCount);
+                    else
+                        scratch.indices32.resize(indexCount);
+                }
+                catch (...)
                 {
                     ib->Release();
                     vb->Release();
                     return E_NOTIMPL;
                 }
-                if (!scratch.used[static_cast<std::size_t>(local)])
+
+                for (UINT i = 0; i < indexCount; ++i)
                 {
-                    ++knownUsedCount;
-                    scratch.used[static_cast<std::size_t>(local)] = 1;
+                    // The signed base cancels when converting to the local
+                    // vertex span, so subtract the minimum raw index directly.
+                    const std::uint32_t raw = index16 ? raw16[i] : raw32[i];
+                    const std::uint64_t local =
+                        static_cast<std::uint64_t>(raw) - minRaw;
+                    // Reject unsafe 16-bit rebasing *before* attempting either
+                    // stereo eye. Never truncate when the physical span is wider
+                    // than a UINT16 index can describe.
+                    if (local >= vertexCount ||
+                        (index16 && local > 0xFFFFu))
+                    {
+                        ib->Release();
+                        vb->Release();
+                        return E_NOTIMPL;
+                    }
+                    if (!scratch.used[static_cast<std::size_t>(local)])
+                    {
+                        ++knownUsedCount;
+                        scratch.used[static_cast<std::size_t>(local)] = 1;
+                    }
+                    if (index16)
+                        scratch.indices16[i] = static_cast<std::uint16_t>(local);
+                    else
+                        scratch.indices32[i] = static_cast<std::uint32_t>(local);
                 }
-                if (index16)
-                    scratch.indices16[i] = static_cast<std::uint16_t>(local);
-                else
-                    scratch.indices32[i] = static_cast<std::uint32_t>(local);
+                auto& next = scratch.indexDecode;
+                next.entry = ibShadow;
+                next.revision = scratch.indexCopy.revision;
+                next.offset = static_cast<UINT>(firstIndexByte);
+                next.size = static_cast<UINT>(indexBytes);
+                next.format = ibShadow->indexFormat;
+                next.minRaw = minRaw;
+                next.maxRaw = maxRaw;
+                next.vertexCount = vertexCount;
+                next.knownUsedCount = knownUsedCount;
+                next.valid = true;
             }
+            const void* rebased = index16
+                ? static_cast<const void*>(scratch.indices16.data())
+                : static_cast<const void*>(scratch.indices32.data());
 
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, scratch.source.data(), vertexCount,

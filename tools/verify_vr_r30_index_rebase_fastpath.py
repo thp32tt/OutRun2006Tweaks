@@ -91,11 +91,60 @@ def optimized_model(raw, base, index16):
     return minimum, size, used, rebased
 
 
+def verify_decode_cache(source, body):
+    # All signature dimensions must be checked before skipping both scans.
+    signature = (
+        "decoded.valid && decoded.entry == ibShadow",
+        "decoded.revision == scratch.indexCopy.revision",
+        "decoded.offset == static_cast<UINT>(firstIndexByte)",
+        "decoded.size == static_cast<UINT>(indexBytes)",
+        "decoded.format == ibShadow->indexFormat",
+        "scratch.used.size() == decoded.vertexCount",
+        "scratch.indices16.size() == indexCount",
+        "scratch.indices32.size() == indexCount",
+        "if (!cachedDecode)",
+        "scratch.indexDecode.valid = false;",
+        "next.entry = ibShadow;",
+        "next.revision = scratch.indexCopy.revision;",
+        "next.minRaw = minRaw;",
+        "next.maxRaw = maxRaw;",
+        "next.knownUsedCount = knownUsedCount;",
+        "next.valid = true;",
+    )
+    assert all(token in body for token in signature)
+    assert "struct R30IndexDecodeCache" in source
+    assert source.count("scratch.indexDecode.valid = false;") == 2
+    assert body.index("if (!cachedDecode)") < body.index(
+        "minRaw = (std::min)(minRaw, raw);")
+    assert body.index("scratch.indexDecode.valid = false;") < body.index(
+        "scratch.used.assign(vertexCount, 0);")
+    assert body.index("next.valid = true;") < body.index(
+        "R30ConfigureXyzrhwWorldEffect(")
+
+    # A rebase/mask is stable across new signed base vertices, while the
+    # physical address validation remains separate on every draw.
+    import random
+    rng = random.Random(697)
+    cases = 0
+    for index16 in (False, True):
+        for _ in range(350):
+            raw = [rng.randint(0, 2000) for _ in range(rng.randint(1, 64))]
+            base_a, base_b = rng.randint(0, 10000), rng.randint(0, 10000)
+            a = optimized_model(raw, base_a, index16)
+            b = optimized_model(raw, base_b, index16)
+            assert a is not None and b is not None
+            assert a[1:] == b[1:]
+            cases += 1
+    print(f"PASS R30 IB decode cache: {cases} base-independent cases, "
+          f"{len(signature)} invariants")
+
+
 def main():
     code = SOURCE.read_text(encoding="utf-8")
     workflow = WORKFLOW.read_text(encoding="utf-8")
     body = indexed_body(code)
     assert valid(body), "scratch-free indexed draw / fallback contract broken"
+    verify_decode_cache(code, body)
     assert workflow.count("tools/verify_vr_r30_index_rebase_fastpath.py") == 2
     assert "std::vector<std::uint32_t> physical;" not in code
     mutations = (
