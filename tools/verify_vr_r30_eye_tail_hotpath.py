@@ -90,7 +90,8 @@ def verify(source: str):
     assert vertices.index("modifiedVertexEnd = i + 1u;") < vertices.index(
         "if (fullDrawOk && selectedVertices != 0)") < vertices.index(
         "for (UINT i = 0; i < modifiedVertexEnd; ++i)") < vertices.index(
-        "const float ndcX = (x - x0)")
+        "const float ndcX = (x - x0)", vertices.index(
+            "for (UINT i = 0; i < modifiedVertexEnd; ++i)"))
     assert "if (leftFull &&" in stereo and "if (rightFull &&" in stereo
     assert stereo.index("if (leftFull &&") < stereo.index(
         "state, 0, left, usedMask, false, ignored)")
