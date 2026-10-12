@@ -9,8 +9,20 @@ FONT = ROOT / "src/overlay/overlay.cpp"
 HEADER = ROOT / "src/overlay/overlay.hpp"
 
 def check(hook: str, font: str, header: str) -> None:
+    # Pin actual owning scopes. Searching whole files misses destructive
+    # mutations when a second valid-looking token remains in a separate
+    # ImGui draw call or VR shell sizing path.
+    font_guard = font.split("void Overlay::rebuild_fonts()", 1)[1].split(
+        "// Read the file rather than handing", 1
+    )[0]
+    shell_guard = font.split("void Overlay::render_shell()", 1)[1].split(
+        "void Overlay::init()", 1
+    )[0]
+    density_guard = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
+        "// A new atlas needs a new font texture.", 1
+    )[0]
     for target, needles in (
-        (hook, (
+        (density_guard, (
             "overlayActive && Game::is_vr_gameplay_presentation()",
             "R29OwnerRecommendedEyeExtent(0, lw, lh)",
             "R29OwnerRecommendedEyeExtent(1, rw, rh)",
@@ -18,20 +30,21 @@ def check(hook: str, font: str, header: str) -> None:
             "std::isfinite(factor) && factor > 0.0f",
             "std::ceil(factor * 4.0f) * 0.25f, 1.0f, 3.0f",
             "Overlay::FontsDirty = true;",
-            "ImGui_ImplDX9_InvalidateDeviceObjects();",
         )),
-        (font, (
+        (hook, ("ImGui_ImplDX9_InvalidateDeviceObjects();",)),
+        (font_guard, (
             "std::clamp(GlobalFontScale, 0.5f, 5.0f)",
             "std::clamp(VrFontMultiplier, 1.0f, 3.0f)",
             "ImGui::GetStyle().FontSizeBase = sizePixels;",
             "io.Fonts->Clear();",
+        )),
+        (shell_guard, (
+            "std::clamp(VrFontMultiplier, 1.0f, 3.0f)",
             "1130.f * vrDensity",
             "600.f * vrDensity",
             "ImGuiCond_Appearing : ImGuiCond_FirstUseEver",
         )),
-        (header, (
-            "inline static float VrFontMultiplier = 1.0f;",
-        )),
+        (header, ("inline static float VrFontMultiplier = 1.0f;",)),
     ):
         for marker in needles:
             assert marker in target, f"missing F11 density guard: {marker}"
@@ -80,7 +93,7 @@ def main():
         except AssertionError:
             continue
         raise AssertionError(f"F11 regression mutant {index} survived")
-    print("VR F11 native font-density guard PASS; 4 negative mutants rejected")
+    print("VR F11 native font-density guard PASS; 5 negative mutants rejected")
 
 if __name__ == "__main__":
     main()
