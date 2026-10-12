@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00595",
+  "production_id": "CONVERSION-DX11-00595",
+  "event_id": "CONVERSION-DX11-00595-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00595",
+  "work_key": "DX11:MENU_RACE_NATIVE_COUNT2_UV_TRANSFORM",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "base_head_sha": "8876602712b048bdddec261ec34023e0f43dd2ff",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "Read live D3D9 TEXCOORDINDEX and TEXTURETRANSFORMFLAGS from game Draw",
+      "Snapshot D3DTS_TEXTURE0 for unprojected COUNT2",
+      "Transform FVF UV through D3D9 row-vector (u,v,1,0) before D3D11 Draw/DrawIndexed",
+      "Preserve original game Draw/Present/gamepad and reject invalid/unsupported state"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/test_dx11_native_tex_transform_00595.py",
+      "tools/test_dx11_first_game_frame_regressions.py",
+      ".github/workflows/backend-conversion-gate.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "1260 CPU UV matrix cases and cross-checked Direct3D9 _31/_32 translation",
+      "negative_regression": "17 destructive source mutations and existing first-frame regression repaired to retain strict COUNT2 allowlist",
+      "component_integration": "D3D9 GetTransform(TEXTURE0) -> TextureCapture -> game FVF UV translation -> D3D11 Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_NATIVE_COUNT2_UV_TRANSFORM",
+      "src/vr/d3d11/live_game_frame_bridge.cpp:TEXTURE_COUNT2"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_DIAGNOSTIC"
+    ],
+    "visible_frame_acceptance": "No actual menu/vehicle/race/Quest3/VDXR pixel observation without game run",
+    "activation_guard_and_fallback": "opt-in diagnostic only; native path remains fail-closed; original D3D9 Draw/Present/gamepad unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_native_tex_transform_00595.py",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    ".github/workflows/backend-conversion-gate.yml",
+    "docs/automation/runs/CONVERSION-DX11-00595.json"
+  ],
+  "packaging": {
+    "status": "NOT_REQUIRED",
+    "reason": "No HMD-approved binary or deployment request"
+  },
+  "next_action": "BUILD_VERIFIED / NEED_HMD_TEST: game/menu/vehicle/race and gamepad input must be checked on Quest3/VDXR before any gameplay or backend promotion; DXVK frozen. Next independent DX11 feature may proceed without rechecking this completed task.",
+  "material_result_sha": "2a42fa8769175da42515cc5dd2aa65a37905e647",
+  "validation_bearing_result_sha": "61824155d5ffb01842bd92012a487208fd7e3b92",
+  "result_sha": "61824155d5ffb01842bd92012a487208fd7e3b92",
+  "c6_basis_head_sha": "61824155d5ffb01842bd92012a487208fd7e3b92",
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38212630876,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "61824155d5ffb01842bd92012a487208fd7e3b92",
+      "event": "push"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38212634052,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "61824155d5ffb01842bd92012a487208fd7e3b92",
+      "event": "pull_request"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38212634068,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "61824155d5ffb01842bd92012a487208fd7e3b92",
+      "event": "pull_request"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38212630884,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "61824155d5ffb01842bd92012a487208fd7e3b92",
+      "event": "push"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38212634061,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "61824155d5ffb01842bd92012a487208fd7e3b92",
+      "event": "pull_request"
+    }
+  ],
+  "local_validation": [
+    "New test 00595 source integration: 17 destructive mutations, 1260 UV matrices; GitHub Backend Gate validate SUCCESS",
+    "First-frame legacy regression fixed after 00595 initial Build failure; final exact SHA Build PASS"
+  ],
+  "runtime_evidence": null
+}
