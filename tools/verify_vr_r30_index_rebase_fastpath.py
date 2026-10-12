@@ -44,7 +44,7 @@ def valid(body):
     leftdraw = body.index("auto leftDraw = [&]()")
     return (
         first < prepare < second < mark < output16 < output32 < transform < leftdraw
-        and body.index("if (p < 0 || p > UINT_MAX)") < first
+        and 0 <= body.find("if (p < 0 || p > UINT_MAX)") < first
         and body.index("const UINT vertexCount = static_cast<UINT>(vertexCount64);") < prepare
         and "if (vertexCount64 > 65535u)" not in body
         and "scratch.indices16[i] = static_cast<std::uint16_t>(scratch.physical[i]);" not in body
