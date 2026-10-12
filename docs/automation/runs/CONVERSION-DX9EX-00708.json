@@ -1,0 +1,106 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00708",
+  "production_id": "CONVERSION-DX9EX-00708",
+  "event_id": "CONVERSION-DX9EX-00708-C6",
+  "event_type": "C6_RESULT_ONLY",
+  "feature_id": "DX9EX_R30_VB_IB_TWO_WAY_SHADOW_CACHE",
+  "work_key": "DX9EX:R30_VB_IB_TWO_WAY_SHADOW_LOOKUP",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "base_sha": "fda4ff9444bb41035df33e2ee63fdea6a1d8cf6c",
+  "source_material_sha": "288d2f97b7fa38f3832724ee25a191ac41226f50",
+  "material_result_sha": "288d2f97b7fa38f3832724ee25a191ac41226f50",
+  "result_sha": "8e83c888e0894e78ebd51f1d5efee72bde8b993a",
+  "validation_bearing_result_sha": "8e83c888e0894e78ebd51f1d5efee72bde8b993a",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "material_commits": [
+    "288d2f97b7fa38f3832724ee25a191ac41226f50",
+    "54906dc2656906b5857a10addd51d32dc67269dd",
+    "8e83c888e0894e78ebd51f1d5efee72bde8b993a"
+  ],
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "tools/verify_vr_r30_shadow_two_way_lookup.py",
+    "tools/verify_vr_r30_shadow_descriptor_fastpath.py"
+  ],
+  "feature_contract": {
+    "goal": "Avoid repeated global VB/IB shadow registry mutex and hash lookups when two geometry buffers alternate on the same game draw thread.",
+    "acceptance": "Two-way per-thread positive/negative lookup, epoch-fenced on registration/final Release/Reset and safe against recycled COM pointer identity; preserve locked miss path and shadow revision validation; deterministic alternating-buffer, lifecycle and destructive mutation regression; exact-SHA DX9Ex Active 5/5, Domain Isolation and original material Full Source Impact SUCCESS."
+  },
+  "acceptance_results": {
+    "source_implementation": "MATERIAL_COMMITTED",
+    "two_way_vb_ib_lookup": "SOURCE_COMMITTED",
+    "registration_release_reset_com_reuse": "PASS_EXACT_SHA_POLICY",
+    "negative_and_positive_alternating_cache": "PASS_EXACT_SHA_POLICY",
+    "destructive_mutations": "PASS_EXACT_SHA_POLICY",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_RESULT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_RESULT_SHA",
+    "full_source_impact": "SUCCESS_ORIGINAL_MATERIAL_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38293810438,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "8e83c888e0894e78ebd51f1d5efee72bde8b993a",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "game": "success",
+        "full-chain-compile": "success",
+        "host": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38293810597,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "8e83c888e0894e78ebd51f1d5efee72bde8b993a",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    {
+      "id": 38293467503,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "288d2f97b7fa38f3832724ee25a191ac41226f50",
+      "conclusion": "success"
+    }
+  ],
+  "failed_prior_runs": [
+    {
+      "id": 38293467560,
+      "head_sha": "288d2f97b7fa38f3832724ee25a191ac41226f50",
+      "failed_job": "policy",
+      "reason": "Existing one-entry R30 shadow descriptor verifier rejected the new two-way lookup; repaired with real lifecycle and mutation guards at 54906dc2 and 8e83c888."
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 11767549897,
+      "name": "OutRun2-VR-DX9EX-ACTIVE-8e83c888e0894e78ebd51f1d5efee72bde8b993a"
+    },
+    {
+      "id": 11768300192,
+      "name": "dx9ex-r84-independent-full-chain-game"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "No Quest 3/VDXR game/HMD display or FPS/p95/p99 measurements occurred in this task. CI PASS proves compile/regression only, not headset behavior or performance gain.",
+  "score_credit_key": "CONVERSION-DX9EX-00708",
+  "score_change": 0,
+  "score_status": "C6_BOOKKEEPING_NO_ADDITIONAL_CREDIT",
+  "notes": "Separate [skip ci] C6 checkpoint after exact validation-bearing result SHA; task performance change and both verifier repairs are one feature/score event, with no duplicate credit for E001 repair/C6."
+}
