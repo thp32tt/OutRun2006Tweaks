@@ -52,7 +52,8 @@ def main():
         for a,b in (
             ("const bool "+flag+" = op == D3DTOP_"+op+" &&","const bool "+flag+" = op == D3DTOP_DISABLE &&"),
             ("capture."+flag+" = "+flag+";","capture."+flag+" = false;"),
-            ("!"+flag+" &&","!"+flag+" ||"),
+            ("!selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha && alphaArg1 != D3DTA_TEXTURE",
+             "!selectTextureTfactorAlpha || !selectDiffuseTfactorAlpha && alphaArg1 != D3DTA_TEXTURE"),
             ("capture."+flag+" ? s."+flag+"Ps.Get()","capture."+flag+" ? nullptr"),
             ("s."+flag+"Ps.GetAddressOf()","nullptr"),
             ('!compile("'+entry+'", "ps_4_0",','!compile("bad", "ps_4_0",'),

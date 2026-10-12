@@ -1274,8 +1274,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
              blendFactorDiffuseAlpha || blendFactorAddAlpha ||
              blendFactorSubtractAlpha || blendFactorAddSmoothAlpha ||
              blendFactorModulate2XAlpha || blendFactorModulate4XAlpha ||
-              selectTextureFactorAlpha || selectDiffuseFactorAlpha ||
-               selectTextureTfactorAlpha || selectDiffuseTfactorAlpha) &&
+              selectTextureTfactorAlpha || selectDiffuseTfactorAlpha ||
+               selectTextureFactorAlpha || selectDiffuseFactorAlpha) &&
             FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))
             return false;
         // RGB and alpha must both use ADD(TEXTURE, DIFFUSE).
@@ -1356,7 +1356,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                                        modulate2xDiffuseAlpha || modulate4xDiffuseAlpha ||
                                        mixedDiffuseAlpha || mixedAddDiffuseAlpha ||
                                        blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;
-        if ((!modulate && !selectTexture && !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha && !selectDiffuseTextureAlpha && !selectDiffuseDiffuseAlpha &&
+        if ((!modulate && !selectTexture && !selectDiffuseTextureAlpha && !selectDiffuseDiffuseAlpha &&
+               !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha &&
               !selectDiffuseBlendTextureAlpha && !selectTextureBlendTextureAlpha && !selectTextureBlendDiffuseAlpha && !selectDiffuseBlendDiffuseAlpha && !selectDiffuseModulateAlpha && !selectDiffuseAddAlpha && !selectDiffuseSubtractAlpha &&
                !selectDiffuseModulate2XAlpha && !selectDiffuseModulate4XAlpha && !selectDiffuseAddSmoothAlpha && !selectDiffuseFactorAlpha && !selectTextureFactorAlpha && !selectTextureDiffuseAlpha && !selectTextureModulateAlpha &&
               !selectTextureAddAlpha && !selectTextureSubtractAlpha && !selectTextureAddSmoothAlpha &&
