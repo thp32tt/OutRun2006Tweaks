@@ -484,6 +484,7 @@ namespace OutRunVRStereo
                 return lowerResolve();
             if (!frameId || !R32EnsureDirectResources(device))
                 return false;
+            // R32EnsureDirectResources must run before this cached rejection:
             // Recheck host PID/LUID first so a new interop generation can
             // clear this per-generation rejection. On a permanently rejected
             // old generation, avoid the per-Present cross-owner source-surface

@@ -758,7 +758,8 @@ def verify_direct_probe_hotpath(source: str) -> None:
                 s in r for s in expected_resolve):
             return False
         return (
-            e.count("R32DirectIdentityMatches()") == 1
+            "const bool resourcesReady =\\n                R30SupportDirectTransportResourcesReady();" in e
+            and e.count("R32DirectIdentityMatches()") == 1
             and e.count("R30SupportDirectTransportResourcesReady()") == 1
             and e.index("if (R32DirectIdentityMatches())")
             < e.index("R32InvalidateDirectInteropOnly();")
