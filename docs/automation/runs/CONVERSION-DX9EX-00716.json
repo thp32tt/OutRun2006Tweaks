@@ -94,5 +94,15 @@
     "after": 1171,
     "run_key": "CONVERSION-DX9EX-00716",
     "commit": "ac457133d70b8b58483a9627a2c78baebfa86e26"
+  },
+  "c6_bookkeeping_confirmation": {
+    "reported_hold_reason": "RUN_RECORD_NOT_FOUND",
+    "resolution": "EXISTING_C6_RECORD_CONFIRMED",
+    "previous_c6_record_commit": "fba514f2529e55f43b052e2bee1f6f8cf75cea3d",
+    "validation_sha": "f18d8dfdb3aa450e800f0f117fac452cf0d44fcd",
+    "exact_sha_gates": "PASS_EXACT_SHA",
+    "source_modified": false,
+    "ci_reexecuted": false,
+    "score_delta": 0
   }
 }
