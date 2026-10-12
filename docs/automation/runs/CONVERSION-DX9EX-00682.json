@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00682",
+  "production_id": "CONVERSION-DX9EX-00682",
+  "event_id": "CONVERSION-DX9EX-00682-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX_R31_RECENT_HOT_WVP_ALTERNATE",
+  "work_key": "dx9ex.r31.world-wvp.hot-recent-alternate",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "base_sha": "8d16674aa3ecc0e03c6f3efff6889aff20495b08",
+  "material_result_sha": "577aa7e2759d0479f69b956980f94ed41238738a",
+  "source_material_sha": "577aa7e2759d0479f69b956980f94ed41238738a",
+  "material_commits": [
+    "577aa7e2759d0479f69b956980f94ed41238738a"
+  ],
+  "result_sha": "577aa7e2759d0479f69b956980f94ed41238738a",
+  "validation_bearing_result_sha": "577aa7e2759d0479f69b956980f94ed41238738a",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "tools/verify_vr_r31_world_wvp_cache.py"
+  ],
+  "feature_contract": {
+    "goal": "Reduce R31 hot-world per-draw exact-WVP comparisons for recurring non-primary interleaved transforms by probing the last successful alternate first, without changing stereo render ownership.",
+    "acceptance": "Preserve strict full 64-byte WVP equality, stable shader/pose/generation gates, live-WVP sampling, eye-tail finite validation, StateBlock/Reset invalidation and current eye-product restoration. Add source contract and destructive marker checks plus deterministic comparison workload.",
+    "numeric_model": "1800 deterministic interleaved draws; 6750 baseline vs 4199 hinted exact-key comparisons; synthetic key workload only, no actual FPS claim."
+  },
+  "acceptance_results": {
+    "world_wvp_hot_recent_source": "PASS_EXACT_SHA",
+    "verified_pose_shader_eye_tail_stateblock_guards": "PASS_EXACT_SHA",
+    "focused_numeric_model": "PASS_POLICY_EXACT_SHA",
+    "destructive_source_mutations": "PASS_POLICY_EXACT_SHA",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_3_OF_3_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38237557371,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "577aa7e2759d0479f69b956980f94ed41238738a",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "game": "success",
+        "full-chain-compile": "success",
+        "host": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38237557365,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "577aa7e2759d0479f69b956980f94ed41238738a",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    {
+      "id": 38237557346,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "577aa7e2759d0479f69b956980f94ed41238738a",
+      "conclusion": "success",
+      "jobs": {
+        "msvc-analyze-active-game": "success",
+        "msvc-analyze-openxr-host": "success",
+        "source-cross-domain": "success"
+      }
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "No Quest3 / VDXR headset, gameplay, optical, wheel/input, hardware 72/90/120Hz, p95/p99, or GPU frame-time test was performed. Build CI and numeric key-compare model do not prove FPS or binocular correctness.",
+  "score_credit_key": "CONVERSION-DX9EX-00682",
+  "score_change": 1,
+  "previous_confirmed_score": 1117,
+  "new_confirmed_score": 1118,
+  "scoreboard_commit": "dfee5c51f4b5281bced4c7a43600384129d09f61",
+  "scoreboard_run_key": "CONVERSION-DX9EX-00682",
+  "notes": "Independent R31 source hot-path task after DX9Ex-00681. DXVK development remains frozen; no changes to DX11, DXVK or Localization. This separate C6 [skip ci] bookkeeping commit is not the validation-bearing implementation result."
+}
