@@ -274,7 +274,15 @@ def main():
     )
     for i, (before, after) in enumerate(mutations, 1):
         assert before in source, f"mutation {i} is ineffective"
-        altered = source.replace(before, after, 1)
+        # 00686 introduces a separate affine-only helper with the same
+        # parallax expression. Mutate the legacy independent-eye fallback
+        # inside R30TransformXyzrhwVertices, not that earlier new helper.
+        if before == "state.parallaxPerRhwX[eye] * rhw":
+            begin = source.index("bool R30TransformXyzrhwVertices(")
+            at = source.index(before, begin)
+            altered = source[:at] + after + source[at + len(before):]
+        else:
+            altered = source.replace(before, after, 1)
         try:
             verify(altered)
         except (AssertionError, ValueError, IndexError):
