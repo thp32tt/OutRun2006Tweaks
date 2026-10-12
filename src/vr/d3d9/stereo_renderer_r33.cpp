@@ -578,7 +578,7 @@ namespace OutRunVRStereo
             }
 
             R32ReviewRecordWorldStereoDuplicate(
-                draw.poseSequence, draw.stereoFrame);
+                draw.poseSequence, stereo);
             R32ReviewNoteStableTwoEyeDraw();
             if (R33TelemetryEnabled())
             {

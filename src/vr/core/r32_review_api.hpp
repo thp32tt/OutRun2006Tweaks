@@ -17,6 +17,7 @@
 #include <d3d9.h>
 #include <type_traits>
 #include <utility>
+#include "../core/r31_support_api.hpp"
 #include "../ipc/protocol.hpp"
 #include "../runtime_eligibility.hpp"
 
@@ -79,13 +80,9 @@ namespace OutRunVRStereo
         HRESULT hr = D3D_OK;
     };
 
-    struct R32ReviewFastWorldConstants
-    {
-        float originalConstants[16]{};
-        float eyeConstants[2][16]{};
-        std::uint32_t poseSequence = 0;
-        OutRunVRRenderer::LatchedStereoFrame stereoFrame{};
-    };
+    // Forward the already verified R31 payload without copying its constants
+    // or the complete stereo-frame snapshot on each fast world draw.
+    using R32ReviewFastWorldConstants = R31SupportFastWorldConstants;
 
     enum class R32ReviewScreenSpaceKind : std::uint8_t
     {

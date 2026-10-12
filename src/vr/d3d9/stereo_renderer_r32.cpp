@@ -952,10 +952,8 @@ namespace OutRunVRStereo
 
     bool R32ReviewBuildFastWorldConstants(IDirect3DDevice9* d, const OutRunVRRenderer::LatchedStereoFrame& s, R32ReviewFastWorldConstants& out) noexcept
     {
-        R31SupportFastWorldConstants draw{}; if (!R31SupportBuildFastWorldConstants(d,s,draw)) return false;
-        std::memcpy(out.originalConstants,draw.originalConstants,sizeof(out.originalConstants));
-        std::memcpy(out.eyeConstants,draw.eyeConstants,sizeof(out.eyeConstants));
-        out.poseSequence=draw.poseSequence; out.stereoFrame=s; return true;
+        // Reuse the caller's validated destination, not a second stack copy.
+        return R31SupportBuildFastWorldConstants(d, s, out);
     }
 
     R32ReviewScreenSpaceKind R32ReviewClassifyScreenSpacePass(
