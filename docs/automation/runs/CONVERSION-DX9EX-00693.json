@@ -1,0 +1,81 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00693",
+  "production_id": "CONVERSION-DX9EX-00693",
+  "event_id": "CONVERSION-DX9EX-00693-C6",
+  "event_type": "C6_RESULT_ONLY",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "source_material_sha": "1826beff1acadb9bcc8d991323f7d38f818016a2",
+  "material_result_sha": "1826beff1acadb9bcc8d991323f7d38f818016a2",
+  "result_sha": "1826beff1acadb9bcc8d991323f7d38f818016a2",
+  "validation_bearing_result_sha": "1826beff1acadb9bcc8d991323f7d38f818016a2",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "material_commits": [
+    "1826beff1acadb9bcc8d991323f7d38f818016a2"
+  ],
+  "changed_paths": [
+    "vrhost/src/runtime/r32_direct_submit.hpp",
+    "tools/verify_vr_r32_ack_poll_fastpath.py"
+  ],
+  "feature_contract": {
+    "goal": "Reduce DirectGPU async ACK driver-query CPU overhead and XR idle polling without weakening D3D11 EVENT/generation ownership.",
+    "acceptance": "Skip pending ACK scans when none armed, reuse signalled D3D11 query on ACK publish failure, maintain single decrement on GPU error/stale/success and reset on teardown, preserve live full-chain Win32 compilation and exact-SHA gates."
+  },
+  "acceptance_results": {
+    "r32_ack_idle_ring_short_circuit": "MATERIAL_COMMITTED",
+    "r32_completed_gpu_event_retry_cache": "MATERIAL_COMMITTED",
+    "r32_destructive_regression": "ADDED_SOURCE_AND_MODEL_VERIFIER",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_3_OF_3_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38262010431,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "1826beff1acadb9bcc8d991323f7d38f818016a2",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "game": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38262010306,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "1826beff1acadb9bcc8d991323f7d38f818016a2",
+      "conclusion": "success"
+    },
+    {
+      "id": 38262010712,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "1826beff1acadb9bcc8d991323f7d38f818016a2",
+      "conclusion": "success",
+      "jobs": {
+        "source-cross-domain": "success",
+        "msvc-analyze-openxr-host": "success",
+        "msvc-analyze-active-game": "success"
+      }
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "No direct Quest 3 / VDXR execution, input trial or GPU frame-time/FPS measurement. Exact-SHA CI confirms build/static checks only.",
+  "score_credit_key": "CONVERSION-DX9EX-00693",
+  "score_change": 0,
+  "score_status": "CREDITED_ONCE_IN_AI_SCOREBOARD_AT_e2d63a7183b1c285917705691a0d2c13fa2b7dec",
+  "notes": "Separate C6 bookkeeping commit after all exact SHA gates succeeded; validation-bearing result remains immutable material sha. No further score credit on bookkeeping."
+}
