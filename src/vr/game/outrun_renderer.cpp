@@ -1827,6 +1827,16 @@ namespace OutRunVRRenderer
 		return CadencePacingActive.load(std::memory_order_acquire);
 	}
 
+	const LatchedStereoFrame* GetLatchedStereoFrameView() noexcept
+	{
+		// The pose and both eyes are latched together at the successful
+		// game BeginScene; R33 consumes this borrowed view synchronously
+		// before the next scene/reset, avoiding a ~150-byte copy per draw.
+		// Never expose invalidated or incomplete pose data.
+		return LatchedStereo.valid && LatchedStereo.poseSequence != 0
+			? &LatchedStereo : nullptr;
+	}
+
 	bool GetLatchedStereoFrame(LatchedStereoFrame& out)
 	{
 		out = LatchedStereo;

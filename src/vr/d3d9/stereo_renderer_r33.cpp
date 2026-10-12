@@ -501,18 +501,20 @@ namespace OutRunVRStereo
             if (!R33PrepareRightDepthStereo(device))
                 return {};
 
-            OutRunVRRenderer::LatchedStereoFrame stereo{};
-            if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo) ||
-                stereo.poseSequence == 0)
+            // Read the one BeginScene-latched pose in place: avoid copying both
+            // eye transforms for every world/HUD primitive. This pointer is
+            // never retained across a scene/reset boundary.
+            const auto* stereo = OutRunVRRenderer::GetLatchedStereoFrameView();
+            if (!stereo)
                 return {};
             const std::uint32_t framePoseSequence =
                 R32ReviewFrameStereoPoseSequence();
             if (framePoseSequence != 0 &&
-                framePoseSequence != stereo.poseSequence)
+                framePoseSequence != stereo->poseSequence)
                 return {};
 
             R32ReviewFastWorldConstants draw{};
-            if (!R32ReviewBuildFastWorldConstants(device, stereo, draw))
+            if (!R32ReviewBuildFastWorldConstants(device, *stereo, draw))
                 return {};
 
             D3DVIEWPORT9 savedViewport{};
@@ -606,7 +608,7 @@ namespace OutRunVRStereo
             }
 
             R32ReviewRecordWorldStereoDuplicate(
-                draw.poseSequence, stereo);
+                draw.poseSequence, *stereo);
             R32ReviewNoteStableTwoEyeDraw();
             if (R33TelemetryEnabled())
             {
@@ -659,21 +661,23 @@ namespace OutRunVRStereo
             if (!R33PrepareRightDepthStereo(device))
                 return {};
 
-            OutRunVRRenderer::LatchedStereoFrame stereo{};
-            if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo) ||
-                stereo.poseSequence == 0)
+            // Read the one BeginScene-latched pose in place: avoid copying both
+            // eye transforms for every world/HUD primitive. This pointer is
+            // never retained across a scene/reset boundary.
+            const auto* stereo = OutRunVRRenderer::GetLatchedStereoFrameView();
+            if (!stereo)
                 return {};
             const std::uint32_t framePoseSequence =
                 R32ReviewFrameStereoPoseSequence();
             if (framePoseSequence != 0 &&
-                framePoseSequence != stereo.poseSequence)
+                framePoseSequence != stereo->poseSequence)
                 return {};
 
             float original[16]{};
             float eyeConstants[2][16]{};
             float eyeScale[2]{};
             float eyeOffset[2]{};
-            if (!R32ReviewBuildScreenSpaceEyeConstants(device, stereo, screenKind,
+            if (!R32ReviewBuildScreenSpaceEyeConstants(device, *stereo, screenKind,
                     original, eyeConstants, eyeScale, eyeOffset))
                 return {};
 

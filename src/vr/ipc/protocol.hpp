@@ -309,6 +309,10 @@ namespace OutRunVRRenderer
         float effectiveEyePosition[2][3]{};
     };
 
+    // Borrowed immutable view for synchronous game-thread stereo draw routing.
+    // Do not retain this pointer across BeginScene/Reset/Present boundaries.
+    // A null view preserves the original fail-closed invalid-pose behavior.
+    const LatchedStereoFrame* GetLatchedStereoFrameView() noexcept;
     bool GetLatchedStereoFrame(LatchedStereoFrame& out);
     bool GetLatchedHeadInverse(float outMatrix[16],
         std::uint32_t& poseSequence) noexcept;
