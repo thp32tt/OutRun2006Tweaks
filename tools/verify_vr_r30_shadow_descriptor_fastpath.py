@@ -235,6 +235,68 @@ def test_shadow_copy_cache_mutations(source):
             raise AssertionError("copy-cache mutation survived: " + str(index))
 
 
+
+def validate_shadow_registry_lookup(source):
+    """R30 steady-state lookup must avoid mutex/hash and obey COM lifetime epochs."""
+    find_v = body(source, "R30ShadowPtr R30FindVertexShadow(")
+    find_i = body(source, "R30ShadowPtr R30FindIndexShadow(")
+    assert "std::atomic<std::uint64_t> R30ShadowRegistryEpoch{1};" in source
+    for fn, cache, mapping in (
+        (find_v, "R30VertexLookup", "R30VertexShadows"),
+        (find_i, "R30IndexLookup", "R30IndexShadows"),
+    ):
+        for token in (f"auto& cached = {cache};",
+                      "R30ShadowRegistryEpoch.load(std::memory_order_acquire)",
+                      "cached.entry && cached.buffer == buffer &&",
+                      "cached.epoch == epoch", "return cached.entry;",
+                      "std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);",
+                      f"{mapping}.find(buffer)",
+                      f"cached.entry = it == {mapping}.end() ? nullptr : it->second;",
+                      "cached.buffer = buffer;",
+                      "R30ShadowRegistryEpoch.load(std::memory_order_relaxed)"):
+            assert token in fn, token
+        assert fn.index("cached.epoch == epoch") < fn.index("std::lock_guard")
+    for type in ("Vertex", "Index"):
+        ensure = body(source, f"R30ShadowPtr R30Ensure{type}Shadow(")
+        release = body(source, f"ULONG __stdcall R30{type}BufferReleaseDest(")
+        assert "if (inserted)" in ensure
+        assert "R30ShadowRegistryEpoch.fetch_add(1, std::memory_order_release);" in ensure
+        assert f"if (R30{type}Shadows.erase(buffer))" in release
+        assert "R30ShadowRegistryEpoch.fetch_add(" in release
+    rollback = body(source, "void R30RollbackBufferShadowHooks(")
+    assert rollback.index("R30VertexShadows.clear();") < rollback.index(
+        "R30ShadowRegistryEpoch.fetch_add(")
+    assert rollback.index("R30IndexShadows.clear();") < rollback.index(
+        "R30ShadowRegistryEpoch.fetch_add(")
+
+
+def test_shadow_registry_lookup_mutations(source):
+    edits = (
+        ("cached.entry && cached.buffer == buffer &&", "cached.entry && true &&"),
+        ("cached.epoch == epoch", "cached.epoch != epoch"),
+        ("R30ShadowRegistryEpoch.load(std::memory_order_acquire)",
+         "R30ShadowRegistryEpoch.load(std::memory_order_relaxed)"),
+        ("std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);\n            const auto it = R30VertexShadows.find(buffer);",
+         "const auto it = R30VertexShadows.find(buffer);"),
+        ("if (inserted)\n                R30ShadowRegistryEpoch.fetch_add(1, std::memory_order_release);",
+         "if (inserted) {}"),
+        ("if (R30VertexShadows.erase(buffer))", "if (false)"),
+        ("if (R30IndexShadows.erase(buffer))", "if (false)"),
+        ("R30IndexShadows.clear();\n                R30VertexShadows.clear();\n                R30ShadowRegistryEpoch.fetch_add(",
+         "R30IndexShadows.clear();\n                R30VertexShadows.clear();\n                ("),
+        ("cached.entry = it == R30IndexShadows.end() ? nullptr : it->second;",
+         "cached.entry = nullptr;"),
+    )
+    for i, (needle, replacement) in enumerate(edits, 1):
+        assert needle in source, (i, needle)
+        mutated = source.replace(needle, replacement, 1)
+        try:
+            validate_shadow_registry_lookup(mutated)
+        except (AssertionError, ValueError):
+            continue
+        raise AssertionError(f"R30 registry negative mutation {i} escaped")
+
+
 def main():
     source = SOURCE.read_text(encoding="utf-8")
     validate(source)
@@ -243,6 +305,8 @@ def main():
     test_range_mutations(source)
     validate_shadow_copy_cache(source)
     test_shadow_copy_cache_mutations(source)
+    validate_shadow_registry_lookup(source)
+    test_shadow_registry_lookup_mutations(source)
     mutations = (
         ("if (!vbShadow)", "if (false)"),
         ("firstByte > vbShadow->size", "false"),
@@ -265,7 +329,7 @@ def main():
             pass
         else:
             raise AssertionError("mutation survived: " + needle)
-    print("PASS R30 VB/IB descriptor, range and revision-keyed shadow copy cache; 11 descriptor + 8 range + 13 cache negative mutations")
+    print("PASS R30 VB/IB descriptor, range and revision-keyed shadow copy cache; 11 descriptor + 8 range + 13 copy + 9 registry negative mutations")
 
 
 if __name__ == "__main__":

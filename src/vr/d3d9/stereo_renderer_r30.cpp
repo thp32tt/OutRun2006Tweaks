@@ -193,6 +193,17 @@ namespace OutRunVRStereo
             R30VertexShadows;
         std::unordered_map<IDirect3DIndexBuffer9*, R30ShadowPtr>
             R30IndexShadows;
+        // Generation is advanced under the registry mutex on membership
+        // changes, including final COM Release and Reset rollback.
+        std::atomic<std::uint64_t> R30ShadowRegistryEpoch{1};
+        struct R30ShadowLookupCache
+        {
+            const void* buffer = nullptr;
+            std::uint64_t epoch = 0;
+            R30ShadowPtr entry;
+        };
+        thread_local R30ShadowLookupCache R30VertexLookup{};
+        thread_local R30ShadowLookupCache R30IndexLookup{};
         std::uint64_t R30ShadowWrites = 0;
         std::uint64_t R30ShadowReadHits = 0;
         std::uint64_t R30ShadowReadMisses = 0;
@@ -294,16 +305,40 @@ namespace OutRunVRStereo
 
         R30ShadowPtr R30FindVertexShadow(IDirect3DVertexBuffer9* buffer)
         {
+            auto& cached = R30VertexLookup;
+            const auto epoch =
+                R30ShadowRegistryEpoch.load(std::memory_order_acquire);
+            if (cached.entry && cached.buffer == buffer &&
+                cached.epoch == epoch)
+                return cached.entry;
+            // Slow path holds the registry lock across lookup and epoch
+            // capture. A recycled COM address never inherits a stale entry.
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             const auto it = R30VertexShadows.find(buffer);
-            return it == R30VertexShadows.end() ? nullptr : it->second;
+            cached.buffer = buffer;
+            cached.entry = it == R30VertexShadows.end() ? nullptr : it->second;
+            cached.epoch =
+                R30ShadowRegistryEpoch.load(std::memory_order_relaxed);
+            return cached.entry;
         }
 
         R30ShadowPtr R30FindIndexShadow(IDirect3DIndexBuffer9* buffer)
         {
+            auto& cached = R30IndexLookup;
+            const auto epoch =
+                R30ShadowRegistryEpoch.load(std::memory_order_acquire);
+            if (cached.entry && cached.buffer == buffer &&
+                cached.epoch == epoch)
+                return cached.entry;
+            // Slow path holds the registry lock across lookup and epoch
+            // capture. A recycled COM address never inherits a stale entry.
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             const auto it = R30IndexShadows.find(buffer);
-            return it == R30IndexShadows.end() ? nullptr : it->second;
+            cached.buffer = buffer;
+            cached.entry = it == R30IndexShadows.end() ? nullptr : it->second;
+            cached.epoch =
+                R30ShadowRegistryEpoch.load(std::memory_order_relaxed);
+            return cached.entry;
         }
 
         R30ShadowPtr R30EnsureVertexShadow(IDirect3DVertexBuffer9* buffer)
@@ -322,6 +357,8 @@ namespace OutRunVRStereo
             entry->pool = desc.Pool;
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             auto [it, inserted] = R30VertexShadows.emplace(buffer, entry);
+            if (inserted)
+                R30ShadowRegistryEpoch.fetch_add(1, std::memory_order_release);
             return inserted ? entry : it->second;
         }
 
@@ -344,6 +381,8 @@ namespace OutRunVRStereo
             entry->indexFormat = desc.Format;
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             auto [it, inserted] = R30IndexShadows.emplace(buffer, entry);
+            if (inserted)
+                R30ShadowRegistryEpoch.fetch_add(1, std::memory_order_release);
             return inserted ? entry : it->second;
         }
 
@@ -567,7 +606,9 @@ namespace OutRunVRStereo
             if (refs == 0)
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-                R30VertexShadows.erase(buffer);
+                if (R30VertexShadows.erase(buffer))
+                    R30ShadowRegistryEpoch.fetch_add(
+                        1, std::memory_order_release);
             }
             return refs;
         }
@@ -609,7 +650,9 @@ namespace OutRunVRStereo
             if (refs == 0)
             {
                 std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-                R30IndexShadows.erase(buffer);
+                if (R30IndexShadows.erase(buffer))
+                    R30ShadowRegistryEpoch.fetch_add(
+                        1, std::memory_order_release);
             }
             return refs;
         }
@@ -747,6 +790,8 @@ namespace OutRunVRStereo
                     R30ShadowRegistryMutex);
                 R30IndexShadows.clear();
                 R30VertexShadows.clear();
+                R30ShadowRegistryEpoch.fetch_add(
+                    1, std::memory_order_release);
             }
         }
 
