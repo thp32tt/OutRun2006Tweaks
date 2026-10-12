@@ -251,6 +251,34 @@ namespace OutRunVRStereo
                     (preferred + offset) % OutRunVR::RenderFrameRingSize;
                 auto& slot = DirectTransportSlots[index];
 
+                // A published slot still belongs to the consumer until its
+                // exact per-slot GPU-completion ACK. Test that ownership first:
+                // polling the producer EVENT while the host is behind causes
+                // needless D3D9 GetData calls on each Present ring scan.
+                const bool publicationNeedsAck =
+                    slot.published && slot.frameId != 0;
+                if (publicationNeedsAck)
+                {
+                    if (!ackSnapshotRead)
+                    {
+                        ackSnapshotValid =
+                            R13ReadGpuCompletionSnapshotWithRebind(ackSnapshot);
+                        ackSnapshotRead = true;
+                    }
+
+                    const std::uint32_t gpuCompleted = ackSnapshotValid
+                        ? ackSnapshot.completedFrameId[index] : 0;
+                    if (!ackSnapshotValid ||
+                        !FrameIdAtOrAfter(gpuCompleted, slot.frameId))
+                    {
+                        ackBlocked = true;
+                        continue;
+                    }
+                }
+
+                // ACK alone never frees a published slot. A producer EVENT
+                // left pending after Present must also report S_OK; S_FALSE
+                // and hard errors preserve quarantine even with a valid ACK.
                 if (slot.producerPending)
                 {
                     const HRESULT ready =
@@ -259,8 +287,8 @@ namespace OutRunVRStereo
                     {
                         slot.producerPending = false;
                         slot.pendingFrameId = 0;
-                        // A frame that missed its publication window was never
-                        // visible to the host and needs no consumer ACK.
+                        // An unpublished timed-out frame was never visible to
+                        // the host and therefore needs no consumer ACK.
                         if (!slot.published)
                             slot.frameId = 0;
                     }
@@ -270,10 +298,6 @@ namespace OutRunVRStereo
                     }
                     else
                     {
-                        // A hard EVENT query error means GPU completion for this
-                        // shared slot is no longer provable. Preserve ownership
-                        // metadata and quarantine the fallback DirectGPU copy
-                        // path until ResetEx recreates transport resources.
                         R13DirectCopyPathRejected = true;
                         R13DirectCopyRejectHr = ready;
                         spdlog::warn(
@@ -283,24 +307,10 @@ namespace OutRunVRStereo
                     }
                 }
 
-                if (slot.published && slot.frameId)
+                // Retire the old publication only after both proofs. The
+                // selected shared surface cannot be overwritten otherwise.
+                if (publicationNeedsAck)
                 {
-                    if (!ackSnapshotRead)
-                    {
-                        ackSnapshotValid =
-                            R13ReadGpuCompletionSnapshotWithRebind(ackSnapshot);
-                        ackSnapshotRead = true;
-                    }
-
-                    const bool ackValid = ackSnapshotValid;
-                    const std::uint32_t gpuCompleted = ackValid
-                        ? ackSnapshot.completedFrameId[index] : 0;
-                    if (!ackValid ||
-                        !FrameIdAtOrAfter(gpuCompleted, slot.frameId))
-                    {
-                        ackBlocked = true;
-                        continue;
-                    }
                     slot.frameId = 0;
                     slot.published = false;
                 }

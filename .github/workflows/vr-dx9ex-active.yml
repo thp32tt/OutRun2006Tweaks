@@ -60,6 +60,7 @@ on:
       - 'tools/verify_vr_r29_wvp_envelope_fastpath.py'
       - 'tools/verify_vr_r29_owner_api_seam.py' # R29 owner fastpath must trigger exact-SHA gate.
       - 'tools/verify_vr_r13_effect_state_read_fastpath.py'
+      - 'tools/verify_vr_r13_ack_fence_fastpath.py'
       - 'tools/verify_vr_r27_effect_fastpath.py'
       - 'tools/verify_vr_r23_host_fresh_fastpath.py'
       - 'tools/verify_vr_r23_pixel_probe_optin.py'
@@ -217,6 +218,7 @@ jobs:
             'tools/verify_vr_r29_effect_cache_generation.py',
             'tools/verify_vr_r29_wvp_envelope_fastpath.py',
             'tools/verify_vr_r13_effect_state_read_fastpath.py',
+            'tools/verify_vr_r13_ack_fence_fastpath.py',
             'tools/verify_vr_r27_effect_fastpath.py',
             'tools/verify_vr_r23_host_fresh_fastpath.py',
             'tools/verify_vr_r23_pixel_probe_optin.py',
