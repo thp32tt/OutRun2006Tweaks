@@ -69,6 +69,7 @@ def violations(source: str) -> list[str]:
     require(build.count("draw.poseSequence = stereo.poseSequence;") == 2,
             "cache hit uses current pose")
     require("R31EyeCache = next;" in prepare and
+            "R31WorldCache.valid = false;" in prepare and
             prepare.index("R31EyeCache = next;") <
             prepare.index("R31WorldCache.valid = false;"), "tail miss invalidate")
     require("R31WorldCache = {};" in reset, "Reset/ResetEx invalidate")
