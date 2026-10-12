@@ -55,6 +55,31 @@ def verify(source):
                    "R29StencilWrite.applyGeneration == R29Effect.applyGeneration",
                    "R29StencilWrite.recordingGeneration == R29Effect.recordingGeneration"):
         assert phrase in current
+    # Skipped getters must remain fenced by state generations and setters.
+    for guard in ("bool maskOnly = false;", "bool frontOnly = false;"):
+        assert guard in state, guard
+    for guard in ("if (next.writeMask == 0)", "next.maskOnly = true;",
+                  "next.mayWrite = false;", "if (next.twoSided != FALSE)",
+                  "next.frontOnly = true;", "if (!next.maskOnly)"):
+        assert guard in sync, guard
+    assert sync.index("if (next.writeMask == 0)") < sync.index(
+        "D3DRS_STENCILFAIL, &next.fail")
+    assert sync.index("if (next.twoSided != FALSE)") < sync.index(
+        "D3DRS_CCW_STENCILFAIL, &next.ccwFail")
+    for guard in (
+        "if (R29StencilWrite.maskOnly)",
+        "state == D3DRS_STENCILWRITEMASK && value != 0",
+        "if (R29StencilWrite.frontOnly)",
+        "state == D3DRS_TWOSIDEDSTENCILMODE && value != FALSE",
+        "state == D3DRS_CCW_STENCILFAIL ||",
+        "state == D3DRS_CCW_STENCILZFAIL ||",
+        "state == D3DRS_CCW_STENCILPASS)",
+    ):
+        assert guard in setter, guard
+    assert setter.index("if (R29StencilWrite.maskOnly)") < setter.index(
+        "case D3DRS_STENCILWRITEMASK: R29StencilWrite.writeMask = value;")
+    assert setter.index("if (R29StencilWrite.frontOnly)") < setter.index(
+        "case D3DRS_TWOSIDEDSTENCILMODE: R29StencilWrite.twoSided = value;")
     assert "if (!device || !R29EffectCacheCurrent())" in sync
     assert "!R29EffectCacheCurrent())" in sync
     assert "R29StencilWrite.valid = false;" in sync
@@ -88,10 +113,27 @@ def legacy(values):
     return bool(cf != 0 or cz != 0 or cp != 0)
 
 
+def staged_reads(values):
+    mask, _, _, _, two, _, _, _ = values
+    return 1 if mask == 0 else (8 if two else 5)
+
+
+def staged_policy(values):
+    mask, fail, zfail, passed, two, cf, cz, cp = values
+    if mask == 0:
+        return False
+    if fail or zfail or passed:
+        return True
+    return bool(two and (cf or cz or cp))
+
+
 def main():
     verify(SRC)
     for values in product((0, 1, 2), repeat=8):
         assert model(values) == legacy(values), values
+        assert staged_policy(values) == legacy(values), values
+        assert staged_reads(values) == (1 if values[0] == 0 else
+                                        (8 if values[4] else 5)), values
     variants = [
         ("state.writeMask != 0", "state.writeMask == 0"),
         ("state.fail != D3DSTENCILOP_KEEP", "state.fail == D3DSTENCILOP_KEEP"),
@@ -112,6 +154,22 @@ def main():
         ("if (!SurfaceHasStencil(TrackedDepthStencil))", "if (false)"),
         ("return LeftDrawMayWriteStencil(device);", "return false;"),
         ("if (state == D3DRS_STENCILENABLE)", "if (false)"),
+        ("bool maskOnly = false;", "bool maskOnly = true;"),
+        ("bool frontOnly = false;", "bool frontOnly = true;"),
+        ("if (next.writeMask == 0)", "if (next.writeMask != 0)"),
+        ("next.maskOnly = true;", "next.maskOnly = false;"),
+        ("next.mayWrite = false;", "next.mayWrite = true;"),
+        ("if (next.twoSided != FALSE)", "if (next.twoSided == FALSE)"),
+        ("next.frontOnly = true;", "next.frontOnly = false;"),
+        ("if (R29StencilWrite.maskOnly)", "if (false)"),
+        ("if (R29StencilWrite.frontOnly)", "if (false)"),
+        ("state == D3DRS_STENCILWRITEMASK && value != 0",
+         "state == D3DRS_STENCILWRITEMASK && value == 0"),
+        ("state == D3DRS_TWOSIDEDSTENCILMODE && value != FALSE",
+         "state == D3DRS_TWOSIDEDSTENCILMODE && value == FALSE"),
+        ("state == D3DRS_CCW_STENCILFAIL ||",
+         "state == D3DRS_CCW_STENCILFAIL &&"),
+        ("if (!next.maskOnly)", "if (false)"),
     ]
     for index, (needle, mutation) in enumerate(variants, 1):
         assert needle in SRC, (index, "ineffective mutation")
@@ -121,7 +179,8 @@ def main():
         except (AssertionError, ValueError):
             continue
         raise AssertionError("escaped negative mutation " + str(index))
-    print("PASS R29 stencil write-cache model (6561 cases), 16 negative mutations")
+    print("PASS R29 conditional stencil policy (6561 cases), "
+          "29 negative mutations, 1/5/8 D3D9 getter paths")
 
 
 if __name__ == "__main__":
