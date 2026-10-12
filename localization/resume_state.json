@@ -16689,5 +16689,25 @@
     "worker": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38162887506",
     "QA": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_CONTROLLER_FIRSTHAND_SAVED_QA.json",
     "recipe": "localization/graphics/role_A/20261012-A250-Q035-NATIVE-ITALIC-TOTAL-RANK/A250_SHA_BOUND_LETTERING_RECIPE.json"
+  },
+  "a256_q099_native_italic_bc3_unpromoted_trial": {
+    "run": "A256",
+    "run_key": "OUTRUN-KOR-A256-Q099-NATIVE-ITALIC-TWO-LINE-BC3-20261012-1000",
+    "role": "A",
+    "queue_index": 99,
+    "source_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+    "previous_sha256": "70970da7653bd75e259d39319c4792c2f95558b7cea79bd20bc9c60ebe1bb612",
+    "unpromoted_trial_sha256": "25aa60916a12602354671675333ecff4f140c7e9401acf2260b44bcf3deda829",
+    "new_saved_DDS": 1,
+    "official_promoted_DDS": 0,
+    "persisted_native_format": "DXT5_2048x256_mip1",
+    "changed_rgba_in_original_bbox": 189366,
+    "changed_rgba_outside_original_bbox": 0,
+    "producer_qa": "SCOPED_SAVED_NATIVE_VISUAL_PASS_COSMETIC_VARIANCE_ACCEPTED",
+    "independent_C2": "NOT_RUN_NEW_SHA",
+    "C3": "NOT_RUN",
+    "ingame": "UNTESTED",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "qa": "localization/graphics/role_A/20261012-A256-Q099-NATIVE-ITALIC-BC3/A256_CONTROLLER_FIRSTHAND_SAVED_VISUAL_QA.json"
   }
 }
