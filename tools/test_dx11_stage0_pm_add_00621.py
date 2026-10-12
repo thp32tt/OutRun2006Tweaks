@@ -50,8 +50,11 @@ def main():
         ("alphaArg2 == D3DTA_DIFFUSE", "alphaArg2 == D3DTA_SPECULAR"),
     ):
         assert not linked(source.replace(PRED, PRED.replace(old, new), 1)), old
+    shader_fragment = SHADER + source.split(SHADER, 1)[1].split("}", 1)[0] + "}"
     for old in ("t.a + v.diffuse.a", "t.rgb + v.diffuse.rgb * (1.0f - t.a)"):
-        assert not linked(source.replace(old, "0.0f", 1)), old
+        assert old in shader_fragment
+        mutant = shader_fragment.replace(old, "0.0f", 1)
+        assert not linked(source.replace(shader_fragment, mutant, 1)), old
     # 8-bit alpha and saturated RGB: covered edge and middle values independently.
     for tr, vr, ta, va in itertools.product((0., .2, .6, 1.), repeat=4):
         rgb = min(1., tr + vr * (1. - ta))
