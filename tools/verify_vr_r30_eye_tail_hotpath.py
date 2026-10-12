@@ -136,11 +136,22 @@ def verify(source: str):
     assert "float eyeView[4]{};" not in vertices
     assert "state.eyeInverse[eye].m[row][col]" not in vertices
     assert "state.eyeProjection[eye].m[row][col]" not in vertices
-    assert vertices.count("state.eyeTail[eye].m[row][col];") == 1
+    # 00684 adds a separate fused binocular world route in addition to the
+    # original independent-eye safety fallback. Each route must retain its
+    # own composed eye-tail multiplication; neither may use a raw projection.
+    fused = source.split("bool R30TryFusedWorldXyzrhwProjection(", 1)[1].split(
+        "bool R30TransformXyzrhwStereo(", 1)[0]
     full = vertices.split(
         "if (state.worldEffect && state.fullWorldReprojection &&", 1)[1].split(
         "if (fullDrawOk && selectedVertices != 0)", 1)[0]
-    assert "state.eyeTail[eye].m[row][col];" in full
+    eye_tail = "state.eyeTail[eye].m[row][col];"
+    assert vertices.count(eye_tail) == 2
+    assert full.count(eye_tail) == 1
+    assert fused.count(eye_tail) == 1
+    assert "for (int eye = 0; eye < 2; ++eye)" in fused
+    assert "clipEye[3] <= 1.0e-6f" in fused
+    assert "if (allValid && referenced != 0)" in fused
+    assert "for (UINT i = 0; i < modifiedVertexEnd; ++i)" in fused
     assert full.index("float clipEye[4]{};") < full.index(
         "clipEye[3] <= 1.0e-6f")
     for required in (
@@ -269,6 +280,34 @@ def main():
         except (AssertionError, ValueError, IndexError):
             continue
         raise AssertionError(f"destructive mutation {i} escaped")
+    # Target the second eye-tail multiplication explicitly: replacing only
+    # the first site above tests the independent-eye fallback, not the fused
+    # world implementation. Guard both routes against independent regression.
+    fused_start = source.index("bool R30TryFusedWorldXyzrhwProjection(")
+    eye_tail = "state.eyeTail[eye].m[row][col];"
+    fused_site = source.index(eye_tail, fused_start)
+    for damaged_eye_tail in (
+        "state.eyeProjection[eye].m[row][col];",
+        "state.eyeInverse[eye].m[row][col];",
+    ):
+        mutated = (source[:fused_site] + damaged_eye_tail +
+                   source[fused_site + len(eye_tail):])
+        try:
+            verify(mutated)
+        except (AssertionError, ValueError, IndexError):
+            continue
+        raise AssertionError("fused world eye-tail mutation escaped")
+    # The fused route must also reject clip-W behind the eye.
+    fused_guard = "clipEye[3] <= 1.0e-6f"
+    fused_guard_site = source.index(fused_guard, fused_start)
+    mutated_guard = (source[:fused_guard_site] + "false" +
+                     source[fused_guard_site + len(fused_guard):])
+    try:
+        verify(mutated_guard)
+    except (AssertionError, ValueError, IndexError):
+        pass
+    else:
+        raise AssertionError("fused world clip-W mutation escaped")
     # The Reset callsite precedes the later TLS geometry declaration. Fail
     # any change that drops its correctly forward-declared invalidator.
     reset_bad = source.replace(
