@@ -49,7 +49,9 @@ def valid(code: str) -> bool:
                 "if (!restored)" in full_body and
                 "state.inverseBaseProjection.m[row][col]" in full_body and
                 "if (fullDrawOk && selectedVertices != 0)" in code and
-                "std::memcpy(out.data(), source, bytes);" in code and
+                "else if (!R30SeedWorldXyzrhwBuffers(" in code and
+                "if (preseeded)" in code and
+                "if (out.size() != bytes)" in code and
                 "bool ignored = false;" not in full_body and
                 code.count("for (UINT i = 0; i < vertexCount; ++i)") >= 2)
     except ValueError:
@@ -167,8 +169,8 @@ def main() -> None:
     stereo = source[source.index("        bool R30TransformXyzrhwStereo("):
                     source.index("        template <typename LeftDraw,", source.index(
                         "        bool R30TransformXyzrhwStereo("))]
-    for keep in ("if (leftFull != rightFull)", "state, 0, left, usedMask, false, ignored)",
-                 "state, 1, right, usedMask, false, ignored)"):
+    for keep in ("if (leftFull != rightFull)", "state, 0, left, usedMask, false, ignored, false)",
+                 "state, 1, right, usedMask, false, ignored, false)"):
         assert keep in stereo, "bilateral fallback altered"
     print("PASS R30 per-draw RHW perspective hotpath; 17 destructive mutations")
 

@@ -68,8 +68,8 @@ mutations = [
     ("no right fallback", "state, 1, right, usedMask, false, ignored, false)",
      "state, 1, right, usedMask, false, ignored, true)"),
     ("invalid buffer protection", "if (out.size() != bytes)", "if (false)"),
-    ("no bounds", "usedMask->size() < vertexCount",
-     "usedMask->size() < 0"),
+    ("no bounds", "usedMask && usedMask->size() < vertexCount))",
+     "usedMask && usedMask->size() < 0))"),
 ]
 for name, before, after in mutations:
     assert SOURCE.count(before) == 1, (name, "fixture")
