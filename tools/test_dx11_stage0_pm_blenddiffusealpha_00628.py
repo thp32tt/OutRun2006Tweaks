@@ -54,7 +54,7 @@ for tr,dr,ta,da in product((0.,.2,.6,1.),repeat=4):
     a = da + (ta-da)*da
     assert 0. <= c <= 1. and 0. <= a <= 1.
     if da == 0.: assert a == 0.
-    if da == 1.: assert a == ta
+    if da == 1.: assert abs(a-ta) < 1.e-12
     if abs(a - (da+(ta-da)*ta)) > 1.e-10: distinct += 1
 assert distinct > 0, "diffuse alpha and texture alpha weighting wrongly aliased"
 print("00628 native PM/diffuse alpha source-to-Draw, destructive and 256 numeric cases PASS; HMD UNTESTED")
