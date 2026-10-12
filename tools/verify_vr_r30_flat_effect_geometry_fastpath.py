@@ -58,7 +58,7 @@ def validate(source: str) -> None:
     assert flat.index("const D3DMATRIX headRelativePlane") < flat.index(
         "for (int eye = 0; eye < 2; ++eye)"
     )
-    assert "R29OwnerMultiplyMatrix(headRelativePlane, geometry->eyeInverse[eye])" in flat
+    assert "R29OwnerMultiplyMatrix( headRelativePlane, geometry->eyeInverse[eye])" in " ".join(flat.split())
     assert "headInverse" not in flat.split(
         "for (int eye = 0; eye < 2; ++eye)", 1
     )[1]
@@ -91,8 +91,8 @@ def negative_mutations(source: str) -> int:
         ("geometry->eyeProjection[eye]", "baseProjection"),
         ("R29OwnerMultiplyMatrix(commonViewPlane, headInverse)",
          "R29OwnerMultiplyMatrix(commonViewPlane, stockWvp)"),
-        ("R29OwnerMultiplyMatrix(headRelativePlane, geometry->eyeInverse[eye])",
-         "R29OwnerMultiplyMatrix(headRelativePlane, headInverse)"),
+        ("R29OwnerMultiplyMatrix(\n                                headRelativePlane, geometry->eyeInverse[eye])",
+         "R29OwnerMultiplyMatrix(\n                                headRelativePlane, headInverse)"),
         ("R30HudContainScale(stereo, hudScaleX, hudScaleY);",
          "/* duplicate HUD contain probe removed entirely */"),
         ("R29OwnerTryGetTrackedViewport(savedViewport)", "false"),
@@ -109,7 +109,7 @@ def negative_mutations(source: str) -> int:
                 "const R30FlatEffectGeometryCache* R30PrepareFlatEffectGeometry")
         elif needle in (
             "R29OwnerMultiplyMatrix(commonViewPlane, headInverse)",
-            "R29OwnerMultiplyMatrix(headRelativePlane, geometry->eyeInverse[eye])",
+            "R29OwnerMultiplyMatrix(\n                                headRelativePlane, geometry->eyeInverse[eye])",
             "R30HudContainScale(stereo, hudScaleX, hudScaleY);",
         ):
             scope = source.index("bool R30BuildScreenSpaceEyeConstants")
