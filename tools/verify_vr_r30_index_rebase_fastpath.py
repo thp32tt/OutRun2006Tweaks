@@ -139,12 +139,93 @@ def verify_decode_cache(source, body):
           f"{len(signature)} invariants")
 
 
+
+def valid_vb_touched(source, body):
+    """Ring/IB-generation-safe touched list, consumed by the stereo seed path."""
+    required = (
+        "std::vector<std::uint32_t> vbTouched;",
+        "scratch.vbTouched.size() == decoded.knownUsedCount",
+        "scratch.vbTouched.clear();",
+        "scratch.vbTouched.push_back(",
+        "static_cast<std::uint32_t>(local));",
+        "scratch.used[static_cast<std::size_t>(local)] = 1;",
+        "next.knownUsedCount = knownUsedCount;",
+        "next.valid = true;",
+        "&scratch.used, knownUsedCount, &scratch.vbTouched)",
+    )
+    combined = source + body
+    if any(token not in combined for token in required):
+        return False
+    if body.count("scratch.vbTouched.push_back(") != 1:
+        return False
+    invalid = body.index("scratch.indexDecode.valid = false;")
+    clear = body.index("scratch.vbTouched.clear();")
+    fill = body.index("scratch.used.assign(vertexCount, 0);")
+    append = body.index("scratch.vbTouched.push_back(")
+    mark = body.index("scratch.used[static_cast<std::size_t>(local)] = 1;")
+    publish = body.index("next.valid = true;")
+    transform = body.index("&scratch.used, knownUsedCount, &scratch.vbTouched)")
+    return invalid < clear < fill < append < mark < publish < transform
+
+
+def verify_vb_touched(source, body):
+    assert valid_vb_touched(source, body), "VB sparse touched producer/consumer broken"
+    # The existing UP touched path is independent of indexed VB decoder state.
+    assert "std::vector<std::uint32_t> upTouched;" in source
+    assert "for (const std::uint32_t previous : scratch.upTouched)" in source
+    assert "R30SeedTouchedXyzrhwVertices(" in source
+    assert source.count("R30SeedTouchedXyzrhwVertices(") >= 3
+    mutations = (
+        ("scratch.vbTouched.size() == decoded.knownUsedCount",
+         "scratch.vbTouched.size() != decoded.knownUsedCount"),
+        ("scratch.vbTouched.clear();", "scratch.vbTouched.reserve(0);"),
+        ("scratch.vbTouched.push_back(", "scratch.vbTouched.pop_back("),
+        ("&scratch.used, knownUsedCount, &scratch.vbTouched)",
+         "&scratch.used, knownUsedCount, nullptr)"),
+        ("next.valid = true;", "next.valid = false;"),
+    )
+    for original, broken in mutations:
+        assert original in body, original
+        assert not valid_vb_touched(source, body.replace(original, broken, 1))
+
+    # Differential: out-of-order and repeated IB indices must reconstruct
+    # the exact old full-span referenced mask. Cache reuse must not invent
+    # references, and a changed IB write generation must rebuild the list.
+    rng = random.Random(707)
+    for _ in range(900):
+        span = rng.randint(64, 8000)
+        count = rng.randint(1, 900)
+        raw = [rng.randrange(span) for _ in range(count)]
+        used = bytearray(span)
+        touched = []
+        for index in raw:
+            if not used[index]:
+                touched.append(index)
+                used[index] = 1
+        original_references = [i for i, flag in enumerate(used) if flag]
+        assert len(touched) == len(original_references)
+        assert set(touched) == set(original_references)
+        assert all(used[index] for index in touched)
+        # A new generation with a different index stream cannot reuse the
+        # old touched list, even if min/max and index count are unchanged.
+        changed = raw[:]
+        if span > 1:
+            changed[0] = (changed[0] + 1) % span
+        changed_mask = bytearray(span)
+        for index in changed:
+            changed_mask[index] = 1
+        assert sum(changed_mask) == len(set(changed))
+    print(f"PASS R30 indexed VB sparse touched: 900 differential cases, "
+          f"{len(mutations)} destructive mutations")
+
+
 def main():
     code = SOURCE.read_text(encoding="utf-8")
     workflow = WORKFLOW.read_text(encoding="utf-8")
     body = indexed_body(code)
     assert valid(body), "scratch-free indexed draw / fallback contract broken"
     verify_decode_cache(code, body)
+    verify_vb_touched(code, body)
     assert workflow.count("tools/verify_vr_r30_index_rebase_fastpath.py") == 2
     assert "std::vector<std::uint32_t> physical;" not in code
     mutations = (

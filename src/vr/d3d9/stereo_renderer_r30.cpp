@@ -266,6 +266,10 @@ namespace OutRunVRStereo
             std::vector<std::uint8_t> left;
             std::vector<std::uint8_t> right;
             std::vector<std::uint8_t> used;
+            // Cached IB local-index order; only the first references are touched.
+            // Reuse it across unchanged IB generations to seed sparse VB stereo
+            // without scanning the full min..max vertex span per draw.
+            std::vector<std::uint32_t> vbTouched;
             // UP has no validated IB revision and must not mutate VB masks.
             std::vector<std::uint8_t> upUsed;
             std::vector<std::uint32_t> upTouched;
@@ -3755,6 +3759,7 @@ namespace OutRunVRStereo
                 decoded.size == static_cast<UINT>(indexBytes) &&
                 decoded.format == ibShadow->indexFormat &&
                 scratch.used.size() == decoded.vertexCount &&
+                scratch.vbTouched.size() == decoded.knownUsedCount &&
                 (index16 ? scratch.indices16.size() == indexCount
                          : scratch.indices32.size() == indexCount);
             std::uint32_t minRaw = cachedDecode ? decoded.minRaw : UINT_MAX;
@@ -3822,6 +3827,7 @@ namespace OutRunVRStereo
             if (!cachedDecode)
             {
                 scratch.indexDecode.valid = false;
+                scratch.vbTouched.clear();
                 try
                 {
                     scratch.used.assign(vertexCount, 0);
@@ -3856,6 +3862,20 @@ namespace OutRunVRStereo
                     }
                     if (!scratch.used[static_cast<std::size_t>(local)])
                     {
+                        // Publish the mask bit only after a successful append.
+                        // A failed allocation returns with the decode cache invalid,
+                        // so no incomplete referenced-vertex list can be replayed.
+                        try
+                        {
+                            scratch.vbTouched.push_back(
+                                static_cast<std::uint32_t>(local));
+                        }
+                        catch (...)
+                        {
+                            ib->Release();
+                            vb->Release();
+                            return E_NOTIMPL;
+                        }
                         ++knownUsedCount;
                         scratch.used[static_cast<std::size_t>(local)] = 1;
                     }
@@ -3887,7 +3907,7 @@ namespace OutRunVRStereo
                 !R30TransformXyzrhwStereo(
                     scratch.source.data(), vertexCount, stride, state,
                     scratch.left, scratch.right,
-                    &scratch.used, knownUsedCount))
+                    &scratch.used, knownUsedCount, &scratch.vbTouched))
             {
                 ib->Release();
                 vb->Release();
