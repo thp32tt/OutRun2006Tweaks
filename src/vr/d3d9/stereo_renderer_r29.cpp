@@ -680,6 +680,32 @@ namespace OutRunVRStereo
             if (FAILED(hr) || !IsGameDevice(device) || InternalStereoPass)
                 return hr;
 
+            // Non-policy render states never alter the cached alpha/depth/cull
+            // or stencil-write classification. Forward them unchanged without
+            // paying for StateBlock generation/recording and cache checks on
+            // each unrelated driver setter (fog, blend factors, color mask...).
+            // Relevant setters still take the complete fail-closed path below.
+            switch (state)
+            {
+            case D3DRS_ALPHABLENDENABLE:
+            case D3DRS_ALPHATESTENABLE:
+            case D3DRS_ZWRITEENABLE:
+            case D3DRS_ZENABLE:
+            case D3DRS_CULLMODE:
+            case D3DRS_STENCILENABLE:
+            case D3DRS_STENCILWRITEMASK:
+            case D3DRS_STENCILFAIL:
+            case D3DRS_STENCILZFAIL:
+            case D3DRS_STENCILPASS:
+            case D3DRS_TWOSIDEDSTENCILMODE:
+            case D3DRS_CCW_STENCILFAIL:
+            case D3DRS_CCW_STENCILZFAIL:
+            case D3DRS_CCW_STENCILPASS:
+                break;
+            default:
+                return hr;
+            }
+
             // StateBlock recording setters may not update live device state.
             // Begin/End also advances R31's generation and invalidates the
             // older five-field snapshot even if no Apply follows.

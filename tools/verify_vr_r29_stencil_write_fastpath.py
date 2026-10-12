@@ -88,6 +88,37 @@ def verify(source):
     assert "if (!R29StencilWriteCacheCurrent())" in setter
     assert "R29RefreshStencilWritePolicy();" in setter
     assert "R29OnStencilWriteSetter(state, value);" in hook
+    # A successful unrelated SetRenderState must not hit StateBlock/cache work.
+    # All fourteen policy-affecting setters must retain the original fail-closed
+    # recording/generation and stencil-write invalidation behavior.
+    fast = hook.split("// Non-policy render states", 1)[1].split(
+        "// StateBlock recording setters", 1)[0]
+    policy_states = (
+        "ALPHABLENDENABLE",
+        "ALPHATESTENABLE",
+        "ZWRITEENABLE",
+        "ZENABLE",
+        "CULLMODE",
+        "STENCILENABLE",
+        "STENCILWRITEMASK",
+        "STENCILFAIL",
+        "STENCILZFAIL",
+        "STENCILPASS",
+        "TWOSIDEDSTENCILMODE",
+        "CCW_STENCILFAIL",
+        "CCW_STENCILZFAIL",
+        "CCW_STENCILPASS",
+    )
+    for name in policy_states:
+        assert fast.count("case D3DRS_" + name + ":") == 1, name
+    assert fast.count("case D3DRS_") == len(policy_states)
+    assert "default:\\n                return hr;" in fast
+    assert fast.index("switch (state)") < fast.index("default:")
+    assert hook.index("if (FAILED(hr)") < hook.index("// Non-policy render states")
+    assert hook.index("// Non-policy render states") < hook.index(
+        "StateBlockTracker::Recording()")
+    assert hook.index("StateBlockTracker::Recording()") < hook.index(
+        "R29OnStencilWriteSetter(state, value);")
     assert hook.count("R29StencilWrite.valid = false;") >= 2
     assert "if (state == D3DRS_STENCILENABLE)" in hook
     assert "if (R29EffectCacheCurrent() && R29Effect.stencilEnable == FALSE)" in draw
@@ -179,6 +210,46 @@ def main():
         except (AssertionError, ValueError):
             continue
         raise AssertionError("escaped negative mutation " + str(index))
+    # Destructive tests target the NEW switch rather than earlier stencil-op
+    # switches. Every omitted policy field, including two-sided CCW ops,
+    # must fail the regression; unrelated states retain the early return.
+    begin = SRC.index("// Non-policy render states", SRC.index(
+        "HRESULT __stdcall SetRenderStateDestR29("))
+    end = SRC.index("// StateBlock recording setters", begin)
+    fast = SRC[begin:end]
+    policy_states = (
+        "ALPHABLENDENABLE",
+        "ALPHATESTENABLE",
+        "ZWRITEENABLE",
+        "ZENABLE",
+        "CULLMODE",
+        "STENCILENABLE",
+        "STENCILWRITEMASK",
+        "STENCILFAIL",
+        "STENCILZFAIL",
+        "STENCILPASS",
+        "TWOSIDEDSTENCILMODE",
+        "CCW_STENCILFAIL",
+        "CCW_STENCILZFAIL",
+        "CCW_STENCILPASS",
+    )
+    for name in policy_states:
+        old = "case D3DRS_" + name + ":"
+        assert fast.count(old) == 1
+        changed = SRC[:begin] + fast.replace(old, "/* omitted policy */", 1) + SRC[end:]
+        try:
+            verify(changed)
+        except (AssertionError, ValueError):
+            continue
+        raise AssertionError("escaped policy-state mutation " + name)
+    changed = SRC[:begin] + fast.replace("default:\\n                return hr;",
+        "default:\\n                break;", 1) + SRC[end:]
+    try:
+        verify(changed)
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("unrelated setters no longer bypass cache work")
     print("PASS R29 conditional stencil policy (6561 cases), "
           "29 negative mutations, 1/5/8 D3D9 getter paths")
 
