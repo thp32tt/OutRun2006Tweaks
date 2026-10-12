@@ -1,0 +1,269 @@
+{
+  "TASK_ID": "OUTRUN-KOR-C1-20261013-0410-Q086-Q133-Q159-Q163-INDEPENDENT-FAST-QA",
+  "date_kst": "2026-10-13",
+  "role": "C1",
+  "base_head": "44c4afb3a91cd5a5c0580356aab6982cdd20e77f",
+  "source_policy": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md"
+  ],
+  "board_name": "C1_Q086_Q133_Q159_Q163_HD_7WAY_BATCH.jpg",
+  "board_sha256": "cac2ee97e895ef12c92363fa8a12caf6ed34a144e748972afe3ff81a65bed470",
+  "scope": "SOURCE DDS RAW/READABLE, SHA-CLEAN if present, ACTUAL SAVED DDS RAW/FLIPY, 75/50% DISPLAY PROXIES. Not actual game UV sampling.",
+  "items": [
+    {
+      "queue_index": 86,
+      "producer": "A144",
+      "original_hd_sha256": "9caaf9d94bb853f8cc00faad6bf03fb6460e893a726c5e200fe4a7826768f3bf",
+      "source_header": {
+        "width": 4096,
+        "height": 4096,
+        "mips": 1,
+        "pixel_flags": 4,
+        "fourcc": "DXT5",
+        "rgb_bits": 0
+      },
+      "clean_sha256": null,
+      "clean_file": null,
+      "source_clean_verdict": "HOLD",
+      "clean_outside_source_regions": null,
+      "final_persisted_sha256": "e3631a376fbe9f35d5926c3668033f3f971298e686c5eb14b8a7321feeb7c513",
+      "final_header": {
+        "width": 4096,
+        "height": 4096,
+        "mips": 1,
+        "pixel_flags": 4,
+        "fourcc": "DXT5",
+        "rgb_bits": 0
+      },
+      "header_equal": true,
+      "changed_outside_reported_text_regions": 34117,
+      "changed_alpha_outside_reported_text_regions": 1157,
+      "change_bbox": [
+        16,
+        608,
+        4022,
+        2795
+      ],
+      "unproven_outside_bbox": [
+        24,
+        608,
+        3888,
+        2795
+      ],
+      "changed_dxt5_blocks": 119391,
+      "unproven_outside_dxt5_blocks": 14389,
+      "documented_target_count": 41,
+      "visually_inspected_translated_labels": [
+        "아웃런 모드"
+      ],
+      "visually_inspected_count": 1,
+      "untranslated_in_inspected_scope": 0,
+      "other_labels_not_independently_inspected": 40,
+      "untranslated_total_entire_dds": "UNKNOWN",
+      "evidence_roi_readable": [
+        1790,
+        1260,
+        2390,
+        1460
+      ],
+      "confirmed_hard_defect_coordinates": null,
+      "verdict": "HOLD",
+      "full_dds_verdict": "TEST_ONLY_HOLD",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "queue_index": 133,
+      "producer": "A47",
+      "original_hd_sha256": "8b59df1eaccdba160cb321335954890d8c4d7d3e793cf83a554c62b707615b04",
+      "source_header": {
+        "width": 2048,
+        "height": 2048,
+        "mips": 1,
+        "pixel_flags": 65,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "rgb_bits": 32
+      },
+      "clean_sha256": "9eac34d252e2ecef38744fcf691897964df8281229f7628953b965ca9f1bada8",
+      "clean_file": "localization/graphics/role_C/20261005-C188-25F697C6/C188_INDEPENDENT_EXACT_CLEAN_PLATE.png",
+      "source_clean_verdict": "SCOPED_SHA_VERIFIED",
+      "clean_outside_source_regions": 0,
+      "final_persisted_sha256": "08352925a1c7b62a177776fc0f7350d334d4057a9e7b8f9b7e94eaa05f2c4013",
+      "final_header": {
+        "width": 2048,
+        "height": 2048,
+        "mips": 1,
+        "pixel_flags": 65,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "rgb_bits": 32
+      },
+      "header_equal": true,
+      "changed_outside_reported_text_regions": 0,
+      "changed_alpha_outside_reported_text_regions": 0,
+      "change_bbox": [
+        216,
+        904,
+        2012,
+        1315
+      ],
+      "unproven_outside_bbox": null,
+      "changed_dxt5_blocks": null,
+      "unproven_outside_dxt5_blocks": null,
+      "documented_target_count": 9,
+      "visually_inspected_translated_labels": [
+        "에인션트 루인스"
+      ],
+      "visually_inspected_count": 1,
+      "untranslated_in_inspected_scope": 0,
+      "other_labels_not_independently_inspected": 8,
+      "untranslated_total_entire_dds": "UNKNOWN",
+      "evidence_roi_readable": [
+        480,
+        1170,
+        1450,
+        1380
+      ],
+      "confirmed_hard_defect_coordinates": null,
+      "verdict": "C1_STATIC_PASS",
+      "full_dds_verdict": "TEST_ONLY_HOLD",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "queue_index": 159,
+      "producer": "A155",
+      "original_hd_sha256": "7ed5e0c85d3ef42b770dad21bdfa331b5eef374b80bff27bc1715f3c5b29fdbd",
+      "source_header": {
+        "width": 2048,
+        "height": 1024,
+        "mips": 1,
+        "pixel_flags": 65,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "rgb_bits": 32
+      },
+      "clean_sha256": null,
+      "clean_file": null,
+      "source_clean_verdict": "HOLD",
+      "clean_outside_source_regions": null,
+      "final_persisted_sha256": "47f64c6733774d713b34dd4424fe87a50a55f17ee70cfdb0df5b63d1c797e461",
+      "final_header": {
+        "width": 2048,
+        "height": 1024,
+        "mips": 1,
+        "pixel_flags": 65,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "rgb_bits": 32
+      },
+      "header_equal": true,
+      "changed_outside_reported_text_regions": 0,
+      "changed_alpha_outside_reported_text_regions": 0,
+      "change_bbox": [
+        2,
+        336,
+        1554,
+        1017
+      ],
+      "unproven_outside_bbox": null,
+      "changed_dxt5_blocks": null,
+      "unproven_outside_dxt5_blocks": null,
+      "documented_target_count": 15,
+      "visually_inspected_translated_labels": [
+        "워터폴스"
+      ],
+      "visually_inspected_count": 1,
+      "untranslated_in_inspected_scope": 0,
+      "other_labels_not_independently_inspected": 14,
+      "untranslated_total_entire_dds": "UNKNOWN",
+      "evidence_roi_readable": [
+        0,
+        915,
+        1090,
+        1024
+      ],
+      "confirmed_hard_defect_coordinates": null,
+      "verdict": "HOLD",
+      "full_dds_verdict": "TEST_ONLY_HOLD",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "queue_index": 163,
+      "producer": "A154",
+      "original_hd_sha256": "7cf4f4c63eb95aea8b98a652051eb4c453596c2214124983d63c46a2f152885d",
+      "source_header": {
+        "width": 1024,
+        "height": 2048,
+        "mips": 1,
+        "pixel_flags": 65,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "rgb_bits": 32
+      },
+      "clean_sha256": "cf39cc5d78112f19adf18d439007c89eb88c1bc96d77380a2151785173e8d179",
+      "clean_file": "localization/graphics/role_A/20261007-A-MANUALQA154-59A79158/A154_CLEAN_PLATE.png",
+      "source_clean_verdict": "SCOPED_SHA_VERIFIED",
+      "clean_outside_source_regions": 0,
+      "final_persisted_sha256": "201044a91730bc9cbde0e68a86a2e39a518d123c7728fdc96d87c9c76d998fa6",
+      "final_header": {
+        "width": 1024,
+        "height": 2048,
+        "mips": 1,
+        "pixel_flags": 65,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "rgb_bits": 32
+      },
+      "header_equal": true,
+      "changed_outside_reported_text_regions": 0,
+      "changed_alpha_outside_reported_text_regions": 0,
+      "change_bbox": [
+        3,
+        240,
+        485,
+        2036
+      ],
+      "unproven_outside_bbox": null,
+      "changed_dxt5_blocks": null,
+      "unproven_outside_dxt5_blocks": null,
+      "documented_target_count": 24,
+      "visually_inspected_translated_labels": [
+        "워터폴스",
+        "튤립 가든"
+      ],
+      "visually_inspected_count": 2,
+      "untranslated_in_inspected_scope": 0,
+      "other_labels_not_independently_inspected": 22,
+      "untranslated_total_entire_dds": "UNKNOWN",
+      "evidence_roi_readable": [
+        0,
+        1875,
+        800,
+        2048
+      ],
+      "confirmed_hard_defect_coordinates": null,
+      "verdict": "C1_STATIC_PASS",
+      "full_dds_verdict": "TEST_ONLY_HOLD",
+      "runtime_validation": "UNTESTED"
+    }
+  ],
+  "summary": {
+    "scoped_pass": 2,
+    "hold": 2,
+    "reviewed_texts": 5,
+    "inspected_untranslated": 0,
+    "whole_dds_pass": 0
+  },
+  "holds": [
+    "q086 SOURCE-CLEAN not SHA bound and 14389 changed BC3 blocks not proved within authorized UI/protection; no tolerance invented",
+    "q159 SOURCE-CLEAN bytes unbound",
+    "q133 8/9 strings not individually reviewed",
+    "q163 22/24 rows not individually reviewed",
+    "No proven game UI cell/UV, C3 or user run"
+  ],
+  "no_actions": [
+    "DDS or image generation",
+    "C2 approvals",
+    "Docker/Portainer/AUTO_SEND",
+    "Queue reset",
+    "Game install/release",
+    "VR/FFB/DX11/DXVK"
+  ],
+  "C3": "UNCHANGED",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
