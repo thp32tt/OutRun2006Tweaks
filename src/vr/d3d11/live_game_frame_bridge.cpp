@@ -537,6 +537,7 @@ struct TextureCapture {
     Microsoft::WRL::ComPtr<IDirect3DTexture9> texture;
     D3DTEXTUREADDRESS addressU = D3DTADDRESS_CLAMP;
     D3DTEXTUREADDRESS addressV = D3DTADDRESS_CLAMP;
+    DWORD borderColor = 0u; // Live game D3D9 sampler ARGB.
     D3DTEXTUREFILTERTYPE minFilter = D3DTEXF_POINT;
     D3DTEXTUREFILTERTYPE magFilter = D3DTEXF_POINT;
     D3DTEXTUREFILTERTYPE mipFilter = D3DTEXF_NONE;
@@ -1166,6 +1167,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         DWORD arg2=0, alphaOp=0, alphaArg1=0, alphaArg2=0;
         DWORD coordIndex=~0u, transformFlags=~0u;
         DWORD addressU=0, addressV=0, mag=0, min=0, mip=0, srgb=1;
+        DWORD borderColor = 0u;
         DWORD maxMip=~0u, mipBias=~0u;
         if (FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG2, &arg2)) ||
             FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)) ||
@@ -1181,6 +1183,11 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             FAILED(game->GetSamplerState(0, D3DSAMP_MAXMIPLEVEL, &maxMip)) ||
             FAILED(game->GetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, &mipBias)) ||
             FAILED(game->GetSamplerState(0, D3DSAMP_SRGBTEXTURE, &srgb)))
+            return false;
+        // Sampled BORDER U or V needs game-authored ARGB rather than D3D11 zero.
+        // Failure stays on original D3D9 Draw, with no native submission.
+        if ((addressU == D3DTADDRESS_BORDER || addressV == D3DTADDRESS_BORDER) &&
+            FAILED(game->GetSamplerState(0, D3DSAMP_BORDERCOLOR, &borderColor)))
             return false;
         // DWORD MIPMAPLODBIAS contains IEEE-754 bits; numeric conversion loses
         // the game's fractional/negative offset. Validate before native capture.
@@ -1416,10 +1423,12 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             (rgbNeedsDiffuse && !arg2Diffuse) ||
             ((alphaNeedsDiffuse && !alphaArg2Diffuse) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha) ||
             coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb ||
-            (addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP &&
-             addressU != D3DTADDRESS_MIRROR && addressU != D3DTADDRESS_MIRRORONCE) ||
-            (addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP &&
-             addressV != D3DTADDRESS_MIRROR && addressV != D3DTADDRESS_MIRRORONCE) ||
+            ((addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP &&
+             addressU != D3DTADDRESS_MIRROR && addressU != D3DTADDRESS_MIRRORONCE) &&
+             addressU != D3DTADDRESS_BORDER) ||
+            ((addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP &&
+             addressV != D3DTADDRESS_MIRROR && addressV != D3DTADDRESS_MIRRORONCE) &&
+             addressV != D3DTADDRESS_BORDER) ||
             (mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR) ||
             (min != D3DTEXF_POINT && min != D3DTEXF_LINEAR) ||
             ((mip != D3DTEXF_NONE && mip != D3DTEXF_POINT) && mip != D3DTEXF_LINEAR) ||
@@ -1430,6 +1439,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.mipLodBias = decodedMipBias;
         capture.addressU = static_cast<D3DTEXTUREADDRESS>(addressU);
         capture.addressV = static_cast<D3DTEXTUREADDRESS>(addressV);
+        capture.borderColor = borderColor;
         capture.minFilter = static_cast<D3DTEXTUREFILTERTYPE>(min);
         capture.magFilter = static_cast<D3DTEXTUREFILTERTYPE>(mag);
         capture.selectTexture = selectTexture;
@@ -1758,6 +1768,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         case D3DTADDRESS_CLAMP: return D3D11_TEXTURE_ADDRESS_CLAMP;
         case D3DTADDRESS_MIRROR: return D3D11_TEXTURE_ADDRESS_MIRROR;
         case D3DTADDRESS_MIRRORONCE: return D3D11_TEXTURE_ADDRESS_MIRROR_ONCE;
+        case D3DTADDRESS_BORDER: return D3D11_TEXTURE_ADDRESS_BORDER;
         default: return static_cast<D3D11_TEXTURE_ADDRESS_MODE>(0);
         }
     };
@@ -1765,6 +1776,11 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     state.AddressV = translateAddress(capture.addressV);
     if (!state.AddressU || !state.AddressV) return false;
     state.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    // D3D9 COLORREF-like D3DCOLOR is 0xAARRGGBB; native BorderColor is RGBA.
+    state.BorderColor[0] = static_cast<float>((capture.borderColor >> 16) & 0xffu) / 255.0f;
+    state.BorderColor[1] = static_cast<float>((capture.borderColor >> 8) & 0xffu) / 255.0f;
+    state.BorderColor[2] = static_cast<float>(capture.borderColor & 0xffu) / 255.0f;
+    state.BorderColor[3] = static_cast<float>((capture.borderColor >> 24) & 0xffu) / 255.0f;
     // Recheck captured source state before CreateSamplerState; no silent
     // D3D11 driver clamp or NaN/Inf propagation in the diagnostic image.
     if (!std::isfinite(capture.mipLodBias) ||

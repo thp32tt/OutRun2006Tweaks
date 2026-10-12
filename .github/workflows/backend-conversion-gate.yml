@@ -168,6 +168,11 @@ jobs:
         shell: pwsh
         run: python tools/test_dx11_native_mip_lod_bias_00593.py
 
+      - name: Verify DX11 live D3D9 BORDER sampler 00594
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_native_border_color_00594.py
+
       - name: Verify DX11 source graph
         shell: pwsh
         run: python tools/verify_dx11_source_graph.py
