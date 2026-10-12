@@ -3405,14 +3405,17 @@ namespace OutRunVRStereo
                 if (!R29OwnerMatrixFinite(commonViewPlane))
                     return false;
 
+                // Head inverse is identical for both eyes. Hoist the shared
+                // multiply out of the two-eye loop without reassociating any
+                // matrix products (preserves the previous FP order/optics).
+                const D3DMATRIX headRelativePlane =
+                    R29OwnerMultiplyMatrix(commonViewPlane, headInverse);
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const D3DMATRIX corrected =
                         R29OwnerMultiplyMatrix(
                             R29OwnerMultiplyMatrix(
-                                R29OwnerMultiplyMatrix(
-                                    commonViewPlane, headInverse),
-                                geometry->eyeInverse[eye]),
+                                headRelativePlane, geometry->eyeInverse[eye]),
                             geometry->eyeProjection[eye]);
                     if (!R29OwnerMatrixFinite(corrected))
                         return false;
@@ -3427,12 +3430,14 @@ namespace OutRunVRStereo
             if (screenKind != R30ScreenSpaceKind::Hud2D)
                 return false;
 
+            // HUD containment depends on this draw's latched stereo packet,
+            // not on the eye index. Avoid a duplicate FOV/aspect cache probe.
+            float hudScaleX = 1.0f;
+            float hudScaleY = 1.0f;
+            R30HudContainScale(stereo, hudScaleX, hudScaleY);
             for (int eye = 0; eye < 2; ++eye)
             {
                 D3DMATRIX clipCorrection{};
-                float hudScaleX = 1.0f;
-                float hudScaleY = 1.0f;
-                R30HudContainScale(stereo, hudScaleX, hudScaleY);
                 // Keep the already-verified ordinary HUD mapping unchanged.
                 // Only FlatPerspectiveEffect uses the finite 3D plane above.
                 clipCorrection._11 = hudScaleX;

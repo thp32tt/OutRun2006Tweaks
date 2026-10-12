@@ -48,6 +48,26 @@ def validate(source: str) -> None:
     assert "headPoseSequence != stereo.poseSequence" in draw
     assert "R29OwnerMultiplyMatrix(stockWvp, depthReset)" in draw
     assert "commonViewPlane, headInverse)" in draw
+    # Both eyes must share exactly one common * head multiply. In particular
+    # do not move the operation back into the per-eye loop or reassociate it
+    # with the eye inverse/projection: the FP multiply order is intentional.
+    flat = draw.split(
+        "if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect)", 1
+    )[1].split("if (screenKind != R30ScreenSpaceKind::Hud2D)", 1)[0]
+    assert flat.count("R29OwnerMultiplyMatrix(commonViewPlane, headInverse)") == 1
+    assert flat.index("const D3DMATRIX headRelativePlane") < flat.index(
+        "for (int eye = 0; eye < 2; ++eye)"
+    )
+    assert "R29OwnerMultiplyMatrix(headRelativePlane, geometry->eyeInverse[eye])" in flat
+    assert "headInverse" not in flat.split(
+        "for (int eye = 0; eye < 2; ++eye)", 1
+    )[1]
+    ordinary_hud = draw.split("if (screenKind != R30ScreenSpaceKind::Hud2D)", 1)[1]
+    scale_call = "R30HudContainScale(stereo, hudScaleX, hudScaleY);"
+    assert ordinary_hud.count(scale_call) == 1
+    assert ordinary_hud.index(scale_call) < ordinary_hud.index(
+        "for (int eye = 0; eye < 2; ++eye)"
+    )
     assert "R29OwnerTryGetTrackedViewport(savedViewport)" in hud
     assert "device->GetViewport(&savedViewport)" in hud  # safe fallback
     assert "device->GetRenderState(D3DRS_SCISSORTESTENABLE" not in hud
@@ -69,6 +89,12 @@ def negative_mutations(source: str) -> int:
         ("R30FlatEffectGeometry = {};", "/* incorrect: reset cache retained */"),
         ("R29OwnerInvertMatrix(baseProjection, next.inverseBaseProjection)", "R29OwnerInvertMatrix(baseProjection, next.baseProjection)"),
         ("geometry->eyeProjection[eye]", "baseProjection"),
+        ("R29OwnerMultiplyMatrix(commonViewPlane, headInverse)",
+         "R29OwnerMultiplyMatrix(commonViewPlane, stockWvp)"),
+        ("R29OwnerMultiplyMatrix(headRelativePlane, geometry->eyeInverse[eye])",
+         "R29OwnerMultiplyMatrix(headRelativePlane, headInverse)"),
+        ("R30HudContainScale(stereo, hudScaleX, hudScaleY);",
+         "/* duplicate HUD contain probe removed entirely */"),
         ("R29OwnerTryGetTrackedViewport(savedViewport)", "false"),
         ("R30CaptureSkyGlowSceneBeforeHud(device)", "/* bloom baseline removed */"),
     ]
@@ -81,6 +107,12 @@ def negative_mutations(source: str) -> int:
         if needle.startswith(("cache.", "std::memcmp(")):
             scope = source.index(
                 "const R30FlatEffectGeometryCache* R30PrepareFlatEffectGeometry")
+        elif needle in (
+            "R29OwnerMultiplyMatrix(commonViewPlane, headInverse)",
+            "R29OwnerMultiplyMatrix(headRelativePlane, geometry->eyeInverse[eye])",
+            "R30HudContainScale(stereo, hudScaleX, hudScaleY);",
+        ):
+            scope = source.index("bool R30BuildScreenSpaceEyeConstants")
         elif needle in (
             "R29OwnerTryGetTrackedViewport(savedViewport)",
             "R30CaptureSkyGlowSceneBeforeHud(device)",
