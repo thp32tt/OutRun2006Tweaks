@@ -695,7 +695,7 @@ def main() -> None:
         "float4 PSTextureAdd(VOut v) : SV_Target { float4 c = saturate(gameTexture.Sample(gameSampler, v.uv) + v.diffuse); AlphaGate(c.a); return c; }",
         '!compile("PSTextureAdd", "ps_4_0", additiveCode)',
         "s.additivePs.Reset();",
-        "s.sampledPs && s.textureOnlyPs && s.selectDiffuseTextureAlphaPs && s.selectDiffuseModulateAlphaPs && s.selectDiffuseAddAlphaPs && s.selectDiffuseSubtractAlphaPs && s.additivePs && s.subtractPs &&",
+        "s.sampledPs && s.textureOnlyPs && s.selectDiffuseTextureAlphaPs && s.selectDiffuseModulateAlphaPs && s.selectDiffuseAddAlphaPs && s.selectDiffuseSubtractAlphaPs && s.selectDiffuseModulate2XAlphaPs && s.selectDiffuseModulate4XAlphaPs && s.additivePs && s.subtractPs &&",
         "capture.additive ? s.additivePs.Get() : s.sampledPs.Get()",
         "const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;",
         "capture.additive = additive;",
@@ -2704,6 +2704,10 @@ def main() -> None:
     # 00580 game-authored SELECTARG2 RGB with independent ADD/SUBTRACT alpha.
     from test_dx11_selectarg2_arithmetic_alpha_00580 import main as run_00580
     run_00580()
+
+    # 00581 D3D9 SELECTARG2 diffuse RGB with independently scaled alpha.
+    from test_dx11_selectarg2_scaled_alpha_00581 import main as run_00581
+    run_00581()
 
     # 00575 game Draw -> four scaled-alpha PS variants -> DrawIndexed/Draw -> inset.
     from test_dx11_scaled_blend_alpha_00575 import run as run_00575
