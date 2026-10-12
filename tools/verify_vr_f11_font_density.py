@@ -25,6 +25,9 @@ def check(hook: str, font: str, header: str) -> None:
             "std::clamp(VrFontMultiplier, 1.0f, 3.0f)",
             "ImGui::GetStyle().FontSizeBase = sizePixels;",
             "io.Fonts->Clear();",
+            "1130.f * vrDensity",
+            "600.f * vrDensity",
+            "ImGuiCond_Appearing : ImGuiCond_FirstUseEver",
         )),
         (header, (
             "inline static float VrFontMultiplier = 1.0f;",
@@ -64,6 +67,7 @@ def main():
          "Overlay::FontsDirty = false;", font, header),
         (font, "std::clamp(VrFontMultiplier, 1.0f, 3.0f)",
          "1.0f", hook, header),
+        (font, "1130.f * vrDensity", "1130.f", hook, header),
     )
     for index, (target, old, new, other, h) in enumerate(mutations):
         assert old in target

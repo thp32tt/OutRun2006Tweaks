@@ -57,16 +57,25 @@ void Overlay::render_shell()
 {
 	const ContentRect content = content_rect();
 
-	// default to 1130 width to fully show course editor at fontsize 2.0
-	const ImVec2 windowSize(min(1130.f, content.width - 40.f), min(600.f, content.height - 40.f));
+	// A 26px desktop F11 face rasterised at Quest3 eye density can be
+	// 50-75 source pixels tall. Give the shell proportional room in VR;
+	// keeping the old 1130x600 canvas clipped tabs and font glyphs even
+	// after the sharper atlas was rebuilt. Desktop positions/sizes are
+	// unchanged; VR uses a centered size only when the window appears.
+	const float vrDensity = std::clamp(VrFontMultiplier, 1.0f, 3.0f);
+	const ImVec2 windowSize(
+		min(1130.f * vrDensity, std::max(64.f, content.width - 40.f)),
+		min(600.f * vrDensity, std::max(64.f, content.height - 40.f)));
+	const ImGuiCond initialPlacement = vrDensity > 1.0f
+		? ImGuiCond_Appearing : ImGuiCond_FirstUseEver;
 
-	ImGui::SetNextWindowSize(windowSize, ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(windowSize, initialPlacement);
 	ImGui::SetNextWindowPos(
 		ImVec2(
 			content.x + (content.width - windowSize.x) * 0.5f,
 			content.y + (content.height - windowSize.y) * 0.5f
 		),
-		ImGuiCond_FirstUseEver
+		initialPlacement
 	);
 
 	// Tab contents scroll in a child of their own, so the tab bar stays at the top rather than

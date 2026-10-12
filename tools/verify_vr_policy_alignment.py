@@ -6,8 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PIN = "fcd18ddd89f6dd40a8246fcf8591f086811149f1"
-STAGES = ["P0_UNRESOLVED_OPTICS_HUD", "P1_R84_STRUCTURAL",
-          "P2_XR_PER_EYE_RESOLUTION", "P3_NATIVE_120FPS"]
+STAGES = ["P0_A_USER_REPORTED_RESPONSIVE_HUD_MENU_F11_ISSUE_119", "P0_B_MEASURED_PERFORMANCE_PARALLEL", "P1_OTHER_CONFIRMED_VISUAL_REGRESSIONS", "P2_XR_PER_EYE_RESOLUTION", "P3_MINOR_CLEANUP_DEFERRED"]
 
 
 def violations(state, queue, docs):
@@ -15,6 +14,8 @@ def violations(state, queue, docs):
     qa = queue["policy"]["executionAuthority"]
     visual = next((item for item in queue.get("items", [])
                    if item.get("id") == "DX9EX-P0-VISUAL-COMPOSITION-20261007"), None)
+    p0_ui = next((item for item in queue.get("items", [])
+                  if item.get("id") == "DX9EX-QUEST3-RESPONSIVE-UI-20261013"), None)
     v3_gate = next((item for item in queue.get("items", [])
                     if item.get("id") == "ARCH-V3-GATE-001"), None)
     v3_start = next((item for item in queue.get("items", [])
@@ -24,7 +25,11 @@ def violations(state, queue, docs):
         (sa["roles"]["A"]["status"] == "ACTIVE" and sa["roles"]["A"]["globalPriority"] == 0, "DX11 A not first-priority ACTIVE"),
         (sa["roles"]["C"]["status"] == "ACTIVE" and sa["roles"]["C"]["effortTargetPercent"] == 50, "DX9Ex C allocation/state changed"),
         (sa["roles"]["B"]["status"] == "FROZEN" and not sa["autoThawDxvk"], "DXVK B thawed"),
-        (sa["dx9exPriority"] == STAGES, "P0 optics/HUD -> R84 -> XR -> measured performance stage order lost"),
+        (sa["dx9exPriority"] == STAGES, "2026-10-13 P0-A responsive UI / P0-B performance priority lost"),
+        (p0_ui is not None and p0_ui.get("status") in ("READY", "IMPLEMENT_NEXT", "NEEDS_VALIDATION")
+         and p0_ui.get("priority", 0) >= 100
+         and p0_ui.get("workKey") == "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+         "P0-A issue 119 must remain dispatchable with stable work key"),
         (visual is not None and visual.get("status") == "READY"
          and not visual.get("blockedBy")
          and "non-overlapping active claim" in visual.get("nextAction", ""),
@@ -70,6 +75,7 @@ def main():
         lambda s, q: s["policy"]["executionAuthority"]["roles"]["B"].update(status="ACTIVE"),
         lambda s, q: s["policy"]["executionAuthority"]["roles"]["C"].update(effortTargetPercent=10),
         lambda s, q: s["policy"]["executionAuthority"]["dx9exPriority"].reverse(),
+        lambda s, q: next(item for item in q["items"] if item["id"] == "DX9EX-QUEST3-RESPONSIVE-UI-20261013").update(status="BLOCKED"),
         lambda s, q: next(item for item in q["items"] if item["id"] == "DX9EX-P0-VISUAL-COMPOSITION-20261007").update(status="BLOCKED"),
         lambda s, q: next(item for item in q["items"] if item["id"] == "DX9EX-P0-VISUAL-COMPOSITION-20261007").update(blockedBy="R84"),
         lambda s, q: next(item for item in q["items"] if item["id"] == "ARCH-V3-001").update(status="READY"),
