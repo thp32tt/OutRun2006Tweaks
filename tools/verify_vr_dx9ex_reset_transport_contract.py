@@ -463,9 +463,12 @@ resolve_direct_r32 = body(r32, "bool R32ResolveDirectTransport(")
 require_order(
     resolve_direct_r32,
     "R32 DirectGPU source-surface owner facade",
-    "R30SupportDirectTransportSourceSurfaces sourceSurfaces{};",
-    "R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces)",
     "const std::uint32_t preferred =",
+    "if (selected >= OutRunVR::RenderFrameRingSize)",
+    "R30SupportDirectTransportSourceSurfaces sourceSurfaces{};",
+    "if (!R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces))",
+    "if (selectedPublication.published && selectedPublication.frameId)",
+    "R30SupportRetireDirectTransportSlotPublication(selected)",
 )
 forbid(
     resolve_direct_r32,
@@ -547,21 +550,25 @@ require_order(
     "if (ready == S_FALSE)",
     "if (FAILED(ready))",
     "R32DirectCopyPathRejected = true;",
-    "// Both the host's exact-frame ACK and the producer EVENT",
-    "R30SupportRetireDirectTransportSlotPublication(index);",
+    "selectedPublication = candidate;",
     "selected = index;",
     "if (selected >= OutRunVR::RenderFrameRingSize)",
     "R30SupportNoteDirectTransportRingBackpressure();",
+    "if (!R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces))",
+    "if (selectedPublication.published && selectedPublication.frameId)",
+    "R30SupportRetireDirectTransportSlotPublication(selected);",
     "R30SupportCopyDirectTransportEyesAndIssueFence(",
     "if (FAILED(copy.hr))",
     "DirectTransportFrameReadyAfterPresent() is",
     "R30SupportMarkDirectTransportSlotPending(selected, frameId);",
     "R30SupportSetActiveDirectTransportSlot(selected);",
 )
-ack_retire_marker = "// Both the host's exact-frame ACK and the producer EVENT"
+ack_retire_marker = "if (!R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces))"
 ack_retire_pos = resolve_direct_r32.find(ack_retire_marker)
 if ack_retire_pos < 0:
-    fail("R32 ACK-completed publication retirement marker missing")
+    fail("R32 guarded source snapshot before publication retirement missing")
+if "if (!R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces))\n                return false;" not in resolve_direct_r32:
+    fail("R32 source snapshot failure must preserve existing host publication")
 retire_publication_r30 = body(r30, "R30SupportRetireDirectTransportSlotPublication(")
 if r84_split:
     require(
@@ -584,7 +591,7 @@ else:
         "target.frameId = 0;",
         "target.published = false;",
     )
-if resolve_direct_r32.count("R30SupportRetireDirectTransportSlotPublication(index)") != 1:
+if resolve_direct_r32.count("R30SupportRetireDirectTransportSlotPublication(selected)") != 1:
     fail("R32 ACK publication retirement must use one R30 owner call")
 forbid(resolve_direct_r32, "R32 raw ACK publication retirement reintroduced",
        "candidate.frameId = 0;", "candidate.published = false;")
@@ -592,8 +599,9 @@ require_order(
     resolve_direct_r32[ack_retire_pos:],
     "R32 ACK-completed publication retirement",
     ack_retire_marker,
-    "R30SupportRetireDirectTransportSlotPublication(index);",
-    "selected = index;",
+    "if (selectedPublication.published && selectedPublication.frameId)",
+    "R30SupportRetireDirectTransportSlotPublication(selected);",
+    "R30SupportCopyDirectTransportEyesAndIssueFence(",
 )
 
 if resolve_direct_r32.count("R30SupportNoteDirectTransportRingBackpressure()") != 1:
