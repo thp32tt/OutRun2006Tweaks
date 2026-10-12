@@ -12,6 +12,10 @@ def linked(s):
     output = part(s, "struct OutputCapture {", "struct ReadbackSlot {")
     state = part(s, "struct State {", "State& state()")
     pipeline = part(s, "bool ensure_pipeline(", "bool supported_game_state(")
+    # New valid INVSRCALPHA states may use the same factors later.
+    # Own these four checks in 00601's original BOTHINVSRCALPHA OM block.
+    inverse_desc = part(pipeline, "// D3D9 BOTHINVSRCALPHA overrides DESTBLEND",
+                        "// Native D3D9 SRCALPHA/ZERO:")
     producer = part(s, "bool supported_game_state(", "bool translate_vertices(")
     consumer = part(s, "bool submit(", "void observe(")
     inv = part(consumer, "} else if (output.inverseSourceAlphaBlend &&", "} else if (output.multiplyBlend &&")
@@ -19,11 +23,11 @@ def linked(s):
         "ComPtr<ID3D11BlendState> inverseSourceAlphaBlend;",
         "std::array<ComPtr<ID3D11BlendState>, 16> inverseSourceAlphaMaskedBlends{};")) and all(x in pipeline for x in (
         "s.inverseSourceAlphaBlend && s.multiplyBlend &&",
+        "dev->CreateBlendState(&blend, s.inverseSourceAlphaBlend.GetAddressOf())")) and all(x in inverse_desc for x in (
         "target.SrcBlend = D3D11_BLEND_INV_SRC_ALPHA;",
         "target.DestBlend = D3D11_BLEND_SRC_ALPHA;",
         "target.SrcBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;",
-        "target.DestBlendAlpha = D3D11_BLEND_SRC_ALPHA;",
-        "dev->CreateBlendState(&blend, s.inverseSourceAlphaBlend.GetAddressOf())")) and all(x in producer for x in (
+        "target.DestBlendAlpha = D3D11_BLEND_SRC_ALPHA;")) and all(x in producer for x in (
         "GetRenderState(D3DRS_SRCBLEND, &src)",
         "GetRenderState(D3DRS_DESTBLEND, &dst)",
         "GetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, &separate)",
