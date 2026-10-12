@@ -11,9 +11,9 @@
   "base_sha": "ef10982567dad5d70d19519d1f4a4a3ad018cfd3",
   "work_key": "DX11:MENU_RACE_SELECTARG2_SCALED_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "BUILD_PENDING_REPAIR",
-  "checkpoint": "C4_MATERIAL_REPAIR_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "native_gameplay_activation": false,
   "hmd_test_performed": false,
@@ -54,7 +54,7 @@
     "tools/test_dx11_selectarg2_scaled_alpha_00581.py",
     "docs/automation/runs/CONVERSION-DX11-00581.json"
   ],
-  "next_action": "New exact-SHA Build/Backend/Fast/OpenXR/HUD Gate must pass; first SHA ef109825 Build failed C2026 and is not validation-bearing.",
+  "next_action": "Do not retry TASK_ID=CONVERSION-DX11-00581. Controller selects next disjoint native-game draw coverage. Quest3/VDXR and gamepad remain NEED_HMD_TEST, not runtime PASS.",
   "evidence": {
     "static_precommit": "source patterns and state/shader selection connected; mandatory test invoked",
     "runtime_validation": "UNTESTED",
@@ -71,6 +71,29 @@
       "primary_literal_bytes": 15936,
       "supplemental_literal_bytes": 648,
       "method": "runtime one-time HLSL source concatenation; old shader test extraction preserved"
-    }
-  }
+    },
+    "backend_gate_run_id": 38191856167,
+    "backend_gate_conclusion": "success",
+    "backend_gate_jobs": "validate and DX11 readiness smoke probes succeeded",
+    "dx11_fast_run_id": 38191856178,
+    "dx11_fast_conclusion": "success",
+    "build_run_id": 38191859606,
+    "build_conclusion": "success",
+    "build_feature_acceptance": "DX11 VISIBLE FRAME/SAFE RETURN and scaled-alpha 21 negative mutation checks passed",
+    "openxr_run_ids": [
+      38191856349,
+      38191859648
+    ],
+    "openxr_conclusions": [
+      "success",
+      "success"
+    ],
+    "hud_inspector_run_id": 38191859597,
+    "hud_inspector_conclusion": "success",
+    "repair_validation_sha": "53861a4566857fe773fd496e37c7f33e086cec9b",
+    "original_material_sha": "ef10982567dad5d70d19519d1f4a4a3ad018cfd3",
+    "quest3_vdxr_gamepad_real_game": "NOT_TESTED; native gameplay promotion blocked"
+  },
+  "material_result_sha": "ef10982567dad5d70d19519d1f4a4a3ad018cfd3",
+  "validation_bearing_result_sha": "53861a4566857fe773fd496e37c7f33e086cec9b"
 }
