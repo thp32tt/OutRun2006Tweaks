@@ -366,17 +366,17 @@ def main() -> None:
             "capture.coordIndex = coordIndex;",
             "(min != D3DTEXF_POINT && min != D3DTEXF_LINEAR)",
             "(mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR)",
-            "mip != D3DTEXF_NONE",
+            "(mip != D3DTEXF_NONE && mip != D3DTEXF_POINT)",
             "nextColorOp != D3DTOP_DISABLE",
         )) and all(x in mirror for x in (
-            "if (info.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
-            "GetLevelCount() == 0",
+            "if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
+            "sourceLevels == 0 || sourceLevels > 11u",
             "D3DFMT_A8R8G8B8", "D3DFMT_X8R8G8B8",
-            "LockRect(0, &locked, nullptr, D3DLOCK_READONLY)",
-            "capture.texture->UnlockRect(0)",
+            "LockRect(level, &lock, nullptr, D3DLOCK_READONLY)",
+            "capture.texture->UnlockRect(level)",
             "dev->CreateTexture2D(", "dev->CreateShaderResourceView(",
             "state.ComparisonFunc = D3D11_COMPARISON_NEVER",
-            "state.MinLOD = 0.0f;", "state.MaxLOD = 0.0f;",
+            "state.MinLOD = 0.0f;", "state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;",
             "dev->CreateSamplerState(",
         )) and all(x in submit for x in (
             "mirror_texture(dev, capture, sampledView, sampledSampler)",
@@ -406,11 +406,11 @@ def main() -> None:
          "const bool arg2Diffuse = arg2 == D3DTA_DIFFUSE;"),
         ("const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT;",
          "const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE;"),
-        ("if (info.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
-         "if (info.Pool == D3DPOOL_SYSTEMMEM && !gpuRenderTarget) return false;"),
-        ("GetLevelCount() == 0", "GetLevelCount() != 1"),
-        ("state.MaxLOD = 0.0f;", "state.MaxLOD = D3D11_FLOAT32_MAX;"),
-        ("capture.texture->UnlockRect(0)", "/* missing texture unlock */"),
+        ("if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
+         "if (base.Pool == D3DPOOL_SYSTEMMEM && !gpuRenderTarget) return false;"),
+        ("sourceLevels == 0 || sourceLevels > 11u", "sourceLevels != 1u"),
+        ("state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;", "state.MaxLOD = D3D11_FLOAT32_MAX;"),
+        ("capture.texture->UnlockRect(level)", "/* missing texture unlock */"),
         ("ctx->PSSetShaderResources(0, 1, &boundView)",
          "/* no native shader texture binding */"),
         ("capture.selectTexture ? s.textureOnlyPs.Get() :\n                      capture.additive ? s.additivePs.Get() : s.sampledPs.Get()",
@@ -971,25 +971,25 @@ def main() -> None:
         producer = source[source.find("bool mirror_texture("):source.find("bool submit(")]
         draw = source[source.find("bool submit("):source.find("void observe(")]
         return all(token in producer for token in (
-            "const bool compressed = info.Format == D3DFMT_DXT1 ||",
-            "info.Format == D3DFMT_DXT3 ||",
-            "info.Format == D3DFMT_DXT5;",
-            "if ((info.Width & 3u) || (info.Height & 3u)) return false;",
-            "const UINT bytesPerBlock = info.Format == D3DFMT_DXT1 ? 8u : 16u;",
-            "rowBytes = (info.Width / 4u) * bytesPerBlock;",
-            "rows = info.Height / 4u;",
+            "const bool compressed = base.Format == D3DFMT_DXT1 ||",
+            "base.Format == D3DFMT_DXT3 ||",
+            "base.Format == D3DFMT_DXT5;",
+            "if ((base.Width & 3u) || (base.Height & 3u)) return false;",
+            "(base.Format == D3DFMT_DXT1 ? 8u : 16u) :",
+            "(std::max)(1u, (desc.Width + 3u) / 4u) *",
+            "const UINT rows = compressed ? (std::max)(1u, (desc.Height + 3u) / 4u) : desc.Height;",
             "DXGI_FORMAT_BC1_UNORM",
             "DXGI_FORMAT_BC2_UNORM",
             "DXGI_FORMAT_BC3_UNORM",
-            "info.Pool == D3DPOOL_DEFAULT",
-            "locked.Pitch > 0",
-            "static_cast<UINT>(locked.Pitch) >= rowBytes",
-            "static_cast<std::size_t>(rowBytes) * rows",
-            "static_cast<std::size_t>(y) * locked.Pitch",
-            "static_cast<std::size_t>(y) * rowBytes",
-            "initial.SysMemPitch = rowBytes;",
+            "base.Pool == D3DPOOL_DEFAULT",
+            "lock.Pitch > 0",
+            "static_cast<UINT>(lock.Pitch) >= rowBytes",
+            "static_cast<std::size_t>(uploadPitch) * rows",
+            "static_cast<std::size_t>(y) * lock.Pitch",
+            "static_cast<std::size_t>(y) * uploadPitch",
+            "initial[level].SysMemPitch = pitches[level];",
             "desc.Format = nativeFormat;",
-            "capture.texture->UnlockRect(0);",
+            "capture.texture->UnlockRect(level);",
             "dev->CreateShaderResourceView(",
         )) and all(token in draw for token in (
             "mirror_texture(dev, capture, sampledView, sampledSampler)",
@@ -999,17 +999,17 @@ def main() -> None:
         ))
     assert dxt_native_draw_connected(bridge)
     for source, wrong in (
-        ("info.Format == D3DFMT_DXT1", "info.Format == D3DFMT_DXT2"),
-        ("info.Format == D3DFMT_DXT3", "info.Format == D3DFMT_DXT2"),
-        ("info.Format == D3DFMT_DXT5", "info.Format == D3DFMT_DXT4"),
-        ("if ((info.Width & 3u) || (info.Height & 3u)) return false;",
+        ("base.Format == D3DFMT_DXT1", "base.Format == D3DFMT_DXT2"),
+        ("base.Format == D3DFMT_DXT3", "base.Format == D3DFMT_DXT2"),
+        ("base.Format == D3DFMT_DXT5", "base.Format == D3DFMT_DXT4"),
+        ("if ((base.Width & 3u) || (base.Height & 3u)) return false;",
          "if (false) return false;"),
-        ("rowBytes = (info.Width / 4u) * bytesPerBlock;",
-         "rowBytes = info.Width * 4u;"),
-        ("rows = info.Height / 4u;", "rows = info.Height;"),
-        ("static_cast<UINT>(locked.Pitch) >= rowBytes",
-         "static_cast<UINT>(locked.Pitch) > 0"),
-        ("initial.SysMemPitch = rowBytes;", "initial.SysMemPitch = info.Width * 4u;"),
+        ("(std::max)(1u, (desc.Width + 3u) / 4u) *",
+         "rowBytes = desc.Width * 4u;"),
+        ("const UINT rows = compressed ? (std::max)(1u, (desc.Height + 3u) / 4u) : desc.Height;", "rows = desc.Height;"),
+        ("static_cast<UINT>(lock.Pitch) >= rowBytes",
+         "static_cast<UINT>(lock.Pitch) > 0"),
+        ("initial[level].SysMemPitch = pitches[level];", "initial[level].SysMemPitch = desc.Width * 4u;"),
         ("desc.Format = nativeFormat;", "desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;"),
     ):
         broken = bridge.replace(source, wrong, 1)
@@ -1039,17 +1039,17 @@ def main() -> None:
         admission = producer[producer.find("const bool packed16 ="):producer.find("DXGI_FORMAT nativeFormat")]
         consumer = code[code.find("bool submit("):code.find("void observe(")]
         return '#include "packed_texture_16bit.hpp"' in code and all(x in admission for x in (
-            "info.Format == D3DFMT_R5G6B5",
-            "info.Format == D3DFMT_A1R5G5B5",
-            "info.Format == D3DFMT_A4R4G4B4",
+            "base.Format == D3DFMT_R5G6B5",
+            "base.Format == D3DFMT_A1R5G5B5",
+            "base.Format == D3DFMT_A4R4G4B4",
         )) and all(x in producer for x in (
-            "rowBytes = info.Width * 2u;",
-            "const UINT uploadRowBytes = packed16 ? info.Width * 4u : rowBytes;",
-            "static_cast<UINT>(locked.Pitch) >= rowBytes",
+            "desc.Width * (packed16 ? 2u : 4u);",
+            "const UINT uploadPitch = packed16 ? desc.Width * 4u : rowBytes;",
+            "static_cast<UINT>(lock.Pitch) >= rowBytes",
             "packed_texture16::unpack_row(",
-            "if (packed16) initial.SysMemPitch = uploadRowBytes;",
+            "initial[level].SysMemPitch = pitches[level];",
             "dev->CreateShaderResourceView(",
-            "capture.texture->UnlockRect(0);",
+            "capture.texture->UnlockRect(level);",
         )) and all(x in helper for x in (
             "case Layout::rgb565:",
             "case Layout::argb1555:",
@@ -1066,12 +1066,12 @@ def main() -> None:
     assert packed16_connected(bridge, packed_header)
     assert "static_assert(unpack(0x8421u, Layout::argb4444).a == 136u);" in packed_probe
     for original, invalid in (
-        ("info.Format == D3DFMT_R5G6B5", "info.Format == D3DFMT_DXT2"),
-        ("info.Format == D3DFMT_A1R5G5B5", "info.Format == D3DFMT_DXT2"),
-        ("info.Format == D3DFMT_A4R4G4B4", "info.Format == D3DFMT_DXT2"),
-        ("rowBytes = info.Width * 2u;", "rowBytes = info.Width * 4u;"),
+        ("base.Format == D3DFMT_R5G6B5", "base.Format == D3DFMT_DXT2"),
+        ("base.Format == D3DFMT_A1R5G5B5", "base.Format == D3DFMT_DXT2"),
+        ("base.Format == D3DFMT_A4R4G4B4", "base.Format == D3DFMT_DXT2"),
+        ("desc.Width * (packed16 ? 2u : 4u);", "desc.Width * 4u;"),
         ("packed_texture16::unpack_row(", "/* no 16-bit conversion */("),
-        ("if (packed16) initial.SysMemPitch = uploadRowBytes;", "/* wrong upload pitch */"),
+        ("initial[level].SysMemPitch = pitches[level];", "/* wrong upload pitch */"),
     ):
         broken = bridge.replace(original, invalid, 1)
         assert broken != bridge and not packed16_connected(broken, packed_header), (
@@ -1487,23 +1487,23 @@ def main() -> None:
     # existing D3D11 SRV/sampler -> actual native Draw/DrawIndexed/inset.
     # Non-render-target DEFAULT, compressed DEFAULT and MSAA fail closed.
     rt_tokens = (
-        "const bool gpuRenderTarget = info.Pool == D3DPOOL_DEFAULT &&",
-        "(info.Usage & D3DUSAGE_RENDERTARGET) != 0u",
-        "(info.Format == D3DFMT_A8R8G8B8 ||\n         info.Format == D3DFMT_X8R8G8B8);",
-        "if (info.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
+        "const bool gpuRenderTarget = base.Pool == D3DPOOL_DEFAULT &&",
+        "(base.Usage & D3DUSAGE_RENDERTARGET) != 0u",
+        "(base.Format == D3DFMT_A8R8G8B8 ||\n         base.Format == D3DFMT_X8R8G8B8);",
+        "if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
         "capture.texture->GetSurfaceLevel(0, sourceSurface.GetAddressOf())",
         "sourceDesc.MultiSampleType != D3DMULTISAMPLE_NONE",
-        "sourceDesc.Width != info.Width || sourceDesc.Height != info.Height",
-        "sourceDesc.Format != info.Format",
+        "sourceDesc.Width != base.Width || sourceDesc.Height != base.Height",
+        "sourceDesc.Format != base.Format",
         "!(sourceDesc.Usage & D3DUSAGE_RENDERTARGET)",
         "capture.texture->GetDevice(gameDevice.GetAddressOf())",
         "gameDevice->CreateOffscreenPlainSurface(",
-        "info.Width, info.Height, info.Format, D3DPOOL_SYSTEMMEM,",
+        "base.Width, base.Height, base.Format, D3DPOOL_SYSTEMMEM,",
         "gameDevice->GetRenderTargetData(sourceSurface.Get(), readbackSurface.Get())",
-        "readbackSurface->LockRect(&locked, nullptr, D3DLOCK_READONLY)",
-        "capture.texture->LockRect(0, &locked, nullptr, D3DLOCK_READONLY)",
+        "readbackSurface->LockRect(&lock, nullptr, D3DLOCK_READONLY)",
+        "capture.texture->LockRect(level, &lock, nullptr, D3DLOCK_READONLY)",
         "if (gpuRenderTarget) readbackSurface->UnlockRect();",
-        "else capture.texture->UnlockRect(0);",
+        "else capture.texture->UnlockRect(level);",
         "desc.Usage = D3D11_USAGE_IMMUTABLE;",
         "dev->CreateShaderResourceView(texture.Get(), nullptr,",
     )
@@ -1512,7 +1512,7 @@ def main() -> None:
         draw = code[code.find("bool submit("):code.find("void observe(")]
         return (all(token in mirror for token in rt_tokens)
                 and "if (FAILED(lockResult)) return false;" in mirror
-                and "static_cast<UINT>(locked.Pitch) >= rowBytes" in mirror
+                and "static_cast<UINT>(lock.Pitch) >= rowBytes" in mirror
                 and "mirror_texture(dev, capture, sampledView, sampledSampler)" in draw
                 and "ctx->PSSetShaderResources(0, 1, &boundView)" in draw
                 and "ctx->DrawIndexed(indexCount, 0, 0);" in draw
@@ -1558,7 +1558,7 @@ def main() -> None:
             "GetSamplerState(0, D3DSAMP_MINFILTER, &min)",
             "(min != D3DTEXF_POINT && min != D3DTEXF_LINEAR)",
             "(mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR)",
-            "mip != D3DTEXF_NONE",
+            "(mip != D3DTEXF_NONE && mip != D3DTEXF_POINT)",
             "capture.minFilter = static_cast<D3DTEXTUREFILTERTYPE>(min);",
             "capture.magFilter = static_cast<D3DTEXTUREFILTERTYPE>(mag);",
         )) and all(token in mirror for token in (
@@ -1569,7 +1569,7 @@ def main() -> None:
             "D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :",
             "D3D11_FILTER_MIN_MAG_MIP_POINT);",
             "state.MinLOD = 0.0f;",
-            "state.MaxLOD = 0.0f;",
+            "state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;",
             "dev->CreateSamplerState(&state, sampler.GetAddressOf())",
         )) and all(token in submit for token in (
             "mirror_texture(dev, capture, sampledView, sampledSampler)",
@@ -1591,7 +1591,7 @@ def main() -> None:
         broken = bridge.replace(token, "/* disconnected 00561 filter link */", 1)
         assert broken != bridge and not mixed_filter_draw_connected(broken), token
     # Reference D3D11_FILTER mapping for all four supported D3D9 pairs;
-    # unsupported anisotropic filters and mip sampling still fail closed.
+    # unsupported anisotropic and mip-linear filtering still fail closed.
     mip_point_map = {
         ("POINT", "POINT"): "MIN_MAG_MIP_POINT",
         ("POINT", "LINEAR"): "MIN_POINT_MAG_LINEAR_MIP_POINT",
@@ -1602,9 +1602,9 @@ def main() -> None:
         for mag_filter in ("POINT", "LINEAR", "ANISOTROPIC"):
             for mip_filter in ("NONE", "POINT", "LINEAR"):
                 allowed = min_filter in ("POINT", "LINEAR") and mag_filter in (
-                    "POINT", "LINEAR") and mip_filter == "NONE"
+                    "POINT", "LINEAR") and mip_filter in ("NONE", "POINT")
                 assert allowed == ((min_filter, mag_filter) in mip_point_map
-                                   and mip_filter == "NONE")
+                                   and mip_filter in ("NONE", "POINT"))
                 if allowed:
                     native = mip_point_map[min_filter, mag_filter]
                     assert ("D3D11_FILTER_" + native) in bridge
