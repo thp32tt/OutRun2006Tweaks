@@ -468,6 +468,7 @@ struct TextureCapture {
     bool selectTextureAddSmoothAlpha = false;
     bool selectTextureFactorAlpha = false;
     bool selectTextureTfactorAlpha = false;
+    bool selectTextureTfactorArg2Alpha = false;
     bool selectTextureBlendTextureAlpha = false;
     bool selectDiffuseTextureAlpha = false;
     bool selectDiffuseDiffuseAlpha = false;
@@ -479,6 +480,7 @@ struct TextureCapture {
     bool selectDiffuseAddSmoothAlpha = false;
     bool selectDiffuseFactorAlpha = false;
     bool selectDiffuseTfactorAlpha = false;
+    bool selectDiffuseTfactorArg2Alpha = false;
     bool selectDiffuseBlendTextureAlpha = false;
     bool selectTextureBlendDiffuseAlpha = false;
     bool selectDiffuseBlendDiffuseAlpha = false;
@@ -1267,11 +1269,18 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             alphaOp == D3DTOP_SELECTARG1 && alphaArg1 == D3DTA_TFACTOR;
         const bool selectDiffuseTfactorAlpha = op == D3DTOP_SELECTARG2 &&
             alphaOp == D3DTOP_SELECTARG1 && alphaArg1 == D3DTA_TFACTOR;
+        // SELECTARG2 alpha reads ALPHAARG2, not ALPHAARG1. Reuse the
+        // verified texture-factor shader and its 8-bit high-byte constant.
+        const bool selectTextureTfactorArg2Alpha = op == D3DTOP_SELECTARG1 &&
+            alphaOp == D3DTOP_SELECTARG2 && alphaArg2 == D3DTA_TFACTOR;
+        const bool selectDiffuseTfactorArg2Alpha = op == D3DTOP_SELECTARG2 &&
+            alphaOp == D3DTOP_SELECTARG2 && alphaArg2 == D3DTA_TFACTOR;
         // Capture the factor only after the SELECTARG predicates exist;
         // unsupported D3D9 states keep the original DX9Ex draw/input.
         DWORD textureFactor = 0;
         if ((blendFactorAlpha || blendFactorTextureAlpha || blendFactorModulateAlpha ||
              selectTextureTfactorAlpha || selectDiffuseTfactorAlpha ||
+             selectTextureTfactorArg2Alpha || selectDiffuseTfactorArg2Alpha ||
              blendFactorDiffuseAlpha || blendFactorAddAlpha ||
              blendFactorSubtractAlpha || blendFactorAddSmoothAlpha ||
              blendFactorModulate2XAlpha || blendFactorModulate4XAlpha ||
@@ -1315,7 +1324,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         if (!layout.hasDiffuse && !selectTexture) return false;
         // Validate the chosen alpha input independently from RGB. Inactive
         // alpha stage operands are ignored; active modifier bits remain denied.
-        const bool rgbNeedsDiffuse = selectDiffuseTextureAlpha || selectDiffuseDiffuseAlpha || selectDiffuseTfactorAlpha || selectDiffuseBlendTextureAlpha ||
+        const bool rgbNeedsDiffuse = selectDiffuseTextureAlpha || selectDiffuseDiffuseAlpha || selectDiffuseTfactorAlpha || selectDiffuseTfactorArg2Alpha || selectDiffuseBlendTextureAlpha ||
                                      selectDiffuseBlendDiffuseAlpha ||
                                      selectDiffuseFactorAlpha ||
                                      selectDiffuseModulateAlpha || selectDiffuseAddAlpha || selectDiffuseSubtractAlpha || selectDiffuseAddSmoothAlpha || selectDiffuseModulate2XAlpha || selectDiffuseModulate4XAlpha ||
@@ -1358,6 +1367,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                                        blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;
         if ((!modulate && !selectTexture && !selectDiffuseTextureAlpha && !selectDiffuseDiffuseAlpha &&
                !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha &&
+               !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha &&
               !selectDiffuseBlendTextureAlpha && !selectTextureBlendTextureAlpha && !selectTextureBlendDiffuseAlpha && !selectDiffuseBlendDiffuseAlpha && !selectDiffuseModulateAlpha && !selectDiffuseAddAlpha && !selectDiffuseSubtractAlpha &&
                !selectDiffuseModulate2XAlpha && !selectDiffuseModulate4XAlpha && !selectDiffuseAddSmoothAlpha && !selectDiffuseFactorAlpha && !selectTextureFactorAlpha && !selectTextureDiffuseAlpha && !selectTextureModulateAlpha &&
               !selectTextureAddAlpha && !selectTextureSubtractAlpha && !selectTextureAddSmoothAlpha &&
@@ -1383,7 +1393,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
               !subtractDiffuseAlpha &&
               !modulate2xDiffuseAlpha && !modulate4xDiffuseAlpha &&
               (!subtractDiffuseAlpha && !blendTextureSelectedDiffuseAlpha && !blendDiffuseSelectedDiffuseAlpha &&
-               ((!selectDiffuseDiffuseAlpha && !mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE) && !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha)))) ||
+               ((!selectDiffuseDiffuseAlpha && !mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE) && !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha &&
+               !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha)))) ||
             (rgbNeedsDiffuse && !arg2Diffuse) ||
             (alphaNeedsDiffuse && !alphaArg2Diffuse) ||
             coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb ||
@@ -1407,6 +1418,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.selectTextureAddSmoothAlpha = selectTextureAddSmoothAlpha;
         capture.selectTextureFactorAlpha = selectTextureFactorAlpha;
         capture.selectTextureTfactorAlpha = selectTextureTfactorAlpha;
+        capture.selectTextureTfactorArg2Alpha = selectTextureTfactorArg2Alpha;
         capture.selectTextureBlendTextureAlpha = selectTextureBlendTextureAlpha;
         capture.selectDiffuseTextureAlpha = selectDiffuseTextureAlpha;
         capture.selectDiffuseDiffuseAlpha = selectDiffuseDiffuseAlpha;
@@ -1418,6 +1430,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.selectDiffuseAddSmoothAlpha = selectDiffuseAddSmoothAlpha;
         capture.selectDiffuseFactorAlpha = selectDiffuseFactorAlpha;
         capture.selectDiffuseTfactorAlpha = selectDiffuseTfactorAlpha;
+        capture.selectDiffuseTfactorArg2Alpha = selectDiffuseTfactorArg2Alpha;
         capture.selectDiffuseBlendTextureAlpha = selectDiffuseBlendTextureAlpha;
         capture.selectTextureBlendDiffuseAlpha = selectTextureBlendDiffuseAlpha;
         capture.selectDiffuseBlendDiffuseAlpha = selectDiffuseBlendDiffuseAlpha;
@@ -1804,6 +1817,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                       capture.selectDiffuseModulate2XAlpha ? s.selectDiffuseModulate2XAlphaPs.Get() :
                       capture.selectDiffuseModulate4XAlpha ? s.selectDiffuseModulate4XAlphaPs.Get() :
                        capture.selectDiffuseAddSmoothAlpha ? s.selectDiffuseAddSmoothAlphaPs.Get() :
+                        capture.selectDiffuseTfactorArg2Alpha ? s.selectDiffuseTfactorAlphaPs.Get() :
                         capture.selectDiffuseTfactorAlpha ? s.selectDiffuseTfactorAlphaPs.Get() :
                          capture.selectDiffuseFactorAlpha ? s.selectDiffuseFactorAlphaPs.Get() :
                         capture.selectDiffuseBlendTextureAlpha ? s.selectDiffuseBlendTextureAlphaPs.Get() :
@@ -1814,6 +1828,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                        capture.selectTextureAddAlpha ? s.selectTextureAddAlphaPs.Get() :
                        capture.selectTextureSubtractAlpha ? s.selectTextureSubtractAlphaPs.Get() :
                         capture.selectTextureAddSmoothAlpha ? s.selectTextureAddSmoothAlphaPs.Get() :
+                        capture.selectTextureTfactorArg2Alpha ? s.selectTextureTfactorAlphaPs.Get() :
                         capture.selectTextureTfactorAlpha ? s.selectTextureTfactorAlphaPs.Get() :
                          capture.selectTextureFactorAlpha ? s.selectTextureFactorAlphaPs.Get() :
                         capture.selectTextureBlendTextureAlpha ? s.selectTextureBlendTextureAlphaPs.Get() :
