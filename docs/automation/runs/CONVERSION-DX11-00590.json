@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00590",
   "work_key": "DX11:MENU_RACE_NATIVE_TRILINEAR_MIP_CHAIN",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "native_gameplay_activation": false,
   "hmd_test_performed": false,
@@ -53,6 +53,7 @@
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tools/test_dx11_native_mip_linear_00590.py",
+    "tools/test_dx11_native_mip_chain_00589.py",
     ".github/workflows/backend-conversion-gate.yml"
   ],
   "base_head_sha": "1da76fc0d594edac83aca57338479b4294f37356",
@@ -60,6 +61,65 @@
     "status": "NOT_REQUIRED",
     "reason": "No runtime-validated HMD package"
   },
-  "next_action": "Run exact SHA backend+Build+DX11+OpenXR+HUD Gate; HMD remains UNTESTED",
-  "runtime_evidence": null
+  "next_action": "Quest3/VDXR menu, vehicle selection, race, gamepad, frame-time evidence NEED_HMD_TEST; native gameplay admission disabled; select new independent DX11 task. DXVK frozen.",
+  "runtime_evidence": null,
+  "material_result_sha": "9e7c263608fd67e3ee6369da85a05e565fd737fb",
+  "validation_bearing_result_sha": "5da67b1db74246486164a9bce3e54df6c05a24c3",
+  "result_sha": "5da67b1db74246486164a9bce3e54df6c05a24c3",
+  "c6_basis_head_sha": "5da67b1db74246486164a9bce3e54df6c05a24c3",
+  "repair_shas": [
+    "25a85449378ed26ac63f6915189836dbae72f1b4",
+    "5da67b1db74246486164a9bce3e54df6c05a24c3"
+  ],
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38205872473,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "5da67b1db74246486164a9bce3e54df6c05a24c3",
+      "job_result": "validate and DX11 readiness smoke success"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38205875977,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "5da67b1db74246486164a9bce3e54df6c05a24c3"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38205872452,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "5da67b1db74246486164a9bce3e54df6c05a24c3"
+    },
+    {
+      "workflow": "OpenXR VR architecture (push)",
+      "run_id": 38205872514,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "5da67b1db74246486164a9bce3e54df6c05a24c3"
+    },
+    {
+      "workflow": "OpenXR VR architecture (PR)",
+      "run_id": 38205875995,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "5da67b1db74246486164a9bce3e54df6c05a24c3"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38205875967,
+      "conclusion": "success",
+      "status": "completed",
+      "validation_sha": "5da67b1db74246486164a9bce3e54df6c05a24c3"
+    }
+  ],
+  "local_validation": [
+    "C++ live stage0 MIP_LINEAR and full CPU-readable mip chain -> D3D11 sampler+SRV -> native game Draw/DrawIndexed",
+    "8 MIN/MAG/MIP sampler combinations with 19 fail-closed source mutations",
+    "Existing 00589 mip-point regression now retains POINT and requires additional LINEAR path",
+    "Exact validation SHA 5da67b1d: Backend validate+readiness smoke, Windows Build, DX11 Fast, OpenXR push and PR, HUD Inspector all SUCCESS"
+  ]
 }
