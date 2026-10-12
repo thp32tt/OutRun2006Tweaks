@@ -185,7 +185,9 @@ namespace OutRunVRStereo
             // atomic recovery loads for every active stereo primitive.
             OutRunVR::State::StateBlockRecovery::FlushPendingResync(device);
             auto onGuardActive = [&]() noexcept {
-                ++R33RasterGuardDraws;
+                // Count routing diagnostics only while telemetry is enabled.
+                if (R33TelemetryEnabled())
+                    ++R33RasterGuardDraws;
                 if (!R33FirstRasterGuardLogged)
                 {
                     R33FirstRasterGuardLogged = true;
@@ -889,7 +891,9 @@ namespace OutRunVRStereo
         HRESULT __stdcall DrawPrimitiveDestR33(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
-            R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, false);
+            // No cross-TU workload observer call when diagnostics are off.
+            if (R33TelemetryEnabled())
+                R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, false);
             auto call = [&](bool resyncAlreadyFlushed) {
                 // The outer raster guard already rejected non-game, aux RT,
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
@@ -926,7 +930,9 @@ namespace OutRunVRStereo
             INT baseVertexIndex, UINT minVertexIndex, UINT numVertices,
             UINT startIndex, UINT primitiveCount)
         {
-            R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, false);
+            // No cross-TU workload observer call when diagnostics are off.
+            if (R33TelemetryEnabled())
+                R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, false);
             auto call = [&](bool resyncAlreadyFlushed) {
                 // The outer raster guard already rejected non-game, aux RT,
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
@@ -966,7 +972,9 @@ namespace OutRunVRStereo
             D3DPRIMITIVETYPE type, UINT primitiveCount, const void* data,
             UINT stride)
         {
-            R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, true);
+            // No cross-TU workload observer call when diagnostics are off.
+            if (R33TelemetryEnabled())
+                R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, true);
             auto call = [&](bool resyncAlreadyFlushed) {
                 // The outer raster guard already rejected non-game, aux RT,
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
@@ -1004,7 +1012,9 @@ namespace OutRunVRStereo
             const void* indexData, D3DFORMAT indexFormat,
             const void* vertexData, UINT stride)
         {
-            R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, true);
+            // No cross-TU workload observer call when diagnostics are off.
+            if (R33TelemetryEnabled())
+                R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, true);
             auto call = [&](bool resyncAlreadyFlushed) {
                 // The outer raster guard already rejected non-game, aux RT,
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
