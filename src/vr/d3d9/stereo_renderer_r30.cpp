@@ -2767,8 +2767,18 @@ namespace OutRunVRStereo
                 return false;
             const float ndcScaleX = 2.0f / width;
             const float ndcScaleY = 2.0f / height;
+            // Do not multiply by 0.5f for every eye and vertex.
+            const float halfWidth = width * 0.5f;
+            const float halfHeight = height * 0.5f;
             const float inv34 = 1.0f / bp._34;
             const float invDet = 1.0f / det;
+            // Every restored game-view position has W=1. Hoist both eye-tail
+            // translation rows outside the smoke/sand vertex loop; per eye
+            // this removes four constant multiplies per referenced vertex.
+            float eyeTailOrigin[2][4]{};
+            for (int eye = 0; eye < 2; ++eye)
+                for (int col = 0; col < 4; ++col)
+                    eyeTailOrigin[eye][col] = state.eyeTail[eye].m[3][col];
             const auto* bytes = static_cast<const std::uint8_t*>(source);
             UINT modifiedVertexEnd = 0;
             UINT referenced = 0;
@@ -2819,9 +2829,12 @@ namespace OutRunVRStereo
                 {
                     float clipEye[4]{};
                     for (int col = 0; col < 4; ++col)
-                        for (int row = 0; row < 4; ++row)
+                    {
+                        for (int row = 0; row < 3; ++row)
                             clipEye[col] += restoredView[row] *
                                 state.eyeTail[eye].m[row][col];
+                        clipEye[col] += eyeTailOrigin[eye][col];
+                    }
                     if (!std::isfinite(clipEye[0]) ||
                         !std::isfinite(clipEye[1]) ||
                         !std::isfinite(clipEye[2]) ||
@@ -2841,8 +2854,8 @@ namespace OutRunVRStereo
                         allValid = false;
                         break;
                     }
-                    projected[eye][0] = x0 + (fullX + 1.0f) * 0.5f * width;
-                    projected[eye][1] = y0 + (1.0f - fullY) * 0.5f * height;
+                    projected[eye][0] = x0 + (fullX + 1.0f) * halfWidth;
+                    projected[eye][1] = y0 + (1.0f - fullY) * halfHeight;
                     projected[eye][2] = z;
                     if (fullZ >= 0.0f && fullZ <= 1.0f)
                         projected[eye][2] = minZ + fullZ * depthSpan;

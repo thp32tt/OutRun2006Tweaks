@@ -245,11 +245,90 @@ def sparse_copy_parity():
     return cases
 
 
+
+def verify_fused_origin_hotpath(source: str) -> None:
+    """R30 fused per-eye constant terms must be hoisted without altering parity."""
+    import struct
+    block = source.split("bool R30TryFusedWorldXyzrhwProjection(", 1)[1].split(
+        "bool R30TransformXyzrhwStereo(", 1)[0]
+
+    requirements = (
+        "const float halfWidth = width * 0.5f;",
+        "const float halfHeight = height * 0.5f;",
+        "float eyeTailOrigin[2][4]{};",
+        "eyeTailOrigin[eye][col] = state.eyeTail[eye].m[3][col];",
+        "for (int row = 0; row < 3; ++row)",
+        "clipEye[col] += restoredView[row] *",
+        "state.eyeTail[eye].m[row][col];",
+        "clipEye[col] += eyeTailOrigin[eye][col];",
+        "projected[eye][0] = x0 + (fullX + 1.0f) * halfWidth;",
+        "projected[eye][1] = y0 + (1.0f - fullY) * halfHeight;",
+        "clipEye[3] <= 1.0e-6f",
+        "if (allValid && referenced != 0)",
+        "for (UINT i = 0; i < modifiedVertexEnd; ++i)",
+    )
+
+    def valid(part):
+        return (all(term in part for term in requirements)
+                and part.index("float eyeTailOrigin[2][4]{};")
+                < part.index("for (UINT i = 0; i < vertexCount; ++i)")
+                and part.index("const float halfWidth = width * 0.5f;")
+                < part.index("for (UINT i = 0; i < vertexCount; ++i)")
+                and part.index("clipEye[col] += eyeTailOrigin[eye][col];")
+                < part.index("clipEye[3] <= 1.0e-6f"))
+    assert valid(block), "fused binocular constant-term fastpath missing"
+    mutants = (
+        ("m[3]", "m[2]"),
+        ("row < 3", "row < 4"),
+        ("clipEye[col] += eyeTailOrigin", "clipEye[col] -= eyeTailOrigin"),
+        ("halfWidth = width * 0.5f", "halfWidth = width * 1.0f"),
+        ("halfHeight = height * 0.5f", "halfHeight = height * 1.0f"),
+        ("(fullX + 1.0f) * halfWidth", "(fullZ + 1.0f) * halfWidth"),
+        ("(1.0f - fullY) * halfHeight", "(1.0f - fullZ) * halfHeight"),
+    )
+    for good, bad in mutants:
+        assert good in block, f"mutation fixture missing: {good}"
+        assert not valid(block.replace(good, bad, 1)), (
+            f"destructive fastpath mutation escaped: {good}")
+
+    f32 = lambda v: struct.unpack("<f", struct.pack("<f", v))[0]
+    rng = random.Random(695)
+    for _ in range(16000):
+        restored = [f32(rng.uniform(-120., 120.)) for _ in range(3)] + [1.0]
+        tails = [[[f32(rng.uniform(-4., 4.)) for _ in range(4)]
+                  for _ in range(4)] for eye in range(2)]
+        for eye in range(2):
+            for col in range(4):
+                original = f32(0.0)
+                for row in range(4):
+                    original = f32(original + f32(
+                        restored[row] * tails[eye][row][col]))
+                optimized = f32(0.0)
+                for row in range(3):
+                    optimized = f32(optimized + f32(
+                        restored[row] * tails[eye][row][col]))
+                optimized = f32(optimized + tails[eye][3][col])
+                assert original == optimized, "eye-tail float32 parity changed"
+        width = f32(rng.choice((320, 640, 1280, 1920, 3440, 4096)))
+        height = f32(rng.choice((240, 480, 720, 1080, 1440, 2160)))
+        x0 = f32(rng.randint(0, 200))
+        y0 = f32(rng.randint(0, 200))
+        full_x, full_y = f32(rng.uniform(-1.5, 1.5)), f32(rng.uniform(-1.5, 1.5))
+        old_x = f32(x0 + f32(f32(f32(full_x + 1.0) * 0.5) * width))
+        new_x = f32(x0 + f32(f32(full_x + 1.0) * f32(width * 0.5)))
+        old_y = f32(y0 + f32(f32(f32(1.0 - full_y) * 0.5) * height))
+        new_y = f32(y0 + f32(f32(1.0 - full_y) * f32(height * 0.5)))
+        assert abs(old_x - new_x) <= .002
+        assert abs(old_y - new_y) <= .002
+    print(f"PASS fused XYZRHW per-eye origin: {len(mutants)} negative mutations, 16000 float32 two-eye/viewport cases")
+
+
 def main():
     source = SOURCE.read_text(encoding="utf-8")
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert workflow.count("tools/verify_vr_r30_eye_tail_hotpath.py") == 2
     verify(source)
+    verify_fused_origin_hotpath(source)
     mutations = (
         ("D3DMATRIX eyeTail[2]{};", "D3DMATRIX omitted[2]{};"),
         ("state.eyeInverse[eye], state.eyeProjection[eye]);",
