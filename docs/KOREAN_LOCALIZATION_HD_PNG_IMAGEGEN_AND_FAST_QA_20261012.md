@@ -107,3 +107,20 @@ OPEN 자동 종료는 금지한다. 정식 승격 전 별도 consumer 코드 이
   자동화 완성이나 신규 DDS 생산으로 계산하지 않는다. 런타임은 `UNTESTED`.
 
 수동 절차: `docker/localization-production/MANUAL_IMAGEGEN_ROLLOUT.md`.
+
+## 2026-10-12 PNG 첨부 컨트롤러 GitHub 구현 보완 (운영 배포 아님)
+
+사용자 PNG 자동 첨부 요청으로 `tools/localization/controller_png_attach.py`와
+`patch_controller_png_upload.py`가 신규 추가되었다. 수동 `--stage`에서만 기존
+기본 Docker 이미지의 `controller.py`에 변경을 적용한다. A/B는 `/data/imagegen/`
+입력 manifest + 실제 SHA 일치 PNG + 승인 문구를 필요로 하며, 첨부 프리뷰를 확인한
+경우에만 메시지를 전송한다. 실패 시 텍스트만 전송하는 fallback은 금지한다.
+이미 전송한 TASK_ID는 `sent/` 기록으로 중복 방지한다.
+C1은 별도 QA, C2 기록은 백업 후 신규 탭을 제외한다. 스케줄 패치는
+A :00/C1 :10/B :30/C1 :40으로 3슬롯이다.
+소스 기본 이미지에 적용한 정적 패치 구문/멱등성 및 격리 테스트는 통과했으나,
+운영 Portainer 수동 배포, ChatGPT 실첨부 성공, 생성 후 PNG 다운로드, DDS 연결,
+게임 실기 검증은 여전히 **UNTESTED**다.
+자세한 준비·입력 방법은 `docs/KOREAN_LOCALIZATION_CONTROLLER_PNG_UPLOAD_20261012.md` 참조.
+사용자가 별도 명시한 `AUTO_SEND=true` staging 설정은 그대로 유지하되
+입력이 없으면 A/B는 FAIL-CLOSED 처리한다.
