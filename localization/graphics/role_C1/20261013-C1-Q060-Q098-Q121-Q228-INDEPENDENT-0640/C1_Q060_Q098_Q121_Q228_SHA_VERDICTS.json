@@ -1,0 +1,545 @@
+{
+  "schema": "outrun-C1-independent-multiDDS-SHA-gated-20261013",
+  "task_id": "OUTRUN-KOR-C1-20261013-0640-Q060-Q098-Q121-Q228",
+  "branch": "korean-localization-recovery-20260928",
+  "date_kst": "2026-10-13",
+  "role": "C1_INDEPENDENT_QA_ONLY",
+  "producer": "A/B",
+  "reviewer": "ChatGPT_AI1_INDEPENDENT_QA",
+  "policy_sha": {
+    "contract": "44754d4d95bcde9a457c9127d1102fc2ea69b0da",
+    "fast_qa": "5ae6007b45073af8f3fd14122de523476730be61"
+  },
+  "source_scope": "Upstream HD-source-exact archived bytes SHA checked against producer pinned source, not localized HD candidate. DDS bytes from exact A/B Git HEAD. CLEAN source files historical/cropped unless author-specific SHA bind proven.",
+  "duplicate_check": "All four saved DDS candidate sha256 searched existing role_C1 and historical role_C/C1 JSON. No same SHA independent C1 review found. Candidates from different queue indexes; former C1-produced candidates excluded.",
+  "contact_sheet": {
+    "path": "localization/graphics/role_C1/20261013-C1-Q060-Q098-Q121-Q228-INDEPENDENT-0640/C1_Q060_Q098_Q121_Q228_BATCH_7WAY.jpg",
+    "sha256": "1513025a6b0f4e8a892e4a6711fcb8068f21f30e6f92515ef9ba1f7a74aaff95",
+    "columns": [
+      "SOURCE_RAW",
+      "SOURCE_READABLE",
+      "HISTORIC_OR_CROPPED_CLEAN_REFERENCE",
+      "SAVED_FINAL_RAW",
+      "SAVED_FINAL_FLIPY",
+      "SAVED_NATIVE_75_PERCENT",
+      "SAVED_NATIVE_50_PERCENT"
+    ],
+    "usage_scale_note": "75/50% image proxy not a game capture; no actual UI cell/UV geometry proven"
+  },
+  "defect_zoom": {
+    "path": "localization/graphics/role_C1/20261013-C1-Q060-Q098-Q121-Q228-INDEPENDENT-0640/C1_Q121_SOURCE_PUNCTUATION_RESIDUE_ZOOM.jpg",
+    "sha256": "7fe690ebb5228cb2267dbd83e372bd04eb5a049fe89278c77e8f5f1280692410",
+    "confirmed_alpha_pixels": 2,
+    "coordinates": [
+      3736,
+      411,
+      3738,
+      413
+    ]
+  },
+  "candidates": [
+    {
+      "queue_index": 60,
+      "producer": "B368",
+      "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "clean_sha256": "e4befa3f25ab2a90173224d7c4cd6ef2184b6c5a43ba4a307b321724870ed089",
+      "final_sha256": "11e081c7f3c12bd13cf100995ec533ce78a557ac97eb1135ff84fc1e0a2d5a6b",
+      "source_path": "work/C1_batch_1541_source_q060.dds",
+      "clean_path": "localization/graphics/role_B/20261004-B-RECOVERY09/A064FDFC_SELECTED_CLEAN_PLATE.png",
+      "final_path": "localization/graphics/role_B/20261011-B368-Q060-HAND-VECTOR-ITALIC-GLYPH-GEOMETRY/B368_Q060_HAND_VECTOR_LAYERED_UNAPPROVED.dds",
+      "DDS_header": {
+        "w": 4096,
+        "h": 2048,
+        "mip": 1,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "bits": 32,
+        "redmask": 255,
+        "length": 33554560
+      },
+      "header_equal_exact": true,
+      "orientation_flipy_consistent": "PENDING_VISUAL",
+      "clean_orientation": "readable",
+      "clean_orientation_autoselected_not_proof": true,
+      "candidate_producer_clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+      "clean_pair_exact_author_binding": false,
+      "clean_is_full_atlas": true,
+      "clean_is_roi_only_reference": false,
+      "regions": [
+        {
+          "name": "BESTTIME",
+          "source_english_bbox_readable": [
+            2179,
+            340,
+            3028,
+            474
+          ],
+          "review_roi_readable": [
+            2090,
+            295,
+            3080,
+            520
+          ],
+          "translation": "최고 기록",
+          "source_clean": {
+            "changed_pixels_in_examined_roi": 0,
+            "changed_outside_reported_source_bbox": 0,
+            "out_of_bbox_coordinates_global": null
+          },
+          "clean_final": {
+            "changed_pixels_in_examined_roi": 148343,
+            "changed_outside_reported_source_bbox": 56387,
+            "out_of_bbox_coordinates_global": [
+              2090,
+              295,
+              3063,
+              520
+            ]
+          },
+          "source_final": {
+            "changed_pixels_in_examined_roi": 148343,
+            "changed_outside_reported_source_bbox": 56387,
+            "out_of_bbox_coordinates_global": [
+              2090,
+              295,
+              3063,
+              520
+            ]
+          }
+        }
+      ],
+      "dxt_block_inspection": {},
+      "reviewed_texts": 1,
+      "untranslated_in_reviewed_region": 0,
+      "uninspected_atlas_texts": "UNKNOWN",
+      "full_asset_verdict": "TEST_ONLY/HOLD",
+      "runtime": "UNTESTED",
+      "plate_file": "c1_0640_review/q060_sevenway.jpg",
+      "plate_sha256": "b8e1ff0e9f9eb0c26950e122276a47766a64c40700bcd8bf128732ab84eac436",
+      "verdict": "HOLD",
+      "translation": "BEST TIME → 최고 기록",
+      "readability": "READABLE_100_75_50",
+      "source_clean_gate": "HOLD_EXACT_AUTHOR_CLEAN_NOT_MATERIALIZED",
+      "candidate_clean_gate": "HOLD_AUTHOR_CLEAN_SHA_MISMATCH",
+      "hard_defect_bboxes": [],
+      "evidence_gap_bbox": [
+        2090,
+        295,
+        3063,
+        520
+      ],
+      "notes": "Actual author CLEAN sha256 a03687... differs from available historical clean sha256 e4befa...; historical CLEAN has zero change in this cropped ROI vs English source, so it is not accepted as B368 clean. 56,387 source-vs-saved pixels outside BEST TIME English bbox within ROI include adjacent atlas contents; no verified real UI cell/UV geometry. Saved 최고 기록: is readable but cannot approve protected regions.",
+      "scope_untranslated": 0,
+      "actual_ui_cell_uv": "UNVERIFIED",
+      "risk": "IGR044_OPEN",
+      "source_clean_review_scope": "HISTORIC_CLEAN_REFERENCE_ONLY",
+      "source_clean_sha_pair": [
+        "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+        "e4befa3f25ab2a90173224d7c4cd6ef2184b6c5a43ba4a307b321724870ed089"
+      ],
+      "clean_final_sha_pair": [
+        "e4befa3f25ab2a90173224d7c4cd6ef2184b6c5a43ba4a307b321724870ed089",
+        "11e081c7f3c12bd13cf100995ec533ce78a557ac97eb1135ff84fc1e0a2d5a6b"
+      ],
+      "source_clean_is_author_verified": false,
+      "actual_runtime_validation": "UNTESTED",
+      "static_scope_only": true,
+      "release_gate": "TEST_ONLY/HOLD",
+      "C3": "NOT_RUN",
+      "user_game": "NOT_RUN",
+      "untranslated_elsewhere": "UNKNOWN",
+      "header_identical_raw_hex_128": true
+    },
+    {
+      "queue_index": 98,
+      "producer": "B330",
+      "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+      "clean_sha256": "c04e242730a30eb85342e780ebec11c3b852eff7993c92790760bc3218c1d11e",
+      "final_sha256": "5d56426b5c8eb54931198f5fbc6a8e864a61be2f2b41d6cd807d8271e23ad298",
+      "source_path": "work/c2_20261012_q098_source/source.dds",
+      "clean_path": "work/c2_20261012_q098_source/clean.png",
+      "final_path": "localization/graphics/role_B/20261009-B330-Q098-ENGLISH-FLANK-REMOVAL/B330_Q098_ENGLISH_REMOVED_UNAPPROVED.dds",
+      "DDS_header": {
+        "w": 2048,
+        "h": 128,
+        "mip": 1,
+        "fourcc": "DXT5",
+        "bits": 0,
+        "redmask": 0,
+        "length": 262272
+      },
+      "header_equal_exact": true,
+      "orientation_flipy_consistent": "PENDING_VISUAL",
+      "clean_orientation": "readable",
+      "clean_orientation_autoselected_not_proof": false,
+      "candidate_producer_clean_sha256": null,
+      "clean_pair_exact_author_binding": true,
+      "clean_is_full_atlas": true,
+      "clean_is_roi_only_reference": false,
+      "regions": [
+        {
+          "name": "COURSE_RECORD",
+          "source_english_bbox_readable": [
+            431,
+            6,
+            1674,
+            123
+          ],
+          "review_roi_readable": [
+            375,
+            0,
+            1720,
+            128
+          ],
+          "translation": "코스 기록에 도전하세요.",
+          "source_clean": {
+            "changed_pixels_in_examined_roi": 119652,
+            "changed_outside_reported_source_bbox": 26729,
+            "out_of_bbox_coordinates_global": [
+              375,
+              0,
+              1720,
+              128
+            ]
+          },
+          "clean_final": {
+            "changed_pixels_in_examined_roi": 156492,
+            "changed_outside_reported_source_bbox": 26729,
+            "out_of_bbox_coordinates_global": [
+              375,
+              0,
+              1720,
+              128
+            ]
+          },
+          "source_final": {
+            "changed_pixels_in_examined_roi": 122412,
+            "changed_outside_reported_source_bbox": 0,
+            "out_of_bbox_coordinates_global": null
+          }
+        }
+      ],
+      "dxt_block_inspection": {
+        "bytes_per_block": 16,
+        "changed_compressed_blocks": 8236,
+        "not_fully_within_source_effect_bbox": 22,
+        "outside_block_bbox_global": [
+          428,
+          4,
+          1676,
+          124
+        ]
+      },
+      "reviewed_texts": 1,
+      "untranslated_in_reviewed_region": 0,
+      "uninspected_atlas_texts": "UNKNOWN",
+      "full_asset_verdict": "TEST_ONLY/HOLD",
+      "runtime": "UNTESTED",
+      "plate_file": "c1_0640_review/q098_sevenway.jpg",
+      "plate_sha256": "e0ecb35923fa3677290b9f2575c815ea98bee59a7c708e7ec29d39a9471d7cd8",
+      "verdict": "HOLD",
+      "translation": "Challenge the course record → 코스 기록에 도전하세요.",
+      "readability": "READABLE_100_75_50",
+      "source_clean_gate": "REFERENCE_CLEAN_SHA_PINNED_BUT_AUTHOR_PAIR_NOT_PROVEN",
+      "candidate_clean_gate": "HOLD_BC3_EDGE_BLOCKS",
+      "hard_defect_bboxes": [],
+      "evidence_gap_bbox": [
+        428,
+        4,
+        1676,
+        124
+      ],
+      "notes": "DXT5 source-final decoded 0 changed RGBA outside source text bbox [431,6,1674,123] in inspected ROI; nevertheless 22 changed compressed 4x4 blocks are not fully inside that text bbox. No block/UV safe cell proof: do not assume protected-asset exactness, do not invent acceptable BC tolerance. Readable localized text and correct RAW/FLIPY are not release approval.",
+      "scope_untranslated": 0,
+      "actual_ui_cell_uv": "UNVERIFIED",
+      "risk": "SHARED_UI_C3_AND_USER_RETEST",
+      "source_clean_review_scope": "OLD_SOURCE_DERIVED_REFERENCE_ONLY",
+      "source_clean_sha_pair": [
+        "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+        "c04e242730a30eb85342e780ebec11c3b852eff7993c92790760bc3218c1d11e"
+      ],
+      "clean_final_sha_pair": [
+        "c04e242730a30eb85342e780ebec11c3b852eff7993c92790760bc3218c1d11e",
+        "5d56426b5c8eb54931198f5fbc6a8e864a61be2f2b41d6cd807d8271e23ad298"
+      ],
+      "source_clean_is_author_verified": false,
+      "actual_runtime_validation": "UNTESTED",
+      "static_scope_only": true,
+      "release_gate": "TEST_ONLY/HOLD",
+      "C3": "NOT_RUN",
+      "user_game": "NOT_RUN",
+      "untranslated_elsewhere": "UNKNOWN",
+      "header_identical_raw_hex_128": true
+    },
+    {
+      "queue_index": 121,
+      "producer": "A242",
+      "source_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "clean_sha256": "b2b793dac51b8696e2564b24d5a0b1b79e54abebb02dc750608d7bb3d0bbd6a0",
+      "final_sha256": "3a4f71ce3fc9628192d56c971c69f5c8cf8ff3bb18b53bf991e0c8e27d238b4d",
+      "source_path": "work/c2_20261012_q121_source.dds",
+      "clean_path": "localization/graphics/role_A/20261011-A242-Q121-BOLD-ITALIC-NATIVE-FONT/A242_PLATE_ONLY_NATIVE.png",
+      "final_path": "localization/graphics/role_A/20261011-A242-Q121-BOLD-ITALIC-NATIVE-FONT/A242_Q121_MANUAL_SOURCE_FAMILY_UNPROMOTED.dds",
+      "DDS_header": {
+        "w": 4096,
+        "h": 4096,
+        "mip": 1,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "bits": 32,
+        "redmask": 255,
+        "length": 67108992
+      },
+      "header_equal_exact": true,
+      "orientation_flipy_consistent": "PENDING_VISUAL",
+      "clean_orientation": "readable",
+      "clean_orientation_autoselected_not_proof": false,
+      "candidate_producer_clean_sha256": null,
+      "clean_pair_exact_author_binding": true,
+      "clean_is_full_atlas": false,
+      "clean_is_roi_only_reference": true,
+      "regions": [
+        {
+          "name": "GAS_PEDAL",
+          "source_english_bbox_readable": [
+            3490,
+            391,
+            3722,
+            440
+          ],
+          "review_roi_readable": [
+            3440,
+            345,
+            3785,
+            497
+          ],
+          "translation": "가속 페달:",
+          "source_clean": {
+            "changed_pixels_in_examined_roi": 6334,
+            "changed_outside_reported_source_bbox": 0,
+            "out_of_bbox_coordinates_global": null
+          },
+          "clean_final": {
+            "changed_pixels_in_examined_roi": 11588,
+            "changed_outside_reported_source_bbox": 220,
+            "out_of_bbox_coordinates_global": [
+              3727,
+              404,
+              3748,
+              439
+            ]
+          },
+          "source_final": {
+            "changed_pixels_in_examined_roi": 10533,
+            "changed_outside_reported_source_bbox": 220,
+            "out_of_bbox_coordinates_global": [
+              3727,
+              404,
+              3748,
+              439
+            ]
+          }
+        }
+      ],
+      "dxt_block_inspection": {},
+      "reviewed_texts": 1,
+      "untranslated_in_reviewed_region": 0,
+      "uninspected_atlas_texts": "UNKNOWN",
+      "full_asset_verdict": "TEST_ONLY/HOLD",
+      "runtime": "UNTESTED",
+      "plate_file": "c1_0640_review/q121_sevenway.jpg",
+      "plate_sha256": "b7d6ed1e4aa46e7ad0a2eda493c93d7b2f8516ddf1348f99f8e2564b450fcef7",
+      "verdict": "REWORK",
+      "translation": "Gas Pedal : → 가속 페달:",
+      "readability": "KOREAN_WORD_READABLE_BUT_ORPHAN_SOURCE_PUNCTUATION_VISIBLE",
+      "source_clean_gate": "SCOPED_232x49_CROPPED_CLEAN_SHA_ONLY",
+      "candidate_clean_gate": "FAIL_SOURCE_COLON_ALPHA_RESIDUE",
+      "hard_defect_bboxes": [
+        [
+          3736,
+          411,
+          3738,
+          413
+        ]
+      ],
+      "evidence_gap_bbox": [
+        3727,
+        404,
+        3748,
+        439
+      ],
+      "notes": "SOURCE and saved DDS exact SHA. Original colon outside source English word bbox [3490,391,3722,440] was mostly erased; saved DDS still has 2 nontransparent alpha pixels at x3736..3737, y411..412. Verified by direct decoded native DDS against English source and 3x black/gray/white background zoom. Remove last original punctuation speck while preserving Korean new colon and nearby UI. Real source CLEAN is only 232x49 crop; constructed QA board reference outside this crop must not be cited as whole-atlas cleaned proof. 220 RGBA changed pixels outside word bbox (mainly removal of source colon); outside source bbox change alone is not a defect, residual tiny visible speck is.",
+      "scope_untranslated": 0,
+      "actual_ui_cell_uv": "UNVERIFIED",
+      "risk": "P0_IGR030_IGR031_IGR040_OPEN",
+      "source_clean_review_scope": "ROI_ONLY_NOT_FULL_ATLAS",
+      "source_clean_sha_pair": [
+        "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+        "b2b793dac51b8696e2564b24d5a0b1b79e54abebb02dc750608d7bb3d0bbd6a0"
+      ],
+      "clean_final_sha_pair": [
+        "b2b793dac51b8696e2564b24d5a0b1b79e54abebb02dc750608d7bb3d0bbd6a0",
+        "3a4f71ce3fc9628192d56c971c69f5c8cf8ff3bb18b53bf991e0c8e27d238b4d"
+      ],
+      "source_clean_is_author_verified": true,
+      "actual_runtime_validation": "UNTESTED",
+      "static_scope_only": true,
+      "release_gate": "TEST_ONLY/HOLD",
+      "C3": "NOT_RUN",
+      "user_game": "NOT_RUN",
+      "untranslated_elsewhere": "UNKNOWN",
+      "header_identical_raw_hex_128": true
+    },
+    {
+      "queue_index": 228,
+      "producer": "B322",
+      "source_sha256": "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+      "clean_sha256": "a8052f2f872f1d4305a56d236c621204d9170a2ae348dea1982084d91de7f7fa",
+      "final_sha256": "ffb982af70aadf36a2f954d1de29bb045385ec0524ab5763a1ae363de370a2dd",
+      "source_path": "work/c258_q228_source.dds",
+      "clean_path": "localization/graphics/role_C/20261005-C144-E7F6E9B7/C144_EXACT_CLEAN_PLATE.png",
+      "final_path": "localization/graphics/role_B/20261009-B322-Q228-SOURCE-CHROME-REPRESENTATIVE/B322_Q228_FILLED_CHROME_TRIAL_NOT_PROMOTED.dds",
+      "DDS_header": {
+        "w": 2048,
+        "h": 2048,
+        "mip": 1,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "bits": 32,
+        "redmask": 16711680,
+        "length": 16777344
+      },
+      "header_equal_exact": true,
+      "orientation_flipy_consistent": "PENDING_VISUAL",
+      "clean_orientation": "readable",
+      "clean_orientation_autoselected_not_proof": true,
+      "candidate_producer_clean_sha256": null,
+      "clean_pair_exact_author_binding": true,
+      "clean_is_full_atlas": true,
+      "clean_is_roi_only_reference": false,
+      "regions": [
+        {
+          "name": "COAST_2_COAST",
+          "source_english_bbox_readable": [
+            5,
+            26,
+            1456,
+            145
+          ],
+          "review_roi_readable": [
+            0,
+            0,
+            1590,
+            190
+          ],
+          "translation": "코스트 2 코스트",
+          "source_clean": {
+            "changed_pixels_in_examined_roi": 100593,
+            "changed_outside_reported_source_bbox": 227,
+            "out_of_bbox_coordinates_global": [
+              1014,
+              182,
+              1047,
+              190
+            ]
+          },
+          "clean_final": {
+            "changed_pixels_in_examined_roi": 50371,
+            "changed_outside_reported_source_bbox": 1114,
+            "out_of_bbox_coordinates_global": [
+              19,
+              186,
+              512,
+              190
+            ]
+          },
+          "source_final": {
+            "changed_pixels_in_examined_roi": 121429,
+            "changed_outside_reported_source_bbox": 1341,
+            "out_of_bbox_coordinates_global": [
+              19,
+              182,
+              1047,
+              190
+            ]
+          }
+        }
+      ],
+      "dxt_block_inspection": {},
+      "reviewed_texts": 1,
+      "untranslated_in_reviewed_region": 0,
+      "uninspected_atlas_texts": "UNKNOWN",
+      "full_asset_verdict": "TEST_ONLY/HOLD",
+      "runtime": "UNTESTED",
+      "plate_file": "c1_0640_review/q228_sevenway.jpg",
+      "plate_sha256": "404668a1b8191673687723ece1cba68fd35f0ac033f274b6b4f6f98dd1b4be91",
+      "verdict": "HOLD",
+      "translation": "COAST 2 COAST → 코스트 2 코스트",
+      "readability": "READABLE_100_75_50",
+      "source_clean_gate": "HISTORIC_C144_CLEAN_SHA_PINNED_NOT_B322_AUTHOR_BOUND",
+      "candidate_clean_gate": "HOLD_NEIGHBOR_CHANGE_UNATTRIBUTED",
+      "hard_defect_bboxes": [],
+      "evidence_gap_bbox": [
+        19,
+        182,
+        1047,
+        190
+      ],
+      "notes": "Saved text readable native and practical 75/50. Source-vs-FINAL 1341 RGBA pixels outside original English glyph bbox in inspected ROI, including y182..189 under the title. Historic C144 clean (sha a805...) is not independently proven as B322 producer's exact clean composite; without actual sprite UI cell/UV and neighbor proof, remain HOLD. Cosmetics alone not rejected.",
+      "scope_untranslated": 0,
+      "actual_ui_cell_uv": "UNVERIFIED",
+      "risk": "IGR038_OPEN",
+      "source_clean_review_scope": "HISTORIC_REFERENCE_ONLY",
+      "source_clean_sha_pair": [
+        "3f98c940c51d2f054934d4e0b7c7d9745f9f8ad71d68548b0b336c62c1cf5154",
+        "a8052f2f872f1d4305a56d236c621204d9170a2ae348dea1982084d91de7f7fa"
+      ],
+      "clean_final_sha_pair": [
+        "a8052f2f872f1d4305a56d236c621204d9170a2ae348dea1982084d91de7f7fa",
+        "ffb982af70aadf36a2f954d1de29bb045385ec0524ab5763a1ae363de370a2dd"
+      ],
+      "source_clean_is_author_verified": false,
+      "actual_runtime_validation": "UNTESTED",
+      "static_scope_only": true,
+      "release_gate": "TEST_ONLY/HOLD",
+      "C3": "NOT_RUN",
+      "user_game": "NOT_RUN",
+      "untranslated_elsewhere": "UNKNOWN",
+      "header_identical_raw_hex_128": true
+    }
+  ],
+  "summary": {
+    "reviewed_dds": 4,
+    "distinct_persisted_candidate_sha": 4,
+    "reviewed_texts": 4,
+    "untranslated_in_inspected_scope": 0,
+    "untranslated_outside_scope": "UNKNOWN",
+    "C1_STATIC_PASS": 0,
+    "REWORK": 1,
+    "HOLD": 3,
+    "whole_DDS_PASS": 0,
+    "release_APPROVED": 0,
+    "new_png_translations": 0,
+    "new_dds": 0,
+    "new_C2_tokens": 0
+  },
+  "constraints": {
+    "qa_cell_bbox": "UNVERIFIED_DO_NOT_USE_BLANK_CANVAS_AS_SAFE_REGION",
+    "BC_dxt": "0_TOLERANCE_UNVERIFIED_BOUNDARY_HOLD",
+    "C2": "RETIRED_HISTORICAL_EVIDENCE_ONLY",
+    "legacy_C2_consumer": "NOT_MIGRATED_TEST_ONLY_HOLD",
+    "C3": "NOT_RUN",
+    "user_actual_game": "NOT_RUN",
+    "runtime_validation": "UNTESTED",
+    "Docker": "NOT_TOUCHED",
+    "Portainer": "NOT_TOUCHED",
+    "AUTO_SEND": "NOT_TOUCHED",
+    "game_install": "NOT_TOUCHED",
+    "official_release": "NOT_DONE",
+    "new_queue": "NOT_CREATED",
+    "queue_reset": "NONE",
+    "excluded": [
+      "VR",
+      "FFB",
+      "DX11",
+      "DXVK"
+    ]
+  }
+}
