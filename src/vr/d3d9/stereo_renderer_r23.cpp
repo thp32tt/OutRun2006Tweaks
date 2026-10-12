@@ -410,7 +410,7 @@ namespace OutRunVRStereo
 #if !defined(OUTRUN_VR_FORCE_LIVE_RASTER_COMPARE)
             if (seededStereo &&
                 IsTrackedStateBlockReliable() &&
-                GetTrackedRasterShadow().Valid())
+                TrackedRasterShadowValid())
             {
                 return R23ClearR22Hook.stdcall<HRESULT>(
                     device, count, rects, flags, color, z, stencil);
@@ -527,7 +527,7 @@ namespace OutRunVRStereo
             // Lost Apply coverage or an invalid shadow still takes the
             // existing live/fail-closed sampling path below.
             if (IsTrackedStateBlockReliable() &&
-                GetTrackedRasterShadow().Valid())
+                TrackedRasterShadowValid())
                 return;
 #endif
             OutRunVR::State::D3D9RasterSnapshot ignored{};
@@ -608,7 +608,26 @@ namespace OutRunVRStereo
                 offsetof(OutRunVR::SharedPoseState, orientation);
             static_assert(R23HostFreshSnapshotBytes == 40u,
                 "host freshness prefix layout changed");
-            OutRunVR::SharedPoseState snap{};
+            // Present reads only a coherent 40-byte host prefix. Avoid
+            // zero-initializing the unused tail of the pose state each frame.
+            struct R23HostFreshHeader
+            {
+                std::uint32_t magic;
+                std::uint32_t protocolVersion;
+                std::uint32_t structSize;
+                std::uint32_t sequence;
+                std::uint32_t hostPid;
+                std::uint32_t clientPid;
+                std::uint32_t flags;
+                std::uint32_t heartbeat;
+                std::int64_t sampleQpc;
+            };
+            static_assert(sizeof(R23HostFreshHeader) == R23HostFreshSnapshotBytes,
+                "R23 host freshness prefix must remain exactly 40 bytes");
+            static_assert(offsetof(R23HostFreshHeader, sampleQpc) ==
+                offsetof(OutRunVR::SharedPoseState, sampleQpc),
+                "R23 host freshness sampleQpc layout changed");
+            R23HostFreshHeader snap{};
             bool stable = false;
             for (int attempt = 0; attempt < 4; ++attempt)
             {

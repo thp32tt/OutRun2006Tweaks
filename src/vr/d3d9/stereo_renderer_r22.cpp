@@ -967,6 +967,13 @@ namespace OutRunVRStereo
         return R22ShadowState;
     }
 
+    // R23's Draw/Clear guards only need the three validity flags, not
+    // a by-value copy of the complete raster snapshot per primitive.
+    inline bool TrackedRasterShadowValid() noexcept
+    {
+        return R22ShadowState.Valid();
+    }
+
     inline bool TryGetTrackedViewport(D3DVIEWPORT9& viewport) noexcept
     {
         if (!R22ShadowState.Valid())
