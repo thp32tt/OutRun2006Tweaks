@@ -73,6 +73,44 @@ namespace OutRunVRStereo
             bool valid = false;
         };
 
+        // SetRenderTarget(0, rightEye) resets the D3D9 viewport to the
+        // complete target. Cache immutable surface extents while the device
+        // generation is alive; avoid one redundant synchronous SetViewport per
+        // world/HUD stereo primitive when the game's viewport is already full.
+        struct R33RightViewportExtent
+        {
+            IDirect3DSurface9* surface = nullptr; // borrowed, never AddRef
+            UINT width = 0;
+            UINT height = 0;
+            bool valid = false;
+        };
+        R33RightViewportExtent R33RightViewport{};
+
+        bool R33TargetResetViewportMatches(
+            IDirect3DSurface9* rightEye,
+            const D3DVIEWPORT9& saved) noexcept
+        {
+            if (!rightEye || saved.X != 0 || saved.Y != 0 ||
+                saved.MinZ != 0.0f || saved.MaxZ != 1.0f)
+                return false;
+            if (!R33RightViewport.valid ||
+                R33RightViewport.surface != rightEye)
+            {
+                // Never skip when GetDesc fails or an untracked render target
+                // replaces the eye surface. Reset clears borrowed identity.
+                R33RightViewport = {};
+                D3DSURFACE_DESC desc{};
+                if (FAILED(rightEye->GetDesc(&desc)) ||
+                    desc.Width == 0 || desc.Height == 0)
+                    return false;
+                R33RightViewport = {
+                    rightEye, desc.Width, desc.Height, true
+                };
+            }
+            return saved.Width == R33RightViewport.width &&
+                saved.Height == R33RightViewport.height;
+        }
+
         thread_local R33DepthStencilWriteState R33DepthStencilState{};
         std::uint64_t R33DepthStencilSyncs = 0;
         std::uint64_t R33DepthStencilCacheHits = 0;
@@ -611,12 +649,17 @@ namespace OutRunVRStereo
             bool restoreOk = true;
             {
                 R32ReviewInternalStereoPassScope guard;
-                rightHr = R32ReviewSetRenderTarget(
-                    device, 0u, R32ReviewRightEyeSurface());
+                IDirect3DSurface9* rightEye = R32ReviewRightEyeSurface();
+                const bool viewportAlreadyFull =
+                    R33TargetResetViewportMatches(rightEye, savedViewport);
+                rightHr = R32ReviewSetRenderTarget(device, 0u, rightEye);
                 if (SUCCEEDED(rightHr) && !depthlessPass)
                     rightHr = R32ReviewSetDepthStencilSurface(
                         device, savedDepth ? R32ReviewRightEyeDepth() : nullptr);
-                if (SUCCEEDED(rightHr))
+                // SetRenderTarget already established this exact full
+                // viewport. Keep the setter for all inset, offset, depth-range,
+                // resized or unknown targets; only the proven case elides it.
+                if (SUCCEEDED(rightHr) && !viewportAlreadyFull)
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) &&
                     !R32ReviewSetWvpBatch(device, draw.eyeConstants[1]))
@@ -776,12 +819,17 @@ namespace OutRunVRStereo
             bool restoreOk = true;
             {
                 R32ReviewInternalStereoPassScope guard;
-                rightHr = R32ReviewSetRenderTarget(
-                    device, 0u, R32ReviewRightEyeSurface());
+                IDirect3DSurface9* rightEye = R32ReviewRightEyeSurface();
+                const bool viewportAlreadyFull =
+                    R33TargetResetViewportMatches(rightEye, savedViewport);
+                rightHr = R32ReviewSetRenderTarget(device, 0u, rightEye);
                 if (SUCCEEDED(rightHr) && !depthlessPass)
                     rightHr = R32ReviewSetDepthStencilSurface(
                         device, savedDepth ? R32ReviewRightEyeDepth() : nullptr);
-                if (SUCCEEDED(rightHr))
+                // SetRenderTarget already established this exact full
+                // viewport. Keep the setter for all inset, offset, depth-range,
+                // resized or unknown targets; only the proven case elides it.
+                if (SUCCEEDED(rightHr) && !viewportAlreadyFull)
                     rightHr = device->SetViewport(&savedViewport);
                 if (SUCCEEDED(rightHr) &&
                     !R32ReviewSetWvpBatch(device, eyeConstants[1]))
@@ -1072,6 +1120,7 @@ namespace OutRunVRStereo
             if (gameDevice)
             {
                 R33InvalidateDepthStencilCache();
+                R33RightViewport = {};
                 if (SUCCEEDED(hr))
                     ++R33ResetSuccesses;
                 else
@@ -1184,6 +1233,7 @@ namespace OutRunVRStereo
 
         void R33RollbackHooks() noexcept
         {
+            R33RightViewport = {};
             R33DrawIndexedPrimitiveUPR30Hook = {};
             R33DrawPrimitiveUPR30Hook = {};
             R33DrawIndexedPrimitiveR30Hook = {};
