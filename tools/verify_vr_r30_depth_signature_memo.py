@@ -44,6 +44,7 @@ def valid(text):
         "const bool canMemoize = haveBaseProjection && signatureCache &&",
         "vertexCopy && vertexCopy->entry",
         "(!indexed || (indexCopy && indexCopy->entry))",
+        "signatureCache->indexed == indexed",
         "signatureCache->vertexCount == vertexCount",
         "signatureCache->stride == stride",
         "signatureCache->minZ == state.viewport.MinZ",
