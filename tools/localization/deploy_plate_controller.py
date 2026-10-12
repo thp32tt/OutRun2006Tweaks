@@ -62,11 +62,14 @@ print(json.dumps({{'compose':(b/{SUBDIR!r}/'docker-compose.yml').read_text(),'en
         for lane in ('A', 'B', 'C1'):
             name = f'localization_{lane}.md'; raw = (prompt_dir / name).read_bytes()
             hashes[name] = hashlib.sha256(raw).hexdigest(); (b / name).write_bytes(raw)
+            if lane == 'C1':
+                hashes['localization_C.md'] = hashes[name]
+                (b / 'localization_C.md').write_bytes(raw)
         (b / 'production_revision').write_text(revision + '\n')
         (b / 'Dockerfile').write_text('FROM ' + BASE + '\nRUN rm -f /opt/outrun/prompts/localization_C2.md\nCOPY localization_*.md /opt/outrun/prompts/\nCOPY production_revision /opt/outrun/production_revision\n')
         run(['docker', 'build', '-t', image, str(b)], timeout=120)
     # Save prompt source in the existing Portainer build context for future rebuilds.
-    encoded = json.dumps({name: (prompt_dir / name).read_text() for name in hashes})
+    encoded = json.dumps({name: (prompt_dir / ('localization_C1.md' if name == 'localization_C.md' else name)).read_text() for name in hashes})
     update = f"""import pathlib,json
 b=pathlib.Path({(STACK+'/'+SUBDIR)!r})
 for name,text in json.loads({encoded!r}).items():
