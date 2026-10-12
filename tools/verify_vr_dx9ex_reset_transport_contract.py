@@ -651,32 +651,37 @@ forbid(
 resolve_direct_r13 = body(r13, "bool ResolveDirectTransportR13(")
 require_order(
     resolve_direct_r13,
-    "R13 base DirectGPU whole-ring ACK scan",
+    "R13 fallback DirectGPU ACK-before-producer-EVENT ring scan",
     "std::uint32_t selected = OutRunVR::RenderFrameRingSize;",
     "R13GpuCompletionSnapshot ackSnapshot{};",
     "bool ackSnapshotRead = false;",
     "bool ackSnapshotValid = false;",
     "for (std::uint32_t offset = 0;",
-    "if (slot.published && slot.frameId)",
+    "const bool publicationNeedsAck =",
+    "slot.published && slot.frameId != 0;",
+    "if (publicationNeedsAck)",
     "R13ReadGpuCompletionSnapshotWithRebind(ackSnapshot)",
     "ackSnapshotRead = true;",
     "ackSnapshot.completedFrameId[index]",
+    "if (!ackSnapshotValid ||",
+    "!FrameIdAtOrAfter(gpuCompleted, slot.frameId)",
+    "ackBlocked = true;",
+    "continue;",
+    "if (slot.producerPending)",
+    "slot.fence->GetData(nullptr, 0, 0)",
+    "else if (ready == S_FALSE)",
+    "R13DirectCopyPathRejected = true;",
+    "R13DirectCopyRejectHr = ready;",
+    "return false;",
+    "if (publicationNeedsAck)",
+    "slot.frameId = 0;",
+    "slot.published = false;",
+    "selected = index;",
 )
 if resolve_direct_r13.count("R13ReadGpuCompletionSnapshotWithRebind(ackSnapshot)") != 1:
     fail("R13 base DirectGPU ring scan must read one owner-managed ACK snapshot per resolve")
-r13_published_marker = "if (slot.published && slot.frameId)"
-r13_published_pos = resolve_direct_r13.find(r13_published_marker)
-if r13_published_pos < 0:
-    fail("R13 base DirectGPU published-slot scope missing")
-require_order(
-    resolve_direct_r13[r13_published_pos:],
-    "R13 base DirectGPU ACK-completed publication retirement",
-    r13_published_marker,
-    "R13ReadGpuCompletionSnapshotWithRebind(ackSnapshot)",
-    "ackSnapshot.completedFrameId[index]",
-    "slot.frameId = 0;",
-    "slot.published = false;",
-)
+if resolve_direct_r13.count("slot.fence->GetData(nullptr, 0, 0)") != 1:
+    fail("R13 fallback DirectGPU must issue no more than one producer EVENT poll per candidate")
 
 # The R13 physical fallback owns DirectGPU before the final R33/R32 owner is
 # available. It must preserve the same fail-closed resource-lifetime invariant:
@@ -703,16 +708,34 @@ require_order(
     "EnsureDirectTransportResources(device)",
     "const std::uint32_t preferred =",
 )
+r13_ack_start = resolve_direct_r13.find("if (publicationNeedsAck)")
 r13_pending_start = resolve_direct_r13.find("if (slot.producerPending)")
-r13_published_start = resolve_direct_r13.find(
-    "if (slot.published && slot.frameId)", r13_pending_start
+r13_retire_start = resolve_direct_r13.find(
+    "if (publicationNeedsAck)", r13_pending_start
 )
-if min(r13_pending_start, r13_published_start) < 0:
-    fail("R13 fallback producer EVENT poll scope missing")
-r13_pending_poll = resolve_direct_r13[r13_pending_start:r13_published_start]
+if min(r13_ack_start, r13_pending_start, r13_retire_start) < 0 or not (
+    r13_ack_start < r13_pending_start < r13_retire_start
+):
+    fail("R13 fallback must gate published ownership by ACK before EVENT and retirement")
+r13_ack_gate = resolve_direct_r13[r13_ack_start:r13_pending_start]
+require_order(
+    r13_ack_gate,
+    "R13 fallback ACK ownership must reject busy slots without producer polls",
+    "if (!ackSnapshotRead)",
+    "R13ReadGpuCompletionSnapshotWithRebind(ackSnapshot)",
+    "ackSnapshotRead = true;",
+    "if (!ackSnapshotValid ||",
+    "!FrameIdAtOrAfter(gpuCompleted, slot.frameId)",
+    "ackBlocked = true;",
+    "continue;",
+)
+r13_pending_poll = resolve_direct_r13[r13_pending_start:r13_retire_start]
 require_order(
     r13_pending_poll,
     "R13 fallback producer EVENT hard-error fail-closed",
+    "if (slot.producerPending)",
+    "slot.fence ? slot.fence->GetData(nullptr, 0, 0) : E_FAIL;",
+    "if (ready == S_OK)",
     "else if (ready == S_FALSE)",
     "continue;",
     "R13DirectCopyPathRejected = true;",
@@ -729,6 +752,14 @@ forbid(
     "slot.pendingFrameId = 0;",
     "slot.frameId = 0;",
     "slot.published = false;",
+)
+require_order(
+    resolve_direct_r13[r13_retire_start:],
+    "R13 fallback retirement must be after ACK and producer completion",
+    "if (publicationNeedsAck)",
+    "slot.frameId = 0;",
+    "slot.published = false;",
+    "selected = index;",
 )
 
 r13_copy_start = resolve_direct_r13.find("auto& slot = DirectTransportSlots[selected];")
