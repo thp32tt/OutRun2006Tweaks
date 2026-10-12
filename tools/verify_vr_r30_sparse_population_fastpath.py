@@ -54,9 +54,12 @@ def valid(code):
                 "&scratch.used, knownUsedCount))",
                 "scratch.used.assign(vertexCount, 0);")):
             return False
-        if not (segment.index(count_init)
-                < segment.index("scratch.used.assign(vertexCount, 0);")
-                < segment.index("++knownUsedCount;")
+        assign_pos = segment.index("scratch.used.assign(vertexCount, 0);")
+        init_pos = segment.index(count_init)
+        init_order_ok = (assign_pos < init_pos if name == "UP" else
+                         init_pos < assign_pos)
+        if not (init_order_ok
+                and init_pos < segment.index("++knownUsedCount;")
                 < segment.index(marker)
                 < segment.index("&scratch.used, knownUsedCount))"):
             return False
