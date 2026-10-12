@@ -1682,8 +1682,10 @@ def main() -> None:
         "alphaOp == D3DTOP_MODULATE;",
         "blendFactorAlpha || blendFactorTextureAlpha || blendFactorModulateAlpha",
         "!blendFactorTextureAlpha && !blendFactorModulateAlpha &&",
-        "rgbNeedsDiffuse = blendFactorTextureAlpha || blendFactorModulateAlpha",
-        "alphaNeedsDiffuse = blendFactorModulateAlpha",
+        "rgbNeedsDiffuse = selectDiffuseTextureAlpha || selectDiffuseDiffuseAlpha ||",
+        "blendFactorTextureAlpha || blendFactorModulateAlpha",
+        "alphaNeedsDiffuse = selectDiffuseDiffuseAlpha || selectDiffuseModulateAlpha ||",
+        "blendFactorModulateAlpha ||",
         "capture.blendFactorTextureAlpha = blendFactorTextureAlpha;",
         "capture.blendFactorModulateAlpha = blendFactorModulateAlpha;",
         "bool blendFactorTextureAlpha = false;",
@@ -1782,7 +1784,8 @@ def main() -> None:
                 code.count("s.blendFactorDiffuseAlphaPs.Reset();") == 2 and
                 code.count("s.blendFactorAddAlphaPs.Reset();") == 2 and
                 "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)" in gate and
-                "alphaNeedsDiffuse = blendFactorModulateAlpha ||" in gate and
+                "alphaNeedsDiffuse = selectDiffuseDiffuseAlpha || selectDiffuseModulateAlpha ||" in gate and
+                "blendFactorModulateAlpha ||" in gate and
                 "alphaArg2Diffuse" in gate and
                 "capture.blendFactorDiffuseAlpha ? s.blendFactorDiffuseAlphaPs.Get() :" in draw and
                 "capture.blendFactorAddAlpha ? s.blendFactorAddAlphaPs.Get() :" in draw)
