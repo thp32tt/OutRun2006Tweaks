@@ -938,15 +938,19 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         output.alphaFunc = static_cast<D3DCMPFUNC>(func);
         output.alphaRef = reference;
     }
-    DWORD op=0, arg=0, nextColorOp=0;
+    DWORD op=0, arg=0, nextColorOp=0, resultArg=0;
     // A later fixed-function texture stage can still change the result even
     // when stage 0 selects DIFFUSE. Reject it rather than mislabel an altered
     // game draw as native color parity; the original DX9Ex draw still runs.
     if (FAILED(game->GetTextureStageState(0, D3DTSS_COLOROP, &op)) ||
         FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG1, &arg)) ||
         FAILED(game->GetTextureStageState(1, D3DTSS_COLOROP, &nextColorOp)) ||
-        nextColorOp != D3DTOP_DISABLE)
+        FAILED(game->GetTextureStageState(0, D3DTSS_RESULTARG, &resultArg)) ||
+        nextColorOp != D3DTOP_DISABLE || resultArg != D3DTA_CURRENT)
         return false;
+    // The native PS writes the stage-0 result directly to the frame.
+    // D3DTA_TEMP would leave CURRENT unchanged, so this diagnostic must
+    // preserve the original D3D9 Draw instead of mirroring a false color.
     if (!capture.enabled) {
         // D3D9 stage 0 CURRENT is the incoming vertex DIFFUSE. An untextured
         // menu/sprite Draw can select that color from ARG1 or ARG2, with its

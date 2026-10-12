@@ -36,9 +36,25 @@ def connected(src):
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
     )) and "if (!diagnostic_enabled() || !game)" in src
+def result_arg_fail_closed(source):
+    gate = source.split("bool supported_game_state(", 1)[-1].split("bool translate_vertices(", 1)[0]
+    return all(token in gate for token in (
+        "DWORD op=0, arg=0, nextColorOp=0, resultArg=0;",
+        "GetTextureStageState(0, D3DTSS_RESULTARG, &resultArg)",
+        "nextColorOp != D3DTOP_DISABLE || resultArg != D3DTA_CURRENT",
+    ))
+
 def run():
     src=SRC.read_text(encoding="utf8")
     assert connected(src), "00579 source->shader->draw/alpha gate disconnected"
+    assert result_arg_fail_closed(src), "stage0 TEMP result must stay on DX9Ex"
+    for old, replacement in (
+        ("GetTextureStageState(0, D3DTSS_RESULTARG, &resultArg)",
+         "GetTextureStageState(1, D3DTSS_RESULTARG, &resultArg)"),
+        ("resultArg != D3DTA_CURRENT", "resultArg == D3DTA_CURRENT"),
+    ):
+        broken = src.replace(old, replacement, 1)
+        assert broken != src and not result_arg_fail_closed(broken), old
     negatives=0
     for flag,op,shader,owner,alpha in CASES:
         for old,bad in (
@@ -74,5 +90,5 @@ def run():
             and rgb=="TEXTURE" and a1=="TEXTURE" and a2 in ("DIFFUSE","CURRENT"))
         assert actual==expected,(color,alpha,rgb,a1,a2)
     assert negatives==14
-    print("DX11 00579 independent ADD/SUBTRACT alpha live Draw static PASS: 14 destructive mutants; HMD UNTESTED")
+    print("DX11 00579 independent ADD/SUBTRACT alpha live Draw static PASS: 14 alpha mutants + 2 RESULTARG negative mutations; HMD UNTESTED")
 if __name__=="__main__": run()
