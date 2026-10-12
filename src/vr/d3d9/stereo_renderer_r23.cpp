@@ -519,6 +519,17 @@ namespace OutRunVRStereo
             if (!IsGameDevice(device) || InternalStereoPass)
                 return;
             ++R23GameDrawSerial;
+#if !defined(OUTRUN_VR_FORCE_LIVE_RASTER_COMPARE)
+            // R22/R31 setters and StateBlock::Apply already maintain this
+            // authoritative raster shadow when the tracker is reliable.
+            // R23 uses no draw-time snapshot result: skip a per-draw POD
+            // construction/copy and redundant state-generation checks.
+            // Lost Apply coverage or an invalid shadow still takes the
+            // existing live/fail-closed sampling path below.
+            if (IsTrackedStateBlockReliable() &&
+                GetTrackedRasterShadow().Valid())
+                return;
+#endif
             OutRunVR::State::D3D9RasterSnapshot ignored{};
             R23CaptureActualGameState(device, ignored, "Draw", false);
         }

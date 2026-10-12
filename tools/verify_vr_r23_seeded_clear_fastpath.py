@@ -40,9 +40,63 @@ def verify(src: str) -> None:
     assert pos("R23InitializeStereoFromAuthoritativeBaseline(") > rawclear
 
 
+
+
+def draw_body(source: str) -> str:
+    start = source.index("void R23BeforeTopLevelDraw(")
+    end = source.index("HRESULT __stdcall DrawPrimitiveDestR23(", start)
+    return source[start:end]
+
+
+def verify_draw(src: str) -> None:
+    body = draw_body(src)
+
+    def pos(token: str) -> int:
+        assert token in body, f"missing R23 draw fastpath: {token}"
+        return body.index(token)
+
+    game = pos("if (!IsGameDevice(device) || InternalStereoPass)")
+    serial = pos("++R23GameDrawSerial;")
+    ifdef = pos("#if !defined(OUTRUN_VR_FORCE_LIVE_RASTER_COMPARE)")
+    reliable = pos("if (IsTrackedStateBlockReliable() &&")
+    shadow = pos("GetTrackedRasterShadow().Valid())")
+    bypass = pos("return;\n#endif")
+    endif = pos("#endif")
+    fallback = pos('R23CaptureActualGameState(device, ignored, "Draw", false);')
+    assert game < serial < ifdef < reliable < shadow < bypass < endif < fallback
+    assert body.count("R23CaptureActualGameState(") == 1
+    assert body.count("++R23GameDrawSerial;") == 1
+    assert src.count("R23BeforeTopLevelDraw(device);") == 4
+    assert "OutRunVR::State::D3D9RasterSnapshot ignored{};" in body
+    assert pos("R23CaptureActualGameState(") > endif
+
+
+def verify_draw_mutations(src: str) -> int:
+    body = draw_body(src)
+    mutations = (
+        ("if (!IsGameDevice(device) || InternalStereoPass)", "if (false)"),
+        ("++R23GameDrawSerial;", "/* draw serial lost */"),
+        ("#if !defined(OUTRUN_VR_FORCE_LIVE_RASTER_COMPARE)", "#if 1"),
+        ("if (IsTrackedStateBlockReliable() &&", "if (true &&"),
+        ("GetTrackedRasterShadow().Valid())", "true)"),
+        ("return;\n#endif", "/* no fast exit */\n#endif"),
+        ('R23CaptureActualGameState(device, ignored, "Draw", false);',
+         "/* no unsafe fallback capture */"),
+    )
+    for good, bad in mutations:
+        assert good in body, f"missing R23 draw mutation anchor: {good}"
+        mutant = src.replace(body, body.replace(good, bad, 1), 1)
+        try:
+            verify_draw(mutant)
+        except (AssertionError, ValueError):
+            continue
+        raise AssertionError(f"R23 draw destructive mutation survived: {good}")
+    return len(mutations)
+
 if __name__ == "__main__":
     src = SOURCE.read_text(encoding="utf-8")
     verify(src)
+    verify_draw(src)
     mutations = (
         ("R9StereoSeeded &&", "true &&"),
         ("OutRunVR::RuntimeEligibility::MayInjectStereo();", "true;"),
@@ -64,4 +118,5 @@ if __name__ == "__main__":
         except (AssertionError, ValueError):
             continue
         raise AssertionError(f"seeded-clear destructive mutation survived: {good}")
-    print(f"PASS R23 seeded-clear raster fastpath/fallback and {len(mutations)} negative mutations")
+    draw_mutations = verify_draw_mutations(src)
+    print(f"PASS R23 seeded-clear + tracked draw raster fastpaths, {len(mutations)} clear and {draw_mutations} draw destructive mutations")
