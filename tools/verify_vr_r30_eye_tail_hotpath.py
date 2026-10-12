@@ -55,6 +55,34 @@ def verify(source: str):
         "state.parallaxPerRhwX[eye] * rhw",
     ):
         assert required in vertices, f"world particle or fallback guard lost: {required}"
+    # CPU-projected smoke/skid/decal geometry is constant within a latched
+    # pose/projection/scale, while depth evidence and viewport stay per draw.
+    assert "thread_local R30XyzrhwWorldGeometryCache R30XyzrhwWorldGeometry{};" in state
+    assert "R30XyzrhwWorldGeometry = {};" in source.split(
+        "HRESULT __stdcall ResetDestR30", 1)[1].split("float R30HudScaleValue", 1)[0]
+    for key in (
+        "geometryCache.valid &&",
+        "geometryCache.worldScale == worldScale",
+        "geometryCache.geometry.stereo.poseSequence == state.stereo.poseSequence",
+        "std::memcmp(&geometryCache.geometry.baseProjection,",
+        "std::memcmp(geometryCache.geometry.stereo.eyeOffset,",
+        "std::memcmp(geometryCache.geometry.stereo.eyeFov,",
+        "geometryCache.valid = false;",
+        "geometryCache.geometry = state;",
+        "geometryCache.valid = true;",
+        "state.inverseBaseProjection = previous.inverseBaseProjection;",
+        "std::memcpy(state.eyeTail, previous.eyeTail,",
+        "std::memcpy(state.parallaxPerRhwX, previous.parallaxPerRhwX,",
+        "std::memcpy(state.parallaxPerRhwY, previous.parallaxPerRhwY,",
+    ):
+        assert key in configure, f"XYZRHW geometry cache guard lost: {key}"
+    # A rejected world signature must not reuse cached world geometry.
+    assert configure.index("state.rhwDepthEvidence =") < configure.index(
+        "if (!state.worldEffect)") < configure.index("geometryCacheHit")
+    assert configure.index("geometryCache.valid = false;") < configure.index(
+        "R29OwnerInvertMatrix(baseProjection, state.inverseBaseProjection)")
+    assert configure.index("!R29OwnerMatrixFinite(state.eyeTail[eye])") < configure.index(
+        "geometryCache.valid = true;")
     # No second 4x4 multiplication may remain inside the particle loop.
     assert "float eyeView[4]{};" not in vertices
     assert "state.eyeInverse[eye].m[row][col]" not in vertices
@@ -133,8 +161,31 @@ def main():
         except (AssertionError, ValueError, IndexError):
             continue
         raise AssertionError(f"destructive mutation {i} escaped")
+    geometry_mutations = (
+        ("geometryCache.worldScale == worldScale", "true"),
+        ("geometryCache.geometry.stereo.poseSequence == state.stereo.poseSequence", "true"),
+        ("std::memcmp(&geometryCache.geometry.baseProjection,", "std::memcmp(&state.baseProjection,"),
+        ("std::memcmp(geometryCache.geometry.stereo.eyeOffset,", "std::memcmp(state.stereo.eyeOffset,"),
+        ("std::memcmp(geometryCache.geometry.stereo.eyeFov,", "std::memcmp(state.stereo.eyeFov,"),
+        ("geometryCache.valid = false;", "/* stale geometry allowed */"),
+        ("geometryCache.geometry = state;", "/* missing geometry publication */"),
+        ("geometryCache.valid = true;", "/* never publish validated geometry */"),
+        ("state.inverseBaseProjection = previous.inverseBaseProjection;", "/* stale inverse */"),
+        ("std::memcpy(state.eyeTail, previous.eyeTail,", "std::memcpy(state.eyeTail, state.eyeTail,"),
+        ("std::memcpy(state.parallaxPerRhwY, previous.parallaxPerRhwY,", "std::memcpy(state.parallaxPerRhwY, state.parallaxPerRhwY,"),
+    )
+    for i, (before, after) in enumerate(geometry_mutations, 1):
+        scope = source.index("bool R30ConfigureXyzrhwWorldEffect(")
+        position = source.find(before, scope)
+        assert position >= 0, f"geometry mutation {i} missing"
+        changed = source[:position] + after + source[position + len(before):]
+        try:
+            verify(changed)
+        except (AssertionError, ValueError, IndexError):
+            continue
+        raise AssertionError(f"XYZRHW cache destructive mutation {i} escaped")
     math_parity()
-    print(f"PASS R30 particle stereo composed eye-tail: {len(mutations)} destructive mutations and 300 matrix parity cases")
+    print(f"PASS R30 particle stereo composed eye-tail/geometry cache: {len(mutations) + len(geometry_mutations)} destructive mutations and 300 matrix parity cases")
 
 
 if __name__ == "__main__":

@@ -1373,6 +1373,7 @@ namespace OutRunVRStereo
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
             R30FlatEffectGeometry = {};
+            R30XyzrhwWorldGeometry = {};
             R30HudContain = {};
             return R30ResetR29Hook.stdcall<HRESULT>(device, params);
         }
@@ -1736,6 +1737,17 @@ namespace OutRunVRStereo
             bool worldEffect = false;
         };
 
+        // R30 XYZRHW world smoke/decal geometry has a latched pose and a
+        // fixed game projection across multiple CPU-projected draws.  Cache
+        // only projection-derived math, never per-draw evidence/viewport data.
+        struct R30XyzrhwWorldGeometryCache
+        {
+            bool valid = false;
+            float worldScale = 0.0f;
+            R30XyzrhwState geometry{};
+        };
+        thread_local R30XyzrhwWorldGeometryCache R30XyzrhwWorldGeometry{};
+
         bool R30PrepareXyzrhwState(
             IDirect3DDevice9* device, R30XyzrhwState& state) noexcept
         {
@@ -1908,6 +1920,50 @@ namespace OutRunVRStereo
             if (!haveBaseProjection)
                 return false;
             state.baseProjection = baseProjection;
+            auto& geometryCache = R30XyzrhwWorldGeometry;
+            const float worldScale =
+                Settings::VRWorldScale * Settings::VRStereoDepth;
+            const bool geometryCacheHit = geometryCache.valid &&
+                geometryCache.worldScale == worldScale &&
+                geometryCache.geometry.stereo.poseSequence == state.stereo.poseSequence &&
+                std::memcmp(&geometryCache.geometry.baseProjection,
+                    &state.baseProjection, sizeof(state.baseProjection)) == 0 &&
+                std::memcmp(geometryCache.geometry.stereo.eyeOffset,
+                    state.stereo.eyeOffset, sizeof(state.stereo.eyeOffset)) == 0 &&
+                std::memcmp(geometryCache.geometry.stereo.eyeFov,
+                    state.stereo.eyeFov, sizeof(state.stereo.eyeFov)) == 0;
+            if (geometryCacheHit)
+            {
+                // Replay only the validated invariant geometry. Never reuse
+                // the previous draw's RHW signature, depth-test, eye-affine,
+                // viewport or stereo/frame ownership state.
+                const auto& previous = geometryCache.geometry;
+                state.inverseBaseProjection = previous.inverseBaseProjection;
+                std::memcpy(state.eyeProjection, previous.eyeProjection,
+                    sizeof(state.eyeProjection));
+                std::memcpy(state.eyeInverse, previous.eyeInverse,
+                    sizeof(state.eyeInverse));
+                std::memcpy(state.eyeTail, previous.eyeTail,
+                    sizeof(state.eyeTail));
+                std::memcpy(state.worldScaleX, previous.worldScaleX,
+                    sizeof(state.worldScaleX));
+                std::memcpy(state.worldOffsetX, previous.worldOffsetX,
+                    sizeof(state.worldOffsetX));
+                std::memcpy(state.worldScaleY, previous.worldScaleY,
+                    sizeof(state.worldScaleY));
+                std::memcpy(state.worldOffsetY, previous.worldOffsetY,
+                    sizeof(state.worldOffsetY));
+                std::memcpy(state.parallaxPerRhwX, previous.parallaxPerRhwX,
+                    sizeof(state.parallaxPerRhwX));
+                std::memcpy(state.parallaxPerRhwY, previous.parallaxPerRhwY,
+                    sizeof(state.parallaxPerRhwY));
+                state.fullWorldReprojection = true;
+            }
+            else
+            {
+                // No stale optics after pose/recenter/projection/scale change;
+                // publish only when both complete eye tails pass finite checks.
+                geometryCache.valid = false;
             if (!R29OwnerMatrixFinite(baseProjection) ||
                 std::fabs(baseProjection._11) < 0.01f ||
                 std::fabs(baseProjection._22) < 0.01f ||
@@ -2009,6 +2065,11 @@ namespace OutRunVRStereo
                     state.worldScaleY[eye] < 0.20f ||
                     state.worldScaleY[eye] > 5.0f)
                     return false;
+            }
+
+                geometryCache.geometry = state;
+                geometryCache.worldScale = worldScale;
+                geometryCache.valid = true;
             }
 
             if (state.rhwDepthEvidence && !state.depthTestEnabled)
