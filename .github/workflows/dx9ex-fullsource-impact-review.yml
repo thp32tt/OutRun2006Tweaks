@@ -19,6 +19,13 @@ on:
       - '.github/workflows/vr-dx9ex-active.yml'
       - '.github/workflows/outrun-exe-hud-inspector.yml'
 
+# Keep the current exact-SHA analysis build running, but coalesce queued obsolete
+# branch pushes into the newest pending run. This prevents parallel duplicate MSVC
+# static-analysis builds without discarding an in-flight acceptance result.
+concurrency:
+  group: dx9ex-fullsource-impact-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
