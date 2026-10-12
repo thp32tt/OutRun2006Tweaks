@@ -102,7 +102,8 @@ def contract(s):
         "if (!R29EffectCacheCurrent())" in telemetry,
         sync.find("recordingGenerationBefore") < sync.find("device->GetRenderState(")
             < sync.find("StateBlockTracker::RecordingGeneration() !="),
-        setter.find("StateBlockTracker::Recording()") < setter.find("switch (state)"),
+        setter.find("StateBlockTracker::Recording()") <
+            setter.find("case D3DRS_ALPHABLENDENABLE:\n                R29Effect.alphaBlend = value;"),
         "if (false)" not in cache and "if (false)" not in sync,
         "if (false)" not in setter and "if (false)" not in telemetry,
         "if (!device || !TrackedDepthStencil)" in depth_owner,
