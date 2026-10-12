@@ -1,0 +1,346 @@
+{
+  "schema": "outrun-C1-sha-bound-independent-fast-batch-v3",
+  "task_id": "OUTRUN-KOR-C1-20261013-0510-Q060-Q103-Q137-Q154",
+  "date_kst": "2026-10-13",
+  "branch": "korean-localization-recovery-20260928",
+  "reviewer": "ChatGPT C1 independent QA",
+  "policy_files": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md"
+  ],
+  "qa_scope": "NEW C1 SHA REVIEW OF EXISTING DISTINCT A/B UNPROMOTED SAVED DDS ONLY; no production",
+  "note": "Previous-role C2 findings may be reused only as historical SHA-pair technical evidence, never issuing or declaring new C2 tokens.",
+  "contact": {
+    "path": "localization/graphics/role_C1/20261013-C1-Q060-Q103-Q137-Q154-INDEPENDENT-SCOPED/C1_Q060_Q103_Q137_Q154_BATCH_7WAY.jpg",
+    "sha256": "9063f57998ca99ab7a43c770bc6d1c9bf5d016dc3b9f7bf90c8fe33cf5a826a6",
+    "columns": [
+      "SOURCE RAW",
+      "SOURCE READABLE/FLIPY",
+      "CLEAN if available",
+      "SAVED DDS RAW",
+      "SAVED DDS READABLE/FLIPY",
+      "SAVED 75% proxy",
+      "SAVED 50% proxy"
+    ],
+    "description": "Four candidate rows in one contact; full DDS decoded in ROIs. 75/50 are image-scale proxies, not actual game capture."
+  },
+  "candidates": [
+    {
+      "queue_index": 60,
+      "producer": "B369",
+      "translation": "BEST TIME: → 최고 기록:",
+      "source_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+      "clean_sha256": "a03687d4cd23ede4323dca63f07961061b7ba850c19c3a2f69764020a538bb48",
+      "final_sha256": "5b42316d777eb08c41f97e665b38e510c1df1820ecd74d78402efead26daddee",
+      "final_path": "localization/graphics/role_B/20261011-B369-Q060-SOURCE-CONDITIONED-HEAVY-CONTOURS/B369_Q060_CONTOUR_METAL_UNAPPROVED.dds",
+      "original_hd_path": "original HD A064FDFC; read-only cached bytes independently SHA matched",
+      "clean_path": "historical C391 exact SHA record; CLEAN image not materialized for independent pixel inspection",
+      "source_clean_review": {
+        "status": "HISTORICAL_SHA_PAIR_ONLY",
+        "observation": "Historical C391 machine report bound this exact source/CLEAN SHA with source→CLEAN 89391 pixels inside targeted original BEST TIME region; no new independently readable CLEAN pixels in this run"
+      },
+      "clean_final_review": {
+        "status": "HOLD",
+        "observation": "No byte-verifiable full CLEAN→B369 comparison in this run. Candidate seen in decoded saved DDS only."
+      },
+      "header": {
+        "width": 4096,
+        "height": 2048,
+        "bits": 32,
+        "mips": 1,
+        "header_equal": true,
+        "bc": "N/A"
+      },
+      "inspected_readable_roi": [
+        2090,
+        295,
+        3080,
+        520
+      ],
+      "inspected_texts": 1,
+      "known_untranslated_in_scope": 0,
+      "other_texts": "UNKNOWN",
+      "source_final_changed_pixels_in_roi": 148853,
+      "changed_outside_one_source_effect_bbox_in_roi": 56387,
+      "unproven_change_bounds": [
+        2090,
+        295,
+        3063,
+        520
+      ],
+      "hard_defect_coords": [],
+      "evidence_gap_coords": [
+        [
+          2090,
+          295,
+          3080,
+          520
+        ]
+      ],
+      "verdict": "HOLD",
+      "reason": "Other preexisting atlas translations intersect review ROI; source-vs-final out-of-bbox differences cannot be assigned to protected art and source/CLEAN persisted byte relationship not independently inspected. Saved 최고 기록: is legible at native/75/50; no fabricated hard FAIL.",
+      "scope": "ONE BEST TIME TEXT ONLY",
+      "C3": "NOT_RUN",
+      "runtime": "UNTESTED"
+    },
+    {
+      "queue_index": 103,
+      "producer": "A252",
+      "translation": "Normal Balance → 일반 밸런스",
+      "source_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+      "clean_sha256": "58d90ffa978119b69d208ae30ac06c42b0a2763ef8d839dc95fadfe2c36b9902",
+      "final_sha256": "f27215f981457c6448fb7a84348998b525a13092b732b3e7de244e3a0f587fce",
+      "final_path": "localization/graphics/role_A/20261012-A252-Q103-NATIVE-BOLD-CLEAN/A252_Q103_NEW_NATIVE_BOLD_UNPROMOTED.dds",
+      "original_hd_path": "canonical HD 590A4724; locally cached exact SHA",
+      "clean_path": "SOURCE-derived cropped clean 454x105, work/c2_20261012_q103_A252/A224_CLEAN_NATIVE.png",
+      "source_clean_review": {
+        "status": "SHA_VERIFIED_CROPPED_INDEPENDENT_EVIDENCE_REUSE",
+        "observation": "Same exact SOURCE/CLEAN sha pair previously independently reported: SOURCE→CLEAN 7439 changed RGBA pixels in source glyph effect bbox, outside0. CLEAN only cropped ROI, not a full atlas."
+      },
+      "clean_final_review": {
+        "status": "CROPPED_SHA_PAIR_REUSED_PLUS_NEW_SAVED_DDS_VISUAL",
+        "observation": "Historical source/CLEAN/final exact SHA triple reported CLEAN→A252 5416 changed RGBA pixels, outside source effect region0. Current inspection independently decoded A252 RAW/FLIPY and 75/50."
+      },
+      "header": {
+        "width": 2048,
+        "height": 2048,
+        "bits": 32,
+        "mips": 1,
+        "header_equal": true,
+        "bc": "N/A"
+      },
+      "inspected_readable_roi": [
+        1320,
+        1900,
+        1850,
+        2048
+      ],
+      "source_effect_bbox": [
+        1432,
+        1980,
+        1786,
+        2025
+      ],
+      "inspected_texts": 1,
+      "known_untranslated_in_scope": 0,
+      "other_texts": "UNKNOWN",
+      "source_final_changed_pixels_in_roi": 10027,
+      "changed_outside_one_source_effect_bbox_in_roi": 0,
+      "hard_defect_coords": [],
+      "verdict": "C1_STATIC_PASS",
+      "reason": "The one translated label is readable in saved DDS native/75/50 with matched RAW/FLIPY; the 10027 edited pixels stay inside original glyph effect bbox. No padding extrapolation or full UI UV pass.",
+      "scope": "ONE NORMAL BALANCE LABEL ONLY",
+      "release_gate": "TEST_ONLY/HOLD",
+      "C3": "NOT_RUN",
+      "runtime": "UNTESTED"
+    },
+    {
+      "queue_index": 137,
+      "producer": "B319",
+      "translation": "Transmission selection and related six Korean labels",
+      "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+      "clean_sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+      "final_sha256": "0c988e8b06010a0f003445d8b068a45871202bf0c3bcbf61dd5c203954458d22",
+      "final_path": "localization/graphics/role_B/20261009-B319-Q137-P0-LONGFORM-TOP-TITLE/B319_TRIAL_NOT_PROMOTED.dds",
+      "original_hd_path": "canonical HD 30CF0D; read-only cached SHA verified",
+      "clean_path": "work/c2_20261012_q137_p0_transmission/clean.png",
+      "source_clean_review": {
+        "status": "SCOPED_SHA_BOUND_STATIC_PASS",
+        "changed_rgba_pixels_within_review_roi": 107239,
+        "changed_outside_6_documented_source_effect_regions": 0
+      },
+      "clean_final_review": {
+        "status": "SCOPED_SHA_BOUND_STATIC_PASS",
+        "changed_rgba_pixels_within_review_roi": 102374,
+        "changed_outside_6_documented_source_effect_regions": 0
+      },
+      "header": {
+        "width": 2048,
+        "height": 1024,
+        "bits": 32,
+        "mips": 1,
+        "header_equal": true,
+        "bc": "N/A"
+      },
+      "inspected_readable_roi": [
+        0,
+        45,
+        1810,
+        343
+      ],
+      "source_effect_regions": [
+        [
+          1,
+          235,
+          397,
+          315
+        ],
+        [
+          889,
+          233,
+          1775,
+          315
+        ],
+        [
+          14,
+          148,
+          339,
+          210
+        ],
+        [
+          822,
+          147,
+          1376,
+          216
+        ],
+        [
+          5,
+          67,
+          868,
+          130
+        ],
+        [
+          1288,
+          96,
+          1569,
+          128
+        ]
+      ],
+      "inspected_texts": 6,
+      "known_untranslated_in_scope": 0,
+      "other_texts": "UNKNOWN",
+      "source_final_changed_pixels_in_roi": 139417,
+      "changed_outside_six_documented_effect_regions_in_roi": 0,
+      "hard_defect_coords": [],
+      "verdict": "C1_STATIC_PASS",
+      "reason": "Six labels readable in exact persisted B319 RAW/FLIPY/75/50 inspection; all measured SOURCE→CLEAN→FINAL changes limited to documented six original effect regions. Actual UI UV cell and full atlas not certified.",
+      "scope": "SIX TRANSMISSION TEXTS ONLY",
+      "release_gate": "TEST_ONLY/HOLD",
+      "user_issue": "P0 IGR041 OPEN_USER_INGAME_FAIL",
+      "C3": "NOT_RUN",
+      "runtime": "UNTESTED"
+    },
+    {
+      "queue_index": 154,
+      "producer": "B355",
+      "translation": "SINGLE PLAYER → 싱글 플레이; SHOWROOM → 쇼룸",
+      "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+      "clean_sha256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+      "final_sha256": "4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87",
+      "final_path": "localization/graphics/role_B/20261010-B355-Q154-HISTORIC-NATIVE-COUNTER-INTERPOLATION/B355_Q154_GRAY_FAMILY_HALF_PIXEL_UNAPPROVED.dds",
+      "original_hd_path": "canonical HD 4D38BBB0; read-only cached SHA verified",
+      "clean_path": "localization/graphics/role_C/20261005-C141-4D38BBB0/C141_EXACT_CLEAN_PLATE.png; B355 specific clean linkage NOT PROVEN",
+      "source_clean_review": {
+        "status": "HOLD_UNBOUND_FULL_CLEAN",
+        "source_clean_changed_in_inspection_roi": 40381,
+        "changed_outside_two_documented_text_bboxes_in_roi": 6050,
+        "other_changes_bbox": [
+          1772,
+          374,
+          3150,
+          385
+        ]
+      },
+      "clean_final_review": {
+        "status": "HOLD_UNBOUND_AND_UNINSPECTED_NEIGHBORS",
+        "clean_final_changed_in_inspection_roi": 27285,
+        "changed_outside_two_documented_bboxes_in_roi": 1157,
+        "other_changes_bbox": [
+          1898,
+          378,
+          2724,
+          385
+        ]
+      },
+      "header": {
+        "width": 4096,
+        "height": 1024,
+        "bits": 32,
+        "mips": 1,
+        "header_equal": true,
+        "bc": "N/A"
+      },
+      "inspected_readable_roi": [
+        1550,
+        242,
+        3150,
+        385
+      ],
+      "source_effect_regions": [
+        [
+          1610,
+          286,
+          2197,
+          350
+        ],
+        [
+          2674,
+          288,
+          3094,
+          350
+        ]
+      ],
+      "inspected_texts": 2,
+      "known_untranslated_in_scope": 0,
+      "other_texts": "At least 1 gray sibling and 5+ other atlas cells not checked in this scoped board; total UNKNOWN",
+      "source_final_changed_pixels_in_roi": 46880,
+      "changed_outside_two_documented_bboxes_in_roi": 5979,
+      "hard_defect_coords": [],
+      "evidence_gap_coords": [
+        [
+          1772,
+          374,
+          3150,
+          385
+        ],
+        [
+          1898,
+          378,
+          2724,
+          385
+        ]
+      ],
+      "verdict": "HOLD",
+      "reason": "Both labels legible, but adjacent red/other atlas content falls outside the two examined text bboxes; this is an evidence gap, not proof of new protected-art damage. Candidate-specific CLEAN binding and surrounding sampled UV unverified; no invented tolerances.",
+      "scope": "TWO GRAY UI LABELS ONLY",
+      "release_gate": "TEST_ONLY/HOLD",
+      "C3": "NOT_RUN",
+      "runtime": "UNTESTED"
+    }
+  ],
+  "summary": {
+    "distinct_candidate_dds": 4,
+    "verified_source_dds_sha": 4,
+    "verified_trial_saved_dds_sha": 4,
+    "checked_inspected_labels": 10,
+    "known_untranslated_in_inspected_scope": 0,
+    "unknown_untranslated_outside_scope": "UNKNOWN_NOT_COUNTED",
+    "C1_STATIC_PASS_SCOPED": 2,
+    "HOLD": 2,
+    "REWORK": 0,
+    "full_atlas_PASS": 0,
+    "current_release_approved": 0,
+    "new_imagegen_png": 0,
+    "new_dds": 0,
+    "official_asset_promotions": 0,
+    "unverified_uv": "NO_EXTRA_BLANK_PX_ASSUMPTIONS"
+  },
+  "legacy_gate": "Current qa_evidence_gate.py C2 consumer not migrated; all findings TEST_ONLY/HOLD for releases",
+  "runtime_validation": "UNTESTED",
+  "C3": "NOT_RUN",
+  "user_game": "NOT_RUN",
+  "manual_deploy": {
+    "Docker": "NO_CHANGE",
+    "Portainer": "NO_CHANGE",
+    "AUTO_SEND": "NOT_TOUCHED",
+    "game_installs": "NOT_TOUCHED",
+    "releases": 0
+  },
+  "exclusions": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "dedup": "C1 role_C1 prior QA SHA and path history scanned before selection; selected four saved trial DDS SHA were absent from that C1 SHA report corpus. Previous C2 reports are historical source/CLEAN provenance only."
+}
