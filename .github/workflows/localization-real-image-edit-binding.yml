@@ -29,6 +29,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # This repository contains large HD DDS/PSD evidence. The read-only
+          # preflight only needs the image binding inputs and two unit suites.
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            tools/localization/
+            localization/graphics/role_B/imagegen_requests/q048_B_OPENAI_EDIT_SOURCE_REQUEST.json
+            localization/graphics/role_B/imagegen_requests/q092_B_OPENAI_EDIT_SOURCE_REQUEST.json
+            localization/graphics/role_B/source_references/q048_20261012/
+            localization/graphics/role_B/source_references/q092_20261012/
+            localization/graphics/role_C1/imagegen_requests/q102_C1_OPENAI_EDIT_SOURCE_REQUEST.json
+            localization/graphics/role_C1/imagegen_requests/q102_LINE2_C1_OPENAI_EDIT_SOURCE_REQUEST.json
+            localization/graphics/role_C1/source_references/q102_20261012/
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
