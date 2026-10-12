@@ -87,9 +87,31 @@ def negative_readiness_hotpath(src: str) -> None:
         ("if (!R33PrepareRightDepthStereo(device))", "if (false)"),
         ("R32ReviewFrameStereoPoseSequence();", "0;"),
     )
+    # The source can contain unrelated guards with the same text before
+    # R33PrepareRightDepthStereo. Mutate the producer itself, otherwise a
+    # negative test silently edits the wrong function and reports a false FAIL.
+    begin = src.index("bool R33PrepareRightDepthStereo(")
+    end = src.index("void R33InvalidateRightForLeftWrite(", begin)
     for i, (before, after) in enumerate(changes, 1):
-        assert before in src, ("mutation anchor absent", i)
-        mutant = src.replace(before, after, 1)
+        if i <= 8:
+            helper = src[begin:end]
+            # Tests 5/6 specifically damage post-bootstrap resampling, not
+            # the first readiness declarations (which share an assignment).
+            if i in (5, 6):
+                start = helper.index("R32ReviewTryBootstrapRightDepth(device);")
+                prefix, suffix = helper[:start], helper[start:]
+                assert before in suffix, ("post-bootstrap mutation anchor absent", i)
+                mutated_helper = prefix + suffix.replace(before, after, 1)
+            else:
+                assert before in helper, ("helper mutation anchor absent", i)
+                mutated_helper = helper.replace(before, after, 1)
+            mutant = src[:begin] + mutated_helper + src[end:]
+        else:
+            # Route-level mutations: one caller or one pose snapshot must
+            # fail the all-routes invariant even if the other path is intact.
+            assert before in src[end:], ("route mutation anchor absent", i)
+            mutant = src[:end] + src[end:].replace(before, after, 1)
+        assert mutant != src, ("mutation did not change source", i)
         try:
             check_readiness_hotpath(mutant)
         except (AssertionError, ValueError, IndexError):
