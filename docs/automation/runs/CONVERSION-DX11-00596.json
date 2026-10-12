@@ -2,17 +2,17 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00596",
   "production_id": "CONVERSION-DX11-00596",
-  "event_id": "CONVERSION-DX11-00596-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX11-00596-E003",
+  "event_type": "retry",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00596",
   "work_key": "DX11:MENU_RACE_NATIVE_ADDITIVE_OM",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "COMPLETE_BUILD_VERIFIED",
-  "checkpoint": "C6_STATE",
-  "automation_validation": "PASS_EXACT_SHA",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -59,11 +59,11 @@
   ],
   "packaging": {
     "status": "NOT_REQUIRED",
-    "reason": "No Quest3/VDXR-approved candidate required; this is an isolated native game frame opt-in diagnostic implementation"
+    "reason": "No new HMD-tested distributable candidate in diagnostic-only native Draw path"
   },
-  "next_action": "BUILD_VERIFIED / NEED_HMD_TEST: Quest3/VDXR real game menu->vehicle selection->race, gamepad input, display pixels and DX9Ex fallback require hardware observation. DXVK remains frozen; continue a new independent DX11 coding item.",
+  "next_action": "Quest3/VDXR real menu, vehicle selection, race, gamepad and diagnostic inset parity remain NEED_HMD_TEST; no production native backend promotion. Controller may choose independent next code feature; do not rerun 00596.",
   "runtime_evidence": null,
-  "ci_failure_repair": "Policy path identifier corrected in cbdda8bba3a123e8f6169fb88244845286bfa009 and duplicate-alpha regression repaired in exact-SHA 943c5ae8b37406cd6aad19dfdd8032c7851df960; no gate weakening.",
+  "ci_failure_repair": "Backend #38214462953 policy acceptance rejected VISIBLE_FRAME_DIAGNOSTIC; 1st fix cbdda8bba3a123e8f6169fb88244845286bfa009 updated documented live game path to VISIBLE_FRAME_OUTPUT. Build #38214568450 then identified alpha mutation false negative after introduction of a second SRC_ALPHA blend state; 2nd fix 943c5ae8b37406cd6aad19dfdd8032c7851df960 requires both occurrences. Both guards retained; full exact-SHA gates all succeeded.",
   "material_result_sha": "f51a51ca82650e60964f36b2954fb10bd31eeb76",
   "validation_bearing_result_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960",
   "result_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960",
@@ -114,5 +114,23 @@
     "00596 new native additive OM real game Draw/DrawIndexed source path: GitHub Backend Gate 00596 test SUCCESS with 17 destructive mutations and alpha factor numeric tests",
     "Previously existing alpha/mask regression repaired to reject duplicate source-alpha blend-factor mutation; Windows Build exact-SHA SUCCESS",
     "DX11 Fast + Backend validate/readiness + Win32 Build + OpenXR + HUD exact-SHA all SUCCESS"
-  ]
+  ],
+  "validation_bearing_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960",
+  "evidence": {
+    "backend_gate_conclusion": "success",
+    "backend_gate_run": 38214680810,
+    "backend_gate_jobs": [
+      "validate:SUCCESS",
+      "DX11 readiness smoke probes:SUCCESS"
+    ],
+    "windows_build_run": 38214685415,
+    "windows_build_conclusion": "success",
+    "dx11_fast_run": 38214680841,
+    "dx11_fast_conclusion": "success",
+    "openxr_run": 38214685559,
+    "openxr_conclusion": "success",
+    "hud_run": 38214685265,
+    "hud_conclusion": "success",
+    "result_sha": "943c5ae8b37406cd6aad19dfdd8032c7851df960"
+  }
 }
