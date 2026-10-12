@@ -11,9 +11,9 @@
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "target_branch": "vr-dx11-native-r71",
   "base_head_sha": "bbdf77961af5e1251828a1a7d4ea880326eb4799",
-  "status": "IMPLEMENTED_PENDING_FULL_GATE",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -57,5 +57,31 @@
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Check mandatory exact-SHA Actions, keep HMD/input UNTESTED; next independent code increment when done."
+  "next_action": "00622 exact-SHA CI complete: no same-TASK retry. Continue independent source implementation on next 30min dispatch. Physical menu/car/race, gamepad and Quest3/VDXR remain NEED_HMD_TEST; default-off DX9Ex fallback maintained.",
+  "validation_bearing_result_sha": "6a2de27e67abc9c5e68c4c76e6b2aae5f13a365a",
+  "result_sha": "6a2de27e67abc9c5e68c4c76e6b2aae5f13a365a",
+  "evidence": {
+    "backend_gate_conclusion": "success",
+    "backend_gate_run_id": 38281748614,
+    "dx11_fast_conclusion": "success",
+    "dx11_fast_run_id": 38281748515,
+    "windows_build_conclusion": "success",
+    "windows_build_run_id": 38281753499,
+    "openxr_push_conclusion": "success",
+    "openxr_push_run_id": 38281748535,
+    "openxr_pr_conclusion": "success",
+    "openxr_pr_run_id": 38281753453,
+    "hud_inspector_conclusion": "success",
+    "hud_inspector_run_id": 38281753412,
+    "game_quest3_vdxr": "UNTESTED",
+    "gamepad_input": "UNTESTED",
+    "native_visual_parity": "NEED_HMD_TEST",
+    "score": {
+      "prior": 1150,
+      "delta": 1,
+      "cumulative": 1151,
+      "run_key": "CONVERSION-DX11-00622",
+      "scoreboard_sha": "3a362bf10af894a5497c07ada3824730a703434d"
+    }
+  }
 }
