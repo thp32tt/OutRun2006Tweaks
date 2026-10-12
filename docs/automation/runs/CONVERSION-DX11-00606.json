@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00606",
   "work_key": "DX11:LIVE_COMPLEMENT_MODULATION",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -46,7 +46,7 @@
       "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "BUILD_VERIFIED pending CI; actual Quest3/VDXR menu/vehicle/race frame remains NEED_HMD_TEST",
+    "visible_frame_acceptance": "BUILD_VERIFIED / NEED_HMD_TEST: no Quest3/VDXR menu/vehicle/race actual runtime evidence",
     "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 opt-in; original D3D9 game drawing and gamepad handling retained"
   },
   "changed_files": [
@@ -59,6 +59,54 @@
     "status": "NOT_REQUIRED",
     "reason": "Diagnostic opt-in code without hardware parity signoff; user packages later"
   },
-  "next_action": "Check exact-SHA GitHub Actions and record result only if Gate SUCCESS; Quest3/VDXR runtime untested",
-  "ci_summary": "Pending exact-SHA Backend, DX11 Fast, OpenXR; no runtime/gamepad test."
+  "next_action": "00606 exact-SHA Gates complete; continue independent new DX11 menu->vehicle->race implementation. Quest3/VDXR and gamepad parity remain NEED_HMD_TEST.",
+  "ci_summary": "Exact-SHA Backend Conversion Gate (validate + readiness WARP), Build Win32 Release, DX11 Fast Structural Checks, OpenXR VR architecture, OutRun EXE HUD Inspector CI all SUCCESS. VR PC Fast Test Build skipped; HMD/gamepad runtime UNTESTED.",
+  "result_sha": "b9988bbf6e0e28bc10bb6a656d765766d44397ca",
+  "validation_bearing_sha": "b9988bbf6e0e28bc10bb6a656d765766d44397ca",
+  "validation_bearing_result_sha": "b9988bbf6e0e28bc10bb6a656d765766d44397ca",
+  "material_commit": "b9988bbf6e0e28bc10bb6a656d765766d44397ca",
+  "evidence": {
+    "backend_gate_conclusion": "success",
+    "exact_sha": "b9988bbf6e0e28bc10bb6a656d765766d44397ca",
+    "gamepad_test_performed": false,
+    "hmd_test_performed": false
+  },
+  "validation_runs": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38237173698,
+      "conclusion": "success",
+      "head_sha": "b9988bbf6e0e28bc10bb6a656d765766d44397ca",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38237173698"
+    },
+    {
+      "name": "Build",
+      "run_id": 38237180213,
+      "conclusion": "success",
+      "head_sha": "b9988bbf6e0e28bc10bb6a656d765766d44397ca",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38237180213"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38237173675,
+      "conclusion": "success",
+      "head_sha": "b9988bbf6e0e28bc10bb6a656d765766d44397ca",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38237173675"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38237180205,
+      "conclusion": "success",
+      "head_sha": "b9988bbf6e0e28bc10bb6a656d765766d44397ca",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38237180205"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38237180188,
+      "conclusion": "success",
+      "head_sha": "b9988bbf6e0e28bc10bb6a656d765766d44397ca",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38237180188"
+    }
+  ],
+  "not_triggered_workflows": []
 }
