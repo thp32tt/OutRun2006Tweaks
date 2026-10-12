@@ -1993,7 +1993,8 @@ namespace OutRunVRStereo
         bool R30XyzrhwHasProjectedDepthSignature(
             const void* source, UINT vertexCount, UINT stride,
             const R30XyzrhwState& state, const D3DMATRIX& projection,
-            const std::vector<std::uint8_t>* usedMask) noexcept
+            const std::vector<std::uint8_t>* usedMask,
+            const std::vector<std::uint32_t>* touched) noexcept
         {
             if (!source || vertexCount == 0 || stride < sizeof(float) * 4)
                 return false;
@@ -2031,8 +2032,37 @@ namespace OutRunVRStereo
             // only (indexed usedMask may skip holes). Check in 16-sample blocks
             // so the bound arithmetic does not cost more than the depth work.
             const UINT sampleLimit = vertexCount < 512u ? vertexCount : 512u;
-            for (UINT i = 0; i < vertexCount && sampled < 512u; ++i)
+            // Indexed-UP/IB producers already supply a unique touched list
+            // and a matching mask. On small referenced sets, walking the
+            // entire [min,max] vertex span (often thousands of empty slots)
+            // costs more than depth math. At <=512 unique references every
+            // referenced vertex is considered, irrespective of visit order;
+            // the conservative early-exit bounds are order-independent.
+            // Larger sets retain the original ascending first-512 sampling
+            // to preserve exact HUD/world classification.
+            bool fastTouched = usedMask && touched && !touched->empty() &&
+                touched->size() <= 512u &&
+                touched->size() <= vertexCount &&
+                usedMask->size() >= vertexCount;
+            if (fastTouched)
             {
+                // Validate the entire bounded list before the first early
+                // classification decision; a corrupt hint falls back to the
+                // original dense scan, never to a partial sample.
+                for (const std::uint32_t index : *touched)
+                {
+                    if (index >= vertexCount || (*usedMask)[index] == 0)
+                    {
+                        fastTouched = false;
+                        break;
+                    }
+                }
+            }
+            const UINT visitCount = fastTouched
+                ? static_cast<UINT>(touched->size()) : vertexCount;
+            for (UINT visit = 0; visit < visitCount && sampled < 512u; ++visit)
+            {
+                const UINT i = fastTouched ? (*touched)[visit] : visit;
                 if (usedMask &&
                     (i >= usedMask->size() || (*usedMask)[i] == 0))
                     continue;
@@ -2109,7 +2139,8 @@ namespace OutRunVRStereo
             const std::vector<std::uint8_t>* usedMask = nullptr,
             const R30ShadowCopyCache* vertexCopy = nullptr,
             const R30ShadowCopyCache* indexCopy = nullptr,
-            R30XyzrhwDepthSignatureCache* signatureCache = nullptr) noexcept
+            R30XyzrhwDepthSignatureCache* signatureCache = nullptr,
+            const std::vector<std::uint32_t>* touched = nullptr) noexcept
         {
             float projectionRaw[16]{};
             D3DMATRIX baseProjection{};
@@ -2151,7 +2182,7 @@ namespace OutRunVRStereo
                 state.rhwDepthEvidence = haveBaseProjection &&
                     R30XyzrhwHasProjectedDepthSignature(
                         source, vertexCount, stride, state,
-                        baseProjection, usedMask);
+                        baseProjection, usedMask, touched);
                 if (canMemoize)
                 {
                     signatureCache->valid = false;
@@ -3618,7 +3649,8 @@ namespace OutRunVRStereo
 
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, vertexData, vertexCount, stride, state,
-                    &scratch.upUsed))
+                    &scratch.upUsed, nullptr, nullptr, nullptr,
+                    &scratch.upTouched))
             {
                 ++R30XyzrhwFallbacks;
                 return E_NOTIMPL;
@@ -3995,7 +4027,8 @@ namespace OutRunVRStereo
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, scratch.source.data(), vertexCount,
                     stride, state, &scratch.used, &scratch.vertexCopy,
-                    &scratch.indexCopy, &scratch.depthSignature) ||
+                    &scratch.indexCopy, &scratch.depthSignature,
+                    &scratch.vbTouched) ||
                 !R30TransformXyzrhwStereo(
                     scratch.source.data(), vertexCount, stride, state,
                     scratch.left, scratch.right,
