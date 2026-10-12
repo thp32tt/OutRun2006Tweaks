@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_PM_RGB_BLENDDIFFUSEALPHA_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "84658fc71b6e7433deba1cb6b9458ec87db3ab55",
-  "status": "CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -58,13 +58,43 @@
     "C0_RECOVER": "PASS: remote HEAD and prior 00627 checked",
     "C1_REVIEW": "PASS: PM RGB + BLENDDIFFUSEALPHA not routed",
     "C2_IMPLEMENT": "PASS: live capture HLSL native Draw and regression",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "Material source commit with [AUTO:CONVERSION-DX11-00628]",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Conversion Gate #38294185382 validate and readiness smoke SUCCESS; DX11 Fast #38294185360, Windows Build #38294190182, OpenXR #38294190198, HUD Inspector #38294190216 SUCCESS",
+    "C4_COMMIT": "PASS: material 7f06895397e00cba9ea5f87a565e0f899e2ef483, actual failed-test repair 45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5 (validation-bearing, no CI skip)",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING: runtime remains UNTESTED"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; RUNTIME_VALIDATION=UNTESTED; exact-SHA result 45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Check exact-SHA mandatory GitHub Actions and repair any failure; do not claim Quest3 PASS."
+  "next_action": "C6 complete. Next independent DX11 unimplemented live renderer/vehicle/game input task only, not rerun 00628. Quest3/VDXR and gamepad runtime remain UNTESTED.",
+  "validation_bearing_result_sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5",
+  "material_source_sha": "7f06895397e00cba9ea5f87a565e0f899e2ef483",
+  "result_sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5",
+  "validation_runs": {
+    "backend_gate": {
+      "id": 38294185382,
+      "conclusion": "success",
+      "sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5"
+    },
+    "dx11_fast": {
+      "id": 38294185360,
+      "conclusion": "success",
+      "sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5"
+    },
+    "windows_build": {
+      "id": 38294190182,
+      "conclusion": "success",
+      "sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5"
+    },
+    "openxr": {
+      "id": 38294190198,
+      "conclusion": "success",
+      "sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5"
+    },
+    "hud_inspector": {
+      "id": 38294190216,
+      "conclusion": "success",
+      "sha": "45a63f5f924eb4ecfc2352edc4de0d0edcedf7c5"
+    }
+  }
 }
