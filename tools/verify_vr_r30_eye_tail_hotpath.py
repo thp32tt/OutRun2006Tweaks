@@ -145,7 +145,7 @@ def verify(source: str):
         "if (state.worldEffect && state.fullWorldReprojection &&", 1)[1].split(
         "if (fullDrawOk && selectedVertices != 0)", 1)[0]
     eye_tail = "state.eyeTail[eye].m[row][col];"
-    assert vertices.count(eye_tail) == 2
+    assert vertices.count(eye_tail) == 1
     assert full.count(eye_tail) == 1
     assert fused.count(eye_tail) == 1
     assert "for (int eye = 0; eye < 2; ++eye)" in fused
