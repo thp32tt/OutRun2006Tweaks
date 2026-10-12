@@ -57,6 +57,7 @@
   },
   "required_source_archive_sha256": "e17db462fcad129d737d385d78f0dd45a569e7640c0c8fc16f5b24e5980b1c57",
   "next_actions": [
+    "B 2026-10-12 15:30 OUTRUN-B-Q044-STAGE-RIVAL-IMAGEGEN-INPUTS-20261012-1530 created actual stage/rival separate canonical English-only transparent input PNG 2 + entire readable HD atlas PNG, direct SHA raw source comparison. Existing Korean two-row only size PASS translation length variance; original source family REWORK remains. Actual generator source attachment missing, new Korean PNG/DDS 0. C1 independent/game UNTESTED.",
     "B q104 OUTRUN-KOR-B-Q104-CANONICAL-BC3-RAW-PRESERVE-CLEAN-20261012-1430: new canonical HD English-only PNG + exact SOURCE-derived CLEAN alpha 118098 removed; raw outside original glyph/effect bbox RGBA0 changed / 380503 hidden alpha0 RGB preserved. Historical existing Korean DDS c84a2703 size-only producer PASS_translation_length (native/75/50 readable, source bbox exceed0), angular/stipple source-style REWORK unchanged; C1 independent plate/glyph review + actual bound ImageGen pending, new Korean PNG0/DDS0, C3/game UNTESTED.",
     "C1 2026-10-12 q030 NEW first native source-style English glyph-only translucent references for dual Total Rank title: upstream flagman PSD 32,399,305B SHA256 e2d7166a41aed53fa637a09490fddb188fa332b13f9efca46dc1897538732cb6 / Git blob a2fa10346185ef39e1dcb753184b0e605f3c7829 verified locally (catalog NOT_COPIED). Native PSD scenes starburst9/pink11 4096x2048; first mask leaked orange decoration and was REJECTED locally, second navy-outline/contained-white reconstruction yields two actual transparent English glyph-only PNG SHA256 73393bc327c72e25f8fdb3db2b1a457897fd6559c5053241da5eb2f771692f4e (582x149 21005B) and 234196c217f4282e410eb91ab35ef876d652a2bce25f44fd16acf1afb47729fc (583x148 22971B). SHA-backed native source RGB for all positive alpha=unchanged0; non-target background and orange star lines visibly excluded, transparent border 24px; PSD masked derivation not Photoshop text-leaf or canonical DDS pixel-exact/C2 CLEAN pass. Actual ImageGen reference attachment not proven: SOURCE_REFERENCE_NOT_BOUND, Korean PNG0, new DDS0, B q030/C392 STRICT REWORK unchanged, C2/C3/user game NOT_RUN, RUNTIME_VALIDATION=UNTESTED. Evidence localization/graphics/role_C1/source_references/q030_20261012/q030_C1_SOURCE_MEDIA_PREFLIGHT.json. RUN_KEY=OUTRUN-C1-20261012-Q030-PSD-SOURCE-GLYPH-EXTRACTION-0740.",
     "B407 q048 OUTRUN-KOR-B-Q048-P1-CANONICAL-STREAK-RESTORE-20261012-0730: new unpromoted exact native 2048² DDS SHA b17750c7bee787be04bd62d553e2cbe8f08c82ffaffdd272dd673fb3cd92c8a7, 415 source cyan streak pixels restored and protected art fixed only (candidate/other atlas exactly preserved). C393 Korean family morphology REWORK pending, user IGR009 open; no ImageGen Korean new, C2/C3/runtime game UNTESTED.",
@@ -16793,5 +16794,57 @@
     "user_game": "UNTESTED",
     "RUNTIME_VALIDATION": "UNTESTED",
     "note": "Source PNG preparation is a newly created handoff input, not a translated output, not a producer pass. Actual source image needs to be attached to ChatGPT user message before native generation. User's strict original effect bbox/underfill condition in prompt; no false approval."
+  },
+  "b_q044_stage_rival_real_source_input_20261012_1530": {
+    "role": "B",
+    "index": 44,
+    "queue_index": 44,
+    "run_key": "OUTRUN-B-Q044-STAGE-RIVAL-IMAGEGEN-INPUTS-20261012-1530",
+    "asset": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+    "source_hd_dds_sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+    "source_hd_readable_png_sha256": "f748b959ef66affbdca7023def3ea3d1823c7ac43cc4222a7e068c5f43b6c82e",
+    "source_hd_readable_png_path": "localization/graphics/role_B/source_references/q044_20261012/q044_HD_READABLE_FULL_SOURCE.png",
+    "source_stage_english_only_png_sha256": "e53a72dbf70a12e14d272295817f1fb586b3fb9f3ee67c22e4c8497003dd9723",
+    "source_rival_english_only_png_sha256": "b8beb84c8a4ad061cebab5b3fcf88242c147da394ed1b5599fd604c466c673ed",
+    "source_stage_alpha_positive": 11145,
+    "source_rival_alpha_positive": 12296,
+    "original_effect_bbox_stage": [
+      571,
+      179,
+      765,
+      259
+    ],
+    "original_effect_bbox_rival": [
+      498,
+      1412,
+      705,
+      1486
+    ],
+    "existing_korean_sha256": "2250de2b7fbe1578750c422c05bd5f3b5785a0bd5006a4afcfb4cbc26ebbe620",
+    "existing_stage_bbox": [
+      576,
+      183,
+      760,
+      255
+    ],
+    "existing_rival_bbox": [
+      510,
+      1415,
+      693,
+      1483
+    ],
+    "producer_glyph_scale_scoped": "PASS_TRANSLATION_LENGTH_VARIANCE_BBOX_0_OVERFLOW_NATIVE75_50_READABLE_TWO_ROWS_ONLY",
+    "whole_candidate": "REWORK_HISTORICAL_STAGE_RIVAL_SOURCE_FAMILY_PENDING_TRUE_IMAGEGEN",
+    "source_png_only_production": true,
+    "new_korean_png": 0,
+    "new_trial_dds": 0,
+    "official_promoted": 0,
+    "real_model_input_binding": "SOURCE_REFERENCE_NOT_BOUND",
+    "manifest": "localization/graphics/role_B/source_references/q044_20261012/q044_B_NATIVE_IMAGEGEN_TWO_ROW_HANDOFF.json",
+    "qa": "localization/graphics/role_B/source_references/q044_20261012/q044_B_STAGE_RIVAL_SOURCE_PRODUCTION_QA.json",
+    "C1": "NOT_RUN_INDEPENDENT",
+    "C2": "RETIRED_HISTORY_NOT_NEW_PASS",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
