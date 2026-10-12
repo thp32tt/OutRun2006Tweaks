@@ -2183,7 +2183,8 @@ namespace
         bool RenderTo(ID3D11RenderTargetView* rtv, std::uint32_t w, std::uint32_t h,
             const UvRect& uv, ID3D11ShaderResourceView* sourceSrv,
             DXGI_FORMAT sourceFormat, int projectionEye = -1,
-            bool reusePairPipeline = false)
+            bool reusePairPipeline = false,
+            bool deferFirstEyeUnbind = false)
         {
             if (!rtv || !sourceSrv || !constantBuffer_) return false;
             // Only the consecutive right-eye projection may reuse common
@@ -2244,10 +2245,15 @@ namespace
             context_->PSSetShaderResources(0, 1, &sourceSrv);
             context_->PSSetConstantBuffers(0, 1, &blitBuffer);
             context_->Draw(3, 0);
-            ID3D11ShaderResourceView* nullSrv = nullptr;
-            context_->PSSetShaderResources(0, 1, &nullSrv);
-            ID3D11RenderTargetView* nullRtv = nullptr;
-            context_->OMSetRenderTargets(1, &nullRtv, nullptr);
+            // Eye 1 immediately replaces both bindings. The owner must
+            // unbind explicitly if its second submission fails before Draw.
+            if (!(deferFirstEyeUnbind && projectionEye == 0))
+            {
+                ID3D11ShaderResourceView* nullSrv = nullptr;
+                context_->PSSetShaderResources(0, 1, &nullSrv);
+                ID3D11RenderTargetView* nullRtv = nullptr;
+                context_->OMSetRenderTargets(1, &nullRtv, nullptr);
+            }
             return true;
         }
 

@@ -48,6 +48,17 @@ int main()
     EXPECT(!CanReuseCommonPipeline(true, 0, 1, 3440, 1440, 3440, 1080));
     EXPECT(!CanReuseCommonPipeline(true, 0, 1, 0, 1440, 0, 1440));
     EXPECT(!CanReuseCommonPipeline(true, 0, 1, 3440, 0, 3440, 0));
+    // Adjacent same-extent projection eyes defer only eye-0 resource unbind.
+    using OutRunVrProjectionPair::CanDeferFirstEyeUnbind;
+    EXPECT(CanDeferFirstEyeUnbind(0, 1, 2064, 2208, 2064, 2208));
+    EXPECT(!CanDeferFirstEyeUnbind(1, 0, 2064, 2208, 2064, 2208));
+    EXPECT(!CanDeferFirstEyeUnbind(0, 0, 2064, 2208, 2064, 2208));
+    EXPECT(!CanDeferFirstEyeUnbind(1, 1, 2064, 2208, 2064, 2208));
+    EXPECT(!CanDeferFirstEyeUnbind(0, 2, 2064, 2208, 2064, 2208));
+    EXPECT(!CanDeferFirstEyeUnbind(0, 1, 2064, 2208, 1920, 2208));
+    EXPECT(!CanDeferFirstEyeUnbind(0, 1, 2064, 2208, 2064, 2048));
+    EXPECT(!CanDeferFirstEyeUnbind(0, 1, 0, 2208, 0, 2208));
+    EXPECT(!CanDeferFirstEyeUnbind(0, 1, 2064, 0, 2064, 0));
     // R23 LOCAL-fixed menu uses an identical clip and source for both eyes.
     // A failed first submission or discontinuity must not skip rebind/upload.
     using OutRunVrMenuPair::PlanSecondEye;

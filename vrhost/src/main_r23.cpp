@@ -1274,9 +1274,16 @@ namespace
 
         std::uint32_t image = 0;
         c.Acquire(c.projection_, image);
+        // The adjacent right-eye draw replaces eye 0's RTV/SRV; it still
+        // binds and draws independently and performs final resource cleanup.
+        const bool deferFirstEyeUnbind =
+            OutRunVrProjectionPair::CanDeferFirstEyeUnbind(
+                0, 1, c.projection_.width, c.projection_.height,
+                c.projection_.width, c.projection_.height);
         const bool firstEyeOk = c.RenderTo(
             c.projection_.rtvs[image][0], c.projection_.width,
-            c.projection_.height, eyes[0], srv[0], fmt[0], 0);
+            c.projection_.height, eyes[0], srv[0], fmt[0], 0,
+            false, deferFirstEyeUnbind);
         // No graphics-context operations intervene between eye submissions.
         // If eye 0 failed (including Map), eye 1 uses the full state setup.
         const bool secondEyeOk = c.RenderTo(
@@ -1285,6 +1292,15 @@ namespace
             OutRunVrProjectionPair::CanReuseCommonPipeline(
                 firstEyeOk, 0, 1, c.projection_.width, c.projection_.height,
                 c.projection_.width, c.projection_.height));
+        // On a failed eye-1 Map the deferred eye-0 bindings still exist.
+        // Always clear them before releasing the OpenXR swapchain image.
+        if (deferFirstEyeUnbind && firstEyeOk && !secondEyeOk)
+        {
+            ID3D11ShaderResourceView* nullSrv = nullptr;
+            c.context_->PSSetShaderResources(0, 1, &nullSrv);
+            ID3D11RenderTargetView* nullRtv = nullptr;
+            c.context_->OMSetRenderTargets(1, &nullRtv, nullptr);
+        }
         const bool ok = firstEyeOk && secondEyeOk;
         if (ok) R23Pixels.ScheduleProjection(c, image);
         c.Release(c.projection_);
