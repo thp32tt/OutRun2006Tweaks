@@ -104,7 +104,7 @@ def patch(source):
     )
     source = replace_once(
         source,
-        '        await page.wait_for_timeout(1500)\\n        return "sent"',
+        '        await page.wait_for_timeout(1500)\n        return "sent"',
         '''        await page.wait_for_timeout(1500)
         if png_binding is not None:
             # Do not mistake a preview + Enter keypress for server receipt.
