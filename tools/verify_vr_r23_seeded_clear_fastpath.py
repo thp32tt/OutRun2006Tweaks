@@ -66,7 +66,9 @@ def verify_draw(src: str) -> None:
     assert game < serial < ifdef < reliable < shadow < bypass < endif < fallback
     assert body.count("R23CaptureActualGameState(") == 1
     assert body.count("++R23GameDrawSerial;") == 1
-    assert src.count("R23BeforeTopLevelDraw(device);") == 4
+    # Four draw hooks plus the public NotifyTopLevelDraw forwarding API.
+    assert src.count("R23BeforeTopLevelDraw(device);") == 5
+    assert "void NotifyTopLevelDraw(IDirect3DDevice9* device)" in src
     assert "OutRunVR::State::D3D9RasterSnapshot ignored{};" in body
     assert pos("R23CaptureActualGameState(") > endif
 
