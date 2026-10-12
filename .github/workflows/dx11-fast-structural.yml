@@ -43,6 +43,7 @@ jobs:
           python tools/test_dx11_stage0_pm_subtract_00622.py
           python tools/test_dx11_stage0_pm_dual_00623.py
           python tools/test_dx11_stage0_pm_modulate4x_00624.py
+          python tools/test_dx11_stage0_pm_addsigned_00625.py
       - name: Verify source graph and dormant runtime activation
         run: |
           python tools/verify_dx11_source_graph.py
