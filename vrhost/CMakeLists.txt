@@ -149,6 +149,8 @@ target_link_libraries(outrun-vr-r23-verified-bundle-smoke PRIVATE
 # device is needed to validate reset-relative safety and fail-closed decisions.
 add_executable(outrun-vr-direct-hold-reuse-smoke tests/direct_hold_frame_reuse_smoke.cpp)
 add_executable(outrun-vr-projection-blit-upload-smoke tests/projection_blit_upload_smoke.cpp)
+add_executable(outrun-vr-menu-projection-copy-smoke tests/menu_projection_slice_copy_smoke.cpp)
+target_include_directories(outrun-vr-menu-projection-copy-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
 add_executable(outrun-vr-capture-descriptor-smoke tests/desktop_capture_descriptor_cache_smoke.cpp)
 target_include_directories(outrun-vr-capture-descriptor-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
 target_include_directories(outrun-vr-direct-hold-reuse-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
@@ -188,6 +190,7 @@ foreach(target
     outrun-vr-r23-verified-bundle-smoke
     outrun-vr-direct-hold-reuse-smoke
     outrun-vr-projection-blit-upload-smoke
+    outrun-vr-menu-projection-copy-smoke
     outrun-vr-capture-descriptor-smoke
     outrun-vr-r32-policy-smoke
     outrun-vr-frame-pacing-smoke

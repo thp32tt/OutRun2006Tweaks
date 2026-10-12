@@ -40,6 +40,7 @@
 #include "runtime/desktop_capture_descriptor_cache.hpp"
 #include "runtime/direct_hold_frame_reuse.hpp"
 #include "runtime/theater_capture_reuse.hpp"
+#include "runtime/menu_projection_slice_copy.hpp"
 #include "runtime/cadence_presented_wait.hpp"
 #include "runtime/cadence_schedule.hpp"
 #include "vr/ipc/cadence_v1.hpp"
@@ -1454,11 +1455,38 @@ namespace
                 leftOk, true, true, 0, 1,
                 c.projection_.width, c.projection_.height,
                 c.projection_.width, c.projection_.height);
-            ok = leftOk && c.RenderMenuPlaneTo(
-                c.projection_.rtvs[image][1],
-                c.projection_.width, c.projection_.height,
-                whole, c.sourceSrv_, c.sourceFormat_, clip,
-                secondEye.reuseUniformsAndPipeline);
+            // Menu clips, UV and source are identical for both LOCAL-fixed
+            // eyes. Render eye 0 once and copy that exact raster to eye 1.
+            // This avoids an entire second full-screen menu shader pass and
+            // its state binds on the 72/90/120-Hz XR menu capture path.
+            // OpenXR projection images are 2-slice, single-mip D3D11 textures.
+            // Keep the existing second-eye draw as a fail-closed fallback if
+            // a runtime supplies anything outside that known layout.
+            const bool copySecondEye =
+                OutRunVrMenuProjectionCopy::CanCopyIdenticalEye(
+                    leftOk, secondEye.reuseUniformsAndPipeline,
+                    c.projection_.arraySize,
+                    image < c.projection_.images.size() &&
+                        c.projection_.images[image].texture != nullptr,
+                    c.projection_.rtvs[image][1] != nullptr);
+            if (copySecondEye)
+            {
+                ID3D11Texture2D* imageTexture =
+                    c.projection_.images[image].texture;
+                c.context_->CopySubresourceRegion(
+                    imageTexture, D3D11CalcSubresource(0, 1, 1),
+                    0, 0, 0, imageTexture,
+                    D3D11CalcSubresource(0, 0, 1), nullptr);
+                ok = true;
+            }
+            else
+            {
+                ok = leftOk && c.RenderMenuPlaneTo(
+                    c.projection_.rtvs[image][1],
+                    c.projection_.width, c.projection_.height,
+                    whole, c.sourceSrv_, c.sourceFormat_, clip,
+                    secondEye.reuseUniformsAndPipeline);
+            }
         }
         if (ok) R23Pixels.ScheduleProjection(c, image);
         c.Release(c.projection_);
