@@ -55,12 +55,17 @@ def violations(source: str) -> list[str]:
         "R31WorldCache.valid = true;",
     ):
         require(marker in build, "build " + marker)
-    require(build.index("R30SupportValidateVerifiedWvp(") <
-            build.index("if (R31WorldCache.valid &&"), "validation precedes hit")
-    require(build.index("R31PrepareEyeTailCache(stereo, projection)") <
-            build.index("if (R31WorldCache.valid &&"), "tail validation precedes hit")
-    require(build.index("if (!R30SupportMatrixFinite(eyeWvp))") <
-            build.index("R31WorldCache.valid = true;"), "two-eye finite before publish")
+    # Destructive mutations deliberately delete individual anchors: record
+    # missing-order violations instead of raising ValueError mid-mutation.
+    try:
+        require(build.index("R30SupportValidateVerifiedWvp(") <
+                build.index("if (R31WorldCache.valid &&"), "validation precedes hit")
+        require(build.index("R31PrepareEyeTailCache(stereo, projection)") <
+                build.index("if (R31WorldCache.valid &&"), "tail validation precedes hit")
+        require(build.index("if (!R30SupportMatrixFinite(eyeWvp))") <
+                build.index("R31WorldCache.valid = true;"), "two-eye finite before publish")
+    except ValueError:
+        errors.append("mandatory validation/publish ordering anchor absent")
     require(build.count("draw.poseSequence = stereo.poseSequence;") == 2,
             "cache hit uses current pose")
     require("R31EyeCache = next;" in prepare and
