@@ -2095,7 +2095,10 @@ def main() -> None:
         "alphaOp == D3DTOP_SELECTARG2;",
         "blendFactorAddAlpha = op == D3DTOP_BLENDFACTORALPHA &&",
         "alphaOp == D3DTOP_ADD;",
-        "blendFactorDiffuseAlpha || blendFactorAddAlpha ||\n             blendFactorSubtractAlpha || blendFactorAddSmoothAlpha ||\n             blendFactorModulate2XAlpha || blendFactorModulate4XAlpha ||\n              selectTextureFactorAlpha || selectDiffuseFactorAlpha) &&",
+        "blendFactorDiffuseAlpha || blendFactorAddAlpha ||\n             blendFactorSubtractAlpha || blendFactorAddSmoothAlpha ||\n             blendFactorModulate2XAlpha || blendFactorModulate4XAlpha ||",
+        # The read is shared by additional guarded TFACTOR native draw cases;
+        # preserve both original branches without requiring the old OR suffix.
+        "selectTextureFactorAlpha || selectDiffuseFactorAlpha ||",
         "!blendFactorDiffuseAlpha && !blendFactorAddAlpha &&",
         "blendFactorDiffuseAlpha || blendFactorAddAlpha ||",
         "(!blendFactorDiffuseAlpha &&",

@@ -102,8 +102,8 @@ def main():
     # Both RGB select modes are mutually exclusive; replacing OR with AND
     # would strand both previously supported factor-alpha draw paths.
     assert not linked(mutate(s,
-        "selectTextureFactorAlpha || selectDiffuseFactorAlpha",
-        "selectTextureFactorAlpha && selectDiffuseFactorAlpha")), "factor guard OR broken"
+        "selectTextureFactorAlpha || selectDiffuseFactorAlpha ||\n              blendTextureAlphaPMFactorArg2Alpha) &&",
+        "selectTextureFactorAlpha && selectDiffuseFactorAlpha ||\n              blendTextureAlphaPMFactorArg2Alpha) &&")), "factor guard OR broken"
     count += 1
     assert count==23,count
     for byte in (0,1,64,128,192,255):
