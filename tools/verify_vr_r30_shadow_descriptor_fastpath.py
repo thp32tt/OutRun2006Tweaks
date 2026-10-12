@@ -90,6 +90,15 @@ def validate_range_fastpath(source):
         "ranges.erase(first + 1, last);",
     ):
         assert part in merge, part
+    for token in ("if (!ranges.empty())", "auto& tail = ranges.back();",
+                  "if (begin >= tail.begin)", "if (begin <= tail.end)",
+                  "tail.end = (std::max)(tail.end, end);",
+                  "ranges.push_back({begin, end});"):
+        assert token in merge, token
+    assert merge.index("if (!ranges.empty())") < merge.index("std::lower_bound(")
+    assert "if (!ranges.empty() && begin >= ranges.back().begin)" in read
+    assert "return end <= ranges.back().end;" in read
+    assert read.index("return end <= ranges.back().end;") < read.index("std::lower_bound(")
     assert "return first != ranges.end() &&" in read
     assert "first->begin <= begin && first->end >= end;" in read
     assert "ranges.erase(it)" not in merge
@@ -101,6 +110,12 @@ def exercise_range_model():
     # duplicate writes, reverse writes and a wide bridging write.
     def add(ranges, begin, end):
         if begin >= end:
+            return
+        if ranges and begin >= ranges[-1][0]:
+            if begin <= ranges[-1][1]:
+                ranges[-1][1] = max(ranges[-1][1], end)
+            else:
+                ranges.append([begin, end])
             return
         first = next((i for i, (a, b) in enumerate(ranges) if b >= begin), len(ranges))
         if first == len(ranges) or ranges[first][0] > end:
@@ -133,6 +148,22 @@ def exercise_range_model():
         add(ranges, 0, 1024)
         assert ranges == [[0, 1024]]
 
+    # 4,096 monotonically streamed partial writes exercise both O(1)
+    # append (disjoint) and tail extension (adjacent/overlapping) paths.
+    for stride, expected_len in ((16, 1), (24, 4096)):
+        ranges = []
+        for index in range(4096):
+            begin = index * stride
+            add(ranges, begin, begin + 16)
+        assert len(ranges) == expected_len, (stride, ranges[:4])
+        assert ranges[0] == [0, 16 if stride > 16 else 65536]
+        if stride > 16:
+            assert ranges[-1] == [4095 * stride, 4095 * stride + 16]
+        # Writing within the newest tail never shrinks coverage.
+        tail = list(ranges[-1])
+        add(ranges, tail[0] + 2, tail[1] - 2)
+        assert ranges[-1] == tail
+
 
 def test_range_mutations(source):
     mutations = (
@@ -144,6 +175,13 @@ def test_range_mutations(source):
         ("last->begin <= first->end", "last->begin < first->end"),
         ("ranges.erase(first + 1, last);", "ranges.erase(first + 1, first + 1);"),
         ("first->end >= end", "first->end < end"),
+        ("if (begin >= tail.begin)", "if (begin > tail.begin)"),
+        ("if (begin <= tail.end)", "if (begin < tail.end)"),
+        ("tail.end = (std::max)(tail.end, end);", "tail.end = end;"),
+        ("ranges.push_back({begin, end});", "ranges.push_back({begin, begin});"),
+        ("if (!ranges.empty() && begin >= ranges.back().begin)",
+         "if (!ranges.empty() && begin <= ranges.back().begin)"),
+        ("return end <= ranges.back().end;", "return end < ranges.back().end;"),
     )
     for needle, replacement in mutations:
         assert needle in source, needle
@@ -396,7 +434,7 @@ def main():
             pass
         else:
             raise AssertionError("mutation survived: " + needle)
-    print("PASS R30 VB/IB descriptor, range and revision-keyed shadow copy cache; 11 descriptor + 8 range + 13 copy + 9 registry negative mutations; VB/IB negative-cache/recycle model")
+    print("PASS R30 VB/IB tail-streamed shadow range append/merge/read, descriptor, range and revision-keyed shadow copy cache; 11 descriptor + 8 range + 13 copy + 9 registry negative mutations; VB/IB negative-cache/recycle model")
 
 
 if __name__ == "__main__":

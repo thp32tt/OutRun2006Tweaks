@@ -300,6 +300,26 @@ namespace OutRunVRStereo
             if (begin >= end)
                 return;
 
+            // Streamed dynamic VB/IB Lock ranges normally arrive in increasing
+            // offset order. Appending a disjoint range or extending the tail
+            // can avoid binary search and vector insertion entirely. The tail
+            // is last in the sorted/coalesced interval invariant.
+            if (!ranges.empty())
+            {
+                auto& tail = ranges.back();
+                if (begin >= tail.begin)
+                {
+                    if (begin <= tail.end)
+                    {
+                        tail.end = (std::max)(tail.end, end);
+                        return;
+                    }
+                    ranges.push_back({begin, end});
+                    return;
+                }
+            }
+
+            // Out-of-order writes still use the full interval merge.
             // Partial dynamic VB/IB locks can generate many disjoint ranges.
             // Locate the first touching interval in O(log n) and merge the
             // entire overlapping span in place. The old erase-per-interval
@@ -332,6 +352,11 @@ namespace OutRunVRStereo
         {
             if (begin >= end)
                 return false;
+            // Most shadow copies read the newest streamed tail. Check it in
+            // constant time before the binary search; only earlier ranges
+            // require a search through the sorted interval set.
+            if (!ranges.empty() && begin >= ranges.back().begin)
+                return end <= ranges.back().end;
             // The merge writer maintains ascending, disjoint intervals; avoid
             // a full linear scan on every stereo VB/IB draw-time shadow read.
             const auto first = std::lower_bound(ranges.begin(), ranges.end(), begin,
