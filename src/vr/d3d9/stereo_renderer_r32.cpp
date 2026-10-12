@@ -447,16 +447,21 @@ namespace OutRunVRStereo
 
         bool R32EnsureDirectResources(IDirect3DDevice9* device) noexcept
         {
-            if (R30SupportDirectTransportResourcesReady() &&
-                R32DirectIdentityMatches())
+            // One resource/host-identity probe per Present. On a rebind the
+            // previous path queried the identity twice (once for the cache
+            // hit, then once for invalidation), even though a failed first
+            // comparison already proves that this interop generation is stale.
+            const bool resourcesReady =
+                R30SupportDirectTransportResourcesReady();
+            if (resourcesReady)
             {
-                if (R30SupportTelemetryEnabled()) ++R32DirectProbeCacheHits;
-                return true;
-            }
-
-            if (R30SupportDirectTransportResourcesReady() &&
-                !R32DirectIdentityMatches())
+                if (R32DirectIdentityMatches())
+                {
+                    if (R30SupportTelemetryEnabled()) ++R32DirectProbeCacheHits;
+                    return true;
+                }
                 R32InvalidateDirectInteropOnly();
+            }
 
             if (!R30SupportEnsureDirectTransportResources(device))
                 return false;
@@ -477,14 +482,17 @@ namespace OutRunVRStereo
         {
             if (!R30SupportOverlayReadyForTransport())
                 return lowerResolve();
-            R30SupportDirectTransportSourceSurfaces sourceSurfaces{};
-            if (!frameId || !R32EnsureDirectResources(device) ||
-                !R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces))
+            if (!frameId || !R32EnsureDirectResources(device))
                 return false;
-            // R32EnsureDirectResources must run before this cached rejection:
-            // host PID/LUID or transport-generation changes invalidate the old
-            // interop identity and clear the rejection automatically.
+            // Recheck host PID/LUID first so a new interop generation can
+            // clear this per-generation rejection. On a permanently rejected
+            // old generation, avoid the per-Present cross-owner source-surface
+            // snapshot: no GPU copy can be attempted until revalidation.
             if (R32DirectCopyPathRejected)
+                return false;
+
+            R30SupportDirectTransportSourceSurfaces sourceSurfaces{};
+            if (!R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces))
                 return false;
 
             const std::uint32_t preferred =

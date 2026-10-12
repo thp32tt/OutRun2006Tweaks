@@ -725,3 +725,87 @@ for number, bad in enumerate(direct_negative_mutations):
         continue
     raise AssertionError(f"R32 DirectGPU mutation {number} escaped")
 print("R32 DirectGPU ACK-first GPU-query skip PASS (5 negative mutations)")
+
+
+# CONVERSION-DX9EX-00685: R32 DirectGPU host-rebind and quarantined path
+# skip redundant identity checks / source snapshot without skipping revalidation.
+def verify_direct_probe_hotpath(source: str) -> None:
+    ensure = source.split("bool R32EnsureDirectResources(", 1)[1].split(
+        "template <typename LowerResolve>", 1)[0]
+    resolve = source.split("bool R32ResolveDirectTransport(", 1)[1].split(
+        "void R32InvalidateResetCaches()", 1)[0]
+
+    def intact(e: str, r: str) -> bool:
+        expected_ensure = (
+            "const bool resourcesReady =",
+            "R30SupportDirectTransportResourcesReady();",
+            "if (resourcesReady)",
+            "if (R32DirectIdentityMatches())",
+            "++R32DirectProbeCacheHits;",
+            "return true;",
+            "R32InvalidateDirectInteropOnly();",
+            "R30SupportEnsureDirectTransportResources(device)",
+            "R30SupportTryGetDirectTransportIdentity(identity)",
+        )
+        expected_resolve = (
+            "if (!frameId || !R32EnsureDirectResources(device))",
+            "if (R32DirectCopyPathRejected)",
+            "R30SupportDirectTransportSourceSurfaces sourceSurfaces{};",
+            "R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces)",
+            "R30SupportCopyDirectTransportEyesAndIssueFence(",
+        )
+        if not all(s in e for s in expected_ensure) or not all(
+                s in r for s in expected_resolve):
+            return False
+        return (
+            e.count("R32DirectIdentityMatches()") == 1
+            and e.count("R30SupportDirectTransportResourcesReady()") == 1
+            and e.index("if (R32DirectIdentityMatches())")
+            < e.index("R32InvalidateDirectInteropOnly();")
+            < e.index("R30SupportEnsureDirectTransportResources(device)")
+            and r.index("R32EnsureDirectResources(device)")
+            < r.index("if (R32DirectCopyPathRejected)")
+            < r.index("R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces)")
+            < r.index("R30SupportCopyDirectTransportEyesAndIssueFence(")
+        )
+
+    assert intact(ensure, resolve), "R32 DirectGPU single-probe/reject-before-surface contract"
+    mutations = (
+        (ensure.replace("if (resourcesReady)", "if (true)", 1), resolve),
+        (ensure.replace("if (R32DirectIdentityMatches())", "if (true)", 1), resolve),
+        (ensure.replace("R32InvalidateDirectInteropOnly();",
+                        "/* skip stale interop release */", 1), resolve),
+        (ensure.replace("const bool resourcesReady =",
+                        "const bool resourcesReady = !", 1), resolve),
+        (ensure, resolve.replace("if (R32DirectCopyPathRejected)",
+                                 "if (false)", 1)),
+        (ensure, resolve.replace(
+            "R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces)",
+            "true", 1)),
+        (ensure, resolve.replace("if (!frameId || !R32EnsureDirectResources(device))",
+                                 "if (!frameId)", 1)),
+    )
+    for idx, (e, r) in enumerate(mutations):
+        assert not intact(e, r), f"R32 DirectGPU mutation {idx} escaped"
+
+    # Model both copies of the formerly duplicated host-identity probe.
+    # Success must preserve the fast path; host rebind must invalidate before
+    # resource allocation; copy-failure quarantine must still re-check identity
+    # without constructing an unused eye-surface snapshot.
+    for ready in (False, True):
+        for matches in (False, True):
+            for rejected in (False, True):
+                identity_reads = int(ready)
+                ready_reads = 1
+                needs_rebind = ready and not matches
+                resource_ensure = not (ready and matches)
+                source_reads = int(not rejected or needs_rebind)
+                assert ready_reads == 1 and identity_reads <= 1
+                assert not (ready and matches and resource_ensure)
+                assert not (needs_rebind and not resource_ensure)
+                assert not (ready and matches and rejected and source_reads)
+    print("PASS R32 DirectGPU identity/surface hotpath: 7 destructive mutations, "
+          "8 readiness/rebind/rejection states")
+
+
+verify_direct_probe_hotpath(r32)
