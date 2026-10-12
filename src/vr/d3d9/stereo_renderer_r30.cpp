@@ -2506,6 +2506,81 @@ namespace OutRunVRStereo
             std::vector<std::uint8_t>& right,
             const std::vector<std::uint8_t>* usedMask = nullptr) noexcept
         {
+            // Ordinary (non-indexed) screen HUD draws require no 3D reprojection.
+            // Both eyes read the same XYZRHW source and preserve Z/RHW, UV and
+            // colours. Transform them together: one source walk, one viewport
+            // conversion and one contain/FOV lookup rather than one per eye.
+            // Sparse indexed/world particles retain their proven fallback.
+            if (!state.worldEffect && !usedMask)
+            {
+                if (!source || !vertexCount || stride < sizeof(float) * 4)
+                    return false;
+                const std::size_t bytes =
+                    static_cast<std::size_t>(vertexCount) * stride;
+                if (!bytes || bytes > 4u * 1024u * 1024u)
+                    return false;
+                const float x0 = static_cast<float>(state.viewport.X);
+                const float y0 = static_cast<float>(state.viewport.Y);
+                const float width = static_cast<float>(state.viewport.Width);
+                const float height = static_cast<float>(state.viewport.Height);
+                const float depthSpan =
+                    state.viewport.MaxZ - state.viewport.MinZ;
+                if (width <= 0.0f || height <= 0.0f ||
+                    !std::isfinite(depthSpan) || depthSpan <= 1.0e-6f)
+                    return false;
+                try
+                {
+                    left.resize(bytes);
+                    right.resize(bytes);
+                }
+                catch (...)
+                {
+                    return false;
+                }
+                std::memcpy(left.data(), source, bytes);
+                std::memcpy(right.data(), source, bytes);
+                float hudScaleX = 1.0f;
+                float hudScaleY = 1.0f;
+                R30HudContainScale(state.stereo, hudScaleX, hudScaleY);
+                const float ndcScaleX = 2.0f / width;
+                const float ndcScaleY = 2.0f / height;
+                const float eyeScaleX[2]{
+                    hudScaleX * state.eyeScale[0],
+                    hudScaleX * state.eyeScale[1]
+                };
+                for (UINT i = 0; i < vertexCount; ++i)
+                {
+                    const std::size_t offset =
+                        static_cast<std::size_t>(i) * stride;
+                    const auto* src = reinterpret_cast<const float*>(
+                        static_cast<const std::uint8_t*>(source) + offset);
+                    if (!std::isfinite(src[0]) || !std::isfinite(src[1]) ||
+                        !std::isfinite(src[2]) || !std::isfinite(src[3]))
+                        return false;
+                    const float ndcX = (src[0] - x0) * ndcScaleX - 1.0f;
+                    const float ndcY = 1.0f - (src[1] - y0) * ndcScaleY;
+                    const float correctedY = hudScaleY * ndcY;
+                    const float transformedY =
+                        y0 + (1.0f - correctedY) * 0.5f * height;
+                    if (!std::isfinite(transformedY))
+                        return false;
+                    for (int eye = 0; eye < 2; ++eye)
+                    {
+                        const float correctedX =
+                            eyeScaleX[eye] * ndcX + state.eyeOffset[eye];
+                        const float transformedX =
+                            x0 + (correctedX + 1.0f) * 0.5f * width;
+                        if (!std::isfinite(transformedX))
+                            return false;
+                        auto* dst = reinterpret_cast<float*>(
+                            (eye == 0 ? left.data() : right.data()) + offset);
+                        dst[0] = transformedX;
+                        dst[1] = transformedY;
+                    }
+                }
+                return true;
+            }
+
             bool leftFull = false;
             bool rightFull = false;
             if (!R30TransformXyzrhwVertices(source, vertexCount, stride,

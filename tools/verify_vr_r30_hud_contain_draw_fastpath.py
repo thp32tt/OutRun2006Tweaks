@@ -45,6 +45,97 @@ def validate(source: str) -> None:
     )[1]
 
 
+def validate_hud_pair(source: str) -> None:
+    """Non-indexed HUD uses one traversal; indexed and world use old bilateral path."""
+    pair = source.split("bool R30TransformXyzrhwStereo(", 1)[1].split(
+        "template <typename LeftDraw", 1
+    )[0]
+    fast = pair.split("if (!state.worldEffect && !usedMask)", 1)[1].split(
+        "bool leftFull = false;", 1
+    )[0]
+    for required in (
+        "stride < sizeof(float) * 4",
+        "bytes > 4u * 1024u * 1024u",
+        "!std::isfinite(depthSpan) || depthSpan <= 1.0e-6f",
+        "std::memcpy(left.data(), source, bytes);",
+        "std::memcpy(right.data(), source, bytes);",
+        "R30HudContainScale(state.stereo, hudScaleX, hudScaleY);",
+        "hudScaleX * state.eyeScale[0]",
+        "hudScaleX * state.eyeScale[1]",
+        "for (UINT i = 0; i < vertexCount; ++i)",
+        "!std::isfinite(src[2]) || !std::isfinite(src[3])",
+        "const float correctedY = hudScaleY * ndcY;",
+        "eyeScaleX[eye] * ndcX + state.eyeOffset[eye]",
+        "if (!std::isfinite(transformedX))",
+        "if (!std::isfinite(transformedY))",
+        "dst[0] = transformedX;",
+        "dst[1] = transformedY;",
+        "return true;",
+    ):
+        assert required in fast, f"pair-HUD source guard lost: {required}"
+    assert fast.count("R30HudContainScale(") == 1
+    assert fast.count("for (UINT i = 0; i < vertexCount; ++i)") == 1
+    assert fast.index("const float ndcScaleX") < fast.index("for (UINT i")
+    assert pair.index("if (!state.worldEffect && !usedMask)") < pair.index("bool leftFull = false;")
+    assert "if (leftFull != rightFull)" in pair
+
+    # Old and paired algebraic order are identical: repeated HUD containment
+    # and per-eye vertex traversal are unnecessary, but eye disparity is not.
+    import math
+    import random
+    rng = random.Random(663)
+    for _ in range(512):
+        width = rng.uniform(100, 5000)
+        height = rng.uniform(100, 3000)
+        x0, y0 = rng.uniform(-100, 100), rng.uniform(-100, 100)
+        x, y = rng.uniform(-200, width + 200), rng.uniform(-200, height + 200)
+        hud_x, hud_y = rng.uniform(0.75, 1.5), rng.uniform(0.75, 1.5)
+        eye_scales = [rng.uniform(0.7, 1.3) for _ in range(2)]
+        eye_offsets = [rng.uniform(-0.3, 0.3) for _ in range(2)]
+        ndc_x = (x - x0) * (2.0 / width) - 1.0
+        ndc_y = 1.0 - (y - y0) * (2.0 / height)
+        for eye in range(2):
+            old_x = x0 + ((hud_x * eye_scales[eye] * ndc_x +
+                           eye_offsets[eye]) + 1.0) * 0.5 * width
+            new_x = x0 + (((hud_x * eye_scales[eye]) * ndc_x +
+                           eye_offsets[eye]) + 1.0) * 0.5 * width
+            old_y = y0 + (1.0 - hud_y * ndc_y) * 0.5 * height
+            new_y = y0 + (1.0 - hud_y * ndc_y) * 0.5 * height
+            assert math.isclose(old_x, new_x, rel_tol=0, abs_tol=1e-10)
+            assert old_y == new_y
+
+    for before, after in (
+        ("if (!state.worldEffect && !usedMask)", "if (!state.worldEffect)"),
+        ("dst[1] = transformedY;", "dst[1] = src[1];"),
+        ("hudScaleX * state.eyeScale[1]", "hudScaleX * state.eyeScale[0]"),
+        ("eyeScaleX[eye] * ndcX + state.eyeOffset[eye]", "eyeScaleX[eye] * ndcX"),
+        ("!std::isfinite(src[2]) || !std::isfinite(src[3])", "!std::isfinite(src[2])"),
+        ("bytes > 4u * 1024u * 1024u", "bytes > 8u * 1024u * 1024u"),
+    ):
+        assert before in fast
+        bad = source.replace(before, after, 1)
+        try:
+            validate_hud_pair_structure(bad)
+        except AssertionError:
+            continue
+        raise AssertionError(f"pair-HUD destructive mutation accepted: {before}")
+
+
+def validate_hud_pair_structure(source: str) -> None:
+    pair = source.split("bool R30TransformXyzrhwStereo(", 1)[1].split(
+        "template <typename LeftDraw", 1
+    )[0]
+    for required in (
+        "if (!state.worldEffect && !usedMask)",
+        "dst[1] = transformedY;",
+        "hudScaleX * state.eyeScale[1]",
+        "eyeScaleX[eye] * ndcX + state.eyeOffset[eye]",
+        "!std::isfinite(src[2]) || !std::isfinite(src[3])",
+        "bytes > 4u * 1024u * 1024u",
+    ):
+        assert required in pair, required
+
+
 def negative_mutations(source: str) -> int:
     negatives = [
         (
@@ -101,6 +192,7 @@ def negative_mutations(source: str) -> int:
 if __name__ == "__main__":
     text = SOURCE.read_text(encoding="utf-8")
     validate(text)
+    validate_hud_pair(text)
     print(
         "R30 HUD contain draw-invariant fastpath PASS; "
         f"{negative_mutations(text)} destructive mutations rejected"
