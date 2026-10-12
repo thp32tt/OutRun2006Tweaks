@@ -37,7 +37,7 @@ def connected(v):
  return all(x in v for x in graph) and v.index(pred)<v.index(read)<v.index(graph[6])<v.index(graph[9])
 assert connected(s)
 for x in graph[:12]:
- assert not connected(s.replace(x,"BROKEN_00641",1)),x[:65]
+ assert not connected(s.replace(x,"BROKEN_00641")),x[:65]
 for x,y in [("D3DTOP_BLENDCURRENTALPHA","D3DTOP_BLENDDIFFUSEALPHA"),("alphaArg1 == D3DTA_TEXTURE","alphaArg1 == D3DTA_TFACTOR"),("alphaArg2 == D3DTA_TFACTOR","alphaArg2 == D3DTA_TEXTURE"),("D3DTOP_BLENDTEXTUREALPHAPM","D3DTOP_BLENDTEXTUREALPHA")]:
  assert not connected(s.replace(pred,pred.replace(x,y),1))
 n=0
