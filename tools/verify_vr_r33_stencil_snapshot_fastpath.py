@@ -90,8 +90,8 @@ def verify(src: str) -> None:
     )
     for state, field in unchanged_fields:
         case = setter.split("case " + state + ":", 1)[1].split("case ", 1)[0]
-        guard = f"if (R33DepthStencilState.{field} == value)\\n                    return hr;"
-        assert guard.replace("\\\\n", "\\n") in case, "unchanged-state fast exit missing: " + state
+        guard = f"if (R33DepthStencilState.{field} == value)\n                    return hr;"
+        assert guard in case, "unchanged-state fast exit missing: " + state
         assert case.index("return hr;") < case.index("R33DepthStencilState." + field + " = value;"), (
             "unchanged setter must not refresh state: " + state
         )
@@ -119,17 +119,17 @@ def main() -> None:
          "            R33RefreshWriteFlags(next);"),
     ]
     mutations.extend((
-        ("unchanged_zEnable", "if (R33DepthStencilState.zEnable == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
-        ("unchanged_zWrite", "if (R33DepthStencilState.zWrite == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
-        ("unchanged_stencilEnable", "if (R33DepthStencilState.stencilEnable == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
-        ("unchanged_stencilWriteMask", "if (R33DepthStencilState.stencilWriteMask == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
-        ("unchanged_stencilFail", "if (R33DepthStencilState.stencilFail == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
-        ("unchanged_stencilZFail", "if (R33DepthStencilState.stencilZFail == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
-        ("unchanged_stencilPass", "if (R33DepthStencilState.stencilPass == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
-        ("unchanged_twoSided", "if (R33DepthStencilState.twoSided == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
-        ("unchanged_ccwStencilFail", "if (R33DepthStencilState.ccwStencilFail == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
-        ("unchanged_ccwStencilZFail", "if (R33DepthStencilState.ccwStencilZFail == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
-        ("unchanged_ccwStencilPass", "if (R33DepthStencilState.ccwStencilPass == value)\\n                    return hr;", "if (false)\\n                    return hr;"),
+        ("unchanged_zEnable", "if (R33DepthStencilState.zEnable == value)\n                    return hr;", "if (false)\n                    return hr;"),
+        ("unchanged_zWrite", "if (R33DepthStencilState.zWrite == value)\n                    return hr;", "if (false)\n                    return hr;"),
+        ("unchanged_stencilEnable", "if (R33DepthStencilState.stencilEnable == value)\n                    return hr;", "if (false)\n                    return hr;"),
+        ("unchanged_stencilWriteMask", "if (R33DepthStencilState.stencilWriteMask == value)\n                    return hr;", "if (false)\n                    return hr;"),
+        ("unchanged_stencilFail", "if (R33DepthStencilState.stencilFail == value)\n                    return hr;", "if (false)\n                    return hr;"),
+        ("unchanged_stencilZFail", "if (R33DepthStencilState.stencilZFail == value)\n                    return hr;", "if (false)\n                    return hr;"),
+        ("unchanged_stencilPass", "if (R33DepthStencilState.stencilPass == value)\n                    return hr;", "if (false)\n                    return hr;"),
+        ("unchanged_twoSided", "if (R33DepthStencilState.twoSided == value)\n                    return hr;", "if (false)\n                    return hr;"),
+        ("unchanged_ccwStencilFail", "if (R33DepthStencilState.ccwStencilFail == value)\n                    return hr;", "if (false)\n                    return hr;"),
+        ("unchanged_ccwStencilZFail", "if (R33DepthStencilState.ccwStencilZFail == value)\n                    return hr;", "if (false)\n                    return hr;"),
+        ("unchanged_ccwStencilPass", "if (R33DepthStencilState.ccwStencilPass == value)\n                    return hr;", "if (false)\n                    return hr;"),
     ))
     for name, old, new in mutations:
         assert old in src, "mutation anchor missing: " + name
