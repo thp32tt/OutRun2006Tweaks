@@ -142,12 +142,93 @@ def negative_mono_aux_fastpath(src: str) -> None:
         raise AssertionError(f"mono/aux negative mutation {index} escaped")
 
 
+
+def check_write_flags_cached(src: str) -> None:
+    """Depth/stencil work is calculated on snapshot and setter, not each draw."""
+    state = src.split("struct R33DepthStencilWriteState", 1)[1].split("};", 1)[0]
+    helper = src.split("void R33RefreshWriteFlags(", 1)[1].split(
+        "bool R33ReadDepthStencilWriteState(", 1)[0]
+    read = src.split("bool R33ReadDepthStencilWriteState(", 1)[1].split(
+        "bool R33DepthStencilCacheCurrent()", 1)[0]
+    getter = src.split("bool R33GetWriteFlags(", 1)[1].split(
+        "void R33InvalidateRightForLeftWrite(", 1)[0]
+    setter = src.split("HRESULT __stdcall SetRenderStateDestR33(", 1)[1].split(
+        "template <typename ActualDraw>", 1)[0]
+    assert "bool mayWriteDepth = false;" in state
+    assert "bool stencilWritesIfPresent = false;" in state
+    for required in (
+        "s.mayWriteDepth = s.zEnable != D3DZB_FALSE &&",
+        "s.zWrite != FALSE;",
+        "s.stencilFail != D3DSTENCILOP_KEEP ||",
+        "s.stencilZFail != D3DSTENCILOP_KEEP ||",
+        "s.stencilPass != D3DSTENCILOP_KEEP;",
+        "s.twoSided != FALSE &&",
+        "s.ccwStencilFail != D3DSTENCILOP_KEEP ||",
+        "s.ccwStencilZFail != D3DSTENCILOP_KEEP ||",
+        "s.ccwStencilPass != D3DSTENCILOP_KEEP);",
+        "s.stencilWritesIfPresent = s.stencilEnable != FALSE &&",
+        "s.stencilWriteMask != 0 && (frontWrites || backWrites);",
+    ):
+        assert required in helper, f"cached write-flag computation changed: {required}"
+    assert read.count("R33RefreshWriteFlags(next);") == 2, (
+        "read must refresh both no-depth and populated snapshots")
+    assert "R33RefreshWriteFlags(R33DepthStencilState);" in setter, (
+        "tracked render-state setters must recompute write flags")
+    for kind in ("D3DRS_ZENABLE", "D3DRS_ZWRITEENABLE",
+                 "D3DRS_STENCILENABLE", "D3DRS_STENCILWRITEMASK",
+                 "D3DRS_STENCILFAIL", "D3DRS_STENCILZFAIL",
+                 "D3DRS_STENCILPASS", "D3DRS_TWOSIDEDSTENCILMODE",
+                 "D3DRS_CCW_STENCILFAIL", "D3DRS_CCW_STENCILZFAIL",
+                 "D3DRS_CCW_STENCILPASS"):
+        assert "case " + kind + ":" in setter, f"setter lost {kind}"
+    assert "mayWriteDepth = s.mayWriteDepth;" in getter
+    assert ("mayWriteStencil = s.stencilWritesIfPresent &&\n"
+            "                R32ReviewMainDepthHasStencil();") in getter, (
+                "short-circuited live format gate is mandatory")
+    assert "if (!R32ReviewTrackedDepthStencil())\n                return true;" in getter
+    assert "if (!OutRunVR::State::StateBlockTracker::Reliable())" in getter
+    assert "if (!R33DepthStencilCacheCurrent())" in getter
+    assert "if (!R33ReadDepthStencilWriteState(device))" in getter
+
+def negative_write_flag_cache(src: str) -> None:
+    alterations = [
+        ("s.stencilFail != D3DSTENCILOP_KEEP ||",
+         "s.stencilFail == D3DSTENCILOP_KEEP ||"),
+        ("s.stencilZFail != D3DSTENCILOP_KEEP ||",
+         "s.stencilZFail == D3DSTENCILOP_KEEP ||"),
+        ("s.stencilPass != D3DSTENCILOP_KEEP;",
+         "s.stencilPass == D3DSTENCILOP_KEEP;"),
+        ("s.twoSided != FALSE &&", "s.twoSided == FALSE &&"),
+        ("s.ccwStencilPass != D3DSTENCILOP_KEEP);",
+         "s.ccwStencilPass == D3DSTENCILOP_KEEP);"),
+        ("s.stencilWriteMask != 0 && (frontWrites || backWrites);",
+         "s.stencilWriteMask == 0 && (frontWrites || backWrites);"),
+        ("s.zWrite != FALSE;", "s.zWrite == FALSE;"),
+        ("R33RefreshWriteFlags(R33DepthStencilState);",
+         "/* tracked setter cache refresh removed */"),
+        ("mayWriteStencil = s.stencilWritesIfPresent &&",
+         "mayWriteStencil = s.stencilWritesIfPresent ||"),
+        ("R32ReviewMainDepthHasStencil();\n            return true;",
+         "true;\n            return true;"),
+    ]
+    for i, (before, after) in enumerate(alterations, 1):
+        assert before in src, f"write-flag mutation anchor {i} missing"
+        mutant = src.replace(before, after, 1)
+        assert mutant != src
+        try:
+            check_write_flags_cached(mutant)
+        except (AssertionError, ValueError):
+            continue
+        raise AssertionError(f"R33 cached-write negative mutation {i} escaped")
+
 def main() -> None:
     src = SOURCE.read_text(encoding="utf-8")
     check(src)
     check_resync_single_flush(src)
     check_mono_aux_fastpath(src)
+    check_write_flags_cached(src)
     negative_mono_aux_fastpath(src)
+    negative_write_flag_cache(src)
     mutants = [
         src.replace("R33TryHud(device, screenKind,", "R33TryHud(device, R32ReviewScreenSpaceKind::None,", 1),
         src.replace("if (screenKind != R32ReviewScreenSpaceKind::None)",
@@ -176,7 +257,7 @@ def main() -> None:
         except (AssertionError, ValueError):
             continue
         raise AssertionError(f"resync regression mutation {i} was not rejected")
-    print("PASS R33 single classification, mono/aux R29 bypass, one active resync, 14 negative mutations")
+    print("PASS R33 classification/resync plus cached depth-stencil write flags (24 negative mutations)")
 
 
 if __name__ == "__main__":

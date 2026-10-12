@@ -63,6 +63,10 @@ namespace OutRunVRStereo
             DWORD ccwStencilFail = D3DSTENCILOP_KEEP;
             DWORD ccwStencilZFail = D3DSTENCILOP_KEEP;
             DWORD ccwStencilPass = D3DSTENCILOP_KEEP;
+            // Recompute the stencil-op predicate only when the snapshot or
+            // a tracked setter changes; ordinary stereo draws reuse it.
+            bool mayWriteDepth = false;
+            bool stencilWritesIfPresent = false;
             std::uint64_t depthGeneration = 0;
             std::uint64_t stateBlockRecordings = 0;
             std::uint64_t stateBlockApplies = 0;
@@ -194,6 +198,25 @@ namespace OutRunVRStereo
             R33DepthStencilState.valid = false;
         }
 
+        // Preserve the original stencil-op semantics while removing repeated
+        // 9-field checks from thousands of valid-cache stereo draws. The
+        // attachment format is still checked live when stencil can be written.
+        void R33RefreshWriteFlags(R33DepthStencilWriteState& s) noexcept
+        {
+            s.mayWriteDepth = s.zEnable != D3DZB_FALSE &&
+                s.zWrite != FALSE;
+            const bool frontWrites =
+                s.stencilFail != D3DSTENCILOP_KEEP ||
+                s.stencilZFail != D3DSTENCILOP_KEEP ||
+                s.stencilPass != D3DSTENCILOP_KEEP;
+            const bool backWrites = s.twoSided != FALSE &&
+                (s.ccwStencilFail != D3DSTENCILOP_KEEP ||
+                 s.ccwStencilZFail != D3DSTENCILOP_KEEP ||
+                 s.ccwStencilPass != D3DSTENCILOP_KEEP);
+            s.stencilWritesIfPresent = s.stencilEnable != FALSE &&
+                s.stencilWriteMask != 0 && (frontWrites || backWrites);
+        }
+
         bool R33ReadDepthStencilWriteState(IDirect3DDevice9* device) noexcept
         {
             if (!device)
@@ -206,6 +229,7 @@ namespace OutRunVRStereo
                 next.depthGeneration = R32ReviewMainDepthGeneration();
                 next.stateBlockRecordings = OutRunVR::State::StateBlockTracker::RecordingGeneration();
                 next.stateBlockApplies = OutRunVR::State::StateBlockTracker::ApplyGeneration();
+                R33RefreshWriteFlags(next);
                 R33DepthStencilState = next;
                 if (R33TelemetryEnabled())
                     ++R33DepthStencilSyncs;
@@ -250,6 +274,7 @@ namespace OutRunVRStereo
             }
 
             next.valid = true;
+            R33RefreshWriteFlags(next);
             next.depthGeneration = R32ReviewMainDepthGeneration();
             next.stateBlockRecordings = OutRunVR::State::StateBlockTracker::RecordingGeneration();
             next.stateBlockApplies = OutRunVR::State::StateBlockTracker::ApplyGeneration();
@@ -302,21 +327,12 @@ namespace OutRunVRStereo
             }
 
             const auto& s = R33DepthStencilState;
-            mayWriteDepth = s.zEnable != D3DZB_FALSE && s.zWrite != FALSE;
-
-            if (!R32ReviewMainDepthHasStencil() || s.stencilEnable == FALSE ||
-                s.stencilWriteMask == 0)
-                return true;
-
-            const bool frontWrites =
-                s.stencilFail != D3DSTENCILOP_KEEP ||
-                s.stencilZFail != D3DSTENCILOP_KEEP ||
-                s.stencilPass != D3DSTENCILOP_KEEP;
-            const bool backWrites = s.twoSided != FALSE &&
-                (s.ccwStencilFail != D3DSTENCILOP_KEEP ||
-                 s.ccwStencilZFail != D3DSTENCILOP_KEEP ||
-                 s.ccwStencilPass != D3DSTENCILOP_KEEP);
-            mayWriteStencil = frontWrites || backWrites;
+            mayWriteDepth = s.mayWriteDepth;
+            // Keep the current depth-format gate authoritative. In the common
+            // stencil-disabled / KEEP / zero-mask case this also avoids the
+            // attachment-format probe on each stereo primitive.
+            mayWriteStencil = s.stencilWritesIfPresent &&
+                R32ReviewMainDepthHasStencil();
             return true;
         }
 
@@ -379,8 +395,9 @@ namespace OutRunVRStereo
                 R33DepthStencilState.ccwStencilPass = value;
                 break;
             default:
-                break;
+                return hr;
             }
+            R33RefreshWriteFlags(R33DepthStencilState);
 
             // Do not rewrite depth/state-block generations here. If a StateBlock
             // made this snapshot stale, changing one tracked render state cannot
