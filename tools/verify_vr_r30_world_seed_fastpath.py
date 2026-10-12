@@ -122,7 +122,13 @@ for count in (1, 2, 8, 63, 64, 65, 127, 512, 4096):
             assert (old_left, old_right) == (new_left, new_right)
             # Simulate one successful full-reprojection eye requiring
             # source restoration; the other eye remains on affine fallback.
-            new_left[:] = bytes([0xA5]) * len(new_left)
+            # Full reprojection writes only XYZRHW (16 bytes) for
+            # referenced vertices. Unreferenced sparse holes are not read
+            # by indexed UP draws and must retain their previous bytes.
+            for i in range(count):
+                if mask is None or mask[i]:
+                    a = i * stride
+                    new_left[a:a + 16] = bytes([0xA5]) * 16
             seed(src, stride, mask, new_left, None)
             assert new_left == old_left and new_right == old_right
             cases += 1
