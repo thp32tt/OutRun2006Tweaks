@@ -492,13 +492,10 @@ namespace OutRunVRStereo
             if (R32DirectCopyPathRejected)
                 return false;
 
-            R30SupportDirectTransportSourceSurfaces sourceSurfaces{};
-            if (!R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces))
-                return false;
-
             const std::uint32_t preferred =
                 (frameId - 1u) % OutRunVR::RenderFrameRingSize;
             std::uint32_t selected = OutRunVR::RenderFrameRingSize;
+            R30SupportDirectTransportSlotPublication selectedPublication{};
             bool ackBlocked = false;
             R30SupportGpuCompletionSnapshot ackSnapshot{};
             bool ackSnapshotRead = false;
@@ -558,14 +555,9 @@ namespace OutRunVRStereo
                     return false;
                 }
 
-                if (candidate.published && candidate.frameId)
-                {
-                    // Both the host's exact-frame ACK and the producer EVENT
-                    // now permit retiring the old publication. Preserve the
-                    // shared-eye immutability rule before either eye copy.
-                    R30SupportRetireDirectTransportSlotPublication(index);
-                }
-
+                // Keep ownership until a valid source snapshot exists.
+                // The backpressured hot path never needs the cross-owner copy.
+                selectedPublication = candidate;
                 selected = index;
                 break;
             }
@@ -576,6 +568,16 @@ namespace OutRunVRStereo
                     R30SupportNoteSafeAckBackpressure();
                 R30SupportNoteDirectTransportRingBackpressure();
                 return false;
+            }
+
+            // Only snapshot on an ACK/fence-safe slot. A failed snapshot
+            // must not retire the prior host-owned frame publication.
+            R30SupportDirectTransportSourceSurfaces sourceSurfaces{};
+            if (!R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces))
+                return false;
+            if (selectedPublication.published && selectedPublication.frameId)
+            {
+                R30SupportRetireDirectTransportSlotPublication(selected);
             }
 
             const R30SupportDirectTransportCopyResult copy =
