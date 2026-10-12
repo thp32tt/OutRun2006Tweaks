@@ -62,7 +62,7 @@
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Validate this exact SHA's mandatory Gates. Runtime/HMD and gamepad UNTESTED. Other task/branch activity must not be disturbed.",
+  "next_action": "Publish prepared material repair after Backend #38272221660 finishes (workflow cancel-in-progress=true), then verify exact-SHA Gate, Build, DX11 Fast, OpenXR, HUD. RUNTIME_VALIDATION=UNTESTED.",
   "failure_context": {
     "backend_gate_run": 38270537945,
     "backend_gate": "FAIL: missing canonical LIVE_D3D9_CALLSITE/D3D11_NATIVE_DRAW/VISIBLE_FRAME_OUTPUT path",
@@ -77,6 +77,8 @@
     "followup2_backend_gate_run": 38271777677,
     "followup2_backend_gate": "FAIL 00587 expected obsolete ALPHAARG1 condition string without 00618 PMDiffuse exemption",
     "followup2_build_run": 38271782698,
-    "followup2_build": "FAIL old 00558 shader-completeness string missing new PMDiffuse PS and outdated allowlist string"
+    "followup2_build": "FAIL old 00558 shader-completeness string missing new PMDiffuse PS and outdated allowlist string",
+    "followup3_build_run": 38272226087,
+    "followup3_build": "FAIL: test 00558 mistakenly rejects an old substring that legitimately remains inside the new, more restrictive PM diffuse-alpha allowlist; remove negative substring check, preserve positive complete denylist requirement"
   }
 }
