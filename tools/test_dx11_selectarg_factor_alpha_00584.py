@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """DX11 00584 D3D9 RGB SELECTARG with independent texture-factor alpha."""
 from pathlib import Path
+import re
 
 P = Path(__file__).resolve().parents[1] / "src/vr/d3d11/live_game_frame_bridge.cpp"
 V = (("selectTextureFactorAlpha", "SELECTARG1", "Texture", "t.rgb"),
@@ -39,7 +40,15 @@ def linked(s):
             if tok not in pipe: return False
         if "capture."+flag+" ? s."+flag+"Ps.Get()" not in draw: return False
         if s.count("s."+flag+"Ps.Reset();") != 2: return False
-    if "selectTextureFactorAlpha || selectDiffuseFactorAlpha) &&" not in gate: return False
+    # Additional native stage0 alpha operations also need TFACTOR. Verify
+    # both historical SELECTARG routes remain inside the *same* live read
+    # guard, without assuming they are the last members of its OR chain.
+    factor_guard = gate.split("DWORD textureFactor = 0;", 1)[1].split(
+        "FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor))", 1)[0]
+    if "if ((" not in factor_guard or not re.search(
+            r"\\bselectTextureFactorAlpha\\s*\\|\\|\\s*selectDiffuseFactorAlpha\\s*(?:\\|\\||\\))",
+            factor_guard):
+        return False
     # The factor-alpha predicates must be defined before the read that uses
     # them. Static graph checks alone previously missed Win32 error C2065.
     factor_read = gate.find("DWORD textureFactor = 0;")
@@ -90,12 +99,18 @@ def main():
             factor_guard_end, factor_guard_end + declaration, 1)
         assert not linked(mutant), flag + " declaration-before-use"
         count += 1
-    assert count==22,count
+    # Both RGB select modes are mutually exclusive; replacing OR with AND
+    # would strand both previously supported factor-alpha draw paths.
+    assert not linked(mutate(s,
+        "selectTextureFactorAlpha || selectDiffuseFactorAlpha",
+        "selectTextureFactorAlpha && selectDiffuseFactorAlpha")), "factor guard OR broken"
+    count += 1
+    assert count==23,count
     for byte in (0,1,64,128,192,255):
         f=byte/255.0
         for t,d in ((0.0,1.0),(1.0,0.0),(.75,.25),(.2,.8)):
             a=d+(t-d)*f
             assert 0.0<=a<=1.0 and abs(a-((1.0-f)*d+f*t))<1e-12
-    print("00584 PASS: 22 destructive source mutations, 24 alpha cases, live Draw path; HMD UNTESTED")
+    print("00584 PASS: 23 destructive source mutations, 24 alpha cases, live Draw path; HMD UNTESTED")
 
 if __name__=="__main__": main()
