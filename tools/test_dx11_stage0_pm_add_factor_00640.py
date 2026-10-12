@@ -24,7 +24,7 @@ graph=[
     "!blendTextureAlphaPMAddFactorAlpha &&\n              !blendTextureAlphaPMAddSmoothFactorAlpha &&",
     "capture.blendTextureAlphaPMAddFactorAlpha = blendTextureAlphaPMAddFactorAlpha;",
     "capture.blendTextureAlphaPMAddSmoothFactorAlpha = blendTextureAlphaPMAddSmoothFactorAlpha;",
-    "if ((blendTextureAlphaPMAddFactorAlpha ||\\n             blendTextureAlphaPMAddSmoothFactorAlpha) &&\\n            (alphaArg2 & D3DTA_COMPLEMENT) != 0u)\\n            capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;",
+    "if ((blendTextureAlphaPMAddFactorAlpha ||\n             blendTextureAlphaPMAddSmoothFactorAlpha) &&\n            (alphaArg2 & D3DTA_COMPLEMENT) != 0u)\n            capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;",
     'compile("PSTextureBlendTextureAlphaPMAddFactorAlpha", "ps_4_0", blendTexturePmAddFactorCode)',
     'compile("PSTextureBlendTextureAlphaPMAddSmoothFactorAlpha", "ps_4_0", blendTexturePmAddSmoothFactorCode)',
     "s.blendTextureAlphaPmAddFactorAlphaPs.GetAddressOf()",
