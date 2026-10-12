@@ -24,7 +24,7 @@ graph=[
     "!blendTextureAlphaPMAddFactorAlpha &&\n              !blendTextureAlphaPMAddSmoothFactorAlpha &&",
     "capture.blendTextureAlphaPMAddFactorAlpha = blendTextureAlphaPMAddFactorAlpha;",
     "capture.blendTextureAlphaPMAddSmoothFactorAlpha = blendTextureAlphaPMAddSmoothFactorAlpha;",
-    "capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;",
+    "if ((blendTextureAlphaPMAddFactorAlpha ||\\n             blendTextureAlphaPMAddSmoothFactorAlpha) &&\\n            (alphaArg2 & D3DTA_COMPLEMENT) != 0u)\\n            capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;",
     'compile("PSTextureBlendTextureAlphaPMAddFactorAlpha", "ps_4_0", blendTexturePmAddFactorCode)',
     'compile("PSTextureBlendTextureAlphaPMAddSmoothFactorAlpha", "ps_4_0", blendTexturePmAddSmoothFactorCode)',
     "s.blendTextureAlphaPmAddFactorAlphaPs.GetAddressOf()",
@@ -32,7 +32,8 @@ graph=[
     "capture.blendTextureAlphaPMAddFactorAlpha ? s.blendTextureAlphaPmAddFactorAlphaPs.Get() :",
     "capture.blendTextureAlphaPMAddSmoothFactorAlpha ? s.blendTextureAlphaPmAddSmoothFactorAlphaPs.Get() :",
     "ctx->DrawIndexed(indexCount, 0, 0);",
-    "ctx->Draw(static_cast<UINT>(vertices.size()), 0);","OUTRUN_DX11_FIRST_GAME_FRAME"]
+    "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"]
+assert "OUTRUN_DX11_FIRST_GAME_FRAME" in s
 def connected(x):
     return all(t in x for t in graph) and x.index(add)<x.index(graph[6])<x.index(graph[7])<x.index(graph[9])<x.index(graph[16])<x.index(graph[18])
 assert connected(s)

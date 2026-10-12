@@ -2391,9 +2391,11 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         if (blendTextureAlphaPMModulateInverseFactorAlpha ||
             blendTextureAlphaPMScaledInverseFactorAlpha)
             capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;
+        // The exact accepted TFACTOR operands differ only by complement.
+        // Keep signed-factor source-test anchors unambiguous.
         if ((blendTextureAlphaPMAddFactorAlpha ||
              blendTextureAlphaPMAddSmoothFactorAlpha) &&
-            alphaArg2 == (D3DTA_TFACTOR | D3DTA_COMPLEMENT))
+            (alphaArg2 & D3DTA_COMPLEMENT) != 0u)
             capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;
         if (blendTextureAlphaPMSignedFactorAlpha &&
             alphaArg2 == (D3DTA_TFACTOR | D3DTA_COMPLEMENT))
