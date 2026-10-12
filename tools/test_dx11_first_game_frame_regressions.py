@@ -1696,7 +1696,9 @@ def main() -> None:
     run_00616()
     # 00617: native Draw with D3D9 premultiplied texture alpha.
     from test_dx11_stage0_premultiplied_00617 import main as run_00617
+    from test_dx11_stage0_pm_diffuse_00618 import main as run_00618
     run_00617()
+    run_00618()
 
     # 00558: real game-authored D3D9 stage0 BLENDTEXTUREALPHA /
     # BLENDDIFFUSEALPHA -> owned native PS -> Draw/DrawIndexed -> opt-in inset.

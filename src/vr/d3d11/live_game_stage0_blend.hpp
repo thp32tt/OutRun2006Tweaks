@@ -16,6 +16,12 @@ constexpr bool game_stage0_premultiplied_pair(std::uint32_t colorOp,
            alphaOp == kGameStage0BlendTextureAlphaPM;
 }
 
+// PM color with an independent stage0 SELECTARG2 alpha: do not borrow PM alpha.
+constexpr bool game_stage0_premultiplied_diffuse_alpha_pair(
+    std::uint32_t colorOp, std::uint32_t alphaOp) noexcept {
+    return colorOp == kGameStage0BlendTextureAlphaPM && alphaOp == 3u; // D3DTOP_SELECTARG2
+}
+
 constexpr std::uint32_t canonical_game_stage0_blend_alpha_op(
     std::uint32_t op, bool currentIsVertexDiffuse) noexcept {
     return currentIsVertexDiffuse && op == kGameStage0BlendCurrentAlpha
