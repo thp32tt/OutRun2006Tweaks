@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00608",
   "work_key": "DX11:LIVE_SRCALPHASAT_COPY_ADD",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "AWAIT_EXACT_SHA_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -58,5 +58,68 @@
     "status": "NOT_REQUIRED",
     "reason": "Diagnostic opted-in code only; runtime test and manual deployment outstanding"
   },
-  "next_action": "Verify exact SHA GitHub gates; fix real failures if needed; HMD/gamepad UNTESTED"
+  "next_action": "00608 C0-C6 source and five Gate complete. Next independent TASK_ID continues DX11 native menu/vehicle/race Draw integration. No HMD/runtime promotion; Quest3/VDXR and pad NEED_HMD_TEST.",
+  "result_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+  "material_commit": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+  "validation_bearing_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+  "validation_bearing_result_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+  "ci_summary": "Exact SHA 00608 Backend validate+readiness native regression SUCCESS; Win32 Build SUCCESS, DX11 Fast SUCCESS, OpenXR(push+PR) SUCCESS, HUD Inspector SUCCESS. VR PC Fast Test Build skipped by policy; Quest3/VDXR/menu/vehicle/race/gamepad UNTESTED.",
+  "validation_runs": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38241862491,
+      "conclusion": "success",
+      "head_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38241862491"
+    },
+    {
+      "name": "Build",
+      "run_id": 38241868165,
+      "conclusion": "success",
+      "head_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38241868165"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38241862527,
+      "conclusion": "success",
+      "head_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38241862527"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38241862498,
+      "conclusion": "success",
+      "head_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38241862498"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38241868131,
+      "conclusion": "success",
+      "head_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38241868131"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38241868105,
+      "conclusion": "success",
+      "head_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38241868105"
+    }
+  ],
+  "skipped_workflows": [
+    {
+      "name": "VR PC Fast Test Build",
+      "run_id": 38241862530,
+      "conclusion": "skipped"
+    }
+  ],
+  "evidence": {
+    "exact_sha": "764512e443577e9a6635bcf5d4df3a6e4f49293b",
+    "backend_gate_conclusion": "success",
+    "source_regression": "00608 25 destructive mutants / 83,521 scalar RGBA cases, exact SHA CI step Verify 00608 SUCCESS",
+    "gamepad_test_performed": false,
+    "hmd_test_performed": false
+  }
 }
