@@ -11,9 +11,9 @@
   "base_sha": "ddea4518a99e9e29a463058e7f85893776a6cf85",
   "work_key": "DX11:MENU_RACE_SELECTARG1_ARITH_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "native_gameplay_activation": false,
   "hmd_test_performed": false,
@@ -55,11 +55,35 @@
     "tools/test_dx11_first_game_frame_regressions.py",
     "docs/automation/runs/CONVERSION-DX11-00579.json"
   ],
-  "next_action": "Run exact-SHA mandatory GitHub Actions on repair commit, then separate C6 bookkeeping only if all required checks PASS. Runtime remains UNTESTED.",
+  "next_action": "Controller: do not reschedule 00579; HUD inspector is an auxiliary in-progress job, investigate if failed; next independent DX11 integration scope must be assigned by controller. Quest3/VDXR needs separate runtime parity.",
   "failure_evidence": {
     "workflow": "Backend Conversion Gate",
     "run_id": 38188978427,
     "conclusion": "failure",
     "cause": "missing live_game_draw_path and visible_frame_acceptance in strategy, before Win32 build"
+  },
+  "material_result_sha": "7785bfe2ab88ef13144ca17677bef38fa9108721",
+  "validation_bearing_result_sha": "7785bfe2ab88ef13144ca17677bef38fa9108721",
+  "evidence": {
+    "backend_gate_run_id": 38189189406,
+    "backend_gate_conclusion": "success",
+    "dx11_fast_run_id": 38189189347,
+    "dx11_fast_conclusion": "success",
+    "build_run_id": 38189192388,
+    "build_conclusion": "success",
+    "openxr_run_ids": [
+      38189192305,
+      38189189344
+    ],
+    "openxr_conclusions": [
+      "success",
+      "success"
+    ],
+    "hud_inspector_run_id": 38189192365,
+    "hud_inspector_conclusion": "in_progress at C6",
+    "result_arg_negative_mutations": 2,
+    "alpha_negative_mutations": 14,
+    "positive_source_proof": "RESULTARG=CURRENT preserved; RESULTARG=TEMP fail-closed keeps game D3D9 Draw",
+    "hardware_test": "not performed"
   }
 }
