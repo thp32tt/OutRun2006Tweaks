@@ -11,9 +11,9 @@
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "target_branch": "vr-dx11-native-r71",
   "base_head_sha": "5276ff8bbdc66b47d6be67169419fd2e79433f09",
-  "status": "IMPLEMENTED_PENDING_FULL_GATE",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -58,13 +58,14 @@
     "C0_RECOVER": "PASS: previous 00625 completed, unique 00626 owner/branch HEAD checked",
     "C1_REVIEW": "PASS: D3D9 ADDSIGNED2X alpha missing from live native PM RGB draw path",
     "C2_IMPLEMENT": "PASS: game capture + D3D11 shader/create/lifetime + native Draw/DrawIndexed integration",
-    "C3_VALIDATE": "SOURCE_STATIC_PENDING; EXACT_SHA_ACTIONS_PENDING",
-    "C4_COMMIT": "PENDING_SHA",
+    "C3_VALIDATE": "PASS_EXACT_SHA: existing GitHub CI SUCCESS for 47fcd94c2f2a6dc762f36758ff305adc2ee182f5 (Build #38289485093, OpenXR #38289486902, HUD #38289485072); no CI rerun",
+    "C4_COMMIT": "PASS: existing source/validation-bearing commit 47fcd94c2f2a6dc762f36758ff305adc2ee182f5; C6 bookkeeping only",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED; HMD/Quest3/VDXR/gamepad runtime UNTESTED"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Validate the final exact source result SHA in required GitHub Actions; HMD/Quest3/VDXR/gamepad UNTESTED."
+  "next_action": "C6 complete on existing exact SHA; no CI rerun or source edit. Actual Quest3/VDXR, gamepad input and native visual parity remain UNTESTED; no duplicate TASK_ID scoring.",
+  "validation_bearing_result_sha": "47fcd94c2f2a6dc762f36758ff305adc2ee182f5"
 }
