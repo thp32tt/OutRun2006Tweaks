@@ -127,7 +127,11 @@ def main():
     )
     for good, bad in mutations:
         assert good in source, good
-        altered = source.replace(good, bad, 1)
+        # Mutate the new affine helper (or its explicit dispatch), not an
+        # older independent-eye/fused function with identical expressions.
+        start = source.index("bool R30TransformWorldAffineStereo(")
+        at = source.index(good, start)
+        altered = source[:at] + bad + source[at + len(good):]
         try:
             verify_source(altered)
         except (AssertionError, ValueError):

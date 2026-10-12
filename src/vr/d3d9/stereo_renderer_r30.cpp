@@ -2182,6 +2182,87 @@ namespace OutRunVRStereo
             }
         }
 
+        // For unusual world projections with no authoritative per-eye inverse,
+        // keep the established affine fallback but visit source XYZRHW ONCE
+        // for both eyes. This avoids duplicate finite checks, viewport-to-NDC
+        // math and sparse-mask traversal in dense smoke/sand effects.
+        // Full eye reprojection and its bilateral rollback are not changed.
+        bool R30TransformWorldAffineStereo(
+            const void* source, UINT vertexCount, UINT stride,
+            const R30XyzrhwState& state,
+            std::vector<std::uint8_t>& left,
+            std::vector<std::uint8_t>& right,
+            const std::vector<std::uint8_t>* usedMask) noexcept
+        {
+            if (!state.worldEffect || state.fullWorldReprojection ||
+                !source || !vertexCount || stride < 4u * sizeof(float) ||
+                (usedMask && usedMask->size() < vertexCount))
+                return false;
+            const std::size_t bytes =
+                static_cast<std::size_t>(vertexCount) * stride;
+            if (!bytes || bytes > 4u * 1024u * 1024u ||
+                left.size() != bytes || right.size() != bytes)
+                return false;
+
+            const float x0 = static_cast<float>(state.viewport.X);
+            const float y0 = static_cast<float>(state.viewport.Y);
+            const float width = static_cast<float>(state.viewport.Width);
+            const float height = static_cast<float>(state.viewport.Height);
+            const float depthSpan =
+                state.viewport.MaxZ - state.viewport.MinZ;
+            if (width <= 0.0f || height <= 0.0f ||
+                !std::isfinite(depthSpan) || depthSpan <= 1.0e-6f)
+                return false;
+            const float ndcScaleX = 2.0f / width;
+            const float ndcScaleY = 2.0f / height;
+            const auto* sourceBytes = static_cast<const std::uint8_t*>(source);
+            for (UINT i = 0; i < vertexCount; ++i)
+            {
+                if (usedMask && !(*usedMask)[i])
+                    continue;
+                const std::size_t offset = static_cast<std::size_t>(i) * stride;
+                const auto* p =
+                    reinterpret_cast<const float*>(sourceBytes + offset);
+                const float x = p[0];
+                const float y = p[1];
+                const float z = p[2];
+                const float rhw = p[3];
+                if (!std::isfinite(x) || !std::isfinite(y) ||
+                    !std::isfinite(z) || !std::isfinite(rhw))
+                    return false;
+                const float ndcX = (x - x0) * ndcScaleX - 1.0f;
+                const float ndcY = 1.0f - (y - y0) * ndcScaleY;
+                const bool parallax = rhw > 0.0f && rhw < 1000.0f;
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    float correctedX =
+                        state.worldScaleX[eye] * ndcX +
+                        state.worldOffsetX[eye];
+                    float correctedY =
+                        state.worldScaleY[eye] * ndcY +
+                        state.worldOffsetY[eye];
+                    if (parallax)
+                    {
+                        correctedX += state.parallaxPerRhwX[eye] * rhw;
+                        correctedY += state.parallaxPerRhwY[eye] * rhw;
+                    }
+                    const float transformedX =
+                        x0 + (correctedX + 1.0f) * 0.5f * width;
+                    const float transformedY =
+                        y0 + (1.0f - correctedY) * 0.5f * height;
+                    if (!std::isfinite(transformedX) ||
+                        !std::isfinite(transformedY))
+                        return false;
+                    auto* dst = reinterpret_cast<float*>(
+                        (eye == 0 ? left.data() : right.data()) + offset);
+                    dst[0] = transformedX;
+                    dst[1] = transformedY;
+                    // Preserve game Z/RHW, packed colour and UV bytes.
+                }
+            }
+            return true;
+        }
+
         // Seed the two world-particle eyes in ONE referenced-span walk. Both
         // draws consume the same validated source indices, but eye reprojection
         // modifies different XYZRHW values after this copy. A rare bilateral
@@ -2776,87 +2857,6 @@ namespace OutRunVRStereo
                     4u * sizeof(float));
             }
             return false;
-        }
-
-        // For unusual world projections with no authoritative per-eye inverse,
-        // keep the established affine fallback but visit source XYZRHW ONCE
-        // for both eyes. This avoids duplicate finite checks, viewport-to-NDC
-        // math and sparse-mask traversal in dense smoke/sand effects.
-        // Full eye reprojection and its bilateral rollback are not changed.
-        bool R30TransformWorldAffineStereo(
-            const void* source, UINT vertexCount, UINT stride,
-            const R30XyzrhwState& state,
-            std::vector<std::uint8_t>& left,
-            std::vector<std::uint8_t>& right,
-            const std::vector<std::uint8_t>* usedMask) noexcept
-        {
-            if (!state.worldEffect || state.fullWorldReprojection ||
-                !source || !vertexCount || stride < 4u * sizeof(float) ||
-                (usedMask && usedMask->size() < vertexCount))
-                return false;
-            const std::size_t bytes =
-                static_cast<std::size_t>(vertexCount) * stride;
-            if (!bytes || bytes > 4u * 1024u * 1024u ||
-                left.size() != bytes || right.size() != bytes)
-                return false;
-
-            const float x0 = static_cast<float>(state.viewport.X);
-            const float y0 = static_cast<float>(state.viewport.Y);
-            const float width = static_cast<float>(state.viewport.Width);
-            const float height = static_cast<float>(state.viewport.Height);
-            const float depthSpan =
-                state.viewport.MaxZ - state.viewport.MinZ;
-            if (width <= 0.0f || height <= 0.0f ||
-                !std::isfinite(depthSpan) || depthSpan <= 1.0e-6f)
-                return false;
-            const float ndcScaleX = 2.0f / width;
-            const float ndcScaleY = 2.0f / height;
-            const auto* sourceBytes = static_cast<const std::uint8_t*>(source);
-            for (UINT i = 0; i < vertexCount; ++i)
-            {
-                if (usedMask && !(*usedMask)[i])
-                    continue;
-                const std::size_t offset = static_cast<std::size_t>(i) * stride;
-                const auto* p =
-                    reinterpret_cast<const float*>(sourceBytes + offset);
-                const float x = p[0];
-                const float y = p[1];
-                const float z = p[2];
-                const float rhw = p[3];
-                if (!std::isfinite(x) || !std::isfinite(y) ||
-                    !std::isfinite(z) || !std::isfinite(rhw))
-                    return false;
-                const float ndcX = (x - x0) * ndcScaleX - 1.0f;
-                const float ndcY = 1.0f - (y - y0) * ndcScaleY;
-                const bool parallax = rhw > 0.0f && rhw < 1000.0f;
-                for (int eye = 0; eye < 2; ++eye)
-                {
-                    float correctedX =
-                        state.worldScaleX[eye] * ndcX +
-                        state.worldOffsetX[eye];
-                    float correctedY =
-                        state.worldScaleY[eye] * ndcY +
-                        state.worldOffsetY[eye];
-                    if (parallax)
-                    {
-                        correctedX += state.parallaxPerRhwX[eye] * rhw;
-                        correctedY += state.parallaxPerRhwY[eye] * rhw;
-                    }
-                    const float transformedX =
-                        x0 + (correctedX + 1.0f) * 0.5f * width;
-                    const float transformedY =
-                        y0 + (1.0f - correctedY) * 0.5f * height;
-                    if (!std::isfinite(transformedX) ||
-                        !std::isfinite(transformedY))
-                        return false;
-                    auto* dst = reinterpret_cast<float*>(
-                        (eye == 0 ? left.data() : right.data()) + offset);
-                    dst[0] = transformedX;
-                    dst[1] = transformedY;
-                    // Preserve game Z/RHW, packed colour and UV bytes.
-                }
-            }
-            return true;
         }
 
         bool R30TransformXyzrhwStereo(
