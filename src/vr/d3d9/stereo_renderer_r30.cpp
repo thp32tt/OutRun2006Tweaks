@@ -2137,37 +2137,35 @@ namespace OutRunVRStereo
             }
         }
 
-        bool R30TransformXyzrhwVertices(
+        // Seed the two world-particle eyes in ONE referenced-span walk. Both
+        // draws consume the same validated source indices, but eye reprojection
+        // modifies different XYZRHW values after this copy. A rare bilateral
+        // fallback can also reseed just its successful eye independently.
+        bool R30SeedWorldXyzrhwBuffers(
             const void* source, UINT vertexCount, UINT stride,
-            const R30XyzrhwState& state, int eye,
-            std::vector<std::uint8_t>& out,
-            const std::vector<std::uint8_t>* usedMask,
-            bool allowFullReprojection, bool& usedFullReprojection) noexcept
+            std::vector<std::uint8_t>& left,
+            std::vector<std::uint8_t>* right,
+            const std::vector<std::uint8_t>* usedMask) noexcept
         {
-            usedFullReprojection = false;
-            if (!source || vertexCount == 0 || stride < sizeof(float) * 4 ||
-                eye < 0 || eye > 1)
+            if (!source || !vertexCount || stride < sizeof(float) * 4)
                 return false;
             const std::size_t bytes =
                 static_cast<std::size_t>(vertexCount) * stride;
-            if (bytes == 0 || bytes > 4u * 1024u * 1024u)
+            if (!bytes || bytes > 4u * 1024u * 1024u ||
+                (usedMask && usedMask->size() < vertexCount))
                 return false;
-            if (usedMask && usedMask->size() < vertexCount)
-                return false;
-
             try
             {
-                out.resize(bytes);
+                left.resize(bytes);
+                if (right)
+                    right->resize(bytes);
             }
             catch (...)
             {
                 return false;
             }
-            // Indexed particle/decal draws can reference only a small fraction
-            // of a wide vertex span. Avoid two whole-span CPU copies (one per
-            // eye) in that sparse case: D3D9 indexed UP draws read only vertices
-            // reached by their validated/rebased indices. Preserve the dense
-            // memcpy path and the atomic full-reprojection fallback below.
+
+            const auto* src = static_cast<const std::uint8_t*>(source);
             bool sparseCopied = false;
             if (usedMask && vertexCount >= 64u)
             {
@@ -2176,8 +2174,6 @@ namespace OutRunVRStereo
                     [](std::uint8_t used) noexcept { return used != 0; });
                 if (static_cast<std::size_t>(selectedCount) * 4u <= vertexCount)
                 {
-                    const auto* srcBytes =
-                        static_cast<const std::uint8_t*>(source);
                     UINT cursor = 0;
                     while (cursor < vertexCount)
                     {
@@ -2192,15 +2188,55 @@ namespace OutRunVRStereo
                                 static_cast<std::size_t>(begin) * stride;
                             const std::size_t runBytes =
                                 static_cast<std::size_t>(cursor - begin) * stride;
-                            std::memcpy(out.data() + offset,
-                                srcBytes + offset, runBytes);
+                            std::memcpy(left.data() + offset,
+                                src + offset, runBytes);
+                            if (right)
+                                std::memcpy(right->data() + offset,
+                                    src + offset, runBytes);
                         }
                     }
                     sparseCopied = true;
                 }
             }
             if (!sparseCopied)
-                std::memcpy(out.data(), source, bytes);
+            {
+                std::memcpy(left.data(), source, bytes);
+                if (right)
+                    std::memcpy(right->data(), source, bytes);
+            }
+            return true;
+        }
+
+        bool R30TransformXyzrhwVertices(
+            const void* source, UINT vertexCount, UINT stride,
+            const R30XyzrhwState& state, int eye,
+            std::vector<std::uint8_t>& out,
+            const std::vector<std::uint8_t>* usedMask,
+            bool allowFullReprojection, bool& usedFullReprojection,
+            bool preseeded) noexcept
+        {
+            usedFullReprojection = false;
+            if (!source || vertexCount == 0 || stride < sizeof(float) * 4 ||
+                eye < 0 || eye > 1)
+                return false;
+            const std::size_t bytes =
+                static_cast<std::size_t>(vertexCount) * stride;
+            if (bytes == 0 || bytes > 4u * 1024u * 1024u)
+                return false;
+            if (usedMask && usedMask->size() < vertexCount)
+                return false;
+
+            // The shared world-particle prepass has already seeded both eye
+            // buffers. On bilateral fallback, only the successful full eye
+            // is reseeded from the original source before affine reprojection.
+            if (preseeded)
+            {
+                if (out.size() != bytes)
+                    return false;
+            }
+            else if (!R30SeedWorldXyzrhwBuffers(
+                    source, vertexCount, stride, out, nullptr, usedMask))
+                return false;
 
             const float x0 = static_cast<float>(state.viewport.X);
             const float y0 = static_cast<float>(state.viewport.Y);
@@ -2665,12 +2701,19 @@ namespace OutRunVRStereo
                 return true;
             }
 
+            // This is the high-frequency indexed smoke/sand/decal path:
+            // one sparse-mask population count and one contiguous-run scan
+            // seeds both eye scratch buffers before per-eye projection work.
+            if (!R30SeedWorldXyzrhwBuffers(
+                    source, vertexCount, stride, left, &right, usedMask))
+                return false;
+
             bool leftFull = false;
             bool rightFull = false;
             if (!R30TransformXyzrhwVertices(source, vertexCount, stride,
-                    state, 0, left, usedMask, true, leftFull) ||
+                    state, 0, left, usedMask, true, leftFull, true) ||
                 !R30TransformXyzrhwVertices(source, vertexCount, stride,
-                    state, 1, right, usedMask, true, rightFull))
+                    state, 1, right, usedMask, true, rightFull, true))
                 return false;
 
             if (leftFull != rightFull)
@@ -2690,11 +2733,11 @@ namespace OutRunVRStereo
                 bool ignored = false;
                 if (leftFull &&
                     !R30TransformXyzrhwVertices(source, vertexCount, stride,
-                        state, 0, left, usedMask, false, ignored))
+                        state, 0, left, usedMask, false, ignored, false))
                     return false;
                 if (rightFull &&
                     !R30TransformXyzrhwVertices(source, vertexCount, stride,
-                        state, 1, right, usedMask, false, ignored))
+                        state, 1, right, usedMask, false, ignored, false))
                     return false;
             }
             return true;
