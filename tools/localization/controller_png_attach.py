@@ -135,7 +135,7 @@ async def attach_png(page, binding):
         return "ATTACHMENT_NOT_VERIFIED"
 
 
-def mark_sent(binding, root=ROOT):
+def mark_sent(binding, root=ROOT, status="CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS"):
     """Prevent re-sending a stale source on later automatic schedules."""
     target = Path(root) / "sent" / (
         binding["role"] + "_" + binding["task_id"] + ".json"
@@ -145,7 +145,7 @@ def mark_sent(binding, root=ROOT):
         "task_id": binding["task_id"], "role": binding["role"],
         "png_sha256": binding["png_sha256"],
         "source_dds_sha256": binding["source_dds_sha256"],
-        "status": "CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS",
+        "status": status,
     }
     with target.open("x", encoding="utf-8") as handle:
         json.dump(payload, handle, ensure_ascii=False, indent=2)
