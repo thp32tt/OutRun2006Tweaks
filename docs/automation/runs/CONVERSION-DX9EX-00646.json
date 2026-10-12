@@ -1,0 +1,76 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00646",
+  "production_id": "CONVERSION-DX9EX-00646",
+  "event_id": "CONVERSION-DX9EX-00646-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R31_EXACT_WORLD_WVP_STEREO_PRODUCT_CACHE",
+  "initial_material_sha": "461b24c85ae4392a92b0d72945c4acdf5c4c04bd",
+  "material_result_sha": "461b24c85ae4392a92b0d72945c4acdf5c4c04bd",
+  "material_commits": [
+    "461b24c85ae4392a92b0d72945c4acdf5c4c04bd"
+  ],
+  "verifier_repair_commits": [
+    "f44328d5bdd3bf6cf953d84175e1b453a22afef4",
+    "de165af5524819c086336809fbc1e9d72d734b71"
+  ],
+  "result_sha": "de165af5524819c086336809fbc1e9d72d734b71",
+  "validation_bearing_result_sha": "de165af5524819c086336809fbc1e9d72d734b71",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Remove redundant 4x4 CPU per-eye matrix products from consecutive DX9Ex R31 world draws that share an exact validated WVP and unchanged XR eye-tail projection.",
+    "acceptance": "Original verified/live WVP, shader epoch and pose gating retained; exact 64-byte key; transactional two-eye finite matrix publish; eye geometry, Reset/ResetEx, StateBlock and blocked-generation invalidation; 14 negative mutations, 1300 numeric parity draws, exact-SHA DX9Ex Active and Domain Isolation gates plus material Full Source Impact.",
+    "runtime_metrics": "No Quest3/VDXR gameplay, frame-time, visual or FPS evidence. Runtime impact UNTESTED."
+  },
+  "acceptance_results": [
+    {
+      "item": "R31_WORLD_WVP_FAST_DRAW",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Material SHA 461b24c85ae4392a92b0d72945c4acdf5c4c04bd changes src/vr/d3d9/stereo_renderer_r31.cpp to reuse matching left/right verified WVP products; computed WVP only on exact cache miss, with both eye matrix finite checks before publish."
+    },
+    {
+      "item": "WVP_PROJECTION_LIVE_VALIDATION_AND_RESET",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Original generation, shader, pose, periodic/unreliable live-WVP gates precede reuse. R31EyeTail miss, Reset/ResetEx, blocked generation and StateBlock dirties invalidate the cache."
+    },
+    {
+      "item": "NEGATIVE_MUTATIONS_AND_NUMERIC_PARITY",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "At validation SHA de165af5524819c086336809fbc1e9d72d734b71 tools/verify_vr_r31_world_wvp_cache.py passed 14 negative mutations, 1300 float32 simulation draws (960 reuse, 340 recompute), policy job SUCCESS."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Validation-bearing SHA de165af5524819c086336809fbc1e9d72d734b71 DX9Ex Active https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38188524583 SUCCESS for policy, host, game, full-chain-compile, package (5/5)."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Validation-bearing SHA de165af5524819c086336809fbc1e9d72d734b71 https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38188524584 SUCCESS."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_MATERIAL_SHA",
+      "evidence": "Initial source material SHA 461b24c85ae4392a92b0d72945c4acdf5c4c04bd https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38188383648 SUCCESS (source-cross-domain, MSVC host/game analyzers). Subsequent SHA changes modify only verifier."
+    },
+    {
+      "item": "PROTECTED_HUD_SKYGLOW_FFB",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "No HUD, SkyGlow, stereo ownership, DirectGPU copy, FFB or DX11/DXVK/Localization source changed."
+    },
+    {
+      "item": "QUEST3_VDXR_RUNTIME",
+      "status": "UNTESTED",
+      "evidence": "Actual headset game render, frame time, FPS, visual and input acceptance were not exercised."
+    }
+  ],
+  "notes": "First two validation-bearing candidates 461b24c8 and f44328d5 failed only due to missing-anchor ValueError in deliberate negative mutations; repaired under identical TASK, not scored separately. This separate [skip ci] C6 commit records exact-SHA gate PASS without replacing result SHA. Score once only for material result + confirmed gates. RUNTIME_VALIDATION=UNTESTED."
+}
