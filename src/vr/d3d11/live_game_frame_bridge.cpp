@@ -55,8 +55,16 @@ cbuffer AlphaParams : register(b0) { float4 alphaParams; };
 void AlphaGate(float alpha) {
     if (alphaParams.x > 0.5f) {
         float value = floor(saturate(alpha) * 255.0f + 0.5f);
-        bool pass = (alphaParams.z == 5.0f && value > alphaParams.y) ||
-                    (alphaParams.z == 7.0f && value >= alphaParams.y);
+        // D3DCMP_NEVER (1) deliberately has no passing case.
+        // Quantize first: all eight D3D9 ALPHAFUNC values compare bytes,
+        // never the interpolated floating point source alpha directly.
+        bool pass = (alphaParams.z == 2.0f && value < alphaParams.y) ||
+                    (alphaParams.z == 3.0f && value == alphaParams.y) ||
+                    (alphaParams.z == 4.0f && value <= alphaParams.y) ||
+                    (alphaParams.z == 5.0f && value > alphaParams.y) ||
+                    (alphaParams.z == 6.0f && value != alphaParams.y) ||
+                    (alphaParams.z == 7.0f && value >= alphaParams.y) ||
+                    (alphaParams.z == 8.0f); // D3DCMP_ALWAYS
         clip(pass ? 1.0f : -1.0f);
     }
 }
@@ -1151,8 +1159,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         output.scissor = true;
         output.nativeScissor = {nativeLeft, nativeTop, nativeRight, nativeBottom};
     }
-    // D3D9 sprite/menu draw states. Reject alternate blend factors,
-    // separate alpha, or alpha compare functions before any native draw.
+    // D3D9 sprite/menu draw states. Mirror the complete 8-bit alpha compare
+    // family, but continue to reject unsupported blend factors/separate alpha.
     if (blend) {
         DWORD src = 0, dst = 0, blendOp = 0, separate = TRUE;
         if (FAILED(game->GetRenderState(D3DRS_SRCBLEND, &src)) ||
@@ -1197,7 +1205,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         DWORD func = 0, reference = ~0u;
         if (FAILED(game->GetRenderState(D3DRS_ALPHAFUNC, &func)) ||
             FAILED(game->GetRenderState(D3DRS_ALPHAREF, &reference)) ||
-            (func != D3DCMP_GREATER && func != D3DCMP_GREATEREQUAL) ||
+            ((func != D3DCMP_GREATER && func != D3DCMP_GREATEREQUAL) &&
+             func != D3DCMP_NEVER && func != D3DCMP_LESS &&
+             func != D3DCMP_EQUAL && func != D3DCMP_LESSEQUAL &&
+             func != D3DCMP_NOTEQUAL && func != D3DCMP_ALWAYS) ||
             reference > 255u)
             return false;
         output.alphaTest = true;

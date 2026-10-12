@@ -185,6 +185,8 @@ jobs:
         run: python tools/test_dx11_native_multiply_00598.py
       - name: DX11 real-game subtract/reverse-subtract OM 00599
         run: python tools/test_dx11_native_subtractive_00599.py
+      - name: DX11 live menu/race 8-bit alpha compare 00600
+        run: python tools/test_dx11_native_alpha_compare_00600.py
 
       - name: Verify DX11 source graph
         shell: pwsh
