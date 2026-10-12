@@ -347,11 +347,15 @@ namespace OutRunVRStereo
             auto& cached = R30VertexLookup;
             const auto epoch =
                 R30ShadowRegistryEpoch.load(std::memory_order_acquire);
-            if (cached.entry && cached.buffer == buffer &&
+            if (cached.buffer == buffer &&
                 cached.epoch == epoch)
                 return cached.entry;
-            // Slow path holds the registry lock across lookup and epoch
-            // capture. A recycled COM address never inherits a stale entry.
+            // Positive and negative hits are both fenced by the registry
+            // membership epoch. Repeated untracked buffers must not take
+            // the global registry mutex/hash lookup on every particle draw.
+            // Registration, final Release and Reset each advance this epoch;
+            // a recycled COM address never inherits stale shadow ownership.
+            // Slow path captures the epoch while holding the registry lock.
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             const auto it = R30VertexShadows.find(buffer);
             cached.buffer = buffer;
@@ -366,11 +370,15 @@ namespace OutRunVRStereo
             auto& cached = R30IndexLookup;
             const auto epoch =
                 R30ShadowRegistryEpoch.load(std::memory_order_acquire);
-            if (cached.entry && cached.buffer == buffer &&
+            if (cached.buffer == buffer &&
                 cached.epoch == epoch)
                 return cached.entry;
-            // Slow path holds the registry lock across lookup and epoch
-            // capture. A recycled COM address never inherits a stale entry.
+            // Positive and negative hits are both fenced by the registry
+            // membership epoch. Repeated untracked buffers must not take
+            // the global registry mutex/hash lookup on every particle draw.
+            // Registration, final Release and Reset each advance this epoch;
+            // a recycled COM address never inherits stale shadow ownership.
+            // Slow path captures the epoch while holding the registry lock.
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
             const auto it = R30IndexShadows.find(buffer);
             cached.buffer = buffer;

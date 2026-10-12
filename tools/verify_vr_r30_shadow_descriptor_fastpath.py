@@ -251,7 +251,7 @@ def validate_shadow_registry_lookup(source):
     ):
         for token in (f"auto& cached = {cache};",
                       "R30ShadowRegistryEpoch.load(std::memory_order_acquire)",
-                      "cached.entry && cached.buffer == buffer &&",
+                      "cached.buffer == buffer &&",
                       "cached.epoch == epoch", "return cached.entry;",
                       "std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);",
                       f"{mapping}.find(buffer)",
@@ -260,6 +260,7 @@ def validate_shadow_registry_lookup(source):
                       "R30ShadowRegistryEpoch.load(std::memory_order_relaxed)"):
             assert token in fn, token
         assert fn.index("cached.epoch == epoch") < fn.index("std::lock_guard")
+        assert "cached.entry && cached.buffer == buffer" not in fn
     for type in ("Vertex", "Index"):
         ensure = body(source, f"R30ShadowPtr R30Ensure{type}Shadow(")
         release = body(source, f"ULONG __stdcall R30{type}BufferReleaseDest(")
@@ -274,9 +275,70 @@ def validate_shadow_registry_lookup(source):
         "R30ShadowRegistryEpoch.fetch_add(")
 
 
+
+def exercise_shadow_negative_lookup_model():
+    """Both lookup families cache absent objects until a membership epoch change."""
+    membership = {}
+    caches = {"VB": {"buffer": None, "epoch": 0, "entry": None},
+              "IB": {"buffer": None, "epoch": 0, "entry": None}}
+    epoch = 1
+    lock_lookups = 0
+
+    def find(kind, pointer):
+        nonlocal lock_lookups
+        cache = caches[kind]
+        if cache["buffer"] == pointer and cache["epoch"] == epoch:
+            return cache["entry"]
+        lock_lookups += 1
+        cache["buffer"] = pointer
+        cache["entry"] = membership.get((kind, pointer))
+        cache["epoch"] = epoch
+        return cache["entry"]
+
+    def register(kind, pointer, value):
+        nonlocal epoch
+        if find(kind, pointer) is not None:
+            return
+        if (kind, pointer) not in membership:
+            membership[(kind, pointer)] = value
+            epoch += 1
+
+    def release(kind, pointer):
+        nonlocal epoch
+        if membership.pop((kind, pointer), None) is not None:
+            epoch += 1
+
+    for kind in ("VB", "IB"):
+        assert find(kind, 0x1234) is None
+        first = lock_lookups
+        for _ in range(256):
+            assert find(kind, 0x1234) is None
+        assert lock_lookups == first, (kind, "negative-cache thrash")
+        register(kind, 0x1234, "old")
+        assert find(kind, 0x1234) == "old"
+        first = lock_lookups
+        for _ in range(256):
+            assert find(kind, 0x1234) == "old"
+        assert lock_lookups == first, (kind, "positive-cache thrash")
+        release(kind, 0x1234)
+        assert find(kind, 0x1234) is None
+        register(kind, 0x1234, "recycled")
+        assert find(kind, 0x1234) == "recycled"
+        release(kind, 0x1234)
+        assert find(kind, 0x1234) is None
+
+    # Registration in either map invalidates the other map's cached absence.
+    assert find("VB", 0xFEED) is None
+    register("IB", 0xBEEF, "indexed")
+    before = lock_lookups
+    assert find("VB", 0xFEED) is None
+    assert lock_lookups == before + 1
+    release("IB", 0xBEEF)
+
+
 def test_shadow_registry_lookup_mutations(source):
     edits = (
-        ("cached.entry && cached.buffer == buffer &&", "cached.entry && true &&"),
+        ("cached.buffer == buffer &&", "cached.entry && cached.buffer == buffer &&"),
         ("cached.epoch == epoch", "cached.epoch != epoch"),
         ("R30ShadowRegistryEpoch.load(std::memory_order_acquire)",
          "R30ShadowRegistryEpoch.load(std::memory_order_relaxed)"),
@@ -310,6 +372,7 @@ def main():
     validate_shadow_copy_cache(source)
     test_shadow_copy_cache_mutations(source)
     validate_shadow_registry_lookup(source)
+    exercise_shadow_negative_lookup_model()
     test_shadow_registry_lookup_mutations(source)
     mutations = (
         ("if (!vbShadow)", "if (false)"),
@@ -333,7 +396,7 @@ def main():
             pass
         else:
             raise AssertionError("mutation survived: " + needle)
-    print("PASS R30 VB/IB descriptor, range and revision-keyed shadow copy cache; 11 descriptor + 8 range + 13 copy + 9 registry negative mutations")
+    print("PASS R30 VB/IB descriptor, range and revision-keyed shadow copy cache; 11 descriptor + 8 range + 13 copy + 9 registry negative mutations; VB/IB negative-cache/recycle model")
 
 
 if __name__ == "__main__":
