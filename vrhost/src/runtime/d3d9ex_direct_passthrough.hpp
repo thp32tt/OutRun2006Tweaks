@@ -410,6 +410,21 @@ namespace OutRunVrD3D9ExDirectPassthrough
                     const std::uint32_t before = slot.sequence;
                     if (before & 1u)
                         continue;
+                    // Avoid copying every unrelated frame in the shared ring.
+                    // Read the cheap frame ID under the slot seqlock first;
+                    // concurrent updates retry instead of trusting the probe.
+                    MemoryBarrier();
+                    const std::uint32_t probedFrameId = slot.frameId;
+                    MemoryBarrier();
+                    const std::uint32_t probeAfter = slot.sequence;
+                    if (before != probeAfter || (probeAfter & 1u))
+                        continue;
+                    if (probedFrameId != frameId)
+                        break;
+
+                    // The prefilter is not authoritative. A matching frame
+                    // still requires the full snapshot and second seqlock
+                    // validation plus ring generation / producer identity.
                     MemoryBarrier();
                     OutRunVR::SharedRenderFrameState candidate{};
                     std::memcpy(&candidate, &slot, sizeof(candidate));
