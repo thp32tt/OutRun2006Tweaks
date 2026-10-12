@@ -88,7 +88,7 @@ def main():
     )
     for anchor, replacement, scope in mutants:
         if scope == "desc":
-            start = source.index("// D3D9 ONE/ZERO:")
+            start = source.index("// D3D9 ONE/ZERO: source replacement in all four channels")
             end = source.index("// Multiplicative game overlays:", start)
         elif scope == "mask":
             start = source.index("} else if (output.sourceReplaceBlend &&")
