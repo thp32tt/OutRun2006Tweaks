@@ -8,7 +8,14 @@ B = ROOT / "src/vr/d3d11/live_game_frame_bridge.cpp"
 def linked(h, b):
     part = b.split("bool supported_game_state(", 1)[-1].split("bool translate_vertices(", 1)[0]
     ps = b.split("float4 PSTextureBlendTextureAlphaPM(VOut v) : SV_Target {", 1)
-    return len(ps) == 2 and all(t in h for t in (
+    # A separate 00618 SELECTARG2 helper shares this identifier. Check the
+    # original PM/PM helper itself so destructive mutations cannot pass via it.
+    pair = h.split("constexpr bool game_stage0_premultiplied_pair(", 1)
+    pair_body = pair[1].split("}", 1)[0] if len(pair) == 2 else ""
+    return len(ps) == 2 and len(pair) == 2 and all(t in pair_body for t in (
+        "colorOp == kGameStage0BlendTextureAlphaPM &&",
+        "alphaOp == kGameStage0BlendTextureAlphaPM;"
+    )) and all(t in h for t in (
         "kGameStage0BlendTextureAlphaPM = 15u;",
         "colorOp == kGameStage0BlendTextureAlphaPM &&",
         "alphaOp == kGameStage0BlendTextureAlphaPM;"

@@ -29,7 +29,7 @@ def linked(b: str, h: str) -> bool:
         "!blendTextureAlphaPMDiffuseAlpha && !blendTextureAlpha",
         "alphaArg1 != D3DTA_TEXTURE && !blendTextureAlphaPMDiffuseAlpha",
         "const bool alphaArg2UnusedOnSelectArg1 = alphaOp == D3DTOP_SELECTARG1;",
-        "(alphaNeedsDiffuse && !alphaArg2Diffuse && !alphaArg2UnusedOnSelectArg1)",
+        "(alphaNeedsDiffuse && !alphaArg2Diffuse) && !alphaArg2UnusedOnSelectArg1",
         "nextColorOp != D3DTOP_DISABLE",
     )
     return (
@@ -53,7 +53,7 @@ def main() -> None:
         ("bridge", "alphaArg1 != D3DTA_TEXTURE && !blendTextureAlphaPMDiffuseAlpha", "alphaArg1 != D3DTA_TEXTURE && false"),
         ("bridge", "float4 c = float4(saturate(t.rgb + v.diffuse.rgb * (1.0f - t.a)), v.diffuse.a);", "float4 c = saturate(t + v.diffuse * (1.0f - t.a));"),
         ("bridge", "const bool alphaArg2UnusedOnSelectArg1 = alphaOp == D3DTOP_SELECTARG1;", "const bool alphaArg2UnusedOnSelectArg1 = false;"),
-        ("bridge", "(alphaNeedsDiffuse && !alphaArg2Diffuse && !alphaArg2UnusedOnSelectArg1)", "(alphaNeedsDiffuse && !alphaArg2Diffuse)"),
+        ("bridge", "(alphaNeedsDiffuse && !alphaArg2Diffuse) && !alphaArg2UnusedOnSelectArg1", "(alphaNeedsDiffuse && !alphaArg2Diffuse)"),
         ("header", "colorOp == kGameStage0BlendTextureAlphaPM && alphaOp == 3u;", "colorOp == kGameStage0BlendTextureAlphaPM && alphaOp == 2u;"),
     )
     for kind, before, after in destructive:
