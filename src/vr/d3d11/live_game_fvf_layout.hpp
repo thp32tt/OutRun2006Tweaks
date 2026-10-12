@@ -253,7 +253,10 @@ inline bool game_fvf_decode_vertex(const void* bytes, std::uint32_t stride,
             std::memcpy(slots[slot], data + offset, bytesToCopy);
             // 3-component FVF stores (u,v,w), but the untransformed 2D
             // texture path consumes (u,v). Preserve the next UV byte offset.
-            offset += (layout.texcoord3DMask & (1u << slot)) ? 12u : bytesToCopy;
+            if (layout.texcoord3DMask & (1u << slot))
+                offset += 12u;
+            else
+                offset += bytesToCopy;
         }
     // UV1 U-only must not borrow the first float of UV2 as its missing V.
     } else if (layout.secondTexcoord1D) {
