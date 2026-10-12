@@ -118,5 +118,12 @@
     "gamepad_runtime_test": false,
     "hmd_runtime_test": false,
     "source_substantive": true
+  },
+  "c6_bookkeeping": {
+    "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+    "resolution": "PASS_EXACT_SHA",
+    "scope": "C6_RESULT_ONLY",
+    "validation_sha": "7000b182ee30dde5dfd2d8a64f2802ccf3b9fb81",
+    "ci_policy": "SKIP_CI"
   }
 }
