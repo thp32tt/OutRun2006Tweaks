@@ -349,7 +349,7 @@ for raw_poll in (
 ):
     if raw_poll in resolve_direct:
         errors.append(f"R32 DirectGPU resolve retained raw lower producer-poll state: {raw_poll}")
-if resolve_direct.count("R30SupportRetireDirectTransportSlotPublication(index)") != 1:
+if resolve_direct.count("R30SupportRetireDirectTransportSlotPublication(selected)") != 1:
     errors.append("R32 DirectGPU ACK retirement must delegate exactly once to R30 publication owner")
 for raw_retire in ("candidate.frameId = 0;", "candidate.published = false;"):
     if raw_retire in resolve_direct:
@@ -433,9 +433,12 @@ for raw in ("BackBuffer", "RightEyeSurface"):
     if re.search(rf"\b{raw}\b", resolve_direct):
         errors.append(f"R32 DirectGPU resolve retained raw lower source surface: {raw}")
 source_order = (
+    "const std::uint32_t preferred =",
+    "if (selected >= OutRunVR::RenderFrameRingSize)",
     "R30SupportDirectTransportSourceSurfaces sourceSurfaces{};",
     "R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces)",
-    "const std::uint32_t preferred =",
+    "if (selectedPublication.published && selectedPublication.frameId)",
+    "R30SupportRetireDirectTransportSlotPublication(selected)",
     "R30SupportCopyDirectTransportEyesAndIssueFence(\n                device, selected, sourceSurfaces)",
 )
 ack_snapshot_order = (
