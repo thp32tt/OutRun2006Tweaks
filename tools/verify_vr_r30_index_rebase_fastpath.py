@@ -142,8 +142,12 @@ def verify_decode_cache(source, body):
 
 def valid_vb_touched(source, body):
     """Ring/IB-generation-safe touched list, consumed by the stereo seed path."""
+    # The declaration belongs to the full translation unit; every other
+    # invariant belongs to the *mutated* indexed-draw body, not the original
+    # translation unit. Otherwise the unmodified source masks broken mutants.
+    if "std::vector<std::uint32_t> vbTouched;" not in source:
+        return False
     required = (
-        "std::vector<std::uint32_t> vbTouched;",
         "scratch.vbTouched.size() == decoded.knownUsedCount",
         "scratch.vbTouched.clear();",
         "scratch.vbTouched.push_back(",
@@ -153,8 +157,7 @@ def valid_vb_touched(source, body):
         "next.valid = true;",
         "&scratch.used, knownUsedCount, &scratch.vbTouched)",
     )
-    combined = source + body
-    if any(token not in combined for token in required):
+    if any(token not in body for token in required):
         return False
     if body.count("scratch.vbTouched.push_back(") != 1:
         return False
