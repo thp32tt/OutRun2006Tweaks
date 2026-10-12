@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00630",
+  "production_id": "CONVERSION-DX11-00630",
+  "event_id": "CONVERSION-DX11-00630-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_PM_RGB_SELECTARG2_TFACTOR_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "623a5cc3198b6fa4ac9481298894c47ce7e34700",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Live game D3D9 ALPHAOP SELECTARG2/ALPHAARG2 TFACTOR state and high-byte render-state capture",
+      "Existing compiled D3D11 PM RGB/factor-alpha PS -> native Draw/DrawIndexed -> diagnostic frame",
+      "Reject modifiers and unhandled states with original DX9Ex draw and input"
+    ],
+    "batch_components": [
+      "C++ strict D3D9 ALPHAARG2 admission and live factor capture",
+      "C++ shader routing precedence override and DX9Ex failure guard",
+      "Destructive source graph and 16384 pixel arithmetic combinations"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "PM RGB with TFACTOR alpha SELECTARG2 uses independently captured ARGB factor high byte",
+      "negative_regression": "Wrong active argument, shader override or missing factor read fails; prior diffuse SELECTARG2 remains distinct",
+      "component_integration": "Real game D3D9 GetTextureStageState/GetRenderState to compiled D3D11 PS with guarded DrawIndexed/Draw"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_PM_RGB_SELECTARG2_TFACTOR_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Code and exact-SHA CI only; actual game image/HMD not tested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME explicit diagnostic enable; unsupported game and input remain DX9Ex"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_factor_arg2_00630.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00630.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub branch and prior active CI checked",
+    "C1_REVIEW": "PASS factor SELECTARG2 wrongly routed through SELECTARG2 diffuse selector",
+    "C2_IMPLEMENT": "PASS exact argument factor capture and mutually-exclusive native shader routing",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_GATE"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Check mandatory GitHub Actions on exact validation-bearing SHA; RUNTIME_VALIDATION remains UNTESTED."
+}

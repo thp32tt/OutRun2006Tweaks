@@ -47,7 +47,8 @@ jobs:
           python tools/test_dx11_stage0_pm_addsigned2x_00626.py
           python tools/test_dx11_stage0_pm_blendtexturealpha_00627.py
           python tools/test_dx11_stage0_pm_blenddiffusealpha_00628.py
-           python tools/test_dx11_stage0_pm_blendfactoralpha_00629.py
+          python tools/test_dx11_stage0_pm_blendfactoralpha_00629.py
+          python tools/test_dx11_stage0_pm_factor_arg2_00630.py
       - name: Verify source graph and dormant runtime activation
         run: |
           python tools/verify_dx11_source_graph.py

@@ -1812,6 +1812,12 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // Only this exact PM RGB / factor-alpha operation is admitted.
         const bool blendTextureAlphaPMFactorAlpha = op == D3DTOP_BLENDTEXTUREALPHAPM &&
             alphaOp == D3DTOP_SELECTARG1 && alphaArg1 == D3DTA_TFACTOR;
+        // SELECTARG2 reads only ALPHAARG2. Route an unmodified TFACTOR
+        // high-byte to the already compiled native PM RGB/factor-alpha PS.
+        // Never alias this to the earlier SELECTARG2 vertex-diffuse PS.
+        const bool blendTextureAlphaPMFactorArg2Alpha =
+            op == D3DTOP_BLENDTEXTUREALPHAPM &&
+            alphaOp == D3DTOP_SELECTARG2 && alphaArg2 == D3DTA_TFACTOR;
         // Reject alpha operand modifiers, TFACTOR and reverse ordering.
         const bool blendTextureAlphaPMModulateAlpha = op == D3DTOP_BLENDTEXTUREALPHAPM &&
             alphaOp == D3DTOP_MODULATE && alphaArg1 == D3DTA_TEXTURE &&
@@ -1868,7 +1874,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
              blendTextureAlphaPMFactorAlpha || blendTextureAlphaPMBlendFactorAlpha || blendFactorDiffuseAlpha || blendFactorAddAlpha ||
              blendFactorSubtractAlpha || blendFactorAddSmoothAlpha ||
              blendFactorModulate2XAlpha || blendFactorModulate4XAlpha ||
-              selectTextureFactorAlpha || selectDiffuseFactorAlpha) &&
+              selectTextureFactorAlpha || selectDiffuseFactorAlpha ||
+              blendTextureAlphaPMFactorArg2Alpha) &&
             FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))
             return false;
         // RGB and alpha must both use ADD(TEXTURE, DIFFUSE).
@@ -1993,7 +2000,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                ((!selectDiffuseDiffuseAlpha && !mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE && !blendTextureAlphaPMDiffuseAlpha) && !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha &&
                !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha && !blendTextureAlphaPMFactorAlpha)))) ||
             (rgbNeedsDiffuse && !arg2Diffuse) ||
-            (((alphaNeedsDiffuse && !alphaArg2Diffuse) && !alphaArg2UnusedOnSelectArg1) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha) ||
+            (((alphaNeedsDiffuse && !alphaArg2Diffuse) && !alphaArg2UnusedOnSelectArg1) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha &&
+              !blendTextureAlphaPMFactorArg2Alpha) ||
             coordIndex >= layout.texcoordCount ||
             (transformFlags != D3DTTFF_DISABLE && transformFlags != D3DTTFF_COUNT2) || srgb ||
             ((addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP &&
@@ -2064,6 +2072,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.blendTextureAlphaPMTextureAlpha = blendTextureAlphaPMTextureAlpha;
         capture.blendTextureAlphaPMDiffuseAlpha = blendTextureAlphaPMDiffuseAlpha;
         capture.blendTextureAlphaPMFactorAlpha = blendTextureAlphaPMFactorAlpha;
+        // The SELECTARG2 diffuse selector is structurally shared; override
+        // it only for verified factor-alpha, before native shader selection.
+        // Unknown/modified ALPHAARG2 still fails the original guard.
+        if (blendTextureAlphaPMFactorArg2Alpha) {
+            capture.blendTextureAlphaPMDiffuseAlpha = false;
+            capture.blendTextureAlphaPMFactorAlpha = true;
+        }
         capture.blendTextureAlphaPMModulateAlpha = blendTextureAlphaPMModulateAlpha;
         capture.blendTextureAlphaPMAddAlpha = blendTextureAlphaPMAddAlpha;
         capture.blendTextureAlphaPMSubtractAlpha = blendTextureAlphaPMSubtractAlpha;
