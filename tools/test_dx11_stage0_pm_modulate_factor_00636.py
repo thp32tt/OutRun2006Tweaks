@@ -15,7 +15,7 @@ shader = """float4 PSTextureBlendTextureAlphaPMModulateFactorAlpha(VOut v) : SV_
                       t.a * alphaParams.w);
     AlphaGate(c.a); return c;
 }"""
-factor_read = """blendTextureAlphaPMModulateFactorAlpha) &&
+factor_read = """if (blendTextureAlphaPMModulateFactorAlpha &&
             FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))"""
 links = [
     predicate, factor_read, shader,
@@ -28,7 +28,7 @@ links = [
     "s.blendTextureAlphaPmModulateFactorAlphaPs.GetAddressOf()",
     "capture.blendTextureAlphaPMModulateFactorAlpha = blendTextureAlphaPMModulateFactorAlpha;",
     "capture.blendTextureAlphaPMModulateFactorAlpha ? s.blendTextureAlphaPmModulateFactorAlphaPs.Get() :",
-    "!blendTextureAlphaPMFactorAlpha && !blendTextureAlphaPMModulateFactorAlpha &&",
+    "!blendTextureAlphaPMModulateFactorAlpha &&\n             !blendTextureAlphaPMDiffuseAlpha &&",
     "ctx->DrawIndexed(indexCount, 0, 0);",
     "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
     "OUTRUN_DX11_FIRST_GAME_FRAME",
