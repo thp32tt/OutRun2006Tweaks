@@ -2413,12 +2413,47 @@ namespace OutRunVRStereo
         // draws consume the same validated source indices, but eye reprojection
         // modifies different XYZRHW values after this copy. A rare bilateral
         // fallback can also reseed just its successful eye independently.
+
+        // Indexed UP calls already own a unique, verified touched list.
+        // On very sparse spans copy only referenced vertices rather than
+        // walking up to the largest index looking for a run. This is never
+        // used by the revision-cached VB/IB path or by unknown mask owners.
+        bool R30SeedTouchedXyzrhwVertices(
+            const std::uint8_t* source, UINT vertexCount, UINT stride,
+            std::vector<std::uint8_t>& left,
+            std::vector<std::uint8_t>* right,
+            const std::vector<std::uint8_t>& usedMask,
+            const std::vector<std::uint32_t>* touched,
+            std::size_t selectedCount) noexcept
+        {
+            if (!touched || touched->size() != selectedCount ||
+                selectedCount * 8u > vertexCount)
+                return false;
+            // Reject a corrupt/out-of-span producer list before any writes.
+            // The UP builder guarantees uniqueness and 1:1 mask coverage.
+            for (const std::uint32_t index : *touched)
+                if (index >= vertexCount || !usedMask[index])
+                    return false;
+            for (const std::uint32_t index : *touched)
+            {
+                const std::size_t offset =
+                    static_cast<std::size_t>(index) * stride;
+                std::memcpy(left.data() + offset,
+                    source + offset, stride);
+                if (right)
+                    std::memcpy(right->data() + offset,
+                        source + offset, stride);
+            }
+            return true;
+        }
+
         bool R30SeedWorldXyzrhwBuffers(
             const void* source, UINT vertexCount, UINT stride,
             std::vector<std::uint8_t>& left,
             std::vector<std::uint8_t>* right,
             const std::vector<std::uint8_t>* usedMask,
-            UINT knownUsedCount = UINT_MAX) noexcept
+            UINT knownUsedCount = UINT_MAX,
+            const std::vector<std::uint32_t>* touched = nullptr) noexcept
         {
             if (!source || !vertexCount || stride < sizeof(float) * 4)
                 return false;
@@ -2453,6 +2488,10 @@ namespace OutRunVRStereo
                         [](std::uint8_t used) noexcept { return used != 0; }));
                 if (static_cast<std::size_t>(selectedCount) * 4u <= vertexCount)
                 {
+                    if (!R30SeedTouchedXyzrhwVertices(
+                            src, vertexCount, stride, left, right,
+                            *usedMask, touched, selectedCount))
+                    {
                     UINT cursor = 0;
                     while (cursor < vertexCount)
                     {
@@ -2473,6 +2512,7 @@ namespace OutRunVRStereo
                                 std::memcpy(right->data() + offset,
                                     src + offset, runBytes);
                         }
+                    }
                     }
                     sparseCopied = true;
                 }
@@ -3031,7 +3071,8 @@ namespace OutRunVRStereo
             std::vector<std::uint8_t>& left,
             std::vector<std::uint8_t>& right,
             const std::vector<std::uint8_t>* usedMask = nullptr,
-            UINT knownUsedCount = UINT_MAX) noexcept
+            UINT knownUsedCount = UINT_MAX,
+            const std::vector<std::uint32_t>* touched = nullptr) noexcept
         {
             // Fuse both non-indexed and indexed ScreenHud eyes in one CPU walk.
             // Preserve Z/RHW, UV, color and the original asymmetric FOV math;
@@ -3080,6 +3121,10 @@ namespace OutRunVRStereo
                     {
                         const auto* srcBytes =
                             static_cast<const std::uint8_t*>(source);
+                        if (!R30SeedTouchedXyzrhwVertices(
+                                srcBytes, vertexCount, stride, left, &right,
+                                *usedMask, touched, selectedCount))
+                        {
                         UINT cursor = 0;
                         while (cursor < vertexCount)
                         {
@@ -3099,6 +3144,7 @@ namespace OutRunVRStereo
                                 std::memcpy(right.data() + offset,
                                     srcBytes + offset, runBytes);
                             }
+                        }
                         }
                         sparseCopied = true;
                     }
@@ -3166,7 +3212,7 @@ namespace OutRunVRStereo
             // seeds both eye scratch buffers before per-eye projection work.
             if (!R30SeedWorldXyzrhwBuffers(
                     source, vertexCount, stride, left, &right,
-                    usedMask, knownUsedCount))
+                    usedMask, knownUsedCount, touched))
                 return false;
 
             // The conservative affine-only world route can share input math
@@ -3452,7 +3498,7 @@ namespace OutRunVRStereo
             if (!R30TransformXyzrhwStereo(
                     vertexData, vertexCount, stride, state,
                     scratch.left, scratch.right,
-                    &scratch.upUsed, knownUsedCount))
+                    &scratch.upUsed, knownUsedCount, &scratch.upTouched))
             {
                 ++R30XyzrhwFallbacks;
                 return E_NOTIMPL;

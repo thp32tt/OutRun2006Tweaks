@@ -37,7 +37,27 @@ def valid(code):
             "std::count_if(",
             "static_cast<std::size_t>(selectedCount) * 4u <= vertexCount")):
             return False
-    if "usedMask, knownUsedCount))" not in stereo:
+    if "usedMask, knownUsedCount, touched))" not in stereo:
+        return False
+    # Live C++ touched-copy branch must be behind sparse cardinality and
+    # preserve the historical contiguous-mask scan as a safe fallback.
+    helper = section(code, "bool R30SeedTouchedXyzrhwVertices(",
+                     "bool R30SeedWorldXyzrhwBuffers(")
+    for token in ("touched->size() != selectedCount",
+                  "selectedCount * 8u > vertexCount",
+                  "index >= vertexCount || !usedMask[index]",
+                  "std::memcpy(left.data() + offset,",
+                  "std::memcpy(right->data() + offset,"):
+        if token not in helper:
+            return False
+    if seed.count("R30SeedTouchedXyzrhwVertices(") != 1 or (
+            "src, vertexCount, stride, left, right," not in seed or
+            "*usedMask, touched, selectedCount" not in seed):
+        return False
+    if stereo.count("R30SeedTouchedXyzrhwVertices(") != 1 or (
+            "srcBytes, vertexCount, stride, left, &right," not in stereo):
+        return False
+    if "&scratch.upUsed, knownUsedCount, &scratch.upTouched))" not in up:
         return False
     if not all(t in code for t in (
             "std::vector<std::uint8_t> upUsed;",
@@ -56,7 +76,7 @@ def valid(code):
         "scratch.upTouched.push_back(raw);",
         "scratch.upUsed[raw] = 1;",
         "++knownUsedCount;",
-        "&scratch.upUsed, knownUsedCount))",
+        "&scratch.upUsed, knownUsedCount, &scratch.upTouched))",
     )
     if not all(t in up for t in up_contract):
         return False
@@ -119,6 +139,19 @@ def fast_copy(data, indices, n, stride, left, right):
     return mask, count, sparse
 
 
+
+def touched_copy(data, mask, touched, stride, left, right):
+    n = len(mask)
+    count = sum(mask)
+    if (n < 64 or count * 4 > n or len(touched) != count or
+            count * 8 > n or any(i >= n or not mask[i] for i in touched)):
+        return old_copy(data, mask, stride, left, right), False
+    for i in touched:
+        a, b = i * stride, (i + 1) * stride
+        left[a:b] = right[a:b] = data[a:b]
+    return True, True
+
+
 def main():
     code = CPP.read_text(encoding="utf-8")
     workflow = WF.read_text(encoding="utf-8")
@@ -134,7 +167,7 @@ def main():
         ("scratch.upUsed.resize(vertexCount, 0);", "/* missing grow */"),
         ("if (!scratch.used[static_cast<std::size_t>(local)])",
          "if (scratch.used[static_cast<std::size_t>(local)])"),
-        ("&scratch.upUsed, knownUsedCount))", "&scratch.upUsed))"),
+        ("&scratch.upUsed, knownUsedCount, &scratch.upTouched))", "&scratch.upUsed))"),
         ("&scratch.used, knownUsedCount))", "&scratch.used))"),
         ("knownUsedCount <= vertexCount", "knownUsedCount > vertexCount"),
         ("static_cast<std::size_t>(knownUsedCount)",
@@ -142,7 +175,13 @@ def main():
         ("std::count_if(", "std::count_none("),
         ("static_cast<std::size_t>(selectedCount) * 4u <= vertexCount",
          "static_cast<std::size_t>(selectedCount) * 2u <= vertexCount"),
-        ("usedMask, knownUsedCount))", "usedMask))"),
+        ("usedMask, knownUsedCount, touched))", "usedMask))"),
+        ("selectedCount * 8u > vertexCount", "selectedCount * 80u > vertexCount"),
+        ("index >= vertexCount || !usedMask[index]", "index >= vertexCount"),
+        ("touched->size() != selectedCount", "touched->size() < selectedCount"),
+        ("*usedMask, touched, selectedCount", "*usedMask, nullptr, selectedCount"),
+        ("&scratch.upUsed, knownUsedCount, &scratch.upTouched))",
+         "&scratch.upUsed, knownUsedCount, nullptr))"),
     )
     for old, new in mutations:
         assert old in code
@@ -180,6 +219,15 @@ def main():
                     assert known == sum(old_mask)
                     assert old_sparse == fast_sparse
                     assert old_l == new_l and old_r == new_r
+                    touched = list(set(indices))
+                    rng.shuffle(touched)
+                    touch_l, touch_r = seed[:], seed[:]
+                    touch_sparse, touched_selected = touched_copy(
+                        data, old_mask, touched, stride, touch_l, touch_r)
+                    assert touch_sparse == old_sparse
+                    assert touch_l == old_l and touch_r == old_r
+                    assert touched_selected == (
+                        n >= 64 and known * 8 <= n)
                     cases += 1
     assert fast_copy(b"\0" * 64, [4], 4, 16,
                      bytearray(64), bytearray(64)) is None
