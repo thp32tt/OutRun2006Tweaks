@@ -29,52 +29,59 @@ def valid(code):
                      "// Called on every eligible FlatPerspectiveEffect draw.")
     except (ValueError, IndexError):
         return False
-    for segment in (seed, stereo):
-        if not all(x in segment for x in (
-                "UINT knownUsedCount = UINT_MAX",
-                "knownUsedCount <= vertexCount",
-                "static_cast<std::size_t>(knownUsedCount)",
-                "std::count_if(", "static_cast<std::size_t>(selectedCount) * 4u <= vertexCount")):
-            return False
-        if segment.index("knownUsedCount <= vertexCount") >= segment.index(
-                "std::count_if("):
+    for block in (seed, stereo):
+        if not all(t in block for t in (
+            "UINT knownUsedCount = UINT_MAX",
+            "knownUsedCount <= vertexCount",
+            "static_cast<std::size_t>(knownUsedCount)",
+            "std::count_if(",
+            "static_cast<std::size_t>(selectedCount) * 4u <= vertexCount")):
             return False
     if "usedMask, knownUsedCount))" not in stereo:
         return False
-    for name, segment, marker in (
-        ("UP", up, "scratch.used[raw] = 1;"),
-        ("VB", vb, "scratch.used[static_cast<std::size_t>(local)] = 1;"),
-    ):
-        # VB's unchanged-index cache carries the exact cardinality from
-        # the previous validated index decode. UP still counts from zero.
-        count_init = ("UINT knownUsedCount = 0;" if name == "UP" else
-                      "UINT knownUsedCount = cachedDecode ? decoded.knownUsedCount : 0;")
-        if not all(x in segment for x in (
-                count_init, "++knownUsedCount;", marker,
-                "&scratch.used, knownUsedCount))",
-                "scratch.used.assign(vertexCount, 0);")):
-            return False
-        assign_pos = segment.index("scratch.used.assign(vertexCount, 0);")
-        init_pos = segment.index(count_init)
-        init_order_ok = (assign_pos < init_pos if name == "UP" else
-                         init_pos < assign_pos)
-        if not (init_order_ok
-                and init_pos < segment.index("++knownUsedCount;")
-                < segment.index(marker)
-                < segment.index("&scratch.used, knownUsedCount))")):
-            return False
-        if name == "VB" and not all(x in segment for x in (
-                "if (!cachedDecode)",
-                "decoded.revision == scratch.indexCopy.revision",
-                "next.knownUsedCount = knownUsedCount;",
-                "next.valid = true;")):
-            return False
-        guard = ("if (!scratch.used[raw])" if name == "UP"
-                 else "if (!scratch.used[static_cast<std::size_t>(local)])")
-        if guard not in segment or segment.index(guard) > segment.index(
-                "++knownUsedCount;"):
-            return False
-    return all(x in up + vb for x in (
+    if not all(t in code for t in (
+            "std::vector<std::uint8_t> upUsed;",
+            "std::vector<std::uint32_t> upTouched;")):
+        return False
+    up_contract = (
+        "scratch.indexDecode.valid = false;",
+        "for (const std::uint32_t previous : scratch.upTouched)",
+        "scratch.upUsed[previous] = 0;",
+        "scratch.upTouched.clear();",
+        "if (scratch.upUsed.size() < vertexCount)",
+        "scratch.upUsed.resize(vertexCount, 0);",
+        "UINT knownUsedCount = 0;",
+        "if (raw >= vertexCount)",
+        "if (!scratch.upUsed[raw])",
+        "scratch.upTouched.push_back(raw);",
+        "scratch.upUsed[raw] = 1;",
+        "++knownUsedCount;",
+        "&scratch.upUsed, knownUsedCount))",
+    )
+    if not all(t in up for t in up_contract):
+        return False
+    if any(up.index(a) >= up.index(b) for a, b in
+           zip(up_contract, up_contract[1:])):
+        return False
+    if up.count("&scratch.upUsed") != 2 or "scratch.used.assign(" in up:
+        return False
+    vb_contract = (
+        "UINT knownUsedCount = cachedDecode ? decoded.knownUsedCount : 0;",
+        "scratch.used.assign(vertexCount, 0);",
+        "if (!scratch.used[static_cast<std::size_t>(local)])",
+        "++knownUsedCount;",
+        "scratch.used[static_cast<std::size_t>(local)] = 1;",
+        "next.knownUsedCount = knownUsedCount;",
+        "next.valid = true;",
+        "&scratch.used, knownUsedCount))",
+    )
+    if not all(t in vb for t in vb_contract):
+        return False
+    if ("if (!cachedDecode)" not in vb or
+            "decoded.revision == scratch.indexCopy.revision" not in vb or
+            "scratch.upUsed" in vb or "scratch.upTouched" in vb):
+        return False
+    return all(t in up + vb for t in (
         "return E_NOTIMPL;", "R30ConfigureXyzrhwWorldEffect(",
         "R30TransformXyzrhwStereo("))
 
@@ -120,9 +127,14 @@ def main():
     mutations = (
         ("UINT knownUsedCount = 0;", "UINT knownUsedCount = vertexCount;"),
         ("++knownUsedCount;", "--knownUsedCount;"),
-        ("if (!scratch.used[raw])", "if (scratch.used[raw])"),
+        ("if (!scratch.upUsed[raw])", "if (scratch.upUsed[raw])"),
+        ("scratch.upTouched.push_back(raw);", "/* lost UP dirty entry */"),
+        ("scratch.upUsed[previous] = 0;", "/* stale UP dirty bit */"),
+        ("scratch.upTouched.clear();", "/* old offsets accumulate */"),
+        ("scratch.upUsed.resize(vertexCount, 0);", "/* missing grow */"),
         ("if (!scratch.used[static_cast<std::size_t>(local)])",
          "if (scratch.used[static_cast<std::size_t>(local)])"),
+        ("&scratch.upUsed, knownUsedCount))", "&scratch.upUsed))"),
         ("&scratch.used, knownUsedCount))", "&scratch.used))"),
         ("knownUsedCount <= vertexCount", "knownUsedCount > vertexCount"),
         ("static_cast<std::size_t>(knownUsedCount)",
@@ -171,6 +183,28 @@ def main():
                     cases += 1
     assert fast_copy(b"\0" * 64, [4], 4, 16,
                      bytearray(64), bytearray(64)) is None
+    # Successive UP draws, shrinking/growing masks and failed index bounds
+    # reproduce the persistent scratch rather than a fresh allocation.
+    up_mask = bytearray()
+    previous_touched = []
+    for n, refs in ((131072, (0, 99999, 99999)),
+                    (8, (7, 7, 0)), (128, (2, 3, 90)),
+                    (4, (0, 7)), (4, (3, 3)),
+                    (131072, (99999, 0)), (1, (0,))):
+        for i in previous_touched:
+            up_mask[i] = 0
+        previous_touched.clear()
+        up_mask.extend(bytes(max(0, n - len(up_mask))))
+        expected = bytearray(n)
+        for index in refs:
+            if index >= n:
+                break
+            expected[index] = 1
+            if not up_mask[index]:
+                previous_touched.append(index)
+                up_mask[index] = 1
+        assert up_mask[:n] == expected
+        assert len(previous_touched) == sum(expected)
     print(f"PASS R30 indexed unique-mask cardinality: {cases} binary "
           f"stereo-copy cases, {len(mutations)} destructive mutations")
 

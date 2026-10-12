@@ -266,6 +266,9 @@ namespace OutRunVRStereo
             std::vector<std::uint8_t> left;
             std::vector<std::uint8_t> right;
             std::vector<std::uint8_t> used;
+            // UP has no validated IB revision and must not mutate VB masks.
+            std::vector<std::uint8_t> upUsed;
+            std::vector<std::uint32_t> upTouched;
             std::vector<std::uint16_t> indices16;
             std::vector<std::uint32_t> indices32;
             bool busy = false;
@@ -3394,12 +3397,16 @@ namespace OutRunVRStereo
             if (!lease)
                 return E_NOTIMPL;
             auto& scratch = *lease.buffers;
-            // Indexed UP can overwrite the shared mask; VB decoder cache
-            // must not hit until the next exact IB span has rebuilt it.
+            // Reuse a UP-only mask. Clearing last draw's actual indices
+            // avoids zero-filling a huge sparse vertex span on every draw.
             scratch.indexDecode.valid = false;
+            for (const std::uint32_t previous : scratch.upTouched)
+                scratch.upUsed[previous] = 0;
+            scratch.upTouched.clear();
             try
             {
-                scratch.used.assign(vertexCount, 0);
+                if (scratch.upUsed.size() < vertexCount)
+                    scratch.upUsed.resize(vertexCount, 0);
             }
             catch (...)
             {
@@ -3417,16 +3424,26 @@ namespace OutRunVRStereo
                     : static_cast<const std::uint32_t*>(indexData)[i];
                 if (raw >= vertexCount)
                     return E_NOTIMPL;
-                if (!scratch.used[raw])
+                if (!scratch.upUsed[raw])
                 {
+                    // Append first: an allocation failure cannot strand a
+                    // dirty bit outside the next draw's clear list.
+                    try
+                    {
+                        scratch.upTouched.push_back(raw);
+                    }
+                    catch (...)
+                    {
+                        return E_NOTIMPL;
+                    }
+                    scratch.upUsed[raw] = 1;
                     ++knownUsedCount;
-                    scratch.used[raw] = 1;
                 }
             }
 
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, vertexData, vertexCount, stride, state,
-                    &scratch.used))
+                    &scratch.upUsed))
             {
                 ++R30XyzrhwFallbacks;
                 return E_NOTIMPL;
@@ -3435,7 +3452,7 @@ namespace OutRunVRStereo
             if (!R30TransformXyzrhwStereo(
                     vertexData, vertexCount, stride, state,
                     scratch.left, scratch.right,
-                    &scratch.used, knownUsedCount))
+                    &scratch.upUsed, knownUsedCount))
             {
                 ++R30XyzrhwFallbacks;
                 return E_NOTIMPL;
