@@ -72,6 +72,11 @@ namespace OutRunVRStereo
             DWORD ccwZFail = D3DSTENCILOP_KEEP;
             DWORD ccwPass = D3DSTENCILOP_KEEP;
             bool mayWrite = true;
+            // A zero write mask needs no stencil-op queries. With a nonzero
+            // mask and one-sided stencil, the three CCW ops are immaterial.
+            // Setter transitions that activate omitted fields invalidate.
+            bool maskOnly = false;
+            bool frontOnly = false;
             bool valid = false;
             std::uint64_t presentEpoch = 0;
             std::uint64_t applyGeneration = 0;
@@ -166,18 +171,60 @@ namespace OutRunVRStereo
             if (!device || !R29EffectCacheCurrent())
                 return false;
 
-            // Read a complete snapshot before publishing it. On failed/torn
-            // reads the original fail-closed reader still owns the draw.
+            // Most stencil-enabled particle/UI passes have a zero write
+            // mask. One live getter proves that neither front nor back ops
+            // can modify stencil, avoiding seven unnecessary D3D9 getters.
             R29StencilWriteState next{};
-            if (FAILED(device->GetRenderState(D3DRS_STENCILWRITEMASK, &next.writeMask)) ||
-                FAILED(device->GetRenderState(D3DRS_STENCILFAIL, &next.fail)) ||
-                FAILED(device->GetRenderState(D3DRS_STENCILZFAIL, &next.zFail)) ||
-                FAILED(device->GetRenderState(D3DRS_STENCILPASS, &next.pass)) ||
-                FAILED(device->GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &next.twoSided)) ||
-                FAILED(device->GetRenderState(D3DRS_CCW_STENCILFAIL, &next.ccwFail)) ||
-                FAILED(device->GetRenderState(D3DRS_CCW_STENCILZFAIL, &next.ccwZFail)) ||
-                FAILED(device->GetRenderState(D3DRS_CCW_STENCILPASS, &next.ccwPass)) ||
-                !R29EffectCacheCurrent())
+            if (FAILED(device->GetRenderState(
+                    D3DRS_STENCILWRITEMASK, &next.writeMask)))
+            {
+                R29StencilWrite.valid = false;
+                return false;
+            }
+            if (next.writeMask == 0)
+            {
+                next.maskOnly = true;
+                next.mayWrite = false;
+            }
+            else
+            {
+                if (FAILED(device->GetRenderState(
+                        D3DRS_STENCILFAIL, &next.fail)) ||
+                    FAILED(device->GetRenderState(
+                        D3DRS_STENCILZFAIL, &next.zFail)) ||
+                    FAILED(device->GetRenderState(
+                        D3DRS_STENCILPASS, &next.pass)) ||
+                    FAILED(device->GetRenderState(
+                        D3DRS_TWOSIDEDSTENCILMODE, &next.twoSided)))
+                {
+                    R29StencilWrite.valid = false;
+                    return false;
+                }
+
+                if (next.twoSided != FALSE)
+                {
+                    if (FAILED(device->GetRenderState(
+                            D3DRS_CCW_STENCILFAIL, &next.ccwFail)) ||
+                        FAILED(device->GetRenderState(
+                            D3DRS_CCW_STENCILZFAIL, &next.ccwZFail)) ||
+                        FAILED(device->GetRenderState(
+                            D3DRS_CCW_STENCILPASS, &next.ccwPass)))
+                    {
+                        R29StencilWrite.valid = false;
+                        return false;
+                    }
+                }
+                else
+                {
+                    // CCW operations cannot write while two-sided stencil is
+                    // disabled. Refresh if a tracked setter enables it.
+                    next.frontOnly = true;
+                }
+            }
+
+            // A StateBlock Apply or Begin/End during the partial live read
+            // invalidates the sample exactly as on the full-read path.
+            if (!R29EffectCacheCurrent())
             {
                 R29StencilWrite.valid = false;
                 return false;
@@ -187,7 +234,8 @@ namespace OutRunVRStereo
             next.applyGeneration = R29Effect.applyGeneration;
             next.recordingGeneration = R29Effect.recordingGeneration;
             R29StencilWrite = next;
-            R29RefreshStencilWritePolicy();
+            if (!next.maskOnly)
+                R29RefreshStencilWritePolicy();
             return true;
         }
 
@@ -214,6 +262,27 @@ namespace OutRunVRStereo
             {
                 R29StencilWrite.valid = false;
                 return;
+            }
+            if (R29StencilWrite.maskOnly)
+            {
+                // Omitted ops may have changed while the mask was zero.
+                // Never promote this one-getter snapshot to a writable state.
+                if (state == D3DRS_STENCILWRITEMASK && value != 0)
+                    R29StencilWrite.valid = false;
+                return;
+            }
+            if (R29StencilWrite.frontOnly)
+            {
+                if (state == D3DRS_TWOSIDEDSTENCILMODE && value != FALSE)
+                {
+                    // CCW ops were not sampled; re-read before allowing them.
+                    R29StencilWrite.valid = false;
+                    return;
+                }
+                if (state == D3DRS_CCW_STENCILFAIL ||
+                    state == D3DRS_CCW_STENCILZFAIL ||
+                    state == D3DRS_CCW_STENCILPASS)
+                    return;
             }
             switch (state)
             {
