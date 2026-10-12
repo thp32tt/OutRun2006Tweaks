@@ -255,9 +255,15 @@ def zero_copy_bridge_violations(api: str, r32: str, r33: str) -> list[str]:
     if "std::memcpy(" in bridge or "R31SupportFastWorldConstants draw" in bridge:
         errors.append("second intermediate WVP array was reintroduced")
     world = body(r33, "R32ReviewOwnedResult R33TryFastWorld(")
-    if "R32ReviewBuildFastWorldConstants(device, stereo, draw)" not in world:
+    # R33 reads the BeginScene-latched stereo frame by immutable view.
+    # Keep the forwarding bridge zero-copy and reject lost pose/null fences.
+    if "const auto* stereo = OutRunVRRenderer::GetLatchedStereoFrameView();" not in world:
+        errors.append("R33 world route no longer borrows the latched pose")
+    if "if (!stereo)" not in world or "framePoseSequence != stereo->poseSequence" not in world:
+        errors.append("R33 world route lost its borrowed-pose validity fence")
+    if "R32ReviewBuildFastWorldConstants(device, *stereo, draw)" not in world:
         errors.append("world constants no longer use verified producer")
-    if "draw.poseSequence, stereo);" not in world or "draw.stereoFrame" in world:
+    if "draw.poseSequence, *stereo);" not in world or "draw.stereoFrame" in world:
         errors.append("R33 no longer uses its existing latched frame")
     return errors
 
@@ -271,15 +277,18 @@ def zero_copy_bridge_test() -> None:
         (0, '#include "../core/r31_support_api.hpp"'),
         (0, "using R32ReviewFastWorldConstants = R31SupportFastWorldConstants;"),
         (1, "return R31SupportBuildFastWorldConstants(d, s, out);"),
-        (2, "R32ReviewBuildFastWorldConstants(device, stereo, draw)"),
-        (2, "draw.poseSequence, stereo);"),
+        (2, "const auto* stereo = OutRunVRRenderer::GetLatchedStereoFrameView();"),
+        (2, "if (!stereo)"),
+        (2, "framePoseSequence != stereo->poseSequence"),
+        (2, "R32ReviewBuildFastWorldConstants(device, *stereo, draw)"),
+        (2, "draw.poseSequence, *stereo);"),
     )
     for index, marker in mutation_cases:
         sources = [api, r32, r33]
         assert sources[index].count(marker) == 1, marker
         sources[index] = sources[index].replace(marker, "BROKEN", 1)
         assert zero_copy_bridge_violations(*sources), marker
-    print("PASS zero-copy R31/R32/R33 and original pose; five destructive mutations")
+    print("PASS zero-copy R31/R32/R33 borrowed pose; eight destructive mutations")
 
 def main() -> None:
     source = SOURCE.read_text(encoding="utf-8")
