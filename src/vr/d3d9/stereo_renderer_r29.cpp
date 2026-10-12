@@ -58,6 +58,27 @@ namespace OutRunVRStereo
         };
 
         thread_local R29EffectState R29Effect{};
+        // Live stencil-write classification is expensive (up to eight D3D9
+        // getters per stereo draw). Keep an independent, generation-fenced
+        // snapshot only when R31 StateBlock tracking is authoritative.
+        struct R29StencilWriteState
+        {
+            DWORD writeMask = 0;
+            DWORD fail = D3DSTENCILOP_KEEP;
+            DWORD zFail = D3DSTENCILOP_KEEP;
+            DWORD pass = D3DSTENCILOP_KEEP;
+            DWORD twoSided = FALSE;
+            DWORD ccwFail = D3DSTENCILOP_KEEP;
+            DWORD ccwZFail = D3DSTENCILOP_KEEP;
+            DWORD ccwPass = D3DSTENCILOP_KEEP;
+            bool mayWrite = true;
+            bool valid = false;
+            std::uint64_t presentEpoch = 0;
+            std::uint64_t applyGeneration = 0;
+            std::uint64_t recordingGeneration = 0;
+        };
+        thread_local R29StencilWriteState R29StencilWrite{};
+
 
         void R29RefreshFragilePolicy() noexcept
         {
@@ -113,6 +134,100 @@ namespace OutRunVRStereo
             const std::uint64_t target = PresentEpoch + extraPresents;
             if (target > R29MonoSafetyThroughEpoch)
                 R29MonoSafetyThroughEpoch = target;
+        }
+
+
+        void R29RefreshStencilWritePolicy() noexcept
+        {
+            const auto& state = R29StencilWrite;
+            R29StencilWrite.mayWrite =
+                state.writeMask != 0 &&
+                (state.fail != D3DSTENCILOP_KEEP ||
+                 state.zFail != D3DSTENCILOP_KEEP ||
+                 state.pass != D3DSTENCILOP_KEEP ||
+                 (state.twoSided != FALSE &&
+                  (state.ccwFail != D3DSTENCILOP_KEEP ||
+                   state.ccwZFail != D3DSTENCILOP_KEEP ||
+                   state.ccwPass != D3DSTENCILOP_KEEP)));
+        }
+
+        bool R29StencilWriteCacheCurrent() noexcept
+        {
+            return R29StencilWrite.valid && R29EffectCacheCurrent() &&
+                R29StencilWrite.presentEpoch == PresentEpoch &&
+                R29StencilWrite.applyGeneration == R29Effect.applyGeneration &&
+                R29StencilWrite.recordingGeneration == R29Effect.recordingGeneration;
+        }
+
+        bool R29SyncStencilWriteState(IDirect3DDevice9* device) noexcept
+        {
+            if (R29StencilWriteCacheCurrent())
+                return true;
+            if (!device || !R29EffectCacheCurrent())
+                return false;
+
+            // Read a complete snapshot before publishing it. On failed/torn
+            // reads the original fail-closed reader still owns the draw.
+            R29StencilWriteState next{};
+            if (FAILED(device->GetRenderState(D3DRS_STENCILWRITEMASK, &next.writeMask)) ||
+                FAILED(device->GetRenderState(D3DRS_STENCILFAIL, &next.fail)) ||
+                FAILED(device->GetRenderState(D3DRS_STENCILZFAIL, &next.zFail)) ||
+                FAILED(device->GetRenderState(D3DRS_STENCILPASS, &next.pass)) ||
+                FAILED(device->GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &next.twoSided)) ||
+                FAILED(device->GetRenderState(D3DRS_CCW_STENCILFAIL, &next.ccwFail)) ||
+                FAILED(device->GetRenderState(D3DRS_CCW_STENCILZFAIL, &next.ccwZFail)) ||
+                FAILED(device->GetRenderState(D3DRS_CCW_STENCILPASS, &next.ccwPass)) ||
+                !R29EffectCacheCurrent())
+            {
+                R29StencilWrite.valid = false;
+                return false;
+            }
+            next.valid = true;
+            next.presentEpoch = PresentEpoch;
+            next.applyGeneration = R29Effect.applyGeneration;
+            next.recordingGeneration = R29Effect.recordingGeneration;
+            R29StencilWrite = next;
+            R29RefreshStencilWritePolicy();
+            return true;
+        }
+
+        void R29OnStencilWriteSetter(D3DRENDERSTATETYPE state, DWORD value) noexcept
+        {
+            // Ordinary in-frame setters update the complete live snapshot
+            // without new getters. Incomplete or generation-stale snapshots
+            // remain invalid and are rebuilt on the next eligible draw.
+            switch (state)
+            {
+            case D3DRS_STENCILWRITEMASK:
+            case D3DRS_STENCILFAIL:
+            case D3DRS_STENCILZFAIL:
+            case D3DRS_STENCILPASS:
+            case D3DRS_TWOSIDEDSTENCILMODE:
+            case D3DRS_CCW_STENCILFAIL:
+            case D3DRS_CCW_STENCILZFAIL:
+            case D3DRS_CCW_STENCILPASS:
+                break;
+            default:
+                return;
+            }
+            if (!R29StencilWriteCacheCurrent())
+            {
+                R29StencilWrite.valid = false;
+                return;
+            }
+            switch (state)
+            {
+            case D3DRS_STENCILWRITEMASK: R29StencilWrite.writeMask = value; break;
+            case D3DRS_STENCILFAIL: R29StencilWrite.fail = value; break;
+            case D3DRS_STENCILZFAIL: R29StencilWrite.zFail = value; break;
+            case D3DRS_STENCILPASS: R29StencilWrite.pass = value; break;
+            case D3DRS_TWOSIDEDSTENCILMODE: R29StencilWrite.twoSided = value; break;
+            case D3DRS_CCW_STENCILFAIL: R29StencilWrite.ccwFail = value; break;
+            case D3DRS_CCW_STENCILZFAIL: R29StencilWrite.ccwZFail = value; break;
+            case D3DRS_CCW_STENCILPASS: R29StencilWrite.ccwPass = value; break;
+            default: return;
+            }
+            R29RefreshStencilWritePolicy();
         }
 
         bool R29SyncEffectState(IDirect3DDevice9* device) noexcept
@@ -502,6 +617,7 @@ namespace OutRunVRStereo
             if (OutRunVR::State::StateBlockTracker::Recording())
             {
                 R29Effect.valid = false;
+                R29StencilWrite.valid = false;
                 return hr;
             }
             // A setter cannot revalidate OTHER fields cached before Apply
@@ -511,7 +627,13 @@ namespace OutRunVRStereo
                      OutRunVR::State::StateBlockTracker::ApplyGeneration() ||
                  R29Effect.recordingGeneration !=
                      OutRunVR::State::StateBlockTracker::RecordingGeneration()))
+            {
                 R29Effect.valid = false;
+                R29StencilWrite.valid = false;
+            }
+            R29OnStencilWriteSetter(state, value);
+            if (state == D3DRS_STENCILENABLE)
+                R29StencilWrite.valid = false;
 
             switch (state)
             {
@@ -844,6 +966,13 @@ namespace OutRunVRStereo
         // preserve the full write-mask/op/two-sided fail-closed reader.
         if (R29EffectCacheCurrent() && R29Effect.stencilEnable == FALSE)
             return false;
+        if (R29EffectCacheCurrent() && R29Effect.stencilEnable != FALSE)
+        {
+            if (!SurfaceHasStencil(TrackedDepthStencil))
+                return false;
+            if (R29SyncStencilWriteState(device))
+                return R29StencilWrite.mayWrite;
+        }
         return LeftDrawMayWriteStencil(device);
     }
 
