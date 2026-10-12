@@ -14,7 +14,7 @@ def connected(s):
     except IndexError: return False
     if not all(x in gate for x in ("arg != D3DTA_TEXTURE", "alphaArg1 != D3DTA_TEXTURE",
           "selectTextureTfactorAlpha || selectDiffuseTfactorAlpha",
-          "(!selectDiffuseDiffuseAlpha && !mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE && !blendTextureAlphaPMDiffuseAlpha && !blendTextureAlphaPMDiffuseArg1Alpha && !blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMInverseDiffuseArg1Alpha) && !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha",
+          "(!selectDiffuseDiffuseAlpha && !mixedDiffuseAlpha && !mixedAddDiffuseAlpha && !blendTextureAlphaPMInverseFactorArg1Alpha && !blendTextureAlphaPMInverseFactorArg2Alpha && alphaArg1 != D3DTA_TEXTURE && !blendTextureAlphaPMDiffuseAlpha && !blendTextureAlphaPMDiffuseArg1Alpha && !blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMInverseDiffuseArg1Alpha) && !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha",
           "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)",
           "const bool rgbNeedsDiffuse = selectDiffuseTextureAlpha || selectDiffuseDiffuseAlpha || selectDiffuseTfactorAlpha ||",
           "(rgbNeedsDiffuse && !arg2Diffuse)", "nextColorOp != D3DTOP_DISABLE",
@@ -40,7 +40,13 @@ def connected(s):
     return True
 
 def mutation(s, old, new):
-    assert s.count(old)==1, (old,s.count(old))
+    occurrences=s.count(old)
+    # 00635 adds an independent complemented-factor source read.
+    # The legacy factor-source negative test must sever *both* consumers.
+    if old=="GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)":
+        assert occurrences>=1, (old,occurrences)
+        return s.replace(old,new)
+    assert occurrences==1, (old,occurrences)
     return s.replace(old,new,1)
 
 def main():
@@ -52,7 +58,7 @@ def main():
         for a,b in (
             ("const bool "+flag+" = op == D3DTOP_"+op+" &&","const bool "+flag+" = op == D3DTOP_DISABLE &&"),
             ("capture."+flag+" = "+flag+";","capture."+flag+" = false;"),
-            ("(!selectDiffuseDiffuseAlpha && !mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE && !blendTextureAlphaPMDiffuseAlpha && !blendTextureAlphaPMDiffuseArg1Alpha && !blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMInverseDiffuseArg1Alpha) && !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha",
+            ("(!selectDiffuseDiffuseAlpha && !mixedDiffuseAlpha && !mixedAddDiffuseAlpha && !blendTextureAlphaPMInverseFactorArg1Alpha && !blendTextureAlphaPMInverseFactorArg2Alpha && alphaArg1 != D3DTA_TEXTURE && !blendTextureAlphaPMDiffuseAlpha && !blendTextureAlphaPMDiffuseArg1Alpha && !blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMInverseDiffuseArg1Alpha) && !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha",
              "!selectTextureTfactorAlpha || !selectDiffuseTfactorAlpha && alphaArg1 != D3DTA_TEXTURE"),
             ("capture."+flag+" ? s."+flag+"Ps.Get()","capture."+flag+" ? nullptr"),
             ("s."+flag+"Ps.GetAddressOf()","nullptr"),

@@ -94,7 +94,10 @@ def main() -> None:
     ]
     for old, new in mutations:
         assert old in s, old
-        assert not connected(s.replace(old, new, 1)), old
+        # 00635 added a separate complemented-factor read in this same
+        # supported_game_state gate. Sever every active factor source here.
+        mutant = s.replace(old, new) if old == "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)" else s.replace(old, new, 1)
+        assert not connected(mutant), old
     for mode in ("SELECTARG1", "SELECTARG2"):
         for alpha_byte in range(256):
             assert (((alpha_byte << 24) & 0xFF000000) >> 24) / 255.0 == alpha_byte / 255.0
