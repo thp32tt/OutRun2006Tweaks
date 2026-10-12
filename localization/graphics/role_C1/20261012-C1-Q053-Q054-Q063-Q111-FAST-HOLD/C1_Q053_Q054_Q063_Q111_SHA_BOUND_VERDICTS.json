@@ -1,0 +1,278 @@
+{
+  "schema": "outrun-C1-independent-fast-batch-v2-20261012",
+  "run_key": "C1-Q053-Q054-Q063-Q111-20261012-2110",
+  "created_date_kst": "2026-10-12",
+  "source_head": "ef7f8b1a9684145bd8e6eb3e1cd6034d8e83ee43",
+  "reviewer": "C1",
+  "role": "INDEPENDENT_STATIC_QA_ONLY",
+  "production_performed": false,
+  "prior_same_sha_qa_repeated": false,
+  "retired_C2_approval_issued": false,
+  "policy": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md"
+  ],
+  "summary": "Four distinct current saved HD DDS assets, sampled in a single contact sheet; source and final byte SHA-256 verified by matching exact Git blob ids; all HOLD owing to missing proven UV/cells and/or complete CLEAN/protected-art evidence. HOLD is not confirmed visual REWORK. No historic C2 PASS invented.",
+  "contact": {
+    "path": "localization/graphics/role_C1/20261012-C1-Q053-Q054-Q063-Q111-FAST-HOLD/C1_Q053_Q054_Q063_Q111_SOURCE_READABLE_CLEAN_RAW_FLIPY_75_50.jpg",
+    "sha256": "586400f938eb7251b08c97725b4f63f959228c1e0f17fc3ff7b509b0d21ef1dd",
+    "columns": [
+      "SOURCE RAW",
+      "SOURCE READABLE FLIPY",
+      "CLEAN",
+      "SAVED FINAL DDS RAW",
+      "SAVED FINAL DDS FLIPY",
+      "FLIPY fitted ROI 75%",
+      "FLIPY fitted ROI 50%"
+    ],
+    "limitations": "For q063 CLEAN blank explicitly means evidence not found. Fit-to-contact then 75/50 is an indicative visual comparison, not exact game pixel sampling. Crops do not establish UV/cell permissions."
+  },
+  "technical_notes": [
+    "DDS/Pillow decoded mip-0 only; q053 header reports 13 mips but deeper mip pixels were not individually checked.",
+    "q053/q054 SOURCE FLIPY→CLEAN pixel difference outside supplied source removal mask exactly zero; stage-scoped observation only.",
+    "q111 supplied source text removal mask is TOP-only; 223625 difference pixels outside mask are unexplained by this mask, not automatically a confirmed protected-art defect.",
+    "Translated final pixels beyond historical English glyph mask are NOT automatic failure under current UI cell/UV policy; actual cells must be proved before PASS.",
+    "q063 source 512x512, final 2048x2048; standalone size difference not proof of game corruption. No independently pinned CLEAN image for this candidate.",
+    "Candidate final header/mip count as stated, decoded RAW/FLIPY in contact. BC protected blocks not independently approved.",
+    "No confirmed misspelling/glyph artifact coordinates were established on inspected contact, but this does not imply all translated glyphs were inspected.",
+    "Existing historic C2 token consumers are not migrated: TEST_ONLY/HOLD, no official export."
+  ],
+  "candidates": [
+    {
+      "index": 53,
+      "producer": "A",
+      "ddspath": "textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+      "source": {
+        "sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+        "git_blob": "3d6bedf9c66d6c43c4ca16483a0f447137b39c3a",
+        "width": 4096,
+        "height": 4096,
+        "format": "DXT5/BC3",
+        "mips": 13,
+        "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds"
+      },
+      "clean": {
+        "path": "localization/graphics/role_A/20261004-A-RECOVERY02/568D3696_CLEAN_PLATE.png",
+        "sha256": "fbbeb206c6c61b53bc396c0aa47e8bab318f7dae87f48d285f729a3048eba416",
+        "git_blob": "7dff44d0f4e03fe408684cda00a1518e78f130c5",
+        "mask_sha256": "f6afdec8b7ad3176f0186e2254be5073ee661298ac9733261cda5831e0e47b2c",
+        "source_clean_raw_flip_y_changed_pixels": 1204480,
+        "source_clean_outside_supplied_mask_pixels": 0,
+        "review": "C1_SCOPED_SOURCE_CLEAN_CONSISTENT_ONLY"
+      },
+      "final": {
+        "sha256": "7df7e0309c621f59d29cac0b1f91d21c5a4a05262c9b916a55c3d87ac5f90e33",
+        "git_blob": "1b24bb289e0e204d7459d5c1e2c47eacd199b6bc",
+        "width": 4096,
+        "height": 4096,
+        "format": "DXT5/BC3",
+        "mips": 13,
+        "changed_vs_clean_readable_pixels": 953000,
+        "changed_outside_original_source_text_mask_pixels": 427714,
+        "investigate_readable_bbox": [
+          544,
+          24,
+          3698,
+          3396
+        ],
+        "review": "HOLD_UI_CELL_UV_AND_BC_BLOCK_MIP_UNVERIFIED",
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds"
+      },
+      "risk": "BC3 protected block/mips and actual sprite UV/cell not independently evidenced",
+      "verdict": "HOLD",
+      "static_status": "HOLD",
+      "hard_defects_proven": [],
+      "hard_defect_coords": [],
+      "known_untranslated_text_count": null,
+      "known_untranslated_text_count_reason": "Whole-atlas original labels not individually inventoried; not zero",
+      "reviewed_scope": "Full native DDS RAW / vertical-flip visual contact and SHA-bound SOURCE→CLEAN stage where available; no individual sprite-cell or complete glyph-level 100%/75%/50% audit",
+      "native_practical_note": "Contact contains fitted ROI and 75%/50% visual reductions; cannot substitute for game sampling proof",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "index": 54,
+      "producer": "B",
+      "ddspath": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+      "source": {
+        "sha256": "61c82072fcc44e9e5f4c6f127d2a29b17abecf5cdb536a5609512246d1ab8d15",
+        "git_blob": "b32fdd46f0d60840977dd913f4631afe0ba6499d",
+        "width": 4096,
+        "height": 2048,
+        "format": "BGRA32",
+        "mips": 1,
+        "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+      },
+      "clean": {
+        "path": "localization/graphics/role_B/20261004-B-RECOVERY01/FA7BBB13_CLEAN_PLATE.png",
+        "sha256": "88a98a1540d4f4196fc3077c0a8daad01b6a991aed9b3f4efd4ea3ee4d0bc720",
+        "git_blob": "f7e8d4bf753db812f19db5ed2565db21355db73e",
+        "mask_sha256": "fa3e4cefe0b312e7f2b641ad97cd3d543e161225ac72c30477d17f65d9861be0",
+        "source_clean_raw_flip_y_changed_pixels": 598897,
+        "source_clean_outside_supplied_mask_pixels": 0,
+        "review": "C1_SCOPED_SOURCE_CLEAN_CONSISTENT_ONLY"
+      },
+      "final": {
+        "sha256": "5107c15ad4daba6578e6a414f48b3cd3b284bde2269c9e749390a58454b7ac6e",
+        "git_blob": "ff5ef6ed79559f02bffde05597d9f2880188b1f4",
+        "width": 4096,
+        "height": 2048,
+        "format": "BGRA32",
+        "mips": 1,
+        "changed_vs_clean_readable_pixels": 572672,
+        "changed_outside_original_source_text_mask_pixels": 125239,
+        "investigate_readable_bbox": [
+          99,
+          38,
+          3924,
+          557
+        ],
+        "review": "HOLD_UI_CELL_UV_NOT_DOCUMENTED",
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds"
+      },
+      "risk": "Multiple labels/atlas regions; displayed row is not proof of each UI cell and protected pixel scope",
+      "verdict": "HOLD",
+      "static_status": "HOLD",
+      "hard_defects_proven": [],
+      "hard_defect_coords": [],
+      "known_untranslated_text_count": null,
+      "known_untranslated_text_count_reason": "Whole-atlas original labels not individually inventoried; not zero",
+      "reviewed_scope": "Full native DDS RAW / vertical-flip visual contact and SHA-bound SOURCE→CLEAN stage where available; no individual sprite-cell or complete glyph-level 100%/75%/50% audit",
+      "native_practical_note": "Contact contains fitted ROI and 75%/50% visual reductions; cannot substitute for game sampling proof",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "index": 63,
+      "producer": "A",
+      "ddspath": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+      "source": {
+        "sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+        "git_blob": "3eb59ab402a87a4a38787d37eaaff6e263f1ffe0",
+        "width": 512,
+        "height": 512,
+        "format": "BGRA32",
+        "mips": 1,
+        "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds"
+      },
+      "clean": {
+        "path": null,
+        "sha256": null,
+        "review": "HOLD_NO_EXACT_SOURCE_CLEAN_PROOF"
+      },
+      "final": {
+        "sha256": "f92629621d421e924a3f1b9d77252c551832824110e755325bcf0bf4a1af2ad0",
+        "git_blob": "1ca284e8cb4d620912fbb4abbfa5febf875ac55e",
+        "width": 2048,
+        "height": 2048,
+        "format": "BGRA32",
+        "mips": 1,
+        "investigate_readable_bbox": [
+          0,
+          0,
+          2048,
+          2048
+        ],
+        "review": "HOLD_ORIGINAL_512_VS_FINAL_2048_CELL_AND_PROVENANCE_UNRESOLVED",
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds"
+      },
+      "risk": "P0 IGR-012 user in-game OPEN; do not interpret 4x scale alone as proof of corruption; C3 and new user retest remain mandatory",
+      "verdict": "HOLD",
+      "static_status": "HOLD",
+      "hard_defects_proven": [],
+      "hard_defect_coords": [],
+      "known_untranslated_text_count": null,
+      "known_untranslated_text_count_reason": "Whole-atlas original labels not individually inventoried; not zero",
+      "reviewed_scope": "Full native DDS RAW / vertical-flip visual contact and SHA-bound SOURCE→CLEAN stage where available; no individual sprite-cell or complete glyph-level 100%/75%/50% audit",
+      "native_practical_note": "Contact contains fitted ROI and 75%/50% visual reductions; cannot substitute for game sampling proof",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "index": 111,
+      "producer": "A",
+      "ddspath": "textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds",
+      "source": {
+        "sha256": "a8942f076b9c3d8cddd62ba39c84a3b3abea72b2ba19a61a21e9a2bd6f8e8036",
+        "git_blob": "fa1787d8d27a724621286e63c022a05ca51c49eb",
+        "width": 2048,
+        "height": 2048,
+        "format": "BGRA32",
+        "mips": 1,
+        "path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds"
+      },
+      "clean": {
+        "path": "localization/graphics/role_A/20261005-A-RECOVERY12/C075FB49_CLEAN_PLATE.png",
+        "sha256": "23445c207db63ab4fd2a01e164231857b373d69139352c82f7b01ac25d031685",
+        "git_blob": "54b3c6d6e44e6aa46147f1ca356bf3f940cd341f",
+        "mask_sha256": "e654f5dd9b70a045851fec8eac41e393bd18c6e51287fd210ce9b2e2c7b1baff",
+        "source_clean_raw_flip_y_changed_pixels": 432291,
+        "source_clean_outside_supplied_mask_pixels": 223625,
+        "source_clean_outside_supplied_mask_bbox_readable": [
+          40,
+          368,
+          2008,
+          1792
+        ],
+        "review": "HOLD_MASK_COVERS_TOP_LABEL_ONLY_OTHER_REMOVAL_NOT_INDEPENDENTLY_AUTHENTICATED"
+      },
+      "final": {
+        "sha256": "3e0507cba9e267388edcabb3168e40f5bd847294fe82eb79e948aa89540dc394",
+        "git_blob": "c5e98a5f728c017df982858707780e7d9fc0ea20",
+        "width": 2048,
+        "height": 2048,
+        "format": "BGRA32",
+        "mips": 1,
+        "changed_vs_clean_readable_pixels": 364044,
+        "changed_outside_original_source_text_mask_pixels": 241866,
+        "investigate_readable_bbox": [
+          44,
+          40,
+          1956,
+          1787
+        ],
+        "review": "HOLD_MULTI_REGION_CELL_UV_UNVERIFIED",
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_selector_cvt_Exst/C075FB49_512x512.dds"
+      },
+      "risk": "Top-mask is not full-atlas removal mask, do not mistake legitimate other text removal for confirmed art damage",
+      "verdict": "HOLD",
+      "static_status": "HOLD",
+      "hard_defects_proven": [],
+      "hard_defect_coords": [],
+      "known_untranslated_text_count": null,
+      "known_untranslated_text_count_reason": "Whole-atlas original labels not individually inventoried; not zero",
+      "reviewed_scope": "Full native DDS RAW / vertical-flip visual contact and SHA-bound SOURCE→CLEAN stage where available; no individual sprite-cell or complete glyph-level 100%/75%/50% audit",
+      "native_practical_note": "Contact contains fitted ROI and 75%/50% visual reductions; cannot substitute for game sampling proof",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    }
+  ],
+  "counts": {
+    "candidates": 4,
+    "C1_STATIC_PASS": 0,
+    "REWORK": 0,
+    "HOLD": 4,
+    "full_asset_pass": 0,
+    "total_translatable_labels": null,
+    "verified_translated_label_count": null,
+    "untranslated_label_count": null,
+    "uninspected_label_count": null
+  },
+  "official_gate": "TEST_ONLY_HOLD_LEGACY_C2_CONSUMER_NOT_MIGRATED",
+  "game_user_retest_required": true,
+  "manual_only": {
+    "Docker": "NOT_CHANGED",
+    "Portainer": "NOT_CHANGED",
+    "AUTO_SEND": "NOT_CHANGED",
+    "game_install": "NOT_CHANGED",
+    "release": "NOT_PERFORMED",
+    "queue": "UNCHANGED"
+  },
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
