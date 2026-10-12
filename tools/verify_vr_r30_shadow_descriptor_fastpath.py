@@ -279,16 +279,56 @@ def test_shadow_copy_cache_mutations(source):
 
 
 def validate_shadow_registry_lookup(source):
-    """Validate two-way lookup and preserve the existing lifecycle contract."""
-    from verify_vr_r30_shadow_two_way_lookup import validate
-    validate(source)
+    """Validate the epoch-fenced two-way VB/IB lookup shared by both wrappers."""
+    find_v = body(source, "R30ShadowPtr R30FindVertexShadow(")
+    find_i = body(source, "R30ShadowPtr R30FindIndexShadow(")
+    common = body(source, "R30ShadowPtr R30FindShadow(")
     assert "std::atomic<std::uint64_t> R30ShadowRegistryEpoch{1};" in source
-    for kind in ("Vertex", "Index"):
-        ensure = body(source, f"R30ShadowPtr R30Ensure{kind}Shadow(")
-        release = body(source, f"ULONG __stdcall R30{kind}BufferReleaseDest(")
+    assert "Slot slots[2]{};" in source
+    assert "unsigned next = 0;" in source
+    assert "return R30FindShadow(buffer, R30VertexShadows, R30VertexLookup);" in find_v
+    assert "return R30FindShadow(buffer, R30IndexShadows, R30IndexLookup);" in find_i
+
+    for token in (
+        "R30ShadowRegistryEpoch.load(std::memory_order_acquire)",
+        "if (cached.epoch == epoch)",
+        "for (const auto& slot : cached.slots)",
+        "if (slot.buffer == buffer)",
+        "return slot.entry;",
+        "std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);",
+        "R30ShadowRegistryEpoch.load(std::memory_order_relaxed)",
+        "if (cached.epoch != lockedEpoch)",
+        "for (auto& slot : cached.slots)",
+        "slot = {};",
+        "cached.epoch = lockedEpoch;",
+        "cached.next = 0;",
+        "registry.find(buffer)",
+        "auto& slot = cached.slots[cached.next];",
+        "cached.next = (cached.next + 1u) % 2u;",
+        "slot.buffer = buffer;",
+        "slot.entry = it == registry.end() ? nullptr : it->second;",
+    ):
+        assert token in common, token
+
+    # A positive or negative hit avoids the registry lock. Every miss
+    # captures the current membership generation while holding that lock;
+    # a concurrent Reset/Release cannot fill a slot with an older epoch.
+    assert common.index("if (cached.epoch == epoch)") < common.index(
+        "std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);")
+    assert common.index("std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);") < (
+        common.index("R30ShadowRegistryEpoch.load(std::memory_order_relaxed)"))
+    assert common.index("if (cached.epoch != lockedEpoch)") < common.index(
+        "registry.find(buffer)")
+    assert common.index("registry.find(buffer)") < common.index(
+        "slot.entry = it == registry.end() ? nullptr : it->second;")
+    assert "if (slot.buffer == buffer && slot.entry)" not in common
+
+    for type in ("Vertex", "Index"):
+        ensure = body(source, f"R30ShadowPtr R30Ensure{type}Shadow(")
+        release = body(source, f"ULONG __stdcall R30{type}BufferReleaseDest(")
         assert "if (inserted)" in ensure
         assert "R30ShadowRegistryEpoch.fetch_add(1, std::memory_order_release);" in ensure
-        assert f"if (R30{kind}Shadows.erase(buffer))" in release
+        assert f"if (R30{type}Shadows.erase(buffer))" in release
         assert "R30ShadowRegistryEpoch.fetch_add(" in release
     rollback = body(source, "void R30RollbackBufferShadowHooks(")
     assert rollback.index("R30VertexShadows.clear();") < rollback.index(
@@ -298,15 +338,105 @@ def validate_shadow_registry_lookup(source):
 
 
 def exercise_shadow_negative_lookup_model():
-    """Both VB and IB must keep negative hits, but invalidate on epoch changes."""
-    from verify_vr_r30_shadow_two_way_lookup import model
-    model()
+    """Alternating positive/negative entries survive hits; lifetime epochs do not."""
+    membership = {}
+    caches = {kind: {"epoch": 0, "slots": [(None, None)] * 2, "next": 0}
+              for kind in ("VB", "IB")}
+    epoch = 1
+    lock_lookups = 0
+
+    def find(kind, pointer):
+        nonlocal lock_lookups
+        cache = caches[kind]
+        if cache["epoch"] == epoch:
+            for key, value in cache["slots"]:
+                if key == pointer:
+                    return value
+        lock_lookups += 1
+        if cache["epoch"] != epoch:
+            cache["slots"] = [(None, None)] * 2
+            cache["epoch"] = epoch
+            cache["next"] = 0
+        value = membership.get((kind, pointer))
+        cache["slots"][cache["next"]] = (pointer, value)
+        cache["next"] = (cache["next"] + 1) % 2
+        return value
+
+    def register(kind, pointer, value):
+        nonlocal epoch
+        if find(kind, pointer) is not None:
+            return
+        if (kind, pointer) not in membership:
+            membership[(kind, pointer)] = value
+            epoch += 1
+
+    def release(kind, pointer):
+        nonlocal epoch
+        if membership.pop((kind, pointer), None) is not None:
+            epoch += 1
+
+    for kind in ("VB", "IB"):
+        # Two alternating untracked addresses should incur only two misses.
+        first = lock_lookups
+        for i in range(512):
+            assert find(kind, (0x1234, 0x2345)[i % 2]) is None
+        assert lock_lookups == first + 2, (kind, "negative-cache thrash")
+        register(kind, 0x1234, "old")
+        first = lock_lookups
+        for i in range(512):
+            assert find(kind, (0x1234, 0x2345)[i % 2]) == (
+                "old" if i % 2 == 0 else None)
+        assert lock_lookups == first + 2, (kind, "mixed-cache thrash")
+        release(kind, 0x1234)
+        assert find(kind, 0x1234) is None
+        register(kind, 0x1234, "recycled")
+        assert find(kind, 0x1234) == "recycled"
+        release(kind, 0x1234)
+        assert find(kind, 0x1234) is None
+
+    # A membership change in either registry invalidates both lookup families.
+    assert find("VB", 0xFEED) is None
+    register("IB", 0xBEEF, "indexed")
+    before = lock_lookups
+    assert find("VB", 0xFEED) is None
+    assert lock_lookups == before + 1
+    release("IB", 0xBEEF)
 
 
 def test_shadow_registry_lookup_mutations(source):
-    """Protect both cache ways and the original registry lifetime contract."""
-    from verify_vr_r30_shadow_two_way_lookup import mutation_tests
-    mutation_tests(source)
+    # Keep the legacy descriptor gate's independent lifecycle coverage after
+    # the single-slot lookup was replaced by a shared two-way helper.
+    edits = (
+        ("Slot slots[2]{};", "Slot slots[1]{};"),
+        ("if (cached.epoch == epoch)", "if (cached.epoch != epoch)"),
+        ("if (slot.buffer == buffer)", "if (slot.buffer == buffer && slot.entry)"),
+        ("R30ShadowRegistryEpoch.load(std::memory_order_acquire)",
+         "R30ShadowRegistryEpoch.load(std::memory_order_relaxed)"),
+        ("std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);\n            const auto lockedEpoch",
+         "const auto lockedEpoch"),
+        ("if (cached.epoch != lockedEpoch)", "if (cached.epoch == lockedEpoch)"),
+        ("slot = {};", "/* retain stale slot */"),
+        ("cached.epoch = lockedEpoch;", "cached.epoch = epoch;"),
+        ("cached.next = (cached.next + 1u) % 2u;", "cached.next = 0u;"),
+        ("slot.entry = it == registry.end() ? nullptr : it->second;",
+         "slot.entry = nullptr;"),
+        ("if (inserted)\n                R30ShadowRegistryEpoch.fetch_add(1, std::memory_order_release);",
+         "if (inserted) {}"),
+        ("if (R30VertexShadows.erase(buffer))", "if (false)"),
+        ("if (R30IndexShadows.erase(buffer))", "if (false)"),
+        ("R30IndexShadows.clear();\n                R30VertexShadows.clear();\n                R30ShadowRegistryEpoch.fetch_add(",
+         "R30IndexShadows.clear();\n                R30VertexShadows.clear();\n                ("),
+        ("return R30FindShadow(buffer, R30IndexShadows, R30IndexLookup);",
+         "return R30FindShadow(buffer, R30IndexShadows, R30VertexLookup);"),
+    )
+    for i, (needle, replacement) in enumerate(edits, 1):
+        assert needle in source, (i, needle)
+        mutated = source.replace(needle, replacement, 1)
+        try:
+            validate_shadow_registry_lookup(mutated)
+        except (AssertionError, ValueError):
+            continue
+        raise AssertionError(f"R30 registry negative mutation {i} escaped")
 
 
 def main():
@@ -342,7 +472,7 @@ def main():
             pass
         else:
             raise AssertionError("mutation survived: " + needle)
-    print("PASS R30 VB/IB tail-streamed shadow range append/merge/read, descriptor, range and revision-keyed shadow copy cache; 11 descriptor + 8 range + 13 copy + 9 registry negative mutations; VB/IB negative-cache/recycle model")
+    print("PASS R30 VB/IB tail-streamed shadow range append/merge/read, descriptor, range and revision-keyed shadow copy cache; 11 descriptor + 8 range + 13 copy + 15 registry negative mutations; VB/IB negative-cache/recycle model")
 
 
 if __name__ == "__main__":
