@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00593",
   "work_key": "DX11:MENU_RACE_NATIVE_MIP_LOD_BIAS",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -67,5 +67,65 @@
     "reason": "No HMD-approved runtime candidate"
   },
   "runtime_evidence": null,
-  "next_action": "Confirm full GitHub CI on exact material SHA; separate C6; HMD and gamepad UNTESTED"
+  "next_action": "BUILD_VERIFIED, NEED_HMD_TEST: Quest3/VDXR native diagnostic inset in menu/vehicle/race and gamepad return; keep original DX9Ex Draw/Present and DXVK frozen; next independent DX11 coding task may start.",
+  "material_result_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+  "validation_bearing_result_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+  "result_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+  "c6_basis_head_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38209680279,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ]
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38209680339,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38209683798,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38209683904,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+      "event": "pull_request"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38209680278,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301",
+      "event": "push"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38209683896,
+      "status": "completed",
+      "conclusion": "success",
+      "validation_sha": "ef4949380880bdec3dfbd5cdbb1002ba07572301"
+    }
+  ],
+  "local_validation": [
+    "Game D3D9 signed MIPMAPLODBIAS IEEE754 DWORD reinterpret -> native D3D11 sampler -> guarded game Draw/DrawIndexed",
+    "00593 regression 1716 IEEE754 cases, 18 destructive source mutations (Backend Gate success)",
+    "00589/00590/00591/00592 source chain regressions unchanged in meaning, all success",
+    "Exact-SHA Windows Build, Backend validate/readiness smoke, DX11 Fast, OpenXR PR and push, HUD Inspector all success"
+  ]
 }
