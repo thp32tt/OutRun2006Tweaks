@@ -1861,6 +1861,15 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             op == D3DTOP_BLENDTEXTUREALPHAPM &&
             alphaOp == D3DTOP_MODULATE &&
             alphaArg1 == D3DTA_TEXTURE && alphaArg2 == D3DTA_TFACTOR;
+        // 00637: D3D9 alpha MODULATE(TEXTURE, 1 - TFACTOR) still uses
+        // original TEXTURE alpha as the PM RGB interpolation weight.  Reuse
+        // the same native PS only after reading and inverting the actual
+        // game-authored factor; all other modified alpha operands fail closed.
+        const bool blendTextureAlphaPMModulateInverseFactorAlpha =
+            op == D3DTOP_BLENDTEXTUREALPHAPM &&
+            alphaOp == D3DTOP_MODULATE &&
+            alphaArg1 == D3DTA_TEXTURE &&
+            alphaArg2 == (D3DTA_TFACTOR | D3DTA_COMPLEMENT);
         // D3D9 complement belongs to the active alpha operand, never to
         // the sampled texture-alpha used by premultiplied RGB blending.
         const bool blendTextureAlphaPMInverseFactorArg1Alpha =
@@ -1972,6 +1981,11 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         if (blendTextureAlphaPMModulateFactorAlpha &&
             FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))
             return false;
+        // 00637: an unreadable live TFACTOR must not produce a fabricated
+        // native modulation or change the original game Draw/input.
+        if (blendTextureAlphaPMModulateInverseFactorAlpha &&
+            FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))
+            return false;
         // These disjoint complemented-factor selectors must fetch the actual
         // game constant; failure leaves the draw on the D3D9 fallback path.
         if ((blendTextureAlphaPMInverseFactorArg1Alpha ||
@@ -2025,6 +2039,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // The new alpha operation's ARG2 is TFACTOR instead, so enforce RGB
         // source polarity separately without accepting other RGB modifiers.
         if (blendTextureAlphaPMModulateFactorAlpha && !arg2Diffuse) return false;
+        if (blendTextureAlphaPMModulateInverseFactorAlpha && !arg2Diffuse) return false;
         // A missing DIFFUSE slot may supply a material color under MODULATE.
         // Only texture selection is provably independent of that color.
         if (!layout.hasDiffuse && !selectTexture) return false;
@@ -2097,6 +2112,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
               !blendTextureSubtractAlpha && !blendDiffuseSubtractAlpha &&
                !blendTextureAddSmoothAlpha && !blendDiffuseAddSmoothAlpha &&
              !blendTextureAlphaPMInverseTextureAlpha && !blendTextureAlphaPMInverseDiffuseAlpha && !blendTextureAlphaPMFactorAlpha && !blendTextureAlphaPMInverseFactorArg1Alpha && !blendTextureAlphaPMInverseFactorArg2Alpha && !blendTextureAlphaPMDiffuseArg1Alpha && !blendTextureAlphaPMModulateAlpha && !blendTextureAlphaPMAddAlpha && !blendTextureAlphaPMSubtractAlpha && !blendTextureAlphaPMModulate2XAlpha && !blendTextureAlphaPMModulate4XAlpha && !blendTextureAlphaPMAddSignedAlpha && !blendTextureAlphaPMAddSigned2XAlpha && !blendTextureAlphaPMBlendTextureAlpha && !blendTextureAlphaPMAddSmoothAlpha && !blendTextureAlphaPMBlendDiffuseAlpha && !blendTextureAlphaPMBlendFactorAlpha &&
+              !blendTextureAlphaPMModulateInverseFactorAlpha &&
               !blendTextureAlphaPMModulateFactorAlpha &&
              !blendTextureAlphaPMDiffuseAlpha && !blendTextureAlpha && !blendTextureAlphaPM && !blendTextureAlphaPMTextureAlpha && !blendDiffuseAlpha && !blendFactorAlpha) || arg != D3DTA_TEXTURE ||
             (!selectTextureDiffuseAlpha && (!blendFactorDiffuseAlpha && !addSmoothDiffuseAlpha &&
@@ -2186,6 +2202,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             capture.blendTextureAlphaPMDiffuseAlpha = true;
         capture.blendTextureAlphaPMFactorAlpha = blendTextureAlphaPMFactorAlpha;
         capture.blendTextureAlphaPMModulateFactorAlpha = blendTextureAlphaPMModulateFactorAlpha;
+        if (blendTextureAlphaPMModulateInverseFactorAlpha)
+            capture.blendTextureAlphaPMModulateFactorAlpha = true;
         // SELECTARG1 complemented factor shares the compiled native PM/factor
         // shader, with alpha inversion applied to its constant below.
         if (blendTextureAlphaPMInverseFactorArg1Alpha)
@@ -2255,6 +2273,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.blendFactorModulate4XAlpha = blendFactorModulate4XAlpha;
         capture.blendFactorAlphaValue = static_cast<float>((textureFactor >> 24u) & 0xffu) / 255.0f;
         if (blendTextureAlphaPMInverseFactorArg1Alpha || blendTextureAlphaPMInverseFactorArg2Alpha)
+            capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;
+        if (blendTextureAlphaPMModulateInverseFactorAlpha)
             capture.blendFactorAlphaValue = 1.0f - capture.blendFactorAlphaValue;
         capture.coordIndex = coordIndex;
         capture.transformUv = transformUv;

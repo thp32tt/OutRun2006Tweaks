@@ -55,6 +55,7 @@ jobs:
           python tools/test_dx11_stage0_pm_inverse_diffuse_00634.py
           python tools/test_dx11_stage0_pm_inverse_factor_00635.py
           python tools/test_dx11_stage0_pm_modulate_factor_00636.py
+          python tools/test_dx11_stage0_pm_inverse_modulate_factor_00637.py
       - name: Verify source graph and dormant runtime activation
         run: |
           python tools/verify_dx11_source_graph.py
