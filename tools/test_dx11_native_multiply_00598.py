@@ -35,8 +35,9 @@ def connected(s):
         and all(x in draw for x in (
             "if (output.multiplyBlend && output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL)",
             "s.multiplyMaskedBlends[output.colorWriteMask]",
-            "s.multiplyBlend->GetDesc(&desc);",
-            "desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;",
+            // Scope masked-write proof to the multiplicative state, not
+            // the new 00599 subtractive state's identically named mask.
+            "s.multiplyBlend->GetDesc(&desc);\n            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;",
             "dev->CreateBlendState(&desc, cached.GetAddressOf())",
             "ctx->OMSetBlendState(s.multiplyBlend.Get(), nullptr, 0xffffffffu);",
             "ctx->DrawIndexed(indexCount, 0, 0);",
@@ -63,7 +64,8 @@ def main():
         ("output.multiplyBlend = multiply;", "output.multiplyBlend = false;"),
         ("s.multiplyMaskedBlends[output.colorWriteMask]", "s.maskedBlends[output.colorWriteMask]"),
         ("s.multiplyBlend->GetDesc(&desc);", "s.alphaBlend->GetDesc(&desc);"),
-        ("desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;", "desc.RenderTarget[0].RenderTargetWriteMask = 0;"),
+        ("s.multiplyBlend->GetDesc(&desc);\n            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;",
+         "s.multiplyBlend->GetDesc(&desc);\n            desc.RenderTarget[0].RenderTargetWriteMask = 0;"),
         ("ctx->OMSetBlendState(s.multiplyBlend.Get(), nullptr, 0xffffffffu);", "ctx->OMSetBlendState(nullptr, nullptr, 0xffffffffu);"),
         ("ctx->DrawIndexed(indexCount, 0, 0);", "/* skipped indexed */"),
         ("ctx->Draw(static_cast<UINT>(vertices.size()), 0);", "/* skipped linear */"),
