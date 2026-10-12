@@ -49,8 +49,9 @@ for tr,dr,ta,da,factor in product((0.,.2,.6,1.),repeat=5):
     rgb_out = min(1.,max(0.,tr+dr*(1.-ta)))
     alpha_out = da + (ta-da)*factor
     assert 0. <= rgb_out <= 1. and 0. <= alpha_out <= 1.
-    if factor == 0: assert alpha_out == da
-    if factor == 1: assert alpha_out == ta
+    # IEEE-754 interpolation can differ by one ULP at the 0/1 endpoints.
+    if factor == 0: assert abs(alpha_out - da) < 1.e-12
+    if factor == 1: assert abs(alpha_out - ta) < 1.e-12
     if abs(alpha_out-(da+(ta-da)*ta)) > 1.e-10: distinct += 1
 assert distinct > 0, "factor interpolation improperly follows texture alpha"
 print("00629 PM RGB-factor alpha graph/destructive/1024 numeric cases PASS; HMD UNTESTED")
