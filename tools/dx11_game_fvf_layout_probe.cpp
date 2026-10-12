@@ -49,7 +49,7 @@ int main() {
     assert(!game_fvf_select_uv(sample, layout, 2u, chosen));
     assert(chosen[0] == .1f && chosen[1] == .2f);
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 | 0x400u, layout));
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 | 0x00020000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 | 0x00020000u, layout));
     assert(game_fvf_layout(kGameFvfXyz | kGameFvfDiffuse | kGameFvfTex2, layout));
     assert(layout.texcoordOffset == 16u && layout.minStride == 32u);
     struct XyzColorUv2 {float x,y,z; std::uint32_t color; float u0,v0,u1,v1;};
@@ -102,7 +102,7 @@ int main() {
     assert(!game_fvf_select_uv(sample, layout, 4u, chosen));
     assert(chosen[0] == .5f && chosen[1] == .6f);
     assert(!game_fvf_layout(kGameFvfXyzRhw | 0x900u, layout));
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 | 0x00020000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 | 0x00020000u, layout));
     assert(game_fvf_layout(kGameFvfXyz | kGameFvfDiffuse | kGameFvfTex4, layout));
     assert(layout.texcoordOffset == 16u && layout.minStride == 48u);
     struct XyzColorUv4 {float x,y,z; std::uint32_t color; float u0,v0,u1,v1,u2,v2,u3,v3;};
@@ -253,7 +253,7 @@ int main() {
     // 00610: one-dimensional D3D9 stage0 UV feeds native Draw/DrawIndexed.
     assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1 | 0x00010000u, layout));
     assert(layout.texcoord3DMask == 1u && layout.minStride == 28u);
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1 | 0x00020000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1 | 0x00020000u, layout));
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTexcoordSize1_0 | kGameFvfDiffuse, layout));
     assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1 | kGameFvfTexcoordSize1_0, layout));
     assert(layout.firstTexcoord1D && layout.texcoordCount == 1u && layout.minStride == 20u);
@@ -288,7 +288,7 @@ int main() {
                             kGameFvfTexcoordSize1_1, layout));
     assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 | 0x00040000u, layout));
     assert(layout.texcoord3DMask == 2u && layout.minStride == 36u);
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 | 0x00080000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 | 0x00080000u, layout));
     assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 |
                            kGameFvfTexcoordSize1_1, layout));
     assert(!layout.firstTexcoord1D && layout.secondTexcoord1D);
@@ -329,7 +329,7 @@ int main() {
                             kGameFvfTexcoordSize1_2, layout));
     assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 | 0x00100000u, layout));
     assert(layout.texcoord3DMask == 4u && layout.minStride == 44u);
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 | 0x00200000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 | 0x00200000u, layout));
     assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 |
                            kGameFvfTexcoordSize1_2, layout));
     assert(layout.thirdTexcoord1D && layout.minStride == 36u);
@@ -377,7 +377,7 @@ int main() {
                             kGameFvfTexcoordSize1_3, layout));
     assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 | 0x00400000u, layout));
     assert(layout.texcoord3DMask == 8u && layout.minStride == 52u);
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 | 0x00800000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 | 0x00800000u, layout));
     assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 |
                            kGameFvfTexcoordSize1_3, layout));
     assert(layout.fourthTexcoord1D && layout.minStride == 44u);
@@ -509,8 +509,37 @@ int main() {
     assert(chosen[0] == .85f && chosen[1] == .95f);
     assert(!game_fvf_decode_vertex(&race3D, 79u, layout, sample));
     assert(sample.uv7[1] == .95f);
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex8 | 0x80000000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex8 | 0x80000000u, layout));
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex7 |
                             kGameFvfTexcoordSize3_7, layout));
+    // 00615: game-authored 4D FVF UV source skips both extra floats.
+    assert(kGameFvfTexcoordSize4_0 == 0x00020000u);
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 |
+                           kGameFvfTexcoordSize4_0 |
+                           kGameFvfTexcoordSize1_1 |
+                           0x00200000u, layout));
+    assert(layout.texcoord4DMask == 0x05u && layout.minStride == 52u);
+    struct Race4DPacked { float x,y,z,rhw,u0,v0,z0,q0,u1,u2,v2,z2,q2; };
+    Race4DPacked race4D{1,2,.5f,1.f,.125f,.25f,700.f,900.f,
+                        .75f,.875f,.9375f,333.f,444.f};
+    assert(sizeof(race4D) == 52u);
+    assert(game_fvf_decode_vertex(&race4D, sizeof(race4D), layout, sample));
+    assert(game_fvf_select_uv(sample, layout, 0u, chosen));
+    assert(chosen[0] == .125f && chosen[1] == .25f);
+    assert(game_fvf_select_uv(sample, layout, 1u, chosen));
+    assert(chosen[0] == .75f && chosen[1] == 0.f);
+    assert(game_fvf_select_uv(sample, layout, 2u, chosen));
+    assert(chosen[0] == .875f && chosen[1] == .9375f);
+    const auto saved4D = sample;
+    assert(!game_fvf_decode_vertex(&race4D, 51u, layout, sample));
+    assert(sample.uv2[1] == saved4D.uv2[1]);
+    auto corrupted4D = layout;
+    corrupted4D.texcoord4DMask = 0u;
+    assert(!game_fvf_decode_vertex(&race4D, sizeof(race4D), corrupted4D, sample));
+    corrupted4D = layout;
+    corrupted4D.texcoord3DMask = corrupted4D.texcoord4DMask;
+    assert(!game_fvf_decode_vertex(&race4D, sizeof(race4D), corrupted4D, sample));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 |
+                            kGameFvfTexcoordSize4_7, layout));
     return 0;
 }

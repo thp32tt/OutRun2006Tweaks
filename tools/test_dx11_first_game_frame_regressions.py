@@ -1614,7 +1614,7 @@ def main() -> None:
             "ctx->DrawIndexed(indexCount, 0, 0);",
         )) and all(x in hdr for x in (
             "candidate.texcoord3DMask = texcoord3DMask;",
-            "format == 2u || (stage >= (texcoordBits >> 8u) && format != 0u)",
+            "if (stage >= (texcoordBits >> 8u) && format != 0u)",
             "4u * game_fvf_texcoord3d_count(candidate.texcoord3DMask)",
             "if (layout.texcoord3DMask & (1u << slot))",
             "offset += 12u;",
@@ -1646,6 +1646,50 @@ def main() -> None:
             mutant = probe_source.replace(old, wrong, 1)
             assert not float3_uv_native_linked(bridge, layout_source, mutant)
     print("DX11 packed float3 UV native Draw integration regression PASS (static only)")
+
+    # 00615: float4 packed vertex bytes feed real native Draw and preserve
+    # packed subsequent coordinates; transformed high dimensions fail closed.
+    def float4_uv_native_linked(src: str, hdr: str, fixture: str) -> bool:
+        return all(x in src for x in (
+            "kGameFvfTexcoordSize4_0 == D3DFVF_TEXCOORDSIZE4(0)",
+            "kGameFvfTexcoordSize4_7 == D3DFVF_TEXCOORDSIZE4(7)",
+            "if (transformUv && layout.texcoord4DMask != 0u) return false;",
+            "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+        )) and all(x in hdr for x in (
+            "candidate.texcoord4DMask = texcoord4DMask;",
+            "8u * game_fvf_texcoord3d_count(candidate.texcoord4DMask)",
+            "8u * game_fvf_texcoord3d_count(layout.texcoord4DMask)",
+            "if (layout.texcoord4DMask & (1u << slot))",
+            "offset += 16u;",
+            "(layout.texcoord3DMask & layout.texcoord4DMask) != 0u",
+        )) and all(x in fixture for x in (
+            "struct Race4DPacked",
+            "assert(layout.texcoord4DMask == 0x05u && layout.minStride == 52u);",
+            "!game_fvf_decode_vertex(&race4D, 51u",
+            "corrupted4D.texcoord4DMask = 0u;",
+            "kGameFvfTexcoordSize4_7, layout",
+        ))
+    assert float4_uv_native_linked(bridge, layout_source, probe_source)
+    for old, wrong in (
+        ("if (transformUv && layout.texcoord4DMask != 0u) return false;",
+         "if (false && layout.texcoord4DMask != 0u) return false;"),
+        ("candidate.texcoord4DMask = texcoord4DMask;",
+         "candidate.texcoord4DMask = 0u;"),
+        ("offset += 16u;", "offset += 8u;"),
+        ("assert(layout.texcoord4DMask == 0x05u && layout.minStride == 52u);",
+         "assert(layout.texcoord4DMask == 0x05u);"),
+    ):
+        if old in bridge:
+            mutant = bridge.replace(old, wrong, 1)
+            assert mutant != bridge and not float4_uv_native_linked(mutant, layout_source, probe_source)
+        elif old in layout_source:
+            mutant = layout_source.replace(old, wrong, 1)
+            assert mutant != layout_source and not float4_uv_native_linked(bridge, mutant, probe_source)
+        else:
+            mutant = probe_source.replace(old, wrong, 1)
+            assert mutant != probe_source and not float4_uv_native_linked(bridge, layout_source, mutant)
+    print("DX11 packed float4 UV native menu/race Draw regression PASS (static only)")
 
     # 00558: real game-authored D3D9 stage0 BLENDTEXTUREALPHA /
     # BLENDDIFFUSEALPHA -> owned native PS -> Draw/DrawIndexed -> opt-in inset.

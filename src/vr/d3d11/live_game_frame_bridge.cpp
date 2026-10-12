@@ -40,7 +40,9 @@ static_assert(kGameFvfXyz == D3DFVF_XYZ && kGameFvfXyzRhw == D3DFVF_XYZRHW &&
                kGameFvfTexcoordSize1_6 == D3DFVF_TEXCOORDSIZE1(6) &&
                kGameFvfTexcoordSize1_7 == D3DFVF_TEXCOORDSIZE1(7) &&
                kGameFvfTexcoordSize3_0 == D3DFVF_TEXCOORDSIZE3(0) &&
-               kGameFvfTexcoordSize3_7 == D3DFVF_TEXCOORDSIZE3(7),
+               kGameFvfTexcoordSize3_7 == D3DFVF_TEXCOORDSIZE3(7) &&
+               kGameFvfTexcoordSize4_0 == D3DFVF_TEXCOORDSIZE4(0) &&
+               kGameFvfTexcoordSize4_7 == D3DFVF_TEXCOORDSIZE4(7),
               "Portable FVF constants must match the D3D9 SDK");
 constexpr UINT kWidth = 256;
 constexpr UINT kHeight = 144;
@@ -1487,6 +1489,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // COUNT2 transform semantics can depend on the source coordinate
         // width; do not reinterpret a packed TEXCOORDSIZE3 under COUNT2.
         if (transformUv && layout.texcoord3DMask != 0u) return false;
+        if (transformUv && layout.texcoord4DMask != 0u) return false;
         D3DMATRIX uvTransform{};
         if (transformUv && FAILED(game->GetTransform(D3DTS_TEXTURE0, &uvTransform)))
             return false;
@@ -1857,7 +1860,7 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
             return false;
         const float* xyz = decoded.position;
         const DWORD diffuse = decoded.diffuse;
-        // TEXCOORDSIZE3(0..7) stores (u,v,w); native 2D UV consumes (u,v).
+        // TEXCOORDSIZE3/4 stores (u,v,extra...); native untransformed 2D UV consumes (u,v).
         // TEXCOORDSIZE1(0..7) U-only streams get V=0; later UV sets
         // retain packed game byte offsets through native Draw/DrawIndexed.
         // TEX2..8 select UV1..7 from game bytes; absent slots fail closed.
