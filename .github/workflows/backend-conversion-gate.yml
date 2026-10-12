@@ -191,6 +191,8 @@ jobs:
         run: python tools/test_dx11_native_both_source_alpha_00601.py
       - name: DX11 live SRCALPHA ZERO OM 00602
         run: python tools/test_dx11_native_srcalpha_zero_00602.py
+      - name: DX11 live ONE ZERO source replacement 00603
+        run: python tools/test_dx11_native_source_replace_00603.py
 
       - name: Verify DX11 source graph
         shell: pwsh
