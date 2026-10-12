@@ -38,7 +38,19 @@ def verify(source: str) -> None:
     assert body.index("R30HudContain.valid = false;") < body.index(
         "R30HudAspectCompensation(stereo)") < body.index(
         "R30HudContain.valid = true;")
-    assert source.count("R30HudContainScale(state.stereo, hudScaleX, hudScaleY)") == 1
+    # Legacy single-eye/affine fallback and the fused non-indexed HUD pair
+    # each look up the already-latched per-Present contain scale once. Never
+    # move this FOV work into the HUD vertex loop.
+    legacy = source.split("bool R30TransformXyzrhwVertices(", 1)[1].split(
+        "bool R30TransformXyzrhwStereo(", 1
+    )[0]
+    paired = source.split("bool R30TransformXyzrhwStereo(", 1)[1].split(
+        "template <typename LeftDraw", 1
+    )[0]
+    lookup = "R30HudContainScale(state.stereo, hudScaleX, hudScaleY)"
+    assert legacy.count(lookup) == 1
+    assert paired.count(lookup) == 1
+    assert source.count(lookup) == 2
 
 
 if __name__ == "__main__":
