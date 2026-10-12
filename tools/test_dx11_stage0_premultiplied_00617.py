@@ -55,7 +55,7 @@ def main():
         ("bridge","capture.blendTextureAlphaPM = blendTextureAlphaPM;","capture.blendTextureAlphaPM = false;"),
         ("bridge","capture.blendTextureAlphaPM ? s.blendTextureAlphaPmPs.Get() :","capture.blendTextureAlphaPM ? s.blendTextureAlphaPs.Get() :"),
         ("bridge","!blendTextureAlpha && !blendTextureAlphaPM && !blendTextureAlphaPMTextureAlpha && !blendDiffuseAlpha",
-        "op == D3DTOP_BLENDTEXTUREALPHAPM && alphaOp == D3DTOP_SELECTARG1","!blendTextureAlpha && !blendDiffuseAlpha")
+         "!blendTextureAlpha && !blendDiffuseAlpha")
     )
     for owner, good, wrong in mutations:
         original = h if owner == "header" else b

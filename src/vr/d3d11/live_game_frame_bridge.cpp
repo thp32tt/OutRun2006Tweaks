@@ -204,19 +204,6 @@ float4 PSTextureBlendTextureAlpha(VOut v) : SV_Target {
     float4 c = lerp(v.diffuse, t, t.a);
     AlphaGate(c.a); return c;
 }
-// D3D9 PM: ARG1 + ARG2*(1-texture alpha), including alpha.
-float4 PSTextureBlendTextureAlphaPM(VOut v) : SV_Target {
-    float4 t = gameTexture.Sample(gameSampler, v.uv);
-    float4 c = saturate(t + v.diffuse * (1.0f - t.a));
-    AlphaGate(c.a); return c;
-}
-// Mixed PM RGB plus independently selected original texture alpha.
-// Unlike a full PM alpha operation, ALPHAOP=SELECTARG1 must return t.a.
-float4 PSTextureBlendTextureAlphaPMSelectTextureAlpha(VOut v) : SV_Target {
-    float4 t = gameTexture.Sample(gameSampler, v.uv);
-    float4 c = float4(saturate(t.rgb + v.diffuse.rgb * (1.0f - t.a)), t.a);
-    AlphaGate(c.a); return c;
-}
 float4 PSTextureBlendDiffuseAlpha(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
     float4 c = lerp(v.diffuse, t, v.diffuse.a);
@@ -401,6 +388,19 @@ float4 PSTextureAddSmooth(VOut v) : SV_Target {
 // Keep both source literals below MSVC C2026 per-literal size limits.
 // The native pixel shaders compile from their concatenation once per pipeline.
 constexpr char kScaledAlphaShader[] = R"(
+// D3D9 PM: ARG1 + ARG2*(1-texture alpha), including alpha.
+float4 PSTextureBlendTextureAlphaPM(VOut v) : SV_Target {
+    float4 t = gameTexture.Sample(gameSampler, v.uv);
+    float4 c = saturate(t + v.diffuse * (1.0f - t.a));
+    AlphaGate(c.a); return c;
+}
+// Mixed PM RGB plus independently selected original texture alpha.
+// Unlike a full PM alpha operation, ALPHAOP=SELECTARG1 must return t.a.
+float4 PSTextureBlendTextureAlphaPMSelectTextureAlpha(VOut v) : SV_Target {
+    float4 t = gameTexture.Sample(gameSampler, v.uv);
+    float4 c = float4(saturate(t.rgb + v.diffuse.rgb * (1.0f - t.a)), t.a);
+    AlphaGate(c.a); return c;
+}
 // Stage0 SELECTARG2 uses DIFFUSE/CURRENT RGB while alpha independently
 // MODULATE2X/4X multiplies texture/vertex alpha, saturating before AlphaGate.
 float4 PSTextureSelectDiffuseModulate2XAlpha(VOut v) : SV_Target {

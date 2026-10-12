@@ -64,9 +64,9 @@
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Validate exact result SHA Gate/Build/Fast/OpenXR/HUD; HMD follow-up only for runtime.",
+  "next_action": "Run exact-SHA Backend Conversion Gate, Build, Fast Structural, OpenXR and HUD on corrected PM shader source; no HMD.",
   "retry_repair": {
-    "reason": "Repair exact-SHA policy metadata missing gameplay_delivery_target/live_game_draw_path and extend real native PM RGB with SELECTARG1 alpha before final validation",
-    "previous_sha": "33c9e4755438ba64bdc27fdc2a75482982ce6032"
+    "reason": "Correct exact-SHA Windows failures: two new PM shader definitions exceeded MSVC 16KB kShader raw literal; relocate to pre-existing concatenated HLSL literal. Repair tuple arity in destructive regression.",
+    "previous_sha": "c5b98fe11b7908067daabea1d4795b7a28fc043d"
   }
 }
