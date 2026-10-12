@@ -39,7 +39,8 @@ def linked(s):
                     "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"))):
         if not all(x in section for x in phrases):
             return False
-    return s.count("for (auto& masked : s.maskedBlends) masked.Reset();") == 2
+    return (s.count("for (auto& masked : s.maskedBlends) masked.Reset();") == 2
+            and s.count("s.premultipliedAlphaBlend.Reset();") == 2)
 
 def main():
     s = SOURCE.read_text(encoding="utf-8")
