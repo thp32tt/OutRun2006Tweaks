@@ -1889,6 +1889,26 @@ namespace OutRunVRRenderer
 		return true;
 	}
 
+	// R30 classifies every perspective/HUD draw using only _34/_44.
+	// Keep the same culling-restored source, full-matrix finite check and
+	// renderer-global validity gate as GetRendererBaseProjection, but avoid
+	// another 64-byte caller copy for every high-volume world primitive.
+	bool GetRendererProjectionSignature(float& m34, float& m44) noexcept
+	{
+		if (!ValidateRendererGlobals() || !RendererProjection)
+			return false;
+		D3DMATRIX projection{};
+		if (CullingProjectionOverridden)
+			projection = CullingProjectionSaved;
+		else
+			std::memcpy(&projection, RendererProjection, sizeof(projection));
+		if (!MatrixFinite(projection))
+			return false;
+		m34 = projection._34;
+		m44 = projection._44;
+		return true;
+	}
+
 	bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
 		std::uint32_t& poseSequence, std::uintptr_t& shaderIdentity,
 		std::uint64_t& shaderSerial)

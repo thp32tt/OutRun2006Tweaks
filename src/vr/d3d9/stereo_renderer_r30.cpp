@@ -1642,13 +1642,13 @@ namespace OutRunVRStereo
             if (!device || !R29OwnerTargetIsBackBuffer())
                 return R30ScreenSpaceKind::None;
 
-            float projection[16]{};
-            if (!OutRunVRRenderer::GetRendererBaseProjection(projection))
+            float m34 = 0.0f;
+            float m44 = 0.0f;
+            if (!OutRunVRRenderer::GetRendererProjectionSignature(m34, m44))
                 return R30ScreenSpaceKind::None;
 
             const auto projectionClass =
-                OutRunVR::PassPolicy::ClassifyProjectionSignature(
-                    projection[11], projection[15]);
+                OutRunVR::PassPolicy::ClassifyProjectionSignature(m34, m44);
             if (projectionClass ==
                 OutRunVR::PassPolicy::ProjectionClass::Orthographic2D)
                 return R30ScreenSpaceKind::Hud2D;

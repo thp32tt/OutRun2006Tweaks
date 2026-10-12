@@ -313,6 +313,9 @@ namespace OutRunVRRenderer
     bool GetLatchedHeadInverse(float outMatrix[16],
         std::uint32_t& poseSequence) noexcept;
     bool GetRendererBaseProjection(float outMatrix[16]);
+    // Classification-only hot path: return validated projection signature
+    // without copying the complete 4x4 matrix to each Draw callsite.
+    bool GetRendererProjectionSignature(float& m34, float& m44) noexcept;
     bool GetLastVerifiedWvp(float outConstants[16], std::uint32_t& generation,
         std::uint32_t& poseSequence, std::uintptr_t& shaderIdentity,
         std::uint64_t& shaderSerial);
