@@ -16846,5 +16846,27 @@
     "C2": "RETIRED_HISTORY_NOT_NEW_PASS",
     "C3": "NOT_RUN",
     "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "a_q217_hd_readable_two_sprite_inputs_20261012_1600": {
+    "role": "A",
+    "index": 217,
+    "run_key": "OUTRUN-KOR-A-Q217-HD-READABLE-TWO-SPRITES-20261012-1600",
+    "canonical_source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+    "readable_atlas_sha256": "dd1488df6fcb0267ff02d46c5cda18875fa0c97fd8379a58f33febb1078fda0a",
+    "source_png_count": 3,
+    "source_reference_zoom_png_count": 2,
+    "source_input_directory": "localization/graphics/role_A/imagegen_inputs/q217_20261012",
+    "material_source_prep_completed": true,
+    "source_visual_QA": "PASS_INPUT_SOURCE_ONLY",
+    "source_imagegen_attachment": "SOURCE_REFERENCE_NOT_BOUND",
+    "new_imagegen_korean_outputs": 0,
+    "new_trial_DDS": 0,
+    "official_promoted_DDS": 0,
+    "asset_rework_status_preserved": "q217 A233 source-family REWORK",
+    "independent_C1": "NOT_RUN_NEW_CANDIDATE",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "source_job": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38216075809",
+    "qa": "localization/graphics/role_A/imagegen_inputs/q217_20261012/q217_A_CONTROLLER_SOURCE_FIRSTHAND_QA.json"
   }
 }
