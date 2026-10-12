@@ -74,8 +74,8 @@ mutations = [
 for name, before, after in mutations:
     # The sparse density rule is also used by the separate ScreenHud path.
     # Mutate this feature's producer, not the unrelated HUD implementation.
-    if name in ("no fallback re-seed", "no right fallback",
-                "invalid buffer protection"):
+    if name in ("no shared seed", "no fallback re-seed",
+                "no right fallback", "invalid buffer protection"):
         assert SOURCE.count(before) == 1, (name, "fixture")
         damaged = SOURCE.replace(before, after, 1)
     else:
