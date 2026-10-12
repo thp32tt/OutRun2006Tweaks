@@ -1640,7 +1640,14 @@ def main() -> None:
         intake = code[code.find("bool supported_game_state("):
                       code.find("bool translate_vertices(")]
         submit = code[code.find("bool submit("):code.find("void observe(")]
+        # Preserve the original 00562 factor pair independently of new
+        # SELECTARG RGB variants that intentionally share its ALPHAOP.
+        original_factor_pair = (
+            "const bool blendFactorAlpha = op == D3DTOP_BLENDFACTORALPHA &&\n"
+            "                                       alphaOp == D3DTOP_BLENDFACTORALPHA;"
+        )
         return (all(token in code for token in factor_links) and
+                original_factor_pair in intake and
                 "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)" in intake and
                 "static_cast<float>(output.alphaFunc), capture.blendFactorAlphaValue" in submit and
                 "ctx->PSSetShader(capture.selectDiffuseTextureAlpha ?" in submit and

@@ -1235,7 +1235,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         if (!layout.hasDiffuse && !selectTexture) return false;
         // Validate the chosen alpha input independently from RGB. Inactive
         // alpha stage operands are ignored; active modifier bits remain denied.
-        const bool rgbNeedsDiffuse = selectDiffuseFactorAlpha || selectDiffuseTextureAlpha || selectDiffuseDiffuseAlpha ||
+        const bool rgbNeedsDiffuse = selectDiffuseTextureAlpha || selectDiffuseDiffuseAlpha ||
+                                     selectDiffuseFactorAlpha ||
                                      selectDiffuseModulateAlpha || selectDiffuseAddAlpha || selectDiffuseSubtractAlpha || selectDiffuseAddSmoothAlpha || selectDiffuseModulate2XAlpha || selectDiffuseModulate4XAlpha ||
                                      blendFactorTextureAlpha || blendFactorModulateAlpha ||
                                      blendFactorDiffuseAlpha || blendFactorAddAlpha ||
@@ -1254,7 +1255,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                                      mixedAddTextureAlpha || mixedAddDiffuseAlpha ||
                                      subtractTextureAlpha || subtractDiffuseAlpha || subtractModulateAlpha ||
                                      blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;
-        const bool alphaNeedsDiffuse = selectTextureFactorAlpha || selectDiffuseFactorAlpha || selectDiffuseDiffuseAlpha || selectDiffuseModulateAlpha ||
+        const bool alphaNeedsDiffuse = selectDiffuseDiffuseAlpha || selectDiffuseModulateAlpha ||
+                                           selectTextureFactorAlpha || selectDiffuseFactorAlpha ||
                                           selectDiffuseAddAlpha || selectDiffuseSubtractAlpha || selectDiffuseAddSmoothAlpha || selectDiffuseModulate2XAlpha || selectDiffuseModulate4XAlpha ||
                                          selectTextureDiffuseAlpha || selectTextureModulateAlpha ||
                                          selectTextureAddAlpha || selectTextureSubtractAlpha || selectTextureAddSmoothAlpha ||
