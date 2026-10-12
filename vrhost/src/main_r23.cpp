@@ -37,6 +37,7 @@
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
 #include "runtime/desktop_capture_reuse.hpp"
+#include "runtime/desktop_capture_descriptor_cache.hpp"
 #include "runtime/direct_hold_frame_reuse.hpp"
 #include "runtime/theater_capture_reuse.hpp"
 #include "runtime/cadence_presented_wait.hpp"
@@ -1001,14 +1002,42 @@ namespace
         bool copied = false;
         if (SUCCEEDED(qi) && texture)
         {
-            D3D11_TEXTURE2D_DESC d{};
-            texture->GetDesc(&d);
-            if ((d.Format == DXGI_FORMAT_B8G8R8A8_UNORM ||
-                 d.Format == DXGI_FORMAT_R16G16B16A16_FLOAT) &&
-                c.EnsureSource(d))
+            // Output Duplication preserves output texture extent/format for
+            // its lifetime. After the first successfully copied image, the
+            // subsequent 72/90/120-Hz captures need no per-frame texture
+            // GetDesc driver call. A new duplication, source recreation,
+            // output switch or missing SRV always takes the real GetDesc path.
+            static OutRunVrDesktopCaptureDescriptor::Cache descriptorCache{};
+            const OutRunVrDesktopCaptureDescriptor::Key key{
+                reinterpret_cast<std::uintptr_t>(c.duplication_),
+                c.sourceWidth_, c.sourceHeight_,
+                static_cast<std::uint32_t>(c.sourceFormat_)
+            };
+            const bool reuseDescriptor = descriptorCache.CanReuse(
+                outputUnchanged, c.haveFrame_,
+                c.source_ != nullptr && c.sourceSrv_ != nullptr, key);
+            bool sourceReady = reuseDescriptor;
+            if (!reuseDescriptor)
+            {
+                D3D11_TEXTURE2D_DESC d{};
+                texture->GetDesc(&d);
+                sourceReady =
+                    (d.Format == DXGI_FORMAT_B8G8R8A8_UNORM ||
+                     d.Format == DXGI_FORMAT_R16G16B16A16_FLOAT) &&
+                    c.EnsureSource(d);
+            }
+            if (sourceReady)
             {
                 c.context_->CopyResource(c.source_, texture);
                 copied = true;
+                // Record only after the acquired texture was validated and
+                // the copy submitted. Never cache failed source setup.
+                if (!reuseDescriptor)
+                    descriptorCache.Record({
+                        reinterpret_cast<std::uintptr_t>(c.duplication_),
+                        c.sourceWidth_, c.sourceHeight_,
+                        static_cast<std::uint32_t>(c.sourceFormat_)
+                    });
             }
             texture->Release();
         }
