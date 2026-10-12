@@ -1718,7 +1718,9 @@ namespace OutRunVRStereo
         R30HudEdgeAnchor R30GetExactHudEdgeAnchor(
             const void* source, UINT count, UINT stride,
             float x0, float y0, float width, float height,
-            const std::vector<std::uint8_t>* usedMask) noexcept
+            const std::vector<std::uint8_t>* usedMask,
+            const std::vector<std::uint32_t>* touched,
+            UINT knownUsedCount) noexcept
         {
             if (!Settings::VRHudEdgeAnchors.get() ||
                 OutRunVR::GameSemantic::EffectiveScope() !=
@@ -1732,8 +1734,24 @@ namespace OutRunVRStereo
             float minY = y0 + height, maxY = y0;
             bool seen = false;
             const auto* bytes = static_cast<const std::uint8_t*>(source);
-            for (UINT i = 0; i < count; ++i)
+            // The draw decoder has already produced a complete, unique
+            // touched-index list for sparse indexed batches. Reuse it for
+            // the semantic bounding box instead of scanning all VB entries.
+            // Unindexed/uncertain batches keep the original full traversal.
+            const bool sparseAnchorTouched = usedMask && touched &&
+                knownUsedCount > 0u &&
+                knownUsedCount == touched->size() &&
+                knownUsedCount <= count / 4u;
+            const UINT anchorVisitCount =
+                sparseAnchorTouched ? knownUsedCount : count;
+            for (UINT visit = 0; visit < anchorVisitCount; ++visit)
             {
+                const UINT i =
+                    sparseAnchorTouched ? (*touched)[visit] : visit;
+                // Bad producer metadata cannot authorize a displaced HUD.
+                if (i >= count ||
+                    (sparseAnchorTouched && !(*usedMask)[i]))
+                    return {};
                 if (usedMask && !(*usedMask)[i])
                     continue;
                 float xy[2]{};
@@ -3388,7 +3406,7 @@ namespace OutRunVRStereo
                 // Z/RHW, UV, color and sparse source coverage stay unchanged.
                 const R30HudEdgeAnchor exactHudAnchor =
                     R30GetExactHudEdgeAnchor(source, vertexCount, stride,
-                        x0, y0, width, height, usedMask);
+                        x0, y0, width, height, usedMask, touched, knownUsedCount);
                 const float halfWidth = width * 0.5f;
                 const float halfHeight = height * 0.5f;
                 const float eyeScaleX[2]{

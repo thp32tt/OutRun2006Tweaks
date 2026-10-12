@@ -39,9 +39,9 @@ def verify_source(source, workflow):
         "if (usedMask && !(*usedMask)[i])",
         "!std::isfinite(src[0]) || !std::isfinite(src[1])",
         "!std::isfinite(src[2]) || !std::isfinite(src[3])",
-        "const float transformedY = hudScaleY * src[1] + hudBiasY;",
-        "eyeScaleX[0] * src[0] + eyeBiasX[0];",
-        "eyeScaleX[1] * src[0] + eyeBiasX[1];",
+        "const float transformedY = hudScaleY * src[1] + hudBiasY + edgeYBias;",
+        "eyeScaleX[0] * src[0] + eyeBiasX[0] + edgeLeftBias;",
+        "eyeScaleX[1] * src[0] + eyeBiasX[1] + edgeRightBias;",
         "leftDst[0] = transformedLeftX;",
         "leftDst[1] = transformedY;",
         "rightDst[0] = transformedRightX;",
@@ -75,6 +75,9 @@ def destructive_mutations(source, workflow):
         ("if (usedMask && !(*usedMask)[i])", "if (false)"),
         ("leftDst[0] = transformedLeftX;", "leftDst[0] = src[0];"),
         ("rightDst[0] = transformedRightX;", "rightDst[0] = src[0];"),
+        ("hudBiasY + edgeYBias;", "hudBiasY;"),
+        ("eyeBiasX[0] + edgeLeftBias;", "eyeBiasX[0];"),
+        ("eyeBiasX[1] + edgeRightBias;", "eyeBiasX[1];"),
     )
     start = source.index("bool R30TransformXyzrhwStereo(")
     end = source.index("// This is the high-frequency indexed smoke/sand/decal path:", start)
@@ -118,19 +121,19 @@ def numeric_parity():
             selected, sparse = visit_indices(mask, touched, count)
             assert selected is not None and set(selected) == set(touched)
             assert sparse == (count > 0 and count <= n // 4)
-            # Both eye transforms change only X; Y is shared, remaining
+            # Eye-specific edge anchoring changes only X; Y is shared, remaining
             # Z/RHW/color/UV payload must remain bit-for-bit identical.
-            for scale, bias in ((0.91, -2.5), (1.08, 7.0)):
+            for scale, bias, edge_x in ((0.91, -2.5, -14.25), (1.08, 7.0, 10.75)):
                 dense = list(data)
                 fast = list(data)
                 for i in range(n):
                     if mask[i]:
                         x, y, z, rhw, color, uv = dense[i]
-                        dense[i] = (scale * x + bias, 1.05 * y + 2.0,
+                        dense[i] = (scale * x + bias + edge_x, 1.05 * y + 2.0 - 8.0,
                                     z, rhw, color, uv)
                 for i in selected:
                     x, y, z, rhw, color, uv = fast[i]
-                    fast[i] = (scale * x + bias, 1.05 * y + 2.0,
+                    fast[i] = (scale * x + bias + edge_x, 1.05 * y + 2.0 - 8.0,
                                z, rhw, color, uv)
                 assert dense == fast, ("sparse/dense parity", n, count)
             if sparse:
