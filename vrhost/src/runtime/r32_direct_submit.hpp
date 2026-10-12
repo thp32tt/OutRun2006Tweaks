@@ -56,12 +56,16 @@ namespace OutRunVrR32DirectSubmit
         ID3D11Query* fence = nullptr;
         bool armed = false;
         bool flushIssued = false;
+        // EVENT completion is monotonic until this query is re-armed.
+        bool completionObserved = false;
         OutRunVR::SharedRenderFrameState frame{};
     };
 
     inline std::array<PendingAck, OutRunVR::RenderFrameRingSize> Pending{};
     inline std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> AckedFrame{};
     inline std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> AckedGeneration{};
+    // Immediate-context thread only; skip idle ACK ring scans.
+    inline std::uint32_t PendingAckCount = 0;
     inline std::uint64_t FastDirectSubmits = 0;
     inline std::uint64_t FastDirectRejects = 0;
     inline std::uint64_t AckArmed = 0;
@@ -115,8 +119,10 @@ namespace OutRunVrR32DirectSubmit
             }
             pending.armed = false;
             pending.flushIssued = false;
+            pending.completionObserved = false;
             pending.frame = {};
         }
+        PendingAckCount = 0;
         AckedFrame.fill(0);
         AckedGeneration.fill(0);
         AckFaultGeneration = 0;
@@ -166,16 +172,23 @@ namespace OutRunVrR32DirectSubmit
 
     inline void PollCompletedAcks() noexcept
     {
-        if (!OutRunVrFinalTest::Context)
+        if (!OutRunVrFinalTest::Context || PendingAckCount == 0)
             return;
         for (auto& pending : Pending)
         {
             if (!pending.armed || !pending.fence)
                 continue;
-            const HRESULT hr = OutRunVrFinalTest::Context->GetData(
-                pending.fence, nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
-            if (hr == S_FALSE)
-                continue;
+            // A failed ACK publication retries without polling a completed EVENT.
+            HRESULT hr = S_OK;
+            if (!pending.completionObserved)
+            {
+                hr = OutRunVrFinalTest::Context->GetData(
+                    pending.fence, nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
+                if (hr == S_FALSE)
+                    continue;
+                if (SUCCEEDED(hr))
+                    pending.completionObserved = true;
+            }
             if (FAILED(hr))
             {
                 // Completion is unknowable, so never ACK this producer frame.
@@ -196,6 +209,8 @@ namespace OutRunVrR32DirectSubmit
                 }
                 ++AckQueryErrors;
                 pending.armed = false;
+                pending.completionObserved = false;
+                --PendingAckCount;
                 pending.flushIssued = false;
                 pending.frame = {};
                 pending.fence->Release();
@@ -218,6 +233,8 @@ namespace OutRunVrR32DirectSubmit
                 // game run is safe to forget, but must never publish into the
                 // active run's ACK state or stall its producer ring.
                 pending.armed = false;
+                pending.completionObserved = false;
+                --PendingAckCount;
                 pending.flushIssued = false;
                 pending.frame = {};
                 ++AckCompleted;
@@ -239,6 +256,8 @@ namespace OutRunVrR32DirectSubmit
                 AckedGeneration[slot] = generation;
             }
             pending.armed = false;
+                pending.completionObserved = false;
+                --PendingAckCount;
             pending.flushIssued = false;
             pending.frame = {};
             ++AckCompleted;
@@ -337,6 +356,8 @@ namespace OutRunVrR32DirectSubmit
         pending.frame = frame;
         pending.armed = true;
         pending.flushIssued = false;
+        pending.completionObserved = false;
+        ++PendingAckCount;
         ++AckArmed;
         return true;
     }
