@@ -534,6 +534,8 @@ struct TextureCapture {
     bool blendFactorModulate4XAlpha = false;
     float blendFactorAlphaValue = 0.0f;
     UINT coordIndex = 0;
+    bool transformUv = false; // Live D3D9 stage0 COUNT2 texture0 transform.
+    D3DMATRIX uvTransform{};
     Microsoft::WRL::ComPtr<IDirect3DTexture9> texture;
     D3DTEXTUREADDRESS addressU = D3DTADDRESS_CLAMP;
     D3DTEXTUREADDRESS addressV = D3DTADDRESS_CLAMP;
@@ -1189,6 +1191,11 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         if ((addressU == D3DTADDRESS_BORDER || addressV == D3DTADDRESS_BORDER) &&
             FAILED(game->GetSamplerState(0, D3DSAMP_BORDERCOLOR, &borderColor)))
             return false;
+        // D3D9 COUNT2 takes (u,v,1,0); projective and other counts fail closed.
+        const bool transformUv = transformFlags == D3DTTFF_COUNT2;
+        D3DMATRIX uvTransform{};
+        if (transformUv && FAILED(game->GetTransform(D3DTS_TEXTURE0, &uvTransform)))
+            return false;
         // DWORD MIPMAPLODBIAS contains IEEE-754 bits; numeric conversion loses
         // the game's fractional/negative offset. Validate before native capture.
         float decodedMipBias = 0.0f;
@@ -1422,7 +1429,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha)))) ||
             (rgbNeedsDiffuse && !arg2Diffuse) ||
             ((alphaNeedsDiffuse && !alphaArg2Diffuse) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha) ||
-            coordIndex >= layout.texcoordCount || transformFlags != D3DTTFF_DISABLE || srgb ||
+            coordIndex >= layout.texcoordCount ||
+            (transformFlags != D3DTTFF_DISABLE && transformFlags != D3DTTFF_COUNT2) || srgb ||
             ((addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP &&
              addressU != D3DTADDRESS_MIRROR && addressU != D3DTADDRESS_MIRRORONCE) &&
              addressU != D3DTADDRESS_BORDER) ||
@@ -1515,6 +1523,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         capture.blendFactorModulate4XAlpha = blendFactorModulate4XAlpha;
         capture.blendFactorAlphaValue = static_cast<float>((textureFactor >> 24u) & 0xffu) / 255.0f;
         capture.coordIndex = coordIndex;
+        capture.transformUv = transformUv;
+        if (transformUv) capture.uvTransform = uvTransform;
     }
     // Custom clip planes are not implemented by the native shader. The
     // object-space path must also reject D3D9 lighting and vertex blending.
@@ -1559,6 +1569,17 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
             return false;
         if (capture.enabled && (!std::isfinite(output[i].uv[0]) ||
                                 !std::isfinite(output[i].uv[1]))) return false;
+        if (capture.enabled && capture.transformUv) {
+            // D3D9 COUNT2: row-vector (u,v,1,0), transformed before
+            // native perspective-correct texture coordinate interpolation.
+            const float u = output[i].uv[0], v = output[i].uv[1];
+            const auto& m = capture.uvTransform;
+            const float texU = u * m._11 + v * m._21 + m._31;
+            const float texV = u * m._12 + v * m._22 + m._32;
+            if (!std::isfinite(texU) || !std::isfinite(texV)) return false;
+            output[i].uv[0] = texU;
+            output[i].uv[1] = texV;
+        }
         if (!std::isfinite(xyz[0]) || !std::isfinite(xyz[1]) ||
             !std::isfinite(xyz[2]) ||
             (layout.pretransformed && (!std::isfinite(xyz[3]) || xyz[3] <= 0.0f)))
