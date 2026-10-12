@@ -61,7 +61,7 @@ def valid(code):
         if not (init_order_ok
                 and init_pos < segment.index("++knownUsedCount;")
                 < segment.index(marker)
-                < segment.index("&scratch.used, knownUsedCount))"):
+                < segment.index("&scratch.used, knownUsedCount))")):
             return False
         if name == "VB" and not all(x in segment for x in (
                 "if (!cachedDecode)",
