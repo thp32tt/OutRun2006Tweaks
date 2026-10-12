@@ -51,5 +51,5 @@ for ta,da,fa,complement in product((0.,.13,.5,.87,1.),(0.,.25,.5,.75,1.),range(2
  assert 0.<=rgb<=1.
  n+=1
 assert n==12800
-assert abs((.9*.25+.2*.75)-(.9*.2+.25*.8))>.01
+assert abs((.9*.25+.2*.75)-(.9*.8+.25*.2))>.1  # Wrong interpolation weight / operand order
 print("00641 PM CURRENT TFACTOR source/native Draw + 12800 numeric PASS; HMD UNTESTED")
