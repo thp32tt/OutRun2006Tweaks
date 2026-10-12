@@ -11,9 +11,9 @@
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "target_branch": "vr-dx11-native-r71",
   "base_head_sha": "8e0ef8debca73eceaa69baa353d67ea80446eca2",
-  "status": "IMPLEMENTED_PENDING_FULL_GATE",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -58,13 +58,34 @@
     "C0_RECOVER": "PASS: latest 00624 and branch HEAD checked",
     "C1_REVIEW": "PASS: signed-add alpha missing from game draw",
     "C2_IMPLEMENT": "PASS: native game callsite shader/capture/draw extended",
-    "C3_VALIDATE": "SOURCE_CHECKS_PASS; EXACT_SHA_ACTIONS_PENDING",
-    "C4_COMMIT": "PENDING_SHA",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Gate 38287679392 validate + smoke, DX11 Fast 38287679296, Windows Build 38287686881, OpenXR push 38287679268 / PR 38287686980, HUD 38287686909; all SUCCESS",
+    "C4_COMMIT": "PASS: actual material game render C++/HLSL + regression on bc2f8248ec9ac4151b964e8d7eae00357a286c88",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA / BUILD_VERIFIED; Quest3/VDXR/gamepad runtime UNTESTED"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Verify exact material SHA Actions, keep runtime/HMD/gamepad UNTESTED"
+  "next_action": "00625 complete on exact material SHA; next independent DX11 item without rerunning same TASK_ID. Native menu/vehicle/race visual parity and gamepad NEED_HMD_TEST; DXVK frozen.",
+  "material_result_sha": "bc2f8248ec9ac4151b964e8d7eae00357a286c88",
+  "validation_bearing_result_sha": "bc2f8248ec9ac4151b964e8d7eae00357a286c88",
+  "result_sha": "bc2f8248ec9ac4151b964e8d7eae00357a286c88",
+  "evidence": {
+    "backend_gate_conclusion": "success",
+    "backend_gate_run_id": 38287679392,
+    "dx11_fast_conclusion": "success",
+    "dx11_fast_run_id": 38287679296,
+    "windows_build_conclusion": "success",
+    "windows_build_run_id": 38287686881,
+    "openxr_push_conclusion": "success",
+    "openxr_push_run_id": 38287679268,
+    "openxr_pr_conclusion": "success",
+    "openxr_pr_run_id": 38287686980,
+    "hud_inspector_conclusion": "success",
+    "hud_inspector_run_id": 38287686909,
+    "game_quest3_vdxr": "UNTESTED",
+    "gamepad_input": "UNTESTED",
+    "native_visual_parity": "NEED_HMD_TEST",
+    "material_sha": "bc2f8248ec9ac4151b964e8d7eae00357a286c88"
+  }
 }
