@@ -672,10 +672,6 @@ require_order(
     "else if (ready == S_FALSE)",
     "R13DirectCopyPathRejected = true;",
     "R13DirectCopyRejectHr = ready;",
-    "return false;",
-    "if (publicationNeedsAck)",
-    "slot.frameId = 0;",
-    "slot.published = false;",
     "selected = index;",
 )
 if resolve_direct_r13.count("R13ReadGpuCompletionSnapshotWithRebind(ackSnapshot)") != 1:
