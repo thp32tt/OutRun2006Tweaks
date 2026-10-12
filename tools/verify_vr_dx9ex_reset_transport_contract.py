@@ -916,15 +916,18 @@ else:
 # Once GetData can no longer prove completion, the shared-eye slot must not be
 # recycled or silently cleared. Keep the final R32 owner fail-closed until a
 # reset/interop identity transition revalidates the DirectGPU copy path.
+# The ACK-gated publication check precedes GPU EVENT polling. The chosen
+# slot follows the poll, so delimit the producer hard-error branch at slot
+# selection rather than searching for a second, now-retired ACK check.
 pending_poll_marker = "const HRESULT ready ="
-published_scan_marker = "if (candidate.published && candidate.frameId)"
+selected_slot_marker = "selectedPublication = candidate;"
 pending_poll_pos = resolve_direct_r32.find(pending_poll_marker)
-published_scan_pos = resolve_direct_r32.find(
-    published_scan_marker, pending_poll_pos
+selected_slot_pos = resolve_direct_r32.find(
+    selected_slot_marker, pending_poll_pos
 )
-if min(pending_poll_pos, published_scan_pos) < 0:
-    fail("R32 producer EVENT poll scope missing")
-producer_poll_r32 = resolve_direct_r32[pending_poll_pos:published_scan_pos]
+if min(pending_poll_pos, selected_slot_pos) < 0:
+    fail("R32 producer EVENT poll/selection scope missing")
+producer_poll_r32 = resolve_direct_r32[pending_poll_pos:selected_slot_pos]
 require_order(
     producer_poll_r32,
     "R32 producer EVENT hard-error fail-closed",
