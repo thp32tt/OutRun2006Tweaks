@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import re
 import struct
+import zlib
 
 ROOT = Path("/data/imagegen")
 SHA = re.compile(r"[0-9a-f]{64}\Z")
@@ -61,6 +62,26 @@ def load_binding(role, root=ROOT):
             return None, "PNG_SHA_MISMATCH"
         if len(data) < 45 or data[:8] != b"\x89PNG\r\n\x1a\n" or data[12:16] != b"IHDR":
             return None, "INVALID_PNG"
+        offset, seen_idat, seen_end = 8, False, False
+        while offset + 12 <= len(data):
+            size = struct.unpack_from(">I", data, offset)[0]
+            end = offset + 12 + size
+            if size > 32 * 1024 * 1024 or end > len(data):
+                return None, "INVALID_PNG"
+            kind = data[offset + 4:offset + 8]
+            crc = struct.unpack_from(">I", data, end - 4)[0]
+            if zlib.crc32(data[offset + 4:end - 4]) != crc:
+                return None, "INVALID_PNG_CRC"
+            if kind == b"IDAT":
+                seen_idat = True
+            if kind == b"IEND":
+                seen_end = True
+                if size != 0 or end != len(data):
+                    return None, "INVALID_PNG"
+                break
+            offset = end
+        if not seen_idat or not seen_end:
+            return None, "INVALID_PNG"
         width, height = struct.unpack(">II", data[16:24])
         if not (1 <= width <= 8192 and 1 <= height <= 8192):
             return None, "INVALID_PNG_DIMENSIONS"
@@ -77,7 +98,9 @@ def load_binding(role, root=ROOT):
 
 async def attach_png(page, binding):
     """File bytes through Playwright; require a NEW visible composer upload chip."""
-    before = await page.locator(PREVIEW).count()
+    before = await page.locator(PREVIEW).evaluate_all(
+        "nodes => nodes.filter(n => n.getClientRects().length > 0).length"
+    )
     file_input = page.locator("input[type='file']")
     try:
         if await file_input.count():
