@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-10-11T20:48:00+09:00",
+  "updatedKst": "2026-10-13T07:28:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -11,7 +11,7 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "DX11 Native A global-first; DX9Ex C P0 measured GPU/CPU frame-time optimization first (dense buildings/sand/particles; 72 Hz / 13.89 ms), P1 actionable optics, P2 performance-beneficial opt-in eye extent, P3 minor safety/cleanup DEFERRED; DXVK B FROZEN; FFB frozen.",
+    "primaryBackend": "DX11 Native A global-first; DX9Ex C P0-A USER-CONFIRMED responsive HUD/main/ESC/F11 legibility FIRST (#119), P0-B measured GPU/CPU performance IN PARALLEL (72 Hz / 13.89 ms and p95/p99), P1 remaining confirmed optics, P2 opt-in XR eye extent, P3 minor safety/cleanup DEFERRED; DXVK B FROZEN; FFB frozen.",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -23,8 +23,8 @@
     "parallelBackendDevelopment": true,
     "backendReplacementGate": "DX9Ex Architecture v3 HMD gate only DX9Ex live IPC promotion, never independent DX11 Native A source development. DXVK B remains user-FROZEN.",
     "parallelTracks": {
-      "HUD": "P1: confirmed optical regressions only when actionable and independent; preserve previous HMD PASS. Do not preempt performance with indefinite review.",
-      "PERFORMANCE": "P0 FIRST: actual game/host GPU and CPU hot-path edits backed by R23/R28/R35 and p95/p99 frame-time evidence, not metrics-only/review-only or defensive micro-guards; 72Hz stable initially, then 90/120Hz only after real measurements.",
+      "HUD": "P0-A FIRST: Issue #119 user-observed 3440x1440 / Quest3 HUD too small/upper-centre, stretched main menu, ESC too small/upward, F11 illegible; implement the whole resolution/FOV-responsive function, not audits. Preserve HMD PASS; coordinate non-overlapping writer.",
+      "PERFORMANCE": "P0-B PARALLEL: keep existing measured C configuration and actual CPU/GPU/R23/R28/R35 p95/p99 optimization active under existing claim, without starving P0-A Issue #119 or claiming unmeasured FPS gain.",
       "DXVK": "FROZEN_BY_USER_2026_10_08: no automatic build/development/distribution/promotion.",
       "DX12": "FROZEN_REFERENCE_ONLY: unchanged; no implementation/build/HMD work.",
       "DX11_NATIVE": "ACTIVE_EXTERNAL_A_FIRST_PRIORITY: independent branch, commits, claims and CI."
@@ -55,7 +55,7 @@
       "disabledReason": "Historical evening HMD matrix disabled, not active A/C source execution."
     },
     "automationCycle": {
-      "mode": "DX9EX_C_PERFORMANCE_P0_WITH_DX11_A_GLOBAL_FIRST",
+      "mode": "DX9EX_C_UI_P0A_PERFORMANCE_P0B_PARALLEL_DX11_A_INDEPENDENT",
       "executionEnvironment": "EXTERNAL_DOCKER_QUEUE_CONTROLLER",
       "cadenceAuthority": "EXTERNAL_DOCKER",
       "repositorySsot": [
@@ -153,10 +153,11 @@
         }
       },
       "dx9exPriority": [
-        "P0_UNRESOLVED_OPTICS_HUD",
-        "P1_R84_STRUCTURAL",
+        "P0_A_USER_REPORTED_RESPONSIVE_HUD_MENU_F11_ISSUE_119",
+        "P0_B_MEASURED_PERFORMANCE_PARALLEL",
+        "P1_OTHER_CONFIRMED_VISUAL_REGRESSIONS",
         "P2_XR_PER_EYE_RESOLUTION",
-        "P3_NATIVE_120FPS"
+        "P3_MINOR_CLEANUP_DEFERRED"
       ],
       "protectedBaseline": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
       "hmdScope": "DX9EX_RUNTIME_ACCEPTANCE_NOT_DX11_SOURCE_GATE",
@@ -164,10 +165,11 @@
     },
     "performancePriorityOverride": {
       "effectiveDate": "2026-10-11",
-      "priority": "MEASURED_FRAME_TIME_FIRST",
+      "priority": "P0_B_MEASURED_PERFORMANCE_PARALLEL_TO_UI_P0_A",
       "deferMinorSafety": true,
       "exception": "proven crash, corruption, blocked build or performance regression",
-      "nextFocus": "heavy buildings/sand/particles; eliminate redundant stereo drawing/copies/capture/sync",
+      "nextFocus": "parallel P0-B: heavy buildings/sand/particles; eliminate redundant stereo drawing/copies/capture/sync; P0-A Issue #119 responsive UI dispatches first when actionable",
+      "supersededBy": "2026-10-13 USER OVERRIDE P0-A Issue #119 responsive HUD/main/ESC/F11 FIRST; P0-B performance remains active concurrently",
       "targetHz": 72,
       "frameBudgetMs": 13.89,
       "doNotRepeat": [
@@ -228,6 +230,33 @@
     }
   },
   "items": [
+    {
+      "id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+      "priority": 120,
+      "status": "READY",
+      "preferredRole": "C_DX9EX",
+      "featureId": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+      "workKey": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+      "issue": 119,
+      "summary": "P0-A next DX9Ex whole feature: Quest3 resolution/FOV-aware HUD safe anchors (no central/upward shrink), main menu 4:3/16:9/21:9 no horizontal stretch, ESC independent legible size/position, F11 ImGui native-resolution legibility. User reported FAIL on exact 75ef9c91cac1295418680c965df564372699f97a.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "runtimeFailureSource": "75ef9c91cac1295418680c965df564372699f97a",
+      "requiredStaticClosure": [
+        "HUD anchors per semantic family and XR FOV/extent with no single center-only squeeze",
+        "main menu aspect preserves intended sprite proportions on 4:3,16:9,21:9",
+        "ESC independently classified and vertically centered/readable",
+        "F11 ImGui VR-native readable UI and desktop 2D regression guard",
+        "preserve world markers, 6th/6, +TIME/GOAL, lens outer rings, SkyGlow and input",
+        "resolution/reset transitions + negative regression checks",
+        "exact-SHA full Win32 DX9Ex Active + Domain Isolation success; package NEED_HMD_TEST"
+      ],
+      "nextAction": "At next authorized non-conflicting DX9Ex C dispatch, claim one stable FEATURE_ID/work_key, implement all user-reported responsive UI issue #119 source fixes, repair gates, ship exact-SHA Quest3 candidate NEED_HMD_TEST. Measured p95/p99 performance P0-B remains active concurrently on separate claimed files.",
+      "blockedBy": null,
+      "blockReason": null
+    },
     {
       "id": "DX9EX-P0-VISUAL-COMPOSITION-20261007",
       "priority": 100,
