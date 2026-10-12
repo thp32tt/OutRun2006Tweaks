@@ -12,7 +12,7 @@ predicate = """const bool blendTextureAlphaPMModulateFactorAlpha =
 shader = """float4 PSTextureBlendTextureAlphaPMModulateFactorAlpha(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
     float4 c = float4(saturate(t.rgb + v.diffuse.rgb * (1.0f - t.a)),
-                      t.a * alphaParams.w);
+                      saturate(t.a * alphaParams.w));
     AlphaGate(c.a); return c;
 }"""
 factor_read = """if (blendTextureAlphaPMModulateFactorAlpha &&
@@ -63,7 +63,9 @@ for rgb_op, alpha_op, a1, a2 in product(
     positive += int(is_exact)
     rejected += int(not is_exact)
 assert positive == 1 and rejected == 35
-# 256 real D3DRS_TEXTUREFACTOR high-byte values, including both endpoints.
+# 256 live D3DRS_TEXTUREFACTOR bytes; unscaled factors remain within [0,1].
+# The saturating native shader also supports 2X/4X factors without changing
+# this fixture's original unscaled alpha arithmetic.
 # A different vertex alpha must not affect this separately selected alpha.
 for tex, vertex, sample_a, diffuse_a, factor_byte in product(
         (0., .2, .8, 1.), (0., .3, .7, 1.),
