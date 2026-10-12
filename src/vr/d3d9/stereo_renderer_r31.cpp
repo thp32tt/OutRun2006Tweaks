@@ -78,6 +78,17 @@ namespace OutRunVRStereo
             bool valid = false;
             float originalWvp[16]{};
             float eyeConstants[2][16]{};
+            // Busy scenes revisit a few WVPs interleaved with other world
+            // draws. Keep three bounded previous exact constants without
+            // allocating or changing the producer/eye-tail authority.
+            struct Recent
+            {
+                bool valid = false;
+                float originalWvp[16]{};
+                float eyeConstants[2][16]{};
+            };
+            Recent recent[3]{};
+            unsigned nextRecent = 0;
         };
         R31WorldWvpCache R31WorldCache{};
 
@@ -416,6 +427,24 @@ namespace OutRunVRStereo
                 draw.poseSequence = stereo.poseSequence;
                 return true;
             }
+            // Only use older entries while the primary cache is valid:
+            // all existing tail-change, StateBlock and Reset invalidations
+            // clear that flag, so stale eye transforms never become hits.
+            if (R31WorldCache.valid)
+            {
+                for (const auto& previous : R31WorldCache.recent)
+                {
+                    if (previous.valid &&
+                        std::memcmp(previous.originalWvp, originalWvp,
+                            sizeof(draw.originalConstants)) == 0)
+                    {
+                        std::memcpy(draw.eyeConstants, previous.eyeConstants,
+                            sizeof(draw.eyeConstants));
+                        draw.poseSequence = stereo.poseSequence;
+                        return true;
+                    }
+                }
+            }
 
             D3DMATRIX uploadedT{};
             std::memcpy(&uploadedT, originalWvp, sizeof(uploadedT));
@@ -434,6 +463,25 @@ namespace OutRunVRStereo
                     sizeof(eyeWvpT));
             }
             // Neither eye may be published before both are finite.
+            // On first miss after any external invalidation, discard the
+            // entire previous-key set; otherwise retain the prior primary.
+            // This is strictly bounded (three entries) and draw-thread local.
+            if (R31WorldCache.valid)
+            {
+                auto& previous = R31WorldCache.recent[R31WorldCache.nextRecent];
+                std::memcpy(previous.originalWvp, R31WorldCache.originalWvp,
+                    sizeof(previous.originalWvp));
+                std::memcpy(previous.eyeConstants, R31WorldCache.eyeConstants,
+                    sizeof(previous.eyeConstants));
+                previous.valid = true;
+                R31WorldCache.nextRecent = (R31WorldCache.nextRecent + 1) % 3;
+            }
+            else
+            {
+                for (auto& previous : R31WorldCache.recent)
+                    previous.valid = false;
+                R31WorldCache.nextRecent = 0;
+            }
             std::memcpy(R31WorldCache.originalWvp, originalWvp,
                 sizeof(R31WorldCache.originalWvp));
             std::memcpy(R31WorldCache.eyeConstants, draw.eyeConstants,

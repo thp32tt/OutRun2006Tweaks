@@ -55,6 +55,42 @@ def violations(source: str) -> list[str]:
         "R31WorldCache.valid = true;",
     ):
         require(marker in build, "build " + marker)
+    # Secondary reuse is legal only after the existing live WVP, shader,
+    # eye-tail, and StateBlock gates. A primary invalidation fences every
+    # historical entry, and two-eye finite validation precedes publication.
+    for marker in (
+        "struct Recent",
+        "Recent recent[3]{};",
+        "unsigned nextRecent = 0;",
+    ):
+        require(marker in cache, "bounded alternate cache " + marker)
+    for marker in (
+        "if (R31WorldCache.valid)\n            {\n                for (const auto& previous : R31WorldCache.recent)",
+        "if (previous.valid &&",
+        "std::memcmp(previous.originalWvp, originalWvp,",
+        "std::memcpy(draw.eyeConstants, previous.eyeConstants,",
+        "if (R31WorldCache.valid)\n            {\n                auto& previous = R31WorldCache.recent[R31WorldCache.nextRecent];",
+        "std::memcpy(previous.originalWvp, R31WorldCache.originalWvp,",
+        "std::memcpy(previous.eyeConstants, R31WorldCache.eyeConstants,",
+        "previous.valid = true;",
+        "R31WorldCache.nextRecent = (R31WorldCache.nextRecent + 1) % 3;",
+        "for (auto& previous : R31WorldCache.recent)",
+        "previous.valid = false;",
+        "R31WorldCache.nextRecent = 0;",
+    ):
+        require(marker in build, "alternate producer " + marker)
+    try:
+        require(build.index("R31PrepareEyeTailCache(stereo, projection)") <
+                build.index("for (const auto& previous : R31WorldCache.recent)"),
+                "eye-tail validation precedes alternate hit")
+        require(build.index("R30SupportValidateVerifiedWvp(") <
+                build.index("for (const auto& previous : R31WorldCache.recent)"),
+                "live WVP validation precedes alternate hit")
+        require(build.index("if (!R30SupportMatrixFinite(eyeWvp))") <
+                build.index("auto& previous = R31WorldCache.recent[R31WorldCache.nextRecent]"),
+                "two-eye finite validation precedes alternate publish")
+    except ValueError:
+        errors.append("alternate guard ordering missing")
     # Destructive mutations deliberately delete individual anchors: record
     # missing-order violations instead of raising ValueError mid-mutation.
     try:
@@ -110,6 +146,48 @@ def numeric_test() -> None:
     print(f"PASS exact numeric parity: hits={hits} misses={misses}")
 
 
+
+def numeric_interleaved_test() -> None:
+    """Four interleaved transforms reuse exact eye products; resets reject old tails."""
+    rng = random.Random(653)
+    keys = [tuple(f32(rng.uniform(-3, 3)) for _ in range(16))
+            for _ in range(4)]
+    tails = tuple(tuple(f32(rng.uniform(-2, 2)) for _ in range(16))
+                  for _ in range(2))
+    primary = None
+    recent = [None, None, None]
+    slot = 0
+    hits = misses = invalidations = 0
+    for index in range(2400):
+        if index % 137 == 0:
+            tails = tuple(tuple(f32(rng.uniform(-2, 2)) for _ in range(16))
+                          for _ in range(2))
+            primary = None
+            invalidations += 1
+        wvp = keys[(index * 7 + index // 19) % len(keys)]
+        key = struct.pack("<16f", *wvp)
+        expected = tuple(matmul(wvp, tail) for tail in tails)
+        entry = None
+        if primary is not None and primary[0] == key:
+            entry = primary
+        elif primary is not None:
+            entry = next((candidate for candidate in recent
+                          if candidate is not None and candidate[0] == key), None)
+        if entry is not None:
+            assert entry[1] == expected, "stale or non-identical stereo product"
+            hits += 1
+        else:
+            misses += 1
+            if primary is None:
+                recent = [None, None, None]
+                slot = 0
+            else:
+                recent[slot] = primary
+                slot = (slot + 1) % len(recent)
+            primary = (key, expected)
+    assert hits > 1700 and misses > 50 and invalidations > 10
+    print(f"PASS four-way interleaved world WVP: hits={hits}, misses={misses}, tail-invalidations={invalidations}")
+
 def main() -> None:
     source = SOURCE.read_text(encoding="utf-8")
     workflow = WORKFLOW.read_text(encoding="utf-8")
@@ -139,8 +217,22 @@ def main() -> None:
         section = body(source, signature)
         assert marker in section
         assert violations(source.replace(section, section.replace(marker, "BROKEN", 1), 1))
+    for marker in (
+        "Recent recent[3]{};",
+        "if (previous.valid &&",
+        "std::memcmp(previous.originalWvp, originalWvp,",
+        "std::memcpy(draw.eyeConstants, previous.eyeConstants,",
+        "std::memcpy(previous.originalWvp, R31WorldCache.originalWvp,",
+        "std::memcpy(previous.eyeConstants, R31WorldCache.eyeConstants,",
+        "R31WorldCache.nextRecent = (R31WorldCache.nextRecent + 1) % 3;",
+        "previous.valid = false;",
+        "R31WorldCache.nextRecent = 0;",
+    ):
+        assert source.count(marker) == 1, marker
+        assert violations(source.replace(marker, "BROKEN", 1)), marker
     numeric_test()
-    print(f"PASS R31 WVP hotpath: {len(markers) + 4} negative mutations")
+    numeric_interleaved_test()
+    print(f"PASS R31 WVP hotpath: {len(markers) + 13} negative mutations")
 
 
 if __name__ == "__main__":
