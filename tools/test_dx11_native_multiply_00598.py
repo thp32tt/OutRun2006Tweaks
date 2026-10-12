@@ -35,8 +35,8 @@ def connected(s):
         and all(x in draw for x in (
             "if (output.multiplyBlend && output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL)",
             "s.multiplyMaskedBlends[output.colorWriteMask]",
-            // Scope masked-write proof to the multiplicative state, not
-            // the new 00599 subtractive state's identically named mask.
+            # Scope masked-write proof to the multiplicative state, not
+            # the new 00599 subtractive state's identically named mask.
             "s.multiplyBlend->GetDesc(&desc);\n            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;",
             "dev->CreateBlendState(&desc, cached.GetAddressOf())",
             "ctx->OMSetBlendState(s.multiplyBlend.Get(), nullptr, 0xffffffffu);",
