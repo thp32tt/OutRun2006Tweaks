@@ -38,6 +38,7 @@ jobs:
           python tools/test_dx11_linear_stream_output_r232.py
           python tools/test_dx11_linear_buffer_owner_r183.py
           python tools/test_dx11_stage0_pm_factor_00619.py
+          python tools/test_dx11_stage0_pm_modulate_00620.py
       - name: Verify source graph and dormant runtime activation
         run: |
           python tools/verify_dx11_source_graph.py
