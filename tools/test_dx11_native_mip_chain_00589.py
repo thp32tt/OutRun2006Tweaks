@@ -22,7 +22,8 @@ def wired(s: str) -> bool:
     ]
     required_mirror = [
         "const UINT levels = usesMips ? sourceLevels : 1u;",
-        "const bool usesMips = capture.mipFilter == D3DTEXF_POINT;",
+        "const bool usesMips = capture.mipFilter == D3DTEXF_POINT ||",
+        "capture.mipFilter == D3DTEXF_LINEAR;",
         "usesMips && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)",
         "usesMips && capture.texture->GetLOD() != 0u",
         "if (gpuRenderTarget && levels != 1u) return false;",
