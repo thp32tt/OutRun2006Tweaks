@@ -26,16 +26,32 @@ TOKENS=(
     'GetEnvironmentVariableW(L"OUTRUN_DX11_FIRST_GAME_FRAME"')
 def linked(s):
     body=s.split("float4 PSTextureBlendTextureAlphaPMSelectFactorAlpha(VOut v) : SV_Target {",1)
-    return len(body)==2 and all(x in s for x in TOKENS) and s.count("s.blendTextureAlphaPmFactorAlphaPs.Reset();")==2 and all(x in body[1].split("}",1)[0] for x in (
+    predicate=s.split("const bool blendTextureAlphaPMFactorAlpha =",1)
+    return (len(predicate)==2 and
+        "op == D3DTOP_BLENDTEXTUREALPHAPM &&" in predicate[1].split(";",1)[0] and
+        "alphaOp == D3DTOP_SELECTARG1 && alphaArg1 == D3DTA_TFACTOR;" in predicate[1].split(";",1)[0] and
+        len(body)==2 and all(x in s for x in TOKENS) and s.count("s.blendTextureAlphaPmFactorAlphaPs.Reset();")==2 and all(x in body[1].split("}",1)[0] for x in (
         "float4 t = gameTexture.Sample(gameSampler, v.uv);",
         "float4 c = float4(saturate(t.rgb + v.diffuse.rgb * (1.0f - t.a)), alphaParams.w);",
         "AlphaGate(c.a); return c;"))
 def main():
     s=S.read_text(encoding="utf-8")
     assert linked(s)
-    for x in TOKENS:
-        assert not linked(s.replace(x, "BROKEN_00619",1)),x
+    # Mutate only uniquely owned links; TFACTOR-alpha is used by earlier
+    # SELECTARG cases, so a global first-occurrence mutation is a false negative.
+    unique_links = [x for x in TOKENS if s.count(x) == 1]
+    for x in unique_links:
+        assert not linked(s.replace(x, "BROKEN_00619", 1)), x
+    predicate = ("const bool blendTextureAlphaPMFactorAlpha = op == D3DTOP_BLENDTEXTUREALPHAPM &&\\n"
+                 "            alphaOp == D3DTOP_SELECTARG1 && alphaArg1 == D3DTA_TFACTOR;")
+    # Source uses a real newline; match the feature-owned predicate exactly.
+    predicate = predicate.replace("\\n", "\n")
+    assert predicate in s
+    assert not linked(s.replace(predicate, predicate.replace("D3DTA_TFACTOR", "D3DTA_TEXTURE"), 1))
+    pixel = "float4 c = float4(saturate(t.rgb + v.diffuse.rgb * (1.0f - t.a)), alphaParams.w);"
+    assert pixel in s
+    assert not linked(s.replace(pixel, "float4 c = float4(t.rgb, t.a);", 1))
     for tr,dr,ta,fa in itertools.product((0.,.25,.85,1.),(0.,.4,.9,1.),(0.,.3,.95,1.),range(256)):
         assert 0<=min(1.,tr+dr*(1.-ta))<=1 and 0<=fa/255.<=1
-    print("00619 source linkage, destructive mutations, 16384 numeric samples PASS; Quest3 UNTESTED")
+    print(f"00619 source linkage, {len(unique_links)+2} scoped destructive mutations, 16384 numeric samples PASS; Quest3 UNTESTED")
 if __name__=="__main__":main()
