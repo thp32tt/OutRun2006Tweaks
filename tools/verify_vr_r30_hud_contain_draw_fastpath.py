@@ -104,6 +104,11 @@ def validate_hud_pair(source: str) -> None:
             assert math.isclose(old_x, new_x, rel_tol=0, abs_tol=1e-10)
             assert old_y == new_y
 
+    # Limit destructive mutations to the new HUD fast branch. The guard
+    # condition precedes `fast`, and similarly named assignments exist in
+    # R30TransformXyzrhwVertices before the paired path.
+    fast_branch = pair.split("bool leftFull = false;", 1)[0]
+    assert source.count(fast_branch) == 1
     for before, after in (
         ("if (!state.worldEffect && !usedMask)", "if (!state.worldEffect)"),
         ("dst[1] = transformedY;", "dst[1] = src[1];"),
@@ -112,8 +117,10 @@ def validate_hud_pair(source: str) -> None:
         ("!std::isfinite(src[2]) || !std::isfinite(src[3])", "!std::isfinite(src[2])"),
         ("bytes > 4u * 1024u * 1024u", "bytes > 8u * 1024u * 1024u"),
     ):
-        assert before in fast
-        bad = source.replace(before, after, 1)
+        assert fast_branch.count(before) == 1, before
+        bad = source.replace(
+            fast_branch, fast_branch.replace(before, after, 1), 1
+        )
         try:
             validate_hud_pair_structure(bad)
         except AssertionError:
@@ -125,6 +132,7 @@ def validate_hud_pair_structure(source: str) -> None:
     pair = source.split("bool R30TransformXyzrhwStereo(", 1)[1].split(
         "template <typename LeftDraw", 1
     )[0]
+    fast_branch = pair.split("bool leftFull = false;", 1)[0]
     for required in (
         "if (!state.worldEffect && !usedMask)",
         "dst[1] = transformedY;",
@@ -133,7 +141,7 @@ def validate_hud_pair_structure(source: str) -> None:
         "!std::isfinite(src[2]) || !std::isfinite(src[3])",
         "bytes > 4u * 1024u * 1024u",
     ):
-        assert required in pair, required
+        assert required in fast_branch, required
 
 
 def negative_mutations(source: str) -> int:
