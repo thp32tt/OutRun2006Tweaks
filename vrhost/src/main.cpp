@@ -27,6 +27,7 @@
 #include "vr_shared.hpp"
 #include "vr/ipc/xr_eye_extent.hpp"
 #include "stereo_shader.hpp"
+#include "runtime/projection_blit_upload.hpp"
 
 namespace
 {
@@ -1447,9 +1448,9 @@ namespace
             std::uint32_t image = 0;
             Acquire(projection_, image);
             bool ok = RenderTo(projection_.rtvs[image][0], projection_.width, projection_.height,
-                eyes[0], eyeSrv[0], eyeFormat[0]);
+                eyes[0], eyeSrv[0], eyeFormat[0], 0);
             ok = RenderTo(projection_.rtvs[image][1], projection_.width, projection_.height,
-                eyes[1], eyeSrv[1], eyeFormat[1]) && ok;
+                eyes[1], eyeSrv[1], eyeFormat[1], 1) && ok;
             Release(projection_);
             if (!ok) return false;
 
@@ -1844,6 +1845,11 @@ namespace
             ReleaseCom(source_);
             ReleaseCom(menuConstantBuffer_);
             ReleaseCom(constantBuffer_);
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                ReleaseCom(projectionBlitBuffers_[eye]);
+                projectionBlitCache_[eye].Invalidate();
+            }
             ReleaseCom(sampler_);
             ReleaseCom(ps_);
             ReleaseCom(menuVs_);
@@ -2000,6 +2006,19 @@ namespace
             bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
             CheckHr(device_->CreateBuffer(&bd, nullptr, &constantBuffer_), "CreateBuffer");
 
+            // Per-eye projection constants survive new source frames when UV/HDR
+            // are unchanged. A failed allocation leaves the legacy path intact.
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                if (FAILED(device_->CreateBuffer(
+                        &bd, nullptr, &projectionBlitBuffers_[eye])))
+                {
+                    for (auto*& buffer : projectionBlitBuffers_)
+                        ReleaseCom(buffer);
+                    break;
+                }
+            }
+
             D3D11_BUFFER_DESC menuBd = bd;
             menuBd.ByteWidth = sizeof(MenuPlaneParams);
             CheckHr(device_->CreateBuffer(&menuBd, nullptr, &menuConstantBuffer_),
@@ -2138,21 +2157,42 @@ namespace
         }
 
         bool RenderTo(ID3D11RenderTargetView* rtv, std::uint32_t w, std::uint32_t h,
-            const UvRect& uv, ID3D11ShaderResourceView* sourceSrv, DXGI_FORMAT sourceFormat)
+            const UvRect& uv, ID3D11ShaderResourceView* sourceSrv,
+            DXGI_FORMAT sourceFormat, int projectionEye = -1)
         {
             if (!rtv || !sourceSrv || !constantBuffer_) return false;
-            D3D11_MAPPED_SUBRESOURCE map{};
-            if (FAILED(context_->Map(constantBuffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &map)))
-                return false;
-            auto* p = static_cast<BlitParams*>(map.pData);
-            p->uvScale[0] = uv.w;
-            p->uvScale[1] = uv.h;
-            p->uvOffset[0] = uv.x;
-            p->uvOffset[1] = uv.y;
-            p->sdrWhiteScale = sdrWhiteScale_;
-            p->sourceIsScRgb = sourceFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ? 1.f : 0.f;
-            p->padding[0] = p->padding[1] = 0;
-            context_->Unmap(constantBuffer_, 0);
+            const OutRunVrProjectionBlit::Key key{
+                uv.w, uv.h, uv.x, uv.y, sdrWhiteScale_,
+                sourceFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ? 1.f : 0.f
+            };
+            ID3D11Buffer* blitBuffer = constantBuffer_;
+            OutRunVrProjectionBlit::Cache* cache = nullptr;
+            if (projectionEye >= 0 && projectionEye < 2 &&
+                projectionBlitBuffers_[projectionEye])
+            {
+                blitBuffer = projectionBlitBuffers_[projectionEye];
+                cache = &projectionBlitCache_[projectionEye];
+            }
+            // Both eyes still bind a current SRV and draw on every new frame.
+            // Only an identical per-eye constant upload is skipped.
+            if (!cache || cache->NeedsUpload(key))
+            {
+                D3D11_MAPPED_SUBRESOURCE map{};
+                if (FAILED(context_->Map(
+                        blitBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &map)))
+                    return false;
+                auto* params = static_cast<BlitParams*>(map.pData);
+                params->uvScale[0] = key.uvScaleX;
+                params->uvScale[1] = key.uvScaleY;
+                params->uvOffset[0] = key.uvOffsetX;
+                params->uvOffset[1] = key.uvOffsetY;
+                params->sdrWhiteScale = key.sdrWhiteScale;
+                params->sourceIsScRgb = key.sourceIsScRgb;
+                params->padding[0] = params->padding[1] = 0.f;
+                context_->Unmap(blitBuffer, 0);
+                if (cache)
+                    cache->MarkUploaded(key);
+            }
 
             D3D11_VIEWPORT vp{};
             vp.Width = static_cast<float>(w);
@@ -2165,7 +2205,7 @@ namespace
             context_->PSSetShader(ps_, nullptr, 0);
             context_->PSSetShaderResources(0, 1, &sourceSrv);
             context_->PSSetSamplers(0, 1, &sampler_);
-            context_->PSSetConstantBuffers(0, 1, &constantBuffer_);
+            context_->PSSetConstantBuffers(0, 1, &blitBuffer);
             context_->Draw(3, 0);
             ID3D11ShaderResourceView* nullSrv = nullptr;
             context_->PSSetShaderResources(0, 1, &nullSrv);
@@ -2245,6 +2285,8 @@ namespace
         ID3D11PixelShader* ps_ = nullptr;
         ID3D11SamplerState* sampler_ = nullptr;
         ID3D11Buffer* constantBuffer_ = nullptr;
+        ID3D11Buffer* projectionBlitBuffers_[2]{};
+        OutRunVrProjectionBlit::Cache projectionBlitCache_[2]{};
         ID3D11Buffer* menuConstantBuffer_ = nullptr;
         DXGI_FORMAT swapFormat_ = DXGI_FORMAT_UNKNOWN;
         SwapchainSet projection_{}, theater_{};

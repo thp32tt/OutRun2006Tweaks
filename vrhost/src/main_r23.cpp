@@ -1275,9 +1275,9 @@ namespace
         std::uint32_t image = 0;
         c.Acquire(c.projection_, image);
         bool ok = c.RenderTo(c.projection_.rtvs[image][0], c.projection_.width,
-            c.projection_.height, eyes[0], srv[0], fmt[0]);
+            c.projection_.height, eyes[0], srv[0], fmt[0], 0);
         ok = c.RenderTo(c.projection_.rtvs[image][1], c.projection_.width,
-            c.projection_.height, eyes[1], srv[1], fmt[1]) && ok;
+            c.projection_.height, eyes[1], srv[1], fmt[1], 1) && ok;
         if (ok) R23Pixels.ScheduleProjection(c, image);
         c.Release(c.projection_);
         if (!ok) return false;
