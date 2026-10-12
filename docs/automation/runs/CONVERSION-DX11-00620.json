@@ -11,9 +11,9 @@
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "target_branch": "vr-dx11-native-r71",
   "base_head_sha": "814a72b694e444dfe75ee3579db23ad1b84e0af4",
-  "status": "MATERIAL_REPAIR_AWAITING_EXACT_SHA_GATE",
-  "checkpoint": "C4_MATERIAL_REPAIR",
-  "automation_validation": "PENDING_EXACT_SHA_GATE",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -62,5 +62,23 @@
     "fast_ci_run_id": 38276147315,
     "reason": "00619 source-linked regression token adjacency after new shader path; repaired without weakening old gate"
   },
-  "next_action": "Check all mandatory exact-SHA Gate conclusions on final validation-bearing commit, then C6."
+  "next_action": "Do not retry 00620; advance independent DX11 implementation. Physical menu/vehicle/race pixels and gamepad/Quest3 must be assessed separately before promotion.",
+  "validation_bearing_result_sha": "a05ec35d0db2f9854624a4ef500864be53dc7169",
+  "result_sha": "a05ec35d0db2f9854624a4ef500864be53dc7169",
+  "evidence": {
+    "backend_gate_conclusion": "success",
+    "backend_gate_run_id": 38277299051,
+    "dx11_fast_conclusion": "success",
+    "dx11_fast_run_id": 38277299095,
+    "windows_build_conclusion": "success",
+    "windows_build_run_id": 38277306530,
+    "openxr_push_conclusion": "success",
+    "openxr_push_run_id": 38277299075,
+    "openxr_pr_conclusion": "success",
+    "openxr_pr_run_id": 38277306502,
+    "hud_inspector_conclusion": "success",
+    "hud_inspector_run_id": 38277306473,
+    "game_quest3_vdxr": "UNTESTED",
+    "native_visual_parity": "NEED_HMD_TEST"
+  }
 }
