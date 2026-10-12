@@ -203,6 +203,14 @@ def main():
             end = code.index("HRESULT R30TryXyzrhwPrimitiveVB(", start)
             assert old in code[start:end]
             mutant = code[:start] + code[start:end].replace(old, new, 1) + code[end:]
+        elif old == "knownUsedCount <= vertexCount":
+            # The affine projection now also has a touched-count density
+            # guard before the seed helper. Damage the seed's authoritative
+            # population check, not an unrelated earlier affine guard.
+            start = code.index("bool R30SeedWorldXyzrhwBuffers(")
+            end = code.index("bool R30TransformXyzrhwVertices(", start)
+            assert old in code[start:end]
+            mutant = code[:start] + code[start:end].replace(old, new, 1) + code[end:]
         else:
             mutant = code.replace(old, new, 1)
         assert not valid(mutant), old
