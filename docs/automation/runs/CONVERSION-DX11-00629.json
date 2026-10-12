@@ -1,0 +1,70 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00629",
+  "production_id": "CONVERSION-DX11-00629",
+  "event_id": "CONVERSION-DX11-00629-E001",
+  "event_type": "dispatch",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_PM_RGB_BLENDFACTORALPHA_ALPHA",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "0016bc5cea52d2da3e6a90769ba5e26f29336d6e",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Live D3D9 fixed-function PM RGB and BLENDFACTORALPHA alpha/texture factor capture",
+      "Real native D3D11 HLSL PS creation and Draw/DrawIndexed dispatch",
+      "Unsupported states return original DX9Ex draw/input"
+    ],
+    "batch_components": [
+      "C++ game D3D9 stage admission and factor capture",
+      "D3D11 PS shader compilation, native draw binding, lifecycle",
+      "Destructive source and 1024 numerical combinations regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "PM RGB texture alpha independent of A interpolation with D3DRS_TEXTUREFACTOR",
+      "negative_regression": "Swapped/modified operands, shader disconnect, factor acquisition and wrong shader alpha must fail",
+      "component_integration": "Game-authored D3D9 draw to D3D11 pixel shader + guarded native DrawIndexed/Draw"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_PM_RGB_BLENDFACTORALPHA_ALPHA"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and CI only; actual OutRun/Quest3 output not tested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME diagnostic opt-in only; default DX9Ex/gamepad path untouched"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_stage0_pm_blendfactoralpha_00629.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00629.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub HEAD and previous run 00628 checked",
+    "C1_REVIEW": "PASS: factor-weighted alpha unavailable for live PM RGB",
+    "C2_IMPLEMENT": "PASS: D3D9 capture, HLSL, compile/binding and tests",
+    "C3_VALIDATE": "PENDING: exact SHA CI",
+    "C4_COMMIT": "PENDING nonforced GitHub CAS",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_GATE"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Validate exact SHA in GitHub Backend Conversion Gate, DX11 Fast, Build, OpenXR and HUD CI; runtime UNTESTED."
+}
