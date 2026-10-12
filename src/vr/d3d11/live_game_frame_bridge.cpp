@@ -1271,11 +1271,11 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // unsupported D3D9 states keep the original DX9Ex draw/input.
         DWORD textureFactor = 0;
         if ((blendFactorAlpha || blendFactorTextureAlpha || blendFactorModulateAlpha ||
+             selectTextureTfactorAlpha || selectDiffuseTfactorAlpha ||
              blendFactorDiffuseAlpha || blendFactorAddAlpha ||
              blendFactorSubtractAlpha || blendFactorAddSmoothAlpha ||
              blendFactorModulate2XAlpha || blendFactorModulate4XAlpha ||
-              selectTextureTfactorAlpha || selectDiffuseTfactorAlpha ||
-               selectTextureFactorAlpha || selectDiffuseFactorAlpha) &&
+              selectTextureFactorAlpha || selectDiffuseFactorAlpha) &&
             FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))
             return false;
         // RGB and alpha must both use ADD(TEXTURE, DIFFUSE).
