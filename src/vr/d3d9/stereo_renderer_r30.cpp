@@ -2942,12 +2942,24 @@ namespace OutRunVRStereo
                 float hudScaleX = 1.0f;
                 float hudScaleY = 1.0f;
                 R30HudContainScale(state.stereo, hudScaleX, hudScaleY);
-                const float ndcScaleX = 2.0f / width;
-                const float ndcScaleY = 2.0f / height;
+                // Compose viewport, HUD containment and asymmetric eye FOV
+                // once per draw. This skips repeated NDC conversions and an
+                // eye-conditional branch for every indexed/UP HUD vertex.
+                // Z/RHW, UV, color and sparse source coverage stay unchanged.
+                const float halfWidth = width * 0.5f;
+                const float halfHeight = height * 0.5f;
                 const float eyeScaleX[2]{
                     hudScaleX * state.eyeScale[0],
                     hudScaleX * state.eyeScale[1]
                 };
+                const float eyeBiasX[2]{
+                    (1.0f - eyeScaleX[0]) * (x0 + halfWidth) +
+                        state.eyeOffset[0] * halfWidth,
+                    (1.0f - eyeScaleX[1]) * (x0 + halfWidth) +
+                        state.eyeOffset[1] * halfWidth
+                };
+                const float hudBiasY =
+                    (1.0f - hudScaleY) * (y0 + halfHeight);
                 for (UINT i = 0; i < vertexCount; ++i)
                 {
                     if (usedMask && !(*usedMask)[i])
@@ -2959,26 +2971,23 @@ namespace OutRunVRStereo
                     if (!std::isfinite(src[0]) || !std::isfinite(src[1]) ||
                         !std::isfinite(src[2]) || !std::isfinite(src[3]))
                         return false;
-                    const float ndcX = (src[0] - x0) * ndcScaleX - 1.0f;
-                    const float ndcY = 1.0f - (src[1] - y0) * ndcScaleY;
-                    const float correctedY = hudScaleY * ndcY;
-                    const float transformedY =
-                        y0 + (1.0f - correctedY) * 0.5f * height;
-                    if (!std::isfinite(transformedY))
+                    const float transformedY = hudScaleY * src[1] + hudBiasY;
+                    const float transformedLeftX =
+                        eyeScaleX[0] * src[0] + eyeBiasX[0];
+                    const float transformedRightX =
+                        eyeScaleX[1] * src[0] + eyeBiasX[1];
+                    if (!std::isfinite(transformedY) ||
+                        !std::isfinite(transformedLeftX) ||
+                        !std::isfinite(transformedRightX))
                         return false;
-                    for (int eye = 0; eye < 2; ++eye)
-                    {
-                        const float correctedX =
-                            eyeScaleX[eye] * ndcX + state.eyeOffset[eye];
-                        const float transformedX =
-                            x0 + (correctedX + 1.0f) * 0.5f * width;
-                        if (!std::isfinite(transformedX))
-                            return false;
-                        auto* dst = reinterpret_cast<float*>(
-                            (eye == 0 ? left.data() : right.data()) + offset);
-                        dst[0] = transformedX;
-                        dst[1] = transformedY;
-                    }
+                    auto* leftDst =
+                        reinterpret_cast<float*>(left.data() + offset);
+                    auto* rightDst =
+                        reinterpret_cast<float*>(right.data() + offset);
+                    leftDst[0] = transformedLeftX;
+                    leftDst[1] = transformedY;
+                    rightDst[0] = transformedRightX;
+                    rightDst[1] = transformedY;
                 }
                 return true;
             }

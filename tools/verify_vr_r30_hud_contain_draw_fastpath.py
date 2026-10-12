@@ -45,144 +45,102 @@ def validate(source: str) -> None:
     )[1]
 
 
-def validate_hud_pair(source: str) -> None:
-    """Indexed and non-indexed screen HUD use one traversal; world remains bilateral."""
-    pair = source.split("bool R30TransformXyzrhwStereo(", 1)[1].split(
-        "template <typename LeftDraw", 1
-    )[0]
-    fast = pair.split("if (!state.worldEffect)", 1)[1].split(
-        "bool leftFull = false;", 1
+def validate_hud_pair_structure(source: str) -> None:
+    """Check draw-local binocular HUD affine and existing sparse/failure gates."""
+    part = source.split("bool R30TransformXyzrhwStereo(", 1)[1].split(
+        "// This is the high-frequency indexed smoke/sand/decal path:", 1
     )[0]
     for required in (
+        "if (!state.worldEffect)",
         "stride < sizeof(float) * 4",
         "bytes > 4u * 1024u * 1024u",
+        "(usedMask && usedMask->size() < vertexCount)",
         "!std::isfinite(depthSpan) || depthSpan <= 1.0e-6f",
+        "if (usedMask && vertexCount >= 64u)",
+        "static_cast<std::size_t>(selectedCount) * 4u <= vertexCount",
+        "std::memcpy(left.data() + offset,",
+        "std::memcpy(right.data() + offset,",
+        "if (!sparseCopied)",
         "std::memcpy(left.data(), source, bytes);",
         "std::memcpy(right.data(), source, bytes);",
         "R30HudContainScale(state.stereo, hudScaleX, hudScaleY);",
         "hudScaleX * state.eyeScale[0]",
         "hudScaleX * state.eyeScale[1]",
-        "for (UINT i = 0; i < vertexCount; ++i)",
-        "!std::isfinite(src[2]) || !std::isfinite(src[3])",
-        "const float correctedY = hudScaleY * ndcY;",
-        "eyeScaleX[eye] * ndcX + state.eyeOffset[eye]",
-        "if (!std::isfinite(transformedX))",
-        "if (!std::isfinite(transformedY))",
-        "dst[0] = transformedX;",
-        "dst[1] = transformedY;",
-        "return true;",
-    ):
-        assert required in fast, f"pair-HUD source guard lost: {required}"
-    assert fast.count("R30HudContainScale(") == 1
-    assert fast.count("for (UINT i = 0; i < vertexCount; ++i)") == 1
-    assert fast.index("const float ndcScaleX") < fast.index("for (UINT i")
-    assert pair.index("if (!state.worldEffect)") < pair.index("bool leftFull = false;")
-    assert "if (leftFull != rightFull)" in pair
-
-    # Both eyes share the indexed coverage fence, sparse copy and vertex scan.
-    for required in (
-        "(usedMask && usedMask->size() < vertexCount)",
-        "if (usedMask && vertexCount >= 64u)",
-        "usedMask->begin() + vertexCount",
-        "static_cast<std::size_t>(selectedCount) * 4u <= vertexCount",
-        "while (cursor < vertexCount && !(*usedMask)[cursor])",
-        "while (cursor < vertexCount && (*usedMask)[cursor])",
-        "std::memcpy(left.data() + offset,",
-        "std::memcpy(right.data() + offset,",
-        "if (!sparseCopied)",
+        "state.eyeOffset[0] * halfWidth",
+        "state.eyeOffset[1] * halfWidth",
+        "(1.0f - hudScaleY) * (y0 + halfHeight)",
         "if (usedMask && !(*usedMask)[i])",
+        "!std::isfinite(src[2]) || !std::isfinite(src[3])",
+        "!std::isfinite(transformedLeftX)",
+        "!std::isfinite(transformedRightX)",
+        "leftDst[0] = transformedLeftX;",
+        "leftDst[1] = transformedY;",
+        "rightDst[0] = transformedRightX;",
+        "rightDst[1] = transformedY;",
     ):
-        assert required in fast, "indexed HUD fused contract: " + required
-    assert fast.index("usedMask->size() < vertexCount") < fast.index("left.resize(bytes)")
-    assert fast.index("if (usedMask && !(*usedMask)[i])") < fast.index("!std::isfinite(src[2])")
+        assert required in part, required
+    assert part.count("R30HudContainScale(") == 1
+    assert part.count("for (UINT i = 0; i < vertexCount; ++i)") == 1
+    assert "for (int eye = 0; eye < 2; ++eye)" not in part
+    assert part.index("const float eyeBiasX[2]") < part.index("for (UINT i")
+    assert part.index("const float hudBiasY") < part.index("for (UINT i")
+    assert "if (leftFull != rightFull)" in source
 
-    # Old and paired algebraic order are identical: repeated HUD containment
-    # and per-eye vertex traversal are unnecessary, but eye disparity is not.
-    import math
+
+def validate_hud_pair(source: str) -> None:
+    """Exact source, negative mutants and original NDC vs affine float32 parity."""
     import random
-    rng = random.Random(663)
-    for _ in range(512):
-        width = rng.uniform(100, 5000)
-        height = rng.uniform(100, 3000)
-        x0, y0 = rng.uniform(-100, 100), rng.uniform(-100, 100)
-        x, y = rng.uniform(-200, width + 200), rng.uniform(-200, height + 200)
-        hud_x, hud_y = rng.uniform(0.75, 1.5), rng.uniform(0.75, 1.5)
-        eye_scales = [rng.uniform(0.7, 1.3) for _ in range(2)]
-        eye_offsets = [rng.uniform(-0.3, 0.3) for _ in range(2)]
-        ndc_x = (x - x0) * (2.0 / width) - 1.0
-        ndc_y = 1.0 - (y - y0) * (2.0 / height)
-        for eye in range(2):
-            old_x = x0 + ((hud_x * eye_scales[eye] * ndc_x +
-                           eye_offsets[eye]) + 1.0) * 0.5 * width
-            new_x = x0 + (((hud_x * eye_scales[eye]) * ndc_x +
-                           eye_offsets[eye]) + 1.0) * 0.5 * width
-            old_y = y0 + (1.0 - hud_y * ndc_y) * 0.5 * height
-            new_y = y0 + (1.0 - hud_y * ndc_y) * 0.5 * height
-            assert math.isclose(old_x, new_x, rel_tol=0, abs_tol=1e-10)
-            assert old_y == new_y
-
-    # Negative indexed mutations must be rejected even if the non-indexed
-    # original still passes its numeric regression.
-    for before, after in (
-        ("(usedMask && usedMask->size() < vertexCount)", "false"),
+    import struct
+    validate_hud_pair_structure(source)
+    start = source.index("bool R30TransformXyzrhwStereo(")
+    end = source.index("// This is the high-frequency indexed smoke/sand/decal path:", start)
+    fast = source[start:end]
+    negatives = (
+        ("hudScaleX * state.eyeScale[1]", "hudScaleX * state.eyeScale[0]"),
+        ("state.eyeOffset[1] * halfWidth", "state.eyeOffset[0] * halfWidth"),
+        ("rightDst[0] = transformedRightX;", "rightDst[0] = transformedLeftX;"),
+        ("rightDst[1] = transformedY;", "rightDst[1] = src[1];"),
         ("if (usedMask && !(*usedMask)[i])", "if (false)"),
+        ("!std::isfinite(src[2]) || !std::isfinite(src[3])", "!std::isfinite(src[2])"),
         ("if (!sparseCopied)", "if (false)"),
         ("std::memcpy(right.data() + offset,", "std::memcpy(left.data() + offset,"),
-    ):
-        assert fast.count(before) == 1, before
-        bad = source.replace(fast, fast.replace(before, after, 1), 1)
+        ("(usedMask && usedMask->size() < vertexCount)", "false"),
+    )
+    for old, wrong in negatives:
+        assert fast.count(old) == 1, old
+        bad = source[:start] + fast.replace(old, wrong, 1) + source[end:]
         try:
             validate_hud_pair_structure(bad)
         except AssertionError:
             pass
         else:
-            raise AssertionError("indexed HUD mutation survived: " + before)
+            raise AssertionError("HUD affine destructive mutation escaped: " + old)
 
-    # Limit destructive mutations to the new HUD fast branch. The guard
-    # condition precedes `fast`, and similarly named assignments exist in
-    # R30TransformXyzrhwVertices before the paired path.
-    fast_branch = pair.split("bool leftFull = false;", 1)[0]
-    assert source.count(fast_branch) == 1
-    for before, after in (
-        ("if (!state.worldEffect)", "if (true)"),
-        ("dst[1] = transformedY;", "dst[1] = src[1];"),
-        ("hudScaleX * state.eyeScale[1]", "hudScaleX * state.eyeScale[0]"),
-        ("eyeScaleX[eye] * ndcX + state.eyeOffset[eye]", "eyeScaleX[eye] * ndcX"),
-        ("!std::isfinite(src[2]) || !std::isfinite(src[3])", "!std::isfinite(src[2])"),
-        ("bytes > 4u * 1024u * 1024u", "bytes > 8u * 1024u * 1024u"),
-    ):
-        assert fast_branch.count(before) == 1, before
-        bad = source.replace(
-            fast_branch, fast_branch.replace(before, after, 1), 1
-        )
-        try:
-            validate_hud_pair_structure(bad)
-        except AssertionError:
-            continue
-        raise AssertionError(f"pair-HUD destructive mutation accepted: {before}")
+    def f32(v):
+        return struct.unpack("<f", struct.pack("<f", v))[0]
 
-
-def validate_hud_pair_structure(source: str) -> None:
-    pair = source.split("bool R30TransformXyzrhwStereo(", 1)[1].split(
-        "template <typename LeftDraw", 1
-    )[0]
-    fast_branch = pair.split("bool leftFull = false;", 1)[0]
-    for required in (
-        "if (!state.worldEffect)",
-        "dst[1] = transformedY;",
-        "hudScaleX * state.eyeScale[1]",
-        "eyeScaleX[eye] * ndcX + state.eyeOffset[eye]",
-        "!std::isfinite(src[2]) || !std::isfinite(src[3])",
-        "bytes > 4u * 1024u * 1024u",
-    ):
-        assert required in fast_branch, required
-    for required in (
-        "(usedMask && usedMask->size() < vertexCount)",
-        "if (usedMask && !(*usedMask)[i])",
-        "if (!sparseCopied)",
-        "std::memcpy(right.data() + offset,",
-    ):
-        assert required in fast_branch, required
+    rng = random.Random(689)
+    worst = 0.0
+    for _ in range(16000):
+        w, h = f32(rng.uniform(640, 5120)), f32(rng.uniform(480, 2880))
+        x0, y0 = f32(rng.uniform(-200, 200)), f32(rng.uniform(-200, 200))
+        x, y = f32(rng.uniform(-200, 1.5 * w)), f32(rng.uniform(-200, 1.5 * h))
+        sx, sy = f32(rng.uniform(.65, 1.4)), f32(rng.uniform(.65, 1.4))
+        offsets = [f32(rng.uniform(-.3, .3)), f32(rng.uniform(-.3, .3))]
+        scales = [f32(sx * f32(rng.uniform(.6, 1.3))) for _ in range(2)]
+        halfw, halfh = f32(w * .5), f32(h * .5)
+        nx = f32(f32(f32(x - x0) * f32(2 / w)) - 1)
+        ny = f32(1 - f32(f32(y - y0) * f32(2 / h)))
+        oldy = f32(y0 + f32(f32(1 - f32(sy * ny)) * halfh))
+        newy = f32(f32(sy * y) + f32(f32(1 - sy) * f32(y0 + halfh)))
+        worst = max(worst, abs(oldy - newy))
+        for i in range(2):
+            oldx = f32(x0 + f32(f32(f32(scales[i] * nx + offsets[i]) + 1) * halfw))
+            bias = f32(f32(f32(1 - scales[i]) * f32(x0 + halfw)) + f32(offsets[i] * halfw))
+            newx = f32(f32(scales[i] * x) + bias)
+            worst = max(worst, abs(oldx - newx))
+    assert worst < .008, "HUD affine float32 pixel error: " + str(worst)
+    print("PASS R30 HUD binocular affine: 16000 float32 cases, 9 negative mutants, max %.6f px" % worst)
 
 
 def negative_mutations(source: str) -> int:
