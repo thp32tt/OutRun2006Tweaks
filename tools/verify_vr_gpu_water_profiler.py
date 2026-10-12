@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Opt-in GPU profiling static acceptance, including nine destructive mutants."""
+"""Opt-in GPU profiling static acceptance, including nine destructive mutants and off-by-default fastpath."""
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 hdr=(root/'src/vr/d3d9/gpu_water_profiler.hpp').read_text(encoding='utf-8')
@@ -19,7 +19,15 @@ def good(x): return all(t in x for t in tokens) and 'D3DGETDATA_FLUSH' not in x
 assert good(hdr),[t for t in tokens if t not in hdr]
 assert hdr.count('CreateQuery(D3DQUERYTYPE_TIMESTAMP,')==4
 assert src.count('GpuWaterProbe::instance().beforeDraw(device, primitiveCount)')==4
-assert src.count('GpuWaterProbe::instance().afterDraw(gpuTimed);')==4
+# The default-disabled draw path must avoid the Meter singleton entirely.
+assert src.count('const bool gpuTimed = GpuWaterProbe::Enabled() &&')==4
+assert src.count('GpuWaterProbe::instance().afterDraw(true);')==4
+assert src.count('if (gpuTimed)\n                GpuWaterProbe::instance().afterDraw(true);')==4
+assert 'GpuWaterProbe::instance().afterDraw(gpuTimed);' not in src
+assert ('if (device && R32ReviewIsGameDevice(device) && GpuWaterProbe::Enabled())\n'
+        '                GpuWaterProbe::instance().beforePresent(device);') in src
+assert ('if (GpuWaterProbe::Enabled())\n'
+        '                    GpuWaterProbe::instance().afterPresent(device);') in src
 assert src.index('GpuWaterProbe::instance().beforePresent(device);')<src.index('R32ReviewRunPresentTelemetry')
 assert src.index('GpuWaterProbe::instance().afterPresent(device);')>src.index('R32ReviewRunPresentTelemetry')
 assert src.count('GpuWaterProbe::instance().reset();')==2
