@@ -320,5 +320,51 @@ int main() {
     const auto raceSaved = sample;
     assert(!game_fvf_decode_vertex(&raceMixed, 43u, layout, sample));
     assert(sample.uv2[0] == raceSaved.uv2[0]);
+    // 00612: TEX3 UV2 U-only must reach the game-authored native stage0 UV.
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 |
+                            kGameFvfTexcoordSize1_2, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 | 0x00100000u, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 | 0x00200000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 |
+                           kGameFvfTexcoordSize1_2, layout));
+    assert(layout.thirdTexcoord1D && layout.minStride == 36u);
+    struct VehicleThirdU {float x,y,z,rhw,u0,v0,u1,v1,u2;};
+    VehicleThirdU vehicleThird{1,2,.4f,1.f,.1f,.2f,.3f,.4f,.875f};
+    assert(sizeof(vehicleThird) == 36u);
+    assert(game_fvf_decode_vertex(&vehicleThird, sizeof(vehicleThird), layout, sample));
+    assert(game_fvf_select_uv(sample, layout, 2u, chosen));
+    assert(chosen[0] == .875f && chosen[1] == 0.f);
+    const auto goodThird = sample;
+    assert(!game_fvf_decode_vertex(&vehicleThird, 35u, layout, sample));
+    assert(sample.uv2[0] == goodThird.uv2[0]);
+    auto corruptThird = layout;
+    corruptThird.thirdTexcoord1D = false;
+    assert(!game_fvf_decode_vertex(&vehicleThird, sizeof(vehicleThird), corruptThird, sample));
+    assert(sample.uv2[0] == goodThird.uv2[0]);
+    // TEX4: three U-only coordinates followed by a full UV3 float2.
+    assert(game_fvf_layout(kGameFvfXyz | kGameFvfNormal | kGameFvfDiffuse |
+                           kGameFvfTex4 | kGameFvfTexcoordSize1_0 |
+                           kGameFvfTexcoordSize1_1 | kGameFvfTexcoordSize1_2, layout));
+    assert(layout.firstTexcoord1D && layout.secondTexcoord1D && layout.thirdTexcoord1D);
+    assert(layout.texcoordOffset == 28u && layout.minStride == 48u);
+    struct RaceThirdPacked {float x,y,z,nx,ny,nz; std::uint32_t color;
+                            float u0,u1,u2,u3,v3;};
+    RaceThirdPacked raceThird{1,2,3,0,1,0,0xffaabbccu,.1f,.2f,.3f,.8f,.9f};
+    assert(sizeof(raceThird) == 48u);
+    assert(game_fvf_decode_vertex(&raceThird, sizeof(raceThird), layout, sample));
+    assert(game_fvf_select_uv(sample, layout, 0u, chosen));
+    assert(chosen[0] == .1f && chosen[1] == 0.f);
+    assert(game_fvf_select_uv(sample, layout, 1u, chosen));
+    assert(chosen[0] == .2f && chosen[1] == 0.f);
+    assert(game_fvf_select_uv(sample, layout, 2u, chosen));
+    assert(chosen[0] == .3f && chosen[1] == 0.f);
+    assert(game_fvf_select_uv(sample, layout, 3u, chosen));
+    assert(chosen[0] == .8f && chosen[1] == .9f);
+    const auto goodRaceThird = sample;
+    assert(!game_fvf_decode_vertex(&raceThird, 47u, layout, sample));
+    assert(sample.uv3[1] == goodRaceThird.uv3[1]);
+    corruptThird = layout;
+    corruptThird.texcoordCount = 2u;
+    assert(!game_fvf_decode_vertex(&raceThird, sizeof(raceThird), corruptThird, sample));
     return 0;
 }

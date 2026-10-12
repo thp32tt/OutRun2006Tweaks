@@ -1,0 +1,58 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00612",
+  "production_id": "CONVERSION-DX11-00612",
+  "event_id": "CONVERSION-DX11-00612-E001",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "attempt": "1/3",
+  "owner_id": "ChatGPT2:CONVERSION-DX11-00612",
+  "work_key": "DX11:LIVE_FVF_TEXCOORDSIZE1_STAGE2",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "status": "PENDING_EXACT_SHA_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "base_head_sha": "eb676fe88d978811fc572680407daa9eeb29c77b",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "integration_path": [
+      "LIVE_D3D9_CALLSITE",
+      "TEXCOORDSIZE1(2) packed UV2 decode",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_fvf_layout.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_fvf_layout_probe.cpp",
+      "tools/test_dx11_first_game_frame_regressions.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "TEX3 U-only UV2 and TEX4 3xU-only + float2 UV3 source",
+      "negative_regression": "Malformed dimension/slot2, truncated stride and source mutation",
+      "component_integration": "D3D9 GetFVF -> byte-packed UV2/UV3 -> native Draw/DrawIndexed diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_FVF_TEXCOORDSIZE1_STAGE2"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "visible_frame_acceptance": "BUILD_VERIFIED/NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Opt-in only; D3D9 Draw, Present, gamepad remain authoritative"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_fvf_layout.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_fvf_layout_probe.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py"
+  ],
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "native_gameplay_activation": false,
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Read exact SHA CI, repair if failed. Runtime HMD UNTESTED."
+}

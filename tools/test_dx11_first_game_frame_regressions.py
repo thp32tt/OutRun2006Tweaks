@@ -1468,6 +1468,52 @@ def main() -> None:
             assert mutant != layout_source and not second_u_native_linked(bridge, mutant, probe_source)
     print("DX11 TEXCOORDSIZE1(1) game-native UV1 Draw PASS (static only)")
 
+    # 00612: stage2 packed U-only FVF from D3D9 GetFVF into real native Draw.
+    def third_u_native_linked(src: str, hdr: str, fixture: str) -> bool:
+        return all(x in src for x in (
+            "kGameFvfTexcoordSize1_2 == D3DFVF_TEXCOORDSIZE1(2)",
+            "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+        )) and all(x in hdr for x in (
+            "kGameFvfTexcoordSize1_2 = 0x00300000u;",
+            "(thirdTexcoord1D && texcoordBits < kGameFvfTex3)",
+            "candidate.thirdTexcoord1D = thirdTexcoord1D;",
+            "(layout.thirdTexcoord1D && layout.texcoordCount < 3u)",
+            "(layout.thirdTexcoord1D ? 4u : 0u)",
+            "std::memcpy(slots[slot], data + offset, bytesToCopy);",
+            "offset += bytesToCopy;",
+        )) and all(x in fixture for x in (
+            "struct VehicleThirdU", "struct RaceThirdPacked",
+            "chosen[0] == .875f && chosen[1] == 0.f",
+            "chosen[0] == .8f && chosen[1] == .9f",
+            "!game_fvf_decode_vertex(&vehicleThird, 35u",
+            "!game_fvf_decode_vertex(&raceThird, 47u",
+            "corruptThird.thirdTexcoord1D = false;",
+            "0x00100000u, layout", "0x00200000u, layout",
+        ))
+    assert third_u_native_linked(bridge, layout_source, probe_source)
+    for old, wrong in (
+        ("kGameFvfTexcoordSize1_2 == D3DFVF_TEXCOORDSIZE1(2)",
+         "kGameFvfTexcoordSize1_2 != D3DFVF_TEXCOORDSIZE1(2)"),
+        ("candidate.thirdTexcoord1D = thirdTexcoord1D;",
+         "candidate.thirdTexcoord1D = false;"),
+        ("(thirdTexcoord1D && texcoordBits < kGameFvfTex3)",
+         "(thirdTexcoord1D && texcoordBits < kGameFvfTex2)"),
+        ("(layout.thirdTexcoord1D ? 4u : 0u)",
+         "(layout.thirdTexcoord1D ? 0u : 0u)"),
+        ("std::memcpy(slots[slot], data + offset, bytesToCopy);",
+         "std::memcpy(slots[slot], data + offset + 4u, bytesToCopy);"),
+        ("offset += bytesToCopy;", "offset += 8u;"),
+    ):
+        if old in bridge:
+            mutant = bridge.replace(old, wrong, 1)
+            assert mutant != bridge and not third_u_native_linked(mutant, layout_source, probe_source)
+        else:
+            mutant = layout_source.replace(old, wrong, 1)
+            assert mutant != layout_source and not third_u_native_linked(bridge, mutant, probe_source)
+    print("DX11 TEXCOORDSIZE1(2) packed native Draw regression PASS (static only)")
+
     # 00558: real game-authored D3D9 stage0 BLENDTEXTUREALPHA /
     # BLENDDIFFUSEALPHA -> owned native PS -> Draw/DrawIndexed -> opt-in inset.
     # Checks source-to-consumer links, shader/reset lifecycle and fail-closed
