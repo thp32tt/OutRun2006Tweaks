@@ -421,6 +421,20 @@ namespace OutRunVRStereo
                 return false;
             }
             std::lock_guard<std::mutex> lock(entry->mutex);
+            // Repeated fixed-geometry draws used to copy the same complete VB/IB
+            // byte span again, even if its observed Lock/Unlock generation had
+            // not changed. A matching generation and byte range were validated on
+            // the cache fill; every write/DISCARD/failed Unlock increments the
+            // revision under this same mutex. Test the hit before the binary
+            // interval search while keeping full range validation on misses.
+            if (cache.entry == entry &&
+                cache.offset == offset && cache.size == size &&
+                cache.revision == entry->revision && out.size() == size)
+            {
+                ++R30ShadowReadHits;
+                return true;
+            }
+            // A cache miss must prove current coverage before reading bytes.
             if (offset > entry->size || size > entry->size - offset ||
                 entry->bytes.size() != entry->size ||
                 !R30RangeValid(entry->valid, offset, offset + size))
@@ -436,17 +450,6 @@ namespace OutRunVRStereo
                         "VR R30.6 BUFFER SHADOW: draw-time GPU Lock removed; an unobserved VB/IB range will fail open until the game's next write Lock/Unlock supplies CPU bytes");
                 }
                 return false;
-            }
-            // Repeated fixed-geometry draws used to copy the same complete VB/IB
-            // byte span again, even if its observed Lock/Unlock generation had
-            // not changed. Range/coverage validation stays under the writer
-            // mutex, but a stable scratch snapshot needs no second memcpy.
-            if (cache.entry == entry &&
-                cache.offset == offset && cache.size == size &&
-                cache.revision == entry->revision && out.size() == size)
-            {
-                ++R30ShadowReadHits;
-                return true;
             }
             try
             {
@@ -479,6 +482,20 @@ namespace OutRunVRStereo
                 return false;
             }
             std::lock_guard<std::mutex> lock(entry->mutex);
+            // Repeated fixed-geometry draws used to copy the same complete VB/IB
+            // byte span again, even if its observed Lock/Unlock generation had
+            // not changed. A matching generation and byte range were validated on
+            // the cache fill; every write/DISCARD/failed Unlock increments the
+            // revision under this same mutex. Test the hit before the binary
+            // interval search while keeping full range validation on misses.
+            if (cache.entry == entry &&
+                cache.offset == offset && cache.size == size &&
+                cache.revision == entry->revision && out.size() == size)
+            {
+                ++R30ShadowReadHits;
+                return true;
+            }
+            // A cache miss must prove current coverage before reading bytes.
             if (offset > entry->size || size > entry->size - offset ||
                 entry->bytes.size() != entry->size ||
                 !R30RangeValid(entry->valid, offset, offset + size))
@@ -488,17 +505,6 @@ namespace OutRunVRStereo
                 cache.entry.reset();
                 ++R30ShadowReadMisses;
                 return false;
-            }
-            // Repeated fixed-geometry draws used to copy the same complete VB/IB
-            // byte span again, even if its observed Lock/Unlock generation had
-            // not changed. Range/coverage validation stays under the writer
-            // mutex, but a stable scratch snapshot needs no second memcpy.
-            if (cache.entry == entry &&
-                cache.offset == offset && cache.size == size &&
-                cache.revision == entry->revision && out.size() == size)
-            {
-                ++R30ShadowReadHits;
-                return true;
             }
             try
             {

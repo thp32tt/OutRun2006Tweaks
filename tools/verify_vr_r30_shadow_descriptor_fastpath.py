@@ -193,7 +193,11 @@ def validate_shadow_copy_cache(source):
         ):
             assert required in fn, required
         assert fn.count("cache.entry.reset();") >= 3
-        assert fn.index("!R30RangeValid") < fn.index("cache.entry == entry")
+        # A stable (entry, offset, size, revision) copy was already range-
+        # validated under this mutex; only misses run the interval binary search.
+        assert fn.index("std::lock_guard<std::mutex> lock(entry->mutex)") < fn.index("cache.entry == entry")
+        assert fn.index("cache.entry == entry") < fn.index("!R30RangeValid")
+        assert fn.index("cache.revision == entry->revision") < fn.index("!R30RangeValid")
         assert fn.index("cache.revision == entry->revision") < fn.index("std::memcpy")
         assert fn.index("std::memcpy") < fn.index("cache.revision = entry->revision;")
     assert "scratch.source,\n                    scratch.vertexCopy))" in primitive
@@ -204,6 +208,7 @@ def validate_shadow_copy_cache(source):
 def test_shadow_copy_cache_mutations(source):
     changes = (
         ("cache.entry == entry", "cache.entry != entry"),
+        ("!R30RangeValid(entry->valid, offset, offset + size)", "false"),
         ("cache.offset == offset", "cache.offset != offset"),
         ("cache.size == size", "cache.size != size"),
         ("cache.revision == entry->revision", "cache.revision == cache.revision"),
