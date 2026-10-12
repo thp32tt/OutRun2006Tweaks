@@ -1393,6 +1393,45 @@ def main() -> None:
         mutant = layout_source.replace(old, bad, 1)
         assert mutant != layout_source and not object_fvf_integrated(bridge, mutant, probe_source)
 
+
+    # 00610: stage0 U-only game vertex -> native Draw/DrawIndexed source proof.
+    def one_dim_fvf_linked(src: str, hdr: str, fixture: str) -> bool:
+        return all(t in src for t in (
+            "kGameFvfTexcoordSize1_0 == D3DFVF_TEXCOORDSIZE1(0)",
+            "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
+            "ctx->DrawIndexed(indexCount, 0, 0);",
+            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
+        )) and all(t in hdr for t in (
+            "constexpr std::uint32_t kGameFvfTexcoordSize1_0 = 0x00030000u;",
+            "(firstTexcoordFormat != 0u && !firstTexcoord1D)",
+            "(firstTexcoord1D && texcoordBits == 0u)",
+            "candidate.firstTexcoord1D = firstTexcoord1D;",
+            "candidate.firstTexcoord1D ? 4u : 0u",
+            "layout.firstTexcoord1D ? 4u : 8u",
+            "data + layout.texcoordOffset + 4u, 8u",
+            "sample = candidate;",
+        )) and all(t in fixture for t in (
+            "struct MenuOneDim", "struct VehicleUv1Uv2",
+            "sample.uv[0] == .625f && sample.uv[1] == 0.f",
+            "chosen[0] == .75f && chosen[1] == .875f",
+            "!game_fvf_decode_vertex(&vehicleUv, 31u",
+            "corruptDimension.firstTexcoord1D = false",
+            "0x00010000u, layout", "0x00020000u, layout",
+        ))
+    assert one_dim_fvf_linked(bridge, layout_source, probe_source)
+    damaged = bridge.replace("kGameFvfTexcoordSize1_0 == D3DFVF_TEXCOORDSIZE1(0)",
+                            "kGameFvfTexcoordSize1_0 != D3DFVF_TEXCOORDSIZE1(0)", 1)
+    assert damaged != bridge and not one_dim_fvf_linked(damaged, layout_source, probe_source)
+    for old, wrong in (
+        ("(firstTexcoordFormat != 0u && !firstTexcoord1D)", "false"),
+        ("candidate.firstTexcoord1D = firstTexcoord1D;", "candidate.firstTexcoord1D = false;"),
+        ("layout.firstTexcoord1D ? 4u : 8u", "8u"),
+        ("data + layout.texcoordOffset + 4u, 8u", "data + layout.texcoordOffset + 8u, 8u"),
+    ):
+        damaged = layout_source.replace(old, wrong, 1)
+        assert damaged != layout_source and not one_dim_fvf_linked(bridge, damaged, probe_source)
+    print("DX11 live TEXCOORDSIZE1(0) native menu/vehicle draw PASS (static only)")
+
     # 00558: real game-authored D3D9 stage0 BLENDTEXTUREALPHA /
     # BLENDDIFFUSEALPHA -> owned native PS -> Draw/DrawIndexed -> opt-in inset.
     # Checks source-to-consumer links, shader/reset lifecycle and fail-closed

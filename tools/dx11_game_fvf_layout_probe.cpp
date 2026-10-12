@@ -247,5 +247,38 @@ int main() {
     assert(game_fvf_layout(kGameFvfXyz | kGameFvfDiffuse, layout));
     assert(!layout.hasPointSize && layout.pointSizeBytes == 0u);
     assert(!layout.textured && layout.minStride == 16);
+
+    // 00610: one-dimensional D3D9 stage0 UV feeds native Draw/DrawIndexed.
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1 | 0x00010000u, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1 | 0x00020000u, layout));
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTexcoordSize1_0 | kGameFvfDiffuse, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1 | kGameFvfTexcoordSize1_0, layout));
+    assert(layout.firstTexcoord1D && layout.texcoordCount == 1u && layout.minStride == 20u);
+    struct MenuOneDim {float x,y,z,rhw,u;} menuOneDim{10,20,.5f,1.f,.625f};
+    assert(sizeof(menuOneDim) == 20u);
+    assert(game_fvf_decode_vertex(&menuOneDim, sizeof(menuOneDim), layout, sample));
+    assert(sample.uv[0] == .625f && sample.uv[1] == 0.f);
+    const auto menuSaved = sample;
+    assert(!game_fvf_decode_vertex(&menuOneDim, 19u, layout, sample));
+    assert(sample.uv[0] == menuSaved.uv[0] && sample.uv[1] == menuSaved.uv[1]);
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfDiffuse |
+                           kGameFvfTex2 | kGameFvfTexcoordSize1_0, layout));
+    assert(layout.firstTexcoord1D && layout.texcoordOffset == 20u && layout.minStride == 32u);
+    struct VehicleUv1Uv2 {float x,y,z,rhw; std::uint32_t diffuse; float u0,u1,v1;};
+    VehicleUv1Uv2 vehicleUv{1,2,.4f,1.f,0xff112233u,.125f,.75f,.875f};
+    assert(sizeof(vehicleUv) == 32u);
+    assert(game_fvf_decode_vertex(&vehicleUv, sizeof(vehicleUv), layout, sample));
+    assert(sample.diffuse == 0xff112233u);
+    assert(game_fvf_select_uv(sample, layout, 0u, chosen));
+    assert(chosen[0] == .125f && chosen[1] == 0.f);
+    assert(game_fvf_select_uv(sample, layout, 1u, chosen));
+    assert(chosen[0] == .75f && chosen[1] == .875f);
+    const auto vehicleSaved = sample;
+    assert(!game_fvf_decode_vertex(&vehicleUv, 31u, layout, sample));
+    assert(sample.uv1[1] == vehicleSaved.uv1[1]);
+    auto corruptDimension = layout;
+    corruptDimension.firstTexcoord1D = false;
+    assert(!game_fvf_decode_vertex(&vehicleUv, sizeof(vehicleUv), corruptDimension, sample));
+    assert(sample.uv1[1] == vehicleSaved.uv1[1]);
     return 0;
 }

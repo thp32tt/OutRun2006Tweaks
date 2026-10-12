@@ -21,6 +21,8 @@ constexpr std::uint32_t kGameFvfTex7 = 0x700u;
 constexpr std::uint32_t kGameFvfTex8 = 0x800u;
 constexpr std::uint32_t kGameFvfTexCountMask = 0x0f00u;
 constexpr std::uint32_t kGameFvfPositionMask = 0x400eu;
+// Only FVF TEXCOORDSIZE1(0) is additionally supported: U only.
+constexpr std::uint32_t kGameFvfTexcoordSize1_0 = 0x00030000u;
 struct GameFvfLayout {
     bool pretransformed = false;
     bool textured = false;
@@ -28,6 +30,7 @@ struct GameFvfLayout {
     bool hasNormal = false;
     bool hasPointSize = false;
     bool hasSpecular = false;
+    bool firstTexcoord1D = false;
     std::uint32_t normalBytes = 0;
     std::uint32_t pointSizeBytes = 0;
     std::uint32_t diffuseOffset = 0;
@@ -40,6 +43,8 @@ struct GameFvfLayout {
 constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcept {
     const std::uint32_t position = fvf & kGameFvfPositionMask;
     const std::uint32_t texcoordBits = fvf & kGameFvfTexCountMask;
+    const std::uint32_t firstTexcoordFormat = fvf & kGameFvfTexcoordSize1_0;
+    const bool firstTexcoord1D = firstTexcoordFormat == kGameFvfTexcoordSize1_0;
     // D3D9 supports eight 2-float UV sets; TEX9+ or nondefault coordinate
     // dimensions require another decoder and remain on the D3D9 path.
     // NORMAL and SPECULAR are byte fields preceding texcoords.
@@ -48,9 +53,11 @@ constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcep
     if ((position != kGameFvfXyz && position != kGameFvfXyzRhw) ||
         (position == kGameFvfXyzRhw && hasNormal) ||
         texcoordBits > kGameFvfTex8 ||
+        (firstTexcoordFormat != 0u && !firstTexcoord1D) ||
+        (firstTexcoord1D && texcoordBits == 0u) ||
         (fvf & ~(kGameFvfXyz | kGameFvfXyzRhw | kGameFvfNormal | kGameFvfPsize |
                  kGameFvfDiffuse | kGameFvfSpecular |
-                 kGameFvfTexCountMask)) != 0u)
+                 kGameFvfTexCountMask | kGameFvfTexcoordSize1_0)) != 0u)
         return false;
     GameFvfLayout candidate{};
     candidate.pretransformed = position == kGameFvfXyzRhw;
@@ -60,6 +67,7 @@ constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcep
     candidate.hasNormal = hasNormal;
     candidate.hasPointSize = hasPointSize;
     candidate.hasSpecular = (fvf & kGameFvfSpecular) != 0u;
+    candidate.firstTexcoord1D = firstTexcoord1D;
     if (!candidate.textured && !candidate.hasDiffuse) return false;
     candidate.positionBytes = candidate.pretransformed ? 16u : 12u;
     candidate.normalBytes = candidate.hasNormal ? 12u : 0u;
@@ -72,7 +80,8 @@ constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcep
                                (candidate.hasDiffuse ? 4u : 0u) +
                                (candidate.hasSpecular ? 4u : 0u);
     candidate.minStride = candidate.texcoordOffset +
-                          candidate.texcoordCount * 8u;
+                          candidate.texcoordCount * 8u -
+                          (candidate.firstTexcoord1D ? 4u : 0u);
     layout = candidate;
     return true;
 }
@@ -105,7 +114,9 @@ inline bool game_fvf_decode_vertex(const void* bytes, std::uint32_t stride,
                                  (layout.hasSpecular ? 4u : 0u) ||
         layout.texcoordCount > 8u ||
         layout.textured != (layout.texcoordCount != 0u) ||
-        layout.minStride != layout.texcoordOffset + layout.texcoordCount * 8u ||
+        (layout.firstTexcoord1D && layout.texcoordCount == 0u) ||
+        layout.minStride != layout.texcoordOffset + layout.texcoordCount * 8u -
+                            (layout.firstTexcoord1D ? 4u : 0u) ||
         stride < layout.minStride)
         return false;
     GameFvfSample candidate{};
@@ -114,21 +125,40 @@ inline bool game_fvf_decode_vertex(const void* bytes, std::uint32_t stride,
     if (layout.hasDiffuse)
         std::memcpy(&candidate.diffuse, data + layout.diffuseOffset, 4u);
     if (layout.texcoordCount >= 1u)
-        std::memcpy(candidate.uv, data + layout.texcoordOffset, 8u);
-    if (layout.texcoordCount >= 2u)
-        std::memcpy(candidate.uv1, data + layout.texcoordOffset + 8u, 8u);
-    if (layout.texcoordCount >= 3u)
-        std::memcpy(candidate.uv2, data + layout.texcoordOffset + 16u, 8u);
-    if (layout.texcoordCount >= 4u)
-        std::memcpy(candidate.uv3, data + layout.texcoordOffset + 24u, 8u);
-    if (layout.texcoordCount >= 5u)
-        std::memcpy(candidate.uv4, data + layout.texcoordOffset + 32u, 8u);
-    if (layout.texcoordCount >= 6u)
-        std::memcpy(candidate.uv5, data + layout.texcoordOffset + 40u, 8u);
-    if (layout.texcoordCount >= 7u)
-        std::memcpy(candidate.uv6, data + layout.texcoordOffset + 48u, 8u);
-    if (layout.texcoordCount >= 8u)
-        std::memcpy(candidate.uv7, data + layout.texcoordOffset + 56u, 8u);
+        std::memcpy(candidate.uv, data + layout.texcoordOffset,
+                    layout.firstTexcoord1D ? 4u : 8u);
+    // Missing V defaults to zero; packed later UV sets begin four bytes earlier.
+    if (layout.firstTexcoord1D) {
+        if (layout.texcoordCount >= 2u)
+            std::memcpy(candidate.uv1, data + layout.texcoordOffset + 4u, 8u);
+        if (layout.texcoordCount >= 3u)
+            std::memcpy(candidate.uv2, data + layout.texcoordOffset + 12u, 8u);
+        if (layout.texcoordCount >= 4u)
+            std::memcpy(candidate.uv3, data + layout.texcoordOffset + 20u, 8u);
+        if (layout.texcoordCount >= 5u)
+            std::memcpy(candidate.uv4, data + layout.texcoordOffset + 28u, 8u);
+        if (layout.texcoordCount >= 6u)
+            std::memcpy(candidate.uv5, data + layout.texcoordOffset + 36u, 8u);
+        if (layout.texcoordCount >= 7u)
+            std::memcpy(candidate.uv6, data + layout.texcoordOffset + 44u, 8u);
+        if (layout.texcoordCount >= 8u)
+            std::memcpy(candidate.uv7, data + layout.texcoordOffset + 52u, 8u);
+    } else {
+        if (layout.texcoordCount >= 2u)
+            std::memcpy(candidate.uv1, data + layout.texcoordOffset + 8u, 8u);
+        if (layout.texcoordCount >= 3u)
+            std::memcpy(candidate.uv2, data + layout.texcoordOffset + 16u, 8u);
+        if (layout.texcoordCount >= 4u)
+            std::memcpy(candidate.uv3, data + layout.texcoordOffset + 24u, 8u);
+        if (layout.texcoordCount >= 5u)
+            std::memcpy(candidate.uv4, data + layout.texcoordOffset + 32u, 8u);
+        if (layout.texcoordCount >= 6u)
+            std::memcpy(candidate.uv5, data + layout.texcoordOffset + 40u, 8u);
+        if (layout.texcoordCount >= 7u)
+            std::memcpy(candidate.uv6, data + layout.texcoordOffset + 48u, 8u);
+        if (layout.texcoordCount >= 8u)
+            std::memcpy(candidate.uv7, data + layout.texcoordOffset + 56u, 8u);
+    }
     sample = candidate;
     return true;
 }
