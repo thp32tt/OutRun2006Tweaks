@@ -198,9 +198,16 @@ namespace OutRunVRStereo
         std::atomic<std::uint64_t> R30ShadowRegistryEpoch{1};
         struct R30ShadowLookupCache
         {
-            const void* buffer = nullptr;
+            struct Slot
+            {
+                const void* buffer = nullptr;
+                R30ShadowPtr entry;
+            };
+            // Two alternating VB/IB addresses share an epoch-fenced
+            // two-way cache instead of contending on the registry mutex.
+            Slot slots[2]{};
             std::uint64_t epoch = 0;
-            R30ShadowPtr entry;
+            unsigned next = 0;
         };
         thread_local R30ShadowLookupCache R30VertexLookup{};
         thread_local R30ShadowLookupCache R30IndexLookup{};
@@ -371,50 +378,53 @@ namespace OutRunVRStereo
                 first->begin <= begin && first->end >= end;
         }
 
-        R30ShadowPtr R30FindVertexShadow(IDirect3DVertexBuffer9* buffer)
+        template <typename Buffer>
+        R30ShadowPtr R30FindShadow(
+            Buffer* buffer,
+            const std::unordered_map<Buffer*, R30ShadowPtr>& registry,
+            R30ShadowLookupCache& cached)
         {
-            auto& cached = R30VertexLookup;
             const auto epoch =
                 R30ShadowRegistryEpoch.load(std::memory_order_acquire);
-            if (cached.buffer == buffer &&
-                cached.epoch == epoch)
-                return cached.entry;
-            // Positive and negative hits are both fenced by the registry
-            // membership epoch. Repeated untracked buffers must not take
-            // the global registry mutex/hash lookup on every particle draw.
-            // Registration, final Release and Reset each advance this epoch;
-            // a recycled COM address never inherits stale shadow ownership.
-            // Slow path captures the epoch while holding the registry lock.
+            if (cached.epoch == epoch)
+            {
+                for (const auto& slot : cached.slots)
+                {
+                    if (slot.buffer == buffer)
+                        return slot.entry;
+                }
+            }
+
+            // Membership and generation must be read under the same lock.
+            // Reset/final Release and recycled COM addresses invalidate both
+            // positive and negative cache entries together.
             std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-            const auto it = R30VertexShadows.find(buffer);
-            cached.buffer = buffer;
-            cached.entry = it == R30VertexShadows.end() ? nullptr : it->second;
-            cached.epoch =
+            const auto lockedEpoch =
                 R30ShadowRegistryEpoch.load(std::memory_order_relaxed);
-            return cached.entry;
+            if (cached.epoch != lockedEpoch)
+            {
+                for (auto& slot : cached.slots)
+                    slot = {};
+                cached.epoch = lockedEpoch;
+                cached.next = 0;
+            }
+
+            const auto it = registry.find(buffer);
+            auto& slot = cached.slots[cached.next];
+            cached.next = (cached.next + 1u) % 2u;
+            slot.buffer = buffer;
+            slot.entry = it == registry.end() ? nullptr : it->second;
+            return slot.entry;
+        }
+
+        R30ShadowPtr R30FindVertexShadow(IDirect3DVertexBuffer9* buffer)
+        {
+            return R30FindShadow(buffer, R30VertexShadows, R30VertexLookup);
         }
 
         R30ShadowPtr R30FindIndexShadow(IDirect3DIndexBuffer9* buffer)
         {
-            auto& cached = R30IndexLookup;
-            const auto epoch =
-                R30ShadowRegistryEpoch.load(std::memory_order_acquire);
-            if (cached.buffer == buffer &&
-                cached.epoch == epoch)
-                return cached.entry;
-            // Positive and negative hits are both fenced by the registry
-            // membership epoch. Repeated untracked buffers must not take
-            // the global registry mutex/hash lookup on every particle draw.
-            // Registration, final Release and Reset each advance this epoch;
-            // a recycled COM address never inherits stale shadow ownership.
-            // Slow path captures the epoch while holding the registry lock.
-            std::lock_guard<std::mutex> lock(R30ShadowRegistryMutex);
-            const auto it = R30IndexShadows.find(buffer);
-            cached.buffer = buffer;
-            cached.entry = it == R30IndexShadows.end() ? nullptr : it->second;
-            cached.epoch =
-                R30ShadowRegistryEpoch.load(std::memory_order_relaxed);
-            return cached.entry;
+            return R30FindShadow(buffer, R30IndexShadows, R30IndexLookup);
         }
 
         R30ShadowPtr R30EnsureVertexShadow(IDirect3DVertexBuffer9* buffer)
