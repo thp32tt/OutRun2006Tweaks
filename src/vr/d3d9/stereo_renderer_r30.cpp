@@ -3286,8 +3286,25 @@ namespace OutRunVRStereo
                 };
                 const float hudBiasY =
                     (1.0f - hudScaleY) * (y0 + halfHeight);
-                for (UINT i = 0; i < vertexCount; ++i)
+                // Indexed-UP and revision-fenced VB/IB builders supply a
+                // unique, mask-complete touched list. On very sparse HUD
+                // spans, visit those references rather than walking every
+                // unused vertex between min and max indices. Unindexed,
+                // dense and unknown-mask draws keep the original full walk.
+                const bool sparseHudTouched = usedMask && touched &&
+                    knownUsedCount > 0u &&
+                    knownUsedCount == touched->size() &&
+                    knownUsedCount <= vertexCount / 8u;
+                const UINT hudVisitCount =
+                    sparseHudTouched ? knownUsedCount : vertexCount;
+                for (UINT visit = 0; visit < hudVisitCount; ++visit)
                 {
+                    const UINT i = sparseHudTouched ? (*touched)[visit] : visit;
+                    // Never dereference an out-of-span list index. The mask
+                    // remains the authority even for a supposedly valid list.
+                    if (i >= vertexCount ||
+                        (sparseHudTouched && !(*usedMask)[i]))
+                        return false;
                     if (usedMask && !(*usedMask)[i])
                         continue;
                     const std::size_t offset =
