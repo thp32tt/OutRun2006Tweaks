@@ -1706,6 +1706,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // Reject operand modifiers; later stages are disabled by the gate.
         const bool arg2Diffuse = arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT;
         const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT;
+        // SELECTARG1 reads ALPHAARG1 only. D3D9 ALPHAARG2 is inactive and
+        // must not spuriously reject a valid PM RGB + texture-alpha Draw.
+        const bool alphaArg2UnusedOnSelectArg1 = alphaOp == D3DTOP_SELECTARG1;
         // A missing DIFFUSE slot may supply a material color under MODULATE.
         // Only texture selection is provably independent of that color.
         if (!layout.hasDiffuse && !selectTexture) return false;
@@ -1785,7 +1788,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                ((!selectDiffuseDiffuseAlpha && !mixedDiffuseAlpha && !mixedAddDiffuseAlpha && alphaArg1 != D3DTA_TEXTURE && !blendTextureAlphaPMDiffuseAlpha) && !selectTextureTfactorAlpha && !selectDiffuseTfactorAlpha &&
                !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha)))) ||
             (rgbNeedsDiffuse && !arg2Diffuse) ||
-            ((alphaNeedsDiffuse && !alphaArg2Diffuse) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha) ||
+            ((alphaNeedsDiffuse && !alphaArg2Diffuse && !alphaArg2UnusedOnSelectArg1) && !selectTextureTfactorArg2Alpha && !selectDiffuseTfactorArg2Alpha) ||
             coordIndex >= layout.texcoordCount ||
             (transformFlags != D3DTTFF_DISABLE && transformFlags != D3DTTFF_COUNT2) || srgb ||
             ((addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP &&
