@@ -269,11 +269,14 @@ def verify_fused_origin_hotpath(source: str) -> None:
     )
 
     def valid(part):
+        # The fused path now walks a bounded list of referenced indices when
+        # sparse; the origin hoist must precede the visit loop, not the
+        # retired full-span vertex loop.
         return (all(term in part for term in requirements)
                 and part.index("float eyeTailOrigin[2][4]{};")
-                < part.index("for (UINT i = 0; i < vertexCount; ++i)")
+                < part.index("for (UINT visit = 0; visit < visitCount; ++visit)")
                 and part.index("const float halfWidth = width * 0.5f;")
-                < part.index("for (UINT i = 0; i < vertexCount; ++i)")
+                < part.index("for (UINT visit = 0; visit < visitCount; ++visit)")
                 and part.index("clipEye[col] += eyeTailOrigin[eye][col];")
                 < part.index("clipEye[3] <= 1.0e-6f"))
     assert valid(block), "fused binocular constant-term fastpath missing"
