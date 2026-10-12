@@ -15,6 +15,11 @@ def connected(s):
     pipeline = part(s, "bool ensure_pipeline(", "bool supported_game_state(")
     producer = part(s, "bool supported_game_state(", "bool translate_vertices(")
     consumer = part(s, "bool submit(", "void observe(")
+    # Test subtractive descriptor mutations against their own OM branch;
+    # other blend paths share write-mask and state-creation statements.
+    subtractive = part(consumer,
+        "if (output.blendOp != D3D11_BLEND_OP_ADD) {",
+        "} else if (output.multiplyBlend &&")
     return (all(x in output for x in (
         "D3D11_BLEND_OP blendOp = D3D11_BLEND_OP_ADD;",
         "bool additiveBlend = false;", "bool sourceAlphaAddBlend = false;",
@@ -35,7 +40,7 @@ def connected(s):
             "D3D11_BLEND_OP_SUBTRACT :",
             "blendOp == D3DBLENDOP_REVSUBTRACT ?",
             "D3D11_BLEND_OP_REV_SUBTRACT : D3D11_BLEND_OP_ADD;"))
-        and all(x in consumer for x in (
+        and all(x in subtractive for x in (
             "if (output.blendOp != D3D11_BLEND_OP_ADD)",
             "output.additiveBlend ? 1u :",
             "output.sourceAlphaAddBlend ? 2u :",
@@ -48,7 +53,8 @@ def connected(s):
             "desc.RenderTarget[0].BlendOpAlpha = output.blendOp;",
             "desc.RenderTarget[0].BlendOpAlpha = output.blendOp;\n            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;",
             "desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;\n            if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf())))",
-            "maskedBlend = &cached;",
+            "maskedBlend = &cached;"))
+        and all(x in consumer for x in (
             "ctx->OMSetBlendState(maskedBlend->Get(), nullptr, 0xffffffffu);",
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"))
