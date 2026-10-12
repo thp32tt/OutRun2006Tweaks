@@ -49,9 +49,15 @@ def linked(code):
         end = min((code.find(n, start + len(section)) for n in next_sections), default=len(code))
         fragment = code[start:end]
         if not all(e in fragment for e in evidence): return False
+    # Count the 00596 additive descriptor only. Later valid source-copy
+    # states may also use ONE without changing the existing additive proof.
+    begin = code.find("// Game-supplied D3D9 SRCBLEND/DESTBLEND factors")
+    end = code.find("// Premultiplied-alpha menu/UI surfaces:", begin)
+    if begin < 0 or end <= begin: return False
+    additive = code[begin:end]
     return (code.count("for (auto& masked : s.maskedBlends) masked.Reset();") == 2
-            and code.count("target.SrcBlend = D3D11_BLEND_ONE;") == 2
-            and code.count("target.SrcBlendAlpha = D3D11_BLEND_ONE;") == 2
+            and additive.count("target.SrcBlend = D3D11_BLEND_ONE;") == 1
+            and additive.count("target.SrcBlendAlpha = D3D11_BLEND_ONE;") == 1
             and "return optedIn;" in code)
 
 def main():
