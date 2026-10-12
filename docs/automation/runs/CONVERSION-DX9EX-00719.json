@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00719",
+  "production_id": "CONVERSION-DX9EX-00719",
+  "event_id": "CONVERSION-DX9EX-00719-E001",
+  "event_type": "C6_RESULT_ONLY",
+  "feature_id": "DX9EX:R28_RAW_WVP_CONTIGUOUS_SHADOW_COPY",
+  "work_key": "DX9EX:R28_RAW_WVP_CONTIGUOUS_SHADOW_COPY",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "base_sha": "ae5f7a0f6ca571555a0a37ab59681af982ad7467",
+  "source_material_sha": "1eee7a2be693f3de0de7ad97d291ac9a81562894",
+  "material_result_sha": "1eee7a2be693f3de0de7ad97d291ac9a81562894",
+  "result_sha": "1eee7a2be693f3de0de7ad97d291ac9a81562894",
+  "validation_bearing_result_sha": "1eee7a2be693f3de0de7ad97d291ac9a81562894",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "material_commits": [
+    "1eee7a2be693f3de0de7ad97d291ac9a81562894"
+  ],
+  "changed_paths": [
+    "src/vr/game/outrun_renderer_r23.cpp",
+    "tools/verify_vr_r29_wvp_envelope_fastpath.py"
+  ],
+  "feature_contract": {
+    "goal": "Reduce game render-thread CPU work for high-frequency D3D9 c64..c67 raw WVP float4 constant uploads by copying the contiguous overlapping span once instead of performing four per-register comparisons/memcpy calls.",
+    "acceptance": "Maintain partial, disjoint and full-upload source byte parity and per-row valid-mask semantics, including 32-bit register edge cases; destructive source mutations plus deterministic >15k input model; exact-SHA DX9Ex Active, Domain Isolation and Full Source Impact all successful."
+  },
+  "acceptance_results": {
+    "source_implementation": "MATERIAL_COMMITTED",
+    "hotpath": "ONE_CONTIGUOUS_MEMCPY_FOR_OVERLAPPING_WVP_ROWS",
+    "partial_and_nonintersecting": "REFERENCE_PARITY_SOURCE_REGRESSION",
+    "targeted_regression": "PASS_SOURCE_NEGATIVE_MUTATIONS_AND_FULL_PARTIAL_RANDOMIZED_MODEL_IN_DX9EX_GATE",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_RESULT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_RESULT_SHA",
+    "full_source_impact": "SUCCESS_3_OF_3_EXACT_RESULT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38312436711,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "1eee7a2be693f3de0de7ad97d291ac9a81562894",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "game": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38312436781,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "1eee7a2be693f3de0de7ad97d291ac9a81562894",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    {
+      "id": 38312436849,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "1eee7a2be693f3de0de7ad97d291ac9a81562894",
+      "conclusion": "success",
+      "jobs": {
+        "source-cross-domain": "success",
+        "msvc-analyze-openxr-host": "success",
+        "msvc-analyze-active-game": "success"
+      }
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_validation_required": "Quest 3 / VDXR actual game HMD stereo, HUD/SkyGlow, input and measured dense-buildings/beach/particles FPS p95/p99. No device or live frame-time test performed.",
+  "c6_bookkeeping_confirmation": {
+    "validation_sha": "1eee7a2be693f3de0de7ad97d291ac9a81562894",
+    "exact_sha_gates": "PASS_EXACT_SHA",
+    "source_modified": false,
+    "ci_reexecuted": false,
+    "score_delta": 0
+  }
+}
