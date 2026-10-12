@@ -11,9 +11,9 @@
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "target_branch": "vr-dx11-native-r71",
   "base_head_sha": "1a1c3adbc399fe81a337befec1fc1c7ae5097bb6",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -56,5 +56,25 @@
   ],
   "packaging": {
     "status": "NOT_REQUIRED"
-  }
+  },
+  "validation_bearing_result_sha": "88d7868505437791ff0d08ebbde800981430993b",
+  "result_sha": "88d7868505437791ff0d08ebbde800981430993b",
+  "previous_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "evidence": {
+    "backend_gate_conclusion": "success",
+    "backend_gate_run_id": 38279708354,
+    "dx11_fast_conclusion": "success",
+    "dx11_fast_run_id": 38279708355,
+    "windows_build_conclusion": "success",
+    "windows_build_run_id": 38279714144,
+    "openxr_push_conclusion": "success",
+    "openxr_push_run_id": 38279708438,
+    "openxr_pr_conclusion": "success",
+    "openxr_pr_run_id": 38279714153,
+    "hud_inspector_conclusion": "success",
+    "hud_inspector_run_id": 38279714147,
+    "game_quest3_vdxr": "UNTESTED",
+    "native_visual_parity": "NEED_HMD_TEST"
+  },
+  "next_action": "C6 completed for 00621: do not rerun same TASK_ID; hardware-only menu/vehicle/race pixel parity and gamepad/Quest3 remain NEED_HMD_TEST."
 }
