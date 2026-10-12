@@ -49,7 +49,10 @@ def linked(code):
         end = min((code.find(n, start + len(section)) for n in next_sections), default=len(code))
         fragment = code[start:end]
         if not all(e in fragment for e in evidence): return False
-    return code.count("for (auto& masked : s.maskedBlends) masked.Reset();") == 2 and "return optedIn;" in code
+    return (code.count("for (auto& masked : s.maskedBlends) masked.Reset();") == 2
+            and code.count("target.SrcBlend = D3D11_BLEND_ONE;") == 2
+            and code.count("target.SrcBlendAlpha = D3D11_BLEND_ONE;") == 2
+            and "return optedIn;" in code)
 
 def main():
     source = S.read_text(encoding="utf8")
