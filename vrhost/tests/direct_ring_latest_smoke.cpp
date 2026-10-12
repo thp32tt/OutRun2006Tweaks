@@ -30,6 +30,14 @@ int main() {
     const auto sw=Select(switched);
     EXPECT(sw.haveGeneration && sw.generation==10 && sw.index==2);
     EXPECT(Select(switched,103).index == NoIndex);
+    // Newest generation is first discovered at the end of the ring,
+    // but its only eligible member was already encountered earlier.
+    // The former naïve single-pass variant incorrectly returned NoIndex.
+    const std::array<Frame,4> lateGeneration{{
+        {14,4,4,true,false},{11,1,3,true,true},
+        {6,2,2,true,true},{17,2,5,true,true}}};
+    const auto lg = Select(lateGeneration,5);
+    EXPECT(lg.haveGeneration && lg.generation == 2 && lg.index == 2);
     const std::array<Frame,4> newestUnready{{
         {100,5,0,true,true},{103,5,1,true,false},
         {102,5,2,true,true},{101,5,3,true,true}}};

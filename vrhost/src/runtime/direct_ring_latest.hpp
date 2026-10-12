@@ -35,7 +35,23 @@ namespace OutRunVrDirectRingLatest
             {
                 newestFrame = frame.frameId;
                 if (!result.haveGeneration || result.generation != generation)
+                {
                     result.index = NoIndex;
+                    // A newer frame can introduce a generation whose older,
+                    // eligible frame appeared earlier in ring order. Backfill
+                    // only on the rare generation change, keeping the steady
+                    // generation's hot path single-pass.
+                    for (std::size_t prior = 0; prior < i; ++prior)
+                    {
+                        const auto& earlier = frames[prior];
+                        if (isBasic(earlier) &&
+                            generationOf(earlier) == generation &&
+                            isEligible(earlier) &&
+                            (result.index == NoIndex ||
+                             before(frames[result.index].frameId, earlier.frameId)))
+                            result.index = prior;
+                    }
+                }
                 result.generation = generation;
                 result.haveGeneration = true;
             }
