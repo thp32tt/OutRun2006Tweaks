@@ -1,0 +1,200 @@
+{
+  "schema": "outrun-c1-independent-scoped-qa-v2",
+  "task_id": "OUTRUN-KOR-C1-Q137-Q205-NEW-INDEPENDENT-20261013-0440",
+  "reviewer": "C1 (ChatGPT, independent of B producers)",
+  "date_kst": "2026-10-13",
+  "branch": "korean-localization-recovery-20260928",
+  "role": "QA_ONLY_NO_GENERATION",
+  "source_of_truth": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md"
+  ],
+  "contact": {
+    "path": "localization/graphics/role_C1/20261013-C1-Q137-Q205-INDEPENDENT-SCOPED/C1_Q137_Q205_BATCH_7WAY.jpg",
+    "sha256": "ce2bbfc0bbd30f84dd6a718a9ead55338b09acc651d90ab8d9b3bfbf171570ce",
+    "kind": "SOURCE/CLEAN/SAVED DDS RAW/FLIPY/practical75/50; 1 shared contact; C205 two ROI rows; JPG navigation only"
+  },
+  "batch_size": 2,
+  "selection": "Prior SHA C1 reviews excluded; only two distinct B candidate assets selected with independently retrievable canonical HD SOURCE and persisted saved trial bytes; remaining SHA-reviewed/older trials not blindly reapproved.",
+  "results": [
+    {
+      "queue_index": 137,
+      "producer": "B320",
+      "source_dds_path": "N100 read-only cached canonical HD original; independent SHA matches 20261012 source record",
+      "source_sha256": "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+      "clean_path": "N100 cached SOURCE-derived CLEAN (SHA matched historical 20261012 record)",
+      "clean_sha256": "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+      "candidate_path": "localization/graphics/role_B/20261009-B320-Q137-P0-SMALL-MODE-HIERARCHY/B320_TRIAL_NOT_PROMOTED.dds",
+      "candidate_sha256": "cdd4a34879b7dce582db643c8e4f9494ef8cb19d533634aef23eb4ecfd186a92",
+      "official_candidate_sha256": "cdd4a34879b7dce582db643c8e4f9494ef8cb19d533634aef23eb4ecfd186a92",
+      "source_clean": {
+        "status": "SCOPED_PASS",
+        "sha_pair": [
+          "11c90e063e83e485d15da16a157a7da7f4c99144b0ee9004205ef4ee724d21cc",
+          "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098"
+        ],
+        "changed_rgba": 107239,
+        "outside_six_source_effect_bboxes_rgba": 0
+      },
+      "clean_final": {
+        "status": "SCOPED_PASS",
+        "sha_pair": [
+          "b128a8fd82f3ccae6300511c22e63bf40e2938e114b8417aada19bbd49bc9098",
+          "cdd4a34879b7dce582db643c8e4f9494ef8cb19d533634aef23eb4ecfd186a92"
+        ],
+        "changed_rgba": 106016,
+        "outside_six_source_effect_bboxes_rgba": 0
+      },
+      "source_final": {
+        "changed_rgba": 140100,
+        "outside_six_source_effect_bboxes_rgba": 0
+      },
+      "format": {
+        "width": 2048,
+        "height": 1024,
+        "uncompressed_32bit": true,
+        "mip_count": 1,
+        "source_candidate_first128_bytes_equal": true,
+        "raw_flipy_review": "SOURCE and FINAL both RAW inverted; FLIPY readable; native/75/50 reviewed",
+        "bc_compression": "NOT_APPLICABLE"
+      },
+      "inspected_region_readable_bboxes": [
+        [
+          1,
+          235,
+          397,
+          315
+        ],
+        [
+          889,
+          233,
+          1775,
+          315
+        ],
+        [
+          14,
+          148,
+          339,
+          210
+        ],
+        [
+          822,
+          147,
+          1376,
+          216
+        ],
+        [
+          5,
+          67,
+          868,
+          130
+        ],
+        [
+          1288,
+          96,
+          1569,
+          128
+        ]
+      ],
+      "inspected_texts": 6,
+      "untranslated_in_inspected_scope": 0,
+      "uninspected_atlas_texts": "UNKNOWN",
+      "hard_defect_coordinates": [],
+      "finding": "Six Korean transmission headings/modes readable in inspected output, no observed clipping or nontext intrusion within established original effect footprints. Not a proof of independent real UI UV boundaries.",
+      "verdict": "C1_STATIC_PASS",
+      "scope": "SIX_ORIGINAL_SOURCE_EFFECT_REGIONS_ONLY",
+      "release_gate": "TEST_ONLY_HOLD",
+      "risk": "P0 IGR041/user in-game OPEN, independent C3 and exact game retest not run"
+    },
+    {
+      "queue_index": 205,
+      "producer": "B303",
+      "source_dds_path": "N100 read-only cached canonical HD original",
+      "source_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "clean_path": "N100 historical CLEAN; candidate-specific SOURCE/CLEAN→B303 binding NOT independently established",
+      "clean_sha256": "2e06b0d14f372a5e904ff09e62fb9ed14387fe8b98e49ae385af094a4b0fd73f",
+      "candidate_path": "localization/graphics/role_B/20261009-B303-Q205-P0-RED-HEADING-NATIVE-FAMILY/Q205_B303_P0_RED_HEADING_TRIAL_NOT_PROMOTED.dds",
+      "candidate_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+      "current_official_candidate_sha256": "d309c8b5243e901642e640eb3b9f3593e5c5b60981156ce11901f88ab8279b70",
+      "source_clean": {
+        "status": "HOLD_NOT_BOUND_TO_TRIAL",
+        "source_clean_changed_outside_protected": null
+      },
+      "clean_final": {
+        "status": "HOLD_NOT_FULLY_PIXEL_VERIFIED",
+        "changed_outside_protected": null
+      },
+      "format": {
+        "width": 4096,
+        "height": 2048,
+        "uncompressed_32bit": true,
+        "mip_count": 1,
+        "source_candidate_first128_bytes_equal": true,
+        "raw_flipy_review": "Direct per-row raw DDS RGBA byte crop, no synthetic re-render. RAW inverted and FLIPY readable; native/75/50 inspected in two heading ROIs.",
+        "bc_compression": "NOT_APPLICABLE"
+      },
+      "inspected_region_readable_bboxes": [
+        [
+          1591,
+          1423,
+          2316,
+          1568
+        ],
+        [
+          33,
+          1245,
+          930,
+          1388
+        ]
+      ],
+      "inspected_texts": 2,
+      "untranslated_in_inspected_scope": 0,
+      "uninspected_atlas_texts": "UNKNOWN (historical inventory mentions >=21 other cells; not independently assessed)",
+      "hard_defect_coordinates": [],
+      "hold_region_coordinates": [
+        [
+          1591,
+          1423,
+          2316,
+          1568
+        ],
+        [
+          33,
+          1245,
+          930,
+          1388
+        ]
+      ],
+      "finding": "OPTIONS→옵션 and RANKINGS→랭킹 visibly legible in persisted B303 RAW/FLIPY. No confirmed new glyph corruption in inspected titles. Whole-atlas protected deltas, trial-specific CLEAN and actual UI cell/UV limits not established; no unsupported zero-pixel clearance.",
+      "verdict": "HOLD",
+      "scope": "TWO_HEADINGS_ONLY",
+      "release_gate": "TEST_ONLY_HOLD",
+      "risk": "P0 IGR026/027/028 remain OPEN; current official DDS is different SHA and not approved by this B303 test"
+    }
+  ],
+  "batch_inventory": {
+    "total_reviewed_text_regions": 8,
+    "known_untranslated_within_scope": 0,
+    "unreviewed_full_atlas_count": "UNKNOWN",
+    "full_dds_approved": 0,
+    "official_release_approved": 0
+  },
+  "downstream": {
+    "C2": "RETIRED_NO_NEW_C2_TOKEN",
+    "legacy_approval_consumer": "NOT_MIGRATED__TEST_ONLY_HOLD",
+    "C3": "NOT_RUN",
+    "user_game": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "docker": "NOT_DEPLOYED",
+    "AUTO_SEND": "NOT_TOUCHED",
+    "queue": "NOT_RESET",
+    "new_png_dds_generated": 0,
+    "excluded": [
+      "VR",
+      "FFB",
+      "DX11",
+      "DXVK"
+    ]
+  },
+  "exclusions": "No C2 PASS fabricated; static ROI PASS is not whole DDS, current evidence export, gameplay acceptance or release."
+}
