@@ -70,6 +70,17 @@ namespace OutRunVRStereo
         };
         R31EyeTailCache R31EyeCache{};
 
+        // Cache exact per-eye matrix products for consecutive world draws
+        // sharing a verified WVP. Shader/pose/generation/live-validation still
+        // run before lookup; any eye-tail miss invalidates both eye products.
+        struct R31WorldWvpCache
+        {
+            bool valid = false;
+            float originalWvp[16]{};
+            float eyeConstants[2][16]{};
+        };
+        R31WorldWvpCache R31WorldCache{};
+
         struct R31FramePerf
         {
             std::uint64_t epoch = 0;
@@ -170,6 +181,7 @@ namespace OutRunVRStereo
             R31BlockedVerifiedGeneration = 0;
             R31FastWorldCandidates = 0;
             R31EyeCache = {};
+            R31WorldCache = {};
             R31TelemetryResetFrameWindow();
             // Reset/ResetEx opens a new performance epoch. Never mix
             // pre-reset route counts with recovered-device telemetry.
@@ -324,6 +336,9 @@ namespace OutRunVRStereo
             }
             next.valid = true;
             R31EyeCache = next;
+            // Eye geometry/FOV/world-scale/projection changed: invalidate
+            // cached WVP products even when the game's original WVP matches.
+            R31WorldCache.valid = false;
             return true;
         }
 
@@ -390,6 +405,18 @@ namespace OutRunVRStereo
             // Original eye restoration and stereo transforms must use one exact source.
             const float* originalWvp = liveValidated ? live : verified;
             std::memcpy(draw.originalConstants, originalWvp, sizeof(verified));
+            // Compare actual restored constants (including live-validation
+            // epsilon) instead of trusting the WVP generation alone.
+            if (R31WorldCache.valid &&
+                std::memcmp(R31WorldCache.originalWvp, originalWvp,
+                    sizeof(draw.originalConstants)) == 0)
+            {
+                std::memcpy(draw.eyeConstants, R31WorldCache.eyeConstants,
+                    sizeof(draw.eyeConstants));
+                draw.poseSequence = stereo.poseSequence;
+                return true;
+            }
+
             D3DMATRIX uploadedT{};
             std::memcpy(&uploadedT, originalWvp, sizeof(uploadedT));
             const D3DMATRIX currentWvp = R30SupportTransposeMatrix(uploadedT);
@@ -406,6 +433,12 @@ namespace OutRunVRStereo
                 std::memcpy(draw.eyeConstants[eye], &eyeWvpT,
                     sizeof(eyeWvpT));
             }
+            // Neither eye may be published before both are finite.
+            std::memcpy(R31WorldCache.originalWvp, originalWvp,
+                sizeof(R31WorldCache.originalWvp));
+            std::memcpy(R31WorldCache.eyeConstants, draw.eyeConstants,
+                sizeof(R31WorldCache.eyeConstants));
+            R31WorldCache.valid = true;
             draw.poseSequence = stereo.poseSequence;
             return true;
         }
@@ -426,6 +459,7 @@ namespace OutRunVRStereo
                     ignored, generation, pose, shader, serial))
                 R31BlockedVerifiedGeneration = generation;
             R31EyeCache.valid = false;
+            R31WorldCache.valid = false;
         }
 
         void R31ResynchronizeShaderEpoch(IDirect3DDevice9* device) noexcept
@@ -441,6 +475,7 @@ namespace OutRunVRStereo
             R30SupportInvalidateTrackedRasterShadow();
             R30SupportInvalidateLiveStateSample();
             R31EyeCache.valid = false;
+            R31WorldCache.valid = false;
             OutRunVR::State::StateBlockTracker::RequireResync();
         }
 
