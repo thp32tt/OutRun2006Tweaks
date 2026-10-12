@@ -75,6 +75,7 @@ on:
       - 'tools/verify_vr_r30_projection_signature_fastpath.py'
       - 'tools/verify_vr_r30_rhw_perspective_fastpath.py'
       - 'tools/verify_vr_r30_world_seed_fastpath.py'
+      - 'tools/verify_vr_r30_world_affine_dual_eye.py'
       - 'tools/verify_vr_r30_eye_tail_hotpath.py'
       - 'tools/verify_vr_r30_viewport_reciprocal_hotpath.py'
       - 'tools/verify_vr_r30_flat_effect_geometry_fastpath.py'
@@ -234,6 +235,7 @@ jobs:
             'tools/verify_vr_r30_projection_signature_fastpath.py',
             'tools/verify_vr_r30_rhw_perspective_fastpath.py',
             'tools/verify_vr_r30_world_seed_fastpath.py',
+            'tools/verify_vr_r30_world_affine_dual_eye.py',
             'tools/verify_vr_r30_eye_tail_hotpath.py',
             'tools/verify_vr_r30_viewport_reciprocal_hotpath.py',
             'tools/verify_vr_r30_flat_effect_geometry_fastpath.py',
