@@ -1,0 +1,16 @@
+{
+  "TASK_ID": "OUTRUN-AUTO-SEND-TRUE-20261012-163934",
+  "attempt": 1,
+  "lane": "POLICY",
+  "branch": "korean-localization-recovery-20260928",
+  "base_head": "db7bba896c3252c3807f3653f835fe8cc5061bca",
+  "change": "Set staged AUTO_SEND=true per explicit user request; retain manual deployment",
+  "status": "IMPLEMENTED_LOCAL_VALIDATED",
+  "validation": {
+    "local_regression": "10/10 PASS",
+    "python_compile": "PASS"
+  },
+  "deployment": "NOT_RUN_USER_MANUAL",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "User manually deploys the updated controller configuration"
+}

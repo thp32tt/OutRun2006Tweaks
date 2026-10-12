@@ -30,7 +30,7 @@ class PolicyTests(unittest.TestCase):
                              source_dds_sha256='a'*64, readable_transform='flip_y',
                              translations=[dict(source='OUT RUN MODE', korean='아웃런 모드')])
         self.compose = {'services': {NAME: {'image': 'outrun-kor-plate-engine:'+'b'*12,
-            'environment': {'AUTO_SEND':'true', 'CHAT_SLOTS':'4', 'SCHEDULE_MINUTES':'0,10,20,30,40,50',
+            'environment': {'AUTO_SEND':'false', 'CHAT_SLOTS':'4', 'SCHEDULE_MINUTES':'0,10,20,30,40,50',
                             'CHATGPT_PROJECT_URL':'${CHATGPT_PROJECT_URL}', 'PRIVATE_VALUE':'${PRIVATE_VALUE}'},
             'volumes':['data:/data', 'logs:/logs']},
             'unrelated': {'image':'unrelated:fixed', 'environment':{'KEEP':'yes'}}},
@@ -59,21 +59,21 @@ class PolicyTests(unittest.TestCase):
         self.manifest['translations'] *= 2
         with self.assertRaises(ValueError): assemble(self.manifest,self.root)
 
-    def test_same_image_still_changes_schedule_and_pauses(self):
+    def test_same_image_still_changes_schedule_and_enables_auto_send(self):
         result=configure(self.compose, 'b'*40)
         env=result['services'][NAME]['environment']
-        self.assertEqual(env['AUTO_SEND'],'false')
+        self.assertEqual(env['AUTO_SEND'],'true')
         self.assertEqual(env['CHAT_SLOTS'],'3')
         self.assertEqual(env['SCHEDULE_MINUTES'],'0,10,30,40')
         self.assertEqual(result['services']['unrelated'],self.compose['services']['unrelated'])
         self.assertEqual(result['volumes'],self.compose['volumes'])
         self.assertEqual(result['services'][NAME]['volumes'],self.compose['services'][NAME]['volumes'])
         self.assertEqual(env['PRIVATE_VALUE'],'${PRIVATE_VALUE}')
-        self.assertEqual(self.compose['services'][NAME]['environment']['AUTO_SEND'],'true')
+        self.assertEqual(self.compose['services'][NAME]['environment']['AUTO_SEND'],'false')
         self.assertEqual(configure(result,'b'*40), result)
 
     def test_updates_existing_owned_image_and_list_environment(self):
-        self.compose['services'][NAME]['environment']=['KEEP=value=with=equals','INHERIT','AUTO_SEND=true']
+        self.compose['services'][NAME]['environment']=['KEEP=value=with=equals','INHERIT','AUTO_SEND=false']
         result=configure(self.compose,'c'*40)
         self.assertEqual(result['services'][NAME]['image'],'outrun-kor-plate-engine:'+'c'*12)
         self.assertEqual(result['services'][NAME]['environment']['KEEP'],'value=with=equals')
@@ -88,14 +88,14 @@ class PolicyTests(unittest.TestCase):
         self.compose['services']['unrelated']=self.compose['services'][NAME]
         result=configure(self.compose,'c'*40)
         self.assertEqual(result['services']['unrelated'],self.compose['services'][NAME])
-        self.assertEqual(result['services'][NAME]['environment']['AUTO_SEND'],'false')
+        self.assertEqual(result['services'][NAME]['environment']['AUTO_SEND'],'true')
 
     def test_shared_environment_anchor_does_not_modify_other_service(self):
         original=self.compose['services'][NAME]['environment']
         self.compose['services']['unrelated']['environment']=original
         result=configure(self.compose,'c'*40)
         self.assertEqual(result['services']['unrelated']['environment'],original)
-        self.assertEqual(result['services']['unrelated']['environment']['AUTO_SEND'],'true')
+        self.assertEqual(result['services']['unrelated']['environment']['AUTO_SEND'],'false')
 
     def test_staging_script_saves_original_backup_without_lifecycle_commands(self):
         import types
@@ -136,10 +136,11 @@ class PolicyTests(unittest.TestCase):
             second=deployer.deploy(checkout,revision)
         self.assertEqual(staged,(stack/'docker-compose.yml').read_text())
         self.assertEqual((stack/('docker-compose.yml.before-plate-'+revision[:12])).read_text(),original)
-        self.assertEqual(yaml.safe_load(staged)['services'][NAME]['environment']['AUTO_SEND'],'false')
+        self.assertEqual(yaml.safe_load(staged)['services'][NAME]['environment']['AUTO_SEND'],'true')
         self.assertFalse((stack/'prompts/localization_C2.md').exists())
         self.assertEqual((stack/('prompts/localization_C2.md.retired-'+revision[:12])).read_text(),'retired evidence')
         self.assertEqual(first['deployment_mode'],'MANUAL_ONLY')
+        self.assertTrue(first['auto_send'])
         self.assertFalse(second['runtime_schedule_verified'])
         self.assertTrue(all(args[0]!='docker' or args[1] in ('build','run') for args in calls))
 

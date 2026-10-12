@@ -61,7 +61,7 @@ print(json.dumps({{'compose':(b/{SUBDIR!r}/'docker-compose.yml').read_text(),'en
         environment[key] = re.sub(r'\$\{([^}:]+)(?::-([^}]*))?\}', substitute, str(value))
     if not environment.get('CHATGPT_PROJECT_URL'):
         raise ValueError('Existing stack must provide project URL')
-    # Staging is always paused; operator verifies the runtime and enables manually.
+    # User explicitly requested AUTO_SEND=true; deployment remains manual.
     sources = list((root / 'tools/localization/controller_prompts').glob('localization_*.md'))
     sources += list((root / 'tools/localization/imagegen_prompts').glob('*.txt'))
     sources += [policy_path, root / 'docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md',
@@ -133,16 +133,16 @@ if p.exists():
         )
     else:
         status = 'STAGED_PORTAINER_REDEPLOY_READY'
-        next_action = ('Manually redeploy the existing Portainer localization stack with AUTO_SEND=false. '
+        next_action = ('Manually redeploy the existing Portainer localization stack with AUTO_SEND=true. '
                        'Verify A/B/C1 tabs, exact minute-to-role dispatch and source attachment/output '
-                       'smoke before the operator explicitly enables AUTO_SEND.')
+                       'smoke after the manual deployment; these checks remain unverified.')
     return {'container': NAME, 'image': image, 'revision': revision,
             'prompt_sha256': hashes, 'status': status, 'next_action': next_action,
             'previous_image': existing_meta['Config']['Image'] if existing_meta else None,
             'previous_status': existing_meta['State']['Status'] if existing_meta else None,
             'preserved_volumes': ['outrun_chat_localization_recovery_data',
                                   'outrun_chat_localization_recovery_logs'],
-            'auto_send': False, 'deployment_mode': 'MANUAL_ONLY',
+            'auto_send': True, 'deployment_mode': 'MANUAL_ONLY',
             'runtime_schedule_verified': False, 'imagegen_e2e': 'UNTESTED',
             'game_validation': 'UNTESTED'}
 
@@ -154,6 +154,6 @@ if __name__ == '__main__':
     p.add_argument('--stage', action='store_true', help='Explicitly build image and stage Compose; never redeploys')
     a = p.parse_args()
     if not a.stage:
-        p.error('--stage is required; this command never deploys/restarts/enables the controller')
+        p.error('--stage is required; this command never deploys/restarts the running controller')
     print(json.dumps(deploy(a.root, a.revision), ensure_ascii=False))
 

@@ -18,15 +18,15 @@
 4. 기존 Portainer stack을 사용자가 수동 재배포한다. 독립 docker run으로 앱을 띄우지 않는다.
    이름 충돌이 있으면 해당 컨트롤러만 유지보수 시간에 정리하고 볼륨은 삭제하지 않는다.
 5. `/opt/outrun/production_revision`과 A/B/C1 prompt를 확인한다. 활성 탭은 A/B/C1,
-   C2 없음. 원래 대화 기록은 삭제하지 않는다. AUTO_SEND=false인지 확인한다.
+   C2 없음. 원래 대화 기록은 삭제하지 않는다. AUTO_SEND=true인지 확인한다.
 6. 단건 원본 PNG 업로드/전송 메시지 첨부 → 내장 이미지 생성 → 실제 PNG 다운로드 →
    원본 SHA/승인 문구/알파 확인 → CLEAN 합성 → 원본 방향·포맷·mipmap의 시험 DDS →
    저장본 재디코딩 순서를 확인한다. 결과를 C1이 독립 검사한다.
 7. 실제 controller 코드/로그가 **0:A, 10:C1, 30:B, 40:C1** (KST)을 지원하는지 확인한다.
-   SCHEDULE_MINUTES와 CHAT_SLOTS만으로는 충분하지 않다. round-robin이면 자동 전송을
-   활성화하지 않는다. 운영 controller의 dispatch 수정은 별도 검증 후 적용한다.
-8. 확인을 마친 사용자가 AUTO_SEND를 수동으로 true로 바꾼다. 다시 staging하면 false로
-   돌아가므로 재배포 검증을 반복한다. 게임 패치 설치/정식 릴리스도 사용자가 별도 수행한다.
+   SCHEDULE_MINUTES와 CHAT_SLOTS만으로는 충분하지 않다. round-robin이면 역할 배정이
+   다를 수 있으므로 운영 controller의 dispatch를 별도 확인한다. 설정 변경은 검증 PASS가 아니다.
+8. 2026-10-12 16:39 KST 사용자 지시로 AUTO_SEND=true가 기본이다. 다시 staging해도
+   true를 유지한다. 별도 활성화 단계는 없으며 컨테이너 배포·게임 설치·정식 릴리스는 사용자 수동이다.
 
 ## 현재 제한
 

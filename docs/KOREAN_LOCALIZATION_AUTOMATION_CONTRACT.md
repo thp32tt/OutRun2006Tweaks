@@ -1,3 +1,7 @@
+## 2026-10-12 16:39 KST 사용자 수정: AUTO_SEND=true
+
+도커 준비 설정의 자동 전송 기본값은 `true`다. 이전 AUTO_SEND=false 강제 및 별도 수동 활성화 지시는 대체한다. 컨테이너 배포·재시작은 계속 사용자 수동이며, 설정 변경은 운영/E2E 검증 통과를 의미하지 않는다.
+
 ## 2026-10-12 13:33 KST 재시작 정책 — 현행 규칙 우선
 
 현행 정본은 `docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md`와

@@ -76,13 +76,16 @@
   "deployment": {
     "mode": "MANUAL_ONLY",
     "auto_deploy": false,
-    "stage_auto_send": false,
+    "stage_auto_send": true,
     "runtime_status": "NOT_DEPLOYED_BY_THIS_CHANGE",
     "activation_requires": [
+      "manual_operator_deploy"
+    ],
+    "auto_send_authorization": "USER_EXPLICIT_20261012_163934_KST",
+    "post_deploy_checks": [
       "source_attachment_to_output_smoke",
       "explicit_minute_to_role_dispatch_verified",
-      "C2_tab_absent",
-      "manual_operator_enable"
+      "C2_tab_absent"
     ]
   },
   "schedule_dispatch": {
@@ -94,7 +97,7 @@
       "40": "C1"
     },
     "round_robin_compatible": false,
-    "runtime_adapter_status": "UNVERIFIED_KEEP_AUTO_SEND_FALSE"
+    "runtime_adapter_status": "UNVERIFIED"
   },
   "imagegen": {
     "backend": "chatgpt_native",

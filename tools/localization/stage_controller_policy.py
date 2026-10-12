@@ -27,7 +27,7 @@ def configure(compose, revision):
         env = mapped
     if not isinstance(env, dict):
         raise ValueError('Environment must be mapping or list')
-    env.update(CHAT_SLOTS='3', SCHEDULE_MINUTES='0,10,30,40', AUTO_SEND='false')
+    env.update(CHAT_SLOTS='3', SCHEDULE_MINUTES='0,10,30,40', AUTO_SEND='true')
     service['environment'] = env
     service['image'] = IMAGE_PREFIX + revision[:12]
     return result
@@ -45,7 +45,7 @@ def validate_roles(roles):
         raise ValueError('Expected A/B/C1 tabs')
     if roles['schedule_dispatch']['minute_to_role'] != expected:
         raise ValueError('Explicit minute-to-role policy mismatch')
-    if roles['deployment']['mode'] != 'MANUAL_ONLY' or roles['deployment']['stage_auto_send']:
-        raise ValueError('Manual deployment and paused staging required')
+    if roles['deployment']['mode'] != 'MANUAL_ONLY' or roles['deployment']['stage_auto_send'] is not True:
+        raise ValueError('Manual deployment and user-authorized AUTO_SEND=true required')
     if roles['lanes']['C1']['image_generation_enabled']:
         raise ValueError('C1 is independent QA only')
