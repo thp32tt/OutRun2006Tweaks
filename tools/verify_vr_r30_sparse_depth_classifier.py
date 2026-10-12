@@ -50,8 +50,8 @@ def static_contract(src, workflow):
     assert "for (UINT i = 0; i < vertexCount && sampled < 512u; ++i)" not in c
     assert "baseProjection, usedMask, touched);" in setup
     assert "const std::vector<std::uint32_t>* touched = nullptr" in setup
-    assert "&scratch.upUsed, nullptr, nullptr, nullptr," in up
-    assert "&scratch.upTouched))" in up
+    assert ("&scratch.upUsed, nullptr, nullptr, nullptr,\n"
+            "                    &scratch.upTouched))") in up
     assert "scratch.upTouched.push_back(raw);" in up
     assert "scratch.upUsed[raw] = 1;" in up
     assert "&scratch.indexCopy, &scratch.depthSignature," in vb
@@ -73,7 +73,10 @@ def negative_mutations(src, workflow):
         ("fastTouched ? (*touched)[visit] : visit", "visit"),
         ("visit < visitCount && sampled < 512u", "visit < vertexCount"),
         ("baseProjection, usedMask, touched);", "baseProjection, usedMask, nullptr);"),
-        ("&scratch.upTouched))", "nullptr))"),
+        ("&scratch.upUsed, nullptr, nullptr, nullptr,\n"
+         "                    &scratch.upTouched))",
+         "&scratch.upUsed, nullptr, nullptr, nullptr,\n"
+         "                    nullptr))"),
         ("&scratch.vbTouched) ||", "nullptr) ||"),
     ):
         assert src.count(old) >= 1, old
