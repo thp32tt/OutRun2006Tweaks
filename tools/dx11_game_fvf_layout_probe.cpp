@@ -197,7 +197,55 @@ int main() {
     assert(chosen[0] == .2f && chosen[1] == .9f);
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfNormal |
                             kGameFvfSpecular | kGameFvfTex1, layout));
+    // PSIZE occupies one float after NORMAL and before vertex COLOR/UV.
+    // This is the live game's diagnostic Draw/DrawIndexed FVF decoder.
+    assert(game_fvf_layout(kGameFvfXyz | kGameFvfNormal | kGameFvfPsize |
+                           kGameFvfDiffuse | kGameFvfSpecular | kGameFvfTex2, layout));
+    assert(layout.hasPointSize && layout.pointSizeBytes == 4u);
+    assert(layout.normalBytes == 12u && layout.diffuseOffset == 28u);
+    assert(layout.texcoordOffset == 36u && layout.minStride == 52u);
+    struct WorldPoint {
+        float x,y,z,nx,ny,nz,pointSize;
+        std::uint32_t diffuse,specular;
+        float u0,v0,u1,v1;
+    } worldPoint{1,2,3,0,0,1,10.f,0xff223344u,0xff556677u,.125f,.25f,.875f,.75f};
+    assert(sizeof(worldPoint) == 52u);
+    assert(game_fvf_decode_vertex(&worldPoint, sizeof(worldPoint), layout, sample));
+    assert(sample.position[2] == 3.f && sample.diffuse == 0xff223344u);
+    assert(game_fvf_select_uv(sample, layout, 1u, chosen));
+    assert(chosen[0] == .875f && chosen[1] == .75f);
+    const auto savedPoint = sample;
+    assert(!game_fvf_decode_vertex(&worldPoint, 51u, layout, sample));
+    assert(sample.diffuse == savedPoint.diffuse && sample.uv1[1] == savedPoint.uv1[1]);
+    auto invalidPoint = layout;
+    invalidPoint.pointSizeBytes = 0u;
+    assert(!game_fvf_decode_vertex(&worldPoint, sizeof(worldPoint), invalidPoint, sample));
+    invalidPoint = layout;
+    invalidPoint.diffuseOffset -= 4u;
+    assert(!game_fvf_decode_vertex(&worldPoint, sizeof(worldPoint), invalidPoint, sample));
+    // XYZRHW menu draw with per-vertex point size must read COLOR/TEX1 correctly.
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfPsize |
+                           kGameFvfDiffuse | kGameFvfTex1, layout));
+    assert(layout.diffuseOffset == 20u && layout.texcoordOffset == 24u &&
+           layout.minStride == 32u);
+    struct MenuPoint { float x,y,z,rhw,pointSize; std::uint32_t diffuse; float u,v; }
+    menuPoint{11,22,.5f,1.f,32.f,0xff112233u,.375f,.625f};
+    assert(sizeof(menuPoint) == 32u);
+    assert(game_fvf_decode_vertex(&menuPoint, sizeof(menuPoint), layout, sample));
+    assert(sample.diffuse == 0xff112233u && sample.uv[0] == .375f);
+    assert(!game_fvf_decode_vertex(&menuPoint, 31u, layout, sample));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfPsize | kGameFvfTex1, layout));
+    assert(!layout.hasDiffuse && layout.texcoordOffset == 20u && layout.minStride == 28u);
+    struct MenuPointUv { float x,y,z,rhw,pointSize,u,v; }
+    menuOnly{1,2,.4f,1.f,5.f,.2f,.8f};
+    assert(game_fvf_decode_vertex(&menuOnly, sizeof(menuOnly), layout, sample));
+    assert(sample.diffuse == 0xffffffffu && sample.uv[0] == .2f);
+    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfNormal |
+                            kGameFvfPsize | kGameFvfTex1, layout));
+    assert(!game_fvf_layout(kGameFvfXyz | kGameFvfPsize | kGameFvfTex1 |
+                            0x00010000u, layout));
     assert(game_fvf_layout(kGameFvfXyz | kGameFvfDiffuse, layout));
+    assert(!layout.hasPointSize && layout.pointSizeBytes == 0u);
     assert(!layout.textured && layout.minStride == 16);
     return 0;
 }

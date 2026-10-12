@@ -8,6 +8,7 @@ namespace outrun::vr::dx11::live_game_frame {
 constexpr std::uint32_t kGameFvfXyz = 0x002u;
 constexpr std::uint32_t kGameFvfXyzRhw = 0x004u;
 constexpr std::uint32_t kGameFvfNormal = 0x010u;
+constexpr std::uint32_t kGameFvfPsize = 0x020u;
 constexpr std::uint32_t kGameFvfDiffuse = 0x040u;
 constexpr std::uint32_t kGameFvfSpecular = 0x080u;
 constexpr std::uint32_t kGameFvfTex1 = 0x100u;
@@ -25,8 +26,10 @@ struct GameFvfLayout {
     bool textured = false;
     bool hasDiffuse = false;
     bool hasNormal = false;
+    bool hasPointSize = false;
     bool hasSpecular = false;
     std::uint32_t normalBytes = 0;
+    std::uint32_t pointSizeBytes = 0;
     std::uint32_t diffuseOffset = 0;
     std::uint32_t texcoordCount = 0;
     std::uint32_t positionBytes = 0;
@@ -41,10 +44,11 @@ constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcep
     // dimensions require another decoder and remain on the D3D9 path.
     // NORMAL and SPECULAR are byte fields preceding texcoords.
     const bool hasNormal = (fvf & kGameFvfNormal) != 0u;
+    const bool hasPointSize = (fvf & kGameFvfPsize) != 0u;
     if ((position != kGameFvfXyz && position != kGameFvfXyzRhw) ||
         (position == kGameFvfXyzRhw && hasNormal) ||
         texcoordBits > kGameFvfTex8 ||
-        (fvf & ~(kGameFvfXyz | kGameFvfXyzRhw | kGameFvfNormal |
+        (fvf & ~(kGameFvfXyz | kGameFvfXyzRhw | kGameFvfNormal | kGameFvfPsize |
                  kGameFvfDiffuse | kGameFvfSpecular |
                  kGameFvfTexCountMask)) != 0u)
         return false;
@@ -54,11 +58,16 @@ constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcep
     candidate.textured = candidate.texcoordCount != 0u;
     candidate.hasDiffuse = (fvf & kGameFvfDiffuse) != 0u;
     candidate.hasNormal = hasNormal;
+    candidate.hasPointSize = hasPointSize;
     candidate.hasSpecular = (fvf & kGameFvfSpecular) != 0u;
     if (!candidate.textured && !candidate.hasDiffuse) return false;
     candidate.positionBytes = candidate.pretransformed ? 16u : 12u;
     candidate.normalBytes = candidate.hasNormal ? 12u : 0u;
-    candidate.diffuseOffset = candidate.positionBytes + candidate.normalBytes;
+    // FVF stream: POSITION, NORMAL, PSIZE, DIFFUSE, SPECULAR, UVs.
+    // Native Draw handles triangles only; ignore the PSIZE value but skip it.
+    candidate.pointSizeBytes = candidate.hasPointSize ? 4u : 0u;
+    candidate.diffuseOffset = candidate.positionBytes + candidate.normalBytes +
+                              candidate.pointSizeBytes;
     candidate.texcoordOffset = candidate.diffuseOffset +
                                (candidate.hasDiffuse ? 4u : 0u) +
                                (candidate.hasSpecular ? 4u : 0u);
@@ -88,7 +97,9 @@ inline bool game_fvf_decode_vertex(const void* bytes, std::uint32_t stride,
         layout.positionBytes != (layout.pretransformed ? 16u : 12u) ||
         (layout.pretransformed && layout.hasNormal) ||
         layout.normalBytes != (layout.hasNormal ? 12u : 0u) ||
-        layout.diffuseOffset != layout.positionBytes + layout.normalBytes ||
+        layout.pointSizeBytes != (layout.hasPointSize ? 4u : 0u) ||
+        layout.diffuseOffset != layout.positionBytes + layout.normalBytes +
+                                layout.pointSizeBytes ||
         layout.texcoordOffset != layout.diffuseOffset +
                                  (layout.hasDiffuse ? 4u : 0u) +
                                  (layout.hasSpecular ? 4u : 0u) ||

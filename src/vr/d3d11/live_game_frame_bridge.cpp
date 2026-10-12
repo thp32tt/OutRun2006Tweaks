@@ -23,6 +23,7 @@ using Microsoft::WRL::ComPtr;
 static_assert(kGameFvfXyz == D3DFVF_XYZ && kGameFvfXyzRhw == D3DFVF_XYZRHW &&
               kGameFvfDiffuse == D3DFVF_DIFFUSE && kGameFvfTex1 == D3DFVF_TEX1 &&
               kGameFvfNormal == D3DFVF_NORMAL &&
+              kGameFvfPsize == D3DFVF_PSIZE &&
               kGameFvfSpecular == D3DFVF_SPECULAR &&
               kGameFvfTex2 == D3DFVF_TEX2 && kGameFvfTex3 == D3DFVF_TEX3 &&
               kGameFvfTex4 == D3DFVF_TEX4 &&
@@ -1187,6 +1188,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
     // Use the live game's exact FVF byte layout; avoid reading UV as
     // diffuse when a menu/sprite TEX1 vertex omits D3DFVF_DIFFUSE.
     if (!game_fvf_layout(fvf, layout)) return false;
+    // observe() admits triangle lists/strips/fans only: FVF PSIZE cannot
+    // affect triangle rasterization, but offsets for live COLOR/UV must skip it.
     capture.enabled = layout.textured;
     // Native VS has no additive specular interpolant. Object-space NORMAL
     // is valid only when D3DRS_LIGHTING is disabled below.
