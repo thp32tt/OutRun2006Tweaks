@@ -5168,7 +5168,11 @@ namespace OutRunVRStereo
 
     std::uint32_t R30SupportFrameStereoPoseSequence() noexcept
     {
-        return R29OwnerCaptureFrameSnapshot().poseSequence;
+        // R33 checks this on every fast-world/HUD draw; avoid collecting
+        // thirteen unrelated frame fields through the R29 snapshot path.
+        // Reading the same R29-owned scalar preserves zero/unlatched and
+        // mismatched-pose fail-closed decisions exactly.
+        return R29OwnerFrameStereoPoseSequence();
     }
 
     void R30SupportReleaseDirectAckState() noexcept

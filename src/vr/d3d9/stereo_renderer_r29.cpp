@@ -941,6 +941,10 @@ namespace OutRunVRStereo
     {
         return R29StereoInstallState.load(std::memory_order_acquire);
     }
+    std::uint32_t R29OwnerFrameStereoPoseSequence() noexcept
+    {
+        return FrameStereoPoseSequence;
+    }
     R29OwnerFrameSnapshot R29OwnerCaptureFrameSnapshot() noexcept
     {
         R29OwnerFrameSnapshot view{};

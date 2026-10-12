@@ -44,6 +44,9 @@ namespace OutRunVRStereo
         bool rightStencilSynchronized = false;
     };
     R29OwnerFrameSnapshot R29OwnerCaptureFrameSnapshot() noexcept;
+    // R33 world/HUD pose fence is checked per draw. Return only the owned
+    // sequence instead of assembling the unrelated render-target frame POD.
+    std::uint32_t R29OwnerFrameStereoPoseSequence() noexcept;
     // Only R29 accesses lower-chain IPC and adapter lifetime state.
     // Consumers receive copied dimensions/identity, never the shared pointer.
     bool R29OwnerRecommendedEyeExtent(std::uint32_t eye,
