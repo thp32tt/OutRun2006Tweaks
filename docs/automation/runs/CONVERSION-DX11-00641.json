@@ -11,9 +11,9 @@
   "work_key": "DX11:PM_CURRENT_TFACTOR_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "c8cda5e1d83901a5af2cb793e83e19ed311165f3",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -59,14 +59,52 @@
     "C0_RECOVER": "PASS: current 00640 C6 and distinct work_key",
     "C1_REVIEW": "PASS: missing D3DTOP_BLENDCURRENTALPHA/TFACTOR",
     "C2_IMPLEMENT": "PASS: real game state capture + HLSL native Draw",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING_MATERIAL_SHA",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Conversion Gate #38323129683 SUCCESS; DX11 Fast Structural Checks #38323129691 SUCCESS on 77e6df4978893ed7c2e2c7041d226f95fcd80df5.",
+    "C4_COMMIT": "PASS: material source implementation f51d8dc5fb4a5c93e4da44ffb0fdbcef4fb0d728; validation-bearing repair/result 77e6df4978893ed7c2e2c7041d226f95fcd80df5 (no CI-skip on result).",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: PASS_EXACT_SHA; runtime Quest3/VDXR and gamepad UNTESTED. No backend promotion."
   },
   "packaging": {
     "status": "NOT_REQUIRED",
     "reason": "No runtime gameplay/HMD evidence"
   },
-  "next_action": "Verify exact-SHA mandatory Actions; after SUCCESS seal separate C6 bookkeeping. HMD/gamepad remain UNTESTED."
+  "next_action": "C6 complete. Do not re-run this TASK_ID; hardware-only Quest3/VDXR gameplay/menu-to-race and input validation remains UNTESTED.",
+  "validation_bearing_result_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5",
+  "material_result_sha": "f51d8dc5fb4a5c93e4da44ffb0fdbcef4fb0d728",
+  "material_implementation_sha": "f51d8dc5fb4a5c93e4da44ffb0fdbcef4fb0d728",
+  "result_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5",
+  "validation_bearing_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5",
+  "completed_at": "2026-10-12T23:49:11.925Z",
+  "git_actions": {
+    "backend_conversion_gate": {
+      "run_id": 38323129683,
+      "conclusion": "success",
+      "head_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5"
+    },
+    "dx11_fast_structural": {
+      "run_id": 38323129691,
+      "conclusion": "success",
+      "head_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5"
+    },
+    "windows_build": {
+      "run_id": 38323133499,
+      "conclusion": "cancelled",
+      "head_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5"
+    },
+    "openxr_architecture": {
+      "run_id": 38323133551,
+      "conclusion": "cancelled",
+      "head_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5"
+    },
+    "hud_inspector": {
+      "run_id": 38323133768,
+      "conclusion": "cancelled",
+      "head_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5"
+    },
+    "vr_pc_fast_test_build": {
+      "run_id": 38323129685,
+      "conclusion": "skipped",
+      "head_sha": "77e6df4978893ed7c2e2c7041d226f95fcd80df5"
+    }
+  }
 }
