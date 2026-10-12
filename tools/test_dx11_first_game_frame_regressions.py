@@ -376,7 +376,7 @@ def main() -> None:
             "capture.texture->UnlockRect(level)",
             "dev->CreateTexture2D(", "dev->CreateShaderResourceView(",
             "state.ComparisonFunc = D3D11_COMPARISON_NEVER",
-            "state.MinLOD = 0.0f;", "state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;",
+            "state.MinLOD = usesMips ? static_cast<float>(capture.maxMipLevel) : 0.0f;", "state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;",
             "dev->CreateSamplerState(",
         )) and all(x in submit for x in (
             "mirror_texture(dev, capture, sampledView, sampledSampler)",
@@ -1568,7 +1568,7 @@ def main() -> None:
             "D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT) :",
             "D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :",
             "D3D11_FILTER_MIN_MAG_MIP_POINT);",
-            "state.MinLOD = 0.0f;",
+            "state.MinLOD = usesMips ? static_cast<float>(capture.maxMipLevel) : 0.0f;",
             "state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;",
             "dev->CreateSamplerState(&state, sampler.GetAddressOf())",
         )) and all(token in submit for token in (
@@ -1585,7 +1585,7 @@ def main() -> None:
         "capture.magFilter = static_cast<D3DTEXTUREFILTERTYPE>(mag);",
         "D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT) :",
         "D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :",
-        "state.MinLOD = 0.0f;",
+        "state.MinLOD = usesMips ? static_cast<float>(capture.maxMipLevel) : 0.0f;",
         "ctx->PSSetSamplers(0, 1, &boundSampler)",
     ):
         broken = bridge.replace(token, "/* disconnected 00561 filter link */", 1)
