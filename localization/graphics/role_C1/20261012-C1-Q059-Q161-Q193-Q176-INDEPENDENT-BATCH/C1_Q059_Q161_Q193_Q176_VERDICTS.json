@@ -1,0 +1,269 @@
+{
+  "schema": "outrun-C1-independent-saved-dds-batch-v3",
+  "run_key": "C1-Q059-Q161-Q193-Q176-20261012-1840",
+  "review_started_kst": "2026-10-12 18:40",
+  "git_source_HEAD": "29ce19e56705189951705c9d7ac3b646b320c4ba",
+  "source_clean_and_final_bound_independently": true,
+  "policy": "HD_PNG_IMAGEGEN_AND_FAST_QA_20261012; SOURCE-to-CLEAN and FINAL separate, actual UI UV not guessed",
+  "candidate_count": 4,
+  "contact": "C1_Q059_Q161_Q193_Q176_SINGLE_COMPARE_NATIVE_75_50_RAW.jpg",
+  "contact_sha256": "f711a59ea8697379aa178356a2a05dddc89867d7f74f9bc8f4fc9d2faa7ec99b",
+  "machine_evidence": "C1_Q059_Q161_Q193_Q176_PIXEL_MACHINE.json",
+  "results": [
+    {
+      "queue_index": 59,
+      "producer": "A255",
+      "source_sha256": "9c35216873d617ed68df55be424f35ddf50b1eacc8ee86072068745aea166f9f",
+      "source_clean_sha256": "dda22f376a2e0b6f96b886808d48ff4e545d7cd41e7647c9cb93a792ab147ae5",
+      "final_saved_sha256": "742ec2fa0f3867833260ce0794cf8638d3e05883c3e11477625d3310cadda815",
+      "scope": "Race The Rivals! → 라이벌과 레이스! ONLY",
+      "bbox": [
+        75,
+        222,
+        625,
+        304
+      ],
+      "source_clean_gate": "SCOPED_PASS_ROI_ALPHA0_SHA_VERIFIED",
+      "final_gate": "HOLD",
+      "verdict": "HOLD",
+      "hard_defects_proven": [],
+      "hold_findings": [
+        {
+          "classification": "UNEXPLAINED_VISIBLE_RGBA_OUTSIDE_SCOPED_ROI",
+          "bbox": [
+            155,
+            70,
+            1295,
+            297
+          ],
+          "count": 383,
+          "alpha_channel_changes": 0,
+          "examples": [
+            [
+              240,
+              70
+            ],
+            [
+              390,
+              70
+            ],
+            [
+              397,
+              70
+            ]
+          ],
+          "details": "Official-to-saved DDS differs in 383 RGBA pixels on preexisting alpha-positive atlas content outside inspected localization cell; do not assume BC tolerance or protected-art exemption before mapping original occupied sprite cells."
+        }
+      ],
+      "translated_in_reviewed_scope": 1,
+      "untranslated_in_reviewed_scope": 0,
+      "remaining_uninspected": "Other atlas labels NOT INVENTORIED",
+      "static_glyph": "PASS_NATIVE_75_50",
+      "C3": "NOT_RUN",
+      "runtime": "UNTESTED"
+    },
+    {
+      "queue_index": 161,
+      "producer": "A237",
+      "source_sha256": "a74d31016e9ab38da4f6bd9a37196848534b9a1c8ac04db3f071000030681c4d",
+      "source_clean_sha256": "60f5b09266bad5f517c06cdd23b02576ec493b5149fc03dea59ee8d1843f1720",
+      "final_saved_sha256": "fd1273493b52c39da0f858ca956d402e86b0b2f04f17987ca2cbf1878a2c68d0",
+      "scope": "R11 AQUARIUS/물병자리, R16 SOUTH KOREA/대한민국, R24 ITALY/이탈리아 ONLY",
+      "bboxes": [
+        [
+          717,
+          1671,
+          1013,
+          1725
+        ],
+        [
+          2,
+          1479,
+          403,
+          1530
+        ],
+        [
+          6,
+          1224,
+          160,
+          1272
+        ]
+      ],
+      "source_clean_gate": "SCOPED_PASS_ALL3_SOURCE_CLEAN_OUTSIDE_UNION0_CLEAN_ALPHA0",
+      "final_gate": "C1_STATIC_PASS_SCOPED_3_OF_38_WITH_FULL_ATLAS_HOLD",
+      "verdict": "C1_STATIC_PASS",
+      "hard_defects_proven": [],
+      "hold_findings": [
+        {
+          "classification": "OTHER_35_CELLS_UNINSPECTED",
+          "bbox": [
+            0,
+            0,
+            2048,
+            2048
+          ],
+          "details": "Never promote whole atlas; historical producer/C2/C3 REWORK and game outstanding."
+        }
+      ],
+      "source_clean_outside_3_roi_rgba": 0,
+      "official_final_outside_3_roi_rgba": 0,
+      "translated_in_reviewed_scope": 3,
+      "untranslated_in_reviewed_scope": 0,
+      "remaining_uninspected": "35 of 38 labeled regions; untranslated count UNKNOWN",
+      "static_glyph": "PASS_NATIVE_75_50",
+      "C3": "NOT_RUN",
+      "runtime": "UNTESTED"
+    },
+    {
+      "queue_index": 193,
+      "producer": "A246",
+      "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "source_clean_sha256": "5bfc8cf8d4496423cbd793d14e632d92decd91502e2b30995b4461a3127ca9ae",
+      "final_saved_sha256": "980662036fcdd75b0676890acc496c27e9322bc3c95999b8bfea3d2ee81c4b8f",
+      "scope": "Goal B-E, 15 Cont., ONLINE: 6 named ROIs ONLY",
+      "bboxes": [
+        [
+          1413,
+          221,
+          1622,
+          268
+        ],
+        [
+          1660,
+          156,
+          1832,
+          194
+        ],
+        [
+          492,
+          221,
+          648,
+          268
+        ],
+        [
+          30,
+          221,
+          188,
+          268
+        ],
+        [
+          1473,
+          308,
+          1629,
+          355
+        ],
+        [
+          1011,
+          308,
+          1171,
+          355
+        ]
+      ],
+      "source_clean_gate": "HOLD_ONLY_FOUR_GOAL_B_E_EMPTY; CLEAN retains alpha in first two previously localized cells",
+      "final_gate": "HOLD",
+      "verdict": "HOLD",
+      "hard_defects_proven": [],
+      "hold_findings": [
+        {
+          "classification": "SOURCE_CLEAN_TWO_ROI_NOT_EMPTY",
+          "bbox": [
+            1413,
+            221,
+            1832,
+            268
+          ],
+          "exact_rois": [
+            [
+              1413,
+              221,
+              1622,
+              268
+            ],
+            [
+              1660,
+              156,
+              1832,
+              194
+            ]
+          ],
+          "alpha_positive": [
+            2560,
+            1392
+          ],
+          "details": "A246 CLEAN_RAW PNG contains already localized pixels in 15 Cont. and ONLINE; not an independent English-free empty plate for those two."
+        },
+        {
+          "classification": "OTHER_ATLAS_CELLS_UNINSPECTED",
+          "bbox": [
+            0,
+            0,
+            2048,
+            1024
+          ]
+        }
+      ],
+      "official_final_changed_outside_6_roi": 0,
+      "translated_in_reviewed_scope": 6,
+      "untranslated_in_reviewed_scope": 0,
+      "remaining_uninspected": "Other atlas strings not completely counted; preserved names/logo are excluded",
+      "static_glyph": "SCOPED_NATIVE_75_50_READABLE",
+      "C3": "NOT_RUN",
+      "runtime": "UNTESTED"
+    },
+    {
+      "queue_index": 176,
+      "producer": "B366",
+      "source_sha256": "8ba40915abca8b7022acbcc743e93186970fdf7e29f0eb80e84903d31074c708",
+      "source_clean_sha256": null,
+      "producer_reported_clean_sha_unverified": "29e77ca7391022eff23b84a197a41c123938f3aa03a6fb7c69a783d0ce0b6ebe",
+      "final_saved_sha256": "ec35b79ce4baa72485f3446559a16dcdc040a2a3f99b99f38c641b549e0e15c5",
+      "scope": "FLAGMAN 4 → 플래그맨 4 only",
+      "bbox": [
+        8,
+        49,
+        988,
+        204
+      ],
+      "source_clean_gate": "HOLD_NO_INDEPENDENT_CLEAN_BYTES",
+      "final_gate": "HOLD",
+      "verdict": "HOLD",
+      "hard_defects_proven": [],
+      "hold_findings": [
+        {
+          "classification": "SOURCE_CLEAN_ARTIFACT_NOT_MATERIALIZED",
+          "bbox": [
+            8,
+            49,
+            988,
+            204
+          ],
+          "details": "CLEAN SHA appears in producer report but byte content was not independently recovered, so do not claim passed source-clean."
+        }
+      ],
+      "official_final_changed_outside_roi": 0,
+      "translated_in_reviewed_scope": 1,
+      "untranslated_in_reviewed_scope": 0,
+      "remaining_uninspected": "3 other existing label cells; untranslated count not independently counted",
+      "static_glyph": "SCOPED_NATIVE_75_50_READABLE",
+      "C3": "NOT_RUN",
+      "runtime": "UNTESTED"
+    }
+  ],
+  "scope_qa_only": true,
+  "generated_korean_images": 0,
+  "generated_dds": 0,
+  "official_promotions": 0,
+  "new_C2_tokens": 0,
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "Docker": "NOT_TOUCHED",
+  "AUTO_SEND": "NOT_TOUCHED",
+  "game_folder": "NOT_TOUCHED",
+  "excluded": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ],
+  "dedup": "q048/q099/q175 excluded due previous SAME-SHA C1; q035/q026/q154/q098 previous batch not repeated"
+}
