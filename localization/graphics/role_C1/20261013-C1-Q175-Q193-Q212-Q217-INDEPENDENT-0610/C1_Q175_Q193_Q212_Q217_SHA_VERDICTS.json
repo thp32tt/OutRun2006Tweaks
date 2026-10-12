@@ -1,0 +1,560 @@
+{
+  "schema": "outrun-C1-20261013-independent-4-candidate-static-qa-v4",
+  "task_id": "OUTRUN-KOR-C1-20261013-0610-Q175-Q193-Q212-Q217",
+  "review_date": "2026-10-13",
+  "role": "C1 QA only",
+  "reviewer": "ChatGPT AI1, independent of producer A/B",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_document_blob_sha": {
+    "contract": "44754d4d95bcde9a457c9127d1102fc2ea69b0da",
+    "hd_fast_qa": "5ae6007b45073af8f3fd14122de523476730be61"
+  },
+  "candidate_selection": "4 distinct A/B persisted DDS candidate sha256 absent from prior role_C1 QA; past C1 production not self-approved. q175 A216, q193 A243, q212 B358, q217 A231.",
+  "source": "Canonical SHA-authenticated upstream HD DDS cached original (not the localized current hd_candidates), candidate exact saved bytes retrieved from GitHub",
+  "comparison_board": {
+    "file": "localization/graphics/role_C1/20261013-C1-Q175-Q193-Q212-Q217-INDEPENDENT-0610/C1_Q175_Q193_Q212_Q217_BATCH_7WAY.jpg",
+    "sha256": "ea1440e33d1cebfa35fcf9cf9ebc2880b81efceae424f9196aa900fb8c44ccac",
+    "columns": [
+      "SOURCE RAW",
+      "SOURCE READABLE FLIPY",
+      "EXACT CLEAN READABLE",
+      "SAVED DDS RAW",
+      "SAVED DDS FLIPY",
+      "75% scaled preview",
+      "50% scaled preview"
+    ],
+    "scope": "6 independent text entries on 4 DDS atlases",
+    "game_image_footprint": "75/50 represent static proxies only; no actual gameplay capture"
+  },
+  "hard_defect_zoom": {
+    "file": "localization/graphics/role_C1/20261013-C1-Q175-Q193-Q212-Q217-INDEPENDENT-0610/C1_Q175_SHOWROOM_GLYPH_DEFECT_ZOOM.jpg",
+    "sha256": "a9770c92c039a0d4876cd27286f5da6087963fc4eb8146901bed49226a11c65e"
+  },
+  "candidate_results": [
+    {
+      "queue_index": 175,
+      "producer": "A216",
+      "source_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+      "clean_sha256": "273ba1f73d60f5748981f6cba7a71c86d1cbcc043a05e893bc912b2ca916e058",
+      "final_sha256": "a5e921ab2563a1ec6a3a1954a247a07d0a9adb9e101c4d73682600476e39323c",
+      "source_path": "work/C2_0820_q175_source.dds",
+      "clean_path": "localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_P1_SOURCE_CLEAN_ONLY.png",
+      "final_path": "localization/graphics/role_A/20261010-A216-Q175-WELDED-MANUAL-SOURCE-CHROME/A216_Q175_MANUAL_SOURCE_WELDED_CHROME_TRIAL.dds",
+      "DDS_header": {
+        "w": 2048,
+        "h": 1024,
+        "mip": 1,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "bits": 32,
+        "redmask": 16711680,
+        "length": 8388736
+      },
+      "header_equal_exact": true,
+      "clean_orientation": "readable",
+      "clean_orientation_autoselected_not_proof": true,
+      "regions": [
+        {
+          "name": "SHOWROOM",
+          "source_english_bbox_readable": [
+            6,
+            397,
+            956,
+            529
+          ],
+          "review_roi_readable": [
+            0,
+            353,
+            1020,
+            568
+          ],
+          "translation": "쇼룸",
+          "source_clean": {
+            "changed_pixels_in_examined_roi": 92909,
+            "changed_outside_reported_source_bbox": 23260,
+            "out_of_bbox_coordinates_global": [
+              6,
+              353,
+              1020,
+              568
+            ]
+          },
+          "clean_final": {
+            "changed_pixels_in_examined_roi": 62414,
+            "changed_outside_reported_source_bbox": 0,
+            "out_of_bbox_coordinates_global": null
+          },
+          "source_final": {
+            "changed_pixels_in_examined_roi": 121642,
+            "changed_outside_reported_source_bbox": 23260,
+            "out_of_bbox_coordinates_global": [
+              6,
+              353,
+              1020,
+              568
+            ]
+          }
+        }
+      ],
+      "dxt_block_inspection": {},
+      "reviewed_texts": 1,
+      "uninspected_atlas_texts": "UNKNOWN",
+      "full_asset_verdict": "TEST_ONLY/HOLD",
+      "runtime": "UNTESTED",
+      "plate_file": "c1_0610_review/q175_sevenway.jpg",
+      "plate_sha256": "393920b0fc3acd42d82772198b39d0b2d2c353be1733e882ea4e76161b0e2a75",
+      "verdict": "REWORK",
+      "text_scope": "SHOWROOM → 쇼룸",
+      "reviewed_text_count": 1,
+      "untranslated_count_scoped": 0,
+      "readability": "FAIL; saved Hangul syllables geometrically disintegrate into roof/rail outlines, not reliably readable as 쇼룸 native/75/50. Strong visual glyph integrity defect, NOT superficial style discrepancy.",
+      "confirmed_defect_coords_readable": [
+        [
+          56,
+          400,
+          866,
+          527
+        ]
+      ],
+      "source_clean_status": "HOLD_PROTECTION_BOUNDARY",
+      "clean_final_status": "REWORK_VISUAL_GLYPHS_AND_SOURCE_CLEAN_SCOPE",
+      "note": "SOURCE→CLEAN original-effect-outside differences 23260 in ROI; exact origin of these adjacent changes and true UI cell bounds not proven. CLEAN→FINAL inside bbox but final syllable shape invalid. Do not assume surroundings safe.",
+      "risk": "IGR032 OPEN; whole atlas and game remain blocked",
+      "source_clean_sha_pair": [
+        "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+        "273ba1f73d60f5748981f6cba7a71c86d1cbcc043a05e893bc912b2ca916e058"
+      ],
+      "clean_final_sha_pair": [
+        "273ba1f73d60f5748981f6cba7a71c86d1cbcc043a05e893bc912b2ca916e058",
+        "a5e921ab2563a1ec6a3a1954a247a07d0a9adb9e101c4d73682600476e39323c"
+      ],
+      "glyph_effect_bbox_not_assumed_as_UI_cell": true,
+      "inspected_text_count": 1,
+      "untranslated_in_inspected_scope": 0,
+      "total_untranslated_full_dds": "UNKNOWN_NOT_INSPECTED",
+      "runtime_validation": "UNTESTED",
+      "release_gate": "TEST_ONLY/HOLD"
+    },
+    {
+      "queue_index": 193,
+      "producer": "A243",
+      "source_sha256": "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+      "clean_sha256": "6bf835697665e52e09a6e8d4648e13f2e2f1159496a4b9c751f47936990bf978",
+      "final_sha256": "79a831d6d6d9351a442e766e16617d79720f32085640bbf874bcc11d1928799f",
+      "source_path": "work/c2_20261012_q193_source.dds",
+      "clean_path": "localization/graphics/role_A/20261011-A243-Q193-15CONT-SOURCE-CLEAN-PILOT/A243_PLATE_ONLY_RAW.png",
+      "final_path": "localization/graphics/role_A/20261011-A243-Q193-15CONT-SOURCE-CLEAN-PILOT/A243_Q193_15CONT_TRUE_CLEAN_NATIVE_TRIAL_UNPROMOTED.dds",
+      "DDS_header": {
+        "w": 2048,
+        "h": 1024,
+        "mip": 1,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "bits": 32,
+        "redmask": 255,
+        "length": 8388736
+      },
+      "header_equal_exact": true,
+      "clean_orientation": "raw",
+      "clean_orientation_autoselected_not_proof": false,
+      "regions": [
+        {
+          "name": "15_CONT",
+          "source_english_bbox_readable": [
+            1413,
+            221,
+            1622,
+            268
+          ],
+          "review_roi_readable": [
+            1350,
+            175,
+            1690,
+            310
+          ],
+          "translation": "15 연속전",
+          "source_clean": {
+            "changed_pixels_in_examined_roi": 4925,
+            "changed_outside_reported_source_bbox": 514,
+            "out_of_bbox_coordinates_global": [
+              1479,
+              175,
+              1690,
+              310
+            ]
+          },
+          "clean_final": {
+            "changed_pixels_in_examined_roi": 4114,
+            "changed_outside_reported_source_bbox": 0,
+            "out_of_bbox_coordinates_global": null
+          },
+          "source_final": {
+            "changed_pixels_in_examined_roi": 6426,
+            "changed_outside_reported_source_bbox": 514,
+            "out_of_bbox_coordinates_global": [
+              1479,
+              175,
+              1690,
+              310
+            ]
+          }
+        }
+      ],
+      "dxt_block_inspection": {},
+      "reviewed_texts": 1,
+      "uninspected_atlas_texts": "UNKNOWN",
+      "full_asset_verdict": "TEST_ONLY/HOLD",
+      "runtime": "UNTESTED",
+      "plate_file": "c1_0610_review/q193_sevenway.jpg",
+      "plate_sha256": "6199e373b9a72036efc41625f46a4328560937ff3b8cfeb2da5f4344d2f501bd",
+      "verdict": "HOLD",
+      "text_scope": "15 CONT. → 15 연속전",
+      "reviewed_text_count": 1,
+      "untranslated_count_scoped": 0,
+      "readability": "Text is native-legible on light background; low contrast on gray/dark backgrounds also exists in English SOURCE, so no ungrounded glyph FAIL, but actual background/UV visibility unverified.",
+      "confirmed_defect_coords_readable": [],
+      "evidence_gap_coords_readable": [
+        [
+          1479,
+          175,
+          1690,
+          310
+        ]
+      ],
+      "source_clean_status": "HOLD_UNATTRIBUTED_514_RGBA_OUTSIDE_REPORTED_SOURCE_GLYPH_BBOX",
+      "clean_final_status": "SCOPED_SHA_PINNED_0_PIXELS_OUTSIDE_REPORTED_ENGLISH_EFFECT_BBOX",
+      "note": "Original SOURCE→CLEAN and SOURCE→FINAL 514 RGBA changes outside documented glyph bbox at edges of ROI; could be inherited neighboring content, not proven actual UI cell damage. C3/game and real UI cell remain unresolved.",
+      "risk": "IGR003/019/033 OPEN; full atlas not reviewed",
+      "source_clean_sha_pair": [
+        "d308bf0558ed46ab531c869c65260e37a02f125ceaf7efd0f12524c3d0266451",
+        "6bf835697665e52e09a6e8d4648e13f2e2f1159496a4b9c751f47936990bf978"
+      ],
+      "clean_final_sha_pair": [
+        "6bf835697665e52e09a6e8d4648e13f2e2f1159496a4b9c751f47936990bf978",
+        "79a831d6d6d9351a442e766e16617d79720f32085640bbf874bcc11d1928799f"
+      ],
+      "glyph_effect_bbox_not_assumed_as_UI_cell": true,
+      "inspected_text_count": 1,
+      "untranslated_in_inspected_scope": 0,
+      "total_untranslated_full_dds": "UNKNOWN_NOT_INSPECTED",
+      "runtime_validation": "UNTESTED",
+      "release_gate": "TEST_ONLY/HOLD"
+    },
+    {
+      "queue_index": 212,
+      "producer": "B358",
+      "source_sha256": "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+      "clean_sha256": "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+      "final_sha256": "38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8",
+      "source_path": "work/c1_1640_q212_source.dds",
+      "clean_path": "localization/graphics/role_C/20261005-C158-BA0147DA/C158_VERIFIED_CLEAN_PLATE.png",
+      "final_path": "localization/graphics/role_B/20261010-B358-Q212-OLD-GLYPH-CLEAN-REBUILD/B358_Q212_TWO_FAMILY_NATIVE_UNAPPROVED.dds",
+      "DDS_header": {
+        "w": 2048,
+        "h": 2048,
+        "mip": 1,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "bits": 32,
+        "redmask": 255,
+        "length": 16777344
+      },
+      "header_equal_exact": true,
+      "clean_orientation": "readable",
+      "clean_orientation_autoselected_not_proof": true,
+      "regions": [
+        {
+          "name": "PROFESSIONAL",
+          "source_english_bbox_readable": [
+            240,
+            341,
+            637,
+            386
+          ],
+          "review_roi_readable": [
+            170,
+            300,
+            710,
+            426
+          ],
+          "translation": "프로페셔널 모드",
+          "source_clean": {
+            "changed_pixels_in_examined_roi": 13753,
+            "changed_outside_reported_source_bbox": 3600,
+            "out_of_bbox_coordinates_global": [
+              222,
+              386,
+              638,
+              404
+            ]
+          },
+          "clean_final": {
+            "changed_pixels_in_examined_roi": 16744,
+            "changed_outside_reported_source_bbox": 11619,
+            "out_of_bbox_coordinates_global": [
+              170,
+              341,
+              638,
+              404
+            ]
+          },
+          "source_final": {
+            "changed_pixels_in_examined_roi": 21840,
+            "changed_outside_reported_source_bbox": 11619,
+            "out_of_bbox_coordinates_global": [
+              170,
+              341,
+              638,
+              404
+            ]
+          }
+        },
+        {
+          "name": "OUTRUN",
+          "source_english_bbox_readable": [
+            1626,
+            524,
+            1837,
+            569
+          ],
+          "review_roi_readable": [
+            1570,
+            480,
+            1910,
+            609
+          ],
+          "translation": "아웃런 모드",
+          "source_clean": {
+            "changed_pixels_in_examined_roi": 5822,
+            "changed_outside_reported_source_bbox": 149,
+            "out_of_bbox_coordinates_global": [
+              1633,
+              569,
+              1786,
+              587
+            ]
+          },
+          "clean_final": {
+            "changed_pixels_in_examined_roi": 7187,
+            "changed_outside_reported_source_bbox": 3798,
+            "out_of_bbox_coordinates_global": [
+              1626,
+              569,
+              1837,
+              587
+            ]
+          },
+          "source_final": {
+            "changed_pixels_in_examined_roi": 9863,
+            "changed_outside_reported_source_bbox": 3798,
+            "out_of_bbox_coordinates_global": [
+              1626,
+              569,
+              1837,
+              587
+            ]
+          }
+        }
+      ],
+      "dxt_block_inspection": {},
+      "reviewed_texts": 2,
+      "uninspected_atlas_texts": "UNKNOWN",
+      "full_asset_verdict": "TEST_ONLY/HOLD",
+      "runtime": "UNTESTED",
+      "plate_file": "c1_0610_review/q212_sevenway.jpg",
+      "plate_sha256": "1981f6661ed605a5436476642980578fd4c2ec3e2e16e6b7f7dca73debaf9f53",
+      "verdict": "HOLD",
+      "text_scope": "PROFESSIONAL → 프로페셔널 모드; OUTRUN → 아웃런 모드",
+      "reviewed_text_count": 2,
+      "untranslated_count_scoped": 0,
+      "readability": "Both Korean labels readable native/75/50, moderate style/scale differences acceptable.",
+      "confirmed_defect_coords_readable": [],
+      "evidence_gap_coords_readable": [
+        [
+          170,
+          341,
+          638,
+          404
+        ],
+        [
+          1626,
+          569,
+          1837,
+          587
+        ]
+      ],
+      "source_clean_status": "HOLD_PROTECTION_AND_UI_CELL_UNMAPPED",
+      "clean_final_status": "HOLD_NEIGHBORING_TEXT_AND_OLD_ATLAS_PIXEL_CHANGES_NOT_FULLY_ATTRIBUTED",
+      "note": "Two ROI SOURCE→CLEAN deltas outside individual source effect bboxes 3600 and 149; CLEAN→FINAL outside 11619 and 3798. Shared atlas with neighboring labels: cannot call this protected damage or assume it is harmless without documented actual cell/UV or full-atlas coverage.",
+      "risk": "P1 IGR029 OPEN; C3/user game retest required",
+      "source_clean_sha_pair": [
+        "f83f58483aab7a99ffe230c86eaa0527d9b7323be36808bdf69f2817e29c9f61",
+        "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67"
+      ],
+      "clean_final_sha_pair": [
+        "c13a24922d4d5e208b8c228fb51f9464d82b42442d9a14f08f7242305e314c67",
+        "38aac182b8691062259b0c758173f19c790b04afbb8e84d241f0b9023c2478a8"
+      ],
+      "glyph_effect_bbox_not_assumed_as_UI_cell": true,
+      "inspected_text_count": 2,
+      "untranslated_in_inspected_scope": 0,
+      "total_untranslated_full_dds": "UNKNOWN_NOT_INSPECTED",
+      "runtime_validation": "UNTESTED",
+      "release_gate": "TEST_ONLY/HOLD"
+    },
+    {
+      "queue_index": 217,
+      "producer": "A231",
+      "source_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+      "clean_sha256": "015e07de95d6fbb38a82525714115ab841e51d82d55677217645bcb5e34064e9",
+      "final_sha256": "8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b",
+      "source_path": "work/c1_1640_q217_source.dds",
+      "clean_path": "localization/graphics/role_A/20261011-A231-Q217-SOURCE-RED-RIM-RESTORE/A231_CLEAN_FULL_NATIVE_READABLE.png",
+      "final_path": "localization/graphics/role_A/20261011-A231-Q217-SOURCE-RED-RIM-RESTORE/A231_Q217_RED_RIM_RESTORED_UNPROMOTED.dds",
+      "DDS_header": {
+        "w": 2048,
+        "h": 2048,
+        "mip": 1,
+        "fourcc": "\u0000\u0000\u0000\u0000",
+        "bits": 32,
+        "redmask": 255,
+        "length": 16777344
+      },
+      "header_equal_exact": true,
+      "clean_orientation": "readable",
+      "clean_orientation_autoselected_not_proof": false,
+      "regions": [
+        {
+          "name": "START",
+          "source_english_bbox_readable": [
+            803,
+            509,
+            884,
+            532
+          ],
+          "review_roi_readable": [
+            751,
+            470,
+            939,
+            570
+          ],
+          "translation": "출발",
+          "source_clean": {
+            "changed_pixels_in_examined_roi": 1744,
+            "changed_outside_reported_source_bbox": 0,
+            "out_of_bbox_coordinates_global": null
+          },
+          "clean_final": {
+            "changed_pixels_in_examined_roi": 725,
+            "changed_outside_reported_source_bbox": 0,
+            "out_of_bbox_coordinates_global": null
+          },
+          "source_final": {
+            "changed_pixels_in_examined_roi": 1755,
+            "changed_outside_reported_source_bbox": 0,
+            "out_of_bbox_coordinates_global": null
+          }
+        },
+        {
+          "name": "GOAL",
+          "source_english_bbox_readable": [
+            1343,
+            771,
+            1420,
+            795
+          ],
+          "review_roi_readable": [
+            1286,
+            729,
+            1470,
+            841
+          ],
+          "translation": "골",
+          "source_clean": {
+            "changed_pixels_in_examined_roi": 1752,
+            "changed_outside_reported_source_bbox": 0,
+            "out_of_bbox_coordinates_global": null
+          },
+          "clean_final": {
+            "changed_pixels_in_examined_roi": 416,
+            "changed_outside_reported_source_bbox": 0,
+            "out_of_bbox_coordinates_global": null
+          },
+          "source_final": {
+            "changed_pixels_in_examined_roi": 1760,
+            "changed_outside_reported_source_bbox": 0,
+            "out_of_bbox_coordinates_global": null
+          }
+        }
+      ],
+      "dxt_block_inspection": {},
+      "reviewed_texts": 2,
+      "uninspected_atlas_texts": "UNKNOWN",
+      "full_asset_verdict": "TEST_ONLY/HOLD",
+      "runtime": "UNTESTED",
+      "plate_file": "c1_0610_review/q217_sevenway.jpg",
+      "plate_sha256": "01a048f790f6a7ab20927e92cac342e7a29ef1e62855cc7309fc7e4e830b769c",
+      "verdict": "C1_STATIC_PASS",
+      "text_scope": "START → 출발; GOAL → 골",
+      "reviewed_text_count": 2,
+      "untranslated_count_scoped": 0,
+      "readability": "Both native stored DDS Korean words are legible native, 75% and 50% on actual red badge background; minor bevel/size variance acceptable. Distinct SHA from previous q217 A232 REWORK.",
+      "confirmed_defect_coords_readable": [],
+      "source_clean_status": "C1_SCOPED_PIXEL_PASS_EXACT_SOURCE_CLEAN_SHA",
+      "clean_final_status": "C1_SCOPED_PIXEL_PASS_EXACT_CLEAN_FINAL_SHA",
+      "note": "SOURCE→CLEAN 1744 and 1752 changed pixels; CLEAN→FINAL 725 and 416 changed pixels, 0 outside both original text-effect bboxes within reviewed ROIs. Actual game UI cell and rest of atlas not certified.",
+      "risk": "P1/shared art; C3/user actual game retest OPEN",
+      "source_clean_sha_pair": [
+        "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+        "015e07de95d6fbb38a82525714115ab841e51d82d55677217645bcb5e34064e9"
+      ],
+      "clean_final_sha_pair": [
+        "015e07de95d6fbb38a82525714115ab841e51d82d55677217645bcb5e34064e9",
+        "8043bd79fe6b5b235c5e7c119e64c8f11e65f34c77b9d69071bfd2ca37b11f1b"
+      ],
+      "glyph_effect_bbox_not_assumed_as_UI_cell": true,
+      "inspected_text_count": 2,
+      "untranslated_in_inspected_scope": 0,
+      "total_untranslated_full_dds": "UNKNOWN_NOT_INSPECTED",
+      "runtime_validation": "UNTESTED",
+      "release_gate": "TEST_ONLY/HOLD"
+    }
+  ],
+  "totals": {
+    "dds_reviewed": 4,
+    "distinct_saved_SHA": 4,
+    "canonical_source_SHA_authenticated": 4,
+    "CLEAN_png_SHA_authenticated": 4,
+    "final_saved_DDS_SHA_authenticated": 4,
+    "inspected_text_count": 6,
+    "untranslated_texts_in_inspected_scope": 0,
+    "uninspected_full_dds_untranslated_count": "UNKNOWN",
+    "C1_STATIC_PASS_scoped_dds": 1,
+    "REWORK_dds": 1,
+    "HOLD_dds": 2,
+    "whole_atlas_approval": 0,
+    "release_approval": 0,
+    "produced_png": 0,
+    "produced_dds": 0,
+    "new_C2_tokens": 0
+  },
+  "downstream": {
+    "C2": "RETIRED_NO_NEW_C2",
+    "historical_gate_C2_dependency": "UNMIGRATED__TEST_ONLY_HOLD",
+    "C3": "NOT_RUN",
+    "user_game": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "P0_P1_shared_atlas": "C3/user retest required"
+  },
+  "deployment": {
+    "Docker": "NOT_TOUCHED",
+    "Portainer": "NOT_TOUCHED",
+    "AUTO_SEND": "NOT_TOUCHED",
+    "game_folder": "NOT_TOUCHED",
+    "release": "NOT_DONE"
+  },
+  "queue": "NO_NEW_QUEUE_NO_RESET",
+  "excluded_domains": [
+    "VR",
+    "FFB",
+    "DX11",
+    "DXVK"
+  ]
+}
