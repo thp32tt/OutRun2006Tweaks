@@ -11,9 +11,9 @@
   "work_key": "DX11:PM_RGB_MODULATE_TEXTURE_TFACTOR_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "7593311a86fa8fc424f6a799b2bda2ed50cf9d3d",
-  "status": "IMPLEMENTED_AWAIT_EXACT_SHA_GATE",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -58,18 +58,55 @@
   "pipeline": {
     "C0_RECOVER": "PASS: 00635 active on remote, disjoint PM TFACTOR modulation path not previously present",
     "C1_REVIEW": "PASS: exact RGB PM plus alpha TFACTOR modulation missing; existing PM factor SELECT outputs a different alpha",
-    "C2_IMPLEMENT": "C++/HLSL source, TFACTOR capture, PS pipeline and Draw binding staged",
-    "C3_VALIDATE": "PENDING exact commit CI and negative source + numeric tests",
-    "C4_COMMIT": "PENDING material SHA; no CI skip",
+    "C2_IMPLEMENT": "PASS actual D3D9 PM RGB / ALPHA MODULATE(TEXTURE,TFACTOR) capture, normalized game high-byte constant, compiled PS and native Draw/DrawIndexed; DX9Ex opt-in fallback",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Conversion Gate #38314485276 (validate Win32+WARP smoke) SUCCESS, DX11 Fast #38314485264 SUCCESS, Windows Build #38314492048 SUCCESS, OpenXR #38314492085 SUCCESS at 1242fbcb58bed8b66b27de08af665ae99b947d94. HUD #38314492041 in progress, not claimed.",
+    "C4_COMMIT": "PASS material C++/HLSL 4c71582002cf69bbbc4ca90883789e19f4cbc5a5; feature test anchor repair 1242fbcb58bed8b66b27de08af665ae99b947d94; both no CI skip",
     "C5_PACKAGE": "NOT_REQUIRED: dormant opt-in diagnostic only, no user-facing binary promotion",
-    "C6_STATE": "PENDING exact-SHA results"
+    "C6_STATE": "PASS_EXACT_SHA: C6 bookkeeping separated from validation-bearing code commit; HMD/game/menu/race/gamepad UNTESTED"
   },
   "packaging": {
     "status": "NOT_REQUIRED",
-    "reason": "No native gameplay promotion; Quest3/VDXR testing pending"
+    "reason": "No native gameplay promotion, distribution, or Quest3/VDXR runtime proof."
   },
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "next_action": "Run exact-SHA Backend Conversion Gate, DX11 Fast, Windows Build and OpenXR/HUD workflows; C6 bookkeeping after verification. Do not claim runtime PASS; leave menu-to-race HMD/gamepad NEED_HMD_TEST."
+  "material_result_sha": "4c71582002cf69bbbc4ca90883789e19f4cbc5a5",
+  "validation_bearing_result_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94",
+  "result_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94",
+  "next_action": "New independent DX11 feature after this exact-SHA source/CI success; HMD/gamepad/menu/vehicle/race parity NEED_HMD_TEST only; previous task C6 is not dependency for new source work. DXVK frozen.",
+  "material_implementation_sha": "4c71582002cf69bbbc4ca90883789e19f4cbc5a5",
+  "validation_runs": {
+    "backend_conversion_gate": {
+      "run_id": 38314485276,
+      "conclusion": "SUCCESS",
+      "head_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94"
+    },
+    "dx11_fast": {
+      "run_id": 38314485264,
+      "conclusion": "SUCCESS",
+      "head_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94"
+    },
+    "windows_build": {
+      "run_id": 38314492048,
+      "conclusion": "SUCCESS",
+      "head_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94"
+    },
+    "openxr_architecture": {
+      "run_id": 38314492085,
+      "conclusion": "SUCCESS",
+      "head_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94"
+    },
+    "hud_inspector": {
+      "run_id": 38314492041,
+      "conclusion": "IN_PROGRESS",
+      "head_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94"
+    }
+  },
+  "failure_recovery": {
+    "first_candidate_sha": "4c71582002cf69bbbc4ca90883789e19f4cbc5a5",
+    "initial_fast_run_id": 38314342995,
+    "initial_backend_run_id": 38314342991,
+    "cause": "Feature-owned Python regression expected pre-refactor adjacent TFACTOR read and allowlist anchors, whereas new C++ preserved the legacy 00619/00635 anchors and isolated the new stage path.",
+    "corrected_validation_bearing_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94",
+    "corrected_fast_and_gate": "SUCCESS"
+  },
+  "completed_at": "2026-10-13T07:16:40+09:00"
 }
