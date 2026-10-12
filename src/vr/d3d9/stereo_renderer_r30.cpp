@@ -2213,8 +2213,41 @@ namespace OutRunVRStereo
             if (width <= 0.0f || height <= 0.0f ||
                 !std::isfinite(depthSpan) || depthSpan <= 1.0e-6f)
                 return false;
-            const float ndcScaleX = 2.0f / width;
-            const float ndcScaleY = 2.0f / height;
+            // Convert viewport/NDC to per-eye pixel-space affine coefficients
+            // ONCE per draw. The rare affine-only world particle route used
+            // to do two viewport conversions and two eye corrections per
+            // selected vertex. Preserve the same RHW-only parallax guard.
+            const float halfWidth = width * 0.5f;
+            const float halfHeight = height * 0.5f;
+            const float centerX = x0 + halfWidth;
+            const float centerY = y0 + halfHeight;
+            float affineScaleX[2]{};
+            float affineScaleY[2]{};
+            float affineBiasX[2]{};
+            float affineBiasY[2]{};
+            float affineRhwX[2]{};
+            float affineRhwY[2]{};
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                affineScaleX[eye] = state.worldScaleX[eye];
+                affineScaleY[eye] = state.worldScaleY[eye];
+                affineBiasX[eye] =
+                    (1.0f - affineScaleX[eye]) * centerX +
+                    state.worldOffsetX[eye] * halfWidth;
+                affineBiasY[eye] =
+                    (1.0f - affineScaleY[eye]) * centerY -
+                    state.worldOffsetY[eye] * halfHeight;
+                affineRhwX[eye] = state.parallaxPerRhwX[eye] * halfWidth;
+                affineRhwY[eye] = -state.parallaxPerRhwY[eye] * halfHeight;
+                if (!std::isfinite(affineScaleX[eye]) ||
+                    !std::isfinite(affineScaleY[eye]) ||
+                    !std::isfinite(affineBiasX[eye]) ||
+                    !std::isfinite(affineBiasY[eye]) ||
+                    !std::isfinite(affineRhwX[eye]) ||
+                    !std::isfinite(affineRhwY[eye]))
+                    return false;
+            }
+            std::uint8_t* eyeData[2]{ left.data(), right.data() };
             const auto* sourceBytes = static_cast<const std::uint8_t*>(source);
             for (UINT i = 0; i < vertexCount; ++i)
             {
@@ -2230,31 +2263,23 @@ namespace OutRunVRStereo
                 if (!std::isfinite(x) || !std::isfinite(y) ||
                     !std::isfinite(z) || !std::isfinite(rhw))
                     return false;
-                const float ndcX = (x - x0) * ndcScaleX - 1.0f;
-                const float ndcY = 1.0f - (y - y0) * ndcScaleY;
                 const bool parallax = rhw > 0.0f && rhw < 1000.0f;
                 for (int eye = 0; eye < 2; ++eye)
                 {
-                    float correctedX =
-                        state.worldScaleX[eye] * ndcX +
-                        state.worldOffsetX[eye];
-                    float correctedY =
-                        state.worldScaleY[eye] * ndcY +
-                        state.worldOffsetY[eye];
+                    float transformedX =
+                        affineScaleX[eye] * x + affineBiasX[eye];
+                    float transformedY =
+                        affineScaleY[eye] * y + affineBiasY[eye];
                     if (parallax)
                     {
-                        correctedX += state.parallaxPerRhwX[eye] * rhw;
-                        correctedY += state.parallaxPerRhwY[eye] * rhw;
+                        transformedX += affineRhwX[eye] * rhw;
+                        transformedY += affineRhwY[eye] * rhw;
                     }
-                    const float transformedX =
-                        x0 + (correctedX + 1.0f) * 0.5f * width;
-                    const float transformedY =
-                        y0 + (1.0f - correctedY) * 0.5f * height;
                     if (!std::isfinite(transformedX) ||
                         !std::isfinite(transformedY))
                         return false;
                     auto* dst = reinterpret_cast<float*>(
-                        (eye == 0 ? left.data() : right.data()) + offset);
+                        eyeData[eye] + offset);
                     dst[0] = transformedX;
                     dst[1] = transformedY;
                     // Preserve game Z/RHW, packed colour and UV bytes.

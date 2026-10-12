@@ -29,24 +29,33 @@ def verify_source(source):
         "usedMask && usedMask->size() < vertexCount",
         "if (usedMask && !(*usedMask)[i])",
         "std::isfinite(z)", "std::isfinite(rhw)",
-        "const float ndcX = (x - x0) * ndcScaleX - 1.0f;",
-        "const float ndcY = 1.0f - (y - y0) * ndcScaleY;",
+        "const float halfWidth = width * 0.5f;",
+        "const float halfHeight = height * 0.5f;",
+        "affineScaleX[eye] = state.worldScaleX[eye];",
+        "affineScaleY[eye] = state.worldScaleY[eye];",
+        "(1.0f - affineScaleX[eye]) * centerX +",
+        "state.worldOffsetX[eye] * halfWidth",
+        "(1.0f - affineScaleY[eye]) * centerY -",
+        "state.worldOffsetY[eye] * halfHeight",
+        "affineRhwX[eye] = state.parallaxPerRhwX[eye] * halfWidth;",
+        "affineRhwY[eye] = -state.parallaxPerRhwY[eye] * halfHeight;",
+        "if (!std::isfinite(affineBiasX[eye]) ||",
         "rhw > 0.0f && rhw < 1000.0f",
         "for (int eye = 0; eye < 2; ++eye)",
-        "state.worldScaleX[eye] * ndcX +",
-        "state.worldOffsetX[eye]",
-        "state.worldScaleY[eye] * ndcY +",
-        "state.worldOffsetY[eye]",
-        "state.parallaxPerRhwX[eye] * rhw",
-        "state.parallaxPerRhwY[eye] * rhw",
+        "affineScaleX[eye] * x + affineBiasX[eye]",
+        "affineScaleY[eye] * y + affineBiasY[eye]",
+        "transformedX += affineRhwX[eye] * rhw;",
+        "transformedY += affineRhwY[eye] * rhw;",
         "if (!std::isfinite(transformedX) ||",
-        "(eye == 0 ? left.data() : right.data()) + offset",
+        "eyeData[eye] + offset",
         "dst[0] = transformedX;",
         "dst[1] = transformedY;",
     ):
         assert term in body, "missing affine contract: " + term
     assert body.count("for (UINT i = 0; i < vertexCount; ++i)") == 1
-    assert body.index("const float ndcX") < body.index("for (int eye = 0; eye < 2")
+    assert body.index("const float halfWidth") < body.index("for (UINT i = 0; i < vertexCount; ++i)")
+    assert body.index("affineBiasX[eye]") < body.index("for (UINT i = 0; i < vertexCount; ++i)")
+    assert "const float ndcX =" not in body and "const float ndcY =" not in body
     assert "dst[2] =" not in body and "dst[3] =" not in body
     assert "R30TryFusedWorldXyzrhwProjection(" in stereo
     guard = "if (!state.fullWorldReprojection)"
@@ -69,6 +78,19 @@ def affine(x, y, rhw, view, eye):
         cy += py[eye] * rhw
     return (x0 + (cx + 1.0) * 0.5 * w,
             y0 + (1.0 - cy) * 0.5 * h)
+
+
+def affine_composed(x, y, rhw, view, eye):
+    x0, y0, w, h, sx, sy, ox, oy, px, py = view
+    half_w, half_h = w * .5, h * .5
+    bias_x = (1 - sx[eye]) * (x0 + half_w) + ox[eye] * half_w
+    bias_y = (1 - sy[eye]) * (y0 + half_h) - oy[eye] * half_h
+    out_x = sx[eye] * x + bias_x
+    out_y = sy[eye] * y + bias_y
+    if 0.0 < rhw < 1000.0:
+        out_x += px[eye] * half_w * rhw
+        out_y -= py[eye] * half_h * rhw
+    return out_x, out_y
 
 
 def verify_math():
@@ -101,14 +123,62 @@ def verify_math():
             for i, (x, y, z, rhw, packed) in enumerate(pts):
                 if mask[i]:
                     for eye in range(2):
-                        new[eye][i] = (*affine(x, y, rhw, view, eye), z, rhw, packed)
-            assert new == old, "bilateral pixel/depth/attribute divergence"
+                        new[eye][i] = (*affine_composed(x, y, rhw, view, eye), z, rhw, packed)
+            for eye in range(2):
+                for baseline, composed in zip(old[eye], new[eye]):
+                    if baseline is None:
+                        assert composed is None
+                    else:
+                        assert baseline[2:] == composed[2:], "Z/RHW/packed changed"
+                        assert abs(baseline[0] - composed[0]) < 1e-9
+                        assert abs(baseline[1] - composed[1]) < 1e-9
             checked += sum(mask)
     assert checked > 1000
     # Any source NaN/Inf in a selected vertex must fail before either draw.
     for bad in (math.nan, math.inf, -math.inf):
         assert not math.isfinite(bad)
     return checked
+
+
+def verify_float32_parity():
+    # Model the single-precision arithmetic used by the game, including
+    # source position, viewport, eye coefficients and RHW boundaries.
+    import struct
+    f32 = lambda v: struct.unpack("<f", struct.pack("<f", v))[0]
+    rng = random.Random(691)
+    maximum_error = 0.0
+    for _ in range(12000):
+        x0, y0 = f32(rng.randrange(0, 320)), f32(rng.randrange(0, 240))
+        w = f32(rng.choice((320, 640, 1280, 3440, 4096)))
+        h = f32(rng.choice((240, 720, 1440, 2160)))
+        x = f32(x0 + rng.uniform(-.25, 1.25) * w)
+        y = f32(y0 + rng.uniform(-.25, 1.25) * h)
+        sx = f32(rng.uniform(.7, 1.3)); sy = f32(rng.uniform(.7, 1.3))
+        ox = f32(rng.uniform(-.5, .5)); oy = f32(rng.uniform(-.5, .5))
+        px = f32(rng.uniform(-.002, .002)); py = f32(rng.uniform(-.002, .002))
+        rhw = f32(rng.choice((-1., 0., .000001, .5, 10., 999.9, 1000.)))
+        nx = f32(f32(x - x0) * f32(2. / w) - 1.)
+        ny = f32(1. - f32(f32(y - y0) * f32(2. / h)))
+        cx = f32(f32(sx * nx) + ox)
+        cy = f32(f32(sy * ny) + oy)
+        if 0. < rhw < 1000.:
+            cx = f32(cx + f32(px * rhw))
+            cy = f32(cy + f32(py * rhw))
+        old_x = f32(x0 + f32(f32(cx + 1.) * f32(.5) * w))
+        old_y = f32(y0 + f32(f32(1. - cy) * f32(.5) * h))
+        half_w, half_h = f32(w * .5), f32(h * .5)
+        bx = f32(f32(f32(1. - sx) * f32(x0 + half_w)) + f32(ox * half_w))
+        by = f32(f32(f32(1. - sy) * f32(y0 + half_h)) - f32(oy * half_h))
+        new_x = f32(f32(sx * x) + bx)
+        new_y = f32(f32(sy * y) + by)
+        if 0. < rhw < 1000.:
+            new_x = f32(new_x + f32(f32(px * half_w) * rhw))
+            new_y = f32(new_y - f32(f32(py * half_h) * rhw))
+        maximum_error = max(maximum_error,
+                            abs(old_x - new_x), abs(old_y - new_y))
+        assert abs(old_x - new_x) < .005
+        assert abs(old_y - new_y) < .005
+    return maximum_error
 
 
 def main():
@@ -122,10 +192,13 @@ def main():
         ("std::isfinite(z)", "true"),
         ("std::isfinite(rhw)", "true"),
         ("rhw > 0.0f && rhw < 1000.0f", "rhw >= 0.0f && rhw <= 1000.0f"),
-        ("state.parallaxPerRhwX[eye] * rhw", "0.0f"),
-        ("state.parallaxPerRhwY[eye] * rhw", "0.0f"),
-        ("state.worldScaleX[eye] * ndcX +", "0.0f +"),
-        ("state.worldScaleY[eye] * ndcY +", "0.0f +"),
+        ("transformedX += affineRhwX[eye] * rhw;", "transformedX += 0.0f;"),
+        ("transformedY += affineRhwY[eye] * rhw;", "transformedY += 0.0f;"),
+        ("affineScaleX[eye] = state.worldScaleX[eye];", "affineScaleX[eye] = 1.0f;"),
+        ("affineScaleY[eye] = state.worldScaleY[eye];", "affineScaleY[eye] = 1.0f;"),
+        ("state.worldOffsetX[eye] * halfWidth", "0.0f * halfWidth"),
+        ("state.worldOffsetY[eye] * halfHeight", "0.0f * halfHeight"),
+        ("if (!std::isfinite(affineBiasX[eye]) ||", "if (false ||"),
         ("dst[0] = transformedX;", "dst[0] = x;"),
         ("dst[1] = transformedY;", "dst[1] = y;"),
     )
@@ -142,7 +215,8 @@ def main():
             continue
         raise AssertionError("undetected destructive mutation: " + good)
     checked = verify_math()
-    print(f"PASS R30 affine-only binocular source routing, {len(mutations)} negative mutations, {checked} referenced vertices")
+    error = verify_float32_parity()
+    print(f"PASS R30 draw-local world affine coefficients, {len(mutations)} negative mutations, {checked} referenced vertices, 12000 float32 pairs, max delta {error:.6f}px")
 
 
 if __name__ == "__main__":
