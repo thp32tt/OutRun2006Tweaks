@@ -458,7 +458,12 @@ require(
     "ExpectedDeclaredFormat",
     "case D3DFMT_A8R8G8B8",
     "DXGI_FORMAT_B8G8R8A8_UNORM",
-    "desc[0].Format == declared",
+    # R23 persistent shared-eye cache validates newly opened textures and
+    # cached hits against the Frame.v2 declared format before copy/fence/ACK.
+    # The pre-cache desc[0] array no longer exists.
+    "fresh.desc.Format == declared",
+    "fresh.desc.Format == second.Format",
+    "cached.desc.Format != declared",
     "host-owned GPU eye copies + completion ACK active",
     "SafeTransportGeneration",
 )
