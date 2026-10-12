@@ -1409,7 +1409,7 @@ def main() -> None:
     assert "alphaArg1 != D3DTA_TEXTURE" in state_section
     assert "AlphaGate(c.a); return c;" in shader_section
     assert "mirror_texture(dev, capture, sampledView, sampledSampler)" in submit_section
-    assert "ctx->PSSetShader(capture.blendTextureAlpha ?" in submit_section
+    assert "ctx->PSSetShader(capture.selectDiffuseTextureAlpha ?" in submit_section
     for link in blend_links[:-2]:
         if "blendTextureAlpha && !blendDiffuseAlpha)" in link:
             continue
@@ -1643,7 +1643,7 @@ def main() -> None:
         return (all(token in code for token in factor_links) and
                 "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)" in intake and
                 "static_cast<float>(output.alphaFunc), capture.blendFactorAlphaValue" in submit and
-                "ctx->PSSetShader(capture.blendTextureAlpha ?" in submit and
+                "ctx->PSSetShader(capture.selectDiffuseTextureAlpha ?" in submit and
                 "capture.blendFactorAlpha ? s.blendFactorAlphaPs.Get() :" in submit and
                 code.count("s.blendFactorAlphaPs.Reset();") == 2 and
                 code.count("blendTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;") == 2)
@@ -1712,7 +1712,7 @@ def main() -> None:
                 code.count("s.blendFactorTextureAlphaPs.Reset();") == 2 and
                 code.count("s.blendFactorModulateAlphaPs.Reset();") == 2 and
                 "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)" in gate and
-                "ctx->PSSetShader(capture.blendTextureAlpha ?" in draw)
+                "ctx->PSSetShader(capture.selectDiffuseTextureAlpha ?" in draw)
     assert mixed_factor_integrated(bridge)
     for token in mixed_factor_links[:-2]:
         broken = bridge.replace(token, "/* disconnect 00563 producer/consumer */")
