@@ -23,7 +23,7 @@ def verify(src: str) -> None:
     bypass = pos("#if !defined(OUTRUN_VR_FORCE_LIVE_RASTER_COMPARE)")
     guard = pos("if (seededStereo &&")
     stateblock = pos("IsTrackedStateBlockReliable() &&")
-    shadow = pos("GetTrackedRasterShadow().Valid()")
+    shadow = pos("TrackedRasterShadowValid()")
     fastreturn = body.index("return R23ClearR22Hook.stdcall<HRESULT>(", shadow)
     endif = pos("#endif")
     capture = pos("const bool stateOk = R23CaptureActualGameState(")
@@ -59,7 +59,7 @@ def verify_draw(src: str) -> None:
     serial = pos("++R23GameDrawSerial;")
     ifdef = pos("#if !defined(OUTRUN_VR_FORCE_LIVE_RASTER_COMPARE)")
     reliable = pos("if (IsTrackedStateBlockReliable() &&")
-    shadow = pos("GetTrackedRasterShadow().Valid())")
+    shadow = pos("TrackedRasterShadowValid())")
     bypass = pos("return;\n#endif")
     endif = pos("#endif")
     fallback = pos('R23CaptureActualGameState(device, ignored, "Draw", false);')
@@ -80,7 +80,7 @@ def verify_draw_mutations(src: str) -> int:
         ("++R23GameDrawSerial;", "/* draw serial lost */"),
         ("#if !defined(OUTRUN_VR_FORCE_LIVE_RASTER_COMPARE)", "#if 1"),
         ("if (IsTrackedStateBlockReliable() &&", "if (true &&"),
-        ("GetTrackedRasterShadow().Valid())", "true)"),
+        ("TrackedRasterShadowValid())", "true)"),
         ("return;\n#endif", "/* no fast exit */\n#endif"),
         ('R23CaptureActualGameState(device, ignored, "Draw", false);',
          "/* no unsafe fallback capture */"),
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         ("OutRunVR::RuntimeEligibility::MayInjectStereo();", "true;"),
         ("#if !defined(OUTRUN_VR_FORCE_LIVE_RASTER_COMPARE)", "#if 1"),
         ("IsTrackedStateBlockReliable() &&", "true &&"),
-        ("GetTrackedRasterShadow().Valid()", "true"),
+        ("TrackedRasterShadowValid()", "true"),
         ("if (seededStereo)\n", "if (true)\n"),
         ('const bool stateOk = R23CaptureActualGameState(\n                device, actual, "Clear", true);',
          "const bool stateOk = true;"),
