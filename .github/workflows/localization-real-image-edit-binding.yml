@@ -7,6 +7,7 @@ on:
       - 'tools/localization/test_imagegen_source_edit_bridge.py'
       - 'tools/localization/imagegen_b_pipeline.py'
       - 'localization/graphics/role_B/imagegen_requests/q092_B_OPENAI_EDIT_SOURCE_REQUEST.json'
+      - 'localization/graphics/role_B/imagegen_requests/q048_B_OPENAI_EDIT_SOURCE_REQUEST.json'
       - 'localization/graphics/role_C1/imagegen_requests/q102_C1_OPENAI_EDIT_SOURCE_REQUEST.json'
       - 'localization/graphics/role_C1/imagegen_requests/q102_LINE2_C1_OPENAI_EDIT_SOURCE_REQUEST.json'
       - '.github/workflows/localization-real-image-edit-binding.yml'
@@ -20,6 +21,7 @@ on:
           - C1_q102
           - C1_q102_line2
           - B_q092
+          - B_q048
 permissions:
   contents: read
 jobs:
@@ -42,6 +44,8 @@ jobs:
         run: python tools/localization/imagegen_source_edit_bridge.py --repo . --dry-run --request localization/graphics/role_C1/imagegen_requests/q102_LINE2_C1_OPENAI_EDIT_SOURCE_REQUEST.json
       - name: B PSD English text-only SHA preflight (no generation)
         run: python tools/localization/imagegen_source_edit_bridge.py --repo . --dry-run --request localization/graphics/role_B/imagegen_requests/q092_B_OPENAI_EDIT_SOURCE_REQUEST.json
+      - name: B q048 source-derived Slipstream actual binary SHA preflight (no generation)
+        run: python tools/localization/imagegen_source_edit_bridge.py --repo . --dry-run --request localization/graphics/role_B/imagegen_requests/q048_B_OPENAI_EDIT_SOURCE_REQUEST.json
 
   live-remote-multipart-edit:
     if: github.event_name == 'workflow_dispatch'
@@ -75,6 +79,7 @@ jobs:
             C1_q102_line2) REQUEST="localization/graphics/role_C1/imagegen_requests/q102_LINE2_C1_OPENAI_EDIT_SOURCE_REQUEST.json";;
             C1_q102) REQUEST="localization/graphics/role_C1/imagegen_requests/q102_C1_OPENAI_EDIT_SOURCE_REQUEST.json";;
             B_q092) REQUEST="localization/graphics/role_B/imagegen_requests/q092_B_OPENAI_EDIT_SOURCE_REQUEST.json";;
+            B_q048) REQUEST="localization/graphics/role_B/imagegen_requests/q048_B_OPENAI_EDIT_SOURCE_REQUEST.json";;
             *) echo "::error::Unknown pilot"; exit 2;;
           esac
           python tools/localization/imagegen_source_edit_bridge.py --repo . --request "$REQUEST"

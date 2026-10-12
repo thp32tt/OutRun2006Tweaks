@@ -1,0 +1,30 @@
+{
+  "schema": "outrun-b-imagegen-attachment-readiness-v1",
+  "task_id": "OUTRUN-KOR-B-Q048-MULTIPART-BRIDGE-20261012-0931",
+  "role": "B",
+  "queue_index": 48,
+  "priority": "P1",
+  "user_ingame_report": "IGR-009",
+  "existing_work_preserved": true,
+  "source_request_path": "localization/graphics/role_B/imagegen_requests/q048_B_OPENAI_EDIT_SOURCE_REQUEST.json",
+  "source_reference_path": "localization/graphics/role_B/source_references/q048_20261012/q048_B408_ENGLISH_LETTERSTYLE_ONLY_5PX.png",
+  "source_reference_sha256": "8a6aa8d897af573f98e9848ae25d7366a5c759f87b235116d420ac062cf09bcf",
+  "source_reference_origin": "SHA-bound canonical DDS SOURCE minus previous clean, source RGBA retained for 25556 selected foreground pixels; speed line excluded; not Photoshop leaf separation or independently PLATE_PASS",
+  "test_gates": [
+    "actual GitHub raw image SHA preflight",
+    "real-binary source path validated before API invocation",
+    "B index modulo 4 parity check",
+    "no-key fail-closed synthetic negative test",
+    "GitHub-hosted no-charge dry-run on push"
+  ],
+  "status": "SOURCE_REFERENCE_NOT_BOUND_PENDING_PROVIDER_APPROVAL_AND_LIVE_MULTIPART_RECEIPT",
+  "real_generation_attempts_this_run": 0,
+  "qualified_korean_png": 0,
+  "new_korean_dds": 0,
+  "official_promotions": 0,
+  "C2": "NOT_RUN_NEW_INPUT",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "open_backlog": "IGR-009_OPEN",
+  "next": "Obtain explicit authorization to use billed OpenAI Images Edit API as B provider and encrypted GitHub Actions API key, then user-dispatch B_q048; inspect actual receipt, exact Hangul and alpha before any DDS conversion."
+}

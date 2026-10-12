@@ -116,6 +116,26 @@ class BridgeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "exact target"):
             bridge.preflight(self.root, self.req)
 
+    def test_b_mod4_48_source_bytes_and_credential_gate(self):
+        self.req.update({
+            "role": "B",
+            "queue_index": 48,
+            "target_text": "슬립스트림",
+            "prompt": "Create one transparent Korean glyph layer: 슬립스트림",
+            "output_dir": "localization/graphics/role_B/imagegen_requests",
+            "request_key": "q048_B_SLIPSTREAM_UNIT_ONLY",
+        })
+        path, binary_source, proof = bridge.preflight(self.root, self.req)
+        self.assertEqual(self.source, path)
+        self.assertEqual(bridge.digest(binary_source), proof["source_sha256"])
+        with mock.patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(RuntimeError, "SOURCE_ATTACHMENT_API_CREDENTIAL_MISSING"):
+                bridge.run(self.root, self.req)
+        self.assertFalse((self.root / self.req["output_dir"]).exists())
+        self.req["queue_index"] = 50
+        with self.assertRaisesRegex(ValueError, "B shard"):
+            bridge.preflight(self.root, self.req)
+
     def test_no_api_key_means_zero_calls_and_zero_output(self):
         with mock.patch.dict(os.environ, {}, clear=True):
             with self.assertRaisesRegex(RuntimeError, "SOURCE_ATTACHMENT_API_CREDENTIAL_MISSING"):
