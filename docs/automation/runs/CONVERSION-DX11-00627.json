@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_PM_RGB_BLENDTEXTUREALPHA_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "9e2326ea2e9c7cf7d5e6633f67ff967510d78ad6",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -58,13 +58,14 @@
     "C0_RECOVER": "PASS: latest 00626 C6; selected disjoint 00627 work_key",
     "C1_REVIEW": "PASS: mixed PM RGB + BLENDTEXTUREALPHA unimplemented",
     "C2_IMPLEMENT": "PASS: shader, live capture, native Draw, test",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "MATERIAL_COMMIT_PENDING",
+    "C3_VALIDATE": "PASS_EXACT_SHA: existing GitHub CI SUCCESS for b0471b833739cb9bcb1bc78276cdb2abeb03c3ef; no build/CI rerun",
+    "C4_COMMIT": "PASS: existing validation-bearing source commit b0471b833739cb9bcb1bc78276cdb2abeb03c3ef; C6 bookkeeping only",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED; HMD/Quest3/VDXR/gamepad runtime UNTESTED"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Verify exact material SHA Actions; repair failures before scoring. Runtime Quest3/VDXR/gamepad UNTESTED."
+  "next_action": "C6 complete on existing exact SHA; no CI rerun or source edit. Actual Quest3/VDXR, gamepad input and native visual parity remain UNTESTED; no duplicate TASK_ID scoring.",
+  "validation_bearing_result_sha": "b0471b833739cb9bcb1bc78276cdb2abeb03c3ef"
 }
