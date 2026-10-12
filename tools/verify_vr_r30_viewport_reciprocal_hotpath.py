@@ -10,8 +10,11 @@ WORKFLOW = ROOT / ".github/workflows/vr-dx9ex-active.yml"
 
 
 def body_for(source: str) -> str:
+    # This guard owns the original single-eye vertex fallback only. The
+    # 00684 fused-binocular path is verified independently, and including
+    # it here adds a third valid viewport-NDC expression to a two-use gate.
     return source.split("bool R30TransformXyzrhwVertices(", 1)[1].split(
-        "bool R30TransformXyzrhwStereo(", 1)[0]
+        "bool R30TryFusedWorldXyzrhwProjection(", 1)[0]
 
 
 def valid(code: str) -> bool:
