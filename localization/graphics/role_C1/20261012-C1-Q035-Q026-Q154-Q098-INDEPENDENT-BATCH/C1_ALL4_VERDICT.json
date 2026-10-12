@@ -1,0 +1,211 @@
+{
+  "schema": "outrun-c1-independently-verified-native-batch-v1",
+  "reviewed_at_kst": "2026-10-12 18:25",
+  "run_key": "C1-Q035-Q026-Q154-Q098-20261012-1810",
+  "role": "C1",
+  "policy_sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md"
+  ],
+  "policy": "No C1 generation; 4 genuinely different candidates, actual source/CLEAN/final SHA and RAW/FLIPY/native/75/50 contact; true UI cell unknown is never enlarged from blank padding; only scoped outcomes.",
+  "source_clean_evidence": {
+    "q35": {
+      "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+      "clean_sha256": "e27fc6877970a1784b3fee3340e8769f8f6b28e7c4b609b9bd1a63bf069eb18e",
+      "rgab_changes_outside_two_original_full_effect_regions": 0,
+      "result": "SOURCE_CLEAN_SCOPED_PASS_REUSED_SHA_AND_INDEPENDENT_PIXELS"
+    },
+    "q26": {
+      "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+      "clean_sha256": "9d9cb6a19dce1ff192ad931ec6e70740e9c0676898544e2bd03bfa60bd033a29",
+      "rgab_changes_outside_two_original_original_text_regions": 0,
+      "result": "SOURCE_CLEAN_SCOPED_PASS"
+    },
+    "q154": {
+      "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+      "clean_sha256": null,
+      "result": "HOLD_CLEAN_FULL_ATLAS_NOT_VERIFIED"
+    },
+    "q98": {
+      "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+      "clean_sha256": "c04e242730a30eb85342e780ebec11c3b852eff7993c92790760bc3218c1d11e",
+      "result": "SOURCE_CLEAN_SCOPED_PASS_WITH_CORRECTED_ORIGINAL_FRINGE",
+      "exact_alpha_fringe": [
+        [
+          756,
+          122
+        ],
+        [
+          757,
+          122
+        ],
+        [
+          758,
+          122
+        ],
+        [
+          759,
+          122
+        ],
+        [
+          762,
+          122
+        ],
+        [
+          763,
+          122
+        ],
+        [
+          764,
+          122
+        ],
+        [
+          765,
+          122
+        ],
+        [
+          766,
+          122
+        ],
+        [
+          767,
+          122
+        ],
+        [
+          768,
+          122
+        ],
+        [
+          772,
+          122
+        ],
+        [
+          773,
+          122
+        ],
+        [
+          774,
+          122
+        ]
+      ],
+      "source_fringe_alpha": "1..2",
+      "clean_fringe_alpha": 0,
+      "saved_fringe_alpha": 0,
+      "native_source_true_alpha_bbox": [
+        431,
+        6,
+        1674,
+        123
+      ],
+      "saved_native_alpha_bbox": [
+        513,
+        13,
+        1524,
+        115
+      ]
+    }
+  },
+  "results": [
+    {
+      "queue_index": 35,
+      "producer": "A250",
+      "candidate_sha256": "5ac62e3ef33ff39277fcef5bd7b00cc36c99666ccd01ac0f5a022e22e37b2369",
+      "verdict": "C1_STATIC_PASS",
+      "scope": "ONLY two Total Rank labels pink and green; original source full-effect regions [600,342,1128,444] [2266,363,2785,448]",
+      "glyph_readability": "PASS native/75/50 right-lean 종합 랭킹 legible; width differences ignored",
+      "protected": "Source-to-CLEAN outside effect region RGBA0; CLEAN-to-FINAL outside0; transparent background/plaque is preserved in inspected ROIs",
+      "actual_UV_cell": "NOT_INDEPENDENTLY_MAPPED; candidate confined within preexisting original glyph/effect region, so no extra claimed cell space",
+      "defects": [],
+      "remaining_untranslated_reviewed_scope": 0,
+      "uninspected_whole_atlas": "NOT_COUNTED",
+      "remaining": "C3/user in-game and official promotion HOLD"
+    },
+    {
+      "queue_index": 26,
+      "producer": "B existing",
+      "candidate_sha256": "2dfc6214ce2383ef01f2739baeff04890d5ff78330b192fcee0d864f6caff719",
+      "verdict": "C1_STATIC_PASS",
+      "scope": "ONLY two Total Rank labels star/speech [747,1174,1271,1275] [599,156,1124,246]",
+      "glyph_readability": "PASS native/75/50 Korean 종합 랭킹 readable; stylistic/size difference accepted; no concrete malformed strokes",
+      "protected": "SOURCE/CLEAN outside exact two text regions0 RGBA and CLEAN/FINAL outside0, original decorative starburst/bubble visibly retained",
+      "actual_UV_cell": "NOT_INDEPENDENTLY_MAPPED; approved only within source English effect footprint; C390 older optical REWORK and user pre-ingame #002 not closed",
+      "defects": [],
+      "remaining_untranslated_reviewed_scope": 0,
+      "uninspected_whole_atlas": "NOT_COUNTED",
+      "remaining": "C3/user JPG/game OPEN; historic blocked export unchanged"
+    },
+    {
+      "queue_index": 154,
+      "producer": "B354",
+      "candidate_sha256": "190462fb95c9b2951c24557d1a6b145a14db4bad8eb4518fcd4c3be6ec159c35",
+      "verdict": "HOLD",
+      "scope": "ONLY SINGLE PLAYER, SHOWROOM, MULTIPLAYER R06/R07/R08; three target cells [1610,286,2197,350], [2674,288,3094,350], [2566,952,3086,1014]",
+      "glyph_readability": "SCOPED_READABLE native/75/50; no fake jamo visually proven, short Korean labels not reason to fail",
+      "protected": "Full SOURCE-to-CLEAN bytes not recovered; source-to-saved differs 623882 RGBA pixels beyond reviewed 3 cells, known other previously localized atlas items; cannot claim zero protected damage or assign defects based on this aggregate",
+      "actual_UV_cell": "Full independent UV/cell of remaining 5 shared-atlas text cells unavailable, do not extend from transparent area",
+      "defects": [
+        {
+          "bbox": [
+            1610,
+            286,
+            2197,
+            350
+          ],
+          "classification": "EVIDENCE_GAP_SOURCE_CLEAN_NOT_VERIFIED"
+        },
+        {
+          "bbox": [
+            0,
+            0,
+            4096,
+            1024
+          ],
+          "classification": "FULL_ATLAS_OTHER_5_CELLS_AND_PROTECTED_SOURCE_DIFFERENCES_NOT_INDEPENDENTLY_CLEARED"
+        }
+      ],
+      "remaining_untranslated_reviewed_scope": 0,
+      "uninspected_whole_atlas": "5 additional known labeled regions NOT examined; whether untranslated unknown",
+      "remaining": "Prior C356 REWORK and C381 C2 source-family history OPEN; C3/user game not run"
+    },
+    {
+      "queue_index": 98,
+      "producer": "B330",
+      "candidate_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
+      "verdict": "C1_STATIC_PASS",
+      "scope": "ONLY course record subtitle original true alpha bbox [431,6,1674,123]",
+      "glyph_readability": "PASS native/75/50 코스 기록에 도전하세요. including terminal period and 받침",
+      "protected": "Initial narrow region [431,5,1674,122] excluded 14 genuine original alpha=1..2 fringe pixels at y122 x756-774. Correct true source effect bbox [431,6,1674,123] adopted; these original 14 alpha pixels are exactly alpha0 in CLEAN and persisted DDS, not foreign artifact. Do not fail because full source and clean hidden RGB differ outside alpha",
+      "actual_UV_cell": "Not independently established; saved visible bbox within true original source effect alpha bbox; no new neighboring alpha",
+      "defects": [],
+      "remaining_untranslated_reviewed_scope": 0,
+      "uninspected_whole_atlas": "NOT_COUNTED",
+      "remaining": "Historic C337 source-family typography REWORK / user game OPEN; no official gate bypass"
+    }
+  ],
+  "batch_scope": {
+    "distinct_asset_count": 4,
+    "scope_target_texts_count": 8,
+    "inspected_texts_translated": 8,
+    "untranslated_in_examined_regions": 0,
+    "remaining_untranslated_full_atlases": "UNKNOWN_NOT_FULLY_INVENTORIED",
+    "qa_only": true,
+    "generation_count": 0,
+    "new_dds_count": 0,
+    "official_promotions": 0,
+    "C2": "DISABLED_NO_NEW_C2_TOKEN",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "policy_auto_send_setting_not_modified": true,
+    "Docker": "NOT_DEPLOYED",
+    "excluded": [
+      "VR",
+      "FFB",
+      "DX11",
+      "DXVK"
+    ]
+  },
+  "machine_evidence": "C1_ALL4_PIXEL_MACHINE.json",
+  "single_contact_jpg": "C1_ALL4_SOURCE_CLEAN_FINAL_NATIVE_75_50_RAW.jpg",
+  "single_contact_sha256": "6b456e32ae8d58c562e74223cde1b234f08df6bfbb30101bc52afd054e148f4c"
+}

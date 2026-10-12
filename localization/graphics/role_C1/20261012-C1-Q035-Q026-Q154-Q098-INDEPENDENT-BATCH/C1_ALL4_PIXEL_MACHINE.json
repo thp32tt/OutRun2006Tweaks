@@ -1,0 +1,361 @@
+{
+  "schema": "c1-independent-four-candidate-native-source-clean-dds-v1",
+  "run_time_kst": "2026-10-12 18:10 KST",
+  "selections": [
+    35,
+    26,
+    154,
+    98
+  ],
+  "source_dds_sha_verified": 4,
+  "saved_dds_sha_verified": 4,
+  "clean_png_sha_verified": 3,
+  "clean_q154": "FULL_CLEAN_NOT_VERIFIED_HOLD",
+  "records": [
+    {
+      "queue_index": 35,
+      "producer": "A250",
+      "source_sha256": "b4f0146b9caa0469a410601d633d3394703e5ec85d07f9bd4973ddc766105583",
+      "clean_sha256": "e27fc6877970a1784b3fee3340e8769f8f6b28e7c4b609b9bd1a63bf069eb18e",
+      "saved_final_sha256": "5ac62e3ef33ff39277fcef5bd7b00cc36c99666ccd01ac0f5a022e22e37b2369",
+      "source_size": [
+        4096,
+        4096
+      ],
+      "saved_size": [
+        4096,
+        4096
+      ],
+      "source_candidate_header128_equal": true,
+      "source_fourcc": "00000000",
+      "candidate_fourcc": "00000000",
+      "mip_source": 1,
+      "mip_final": 1,
+      "readable_transform": "FLIP_TOP_BOTTOM",
+      "cells": [
+        {
+          "id": "pink",
+          "korean_target": "종합 랭킹",
+          "review_bbox_readable": [
+            600,
+            342,
+            1128,
+            444
+          ],
+          "source_final_changed_rgba": 39850,
+          "source_final_changed_bbox_local": [
+            0,
+            0,
+            528,
+            102
+          ],
+          "source_positive_alpha": 53856,
+          "final_positive_alpha": 53856,
+          "glyph_legibility_manual": "PENDING_FIRSTHAND",
+          "actual_UI_UV_cell_boundary_evidence": "UNKNOWN_ONLY_SOURCE_TEXT_ROI",
+          "candidate_korean_outside_verified_cell": "UNDETERMINED",
+          "clean_positive_alpha_in_scope": 53856
+        },
+        {
+          "id": "green",
+          "korean_target": "종합 랭킹",
+          "review_bbox_readable": [
+            2266,
+            363,
+            2785,
+            448
+          ],
+          "source_final_changed_rgba": 42316,
+          "source_final_changed_bbox_local": [
+            0,
+            0,
+            519,
+            85
+          ],
+          "source_positive_alpha": 44115,
+          "final_positive_alpha": 44115,
+          "glyph_legibility_manual": "PENDING_FIRSTHAND",
+          "actual_UI_UV_cell_boundary_evidence": "UNKNOWN_ONLY_SOURCE_TEXT_ROI",
+          "candidate_korean_outside_verified_cell": "UNDETERMINED",
+          "clean_positive_alpha_in_scope": 44115
+        }
+      ],
+      "inspected_label_count": 2,
+      "total_translatable_labels_in_atlas": "NOT_FULLY_INVENTORIED",
+      "remaining_untranslated_labels_atlas": "UNKNOWN_NOT_ASSUMED_ZERO",
+      "CLEAN_scope": "FULL_SOURCE_CLEAN_INDEPENDENT_SHA_PX",
+      "source_final_rgba_change_in_selected_rois": 82166,
+      "source_final_rgba_change_outside_selected_rois": 0,
+      "source_clean": {
+        "rgba_change_in_rois": 82769,
+        "rgba_change_outside_rois": 0,
+        "visible_alpha_change_outside": 0,
+        "clean_positive_alpha_inside": 97971
+      },
+      "clean_saved": {
+        "rgba_change_in_rois": 23080,
+        "rgba_change_outside_rois": 0,
+        "visible_alpha_change_outside": 0
+      }
+    },
+    {
+      "queue_index": 26,
+      "producer": "B",
+      "source_sha256": "d44868cbb37f8412901fa6252638250fcaebfed87e23a65772f61e710e3273ab",
+      "clean_sha256": "9d9cb6a19dce1ff192ad931ec6e70740e9c0676898544e2bd03bfa60bd033a29",
+      "saved_final_sha256": "2dfc6214ce2383ef01f2739baeff04890d5ff78330b192fcee0d864f6caff719",
+      "source_size": [
+        2048,
+        2048
+      ],
+      "saved_size": [
+        2048,
+        2048
+      ],
+      "source_candidate_header128_equal": true,
+      "source_fourcc": "00000000",
+      "candidate_fourcc": "00000000",
+      "mip_source": 1,
+      "mip_final": 1,
+      "readable_transform": "FLIP_TOP_BOTTOM",
+      "cells": [
+        {
+          "id": "star",
+          "korean_target": "종합 랭킹",
+          "review_bbox_readable": [
+            747,
+            1174,
+            1271,
+            1275
+          ],
+          "source_final_changed_rgba": 42239,
+          "source_final_changed_bbox_local": [
+            0,
+            0,
+            524,
+            101
+          ],
+          "source_positive_alpha": 51356,
+          "final_positive_alpha": 52065,
+          "glyph_legibility_manual": "PENDING_FIRSTHAND",
+          "actual_UI_UV_cell_boundary_evidence": "UNKNOWN_ONLY_SOURCE_TEXT_ROI",
+          "candidate_korean_outside_verified_cell": "UNDETERMINED",
+          "clean_positive_alpha_in_scope": 51459
+        },
+        {
+          "id": "speech",
+          "korean_target": "종합 랭킹",
+          "review_bbox_readable": [
+            599,
+            156,
+            1124,
+            246
+          ],
+          "source_final_changed_rgba": 34247,
+          "source_final_changed_bbox_local": [
+            3,
+            0,
+            522,
+            90
+          ],
+          "source_positive_alpha": 47250,
+          "final_positive_alpha": 47250,
+          "glyph_legibility_manual": "PENDING_FIRSTHAND",
+          "actual_UI_UV_cell_boundary_evidence": "UNKNOWN_ONLY_SOURCE_TEXT_ROI",
+          "candidate_korean_outside_verified_cell": "UNDETERMINED",
+          "clean_positive_alpha_in_scope": 47250
+        }
+      ],
+      "inspected_label_count": 2,
+      "total_translatable_labels_in_atlas": "NOT_FULLY_INVENTORIED",
+      "remaining_untranslated_labels_atlas": "UNKNOWN_NOT_ASSUMED_ZERO",
+      "CLEAN_scope": "FULL_SOURCE_CLEAN_INDEPENDENT_SHA_PX",
+      "source_final_rgba_change_in_selected_rois": 76486,
+      "source_final_rgba_change_outside_selected_rois": 0,
+      "source_clean": {
+        "rgba_change_in_rois": 80451,
+        "rgba_change_outside_rois": 0,
+        "visible_alpha_change_outside": 0,
+        "clean_positive_alpha_inside": 98709
+      },
+      "clean_saved": {
+        "rgba_change_in_rois": 61043,
+        "rgba_change_outside_rois": 0,
+        "visible_alpha_change_outside": 0
+      }
+    },
+    {
+      "queue_index": 154,
+      "producer": "B354",
+      "source_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+      "clean_sha256": null,
+      "saved_final_sha256": "190462fb95c9b2951c24557d1a6b145a14db4bad8eb4518fcd4c3be6ec159c35",
+      "source_size": [
+        4096,
+        1024
+      ],
+      "saved_size": [
+        4096,
+        1024
+      ],
+      "source_candidate_header128_equal": true,
+      "source_fourcc": "00000000",
+      "candidate_fourcc": "00000000",
+      "mip_source": 1,
+      "mip_final": 1,
+      "readable_transform": "FLIP_TOP_BOTTOM",
+      "cells": [
+        {
+          "id": "single_player",
+          "korean_target": "싱글 플레이",
+          "review_bbox_readable": [
+            1610,
+            286,
+            2197,
+            350
+          ],
+          "source_final_changed_rgba": 36039,
+          "source_final_changed_bbox_local": [
+            0,
+            0,
+            587,
+            64
+          ],
+          "source_positive_alpha": 19100,
+          "final_positive_alpha": 5515,
+          "glyph_legibility_manual": "PENDING_FIRSTHAND",
+          "actual_UI_UV_cell_boundary_evidence": "UNKNOWN_ONLY_SOURCE_TEXT_ROI",
+          "candidate_korean_outside_verified_cell": "UNDETERMINED"
+        },
+        {
+          "id": "showroom",
+          "korean_target": "쇼룸",
+          "review_bbox_readable": [
+            2674,
+            288,
+            3094,
+            350
+          ],
+          "source_final_changed_rgba": 25178,
+          "source_final_changed_bbox_local": [
+            0,
+            0,
+            420,
+            62
+          ],
+          "source_positive_alpha": 15231,
+          "final_positive_alpha": 2193,
+          "glyph_legibility_manual": "PENDING_FIRSTHAND",
+          "actual_UI_UV_cell_boundary_evidence": "UNKNOWN_ONLY_SOURCE_TEXT_ROI",
+          "candidate_korean_outside_verified_cell": "UNDETERMINED"
+        },
+        {
+          "id": "multiplayer",
+          "korean_target": "멀티플레이",
+          "review_bbox_readable": [
+            2566,
+            952,
+            3086,
+            1014
+          ],
+          "source_final_changed_rgba": 30451,
+          "source_final_changed_bbox_local": [
+            0,
+            0,
+            520,
+            62
+          ],
+          "source_positive_alpha": 17402,
+          "final_positive_alpha": 5583,
+          "glyph_legibility_manual": "PENDING_FIRSTHAND",
+          "actual_UI_UV_cell_boundary_evidence": "UNKNOWN_ONLY_SOURCE_TEXT_ROI",
+          "candidate_korean_outside_verified_cell": "UNDETERMINED"
+        }
+      ],
+      "inspected_label_count": 3,
+      "total_translatable_labels_in_atlas": "NOT_FULLY_INVENTORIED",
+      "remaining_untranslated_labels_atlas": "UNKNOWN_NOT_ASSUMED_ZERO",
+      "CLEAN_scope": "FULL_CLEAN_SHA_NOT_ESTABLISHED_HOLD",
+      "source_final_rgba_change_in_selected_rois": 91668,
+      "source_final_rgba_change_outside_selected_rois": 623882
+    },
+    {
+      "queue_index": 98,
+      "producer": "B330",
+      "source_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+      "clean_sha256": "c04e242730a30eb85342e780ebec11c3b852eff7993c92790760bc3218c1d11e",
+      "saved_final_sha256": "27a1f95d3b81d0a68404aea6f3d7a3ab4cc7328e57f04abc6882c38041785c51",
+      "source_size": [
+        2048,
+        128
+      ],
+      "saved_size": [
+        2048,
+        128
+      ],
+      "source_candidate_header128_equal": true,
+      "source_fourcc": "44585435",
+      "candidate_fourcc": "44585435",
+      "mip_source": 1,
+      "mip_final": 1,
+      "readable_transform": "FLIP_TOP_BOTTOM",
+      "cells": [
+        {
+          "id": "main",
+          "korean_target": "코스 기록에 도전하세요.",
+          "review_bbox_readable": [
+            431,
+            5,
+            1674,
+            122
+          ],
+          "source_final_changed_rgba": 122398,
+          "source_final_changed_bbox_local": [
+            0,
+            1,
+            1243,
+            117
+          ],
+          "source_positive_alpha": 92864,
+          "final_positive_alpha": 83972,
+          "glyph_legibility_manual": "PENDING_FIRSTHAND",
+          "actual_UI_UV_cell_boundary_evidence": "UNKNOWN_ONLY_SOURCE_TEXT_ROI",
+          "candidate_korean_outside_verified_cell": "UNDETERMINED",
+          "clean_positive_alpha_in_scope": 0
+        }
+      ],
+      "inspected_label_count": 1,
+      "total_translatable_labels_in_atlas": "NOT_FULLY_INVENTORIED",
+      "remaining_untranslated_labels_atlas": "UNKNOWN_NOT_ASSUMED_ZERO",
+      "CLEAN_scope": "FULL_SOURCE_CLEAN_INDEPENDENT_SHA_PX",
+      "source_final_rgba_change_in_selected_rois": 122398,
+      "source_final_rgba_change_outside_selected_rois": 14,
+      "source_clean": {
+        "rgba_change_in_rois": 94134,
+        "rgba_change_outside_rois": 115502,
+        "visible_alpha_change_outside": 14,
+        "clean_positive_alpha_inside": 0
+      },
+      "clean_saved": {
+        "rgba_change_in_rois": 130974,
+        "rgba_change_outside_rois": 115502,
+        "visible_alpha_change_outside": 0
+      }
+    }
+  ],
+  "contact_image": {
+    "name": "C1_ALL4_SOURCE_CLEAN_FINAL_NATIVE_75_50_RAW.jpg",
+    "sha256": "6b456e32ae8d58c562e74223cde1b234f08df6bfbb30101bc52afd054e148f4c",
+    "bytes": 1064687,
+    "size": [
+      3837,
+      4098
+    ]
+  },
+  "final_approval": "NOT_PERFORMED",
+  "C2": "RETIRED_HISTORICAL",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "new_images": 0,
+  "new_dds": 0
+}
