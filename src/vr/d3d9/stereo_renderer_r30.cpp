@@ -108,6 +108,10 @@ namespace OutRunVRStereo
         bool R30FirstXyzrhwBilateralFallbackLogged = false;
 
 
+        // Reset occurs before the XYZRHW geometry owner is defined in this TU.
+        // Dispatch through a forward-declared helper, not a later TLS object.
+        void R30InvalidateXyzrhwWorldGeometry() noexcept;
+
         // Flat perspective screen-space effects reuse the same headset/base
         // projection and head pose for many particle/overlay draws. The per-
         // draw stock WVP is still unique, so cache only the independent geometry.
@@ -1373,7 +1377,7 @@ namespace OutRunVRStereo
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
             R30FlatEffectGeometry = {};
-            R30XyzrhwWorldGeometry = {};
+            R30InvalidateXyzrhwWorldGeometry();
             R30HudContain = {};
             return R30ResetR29Hook.stdcall<HRESULT>(device, params);
         }
@@ -1747,6 +1751,11 @@ namespace OutRunVRStereo
             R30XyzrhwState geometry{};
         };
         thread_local R30XyzrhwWorldGeometryCache R30XyzrhwWorldGeometry{};
+
+        void R30InvalidateXyzrhwWorldGeometry() noexcept
+        {
+            R30XyzrhwWorldGeometry = {};
+        }
 
         bool R30PrepareXyzrhwState(
             IDirect3DDevice9* device, R30XyzrhwState& state) noexcept

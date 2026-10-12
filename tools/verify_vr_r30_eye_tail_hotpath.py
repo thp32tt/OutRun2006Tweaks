@@ -58,8 +58,10 @@ def verify(source: str):
     # CPU-projected smoke/skid/decal geometry is constant within a latched
     # pose/projection/scale, while depth evidence and viewport stay per draw.
     assert "thread_local R30XyzrhwWorldGeometryCache R30XyzrhwWorldGeometry{};" in state
-    assert "R30XyzrhwWorldGeometry = {};" in source.split(
+    assert "R30InvalidateXyzrhwWorldGeometry();" in source.split(
         "HRESULT __stdcall ResetDestR30", 1)[1].split("float R30HudScaleValue", 1)[0]
+    assert "void R30InvalidateXyzrhwWorldGeometry() noexcept" in state
+    assert "R30XyzrhwWorldGeometry = {};" in state
     for key in (
         "geometryCache.valid &&",
         "geometryCache.worldScale == worldScale",
@@ -161,6 +163,17 @@ def main():
         except (AssertionError, ValueError, IndexError):
             continue
         raise AssertionError(f"destructive mutation {i} escaped")
+    # The Reset callsite precedes the later TLS geometry declaration. Fail
+    # any change that drops its correctly forward-declared invalidator.
+    reset_bad = source.replace(
+        "            R30InvalidateXyzrhwWorldGeometry();",
+        "            /* reset invalidation removed */", 1)
+    try:
+        verify(reset_bad)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("Reset invalidation mutation escaped")
     geometry_mutations = (
         ("geometryCache.worldScale == worldScale", "true"),
         ("geometryCache.geometry.stereo.poseSequence == state.stereo.poseSequence", "true"),
@@ -185,7 +198,7 @@ def main():
             continue
         raise AssertionError(f"XYZRHW cache destructive mutation {i} escaped")
     math_parity()
-    print(f"PASS R30 particle stereo composed eye-tail/geometry cache: {len(mutations) + len(geometry_mutations)} destructive mutations and 300 matrix parity cases")
+    print(f"PASS R30 particle stereo composed eye-tail/geometry cache: {len(mutations) + len(geometry_mutations) + 1} destructive mutations and 300 matrix parity cases")
 
 
 if __name__ == "__main__":
