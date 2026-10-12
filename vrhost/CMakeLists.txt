@@ -148,6 +148,8 @@ target_link_libraries(outrun-vr-r23-verified-bundle-smoke PRIVATE
 # R32 review regressions are pure policy tests: no headset, game or graphics
 # device is needed to validate reset-relative safety and fail-closed decisions.
 add_executable(outrun-vr-direct-hold-reuse-smoke tests/direct_hold_frame_reuse_smoke.cpp)
+add_executable(outrun-vr-direct-ring-latest-smoke tests/direct_ring_latest_smoke.cpp)
+target_include_directories(outrun-vr-direct-ring-latest-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
 add_executable(outrun-vr-projection-blit-upload-smoke tests/projection_blit_upload_smoke.cpp)
 add_executable(outrun-vr-menu-projection-copy-smoke tests/menu_projection_slice_copy_smoke.cpp)
 target_include_directories(outrun-vr-menu-projection-copy-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
@@ -189,6 +191,7 @@ foreach(target
     outrun-vr-runtime-eligibility-smoke
     outrun-vr-r23-verified-bundle-smoke
     outrun-vr-direct-hold-reuse-smoke
+    outrun-vr-direct-ring-latest-smoke
     outrun-vr-projection-blit-upload-smoke
     outrun-vr-menu-projection-copy-smoke
     outrun-vr-capture-descriptor-smoke

@@ -39,6 +39,7 @@
 #include "runtime/desktop_capture_reuse.hpp"
 #include "runtime/desktop_capture_descriptor_cache.hpp"
 #include "runtime/direct_hold_frame_reuse.hpp"
+#include "runtime/direct_ring_latest.hpp"
 #include "runtime/theater_capture_reuse.hpp"
 #include "runtime/menu_projection_slice_copy.hpp"
 #include "runtime/cadence_presented_wait.hpp"
@@ -2577,7 +2578,7 @@ int main(int argc, char** argv)
                         OutRunVrR23VerifiedBundle::SourceKind::None;
                     std::int64_t pendingBundleCaptureQpc = 0;
                     OutRunVR::SharedRenderFrameState before{};
-                    bool have = renderFrames.Read(before);
+                    bool have = !directTransportOnly && renderFrames.Read(before);
 
                     // R41 DirectGPU latest-frame-wins. R37 walked the four
                     // producer slots oldest-first, which made VDXR display a
@@ -2596,57 +2597,35 @@ int main(int argc, char** argv)
                         bool foundDirect = false;
                         if (renderFrames.ReadHistory(history, historyCount))
                         {
-                            std::uint32_t currentGeneration = 0;
-                            std::uint32_t newestDirectFrame = 0;
-                            bool haveCurrentGeneration = false;
-                            for (std::size_t i = 0; i < historyCount; ++i)
+                            // R41: one pass identifies the newest valid producer
+                            // generation and its newest unconsumed frame. This
+                            // eliminates a redundant ring scan each XR tick;
+                            // newer but ineligible slots still fence off old runs.
+                            const auto latest = OutRunVrDirectRingLatest::Pick(
+                                history.data(), historyCount,
+                                [](const auto& frame) noexcept {
+                                    return frame.frameId &&
+                                        frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex] &&
+                                        frame.state == OutRunVR::StereoSbsActive &&
+                                        (frame.flags & OutRunVR::RenderFramePresentInFlight) == 0 &&
+                                        (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) != 0;
+                                },
+                                [&](const auto& frame) noexcept {
+                                    const auto slot = frame.reserved[
+                                        OutRunVR::RenderFrameDirectSlotIndex];
+                                    return slot < OutRunVR::RenderFrameRingSize &&
+                                        (lastProcessedStereoFrame == 0 ||
+                                         R37FrameIdBefore(lastProcessedStereoFrame, frame.frameId));
+                                },
+                                [](const auto& frame) noexcept {
+                                    return frame.reserved[
+                                        OutRunVR::RenderFrameDirectGenerationIndex];
+                                }, R37FrameIdBefore);
+                            const std::uint32_t currentGeneration = latest.generation;
+                            if (latest.index != OutRunVrDirectRingLatest::NoIndex)
                             {
-                                const auto& frame = history[i];
-                                const std::uint32_t generation =
-                                    frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-                                if (!frame.frameId || !generation ||
-                                    frame.state != OutRunVR::StereoSbsActive ||
-                                    (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
-                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
-                                    continue;
-                                if (!haveCurrentGeneration ||
-                                    R37FrameIdBefore(
-                                        newestDirectFrame, frame.frameId))
-                                {
-                                    newestDirectFrame = frame.frameId;
-                                    currentGeneration = generation;
-                                    haveCurrentGeneration = true;
-                                }
-                            }
-
-                            for (std::size_t i = 0; i < historyCount; ++i)
-                            {
-                                const auto& frame = history[i];
-                                const std::uint32_t slot =
-                                    frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
-                                const std::uint32_t generation =
-                                    frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-                                if (!frame.frameId ||
-                                    (lastProcessedStereoFrame != 0 &&
-                                     !R37FrameIdBefore(
-                                         lastProcessedStereoFrame,
-                                         frame.frameId)) ||
-                                    frame.state != OutRunVR::StereoSbsActive ||
-                                    (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
-                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
-                                    slot >= OutRunVR::RenderFrameRingSize ||
-                                    generation == 0 ||
-                                    !haveCurrentGeneration ||
-                                    generation != currentGeneration)
-                                    continue;
-
-                                if (!foundDirect ||
-                                    R37FrameIdBefore(
-                                        selectedDirect.frameId, frame.frameId))
-                                {
-                                    selectedDirect = frame;
-                                    foundDirect = true;
-                                }
+                                selectedDirect = history[latest.index];
+                                foundDirect = true;
                             }
 
                             if (foundDirect)
