@@ -46,7 +46,7 @@ def linked(s):
     factor_guard = gate.split("DWORD textureFactor = 0;", 1)[1].split(
         "FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor))", 1)[0]
     if "if ((" not in factor_guard or not re.search(
-            r"\\bselectTextureFactorAlpha\\s*\\|\\|\\s*selectDiffuseFactorAlpha\\s*(?:\\|\\||\\))",
+            r"\bselectTextureFactorAlpha\s*\|\|\s*selectDiffuseFactorAlpha\s*(?:\|\||\))",
             factor_guard):
         return False
     # The factor-alpha predicates must be defined before the read that uses
