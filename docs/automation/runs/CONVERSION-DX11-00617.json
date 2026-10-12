@@ -27,22 +27,35 @@
     "batch_components": [
       "new native PM RGBA shader",
       "live state/shader/Draw integration",
-      "destructive regression"
+      "destructive regression",
+      "independent PM RGB with original texture alpha game stage 0"
     ],
     "acceptance_proof": {
-      "positive_probe": "PM numeric formula and C++ source link",
+      "positive_probe": "PM numeric formula and C++ source link; independent texture-alpha branch shader and numeric probe",
       "negative_regression": "eight destructive mutations, missing-source denial",
       "component_integration": "game-created D3D9 draw into opt-in native PS; fallback unchanged"
     },
     "conflict_keys": [
       "DX11:LIVE_GAME_STAGE0_PREMULTIPLIED_ALPHA"
     ],
-    "full_gate_plan": "one_validation_bearing_sha"
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "STAGE0_PREMULTIPLIED_RGBA",
+      "NATIVE_D3D11_PS",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "BUILD_VERIFIED/NEED_HMD_TEST",
+    "activation_guard_and_fallback": "No production activation; unsupported texture or alpha ops use untouched game D3D9 Draw/Present and gamepad path"
   },
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/live_game_stage0_blend.hpp",
     "tools/test_dx11_first_game_frame_regressions.py",
+    "tools/test_dx11_stage0_premultiplied_00617.py",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tools/test_dx11_stage0_premultiplied_00617.py"
   ],
   "native_gameplay_activation": false,
@@ -51,5 +64,9 @@
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Validate exact result SHA Gate/Build/Fast/OpenXR/HUD; HMD follow-up only for runtime."
+  "next_action": "Validate exact result SHA Gate/Build/Fast/OpenXR/HUD; HMD follow-up only for runtime.",
+  "retry_repair": {
+    "reason": "Repair exact-SHA policy metadata missing gameplay_delivery_target/live_game_draw_path and extend real native PM RGB with SELECTARG1 alpha before final validation",
+    "previous_sha": "33c9e4755438ba64bdc27fdc2a75482982ce6032"
+  }
 }
