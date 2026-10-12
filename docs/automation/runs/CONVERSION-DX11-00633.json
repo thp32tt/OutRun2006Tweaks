@@ -53,13 +53,14 @@
     "tools/test_dx11_stage0_pm_inverse_arg2_00633.py",
     ".github/workflows/dx11-fast-structural.yml",
     ".github/workflows/backend-conversion-gate.yml",
-    "docs/automation/runs/CONVERSION-DX11-00633.json"
+    "docs/automation/runs/CONVERSION-DX11-00633.json",
+    "tools/test_dx11_stage0_pm_factor_arg2_00630.py"
   ],
   "pipeline": {
     "C0_RECOVER": "PASS source/policy/00632 GitHub HEAD",
     "C1_REVIEW": "PASS previously unhandled SELECTARG2 complemented texture-alpha",
     "C2_IMPLEMENT": "PASS actual C++ capture/native PS routing and destructive regression",
-    "C3_VALIDATE": "PENDING exact-SHA GitHub Gate",
+    "C3_VALIDATE": "First material Fast FAIL: old 00630 guard test; repair staged to publish after active CI terminates",
     "C4_COMMIT": "PENDING remote material publication",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING CI; HMD/gamepad UNTESTED"
@@ -70,5 +71,11 @@
   "next_action": "Check CI on material RESULT_SHA; repair actual regressions; separately record C6 only on full PASS",
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
-  "result_sha": null
+  "result_sha": null,
+  "failure_recovery": {
+    "first_material_sha": "ce87f6b872c211bbe5350398ccc8faea87155e57",
+    "fast_run_id": 38307212201,
+    "failure": "Legacy 00630 source-graph hardcoded old suffix; repair maintains factor rejection and also requires 00633 inverse-alpha carveout",
+    "repair_status": "STAGED"
+  }
 }
