@@ -8,6 +8,7 @@ param(
     [ValidateSet('DEFAULT','512','1024')][string]$GpuLabReflection = 'DEFAULT',
     [ValidateSet('DEFAULT','0','4')][string]$GpuLabSkyGlow = 'DEFAULT',
     [ValidateSet('DEFAULT','ON','OFF')][string]$GpuLabCulling = 'DEFAULT',
+    [ValidateSet('DEFAULT','OFF','2X','4X')][string]$GpuLabMsaa = 'DEFAULT',
     [ValidateSet('NONE','WATERFRONT','SAND_SPRAY','DENSE_BUILDINGS','OTHER')][string]$GpuLabScene = 'NONE'
 )
 
@@ -128,9 +129,10 @@ if($gpuLabActive){
     $helper=Join-Path $root 'OutRunVR-GPU-Lab-Settings.ps1'
     if(!(Test-Path -LiteralPath $helper)){throw 'GPU lab settings helper missing'}
     . $helper
+    $msaa = if($GpuLabMsaa -eq 'DEFAULT'){'4X'}else{$GpuLabMsaa}
     $gameArgs=@(Set-OutRunVRGpuLabArguments -BaseArgs $gameArgs `
         -Transparency $GpuLabTransparency -Reflection $GpuLabReflection `
-        -SkyGlow $GpuLabSkyGlow -StageCulling $GpuLabCulling)
+        -SkyGlow $GpuLabSkyGlow -StageCulling $GpuLabCulling -Msaa $msaa)
 }
 if($backend -ne '2d'){
     $gameArgs += '-HudInspector=true'
@@ -173,7 +175,10 @@ if($pythonCmd -and (Test-Path $assetAnalyzer)){
     "gpuLabReflection=$GpuLabReflection"
     "gpuLabSkyGlow=$GpuLabSkyGlow"
     "gpuLabCulling=$GpuLabCulling"
+    "gpuLabMsaa=$GpuLabMsaa"
     "gpuLabScene=$GpuLabScene"
+    "gpuLabSSAAExpectedGate=$(if($gpuLabActive){$GpuLabTransparency}else{'UNSPECIFIED'})"
+    "gpuLabSSAAValidation=CHECK_VR_GPU_LAB_SSAA_GATE_AND_DEVICE_LINES"
     "forceVrDisabled=$($backend -eq '2d')"
     "arguments=$($gameArgs -join ' ')"
 )|Set-Content (Join-Path $sessionRoot 'RUN_OVERRIDES.txt') -Encoding UTF8
@@ -186,6 +191,7 @@ $oldVkDebug = $env:VK_LOADER_DEBUG
 $oldVrForceDisabled = $env:OUTRUN_VR_FORCE_DISABLED
 $oldGpuProfiling = $env:OUTRUN_VR_GPU_PROFILE
 $oldPacingDiagnostics = $env:OUTRUN_VR_PACING_DIAGNOSTICS
+$oldGpuScene = $env:OUTRUN_VR_GPU_SCENE
 $oldTestProfile = $env:OUTRUN_VR_TEST_PROFILE
 $oldPerformanceProfile = $env:OUTRUN_VR_PERFORMANCE_PROFILE
 $oldShaderFingerprint = $env:OUTRUN_VR_SHADER_FINGERPRINT
@@ -264,6 +270,9 @@ if ($GpuDiagnostics -eq 'ON' -and $backend -ne 'd3d9') {
 }
 $gpuDiagnosticActive = ($backend -eq 'd3d9' -and $GpuDiagnostics -eq 'ON')
 $env:OUTRUN_VR_GPU_PROFILE = if ($gpuDiagnosticActive) { '1' } else { $null }
+$env:OUTRUN_VR_GPU_SCENE = if ($gpuDiagnosticActive -and $GpuLabScene -ne 'NONE') {
+    $GpuLabScene
+} else { $null }
 if ($gpuDiagnosticActive) { $env:OUTRUN_VR_PACING_DIAGNOSTICS = '1' }
 Write-Host "GPU detailed diagnostics: $GpuDiagnostics (D3D9 timestamps / pacing / whole-GPU sampler)"
 # Opt-in whole-GPU telemetry accompanies the QPC pacing session. The external
@@ -410,6 +419,7 @@ try{
         } | ConvertTo-Json -Depth 3 |
             Set-Content (Join-Path $sessionRoot 'gpu-utilization-status.json') -Encoding UTF8
     }
+    $env:OUTRUN_VR_GPU_SCENE=$oldGpuScene
     $env:OUTRUN_VR_GPU_PROFILE=$oldGpuProfiling
     $env:OUTRUN_VR_PACING_DIAGNOSTICS=$oldPacingDiagnostics
     $env:OUTRUN_VR_FORCE_DISABLED=$oldVrForceDisabled

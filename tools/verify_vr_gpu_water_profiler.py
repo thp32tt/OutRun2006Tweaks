@@ -8,7 +8,9 @@ tokens=['OUTRUN_VR_GPU_PROFILE','std::strcmp(v,"1")==0','D3DQUERYTYPE_TIMESTAMPD
 'D3DQUERYTYPE_TIMESTAMPFREQ','D3DQUERYTYPE_TIMESTAMP','D3DISSUE_BEGIN',
 'D3DRS_ALPHABLENDENABLE','D3DRS_ALPHATESTENABLE','q->GetData(&v,sizeof(v),0)',
 'if(ready==S_FALSE) continue;','if(s.pending) { ++dropped_; skip_=true; return false; }',
-'waterAttribution=UNPROVEN','noZWriteSamples','zDisabledSamples',
+'waterAttribution=UNPROVEN','noZWriteSamples',
+'gpuSpanP50Ms','gpuSpanP95Ms','gpuSpanP99Ms','gpuSpanSampleCount',
+'gpuSpanOverflow','OUTRUN_VR_GPU_SCENE','std::sort(gpuSpans_.begin()','zDisabledSamples',
 'D3DRS_ZWRITEENABLE','D3DRS_ZENABLE','D3DRS_STENCILENABLE',
 'programmablePsSamples','fixedFnPsSamples','d->GetPixelShader(&ps)','ps->Release()']
 def good(x): return all(t in x for t in tokens) and 'D3DGETDATA_FLUSH' not in x
