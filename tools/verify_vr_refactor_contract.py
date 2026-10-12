@@ -1150,14 +1150,14 @@ def r33_readiness_facade_ok(src: str) -> bool:
             or helper.count("R32ReviewRightDepthInSync()") != 2
             or helper.count("R32ReviewRightStencilInSync()") != 2):
         return False
-    initial = "if (!R32ReviewTrackedDepthStencil())\\n                return true;"
+    initial = "if (!R32ReviewTrackedDepthStencil())\n                return true;"
     boot_condition = "if (!depthInSync || !stencilInSync)"
     bootstrap = "R32ReviewTryBootstrapRightDepth(device);"
-    after_boot = "if (!R32ReviewTrackedDepthStencil())\\n                    return true;"
+    after_boot = "if (!R32ReviewTrackedDepthStencil())\n                    return true;"
     depth_resample = "depthInSync = R32ReviewRightDepthInSync();"
     stencil_resample = "stencilInSync = R32ReviewRightStencilInSync();"
-    depth_veto = "if (!depthInSync && R32ReviewDepthTestActive(device))\\n                return false;"
-    stencil_veto = "if (!stencilInSync && R32ReviewStencilTestActive(device))\\n                return false;"
+    depth_veto = "if (!depthInSync && R32ReviewDepthTestActive(device))\n                return false;"
+    stencil_veto = "if (!stencilInSync && R32ReviewStencilTestActive(device))\n                return false;"
     required = (initial, "bool depthInSync = R32ReviewRightDepthInSync();",
                 "bool stencilInSync = R32ReviewRightStencilInSync();",
                 boot_condition, bootstrap, after_boot,
@@ -1171,7 +1171,7 @@ def r33_readiness_facade_ok(src: str) -> bool:
         return False
     for route in (world, hud):
         if (route.count("R33PrepareRightDepthStereo(device)") != 1
-                or "if (!R33PrepareRightDepthStereo(device))\\n                return {};" not in route
+                or "if (!R33PrepareRightDepthStereo(device))\n                return {};" not in route
                 or "R32ReviewRightDepthInSync()" in route
                 or "R32ReviewRightStencilInSync()" in route):
             return False
