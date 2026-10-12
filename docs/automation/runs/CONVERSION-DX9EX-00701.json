@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00701",
+  "production_id": "CONVERSION-DX9EX-00701",
+  "event_id": "CONVERSION-DX9EX-00701-C6",
+  "event_type": "C6_RESULT_ONLY",
+  "work_key": "DX9EX:R30_INDEXED_UP_SPARSE_MASK_REUSE",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "stage": "C6_RESULT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "base_sha": "c799866ecdb543bf5e8e0bc846f217508de82424",
+  "source_material_sha": "63208feaa4d55a5f041a4d07ffcef2307a53d27b",
+  "material_result_sha": "63208feaa4d55a5f041a4d07ffcef2307a53d27b",
+  "result_sha": "63208feaa4d55a5f041a4d07ffcef2307a53d27b",
+  "validation_bearing_result_sha": "63208feaa4d55a5f041a4d07ffcef2307a53d27b",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "material_commits": [
+    "63208feaa4d55a5f041a4d07ffcef2307a53d27b"
+  ],
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_sparse_population_fastpath.py"
+  ],
+  "feature_contract": {
+    "goal": "Reduce CPU work in sparse indexed XYZRHW particle and smoke stereo draws by eliminating O(maxIndex) mask zero-fills across repeated UP submissions.",
+    "acceptance": "Separate transient UP used-mask from VB generation-validated index decode; clear only previously referenced positions, track writes exception-safely and preserve bounds/fallback and per-eye sparse copying; canonical parity+destructive regression and exact-SHA DX9Ex Active, Domain Isolation, Full Source Impact SUCCESS."
+  },
+  "acceptance_results": {
+    "r30_indexed_up_touched_mask": "MATERIAL_COMMITTED",
+    "up_vb_mask_isolation": "PASS_EXACT_SHA_POLICY",
+    "repeat_span_parity_and_mutations": "PASS_EXACT_SHA_POLICY",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_3_OF_3_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38280427215,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "63208feaa4d55a5f041a4d07ffcef2307a53d27b",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "game": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38280427337,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "63208feaa4d55a5f041a4d07ffcef2307a53d27b",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    {
+      "id": 38280427460,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "63208feaa4d55a5f041a4d07ffcef2307a53d27b",
+      "conclusion": "success",
+      "jobs": {
+        "source-cross-domain": "success",
+        "msvc-analyze-active-game": "success",
+        "msvc-analyze-openxr-host": "success"
+      }
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "Quest 3 / VDXR gameplay, screen optics and real FPS/p95 frame-time are not validated by GitHub Actions.",
+  "attempt": 1,
+  "score_credit_key": "CONVERSION-DX9EX-00701",
+  "score_change": 0,
+  "score_status": "C6_BOOKKEEPING_NO_ADDITIONAL_CREDIT",
+  "notes": "Material result and three required exact-SHA Gates are immutable. Subsequent documentation-only bookkeeping is separated and includes CI-skip; source result does not."
+}
