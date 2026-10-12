@@ -28,6 +28,14 @@
 8. 2026-10-12 16:39 KST 사용자 지시로 AUTO_SEND=true가 기본이다. 다시 staging해도
    true를 유지한다. 별도 활성화 단계는 없으며 컨테이너 배포·게임 설치·정식 릴리스는 사용자 수동이다.
 
+## 신규 PNG 자동 첨부 — 수동 배포 전 준비
+
+`docs/KOREAN_LOCALIZATION_CONTROLLER_PNG_UPLOAD_20261012.md`의 `/data/imagegen/inputs/` 및 `pending_A.json`/`pending_B.json`에 실제 SHA·승인 프롬프트가 포함된 원본 HD PNG를 준비한다.
+
+수동 `--stage`는 컨트롤러의 실제 `send_message()`에 Playwright 파일 선택 및 첨부 프리뷰 검증을 적용한 이미지로 빌드한다. 기존 기본 Docker 이미지의 소스가 알려진 구조와 다르면 **패치 자체가 실패**하며 운영 재배포로 넘어가지 않는다. A/B는 원본 바인딩이 없으면 `SOURCE_REFERENCE_NOT_BOUND`로 전송 보류, C1은 기존 QA 경로를 사용한다. 기존 C2 상태는 별도 파일로 보존하며 탭을 다시 열지 않는다.
+
+`AUTO_SEND=true`라는 사용자 승인 값은 유지한다. 이것이 PNG 업로드 또는 ImageGen 통합 PASS를 의미하지 않는다. 수동 재배포 후 실제 ChatGPT composer 썸네일, 본문 메시지, 실제 이미지 출력 바이트를 단건 확인한다. 검사 전에는 `UPLOAD_RUNTIME=UNTESTED`이다.
+
 ## 현재 제한
 
 고정 프롬프트/조립기와 staging 회귀는 검증 가능하다. 실제 브라우저 첨부, 내장 ImageGen 호출,
