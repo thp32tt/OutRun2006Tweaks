@@ -40,6 +40,13 @@ def linked(s):
         if "capture."+flag+" ? s."+flag+"Ps.Get()" not in draw: return False
         if s.count("s."+flag+"Ps.Reset();") != 2: return False
     if "selectTextureFactorAlpha || selectDiffuseFactorAlpha) &&" not in gate: return False
+    # The factor-alpha predicates must be defined before the read that uses
+    # them. Static graph checks alone previously missed Win32 error C2065.
+    factor_read = gate.find("DWORD textureFactor = 0;")
+    if factor_read < 0: return False
+    for flag, _, _, _ in V:
+        decl = gate.find("const bool " + flag + " =")
+        if decl < 0 or decl > factor_read: return False
     return True
 
 def mutate(s,a,b):
@@ -71,12 +78,24 @@ def main():
         ("((textureFactor >> 24u) & 0xffu) / 255.0f", "((textureFactor >> 16u) & 0xffu) / 255.0f")):
         assert not linked(mutate(s,a,b)),a
         count+=1
-    assert count==20,count
+    # Win32 declaration-order regression: simulate moving a live predicate
+    # after its first use without changing its shader or D3D9 semantics.
+    factor_guard_end = ("            FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))\n"
+                        "            return false;\n")
+    for flag, op, _, _ in V:
+        declaration = ("        const bool " + flag + " = op == D3DTOP_" + op +
+                       " &&\n                                      alphaOp == D3DTOP_BLENDFACTORALPHA;\n")
+        assert s.count(declaration) == 1 and s.count(factor_guard_end) == 1
+        mutant = s.replace(declaration, "", 1).replace(
+            factor_guard_end, factor_guard_end + declaration, 1)
+        assert not linked(mutant), flag + " declaration-before-use"
+        count += 1
+    assert count==22,count
     for byte in (0,1,64,128,192,255):
         f=byte/255.0
         for t,d in ((0.0,1.0),(1.0,0.0),(.75,.25),(.2,.8)):
             a=d+(t-d)*f
             assert 0.0<=a<=1.0 and abs(a-((1.0-f)*d+f*t))<1e-12
-    print("00584 PASS: 20 destructive source mutations, 24 alpha cases, live Draw path; HMD UNTESTED")
+    print("00584 PASS: 22 destructive source mutations, 24 alpha cases, live Draw path; HMD UNTESTED")
 
 if __name__=="__main__": main()

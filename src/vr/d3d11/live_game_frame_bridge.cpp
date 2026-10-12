@@ -1153,14 +1153,6 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                                                 alphaOp == D3DTOP_MODULATE2X;
         const bool blendFactorModulate4XAlpha = op == D3DTOP_BLENDFACTORALPHA &&
                                                 alphaOp == D3DTOP_MODULATE4X;
-        DWORD textureFactor = 0;
-        if ((blendFactorAlpha || blendFactorTextureAlpha || blendFactorModulateAlpha ||
-             blendFactorDiffuseAlpha || blendFactorAddAlpha ||
-             blendFactorSubtractAlpha || blendFactorAddSmoothAlpha ||
-             blendFactorModulate2XAlpha || blendFactorModulate4XAlpha ||
-              selectTextureFactorAlpha || selectDiffuseFactorAlpha) &&
-            FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))
-            return false;
         const bool modulate = op == D3DTOP_MODULATE && alphaOp == D3DTOP_MODULATE;
         const bool selectTexture = op == D3DTOP_SELECTARG1 && alphaOp == D3DTOP_SELECTARG1;
         const bool selectTextureDiffuseAlpha = op == D3DTOP_SELECTARG1 &&
@@ -1198,6 +1190,16 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
                                                  alphaOp == D3DTOP_ADDSMOOTH;
         const bool selectDiffuseFactorAlpha = op == D3DTOP_SELECTARG2 &&
                                       alphaOp == D3DTOP_BLENDFACTORALPHA;
+        // Capture the factor only after the SELECTARG predicates exist;
+        // unsupported D3D9 states keep the original DX9Ex draw/input.
+        DWORD textureFactor = 0;
+        if ((blendFactorAlpha || blendFactorTextureAlpha || blendFactorModulateAlpha ||
+             blendFactorDiffuseAlpha || blendFactorAddAlpha ||
+             blendFactorSubtractAlpha || blendFactorAddSmoothAlpha ||
+             blendFactorModulate2XAlpha || blendFactorModulate4XAlpha ||
+              selectTextureFactorAlpha || selectDiffuseFactorAlpha) &&
+            FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)))
+            return false;
         // RGB and alpha must both use ADD(TEXTURE, DIFFUSE).
         const bool additive = op == D3DTOP_ADD && alphaOp == D3DTOP_ADD;
         // Mixed RGB/alpha operations remain DX9Ex; operand order stays exact.
