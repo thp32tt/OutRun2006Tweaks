@@ -19,7 +19,7 @@ def connected(s):
     # other blend paths share write-mask and state-creation statements.
     subtractive = part(consumer,
         "if (output.blendOp != D3D11_BLEND_OP_ADD) {",
-        "} else if (output.multiplyBlend &&")
+        "} else if (output.inverseSourceAlphaBlend &&")
     return (all(x in output for x in (
         "D3D11_BLEND_OP blendOp = D3D11_BLEND_OP_ADD;",
         "bool additiveBlend = false;", "bool sourceAlphaAddBlend = false;",
