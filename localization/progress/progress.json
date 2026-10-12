@@ -1,6 +1,6 @@
 {
   "schema_version": 4,
-  "updated_at_kst": "2026-10-12 08:10 KST",
+  "updated_at_kst": "2026-10-12 14:37 KST",
   "branch": "korean-localization-recovery-20260928",
   "a254_q175_native_chrome_new_trial_20261012": {
     "role": "A",
@@ -14235,5 +14235,51 @@
     "C3": "NOT_RUN",
     "RUNTIME_VALIDATION": "UNTESTED",
     "evidence": "localization/graphics/role_B/20261012-B407-Q048-STREAK-RESTORE/B407_Q048_STREAK_RESTORE_PRODUCER_QA.json"
+  },
+  "b_q104_canonical_raw_preserve_clean_20261012_1430": {
+    "role": "B",
+    "queue_index": 104,
+    "run_key": "OUTRUN-KOR-B-Q104-CANONICAL-BC3-RAW-PRESERVE-CLEAN-20261012-1430",
+    "priority": "REWORK",
+    "asset": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+    "source_dds_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+    "source_native": "2048x256 BC3_DXT5 mip1 readable_flipY",
+    "source_effect_bbox": [
+      392,
+      52,
+      1357,
+      201
+    ],
+    "source_glyph_alpha_removed": 118098,
+    "clean_producer_png_sha256": "505f82b65bd188f2acdb92a024fbd8764e20f47730de69e26a1d6d1b59a20394",
+    "source_english_only_png_sha256": "db39effd6264700bb21ca6564a0864cdacdd20fbab83a2deedc592d4f98eb482",
+    "source_hd_png_sha256": "72262a89ab3cda1dcb24e43ffbcff55885972ceb92437b75d2113bea5f5bd503",
+    "raw_rgba_changed_outside_source_bbox": 0,
+    "source_transparent_rgb_outside_bbox_preserved": 380503,
+    "old_korean_saved_dds_unchanged_sha256": "c84a2703d0a22b36384e07ce72d4e761e651a1a23219cd78153b4a0aff022505",
+    "old_candidate_bbox": [
+      574,
+      56,
+      1174,
+      197
+    ],
+    "old_candidate_new_alpha_outside_source_effect_bbox": 0,
+    "producer_glyph_scale": "PASS_TRANSLATION_LENGTH_VARIANCE_NATIVE_75_50_READABLE_SIZE_ONLY",
+    "producer_full_candidate": "REWORK_REQUIRED_ANGULAR_STIPPLED_OUTLINE_SOURCE_STYLE",
+    "producer_clean": "NEW_PRELIMINARY_SOURCE_DERIVED_PLATE_PENDING_C1_INDEPENDENT",
+    "clean_png": "localization/graphics/role_B/20261012-B-Q104-CANONICAL-RAW-PRESERVE-CLEAN/q104_CANONICAL_SOURCE_DERIVED_CLEAN_RGBA.png",
+    "source_png": "localization/graphics/role_B/20261012-B-Q104-CANONICAL-RAW-PRESERVE-CLEAN/q104_HD_SOURCE_READABLE_FULL.png",
+    "english_crop_png": "localization/graphics/role_B/20261012-B-Q104-CANONICAL-RAW-PRESERVE-CLEAN/q104_CANONICAL_SOURCE_ENGLISH_ONLY_PAD24.png",
+    "glyph_scale_qa": "localization/graphics/role_B/20261012-B-Q104-CANONICAL-RAW-PRESERVE-CLEAN/q104_B_GLYPH_SCALE_RECHECK_MACHINE.json",
+    "clean_qa": "localization/graphics/role_B/20261012-B-Q104-CANONICAL-RAW-PRESERVE-CLEAN/q104_B_CANONICAL_CLEAN_PRODUCER_QA.json",
+    "verified_policy": "USER_CURRENT_GLYPH_SCALE_BBOX_MAX_AND_CURRENT_HD_NATIVE_INPUT",
+    "actual_native_imagegen_input_bound": false,
+    "new_generated_korean_png": 0,
+    "new_saved_dds": 0,
+    "official_promoted": 0,
+    "C1": "PENDING_INDEPENDENT_CLEAN_AND_SAVED_DDS",
+    "C2": "RETIRED_HISTORICAL_Q104_REWORK_PRESERVED",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED"
   }
 }
