@@ -123,3 +123,93 @@ for _ in range(15000):
 
 print(f"PASS R29 zero-fill-free WVP upload envelope: {cases} "
       f"interval boundary/model cases and {len(mutations)} destructive source mutations")
+
+
+# R28 hot-path regression: stock c64..c67 shadow must be bit-for-bit
+# equivalent for full, partial and nonintersecting float4 uploads. The
+# implementation performs one contiguous copy, not four per-register copies.
+r28_src = (ROOT / "src/vr/game/outrun_renderer_r23.cpp").read_text(encoding="utf-8")
+r28_body = function(r28_src, "void R28TrackRawWvpWrite(")
+r28_required = (
+    "const std::uint64_t overlapFirst =",
+    "first > wvpFirst ? first : wvpFirst",
+    "const std::uint64_t overlapLast =",
+    "last < wvpLast ? last : wvpLast",
+    "if (overlapFirst >= overlapLast)",
+    "const UINT sourceOffset =",
+    "static_cast<UINT>(overlapFirst - first)",
+    "const UINT destOffset =",
+    "static_cast<UINT>(overlapFirst - wvpFirst)",
+    "const UINT rowCount =",
+    "static_cast<UINT>(overlapLast - overlapFirst)",
+    "static_cast<std::size_t>(rowCount) * 4 * sizeof(float)",
+    "R28RawWvpMask |= ((1u << rowCount) - 1u) << destOffset;",
+)
+assert all(token in r28_body for token in r28_required)
+assert r28_body.count("std::memcpy(") == 1
+r28_mutations = (
+    ("first > wvpFirst ? first : wvpFirst", "first"),
+    ("last < wvpLast ? last : wvpLast", "last"),
+    ("if (overlapFirst >= overlapLast)", "if (false)"),
+    ("overlapFirst - first", "overlapFirst - wvpFirst"),
+    ("overlapFirst - wvpFirst", "overlapFirst - first"),
+    ("overlapLast - overlapFirst", "overlapLast - overlapFirst + 1"),
+    ("((1u << rowCount) - 1u) << destOffset",
+     "((1u << rowCount) - 1u)"),
+)
+for old, new in r28_mutations:
+    assert r28_body.count(old) == 1, old
+    mutated = r28_body.replace(old, new, 1)
+    assert not all(token in mutated for token in r28_required), old
+
+
+def r28_shadow_reference(start, rows, payload, shadow, mask):
+    for reg in range(64, 68):
+        if start <= reg < start + rows:
+            shadow[reg - 64] = payload[reg - start]
+            mask |= 1 << (reg - 64)
+    return shadow, mask
+
+
+def r28_shadow_contiguous(start, rows, payload, shadow, mask):
+    if not rows or rows > 256:
+        return shadow, mask
+    first, last = start, start + rows
+    first = max(first, 64)
+    last = min(last, 68)
+    if first >= last:
+        return shadow, mask
+    source_offset, dest_offset = first - start, first - 64
+    count = last - first
+    shadow[dest_offset:dest_offset + count] = (
+        payload[source_offset:source_offset + count])
+    mask |= ((1 << count) - 1) << dest_offset
+    return shadow, mask
+
+
+r28_cases = 0
+r28_rng = random.Random(282819)
+for start in list(range(0, 75)) + [255, 65535, 2**32 - 256, 2**32 - 1]:
+    for rows in (1, 2, 3, 4, 5, 10, 64, 255, 256):
+        payload = [(start, i, r28_rng.getrandbits(32)) for i in range(rows)]
+        original = [(0xABCD, i) for i in range(4)]
+        initial_mask = r28_rng.randrange(16)
+        expected = r28_shadow_reference(
+            start, rows, payload, original[:], initial_mask)
+        actual = r28_shadow_contiguous(
+            start, rows, payload, original[:], initial_mask)
+        assert actual == expected, (start, rows, expected, actual)
+        r28_cases += 1
+for _ in range(15000):
+    start = r28_rng.choice(
+        [r28_rng.randrange(0, 100), r28_rng.getrandbits(32)])
+    rows = r28_rng.randrange(1, 257)
+    payload = [r28_rng.getrandbits(32) for _ in range(rows)]
+    old_shadow = [r28_rng.getrandbits(32) for _ in range(4)]
+    mask = r28_rng.randrange(16)
+    assert r28_shadow_reference(
+        start, rows, payload, old_shadow[:], mask) == r28_shadow_contiguous(
+        start, rows, payload, old_shadow[:], mask)
+    r28_cases += 1
+print(f"PASS R28 contiguous stock WVP shadow copy: {r28_cases} "
+      f"full/partial/boundary randomized cases, {len(r28_mutations)} mutations")

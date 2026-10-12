@@ -79,17 +79,29 @@ namespace OutRunVRRenderer
                 return;
             const std::uint64_t first = startRegister;
             const std::uint64_t last = first + vector4fCount;
-            for (UINT reg = OutRunWvpRegister;
-                reg < OutRunWvpRegister + OutRunWvpRegisterCount; ++reg)
-            {
-                if (reg < first || reg >= last)
-                    continue;
-                const UINT sourceOffset = reg - startRegister;
-                const UINT destOffset = reg - OutRunWvpRegister;
-                std::memcpy(R28RawWvp + destOffset * 4,
-                    constantData + sourceOffset * 4, sizeof(float) * 4);
-                R28RawWvpMask |= (1u << destOffset);
-            }
+            // An overlapping contiguous float4 register upload can seed
+            // the raw c64..c67 shadow with ONE memcpy. Shader-heavy world
+            // draws commonly write all four registers together; avoid four
+            // independent comparisons/copies while preserving partial rows.
+            const std::uint64_t wvpFirst = OutRunWvpRegister;
+            const std::uint64_t wvpLast =
+                wvpFirst + OutRunWvpRegisterCount;
+            const std::uint64_t overlapFirst =
+                first > wvpFirst ? first : wvpFirst;
+            const std::uint64_t overlapLast =
+                last < wvpLast ? last : wvpLast;
+            if (overlapFirst >= overlapLast)
+                return;
+            const UINT sourceOffset =
+                static_cast<UINT>(overlapFirst - first);
+            const UINT destOffset =
+                static_cast<UINT>(overlapFirst - wvpFirst);
+            const UINT rowCount =
+                static_cast<UINT>(overlapLast - overlapFirst);
+            std::memcpy(R28RawWvp + destOffset * 4,
+                constantData + sourceOffset * 4,
+                static_cast<std::size_t>(rowCount) * 4 * sizeof(float));
+            R28RawWvpMask |= ((1u << rowCount) - 1u) << destOffset;
         }
 
         bool R28RawWvpComplete() noexcept
