@@ -118,13 +118,21 @@ if($backend -eq 'd3d9'){
     }
 }
 
-# GPU lab arguments are supported only by the separate DX9Ex diagnostic GUI.
+# The measured C preset may run WITHOUT the GPU-Lab instrumentation. Other
+# A/B diagnostic combinations still require GPU Diagnostics ON; they are not
+# silently promoted to gameplay defaults.
 $gpuLabValues=@($GpuLabTransparency,$GpuLabReflection,$GpuLabSkyGlow,$GpuLabCulling)
 $gpuLabActive=@($gpuLabValues|Where-Object{$_ -ne 'DEFAULT'}).Count -gt 0
+$measuredCProduction=($backend -eq 'd3d9' -and $GpuDiagnostics -eq 'OFF' -and
+    $gpuLabActive -and $GpuLabTransparency -eq 'OFF' -and
+    $GpuLabReflection -eq '1024' -and $GpuLabSkyGlow -eq '4' -and
+    $GpuLabCulling -eq 'ON' -and
+    $GpuLabMsaa -in @('4X','DEFAULT'))
 if($gpuLabActive){
-    if($backend -ne 'd3d9' -or $GpuDiagnostics -ne 'ON' -or
-        @($gpuLabValues|Where-Object{$_ -eq 'DEFAULT'}).Count -gt 0){
-        throw 'GPU lab requires DX9Ex, GPU Diagnostics ON and four explicit quality settings.'
+    if($backend -ne 'd3d9' -or
+        @($gpuLabValues|Where-Object{$_ -eq 'DEFAULT'}).Count -gt 0 -or
+        ($GpuDiagnostics -ne 'ON' -and -not $measuredCProduction)){
+        throw 'GPU lab A/B needs DX9Ex diagnostics ON; production OFF is supported only for measured C (culling ON, SSAA OFF, reflection 1024, SkyGlow 4, MSAA 4X).'
     }
     $helper=Join-Path $root 'OutRunVR-GPU-Lab-Settings.ps1'
     if(!(Test-Path -LiteralPath $helper)){throw 'GPU lab settings helper missing'}
@@ -135,7 +143,9 @@ if($gpuLabActive){
         -SkyGlow $GpuLabSkyGlow -StageCulling $GpuLabCulling -Msaa $msaa)
 }
 if($backend -ne '2d'){
-    $gameArgs += '-HudInspector=true'
+    # The optional C gameplay preset must not force per-draw HUD inspector
+    # overhead. Keep HUD Inspector ON for all existing diagnostic sessions.
+    $gameArgs += if($measuredCProduction){'-HudInspector=false'}else{'-HudInspector=true'}
 }
 
 $sessionRoot=Join-Path $root ("logs/{0}/{1}/{2}/{3}" -f $state.BuildMatrixId,$state.VariantId,$TestProfile,$state.SessionId)
@@ -273,7 +283,12 @@ $env:OUTRUN_VR_GPU_PROFILE = if ($gpuDiagnosticActive) { '1' } else { $null }
 $env:OUTRUN_VR_GPU_SCENE = if ($gpuDiagnosticActive -and $GpuLabScene -ne 'NONE') {
     $GpuLabScene
 } else { $null }
-if ($gpuDiagnosticActive) { $env:OUTRUN_VR_PACING_DIAGNOSTICS = '1' }
+if ($gpuDiagnosticActive) {
+    $env:OUTRUN_VR_PACING_DIAGNOSTICS = '1'
+} elseif ($measuredCProduction) {
+    # An inherited diagnostic environment must not defeat no-profiling mode.
+    $env:OUTRUN_VR_PACING_DIAGNOSTICS = $null
+}
 Write-Host "GPU detailed diagnostics: $GpuDiagnostics (D3D9 timestamps / pacing / whole-GPU sampler)"
 # Opt-in whole-GPU telemetry accompanies the QPC pacing session. The external
 # nvidia-smi process samples NVIDIA's driver once per second and does not run

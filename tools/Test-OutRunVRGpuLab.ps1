@@ -59,4 +59,20 @@ foreach($file in @('OutRunVR-GPU-Lab.ps1','Run-OutRunVRTest.ps1',
     [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot $file),[ref]$t,[ref]$e)
     if($e.Count){throw "PowerShell syntax failed $file : $($e -join '; ')"}
 }
-Write-Host 'PASS seven vectors + negative invalid + two-gate SSAA source checks'
+# The production button uses the exact measured C tuple and cannot enable
+# D3D9 timestamps, inherited XR pacing diagnostics or HUD draw inspection.
+foreach($token in @('$measuredCProduction',"$" + "GpuDiagnostics -eq 'OFF'",
+ 'GpuLabTransparency -eq ' + [char]39 + 'OFF',
+ 'GpuLabReflection -eq ' + [char]39 + '1024',
+ 'GpuLabSkyGlow -eq ' + [char]39 + '4',
+ 'GpuLabCulling -eq ' + [char]39 + 'ON',
+ '-HudInspector=false','OUTRUN_VR_PACING_DIAGNOSTICS = $null')){
+    if(!$runner.Contains([string]$token)){throw "Production C missing guard: $token"}
+}
+if(!$gui.Contains('$preset.SelectedIndex=2') -or
+   !$gui.Contains("'-GpuDiagnostics','OFF'") -or
+   !$gui.Contains("'-GpuLabTransparency','OFF'") -or
+   !$gui.Contains("'-GpuLabCulling','ON'")){
+    throw 'Measured C opt-in GUI launch mismatch'
+}
+Write-Host 'PASS measured C no-diagnostics production gate and A-E diagnostic vectors'

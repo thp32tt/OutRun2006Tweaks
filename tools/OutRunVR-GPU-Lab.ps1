@@ -10,7 +10,7 @@ if(!(Test-Path $runner) -or !(Test-Path $selector)){throw 'GPU lab runner/select
 $form=New-Object System.Windows.Forms.Form
 $form.Text='OutRun 2006 VR - GPU Performance Lab'
 $form.StartPosition='CenterScreen'
-$form.ClientSize=[System.Drawing.Size]::new(655,608)
+$form.ClientSize=[System.Drawing.Size]::new(655,675)
 $form.FormBorderStyle='FixedDialog'
 $form.MaximizeBox=$false
 function Add-Label([string]$name,[int]$y){
@@ -43,7 +43,7 @@ $hint.Location=[System.Drawing.Point]::new(28,60)
 $hint.Size=[System.Drawing.Size]::new(615,34)
 $form.Controls.Add($hint)
 Add-Label 'A/B 프리셋' 105
-$preset=Add-Choice 102 @('A 기준','B 컬링 ON','C 반투명 SSAA OFF','D 반사 512','E SkyGlow OFF','사용자 지정') 0
+$preset=Add-Choice 102 @('A 기준','B 컬링 ON','C 권장 - 컬링 ON / SSAA OFF','D 반사 512','E SkyGlow OFF','사용자 지정') 0
 Add-Label '반투명 SSAA' 151
 $alpha=Add-Choice 148 @('ON 기준 화질','OFF 비용 비교') 0
 Add-Label '반사 해상도' 197
@@ -77,12 +77,12 @@ foreach($ctrl in @($alpha,$reflection,$sky,$culling,$msaa)){
     })
 }
 $note=New-Object System.Windows.Forms.Label
-$note.Text='자동 측정: GPU 타임스탬프 + 투명/깊이/픽셀셰이더 + R32 Draw + CPU/XR + NVIDIA GPU 사용률 (계측 오버헤드 있음).'
+$note.Text='A~E 비교는 계측 ON입니다. 실측 권장 C를 계측 OFF로 실행하려면 아래 성능 주행 버튼을 사용하세요.'
 $note.Location=[System.Drawing.Point]::new(28,438)
 $note.Size=[System.Drawing.Size]::new(590,50)
 $form.Controls.Add($note)
 $start=New-Object System.Windows.Forms.Button
-$start.Text='GPU 측정 시작 / 게임 실행'
+$start.Text='A~E 성능 측정 (계측 ON)'
 $start.Location=[System.Drawing.Point]::new(28,507)
 $start.Size=[System.Drawing.Size]::new(385,49)
 $start.Font=[System.Drawing.Font]::new('Segoe UI',11,[System.Drawing.FontStyle]::Bold)
@@ -114,6 +114,34 @@ $start.Add_Click({
         $form.WindowState=[System.Windows.Forms.FormWindowState]::Minimized
     }catch{
         [System.Windows.Forms.MessageBox]::Show($_.Exception.Message,'GPU 측정 실행 실패')|Out-Null
+        $form.WindowState=[System.Windows.Forms.FormWindowState]::Normal
+    }
+})
+# Start with the best measured A~E trial while preserving the full matrix.
+# Assign after the selection callbacks exist so C's toggles are synchronized.
+$preset.SelectedIndex=2
+$production=New-Object System.Windows.Forms.Button
+$production.Text='권장 C 실주행 (GPU 계측 OFF / HUD 검사 OFF)'
+$production.Location=[System.Drawing.Point]::new(28,568)
+$production.Size=[System.Drawing.Size]::new(581,46)
+$production.Font=[System.Drawing.Font]::new('Segoe UI',10,[System.Drawing.FontStyle]::Bold)
+$form.Controls.Add($production)
+$production.Add_Click({
+    try {
+        if(!(Test-Path (Join-Path $root 'OR2006C2C.EXE'))){throw '원본 OR2006C2C.EXE가 있는 게임 폴더에서 실행하세요.'}
+        if(Get-Process -Name OR2006C2C -ErrorAction SilentlyContinue){throw '게임이 이미 실행 중입니다.'}
+        & $selector -Backend d3d9 -TestProfile PERFORMANCE -VariantId CURRENT_FOCUS
+        if($LASTEXITCODE -and $LASTEXITCODE -ne 0){throw 'DX9Ex 백엔드 준비 실패'}
+        $args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',
+            ('"{0}"' -f $runner),'-TestProfile','PERFORMANCE','-GpuDiagnostics','OFF',
+            '-GpuLabTransparency','OFF','-GpuLabReflection','1024',
+            '-GpuLabSkyGlow','4','-GpuLabCulling','ON',
+            '-GpuLabMsaa','4X','-GpuLabScene','OTHER')
+        $p=Start-Process -FilePath 'powershell.exe' -ArgumentList $args -WorkingDirectory $root -PassThru
+        if(!$p){throw '계측 OFF 실주행 프로세스 시작 실패'}
+        $form.WindowState=[System.Windows.Forms.FormWindowState]::Minimized
+    }catch{
+        [System.Windows.Forms.MessageBox]::Show($_.Exception.Message,'성능 주행 실행 실패')|Out-Null
         $form.WindowState=[System.Windows.Forms.FormWindowState]::Normal
     }
 })
