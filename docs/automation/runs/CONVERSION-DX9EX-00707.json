@@ -1,0 +1,108 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00707",
+  "production_id": "CONVERSION-DX9EX-00707",
+  "event_id": "CONVERSION-DX9EX-00707-C6",
+  "event_type": "C6_RESULT_ONLY",
+  "feature_id": null,
+  "work_key": "DX9EX:R30_INDEXED_VB_TOUCHED_SPARSE_STEREO_SEEDS",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "base_sha": "84eaf0a8c27cae7a4efcb40f2ff55f1e8834e1d2",
+  "source_material_sha": "4e61a27c1e7af7ccddc1df572d1703f8268649f8",
+  "material_result_sha": "4e61a27c1e7af7ccddc1df572d1703f8268649f8",
+  "result_sha": "dcfa05b469bd8e1173c3dfd55f64c47dbd130f86",
+  "validation_bearing_result_sha": "dcfa05b469bd8e1173c3dfd55f64c47dbd130f86",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "material_commits": [
+    "4e61a27c1e7af7ccddc1df572d1703f8268649f8",
+    "65a38408dc723cd078d60773656a1a0feee58ebd",
+    "dcfa05b469bd8e1173c3dfd55f64c47dbd130f86"
+  ],
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_index_rebase_fastpath.py",
+    "tools/verify_vr_r30_sparse_population_fastpath.py"
+  ],
+  "feature_contract": {
+    "goal": "Reuse the unique indexed VB vertices touched by each IB decode generation when seeding R30 sparse stereo-eye transforms, avoiding repeated scans of the full min-to-max VB span.",
+    "acceptance": "Cache the unique touched indices only for an unchanged IB decode generation; validate list length against knownUsedCount, invalidate and clear before new decodes, publish used-mask bits only after successful append, fail closed on allocation failure or changed index bytes, preserve the independent UP path, and require deterministic differential/destructive regressions plus exact-SHA GitHub CI."
+  },
+  "acceptance_results": {
+    "source_implementation": "MATERIAL_COMMITTED",
+    "indexed_vb_touched_generation_cache": "SOURCE_COMMITTED",
+    "sparse_stereo_seed_reuse": "SOURCE_COMMITTED",
+    "differential_900_cases_and_destructive_mutations": "PASS_EXACT_SHA_POLICY",
+    "related_sparse_population_regression_repair": "PASS_EXACT_SHA_POLICY",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_RESULT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_RESULT_SHA",
+    "full_source_impact": "SUCCESS_ORIGINAL_MATERIAL_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38291444966,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "dcfa05b469bd8e1173c3dfd55f64c47dbd130f86",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "full-chain-compile": "success",
+        "game": "success",
+        "host": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38291445032,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "dcfa05b469bd8e1173c3dfd55f64c47dbd130f86",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    {
+      "id": 38290947473,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "4e61a27c1e7af7ccddc1df572d1703f8268649f8",
+      "conclusion": "success"
+    }
+  ],
+  "failed_prior_runs": [
+    {
+      "id": 38290947514,
+      "head_sha": "4e61a27c1e7af7ccddc1df572d1703f8268649f8",
+      "failed_job": "policy",
+      "reason": "Sparse population verifier assumed obsolete indexed transform arity; repaired in 65a38408dc723cd078d60773656a1a0feee58ebd."
+    },
+    {
+      "id": 38291287406,
+      "head_sha": "65a38408dc723cd078d60773656a1a0feee58ebd",
+      "failed_job": "policy",
+      "reason": "Destructive index-rebase verifier inspected pristine source alongside mutated body; repaired in the validation-bearing result commit."
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 11767196111,
+      "name": "OutRun2-VR-DX9EX-ACTIVE-dcfa05b469bd8e1173c3dfd55f64c47dbd130f86"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "Quest 3/VDXR HMD gameplay, visual correctness, FPS, and frame-time p95/p99 were not tested during this C6 result-only operation. GitHub CI success is not runtime validation.",
+  "hold_reason_resolved": "RUN_RECORD_NOT_FOUND",
+  "score_credit_key": "CONVERSION-DX9EX-00707",
+  "score_change": 0,
+  "score_status": "C6_BOOKKEEPING_NO_ADDITIONAL_CREDIT",
+  "notes": "Run JSON was absent at the exact validation SHA and target branch. This C6-only [skip ci] record reconstructs material and acceptance evidence from the existing 00707 C++ and verifier commits without modifying source or rerunning CI. The original material_result_sha and exact validation_bearing_result_sha remain separate and immutable; no duplicate score credit."
+}
