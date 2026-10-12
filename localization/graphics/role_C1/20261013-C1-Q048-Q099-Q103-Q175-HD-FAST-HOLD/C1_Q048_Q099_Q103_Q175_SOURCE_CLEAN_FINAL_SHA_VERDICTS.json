@@ -1,0 +1,213 @@
+{
+  "schema": "outrun-c1-sha-locked-source-clean-vs-persisted-dds-batch-v1",
+  "task_id": "OUTRUN-C1-20261013-0210-Q048-Q099-Q103-Q175-FAST-QA",
+  "role": "C1",
+  "reviewer": "ChatGPT AI 1",
+  "review_date_kst": "2026-10-13",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "base_head": "d1d23262608fa9b6d036a78020d3f31bd2445ffa",
+  "production_attempts": 0,
+  "candidates_reviewed": 4,
+  "contact_sheet": "C1_Q048_Q099_Q103_Q175_SOURCE_CLEAN_SAVED_RAW_FLIPY_75_50.jpg",
+  "contact_sheet_sha256": "88f4db4047e10af0cf738375b73d94bd10558d1d1f957e98d6dc89f85a83058b",
+  "policy": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md"
+  ],
+  "confirmed_header_checks": "all four actual persisted DDS header bytes 0..127 exactly source; includes same format/dimensions/mip1",
+  "pass_semantics": "native/75/50 viewed glyph readability is a scoped subcheck only, no whole-DDS static PASS",
+  "final_release": "TEST_ONLY/HOLD",
+  "historical_c2_tokens_issued": 0,
+  "C3": "NOT_RUN",
+  "user_game": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "items": [
+    {
+      "queue_index": 48,
+      "producer": "B407",
+      "source_dds_sha256": "3c58bf9587d0454e5bb8733bd35c5b2613b11c7fd52c49a428f0fa5fb4cea12d",
+      "source_provenance": "Pinned upstream Sonic-TV/OR2006Sprites original HD DDS verified by expected SHA-256",
+      "source_clean_sha256": "099a23f372463f74de4310581db6c00a2955dcb8787e5938bb03a30095c658d0",
+      "source_clean_artifact": "localization/graphics/role_B/20261012-B407-Q048-STREAK-RESTORE/B407_Q048_SOURCE_CORRECTED_CLEAN.png",
+      "source_clean_gate": "HOLD_FULL_ATLAS_CLEAN_PROTECTED_UV_UNPROVEN",
+      "source_clean_decoded_change_pixels_full_atlas": 286072,
+      "source_clean_orientation": "READABLE",
+      "final_dds_sha256": "b17750c7bee787be04bd62d553e2cbe8f08c82ffaffdd272dd673fb3cd92c8a7",
+      "final_dds_artifact": "localization/graphics/role_B/20261012-B407-Q048-STREAK-RESTORE/B407_Q048_STREAK_ONLY_UNPROMOTED.dds",
+      "final_header_equal_original": true,
+      "final_decoded_changed_pixels": 294870,
+      "final_changed_bbox_readable": [
+        51,
+        769,
+        1877,
+        2043
+      ],
+      "contact_readable_roi": [
+        690,
+        1635,
+        1435,
+        1920
+      ],
+      "contact_raw_roi": [
+        690,
+        128,
+        1435,
+        413
+      ],
+      "readability_native_75_50": "SCOPED_READABLE_ON_INSPECTED_VIEW_NOT_FULL_PASS",
+      "scope": "SLIPSTREAM / 슬립스트림 glyph and B407 cyan streak vicinity; other atlas labels not reviewed",
+      "reviewed_translated_phrase_count": 1,
+      "untranslated_phrase_count_in_reviewed_scope": 0,
+      "remaining_scope": "uninspected atlas labels UNKNOWN",
+      "observed_new_hard_defect_coordinates": null,
+      "known_open_problem": "IGR009/P1 open; B407 restored 415 cyan-streak pixels but producer documents inherited C393 italic source-family defect; no new Korean glyph recreation",
+      "hold_reason": "source-clean changes across multiple atlas regions without independently verified UV cell/protection block mapping",
+      "source_clean_verdict": "HOLD",
+      "final_dds_verdict": "HOLD",
+      "verdict": "HOLD",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "queue_index": 99,
+      "producer": "A256",
+      "source_dds_sha256": "d97206d8ab5e0898c81d9cc0d6562db1a381894b0fa3e2d9fa75303867a638e2",
+      "source_provenance": "Pinned upstream Sonic-TV/OR2006Sprites original HD DDS verified by expected SHA-256",
+      "source_clean_sha256": "32da2a6e7d9731429a5876eb268ea492df346a8e57fc3d044f8be371fde6be9a",
+      "source_clean_artifact": "localization/graphics/role_A/20261012-A256-Q099-NATIVE-ITALIC-BC3/A256_SOURCE_DERIVED_EMPTY_CLEAN.png",
+      "source_clean_gate": "HOLD_CROPPED_CLEAN_SOURCE_COORDINATE_NOT_INDEPENDENTLY_BOUND",
+      "source_clean_decoded_change_pixels_full_atlas": null,
+      "source_clean_orientation": "CROP_OR_UNBOUND",
+      "final_dds_sha256": "25aa60916a12602354671675333ecff4f140c7e9401acf2260b44bcf3deda829",
+      "final_dds_artifact": "localization/graphics/role_A/20261012-A256-Q099-NATIVE-ITALIC-BC3/A256_Q099_TWO_LINE_ITALIC_BC3_UNPROMOTED.dds",
+      "final_header_equal_original": true,
+      "final_decoded_changed_pixels": 188949,
+      "final_changed_bbox_readable": [
+        514,
+        37,
+        1614,
+        217
+      ],
+      "contact_readable_roi": [
+        479,
+        17,
+        1649,
+        237
+      ],
+      "contact_raw_roi": [
+        479,
+        19,
+        1649,
+        239
+      ],
+      "readability_native_75_50": "SCOPED_READABLE_ON_INSPECTED_VIEW_NOT_FULL_PASS",
+      "scope": "Drive against the Ghost Car and challenge for the course record!! → 고스트 카와 달리며 / 코스 기록에 도전하세요! (2 lines)",
+      "reviewed_translated_phrase_count": 1,
+      "untranslated_phrase_count_in_reviewed_scope": 0,
+      "remaining_scope": "other atlas labels not inventoried",
+      "observed_new_hard_defect_coordinates": null,
+      "known_open_problem": "previous C383 material REWORK; new A256 native/75/50 is readable",
+      "hold_reason": "1100x182 CLEAN cropped layer lacks independently verified atlas offset/UV; BC3 protection-block containment not independently proven",
+      "source_clean_verdict": "HOLD",
+      "final_dds_verdict": "HOLD",
+      "verdict": "HOLD",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "queue_index": 103,
+      "producer": "A253",
+      "source_dds_sha256": "76b6f6d8bc8b3269c2fdb73fcf7f2dd74163ed426a3d31efe33b6e51103af544",
+      "source_provenance": "Pinned upstream Sonic-TV/OR2006Sprites original HD DDS verified by expected SHA-256",
+      "source_clean_sha256": "76624c65cc3cb7025e5c10a16341fb347bf48ce6f5de9337afaf7a25876ce941",
+      "source_clean_artifact": "localization/graphics/role_A/20261012-A253-Q103-SOURCE-ITALIC-REWORK/A253_CLEAN_NATIVE.png",
+      "source_clean_gate": "HOLD_CROPPED_CLEAN_SOURCE_COORDINATE_NOT_INDEPENDENTLY_BOUND",
+      "source_clean_decoded_change_pixels_full_atlas": null,
+      "source_clean_orientation": "CROP_OR_UNBOUND",
+      "final_dds_sha256": "4f442a8a42a5e6ae04d505f32712140548b8fc8116d1fd3bfe295714bfb8f37d",
+      "final_dds_artifact": "localization/graphics/role_A/20261012-A253-Q103-SOURCE-ITALIC-REWORK/A253_Q103_RIGHT_ITALIC_MEDIUM_UNPROMOTED.dds",
+      "final_header_equal_original": true,
+      "final_decoded_changed_pixels": 9951,
+      "final_changed_bbox_readable": [
+        1432,
+        1980,
+        1786,
+        2025
+      ],
+      "contact_readable_roi": [
+        1350,
+        1925,
+        1860,
+        2048
+      ],
+      "contact_raw_roi": [
+        1350,
+        0,
+        1860,
+        123
+      ],
+      "readability_native_75_50": "SCOPED_READABLE_ON_INSPECTED_VIEW_NOT_FULL_PASS",
+      "scope": "Normal Balance → 일반 밸런스 within yellow selection plate",
+      "reviewed_translated_phrase_count": 1,
+      "untranslated_phrase_count_in_reviewed_scope": 0,
+      "remaining_scope": "other selector atlas labels UNKNOWN",
+      "observed_new_hard_defect_coordinates": null,
+      "known_open_problem": "previous independent italic-family rejection; current A253 native/75/50 readable and original source right-slant orientation retained",
+      "hold_reason": "producer CLEAN is crop-only, no independently verified crop-to-canonical-source clean map/UV cell or outside-protection footprint",
+      "source_clean_verdict": "HOLD",
+      "final_dds_verdict": "HOLD",
+      "verdict": "HOLD",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "queue_index": 175,
+      "producer": "A254",
+      "source_dds_sha256": "9314372585b8309f2f8b3e714076ef1ad1999d770422a570398ef20a80ac10a5",
+      "source_provenance": "Pinned upstream Sonic-TV/OR2006Sprites original HD DDS verified by expected SHA-256",
+      "source_clean_sha256": "3414e04943f74e34d6a089c451167b5b34d5a87396953b452f49fa444e3b816b",
+      "source_clean_artifact": "localization/graphics/role_A/20261012-A254-Q175-NATIVE-CHROME-GLYPH/A254_CLEAN_NATIVE.png",
+      "source_clean_gate": "HOLD_CROPPED_CLEAN_SOURCE_COORDINATE_NOT_INDEPENDENTLY_BOUND",
+      "source_clean_decoded_change_pixels_full_atlas": null,
+      "source_clean_orientation": "CROP_OR_UNBOUND",
+      "final_dds_sha256": "d5789dc2eb173ad670eb0a5e80ec9e5cd174a66485d4afb3c05dc8571fce5855",
+      "final_dds_artifact": "localization/graphics/role_A/20261012-A254-Q175-NATIVE-CHROME-GLYPH/A254_Q175_REAL_HANGUL_METALLIC_UNPROMOTED.dds",
+      "final_header_equal_original": true,
+      "final_decoded_changed_pixels": 373066,
+      "final_changed_bbox_readable": [
+        2,
+        254,
+        1386,
+        717
+      ],
+      "contact_readable_roi": [
+        0,
+        365,
+        995,
+        556
+      ],
+      "contact_raw_roi": [
+        0,
+        468,
+        995,
+        659
+      ],
+      "readability_native_75_50": "SCOPED_READABLE_ON_INSPECTED_VIEW_NOT_FULL_PASS",
+      "scope": "SHOWROOM → 쇼룸 in one inspected region only (3 translated header regions in trial)",
+      "reviewed_translated_phrase_count": 1,
+      "untranslated_phrase_count_in_reviewed_scope": 0,
+      "remaining_scope": "at least 2 other translated header regions not individually visually reviewed; untranslated count outside region UNKNOWN",
+      "observed_new_hard_defect_coordinates": null,
+      "known_open_problem": "IGR032/P1 game retest OPEN; trial differs from source over [2,254,1386,717] and only showroom inspected",
+      "hold_reason": "CLEAN is not full atlas, remaining two headers and full protected pixels/UV mapping unreviewed",
+      "source_clean_verdict": "HOLD",
+      "final_dds_verdict": "HOLD",
+      "verdict": "HOLD",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    }
+  ],
+  "unsafe_inferences_disallowed": [
+    "Do not infer actual cell UV from visually empty pixels",
+    "Do not treat compression changes on protected art as permitted without verified exception",
+    "Do not claim cropped CLEAN equal full atlas CLEAN",
+    "Do not reuse C2 PASS or promote whole DDS from scoped readability"
+  ],
+  "score_award": "deferred_until_remote_commit_confirmed"
+}
