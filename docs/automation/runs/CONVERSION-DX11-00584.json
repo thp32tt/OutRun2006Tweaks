@@ -2,18 +2,18 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00584",
   "production_id": "CONVERSION-DX11-00584",
-  "event_id": "CONVERSION-DX11-00584-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX11-00584-E003",
+  "event_type": "retry",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
-  "attempt": "1/3",
+  "attempt": "2/3",
   "owner_id": "ChatGPT2:CONVERSION-DX11-00584",
   "base_sha": "441e55b5f1ad01eef74e04cb9132172f403f7eb6",
   "work_key": "DX11:MENU_RACE_SELECTARG_BLENDFACTOR_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "MATERIAL_COMMITTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "native_gameplay_activation": false,
   "hmd_test_performed": false,
@@ -58,5 +58,48 @@
     "static_precommit": "Live D3D9 state to native shader source, ready, reset, dispatch guarded; 20 mutation cases",
     "runtime_validation": "UNTESTED"
   },
-  "next_action": "Verify GitHub Actions exact validation-bearing SHA, then separate C6 bookkeeping without CI; HMD/gamepad remain UNTESTED."
+  "next_action": "NEED_HMD_TEST: Quest 3/VDXR and real menu/vehicle-select/race/gamepad visual proof; new feature assignment may proceed independently without implicit native gameplay promotion.",
+  "material_result_sha": "a2727c125f7f7aa52cb1141a9c2e475dbb7d9c0f",
+  "validation_bearing_result_sha": "37611f77146da5a83766d13e56643265b8ccfcb8",
+  "result_sha": "37611f77146da5a83766d13e56643265b8ccfcb8",
+  "c6_basis_head_sha": "37611f77146da5a83766d13e56643265b8ccfcb8",
+  "c6_validation_note": "Exact SHA Backend Conversion Gate (validate + readiness smoke), Build, DX11 Fast, OpenXR x86/x64 and HUD Inspector succeeded. Win32 C2065 declaration-order repaired, 22 negative mutation probes; no gameplay/HMD promotion.",
+  "automation_ci_results": [
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38196288256,
+      "conclusion": "success",
+      "validation_sha": "37611f77146da5a83766d13e56643265b8ccfcb8"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38196292202,
+      "conclusion": "success",
+      "validation_sha": "37611f77146da5a83766d13e56643265b8ccfcb8"
+    },
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38196288230,
+      "conclusion": "success",
+      "validation_sha": "37611f77146da5a83766d13e56643265b8ccfcb8"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38196288279,
+      "conclusion": "success",
+      "validation_sha": "37611f77146da5a83766d13e56643265b8ccfcb8"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38196292214,
+      "conclusion": "success",
+      "validation_sha": "37611f77146da5a83766d13e56643265b8ccfcb8"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38196292253,
+      "conclusion": "success",
+      "validation_sha": "37611f77146da5a83766d13e56643265b8ccfcb8"
+    }
+  ]
 }
