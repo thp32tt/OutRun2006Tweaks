@@ -30,8 +30,12 @@ def validate(source):
     assert "entry->size = desc.Size;" in ensure_vb
     assert "entry->size = desc.Size;" in ensure_ib
     assert "entry->indexFormat = desc.Format;" in ensure_ib
-    assert "R30VertexShadows.erase(buffer);" in source
-    assert "R30IndexShadows.erase(buffer);" in source
+    # Final Release now erases only live entries, advancing the generation so
+    # thread-local VB/IB lookup caches cannot reuse a recycled COM address.
+    release_vb = body(source, "ULONG __stdcall R30VertexBufferReleaseDest(")
+    release_ib = body(source, "ULONG __stdcall R30IndexBufferReleaseDest(")
+    assert "if (R30VertexShadows.erase(buffer))" in release_vb
+    assert "if (R30IndexShadows.erase(buffer))" in release_ib
     assert "R30VertexShadows.clear();" in source
     assert "R30IndexShadows.clear();" in source
     for copy, signature in ((copy_vb, "const R30ShadowPtr& entry,"),
