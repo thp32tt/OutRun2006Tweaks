@@ -2531,7 +2531,7 @@ namespace OutRunVRStereo
             std::size_t selectedCount) noexcept
         {
             if (!touched || touched->size() != selectedCount ||
-                selectedCount * 8u > vertexCount)
+                selectedCount * 4u > vertexCount)
                 return false;
             // Reject a corrupt/out-of-span producer list before any writes.
             // The UP builder guarantees uniqueness and 1:1 mask coverage.

@@ -47,7 +47,7 @@ def valid(code):
     helper = section(code, "bool R30SeedTouchedXyzrhwVertices(",
                      "bool R30SeedWorldXyzrhwBuffers(")
     for token in ("touched->size() != selectedCount",
-                  "selectedCount * 8u > vertexCount",
+                  "selectedCount * 4u > vertexCount",
                   "index >= vertexCount || !usedMask[index]",
                   "std::memcpy(left.data() + offset,",
                   "std::memcpy(right->data() + offset,"):
@@ -150,7 +150,7 @@ def touched_copy(data, mask, touched, stride, left, right):
     n = len(mask)
     count = sum(mask)
     if (n < 64 or count * 4 > n or len(touched) != count or
-            count * 8 > n or any(i >= n or not mask[i] for i in touched)):
+            count * 4 > n or any(i >= n or not mask[i] for i in touched)):
         return old_copy(data, mask, stride, left, right), False
     for i in touched:
         a, b = i * stride, (i + 1) * stride
@@ -187,7 +187,7 @@ def main():
         ("static_cast<std::size_t>(selectedCount) * 4u <= vertexCount",
          "static_cast<std::size_t>(selectedCount) * 2u <= vertexCount"),
         ("usedMask, knownUsedCount, touched))", "usedMask))"),
-        ("selectedCount * 8u > vertexCount", "selectedCount * 80u > vertexCount"),
+        ("selectedCount * 4u > vertexCount", "selectedCount * 80u > vertexCount"),
         ("index >= vertexCount || !usedMask[index]", "index >= vertexCount"),
         ("touched->size() != selectedCount", "touched->size() < selectedCount"),
         ("*usedMask, touched, selectedCount", "*usedMask, nullptr, selectedCount"),
@@ -238,8 +238,35 @@ def main():
                     assert touch_sparse == old_sparse
                     assert touch_l == old_l and touch_r == old_r
                     assert touched_selected == (
-                        n >= 64 and known * 8 <= n)
+                        n >= 64 and known * 4 <= n)
                     cases += 1
+
+    # Intermediate sparse spans (12.5-25%): use the validated touched
+    # list for both eyes rather than scanning every source vertex.
+    for n, used in ((80, 10), (80, 11), (80, 16), (80, 20), (80, 21)):
+        stride = 32
+        data = bytearray(rng.randbytes(n * stride))
+        initial = bytearray(rng.randbytes(n * stride))
+        mask = bytearray([1] * used + [0] * (n - used))
+        touched = list(range(used))
+        rng.shuffle(touched)
+        old_left, old_right = initial[:], initial[:]
+        new_left, new_right = initial[:], initial[:]
+        expected_sparse = old_copy(data, mask, stride, old_left, old_right)
+        sparse, used_touched = touched_copy(
+            data, mask, touched, stride, new_left, new_right)
+        assert sparse == expected_sparse
+        assert used_touched == (used * 4 <= n)
+        assert (new_left, new_right) == (old_left, old_right)
+        if used:
+            corrupt = touched[:]
+            corrupt[0] = n
+            fallback_left, fallback_right = initial[:], initial[:]
+            sparse, used_touched = touched_copy(
+                data, mask, corrupt, stride, fallback_left, fallback_right)
+            assert sparse == expected_sparse and not used_touched
+            assert (fallback_left, fallback_right) == (old_left, old_right)
+
     assert fast_copy(b"\0" * 64, [4], 4, 16,
                      bytearray(64), bytearray(64)) is None
     # Successive UP draws, shrinking/growing masks and failed index bounds
