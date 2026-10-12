@@ -1126,10 +1126,89 @@ for marker in (
 for raw in ("RightDepthSynchronized", "RightStencilSynchronized"):
     if re.search(rf"\b{raw}\b", r33):
         errors.append(f"R33 retained direct R9 right-depth sync read: {raw}")
-if r33.count("R32ReviewRightDepthInSync()") < 4:
-    errors.append("R33 missing R32 review facade depth-sync query at both world/HUD readiness gates")
-if r33.count("R32ReviewRightStencilInSync()") < 4:
-    errors.append("R33 missing R32 review facade stencil-sync query at both world/HUD readiness gates")
+# A single, fail-closed R33 readiness helper may serve both world and HUD.
+# Prior to 00675 the two draw routes each queried both bits multiple times.
+# Do not mistake those obsolete call-counts for ownership protection: the
+# shared helper must preserve the tracked-attachment/bootstrap/resample gates,
+# the live depth and stencil vetoes, and both callers' early exits.
+def r33_readiness_facade_ok(src: str) -> bool:
+    helper_signature = "bool R33PrepareRightDepthStereo("
+    if helper_signature not in src:
+        # Legacy inline routes, retained for historical contract compatibility.
+        return (src.count("R32ReviewRightDepthInSync()") >= 4
+                and src.count("R32ReviewRightStencilInSync()") >= 4)
+    try:
+        helper = src.split(helper_signature, 1)[1].split(
+            "void R33InvalidateRightForLeftWrite(", 1)[0]
+        world = src.split("R32ReviewOwnedResult R33TryFastWorld(", 1)[1].split(
+            "R32ReviewOwnedResult R33TryHud(", 1)[0]
+        hud = src.split("R32ReviewOwnedResult R33TryHud(", 1)[1].split(
+            "HRESULT R33Dispatch(", 1)[0]
+    except IndexError:
+        return False
+    if (helper.count("R32ReviewTrackedDepthStencil()") != 2
+            or helper.count("R32ReviewRightDepthInSync()") != 2
+            or helper.count("R32ReviewRightStencilInSync()") != 2):
+        return False
+    initial = "if (!R32ReviewTrackedDepthStencil())\\n                return true;"
+    boot_condition = "if (!depthInSync || !stencilInSync)"
+    bootstrap = "R32ReviewTryBootstrapRightDepth(device);"
+    after_boot = "if (!R32ReviewTrackedDepthStencil())\\n                    return true;"
+    depth_resample = "depthInSync = R32ReviewRightDepthInSync();"
+    stencil_resample = "stencilInSync = R32ReviewRightStencilInSync();"
+    depth_veto = "if (!depthInSync && R32ReviewDepthTestActive(device))\\n                return false;"
+    stencil_veto = "if (!stencilInSync && R32ReviewStencilTestActive(device))\\n                return false;"
+    required = (initial, "bool depthInSync = R32ReviewRightDepthInSync();",
+                "bool stencilInSync = R32ReviewRightStencilInSync();",
+                boot_condition, bootstrap, after_boot,
+                depth_resample, stencil_resample, depth_veto, stencil_veto)
+    if not all(s in helper for s in required):
+        return False
+    if not (helper.index(initial) < helper.index(boot_condition)
+            < helper.index(bootstrap) < helper.index(after_boot)
+            < helper.index(depth_resample) < helper.index(stencil_resample)
+            < helper.index(depth_veto) < helper.index(stencil_veto)):
+        return False
+    for route in (world, hud):
+        if (route.count("R33PrepareRightDepthStereo(device)") != 1
+                or "if (!R33PrepareRightDepthStereo(device))\\n                return {};" not in route
+                or "R32ReviewRightDepthInSync()" in route
+                or "R32ReviewRightStencilInSync()" in route):
+            return False
+        if not (route.index("R32ReviewEnsureStereoResources(device)")
+                < route.index("R33PrepareRightDepthStereo(device)")
+                < route.index("GetLatchedStereoFrame(stereo)")):
+            return False
+    return True
+
+
+if not r33_readiness_facade_ok(r33):
+    errors.append("R33 missing fail-closed R32 depth/stencil sync facade at world/HUD readiness gates")
+
+# Assert that the migrated facade is not simply declared but actually used
+# and that disabling any of its critical checks is still rejected.
+if "bool R33PrepareRightDepthStereo(" in r33:
+    helper_start = r33.index("bool R33PrepareRightDepthStereo(")
+    helper_end = r33.index("void R33InvalidateRightForLeftWrite(", helper_start)
+    helper_body = r33[helper_start:helper_end]
+    for label, before, after in (
+        ("bootstrap", "R32ReviewTryBootstrapRightDepth(device);", "(void)device;"),
+        ("depth veto", "if (!depthInSync && R32ReviewDepthTestActive(device))",
+         "if (false && R32ReviewDepthTestActive(device))"),
+        ("stencil veto", "if (!stencilInSync && R32ReviewStencilTestActive(device))",
+         "if (false && R32ReviewStencilTestActive(device))"),
+        ("depth resample", "depthInSync = R32ReviewRightDepthInSync();",
+         "depthInSync = true;"),
+        ("stencil resample", "stencilInSync = R32ReviewRightStencilInSync();",
+         "stencilInSync = true;"),
+    ):
+        if before not in helper_body:
+            errors.append("R33 depth/stencil negative mutation anchor missing: " + label)
+            continue
+        changed = (r33[:helper_start] + helper_body.replace(before, after, 1)
+                   + r33[helper_end:])
+        if r33_readiness_facade_ok(changed):
+            errors.append("R33 depth/stencil negative mutation escaped: " + label)
 if "return RightDepthSynchronized;" not in r9:
     errors.append("R9 depth-sync owner query no longer preserves tracked-state read")
 if "return RightStencilSynchronized;" not in r9:
