@@ -1,0 +1,81 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00694",
+  "production_id": "CONVERSION-DX9EX-00694",
+  "event_id": "CONVERSION-DX9EX-00694-C6",
+  "event_type": "C6_RESULT_ONLY",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "source_material_sha": "81676f627ad0187295bdc2a199fcd98eeb35e01f",
+  "material_result_sha": "81676f627ad0187295bdc2a199fcd98eeb35e01f",
+  "result_sha": "7c43adc67ce9205f3eb1a310016b3edcf90c1caf",
+  "validation_bearing_result_sha": "7c43adc67ce9205f3eb1a310016b3edcf90c1caf",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "material_commits": [
+    "81676f627ad0187295bdc2a199fcd98eeb35e01f",
+    "fa9846f675ae77ee93b9f942df994f8ebb4bf350",
+    "7c43adc67ce9205f3eb1a310016b3edcf90c1caf"
+  ],
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "tools/verify_vr_r30_sparse_population_fastpath.py",
+    "tools/verify_vr_r30_world_seed_fastpath.py"
+  ],
+  "feature_contract": {
+    "goal": "Remove redundant whole-mask unique-reference recounts from indexed R30 XYZRHW stereo draw particle/HUD paths, preserving source data, original fallback and both-eye behavior.",
+    "acceptance": "C++ 16/32-bit UP/VB indexed draw computes distinct vertex count during existing index pass; R30 world/HUD stereo seeding accepts authoritative count; legacy unknown-count uses existing count_if; targeted destructive/static and byte-equivalence tests, exact-SHA Active 5/5 and Domain success; protected visual and stereo routes unmodified."
+  },
+  "acceptance_results": {
+    "r30_unique_index_population": "MATERIAL_COMMITTED",
+    "r30_stereo_sparse_copy_count_reuse": "MATERIAL_COMMITTED",
+    "r30_destructive_and_copy_model_regression": "PASS_EXACT_SHA_POLICY",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_3_OF_3_ORIGINAL_MATERIAL_SHA_ONLY",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38265706195,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "7c43adc67ce9205f3eb1a310016b3edcf90c1caf",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "full-chain-compile": "success",
+        "game": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38265706242,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "7c43adc67ce9205f3eb1a310016b3edcf90c1caf",
+      "conclusion": "success"
+    },
+    {
+      "id": 38264827796,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "81676f627ad0187295bdc2a199fcd98eeb35e01f",
+      "conclusion": "success",
+      "note": "C++ material source unchanged in later only-Python-verifier fix commits; this impact run belongs to original source material SHA."
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "Quest3/VDXR/visual/FPS/p95/p99 were not exercised; no measured performance or optical pass claimed.",
+  "score_credit_key": "CONVERSION-DX9EX-00694",
+  "score_change": 0,
+  "score_status": "C6_BOOKKEEPING_NO_ADDITIONAL_CREDIT",
+  "notes": "One feature across initial C++ material and two source-policy verifier repair commits. This C6 document is independent from validation-bearing result and uses CI-skip; CI must be judged only on 7c43adc67ce9205f3eb1a310016b3edcf90c1caf. No DX11/DXVK/FFB/localization changes."
+}
