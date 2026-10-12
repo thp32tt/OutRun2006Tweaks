@@ -66,6 +66,7 @@ on:
       - 'tools/verify_vr_r23_host_fresh_fastpath.py'
       - 'tools/verify_vr_r23_pipeline_aggregation_fastpath.py'
       - 'tools/verify_vr_r23_direct_ring_read_fastpath.py'
+      - 'tools/verify_vr_r23_shared_eye_cache.py'
       - 'tools/verify_vr_r23_pixel_probe_optin.py'
       - 'tools/verify_vr_r23_seeded_clear_fastpath.py'
       - 'tools/verify_vr_r23_stencil_clear_batch.py'
@@ -233,6 +234,7 @@ jobs:
             'tools/verify_vr_r23_host_fresh_fastpath.py',
             'tools/verify_vr_r23_pipeline_aggregation_fastpath.py',
             'tools/verify_vr_r23_direct_ring_read_fastpath.py',
+            'tools/verify_vr_r23_shared_eye_cache.py',
             'tools/verify_vr_r23_pixel_probe_optin.py',
             'tools/verify_vr_r23_seeded_clear_fastpath.py',
             'tools/verify_vr_r23_stencil_clear_batch.py',

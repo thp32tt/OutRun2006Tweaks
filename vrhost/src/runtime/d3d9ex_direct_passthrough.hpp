@@ -63,6 +63,22 @@ namespace OutRunVrD3D9ExDirectPassthrough
     inline std::uint32_t SafeRunGeneration = 0;
     inline std::uint32_t SafeGamePid = 0;
 
+    // Keep opened D3D11 views of the four producer-owned shared textures alive
+    // across frame ACK/reuse. Never reuse one across a new run, transport
+    // generation, host D3D11 device or changed per-slot NT/legacy handle.
+    struct SharedEyeCacheSlot
+    {
+        ID3D11Texture2D* eyes[2]{};
+        std::uint32_t handles[2]{};
+        D3D11_TEXTURE2D_DESC desc{};
+    };
+    inline std::array<SharedEyeCacheSlot, OutRunVR::R13::DirectGpuAckRingSize>
+        SharedEyeCache{};
+    inline std::uint32_t SharedSourceGeneration = 0;
+    inline std::uint32_t SharedSourceRunGeneration = 0;
+    inline std::uint32_t SharedSourceGamePid = 0;
+    inline ID3D11Device* SharedSourceDevice = nullptr;
+
     inline std::uint64_t LastObservedCaptureFresh = 0;
     inline ULONGLONG LastCaptureFreshMs = 0;
 
@@ -74,6 +90,23 @@ namespace OutRunVrD3D9ExDirectPassthrough
             value->Release();
             value = nullptr;
         }
+    }
+
+    inline void ResetSharedEyeCacheSlot(SharedEyeCacheSlot& slot) noexcept
+    {
+        ReleaseCom(slot.eyes[0]);
+        ReleaseCom(slot.eyes[1]);
+        slot = {};
+    }
+
+    inline void ResetSharedEyeCache() noexcept
+    {
+        for (auto& slot : SharedEyeCache)
+            ResetSharedEyeCacheSlot(slot);
+        SharedSourceGeneration = 0;
+        SharedSourceRunGeneration = 0;
+        SharedSourceGamePid = 0;
+        SharedSourceDevice = nullptr;
     }
 
     struct DirectHostState
@@ -629,6 +662,100 @@ namespace OutRunVrD3D9ExDirectPassthrough
         return true;
     }
 
+    inline bool EnsureSharedEyeCacheSlot(
+        const OutRunVR::SharedRenderFrameState& frame,
+        std::uint32_t leftRaw, std::uint32_t rightRaw,
+        std::uint32_t width, std::uint32_t height, DXGI_FORMAT declared,
+        SharedEyeCacheSlot*& out) noexcept
+    {
+        out = nullptr;
+        const std::uint32_t slotIndex =
+            frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
+        const std::uint32_t generation =
+            frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
+        const std::uint32_t runGeneration =
+            frame.reserved[OutRunVR::RenderFrameRunGenerationIndex];
+        if (slotIndex >= SharedEyeCache.size() || !generation ||
+            !runGeneration || !frame.clientPid)
+            return false;
+
+        // A host session/device switch or game Reset must immediately release
+        // ALL old shared resource references, not merely the next reused slot.
+        if (SharedSourceGeneration != generation ||
+            SharedSourceRunGeneration != runGeneration ||
+            SharedSourceGamePid != frame.clientPid ||
+            SharedSourceDevice != OutRunVrFinalTest::Device)
+        {
+            ResetSharedEyeCache();
+            SharedSourceGeneration = generation;
+            SharedSourceRunGeneration = runGeneration;
+            SharedSourceGamePid = frame.clientPid;
+            SharedSourceDevice = OutRunVrFinalTest::Device;
+        }
+
+        auto& cached = SharedEyeCache[slotIndex];
+        if (cached.eyes[0] && cached.eyes[1] &&
+            cached.handles[0] == leftRaw &&
+            cached.handles[1] == rightRaw)
+        {
+            // Frame.v2 metadata must match the previously opened physical
+            // texture; never trust a stale cached view on a malformed frame.
+            if (cached.desc.Width != width || cached.desc.Height != height ||
+                cached.desc.Format != declared)
+                return false;
+            if (!EnsureSafeEyes(cached.desc))
+                return false;
+            out = &cached;
+            return true;
+        }
+
+        SharedEyeCacheSlot fresh{};
+        const std::uint32_t handles[2]{leftRaw, rightRaw};
+        for (int eye = 0; eye < 2; ++eye)
+        {
+            const HANDLE handle = reinterpret_cast<HANDLE>(
+                static_cast<std::uintptr_t>(handles[eye]));
+            if (FAILED(OutRunVrFinalTest::Device->OpenSharedResource(
+                    handle, __uuidof(ID3D11Texture2D),
+                    reinterpret_cast<void**>(&fresh.eyes[eye]))) ||
+                !fresh.eyes[eye])
+            {
+                ResetSharedEyeCacheSlot(fresh);
+                return false;
+            }
+        }
+
+        D3D11_TEXTURE2D_DESC second{};
+        fresh.eyes[0]->GetDesc(&fresh.desc);
+        fresh.eyes[1]->GetDesc(&second);
+        const bool match = fresh.desc.Width == width &&
+            fresh.desc.Height == height &&
+            second.Width == width && second.Height == height &&
+            fresh.desc.Format == second.Format &&
+            fresh.desc.Format == declared &&
+            fresh.desc.SampleDesc.Count == 1 &&
+            second.SampleDesc.Count == 1;
+        if (!match || !EnsureSafeEyes(fresh.desc))
+        {
+            if (fresh.desc.Format != declared &&
+                !FirstDeclaredFormatMismatchLogged)
+            {
+                FirstDeclaredFormatMismatchLogged = true;
+                std::cerr
+                    << "[D3D9Ex R23] Frame.v2 declared direct format does not match opened D3D11 texture; candidate rejected\n";
+            }
+            ResetSharedEyeCacheSlot(fresh);
+            return false;
+        }
+
+        fresh.handles[0] = leftRaw;
+        fresh.handles[1] = rightRaw;
+        ResetSharedEyeCacheSlot(cached);
+        cached = fresh; // ownership moves to this persistent slot
+        out = &cached;
+        return true;
+    }
+
     inline bool CopySharedFrameToSafeEyes(
         const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
@@ -650,59 +777,20 @@ namespace OutRunVrD3D9ExDirectPassthrough
             declared == DXGI_FORMAT_UNKNOWN)
             return false;
 
-        ID3D11Texture2D* shared[2]{};
-        bool ok = true;
-        const std::uint32_t handles[2]{ leftRaw, rightRaw };
-        for (int eye = 0; eye < 2 && ok; ++eye)
+        SharedEyeCacheSlot* source = nullptr;
+        if (!EnsureSharedEyeCacheSlot(frame, leftRaw, rightRaw, width, height,
+                declared, source))
         {
-            ID3D11Resource* resource = nullptr;
-            const HANDLE handle = reinterpret_cast<HANDLE>(
-                static_cast<std::uintptr_t>(handles[eye]));
-            if (FAILED(OutRunVrFinalTest::Device->OpenSharedResource(
-                    handle, __uuidof(ID3D11Resource),
-                    reinterpret_cast<void**>(&resource))) || !resource)
-            {
-                ok = false;
-                break;
-            }
-            const HRESULT qi = resource->QueryInterface(
-                __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&shared[eye]));
-            resource->Release();
-            if (FAILED(qi) || !shared[eye])
-                ok = false;
+            ++SafeCopyFailure;
+            return false;
         }
 
-        D3D11_TEXTURE2D_DESC desc[2]{};
-        if (ok)
-        {
-            shared[0]->GetDesc(&desc[0]);
-            shared[1]->GetDesc(&desc[1]);
-            ok = desc[0].Width == width && desc[0].Height == height &&
-                desc[1].Width == width && desc[1].Height == height &&
-                desc[0].Format == desc[1].Format &&
-                desc[0].Format == declared &&
-                desc[0].SampleDesc.Count == 1 &&
-                desc[1].SampleDesc.Count == 1 &&
-                EnsureSafeEyes(desc[0]);
-            if (!ok && desc[0].Format != declared &&
-                !FirstDeclaredFormatMismatchLogged)
-            {
-                FirstDeclaredFormatMismatchLogged = true;
-                std::cerr
-                    << "[D3D9Ex R23] Frame.v2 declared direct format does not match opened D3D11 texture; candidate rejected\n";
-            }
-        }
-
-        if (ok)
-        {
-            OutRunVrFinalTest::Context->CopyResource(SafeEye[0], shared[0]);
-            OutRunVrFinalTest::Context->CopyResource(SafeEye[1], shared[1]);
-            ok = WaitForCopyFence();
-        }
-
-        ReleaseCom(shared[0]);
-        ReleaseCom(shared[1]);
-        if (!ok || !PublishCompletedFrame(frame))
+        // Once each ring slot has been opened, normal frames do only these
+        // two GPU copies and the existing fence/ACK; no per-frame driver
+        // OpenSharedResource, QueryInterface, GetDesc or COM release churn.
+        OutRunVrFinalTest::Context->CopyResource(SafeEye[0], source->eyes[0]);
+        OutRunVrFinalTest::Context->CopyResource(SafeEye[1], source->eyes[1]);
+        if (!WaitForCopyFence() || !PublishCompletedFrame(frame))
         {
             ++SafeCopyFailure;
             return false;
@@ -828,6 +916,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
     inline void ResetR13HostState() noexcept
     {
         ResetSafeEyes();
+        ResetSharedEyeCache();
         ReleaseCom(CopyFence);
         CloseDirectAckMapping();
         CloseReadMappings();
