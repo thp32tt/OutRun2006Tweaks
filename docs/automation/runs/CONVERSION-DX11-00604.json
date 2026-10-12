@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00604",
   "work_key": "DX11:MENU_RACE_INVSRCALPHA_ZERO_ONE",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -60,5 +60,41 @@
     "status": "NOT_REQUIRED",
     "reason": "diagnostic-only; hardware parity untested"
   },
-  "next_action": "Exact-SHA GitHub five Gates then final status; runtime UNTESTED"
+  "next_action": "New independent DX11 work may continue. This feature requires real Quest3/VDXR/menu-selection-race and gamepad input parity verification prior to gameplay promotion.",
+  "result_sha": "c479c503fb4fac5093402708c3d03a0ef525cc96",
+  "validation_bearing_sha": "c479c503fb4fac5093402708c3d03a0ef525cc96",
+  "ci_summary": "Exact-SHA Backend Conversion Gate + DX11 Fast + Build + OpenXR + HUD successful; no Quest3/VDXR user runtime test",
+  "validation_runs": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38232780981,
+      "conclusion": "success"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38232781045,
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 38232788014,
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38232788101,
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38232788072,
+      "conclusion": "success"
+    }
+  ],
+  "material_commit": "1f70374ae61ed415714839570e761c9963362d85",
+  "validation_repairs": [
+    "839d81e43dc00d365a02d909ad9203b01b29e4b2",
+    "f88e00c8c8d2b8665b749b83b65291814aa420f5",
+    "c479c503fb4fac5093402708c3d03a0ef525cc96"
+  ]
 }
