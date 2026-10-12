@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00692",
+  "production_id": "CONVERSION-DX9EX-00692",
+  "event_id": "CONVERSION-DX9EX-00692-C6",
+  "event_type": "C6_RESULT_ONLY",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "hold_reason": "RUN_RECORD_NOT_FOUND",
+  "source_material_sha": "75ef9c91cac1295418680c965df564372699f97a",
+  "material_result_sha": "75ef9c91cac1295418680c965df564372699f97a",
+  "result_sha": "75ef9c91cac1295418680c965df564372699f97a",
+  "validation_bearing_result_sha": "75ef9c91cac1295418680c965df564372699f97a",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "material_commits": [
+    "75ef9c91cac1295418680c965df564372699f97a"
+  ],
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_index_rebase_fastpath.py"
+  ],
+  "feature_contract": {
+    "goal": "Eliminate per-index physical scratch-vector allocation and writes in the R30 indexed particle stereo rebasing hot path by scanning raw 16/32-bit indices for extrema and applying the signed base only to validated range endpoints.",
+    "acceptance": "Preserve 16/32-bit index behavior, unsigned address endpoint bounds, sparse/stereo fail-open guards, contiguous span limits, and vertex attributes; retain the two-pass rebasing verifier and exact-SHA DX9Ex Active 5-job, Domain Isolation, and Full Source Impact 3-job SUCCESS."
+  },
+  "acceptance_results": {
+    "r30_raw_index_endpoint_optimization": "MATERIAL_COMMITTED",
+    "r30_index_rebase_verifier": "PASS_EXACT_SHA_POLICY",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_3_OF_3_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38259077283,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "75ef9c91cac1295418680c965df564372699f97a",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "game": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38259077201,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "75ef9c91cac1295418680c965df564372699f97a",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    {
+      "id": 38259077197,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "75ef9c91cac1295418680c965df564372699f97a",
+      "conclusion": "success",
+      "jobs": {
+        "source-cross-domain": "success",
+        "msvc-analyze-openxr-host": "success",
+        "msvc-analyze-active-game": "success"
+      }
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "No Quest 3 / VDXR headset rendering, gameplay input or FPS/p95/p99 measurement was performed during this C6-only documentation action. GitHub CI is not HMD runtime acceptance.",
+  "score_credit_key": "CONVERSION-DX9EX-00692",
+  "score_change": 0,
+  "score_status": "NO_ADDITIONAL_CREDIT_C6_RESULT_ONLY",
+  "notes": "The original task run JSON was absent on the target branch (RUN_RECORD_NOT_FOUND). Material SHA and feature contract/acceptance evidence were reconstructed from the existing exact-SHA source commit and read-only GitHub CI results; no existing run JSON fields existed to overwrite. This [skip ci] bookkeeping record is not validation-bearing. No source changes, CI reruns, SHA replacement, or duplicate scoreboard credit."
+}
