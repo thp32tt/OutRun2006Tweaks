@@ -77,7 +77,12 @@ for name,text in json.loads({encoded!r}).items():
  backup=p.with_suffix('.md.before-plate-{revision[:12]}')
  if p.exists() and not backup.exists(): backup.write_bytes(p.read_bytes())
  p.write_text(text)
-p=b/'docker-compose.yml';s=p.read_text(); marker='    image: {image}\\n'
+p=b/'docker-compose.yml';s=p.read_text()
+if 'CHAT_SLOTS: "4"' in s: s=s.replace('CHAT_SLOTS: "4"','CHAT_SLOTS: "3"')
+elif 'CHAT_SLOTS: "3"' not in s: raise RuntimeError('CHAT_SLOTS mapping unexpected')
+if 'SCHEDULE_MINUTES: "0,10,20,30,40,50"' in s: s=s.replace('SCHEDULE_MINUTES: "0,10,20,30,40,50"','SCHEDULE_MINUTES: "0,10,30,40"')
+elif 'SCHEDULE_MINUTES: "0,10,30,40"' not in s: raise RuntimeError('Schedule mapping unexpected')
+marker='    image: {image}\\n'
 if marker not in s:
  if '    image:' in s: raise RuntimeError('Unexpected existing image mapping; manual reconcile required')
  backup=p.with_suffix('.yml.before-plate-{revision[:12]}')
