@@ -42,6 +42,7 @@
 #include "runtime/direct_ring_latest.hpp"
 #include "runtime/theater_capture_reuse.hpp"
 #include "runtime/menu_projection_slice_copy.hpp"
+#include "runtime/menu_content_aspect.hpp"
 #include "runtime/cadence_presented_wait.hpp"
 #include "runtime/cadence_schedule.hpp"
 #include "vr/ipc/cadence_v1.hpp"
@@ -1412,10 +1413,35 @@ namespace
 
         RECT cr{};
         GetClientRect(c.hwnd_, &cr);
-        const float sourceAspect = (cr.bottom > cr.top)
+        float sourceAspect = (cr.bottom > cr.top)
             ? static_cast<float>(cr.right - cr.left) /
                 static_cast<float>(cr.bottom - cr.top)
             : 16.0f / 9.0f;
+
+        // Issue #119: UIScalingMode=1 / UILetterboxing=1 already centers
+        // original 4:3 menu content inside the 16:9 or 21:9 game client.
+        // Projecting the whole ultrawide client into XR keeps those empty
+        // horizontal rails, making the readable content unnecessarily tiny.
+        // This opt-in A/B path crops ONLY the LOCAL-fixed theater menu input,
+        // leaving world stereo, game HUD, F11, source capture and the default
+        // output completely unchanged. The same UV feeds BOTH eyes.
+        static const bool center43OptIn = []() noexcept {
+            const char* v = std::getenv("OUTRUN_VR_MENU_CENTER_4_3");
+            return v && v[0] == '1' && v[1] == '\0';
+        }();
+        RECT fullClient{};
+        if (center43OptIn && c.GetGameClientOutputRect(fullClient))
+        {
+            const auto plan = OutRunVrMenuAspect::PlanCenteredContent(
+                sourceAspect, 4.0f / 3.0f);
+            if (plan.crop)
+            {
+                const float previousWidth = whole.w;
+                whole.x += previousWidth * plan.offsetX;
+                whole.w = previousWidth * plan.width;
+                sourceAspect = plan.aspect;
+            }
+        }
         const float fovAspect = spanX / spanY;
         if (!std::isfinite(sourceAspect) || !std::isfinite(fovAspect) ||
             sourceAspect <= 0.1f || fovAspect <= 0.1f)
