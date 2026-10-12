@@ -2,9 +2,9 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00636",
   "production_id": "CONVERSION-DX11-00636",
-  "event_id": "CONVERSION-DX11-00636-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00636-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2",
@@ -56,22 +56,22 @@
     "docs/automation/runs/CONVERSION-DX11-00636.json"
   ],
   "pipeline": {
-    "C0_RECOVER": "PASS: 00635 active on remote, disjoint PM TFACTOR modulation path not previously present",
-    "C1_REVIEW": "PASS: exact RGB PM plus alpha TFACTOR modulation missing; existing PM factor SELECT outputs a different alpha",
-    "C2_IMPLEMENT": "PASS actual D3D9 PM RGB / ALPHA MODULATE(TEXTURE,TFACTOR) capture, normalized game high-byte constant, compiled PS and native Draw/DrawIndexed; DX9Ex opt-in fallback",
-    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Conversion Gate #38314485276 (validate Win32+WARP smoke) SUCCESS, DX11 Fast #38314485264 SUCCESS, Windows Build #38314492048 SUCCESS, OpenXR #38314492085 SUCCESS at 1242fbcb58bed8b66b27de08af665ae99b947d94. HUD #38314492041 in progress, not claimed.",
-    "C4_COMMIT": "PASS material C++/HLSL 4c71582002cf69bbbc4ca90883789e19f4cbc5a5; feature test anchor repair 1242fbcb58bed8b66b27de08af665ae99b947d94; both no CI skip",
-    "C5_PACKAGE": "NOT_REQUIRED: dormant opt-in diagnostic only, no user-facing binary promotion",
-    "C6_STATE": "PASS_EXACT_SHA: C6 bookkeeping separated from validation-bearing code commit; HMD/game/menu/race/gamepad UNTESTED"
+    "C0_RECOVER": "PASS: resume failed exact Gate 38314342991 at 4c715820; source anchor repair already committed at 1242fbcb, same TASK_ID; no duplicate code rewrite.",
+    "C1_REVIEW": "PASS: failed 00636 source-link predicate mismatch, not a D3D11 PS/Draw runtime failure; confirm original material source and preservation of legacy factor selectors.",
+    "C2_IMPLEMENT": "PASS: material 4c715820 C++ shader, capture, native Draw/DrawIndexed and numeric/destructive tests; followup 1242fbcb fixes source test anchor with no weakening of production gate.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 1242fbcb; DX11 Fast 38314485264, Backend Gate 38314485276 (validate + readiness smoke), Build 38314492048, OpenXR 38314492085, HUD 38314492041 all completed SUCCESS.",
+    "C4_COMMIT": "PASS: original material 4c715820; exact validation-bearing test repair 1242fbcb. Both have [AUTO:CONVERSION-DX11-00636] and neither used CI-skip.",
+    "C5_PACKAGE": "NOT_REQUIRED: native game opt-in diagnostic only, Quest3/VDXR and gamepad never tested; no promotion or user deployment.",
+    "C6_STATE": "PASS_EXACT_SHA: preserved validation-bearing 1242fbcb, PASS build/static; runtime NEED_HMD_TEST; separate bookkeeping-only [skip ci] commit."
   },
   "packaging": {
     "status": "NOT_REQUIRED",
-    "reason": "No native gameplay promotion, distribution, or Quest3/VDXR runtime proof."
+    "reason": "No native gameplay promotion; Quest3/VDXR visual/input runtime still UNTESTED"
   },
   "material_result_sha": "4c71582002cf69bbbc4ca90883789e19f4cbc5a5",
   "validation_bearing_result_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94",
   "result_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94",
-  "next_action": "New independent DX11 feature after this exact-SHA source/CI success; HMD/gamepad/menu/vehicle/race parity NEED_HMD_TEST only; previous task C6 is not dependency for new source work. DXVK frozen.",
+  "next_action": "Do not repeat task 00636 or reactivate DXVK. Controller may select independent disjoint native menu->vehicle->race draw/input integration; Quest3/VDXR screen+gamepad proof is NEED_HMD_TEST, no backend promotion until then.",
   "material_implementation_sha": "4c71582002cf69bbbc4ca90883789e19f4cbc5a5",
   "validation_runs": {
     "backend_conversion_gate": {
@@ -108,5 +108,20 @@
     "corrected_validation_bearing_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94",
     "corrected_fast_and_gate": "SUCCESS"
   },
-  "completed_at": "2026-10-13T07:16:40+09:00"
+  "completed_at": "2026-10-13T07:16:40+09:00",
+  "evidence": {
+    "backend_gate_run_id": 38314485276,
+    "backend_gate_conclusion": "success",
+    "dx11_fast_run_id": 38314485264,
+    "dx11_fast_conclusion": "success",
+    "windows_build_run_id": 38314492048,
+    "windows_build_conclusion": "success",
+    "openxr_run_id": 38314492085,
+    "openxr_conclusion": "success",
+    "hud_run_id": 38314492041,
+    "hud_conclusion": "success",
+    "failed_predecessor_run_id": 38314342991,
+    "failed_predecessor_conclusion": "failure",
+    "validation_bearing_result_sha": "1242fbcb58bed8b66b27de08af665ae99b947d94"
+  }
 }
