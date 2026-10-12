@@ -2072,6 +2072,12 @@ namespace OutRunVRStereo
                 !std::isfinite(depthSpan) || depthSpan <= 1.0e-6f)
                 return false;
 
+            // Viewport extent is constant for this draw; avoid two floating-point
+            // divides per XYZRHW vertex on both eye paths (smoke/sand/HUD).
+            // The existing dimension/depth guards above remain authoritative.
+            const float ndcScaleX = 2.0f / width;
+            const float ndcScaleY = 2.0f / height;
+
             // The base-projection shape and XY determinant are invariant for
             // this draw (and for both eyes). Particle-heavy scenes used to
             // recompute all five guards and the determinant per vertex.
@@ -2137,9 +2143,8 @@ namespace OutRunVRStereo
                         break;
                     }
 
-                    const float ndcX = ((x - x0) / width) * 2.0f - 1.0f;
-                    const float ndcY =
-                        1.0f - ((y - y0) / height) * 2.0f;
+                    const float ndcX = (x - x0) * ndcScaleX - 1.0f;
+                    const float ndcY = 1.0f - (y - y0) * ndcScaleY;
                     const float clipW = 1.0f / rhw;
                     const float clipX = ndcX * clipW;
                     const float clipY = ndcY * clipW;
@@ -2325,9 +2330,8 @@ namespace OutRunVRStereo
                     !std::isfinite(z) || !std::isfinite(rhw))
                     return false;
 
-                const float ndcX = ((x - x0) / width) * 2.0f - 1.0f;
-                const float ndcY =
-                    1.0f - ((y - y0) / height) * 2.0f;
+                const float ndcX = (x - x0) * ndcScaleX - 1.0f;
+                const float ndcY = 1.0f - (y - y0) * ndcScaleY;
 
                 float correctedX = 0.0f;
                 float correctedY = 0.0f;

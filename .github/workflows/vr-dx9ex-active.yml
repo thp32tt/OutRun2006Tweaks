@@ -72,6 +72,7 @@ on:
       - 'tools/verify_vr_r30_eye_affine_fastpath.py'
       - 'tools/verify_vr_r30_rhw_perspective_fastpath.py'
       - 'tools/verify_vr_r30_eye_tail_hotpath.py'
+      - 'tools/verify_vr_r30_viewport_reciprocal_hotpath.py'
       - 'tools/verify_vr_r30_flat_effect_geometry_fastpath.py'
       - 'tools/verify_vr_r30_hud_contain_draw_fastpath.py'
       - 'tools/verify_vr_r30_hud_present_cache.py'
@@ -220,6 +221,7 @@ jobs:
             'tools/verify_vr_r30_eye_affine_fastpath.py',
             'tools/verify_vr_r30_rhw_perspective_fastpath.py',
             'tools/verify_vr_r30_eye_tail_hotpath.py',
+            'tools/verify_vr_r30_viewport_reciprocal_hotpath.py',
             'tools/verify_vr_r30_flat_effect_geometry_fastpath.py',
             'tools/verify_vr_r30_hud_contain_draw_fastpath.py',
             'tools/verify_vr_r30_hud_present_cache.py',
