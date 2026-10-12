@@ -116,9 +116,11 @@ def main():
         if not (mask & 7): # Alpha-only cannot show the diagnostic RGB inset.
             continue
         for channel in range(4):
-            source, dest, alpha = .8, .23, .375
-            expected = source * alpha if mask & (1 << channel) else dest
-            native = source * alpha if mask & (1 << channel) else dest
+            # Do not shadow `source`: it holds the full C++ source text for
+            # the opt-in / DX9Ex fallback assertion below.
+            channel_source, channel_dest, channel_alpha = .8, .23, .375
+            expected = channel_source * channel_alpha if mask & (1 << channel) else channel_dest
+            native = channel_source * channel_alpha if mask & (1 << channel) else channel_dest
             assert abs(expected - native) < 1e-12
     assert "OUTRUN_DX11_FIRST_GAME_FRAME" in source
     print(f"00602 SRCALPHA/ZERO: {len(attacks)} destructive mutations, {checked} numeric OM cases PASS")
