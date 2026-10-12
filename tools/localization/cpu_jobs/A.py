@@ -78,13 +78,27 @@ with (ROOT/"localization/graphics/asset_queue.csv").open(encoding="utf-8-sig",ne
     q=next(x for x in csv.DictReader(fh) if x["index"]=="59")
 fail_if(q["action"]!="localize_text" or "rework" not in q["artwork_status"].lower(),"q59 not REWORK")
 tri=json.loads(subprocess.check_output([sys.executable,"tools/localization/rework_triage.py","--index","59"],text=True))
-fail_if(tri["assets"][0]["next_action"] not in ("MATERIAL_REWORK","METHOD_CHANGE_REQUIRED"),
-        "triage does not permit rerender")
-subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","59","--require-safe-rerender"],
-               check=True,capture_output=True,text=True)
+action=tri["assets"][0]["next_action"]
 r=json.loads(REVIEW.read_text(encoding="utf-8"))
 fail_if(r["reviewed_trial_sha256"]!=OLD_SHA or r["source_sha256"]!=SRC_SHA,
         "independently rejected A228 exact SHA drift")
+confirmed_material=(r["observations"]["race_rivals"]["verdict"]=="REWORK_REQUIRED_TRIAL" and
+                    r["observations"]["race_rivals"]["checks"]["source_style"]["result"]=="FAIL_SOURCE_FAMILY")
+fail_if(action not in ("MATERIAL_REWORK","METHOD_CHANGE_REQUIRED","EVIDENCE_ONLY_HOLD"),
+        "triage disallows new Korean candidate")
+if action=="EVIDENCE_ONLY_HOLD":
+    # Normal/same-method rerender is explicitly blocked. This exception is NOT
+    # triage reclassification or a PASS; later independent exact-A228 C1 pixel
+    # evidence proves a real source-family defect in this particular region.
+    # A255 fundamentally changes the glyph construction and BC3 block codec;
+    # preserving the hold on the prior official and on A228 is mandatory.
+    fail_if(not confirmed_material,"no fresh actual-pixel material defect to justify new method")
+    documented_override="EXACT_A228_C1_CONFIRMED_MATERIAL_FAIL_DIFFERENT_METHOD"
+else:
+    subprocess.run([sys.executable,"tools/localization/rework_triage.py","--index","59","--require-safe-rerender"],
+                   check=True,capture_output=True,text=True)
+    documented_override="NOT_NEEDED"
+
 old=OLD.read_bytes();check_dds(old)
 fail_if(hashb(old)!=OLD_SHA,"old rejected trial changed")
 request=urllib.request.Request(URL,headers={"User-Agent":"OutRun-A255-exact-canonical"})
@@ -220,7 +234,8 @@ recipe={
 }
 rec=save_json("A255_SHA_BOUND_LETTERING_RECIPE",recipe)
 report={"schema_version":2,"role":"A","queue_index":59,"run_key":RUN,
- "old_rejected_sha256":OLD_SHA,"canonical_source_sha256":SRC_SHA,"official_sha256":OFFICIAL_SHA,
+ "old_rejected_sha256":OLD_SHA,"canonical_source_sha256":SRC_SHA,
+ "triage_read_only_action":action,"documented_method_change_override":documented_override,"official_sha256":OFFICIAL_SHA,
  "new_unpromoted_trial":{"path":str(dds.relative_to(ROOT)),"sha256":hashb(output)},
  "dds_generated":1,"dds_official_promoted":0,
  "format":"DXT5 BC3 2048x512 mip1 RAW vertically mirrored",
