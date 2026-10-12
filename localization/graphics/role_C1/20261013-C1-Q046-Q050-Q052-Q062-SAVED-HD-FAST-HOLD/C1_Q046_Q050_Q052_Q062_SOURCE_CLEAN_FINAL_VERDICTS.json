@@ -1,0 +1,376 @@
+{
+  "schema": "outrun-c1-independent-saved-dds-source-clean-final-split-v2",
+  "run_key": "OUTRUN-C1-20261013-0240-Q046-Q050-Q052-Q062-BATCH-FAST-HOLD",
+  "role": "C1",
+  "purpose": "4 distinct A/B persisted canonical HD DDS, no producer work",
+  "reviewer": "ChatGPT AI1",
+  "start_kst": "2026-10-13 02:40",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "base_remote_head": "8d38126401993971836307b0524226def54cdc19",
+  "policy_exact": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md"
+  ],
+  "comparison_file": "C1_Q046_Q050_Q052_Q062_7V_SOURCE_READABLE_CLEAN_SAVED_RAW_FLIPY_75_50.jpg",
+  "comparison_sha256": "52b2ac9afc67416becde7d239781d6cf7cc13ab69bae9cd44b11a7ff761e77b9",
+  "comparison_view_note": "Atlas-native readable crop, RAW original mirrored view, source-derived/archived CLEAN if byte-verifiable, saved DDS decoded RAW and FLIPY, displayed resamples 75/50%; these are illustrative UI-size proxies, not measured game UV sampling",
+  "dds_image_generation_count": 0,
+  "dds_production_count": 0,
+  "previous_C2": "HISTORIC_ONLY_NOT_REISSUED",
+  "unverified_runtime_ui_cell": "DO_NOT_INFER_FROM_EMPTY_CANVAS",
+  "classification": "TEST_ONLY_HOLD",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "C3": "NOT_RUN",
+  "user_game": "NOT_RUN",
+  "new_C2_tokens": 0,
+  "results": [
+    {
+      "queue_index": 46,
+      "producer": "B231",
+      "source_hd": {
+        "path": "Sonic-TV/OR2006Sprites@3ce344e7 Release/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+        "sha256": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+        "header": {
+          "magic": "DDS ",
+          "width": 2048,
+          "height": 2048,
+          "mips": 1,
+          "pixel_format_flags": 65,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "rgb_bits": 32
+        },
+        "source_is_pinned": "Sonic-TV/OR2006Sprites release @3ce344e7"
+      },
+      "source_clean": {
+        "path": null,
+        "sha256": null,
+        "source_to_clean_readable_changed_pixels": null,
+        "source_to_clean_readable_alpha_removed": null,
+        "source_to_clean_readable_change_bbox": null,
+        "gate": "HOLD",
+        "reason": "REUSE_HISTORIC_INDEPENDENT_SOURCE_CLEAN_ONLY_IF_PROVEN_BYTES_MATCH; EXACT CLEAN FILE NOT RECOVERED",
+        "historic_independent_evidence": "localization/graphics/role_C/20261007-C236-C2-Q046-AA04D779-B231/C236_AA04D779_MACHINE_QA.json"
+      },
+      "saved_final_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+        "sha256": "d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0",
+        "header": {
+          "magic": "DDS ",
+          "width": 2048,
+          "height": 2048,
+          "mips": 1,
+          "pixel_format_flags": 65,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "rgb_bits": 32
+        },
+        "source_header_128_identical": true,
+        "source_to_final_changed_pixels": 498639,
+        "source_to_final_changed_bbox_READABLE": [
+          7,
+          47,
+          1985,
+          1325
+        ],
+        "source_to_final_alpha_changed_pixels": 347917,
+        "gate": "HOLD",
+        "reason": "EXACT_CLEAN_BYTES_MISSING; independent original UI cell/UV and other 28+ translated regions not reviewed"
+      },
+      "scope": {
+        "reviewed_texts": [
+          "In pre-game lobby → 게임 전 로비",
+          "Offline → 오프라인"
+        ],
+        "translated_count": 2,
+        "untranslated_in_reviewed_scope": 0,
+        "other_labels_reviewed": false,
+        "total_labels_known": 30,
+        "untranslated_whole_dds": "UNKNOWN_NOT_INVENTORIED",
+        "contact_crop_readable": [
+          0,
+          24,
+          680,
+          110
+        ],
+        "contact_crop_raw": [
+          0,
+          1938,
+          680,
+          2024
+        ]
+      },
+      "observed_new_hard_defect_coordinates": null,
+      "new_hard_defect_proven": false,
+      "readability": "SCOPED_STATIC_READABLE_NATIVE_75_50_ONLY",
+      "SOURCE_CLEAN_VERDICT": "HOLD",
+      "FINAL_DDS_VERDICT": "HOLD",
+      "overall_C1": "HOLD",
+      "formal_game_release": "BLOCKED",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "queue_index": 50,
+      "producer": "B210",
+      "source_hd": {
+        "path": "Sonic-TV/OR2006Sprites@3ce344e7 Release/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+        "sha256": "3a2a40256a6c3c945dfd4fab275edba5ec05802e4cff54f2ad93d5196cd992fe",
+        "header": {
+          "magic": "DDS ",
+          "width": 4096,
+          "height": 2048,
+          "mips": 1,
+          "pixel_format_flags": 65,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "rgb_bits": 32
+        },
+        "source_is_pinned": "Sonic-TV/OR2006Sprites release @3ce344e7"
+      },
+      "source_clean": {
+        "path": null,
+        "sha256": null,
+        "source_to_clean_readable_changed_pixels": null,
+        "source_to_clean_readable_alpha_removed": null,
+        "source_to_clean_readable_change_bbox": null,
+        "gate": "HOLD",
+        "reason": "HISTORIC_C259_PLATE_CHECK_REFERENCED; EXACT CLEAN FILE NOT RECOVERED",
+        "historic_independent_evidence": "localization/graphics/role_C/20261008-C259-C2-Q212-Q050-Q062/C259_Q050_MACHINE_QA.json"
+      },
+      "saved_final_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+        "sha256": "af6a189de92ccade79687c92a46cd2304a5f631f73e96a24a9d6a74844de5c33",
+        "header": {
+          "magic": "DDS ",
+          "width": 4096,
+          "height": 2048,
+          "mips": 1,
+          "pixel_format_flags": 65,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "rgb_bits": 32
+        },
+        "source_header_128_identical": true,
+        "source_to_final_changed_pixels": 944030,
+        "source_to_final_changed_bbox_READABLE": [
+          241,
+          1017,
+          3409,
+          2024
+        ],
+        "source_to_final_alpha_changed_pixels": 908787,
+        "gate": "HOLD",
+        "reason": "EXACT_CLEAN_BYTES_MISSING; source original time-over effect bbox is not verified runtime UI cell; other 6 regions not reviewed"
+      },
+      "scope": {
+        "reviewed_texts": [
+          "Time Over → 시간 종료"
+        ],
+        "translated_count": 1,
+        "untranslated_in_reviewed_scope": 0,
+        "other_labels_reviewed": false,
+        "total_labels_known": 7,
+        "untranslated_whole_dds": "UNKNOWN_NOT_INVENTORIED",
+        "contact_crop_readable": [
+          210,
+          1225,
+          1660,
+          1555
+        ],
+        "contact_crop_raw": [
+          210,
+          493,
+          1660,
+          823
+        ]
+      },
+      "observed_new_hard_defect_coordinates": null,
+      "new_hard_defect_proven": false,
+      "readability": "SCOPED_STATIC_READABLE_NATIVE_75_50_ONLY",
+      "SOURCE_CLEAN_VERDICT": "HOLD",
+      "FINAL_DDS_VERDICT": "HOLD",
+      "overall_C1": "HOLD",
+      "formal_game_release": "BLOCKED",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "queue_index": 52,
+      "producer": "B239",
+      "source_hd": {
+        "path": "Sonic-TV/OR2006Sprites@3ce344e7 Release/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+        "sha256": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+        "header": {
+          "magic": "DDS ",
+          "width": 2048,
+          "height": 1024,
+          "mips": 1,
+          "pixel_format_flags": 4,
+          "fourcc": "DXT5",
+          "rgb_bits": 0
+        },
+        "source_is_pinned": "Sonic-TV/OR2006Sprites release @3ce344e7"
+      },
+      "source_clean": {
+        "path": null,
+        "sha256": null,
+        "source_to_clean_readable_changed_pixels": null,
+        "source_to_clean_readable_alpha_removed": null,
+        "source_to_clean_readable_change_bbox": null,
+        "gate": "HOLD",
+        "reason": "HISTORIC_C256_SOURCE/CLEAN_REFERENCE_ONLY; EXACT CLEAN BYTES NOT IN CURRENT BATCH",
+        "historic_independent_evidence": "localization/graphics/role_C/20261008-C256-C2-BATCH-Q060-Q212-Q052/C256_Q052_MACHINE_QA.json"
+      },
+      "saved_final_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_fight_Exst/A8CE339F_512x256.dds",
+        "sha256": "c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e",
+        "header": {
+          "magic": "DDS ",
+          "width": 2048,
+          "height": 1024,
+          "mips": 1,
+          "pixel_format_flags": 4,
+          "fourcc": "DXT5",
+          "rgb_bits": 0
+        },
+        "source_header_128_identical": true,
+        "source_to_final_changed_pixels": 40712,
+        "source_to_final_changed_bbox_READABLE": [
+          16,
+          213,
+          1521,
+          350
+        ],
+        "source_to_final_alpha_changed_pixels": 30424,
+        "gate": "HOLD",
+        "reason": "EXACT_CLEAN_BYTES_MISSING; BC3 block-level protected-art boundary and actual UV cell not independently proven"
+      },
+      "scope": {
+        "reviewed_texts": [
+          "Start (right) → 출발"
+        ],
+        "translated_count": 1,
+        "untranslated_in_reviewed_scope": 0,
+        "other_labels_reviewed": false,
+        "total_labels_known": null,
+        "untranslated_whole_dds": "UNKNOWN_NOT_INVENTORIED",
+        "contact_crop_readable": [
+          760,
+          276,
+          960,
+          388
+        ],
+        "contact_crop_raw": [
+          760,
+          636,
+          960,
+          748
+        ]
+      },
+      "observed_new_hard_defect_coordinates": null,
+      "new_hard_defect_proven": false,
+      "readability": "SCOPED_STATIC_READABLE_NATIVE_75_50_ONLY",
+      "SOURCE_CLEAN_VERDICT": "HOLD",
+      "FINAL_DDS_VERDICT": "HOLD",
+      "overall_C1": "HOLD",
+      "formal_game_release": "BLOCKED",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    },
+    {
+      "queue_index": 62,
+      "producer": "B247",
+      "source_hd": {
+        "path": "Sonic-TV/OR2006Sprites@3ce344e7 Release/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+        "sha256": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+        "header": {
+          "magic": "DDS ",
+          "width": 2048,
+          "height": 1024,
+          "mips": 1,
+          "pixel_format_flags": 65,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "rgb_bits": 32
+        },
+        "source_is_pinned": "Sonic-TV/OR2006Sprites release @3ce344e7"
+      },
+      "source_clean": {
+        "path": "localization/graphics/role_B/20261008-B247-Q062-TRANSPARENT-L43-CLEAN/B247_Q062_CLEAN_PLATE.png",
+        "sha256": "2a56b0f11e3b12fc8ab186371e9fab1d57d0f00ce7a788bff47477d5132a4ec7",
+        "source_to_clean_readable_changed_pixels": 151602,
+        "source_to_clean_readable_alpha_removed": 59643,
+        "source_to_clean_readable_change_bbox": [
+          142,
+          14,
+          2008,
+          375
+        ],
+        "gate": "HOLD",
+        "reason": "CURRENT_FULL_ATLAS_CLEAN_BYTES_SHA_VERIFIED; INCLUDES ALREADY_LOCALIZED OTHER CELLS, NOT A BLANK ALL-ATLAS CLEAN",
+        "historic_independent_evidence": "localization/graphics/role_C/20261008-C264-C2-Q212-Q062-Q172/C264_BATCH_MACHINE_QA.json"
+      },
+      "saved_final_dds": {
+        "path": "localization/graphics/hd_candidates/textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+        "sha256": "dcec31a16d2a21d34bcf6ef33267b31d2940072ca897060a3ad52147a5d101d4",
+        "header": {
+          "magic": "DDS ",
+          "width": 2048,
+          "height": 1024,
+          "mips": 1,
+          "pixel_format_flags": 65,
+          "fourcc": "\u0000\u0000\u0000\u0000",
+          "rgb_bits": 32
+        },
+        "source_header_128_identical": true,
+        "source_to_final_changed_pixels": 142752,
+        "source_to_final_changed_bbox_READABLE": [
+          142,
+          14,
+          2008,
+          375
+        ],
+        "source_to_final_alpha_changed_pixels": 49054,
+        "gate": "HOLD",
+        "reason": "EXACT UI cell/UV and protected boundaries not independently verified; current crop omits other sprites and EASY/HARD rework geometry"
+      },
+      "scope": {
+        "reviewed_texts": [
+          "Diverge → 분기",
+          "Left → 좌측",
+          "Easy → 쉬움"
+        ],
+        "translated_count": 3,
+        "untranslated_in_reviewed_scope": 0,
+        "other_labels_reviewed": false,
+        "total_labels_known": null,
+        "untranslated_whole_dds": "UNKNOWN_NOT_INVENTORIED",
+        "contact_crop_readable": [
+          0,
+          0,
+          950,
+          950
+        ],
+        "contact_crop_raw": [
+          0,
+          74,
+          950,
+          1024
+        ]
+      },
+      "observed_new_hard_defect_coordinates": null,
+      "new_hard_defect_proven": false,
+      "readability": "SCOPED_STATIC_READABLE_NATIVE_75_50_ONLY",
+      "SOURCE_CLEAN_VERDICT": "HOLD",
+      "FINAL_DDS_VERDICT": "HOLD",
+      "overall_C1": "HOLD",
+      "formal_game_release": "BLOCKED",
+      "C3": "NOT_RUN",
+      "RUNTIME_VALIDATION": "UNTESTED"
+    }
+  ],
+  "do_not_override": [
+    "Historic C2 tokens / old C3 status",
+    "Existing asset_queue / resume_state / producer files",
+    "User game OPEN flags",
+    "Legacy evidence gate requiring historical C2",
+    "No new queues; no Docker/Portainer, AUTO_SEND, game installs, releases"
+  ],
+  "scoreboard": "UPDATE_AFTER_REMOTE_HEAD_VALIDATION"
+}
