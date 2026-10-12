@@ -693,18 +693,32 @@ def verify_direct_ack_before_event(source: str) -> None:
         "if (ready == S_FALSE)",
         "if (FAILED(ready))",
         "R32DirectCopyPathRejected = true;",
-        "R30SupportRetireDirectTransportSlotPublication(index)",
+        "selectedPublication = candidate;",
         "selected = index;",
     )
     # ACK rejection must skip GPU query, while ACK success MUST still await
-    # producer completion (including S_FALSE/error) before retirement/copy.
+    # producer completion (including S_FALSE/error) before slot selection.
     locations = [scan.index(marker) for marker in markers]
-    assert locations == sorted(locations), "R32 ACK-first/event-before-retire order"
+    assert locations == sorted(locations), "R32 ACK-first/event-before-selection order"
     assert scan.count("R30SupportPollDirectTransportSlotProducer(index)") == 1
-    assert scan.count("R30SupportRetireDirectTransportSlotPublication(index)") == 1
-    assert scan.count("if (candidate.published && candidate.frameId)") == 2
+    assert scan.count("R30SupportRetireDirectTransportSlotPublication(") == 0
+    assert scan.count("if (candidate.published && candidate.frameId)") == 1
     assert "if (!ackSnapshotValid ||" in scan
     assert "R32DirectCopyRejectHr = ready;" in scan
+
+    # Host ACK + GPU EVENT prove a selected slot is reusable. Snapshot source
+    # only after selection, and never drop a published slot if that fails.
+    tail = resolve.split("if (selected >= OutRunVR::RenderFrameRingSize)", 1)[1]
+    tail_markers = (
+        "R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces)",
+        "if (selectedPublication.published && selectedPublication.frameId)",
+        "R30SupportRetireDirectTransportSlotPublication(selected)",
+        "R30SupportCopyDirectTransportEyesAndIssueFence(",
+    )
+    tail_locations = [tail.index(marker) for marker in tail_markers]
+    assert tail_locations == sorted(tail_locations), "R32 source-before-retire/copy order"
+    assert "if (!R30SupportTryGetDirectTransportSourceSurfaces(sourceSurfaces))\n                return false;" in tail
+    assert tail.count("R30SupportRetireDirectTransportSlotPublication(selected)") == 1
 
 
 verify_direct_ack_before_event(r32)
@@ -713,7 +727,7 @@ direct_negative_mutations = (
                 "ackBlocked = true;", 1),
     r32.replace("R30SupportPollDirectTransportSlotProducer(index)", "S_OK", 1),
     r32.replace("if (FAILED(ready))", "if (false)", 1),
-    r32.replace("R30SupportRetireDirectTransportSlotPublication(index)",
+    r32.replace("R30SupportRetireDirectTransportSlotPublication(selected)",
                 "/* no retire */", 1),
     r32.replace("if (!ackSnapshotValid ||", "if (false &&", 1),
 )
