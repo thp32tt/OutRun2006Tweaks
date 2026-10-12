@@ -1,0 +1,94 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00711",
+  "production_id": "CONVERSION-DX9EX-00711",
+  "event_id": "CONVERSION-DX9EX-00711-E001",
+  "event_type": "C6_RESULT_ONLY",
+  "feature_id": "DX9EX_R30_SPARSE_INDEXED_FUSED_WORLD_PROJECTION",
+  "work_key": "DX9EX:R30_SPARSE_TOUCHED_INDEX_WORLD_FUSED_EYE_PROJECTION",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "base_sha": "cc383e9c8801cf1cdb87729764056d5d74d0e8a5",
+  "source_material_sha": "df2bc9aac93f75a8cffd9c4510cddaab73e7d438",
+  "material_result_sha": "df2bc9aac93f75a8cffd9c4510cddaab73e7d438",
+  "result_sha": "09bfa1e77df3f91938d31ded378ab23f4e7abb54",
+  "validation_bearing_result_sha": "09bfa1e77df3f91938d31ded378ab23f4e7abb54",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "material_commits": [
+    "df2bc9aac93f75a8cffd9c4510cddaab73e7d438",
+    "f3d00934e2fd7f6b0332c1fd5e710a71c891514c",
+    "09bfa1e77df3f91938d31ded378ab23f4e7abb54"
+  ],
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_rhw_perspective_fastpath.py",
+    "tools/verify_vr_r30_sparse_population_fastpath.py",
+    "tools/verify_vr_r30_eye_tail_hotpath.py"
+  ],
+  "feature_contract": {
+    "goal": "Reduce CPU min..max sparse indexed smoke/sand fused XYZRHW reprojection visitation to exact previously validated touched indices; preserve dense path and bilateral rollback.",
+    "acceptance": "Retain IB generated touched/knownUsedCount authority, <=1/8 sparse gate, reject unsafe indices, visit touched only on sparse path, restore modified 16-byte XYZRHW headers on any partial failed reprojection, keep state/renderer invariants. Negative and randomized sparse/dense regression; exact-SHA Active 5/5 and Domain success; original material Full Source Impact 3/3."
+  },
+  "acceptance_results": {
+    "source_implementation": "MATERIAL_COMMITTED",
+    "sparse_touched_projection": "PASS_EXACT_SHA_POLICY",
+    "sparse_reprojection_rollback": "PASS_EXACT_SHA_POLICY",
+    "negative_mutations": "PASS_EXACT_SHA_POLICY",
+    "sparse_dense_randomized_models": "3500_CASES",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_RESULT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_RESULT_SHA",
+    "full_source_impact": "SUCCESS_3_OF_3_ON_SOURCE_MATERIAL_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38298937308,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "09bfa1e77df3f91938d31ded378ab23f4e7abb54",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "game": "success",
+        "host": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38298937466,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "09bfa1e77df3f91938d31ded378ab23f4e7abb54",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    {
+      "id": 38298548352,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "df2bc9aac93f75a8cffd9c4510cddaab73e7d438",
+      "conclusion": "success",
+      "jobs": {
+        "source-cross-domain": "success",
+        "msvc-analyze-active-game": "success",
+        "msvc-analyze-openxr-host": "success"
+      }
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "Quest 3 / VDXR not exercised; hardware FPS, p95/p99, optics and device runtime not established.",
+  "score_credit_key": "CONVERSION-DX9EX-00711",
+  "score_change": 0,
+  "score_status": "C6_BOOKKEEPING_NO_ADDITIONAL_CREDIT",
+  "notes": "Exact result SHA owns Actions and does not include CI-skip; C6 checkpoint separate after PASS, DX11/DXVK/localization/FFB untouched."
+}
