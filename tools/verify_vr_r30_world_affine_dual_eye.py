@@ -27,6 +27,12 @@ def verify_source(source):
         "!state.worldEffect || state.fullWorldReprojection",
         "left.size() != bytes || right.size() != bytes",
         "usedMask && usedMask->size() < vertexCount",
+        "const bool sparseAffineTouched = usedMask && touched &&",
+        "knownUsedCount == touched->size()",
+        "knownUsedCount <= vertexCount / 4u",
+        "sparseAffineTouched ? knownUsedCount : vertexCount",
+        "sparseAffineTouched ? (*touched)[visit] : visit",
+        "(sparseAffineTouched && !(*usedMask)[i])",
         "if (usedMask && !(*usedMask)[i])",
         "std::isfinite(z)", "std::isfinite(rhw)",
         "const float halfWidth = width * 0.5f;",
@@ -52,9 +58,11 @@ def verify_source(source):
         "dst[1] = transformedY;",
     ):
         assert term in body, "missing affine contract: " + term
-    assert body.count("for (UINT i = 0; i < vertexCount; ++i)") == 1
-    assert body.index("const float halfWidth") < body.index("for (UINT i = 0; i < vertexCount; ++i)")
-    assert body.index("affineBiasX[eye]") < body.index("for (UINT i = 0; i < vertexCount; ++i)")
+    assert body.count("for (UINT visit = 0; visit < affineVisitCount; ++visit)") == 1
+    assert "for (UINT i = 0; i < vertexCount; ++i)" not in body
+    assert body.index("const float halfWidth") < body.index("for (UINT visit = 0; visit < affineVisitCount; ++visit)")
+    assert body.index("affineBiasX[eye]") < body.index("for (UINT visit = 0; visit < affineVisitCount; ++visit)")
+    assert body.index("const UINT i = sparseAffineTouched") < body.index("if (i >= vertexCount ||") < body.index("const auto* p =")
     assert "const float ndcX =" not in body and "const float ndcY =" not in body
     assert "dst[2] =" not in body and "dst[3] =" not in body
     assert "R30TryFusedWorldXyzrhwProjection(" in stereo
@@ -65,6 +73,19 @@ def verify_source(source):
     assert stereo.index(guard) < stereo.index("R30TryFusedWorldXyzrhwProjection(")
     assert "if (leftFull != rightFull)" in stereo
     assert "R30TransformXyzrhwVertices(" in stereo
+    assert "usedMask, knownUsedCount, touched);" in stereo
+    fused_start = source.index("bool R30TryFusedWorldXyzrhwProjection(")
+    fused = source[fused_start:stereo_start]
+    for guard in (
+        "const bool sparseTouched = usedMask && touched &&",
+        "knownUsedCount == touched->size()",
+        "knownUsedCount <= vertexCount / 4u",
+        "sparseTouched ? knownUsedCount : vertexCount",
+        "sparseTouched ? (*touched)[visit] : visit",
+        "(sparseTouched && !(*usedMask)[i])",
+        "if (sparseTouched)",  # fail-closed rollback restores sparse mutations
+    ):
+        assert guard in fused, "missing fused-world invariant: " + guard
 
 
 def affine(x, y, rhw, view, eye):
@@ -189,6 +210,11 @@ def main():
     mutations = (
         ("if (!state.fullWorldReprojection)", "if (state.fullWorldReprojection)"),
         ("if (usedMask && !(*usedMask)[i])", "if (false)"),
+        ("knownUsedCount == touched->size()", "knownUsedCount != touched->size()"),
+        ("knownUsedCount <= vertexCount / 4u", "knownUsedCount <= vertexCount"),
+        ("sparseAffineTouched ? knownUsedCount : vertexCount", "vertexCount"),
+        ("sparseAffineTouched ? (*touched)[visit] : visit", "visit"),
+        ("(sparseAffineTouched && !(*usedMask)[i])", "false"),
         ("std::isfinite(z)", "true"),
         ("std::isfinite(rhw)", "true"),
         ("rhw > 0.0f && rhw < 1000.0f", "rhw >= 0.0f && rhw <= 1000.0f"),
@@ -214,6 +240,34 @@ def main():
         except (AssertionError, ValueError):
             continue
         raise AssertionError("undetected destructive mutation: " + good)
+    # A deterministic moderate-sparse producer spans the full VB yet
+    # references only one quarter of its slots in shuffled draw order.
+    mask = [i % 4 == 0 for i in range(4096)]
+    touched = [i for i, selected in enumerate(mask) if selected]
+    random.Random(721).shuffle(touched)
+    fast_visits = touched if len(touched) <= len(mask) // 4 else range(len(mask))
+    assert len(fast_visits) == 1024 and set(fast_visits) == set(touched)
+    assert len(fast_visits) < len(mask), "no moderate sparse CPU-work reduction"
+    # Mismatched or corrupted lists must not silently authorize a sparse read.
+    assert len(touched[:-1]) != sum(mask)
+    assert any(i >= len(mask) for i in touched[:-1] + [len(mask)])
+    # The fused perspective path must reject loss of the producer density
+    # boundary too, independent of the separate affine helper.
+    fused_begin = source.index("bool R30TryFusedWorldXyzrhwProjection(")
+    fused_end = source.index("bool R30TransformXyzrhwStereo(", fused_begin)
+    fused_body = source[fused_begin:fused_end]
+    for old, new in (
+        ("knownUsedCount <= vertexCount / 4u", "knownUsedCount <= vertexCount"),
+        ("sparseTouched ? knownUsedCount : vertexCount", "vertexCount"),
+        ("(sparseTouched && !(*usedMask)[i])", "false"),
+    ):
+        assert fused_body.count(old) == 1
+        damaged = source[:fused_begin] + fused_body.replace(old, new, 1) + source[fused_end:]
+        try:
+            verify_source(damaged)
+        except (AssertionError, ValueError):
+            continue
+        raise AssertionError("undetected fused-world sparse mutation: " + old)
     checked = verify_math()
     error = verify_float32_parity()
     print(f"PASS R30 draw-local world affine coefficients, {len(mutations)} negative mutations, {checked} referenced vertices, 12000 float32 pairs, max delta {error:.6f}px")

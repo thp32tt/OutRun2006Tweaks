@@ -2417,7 +2417,9 @@ namespace OutRunVRStereo
             const R30XyzrhwState& state,
             std::vector<std::uint8_t>& left,
             std::vector<std::uint8_t>& right,
-            const std::vector<std::uint8_t>* usedMask) noexcept
+            const std::vector<std::uint8_t>* usedMask,
+            UINT knownUsedCount,
+            const std::vector<std::uint32_t>* touched) noexcept
         {
             if (!state.worldEffect || state.fullWorldReprojection ||
                 !source || !vertexCount || stride < 4u * sizeof(float) ||
@@ -2474,8 +2476,22 @@ namespace OutRunVRStereo
             }
             std::uint8_t* eyeData[2]{ left.data(), right.data() };
             const auto* sourceBytes = static_cast<const std::uint8_t*>(source);
-            for (UINT i = 0; i < vertexCount; ++i)
+            // The indexed producer owns a unique, mask-complete touched list.
+            // For 12.5-25% sparse world smoke/sand, avoid scanning unused
+            // vertex slots after the shared two-eye seed. Unknown/denser
+            // producers keep the original full walk and mask filtering.
+            const bool sparseAffineTouched = usedMask && touched &&
+                knownUsedCount > 0u &&
+                knownUsedCount == touched->size() &&
+                knownUsedCount <= vertexCount / 4u;
+            const UINT affineVisitCount = sparseAffineTouched
+                ? knownUsedCount : vertexCount;
+            for (UINT visit = 0; visit < affineVisitCount; ++visit)
             {
+                const UINT i = sparseAffineTouched ? (*touched)[visit] : visit;
+                if (i >= vertexCount ||
+                    (sparseAffineTouched && !(*usedMask)[i]))
+                    return false;
                 if (usedMask && !(*usedMask)[i])
                     continue;
                 const std::size_t offset = static_cast<std::size_t>(i) * stride;
@@ -3056,10 +3072,12 @@ namespace OutRunVRStereo
             // ordered, unique list of exactly the selected mask bits. On
             // sparse smoke/sand batches, skip the potentially huge untouched
             // min..max vertex span in the fused two-eye projection itself.
-            // Non-indexed, untrusted or dense inputs retain the original walk.
+            // Moderate 12.5-25% sparse indexed sources now share the same
+            // touched-list cutoff as their dual-eye seed; dense/untrusted
+            // sources retain the original full walk.
             const bool sparseTouched = usedMask && touched &&
                 knownUsedCount > 0u && knownUsedCount == touched->size() &&
-                knownUsedCount <= vertexCount / 8u;
+                knownUsedCount <= vertexCount / 4u;
             const UINT visitCount = sparseTouched ? knownUsedCount : vertexCount;
             for (UINT visit = 0; visit < visitCount; ++visit)
             {
@@ -3325,7 +3343,7 @@ namespace OutRunVRStereo
                 const bool sparseHudTouched = usedMask && touched &&
                     knownUsedCount > 0u &&
                     knownUsedCount == touched->size() &&
-                    knownUsedCount <= vertexCount / 8u;
+                    knownUsedCount <= vertexCount / 4u;
                 const UINT hudVisitCount =
                     sparseHudTouched ? knownUsedCount : vertexCount;
                 for (UINT visit = 0; visit < hudVisitCount; ++visit)
@@ -3379,7 +3397,8 @@ namespace OutRunVRStereo
             // and existing independent-eye safety fallback untouched.
             if (!state.fullWorldReprojection)
                 return R30TransformWorldAffineStereo(
-                    source, vertexCount, stride, state, left, right, usedMask);
+                    source, vertexCount, stride, state, left, right,
+                    usedMask, knownUsedCount, touched);
 
             // Common perspective world draws need only one game-space
             // reconstruction pass. Unusual/rejected input still takes the

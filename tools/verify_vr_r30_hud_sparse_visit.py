@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Sparse ScreenHud XYZRHW two-eye visit contract; no HMD FPS assertion.
 
+The moderate 12.5-25% indexed density band now visits only touched
+vertices, matching the existing two-eye seed threshold.
+
 The indexed-UP or generation-fenced VB/IB producer supplies unique touched
 indices and exactly matching mask bits. The fast route must visit only those
 indices, preserve pixel transforms and all other vertex payload bytes, and
@@ -26,7 +29,7 @@ def verify_source(source, workflow):
         "if (!state.worldEffect)",
         "knownUsedCount > 0u",
         "knownUsedCount == touched->size()",
-        "knownUsedCount <= vertexCount / 8u",
+        "knownUsedCount <= vertexCount / 4u",
         "const bool sparseHudTouched = usedMask && touched &&",
         "sparseHudTouched ? knownUsedCount : vertexCount",
         "for (UINT visit = 0; visit < hudVisitCount; ++visit)",
@@ -64,7 +67,7 @@ def destructive_mutations(source, workflow):
     hud = hud_section(source)
     mutants = (
         ("knownUsedCount == touched->size()", "knownUsedCount != touched->size()"),
-        ("knownUsedCount <= vertexCount / 8u", "knownUsedCount <= vertexCount"),
+        ("knownUsedCount <= vertexCount / 4u", "knownUsedCount <= vertexCount"),
         ("sparseHudTouched ? knownUsedCount : vertexCount", "vertexCount"),
         ("sparseHudTouched ? (*touched)[visit] : visit;", "visit;"),
         ("if (i >= vertexCount ||", "if (false ||"),
@@ -88,7 +91,7 @@ def destructive_mutations(source, workflow):
 def visit_indices(mask, touched, known_count):
     n = len(mask)
     sparse = (touched is not None and known_count > 0 and
-              known_count == len(touched) and known_count <= n // 8)
+              known_count == len(touched) and known_count <= n // 4)
     if not sparse:
         return [i for i in range(n) if mask[i]], False
     indices = []
@@ -114,7 +117,7 @@ def numeric_parity():
                     for _ in range(n)]
             selected, sparse = visit_indices(mask, touched, count)
             assert selected is not None and set(selected) == set(touched)
-            assert sparse == (count > 0 and count <= n // 8)
+            assert sparse == (count > 0 and count <= n // 4)
             # Both eye transforms change only X; Y is shared, remaining
             # Z/RHW/color/UV payload must remain bit-for-bit identical.
             for scale, bias in ((0.91, -2.5), (1.08, 7.0)):
