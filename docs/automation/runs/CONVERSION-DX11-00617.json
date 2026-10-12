@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_STAGE0_PREMULTIPLIED_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "82bc978cf2fd339681d290f477c49a87baac05ee",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA_GATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "development_strategy": {
     "work_class": "integration",
@@ -64,9 +64,61 @@
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Exact-SHA Gate/Build/Fast/OpenXR/HUD from corrected 00558 and 00617 checks.",
+  "next_action": "Quest 3/VDXR menu/vehicle/race visual parity and actual gamepad input NEED_HMD_TEST. Do not claim runtime playable or promote native gameplay; DXVK frozen, DX9Ex fallback kept. Next independently assigned DX11 C++ feature only.",
   "retry_repair": {
-    "previous_sha": "6925c6cbed41d3272d1e96a5d8f5e65be1070202",
-    "reason": "00617 PM variants also require preserving 00562 BLENDFACTORALPHA positive/negative source-linked mutation checks with expanded native allowlist; no original factor shader weakening"
-  }
+    "initial_material_commit": "33c9e4755438ba64bdc27fdc2a75482982ce6032",
+    "validation_bearing_commit": "f0aa360d85119dcd7649c5cefa566c121b1deee1",
+    "reason": "Repair missing task policy fields, PM + independent selected texture alpha integration, MSVC HLSL raw-literal size, destructive test arity, 00558/00562 prior feature regression matcher alignment. Retries same TASK_ID no duplicate score."
+  },
+  "material_commit": "33c9e4755438ba64bdc27fdc2a75482982ce6032",
+  "validation_bearing_sha": "f0aa360d85119dcd7649c5cefa566c121b1deee1",
+  "validation_bearing_result_sha": "f0aa360d85119dcd7649c5cefa566c121b1deee1",
+  "result_sha": "f0aa360d85119dcd7649c5cefa566c121b1deee1",
+  "validation_runs": [
+    {
+      "name": "Backend Conversion Gate",
+      "event": "push",
+      "run_id": 38268673557,
+      "conclusion": "success",
+      "status": "completed",
+      "head_sha": "f0aa360d85119dcd7649c5cefa566c121b1deee1",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38268673557"
+    },
+    {
+      "name": "Build",
+      "event": "pull_request",
+      "run_id": 38268681588,
+      "conclusion": "success",
+      "status": "completed",
+      "head_sha": "f0aa360d85119dcd7649c5cefa566c121b1deee1",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38268681588"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "event": "push",
+      "run_id": 38268672621,
+      "conclusion": "success",
+      "status": "completed",
+      "head_sha": "f0aa360d85119dcd7649c5cefa566c121b1deee1",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38268672621"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "event": "pull_request",
+      "run_id": 38268681594,
+      "conclusion": "success",
+      "status": "completed",
+      "head_sha": "f0aa360d85119dcd7649c5cefa566c121b1deee1",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38268681594"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "event": "pull_request",
+      "run_id": 38268681630,
+      "conclusion": "success",
+      "status": "completed",
+      "head_sha": "f0aa360d85119dcd7649c5cefa566c121b1deee1",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38268681630"
+    }
+  ]
 }
