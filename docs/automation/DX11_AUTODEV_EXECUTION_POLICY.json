@@ -98,7 +98,10 @@
     "require_game_created_draw_for_native_feature": true,
     "require_explicit_gameplay_outcome_since_00537": true,
     "prioritize_r175_and_game_frame_before_more_readiness_guards": true,
-    "never_bypass_r175_or_visual_fail_closed_gate": true
+    "never_bypass_r175_or_visual_fail_closed_gate": true,
+    "batch_source_and_regressions_before_full_gate": true,
+    "avoid_full_build_after_each_individual_edit": true,
+    "prefer_one_material_commit_per_coherent_batch_when_possible": true
   },
   "required_task_strategy_fields": [
     "work_class",
@@ -143,5 +146,20 @@
     "live_game_draw_path",
     "visible_frame_acceptance",
     "activation_guard_and_fallback"
-  ]
+  ],
+  "ci_batching": {
+    "strategy": "stage related renderer, shader, and regression edits before one material commit per coherent feature batch when possible",
+    "during_implementation": [
+      "FAST_STATIC",
+      "changed_component_positive_and_negative",
+      "TARGETED_WARP_when_relevant",
+      "targeted_early_compile_for_high_risk_ownership_or_ABI"
+    ],
+    "heavy_build_trigger": "final_validation_bearing_material_sha_after_related_components_integrate",
+    "required_exact_sha_checks_unchanged": true,
+    "no_skip_ci_on_validation_bearing_commit": true,
+    "heavy_gate_concurrency": "one_running_plus_newest_pending_per_branch; older pending is SUPERSEDED, never PASS",
+    "repair_policy": "one coherent cause-based repair batch under same TASK_ID, then revalidate new exact SHA",
+    "runtime_validation_boundary": "UNTESTED until actual matching Quest3/VDXR game and fps evidence"
+  }
 }

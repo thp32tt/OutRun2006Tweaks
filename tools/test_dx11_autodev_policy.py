@@ -7,6 +7,16 @@ from dx11_autodev_policy import POLICY_FILE, validate_policy, validate_task, lat
 
 p = json.loads(POLICY_FILE.read_text(encoding="utf-8"))
 assert not validate_policy(p), validate_policy(p)
+# Guard against regressing to a full remote build for each source/test edit.
+for batch_rule in (
+    "batch_source_and_regressions_before_full_gate",
+    "avoid_full_build_after_each_individual_edit",
+    "prefer_one_material_commit_per_coherent_batch_when_possible",
+    "only_one_final_full_gate_per_coherent_batch_when_possible",
+):
+    broken_policy = copy.deepcopy(p)
+    broken_policy["selection_rules"][batch_rule] = False
+    assert validate_policy(broken_policy), "per-edit heavy CI policy silently allowed: " + batch_rule
 base = {
     "task_id": "CONVERSION-DX11-00531",
     "target_branch": "vr-dx11-native-r71",

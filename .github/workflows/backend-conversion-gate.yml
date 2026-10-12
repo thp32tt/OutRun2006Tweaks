@@ -7,9 +7,12 @@ on:
       - vr-dxvk-r71-disasm
   workflow_dispatch:
 
+# Serialize costly Windows gates without killing an already-running exact-SHA build.
+# GitHub keeps only the newest pending run per ref; intermediate pending pushes
+# are coalesced while completed validation-bearing SHAs retain their evidence.
 concurrency:
   group: backend-conversion-gate-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read

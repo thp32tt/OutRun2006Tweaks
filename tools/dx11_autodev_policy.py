@@ -48,6 +48,10 @@ def validate_policy(policy: dict) -> list[str]:
         "require_explicit_gameplay_outcome_since_00537",
         "prioritize_r175_and_game_frame_before_more_readiness_guards",
         "never_bypass_r175_or_visual_fail_closed_gate",
+        "batch_source_and_regressions_before_full_gate",
+        "avoid_full_build_after_each_individual_edit",
+        "prefer_one_material_commit_per_coherent_batch_when_possible",
+        "only_one_final_full_gate_per_coherent_batch_when_possible",
     ):
         if rules.get(key) is not True:
             errors.append("safety/progress rule disabled: " + key)

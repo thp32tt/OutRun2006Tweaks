@@ -1,3 +1,13 @@
+## 2026-10-13 USER OVERRIDE — COHERENT CODE BATCHES BEFORE FULL COMPILATION (ACTIVE)
+
+The user requires productive DX11 implementation toward a real game-visible native frame and **120 FPS performance objective**, not a full build per source edit. Apply to NEW and RETRY dispatches with the same original FEATURE_ID/TASK_ID and exact GitHub HEAD authority:
+
+1. In C2, implement the **cohesive source+HLSL+regression batch** in a single owned Git tree/staging snapshot. Prefer one validation-bearing material commit per related feature batch rather than one push per edited file, test assertion, or minor failure fix. Read source/lease from GitHub; protect the independently active DX9Ex branch and frozen DXVK. Never let a bookkeeping-only commit count as material implementation.
+2. During editing, run focused diff/syntax/static, numeric, destructive/mutation and TARGETED_WARP checks related to touched components. Do **not** compile full Win32/OpenXR or dispatch the full Backend Conversion Gate for each intermediate source change. An early targeted compile is allowed for risky cross-ABI, device lifetime, native shader linkage, resource ownership or fallback integration. If a focused verifier fails from stale test anchors, repair all related anchors **before** the next material commit, never remove negative coverage just to pass.
+3. Finish one coherent C++/HLSL+test integration and publish the final validation-bearing material SHA. Require the **same** final SHA's Backend Conversion Gate and all required Build/OpenXR/HUD/DX11 Fast checks; do not skip/alter any mandatory job and do not claim runtime frame/input/HMD proof from CI alone. Queue heavy backend runs with **one running + newest pending per ref**; replaced older pending SHA is SUPERSEDED, not a gate PASS, and the actual material result remains subject to exact-SHA checks.
+4. When full CI reveals a genuine failure, inspect failing logs; batch the same TASK_ID's fix and regressions and produce a new exact-SHA material repair commit. Continue bounded repair attempts as before; do not fabricate success or re-score a retry. Only after exact-SHA required checks pass can C6 be completed. Docs-only C6 evidence may use [skip ci] after the validation-bearing SHA is pinned.
+5. A 120 FPS claim requires actual 120 Hz-compatible negotiated OpenXR mode and frame-time distribution measured on the matching Quest3/VDXR configuration; never force a fixed XR refresh and keep `RUNTIME_VALIDATION=UNTESTED` until actual hardware evidence. This repository policy does **not** prove the external Docker/Portainer controller has reloaded; validate runtime adoption separately.
+
 # Queue Controller Automation Contract
 
 This branch is managed by the ChatGPT queue controller.
