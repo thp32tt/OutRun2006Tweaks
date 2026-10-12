@@ -13,7 +13,7 @@ def check(hook: str, font: str, header: str) -> None:
     # mutations when a second valid-looking token remains in a separate
     # ImGui draw call or VR shell sizing path.
     font_guard = font.split("void Overlay::rebuild_fonts()", 1)[1].split(
-        "// Read the file rather than handing", 1
+        "// Metrics shared by every theme.", 1
     )[0]
     shell_guard = font.split("void Overlay::render_shell()", 1)[1].split(
         "void Overlay::init()", 1
