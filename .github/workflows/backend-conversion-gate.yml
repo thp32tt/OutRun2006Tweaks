@@ -189,6 +189,8 @@ jobs:
         run: python tools/test_dx11_native_alpha_compare_00600.py
       - name: DX11 live BOTH* source-alpha OM 00601
         run: python tools/test_dx11_native_both_source_alpha_00601.py
+      - name: DX11 live SRCALPHA ZERO OM 00602
+        run: python tools/test_dx11_native_srcalpha_zero_00602.py
 
       - name: Verify DX11 source graph
         shell: pwsh
