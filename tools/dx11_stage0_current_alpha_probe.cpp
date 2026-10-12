@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
+#include <initializer_list>
 using namespace outrun::vr::dx11::live_game_frame;
 
 int main() {

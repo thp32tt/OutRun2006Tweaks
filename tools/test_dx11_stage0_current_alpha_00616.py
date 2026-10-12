@@ -28,6 +28,7 @@ def linked(bridge: str, header: str, probe: str) -> bool:
         "return currentIsVertexDiffuse && op == kGameStage0BlendCurrentAlpha",
     )
     required_probe = (
+        "#include <initializer_list>",
         "static_assert(canonical_game_stage0_blend_alpha_op(16u, true) == 12u);",
         "static_assert(canonical_game_stage0_blend_alpha_op(16u, false) == 16u);",
         "assert(canonical_game_stage0_blend_alpha_op(rgb, false) == rgb);",
