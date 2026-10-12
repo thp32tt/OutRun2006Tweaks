@@ -40,6 +40,63 @@ def check(text: str) -> None:
 
 
 
+def check_readiness_hotpath(src: str) -> None:
+    """One ready-frame sync snapshot per route; resample after bootstrap."""
+    helper = src.split("bool R33PrepareRightDepthStereo(", 1)[1].split(
+        "void R33InvalidateRightForLeftWrite(", 1)[0]
+    assert helper.count("R32ReviewTrackedDepthStencil()") == 2
+    assert helper.count("R32ReviewRightDepthInSync()") == 2
+    assert helper.count("R32ReviewRightStencilInSync()") == 2
+    assert "if (!depthInSync || !stencilInSync)" in helper
+    assert helper.index("R32ReviewTryBootstrapRightDepth(device);") < helper.rindex(
+        "if (!R32ReviewTrackedDepthStencil())")
+    assert helper.rindex("depthInSync = R32ReviewRightDepthInSync();") > helper.index(
+        "R32ReviewTryBootstrapRightDepth(device);")
+    assert helper.rindex("stencilInSync = R32ReviewRightStencilInSync();") > helper.index(
+        "R32ReviewTryBootstrapRightDepth(device);")
+    assert "if (!depthInSync && R32ReviewDepthTestActive(device))" in helper
+    assert "if (!stencilInSync && R32ReviewStencilTestActive(device))" in helper
+    for start, end in (("R32ReviewOwnedResult R33TryFastWorld(", "R32ReviewOwnedResult R33TryHud("),
+                       ("R32ReviewOwnedResult R33TryHud(", "HRESULT R33Dispatch(")):
+        route = src.split(start, 1)[1].split(end, 1)[0]
+        assert route.count("R33PrepareRightDepthStereo(device)") == 1
+        assert route.index("R32ReviewEnsureStereoResources(device)") < route.index(
+            "R33PrepareRightDepthStereo(device)") < route.index(
+            "GetLatchedStereoFrame(stereo)")
+        assert "if (!R33PrepareRightDepthStereo(device))\n                return {};" in route
+        assert "R32ReviewRightDepthInSync()" not in route
+        assert "R32ReviewRightStencilInSync()" not in route
+        assert route.count("R32ReviewFrameStereoPoseSequence()") == 1
+        assert "framePoseSequence != stereo.poseSequence" in route
+
+
+def negative_readiness_hotpath(src: str) -> None:
+    changes = (
+        ("if (!R32ReviewTrackedDepthStencil())\n                return true;",
+         "if (false)\n                return true;"),
+        ("if (!depthInSync || !stencilInSync)", "if (!depthInSync && !stencilInSync)"),
+        ("R32ReviewTryBootstrapRightDepth(device);", "/* removed */"),
+        ("if (!R32ReviewTrackedDepthStencil())\n                    return true;",
+         "if (false)\n                    return true;"),
+        ("depthInSync = R32ReviewRightDepthInSync();", "depthInSync = true;"),
+        ("stencilInSync = R32ReviewRightStencilInSync();", "stencilInSync = true;"),
+        ("if (!depthInSync && R32ReviewDepthTestActive(device))",
+         "if (!depthInSync && false)"),
+        ("if (!stencilInSync && R32ReviewStencilTestActive(device))",
+         "if (!stencilInSync && false)"),
+        ("if (!R33PrepareRightDepthStereo(device))", "if (false)"),
+        ("R32ReviewFrameStereoPoseSequence();", "0;"),
+    )
+    for i, (before, after) in enumerate(changes, 1):
+        assert before in src, ("mutation anchor absent", i)
+        mutant = src.replace(before, after, 1)
+        try:
+            check_readiness_hotpath(mutant)
+        except (AssertionError, ValueError, IndexError):
+            continue
+        raise AssertionError(f"readiness negative mutation {i} survived")
+
+
 def check_resync_single_flush(text: str) -> None:
     """Guarded stereo draws flush once; bypasses retain the old recovery gate."""
     guard = text.split("HRESULT R33GuardStereoRasterState(", 1)[1].split(
@@ -283,6 +340,8 @@ def main() -> None:
     check_resync_single_flush(src)
     check_mono_aux_fastpath(src)
     check_write_flags_cached(src)
+    check_readiness_hotpath(src)
+    negative_readiness_hotpath(src)
     check_gpu_profiler_disabled_fastpath(src)
     negative_gpu_profiler_fastpath(src)
     negative_mono_aux_fastpath(src)

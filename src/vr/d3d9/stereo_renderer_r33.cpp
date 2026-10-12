@@ -364,6 +364,32 @@ namespace OutRunVRStereo
             return true;
         }
 
+        // Single shared depth/stencil readiness path for world and HUD.
+        // Normal synchronized draws make only one read of each sync bit.
+        bool R33PrepareRightDepthStereo(IDirect3DDevice9* device) noexcept
+        {
+            if (!R32ReviewTrackedDepthStencil())
+                return true;
+
+            bool depthInSync = R32ReviewRightDepthInSync();
+            bool stencilInSync = R32ReviewRightStencilInSync();
+            if (!depthInSync || !stencilInSync)
+            {
+                R32ReviewTryBootstrapRightDepth(device);
+                // Bootstrap can change depth ownership; preserve the original
+                // post-bootstrap tracked-attachment and live-test veto.
+                if (!R32ReviewTrackedDepthStencil())
+                    return true;
+                depthInSync = R32ReviewRightDepthInSync();
+                stencilInSync = R32ReviewRightStencilInSync();
+            }
+            if (!depthInSync && R32ReviewDepthTestActive(device))
+                return false;
+            if (!stencilInSync && R32ReviewStencilTestActive(device))
+                return false;
+            return true;
+        }
+
         void R33InvalidateRightForLeftWrite(
             bool mayWriteDepth, bool mayWriteStencil) noexcept
         {
@@ -470,22 +496,19 @@ namespace OutRunVRStereo
 
             if (!R32ReviewEnsureStereoResources(device))
                 return {};
-            if (R32ReviewTrackedDepthStencil() &&
-                (!R32ReviewRightDepthInSync() || !R32ReviewRightStencilInSync()))
-                R32ReviewTryBootstrapRightDepth(device);
-            if (R32ReviewTrackedDepthStencil() && !R32ReviewRightDepthInSync() &&
-                R32ReviewDepthTestActive(device))
-                return {};
-            if (R32ReviewTrackedDepthStencil() && !R32ReviewRightStencilInSync() &&
-                R32ReviewStencilTestActive(device))
+            // Avoid redundant cross-TU sync reads on the stereo draw path;
+            // the helper resamples after bootstrap and keeps the live vetoes.
+            if (!R33PrepareRightDepthStereo(device))
                 return {};
 
             OutRunVRRenderer::LatchedStereoFrame stereo{};
             if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo) ||
                 stereo.poseSequence == 0)
                 return {};
-            if (R32ReviewFrameStereoPoseSequence() != 0 &&
-                R32ReviewFrameStereoPoseSequence() != stereo.poseSequence)
+            const std::uint32_t framePoseSequence =
+                R32ReviewFrameStereoPoseSequence();
+            if (framePoseSequence != 0 &&
+                framePoseSequence != stereo.poseSequence)
                 return {};
 
             R32ReviewFastWorldConstants draw{};
@@ -631,22 +654,19 @@ namespace OutRunVRStereo
 
             if (!R32ReviewEnsureStereoResources(device))
                 return {};
-            if (R32ReviewTrackedDepthStencil() &&
-                (!R32ReviewRightDepthInSync() || !R32ReviewRightStencilInSync()))
-                R32ReviewTryBootstrapRightDepth(device);
-            if (R32ReviewTrackedDepthStencil() && !R32ReviewRightDepthInSync() &&
-                R32ReviewDepthTestActive(device))
-                return {};
-            if (R32ReviewTrackedDepthStencil() && !R32ReviewRightStencilInSync() &&
-                R32ReviewStencilTestActive(device))
+            // Avoid redundant cross-TU sync reads on the stereo draw path;
+            // the helper resamples after bootstrap and keeps the live vetoes.
+            if (!R33PrepareRightDepthStereo(device))
                 return {};
 
             OutRunVRRenderer::LatchedStereoFrame stereo{};
             if (!OutRunVRRenderer::GetLatchedStereoFrame(stereo) ||
                 stereo.poseSequence == 0)
                 return {};
-            if (R32ReviewFrameStereoPoseSequence() != 0 &&
-                R32ReviewFrameStereoPoseSequence() != stereo.poseSequence)
+            const std::uint32_t framePoseSequence =
+                R32ReviewFrameStereoPoseSequence();
+            if (framePoseSequence != 0 &&
+                framePoseSequence != stereo.poseSequence)
                 return {};
 
             float original[16]{};
