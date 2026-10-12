@@ -112,7 +112,7 @@ def verify(source):
     for name in policy_states:
         assert fast.count("case D3DRS_" + name + ":") == 1, name
     assert fast.count("case D3DRS_") == len(policy_states)
-    assert "default:\\n                return hr;" in fast
+    assert "default:\n                return hr;" in fast
     assert fast.index("switch (state)") < fast.index("default:")
     assert hook.index("if (FAILED(hr)") < hook.index("// Non-policy render states")
     assert hook.index("// Non-policy render states") < hook.index(
@@ -242,8 +242,8 @@ def main():
         except (AssertionError, ValueError):
             continue
         raise AssertionError("escaped policy-state mutation " + name)
-    changed = SRC[:begin] + fast.replace("default:\\n                return hr;",
-        "default:\\n                break;", 1) + SRC[end:]
+    changed = SRC[:begin] + fast.replace("default:\n                return hr;",
+        "default:\n                break;", 1) + SRC[end:]
     try:
         verify(changed)
     except (AssertionError, ValueError):
