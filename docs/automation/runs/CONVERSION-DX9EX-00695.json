@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00695",
+  "production_id": "CONVERSION-DX9EX-00695",
+  "event_id": "CONVERSION-DX9EX-00695-E003",
+  "event_type": "C6_RESULT_ONLY_RETRY",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "source_material_sha": "714a6c3f3c05f3a29471d5f4698e8180b1c9d08a",
+  "material_result_sha": "714a6c3f3c05f3a29471d5f4698e8180b1c9d08a",
+  "result_sha": "d3449b7b9314bdcaf01c79351627c586b22ba94d",
+  "validation_bearing_result_sha": "d3449b7b9314bdcaf01c79351627c586b22ba94d",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "material_commits": [
+    "714a6c3f3c05f3a29471d5f4698e8180b1c9d08a",
+    "d3449b7b9314bdcaf01c79351627c586b22ba94d"
+  ],
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_eye_tail_hotpath.py",
+    "tools/verify_vr_r30_rhw_perspective_fastpath.py"
+  ],
+  "feature_contract": {
+    "goal": "Hoist R30 per-draw fused stereo world XYZRHW particle eye-tail fourth-row origin and viewport half extents without losing per-eye projection, original Z/RHW, sparse mask and rollback.",
+    "acceptance": "Actual C++ particle hotpath material commit; per-eye float32 parity and negative mutations; repair formerly ambiguous double-eye-loop verifier mutation; exact-SHA Active 5/5 and Domain Success; material SHA Full Source Impact 3/3 SUCCESS. Quest3/VDXR runtime separately untested."
+  },
+  "acceptance_results": {
+    "fused_r30_particle_origin_hoist": "MATERIAL_COMMITTED",
+    "fused_binocular_per_vertex_math": "MATERIAL_COMMITTED",
+    "r30_two_eye_loop_mutation_guard": "PASS_EXACT_SHA_POLICY",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_3_OF_3_ORIGINAL_MATERIAL_SHA_ONLY",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "failed_prior_run": {
+    "id": 38268018275,
+    "head_sha": "714a6c3f3c05f3a29471d5f4698e8180b1c9d08a",
+    "failure": "policy: verify_vr_r30_rhw_perspective_fastpath.py fused mutation escaped: for (int eye = 0; eye < 2; ++eye)",
+    "repair": "Scope eye-loop negative mutations to hoisted init and per-vertex projection; preserve game source implementation."
+  },
+  "verified_workflows": [
+    {
+      "id": 38268470509,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "d3449b7b9314bdcaf01c79351627c586b22ba94d",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "game": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38268470781,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "d3449b7b9314bdcaf01c79351627c586b22ba94d",
+      "conclusion": "success"
+    },
+    {
+      "id": 38268018188,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "714a6c3f3c05f3a29471d5f4698e8180b1c9d08a",
+      "conclusion": "success",
+      "note": "Original C++ material SHA; validation-bearing repair only changed Python policy checker."
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "No actual Quest3/VDXR game/HMD/FFB or FPS/p95/p99 measurements were performed.",
+  "score_credit_key": "CONVERSION-DX9EX-00695",
+  "score_change": 0,
+  "score_status": "C6_BOOKKEEPING_NO_ADDITIONAL_CREDIT",
+  "notes": "Material performance change and verifier repair form ONE feature. C6 doc-only commit separate from non-CI-skip validation-bearing result SHA. No DX11/DXVK/localization changes."
+}
