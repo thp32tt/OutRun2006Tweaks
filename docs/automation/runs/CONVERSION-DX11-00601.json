@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2:CONVERSION-DX11-00601",
   "work_key": "DX11:MENU_RACE_BOTH_SOURCE_ALPHA",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
-  "status": "C4_MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -60,7 +60,43 @@
     "status": "NOT_REQUIRED",
     "reason": "Diagnostic-only source implementation, no HMD-qualified release"
   },
-  "next_action": "Check exact-SHA Backend/Build/DX11 Fast/OpenXR/HUD GitHub Actions; repair failures; seal C6 separately",
-  "result_sha": null,
-  "validation_bearing_result_sha": null
+  "next_action": "Independent next DX11 menu->race or native XR link task; Quest3/VDXR and gamepad runtime remain NEED_HMD_TEST, never infer actual gameplay parity from CI.",
+  "result_sha": "f013416de2fe7d331675bfcfd18310b2e8f13478",
+  "validation_bearing_result_sha": "f013416de2fe7d331675bfcfd18310b2e8f13478",
+  "material_commit_sha": "d76c4c36c0d51b7bc316105eafd21f3568be4f0a",
+  "repair_commit_shas": [
+    "f013416de2fe7d331675bfcfd18310b2e8f13478"
+  ],
+  "verified_ci": {
+    "backend_conversion_gate": {
+      "id": 38225154188,
+      "conclusion": "success",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ]
+    },
+    "build": {
+      "id": 38225158890,
+      "conclusion": "success"
+    },
+    "dx11_fast_structural": {
+      "id": 38225154190,
+      "conclusion": "success"
+    },
+    "openxr_architecture": {
+      "id": 38225158897,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "id": 38225159005,
+      "conclusion": "success"
+    },
+    "vr_pc_fast": {
+      "id": 38225154179,
+      "conclusion": "skipped",
+      "required": false
+    }
+  },
+  "validation_notes": "Exact f013416d: required five GitHub workflows SUCCESS; original d76c4c36 Backend 00599 destructive gate failure repaired by narrowing test scope to subtractive OM branch. 19 new 00601 mutations and 131072 formula checks run under validation. No actual game/HMD/gamepad runtime."
 }
