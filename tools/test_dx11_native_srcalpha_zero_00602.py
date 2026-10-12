@@ -15,7 +15,8 @@ def linked(src):
     pipeline = part(src, "bool ensure_pipeline(", "bool supported_game_state(")
     game = part(src, "bool supported_game_state(", "bool translate_vertices(")
     draw = part(src, "bool submit(", "void observe(")
-    om = part(pipeline, "// Native D3D9 SRCALPHA/ZERO:", "// D3D9 ONE/ZERO:")
+    om = part(pipeline, "// Native D3D9 SRCALPHA/ZERO:",
+              "// Exact live D3D9 inverse-source-alpha")
     mask = part(draw, "} else if (output.sourceAlphaCopyBlend &&", "} else if (output.colorWriteMask !=")
     required = (
         (output, ("bool sourceAlphaCopyBlend = false;",)),
@@ -90,7 +91,7 @@ def main():
         # cannot hide a destructive mutation in the new factor pair.
         if old.startswith("target."):
             begin = source.index("// Native D3D9 SRCALPHA/ZERO:")
-            end = source.index("// D3D9 ONE/ZERO:", begin)
+            end = source.index("// Exact live D3D9 inverse-source-alpha", begin)
             portion = source[begin:end]
             assert old in portion
             mutant = source[:begin] + portion.replace(old, changed, 1) + source[end:]
