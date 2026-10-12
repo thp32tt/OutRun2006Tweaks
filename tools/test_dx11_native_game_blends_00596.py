@@ -8,7 +8,7 @@ REQUIRED = {
     "struct State {": [
         "ComPtr<ID3D11BlendState> additiveBlend;",
         "ComPtr<ID3D11BlendState> sourceAlphaAddBlend;",
-        "std::array<ComPtr<ID3D11BlendState>, 64> maskedBlends{};"],
+        "std::array<ComPtr<ID3D11BlendState>, 80> maskedBlends{};"],
     "bool ensure_pipeline(": [
         "s.additiveBlend && s.sourceAlphaAddBlend",
         "s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset();",
@@ -57,7 +57,7 @@ def main():
     mutations = [
         ("bool additiveBlend = false;", "bool addLost = false;"),
         ("bool sourceAlphaAddBlend = false;", "bool alphaAddLost = false;"),
-        ("std::array<ComPtr<ID3D11BlendState>, 64> maskedBlends{};", "std::array<ComPtr<ID3D11BlendState>, 32> maskedBlends{};"),
+        ("std::array<ComPtr<ID3D11BlendState>, 80> maskedBlends{};", "std::array<ComPtr<ID3D11BlendState>, 32> maskedBlends{};"),
         ("target.SrcBlend = D3D11_BLEND_ONE;", "target.SrcBlend = D3D11_BLEND_ZERO;"),
         ("target.DestBlend = D3D11_BLEND_ONE;", "target.DestBlend = D3D11_BLEND_ZERO;"),
         ("target.SrcBlendAlpha = D3D11_BLEND_ONE;", "target.SrcBlendAlpha = D3D11_BLEND_ZERO;"),

@@ -551,6 +551,7 @@ struct OutputCapture {
     bool alphaBlend = false;
     bool additiveBlend = false; // D3D9 ONE/ONE
     bool sourceAlphaAddBlend = false; // D3D9 SRCALPHA/ONE
+    bool premultipliedAlphaBlend = false; // D3D9 ONE/INVSRCALPHA
     bool alphaTest = false;
     DWORD alphaRef = 0;
     D3DCMPFUNC alphaFunc = D3DCMP_ALWAYS;
@@ -645,8 +646,9 @@ struct State {
     ComPtr<ID3D11BlendState> alphaBlend;
     ComPtr<ID3D11BlendState> additiveBlend;
     ComPtr<ID3D11BlendState> sourceAlphaAddBlend;
-    // Opaque/over/additive/source-alpha-add, each with sixteen channel masks.
-    std::array<ComPtr<ID3D11BlendState>, 64> maskedBlends{};
+    ComPtr<ID3D11BlendState> premultipliedAlphaBlend;
+    // Opaque/over/additive/source-alpha-add/premultiplied, 16 masks each.
+    std::array<ComPtr<ID3D11BlendState>, 80> maskedBlends{};
     ComPtr<ID3D11Buffer> alphaConstants;
     std::array<ReadbackSlot, kReadbackSlots> readbacks{};
     UINT readSlot = 0;
@@ -702,7 +704,7 @@ bool ensure_pipeline(State& s) noexcept {
         s.blendFactorModulate2XAlphaPs && s.blendFactorModulate4XAlphaPs &&
         s.addSmoothTextureAlphaPs && s.addSmoothDiffuseAlphaPs &&
         s.layout && s.raster && s.scissorRaster && s.alphaBlend &&
-         s.additiveBlend && s.sourceAlphaAddBlend &&
+         s.additiveBlend && s.sourceAlphaAddBlend && s.premultipliedAlphaBlend &&
         s.alphaConstants && readbackReady)
         return true;
     s.backend.shutdown();
@@ -712,7 +714,7 @@ bool ensure_pipeline(State& s) noexcept {
     s.blendFactorModulate2XAlphaPs.Reset(); s.blendFactorModulate4XAlphaPs.Reset();
     s.addSmoothTextureAlphaPs.Reset(); s.addSmoothDiffuseAlphaPs.Reset();
     s.layout.Reset(); s.raster.Reset(); s.scissorRaster.Reset();
-    s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset();
+    s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset();
     s.alphaConstants.Reset();
     for (auto& item : s.readbacks) {
         item.staging.Reset(); item.fence.Reset(); item.busy = false;
@@ -988,6 +990,15 @@ bool ensure_pipeline(State& s) noexcept {
     target.SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
     if (FAILED(dev->CreateBlendState(&blend, s.sourceAlphaAddBlend.GetAddressOf())))
         return false;
+    // Premultiplied-alpha menu/UI surfaces: source RGB is already scaled.
+    // Same ONE/INVSRCALPHA factors apply to output alpha, since separate
+    // D3D9 alpha blending is rejected by the live state capture.
+    target.SrcBlend = D3D11_BLEND_ONE;
+    target.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    target.SrcBlendAlpha = D3D11_BLEND_ONE;
+    target.DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+    if (FAILED(dev->CreateBlendState(&blend, s.premultipliedAlphaBlend.GetAddressOf())))
+        return false;
     D3D11_BUFFER_DESC constants{};
     constants.ByteWidth = sizeof(float) * 4u;
     constants.Usage = D3D11_USAGE_DEFAULT;
@@ -1134,11 +1145,15 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         const bool additive = src == D3DBLEND_ONE && dst == D3DBLEND_ONE;
         const bool sourceAlphaAdd = src == D3DBLEND_SRCALPHA &&
                                     dst == D3DBLEND_ONE;
-        if ((src != D3DBLEND_SRCALPHA || dst != D3DBLEND_INVSRCALPHA) &&
+        const bool premultipliedAlpha = src == D3DBLEND_ONE &&
+                                        dst == D3DBLEND_INVSRCALPHA;
+        if (!premultipliedAlpha &&
+            (src != D3DBLEND_SRCALPHA || dst != D3DBLEND_INVSRCALPHA) &&
             !additive && !sourceAlphaAdd) return false;
         output.alphaBlend = true;
         output.additiveBlend = additive;
         output.sourceAlphaAddBlend = sourceAlphaAdd;
+        output.premultipliedAlphaBlend = premultipliedAlpha;
     }
     if (alpha) {
         DWORD func = 0, reference = ~0u;
@@ -1884,7 +1899,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     if (output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
         const UINT baseSlot = (output.alphaBlend ? 16u : 0u) + output.colorWriteMask;
         const UINT slot = baseSlot + (output.additiveBlend ? 16u :
-                                     output.sourceAlphaAddBlend ? 32u : 0u);
+                                     output.sourceAlphaAddBlend ? 32u : 0u) +
+                                     (output.premultipliedAlphaBlend ? 48u : 0u);
         if (slot >= s.maskedBlends.size()) return false;
         auto& cached = s.maskedBlends[slot];
         if (!cached) {
@@ -1894,8 +1910,14 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             // on devices that validate disabled-blend fields as well.
             s.alphaBlend->GetDesc(&maskDesc);
             maskDesc.RenderTarget[0].BlendEnable = output.alphaBlend ? TRUE : FALSE;
+            // The D3D9 write mask never changes source/destination factors.
+            if (output.premultipliedAlphaBlend) {
+                maskDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+                maskDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+                maskDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+                maskDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
             // Never use standard over factors for masked additive draw calls.
-            if (output.additiveBlend || output.sourceAlphaAddBlend) {
+            } else if (output.additiveBlend || output.sourceAlphaAddBlend) {
                 maskDesc.RenderTarget[0].SrcBlend =
                     output.additiveBlend ? D3D11_BLEND_ONE : D3D11_BLEND_SRC_ALPHA;
                 maskDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
@@ -1917,6 +1939,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         ctx->OMSetBlendState(s.additiveBlend.Get(), nullptr, 0xffffffffu);
     else if (output.sourceAlphaAddBlend)
         ctx->OMSetBlendState(s.sourceAlphaAddBlend.Get(), nullptr, 0xffffffffu);
+    else if (output.premultipliedAlphaBlend)
+        ctx->OMSetBlendState(s.premultipliedAlphaBlend.Get(), nullptr, 0xffffffffu);
     else
         ctx->OMSetBlendState(output.alphaBlend ? s.alphaBlend.Get() : nullptr, nullptr, 0xffffffffu);
     ID3D11Buffer* alphaBuffer = s.alphaConstants.Get();
@@ -2245,7 +2269,7 @@ void before_game_reset() noexcept {
     s.readSlot = s.writeSlot = 0;
     s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
     s.raster.Reset(); s.scissorRaster.Reset(); s.layout.Reset();
-    s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset();
+    s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset();
     s.alphaConstants.Reset();
     for (auto& masked : s.maskedBlends) masked.Reset();
     s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.selectTextureDiffuseAlphaPs.Reset(); s.selectTextureModulateAlphaPs.Reset(); s.selectTextureModulate2XAlphaPs.Reset(); s.selectTextureModulate4XAlphaPs.Reset(); s.selectTextureAddAlphaPs.Reset(); s.selectTextureSubtractAlphaPs.Reset(); s.selectDiffuseTextureAlphaPs.Reset(); s.selectDiffuseModulateAlphaPs.Reset(); s.selectDiffuseAddAlphaPs.Reset(); s.selectDiffuseSubtractAlphaPs.Reset(); s.selectDiffuseModulate2XAlphaPs.Reset(); s.selectDiffuseModulate4XAlphaPs.Reset(); s.selectTextureAddSmoothAlphaPs.Reset(); s.selectDiffuseAddSmoothAlphaPs.Reset(); s.selectTextureFactorAlphaPs.Reset(); s.selectTextureTfactorAlphaPs.Reset(); s.selectDiffuseFactorAlphaPs.Reset(); s.selectDiffuseTfactorAlphaPs.Reset(); s.selectTextureBlendTextureAlphaPs.Reset(); s.selectDiffuseBlendTextureAlphaPs.Reset(); s.selectTextureBlendDiffuseAlphaPs.Reset(); s.selectDiffuseBlendDiffuseAlphaPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset();

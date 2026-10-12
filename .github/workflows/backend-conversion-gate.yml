@@ -179,6 +179,8 @@ jobs:
         run: python tools/test_dx11_native_tex_transform_00595.py
       - name: DX11 real-game additive blend 00596
         run: python tools/test_dx11_native_game_blends_00596.py
+      - name: DX11 real-game premultiplied alpha 00597
+        run: python tools/test_dx11_native_premultiplied_00597.py
 
       - name: Verify DX11 source graph
         shell: pwsh
