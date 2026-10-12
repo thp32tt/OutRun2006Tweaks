@@ -141,7 +141,7 @@ inline bool game_fvf_decode_vertex(const void* bytes, std::uint32_t stride,
     // UV1 U-only must not borrow the first float of UV2 as its missing V.
     if (layout.secondTexcoord1D) {
         const std::uint32_t secondOffset = layout.texcoordOffset +
-                                            (layout.firstTexcoord1D ? 4u : 8u);
+                                            (8u - (layout.firstTexcoord1D ? 4u : 0u));
         std::memcpy(candidate.uv1, data + secondOffset, 4u);
         const std::uint32_t later = secondOffset + 4u;
         if (layout.texcoordCount >= 3u)
