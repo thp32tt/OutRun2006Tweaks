@@ -58,7 +58,7 @@ class BindingTests(unittest.TestCase):
 
     def test_corrupted_png_crc_is_rejected(self):
         bad = bytearray((self.root / "inputs" / "hd.png").read_bytes())
-        bad[34] ^= 1
+        bad[24] ^= 1
         (self.root / "inputs" / "hd.png").write_bytes(bad)
         self.manifest["png_sha256"] = hashlib.sha256(bad).hexdigest()
         self.write_manifest()
