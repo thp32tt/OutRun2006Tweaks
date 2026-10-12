@@ -3,15 +3,15 @@
   "task_id": "CONVERSION-DX9EX-00725",
   "production_id": "CONVERSION-DX9EX-00725",
   "event_id": "CONVERSION-DX9EX-00725-E003",
-  "event_type": "retry",
+  "event_type": "C6_RESULT_ONLY",
   "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "feature_id": null,
   "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
   "stage": "C6_RESULT",
   "checkpoint": "C6_STATE",
-  "status": "BUILD_VERIFIED_PARTIAL_FEATURE",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "feature_status": "IN_PROGRESS",
   "controller_terminal": false,
   "base_sha": "cce2704e9cfe9f996f889281ac98cf7322e8e190",
@@ -90,5 +90,14 @@
   },
   "score_delta": 0,
   "score_awarded": false,
-  "score_policy": "Same TASK_ID retry and incomplete overall feature; no duplicate accounting."
+  "score_policy": "Same TASK_ID retry and incomplete overall feature; no duplicate accounting.",
+  "previous_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "c6_bookkeeping_confirmation": {
+    "validation_sha": "c24b004cc8a8e47590bc824e05694a3f49b0c7e3",
+    "exact_sha_gates": "PASS_EXACT_SHA",
+    "run_record_recovered": true,
+    "source_modified": false,
+    "ci_reexecuted": false,
+    "score_delta": 0
+  }
 }
