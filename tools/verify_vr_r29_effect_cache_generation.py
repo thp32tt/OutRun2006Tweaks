@@ -59,9 +59,11 @@ def contract(s):
         "if (R27ShouldBypassLegacyZeroDisparity(device))" in world,
         "if (fragile && !forceZeroDisparity && !worldGateChecked &&" in world,
         world.count("R27ShouldBypassLegacyZeroDisparity(device)") == 2,
-        world.index("bool worldGateChecked = false;") <
-            world.index("worldGateChecked = true;") <
-            world.index("if (fragile && !forceZeroDisparity && !worldGateChecked &&"),
+        # Destructive source mutations remove these anchors; find() must
+        # return -1 rather than raising ValueError, so contract() fails cleanly.
+        world.find("bool worldGateChecked = false;") <
+            world.find("worldGateChecked = true;") <
+            world.find("if (fragile && !forceZeroDisparity && !worldGateChecked &&"),
         "R29DirectTwoEye(device" in world,
         "R29EffectCacheCurrent()" in sync,
         "if (!device || OutRunVR::State::StateBlockTracker::Recording())" in sync,
