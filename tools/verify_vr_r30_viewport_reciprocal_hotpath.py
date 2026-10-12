@@ -20,14 +20,14 @@ def valid(code: str) -> bool:
         scale_x = code.index("const float ndcScaleX = 2.0f / width;")
         scale_y = code.index("const float ndcScaleY = 2.0f / height;")
         full = code.index("if (state.worldEffect && state.fullWorldReprojection &&\n                allowFullReprojection)")
-        affine = code.index("                std::memcpy(out.data(), source, bytes);", full)
-        second = code.index("            for (UINT i = 0; i < vertexCount; ++i)", affine)
+        rollback = code.index("for (UINT i = 0; i < modifiedVertexEnd; ++i)", full)
+        second = code.index("            for (UINT i = 0; i < vertexCount; ++i)", rollback)
         x = "const float ndcX = (x - x0) * ndcScaleX - 1.0f;"
         y = "const float ndcY = 1.0f - (y - y0) * ndcScaleY;"
         return (
             guard < scale_x < scale_y < full < second
             and code.count(x) == 2 and code.count(y) == 2
-            and x in code[full:affine] and y in code[full:affine]
+            and x in code[full:rollback] and y in code[full:rollback]
             and x in code[second:] and y in code[second:]
             and "((x - x0) / width)" not in code
             and "((y - y0) / height)" not in code
@@ -38,7 +38,9 @@ def valid(code: str) -> bool:
             and "state.eyeTail[eye].m[row][col]" in code
             and "clipEye[3] <= 1.0e-6f" in code
             and "if (fullDrawOk && selectedVertices != 0)" in code
-            and "std::memcpy(out.data(), source, bytes);" in code[affine:]
+            and code.count("std::memcpy(out.data(), source, bytes);") == 1
+            and "std::memcpy(outputVertex(i), sourceVertex(i)," in code[rollback:second]
+            and "4u * sizeof(float));" in code[rollback:second]
             and "state.parallaxPerRhwX[eye] * rhw" in code)
     except ValueError:
         return False
