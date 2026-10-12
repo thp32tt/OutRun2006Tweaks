@@ -1,0 +1,58 @@
+{
+  "task_id": "CONVERSION-DX9EX-00670",
+  "production_id": "CONVERSION-DX9EX-00670",
+  "event_id": "CONVERSION-DX9EX-00670-E003",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "stage": "C6_RESULT",
+  "feature": "R29 world-effect live state probe deduplication with ForceZero veto preservation",
+  "source_material_sha": "38e48df6f60ee3606b6f0d8b434059747c430c61",
+  "validation_bearing_result_sha": "01eefa79be7539200135fe5c3a43f1ff1ccbee7e",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "failure_run": {
+    "id": 38212844847,
+    "conclusion": "failure",
+    "policy_error": "Python negative mutation world.index raised ValueError before contract rejection"
+  },
+  "repair": "Replace three world.index anchors with non-raising world.find while retaining membership checks and destructive mutation contract",
+  "automation_validation": "PASS",
+  "verified_workflows": [
+    {
+      "id": 38213109752,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "01eefa79be7539200135fe5c3a43f1ff1ccbee7e",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "game": "success",
+        "full_chain_compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38213109742,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "01eefa79be7539200135fe5c3a43f1ff1ccbee7e",
+      "conclusion": "success"
+    },
+    {
+      "id": 38212844789,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "38e48df6f60ee3606b6f0d8b434059747c430c61",
+      "conclusion": "success",
+      "jobs": "3/3"
+    },
+    {
+      "id": 38212844786,
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "head_sha": "38e48df6f60ee3606b6f0d8b434059747c430c61",
+      "conclusion": "success"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_note": "Quest 3 / VDXR stereo/optics/frame-time and gameplay not tested. CI does not establish runtime pass or measured FPS.",
+  "score_credit_key": "CONVERSION-DX9EX-00670"
+}
