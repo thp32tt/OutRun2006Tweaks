@@ -1219,7 +1219,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // subtractive operations are directional. Keep them on D3D9 rather
         // than incorrectly substituting the canonical DESTCOLOR/ZERO state.
         if (multiply && blendOp != D3DBLENDOP_ADD) return false;
-        if (!premultipliedAlpha && !multiply && !sourceAlphaCopy &&
+        if (!premultipliedAlpha && !multiply &&
+            !sourceAlphaCopy &&
             (src != D3DBLEND_SRCALPHA || dst != D3DBLEND_INVSRCALPHA) &&
             !bothSourceAlpha && !inverseSourceAlpha &&
             !additive && !sourceAlphaAdd) return false;

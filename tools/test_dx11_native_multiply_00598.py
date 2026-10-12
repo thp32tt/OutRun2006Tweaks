@@ -15,12 +15,14 @@ def connected(s):
     pipe = section(s, "bool ensure_pipeline(", "bool supported_game_state(")
     capture = section(s, "bool supported_game_state(", "bool translate_vertices(")
     draw = section(s, "bool submit(", "void observe(")
+    multiply_om = section(pipe, "// Multiplicative game overlays:",
+                          "D3D11_BUFFER_DESC constants{}")
     return (
         "bool multiplyBlend = false;" in output
         and "ComPtr<ID3D11BlendState> multiplyBlend;" in state
         and "std::array<ComPtr<ID3D11BlendState>, 16> multiplyMaskedBlends{};" in state
-        and all(x in pipe for x in (
-            "s.multiplyBlend &&",
+        and "s.multiplyBlend &&" in pipe
+        and all(x in multiply_om for x in (
             "target.SrcBlend = D3D11_BLEND_DEST_COLOR;",
             "target.DestBlend = D3D11_BLEND_ZERO;",
             "target.SrcBlendAlpha = D3D11_BLEND_DEST_ALPHA;",
@@ -72,7 +74,17 @@ def main():
     )
     for old, bad in mutations:
         assert old in s, old
-        assert not connected(s.replace(old, bad, 1)), "escaped mutation: " + old
+        # An adjacent SRCALPHA/ZERO descriptor has its own ZERO factor;
+        # mutate only the original 00598 multiplicative output-merger state.
+        if old.startswith("target."):
+            start = s.index("// Multiplicative game overlays:")
+            end = s.index("D3D11_BUFFER_DESC constants{}", start)
+            block = s[start:end]
+            assert old in block, "missing multiplicative OM anchor: " + old
+            mutant = s[:start] + block.replace(old, bad, 1) + s[end:]
+        else:
+            mutant = s.replace(old, bad, 1)
+        assert not connected(mutant), "escaped mutation: " + old
     # Both D3D9 blend choices yield source*destination on all RGBA channels.
     # D3D11 DEST_COLOR is not valid for the alpha blend slot; DEST_ALPHA is.
     cases = 0

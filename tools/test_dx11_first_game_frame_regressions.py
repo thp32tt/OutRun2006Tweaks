@@ -785,9 +785,10 @@ def main() -> None:
             "target.DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;",
             "dev->CreateBlendState(&blend, s.alphaBlend.GetAddressOf())",
             "dev->CreateBuffer(&constants, nullptr, s.alphaConstants.GetAddressOf())",
-        # Two distinct game blend modes must retain SRC_ALPHA on alpha, so
-        # mutation of the first cannot be hidden by the second occurrence.
-        )) and pipeline.count("target.SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;") == 2 and all(x in submit for x in (
+        # Three distinct source-alpha paths (over, additive, SRCALPHA/ZERO)
+        # must each retain SRC_ALPHA on the alpha channel. A mutation of the
+        # original over path cannot be hidden by later valid modes.
+        )) and pipeline.count("target.SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;") == 3 and all(x in submit for x in (
             "ctx->UpdateSubresource(s.alphaConstants.Get(), 0, nullptr, alphaParams, 0, 0)",
             "ctx->OMSetBlendState(output.alphaBlend ? s.alphaBlend.Get() : nullptr",
             "ctx->PSSetConstantBuffers(0, 1, &alphaBuffer)",
