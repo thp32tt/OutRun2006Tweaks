@@ -853,6 +853,10 @@ namespace OutRunVRStereo
             IDirect3DPixelShader9* bright = nullptr;
             IDirect3DPixelShader9* blur = nullptr;
             IDirect3DPixelShader9* composite = nullptr;
+            // Keep the expensive D3DSBT_ALL object across Presents; Capture()
+            // refreshes all current game state before each private glow pass.
+            // Release before Reset/size changes together with the eye RTs.
+            IDirect3DStateBlock9* savedGameState = nullptr;
             UINT eyeWidth = 0;
             UINT eyeHeight = 0;
             UINT glowWidth = 0;
@@ -884,6 +888,9 @@ namespace OutRunVRStereo
 
         void R30ReleaseSkyGlowResources() noexcept
         {
+            // StateBlock may hold references to game/eye surfaces. Release
+            // before the textures on Reset or SkyGlow resize/reconfiguration.
+            R30ReleaseCom(R30SkyGlow.savedGameState);
             for (int eye = 0; eye < 2; ++eye)
             {
                 // Release borrowed level-zero surfaces before their textures.
@@ -1240,19 +1247,36 @@ namespace OutRunVRStereo
             if (!R30EnsureSkyGlowResources(device))
                 return false;
 
-            IDirect3DStateBlock9* stateBlock = nullptr;
+            // Create once per SkyGlow resource epoch, then update the SAME
+            // D3DSBT_ALL capture before changing any of the game's state.
+            // Calling CreateStateBlock every Present pays the driver's COM
+            // allocation/full-state setup cost even in the reduced-resolution
+            // path. Capture retains its exact game-state restoration semantics.
+            if (!R30SkyGlow.savedGameState)
+            {
+                if (FAILED(device->CreateStateBlock(
+                        D3DSBT_ALL, &R30SkyGlow.savedGameState)) ||
+                    !R30SkyGlow.savedGameState)
+                {
+                    R30ReleaseCom(R30SkyGlow.savedGameState);
+                    return false;
+                }
+            }
+            else if (FAILED(R30SkyGlow.savedGameState->Capture()))
+            {
+                // A failed Capture must not replay an earlier Present's state.
+                R30ReleaseCom(R30SkyGlow.savedGameState);
+                return false;
+            }
+            IDirect3DStateBlock9* const stateBlock = R30SkyGlow.savedGameState;
             IDirect3DSurface9* savedRt = nullptr;
             IDirect3DSurface9* savedDepth = nullptr;
             D3DVIEWPORT9 savedViewport{};
-            if (FAILED(device->CreateStateBlock(
-                    D3DSBT_ALL, &stateBlock)) ||
-                !stateBlock ||
-                FAILED(device->GetRenderTarget(0, &savedRt)) ||
+            if (FAILED(device->GetRenderTarget(0, &savedRt)) ||
                 !savedRt ||
                 FAILED(device->GetViewport(&savedViewport)))
             {
                 if (savedRt) savedRt->Release();
-                if (stateBlock) stateBlock->Release();
                 return false;
             }
             const HRESULT depthHr =
@@ -1262,7 +1286,6 @@ namespace OutRunVRStereo
             if (!depthOk)
             {
                 savedRt->Release();
-                stateBlock->Release();
                 return false;
             }
 
@@ -1377,7 +1400,10 @@ namespace OutRunVRStereo
                 restoreOk;
             savedRt->Release();
             if (savedDepth) savedDepth->Release();
-            stateBlock->Release();
+            // Preserve cache on success; discard it on a device-lost or Apply
+            // failure so the next attempt cannot replay a stale game snapshot.
+            if (!restoreOk)
+                R30ReleaseCom(R30SkyGlow.savedGameState);
 
             if (ok && restoreOk)
             {
@@ -1445,6 +1471,14 @@ namespace OutRunVRStereo
             {
                 R30ScopedInternalPass guard;
                 R30ApplyStereoSkyGlow(device);
+            }
+            else
+            {
+                // If stereo eligibility or SkyGlow is switched off, do not
+                // retain an ALL-state snapshot referencing old game RT/depth
+                // across indefinitely many mono Presents. The eye resources
+                // themselves remain cached for a later stereo re-entry.
+                R30ReleaseCom(R30SkyGlow.savedGameState);
             }
             return R30PresentR29Hook.stdcall<HRESULT>(
                 device, sourceRect, destRect,
