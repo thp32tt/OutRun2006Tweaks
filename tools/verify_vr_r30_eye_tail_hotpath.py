@@ -19,7 +19,7 @@ def sections(source: str):
     configure = source.split("bool R30ConfigureXyzrhwWorldEffect(", 1)[1].split(
         "UINT R30PrimitiveElementCount(", 1)[0]
     vertices = source.split("bool R30TransformXyzrhwVertices(", 1)[1].split(
-        "bool R30TransformXyzrhwStereo(", 1)[0]
+        "bool R30TryFusedWorldXyzrhwProjection(", 1)[0]
     stereo = source.split("bool R30TransformXyzrhwStereo(", 1)[1].split(
         "template <typename LeftDraw,", 1)[0]
     return state, configure, vertices, stereo
