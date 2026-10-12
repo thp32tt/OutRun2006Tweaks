@@ -536,6 +536,7 @@ struct TextureCapture {
     D3DTEXTUREADDRESS addressV = D3DTADDRESS_CLAMP;
     D3DTEXTUREFILTERTYPE minFilter = D3DTEXF_POINT;
     D3DTEXTUREFILTERTYPE magFilter = D3DTEXF_POINT;
+    D3DTEXTUREFILTERTYPE mipFilter = D3DTEXF_NONE;
 };
 
 struct OutputCapture {
@@ -1160,6 +1161,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         DWORD arg2=0, alphaOp=0, alphaArg1=0, alphaArg2=0;
         DWORD coordIndex=~0u, transformFlags=~0u;
         DWORD addressU=0, addressV=0, mag=0, min=0, mip=0, srgb=1;
+        DWORD maxMip=~0u, mipBias=~0u;
         if (FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG2, &arg2)) ||
             FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)) ||
             FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAARG1, &alphaArg1)) ||
@@ -1171,10 +1173,14 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             FAILED(game->GetSamplerState(0, D3DSAMP_MAGFILTER, &mag)) ||
             FAILED(game->GetSamplerState(0, D3DSAMP_MINFILTER, &min)) ||
             FAILED(game->GetSamplerState(0, D3DSAMP_MIPFILTER, &mip)) ||
+            FAILED(game->GetSamplerState(0, D3DSAMP_MAXMIPLEVEL, &maxMip)) ||
+            FAILED(game->GetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, &mipBias)) ||
             FAILED(game->GetSamplerState(0, D3DSAMP_SRGBTEXTURE, &srgb)))
             return false;
-        // Reject complement/alpha-replicate modifiers, projected or displaced
-        // coordinates, gamma reads and mip/anisotropic paths we do not emulate.
+        // MIP_POINT is supported with a fully mirrored CPU-readable mip chain.
+        // Reject nonzero source LOD bias/MaxMipLevel until those controls are
+        // translated. MIP_LINEAR and anisotropy remain on the original DX9Ex path.
+        // Reject complement/alpha-replicate modifiers and projected coordinates.
         const bool blendTextureModulateAlpha = op == D3DTOP_BLENDTEXTUREALPHA &&
                                                 alphaOp == D3DTOP_MODULATE;
         const bool blendDiffuseModulateAlpha = op == D3DTOP_BLENDDIFFUSEALPHA &&
@@ -1402,8 +1408,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             (addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP) ||
             (mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR) ||
             (min != D3DTEXF_POINT && min != D3DTEXF_LINEAR) ||
-            mip != D3DTEXF_NONE)
+            (mip != D3DTEXF_NONE && mip != D3DTEXF_POINT) ||
+            maxMip != 0u || mipBias != 0u)
             return false;
+        capture.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(mip);
         capture.addressU = static_cast<D3DTEXTUREADDRESS>(addressU);
         capture.addressV = static_cast<D3DTEXTUREADDRESS>(addressV);
         capture.minFilter = static_cast<D3DTEXTUREFILTERTYPE>(min);
@@ -1572,69 +1580,51 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
     return true;
 }
 
-// Snapshot a live game texture's level 0 into a D3D11 sampleable resource.
-// Managed/system-memory DXT1/3/5 are copied as BC1/2/3 blocks, not decoded
-// or reinterpreted as BGRA pixels. Unsupported or GPU-only sources remain DX9Ex.
+// Snapshot a live game texture into a D3D11 sampleable resource. When the
+// source asks for MIP_POINT, upload *every* readable mip rather than binding
+// level 0 and silently changing the game's minification result. All error
+// paths preserve the original D3D9 Draw/Present/gamepad behavior.
 bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     ComPtr<ID3D11ShaderResourceView>& view,
                     ComPtr<ID3D11SamplerState>& sampler) noexcept {
-    if (!dev || !capture.enabled || !capture.texture ||
-        capture.texture->GetLevelCount() == 0) return false;
-    D3DSURFACE_DESC info{};
-    if (FAILED(capture.texture->GetLevelDesc(0, &info)) ||
-        info.Width == 0 || info.Height == 0 ||
-        info.Width > 1024 || info.Height > 1024)
-        return false;
-    // Game-authored DEFAULT render-target textures may be mirrored through an
-    // exact-format D3D9 RT readback. Ordinary DEFAULT textures are still
-    // GPU-only and must never be treated as lockable CPU memory.
-    const bool gpuRenderTarget = info.Pool == D3DPOOL_DEFAULT &&
-        (info.Usage & D3DUSAGE_RENDERTARGET) != 0u &&
-        (info.Format == D3DFMT_A8R8G8B8 ||
-         info.Format == D3DFMT_X8R8G8B8);
-    if (info.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;
-
-    // Both the producer's LockRect rows and D3D11's immutable subresource
-    // pitch are in *compressed block bytes* for DXT. A BGRA pitch for BCn
-    // silently corrupts the sampled menu/vehicle artwork.
-    const bool compressed = info.Format == D3DFMT_DXT1 ||
-                            info.Format == D3DFMT_DXT3 ||
-                            info.Format == D3DFMT_DXT5;
-    // Expand game-authored 16-bit packed texels into an immutable BGRA8
-    // diagnostic SRV. D3D9 owns the source and continues its own Draw.
-    const bool packed16 = info.Format == D3DFMT_R5G6B5 ||
-                          info.Format == D3DFMT_A1R5G5B5 ||
-                          info.Format == D3DFMT_A4R4G4B4;
+    if (!dev || !capture.enabled || !capture.texture) return false;
+    const UINT sourceLevels = capture.texture->GetLevelCount();
+    if (sourceLevels == 0 || sourceLevels > 11u) return false;
+    D3DSURFACE_DESC base{};
+    if (FAILED(capture.texture->GetLevelDesc(0, &base)) ||
+        base.Width == 0 || base.Height == 0 ||
+        base.Width > 1024 || base.Height > 1024) return false;
+    const bool gpuRenderTarget = base.Pool == D3DPOOL_DEFAULT &&
+        (base.Usage & D3DUSAGE_RENDERTARGET) != 0u &&
+        (base.Format == D3DFMT_A8R8G8B8 ||
+         base.Format == D3DFMT_X8R8G8B8);
+    if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;
+    const bool usesMips = capture.mipFilter == D3DTEXF_POINT;
+    // AUTOGENMIPMAP exposes one level to LockRect even though the D3D9
+    // sampler consumes generated levels. Never claim those mips were copied.
+    if (usesMips && (base.Usage & D3DUSAGE_AUTOGENMIPMAP)) return false;
+    if (usesMips && capture.texture->GetLOD() != 0u) return false;
+    const UINT levels = usesMips ? sourceLevels : 1u;
+    if (gpuRenderTarget && levels != 1u) return false;
+    const bool compressed = base.Format == D3DFMT_DXT1 ||
+                            base.Format == D3DFMT_DXT3 ||
+                            base.Format == D3DFMT_DXT5;
+    const bool packed16 = base.Format == D3DFMT_R5G6B5 ||
+                          base.Format == D3DFMT_A1R5G5B5 ||
+                          base.Format == D3DFMT_A4R4G4B4;
     DXGI_FORMAT nativeFormat = DXGI_FORMAT_UNKNOWN;
-    UINT rowBytes = 0, rows = 0;
     if (compressed) {
-        // Level-0 BC resources must have full 4x4 blocks. Reject tiny or
-        // partial blocks rather than relying on device-specific acceptance.
-        if ((info.Width & 3u) || (info.Height & 3u)) return false;
-        const UINT bytesPerBlock = info.Format == D3DFMT_DXT1 ? 8u : 16u;
-        rowBytes = (info.Width / 4u) * bytesPerBlock;
-        rows = info.Height / 4u;
-        nativeFormat = info.Format == D3DFMT_DXT1 ? DXGI_FORMAT_BC1_UNORM :
-                       info.Format == D3DFMT_DXT3 ? DXGI_FORMAT_BC2_UNORM :
-                                                    DXGI_FORMAT_BC3_UNORM;
-    } else if (info.Format == D3DFMT_A8R8G8B8 ||
-               info.Format == D3DFMT_X8R8G8B8) {
-        rowBytes = info.Width * 4u;
-        rows = info.Height;
+        // A full-sized BC base level is required, but its final mips may
+        // legally be 2x2 or 1x1, each occupying one compressed 4x4 block.
+        if ((base.Width & 3u) || (base.Height & 3u)) return false;
+        nativeFormat = base.Format == D3DFMT_DXT1 ? DXGI_FORMAT_BC1_UNORM :
+                       base.Format == D3DFMT_DXT3 ? DXGI_FORMAT_BC2_UNORM :
+                                                     DXGI_FORMAT_BC3_UNORM;
+    } else if (base.Format == D3DFMT_A8R8G8B8 ||
+               base.Format == D3DFMT_X8R8G8B8 || packed16) {
         nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
-    } else if (packed16) {
-        // D3D9 LockRect is 2 bytes/pixel, whereas DX11 BGRA8 upload is 4.
-        rowBytes = info.Width * 2u;
-        rows = info.Height;
-        nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
-    } else {
-        return false;
-    }
+    } else return false;
 
-    // The source texture and its owning game device remain authoritative.
-    // GetRenderTargetData is only legal for non-MSAA render targets; no
-    // StretchRect, format conversion or D3D9 state mutation is permitted.
-    // A failed readback leaves the original game Draw/Present untouched.
     ComPtr<IDirect3DSurface9> readbackSurface;
     if (gpuRenderTarget) {
         ComPtr<IDirect3DSurface9> sourceSurface;
@@ -1643,91 +1633,103 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         if (FAILED(capture.texture->GetSurfaceLevel(0, sourceSurface.GetAddressOf())) ||
             FAILED(sourceSurface->GetDesc(&sourceDesc)) ||
             sourceDesc.MultiSampleType != D3DMULTISAMPLE_NONE ||
-            sourceDesc.Width != info.Width || sourceDesc.Height != info.Height ||
-            sourceDesc.Format != info.Format ||
+            sourceDesc.Width != base.Width || sourceDesc.Height != base.Height ||
+            sourceDesc.Format != base.Format ||
             !(sourceDesc.Usage & D3DUSAGE_RENDERTARGET) ||
             FAILED(capture.texture->GetDevice(gameDevice.GetAddressOf())) ||
             FAILED(gameDevice->CreateOffscreenPlainSurface(
-                info.Width, info.Height, info.Format, D3DPOOL_SYSTEMMEM,
+                base.Width, base.Height, base.Format, D3DPOOL_SYSTEMMEM,
                 readbackSurface.GetAddressOf(), nullptr)) ||
             FAILED(gameDevice->GetRenderTargetData(sourceSurface.Get(), readbackSurface.Get())))
             return false;
     }
-    D3DLOCKED_RECT locked{};
-    const HRESULT lockResult = gpuRenderTarget ?
-        readbackSurface->LockRect(&locked, nullptr, D3DLOCK_READONLY) :
-        capture.texture->LockRect(0, &locked, nullptr, D3DLOCK_READONLY);
-    if (FAILED(lockResult)) return false;
-    bool ok = false;
-    if (locked.pBits && locked.Pitch > 0 &&
-        static_cast<UINT>(locked.Pitch) >= rowBytes) {
-        const UINT uploadRowBytes = packed16 ? info.Width * 4u : rowBytes;
-        const std::size_t sourceByteCount = static_cast<std::size_t>(rowBytes) * rows;
-        std::vector<std::uint8_t> pixels(
-            packed16 ? static_cast<std::size_t>(uploadRowBytes) * rows : sourceByteCount);
-        const auto layout = info.Format == D3DFMT_R5G6B5 ?
-            packed_texture16::Layout::rgb565 : info.Format == D3DFMT_A1R5G5B5 ?
-            packed_texture16::Layout::argb1555 : packed_texture16::Layout::argb4444;
-        for (UINT y = 0; y < rows; ++y) {
-            const auto* source = static_cast<const std::uint8_t*>(locked.pBits) +
-                                 static_cast<std::size_t>(y) * locked.Pitch;
-            if (packed16) {
-                packed_texture16::unpack_row(
-                    source, pixels.data() + static_cast<std::size_t>(y) * uploadRowBytes,
-                    info.Width, layout);
-            } else {
-                std::memcpy(pixels.data() + static_cast<std::size_t>(y) * rowBytes,
-                            source, rowBytes);
+
+    std::vector<std::vector<std::uint8_t>> copied(levels);
+    std::vector<UINT> pitches(levels);
+    for (UINT level = 0; level < levels; ++level) {
+        D3DSURFACE_DESC desc{};
+        if (FAILED(capture.texture->GetLevelDesc(level, &desc)) ||
+            desc.Format != base.Format || desc.Pool != base.Pool ||
+            desc.Width != (std::max)(1u, base.Width >> level) ||
+            desc.Height != (std::max)(1u, base.Height >> level))
+            return false;
+        const UINT rows = compressed ? (std::max)(1u, (desc.Height + 3u) / 4u) : desc.Height;
+        const UINT rowBytes = compressed ?
+            (std::max)(1u, (desc.Width + 3u) / 4u) *
+                (base.Format == D3DFMT_DXT1 ? 8u : 16u) :
+            desc.Width * (packed16 ? 2u : 4u);
+        const UINT uploadPitch = packed16 ? desc.Width * 4u : rowBytes;
+        D3DLOCKED_RECT lock{};
+        const HRESULT lockResult = gpuRenderTarget ?
+            readbackSurface->LockRect(&lock, nullptr, D3DLOCK_READONLY) :
+            capture.texture->LockRect(level, &lock, nullptr, D3DLOCK_READONLY);
+        if (FAILED(lockResult)) return false;
+        const bool readable = lock.pBits && lock.Pitch > 0 &&
+                              static_cast<UINT>(lock.Pitch) >= rowBytes;
+        if (readable) {
+            auto& pixels = copied[level];
+            pixels.resize(static_cast<std::size_t>(uploadPitch) * rows);
+            const auto packing = base.Format == D3DFMT_R5G6B5 ?
+                packed_texture16::Layout::rgb565 :
+                base.Format == D3DFMT_A1R5G5B5 ?
+                packed_texture16::Layout::argb1555 :
+                packed_texture16::Layout::argb4444;
+            for (UINT y = 0; y < rows; ++y) {
+                const auto* source = static_cast<const std::uint8_t*>(lock.pBits) +
+                                     static_cast<std::size_t>(y) * lock.Pitch;
+                auto* destination = pixels.data() + static_cast<std::size_t>(y) * uploadPitch;
+                if (packed16)
+                    packed_texture16::unpack_row(source, destination, desc.Width, packing);
+                else
+                    std::memcpy(destination, source, rowBytes);
             }
+            // X8R8G8B8 has no usable alpha; every mip must sample opaque.
+            if (base.Format == D3DFMT_X8R8G8B8)
+                for (std::size_t p = 3; p < pixels.size(); p += 4)
+                    pixels[p] = 0xffu;
+            pitches[level] = uploadPitch;
         }
-        // D3DFMT_X8R8G8B8 alpha is undefined in D3D9; the native
-        // texture-only and modulate pixel shaders must sample opaque alpha.
-        if (info.Format == D3DFMT_X8R8G8B8)
-            for (std::size_t x = 3; x < pixels.size(); x += 4)
-                pixels[x] = 0xffu;
-        D3D11_TEXTURE2D_DESC desc{};
-        desc.Width = info.Width; desc.Height = info.Height;
-        desc.MipLevels = 1; desc.ArraySize = 1;
-        desc.Format = nativeFormat;
-        desc.SampleDesc.Count = 1;
-        desc.Usage = D3D11_USAGE_IMMUTABLE;
-        desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-        D3D11_SUBRESOURCE_DATA initial{};
-        initial.pSysMem = pixels.data();
-        initial.SysMemPitch = rowBytes;
-        if (packed16) initial.SysMemPitch = uploadRowBytes;
-        ComPtr<ID3D11Texture2D> texture;
-        if (SUCCEEDED(dev->CreateTexture2D(&desc, &initial, texture.GetAddressOf())) &&
-            SUCCEEDED(dev->CreateShaderResourceView(texture.Get(), nullptr,
-                                                   view.GetAddressOf()))) {
-            D3D11_SAMPLER_DESC state{};
-            // D3D9 permits independent MIN and MAG point/linear filters.
-            // MIPFILTER=NONE fixes LOD to level 0, so only MIP_POINT modes
-            // are exact; do not collapse mixed source filters to one mode.
-            state.Filter = capture.minFilter == D3DTEXF_LINEAR ?
-                (capture.magFilter == D3DTEXF_LINEAR ?
-                    D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT :
-                    D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT) :
-                (capture.magFilter == D3DTEXF_LINEAR ?
-                    D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :
-                    D3D11_FILTER_MIN_MAG_MIP_POINT);
-            state.AddressU = capture.addressU == D3DTADDRESS_WRAP ?
-                D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
-            state.AddressV = capture.addressV == D3DTADDRESS_WRAP ?
-                D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
-            state.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-            // D3DSAMP_MIPFILTER=NONE always reads mip 0 even when the
-            // source texture contains more mips; never sample unmirrored levels.
-            state.MinLOD = 0.0f;
-            state.MaxLOD = 0.0f;
-            state.MaxAnisotropy = 1;
-            state.ComparisonFunc = D3D11_COMPARISON_NEVER;
-            ok = SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));
-        }
+        if (gpuRenderTarget) readbackSurface->UnlockRect();
+        else capture.texture->UnlockRect(level);
+        if (!readable) return false;
     }
-    if (gpuRenderTarget) readbackSurface->UnlockRect();
-    else capture.texture->UnlockRect(0);
-    return ok;
+    std::vector<D3D11_SUBRESOURCE_DATA> initial(levels);
+    for (UINT level = 0; level < levels; ++level) {
+        initial[level].pSysMem = copied[level].data();
+        initial[level].SysMemPitch = pitches[level];
+    }
+    D3D11_TEXTURE2D_DESC desc{};
+    desc.Width = base.Width; desc.Height = base.Height;
+    desc.MipLevels = levels; desc.ArraySize = 1;
+    desc.Format = nativeFormat;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_IMMUTABLE;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    ComPtr<ID3D11Texture2D> texture;
+    if (FAILED(dev->CreateTexture2D(&desc, initial.data(), texture.GetAddressOf())) ||
+        FAILED(dev->CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())))
+        return false;
+    D3D11_SAMPLER_DESC state{};
+    // Independent D3D9 MIN/MAG filtering with mip point selection. For
+    // MIPFILTER=NONE force LOD 0 even if the source has additional mips.
+    state.Filter = capture.minFilter == D3DTEXF_LINEAR ?
+        (capture.magFilter == D3DTEXF_LINEAR ?
+            D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT :
+            D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT) :
+        (capture.magFilter == D3DTEXF_LINEAR ?
+            D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :
+            D3D11_FILTER_MIN_MAG_MIP_POINT);
+    state.AddressU = capture.addressU == D3DTADDRESS_WRAP ?
+        D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
+    state.AddressV = capture.addressV == D3DTADDRESS_WRAP ?
+        D3D11_TEXTURE_ADDRESS_WRAP : D3D11_TEXTURE_ADDRESS_CLAMP;
+    state.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    state.MinLOD = 0.0f;
+    state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;
+    state.MipLODBias = 0.0f;
+    state.MaxAnisotropy = 1;
+    state.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    return SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));
 }
 
 bool submit(State& s, const std::vector<NativeVertex>& vertices,
