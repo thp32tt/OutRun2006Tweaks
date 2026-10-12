@@ -17,7 +17,7 @@
     "no-key fail-closed synthetic negative test",
     "GitHub-hosted no-charge dry-run on push"
   ],
-  "status": "SOURCE_REFERENCE_NOT_BOUND_PENDING_PROVIDER_APPROVAL_AND_LIVE_MULTIPART_RECEIPT",
+  "status": "PREPARATION_AND_CI_VERIFIED__SOURCE_REFERENCE_NOT_BOUND_LIVE",
   "real_generation_attempts_this_run": 0,
   "qualified_korean_png": 0,
   "new_korean_dds": 0,
@@ -26,5 +26,38 @@
   "C3": "NOT_RUN",
   "RUNTIME_VALIDATION": "UNTESTED",
   "open_backlog": "IGR-009_OPEN",
-  "next": "Obtain explicit authorization to use billed OpenAI Images Edit API as B provider and encrypted GitHub Actions API key, then user-dispatch B_q048; inspect actual receipt, exact Hangul and alpha before any DDS conversion."
+  "next": "Obtain explicit authorization to use billed OpenAI Images Edit API as B provider and encrypted GitHub Actions API key, then user-dispatch B_q048; inspect actual receipt, exact Hangul and alpha before any DDS conversion.",
+  "local_dry_run": {
+    "status": "LOCAL_SOURCE_SHA_VERIFIED_ONLY_NOT_GENERATOR_BOUND",
+    "role": "B",
+    "queue_index": 48,
+    "source_dimensions": [
+      496,
+      155
+    ],
+    "source_visible_bbox": [
+      36,
+      31,
+      413,
+      124
+    ],
+    "source_sha256": "8a6aa8d897af573f98e9848ae25d7366a5c759f87b235116d420ac062cf09bcf",
+    "source_bytes": 39022,
+    "generation_calls": 0,
+    "new_trial_dds": 0
+  },
+  "ci": {
+    "base_commit": "8cbced5899852bcb747b92717383c866e5efad59",
+    "base_run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38188455249",
+    "base_conclusion": "success",
+    "sparse_checkout_commit": "2d9b9e8c375383a52bb4fb6bdaa59d3ab5414fb1",
+    "sparse_run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38188657654",
+    "sparse_conclusion": "success",
+    "positive_checks": [
+      "hosted synthetic image field byte matching",
+      "B/C1 PNG to DDS unit tests",
+      "q048 real SHA pinned English PNG dry-run"
+    ]
+  },
+  "confirmed_provider_api_calls": 0
 }
