@@ -139,7 +139,8 @@ int main() {
     assert(!game_fvf_decode_vertex(&eight, sizeof(eight), badEight, sample));
     assert(sample.uv7[1] == eightSaved.uv7[1]);
     assert(!game_fvf_layout(kGameFvfXyzRhw | 0x900u, layout));
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex8 | 0x00010000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex8 | 0x00010000u, layout));
+    assert(layout.texcoord3DMask == 1u && layout.minStride == 84u);
     assert(game_fvf_layout(kGameFvfXyz | kGameFvfNormal |
                            kGameFvfDiffuse | kGameFvfSpecular | kGameFvfTex5, layout));
     assert(layout.texcoordCount == 5u && layout.texcoordOffset == 32u &&
@@ -242,14 +243,16 @@ int main() {
     assert(sample.diffuse == 0xffffffffu && sample.uv[0] == .2f);
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfNormal |
                             kGameFvfPsize | kGameFvfTex1, layout));
-    assert(!game_fvf_layout(kGameFvfXyz | kGameFvfPsize | kGameFvfTex1 |
-                            0x00010000u, layout));
+    assert(game_fvf_layout(kGameFvfXyz | kGameFvfPsize | kGameFvfTex1 |
+                           0x00010000u, layout));
+    assert(layout.texcoord3DMask == 1u && layout.minStride == 28u);
     assert(game_fvf_layout(kGameFvfXyz | kGameFvfDiffuse, layout));
     assert(!layout.hasPointSize && layout.pointSizeBytes == 0u);
     assert(!layout.textured && layout.minStride == 16);
 
     // 00610: one-dimensional D3D9 stage0 UV feeds native Draw/DrawIndexed.
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1 | 0x00010000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1 | 0x00010000u, layout));
+    assert(layout.texcoord3DMask == 1u && layout.minStride == 28u);
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1 | 0x00020000u, layout));
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTexcoordSize1_0 | kGameFvfDiffuse, layout));
     assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1 | kGameFvfTexcoordSize1_0, layout));
@@ -283,7 +286,8 @@ int main() {
     // 00611: game-authored UV1 U-only feeds TEXCOORDINDEX=1 native Draw.
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1 |
                             kGameFvfTexcoordSize1_1, layout));
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 | 0x00040000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 | 0x00040000u, layout));
+    assert(layout.texcoord3DMask == 2u && layout.minStride == 36u);
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 | 0x00080000u, layout));
     assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 |
                            kGameFvfTexcoordSize1_1, layout));
@@ -323,7 +327,8 @@ int main() {
     // 00612: TEX3 UV2 U-only must reach the game-authored native stage0 UV.
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex2 |
                             kGameFvfTexcoordSize1_2, layout));
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 | 0x00100000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 | 0x00100000u, layout));
+    assert(layout.texcoord3DMask == 4u && layout.minStride == 44u);
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 | 0x00200000u, layout));
     assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 |
                            kGameFvfTexcoordSize1_2, layout));
@@ -370,7 +375,8 @@ int main() {
     // slot, and its missing V must not consume the fifth UV pair.
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex3 |
                             kGameFvfTexcoordSize1_3, layout));
-    assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 | 0x00400000u, layout));
+    assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 | 0x00400000u, layout));
+    assert(layout.texcoord3DMask == 8u && layout.minStride == 52u);
     assert(!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 | 0x00800000u, layout));
     assert(game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex4 |
                            kGameFvfTexcoordSize1_3, layout));
