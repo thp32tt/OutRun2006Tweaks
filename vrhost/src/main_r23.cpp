@@ -29,6 +29,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <unordered_map>
 #include <vector>
@@ -207,6 +208,7 @@ namespace
         std::vector<double> values;
         double sum = 0.0;
         double maximum = 0.0;
+        R23MetricWindow() { values.reserve(1024); } // 120Hz * 5s
 
         void Add(double value)
         {
@@ -223,18 +225,19 @@ namespace
                 sum / static_cast<double>(values.size());
         }
 
-        double P95() const
+        double P95()
         {
             if (values.empty())
                 return 0.0;
-            std::vector<double> sorted = values;
-            std::sort(sorted.begin(), sorted.end());
             const std::size_t index =
                 std::min<std::size_t>(
-                    sorted.size() - 1,
+                    values.size() - 1,
                     static_cast<std::size_t>(
-                        std::ceil(sorted.size() * 0.95)) - 1);
-            return sorted[index];
+                        std::ceil(values.size() * 0.95)) - 1);
+            // Reporting immediately resets this unordered sample set.
+            // Preserve nearest-rank P95 without copy/full sort on XR tick.
+            std::nth_element(values.begin(), values.begin() + index, values.end());
+            return values[index];
         }
 
         void Reset()
@@ -245,16 +248,41 @@ namespace
         }
     };
 
+    struct R23TransparentHash
+    {
+        using is_transparent = void;
+        std::size_t operator()(std::string_view text) const noexcept
+        {
+            return std::hash<std::string_view>{}(text);
+        }
+    };
+    struct R23TransparentEqual
+    {
+        using is_transparent = void;
+        bool operator()(std::string_view a, std::string_view b) const noexcept
+        {
+            return a == b;
+        }
+    };
     struct R23PipelineWindow
     {
-        std::unordered_map<std::string, std::uint64_t> rejects;
-        std::unordered_map<std::string, std::uint64_t> finals;
+        // Own label storage but avoid constructing a string on every XR tick.
+        using Counts = std::unordered_map<std::string, std::uint64_t,
+            R23TransparentHash, R23TransparentEqual>;
+        Counts rejects;
+        Counts finals;
         R23MetricWindow capture;
         R23MetricWindow commit;
         R23MetricWindow render;
         R23MetricWindow endFrame;
         std::uint64_t frames = 0;
 
+        static void Increment(Counts& counts, const char* key)
+        {
+            const auto it = counts.find(std::string_view(key));
+            if (it != counts.end()) ++it->second;
+            else counts.emplace(std::string(key), 1u);
+        }
         void Note(const char* rejectReason, const char* finalKind,
             double captureMs, double commitMs,
             double renderMs, double endMs)
@@ -265,9 +293,9 @@ namespace
                 std::strcmp(rejectReason, "already-processed") != 0 &&
                 std::strcmp(rejectReason, "committed-pending-render") != 0 &&
                 std::strcmp(rejectReason, "displayed-fresh") != 0)
-                ++rejects[rejectReason];
+                Increment(rejects, rejectReason);
             if (finalKind && *finalKind)
-                ++finals[finalKind];
+                Increment(finals, finalKind);
             capture.Add(captureMs);
             commit.Add(commitMs);
             render.Add(renderMs);
@@ -276,7 +304,7 @@ namespace
 
         static void AppendCounts(
             std::ostringstream& out,
-            const std::unordered_map<std::string, std::uint64_t>& counts)
+            const Counts& counts)
         {
             bool first = true;
             for (const auto& item : counts)
