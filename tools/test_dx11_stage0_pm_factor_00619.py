@@ -27,7 +27,13 @@ TOKENS=(
 def linked(s):
     body=s.split("float4 PSTextureBlendTextureAlphaPMSelectFactorAlpha(VOut v) : SV_Target {",1)
     predicate=s.split("const bool blendTextureAlphaPMFactorAlpha =",1)
-    return (len(predicate)==2 and
+    texture_alpha=s.split("const bool blendTextureAlphaPMTextureAlpha =",1)
+    texture_predicate=texture_alpha[1].split(";",1)[0] if len(texture_alpha)==2 else ""
+    # The earlier texture-alpha shader must be mutually exclusive with factor
+    # alpha, otherwise submit() selects its earlier branch and loses TFACTOR A.
+    return (len(texture_alpha)==2 and
+        "alphaArg1 == D3DTA_TEXTURE" in texture_predicate and
+        len(predicate)==2 and
         "op == D3DTOP_BLENDTEXTUREALPHAPM &&" in predicate[1].split(";",1)[0] and
         "alphaOp == D3DTOP_SELECTARG1 && alphaArg1 == D3DTA_TFACTOR" in predicate[1].split(";",1)[0] and
         len(body)==2 and all(x in s for x in TOKENS) and s.count("s.blendTextureAlphaPmFactorAlphaPs.Reset();")==2 and all(x in body[1].split("}",1)[0] for x in (
@@ -42,6 +48,12 @@ def main():
     unique_links = [x for x in TOKENS if s.count(x) == 1]
     for x in unique_links:
         assert not linked(s.replace(x, "BROKEN_00619", 1)), x
+    texture_condition = ("const bool blendTextureAlphaPMTextureAlpha =\\n"
+                         "            op == D3DTOP_BLENDTEXTUREALPHAPM && alphaOp == D3DTOP_SELECTARG1 &&\\n"
+                         "            alphaArg1 == D3DTA_TEXTURE;").replace("\\n", "\n")
+    assert texture_condition in s
+    assert not linked(s.replace(texture_condition,
+        texture_condition.replace("alphaArg1 == D3DTA_TEXTURE", "alphaArg1 == D3DTA_TFACTOR"), 1))
     predicate = ("const bool blendTextureAlphaPMFactorAlpha = op == D3DTOP_BLENDTEXTUREALPHAPM &&\\n"
                  "            alphaOp == D3DTOP_SELECTARG1 && alphaArg1 == D3DTA_TFACTOR;")
     # Source uses a real newline; match the feature-owned predicate exactly.
@@ -53,5 +65,5 @@ def main():
     assert not linked(s.replace(pixel, "float4 c = float4(t.rgb, t.a);", 1))
     for tr,dr,ta,fa in itertools.product((0.,.25,.85,1.),(0.,.4,.9,1.),(0.,.3,.95,1.),range(256)):
         assert 0<=min(1.,tr+dr*(1.-ta))<=1 and 0<=fa/255.<=1
-    print(f"00619 source linkage, {len(unique_links)+2} scoped destructive mutations, 16384 numeric samples PASS; Quest3 UNTESTED")
+    print(f"00619 source linkage, {len(unique_links)+3} scoped destructive mutations, 16384 numeric samples PASS; Quest3 UNTESTED")
 if __name__=="__main__":main()

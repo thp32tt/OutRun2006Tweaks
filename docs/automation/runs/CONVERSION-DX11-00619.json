@@ -11,8 +11,8 @@
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "target_branch": "vr-dx11-native-r71",
   "base_head_sha": "146714d870ee49defb733a09a374d41c7723b3e5",
-  "status": "AWAITING_EXACT_SHA_GATE",
-  "checkpoint": "C4_MATERIAL_COMMIT",
+  "status": "MATERIAL_REPAIR_AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_MATERIAL_REPAIR",
   "automation_validation": "PENDING_EXACT_SHA_GATE",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
@@ -57,5 +57,10 @@
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Check exact-SHA Actions, no physical game/Quest3 claim"
+  "next_action": "Check exact-SHA Actions, no physical game/Quest3 claim",
+  "failure_context": {
+    "fix": "Earlier PMTextureAlpha predicate matched TFACTOR and shadowed 00619 PS; make mutually exclusive",
+    "earlier_fast_success_run": 38273938177,
+    "prior_validation_bearing_sha": "388f56a2becf2609acea84e3a88e01b6d433c7af"
+  }
 }

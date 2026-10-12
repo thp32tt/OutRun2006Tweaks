@@ -1708,7 +1708,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         // No mixed PM RGB/alpha admission without separate native shader parity.
         const bool blendTextureAlphaPM = game_stage0_premultiplied_pair(op, alphaOp);
         const bool blendTextureAlphaPMTextureAlpha =
-            op == D3DTOP_BLENDTEXTUREALPHAPM && alphaOp == D3DTOP_SELECTARG1;
+            op == D3DTOP_BLENDTEXTUREALPHAPM && alphaOp == D3DTOP_SELECTARG1 &&
+            alphaArg1 == D3DTA_TEXTURE;
         const bool blendTextureAlphaPMDiffuseAlpha =
             game_stage0_premultiplied_diffuse_alpha_pair(op, alphaOp);
         const bool blendDiffuseAlpha = op == D3DTOP_BLENDDIFFUSEALPHA && alphaOp == D3DTOP_BLENDDIFFUSEALPHA;
