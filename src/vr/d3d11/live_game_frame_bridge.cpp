@@ -6,6 +6,7 @@
 #include "live_game_stage0_blend.hpp"
 #include "native_backend.hpp"
 #include "packed_texture_16bit.hpp"
+#include "live_game_luminance_texture.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -2722,9 +2723,15 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     const bool packed16 = base.Format == D3DFMT_R5G6B5 ||
                           base.Format == D3DFMT_A1R5G5B5 ||
                           base.Format == D3DFMT_A4R4G4B4;
+    // Live menu masks and lettering may use alpha/luminance-only D3D9 texels.
+    const bool luminance = base.Format == D3DFMT_A8 ||
+                           base.Format == D3DFMT_L8 ||
+                           base.Format == D3DFMT_A8L8;
     // D3D9 packed 16-bit texture formats have no equivalent sRGB D3D11 SRV.
     // Keep their live Draw on DX9Ex; never decode as linear by mistake.
     if (capture.srgbTexture && packed16) return false;
+    // Legacy alpha/luminance sRGB parity has not been proven: DX9Ex owns it.
+    if (capture.srgbTexture && luminance) return false;
     DXGI_FORMAT nativeFormat = DXGI_FORMAT_UNKNOWN;
     if (compressed) {
         // A full-sized BC base level is required, but its final mips may
@@ -2736,7 +2743,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             (capture.srgbTexture ? DXGI_FORMAT_BC2_UNORM_SRGB : DXGI_FORMAT_BC2_UNORM) :
             (capture.srgbTexture ? DXGI_FORMAT_BC3_UNORM_SRGB : DXGI_FORMAT_BC3_UNORM);
     } else if (base.Format == D3DFMT_A8R8G8B8 ||
-               base.Format == D3DFMT_X8R8G8B8 || packed16) {
+               base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance) {
         nativeFormat = capture.srgbTexture ?
             DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : DXGI_FORMAT_B8G8R8A8_UNORM;
     } else return false;
@@ -2760,6 +2767,13 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             return false;
     }
 
+    const auto luminanceLayout = base.Format == D3DFMT_A8 ?
+        luminance_texture::Layout::alpha8 :
+        base.Format == D3DFMT_L8 ?
+        luminance_texture::Layout::luminance8 :
+        luminance_texture::Layout::alpha8_luminance8;
+    const UINT sourceTexelBytes = packed16 ? 2u :
+        luminance ? luminance_texture::source_bytes_per_texel(luminanceLayout) : 4u;
     std::vector<std::vector<std::uint8_t>> copied(levels);
     std::vector<UINT> pitches(levels);
     for (UINT level = 0; level < levels; ++level) {
@@ -2773,8 +2787,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         const UINT rowBytes = compressed ?
             (std::max)(1u, (desc.Width + 3u) / 4u) *
                 (base.Format == D3DFMT_DXT1 ? 8u : 16u) :
-            desc.Width * (packed16 ? 2u : 4u);
-        const UINT uploadPitch = packed16 ? desc.Width * 4u : rowBytes;
+            desc.Width * sourceTexelBytes;
+        const UINT uploadPitch = (packed16 || luminance) ?
+            desc.Width * 4u : rowBytes;
         D3DLOCKED_RECT lock{};
         const HRESULT lockResult = gpuRenderTarget ?
             readbackSurface->LockRect(&lock, nullptr, D3DLOCK_READONLY) :
@@ -2796,6 +2811,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                 auto* destination = pixels.data() + static_cast<std::size_t>(y) * uploadPitch;
                 if (packed16)
                     packed_texture16::unpack_row(source, destination, desc.Width, packing);
+                else if (luminance)
+                    luminance_texture::unpack_row(source, destination, desc.Width, luminanceLayout);
                 else
                     std::memcpy(destination, source, rowBytes);
             }
