@@ -10,22 +10,22 @@
   "feature_id": "DX9EX:PERF:R29_STENCIL_FORMAT_READ_ELISION",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R29_STENCIL_FORMAT_READ_ELISION",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C3_VALIDATED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00786]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r29.cpp",
     "tools/verify_vr_r29_stencil_write_fastpath.py",
     "docs/automation/runs/CONVERSION-DX9EX-00786.json"
   ],
-  "score_delta": 0,
+  "score_delta": 1,
   "feature_contract": {
     "feature_id": "DX9EX:PERF:R29_STENCIL_FORMAT_READ_ELISION",
     "goal": "For the complete stencil read-only stereo draw path, eliminate redundant per-draw depth-surface format driver queries after a generation-fenced R29 no-write policy while preserving active stencil writes and all missing-cache/device-reset conservative paths.",
     "scope_boundary": "R29 game-side stencil read-only depth-surface format queries only. No R30 buffer registry, HUD/menu placement, eye pose, host copy, DX11, DXVK, quality presets or FFB changes.",
-    "special_work_evidence": "R29OwnerLeftDrawMayWriteStencil previously invokes SurfaceHasStencil(TrackedDepthStencil) for every stencil-enabled stereo draw even when R29StencilWriteCacheCurrent() already guarantees mayWrite=false. The live surface format COM GetDesc is unnecessary for a provably nonwriting draw; Quest3 scene-matched savings are unmeasured.",
+    "special_work_evidence": "R29OwnerLeftDrawMayWriteStencil invoked the tracked surface-format helper on every stencil-enabled draw before considering generation-fenced mayWrite=false. SurfaceHasStencil already caches the actual COM GetDesc after initial probing, so this change saves steady-state CPU helper/cache-path evaluation, not a repeated driver GetDesc. HMD scene-matched frame-time and FPS gains remain unmeasured.",
     "trace_stages": [
       "D3D9 game SetRenderState stencil enable, write mask and operations are tracked by R29 setter and StateBlock generation fences.",
       "R29OwnerLeftDrawMayWriteStencil drives stereo main depth/stencil write accounting before R30/R33 per-eye rendering.",
@@ -57,13 +57,14 @@
     ]
   },
   "acceptance_results": {
-    "READ_ONLY_STENCIL_FORMAT_ELISION": "SOURCE_MODEL_VERIFIED",
-    "WRITABLE_STALE_RESET_SAFE": "SOURCE_MUTATION_ADDED_PENDING_CI",
-    "EXACT_SHA_FULLCHAIN_WINDOWS": "PENDING_EXACT_SHA_CI"
+    "READ_ONLY_STENCIL_FORMAT_ELISION": "PASS",
+    "WRITABLE_STALE_RESET_SAFE": "PASS",
+    "EXACT_SHA_FULLCHAIN_WINDOWS": "PASS",
+    "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
     "original_evidence": "At R29 current HEAD, the depth-surface format check precedes the available generation-fenced no-write predicate in every stencil-enabled Draw.",
-    "root_cause": "The function always runs SurfaceHasStencil, a live COM format query, before considering a previously proven no-write policy for the same Present and StateBlock generation.",
+    "root_cause": "A generation-current read-only stencil policy was checked only after a redundant tracked-surface-format cache/helper call and redundant R29SyncStencilWriteState path. The tracked format helper already caches its COM GetDesc; the improvement only removes unnecessary per-draw CPU evaluations in the no-write path.",
     "source_trace": [
       "R29 stencil state setter updates generation-coherent write policy.",
       "R29 stereo draw uses R29OwnerLeftDrawMayWriteStencil to decide depth/stencil writes.",
@@ -76,8 +77,44 @@
     ]
   },
   "ci_evidence": {
-    "status": "PENDING",
-    "expected_branch": "vr-d3d9ex-focus",
-    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
-  }
+    "status": "SUCCESS",
+    "material_sha": "06ef7a457cc599d7f634d7afe7cd6cd48a2de460",
+    "validation_bearing_sha": "06ef7a457cc599d7f634d7afe7cd6cd48a2de460",
+    "dx9ex_active": {
+      "run_id": 38428989841,
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "game",
+        "host",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38428989644,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38428989863,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38428989850,
+      "conclusion": "success"
+    },
+    "coordination": {
+      "run_id": 38428989851,
+      "conclusion": "success"
+    },
+    "source_regression": "R29 31 destructive negative mutations, 6561 conditional stencil cases, 16 focused local snapshot model combinations",
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+    "performance_evidence": "source-cpu-path simplification, FPS change unmeasured"
+  },
+  "runtime_status": "NEED_SCENE_MATCHED_QUEST3_FRAME_TIMING",
+  "material_sha": "06ef7a457cc599d7f634d7afe7cd6cd48a2de460",
+  "material_result_sha": "06ef7a457cc599d7f634d7afe7cd6cd48a2de460",
+  "validation_bearing_result_sha": "06ef7a457cc599d7f634d7afe7cd6cd48a2de460",
+  "result_sha": "06ef7a457cc599d7f634d7afe7cd6cd48a2de460",
+  "c6_result": "PASS_EXACT_SHA"
 }
