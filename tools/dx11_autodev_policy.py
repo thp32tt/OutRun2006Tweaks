@@ -140,6 +140,54 @@ def validate_task(task: dict, policy: dict) -> list[str]:
             changes = task.get("changed_files") or []
             if terminal and not any(str(p).startswith(("src/", "vrhost/")) for p in changes):
                 errors.append("completed game-frame work requires real renderer or hook source change")
+    # From 00672, source-format and one-guard edits are subtasks, not terminal features.
+    unit = policy.get("feature_unit", {})
+    if int(found.group(1)) >= unit.get("effective_from_task_number", 10**9):
+        feature_id = task.get("feature_id")
+        contract = task.get("feature_contract")
+        if not isinstance(feature_id, str) or not feature_id.strip():
+            errors.append("feature_id required for feature-sized task")
+        if not isinstance(contract, dict):
+            errors.append("feature_contract required for feature-sized task")
+        else:
+            goal = contract.get("goal")
+            if not isinstance(goal, str) or len(goal.strip()) < 24:
+                errors.append("feature goal must describe integrated behavior")
+            if contract.get("feature_id") != feature_id:
+                errors.append("feature_contract feature_id mismatch")
+            items = contract.get("acceptance_items")
+            if not isinstance(items, list) or len(items) < unit["minimum_acceptance_items"]:
+                errors.append("at least three feature acceptance items required")
+                items = []
+            ids = [item.get("id") for item in items if isinstance(item, dict)]
+            if len(ids) != len(items) or len(set(ids)) != len(items) or any(not isinstance(i, str) or not i for i in ids):
+                errors.append("feature acceptance IDs must be unique/nonempty")
+            categories = set()
+            areas = set()
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
+                categories.add(item.get("category"))
+                area = item.get("behavior_area")
+                if isinstance(area, str) and area.strip():
+                    areas.add(area.strip())
+                expected = item.get("expected_behavior")
+                if not isinstance(expected, str) or len(expected.strip()) < 12:
+                    errors.append("feature acceptance item missing expected behavior")
+            if not set(unit["required_categories"]).issubset(categories):
+                errors.append("feature acceptance must cover end-to-end, fallback and integration")
+            if len(areas) < unit["minimum_behavior_areas"]:
+                errors.append("feature must span at least two behavior areas")
+            terminal = str(task.get("status") or "").upper().startswith(("COMPLETE", "DONE", "PASS"))
+            if terminal:
+                results = task.get("acceptance_results")
+                if not isinstance(results, dict) or any(results.get(i) not in ("PASS", "PASS_BUILD", "PASS_EXACT_SHA") for i in ids):
+                    errors.append("terminal feature requires all acceptance items PASS")
+                if task.get("automation_validation") not in ("PASS", "PASS_EXACT_SHA"):
+                    errors.append("terminal feature requires exact-SHA automation PASS")
+                sha = task.get("validation_bearing_result_sha")
+                if not isinstance(sha, str) or re.fullmatch(r"[0-9a-f]{40}", sha) is None:
+                    errors.append("terminal feature missing validated source SHA")
     if task.get("runtime_validation") == "PASS" and not task.get("runtime_evidence"):
         errors.append("runtime PASS without actual HMD/game evidence")
     if task.get("automation_validation") == "PASS" and task.get("evidence", {}).get("backend_gate_conclusion") == "failure":
