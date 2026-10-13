@@ -46,10 +46,12 @@
     "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
       "D3D11_GPU_EYE_SHARED_HANDLE",
       "OPENXR_HOST_DIRECTGPU_PROJECTION"
     ],
-    "visible_frame_acceptance": "Build-only host contract, game/HMD projection parity NEED_HMD_TEST",
+    "visible_frame_acceptance": "Existing native game Draw produces a diagnostic visible inset, while host shared-eye DirectGPU is a separate production path. This change validates both host import and OpenXR staging, not a claim that native game Draw is already wired to the shared-eye producer. Real Quest3 frame and gamepad NEED_HMD_TEST.",
     "activation_guard_and_fallback": "Original D3D9 Draw/gamepad and SBS continue; native shared-eye output only with valid opt-in producer transport"
   },
   "feature_contract": {
@@ -101,7 +103,7 @@
     "C0_RECOVER": "PASS",
     "C1_REVIEW": "Host direct source import allowed aliased eye handles and cached pair descriptor mismatches; distinct native producer/host tests preexist but active host projection contract was weak",
     "C2_IMPLEMENT": "ACTIVE_HOST_IMPORT_AND_OPENXR_COPY_SHAPE_ENFORCEMENT",
-    "C3_VALIDATE": "COMPILED_TEST_ENROLLED_EXACT_SHA_PENDING",
+    "C3_VALIDATE": "RETRY_EXACT_SHA_AFTER_WORKFLOW_CONTRACT_REPAIR",
     "C4_COMMIT": "PENDING_FAST_FORWARD",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_EXACT_SHA"
