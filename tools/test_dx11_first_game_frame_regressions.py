@@ -294,7 +294,8 @@ def main() -> None:
         )
         return (all(x in state for x in required_state)
                 and all(x in vertices for x in required_vertices)
-                and "supported_game_state(game, vp, layout, transforms, capture, output)" in observe
+                and "D3DPRIMITIVETYPE topology," in state
+                and "supported_game_state(game, type, vp, layout, transforms, capture, output)" in observe
                 and "layout, transforms, capture, vertices)" in observe)
 
     assert object_space_draw_safe(bridge)
@@ -309,6 +310,8 @@ def main() -> None:
          "next[col] += clip[row] * matrix.m[col][row];"),
         ("stride < layout.minStride", "stride < 20u"),
         ("clip[3] <= 0.0f", "clip[3] < 0.0f"),
+        ("supported_game_state(game, type, vp, layout, transforms, capture, output)",
+         "supported_game_state(game, D3DPT_TRIANGLELIST, vp, layout, transforms, capture, output)"),
     ):
         changed = bridge.replace(good, bad, 1)
         assert changed != bridge and not object_space_draw_safe(changed), (
@@ -1183,8 +1186,8 @@ def main() -> None:
             "if (!game_fvf_decode_vertex(data, stride, layout, decoded))",
             "const DWORD diffuse = decoded.diffuse;",
             "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
-        )) and all(v in observe for v in (
-            "supported_game_state(game, vp, layout, transforms, capture, output)",
+        )) and "D3DPRIMITIVETYPE topology," in body and all(v in observe for v in (
+            "supported_game_state(game, type, vp, layout, transforms, capture, output)",
             "layout, transforms, capture, vertices)",
         ))
     assert fvf_connected(bridge)
