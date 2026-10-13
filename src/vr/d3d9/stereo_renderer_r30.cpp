@@ -930,6 +930,8 @@ namespace OutRunVRStereo
             UINT sourceHeight = 0;
             float userScale = 0.0f;
             float eyeFov[8]{};
+            // XR recommended extents can publish independently of FOV/pose.
+            std::uint32_t eyeExtent[4]{};
             float scaleX = 1.0f;
             float scaleY = 1.0f;
         };
@@ -1562,7 +1564,8 @@ namespace OutRunVRStereo
         }
 
         float R30HudAspectCompensation(
-            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+            const OutRunVRRenderer::LatchedStereoFrame& stereo,
+            const std::uint32_t* publishedExtent = nullptr) noexcept
         {
             const auto frame = R29OwnerCaptureFrameSnapshot();
             if (!frame.width || !frame.height)
@@ -1582,7 +1585,14 @@ namespace OutRunVRStereo
             for (std::uint32_t eye = 0; eye < 2; ++eye)
             {
                 std::uint32_t w = 0, h = 0;
-                if (!R29OwnerRecommendedEyeExtent(eye, w, h))
+                if (publishedExtent)
+                {
+                    w = publishedExtent[eye * 2u];
+                    h = publishedExtent[eye * 2u + 1u];
+                }
+                else
+                    R29OwnerRecommendedEyeExtent(eye, w, h);
+                if (!w || !h)
                     continue;
                 const float aspect =
                     static_cast<float>(w) / static_cast<float>(h);
@@ -1697,6 +1707,13 @@ namespace OutRunVRStereo
                 stereo.eyeFov[1].angleUp,
                 stereo.eyeFov[1].angleDown
             };
+            // Capture once per HUD draw, reuse on a miss. A late XR host
+            // publication must not reuse a stale target pixel aspect even
+            // when the Present epoch, pose and FOV have not advanced.
+            std::uint32_t eyeExtent[4]{};
+            for (std::uint32_t eye = 0; eye < 2u; ++eye)
+                R29OwnerRecommendedEyeExtent(eye,
+                    eyeExtent[eye * 2u], eyeExtent[eye * 2u + 1u]);
             bool canCache = frame.presentEpoch != 0 &&
                 frame.width != 0 && frame.height != 0 &&
                 std::isfinite(userScale);
@@ -1707,7 +1724,11 @@ namespace OutRunVRStereo
             for (int i = 0; i < 8; ++i)
                 fovMatches = fovMatches &&
                     (R30HudContain.eyeFov[i] == fov[i]);
-            if (canCache && R30HudContain.valid &&
+            bool extentMatches = true;
+            for (int i = 0; i < 4; ++i)
+                extentMatches = extentMatches &&
+                    (R30HudContain.eyeExtent[i] == eyeExtent[i]);
+            if (canCache && extentMatches && R30HudContain.valid &&
                 R30HudContain.presentEpoch == frame.presentEpoch &&
                 R30HudContain.poseSequence == stereo.poseSequence &&
                 R30HudContain.sourceWidth == frame.width &&
@@ -1724,7 +1745,7 @@ namespace OutRunVRStereo
             // previous eye extent. The next Present always samples XR again.
             R30HudContain.valid = false;
             const float sourceOverTarget =
-                R30HudAspectCompensation(stereo);
+                R30HudAspectCompensation(stereo, eyeExtent);
 
             // The existing contain math is unchanged: eye offset, Z/RHW,
             // source HUD geometry and SkyGlow are outside this CPU fastpath.
@@ -1749,6 +1770,8 @@ namespace OutRunVRStereo
             R30HudContain.userScale = userScale;
             for (int i = 0; i < 8; ++i)
                 R30HudContain.eyeFov[i] = fov[i];
+            for (int i = 0; i < 4; ++i)
+                R30HudContain.eyeExtent[i] = eyeExtent[i];
             R30HudContain.scaleX = scaleX;
             R30HudContain.scaleY = scaleY;
             R30HudContain.valid = true;
