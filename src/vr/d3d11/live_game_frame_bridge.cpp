@@ -2851,7 +2851,10 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                 (base.Format == D3DFMT_DXT1 ? 8u : 16u) :
             desc.Width * sourceTexelBytes;
         const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) || extendedLuma ?
-            desc.Width * 4u : (a8p8 ? desc.Width * 4u : rowBytes);
+            desc.Width * 4u : rowBytes;
+        // Preserve existing format pitch contracts and only widen A8P8
+        // (two source bytes per texel) to four-byte decoded native pixels.
+        const UINT a8p8UploadPitch = a8p8 ? desc.Width * 4u : uploadPitch;
         D3DLOCKED_RECT lock{};
         const HRESULT lockResult = gpuRenderTarget ?
             readbackSurface->LockRect(&lock, nullptr, D3DLOCK_READONLY) :
@@ -2861,7 +2864,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                               static_cast<UINT>(lock.Pitch) >= rowBytes;
         if (readable) {
             auto& pixels = copied[level];
-            pixels.resize(static_cast<std::size_t>(uploadPitch) * rows);
+            pixels.resize(static_cast<std::size_t>(a8p8UploadPitch) * rows);
             const auto packing = base.Format == D3DFMT_R5G6B5 ?
                 packed_texture16::Layout::rgb565 :
                 base.Format == D3DFMT_A1R5G5B5 ?
@@ -2874,7 +2877,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             for (UINT y = 0; y < rows; ++y) {
                 const auto* source = static_cast<const std::uint8_t*>(lock.pBits) +
                                      static_cast<std::size_t>(y) * lock.Pitch;
-                auto* destination = pixels.data() + static_cast<std::size_t>(y) * uploadPitch;
+                auto* destination = pixels.data() + static_cast<std::size_t>(y) * a8p8UploadPitch;
                 if (packed16)
                     packed_texture16::unpack_row(source, destination, desc.Width, packing);
                 else if (luminance)
@@ -2904,7 +2907,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             if (base.Format == D3DFMT_X8R8G8B8)
                 for (std::size_t p = 3; p < pixels.size(); p += 4)
                     pixels[p] = 0xffu;
-            pitches[level] = uploadPitch;
+            pitches[level] = a8p8UploadPitch;
         }
         if (gpuRenderTarget) readbackSurface->UnlockRect();
         else capture.texture->UnlockRect(level);
