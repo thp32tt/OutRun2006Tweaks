@@ -32,7 +32,10 @@ def connected(s):
         and all(x in producer for x in (
             "GetRenderState(D3DRS_BLENDOP, &blendOp)",
             "GetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, &separate)",
-            "blendOp != D3DBLENDOP_ADD || separate",
+            "if (separate != FALSE) {",
+            "!native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,",
+            "output.separateAlphaBlend = true;",
+            "if (blendOp != D3DBLENDOP_ADD) {",
             "blendOp != D3DBLENDOP_SUBTRACT &&",
             "blendOp != D3DBLENDOP_REVSUBTRACT",
             "if (multiply && blendOp != D3DBLENDOP_ADD) return false;",
@@ -66,6 +69,8 @@ def main():
     changes = (
         ("D3D11_BLEND_OP blendOp = D3D11_BLEND_OP_ADD;", "D3D11_BLEND_OP blendOp = D3D11_BLEND_OP_SUBTRACT;"),
         ("std::array<ComPtr<ID3D11BlendState>, 128> subtractiveMaskedBlends{};", "std::array<ComPtr<ID3D11BlendState>, 64> subtractiveMaskedBlends{};"),
+        ("!native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,", "/* independent alpha validation lost */ false &&"),
+        ("output.separateAlphaBlend = true;", "output.separateAlphaBlend = false;"),
         ("blendOp != D3DBLENDOP_SUBTRACT &&", "blendOp != D3DBLENDOP_ADD &&"),
         ("blendOp != D3DBLENDOP_REVSUBTRACT", "blendOp != D3DBLENDOP_ADD"),
         ("if (multiply && blendOp != D3DBLENDOP_ADD) return false;", "if (multiply && blendOp == D3DBLENDOP_ADD) return false;"),

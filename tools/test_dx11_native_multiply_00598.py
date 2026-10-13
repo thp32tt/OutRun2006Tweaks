@@ -31,7 +31,10 @@ def connected(s):
         and all(x in capture for x in (
             "src == D3DBLEND_DESTCOLOR && dst == D3DBLEND_ZERO",
             "src == D3DBLEND_ZERO && dst == D3DBLEND_SRCCOLOR",
-            "blendOp != D3DBLENDOP_ADD || separate",
+            "if (separate != FALSE) {",
+            "!native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,",
+            "output.separateAlphaBlend = true;",
+            "if (blendOp != D3DBLENDOP_ADD) {",
             "if (!premultipliedAlpha && !multiply &&",
             "output.multiplyBlend = multiply;"))
         and all(x in draw for x in (
@@ -60,6 +63,8 @@ def main():
         ("target.DestBlend = D3D11_BLEND_ZERO;", "target.DestBlend = D3D11_BLEND_ONE;"),
         ("target.SrcBlendAlpha = D3D11_BLEND_DEST_ALPHA;", "target.SrcBlendAlpha = D3D11_BLEND_DEST_COLOR;"),
         ("dev->CreateBlendState(&blend, s.multiplyBlend.GetAddressOf())", "dev->CreateBlendState(&blend, s.alphaBlend.GetAddressOf())"),
+        ("!native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,", "/* independent alpha validation lost */ false &&"),
+        ("output.separateAlphaBlend = true;", "output.separateAlphaBlend = false;"),
         ("src == D3DBLEND_DESTCOLOR && dst == D3DBLEND_ZERO", "src == D3DBLEND_ONE && dst == D3DBLEND_ZERO"),
         ("src == D3DBLEND_ZERO && dst == D3DBLEND_SRCCOLOR", "src == D3DBLEND_ZERO && dst == D3DBLEND_ONE"),
         ("if (!premultipliedAlpha && !multiply &&", "if (!premultipliedAlpha && true &&"),
