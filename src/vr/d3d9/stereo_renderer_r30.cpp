@@ -1986,6 +1986,7 @@ namespace OutRunVRStereo
             float x0, float y0, float width, float height,
             const float eyeScaleX[2], const float eyeBiasX[2],
             float hudScaleY, float hudBiasY,
+            const float eyeScaleY[2], const float eyeBiasY[2],
             float& edgeLeftBias, float& edgeRightBias,
             float& edgeYBias) noexcept
         {
@@ -1993,7 +1994,13 @@ namespace OutRunVRStereo
                 (anchor.x == 0.0f && anchor.y == 0.0f) ||
                 !(width > 0.0f && height > 0.0f) ||
                 !std::isfinite(width) || !std::isfinite(height) ||
-                !std::isfinite(hudScaleY) || !std::isfinite(hudBiasY))
+                !std::isfinite(hudScaleY) || !std::isfinite(hudBiasY) ||
+                !eyeScaleY || !eyeBiasY ||
+                !std::isfinite(eyeScaleY[0]) ||
+                !std::isfinite(eyeScaleY[1]) ||
+                !std::isfinite(eyeBiasY[0]) ||
+                !std::isfinite(eyeBiasY[1]) ||
+                eyeScaleY[0] <= 0.0f || eyeScaleY[1] <= 0.0f)
                 return;
             const float x1 = x0 + width, y1 = y0 + height;
             // Deliberately do not shift partially offscreen transition
@@ -2028,12 +2035,22 @@ namespace OutRunVRStereo
                 edgeRightBias += sharedShift;
             }
 
-            const float yMin =
-                hudScaleY * anchor.minY + hudBiasY + edgeYBias;
-            const float yMax =
-                hudScaleY * anchor.maxY + hudBiasY + edgeYBias;
-            const float verticalMin = safeTop - yMin;
-            const float verticalMax = safeBottom - yMax;
+            // Match the actual paired-eye draw, not the pre-FOV HUD
+            // containment. Vertical FOV/optical centres can differ between
+            // eyes; a single-eye inset would clip the other eye at 21:9.
+            // Preserve one COMMON correction so binocular disparity remains.
+            const float leftYMin =
+                eyeScaleY[0] * anchor.minY + eyeBiasY[0] + edgeYBias;
+            const float rightYMin =
+                eyeScaleY[1] * anchor.minY + eyeBiasY[1] + edgeYBias;
+            const float leftYMax =
+                eyeScaleY[0] * anchor.maxY + eyeBiasY[0] + edgeYBias;
+            const float rightYMax =
+                eyeScaleY[1] * anchor.maxY + eyeBiasY[1] + edgeYBias;
+            const float verticalMin = (std::max)(
+                safeTop - leftYMin, safeTop - rightYMin);
+            const float verticalMax = (std::min)(
+                safeBottom - leftYMax, safeBottom - rightYMax);
             if (std::isfinite(verticalMin) && std::isfinite(verticalMax) &&
                 verticalMin <= verticalMax)
                 edgeYBias += std::clamp(0.0f, verticalMin, verticalMax);
@@ -3852,6 +3869,7 @@ namespace OutRunVRStereo
                 R30ConstrainHudEdgeToVisibleBounds(
                     exactHudAnchor, x0, y0, width, height,
                     eyeScaleX, eyeBiasX, hudScaleY, hudBiasY,
+                    eyeScaleY, eyeBiasY,
                     edgeLeftBias, edgeRightBias, edgeYBias);
                 // Indexed-UP and revision-fenced VB/IB builders supply a
                 // unique, mask-complete touched list. On very sparse HUD

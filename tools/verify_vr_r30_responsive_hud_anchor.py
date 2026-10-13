@@ -554,6 +554,62 @@ for w,h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
     yfit=visible_fit((.005*h,.10*h),(0,h),(.90,),(.05*h,),yorig)
     assert .90*.005*h+.05*h+yfit[0] >= .025*h-1e-6*h
 
+    # Non-symmetric left/right vertical FOV or optical centres must fit
+    # BOTH actual eye affines. The old scalar HudScaleY/HudBiasY check
+    # silently excluded right-eye bounds and clipped the top/right-eye HUD.
+    y_box=(.005*h,.10*h)
+    y_scales=(.90,.94)
+    y_biases=(0.,-.04*h)
+    y_wanted=(.04*h,.04*h)
+    paired=visible_fit(y_box,(0,h),y_scales,y_biases,y_wanted)
+    first_only=visible_fit(y_box,(0,h),y_scales[:1],y_biases[:1],y_wanted[:1])
+    assert paired[0]>first_only[0]+.01*h
+    assert abs((paired[0]-paired[1]) -
+               (y_wanted[0]-y_wanted[1])) < 1e-7*h
+    for s,b,wanted in zip(y_scales,y_biases,paired):
+        assert s*y_box[0]+b+wanted >= .025*h-1e-6*h
+        assert s*y_box[1]+b+wanted <= .975*h+1e-6*h
+    # Bottom edge in either eye is equally authoritative.
+    bottom=visible_fit((.90*h,.995*h),(0,h),
+                       (.91,.95),(.05*h,.06*h),y_wanted)
+    assert bottom[0] < y_wanted[0]
+    for s,b,wanted in zip((.91,.95),(.05*h,.06*h),bottom):
+        assert s*.995*h+b+wanted <= .975*h+1e-6*h
+    # Offscreen-transition / infeasible stereo fit retains the old input.
+    assert visible_fit((-.02*h,.12*h),(0,h),
+                       y_scales,y_biases,y_wanted)==y_wanted
+    assert visible_fit((.05*h,.95*h),(0,h),
+                       (1.4,1.4),(0.,0.),y_wanted)==y_wanted
+
+# Structural/mutation acceptance: both eyes are mandatory; neither the
+# pre-FOV scalar approximation nor separately clamped eye shifts is valid.
+for marker in (
+    "const float eyeScaleY[2], const float eyeBiasY[2]",
+    "eyeScaleY[0] * anchor.minY + eyeBiasY[0] + edgeYBias",
+    "eyeScaleY[1] * anchor.minY + eyeBiasY[1] + edgeYBias",
+    "eyeScaleY[0] * anchor.maxY + eyeBiasY[0] + edgeYBias",
+    "eyeScaleY[1] * anchor.maxY + eyeBiasY[1] + edgeYBias",
+    "safeTop - leftYMin, safeTop - rightYMin",
+    "safeBottom - leftYMax, safeBottom - rightYMax",
+    "edgeYBias += std::clamp(0.0f, verticalMin, verticalMax);",
+):
+    assert marker in safe, marker
+assert "eyeScaleY, eyeBiasY," in draw
+for wrong,replacement in (
+    ("safeTop - rightYMin", "safeTop - leftYMin"),
+    ("safeBottom - rightYMax", "safeBottom - leftYMax"),
+    ("eyeScaleY[1] * anchor.minY", "hudScaleY * anchor.minY"),
+    ("eyeBiasY[1] + edgeYBias", "hudBiasY + edgeYBias"),
+):
+    assert wrong in safe
+    changed=safe.replace(wrong,replacement,1)
+    assert changed!=safe
+    assert not all(token in changed for token in (
+        "safeTop - leftYMin, safeTop - rightYMin",
+        "safeBottom - leftYMax, safeBottom - rightYMax",
+        "eyeScaleY[1] * anchor.minY + eyeBiasY[1] + edgeYBias"))
+print("PASS bilateral vertical inset, 4 aspect fixtures and 4 destructive source mutants")
+
 # Destructive regression: either-eye correction, viewport bounds or the
 # source-bbox material integration must be detectably removed.
 for wrong, replacement in (
