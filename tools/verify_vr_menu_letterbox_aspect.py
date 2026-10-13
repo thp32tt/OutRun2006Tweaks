@@ -219,7 +219,19 @@ for good, bad in (
         ("LetterboxRasterHeight = 0.0f;", "// stale height on reset"),
 ):
     assert good in src
-    mutant = src.replace(good, bad, 1)
+    if good == "LetterboxRasterHeight = 0.0f;":
+        # The same assignment appears at file scope and in Create() as
+        # well as Reset(). Mutate the Reset owner ONLY; changing a global
+        # declaration while leaving Reset intact was a false negative.
+        reset_at = src.index("static void D3DTemporariesRelease(")
+        reset_end = src.index("static void D3DTemporariesCreate(", reset_at)
+        reset_body = src[reset_at:reset_end]
+        assert reset_body.count(good) == 1
+        mutant = (src[:reset_at] +
+                  reset_body.replace(good, bad, 1) +
+                  src[reset_end:])
+    else:
+        mutant = src.replace(good, bad, 1)
     try:
         verify_live_resize(mutant)
     except AssertionError:
