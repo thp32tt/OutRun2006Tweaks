@@ -1153,8 +1153,8 @@ bool env_batch_opt_in() noexcept {
 }
 
 constexpr char kStage1FactorShader[] = R"(
-// Stage 1 accepts CURRENT/TFACTOR with D3DTA_COMPLEMENT and
-// D3DTA_ALPHAREPLICATE. Stage 0 already produced color; unsupported sources
+// Stage 1 accepts raw vertex DIFFUSE, stage-0 CURRENT and TFACTOR with
+// D3DTA_COMPLEMENT/ALPHAREPLICATE. Unsupported sources
 // are CPU-rejected before either native Draw or DrawIndexed is submitted.
 // Separate RGB and alpha instructions run before native alpha-test/OM blend.
 cbuffer Stage1FactorParams : register(b1) {
@@ -1162,11 +1162,12 @@ cbuffer Stage1FactorParams : register(b1) {
     int4 stage1Ops;  // color op, alpha op, reserved, reserved
     int4 stage1Args; // color arg1/2, alpha arg1/2
 };
-float4 Stage1Source(float4 current, int source) {
-    // D3DTA_MASK=0x0f; CURRENT=1, TFACTOR=3. CPU admission owns the
+float4 Stage1Source(float4 current, float4 diffuse, int source) {
+    // D3DTA_MASK=0x0f; DIFFUSE=0, CURRENT=1, TFACTOR=3. CPU admission owns the
     // strict selector/flag allowlist. Apply alpha replication before optional
     // complement, identically for RGB and independent stage-1 alpha.
     float4 value = (source & 15) == 3 ? stage1Factor : current;
+    if ((source & 15) == 0) value = diffuse;
     if ((source & 32) != 0) value = value.aaaa;
     if ((source & 16) != 0) value = 1.0f - value;
     return value;
@@ -1181,28 +1182,28 @@ float4 Stage1Combine(float4 a, float4 b, int op) {
     if (op == 10) return saturate(a - b);
     return saturate(a + b * (1.0f - a)); // 11: ADDSMOOTH, CPU-gated
 }
-float4 Stage1AndAlpha(float4 stage0) {
+float4 Stage1AndAlpha(float4 stage0, float4 diffuse) {
     float4 color = Stage1Combine(
-        Stage1Source(stage0, stage1Args.x),
-        Stage1Source(stage0, stage1Args.y), stage1Ops.x);
+        Stage1Source(stage0, diffuse, stage1Args.x),
+        Stage1Source(stage0, diffuse, stage1Args.y), stage1Ops.x);
     float alpha = stage1Ops.y == 1 ? stage0.a : Stage1Combine(
-        Stage1Source(stage0, stage1Args.z),
-        Stage1Source(stage0, stage1Args.w), stage1Ops.y).a;
+        Stage1Source(stage0, diffuse, stage1Args.z),
+        Stage1Source(stage0, diffuse, stage1Args.w), stage1Ops.y).a;
     float4 result = float4(color.rgb, alpha);
     AlphaGate(result.a);
     return result;
 }
 float4 PSStage1Diffuse(VOut v) : SV_Target {
-    return Stage1AndAlpha(v.diffuse);
+    return Stage1AndAlpha(v.diffuse, v.diffuse);
 }
 float4 PSStage1Modulate(VOut v) : SV_Target {
-    return Stage1AndAlpha(gameTexture.Sample(gameSampler, v.uv) * v.diffuse);
+    return Stage1AndAlpha(gameTexture.Sample(gameSampler, v.uv) * v.diffuse, v.diffuse);
 }
 float4 PSStage1TextureOnly(VOut v) : SV_Target {
-    return Stage1AndAlpha(gameTexture.Sample(gameSampler, v.uv));
+    return Stage1AndAlpha(gameTexture.Sample(gameSampler, v.uv), v.diffuse);
 }
 float4 PSStage1Add(VOut v) : SV_Target {
-    return Stage1AndAlpha(saturate(gameTexture.Sample(gameSampler, v.uv) + v.diffuse));
+    return Stage1AndAlpha(saturate(gameTexture.Sample(gameSampler, v.uv) + v.diffuse), v.diffuse);
 }
 )";
 
@@ -2889,8 +2890,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         if (transformUv) capture.uvTransform = uvTransform;
     }
     // Real fixed-function stage 1 can combine the stage-0 CURRENT pixel
-    // with D3DRS_TEXTUREFACTOR, including alpha-replicate/complement flags
-    // on either RGB or independent alpha arguments. No stage-1 texture, TEMP,
+    // with D3DRS_TEXTUREFACTOR or live vertex DIFFUSE, including operand
+    // modifiers on RGB and independent alpha. No stage-1 texture, TEMP,
     // unknown operand bits or stage-2 semantics are guessed; unsupported
     // stage-0 shaders never enter this path.
     if (nextColorOp != D3DTOP_DISABLE) {
@@ -2907,6 +2908,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             stage1Result != D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE ||
             !stage1_combiner_supported(nextColorOp, color1, color2) ||
             !stage1_alpha_supported(alphaOp, alpha1, alpha2) ||
+            (!layout.hasDiffuse &&
+             (stage1_operation_reads_diffuse(nextColorOp, color1, color2) ||
+              stage1_operation_reads_diffuse(alphaOp, alpha1, alpha2))) ||
             (capture.enabled && !capture.stage0FullModulate &&
              !capture.selectTexture && !capture.additive))
             return false;

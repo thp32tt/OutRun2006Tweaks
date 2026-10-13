@@ -1,0 +1,106 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00701",
+  "production_id": "CONVERSION-DX11-00701",
+  "event_id": "CONVERSION-DX11-00701-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "GAME_STAGE1_VERTEX_DIFFUSE_MENU_RACE",
+  "work_key": "DX11:GAME_STAGE1_VERTEX_DIFFUSE_RGB_ALPHA",
+  "status": "PENDING_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Live game D3D9 menu/vehicle/race stage-1 vertex DIFFUSE/CURRENT/TFACTOR capture",
+      "FVF DIFFUSE admission -> RGB/alpha operand source to native stage-1 HLSL in Draw/DrawIndexed",
+      "Safe DX9Ex original Draw/input and diagnostic-only GPU readback/inset Present"
+    ],
+    "batch_components": [
+      "Live CPU GetTextureStageState/FVF admit",
+      "Native D3D11 stage1 HLSL RGB/alpha shader selector",
+      "32-case C++ positive/negative probe and destructive source-to-Draw test",
+      "DX11 fast exact-SHA gate with prior 00673/00700 compatibility"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Stage1 vertex DIFFUSE for RGB and independent alpha across eight color/alpha ops with complement/alpha-replicate",
+      "negative_regression": "FVF without vertex DIFFUSE rejects only active diffuse operand; inactive select/disabled alpha never falsely requires DIFFUSE; unsupported texture/temp stages original DX9Ex and gamepad",
+      "component_integration": "Captured real FVF and stage state -> HLSL stage1 source -> native pixel/Draw/DrawIndexed -> optional diagnostic inset; Win32 Windows build and exact-SHA gates pending"
+    },
+    "conflict_keys": [
+      "DX11:GAME_STAGE1_VERTEX_DIFFUSE_RGB_ALPHA",
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_READBACK",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "source-level integrated DIFFUSE stage1 output; actual Quest3/VDXR runtime pixels NEED_HMD_TEST",
+    "activation_guard_and_fallback": "DX11 native default disabled and opt-in diagnostic only; missing vertex diffuse and unsupported states return unchanged original DX9Ex Draw/Present/gamepad"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_STAGE1_VERTEX_DIFFUSE_MENU_RACE",
+    "goal": "Native game-authored D3D9 vertex diffuse stage-1 UI/race color and alpha independent operands, without FVF false positives or input changes",
+    "acceptance_items": [
+      {
+        "id": "stage1-diffuse-live-rgb-alpha",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_fvf_capture_native_hlsl",
+        "expected_behavior": "Stage 1 DIFFUSE selected independently of stage0 current from real vertex diffuse for RGB and alpha with modifiers into native Draw/DrawIndexed"
+      },
+      {
+        "id": "no-diffuse-fallback-input",
+        "category": "fallback_regression",
+        "behavior_area": "game_dx9ex_input_fallback",
+        "expected_behavior": "Missing FVF diffuse for active selector fails closed; unused selector/disabled alpha no false rejection, DX9Ex/gamepad authoritative"
+      },
+      {
+        "id": "stage1-diffuse-32-variant-gates",
+        "category": "integrated_validation",
+        "behavior_area": "portable_cpp_shader_windows_actions",
+        "expected_behavior": "32 live-stage1 diffuse RGB/alpha operator/flag variants, destructive source guards, previous tests and exact-SHA Actions"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage1-diffuse-live-rgb-alpha": "PENDING_GATE",
+    "no-diffuse-fallback-input": "PENDING_GATE",
+    "stage1-diffuse-32-variant-gates": "PENDING_GATE"
+  },
+  "base_head_sha": "78788901cd23868d3e0cb8884d5818f535877553",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_stage1_factor_probe.cpp",
+    "tools/test_dx11_stage1_factor_00673.py",
+    "tools/test_dx11_stage1_operands_00700.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_stage1_diffuse_00701.py",
+    "docs/automation/runs/CONVERSION-DX11-00701.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "DONE HEAD 78788901cd23868d3e0cb8884d5818f535877553",
+    "C1_REVIEW": "DONE missing DIFFUSE FVF stage1 native rgb and alpha",
+    "C2_IMPLEMENT": "DONE source and tests staged",
+    "C3_VALIDATE": "PENDING same-SHA full GitHub gates; HMD not run",
+    "C4_COMMIT": "PENDING material fast forward",
+    "C5_PACKAGE": "NOT_REQUIRED until HMD gate",
+    "C6_STATE": "PENDING CI result"
+  },
+  "next_action": "Consume same-SHA required GitHub Actions; repair actual failures under 00701 without scoring until exact SHA pass; Quest3/VDXR NEED_HMD_TEST"
+}

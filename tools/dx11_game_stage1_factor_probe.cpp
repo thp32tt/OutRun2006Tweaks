@@ -34,10 +34,37 @@ int main() {
         !stage1_operand_supported(kStage1Factor | kStage1Complement |
                                  kStage1AlphaReplicate))
         return 3;
-    for (std::uint32_t bad : {0u, 2u, 4u, 0x12u, 0x14u, 0x43u, 0x81u, 0x103u})
+    for (std::uint32_t bad : {2u, 4u, 5u, 0x12u, 0x14u, 0x43u, 0x81u, 0x103u})
         if (stage1_operand_supported(bad) ||
             stage1_combiner_supported(kStage1Modulate,kStage1Current,bad))
             return 5;
-    std::printf("00700 512 stage1 operand-modified native combinations and fallback: %u PASS\\n", tested);
+    // Stage1 DIFFUSE is not synonymous with stage0 CURRENT after texture
+    // modulation; both RGB and independent alpha can select it with flags.
+    unsigned diffuseCases = 0;
+    for (std::uint32_t op : {kStage1SelectArg1, kStage1SelectArg2,
+        kStage1Modulate, kStage1Modulate2X, kStage1Modulate4X,
+        kStage1Add, kStage1Subtract, kStage1AddSmooth}) {
+        for (std::uint32_t flags : {0u, kStage1Complement,
+            kStage1AlphaReplicate, kStage1Complement | kStage1AlphaReplicate}) {
+            const auto d = kStage1Diffuse | flags;
+            if (!stage1_combiner_supported(op, d, kStage1Factor) ||
+                !stage1_alpha_supported(op, kStage1Factor, d) ||
+                stage1_operation_reads_diffuse(op, d, kStage1Factor) !=
+                    (op != kStage1SelectArg2) ||
+                stage1_operation_reads_diffuse(op, kStage1Factor, d) !=
+                    (op != kStage1SelectArg1))
+                return 6;
+            ++diffuseCases;
+        }
+    }
+    if (stage1_operation_reads_diffuse(kStage1Disable,
+                                      kStage1Diffuse, kStage1Diffuse) ||
+        stage1_operation_reads_diffuse(kStage1SelectArg1,
+                                      kStage1Factor, kStage1Diffuse) ||
+        !stage1_operation_reads_diffuse(kStage1SelectArg2,
+                                       kStage1Factor, kStage1Diffuse))
+        return 7;
+    std::printf("00701 stage1 DIFFUSE RGB/alpha ops=%u; prior 00700 variants=%u PASS\\n",
+                diffuseCases, tested);
     return tested == 512u ? 0 : 4;
 }
