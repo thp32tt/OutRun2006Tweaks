@@ -310,8 +310,8 @@ body = src[start:end]
 for old, bad in (
     ("if (FAILED(candidate->Unlock()))", "if (SUCCEEDED(candidate->Unlock()))"),
     ("LetterboxVertex = candidate;", "// lost successful GPU buffer"),
-    ("LetterboxRasterDevice = d3ddev;\n\tLetterboxRasterWidth = sourceWidth;\n\tLetterboxRasterHeight = sourceHeight;\n\treturn;",
-     "return;"),  # portrait/4:3 cache must not disappear
+    ("LetterboxRasterDevice = d3ddev;",
+     "LetterboxRasterDevice = nullptr;"),  # portrait/4:3 cache must not disappear
     ("LetterboxVertex = candidate;\n\t// Only completed buffers",
      "LetterboxRasterDevice = d3ddev;\n\tLetterboxVertex = candidate;\n\t// Only completed buffers"),
 ):
