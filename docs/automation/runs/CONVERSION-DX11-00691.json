@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2",
   "feature_id": "GAME_AUTHORED_RENDER_TARGET_COLOR_FAMILY_READBACK",
   "work_key": "DX11:GAME_RENDER_TARGET_COLOR_READBACK",
-  "status": "MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -76,13 +76,13 @@
     ]
   },
   "acceptance_results": {
-    "game-rt-native-draw": "PENDING_EXACT_SHA",
-    "rt-fallback": "PENDING_EXACT_SHA",
-    "integration-gates": "PENDING_EXACT_SHA"
+    "game-rt-native-draw": "PASS_EXACT_SHA (source/CI verified; HMD untested)",
+    "rt-fallback": "PASS_EXACT_SHA (negative guard/format tests; live game untested)",
+    "integration-gates": "PASS_EXACT_SHA"
   },
   "base_head_sha": "7ce62159334db4e0280b5df2cef21076f5d679f0",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "e5b6b7c29c0aa0a905c2c24769eb85e430e2e787",
+  "validation_bearing_result_sha": "06820059b675f02be1549688742bf262fd990119",
   "changed_files": [
     "src/vr/d3d11/live_game_render_target_readback.hpp",
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -91,13 +91,55 @@
     "docs/automation/runs/CONVERSION-DX11-00691.json"
   ],
   "pipeline": {
-    "C0_RECOVER": "PASS GitHub HEAD and 00689/00690 active work distinguished",
-    "C1_REVIEW": "PASS missing game DEFAULT RT color layouts through real native game SRV",
-    "C2_IMPLEMENT": "PASS game RT staging decode and native Draw/Indexed connection",
-    "C3_VALIDATE": "Portable pixel probe and source destructive regressions integrated into DX11 fast structural workflow; exact-SHA CI pending",
-    "C4_COMMIT": "MATERIAL_RESULT (sha resolved from GitHub commit)",
-    "C5_PACKAGE": "NOT_REQUIRED; diagnostic only",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C0_RECOVER": "PASS GitHub head + remote owner / already completed 00689/00690 reconcilied",
+    "C1_REVIEW": "PASS game-authored DEFAULT render-target color formats not previously supported; no duplicate shader-only work",
+    "C2_IMPLEMENT": "PASS actual D3D9 RT readback and DX11 SRV Draw/DrawIndexed conversion, source and decoder C++ committed e5b6b7c29c0aa0a905c2c24769eb85e430e2e787",
+    "C3_VALIDATE": "PASS exact validation-bearing SHA 06820059b675f02be1549688742bf262fd990119; Backend Conversion Gate #38449688609, Fast #38449688634, Build #38449696590, OpenXR #38449696446, HUD #38449696505 all SUCCESS; 3 successive failed exact-SHA test/wiring regressions repaired",
+    "C4_COMMIT": "PASS material e5b6b7c29c0aa0a905c2c24769eb85e430e2e787; validation-bearing repairs 06820059b675f02be1549688742bf262fd990119 (no CI skip)",
+    "C5_PACKAGE": "NOT_REQUIRED; diagnostic opt-in, no standalone deployment request; runtime remains UNTESTED",
+    "C6_STATE": "PASS_EXACT_SHA record in separate [skip ci] bookkeeping commit; hardware validation deferred without blocking future DX11 development"
   },
-  "next_action": "Check GitHub required workflows at validation-bearing material SHA; address actual CI failures in same TASK_ID and defer HMD-specific verdict."
+  "next_action": "Controller select next independent real DX11 native scene/input integration item; keep this BUILD_VERIFIED, park Quest3/VDXR/menu-car-race/gamepad visual acceptance as NEED_HMD_TEST and never claim runtime PASS.",
+  "validation_evidence": {
+    "validation_bearing_result_sha": "06820059b675f02be1549688742bf262fd990119",
+    "verified_git_branch": "vr-dx11-native-r71",
+    "automated_verification": "PASS_EXACT_SHA",
+    "workflows": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 38449688609,
+        "conclusion": "success"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 38449688634,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 38449696590,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38449696446,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38449696505,
+        "conclusion": "success"
+      },
+      {
+        "name": "VR PC Fast Test Build",
+        "run_id": 38449688627,
+        "conclusion": "skipped",
+        "note": "optional PC-fast trigger, not requested"
+      }
+    ],
+    "portable_cpp_probe": "PASS in DX11 Fast Structural Checks",
+    "source_integration_regression": "PASS native RGBA/10-bit/RT tests + legacy Build regressions",
+    "quest3_vdxr_hmd": "UNTESTED",
+    "gameplay_and_gamepad": "UNTESTED"
+  }
 }
