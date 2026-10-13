@@ -11,11 +11,11 @@
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "work_key": "DX9EX:VIS:MAIN_MENU",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
-  "checkpoint": "C4_COMMITTED",
-  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00809]",
   "changed_files": [
     "vrhost/src/main_r23.cpp",
@@ -59,9 +59,9 @@
     ]
   },
   "acceptance_results": {
-    "MENU_DEFAULT_43_CROP": "SOURCE_IMPLEMENTED_PENDING_GATE",
-    "MENU_INI_OVERRIDE_FAIL_CLOSED": "SOURCE_IMPLEMENTED_PENDING_GATE",
-    "MENU_EXACT_SHA_WINDOWS": "PENDING_EXACT_SHA_GATES",
+    "MENU_DEFAULT_43_CROP": "PASS_EXACT_SHA",
+    "MENU_INI_OVERRIDE_FAIL_CLOSED": "PASS_EXACT_SHA",
+    "MENU_EXACT_SHA_WINDOWS": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -83,6 +83,37 @@
   },
   "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA"
-  }
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "12756124f60df7546b3ef8f331432d1b95f4294e",
+    "dx9ex_active": {
+      "run_id": 38486366952,
+      "conclusion": "SUCCESS",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ],
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38486366952"
+    },
+    "domain_isolation": {
+      "run_id": 38486367018,
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38486367018"
+    },
+    "full_source_impact": {
+      "run_id": 38486366851,
+      "conclusion": "SUCCESS",
+      "jobs": [
+        "source-cross-domain",
+        "msvc-analyze-openxr-host",
+        "msvc-analyze-active-game"
+      ],
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38486366851"
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  },
+  "material_result_sha": "12756124f60df7546b3ef8f331432d1b95f4294e",
+  "validation_bearing_result_sha": "12756124f60df7546b3ef8f331432d1b95f4294e"
 }
