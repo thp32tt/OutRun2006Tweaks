@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_POINT_TOPOLOGY",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "ab46b9b6fa96343eb7429523993ab21c700eb2e4",
-  "status": "AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -61,13 +61,47 @@
     "C0_RECOVER": "PASS",
     "C1_REVIEW": "PASS: D3DPT_POINTLIST ignored by live bridge, point size/sprite not guarded",
     "C2_IMPLEMENT": "PASS: R30 point source and guarded D3D11 POINTLIST",
-    "C3_VALIDATE": "PENDING_EXACT_SHA_CI",
-    "C4_COMMIT": "PENDING_MATERIAL_SHA",
+    "C3_VALIDATE": "PASS_EXACT_SHA",
+    "C4_COMMIT": "PASS_MATERIAL_COMMIT",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING"
+    "C6_STATE": "PASS_DURABLE_RESULT"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Run exact-SHA GitHub Backend Conversion Gate, DX11 Fast Structural and Windows build; preserve HMD and gamepad UNTESTED"
+  "next_action": "Separate runtime Quest3/VDXR game+gamepad tests remain UNTESTED; next independent DX11 native gameplay code item may start immediately. DXVK remains frozen.",
+  "validation_bearing_result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8",
+  "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8",
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38331015386,
+      "conclusion": "success",
+      "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8"
+    },
+    "dx11_fast_structural": {
+      "id": 38331015339,
+      "conclusion": "success",
+      "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8"
+    },
+    "windows_build": {
+      "id": 38331018370,
+      "conclusion": "success",
+      "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8"
+    },
+    "openxr_architecture_push": {
+      "id": 38331015312,
+      "conclusion": "success",
+      "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8"
+    },
+    "openxr_architecture_other": {
+      "id": 38331018562,
+      "conclusion": "success",
+      "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8"
+    },
+    "optional_hud_inspector": {
+      "id": 38331018323,
+      "conclusion": "success",
+      "result_sha": "657f514aa2a3e970116b91d3a90dfb7f8ca575d8"
+    }
+  }
 }
