@@ -36,7 +36,11 @@ def patch(source):
         source,
         'SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "C1", 20: "C2",\n'
         '                                30: "B", 40: "C1", 50: "C2"}',
-        'SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "C1", 30: "B", 40: "C1"}',
+        '''SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "C1", 30: "B", 40: "C1"}
+# OUTRUN_SINGLE_A_SMOKE_V1: a single authorized A task, no B/C1 dispatch.
+OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SMOKE_TASK_ID", "").strip()
+if OUTRUN_A_SINGLE_SMOKE_TASK_ID:
+    SCHEDULED_LOCALIZATION_LANES = {0: "A"}''',
         "minute-role-schedule",
     )
     source = replace_once(
@@ -75,7 +79,7 @@ def patch(source):
         '        prompt = prompt_for_slot(slot, "watchdog")',
         '''        # The watchdog must never silently send a producer text-only prompt.
         # A/B are single-asset source-bound jobs; only the explicit scheduler sends.
-        if CONTROLLER_MODE == "localization" and slot.name in ("A", "B"):
+        if CONTROLLER_MODE == "localization" and (slot.name in ("A", "B") or OUTRUN_A_SINGLE_SMOKE_TASK_ID):
             continue
         prompt = prompt_for_slot(slot, "watchdog")''',
         "producer-watchdog",
@@ -85,6 +89,9 @@ def patch(source):
         '    send_result = await send_message(page, prompt)\n'
         '    if send_result != "sent":',
         '''    # OUTRUN_PNG_UPLOAD_V1: per-role SHA-pinned source manifest, fail closed.
+    # Suppress every scheduled non-A lane in one-A pilot mode.
+    if OUTRUN_A_SINGLE_SMOKE_TASK_ID and slot.name != "A":
+        return
     png_binding = None
     if CONTROLLER_MODE == "localization" and slot.name in ("A", "B"):
         png_binding, png_reason = load_binding(slot.name)
@@ -126,7 +133,7 @@ def patch(source):
     )
     # The import must be part of controller code itself; no executable startup
     # shell monkey-patching and no separate daemon.
-    import_line = 'from app.controller_png_attach import load_binding, attach_png, mark_sent\n'
+    import_line = 'from app.controller_png_attach import load_binding, attach_png, mark_sent\nimport os as _outrun_smoke_os\n'
     lines = source.splitlines(keepends=True)
     future_imports = [i for i, line in enumerate(lines)
                       if line.startswith("from __future__ import ")]
