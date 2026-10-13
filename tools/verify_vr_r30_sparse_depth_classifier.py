@@ -281,6 +281,9 @@ def cached_mask_lifecycle():
         return order[:512]
 
     for generation_index, n in enumerate((8192, 16384, 65536)):
+        # Each new vertex span comes from a different decoded IB mask;
+        # invalidate the previous generation even when its cardinality is 700.
+        gen += 1
         selected = rng.sample(range(n), 700)
         mask = bytearray(n)
         for i in selected:
