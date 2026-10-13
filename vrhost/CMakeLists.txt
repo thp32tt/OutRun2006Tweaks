@@ -154,6 +154,7 @@ add_executable(outrun-vr-projection-blit-upload-smoke tests/projection_blit_uplo
 add_executable(outrun-vr-menu-projection-copy-smoke tests/menu_projection_slice_copy_smoke.cpp)
 target_include_directories(outrun-vr-menu-projection-copy-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
 add_executable(outrun-vr-menu-content-aspect-smoke tests/menu_content_aspect_smoke.cpp)
+add_executable(outrun-vr-pause-eye-affine-smoke tests/pause_menu_eye_affine_smoke.cpp)
 target_include_directories(outrun-vr-menu-content-aspect-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
 add_executable(outrun-vr-capture-descriptor-smoke tests/desktop_capture_descriptor_cache_smoke.cpp)
 target_include_directories(outrun-vr-capture-descriptor-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
@@ -197,6 +198,7 @@ foreach(target
     outrun-vr-projection-blit-upload-smoke
     outrun-vr-menu-projection-copy-smoke
     outrun-vr-menu-content-aspect-smoke
+    outrun-vr-pause-eye-affine-smoke
     outrun-vr-capture-descriptor-smoke
     outrun-vr-r32-policy-smoke
     outrun-vr-frame-pacing-smoke

@@ -23,6 +23,7 @@
 #include <cstring>
 #include "../state/state_block_tracker.hpp"
 #include "vr_pass_policy.hpp"
+#include "pause_menu_eye_affine.hpp"
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "vr_shared.hpp"
@@ -1705,19 +1706,42 @@ namespace OutRunVRStereo
                     OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite;
         }
 
+        // The source game draws the ESC shell as generic overlay and its
+        // arrows/YES-NO as exact queued HUD sprites. Both must use one optical
+        // correction; F11, ordinary HUD and results remain strictly excluded.
+        bool R30IsPauseMenuElement() noexcept
+        {
+            return OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
+                Game::current_mode &&
+                *Game::current_mode == GameState::STATE_SMPAUSEMENU &&
+                (OutRunVR::GameSemantic::EffectiveScope() ==
+                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D ||
+                 R30IsPauseMenuExactArrow());
+        }
+
         float R30PauseMenuVerticalFraction() noexcept
         {
-            if (OutRunVR::GameSemantic::ExternalOverlaySemanticDepth != 0 ||
-                !Game::current_mode ||
-                *Game::current_mode != GameState::STATE_SMPAUSEMENU ||
-                (OutRunVR::GameSemantic::EffectiveScope() !=
-                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D &&
-                 !R30IsPauseMenuExactArrow()))
+            if (!R30IsPauseMenuElement())
                 return 0.0f;
             const float fraction = Settings::VRPauseMenuVerticalOffset.get();
             if (!std::isfinite(fraction))
                 return 0.0f;
             return std::clamp(fraction, -0.25f, 0.25f);
+        }
+
+        OutRunVrPauseEye::VerticalAffine R30PauseMenuVerticalAffine(
+            const OutRunVRRenderer::LatchedStereoFrame& stereo) noexcept
+        {
+            if (!R30IsPauseMenuElement())
+                return {};
+            // Model a head-forward/common vertical tangent interval. Unlike
+            // horizontal mapping, the authored ESC shell should be optically
+            // centred at tan(vertical angle)=0 even when both XR eyes share
+            // the same asymmetric up/down FOV. Reject both eyes together if
+            // recenter publishes a partial/invalid FOV.
+            return OutRunVrPauseEye::Compute(
+                stereo.eyeFov[0].angleDown, stereo.eyeFov[0].angleUp,
+                stereo.eyeFov[1].angleDown, stereo.eyeFov[1].angleUp);
         }
 
         float R30HudScopeScale() noexcept
@@ -1732,12 +1756,7 @@ namespace OutRunVRStereo
             // ScreenOverlay2D, gets its own centre-anchored legible scale.
             // Never enlarge gameplay ScreenHud, world, +TIME/GOAL or front-end.
             // A missing game-state pointer retains the baseline HUD setting.
-            if (OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
-                Game::current_mode &&
-                *Game::current_mode == GameState::STATE_SMPAUSEMENU &&
-                (OutRunVR::GameSemantic::EffectiveScope() ==
-                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D ||
-                 R30IsPauseMenuExactArrow()) &&
+            if (R30IsPauseMenuElement() &&
                 Settings::VRPauseMenuScale.get() > 0.0f)
             {
                 const float requested = Settings::VRPauseMenuScale.get();
@@ -3410,6 +3429,9 @@ namespace OutRunVRStereo
             const float pauseNdcOffset =
                 state.worldEffect ? 0.0f :
                 2.0f * R30PauseMenuVerticalFraction();
+            const auto pauseVertical = state.worldEffect
+                ? OutRunVrPauseEye::VerticalAffine{}
+                : R30PauseMenuVerticalAffine(state.stereo);
             for (UINT i = 0; i < vertexCount; ++i)
             {
                 if (!selected(i))
@@ -3455,7 +3477,9 @@ namespace OutRunVRStereo
                     // per-eye asymmetric-FOV centre offset for convergence.
                     correctedX =
                         hudScaleX * state.eyeScale[eye] * ndcX + state.eyeOffset[eye];
-                    correctedY = hudScaleY * ndcY - pauseNdcOffset;
+                    correctedY =
+                        hudScaleY * pauseVertical.scale[eye] * ndcY +
+                        pauseVertical.offset[eye] - pauseNdcOffset;
                 }
 
                 const float transformedX =
@@ -3801,9 +3825,22 @@ namespace OutRunVRStereo
                     (1.0f - eyeScaleX[1]) * (x0 + halfWidth) +
                         state.eyeOffset[1] * halfWidth
                 };
-                const float hudBiasY =
-                    (1.0f - hudScaleY) * (y0 + halfHeight) +
+                const auto pauseVertical =
+                    R30PauseMenuVerticalAffine(state.stereo);
+                const float pauseShiftY =
                     height * R30PauseMenuVerticalFraction();
+                const float hudBiasY =
+                    (1.0f - hudScaleY) * (y0 + halfHeight) + pauseShiftY;
+                const float eyeScaleY[2]{
+                    hudScaleY * pauseVertical.scale[0],
+                    hudScaleY * pauseVertical.scale[1]
+                };
+                const float eyeBiasY[2]{
+                    (1.0f - eyeScaleY[0]) * (y0 + halfHeight) -
+                        pauseVertical.offset[0] * halfHeight + pauseShiftY,
+                    (1.0f - eyeScaleY[1]) * (y0 + halfHeight) -
+                        pauseVertical.offset[1] * halfHeight + pauseShiftY
+                };
                 // Bias computed once per draw. A zero (default-off) anchor
                 // reproduces the existing centre-convergent mapping.
                 float edgeLeftBias =
@@ -3844,12 +3881,16 @@ namespace OutRunVRStereo
                     if (!std::isfinite(src[0]) || !std::isfinite(src[1]) ||
                         !std::isfinite(src[2]) || !std::isfinite(src[3]))
                         return false;
-                    const float transformedY = hudScaleY * src[1] + hudBiasY + edgeYBias;
+                    const float transformedLeftY =
+                        eyeScaleY[0] * src[1] + eyeBiasY[0] + edgeYBias;
+                    const float transformedRightY =
+                        eyeScaleY[1] * src[1] + eyeBiasY[1] + edgeYBias;
                     const float transformedLeftX =
                         eyeScaleX[0] * src[0] + eyeBiasX[0] + edgeLeftBias;
                     const float transformedRightX =
                         eyeScaleX[1] * src[0] + eyeBiasX[1] + edgeRightBias;
-                    if (!std::isfinite(transformedY) ||
+                    if (!std::isfinite(transformedLeftY) ||
+                        !std::isfinite(transformedRightY) ||
                         !std::isfinite(transformedLeftX) ||
                         !std::isfinite(transformedRightX))
                         return false;
@@ -3858,9 +3899,9 @@ namespace OutRunVRStereo
                     auto* rightDst =
                         reinterpret_cast<float*>(right.data() + offset);
                     leftDst[0] = transformedLeftX;
-                    leftDst[1] = transformedY;
+                    leftDst[1] = transformedLeftY;
                     rightDst[0] = transformedRightX;
-                    rightDst[1] = transformedY;
+                    rightDst[1] = transformedRightY;
                 }
                 return true;
             }
@@ -4732,19 +4773,22 @@ namespace OutRunVRStereo
             float hudScaleX = 1.0f;
             float hudScaleY = 1.0f;
             R30HudContainScale(stereo, hudScaleX, hudScaleY);
+            const auto pauseVertical = R30PauseMenuVerticalAffine(stereo);
             for (int eye = 0; eye < 2; ++eye)
             {
                 D3DMATRIX clipCorrection{};
                 // Keep the already-verified ordinary HUD mapping unchanged.
                 // Only FlatPerspectiveEffect uses the finite 3D plane above.
                 clipCorrection._11 = hudScaleX;
-                clipCorrection._22 = hudScaleY;
+                clipCorrection._22 =
+                    hudScaleY * pauseVertical.scale[eye];
                 clipCorrection._33 = 1.0f;
                 clipCorrection._44 = 1.0f;
                 clipCorrection._41 = eyeOffset[eye];
                 // Row-vector post-projection translation: positive viewport
                 // fraction must move pixels down (negative clip-space Y).
-                clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();
+                clipCorrection._42 = pauseVertical.offset[eye] -
+                    2.0f * R30PauseMenuVerticalFraction();
 
                 const D3DMATRIX corrected =
                     R29OwnerMultiplyMatrix(stockWvp, clipCorrection);
