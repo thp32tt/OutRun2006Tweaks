@@ -1,5 +1,18 @@
 # 이미지 생성 정책 수동 적용 절차
 
+## 2026-10-13 q217 A 단건 파일 첨부 + 내장 ImageGen 시험
+
+- 전용 설명: `docs/OUTRUN_A_Q217_IMAGEGEN_SMOKE_20261013.md`.
+- **반드시** `python tools/localization/deploy_plate_controller.py --root . --revision <FULL_40_CHAR_SHA> --stage --single-a-smoke`로 스테이징한 뒤 사용자가 Portainer에서 수동 배포한다.
+- staging은 `AUTO_SEND=true`, `CHAT_SLOTS=3`, `SCHEDULE_MINUTES=0`, `OUTRUN_A_SINGLE_SMOKE_TASK_ID=OUTRUN-A-Q217-IMG-SMOKE-20261013`만 단건 모드에 적용한다. controller 런타임 패치도 B/C1 예정 발송과 모든 watchdog을 차단한다.
+- q217 단건 첨부 PNG와 SHA-pinned `pending_A.json`을 `/data/imagegen`에 준비해야 한다. 다른 A 큐나 B로 폴백하지 않는다.
+- `sent/` 기록은 첨부된 메시지 전송 증거일 뿐 이미지 생성 성공 근거가 아니다. 다운로드한 출력 실제 PNG bytes/SHA가 없으면 `IMAGEGEN_E2E=UNTESTED`.
+- 복원: **같은 GitHub HEAD**에서 `--single-a-smoke` 없이 스테이징하고 정상 스케줄 복원 확인 후 사용자만 Portainer 재배포. 다른 자료·보안 설정·볼륨·기존 기록 보존.
+
+---
+
+
+
 대상: localization recovery 컨트롤러만. 사용자 2026-10-12 수동 배포 지시.
 이 문서와 Git 커밋은 실행 중 컨테이너를 변경하지 않는다.
 `docker/localization-production/Dockerfile`은 CPU plate 작업 이미지이며 ChatGPT 브라우저
