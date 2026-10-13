@@ -1663,7 +1663,12 @@ namespace OutRunVRStereo
                 }
             }
 
-            if (!targetEyes)
+            // VDXR can transiently publish a finite yet inverted FOV for
+            // one eye on recenter/resize. Do not let the surviving eye's
+            // aspect resize BOTH HUD projections. A coherent pixel pair
+            // already sets targetEyes=2 above; otherwise wait for BOTH
+            // valid angular spans and retain neutral containment for now.
+            if (targetEyes != 2)
                 return 1.0f;
 
             const float targetAspect =

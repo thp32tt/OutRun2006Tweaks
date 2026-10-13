@@ -2,6 +2,7 @@
 """R30 Issue #119 opt-in peripheral HUD draw contract (no HMD claims)."""
 from pathlib import Path
 from math import isfinite
+import math
 
 root = Path(__file__).resolve().parents[1]
 code = (root / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text()
@@ -410,6 +411,36 @@ for wrong, replacement in (
         "anchor.maxX > x1 ||", "kSafeInset = 0.025f"))
 print("PASS Quest3 peripheral HUD visible-area fit: stereo shift parity, 4 resolutions, bounds fail-closed")
 
+
+# Issue #119 binocular FOV fallback: a single finite but inverted eye
+# cannot authorize BOTH eyes' HUD contain aspect during VDXR recenter.
+section = code[code.index("float R30HudAspectCompensation("):
+               code.index("float R30PauseMenuVerticalFraction()")]
+assert "if (targetEyes != 2)\\n                return 1.0f;" in section
+assert section.index("targetEyes = 2;") < section.index("if (targetEyes != 2)")
+
+def fov_pair_aspect(eyes):
+    aspects = []
+    for l, r, d, u in eyes:
+        h = math.tan(r) - math.tan(l)
+        v = math.tan(u) - math.tan(d)
+        if not isfinite(h) or not isfinite(v) or h <= .05 or v <= .05:
+            continue
+        aspect = h / v
+        if isfinite(aspect) and .25 <= aspect <= 4.0:
+            aspects.append(aspect)
+    return sum(aspects) / 2.0 if len(aspects) == 2 else 1.0
+
+valid = (-.7, .7, -.8, .8)
+other = (-.75, .75, -.8, .8)
+inverted = (.7, -.7, -.8, .8)
+assert abs(fov_pair_aspect((valid, other)) -
+    (fov_pair_aspect((valid, valid)) + fov_pair_aspect((other, other))) / 2) < 1e-6
+for pair in ((valid, inverted), (inverted, valid), (inverted, inverted)):
+    assert fov_pair_aspect(pair) == 1.0
+assert "if (targetEyes != 2)" not in section.replace(
+    "if (targetEyes != 2)", "if (!targetEyes)", 1)
+print("PASS binocular FOV fallback rejects unilateral aspect at recenter")
 
 # Issue #119 binocular XR extent coherence: only a jointly published
 # pixel pair may drive HUD aspect. One-eye or mixed-generation extents
