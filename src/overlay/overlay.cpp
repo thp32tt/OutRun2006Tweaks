@@ -660,8 +660,31 @@ static void render_first_run_intro()
 		ImGui::OpenPopup(Title);
 
 	const ImVec2 display = ImGui::GetIO().DisplaySize;
-	ImGui::SetNextWindowPos(ImVec2(display.x * 0.5f, display.y * 0.5f), 0, ImVec2(0.5f, 0.5f));
-	ImGui::SetNextWindowSize(ImVec2(384.0f * Overlay::GlobalFontScale, 0.0f));
+	// The F11 shell already uses a sharp headset-density atlas, but the
+	// first-run modal previously kept a desktop-only 384px width. In VR
+	// that makes its much larger glyphs wrap into a tall, unreadable
+	// window. Size this modal from the same live eye-density authority,
+	// capping both dimensions to the actual usable F11 canvas. A fixed
+	// VR height enables ImGui's own scrolling instead of clipping the
+	// Continue button below the HMD-visible viewport.
+	const bool vrModal = Game::is_vr_gameplay_presentation();
+	const Overlay::ContentRect content = Overlay::content_rect();
+	const float density = vrModal
+		? std::clamp(Overlay::VrFontMultiplier, 1.0f, 3.0f) : 1.0f;
+	const float usableWidth = (std::max)(1.0f, content.width * 0.90f);
+	const float usableHeight = (std::max)(1.0f, content.height * 0.90f);
+	const ImVec2 center = vrModal
+		? ImVec2(content.x + content.width * 0.5f,
+			content.y + content.height * 0.5f)
+		: ImVec2(display.x * 0.5f, display.y * 0.5f);
+	const float popupWidth = vrModal
+		? (std::min)(384.0f * Overlay::GlobalFontScale * density,
+			usableWidth)
+		: 384.0f * Overlay::GlobalFontScale;
+	const float popupHeight = vrModal
+		? (std::min)(700.0f * density, usableHeight) : 0.0f;
+	ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
+	ImGui::SetNextWindowSize(ImVec2(popupWidth, popupHeight));
 
 	if (!ImGui::BeginPopupModal(Title, nullptr, ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize))
 		return;

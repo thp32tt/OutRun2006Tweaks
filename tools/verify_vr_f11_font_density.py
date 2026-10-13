@@ -615,6 +615,63 @@ def check_external_vr_f11_canvas(font: str) -> None:
         assert not all(x in changed for x in required), original
     print("PASS F11 VR font-independent full-source canvas, desktop/menu 4:3 preserved, 5 sizes and 4 mutants")
 
+def check_first_run_vr_modal(font: str) -> None:
+    """The first-run F11 popup follows XR glyph density and is viewport bounded."""
+    modal = font.split("static void render_first_run_intro()", 1)[1].split(
+        "void ForceShowCursor", 1)[0]
+    tokens = (
+        "const bool vrModal = Game::is_vr_gameplay_presentation();",
+        "const Overlay::ContentRect content = Overlay::content_rect();",
+        "std::clamp(Overlay::VrFontMultiplier, 1.0f, 3.0f)",
+        "content.width * 0.90f",
+        "content.height * 0.90f",
+        "384.0f * Overlay::GlobalFontScale * density",
+        "384.0f * Overlay::GlobalFontScale;",
+        "700.0f * density, usableHeight",
+        "(std::min)(384.0f * Overlay::GlobalFontScale * density,",
+        "ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));",
+        "ImGui::SetNextWindowSize(ImVec2(popupWidth, popupHeight));",
+        "const float popupHeight = vrModal",
+        ": 0.0f;",
+    )
+    for token in tokens:
+        assert token in modal, token
+    assert modal.index("const bool vrModal =") < modal.index("const float popupWidth =")
+    assert modal.index("const float popupHeight =") < modal.index("ImGui::BeginPopupModal(")
+
+    def geometry(w, h, scale, density, vr):
+        if not vr:
+            return 384.0 * scale, 0.0
+        atlas = min(max(density, 1.0), 3.0)
+        return (min(384.0 * scale * atlas, max(1.0, w * 0.90)),
+                min(700.0 * atlas, max(1.0, h * 0.90)))
+
+    for w, h in ((1024, 768), (1920, 1080), (3440, 1440),
+                 (2560, 1080), (2496, 2688), (768, 1024),
+                 (1, 1)):
+        for density in (1.0, 2.0, 2.75, 3.0):
+            pw, ph = geometry(w, h, 2.0, density, True)
+            assert 0.0 < pw <= max(1.0, w * 0.9)
+            assert 0.0 < ph <= max(1.0, h * 0.9)
+            assert geometry(w, h, 2.0, density, False) == (768.0, 0.0)
+    assert geometry(3440, 1440, 2.0, 2.75, True)[0] > 768.0
+    assert geometry(3440, 1440, 2.0, 2.75, True)[1] <= 1296.0
+    for original, bad in (
+        ("std::clamp(Overlay::VrFontMultiplier, 1.0f, 3.0f)", "1.0f"),
+        ("content.width * 0.90f", "content.width * 4.0f"),
+        ("content.height * 0.90f", "content.height * 4.0f"),
+        ("384.0f * Overlay::GlobalFontScale * density",
+         "384.0f * Overlay::GlobalFontScale"),
+        ("700.0f * density, usableHeight", "700.0f * density, 99999.0f"),
+        ("const bool vrModal = Game::is_vr_gameplay_presentation();",
+         "const bool vrModal = false;"),
+    ):
+        assert original in modal
+        mutated = modal.replace(original, bad, 1)
+        assert any(token not in mutated for token in tokens), original
+    print("PASS first-run F11 modal XR density, 7 viewport sizes, scroll limit and 6 mutants")
+
+
 def main():
     hook, font, header = (p.read_text(encoding="utf-8")
                           for p in (HOOK, FONT, HEADER))
@@ -630,6 +687,7 @@ def main():
     check_shell_numeric_cases()
     check_shell_vr_mode_transitions(font)
     check_external_vr_f11_canvas(font)
+    check_first_run_vr_modal(font)
     check_projection(renderer, semantic)
     check_projection_mutations(renderer, semantic)
     # Default R26 and new R29 compile separate final TUs but share R23.
