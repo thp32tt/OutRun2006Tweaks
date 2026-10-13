@@ -318,8 +318,12 @@ def factor(source_w, source_h, eye_w, eye_h):
 
 def check_native_eye_height_density(hook: str) -> None:
     """F11 atlas density tracks both XR aspect AND the real eye pixel height."""
-    owner = hook.split("const float sourceAspect =", 1)[1].split(
+    # Restrict destructive mutations to the eye-pixel floor owner. The
+    # upstream source-aspect computation also uses screen_resolution->y;
+    # a broad search replaces that unrelated denominator first.
+    owner = hook.split("const float eyePixelScale =", 1)[1].split(
         "if (std::isfinite(factor) && factor > 0.0f)", 1)[0]
+    owner = "const float eyePixelScale =" + owner
     tokens = (
         "const float eyePixelScale =",
         "static_cast<float>(lh) + static_cast<float>(rh)",
