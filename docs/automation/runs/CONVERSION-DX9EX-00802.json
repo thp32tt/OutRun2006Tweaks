@@ -11,9 +11,9 @@
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R30_VB_IB_INCREMENTAL_SHADOW",
   "status": "COMPLETE_BUILD_VERIFIED",
-  "checkpoint": "C6_RESULT",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00802]",
-  "automation_validation": "SUCCESS",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_delta": 1,
   "changed_files": [
@@ -125,5 +125,39 @@
       }
     },
     "runtime": "Quest3/VDXR HMD, optical appearance, FPS and p95/p99 not run. RUNTIME_VALIDATION=UNTESTED"
-  }
+  },
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "9ae047cb344e9d3319ebf342d364f85acdc5a1b3",
+    "dx9ex_active": {
+      "run_id": 38471375043,
+      "head_sha": "9ae047cb344e9d3319ebf342d364f85acdc5a1b3",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "game": "SUCCESS",
+        "host": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38471375052,
+      "head_sha": "9ae047cb344e9d3319ebf342d364f85acdc5a1b3",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38470938284,
+      "head_sha": "09619ca7a2a059fdefea750d819315fb18e9e5f4",
+      "conclusion": "SUCCESS",
+      "source_tree_unchanged_in_validation_commits": true,
+      "jobs": {
+        "msvc-analyze-active-game": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "source-cross-domain": "SUCCESS"
+      }
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  },
+  "c6_recorded_at_kst": "2026-10-14 06:40 KST"
 }
