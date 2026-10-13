@@ -61,9 +61,10 @@ def verify(text):
     # X8B8 and A8B8 both need the same per-mip byte-order fix, but with
     # their own opaque/alpha destination formats.
     xrgb_checks=[
+        (fmt,"if ((format.dwFlags & DDPF_RGB) != 0 &&\n\t\tformat.dwRGBBitCount == 32 &&\n\t\tformat.dwRGBAlphaBitMask == 0)","XRGB mask checks must remain one combined condition"),
         (fmt,"(format.dwFlags & DDPF_RGB) != 0","only 32-bit RGB can be accepted as XRGB"),
         (fmt,"format.dwRGBBitCount == 32","opaque fast DDS must be 32 bits"),
-        (fmt,"format.dwRGBAlphaBitMask == 0","opaque source excludes alpha-mask DDS"),
+        (fmt,"format.dwRGBAlphaBitMask == 0)","opaque source excludes alpha-mask DDS"),
         (fmt,"format.dwRBitMask == 0x00ff0000","native X8R8 source R mask"),
         (fmt,"format.dwRBitMask == 0x000000ff","swizzled X8B8 source R mask"),
         (fmt,"return D3DFMT_X8R8G8B8;","native opaque RGB format"),
@@ -196,7 +197,7 @@ def negatives(text):
         "original.restoreOriginal();",
         "pDevice, original.data, original.bytes, D3DX_DEFAULT",
         "return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(",
-        "format.dwRGBAlphaBitMask == 0",
+        "format.dwRGBAlphaBitMask == 0)",
         "return D3DFMT_X8R8G8B8;",
         "return D3DFMT_X8B8G8R8;",
         "? D3DFMT_A8R8G8B8 : D3DFMT_X8R8G8B8;",

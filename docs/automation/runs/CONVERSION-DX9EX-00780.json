@@ -82,5 +82,5 @@
     "eye_ownership": "Texture decode/source only; does not modify stereo ownership.",
     "negative_test_evidence": "Existing HUD DDS mutation verifier extended for no-alpha XRGB masks, destination format and both channel-swap writes."
   },
-  "validation_notes": "GitHub commit prepared without moving target ref while earlier 00779 DX9Ex Active CI is in progress. Exact-SHA validation and Quest3 test pending. Do not mark whole optical defect fixed from this code path alone."
+  "validation_notes": "GitHub commit prepared without moving target ref while earlier 00779 DX9Ex Active CI is in progress. Exact-SHA validation and Quest3 test pending. Do not mark whole optical defect fixed from this code path alone.\nFirst a9c01e4d DX9Ex HUD Inspector static EXE job failed: DDS negative mutation used a prefix of an alpha hex mask, not the exact XRGB no-alpha condition. This same-task verifier repair now matches the complete alpha-mask expression, retaining A8 texture guard and source-level negative regressions."
 }
