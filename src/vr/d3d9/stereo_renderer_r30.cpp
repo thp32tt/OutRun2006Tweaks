@@ -2539,11 +2539,52 @@ namespace OutRunVRStereo
                     }
                 }
             }
+            // Large, sparse indexed VB ranges previously scanned every
+            // unused vertex just to find the first 512 selected depths.
+            // Sorting bounded unique references restores the *original*
+            // ascending first-512 sample exactly (the <=512 direct path
+            // remains untouched). Do not allocate for dense/small draws.
+            std::vector<std::uint32_t> sortedTouched;
+            if (!fastTouched && usedMask && touched &&
+                touched->size() > 512u && touched->size() <= 2048u &&
+                touched->size() <= vertexCount &&
+                usedMask->size() >= vertexCount &&
+                vertexCount / touched->size() >= 8u)
+            {
+                try
+                {
+                    sortedTouched.assign(touched->begin(), touched->end());
+                }
+                catch (...)
+                {
+                    sortedTouched.clear(); // original dense fallback
+                }
+                if (!sortedTouched.empty())
+                {
+                    std::sort(sortedTouched.begin(), sortedTouched.end());
+                    // Reject a corrupt, duplicated or incomplete hint.
+                    // Original producer owns the mask; absent membership or
+                    // duplicate references cannot change classification.
+                    for (std::size_t n = 0; n < sortedTouched.size(); ++n)
+                    {
+                        const std::uint32_t index = sortedTouched[n];
+                        if (index >= vertexCount || (*usedMask)[index] == 0 ||
+                            (n != 0u && sortedTouched[n - 1u] == index))
+                        {
+                            sortedTouched.clear();
+                            break;
+                        }
+                    }
+                }
+            }
             const UINT visitCount = fastTouched
-                ? static_cast<UINT>(touched->size()) : vertexCount;
+                ? static_cast<UINT>(touched->size()) :
+                (sortedTouched.empty() ? vertexCount :
+                    static_cast<UINT>(sortedTouched.size()));
             for (UINT visit = 0; visit < visitCount && sampled < 512u; ++visit)
             {
-                const UINT i = fastTouched ? (*touched)[visit] : visit;
+                const UINT i = fastTouched ? (*touched)[visit] :
+                    (sortedTouched.empty() ? visit : sortedTouched[visit]);
                 if (usedMask &&
                     (i >= usedMask->size() || (*usedMask)[i] == 0))
                     continue;

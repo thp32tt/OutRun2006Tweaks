@@ -3,7 +3,8 @@
 
 The UP and shadowed VB/IB indexed producers publish unique touched indices
 and a matching mask. For <=512 references the classifier visits only those
-indices; above that limit it retains the original ascending first-512 sample.
+indices; 513..2048 sparse references use a bounded ascending sort to retain
+the original first-512 sample, while dense/untrusted hints scan as before.
 This tests both the classification result and fail-closed hint rejection.
 """
 from pathlib import Path
@@ -37,12 +38,19 @@ def static_contract(src, workflow):
         "if (index >= vertexCount || (*usedMask)[index] == 0)",
         "fastTouched = false;",
         "const UINT visitCount = fastTouched",
-        "const UINT i = fastTouched ? (*touched)[visit] : visit;",
+        "const UINT i = fastTouched ? (*touched)[visit] :",
+        "sortedTouched.empty() ? visit : sortedTouched[visit]",
         "visit < visitCount && sampled < 512u",
         "const UINT remaining = sampleLimit - sampled;",
         "const float projectionDepthScale =",
         "if (!projectionDepthFast || !std::isfinite(depthDelta) ||",
         "return sampled >= 3u && valid >= 3u",
+        "touched->size() > 512u && touched->size() <= 2048u",
+        "vertexCount / touched->size() >= 8u",
+        "sortedTouched.assign(touched->begin(), touched->end());",
+        "std::sort(sortedTouched.begin(), sortedTouched.end());",
+        "sortedTouched[n - 1u] == index",
+        "sortedTouched.clear(); // original dense fallback",
     ):
         assert token in c, ("classifier", token)
     assert c.index("for (const std::uint32_t index : *touched)") < c.index(
@@ -70,7 +78,14 @@ def negative_mutations(src, workflow):
         ("usedMask->size() >= vertexCount", "usedMask->size() < vertexCount"),
         ("index >= vertexCount || (*usedMask)[index] == 0", "false"),
         ("fastTouched = false;", "fastTouched = true;"),
-        ("fastTouched ? (*touched)[visit] : visit", "visit"),
+        ("sortedTouched.empty() ? visit : sortedTouched[visit]",
+         "sortedTouched.empty() ? visit : visit"),
+        ("std::sort(sortedTouched.begin(), sortedTouched.end());",
+         "std::reverse(sortedTouched.begin(), sortedTouched.end());"),
+        ("sortedTouched[n - 1u] == index",
+         "sortedTouched[n - 1u] != index"),
+        ("vertexCount / touched->size() >= 8u",
+         "vertexCount / touched->size() >= 0u"),
         ("visit < visitCount && sampled < 512u", "visit < vertexCount"),
         ("baseProjection, usedMask, touched);", "baseProjection, usedMask, nullptr);"),
         ("&scratch.upUsed, nullptr, nullptr, nullptr,\n"
@@ -93,7 +108,13 @@ def simulate(mask, touched, quality, fast):
     use_touched = bool(fast and touched and len(touched) <= 512 and
                        len(touched) <= n and
                        all(0 <= i < n and mask[i] for i in touched))
-    visits = touched if use_touched else range(n)
+    use_sorted = bool(fast and not use_touched and touched and
+                      512 < len(touched) <= 2048 and len(touched) <= n and
+                      n // len(touched) >= 8 and
+                      len(set(touched)) == len(touched) and
+                      all(0 <= i < n and mask[i] for i in touched))
+    visits = (touched if use_touched else
+              sorted(touched) if use_sorted else range(n))
     sampled = valid = projected = 0
     limit = min(n, 512)
     for i in visits:
@@ -136,6 +157,14 @@ def parity():
                 base = simulate(mask, selected, quality, False)
                 fast = simulate(mask, selected, quality, True)
                 assert base == fast, (n, count, kind)
+            if count >= 513 and n // count >= 8:
+                # Ascending first-512 identity is critical for World/HUD
+                # projected-depth decisions on sparse indexed buffers.
+                assert sorted(selected)[:512] == [
+                    i for i in range(n) if mask[i]][:512]
+                assert simulate(mask, selected[::-1], quality, True) == base
+                bad = selected[:-1] + [selected[0]]
+                assert simulate(mask, bad, quality, True) == base
             if count and count <= 512:
                 # Bad bounds or mask membership reject the hint, then use dense.
                 bad = selected[:-1] + [n]
