@@ -37,7 +37,8 @@ assert integrated(bridge), "game stage1 modifiers must reach real native draw"
 for token in (
     "kStage1ArgMask = 0x0fu", "kStage1Complement = 0x10u",
     "kStage1AlphaReplicate = 0x20u", "(operand & ~allowedBits) == 0u",
-    "source == kStage1Current || source == kStage1Factor",
+    "source == kStage1Diffuse ||", "source == kStage1Current ||",
+    "source == kStage1Factor",
     "kStage1Modulate2X", "kStage1Modulate4X", "kStage1Subtract",
     "kStage1AddSmooth"):
     assert token in header, token
