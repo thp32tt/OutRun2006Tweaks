@@ -310,10 +310,48 @@ def check_transient_eye_extent_dropout(hook: str) -> None:
 def factor(source_w, source_h, eye_w, eye_h):
     if min(source_w, source_h, eye_w, eye_h) <= 0:
         return 1.0
-    raw = (source_w / source_h) / (eye_w / eye_h)
+    raw = max((source_w / source_h) / (eye_w / eye_h),
+              eye_h / source_h)
     if not math.isfinite(raw) or raw <= 0:
         return 1.0
     return min(3.0, max(1.0, math.ceil(raw * 4.0) * 0.25))
+
+def check_native_eye_height_density(hook: str) -> None:
+    """F11 atlas density tracks both XR aspect AND the real eye pixel height."""
+    owner = hook.split("const float sourceAspect =", 1)[1].split(
+        "if (std::isfinite(factor) && factor > 0.0f)", 1)[0]
+    tokens = (
+        "const float eyePixelScale =",
+        "static_cast<float>(lh) + static_cast<float>(rh)",
+        "static_cast<float>(Game::screen_resolution->y);",
+        "(std::max)(sourceAspect / eyeAspect, eyePixelScale);",
+    )
+    assert all(t in owner for t in tokens)
+    for original, broken in (
+        ("(std::max)(sourceAspect / eyeAspect, eyePixelScale);",
+         "sourceAspect / eyeAspect;"),
+        ("static_cast<float>(lh) + static_cast<float>(rh)",
+         "static_cast<float>(lh) + static_cast<float>(lh)"),
+        ("static_cast<float>(Game::screen_resolution->y);",
+         "static_cast<float>(Game::screen_resolution->x);"),
+    ):
+        assert original in owner
+        mutated = owner.replace(original, broken, 1)
+        assert not all(t in mutated for t in tokens)
+    # Original user-reported 3440x1440 case stays in the same 2.75 bucket.
+    assert factor(3440, 1440, 2496, 2688) == 2.75
+    # XR portrait eye heights exceeding a 1080p/768p mirror must not
+    # fall back to only a 16:9 or 4:3 aspect-ratio correction.
+    assert factor(1920, 1080, 2496, 2688) == 2.50
+    assert factor(1024, 768, 2496, 2688) == 3.0
+    # Native and low-resolution eye outputs are unchanged; no desktop branch
+    # inherits this VR-only font density or any gameplay HUD transform.
+    assert factor(1920, 1080, 1920, 1080) == 1.0
+    assert factor(1024, 768, 1024, 768) == 1.0
+    assert factor(5120, 1440, 2496, 2688) == 3.0
+    assert factor(0, 1440, 2496, 2688) == 1.0
+    print("PASS VR F11 native eye-height atlas floor, 5 resolution pairs, 3 destructive mutations")
+
 
 def check_font_density_hysteresis(hook: str) -> None:
     """Do not regenerate F11's D3D9 font atlas for near-boundary XR jitter."""
@@ -581,6 +619,7 @@ def main():
     check(hook, font, header)
     check_font_io_cache(font)
     check_font_density_hysteresis(hook)
+    check_native_eye_height_density(hook)
     check_stereo_extent_coherence(hook)
     check_transient_eye_extent_dropout(hook)
     check_shell_layout_mutations(font)
@@ -601,7 +640,7 @@ def main():
     assert "SharedState->recommendedHeight[eye]" in common
     # Desktop 4:3 is unmodified; wide/portrait XR needs sharp larger glyphs.
     assert factor(1024, 768, 1024, 768) == 1.0
-    assert factor(1920, 1080, 2496, 2688) == 2.0
+    assert factor(1920, 1080, 2496, 2688) == 2.5
     assert factor(3440, 1440, 2496, 2688) == 2.75
     assert factor(5120, 1440, 2496, 2688) == 3.0
     assert factor(0, 1440, 2496, 2688) == 1.0

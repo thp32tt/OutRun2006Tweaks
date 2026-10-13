@@ -395,7 +395,7 @@ class D3DHooks : public Hook
 					const float eyeAspect =
 						0.5f * (static_cast<float>(lw) / lh +
 							static_cast<float>(rw) / rh);
-					const float factor = sourceAspect / eyeAspect;
+					// Preserve source-space glyph pixels when a lower-height\n					// mirror is expanded to a taller XR eye. Aspect correction\n					// alone misses 1080p/768p source -> 2688p eye cases.\n					// This is F11-only atlas raster density, not a change to\n					// the game's HUD projection or desktop ImGui scaling.\n					const float eyePixelScale =\n						(0.5f * (static_cast<float>(lh) + static_cast<float>(rh))) /\n						static_cast<float>(Game::screen_resolution->y);\n					const float factor =\n						(std::max)(sourceAspect / eyeAspect, eyePixelScale);
 					if (std::isfinite(factor) && factor > 0.0f)
 					{
 						const float stepped = std::clamp(
