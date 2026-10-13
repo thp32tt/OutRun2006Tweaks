@@ -24,7 +24,12 @@ def connected(hook, hdr, impl, prov):
         "sourceRect ? static_cast<std::int64_t>(sourceRect->left)" in present,
         "sourceRect ? static_cast<std::int64_t>(sourceRect->right)" in present,
         "sourceRect ? static_cast<std::int64_t>(sourceRect->bottom)" in present,
-        "presentRegion.allows_inset(bb.Width, bb.Height, kWidth, kHeight, 8u)" in present,
+        "presentRegion.inset_placement(" in present,
+        "bb.Width, bb.Height, kWidth, kHeight, 8u)" in present,
+        "insetPlacement.valid" in present,
+        "POINT destination{" in present,
+        "static_cast<LONG>(insetPlacement.left)" in present,
+        "static_cast<LONG>(insetPlacement.top)" in present,
         "!outputNow.hasDirtyRegion" in present,
         "outputNow.hasDirtyRegion = dirtyRegion != nullptr;" in present,
         "outputNow.sourceLeft = presentRegion.left;" in present,
@@ -43,8 +48,10 @@ assert connected(r30, bridge_h, bridge, provenance)
 for label, i, token in (
     ("R30 actual Present attribution", 0,
      "before_game_present(device, sourceRect, dirtyRegion)"),
-    ("crop reject", 2,
-     "presentRegion.allows_inset(bb.Width, bb.Height, kWidth, kHeight, 8u)"),
+    ("crop relocation", 2, "presentRegion.inset_placement("),
+    ("crop bound", 2, "insetPlacement.valid"),
+    ("dynamic x destination", 2, "static_cast<LONG>(insetPlacement.left)"),
+    ("dynamic y destination", 2, "static_cast<LONG>(insetPlacement.top)"),
     ("dirty rectangle rejection", 2, "!outputNow.hasDirtyRegion"),
     ("async generation change", 2, "!s.previousOutput.same(outputNow)"),
     ("late readback owner", 2, "!oldest.provenance.same_output(s.outputGeneration)"),
@@ -74,6 +81,19 @@ static_assert(!GameNativePresentRegion{0,0,3441,1440}.allows_inset(3440,1440,256
 static_assert(!GameNativePresentRegion{0,0,3440,1441}.allows_inset(3440,1440,256,144,8));
 static_assert(!full.allows_inset(200,100,256,144,8));
 static_assert(!full.allows_inset(3440,1440,256,144,4000));
+// A menu source crop need not include the physical backbuffer top-right.
+// Its native inset must move inside the crop, preserving 8px margins.
+constexpr auto fullInset = full.inset_placement(3440,1440,256,144,8);
+static_assert(fullInset.valid && fullInset.left == 3176 && fullInset.top == 8);
+constexpr auto menuInset = GameNativePresentRegion{0,0,1920,1080}.inset_placement(3440,1440,256,144,8);
+static_assert(menuInset.valid && menuInset.left == 1656 && menuInset.top == 8);
+constexpr auto carInset = GameNativePresentRegion{200,100,1000,400}.inset_placement(3440,1440,256,144,8);
+static_assert(carInset.valid && carInset.left == 736 && carInset.top == 108);
+static_assert(!GameNativePresentRegion{0,0,260,150}.inset_placement(3440,1440,256,144,8).valid);
+static_assert(!GameNativePresentRegion{0,0,3441,1440}.inset_placement(3440,1440,256,144,8).valid);
+static_assert(!GameNativePresentRegion{1,0,0,1440}.inset_placement(3440,1440,256,144,8).valid);
+static_assert(!GameNativePresentRegion{0,0,3440,1440}.inset_placement(0xffffffffU,1440,256,144,8).valid);
+static_assert(!full.inset_placement(3440,1440,256,144,4000).valid);
 constexpr GameOutputSignature a{0x10u,3440u,1440u,21u,0xabcdu,0,0,3440,1440,false};
 static_assert(a.valid());
 static_assert(a.same(GameOutputSignature{0x10u,3440u,1440u,21u,0xabcdu,0,0,3440,1440,false}));
@@ -94,4 +114,4 @@ with TemporaryDirectory(prefix="dx11-00698-") as temporary:
         capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert subprocess.run([str(directory/"probe")]).returncode == 0
-print("PASS 00698: D3D9 Present crop/dirty source -> native inset + async GPU generation")
+print("PASS 00698: crop-relative native inset, dirty fallback, async generation, and live D3D9 Present wiring")

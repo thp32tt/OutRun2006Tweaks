@@ -4324,10 +4324,13 @@ void before_game_present(IDirect3DDevice9* game,
         }
         // Reuse the inspected game backbuffer for bounds proof and D3D9 upload.
         const auto& bb = presentDesc;
+        // Place the inset inside the actual Present source, rather than always
+        // at the backbuffer's top-right (which cropped menus may not show).
+        // Dirty/invalid/small crops still preserve the original D3D9 Present.
+        const auto insetPlacement = presentRegion.inset_placement(
+            bb.Width, bb.Height, kWidth, kHeight, 8u);
         const bool outputWritable = outputNow.valid() &&
-            !outputNow.hasDirtyRegion &&
-            presentRegion.allows_inset(bb.Width, bb.Height, kWidth, kHeight, 8u) &&
-            bb.Width >= kWidth + 8u && bb.Height >= kHeight + 8u &&
+            !outputNow.hasDirtyRegion && insetPlacement.valid &&
             bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
             (bb.Format == D3DFMT_A8R8G8B8 ||
              bb.Format == D3DFMT_X8R8G8B8);
@@ -4397,7 +4400,9 @@ void before_game_present(IDirect3DDevice9* game,
                                                 static_cast<std::size_t>(y)*mapped.RowPitch,
                                             kWidth*4);
                                     s.insetSurface->UnlockRect();
-                                    POINT destination{static_cast<LONG>(bb.Width-kWidth-8), 8};
+                                    POINT destination{
+                                        static_cast<LONG>(insetPlacement.left),
+                                        static_cast<LONG>(insetPlacement.top)};
                                     if (SUCCEEDED(game->UpdateSurface(
                                             s.insetSurface.Get(), nullptr, back.Get(), &destination))) {
                                         ++s.visible;
