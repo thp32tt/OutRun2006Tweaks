@@ -27,7 +27,7 @@ def connected(c: str, h: str, p: str) -> bool:
         and "std::array<ComPtr<ID3D11DepthStencilState>, 2> diagnosticDepthAlwaysStates;" in c
         and "bool nativeDepthAlways = false;" in c
         and "output.always = zFunc == 8u;" in h
-        and "(zFunc != 2u && zFunc != 4u && zFunc != 8u)" in h
+        and "(zFunc != 2u && zFunc != 4u && zFunc != 8u &&" in h
         and "bool always = false;" in h
         and all(x in p for x in (
         "game_native_depth_admission(1,1,8,0,0,true,depth)",
@@ -49,7 +49,7 @@ for a,b in (
     assert mutant != cpp and not connected(mutant,hdr,probe), a
 for a,b in (
     ("output.always = zFunc == 8u;","output.always = false;"),
-    ("(zFunc != 2u && zFunc != 4u && zFunc != 8u)","(zFunc != 2u && zFunc != 4u)"),
+    ("(zFunc != 2u && zFunc != 4u && zFunc != 8u &&","(zFunc != 2u && zFunc != 4u && zFunc != 9u &&"),
 ):
     mutant=hdr.replace(a,b,1)
     assert mutant != hdr and not connected(cpp,mutant,probe), a

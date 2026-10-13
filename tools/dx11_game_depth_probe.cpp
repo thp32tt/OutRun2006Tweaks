@@ -36,20 +36,41 @@ int main() {
     assert(depth.enabled && depth.always && !depth.writeEnabled);
     assert(game_native_depth_admission(1,1,2,0,0,true,depth));
     assert(!depth.always && depth.writeEnabled && !depth.lessEqual);
+    // EQUAL/NOTEQUAL preserve independent read-only and depth-writing DSVs.
+    using outrun::vr::dx11::live_game_frame::game_native_depth_equality_slot;
+    for (unsigned compare : {3u, 6u}) {
+        for (unsigned write : {0u, 1u}) {
+            assert(game_native_depth_admission(1,write,compare,0,0,true,depth));
+            assert(depth.enabled && depth.equalityMode == compare &&
+                   !depth.always && depth.writeEnabled == (write != 0u));
+            assert(game_native_depth_equality_slot(write != 0u, compare) ==
+                   (write ? 2u : 0u) + (compare == 6u ? 1u : 0u));
+        }
+    }
+    assert(game_native_depth_equality_slot(false, 3u) !=
+           game_native_depth_equality_slot(false, 6u));
+    assert(game_native_depth_equality_slot(true, 3u) !=
+           game_native_depth_equality_slot(false, 3u));
+    assert(!game_native_depth_admission(1,1,3,0,0,false,depth));
+    assert(!game_native_depth_admission(1,0,6,1,0,true,depth));
+    assert(game_native_depth_admission(1,1,8,0,0,true,depth));
+    assert(depth.equalityMode == 0u && depth.always);
     assert(!game_native_depth_admission(1,1,8,0,0,false,depth));
     assert(!game_native_depth_admission(1,2,8,0,0,true,depth));
     const auto retained = depth;
     for (unsigned mode : {2u, 3u, 0xffffffffu})
         assert(!game_native_depth_admission(mode,1,4,0,0,true,depth));
     assert(!game_native_depth_admission(1,2,4,0,0,true,depth));
-    assert(!game_native_depth_admission(1,1,5,0,0,true,depth));
+    for (unsigned unsupported : {1u, 5u, 7u, 9u})
+        assert(!game_native_depth_admission(1,1,unsupported,0,0,true,depth));
     assert(!game_native_depth_admission(1,1,4,1,0,true,depth));
     assert(!game_native_depth_admission(1,1,4,0,0x3f800000u,true,depth));
     assert(!game_native_depth_admission(1,1,4,0,0,false,depth));
     assert(depth.enabled == retained.enabled &&
            depth.lessEqual == retained.lessEqual &&
            depth.writeEnabled == retained.writeEnabled &&
-           depth.always == retained.always);
+           depth.always == retained.always &&
+           depth.equalityMode == retained.equalityMode);
     assert(game_native_depth_admission(1,1,4,0x80000000u,
                                        0x80000000u,true,depth));
     return 0;

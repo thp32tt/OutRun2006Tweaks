@@ -149,6 +149,9 @@ jobs:
       - name: Verify live D3D9 ZFUNC ALWAYS native DSV 00652
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_depth_always_draw_00652.py
+      - name: Verify live D3D9 EQUAL/NOTEQUAL native depth Draw 00653
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_depth_equality_draw_00653.py
 
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'

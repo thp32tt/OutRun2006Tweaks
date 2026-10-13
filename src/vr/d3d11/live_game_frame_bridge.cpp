@@ -783,6 +783,7 @@ struct OutputCapture {
     bool nativeDepthLessEqual = false;
     bool nativeDepthWrite = false;
     bool nativeDepthAlways = false;
+    std::uint32_t nativeDepthEqualityMode = 0u;
     DWORD nativeCullMode = D3DCULL_NONE; // live game face exclusion
     DWORD alphaRef = 0;
     D3DCMPFUNC alphaFunc = D3DCMP_ALWAYS;
@@ -806,6 +807,8 @@ struct State {
     std::array<ComPtr<ID3D11DepthStencilState>, 4> diagnosticDepthStates;
     // Independent ALWAYS depth-write OFF/ON states.
     std::array<ComPtr<ID3D11DepthStencilState>, 2> diagnosticDepthAlwaysStates;
+    // EQUAL/NOTEQUAL each preserve both depth-write modes independently.
+    std::array<ComPtr<ID3D11DepthStencilState>, 4> diagnosticDepthEqualityStates;
     ComPtr<ID3D11VertexShader> vs;
     ComPtr<ID3D11PixelShader> ps;
     ComPtr<ID3D11PixelShader> sampledPs;
@@ -1011,6 +1014,7 @@ bool ensure_pipeline(State& s) noexcept {
     s.diagnosticDepth.Reset();
     for (auto& depthState : s.diagnosticDepthStates) depthState.Reset();
     for (auto& depthState : s.diagnosticDepthAlwaysStates) depthState.Reset();
+    for (auto& depthState : s.diagnosticDepthEqualityStates) depthState.Reset();
     s.backend.shutdown();
     s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.selectTextureDiffuseAlphaPs.Reset(); s.selectTextureModulateAlphaPs.Reset(); s.selectTextureModulate2XAlphaPs.Reset(); s.selectTextureModulate4XAlphaPs.Reset(); s.selectTextureAddAlphaPs.Reset(); s.selectTextureSubtractAlphaPs.Reset(); s.selectDiffuseTextureAlphaPs.Reset(); s.selectDiffuseModulateAlphaPs.Reset(); s.selectDiffuseAddAlphaPs.Reset(); s.selectDiffuseSubtractAlphaPs.Reset(); s.selectDiffuseModulate2XAlphaPs.Reset(); s.selectDiffuseModulate4XAlphaPs.Reset(); s.selectTextureAddSmoothAlphaPs.Reset(); s.selectDiffuseAddSmoothAlphaPs.Reset(); s.selectTextureFactorAlphaPs.Reset(); s.selectTextureTfactorAlphaPs.Reset(); s.selectDiffuseFactorAlphaPs.Reset(); s.selectDiffuseTfactorAlphaPs.Reset(); s.selectTextureBlendTextureAlphaPs.Reset(); s.selectDiffuseBlendTextureAlphaPs.Reset(); s.selectTextureBlendDiffuseAlphaPs.Reset(); s.selectDiffuseBlendDiffuseAlphaPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset();
     s.subtractTextureAlphaPs.Reset(); s.subtractDiffuseAlphaPs.Reset(); s.subtractModulateAlphaPs.Reset(); s.modulate2xPs.Reset(); s.modulate4xPs.Reset(); s.modulate2xTextureAlphaPs.Reset(); s.modulate2xDiffuseAlphaPs.Reset(); s.modulate4xTextureAlphaPs.Reset(); s.modulate4xDiffuseAlphaPs.Reset(); s.mixedTextureAlphaPs.Reset(); s.mixedDiffuseAlphaPs.Reset(); s.mixedAddTextureAlphaPs.Reset(); s.mixedAddDiffuseAlphaPs.Reset(); s.blendTextureAlphaPs.Reset(); s.blendTextureAlphaPmPs.Reset(); s.blendTextureAlphaPmTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmFactorAlphaPs.Reset(); s.blendTextureAlphaPmSignedFactorAlphaPs.Reset(); s.blendTextureAlphaPmSigned2XFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateAlphaPs.Reset(); s.blendTextureAlphaPmAddAlphaPs.Reset(); s.blendTextureAlphaPmSubtractAlphaPs.Reset(); s.blendTextureAlphaPmModulate2XAlphaPs.Reset(); s.blendTextureAlphaPmModulate4XAlphaPs.Reset(); s.blendTextureAlphaPmAddSignedAlphaPs.Reset(); s.blendTextureAlphaPmAddSigned2XAlphaPs.Reset(); s.blendTextureAlphaPmBlendTextureAlphaPs.Reset(); s.blendTextureAlphaPmBlendDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmBlendCurrentFactorAlphaPs.Reset(); s.blendTextureAlphaPmBlendFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothAlphaPs.Reset(); s.blendDiffuseAlphaPs.Reset(); s.blendTextureSelectedTextureAlphaPs.Reset(); s.blendTextureSelectedDiffuseAlphaPs.Reset(); s.blendDiffuseSelectedTextureAlphaPs.Reset(); s.blendDiffuseSelectedDiffuseAlphaPs.Reset(); s.blendTextureModulateAlphaPs.Reset(); s.blendDiffuseModulateAlphaPs.Reset(); s.blendTextureModulate2XAlphaPs.Reset(); s.blendTextureModulate4XAlphaPs.Reset(); s.blendDiffuseModulate2XAlphaPs.Reset(); s.blendDiffuseModulate4XAlphaPs.Reset(); s.blendTextureAddAlphaPs.Reset(); s.blendDiffuseAddAlphaPs.Reset(); s.blendTextureSubtractAlphaPs.Reset(); s.blendDiffuseSubtractAlphaPs.Reset(); s.blendTextureAddSmoothAlphaPs.Reset(); s.blendDiffuseAddSmoothAlphaPs.Reset(); s.blendFactorAlphaPs.Reset(); s.blendFactorTextureAlphaPs.Reset(); s.blendFactorModulateAlphaPs.Reset();
@@ -1606,6 +1610,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         output.nativeDepthLessEqual = admitted.lessEqual;
         output.nativeDepthWrite = admitted.writeEnabled;
         output.nativeDepthAlways = admitted.always;
+        output.nativeDepthEqualityMode = admitted.equalityMode;
     }
     // Only native one-pixel points without sprites or per-vertex point sizes.
     // All larger/scaled point raster states continue to the original D3D9
@@ -3116,6 +3121,23 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                                                         alwaysDepthState.GetAddressOf())))
                     return false;
             }
+        } else if (output.nativeDepthEqualityMode != 0u) {
+            // Real D3D9 menu/vehicle/race compare, not a depth-disabled draw.
+            auto& equalityDepthState = s.diagnosticDepthEqualityStates[
+                game_native_depth_equality_slot(output.nativeDepthWrite,
+                                                output.nativeDepthEqualityMode)];
+            if (!equalityDepthState) {
+                D3D11_DEPTH_STENCIL_DESC ds{};
+                ds.DepthEnable = TRUE;
+                ds.DepthWriteMask = output.nativeDepthWrite ?
+                    D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+                ds.DepthFunc = output.nativeDepthEqualityMode == D3DCMP_EQUAL ?
+                    D3D11_COMPARISON_EQUAL : D3D11_COMPARISON_NOT_EQUAL;
+                ds.StencilEnable = FALSE;
+                if (FAILED(dev->CreateDepthStencilState(&ds,
+                                                        equalityDepthState.GetAddressOf())))
+                    return false;
+            }
         } else {
         auto& depthState =
             s.diagnosticDepthStates[game_native_depth_slot(
@@ -3144,6 +3166,10 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         if (output.nativeDepthAlways)
             ctx->OMSetDepthStencilState(
                 s.diagnosticDepthAlwaysStates[output.nativeDepthWrite ? 1u : 0u].Get(), 0);
+        else if (output.nativeDepthEqualityMode != 0u)
+            ctx->OMSetDepthStencilState(
+                s.diagnosticDepthEqualityStates[game_native_depth_equality_slot(
+                    output.nativeDepthWrite, output.nativeDepthEqualityMode)].Get(), 0);
         else
         ctx->OMSetDepthStencilState(
             s.diagnosticDepthStates[game_native_depth_slot(
@@ -3546,6 +3572,7 @@ void before_game_reset() noexcept {
     s.diagnosticDepthView.Reset(); s.diagnosticDepth.Reset();
     for (auto& depthState : s.diagnosticDepthStates) depthState.Reset();
     for (auto& depthState : s.diagnosticDepthAlwaysStates) depthState.Reset();
+    for (auto& depthState : s.diagnosticDepthEqualityStates) depthState.Reset();
     s.raster.Reset(); s.scissorRaster.Reset(); s.layout.Reset();
     for (auto& item : s.diagnosticCullRasters) item.Reset();
     s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset(); s.inverseSourceAlphaBlend.Reset(); s.sourceAlphaCopyBlend.Reset(); s.inverseAlphaCopyBlend.Reset(); s.inverseAlphaAddBlend.Reset(); s.sourceReplaceBlend.Reset(); s.multiplyBlend.Reset(); s.inverseDestMultiplyBlend.Reset(); s.inverseSourceMultiplyBlend.Reset(); s.destAlphaCrossfadeBlend.Reset(); s.reverseDestAlphaCrossfadeBlend.Reset(); s.sourceAlphaSaturateCopyBlend.Reset(); s.sourceAlphaSaturateAddBlend.Reset();
