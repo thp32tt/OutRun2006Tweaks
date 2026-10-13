@@ -33,6 +33,12 @@ struct CUSTOMVERTEX
 #define CUSTOMFVF (D3DFVF_XYZRHW | D3DFVF_DIFFUSE)
 
 IDirect3DVertexBuffer9* LetterboxVertex = nullptr;
+// The menu bars are a source-backbuffer-sized GPU buffer, not a fixed game
+// resolution. Game resolution changes can occur before the next temporary
+// resource Reset callback, so never replay geometry from the previous size.
+IDirect3DDevice9* LetterboxRasterDevice = nullptr; // borrowed, never AddRef
+float LetterboxRasterWidth = 0.0f;
+float LetterboxRasterHeight = 0.0f;
 
 void CreateLetterboxVertex()
 {
@@ -45,6 +51,9 @@ void CreateLetterboxVertex()
 		LetterboxVertex->Release();
 		LetterboxVertex = nullptr;
 	}
+	LetterboxRasterDevice = nullptr;
+	LetterboxRasterWidth = 0.0f;
+	LetterboxRasterHeight = 0.0f;
 	IDirect3DDevice9* d3ddev = Game::D3DDevice();
 	if (!d3ddev || !Game::screen_resolution)
 		return;
@@ -55,7 +64,15 @@ void CreateLetterboxVertex()
 		sourceWidth < 1.0f || sourceHeight < 1.0f)
 		return;
 	const float contentWidth = sourceHeight * (4.0f / 3.0f);
-	if (!std::isfinite(contentWidth) || sourceWidth <= contentWidth)
+	if (!std::isfinite(contentWidth))
+		return;
+	// Cache even a 4:3/portrait result (which correctly needs NO bars), so
+	// EndScene doesn't allocate/retry on every menu frame. A size or device
+	// change invalidates this record and triggers one fresh construction.
+	LetterboxRasterDevice = d3ddev;
+	LetterboxRasterWidth = sourceWidth;
+	LetterboxRasterHeight = sourceHeight;
+	if (sourceWidth <= contentWidth)
 		return;
 	const float borderWidth = (sourceWidth - contentWidth) * 0.5f + 0.5f;
 	if (!std::isfinite(borderWidth) || borderWidth >= sourceWidth * 0.5f)
@@ -114,7 +131,28 @@ class D3DHooks : public Hook
 	inline static SafetyHookMid midhook_d3dendscene{};
 	static void D3DEndScene(SafetyHookContext& ctx)
 	{
-		if (Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0 && LetterboxVertex)
+		// A live source resolution switch (e.g. 21:9 -> 4:3 -> 16:9)
+		// does not necessarily pass through the game's temporary resource
+		// Reset hooks. Recreate menu bars once on an actual size/device change;
+		// never draw an old widescreen rectangle during a portrait/invalid
+		// publication gap. Gameplay without forced bars avoids this work.
+		IDirect3DDevice9* currentDevice = Game::D3DDevice();
+		const auto* currentSize = Game::screen_resolution;
+		const bool validSource = currentDevice && currentSize &&
+			std::isfinite(currentSize->x) && std::isfinite(currentSize->y) &&
+			currentSize->x >= 1.0f && currentSize->y >= 1.0f;
+		if (Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0 &&
+			(!Game::is_in_game() || Settings::UILetterboxing == 2) &&
+			validSource &&
+			(currentDevice != LetterboxRasterDevice ||
+			 currentSize->x != LetterboxRasterWidth ||
+			 currentSize->y != LetterboxRasterHeight))
+			CreateLetterboxVertex();
+
+		if (Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0 && LetterboxVertex &&
+			validSource && currentDevice == LetterboxRasterDevice &&
+			currentSize->x == LetterboxRasterWidth &&
+			currentSize->y == LetterboxRasterHeight)
 		{
 			IDirect3DDevice9* d3ddev = Game::D3DDevice();
 
@@ -326,6 +364,9 @@ class D3DHooks : public Hook
 			LetterboxVertex->Release();
 			LetterboxVertex = nullptr;
 		}
+		LetterboxRasterDevice = nullptr;
+		LetterboxRasterWidth = 0.0f;
+		LetterboxRasterHeight = 0.0f;
 	}
 
 	inline static SafetyHookMid midhook_d3dTemporariesCreate{};

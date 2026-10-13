@@ -143,3 +143,88 @@ for old, bad in mutants:
     else:
         raise AssertionError("mutant survived: " + old)
 print("PASS menu/F11 letterbox shared rect, portrait/reset/mode-2, 11 destructive controls")
+
+# A frontend resize can update the source aspect without the game's
+# temporary-resource callbacks. The old vertex buffer must never be reused.
+def verify_live_resize(source: str) -> None:
+    create = source.split("void CreateLetterboxVertex()\n{", 1)[1].split(
+        "\nclass D3DHooks : public Hook", 1)[0]
+    endscene = source.split("static void D3DEndScene(", 1)[1].split(
+        "if (overlayInited)", 1)[0]
+    release = source.split("static void D3DTemporariesRelease(", 1)[1].split(
+        "static void D3DTemporariesCreate(", 1)[0]
+    for token in ("LetterboxRasterDevice = nullptr;",
+                  "LetterboxRasterWidth = 0.0f;",
+                  "LetterboxRasterHeight = 0.0f;",
+                  "LetterboxRasterDevice = d3ddev;",
+                  "LetterboxRasterWidth = sourceWidth;",
+                  "LetterboxRasterHeight = sourceHeight;"):
+        assert token in create, token
+    assert create.index("LetterboxRasterDevice = d3ddev;") < create.index(
+        "if (sourceWidth <= contentWidth)")
+    for token in ("validSource &&",
+                  "currentDevice != LetterboxRasterDevice",
+                  "currentSize->x != LetterboxRasterWidth",
+                  "currentSize->y != LetterboxRasterHeight",
+                  "CreateLetterboxVertex();",
+                  "currentDevice == LetterboxRasterDevice",
+                  "currentSize->x == LetterboxRasterWidth",
+                  "currentSize->y == LetterboxRasterHeight"):
+        assert token in endscene, token
+    assert endscene.index("CreateLetterboxVertex();") < endscene.index(
+        "if (Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0 && LetterboxVertex")
+    assert "std::isfinite(currentSize->x)" in endscene
+    assert "std::isfinite(currentSize->y)" in endscene
+    assert "currentSize->x >= 1.0f && currentSize->y >= 1.0f" in endscene
+    for token in ("LetterboxVertex->Release();",
+                  "LetterboxRasterDevice = nullptr;",
+                  "LetterboxRasterWidth = 0.0f;",
+                  "LetterboxRasterHeight = 0.0f;"):
+        assert token in release, token
+
+verify_live_resize(src)
+
+def should_rebuild(cached, next_size, enabled=True, menu=True):
+    if not enabled or not menu:
+        return False
+    device, w, h = next_size
+    if not device or not isfinite(w) or not isfinite(h) or w < 1 or h < 1:
+        return False
+    return cached != next_size
+
+for seq in (
+        ((1, 3440, 1440), (1, 1024, 768), (1, 1920, 1080)),
+        ((1, 1920, 1080), (1, 2496, 2688), (1, 3440, 1440)),
+        ((1, 1024, 768), (2, 1024, 768), (2, 2560, 1080))):
+    cached = (None, 0, 0)
+    for next_size in seq:
+        assert should_rebuild(cached, next_size)
+        cached = next_size
+        assert not should_rebuild(cached, next_size)
+        assert not should_rebuild(cached, next_size, menu=False)
+    for invalid in ((1, float("nan"), 1440),
+                    (1, 3440, float("inf")), (1, 0, 768)):
+        assert not should_rebuild(cached, invalid)
+assert should_rebuild((1, 3440, 1440), (1, 2496, 2688))
+# Switching from widescreen to portrait must retire prior bars rather
+# than rendering a stale 21:9 left/right cover.
+assert shell_rect(3440, 1440, 1, 1, False)[0] > 0
+assert shell_rect(2496, 2688, 1, 1, False)[0] == 0
+for good, bad in (
+        ("currentSize->x != LetterboxRasterWidth", "currentSize->x == LetterboxRasterWidth"),
+        ("currentSize->y != LetterboxRasterHeight", "currentSize->y == LetterboxRasterHeight"),
+        ("currentDevice != LetterboxRasterDevice", "currentDevice == LetterboxRasterDevice"),
+        ("currentSize->x == LetterboxRasterWidth", "currentSize->x != LetterboxRasterWidth"),
+        ("std::isfinite(currentSize->y)", "std::isnan(currentSize->y)"),
+        ("LetterboxRasterHeight = 0.0f;", "// stale height on reset"),
+):
+    assert good in src
+    mutant = src.replace(good, bad, 1)
+    try:
+        verify_live_resize(mutant)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("live-resize contract mutant survived: " + good)
+print("PASS live menu 4:3/16:9/21:9/portrait resize, invalid source and 6 destructive mutants")
+
