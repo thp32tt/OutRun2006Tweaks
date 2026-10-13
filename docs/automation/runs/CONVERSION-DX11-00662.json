@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_10BIT_MIP_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "56b5ee9d1d3ccc81ea50d476567c94dacaa16fd7",
-  "status": "MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -63,21 +63,28 @@
     "C0_RECOVER": "PASS GitHub exact HEAD 56b5ee9d; 00661 C6 exact-SHA 5/5 success",
     "C1_REVIEW": "PASS separate 10-bit packed texture support missing; no active competing branch writer at HEAD check",
     "C2_IMPLEMENT": "PASS game source 10-bit format mip SRV conversion, native Draw linked with opt-in fallback",
-    "C3_VALIDATE": "LOCAL_CPP_PASS; GitHub exact-SHA required Gates PENDING",
+    "C3_VALIDATE": "PASS exact-SHA Backend #38362800782, DX11 Fast #38362800542, Build #38362807689, OpenXR #38362806236 and HUD #38362806234 all SUCCESS; existing local C++ probe and destructive tests retained",
     "C4_COMMIT": "MATERIAL_COMMITTED",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "acceptance_results": {
     "cpu_probe": "LOCAL_CPP_PASS",
-    "static_regression": "PENDING_EXACT_SHA",
-    "compile_build": "PENDING_EXACT_SHA",
+    "static_regression": "PASS_EXACT_SHA",
+    "compile_build": "SUCCESS_EXACT_SHA",
     "game_visual_parity": "NEED_HMD_TEST",
     "gamepad": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
   },
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "next_action": "Check exact-SHA Backend Conversion Gate, DX11 Fast Structural, Build, OpenXR architecture and HUD inspector. Separate C6 bookkeeping only after exact SHA SUCCESS. HMD, gamepad and real menu/race output remain UNTESTED."
+  "validation_bearing_result_sha": "a4fc3d6d43c0a28139f2892730a44a92e28447e5",
+  "result_sha": "a4fc3d6d43c0a28139f2892730a44a92e28447e5",
+  "next_action": "C6 complete on exact validation SHA a4fc3d6d43c0a28139f2892730a44a92e28447e5, 5/5 mandatory GitHub Actions SUCCESS. Native in-game visible pixels, gamepad and Quest3/VDXR still require physical runtime test; RUNTIME_VALIDATION=UNTESTED. No further action under this completed TASK_ID.",
+  "gate_runs": {
+    "Backend Conversion Gate": 38362800782,
+    "DX11 Fast Structural Checks": 38362800542,
+    "Build": 38362807689,
+    "OpenXR VR architecture": 38362806236,
+    "OutRun EXE HUD Inspector CI": 38362806234
+  }
 }
