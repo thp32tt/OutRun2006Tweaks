@@ -1,3 +1,11 @@
+> **Current Portainer deployment profile (2026-10-13):** A-only source-folder trial.
+> This branch mounts `/home/chatgpt-runner2/work/image-src` at `/data/imagegen`;
+> `AUTO_SEND=true`, `SCHEDULE_MINUTES=0`, `CHAT_SLOTS=3` (controller compatibility),
+> and an empty `OUTRUN_A_SINGLE_SMOKE_TASK_ID` allow distinct A task manifests.
+> The historical four-lane schedule documented below is inactive for this Compose.
+> See [A_IMAGE_SRC_MOUNT_20261013.md](A_IMAGE_SRC_MOUNT_20261013.md).
+> Rebuild/redeployment is **manual in Portainer**.
+
 # Localization Recovery Controller v1
 
 Purpose: run the compact 2026-09-28 localization workflow on a fresh ChatGPT account/project without importing later accumulated controller requirements.

@@ -15,10 +15,10 @@ services:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
       AUTO_SEND: "true"
-      # Only A at :00. All other scheduled roles disabled for the one-shot pilot.
+      # A-only trial at :00. B/C1/C2 remain unscheduled.
       SCHEDULE_MINUTES: "0"
       CHAT_SLOTS: "3"
-      OUTRUN_A_SINGLE_SMOKE_TASK_ID: "OUTRUN-A-Q217-IMG-SMOKE-20261013"
+      OUTRUN_A_SINGLE_SMOKE_TASK_ID: "" # No Q217 pin; pending_A.json selects the task.
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
       CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"
@@ -56,10 +56,14 @@ services:
       - "8788:8787"
     volumes:
       - outrun_chat_localization_recovery_data:/data
-      # N100 host folder already contains verified 2048x2048 source PNG and pending_A.json.
+      # Host stages source PNGs in inputs/A/ and current work in pending_A.json.
       # Overlay ONLY /data/imagegen; browser profile, state and logs stay on named volumes.
-      # This absolute path MUST exist on the Docker host, not only on a remote MCP machine.
-      - /home/chatgpt-runner2/work/a_q217_smoke_preflight/imagegen:/data/imagegen
+      # Docker daemon host path must exist; do not silently create an empty bind directory.
+      - type: bind
+        source: /home/chatgpt-runner2/work/image-src
+        target: /data/imagegen
+        bind:
+          create_host_path: false
       - outrun_chat_localization_recovery_logs:/logs
 
 volumes:

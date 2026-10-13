@@ -1,4 +1,4 @@
-name: Localization q217 A-only ImageGen Portainer preflight
+name: Localization A-only image-src Portainer preflight
 on:
   push:
     branches: [localization-controller-recovery-20260928]
@@ -9,7 +9,7 @@ on:
 permissions:
   contents: read
 jobs:
-  fail-closed-q217-controller:
+  fail-closed-a-image-src-controller:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
@@ -45,18 +45,18 @@ jobs:
           env=svc["environment"]
           assert env["AUTO_SEND"]=="true" and env["SCHEDULE_MINUTES"]=="0"
           assert env["CHAT_SLOTS"]=="3"
-          assert env["OUTRUN_A_SINGLE_SMOKE_TASK_ID"]=="OUTRUN-A-Q217-IMG-SMOKE-20261013"
+          assert env["OUTRUN_A_SINGLE_SMOKE_TASK_ID"]==""
           assert env["WATCHDOG_ENABLED"]=="false"
           assert svc["pull_policy"]=="build"
           vols=svc["volumes"]
           assert "outrun_chat_localization_recovery_data:/data" in vols
           assert "outrun_chat_localization_recovery_logs:/logs" in vols
-          assert "/home/chatgpt-runner2/work/a_q217_smoke_preflight/imagegen:/data/imagegen" in vols
+          assert any(isinstance(m,dict) and m.get("type")=="bind" and m.get("source")=="/home/chatgpt-runner2/work/image-src" and m.get("target")=="/data/imagegen" and m.get("bind",{}).get("create_host_path") is False for m in vols)
           assert c["volumes"]["outrun_chat_localization_recovery_data"]["name"]=="outrun_chat_localization_recovery_data"
           assert c["volumes"]["outrun_chat_localization_recovery_logs"]["name"]=="outrun_chat_localization_recovery_logs"
           print("A-ONLY CONTROLLER PATCH + BUILD + NAMED VOLUMES + BIND: STATIC PASS")
           PY
-      - name: Check source binding SHA/CRC and one-task fail-closed behavior
+      - name: Check distinct A inputs, SHA/CRC and duplicate-submit guard
         run: |
           python - <<'PY'
           import hashlib, importlib.util, json, os, pathlib, struct, tempfile, zlib
@@ -67,14 +67,21 @@ jobs:
           def chunk(tag,data):
               return struct.pack(">I",len(data))+tag+data+struct.pack(">I",zlib.crc32(tag+data))
           raw=(b"\x89PNG\r\n\x1a\n"+chunk(b"IHDR",struct.pack(">IIBBBBB",1,1,8,6,0,0,0))+chunk(b"IDAT",zlib.compress(b"\x00\x00\x00\x00\x00"))+chunk(b"IEND",b""))
-          with tempfile.TemporaryDirectory() as td, patch.dict(os.environ,{"OUTRUN_A_SINGLE_SMOKE_TASK_ID":"OUTRUN-A-Q217-IMG-SMOKE-20261013"}):
+          with tempfile.TemporaryDirectory() as td, patch.dict(os.environ,{"OUTRUN_A_SINGLE_SMOKE_TASK_ID":""}):
               root=pathlib.Path(td);(root/"inputs"/"A").mkdir(parents=True);(root/"inputs"/"A"/"source.png").write_bytes(raw)
-              manifest={"role":"A","task_id":"OUTRUN-A-Q217-IMG-SMOKE-20261013","png":"A/source.png","png_sha256":hashlib.sha256(raw).hexdigest(),"source_dds_sha256":"d"*64,"prompt":"START -> 출발; GOAL -> 골"}
+              tasks=("OUTRUN-A-Q101-IMG-20261013","OUTRUN-A-Q218-IMG-20261013")
+              manifest={"role":"A","task_id":tasks[0],"png":"A/source.png","png_sha256":hashlib.sha256(raw).hexdigest(),"source_dds_sha256":"d"*64,"prompt":"START -> 출발; GOAL -> 골"}
+              for task in tasks:
+                  manifest["task_id"]=task
+                  (root/"pending_A.json").write_text(json.dumps(manifest),encoding="utf-8")
+                  binding,reason=mod.load_binding("A",root)
+                  assert reason is None and binding["task_id"]==task and binding["dimensions"]==[1,1],reason
+                  mod.mark_sent(binding,root=root)
+                  assert mod.load_binding("A",root)[1]=="ALREADY_SENT", "do not duplicate an already-submitted task"
+              assert mod.load_binding("B",root)[1]=="SOURCE_REFERENCE_NOT_BOUND", "no unbound B source"
+              manifest["task_id"]="OUTRUN-A-Q219-IMG-20261013"
+              manifest["png_sha256"]="0"*64
               (root/"pending_A.json").write_text(json.dumps(manifest),encoding="utf-8")
-              binding,reason=mod.load_binding("A",root)
-              assert reason is None and binding["dimensions"]==[1,1],reason
-              assert mod.load_binding("B",root)[1]=="PILOT_ROLE_BLOCKED"
-              manifest["task_id"]="WRONG-TASK";(root/"pending_A.json").write_text(json.dumps(manifest))
-              assert mod.load_binding("A",root)[1]=="PILOT_TASK_ID_MISMATCH"
-              print("ONE Q217 SHA-BOUND INPUT ONLY: PASS")
+              assert mod.load_binding("A",root)[1]=="PNG_SHA_MISMATCH", "fail closed on stale/corrupt PNG"
+              print("TWO A SOURCE INPUTS + DUPLICATE GUARD + SHA FAIL-CLOSED: PASS")
           PY
