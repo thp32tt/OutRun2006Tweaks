@@ -93,7 +93,15 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
         source,
         '    send_result = await send_message(page, prompt)\n'
         '    if send_result != "sent":',
-        '''    # OUTRUN_PNG_UPLOAD_V1: per-role SHA-pinned source manifest, fail closed.
+        '''    # No automatic upload without an explicit destination.
+    if CONTROLLER_MODE == "localization" and slot.name == "A":
+        if not slot.url and not _outrun_smoke_os.environ.get("OUTRUN_A_PROJECT_NAME", "").strip():
+            slot.last_result = "NO_TARGET_CHAT_URL"
+            save_registry(reg)
+            write_runtime(status="target_missing",
+                          last_action="A upload blocked: no saved chat URL or project target")
+            return
+    # OUTRUN_PNG_UPLOAD_V1: per-role SHA-pinned source manifest, fail closed.
     if CONTROLLER_MODE == "localization" and slot.name == "A":
         target_status = await prepare_a_project_target(
             page, _outrun_smoke_os.environ.get("OUTRUN_A_PROJECT_NAME", "").strip(),
