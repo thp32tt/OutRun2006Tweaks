@@ -323,6 +323,116 @@ int main()
             ring.slot_state(staleAcquiredSlot) == SharedEyeSlotState::Acquired,
             "R178 invalidated acquired slot blocks generation retag");
 
+    // R306 integrated stereo transport: render two distinct native D3D11
+    // eye targets, copy both into generation-owned shared surfaces, publish
+    // only after GPU completion and verify both independent GPU pixel results.
+    ring.shutdown();
+    require(ring.initialize(
+                d3d.device, 64, 64, DXGI_FORMAT_R8G8B8A8_UNORM) &&
+            ring.bind_lifetime(1001, 2002, 7, 13),
+            "R306 stereo producer generation initialized");
+
+    D3D11_TEXTURE2D_DESC sourceDesc{};
+    sourceDesc.Width = 64;
+    sourceDesc.Height = 64;
+    sourceDesc.MipLevels = 1;
+    sourceDesc.ArraySize = 1;
+    sourceDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    sourceDesc.SampleDesc.Count = 1;
+    sourceDesc.Usage = D3D11_USAGE_DEFAULT;
+    sourceDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
+    ID3D11Texture2D* leftSource = nullptr;
+    ID3D11Texture2D* rightSource = nullptr;
+    ID3D11Texture2D* wrongSizeSource = nullptr;
+    ID3D11Texture2D* foreignSource = nullptr;
+    ID3D11RenderTargetView* leftView = nullptr;
+    ID3D11RenderTargetView* rightView = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &sourceDesc, nullptr, &leftSource)) &&
+            SUCCEEDED(d3d.device->CreateTexture2D(
+                &sourceDesc, nullptr, &rightSource)) &&
+            SUCCEEDED(d3d.device->CreateRenderTargetView(
+                leftSource, nullptr, &leftView)) &&
+            SUCCEEDED(d3d.device->CreateRenderTargetView(
+                rightSource, nullptr, &rightView)),
+            "R306 native source eye targets created");
+    sourceDesc.Width = 32;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &sourceDesc, nullptr, &wrongSizeSource)),
+            "R306 mismatched right eye created");
+    sourceDesc.Width = 64;
+    require(SUCCEEDED(foreign.device->CreateTexture2D(
+                &sourceDesc, nullptr, &foreignSource)),
+            "R306 foreign-device source created");
+
+    std::uint32_t stereoSlot = 99;
+    require(ring.try_acquire_slot(d3d.context, 20, nullptr, stereoSlot),
+            "R306 acquire native game eye frame");
+    require(!ring.submit_eye_pair(
+                foreign.context, stereoSlot, 20, leftSource, rightSource) &&
+            !ring.submit_eye_pair(
+                d3d.context, stereoSlot, 20, leftSource, leftSource) &&
+            !ring.submit_eye_pair(
+                d3d.context, stereoSlot, 20, leftSource, wrongSizeSource) &&
+            !ring.submit_eye_pair(
+                d3d.context, stereoSlot, 20, leftSource, foreignSource) &&
+            ring.slot_state(stereoSlot) == SharedEyeSlotState::Acquired &&
+            ring.slot_frame_id(stereoSlot) == 20,
+            "R306 invalid stereo inputs fail closed without partial publication");
+
+    const float red[] = {1.f, 0.f, 0.f, 1.f};
+    const float blue[] = {0.f, 0.f, 1.f, 1.f};
+    d3d.context->ClearRenderTargetView(leftView, red);
+    d3d.context->ClearRenderTargetView(rightView, blue);
+    require(ring.submit_eye_pair(
+                d3d.context, stereoSlot, 20, leftSource, rightSource) &&
+            ring.slot_state(stereoSlot) == SharedEyeSlotState::ProducerPending,
+            "R306 both native game eyes copied and producer GPU EVENT armed");
+    publish_bounded(ring, d3d.context, stereoSlot, 20);
+    NativeSharedEyePublication stereoPublication{};
+    require(ring.snapshot_published_frame(
+                stereoSlot, 20, stereoPublication) &&
+            ring.validate_publication_snapshot(stereoPublication) &&
+            stereoPublication.left_handle != stereoPublication.right_handle,
+            "R306 complete stereo pair is advertised only after GPU fence");
+
+    D3D11_TEXTURE2D_DESC readbackDesc = sourceDesc;
+    readbackDesc.Usage = D3D11_USAGE_STAGING;
+    readbackDesc.BindFlags = 0;
+    readbackDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+    ID3D11Texture2D* readback = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &readbackDesc, nullptr, &readback)),
+            "R306 readback surface");
+    for (std::uint32_t eyeIndex = 0; eyeIndex < 2; ++eyeIndex)
+    {
+        d3d.context->CopyResource(readback, ring.eye(stereoSlot, eyeIndex));
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        require(SUCCEEDED(d3d.context->Map(
+                    readback, 0, D3D11_MAP_READ, 0, &mapped)),
+                "R306 GPU native stereo eye readback");
+        const auto* pixel = static_cast<const std::uint8_t*>(mapped.pData);
+        const bool correct = eyeIndex == 0
+            ? pixel[0] == 255 && pixel[1] == 0 && pixel[2] == 0 && pixel[3] == 255
+            : pixel[0] == 0 && pixel[1] == 0 && pixel[2] == 255 && pixel[3] == 255;
+        d3d.context->Unmap(readback, 0);
+        require(correct, "R306 left/right GPU pixel copy identity");
+    }
+    require(!ring.submit_eye_pair(
+                d3d.context, stereoSlot, 20, leftSource, rightSource),
+            "R306 published frame cannot be overwritten");
+    const auto stereoAck = make_ack(ring.identity(), stereoSlot, 20);
+    require(ring.retire_acknowledged(stereoAck) &&
+            !ring.validate_publication_snapshot(stereoPublication),
+            "R306 exact host ACK releases both eyes and invalidates snapshot");
+
+    readback->Release();
+    foreignSource->Release();
+    wrongSizeSource->Release();
+    rightView->Release();
+    leftView->Release();
+    rightSource->Release();
+    leftSource->Release();
     ring.shutdown();
     foreign.context->Release();
     foreign.device->Release();

@@ -95,6 +95,17 @@ namespace outrun::vr::dx11
 
         // Call after both eye writes/copies have been recorded. The EVENT query
         // is ended immediately and the slot is quarantined until completion.
+        // R306: Copy the complete native game-created eye pair into this
+        // generation's shared resources before arming the producer EVENT.
+        // Both sources are validated before either GPU copy is recorded.
+        // The caller still owns the original D3D9 Draw/input fallback.
+        bool submit_eye_pair(
+            ID3D11DeviceContext* context,
+            std::uint32_t slot,
+            std::uint64_t frame_id,
+            ID3D11Texture2D* left_source,
+            ID3D11Texture2D* right_source) noexcept;
+
         bool signal_producer_fence(
             ID3D11DeviceContext* context,
             std::uint32_t slot,

@@ -304,6 +304,52 @@ namespace outrun::vr::dx11
         return true;
     }
 
+    // R306 native-eye producer: one submitted stereo pair, one EVENT and
+    // one exact frame/slot lifetime. Do not advertise a half-updated pair.
+    bool NativeSharedEyeRing::submit_eye_pair(
+        ID3D11DeviceContext* context,
+        std::uint32_t slot,
+        std::uint64_t frame_id,
+        ID3D11Texture2D* left_source,
+        ID3D11Texture2D* right_source) noexcept
+    {
+        if (!activation_ready() || same_producer_context(context) == false ||
+            slot >= slots_.size() || frame_id == 0 ||
+            !left_source || !right_source || left_source == right_source)
+            return false;
+
+        auto& entry = slots_[slot];
+        if (entry.state != SharedEyeSlotState::Acquired ||
+            entry.frame_id != frame_id || !entry.producer_fence ||
+            !entry.eye[0] || !entry.eye[1])
+            return false;
+
+        const auto exact_source = [&](ID3D11Texture2D* source) noexcept {
+            D3D11_TEXTURE2D_DESC desc{};
+            source->GetDesc(&desc);
+            if (desc.Width != width_ || desc.Height != height_ ||
+                desc.Format != format_ || desc.MipLevels != 1 ||
+                desc.ArraySize != 1 || desc.SampleDesc.Count != 1 ||
+                desc.SampleDesc.Quality != 0 ||
+                desc.Usage != D3D11_USAGE_DEFAULT || desc.CPUAccessFlags != 0 ||
+                source == entry.eye[0].Get() ||
+                source == entry.eye[1].Get())
+                return false;
+            Microsoft::WRL::ComPtr<ID3D11Device> owner;
+            source->GetDevice(owner.GetAddressOf());
+            return owner && owner.Get() == producer_device_.Get();
+        };
+
+        // Validate both resource descriptors and owning devices up front.
+        // Any rejection leaves the Acquired slot unchanged and records no
+        // native GPU commands, so the original DX9Ex frame remains usable.
+        if (!exact_source(left_source) || !exact_source(right_source))
+            return false;
+        context->CopyResource(entry.eye[0].Get(), left_source);
+        context->CopyResource(entry.eye[1].Get(), right_source);
+        return signal_producer_fence(context, slot, frame_id);
+    }
+
     bool NativeSharedEyeRing::signal_producer_fence(
         ID3D11DeviceContext* context,
         std::uint32_t slot,

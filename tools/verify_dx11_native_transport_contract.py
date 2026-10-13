@@ -211,8 +211,35 @@ def main() -> None:
             raise SystemExit(
                 f"DX11 R118 publication validation missing stale-snapshot evidence: {needle}"
             )
-    if ring_cpp.count("!same_producer_context(context)") != 4:
-        raise SystemExit("DX11 native ring must check all four context-bearing paths")
+    if ring_cpp.count("!same_producer_context(context)") != 4 or \
+            "same_producer_context(context) == false" not in ring_cpp:
+        raise SystemExit("DX11 native ring must check all five context-bearing paths")
+    eye_copy_start = ring_cpp.find("bool NativeSharedEyeRing::submit_eye_pair(")
+    signal_start = ring_cpp.find("bool NativeSharedEyeRing::signal_producer_fence(", eye_copy_start)
+    if eye_copy_start < 0 or signal_start <= eye_copy_start:
+        raise SystemExit("DX11 producer stereo GPU copy path not connected")
+    eye_copy_body = ring_cpp[eye_copy_start:signal_start]
+    for needle in [
+        "same_producer_context(context) == false",
+        "entry.state != SharedEyeSlotState::Acquired",
+        "!exact_source(left_source) || !exact_source(right_source)",
+        "source->GetDevice(owner.GetAddressOf())",
+        "context->CopyResource(entry.eye[0].Get(), left_source);",
+        "context->CopyResource(entry.eye[1].Get(), right_source);",
+        "return signal_producer_fence(context, slot, frame_id);",
+    ]:
+        if needle not in eye_copy_body:
+            raise SystemExit(f"DX11 R306 native producer missing: {needle}")
+    if not (eye_copy_body.index("!exact_source(left_source)") <
+            eye_copy_body.index("context->CopyResource(entry.eye[0]") <
+            eye_copy_body.index("context->CopyResource(entry.eye[1]") <
+            eye_copy_body.index("return signal_producer_fence(")):
+        raise SystemExit("DX11 R306 two eyes must validate before either GPU copy")
+    probe_source = (ROOT / "tools/dx11_native_transport_probe.cpp").read_text(
+        encoding="utf-8")
+    if "R306 left/right GPU pixel copy identity" not in probe_source:
+        raise SystemExit("DX11 R306 two-eye GPU pixel validation missing")
+
 
     # EVENT completion must not depend on an unrelated game Present or
     # test-side Flush: production submits immediately after End, while

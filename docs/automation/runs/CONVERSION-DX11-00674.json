@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00674",
+  "production_id": "CONVERSION-DX11-00674",
+  "event_id": "CONVERSION-DX11-00674-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:NATIVE_STEREO_EYE_COPY_AND_SHARED_GPU_FENCE",
+  "feature_id": "NATIVE_STEREO_EYE_OUTPUT_GAME_FRAME_TRANSPORT",
+  "base_head_sha": "9ca093e843d9a0e45b494233213d3ef005b24ebe",
+  "status": "PARTIAL_IMPLEMENTATION_AWAITING_LIVE_GAME_LINK_AND_EXACT_SHA_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Native D3D11 eye render textures are checked for identical size/format/device, then both copied into one lifetime-owned shared eye slot before producer GPU EVENT",
+      "Exact stereo handle publication becomes available only after GPU fence and is invalidated on exact host ACK",
+      "Future follow-up: connect the live game-authored menu/race native frame producer and host OpenXR projection consumer, not yet verified"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_shared_eye_ring.hpp",
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "tools/dx11_native_transport_probe.cpp",
+      "tools/verify_dx11_native_transport_contract.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Executable native D3D11 WARP separate red/blue source RTVs -> CopyResource shared eye pair -> EVENT/publish -> distinct GPU pixel readbacks",
+      "negative_regression": "Foreign producer context/texture, same-source eyes, mismatched dimensions, duplicate publication and stale ACK fail closed",
+      "component_integration": "Native shared-eye source copy is joined to existing producer fence and transport publication lifecycle; original D3D9 game Draw/input not intercepted"
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_STEREO_EYE_COPY_AND_SHARED_GPU_FENCE",
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "src/vr/d3d11/native_shared_eye_ring.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "D3D11_EYE_TEXTURE_SOURCE_ACCEPTED",
+      "SHARED_STEREO_RING_PUBLISH",
+      "LIVE_GAME_AND_OPENXR_CALLSITE_PENDING"
+    ],
+    "visible_frame_acceptance": "NEED_HMD_TEST; live game producer and OpenXR host projection consumer not connected by this change",
+    "activation_guard_and_fallback": "New producer copy API is opt-in and uncalled by production selector; original DX9Ex game Draw/Present/gamepad remain authoritative"
+  },
+  "feature_contract": {
+    "feature_id": "NATIVE_STEREO_EYE_OUTPUT_GAME_FRAME_TRANSPORT",
+    "goal": "Complete opt-in game native stereo eye submission from native scene source textures through shared per-eye GPU producer fence and identity-bound host consumption, without regressing original DX9Ex input/game frame",
+    "acceptance_items": [
+      {
+        "id": "eye-producer-pair",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d11_stereo_gpu_copy",
+        "expected_behavior": "Both distinct native eye GPU textures are validated and copied atomically before EVENT, preserving true RGBA pixels"
+      },
+      {
+        "id": "eye-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_game_fallback",
+        "expected_behavior": "Incompatible or foreign source never updates either shared eye or arms producer EVENT; game Draw and input preserved"
+      },
+      {
+        "id": "eye-transport-gate",
+        "category": "integrated_validation",
+        "behavior_area": "ipc_gpu_lifetime",
+        "expected_behavior": "Two-eye positive/negative WARP probe, exact ACK retirement and GitHub exact-SHA gates pass"
+      },
+      {
+        "id": "eye-live-host-output",
+        "category": "end_to_end_behavior",
+        "behavior_area": "openxr_gameplay_present",
+        "expected_behavior": "Live menu/car/race scene authors eye textures used by OpenXR projection with exact identity and input-safe fallback"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_shared_eye_ring.hpp",
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_native_transport_contract.py",
+    "docs/automation/runs/CONVERSION-DX11-00674.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "Disjoint unconnected native shared eye transport identified while 00673 stage1 and 00672 mesh work are owned",
+    "C2_IMPLEMENT": "TWO_EYE_GPU_COPY_FENCE_PUBLICATION_POSITIVE_NEGATIVE_PROBE_PARTIAL_FEATURE",
+    "C3_VALIDATE": "PENDING_EXACT_SHA_GITHUB_ACTIONS",
+    "C4_COMMIT": "MATERIAL_COMMIT_PREPARED",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA_AND_LIVE_GAME_OUTPUT"
+  },
+  "acceptance_results": {
+    "eye-producer-pair": "PENDING_GITHUB_TRANSPORT_WARP",
+    "eye-fallback": "PENDING_GITHUB_TRANSPORT_WARP",
+    "eye-transport-gate": "PENDING_EXACT_SHA",
+    "eye-live-host-output": "NEED_LIVE_GAME_LINK_AND_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null
+}
