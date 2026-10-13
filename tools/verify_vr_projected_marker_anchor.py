@@ -258,10 +258,60 @@ for body, label, producer in (
     if producer not in body:
         fail(f"{label} lost diagnostic producer token: {producer}")
 
-if "&RankMarkerProjectedInfo" not in rank13 or "&RankMarkerProjectedInfo" not in rank46:
-    fail("rank marker nodes do not carry recovered rank anchor")
+if "&projectedAnchor" not in rank13 or "&projectedAnchor" not in rank46:
+    fail("rank marker nodes do not carry snapshotted vehicle rank anchor")
 if "&projectedAnchor" not in rival or "RivalMarkerProjectedInfo = {};" not in rival:
     fail("rival marker must consume one exact recovered anchor and copy it to all sibling nodes")
+# Both immediate (pre-queue) and deferred SpriteNode draws for each exact
+# vehicle marker must use the *same* anchor. The old rival wrapper captured
+# its anchor after the original sprani CALL and tagged only new SpriteNodes,
+# allowing a synchronous Draw to inherit the previous queue semantic.
+def require_exact_marker_source_and_queue(body: str, label: str,
+                                          is_rival: bool = False) -> None:
+    frozen = body.find("const auto projectedAnchor =")
+    owner = body.find("ScopedExactProducerSemantic producerScope(")
+    direct = body.find("Game::sprani_play_ae_auth_alpha(") if label != "rank clip" else body.find("Game::put_clip_sprite(")
+    queued = body.find("TagAppendedNodes(")
+    if min(frozen, owner, direct, queued) < 0 or not (frozen < owner < direct < queued):
+        fail(label + " must snapshot anchor, scope direct original and tag queued siblings in order")
+    if "&RankMarkerProjectedInfo" in body or (
+        is_rival and "&RivalMarkerProjectedInfo" in body
+    ):
+        fail(label + " reuses mutable thread-local anchor after direct Draw")
+    if "projected ? &projectedAnchor : nullptr" not in body:
+        fail(label + " direct/queue scope lost exact per-vehicle projected anchor")
+    if is_rival:
+        consume = body.find("RivalMarkerProjectedInfo = {};")
+        if not (frozen < consume < owner):
+            fail("rival exact anchor must be consumed before invoking original sprani")
+        if "RenderScope::WorldBillboard" not in body or "TagAppendedNodes(before, scope," not in body:
+            fail("rival lost its established queued WorldBillboard fallback")
+
+
+for label, body in (
+    ("rank sprani", rank13),
+    ("rank clip", rank46),
+    ("rival sprani", rival),
+):
+    require_exact_marker_source_and_queue(body, label, label == "rival sprani")
+
+# Destructive, independently detected mutations (not repeated PASS audits).
+for label, body, old, new in (
+    ("rank sprani", rank13, "const auto projectedAnchor =", "const auto removedAnchor ="),
+    ("rank clip", rank46, "ScopedExactProducerSemantic producerScope(", "ScopedRenderSemantic producerScope("),
+    ("rival sprani", rival, "RivalMarkerProjectedInfo = {};", "/* consume lost */"),
+    ("rival sprani", rival, "TagAppendedNodes(before, scope,", "TagAppendedNodes(before, RenderScope::ScreenHud,"),
+):
+    mutant = body.replace(old, new, 1)
+    if mutant == body:
+        fail("projected marker negative test setup did not mutate " + label)
+    try:
+        require_exact_marker_source_and_queue(mutant, label, label == "rival sprani")
+    except SystemExit:
+        pass
+    else:
+        fail("projected marker direct/queue mutant escaped: " + label)
+
 # Original emoose/OutRun2006Tweaks 0xBB046 fractional correction is
 # retained for all finite inputs. This exact producer can otherwise forward
 # NaN/Inf through both 1st-3rd sprani and 4th+ clip-sprite sibling draws.

@@ -982,6 +982,10 @@ class UIScaling : public Hook
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
 
+		// Freeze this vehicle's exact Calc3D2D anchor before the original
+		// sprani call can nest another producer or mutate thread-local state.
+		// Both the synchronous draw and every queued sibling use this snapshot.
+		const auto projectedAnchor = RankMarkerProjectedInfo;
 		OutRunVR::GameSemantic::RenderScope scope{};
 		const OutRunVR::GameSemantic::ProjectedMarkerInfo* marker = nullptr;
 		if (RankMarkerSubScreenHudDepth != 0)
@@ -990,11 +994,11 @@ class UIScaling : public Hook
 		}
 		else
 		{
-			const bool projected = RankMarkerProjectedInfo.valid;
+			const bool projected = projectedAnchor.valid;
 			scope = projected
 				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
 				: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
-			marker = projected ? &RankMarkerProjectedInfo : nullptr;
+			marker = projected ? &projectedAnchor : nullptr;
 		}
 
         // Scope the actual original draw AFTER determining NaviPub vs
@@ -1033,8 +1037,11 @@ class UIScaling : public Hook
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			tailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
+		// Preserve the same per-car anchor through direct draw and post-call
+		// queue tagging, even if a nested producer updates the live TLS state.
+		const auto projectedAnchor = RankMarkerProjectedInfo;
 		const bool screenHud = RankMarkerSubScreenHudDepth != 0;
-		const bool projected = !screenHud && RankMarkerProjectedInfo.valid;
+		const bool projected = !screenHud && projectedAnchor.valid;
 		const auto scope = screenHud
 			? OutRunVR::GameSemantic::RenderScope::ScreenHud
 			: (projected
@@ -1043,7 +1050,7 @@ class UIScaling : public Hook
         int result = 0;
         {
             OutRunVR::GameSemantic::ScopedExactProducerSemantic producerScope(
-                scope, projected ? &RankMarkerProjectedInfo : nullptr);
+                scope, projected ? &projectedAnchor : nullptr);
             result = Game::put_clip_sprite(
                 xstnum, x, y, flags, priority, color);
         }
@@ -1076,7 +1083,7 @@ class UIScaling : public Hook
 		}
 		TagAppendedNodes(tailsBefore, scope,
 			OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite,
-			projected ? &RankMarkerProjectedInfo : nullptr);
+			projected ? &projectedAnchor : nullptr);
 		return result;
 	}
 
@@ -1132,21 +1139,26 @@ class UIScaling : public Hook
 			before[prio] = root ? root->tail_4 : nullptr;
 		}
 
-		const int result = Game::sprani_play_ae_auth_alpha(
-			spriteId, x, y, a4, a5, alpha);
-		// R71 HMD evidence binds this exact 0xBB796 producer to the
-		// vehicle-relative rival marker. Reuse its proven Calc3D2D anchor when
-		// available; fail softly to the current strict WorldBillboard route.
+		// The original exact 0xBB796 rival CALL may draw immediately before
+		// queueing animated siblings. Consume the preceding 0xBB6F5 anchor
+		// once and use it for BOTH source-time and queued draw ownership.
+		// Keep the game's original coordinates, alpha and sprite calls intact.
 		const auto projectedAnchor = RivalMarkerProjectedInfo;
-		// Only the first marker from the matching 0xBB6F5 Calc3D2D producer
-		// can consume this anchor. No subsequent vehicle or frame may inherit it.
 		RivalMarkerProjectedInfo = {};
 		const bool projected = projectedAnchor.valid;
-		TagAppendedNodes(
-			before,
-			projected
-				? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
-				: OutRunVR::GameSemantic::RenderScope::WorldBillboard,
+		const auto scope = projected
+			? OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D
+			: OutRunVR::GameSemantic::RenderScope::WorldBillboard;
+		int result = 0;
+		{
+			OutRunVR::GameSemantic::ScopedExactProducerSemantic producerScope(
+				scope, projected ? &projectedAnchor : nullptr);
+			result = Game::sprani_play_ae_auth_alpha(
+				spriteId, x, y, a4, a5, alpha);
+		}
+		// The prior HMD-accepted queued rival nodes retain exactly the same
+		// scope and anchor, with no widening to generic world/HUD sprites.
+		TagAppendedNodes(before, scope,
 			OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani,
 			projected ? &projectedAnchor : nullptr);
 		return result;

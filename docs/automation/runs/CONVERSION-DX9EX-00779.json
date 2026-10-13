@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00779",
+  "production_id": "CONVERSION-DX9EX-00779",
+  "event_id": "CONVERSION-DX9EX-00779-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+  "work_key": "DX9EX:VIS:RANK_MARKERS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "feature_status": "IN_PROGRESS_NEED_EXACT_SHA_GATE_AND_HMD",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00779]",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "score_delta": 0,
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_projected_marker_anchor.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00779.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+    "goal": "Keep projected vehicle rank (1st-3rd and 4th+ digit siblings) and exact rival car markers attached through immediate and queued draw submission, with one matching source-time Calc3D2D anchor per car and per-eye reprojection.",
+    "scope_boundary": "Only original vehicle rank 0xBAD20/0xBAEE2, exact rank 0xBB0FB..0xBB2D0 and rival 0xBB6F5/0xBB796; do not retag general HUD, non-rank sprites, accepted outer lens or SkyGlow.",
+    "trace_stages": [
+      "Original Calc3D2D preprojection exact rank and rival producers preserve matching source view-space anchor",
+      "Source-time rank/rival sprani or clip draws may precede sprite queue append, so snapshots and exact semantic scope must be coherent",
+      "Post-call tagged SpriteNode siblings and Sumo replay preserve projected anchor through c64/fixedfn or VS stereo draw",
+      "R30 projected marker per-eye delta is applied to game screen-space anchor; Quest3 attachment needs separate real-world evidence"
+    ],
+    "subcomponents": [
+      "Ordinal rank sprani and 4th+ clip siblings freeze per-vehicle original anchor across synchronous draw and queue tagging",
+      "Rival 0xBB796 exact producer consumes previous Calc3D2D payload once and scopes immediate Draw, retaining its accepted queued semantic",
+      "Negative and fallback regressions preserve NaviPub ScreenHud, invalid-anchor WorldBillboard fallback and no generic classification expansion"
+    ],
+    "acceptance_items": [
+      {
+        "id": "RANK_SOURCE_QUEUE_ANCHOR",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ordinal_rank_and_clip",
+        "expected_behavior": "Direct original rank sprani and 4th+ clip glyphs use the same snapshotted view anchor as all newly queued siblings"
+      },
+      {
+        "id": "RIVAL_DIRECT_QUEUE_OWNER",
+        "category": "end_to_end_behavior",
+        "behavior_area": "rival_source_and_queue",
+        "expected_behavior": "Exact rival direct draw and children use the same one-time Calc3D2D anchor, preserving existing car placement"
+      },
+      {
+        "id": "NO_STALE_HUD_OR_DESKTOP_REGRESSION",
+        "category": "fallback_regression",
+        "behavior_area": "desktop_and_scope_unwind",
+        "expected_behavior": "No generic HUD/world promotion, no stale TLS projected anchor, and unchanged game sprite arguments or verified original call sites"
+      },
+      {
+        "id": "RANK_EXACT_SHA_INTEGRATION",
+        "category": "integrated_validation",
+        "behavior_area": "win32_host_game_package",
+        "expected_behavior": "Exact-SHA DX9Ex Active full game and host compilation, package and Domain Isolation SUCCESS; Quest3 visual acceptance separate"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "RANK_SOURCE_QUEUE_ANCHOR": "SOURCE_IMPLEMENTED_CI_PENDING",
+    "RIVAL_DIRECT_QUEUE_OWNER": "SOURCE_IMPLEMENTED_CI_PENDING",
+    "NO_STALE_HUD_OR_DESKTOP_REGRESSION": "NEGATIVE_TEST_WRITTEN_CI_PENDING",
+    "RANK_EXACT_SHA_INTEGRATION": "PENDING",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "Known Quest3 visual regression VR-R51-VEHICLE-RANK-ANCHOR-001: ordinal car rank detached/head-locked; rival route previously seen attached and must be preserved.",
+    "bounded_cause": "One exact rival producer tagged nodes only after its original CALL and rank producer read mutable per-thread anchor after original returned; immediate and deferred siblings could disagree on owner.",
+    "alternatives_rejected": [
+      "Do not widen generic XYZRHW or ScreenOverlay2D to WorldBillboard or alter global camera disparity",
+      "Do not change original Calc3D2D view/stock projection math, rank sprite color/geometry, accepted rival queue mapping or unrelated HUD"
+    ],
+    "source_trace": [
+      "0xBAEE2 exact rank Calc3D2D and 0xBB6F5 exact rival Calc3D2D capture producer-local view anchor",
+      "Rank sprani/clip immediate Draw and 0xBB796 rival original CALL need the identical snapshot before queue append",
+      "TagAppendedNodes and Sumo queue replay forward same anchor to R30 R57BuildProjectedMarkerDelta and OpenXR eyes"
+    ],
+    "eye_ownership": "Exact projected marker scope only when matching recovered view anchor is valid; invalid anchor follows existing WorldBillboard fallback, with no generic sprite ownership expansion.",
+    "negative_test_evidence": "Four destructive source mutations for source snapshot, direct semantic scope, one-time rival anchor consume, queued fallback classification."
+  },
+  "validation_notes": "This C4 commit is material C++ and targeted regression work. Automated exact-SHA gate pending; no HMD evidence and no SCORE until whole feature acceptance and source/CI are verified."
+}
