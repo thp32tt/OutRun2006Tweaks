@@ -154,6 +154,9 @@ jobs:
         run: python tools/test_dx11_depth_equality_draw_00653.py
       - name: Verify live GREATER/GREATEREQUAL native depth Draw 00654
         run: python tools/test_dx11_depth_ordering_draw_00654.py
+      - name: Verify live D3D9 anisotropic sampler in native Draw 00655
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_native_anisotropic_sampler_00655.py
 
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'

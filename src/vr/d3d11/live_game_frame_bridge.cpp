@@ -756,6 +756,7 @@ struct TextureCapture {
     D3DTEXTUREFILTERTYPE minFilter = D3DTEXF_POINT;
     D3DTEXTUREFILTERTYPE magFilter = D3DTEXF_POINT;
     D3DTEXTUREFILTERTYPE mipFilter = D3DTEXF_NONE;
+    DWORD maxAnisotropy = 1u; // Captured live game D3D9 anisotropy.
     DWORD maxMipLevel = 0u;  // D3D9's most detailed permitted mip for MIN sampling.
     float mipLodBias = 0.0f; // Signed game-authored MIPMAPLODBIAS (IEEE-754).
 };
@@ -1856,7 +1857,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         DWORD coordIndex=~0u, transformFlags=~0u;
         DWORD addressU=0, addressV=0, mag=0, min=0, mip=0, srgb=1;
         DWORD borderColor = 0u;
-        DWORD maxMip=~0u, mipBias=~0u;
+        DWORD maxMip=~0u, mipBias=~0u, maxAniso=0u;
         if (FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG2, &arg2)) ||
             FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)) ||
             FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAARG1, &alphaArg1)) ||
@@ -1871,6 +1872,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             FAILED(game->GetSamplerState(0, D3DSAMP_MAXMIPLEVEL, &maxMip)) ||
             FAILED(game->GetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, &mipBias)) ||
             FAILED(game->GetSamplerState(0, D3DSAMP_SRGBTEXTURE, &srgb)))
+            return false;
+        // Capture the live D3D9 anisotropy only when the game uses it.
+        if (min == D3DTEXF_ANISOTROPIC &&
+            FAILED(game->GetSamplerState(0, D3DSAMP_MAXANISOTROPY, &maxAniso)))
             return false;
         // Sampled BORDER U or V needs game-authored ARGB rather than D3D11 zero.
         // Failure stays on original D3D9 Draw, with no native submission.
@@ -1894,6 +1899,11 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         const bool validMipBias = std::isfinite(decodedMipBias) &&
                                  decodedMipBias >= kMinMipLodBias &&
                                  decodedMipBias <= kMaxMipLodBias;
+        // Native aniso mirrors the narrow game MIN-aniso/MAG-linear/MIP-linear
+        // profile; all other combinations retain the original D3D9 Draw.
+        const bool anisotropic = min == D3DTEXF_ANISOTROPIC &&
+            mag == D3DTEXF_LINEAR && mip == D3DTEXF_LINEAR &&
+            maxAniso >= 2u && maxAniso <= D3D11_REQ_MAXANISOTROPY;
         // Fixed-function stage 0 CURRENT is the incoming vertex DIFFUSE.
         // With stage 1 disabled and RESULTARG=CURRENT (enforced above),
         // BLENDCURRENTALPHA is pixel-identical to the already supported
@@ -2376,7 +2386,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
              addressV != D3DTADDRESS_MIRROR && addressV != D3DTADDRESS_MIRRORONCE) &&
              addressV != D3DTADDRESS_BORDER) ||
             (mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR) ||
-            (min != D3DTEXF_POINT && min != D3DTEXF_LINEAR) ||
+            ((min != D3DTEXF_POINT && min != D3DTEXF_LINEAR) && !anisotropic) ||
             ((mip != D3DTEXF_NONE && mip != D3DTEXF_POINT) && mip != D3DTEXF_LINEAR) ||
             (mip == D3DTEXF_NONE && (maxMip != 0u || decodedMipBias != 0.0f)) || !validMipBias)
             return false;
@@ -2387,6 +2397,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         capture.addressV = static_cast<D3DTEXTUREADDRESS>(addressV);
         capture.borderColor = borderColor;
         capture.minFilter = static_cast<D3DTEXTUREFILTERTYPE>(min);
+        capture.maxAnisotropy = anisotropic ? maxAniso : 1u;
         capture.magFilter = static_cast<D3DTEXTUREFILTERTYPE>(mag);
         capture.selectTexture = selectTexture;
         capture.selectTextureDiffuseAlpha = selectTextureDiffuseAlpha;
@@ -2669,6 +2680,12 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     ComPtr<ID3D11ShaderResourceView>& view,
                     ComPtr<ID3D11SamplerState>& sampler) noexcept {
     if (!dev || !capture.enabled || !capture.texture) return false;
+    // Fail closed if captured game sampler parameters no longer fit this path.
+    if (capture.minFilter == D3DTEXF_ANISOTROPIC &&
+        (capture.magFilter != D3DTEXF_LINEAR ||
+         capture.mipFilter != D3DTEXF_LINEAR ||
+         capture.maxAnisotropy < 2u ||
+         capture.maxAnisotropy > D3D11_REQ_MAXANISOTROPY)) return false;
     const UINT sourceLevels = capture.texture->GetLevelCount();
     if (sourceLevels == 0 || sourceLevels > 11u) return false;
     D3DSURFACE_DESC base{};
@@ -2814,6 +2831,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                 D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR :
                 D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR);
     }
+    // Mirror the full mip chain and game-authored anisotropic MIN filter.
+    if (capture.minFilter == D3DTEXF_ANISOTROPIC)
+        state.Filter = D3D11_FILTER_ANISOTROPIC;
     // D3D9 game/menu UVs may reflect outside [0,1]. Preserve their
     // addressing semantics through the native pixel sampler; never silently
     // clamp an unknown D3D9 state, which would mislabel a diagnostic frame.
@@ -2846,7 +2866,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     state.MinLOD = usesMips ? static_cast<float>(capture.maxMipLevel) : 0.0f;
     state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;
     state.MipLODBias = usesMips ? capture.mipLodBias : 0.0f;
-    state.MaxAnisotropy = 1;
+    state.MaxAnisotropy = capture.minFilter == D3DTEXF_ANISOTROPIC ?
+        capture.maxAnisotropy : 1u;
     state.ComparisonFunc = D3D11_COMPARISON_NEVER;
     return SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));
 }
