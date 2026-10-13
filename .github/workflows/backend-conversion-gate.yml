@@ -194,6 +194,11 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_native_a8p8_00665.py
 
+      - name: Verify DX11 game stage1 factor/native Draw integration 00673
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_stage1_factor_00673.py
+
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh
