@@ -1,0 +1,78 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00764",
+  "production_id": "CONVERSION-DX9EX-00764",
+  "event_id": "CONVERSION-DX9EX-00764-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00764",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "7d9e98fbc212fb6f05d1d6245ab9dbd983c8409f",
+  "material_result_sha": "7d9e98fbc212fb6f05d1d6245ab9dbd983c8409f",
+  "validation_bearing_result_sha": "7d9e98fbc212fb6f05d1d6245ab9dbd983c8409f",
+  "result_sha": "7d9e98fbc212fb6f05d1d6245ab9dbd983c8409f",
+  "material_commits": [
+    "7d9e98fbc212fb6f05d1d6245ab9dbd983c8409f"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 P0-A: prevent exact producer-owned speed/time/rank peripheral HUD from jumping as clipped animation glyphs cross the game source viewport boundary; keep bilateral placement, screen-world separation, GOAL/+TIME and stereo unchanged.",
+    "completed_scope": "R30GetExactHudEdgeAnchor now returns the original no-anchor/no-boost fallback for any exact producer source-space bounding box extending outside the viewport, matching the downstream bilateral fit guard. Source transform remains stable until the complete glyph batch is visible in both eyes. Four source/eye aspect-size numerical regressions and destructive negative control added to tools/verify_vr_r30_responsive_hud_anchor.py. Source material SHA 7d9e98fbc212fb6f05d1d6245ab9dbd983c8409f.",
+    "remaining_acceptance": [
+      "Integrated Issue #119 HUD/main/ESC/F11 physical optics remain IN_PROGRESS; sub-feature build-verified only.",
+      "Quest3/VDXR exact-build optical review and p95/p99 gameplay performance confirmation remain NEED_HMD_TEST.",
+      "No physical HMD/OutRun gameplay run took place during this task."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "SOURCE_BBOX_FULLY_CONTAINED_GATE_FOUR_RESOLUTIONS_OFFSCREEN_TRANSITIONS_AND_DESTRUCTIVE_CONTROL",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "dx9ex_full_chain": "SUCCESS_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38373468762,
+      "head_sha": "7d9e98fbc212fb6f05d1d6245ab9dbd983c8409f",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "policy, host, full-chain-compile, game, package: 5/5 SUCCESS"
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38373468784,
+      "head_sha": "7d9e98fbc212fb6f05d1d6245ab9dbd983c8409f",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "domain-isolation: 1/1 SUCCESS"
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38373468819,
+      "head_sha": "7d9e98fbc212fb6f05d1d6245ab9dbd983c8409f",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "msvc-analyze-active-game, msvc-analyze-openxr-host, source-cross-domain: 3/3 SUCCESS"
+    }
+  ],
+  "score_delta": 0,
+  "score_reason": "Incremental Issue #119 P0-A source sub-feature; entire responsive HUD/main/ESC/F11 integration and Quest3 optical acceptance remain pending. No independent whole-feature achievement scored, no repeated C6/retry credit.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "Material/validation-bearing commit has no CI skip; this later bookkeeping commit uses [skip ci] separately after exact-SHA 3/3 workflows SUCCESS. VR PC Fast and VR Evening Unified Test Build skipped by policy and excluded. No HMD, DX11, DXVK, Localization or FFB writes."
+}
