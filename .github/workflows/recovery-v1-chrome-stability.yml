@@ -1,4 +1,4 @@
-name: Recovery v1 Chrome Stability
+name: Recovery v1 Chrome Stability / A source-folder
 
 on:
   push:
@@ -24,37 +24,40 @@ jobs:
           python -m py_compile tools/chat-controller/localization-recovery-v1/chrome_maintenance.py
           bash -n tools/chat-controller/localization-recovery-v1/entrypoint.sh
           bash -n tools/chat-controller/localization-recovery-v1/chrome-cache-clean.sh
-      - name: Four-worker, parity, error-tab and recycle regression
+      - name: Historical four-worker source and Chrome repair regression
         run: python tools/chat-controller/localization-recovery-v1/tests/test_recovery_maintenance.py
       - name: Prove Chrome cookies and session files survive cleaning
         run: bash tools/chat-controller/localization-recovery-v1/tests/test_chrome_cache_clean.sh
-      - name: Check original recovery Compose and exact deployment contract
+      - name: Check active A-only Compose and exact mount contract
         run: |
           docker compose -f tools/chat-controller/localization-recovery-v1/docker-compose.yml config --quiet
           python - <<'PY'
           from pathlib import Path
           x=Path('tools/chat-controller/localization-recovery-v1/docker-compose.yml').read_text()
-          assert 'CHAT_SLOTS: "4"' in x
-          assert 'SCHEDULE_MINUTES: "0,10,20,30,40,50"' in x
+          assert 'CHAT_SLOTS: "3"' in x
+          assert 'SCHEDULE_MINUTES: "0"' in x
+          assert 'OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""' in x
+          assert 'source: /home/chatgpt-runner2/work/image-src' in x
+          assert 'target: /data/imagegen' in x
           assert 'CHROME_RECYCLE_INTERVAL_MINUTES: "120"' in x
           assert 'CHAT_RECYCLE_RUNS: "5"' in x
-          assert 'AUTO_SEND: "${AUTO_SEND:-false}"' in x
+          assert 'AUTO_SEND: "true"' in x
           assert '6082:6080' in x and '8788:8787' in x
           assert 'outrun_chat_localization_recovery_data' in x
           assert 'outrun_chat_localization_recovery_logs' in x
           src=''.join(p.read_text() for p in sorted(Path('tools/chat-controller/localization-recovery-v1/src').glob('controller.py.part*')))
           assert 'next_production_id' not in src and 'task_events' not in src
-          print("PASS original v1 deployment contract, no v2 queue engines")
+          print("PASS active A-only image-src deployment and original v1 source contract")
           PY
-      - name: Build original recovery v1 image
+      - name: Build patched A-only recovery image
         run: docker build -t recovery-v1-chrome:test tools/chat-controller/localization-recovery-v1
-      - name: Container startup and four dedicated slots
+      - name: Container startup, A dispatch and retired C2
         shell: bash
         run: |
           set -euo pipefail
           docker run -d --name recovery-v1-smoke \
             -e AUTO_SEND=false -e REQUIRE_PROJECT_URL=false \
-            -e CHAT_SLOTS=4 \
+            -e CHAT_SLOTS=3 -e SCHEDULE_MINUTES=0 \
             recovery-v1-chrome:test
           trap 'docker logs recovery-v1-smoke; docker rm -f recovery-v1-smoke >/dev/null 2>&1 || true' EXIT
           ok=0
@@ -67,5 +70,5 @@ jobs:
           test "$ok" = 1
           grep -q 'Chat Controller' /tmp/recovery-status.html
           grep -q 'C1' /tmp/recovery-status.html
-          grep -q 'C2' /tmp/recovery-status.html
+          if grep -q 'C2' /tmp/recovery-status.html; then echo 'retired C2 tab unexpectedly active'; exit 1; fi
           docker exec recovery-v1-smoke curl -fsS http://127.0.0.1:9222/json/version
