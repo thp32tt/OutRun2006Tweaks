@@ -184,6 +184,13 @@ namespace OutRunVRStereo
             // coverage change. Draw scratch copies are reusable only for this
             // exact generation and byte range.
             std::uint64_t revision = 1;
+            // A single successful non-DISCARD write can refresh an existing
+            // per-thread snapshot without copying the untouched VB/IB bytes.
+            // Revisions prevent unsafe reuse after multiple writes or loss.
+            std::uint64_t lastWriteRevision = 0;
+            UINT lastWriteBegin = 0;
+            UINT lastWriteEnd = 0;
+            bool lastWriteSafe = false;
             void* lockPtr = nullptr;
             UINT lockOffset = 0;
             UINT lockSize = 0;
@@ -527,6 +534,11 @@ namespace OutRunVRStereo
                     R30MergeValidRange(entry->valid, entry->lockOffset,
                         entry->lockOffset + entry->lockSize);
                     ++entry->revision;
+                    entry->lastWriteRevision = entry->revision;
+                    entry->lastWriteBegin = entry->lockOffset;
+                    entry->lastWriteEnd = entry->lockOffset + entry->lockSize;
+                    entry->lastWriteSafe =
+                        (entry->lockFlags & D3DLOCK_DISCARD) == 0;
                     ++R30ShadowWrites;
                 }
                 catch (...)
@@ -546,6 +558,39 @@ namespace OutRunVRStereo
             entry->lockSize = 0;
             entry->lockFlags = 0;
             entry->writeLock = false;
+        }
+
+        // Entry mutex must be held. A cached full-range snapshot can absorb
+        // exactly ONE observed non-DISCARD write by copying only its overlap.
+        // Do not use this path across DISCARD, failed Unlock, partial coverage,
+        // a second write generation or a different buffer/span.
+        bool R30TryIncrementalShadowCopy(
+            const R30ShadowPtr& entry, UINT offset, UINT size,
+            std::vector<std::uint8_t>& out,
+            R30ShadowCopyCache& cache) noexcept
+        {
+            if (cache.entry != entry ||
+                cache.offset != offset || cache.size != size ||
+                out.size() != size ||
+                cache.revision >= entry->revision ||
+                entry->revision - cache.revision != 1u ||
+                entry->lastWriteRevision != entry->revision ||
+                !entry->lastWriteSafe ||
+                offset > entry->size || size > entry->size - offset ||
+                entry->bytes.size() != entry->size ||
+                !R30RangeValid(entry->valid, offset, offset + size))
+                return false;
+
+            const UINT begin = (std::max)(offset, entry->lastWriteBegin);
+            const UINT end =
+                (std::min)(offset + size, entry->lastWriteEnd);
+            if (begin < end)
+                std::memcpy(out.data() + (begin - offset),
+                    entry->bytes.data() + begin, end - begin);
+            // Even a disjoint buffer write changes its revision. Bump the
+            // copied snapshot revision so subsequent changes remain fenced.
+            cache.revision = entry->revision;
+            return true;
         }
 
         bool R30CopyVertexShadow(const R30ShadowPtr& entry,
@@ -570,6 +615,11 @@ namespace OutRunVRStereo
             if (cache.entry == entry &&
                 cache.offset == offset && cache.size == size &&
                 cache.revision == entry->revision && out.size() == size)
+            {
+                ++R30ShadowReadHits;
+                return true;
+            }
+            if (R30TryIncrementalShadowCopy(entry, offset, size, out, cache))
             {
                 ++R30ShadowReadHits;
                 return true;
@@ -631,6 +681,11 @@ namespace OutRunVRStereo
             if (cache.entry == entry &&
                 cache.offset == offset && cache.size == size &&
                 cache.revision == entry->revision && out.size() == size)
+            {
+                ++R30ShadowReadHits;
+                return true;
+            }
+            if (R30TryIncrementalShadowCopy(entry, offset, size, out, cache))
             {
                 ++R30ShadowReadHits;
                 return true;
