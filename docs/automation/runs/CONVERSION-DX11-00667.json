@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_RGB332_MIP_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "e323a02d26d9521d8ddedcce5ee78e1178b2d02e",
-  "status": "MATERIAL_COMMITTED_PENDING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -63,10 +63,10 @@
     "C0_RECOVER": "PASS head e323a02d26d9521d8ddedcce5ee78e1178b2d02e; 00666 C6 complete; new independent RGB332 work key",
     "C1_REVIEW": "PASS R3G3B2 and A8R3G3B2 unsupported by native mirror_texture; no palette dependence",
     "C2_IMPLEMENT": "PASS source format eligibility, mip conversion, BGRA8 SRV live native Draw, fail-closed sRGB",
-    "C3_VALIDATE": "local portable C++ ASan/UBSan RGB332 CPU probe PASS; exact GitHub CI pending",
-    "C4_COMMIT": "MATERIAL_COMMITTED_PENDING_CI",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 450a6e9cf7197d0c7852dd1c0a782fa556849dce; Backend Conversion Gate, DX11 Fast Structural Checks, Build, OpenXR VR architecture and HUD Inspector SUCCESS (VR PC Fast Test Build skipped)",
+    "C4_COMMIT": "PASS material committed; validation-bearing SHA 450a6e9cf7197d0c7852dd1c0a782fa556849dce; material_result_sha preserved from existing record",
     "C5_PACKAGE": "NOT_REQUIRED; Quest3 not tested",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "acceptance_results": {
     "cpu_probe": "LOCAL_ASAN_UBSAN_PASS",
@@ -77,7 +77,7 @@
     "quest3_vdxr": "UNTESTED"
   },
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "next_action": "Confirm exact-SHA mandatory GitHub Actions; repair any real CI failure with same TASK_ID. Later C6 bookkeeping commit only after confirmed results."
+  "validation_bearing_result_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+  "result_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+  "next_action": "C6 COMPLETE_BUILD_VERIFIED. No repeat build/CI or source modification for this TASK_ID; HMD/Quest3/VDXR/gamepad runtime UNTESTED."
 }
