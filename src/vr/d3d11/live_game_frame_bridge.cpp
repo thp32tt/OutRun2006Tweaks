@@ -87,6 +87,59 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
 constexpr UINT kWidth = 256;
 constexpr UINT kHeight = 144;
 
+// D3D9 menu/race fades can blend alpha independently of RGB. Only factors
+// and operations supported by D3D11 output merger are admitted, otherwise
+// the original D3D9 game draw and input remain authoritative.
+constexpr bool native_game_alpha_factor(DWORD f, D3D11_BLEND& out) noexcept {
+    switch (f) {
+    case D3DBLEND_ZERO: out = D3D11_BLEND_ZERO; return true;
+    case D3DBLEND_ONE: out = D3D11_BLEND_ONE; return true;
+    case D3DBLEND_SRCALPHA: out = D3D11_BLEND_SRC_ALPHA; return true;
+    case D3DBLEND_INVSRCALPHA: out = D3D11_BLEND_INV_SRC_ALPHA; return true;
+    case D3DBLEND_DESTALPHA: out = D3D11_BLEND_DEST_ALPHA; return true;
+    case D3DBLEND_INVDESTALPHA: out = D3D11_BLEND_INV_DEST_ALPHA; return true;
+    default: return false;
+    }
+}
+constexpr bool native_game_separate_alpha(
+    DWORD source, DWORD destination, DWORD equation,
+    D3D11_BLEND& src, D3D11_BLEND& dst, D3D11_BLEND_OP& op) noexcept {
+    D3D11_BLEND s{}, d{};
+    if (!native_game_alpha_factor(source, s) ||
+        !native_game_alpha_factor(destination, d)) return false;
+    D3D11_BLEND_OP operation{};
+    switch (equation) {
+    case D3DBLENDOP_ADD: operation = D3D11_BLEND_OP_ADD; break;
+    case D3DBLENDOP_SUBTRACT: operation = D3D11_BLEND_OP_SUBTRACT; break;
+    case D3DBLENDOP_REVSUBTRACT: operation = D3D11_BLEND_OP_REV_SUBTRACT; break;
+    default: return false;
+    }
+    src = s; dst = d; op = operation;
+    return true;
+}
+constexpr bool native_game_separate_alpha_contract() noexcept {
+    D3D11_BLEND src = D3D11_BLEND_ZERO, dst = D3D11_BLEND_ZERO;
+    D3D11_BLEND_OP op = D3D11_BLEND_OP_ADD;
+    if (!native_game_separate_alpha(D3DBLEND_ONE, D3DBLEND_INVSRCALPHA,
+            D3DBLENDOP_ADD, src, dst, op) ||
+        src != D3D11_BLEND_ONE || dst != D3D11_BLEND_INV_SRC_ALPHA ||
+        op != D3D11_BLEND_OP_ADD) return false;
+    if (!native_game_separate_alpha(D3DBLEND_SRCALPHA, D3DBLEND_DESTALPHA,
+            D3DBLENDOP_REVSUBTRACT, src, dst, op) ||
+        src != D3D11_BLEND_SRC_ALPHA || dst != D3D11_BLEND_DEST_ALPHA ||
+        op != D3D11_BLEND_OP_REV_SUBTRACT) return false;
+    const auto oldSrc = src, oldDst = dst, oldOp = op;
+    return !native_game_separate_alpha(D3DBLEND_SRCALPHASAT, D3DBLEND_ONE,
+                D3DBLENDOP_ADD, src, dst, op) &&
+           !native_game_separate_alpha(D3DBLEND_ONE, D3DBLEND_ONE,
+                D3DBLENDOP_MIN, src, dst, op) &&
+           !native_game_separate_alpha(D3DBLEND_BLENDFACTOR, D3DBLEND_ONE,
+                D3DBLENDOP_ADD, src, dst, op) &&
+           src == oldSrc && dst == oldDst && op == oldOp;
+}
+static_assert(native_game_separate_alpha_contract(),
+              "Live D3D9 independent alpha OM/fallback regression");
+
 // Map a live D3D9 source viewport onto the diagnostic backbuffer inset.
 // Using the complete game render-target dimensions (not viewport.Width alone)
 // preserves split/partial menu, vehicle-selection and race views during both
@@ -866,7 +919,11 @@ struct OutputCapture {
     bool reverseDestAlphaCrossfadeBlend = false; // INVDESTALPHA / DESTALPHA
     bool sourceAlphaSaturateCopyBlend = false; // SRCALPHASAT/ZERO
     bool sourceAlphaSaturateAddBlend = false; // SRCALPHASAT/ONE
-    D3D11_BLEND_OP blendOp = D3D11_BLEND_OP_ADD; // Captured D3D9 RGB and alpha operation.
+    D3D11_BLEND_OP blendOp = D3D11_BLEND_OP_ADD; // Captured D3D9 RGB operation.
+    bool separateAlphaBlend = false;
+    D3D11_BLEND nativeSrcAlpha = D3D11_BLEND_ONE;
+    D3D11_BLEND nativeDstAlpha = D3D11_BLEND_ZERO;
+    D3D11_BLEND_OP nativeAlphaOp = D3D11_BLEND_OP_ADD;
     bool alphaTest = false;
     bool nativeDepthTest = false;
     bool nativeDepthLessEqual = false;
@@ -1929,12 +1986,22 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         if (FAILED(game->GetRenderState(D3DRS_SRCBLEND, &src)) ||
             FAILED(game->GetRenderState(D3DRS_DESTBLEND, &dst)) ||
             FAILED(game->GetRenderState(D3DRS_BLENDOP, &blendOp)) ||
-            FAILED(game->GetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, &separate)) ||
-            separate)
+            FAILED(game->GetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, &separate)))
             return false;
-        // Do not enable separate-alpha blending: both native OM operations
-        // always apply to RGB and alpha, matching a single D3D9 BLENDOP.
-        if (blendOp != D3DBLENDOP_ADD || separate) {
+        // Capture the actual independent game alpha operation only when
+        // enabled. Never use RGB factors as a surrogate for a menu fade.
+        if (separate != FALSE) {
+            DWORD srcAlpha = 0u, dstAlpha = 0u, opAlpha = 0u;
+            if (FAILED(game->GetRenderState(D3DRS_SRCBLENDALPHA, &srcAlpha)) ||
+                FAILED(game->GetRenderState(D3DRS_DESTBLENDALPHA, &dstAlpha)) ||
+                FAILED(game->GetRenderState(D3DRS_BLENDOPALPHA, &opAlpha)) ||
+                !native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,
+                    output.nativeSrcAlpha, output.nativeDstAlpha,
+                    output.nativeAlphaOp))
+                return false;
+            output.separateAlphaBlend = true;
+        }
+        if (blendOp != D3DBLENDOP_ADD) {
             if (blendOp != D3DBLENDOP_SUBTRACT &&
                 blendOp != D3DBLENDOP_REVSUBTRACT) return false;
         }
@@ -3384,7 +3451,42 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     // Copy the validated alpha blend descriptor rather than approximating
     // its RGB/alpha factors in a second path.
     ComPtr<ID3D11BlendState>* maskedBlend = nullptr;
-    if (output.blendOp != D3D11_BLEND_OP_ADD) {
+    ComPtr<ID3D11BlendState> independentAlphaBlend;
+    if (output.separateAlphaBlend) {
+        // Clone the admitted RGB descriptor; bind exact game alpha factors,
+        // independent alpha equation and the original color-write mask on
+        // this real game Draw/DrawIndexed. Opt-in diagnostics are bounded to
+        // eight submissions per Present and never replace D3D9 rendering.
+        ID3D11BlendState* rgbBase =
+            output.additiveBlend ? s.additiveBlend.Get() :
+            output.sourceAlphaAddBlend ? s.sourceAlphaAddBlend.Get() :
+            output.premultipliedAlphaBlend ? s.premultipliedAlphaBlend.Get() :
+            output.inverseSourceAlphaBlend ? s.inverseSourceAlphaBlend.Get() :
+            output.sourceAlphaCopyBlend ? s.sourceAlphaCopyBlend.Get() :
+            output.inverseAlphaCopyBlend ? s.inverseAlphaCopyBlend.Get() :
+            output.inverseAlphaAddBlend ? s.inverseAlphaAddBlend.Get() :
+            output.sourceReplaceBlend ? s.sourceReplaceBlend.Get() :
+            output.multiplyBlend ? s.multiplyBlend.Get() :
+            output.inverseDestMultiplyBlend ? s.inverseDestMultiplyBlend.Get() :
+            output.inverseSourceMultiplyBlend ? s.inverseSourceMultiplyBlend.Get() :
+            output.destAlphaCrossfadeBlend ? s.destAlphaCrossfadeBlend.Get() :
+            output.reverseDestAlphaCrossfadeBlend ? s.reverseDestAlphaCrossfadeBlend.Get() :
+            output.sourceAlphaSaturateCopyBlend ? s.sourceAlphaSaturateCopyBlend.Get() :
+            output.sourceAlphaSaturateAddBlend ? s.sourceAlphaSaturateAddBlend.Get() :
+            s.alphaBlend.Get();
+        if (!rgbBase) return false;
+        D3D11_BLEND_DESC desc{};
+        rgbBase->GetDesc(&desc);
+        desc.RenderTarget[0].BlendOp = output.blendOp;
+        desc.RenderTarget[0].SrcBlendAlpha = output.nativeSrcAlpha;
+        desc.RenderTarget[0].DestBlendAlpha = output.nativeDstAlpha;
+        desc.RenderTarget[0].BlendOpAlpha = output.nativeAlphaOp;
+        desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+        if (FAILED(dev->CreateBlendState(&desc,
+                                        independentAlphaBlend.GetAddressOf())))
+            return false;
+        maskedBlend = &independentAlphaBlend;
+    } else if (output.blendOp != D3D11_BLEND_OP_ADD) {
         // The native game draw uses the original captured factor pair and
         // requested direction. Copy proven ADD factors; change BOTH RGB and
         // alpha operations and preserve D3D9 COLORWRITEENABLE per draw.
