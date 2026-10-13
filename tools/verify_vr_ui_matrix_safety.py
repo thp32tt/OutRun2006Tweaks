@@ -18,6 +18,9 @@ def require_safe(source: str) -> None:
         "std::isfinite(pTranslation->y)",
         "std::isfinite(xScale) && std::isfinite(yScale)",
         "std::isfinite(centeredX) && std::isfinite(centeredY)",
+        "std::isfinite(Game::screen_resolution->y)",
+        "std::isfinite(Game::original_resolution.y)",
+        "Game::original_resolution.y * scale) / 2",
     )
     for needle in required:
         if needle not in s:
@@ -39,6 +42,31 @@ def require_safe(source: str) -> None:
 
 
 require_safe(text)
+
+
+def require_portrait_center(code):
+    sprite = code.split("static void __cdecl draw_sprite_custom_matrix_mid(", 1)[1].split(
+        "// Adjust positions of sprites in 3d space", 1)[0]
+    for token in (
+        "!std::isfinite(Game::screen_resolution->y)",
+        "!std::isfinite(Game::original_resolution.y)",
+        "const float verticalCenter =",
+        "Game::original_resolution.y * scaleY) / 2",
+        "g_spriteVertexStream[1] = scaleY * topLeft.y + verticalCenter + 0.5;",
+        "g_spriteVertexStream[8] = scaleY * bottomLeft.y + verticalCenter + 0.5;",
+        "g_spriteVertexStream[0xF] = scaleY * topRight.y + verticalCenter + 0.5;",
+        "g_spriteVertexStream[0x16] = scaleY * bottomRight.y + verticalCenter + 0.5;",
+    ):
+        if token not in sprite:
+            raise AssertionError(token)
+
+
+require_portrait_center(text)
+for w, h, margin in ((2496, 2688, 408), (3440, 1440, 0),
+                     (1920, 1440, 0)):
+    s = min(w / 640, h / 480)
+    assert abs((h - 480 * s) / 2 - margin) < 1e-5
+
 mutants = (
     ("pScaling && pTranslation &&", "pScaling || pTranslation ||"),
     ("sx > 1.0e-6f && sy > 1.0e-6f", "sx >= 0.0f && sy >= 0.0f"),
@@ -55,4 +83,21 @@ for good, bad in mutants:
         pass
     else:
         raise AssertionError("Escaped regression: " + bad)
-print("DX9Ex UI matrix optional inputs and finite-scale: PASS (3 negative controls)")
+for old, bad in (
+    ("Game::original_resolution.y * scale) / 2",
+     "Game::original_resolution.y * scale) * 0"),
+    ("Game::original_resolution.y * scaleY) / 2",
+     "Game::original_resolution.y * scaleY) * 0"),
+    ("g_spriteVertexStream[8] = scaleY * bottomLeft.y + verticalCenter + 0.5;",
+     "g_spriteVertexStream[8] = scaleY * bottomLeft.y + 0.5;"),
+):
+    assert old in text
+    broken = text.replace(old, bad, 1)
+    try:
+        require_safe(broken)
+        require_portrait_center(broken)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("Portrait Y regression not detected")
+print("DX9Ex UI matrix and portrait containment PASS (6 negative controls)")

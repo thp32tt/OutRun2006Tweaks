@@ -212,7 +212,9 @@ class UIScaling : public Hook
 			    std::isfinite(pTranslation->x) &&
 			    std::isfinite(pTranslation->y) &&
 			    std::isfinite(Game::screen_resolution->x) &&
-			    std::isfinite(Game::original_resolution.x))
+                std::isfinite(Game::screen_resolution->y) &&
+                std::isfinite(Game::original_resolution.x) &&
+                std::isfinite(Game::original_resolution.y))
 			{
 				const float scale = min(sx, sy);
 				const float xScale = (pScaling->x / sx) * scale;
@@ -221,7 +223,9 @@ class UIScaling : public Hook
 				    (pTranslation->x / sx) * scale +
 				    (Game::screen_resolution->x -
 				     Game::original_resolution.x * scale) / 2;
-				const float centeredY = (pTranslation->y / sy) * scale;
+				const float centeredY = (pTranslation->y / sy) * scale +
+                    (Game::screen_resolution->y -
+                     Game::original_resolution.y * scale) / 2;
 				// Complete the finite check before mutating any in/out argument.
 				if (std::isfinite(xScale) && std::isfinite(yScale) &&
 				    std::isfinite(centeredX) && std::isfinite(centeredY))
@@ -262,7 +266,9 @@ class UIScaling : public Hook
 			 mode == ScalingMode::OnlineArcade) &&
 			(!Game::screen_resolution ||
 			 !std::isfinite(Game::screen_resolution->x) ||
-			 !std::isfinite(Game::original_resolution.x)))
+             !std::isfinite(Game::screen_resolution->y) ||
+             !std::isfinite(Game::original_resolution.x) ||
+             !std::isfinite(Game::original_resolution.y)))
 			return;
 
 		D3DSURFACE_DESC v25{};
@@ -289,6 +295,15 @@ class UIScaling : public Hook
 		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
 			scaleY = min(screenScaleX, screenScaleY);
 
+        // The 4:3 UI must be vertically contained on a portrait XR target.
+        // 2496x2688 / 640x480 gives a symmetric 408 px Y letterbox.
+        const float verticalCenter =
+            (mode == ScalingMode::KeepCentered ||
+             mode == ScalingMode::OnlineArcade)
+            ? (Game::screen_resolution->y -
+               Game::original_resolution.y * scaleY) / 2
+            : 0.0f;
+
 		// TopLeft
 		vec.x = a1->TopLeft_54.x;
 		vec.y = a1->TopLeft_54.y;
@@ -296,7 +311,7 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&topLeft, &vec, &pM);
 
-		g_spriteVertexStream[1] = scaleY * topLeft.y + 0.5;
+		g_spriteVertexStream[1] = scaleY * topLeft.y + verticalCenter + 0.5;
 		g_spriteVertexStream[2] = topLeft.z;
 		g_spriteVertexStream[3] = 1.0;
 		g_spriteVertexStream[4] = a1->color_4;
@@ -310,7 +325,7 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&bottomLeft, &vec, &pM);
 
-		g_spriteVertexStream[8] = scaleY * bottomLeft.y + 0.5;
+		g_spriteVertexStream[8] = scaleY * bottomLeft.y + verticalCenter + 0.5;
 		g_spriteVertexStream[9] = bottomLeft.z;
 		g_spriteVertexStream[0xA] = 1.0;
 		g_spriteVertexStream[0xB] = a1->color_4;
@@ -324,7 +339,7 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&topRight, &vec, &pM);
 
-		g_spriteVertexStream[0xF] = scaleY * topRight.y + 0.5;
+		g_spriteVertexStream[0xF] = scaleY * topRight.y + verticalCenter + 0.5;
 		g_spriteVertexStream[0x10] = topRight.z;
 		g_spriteVertexStream[0x11] = 1.0;
 		g_spriteVertexStream[0x12] = a1->color_4;
@@ -338,7 +353,7 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&bottomRight, &vec, &pM);
 
-		g_spriteVertexStream[0x16] = scaleY * bottomRight.y + 0.5;
+		g_spriteVertexStream[0x16] = scaleY * bottomRight.y + verticalCenter + 0.5;
 		g_spriteVertexStream[0x17] = bottomRight.z;
 		g_spriteVertexStream[0x18] = 1.0;
 		g_spriteVertexStream[0x19] = a1->color_4;
