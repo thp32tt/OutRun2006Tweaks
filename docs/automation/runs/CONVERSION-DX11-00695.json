@@ -43,9 +43,13 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "GAME_AUTHORED_DRAW_SNAPSHOT",
+      "D3D11_NATIVE_DRAW",
       "LOCAL_STEREO_GAME_RENDER_TARGET",
       "DX11_MULTISAMPLE_RESOLVE",
       "SHARED_EYE_RING",
+      "VISIBLE_FRAME_OUTPUT",
       "HOST_OPENXR_FENCE_ACK"
     ],
     "visible_frame_acceptance": "Build-integrated producer capability only; no Quest3/VDXR runtime frame nor gamepad verification",
@@ -95,7 +99,7 @@
     "C0_RECOVER": "PASS GitHub HEAD AGENTS.md DX11 policy and 00694 source ownership reviewed",
     "C1_REVIEW": "PASS stereo single-sample-only eye transfer gap located in NativeSharedEyeRing submit_eye_pair; independent of active texture source",
     "C2_IMPLEMENT": "PASS paired MSAA Resolve/copy dispatch and portable regression integration",
-    "C3_VALIDATE": "PENDING full exact SHA CI; portable probe on workflow",
+    "C3_VALIDATE": "Initial Fast Gate policy failure due to missing upstream D3D9/native Draw/visible-frame graph identifiers; corrected policy record. New SHA Gate pending.",
     "C4_COMMIT": "PENDING material commit",
     "C5_PACKAGE": "NOT_REQUIRED; native eye output Quest3/VDXR UNTESTED",
     "C6_STATE": "PENDING exact-SHA GitHub Actions; bookkeeping separate after verification"

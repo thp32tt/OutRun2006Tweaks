@@ -24,7 +24,8 @@ enum class NativeGameEyeTransfer : std::uint8_t { Reject, Copy, Resolve };
     std::uint32_t leftSamples, std::uint32_t leftQuality,
     std::uint32_t rightSamples, std::uint32_t rightQuality,
     bool formatSupportsResolve) noexcept {
-    if (leftSamples == 0u || leftSamples != rightSamples ||
+    if (leftSamples == 0u || leftSamples > 32u ||
+        leftSamples != rightSamples ||
         leftQuality != rightQuality)
         return NativeGameEyeTransfer::Reject;
     if (leftSamples == 1u)

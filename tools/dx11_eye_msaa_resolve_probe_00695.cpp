@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <cstdio>
+#include <initializer_list>
 using outrun::vr::dx11::NativeGameEyeTransfer;
 using outrun::vr::dx11::native_game_eye_transfer;
 constexpr bool accepts() {
@@ -13,6 +14,7 @@ constexpr bool accepts() {
            native_game_eye_transfer(4,3,4,3,true)==T::Resolve &&
            native_game_eye_transfer(8,0,8,0,true)==T::Resolve &&
            native_game_eye_transfer(0,0,0,0,true)==T::Reject &&
+           native_game_eye_transfer(33,0,33,0,true)==T::Reject &&
            native_game_eye_transfer(1,0,4,0,true)==T::Reject &&
            native_game_eye_transfer(4,0,4,1,true)==T::Reject &&
            native_game_eye_transfer(4,0,4,0,false)==T::Reject &&

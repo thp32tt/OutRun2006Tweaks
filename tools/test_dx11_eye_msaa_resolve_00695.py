@@ -34,11 +34,12 @@ def connected(s,h):
         "return signal_producer_fence(context, slot, frame_id);",
     ]
     hchecks=[
-        "leftSamples == 0u || leftSamples != rightSamples",
+        "leftSamples == 0u || leftSamples > 32u",
+        "leftSamples != rightSamples",
         "leftQuality != rightQuality",
         "leftSamples == 1u",
         "leftQuality == 0u",
-        "formatSupportsResolve",
+        "return formatSupportsResolve",
     ]
     return all(x in fn for x in checks) and all(x in h for x in hchecks) and (
         fn.index("native_game_eye_transfer(") <
@@ -66,10 +67,11 @@ for key in [
     assert key in source and not connected(source.replace(key,"/* removed */",1),header),key
     changes+=1
 for key in [
-    "leftSamples == 0u || leftSamples != rightSamples",
+    "leftSamples == 0u || leftSamples > 32u",
+        "leftSamples != rightSamples",
     "leftQuality != rightQuality",
     "leftQuality == 0u",
-    "formatSupportsResolve",
+    "return formatSupportsResolve",
 ]:
     assert key in header and not connected(source,header.replace(key,"/* removed */",1)),key
     changes+=1
