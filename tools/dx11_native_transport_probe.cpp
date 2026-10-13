@@ -90,7 +90,8 @@ namespace
         std::uint32_t slot,
         std::uint64_t frameId)
     {
-        context->Flush();
+        // Production signal_producer_fence must submit its own EVENT.
+        // This helper intentionally does NOT call Flush before polling.
         for (int attempt = 0; attempt < 2000; ++attempt)
         {
             if (ring.publish_if_fence_complete(context, slot, frameId))

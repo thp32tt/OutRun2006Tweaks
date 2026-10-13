@@ -214,6 +214,28 @@ def main() -> None:
     if ring_cpp.count("!same_producer_context(context)") != 4:
         raise SystemExit("DX11 native ring must check all four context-bearing paths")
 
+    # EVENT completion must not depend on an unrelated game Present or
+    # test-side Flush: production submits immediately after End, while
+    # consumer polling remains DONOTFLUSH and non-blocking.
+    signal_start = ring_cpp.find("bool NativeSharedEyeRing::signal_producer_fence(")
+    publish_start = ring_cpp.find("bool NativeSharedEyeRing::publish_if_fence_complete(", signal_start)
+    if signal_start < 0 or publish_start <= signal_start:
+        raise SystemExit("DX11 producer EVENT submission boundary missing")
+    signal_body = ring_cpp[signal_start:publish_start]
+    end_pos = signal_body.find("context->End(entry.producer_fence.Get());")
+    flush_pos = signal_body.find("context->Flush();")
+    pending_pos = signal_body.find("entry.state = SharedEyeSlotState::ProducerPending;")
+    if not (0 <= end_pos < flush_pos < pending_pos) or signal_body.count("context->Flush();") != 1:
+        raise SystemExit("DX11 producer must flush EVENT before entering ProducerPending")
+    if "D3D11_ASYNC_GETDATA_DONOTFLUSH" not in publish_body:
+        raise SystemExit("DX11 producer fence polling must remain nonblocking")
+    probe_start = probe_cpp.find("void publish_bounded(")
+    probe_end = probe_cpp.find("int main()", probe_start)
+    if probe_start < 0 or probe_end <= probe_start or (
+        "context->Flush();" in probe_cpp[probe_start:probe_end]
+    ):
+        raise SystemExit("DX11 WARP probe must not hide a missing producer Flush")
+
     # R178: the acquired slot must remain quarantined after invalidation.
     # This path does not query a GPU fence, so an invalidated generation
     # cannot safely cancel and reuse it.

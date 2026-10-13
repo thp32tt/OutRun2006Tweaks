@@ -322,6 +322,11 @@ namespace outrun::vr::dx11
         // End is recorded immediately after both eye writes/copies. No blocking
         // wait is introduced on the game thread; completion is polled later.
         context->End(entry.producer_fence.Get());
+        // GetData below deliberately uses DONOTFLUSH; submit the EVENT and
+        // both preceding eye writes here so a caller can poll asynchronously
+        // without an unrelated Present or an external Flush dependency.
+        // Flush submits commands to the GPU, it does not wait for completion.
+        context->Flush();
         entry.state = SharedEyeSlotState::ProducerPending;
         return true;
     }
