@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_FRAGMENTED_VB_SHADOW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "52ffc42a2b7c98e9431c8665ea62f844d5930f9f",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -60,17 +60,49 @@
     "C0_RECOVER": "PASS",
     "C1_REVIEW": "PASS: dense CPU VB shadow may contain holes despite all referenced indexed slots valid",
     "C2_IMPLEMENT": "PASS: R30 and R26-safe native DrawIndexed sparse retry after failed contiguous snapshot",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING",
+    "C3_VALIDATE": "PASS_EXACT_SHA",
+    "C4_COMMIT": "PASS_MATERIAL_COMMIT",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Wait for exact-SHA GitHub mandatory validation before COMPLETE_BUILD_VERIFIED; Quest3/VDXR HMD and gamepad not tested.",
-  "material_result_sha": null,
-  "result_sha": null,
-  "validation_bearing_result_sha": null,
-  "validation_evidence": {}
+  "next_action": "Actual Quest3/VDXR game menu→vehicle selection→race visual and gamepad runtime verification still UNTESTED; no native backend promotion. Continue independent DX11 native feature, DXVK frozen.",
+  "material_result_sha": "6554071d98002b32eb6cb104ec519b6ee9202e8a",
+  "result_sha": "6554071d98002b32eb6cb104ec519b6ee9202e8a",
+  "validation_bearing_result_sha": "6554071d98002b32eb6cb104ec519b6ee9202e8a",
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38333960373,
+      "conclusion": "success",
+      "result_sha": "6554071d98002b32eb6cb104ec519b6ee9202e8a",
+      "jobs": "validate + readiness-smoke SUCCESS"
+    },
+    "dx11_fast_structural": {
+      "id": 38333960390,
+      "conclusion": "success",
+      "result_sha": "6554071d98002b32eb6cb104ec519b6ee9202e8a"
+    },
+    "windows_build": {
+      "id": 38333964510,
+      "conclusion": "success",
+      "result_sha": "6554071d98002b32eb6cb104ec519b6ee9202e8a"
+    },
+    "openxr_architecture_push": {
+      "id": 38333960392,
+      "conclusion": "success",
+      "result_sha": "6554071d98002b32eb6cb104ec519b6ee9202e8a"
+    },
+    "openxr_architecture_pr": {
+      "id": 38333964501,
+      "conclusion": "success",
+      "result_sha": "6554071d98002b32eb6cb104ec519b6ee9202e8a"
+    },
+    "optional_hud_inspector": {
+      "id": 38333964449,
+      "conclusion": "in_progress_when_C6_recorded",
+      "result_sha": "6554071d98002b32eb6cb104ec519b6ee9202e8a"
+    }
+  }
 }
