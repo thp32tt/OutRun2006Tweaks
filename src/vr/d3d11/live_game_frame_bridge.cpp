@@ -13,6 +13,7 @@
 #include "live_game_rgb24_texture.hpp"
 #include "live_game_rgba_texture.hpp"
 #include "live_game_render_target_readback.hpp"
+#include "live_game_float_vector_texture.hpp"
 #include "live_game_10bit_texture.hpp"
 #include "live_game_extended_luminance_texture.hpp"
 #include "live_game_rg16_texture.hpp"
@@ -3099,6 +3100,18 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // Preserve real game float component payloads without BGRA8 quantization.
     const bool floatRgba = base.Format == D3DFMT_A16B16G16R16F ||
                            base.Format == D3DFMT_A32B32G32R32F;
+    // Actual game R/RG floating-point texture mip data has no BGRA8
+    // representation: preserve the native scalar/vector IEEE754 channels
+    // through the same immutable SRV used by Draw and DrawIndexed.
+    const bool floatVector = base.Format == D3DFMT_R16F ||
+                             base.Format == D3DFMT_G16R16F ||
+                             base.Format == D3DFMT_R32F ||
+                             base.Format == D3DFMT_G32R32F;
+    const auto floatVectorLayout =
+        base.Format == D3DFMT_R16F ? float_vector_texture::Layout::r16f :
+        base.Format == D3DFMT_G16R16F ? float_vector_texture::Layout::rg16f :
+        base.Format == D3DFMT_R32F ? float_vector_texture::Layout::r32f :
+                                     float_vector_texture::Layout::rg32f;
     const auto floatLayout = base.Format == D3DFMT_A32B32G32R32F ?
         float_rgba_texture::Layout::rgba32f : float_rgba_texture::Layout::rgba16f;
     // Some legacy menu/text atlases encode palette index and per-texel alpha.
@@ -3128,6 +3141,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     if (capture.srgbTexture && rgba16) return false;
     // FLOAT SRVs lack sRGB views. Unverified D3D9 modes stay with DX9Ex.
     if (capture.srgbTexture && floatRgba) return false;
+    // FLOAT source textures have no DXGI sRGB view. Never reinterpret a
+    // game-authored sRGB request as linear in the diagnostic output.
+    if (capture.srgbTexture && floatVector) return false;
     // Palettized sRGB lookup/transfer parity is not proven on D3D9.
     if (capture.srgbTexture && a8p8) return false;
     if (capture.srgbTexture && p8) return false;
@@ -3147,6 +3163,13 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance || rgb24 || rgbaSwizzle || tenBit || extendedLuma) {
         nativeFormat = capture.srgbTexture ?
             DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : DXGI_FORMAT_B8G8R8A8_UNORM;
+    } else if (floatVector) {
+        // D3D9 R16F/G16R16F/R32F/G32R32F LockRect rows match the
+        // little-endian DXGI R/RG FLOAT component ordering and precision.
+        nativeFormat = base.Format == D3DFMT_R16F ? DXGI_FORMAT_R16_FLOAT :
+            base.Format == D3DFMT_G16R16F ? DXGI_FORMAT_R16G16_FLOAT :
+            base.Format == D3DFMT_R32F ? DXGI_FORMAT_R32_FLOAT :
+                                         DXGI_FORMAT_R32G32_FLOAT;
     } else if (rgba16) {
         // Preserve all game R/G/B/A 16-bit channels in a native UNORM SRV.
         nativeFormat = DXGI_FORMAT_R16G16B16A16_UNORM;
@@ -3228,6 +3251,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         extended_luminance_texture::Layout::alpha4_luminance4;
     const UINT sourceTexelBytes = packed16 ? 2u :
         floatRgba ? float_rgba_texture::source_bytes_per_texel(floatLayout) :
+        floatVector ? float_vector_texture::source_bytes_per_texel(floatVectorLayout) :
         rgba16 ? rgba16_texture::source_bytes_per_texel() :
         luminance ? luminance_texture::source_bytes_per_texel(luminanceLayout) :
         extendedLuma ? extended_luminance_texture::source_bytes_per_texel(extendedLumaLayout) :
@@ -3303,6 +3327,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     rgba16_texture::copy_row(source, destination, desc.Width);
                 else if (floatRgba)
                     float_rgba_texture::copy_row(source, destination, desc.Width, floatLayout);
+                else if (floatVector)
+                    float_vector_texture::copy_row(source, destination, desc.Width, floatVectorLayout);
                 else if (rgb332)
                     rgb332_texture::unpack_row(source, destination, desc.Width, rgb332Layout);
                 else if (p8)
