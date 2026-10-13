@@ -1406,15 +1406,17 @@ require('RankMarkerSubSemanticDest', ui, 'sub_4BAD20 caller semantic wrapper')
 rank_sprani = function_body(ui, 'static int __cdecl RankMarker_sprani(')
 require_order(
     rank_sprani, 'screen-owned sub_4BAD20 must outrank projected/world marker tagging',
+    'const auto projectedAnchor = RankMarkerProjectedInfo;',
     'if (RankMarkerSubScreenHudDepth != 0)',
     'RenderScope::ScreenHud',
-    'const bool projected = RankMarkerProjectedInfo.valid'
+    'const bool projected = projectedAnchor.valid'
 )
 rank_clip = function_body(ui, 'static int __cdecl RankMarker_putClipSprite(')
 require_order(
     rank_clip, 'screen-owned 4th+ rank digits must outrank projected/world tagging',
+    'const auto projectedAnchor = RankMarkerProjectedInfo;',
     'const bool screenHud = RankMarkerSubScreenHudDepth != 0;',
-    'const bool projected = !screenHud && RankMarkerProjectedInfo.valid;',
+    'const bool projected = !screenHud && projectedAnchor.valid;',
     'RenderScope::ScreenHud',
     'RenderScope::ProjectedWorldMarker2D',
     'RenderScope::WorldBillboard',
@@ -2036,8 +2038,10 @@ def verify_rank_producer_time_scopes(source):
                 'rank semantic while game producer actually executes')
         require('RankMarkerSubScreenHudDepth != 0', body,
                 'NaviPub ScreenHud must not become a vehicle billboard')
-        require('RankMarkerProjectedInfo.valid', body,
-                'real Calc3D2D anchor remains necessary')
+        require('const auto projectedAnchor = RankMarkerProjectedInfo;', body,
+                'per-car Calc3D2D anchor snapshot remains necessary')
+        require('projectedAnchor.valid', body,
+                'rank source-time projection needs a valid frozen Calc3D2D anchor')
         require('TagAppendedNodes(', body,
                 'delayed queue sprites still individually tagged')
 verify_rank_producer_time_scopes(ui)
