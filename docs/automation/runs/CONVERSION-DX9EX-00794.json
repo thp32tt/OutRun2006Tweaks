@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00794",
+  "production_id": "CONVERSION-DX9EX-00794",
+  "event_id": "CONVERSION-DX9EX-00794-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R23_RT0_RASTER_FASTPATH",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R23_RT0_RASTER_FASTPATH",
+  "status": "IMPLEMENTED_WAITING_CI",
+  "checkpoint": "C4_MATERIAL",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00794]",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "tools/verify_vr_r23_raster_setrt_fastpath.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00794.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R23_RT0_RASTER_FASTPATH",
+    "goal": "Complete the RT0 raster-state read-path improvement with one fewer trusted synchronous D3D9 getter while preserving SetRenderTarget implicit viewport/scissor changes, full live fallback, and fail-closed Reset recovery.",
+    "scope_boundary": "Only R23 game-side RT0 raster state read and its regression gate; no changes to R22 tracked setters, game HUD, F11, ESC, main menu, SkyGlow, stereo resource ownership, FFB, DX11 or DXVK.",
+    "special_work_evidence": "At authenticated source HEAD, R23 forced GetViewport/GetScissorRect/GetRenderState on every RT0 setter; R22 already tracks scissor-enable under reliable StateBlock Apply and SetRenderTarget cannot change that render state. New fast path performs two live getters rather than three for trusted RT0. CPU source call-count improvement only; Quest3 p95/p99 and FPS unmeasured.",
+    "trace_stages": [
+      "Game SetRenderTarget RT0 intrinsically resets viewport and can affect scissor rect, so both geometries must be sampled.",
+      "R22 StateBlock Apply/setter shadow fences scissor-enable validity while R23 resynchronizes actual viewport and scissor from device.",
+      "R23 baseline recovery and R29/R33 stereo replay use shadow to restore actual game geometry before OpenXR host eye composition."
+    ],
+    "subcomponents": [
+      "Trust scissor-enable only when R22 snapshot and StateBlock tracking are both valid, while always sampling two device geometry getters on RT0 switches.",
+      "Retain original three-getter full capture when Apply/Reset trust is lost; enforce failed-read fail-closed without stale geometry.",
+      "Add registered source regression checker with six destructive mutations, 16 state combinations and per-mode fallback call counts."
+    ],
+    "acceptance_items": [
+      {
+        "id": "TRUSTED_RT0_GEOMETRY_LIVE",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_render_target_cpu_driver_calls",
+        "expected_behavior": "Trusted RT0 switches update live viewport/scissor and only inherit reliable scissor-enable, eliminating one device getter without impairing game raster state."
+      },
+      {
+        "id": "UNTRUSTED_RESET_FAILCLOSED",
+        "category": "fallback_regression",
+        "behavior_area": "r22_stateblock_recovery_and_stereo_integrity",
+        "expected_behavior": "Loss of StateBlock reliability or shadow validity uses the previous full three-query capture; failed live geometry reads retain the existing fail-closed stereo recovery."
+      },
+      {
+        "id": "R23_EXACT_SHA_GATE",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_x64_host_domain_package",
+        "expected_behavior": "Registered deterministic mutation checker and exactly matching DX9Ex Active five jobs, Domain Isolation and Full Source Impact if triggered; hardware optics/FPS remain UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "TRUSTED_RT0_GEOMETRY_LIVE": "PENDING_GATE",
+    "UNTRUSTED_RESET_FAILCLOSED": "PENDING_GATE",
+    "R23_EXACT_SHA_GATE": "PENDING_GATE",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "R23CaptureActualGameState force=true SetRenderTarget invokes R22CaptureGameScissor to retrieve all three raster values even when R22 shadow tracks enable reliably.",
+    "root_cause": "RenderTarget transitions may implicitly change viewport/scissor geometry but do not change D3DRS_SCISSORTESTENABLE; catch-all forced live state collection redundantly re-reads this trusted bit.",
+    "source_trace": [
+      "OutRun game SetRenderTarget updates RT0, then R23 SetRenderTarget hook samples actual state.",
+      "R22 setter and StateBlock generation determine trusted enable; R23 reads changed viewport/scissor and re-publishes corrected shadow.",
+      "Downstream R23 clear/mono recovery and R29/R33 eye draws consume the actual game raster shadow."
+    ],
+    "alternatives_rejected": [
+      "Caching viewport on RT switches would lose implicit viewport reset and crop game geometry.",
+      "Skipping live scissor geometry is unsafe, even when scissor test is currently disabled.",
+      "Reusing enable after unreliable Apply or Reset is unsafe; full conservative capture remains the fallback."
+    ],
+    "fix_evidence": "C++ R23 material changes capture live viewport/scissor but inherit scissor enable only under reliable tracked shadow and preserve failure/epoch logic.",
+    "negative_test_evidence": "Six destructive source mutations guard shadow validity, both geometry getters, full fallback and error handling; positive model enumerates reliability, validity, enable state and simulated read failures."
+  },
+  "runtime_status": "NEED_QUEST3_VDXR_SCENE_MATCHED_PERFORMANCE_TEST"
+}

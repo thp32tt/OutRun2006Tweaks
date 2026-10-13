@@ -91,7 +91,27 @@ namespace OutRunVRStereo
             }
 
             OutRunVR::State::D3D9RasterSnapshot actual{};
-            if (!CaptureTrackedRasterState(device, actual))
+            // RT0 switches can implicitly reset viewport/scissor geometry,
+            // but cannot modify D3DRS_SCISSORTESTENABLE. A reliable R22
+            // StateBlock/setter shadow owns that single unchanged state bit.
+            // Live-sample both coordinates; retain full live capture on any
+            // invalid shadow, unreliable Apply, or Reset transition.
+            const bool trustedRtScissorEnable =
+                force && site && std::strcmp(site, "SetRenderTarget") == 0 &&
+                shadow.Valid() && IsTrackedStateBlockReliable();
+            bool captured = false;
+            if (trustedRtScissorEnable)
+            {
+                actual = shadow;
+                captured =
+                    SUCCEEDED(device->GetViewport(&actual.viewport)) &&
+                    SUCCEEDED(device->GetScissorRect(&actual.rect));
+            }
+            else
+            {
+                captured = CaptureTrackedRasterState(device, actual);
+            }
+            if (!captured)
             {
                 ++R23StateCaptureFailures;
                 return false;

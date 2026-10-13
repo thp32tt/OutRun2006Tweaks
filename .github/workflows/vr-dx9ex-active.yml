@@ -75,6 +75,7 @@ on:
       - 'tools/verify_vr_r23_shared_eye_cache.py'
       - 'tools/verify_vr_r23_pixel_probe_optin.py'
       - 'tools/verify_vr_r23_seeded_clear_fastpath.py'
+      - 'tools/verify_vr_r23_raster_setrt_fastpath.py'
       - 'tools/verify_vr_r23_stencil_clear_batch.py'
       - 'tools/verify_vr_gpu_water_profiler.py'
       - 'src/vr/d3d9/gpu_water_profiler.hpp'
@@ -262,6 +263,7 @@ jobs:
             'tools/verify_vr_r23_shared_eye_cache.py',
             'tools/verify_vr_r23_pixel_probe_optin.py',
             'tools/verify_vr_r23_seeded_clear_fastpath.py',
+            'tools/verify_vr_r23_raster_setrt_fastpath.py',
             'tools/verify_vr_r23_stencil_clear_batch.py',
             'tools/verify_vr_gpu_water_profiler.py',
             'tools/verify_vr_r7_stencil_format_cache.py',
