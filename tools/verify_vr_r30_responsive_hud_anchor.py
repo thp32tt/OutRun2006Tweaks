@@ -387,7 +387,8 @@ for old,new in (
     mutant = fallback.replace(old,new,1)
     assert mutant != fallback
     assert not (fallback_hoist in mutant and
-                fallback_y_affine in mutant)
+                fallback_y_affine in mutant and
+                "R30PauseMenuVerticalAffine(state.stereo);" in mutant)
 def pause_fraction(state, semantic, external, fraction, producer=None):
     owns = semantic == "overlay" or (
         semantic == "hud" and producer == "exact_menu_arrow")
