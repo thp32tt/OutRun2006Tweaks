@@ -146,10 +146,12 @@ async def attach_png(page,binding):
         await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(state="visible",timeout=12000)
         if not page.url.startswith("https://chatgpt.com/"):
             return "TARGET_ORIGIN_NOT_CHATGPT"
-        prev=page.locator('button[aria-label="Remove '+filename+'"]')
-        if await prev.count():
-            await prev.first.dispatch_event("click")
-            await page.wait_for_timeout(500)
+        previous=page.locator('button[aria-label^="Remove '+filename[:-4]+'"]')
+        for _ in range(8):
+            if not await previous.count():
+                break
+            await previous.first.dispatch_event("click")
+            await page.wait_for_timeout(350)
         inp=page.locator('input[type="file"][aria-label="Attach files"]')
         if await inp.count()!=1:
             return "ATTACH_FILES_INPUT_NOT_FOUND"
@@ -157,12 +159,18 @@ async def attach_png(page,binding):
         await page.wait_for_function(
             """filename => {
              const visible=e=>!!e.getClientRects().length;
+             const stem=filename.slice(0,-4);
+             const sameName=name=>name===filename ||
+               (name.startsWith(stem+'(') && name.endsWith(').png') &&
+                /^[0-9]+$/.test(name.slice(stem.length+1,-5)));
              const image=[...document.querySelectorAll('img[alt]')].some(e=>
-                  visible(e) && e.alt===filename && e.complete && e.naturalWidth>0);
+                  visible(e) && sameName(e.alt) && e.complete && e.naturalWidth>0);
              const remove=[...document.querySelectorAll('button[aria-label]')].some(e=>
-                  e.getAttribute('aria-label')==='Remove '+filename);
+                  (e.getAttribute('aria-label')||'').startsWith('Remove ') &&
+                  sameName((e.getAttribute('aria-label')||'').slice(7)));
              const loading=[...document.querySelectorAll('[aria-label]')].some(e=>
-                  e.getAttribute('aria-label')==='Uploading '+filename);
+                  (e.getAttribute('aria-label')||'').startsWith('Uploading ') &&
+                  sameName((e.getAttribute('aria-label')||'').slice(10)));
              return image && remove && !loading;
             }""",arg=filename,timeout=90000)
         return "ATTACHMENT_UPLOAD_COMPLETED"
