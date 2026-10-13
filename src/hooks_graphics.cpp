@@ -263,16 +263,19 @@ class RestoreCarBaseShadow : public Hook
 		// to CurrentScope. A nonqueued direct Draw therefore needs a bounded
 		// exact owner; it must never overwrite the owner of a live queue draw.
 		{
-			OutRunVR::GameSemantic::ScopedRenderSemantic worldFallback(
-				OutRunVR::GameSemantic::RenderScope::WorldParticle);
 			const auto directWorldScope =
 				Settings::VREnabled &&
 				!OutRunVR::GameSemantic::QueueRenderActive()
 				? OutRunVR::GameSemantic::RenderScope::WorldParticle
 				: OutRunVR::GameSemantic::RenderScope::None;
+			// The direct producer must not consume an unrelated pending
+			// HUD one-shot token or inherit a stale queue-owned scope.
 			OutRunVR::GameSemantic::ScopedExactProducerSemantic directWorld(
-				directWorldScope);
-			// Keep exactly one original draw, unchanged matrix, alpha and depth.
+				directWorldScope, nullptr, true);
+			// Keep the legacy RAII world scope immediately around the draw.
+			// This also preserves the original live-queue/desktop fallback.
+			OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
+				OutRunVR::GameSemantic::RenderScope::WorldParticle);
 			Game::DrawObjectAlpha_Internal(
 				a1, a4 * Settings::CarBaseShadowOpacity, 0, -1);
 		}

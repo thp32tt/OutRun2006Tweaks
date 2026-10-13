@@ -19,8 +19,9 @@ def check(code, sem):
         "Settings::CarBaseShadowOpacity <= 0.f",
         "Game::mxPushLoadMatrix(&car->matrix_B0);",
         "Game::mxTranslate(0.0f, 0.05f, 0.0f);",
-        "ScopedRenderSemantic worldFallback(",
+        "ScopedRenderSemantic semantic(",
         "ScopedExactProducerSemantic directWorld(",
+        "directWorldScope, nullptr, true",
         "Settings::VREnabled &&\n\t\t\t\t!OutRunVR::GameSemantic::QueueRenderActive()",
         "? OutRunVR::GameSemantic::RenderScope::WorldParticle",
         ": OutRunVR::GameSemantic::RenderScope::None",
@@ -30,12 +31,27 @@ def check(code, sem):
         assert fragment in block, fragment
     exact = sem.split("class ScopedExactProducerSemantic final", 1)[1].split(
         "inline void RegisterSpriteNodeScope(", 1)[0]
+    # Preserve P0 world RAII and the exact direct-world ownership together.
+    import re
+    assert re.search(
+        r"ScopedExactProducerSemantic directWorld\(\s*"
+        r"directWorldScope, nullptr, true\s*\);\s*"
+        r"OutRunVR::GameSemantic::ScopedRenderSemantic semantic\(\s*"
+        r"OutRunVR::GameSemantic::RenderScope::WorldParticle\s*\);\s*"
+        r"Game::DrawObjectAlpha_Internal\(\s*a1,\s*"
+        r"a4\s*\*\s*Settings::CarBaseShadowOpacity,\s*0,\s*-1\);",
+        block, re.S,
+    )
     for fragment in (
         "SpriteQueueDepth == 0", "savedQueueScope_ = CurrentQueueExactScope;",
         "CurrentQueueExactScope = RenderScope::None;",
         "CurrentQueueExactScope = savedQueueScope_;",
         "CurrentScope = savedScope_;",
         "CurrentQueueProjectedMarker = savedProjectedMarker_;",
+        "isolatePendingDraw_(active_ && isolatePendingDraw)",
+        "savedPendingDraw_ = NextDrawScope;",
+        "NextDrawScope = RenderScope::None;",
+        "NextDrawScope = savedPendingDraw_;",
     ):
         assert fragment in exact, fragment
 
@@ -50,6 +66,8 @@ def verify_mutations(code, sem):
         ("a1, a4 * Settings::CarBaseShadowOpacity, 0, -1", "a1, a4 * 2.0f, 0, -1"),
         ("Game::mxPopMatrix();", "// missing matrix unwind"),
         ("Game::DrawObjectAlpha_Internal(", "Game::IncorrectObjectDraw("),
+        ("ScopedRenderSemantic semantic(", "ScopedRenderSemantic escaped("),
+        ("directWorldScope, nullptr, true", "directWorldScope, nullptr, false"),
     )
     for original, mutant in probes:
         assert original in code, original
@@ -58,6 +76,16 @@ def verify_mutations(code, sem):
         except (AssertionError, ValueError):
             continue
         raise AssertionError("mutant escaped: " + original)
+    for original, mutant in (
+        ("savedPendingDraw_ = NextDrawScope;", "savedPendingDraw_ = RenderScope::None;"),
+        ("NextDrawScope = savedPendingDraw_;", "NextDrawScope = RenderScope::None;"),
+    ):
+        assert original in sem, original
+        try:
+            check(code, sem.replace(original, mutant, 1))
+        except (AssertionError, ValueError):
+            continue
+        raise AssertionError("semantic mutant escaped: " + original)
 
 
 def model():
@@ -79,7 +107,7 @@ def main():
     check(code, sem)
     verify_mutations(code, sem)
     model()
-    print("car shadow original CALL/world-eye ownership: PASS; 8 negative mutations rejected")
+    print("car shadow original CALL/world-eye ownership: PASS; 12 negative mutations rejected")
 
 
 if __name__ == "__main__":

@@ -317,20 +317,31 @@ namespace OutRunVR::GameSemantic
     {
         RenderScope savedScope_ = RenderScope::None;
         RenderScope savedQueueScope_ = RenderScope::None;
+        RenderScope savedPendingDraw_ = RenderScope::None;
         ProjectedMarkerInfo savedProjectedMarker_{};
         bool active_ = false;
+        bool isolatePendingDraw_ = false;
 
     public:
         explicit ScopedExactProducerSemantic(
             RenderScope scope,
-            const ProjectedMarkerInfo* marker = nullptr) noexcept
-            : active_(SpriteQueueDepth == 0 && scope != RenderScope::None)
+            const ProjectedMarkerInfo* marker = nullptr,
+            bool isolatePendingDraw = false) noexcept
+            : active_(SpriteQueueDepth == 0 && scope != RenderScope::None),
+              isolatePendingDraw_(active_ && isolatePendingDraw)
         {
             if (!active_)
                 return;
             savedScope_ = CurrentScope;
             savedQueueScope_ = CurrentQueueExactScope;
             savedProjectedMarker_ = CurrentQueueProjectedMarker;
+            // Only the opted-in direct draw shields and restores a previously
+            // armed producer token. All other exact producers are unchanged.
+            if (isolatePendingDraw_)
+            {
+                savedPendingDraw_ = NextDrawScope;
+                NextDrawScope = RenderScope::None;
+            }
             CurrentQueueExactScope = RenderScope::None;
             CurrentQueueProjectedMarker =
                 scope == RenderScope::ProjectedWorldMarker2D &&
@@ -345,6 +356,8 @@ namespace OutRunVR::GameSemantic
             CurrentScope = savedScope_;
             CurrentQueueExactScope = savedQueueScope_;
             CurrentQueueProjectedMarker = savedProjectedMarker_;
+            if (isolatePendingDraw_)
+                NextDrawScope = savedPendingDraw_;
         }
 
         ScopedExactProducerSemantic(
