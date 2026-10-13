@@ -1,0 +1,15 @@
+{
+  "source_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+  "candidate_sha256": "bb306b9a38de88d49602f3c45ff293302d0132290368984af2af65ecf1a766ac",
+  "format": "uncompressed RGBA32 2048x2048, original 128-byte header, no mips",
+  "size_bytes": 16777344,
+  "original_alpha_preserved": true,
+  "other_ui_changed_pixels": 0,
+  "modified_pixel_count": 24171,
+  "translation": {
+    "TUNED": "튜닝",
+    "NORMAL": "일반"
+  },
+  "static_qa": "PASS",
+  "runtime_validation": "UNTESTED"
+}
