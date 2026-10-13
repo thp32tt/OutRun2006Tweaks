@@ -47,7 +47,7 @@ def main() -> None:
         assert bad != source and not indexed_descriptor_safe(bad), (
             f"{path.name}: unsafe descriptor-read negative control was missed"
         )
-        assert "live_game_frame::before_game_present(device);" in source
+        assert "live_game_frame::before_game_present(device, sourceRect, dirtyRegion);" in source
         assert "live_game_frame::before_game_reset();" in source
         assert "R30PresentR29Hook.stdcall<HRESULT>(" in source
 

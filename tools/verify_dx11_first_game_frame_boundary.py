@@ -112,7 +112,11 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(" in caller and
             "R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>(" in caller,
             "DX9Ex fallback must retain the established D3D9 caller")
-    require("before_game_reset();" in caller and "before_game_present(device);" in caller,
+    require("before_game_reset();" in caller and
+            "before_game_present(device, sourceRect, dirtyRegion);" in caller and
+            "const RECT* sourceRect, const RGNDATA* dirtyRegion" in header and
+            "const auto insetPlacement = presentRegion.inset_placement(" in code and
+            "insetPlacement.valid" in code,
             "Present and reset must be tied to the game's real R30 hooks")
     require("bool initialize(const NativeBackendConfig& config)" in native and
             "ID3D11RenderTargetView* color_rtv()" in native,
