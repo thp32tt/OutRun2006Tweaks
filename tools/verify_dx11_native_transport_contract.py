@@ -229,6 +229,9 @@ def main() -> None:
         raise SystemExit("DX11 producer must flush EVENT before entering ProducerPending")
     if "D3D11_ASYNC_GETDATA_DONOTFLUSH" not in publish_body:
         raise SystemExit("DX11 producer fence polling must remain nonblocking")
+    probe_cpp = (ROOT / "tools/dx11_native_transport_probe.cpp").read_text(
+        encoding="utf-8"
+    )
     probe_start = probe_cpp.find("void publish_bounded(")
     probe_end = probe_cpp.find("int main()", probe_start)
     if probe_start < 0 or probe_end <= probe_start or (
@@ -251,9 +254,6 @@ def main() -> None:
         cancel_body.index("reset_slot_lifetime(entry);")
     ):
         raise SystemExit("DX11 R178 invalidated acquired slot may be recycled")
-    probe_cpp = (ROOT / "tools/dx11_native_transport_probe.cpp").read_text(
-        encoding="utf-8"
-    )
     for needle in [
         "R178 invalidated acquired slot cannot be cancelled or recycled",
         "R178 invalidated acquired slot blocks generation retag",

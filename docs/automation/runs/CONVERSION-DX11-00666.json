@@ -43,7 +43,9 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
     "live_game_draw_path": [
-      "D3D11_NATIVE_EYE_PRODUCER",
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
       "EVENT_QUERY_HANDOFF",
       "CONSUMER_PUBLICATION_ACK"
     ],
@@ -60,15 +62,15 @@
     "C0_RECOVER": "PASS bf1936473bd9cec32ddbfbaa9687f1c23bebc45a: 00665 A8P8 independent, existing CI in progress",
     "C1_REVIEW": "PASS producer EVENT polling DONOTFLUSH relied on probe-side Flush absent from API caller",
     "C2_IMPLEMENT": "PASS immediate producer context queues EVENT and eye writes without helper flush",
-    "C3_VALIDATE": "PENDING_EXACT_SHA targeted native transport WARP and mandatory branch CI",
+    "C3_VALIDATE": "INITIAL_EXACT_SHA_FAIL (policy run record; verifier uninitialized probe_cpp); repaired and requeued for new exact SHA",
     "C4_COMMIT": "MATERIAL_COMMITTED",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_EXACT_SHA"
   },
   "acceptance_results": {
     "cpu_probe": "SOURCE_STATIC_PRECHECK_PASS",
-    "static_regression": "PENDING_GITHUB_ACTIONS",
-    "compile_build": "PENDING_GITHUB_ACTIONS",
+    "static_regression": "PENDING_REPAIRED_EXACT_SHA",
+    "compile_build": "PENDING_REPAIRED_EXACT_SHA",
     "game_visual_parity": "NEED_HMD_TEST",
     "gamepad": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
@@ -76,5 +78,5 @@
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
   "result_sha": null,
-  "next_action": "Check exact-SHA DX11 native transport WARP and mandatory gates; repair only confirmed failure. Preserve runtime UNTESTED. C6 separate bookkeeping after success."
+  "next_action": "Check repaired validation-bearing result SHA for mandatory exact GitHub gates and Native Transport Isolated WARP. HMD gameplay remains UNTESTED; complete C6 only after successful verification."
 }
