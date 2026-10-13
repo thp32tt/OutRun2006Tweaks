@@ -11,6 +11,9 @@ def integrated(bridge: str, header: str) -> bool:
     state = bridge.split("bool supported_game_state(", 1)[-1].split("bool translate_vertices(", 1)[0]
     translated = bridge.split("bool translate_vertices(", 1)[-1].split("bool mirror_texture(", 1)[0]
     native = bridge.split("bool submit(", 1)[-1].split("bool observe_source_device(", 1)[0]
+    world_hdr = header.split("inline bool game_native_world_depth_clip(", 1)[-1].split(
+        "inline bool game_native_screen_depth_clip(", 1)[0]
+    screen_hdr = header.split("inline bool game_native_screen_depth_clip(", 1)[-1]
     observer = bridge.split("void observe(", 1)[-1].split("} // namespace", 1)[0]
     return all((
         '#include "live_game_viewport_depth.hpp"' in bridge,
@@ -19,7 +22,7 @@ def integrated(bridge: str, header: str) -> bool:
         "xyz[2], w, vp.MinZ, vp.MaxZ, v.clip[2]" in translated,
         "game_native_world_depth_clip(clip, vp.MinZ, vp.MaxZ)" in translated,
         "game_native_object_clip_position(clip)" in translated,
-        translated.index("game_native_world_depth_clip(") < translated.index("game_native_object_clip_position(clip)"),
+        translated.find("game_native_world_depth_clip(") < translated.find("game_native_object_clip_position(clip)"),
         "ctx->DrawIndexed(indexCount, 0, 0);" in native,
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in native,
         "if (!translate_vertices(bytes, vertexCount, stride, vp," in observer,
@@ -28,7 +31,8 @@ def integrated(bridge: str, header: str) -> bool:
         "const float remapped = (maxZ - minZ) * clip[2] + minZ * clip[3];" in header,
         "inline bool game_native_screen_depth_clip(" in header,
         "const float remapped = windowZ * w;" in header,
-        "if (!std::isfinite(remapped)) return false;" in header,
+        "if (!std::isfinite(remapped)) return false;" in world_hdr,
+        "if (!std::isfinite(remapped)) return false;" in screen_hdr,
         "minZ >= 0.0f && minZ <= 1.0f" in header,
         "maxZ >= 0.0f && maxZ <= 1.0f" in header,
     ))
