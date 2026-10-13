@@ -258,13 +258,21 @@ class RestoreCarBaseShadow : public Hook
 		Game::mxPushLoadMatrix(&car->matrix_B0);
 		Game::mxTranslate(0.0f, 0.05f, 0.0f);
 
-		// Xbox C2C would multiply a4 by 0.5, halving the opacity, which on PC made it almost invisible.
-		// These three original-mod call sites are exact car/world geometry, not
-		// screen overlays. Keep the restored base shadow on the verified world
-		// path so R29/R30 never duplicate it as a head-following alpha effect.
+		// Each original-mod shadow CALL is world geometry, not a HUD sprite.
+		// EffectiveScope prefers an old selected SpriteNode's exact ScreenHud
+		// to CurrentScope. A nonqueued direct Draw therefore needs a bounded
+		// exact owner; it must never overwrite the owner of a live queue draw.
 		{
-			OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
+			OutRunVR::GameSemantic::ScopedRenderSemantic worldFallback(
 				OutRunVR::GameSemantic::RenderScope::WorldParticle);
+			const auto directWorldScope =
+				Settings::VREnabled &&
+				!OutRunVR::GameSemantic::QueueRenderActive()
+				? OutRunVR::GameSemantic::RenderScope::WorldParticle
+				: OutRunVR::GameSemantic::RenderScope::None;
+			OutRunVR::GameSemantic::ScopedExactProducerSemantic directWorld(
+				directWorldScope);
+			// Keep exactly one original draw, unchanged matrix, alpha and depth.
 			Game::DrawObjectAlpha_Internal(
 				a1, a4 * Settings::CarBaseShadowOpacity, 0, -1);
 		}

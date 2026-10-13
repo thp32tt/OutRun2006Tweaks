@@ -1,0 +1,89 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00781",
+  "production_id": "CONVERSION-DX9EX-00781",
+  "event_id": "CONVERSION-DX9EX-00781-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:START_SHADOW",
+  "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+  "work_key": "DX9EX:VIS:START_SHADOW",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C2_IMPLEMENTED_C3_PENDING",
+  "feature_status": "SOURCE_CANDIDATE_UNVERIFIED",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00781]",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "score_delta": 0,
+  "changed_files": [
+    "src/hooks_graphics.cpp",
+    "tools/verify_vr_start_shadow_world_owner.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00781.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:START_SHADOW",
+    "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+    "goal": "Resolve complete Quest3 race-start car base shadow diplopia by tracking the three original Xbox-port calls, explicit world-per-eye render ownership, exact queue fallback and depth/stencil, preserving normal world/car shadows.",
+    "scope_boundary": "Only original three car-base shadow source calls and bounded VR semantic scope; exclude general gameplay HUD, skyglow, flares, wheel input, DX11 and DXVK.",
+    "trace_stages": [
+      "Original EXE car/model shadow 0x69EB4 plus two distinct car-select shadow call sites render one DrawObjectAlpha_Internal with player-car matrix.",
+      "EffectiveScope prioritizes old ScreenHud/WorldBillboard queue token over ScopedRenderSemantic WorldParticle on direct original draw.",
+      "ScopedExactProducerSemantic protects direct non-queue shadow WorldParticle and restores old owner before R30 per-eye replay/host; stencil duplication remains a separate runtime hypothesis."
+    ],
+    "subcomponents": [
+      "Source-time shadow identity across all three original-mode entry points and native alpha/matrix preserved.",
+      "Direct VR draw overrides stale queue HUD without changing live queue draws and desktop path.",
+      "Negative mutants and same-result SHA full Windows x86/x64 integration and headset separated."
+    ],
+    "acceptance_items": [
+      {
+        "id": "SHADOW_DIRECT_EYE_WORLD",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_car_shadow_and_stereo",
+        "expected_behavior": "Original car-ground alpha is drawn once with direct WorldParticle ownership in VR, never stale queue HUD or zero-parallax projection."
+      },
+      {
+        "id": "SHADOW_QUEUE_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "desktop_queue_and_matrix",
+        "expected_behavior": "No SpriteNode queue scope overwrite, no desktop alpha, original CALL, car matrix or ordinary world-shadow regression; 8 negative mutations reject drift."
+      },
+      {
+        "id": "SHADOW_EXACT_SHA_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "windows_game_host_package",
+        "expected_behavior": "Exact SHA Active policy/game/host/package, Domain Isolation, Full Source Impact; Quest3 double-shadow assessment separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "SHADOW_DIRECT_EYE_WORLD": "PENDING_EXACT_SHA",
+    "SHADOW_QUEUE_FALLBACK": "PENDING_EXACT_SHA",
+    "SHADOW_EXACT_SHA_GATES": "PENDING_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "Old Quest3 visible report: race-start shadow doubled. Canonical upstream Xbox port car-ground shadow has three known original calls; existing 2026-10-08 deep review explicitly leaves stencil-vs-two draw root cause unresolved.",
+    "root_cause": "Bounded source failure candidate: ScopedRenderSemantic CurrentScope WorldParticle loses EffectiveScope precedence to a stale selected SpriteNode ScreenHud/marker outside a queue.",
+    "alternatives_rejected": [
+      "Do not remove original shadows, force mono, change all alpha effects or SkyGlow; stereo stencil/replay must be independently proven.",
+      "Changing a4, car shadow opacity or player-car matrix is not supported by existing eye-depth evidence."
+    ],
+    "source_trace": [
+      "Original EXE car/model shadow 0x69EB4 plus two distinct car-select shadow call sites render one DrawObjectAlpha_Internal with player-car matrix.",
+      "EffectiveScope prioritizes old ScreenHud/WorldBillboard queue token over ScopedRenderSemantic WorldParticle on direct original draw.",
+      "ScopedExactProducerSemantic protects direct non-queue shadow WorldParticle and restores old owner before R30 per-eye replay/host; stencil duplication remains a separate runtime hypothesis."
+    ],
+    "eye_ownership": "Direct draw VR-only exact queue-owner rebind; live SpriteNode queue unchanged; desktop/game matrix unchanged.",
+    "fix_evidence": "C2 candidate nests scoped exact direct WorldParticle owner under existing world fallback; no additional Draw call.",
+    "negative_test_evidence": "8 source mutant probes include scope, queue, VR, 3 call, alpha and matrix; automatic GitHub policy run pending.",
+    "unresolved": "Source-only change does not prove observed race-start diplopia cured; compare original producer draw count and per-eye stencil/depth using Quest3/VDXR."
+  }
+}
