@@ -1204,7 +1204,7 @@ def main() -> None:
             "DXGI_FORMAT_BC2_UNORM",
             "DXGI_FORMAT_BC3_UNORM",
             "base.Pool == D3DPOOL_DEFAULT",
-            "lock.Pitch > 0",
+            "const bool readable = lock.pBits &&",
             "dynamic_texture::readable_pitch(lock.Pitch, rowBytes)",
             "static_cast<std::size_t>(uploadPitch) * rows",
             "static_cast<std::size_t>(y) * lock.Pitch",
