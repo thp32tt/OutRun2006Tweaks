@@ -19,15 +19,22 @@ def connected(source, decoder):
     try:
         mirror = source.split("bool mirror_texture(", 1)[1].split("bool submit(", 1)[0]
         draw = source.split("bool submit(", 1)[1].split("bool observe_source_device(", 1)[0]
+        float_formats = mirror.split("const bool floatVector = ", 1)[1].split(";", 1)[0]
     except IndexError:
         return False
+    # The last DXGI format is the explicit default of the guarded four-format
+    # branch, not a fourth ternary. Check real source admission separately.
+    native_choices = tuple(formats.items())[:3]
     return (
-        all("base.Format == " + fmt for fmt in formats) and
-        all("float_vector_texture::Layout::" + layout in mirror and
-            "base.Format == " + fmt + " ? " + native in mirror
-            for fmt, (layout, native) in formats.items()) and
+        all("base.Format == " + fmt in float_formats for fmt in formats) and
+        all("float_vector_texture::Layout::" + layout in mirror
+            for layout, _ in formats.values()) and
+        all("base.Format == " + fmt + " ? " + native in mirror
+            for fmt, (_, native) in native_choices) and
+        "DXGI_FORMAT_R32G32_FLOAT;" in mirror and
         all("case Layout::" + layout + ":" in decoder
             for layout in ["r16f", "rg16f", "r32f", "rg32f"]) and
+        "case Layout::r16f: return 2u;" in decoder and
         all(s in mirror for s in [
             "if (capture.srgbTexture && floatVector) return false;",
             "floatVector ? float_vector_texture::source_bytes_per_texel(floatVectorLayout)",
@@ -49,9 +56,11 @@ def connected(source, decoder):
 
 assert connected(src, hdr), "live R/RG float source->native Draw integration disconnected"
 mutations = 0
-for fmt, (_, native) in formats.items():
-    old = "base.Format == " + fmt + " ? " + native
-    assert old in src and not connected(src.replace(old, "false ? " + native, 1), hdr)
+for fmt in formats:
+    # Drop each game source admission. Other DXGI enum mentions may remain,
+    # but a native draw cannot occur without the complete source family.
+    old = "base.Format == " + fmt
+    assert old in src and not connected(src.replace(old, "false", 1), hdr)
     mutations += 1
 for old in [
     "if (capture.srgbTexture && floatVector) return false;",
