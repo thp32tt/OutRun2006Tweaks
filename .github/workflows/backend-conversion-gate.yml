@@ -190,6 +190,10 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_native_rg16_00664.py
 
+      - name: Verify native game A8P8 palette/alpha mip Draw 00665
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_native_a8p8_00665.py
+
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh

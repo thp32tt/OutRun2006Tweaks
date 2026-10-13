@@ -83,6 +83,8 @@ jobs:
           python tools/test_dx11_native_10bit_texture_00662.py
           python tools/test_dx11_native_extended_luminance_00663.py
           python tools/test_dx11_native_rg16_00664.py
+          python tools/test_dx11_native_a8p8_00665.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_a8p8_probe.cpp -o /tmp/dx11_a8p8_00665 && /tmp/dx11_a8p8_00665
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rg16_probe.cpp -o /tmp/dx11_rg16_00664 && /tmp/dx11_rg16_00664
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_extended_luminance_probe.cpp -o /tmp/dx11_luma_00663 && /tmp/dx11_luma_00663
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_10bit_probe.cpp -o /tmp/dx11_10bit_00662 && /tmp/dx11_10bit_00662
