@@ -14,7 +14,14 @@ required = (
 assert all(x in toggle for x in required)
 for token in required:
     assert token not in toggle.replace(token, "false", 1), token
-assert overlay.count("Overlay::will_be_visible_this_frame()") == 2
+# The out-of-class definition is qualified; render() calls it unqualified.
+# Own each site separately so either missing/duplicated poll is rejected.
+assert overlay.count("Overlay::will_be_visible_this_frame()") == 1
+render = overlay.split("bool Overlay::render()", 1)[1].split(
+    "// Creates a unique machine ID", 1)[0]
+assert render.count("will_be_visible_this_frame();") == 1
+assert render.index("will_be_visible_this_frame();") < render.index(
+    "const bool toggleOverlay = s_togglePending;")
 assert "s_togglePending = next.toggle;" in overlay
 assert "s_toggleCaptureValid = true;" in overlay
 assert "const bool toggleOverlay = s_togglePending;" in overlay
