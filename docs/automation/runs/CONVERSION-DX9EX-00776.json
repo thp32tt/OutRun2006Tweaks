@@ -11,13 +11,13 @@
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "work_key": "DX9EX:VIS:EXTENDED_TIME",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "feature_status": "BUILD_PENDING_NEED_HMD_TEST",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00776]",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "validation_bearing_result_sha": "c073fe69056361729a214ab7e60391b6b6e5da7a",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_status": "NEED_HMD_TEST",
   "score_delta": 0,
@@ -94,7 +94,46 @@
     "negative_test_evidence": "Targeted source checks reject removed exact owner, missing exit reset, removed queue-depth guard and lost projected-marker restore; DX9Ex Active/Domain/Full Source Impact exact-SHA pending."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA_ACTIONS"
+    "validation_bearing_result_sha": "c073fe69056361729a214ab7e60391b6b6e5da7a",
+    "dx9ex_active": {
+      "run_id": 38397254805,
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "game": "success",
+        "host": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38397255099,
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    "full_source_impact": {
+      "run_id": 38397255242,
+      "conclusion": "success",
+      "jobs": {
+        "msvc-analyze-active-game": "success",
+        "msvc-analyze-openxr-host": "success",
+        "source-cross-domain": "success"
+      }
+    },
+    "non_gating_coordination": {
+      "run_id": 38397254979,
+      "conclusion": "failure",
+      "note": "VR Autodev Coordination validate failed; independent of required exact-SHA DX9Ex Active, Domain Isolation and Full Source Impact gating."
+    },
+    "hmd": "UNTESTED"
   },
-  "notes": "This candidate is a source-level closure of +TIME direct-versus-deferred semantic precedence. No Quest3/VDXR test; do not infer optical PASS from static or CI."
+  "notes": "C6 standalone [skip ci] bookkeeping after exact-SHA c073fe69056361729a214ab7e60391b6b6e5da7a required DX9Ex Active 5/5, Domain Isolation and Full Source Impact 3/3 SUCCESS. VR Autodev Coordination is a separate non-gating FAILURE, not a required-gate PASS. Quest3/VDXR HMD remains UNTESTED. Prior hold: TERMINAL_STATUS_NOT_COMPLETE; now terminal status COMPLETE_BUILD_VERIFIED. No new material implementation or score delta.",
+  "controller_terminal": true,
+  "validation_runs": {
+    "active": 38397254805,
+    "domain": 38397255099,
+    "full_source_impact": 38397255242
+  }
 }
