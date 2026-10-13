@@ -2,25 +2,25 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00781",
   "production_id": "CONVERSION-DX9EX-00781",
-  "event_id": "CONVERSION-DX9EX-00781-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00781-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:START_SHADOW",
   "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
   "work_key": "DX9EX:VIS:START_SHADOW",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C5_WAIT_FULL_SOURCE_IMPACT",
-  "feature_status": "BUILD_CANDIDATE_NEED_FULL_IMPACT_AND_HMD",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00781]",
   "material_result_sha": "39ca3cde17b58577121429b03880349f0979ba84",
   "validation_bearing_result_sha": "a01f202655d4c0a96059f12808e0b0a8277bcbd1",
-  "automation_validation": "PARTIAL_GATES_PASS_FULL_IMPACT_PENDING",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_status": "NEED_HMD_TEST",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/hooks_graphics.cpp",
     "tools/verify_vr_start_shadow_world_owner.py",
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "SHADOW_DIRECT_EYE_WORLD": "PASS_EXACT_SHA",
+    "SHADOW_DIRECT_EYE_WORLD": "PASS_SOURCE_BUILD_NEED_HMD_TEST",
     "SHADOW_QUEUE_FALLBACK": "PASS_EXACT_SHA",
-    "SHADOW_EXACT_SHA_GATES": "PENDING_FULL_SOURCE_IMPACT",
+    "SHADOW_EXACT_SHA_GATES": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -85,8 +85,10 @@
     ],
     "eye_ownership": "Direct draw VR-only exact queue-owner rebind; live SpriteNode queue unchanged; desktop/game matrix unchanged.",
     "fix_evidence": "Original three car-shadow calls and one alpha draw preserved; direct scoped exact WorldParticle owner now also saves/clears/restores stale pending one-shot render token. Original world RAII/matrix/depth/desktop fallback retained in source SHA 64cde382; exact game/host/full-chain/package pass at a01f2026.",
-    "negative_test_evidence": "Updated start-shadow verifier 12 negative mutants PASS on exact SHA a01f2026, P0 composite structural contract PASS, HUD Inspector, Domain and DX9Ex Active green; Full Source Impact final game analysis remains in progress.",
-    "unresolved": "Source-only change does not prove observed race-start diplopia cured; compare original producer draw count and per-eye stencil/depth using Quest3/VDXR."
+    "negative_test_evidence": "12 source/semantic mutants, canonical P0 visual ownership contract, DX9Ex Active 5/5, Domain Isolation, HUD Inspector and Full Source Impact 3/3 passed exact validation SHA a01f2026.",
+    "unresolved": "Source-only change does not prove observed race-start diplopia cured; compare original producer draw count and per-eye stencil/depth using Quest3/VDXR.",
+    "retry_failure_cause": "Run 38411024905 failed P0 scoped original Draw contract; first repair policy detected an overstrict whitespace-only test due comments between adjacent scopes.",
+    "retry_resolution": "Bounded direct-world pending token save/clear/restore and adjacent legacy world RAII preserve original car-shadow calls, opacity, queue and desktop."
   },
   "ci_evidence": {
     "exact_sha": "a01f202655d4c0a96059f12808e0b0a8277bcbd1",
@@ -124,5 +126,35 @@
     },
     "runtime": "UNTESTED"
   },
-  "blocked_reason": "FULL_SOURCE_IMPACT_NOT_YET_COMPLETE"
+  "blocked_reason": "FULL_SOURCE_IMPACT_NOT_YET_COMPLETE",
+  "material_repair_shas": [
+    "64cde3821ff5de789407212aff67143432621c9b",
+    "a01f202655d4c0a96059f12808e0b0a8277bcbd1"
+  ],
+  "validation_evidence": {
+    "exact_sha": "a01f202655d4c0a96059f12808e0b0a8277bcbd1",
+    "dx9ex_active": {
+      "run_id": 38412390181,
+      "policy": "SUCCESS",
+      "game": "SUCCESS",
+      "host": "SUCCESS",
+      "full_chain_compile": "SUCCESS",
+      "package": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38412389968,
+      "result": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38412389839,
+      "result": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38412389697,
+      "msvc_game": "SUCCESS",
+      "msvc_host": "SUCCESS",
+      "source_cross_domain": "SUCCESS"
+    },
+    "runtime": "UNTESTED"
+  }
 }
