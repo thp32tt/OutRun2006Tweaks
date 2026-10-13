@@ -20,6 +20,8 @@ def integrated(source):
         "!capture.stage0FullModulate &&",
         "stage1FactorShader" if False else "kStage1FactorShader",
         'compile("PSStage1Modulate", "ps_4_0", stage1ModulateCode)',
+        'static const std::string stage1ShaderSource = shaderSource + kStage1FactorShader;',
+        'D3DCompile(stage1ShaderSource.data(), stage1ShaderSource.size(),'
         "s.stage1DiffusePs.GetAddressOf()",
         "s.stage1AddPs.GetAddressOf()",
         "ctx->PSSetConstantBuffers(1, 1, &combiner)",
@@ -28,6 +30,9 @@ def integrated(source):
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
     ))
 assert integrated(src)
+# Both the pipeline-rebuild and full-reset paths must release stage-1 PS owners.
+for name in ("stage1DiffusePs", "stage1ModulatePs", "stage1TextureOnlyPs", "stage1AddPs"):
+    assert src.count("s." + name + ".Reset();") == 2, name
 assert len(shader) < 16380
 for label, snippet in (
     ("1st stage read", "GetTextureStageState(1, D3DTSS_COLOROP, &nextColorOp)"),
