@@ -11,9 +11,9 @@
   "work_key": "DX11:GAME_EQUALITY_DEPTH_DSV",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "826a7d3a2ce4a0545126e44df0c4eb3b92e995c4",
-  "status": "AWAIT_EXACT_SHA_GATES",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -64,13 +64,52 @@
     "C0_RECOVER": "PASS: 00652 exact-SHA validated",
     "C1_REVIEW": "PASS: game ZFUNC EQUAL/NOTEQUAL absent",
     "C2_IMPLEMENT": "PASS: C++ admission, native OM depth state, probe and destructive regressions",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING_MATERIAL",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend Conversion Gate validate+readiness, DX11 Fast, Windows Build, OpenXR architecture, HUD Inspector all SUCCESS on 8200eec83d63abcd4e53b1a667a64436826743af",
+    "C4_COMMIT": "PASS: material 10578369, source test correction b43be46f, final validation-bearing b8200eec",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA: C6 bookkeeping is separate from validation-bearing commit"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Wait for exact SHA backend conversion, DX11 fast, Windows build, OpenXR architecture and HUD inspector Gates; HMD and gamepad still UNTESTED"
+  "next_action": "C6 exact SHA 5/5 automated PASS; Quest3/VDXR menu, vehicle select, race pixels, gamepad and stereo NOT TESTED. Preserve D3D9 fallback; DXVK remains frozen. Next independent feature via controller.",
+  "material_result_sha": "105783692693696369bb71c08633fb1bd9fa30b4",
+  "validation_bearing_result_sha": "8200eec83d63abcd4e53b1a667a64436826743af",
+  "result_sha": "8200eec83d63abcd4e53b1a667a64436826743af",
+  "source_test_repair_shas": [
+    "b43be46f6c0e87babc2eba56914f0da4a25976e8",
+    "8200eec83d63abcd4e53b1a667a64436826743af"
+  ],
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38343750984,
+      "conclusion": "success",
+      "validation_sha": "8200eec83d63abcd4e53b1a667a64436826743af",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38343750984"
+    },
+    "dx11_fast_structural": {
+      "id": 38343750948,
+      "conclusion": "success",
+      "validation_sha": "8200eec83d63abcd4e53b1a667a64436826743af",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38343750948"
+    },
+    "windows_build": {
+      "id": 38343754483,
+      "conclusion": "success",
+      "validation_sha": "8200eec83d63abcd4e53b1a667a64436826743af",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38343754483"
+    },
+    "openxr_architecture": {
+      "id": 38343754498,
+      "conclusion": "success",
+      "validation_sha": "8200eec83d63abcd4e53b1a667a64436826743af",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38343754498"
+    },
+    "hud_inspector": {
+      "id": 38343754486,
+      "conclusion": "success",
+      "validation_sha": "8200eec83d63abcd4e53b1a667a64436826743af",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38343754486"
+    }
+  }
 }
