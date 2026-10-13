@@ -258,7 +258,7 @@ def cached_mask_lifecycle():
         assert classify_order(mask, selected, gen, "vb") == base
         for _ in range(15):
             assert classify_order(mask, selected, gen, "vb") == base
-        assert sort_count == (n == 8192) + (n >= 16384) + (n >= 65536)
+        assert sort_count == 3 * ((n == 8192) + (n >= 16384) + (n >= 65536))
         # UP is independent and always builds its own ascending order.
         other = rng.sample(range(n), 700)
         assert classify_order(mask, other, gen, "up") == sorted(other)[:512]
