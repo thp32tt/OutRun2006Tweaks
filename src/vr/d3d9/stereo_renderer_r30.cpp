@@ -1799,6 +1799,24 @@ namespace OutRunVRStereo
             };
         }
 
+        // The anchor keeps an exact OutRunHudText group near its original
+        // screen edge, but without a size floor HudScale=0.55 still makes
+        // speed/time glyphs illegible inside a portrait XR eye. Only the
+        // opt-in producer-verified peripheral draw may enlarge to 0.90 of
+        // the original source layout. A centred group, F11, menus, world
+        // markers and every default-off draw retain their original scale.
+        float R30ExactPeripheralHudBoost(
+            const R30HudEdgeAnchor& anchor) noexcept
+        {
+            if ((anchor.x == 0.0f && anchor.y == 0.0f) ||
+                !std::isfinite(anchor.x) || !std::isfinite(anchor.y))
+                return 1.0f;
+            const float baseScale = R30HudScaleValue();
+            if (!std::isfinite(baseScale) || baseScale <= 0.0f)
+                return 1.0f;
+            return std::clamp(0.90f / baseScale, 1.0f, 3.0f);
+        }
+
         bool R30TransformHudScissor(
             const RECT& source, const D3DVIEWPORT9& viewport,
             float scaleX, float scaleY, float offsetX,
@@ -3423,6 +3441,12 @@ namespace OutRunVRStereo
                 const R30HudEdgeAnchor exactHudAnchor =
                     R30GetExactHudEdgeAnchor(source, vertexCount, stride,
                         x0, y0, width, height, usedMask, touched, knownUsedCount);
+                // Per-draw only: keep both eyes' sprite aspect and FOV bias
+                // paired, without touching a shared/cached gameplay scale.
+                const float peripheralBoost =
+                    R30ExactPeripheralHudBoost(exactHudAnchor);
+                hudScaleX *= peripheralBoost;
+                hudScaleY *= peripheralBoost;
                 const float halfWidth = width * 0.5f;
                 const float halfHeight = height * 0.5f;
                 const float eyeScaleX[2]{
