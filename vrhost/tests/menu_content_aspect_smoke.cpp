@@ -213,6 +213,24 @@ int main()
             (optical.centerY + 1.0f) * 0.5f *
             (shared.up - shared.down)) > 1e-5f)
         return 8;
+    // HMD 2026-10-13: a full-FOV theater is cropped/overlarge.
+    // Shrink both axes uniformly while leaving the same optical centre,
+    // authored 4:3 physical ratio and existing clip-safety checks.
+    const auto compact = PlanOpticallyCenteredClip(
+        shared, 4.0f / 3.0f, 0.78f);
+    if (!compact.valid ||
+        std::fabs(compact.centerX - optical.centerX) > 1e-6f ||
+        std::fabs(compact.centerY - optical.centerY) > 1e-6f ||
+        std::fabs(compact.halfWidth / optical.halfWidth - 0.78f) > 1e-5f ||
+        std::fabs(compact.halfHeight / optical.halfHeight - 0.78f) > 1e-5f ||
+        std::fabs(compact.halfWidth / compact.halfHeight *
+            (shared.right - shared.left) / (shared.up - shared.down) -
+            4.0f / 3.0f) > 1e-5f ||
+        PlanOpticallyCenteredClip(shared, 4.0f / 3.0f, 0.f).valid ||
+        PlanOpticallyCenteredClip(shared, 4.0f / 3.0f, 1.1f).valid ||
+        PlanOpticallyCenteredClip(shared, 4.0f / 3.0f,
+            std::numeric_limits<float>::quiet_NaN()).valid)
+        return 22;
     // Both edges remain on the visible image; physical, not NDC, aspect
     // must equal the cropped 4:3 menu even for asymmetric Quest-style FOV.
     if (std::fabs(optical.centerX) + optical.halfWidth > 1.00001f ||

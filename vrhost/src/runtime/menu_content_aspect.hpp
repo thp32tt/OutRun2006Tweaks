@@ -89,10 +89,13 @@ namespace OutRunVrMenuAspect
     };
 
     inline OpticalClipPlan PlanOpticallyCenteredClip(
-        const CommonFovTangents& fov, float sourceAspect) noexcept
+        const CommonFovTangents& fov, float sourceAspect,
+        float coverage = 1.0f) noexcept
     {
         if (!fov.valid || !std::isfinite(sourceAspect) ||
             sourceAspect < 0.5f || sourceAspect > 5.0f ||
+            !std::isfinite(coverage) || coverage < 0.50f ||
+            coverage > 1.0f ||
             !std::isfinite(fov.left) || !std::isfinite(fov.right) ||
             !std::isfinite(fov.down) || !std::isfinite(fov.up))
             return {};
@@ -115,12 +118,14 @@ namespace OutRunVrMenuAspect
             return {};
 
         // Keep original physical content aspect (not raw NDC ratio).
-        // Shrink X and Y together into the clipped optical-centre margins;
+        // Shrink X and Y together into the clipped optical-centre margins.
+        // A validated coverage below 1 keeps the old 4:3 theater from
+        // occupying the full Quest field of view (no independent X/Y zoom).
         // do not independently clamp axes and stretch 4:3 menus at 21:9.
         const float usableHalfX = 1.0f - std::fabs(centerX);
         const float usableHalfY = 1.0f - std::fabs(centerY);
         const float halfWidth = (std::min)(
-            usableHalfX, usableHalfY * requiredRatio);
+            usableHalfX, usableHalfY * requiredRatio) * coverage;
         const float halfHeight = halfWidth / requiredRatio;
         if (!std::isfinite(halfWidth) || !std::isfinite(halfHeight) ||
             halfWidth < 0.05f || halfHeight < 0.05f)

@@ -122,10 +122,33 @@ namespace
 
         const int scalingMode = static_cast<int>(GetPrivateProfileIntW(
             L"Graphics", L"UIScalingMode", 0, path));
-        const int letterboxingMode = static_cast<int>(GetPrivateProfileIntW(
+        int letterboxingMode = static_cast<int>(GetPrivateProfileIntW(
             L"Graphics", L"UILetterboxing", 0, path));
+        int effectiveScalingMode = scalingMode;
+        // The F11 overlay persists overrides in OutRun2006Tweaks.user.ini.
+        // Respect the same precedence as the game: otherwise the host may
+        // crop an unletterboxed UI (or fail to crop a letterboxed one).
+        constexpr wchar_t userConfigName[] =
+            L"OutRun2006Tweaks.user.ini";
+        if (static_cast<std::size_t>(filename + 1 - path) +
+                std::size(userConfigName) <= MAX_PATH)
+        {
+            std::memcpy(filename + 1, userConfigName,
+                sizeof(userConfigName));
+            const DWORD userAttrs = GetFileAttributesW(path);
+            if (userAttrs != INVALID_FILE_ATTRIBUTES &&
+                (userAttrs & FILE_ATTRIBUTE_DIRECTORY) == 0)
+            {
+                effectiveScalingMode = static_cast<int>(
+                    GetPrivateProfileIntW(L"Graphics", L"UIScalingMode",
+                        effectiveScalingMode, path));
+                letterboxingMode = static_cast<int>(
+                    GetPrivateProfileIntW(L"Graphics", L"UILetterboxing",
+                        letterboxingMode, path));
+            }
+        }
         cachedLetterbox = OutRunVrMenuAspect::ShouldCropConfiguredMenu(
-            scalingMode, letterboxingMode);
+            effectiveScalingMode, letterboxingMode);
         return cachedLetterbox;
     }
 
@@ -1535,8 +1558,13 @@ namespace
         // projections. Center LOCAL-fixed menu content on the optical ray,
         // then preserve its physical aspect within BOTH clipped FOV margins.
         // Reject invalid/stale publications rather than stretching a menu.
+        // User Quest3 2026-10-13: full-FOV menu is excessively wide/tall.
+        // Keep the independently authored menu 4:3 and optical centre,
+        // but reserve 22% of the available symmetric image margin.
+        // Only LOCAL theater/menu, never gameplay stereo HUD or F11.
         const auto placement =
-            OutRunVrMenuAspect::PlanOpticallyCenteredClip(common, sourceAspect);
+            OutRunVrMenuAspect::PlanOpticallyCenteredClip(
+                common, sourceAspect, 0.78f);
         if (!placement.valid)
             return false;
         const float visibleCenterX =
