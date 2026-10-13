@@ -56,6 +56,11 @@ def check(hook: str, font: str, header: str) -> None:
             "(std::min)(maxWidth / 1130.f, maxHeight / 600.f)",
             "shellStyle.GrabMinSize * styleDensity",
             "shellStyle.WindowPadding.x * styleDensity",
+            "const bool externalVrShell = Game::is_vr_gameplay_presentation();",
+            "const ImGuiCond initialPlacement = externalVrShell",
+            "previousVrShell != externalVrShell ||",
+            "previousVrShell = externalVrShell;",
+            "const bool vrStyle = externalVrShell;",
             "ImGuiStyleVar_FramePadding",
             "ImGuiStyleVar_ItemSpacing",
             "ImGuiStyleVar_ItemInnerSpacing",
@@ -147,6 +152,45 @@ def check_shell_numeric_cases() -> None:
         changes.append(changed)
         previous = (*content, density)
     assert changes == [False, True, True, True, False, True, True, True]
+
+
+def check_shell_vr_mode_transitions(font: str) -> None:
+    """A 1x XR atlas must not silently restore desktop shell layout."""
+    shell = font.split("void Overlay::render_shell()", 1)[1].split(
+        "void Overlay::init()", 1)[0]
+    exact = (
+        "const bool externalVrShell = Game::is_vr_gameplay_presentation();",
+        "const ImGuiCond initialPlacement = externalVrShell",
+        "previousVrShell != externalVrShell ||",
+        "previousVrShell = externalVrShell;",
+        "const bool vrStyle = externalVrShell;",
+    )
+    for token in exact:
+        assert token in shell, token
+    for original, wrong in (
+        (exact[1], "const ImGuiCond initialPlacement = vrDensity > 1.0f"),
+        (exact[2], "false ||"),
+        (exact[3], "previousVrShell = false;"),
+        (exact[4], "const bool vrStyle = vrDensity > 1.0f;"),
+    ):
+        mutant = shell.replace(original, wrong, 1)
+        assert mutant != shell
+        assert not all(token in mutant for token in exact)
+    def changed(old, new):
+        if old is None:
+            return False
+        return (old[0] != new[0] or abs(old[1] - new[1]) > .01 or
+                any(abs(a-b) > .5 for a,b in zip(old[2], new[2])))
+    for rect in ((0., 0., 1024., 768.), (0., 0., 3440., 1440.),
+                 (0., 0., 2496., 2688.)):
+        states = ((False, 1., rect), (True, 1., rect),
+                  (True, 1., rect), (True, 2.75, rect),
+                  (True, 2.75, rect), (False, 1., rect),
+                  (False, 1., rect))
+        assert [changed(states[i-1] if i else None, state)
+                for i, state in enumerate(states)] == [
+            False, True, False, True, False, True, False]
+    print("PASS VR F11 equal-density presentation transition and four destructive controls")
 
 
 def check_projection(renderer: str, semantic: str) -> None:
@@ -541,6 +585,7 @@ def main():
     check_transient_eye_extent_dropout(hook)
     check_shell_layout_mutations(font)
     check_shell_numeric_cases()
+    check_shell_vr_mode_transitions(font)
     check_external_vr_f11_canvas(font)
     check_projection(renderer, semantic)
     check_projection_mutations(renderer, semantic)

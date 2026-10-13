@@ -85,6 +85,10 @@ void Overlay::render_shell()
 	// keeping the old 1130x600 canvas clipped tabs and font glyphs even
 	// after the sharper atlas was rebuilt. Desktop positions/sizes are
 	// unchanged; VR uses a centered size only when the window appears.
+	// VR shell ownership must not depend on the transient XR font atlas
+	// density: an active headset can legitimately render at 1x during
+	// resolution changes, without becoming a desktop F11 window.
+	const bool externalVrShell = Game::is_vr_gameplay_presentation();
 	const float vrDensity = std::clamp(VrFontMultiplier, 1.0f, 3.0f);
 	// On a tiny reset/recreate surface, never grow beyond the real content
 	// rectangle (the former 64px floor could exceed the viewport).
@@ -103,7 +107,7 @@ void Overlay::render_shell()
 	const ImVec2 windowSize(
 		(std::min)(1130.f * vrDensity, maxWidth),
 		(std::min)(600.f * vrDensity, maxHeight));
-	const ImGuiCond initialPlacement = vrDensity > 1.0f
+	const ImGuiCond initialPlacement = externalVrShell
 		? ImGuiCond_Appearing : ImGuiCond_FirstUseEver;
 
 	// ImGuiCond_Appearing is not reapplied while the shell stays open.
@@ -113,8 +117,10 @@ void Overlay::render_shell()
 	// across every steady desktop and VR frame.
 	static ContentRect previousContent{};
 	static float previousDensity = 1.0f;
+	static bool previousVrShell = false;
 	static bool havePreviousLayout = false;
 	const bool layoutChanged = havePreviousLayout && (
+		previousVrShell != externalVrShell ||
 		std::fabs(previousContent.x - content.x) > 0.5f ||
 		std::fabs(previousContent.y - content.y) > 0.5f ||
 		std::fabs(previousContent.width - content.width) > 0.5f ||
@@ -122,6 +128,7 @@ void Overlay::render_shell()
 		std::fabs(previousDensity - vrDensity) > 0.01f);
 	previousContent = content;
 	previousDensity = vrDensity;
+	previousVrShell = externalVrShell;
 	havePreviousLayout = true;
 	const ImGuiCond layoutPlacement = layoutChanged ? ImGuiCond_Always : initialPlacement;
 
@@ -137,7 +144,9 @@ void Overlay::render_shell()
 	// Enlarging a font atlas alone leaves keyboard/mouse hit targets and
 	// frame padding tiny at Quest3 eye density. Scale ONLY the F11 shell's
 	// controls, not notifications, game HUD, desktop style or world passes.
-	const bool vrStyle = vrDensity > 1.0f;
+	// A 1x XR atlas is still a VR UI; use VR control ownership regardless
+	// of the transient font-density value, without changing desktop style.
+	const bool vrStyle = externalVrShell;
 	if (vrStyle)
 	{
 		const ImGuiStyle& shellStyle = ImGui::GetStyle();
