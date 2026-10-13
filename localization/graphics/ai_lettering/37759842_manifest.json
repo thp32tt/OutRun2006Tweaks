@@ -1,0 +1,116 @@
+{
+  "schema": "outrun-ai-extracted-lettering-v1",
+  "asset_id": "37759842",
+  "queue_index": 95,
+  "source_dds": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "hd_canvas": [
+    4096,
+    4096
+  ],
+  "sheets": {
+    "ai": {
+      "sha256": "cc98da285a37d741182476dc28f643bae3ef4364c500907e7d5d917f2cdeb46c",
+      "canvas": [
+        1254,
+        1254
+      ]
+    },
+    "reference": {
+      "sha256": "a8ac6ee9f19b3a28b14b3d99299783f75c1fd46f3cec5ee390c9969625cc1249",
+      "canvas": [
+        1254,
+        1254
+      ]
+    }
+  },
+  "elements": [
+    {
+      "id": "tuned_467",
+      "sheet": "ai",
+      "sheet_crop_ltrb": [
+        1120,
+        160,
+        1254,
+        254
+      ],
+      "canonical_korean": "튜닝",
+      "source_text": "Tuned",
+      "sprite": "sprite_467",
+      "hd_cell_ltrb": [
+        2976,
+        40,
+        3368,
+        160
+      ]
+    },
+    {
+      "id": "manual_464",
+      "sheet": "reference",
+      "sheet_crop_ltrb": [
+        907,
+        57,
+        1007,
+        102
+      ],
+      "canonical_korean": "수동",
+      "source_text": "Manual",
+      "sprite": "sprite_464",
+      "hd_cell_ltrb": [
+        2800,
+        208,
+        3352,
+        344
+      ]
+    },
+    {
+      "id": "waiting_entries_443",
+      "sheet": "reference",
+      "sheet_crop_ltrb": [
+        2,
+        213,
+        470,
+        277
+      ],
+      "canonical_korean": "참가자를 기다리는 중입니다.",
+      "source_text": "Waiting for entries.",
+      "sprite": "sprite_443",
+      "hd_cell_ltrb": [
+        0,
+        728,
+        1560,
+        944
+      ]
+    }
+  ],
+  "excluded_mismatches": [
+    {
+      "ai_text": "상급차용",
+      "canonical": "상급자용"
+    },
+    {
+      "ai_text": "잠시만 기다려 주세요.",
+      "canonical": "잠시 기다려 주세요."
+    },
+    {
+      "ai_text": "참가 접수가 마감되었습니다.",
+      "canonical": "참가 접수가 종료되었습니다."
+    },
+    {
+      "ai_text": "아니요",
+      "canonical": "아니오"
+    },
+    {
+      "ai_text": "랜덤",
+      "canonical": "무작위"
+    },
+    {
+      "ai_text": "수동 변속기",
+      "canonical": "수동 변속"
+    },
+    {
+      "ai_text": "자동 변속기",
+      "canonical": "자동 변속"
+    }
+  ],
+  "status": "EXTRACTION_ONLY__HD_CLEAN_PLATE_MISSING__NO_DDS_PROMOTION"
+}
