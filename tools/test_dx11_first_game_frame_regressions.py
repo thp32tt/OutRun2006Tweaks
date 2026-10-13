@@ -111,7 +111,9 @@ def main() -> None:
             "if (!rgbDiffuse || !alphaDiffuse) return false;",
             "GetRenderState(D3DRS_FOGENABLE, &fog)",
             "GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
-            "stencil || depth || !clip || fog ||",
+            "stencil || !clip || fog ||",
+            "if (depth != D3DZB_FALSE) {",
+            "game_native_depth_admission(",
         ))
 
     assert exact_diffuse_state_gate(bridge)
@@ -122,8 +124,12 @@ def main() -> None:
          "GetRenderState(D3DRS_FOGENABLE, &clip)"),
         ("GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
          "GetRenderState(D3DRS_SCISSORTESTENABLE, &clip)"),
-        ("stencil || depth || !clip || fog ||",
-         "stencil || depth || !clip || scissor ||"),
+        ("stencil || !clip || fog ||",
+         "stencil || !clip || scissor ||"),
+        ("if (depth != D3DZB_FALSE) {",
+         "if (depth == D3DZB_FALSE) {"),
+        ("game_native_depth_admission(",
+         "game_native_depth_unguarded("),
     ):
         mutated = bridge.replace(bad, replacement, 1)
         assert mutated != bridge and not exact_diffuse_state_gate(mutated), (
