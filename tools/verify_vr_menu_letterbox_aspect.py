@@ -63,7 +63,11 @@ def verify_shell_rect(code: str) -> None:
     assert shell.index("screen.x <= 0.f") < shell.index("float border = 0.f;")
     assert shell.index("screen.x > contentWidth") < shell.index("border = candidate;")
     # The UI and GPU need exactly the same mode-2 / gameplay decision.
-    assert "Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0" in endscene
+    gpu = src.split("static void D3DEndScene(", 1)[1].split(
+        "if (overlayInited)", 1)[0]
+    assert "Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0 && LetterboxVertex" in gpu
+    assert "Settings::UILetterboxing == 2" in gpu
+    assert "!Game::is_in_game()" in gpu
 
 verify_shell_rect(overlay)
 
