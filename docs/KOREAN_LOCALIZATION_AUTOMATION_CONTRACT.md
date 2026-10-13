@@ -1,3 +1,9 @@
+## 2026-10-13 11:03 KST 사용자 운영 경로 확정: Portainer ← GitHub
+
+운영 Docker lifecycle은 Portainer가 관리하며 GitHub가 정책 정본이다. q217 단건 A 이미지 생성 smoke의 최신 전달 정본은 `docs/OUTRUN_PORTAINER_GITHUB_DELIVERY_20261013.md`. 기존 Git 연결 Stack인 경우 Portainer의 지정 Git repository/ref/Compose path가 실제 반영 경로이며 사용자가 **Portainer에서 수동 Pull and redeploy** 한다. 기존 `deploy_plate_controller.py --stage`는 레거시 비Git Stack 지원 수단일 뿐 이 경로의 필수 단계로 제시하지 않는다. 현 브랜치의 Portainer base Compose와 사용 중 이미지/입력 PNG 자동 공급이 확인되지 않았으므로 GitHub 정책 commit만으로 live 이미지 첨부·ImageGen이 작동한다고 주장하지 않는다. 단건 Compose override는 기존 Git Stack에만 선택 적용하며 다른 Stack·볼륨/서비스/이미지를 훼손하지 않는다. 실제 upload/generation/DDS/game은 증거 전까지 UNTESTED. Portainer 자동 GitOps 재배포는 사용자 수동 배포 승인과 별개다.
+
+---
+
 ## 2026-10-13 q217 A 단건 ChatGPT PNG/이미지 생성 실험 — 수동 Docker 배포
 
 사용자 최신 단건 시험 지시: `docs/OUTRUN_A_Q217_IMAGEGEN_SMOKE_20261013.md` 및 `--single-a-smoke` 스테이징을 사용한다. 이 모드는 기존 A/B/C1 정상 자동화 규칙을 영구 대체하지 않는 **명시적·임시 단건 모드**다. A q217의 해시 지정 PNG와 TASK_ID 하나만 송신, B/C1 스케줄 및 모든 watchdog 전송 차단, `AUTO_SEND=true` 유지, 중복 송신 차단. GitHub 변경 자체는 컨테이너 배포가 아니다. Portainer 스테이징·재배포·복원은 사용자 수동. 라이브 ChatGPT 첨부·이미지 생성·결과 PNG·DDS/게임 실기 성공은 각각 실제 증거가 생기기 전까지 UNTESTED.
