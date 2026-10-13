@@ -26,7 +26,8 @@ def integrated(src, budget):
         "const UINT atlasBlockBytes = compressed ?" in mirror,
         "if (!native_game_texture_upload_bytes(" in mirror,
         "compressed ? 0u : atlasTexelBytes, atlasBlockBytes))" in mirror,
-        mirror.index("native_game_texture_upload_bytes(") < mirror.index(
+        mirror.find("native_game_texture_upload_bytes(") >= 0 and
+        mirror.find("native_game_texture_upload_bytes(") < mirror.find(
             "ComPtr<IDirect3DSurface9> readbackSurface;"),
         "CreateTexture2D(&desc, initial.data(), texture.GetAddressOf())" in mirror,
         "CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())" in mirror,
