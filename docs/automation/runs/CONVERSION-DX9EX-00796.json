@@ -2,20 +2,20 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00796",
   "production_id": "CONVERSION-DX9EX-00796",
-  "event_id": "CONVERSION-DX9EX-00796-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00796-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:PERF:R26_OCCLUSION_AND_PRESENT_CPU_HOTPATH",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R26_OCCLUSION_AND_PRESENT_CPU_HOTPATH",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_COMMIT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00796]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r26.cpp",
     "tools/verify_vr_r26_occlusion_present_fastpath.py",
@@ -61,9 +61,9 @@
     ]
   },
   "acceptance_results": {
-    "OCCLUSION_FAST_REJECT": "PENDING_CI",
-    "PRESENT_DIAGNOSTIC_LIFECYCLE": "PENDING_CI",
-    "EXACT_SHA_WIN32_GATES": "PENDING_EXACT_SHA",
+    "OCCLUSION_FAST_REJECT": "PASS_SOURCE_AND_WIN32_BUILD",
+    "PRESENT_DIAGNOSTIC_LIFECYCLE": "PASS_NEGATIVE_REGRESSION",
+    "EXACT_SHA_WIN32_GATES": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -83,16 +83,48 @@
     "negative_test_evidence": "CI-registered verifier enumerates 16 render state tuples, every actually consulted getter failure and ten destructive source mutations; Quest3 runtime not executed.",
     "failed_run_id": 38457132850,
     "failed_step": "R26 checker destructive mutation incorrectly matched thread_local initialization rather than transition assignment",
-    "repair": "Anchor the disabled transition mutation with its unique 20-space indentation, so the verifier fails on removed edge-trigger reset; negative assertions remain strict. Original C++ material unchanged."
+    "repair": "Anchor the disabled transition mutation with its unique 20-space indentation, so the verifier fails on removed edge-trigger reset; negative assertions remain strict. Original C++ material unchanged.",
+    "latest_validation": "R26 mutation verifier now targets both actual Present transition assignments rather than identically named TLS initializers; exact SHA f4b91f2 passes 5/5 DX9Ex Active. No C++ material change after 5eea2307.",
+    "validation_workflow_id": 38457461205
   },
   "runtime_status": "NEED_QUEST3_VDXR_P95_P99_TEST",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "required": [
       "DX9Ex Active",
       "Domain Isolation Guard",
-      "DX9Ex Full Source Impact Review where triggered"
+      "Full Source Impact where triggered"
+    ],
+    "validation_bearing_result_sha": "f4b91f205b475de827e82c7246bdac958d395a7f",
+    "full_source_impact_material_sha": "5eea23073279810d635cb4d2ee38978cac7c5b64",
+    "runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "id": 38457461205,
+        "head_sha": "f4b91f205b475de827e82c7246bdac958d395a7f",
+        "conclusion": "success",
+        "jobs": [
+          "policy",
+          "game",
+          "host",
+          "full-chain-compile",
+          "package"
+        ]
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "id": 38457461188,
+        "head_sha": "f4b91f205b475de827e82c7246bdac958d395a7f",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "id": 38456906290,
+        "head_sha": "5eea23073279810d635cb4d2ee38978cac7c5b64",
+        "conclusion": "success"
+      }
     ]
   },
-  "material_result_sha": "5eea23073279810d635cb4d2ee38978cac7c5b64"
+  "material_result_sha": "5eea23073279810d635cb4d2ee38978cac7c5b64",
+  "validation_bearing_result_sha": "f4b91f205b475de827e82c7246bdac958d395a7f"
 }
