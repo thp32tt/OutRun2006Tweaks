@@ -11,9 +11,9 @@
   "work_key": "DX11:GAME_A8_L8_A8L8_MIP_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "3a17d98493e6ba518da582bd8340d4212a6e91ac",
-  "status": "MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -65,7 +65,7 @@
     "C3_VALIDATE": "LOCAL_CPU_PROBE_PASS; EXACT_SHA_GATE_PENDING",
     "C4_COMMIT": "PENDING_REMOTE_PUBLICATION",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_GITHUB_GATES"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "acceptance_results": {
     "static_regression": "LOCAL_CPU_PASS",
@@ -75,7 +75,7 @@
     "quest3_vdxr": "UNTESTED"
   },
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "ed4d019b3bf19c7f0f46befd4ffb18d4d4ce3198",
   "result_sha": null,
   "next_action": "Check exact SHA GitHub 5 gates and repair actual failures; keep Quest3/VDXR and gamepad UNTESTED."
 }
