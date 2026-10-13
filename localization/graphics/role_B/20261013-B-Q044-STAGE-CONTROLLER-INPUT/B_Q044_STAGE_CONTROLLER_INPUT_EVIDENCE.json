@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "run_key": "OUTRUN-KOR-B-Q044-STAGE-CONTROLLER-INPUT-20261013-1230",
+  "role": "B",
+  "queue_index": 44,
+  "queue_selection": "q044 % 4 == 0; existing B rework, not a previously completed asset",
+  "action": "SOURCE_MEDIA_INPUT_STAGE_ONLY_NO_IMAGEGEN",
+  "asset_path": "textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+  "source": {
+    "repo_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/19CEDB9_512x512.dds",
+    "sha256": "2472c7aab0751987bd736131b8b4c22be4a7613d9bd1478c9b9f35a615dd6c7e",
+    "bytes": 16777344,
+    "sha_verified_against_previous_canonical": true
+  },
+  "reference": {
+    "repo_path": "localization/graphics/role_B/source_references/q044_20261012/stage_ENGLISH_SOURCE_ONLY_TRANSPARENT.png",
+    "sha256": "e53a72dbf70a12e14d272295817f1fb586b3fb9f3ee67c22e4c8497003dd9723",
+    "bytes": 10722,
+    "dimensions": [
+      242,
+      128
+    ],
+    "mode": "RGBA",
+    "png_structure_crc": "PASS_BY_LOAD_BINDING",
+    "new_image_generation": false
+  },
+  "controller": {
+    "version": "origin/korean-localization-recovery-20260928@76713666401ed2434a1a65c8dd3bc771c81b3d64",
+    "stage_location": "N100 operator-isolated home staging: work/out_b_q044_stage_input_20261013/imagegen (NOT /data/Portainer live volume)",
+    "pending_json_relative": "pending_B.json",
+    "png_relative": "inputs/B/q044_STAGE_ENGLISH_ONLY.png",
+    "task_id": "OUTRUN-B-Q044-STAGE-ENGLISH-BOUND-20261013-1230",
+    "role_binding_without_A_pilot": "PASS; hashes+PNG CRC+dimensions validated",
+    "role_binding_when_A_smoke_configured": "PILOT_ROLE_BLOCKED",
+    "message_delivery": "NOT_RUN",
+    "actual_ChatGPT_attachment": "SOURCE_REFERENCE_NOT_BOUND",
+    "native_ImageGen": "NOT_RUN",
+    "OpenAI_paid_API": "NOT_USED"
+  },
+  "translation": {
+    "original": "STAGE",
+    "korean": "스테이지",
+    "preservation": "transparent lettering only; no extra boxes/art; translation-length ratio diagnostic only; must retain original glyph/effect bbox"
+  },
+  "qa": {
+    "glyph_scale_policy": "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "per_glyph_native_75_50": "NOT_RUN_NO_NEW_KOREAN_PNG",
+    "bbox_overflow": "NOT_RUN_NO_NEW_KOREAN_PNG",
+    "source_vs_reference_pixel_equivalence": "NOT_RETESTED_PREVIOUS_SOURCE_PREP_REUSED",
+    "new_saved_DDS_bytes": 0,
+    "producer_visual_status": "HOLD_NO_IMAGEGEN_OUTPUT",
+    "independent_C1": "NOT_RUN",
+    "C2": "NO_NEW_PASS",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "state": {
+    "asset_queue_changed": false,
+    "prior_REWORK_preserved": true,
+    "prior_source_png_reused_no_duplicate_production": true,
+    "live_Portainer_touched": false,
+    "Docker_deployed": false
+  },
+  "purpose": "Reproducible source-bound manifest prepared with real PNG bytes and tested against currently tracked attachment loader; NOT a generated/localized graphic and NOT ChatGPT live attachment."
+}
