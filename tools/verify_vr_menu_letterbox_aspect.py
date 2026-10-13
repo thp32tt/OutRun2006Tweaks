@@ -35,6 +35,13 @@ def verify(code: str) -> None:
         "IDirect3DVertexBuffer9* candidate")
     assert create.index("FAILED(candidate->Lock(") < create.index(
         "LetterboxVertex = candidate;")
+    # Create and Unlock now each have independent failed-buffer releases.
+    # Inspect the Lock failure's own branch, so removing its Release cannot
+    # falsely pass by finding the later Unlock failure's Release.
+    lock_failure = create.split("if (FAILED(candidate->Lock(", 1)[1].split(
+        "memcpy(mapped, vertices", 1)[0]
+    assert "candidate->Release();" in lock_failure
+    assert "return;" in lock_failure
     assert "Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0 && LetterboxVertex" in endscene
     assert "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);" in endscene
 
