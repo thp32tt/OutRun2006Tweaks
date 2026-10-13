@@ -10,12 +10,12 @@
   "feature_id": "DX9EX:PERF:R27_SHADOW_OCCLUSION_EFFECT_ROUTE",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R27_SHADOW_OCCLUSION_EFFECT_ROUTE",
-  "status": "VALIDATION_PENDING",
-  "checkpoint": "C4_MATERIAL_COMMITTED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00798]",
-  "automation_validation": "PENDING_CI",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r26.cpp",
     "tools/verify_vr_r27_shadow_occlusion_fastpath.py",
@@ -59,9 +59,10 @@
     ]
   },
   "acceptance_results": {
-    "R27_VETOED_EFFECT_COST": "PENDING",
-    "R27_QUERY_TRACE_FALLBACK": "PENDING",
-    "R27_EXACT_SHA_INTEGRATION": "PENDING"
+    "R27_VETOED_EFFECT_COST": "PASS",
+    "R27_QUERY_TRACE_FALLBACK": "PASS",
+    "R27_EXACT_SHA_INTEGRATION": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
     "original_evidence": "R27GuardWorldEffect tried R28 and R13 effect snapshot even for forced mono-shadow, aux RT and active/unavailable occlusion that both stereo routes veto.",
@@ -77,8 +78,46 @@
       "Do not assume query-only proxies are write-free without R26 state proof."
     ],
     "fix_evidence": "Short-circuit to unchanged R13 only for existing shared veto predicates when GPL trace disabled.",
-    "negative_test_evidence": "32 boolean-table combinations, 6 destructive mutations, integrated gate test pending."
+    "negative_test_evidence": "32 boolean decision inputs and six destructive guards registered in exact SHA Windows policy CI; initial verifier counting/scope issue repaired in validation-bearing commit."
   },
   "runtime_status": "NEED_QUEST3_VDXR_P95_P99_TEST",
-  "performance_evidence": "Source-level reduction of redundant upper-layer state/WVP checks; no measured p95/p99 data."
+  "performance_evidence": "Source-level reduction of redundant upper-layer state/WVP checks; no measured p95/p99 data.",
+  "material_result_sha": "b0d672e54e885ba79c30eb51b8095e362f120c94",
+  "validation_bearing_result_sha": "b0da00a3a9a38bee154665883e8d61237abb62f5",
+  "result_sha": "b0da00a3a9a38bee154665883e8d61237abb62f5",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "b0da00a3a9a38bee154665883e8d61237abb62f5",
+    "dx9ex_active": {
+      "run_id": 38461928973,
+      "head_sha": "b0da00a3a9a38bee154665883e8d61237abb62f5",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "game": "SUCCESS",
+        "host": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38461928741,
+      "head_sha": "b0da00a3a9a38bee154665883e8d61237abb62f5",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38461618348,
+      "head_sha": "b0d672e54e885ba79c30eb51b8095e362f120c94",
+      "conclusion": "SUCCESS",
+      "source_tree_unchanged_in_validation_commit": true,
+      "jobs": {
+        "msvc-analyze-active-game": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "source-cross-domain": "SUCCESS"
+      }
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+    "performance_evidence": "Source-level redundant upper-layer routing work bypassed; no measured real headset frame-time delta."
+  },
+  "c6_recorded_at_kst": "2026-10-14 05:26 KST"
 }
