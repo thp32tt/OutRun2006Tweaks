@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_P8_PALETTE_NATIVE_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "6f4dfbde6e5fa6ffc3aecac24878dda7fde124b8",
-  "status": "VALIDATING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -68,7 +68,7 @@
     "C3_VALIDATE": "First material SHA d49fc50006626e5f87326d795802c4088a65a326 failed legacy 00663/00667 pitch string assertions; updated both destructive static regressions to preserve existing contract while adding P8. Exact-SHA repair CI pending.",
     "C4_COMMIT": "Material d49fc50006626e5f87326d795802c4088a65a326; regression compatibility repair pending exact SHA.",
     "C5_PACKAGE": "NOT_REQUIRED; HMD not tested",
-    "C6_STATE": "PENDING_GITHUB_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA: GitHub CI SUCCESS at exact validation-bearing SHA 27d57f209a4cb536797a5b3d165dcc8ff633e53f; bookkeeping-only finalization, no CI rerun."
   },
   "acceptance_results": {
     "cpu_probe": "PENDING_GITHUB_FAST",
@@ -78,5 +78,6 @@
     "gamepad": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
   },
-  "next_action": "Await exact-SHA GitHub required Gates for repair commit; preserve runtime UNTESTED."
+  "next_action": "C6 complete (BUILD_VERIFIED); keep HMD/gamepad and Quest 3 runtime validation UNTESTED pending separate real-device test.",
+  "validation_bearing_result_sha": "27d57f209a4cb536797a5b3d165dcc8ff633e53f"
 }
