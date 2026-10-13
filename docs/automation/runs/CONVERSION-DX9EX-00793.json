@@ -22,7 +22,7 @@
   "validation_bearing_result_sha": null,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
-    "tools/verify_vr_r30_hud_responsive_layout.py",
+    "tools/verify_vr_r30_responsive_hud_anchor.py",
     "docs/automation/runs/CONVERSION-DX9EX-00793.json"
   ],
   "feature_contract": {
@@ -90,7 +90,8 @@
     "failed_job": "policy",
     "error": "DX9Ex function policy FAIL: run record missing docs/automation/runs/CONVERSION-DX9EX-00793.json",
     "root_cause": "C4 material commit preceded mandatory feature-contract run record; policy blocked all game/host/package jobs before compiler execution.",
-    "repair": "Commit nonterminal feature run record without CI-skip; preserve original C++ material SHA, let exact-SHA CI evaluate; reserve C6 terminal bookkeeping for all required gates."
+    "repair": "Commit nonterminal feature run record without CI-skip; preserve original C++ material SHA, let exact-SHA CI evaluate; reserve C6 terminal bookkeeping for all required gates.",
+    "ci_trigger": "DX9Ex Active push path filter excludes docs/automation/runs/*.json; extend existing HUD producer bilateral regression test to trigger exact-SHA required gate."
   },
   "ci_evidence": {
     "status": "FAILED_BEFORE_BUILD",
