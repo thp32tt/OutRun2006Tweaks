@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2",
   "work_key": "DX11:SAME_MODE_PRESENT_BACKBUFFER_IDENTITY_GENERATION",
   "feature_id": "MENU_RACE_BACKBUFFER_COM_REPLACEMENT_FENCING",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -92,10 +92,50 @@
     "C0_RECOVER": "PASS GitHub branch and 00683 five mandatory gates verified",
     "C1_REVIEW": "PASS same-mode backbuffer replacement missing from output-generation identity",
     "C2_IMPLEMENT": "PASS COM canonical output identity and generation/readback integration",
-    "C3_VALIDATE": "PORTABLE_TESTS_PENDING_CI",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 5/5 GitHub Actions SUCCESS at validation-bearing result SHA",
     "C4_COMMIT": "MATERIAL_RESULT",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_CI"
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED; runtime UNTESTED"
   },
-  "next_action": "Collect exact-SHA mandatory GitHub gates; record separately after success; Quest3/VDXR/gamepad UNTESTED."
+  "next_action": "C6 terminal build verification recorded. Do not rerun this TASK_ID; advance controller to next independent DX11 feature. Quest3/VDXR and gamepad need separate runtime test.",
+  "material_result_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+  "validation_bearing_result_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "exact_sha_gates": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38424439829,
+      "head_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38424439829"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38424439614,
+      "head_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38424439614"
+    },
+    {
+      "name": "Build",
+      "run_id": 38424447870,
+      "head_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38424447870"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38424448023,
+      "head_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38424448023"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38424447906,
+      "head_sha": "9100a6e0fd7596672ac3037495402e27921f2363",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38424447906"
+    }
+  ]
 }
