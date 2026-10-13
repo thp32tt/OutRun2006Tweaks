@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_NATIVE_Z_DEPTH_SLOT_REPAIR",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "7da38cf308e97429b5b0379195c1508c322b3dde",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -62,17 +62,56 @@
   "pipeline": {
     "C0_RECOVER": "PASS: 00650 completed exact SHA 4310c0ce; next HEAD 7da38cf3; no active CI for current branch.",
     "C1_REVIEW": "PASS: compared cache creation and OM binding, identified +2 write-enable slot omission.",
-    "C2_IMPLEMENT": "SOURCE_AND_REGRESSIONS_READY",
-    "C3_VALIDATE": "PENDING_GITHUB_EXACT_SHA",
-    "C4_COMMIT": "SOURCE_STAGED_MATERIAL_COMMIT",
-    "C5_PACKAGE": "NOT_REQUIRED: only guarded game diagnostic native draw, no HMD release",
-    "C6_STATE": "PENDING_EXACT_SHA_GATE"
+    "C2_IMPLEMENT": "PASS: live C++ OM creation/binding 4-slot fix and same-task broken Python regex repair",
+    "C3_VALIDATE": "PASS_EXACT_SHA: backend validate+smoke, DX11 Fast, Windows Build, OpenXR, HUD SUCCESS",
+    "C4_COMMIT": "PASS_MATERIAL_COMMIT: 57a62f25; validation-bearing repair 346eb97e",
+    "C5_PACKAGE": "NOT_REQUIRED: no runtime release",
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "packaging": {
     "status": "NOT_REQUIRED",
     "reason": "No HMD promotion or distribution requested"
   },
-  "validation_bearing_result_sha": null,
-  "material_result_sha": null,
-  "next_action": "Observe single exact-SHA required GitHub Actions Gates for 00651; on SUCCESS write separate [skip ci] C6 bookkeeping without modifying source. Quest3/VDXR UNTESTED."
+  "validation_bearing_result_sha": "346eb97e5a248992615f8a3c0093805698103de7",
+  "material_result_sha": "57a62f25ddcff15d8012aaf32403190ace7cb8c7",
+  "next_action": "C6 PASS_EXACT_SHA; commit tested source+failure repair verified in required GitHub Gates. Runtime Quest3/VDXR and actual menu/vehicle/race/gamepad UNTESTED. Do not rerun task; controller choose next independent DX11 feature, preserve DX9Ex fallback and DXVK freeze.",
+  "result_sha": "346eb97e5a248992615f8a3c0093805698103de7",
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38340853862,
+      "conclusion": "success",
+      "validation_sha": "346eb97e5a248992615f8a3c0093805698103de7",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38340853862"
+    },
+    "dx11_fast_structural": {
+      "id": 38340853335,
+      "conclusion": "success",
+      "validation_sha": "346eb97e5a248992615f8a3c0093805698103de7",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38340853335"
+    },
+    "windows_build": {
+      "id": 38340856731,
+      "conclusion": "success",
+      "validation_sha": "346eb97e5a248992615f8a3c0093805698103de7",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38340856731"
+    },
+    "openxr_architecture": {
+      "id": 38340856649,
+      "conclusion": "success",
+      "validation_sha": "346eb97e5a248992615f8a3c0093805698103de7",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38340856649"
+    },
+    "hud_inspector": {
+      "id": 38340856638,
+      "conclusion": "success",
+      "validation_sha": "346eb97e5a248992615f8a3c0093805698103de7",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38340856638"
+    }
+  },
+  "failure_repair": {
+    "failed_run_id": 38340611906,
+    "failed_step": "Verify native Z-write and read-only depth OM slot binding 00651",
+    "cause": "Python raw regex accidentally double-escaped grouping/whitespace and returned false negative",
+    "repair_commit": "346eb97e5a248992615f8a3c0093805698103de7"
+  }
 }
