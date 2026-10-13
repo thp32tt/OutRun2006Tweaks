@@ -431,7 +431,8 @@ def main() -> None:
             "const DWORD diffuse = decoded.diffuse;",
             "game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv)",
             "next[col] += clip[row] * matrix.m[row][col];",
-            "if (!game_native_object_clip_position(clip))",
+            "if (!game_native_world_depth_clip(clip, vp.MinZ, vp.MaxZ) ||",
+            "!game_native_object_clip_position(clip))",
             "std::copy(clip.begin(), clip.end(), v.clip);",
         )
         return (all(x in state for x in required_state)
@@ -451,7 +452,9 @@ def main() -> None:
         ("next[col] += clip[row] * matrix.m[row][col];",
          "next[col] += clip[row] * matrix.m[col][row];"),
         ("stride < layout.minStride", "stride < 20u"),
-        ("if (!game_native_object_clip_position(clip))", "if (false)"),
+        ("if (!game_native_world_depth_clip(clip, vp.MinZ, vp.MaxZ) ||",
+         "if (false ||"),
+        ("!game_native_object_clip_position(clip))", "false)"),
         ("supported_game_state(game, type, vp, layout, transforms, capture, output)",
          "supported_game_state(game, D3DPT_TRIANGLELIST, vp, layout, transforms, capture, output)"),
     ):
