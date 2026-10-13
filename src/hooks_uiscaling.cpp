@@ -105,6 +105,9 @@ class UIScaling : public Hook
 	// ScreenHud-classified parents may tag these child sprites as ScreenHud.
 	static inline SafetyHookInline OutRunHudTextProducerHook{};
 	inline static thread_local bool OutRunHudTextScreenHud = false;
+	// Only exact driving peripheral producers may opt in to VR edge layout.
+	// Keep GOAL/+TIME, C2C controls, speech, and unknown text on old HUD paths.
+	inline static thread_local bool OutRunHudPeripheralText = false;
 	static constexpr int OutRunHudTextProducerRva = 0xBA9D0;
 	static constexpr int OutRunHudTextClipCallRva = 0xBAAA0;
 	static constexpr int OutRunHudTextSpraniCallRva = 0xBAAEA;
@@ -610,10 +613,20 @@ class UIScaling : public Hook
 		const auto caller = OutRunHudTextCallerRva(_ReturnAddress());
 		const auto semantic = OutRunVRHudSemantics::ClassifyCaller(caller);
 		const bool previous = OutRunHudTextScreenHud;
+		const bool previousPeripheral = OutRunHudPeripheralText;
 		OutRunHudTextScreenHud = previous ||
 			semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud;
+		// Producer-callsite whitelist, not position-only inference: the
+		// generic OutRunHudText token also includes protected GOAL and other
+		// screen HUD. Preserve those sibling glyphs and their queue scopes.
+		OutRunHudPeripheralText =
+			semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud &&
+			(OutRunVRHudSemantics::InRange(caller, 0x0B9000, 0x0B9200) || // gear/REV
+			 OutRunVRHudSemantics::InRange(caller, 0x0B9E00, 0x0BA100) || // rank
+			 OutRunVRHudSemantics::InRange(caller, 0x0BE300, 0x0BEA40)); // time attack, not GOAL
 		OutRunHudTextProducerHook.call(
 			glyphSet, x, y, text, a4, alpha);
+		OutRunHudPeripheralText = previousPeripheral;
 		OutRunHudTextScreenHud = previous;
 	}
 	static int __cdecl OutRunHudText_clip(
@@ -633,7 +646,9 @@ class UIScaling : public Hook
 			sprite, x, y, flags, priority, color);
 		TagAppendedNodes(before,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
-			OutRunVR::GameSemantic::ProducerToken::OutRunHudText);
+			OutRunHudPeripheralText
+				? OutRunVR::GameSemantic::ProducerToken::OutRunHudPeripheralText
+				: OutRunVR::GameSemantic::ProducerToken::OutRunHudText);
 		return result;
 	}
 	static int __cdecl OutRunHudText_sprani(
@@ -652,7 +667,9 @@ class UIScaling : public Hook
 			spriteId, x, y, a4, a5, alpha);
 		TagAppendedNodes(before,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
-			OutRunVR::GameSemantic::ProducerToken::OutRunHudText);
+			OutRunHudPeripheralText
+				? OutRunVR::GameSemantic::ProducerToken::OutRunHudPeripheralText
+				: OutRunVR::GameSemantic::ProducerToken::OutRunHudText);
 		return result;
 	}
 

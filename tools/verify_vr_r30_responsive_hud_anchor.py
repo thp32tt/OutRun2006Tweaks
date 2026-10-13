@@ -10,7 +10,7 @@ assert 'Setting<bool> VRHudEdgeAnchors{ "VR", "HudEdgeAnchors", false' in settin
 start = code.index("R30HudEdgeAnchor R30GetExactHudEdgeAnchor(")
 end = code.index("bool R30TransformHudScissor(", start)
 helper = code[start:end]
-for tok in ("CurrentSpriteQueueProducer", "ProducerToken::OutRunHudText",
+for tok in ("CurrentSpriteQueueProducer", "ProducerToken::OutRunHudPeripheralText",
             "EffectiveScope()", "RenderScope::ScreenHud",
             "Settings::VRHudEdgeAnchors.get()", "if (!seen)",
             "std::isfinite(xy[0])", "std::isfinite(xy[1])",
@@ -50,6 +50,59 @@ for w,h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
     assert abs(changed_delta-scale*original_delta) < .001
 assert peripheral(float("nan"),.82)==0
 print("PASS exact-producer opt-in HUD edge anchor routing and numeric fixtures")
+
+# Producer identity is more restrictive than ScreenHud or the legacy
+# OutRunHudText: only source-confirmed gear/REV, rank and running time
+# may move to the XR periphery. Goal/final records, stage +TIME, C2C
+# dialogue, world/rival and centre reticles keep their established path.
+producer = (root / "src/hooks_uiscaling.cpp").read_text()
+semantic = (root / "src/vr/game/render_semantics.hpp").read_text()
+begin = producer.index("static void __cdecl OutRunHudTextProducer_dest(")
+end = producer.index("// R71 synchronous stage/checkpoint/result", begin)
+owner = producer[begin:end]
+for token in (
+    "const bool previousPeripheral = OutRunHudPeripheralText;",
+    "semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud &&",
+    "InRange(caller, 0x0B9000, 0x0B9200)",
+    "InRange(caller, 0x0B9E00, 0x0BA100)",
+    "InRange(caller, 0x0BE300, 0x0BEA40)",
+    "OutRunHudPeripheralText = previousPeripheral;",
+):
+    assert token in owner, token
+assert owner.count("ProducerToken::OutRunHudPeripheralText") == 2
+assert owner.count("ProducerToken::OutRunHudText") == 2
+assert "OutRunHudPeripheralText," in semantic
+assert 'case ProducerToken::OutRunHudPeripheralText: return "OUTRUN_HUD_PERIPHERAL_TEXT";' in semantic
+assert "ProducerToken::OutRunHudText ||" not in helper
+def edge_producer(caller):
+    return (0x0B9000 <= caller < 0x0B9200 or
+            0x0B9E00 <= caller < 0x0BA100 or
+            0x0BE300 <= caller < 0x0BEA40)
+for caller in (0x0B9000, 0x0B91FF, 0x0B9E00, 0x0BA0FF,
+               0x0BE300, 0x0BEA3F):
+    assert edge_producer(caller)
+for caller in (0x0B9200, 0x0BA100, 0x0BEA40, 0x0BEA64,
+               0x0BBA89, 0x0BD32E, 0x0FC84E, 0x0BAD20):
+    assert not edge_producer(caller)
+# Mutating either the R30 exact owner or the protected GOAL boundary must
+# fail this contract even when all unrelated HUD source remains unchanged.
+for original, replacement in (
+    ("0x0BE300, 0x0BEA40", "0x0BE300, 0x0BEB20"),
+    ("0x0B9000, 0x0B9200", "0x0B9000, 0x0BEB20"),
+    ("OutRunHudPeripheralText = previousPeripheral;",
+     "OutRunHudPeripheralText = true;"),
+    ("? OutRunVR::GameSemantic::ProducerToken::OutRunHudPeripheralText",
+     "? OutRunVR::GameSemantic::ProducerToken::OutRunHudText"),
+):
+    assert original in owner
+    assert not all(token in owner.replace(original, replacement, 1)
+                   for token in (
+                       "0x0B9000, 0x0B9200", "0x0BE300, 0x0BEA40",
+                       "OutRunHudPeripheralText = previousPeripheral;",
+                       "? OutRunVR::GameSemantic::ProducerToken::OutRunHudPeripheralText"))
+print("PASS exact driving peripheral producer; protected GOAL/+TIME/unknown 4 negative mutants")
+
+
 
 # Sparse semantic bbox must be identical to the masked full traversal,
 # regardless of draw/index ordering. Corrupt metadata fails closed.

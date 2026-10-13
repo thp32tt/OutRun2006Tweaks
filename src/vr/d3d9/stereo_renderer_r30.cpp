@@ -1777,7 +1777,7 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::EffectiveScope() !=
                     OutRunVR::GameSemantic::RenderScope::ScreenHud ||
                 OutRunVR::GameSemantic::CurrentSpriteQueueProducer !=
-                    OutRunVR::GameSemantic::ProducerToken::OutRunHudText ||
+                    OutRunVR::GameSemantic::ProducerToken::OutRunHudPeripheralText ||
                 !source || !count || stride < 4u * sizeof(float) ||
                 !(width > 0.0f && height > 0.0f))
                 return {};
@@ -1834,7 +1834,7 @@ namespace OutRunVRStereo
             };
         }
 
-        // The anchor keeps an exact OutRunHudText group near its original
+        // The anchor keeps an exact peripheral driving HUD group near its original
         // screen edge, but without a size floor HudScale=0.55 still makes
         // speed/time glyphs illegible inside a portrait XR eye. Only the
         // opt-in producer-verified peripheral draw may enlarge to 0.90 of

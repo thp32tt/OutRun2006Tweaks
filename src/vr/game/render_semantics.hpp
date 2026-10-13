@@ -78,6 +78,8 @@ namespace OutRunVR::GameSemantic
         // Keep their source distinct so D3DXSprite::Flush never widens
         // to menu, result, +TIME, DDS or all ScreenHud.
         DispRankClipSprite,
+        // Append-only: retain existing numeric producer tokens in IPC/debug logs.
+        OutRunHudPeripheralText,
     };
 
     inline thread_local RenderScope CurrentScope = RenderScope::None;
@@ -120,6 +122,7 @@ namespace OutRunVR::GameSemantic
         case ProducerToken::StageExtensionTime: return "OUTRUN_STAGE_EXTENSION_TIME";
         case ProducerToken::GoalTimeHelper: return "GOAL_TIME_HELPER";
         case ProducerToken::OutRunHudText: return "OUTRUN_HUD_TEXT";
+        case ProducerToken::OutRunHudPeripheralText: return "OUTRUN_HUD_PERIPHERAL_TEXT";
         case ProducerToken::DispRankFirst: return "DISPLAY_RANK_FIRST";
         case ProducerToken::GoalTime020: return "GOAL_TIME_HELPER_020";
         case ProducerToken::GoalTime150: return "GOAL_TIME_HELPER_150";
