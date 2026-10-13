@@ -20,8 +20,8 @@ def connected(cpp: str, adm: str) -> bool:
         'std::array<ComPtr<ID3D11DepthStencilState>, 4> diagnosticDepthStates;',
         'D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO',
         'ds.DepthFunc = output.nativeDepthLessEqual ?',
-        'output.nativeDepthWrite ? 2u : 0u',
-        'output.nativeDepthLessEqual ? 1u : 0u',
+        'game_native_depth_slot(',
+        'output.nativeDepthWrite, output.nativeDepthLessEqual',
         'ctx->OMSetDepthStencilState(',
         'ctx->OMSetRenderTargets(1, &rtv, s.diagnosticDepthView.Get());',
         'ctx->DrawIndexed(indexCount, 0, 0);',
@@ -36,6 +36,8 @@ def connected(cpp: str, adm: str) -> bool:
             'ctx->DrawIndexed(indexCount, 0, 0);',
             'ctx->Draw(static_cast<UINT>(vertices.size()), 0);',
         ))
+        and cpp.count('game_native_depth_slot(') == 2
+        and 'constexpr std::uint32_t game_native_depth_slot(' in adm
         and 'zWrite > 1u' in adm
         and 'output = {true, zFunc == 4u, zWrite == 1u};' in adm
         and 'zFunc != 2u && zFunc != 4u' in adm
@@ -47,7 +49,7 @@ assert connected(bridge, header)
 for original, broken in (
     ('output.nativeDepthWrite = admitted.writeEnabled;', 'output.nativeDepthWrite = true;'),
     ('D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO', 'D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ALL'),
-    ('output.nativeDepthWrite ? 2u : 0u', '0u'),
+    ('game_native_depth_slot(', 'game_native_depth_slot_broken('),
     ('ctx->OMSetDepthStencilState(', 'ctx->OMSetRenderTargets('),
 ):
     mutated = bridge.replace(original, broken)

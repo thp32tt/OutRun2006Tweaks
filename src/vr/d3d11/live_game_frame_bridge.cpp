@@ -3096,8 +3096,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             s.diagnosticDepthView = std::move(createdView);
         }
         auto& depthState =
-            s.diagnosticDepthStates[(output.nativeDepthWrite ? 2u : 0u) +
-                                    (output.nativeDepthLessEqual ? 1u : 0u)];
+            s.diagnosticDepthStates[game_native_depth_slot(
+                output.nativeDepthWrite, output.nativeDepthLessEqual)];
         if (!depthState) {
             D3D11_DEPTH_STENCIL_DESC ds{};
             ds.DepthEnable = TRUE;
@@ -3119,7 +3119,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         ctx->ClearDepthStencilView(s.diagnosticDepthView.Get(),
                                    D3D11_CLEAR_DEPTH, 1.0f, 0);
         ctx->OMSetDepthStencilState(
-            s.diagnosticDepthStates[output.nativeDepthLessEqual ? 1u : 0u].Get(), 0);
+            s.diagnosticDepthStates[game_native_depth_slot(
+                output.nativeDepthWrite, output.nativeDepthLessEqual)].Get(), 0);
     } else {
         // Immediate-context state survives across draws; do not depth-test
         // later menu/vehicle/HUD draws using the previous race state.

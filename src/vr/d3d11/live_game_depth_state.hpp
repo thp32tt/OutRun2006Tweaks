@@ -30,4 +30,11 @@ constexpr bool game_native_depth_admission(
     output = {true, zFunc == 4u, zWrite == 1u};
     return true;
 }
+// Four independent OM states: write-off LESS, write-off LEQUAL,
+// write-on LESS, write-on LEQUAL. Both creation AND binding must select
+// the exact same slot; a missing +2 silently binds an uninitialized state.
+constexpr std::uint32_t game_native_depth_slot(
+    bool writeEnabled, bool lessEqual) noexcept {
+    return (writeEnabled ? 2u : 0u) + (lessEqual ? 1u : 0u);
+}
 } // namespace outrun::vr::dx11::live_game_frame

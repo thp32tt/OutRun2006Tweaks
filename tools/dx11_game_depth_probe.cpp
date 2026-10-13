@@ -18,6 +18,17 @@ int main() {
     assert(game_native_depth_admission(1,0,4,0,0,true,depth));
     assert(depth.enabled && depth.lessEqual && !depth.writeEnabled);
     assert(game_native_depth_admission(1,1,4,0,0,true,depth));
+    // For all four D3D9 Z-write/comparison combinations the native OM
+    // descriptor selected for creation is the one actually bound to Draw.
+    using outrun::vr::dx11::live_game_frame::game_native_depth_slot;
+    for (unsigned slot = 0u; slot < 4u; ++slot) {
+        assert(game_native_depth_slot((slot & 2u) != 0u,
+                                      (slot & 1u) != 0u) == slot);
+    }
+    assert(game_native_depth_slot(false, false) !=
+           game_native_depth_slot(true, false));
+    assert(game_native_depth_slot(false, true) !=
+           game_native_depth_slot(true, true));
     const auto retained = depth;
     for (unsigned mode : {2u, 3u, 0xffffffffu})
         assert(!game_native_depth_admission(mode,1,4,0,0,true,depth));
