@@ -1113,7 +1113,7 @@ def main() -> None:
         assert start >= 0 and end > start
         entrypoints = source[start:end]
         assert entrypoints.count("topology != D3DPT_TRIANGLESTRIP") == 3
-        assert entrypoints.count("live::game_primitive_element_count(") == 3
+        assert entrypoints.count("live::game_native_primitive_element_count(") == 3
         assert "static_cast<std::uint64_t>(nativeElements)*stride" in entrypoints
         assert "const UINT count = nativeElements;" in entrypoints
         assert "const UINT count=nativeElements;" in entrypoints
@@ -1124,8 +1124,8 @@ def main() -> None:
 
     strip_tokens = (
         '#include "live_game_primitive_span.hpp"',
-        "type != D3DPT_TRIANGLESTRIP",
-        "type == D3DPT_TRIANGLESTRIP",
+        "game_native_primitive_element_count(static_cast<std::uint32_t>(type),",
+        "topology == D3DPT_TRIANGLESTRIP ?",
         "indexCount != expectedElements",
         "vertexCount != expectedElements",
         "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP",
@@ -1148,7 +1148,8 @@ def main() -> None:
     for token in ("game_fan_to_triangle_list", "result.push_back(center);",
                   "result.push_back(b);", "result.push_back(c);", "triangles.swap(result);"):
         assert token in fan_header
-    for token in ("type != D3DPT_TRIANGLEFAN", "type == D3DPT_TRIANGLEFAN",
+    for token in ("game_native_primitive_element_count(static_cast<std::uint32_t>(type),",
+                  "type == D3DPT_TRIANGLEFAN",
                   "fanTriangles.data()", "D3DPT_TRIANGLELIST, capture, output"):
         assert token in bridge
     assert "fan == preserved" in fan_probe
