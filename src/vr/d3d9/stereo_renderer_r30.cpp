@@ -1691,13 +1691,26 @@ namespace OutRunVRStereo
         // downward on screen. The old fallback stays exactly zero for all
         // F11, gameplay HUD, world, GOAL/+TIME, title and unknown states.
         // Apply the SAME signed fraction in both XYZRHW and shader HUD paths.
+        // The original option arrows/YES-NO are explicit ScreenHud sprites,
+        // whereas the pause shell is generic ScreenOverlay2D. Keep both on
+        // the SAME per-eye pause transform. This producer is never allowed
+        // to promote unrelated ScreenHud or world/GOAL draws.
+        bool R30IsPauseMenuExactArrow() noexcept
+        {
+            return OutRunVR::GameSemantic::EffectiveScope() ==
+                    OutRunVR::GameSemantic::RenderScope::ScreenHud &&
+                OutRunVR::GameSemantic::CurrentSpriteQueueProducer ==
+                    OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite;
+        }
+
         float R30PauseMenuVerticalFraction() noexcept
         {
             if (OutRunVR::GameSemantic::ExternalOverlaySemanticDepth != 0 ||
                 !Game::current_mode ||
                 *Game::current_mode != GameState::STATE_SMPAUSEMENU ||
-                OutRunVR::GameSemantic::EffectiveScope() !=
-                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D)
+                (OutRunVR::GameSemantic::EffectiveScope() !=
+                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D &&
+                 !R30IsPauseMenuExactArrow()))
                 return 0.0f;
             const float fraction = Settings::VRPauseMenuVerticalOffset.get();
             if (!std::isfinite(fraction))
@@ -1720,8 +1733,9 @@ namespace OutRunVRStereo
             if (OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
                 Game::current_mode &&
                 *Game::current_mode == GameState::STATE_SMPAUSEMENU &&
-                OutRunVR::GameSemantic::EffectiveScope() ==
-                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D &&
+                (OutRunVR::GameSemantic::EffectiveScope() ==
+                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D ||
+                 R30IsPauseMenuExactArrow()) &&
                 Settings::VRPauseMenuScale.get() > 0.0f)
             {
                 const float requested = Settings::VRPauseMenuScale.get();

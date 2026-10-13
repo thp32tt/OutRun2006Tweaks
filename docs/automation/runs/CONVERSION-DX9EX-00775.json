@@ -1,0 +1,95 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00775",
+  "production_id": "CONVERSION-DX9EX-00775",
+  "event_id": "CONVERSION-DX9EX-00775-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:ESC_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:ESC_MENU",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_MATERIAL",
+  "feature_status": "BUILD_PENDING_NEED_HMD_TEST",
+  "controller_terminal": false,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00775]",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:ESC_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+    "goal": "Repair the complete original-game ESC pause/options menu so the shell and exactly authored option-arrow UI share a native-eye legible scale and vertical position across fixed-function, shader and independent-eye replay while game input and non-menu HUD remain unchanged.",
+    "scope_boundary": "Only DX9Ex original pause menu and exact authored option arrows; excludes driving HUD, F11 ImGui, main-menu aspect, GOAL/+TIME, world markers and DX11/DXVK.",
+    "trace_stages": [
+      "Original x86 option-arrow put_clip_sprite E8 callsites and exact SpriteNode ScreenHud producer token",
+      "Queue replay and renderer R30 EffectiveScope/CurrentSpriteQueueProducer per-draw identity",
+      "R30HudContainScale and R30PauseMenuVerticalFraction shared fixed XYZRHW, independent-eye fallback and shader projection",
+      "OpenXR per-eye FOV/viewport composition, desktop mode and resolution/reset fallback"
+    ],
+    "subcomponents": [
+      "Pause shell, option-arrow and selection highlight alignment via exact queue producer gate",
+      "Shared pause-only per-eye contain scale and signed vertical translation in all draw paths",
+      "Preservation of original input ownership and excluded gameplay/GOAL/F11/world geometry"
+    ],
+    "acceptance_items": [
+      {
+        "id": "ESC_MENU_ALIGNED",
+        "category": "end_to_end_behavior",
+        "behavior_area": "menu_shell_and_original_arrows",
+        "expected_behavior": "Original pause shell and exact option-arrow sprites use same responsive 1.25 default/0.10 vertical transform without detaching selection controls"
+      },
+      {
+        "id": "ESC_BOTH_RENDER_PATHS",
+        "category": "end_to_end_behavior",
+        "behavior_area": "per_eye_render_paths",
+        "expected_behavior": "Paired XYZRHW, independent-eye fallback and WVP shader share pause offset/scale and preserve left/right coherence"
+      },
+      {
+        "id": "ESC_NEGATIVE_SCOPE_RESET",
+        "category": "fallback_regression",
+        "behavior_area": "desktop_gameplay_reset",
+        "expected_behavior": "Unrelated ScreenHud, GOAL/result, external F11, nonpause state, invalid offset, reset and world remain on their original owners"
+      },
+      {
+        "id": "ESC_EXACT_SHA_INTEGRATION",
+        "category": "integrated_validation",
+        "behavior_area": "host_game_build",
+        "expected_behavior": "Exact-SHA DX9Ex Active Win32 host/game/full-chain/package and Domain Isolation gate succeed, hardware acceptance remains separate"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "ESC_MENU_ALIGNED": "PENDING",
+    "ESC_BOTH_RENDER_PATHS": "PENDING",
+    "ESC_NEGATIVE_SCOPE_RESET": "PENDING",
+    "ESC_EXACT_SHA_INTEGRATION": "PENDING",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "User's 2026-10-13 Quest3/VDXR build 75ef9c91 shows tiny/upward pause menu; current source applied pause-only scale and Y shift to ScreenOverlay2D alone.",
+    "source_trace": [
+      "Original OptionArrow_ClipSpriteCalls exact x86 E8 callers route through ExactScreenHud_putClipSprite.",
+      "SpriteNode exact callback records ProducerToken::ExactScreenHudClipSprite with RenderScope::ScreenHud.",
+      "R30 pause scale and vertical offset originally checked only ScreenOverlay2D, leaving exact pause arrow on gameplay HudScale."
+    ],
+    "root_cause": "When current mode is STATE_SMPAUSEMENU, pause shell ScreenOverlay2D uses dedicated scale and offset, but its separate exact option arrow ScreenHud retains gameplay scale/zero Y offset, detaching the controls.",
+    "alternatives_rejected": [
+      "A global ScreenHud -> pause promotion would also affect non-menu GOAL/position; gate only exact original arrow token in pause state.",
+      "Changing only VRPauseMenuScale or a global HudScale cannot align two differently-classified draw producers."
+    ],
+    "eye_ownership": "Per-draw token never grants world ownership; exact pause arrow joins shell's shared stereo HUD-plane affine in both eyes only within original game's pause state.",
+    "fix_evidence": "Added R30IsPauseMenuExactArrow and gated both pause contain scale and vertical offset; source-identity, numerical and destructive regression verification updated."
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_responsive_hud_anchor.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00775.json"
+  ],
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "score_delta": 0
+}

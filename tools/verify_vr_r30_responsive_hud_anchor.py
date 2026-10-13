@@ -225,7 +225,7 @@ for token in (
     "ExternalOverlaySemanticDepth == 0 &&",
     "Game::current_mode &&",
     "*Game::current_mode == GameState::STATE_SMPAUSEMENU",
-    "RenderScope::ScreenOverlay2D &&",
+    "R30IsPauseMenuExactArrow()) &&",
     "Settings::VRPauseMenuScale.get()",
     "std::clamp(readable,",
     "0.55f, 1.50f",
@@ -246,10 +246,12 @@ assert "const float userScale = R30HudScopeScale();" in contain
 assert "R30HudContain.userScale == userScale" in contain
 assert "R30HudContain.userScale = userScale;" in contain
 def effective(mode, semantic, f11=False, hud=.55, pause=1.0,
-              responsive=True):
+              responsive=True, producer=None):
     if semantic == "overlay" and f11:
         return 1.0
-    if mode == 0x12 and semantic == "overlay" and not f11 and pause > 0:
+    pause_owned = semantic == "overlay" or (
+        semantic == "hud" and producer == "exact_menu_arrow")
+    if mode == 0x12 and pause_owned and not f11 and pause > 0:
         requested = max(pause, 1.25) if responsive else pause
         return max(.55, min(1.50, requested))
     return hud
@@ -260,6 +262,9 @@ for source_w, source_h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
         assert effective(0x12, "overlay") == 1.25
         assert effective(0x12, "overlay", responsive=False) == 1.0
         assert effective(0x12, "hud") == .55
+        assert effective(0x12, "hud", producer="exact_menu_arrow") == 1.25
+        assert effective(0x12, "hud", producer="result_progress") == .55
+        assert effective(0x09, "hud", producer="exact_menu_arrow") == .55
         assert effective(0x12, "world") == .55
         assert effective(0x09, "overlay") == .55
         assert effective(0x10, "overlay") == .55
@@ -272,7 +277,7 @@ for bad, good in (
      "ExternalOverlaySemanticDepth != 0 &&"),
     ("*Game::current_mode == GameState::STATE_SMPAUSEMENU",
      "*Game::current_mode == GameState::STATE_GAME"),
-    ("RenderScope::ScreenOverlay2D &&", "RenderScope::ScreenHud &&"),
+    ("R30IsPauseMenuExactArrow()) &&", "R30IsPauseMenuExactArrow()) ||"),
     ("std::clamp(readable,",
      "std::clamp(Settings::VRHudScale.get(),"),
 ):
@@ -281,7 +286,7 @@ for bad, good in (
     assert not all(token in mutant for token in (
         "ExternalOverlaySemanticDepth == 0 &&",
         "*Game::current_mode == GameState::STATE_SMPAUSEMENU",
-        "RenderScope::ScreenOverlay2D &&",
+        "R30IsPauseMenuExactArrow()) &&",
         "std::clamp(readable,"))
 print("PASS exact ESC pause ownership, F11/HUD/world negatives and size/aspect fixtures")
 
@@ -289,14 +294,34 @@ print("PASS exact ESC pause ownership, F11/HUD/world negatives and size/aspect f
 # Issue #119: independently centre the ESC/pause menu vertically. The same
 # viewport-fraction must feed the pretransformed XYZRHW and shader HUD paths.
 # User-visible placement still requires Quest3/VDXR optical acceptance.
+# Verify original-game exact arrow producer identity, never blanket ScreenHud.
+arrow_begin = code.index("bool R30IsPauseMenuExactArrow() noexcept")
 pause_begin = code.index("float R30PauseMenuVerticalFraction() noexcept")
+arrow_scope = code[arrow_begin:pause_begin]
+for marker in ("RenderScope::ScreenHud",
+               "CurrentSpriteQueueProducer",
+               "ProducerToken::ExactScreenHudClipSprite"):
+    assert marker in arrow_scope, marker
+for original, corrupt in (
+    ("RenderScope::ScreenHud", "RenderScope::WorldBillboard"),
+    ("ProducerToken::ExactScreenHudClipSprite",
+     "ProducerToken::ResultProgress"),
+):
+    mutant = arrow_scope.replace(original, corrupt, 1)
+    assert original not in mutant
+producer = (root / "src/hooks_uiscaling.cpp").read_text()
+assert "OptionArrow_ClipSpriteCalls[]" in producer
+assert "Module::exe_ptr(addr), ExactScreenHud_putClipSprite" in producer
+assert "ProducerToken::ExactScreenHudClipSprite" in producer
+
 pause_end = code.index("float R30HudScopeScale() noexcept", pause_begin)
 pause_func = code[pause_begin:pause_end]
 for token in (
     "ExternalOverlaySemanticDepth != 0 ||",
     "!Game::current_mode ||",
     "*Game::current_mode != GameState::STATE_SMPAUSEMENU ||",
-    "RenderScope::ScreenOverlay2D)",
+    "RenderScope::ScreenOverlay2D &&",
+    "!R30IsPauseMenuExactArrow()))",
     "Settings::VRPauseMenuVerticalOffset.get()",
     "!std::isfinite(fraction)",
     "std::clamp(fraction, -0.25f, 0.25f)",
@@ -350,10 +375,20 @@ for old,new in (
     assert mutant != fallback
     assert not (fallback_hoist in mutant and
                 "correctedY = hudScaleY * ndcY - pauseNdcOffset;" in mutant)
-def pause_fraction(state, semantic, external, fraction):
-    if external or state != "pause" or semantic != "overlay" or not isfinite(fraction):
+def pause_fraction(state, semantic, external, fraction, producer=None):
+    owns = semantic == "overlay" or (
+        semantic == "hud" and producer == "exact_menu_arrow")
+    if external or state != "pause" or not owns or not isfinite(fraction):
         return 0.0
     return max(-.25, min(.25, fraction))
+assert pause_fraction("pause", "hud", False, .10,
+                      producer="exact_menu_arrow") == .10
+assert pause_fraction("pause", "hud", False, .10,
+                      producer="result_progress") == 0
+assert pause_fraction("game", "hud", False, .10,
+                      producer="exact_menu_arrow") == 0
+assert pause_fraction("pause", "hud", True, .10,
+                      producer="exact_menu_arrow") == 0
 
 for width,height in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
     for fraction in (-.25,0.,.10,.25):
