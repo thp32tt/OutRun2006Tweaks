@@ -1,0 +1,31 @@
+{
+  "TASK_ID": "OUTRUN-NEW-A-Q217-20261013-142553",
+  "branch": "korean-localization-clean-start-20261013",
+  "lane": "A",
+  "attempt": 1,
+  "base_head": "0cf164899f8118dcf6c279971469fe00b57bbc7c",
+  "result_sha": "631ff15ecdb2c1dc59d7d8c669e98bc09d598905",
+  "state": "STACK_BUILD_AND_FIXTURE_VALIDATED",
+  "validation": {
+    "github_run_id": 38352250030,
+    "github_job_id": 115147045548,
+    "conclusion": "success",
+    "unit_tests": 10,
+    "chromium_fixture_tests": 1,
+    "actual_github_png_download": "PASS",
+    "docker_build": "PASS",
+    "compose_config": "PASS"
+  },
+  "runtime": {
+    "deployment": "NOT_RUN_USER_MANUAL",
+    "live_chatgpt_upload": "UNTESTED",
+    "native_imagegen": "UNTESTED",
+    "automatic_visual_self_qa": "UNTESTED",
+    "DDS": "NOT_BUILT",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "next_action": "User manually deploys Portainer Git stack docker/imagegen-a/docker-compose.yml on this branch and signs in via noVNC; A automatically runs once. Inspect /data/results/TASK_ID/state.json.",
+  "source_sha256": "56b3834649568383293786e862025351d0f2379ec632592cf40d78c532a50b15",
+  "source_container_directory": "/sources",
+  "qa_scope": "producer self-QA plus mechanical only; no independent or game approval"
+}
