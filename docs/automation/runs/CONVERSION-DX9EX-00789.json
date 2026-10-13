@@ -11,12 +11,12 @@
   "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
   "work_key": "DX9EX:VIS:ESC_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
-  "checkpoint": "C4_VALIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00789]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/pause_menu_eye_affine.hpp",
@@ -24,7 +24,10 @@
     "vrhost/CMakeLists.txt",
     ".github/workflows/vr-dx9ex-active.yml",
     "tools/verify_vr_pause_menu_eye_affine.py",
-    "docs/automation/runs/CONVERSION-DX9EX-00789.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00789.json",
+    "tools/verify_vr_r30_hud_sparse_visit.py",
+    "tools/verify_vr_r30_hud_contain_draw_fastpath.py",
+    "tools/verify_vr_r30_responsive_hud_anchor.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:ESC_MENU",
@@ -62,9 +65,9 @@
     ]
   },
   "acceptance_results": {
-    "ESC_STEREO_SHELL_ARROWS": "PENDING_EXACT_SHA",
-    "ESC_RESET_F11_HUD_FALLBACK": "PENDING_EXACT_SHA",
-    "EXACT_SHA_WIN32_DOMAIN_GATE": "PENDING_EXACT_SHA",
+    "ESC_STEREO_SHELL_ARROWS": "PASS",
+    "ESC_RESET_F11_HUD_FALLBACK": "PASS",
+    "EXACT_SHA_WIN32_DOMAIN_GATE": "PASS",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -78,11 +81,35 @@
     "negative_test_evidence": "Pure C++ asymmetric/symmetric/one-eye-invalid/inverted/extreme eye FOV smoke and source destructive checks for three R30 paths and F11 exclusion."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "SUCCESS",
+    "material_sha": "ae802bebd0e0bdf694d4883bd19c04f13376e96e",
+    "validation_bearing_sha": "c06a55623c41a4cd8eecb00ad115df33d33835ed",
+    "dx9ex_active": {
+      "run_id": 38438926239,
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38438926293,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38437735208,
+      "conclusion": "success",
+      "note": "material C++ source SHA validated; subsequent revisions updated deterministic gate scripts only"
+    },
     "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
   },
   "runtime_status": "NEED_QUEST3_VDXR_TEST",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null
+  "material_result_sha": "ae802bebd0e0bdf694d4883bd19c04f13376e96e",
+  "validation_bearing_result_sha": "c06a55623c41a4cd8eecb00ad115df33d33835ed",
+  "result_sha": "c06a55623c41a4cd8eecb00ad115df33d33835ed",
+  "material_sha": "ae802bebd0e0bdf694d4883bd19c04f13376e96e",
+  "c6_result": "PASS_EXACT_SHA"
 }
