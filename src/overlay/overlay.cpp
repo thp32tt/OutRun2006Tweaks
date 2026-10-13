@@ -89,7 +89,16 @@ void Overlay::render_shell()
 	// density: an active headset can legitimately render at 1x during
 	// resolution changes, without becoming a desktop F11 window.
 	const bool externalVrShell = Game::is_vr_gameplay_presentation();
-	const float vrDensity = std::clamp(VrFontMultiplier, 1.0f, 3.0f);
+	// First-run F11 and later font-size edits change rasterised glyph height.
+	// The VR shell previously stayed at the original 2x-font canvas while
+	// its text grew (or shrank), clipping tabs/settings after a live edit.
+	// Keep the Quest3 eye-density factor, but scale ONLY this external shell
+	// with the user's font setting relative to the shipped 2.0 default.
+	// The editor remains reversible and desktop/menu shells are unchanged.
+	const float vrFontScale = std::clamp(GlobalFontScale, 0.5f, 5.0f);
+	const float vrUiFactor = externalVrShell
+		? std::clamp(vrFontScale / 2.0f, 0.5f, 2.5f) : 1.0f;
+	const float vrDensity = std::clamp(VrFontMultiplier, 1.0f, 3.0f) * vrUiFactor;
 	// On a tiny reset/recreate surface, never grow beyond the real content
 	// rectangle (the former 64px floor could exceed the viewport).
 	const float maxWidth = (std::max)(1.f, content.width -

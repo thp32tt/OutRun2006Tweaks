@@ -1,4 +1,19 @@
 #!/usr/bin/env python3
+# F11 live font slider: keep window/control geometry proportional to the
+# independently rasterised VR atlas. The native desktop shell must remain 1x.
+def f11_shell_density(font_size, eye_density, vr):
+    bounded_font = max(0.5, min(5.0, font_size))
+    ui_factor = max(0.5, min(2.5, bounded_font / 2.0)) if vr else 1.0
+    return max(1.0, min(3.0, eye_density)) * ui_factor
+
+for eye in (1.0, 1.75, 2.75, 3.0):
+    assert f11_shell_density(2.0, eye, True) == eye
+    assert f11_shell_density(4.0, eye, True) == 2.0 * eye
+    assert f11_shell_density(1.0, eye, True) == 0.5 * eye
+    assert f11_shell_density(4.0, eye, False) == eye
+assert f11_shell_density(5.0, 2.75, True) == 2.75 * 2.5
+assert f11_shell_density(float("inf"), 2.75, True) == 2.75 * 2.5
+
 """F11 Quest3 eye-aspect raster-density regression (static + numeric/destructive)."""
 from pathlib import Path
 import math
@@ -44,6 +59,10 @@ def check(hook: str, font: str, header: str) -> None:
         )),
         (shell_guard, (
             "std::clamp(VrFontMultiplier, 1.0f, 3.0f)",
+            "const float vrFontScale = std::clamp(GlobalFontScale, 0.5f, 5.0f);",
+            "const float vrUiFactor = externalVrShell",
+            "std::clamp(vrFontScale / 2.0f, 0.5f, 2.5f) : 1.0f;",
+            "const float vrDensity = std::clamp(VrFontMultiplier, 1.0f, 3.0f) * vrUiFactor;",
             "1130.f * vrDensity",
             "600.f * vrDensity",
             "ImGuiCond_Appearing : ImGuiCond_FirstUseEver",
