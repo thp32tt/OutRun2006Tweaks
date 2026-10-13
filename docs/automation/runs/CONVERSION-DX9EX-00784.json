@@ -20,7 +20,7 @@
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_status": "NEED_HMD_TEST",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/overlay/overlay.hpp",
     "src/overlay/overlay.cpp",
@@ -106,5 +106,10 @@
       "conclusion": "success"
     },
     "hmd": "UNTESTED"
-  }
+  },
+  "score_run_key": "CONVERSION-DX9EX-00784",
+  "scoreboard_commit_sha": "bd1cc063d043a7d7b2616ef74b6a10d70861dadf",
+  "scoreboard_previous": 1239,
+  "scoreboard_cumulative": 1240,
+  "score_duplication_policy": "Single +1 for original material + failed gate repair + retry + C6; no additional credit for this bookkeeping reconciliation."
 }
