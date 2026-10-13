@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2",
   "work_key": "DX11:MENU_RACE_OUTPUT_GENERATION_DEVICE_UPLOAD",
   "feature_id": "MENU_RACE_OUTPUT_GENERATION_AND_DEVICE_OWNED_INSET",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA_5_OF_5",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -82,9 +82,9 @@
     ]
   },
   "acceptance_results": {
-    "gpu-output-epoch": "PENDING_GATE",
-    "device-safe-inset": "PENDING_GATE",
-    "exact-sha-ci": "PENDING_GATE",
+    "gpu-output-epoch": "PASS_BUILD",
+    "device-safe-inset": "PASS_BUILD",
+    "exact-sha-ci": "PASS_EXACT_SHA",
     "quest3-hmd": "NEED_HMD_TEST"
   },
   "base_head_sha": "f0b884bf7194dce865c3852fec25c29f38bd4cd3",
@@ -93,16 +93,63 @@
     "src/vr/d3d11/native_game_readback_provenance.hpp",
     "tools/test_dx11_game_output_transition_00682.py",
     ".github/workflows/dx11-fast-structural.yml",
-    "docs/automation/runs/CONVERSION-DX11-00682.json"
+    "docs/automation/runs/CONVERSION-DX11-00682.json",
+    "tools/test_dx11_game_device_handoff_00681.py"
   ],
   "pipeline": {
     "C0_RECOVER": "PASS 00681 verified and current branch",
     "C1_REVIEW": "PASS observed stale async output epoch and D3D9 CPU upload surface ownership defect",
     "C2_IMPLEMENT": "PASS game-output epoch and device-owned CPU inset binding",
-    "C3_VALIDATE": "PENDING required GitHub Actions",
-    "C4_COMMIT": "SOURCE_COMMIT",
+    "C3_VALIDATE": "PASS C++17 native output test and 5/5 exact-SHA GitHub Actions; preflight shape test repairs under same TASK_ID",
+    "C4_COMMIT": "PASS material cc17b4b5; repair/validation-bearing 85c017a50636ffff1357f12fd21a77a4cbce17e6",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_CI"
+    "C6_STATE": "DONE_BUILD_VERIFIED; actual Quest3/VDXR and gamepad NEED_HMD_TEST"
   },
-  "next_action": "Check exact SHA five GitHub Actions; fix failed tests under same TASK_ID without replay; runtime Quest3/VDXR UNTESTED."
+  "next_action": "Build verified on 85c017a50636ffff1357f12fd21a77a4cbce17e6; original D3D9 gamepad and diagnostic opt-in only. Quest3/VDXR menu/vehicle/race and input runtime need hardware; do not re-run 00682, select new feature.",
+  "material_result_sha": "cc17b4b56f3822f1e223f82afa6ca55b6dc7b41b",
+  "validation_bearing_result_sha": "85c017a50636ffff1357f12fd21a77a4cbce17e6",
+  "result_sha": "85c017a50636ffff1357f12fd21a77a4cbce17e6",
+  "exact_sha_workflow_gates": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38417699975,
+      "head_sha": "85c017a50636ffff1357f12fd21a77a4cbce17e6",
+      "result": "success",
+      "status": "completed",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38417699975"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38417699938,
+      "head_sha": "85c017a50636ffff1357f12fd21a77a4cbce17e6",
+      "result": "success",
+      "status": "completed",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38417699938"
+    },
+    {
+      "name": "Build",
+      "run_id": 38417706132,
+      "head_sha": "85c017a50636ffff1357f12fd21a77a4cbce17e6",
+      "result": "success",
+      "status": "completed",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38417706132"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38417706334,
+      "head_sha": "85c017a50636ffff1357f12fd21a77a4cbce17e6",
+      "result": "success",
+      "status": "completed",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38417706334"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38417706341,
+      "head_sha": "85c017a50636ffff1357f12fd21a77a4cbce17e6",
+      "result": "success",
+      "status": "completed",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38417706341"
+    }
+  ],
+  "verified_utc": "2026-10-13T15:08:29.904Z"
 }
