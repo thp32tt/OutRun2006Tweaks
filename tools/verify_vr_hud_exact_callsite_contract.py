@@ -306,7 +306,11 @@ def check(ui, manifest):
                     "ScopedExactProducerSemantic producerScope(",
                     "Game::sprani_play_ae_auth_alpha(",
                     "TagAppendedNodes(tailsBefore, scope,")
-            if chunk.count("&projectedAnchor") < 2:
+            # The rank sprani wrapper passes one frozen marker pointer through
+            # the local 'marker' alias to both synchronous and deferred draws.
+            if ("marker = projected ? &projectedAnchor : nullptr;" not in chunk or
+                    "scope, marker);" not in chunk or
+                    "ProducerToken::RankMarkerSprani, marker)" not in chunk):
                 fail("rank immediate draw and queued siblings must share frozen anchor")
             if "TagAppendedNodes(tailsBefore, scope," not in chunk:
                 fail("rank sprani lost all-node exact producer tagging")

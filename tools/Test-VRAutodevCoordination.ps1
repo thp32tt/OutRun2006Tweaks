@@ -40,7 +40,10 @@ Require ($queue.policy.candidateWriter -eq "D_INTEGRATION_PLANNER") "Queue candi
 Require ([int]$queue.policy.maxIndependentUnvalidatedRuntimeCandidates -eq 3) "Queue WIP cap must be 3"
 Require ([int]$queue.policy.maxMateriallyDifferentFixAttempts -eq 2) "Queue fix-attempt cap must be 2"
 
-$allowed = @("READY","IN_PROGRESS","NEEDS_VALIDATION","VALIDATED","NEEDS_POST_REVIEW","NEED_HMD_TEST","BLOCKED","DONE")
+# The 2026-10-13 function-level queue intentionally decomposed the old Issue
+# 119 mega-feature into distinct HUD/F11/ESC/main-menu children. Its parent
+# is tracking-only, not a new runnable writer or proof of runtime acceptance.
+$allowed = @("READY","IN_PROGRESS","NEEDS_VALIDATION","VALIDATED","NEEDS_POST_REVIEW","NEED_HMD_TEST","BLOCKED","DONE","DECOMPOSED_PARENT_TRACKING_ONLY")
 $ids = @{}
 foreach ($item in @($queue.items)) {
     $id = [string]$item.id
