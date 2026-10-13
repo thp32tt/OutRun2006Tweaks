@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00695",
+  "production_id": "CONVERSION-DX11-00695",
+  "event_id": "CONVERSION-DX11-00695-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "feature_id": "GAME_STEREO_MSAA_EYE_TRANSPORT",
+  "work_key": "DX11:NATIVE_GAME_STEREO_MSAA_RESOLVE",
+  "status": "AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Local game-authored stereo D3D11 MSAA render targets and sample/format ownership",
+      "Two native ResolveSubresource GPU operations into the shared 1x DX11 stereo eye ring",
+      "Existing single-sample CopyResource path and exact frame/slot GPU EVENT, later host OpenXR ACK"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+      "tools/dx11_eye_msaa_resolve_probe_00695.cpp",
+      "tools/test_dx11_eye_msaa_resolve_00695.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++17 compiled sample/quality pair matrix and end-to-end exact-DXGI source-to-ring Resolve dispatch",
+      "negative_regression": "Mismatch/missing MSAA resolve format support, source alias, shared provenance and rejected descriptors leave Acquired slot unchanged and original D3D9 game Draw/input intact",
+      "component_integration": "Game local stereo MSAA RT -> D3D11 ResolveSubresource into shared ring -> existing producer EVENT/host ACK publication path; non-MSAA Copy preserved"
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_GAME_STEREO_MSAA_RESOLVE",
+      "src/vr/d3d11/native_shared_eye_ring.cpp",
+      "src/vr/d3d11/native_game_eye_pair_sources.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LOCAL_STEREO_GAME_RENDER_TARGET",
+      "DX11_MULTISAMPLE_RESOLVE",
+      "SHARED_EYE_RING",
+      "HOST_OPENXR_FENCE_ACK"
+    ],
+    "visible_frame_acceptance": "Build-integrated producer capability only; no Quest3/VDXR runtime frame nor gamepad verification",
+    "activation_guard_and_fallback": "No change to production native draw enablement; only explicit live ring submission accepts validated source eyes; D3D9 source Draw/input unaffected"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_STEREO_MSAA_EYE_TRANSPORT",
+    "goal": "Accept local game-produced stereoscopic MSAA color targets and resolve both eyes into the existing DX11/OpenXR shareable ring without weakening single-sample copy, failure handling or ACK ownership.",
+    "acceptance_items": [
+      {
+        "id": "eye-msaa-native-output",
+        "category": "end_to_end_behavior",
+        "behavior_area": "dx11_stereo_resolve_ring_event",
+        "expected_behavior": "Game-created 2/4/8x local render eye pair resolves to the 1x shared native ring before the existing single GPU fence"
+      },
+      {
+        "id": "eye-msaa-source-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "sample_quality_ownership_d3d9_fallback",
+        "expected_behavior": "Mixed sample counts/quality, lack of format support, stale shared sources and device mismatch issue no native GPU commands and preserve game D3D9 drawing"
+      },
+      {
+        "id": "eye-msaa-exact-gate",
+        "category": "integrated_validation",
+        "behavior_area": "portable_cpp_mutation_windows_ci",
+        "expected_behavior": "Compiled C++ pair matrix, destructive source/producer tests and exact-SHA Actions including native Win32 build"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "eye-msaa-native-output": "PENDING_GATE",
+    "eye-msaa-source-fallback": "PENDING_GATE",
+    "eye-msaa-exact-gate": "PENDING_GATE"
+  },
+  "base_head_sha": "08447dfbdc066dec6dc636255862854f9877c9e4",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/native_shared_eye_ring.cpp",
+    "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_eye_msaa_resolve_probe_00695.cpp",
+    "tools/test_dx11_eye_msaa_resolve_00695.py",
+    "docs/automation/runs/CONVERSION-DX11-00695.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD AGENTS.md DX11 policy and 00694 source ownership reviewed",
+    "C1_REVIEW": "PASS stereo single-sample-only eye transfer gap located in NativeSharedEyeRing submit_eye_pair; independent of active texture source",
+    "C2_IMPLEMENT": "PASS paired MSAA Resolve/copy dispatch and portable regression integration",
+    "C3_VALIDATE": "PENDING full exact SHA CI; portable probe on workflow",
+    "C4_COMMIT": "PENDING material commit",
+    "C5_PACKAGE": "NOT_REQUIRED; native eye output Quest3/VDXR UNTESTED",
+    "C6_STATE": "PENDING exact-SHA GitHub Actions; bookkeeping separate after verification"
+  },
+  "next_action": "Confirm exact SHA Backend Conversion Gate, Fast Structural, Build and OpenXR success, then record separate C6 state. Quest3/VDXR runtime and gamepad remain UNTESTED."
+}

@@ -14,6 +14,27 @@ namespace outrun::vr::dx11 {
         (bindFlags & renderTargetFlag) == renderTargetFlag &&
         (miscFlags & sharedFlags) == 0u;
 }
+// Source eyes are local game-rendered RTs; the ring publishes single-sample
+// shared textures. A multisampled stereo pair needs an explicit DX11 GPU
+// resolve, never a CopyResource into a single-sample allocation. Reject
+// mismatched eye sample modes and missing format resolve support before any
+// GPU commands, leaving the acquired slot and original D3D9 frame intact.
+enum class NativeGameEyeTransfer : std::uint8_t { Reject, Copy, Resolve };
+[[nodiscard]] constexpr NativeGameEyeTransfer native_game_eye_transfer(
+    std::uint32_t leftSamples, std::uint32_t leftQuality,
+    std::uint32_t rightSamples, std::uint32_t rightQuality,
+    bool formatSupportsResolve) noexcept {
+    if (leftSamples == 0u || leftSamples != rightSamples ||
+        leftQuality != rightQuality)
+        return NativeGameEyeTransfer::Reject;
+    if (leftSamples == 1u)
+        return leftQuality == 0u
+            ? NativeGameEyeTransfer::Copy
+            : NativeGameEyeTransfer::Reject;
+    return formatSupportsResolve
+        ? NativeGameEyeTransfer::Resolve
+        : NativeGameEyeTransfer::Reject;
+}
 // Compare canonical IUnknown identities, not interface pointers: two views of
 // one eye or an in-flight ring output must never enter CopyResource as a source.
 // Reject partially initialized rings rather than trust incomplete provenance.

@@ -325,13 +325,13 @@ namespace outrun::vr::dx11
             !entry.eye[0] || !entry.eye[1])
             return false;
 
-        const auto exact_source = [&](ID3D11Texture2D* source) noexcept {
-            D3D11_TEXTURE2D_DESC desc{};
+        const auto exact_source = [&](ID3D11Texture2D* source,
+                                      D3D11_TEXTURE2D_DESC& desc) noexcept {
             source->GetDesc(&desc);
             if (desc.Width != width_ || desc.Height != height_ ||
                 desc.Format != format_ || desc.MipLevels != 1 ||
-                desc.ArraySize != 1 || desc.SampleDesc.Count != 1 ||
-                desc.SampleDesc.Quality != 0 ||
+                desc.ArraySize != 1 || desc.SampleDesc.Count == 0 ||
+                (desc.SampleDesc.Count == 1 && desc.SampleDesc.Quality != 0) ||
                 desc.Usage != D3D11_USAGE_DEFAULT || desc.CPUAccessFlags != 0 ||
                 // Accept only a locally owned color target, not a shared handle
                 // that could alias an in-flight OpenXR ring eye allocation.
@@ -351,8 +351,25 @@ namespace outrun::vr::dx11
         // Validate both resource descriptors and owning devices up front.
         // Any rejection leaves the Acquired slot unchanged and records no
         // native GPU commands, so the original DX9Ex frame remains usable.
-        if (!exact_source(left_source) || !exact_source(right_source))
+        D3D11_TEXTURE2D_DESC leftDesc{}, rightDesc{};
+        if (!exact_source(left_source, leftDesc) ||
+            !exact_source(right_source, rightDesc))
             return false;
+        // ResolveSubresource is only legal for formats the actual producer
+        // device advertises as resolvable; check before either eye is written.
+        bool formatSupportsResolve = false;
+        if (leftDesc.SampleDesc.Count > 1u) {
+            UINT formatSupport = 0;
+            if (FAILED(producer_device_->CheckFormatSupport(format_, &formatSupport)))
+                return false;
+            formatSupportsResolve =
+                (formatSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0u;
+        }
+        const auto transfer = native_game_eye_transfer(
+            leftDesc.SampleDesc.Count, leftDesc.SampleDesc.Quality,
+            rightDesc.SampleDesc.Count, rightDesc.SampleDesc.Quality,
+            formatSupportsResolve);
+        if (transfer == NativeGameEyeTransfer::Reject) return false;
         // Even when texture interfaces differ, both eyes may alias the same
         // underlying COM allocation. No ring-owned output from ANY slot may
         // become a producer source: published eyes remain immutable until ACK.
@@ -386,8 +403,13 @@ namespace outrun::vr::dx11
             return false;
         // All rejection paths precede both GPU commands. The acquired slot
         // remains cancelable and original D3D9 rendering/input is untouched.
-        context->CopyResource(entry.eye[0].Get(), left_source);
-        context->CopyResource(entry.eye[1].Get(), right_source);
+        if (transfer == NativeGameEyeTransfer::Resolve) {
+            context->ResolveSubresource(entry.eye[0].Get(), 0u, left_source, 0u, format_);
+            context->ResolveSubresource(entry.eye[1].Get(), 0u, right_source, 0u, format_);
+        } else {
+            context->CopyResource(entry.eye[0].Get(), left_source);
+            context->CopyResource(entry.eye[1].Get(), right_source);
+        }
         return signal_producer_fence(context, slot, frame_id);
     }
 

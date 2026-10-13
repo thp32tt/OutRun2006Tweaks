@@ -101,6 +101,7 @@ jobs:
           python tools/test_dx11_game_rt_16bit_00692.py
           python tools/test_dx11_game_float_vector_00693.py
           python tools/test_dx11_game_dynamic_texture_00694.py
+          python tools/test_dx11_eye_msaa_resolve_00695.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_viewport_depth_probe_00687.cpp -o /tmp/dx11_00687 && /tmp/dx11_00687
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_untextured_game_probe_00686.cpp -o /tmp/dx11_00686 && /tmp/dx11_00686
           python tools/test_dx11_stage1_factor_00673.py
