@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00664",
+  "production_id": "CONVERSION-DX11-00664",
+  "event_id": "CONVERSION-DX11-00664-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_RG16_MIP_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "fa47b7f3fd340addeab187409b99dd3be4bdfc26",
+  "status": "MATERIAL_COMMITTED_AWAITING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "live game D3D9 G16R16 LockRect all readable mip source rows",
+      "little endian RG16 -> BGRA8 game native shader-resource per mip",
+      "guarded native Draw/DrawIndexed plus original D3D9 fallback"
+    ],
+    "batch_components": [
+      "live_game_frame_bridge.cpp G16R16 eligibility/sRGB fail-closed and per-mip source conversion",
+      "live_game_rg16_texture.hpp RG16 normalized decoder",
+      "padded C++ row/mip probe, 20 destructive source bridge regressions, exact GitHub gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "LOCAL_RG16_CPP_PASS: two pitched rows, RG channel order, 1x1 mip, intermediate rounding",
+      "negative_regression": "20 destructive regressions plus D3D9 DEFAULT pool, sRGB and bad-pitch fallbacks",
+      "component_integration": "D3D9 GetLevelDesc/LockRect -> BGRA8 mip SRV -> native PSSetShaderResources -> Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_RG16_MIP_DRAW",
+      "src/vr/d3d11/live_game_rg16_texture.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CPU_PROBE_ONLY; real menu/vehicle/race NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME diagnostic opt-in, sRGB/unreadable/default pool reject; D3D9 gamepad and Present preserved"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "src/vr/d3d11/live_game_rg16_texture.hpp",
+    "tools/dx11_game_rg16_probe.cpp",
+    "tools/test_dx11_native_rg16_00664.py",
+    "docs/automation/runs/CONVERSION-DX11-00664.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS fa47b7f3fd340addeab187409b99dd3be4bdfc26 after 00663 C6",
+    "C1_REVIEW": "PASS G16R16 real game-texture source format currently absent from native mirror",
+    "C2_IMPLEMENT": "PASS RG16 C++ decoder + game all-mip native Draw integration",
+    "C3_VALIDATE": "LOCAL_RG16_CPP_PASS; CI PENDING_EXACT_SHA",
+    "C4_COMMIT": "MATERIAL_COMMITTED",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "acceptance_results": {
+    "cpu_probe": "LOCAL_RG16_CPP_PASS",
+    "static_regression": "PENDING_GITHUB_ACTIONS",
+    "compile_build": "PENDING_GITHUB_ACTIONS",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "next_action": "Consume GitHub five exact SHA gates; after success separate C6 bookkeeping. No Quest 3/VDXR/gamepad proof."
+}

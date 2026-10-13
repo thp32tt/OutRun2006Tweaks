@@ -186,6 +186,10 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_native_extended_luminance_00663.py
 
+      - name: Verify native game G16R16 mip Draw 00664
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_native_rg16_00664.py
+
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh

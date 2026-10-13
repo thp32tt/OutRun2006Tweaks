@@ -11,6 +11,7 @@
 #include "live_game_rgba_texture.hpp"
 #include "live_game_10bit_texture.hpp"
 #include "live_game_extended_luminance_texture.hpp"
+#include "live_game_rg16_texture.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -2744,6 +2745,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // A4L4 and L16 are game-authored legacy luminance formats not sampleable as BGRA8.
     const bool extendedLuma = base.Format == D3DFMT_A4L4 ||
                               base.Format == D3DFMT_L16;
+    // D3D9 G16R16 is a four-byte, two-channel texture, not BGRA8.
+    const bool rg16 = base.Format == D3DFMT_G16R16;
     // D3D9 packed 16-bit texture formats have no equivalent sRGB D3D11 SRV.
     // Keep their live Draw on DX9Ex; never decode as linear by mistake.
     if (capture.srgbTexture && packed16) return false;
@@ -2753,6 +2756,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     if (capture.srgbTexture && tenBit) return false;
     // Legacy luminance sRGB transfer is not yet proven for this native path.
     if (capture.srgbTexture && extendedLuma) return false;
+    // Do not assume D3D9 sRGB transfer for high precision RG; DX9Ex owns it.
+    if (capture.srgbTexture && rg16) return false;
     DXGI_FORMAT nativeFormat = DXGI_FORMAT_UNKNOWN;
     if (compressed) {
         // A full-sized BC base level is required, but its final mips may
@@ -2767,6 +2772,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance || rgb24 || rgbaSwizzle || tenBit || extendedLuma) {
         nativeFormat = capture.srgbTexture ?
             DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : DXGI_FORMAT_B8G8R8A8_UNORM;
+    } else if (rg16) {
+        // RG16 is converted to BGRA8 per row; no native format reinterpretation.
+        nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
     } else return false;
 
     ComPtr<IDirect3DSurface9> readbackSurface;
@@ -2847,6 +2855,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     extended_luminance_texture::unpack_row(source, destination, desc.Width, extendedLumaLayout);
                 else if (rgb24)
                     rgb24_texture::unpack_row(source, destination, desc.Width);
+                else if (rg16)
+                    rg16_texture::unpack_row(source, destination, desc.Width);
                 else if (rgbaSwizzle)
                     rgba_texture::unpack_row(source, destination, desc.Width,
                         base.Format == D3DFMT_X8B8G8R8 ?
