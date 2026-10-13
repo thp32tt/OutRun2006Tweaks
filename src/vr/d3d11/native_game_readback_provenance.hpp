@@ -8,6 +8,11 @@ struct GameOutputSignature {
     // replacement can occur during menu/car/race transitions without a
     // device, width, height or format change.
     std::uintptr_t backbufferIdentity = 0u;
+    // Preserve Present crop/dirty-mode identity while asynchronous D3D11
+    // readback is in flight. Default values preserve legacy aggregate probes.
+    std::int64_t sourceLeft = 0, sourceTop = 0;
+    std::int64_t sourceRight = 0, sourceBottom = 0;
+    bool hasDirtyRegion = false;
     [[nodiscard]] constexpr bool valid() const noexcept {
         return device != 0u && width != 0u && height != 0u && format != 0u &&
                backbufferIdentity != 0u;
@@ -15,7 +20,12 @@ struct GameOutputSignature {
     [[nodiscard]] constexpr bool same(const GameOutputSignature& other) const noexcept {
         return valid() && other.valid() && device == other.device &&
                width == other.width && height == other.height && format == other.format &&
-               backbufferIdentity == other.backbufferIdentity;
+               backbufferIdentity == other.backbufferIdentity &&
+               sourceLeft == other.sourceLeft &&
+               sourceTop == other.sourceTop &&
+               sourceRight == other.sourceRight &&
+               sourceBottom == other.sourceBottom &&
+               hasDirtyRegion == other.hasDirtyRegion;
     }
 };
 // A completed GPU event might contain a previous game menu/car/race scene.

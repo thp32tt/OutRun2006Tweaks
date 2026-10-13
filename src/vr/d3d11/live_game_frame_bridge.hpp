@@ -32,6 +32,7 @@ void observe_scene_boundary(IDirect3DDevice9* gameDevice) noexcept;
 
 // Present draws an isolated inset only if native GPU pixels were produced.
 // Failure never propagates to the original game Present.
-void before_game_present(IDirect3DDevice9* gameDevice) noexcept;
+void before_game_present(IDirect3DDevice9* gameDevice,
+                         const RECT* sourceRect, const RGNDATA* dirtyRegion) noexcept;
 void before_game_reset() noexcept;
 } // namespace outrun::vr::dx11::live_game_frame

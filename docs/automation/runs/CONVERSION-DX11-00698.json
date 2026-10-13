@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00698",
+  "production_id": "CONVERSION-DX11-00698",
+  "event_id": "CONVERSION-DX11-00698-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "feature_id": "GAME_NATIVE_PRESENT_CROP_SAFE_VISIBLE_FRAME",
+  "work_key": "DX11:GAME_NATIVE_PRESENT_SOURCE_CROP",
+  "status": "AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Actual game D3D9 Present source rectangle/dirtyRegion forwarded by live R30 callback into native game frame bridge",
+      "Diagnostic game-authored native Draw/DrawIndexed readback uploads only when complete top-right inset lies inside actual Present source crop",
+      "Asynchronous GPU readback output generation changes on menu/car/race Present crop and dirty mode; original D3D9 Draw/Present/gamepad unchanged"
+    ],
+    "batch_components": [
+      "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_present_region.hpp",
+      "src/vr/d3d11/native_game_readback_provenance.hpp",
+      "tools/test_dx11_game_present_crop_00698.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable C++17 fullscreen and crop-inclusive native inset proof, connected real D3D9 R30 Present callback to GPU readback",
+      "negative_regression": "Clipped/invalid source rect and dirty Present fail closed; crop or dirty-mode transition retires late GPU readbacks; destructive wiring tests",
+      "component_integration": "Source rectangle is observed on real game Present; D3D11 GPU pixels are read back only for compatible D3D9 crop and output generation without replacing D3D9 input"
+    },
+    "conflict_keys": [
+      "DX11:GAME_NATIVE_PRESENT_SOURCE_CROP",
+      "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_readback_provenance.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_DRAW",
+      "NATIVE_D3D11_DRAW",
+      "GPU_READBACK",
+      "LIVE_D3D9_PRESENT_SOURCE_RECT",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native diagnostic pixels are cropped only when actually presentable in game menu/vehicle/race source region; in-game Quest3/VDXR pixels and gamepad remain UNTESTED",
+    "activation_guard_and_fallback": "Diagnostic opt-in only; dirty/invalid/cropped Present rejects native upload and preserves original D3D9 Present and gamepad input."
+  },
+  "feature_contract": {
+    "feature_id": "GAME_NATIVE_PRESENT_CROP_SAFE_VISIBLE_FRAME",
+    "goal": "Make game-authored D3D11 Draw/DrawIndexed pixel output actually visible and scene-correct across real D3D9 menu/car/race cropped or dirty Present calls without touching game input.",
+    "acceptance_items": [
+      {
+        "id": "native-present-source-inset",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_r30_present_native_draw_upload",
+        "expected_behavior": "Full source or crop including inset admits native GPU pixels; crop excluding inset does not upload invisible diagnostic pixels"
+      },
+      {
+        "id": "crop-dirty-safe-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_input_and_async_readback_lifetime",
+        "expected_behavior": "Malformed crop and dirty region fail closed, crop generation invalidates stale GPU pixels and original D3D9 Present/gamepad return untouched"
+      },
+      {
+        "id": "source-crop-integrated-gate",
+        "category": "integrated_validation",
+        "behavior_area": "actual_header_cpp_static_destruction_and_ci",
+        "expected_behavior": "C++17 geometric positive/negative and destructive game source wiring probes plus exact-SHA GitHub Gate"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-present-source-inset": "PENDING_GATE",
+    "crop-dirty-safe-fallback": "PENDING_GATE",
+    "source-crop-integrated-gate": "PENDING_GATE"
+  },
+  "base_head_sha": "35752e02c8d31cfeceb659cb921070dfacab2ab8",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_readback_provenance.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/native_game_present_region.hpp",
+    "tools/test_dx11_game_present_crop_00698.py",
+    "docs/automation/runs/CONVERSION-DX11-00698.json"
+  ],
+  "next_action": "Run exact-SHA mandatory DX11 Gates on material commit; do not promote runtime/HMD without Quest3/VDXR and gamepad proof."
+}

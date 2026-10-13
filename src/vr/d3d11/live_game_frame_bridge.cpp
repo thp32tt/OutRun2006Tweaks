@@ -25,6 +25,7 @@
 #include "live_game_float_rgba_texture.hpp"
 #include "native_game_frame_batch.hpp"
 #include "native_game_readback_provenance.hpp"
+#include "native_game_present_region.hpp"
 #include "native_game_backbuffer_admission.hpp"
 
 #include <Windows.h>
@@ -4272,7 +4273,8 @@ void observe_unavailable_game_draw(IDirect3DDevice9* game) noexcept {
     }
 }
 
-void before_game_present(IDirect3DDevice9* game) noexcept {
+void before_game_present(IDirect3DDevice9* game,
+                         const RECT* sourceRect, const RGNDATA* dirtyRegion) noexcept {
     if (!diagnostic_enabled() || !game) return;
     try {
         State& s = state();
@@ -4286,12 +4288,30 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
             presentBackbuffer && SUCCEEDED(presentBackbuffer->GetDesc(&presentDesc)) &&
             SUCCEEDED(presentBackbuffer.As(&presentBackbufferIdentity)) &&
             presentBackbufferIdentity;
-        const GameOutputSignature outputNow = backbufferKnown
+        GameOutputSignature outputNow = backbufferKnown
             ? GameOutputSignature{presentDevice, presentDesc.Width, presentDesc.Height,
                                   static_cast<std::uint32_t>(presentDesc.Format),
                                   reinterpret_cast<std::uintptr_t>(
                                       presentBackbufferIdentity.Get())}
             : GameOutputSignature{};
+        // D3D9 can crop Present during menu, car selection and race transitions.
+        // An UpdateSurface into the backbuffer is not proof of a visible inset
+        // unless the *actual source rectangle* includes all native pixels.
+        const GameNativePresentRegion presentRegion{
+            sourceRect ? static_cast<std::int64_t>(sourceRect->left) : 0,
+            sourceRect ? static_cast<std::int64_t>(sourceRect->top) : 0,
+            sourceRect ? static_cast<std::int64_t>(sourceRect->right)
+                       : static_cast<std::int64_t>(presentDesc.Width),
+            sourceRect ? static_cast<std::int64_t>(sourceRect->bottom)
+                       : static_cast<std::int64_t>(presentDesc.Height)};
+        // Generation tracks the exact crop and dirty-region mode, not only
+        // backbuffer identity. A late GPU readback from a prior scene/crop
+        // must never be overlaid on the next Present's game output.
+        outputNow.sourceLeft = presentRegion.left;
+        outputNow.sourceTop = presentRegion.top;
+        outputNow.sourceRight = presentRegion.right;
+        outputNow.sourceBottom = presentRegion.bottom;
+        outputNow.hasDirtyRegion = dirtyRegion != nullptr;
         if (!s.previousOutput.same(outputNow)) {
             // Also reject earlier GPU readbacks if the Present backbuffer COM identity
             // changed while the device, dimensions and format stayed identical.
@@ -4305,6 +4325,8 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         // Reuse the inspected game backbuffer for bounds proof and D3D9 upload.
         const auto& bb = presentDesc;
         const bool outputWritable = outputNow.valid() &&
+            !outputNow.hasDirtyRegion &&
+            presentRegion.allows_inset(bb.Width, bb.Height, kWidth, kHeight, 8u) &&
             bb.Width >= kWidth + 8u && bb.Height >= kHeight + 8u &&
             bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
             (bb.Format == D3DFMT_A8R8G8B8 ||

@@ -1271,7 +1271,7 @@ namespace OutRunVRStereo
                 InternalPassScope guard;
                 R30ApplyStereoSkyGlow(device);
             }
-            outrun::vr::dx11::live_game_frame::before_game_present(device);
+            outrun::vr::dx11::live_game_frame::before_game_present(device, sourceRect, dirtyRegion);
             return R30PresentR29Hook.stdcall<HRESULT>(
                 device, sourceRect, destRect,
                 destWindowOverride, dirtyRegion);
