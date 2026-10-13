@@ -61,16 +61,20 @@ def check_projection(renderer: str, semantic: str) -> None:
     start = renderer.index("float R30HudScopeScale() noexcept")
     end = renderer.index("void R30HudContainScale(", start)
     scope = renderer[start:end]
+    # A separate ESC/ScreenOverlay2D branch can also mention this semantic.
+    # Assert the exact F11 branch BEFORE its return, not a token that survives
+    # elsewhere after a destructive edit to F11's owning condition.
+    f11_condition, f11_return, remaining_scope = scope.partition("return 1.0f;")
+    assert f11_return, "missing F11 projection escape"
     for token in (
         "ExternalOverlaySemanticDepth != 0",
         "EffectiveScope() ==",
-        "RenderScope::ScreenOverlay2D",
-        "return 1.0f;",
-        "return R30HudScaleValue();",
+        "RenderScope::ScreenOverlay2D)",
     ):
-        assert token in scope, token
-    assert scope.index("ExternalOverlaySemanticDepth != 0") < scope.index(
-        "return 1.0f;") < scope.index("return R30HudScaleValue();")
+        assert token in f11_condition, token
+    assert "return R30HudScaleValue();" in remaining_scope
+    assert f11_condition.index("ExternalOverlaySemanticDepth != 0") < (
+        f11_condition.index("RenderScope::ScreenOverlay2D)"))
     contain = renderer[end:renderer.index("bool R30TransformHudScissor(", end)]
     assert "const float userScale = R30HudScopeScale();" in contain
     assert "R30HudContain.userScale == userScale" in contain
