@@ -1,0 +1,174 @@
+{
+  "schema": "OutRun-C2-manual-independent-20261013-optical-v1",
+  "reviewer": "ChatGPT AI1",
+  "local_time_start_kst": "2026-10-13 11:50",
+  "source_head": "40897644482af9052c4eecd9a7c7ccf5f29d002a",
+  "branch": "korean-localization-recovery-20260928",
+  "policy_conflict": "Current controller_roles.json explicitly retires C2 and assigns C1 independent fast QA, while latest user message requests legacy C2 independent final QA. This is a one-time MANUAL supplemental C2-like independent optical review, not reinstating C2 tabs/schedule/approval token. Historic C3 and user game gates remain independent.",
+  "sources": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md",
+    "localization/graphics/asset_queue.csv",
+    "localization/graphics/INGAME_REWORK_BACKLOG.csv"
+  ],
+  "canonical_upstream": "Sonic-TV/OR2006Sprites tree 3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6 Release/<sprite>.dds",
+  "never_size_fail_due_to_sentence_length": true,
+  "same_candidate_sha_reproduction_count": 0,
+  "new_dds": 0,
+  "new_imagegen": 0,
+  "new_c2_tokens": 0,
+  "runtime_validation": "UNTESTED",
+  "results": [
+    {
+      "q": 46,
+      "old_status": "c236_c3_strict_pass_pending_user_jpg_ingame",
+      "new_status": "UNCHANGED",
+      "verdict": "HOLD_SCOPE_ONLY_NO_NEW_APPROVAL",
+      "source_sha": "1a01e19b2749acdd275d10ff6e82bcb525d6621fd9118fb0c1fa5997c4c1dfa5",
+      "saved_sha": "d927658b1fe0545b0ec536c32b11cd57afec8a509ce90dd90f1de5ba0ed58ba0",
+      "format": "2048x2048 BGRA32 mip1 header exact",
+      "source_final_rgba_changes": 498639,
+      "changed_readable_bbox": [
+        7,
+        47,
+        1985,
+        1325
+      ],
+      "scoped": [
+        "In pre-game lobby→게임 전 로비",
+        "Offline→오프라인"
+      ],
+      "scope_readability": "native/75/50 legible; no confirmed fake stroke or style failure in this partial crop",
+      "clean": "MISSING_SHA_BOUND",
+      "letter_layer": "MISSING",
+      "unreviewed_labels": "28+; no full atlas QA",
+      "underfill": "NOT_FAIL",
+      "evidence": [
+        "localization/graphics/role_C/20261013-C2-MANUAL-Q046-Q052-Q062-OPTICAL-PLATE/Q046_SOURCE_CLEAN_FINAL_RAW_75_50.png"
+      ],
+      "old_c3": "Preserved as historical only; not reissued",
+      "next": "Recover exact SOURCE→CLEAN and inspect all atlas labels/UV before full current-policy export"
+    },
+    {
+      "q": 52,
+      "old_status": "c256_c3_strict_pass_pending_pre_ingame_user_jpg_ingame",
+      "new_status": "manual_c2_20261013_rework_glyph_stipple_dxt5_past_c3_superseded",
+      "verdict": "REWORK_REQUIRED_GLYPH_DAMAGE",
+      "source_sha": "08afacc681737d6a138496cefce559853985084cf779921ac32ef2ebfe06883b",
+      "saved_sha": "c37ce8ccc4438c985dcc73691c6b3b4c8f699d6e9c841e5db2bb2cfb9e58c67e",
+      "format": "2048x1024 DXT5/BC3 mip1 header exact source/final",
+      "source_final_rgba_changes": 40712,
+      "alpha_changed": 30424,
+      "whole_diff_bbox_readable": [
+        16,
+        213,
+        1521,
+        350
+      ],
+      "target_original_source_bbox_readable": [
+        801,
+        309,
+        908,
+        350
+      ],
+      "target_localized_bbox_readable": [
+        826,
+        312,
+        886,
+        348
+      ],
+      "bbox_containment": "SCOPED_PASS; NO_OVERFLOW_PROOF_OUTSIDE_ALL_LABELS",
+      "native_glyph_error": "Right Start→출발 (within x826..886 y312..348) shows visually damaged/stippled white letter fill, repeated thin horizontal interruptions/point clusters. Observed in persisted DXT5 decode (not a source width issue), 75/50 practical outputs reduce legibility. Other label copies show similar rendering. Absent SHA-bound CLEAN: cannot clear entire plate.",
+      "raw_flipy": "same vertical orientation as source in saved DDS",
+      "producer_prior_c3": "historical C256 C3_STRICT_PASS contradicted by new optical defect, do not forge new C3 stage",
+      "size_policy": "PASS_TRANSLATION_LENGTH_VARIANCE; FAIL is syllable stroke integrity not underfill",
+      "evidence": [
+        "localization/graphics/role_C/20261013-C2-MANUAL-Q046-Q052-Q062-OPTICAL-PLATE/Q052_SOURCE_CLEAN_FINAL_RAW_75_50.png",
+        "localization/graphics/role_C/20261013-C2-MANUAL-Q046-Q052-Q062-OPTICAL-PLATE/Q052_LEFT_RIGHT_STARTS_NATIVE.png",
+        "localization/graphics/role_C/20261013-C2-MANUAL-Q046-Q052-Q062-OPTICAL-PLATE/Q052_START_GLYPH_TRIPLEX.png"
+      ],
+      "next": "Regenerate non-stippled native glyphs, inspect BC3 decoded mip0/75/50, re-QA exact new SHA; C3 and user game remain open"
+    },
+    {
+      "q": 62,
+      "old_status": "c264_c3_strict_pass_pending_pre_ingame_user_jpg_ingame",
+      "new_status": "manual_c2_20261013_rework_plate_alpha_rectangle_past_c3_superseded",
+      "verdict": "REWORK_REQUIRED_PLATE_ALPHA_HOLES",
+      "source_sha": "796531b06a159745d799f66f1476b9f78c5a14fd670468f58ce5404e6ced0551",
+      "clean_sha": "2a56b0f11e3b12fc8ab186371e9fab1d57d0f00ce7a788bff47477d5132a4ec7",
+      "saved_sha": "dcec31a16d2a21d34bcf6ef33267b31d2940072ca897060a3ad52147a5d101d4",
+      "format": "2048x1024 BGRA32 mip1 header exact source/final",
+      "source_to_clean_rgba_changes": 151602,
+      "clean_to_saved_rgba_changes": 24710,
+      "source_to_saved_rgba_changes": 142752,
+      "clean_to_saved_changed_outside_2_target_bboxes": 0,
+      "clean_to_saved_alpha_changed_outside_2_target_bboxes": 0,
+      "source_effect_bboxes_readable": [
+        [
+          142,
+          285,
+          385,
+          375
+        ],
+        [
+          808,
+          287,
+          1068,
+          373
+        ]
+      ],
+      "alpha_inside_two_effect_bboxes": {
+        "easy": {
+          "source_zero": 0,
+          "clean_zero": 12028,
+          "final_zero": 5647
+        },
+        "hard": {
+          "source_zero": 0,
+          "clean_zero": 12267,
+          "final_zero": 4150
+        }
+      },
+      "visual_defect": "Native SOURCE has opaque illustration under English EASY/HARD. Partial CLEAN exposes axis-aligned rectangular alpha-transparent voids, which remain visible around shorter Korean 쉬움/어려움 in saved file over neutral background; road/background continuity is broken. This is PLATE defect regardless of 0 outer-bbox changed pixels. Actual runtime compositing not tested.",
+      "readability": "Hangul individually legible native/75/50 in reviewed scopes",
+      "size_policy": "PASS; NOT underfill issue",
+      "raw_flipy": "same source storage transform",
+      "prior_c3": "historical C264 C3_STRICT_PASS contradicted by visibly unfilled panel holes; no forged C3 reapproval",
+      "evidence": [
+        "localization/graphics/role_C/20261013-C2-MANUAL-Q046-Q052-Q062-OPTICAL-PLATE/Q062_SOURCE_CLEAN_FINAL_RAW_75_50.png",
+        "localization/graphics/role_C/20261013-C2-MANUAL-Q046-Q052-Q062-OPTICAL-PLATE/Q062_EASY_PLATE_ALPHA_NATIVE.png",
+        "localization/graphics/role_C/20261013-C2-MANUAL-Q046-Q052-Q062-OPTICAL-PLATE/Q062_HARD_PLATE_ALPHA_NATIVE.png"
+      ],
+      "next": "Reconstruct underlying road/background pixels on exact source-derived CLEAN without opaque foreign rectangles, then new saved DDS and independent QA; retain user-game OPEN"
+    }
+  ],
+  "summary": {
+    "reviewed": 3,
+    "new_production": 0,
+    "new_c2_pass": 0,
+    "hold": 1,
+    "rework": 2,
+    "current_policy_full_qa_pass": 0
+  },
+  "state_change": {
+    "asset_queue": "q052 and q062 REWORK statuses + issue notes",
+    "q046": "unchanged",
+    "INGAME_REWORK_BACKLOG": "unchanged pending actual user game",
+    "resume_state": "UNCHANGED",
+    "runtime": "UNTESTED",
+    "C3": "NEW_NOT_RUN",
+    "docker": "UNTOUCHED",
+    "forbidden_domains": "VR/FFB/DX11/DXVK untouched"
+  },
+  "evidence_sha256": {
+    "Q046_SOURCE_CLEAN_FINAL_RAW_75_50.png": "250867245c549fd9361eebb654bb7bd0bb87b0dbbfa22da16e737babc9db137e",
+    "Q052_SOURCE_CLEAN_FINAL_RAW_75_50.png": "c3c9322648c71954a8c63263d8727b607a3b9a4661bb3e57b66e7989469d0a76",
+    "Q062_SOURCE_CLEAN_FINAL_RAW_75_50.png": "23e1e5ce42babc4045fee4cb1e3815dcce39aa9de2d2e88fd9b7c05b9fecaf35",
+    "Q052_START_GLYPH_TRIPLEX.png": "f7ae2fd0292b2ef79397d9bec941811c846fd19fa51f6c8ac3a9386cbf9fde29",
+    "Q062_EASY_PLATE_ALPHA_NATIVE.png": "17606facfc2eca154d868b9cb98d199e3b64f99b5f8aab32fc5fcc1944d8b7c9",
+    "Q062_HARD_PLATE_ALPHA_NATIVE.png": "d3994a4b97deff86c1a32920a3b663ba72a37c73378660d76a9a4f892f4e7629",
+    "Q052_LEFT_RIGHT_STARTS_NATIVE.png": "32d2bc3e949d28334cd1d612a6aaae88161c7ea7b7ea961b7aa82518fe8bfb8a"
+  }
+}
