@@ -93,7 +93,9 @@ void CreateLetterboxVertex()
 
 	IDirect3DVertexBuffer9* candidate = nullptr;
 	if (FAILED(d3ddev->CreateVertexBuffer(sizeof(vertices), 0, CUSTOMFVF,
-		D3DPOOL_MANAGED, &candidate, nullptr)) || !candidate)
+		// D3D9Ex rejects D3DPOOL_MANAGED. DEFAULT works on classic D3D9
+		// and Ex; the game's temporary-resource release hook owns Reset.
+		D3DPOOL_DEFAULT, &candidate, nullptr)) || !candidate)
 		return;
 	void* mapped = nullptr;
 	if (FAILED(candidate->Lock(0, 0, &mapped, 0)) || !mapped)

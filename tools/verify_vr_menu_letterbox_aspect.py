@@ -40,6 +40,39 @@ def verify(code: str) -> None:
 
 verify(src)
 
+# The 4:3 menu sidebars are also allocated on the promoted D3D9Ex device.
+# D3DPOOL_MANAGED is invalid there; DEFAULT is released before Reset and
+# rebuilt after Reset or a live source-size/device switch.
+def verify_ex_letterbox_pool(code: str) -> None:
+    create = code.split("void CreateLetterboxVertex()\n{", 1)[1].split(
+        "\nclass D3DHooks : public Hook", 1)[0]
+    reset = code.split("static void D3DTemporariesRelease(", 1)[1].split(
+        "static void D3DTemporariesCreate(", 1)[0]
+    remake = code.split("static void D3DTemporariesCreate(", 1)[1].split(
+        "\npublic:", 1)[0]
+    assert create.count("D3DPOOL_DEFAULT, &candidate, nullptr") == 1
+    assert "D3DPOOL_MANAGED" not in create
+    assert create.index("FAILED(d3ddev->CreateVertexBuffer(") < create.index(
+        "candidate->Unlock();") < create.index("LetterboxVertex = candidate;")
+    assert "LetterboxVertex->Release();" in reset
+    assert reset.index("LetterboxVertex->Release();") < reset.index(
+        "LetterboxRasterDevice = nullptr;")
+    assert "CreateLetterboxVertex();" in remake
+
+verify_ex_letterbox_pool(src)
+for old, bad in (
+    ("D3DPOOL_DEFAULT, &candidate, nullptr", "D3DPOOL_MANAGED, &candidate, nullptr"),
+    ("candidate->Unlock();", "// leave buffer locked across Reset"),
+):
+    assert old in src
+    try:
+        verify_ex_letterbox_pool(src.replace(old, bad, 1))
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("D3D9Ex managed/reset regression survived: " + old)
+print("PASS D3D9Ex-compatible menu bars pool/Reset lifecycle, 2 destructive controls")
+
 # The ImGui F11 shell must share the GPU bars' enablement and rect, instead
 # of using a different letterboxing mode or producing negative portrait bars.
 overlay = (Path(__file__).resolve().parents[1] / "src/overlay/overlay.cpp").read_text()
