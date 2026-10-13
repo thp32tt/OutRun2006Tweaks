@@ -48,9 +48,27 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     require("GetRenderState(D3DRS_ALPHABLENDENABLE" in code and
             "GetRenderState(D3DRS_ZENABLE" in code,
             "blended/depth state must be rejected")
-    require("type != D3DPT_TRIANGLELIST" in code and
-            "idx" not in "" and "indices[i] >= vertexCount" in code,
-            "non-triangle or invalid indices must be rejected")
+    # The game-owned diagnostic now admits both bounded D3D9 line families
+    # as well as triangles. Inspect the shared enumerated span validator and
+    # the live observer together so an unknown primitive cannot be promoted.
+    span = (ROOT / "src/vr/d3d11/live_game_primitive_span.hpp").read_text(
+        encoding="utf-8")
+    require("game_native_primitive_element_count(static_cast<std::uint32_t>(type)," in code and
+            all(f"case {kind}u:" in span for kind in (2, 3, 4, 5, 6)) and
+            "default: return false;" in span and
+            "primitiveCount == 0u || primitiveCount > 512u" in span and
+            "required > 1536u" in span and
+            "indexCount != expectedElements" in code and
+            "vertexCount != expectedElements" in code and
+            "indices[i] >= vertexCount" in code,
+            "unknown/unbounded primitives or invalid indexed game draws must be rejected")
+    require("topology == D3DPT_LINELIST || topology == D3DPT_LINESTRIP" in code and
+            "GetRenderState(D3DRS_ANTIALIASEDLINEENABLE, &lineAA)" in code and
+            "GetRenderState(D3DRS_LASTPIXEL, &lastPixel)" in code and
+            "lineAA != FALSE || lastPixel != TRUE" in code and
+            "D3D11_PRIMITIVE_TOPOLOGY_LINELIST" in code and
+            "D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP" in code,
+            "native lines must retain explicit source raster-state parity fencing")
     # Validate the complete source-to-inset chain. A bounded, fenced,
     # nonblocking copy is stricter than the old synchronous staging Map:
     # no CPU wait, no unread-slot overwrite, and checked RGB pixel evidence.
