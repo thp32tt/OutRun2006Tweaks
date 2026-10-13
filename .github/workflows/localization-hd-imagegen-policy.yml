@@ -7,6 +7,9 @@ on:
       - tools/localization/*controller_policy.py
       - tools/localization/deploy_plate_controller.py
       - tools/localization/test_hd_imagegen_policy.py
+      - tools/localization/test_portainer_git_policy.py
+      - docker/localization-production/*.override.yml
+      - docs/OUTRUN_PORTAINER_GITHUB_DELIVERY_20261013.md
       - tools/localization/imagegen_prompts/**
       - localization/controller_roles.json
       - .github/workflows/localization-hd-imagegen-policy.yml
@@ -30,5 +33,7 @@ jobs:
       - run: python -m pip install PyYAML==6.0.3
       - name: Prompt and Compose regression (no Docker deployment or image calls)
         run: python -m unittest discover -s tools/localization -p test_hd_imagegen_policy.py -v
+      - name: Validate Portainer Git smoke and normal override (no deployment)
+        run: python -m unittest discover -s tools/localization -p test_portainer_git_policy.py -v
       - name: Compile staging and prompt tools
         run: python -m py_compile tools/localization/deploy_plate_controller.py tools/localization/stage_controller_policy.py tools/localization/build_imagegen_prompt.py
