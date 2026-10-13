@@ -345,8 +345,11 @@ def main() -> None:
             return False
         section = code[start:end]
         return all(token in section for token in (
-            "bb.Width >= kWidth + 8u",
-            "bb.Height >= kHeight + 8u",
+            "const auto insetPlacement = presentRegion.inset_placement(",
+            "bb.Width, bb.Height, kWidth, kHeight, 8u);",
+            "!outputNow.hasDirtyRegion && insetPlacement.valid",
+            "static_cast<LONG>(insetPlacement.left)",
+            "static_cast<LONG>(insetPlacement.top)",
             "bb.MultiSampleType == D3DMULTISAMPLE_NONE",
             "bb.Format == D3DFMT_A8R8G8B8",
             "bb.Format == D3DFMT_X8R8G8B8",
@@ -362,8 +365,14 @@ def main() -> None:
          "kWidth, kHeight, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM"),
         ("bb.MultiSampleType == D3DMULTISAMPLE_NONE",
          "bb.MultiSampleType != D3DMULTISAMPLE_NONE"),
-        ("bb.Width >= kWidth + 8u", "bb.Width >= kWidth"),
-        ("bb.Height >= kHeight + 8u", "bb.Height >= kHeight"),
+        ("const auto insetPlacement = presentRegion.inset_placement(",
+         "const auto insetPlacement = /* missing crop bounds */ ("),
+        ("!outputNow.hasDirtyRegion && insetPlacement.valid",
+         "!outputNow.hasDirtyRegion"),
+        ("static_cast<LONG>(insetPlacement.left)",
+         "static_cast<LONG>(bb.Width - kWidth - 8)"),
+        ("static_cast<LONG>(insetPlacement.top)",
+         "static_cast<LONG>(8)"),
         ("bb.Format == D3DFMT_X8R8G8B8",
          "bb.Format == D3DFMT_A2R10G10B10"),
     ):
