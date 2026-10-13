@@ -95,10 +95,23 @@ def check_projection_mutations(renderer: str, semantic: str) -> None:
         ("R30HudContain.userScale == userScale",
          "R30HudContain.userScale == 1.0f"),
     )
-    for a, b in mutants:
-        assert a in renderer
+    # Mutate the owning function, never an earlier unrelated occurrence
+    # of a generic token (e.g. 'return 1.0f;' in the aspect helper).
+    scope_start = renderer.index("float R30HudScopeScale() noexcept")
+    scope_end = renderer.index("void R30HudContainScale(", scope_start)
+    contain_end = renderer.index("bool R30TransformHudScissor(", scope_end)
+    for index, (a, b) in enumerate(mutants):
+        begin, end = ((scope_start, scope_end) if index < 3
+                      else (scope_end, contain_end))
+        owning_function = renderer[begin:end]
+        assert owning_function.count(a) == 1, (
+            "F11 mutant target is not unique in owner: " + a
+        )
+        broken = (renderer[:begin] +
+                  owning_function.replace(a, b, 1) +
+                  renderer[end:])
         try:
-            check_projection(renderer.replace(a, b, 1), semantic)
+            check_projection(broken, semantic)
         except AssertionError:
             pass
         else:
