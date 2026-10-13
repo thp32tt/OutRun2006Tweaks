@@ -1151,7 +1151,8 @@ def main() -> None:
         "indexCount != expectedElements",
         "vertexCount != expectedElements",
         "D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP",
-        "submit(s, vertices, indices, indexCount, type, capture, output)",
+        "nativeSubmitted = submit(s, vertices, indices, indexCount,",
+        "type, capture, output);",
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
     )

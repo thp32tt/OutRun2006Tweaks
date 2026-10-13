@@ -989,7 +989,7 @@ bool env_opt_in() noexcept {
 
 bool env_batch_opt_in() noexcept {
     wchar_t value[8]{};
-    // Requires OUTRUN_DX11_FIRST_GAME_FRAME=1 in the outer capture path.
+    // Requires primary diagnostic opt-in in the outer capture path.
     return GetEnvironmentVariableW(L"OUTRUN_DX11_FRAME_BATCH", value, 8) == 1
         && value[0] == L'1';
 }
