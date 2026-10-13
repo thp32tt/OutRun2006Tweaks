@@ -223,7 +223,7 @@ assert "extern Setting<float> VRPauseMenuVerticalOffset;" in code
 assert 'Setting<float> VRPauseMenuVerticalOffset{ "VR", "PauseMenuVerticalOffset", 0.10f' in settings
 assert 'Range<float>{ -0.25f, 0.25f }' in settings
 fixed_begin = code.index("bool R30TransformXyzrhwStereo(")
-fixed_end = code.index("bool R30TransformXyzrhwVertices(", fixed_begin)
+fixed_end = code.index("// This is the high-frequency indexed smoke/sand/decal path:", fixed_begin)
 fixed = code[fixed_begin:fixed_end]
 shader_begin = code.index("bool R30BuildScreenSpaceEyeConstants(")
 shader_end = code.index("template <typename ActualDraw>", shader_begin)
@@ -232,7 +232,7 @@ assert fixed.count("height * R30PauseMenuVerticalFraction();") == 1
 assert fixed.index("height * R30PauseMenuVerticalFraction();") < fixed.index("for (UINT visit = 0;")
 assert shader.count("clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();") == 1
 assert shader.index("clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();") > shader.index("screenKind != R30ScreenSpaceKind::Hud2D")
-assert "R30PauseMenuVerticalFraction()" not in code[code.index("bool R30TransformXyzrhwVertices("):shader_begin]
+assert "R30PauseMenuVerticalFraction()" not in code[fixed_end:shader_begin]
 
 def pause_fraction(state, semantic, external, fraction):
     if external or state != "pause" or semantic != "overlay" or not isfinite(fraction):
