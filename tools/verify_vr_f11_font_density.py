@@ -409,12 +409,69 @@ def check_stereo_extent_coherence(hook: str) -> None:
     print("PASS F11 binocular resize coherence: 3 aspects, 4 destructive controls")
 
 
+
+def check_font_io_cache(font: str) -> None:
+    """F11 re-rasterisation must not repeat synchronous Win32 TTF I/O per XR resize."""
+    block = font.split("void Overlay::rebuild_fonts()", 1)[1].split("bool loaded = false;", 1)[0]
+    expected = (
+        "static const std::vector<uint8_t> fontData = []() {",
+        "GetWindowsDirectoryW(windowsDir, MAX_PATH)",
+        "pathLength == 0 || pathLength >= MAX_PATH",
+        "std::ifstream file(fontPath, std::ios::binary | std::ios::ate)",
+        "const std::streamoff fileBytes = file.tellg();",
+        "fileBytes <= 0 || fileBytes > 16 * 1024 * 1024",
+        "std::vector<uint8_t> bytes(static_cast<std::size_t>(fileBytes));",
+        "static_cast<std::streamsize>(fileBytes)",
+        "return bytes;",
+        "}();",
+    )
+    for token in expected:
+        assert token in block, token
+    assert block.index("fileBytes <= 0") < block.index("bytes(static_cast")
+    assert "std::vector<uint8_t> fontData;" not in block
+    # Ensure the cached ORIGINAL bytes are copied to the separately-owned
+    # ImGui buffer after every Clear(), not transferred to ImGui once.
+    after = font.split("bool loaded = false;", 1)[1].split("if (!loaded)", 1)[0]
+    for token in ("if (!fontData.empty())", "IM_ALLOC(fontData.size())",
+                  "memcpy(owned, fontData.data(), fontData.size())",
+                  "io.Fonts->AddFontFromMemoryTTF(owned, int(fontData.size()), sizePixels)"):
+        assert token in after
+    for old, bad in (
+        ("static const std::vector<uint8_t> fontData", "const std::vector<uint8_t> fontData"),
+        ("fileBytes <= 0", "fileBytes < 0"),
+        ("fileBytes > 16 * 1024 * 1024", "fileBytes > 1024 * 1024 * 1024"),
+        ("pathLength >= MAX_PATH", "pathLength > MAX_PATH"),
+        ("return bytes;", "return std::vector<uint8_t>{};"),
+        ("IM_ALLOC(fontData.size())", "IM_ALLOC(13)"),
+    ):
+        assert old in font
+        damaged = font.replace(old, bad, 1)
+        try:
+            check_font_io_cache_contract(damaged)
+        except AssertionError:
+            continue
+        raise AssertionError(f"F11 cache destructive mutant escaped: {old}")
+
+
+def check_font_io_cache_contract(font: str) -> None:
+    block = font.split("void Overlay::rebuild_fonts()", 1)[1].split("bool loaded = false;", 1)[0]
+    for token in (
+        "static const std::vector<uint8_t> fontData = []() {",
+        "fileBytes <= 0 || fileBytes > 16 * 1024 * 1024",
+        "pathLength == 0 || pathLength >= MAX_PATH",
+        "return bytes;",
+    ):
+        assert token in block
+    after = font.split("bool loaded = false;", 1)[1].split("if (!loaded)", 1)[0]
+    assert "IM_ALLOC(fontData.size())" in after
+
 def main():
     hook, font, header = (p.read_text(encoding="utf-8")
                           for p in (HOOK, FONT, HEADER))
     renderer = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
     semantic = (ROOT / "src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
     check(hook, font, header)
+    check_font_io_cache(font)
     check_font_density_hysteresis(hook)
     check_stereo_extent_coherence(hook)
     check_transient_eye_extent_dropout(hook)

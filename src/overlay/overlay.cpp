@@ -240,25 +240,35 @@ void Overlay::rebuild_fonts()
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->Clear();
 
-	// Read the file rather than handing ImGui the path, so a Windows directory
-	// with characters outside the active code page still works.
-	std::vector<uint8_t> fontData;
-	{
+	// F11 VR density changes re-rasterise the atlas from EndScene. Keep the
+	// original TTF bytes across these rebuilds: rereading Windows/Fonts from
+	// the render thread can cause a disk/AV stall on each live XR resize.
+	// AddFontFromMemoryTTF owns its input, so copy from this immutable cache
+	// into ImGui allocation on each atlas generation below. Failed/missing
+	// fonts still use the built-in fallback without repeated disk probes.
+	static const std::vector<uint8_t> fontData = []() {
 		wchar_t windowsDir[MAX_PATH]{};
-		if (GetWindowsDirectoryW(windowsDir, MAX_PATH))
-		{
-			const std::filesystem::path fontPath = std::filesystem::path(windowsDir) / "Fonts" / "segoeui.ttf";
-
-			std::ifstream file(fontPath, std::ios::binary | std::ios::ate);
-			if (file)
-			{
-				fontData.resize(size_t(file.tellg()));
-				file.seekg(0);
-				if (!file.read(reinterpret_cast<char*>(fontData.data()), fontData.size()))
-					fontData.clear();
-			}
-		}
-	}
+		const UINT pathLength = GetWindowsDirectoryW(windowsDir, MAX_PATH);
+		if (pathLength == 0 || pathLength >= MAX_PATH)
+			return std::vector<uint8_t>{};
+		const std::filesystem::path fontPath =
+			std::filesystem::path(windowsDir) / "Fonts" / "segoeui.ttf";
+		std::ifstream file(fontPath, std::ios::binary | std::ios::ate);
+		if (!file)
+			return std::vector<uint8_t>{};
+		// tellg can return -1 for an unreadable file. Do not turn it into
+		// size_t(-1) on the render thread; ordinary Windows Segoe UI TTFs
+		// are far below this generous 16 MiB upper bound.
+		const std::streamoff fileBytes = file.tellg();
+		if (fileBytes <= 0 || fileBytes > 16 * 1024 * 1024)
+			return std::vector<uint8_t>{};
+		std::vector<uint8_t> bytes(static_cast<std::size_t>(fileBytes));
+		file.seekg(0);
+		if (!file.read(reinterpret_cast<char*>(bytes.data()),
+				static_cast<std::streamsize>(fileBytes)))
+			return std::vector<uint8_t>{};
+		return bytes;
+	}();
 
 	bool loaded = false;
 	if (!fontData.empty())
