@@ -1,0 +1,80 @@
+name: Localization q217 A-only ImageGen Portainer preflight
+on:
+  push:
+    branches: [localization-controller-recovery-20260928]
+    paths:
+      - tools/chat-controller/localization-recovery-v1/**
+      - .github/workflows/localization-q217-a-imagegen-smoke-preflight.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fail-closed-q217-controller:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3
+      - name: Verify original 4-part controller accepts exact build-time patch, no extra schedules
+        run: |
+          python - <<'PY'
+          import ast, importlib.util, os, pathlib, re, tempfile
+          import yaml
+          root=pathlib.Path("tools/chat-controller/localization-recovery-v1")
+          src=b"".join(p.read_bytes() for p in sorted((root/"src").glob("controller.py.part*"))).decode()
+          sp=importlib.util.spec_from_file_location("png_patch",root/"patch_controller_png_upload.py")
+          mod=importlib.util.module_from_spec(sp);sp.loader.exec_module(mod)
+          result=mod.patch(src)
+          assert mod.patch(result)==result, "patch must be idempotent"
+          ast.parse(result)
+          assert 'LOCALIZATION_SLOT_NAMES = ("A", "B", "C1")' in result
+          assert 'SCHEDULED_LOCALIZATION_LANES = {0: "A"}' in result
+          assert "OUTRUN_A_SINGLE_SMOKE_TASK_ID and slot.name != \"A\"" in result
+          assert "ATTACHED_PREVIEW_CONFIRMED" in result
+          assert "SOURCE_REFERENCE_NOT_BOUND" in result
+          assert "SUBMISSION_UNVERIFIED_DO_NOT_AUTO_RETRY" in result
+          docker=(root/"Dockerfile").read_text()
+          assert "COPY controller_png_attach.py" in docker
+          assert "COPY patch_controller_png_upload.py" in docker
+          assert "RUN python /tmp/patch_controller_png_upload.py /opt/outrun/app/controller.py" in docker
+          c=yaml.safe_load((root/"docker-compose.yml").read_text())
+          svc=c["services"]["outrun-chat-controller-localization-recovery"]
+          env=svc["environment"]
+          assert env["AUTO_SEND"]=="true" and env["SCHEDULE_MINUTES"]=="0"
+          assert env["CHAT_SLOTS"]=="3"
+          assert env["OUTRUN_A_SINGLE_SMOKE_TASK_ID"]=="OUTRUN-A-Q217-IMG-SMOKE-20261013"
+          assert env["WATCHDOG_ENABLED"]=="false"
+          assert svc["pull_policy"]=="build"
+          vols=svc["volumes"]
+          assert "outrun_chat_localization_recovery_data:/data" in vols
+          assert "outrun_chat_localization_recovery_logs:/logs" in vols
+          assert "/home/chatgpt-runner2/work/a_q217_smoke_preflight/imagegen:/data/imagegen" in vols
+          assert c["volumes"]["outrun_chat_localization_recovery_data"]["name"]=="outrun_chat_localization_recovery_data"
+          assert c["volumes"]["outrun_chat_localization_recovery_logs"]["name"]=="outrun_chat_localization_recovery_logs"
+          print("A-ONLY CONTROLLER PATCH + BUILD + NAMED VOLUMES + BIND: STATIC PASS")
+          PY
+      - name: Check source binding SHA/CRC and one-task fail-closed behavior
+        run: |
+          python - <<'PY'
+          import hashlib, importlib.util, json, os, pathlib, struct, tempfile, zlib
+          from unittest.mock import patch
+          path=pathlib.Path("tools/chat-controller/localization-recovery-v1/controller_png_attach.py")
+          sp=importlib.util.spec_from_file_location("source_binding",path)
+          mod=importlib.util.module_from_spec(sp);sp.loader.exec_module(mod)
+          def chunk(tag,data):
+              return struct.pack(">I",len(data))+tag+data+struct.pack(">I",zlib.crc32(tag+data))
+          raw=(b"\x89PNG\r\n\x1a\n"+chunk(b"IHDR",struct.pack(">IIBBBBB",1,1,8,6,0,0,0))+chunk(b"IDAT",zlib.compress(b"\x00\x00\x00\x00\x00"))+chunk(b"IEND",b""))
+          with tempfile.TemporaryDirectory() as td, patch.dict(os.environ,{"OUTRUN_A_SINGLE_SMOKE_TASK_ID":"OUTRUN-A-Q217-IMG-SMOKE-20261013"}):
+              root=pathlib.Path(td);(root/"inputs"/"A").mkdir(parents=True);(root/"inputs"/"A"/"source.png").write_bytes(raw)
+              manifest={"role":"A","task_id":"OUTRUN-A-Q217-IMG-SMOKE-20261013","png":"A/source.png","png_sha256":hashlib.sha256(raw).hexdigest(),"source_dds_sha256":"d"*64,"prompt":"START -> 출발; GOAL -> 골"}
+              (root/"pending_A.json").write_text(json.dumps(manifest),encoding="utf-8")
+              binding,reason=mod.load_binding("A",root)
+              assert reason is None and binding["dimensions"]==[1,1],reason
+              assert mod.load_binding("B",root)[1]=="PILOT_ROLE_BLOCKED"
+              manifest["task_id"]="WRONG-TASK";(root/"pending_A.json").write_text(json.dumps(manifest))
+              assert mod.load_binding("A",root)[1]=="PILOT_TASK_ID_MISMATCH"
+              print("ONE Q217 SHA-BOUND INPUT ONLY: PASS")
+          PY
