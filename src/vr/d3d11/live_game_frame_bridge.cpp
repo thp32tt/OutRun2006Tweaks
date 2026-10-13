@@ -16,6 +16,7 @@
 #include "live_game_p8_texture.hpp"
 #include "live_game_rgb332_texture.hpp"
 #include "live_game_rgba16_texture.hpp"
+#include "live_game_float_rgba_texture.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -2753,6 +2754,11 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     const bool rg16 = base.Format == D3DFMT_G16R16;
     // Game-authored 64-bit RGBA UNORM mips are byte-compatible with DXGI RGBA16.
     const bool rgba16 = base.Format == D3DFMT_A16B16G16R16;
+    // Preserve real game float component payloads without BGRA8 quantization.
+    const bool floatRgba = base.Format == D3DFMT_A16B16G16R16F ||
+                           base.Format == D3DFMT_A32B32G32R32F;
+    const auto floatLayout = base.Format == D3DFMT_A32B32G32R32F ?
+        float_rgba_texture::Layout::rgba32f : float_rgba_texture::Layout::rgba16f;
     // Some legacy menu/text atlases encode palette index and per-texel alpha.
     // The native diagnostic must fetch the live game palette, not treat
     // A8P8's two bytes as a packed RGB color.
@@ -2778,6 +2784,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     if (capture.srgbTexture && rg16) return false;
     // No sRGB view exists for 16-bit UNORM: never silently sample as linear.
     if (capture.srgbTexture && rgba16) return false;
+    // FLOAT SRVs lack sRGB views. Unverified D3D9 modes stay with DX9Ex.
+    if (capture.srgbTexture && floatRgba) return false;
     // Palettized sRGB lookup/transfer parity is not proven on D3D9.
     if (capture.srgbTexture && a8p8) return false;
     if (capture.srgbTexture && p8) return false;
@@ -2800,6 +2808,10 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     } else if (rgba16) {
         // Preserve all game R/G/B/A 16-bit channels in a native UNORM SRV.
         nativeFormat = DXGI_FORMAT_R16G16B16A16_UNORM;
+    } else if (floatRgba) {
+        // Game D3D9 FLOAT memory matches little-endian DXGI R/G/B/A layout.
+        nativeFormat = floatLayout == float_rgba_texture::Layout::rgba16f ?
+            DXGI_FORMAT_R16G16B16A16_FLOAT : DXGI_FORMAT_R32G32B32A32_FLOAT;
     } else if (rg16) {
         // RG16 is converted to BGRA8 per row; no native format reinterpretation.
         nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -2873,6 +2885,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         extended_luminance_texture::Layout::luminance16 :
         extended_luminance_texture::Layout::alpha4_luminance4;
     const UINT sourceTexelBytes = packed16 ? 2u :
+        floatRgba ? float_rgba_texture::source_bytes_per_texel(floatLayout) :
         rgba16 ? rgba16_texture::source_bytes_per_texel() :
         luminance ? luminance_texture::source_bytes_per_texel(luminanceLayout) :
         extendedLuma ? extended_luminance_texture::source_bytes_per_texel(extendedLumaLayout) :
@@ -2938,6 +2951,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     rg16_texture::unpack_row(source, destination, desc.Width);
                 else if (rgba16)
                     rgba16_texture::copy_row(source, destination, desc.Width);
+                else if (floatRgba)
+                    float_rgba_texture::copy_row(source, destination, desc.Width, floatLayout);
                 else if (rgb332)
                     rgb332_texture::unpack_row(source, destination, desc.Width, rgb332Layout);
                 else if (p8)

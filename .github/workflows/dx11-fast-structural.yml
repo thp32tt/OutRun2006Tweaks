@@ -87,9 +87,11 @@ jobs:
           python tools/test_dx11_native_rgb332_00667.py
           python tools/test_dx11_native_p8_00668.py
           python tools/test_dx11_native_rgba16_00669.py
+          python tools/test_dx11_native_float_rgba_00670.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rgb332_probe.cpp -o /tmp/dx11_rgb332_00667 && /tmp/dx11_rgb332_00667
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_p8_probe.cpp -o /tmp/dx11_p8_00668 && /tmp/dx11_p8_00668
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rgba16_probe.cpp -o /tmp/dx11_rgba16_00669 && /tmp/dx11_rgba16_00669
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_float_rgba_probe.cpp -o /tmp/dx11_float_rgba_00670 && /tmp/dx11_float_rgba_00670
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_a8p8_probe.cpp -o /tmp/dx11_a8p8_00665 && /tmp/dx11_a8p8_00665
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rg16_probe.cpp -o /tmp/dx11_rg16_00664 && /tmp/dx11_rg16_00664
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_extended_luminance_probe.cpp -o /tmp/dx11_luma_00663 && /tmp/dx11_luma_00663
