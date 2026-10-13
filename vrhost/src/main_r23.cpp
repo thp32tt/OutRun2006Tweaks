@@ -34,6 +34,7 @@
 #include "vr_shared.hpp"
 #include "stereo_shader.hpp"
 #include "runtime/r23_verified_bundle.hpp"
+#include "runtime/native_direct_stereo_pair.hpp"
 #include "vr/ipc/cadence_v1.hpp"
 
 #ifndef OUTRUN_VR_BUILD_SHA
@@ -374,12 +375,14 @@ namespace
         D3D11_TEXTURE2D_DESC right{};
         c.directLeft_[slot]->GetDesc(&left);
         c.directRight_[slot]->GetDesc(&right);
-        if (!left.Width || !left.Height || left.Width != right.Width ||
-            left.Height != right.Height || left.MipLevels != right.MipLevels ||
-            left.ArraySize != right.ArraySize || left.Format != right.Format ||
-            left.SampleDesc.Count != 1 || right.SampleDesc.Count != 1 ||
-            left.Width != frame.backbufferWidth ||
-            left.Height != frame.backbufferHeight)
+        // Re-check before the actual GPU CopyResource + OpenXR eye projection:
+        // a changed transport generation or an aliased eye cannot reach HMD.
+        if (c.directLeft_[slot] == c.directRight_[slot] ||
+            !OutRunVrNativeEyePair::Compatible(
+                frame.reserved[OutRunVR::RenderFrameDirectLeftHandleIndex],
+                frame.reserved[OutRunVR::RenderFrameDirectRightHandleIndex],
+                generation, frame.backbufferWidth, frame.backbufferHeight,
+                left, right))
             return false;
 
         const bool recreate =

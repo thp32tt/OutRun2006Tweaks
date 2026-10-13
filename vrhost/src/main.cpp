@@ -25,6 +25,7 @@
 
 #include "vr_shared.hpp"
 #include "stereo_shader.hpp"
+#include "runtime/native_direct_stereo_pair.hpp"
 
 namespace
 {
@@ -1349,7 +1350,9 @@ namespace
             const std::uint32_t width = frame.reserved[OutRunVR::RenderFrameDirectWidthIndex];
             const std::uint32_t height = frame.reserved[OutRunVR::RenderFrameDirectHeightIndex];
             const std::uint32_t generation = frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-            if (slot >= OutRunVR::RenderFrameRingSize || !leftHandleValue || !rightHandleValue || !width || !height || !generation){invalidateDirect();return false;}
+            if (slot >= OutRunVR::RenderFrameRingSize || !leftHandleValue || !rightHandleValue ||
+                leftHandleValue == rightHandleValue || !width || !height || !generation)
+            { invalidateDirect(); return false; }
             const bool same = directLeft_[slot] && directRight_[slot] && directLeftSrv_[slot] && directRightSrv_[slot] && directLeftHandle_[slot] == leftHandleValue && directRightHandle_[slot] == rightHandleValue && directGeneration_[slot] == generation;
             if (!same)
             {
@@ -1367,6 +1370,25 @@ namespace
                 D3D11_TEXTURE2D_DESC ld{}; directLeft_[slot]->GetDesc(&ld); D3D11_TEXTURE2D_DESC rd{}; directRight_[slot]->GetDesc(&rd);
                 if(ld.Format!=rd.Format){ReleaseCom(directLeftSrv_[slot]);ReleaseCom(directLeft_[slot]);ReleaseCom(directRightSrv_[slot]);ReleaseCom(directRight_[slot]);directLeftHandle_[slot]=directRightHandle_[slot]=directGeneration_[slot]=0;directFormat_[slot]=DXGI_FORMAT_UNKNOWN;invalidateDirect();std::cout<<"Direct GPU eye ring format mismatch; Ready cleared and SBS fallback requested.\n";return false;}
                 directLeftHandle_[slot]=leftHandleValue;directRightHandle_[slot]=rightHandleValue;directGeneration_[slot]=generation;directFormat_[slot]=ld.Format;std::cout<<"Direct GPU eye ring slot "<<slot<<" opened: source "<<width<<"x"<<height<<" -> OpenXR "<<projection_.width<<"x"<<projection_.height<<".\n";
+            }
+            // Validate even a cached source: reused handles with different
+            // frame metadata must never masquerade as a valid pair. The R23
+            // compositor copies only after this succeeds, preserving the
+            // original DX9Ex/SBS frame and gamepad on any rejection.
+            D3D11_TEXTURE2D_DESC nativeLeft{}, nativeRight{};
+            directLeft_[slot]->GetDesc(&nativeLeft);
+            directRight_[slot]->GetDesc(&nativeRight);
+            if (directLeft_[slot] == directRight_[slot] ||
+                !OutRunVrNativeEyePair::Compatible(
+                    leftHandleValue, rightHandleValue, generation,
+                    width, height, nativeLeft, nativeRight))
+            {
+                ReleaseCom(directLeftSrv_[slot]); ReleaseCom(directLeft_[slot]);
+                ReleaseCom(directRightSrv_[slot]); ReleaseCom(directRight_[slot]);
+                directLeftHandle_[slot] = directRightHandle_[slot] = directGeneration_[slot] = 0;
+                directFormat_[slot] = DXGI_FORMAT_UNKNOWN;
+                invalidateDirect();
+                return false;
             }
             // Production R23 copies directly into its host-owned hold textures.
             // Stop here after opening/validating the shared ring so that path

@@ -1,0 +1,109 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00676",
+  "production_id": "CONVERSION-DX11-00676",
+  "event_id": "CONVERSION-DX11-00676-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:HOST_NATIVE_STEREO_PAIR_AND_OPENXR_PROJECTION",
+  "feature_id": "NATIVE_HOST_STEREO_PAIR_IDENTITY_AND_PROJECTION",
+  "base_head_sha": "abfecb8b04042302ec0ed90c885db19da4f045e8",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Current D3D9 game-created shared GPU eye handles -> x64 host OpenSharedResource and per-frame descriptor/resource-identity gate",
+      "Exact two-eye GPU CopyResource into R23 host-owned staging -> OpenXR projection RTV per eye",
+      "Malformed, aliased or incompatible eyes fail closed and keep existing DX9Ex/SBS and gamepad path"
+    ],
+    "batch_components": [
+      "vrhost/src/main.cpp",
+      "vrhost/src/main_r23.cpp",
+      "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+      "vrhost/tests/native_direct_eye_pair_smoke.cpp",
+      ".github/workflows/vr-openxr.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Two independent, same-shape D3D11 source descriptors are admitted in compiled host regression",
+      "negative_regression": "Zero generation, duplicate eye handles, missing eye, mismatched dimensions/format/mips/array/MSAA/non-SRV sources rejected before CopyResource or projection",
+      "component_integration": "Live host GPU shared-handle importer and real R23 CopyResource/OpenXR projection staging both call the same exact stereo admissibility; unchanged DX9Ex/gamepad fallback"
+    },
+    "conflict_keys": [
+      "DX11:HOST_NATIVE_STEREO_PAIR_AND_OPENXR_PROJECTION",
+      "vrhost/src/main.cpp",
+      "vrhost/src/main_r23.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_GPU_EYE_SHARED_HANDLE",
+      "OPENXR_HOST_DIRECTGPU_PROJECTION"
+    ],
+    "visible_frame_acceptance": "Build-only host contract, game/HMD projection parity NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Original D3D9 Draw/gamepad and SBS continue; native shared-eye output only with valid opt-in producer transport"
+  },
+  "feature_contract": {
+    "feature_id": "NATIVE_HOST_STEREO_PAIR_IDENTITY_AND_PROJECTION",
+    "goal": "Protect actual native game stereo texture import through R23 OpenXR GPU copy and projection from aliased, mismatched and incompatible eye resources while preserving game fallback",
+    "acceptance_items": [
+      {
+        "id": "host-stereo-source-acceptance",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d11_shared_gpu_openxr_projection",
+        "expected_behavior": "Both distinct valid game-created GPU eyes stage to independent OpenXR projection SRVs"
+      },
+      {
+        "id": "host-stereo-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_gamepad_fallback",
+        "expected_behavior": "Aliased, mismatched or unusable eyes are rejected without changing original game Draw/input and Classic SBS recovery"
+      },
+      {
+        "id": "host-stereo-exact-sha",
+        "category": "integrated_validation",
+        "behavior_area": "host_automated_gpu_contract",
+        "expected_behavior": "Compiled positive/negative native host direct eye regression plus required exact SHA GitHub Actions gates pass"
+      },
+      {
+        "id": "host-stereo-quest3",
+        "category": "end_to_end_behavior",
+        "behavior_area": "quest3_vdxr",
+        "expected_behavior": "Real menu, vehicle, race stereo parity and gamepad remain hardware-only"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "host-stereo-source-acceptance": "PENDING_EXACT_SHA",
+    "host-stereo-fallback": "PENDING_EXACT_SHA",
+    "host-stereo-exact-sha": "PENDING_EXACT_SHA",
+    "host-stereo-quest3": "NEED_HMD_TEST"
+  },
+  "changed_files": [
+    "vrhost/src/main.cpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/CMakeLists.txt",
+    ".github/workflows/vr-openxr.yml",
+    "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+    "vrhost/tests/native_direct_eye_pair_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX11-00676.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "Host direct source import allowed aliased eye handles and cached pair descriptor mismatches; distinct native producer/host tests preexist but active host projection contract was weak",
+    "C2_IMPLEMENT": "ACTIVE_HOST_IMPORT_AND_OPENXR_COPY_SHAPE_ENFORCEMENT",
+    "C3_VALIDATE": "COMPILED_TEST_ENROLLED_EXACT_SHA_PENDING",
+    "C4_COMMIT": "PENDING_FAST_FORWARD",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  }
+}
