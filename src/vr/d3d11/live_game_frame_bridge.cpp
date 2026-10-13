@@ -10,6 +10,7 @@
 #include "live_game_rgb24_texture.hpp"
 #include "live_game_rgba_texture.hpp"
 #include "live_game_10bit_texture.hpp"
+#include "live_game_extended_luminance_texture.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -2740,6 +2741,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // Ten-bit game RGB/2-bit alpha has no BGRA8 byte-compatible memory layout.
     const bool tenBit = base.Format == D3DFMT_A2R10G10B10 ||
                         base.Format == D3DFMT_A2B10G10R10;
+    // A4L4 and L16 are game-authored legacy luminance formats not sampleable as BGRA8.
+    const bool extendedLuma = base.Format == D3DFMT_A4L4 ||
+                              base.Format == D3DFMT_L16;
     // D3D9 packed 16-bit texture formats have no equivalent sRGB D3D11 SRV.
     // Keep their live Draw on DX9Ex; never decode as linear by mistake.
     if (capture.srgbTexture && packed16) return false;
@@ -2747,6 +2751,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     if (capture.srgbTexture && luminance) return false;
     // Unproven 10-bit D3D9 sRGB transfer semantics remain on DX9Ex.
     if (capture.srgbTexture && tenBit) return false;
+    // Legacy luminance sRGB transfer is not yet proven for this native path.
+    if (capture.srgbTexture && extendedLuma) return false;
     DXGI_FORMAT nativeFormat = DXGI_FORMAT_UNKNOWN;
     if (compressed) {
         // A full-sized BC base level is required, but its final mips may
@@ -2758,7 +2764,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             (capture.srgbTexture ? DXGI_FORMAT_BC2_UNORM_SRGB : DXGI_FORMAT_BC2_UNORM) :
             (capture.srgbTexture ? DXGI_FORMAT_BC3_UNORM_SRGB : DXGI_FORMAT_BC3_UNORM);
     } else if (base.Format == D3DFMT_A8R8G8B8 ||
-               base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance || rgb24 || rgbaSwizzle || tenBit) {
+               base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance || rgb24 || rgbaSwizzle || tenBit || extendedLuma) {
         nativeFormat = capture.srgbTexture ?
             DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : DXGI_FORMAT_B8G8R8A8_UNORM;
     } else return false;
@@ -2787,8 +2793,12 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         base.Format == D3DFMT_L8 ?
         luminance_texture::Layout::luminance8 :
         luminance_texture::Layout::alpha8_luminance8;
+    const auto extendedLumaLayout = base.Format == D3DFMT_L16 ?
+        extended_luminance_texture::Layout::luminance16 :
+        extended_luminance_texture::Layout::alpha4_luminance4;
     const UINT sourceTexelBytes = packed16 ? 2u :
         luminance ? luminance_texture::source_bytes_per_texel(luminanceLayout) :
+        extendedLuma ? extended_luminance_texture::source_bytes_per_texel(extendedLumaLayout) :
         rgb24 ? rgb24_texture::source_bytes_per_texel() : 4u;
     std::vector<std::vector<std::uint8_t>> copied(levels);
     std::vector<UINT> pitches(levels);
@@ -2804,7 +2814,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             (std::max)(1u, (desc.Width + 3u) / 4u) *
                 (base.Format == D3DFMT_DXT1 ? 8u : 16u) :
             desc.Width * sourceTexelBytes;
-        const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) ?
+        const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) || extendedLuma ?
             desc.Width * 4u : rowBytes;
         D3DLOCKED_RECT lock{};
         const HRESULT lockResult = gpuRenderTarget ?
@@ -2833,6 +2843,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     packed_texture16::unpack_row(source, destination, desc.Width, packing);
                 else if (luminance)
                     luminance_texture::unpack_row(source, destination, desc.Width, luminanceLayout);
+                else if (extendedLuma)
+                    extended_luminance_texture::unpack_row(source, destination, desc.Width, extendedLumaLayout);
                 else if (rgb24)
                     rgb24_texture::unpack_row(source, destination, desc.Width);
                 else if (rgbaSwizzle)
