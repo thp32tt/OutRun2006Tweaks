@@ -399,7 +399,7 @@ for w,h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
 for wrong, replacement in (
     ("edgeRightBias += sharedShift;", "edgeRightBias += 0.0f;"),
     ("safeRight - rightMax", "safeRight - leftMax"),
-    ("anchor.maxX > x1", "anchor.maxX > x1 + width"),
+    ("anchor.maxX > x1 ||", "anchor.maxX > x1 + width ||"),
     ("kSafeInset = 0.025f", "kSafeInset = 0.0f"),
 ):
     assert wrong in safe
@@ -407,5 +407,5 @@ for wrong, replacement in (
     assert changed != safe
     assert not all(item in changed for item in (
         "edgeRightBias += sharedShift;", "safeRight - rightMax",
-        "anchor.maxX > x1", "kSafeInset = 0.025f"))
+        "anchor.maxX > x1 ||", "kSafeInset = 0.025f"))
 print("PASS Quest3 peripheral HUD visible-area fit: stereo shift parity, 4 resolutions, bounds fail-closed")
