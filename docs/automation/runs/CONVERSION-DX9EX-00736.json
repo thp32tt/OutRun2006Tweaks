@@ -1,0 +1,104 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00736",
+  "production_id": "CONVERSION-DX9EX-00736",
+  "event_id": "CONVERSION-DX9EX-00736-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "546a94df91bbffc9f4ec44f8ba141357520b6971",
+  "material_result_sha": "546a94df91bbffc9f4ec44f8ba141357520b6971",
+  "validation_bearing_result_sha": "17c611fc7f040226a2fad2e150d8cbcf17ccec36",
+  "result_sha": "17c611fc7f040226a2fad2e150d8cbcf17ccec36",
+  "material_commits": [
+    "546a94df91bbffc9f4ec44f8ba141357520b6971",
+    "17c611fc7f040226a2fad2e150d8cbcf17ccec36"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 Quest3/VDXR responsive HUD/menu/F11 optical acceptance without desktop or protected stereo regressions",
+    "completed_scope": "F11-only XR aspect quarter-step font atlas hysteresis to suppress repeated Segoe UI/D3D9 font texture rebuild at near-boundary OpenXR eye/source aspect jitter; large extent changes and non-VR reset still apply immediately. Added source-scoped destructive branch mutations, numeric threshold/64-sample jitter/invalid-extent transitions.",
+    "remaining_acceptance": [
+      "Full Issue #119 integrated main-menu/ESC/HUD/F11 optical acceptance remains pending matching hardware test.",
+      "Live headset 72/90/120Hz frame-pacing or visible legibility was not measured by this task."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_POLICY",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38335362243,
+      "head_sha": "17c611fc7f040226a2fad2e150d8cbcf17ccec36",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38335362216,
+      "head_sha": "17c611fc7f040226a2fad2e150d8cbcf17ccec36",
+      "conclusion": "success",
+      "jobs": [
+        "domain-isolation"
+      ]
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38335235254,
+      "head_sha": "546a94df91bbffc9f4ec44f8ba141357520b6971",
+      "conclusion": "success",
+      "jobs": [
+        "msvc-analyze-active-game",
+        "msvc-analyze-openxr-host",
+        "source-cross-domain"
+      ],
+      "note": "C++ material SHA; validation descendant changes only verifier."
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38335235255,
+      "head_sha": "546a94df91bbffc9f4ec44f8ba141357520b6971",
+      "conclusion": "success"
+    }
+  ],
+  "previous_failures": [
+    {
+      "run_id": 38335235270,
+      "head_sha": "546a94df91bbffc9f4ec44f8ba141357520b6971",
+      "failed_job": "policy",
+      "failed_verifier": "tools/verify_vr_f11_font_density.py",
+      "repair_sha": "17c611fc7f040226a2fad2e150d8cbcf17ccec36",
+      "cause": "Both hysteresis branches use the same previous-multiplier assignment; destructive test incorrectly expected disappearance of the token after one-arm mutation."
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_validation_required": "Quest3/VDXR exact binary F11 font size/legibility and stable frame pacing around headset eye-aspect transition, while preserving main menu, ESC, speed/time/position HUD and other Issue #119 optics.",
+  "score_delta": 1,
+  "score_awarded": true,
+  "scoreboard_commit": "e5304607e57a5172438bb0d2fd35328ac34e9a8b",
+  "score_run_key": "CONVERSION-DX9EX-00736",
+  "score_previous": 1194,
+  "score_cumulative": 1195,
+  "summary": "F11 atlas aspect transition C++ and numeric/destructive regression; initial test-only false mutation failure repaired on same TASK. Exact validation SHA Active 5/5 and Domain successful, original C++ material SHA Full Impact 3/3 and HUD Inspector successful. Overall UI/HMD acceptance remains pending."
+}
