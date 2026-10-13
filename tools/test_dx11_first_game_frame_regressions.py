@@ -572,7 +572,13 @@ def main() -> None:
         assert mutated != bridge and not texture_path_complete(mutated), (
             "texture-stage native-D3D11 negative mutation escaped: " + old
         )
-    assert "xyz[2] * w" in bridge and "v.clip[3] = w;" in bridge
+    # D3D9 XYZRHW z is already window-space depth: the live bridge must
+    # call the portable helper instead of blindly multiplying stale vertex Z.
+    assert "game_native_screen_depth_clip(" in bridge
+    assert "xyz[2], w, vp.MinZ, vp.MaxZ, v.clip[2]" in bridge
+    assert "v.clip[3] = w;" in bridge
+    viewport_depth = (ROOT / "src/vr/d3d11/live_game_viewport_depth.hpp").read_text(encoding="utf-8")
+    assert "const float remapped = windowZ * w;" in viewport_depth
     assert "float2 uv : TEXCOORD0" in bridge
     assert "gameTexture.Sample(gameSampler, v.uv) * v.diffuse" in bridge
     assert "float4 PSTextureOnly(VOut v) : SV_Target { float4 c = gameTexture.Sample(gameSampler, v.uv); AlphaGate(c.a); return c; }" in bridge
