@@ -3384,6 +3384,16 @@ namespace OutRunVRStereo
                 }
             }
 
+            // The generic XYZRHW fallback is used after a rejected fused
+            // stereo draw (e.g. a device reset or unsupported vertex batch).
+            // Keep ESC/pause vertical placement identical to the paired-eye
+            // fast path and the HUD vertex-shader path; only the original
+            // paused game's generic ScreenOverlay2D may supply a nonzero
+            // fraction. Do not move world particles, game HUD or external F11.
+            // Calculate once per draw rather than once per HUD vertex.
+            const float pauseNdcOffset =
+                state.worldEffect ? 0.0f :
+                2.0f * R30PauseMenuVerticalFraction();
             for (UINT i = 0; i < vertexCount; ++i)
             {
                 if (!selected(i))
@@ -3429,7 +3439,7 @@ namespace OutRunVRStereo
                     // per-eye asymmetric-FOV centre offset for convergence.
                     correctedX =
                         hudScaleX * state.eyeScale[eye] * ndcX + state.eyeOffset[eye];
-                    correctedY = hudScaleY * ndcY;
+                    correctedY = hudScaleY * ndcY - pauseNdcOffset;
                 }
 
                 const float transformedX =

@@ -315,7 +315,50 @@ assert fixed.count("height * R30PauseMenuVerticalFraction();") == 1
 assert fixed.index("height * R30PauseMenuVerticalFraction();") < fixed.index("for (UINT visit = 0;")
 assert shader.count("clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();") == 1
 assert shader.index("clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();") > shader.index("screenKind != R30ScreenSpaceKind::Hud2D")
-assert "R30PauseMenuVerticalFraction()" not in code[fixed_end:shader_begin]
+# The previously missing independent-eye XYZRHW fallback must apply the
+# identical pause-only signed fraction. Test its owner, not a detached token:
+# a fused-path rejection or Reset must not jump the ESC menu upward.
+fallback_begin = code.index("bool R30TransformXyzrhwVertices(")
+fallback_end = code.index("// R30 high-frequency world smoke/sand path:", fallback_begin)
+fallback = code[fallback_begin:fallback_end]
+fallback_hoist = (
+    "const float pauseNdcOffset =\n"
+    "                state.worldEffect ? 0.0f :\n"
+    "                2.0f * R30PauseMenuVerticalFraction();"
+)
+assert fallback.count(fallback_hoist) == 1
+assert fallback.count("correctedY = hudScaleY * ndcY - pauseNdcOffset;") == 1
+assert fallback.index(fallback_hoist) < fallback.index(
+    "correctedY = hudScaleY * ndcY - pauseNdcOffset;")
+assert "correctedY = hudScaleY * ndcY;" not in fallback
+assert "state.worldEffect ? 0.0f" in fallback
+# No new pause transform may spill into smoke/sand or unrelated render passes.
+assert "R30PauseMenuVerticalFraction()" not in code[fallback_end:shader_begin]
+for old,new in (
+    ("2.0f * R30PauseMenuVerticalFraction();",
+     "0.0f * R30PauseMenuVerticalFraction();"),
+    ("state.worldEffect ? 0.0f :", "state.worldEffect ? 1.0f :"),
+    ("correctedY = hudScaleY * ndcY - pauseNdcOffset;",
+     "correctedY = hudScaleY * ndcY + pauseNdcOffset;"),
+):
+    mutant = fallback.replace(old,new,1)
+    assert mutant != fallback
+    assert not (fallback_hoist in mutant and
+                "correctedY = hudScaleY * ndcY - pauseNdcOffset;" in mutant)
+for width,height in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
+    for fraction in (-.25,0.,.10,.25):
+        for source_y in (0., height*.3, height*.5, height):
+            ndc_y = 1. - 2.*source_y/height
+            fast_y = source_y + height*fraction
+            fallback_y = height * (1. - (ndc_y-2.*fraction))*.5
+            shader_y = height * (1. - (ndc_y-2.*fraction))*.5
+            assert abs(fast_y-fallback_y) < 1e-6
+            assert abs(fallback_y-shader_y) < 1e-6
+            # World/F11/gameplay/GOAL are non-pause semantic owners.
+            for context in (("game","overlay",False),("pause","hud",False),
+                            ("pause","world",False),("pause","overlay",True)):
+                assert pause_fraction(*context,fraction) == 0.0
+print("PASS ESC fallback/paired/shader vertical parity across 4 dimensions and 3 source-owning mutations")
 
 def pause_fraction(state, semantic, external, fraction):
     if external or state != "pause" or semantic != "overlay" or not isfinite(fraction):
