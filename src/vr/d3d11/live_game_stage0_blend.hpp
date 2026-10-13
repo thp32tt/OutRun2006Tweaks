@@ -28,4 +28,29 @@ constexpr std::uint32_t canonical_game_stage0_blend_alpha_op(
         ? kGameStage0BlendDiffuseAlpha : op;
 }
 
+// Preserve the original CURRENT-weighted alpha operation when PM RGB requires
+// its own shader (TEXTURE/TFACTOR versus TEXTURE/DIFFUSE). Canonicalizing this
+// alpha op first made both live native PM variants unreachable. All non-PM
+// stage0 color operations retain the established CURRENT->DIFFUSE mapping.
+constexpr std::uint32_t canonical_game_stage0_pm_alpha_op(
+    std::uint32_t colorOp, std::uint32_t alphaOp,
+    bool currentIsVertexDiffuse) noexcept {
+    return currentIsVertexDiffuse &&
+           colorOp == kGameStage0BlendTextureAlphaPM &&
+           alphaOp == kGameStage0BlendCurrentAlpha
+        ? alphaOp
+        : canonical_game_stage0_blend_alpha_op(alphaOp, currentIsVertexDiffuse);
+}
+
+static_assert(canonical_game_stage0_pm_alpha_op(
+    kGameStage0BlendTextureAlphaPM, kGameStage0BlendCurrentAlpha, true) ==
+    kGameStage0BlendCurrentAlpha);
+static_assert(canonical_game_stage0_pm_alpha_op(
+    kGameStage0BlendDiffuseAlpha, kGameStage0BlendCurrentAlpha, true) ==
+    kGameStage0BlendDiffuseAlpha);
+static_assert(canonical_game_stage0_pm_alpha_op(
+    kGameStage0BlendTextureAlphaPM, kGameStage0BlendCurrentAlpha, false) ==
+    kGameStage0BlendCurrentAlpha);
+
+
 } // namespace outrun::vr::dx11::live_game_frame

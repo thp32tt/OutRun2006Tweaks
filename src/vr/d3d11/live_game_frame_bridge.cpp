@@ -1803,7 +1803,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
             layout.hasDiffuse && nextColorOp == D3DTOP_DISABLE &&
             resultArg == D3DTA_CURRENT;
         op = canonical_game_stage0_blend_alpha_op(op, stage0CurrentIsDiffuse);
-        alphaOp = canonical_game_stage0_blend_alpha_op(alphaOp, stage0CurrentIsDiffuse);
+        // Keep PM CURRENT alpha distinguishable for its exact native shaders.
+        // Otherwise the 00641/00642 predicates are dead after canonicalization.
+        alphaOp = canonical_game_stage0_pm_alpha_op(
+            op, alphaOp, stage0CurrentIsDiffuse);
         // Full CPU-readable mip chain required; aniso and invalid inputs
         // retain the original D3D9 Draw path without native promotion.
         // Reject complement/alpha-replicate modifiers and projected coordinates.
