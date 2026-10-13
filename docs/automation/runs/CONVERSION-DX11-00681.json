@@ -11,7 +11,7 @@
   "work_key": "DX11:MENU_RACE_NATIVE_DEVICE_COHERENCE",
   "feature_id": "MENU_RACE_NATIVE_DRAW_DEVICE_OWNERSHIP_AND_INPUT_SAFE_PRESENT",
   "status": "AWAITING_EXACT_SHA_GATES",
-  "checkpoint": "C4_COMMIT",
+  "checkpoint": "C3_VALIDATE",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
@@ -29,7 +29,8 @@
       "src/vr/d3d11/native_game_readback_provenance.hpp",
       ".github/workflows/dx11-fast-structural.yml",
       "tools/test_dx11_game_device_handoff_00681.py",
-      "docs/automation/runs/CONVERSION-DX11-00681.json"
+      "docs/automation/runs/CONVERSION-DX11-00681.json",
+      "tools/test_dx11_game_scene_readback_00680.py"
     ],
     "acceptance_proof": {
       "positive_probe": "C++17 same-device/stale-frame provenance plus native draw, unavailable-draw and Present source wiring",
@@ -42,7 +43,8 @@
       "src/vr/d3d11/native_game_readback_provenance.hpp",
       ".github/workflows/dx11-fast-structural.yml",
       "tools/test_dx11_game_device_handoff_00681.py",
-      "docs/automation/runs/CONVERSION-DX11-00681.json"
+      "docs/automation/runs/CONVERSION-DX11-00681.json",
+      "tools/test_dx11_game_scene_readback_00680.py"
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
@@ -95,20 +97,21 @@
     "src/vr/d3d11/native_game_readback_provenance.hpp",
     ".github/workflows/dx11-fast-structural.yml",
     "tools/test_dx11_game_device_handoff_00681.py",
-    "docs/automation/runs/CONVERSION-DX11-00681.json"
+    "docs/automation/runs/CONVERSION-DX11-00681.json",
+    "tools/test_dx11_game_scene_readback_00680.py"
   ],
   "base_head_sha": "25f5a21803f640eb77d506751aba47c4dd96f3a2",
   "pipeline": {
     "C0_RECOVER": "PASS confirmed 00680 exact-SHA 5 Gates; inspected latest GitHub HEAD",
     "C1_REVIEW": "CONFIRMED missing D3D9 source device identity on native Draw batch/readback/Present",
     "C2_IMPLEMENT": "PASS actual native draw and GPU-to-game Present integration changed",
-    "C3_VALIDATE": "PENDING exact SHA GitHub CI; new C++17/destructive tests wired",
-    "C4_COMMIT": "PENDING material commit",
+    "C3_VALIDATE": "First SHA 4491cc33b90fd627b730b1c04e202af00d5b0f38 DX11 Fast failed: legacy 00680 test assumed exact old if-expression. Expanded existing regression to require both freshness and same D3D9 present device; five mandatory Gate rerun on repair SHA.",
+    "C4_COMMIT": "Initial material SHA 4491cc33b90fd627b730b1c04e202af00d5b0f38; CI repair commit pending",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_EXACT_SHA_GATES"
   },
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
   "result_sha": null,
-  "next_action": "Check exact SHA Backend, DX11 Fast, Build, OpenXR and HUD GitHub Gates; record separate [skip ci] C6 only after confirmed success. Quest3 UNTESTED."
+  "next_action": "Revalidate exact same SHA of repair material-result chain across all five GitHub Gates; C6 record in separate [skip ci] commit after success. Hardware UNTESTED."
 }

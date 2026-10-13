@@ -14,7 +14,8 @@ def wired(code):
     x = code[a:b]
     return (code.count('#include "native_game_readback_provenance.hpp"') == 1
         and "GameReadbackProvenance provenance{};" in code
-        and "ready == S_OK && !oldest.provenance.may_overlay(s.presents)" in x
+        and "ready == S_OK && (!oldest.provenance.may_overlay(s.presents) ||" in x
+        and "!oldest.provenance.same_device(presentDevice)" in x
         and "++s.staleReadbacks;" in x
         and "next.provenance = {s.presents, s.sourceDrawsThisFrame};" in x
         and "ctx->CopyResource(next.staging.Get(), s.backend.color_texture());" in x
