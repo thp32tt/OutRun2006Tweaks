@@ -8,9 +8,10 @@ def connected(src):
     try:
         mirror = src.split("bool mirror_texture(", 1)[1].split("bool submit(", 1)[0]
         draw = src.split("bool submit(", 1)[1].split("void before_game_present(", 1)[0]
+        rgba_branch = mirror.split("else if (rgbaSwizzle)", 1)[1].split("else if (tenBit)", 1)[0]
     except IndexError:
+        # Removing the producer branch is an expected destructive mutation.
         return False
-    rgba_branch = mirror.split("else if (rgbaSwizzle)", 1)[1].split("else if (tenBit)", 1)[0]
     return ('#include "live_game_rgba_texture.hpp"' in src
         and "base.Format == D3DFMT_X8B8G8R8 ?" in rgba_branch
         and all(s in mirror for s in (
