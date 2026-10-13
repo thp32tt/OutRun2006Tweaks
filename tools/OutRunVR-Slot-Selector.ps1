@@ -29,11 +29,44 @@ function Get-Active {
 function Prepare-Slot([string]$slot){
     if(!$slots.Contains($slot)){throw "Unknown slot: $slot"}
     $cfg=$slots[$slot]
-    # Direct script invocation preserves spaces in the game path and surfaces
-    # actual backend/payload errors in the existing GUI catch block.
+    $sessionPath=Join-Path $root 'CURRENT_VR_SESSION.json'
+    # A previous successful test can leave this file behind. Its existence
+    # is not evidence that the selector actually prepared this launch.
+    $previousSessionId=$null
+    if(Test-Path -LiteralPath $sessionPath){
+        try{
+            $previousSessionId=[string]((Get-Content -LiteralPath $sessionPath -Raw -ErrorAction Stop |
+                ConvertFrom-Json -ErrorAction Stop).SessionId)
+        }catch{
+            $previousSessionId=$null
+        }
+    }
+    # Direct invocation preserves spaces and propagates backend/PE/hash errors.
     & $selector -Backend $cfg.Backend -TestProfile $cfg.Profile -VariantId $slot
-    if(-not (Test-Path (Join-Path $root 'CURRENT_VR_SESSION.json'))){
+    if(-not (Test-Path -LiteralPath $sessionPath)){
         throw "Slot preparation did not create a session: $slot"
+    }
+    try{
+        $session=Get-Content -LiteralPath $sessionPath -Raw -ErrorAction Stop |
+            ConvertFrom-Json -ErrorAction Stop
+    }catch{
+        throw "Slot preparation produced an unreadable session for $slot : $($_.Exception.Message)"
+    }
+    if(-not $session.SessionId -or
+        ($previousSessionId -and $session.SessionId -eq $previousSessionId)){
+        throw "Slot preparation reused a stale session for $slot"
+    }
+    if($session.Backend -ne $cfg.Backend -or
+       $session.TestProfile -ne $cfg.Profile -or
+       $session.VariantId -ne $slot){
+        throw "Slot preparation session identity mismatch for $slot"
+    }
+    # The manifest and the actual installed backend marker must agree.
+    $active=Get-Active
+    if($active.backend -ne $cfg.Backend -or
+       $active.variant -ne $slot -or
+       $active.profile -ne $cfg.Profile){
+        throw "Slot preparation active backend identity mismatch for $slot"
     }
 }
 
