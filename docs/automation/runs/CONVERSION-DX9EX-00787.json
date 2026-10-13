@@ -10,10 +10,10 @@
   "feature_id": "DX9EX:CAPTURE:DXGI_ACQUIRE_RELEASE_RECOVERY",
   "feature_class": "CRITICAL_BLOCKER",
   "work_key": "DX9EX:CAPTURE:DXGI_ACQUIRE_RELEASE_RECOVERY",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00787]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "vrhost/src/main_r23.cpp",
@@ -78,12 +78,14 @@
     "negative_test_evidence": "Source verifier adds 6 additional mutation controls for malformed Acquire, missing release and rebind failure."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "SUCCESS",
     "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
-    "performance_evidence": "CAPTURE_PROTOCOL_RECOVERY_NO_MEASURED_FPS"
+    "performance_evidence": "CAPTURE_PROTOCOL_RECOVERY_NO_MEASURED_FPS",
+    "validation_bearing_sha": "d758197c0678442f5451044007015f7beaad8a51"
   },
   "runtime_status": "NEED_QUEST3_VDXR_TEST",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null
+  "validation_bearing_result_sha": "d758197c0678442f5451044007015f7beaad8a51",
+  "result_sha": "d758197c0678442f5451044007015f7beaad8a51",
+  "c6_result": "PASS_EXACT_SHA"
 }
