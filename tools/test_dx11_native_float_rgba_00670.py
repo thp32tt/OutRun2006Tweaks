@@ -75,7 +75,7 @@ def main():
         ("game32.data()+24", "game32.data()+16"),
         ("nativeMip != halfMip", "nativeMip == halfMip"),
     ):
-        assert old in probe and not linked(src, header, probe.replace(old, bad, 1)), old
+        assert old in probe and not linked(src, header, probe.replace(old, bad)), old
     print("00670 PASS: 16 destructive float RGBA integration regressions; HMD/gamepad UNTESTED")
 
 if __name__ == "__main__":
