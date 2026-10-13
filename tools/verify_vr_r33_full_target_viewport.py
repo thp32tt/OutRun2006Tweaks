@@ -5,7 +5,7 @@ from pathlib import Path
 src = (Path(__file__).resolve().parents[1] /
        "src/vr/d3d9/stereo_renderer_r33.cpp").read_text(encoding="utf-8")
 start = src.index("bool R33TargetResetViewportMatches(")
-end = src.index("thread_local R33DepthStencilWriteState", start)
+end = src.index("R33RightViewportExtent R33SavedViewport{};", start)
 helper = src[start:end]
 assert "rightEye->GetDesc(&desc)" in helper
 assert "desc.Width == 0 || desc.Height == 0" in helper
