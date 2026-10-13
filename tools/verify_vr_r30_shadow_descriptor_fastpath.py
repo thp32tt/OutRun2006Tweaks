@@ -210,7 +210,11 @@ def validate_shadow_copy_cache(source):
     assert "R30ShadowCopyCache vertexCopy;" in source
     assert "R30ShadowCopyCache indexCopy;" in source
     assert "R30ShadowPtr entry;" in source
-    assert source.count("R30ShadowCopyCache& cache)") == 2
+    # The incremental-copy helper has its own cache parameter; verify the two
+    # original VB/IB readers independently instead of counting every helper.
+    for reader in ("R30CopyVertexShadow", "R30CopyIndexShadow"):
+        signature = source.split(f"bool {reader}(", 1)[1].split("{", 1)[0]
+        assert "R30ShadowCopyCache& cache)" in signature
     for fn in (begin, finish, vb_unlock, ib_unlock):
         assert "++entry->revision;" in fn
     assert "entry->valid.clear();" in begin
@@ -241,6 +245,7 @@ def validate_shadow_copy_cache(source):
         assert fn.index("cache.entry == entry") < fn.index("!R30RangeValid")
         assert fn.index("cache.revision == entry->revision") < fn.index("!R30RangeValid")
         assert fn.index("cache.revision == entry->revision") < fn.index("std::memcpy")
+        assert fn.index("R30TryIncrementalShadowCopy(entry, offset, size, out, cache)") < fn.index("std::memcpy")
         assert fn.index("std::memcpy") < fn.index("cache.revision = entry->revision;")
     assert "scratch.source,\n                    scratch.vertexCopy))" in primitive
     assert "scratch.source,\n                    scratch.vertexCopy))" in indexed
@@ -259,7 +264,8 @@ def test_shadow_copy_cache_mutations(source):
         ("cache.revision = entry->revision;", "cache.revision = 0;"),
         ("std::memcpy(out.data(), entry->bytes.data() + offset, size)", "// missing CPU shadow refresh"),
         ("++entry->revision;\n                ++R30ShadowDiscardInvalidations;", "++R30ShadowDiscardInvalidations;"),
-        ("++entry->revision;\n                    ++R30ShadowWrites;", "++R30ShadowWrites;"),
+        ("++entry->revision;\n                    entry->lastWriteRevision = entry->revision;",
+         "entry->lastWriteRevision = entry->revision;"),
         ("entry->valid.clear();\n                ++entry->revision;\n            }\n            return hr;", "entry->valid.clear();\n            }\n            return hr;"),
         ("static_cast<UINT>(indexBytes), scratch.indexSource,\n                    scratch.indexCopy))",
          "static_cast<UINT>(indexBytes), scratch.indexSource,\n                    scratch.vertexCopy))"),
@@ -268,7 +274,17 @@ def test_shadow_copy_cache_mutations(source):
     )
     for index, (needle, changed) in enumerate(changes, 1):
         assert needle in source, (index, needle)
-        altered = source.replace(needle, changed, 1)
+        # A new incremental helper may contain the same tokens as the reader.
+        # Target the vertex reader so a mutation cannot accidentally touch the
+        # helper and leave both original VB/IB cache paths untested.
+        vb_begin = source.index("bool R30CopyVertexShadow(")
+        vb_end = source.index("bool R30CopyIndexShadow(", vb_begin)
+        vb_reader = source[vb_begin:vb_end]
+        if needle in vb_reader:
+            altered = (source[:vb_begin] + vb_reader.replace(needle, changed, 1)
+                       + source[vb_end:])
+        else:
+            altered = source.replace(needle, changed, 1)
         try:
             validate_shadow_copy_cache(altered)
         except AssertionError:
