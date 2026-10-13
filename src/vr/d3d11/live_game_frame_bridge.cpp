@@ -8,6 +8,7 @@
 #include "packed_texture_16bit.hpp"
 #include "live_game_luminance_texture.hpp"
 #include "live_game_rgb24_texture.hpp"
+#include "live_game_rgba_texture.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -2730,6 +2731,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                            base.Format == D3DFMT_A8L8;
     // The game RGB24 B,G,R rows have no native 24-bit D3D11 SRV.
     const bool rgb24 = base.Format == D3DFMT_R8G8B8;
+    // Little-endian RGBA memory cannot be memcpy-ed into a BGRA8 SRV.
+    const bool rgbaSwizzle = base.Format == D3DFMT_A8B8G8R8 ||
+                             base.Format == D3DFMT_X8B8G8R8;
     // D3D9 packed 16-bit texture formats have no equivalent sRGB D3D11 SRV.
     // Keep their live Draw on DX9Ex; never decode as linear by mistake.
     if (capture.srgbTexture && packed16) return false;
@@ -2746,7 +2750,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             (capture.srgbTexture ? DXGI_FORMAT_BC2_UNORM_SRGB : DXGI_FORMAT_BC2_UNORM) :
             (capture.srgbTexture ? DXGI_FORMAT_BC3_UNORM_SRGB : DXGI_FORMAT_BC3_UNORM);
     } else if (base.Format == D3DFMT_A8R8G8B8 ||
-               base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance || rgb24) {
+               base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance || rgb24 || rgbaSwizzle) {
         nativeFormat = capture.srgbTexture ?
             DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : DXGI_FORMAT_B8G8R8A8_UNORM;
     } else return false;
@@ -2792,7 +2796,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             (std::max)(1u, (desc.Width + 3u) / 4u) *
                 (base.Format == D3DFMT_DXT1 ? 8u : 16u) :
             desc.Width * sourceTexelBytes;
-        const UINT uploadPitch = ((packed16 || luminance) || rgb24) ?
+        const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) ?
             desc.Width * 4u : rowBytes;
         D3DLOCKED_RECT lock{};
         const HRESULT lockResult = gpuRenderTarget ?
@@ -2819,6 +2823,10 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     luminance_texture::unpack_row(source, destination, desc.Width, luminanceLayout);
                 else if (rgb24)
                     rgb24_texture::unpack_row(source, destination, desc.Width);
+                else if (rgbaSwizzle)
+                    rgba_texture::unpack_row(source, destination, desc.Width,
+                        base.Format == D3DFMT_X8B8G8R8 ?
+                            rgba_texture::Layout::xrgb : rgba_texture::Layout::argb);
                 else
                     std::memcpy(destination, source, rowBytes);
             }
