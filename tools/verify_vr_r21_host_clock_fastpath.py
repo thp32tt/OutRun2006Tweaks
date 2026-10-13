@@ -49,12 +49,31 @@ def verify(source):
     assert read.index("if (before != after ||") < read.index("if (headerMagic !=")
     assert read.index("if (headerMagic !=") < read.index("hostPid = pid;")
     assert "SharedState->magic != OutRunVR::SharedMagic" not in read
+    assert read.index("if (!hostPid ||") < read.index("if (sampleQpc == 0")
+    assert read.index("if (sampleQpc == 0") < read.index("if (!R21ComputeAgeMs")
+    assert read.count("return R21HostStatus::UnstableRead;") == 2
+    assert "if (sampleQpc == 0 && hostPid == R21LastHealthyHostPid)" in read
+    fence = source[source.index("void R21FenceHostIdentityChange("):
+                   source.index("void R21ApplyHostFailClosedAtPresent()")]
+    for token in ("hostPid == R21LastHealthyHostPid",
+                  "RuntimeEligibility::FailClosed();",
+                  "R20StereoEligibilityGate.store(false",
+                  "R9StereoSeeded = false;", "R9MonoSeeded = false;",
+                  "R9MonoBackupGap = false;", "R21HostFailClosed = true;"):
+        assert token in fence, token
+    assert caller.count("R21FenceHostIdentityChange(hostPid);") == 2
+    assert caller.index("R21FenceHostIdentityChange(hostPid);") < caller.index("R21LastHealthyHostPid = hostPid;")
+    assert "if (status == R21HostStatus::UnstableRead &&" in caller
     for token in ("ObserveFreshHost();", "ObserveSoftHostSuspend();", "RuntimeEligibility::FailClosed();", "nowMs - R21LastHealthyTickMs <="):
         assert token in caller, token
 
-def status(valid, coherent, pid, flags, sample, now, hz):
-    if not valid or not coherent or not pid or (flags & 3) != 3:
+def status(valid, coherent, pid, flags, sample, now, hz, last_pid=9):
+    if not coherent:
+        return "UNSTABLE"
+    if not valid or not pid or (flags & 3) != 3:
         return "STALE"
+    if sample == 0 and pid == last_pid:
+        return "UNSTABLE"
     if sample <= 0 or hz <= 0 or now < sample:
         return "STALE"
     delta = now - sample
@@ -69,14 +88,29 @@ def main():
         ("FRESH", (1, 1, 9, 7, 100000, 130000, 1000000)),
         ("SOFT", (1, 1, 9, 3, 100000, 130000, 1000000)),
         ("STALE", (0, 1, 9, 7, 100000, 130000, 1000000)),
-        ("STALE", (1, 0, 9, 7, 100000, 130000, 1000000)),
+        ("UNSTABLE", (1, 0, 9, 7, 100000, 130000, 1000000)),
         ("STALE", (1, 1, 0, 7, 100000, 130000, 1000000)),
         ("STALE", (1, 1, 9, 7, 100000, 430000, 1000000)),
         ("STALE", (1, 1, 9, 7, 1, 2**63-1, 1000000)),
         ("STALE", (1, 1, 9, 7, 200, 100, 1000000)),
+        ("UNSTABLE", (1, 1, 9, 7, 0, 130000, 1000000)),
+        ("STALE", (1, 1, 10, 7, 0, 130000, 1000000)),
+        ("STALE", (1, 1, 9, 3, 0, 130000, 1000000, 0)),
     )
     for expected, args in fixtures:
         assert status(*args) == expected, (expected, args)
+    # Model both baseline ownership and expiry independently of HMD.
+    for old_pid, new_pid, replaced in ((9, 9, False), (9, 10, True), (0, 10, False)):
+        assert (old_pid != 0 and old_pid != new_pid) == replaced
+    for sample_kind, now_ms, healthy_ms, fenced, keep in (
+        ("UNSTABLE", 1200, 1100, False, True),
+        ("UNSTABLE", 1351, 1100, False, False),
+        ("STALE", 1200, 1100, False, False),
+        ("FRESH", 1200, 1100, False, False),
+        ("UNSTABLE", 1200, 1100, True, False),
+    ):
+        assert (sample_kind == "UNSTABLE" and not fenced and healthy_ms != 0
+                and now_ms >= healthy_ms and now_ms - healthy_ms <= 250) == keep
     mutations = (
         ("static const LONGLONG frequency", "const LONGLONG frequency"),
         ("QueryPerformanceFrequency(&value)", "QueryPerformanceFrequency(&now)"),
@@ -89,6 +123,10 @@ def main():
         ("headerSize != sizeof(OutRunVR::SharedPoseState))", "false)"),
         ("if ((flags & OutRunVR::HostShouldRender) == 0)", "if (false)"),
         ("if (!hostPid ||", "if (false ||"),
+        ("if (sampleQpc == 0 && hostPid == R21LastHealthyHostPid)", "if (sampleQpc == 0)"),
+        ("R21FenceHostIdentityChange(hostPid);", "/* lost PID fence */"),
+        ("if (status == R21HostStatus::UnstableRead &&", "if ("),
+        ("R9MonoBackupGap = false;", "/* lost mono-backup fence */"),
     )
     for original, damaged in mutations:
         assert original in source, original
@@ -97,7 +135,7 @@ def main():
         except (AssertionError, ValueError):
             continue
         raise AssertionError("R21 destructive mutation survived: " + original)
-    print(f"PASS R21 host clock/coherent-seqlock/soft/fail-closed: 8 scenarios, {len(mutations)} negative mutations")
+    print(f"PASS R21 host-handoff/seqlock/clock: {len(fixtures)} cases, 5 grace transitions, {len(mutations)} destructive mutations")
 
 if __name__ == "__main__":
     main()

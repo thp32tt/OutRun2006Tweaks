@@ -1,0 +1,68 @@
+{
+  "task_id": "CONVERSION-DX9EX-00806",
+  "run_id": "CONVERSION-DX9EX-00806",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "base_sha": "3b798204a97aa42f500c2e427c5e2ecbf6c87ec4",
+  "work_key": "DX9EX:HOST_LIFECYCLE:PID_HANDOFF_SEEDED_RECOVERY",
+  "feature_contract": {
+    "feature_id": "DX9EX:HOST_LIFECYCLE:PID_HANDOFF_SEEDED_RECOVERY",
+    "goal": "On a replaced OpenXR host process, revoke the previous verified stereo/depth/WVP baseline immediately; only uncertain same-host IPC samples retain a bounded grace before fail-closed recovery.",
+    "trace_stages": [
+      "x64 OpenXR host seqlock SharedPoseState hostPid/flags/heartbeat/sampleQpc",
+      "R21 Present owner tests coherent hard failures, same-host transient reads and PID changes",
+      "RuntimeEligibility stereo gate, R9 mono/stereo seed and R23 recovery warmup/color-depth baseline"
+    ],
+    "acceptance_items": [
+      {
+        "id": "HOST_PID_FRESH_SOFT_REBASE",
+        "category": "end_to_end_behavior",
+        "behavior_area": "host_process_identity",
+        "expected_behavior": "Fresh and SoftSuspend of new PID both fence old stereo/WVP/mono baseline and require a new recovery warmup."
+      },
+      {
+        "id": "TRANSIENT_IPC_VS_HARD_STALE",
+        "category": "fallback_regression",
+        "behavior_area": "same_pid_seqlock_invalid_and_stale",
+        "expected_behavior": "Torn reads and same-PID zero QPC use at most 250ms grace; valid dead host, new-PID zero, invalid header, future/expired timestamps fail closed."
+      },
+      {
+        "id": "HOST_LIFECYCLE_FULL_BUILD_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_win32_game_host_package",
+        "expected_behavior": "R21 negative/mutation models, DX9Ex Active five-job Win32 build, Domain Isolation and Full Source Impact pass on final result SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "HOST_PID_FRESH_SOFT_REBASE": "PENDING_EXACT_SHA",
+    "TRANSIENT_IPC_VS_HARD_STALE": "PENDING_EXACT_SHA",
+    "HOST_LIFECYCLE_FULL_BUILD_GATES": "PENDING_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "root_cause": "Coherent Stale and torn seqlock samples shared the same 250ms grace; an independently fresh host PID reused the old process baseline through R21HostFailClosed=false.",
+    "alternatives_rejected": [
+      "Deleting grace entirely would regress observed single-frame seqlock handoffs.",
+      "Clearing only R9StereoSeeded without RuntimeEligibility::FailClosed would retain WVP injection eligibility.",
+      "Changing UI/HUD, Quest3 FOV or frame pacing timers cannot repair process ownership."
+    ],
+    "source_trace": [
+      "SharedState seqlock validity/pid/host flags",
+      "R21 Present host status + PID fence",
+      "RuntimeEligibility FailClosed and R9 seed reset, R23 new-baseline authority"
+    ],
+    "negative_test_evidence": "11 model snapshots, 5 bounded-grace/PID transitions and destructive verifier mutations; final GitHub CI pending."
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r21.cpp",
+    "tools/verify_vr_r21_host_clock_fastpath.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00806.json"
+  ],
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  },
+  "runtime_validation": "UNTESTED"
+}

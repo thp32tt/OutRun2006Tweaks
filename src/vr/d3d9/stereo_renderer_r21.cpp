@@ -27,6 +27,7 @@ namespace OutRunVRStereo
         enum class R21HostStatus : std::uint8_t
         {
             Stale,
+            UnstableRead, // torn seqlock or same-PID zero-QPC, bounded grace only
             SoftSuspend,
             Fresh
         };
@@ -98,8 +99,15 @@ namespace OutRunVRStereo
 
                 constexpr std::uint32_t hardRequired =
                     OutRunVR::HostAlive | OutRunVR::SessionVisible;
-                if (!hostPid || (flags & hardRequired) != hardRequired ||
-                    !R21ComputeAgeMs(sampleQpc, ageMs) ||
+                // A coherent protocol/host-death failure must not inherit
+                // the grace intended for a transient torn IPC read.
+                if (!hostPid || (flags & hardRequired) != hardRequired)
+                    return R21HostStatus::Stale;
+                // Only the same previously healthy host may publish a
+                // temporary zero-QPC snapshot during a mapping handoff.
+                if (sampleQpc == 0 && hostPid == R21LastHealthyHostPid)
+                    return R21HostStatus::UnstableRead;
+                if (!R21ComputeAgeMs(sampleQpc, ageMs) ||
                     ageMs > R21HostStaleMs)
                     return R21HostStatus::Stale;
 
@@ -107,7 +115,28 @@ namespace OutRunVRStereo
                     return R21HostStatus::SoftSuspend;
                 return R21HostStatus::Fresh;
             }
-            return R21HostStatus::Stale;
+            // Exhausted seqlock retries carry no coherent death evidence.
+            return R21HostStatus::UnstableRead;
+        }
+
+        void R21FenceHostIdentityChange(std::uint32_t hostPid) noexcept
+        {
+            if (R21LastHealthyHostPid == 0 ||
+                hostPid == R21LastHealthyHostPid)
+                return;
+
+            // Fresh and SoftSuspend of a different host both invalidate the
+            // old pose/WVP and stereo color/depth baseline before PID update.
+            OutRunVR::RuntimeEligibility::FailClosed();
+            R20StereoEligibilityGate.store(false, std::memory_order_release);
+            R9StereoSeeded = false;
+            R9MonoSeeded = false;
+            R9MonoBackupGap = false;
+            R21HostFailClosed = true;
+            R21HostSoftSuspended = false;
+            spdlog::warn(
+                "VR R21 HOST-HANDOFF: previous pid={} new pid={}; stereo baseline fenced until new pose warmup and verified clear",
+                R21LastHealthyHostPid, hostPid);
         }
 
         void R21ApplyHostFailClosedAtPresent() noexcept
@@ -122,6 +151,7 @@ namespace OutRunVRStereo
 
             if (status == R21HostStatus::Fresh)
             {
+                R21FenceHostIdentityChange(hostPid);
                 R21LastHealthyHostPid = hostPid;
                 R21LastHealthyTickMs = GetTickCount64();
                 OutRunVR::RuntimeEligibility::ObserveFreshHost();
@@ -156,6 +186,7 @@ namespace OutRunVRStereo
 
             if (status == R21HostStatus::SoftSuspend)
             {
+                R21FenceHostIdentityChange(hostPid);
                 R21LastHealthyHostPid = hostPid;
                 R21LastHealthyTickMs = GetTickCount64();
                 OutRunVR::RuntimeEligibility::ObserveSoftHostSuspend();
@@ -171,14 +202,12 @@ namespace OutRunVRStereo
                 return;
             }
 
-            // A single invalid/zero shared-state sample was observed in the
-            // supplied run while the host heartbeat resumed on the very next
-            // Present. Honor the same 250 ms freshness budget before destroying
-            // the verified baseline. This still fail-closes promptly on a real
-            // host death, but avoids a full recovery cycle for a transient
-            // seqlock/mapping handoff.
+            // Keep only a torn-seqlock or same-host zero-QPC handoff for
+            // at most 250ms. Definitive stale/dead/invalid-protocol evidence
+            // fails closed immediately; even uncertain reads expire.
             const ULONGLONG nowMs = GetTickCount64();
-            if (!R21HostFailClosed && R21LastHealthyTickMs != 0 &&
+            if (status == R21HostStatus::UnstableRead &&
+                !R21HostFailClosed && R21LastHealthyTickMs != 0 &&
                 nowMs >= R21LastHealthyTickMs &&
                 nowMs - R21LastHealthyTickMs <=
                     static_cast<ULONGLONG>(R21HostStaleMs))
@@ -189,7 +218,7 @@ namespace OutRunVRStereo
                 {
                     R21LastTransientGraceLogMs = nowMs;
                     spdlog::info(
-                        "VR R21 TRANSIENT-GRACE: one invalid host sample kept the verified stereo baseline alive within {}ms freshness budget (count={})",
+                        "VR R21 TRANSIENT-GRACE: uncertain same-host IPC sample kept stereo alive within {}ms freshness budget (count={})",
                         R21HostStaleMs, R21TransientInvalidReadGrace);
                 }
                 return;
