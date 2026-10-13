@@ -617,6 +617,20 @@ namespace OutRunVRStereo
                  !TargetIsBackBuffer() || !StereoWanted() || !R9StereoSeeded))
                 return legacyR13Draw();
 
+            // R28's verified-world continuation AND R27's perspective-effect
+            // override both veto forced-mono shadows, auxiliary attachments
+            // and active/untrusted occlusion. These draws previously still
+            // fetched a WVP/pose candidate and captured up to five render
+            // states before falling back to the same conservative R13 chain.
+            // Keep GPL fingerprint tracing on the original full snapshot path.
+            // The lower hook owns its own effect snapshot and fail-closed
+            // mono/occlusion policy; no game draw or eye replay is skipped.
+            if (!traceShaderFingerprint &&
+                (R13ForceMonoShadow || AnyAuxRenderTargetActive() ||
+                 OcclusionQueryTrackingUnavailable.load(std::memory_order_acquire) ||
+                 ActiveOcclusionQueries.load(std::memory_order_acquire) > 0))
+                return legacyR13Draw();
+
             if (!traceShaderFingerprint)
             {
                 const HRESULT rebound = R28RunWithVerifiedWorldEpoch(
