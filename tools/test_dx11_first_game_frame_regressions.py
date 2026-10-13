@@ -373,7 +373,8 @@ def main() -> None:
             "capture.additive = additive;",
             "coordIndex >= layout.texcoordCount ||",
             "transformFlags != D3DTTFF_DISABLE && transformFlags != D3DTTFF_COUNT2",
-            "srgb ||",
+            "srgb > 1u ||",
+            "capture.srgbTexture = srgb == TRUE;",
             "capture.coordIndex = coordIndex;",
             "(min != D3DTEXF_POINT && min != D3DTEXF_LINEAR)",
             "(mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR)",
@@ -398,6 +399,7 @@ def main() -> None:
         ))
     assert texture_path_complete(bridge)
     for old, bad in (
+        ("srgb > 1u ||", "srgb > 2u ||"),
         ("capture.enabled = layout.textured;", "capture.enabled = false;"),
         ("if (!layout.hasDiffuse && !selectTexture) return false;",
          "if (layout.hasDiffuse && !selectTexture) return false;"),
