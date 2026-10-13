@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_RGB24_MIP_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "1f249cbf77c865204d7e65bf3297ebcb3239d59f",
-  "status": "MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -65,7 +65,7 @@
     "C3_VALIDATE": "LOCAL_RGB24_CPU_PROBE_PASS; Build #38355081329 failed outdated packed16 source regression expecting pre-RGB24 predicate; preserve packed16 mutation check and broaden positive predicate to include RGB24; exact SHA CI pending",
     "C4_COMMIT": "MATERIAL_COMMIT_REQUESTED",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "acceptance_results": {
     "cpu_probe": "LOCAL_CPP_PASS",
@@ -75,7 +75,7 @@
     "quest3_vdxr": "UNTESTED"
   },
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "aa57fd0b5edfa7b117f4e0badcd5991af61a5e73",
   "result_sha": null,
-  "next_action": "Confirm exact new validation-bearing SHA required GitHub Gates then separate C6; Quest3/VDXR + gamepad UNTESTED"
+  "next_action": "BUILD_VERIFIED exact-SHA GitHub CI SUCCESS; Quest3/VDXR HMD and gamepad runtime validation remain UNTESTED"
 }
