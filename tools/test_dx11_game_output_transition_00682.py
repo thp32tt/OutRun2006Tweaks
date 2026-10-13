@@ -49,16 +49,18 @@ assert compiler
 probe = r"""
 #include "native_game_readback_provenance.hpp"
 using namespace outrun::vr::dx11::live_game_frame;
-constexpr GameOutputSignature output{0x10u,3440u,1440u,21u};
+constexpr GameOutputSignature output{0x10u,3440u,1440u,21u,0xabcdu};
 static_assert(output.valid());
-static_assert(output.same(GameOutputSignature{0x10u,3440u,1440u,21u}));
-static_assert(!output.same(GameOutputSignature{0x20u,3440u,1440u,21u}));
-static_assert(!output.same(GameOutputSignature{0x10u,1920u,1440u,21u}));
-static_assert(!output.same(GameOutputSignature{0x10u,3440u,1080u,21u}));
-static_assert(!output.same(GameOutputSignature{0x10u,3440u,1440u,22u}));
+static_assert(output.same(GameOutputSignature{0x10u,3440u,1440u,21u,0xabcdu}));
+static_assert(!output.same(GameOutputSignature{0x20u,3440u,1440u,21u,0xabcdu}));
+static_assert(!output.same(GameOutputSignature{0x10u,1920u,1440u,21u,0xabcdu}));
+static_assert(!output.same(GameOutputSignature{0x10u,3440u,1080u,21u,0xabcdu}));
+static_assert(!output.same(GameOutputSignature{0x10u,3440u,1440u,22u,0xabcdu}));
 static_assert(!output.same(GameOutputSignature{}));
 static_assert(!GameOutputSignature{}.valid());
-static_assert(!GameOutputSignature{0x10u,3440u,1440u,0u}.valid());
+static_assert(!GameOutputSignature{0x10u,3440u,1440u,21u,0u}.valid());
+static_assert(!output.same(GameOutputSignature{0x10u,3440u,1440u,21u,0xbeefu}));
+static_assert(!GameOutputSignature{0x10u,3440u,1440u,0u,0xabcdu}.valid());
 static_assert(GameReadbackProvenance{20u,4u,0x10u,2u}.same_output(2u));
 static_assert(!GameReadbackProvenance{20u,4u,0x10u,2u}.same_output(3u));
 static_assert(!GameReadbackProvenance{20u,4u,0x10u,0u}.same_output(0u));

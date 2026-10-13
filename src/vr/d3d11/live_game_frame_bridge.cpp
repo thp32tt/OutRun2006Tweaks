@@ -4008,15 +4008,22 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         const auto presentDevice = reinterpret_cast<std::uintptr_t>(game);
         ComPtr<IDirect3DSurface9> presentBackbuffer;
         D3DSURFACE_DESC presentDesc{};
+        ComPtr<IUnknown> presentBackbufferIdentity;
         const bool backbufferKnown = SUCCEEDED(game->GetBackBuffer(
             0, 0, D3DBACKBUFFER_TYPE_MONO, presentBackbuffer.GetAddressOf())) &&
-            presentBackbuffer && SUCCEEDED(presentBackbuffer->GetDesc(&presentDesc));
+            presentBackbuffer && SUCCEEDED(presentBackbuffer->GetDesc(&presentDesc)) &&
+            SUCCEEDED(presentBackbuffer.As(&presentBackbufferIdentity)) &&
+            presentBackbufferIdentity;
         const GameOutputSignature outputNow = backbufferKnown
             ? GameOutputSignature{presentDevice, presentDesc.Width, presentDesc.Height,
-                                  static_cast<std::uint32_t>(presentDesc.Format)}
+                                  static_cast<std::uint32_t>(presentDesc.Format),
+                                  reinterpret_cast<std::uintptr_t>(
+                                      presentBackbufferIdentity.Get())}
             : GameOutputSignature{};
         if (!s.previousOutput.same(outputNow)) {
-            // Reject earlier menu/car/race readbacks and CPU uploads after output change.
+            // Also reject earlier GPU readbacks if the Present backbuffer COM identity
+            // changed while the device, dimensions and format stayed identical.
+            // Retire the previous upload surface and advance the GPU generation.
             s.previousOutput = outputNow;
             s.insetSurface.Reset();
             s.insetFormat = D3DFMT_UNKNOWN;

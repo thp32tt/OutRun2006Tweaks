@@ -4,12 +4,18 @@ namespace outrun::vr::dx11::live_game_frame {
 struct GameOutputSignature {
     std::uintptr_t device = 0u;
     std::uint32_t width = 0u, height = 0u, format = 0u;
+    // Canonical Present backbuffer IUnknown identity. A same-mode surface
+    // replacement can occur during menu/car/race transitions without a
+    // device, width, height or format change.
+    std::uintptr_t backbufferIdentity = 0u;
     [[nodiscard]] constexpr bool valid() const noexcept {
-        return device != 0u && width != 0u && height != 0u && format != 0u;
+        return device != 0u && width != 0u && height != 0u && format != 0u &&
+               backbufferIdentity != 0u;
     }
     [[nodiscard]] constexpr bool same(const GameOutputSignature& other) const noexcept {
         return valid() && other.valid() && device == other.device &&
-               width == other.width && height == other.height && format == other.format;
+               width == other.width && height == other.height && format == other.format &&
+               backbufferIdentity == other.backbufferIdentity;
     }
 };
 // A completed GPU event might contain a previous game menu/car/race scene.
