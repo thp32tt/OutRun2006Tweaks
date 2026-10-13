@@ -188,6 +188,51 @@ def validate_task(task: dict, policy: dict) -> list[str]:
                 sha = task.get("validation_bearing_result_sha")
                 if not isinstance(sha, str) or re.fullmatch(r"[0-9a-f]{40}", sha) is None:
                     errors.append("terminal feature missing validated source SHA")
+    # 00672+: material result is one functional renderer capability, not a
+    # succession of one-format or one-guard tasks. The feature contract is
+    # distinct from runtime/HMD proof and must survive task retries.
+    feature_unit = policy.get("feature_unit", {})
+    if int(found.group(1)) >= feature_unit.get("effective_from_task_number", 672):
+        contract = task.get("feature_contract")
+        if not isinstance(contract, dict):
+            errors.append("feature-sized task missing feature_contract")
+        else:
+            if not isinstance(task.get("feature_id"), str) or not task["feature_id"] or (
+                contract.get("feature_id") != task["feature_id"]
+            ):
+                errors.append("feature contract identity mismatch")
+            if not isinstance(contract.get("goal"), str) or not contract["goal"].strip():
+                errors.append("feature contract goal missing")
+            items = contract.get("acceptance_items")
+            if not isinstance(items, list) or len(items) < feature_unit.get("minimum_acceptance_items", 3):
+                errors.append("feature acceptance list incomplete")
+            else:
+                ids = [item.get("id") if isinstance(item, dict) else None for item in items]
+                categories = {item.get("category") for item in items if isinstance(item, dict)}
+                areas = {item.get("behavior_area") for item in items if isinstance(item, dict)
+                         and isinstance(item.get("behavior_area"), str) and item["behavior_area"].strip()}
+                if any(not isinstance(i, str) or not i.strip() for i in ids) or len(set(ids)) != len(ids):
+                    errors.append("feature acceptance IDs missing or duplicated")
+                if not set(feature_unit.get("required_categories", [])).issubset(categories):
+                    errors.append("feature acceptance categories incomplete")
+                if len(areas) < feature_unit.get("minimum_behavior_areas", 2):
+                    errors.append("feature capability limited to one behavior area")
+                if any(not isinstance(item, dict) or
+                       not isinstance(item.get("expected_behavior"), str) or
+                       not item["expected_behavior"].strip() for item in items):
+                    errors.append("feature acceptance expected behavior missing")
+                status = str(task.get("status") or "").upper()
+                if status.startswith(("COMPLETE", "PASS")):
+                    results = task.get("acceptance_results") or {}
+                    if not isinstance(results, dict) or any(
+                        results.get(item_id) not in {"PASS", "PASS_EXACT_SHA"} for item_id in ids
+                    ):
+                        errors.append("complete feature has unverified acceptance items")
+                    sha = task.get("validation_bearing_result_sha")
+                    if not isinstance(sha, str) or re.fullmatch(r"[0-9a-f]{40}", sha) is None:
+                        errors.append("complete feature missing exact validation SHA")
+                    if task.get("automation_validation") != "PASS_EXACT_SHA":
+                        errors.append("complete feature missing exact-SHA Gate PASS")
     if task.get("runtime_validation") == "PASS" and not task.get("runtime_evidence"):
         errors.append("runtime PASS without actual HMD/game evidence")
     if task.get("automation_validation") == "PASS" and task.get("evidence", {}).get("backend_gate_conclusion") == "failure":

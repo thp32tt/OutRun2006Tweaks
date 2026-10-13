@@ -54,29 +54,25 @@
   },
   "feature_contract": {
     "feature_id": "MENU_TO_RACE_NATIVE_FRAME_SPARSE_MESH_CAPTURE",
-    "scope": "complete bounded sparse indexed-VB capture for full 512-primitive real game meshes in both R30 source modes",
-    "behavior_areas": [
-      "live D3D9 DrawIndexedPrimitive VB/IB data extraction",
-      "native DX11 DrawIndexed diagnostic geometry feed"
-    ],
-    "acceptance": [
+    "goal": "Capture complete 512-triangle indexed OutRun game meshes whose valid CPU shadow vertices are scattered across a dynamic D3D9 VB, feeding native DX11 DrawIndexed without altering D3D9 input or output fallback",
+    "acceptance_items": [
       {
+        "id": "mesh-end2end",
         "category": "end_to_end_behavior",
-        "id": "A1",
-        "expected": "1536 unique noncontiguous game VB slots may be compacted and passed to native DrawIndexed",
-        "status": "PENDING_EXACT_SHA_CI"
+        "behavior_area": "live_indexed_capture",
+        "expected_behavior": "Game-authored full 1536-slot sparse VB/IB is compacted with exact index order and offered to native DrawIndexed"
       },
       {
+        "id": "mesh-fallback",
         "category": "fallback_regression",
-        "id": "A2",
-        "expected": "invalid index/window or shadow epoch and >1536 unique vertices never corrupt game Draw or return partial native data",
-        "status": "PENDING_EXACT_SHA_CI"
+        "behavior_area": "safe_fallback",
+        "expected_behavior": "Over-limit, invalid game indices, shadow holes or stale epochs cannot partially publish native draws; original D3D9 Draw remains authoritative"
       },
       {
+        "id": "mesh-gate",
         "category": "integrated_validation",
-        "id": "A3",
-        "expected": "portable C++ full mesh positive/negative probe plus 2 R30 variants source contract and exact-SHA Windows CI",
-        "status": "PENDING_EXACT_SHA_CI"
+        "behavior_area": "native_draw_handoff",
+        "expected_behavior": "Executable 512-triangle positive and destructive negative probe and both R30 variants pass exact-SHA full GitHub gate"
       }
     ]
   },
@@ -86,14 +82,15 @@
     "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
     "tools/dx11_game_primitive_span_probe.cpp",
     "tools/test_dx11_sparse_index_draw_00646.py",
-    "docs/automation/runs/CONVERSION-DX11-00672.json"
+    "docs/automation/runs/CONVERSION-DX11-00672.json",
+    "tools/dx11_autodev_policy.py"
   ],
   "pipeline": {
     "C0_RECOVER": "PASS",
     "C1_REVIEW": "R30 duplicated source paths cap sparse native indexed captures at 128 though actual native Draw/DrawIndexed accepts 1536",
     "C2_IMPLEMENT": "1536-cap shared compactor + both game R30 shadow producers + executable mesh regression",
-    "C3_VALIDATE": "STATIC_MUTATION_PROOFS_PASS_PENDING_EXACT_CI",
-    "C4_COMMIT": "MATERIAL_COMMIT_PENDING",
+    "C3_VALIDATE": "FIX_FEATURE_CONTRACT_SCHEMA_AND_VALIDATE_NEGATIVE_MUTATIONS_PENDING_EXACT_SHA",
+    "C4_COMMIT": "MATERIAL_REPAIR_COMMIT",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_EXACT_SHA"
   },
@@ -104,7 +101,10 @@
     "compile_build": "PENDING_GITHUB_BUILD",
     "game_visual_parity": "NEED_HMD_TEST",
     "gamepad": "UNTESTED",
-    "quest3_vdxr": "UNTESTED"
+    "quest3_vdxr": "UNTESTED",
+    "mesh-end2end": "PENDING_GITHUB_FAST",
+    "mesh-fallback": "PENDING_GITHUB_FAST",
+    "mesh-gate": "PENDING_EXACT_SHA"
   },
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
