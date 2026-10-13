@@ -11,12 +11,12 @@
   "symptom_id": "DX9EX:PERF:INDEXED_UP_SINGLE_PASS",
   "work_key": "DX9EX:PERF:INDEXED_UP_SINGLE_PASS",
   "feature_class": "MEASURED_PERFORMANCE",
-  "status": "IMPLEMENTED_NEEDS_VALIDATION",
-  "checkpoint": "C3_VALIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00792]",
-  "automation_validation": "PENDING_GITHUB_CI",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "tools/verify_vr_r30_index_rebase_fastpath.py",
@@ -59,9 +59,9 @@
     ]
   },
   "acceptance_results": {
-    "UP_STEREO_16_32_SINGLE_WALK": "PENDING_CI",
-    "INVALID_RANGE_AND_FALLBACK": "PENDING_CI",
-    "WIN32_EXACT_SHA_INTEGRATION": "PENDING_CI",
+    "UP_STEREO_16_32_SINGLE_WALK": "PASS",
+    "INVALID_RANGE_AND_FALLBACK": "PASS",
+    "WIN32_EXACT_SHA_INTEGRATION": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -82,13 +82,48 @@
     ]
   },
   "ci_evidence": {
-    "status": "REPAIR_PENDING_NEW_EXACT_SHA",
-    "failed_run_id": 38445374692,
-    "failed_sha": "3381b885f75554ed12149b1337d03f04b79a5b59",
-    "failed_job": "policy",
-    "failed_step": "verify_vr_feature_unit_policy.py --check-head",
-    "failure_reason": "record feature_class not MEASURED_PERFORMANCE; special_work_evidence and subcomponents missing",
-    "next": "New material result commit with source/test and contract repair must pass exact-SHA DX9Ex Active and Domain Isolation."
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "2cf49e9fe9d1238079663e145dc93c10e89cac5d",
+    "dx9ex_active": {
+      "run_id": 38446338661,
+      "head_sha": "2cf49e9fe9d1238079663e145dc93c10e89cac5d",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "game": "SUCCESS",
+        "host": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38446338676,
+      "head_sha": "2cf49e9fe9d1238079663e145dc93c10e89cac5d",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38446023826,
+      "head_sha": "06a6412a48bad28f77d05c26d90bd65832798777",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "msvc-analyze-active-game": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "source-cross-domain": "SUCCESS"
+      }
+    },
+    "note": "Quest3/VDXR headset and real frame-time are not validated; static/Win32 CI only."
   },
-  "runtime_status": "NEED_QUEST3_VDXR_TEST"
+  "runtime_status": "NEED_QUEST3_VDXR_TEST",
+  "material_result_sha": "3381b885f75554ed12149b1337d03f04b79a5b59",
+  "repair_material_result_sha": "06a6412a48bad28f77d05c26d90bd65832798777",
+  "validation_bearing_result_sha": "2cf49e9fe9d1238079663e145dc93c10e89cac5d",
+  "scoreboard": {
+    "repository": "thp32tt/ai-dev-lab",
+    "file": "AI_SCOREBOARD.md",
+    "run_key": "CONVERSION-DX9EX-00792",
+    "previous": 1245,
+    "delta": 1,
+    "cumulative": 1246,
+    "commit": "03ecb9866a6078105332d9250fb3499a581f814e"
+  }
 }
