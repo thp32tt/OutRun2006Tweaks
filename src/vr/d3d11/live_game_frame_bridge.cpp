@@ -2864,7 +2864,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                               static_cast<UINT>(lock.Pitch) >= rowBytes;
         if (readable) {
             auto& pixels = copied[level];
-            pixels.resize(static_cast<std::size_t>(a8p8UploadPitch) * rows);
+            pixels.resize(static_cast<std::size_t>(uploadPitch) * rows);
+            // Only palettized rows need widening beyond the source pitch.
+            if (a8p8) pixels.resize(static_cast<std::size_t>(a8p8UploadPitch) * rows);
             const auto packing = base.Format == D3DFMT_R5G6B5 ?
                 packed_texture16::Layout::rgb565 :
                 base.Format == D3DFMT_A1R5G5B5 ?
@@ -2877,7 +2879,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             for (UINT y = 0; y < rows; ++y) {
                 const auto* source = static_cast<const std::uint8_t*>(lock.pBits) +
                                      static_cast<std::size_t>(y) * lock.Pitch;
-                auto* destination = pixels.data() + static_cast<std::size_t>(y) * a8p8UploadPitch;
+                auto* destination = pixels.data() + static_cast<std::size_t>(y) * uploadPitch;
+                if (a8p8)
+                    destination = pixels.data() + static_cast<std::size_t>(y) * a8p8UploadPitch;
                 if (packed16)
                     packed_texture16::unpack_row(source, destination, desc.Width, packing);
                 else if (luminance)
