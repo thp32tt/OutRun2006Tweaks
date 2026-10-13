@@ -11,15 +11,15 @@
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "work_key": "DX9EX:VIS:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "VALIDATING",
-  "checkpoint": "C4_MATERIAL_CI_REPAIR",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00793]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_status": "NEED_QUEST3_VDXR_TEST",
   "score_delta": 0,
   "material_result_sha": "7b01af4886b9e50d34ed2bd23fcd027abf5ec896",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "f031bb976602fe03a52c7ae4310fefa1a69a0766",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "tools/verify_vr_r30_responsive_hud_anchor.py",
@@ -62,9 +62,10 @@
     ]
   },
   "acceptance_results": {
-    "HUD_GROUPED_SOURCE_AND_STEREO": "PENDING_FULL_FEATURE",
-    "HUD_NEGATIVE_FALLBACK_PROTECTION": "PENDING_EXACT_SHA",
-    "HUD_WIN32_EXACT_SHA_INTEGRATION": "PENDING_EXACT_SHA"
+    "HUD_GROUPED_SOURCE_AND_STEREO": "PASS",
+    "HUD_NEGATIVE_FALLBACK_PROTECTION": "PASS",
+    "HUD_WIN32_EXACT_SHA_INTEGRATION": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
     "original_evidence": "User reported Quest3 3440x1440 HUD too close to upper centre; paired right-eye top clipping remained possible under asymmetric eye vertical FOV.",
@@ -94,19 +95,35 @@
     "ci_trigger": "DX9Ex Active push path filter excludes docs/automation/runs/*.json; extend existing HUD producer bilateral regression test to trigger exact-SHA required gate."
   },
   "ci_evidence": {
-    "status": "FAILED_BEFORE_BUILD",
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "f031bb976602fe03a52c7ae4310fefa1a69a0766",
     "dx9ex_active": {
-      "run_id": 38448484497,
-      "head_sha": "7b01af4886b9e50d34ed2bd23fcd027abf5ec896",
-      "conclusion": "failure",
+      "run_id": 38449579295,
+      "head_sha": "f031bb976602fe03a52c7ae4310fefa1a69a0766",
+      "conclusion": "SUCCESS",
       "jobs": {
-        "policy": "FAIL_MISSING_RUN_RECORD",
-        "game": "SKIPPED",
-        "host": "SKIPPED",
-        "full-chain-compile": "SKIPPED",
-        "package": "SKIPPED"
+        "policy": "SUCCESS",
+        "game": "SUCCESS",
+        "host": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
       }
     },
-    "domain_isolation": "NOT_YET_CONFIRMED_AT_VALIDATION_SHA"
-  }
+    "domain_isolation": {
+      "run_id": 38449579243,
+      "head_sha": "f031bb976602fe03a52c7ae4310fefa1a69a0766",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "domain-isolation": "SUCCESS"
+      }
+    },
+    "full_source_impact": {
+      "run_id": 38448484378,
+      "head_sha": "7b01af4886b9e50d34ed2bd23fcd027abf5ec896",
+      "conclusion": "SUCCESS",
+      "note": "Only unchanged C++ source was analyzed; subsequent same-task commits added run metadata and HUD verifier fixtures."
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  },
+  "validation_note": "C6 exact-SHA five-job Active and Domain success; C++ source analysis passed on original material. No headset validation. Source/feature work key previously active as 00791; no duplicate AI2 point."
 }
