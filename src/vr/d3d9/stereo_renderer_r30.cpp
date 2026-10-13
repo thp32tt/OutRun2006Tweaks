@@ -3215,11 +3215,9 @@ namespace OutRunVRStereo
                     R30CopyVertexShadow(vb, static_cast<UINT>(firstByte),
                                         static_cast<UINT>(byteCount), bytes);
                 vb->Release();
-                if (valid) {
-                    nativeSource.forwarded = true;
-                    live::observe_linear(device, topology,
+                if (valid) nativeSource.forwarded = true;
+                if (valid) live::observe_linear(device, topology,
                                 primitiveCount, bytes.data(), stride);
-                }
             } catch (...) { /* Native diagnostic must never alter game HRESULT. */ }
         }
 
@@ -3339,12 +3337,10 @@ namespace OutRunVRStereo
                 } else if (!validPhysicalIndices) ok = false;
                 ib->Release();
                 vb->Release();
-                if (ok) {
-                    nativeSource.forwarded = true;
-                    live::observe_indexed(device, topology, primitiveCount,
+                if (ok) nativeSource.forwarded = true;
+                if (ok) live::observe_indexed(device, topology, primitiveCount,
                     vertices.data(), stride, nativeVertexCount,
                     indices.data(), count);
-                }
             } catch (...) { /* Preserve D3D9 draw even on allocation failure. */ }
         }
 
