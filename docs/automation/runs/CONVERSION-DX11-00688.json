@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00688",
+  "production_id": "CONVERSION-DX11-00688",
+  "event_id": "CONVERSION-DX11-00688-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "feature_id": null,
+  "work_key": "DX11:GAME_MENU_RACE_PARTIAL_VIEWPORT_NATIVE_DRAW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "material_result_sha": "d6d03e37d5a35f578990d7c8d361427eae54004d",
+  "validation_bearing_result_sha": "d6d03e37d5a35f578990d7c8d361427eae54004d",
+  "feature_contract": {
+    "feature_id": null,
+    "goal": "Preserve real OutRun D3D9 menu, car-selection and race partial viewport/scissor coordinates when submitting the native D3D11 Draw/DrawIndexed diagnostic inset, without replacing original D3D9 input/rendering.",
+    "acceptance_items": [
+      {
+        "id": "partial-viewport-native",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_viewport_to_d3d11_native_draw",
+        "expected_behavior": "Read live D3D9 render-target dimensions and viewport origin/size, map to source-backbuffer-relative native inset, and bind per native Draw/Indexed."
+      },
+      {
+        "id": "scissor-and-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "native_scissor_and_source_fallback",
+        "expected_behavior": "Map enabled source scissor against original target dimensions; reject out-of-bounds, empty or subpixel viewports while retaining original D3D9 rendering/input."
+      },
+      {
+        "id": "exact-sha-build",
+        "category": "integrated_validation",
+        "behavior_area": "native_compilation_and_github_actions",
+        "expected_behavior": "Compile-time positive/negative viewport mapping assertions and mandatory GitHub CI succeed at exactly the validation-bearing material SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "partial-viewport-native": "PASS_EXACT_SHA (source integration/CI; HMD runtime UNTESTED)",
+    "scissor-and-fallback": "PASS_EXACT_SHA (source assertions/CI; gamepad runtime UNTESTED)",
+    "exact-sha-build": "PASS_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: source material SHA at target branch HEAD; requested run record absent",
+    "C1_REVIEW": "PASS: prior native full-inset viewport and viewport-relative scissor mismatch identified from material diff",
+    "C2_IMPLEMENT": "PASS: source implementation already material-committed; no C6 source edits",
+    "C3_VALIDATE": "PASS_EXACT_SHA: 5/5 requested mandatory GitHub Actions success; no CI rerun",
+    "C4_COMMIT": "MATERIAL_RESULT: d6d03e37d5a35f578990d7c8d361427eae54004d",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA: COMPLETE_BUILD_VERIFIED; runtime UNTESTED"
+  },
+  "exact_sha_ci": {
+    "head_sha": "d6d03e37d5a35f578990d7c8d361427eae54004d",
+    "required_pass_count": 5,
+    "required_results": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 38441375480,
+        "conclusion": "success"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 38441375609,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 38441383364,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38441383439,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38441383392,
+        "conclusion": "success"
+      }
+    ]
+  },
+  "recovery": {
+    "prior_hold_reason": "RUN_RECORD_NOT_FOUND",
+    "run_record_action": "CREATE_MISSING_C6_RECORD",
+    "source_modifications": false,
+    "ci_rerun": false
+  },
+  "next_action": "C6 build-verification complete; Quest3/VDXR HMD and actual gamepad/menu/race runtime remain UNTESTED; do not rescore or rerun this TASK_ID."
+}
