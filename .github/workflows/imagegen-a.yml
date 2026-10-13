@@ -18,6 +18,7 @@ jobs:
       - run: |
           cp -r docker/imagegen-a stack
           pip install -r stack/requirements.txt
+          python -c "from stack.fetch_source import fetch; from pathlib import Path; print(fetch(Path('stack/input/source.json'), Path('/tmp/outrun-source-check')))"
           python -m unittest stack.test_stack -v
           python -m playwright install --with-deps chromium
           python -m unittest stack.test_browser -v
