@@ -91,7 +91,11 @@ def projected_depth_signature_contract(source: str) -> None:
             and "sampled >= 3u && valid >= 3u && valid * 2u >= sampled" in s
             and "projected * 4u >= valid * 3u" in s
             and "if (usedMask &&" in s
-            and "const UINT i = fastTouched ? (*touched)[visit] : visit;" in s[loop:slow]
+            # Both direct <=512 and sorted large-sparse visits preserve
+            # projected-depth arithmetic and ascending first-512 semantics.
+            and "const UINT i = fastTouched ? (*touched)[visit] :" in s[loop:slow]
+            and "(sortedTouched.empty() ? visit : sortedTouched[visit])" in s[loop:slow]
+            and "std::sort(sortedTouched.begin(), sortedTouched.end());" in s[:loop]
             and "if (index >= vertexCount || (*usedMask)[index] == 0)" in s[:loop]
             and "fastTouched = false;" in s[:loop])
     assert valid(code), "R30 projected world/particle depth fastpath contract lost"
