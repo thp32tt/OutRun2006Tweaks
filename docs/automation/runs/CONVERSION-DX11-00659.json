@@ -62,7 +62,7 @@
     "C0_RECOVER": "PASS prior 00658 C6 at HEAD",
     "C1_REVIEW": "PASS R8G8B8 missing from native bridge",
     "C2_IMPLEMENT": "PASS C++ game bridge and decoder",
-    "C3_VALIDATE": "LOCAL_RGB24_CPU_PROBE_PASS; EXACT_SHA_CI_PENDING",
+    "C3_VALIDATE": "LOCAL_RGB24_CPU_PROBE_PASS; Build #38355081329 failed outdated packed16 source regression expecting pre-RGB24 predicate; preserve packed16 mutation check and broaden positive predicate to include RGB24; exact SHA CI pending",
     "C4_COMMIT": "MATERIAL_COMMIT_REQUESTED",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_EXACT_SHA"
@@ -77,5 +77,5 @@
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
   "result_sha": null,
-  "next_action": "Wait for exact SHA GitHub required Gates and repair any actual failing Gate; preserve Quest3/VDXR UNTESTED."
+  "next_action": "Confirm exact new validation-bearing SHA required GitHub Gates then separate C6; Quest3/VDXR + gamepad UNTESTED"
 }
