@@ -1,0 +1,112 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00680",
+  "production_id": "CONVERSION-DX11-00680",
+  "event_id": "CONVERSION-DX11-00680-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:MENU_RACE_FENCED_GPU_READBACK",
+  "feature_id": "MENU_RACE_FENCED_GPU_READBACK_AND_D3D9_PRESENT_CONTINUITY",
+  "base_head_sha": "48c9e050d60ef2a30e61c50b5dac03d03cdf7b4f",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Real D3D9 menu/car/race Draw/DrawIndexed source captured into native D3D11 diagnostic GPU target",
+      "Staging CopyResource and event-fence carry source Draw and game Present ordinal",
+      "Ready GPU result is presented only if within 2 game Presents; otherwise drop while preserving DX9Ex Draw and gamepad"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_readback_provenance.hpp",
+      "tools/test_dx11_game_scene_readback_00680.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable C++17 source Draw/Present freshness and native path static binding",
+      "negative_regression": "Three C++ destructive stale/unowned/same-Present mutations plus four live bridge wiring mutations",
+      "component_integration": "Game Draw -> D3D11 Draw -> GPU event -> nonblocking Map -> bounded-age D3D9 UpdateSurface"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_FENCED_GPU_READBACK",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_readback_provenance.hpp",
+      "tools/test_dx11_game_scene_readback_00680.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Late DX11 GPU result from earlier menu/vehicle/race must not be composited onto new D3D9 frame; Quest3 gamepad still UNTESTED.",
+    "activation_guard_and_fallback": "Explicit diagnostic opt-in only. No gameplay native promotion. Original D3D9 Draw/Present/gamepad unchanged."
+  },
+  "feature_contract": {
+    "feature_id": "MENU_RACE_FENCED_GPU_READBACK_AND_D3D9_PRESENT_CONTINUITY",
+    "goal": "Keep async DX11 menu-to-race native frame publication consistent with real game Present and retain gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "native-fence-draw-stamp",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_draw_to_native_bridge",
+        "expected_behavior": "Source ordinal and Present are stamped on GPU staging before fence End"
+      },
+      {
+        "id": "late-frame-input-safe-drop",
+        "category": "fallback_regression",
+        "behavior_area": "game_present_input_fallback",
+        "expected_behavior": "Late/empty/wrapped scene is discarded without blocking game Present or gamepad"
+      },
+      {
+        "id": "exact-sha-scene-test",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_native_render_ci",
+        "expected_behavior": "Portable positive and destructive tests plus mandatory exact-SHA Gate pass"
+      },
+      {
+        "id": "quest3-real-scene",
+        "category": "end_to_end_behavior",
+        "behavior_area": "quest3_vdxr_runtime",
+        "expected_behavior": "Quest 3 menu/car/race and gamepad tested"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-fence-draw-stamp": "PENDING_EXACT_SHA",
+    "late-frame-input-safe-drop": "PENDING_EXACT_SHA",
+    "exact-sha-scene-test": "PENDING_EXACT_SHA",
+    "quest3-real-scene": "NEED_HMD_TEST"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_readback_provenance.hpp",
+    "tools/test_dx11_game_scene_readback_00680.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00680.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS previous 00679 five CI Gates success",
+    "C1_REVIEW": "PASS confirmed async readback lacks scene Present provenance",
+    "C2_IMPLEMENT": "NATIVE_SCENE_FENCE_FRESH_PRESENT",
+    "C3_VALIDATE": "C++17 portable probe PASS, exact SHA CI pending",
+    "C4_COMMIT": "PENDING_SHA",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_CI"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "next_action": "Exact-SHA five Gates; repair failures under same task; Quest3/VDXR UNTESTED."
+}

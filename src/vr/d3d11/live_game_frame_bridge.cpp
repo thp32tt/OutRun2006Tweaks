@@ -19,6 +19,7 @@
 #include "live_game_rgba16_texture.hpp"
 #include "live_game_float_rgba_texture.hpp"
 #include "native_game_frame_batch.hpp"
+#include "native_game_readback_provenance.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -831,6 +832,7 @@ struct ReadbackSlot {
     ComPtr<ID3D11Texture2D> staging;
     ComPtr<ID3D11Query> fence;
     bool busy = false;
+    GameReadbackProvenance provenance{};
 };
 struct State {
     std::mutex mutex;
@@ -987,6 +989,7 @@ struct State {
     UINT readSlot = 0;
     UINT writeSlot = 0;
     UINT droppedCopies = 0;
+    std::uint64_t staleReadbacks = 0;
     ComPtr<IDirect3DSurface9> insetSurface;
     D3DFORMAT insetFormat = D3DFMT_UNKNOWN;
     bool pending = false;
@@ -3947,7 +3950,13 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
             if (oldest.busy) {
                 const HRESULT ready = ctx->GetData(
                     oldest.fence.Get(), nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
-                if (ready == S_OK) {
+                if (ready == S_OK && !oldest.provenance.may_overlay(s.presents)) {
+                    // A late native frame cannot overwrite a newer menu/race Present.
+                    // Its GPU fence is complete; recycle without blocking D3D9/input.
+                    ++s.staleReadbacks;
+                    oldest.busy = false;
+                    s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
+                } else if (ready == S_OK) {
                     D3D11_MAPPED_SUBRESOURCE mapped{};
                     const HRESULT mapStatus = ctx->Map(oldest.staging.Get(), 0,
                         D3D11_MAP_READ, D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped);
@@ -4027,6 +4036,7 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
                 auto& next = s.readbacks[s.writeSlot];
                 if (!next.busy) {
                     ctx->CopyResource(next.staging.Get(), s.backend.color_texture());
+                    next.provenance = {s.presents, s.sourceDrawsThisFrame};
                     ctx->End(next.fence.Get());
                     // A single GPU submit per diagnostic frame; never a blocking Map.
                     ctx->Flush();
@@ -4054,9 +4064,9 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         if (s.presents == 300 ||
             (s.presents % 1800u == 0u && s.visible == 0u)) {
             spdlog::info(
-                "DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws={} native_draws={} desktop_insets={} failed={} presents={} eligible_state_draws={} next_probe_slot={}; unsupported draws stay DX9Ex; HMD UNTESTED",
+                "DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws={} native_draws={} desktop_insets={} failed={} presents={} eligible_state_draws={} stale_readbacks={} next_probe_slot={}; unsupported draws stay DX9Ex; HMD UNTESTED",
                 s.observed, s.issued, s.visible, s.failed, s.presents,
-                s.eligible, s.probeSlot);
+                s.eligible, s.staleReadbacks, s.probeSlot);
         }
     } catch (...) {
         // Preserve DX9Ex Present and recover on the next game frame.
@@ -4082,6 +4092,7 @@ void before_game_reset() noexcept {
     s.probeSlot = 0;
     for (auto& item : s.readbacks) {
         item.staging.Reset(); item.fence.Reset(); item.busy = false;
+        item.provenance = {};
     }
     s.readSlot = s.writeSlot = 0;
     s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
