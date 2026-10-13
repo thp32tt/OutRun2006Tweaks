@@ -3,6 +3,20 @@
 #include <limits>
 
 using OutRunVrMenuAspect::PlanCenteredContent;
+using OutRunVrMenuAspect::ShouldCropConfiguredMenu;
+// Live Quest3 user profile (UIScalingMode=1, UILetterboxing=1) must crop
+// the game's 4:3 letterbox by default, not require a manual environment flag.
+static_assert(ShouldCropConfiguredMenu(1, 1));
+static_assert(ShouldCropConfiguredMenu(2, 1));
+static_assert(ShouldCropConfiguredMenu(1, 2));
+// Never cut off full-width vanilla/online menus or a disabled letterbox.
+static_assert(!ShouldCropConfiguredMenu(0, 1));
+static_assert(!ShouldCropConfiguredMenu(1, 0));
+static_assert(!ShouldCropConfiguredMenu(2, 0));
+static_assert(!ShouldCropConfiguredMenu(-1, 1));
+static_assert(!ShouldCropConfiguredMenu(3, 1));
+static_assert(!ShouldCropConfiguredMenu(1, 3));
+
 
 constexpr auto native43 = PlanCenteredContent(4.0f / 3.0f, 4.0f / 3.0f);
 static_assert(!native43.crop && native43.width == 1.0f &&

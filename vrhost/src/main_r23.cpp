@@ -24,6 +24,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <cwchar>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -73,6 +74,61 @@
 
 namespace
 {
+    // Read the GAME process's UI settings, not the x64 host's working
+    // directory. The game can live in another folder/drive. Missing config,
+    // inaccessible process, or a transient Reset never guesses letterboxing.
+    // Poll only once per 2.5 seconds, keeping registry/process/INI work off
+    // the OpenXR per-frame hot path; refresh after HWND replacement.
+    bool R23GameMenuIsLetterboxed(HWND gameWindow) noexcept
+    {
+        static HWND cachedWindow = nullptr;
+        static ULONGLONG nextCheckMs = 0;
+        static bool cachedLetterbox = false;
+        const ULONGLONG now = GetTickCount64();
+        if (gameWindow == cachedWindow && now < nextCheckMs)
+            return cachedLetterbox;
+        cachedWindow = gameWindow;
+        nextCheckMs = now + 2500;
+        cachedLetterbox = false;
+        if (!gameWindow || !IsWindow(gameWindow))
+            return false;
+
+        DWORD gamePid = 0;
+        GetWindowThreadProcessId(gameWindow, &gamePid);
+        if (!gamePid)
+            return false;
+        HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION,
+            FALSE, gamePid);
+        if (!process)
+            return false;
+        wchar_t path[MAX_PATH]{};
+        DWORD pathChars = MAX_PATH;
+        const bool haveImagePath = QueryFullProcessImageNameW(
+            process, 0, path, &pathChars) != 0;
+        CloseHandle(process);
+        if (!haveImagePath)
+            return false;
+        wchar_t* filename = std::wcsrchr(path, L'\\');
+        constexpr wchar_t configName[] = L"OutRun2006Tweaks.ini";
+        if (!filename ||
+            static_cast<std::size_t>(filename + 1 - path) +
+                std::size(configName) > MAX_PATH)
+            return false;
+        std::memcpy(filename + 1, configName, sizeof(configName));
+        const DWORD attributes = GetFileAttributesW(path);
+        if (attributes == INVALID_FILE_ATTRIBUTES ||
+            (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+            return false;
+
+        const int scalingMode = static_cast<int>(GetPrivateProfileIntW(
+            L"Graphics", L"UIScalingMode", 0, path));
+        const int letterboxingMode = static_cast<int>(GetPrivateProfileIntW(
+            L"Graphics", L"UILetterboxing", 0, path));
+        cachedLetterbox = OutRunVrMenuAspect::ShouldCropConfiguredMenu(
+            scalingMode, letterboxingMode);
+        return cachedLetterbox;
+    }
+
     constexpr ULONGLONG R23PixelIntervalMs = 5000;
     // Opt-in only: staging copies and Map polling are diagnostic GPU work.
     // A fixed process-start decision avoids environment queries per XR tick.
@@ -1426,18 +1482,22 @@ namespace
         float sourceAspect = OutRunVrMenuAspect::PlanCapturedAspect(
             c.sourceWidth_, c.sourceHeight_, whole.w, whole.h, clientAspect);
 
-        // Issue #119: UIScalingMode=1 / UILetterboxing=1 already centers
-        // original 4:3 menu content inside the 16:9 or 21:9 game client.
-        // Projecting the whole ultrawide client into XR keeps those empty
-        // horizontal rails, making the readable content unnecessarily tiny.
-        // This opt-in A/B path crops ONLY the LOCAL-fixed theater menu input,
-        // leaving world stereo, game HUD, F11, source capture and the default
-        // output completely unchanged. The same UV feeds BOTH eyes.
-        static const bool center43OptIn = []() noexcept {
-            const char* v = std::getenv("OUTRUN_VR_MENU_CENTER_4_3");
-            return v && v[0] == '1' && v[1] == '\0';
-        }();
-        if (center43OptIn)
+        // Issue #119: the game's actual letterbox settings determine
+        // whether the captured wide front-end has 4:3 authored content.
+        // Never crop a vanilla/stretched or unletterboxed UI. A/B override:
+        // OUTRUN_VR_MENU_CENTER_4_3=1 forces the old explicit opt-in;
+        // =0 preserves the complete-client legacy projection.
+        // The crop affects only the LOCAL menu UV, shared by both eyes.
+        bool cropCentered43 = R23GameMenuIsLetterboxed(c.hwnd_);
+        if (const char* overrideValue =
+                std::getenv("OUTRUN_VR_MENU_CENTER_4_3"))
+        {
+            if (std::strcmp(overrideValue, "1") == 0)
+                cropCentered43 = true;
+            else if (std::strcmp(overrideValue, "0") == 0)
+                cropCentered43 = false;
+        }
+        if (cropCentered43)
         {
             RECT fullClient{};
             // The API still supplies original, unclipped client bounds when

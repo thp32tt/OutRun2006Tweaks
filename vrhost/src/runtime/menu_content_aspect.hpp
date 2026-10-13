@@ -7,6 +7,16 @@
 // content aspect and UV, not the ultrawide desktop aspect with black rails.
 namespace OutRunVrMenuAspect
 {
+    // Automatic 4:3 menu crop is valid only when the game itself is drawing
+    // the 4:3 letterbox. Vanilla/stretched or unletterboxed menus must keep
+    // the complete captured client. Environment overrides remain reversible.
+    constexpr bool ShouldCropConfiguredMenu(int scalingMode,
+        int letterboxingMode) noexcept
+    {
+        return scalingMode >= 1 && scalingMode <= 2 &&
+            letterboxingMode >= 1 && letterboxingMode <= 2;
+    }
+
     struct CropPlan
     {
         bool crop = false;
