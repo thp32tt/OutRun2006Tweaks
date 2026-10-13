@@ -1059,8 +1059,10 @@ def main() -> None:
             "base.Format == D3DFMT_A1R5G5B5",
             "base.Format == D3DFMT_A4R4G4B4",
         )) and all(x in producer for x in (
-            "desc.Width * (packed16 ? 2u : 4u);",
-            "const UINT uploadPitch = packed16 ? desc.Width * 4u : rowBytes;",
+            "const UINT sourceTexelBytes = packed16 ? 2u :",
+            "desc.Width * sourceTexelBytes;",
+            "const UINT uploadPitch = (packed16 || luminance) ?",
+            "desc.Width * 4u : rowBytes;",
             "static_cast<UINT>(lock.Pitch) >= rowBytes",
             "packed_texture16::unpack_row(",
             "initial[level].SysMemPitch = pitches[level];",
@@ -1085,7 +1087,9 @@ def main() -> None:
         ("base.Format == D3DFMT_R5G6B5", "base.Format == D3DFMT_DXT2"),
         ("base.Format == D3DFMT_A1R5G5B5", "base.Format == D3DFMT_DXT2"),
         ("base.Format == D3DFMT_A4R4G4B4", "base.Format == D3DFMT_DXT2"),
-        ("desc.Width * (packed16 ? 2u : 4u);", "desc.Width * 4u;"),
+        ("const UINT sourceTexelBytes = packed16 ? 2u :", "const UINT sourceTexelBytes = packed16 ? 4u :"),
+        ("desc.Width * sourceTexelBytes", "desc.Width * 4u"),
+        ("const UINT uploadPitch = (packed16 || luminance) ?", "const UINT uploadPitch = (luminance) ?"),
         ("packed_texture16::unpack_row(", "/* no 16-bit conversion */("),
         ("initial[level].SysMemPitch = pitches[level];", "/* wrong upload pitch */"),
     ):
