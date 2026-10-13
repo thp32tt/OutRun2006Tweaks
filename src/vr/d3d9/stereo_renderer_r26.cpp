@@ -113,6 +113,7 @@ namespace OutRunVRStereo
         thread_local std::uint8_t R28LastDipLogTier = 0;
         thread_local std::uint64_t R28PreviousThreadCpu100ns = 0;
         thread_local bool R28PreviousThreadCpuValid = false;
+        thread_local bool R27TelemetryActiveOnThread = false;
 
         std::uint64_t R28ThreadCpuTime100ns(
             const FILETIME& kernel, const FILETIME& user) noexcept
@@ -331,18 +332,31 @@ namespace OutRunVRStereo
             if (!device)
                 return false;
 
+            // Query-only occlusion draws are rare. Reject known writers at
+            // the first authoritative state instead of consulting all four
+            // R22/D3D9 getters on every active-query geometry draw. This is
+            // equivalent to the full write predicate whenever the states are
+            // readable, and failed reads still fail closed.
             DWORD colorWrite = 0xFFFFFFFFu;
-            DWORD zWrite = TRUE;
-            DWORD stencilEnable = FALSE;
-            DWORD stencilWriteMask = 0xFFFFFFFFu;
             if (!ReadTrackedRenderState(device, D3DRS_COLORWRITEENABLE, colorWrite) ||
-                !ReadTrackedRenderState(device, D3DRS_ZWRITEENABLE, zWrite) ||
-                !ReadTrackedRenderState(device, D3DRS_STENCILENABLE, stencilEnable) ||
-                !ReadTrackedRenderState(device, D3DRS_STENCILWRITEMASK, stencilWriteMask))
+                colorWrite != 0)
                 return false;
-
-            return colorWrite == 0 && zWrite == FALSE &&
-                (stencilEnable == FALSE || stencilWriteMask == 0);
+            DWORD zWrite = TRUE;
+            if (!ReadTrackedRenderState(device, D3DRS_ZWRITEENABLE, zWrite) ||
+                zWrite != FALSE)
+                return false;
+            DWORD stencilEnable = FALSE;
+            if (!ReadTrackedRenderState(device, D3DRS_STENCILENABLE, stencilEnable))
+                return false;
+            // Disabled stencil cannot write regardless of the (possibly
+            // unreadable) stencil mask. A live stencil test must still prove
+            // the zero write mask before allowing query-only single execution.
+            if (stencilEnable == FALSE)
+                return true;
+            DWORD stencilWriteMask = 0xFFFFFFFFu;
+            return ReadTrackedRenderState(
+                device, D3DRS_STENCILWRITEMASK, stencilWriteMask) &&
+                stencilWriteMask == 0;
         }
 
         template <typename ActualDraw, typename NormalR23Draw>
@@ -787,6 +801,40 @@ namespace OutRunVRStereo
             const RECT* sourceRect, const RECT* destRect,
             HWND destWindowOverride, const RGNDATA* dirtyRegion)
         {
+            // Sampling is diagnostic-only. With VRTelemetry off, retain the
+            // exact original Present call but avoid two QPC reads, frequency
+            // checks and floating-point accumulation every frame. Clear the
+            // prior pacing window only on the enabled->disabled transition.
+            if (!Settings::VRTelemetry)
+            {
+                if (R27TelemetryActiveOnThread)
+                {
+                    R27TelemetryActiveOnThread = false;
+                    R28Pacing = {};
+                    R28PreviousPresentEndQpc = 0;
+                    R28PreviousDrawSerial = 0;
+                    R28PreviousThreadCpu100ns = 0;
+                    R28PreviousThreadCpuValid = false;
+                    R28LastDipLogMs = 0;
+                    R28LastDipLogTier = 0;
+                    R27PerfLastLogMs = 0;
+                    R27PerfLastDrawSerial = 0;
+                    R27PerfLastPresentSamples = 0;
+                    R27PresentTotalMs = 0.0;
+                    R27PresentMaxMs = 0.0;
+                    R27PresentSamples = 0;
+                }
+                return R27PresentR23Hook.stdcall<HRESULT>(device,
+                    sourceRect, destRect, destWindowOverride, dirtyRegion);
+            }
+            if (!R27TelemetryActiveOnThread)
+            {
+                // First enabled sample cannot include draws during an
+                // unmeasured interval or bridge the last disabled Present.
+                R28PreviousDrawSerial = TopLevelDrawSerial();
+                R27PerfLastDrawSerial = R28PreviousDrawSerial;
+            }
+            R27TelemetryActiveOnThread = true;
             LARGE_INTEGER begin{}, end{};
             QueryPerformanceCounter(&begin);
             const HRESULT hr = R27PresentR23Hook.stdcall<HRESULT>(device,
