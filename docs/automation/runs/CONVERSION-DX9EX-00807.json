@@ -10,12 +10,12 @@
   "feature_id": "DX9EX:PERF:R33_RESTORE_RT0_VIEWPORT_ELISION",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R33_RESTORE_RT0_VIEWPORT_ELISION",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
-  "checkpoint": "C4_MATERIAL_COMMIT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00807]",
-  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r32.cpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -62,9 +62,9 @@
     ]
   },
   "acceptance_results": {
-    "R33_WORLD_HUD_RESTORE_FASTPATH": "PENDING_EXACT_SHA",
-    "R33_RESTORE_FAIL_CLOSED": "PENDING_EXACT_SHA",
-    "R33_WIN32_EXACT_SHA": "PENDING_EXACT_SHA",
+    "R33_WORLD_HUD_RESTORE_FASTPATH": "PASS_EXACT_SHA",
+    "R33_RESTORE_FAIL_CLOSED": "PASS_EXACT_SHA",
+    "R33_WIN32_EXACT_SHA": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -80,9 +80,55 @@
       "Never cache saved surface identity across device Reset or use unknown StateBlock state.",
       "Do not reduce HMD quality or world/HUD stereo renders to fake performance gains."
     ],
-    "negative_test_evidence": "Deterministic 4-resolution positive/negative viewport model and source guard mutations; CI exact-SHA pending.",
+    "negative_test_evidence": "Exact-SHA Windows policy PASS: 4 aspect/eye resolutions and failure/Reset/partial/Z-range/StateBlock negative cases, original right-eye mutations and existing depthless path regression.",
     "fix_evidence": "Separate generation-scoped saved RT0 dimension lease and guarded R32 success-bound skip."
   },
   "performance_evidence": "One SetViewport driver state submission removed for each full-target stereo world/HUD draw with no projection quality change; HMD frame-time benefit not measured.",
-  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+  "material_result_sha": "0b91d8b1e4952940c58b6712b26c7b2a267fef4f",
+  "validation_bearing_result_sha": "2b6eedca1a1d26aaec59340e13a0445303247f77",
+  "result_sha": "2b6eedca1a1d26aaec59340e13a0445303247f77",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "2b6eedca1a1d26aaec59340e13a0445303247f77",
+    "dx9ex_active": {
+      "run_id": 38482871189,
+      "head_sha": "2b6eedca1a1d26aaec59340e13a0445303247f77",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "host": "SUCCESS",
+        "game": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38482871139,
+      "head_sha": "2b6eedca1a1d26aaec59340e13a0445303247f77",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38482680137,
+      "head_sha": "0b91d8b1e4952940c58b6712b26c7b2a267fef4f",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "msvc-analyze-active-game": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "source-cross-domain": "SUCCESS"
+      },
+      "note": "Validation-bearing SHA changes only the same-task Python verifier; R32/R33 C++ and API material identical."
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  },
+  "validation_evidence": {
+    "material": {
+      "sha": "0b91d8b1e4952940c58b6712b26c7b2a267fef4f",
+      "description": "R33 saved original RT0 viewport lease and success-bound R32 viewport restore elision for world/HUD Draw"
+    },
+    "targeted": "New R33 source/negative mutation+4-resolution viewport model and R32 depthless regression PASS in exact-SHA Windows policy gate",
+    "runtime": "Quest3/VDXR actual game and frame-time untested."
+  },
+  "runtime_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "c6_recorded_at_utc": "2026-10-13T23:20:11.981Z"
 }
