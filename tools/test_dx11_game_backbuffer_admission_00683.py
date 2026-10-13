@@ -59,7 +59,7 @@ with TemporaryDirectory(prefix="dx11-00683-") as tmp:
         ("auxiliary RT",hdr.replace("targetIdentity == backbufferIdentity","targetIdentity != backbufferIdentity"),False),
         ("target size",hdr.replace("targetWidth == backbufferWidth","targetWidth != backbufferWidth"),False),
         ("format",hdr.replace("formatMatches && ",""),False),
-        ("MSAA",hdr.replace("singleSample && ",""),False),
+        ("MSAA",hdr.replace("supportedBackbufferFormat && singleSample &&", "supportedBackbufferFormat &&"),False),
         ("viewport",hdr.replace("viewportWidth <= backbufferWidth - viewportX","viewportWidth > backbufferWidth - viewportX"),False),
         ("present inset",hdr.replace("insetHeight <= backbufferHeight - margin","insetHeight > backbufferHeight - margin"),False))
     for label,body,expected in cases:
