@@ -1,9 +1,9 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "effective_from_task_number": 772,
-  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "feature_id": "DYNAMIC_PER_USER_VISIBLE_FUNCTION",
   "minimum_acceptance_items": 3,
   "minimum_behavior_areas": 2,
   "required_categories": [
@@ -17,9 +17,211 @@
   "terminal_requires_exact_sha_ci": true,
   "hmd_test_separate": "UNTESTED until actual matching Quest3/VDXR evidence",
   "feature_delivery_examples": [
-    "One Quest3 UI capability: responsive speed/time/position HUD, aspect-correct main menu, readable ESC and F11, reset/mode negative tests",
-    "One measured GPU performance optimization: dominant stereo source/capture/submit hot path, before-after p95/p99 plus quality regression tests",
-    "One coherent GOAL/+TIME/rank/lens optics correction and regression family with HMD visual acceptance separately tracked"
+    "Full gameplay HUD layout: grouped speed/time/position, not one anchor",
+    "Full F11 ImGui menu: font, shell, hitboxes, input and save",
+    "Full ESC pause menu including navigation and scaling",
+    "One specific central flare dot diplopia with original EXE trace",
+    "One complete stage +TIME sprite and numeric glyph path, not just one CALL"
   ],
-  "controller_adoption": "NOT_VERIFIED_DOCKER_RUNTIME"
+  "controller_adoption": "NOT_VERIFIED_DOCKER_RUNTIME",
+  "granularity": "ONE_USER_VISIBLE_FUNCTION_OR_ONE_OBSERVABLE_VISUAL_DEFECT_PER_FEATURE",
+  "no_umbrella_completion": true,
+  "previous_umbrella_feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "feature_catalog": [
+    {
+      "id": "HUD_GAMEPLAY",
+      "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+      "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+      "title": "HUD 위치·배율",
+      "priority": 125,
+      "goal": "Repair and validate the complete visible function: Gameplay speed/time/position HUD grouping, safe edge anchors, per-eye FOV/extent and native aspect.",
+      "trace_stages": [
+        "native speed/time/position source",
+        "R30 HUD semantic queue and XYZRHW/c64",
+        "XR eye viewport, stereo host composition"
+      ],
+      "acceptance_scenarios": [
+        "4:3/16:9/21:9 positions; reset/recenter; 6th/6 unaffected",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ]
+    },
+    {
+      "id": "F11_MENU",
+      "feature_id": "DX9EX:VIS:F11_MENU",
+      "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+      "title": "F11 설정창 전체",
+      "priority": 124,
+      "goal": "Repair and validate the complete visible function: F11 ImGui font atlas density, external shell, control hitboxes, keyboard/gamepad input, focus and saved scale.",
+      "trace_stages": [
+        "ImGui font atlas/input producer",
+        "external overlay and independent Draw semantics",
+        "eye placement and desktop 2D fallback"
+      ],
+      "acceptance_scenarios": [
+        "menus and gameplay readability, edit/focus/persist, preserve already-accepted F11 single-image behavior",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ]
+    },
+    {
+      "id": "ESC_MENU",
+      "feature_id": "DX9EX:VIS:ESC_MENU",
+      "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+      "title": "ESC 일시정지 메뉴 전체",
+      "priority": 123,
+      "goal": "Repair and validate the complete visible function: ESC pause/options scale, vertical center, arrows and full controller navigation independently of gameplay HUD.",
+      "trace_stages": [
+        "pause sprite/menu-state producer",
+        "menu semantic classification and geometry scale",
+        "per-eye viewport, clipping, hitboxes"
+      ],
+      "acceptance_scenarios": [
+        "menu centered and legible, options arrows, resolution/reset and desktop navigation",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ]
+    },
+    {
+      "id": "MAIN_MENU",
+      "feature_id": "DX9EX:VIS:MAIN_MENU",
+      "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+      "title": "메인 메뉴 화면비 전체",
+      "priority": 122,
+      "goal": "Repair and validate the complete visible function: Main and car-select intended content aspect at 4:3/16:9/21:9 with no stretch or erroneous crop.",
+      "trace_stages": [
+        "original main/menu sprites and image aspect",
+        "UI scaling and letterboxing owners",
+        "XR compositor crop and screen presentation"
+      ],
+      "acceptance_scenarios": [
+        "menu and selection text/sprites; 4:3/16:9/21:9; desktop fallback",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ]
+    },
+    {
+      "id": "LENS_FLARE_CENTRE",
+      "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+      "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+      "title": "렌즈플레어 중심점 중복",
+      "priority": 119,
+      "goal": "Repair and validate the complete visible function: Duplicated/headlocked centre lens flare dot only; preserve accepted 3–4 outer discs and SkyGlow.",
+      "trace_stages": [
+        "canonical original EXE 0xD3A5→0xC980 centre vs 0xD5F5..0xD796 outer flare chain",
+        "SceneEffect producer/replay/c64/fixedfn Draw scope",
+        "per-eye perspective/depth, camera and host stereo"
+      ],
+      "acceptance_scenarios": [
+        "central dot single/scene-attached, outer discs unchanged, negative source-scope mutation",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ]
+    },
+    {
+      "id": "EXTENDED_TIME",
+      "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+      "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+      "title": "연장시간 +TIME 화면오류",
+      "priority": 118,
+      "goal": "Repair and validate the complete visible function: Entire +TIME stage extension including sprite and numeric text producer; avoid headlock/double in eyes.",
+      "trace_stages": [
+        "canonical original EXE sprite CALL 0x9898E/0x98A36/0x98AC6 and glyph 0x989AD/0x98A89/0x98A10",
+        "sprite and glyph→SpriteNode→Sumo replay→queue→c64 Draw",
+        "stereo screen-HUD layer vs world and host composition"
+      ],
+      "acceptance_scenarios": [
+        "sprite+number one-image during stage transition, ordinary timer/GOAL/final results preserved",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ]
+    },
+    {
+      "id": "GOAL_PROGRESS",
+      "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+      "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+      "title": "GOAL 진행 연출 오류",
+      "priority": 117,
+      "goal": "Repair and validate the complete visible function: GOAL 0–99 animation and time/title duplication, distinct from accepted final race results.",
+      "trace_stages": [
+        "original GOAL-progress sprites/text producers",
+        "GOAL state semantics and fixedfn/VS glyph owner",
+        "both eyes and TIMEUP/GOAL compositor transitions"
+      ],
+      "acceptance_scenarios": [
+        "0–99 title/time single; final result and normal race untouched",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ]
+    },
+    {
+      "id": "RANK_MARKERS",
+      "feature_id": "DX9EX:VIS:RANK_MARKERS",
+      "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+      "title": "차량 순위 마커 오류",
+      "priority": 116,
+      "goal": "Repair and validate the complete visible function: Projected car/rival rank marker remains attached to its own moving car in both eyes.",
+      "trace_stages": [
+        "original Calc3D2D individual car producer",
+        "SpriteNode/replay/queue anchor lifetime",
+        "world billboard per-eye transform"
+      ],
+      "acceptance_scenarios": [
+        "moving cars track markers; NaviPub and screen rank unchanged",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ]
+    },
+    {
+      "id": "START_SHADOW",
+      "feature_id": "DX9EX:VIS:START_SHADOW",
+      "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+      "title": "시작 그림자 중복",
+      "priority": 115,
+      "goal": "Repair and validate the complete visible function: Race-start duplicated scene shadow eliminated while protecting normal car/world shadow.",
+      "trace_stages": [
+        "race-start original shadow producer",
+        "depth/alpha/world-effect ownership",
+        "both eye effect layer and host"
+      ],
+      "acceptance_scenarios": [
+        "race-start single shadow, normal world shadow and Reset unchanged",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ]
+    },
+    {
+      "id": "VEHICLE_SELECT",
+      "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+      "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+      "title": "차량선택 흰색·누락 텍스처",
+      "priority": 114,
+      "goal": "Repair and validate the complete visible function: Vehicle-select white or missing selection sprites/textures through complete texture/resource lifetime.",
+      "trace_stages": [
+        "native vehicle-selection texture source",
+        "MANAGED LockRect and sprite resource lifecycle",
+        "XR vehicle selection composition"
+      ],
+      "acceptance_scenarios": [
+        "full car UI appears, no white box, reset/recreate and desktop intact",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ]
+    }
+  ],
+  "diagnosis_required_for_terminal": {
+    "required_fields": [
+      "original_evidence",
+      "source_trace",
+      "root_cause",
+      "alternatives_rejected",
+      "fix_evidence",
+      "negative_test_evidence"
+    ],
+    "minimum_source_trace_stages": 3,
+    "minimum_alternatives_rejected": 1
+  },
+  "terminal_requires_source_changes": true,
+  "terminal_requires_diagnosis_evidence": true,
+  "runtime_failure_reopens_same_symptom_id": true
 }

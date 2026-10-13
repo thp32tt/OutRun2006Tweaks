@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-10-13T07:28:00+09:00",
+  "updatedKst": "2026-10-13T20:15:00+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -11,7 +11,7 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "DX11 Native A global-first; DX9Ex C P0-A USER-CONFIRMED responsive HUD/main/ESC/F11 legibility FIRST (#119), P0-B measured GPU/CPU performance IN PARALLEL (72 Hz / 13.89 ms and p95/p99), P1 remaining confirmed optics, P2 opt-in XR eye extent, P3 minor safety/cleanup DEFERRED; DXVK B FROZEN; FFB frozen.",
+    "primaryBackend": "DX11 A active; DX9Ex C separate functional visual-feature queue with whole-feature root cause and fix; measured performance P0-B nonoverlap; DXVK frozen.",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -23,7 +23,7 @@
     "parallelBackendDevelopment": true,
     "backendReplacementGate": "DX9Ex Architecture v3 HMD gate only DX9Ex live IPC promotion, never independent DX11 Native A source development. DXVK B remains user-FROZEN.",
     "parallelTracks": {
-      "HUD": "P0-A FIRST: Issue #119 user-observed 3440x1440 / Quest3 HUD too small/upper-centre, stretched main menu, ESC too small/upward, F11 illegible; implement the whole resolution/FOV-responsive function, not audits. Preserve HMD PASS; coordinate non-overlapping writer.",
+      "HUD": "One whole function per task (HUD/F11/ESC/main menu separately), persistent symptom-specific owner across rounds; shared renderer source overlap is exclusive.",
       "PERFORMANCE": "P0-B PARALLEL: keep existing measured C configuration and actual CPU/GPU/R23/R28/R35 p95/p99 optimization active under existing claim, without starving P0-A Issue #119 or claiming unmeasured FPS gain.",
       "DXVK": "FROZEN_BY_USER_2026_10_08: no automatic build/development/distribution/promotion.",
       "DX12": "FROZEN_REFERENCE_ONLY: unchanged; no implementation/build/HMD work.",
@@ -67,7 +67,7 @@
       ],
       "activeTaskIds": [],
       "productionIntegrationWip": 1,
-      "rule": "Inspect remote HEAD and current feature/work_key claim before dispatch. Continue feature-scoped DX9Ex C implementation + integrated Win32 debug + exact-SHA gates under SAME TASK_ID until all acceptance criteria pass; do not retire a job after a single minor edit or FEATURE_READY. R84 is one full TU/CMake feature. DX11 A stays independently active, DXVK B frozen; Quest3 runtime acceptance separate."
+      "rule": "Resolve live TASK_ID and owner/lease first. Dispatch one complete observable DX9Ex function or defect (HUD, F11, ESC, main-menu aspect, centre lens, +TIME, GOAL...) per FEATURE_ID/symptom_id; track every original producer through current stereo composition, disprove alternative causes, fix full feature with regressions, integrate and exact-SHA build. Same TASK_ID on source edits, CI repairs and HMD failure follow-ups. No separate tiny task and no mega HUD+F11+ESC bundle. DX11 independent and DXVK frozen; runtime UNTESTED unless exact Quest3/VDXR test."
     },
     "implementationFirstEnforcement": {
       "enabled": true,
@@ -177,6 +177,20 @@
         "CONVERSION-DX9EX-00598",
         "CONVERSION-DX9EX-00599"
       ]
+    },
+    "functionalFeatureDispatch": {
+      "schema": 2,
+      "policyPath": "docs/automation/DX9EX_FEATURE_UNIT_POLICY.json",
+      "unit": "ONE_USER_VISIBLE_FUNCTION_OR_ONE_OBSERVABLE_VISUAL_DEFECT_PER_FEATURE",
+      "parentIssue119": "TRACKING_ONLY",
+      "stableSymptomAndFeatureId": true,
+      "oneWriterPerOverlappingSource": true,
+      "continueTaskAcrossPartialCommitsAndRetries": true,
+      "distinctRootCauseEvidenceRequired": true,
+      "exactShaIntegratedBuildRequired": true,
+      "hardwareAcceptanceSeparate": true,
+      "reopenSameFeatureAfterHmdFailure": true,
+      "liveDockerAdoption": "NOT_VERIFIED"
     }
   },
   "candidateWip": {
@@ -233,7 +247,7 @@
     {
       "id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
       "priority": 120,
-      "status": "READY",
+      "status": "DECOMPOSED_PARENT_TRACKING_ONLY",
       "preferredRole": "C_DX9EX",
       "featureId": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
       "workKey": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
@@ -253,9 +267,15 @@
         "resolution/reset transitions + negative regression checks",
         "exact-SHA full Win32 DX9Ex Active + Domain Isolation success; package NEED_HMD_TEST"
       ],
-      "nextAction": "At next authorized non-conflicting DX9Ex C dispatch, claim one stable FEATURE_ID/work_key, implement all user-reported responsive UI issue #119 source fixes, repair gates, ship exact-SHA Quest3 candidate NEED_HMD_TEST. Measured p95/p99 performance P0-B remains active concurrently on separate claimed files.",
+      "nextAction": "No new dispatch of umbrella. Reconcile any already-claimed task first; only then dispatch one complete child feature under one TASK_ID. This is tracking-only; preserve existing live lease.",
       "blockedBy": null,
-      "blockReason": null
+      "blockReason": "Latest user correction: HUD, F11, ESC and main menu are independent whole-function deliverables.",
+      "childFeatureIds": [
+        "DX9EX:VIS:HUD_GAMEPLAY",
+        "DX9EX:VIS:F11_MENU",
+        "DX9EX:VIS:ESC_MENU",
+        "DX9EX:VIS:MAIN_MENU"
+      ]
     },
     {
       "id": "DX9EX-P0-VISUAL-COMPOSITION-20261007",
@@ -879,6 +899,376 @@
       "attempts": 0,
       "runtimeCandidate": false,
       "nextAction": "Record SUPERSEDED_BY_DX9EX_FOCUS in durable state with final focus SHA, donor SHA, validation runs/artifacts and remaining HMD-only obligations. Do not delete the donor branch automatically."
+    },
+    {
+      "id": "DX9EX-FEATURE-HUD_GAMEPLAY",
+      "priority": 125,
+      "status": "READY",
+      "preferredRole": "C_DX9EX",
+      "featureId": "DX9EX:VIS:HUD_GAMEPLAY",
+      "workKey": "DX9EX:VIS:HUD_GAMEPLAY",
+      "symptomId": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+      "issue": 119,
+      "summary": "Repair and validate the complete visible function: Gameplay speed/time/position HUD grouping, safe edge anchors, per-eye FOV/extent and native aspect.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "traceStages": [
+        "native speed/time/position source",
+        "R30 HUD semantic queue and XYZRHW/c64",
+        "XR eye viewport, stereo host composition"
+      ],
+      "requiredStaticClosure": [
+        "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
+        "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
+        "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",
+        "Final exact-SHA full DX9Ex Active Win32 host/game/package and Domain/Full Source Impact as applicable",
+        "RUNTIME_VALIDATION=UNTESTED / NEED_HMD_TEST until exact Quest3 test"
+      ],
+      "acceptanceScenarios": [
+        "4:3/16:9/21:9 positions; reset/recenter; 6th/6 unaffected",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ],
+      "conflictKeys": [
+        "DX9EX:SHARED_R30_HUD_RENDERER",
+        "DX9EX:SYMPTOM:HUD_GAMEPLAY"
+      ],
+      "nextAction": "Reconcile existing live work_key and TASK_ID; claim one coherent whole defect, trace and reject hypotheses, implement full fix, run grouped negative regressions and exact-SHA CI, then HMD separately. Never finish on a tiny micro-patch."
+    },
+    {
+      "id": "DX9EX-FEATURE-F11_MENU",
+      "priority": 124,
+      "status": "READY",
+      "preferredRole": "C_DX9EX",
+      "featureId": "DX9EX:VIS:F11_MENU",
+      "workKey": "DX9EX:VIS:F11_MENU",
+      "symptomId": "DX9EX:SYMPTOM:F11_MENU",
+      "issue": 119,
+      "summary": "Repair and validate the complete visible function: F11 ImGui font atlas density, external shell, control hitboxes, keyboard/gamepad input, focus and saved scale.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "traceStages": [
+        "ImGui font atlas/input producer",
+        "external overlay and independent Draw semantics",
+        "eye placement and desktop 2D fallback"
+      ],
+      "requiredStaticClosure": [
+        "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
+        "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
+        "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",
+        "Final exact-SHA full DX9Ex Active Win32 host/game/package and Domain/Full Source Impact as applicable",
+        "RUNTIME_VALIDATION=UNTESTED / NEED_HMD_TEST until exact Quest3 test"
+      ],
+      "acceptanceScenarios": [
+        "menus and gameplay readability, edit/focus/persist, preserve already-accepted F11 single-image behavior",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ],
+      "conflictKeys": [
+        "DX9EX:SHARED_R30_HUD_RENDERER",
+        "DX9EX:SYMPTOM:F11_MENU"
+      ],
+      "nextAction": "Reconcile existing live work_key and TASK_ID; claim one coherent whole defect, trace and reject hypotheses, implement full fix, run grouped negative regressions and exact-SHA CI, then HMD separately. Never finish on a tiny micro-patch."
+    },
+    {
+      "id": "DX9EX-FEATURE-ESC_MENU",
+      "priority": 123,
+      "status": "READY",
+      "preferredRole": "C_DX9EX",
+      "featureId": "DX9EX:VIS:ESC_MENU",
+      "workKey": "DX9EX:VIS:ESC_MENU",
+      "symptomId": "DX9EX:SYMPTOM:ESC_MENU",
+      "issue": 119,
+      "summary": "Repair and validate the complete visible function: ESC pause/options scale, vertical center, arrows and full controller navigation independently of gameplay HUD.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "traceStages": [
+        "pause sprite/menu-state producer",
+        "menu semantic classification and geometry scale",
+        "per-eye viewport, clipping, hitboxes"
+      ],
+      "requiredStaticClosure": [
+        "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
+        "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
+        "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",
+        "Final exact-SHA full DX9Ex Active Win32 host/game/package and Domain/Full Source Impact as applicable",
+        "RUNTIME_VALIDATION=UNTESTED / NEED_HMD_TEST until exact Quest3 test"
+      ],
+      "acceptanceScenarios": [
+        "menu centered and legible, options arrows, resolution/reset and desktop navigation",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ],
+      "conflictKeys": [
+        "DX9EX:SHARED_R30_HUD_RENDERER",
+        "DX9EX:SYMPTOM:ESC_MENU"
+      ],
+      "nextAction": "Reconcile existing live work_key and TASK_ID; claim one coherent whole defect, trace and reject hypotheses, implement full fix, run grouped negative regressions and exact-SHA CI, then HMD separately. Never finish on a tiny micro-patch."
+    },
+    {
+      "id": "DX9EX-FEATURE-MAIN_MENU",
+      "priority": 122,
+      "status": "READY",
+      "preferredRole": "C_DX9EX",
+      "featureId": "DX9EX:VIS:MAIN_MENU",
+      "workKey": "DX9EX:VIS:MAIN_MENU",
+      "symptomId": "DX9EX:SYMPTOM:MAIN_MENU",
+      "issue": 119,
+      "summary": "Repair and validate the complete visible function: Main and car-select intended content aspect at 4:3/16:9/21:9 with no stretch or erroneous crop.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "traceStages": [
+        "original main/menu sprites and image aspect",
+        "UI scaling and letterboxing owners",
+        "XR compositor crop and screen presentation"
+      ],
+      "requiredStaticClosure": [
+        "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
+        "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
+        "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",
+        "Final exact-SHA full DX9Ex Active Win32 host/game/package and Domain/Full Source Impact as applicable",
+        "RUNTIME_VALIDATION=UNTESTED / NEED_HMD_TEST until exact Quest3 test"
+      ],
+      "acceptanceScenarios": [
+        "menu and selection text/sprites; 4:3/16:9/21:9; desktop fallback",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ],
+      "conflictKeys": [
+        "DX9EX:SHARED_R30_HUD_RENDERER",
+        "DX9EX:SYMPTOM:MAIN_MENU"
+      ],
+      "nextAction": "Reconcile existing live work_key and TASK_ID; claim one coherent whole defect, trace and reject hypotheses, implement full fix, run grouped negative regressions and exact-SHA CI, then HMD separately. Never finish on a tiny micro-patch."
+    },
+    {
+      "id": "DX9EX-FEATURE-LENS_FLARE_CENTRE",
+      "priority": 119,
+      "status": "READY",
+      "preferredRole": "C_DX9EX",
+      "featureId": "DX9EX:VIS:LENS_FLARE_CENTRE",
+      "workKey": "DX9EX:VIS:LENS_FLARE_CENTRE",
+      "symptomId": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+      "issue": 13,
+      "summary": "Repair and validate the complete visible function: Duplicated/headlocked centre lens flare dot only; preserve accepted 3–4 outer discs and SkyGlow.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "traceStages": [
+        "canonical original EXE 0xD3A5→0xC980 centre vs 0xD5F5..0xD796 outer flare chain",
+        "SceneEffect producer/replay/c64/fixedfn Draw scope",
+        "per-eye perspective/depth, camera and host stereo"
+      ],
+      "requiredStaticClosure": [
+        "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
+        "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
+        "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",
+        "Final exact-SHA full DX9Ex Active Win32 host/game/package and Domain/Full Source Impact as applicable",
+        "RUNTIME_VALIDATION=UNTESTED / NEED_HMD_TEST until exact Quest3 test"
+      ],
+      "acceptanceScenarios": [
+        "central dot single/scene-attached, outer discs unchanged, negative source-scope mutation",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ],
+      "conflictKeys": [
+        "DX9EX:SHARED_R30_HUD_RENDERER",
+        "DX9EX:SYMPTOM:LENS_FLARE_CENTRE"
+      ],
+      "nextAction": "Reconcile existing live work_key and TASK_ID; claim one coherent whole defect, trace and reject hypotheses, implement full fix, run grouped negative regressions and exact-SHA CI, then HMD separately. Never finish on a tiny micro-patch."
+    },
+    {
+      "id": "DX9EX-FEATURE-EXTENDED_TIME",
+      "priority": 118,
+      "status": "READY",
+      "preferredRole": "C_DX9EX",
+      "featureId": "DX9EX:VIS:EXTENDED_TIME",
+      "workKey": "DX9EX:VIS:EXTENDED_TIME",
+      "symptomId": "DX9EX:SYMPTOM:EXTENDED_TIME",
+      "issue": 13,
+      "summary": "Repair and validate the complete visible function: Entire +TIME stage extension including sprite and numeric text producer; avoid headlock/double in eyes.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "traceStages": [
+        "canonical original EXE sprite CALL 0x9898E/0x98A36/0x98AC6 and glyph 0x989AD/0x98A89/0x98A10",
+        "sprite and glyph→SpriteNode→Sumo replay→queue→c64 Draw",
+        "stereo screen-HUD layer vs world and host composition"
+      ],
+      "requiredStaticClosure": [
+        "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
+        "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
+        "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",
+        "Final exact-SHA full DX9Ex Active Win32 host/game/package and Domain/Full Source Impact as applicable",
+        "RUNTIME_VALIDATION=UNTESTED / NEED_HMD_TEST until exact Quest3 test"
+      ],
+      "acceptanceScenarios": [
+        "sprite+number one-image during stage transition, ordinary timer/GOAL/final results preserved",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ],
+      "conflictKeys": [
+        "DX9EX:SHARED_R30_HUD_RENDERER",
+        "DX9EX:SYMPTOM:EXTENDED_TIME"
+      ],
+      "nextAction": "Reconcile existing live work_key and TASK_ID; claim one coherent whole defect, trace and reject hypotheses, implement full fix, run grouped negative regressions and exact-SHA CI, then HMD separately. Never finish on a tiny micro-patch."
+    },
+    {
+      "id": "DX9EX-FEATURE-GOAL_PROGRESS",
+      "priority": 117,
+      "status": "READY",
+      "preferredRole": "C_DX9EX",
+      "featureId": "DX9EX:VIS:GOAL_PROGRESS",
+      "workKey": "DX9EX:VIS:GOAL_PROGRESS",
+      "symptomId": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+      "issue": 13,
+      "summary": "Repair and validate the complete visible function: GOAL 0–99 animation and time/title duplication, distinct from accepted final race results.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "traceStages": [
+        "original GOAL-progress sprites/text producers",
+        "GOAL state semantics and fixedfn/VS glyph owner",
+        "both eyes and TIMEUP/GOAL compositor transitions"
+      ],
+      "requiredStaticClosure": [
+        "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
+        "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
+        "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",
+        "Final exact-SHA full DX9Ex Active Win32 host/game/package and Domain/Full Source Impact as applicable",
+        "RUNTIME_VALIDATION=UNTESTED / NEED_HMD_TEST until exact Quest3 test"
+      ],
+      "acceptanceScenarios": [
+        "0–99 title/time single; final result and normal race untouched",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ],
+      "conflictKeys": [
+        "DX9EX:SHARED_R30_HUD_RENDERER",
+        "DX9EX:SYMPTOM:GOAL_PROGRESS"
+      ],
+      "nextAction": "Reconcile existing live work_key and TASK_ID; claim one coherent whole defect, trace and reject hypotheses, implement full fix, run grouped negative regressions and exact-SHA CI, then HMD separately. Never finish on a tiny micro-patch."
+    },
+    {
+      "id": "DX9EX-FEATURE-RANK_MARKERS",
+      "priority": 116,
+      "status": "READY",
+      "preferredRole": "C_DX9EX",
+      "featureId": "DX9EX:VIS:RANK_MARKERS",
+      "workKey": "DX9EX:VIS:RANK_MARKERS",
+      "symptomId": "DX9EX:SYMPTOM:RANK_MARKERS",
+      "issue": 13,
+      "summary": "Repair and validate the complete visible function: Projected car/rival rank marker remains attached to its own moving car in both eyes.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "traceStages": [
+        "original Calc3D2D individual car producer",
+        "SpriteNode/replay/queue anchor lifetime",
+        "world billboard per-eye transform"
+      ],
+      "requiredStaticClosure": [
+        "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
+        "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
+        "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",
+        "Final exact-SHA full DX9Ex Active Win32 host/game/package and Domain/Full Source Impact as applicable",
+        "RUNTIME_VALIDATION=UNTESTED / NEED_HMD_TEST until exact Quest3 test"
+      ],
+      "acceptanceScenarios": [
+        "moving cars track markers; NaviPub and screen rank unchanged",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ],
+      "conflictKeys": [
+        "DX9EX:SHARED_R30_HUD_RENDERER",
+        "DX9EX:SYMPTOM:RANK_MARKERS"
+      ],
+      "nextAction": "Reconcile existing live work_key and TASK_ID; claim one coherent whole defect, trace and reject hypotheses, implement full fix, run grouped negative regressions and exact-SHA CI, then HMD separately. Never finish on a tiny micro-patch."
+    },
+    {
+      "id": "DX9EX-FEATURE-START_SHADOW",
+      "priority": 115,
+      "status": "READY",
+      "preferredRole": "C_DX9EX",
+      "featureId": "DX9EX:VIS:START_SHADOW",
+      "workKey": "DX9EX:VIS:START_SHADOW",
+      "symptomId": "DX9EX:SYMPTOM:START_SHADOW",
+      "issue": 13,
+      "summary": "Repair and validate the complete visible function: Race-start duplicated scene shadow eliminated while protecting normal car/world shadow.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "traceStages": [
+        "race-start original shadow producer",
+        "depth/alpha/world-effect ownership",
+        "both eye effect layer and host"
+      ],
+      "requiredStaticClosure": [
+        "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
+        "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
+        "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",
+        "Final exact-SHA full DX9Ex Active Win32 host/game/package and Domain/Full Source Impact as applicable",
+        "RUNTIME_VALIDATION=UNTESTED / NEED_HMD_TEST until exact Quest3 test"
+      ],
+      "acceptanceScenarios": [
+        "race-start single shadow, normal world shadow and Reset unchanged",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ],
+      "conflictKeys": [
+        "DX9EX:SHARED_R30_HUD_RENDERER",
+        "DX9EX:SYMPTOM:START_SHADOW"
+      ],
+      "nextAction": "Reconcile existing live work_key and TASK_ID; claim one coherent whole defect, trace and reject hypotheses, implement full fix, run grouped negative regressions and exact-SHA CI, then HMD separately. Never finish on a tiny micro-patch."
+    },
+    {
+      "id": "DX9EX-FEATURE-VEHICLE_SELECT",
+      "priority": 114,
+      "status": "READY",
+      "preferredRole": "C_DX9EX",
+      "featureId": "DX9EX:VIS:VEHICLE_SELECT",
+      "workKey": "DX9EX:VIS:VEHICLE_SELECT",
+      "symptomId": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+      "issue": 13,
+      "summary": "Repair and validate the complete visible function: Vehicle-select white or missing selection sprites/textures through complete texture/resource lifetime.",
+      "testLevel": "LEVEL0",
+      "dependencies": [],
+      "attempts": 0,
+      "runtimeCandidate": false,
+      "traceStages": [
+        "native vehicle-selection texture source",
+        "MANAGED LockRect and sprite resource lifecycle",
+        "XR vehicle selection composition"
+      ],
+      "requiredStaticClosure": [
+        "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
+        "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
+        "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",
+        "Final exact-SHA full DX9Ex Active Win32 host/game/package and Domain/Full Source Impact as applicable",
+        "RUNTIME_VALIDATION=UNTESTED / NEED_HMD_TEST until exact Quest3 test"
+      ],
+      "acceptanceScenarios": [
+        "full car UI appears, no white box, reset/recreate and desktop intact",
+        "prove source-cause correction with mutation/negative regression",
+        "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
+      ],
+      "conflictKeys": [
+        "DX9EX:SHARED_R30_HUD_RENDERER",
+        "DX9EX:SYMPTOM:VEHICLE_SELECT"
+      ],
+      "nextAction": "Reconcile existing live work_key and TASK_ID; claim one coherent whole defect, trace and reject hypotheses, implement full fix, run grouped negative regressions and exact-SHA CI, then HMD separately. Never finish on a tiny micro-patch."
     }
   ],
   "hmdTestMatrix": {
