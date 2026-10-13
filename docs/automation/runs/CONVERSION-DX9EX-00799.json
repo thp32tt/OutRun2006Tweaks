@@ -1,0 +1,89 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00799",
+  "production_id": "CONVERSION-DX9EX-00799",
+  "event_id": "CONVERSION-DX9EX-00799-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:MAIN_MENU",
+  "status": "IMPLEMENTED_NEEDS_EXACT_SHA_CI",
+  "checkpoint": "C3_VALIDATE",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00799]",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "changed_files": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp",
+    "tools/verify_vr_menu_letterbox_aspect.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00799.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Keep a complete native 4:3 or letterboxed 16:9/21:9 main-menu selection scene at its authored physical aspect and original optical position through partial Desktop Duplication capture, Reset and window relocation.",
+    "scope_boundary": "Only front-end menu LOCAL theater UV and optical fragment planning, not F11, gameplay HUD, world stereo, input, SkyGlow, DX11 or DXVK.",
+    "trace_stages": [
+      "Original OutRun 4:3 menu and vehicle-selection sprites are letterboxed by UI settings on the game client.",
+      "Desktop Duplication reports the visible intersection as cropped UV, while R23 host PlanVisibleCenteredContent reconstructs the authored content rectangle.",
+      "R23 host fixes one optical clip and shared UV for both OpenXR eyes; invalid or fully restored capture uses conservative source fallback."
+    ],
+    "subcomponents": [
+      "Native 4:3 partial-capture placement/extent relative to the full uncropped client with correct left/top/right optical offsets.",
+      "Unchanged authored letterboxed 16:9, ultrawide and portrait crop plus full-visibility/recenter/stale-UV fallback.",
+      "Deterministic native C++ smoke and destructive source-guard mutation in GitHub Windows policy test."
+    ],
+    "acceptance_items": [
+      {
+        "id": "MAIN_NATIVE_CLIP",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_43_left_top_right_fragment",
+        "expected_behavior": "Native 4:3 menus retain full authored optical scale/center while clipped left, top or right fragments occupy exactly the original partial quad."
+      },
+      {
+        "id": "MAIN_CROP_RESET_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "ultrawide_portrait_invalid_capture",
+        "expected_behavior": "4:3/16:9/21:9 and portrait letterboxed crops remain unchanged; restored fully visible 4:3 and invalid/stale UV have no fragment override."
+      },
+      {
+        "id": "MAIN_EXACT_SHA_GATE",
+        "category": "integrated_validation",
+        "behavior_area": "win32_host_game_package",
+        "expected_behavior": "Exact-SHA DX9Ex Active complete Win32 game/host/package plus Domain Isolation and Full Source Impact required gates succeed before build-verified status."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "MAIN_NATIVE_CLIP": "PENDING_CI",
+    "MAIN_CROP_RESET_FALLBACK": "PENDING_CI",
+    "MAIN_EXACT_SHA_GATE": "PENDING_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "main_r23.cpp calls PlanVisibleCenteredContent for user letterboxed menu; original helper exits on !fullPlan.crop even when original 4:3 client is partially outside the capture output.",
+    "root_cause": "Native 4:3 originalAspect == intendedAspect causes PlanCenteredContent to return crop=false and skips R23 visibleOffset/visibleScale optical fragment path; sampled fragment is projected full-size at the center.",
+    "source_trace": [
+      "Original menu 4:3 sprites and front-end UI scaling produce authored client rectangle.",
+      "GetGameUv samples only clipped Desktop Duplication intersection; PlanVisibleCenteredContent decides crop and fragment geometry.",
+      "R23 LOCAL menu projects the reconstructed clip and source UV identically to both OpenXR eye slices."
+    ],
+    "alternatives_rejected": [
+      "Correcting PlanCapturedAspect alone would change apparent ratio but still center a partial native 4:3 image at full scale.",
+      "Changing per-eye projection/view matrix risks asymmetric FOV stereo and cannot recover original client-space clipping.",
+      "Removing cropping globally would regress existing 21:9 sidebars, portrait matte and source geometry."
+    ],
+    "fix_evidence": "Retain full native client optical geometry and permit a fragment plan only when UV proves output edge intersection; keep fully visible native 4:3 no-crop.",
+    "negative_test_evidence": "Three native 4:3 left/top/right clipped C++ fixtures fail on old early-return path, plus fully restored and stale-UV controls and three destructive source guard mutants."
+  },
+  "runtime_status": "NEED_QUEST3_VDXR_OPTICAL_TEST",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  }
+}

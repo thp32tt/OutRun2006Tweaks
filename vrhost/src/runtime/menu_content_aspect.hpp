@@ -218,9 +218,17 @@ namespace OutRunVrMenuAspect
             uvY + uvHeight > 1.00001f)
             return {};
 
+        const float originalAspect = clientWidth / clientHeight;
         const auto fullPlan = PlanCenteredContent(
-            clientWidth / clientHeight, intendedAspect);
-        if (!fullPlan.crop)
+            originalAspect, intendedAspect);
+        // Native 4:3 has no matte to remove. A PARTIALLY captured native
+        // menu still needs its original optical placement: otherwise the
+        // surviving fragment is incorrectly expanded and recentered on the
+        // Quest menu quad. Do not accept an invalid/mismatched target aspect.
+        if (!fullPlan.crop &&
+            (!(originalAspect >= 0.5f && originalAspect <= 5.0f) ||
+             !(intendedAspect >= 0.5f && intendedAspect <= 4.0f) ||
+             std::fabs(originalAspect - intendedAspect) > 0.0005f))
             return {};
 
         const float sampledLeft = uvX * captureWidth;
@@ -237,6 +245,17 @@ namespace OutRunVrMenuAspect
                 (std::max)(0.0f, clientTop)) > 1.0f ||
             std::fabs(sampledBottom -
                 (std::min)(captureHeight, clientBottom)) > 1.0f)
+            return {};
+
+        // A completely visible native 4:3 client needs no UV crop or
+        // optical placement override. Only a genuinely clipped fragment
+        // should opt in. After a window move/Reset the full image restores
+        // the default path without retaining a stale fragment transform.
+        if (!fullPlan.crop &&
+            std::fabs(sampledLeft - clientLeft) <= 1.0f &&
+            std::fabs(sampledRight - clientRight) <= 1.0f &&
+            std::fabs(sampledTop - clientTop) <= 1.0f &&
+            std::fabs(sampledBottom - clientBottom) <= 1.0f)
             return {};
 
         // Intersect the ORIGINAL authored 4:3 rectangle with the captured

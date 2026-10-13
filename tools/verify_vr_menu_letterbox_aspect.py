@@ -727,7 +727,10 @@ def verify_visible_fragment_source(code: str) -> None:
         "visibleHeight / contentHeight;",
         "result.offsetY = (visibleTop - sampledTop) / sampledHeight;",
         "result.height = visibleHeight / sampledHeight;",
-        "visibleOffsetX, visibleOffsetY, widthScale, heightScale"
+        "visibleOffsetX, visibleOffsetY, widthScale, heightScale",
+        "std::fabs(originalAspect - intendedAspect) > 0.0005f",
+        "std::fabs(sampledLeft - clientLeft) <= 1.0f",
+        "std::fabs(sampledBottom - clientBottom) <= 1.0f",
     ):
         assert token in body, token
 
@@ -753,6 +756,12 @@ for old, bad in (
     else:
         raise AssertionError("menu fragment geometry mutation survived: " + old)
 for old, bad in (
+    ("std::fabs(originalAspect - intendedAspect) > 0.0005f",
+     "std::fabs(originalAspect - intendedAspect) > 100.0f"),
+    ("std::fabs(sampledLeft - clientLeft) <= 1.0f",
+     "std::fabs(sampledLeft - clientLeft) > 1.0f"),
+    ("std::fabs(sampledBottom - clientBottom) <= 1.0f",
+     "std::fabs(sampledBottom - clientBottom) > 1.0f"),
     ("visibleWidth / contentWidth;", "sampledWidth / contentWidth;"),
     ("visibleHeight / contentHeight;", "sampledHeight / contentHeight;"),
     ("result.offsetY = (visibleTop - sampledTop) / sampledHeight;",

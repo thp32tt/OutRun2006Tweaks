@@ -184,6 +184,46 @@ int main()
             0, 0.22f, 1, 0.78f, 4.f / 3.f).crop)
         return 25;
 
+    // Native 4:3 menus have no black matte, but a partially off-output
+    // source still occupies only a fragment of the ORIGINAL 4:3 quad.
+    // Old behavior returned crop=false and centered the fragment at full
+    // optical size, stretching/repositioning it on both Quest eyes.
+    const auto native43Left = PlanVisibleCenteredContent(
+        -320, 0, 960, 960, 1920, 1080, 0, 0,
+        960.f / 1920.f, 960.f / 1080.f, 4.f / 3.f);
+    const auto native43Top = PlanVisibleCenteredContent(
+        0, -240, 1280, 720, 1920, 1080, 0, 0,
+        1280.f / 1920.f, 720.f / 1080.f, 4.f / 3.f);
+    const auto native43Right = PlanVisibleCenteredContent(
+        1280, 0, 2560, 960, 1920, 1080,
+        1280.f / 1920.f, 0, 640.f / 1920.f,
+        960.f / 1080.f, 4.f / 3.f);
+    if (!native43Left.crop || !native43Top.crop ||
+        !native43Right.crop ||
+        !near(native43Left.offsetX, 0.f) ||
+        !near(native43Left.width, 1.f) ||
+        !near(native43Left.visibleOffsetX, 0.25f) ||
+        !near(native43Left.visibleWidthScale, 0.75f) ||
+        !near(native43Left.aspect, 1.f) ||
+        !near(native43Top.visibleOffsetY, 0.25f) ||
+        !near(native43Top.visibleHeightScale, 0.75f) ||
+        !near(native43Top.aspect, 16.f / 9.f) ||
+        !near(native43Right.visibleOffsetX, -0.5f) ||
+        !near(native43Right.visibleWidthScale, 0.5f))
+        return 26;
+    // Full 4:3 visibility must restore no-crop/no-fragment behavior.
+    // A stale UV after a monitor change must NOT synthesize a transform.
+    if (PlanVisibleCenteredContent(
+            0, 0, 1280, 960, 1920, 1080, 0, 0,
+            1280.f / 1920.f, 960.f / 1080.f, 4.f / 3.f).crop ||
+        PlanVisibleCenteredContent(
+            -320, 0, 960, 960, 1920, 1080, 0.05f, 0,
+            960.f / 1920.f, 960.f / 1080.f, 4.f / 3.f).crop ||
+        PlanVisibleCenteredContent(
+            -320, 0, 960, 960, 1920, 1080, 0, 0,
+            960.f / 1920.f, 960.f / 1080.f, 1.6f).crop)
+        return 27;
+
     using OutRunVrMenuAspect::PlanCommonFovTangents;
     // Two asymmetric Quest-style FOVs must average the actual tangent
     // plane. tan(mean angle) causes a different apparent menu aspect.
