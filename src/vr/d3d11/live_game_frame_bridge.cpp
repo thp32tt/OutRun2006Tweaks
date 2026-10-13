@@ -2872,8 +2872,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     const auto extendedLumaLayout = base.Format == D3DFMT_L16 ?
         extended_luminance_texture::Layout::luminance16 :
         extended_luminance_texture::Layout::alpha4_luminance4;
-    const UINT sourceTexelBytes = rgba16 ? rgba16_texture::source_bytes_per_texel() :
-        packed16 ? 2u :
+    const UINT sourceTexelBytes = packed16 ? 2u :
+        rgba16 ? rgba16_texture::source_bytes_per_texel() :
         luminance ? luminance_texture::source_bytes_per_texel(luminanceLayout) :
         extendedLuma ? extended_luminance_texture::source_bytes_per_texel(extendedLumaLayout) :
         a8p8 ? a8p8_texture::source_bytes_per_texel() :
