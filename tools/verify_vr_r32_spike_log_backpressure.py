@@ -59,7 +59,11 @@ def violations(source):
               "R32PerfBaselineUs = 0;", "R32Counters = {};",
               "R32LastPresentEndQpc = 0;"):
         check(x in present, "diagnostic opt-out " + x)
-    check(log.index("spdlog::info(") < log.index("R32PerfWindowCounters = {};"),
+    # During a destructive mutation either anchor can disappear; that is
+    # a negative-test violation, never a Python ValueError.
+    check("spdlog::info(" in log and
+          "R32PerfWindowCounters = {};" in log and
+          log.index("spdlog::info(") < log.index("R32PerfWindowCounters = {};"),
           "aggregate emitted before window clear")
     return errors
 
