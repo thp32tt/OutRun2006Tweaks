@@ -44,7 +44,7 @@ def connected(c: str, h: str, p: str) -> bool:
         "depth.equalityMode == compare",
         "!game_native_depth_admission(1,1,3,0,0,false,depth)",
         "!game_native_depth_admission(1,0,6,1,0,true,depth)",
-        "for (unsigned unsupported : {1u, 5u, 7u, 9u})",
+        "for (unsigned unsupported : {1u, 9u})",
     )))
 
 assert connected(CPP, HDR, PROBE)

@@ -51,6 +51,24 @@ int main() {
            game_native_depth_equality_slot(false, 6u));
     assert(game_native_depth_equality_slot(true, 3u) !=
            game_native_depth_equality_slot(false, 3u));
+    // GREATER/GREATEREQUAL: four native depth modes; unsupported still fallback.
+    using outrun::vr::dx11::live_game_frame::game_native_depth_ordering_slot;
+    for (unsigned compare : {5u, 7u}) {
+        for (unsigned write : {0u, 1u}) {
+            assert(game_native_depth_admission(1,write,compare,0,0,true,depth));
+            assert(depth.enabled && depth.orderingMode == compare &&
+                   depth.equalityMode == 0u && !depth.always &&
+                   depth.writeEnabled == (write != 0u));
+            assert(game_native_depth_ordering_slot(write != 0u, compare) ==
+                   (write ? 2u : 0u) + (compare == 7u ? 1u : 0u));
+        }
+    }
+    assert(game_native_depth_ordering_slot(false,5u) != game_native_depth_ordering_slot(false,7u));
+    assert(game_native_depth_ordering_slot(false,5u) != game_native_depth_ordering_slot(true,5u));
+    assert(!game_native_depth_admission(1,1,7,0,0,false,depth));
+    assert(!game_native_depth_admission(1,0,5,0x3f800000u,0,true,depth));
+    assert(game_native_depth_admission(1,1,3,0,0,true,depth));
+    assert(depth.orderingMode == 0u && depth.equalityMode == 3u);
     assert(!game_native_depth_admission(1,1,3,0,0,false,depth));
     assert(!game_native_depth_admission(1,0,6,1,0,true,depth));
     assert(game_native_depth_admission(1,1,8,0,0,true,depth));
@@ -61,7 +79,7 @@ int main() {
     for (unsigned mode : {2u, 3u, 0xffffffffu})
         assert(!game_native_depth_admission(mode,1,4,0,0,true,depth));
     assert(!game_native_depth_admission(1,2,4,0,0,true,depth));
-    for (unsigned unsupported : {1u, 5u, 7u, 9u})
+    for (unsigned unsupported : {1u, 9u})
         assert(!game_native_depth_admission(1,1,unsupported,0,0,true,depth));
     assert(!game_native_depth_admission(1,1,4,1,0,true,depth));
     assert(!game_native_depth_admission(1,1,4,0,0x3f800000u,true,depth));
