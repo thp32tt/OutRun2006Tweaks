@@ -66,14 +66,17 @@ void CreateLetterboxVertex()
 	const float contentWidth = sourceHeight * (4.0f / 3.0f);
 	if (!std::isfinite(contentWidth))
 		return;
-	// Cache even a 4:3/portrait result (which correctly needs NO bars), so
-	// EndScene doesn't allocate/retry on every menu frame. A size or device
-	// change invalidates this record and triggers one fresh construction.
-	LetterboxRasterDevice = d3ddev;
-	LetterboxRasterWidth = sourceWidth;
-	LetterboxRasterHeight = sourceHeight;
+	// No GPU bars are needed for a 4:3/portrait source. Cache that successful
+	// empty result, but defer caching a widescreen size/device until its VB
+	// has actually been created, locked, filled and unlocked. Otherwise a
+	// transient D3D9Ex Reset allocation failure permanently hides menu bars.
 	if (sourceWidth <= contentWidth)
+	{
+		LetterboxRasterDevice = d3ddev;
+		LetterboxRasterWidth = sourceWidth;
+		LetterboxRasterHeight = sourceHeight;
 		return;
+	}
 	const float borderWidth = (sourceWidth - contentWidth) * 0.5f + 0.5f;
 	if (!std::isfinite(borderWidth) || borderWidth >= sourceWidth * 0.5f)
 		return;
@@ -104,8 +107,17 @@ void CreateLetterboxVertex()
 		return;
 	}
 	memcpy(mapped, vertices, sizeof(vertices));
-	candidate->Unlock();
+	if (FAILED(candidate->Unlock()))
+	{
+		candidate->Release();
+		return;
+	}
 	LetterboxVertex = candidate;
+	// Only completed buffers are cached. Create/Lock/Unlock failures leave
+	// the cache empty, so the next valid same-size menu frame can retry.
+	LetterboxRasterDevice = d3ddev;
+	LetterboxRasterWidth = sourceWidth;
+	LetterboxRasterHeight = sourceHeight;
 }
 
 class D3DHooks : public Hook

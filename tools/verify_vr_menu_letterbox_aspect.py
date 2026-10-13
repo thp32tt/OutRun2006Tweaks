@@ -53,7 +53,7 @@ def verify_ex_letterbox_pool(code: str) -> None:
     assert create.count("D3DPOOL_DEFAULT, &candidate, nullptr") == 1
     assert "D3DPOOL_MANAGED, &candidate, nullptr" not in create
     assert create.index("FAILED(d3ddev->CreateVertexBuffer(") < create.index(
-        "candidate->Unlock();") < create.index("LetterboxVertex = candidate;")
+        "if (FAILED(candidate->Unlock()))") < create.index("LetterboxVertex = candidate;")
     assert "LetterboxVertex->Release();" in reset
     assert reset.index("LetterboxVertex->Release();") < reset.index(
         "LetterboxRasterDevice = nullptr;")
@@ -62,7 +62,7 @@ def verify_ex_letterbox_pool(code: str) -> None:
 verify_ex_letterbox_pool(src)
 for old, bad in (
     ("D3DPOOL_DEFAULT, &candidate, nullptr", "D3DPOOL_MANAGED, &candidate, nullptr"),
-    ("candidate->Unlock();", "// leave buffer locked across Reset"),
+    ("if (FAILED(candidate->Unlock()))", "if (SUCCEEDED(candidate->Unlock()))"),
 ):
     assert old in src
     try:
@@ -193,8 +193,8 @@ def verify_live_resize(source: str) -> None:
                   "LetterboxRasterWidth = sourceWidth;",
                   "LetterboxRasterHeight = sourceHeight;"):
         assert token in create, token
-    assert create.index("LetterboxRasterDevice = d3ddev;") < create.index(
-        "if (sourceWidth <= contentWidth)")
+    assert create.index("if (sourceWidth <= contentWidth)") < create.index(
+        "LetterboxRasterDevice = d3ddev;")
     for token in ("validSource &&",
                   "currentDevice != LetterboxRasterDevice",
                   "currentSize->x != LetterboxRasterWidth",
@@ -273,3 +273,65 @@ for good, bad in (
         raise AssertionError("live-resize contract mutant survived: " + good)
 print("PASS live menu 4:3/16:9/21:9/portrait resize, invalid source and 6 destructive mutants")
 
+
+
+# D3D9Ex Reset can transiently fail VB Create/Lock/Unlock. A failed
+# widescreen attempt must not be marked as cached: the next EndScene at
+# the same valid source size has to retry. An empty 4:3/portrait result
+# *is* complete and should remain cached without GPU allocations.
+def verify_transient_ex_menu_retry(code: str) -> None:
+    create = code.split("void CreateLetterboxVertex()\n{", 1)[1].split(
+        "\nclass D3DHooks : public Hook", 1)[0]
+    empty = create.split("if (sourceWidth <= contentWidth)", 1)[1].split(
+        "const float borderWidth", 1)[0]
+    unlock = create.split("if (FAILED(candidate->Unlock()))", 1)[1]
+    ready = unlock.split("LetterboxVertex = candidate;", 1)[1]
+    assert empty.count("LetterboxRasterDevice = d3ddev;") == 1
+    assert empty.count("LetterboxRasterWidth = sourceWidth;") == 1
+    assert empty.count("LetterboxRasterHeight = sourceHeight;") == 1
+    assert create.count("LetterboxRasterDevice = d3ddev;") == 2
+    assert create.count("LetterboxRasterWidth = sourceWidth;") == 2
+    assert create.count("LetterboxRasterHeight = sourceHeight;") == 2
+    assert "candidate->Release();" in unlock.split(
+        "LetterboxVertex = candidate;", 1)[0]
+    assert "return;" in unlock.split(
+        "LetterboxVertex = candidate;", 1)[0]
+    assert unlock.index("candidate->Release();") < unlock.index(
+        "LetterboxVertex = candidate;")
+    assert "LetterboxRasterDevice = d3ddev;" in ready
+    assert ready.index("LetterboxRasterDevice = d3ddev;") < ready.index(
+        "LetterboxRasterWidth = sourceWidth;") < ready.index(
+        "LetterboxRasterHeight = sourceHeight;")
+
+verify_transient_ex_menu_retry(src)
+start = src.index("void CreateLetterboxVertex()")
+end = src.index("\nclass D3DHooks : public Hook", start)
+body = src[start:end]
+for old, bad in (
+    ("if (FAILED(candidate->Unlock()))", "if (SUCCEEDED(candidate->Unlock()))"),
+    ("LetterboxVertex = candidate;", "// lost successful GPU buffer"),
+    ("LetterboxRasterDevice = d3ddev;\n\tLetterboxRasterWidth = sourceWidth;\n\tLetterboxRasterHeight = sourceHeight;\n\treturn;",
+     "return;"),  # portrait/4:3 cache must not disappear
+    ("LetterboxVertex = candidate;\n\t// Only completed buffers",
+     "LetterboxRasterDevice = d3ddev;\n\tLetterboxVertex = candidate;\n\t// Only completed buffers"),
+):
+    assert old in body, old
+    mutated = src[:start] + body.replace(old, bad, 1) + src[end:]
+    try:
+        verify_transient_ex_menu_retry(mutated)
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("D3D9Ex transient cache mutant survived: " + old)
+
+for w, h in ((3440, 1440), (1920, 1080), (1024, 768), (2496, 2688)):
+    next_size = (7, w, h)
+    cached = (None, 0, 0)
+    assert should_rebuild(cached, next_size)
+    if w > h * 4 / 3:
+        for failed_stage in ("Create", "Lock", "Unlock"):
+            # The real code leaves cached untouched on all three failures.
+            assert should_rebuild(cached, next_size), failed_stage
+    cached = next_size  # successful widescreen VB or completed empty bars
+    assert not should_rebuild(cached, next_size)
+print("PASS D3D9Ex transient Create/Lock/Unlock retry, 4:3 no-bars cache, 4 destructive controls")
