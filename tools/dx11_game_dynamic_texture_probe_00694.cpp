@@ -7,9 +7,16 @@
 #include <cstring>
 namespace dt = outrun::vr::dx11::live_game_frame::dynamic_texture;
 
-template<std::size_t Pitch, std::size_t Rows>
-bool snapshot(const std::array<std::uint8_t, Pitch*Rows>& game,
-              unsigned rowBytes, std::array<std::uint8_t, Rows*8>& out) {
+template<std::size_t N, std::size_t Out>
+bool snapshot(const std::array<std::uint8_t, N>& game,
+              unsigned rowBytes, std::array<std::uint8_t, Out>& out) {
+    // N is the full game row-strided buffer, Out holds 8 bytes per row.
+    // Deduce both array lengths directly (Pitch*Rows is a non-deduced
+    // template expression in C++17 and previously broke the Fast Gate).
+    static_assert(Out > 0 && Out % 8 == 0);
+    constexpr std::size_t Rows = Out / 8;
+    static_assert(N % Rows == 0);
+    constexpr std::size_t Pitch = N / Rows;
     if (!dt::readable_pitch(Pitch, rowBytes) || rowBytes > 8) return false;
     for (std::size_t y=0; y<Rows; ++y)
         std::memcpy(out.data()+y*8, game.data()+y*Pitch, rowBytes);
