@@ -21,6 +21,9 @@
 namespace outrun::vr::dx11::live_game_frame {
 namespace {
 using Microsoft::WRL::ComPtr;
+static_assert(D3DPT_LINELIST == 2 && D3DPT_LINESTRIP == 3 &&
+              D3DPT_TRIANGLELIST == 4 && D3DPT_TRIANGLESTRIP == 5 &&
+              D3DPT_TRIANGLEFAN == 6, "D3D9 primitive span enum changed");
 static_assert(kGameStage0BlendDiffuseAlpha == D3DTOP_BLENDDIFFUSEALPHA &&
               kGameStage0BlendTextureAlphaPM == D3DTOP_BLENDTEXTUREALPHAPM &&
               kGameStage0BlendCurrentAlpha == D3DTOP_BLENDCURRENTALPHA &&
@@ -1480,7 +1483,8 @@ bool ensure_pipeline(State& s) noexcept {
 
 // Read the current game device, not a WARP fixture's manufactured state.
 // COM getters AddRef; local ComPtrs always release before reset/return.
-bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
+bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
+                          D3DVIEWPORT9& viewport,
                           GameFvfLayout& layout,
                           std::array<D3DMATRIX, 3>& transforms,
                           TextureCapture& capture, OutputCapture& output) noexcept {
@@ -1540,6 +1544,15 @@ bool supported_game_state(IDirect3DDevice9* game, D3DVIEWPORT9& viewport,
         stencil || depth || !clip || fog ||
         cullMode != D3DCULL_NONE || fillMode != D3DFILL_SOLID)
         return false;
+    // Lines with D3D9-specific AA/last-pixel behavior cannot be represented
+    // exactly by this single-sample native diagnostic target: fail closed.
+    if (topology == D3DPT_LINELIST || topology == D3DPT_LINESTRIP) {
+        DWORD lineAA = TRUE, lastPixel = FALSE;
+        if (FAILED(game->GetRenderState(D3DRS_ANTIALIASEDLINEENABLE, &lineAA)) ||
+            FAILED(game->GetRenderState(D3DRS_LASTPIXEL, &lastPixel)) ||
+            lineAA != FALSE || lastPixel != TRUE)
+            return false;
+    }
     const DWORD legalMask = D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
                             D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA;
     const DWORD visibleMask = D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
@@ -3027,7 +3040,11 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     const UINT stride = sizeof(NativeVertex), offset = 0;
     ID3D11Buffer* boundVB = vb.Get();
     ctx->IASetInputLayout(s.layout.Get());
-    ctx->IASetPrimitiveTopology(topology == D3DPT_TRIANGLESTRIP ?
+    ctx->IASetPrimitiveTopology(topology == D3DPT_LINELIST ?
+        D3D11_PRIMITIVE_TOPOLOGY_LINELIST :
+        topology == D3DPT_LINESTRIP ?
+        D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP :
+        topology == D3DPT_TRIANGLESTRIP ?
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP :
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     ctx->IASetVertexBuffers(0, 1, &boundVB, &stride, &offset);
@@ -3150,11 +3167,8 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
              const std::uint32_t* indices, UINT indexCount) noexcept {
     UINT expectedElements = 0;
     if (!diagnostic_enabled() || !game ||
-        (type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP &&
-         type != D3DPT_TRIANGLEFAN) ||
-        !game_primitive_element_count(type == D3DPT_TRIANGLESTRIP ||
-                                       type == D3DPT_TRIANGLEFAN,
-                                      primitives, expectedElements))
+        !game_native_primitive_element_count(static_cast<std::uint32_t>(type),
+                                             primitives, expectedElements))
         return;
     try {
         State& s = state();
@@ -3165,7 +3179,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         std::array<D3DMATRIX, 3> transforms{};
         TextureCapture capture{};
         OutputCapture output{};
-        if (!supported_game_state(game, vp, layout, transforms, capture, output)) return;
+        if (!supported_game_state(game, type, vp, layout, transforms, capture, output)) return;
         // Count every admitted state, including calls after this frame's one
         // native draw. Use that bounded population to rotate the next frame's
         // probe rather than sampling its same first triangle indefinitely.
@@ -3214,11 +3228,8 @@ bool diagnostic_enabled() noexcept {
 void observe_linear(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
                     UINT primitives, const void* vertices, UINT stride) noexcept {
     UINT nativeElements = 0;
-    if ((type != D3DPT_TRIANGLELIST && type != D3DPT_TRIANGLESTRIP &&
-         type != D3DPT_TRIANGLEFAN) ||
-        !game_primitive_element_count(type == D3DPT_TRIANGLESTRIP ||
-                                       type == D3DPT_TRIANGLEFAN,
-                                      primitives, nativeElements)) return;
+    if (!game_native_primitive_element_count(static_cast<std::uint32_t>(type),
+                                             primitives, nativeElements)) return;
     observe(game, type, primitives, vertices, stride, nativeElements, nullptr, 0);
 }
 

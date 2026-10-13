@@ -118,6 +118,11 @@ jobs:
       - name: Verify DX11 live PM CURRENT alpha dispatch 00643
         run: python tools/test_dx11_stage0_pm_current_dispatch_00643.py
 
+      - name: Verify DX11 live line Draw/DrawIndexed bridge 00644
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_live_line_draw_00644.py
+
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh

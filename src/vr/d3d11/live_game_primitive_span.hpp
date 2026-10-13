@@ -19,6 +19,29 @@ constexpr bool game_primitive_element_count(bool triangleStrip,
     return true;
 }
  
+// D3DPRIMITIVETYPE values (2..6) are defined by D3D9. Keep this span
+// validator independent of Windows headers for deterministic Linux probes.
+constexpr bool game_native_primitive_element_count(
+    std::uint32_t d3d9Type, std::uint32_t primitiveCount,
+    std::uint32_t& elements) noexcept {
+    switch (d3d9Type) {
+    case 2u: // D3DPT_LINELIST: P * 2 source elements
+    case 3u: { // D3DPT_LINESTRIP: P + 1 source elements
+        if (primitiveCount == 0u || primitiveCount > 512u) return false;
+        const std::uint64_t required = d3d9Type == 2u
+            ? static_cast<std::uint64_t>(primitiveCount) * 2u
+            : static_cast<std::uint64_t>(primitiveCount) + 1u;
+        if (required > 1536u) return false;
+        elements = static_cast<std::uint32_t>(required);
+        return true;
+    }
+    case 4u: return game_primitive_element_count(false, primitiveCount, elements); // TRIANGLELIST
+    case 5u: // TRIANGLESTRIP
+    case 6u: return game_primitive_element_count(true, primitiveCount, elements); // TRIANGLEFAN
+    default: return false; // POINTLIST and unknowns remain DX9Ex-only.
+    }
+}
+
 // D3D9 fan (P+2 source elements) becomes P*3 indexed D3D11 triangles.
 // Bounds and winding are preserved. On a bad source, output stays unchanged.
 inline bool game_fan_to_triangle_list(std::uint32_t primitiveCount,

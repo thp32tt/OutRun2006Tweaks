@@ -17,6 +17,24 @@ int main() {
     assert(!game_primitive_element_count(true, 0, elements) && elements == last);
     assert(!game_primitive_element_count(false, 513, elements) && elements == last);
     assert(!game_primitive_element_count(true, 513, elements) && elements == last);
+    using outrun::vr::dx11::live_game_frame::game_native_primitive_element_count;
+    assert(game_native_primitive_element_count(2, 1, elements) && elements == 2);
+    assert(game_native_primitive_element_count(3, 1, elements) && elements == 2);
+    assert(game_native_primitive_element_count(2, 512, elements) && elements == 1024);
+    assert(game_native_primitive_element_count(3, 512, elements) && elements == 513);
+    assert(game_native_primitive_element_count(4, 512, elements) && elements == 1536);
+    assert(game_native_primitive_element_count(5, 512, elements) && elements == 514);
+    assert(game_native_primitive_element_count(6, 512, elements) && elements == 514);
+    const auto retained = elements;
+    for (unsigned rejected : {0u, 1u, 7u, 0xffffffffu})
+        assert(!game_native_primitive_element_count(rejected, 1, elements) &&
+               elements == retained);
+    for (unsigned kind : {2u, 3u, 4u, 5u, 6u}) {
+        assert(!game_native_primitive_element_count(kind, 0, elements) &&
+               elements == retained);
+        assert(!game_native_primitive_element_count(kind, 513, elements) &&
+               elements == retained);
+    }
     using outrun::vr::dx11::live_game_frame::game_fan_to_triangle_list;
     std::vector<std::uint32_t> fan;
     assert(game_fan_to_triangle_list(1, nullptr, 0, 3, fan));

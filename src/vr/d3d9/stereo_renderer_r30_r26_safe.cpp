@@ -4401,13 +4401,14 @@ namespace OutRunVRStereo
             namespace live = outrun::vr::dx11::live_game_frame;
             UINT nativeElements = 0;
             if (!live::diagnostic_enabled() || !device ||
-                (topology != D3DPT_TRIANGLELIST &&
-                 topology != D3DPT_TRIANGLESTRIP &&
+                (topology != D3DPT_LINELIST &&
+                  topology != D3DPT_LINESTRIP &&
+                  topology != D3DPT_TRIANGLELIST &&
+                  topology != D3DPT_TRIANGLESTRIP &&
                   topology != D3DPT_TRIANGLEFAN) ||
-                !live::game_primitive_element_count(
-                    (topology == D3DPT_TRIANGLESTRIP ||
-                      topology == D3DPT_TRIANGLEFAN), primitiveCount,
-                    nativeElements)) return;
+                !live::game_native_primitive_element_count(
+                     static_cast<std::uint32_t>(topology),
+                     primitiveCount, nativeElements)) return;
             try {
                 IDirect3DVertexBuffer9* vb = nullptr;
                 UINT offset=0, stride=0;
@@ -4443,13 +4444,14 @@ namespace OutRunVRStereo
             namespace live = outrun::vr::dx11::live_game_frame;
             UINT nativeElements = 0;
             if (!live::diagnostic_enabled() || !device ||
-                (topology != D3DPT_TRIANGLELIST &&
-                 topology != D3DPT_TRIANGLESTRIP &&
+                (topology != D3DPT_LINELIST &&
+                  topology != D3DPT_LINESTRIP &&
+                  topology != D3DPT_TRIANGLELIST &&
+                  topology != D3DPT_TRIANGLESTRIP &&
                   topology != D3DPT_TRIANGLEFAN) ||
-                !live::game_primitive_element_count(
-                    (topology == D3DPT_TRIANGLESTRIP ||
-                      topology == D3DPT_TRIANGLEFAN), primitiveCount,
-                    nativeElements) || !numVertices) return;
+                !live::game_native_primitive_element_count(
+                     static_cast<std::uint32_t>(topology),
+                     primitiveCount, nativeElements) || !numVertices) return;
             try {
                 IDirect3DVertexBuffer9* vb = nullptr;
                 IDirect3DIndexBuffer9* ib = nullptr;
@@ -4533,15 +4535,16 @@ namespace OutRunVRStereo
             namespace live = outrun::vr::dx11::live_game_frame;
             UINT nativeElements = 0;
             if (!live::diagnostic_enabled() || !device ||
-                (topology != D3DPT_TRIANGLELIST &&
-                 topology != D3DPT_TRIANGLESTRIP &&
+                (topology != D3DPT_LINELIST &&
+                  topology != D3DPT_LINESTRIP &&
+                  topology != D3DPT_TRIANGLELIST &&
+                  topology != D3DPT_TRIANGLESTRIP &&
                   topology != D3DPT_TRIANGLEFAN) ||
                 !numVertices || numVertices > 1536 ||
                 minVertex > 1536u - numVertices ||
-                !live::game_primitive_element_count(
-                    (topology == D3DPT_TRIANGLESTRIP ||
-                      topology == D3DPT_TRIANGLEFAN), primitiveCount,
-                    nativeElements) ||
+                !live::game_native_primitive_element_count(
+                     static_cast<std::uint32_t>(topology),
+                     primitiveCount, nativeElements) ||
                 !indices || !vertices || stride < 16 || stride > 512 ||
                 (format != D3DFMT_INDEX16 && format != D3DFMT_INDEX32))
                 return;
