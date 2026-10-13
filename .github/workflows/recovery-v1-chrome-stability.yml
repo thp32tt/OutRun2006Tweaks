@@ -69,8 +69,15 @@ jobs:
           done
           test "$ok" = 1
           grep -q 'Chat Controller' /tmp/recovery-status.html
-          grep -q '"name": "A"' /tmp/recovery-status.html
-          if grep -Eq '"name": "(B|C1|C2)"' /tmp/recovery-status.html; then
-            echo 'A-only: extra role tab unexpectedly active'; exit 1
-          fi
+          python - <<'PY'
+          import html, json, re
+          from pathlib import Path
+          body = Path('/tmp/recovery-status.html').read_text(encoding='utf-8')
+          match = re.search(r'<h2>Registry</h2><pre>(.*?)</pre>', body, flags=re.S)
+          assert match, 'status page missing registry block'
+          registry = json.loads(html.unescape(match.group(1)))
+          assert [slot['name'] for slot in registry['slots']] == ['A'], registry['slots']
+          assert registry['next_slot'] == 0
+          print('PASS actual runtime status: A only; B/C1/C2 absent')
+          PY
           docker exec recovery-v1-smoke curl -fsS http://127.0.0.1:9222/json/version
