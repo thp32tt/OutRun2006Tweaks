@@ -11,9 +11,9 @@
   "work_key": "DX11:PM_CURRENT_ALPHA_CANONICALIZATION",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "a65391b7edbc97e9d707563fa236ed33bb5df74a",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -59,16 +59,35 @@
     "C0_RECOVER": "PASS: GitHub HEAD, AGENTS, execution policy, 00642 exact CI and source inspected",
     "C1_REVIEW": "PASS: 00641 and 00642 PM CURRENT branch conditions unreachable due to preceding unconditional operation normalization",
     "C2_IMPLEMENT": "PASS: C++ shader-dispatch fix plus positive/negative regression registration",
-    "C3_VALIDATE": "SOURCE_STATIC_PASS; exact-SHA CI pending",
-    "C4_COMMIT": "MATERIAL_COMMIT_PENDING",
+    "C3_VALIDATE": "PASS_EXACT_SHA: validation-bearing SHA 4d48fa4d1a26f9e4d5102187b5231d0e87ebd74a; Build #38326448382 SUCCESS, OpenXR VR architecture #38326448408 SUCCESS, HUD Inspector #38326448459 SUCCESS. No CI rerun.",
+    "C4_COMMIT": "PASS: validation-bearing material/repair commit 4d48fa4d1a26f9e4d5102187b5231d0e87ebd74a already committed; no new source modification; original material_result_sha preserved.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "AWAIT_EXACT_SHA_GATE"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: PASS_EXACT_SHA on 4d48fa4d1a26f9e4d5102187b5231d0e87ebd74a; HMD/Quest3/VDXR and gamepad runtime UNTESTED; C6 bookkeeping-only [skip ci]."
   },
   "packaging": {
     "status": "NOT_REQUIRED",
     "reason": "No proven HMD/real-game candidate"
   },
-  "next_action": "Check only the material-result exact-SHA Actions Gate; if success record distinct [skip ci] C6 result; HMD/Quest3/VDXR and input remain UNTESTED.",
-  "validation_bearing_result_sha": null,
-  "material_result_sha": null
+  "next_action": "C6 complete. Do not rerun CI or rescore this TASK_ID; HMD/Quest3/VDXR and gamepad runtime remain UNTESTED.",
+  "validation_bearing_result_sha": "4d48fa4d1a26f9e4d5102187b5231d0e87ebd74a",
+  "material_result_sha": null,
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "git_actions": {
+    "windows_build": {
+      "run_id": 38326448382,
+      "conclusion": "success",
+      "head_sha": "4d48fa4d1a26f9e4d5102187b5231d0e87ebd74a"
+    },
+    "openxr_architecture": {
+      "run_id": 38326448408,
+      "conclusion": "success",
+      "head_sha": "4d48fa4d1a26f9e4d5102187b5231d0e87ebd74a"
+    },
+    "hud_inspector": {
+      "run_id": 38326448459,
+      "conclusion": "success",
+      "head_sha": "4d48fa4d1a26f9e4d5102187b5231d0e87ebd74a"
+    }
+  },
+  "completed_at": "2026-10-13T00:38:12.686Z"
 }
