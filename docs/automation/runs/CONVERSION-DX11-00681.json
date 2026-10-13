@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2",
   "work_key": "DX11:MENU_RACE_NATIVE_DEVICE_COHERENCE",
   "feature_id": "MENU_RACE_NATIVE_DRAW_DEVICE_OWNERSHIP_AND_INPUT_SAFE_PRESENT",
-  "status": "AWAITING_EXACT_SHA_GATES",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA_5_OF_5",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -87,9 +87,9 @@
     ]
   },
   "acceptance_results": {
-    "real-game-native-device": "PENDING_EXACT_SHA",
-    "same-device-present-fallback": "PENDING_EXACT_SHA",
-    "exact-sha-device-gate": "PENDING_EXACT_SHA",
+    "real-game-native-device": "PASS_BUILD",
+    "same-device-present-fallback": "PASS_BUILD",
+    "exact-sha-device-gate": "PASS_EXACT_SHA",
     "quest3-gamepad-runtime": "NEED_HMD_TEST"
   },
   "changed_files": [
@@ -102,16 +102,59 @@
   ],
   "base_head_sha": "25f5a21803f640eb77d506751aba47c4dd96f3a2",
   "pipeline": {
-    "C0_RECOVER": "PASS confirmed 00680 exact-SHA 5 Gates; inspected latest GitHub HEAD",
-    "C1_REVIEW": "CONFIRMED missing D3D9 source device identity on native Draw batch/readback/Present",
-    "C2_IMPLEMENT": "PASS actual native draw and GPU-to-game Present integration changed",
-    "C3_VALIDATE": "DX11 Fast exact CI failed source test shape 4491cc33, corrected bd3dc04d; failed naive reset-negative a4edb812, corrected; next null-identity mutant lacked (0,0) assertion, added strict (0,0) rejection. Resume full five Gates at latest repair SHA.",
-    "C4_COMMIT": "Material implementation 4491cc33; CI-bound source/test repairs bd3dc04d, a4edb812 and current negative-test repair; all same TASK_ID.",
+    "C0_RECOVER": "PASS prior 00680 exact five Gates and branch HEAD",
+    "C1_REVIEW": "PASS identified cross-D3D9-device Draw and readback overlay risk",
+    "C2_IMPLEMENT": "PASS actual game Draw/DrawIndexed native GPU device ownership and safe original-D3D9 input/Present fallback",
+    "C3_VALIDATE": "PASS same-SHA native device provenance C++ positive/destructive tests plus exact 5/5 GitHub Actions Gates; source-shape/negative-test CI repairs preserved under same TASK_ID",
+    "C4_COMMIT": "PASS initial renderer material 4491cc33 and validation-bearing c26b22a6 (same TASK_ID)",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA_GATES"
+    "C6_STATE": "DONE_BUILD_VERIFIED; runtime Quest3/VDXR/gamepad NEED_HMD_TEST"
   },
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "next_action": "Revalidate exact same SHA of repair material-result chain across all five GitHub Gates; C6 record in separate [skip ci] commit after success. Hardware UNTESTED."
+  "material_result_sha": "4491cc33b90fd627b730b1c04e202af00d5b0f38",
+  "validation_bearing_result_sha": "c26b22a6cede2710032ecebd4cb1afcc2492b833",
+  "result_sha": "c26b22a6cede2710032ecebd4cb1afcc2492b833",
+  "next_action": "DONE_BUILD_VERIFIED. Quest3/VDXR menu->vehicle->race/gamepad remains NEED_HMD_TEST; controller selects a new independent feature and must not replay 00681.",
+  "exact_sha_workflow_gates": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38411742642,
+      "head_sha": "c26b22a6cede2710032ecebd4cb1afcc2492b833",
+      "result": "success",
+      "status": "completed",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38411742642"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38411741700,
+      "head_sha": "c26b22a6cede2710032ecebd4cb1afcc2492b833",
+      "result": "success",
+      "status": "completed",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38411741700"
+    },
+    {
+      "name": "Build",
+      "run_id": 38411756461,
+      "head_sha": "c26b22a6cede2710032ecebd4cb1afcc2492b833",
+      "result": "success",
+      "status": "completed",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38411756461"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38411757101,
+      "head_sha": "c26b22a6cede2710032ecebd4cb1afcc2492b833",
+      "result": "success",
+      "status": "completed",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38411757101"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38411757252,
+      "head_sha": "c26b22a6cede2710032ecebd4cb1afcc2492b833",
+      "result": "success",
+      "status": "completed",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38411757252"
+    }
+  ],
+  "verified_utc": "2026-10-13T14:33:37.856Z"
 }
