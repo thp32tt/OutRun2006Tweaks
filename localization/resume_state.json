@@ -16878,7 +16878,7 @@
     "starburst_english_reference_sha256": "73393bc327c72e25f8fdb3db2b1a457897fd6559c5053241da5eb2f771692f4e",
     "pink_balloon_english_reference_sha256": "234196c217f4282e410eb91ab35ef876d652a2bce25f44fd16acf1afb47729fc",
     "translation": "Total Rank -> 종합 랭킹",
-    "existing_producer_owner": "B historical producer; C1 ownership not reassigned",
+    "existing_producer_owner": "B historical producer; PJR-004 P1 explicit current owner_lane A; C1 ownership not reassigned",
     "source_canonical_DDS_check": "NOT_VERIFIED",
     "actual_chatgpt_image_media_attachment": "SOURCE_REFERENCE_NOT_BOUND",
     "generation_id": null,
