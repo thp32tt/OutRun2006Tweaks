@@ -21,37 +21,42 @@ def patch(source):
     source = replace_once(
         source,
         'LOCALIZATION_SLOT_NAMES = ("A", "B", "C1", "C2")',
-        'LOCALIZATION_SLOT_NAMES = ("A", "B", "C1")',
+        'LOCALIZATION_SLOT_NAMES = ("A",)',
         "role-tab-list",
     )
     source = replace_once(
         source,
         'if CONTROLLER_MODE == "localization" and CHAT_SLOTS != 4:\n'
         '    raise ValueError("Recovery localization requires CHAT_SLOTS=4 (A/B/C1/C2)")',
-        'if CONTROLLER_MODE == "localization" and CHAT_SLOTS != 3:\n'
-        '    raise ValueError("Recovery localization requires CHAT_SLOTS=3 (A/B/C1)")',
+        'if CONTROLLER_MODE == "localization" and CHAT_SLOTS != 1:\n'
+        '    raise ValueError("Recovery A-only mode requires CHAT_SLOTS=1")',
         "slot-count",
     )
     source = replace_once(
         source,
         'SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "C1", 20: "C2",\n'
         '                                30: "B", 40: "C1", 50: "C2"}',
-        '''SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "C1", 30: "B", 40: "C1"}
-# OUTRUN_SINGLE_A_SMOKE_V1: a single authorized A task, no B/C1 dispatch.
-OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SMOKE_TASK_ID", "").strip()
-if OUTRUN_A_SINGLE_SMOKE_TASK_ID:
-    SCHEDULED_LOCALIZATION_LANES = {0: "A"}''',
+        '''SCHEDULED_LOCALIZATION_LANES = {0: "A"}
+# A-only source-folder testing: manifest selects any valid A task ID.
+OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SMOKE_TASK_ID", "").strip()''',
         "minute-role-schedule",
     )
     source = replace_once(
         source,
         '        unexpected = set(existing) - set(LOCALIZATION_SLOT_NAMES)',
-        '''        # Preserve retired C2's exact checkpoint without re-opening a C2 tab.
-        if "C2" in existing:
-            retired = STATE_DIR / "retired_C2_slot_before_png_upload_v1.json"
-            if not retired.exists():
-                retired.write_text(json.dumps(asdict(existing["C2"]), ensure_ascii=False, indent=2), encoding="utf-8")
-            del existing["C2"]
+        '''        # Back up all inactive lanes before dropping their live registry slots.
+        # Never overwrite a different historical record without operator review.
+        for retired_name in ("B", "C1", "C2"):
+            if retired_name not in existing:
+                continue
+            retired = STATE_DIR / ("retired_" + retired_name + "_slot_before_a_only_20261013.json")
+            payload = json.dumps(asdict(existing[retired_name]), ensure_ascii=False, indent=2)
+            if retired.exists():
+                if retired.read_text(encoding="utf-8") != payload:
+                    raise ValueError("Conflicting retired slot backup: " + str(retired))
+            else:
+                retired.write_text(payload, encoding="utf-8")
+            del existing[retired_name]
             changed = True
         unexpected = set(existing) - set(LOCALIZATION_SLOT_NAMES)''',
         "retired-c2-checkpoint",
@@ -79,7 +84,7 @@ if OUTRUN_A_SINGLE_SMOKE_TASK_ID:
         '        prompt = prompt_for_slot(slot, "watchdog")',
         '''        # The watchdog must never silently send a producer text-only prompt.
         # A/B are single-asset source-bound jobs; only the explicit scheduler sends.
-        if CONTROLLER_MODE == "localization" and (slot.name in ("A", "B") or OUTRUN_A_SINGLE_SMOKE_TASK_ID):
+        if CONTROLLER_MODE == "localization":
             continue
         prompt = prompt_for_slot(slot, "watchdog")''',
         "producer-watchdog",
@@ -89,11 +94,11 @@ if OUTRUN_A_SINGLE_SMOKE_TASK_ID:
         '    send_result = await send_message(page, prompt)\n'
         '    if send_result != "sent":',
         '''    # OUTRUN_PNG_UPLOAD_V1: per-role SHA-pinned source manifest, fail closed.
-    # Suppress every scheduled non-A lane in one-A pilot mode.
-    if OUTRUN_A_SINGLE_SMOKE_TASK_ID and slot.name != "A":
+    # Any non-A task is prohibited regardless of the pilot task ID.
+    if CONTROLLER_MODE == "localization" and slot.name != "A":
         return
     png_binding = None
-    if CONTROLLER_MODE == "localization" and slot.name in ("A", "B"):
+    if CONTROLLER_MODE == "localization" and slot.name == "A":
         png_binding, png_reason = load_binding(slot.name)
         if png_reason is not None:
             send_result = "SOURCE_REFERENCE_NOT_BOUND:" + png_reason

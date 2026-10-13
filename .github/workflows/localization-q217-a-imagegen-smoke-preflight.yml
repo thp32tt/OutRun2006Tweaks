@@ -30,9 +30,11 @@ jobs:
           result=mod.patch(src)
           assert mod.patch(result)==result, "patch must be idempotent"
           ast.parse(result)
-          assert 'LOCALIZATION_SLOT_NAMES = ("A", "B", "C1")' in result
+          assert 'LOCALIZATION_SLOT_NAMES = ("A",)' in result
           assert 'SCHEDULED_LOCALIZATION_LANES = {0: "A"}' in result
-          assert "OUTRUN_A_SINGLE_SMOKE_TASK_ID and slot.name != \"A\"" in result
+          assert 'SCHEDULED_LOCALIZATION_LANES = {0: "A", 10:' not in result
+          assert '("B", "C1", "C2")' in result, "ensure retired slot backup covers all disabled roles"
+          assert 'if CONTROLLER_MODE == "localization" and slot.name != "A":' in result
           assert "ATTACHED_PREVIEW_CONFIRMED" in result
           assert "SOURCE_REFERENCE_NOT_BOUND" in result
           assert "SUBMISSION_UNVERIFIED_DO_NOT_AUTO_RETRY" in result
@@ -44,7 +46,7 @@ jobs:
           svc=c["services"]["outrun-chat-controller-localization-recovery"]
           env=svc["environment"]
           assert env["AUTO_SEND"]=="true" and env["SCHEDULE_MINUTES"]=="0"
-          assert env["CHAT_SLOTS"]=="3"
+          assert env["CHAT_SLOTS"]=="1"
           assert env["OUTRUN_A_SINGLE_SMOKE_TASK_ID"]==""
           assert env["WATCHDOG_ENABLED"]=="false"
           assert svc["pull_policy"]=="build"

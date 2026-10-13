@@ -11,7 +11,7 @@
 ## Runtime configuration
 
 - A-only schedule at :00 (KST): `AUTO_SEND=true`, `SCHEDULE_MINUTES=0`, `WATCHDOG_ENABLED=false`.
-- `CHAT_SLOTS=3` remains to satisfy the existing patched controller; it does *not* schedule B/C1. C2 is inactive.
+- `CHAT_SLOTS=1`: one ChatGPT A tab only. B, C1 and C2 **never open tabs, run watchdog tasks, or dispatch scheduled prompts**. Existing inactive slot records are preserved separately under `/data/state/retired_{B,C1,C2}_slot_before_a_only_20261013.json` if present; a conflicting backup stops startup rather than overwriting history.
 - `OUTRUN_A_SINGLE_SMOKE_TASK_ID=""` removes Q217 task-ID pinning. The next eligible A task is read from a source manifest, not hardcoded.
 - Host `/home/chatgpt-runner2/work/image-src` is mounted RW as `/data/imagegen` with `create_host_path=false`. The directory exists on N100. The existing `/data` and `/logs` volumes, noVNC `6082`, status `8788` and VR controller are not changed.
 

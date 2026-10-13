@@ -15,9 +15,9 @@ services:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
       AUTO_SEND: "true"
-      # A-only trial at :00. B/C1/C2 remain unscheduled.
+      # One A tab only; B/C1/C2 have no tab, scheduler, or background send.
       SCHEDULE_MINUTES: "0"
-      CHAT_SLOTS: "3"
+      CHAT_SLOTS: "1"
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: "" # No Q217 pin; pending_A.json selects the task.
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"

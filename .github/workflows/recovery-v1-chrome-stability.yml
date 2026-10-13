@@ -34,7 +34,7 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           x=Path('tools/chat-controller/localization-recovery-v1/docker-compose.yml').read_text()
-          assert 'CHAT_SLOTS: "3"' in x
+          assert 'CHAT_SLOTS: "1"' in x
           assert 'SCHEDULE_MINUTES: "0"' in x
           assert 'OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""' in x
           assert 'source: /home/chatgpt-runner2/work/image-src' in x
@@ -57,7 +57,7 @@ jobs:
           set -euo pipefail
           docker run -d --name recovery-v1-smoke \
             -e AUTO_SEND=false -e REQUIRE_PROJECT_URL=false \
-            -e CHAT_SLOTS=3 -e SCHEDULE_MINUTES=0 \
+            -e CHAT_SLOTS=1 -e SCHEDULE_MINUTES=0 \
             recovery-v1-chrome:test
           trap 'docker logs recovery-v1-smoke; docker rm -f recovery-v1-smoke >/dev/null 2>&1 || true' EXIT
           ok=0
@@ -69,6 +69,8 @@ jobs:
           done
           test "$ok" = 1
           grep -q 'Chat Controller' /tmp/recovery-status.html
-          grep -q 'C1' /tmp/recovery-status.html
-          if grep -q 'C2' /tmp/recovery-status.html; then echo 'retired C2 tab unexpectedly active'; exit 1; fi
+          grep -q '"name": "A"' /tmp/recovery-status.html
+          if grep -Eq '"name": "(B|C1|C2)"' /tmp/recovery-status.html; then
+            echo 'A-only: extra role tab unexpectedly active'; exit 1
+          fi
           docker exec recovery-v1-smoke curl -fsS http://127.0.0.1:9222/json/version
