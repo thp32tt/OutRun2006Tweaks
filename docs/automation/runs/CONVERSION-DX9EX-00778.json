@@ -11,13 +11,13 @@
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "work_key": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C4_SOURCE_AND_CONTRACT_REPAIRED_C5_EXACT_SHA_PENDING",
-  "feature_status": "BUILD_PENDING_HMD_UNTESTED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_status": "BUILD_VERIFIED_HMD_UNTESTED",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00778]",
   "material_result_sha": "4f9a0b84bc1c19759e5d05eca3022a1c78312ca3",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "validation_bearing_result_sha": "d0cbce526d96eae3f2dc28453b305d9b679ba12f",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_status": "NEED_HMD_TEST",
   "score_delta": 0,
@@ -93,5 +93,5 @@
     "tools/verify_vr_visual_composition_p0.py",
     "docs/automation/runs/CONVERSION-DX9EX-00778.json"
   ],
-  "validation_notes": "Previous exact HEAD 4f9a0b84bc1c19759e5d05eca3022a1c78312ca3 DX9Ex Active policy job 115311263959 failed (missing feature_contract.feature_id/symptom_id/subcomponents); new material C++ queue separation and regression plus canonical contract correct that failure; awaiting new exact-SHA CI. No HMD verification."
+  "validation_notes": "Previous exact HEAD 4f9a0b84bc1c19759e5d05eca3022a1c78312ca3 DX9Ex Active policy job 115311263959 failed (missing feature_contract.feature_id/symptom_id/subcomponents); new material C++ queue separation and regression plus canonical contract correct that failure; exact validation-bearing SHA d0cbce526d96eae3f2dc28453b305d9b679ba12f has successful GitHub CI per C6 dispatch; no HMD verification.\nC6 bookkeeping only: PASS_EXACT_SHA at d0cbce526d96eae3f2dc28453b305d9b679ba12f; resolved hold TERMINAL_STATUS_NOT_COMPLETE. No source change, CI rerun, HMD test, or new score."
 }
