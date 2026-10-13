@@ -31,8 +31,8 @@ def connected(b, c, h, r):
         "live_game_frame::observe_scene_boundary(device)" in rt,
         "if (!IsGameDevice(device) || InternalStereoPass)" in clear,
         "live_game_frame::observe_scene_boundary(device)" in clear,
-        clear.index("live_game_frame::observe_scene_boundary(device)") <
-            clear.index("++R9ClearCalls;"),
+        0 <= clear.find("live_game_frame::observe_scene_boundary(device)") <
+            clear.find("++R9ClearCalls;"),
         "void observe_scene_boundary(IDirect3DDevice9* gameDevice) noexcept;" in h,
         "if (!diagnostic_enabled() || !game) return;" in event,
         "s.sourceGameDevice != reinterpret_cast<std::uintptr_t>(game)" in event,
