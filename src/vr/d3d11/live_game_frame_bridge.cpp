@@ -12,6 +12,7 @@
 #include "live_game_luminance_texture.hpp"
 #include "live_game_rgb24_texture.hpp"
 #include "live_game_rgba_texture.hpp"
+#include "live_game_render_target_readback.hpp"
 #include "live_game_10bit_texture.hpp"
 #include "live_game_extended_luminance_texture.hpp"
 #include "live_game_rg16_texture.hpp"
@@ -3037,10 +3038,20 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     if (FAILED(capture.texture->GetLevelDesc(0, &base)) ||
         base.Width == 0 || base.Height == 0 ||
         base.Width > 1024 || base.Height > 1024) return false;
+    // The game can render menu, car and race textures into more than one
+    // color layout. Snapshot the real D3D9 RT before converting to a native
+    // BGRA8 SRV; never reinterpret RGBA or packed 10-bit pixels as BGRA.
+    const native_rt_readback::Layout rtLayout =
+        base.Format == D3DFMT_A8R8G8B8 ? native_rt_readback::Layout::argb8 :
+        base.Format == D3DFMT_X8R8G8B8 ? native_rt_readback::Layout::xrgb8 :
+        base.Format == D3DFMT_A8B8G8R8 ? native_rt_readback::Layout::a8b8g8r8 :
+        base.Format == D3DFMT_X8B8G8R8 ? native_rt_readback::Layout::x8b8g8r8 :
+        base.Format == D3DFMT_A2R10G10B10 ? native_rt_readback::Layout::a2r10g10b10 :
+        base.Format == D3DFMT_A2B10G10R10 ? native_rt_readback::Layout::a2b10g10r10 :
+                                              native_rt_readback::Layout::unsupported;
     const bool gpuRenderTarget = base.Pool == D3DPOOL_DEFAULT &&
         (base.Usage & D3DUSAGE_RENDERTARGET) != 0u &&
-        (base.Format == D3DFMT_A8R8G8B8 ||
-         base.Format == D3DFMT_X8R8G8B8);
+        native_rt_readback::sampleable(rtLayout, capture.srgbTexture);
     if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;
     const bool usesMips = capture.mipFilter == D3DTEXF_POINT ||
                           capture.mipFilter == D3DTEXF_LINEAR;
@@ -3264,7 +3275,15 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                 auto* destination = pixels.data() + static_cast<std::size_t>(y) * uploadPitch;
                 if (a8p8)
                     destination = pixels.data() + static_cast<std::size_t>(y) * a8p8UploadPitch;
-                if (packed16)
+                if (gpuRenderTarget) {
+                    // Decode the readback's exact D3D9 color layout before
+                    // binding this real game-authored texture in native Draw.
+                    if (!native_rt_readback::unpack_row(
+                            source, destination, desc.Width, rtLayout)) {
+                        readbackSurface->UnlockRect();
+                        return false;
+                    }
+                } else if (packed16)
                     packed_texture16::unpack_row(source, destination, desc.Width, packing);
                 else if (luminance)
                     luminance_texture::unpack_row(source, destination, desc.Width, luminanceLayout);
