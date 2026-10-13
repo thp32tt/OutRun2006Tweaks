@@ -108,6 +108,10 @@ assert validate_task(r175_new, p), 'R175 ownership takeover without evidence mus
 feature = copy.deepcopy(frame)
 feature["task_id"] = "CONVERSION-DX11-00672"
 feature["feature_id"] = "DX11-INTEGRATED-TEXTURE-MIRROR"
+# The positive terminal fixture includes a substantive game renderer change;
+# negative contract mutations must fail for their own reason, not merely for
+# missing source work from the inherited pre-feature test fixture.
+feature["changed_files"] = ["src/vr/d3d11/live_game_frame_bridge.cpp"]
 feature["feature_contract"] = {
     "feature_id": "DX11-INTEGRATED-TEXTURE-MIRROR",
     "goal": "Integrate the real game texture family through native game-frame draws and fallbacks",
