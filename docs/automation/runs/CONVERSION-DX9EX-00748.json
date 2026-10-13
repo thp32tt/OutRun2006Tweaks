@@ -1,0 +1,82 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00748",
+  "production_id": "CONVERSION-DX9EX-00748",
+  "event_id": "CONVERSION-DX9EX-00748-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00748",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "54019cc5a853180960849ab8931d727a529d78eb",
+  "material_result_sha": "54019cc5a853180960849ab8931d727a529d78eb",
+  "validation_bearing_result_sha": "54019cc5a853180960849ab8931d727a529d78eb",
+  "result_sha": "54019cc5a853180960849ab8931d727a529d78eb",
+  "material_commits": [
+    "54019cc5a853180960849ab8931d727a529d78eb"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 P0-A: ensure fixed-function 4:3 menu black rails stay solid black despite inherited fog or wireframe state, preserving the next F11/game draws.",
+    "completed_scope": "D3DEndScene snapshots D3DRS_FOGENABLE and D3DRS_FILLMODE together with its existing alpha/scissor/stencil evidence; overrides with fog-free solid fill for both bar triangles and restores both exact prior values before ImGui/next frame. Six new destructive negative regressions were added to the existing menu letterbox verifier.",
+    "remaining_acceptance": [
+      "The overall Issue #119 integrated responsive HUD/menu/ESC/F11 feature is IN_PROGRESS; this is an independent source/build checkpoint, not optical acceptance.",
+      "Quest 3/VDXR matching-build inspection is needed to verify UI legibility, menu aspect, HUD optics and no stereo regressions."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_POLICY_6_DESTRUCTIVE_MUTANTS",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "dx9ex_full_chain": "SUCCESS_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_EXACT_SHA",
+    "hud_inspector": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38348933274,
+      "head_sha": "54019cc5a853180960849ab8931d727a529d78eb",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38348933317,
+      "head_sha": "54019cc5a853180960849ab8931d727a529d78eb",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38348933331,
+      "head_sha": "54019cc5a853180960849ab8931d727a529d78eb",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38348933312,
+      "head_sha": "54019cc5a853180960849ab8931d727a529d78eb",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "score_delta": 0,
+  "score_reason": "Issue #119 remains one integrated responsive-UI feature: 00748 is a code/build checkpoint, not whole-feature completion; no duplicate point.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "This post-validation bookkeeping commit is [skip ci] only. All required Actions succeeded at original exact material/validation-bearing result SHA. The current bookkeeping HEAD is not the RESULT_SHA or CI validation target."
+}
