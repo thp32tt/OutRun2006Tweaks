@@ -219,7 +219,7 @@ print("PASS exact peripheral glyph legibility floor, aspect parity and 4 destruc
 
 # Issue #119 independent ESC/pause menu: do not inherit the gameplay HudScale.
 # Pin the original game state AND its generic 2D semantic producer boundary.
-scope_begin = code.index("float R30HudScopeScale() noexcept")
+scope_begin = code.index("bool R30IsPauseMenuElement() noexcept")
 scope_end = code.index("void R30HudContainScale(", scope_begin)
 scope = code[scope_begin:scope_end]
 for token in (
@@ -227,7 +227,8 @@ for token in (
     "ExternalOverlaySemanticDepth == 0 &&",
     "Game::current_mode &&",
     "*Game::current_mode == GameState::STATE_SMPAUSEMENU",
-    "R30IsPauseMenuExactArrow()) &&",
+    "R30IsPauseMenuExactArrow());",
+    "if (R30IsPauseMenuElement() &&",
     "Settings::VRPauseMenuScale.get()",
     "std::clamp(readable,",
     "0.55f, 1.50f",
@@ -235,7 +236,7 @@ for token in (
 ):
     assert token in scope, token
 assert scope.index("return 1.0f;") < scope.index(
-    "*Game::current_mode == GameState::STATE_SMPAUSEMENU") < scope.index(
+    "if (R30IsPauseMenuElement() &&") < scope.index(
     "return R30HudScaleValue();")
 assert '#include "game_addrs.hpp"' in code
 assert 'extern Setting<float> VRPauseMenuScale;' in code
@@ -279,7 +280,7 @@ for bad, good in (
      "ExternalOverlaySemanticDepth != 0 &&"),
     ("*Game::current_mode == GameState::STATE_SMPAUSEMENU",
      "*Game::current_mode == GameState::STATE_GAME"),
-    ("R30IsPauseMenuExactArrow()) &&", "R30IsPauseMenuExactArrow()) ||"),
+    ("R30IsPauseMenuExactArrow());", "R30IsPauseMenuExactArrow() || true);"),
     ("std::clamp(readable,",
      "std::clamp(Settings::VRHudScale.get(),"),
 ):
@@ -288,7 +289,7 @@ for bad, good in (
     assert not all(token in mutant for token in (
         "ExternalOverlaySemanticDepth == 0 &&",
         "*Game::current_mode == GameState::STATE_SMPAUSEMENU",
-        "R30IsPauseMenuExactArrow()) &&",
+        "R30IsPauseMenuExactArrow());",
         "std::clamp(readable,"))
 print("PASS exact ESC pause ownership, F11/HUD/world negatives and size/aspect fixtures")
 
@@ -317,13 +318,14 @@ assert "Module::exe_ptr(addr), ExactScreenHud_putClipSprite" in producer
 assert "ProducerToken::ExactScreenHudClipSprite" in producer
 
 pause_end = code.index("float R30HudScopeScale() noexcept", pause_begin)
-pause_func = code[pause_begin:pause_end]
+pause_func = code[code.index("bool R30IsPauseMenuElement() noexcept"):pause_end]
 for token in (
-    "ExternalOverlaySemanticDepth != 0 ||",
-    "!Game::current_mode ||",
-    "*Game::current_mode != GameState::STATE_SMPAUSEMENU ||",
-    "RenderScope::ScreenOverlay2D &&",
-    "!R30IsPauseMenuExactArrow()))",
+    "ExternalOverlaySemanticDepth == 0 &&",
+    "Game::current_mode &&",
+    "*Game::current_mode == GameState::STATE_SMPAUSEMENU &&",
+    "RenderScope::ScreenOverlay2D ||",
+    "R30IsPauseMenuExactArrow());",
+    "if (!R30IsPauseMenuElement())",
     "Settings::VRPauseMenuVerticalOffset.get()",
     "!std::isfinite(fraction)",
     "std::clamp(fraction, -0.25f, 0.25f)",
@@ -340,8 +342,10 @@ shader_end = code.index("template <typename ActualDraw>", shader_begin)
 shader = code[shader_begin:shader_end]
 assert fixed.count("height * R30PauseMenuVerticalFraction();") == 1
 assert fixed.index("height * R30PauseMenuVerticalFraction();") < fixed.index("for (UINT visit = 0;")
-assert shader.count("clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();") == 1
-assert shader.index("clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();") > shader.index("screenKind != R30ScreenSpaceKind::Hud2D")
+assert shader.count("clipCorrection._42 = pauseVertical.offset[eye] -") == 1
+assert shader.count("2.0f * R30PauseMenuVerticalFraction();") == 1
+assert "hudScaleY * pauseVertical.scale[eye];" in shader
+assert shader.index("clipCorrection._42 = pauseVertical.offset[eye] -") > shader.index("screenKind != R30ScreenSpaceKind::Hud2D")
 # The previously missing independent-eye XYZRHW fallback must apply the
 # identical pause-only signed fraction. Test its owner, not a detached token:
 # a fused-path rejection or Reset must not jump the ESC menu upward.
@@ -354,9 +358,15 @@ fallback_hoist = (
     "                2.0f * R30PauseMenuVerticalFraction();"
 )
 assert fallback.count(fallback_hoist) == 1
-assert fallback.count("correctedY = hudScaleY * ndcY - pauseNdcOffset;") == 1
+fallback_y_affine = (
+    "correctedY =\n"
+    "                        hudScaleY * pauseVertical.scale[eye] * ndcY +\n"
+    "                        pauseVertical.offset[eye] - pauseNdcOffset;"
+)
+assert fallback.count(fallback_y_affine) == 1
+assert fallback.count("R30PauseMenuVerticalAffine(state.stereo);") == 1
 assert fallback.index(fallback_hoist) < fallback.index(
-    "correctedY = hudScaleY * ndcY - pauseNdcOffset;")
+    fallback_y_affine)
 assert "correctedY = hudScaleY * ndcY;" not in fallback
 assert "state.worldEffect ? 0.0f" in fallback
 # No new pause transform may spill into smoke/sand or unrelated render passes.
@@ -370,13 +380,14 @@ for old,new in (
     ("2.0f * R30PauseMenuVerticalFraction();",
      "0.0f * R30PauseMenuVerticalFraction();"),
     ("state.worldEffect ? 0.0f :", "state.worldEffect ? 1.0f :"),
-    ("correctedY = hudScaleY * ndcY - pauseNdcOffset;",
-     "correctedY = hudScaleY * ndcY + pauseNdcOffset;"),
+    (fallback_y_affine, "correctedY = hudScaleY * ndcY + pauseNdcOffset;"),
+    ("R30PauseMenuVerticalAffine(state.stereo);",
+     "OutRunVrPauseEye::VerticalAffine{};"),
 ):
     mutant = fallback.replace(old,new,1)
     assert mutant != fallback
     assert not (fallback_hoist in mutant and
-                "correctedY = hudScaleY * ndcY - pauseNdcOffset;" in mutant)
+                fallback_y_affine in mutant)
 def pause_fraction(state, semantic, external, fraction, producer=None):
     owns = semantic == "overlay" or (
         semantic == "hud" and producer == "exact_menu_arrow")
@@ -401,6 +412,17 @@ for width,height in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
             shader_y = height * (1. - (ndc_y-2.*fraction))*.5
             assert abs(fast_y-fallback_y) < 1e-6
             assert abs(fallback_y-shader_y) < 1e-6
+            # New per-eye optical vertical maps must still agree across
+            # paired/fallback/shader routes, not merely at neutral FOV.
+            for eye_scale, eye_offset in ((0.96, -0.08), (1.04, 0.12)):
+                corrected = eye_scale*ndc_y + eye_offset - 2.*fraction
+                fallback_optical = height*(1. - corrected)*.5
+                paired_optical = eye_scale*source_y + (
+                    (1.-eye_scale)*height*.5
+                    - eye_offset*height*.5 + fraction*height)
+                shader_optical = height*(1. - corrected)*.5
+                assert abs(fallback_optical-paired_optical) < 1e-6
+                assert abs(paired_optical-shader_optical) < 1e-6
             # World/F11/gameplay/GOAL are non-pause semantic owners.
             for context in (("game","overlay",False),("pause","hud",False),
                             ("pause","world",False),("pause","overlay",True)):
@@ -419,28 +441,28 @@ for width, height in ((1024, 768), (1920, 1080), (3440, 1440), (2496, 2688)):
 # Destructive controls must reject wrong scope, inverted shader sign and a
 # missing fixed-function offset, rather than passing a detached static test.
 for bad, good in (
-    ("*Game::current_mode != GameState::STATE_SMPAUSEMENU ||",
-     "*Game::current_mode != GameState::STATE_GAME ||"),
-    ("ExternalOverlaySemanticDepth != 0 ||",
-     "ExternalOverlaySemanticDepth == 0 ||"),
+    ("*Game::current_mode == GameState::STATE_SMPAUSEMENU &&",
+     "*Game::current_mode == GameState::STATE_GAME &&"),
+    ("ExternalOverlaySemanticDepth == 0 &&",
+     "ExternalOverlaySemanticDepth != 0 &&"),
     ("std::clamp(fraction, -0.25f, 0.25f)",
      "std::clamp(fraction, -1.0f, 1.0f)"),
 ):
     assert pause_func.count(bad) == 1
     mutant = pause_func.replace(bad, good, 1)
     assert not all(t in mutant for t in (
-        "*Game::current_mode != GameState::STATE_SMPAUSEMENU ||",
-        "ExternalOverlaySemanticDepth != 0 ||",
+        "*Game::current_mode == GameState::STATE_SMPAUSEMENU &&",
+        "ExternalOverlaySemanticDepth == 0 &&",
         "std::clamp(fraction, -0.25f, 0.25f)"))
 for bad, good in (
     ("height * R30PauseMenuVerticalFraction();", "height * 0.0f;"),
-    ("clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();",
-     "clipCorrection._42 = 2.0f * R30PauseMenuVerticalFraction();"),
+    ("clipCorrection._42 = pauseVertical.offset[eye] -",
+     "clipCorrection._42 = pauseVertical.offset[eye] +"),
 ):
     assert (fixed + shader).count(bad) == 1
     mutant = (fixed + shader).replace(bad, good, 1)
     assert not (("height * R30PauseMenuVerticalFraction();" in mutant) and
-                ("clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();" in mutant))
+                ("clipCorrection._42 = pauseVertical.offset[eye] -" in mutant))
 print("PASS pause-only vertical placement, 4 source/eye resolutions, exact ownership and 5 destructive controls")
 
 # Issue #119: exact producer group must remain INSIDE the visible region

@@ -34,7 +34,11 @@ def validate(source: str) -> None:
     # *uniform* source-HUD aspect containment. Do not use worldEye scaling for
     # the HUD or change its Z/RHW/depth.
     assert "correctedX =\n                        hudScaleX * state.eyeScale[eye] * ndcX + state.eyeOffset[eye];" in affine
-    assert "correctedY = hudScaleY * ndcY - pauseNdcOffset;" in affine
+    assert ("correctedY =\n                        "
+            "hudScaleY * pauseVertical.scale[eye] * ndcY +\n"
+            "                        pauseVertical.offset[eye] - pauseNdcOffset;") in affine
+    assert "const auto pauseVertical = state.worldEffect" in affine
+    assert "R30PauseMenuVerticalAffine(state.stereo);" in affine
     # Pause offset must stay draw-local and outside the HUD vertex loop.
     assert affine.count("const float pauseNdcOffset =") == 1
     assert "state.worldEffect ? 0.0f :" in affine
@@ -74,14 +78,20 @@ def validate_hud_pair_structure(source: str) -> None:
         "state.eyeOffset[0] * halfWidth",
         "state.eyeOffset[1] * halfWidth",
         "(1.0f - hudScaleY) * (y0 + halfHeight)",
+        "const auto pauseVertical =",
+        "R30PauseMenuVerticalAffine(state.stereo);",
+        "const float eyeScaleY[2]{",
+        "const float eyeBiasY[2]{",
+        "eyeScaleY[0] * src[1] + eyeBiasY[0] + edgeYBias;",
+        "eyeScaleY[1] * src[1] + eyeBiasY[1] + edgeYBias;",
         "if (usedMask && !(*usedMask)[i])",
         "!std::isfinite(src[2]) || !std::isfinite(src[3])",
         "!std::isfinite(transformedLeftX)",
         "!std::isfinite(transformedRightX)",
         "leftDst[0] = transformedLeftX;",
-        "leftDst[1] = transformedY;",
+        "leftDst[1] = transformedLeftY;",
         "rightDst[0] = transformedRightX;",
-        "rightDst[1] = transformedY;",
+        "rightDst[1] = transformedRightY;",
     ):
         assert required in part, required
     assert part.count("R30HudContainScale(") == 1
@@ -112,7 +122,12 @@ def validate_hud_pair(source: str) -> None:
         ("hudScaleX * state.eyeScale[1]", "hudScaleX * state.eyeScale[0]"),
         ("state.eyeOffset[1] * halfWidth", "state.eyeOffset[0] * halfWidth"),
         ("rightDst[0] = transformedRightX;", "rightDst[0] = transformedLeftX;"),
-        ("rightDst[1] = transformedY;", "rightDst[1] = src[1];"),
+        ("rightDst[1] = transformedRightY;", "rightDst[1] = src[1];"),
+        ("leftDst[1] = transformedLeftY;", "leftDst[1] = transformedRightY;"),
+        ("eyeScaleY[0] * src[1] + eyeBiasY[0] + edgeYBias;",
+         "hudScaleY * src[1] + eyeBiasY[0] + edgeYBias;"),
+        ("eyeScaleY[1] * src[1] + eyeBiasY[1] + edgeYBias;",
+         "hudScaleY * src[1] + eyeBiasY[1] + edgeYBias;"),
         ("if (usedMask && !(*usedMask)[i])", "if (false)"),
         ("!std::isfinite(src[2]) || !std::isfinite(src[3])", "!std::isfinite(src[2])"),
         ("if (!sparseCopied)", "if (false)"),
@@ -153,7 +168,7 @@ def validate_hud_pair(source: str) -> None:
             newx = f32(f32(scales[i] * x) + bias)
             worst = max(worst, abs(oldx - newx))
     assert worst < .008, "HUD affine float32 pixel error: " + str(worst)
-    print("PASS R30 HUD binocular affine: 16000 float32 cases, 9 negative mutants, max %.6f px" % worst)
+    print("PASS R30 HUD binocular affine: 16000 float32 cases, 12 negative mutants, max %.6f px" % worst)
 
 
 def negative_mutations(source: str) -> int:
@@ -175,7 +190,7 @@ def negative_mutations(source: str) -> int:
             "state.eyeScale[eye] * ndcX",
         ),
         (
-            "correctedY = hudScaleY * ndcY - pauseNdcOffset;",
+            "correctedY =\n                        hudScaleY * pauseVertical.scale[eye] * ndcY +\n                        pauseVertical.offset[eye] - pauseNdcOffset;",
             "correctedY = ndcY;",
         ),
     ]
