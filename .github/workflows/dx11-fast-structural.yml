@@ -94,6 +94,7 @@ jobs:
           python tools/test_dx11_game_output_transition_00682.py
           python tools/test_dx11_game_backbuffer_admission_00683.py
           python tools/test_dx11_same_mode_swapchain_transition_00684.py
+          python tools/test_dx11_object_clip_draw_00685.py
           python tools/test_dx11_stage1_factor_00673.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_factor_probe.cpp -o /tmp/dx11_stage1_00673 && /tmp/dx11_stage1_00673
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rgb332_probe.cpp -o /tmp/dx11_rgb332_00667 && /tmp/dx11_rgb332_00667

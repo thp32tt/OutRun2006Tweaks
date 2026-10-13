@@ -3,6 +3,7 @@
 #include "live_game_depth_state.hpp"
 #include "live_game_cull_state.hpp"
 #include "live_game_fvf_layout.hpp"
+#include "live_game_object_clip.hpp"
 #include "live_game_stage0_blend.hpp"
 #include "live_game_stage1_factor.hpp"
 #include "native_backend.hpp"
@@ -2852,9 +2853,11 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
                         next[col] += clip[row] * matrix.m[row][col];
                 clip = next;
             }
-            if (!std::isfinite(clip[0]) || !std::isfinite(clip[1]) ||
-                !std::isfinite(clip[2]) || !std::isfinite(clip[3]) ||
-                clip[3] <= 0.0f)
+            // World-space geometry may straddle the camera plane. D3D11
+            // clips homogeneous triangles/lines before perspective division;
+            // rejecting one negative-W vertex dropped the *entire* game Draw.
+            // Reject nonfinite and W==0 inputs; preserve D3D9 as fallback.
+            if (!game_native_object_clip_position(clip))
                 return false;
             std::copy(clip.begin(), clip.end(), v.clip);
         }
