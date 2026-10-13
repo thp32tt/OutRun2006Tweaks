@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2",
   "feature_id": "GAME_AUTHORED_RT16_NATIVE_DRAW_FAMILY",
   "work_key": "DX11:GAME_RT16_NATIVE_SCENE",
-  "status": "MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -77,13 +77,13 @@
     ]
   },
   "acceptance_results": {
-    "rt16-game-native-draw": "PENDING_EXACT_SHA",
-    "rt16-fallback": "PENDING_EXACT_SHA",
-    "rt16-exact-ci": "PENDING_EXACT_SHA"
+    "rt16-game-native-draw": "PASS_EXACT_SHA (source integration + compiled portable pixels; HMD UNTESTED)",
+    "rt16-fallback": "PASS_EXACT_SHA (sRGB/unsupported/readback/source-destructive safety tests; runtime UNTESTED)",
+    "rt16-exact-ci": "PASS_EXACT_SHA (five mandatory GitHub workflows success on same SHA)"
   },
   "base_head_sha": "170f628cbb24ed8602d4d79a9f02ed3afaf10589",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "d2dc55af2a996374fd3698c7a1564ba7653a9394",
+  "validation_bearing_result_sha": "7b4a0a2a554e7994aed14d264059890030f58050",
   "changed_files": [
     "src/vr/d3d11/live_game_render_target_readback.hpp",
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -93,13 +93,52 @@
     "docs/automation/runs/CONVERSION-DX11-00692.json"
   ],
   "pipeline": {
-    "C0_RECOVER": "PASS GitHub latest HEAD and 00691 C6; 00692 not present",
-    "C1_REVIEW": "PASS RT16 source textures supported but DEFAULT 16-bit RTs rejected",
-    "C2_IMPLEMENT": "PASS C++ source/staging/native Draw wiring and positive/negative probes",
-    "C3_VALIDATE": "PENDING_EXACT_SHA GitHub Actions; HMD UNTESTED",
-    "C4_COMMIT": "Material commit contains exact TASK_ID marker",
-    "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C0_RECOVER": "PASS: target GitHub HEAD/AGENTS.md/DX11 policy and previous completed 00691 inspected",
+    "C1_REVIEW": "PASS: native game RT16 staging format gap separate from prior texture/RT32 feature",
+    "C2_IMPLEMENT": "PASS: five actual D3D9 DEFAULT RT16 formats to SYSTEMMEM readback, BGRA8 SRV and native game Draw/Indexed, material d2dc55af2a996374fd3698c7a1564ba7653a9394",
+    "C3_VALIDATE": "PASS_EXACT_SHA 7b4a0a2a554e7994aed14d264059890030f58050: Backend Conversion Gate #38452790377; DX11 Fast #38452790398; Build #38452795009; OpenXR #38452795015; HUD #38452794913 all SUCCESS; legacy 00661 and first-game-frame destructive test collisions repaired without bypass",
+    "C4_COMMIT": "PASS material d2dc55af2a996374fd3698c7a1564ba7653a9394, validation-bearing repaired SHA 7b4a0a2a554e7994aed14d264059890030f58050; no skip CI on source/result commits",
+    "C5_PACKAGE": "NOT_REQUIRED; diagnostic opt-in only, no standalone deployment requested",
+    "C6_STATE": "PASS_EXACT_SHA in separate [skip ci] bookkeeping commit, unchanged validation-bearing SHA; Quest3/VDXR gameplay UNTESTED"
   },
-  "next_action": "Check mandatory exact material SHA GitHub Actions; repair regressions under same TASK_ID if failed. Separate C6 bookkeeping after success."
+  "next_action": "Controller select a new independent genuine DX11 source integration feature. 00692 BUILD_VERIFIED; Quest3/VDXR actual menu/car/race visual parity and gamepad remain NEED_HMD_TEST. Do not rescore or rerun 00692.",
+  "validation_evidence": {
+    "verified_git_branch": "vr-dx11-native-r71",
+    "validation_bearing_result_sha": "7b4a0a2a554e7994aed14d264059890030f58050",
+    "automated_verification": "PASS_EXACT_SHA",
+    "workflows": [
+      {
+        "name": "Backend Conversion Gate",
+        "run_id": 38452790377,
+        "conclusion": "success"
+      },
+      {
+        "name": "DX11 Fast Structural Checks",
+        "run_id": 38452790398,
+        "conclusion": "success"
+      },
+      {
+        "name": "Build",
+        "run_id": 38452795009,
+        "conclusion": "success"
+      },
+      {
+        "name": "OpenXR VR architecture",
+        "run_id": 38452795015,
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38452794913,
+        "conclusion": "success"
+      }
+    ],
+    "source_mutation_regressions": "PASS compiled RT16 positive and negative, legacy 00661/first_game_frame scoped to correct source ownership",
+    "repair_commits": [
+      "2b251dd1e7e4d92e2b4f0e82a2c61e4039aa8b7d",
+      "7b4a0a2a554e7994aed14d264059890030f58050"
+    ],
+    "quest3_vdxr_hmd": "UNTESTED",
+    "gameplay_and_gamepad": "UNTESTED"
+  }
 }
