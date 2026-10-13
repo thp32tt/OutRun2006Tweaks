@@ -21,9 +21,9 @@
     "work_class": "integration",
     "milestone_id": "native_stereo_eye_transport",
     "integration_path": [
-      "Native D3D11 eye render textures are checked for identical size/format/device, then both copied into one lifetime-owned shared eye slot before producer GPU EVENT",
-      "Exact stereo handle publication becomes available only after GPU fence and is invalidated on exact host ACK",
-      "Future follow-up: connect the live game-authored menu/race native frame producer and host OpenXR projection consumer, not yet verified"
+      "Existing live D3D9 game hooks capture Draw and feed native D3D11 Draw/DrawIndexed in opt-in diagnostic visible frame output; this remains the only existing game-callsite path",
+      "New opt-in NativeSharedEyeRing copies two distinct D3D11 rendered eye source targets to identity-bound shared resources before one GPU EVENT, atomically validating both",
+      "A distinct D3D11 consumer device opens published producer handles and verifies two independent GPU colors before exact host ACK, while live game frame-to-eye pairing and OpenXR projection hookup remain pending"
     ],
     "batch_components": [
       "src/vr/d3d11/native_shared_eye_ring.hpp",
@@ -32,7 +32,7 @@
       "tools/verify_dx11_native_transport_contract.py"
     ],
     "acceptance_proof": {
-      "positive_probe": "Executable native D3D11 WARP separate red/blue source RTVs -> CopyResource shared eye pair -> EVENT/publish -> distinct GPU pixel readbacks",
+      "positive_probe": "D3D11 WARP stereo RTVs red/blue -> producer CopyResource -> shared handles opened by separate simulated host D3D11 device -> independent GPU pixel readback and exact ACK",
       "negative_regression": "Foreign producer context/texture, same-source eyes, mismatched dimensions, duplicate publication and stale ACK fail closed",
       "component_integration": "Native shared-eye source copy is joined to existing producer fence and transport publication lifecycle; original D3D9 game Draw/input not intercepted"
     },
@@ -44,9 +44,11 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
     "live_game_draw_path": [
-      "D3D11_EYE_TEXTURE_SOURCE_ACCEPTED",
-      "SHARED_STEREO_RING_PUBLISH",
-      "LIVE_GAME_AND_OPENXR_CALLSITE_PENDING"
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "NATIVE_SHARED_EYE_PAIR_COPY_FROM_GAME_NATIVE_GPU_TARGETS_PENDING_LIVE_CALLSITE",
+      "OPENXR_HOST_SHARED_EYE_CONSUMER_HANDOFF_PENDING"
     ],
     "visible_frame_acceptance": "NEED_HMD_TEST; live game producer and OpenXR host projection consumer not connected by this change",
     "activation_guard_and_fallback": "New producer copy API is opt-in and uncalled by production selector; original DX9Ex game Draw/Present/gamepad remain authoritative"
@@ -90,17 +92,17 @@
   ],
   "pipeline": {
     "C0_RECOVER": "PASS",
-    "C1_REVIEW": "Disjoint unconnected native shared eye transport identified while 00673 stage1 and 00672 mesh work are owned",
-    "C2_IMPLEMENT": "TWO_EYE_GPU_COPY_FENCE_PUBLICATION_POSITIVE_NEGATIVE_PROBE_PARTIAL_FEATURE",
-    "C3_VALIDATE": "PENDING_EXACT_SHA_GITHUB_ACTIONS",
+    "C1_REVIEW": "Existing guarded D3D9 game Draw/native visible inset already exists; producer→host eye transport is not yet wired from game frame. Missing R306 consumer shared-handle integration test repaired.",
+    "C2_IMPLEMENT": "NATIVE_EYE_PAIR_COPY_AND_SECOND_DEVICE_HOST_SHARED_HANDLE_GPU_PIXELS",
+    "C3_VALIDATE": "RETRY_EXACT_SHA_AFTER_POLICY_AND_CONSUMER_PROBE_REPAIR",
     "C4_COMMIT": "MATERIAL_COMMIT_PREPARED",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_EXACT_SHA_AND_LIVE_GAME_OUTPUT"
   },
   "acceptance_results": {
-    "eye-producer-pair": "PENDING_GITHUB_TRANSPORT_WARP",
+    "eye-producer-pair": "PENDING_GITHUB_HOST_WARP",
     "eye-fallback": "PENDING_GITHUB_TRANSPORT_WARP",
-    "eye-transport-gate": "PENDING_EXACT_SHA",
+    "eye-transport-gate": "PENDING_EXACT_SHA_GITHUB_TRANSPORT",
     "eye-live-host-output": "NEED_LIVE_GAME_LINK_AND_HMD_TEST",
     "gamepad": "UNTESTED",
     "quest3_vdxr": "UNTESTED"

@@ -239,6 +239,13 @@ def main() -> None:
         encoding="utf-8")
     if "R306 left/right GPU pixel copy identity" not in probe_source:
         raise SystemExit("DX11 R306 two-eye GPU pixel validation missing")
+    for needle in [
+        "foreign.device->OpenSharedResource(",
+        "foreign.context->CopyResource(hostReadback, hostEyes[eyeIndex]);",
+        "R306 foreign host shared handle preserves both eye colors",
+    ]:
+        if needle not in probe_source:
+            raise SystemExit(f"DX11 R306 host GPU consumer evidence missing: {needle}")
 
 
     # EVENT completion must not depend on an unrelated game Present or

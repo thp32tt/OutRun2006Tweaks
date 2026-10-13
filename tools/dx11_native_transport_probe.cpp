@@ -418,6 +418,38 @@ int main()
         d3d.context->Unmap(readback, 0);
         require(correct, "R306 left/right GPU pixel copy identity");
     }
+    // Emulate the x64 OpenXR host on a second D3D11 WARP device. Reading
+    // the producer's resource directly would not prove shared-handle transport.
+    ID3D11Texture2D* hostEyes[2]{};
+    ID3D11Texture2D* hostReadback = nullptr;
+    require(SUCCEEDED(foreign.device->CreateTexture2D(
+                &readbackDesc, nullptr, &hostReadback)),
+            "R306 independent host GPU readback surface");
+    const HANDLE hostHandles[] = {
+        stereoPublication.left_handle, stereoPublication.right_handle};
+    for (std::uint32_t eyeIndex = 0; eyeIndex < 2; ++eyeIndex)
+    {
+        require(SUCCEEDED(foreign.device->OpenSharedResource(
+                    hostHandles[eyeIndex], __uuidof(ID3D11Texture2D),
+                    reinterpret_cast<void**>(&hostEyes[eyeIndex]))) &&
+                hostEyes[eyeIndex],
+                "R306 host opens published native producer eye handle");
+        foreign.context->CopyResource(hostReadback, hostEyes[eyeIndex]);
+        D3D11_MAPPED_SUBRESOURCE hostMapped{};
+        require(SUCCEEDED(foreign.context->Map(
+                    hostReadback, 0, D3D11_MAP_READ, 0, &hostMapped)),
+                "R306 host reads independent shared eye GPU pixels");
+        const auto* px = static_cast<const std::uint8_t*>(hostMapped.pData);
+        const bool match = eyeIndex == 0
+            ? px[0] == 255 && px[1] == 0 && px[2] == 0 && px[3] == 255
+            : px[0] == 0 && px[1] == 0 && px[2] == 255 && px[3] == 255;
+        foreign.context->Unmap(hostReadback, 0);
+        require(match, "R306 foreign host shared handle preserves both eye colors");
+    }
+    hostReadback->Release();
+    hostEyes[1]->Release();
+    hostEyes[0]->Release();
+
     require(!ring.submit_eye_pair(
                 d3d.context, stereoSlot, 20, leftSource, rightSource),
             "R306 published frame cannot be overwritten");
