@@ -4,6 +4,7 @@
 #include "live_game_cull_state.hpp"
 #include "live_game_fvf_layout.hpp"
 #include "live_game_object_clip.hpp"
+#include "live_game_viewport_depth.hpp"
 #include "live_game_stage0_blend.hpp"
 #include "live_game_stage1_factor.hpp"
 #include "native_backend.hpp"
@@ -1689,7 +1690,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
                           std::array<D3DMATRIX, 3>& transforms,
                           TextureCapture& capture, OutputCapture& output) noexcept {
     if (!game || FAILED(game->GetViewport(&viewport)) ||
-        viewport.Width == 0 || viewport.Height == 0)
+        viewport.Width == 0 || viewport.Height == 0 ||
+        !game_native_viewport_depth_valid(viewport.MinZ, viewport.MaxZ))
         return false;
     DWORD fvf = 0;
     if (FAILED(game->GetFVF(&fvf))) return false;
@@ -2833,7 +2835,10 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
                         static_cast<float>(vp.Width) - 1.0f) * w;
             v.clip[1] = (1.0f - 2.0f * (xyz[1] - static_cast<float>(vp.Y)) /
                         static_cast<float>(vp.Height)) * w;
-            v.clip[2] = xyz[2] * w;
+            // XYZRHW already contains post-viewport window depth: do not
+            // reapply D3D9 MinZ/MaxZ during menu/HUD native Draw.
+            if (!game_native_screen_depth_clip(
+                    xyz[2], w, vp.MinZ, vp.MaxZ, v.clip[2])) return false;
             v.clip[3] = w;
         } else {
             // D3D9 fixed-function uses row vectors: position * World * View *
@@ -2852,7 +2857,11 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
             // clips homogeneous triangles/lines before perspective division;
             // rejecting one negative-W vertex dropped the *entire* game Draw.
             // Reject nonfinite and W==0 inputs; preserve D3D9 as fallback.
-            if (!game_native_object_clip_position(clip))
+            // The game-authored viewport Z range is not necessarily [0,1].
+            // Mirror its depth map before D3D11 homogeneous clipping so
+            // world/race Draw and DrawIndexed share D3D9 depth ordering.
+            if (!game_native_world_depth_clip(clip, vp.MinZ, vp.MaxZ) ||
+                !game_native_object_clip_position(clip))
                 return false;
             std::copy(clip.begin(), clip.end(), v.clip);
         }
