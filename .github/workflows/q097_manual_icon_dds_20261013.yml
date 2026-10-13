@@ -1,0 +1,46 @@
+name: Q097 Korean icon DDS (manual)
+on:
+  push:
+    branches:
+      - manual/q097-icon-korean-dds-20261013
+    paths:
+      - localization/graphics/manual_imagegen_q097_20261013/rebuild.py
+      - localization/graphics/manual_imagegen_q097_20261013/sprite_*.png
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build-dds:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds
+            localization/graphics/manual_imagegen_q097_20261013
+          sparse-checkout-cone-mode: false
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install minimal image tooling
+        run: python -m pip install pillow numpy
+      - name: Rebuild original-format DDS and run pixel QA
+        run: python localization/graphics/manual_imagegen_q097_20261013/rebuild.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Q097_Korean_Icon_DDS_STATIC_QA
+          path: |
+            localization/graphics/manual_imagegen_q097_20261013/411827E_512x512_KOR.dds
+            localization/graphics/manual_imagegen_q097_20261013/Q097_KOR_ICON_TRANSPARENT.png
+            localization/graphics/manual_imagegen_q097_20261013/Q097_KOR_QA.json
+      - name: Commit reproducible result to isolated branch
+        run: |
+          git config user.name 'OutRun Localization QA'
+          git config user.email 'localization-qa@users.noreply.github.com'
+          git add -f localization/graphics/manual_imagegen_q097_20261013/411827E_512x512_KOR.dds
+          git add -f localization/graphics/manual_imagegen_q097_20261013/Q097_KOR_ICON_TRANSPARENT.png
+          git add -f localization/graphics/manual_imagegen_q097_20261013/Q097_KOR_QA.json
+          git diff --cached --quiet || git commit -m 'localization: save Q097 icon Korean DDS static QA candidate [skip ci]'
+          git push origin HEAD:refs/heads/manual/q097-icon-korean-dds-20261013
