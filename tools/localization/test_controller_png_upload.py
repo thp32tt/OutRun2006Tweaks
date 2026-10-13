@@ -2,14 +2,17 @@
 import asyncio
 import hashlib
 import json
+import os
 from pathlib import Path
 import struct
 import tempfile
 import unittest
+from unittest.mock import patch as mock_patch
 import zlib
 
 from controller_png_attach import load_binding, mark_sent, attach_png
 from patch_controller_png_upload import patch
+from stage_controller_policy import configure, A_SMOKE_TASK_ID, NAME as CONTROLLER_NAME
 
 
 def small_png():
@@ -78,6 +81,22 @@ class BindingTests(unittest.TestCase):
         self.write_manifest()
         self.assertEqual(load_binding("A", self.root)[1], "MISSING_APPROVED_PROMPT")
 
+    def test_single_a_pilot_allows_only_exact_task_and_role(self):
+        with mock_patch.dict(os.environ, {"OUTRUN_A_SINGLE_SMOKE_TASK_ID": A_SMOKE_TASK_ID}):
+            self.assertEqual(load_binding("A", self.root)[1], "PILOT_TASK_ID_MISMATCH")
+            self.assertEqual(load_binding("B", self.root)[1], "PILOT_ROLE_BLOCKED")
+            self.manifest["task_id"] = A_SMOKE_TASK_ID
+            self.write_manifest()
+            binding, reason = load_binding("A", self.root)
+            self.assertIsNone(reason)
+            self.assertEqual(binding["task_id"], A_SMOKE_TASK_ID)
+            mark_sent(binding, self.root)
+            self.assertEqual(load_binding("A", self.root)[1], "ALREADY_SENT")
+
+    def test_invalid_pilot_id_fails_closed(self):
+        with mock_patch.dict(os.environ, {"OUTRUN_A_SINGLE_SMOKE_TASK_ID": "../../bad"}):
+            self.assertEqual(load_binding("A", self.root)[1], "INVALID_PILOT_TASK_ID")
+
 
 FIXTURE = '''LOCALIZATION_SLOT_NAMES = ("A", "B", "C1", "C2")
 if CONTROLLER_MODE == "localization" and CHAT_SLOTS != 4:
@@ -111,10 +130,40 @@ class PatchTests(unittest.TestCase):
         self.assertIn('SOURCE_REFERENCE_NOT_BOUND', result)
         self.assertIn('png_binding["prompt"]', result)
         self.assertIn('retired_C2_slot_before_png_upload_v1.json', result)
+        self.assertIn('OUTRUN_SINGLE_A_SMOKE_V1', result)
+        self.assertIn('SCHEDULED_LOCALIZATION_LANES = {0: "A"}', result)
+        self.assertIn('OUTRUN_A_SINGLE_SMOKE_TASK_ID and slot.name != "A"', result)
 
     def test_unknown_base_fails_without_modification(self):
         with self.assertRaises(ValueError):
             patch("async def send_message(page, message): pass")
+
+
+class ComposeSmokeTests(unittest.TestCase):
+    def setUp(self):
+        self.revision = "a" * 40
+        self.base = {"services": {CONTROLLER_NAME: {
+            "environment": {"CHATGPT_PROJECT_URL": "https://chatgpt.com/g/example"},
+            "volumes": ["volume:/data"],
+        }}}
+
+    def test_single_a_compose_preserves_volumes_and_true_autosend(self):
+        cfg = configure(self.base, self.revision, single_a_smoke=True)
+        service = cfg["services"][CONTROLLER_NAME]
+        self.assertEqual(service["environment"]["CHAT_SLOTS"], "3")
+        self.assertEqual(service["environment"]["SCHEDULE_MINUTES"], "0")
+        self.assertEqual(service["environment"]["AUTO_SEND"], "true")
+        self.assertEqual(service["environment"]["OUTRUN_A_SINGLE_SMOKE_TASK_ID"], A_SMOKE_TASK_ID)
+        self.assertEqual(service["volumes"], ["volume:/data"])
+        self.assertNotIn("OUTRUN_A_SINGLE_SMOKE_TASK_ID", self.base["services"][CONTROLLER_NAME]["environment"])
+
+    def test_normal_compose_clears_pilot_lock(self):
+        staged = configure(self.base, self.revision, single_a_smoke=True)
+        normal = configure(staged, self.revision, single_a_smoke=False)
+        env = normal["services"][CONTROLLER_NAME]["environment"]
+        self.assertEqual(env["SCHEDULE_MINUTES"], "0,10,30,40")
+        self.assertNotIn("OUTRUN_A_SINGLE_SMOKE_TASK_ID", env)
+        self.assertEqual(env["AUTO_SEND"], "true")
 
 
 class DummyLocator:
