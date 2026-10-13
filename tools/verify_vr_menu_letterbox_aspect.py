@@ -693,6 +693,7 @@ def verify_visible_menu_fragment(code: str) -> None:
     required = [
         "PlanVisibleCenteredContent(",
         "sourceAspect = 4.0f / 3.0f;",
+        "common, sourceAspect, 0.78f);",
         "visibleOffsetX = plan.visibleOffsetX;",
         "visibleOffsetY = plan.visibleOffsetY;",
         "visibleWidthScale = plan.visibleWidthScale;",
@@ -707,7 +708,7 @@ def verify_visible_menu_fragment(code: str) -> None:
     for token in required:
         assert token in body, token
     assert body.index("sourceAspect = 4.0f / 3.0f;") < body.index(
-        "PlanOpticallyCenteredClip(common, sourceAspect)")
+        "PlanOpticallyCenteredClip(")
     assert body.index("placement.centerX + placement.halfWidth * visibleOffsetX;") < body.index(
         "const float sx[4]")
     assert "sourceAspect = plan.aspect;" not in body
@@ -727,6 +728,7 @@ verify_visible_menu_fragment(r23)
 verify_visible_fragment_source(menu_geometry)
 for old, bad in (
     ("sourceAspect = 4.0f / 3.0f;", "sourceAspect = plan.aspect;"),
+    ("common, sourceAspect, 0.78f);", "common, sourceAspect, 1.0f);"),
     ("placement.centerY - placement.halfHeight * visibleOffsetY;",
      "placement.centerY + placement.halfHeight * visibleOffsetY;"),
     ("placement.halfWidth * visibleWidthScale;",
