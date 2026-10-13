@@ -86,6 +86,58 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1Factor == D3DTA_TFACTOR);
 constexpr UINT kWidth = 256;
 constexpr UINT kHeight = 144;
+
+// Map a live D3D9 source viewport onto the diagnostic backbuffer inset.
+// Using the complete game render-target dimensions (not viewport.Width alone)
+// preserves split/partial menu, vehicle-selection and race views during both
+// real game Draw and DrawIndexed. Always retain original D3D9 rendering.
+struct GameNativeInsetRect {
+    float left = 0.0f, top = 0.0f, right = 0.0f, bottom = 0.0f;
+};
+constexpr bool game_native_inset_viewport(
+    std::uint32_t x, std::uint32_t y,
+    std::uint32_t width, std::uint32_t height,
+    std::uint32_t sourceWidth, std::uint32_t sourceHeight,
+    GameNativeInsetRect& result) noexcept {
+    if (!width || !height || !sourceWidth || !sourceHeight ||
+        static_cast<std::uint64_t>(x) + width > sourceWidth ||
+        static_cast<std::uint64_t>(y) + height > sourceHeight)
+        return false;
+    const double dx = static_cast<double>(kWidth) / sourceWidth;
+    const double dy = static_cast<double>(kHeight) / sourceHeight;
+    const GameNativeInsetRect mapped{
+        static_cast<float>(x * dx),
+        static_cast<float>(y * dy),
+        static_cast<float>((static_cast<std::uint64_t>(x) + width) * dx),
+        static_cast<float>((static_cast<std::uint64_t>(y) + height) * dy)
+    };
+    if (!(mapped.right > mapped.left && mapped.bottom > mapped.top) ||
+        mapped.right - mapped.left < 1.0f ||
+        mapped.bottom - mapped.top < 1.0f ||
+        mapped.left < 0.0f || mapped.top < 0.0f ||
+        mapped.right > kWidth || mapped.bottom > kHeight)
+        return false;
+    result = mapped;
+    return true;
+}
+// Compile-time positive/negative source-to-native raster geometry contracts.
+constexpr bool game_native_inset_viewport_contract() noexcept {
+    GameNativeInsetRect mapped{};
+    if (!game_native_inset_viewport(0, 0, 1920, 1080, 1920, 1080, mapped) ||
+        mapped.left != 0.0f || mapped.top != 0.0f ||
+        mapped.right != 256.0f || mapped.bottom != 144.0f)
+        return false;
+    if (!game_native_inset_viewport(480, 270, 960, 540, 1920, 1080, mapped) ||
+        mapped.left != 64.0f || mapped.top != 36.0f ||
+        mapped.right != 192.0f || mapped.bottom != 108.0f)
+        return false;
+    return !game_native_inset_viewport(1919, 0, 2, 1080, 1920, 1080, mapped) &&
+           !game_native_inset_viewport(0, 1080, 1920, 1, 1920, 1080, mapped) &&
+           !game_native_inset_viewport(0, 0, 0, 1080, 1920, 1080, mapped) &&
+           !game_native_inset_viewport(0, 0, 1, 1, 1920, 1080, mapped);
+}
+static_assert(game_native_inset_viewport_contract(),
+              "DX11 live game partial-viewport native raster mapping regression");
 constexpr UINT kMaxVertices = kMaxNativeGameVertices;
 constexpr UINT kMaxIndices = kMaxNativeGameVertices;
 // Rotate through the entire eligible game Draw population, not only the first
@@ -827,6 +879,7 @@ struct OutputCapture {
     D3DCMPFUNC alphaFunc = D3DCMP_ALWAYS;
     bool scissor = false;
     D3D11_RECT nativeScissor{};
+    D3D11_VIEWPORT nativeViewport{}; // Original game backbuffer-relative raster region.
     // Only source RGB-visible masks are eligible for the diagnostic inset.
     std::uint8_t colorWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 };
@@ -1693,6 +1746,24 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         viewport.Width == 0 || viewport.Height == 0 ||
         !game_native_viewport_depth_valid(viewport.MinZ, viewport.MaxZ))
         return false;
+    // Source viewport may be smaller than its target during menu/UI/race
+    // transitions. A full-size D3D11 viewport distorted those actual game
+    // Draws even though vertices were decoded correctly.
+    ComPtr<IDirect3DSurface9> sourceTarget;
+    D3DSURFACE_DESC sourceDesc{};
+    if (FAILED(game->GetRenderTarget(0, sourceTarget.GetAddressOf())) ||
+        !sourceTarget || FAILED(sourceTarget->GetDesc(&sourceDesc)))
+        return false;
+    GameNativeInsetRect nativeRect{};
+    if (!game_native_inset_viewport(
+            viewport.X, viewport.Y, viewport.Width, viewport.Height,
+            sourceDesc.Width, sourceDesc.Height, nativeRect))
+        return false;
+    output.nativeViewport = {
+        nativeRect.left, nativeRect.top,
+        nativeRect.right - nativeRect.left,
+        nativeRect.bottom - nativeRect.top, 0.0f, 1.0f
+    };
     DWORD fvf = 0;
     if (FAILED(game->GetFVF(&fvf))) return false;
     // Use the live game's exact FVF byte layout; avoid reading UV as
@@ -1839,13 +1910,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         // rectangle would draw pixels the original source scissor excluded.
         // This is conservative pixel sampling, not D3D9 screen parity proof.
         const LONG nativeLeft = static_cast<LONG>(std::ceil(
-            static_cast<double>(left - viewport.X) * kWidth / viewport.Width));
+            static_cast<double>(left) * kWidth / sourceDesc.Width));
         const LONG nativeTop = static_cast<LONG>(std::ceil(
-            static_cast<double>(top - viewport.Y) * kHeight / viewport.Height));
+            static_cast<double>(top) * kHeight / sourceDesc.Height));
         const LONG nativeRight = static_cast<LONG>(std::floor(
-            static_cast<double>(right - viewport.X) * kWidth / viewport.Width));
+            static_cast<double>(right) * kWidth / sourceDesc.Width));
         const LONG nativeBottom = static_cast<LONG>(std::floor(
-            static_cast<double>(bottom - viewport.Y) * kHeight / viewport.Height));
+            static_cast<double>(bottom) * kHeight / sourceDesc.Height));
         if (nativeRight <= nativeLeft || nativeBottom <= nativeTop)
             return false;
         output.scissor = true;
@@ -3690,6 +3761,10 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     if (ib) ctx->IASetIndexBuffer(ib.Get(), DXGI_FORMAT_R32_UINT, 0);
     const D3D11_RECT fullScissor{0, 0, static_cast<LONG>(kWidth),
                                   static_cast<LONG>(kHeight)};
+    // NativeBackend::begin_frame installs a full-inset viewport. Restore
+    // the captured game viewport for EACH draw, including indexed draws,
+    // so the diagnostic frame keeps original menu/race layout coordinates.
+    ctx->RSSetViewports(1, &output.nativeViewport);
     const D3D11_RECT& rect = output.scissor ? output.nativeScissor : fullScissor;
     ctx->RSSetScissorRects(1, &rect);
     // The R30 game Draw always survives. The native diagnostic mirrors its
