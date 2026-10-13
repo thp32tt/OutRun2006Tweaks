@@ -231,6 +231,11 @@ def verify_up_single_pass(source):
         "static_cast<std::uint64_t>(minVertexIndex) + numVertices;",
         "if (numVertices == 0 || declaredEnd > 262144u)",
         "if (raw < minVertexIndex || raw >= vertexCount)",
+        "const auto collectUsed = [&](const auto* typedIndices)",
+        "const std::uint32_t raw = typedIndices[i];",
+        "collectUsed(static_cast<const std::uint16_t*>(indexData))",
+        "collectUsed(static_cast<const std::uint32_t*>(indexData))",
+        "if (!validIndices)",
         "scratch.upTouched.push_back(raw);",
         "scratch.upUsed[raw] = 1;",
         "&scratch.upUsed, knownUsedCount, &scratch.upTouched)",
@@ -239,6 +244,8 @@ def verify_up_single_pass(source):
     assert all(token in body for token in required)
     assert "UINT maxIndex = 0;" not in body
     assert body.count("for (UINT i = 0; i < indexCount; ++i)") == 1
+    assert body.index("for (UINT i = 0; i < indexCount; ++i)") < body.index(
+        "const bool validIndices = indexFormat == D3DFMT_INDEX16")
     for original, wrong in (
         ("numVertices == 0", "numVertices != 0"),
         ("declaredEnd > 262144u", "declaredEnd < 262144u"),
@@ -246,6 +253,10 @@ def verify_up_single_pass(source):
         ("raw >= vertexCount", "false"),
         ("scratch.upTouched.push_back(raw);", "scratch.upTouched.clear();"),
         ("scratch.upUsed[raw] = 1;", "scratch.upUsed[raw] = 0;"),
+        ("collectUsed(static_cast<const std::uint16_t*>(indexData))",
+         "collectUsed(static_cast<const std::uint32_t*>(indexData))"),
+        ("collectUsed(static_cast<const std::uint32_t*>(indexData))",
+         "collectUsed(static_cast<const std::uint16_t*>(indexData))"),
     ):
         assert original in body
         mutant = body.replace(original, wrong, 1)
@@ -268,7 +279,18 @@ def verify_up_single_pass(source):
             # In-range original max-index scan and one-pass upper bound agree.
             old_end = max(end, max(indices) + 1)
             assert old_end == end and accepted(indices, low, count)
-            assert set(indices) == set(indices)  # repeated index semantics
+            # Compare the populated touched list/mask with a separate
+            # reference to detect loss or duplicate counting of indices.
+            reference = set(indices)
+            touched = []
+            used = set()
+            for raw in indices:
+                if raw not in used:
+                    touched.append(raw)
+                    used.add(raw)
+            assert used == reference
+            assert len(touched) == len(reference)
+            assert len(touched) == len(set(touched))
             if low:
                 assert not accepted(indices + [low - 1], low, count)
             if end <= max_raw:

@@ -4150,30 +4150,37 @@ namespace OutRunVRStereo
             // Both eyes can then choose sparse copying without recounting
             // the entire potentially large vertex span.
             UINT knownUsedCount = 0;
-            for (UINT i = 0; i < indexCount; ++i)
-            {
-                const std::uint32_t raw =
-                    indexFormat == D3DFMT_INDEX16
-                    ? static_cast<const std::uint16_t*>(indexData)[i]
-                    : static_cast<const std::uint32_t*>(indexData)[i];
-                if (raw < minVertexIndex || raw >= vertexCount)
-                    return E_NOTIMPL;
-                if (!scratch.upUsed[raw])
+            // Choose the index width once per draw, not for each index.
+            // Each typed walk fills the same sparse mask for both eyes.
+            const auto collectUsed = [&](const auto* typedIndices) {
+                for (UINT i = 0; i < indexCount; ++i)
                 {
-                    // Append first: an allocation failure cannot strand a
-                    // dirty bit outside the next draw's clear list.
-                    try
+                    const std::uint32_t raw = typedIndices[i];
+                    if (raw < minVertexIndex || raw >= vertexCount)
+                        return false;
+                    if (!scratch.upUsed[raw])
                     {
-                        scratch.upTouched.push_back(raw);
+                        // Append first: failed allocation cannot strand
+                        // a dirty bit outside the next draw's clear list.
+                        try
+                        {
+                            scratch.upTouched.push_back(raw);
+                        }
+                        catch (...)
+                        {
+                            return false;
+                        }
+                        scratch.upUsed[raw] = 1;
+                        ++knownUsedCount;
                     }
-                    catch (...)
-                    {
-                        return E_NOTIMPL;
-                    }
-                    scratch.upUsed[raw] = 1;
-                    ++knownUsedCount;
                 }
-            }
+                return true;
+            };
+            const bool validIndices = indexFormat == D3DFMT_INDEX16
+                ? collectUsed(static_cast<const std::uint16_t*>(indexData))
+                : collectUsed(static_cast<const std::uint32_t*>(indexData));
+            if (!validIndices)
+                return E_NOTIMPL;
 
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, vertexData, vertexCount, stride, state,

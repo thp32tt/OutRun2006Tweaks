@@ -2,15 +2,15 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00792",
   "production_id": "CONVERSION-DX9EX-00792",
-  "event_id": "CONVERSION-DX9EX-00792-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00792-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:PERF:INDEXED_UP_SINGLE_PASS",
   "symptom_id": "DX9EX:PERF:INDEXED_UP_SINGLE_PASS",
   "work_key": "DX9EX:PERF:INDEXED_UP_SINGLE_PASS",
-  "feature_class": "PERFORMANCE_FULL_DRAW_PATH",
+  "feature_class": "MEASURED_PERFORMANCE",
   "status": "IMPLEMENTED_NEEDS_VALIDATION",
   "checkpoint": "C3_VALIDATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00792]",
@@ -50,6 +50,12 @@
         "behavior_area": "win32_x86_game_x64_host_package_domain",
         "expected_behavior": "DX9Ex Active full Win32 game/host/package and Domain Isolation for the exact material SHA; no Quest3 visual/fps claim."
       }
+    ],
+    "special_work_evidence": "Quantified source-level index-array pass count: original R30 indexed-UP scanned indexCount twice (max-index plus sparse-mask); first material patch reduced this to one scan for D3DFMT_INDEX16 and D3DFMT_INDEX32, and this repair moves format dispatch outside the index loop. This is a deterministic CPU-work reduction, not a Quest3 FPS or p95 measurement.",
+    "subcomponents": [
+      "Complete 16-bit IndexedPrimitiveUP index validation and sparse unique-vertex collection, with a single type dispatch per call",
+      "Complete 32-bit IndexedPrimitiveUP index validation and sparse unique-vertex collection, with a single type dispatch per call",
+      "Both-eye stereo transform and original D3D9 fallback for out-of-window indices and failed mask allocations"
     ]
   },
   "acceptance_results": {
@@ -65,13 +71,24 @@
       "R30 single-pass sparse mask",
       "R30 per-eye transforms and R29 raw left/right draw"
     ],
-    "fix_evidence": "Replace max-index loop with a checked 64-bit declared window; validate each index while populating the sparse mask.",
-    "negative_test_evidence": "2000 deterministic randomized 16/32-bit in-range cases, outside-range and overflow fallback, six destructive source mutations.",
+    "fix_evidence": "The previous material patch removed the max-index walk and bounds checked the single mask pass. This repair hoists the 16/32-bit decoder dispatch out of the loop while retaining append-before-bit-set allocation safety and original D3D9 fallback.",
+    "negative_test_evidence": "Existing 2000 randomized 16/32-bit windows and negative mutations; repair replaces tautological set comparison with independent touched-list reconstruction and adds two typed-dispatch destructive mutations.",
     "protected_behaviors": "Stereo both eyes, legal D3D9 min/count, desktop fallback, world/HUD, SkyGlow, FFB.",
-    "measurement_limitation": "CPU loop count improved in source; Quest3/VDXR frame-time, HMD graphics and 72Hz remain untested."
+    "measurement_limitation": "Source-level index walk reduction is quantified; actual Quest3/VDXR 72Hz and p95/p99 frame-time improvement is NOT measured.",
+    "original_evidence": "Previous indexed-UP producer performed one max-index pass followed by a distinct used-mask pass for the same 16/32-bit index buffer.",
+    "alternatives_rejected": [
+      "Per-eye stereo vertex writes cannot be skipped without breaking the distinct Quest3 left/right views; the redundant work is confined to index decoding.",
+      "16-bit and 32-bit buffers require distinct typed reads, but do not require repeating their index-format decision for every index."
+    ]
   },
   "ci_evidence": {
-    "status": "NOT_YET_RUN"
+    "status": "REPAIR_PENDING_NEW_EXACT_SHA",
+    "failed_run_id": 38445374692,
+    "failed_sha": "3381b885f75554ed12149b1337d03f04b79a5b59",
+    "failed_job": "policy",
+    "failed_step": "verify_vr_feature_unit_policy.py --check-head",
+    "failure_reason": "record feature_class not MEASURED_PERFORMANCE; special_work_evidence and subcomponents missing",
+    "next": "New material result commit with source/test and contract repair must pass exact-SHA DX9Ex Active and Domain Isolation."
   },
   "runtime_status": "NEED_QUEST3_VDXR_TEST"
 }
