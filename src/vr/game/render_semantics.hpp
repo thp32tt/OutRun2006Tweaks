@@ -279,6 +279,10 @@ namespace OutRunVR::GameSemantic
     inline thread_local std::uint64_t SpriteQueueNodeEpoch = 0;
     inline thread_local ProducerToken CurrentSpriteQueueProducer =
         ProducerToken::None;
+    // Direct original-game glyph rasterization occurs before SpriteNodes
+    // exist. Its token must never overwrite the active queue cursor.
+    inline thread_local ProducerToken CurrentDirectExactProducer =
+        ProducerToken::None;
     inline thread_local ProjectedMarkerInfo CurrentQueueProjectedMarker{};
 
     inline const void* CurrentQueueNode() noexcept
@@ -294,6 +298,14 @@ namespace OutRunVR::GameSemantic
     inline ProducerToken CurrentQueueProducerToken() noexcept
     {
         return CurrentSpriteQueueProducer;
+    }
+
+    inline ProducerToken CurrentRenderProducerToken() noexcept
+    {
+        // Real SpriteNode replay is authoritative even when a nested
+        // exact source call is on the stack.
+        return SpriteQueueDepth != 0
+            ? CurrentSpriteQueueProducer : CurrentDirectExactProducer;
     }
 
     inline const ProjectedMarkerInfo* CurrentProjectedMarker() noexcept
@@ -319,6 +331,7 @@ namespace OutRunVR::GameSemantic
         RenderScope savedQueueScope_ = RenderScope::None;
         RenderScope savedPendingDraw_ = RenderScope::None;
         ProjectedMarkerInfo savedProjectedMarker_{};
+        ProducerToken savedDirectProducer_ = ProducerToken::None;
         bool active_ = false;
         bool isolatePendingDraw_ = false;
 
@@ -326,7 +339,8 @@ namespace OutRunVR::GameSemantic
         explicit ScopedExactProducerSemantic(
             RenderScope scope,
             const ProjectedMarkerInfo* marker = nullptr,
-            bool isolatePendingDraw = false) noexcept
+            bool isolatePendingDraw = false,
+            ProducerToken directProducer = ProducerToken::None) noexcept
             : active_(SpriteQueueDepth == 0 && scope != RenderScope::None),
               isolatePendingDraw_(active_ && isolatePendingDraw)
         {
@@ -335,6 +349,7 @@ namespace OutRunVR::GameSemantic
             savedScope_ = CurrentScope;
             savedQueueScope_ = CurrentQueueExactScope;
             savedProjectedMarker_ = CurrentQueueProjectedMarker;
+            savedDirectProducer_ = CurrentDirectExactProducer;
             // Only the opted-in direct draw shields and restores a previously
             // armed producer token. All other exact producers are unchanged.
             if (isolatePendingDraw_)
@@ -343,6 +358,7 @@ namespace OutRunVR::GameSemantic
                 NextDrawScope = RenderScope::None;
             }
             CurrentQueueExactScope = RenderScope::None;
+            CurrentDirectExactProducer = directProducer;
             CurrentQueueProjectedMarker =
                 scope == RenderScope::ProjectedWorldMarker2D &&
                 marker && marker->valid ? *marker : ProjectedMarkerInfo{};
@@ -355,6 +371,7 @@ namespace OutRunVR::GameSemantic
                 return;
             CurrentScope = savedScope_;
             CurrentQueueExactScope = savedQueueScope_;
+            CurrentDirectExactProducer = savedDirectProducer_;
             CurrentQueueProjectedMarker = savedProjectedMarker_;
             if (isolatePendingDraw_)
                 NextDrawScope = savedPendingDraw_;

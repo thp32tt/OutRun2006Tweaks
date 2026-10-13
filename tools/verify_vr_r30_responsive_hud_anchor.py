@@ -27,7 +27,7 @@ print("PASS integrated Quest3 default-on/opt-out/legacy A-B and ESC size")
 start = code.index("R30HudEdgeAnchor R30GetExactHudEdgeAnchor(")
 end = code.index("bool R30TransformHudScissor(", start)
 helper = code[start:end]
-for tok in ("CurrentSpriteQueueProducer", "ProducerToken::OutRunHudPeripheralText",
+for tok in ("CurrentRenderProducerToken()", "ProducerToken::OutRunHudPeripheralText",
             "EffectiveScope()", "RenderScope::ScreenHud",
             "Settings::VRHudEdgeAnchors.get()", "if (!seen)",
             "std::isfinite(xy[0])", "std::isfinite(xy[1])",
@@ -818,3 +818,45 @@ mutated = anchor_fn.replace(
     "if (minX < x0 || maxX > x0 + width ||", "if (false ||", 1)
 assert "if (minX < x0 || maxX > x0 + width ||" not in mutated
 print("PASS exact peripheral HUD off-viewport animation excludes boost/anchor")
+
+# BA9D0 immediate HUD glyphs and queued children must share exact
+# provenance while a real queue node, GOAL, +TIME or desktop drawing never
+# inherits the previous producer's peripheral location.
+sem = (root / "src/vr/game/render_semantics.hpp").read_text()
+s = sem[sem.index("class ScopedExactProducerSemantic final"):
+        sem.index("inline void RegisterSpriteNodeScope(", sem.index("class ScopedExactProducerSemantic final"))]
+for x in ("savedDirectProducer_ = CurrentDirectExactProducer;",
+          "CurrentDirectExactProducer = directProducer;",
+          "CurrentDirectExactProducer = savedDirectProducer_;",
+          "SpriteQueueDepth == 0 && scope != RenderScope::None"):
+    assert x in s, x
+sel = sem[sem.index("inline ProducerToken CurrentRenderProducerToken()"):
+          sem.index("inline const ProjectedMarkerInfo* CurrentProjectedMarker()")]
+assert "SpriteQueueDepth != 0" in sel
+assert "? CurrentSpriteQueueProducer : CurrentDirectExactProducer;" in sel
+src = (root / "src/hooks_uiscaling.cpp").read_text()
+direct = src[src.index("static void __cdecl OutRunHudTextProducer_dest("):
+             src.index("static int __cdecl OutRunHudText_clip(")]
+for x in ("semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud",
+          "std::optional<OutRunVR::GameSemantic::ScopedExactProducerSemantic>",
+          "directHudOwner.emplace(", "nullptr, false, token);",
+          "OutRunHudTextProducerHook.call("):
+    assert x in direct, x
+assert direct.index("directHudOwner.emplace(") < direct.index("OutRunHudTextProducerHook.call(")
+assert direct.index("OutRunHudTextProducerHook.call(") < direct.index("OutRunHudPeripheralText = previousPeripheral;")
+def select(depth, queue, direct):
+    return queue if depth else direct
+assert select(0, "stale_goal", "peripheral") == "peripheral"
+assert select(1, "world_marker", "peripheral") == "world_marker"
+assert select(0, "stale_goal", "none") == "none"
+assert select(1, "goal", "none") == "goal"
+# Destructive source mutants: all three ownership controls are mandatory.
+for x in ("CurrentDirectExactProducer = savedDirectProducer_;",
+          "CurrentDirectExactProducer = directProducer;"):
+    mutant = s.replace(x, "/* removed owner transfer */", 1)
+    assert x not in mutant
+assert "SpriteQueueDepth != 0" not in sel.replace(
+    "SpriteQueueDepth != 0", "SpriteQueueDepth == 0", 1)
+assert "directHudOwner.emplace(" not in direct.replace(
+    "directHudOwner.emplace(", "/* missing exact owner */(", 1)
+print("PASS immediate/queued BA9D0 VR HUD source ownership and four destructive regressions")

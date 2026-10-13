@@ -625,8 +625,25 @@ class UIScaling : public Hook
 			(OutRunVRHudSemantics::InRange(caller, 0x0B9000, 0x0B9200) || // gear/REV
 			 OutRunVRHudSemantics::InRange(caller, 0x0B9E00, 0x0BA100) || // rank
 			 OutRunVRHudSemantics::InRange(caller, 0x0BE300, 0x0BEA40)); // time attack, not GOAL
-		OutRunHudTextProducerHook.call(
-			glyphSet, x, y, text, a4, alpha);
+        // BA9D0 may rasterize immediately before its exact clip/sprani
+        // children enter the SpriteNode queue. Unify ownership without
+        // widening GOAL/+TIME/unknown callers or changing desktop fallback.
+        {
+            std::optional<OutRunVR::GameSemantic::ScopedExactProducerSemantic>
+                directHudOwner;
+            if (Settings::VREnabled &&
+                semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud)
+            {
+                const auto token = OutRunHudPeripheralText
+                    ? OutRunVR::GameSemantic::ProducerToken::OutRunHudPeripheralText
+                    : OutRunVR::GameSemantic::ProducerToken::OutRunHudText;
+                directHudOwner.emplace(
+                    OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                    nullptr, false, token);
+            }
+            OutRunHudTextProducerHook.call(
+                glyphSet, x, y, text, a4, alpha);
+        }
 		OutRunHudPeripheralText = previousPeripheral;
 		OutRunHudTextScreenHud = previous;
 	}
