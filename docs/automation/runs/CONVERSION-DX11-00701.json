@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "feature_id": "GAME_STAGE1_VERTEX_DIFFUSE_MENU_RACE",
   "work_key": "DX11:GAME_STAGE1_VERTEX_DIFFUSE_RGB_ALPHA",
-  "status": "PENDING_EXACT_SHA_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -76,13 +76,13 @@
     ]
   },
   "acceptance_results": {
-    "stage1-diffuse-live-rgb-alpha": "PENDING_GATE",
-    "no-diffuse-fallback-input": "PENDING_GATE",
-    "stage1-diffuse-32-variant-gates": "PENDING_GATE"
+    "stage1-diffuse-live-rgb-alpha": "PASS",
+    "no-diffuse-fallback-input": "PASS",
+    "stage1-diffuse-32-variant-gates": "PASS"
   },
   "base_head_sha": "78788901cd23868d3e0cb8884d5818f535877553",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "1ec70de0ecbb6f558f51ba125a8a43541bd6d7d0",
+  "validation_bearing_result_sha": "92b3299432269adc7ab4d289f3c40b35ec02a1a8",
   "changed_files": [
     "src/vr/d3d11/live_game_stage1_factor.hpp",
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -96,11 +96,45 @@
   "pipeline": {
     "C0_RECOVER": "DONE HEAD 78788901cd23868d3e0cb8884d5818f535877553",
     "C1_REVIEW": "DONE missing DIFFUSE FVF stage1 native rgb and alpha",
-    "C2_IMPLEMENT": "DONE source and tests staged",
-    "C3_VALIDATE": "PENDING same-SHA full GitHub gates; HMD not run",
-    "C4_COMMIT": "PENDING material fast forward",
-    "C5_PACKAGE": "NOT_REQUIRED until HMD gate",
-    "C6_STATE": "PENDING CI result"
+    "C2_IMPLEMENT": "DONE: actual game D3D9 stage1 vertex DIFFUSE independently feeds HLSL RGB/alpha native Draw and DrawIndexed with FVF fail-closed",
+    "C3_VALIDATE": "PASS_EXACT_SHA: DX11 Fast, Backend validate+smoke, Win32 Build, OpenXR, HUD 5/5 SUCCESS at 92b3299432269adc7ab4d289f3c40b35ec02a1a8; HMD/gamepad UNTESTED",
+    "C4_COMMIT": "PASS: material source 1ec70de0ecbb6f558f51ba125a8a43541bd6d7d0; regression fixes 2169a37a and validation-bearing 92b3299432269adc7ab4d289f3c40b35ec02a1a8 (no CI-skip)",
+    "C5_PACKAGE": "NOT_REQUIRED: no runtime promotion; Quest3/VDXR/HMD and live gamepad are UNTESTED",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: 3/3 build-verifiable feature acceptance PASS; exact SHA 5/5 mandatory Gates SUCCESS; HMD remains NEED_HMD_TEST"
   },
-  "next_action": "Consume same-SHA required GitHub Actions; repair actual failures under 00701 without scoring until exact SHA pass; Quest3/VDXR NEED_HMD_TEST"
+  "next_action": "This feature build-verified; do not reassign or score 00701 again. Controller should dispatch a distinct unowned DX11 menu/vehicle/race gap; Quest3/VDXR runtime for this SHA remains NEED_HMD_TEST.",
+  "material_followup_repair_commits": [
+    "2169a37a7f1d4bc90278b36c735aeb9ba6d7c5f3",
+    "92b3299432269adc7ab4d289f3c40b35ec02a1a8"
+  ],
+  "gate_evidence": {
+    "validation_bearing_sha": "92b3299432269adc7ab4d289f3c40b35ec02a1a8",
+    "dx11_fast_structural_checks": {
+      "id": 38485023125,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38485023131,
+      "conclusion": "SUCCESS"
+    },
+    "windows_build": {
+      "id": 38485026314,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38485026280,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38485026275,
+      "conclusion": "SUCCESS"
+    },
+    "backend_jobs": [
+      "validate SUCCESS",
+      "DX11 readiness smoke probes SUCCESS"
+    ],
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  },
+  "state_persisted": true
 }
