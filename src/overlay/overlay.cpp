@@ -732,10 +732,20 @@ static void render_first_run_intro()
 
 	bool changed = false;
 	static bool fontScaleHeld = false;
-	static float fontScale = Overlay::GlobalFontScale; // TODO: This can go stale if user closes popup -> changes setting in Overlay -> opens popup
+	static float fontScale = Overlay::GlobalFontScale;
+	// A reopened first-run popup must show the current Overlay setting,
+	// not the draft left by an earlier mouse/keyboard interaction. Do not
+	// overwrite an in-progress edit with the old committed value.
+	if (!fontScaleHeld)
+		fontScale = Overlay::GlobalFontScale;
 	if (ImGui::SliderFloat("Font Scale", &fontScale, 0.5f, 3.5f))
 		fontScaleHeld = true;
-	if (fontScaleHeld && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+	// IsMouseReleased alone never commits keyboard/gamepad navigation edits.
+	// ImGui's item deactivation covers those inputs, while the original
+	// mouse-release path remains available. Rebuild the VR font atlas once
+	// per committed edit, not on every drag/key-repeat frame.
+	if (fontScaleHeld && (ImGui::IsItemDeactivatedAfterEdit() ||
+		ImGui::IsMouseReleased(ImGuiMouseButton_Left)))
 	{
 		Overlay::GlobalFontScale = fontScale;
 		Overlay::FontsDirty = true;

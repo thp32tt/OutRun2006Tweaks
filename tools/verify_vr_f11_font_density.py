@@ -675,6 +675,64 @@ def check_first_run_vr_modal(font: str) -> None:
 
 
 
+def check_first_run_font_slider_commit(font: str) -> None:
+    """F11 first-run font scale: keyboard/gamepad commit and reopened popup sync."""
+    owner = font.split("static void render_first_run_intro()", 1)[1].split(
+        "void ForceShowCursor", 1)[0]
+    required = (
+        "if (!fontScaleHeld)\n\t\tfontScale = Overlay::GlobalFontScale;",
+        'ImGui::SliderFloat("Font Scale", &fontScale, 0.5f, 3.5f)',
+        "ImGui::IsItemDeactivatedAfterEdit() ||",
+        "ImGui::IsMouseReleased(ImGuiMouseButton_Left)",
+        "Overlay::GlobalFontScale = fontScale;",
+        "Overlay::FontsDirty = true;",
+        "fontScaleHeld = false;",
+    )
+    for token in required:
+        assert token in owner, "missing first-run F11 slider invariant: " + token
+    assert owner.index(required[0]) < owner.index(required[1])
+    assert owner.index(required[1]) < owner.index(required[2])
+    assert owner.index(required[2]) < owner.index(required[4])
+
+    for original, bad in (
+        ("if (!fontScaleHeld)\n\t\tfontScale = Overlay::GlobalFontScale;",
+         "if (fontScaleHeld)\n\t\tfontScale = Overlay::GlobalFontScale;"),
+        ("ImGui::IsItemDeactivatedAfterEdit() ||", "false ||"),
+        ("ImGui::IsMouseReleased(ImGuiMouseButton_Left)", "false"),
+        ("Overlay::FontsDirty = true;", "Overlay::FontsDirty = false;"),
+    ):
+        assert owner.count(original) == 1, original
+        mutant = owner.replace(original, bad, 1)
+        assert any(token not in mutant for token in required), original
+
+    def update(committed, draft, held, edited=False, deactivate=False,
+               mouse_release=False):
+        if not held:
+            draft = committed
+        if edited:
+            held = True
+        if held and (deactivate or mouse_release):
+            committed, held = draft, False
+        return committed, draft, held
+
+    # External Overlay font edits must appear in the first-run slider.
+    committed, draft, held = update(2.4, 2.0, False)
+    assert (committed, draft, held) == (2.4, 2.4, False)
+    # Keyboard/gamepad edit: retain the draft across frames until focus leaves.
+    committed, draft, held = update(committed, 2.9, True, edited=True)
+    assert (committed, draft, held) == (2.4, 2.9, True)
+    committed, draft, held = update(committed, draft, held, deactivate=True)
+    assert (committed, draft, held) == (2.9, 2.9, False)
+    # Mouse drag still commits only on release, with no per-frame atlas churn.
+    committed, draft, held = update(committed, 3.1, True, edited=True)
+    assert committed == 2.9 and held
+    committed, draft, held = update(committed, draft, held, mouse_release=True)
+    assert committed == 3.1 and not held
+    # Reopening after a separate font setting change resets stale draft.
+    assert update(1.8, 3.1, False) == (1.8, 1.8, False)
+    print("PASS F11 first-run font slider nav commit/reopen sync, 4 destructive controls")
+
+
 def check_source_reset_atlas_hold(hook: str) -> None:
     """Preserve an XR F11 font atlas when game-source size lapses on Reset."""
     area = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
@@ -758,6 +816,7 @@ def main():
     check_shell_vr_mode_transitions(font)
     check_external_vr_f11_canvas(font)
     check_first_run_vr_modal(font)
+    check_first_run_font_slider_commit(font)
     check_projection(renderer, semantic)
     check_projection_mutations(renderer, semantic)
     # Default R26 and new R29 compile separate final TUs but share R23.
