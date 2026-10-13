@@ -2,18 +2,18 @@
   "schema_version": 2,
   "task_id": "CONVERSION-DX11-00657",
   "production_id": "CONVERSION-DX11-00657",
-  "event_id": "CONVERSION-DX11-00657-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX11-00657-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2",
   "work_key": "DX11:GAME_SRGB_SAMPLER_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "aca84f6d550277e24d4c3658e338f8aa8d9931b7",
-  "status": "MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -53,8 +53,8 @@
     "scope": "captured live game sRGB sampler reads through native D3D11 typed SRV and Draw"
   },
   "acceptance_results": {
-    "static_regression": "PENDING_GITHUB_GATE",
-    "compile_build": "PENDING_EXACT_SHA",
+    "static_regression": "PASS",
+    "compile_build": "PASS_EXACT_SHA",
     "game_visual_parity": "NEED_HMD_TEST",
     "gamepad": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
@@ -64,22 +64,54 @@
     ".github/workflows/dx11-fast-structural.yml",
     ".github/workflows/backend-conversion-gate.yml",
     "tools/test_dx11_native_srgb_texture_00657.py",
-    "docs/automation/runs/CONVERSION-DX11-00657.json"
+    "docs/automation/runs/CONVERSION-DX11-00657.json",
+    "tools/test_dx11_native_address_mirror_00591.py",
+    "tools/test_dx11_native_border_color_00594.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
   ],
   "pipeline": {
-    "C0_RECOVER": "PASS exact HEAD and released prior work",
-    "C1_REVIEW": "PASS missing SRGBTEXTURE live game sampling",
-    "C2_IMPLEMENT": "PASS C++ native resource/draw integration + format fallback",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING_GIT_PUBLISH",
+    "C0_RECOVER": "PASS exact HEAD and CI failed step 00591 isolated",
+    "C1_REVIEW": "PASS stale sRGB rejection in 00591, 00594, SAFE-RETURN regressions",
+    "C2_IMPLEMENT": "PASS C++ sRGB game-sampled Draw plus three real failed regression repairs",
+    "C3_VALIDATE": "PASS exact SHA five mandatory GitHub Actions checks",
+    "C4_COMMIT": "PASS original C++ material + two repair material commits",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA_GATE"
+    "C6_STATE": "PASS separate bookkeeping [skip ci]"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "next_action": "Validate exact SHA required five GitHub gates. No Quest3/VDXR or live game visual/gamepad evidence. DXVK frozen."
+  "material_result_sha": "bba805abf42b2f4181f6d7401b98c100476f4e92",
+  "validation_bearing_result_sha": "e380434db066c87ebfe0a73755ac92d15127c82a",
+  "result_sha": "e380434db066c87ebfe0a73755ac92d15127c82a",
+  "next_action": "Feature source and exact-SHA Windows build validated; actual OutRun menu->vehicle->race game frame, gamepad, Quest3/VDXR runtime NEED_HMD_TEST / UNTESTED. Next independent DX11 task only, do not repeat 00657. DXVK frozen.",
+  "validation_evidence": {
+    "build": {
+      "run_id": 38350646129,
+      "conclusion": "success",
+      "head_sha": "e380434db066c87ebfe0a73755ac92d15127c82a"
+    },
+    "openxr": {
+      "run_id": 38350646150,
+      "conclusion": "success",
+      "head_sha": "e380434db066c87ebfe0a73755ac92d15127c82a"
+    },
+    "hud": {
+      "run_id": 38350646128,
+      "conclusion": "success",
+      "head_sha": "e380434db066c87ebfe0a73755ac92d15127c82a"
+    },
+    "dx11_fast": {
+      "run_id": 38350640933,
+      "conclusion": "success",
+      "head_sha": "e380434db066c87ebfe0a73755ac92d15127c82a"
+    },
+    "backend_conversion_gate": {
+      "run_id": 38350640620,
+      "conclusion": "success",
+      "head_sha": "e380434db066c87ebfe0a73755ac92d15127c82a"
+    },
+    "prior_failed_backend_run": 38349618334,
+    "prior_failed_build_run": 38349989881
+  }
 }
