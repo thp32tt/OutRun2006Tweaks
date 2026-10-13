@@ -91,7 +91,9 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1Subtract == D3DTOP_SUBTRACT &&
               kStage1AddSmooth == D3DTOP_ADDSMOOTH &&
               kStage1Current == D3DTA_CURRENT &&
-              kStage1Factor == D3DTA_TFACTOR);
+              kStage1Factor == D3DTA_TFACTOR &&
+              kStage1Complement == D3DTA_COMPLEMENT &&
+              kStage1AlphaReplicate == D3DTA_ALPHAREPLICATE);
 constexpr UINT kWidth = 256;
 constexpr UINT kHeight = 144;
 
@@ -1151,7 +1153,9 @@ bool env_batch_opt_in() noexcept {
 }
 
 constexpr char kStage1FactorShader[] = R"(
-// Stage 1 accepts only CURRENT and TFACTOR; stage 0 already produced color.
+// Stage 1 accepts CURRENT/TFACTOR with D3DTA_COMPLEMENT and
+// D3DTA_ALPHAREPLICATE. Stage 0 already produced color; unsupported sources
+// are CPU-rejected before either native Draw or DrawIndexed is submitted.
 // Separate RGB and alpha instructions run before native alpha-test/OM blend.
 cbuffer Stage1FactorParams : register(b1) {
     float4 stage1Factor;
@@ -1159,7 +1163,13 @@ cbuffer Stage1FactorParams : register(b1) {
     int4 stage1Args; // color arg1/2, alpha arg1/2
 };
 float4 Stage1Source(float4 current, int source) {
-    return source == 3 ? stage1Factor : current;
+    // D3DTA_MASK=0x0f; CURRENT=1, TFACTOR=3. CPU admission owns the
+    // strict selector/flag allowlist. Apply alpha replication before optional
+    // complement, identically for RGB and independent stage-1 alpha.
+    float4 value = (source & 15) == 3 ? stage1Factor : current;
+    if ((source & 32) != 0) value = value.aaaa;
+    if ((source & 16) != 0) value = 1.0f - value;
+    return value;
 }
 float4 Stage1Combine(float4 a, float4 b, int op) {
     if (op == 2) return a;
@@ -2879,8 +2889,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         if (transformUv) capture.uvTransform = uvTransform;
     }
     // Real fixed-function stage 1 can combine the stage-0 CURRENT pixel
-    // with D3DRS_TEXTUREFACTOR. No stage-1 texture, TEMP or stage-2 semantics
-    // are guessed, and unsupported stage-0 shaders never enter this path.
+    // with D3DRS_TEXTUREFACTOR, including alpha-replicate/complement flags
+    // on either RGB or independent alpha arguments. No stage-1 texture, TEMP,
+    // unknown operand bits or stage-2 semantics are guessed; unsupported
+    // stage-0 shaders never enter this path.
     if (nextColorOp != D3DTOP_DISABLE) {
         DWORD color1=~0u, color2=~0u, alphaOp=~0u, alpha1=~0u, alpha2=~0u;
         DWORD stage1Result=~0u, stage2Op=~0u, factor=0u;

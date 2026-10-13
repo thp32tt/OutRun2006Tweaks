@@ -10,14 +10,18 @@ int main() {
         kStage1Add, kStage1Subtract, kStage1AddSmooth}) {
         for (std::uint32_t a : {kStage1Current, kStage1Factor}) {
             for (std::uint32_t b : {kStage1Current, kStage1Factor}) {
-                if (!stage1_combiner_supported(op,a,b) ||
-                    !stage1_alpha_supported(op,a,b) ||
-                    (op != kStage1SelectArg2 &&
-                     stage1_combiner_supported(op,a | 0x10u,b)) ||
-                    (op != kStage1SelectArg1 &&
-                     stage1_combiner_supported(op,a,b | 0x20u)))
-                    return 1;
-                ++tested;
+                for (std::uint32_t left : {0u, kStage1Complement,
+                                             kStage1AlphaReplicate,
+                                             kStage1Complement | kStage1AlphaReplicate}) {
+                    for (std::uint32_t right : {0u, kStage1Complement,
+                                                kStage1AlphaReplicate,
+                                                kStage1Complement | kStage1AlphaReplicate}) {
+                        if (!stage1_combiner_supported(op,a | left,b | right) ||
+                            !stage1_alpha_supported(op,a | left,b | right))
+                            return 1;
+                        ++tested;
+                    }
+                }
             }
         }
     }
@@ -25,9 +29,15 @@ int main() {
         if (stage1_combiner_supported(bad,kStage1Current,kStage1Factor))
             return 2;
     if (!stage1_alpha_supported(kStage1Disable,0xffu,0xffu) ||
-         stage1_operand_supported(kStage1Current | 0x20u) ||
-         stage1_operand_supported(kStage1Factor | 0x10u))
+        !stage1_operand_supported(kStage1Current | kStage1AlphaReplicate) ||
+        !stage1_operand_supported(kStage1Factor | kStage1Complement) ||
+        !stage1_operand_supported(kStage1Factor | kStage1Complement |
+                                 kStage1AlphaReplicate))
         return 3;
-    std::printf("00673 32 positive stage1 variants, modifiers and fallback: %u PASS\\n", tested);
-    return tested == 32u ? 0 : 4;
+    for (std::uint32_t bad : {0u, 2u, 4u, 0x12u, 0x14u, 0x43u, 0x81u, 0x103u})
+        if (stage1_operand_supported(bad) ||
+            stage1_combiner_supported(kStage1Modulate,kStage1Current,bad))
+            return 5;
+    std::printf("00700 512 stage1 operand-modified native combinations and fallback: %u PASS\\n", tested);
+    return tested == 512u ? 0 : 4;
 }

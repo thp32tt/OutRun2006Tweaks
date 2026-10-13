@@ -108,6 +108,7 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_viewport_depth_probe_00687.cpp -o /tmp/dx11_00687 && /tmp/dx11_00687
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_untextured_game_probe_00686.cpp -o /tmp/dx11_00686 && /tmp/dx11_00686
           python tools/test_dx11_stage1_factor_00673.py
+          python tools/test_dx11_stage1_operands_00700.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_factor_probe.cpp -o /tmp/dx11_stage1_00673 && /tmp/dx11_stage1_00673
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rgb332_probe.cpp -o /tmp/dx11_rgb332_00667 && /tmp/dx11_rgb332_00667
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_p8_probe.cpp -o /tmp/dx11_p8_00668 && /tmp/dx11_p8_00668
