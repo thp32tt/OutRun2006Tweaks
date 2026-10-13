@@ -53,7 +53,8 @@ def linked(s):
         and "ctx->PSSetConstantBuffers(0, 1, &alphaBuffer);" in consumer
         and "ctx->DrawIndexed(indexCount, 0, 0);" in consumer
         and "ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in consumer
-        and "supported_game_state(game, vp, layout, transforms, capture, output)" in observer
+        and "D3DPRIMITIVETYPE topology," in producer
+        and "supported_game_state(game, type, vp, layout, transforms, capture, output)" in observer
         and "if (!submit(s, vertices, fanTriangles.data()," in observer
         and "if (!submit(s, vertices, indices, indexCount, type, capture, output))" in observer
         and "return optedIn;" in s
@@ -73,6 +74,9 @@ def main():
         ("output.alphaRef = reference;", "output.alphaRef = 0u;"),
         ("static_cast<float>(output.alphaFunc)", "8.0f"),
         ("static_cast<float>(output.alphaRef)", "0.0f"),
+        ("supported_game_state(game, type, vp, layout, transforms, capture, output)",
+         "supported_game_state(game, D3DPT_TRIANGLELIST, vp, layout, transforms, capture, output)"),
+        ("D3DPRIMITIVETYPE topology,", "D3DPRIMITIVETYPE unusedTopology,"),
         ("ctx->DrawIndexed(indexCount, 0, 0);", "/* indexed draw dropped */"),
         ("ctx->Draw(static_cast<UINT>(vertices.size()), 0);", "/* linear draw dropped */"),
     ]
