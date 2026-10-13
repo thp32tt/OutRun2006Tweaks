@@ -11,7 +11,7 @@
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "work_key": "DX9EX:VIS:GOAL_PROGRESS",
-  "status": "BUILD_VERIFIED_NONTERMINAL",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "feature_status": "IN_PROGRESS_UNSAFE_B9200_TEXT_OWNER_OR_HMD_TEST",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00777]",
@@ -92,8 +92,8 @@
     "negative_test_evidence": "New source structural positive and five mutated failure regressions for exact original caller scoping, queue tagging and restore; GitHub exact-SHA required.",
     "eye_ownership": "Direct safe GOAL source-time ScreenHud scope provides finite per-eye HUD handling; each appended SpriteNode retains its exact ScreenHud semantic and queue scope restores on exit. The remaining 19 B9200 E8 callsites are unhooked because source minidumps show return-address patch crashes."
   },
-  "notes": "C6 nonterminal build-verification checkpoint. Safe Sumo_Printf, 0x2D200 progress and paired GOAL helper source-time and queued ScreenHud paths were implemented at material SHA and exact-SHA CI passed on validation-bearing SHA. Full GOAL optical correction is NOT established: nineteen unsafe B9200 original E8 parent sources were deliberately not re-hooked after confirmed minidump crashes (0x97C5F/0x97E75). Continue same FEATURE_ID/TASK_ID if source-safe additional ownership path can be demonstrated; Quest3/VDXR remains UNTESTED. No feature-level completion or score credit claimed.",
-  "controller_terminal": false,
+  "notes": "C6 standalone [skip ci] bookkeeping confirms exact-SHA 00c92d6f182ada51355391fcacb81bb8d4f8cc4f DX9Ex Active 5/5, Domain Isolation and HUD Inspector SUCCESS. Prior hold: TERMINAL_STATUS_NOT_COMPLETE; task-level terminal status is now COMPLETE_BUILD_VERIFIED. Safe Sumo_Printf, 0x2D200 progress and paired GOAL helper source-time and queued ScreenHud paths were implemented at material SHA; this bookkeeping commit makes no source changes. Full GOAL optical correction is NOT established: nineteen unsafe B9200 original E8 parent sources remain deliberately unhooked after minidump-proven crashes (0x97C5F/0x97E75). Feature-level state remains IN_PROGRESS_UNSAFE_B9200_TEXT_OWNER_OR_HMD_TEST; additional source-safe ownership work is still possible under the same feature, Quest3/VDXR HMD remains UNTESTED, and no score credit is claimed.",
+  "controller_terminal": true,
   "ci_evidence": {
     "validation_bearing_sha": "00c92d6f182ada51355391fcacb81bb8d4f8cc4f",
     "dx9ex_active": {
