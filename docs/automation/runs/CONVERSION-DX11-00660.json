@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_RGBA_SWIZZLE_MIP_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "166835581205f874a26c4b59c70e0543cb431146",
-  "status": "MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -56,27 +56,35 @@
     "tools/test_dx11_native_rgba_texture_00660.py",
     ".github/workflows/dx11-fast-structural.yml",
     ".github/workflows/backend-conversion-gate.yml",
-    "docs/automation/runs/CONVERSION-DX11-00660.json"
+    "docs/automation/runs/CONVERSION-DX11-00660.json",
+    "tools/test_dx11_first_game_frame_regressions.py"
   ],
   "pipeline": {
     "C0_RECOVER": "PASS latest branch HEAD and policy; previous 00659 C6",
     "C1_REVIEW": "PASS A8B8G8R8/X8B8G8R8 absent from native game texture bridge",
     "C2_IMPLEMENT": "PASS real D3D9 RGB channel swizzle -> D3D11 SRV plus regression",
-    "C3_VALIDATE": "LOCAL_RGBA_CPU_PROBE_PASS; EXACT_SHA_GATES_PENDING",
-    "C4_COMMIT": "MATERIAL_COMMITTED",
+    "C3_VALIDATE": "PASS Local CPU pixel probe + DX11 Fast #38358054655 + Build #38358061641 + OpenXR #38358061628 + HUD #38358061685 + Backend Gate #38358054731 exact-SHA 5/5 SUCCESS after source regression repair",
+    "C4_COMMIT": "PASS material 022483b27993756fc376feb4fb76d03ac1735805; validation-bearing repair 28e375e50edbc93e7d789b9e91347b2057017be9",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "acceptance_results": {
     "cpu_probe": "LOCAL_CPP_PASS",
-    "static_regression": "PENDING_GITHUB_GATE",
-    "compile_build": "PENDING_EXACT_SHA",
+    "static_regression": "PASS_EXACT_SHA",
+    "compile_build": "SUCCESS_EXACT_SHA",
     "game_visual_parity": "NEED_HMD_TEST",
     "gamepad": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
   },
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "next_action": "Check GitHub backend/fast/build/OpenXR/HUD on material exact SHA, repair actual failures; Quest3 runtime remains untested."
+  "material_result_sha": "022483b27993756fc376feb4fb76d03ac1735805",
+  "validation_bearing_result_sha": "28e375e50edbc93e7d789b9e91347b2057017be9",
+  "result_sha": "28e375e50edbc93e7d789b9e91347b2057017be9",
+  "next_action": "BUILD_VERIFIED at exact 28e375e SHA 5/5 gates SUCCESS. Quest3/VDXR actual menu/car/race pixels and gamepad still NEED_HMD_TEST, RUNTIME_VALIDATION=UNTESTED. New code selection belongs to next controller task.",
+  "gate_runs": {
+    "Backend Conversion Gate": 38358054731,
+    "DX11 Fast Structural Checks": 38358054655,
+    "Build": 38358061641,
+    "OpenXR VR architecture": 38358061628,
+    "OutRun EXE HUD Inspector CI": 38358061685
+  }
 }
