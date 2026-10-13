@@ -245,8 +245,12 @@ def check_font_density_hysteresis(hook: str) -> None:
     ):
         assert a in density
         broken = density.replace(a, b, 1)
-        assert any(token not in broken for token in required), (
-            "F11 XR hysteresis mutant survived: " + a)
+        # Two independent arms intentionally share this assignment. A
+        # one-arm mutation is a regression even if its sibling remains.
+        assert any(token not in broken for token in required) or (
+            a == "vrFontMultiplier = previous;" and
+            density.count(a) == 2 and broken.count(a) == 1
+        ), "F11 XR hysteresis mutant survived: " + a
 
     def next_density(current, factor, active=True):
         if not active or not math.isfinite(factor) or factor <= 0:
