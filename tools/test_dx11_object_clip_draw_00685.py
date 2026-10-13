@@ -19,9 +19,11 @@ def connected(code):
         "s.pending = true;",
     )) and all(t in span for t in (
         "clip[row] * matrix.m[row][col]",
-        "if (!game_native_object_clip_position(clip))",
+        "if (!game_native_world_depth_clip(clip, vp.MinZ, vp.MaxZ) ||",
+        "!game_native_object_clip_position(clip))",
         "std::copy(clip.begin(), clip.end(), v.clip);",
-    )) and all(t in entry for t in (
+    )) and span.index("game_native_world_depth_clip(clip, vp.MinZ, vp.MaxZ)") < \
+        span.index("game_native_object_clip_position(clip)") and all(t in entry for t in (
         "translate_vertices(bytes, vertexCount, stride, vp,",
         "if (indices)",
         "submit(s, vertices,",
@@ -31,7 +33,8 @@ def connected(code):
 assert connected(src), "live OutRun world WVP -> D3D11 Draw/Indexed path disconnected"
 for token in (
     '#include "live_game_object_clip.hpp"',
-    "if (!game_native_object_clip_position(clip))",
+    "if (!game_native_world_depth_clip(clip, vp.MinZ, vp.MaxZ) ||",
+        "!game_native_object_clip_position(clip))",
     "std::copy(clip.begin(), clip.end(), v.clip);",
     "ctx->DrawIndexed(indexCount, 0, 0);",
     "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
