@@ -361,7 +361,10 @@ def verify_menu_bar_clip_state(code: str) -> None:
         "d3ddev->SetRenderState(D3DRS_SCISSORTESTENABLE, prevScissorTest);",
         "d3ddev->SetRenderState(D3DRS_STENCILENABLE, prevStencilEnable);",
     )
-    order = [endscene.index(item) for item in required]
+    # The live-resize predicate occurs earlier in EndScene as well. Anchor
+    # the ordering check at the snapshot owner, not the first matching token.
+    clip_start = endscene.index("const bool clipStateReady =")
+    order = [endscene.index(item, clip_start) for item in required]
     assert order == sorted(order) and len(set(order)) == len(order)
     assert endscene.count("if (clipStateReady)") == 1
     # A failed state snapshot gates ALL sidebar draws, not the ImGui branch.
