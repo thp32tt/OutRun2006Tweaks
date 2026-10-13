@@ -11,9 +11,9 @@
   "work_key": "DX11:NATIVE_STEREO_EYE_COPY_AND_SHARED_GPU_FENCE",
   "feature_id": "NATIVE_STEREO_EYE_OUTPUT_GAME_FRAME_TRANSPORT",
   "base_head_sha": "9ca093e843d9a0e45b494233213d3ef005b24ebe",
-  "status": "PARTIAL_IMPLEMENTATION_AWAITING_LIVE_GAME_LINK_AND_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -97,7 +97,7 @@
     "C3_VALIDATE": "RETRY_EXACT_SHA_AFTER_POLICY_AND_CONSUMER_PROBE_REPAIR",
     "C4_COMMIT": "MATERIAL_COMMIT_PREPARED",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA_AND_LIVE_GAME_OUTPUT"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "acceptance_results": {
     "eye-producer-pair": "PENDING_GITHUB_HOST_WARP",
@@ -108,6 +108,6 @@
     "quest3_vdxr": "UNTESTED"
   },
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "dbc08b382ece2c1f38aa3975224897048a55f09d",
   "result_sha": null
 }
