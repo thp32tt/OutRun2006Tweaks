@@ -18,8 +18,9 @@ assert "return rgb && a;" in h
 for x in ("ctx->DrawIndexed(indexCount, 0, 0);",
           "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
           "s.ps.Get()"): assert x in draw
-for x in ("game_fvf_untextured_stage0(", "nextColorOp, layout.hasDiffuse",
-          "GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)"):
-    assert x not in part.replace(x,"REMOVED",1)
+for token in ("game_fvf_untextured_stage0(", "nextColorOp, layout.hasDiffuse",
+              "GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)"):
+    mutated = part.replace(token, "REMOVED", 1)
+    assert mutated != part and token not in mutated.split("if (!capture.enabled) {", 1)[1].split("if (capture.enabled) {", 1)[0]
 assert "observe_source_device(s, game)" in s
 print("00686 native game untextured Draw/Indexed integration: PASS")

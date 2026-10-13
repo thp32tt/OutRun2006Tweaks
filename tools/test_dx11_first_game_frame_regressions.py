@@ -156,9 +156,8 @@ def main() -> None:
             return False
         section = code[start:end]
         return all(token in section for token in (
-            "const bool rgbDiffuse =",
-            "const bool alphaDiffuse =",
-            "if (!rgbDiffuse || !alphaDiffuse) return false;",
+            "if (!game_fvf_untextured_stage0(",
+            "nextColorOp, layout.hasDiffuse",
             "GetRenderState(D3DRS_FOGENABLE, &fog)",
             "GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
             "stencil || !clip || fog ||",
@@ -168,8 +167,8 @@ def main() -> None:
 
     assert exact_diffuse_state_gate(bridge)
     for bad, replacement in (
-        ("if (!rgbDiffuse || !alphaDiffuse) return false;",
-         "if (!rgbDiffuse && !alphaDiffuse) return false;"),
+        ("if (!game_fvf_untextured_stage0(",
+         "if (false && !game_fvf_untextured_stage0("),
         ("GetRenderState(D3DRS_FOGENABLE, &fog)",
          "GetRenderState(D3DRS_FOGENABLE, &clip)"),
         ("GetRenderState(D3DRS_SCISSORTESTENABLE, &scissor)",
@@ -592,15 +591,8 @@ def main() -> None:
             "GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)",
             "GetTextureStageState(0, D3DTSS_ALPHAARG1, &alphaArg1)",
             "GetTextureStageState(0, D3DTSS_ALPHAARG2, &alphaArg2)",
-            "(op == D3DTOP_SELECTARG1 &&",
-            "(arg == D3DTA_DIFFUSE || arg == D3DTA_CURRENT)",
-            "(op == D3DTOP_SELECTARG2 &&",
-            "(arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT)",
-            "(alphaOp == D3DTOP_SELECTARG1 &&",
-            "(alphaArg1 == D3DTA_DIFFUSE || alphaArg1 == D3DTA_CURRENT)",
-            "(alphaOp == D3DTOP_SELECTARG2 &&",
-            "(alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT)",
-            "if (!rgbDiffuse || !alphaDiffuse) return false;",
+            "if (!game_fvf_untextured_stage0(",
+            "nextColorOp, layout.hasDiffuse",
         )
         return all(p in gate for p in predicates) and (
             "float4 PS(VOut v) : SV_Target { float4 c = v.diffuse;" in code
@@ -615,15 +607,10 @@ def main() -> None:
         ("D3DTSS_ALPHAOP, &alphaOp)", "D3DTSS_ALPHAOP, &arg2)"),
         ("D3DTSS_ALPHAARG1, &alphaArg1)", "D3DTSS_ALPHAARG1, &arg2)"),
         ("D3DTSS_ALPHAARG2, &alphaArg2)", "D3DTSS_ALPHAARG2, &arg2)"),
-        ("op == D3DTOP_SELECTARG1 &&", "op == D3DTOP_MODULATE &&"),
-        ("arg == D3DTA_DIFFUSE || arg == D3DTA_CURRENT", "arg == D3DTA_TEXTURE || arg == D3DTA_CURRENT"),
-        ("op == D3DTOP_SELECTARG2 &&", "op == D3DTOP_MODULATE &&"),
-        ("arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT", "arg2 == D3DTA_TEXTURE || arg2 == D3DTA_CURRENT"),
-        ("alphaOp == D3DTOP_SELECTARG1 &&", "alphaOp == D3DTOP_MODULATE &&"),
-        ("alphaArg1 == D3DTA_DIFFUSE || alphaArg1 == D3DTA_CURRENT", "alphaArg1 == D3DTA_TEXTURE || alphaArg1 == D3DTA_CURRENT"),
-        ("alphaOp == D3DTOP_SELECTARG2 &&", "alphaOp == D3DTOP_MODULATE &&"),
-        ("alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT", "alphaArg2 == D3DTA_TEXTURE || alphaArg2 == D3DTA_CURRENT"),
-        ("if (!rgbDiffuse || !alphaDiffuse) return false;", "if (!rgbDiffuse && !alphaDiffuse) return false;"),
+        ("if (!game_fvf_untextured_stage0(",
+         "if (false && !game_fvf_untextured_stage0("),
+        ("nextColorOp, layout.hasDiffuse",
+         "D3DTOP_DISABLE, layout.hasDiffuse"),
     )
     for original, altered in untextured_mutations:
         # Mutate the local admission clause only: the textured stage has
@@ -636,6 +623,30 @@ def main() -> None:
         assert not untextured_diffuse_linked(mutant), (
             "untextured stage-0 RGB/alpha native regression escaped: " + original
         )
+
+    # The portable FVF converter is a genuine fail-closed native admission
+    # function: reject source complements/TFACTOR, missing diffuse, active
+    # downstream stages and undefined enabled-color alpha disable.
+    fvf = (ROOT / "src/vr/d3d11/live_game_fvf_layout.hpp").read_text(encoding="utf-8")
+    def exact_untextured_fvf_helper(text: str) -> bool:
+        return all(x in text for x in (
+            "if (!diffuse) return false;",
+            "if (op == 1u) return nextOp == 1u;",
+            "(op == 2u && (arg1 == 0u || arg1 == 1u))",
+            "(op == 3u && (arg2 == 0u || arg2 == 1u))",
+            "(alphaOp == 2u && (alpha1 == 0u || alpha1 == 1u))",
+            "(alphaOp == 3u && (alpha2 == 0u || alpha2 == 1u))",
+            "return rgb && a;",
+        ))
+    assert exact_untextured_fvf_helper(fvf)
+    for token in ("if (!diffuse) return false;",
+                  "if (op == 1u) return nextOp == 1u;",
+                  "(op == 2u && (arg1 == 0u || arg1 == 1u))",
+                  "(op == 3u && (arg2 == 0u || arg2 == 1u))",
+                  "(alphaOp == 2u && (alpha1 == 0u || alpha1 == 1u))",
+                  "(alphaOp == 3u && (alpha2 == 0u || alpha2 == 1u))",
+                  "return rgb && a;"):
+        assert not exact_untextured_fvf_helper(fvf.replace(token, "REMOVED", 1)), token
 
     # Source D3DTOP numeric SELECTARG1/2, texture vs diffuse/current and
     # modifier inputs: both independently selected channels must agree.
