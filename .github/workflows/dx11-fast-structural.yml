@@ -66,6 +66,8 @@ jobs:
           python tools/test_dx11_live_point_draw_00645.py
           python tools/test_dx11_sparse_index_draw_00646.py
           python tools/test_dx11_fragmented_vb_shadow_00647.py
+          python tools/test_dx11_race_depth_draw_00648.py
+          g++ -std=c++17 -O2 -Wall -Wextra -pedantic tools/dx11_game_depth_probe.cpp -o /tmp/dx11_depth_00648 && /tmp/dx11_depth_00648
           g++ -std=c++17 -O2 -Wall -Wextra -pedantic tools/dx11_game_primitive_span_probe.cpp -o /tmp/dx11_primitive_00644 && /tmp/dx11_primitive_00644
       - name: Verify source graph and dormant runtime activation
         run: |

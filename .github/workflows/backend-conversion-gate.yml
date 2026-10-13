@@ -134,6 +134,10 @@ jobs:
       - name: Verify fragmented indexed VB shadow native DrawIndexed 00647
         if: startsWith(github.ref_name, 'vr-dx11-native')
         run: python tools/test_dx11_fragmented_vb_shadow_00647.py
+      - name: Verify DX11 depth-tested race Draw integration 00648
+        if: startsWith(github.ref_name, 'vr-dx11-native')
+        run: python tools/test_dx11_race_depth_draw_00648.py
+
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh

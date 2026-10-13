@@ -1,5 +1,6 @@
 #include "live_game_frame_bridge.hpp"
 #include "live_game_primitive_span.hpp"
+#include "live_game_depth_state.hpp"
 #include "live_game_fvf_layout.hpp"
 #include "live_game_stage0_blend.hpp"
 #include "native_backend.hpp"
@@ -777,6 +778,8 @@ struct OutputCapture {
     bool sourceAlphaSaturateAddBlend = false; // SRCALPHASAT/ONE
     D3D11_BLEND_OP blendOp = D3D11_BLEND_OP_ADD; // Captured D3D9 RGB and alpha operation.
     bool alphaTest = false;
+    bool nativeDepthTest = false;
+    bool nativeDepthLessEqual = false;
     DWORD alphaRef = 0;
     D3DCMPFUNC alphaFunc = D3DCMP_ALWAYS;
     bool scissor = false;
@@ -793,6 +796,10 @@ struct ReadbackSlot {
 struct State {
     std::mutex mutex;
     NativeBackend backend;
+    // Diagnostic-only depth is never shared with the original D3D9 renderer.
+    ComPtr<ID3D11Texture2D> diagnosticDepth;
+    ComPtr<ID3D11DepthStencilView> diagnosticDepthView;
+    std::array<ComPtr<ID3D11DepthStencilState>, 2> diagnosticDepthStates;
     ComPtr<ID3D11VertexShader> vs;
     ComPtr<ID3D11PixelShader> ps;
     ComPtr<ID3D11PixelShader> sampledPs;
@@ -990,6 +997,9 @@ bool ensure_pipeline(State& s) noexcept {
         s.inverseAlphaAddBlend && s.sourceReplaceBlend &&
         s.alphaConstants && readbackReady)
         return true;
+    s.diagnosticDepthView.Reset();
+    s.diagnosticDepth.Reset();
+    for (auto& depthState : s.diagnosticDepthStates) depthState.Reset();
     s.backend.shutdown();
     s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset(); s.textureOnlyPs.Reset(); s.selectTextureDiffuseAlphaPs.Reset(); s.selectTextureModulateAlphaPs.Reset(); s.selectTextureModulate2XAlphaPs.Reset(); s.selectTextureModulate4XAlphaPs.Reset(); s.selectTextureAddAlphaPs.Reset(); s.selectTextureSubtractAlphaPs.Reset(); s.selectDiffuseTextureAlphaPs.Reset(); s.selectDiffuseModulateAlphaPs.Reset(); s.selectDiffuseAddAlphaPs.Reset(); s.selectDiffuseSubtractAlphaPs.Reset(); s.selectDiffuseModulate2XAlphaPs.Reset(); s.selectDiffuseModulate4XAlphaPs.Reset(); s.selectTextureAddSmoothAlphaPs.Reset(); s.selectDiffuseAddSmoothAlphaPs.Reset(); s.selectTextureFactorAlphaPs.Reset(); s.selectTextureTfactorAlphaPs.Reset(); s.selectDiffuseFactorAlphaPs.Reset(); s.selectDiffuseTfactorAlphaPs.Reset(); s.selectTextureBlendTextureAlphaPs.Reset(); s.selectDiffuseBlendTextureAlphaPs.Reset(); s.selectTextureBlendDiffuseAlphaPs.Reset(); s.selectDiffuseBlendDiffuseAlphaPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset();
     s.subtractTextureAlphaPs.Reset(); s.subtractDiffuseAlphaPs.Reset(); s.subtractModulateAlphaPs.Reset(); s.modulate2xPs.Reset(); s.modulate4xPs.Reset(); s.modulate2xTextureAlphaPs.Reset(); s.modulate2xDiffuseAlphaPs.Reset(); s.modulate4xTextureAlphaPs.Reset(); s.modulate4xDiffuseAlphaPs.Reset(); s.mixedTextureAlphaPs.Reset(); s.mixedDiffuseAlphaPs.Reset(); s.mixedAddTextureAlphaPs.Reset(); s.mixedAddDiffuseAlphaPs.Reset(); s.blendTextureAlphaPs.Reset(); s.blendTextureAlphaPmPs.Reset(); s.blendTextureAlphaPmTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmFactorAlphaPs.Reset(); s.blendTextureAlphaPmSignedFactorAlphaPs.Reset(); s.blendTextureAlphaPmSigned2XFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateAlphaPs.Reset(); s.blendTextureAlphaPmAddAlphaPs.Reset(); s.blendTextureAlphaPmSubtractAlphaPs.Reset(); s.blendTextureAlphaPmModulate2XAlphaPs.Reset(); s.blendTextureAlphaPmModulate4XAlphaPs.Reset(); s.blendTextureAlphaPmAddSignedAlphaPs.Reset(); s.blendTextureAlphaPmAddSigned2XAlphaPs.Reset(); s.blendTextureAlphaPmBlendTextureAlphaPs.Reset(); s.blendTextureAlphaPmBlendDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmBlendCurrentFactorAlphaPs.Reset(); s.blendTextureAlphaPmBlendFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothAlphaPs.Reset(); s.blendDiffuseAlphaPs.Reset(); s.blendTextureSelectedTextureAlphaPs.Reset(); s.blendTextureSelectedDiffuseAlphaPs.Reset(); s.blendDiffuseSelectedTextureAlphaPs.Reset(); s.blendDiffuseSelectedDiffuseAlphaPs.Reset(); s.blendTextureModulateAlphaPs.Reset(); s.blendDiffuseModulateAlphaPs.Reset(); s.blendTextureModulate2XAlphaPs.Reset(); s.blendTextureModulate4XAlphaPs.Reset(); s.blendDiffuseModulate2XAlphaPs.Reset(); s.blendDiffuseModulate4XAlphaPs.Reset(); s.blendTextureAddAlphaPs.Reset(); s.blendDiffuseAddAlphaPs.Reset(); s.blendTextureSubtractAlphaPs.Reset(); s.blendDiffuseSubtractAlphaPs.Reset(); s.blendTextureAddSmoothAlphaPs.Reset(); s.blendDiffuseAddSmoothAlphaPs.Reset(); s.blendFactorAlphaPs.Reset(); s.blendFactorTextureAlphaPs.Reset(); s.blendFactorModulateAlphaPs.Reset();
@@ -1541,9 +1551,31 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cullMode)) ||
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fillMode)) ||
-        stencil || depth || !clip || fog ||
+        stencil || !clip || fog ||
         cullMode != D3DCULL_NONE || fillMode != D3DFILL_SOLID)
         return false;
+    // Mirror only one isolated game-authored Z draw. The newly cleared DSV
+    // omits earlier D3D9 occluders: this is diagnostic, NOT scene parity.
+    // W-buffering, depth-bias, missing depth, and disabled Z-writes fail closed.
+    if (depth != D3DZB_FALSE) {
+        DWORD zWrite = 0, zFunc = 0, bias = ~0u, slopeBias = ~0u;
+        ComPtr<IDirect3DSurface9> gameDepth;
+        D3DSURFACE_DESC depthDesc{};
+        if (FAILED(game->GetRenderState(D3DRS_ZWRITEENABLE, &zWrite)) ||
+            FAILED(game->GetRenderState(D3DRS_ZFUNC, &zFunc)) ||
+            FAILED(game->GetRenderState(D3DRS_DEPTHBIAS, &bias)) ||
+            FAILED(game->GetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, &slopeBias)) ||
+            FAILED(game->GetDepthStencilSurface(gameDepth.GetAddressOf())) ||
+            !gameDepth || FAILED(gameDepth->GetDesc(&depthDesc)))
+            return false;
+        GameNativeDepthAdmission admitted{};
+        if (!game_native_depth_admission(
+                depth, zWrite, zFunc, bias, slopeBias,
+                depthDesc.MultiSampleType == D3DMULTISAMPLE_NONE, admitted))
+            return false;
+        output.nativeDepthTest = admitted.enabled;
+        output.nativeDepthLessEqual = admitted.lessEqual;
+    }
     // Only native one-pixel points without sprites or per-vertex point sizes.
     // All larger/scaled point raster states continue to the original D3D9
     // Draw only; do not display a misleading native menu/effect inset.
@@ -3014,8 +3046,57 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         }
         maskedBlend = &cached;
     }
+    // Allocate an optional isolated D32 target for exact supported Z draws.
+    // Existing no-depth menu/UI draws never depend on this attachment.
+    if (output.nativeDepthTest) {
+        if (!s.diagnosticDepthView) {
+            D3D11_TEXTURE2D_DESC depthDesc{};
+            depthDesc.Width = kWidth;
+            depthDesc.Height = kHeight;
+            depthDesc.MipLevels = 1;
+            depthDesc.ArraySize = 1;
+            depthDesc.Format = DXGI_FORMAT_D32_FLOAT;
+            depthDesc.SampleDesc.Count = 1;
+            depthDesc.Usage = D3D11_USAGE_DEFAULT;
+            depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+            ComPtr<ID3D11Texture2D> createdDepth;
+            ComPtr<ID3D11DepthStencilView> createdView;
+            if (FAILED(dev->CreateTexture2D(&depthDesc, nullptr,
+                                            createdDepth.GetAddressOf())) ||
+                FAILED(dev->CreateDepthStencilView(createdDepth.Get(), nullptr,
+                                                  createdView.GetAddressOf())))
+                return false;
+            s.diagnosticDepth = std::move(createdDepth);
+            s.diagnosticDepthView = std::move(createdView);
+        }
+        auto& depthState =
+            s.diagnosticDepthStates[output.nativeDepthLessEqual ? 1u : 0u];
+        if (!depthState) {
+            D3D11_DEPTH_STENCIL_DESC ds{};
+            ds.DepthEnable = TRUE;
+            ds.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+            ds.DepthFunc = output.nativeDepthLessEqual ?
+                D3D11_COMPARISON_LESS_EQUAL : D3D11_COMPARISON_LESS;
+            ds.StencilEnable = FALSE;
+            if (FAILED(dev->CreateDepthStencilState(&ds,
+                                                    depthState.GetAddressOf())))
+                return false;
+        }
+    }
     ctx->UpdateSubresource(s.alphaConstants.Get(), 0, nullptr, alphaParams, 0, 0);
     s.backend.begin_frame(kBackground);
+    if (output.nativeDepthTest) {
+        ID3D11RenderTargetView* rtv = s.backend.color_rtv();
+        ctx->OMSetRenderTargets(1, &rtv, s.diagnosticDepthView.Get());
+        ctx->ClearDepthStencilView(s.diagnosticDepthView.Get(),
+                                   D3D11_CLEAR_DEPTH, 1.0f, 0);
+        ctx->OMSetDepthStencilState(
+            s.diagnosticDepthStates[output.nativeDepthLessEqual ? 1u : 0u].Get(), 0);
+    } else {
+        // Immediate-context state survives across draws; do not depth-test
+        // later menu/vehicle/HUD draws using the previous race state.
+        ctx->OMSetDepthStencilState(nullptr, 0);
+    }
     if (maskedBlend)
         ctx->OMSetBlendState(maskedBlend->Get(), nullptr, 0xffffffffu);
     else if (output.additiveBlend)
@@ -3398,6 +3479,8 @@ void before_game_reset() noexcept {
     }
     s.readSlot = s.writeSlot = 0;
     s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
+    s.diagnosticDepthView.Reset(); s.diagnosticDepth.Reset();
+    for (auto& depthState : s.diagnosticDepthStates) depthState.Reset();
     s.raster.Reset(); s.scissorRaster.Reset(); s.layout.Reset();
     s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset(); s.inverseSourceAlphaBlend.Reset(); s.sourceAlphaCopyBlend.Reset(); s.inverseAlphaCopyBlend.Reset(); s.inverseAlphaAddBlend.Reset(); s.sourceReplaceBlend.Reset(); s.multiplyBlend.Reset(); s.inverseDestMultiplyBlend.Reset(); s.inverseSourceMultiplyBlend.Reset(); s.destAlphaCrossfadeBlend.Reset(); s.reverseDestAlphaCrossfadeBlend.Reset(); s.sourceAlphaSaturateCopyBlend.Reset(); s.sourceAlphaSaturateAddBlend.Reset();
     s.alphaConstants.Reset();
