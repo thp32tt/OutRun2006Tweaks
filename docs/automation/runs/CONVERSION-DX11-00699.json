@@ -12,7 +12,7 @@
   "work_key": "DX11:GAME_NATIVE_2K_TEXTURE_ATLAS",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_RESULT",
-  "automation_validation": "PASS_EXACT_SHA_5_OF_5",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
