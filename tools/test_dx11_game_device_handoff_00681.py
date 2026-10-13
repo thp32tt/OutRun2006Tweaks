@@ -50,6 +50,7 @@ static_assert(GameReadbackProvenance{20,4,0xA0}.same_device(0xA0));
 static_assert(!GameReadbackProvenance{20,4,0xA0}.same_device(0xB0));
 static_assert(!GameReadbackProvenance{20,4,0xA0}.same_device(0));
 static_assert(!GameReadbackProvenance{20,4,0}.same_device(0xA0));
+static_assert(!GameReadbackProvenance{20,4,0}.same_device(0));
 static_assert(!GameReadbackProvenance{20,4,0xA0}.may_overlay(23));
 static_assert(!GameReadbackProvenance{20,0,0xA0}.may_overlay(21));
 int main() { return 0; }
