@@ -350,6 +350,47 @@ namespace OutRunVRStereo
             return true;
         }
 
+        // Read a sparse *game-authored* VB range under one shadow mutex.
+        // Each accessed vertex must belong to the current Lock/Unlock valid
+        // ranges; no D3D9 Lock on a live GPU buffer, no partial output on miss.
+        bool R30CopySparseVertexShadow(
+            IDirect3DVertexBuffer9* buffer, UINT streamOffset, UINT stride,
+            const std::vector<std::uint32_t>& physical,
+            std::vector<std::uint8_t>& out)
+        {
+            if (!buffer || stride < 16u || stride > 512u ||
+                physical.empty() || physical.size() > 128u) return false;
+            const auto entry = R30FindVertexShadow(buffer);
+            if (!entry) { ++R30ShadowReadMisses; return false; }
+            std::lock_guard<std::mutex> lock(entry->mutex);
+            if (entry->bytes.size() != entry->size) {
+                ++R30ShadowReadMisses;
+                return false;
+            }
+            std::vector<UINT> byteOffsets;
+            byteOffsets.reserve(physical.size());
+            for (const auto physicalIndex : physical) {
+                const std::uint64_t offset =
+                    static_cast<std::uint64_t>(streamOffset) +
+                    static_cast<std::uint64_t>(physicalIndex) * stride;
+                if (offset > UINT_MAX || offset > entry->size ||
+                    stride > entry->size - offset ||
+                    !R30RangeValid(entry->valid, static_cast<UINT>(offset),
+                                   static_cast<UINT>(offset + stride))) {
+                    ++R30ShadowReadMisses;
+                    return false;
+                }
+                byteOffsets.push_back(static_cast<UINT>(offset));
+            }
+            std::vector<std::uint8_t> candidate(physical.size() * stride);
+            for (std::size_t i = 0; i < byteOffsets.size(); ++i)
+                std::memcpy(candidate.data() + i * stride,
+                            entry->bytes.data() + byteOffsets[i], stride);
+            out.swap(candidate);
+            ++R30ShadowReadHits;
+            return true;
+        }
+
         bool R30CopyIndexShadow(IDirect3DIndexBuffer9* buffer,
             UINT offset, UINT size, std::vector<std::uint8_t>& out)
         {
@@ -3237,7 +3278,9 @@ namespace OutRunVRStereo
                     high = std::max(high, static_cast<std::uint64_t>(physical));
                 }
                 std::vector<std::uint8_t> vertices;
+                UINT nativeVertexCount = 0u;
                 if (ok && high >= low && high-low+1u <= 1536u) {
+                    // Preserve the fast path for dense/menu index buffers.
                     const std::uint64_t first =
                         static_cast<std::uint64_t>(streamOffset)+low*stride;
                     const std::uint64_t vertexBytes=(high-low+1u)*stride;
@@ -3246,13 +3289,29 @@ namespace OutRunVRStereo
                          first <= UINT_MAX && vertexBytes <= UINT_MAX &&
                          R30CopyVertexShadow(vb, static_cast<UINT>(first),
                                              static_cast<UINT>(vertexBytes), vertices);
-                    if (ok) for (auto& i : indices)
-                        i -= static_cast<std::uint32_t>(low);
+                    if (ok) {
+                        for (auto& i : indices)
+                            i -= static_cast<std::uint32_t>(low);
+                        nativeVertexCount = static_cast<UINT>(high-low+1u);
+                    }
+                } else if (ok && high >= low) {
+                    // Distant indexed VB slots (e.g. vehicle/track meshes):
+                    // gather only game-referenced vertices, at most 128, with
+                    // epoch-valid shadow bytes and compact native indices.
+                    std::vector<std::uint32_t> uniquePhysical, compact;
+                    ok = live::game_compact_sparse_indices(
+                             indices.data(), count, 128u, uniquePhysical, compact) &&
+                         R30CopySparseVertexShadow(
+                             vb, streamOffset, stride, uniquePhysical, vertices);
+                    if (ok) {
+                        nativeVertexCount = static_cast<UINT>(uniquePhysical.size());
+                        indices.swap(compact);
+                    }
                 } else ok = false;
                 ib->Release();
                 vb->Release();
                 if (ok) live::observe_indexed(device, topology, primitiveCount,
-                    vertices.data(), stride, static_cast<UINT>(high-low+1u),
+                    vertices.data(), stride, nativeVertexCount,
                     indices.data(), count);
             } catch (...) { /* Preserve D3D9 draw even on allocation failure. */ }
         }

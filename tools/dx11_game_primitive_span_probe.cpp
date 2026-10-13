@@ -64,5 +64,20 @@ int main() {
     assert(!game_fan_to_triangle_list(2, nullptr, 0, 3, fan) && fan == preserved);
     assert(!game_fan_to_triangle_list(0, nullptr, 0, 0, fan) && fan == preserved);
     assert(!game_fan_to_triangle_list(513, nullptr, 0, 515, fan) && fan == preserved);
+    // Sparse real D3D9 VB uses absolute physical offsets far outside the
+    // 1536 contiguous-slot diagnostic bound, but only three distinct slots.
+    using outrun::vr::dx11::live_game_frame::game_compact_sparse_indices;
+    const std::uint32_t distant[] = {100u, 10000u, 100u, 200000u, 10000u};
+    std::vector<std::uint32_t> uniqueSlots{999u}, remapped{888u};
+    assert(game_compact_sparse_indices(distant, 5u, 3u, uniqueSlots, remapped));
+    assert((uniqueSlots == std::vector<std::uint32_t>{100u, 10000u, 200000u}));
+    assert((remapped == std::vector<std::uint32_t>{0u, 1u, 0u, 2u, 1u}));
+    const auto keptSlots = uniqueSlots, keptIndices = remapped;
+    assert(!game_compact_sparse_indices(distant, 5u, 2u, uniqueSlots, remapped));
+    assert(uniqueSlots == keptSlots && remapped == keptIndices);
+    assert(!game_compact_sparse_indices(nullptr, 5u, 3u, uniqueSlots, remapped));
+    assert(!game_compact_sparse_indices(distant, 0u, 3u, uniqueSlots, remapped));
+    assert(!game_compact_sparse_indices(distant, 1537u, 3u, uniqueSlots, remapped));
+    assert(uniqueSlots == keptSlots && remapped == keptIndices);
     return 0;
 }

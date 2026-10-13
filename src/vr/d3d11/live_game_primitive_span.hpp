@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <vector>
 
@@ -44,6 +45,33 @@ constexpr bool game_native_primitive_element_count(
     case 6u: return game_primitive_element_count(true, primitiveCount, elements); // TRIANGLEFAN
     default: return false; // Unknown primitive modes remain DX9Ex-only.
     }
+}
+
+// D3D9 can reference a few distant VB vertices in one DrawIndexedPrimitive.
+// A contiguous [min,max] shadow would overread or reject that real game draw.
+// Compact only the referenced *physical* VB slots, retaining original index order.
+// The caller validates every indexed VB byte against its current Lock/Unlock
+// shadow epoch before issuing the native DrawIndexed. Transactional on failure.
+inline bool game_compact_sparse_indices(
+    const std::uint32_t* physicalIndices, std::uint32_t count,
+    std::uint32_t maxUnique, std::vector<std::uint32_t>& uniquePhysical,
+    std::vector<std::uint32_t>& compactIndices) {
+    if (!physicalIndices || count == 0u || count > 1536u ||
+        maxUnique == 0u || maxUnique > 1536u) return false;
+    std::vector<std::uint32_t> sorted(physicalIndices, physicalIndices + count);
+    std::sort(sorted.begin(), sorted.end());
+    sorted.erase(std::unique(sorted.begin(), sorted.end()), sorted.end());
+    if (sorted.size() > maxUnique) return false;
+    std::vector<std::uint32_t> remapped;
+    remapped.reserve(count);
+    for (std::uint32_t n = 0; n < count; ++n) {
+        const auto found = std::lower_bound(
+            sorted.begin(), sorted.end(), physicalIndices[n]);
+        remapped.push_back(static_cast<std::uint32_t>(found - sorted.begin()));
+    }
+    uniquePhysical.swap(sorted);
+    compactIndices.swap(remapped);
+    return true;
 }
 
 // D3D11 draws 1-pixel points, but D3D9 may enlarge each point, scale it,
