@@ -467,11 +467,11 @@ def check_font_io_cache_contract(font: str) -> None:
 
 
 def check_external_vr_f11_canvas(font: str) -> None:
-    """XR-density F11 uses the whole source canvas; game 4:3 bars stay intact."""
+    """Active VR F11 uses the whole source canvas even at density 1; game rails stay intact."""
     shell = font.split("Overlay::ContentRect Overlay::content_rect()", 1)[1].split(
         "const std::vector<OverlayWindow*>& Overlay::windows()", 1)[0]
     required = (
-        "const bool externalVrShell = VrFontMultiplier > 1.0f &&",
+        "const bool externalVrShell = Game::is_vr_gameplay_presentation();",
         "Game::is_vr_gameplay_presentation();",
         "if (externalVrShell)",
         "return { 0.f, 0.f, screen.x, screen.y };",
@@ -487,6 +487,7 @@ def check_external_vr_f11_canvas(font: str) -> None:
         shell.index("float border = 0.f;"))
     assert shell.index("float border = 0.f;") < (
         shell.index("return { border, 0.f,"))
+    assert "VrFontMultiplier > 1.0f" not in shell
 
     # A real VR F11 window may use the side-rail pixels, but the original
     # front-end and desktop F11 still respect a forced 4:3 letterbox.
@@ -494,7 +495,7 @@ def check_external_vr_f11_canvas(font: str) -> None:
         if not math.isfinite(source_w) or not math.isfinite(source_h) or (
                 source_w <= 0 or source_h <= 0):
             return 0.
-        if in_vr and density > 1.0:
+        if in_vr:
             return source_w
         if force_rails and source_w > source_h * 4. / 3.:
             return source_h * 4. / 3. - 1.0
@@ -506,14 +507,18 @@ def check_external_vr_f11_canvas(font: str) -> None:
         vr_shell = width(w, h, True, 2.75, True)
         assert vr_shell == w
         assert normal <= vr_shell
-        assert width(w, h, True, 1., True) == normal
+        # The VR shell is still external when XR aspect normalises to 1x
+        # font density. Font appearance cannot change the layout owner.
+        assert width(w, h, True, 1., True) == w
+        assert width(w, h, True, 0.5, True) == w
         assert width(w, h, False, 2.75, True) == normal
         assert width(w, h, True, 2.75, False) == w
     assert width(float("nan"), 1440, True, 2.75, True) == 0.
 
     # Mutants must fail at the actual owner (not detached numeric fixtures).
     for original, bad in (
-        ("VrFontMultiplier > 1.0f", "VrFontMultiplier >= 1.0f"),
+        ("const bool externalVrShell = Game::is_vr_gameplay_presentation();",
+         "const bool externalVrShell = VrFontMultiplier > 1.0f && Game::is_vr_gameplay_presentation();"),
         ("Game::is_vr_gameplay_presentation();", "Game::is_in_game();"),
         ("if (externalVrShell)", "if (false)"),
         ("return { 0.f, 0.f, screen.x, screen.y };",
@@ -522,7 +527,7 @@ def check_external_vr_f11_canvas(font: str) -> None:
         assert shell.count(original) == 1, original
         changed = shell.replace(original, bad, 1)
         assert not all(x in changed for x in required), original
-    print("PASS F11 VR full-source canvas, desktop/menu 4:3 preserved, 5 sizes and 4 mutants")
+    print("PASS F11 VR font-independent full-source canvas, desktop/menu 4:3 preserved, 5 sizes and 4 mutants")
 
 def main():
     hook, font, header = (p.read_text(encoding="utf-8")

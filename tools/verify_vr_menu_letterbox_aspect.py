@@ -81,7 +81,8 @@ for old, bad in (
 print("PASS D3D9Ex-compatible menu bars pool/Reset lifecycle, 2 destructive controls")
 
 # Desktop/front-end F11 shares the GPU bars' enablement and rect; only the
-# external high-density XR gameplay shell may use the full source viewport.
+# external XR gameplay shell may use the full source viewport, including
+# when source/eye aspect changes yield an ordinary 1x font atlas.
 # The game 4:3 bars and native desktop/menu layout remain unchanged.
 overlay = (Path(__file__).resolve().parents[1] / "src/overlay/overlay.cpp").read_text()
 
@@ -103,10 +104,19 @@ def verify_shell_rect(code: str) -> None:
         assert marker in shell, marker
     assert shell.index("screen.x <= 0.f") < shell.index("float border = 0.f;")
     assert shell.index("screen.x > contentWidth") < shell.index("border = candidate;")
-    assert "const bool externalVrShell = VrFontMultiplier > 1.0f &&" in shell
+    assert "const bool externalVrShell = Game::is_vr_gameplay_presentation();" in shell
+    assert "VrFontMultiplier > 1.0f" not in shell
     assert "Game::is_vr_gameplay_presentation();" in shell
     assert "if (externalVrShell)" in shell
     assert shell.index("return { 0.f, 0.f, screen.x, screen.y };") < shell.index("float border = 0.f;")
+    # Destructive regression: reinstating the old font-density gate would
+    # clip F11 at the 1.0x threshold during a live XR resolution transition.
+    gated = shell.replace(
+        "const bool externalVrShell = Game::is_vr_gameplay_presentation();",
+        "const bool externalVrShell = VrFontMultiplier > 1.0f && Game::is_vr_gameplay_presentation();",
+        1)
+    assert "const bool externalVrShell = Game::is_vr_gameplay_presentation();" not in gated
+    assert "VrFontMultiplier > 1.0f" in gated
     # The UI and GPU need exactly the same mode-2 / gameplay decision.
     gpu = src.split("static void D3DEndScene(", 1)[1].split(
         "if (overlayInited)", 1)[0]

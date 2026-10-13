@@ -30,13 +30,12 @@ Overlay::ContentRect Overlay::content_rect()
 		screen.x <= 0.f || screen.y <= 0.f)
 		return { 0.f, 0.f, 0.f, 0.f };
 
-	// In active VR gameplay the F11 shell is an external ImGui surface,
-	// not a game/menu sprite. A forced 4:3 game letterbox on a 21:9
-	// mirror otherwise clips its XR-density tabs to a 4:3 canvas, even
-	// though ImGui renders after the letterbox rails over the full source
-	// backbuffer. Keep desktop F11 and actual front-end menus unchanged.
-	const bool externalVrShell = VrFontMultiplier > 1.0f &&
-		Game::is_vr_gameplay_presentation();
+	// F11 is an external ImGui surface throughout VR gameplay, independent
+	// of its font-atlas density. A changed or temporarily missing XR extent
+	// can legitimately yield VrFontMultiplier == 1 while VR is still active:
+	// do not snap the shell back into the game's 4:3 letterbox side rails.
+	// Keep native desktop F11 and original front-end/menu bars untouched.
+	const bool externalVrShell = Game::is_vr_gameplay_presentation();
 	if (externalVrShell)
 		return { 0.f, 0.f, screen.x, screen.y };
 
