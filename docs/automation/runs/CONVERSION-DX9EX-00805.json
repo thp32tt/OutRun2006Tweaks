@@ -10,18 +10,18 @@
   "feature_id": "DX9EX:PERF:R30_SPARSE_INDEX_DEPTH_SORT_CACHE",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R30_SPARSE_INDEX_DEPTH_SORT_CACHE",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATES",
-  "checkpoint": "C3_VALIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00805]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "tools/verify_vr_r30_sparse_depth_classifier.py",
     "docs/automation/runs/CONVERSION-DX9EX-00805.json"
   ],
-  "material_result_sha": "5c8f612ee933102e3752772e9baca8d9485965c2",
+  "material_result_sha": "b919af6b769441418f33e990e45b14e482e54340",
   "feature_contract": {
     "feature_id": "DX9EX:PERF:R30_SPARSE_INDEX_DEPTH_SORT_CACHE",
     "goal": "Preserve the exact first-512 ascending projected-depth classification of OutRun smoke/sand/effect indexed XYZRHW draws while eliminating redundant full index sorts across decoder-stable VB frames and per-UP heap churn.",
@@ -59,9 +59,9 @@
     ]
   },
   "acceptance_results": {
-    "R30_INDEX_GENERATION_SORT_REUSE": "PENDING_EXACT_SHA",
-    "R30_UP_AND_INVALID_HINT_FALLBACK": "PENDING_EXACT_SHA",
-    "R30_EXACT_SHA_WIN32_GATES": "PENDING_EXACT_SHA",
+    "R30_INDEX_GENERATION_SORT_REUSE": "PASS_EXACT_SHA",
+    "R30_UP_AND_INVALID_HINT_FALLBACK": "PASS_EXACT_SHA",
+    "R30_EXACT_SHA_WIN32_GATES": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -78,16 +78,55 @@
       "Forcing lower game resolution or reducing eye quality would change visible image quality without removing the identified CPU work."
     ],
     "fix_evidence": "R30 scratch owns separate VB and UP sorted vectors, with guarded decoded IB generation reuse and invalidation on every decoder miss; raw/no-lease calls preserve old local fallback.",
-    "negative_test_evidence": "Extended destructive static checks and deterministic VB/UP lifecycle+generation/first-512 model; GitHub exact-SHA CI not yet confirmed."
+    "negative_test_evidence": "Exact-SHA policy SUCCESS with source/verifier negative mutations, seeded sparse-depth parity, leased producer ownership and 3-generation decoded-IB fixture."
   },
   "performance_evidence": "Eliminates duplicate >512 reference VB sorting between unchanged IB generations, and reuses UP scratch allocations; measurable p95/p99 Quest3 benefit remains UNTESTED.",
-  "runtime_status": "NEED_QUEST3_VDXR_SCENE_MATCHED_P95_P99",
+  "runtime_status": "BUILD_VERIFIED_NEED_HMD_TEST",
   "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
-    "first_failed_sha": "e66d4dfd5b0e60639830d30c2b0c0327afa513db",
-    "dx9ex_active_run_id": 38478332529,
-    "failure": "policy: run record absent before C++ jobs started",
-    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
-  }
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "3b798204a97aa42f500c2e427c5e2ecbf6c87ec4",
+    "dx9ex_active": {
+      "run_id": 38479067505,
+      "run_attempt": 2,
+      "head_sha": "3b798204a97aa42f500c2e427c5e2ecbf6c87ec4",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "game": "SUCCESS",
+        "host": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38479067519,
+      "head_sha": "3b798204a97aa42f500c2e427c5e2ecbf6c87ec4",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38478645275,
+      "head_sha": "b919af6b769441418f33e990e45b14e482e54340",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "msvc-analyze-active-game": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "source-cross-domain": "SUCCESS"
+      },
+      "note": "Original substantive R30 C++ source identical at validation-bearing 3b798204; subsequent commits affect only the same-task verifier."
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+    "initial_result": "First attempt cancelled by independent 00806 branch push; exact-SHA run 38479067505 attempt 2 reran failed/cancelled game/full-chain and completed all five jobs SUCCESS."
+  },
+  "validation_bearing_result_sha": "3b798204a97aa42f500c2e427c5e2ecbf6c87ec4",
+  "result_sha": "3b798204a97aa42f500c2e427c5e2ecbf6c87ec4",
+  "validation_evidence": {
+    "material": {
+      "sha": "b919af6b769441418f33e990e45b14e482e54340",
+      "description": "R30 actual C++ leased decoder generation cache, UP-owned sparse scratch and fail-closed unknown direct hints"
+    },
+    "targeted": "Seeded ascending first-512 parity across three sparse cardinalities, VB generation cache reuse/invalidations, UP isolation, malformed hint rejection, destructive checks, and full policy Windows CI exact SHA.",
+    "runtime": "Quest3/VDXR headset and p95/p99 runtime not tested."
+  },
+  "c6_recorded_at_utc": "2026-10-13T22:57:14Z"
 }
