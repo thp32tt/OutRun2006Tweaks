@@ -885,13 +885,16 @@ def check_f11_overlay_font_persistence(font: str, header: str) -> None:
     # the INI on every render frame.
     required = (
         "if (FontScalePending &&",
-        "FontScaleCommitRequested || !overlay_visible ||",
+        "FontScaleCommitRequested ||",
         "!ImGui::IsMouseDown(ImGuiMouseButton_Left)",
         "!ImGui::IsAnyItemActive()",
         "FontsDirty = true;",
-        "settings_write();",
+        "SettingsDirtyPending = true;",
         "FontScalePending = false;",
         "FontScaleCommitRequested = false;",
+        "if (SettingsDirtyPending && canCommitSettings)",
+        "if (settings_write())",
+        "SettingsDirtyPending = false;",
         "ImGui::EndFrame();",
     )
     for token in required:
@@ -902,9 +905,12 @@ def check_f11_overlay_font_persistence(font: str, header: str) -> None:
     finaliser = render[render.index("if (FontScalePending &&"):]
     offsets = [finaliser.index(token) for token in (
         "if (FontScalePending &&", "FontsDirty = true;",
-        "settings_write();", "FontScalePending = false;",
-        "FontScaleCommitRequested = false;", "ImGui::EndFrame();")]
-    assert offsets == sorted(offsets), "Font scale save must precede EndFrame"
+        "SettingsDirtyPending = true;", "FontScalePending = false;",
+        "FontScaleCommitRequested = false;",
+        "if (SettingsDirtyPending && canCommitSettings)",
+        "if (settings_write())", "SettingsDirtyPending = false;",
+        "ImGui::EndFrame();")]
+    assert offsets == sorted(offsets), "F11 frame save must precede EndFrame"
     assert "std::isfinite(savedFontScale)" in font
     assert "std::clamp(savedFontScale, 0.5f, 5.0f) : 2.0f" in font
     assert "std::isfinite(GlobalFontScale)" in render
@@ -949,14 +955,88 @@ def check_f11_overlay_font_persistence(font: str, header: str) -> None:
         (ui, markers[1], "ImGui::IsMouseReleased(ImGuiMouseButton_Left)", markers),
         (finaliser, required[1], "false ||", required),
         (finaliser, required[2], "ImGui::IsMouseDown(ImGuiMouseButton_Left)", required),
-        (finaliser, required[5], "/* dropped settings save */", required),
-        (finaliser, required[6], "FontScalePending = true;", required),
+        (finaliser, "if (settings_write())", "if (false)", required),
+        (finaliser, "SettingsDirtyPending = false;", "SettingsDirtyPending = true;", required),
     )
     for original, good, bad, needed in mutations:
         assert original.count(good) >= 1
         mutated = original.replace(good, bad, 1)
         assert not all(token in mutated for token in needed), good
     print("PASS F11 full edit/save/atlas lifecycle: drag, keys, pad, tab, close, invalid INI and 6 destructive mutants")
+
+
+def check_all_f11_settings_frame_commit(font: str, header: str) -> None:
+    """Theme/chat/notification/opacity edits survive tab, focus and F11 close."""
+    ui = (ROOT / "src/overlay/overlay_settings_ui.cpp").read_text(encoding="utf-8")
+    render = font.split("bool Overlay::render()", 1)[1].split(
+        "// Creates a unique machine ID", 1)[0]
+    for marker in (
+        "const bool appearanceChanged = draw_appearance();",
+        "const bool notificationsChanged = draw_notifications();",
+        "const bool chatChanged = draw_chat();",
+        "Overlay::SettingsDirtyPending |=",
+        "appearanceChanged || notificationsChanged || chatChanged;",
+    ):
+        assert marker in ui, marker
+    assert "bool settingsDirty = false;" not in ui
+    assert "inline static bool SettingsDirtyPending = false;" in header
+    for marker in (
+        "const bool canCommitSettings = !overlay_visible ||",
+        "FontScaleCommitRequested ||",
+        "!ImGui::IsMouseDown(ImGuiMouseButton_Left)",
+        "!ImGui::IsAnyItemActive()",
+        "if (SettingsDirtyPending && canCommitSettings)",
+        "if (settings_write())",
+        "SettingsDirtyPending = false;",
+        "SettingsDirtyPending = true;",
+    ):
+        assert marker in render, marker
+    # Opening a different tab is not permission to lose a pending edit.
+    # Font and non-font edit are coalesced into one INI write.
+    def next_frame(pending, saves, *, changed=False, visible=True,
+                   mouse_down=False, item_active=False,
+                   font_requested=False, write_ok=True):
+        pending = pending or changed
+        can_write = not visible or font_requested or (
+            not mouse_down and not item_active)
+        if pending and can_write and write_ok:
+            return False, saves + 1
+        return pending, saves
+    pending, saves = False, 0
+    for _ in range(40):
+        pending, saves = next_frame(pending, saves, changed=True,
+                                    mouse_down=True, item_active=True)
+    assert (pending, saves) == (True, 0)
+    pending, saves = next_frame(pending, saves, mouse_down=False,
+                                item_active=True)  # tab switched; focus held
+    assert (pending, saves) == (True, 0)
+    pending, saves = next_frame(pending, saves, visible=False,
+                                mouse_down=True, item_active=True,
+                                write_ok=False)  # locked/read-only INI
+    assert (pending, saves) == (True, 0)
+    pending, saves = next_frame(pending, saves, visible=False)
+    assert (pending, saves) == (False, 1)
+    for _ in range(20):
+        pending, saves = next_frame(pending, saves)
+    assert (pending, saves) == (False, 1)
+    pending, saves = next_frame(pending, saves, changed=True,
+                                item_active=True, font_requested=True)
+    assert (pending, saves) == (False, 2)
+    # Mutation must invalidate the actual owner, not just some unrelated write.
+    changes = (
+        (ui, "Overlay::SettingsDirtyPending |=", "false |="),
+        (ui, "appearanceChanged || notificationsChanged || chatChanged",
+         "appearanceChanged"),
+        (render, "if (SettingsDirtyPending && canCommitSettings)",
+         "if (false)"),
+        (render, "if (settings_write())", "if (true)"),
+        (render, "SettingsDirtyPending = false;", "SettingsDirtyPending = true;"),
+    )
+    for source, good, bad in changes:
+        assert source.count(good) == 1, good
+        mutant = source.replace(good, bad, 1)
+        assert good not in mutant, good
+    print("PASS F11 all-preference save lifetime + tab/close/write-failure negative cases")
 
 def main():
     hook, font, header = (p.read_text(encoding="utf-8")
@@ -965,6 +1045,7 @@ def main():
     semantic = (ROOT / "src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
     check(hook, font, header)
     check_f11_overlay_font_persistence(font, header)
+    check_all_f11_settings_frame_commit(font, header)
     check_font_io_cache(font)
     check_font_density_hysteresis(hook)
     check_first_visible_f11_frame(hook)

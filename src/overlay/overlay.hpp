@@ -52,6 +52,10 @@ public:
 	// releasing a mouse button over the original slider.
 	inline static bool FontScalePending = false;
 	inline static bool FontScaleCommitRequested = false;
+	// Every F11 preference (theme/opacity/notification/chat/font) shares the
+	// same final-frame save owner. A tab must not own the pending write: it can
+	// disappear while a slider is active, or F11 can close before release.
+	inline static bool SettingsDirtyPending = false;
 	// Runtime-only VR font density; never persisted to the desktop Overlay.ini.
 	inline static float VrFontMultiplier = 1.0f;
 	inline static float GlobalOpacity = 0.8f;

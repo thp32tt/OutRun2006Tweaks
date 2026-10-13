@@ -898,24 +898,31 @@ bool Overlay::render()
 		Overlay::RequestMouseHide = false;
 	}
 
-	// Finalise after every F11 frame, not only when the Overlay tab is
-	// visible. Mouse drags remain deferred, while keyboard/gamepad release,
-	// focus transfer, tab switch and closing F11 cannot strand an edited
-	// font size without refreshing its DX9 atlas or saving Overlay.ini.
-	// This runs after render_shell() and before ImGui::EndFrame(), so
-	// changing the atlas itself is still deferred to the next EndScene.
-	if (FontScalePending &&
-		(FontScaleCommitRequested || !overlay_visible ||
-			(!ImGui::IsMouseDown(ImGuiMouseButton_Left) &&
-			 !ImGui::IsAnyItemActive())))
+	// All F11 preferences share one frame-finaliser. A tab can disappear
+	// during a mouse drag or controller edit; per-tab dirty flags then strand
+	// theme/opacity/notification/chat changes indefinitely. The existing font
+	// edit follows this same save lifetime while atlas rebuild remains deferred
+	// to the next EndScene, outside the active ImGui frame.
+	const bool canCommitSettings = !overlay_visible ||
+		FontScaleCommitRequested ||
+		(!ImGui::IsMouseDown(ImGuiMouseButton_Left) &&
+		 !ImGui::IsAnyItemActive());
+	if (FontScalePending && canCommitSettings)
 	{
 		GlobalFontScale = std::isfinite(GlobalFontScale)
 			? std::clamp(GlobalFontScale, 0.5f, 5.0f) : 2.0f;
 		FontsDirty = true;
-		settings_write();
+		SettingsDirtyPending = true;
 		FontScalePending = false;
 	}
 	FontScaleCommitRequested = false;
+	if (SettingsDirtyPending && canCommitSettings)
+	{
+		// A failed/locked INI write remains pending. Avoid repeatedly writing
+		// on every drag frame; retry only at a safe end-of-frame opportunity.
+		if (settings_write())
+			SettingsDirtyPending = false;
+	}
 	ImGui::EndFrame();
 
 	if (overlay_visible)

@@ -14,10 +14,6 @@ class OverlaySettingsWindow : public OverlayWindow
 {
 	bool showStyleEditor = false;
 
-	// Writing the INI on every frame of a slider drag would hit the disk
-	// hundreds of times, so the write waits until nothing is being dragged.
-	bool settingsDirty = false;
-
 	bool draw_appearance()
 	{
 		bool changed = false;
@@ -114,16 +110,14 @@ public:
 			ImGui::End();
 		}
 
-		settingsDirty |= draw_appearance();
-		settingsDirty |= draw_notifications();
-		settingsDirty |= draw_chat();
-
-		// Waits for the control being dragged to be released.
-		if (settingsDirty && !ImGui::IsAnyItemActive())
-		{
-			Overlay::settings_write();
-			settingsDirty = false;
-		}
+		// Persist through a shared F11 frame-finaliser instead of relying
+		// on this tab rendering again after focus, tab or visibility changes.
+		// Evaluate every section even when an earlier section changed.
+		const bool appearanceChanged = draw_appearance();
+		const bool notificationsChanged = draw_notifications();
+		const bool chatChanged = draw_chat();
+		Overlay::SettingsDirtyPending |=
+			appearanceChanged || notificationsChanged || chatChanged;
 	}
 
 	static OverlaySettingsWindow instance;
