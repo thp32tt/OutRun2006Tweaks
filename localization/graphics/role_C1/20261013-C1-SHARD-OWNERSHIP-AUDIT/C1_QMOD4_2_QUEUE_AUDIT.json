@@ -1,0 +1,291 @@
+{
+  "schema": "outrun-c1-imagegen-shard-ownership-audit-v1",
+  "date_kst": "2026-10-13",
+  "role_requested": "C1_IMAGEGEN_PRODUCTION",
+  "source_branch": "korean-localization-recovery-20260928",
+  "source_queue_sha_git_blob": "5bfdcde29765634186ecade2f87afae48b34b168",
+  "source_user_backlog_sha_git_blob": "c27d483a6c94f29e1c68d32d3299c540cf060435",
+  "source_hd_policy": "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md",
+  "runtime_controller_c1_mode": "INDEPENDENT_QA_ONLY_AS_OF_GIT_HEAD",
+  "requested_new_production_shard": "queue_index % 4 == 2",
+  "totals": {
+    "shard_items": 34,
+    "fonts_no_dds": 2,
+    "preserve_only": 12,
+    "existing_pass_still_requires_user_game": 12,
+    "material_rework_existing_producer_history": 8,
+    "unclassified": 0
+  },
+  "user_backlog_P1_owners": [
+    {
+      "backlog_id": "PJR-002-20261006",
+      "queue_index": 26,
+      "owner_lane": "A",
+      "priority": "P1",
+      "backlog_status": "C245_C3_STRICT_PASS_PENDING_PRE_INGAME_REFRESH_USER_JPG_AND_NEW_INGAME_RETEST"
+    },
+    {
+      "backlog_id": "PJR-004-20261006",
+      "queue_index": 30,
+      "owner_lane": "A",
+      "priority": "P1",
+      "backlog_status": "C246_C3_STATIC_PASS_PRE_INGAME_REFRESHED_PENDING_USER_JPG_AND_INGAME_RETEST"
+    }
+  ],
+  "grouped_items": {
+    "font_pipeline_no_dds": [
+      {
+        "queue_index": 18,
+        "asset_path": "textures/load/spr_font_xst/7B65A191_256x128.dds",
+        "action": "font_pipeline",
+        "artwork_status": "k4_overlay_preserve_original_no_candidate_required"
+      },
+      {
+        "queue_index": 22,
+        "asset_path": "textures/load/spr_font_xst/E86D77E8_256x128.dds",
+        "action": "font_pipeline",
+        "artwork_status": "k4_overlay_preserve_original_no_candidate_required"
+      }
+    ],
+    "preserve_original_no_localization": [
+      {
+        "queue_index": 122,
+        "asset_path": "textures/load/spr_sprani_splash_cvt_xst/549D375_512x256.dds",
+        "action": "preserve_brand_song_credit",
+        "artwork_status": "preserve_original"
+      },
+      {
+        "queue_index": 146,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/39018963_512x256.dds",
+        "action": "zoom_review",
+        "artwork_status": "preserve_original_no_localization"
+      },
+      {
+        "queue_index": 150,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/40A4D914_256x128.dds",
+        "action": "zoom_review",
+        "artwork_status": "preserve_original_no_localization"
+      },
+      {
+        "queue_index": 166,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/5EBD7FE8_1024x1024.dds",
+        "action": "zoom_review",
+        "artwork_status": "preserve_original_no_localization"
+      },
+      {
+        "queue_index": 174,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/73F852A4_512x512.dds",
+        "action": "zoom_review",
+        "artwork_status": "preserve_original_no_localization"
+      },
+      {
+        "queue_index": 178,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/798A1E_1024x256.dds",
+        "action": "zoom_review",
+        "artwork_status": "preserve_original_no_localization"
+      },
+      {
+        "queue_index": 182,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/7D747BED_512x128.dds",
+        "action": "localize_text",
+        "artwork_status": "preserve_original_no_localization"
+      },
+      {
+        "queue_index": 194,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9AC75730_512x512.dds",
+        "action": "zoom_review",
+        "artwork_status": "preserve_original_no_localization"
+      },
+      {
+        "queue_index": 202,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/AB56F682_512x512.dds",
+        "action": "zoom_review",
+        "artwork_status": "preserve_original_no_localization"
+      },
+      {
+        "queue_index": 206,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/AEA507A4_512x256.dds",
+        "action": "zoom_review",
+        "artwork_status": "preserve_original_no_localization"
+      },
+      {
+        "queue_index": 210,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/B5BB7AB0_512x512.dds",
+        "action": "zoom_review",
+        "artwork_status": "preserve_original_no_localization"
+      },
+      {
+        "queue_index": 238,
+        "asset_path": "textures/load/spr_sprani_sumo_loading_Exst/132A1B1F_512x512.dds",
+        "action": "zoom_review",
+        "artwork_status": "preserve_original_no_localization"
+      }
+    ],
+    "existing_c3_or_static_pass_pending_user_game": [
+      {
+        "queue_index": 34,
+        "asset_path": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+        "action": "localize_text",
+        "artwork_status": "c248_c3_strict_pass_pre_ingame_refreshed_pending_user_jpg_ingame"
+      },
+      {
+        "queue_index": 38,
+        "asset_path": "textures/load/spr_sprani_JENN_RANK_Exst/6AB5CEE_1024x1024.dds",
+        "action": "localize_text",
+        "artwork_status": "c248_c3_strict_pass_pre_ingame_refreshed_pending_user_jpg_ingame"
+      },
+      {
+        "queue_index": 46,
+        "asset_path": "textures/load/spr_sprani_etc_cvt_Exst/AA04D779_512x512.dds",
+        "action": "localize_text",
+        "artwork_status": "c236_c3_strict_pass_pending_user_jpg_ingame"
+      },
+      {
+        "queue_index": 50,
+        "asset_path": "textures/load/spr_sprani_etc_cvt_Exst/CBF8ECBF_1024x512.dds",
+        "action": "localize_text",
+        "artwork_status": "c259_c3_strict_pass_pending_pre_ingame_user_jpg_ingame"
+      },
+      {
+        "queue_index": 54,
+        "asset_path": "textures/load/spr_sprani_fruity_cvt_Exst/FA7BBB13_1024x512.dds",
+        "action": "localize_text",
+        "artwork_status": "c251_c3_strict_pass_pre_ingame_refreshed_pending_user_jpg_ingame"
+      },
+      {
+        "queue_index": 86,
+        "asset_path": "textures/load/spr_sprani_ranking_cvt_Exst/C598919A_1024x1024.dds",
+        "action": "localize_text",
+        "artwork_status": "c249_c3_strict_pass_pending_pre_ingame_refresh_user_jpg_and_ingame"
+      },
+      {
+        "queue_index": 94,
+        "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/2DA43E41_1024x1024.dds",
+        "action": "localize_text",
+        "artwork_status": "c260_c3_strict_pass_pending_pre_ingame_user_jpg_ingame"
+      },
+      {
+        "queue_index": 106,
+        "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/788CE557_512x256.dds",
+        "action": "localize_text",
+        "artwork_status": "c238_c3_strict_pass_pending_user_jpg_ingame_retest"
+      },
+      {
+        "queue_index": 130,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/1762489B_512x128.dds",
+        "action": "localize_text",
+        "artwork_status": "c265_c3_strict_pass_pending_pre_ingame_user_jpg_ingame"
+      },
+      {
+        "queue_index": 198,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9FC88069_1024x512.dds",
+        "action": "localize_text",
+        "artwork_status": "c258_c3_strict_pass_pending_pre_ingame_user_jpg_ingame"
+      },
+      {
+        "queue_index": 222,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/DDF0392A_256x512.dds",
+        "action": "localize_text",
+        "artwork_status": "c257_c3_strict_pass_pending_pre_ingame_refresh_user_jpg_ingame"
+      },
+      {
+        "queue_index": 226,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E3F4BA07_512x128.dds",
+        "action": "localize_text",
+        "artwork_status": "c258_c3_strict_pass_pending_pre_ingame_user_jpg_ingame"
+      }
+    ],
+    "material_rework_existing_producer_history": [
+      {
+        "queue_index": 26,
+        "asset_path": "textures/load/spr_sprani_CLAR_RANK_Exst/63C91067_512x512.dds",
+        "action": "localize_text",
+        "artwork_status": "c390_c2_c3_strict_rework_required_source_family_italic_morphology",
+        "last_known_producer_or_owner": "A historical and PJR-002 P1 A"
+      },
+      {
+        "queue_index": 30,
+        "asset_path": "textures/load/spr_sprani_FLAG_RANK_Exst/8215FD25_1024x512.dds",
+        "action": "localize_text",
+        "artwork_status": "c392_c2_c3_strict_rework_required_source_family_italic_morphology",
+        "last_known_producer_or_owner": "B historical, PJR-004 P1 A explicit"
+      },
+      {
+        "queue_index": 62,
+        "asset_path": "textures/load/spr_sprani_loading_cvt_Exst/33491F83_512x256.dds",
+        "action": "localize_text",
+        "artwork_status": "manual_c2_20261013_rework_plate_alpha_rectangle_past_c3_superseded",
+        "last_known_producer_or_owner": "A historical (A132)"
+      },
+      {
+        "queue_index": 98,
+        "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+        "action": "localize_text",
+        "artwork_status": "c337_c2_rework_required_source_italic_weight_family",
+        "last_known_producer_or_owner": "B historical (B330)"
+      },
+      {
+        "queue_index": 102,
+        "asset_path": "textures/load/spr_sprani_selector_cvt_Exst/571E78F3_512x64.dds",
+        "action": "localize_text",
+        "artwork_status": "c2_20261011_rework_required_detached_effect_fragments",
+        "last_known_producer_or_owner": "A takeover (A179)"
+      },
+      {
+        "queue_index": 154,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/4D38BBB0_1024x256.dds",
+        "action": "localize_text",
+        "artwork_status": "c356_c2_rework_required_gray_family_overweight_counterspace",
+        "last_known_producer_or_owner": "B historical (B354)"
+      },
+      {
+        "queue_index": 214,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/BF229CF4_512x512.dds",
+        "action": "localize_text",
+        "artwork_status": "b340_b339_bc3_alpha_topology_producer_visual_fail_original_preserved",
+        "last_known_producer_or_owner": "B historical (B340)"
+      },
+      {
+        "queue_index": 230,
+        "asset_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/E95DA5_512x256.dds",
+        "action": "localize_text",
+        "artwork_status": "c380_c2_rework_required_source_family_hierarchy",
+        "last_known_producer_or_owner": "B historical (B228)"
+      }
+    ],
+    "unclassified": []
+  },
+  "material_rework_queue_ids": [
+    26,
+    30,
+    62,
+    98,
+    102,
+    154,
+    214,
+    230
+  ],
+  "selection_decision": "HOLD_NO_VERIFIED_UNOWNED_SHARD_AND_NO_CHATGPT_TOOL_SOURCE_MEDIA_ATTACHMENT",
+  "imagegen_blockers": [
+    "All eight material rework shard indexes carry historical producer/owner or current P1 owner evidence; do not steal without explicit transfer",
+    "No real English-only transparent PNG bytes attached to current image_gen tool input; GitHub/media-tool preview alone is not a bound source",
+    "Live controller_roles.json declares C1 image_generation_enabled=false, manual request does not establish deployed mode",
+    "Pipeline imagegen_b_pipeline.py still demands independent C2 clean plate approval although operational C2 is retired; do not invent legacy token"
+  ],
+  "qa_glyph_scale_policy": {
+    "text_length_difference_ignored": true,
+    "whole_sentence_width_ratio": "DIAGNOSTIC_ONLY",
+    "native_75_50": "NOT_RUN_NO_GENERATED_KOREAN_OUTPUT",
+    "original_effect_bbox_1px_overflow": "NOT_RUN_NO_GENERATED_KOREAN_OUTPUT"
+  },
+  "generated_korean_png_count": 0,
+  "new_trial_dds_count": 0,
+  "promoted_dds_count": 0,
+  "generation_id": null,
+  "source_media_actual_attachment_confirmed": false,
+  "producer_QA": "NOT_RUN",
+  "C2": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "forbidden_changes": "NONE"
+}
