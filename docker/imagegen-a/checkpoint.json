@@ -1,0 +1,15 @@
+{
+  "TASK_ID": "OUTRUN-NEW-A-Q217-20261013-142553",
+  "branch": "korean-localization-clean-start-20261013",
+  "base_head": "0cf164899f8118dcf6c279971469fe00b57bbc7c",
+  "lane": "A",
+  "attempt": 1,
+  "state": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "local_unit_tests": "10_PASS",
+  "live_chatgpt_upload": "UNTESTED",
+  "native_imagegen": "UNTESTED",
+  "live_self_qa": "UNTESTED",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "deployment": "NOT_RUN_USER_MANUAL",
+  "next_action": "Exact-SHA GitHub CI; user manual Portainer deployment and initial login; inspect saved result/checkpoint"
+}

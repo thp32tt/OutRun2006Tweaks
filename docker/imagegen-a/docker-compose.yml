@@ -1,0 +1,28 @@
+services:
+  outrun-imagegen-a:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    pull_policy: build
+    restart: unless-stopped
+    shm_size: 1g
+    mem_limit: 4g
+    cpus: 2.0
+    environment:
+      TZ: Asia/Seoul
+      AUTO_SEND: "true"
+      CHAT_SLOTS: "1"
+      CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-https://chatgpt.com/}"
+      VNC_PASSWORD: "${VNC_PASSWORD:?Set VNC_PASSWORD in Portainer}"
+      TASK_ID: OUTRUN-NEW-A-Q217-20261013-142553
+    ports:
+      - "${VNC_PORT:-6082}:6080"
+      - "${STATUS_PORT:-8788}:8787"
+    volumes:
+      - a_data:/data
+      - a_logs:/logs
+      - a_sources:/sources
+volumes:
+  a_data:
+  a_logs:
+  a_sources:

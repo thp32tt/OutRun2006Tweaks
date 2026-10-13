@@ -1,0 +1,25 @@
+name: Single A imagegen stack
+on:
+  push:
+    branches: [korean-localization-clean-start-20261013]
+    paths: ['docker/imagegen-a/**', 'source/english_png/**', '.github/workflows/imagegen-a.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          cp -r docker/imagegen-a stack
+          pip install -r stack/requirements.txt
+          python -m unittest stack.test_stack -v
+          python -m playwright install --with-deps chromium
+          python -m unittest stack.test_browser -v
+          VNC_PASSWORD=ci-only-not-deployed docker compose -f docker/imagegen-a/docker-compose.yml config --quiet
+          docker build -t outrun-imagegen-a:test docker/imagegen-a
