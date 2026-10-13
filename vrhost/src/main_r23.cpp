@@ -1437,11 +1437,22 @@ namespace
             const char* v = std::getenv("OUTRUN_VR_MENU_CENTER_4_3");
             return v && v[0] == '1' && v[1] == '\0';
         }();
-        RECT fullClient{};
-        if (center43OptIn && c.GetGameClientOutputRect(fullClient))
+        if (center43OptIn)
         {
-            const auto plan = OutRunVrMenuAspect::PlanCenteredContent(
-                sourceAspect, 4.0f / 3.0f);
+            RECT fullClient{};
+            // The API still supplies original, unclipped client bounds when
+            // a window partly leaves the output (its boolean then is false).
+            // Use those bounds only through the validated visible-UV
+            // intersection. A false/zero/stale rect keeps the baseline UV.
+            c.GetGameClientOutputRect(fullClient);
+            const auto plan = OutRunVrMenuAspect::PlanVisibleCenteredContent(
+                static_cast<float>(fullClient.left),
+                static_cast<float>(fullClient.top),
+                static_cast<float>(fullClient.right),
+                static_cast<float>(fullClient.bottom),
+                static_cast<float>(c.sourceWidth_),
+                static_cast<float>(c.sourceHeight_),
+                whole.x, whole.y, whole.w, whole.h, 4.0f / 3.0f);
             if (plan.crop)
             {
                 const float previousWidth = whole.w;

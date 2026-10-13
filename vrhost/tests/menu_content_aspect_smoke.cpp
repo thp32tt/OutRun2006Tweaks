@@ -58,6 +58,60 @@ int main()
             fallback) - 4.0f / 3.0f) > 1e-5f)
         return 15;
 
+    // Issue #119: the window's 4:3 authored content must be cropped from
+    // ORIGINAL client coordinates even after Desktop Duplication clipped
+    // the game client at a monitor edge. Never crop the centre of a
+    // partially visible UV as if it still contained the entire client.
+    using OutRunVrMenuAspect::PlanVisibleCenteredContent;
+    auto near = [](float a, float b) { return std::fabs(a - b) < 1e-4f; };
+    const auto visible219 = PlanVisibleCenteredContent(
+        0, 0, 3440, 1440, 3440, 1440, 0, 0, 1, 1, 4.f / 3.f);
+    if (!visible219.crop ||
+        !near(visible219.offsetX, wide219.offsetX) ||
+        !near(visible219.width, wide219.width) ||
+        !near(visible219.aspect, 4.f / 3.f))
+        return 16;
+    const auto offLeft = PlanVisibleCenteredContent(
+        -320, 0, 3120, 1440, 3440, 1440, 0, 0,
+        3120.f / 3440.f, 1, 4.f / 3.f);
+    const auto offRight = PlanVisibleCenteredContent(
+        280, 0, 3720, 1440, 3440, 1440, 280.f / 3440.f, 0,
+        3160.f / 3440.f, 1, 4.f / 3.f);
+    if (!offLeft.crop || !offRight.crop ||
+        !near(offLeft.offsetX, 440.f / 3120.f) ||
+        !near(offLeft.width, 1920.f / 3120.f) ||
+        !near(offRight.offsetX, 760.f / 3160.f) ||
+        !near(offRight.width, 1920.f / 3160.f) ||
+        !near(offLeft.aspect, 4.f / 3.f) ||
+        !near(offRight.aspect, 4.f / 3.f))
+        return 17;
+    // A top-clipped window keeps the sampled physical aspect of the
+    // actually visible texture; it must not stretch the missing 360 rows.
+    const auto offTop = PlanVisibleCenteredContent(
+        0, -360, 3440, 1080, 3440, 1440, 0, 0, 1,
+        1080.f / 1440.f, 4.f / 3.f);
+    if (!offTop.crop || !near(offTop.aspect, 16.f / 9.f))
+        return 18;
+    // Do not crop portrait/4:3, stale capture UV after a monitor move,
+    // missing/reset source or a strip that cannot fit a coherent menu.
+    if (PlanVisibleCenteredContent(
+            0, 0, 1280, 960, 1920, 1080, 0, 0,
+            1280.f / 1920.f, 960.f / 1080.f, 4.f / 3.f).crop ||
+        PlanVisibleCenteredContent(
+            0, 0, 3440, 1440, 3440, 1440, 0.3f, 0, 0.7f,
+            1, 4.f / 3.f).crop ||
+        PlanVisibleCenteredContent(
+            0, 0, 3440, 1440, 0, 1440, 0, 0, 1, 1,
+            4.f / 3.f).crop ||
+        PlanVisibleCenteredContent(
+            -2400, 0, 1040, 1440, 3440, 1440, 0, 0,
+            1040.f / 3440.f, 1, 4.f / 3.f).crop ||
+        PlanVisibleCenteredContent(
+            0, 0, 3440, 1440, 3440, 1440,
+            std::numeric_limits<float>::quiet_NaN(), 0, 1, 1,
+            4.f / 3.f).crop)
+        return 19;
+
     using OutRunVrMenuAspect::PlanCommonFovTangents;
     // Two asymmetric Quest-style FOVs must average the actual tangent
     // plane. tan(mean angle) causes a different apparent menu aspect.

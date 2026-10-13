@@ -151,4 +151,80 @@ namespace OutRunVrMenuAspect
         const float width = intendedAspect / sourceAspect;
         return { true, (1.0f - width) * 0.5f, width, intendedAspect };
     }
+
+    // OutRun's authored 4:3 sidebars belong to the FULL game client, not
+    // the portion of the window still visible on a desktop output. If a
+    // window straddles the output edge, cropping a centred fraction of the
+    // already-clipped UV recentres the WRONG pixels (or skips the crop).
+    // Intersect the original client-space 4:3 content with the sampled UV
+    // instead. Return fractions relative to the CURRENT sampled region so
+    // both eyes use the identical, actually visible crop.
+    inline CropPlan PlanVisibleCenteredContent(
+        float clientLeft, float clientTop,
+        float clientRight, float clientBottom,
+        float captureWidth, float captureHeight,
+        float uvX, float uvY, float uvWidth, float uvHeight,
+        float intendedAspect) noexcept
+    {
+        const float values[]{
+            clientLeft, clientTop, clientRight, clientBottom,
+            captureWidth, captureHeight, uvX, uvY, uvWidth, uvHeight,
+            intendedAspect
+        };
+        for (const float value : values)
+            if (!std::isfinite(value))
+                return {};
+
+        const float clientWidth = clientRight - clientLeft;
+        const float clientHeight = clientBottom - clientTop;
+        if (!(clientWidth > 0.0f && clientHeight > 0.0f) ||
+            !(captureWidth > 0.0f && captureHeight > 0.0f) ||
+            !(uvX >= 0.0f && uvY >= 0.0f &&
+              uvWidth > 0.0f && uvHeight > 0.0f) ||
+            uvX + uvWidth > 1.00001f ||
+            uvY + uvHeight > 1.00001f)
+            return {};
+
+        const auto fullPlan = PlanCenteredContent(
+            clientWidth / clientHeight, intendedAspect);
+        if (!fullPlan.crop)
+            return {};
+
+        const float sampledLeft = uvX * captureWidth;
+        const float sampledRight = (uvX + uvWidth) * captureWidth;
+        const float sampledTop = uvY * captureHeight;
+        const float sampledBottom = (uvY + uvHeight) * captureHeight;
+        // The UV must describe the actual client/output intersection.
+        // A stale frame after moving outputs or Reset cannot be recropped.
+        if (std::fabs(sampledLeft -
+                (std::max)(0.0f, clientLeft)) > 1.0f ||
+            std::fabs(sampledRight -
+                (std::min)(captureWidth, clientRight)) > 1.0f ||
+            std::fabs(sampledTop -
+                (std::max)(0.0f, clientTop)) > 1.0f ||
+            std::fabs(sampledBottom -
+                (std::min)(captureHeight, clientBottom)) > 1.0f)
+            return {};
+
+        const float contentLeft =
+            clientLeft + (clientWidth - clientHeight * intendedAspect) * 0.5f;
+        const float contentRight =
+            clientRight - (clientWidth - clientHeight * intendedAspect) * 0.5f;
+        const float visibleLeft = (std::max)(sampledLeft, contentLeft);
+        const float visibleRight = (std::min)(sampledRight, contentRight);
+        const float visibleWidth = visibleRight - visibleLeft;
+        const float sampledWidth = sampledRight - sampledLeft;
+        const float sampledHeight = sampledBottom - sampledTop;
+        if (!(visibleWidth > 0.0f && sampledWidth > 0.0f &&
+              sampledHeight > 0.0f) ||
+            visibleWidth < 0.05f * sampledWidth)
+            return {};
+
+        const float visibleAspect = visibleWidth / sampledHeight;
+        if (!std::isfinite(visibleAspect) ||
+            visibleAspect < 0.5f || visibleAspect > 5.0f)
+            return {};
+        return { true, (visibleLeft - sampledLeft) / sampledWidth,
+            visibleWidth / sampledWidth, visibleAspect };
+    }
 }
