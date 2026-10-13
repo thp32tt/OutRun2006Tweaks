@@ -114,7 +114,7 @@ def check_extra_producers(ui, contracts):
     ordered(goal, 'GOAL sprite parent call and all-node scope',
             'Game::SpritePriorityCount', 'Module::exe_ptr(helperRva)',
             'original();', 'TagAppendedNodes(before,',
-            'RenderScope::ScreenHud')
+            'RenderScope::ScreenHud, producer);')
     # There are two intentionally different original components on the GOAL
     # screen (likely course/stage label and recorded time). Do not interpret
     # adjacent E8 calls as the same white timer emitted twice; either
@@ -389,11 +389,11 @@ def test_mutations(ui, manifest):
               ui.replace('GoalTime_TagHelper(0xBE150);',
                          'GoalTime_TagHelper(0xBE020);', 1))
     must_fail('original course/time helper called twice',
-              ui.replace('original();\n\t\t// Both original GOAL helpers',
-                         'original();\n\t\toriginal();\n\t\t// Both original GOAL helpers', 1))
+              ui.replace('original();\n        goalDirectDrawOwner.reset();',
+                         'original();\n        original();\n        goalDirectDrawOwner.reset();', 1))
     must_fail('original course/time helper skipped',
-              ui.replace('original();\n\t\t// Both original GOAL helpers',
-                         'return;\n\t\t// Both original GOAL helpers', 1))
+              ui.replace('original();\n        goalDirectDrawOwner.reset();',
+                         'return;\n        goalDirectDrawOwner.reset();', 1))
     corrupt = copy.deepcopy(manifest)
     next(x for x in corrupt['contracts'] if int(x['rva'], 16) == 0x97BE4)['expectedBytes'] = 'e800000000' + '00'*11
     must_fail('original result E8 destination corrupted', changed_manifest=corrupt)
