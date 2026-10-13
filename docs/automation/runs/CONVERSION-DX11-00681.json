@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00681",
+  "production_id": "CONVERSION-DX11-00681",
+  "event_id": "CONVERSION-DX11-00681-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:MENU_RACE_NATIVE_DEVICE_COHERENCE",
+  "feature_id": "MENU_RACE_NATIVE_DRAW_DEVICE_OWNERSHIP_AND_INPUT_SAFE_PRESENT",
+  "status": "AWAITING_EXACT_SHA_GATES",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Intercept real D3D9 menu/car/race Draw and DrawIndexed into a device-owned native batch",
+      "Preserve same source device identity through D3D11 Draw, CopyResource and event-fenced readback",
+      "Render native diagnostic inset only onto the same D3D9 Present device; other devices always retain original game draw/gamepad"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_readback_provenance.hpp",
+      ".github/workflows/dx11-fast-structural.yml",
+      "tools/test_dx11_game_device_handoff_00681.py",
+      "docs/automation/runs/CONVERSION-DX11-00681.json"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++17 same-device/stale-frame provenance plus native draw, unavailable-draw and Present source wiring",
+      "negative_regression": "Five destructive C++ binding mutations and two portable same-device/fail-open C++ mutations",
+      "component_integration": "Game Draw/DrawIndexed -> device-owned native frame batch -> GPU fence -> same-game-device D3D9 UpdateSurface"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_NATIVE_DEVICE_COHERENCE",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_readback_provenance.hpp",
+      ".github/workflows/dx11-fast-structural.yml",
+      "tools/test_dx11_game_device_handoff_00681.py",
+      "docs/automation/runs/CONVERSION-DX11-00681.json"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Mixed D3D9 source devices never produce or receive another device's diagnostic GPU inset during menu/car/race transitions.",
+    "activation_guard_and_fallback": "Diagnostic opt-in only; keep original DX9Ex Draw/Present/gamepad and fail closed on device mismatch."
+  },
+  "feature_contract": {
+    "feature_id": "MENU_RACE_NATIVE_DRAW_DEVICE_OWNERSHIP_AND_INPUT_SAFE_PRESENT",
+    "goal": "Maintain native D3D11 menu-to-race frame continuity across D3D9 device transitions while preserving the original game input and fallback.",
+    "acceptance_items": [
+      {
+        "id": "real-game-native-device",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_draw_and_native_pipeline",
+        "expected_behavior": "Real Draw and Indexed Draws from different D3D9 devices cannot mix within one native batch"
+      },
+      {
+        "id": "same-device-present-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_present_gamepad_continuity",
+        "expected_behavior": "Fenced GPU results from a foreign game device cannot overlay its current D3D9 Present; original Draw/input unaffected"
+      },
+      {
+        "id": "exact-sha-device-gate",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_renderer_and_ci",
+        "expected_behavior": "Positive C++17, destructive source/C++ test and mandatory same-SHA five integrated GitHub Actions gates pass"
+      },
+      {
+        "id": "quest3-gamepad-runtime",
+        "category": "end_to_end_behavior",
+        "behavior_area": "quest3_vdxr_hardware",
+        "expected_behavior": "Quest3 menu, vehicle choice, race and gamepad verified on actual hardware"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "real-game-native-device": "PENDING_EXACT_SHA",
+    "same-device-present-fallback": "PENDING_EXACT_SHA",
+    "exact-sha-device-gate": "PENDING_EXACT_SHA",
+    "quest3-gamepad-runtime": "NEED_HMD_TEST"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_readback_provenance.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_game_device_handoff_00681.py",
+    "docs/automation/runs/CONVERSION-DX11-00681.json"
+  ],
+  "base_head_sha": "25f5a21803f640eb77d506751aba47c4dd96f3a2",
+  "pipeline": {
+    "C0_RECOVER": "PASS confirmed 00680 exact-SHA 5 Gates; inspected latest GitHub HEAD",
+    "C1_REVIEW": "CONFIRMED missing D3D9 source device identity on native Draw batch/readback/Present",
+    "C2_IMPLEMENT": "PASS actual native draw and GPU-to-game Present integration changed",
+    "C3_VALIDATE": "PENDING exact SHA GitHub CI; new C++17/destructive tests wired",
+    "C4_COMMIT": "PENDING material commit",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA_GATES"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "next_action": "Check exact SHA Backend, DX11 Fast, Build, OpenXR and HUD GitHub Gates; record separate [skip ci] C6 only after confirmed success. Quest3 UNTESTED."
+}

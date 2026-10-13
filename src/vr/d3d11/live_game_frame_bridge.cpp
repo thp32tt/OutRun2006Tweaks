@@ -836,6 +836,9 @@ struct ReadbackSlot {
 };
 struct State {
     std::mutex mutex;
+    // Non-owning identity only: reset at every Present/Reset. Never retain a
+    // game D3D9 COM object or mix different device Draw calls in one GPU batch.
+    std::uintptr_t sourceGameDevice = 0u;
     NativeBackend backend;
     // Diagnostic-only depth is never shared with the original D3D9 renderer.
     ComPtr<ID3D11Texture2D> diagnosticDepth;
@@ -3763,6 +3766,20 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     return true;
 }
 
+bool observe_source_device(State& s, IDirect3DDevice9* game) noexcept {
+    const auto current = reinterpret_cast<std::uintptr_t>(game);
+    if (s.sourceGameDevice == 0u) s.sourceGameDevice = current;
+    else if (s.sourceGameDevice != current) {
+        // A second D3D9 device (menu/race transition or auxiliary swapchain)
+        // cannot append to the first device's native draw batch. Original
+        // D3D9 draw/gamepad still run; no ownership of either device is held.
+        s.frameBatch.abort();
+        s.pending = false;
+        return false;
+    }
+    return true;
+}
+
 void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
              const void* bytes, UINT stride, UINT vertexCount,
              const std::uint32_t* indices, UINT indexCount) noexcept {
@@ -3771,6 +3788,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
         ++s.observed;
+        if (!observe_source_device(s, game)) return;
         // Record every observed game Draw/DrawIndexed before native state
         // admission. Eligible-only ordinals are insufficient to establish
         // contiguous menu, vehicle-selection or race source calls.
@@ -3922,6 +3940,9 @@ void observe_unavailable_game_draw(IDirect3DDevice9* game) noexcept {
     try {
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
+        // Unavailable game draws must obey the same D3D9 device boundary as
+        // native-admitted draws; no unrelated source may bridge a scene.
+        if (!observe_source_device(s, game)) return;
         // VB/IB Lock shadow miss or an unsupported IndexedUP source must not
         // disappear from the original game's Draw/DrawIndexed ordinal stream.
         if (s.sourceDrawsThisFrame == (std::numeric_limits<std::uint64_t>::max)()) {
@@ -3943,6 +3964,12 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
     try {
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
+        const auto presentDevice = reinterpret_cast<std::uintptr_t>(game);
+        if (s.sourceGameDevice != 0u && s.sourceGameDevice != presentDevice) {
+            // Do not copy a Draw batch from another D3D9 device to this Present.
+            s.frameBatch.abort();
+            s.pending = false;
+        }
         if (s.backend.ready() && s.backend.context()) {
             auto* ctx = s.backend.context();
             // Poll the oldest GPU fence without implicit flushing or CPU waits.
@@ -3950,7 +3977,8 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
             if (oldest.busy) {
                 const HRESULT ready = ctx->GetData(
                     oldest.fence.Get(), nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
-                if (ready == S_OK && !oldest.provenance.may_overlay(s.presents)) {
+                if (ready == S_OK && (!oldest.provenance.may_overlay(s.presents) ||
+                                     !oldest.provenance.same_device(presentDevice))) {
                     // A late native frame cannot overwrite a newer menu/race Present.
                     // Its GPU fence is complete; recycle without blocking D3D9/input.
                     ++s.staleReadbacks;
@@ -4037,6 +4065,7 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
                 if (!next.busy) {
                     ctx->CopyResource(next.staging.Get(), s.backend.color_texture());
                     next.provenance = {s.presents, s.sourceDrawsThisFrame};
+                    next.provenance.sourceDevice = presentDevice;
                     ctx->End(next.fence.Get());
                     // A single GPU submit per diagnostic frame; never a blocking Map.
                     ctx->Flush();
@@ -4057,6 +4086,7 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
             s.probeSlot, s.eligibleThisFrame);
         s.eligibleThisFrame = 0;
         s.sourceDrawsThisFrame = 0u;
+        s.sourceGameDevice = 0u;
         // Opt-in-only evidence: a hooked game Draw is not proof that the
         // restricted FVF subset was admitted, nor that GPU pixels became
         // visible in the game's backbuffer. Log both missing links explicitly.
@@ -4077,6 +4107,7 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         s.frameBatch.reset();
         s.eligibleThisFrame = 0;
         s.sourceDrawsThisFrame = 0u;
+        s.sourceGameDevice = 0u;
         s.probeSlot = 0;
     }
 }
@@ -4089,6 +4120,7 @@ void before_game_reset() noexcept {
     s.frameBatch.reset();
     s.eligibleThisFrame = 0;
     s.sourceDrawsThisFrame = 0u;
+    s.sourceGameDevice = 0u;
     s.probeSlot = 0;
     for (auto& item : s.readbacks) {
         item.staging.Reset(); item.fence.Reset(); item.busy = false;
