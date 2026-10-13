@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00671",
+  "production_id": "CONVERSION-DX11-00671",
+  "event_id": "CONVERSION-DX11-00671-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_NATIVE_FRAME_MULTIDRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "ea2a72c2e9358ab9a0e2c36d915dfd2077d14d88",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "live game D3D9 Draw/DrawIndexed source interception",
+      "bounded 8-draw ordered native D3D11 color/depth composition within same diagnostic frame",
+      "async Present GPU readback into optional D3D9 desktop inset, original game Draw/Present/input retained"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_frame_batch.hpp",
+      "tools/dx11_native_frame_batch_probe.cpp",
+      "tools/test_dx11_native_frame_batch_00671.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++17 admission, first frame color and depth clear, 8 draw limit",
+      "negative_regression": "destructive kMaxDraws=1 mutant must fail",
+      "component_integration": "real Draw/DrawIndexed->same native target->one Present readback"
+    },
+    "conflict_keys": [
+      "DX11:GAME_NATIVE_FRAME_MULTIDRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "visible_frame_acceptance": "NEED_HMD_TEST; menu/vehicle/race pixels unverified",
+    "activation_guard_and_fallback": "both OUTRUN_DX11_FIRST_GAME_FRAME=1 and OUTRUN_DX11_FRAME_BATCH=1; D3D9 Draw/Present and gamepad input original"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "tools/dx11_native_frame_batch_probe.cpp",
+    "tools/test_dx11_native_frame_batch_00671.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00671.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "single native Draw per Present prevented menu/race element composition",
+    "C2_IMPLEMENT": "bounded opt-in live native multi-Draw C++",
+    "C3_VALIDATE": "PENDING_EXACT_SHA_CI",
+    "C4_COMMIT": "MATERIAL_COMMIT",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "acceptance_results": {
+    "positive_probe": "PENDING_GITHUB_FAST",
+    "destructive_mutant": "PENDING_GITHUB_FAST",
+    "compile_build": "PENDING_GITHUB_BUILD",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null
+}

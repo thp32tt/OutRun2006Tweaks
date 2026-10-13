@@ -17,6 +17,7 @@
 #include "live_game_rgb332_texture.hpp"
 #include "live_game_rgba16_texture.hpp"
 #include "live_game_float_rgba_texture.hpp"
+#include "native_game_frame_batch.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -966,7 +967,7 @@ struct State {
     ComPtr<IDirect3DSurface9> insetSurface;
     D3DFORMAT insetFormat = D3DFMT_UNKNOWN;
     bool pending = false;
-    bool attempted = false;
+    GameNativeFrameBatch frameBatch{}; // Opt-in native only, original D3D9/input preserved.
     bool logged = false;
     UINT observed = 0;
     std::uint64_t presents = 0;
@@ -983,6 +984,13 @@ bool env_opt_in() noexcept {
     wchar_t value[8]{};
     // Exact opt-in only. No ini, default flag or runtime backend promotion.
     return GetEnvironmentVariableW(L"OUTRUN_DX11_FIRST_GAME_FRAME", value, 8) == 1
+        && value[0] == L'1';
+}
+
+bool env_batch_opt_in() noexcept {
+    wchar_t value[8]{};
+    // Requires OUTRUN_DX11_FIRST_GAME_FRAME=1 in the outer capture path.
+    return GetEnvironmentVariableW(L"OUTRUN_DX11_FRAME_BATCH", value, 8) == 1
         && value[0] == L'1';
 }
 
@@ -3389,7 +3397,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         }
     }
     ctx->UpdateSubresource(s.alphaConstants.Get(), 0, nullptr, alphaParams, 0, 0);
-    s.backend.begin_frame(kBackground);
+    // Only the first live game Draw clears the native diagnostic color.
+    if (s.frameBatch.first_draw()) s.backend.begin_frame(kBackground);
     if (output.nativeDepthTest) {
         ID3D11RenderTargetView* rtv = s.backend.color_rtv();
         ctx->OMSetRenderTargets(1, &rtv, s.diagnosticDepthView.Get());
@@ -3397,8 +3406,10 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         // Reversed ordering needs a zero baseline to show positive fragments.
         const float diagnosticDepthClear =
             output.nativeDepthOrderingMode != 0u ? 0.0f : 1.0f;
-        ctx->ClearDepthStencilView(s.diagnosticDepthView.Get(),
-                                   D3D11_CLEAR_DEPTH, diagnosticDepthClear, 0);
+        // Clear native Z once, when the first DEPTH draw is submitted.
+        if (s.frameBatch.clear_depth())
+            ctx->ClearDepthStencilView(s.diagnosticDepthView.Get(),
+                                       D3D11_CLEAR_DEPTH, diagnosticDepthClear, 0);
         if (output.nativeDepthAlways)
             ctx->OMSetDepthStencilState(
                 s.diagnosticDepthAlwaysStates[output.nativeDepthWrite ? 1u : 0u].Get(), 0);
@@ -3613,7 +3624,8 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         // probe rather than sampling its same first triangle indefinitely.
         const UINT candidateOrdinal = s.eligibleThisFrame++;
         ++s.eligible;
-        if (s.attempted || candidateOrdinal != s.probeSlot) return;
+        if (!s.frameBatch.accepts(candidateOrdinal, s.probeSlot,
+                                  env_batch_opt_in())) return;
         if (indexCount && (!indices || indexCount != expectedElements ||
                            vertexCount > kMaxVertices))
             return;
@@ -3626,22 +3638,23 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             for (UINT i=0; i<indexCount; ++i)
                 if (indices[i] >= vertexCount) return;
         }
+        bool nativeSubmitted = false;
         if (type == D3DPT_TRIANGLEFAN) {
             // Real game VB/IB/UP data, rebased by R30. No fixture substitution.
             std::vector<std::uint32_t> fanTriangles;
             if (!game_fan_to_triangle_list(primitives, indices, indexCount,
                                            vertexCount, fanTriangles))
                 return;
-            s.attempted = true;
-            if (!submit(s, vertices, fanTriangles.data(),
-                        static_cast<UINT>(fanTriangles.size()),
-                        D3DPT_TRIANGLELIST, capture, output))
-                ++s.failed;
+            nativeSubmitted = submit(s, vertices, fanTriangles.data(),
+                                     static_cast<UINT>(fanTriangles.size()),
+                                     D3DPT_TRIANGLELIST, capture, output);
         } else {
-            s.attempted = true;
-            if (!submit(s, vertices, indices, indexCount, type, capture, output))
-                ++s.failed;
+            nativeSubmitted = submit(s, vertices, indices, indexCount,
+                                     type, capture, output);
         }
+        // One failed native submission terminates only this diagnostic batch.
+        if (nativeSubmitted) s.frameBatch.succeeded(output.nativeDepthTest);
+        else { s.frameBatch.abort(); ++s.failed; }
     } catch (...) {
         // Never interrupt the game's real draw or input on diagnostic failure.
     }
@@ -3769,7 +3782,7 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
             }
         } else if (s.pending) ++s.failed;
         s.pending = false;
-        s.attempted = false;
+        s.frameBatch.reset();
         const UINT window = (std::min)(s.eligibleThisFrame, kProbeSlots);
         s.probeSlot = window ? (s.probeSlot + 1u) % window : 0u;
         s.eligibleThisFrame = 0;
@@ -3790,7 +3803,7 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         // leave all original D3D9 Present and input behavior untouched.
         State& s = state();
         s.pending = false;
-        s.attempted = false;
+        s.frameBatch.reset();
         s.eligibleThisFrame = 0;
         s.probeSlot = 0;
     }
@@ -3801,7 +3814,7 @@ void before_game_reset() noexcept {
     State& s = state();
     std::lock_guard<std::mutex> lock(s.mutex);
     s.pending = false;
-    s.attempted = false;
+    s.frameBatch.reset();
     s.eligibleThisFrame = 0;
     s.probeSlot = 0;
     for (auto& item : s.readbacks) {
