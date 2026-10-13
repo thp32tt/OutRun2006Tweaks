@@ -11,7 +11,7 @@ def connected(c: str, h: str, p: str) -> bool:
     slot = """game_native_depth_equality_slot(
                     output.nativeDepthWrite, output.nativeDepthEqualityMode)"""
     return (all(s in h for s in (
-        "zFunc != 3u && zFunc != 6u) ||",
+        "zFunc != 3u && zFunc != 6u &&",
         "output.equalityMode = (zFunc == 3u || zFunc == 6u) ? zFunc : 0u;",
         "(writeEnabled ? 2u : 0u) + (equalityMode == 6u ? 1u : 0u);",
     )) and all(s in admit for s in (
@@ -61,7 +61,7 @@ for original, broken in (
     mutant = CPP.replace(original, broken, 1)
     assert mutant != CPP and not connected(mutant, HDR, PROBE), original
 for original, broken in (
-    ("zFunc != 3u && zFunc != 6u) ||", "zFunc != 3u) ||"),
+    ("zFunc != 3u && zFunc != 6u &&", "zFunc != 3u &&"),
     ("output.equalityMode = (zFunc == 3u || zFunc == 6u) ? zFunc : 0u;",
      "output.equalityMode = 0u;"),
     ("(writeEnabled ? 2u : 0u) + (equalityMode == 6u ? 1u : 0u);",
