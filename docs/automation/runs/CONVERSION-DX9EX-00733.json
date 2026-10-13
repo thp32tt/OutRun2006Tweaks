@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00733",
+  "production_id": "CONVERSION-DX9EX-00733",
+  "event_id": "CONVERSION-DX9EX-00733-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "affe08c7fe16b39ce51f5d96a76e7a20e274d2d9",
+  "material_result_sha": "affe08c7fe16b39ce51f5d96a76e7a20e274d2d9",
+  "validation_bearing_result_sha": "affe08c7fe16b39ce51f5d96a76e7a20e274d2d9",
+  "result_sha": "affe08c7fe16b39ce51f5d96a76e7a20e274d2d9",
+  "material_commits": [
+    "affe08c7fe16b39ce51f5d96a76e7a20e274d2d9"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 Quest3/VDXR adaptive HUD placement/legibility, unstretched main menu, independent ESC pause, readable F11 ImGui",
+    "completed_scope": "F11 live-content rectangle/density responsive reflow through C++: recenter/rescale only upon XR density, desktop resolution or 4:3 letterbox-content transition; prevent minimum-size overshoot on tiny reset surfaces; VR-only frame/spacing/scroll hit targets enlarged and balanced; desktop 2D and game world unchanged; numeric and 16 negative-mutant regression",
+    "remaining_acceptance": [
+      "Integrated Issue #119 final VR optical acceptance requires matched headset testing, including semantic driving HUD, main menu, ESC and F11 together",
+      "Quest3/VDXR UI legibility and 120fps/8.33ms frame-time not measured by automated CI"
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_POLICY",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38331845498,
+      "head_sha": "affe08c7fe16b39ce51f5d96a76e7a20e274d2d9",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "full-chain-compile",
+        "game",
+        "host",
+        "package"
+      ]
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38331845545,
+      "head_sha": "affe08c7fe16b39ce51f5d96a76e7a20e274d2d9",
+      "conclusion": "success",
+      "jobs": [
+        "domain-isolation"
+      ]
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38331845536,
+      "head_sha": "affe08c7fe16b39ce51f5d96a76e7a20e274d2d9",
+      "conclusion": "success",
+      "jobs": [
+        "source-cross-domain",
+        "msvc-analyze-active-game",
+        "msvc-analyze-openxr-host"
+      ]
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_validation_required": "User Quest3/VDXR matching-build UI optics + HUD placement / 120Hz test pending; no HMD PASS asserted.",
+  "score_delta": 1,
+  "score_awarded": true,
+  "scoreboard_commit": "0faca111bbf4862cff7fe08ce33e09a2be9686c4",
+  "score_run_key": "CONVERSION-DX9EX-00733",
+  "score_previous": 1189,
+  "score_cumulative": 1190,
+  "summary": "F11 live source/eye responsive ImGui shell reflow and scoped VR legible controls, negative regression and exact-SHA Active/Domain/Impact SUCCESS. Issue #119 still in progress; Quest3 UNTESTED."
+}
