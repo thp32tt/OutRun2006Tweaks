@@ -8,6 +8,7 @@
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx9.h>
 #include "overlay.hpp"
+#include "input_manager.hpp"
 #include "vr/game/render_semantics.hpp"
 #include "vr/core/r23_eye_extent_api.hpp"
 #include <algorithm>
@@ -363,7 +364,15 @@ class D3DHooks : public Hook
 			// never bitmap-upscale ImGui's existing font atlas. Keep the game
 			// sprite HUD, menu, native 2D desktop UI and world passes untouched.
 			float vrFontMultiplier = 1.0f;
-			if (overlayActive && Game::is_vr_gameplay_presentation() &&
+			// A freshly pressed F11 action is consumed by Overlay::render()
+			// later in this SAME EndScene. Sampling only overlayActive (last
+			// frame) made the first visible Quest3 frame use the tiny desktop
+			// 13px atlas before a second-frame rebuild. Probe the live bound
+			// action here as well, without changing input ownership, toggling
+			// visibility or using this density for gameplay HUD/world draws.
+			if (((overlayActive && Game::is_vr_gameplay_presentation()) ||
+				 (InputManager_ModActionHeld(ModAction::OverlayToggle) &&
+				  Game::is_vr_gameplay_presentation())) &&
 				Game::screen_resolution &&
 				Game::screen_resolution->x > 0 &&
 				Game::screen_resolution->y > 0)

@@ -26,6 +26,7 @@ def check(hook: str, font: str, header: str) -> None:
     for target, needles in (
         (density_guard, (
             "overlayActive && Game::is_vr_gameplay_presentation()",
+            "InputManager_ModActionHeld(ModAction::OverlayToggle)",
             "R23TryGetPublishedEyeExtent(0, lw, lh)",
             "R23TryGetPublishedEyeExtent(1, rw, rh)",
             "lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u",
@@ -33,7 +34,8 @@ def check(hook: str, font: str, header: str) -> None:
             "std::ceil(factor * 4.0f) * 0.25f, 1.0f, 3.0f",
             "Overlay::FontsDirty = true;",
         )),
-        (hook, ("ImGui_ImplDX9_InvalidateDeviceObjects();",)),
+        (hook, ("ImGui_ImplDX9_InvalidateDeviceObjects();",
+                '#include "input_manager.hpp"',)),
         (font_guard, (
             "std::clamp(GlobalFontScale, 0.5f, 5.0f)",
             "std::clamp(VrFontMultiplier, 1.0f, 3.0f)",
@@ -672,6 +674,40 @@ def check_first_run_vr_modal(font: str) -> None:
     print("PASS first-run F11 modal XR density, 7 viewport sizes, scroll limit and 6 mutants")
 
 
+
+def check_first_visible_f11_frame(hook: str) -> None:
+    """A newly pressed bound F11 action needs its XR font on frame zero."""
+    before = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
+        "R23TryGetPublishedEyeExtent(0, lw, lh)", 1)[0]
+    original = "overlayActive && Game::is_vr_gameplay_presentation()"
+    first_press = "InputManager_ModActionHeld(ModAction::OverlayToggle)"
+    assert original in before and first_press in before
+    assert before.index(original) < before.index(first_press)
+    assert "Game::screen_resolution &&" in before
+    assert '#include "input_manager.hpp"' in hook
+    assert hook.index("float vrFontMultiplier = 1.0f;") < hook.index(
+        "overlayActive = Overlay::render();")
+    # The held action is only a font-prewarm hint. Overlay::render() still
+    # owns edge detection, cursor updates, key bindings and visibility.
+    assert "InputManager_ModActionHeld(ModAction::OverlayToggle)" not in (
+        hook.split("overlayActive = Overlay::render();", 1)[1])
+    # Frames: closed, first press/open, steady open, released/open,
+    # press/close, released/closed, a desktop press. No HMD claim.
+    states = [
+        (False, False, True, False),
+        (False, True, True, True),
+        (True, True, True, True),
+        (True, False, True, True),
+        (True, True, True, True),
+        (False, False, True, False),
+        (False, True, False, False),
+    ]
+    for was_visible, held, vr, expected in states:
+        assert ((was_visible and vr) or (held and vr)) == expected
+    damaged = before.replace(first_press, "false", 1)
+    assert damaged != before and first_press not in damaged
+    print("PASS F11 first-visible-frame XR atlas prewarm, desktop and close negatives")
+
 def main():
     hook, font, header = (p.read_text(encoding="utf-8")
                           for p in (HOOK, FONT, HEADER))
@@ -680,6 +716,7 @@ def main():
     check(hook, font, header)
     check_font_io_cache(font)
     check_font_density_hysteresis(hook)
+    check_first_visible_f11_frame(hook)
     check_native_eye_height_density(hook)
     check_stereo_extent_coherence(hook)
     check_transient_eye_extent_dropout(hook)
