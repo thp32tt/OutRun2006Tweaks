@@ -41,7 +41,6 @@ def check(hook: str, font: str, header: str) -> None:
     for target, needles in (
         (density_guard, (
             "f11VisibleThisFrame && Game::is_vr_gameplay_presentation()",
-            "const bool f11VisibleThisFrame = Overlay::will_be_visible_this_frame();",
             "R23TryGetPublishedEyeExtent(0, lw, lh)",
             "R23TryGetPublishedEyeExtent(1, rw, rh)",
             "lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u",
@@ -50,7 +49,8 @@ def check(hook: str, font: str, header: str) -> None:
             "Overlay::FontsDirty = true;",
         )),
         (hook, ("ImGui_ImplDX9_InvalidateDeviceObjects();",
-                '#include "input_manager.hpp"',)),
+                '#include "input_manager.hpp"',
+                "const bool f11VisibleThisFrame = Overlay::will_be_visible_this_frame();",)),
         (font_guard, (
             "std::clamp(GlobalFontScale, 0.5f, 5.0f)",
             "std::clamp(VrFontMultiplier, 1.0f, 3.0f)",
