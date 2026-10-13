@@ -2779,9 +2779,11 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance || rgb24 || rgbaSwizzle || tenBit || extendedLuma) {
         nativeFormat = capture.srgbTexture ?
             DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : DXGI_FORMAT_B8G8R8A8_UNORM;
-    } else if (rg16 || a8p8) {
-        // Decode RG16 or current-paletted A8P8 to native BGRA8 instead of
-        // reinterpreting their unrelated D3D9 source layouts.
+    } else if (rg16) {
+        // RG16 is converted to BGRA8 per row; no native format reinterpretation.
+        nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    } else if (a8p8) {
+        // Current D3D9 palette RGB and source alpha must be decoded per texel.
         nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
     } else return false;
 
@@ -2832,8 +2834,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     const UINT sourceTexelBytes = packed16 ? 2u :
         luminance ? luminance_texture::source_bytes_per_texel(luminanceLayout) :
         extendedLuma ? extended_luminance_texture::source_bytes_per_texel(extendedLumaLayout) :
-        rgb24 ? rgb24_texture::source_bytes_per_texel() :
-        a8p8 ? a8p8_texture::source_bytes_per_texel() : 4u;
+        a8p8 ? a8p8_texture::source_bytes_per_texel() :
+        rgb24 ? rgb24_texture::source_bytes_per_texel() : 4u;
     std::vector<std::vector<std::uint8_t>> copied(levels);
     std::vector<UINT> pitches(levels);
     for (UINT level = 0; level < levels; ++level) {
