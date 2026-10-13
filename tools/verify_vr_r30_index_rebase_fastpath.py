@@ -24,7 +24,7 @@ def valid(body):
         "static_cast<std::int64_t>(baseVertexIndex) + maxRaw;",
         "if (minPhysical < 0 || maxPhysical > UINT_MAX)",
         "static_cast<std::uint64_t>(maxRaw) - minRaw + 1u;",
-        "scratch.used.assign(vertexCount, 0);",
+        "scratch.used.resize(vertexCount, 0);",
         "scratch.indices16.resize(indexCount);",
         "scratch.indices32.resize(indexCount);",
         "static_cast<std::uint64_t>(raw) - minRaw;",
@@ -43,7 +43,7 @@ def valid(body):
         return False
     first = body.index("minRaw = (std::min)(minRaw, raw);")
     bound = body.index("if (minPhysical < 0 || maxPhysical > UINT_MAX)")
-    setup = body.index("scratch.used.assign(vertexCount, 0);")
+    setup = body.index("scratch.used.resize(vertexCount, 0);")
     second = body.index("static_cast<std::uint64_t>(raw) - minRaw;")
     mark = body.index("scratch.used[static_cast<std::size_t>(local)] = 1;")
     i16 = body.index("scratch.indices16[i] = static_cast<std::uint16_t>(local);")
@@ -117,7 +117,7 @@ def verify_decode_cache(source, body):
     assert body.index("if (!cachedDecode)") < body.index(
         "minRaw = (std::min)(minRaw, raw);")
     assert body.index("scratch.indexDecode.valid = false;") < body.index(
-        "scratch.used.assign(vertexCount, 0);")
+        "scratch.used.resize(vertexCount, 0);")
     assert body.index("next.valid = true;") < body.index(
         "R30ConfigureXyzrhwWorldEffect(")
 
@@ -163,7 +163,7 @@ def valid_vb_touched(source, body):
         return False
     invalid = body.index("scratch.indexDecode.valid = false;")
     clear = body.index("scratch.vbTouched.clear();")
-    fill = body.index("scratch.used.assign(vertexCount, 0);")
+    fill = body.index("scratch.used.resize(vertexCount, 0);")
     append = body.index("scratch.vbTouched.push_back(")
     mark = body.index("scratch.used[static_cast<std::size_t>(local)] = 1;")
     publish = body.index("next.valid = true;")
@@ -220,6 +220,75 @@ def verify_vb_touched(source, body):
         assert sum(changed_mask) == len(set(changed))
     print(f"PASS R30 indexed VB sparse touched: 900 differential cases, "
           f"{len(mutations)} destructive mutations")
+
+
+
+
+def valid_vb_mask_reuse(body):
+    """On changed IB, clear only previous references before resizing the mask."""
+    try:
+        region = body.split("scratch.indexDecode.valid = false;", 1)[1].split(
+            "for (UINT i = 0; i < indexCount; ++i)", 1)[0]
+        required = (
+            "for (const std::uint32_t previous : scratch.vbTouched)",
+            "if (previous < scratch.used.size())",
+            "scratch.used[previous] = 0;",
+            "scratch.vbTouched.clear();",
+            "scratch.used.resize(vertexCount, 0);",
+        )
+        order = [region.index(item) for item in required]
+        return order == sorted(order) and len(set(order)) == len(order) and (
+            "scratch.used.assign(vertexCount, 0);" not in body)
+    except (ValueError, IndexError):
+        return False
+
+
+def verify_vb_mask_reuse(body):
+    assert valid_vb_mask_reuse(body), "changed-IB mask reset contract broken"
+    mutants = (
+        ("for (const std::uint32_t previous : scratch.vbTouched)",
+         "for (const std::uint32_t previous : scratch.upTouched)"),
+        ("if (previous < scratch.used.size())",
+         "if (previous > scratch.used.size())"),
+        ("scratch.used[previous] = 0;", "scratch.used[previous] = 1;"),
+        ("scratch.vbTouched.clear();", "scratch.vbTouched.reserve(0);"),
+        ("scratch.used.resize(vertexCount, 0);",
+         "scratch.used.assign(vertexCount, 0);"),
+    )
+    for good, bad in mutants:
+        assert good in body
+        assert not valid_vb_mask_reuse(body.replace(good, bad, 1)), good
+    # Reference full-mask allocation versus sparse touched-bit clearing.
+    # Includes changing IB revisions, shrink/expand, partial failed decodes.
+    rng = random.Random(801)
+    mask = bytearray()
+    touched = []
+    for epoch in range(2200):
+        count = rng.choice((1, 2, 64, 511, 4096, 12000))
+        for previous in touched:
+            if previous < len(mask):
+                mask[previous] = 0
+        touched.clear()
+        if len(mask) < count:
+            mask.extend(bytes(count - len(mask)))
+        else:
+            del mask[count:]
+        indices = [rng.randrange(count) for _ in range(rng.randint(1, 120))]
+        if epoch % 13 == 0:
+            indices = indices[:rng.randrange(len(indices) + 1)]
+        for index in indices:
+            if not mask[index]:
+                touched.append(index)
+                mask[index] = 1
+        reference = bytearray(count)
+        for index in indices:
+            reference[index] = 1
+        assert mask == reference, ("stale mask", epoch)
+        assert len(touched) == sum(reference) == len(set(touched))
+        if epoch % 5 == 0:
+            assert all(mask[index] for index in touched)  # cache hit
+    print(f"PASS R30 changed-IB mask reuse: 2200 generations, "
+          f"{len(mutants)} destructive mutations")
 
 
 
@@ -310,6 +379,7 @@ def main():
     assert valid(body), "scratch-free indexed draw / fallback contract broken"
     verify_decode_cache(code, body)
     verify_vb_touched(code, body)
+    verify_vb_mask_reuse(body)
     verify_up_single_pass(code)
     assert workflow.count("tools/verify_vr_r30_index_rebase_fastpath.py") == 2
     assert "std::vector<std::uint32_t> physical;" not in code

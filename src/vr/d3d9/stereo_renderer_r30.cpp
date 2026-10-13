@@ -4545,10 +4545,18 @@ namespace OutRunVRStereo
             if (!cachedDecode)
             {
                 scratch.indexDecode.valid = false;
+                // Only prior referenced mask bits can be nonzero. Clear them
+                // before resizing: shrink/grow must never revive stale bits.
+                // A failed partial decode still lists every marked index.
+                for (const std::uint32_t previous : scratch.vbTouched)
+                {
+                    if (previous < scratch.used.size())
+                        scratch.used[previous] = 0;
+                }
                 scratch.vbTouched.clear();
                 try
                 {
-                    scratch.used.assign(vertexCount, 0);
+                    scratch.used.resize(vertexCount, 0);
                     if (index16)
                         scratch.indices16.resize(indexCount);
                     else
