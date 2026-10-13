@@ -1,0 +1,73 @@
+{
+  "schema": "outrun-c1-imagegen-production-preflight-v1",
+  "date_kst": "2026-10-13",
+  "requested_role": "C1",
+  "requested_activity": "actual_ChatGPT_ImageGen_transparent_Korean_PNG_then_schema_bound_test_DDS_and_producer_QA",
+  "reviewed_branch": "korean-localization-recovery-20260928",
+  "observed_remote_head_before_report": "96b37f3677e1d63fe4455d638d0750e9399a4eed",
+  "contract_sha_git_blob": "adae20103c19c327e31173216111af6d9040cc58",
+  "imagegen_lane_doc_sha_git_blob": "88efa1d7469880e73e564cfafa498103406010dc",
+  "glyph_scale_policy_applied": true,
+  "current_automatic_controller_C1_mode": "batch_independent_lightweight_qa_only",
+  "current_controller_image_generation_enabled": false,
+  "explicit_user_request_conflicts_with_auto_controller_mode": true,
+  "manual_user_request_not_treated_as_deployed_controller_policy": true,
+  "pipeline": "tools/localization/imagegen_b_pipeline.py",
+  "pipeline_c1_input_schema": "outrun-c1-imagegen-v1",
+  "pipeline_c1_index_requirement": "queue_index % 4 == 2",
+  "source_references_checked": [
+    {
+      "queue_index": 102,
+      "label": "Time Attack Mode",
+      "translation": "타임 어택 모드",
+      "path": "localization/graphics/role_C1/source_references/q102_20261012/q102_LINE1_CANONICAL_ENGLISH_INPUT_PAD24.png",
+      "sha256": "affc027f5d9dd73b5a095cbd59f28945ba8aa999bb2f8d22e6f8a148483fcc7d",
+      "size_bytes": 50688,
+      "hash_verified_by_mcp": true
+    },
+    {
+      "queue_index": 102,
+      "label": "15 Continuous Course",
+      "translation": "15코스 연속",
+      "path": "localization/graphics/role_C1/source_references/q102_20261012/q102_LINE2_CANONICAL_ENGLISH_INPUT_PAD24.png",
+      "sha256": "b14e85c8ba5e51d2efc37102269c28332799d1a61e291780550a9bb30fc39045",
+      "size_bytes": 55780,
+      "hash_verified_by_mcp": true
+    }
+  ],
+  "canonical_q102_english_source_dds_sha256_from_existing_provenance": "17ee051e59d23c741c9df428dccd3ee2f7863c19a038f02db250001f44b6c121",
+  "q102_existing_owner": "historical_A_work_steal_of_B_even_work_20261008; no_C1_takeover_authorized_or_recorded",
+  "source_png_tool_attachment": false,
+  "generator_tool_available": true,
+  "generator_called": false,
+  "generator_call_blocker": "SOURCE_REFERENCE_NOT_BOUND: GitHub stored PNG and MCP hash results were not binary media attached to image_gen in this conversation",
+  "generator_generation_id": null,
+  "output_png_sha256": null,
+  "producer_dds_sha256": null,
+  "output_counts": {
+    "new_translated_imagegen_png": 0,
+    "new_trial_dds": 0,
+    "official_promoted_dds": 0
+  },
+  "pipeline_gate_note": "Legacy pipeline requires an independently SHA-bound CLEAN PLATE_PASS reviewer C2; no token fabricated. Official C2 role was retired in 2026-10-12 live policy. Do not override automatically.",
+  "qa": {
+    "source_reference_sha256": "VERIFIED_EXISTING_TWO_FILES",
+    "per_glyph_native_75_50": "NOT_RUN_NO_GENERATED_OUTPUT",
+    "source_effect_bbox_overflow": "NOT_RUN_NO_GENERATED_OUTPUT",
+    "producer_self_QA": "HOLD",
+    "C1_independent": "NOT_APPLICABLE_TO_SELF_PRODUCTION",
+    "C2": "NOT_RUN_NO_NEW_PASS",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "preservation": {
+    "queue_unchanged": true,
+    "producer_candidates_unchanged": true,
+    "no_new_task_id_or_queue_engine": true,
+    "no_Docker_or_Portainer_deploy": true,
+    "no_auto_send_change": true,
+    "no_game_install_or_release": true
+  },
+  "decision": "HOLD_SOURCE_REFERENCE_NOT_BOUND_AND_ROLE_OWNERSHIP_UNRESOLVED",
+  "policy": "Do not treat English source availability, prompt preparation or a source file hash check as ImageGen generation, DDS production or visual QA PASS."
+}
