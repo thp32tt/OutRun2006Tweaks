@@ -222,19 +222,49 @@ def main() -> None:
     for needle in [
         "same_producer_context(context) == false",
         "entry.state != SharedEyeSlotState::Acquired",
-        "!exact_source(left_source) || !exact_source(right_source)",
+        "exact_source(left_source, leftDesc)",
+        "exact_source(right_source, rightDesc)",
         "source->GetDevice(owner.GetAddressOf())",
+        "producer_device_->CheckFormatSupport(format_, &formatSupport)",
+        "formatSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE",
+        "native_game_eye_transfer(",
+        "transfer == NativeGameEyeTransfer::Reject",
+        "native_game_eye_pair_sources_admitted(",
+        "context->ResolveSubresource(entry.eye[0].Get(), 0u, left_source, 0u, format_);",
+        "context->ResolveSubresource(entry.eye[1].Get(), 0u, right_source, 0u, format_);",
         "context->CopyResource(entry.eye[0].Get(), left_source);",
         "context->CopyResource(entry.eye[1].Get(), right_source);",
         "return signal_producer_fence(context, slot, frame_id);",
     ]:
         if needle not in eye_copy_body:
-            raise SystemExit(f"DX11 R306 native producer missing: {needle}")
-    if not (eye_copy_body.index("!exact_source(left_source)") <
-            eye_copy_body.index("context->CopyResource(entry.eye[0]") <
-            eye_copy_body.index("context->CopyResource(entry.eye[1]") <
-            eye_copy_body.index("return signal_producer_fence(")):
-        raise SystemExit("DX11 R306 two eyes must validate before either GPU copy")
+            raise SystemExit(f"DX11 R306/00695 native producer missing: {needle}")
+    # Both descriptors and exact COM source aliases must be admitted before
+    # the first GPU Copy or Resolve. Both transfer branches remain required,
+    # and only the common producer EVENT can publish a complete stereo pair.
+    def offset(needle: str) -> int:
+        return eye_copy_body.index(needle)
+    if not (offset("exact_source(left_source, leftDesc)") <
+            offset("exact_source(right_source, rightDesc)") <
+            offset("native_game_eye_transfer(") <
+            offset("native_game_eye_pair_sources_admitted(") <
+            offset("context->ResolveSubresource(entry.eye[0]") <
+            offset("context->ResolveSubresource(entry.eye[1]") <
+            offset("context->CopyResource(entry.eye[0]") <
+            offset("context->CopyResource(entry.eye[1]") <
+            offset("return signal_producer_fence(")):
+        raise SystemExit("DX11 R306/00695 sample/alias check must precede both eye GPU writes")
+    helper = require(
+        "src/vr/d3d11/native_game_eye_pair_sources.hpp",
+        [
+            "leftSamples == 0u || leftSamples > 32u",
+            "leftSamples != rightSamples",
+            "leftQuality != rightQuality",
+            "leftQuality == 0u",
+            "return formatSupportsResolve",
+        ],
+    )
+    if helper.index("NativeGameEyeTransfer native_game_eye_transfer(") > helper.index("return formatSupportsResolve"):
+        raise SystemExit("DX11 00695 fail-closed transfer selection missing")
     probe_source = (ROOT / "tools/dx11_native_transport_probe.cpp").read_text(
         encoding="utf-8")
     if "R306 left/right GPU pixel copy identity" not in probe_source:

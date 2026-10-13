@@ -458,6 +458,105 @@ int main()
             !ring.validate_publication_snapshot(stereoPublication),
             "R306 exact host ACK releases both eyes and invalidates snapshot");
 
+    // 00695 live native eye producer: WARP-resolve two different game-created
+    // 4xMSAA color buffers into the pre-existing single-sample host eye ring.
+    // Prove that source sample mismatch does not enqueue a half-resolved frame.
+    D3D11_TEXTURE2D_DESC msaaDesc = sourceDesc;
+    msaaDesc.SampleDesc.Count = 4;
+    msaaDesc.SampleDesc.Quality = 0;
+    UINT msaaQualities = 0;
+    UINT resolveSupport = 0;
+    require(SUCCEEDED(d3d.device->CheckMultisampleQualityLevels(
+                sourceDesc.Format, 4, &msaaQualities)) && msaaQualities > 0 &&
+            SUCCEEDED(d3d.device->CheckFormatSupport(
+                sourceDesc.Format, &resolveSupport)) &&
+            (resolveSupport & D3D11_FORMAT_SUPPORT_MULTISAMPLE_RESOLVE) != 0,
+            "00695 WARP native game 4x eye format can resolve");
+    ID3D11Texture2D* msaaLeft = nullptr;
+    ID3D11Texture2D* msaaRight = nullptr;
+    ID3D11RenderTargetView* msaaLeftView = nullptr;
+    ID3D11RenderTargetView* msaaRightView = nullptr;
+    require(SUCCEEDED(d3d.device->CreateTexture2D(
+                &msaaDesc, nullptr, &msaaLeft)) &&
+            SUCCEEDED(d3d.device->CreateTexture2D(
+                &msaaDesc, nullptr, &msaaRight)) &&
+            SUCCEEDED(d3d.device->CreateRenderTargetView(
+                msaaLeft, nullptr, &msaaLeftView)) &&
+            SUCCEEDED(d3d.device->CreateRenderTargetView(
+                msaaRight, nullptr, &msaaRightView)),
+            "00695 local game 4x stereo targets created");
+    const float green[] = {0.f, 1.f, 0.f, 1.f};
+    const float magenta[] = {1.f, 0.f, 1.f, 1.f};
+    d3d.context->ClearRenderTargetView(msaaLeftView, green);
+    d3d.context->ClearRenderTargetView(msaaRightView, magenta);
+    std::uint32_t msaaSlot = 99;
+    require(ring.try_acquire_slot(d3d.context, 21, nullptr, msaaSlot) &&
+            !ring.submit_eye_pair(
+                d3d.context, msaaSlot, 21, msaaLeft, rightSource) &&
+            ring.slot_state(msaaSlot) == SharedEyeSlotState::Acquired &&
+            ring.slot_frame_id(msaaSlot) == 21,
+            "00695 mixed sample stereo pair must fail before GPU Resolve");
+    require(ring.submit_eye_pair(
+                d3d.context, msaaSlot, 21, msaaLeft, msaaRight) &&
+            ring.slot_state(msaaSlot) == SharedEyeSlotState::ProducerPending,
+            "00695 both 4x game eyes submitted for native DX11 MSAA Resolve");
+    publish_bounded(ring, d3d.context, msaaSlot, 21);
+    NativeSharedEyePublication msaaPublication{};
+    require(ring.snapshot_published_frame(msaaSlot, 21, msaaPublication) &&
+            ring.validate_publication_snapshot(msaaPublication),
+            "00695 MSAA eye pair has one complete producer EVENT and exact publication");
+    for (std::uint32_t eyeIndex = 0; eyeIndex < 2; ++eyeIndex)
+    {
+        d3d.context->CopyResource(readback, ring.eye(msaaSlot, eyeIndex));
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        require(SUCCEEDED(d3d.context->Map(
+                    readback, 0, D3D11_MAP_READ, 0, &mapped)),
+                "00695 GPU MSAA resolved eye readback");
+        const auto* p = static_cast<const std::uint8_t*>(mapped.pData);
+        const bool match = eyeIndex == 0
+            ? p[0] == 0 && p[1] == 255 && p[2] == 0 && p[3] == 255
+            : p[0] == 255 && p[1] == 0 && p[2] == 255 && p[3] == 255;
+        d3d.context->Unmap(readback, 0);
+        require(match, "00695 left/right game eye GPU MSAA Resolve color identity");
+    }
+    // The native host must consume the resolved single-sample texture,
+    // not the producer's game MSAA resource.
+    ID3D11Texture2D* hostMsaaReadback = nullptr;
+    require(SUCCEEDED(foreign.device->CreateTexture2D(
+                &readbackDesc, nullptr, &hostMsaaReadback)),
+            "00695 independent host resolved-eye staging");
+    for (std::uint32_t eyeIndex = 0; eyeIndex < 2; ++eyeIndex)
+    {
+        ID3D11Texture2D* hostResolvedEye = nullptr;
+        const HANDLE handle = eyeIndex == 0
+            ? msaaPublication.left_handle : msaaPublication.right_handle;
+        require(SUCCEEDED(foreign.device->OpenSharedResource(
+                    handle, __uuidof(ID3D11Texture2D),
+                    reinterpret_cast<void**>(&hostResolvedEye))) && hostResolvedEye,
+                "00695 host opened published resolved MSAA eye handle");
+        foreign.context->CopyResource(hostMsaaReadback, hostResolvedEye);
+        D3D11_MAPPED_SUBRESOURCE mapped{};
+        require(SUCCEEDED(foreign.context->Map(
+                    hostMsaaReadback, 0, D3D11_MAP_READ, 0, &mapped)),
+                "00695 independent OpenXR host GPU resolved color");
+        const auto* p = static_cast<const std::uint8_t*>(mapped.pData);
+        const bool match = eyeIndex == 0
+            ? p[0] == 0 && p[1] == 255 && p[2] == 0 && p[3] == 255
+            : p[0] == 255 && p[1] == 0 && p[2] == 255 && p[3] == 255;
+        foreign.context->Unmap(hostMsaaReadback, 0);
+        hostResolvedEye->Release();
+        require(match, "00695 foreign host sees both independent resolved game eyes");
+    }
+    hostMsaaReadback->Release();
+    require(ring.retire_acknowledged(
+                make_ack(ring.identity(), msaaSlot, 21)) &&
+            !ring.validate_publication_snapshot(msaaPublication),
+            "00695 exact ACK releases GPU-resolved stereo frame");
+    msaaRightView->Release();
+    msaaLeftView->Release();
+    msaaRight->Release();
+    msaaLeft->Release();
+
     readback->Release();
     foreignSource->Release();
     wrongSizeSource->Release();

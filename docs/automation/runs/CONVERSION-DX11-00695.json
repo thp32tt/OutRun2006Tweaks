@@ -28,11 +28,13 @@
       "src/vr/d3d11/native_shared_eye_ring.cpp",
       "src/vr/d3d11/native_game_eye_pair_sources.hpp",
       "tools/dx11_eye_msaa_resolve_probe_00695.cpp",
-      "tools/test_dx11_eye_msaa_resolve_00695.py"
+      "tools/test_dx11_eye_msaa_resolve_00695.py",
+      "tools/dx11_native_transport_probe.cpp",
+      "tools/verify_dx11_native_transport_contract.py"
     ],
     "acceptance_proof": {
-      "positive_probe": "C++17 compiled sample/quality pair matrix and end-to-end exact-DXGI source-to-ring Resolve dispatch",
-      "negative_regression": "Mismatch/missing MSAA resolve format support, source alias, shared provenance and rejected descriptors leave Acquired slot unchanged and original D3D9 game Draw/input intact",
+      "positive_probe": "C++17 sample/quality matrix plus real Windows WARP 4x per-eye MSAA GPU Resolve, producer EVENT and cross-device host shared-handle color readback",
+      "negative_regression": "Mixed samples/quality, unsupported format or source alias reject before either GPU command; WARP mixed 1x/4x rejection and existing single-sample GPU copy/ACK checks",
       "component_integration": "Game local stereo MSAA RT -> D3D11 ResolveSubresource into shared ring -> existing producer EVENT/host ACK publication path; non-MSAA Copy preserved"
     },
     "conflict_keys": [
@@ -93,13 +95,15 @@
     ".github/workflows/dx11-fast-structural.yml",
     "tools/dx11_eye_msaa_resolve_probe_00695.cpp",
     "tools/test_dx11_eye_msaa_resolve_00695.py",
-    "docs/automation/runs/CONVERSION-DX11-00695.json"
+    "docs/automation/runs/CONVERSION-DX11-00695.json",
+    "tools/dx11_native_transport_probe.cpp",
+    "tools/verify_dx11_native_transport_contract.py"
   ],
   "pipeline": {
     "C0_RECOVER": "PASS GitHub HEAD AGENTS.md DX11 policy and 00694 source ownership reviewed",
     "C1_REVIEW": "PASS stereo single-sample-only eye transfer gap located in NativeSharedEyeRing submit_eye_pair; independent of active texture source",
     "C2_IMPLEMENT": "PASS paired MSAA Resolve/copy dispatch and portable regression integration",
-    "C3_VALIDATE": "Initial Fast Gate policy failure due to missing upstream D3D9/native Draw/visible-frame graph identifiers; corrected policy record. New SHA Gate pending.",
+    "C3_VALIDATE": "Fast Structural PASS on preceding SHA, Backend Gate R306 old single-sample-only verifier rejected new function signature. Updated verifier to require copy + resolve safety and added true WARP pixel and host readback. New exact SHA pending.",
     "C4_COMMIT": "PENDING material commit",
     "C5_PACKAGE": "NOT_REQUIRED; native eye output Quest3/VDXR UNTESTED",
     "C6_STATE": "PENDING exact-SHA GitHub Actions; bookkeeping separate after verification"
