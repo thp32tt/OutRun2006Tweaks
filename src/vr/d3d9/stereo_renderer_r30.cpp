@@ -50,6 +50,7 @@ namespace Settings
     extern Setting<float> VRWorldScale;
     extern Setting<float> VRHudScale;
     extern Setting<float> VRPauseMenuScale;
+    extern Setting<float> VRPauseMenuVerticalOffset;
     extern Setting<bool> VRHudEdgeAnchors;
     extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
@@ -1639,6 +1640,24 @@ namespace OutRunVRStereo
         // canonical SpriteNode HUD, pause/menu, world and SkyGlow remain on
         // the original contain mapping. The per-eye aspect and FOV affine
         // below are still applied so glyphs keep their original proportions.
+        // Signed share of the game viewport height; positive moves ESC menu
+        // downward on screen. The old fallback stays exactly zero for all
+        // F11, gameplay HUD, world, GOAL/+TIME, title and unknown states.
+        // Apply the SAME signed fraction in both XYZRHW and shader HUD paths.
+        float R30PauseMenuVerticalFraction() noexcept
+        {
+            if (OutRunVR::GameSemantic::ExternalOverlaySemanticDepth != 0 ||
+                !Game::current_mode ||
+                *Game::current_mode != GameState::STATE_SMPAUSEMENU ||
+                OutRunVR::GameSemantic::EffectiveScope() !=
+                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D)
+                return 0.0f;
+            const float fraction = Settings::VRPauseMenuVerticalOffset.get();
+            if (!std::isfinite(fraction))
+                return 0.0f;
+            return std::clamp(fraction, -0.25f, 0.25f);
+        }
+
         float R30HudScopeScale() noexcept
         {
             // F11 rasterises its atlas independently of gameplay HudScale.
@@ -3476,7 +3495,8 @@ namespace OutRunVRStereo
                         state.eyeOffset[1] * halfWidth
                 };
                 const float hudBiasY =
-                    (1.0f - hudScaleY) * (y0 + halfHeight);
+                    (1.0f - hudScaleY) * (y0 + halfHeight) +
+                    height * R30PauseMenuVerticalFraction();
                 // Bias computed once per draw. A zero (default-off) anchor
                 // reproduces the existing centre-convergent mapping.
                 const float edgeLeftBias =
@@ -4411,6 +4431,9 @@ namespace OutRunVRStereo
                 clipCorrection._33 = 1.0f;
                 clipCorrection._44 = 1.0f;
                 clipCorrection._41 = eyeOffset[eye];
+                // Row-vector post-projection translation: positive viewport
+                // fraction must move pixels down (negative clip-space Y).
+                clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();
 
                 const D3DMATRIX corrected =
                     R29OwnerMultiplyMatrix(stockWvp, clipCorrection);

@@ -201,3 +201,76 @@ for bad, good in (
         "RenderScope::ScreenOverlay2D &&",
         "std::clamp(Settings::VRPauseMenuScale.get(),"))
 print("PASS exact ESC pause ownership, F11/HUD/world negatives and size/aspect fixtures")
+
+
+# Issue #119: independently centre the ESC/pause menu vertically. The same
+# viewport-fraction must feed the pretransformed XYZRHW and shader HUD paths.
+# User-visible placement still requires Quest3/VDXR optical acceptance.
+pause_begin = code.index("float R30PauseMenuVerticalFraction() noexcept")
+pause_end = code.index("float R30HudScopeScale() noexcept", pause_begin)
+pause_func = code[pause_begin:pause_end]
+for token in (
+    "ExternalOverlaySemanticDepth != 0 ||",
+    "!Game::current_mode ||",
+    "*Game::current_mode != GameState::STATE_SMPAUSEMENU ||",
+    "RenderScope::ScreenOverlay2D)",
+    "Settings::VRPauseMenuVerticalOffset.get()",
+    "!std::isfinite(fraction)",
+    "std::clamp(fraction, -0.25f, 0.25f)",
+):
+    assert token in pause_func, token
+assert "extern Setting<float> VRPauseMenuVerticalOffset;" in code
+assert 'Setting<float> VRPauseMenuVerticalOffset{ "VR", "PauseMenuVerticalOffset", 0.10f' in settings
+assert 'Range<float>{ -0.25f, 0.25f }' in settings
+fixed_begin = code.index("bool R30TransformXyzrhwStereo(")
+fixed_end = code.index("bool R30TransformXyzrhwVertices(", fixed_begin)
+fixed = code[fixed_begin:fixed_end]
+shader_begin = code.index("bool R30BuildScreenSpaceEyeConstants(")
+shader_end = code.index("template <typename ActualDraw>", shader_begin)
+shader = code[shader_begin:shader_end]
+assert fixed.count("height * R30PauseMenuVerticalFraction();") == 1
+assert fixed.index("height * R30PauseMenuVerticalFraction();") < fixed.index("for (UINT visit = 0;")
+assert shader.count("clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();") == 1
+assert shader.index("clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();") > shader.index("screenKind != R30ScreenSpaceKind::Hud2D")
+assert "R30PauseMenuVerticalFraction()" not in code[code.index("bool R30TransformXyzrhwVertices("):shader_begin]
+
+def pause_fraction(state, semantic, external, fraction):
+    if external or state != "pause" or semantic != "overlay" or not isfinite(fraction):
+        return 0.0
+    return max(-.25, min(.25, fraction))
+
+for width, height in ((1024, 768), (1920, 1080), (3440, 1440), (2496, 2688)):
+    for fraction in (-.25, 0.0, .10, .25, .50, float("nan")):
+        v = pause_fraction("pause", "overlay", False, fraction)
+        assert abs(v*height - (-2*v)*(-height/2)) < 1e-6
+        assert -height/4 <= v*height <= height/4
+        for context in (("game", "overlay", False), ("pause", "hud", False),
+                        ("pause", "world", False), ("pause", "overlay", True),
+                        ("menu", "overlay", False)):
+            assert pause_fraction(*context, fraction) == 0
+# Destructive controls must reject wrong scope, inverted shader sign and a
+# missing fixed-function offset, rather than passing a detached static test.
+for bad, good in (
+    ("*Game::current_mode != GameState::STATE_SMPAUSEMENU ||",
+     "*Game::current_mode != GameState::STATE_GAME ||"),
+    ("ExternalOverlaySemanticDepth != 0 ||",
+     "ExternalOverlaySemanticDepth == 0 ||"),
+    ("std::clamp(fraction, -0.25f, 0.25f)",
+     "std::clamp(fraction, -1.0f, 1.0f)"),
+):
+    assert pause_func.count(bad) == 1
+    mutant = pause_func.replace(bad, good, 1)
+    assert not all(t in mutant for t in (
+        "*Game::current_mode != GameState::STATE_SMPAUSEMENU ||",
+        "ExternalOverlaySemanticDepth != 0 ||",
+        "std::clamp(fraction, -0.25f, 0.25f)"))
+for bad, good in (
+    ("height * R30PauseMenuVerticalFraction();", "height * 0.0f;"),
+    ("clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();",
+     "clipCorrection._42 = 2.0f * R30PauseMenuVerticalFraction();"),
+):
+    assert (fixed + shader).count(bad) == 1
+    mutant = (fixed + shader).replace(bad, good, 1)
+    assert not (("height * R30PauseMenuVerticalFraction();" in mutant) and
+                ("clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();" in mutant))
+print("PASS pause-only vertical placement, 4 source/eye resolutions, exact ownership and 5 destructive controls")

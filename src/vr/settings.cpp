@@ -57,6 +57,8 @@ namespace Settings
 		"Projection-space HUD size after the headset-specific asymmetric-FOV correction. Lower values make speed/time/position and menus smaller in the HMD.", Range<float>{ 0.30f, 1.20f } };
 	Setting<float> VRPauseMenuScale{ "VR", "PauseMenuScale", 1.0f,
 		"Independent centred ESC/pause menu size in VR; does not resize gameplay HUD, F11, the title menus, or world markers.", Range<float>{ 0.55f, 1.50f } };
+	Setting<float> VRPauseMenuVerticalOffset{ "VR", "PauseMenuVerticalOffset", 0.10f,
+		"Signed fraction of viewport height to move ESC/pause menu vertically in VR (positive is down); independent of gameplay HUD and F11.", Range<float>{ -0.25f, 0.25f } };
 	Setting<bool> VRHudEdgeAnchors{ "VR", "HudEdgeAnchors", false,
 		"Quest3 experimental exact HUD text peripheral anchors; opt in for A/B only. Centre HUD, GOAL, 6th/6, F11, menus and world rays are unchanged by default." };
 	Setting<bool> VRHeadTracking{ "VR", "HeadTracking", true,
