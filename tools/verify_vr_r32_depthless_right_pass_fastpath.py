@@ -13,17 +13,17 @@ def body(source, start, end):
 
 
 def verify(r32, r33, api):
-    assert "bool depthlessPass) noexcept;" in api
+    assert "bool depthlessPass,\n        bool skipSavedViewportRestore) noexcept;" in api
     restore = body(r32, "bool R32RestoreRightPassState(", "template <typename LowerDraw>")
-    assert "bool restoreWvp,\n            bool depthlessPass" in restore
+    assert "bool restoreWvp,\n            bool depthlessPass,\n            bool skipSavedViewportRestore" in restore
     assert "if (!depthlessPass)" in restore
     assert restore.index("if (!depthlessPass)") < restore.index(
         "R30SupportCallOriginalSetDepthStencilSurface(")
     assert restore.index("R30SupportCallOriginalSetDepthStencilSurface(") < restore.index(
         "device->SetViewport(&savedViewport)")
     wrapper = body(r32, "bool R32ReviewRestoreRightPassState(", "void R32ReviewObserveFrameWorkload(")
-    assert "bool restoreWvp, bool depthlessPass" in wrapper
-    assert "originalConstants, restoreWvp, depthlessPass" in wrapper
+    assert "bool restoreWvp, bool depthlessPass,\n        bool skipSavedViewportRestore" in wrapper
+    assert "originalConstants, restoreWvp, depthlessPass,\n            skipSavedViewportRestore" in wrapper
     for start, end in (
         ("R32ReviewOwnedResult R33TryFastWorld(", "R32ReviewOwnedResult R33TryHud("),
         ("R32ReviewOwnedResult R33TryHud(", "HRESULT R33Dispatch("),
@@ -35,7 +35,7 @@ def verify(r32, r33, api):
         assert scope.index("R32ReviewSetRenderTarget(") < scope.index(guard)
         assert scope.index(guard) < scope.index("rightHr = device->SetViewport(")
         assert scope.index("R32ReviewRestoreRightPassState(") > scope.index(guard)
-        assert "true, depthlessPass);" in scope
+        assert "true, depthlessPass, skipSavedViewportRestore);" in scope
         # One authoritative post-left-draw attachment snapshot feeds right-eye
         # bind, depthless decision and restore: no second cross-TU lookup per
         # stereo primitive, including HUD/fast-world.
@@ -62,7 +62,8 @@ def main():
                           "savedDepth == nullptr &&\n                true;", 1), api),
         (r32, r33.replace("if (SUCCEEDED(rightHr) && !depthlessPass)",
                           "if (SUCCEEDED(rightHr))", 1), api),
-        (r32, r33.replace("true, depthlessPass);", "true, false);", 1), api),
+        (r32, r33.replace("true, depthlessPass, skipSavedViewportRestore);",
+                          "true, false, skipSavedViewportRestore);", 1), api),
         (r32, r33.replace("savedDepth ? R32ReviewRightEyeDepth() : nullptr",
                            "R32ReviewTrackedDepthStencil() ? R32ReviewRightEyeDepth() : nullptr", 1), api),
         (r32, r33.replace("savedDepth ? R32ReviewRightEyeDepth() : nullptr",
@@ -70,7 +71,8 @@ def main():
         (r32.replace("if (!depthlessPass)", "if (false)", 1), r33, api),
         (r32.replace("originalConstants, restoreWvp, depthlessPass",
                      "originalConstants, restoreWvp, false", 1), r33, api),
-        (r32, r33, api.replace("bool depthlessPass) noexcept;", "bool depthlessPass = false) noexcept;", 1)),
+        (r32, r33, api.replace("bool depthlessPass,\n        bool skipSavedViewportRestore) noexcept;",
+                     "bool depthlessPass = false,\n        bool skipSavedViewportRestore) noexcept;", 1)),
     ]
     for i, altered in enumerate(mutations, 1):
         assert altered != tuple(original), f"mutation {i} missed its anchor"

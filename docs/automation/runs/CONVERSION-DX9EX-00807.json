@@ -1,0 +1,88 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00807",
+  "production_id": "CONVERSION-DX9EX-00807",
+  "event_id": "CONVERSION-DX9EX-00807-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R33_RESTORE_RT0_VIEWPORT_ELISION",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R33_RESTORE_RT0_VIEWPORT_ELISION",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00807]",
+  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/core/r32_review_api.hpp",
+    "tools/verify_vr_r32_depthless_right_pass_fastpath.py",
+    "tools/verify_vr_r33_full_target_viewport.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00807.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R33_RESTORE_RT0_VIEWPORT_ELISION",
+    "goal": "Avoid redundant D3D9 SetViewport submissions on every full-target world and HUD stereo draw while retaining exact original viewport/depth behavior on error or Reset.",
+    "scope_boundary": "R32 state restore and R33 FastWorld/HUD render paths plus verifier and CI; never modify FFB, DX11, frozen DXVK, SkyGlow or menu/HUD coordinates.",
+    "special_work_evidence": "R32 right-pass restoration always issues SetRenderTarget(savedRt) then SetViewport(savedViewport) per successful R33 world/HUD stereo draw, although D3D9 SetRenderTarget resets to full viewport; R33 already elides same redundant call for right eye. Up to 3298 source draws per dense Quest3 frame in previous traces; FPS improvement unmeasured.",
+    "trace_stages": [
+      "OutRun source original game RT0/viewport and left-eye draw establishes tracked state.",
+      "R33 FastWorld and HUD right-eye replay follow saved RT0 and extent-generation decision, separately from right-eye target.",
+      "R32 restore rebinds left RT0 then conditionally skips redundant SetViewport only on successful full-target bind; failure/recovery preserves explicit restoration."
+    ],
+    "subcomponents": [
+      "Add separate borrowed game RT0 extent cache with Reset/rollback invalidation and reliable StateBlock gating for both stereo world and HUD callers.",
+      "Ensure successful RT0 bind is a precondition for skipping SetViewport and retain fallback for changed/inset/unknown/depth range, preserving all WVP and depth restoration.",
+      "Integrate seeded 4:3/16:9/21:9/Quest3 regression, destructive guard and same-SHA full Windows host/game/package/domain/impact CI."
+    ],
+    "acceptance_items": [
+      {
+        "id": "R33_WORLD_HUD_RESTORE_FASTPATH",
+        "category": "end_to_end_behavior",
+        "behavior_area": "left_rt_world_hud",
+        "expected_behavior": "World and HUD stereo replay skip a redundant SetViewport only after proven successful full-viewport original RT0 rebinding."
+      },
+      {
+        "id": "R33_RESTORE_FAIL_CLOSED",
+        "category": "fallback_regression",
+        "behavior_area": "reset_inset_invalid_binding",
+        "expected_behavior": "Failed bind, unreliable tracking, inset or Z-range viewport, changed surface dimensions and device Reset retain explicit original viewport restoration."
+      },
+      {
+        "id": "R33_WIN32_EXACT_SHA",
+        "category": "integrated_validation",
+        "behavior_area": "full_win32_host_game_package",
+        "expected_behavior": "Targeted deterministic regression and mutation guard and complete exact-SHA DX9Ex Active Win32 game/host/package, Domain Isolation and Full Source Impact are successful."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "R33_WORLD_HUD_RESTORE_FASTPATH": "PENDING_EXACT_SHA",
+    "R33_RESTORE_FAIL_CLOSED": "PENDING_EXACT_SHA",
+    "R33_WIN32_EXACT_SHA": "PENDING_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "R32RestoreRightPassState unconditionally called device->SetViewport after binding savedRt on every R33 FastWorld and Hud stereo draw; D3D9 RT0 successful bind already resets full viewport.",
+    "root_cause": "The pre-existing right-eye viewport full-target optimization lacked a symmetric original RT0 restore case, causing redundant driver state calls in each stereo primitive.",
+    "source_trace": [
+      "D3D9 original game viewport and RT0 from R33 left-eye Draw.",
+      "R33 FastWorld/HUD right-eye replay and original target extent matched against generation-scoped cache.",
+      "R32 RestoreRightPassState original RT0 and depth/WVP restore after right Draw."
+    ],
+    "alternatives_rejected": [
+      "Do not optimize by forcing full viewport on an inset or non-default depth range.",
+      "Never cache saved surface identity across device Reset or use unknown StateBlock state.",
+      "Do not reduce HMD quality or world/HUD stereo renders to fake performance gains."
+    ],
+    "negative_test_evidence": "Deterministic 4-resolution positive/negative viewport model and source guard mutations; CI exact-SHA pending.",
+    "fix_evidence": "Separate generation-scoped saved RT0 dimension lease and guarded R32 success-bound skip."
+  },
+  "performance_evidence": "One SetViewport driver state submission removed for each full-target stereo world/HUD draw with no projection quality change; HMD frame-time benefit not measured.",
+  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+}

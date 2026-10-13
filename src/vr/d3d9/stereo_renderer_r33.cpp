@@ -111,6 +111,33 @@ namespace OutRunVRStereo
                 saved.Height == R33RightViewport.height;
         }
 
+        // Separate original-target and right-eye extent leases. A successful
+        // game RT0 rebind resets to this full viewport; keep inset/offset/Z
+        // viewport restoration explicit. Borrowed identities expire on Reset.
+        R33RightViewportExtent R33SavedViewport{};
+
+        bool R33SavedTargetResetViewportMatches(
+            IDirect3DSurface9* savedRt,
+            const D3DVIEWPORT9& saved) noexcept
+        {
+            if (!savedRt || saved.X != 0 || saved.Y != 0 ||
+                saved.MinZ != 0.0f || saved.MaxZ != 1.0f ||
+                saved.Width == 0 || saved.Height == 0)
+                return false;
+            if (!R33SavedViewport.valid ||
+                R33SavedViewport.surface != savedRt)
+            {
+                R33SavedViewport = {};
+                D3DSURFACE_DESC desc{};
+                if (FAILED(savedRt->GetDesc(&desc)) ||
+                    desc.Width == 0 || desc.Height == 0)
+                    return false;
+                R33SavedViewport = { savedRt, desc.Width, desc.Height, true };
+            }
+            return saved.Width == R33SavedViewport.width &&
+                saved.Height == R33SavedViewport.height;
+        }
+
         thread_local R33DepthStencilWriteState R33DepthStencilState{};
         std::uint64_t R33DepthStencilSyncs = 0;
         std::uint64_t R33DepthStencilCacheHits = 0;
@@ -643,6 +670,9 @@ namespace OutRunVRStereo
             // primitive; unreliable tracking retains the full restore path.
             const bool depthlessPass = savedDepth == nullptr &&
                 OutRunVR::State::StateBlockTracker::Reliable();
+            const bool skipSavedViewportRestore =
+                OutRunVR::State::StateBlockTracker::Reliable() &&
+                R33SavedTargetResetViewportMatches(savedRt, savedViewport);
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
@@ -675,7 +705,7 @@ namespace OutRunVRStereo
                 }
                 restoreOk = R32ReviewRestoreRightPassState(
                     device, savedRt, savedDepth, savedViewport,
-                    draw.originalConstants, true, depthlessPass);
+                    draw.originalConstants, true, depthlessPass, skipSavedViewportRestore);
             }
 
             R32ReviewRecordWorldStereoDuplicate(
@@ -813,6 +843,9 @@ namespace OutRunVRStereo
             // primitive; unreliable tracking retains the full restore path.
             const bool depthlessPass = savedDepth == nullptr &&
                 OutRunVR::State::StateBlockTracker::Reliable();
+            const bool skipSavedViewportRestore =
+                OutRunVR::State::StateBlockTracker::Reliable() &&
+                R33SavedTargetResetViewportMatches(savedRt, savedViewport);
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
@@ -844,7 +877,7 @@ namespace OutRunVRStereo
                     rightHr = actualDraw();
                 }
                 restoreOk = R32ReviewRestoreRightPassState(
-                    device, savedRt, savedDepth, savedViewport, original, true, depthlessPass);
+                    device, savedRt, savedDepth, savedViewport, original, true, depthlessPass, skipSavedViewportRestore);
             }
 
             R32ReviewRecordHudStereoDuplicate();
@@ -1121,6 +1154,7 @@ namespace OutRunVRStereo
             {
                 R33InvalidateDepthStencilCache();
                 R33RightViewport = {};
+                R33SavedViewport = {};
                 if (SUCCEEDED(hr))
                     ++R33ResetSuccesses;
                 else
@@ -1234,6 +1268,7 @@ namespace OutRunVRStereo
         void R33RollbackHooks() noexcept
         {
             R33RightViewport = {};
+            R33SavedViewport = {};
             R33DrawIndexedPrimitiveUPR30Hook = {};
             R33DrawPrimitiveUPR30Hook = {};
             R33DrawIndexedPrimitiveR30Hook = {};
