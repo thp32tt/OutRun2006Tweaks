@@ -2,22 +2,22 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00784",
   "production_id": "CONVERSION-DX9EX-00784",
-  "event_id": "CONVERSION-DX9EX-00784-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00784-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:F11_MENU",
   "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
   "work_key": "DX9EX:VIS:F11_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C3_VALIDATE",
-  "feature_status": "IN_PROGRESS_F11_FULL_FUNCTION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00784]",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "material_result_sha": "53c2ed2a510024b8b76512fbd76589be7599190f",
+  "validation_bearing_result_sha": "1e9b72b597381ad4a517aef0a43ef5a374f89adc",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_status": "NEED_HMD_TEST",
   "score_delta": 0,
@@ -65,9 +65,9 @@
     ]
   },
   "acceptance_results": {
-    "F11_SETTINGS_ALL_TABS": "PENDING_CI",
-    "F11_FONTS_AND_FALLBACK": "PENDING_CI",
-    "F11_FULL_WIN32_GATE": "PENDING_CI",
+    "F11_SETTINGS_ALL_TABS": "PASS_EXACT_SHA",
+    "F11_FONTS_AND_FALLBACK": "PASS_EXACT_SHA",
+    "F11_FULL_WIN32_GATE": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -83,8 +83,28 @@
       "Do not rebuild DX9 ImGui atlas during an active frame or change established single-image F11 semantic/projection."
     ],
     "fix_evidence": "Source change makes frame-wide SettingsDirtyPending authority, retries failed settings_write and coalesces font/non-font changes.",
-    "negative_test_evidence": "Expanded F11 existing verifier covers switch-away, controller edit, hidden F11, read-only INI and 5 source mutation guards; awaiting exact SHA GitHub CI.",
+    "negative_test_evidence": "First attempt 38421627717 failed tools/verify_vr_f11_font_density.py:962 mutation precondition after canCommitSettings moved before font finalizer; repaired source-mutant anchors at 1e9b72b5. Exact 1e9b72b5 DX9Ex Active attempt 2 and Domain Isolation both SUCCESS.",
     "eye_ownership": "Existing external ScreenOverlay2D RAII, R30 per-eye common-ray scaling, actual XR eye-aware atlas density remain untouched; this patch fixes input-state persistence, not Quest3 optical hardware acceptance."
   },
-  "notes": "Partial feature material: do not declare optical F11 acceptance until actual Quest3/VDXR test; exact CI is pending; no score until independently verified whole functionality."
+  "notes": "C6 build-verified at exact SHA 1e9b72b597381ad4a517aef0a43ef5a374f89adc (DX9Ex Active #38422166211 attempt 2 policy/host/game/full-chain/package 5/5 SUCCESS; Domain #38422166087 SUCCESS). Material C++ result remains 53c2ed2a510024b8b76512fbd76589be7599190f. Quest3/VDXR optical behavior untested; no HMD PASS. Scoreboard credit handled separately to avoid duplicate RUN_KEY.",
+  "validation_evidence": {
+    "validation_bearing_result_sha": "1e9b72b597381ad4a517aef0a43ef5a374f89adc",
+    "dx9ex_active": {
+      "run_id": 38422166211,
+      "attempt": 2,
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38422166087,
+      "conclusion": "success"
+    },
+    "hmd": "UNTESTED"
+  }
 }
