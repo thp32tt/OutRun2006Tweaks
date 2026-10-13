@@ -1,0 +1,111 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00793",
+  "production_id": "CONVERSION-DX9EX-00793",
+  "event_id": "CONVERSION-DX9EX-00793-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "work_key": "DX9EX:VIS:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATING",
+  "checkpoint": "C4_MATERIAL_CI_REPAIR",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00793]",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_QUEST3_VDXR_TEST",
+  "score_delta": 0,
+  "material_result_sha": "7b01af4886b9e50d34ed2bd23fcd027abf5ec896",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_hud_responsive_layout.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00793.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Restore complete game speed/time/position HUD safe placement and legibility across 4:3, 16:9, 21:9 source resolutions and asymmetric Quest3 OpenXR left/right vertical FOV, retaining native semantics and binocular disparity.",
+    "scope_boundary": "Gameplay HUD semantic owner, native viewport, stereo edge geometry only. Do not alter F11, ESC, main menu, rank world billboards, GOAL, stage +TIME, SkyGlow, lens rings, FFB, DX11 or DXVK.",
+    "trace_stages": [
+      "Original speed, time, position sprite producers and native XYZRHW/c64 bounds in the OutRun D3D9 game.",
+      "R30 trusted HUD semantic classification, safe bounds, stereo queue geometry and bilateral eye-specific viewport affine.",
+      "R29 left/right D3D9Ex draw replay and OpenXR host per-eye composition, with original game fallback."
+    ],
+    "subcomponents": [
+      "Full trusted peripheral HUD source bounds and semantic producer ownership for speed, time and position.",
+      "Left/right asymmetric eye vertical FOV safe-area shift with one shared correction retaining binocular disparity.",
+      "Native aspect/reset/resolution fallback and world/effects exclusions without affecting independent menus."
+    ],
+    "acceptance_items": [
+      {
+        "id": "HUD_GROUPED_SOURCE_AND_STEREO",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_hud_semantic_geometry",
+        "expected_behavior": "Complete speed/time/position HUD stays separately legible at peripheral source anchors with source-bounds preservation and binocular visibility across asymmetric left/right FOV and three source aspects."
+      },
+      {
+        "id": "HUD_NEGATIVE_FALLBACK_PROTECTION",
+        "category": "fallback_regression",
+        "behavior_area": "stereo_world_reset_fallback",
+        "expected_behavior": "Offscreen transitions and impossible shared fit retain prior offsets; 6th/6, GOAL, +TIME, SkyGlow, F11, ESC, world billboards and original D3D9 desktop/reset fallback remain unchanged."
+      },
+      {
+        "id": "HUD_WIN32_EXACT_SHA_INTEGRATION",
+        "category": "integrated_validation",
+        "behavior_area": "x86_game_x64_host_package_ci",
+        "expected_behavior": "All DX9Ex Active policy, game, host, full-chain Win32 and package checks plus Domain Isolation pass on one declared validation-bearing SHA; Quest3 optical result remains separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "HUD_GROUPED_SOURCE_AND_STEREO": "PENDING_FULL_FEATURE",
+    "HUD_NEGATIVE_FALLBACK_PROTECTION": "PENDING_EXACT_SHA",
+    "HUD_WIN32_EXACT_SHA_INTEGRATION": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "User reported Quest3 3440x1440 HUD too close to upper centre; paired right-eye top clipping remained possible under asymmetric eye vertical FOV.",
+    "root_cause": "R30 shared vertical safe-area adjustment used pre-eye FOV scalar HudScaleY/HudBiasY rather than the two final left/right eye Y affines and could clip the right-eye peripheral HUD.",
+    "source_trace": [
+      "Original game XYZRHW HUD producer and semantic anchoring to trustworthy sprite source bounds.",
+      "R30 shared HUD y-shift compares both post-FOV eye scale/bias and intersects visible safe-area constraints.",
+      "R29 bilateral replay inherits the identical common edge shift while actual eye-specific stereo disparity remains distinct."
+    ],
+    "alternatives_rejected": [
+      "Changing only global HudScaleY was rejected: asymmetric optical centres need the actual distinct left/right eye affine, not one pre-FOV approximation.",
+      "Clamping each eye independently was rejected: different left/right shifts destroy original binocular disparity.",
+      "Blindly re-centering all XYZRHW primitives was rejected: it would contaminate world rank, stage effects and pause-menu semantics."
+    ],
+    "fix_evidence": "Source material 7b01af4886b9e50d34ed2bd23fcd027abf5ec896 added paired-eye vertical FOV fit with common y correction in R30 and bilateral verifier fixtures.",
+    "negative_test_evidence": "Material adds four destructive source mutants plus paired-eye top/bottom fixtures at four aspect resolutions, infeasible fit and transition safeguards; exact-SHA CI not yet green.",
+    "eye_ownership": "Trusted peripheral ScreenHud uses common safe-area bias with per-eye affine; 3D billboards, rank markers and stage effects must not inherit HUD correction.",
+    "runtime_limit": "No matching Quest3/VDXR headset or user screenshot validation of this commit; visual correctness not claimed."
+  },
+  "failure_recovery": {
+    "failed_run_id": 38448484497,
+    "failed_sha": "7b01af4886b9e50d34ed2bd23fcd027abf5ec896",
+    "failed_job": "policy",
+    "error": "DX9Ex function policy FAIL: run record missing docs/automation/runs/CONVERSION-DX9EX-00793.json",
+    "root_cause": "C4 material commit preceded mandatory feature-contract run record; policy blocked all game/host/package jobs before compiler execution.",
+    "repair": "Commit nonterminal feature run record without CI-skip; preserve original C++ material SHA, let exact-SHA CI evaluate; reserve C6 terminal bookkeeping for all required gates."
+  },
+  "ci_evidence": {
+    "status": "FAILED_BEFORE_BUILD",
+    "dx9ex_active": {
+      "run_id": 38448484497,
+      "head_sha": "7b01af4886b9e50d34ed2bd23fcd027abf5ec896",
+      "conclusion": "failure",
+      "jobs": {
+        "policy": "FAIL_MISSING_RUN_RECORD",
+        "game": "SKIPPED",
+        "host": "SKIPPED",
+        "full-chain-compile": "SKIPPED",
+        "package": "SKIPPED"
+      }
+    },
+    "domain_isolation": "NOT_YET_CONFIRMED_AT_VALIDATION_SHA"
+  }
+}
