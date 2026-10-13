@@ -345,6 +345,11 @@ for old,new in (
     assert mutant != fallback
     assert not (fallback_hoist in mutant and
                 "correctedY = hudScaleY * ndcY - pauseNdcOffset;" in mutant)
+def pause_fraction(state, semantic, external, fraction):
+    if external or state != "pause" or semantic != "overlay" or not isfinite(fraction):
+        return 0.0
+    return max(-.25, min(.25, fraction))
+
 for width,height in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
     for fraction in (-.25,0.,.10,.25):
         for source_y in (0., height*.3, height*.5, height):
@@ -359,11 +364,6 @@ for width,height in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
                             ("pause","world",False),("pause","overlay",True)):
                 assert pause_fraction(*context,fraction) == 0.0
 print("PASS ESC fallback/paired/shader vertical parity across 4 dimensions and 3 source-owning mutations")
-
-def pause_fraction(state, semantic, external, fraction):
-    if external or state != "pause" or semantic != "overlay" or not isfinite(fraction):
-        return 0.0
-    return max(-.25, min(.25, fraction))
 
 for width, height in ((1024, 768), (1920, 1080), (3440, 1440), (2496, 2688)):
     for fraction in (-.25, 0.0, .10, .25, .50, float("nan")):

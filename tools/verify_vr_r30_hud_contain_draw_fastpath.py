@@ -34,7 +34,12 @@ def validate(source: str) -> None:
     # *uniform* source-HUD aspect containment. Do not use worldEye scaling for
     # the HUD or change its Z/RHW/depth.
     assert "correctedX =\n                        hudScaleX * state.eyeScale[eye] * ndcX + state.eyeOffset[eye];" in affine
-    assert "correctedY = hudScaleY * ndcY;" in affine
+    assert "correctedY = hudScaleY * ndcY - pauseNdcOffset;" in affine
+    # Pause offset must stay draw-local and outside the HUD vertex loop.
+    assert affine.count("const float pauseNdcOffset =") == 1
+    assert "state.worldEffect ? 0.0f :" in affine
+    assert "2.0f * R30PauseMenuVerticalFraction();" in affine
+    assert affine.index("const float pauseNdcOffset =") < affine.index("for (UINT i = 0; i < vertexCount; ++i)")
     assert "p[0] = transformedX;" in affine
     assert "p[1] = transformedY;" in affine
     assert "p[2] = transformedZ;" not in affine
@@ -170,7 +175,7 @@ def negative_mutations(source: str) -> int:
             "state.eyeScale[eye] * ndcX",
         ),
         (
-            "correctedY = hudScaleY * ndcY;",
+            "correctedY = hudScaleY * ndcY - pauseNdcOffset;",
             "correctedY = ndcY;",
         ),
     ]
