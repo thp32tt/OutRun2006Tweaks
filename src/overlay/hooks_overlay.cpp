@@ -370,20 +370,20 @@ class D3DHooks : public Hook
 			// 13px atlas before a second-frame rebuild. Probe the live bound
 			// action here as well, without changing input ownership, toggling
 			// visibility or using this density for gameplay HUD/world draws.
-			if (((overlayActive && Game::is_vr_gameplay_presentation()) ||
-				 (InputManager_ModActionHeld(ModAction::OverlayToggle) &&
-				  Game::is_vr_gameplay_presentation())) &&
-				Game::screen_resolution &&
-				Game::screen_resolution->x > 0 &&
-				Game::screen_resolution->y > 0)
+			if ((overlayActive && Game::is_vr_gameplay_presentation()) ||
+				(InputManager_ModActionHeld(ModAction::OverlayToggle) &&
+				 Game::is_vr_gameplay_presentation()))
 			{
-				// A short-lived XR publication gap is not an instruction to
-				// shrink the already-rasterised F11 shell to desktop density.
-				// Keep the last finite VR atlas until BOTH eye extents can be
-				// sampled again. Outside gameplay/F11 the 1.0 default above
-				// still restores the desktop font on the next EndScene.
+				// A zero-sized/stale source publication during Reset is no more
+				// reason to replace a valid Quest3 atlas than a missing eye
+				// extent. Hold VR density for the entire live F11 action.
+				// Desktop/front-end and a closed overlay still reset to 1x.
 				vrFontMultiplier = std::clamp(
 					Overlay::VrFontMultiplier, 1.0f, 3.0f);
+				if (Game::screen_resolution &&
+					Game::screen_resolution->x > 0 &&
+					Game::screen_resolution->y > 0)
+				{
 				std::uint32_t lw = 0, lh = 0, rw = 0, rh = 0;
 				if (OutRunVRStereo::R23TryGetPublishedEyeExtent(0, lw, lh) &&
 					OutRunVRStereo::R23TryGetPublishedEyeExtent(1, rw, rh) &&
@@ -438,6 +438,7 @@ class D3DHooks : public Hook
 						else
 							vrFontMultiplier = stepped;
 					}
+				}
 				}
 			}
 			// Quantised quarter-steps prevent continuous atlas churn when the

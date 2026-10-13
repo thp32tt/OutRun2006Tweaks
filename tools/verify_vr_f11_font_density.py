@@ -675,6 +675,38 @@ def check_first_run_vr_modal(font: str) -> None:
 
 
 
+def check_source_reset_atlas_hold(hook: str) -> None:
+    """Preserve an XR F11 font atlas when game-source size lapses on Reset."""
+    area = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
+        "// Quantised quarter-steps prevent continuous atlas churn", 1)[0]
+    active = "if ((overlayActive && Game::is_vr_gameplay_presentation()) ||"
+    size = "if (Game::screen_resolution &&"
+    retain = ("vrFontMultiplier = std::clamp(\n"
+              "\t\t\t\t\tOverlay::VrFontMultiplier, 1.0f, 3.0f);")
+    assert area.count(active) == 1
+    assert area.count(size) == 1
+    assert area.count(retain) == 1
+    assert area.index(active) < area.index(retain) < area.index(size)
+    assert area.index(size) < area.index(
+        "R23TryGetPublishedEyeExtent(0, lw, lh)")
+    def density(opened, held, vr, source_valid, prior, eye_factor):
+        current = 1.0
+        if vr and (opened or held):
+            current = max(1.0, min(3.0, prior))
+            if source_valid and eye_factor is not None:
+                current = max(1.0, min(3.0, eye_factor))
+        return current
+    for initial in (1.25, 2.0, 2.75, 3.0):
+        assert density(True, False, True, False, initial, None) == initial
+        assert density(False, True, True, False, initial, None) == initial
+        assert density(True, False, True, True, initial, None) == initial
+        assert density(True, False, True, True, initial, 2.25) == 2.25
+        assert density(False, False, True, False, initial, None) == 1.0
+        assert density(True, True, False, False, initial, None) == 1.0
+    assert size not in area.replace(size, "if (true &&", 1)
+    print("PASS F11 XR atlas held through Reset source-size gap; desktop negative")
+
+
 def check_first_visible_f11_frame(hook: str) -> None:
     """A newly pressed bound F11 action needs its XR font on frame zero."""
     before = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
@@ -717,6 +749,7 @@ def main():
     check_font_io_cache(font)
     check_font_density_hysteresis(hook)
     check_first_visible_f11_frame(hook)
+    check_source_reset_atlas_hold(hook)
     check_native_eye_height_density(hook)
     check_stereo_extent_coherence(hook)
     check_transient_eye_extent_dropout(hook)
