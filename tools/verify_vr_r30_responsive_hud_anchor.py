@@ -95,11 +95,12 @@ for original, replacement in (
      "? OutRunVR::GameSemantic::ProducerToken::OutRunHudText"),
 ):
     assert original in owner
-    assert not all(token in owner.replace(original, replacement, 1)
-                   for token in (
-                       "0x0B9000, 0x0B9200", "0x0BE300, 0x0BEA40",
-                       "OutRunHudPeripheralText = previousPeripheral;",
-                       "? OutRunVR::GameSemantic::ProducerToken::OutRunHudPeripheralText"))
+    mutated = owner.replace(original, replacement, 1)
+    # Clip and sprani have TWO identical producer expressions. A one-site
+    # mutation must still be rejected even when the other site is intact.
+    # Compare exact occurrences, never mere substring presence.
+    assert mutated.count(original) == owner.count(original) - 1
+    assert mutated != owner
 print("PASS exact driving peripheral producer; protected GOAL/+TIME/unknown 4 negative mutants")
 
 
