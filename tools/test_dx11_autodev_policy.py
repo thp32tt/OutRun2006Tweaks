@@ -130,7 +130,7 @@ for label, mutate in (
     mutate(bad)
     assert validate_task(bad, p), "feature-sized negative admitted: " + label
 complete = copy.deepcopy(feature)
-complete.update(status="COMPLETE_BUILD_VERIFIED", automation_validation="PASS_EXACT_SHA", validation_bearing_result_sha="a"*40, acceptance_results={"end2end":"PASS", "fallback":"PASS", "gates":"PASS_EXACT_SHA"})
+complete.update(status="COMPLETE_BUILD_VERIFIED", automation_validation="PASS_EXACT_SHA", validation_bearing_result_sha="a"*40, changed_files=["src/vr/d3d11/live_game_frame_bridge.cpp"], acceptance_results={"end2end":"PASS", "fallback":"PASS", "gates":"PASS_EXACT_SHA"})
 assert not validate_task(complete, p), validate_task(complete, p)
 run = latest_dx11_run()
 assert run is not None, "expected durable DX11 run records"
