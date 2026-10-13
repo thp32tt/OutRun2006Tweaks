@@ -11,13 +11,13 @@
   "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "work_key": "DX9EX:VIS:ESC_MENU",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
-  "checkpoint": "C4_MATERIAL",
-  "feature_status": "BUILD_PENDING_NEED_HMD_TEST",
-  "controller_terminal": false,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "controller_terminal": true,
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00775]",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "1db94e8000c2cd941172b00794f5352fca4a1653",
+  "validation_bearing_result_sha": "1db94e8000c2cd941172b00794f5352fca4a1653",
   "feature_contract": {
     "feature_id": "DX9EX:VIS:ESC_MENU",
     "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
@@ -62,10 +62,10 @@
     ]
   },
   "acceptance_results": {
-    "ESC_MENU_ALIGNED": "PENDING",
-    "ESC_BOTH_RENDER_PATHS": "PENDING",
-    "ESC_NEGATIVE_SCOPE_RESET": "PENDING",
-    "ESC_EXACT_SHA_INTEGRATION": "PENDING",
+    "ESC_MENU_ALIGNED": "PASS_EXACT_SHA",
+    "ESC_BOTH_RENDER_PATHS": "PASS_EXACT_SHA",
+    "ESC_NEGATIVE_SCOPE_RESET": "PASS_EXACT_SHA",
+    "ESC_EXACT_SHA_INTEGRATION": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -88,8 +88,50 @@
     "tools/verify_vr_r30_responsive_hud_anchor.py",
     "docs/automation/runs/CONVERSION-DX9EX-00775.json"
   ],
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_status": "NEED_HMD_TEST",
-  "score_delta": 0
+  "score_delta": 1,
+  "ci_evidence": {
+    "validation_bearing_result_sha": "1db94e8000c2cd941172b00794f5352fca4a1653",
+    "dx9ex_active": {
+      "run_id": 38395406316,
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "game": "success",
+        "host": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38395405893,
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    "full_source_impact": {
+      "run_id": 38395406003,
+      "conclusion": "success",
+      "jobs": {
+        "msvc-analyze-openxr-host": "success",
+        "msvc-analyze-active-game": "success",
+        "source-cross-domain": "success"
+      }
+    },
+    "non_gating_coordination": {
+      "run_id": 38395405967,
+      "conclusion": "failure",
+      "preexisting_issue": "Test-VRAutodevCoordination.ps1 rejects queue status DECOMPOSED_PARENT_TRACKING_ONLY; independent of ESC source compile and separate from required DX9Ex gates"
+    },
+    "hmd": "UNTESTED"
+  },
+  "validation_runs": {
+    "active": 38395406316,
+    "domain": 38395405893,
+    "full_source_impact": 38395406003
+  },
+  "notes": "C6 standalone [skip ci] metadata commit after validation-bearing material SHA 1db94e8000c2cd941172b00794f5352fca4a1653 passed required DX9Ex Active 5/5, Domain, Full Source Impact 3/3. No Quest3/VDXR headset test; runtime remains UNTESTED. Coordination unrelated legacy queue-status verifier failed, not misrepresented as passed."
 }
