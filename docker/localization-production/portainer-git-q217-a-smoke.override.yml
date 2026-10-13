@@ -1,0 +1,9 @@
+# A q217 single-task smoke. Portainer Git-based stack ADDITIONAL compose path only.
+# Never deploy standalone; requires existing base Compose and a rebuilt image with OUTRUN_PNG_UPLOAD_V1 patch.
+services:
+  outrun-chat-controller-localization-recovery:
+    environment:
+      AUTO_SEND: "true"
+      CHAT_SLOTS: "3"
+      SCHEDULE_MINUTES: "0"
+      OUTRUN_A_SINGLE_SMOKE_TASK_ID: "OUTRUN-A-Q217-IMG-SMOKE-20261013"
