@@ -11,12 +11,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 POLICY = ROOT / "docs/automation/DX9EX_FEATURE_UNIT_POLICY.json"
 RUNS = ROOT / "docs/automation/runs"
-PATTERN = re.compile(r"CONVERSION-DX9EX-(\\d{5})")
+PATTERN = re.compile(r"CONVERSION-DX9EX-(\d{5})")
 
 
 def validate(record: dict, policy: dict) -> list[str]:
     task_id = record.get("task_id", "")
-    match = re.fullmatch(r"CONVERSION-DX9EX-(\\d{5})", task_id)
+    match = re.fullmatch(r"CONVERSION-DX9EX-(\d{5})", task_id)
     if not match:
         return ["invalid DX9Ex TASK_ID"]
     if int(match.group(1)) < policy["effective_from_task_number"]:
