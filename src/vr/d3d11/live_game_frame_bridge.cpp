@@ -13,6 +13,7 @@
 #include "live_game_extended_luminance_texture.hpp"
 #include "live_game_rg16_texture.hpp"
 #include "live_game_a8p8_texture.hpp"
+#include "live_game_rgb332_texture.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -2752,6 +2753,11 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // The native diagnostic must fetch the live game palette, not treat
     // A8P8's two bytes as a packed RGB color.
     const bool a8p8 = base.Format == D3DFMT_A8P8;
+    // Packed 3:3:2 game textures carry one color byte and optional alpha.
+    const bool rgb332 = base.Format == D3DFMT_R3G3B2 ||
+                        base.Format == D3DFMT_A8R3G3B2;
+    const auto rgb332Layout = base.Format == D3DFMT_A8R3G3B2 ?
+        rgb332_texture::Layout::a8rgb332 : rgb332_texture::Layout::rgb332;
     // D3D9 packed 16-bit texture formats have no equivalent sRGB D3D11 SRV.
     // Keep their live Draw on DX9Ex; never decode as linear by mistake.
     if (capture.srgbTexture && packed16) return false;
@@ -2765,6 +2771,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     if (capture.srgbTexture && rg16) return false;
     // Palettized sRGB lookup/transfer parity is not proven on D3D9.
     if (capture.srgbTexture && a8p8) return false;
+    // No verified legacy sRGB equivalence for 3:3:2 packed color.
+    if (capture.srgbTexture && rgb332) return false;
     DXGI_FORMAT nativeFormat = DXGI_FORMAT_UNKNOWN;
     if (compressed) {
         // A full-sized BC base level is required, but its final mips may
@@ -2781,6 +2789,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : DXGI_FORMAT_B8G8R8A8_UNORM;
     } else if (rg16) {
         // RG16 is converted to BGRA8 per row; no native format reinterpretation.
+        nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    } else if (rgb332) {
+        // One/two-byte source texels expand into four-byte BGRA8 pixels.
         nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
     } else if (a8p8) {
         // Current D3D9 palette RGB and source alpha must be decoded per texel.
@@ -2835,6 +2846,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         luminance ? luminance_texture::source_bytes_per_texel(luminanceLayout) :
         extendedLuma ? extended_luminance_texture::source_bytes_per_texel(extendedLumaLayout) :
         a8p8 ? a8p8_texture::source_bytes_per_texel() :
+        rgb332 ? rgb332_texture::source_bytes_per_texel(rgb332Layout) :
         rgb24 ? rgb24_texture::source_bytes_per_texel() : 4u;
     std::vector<std::vector<std::uint8_t>> copied(levels);
     std::vector<UINT> pitches(levels);
@@ -2850,7 +2862,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             (std::max)(1u, (desc.Width + 3u) / 4u) *
                 (base.Format == D3DFMT_DXT1 ? 8u : 16u) :
             desc.Width * sourceTexelBytes;
-        const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) || extendedLuma ?
+        const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) || extendedLuma || rgb332 ?
             desc.Width * 4u : rowBytes;
         // Preserve existing format pitch contracts and only widen A8P8
         // (two source bytes per texel) to four-byte decoded native pixels.
@@ -2892,6 +2904,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     rgb24_texture::unpack_row(source, destination, desc.Width);
                 else if (rg16)
                     rg16_texture::unpack_row(source, destination, desc.Width);
+                else if (rgb332)
+                    rgb332_texture::unpack_row(source, destination, desc.Width, rgb332Layout);
                 else if (a8p8)
                     a8p8_texture::unpack_row(source, destination, desc.Width,
                                              activePalette.data());
