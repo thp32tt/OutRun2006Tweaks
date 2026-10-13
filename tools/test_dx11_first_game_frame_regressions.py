@@ -195,11 +195,17 @@ def main() -> None:
     batch = (ROOT / "src/vr/d3d11/native_game_frame_batch.hpp").read_text()
     for invariant in ("kMaxDraws = 8u", "next_probe_slot(", "if (stopped) return false;",
                       "if (!multi) return submitted == 0u && ordinal == slot;",
-                      "return submitted < kMaxDraws && ordinal >= slot;",
+                      "return submitted < kMaxDraws && ordinal >= slot &&",
                       "return !depth || depthDirection == 0u ||"):
         assert invariant in batch
+    assert "ordinal - slot < kMaxDraws;" in batch
     assert "kMaxDraws = 8u" not in batch.replace("kMaxDraws = 8u",
                                                  "kMaxDraws = 0u", 1)
+    # Negative regression: a late accepted draw outside the contiguous
+    # 8-candidate window cannot be silently mixed into the same native frame.
+    unsafe_mix = batch.replace("ordinal - slot < kMaxDraws;",
+                               "ordinal - slot >= kMaxDraws;", 1)
+    assert unsafe_mix != batch and "ordinal - slot < kMaxDraws;" not in unsafe_mix
     # Rotation reaches eligible menu, vehicle selection and race candidates.
     slot = 0
     chosen = []
