@@ -227,7 +227,7 @@ for token in (
     "*Game::current_mode == GameState::STATE_SMPAUSEMENU",
     "RenderScope::ScreenOverlay2D &&",
     "Settings::VRPauseMenuScale.get()",
-    "std::clamp(Settings::VRPauseMenuScale.get(),",
+    "std::clamp(readable,",
     "0.55f, 1.50f",
     "return R30HudScaleValue();",
 ):
@@ -245,17 +245,20 @@ contain = code[scope_end:code.index("R30HudEdgeAnchor R30GetExactHudEdgeAnchor("
 assert "const float userScale = R30HudScopeScale();" in contain
 assert "R30HudContain.userScale == userScale" in contain
 assert "R30HudContain.userScale = userScale;" in contain
-def effective(mode, semantic, f11=False, hud=.55, pause=1.0):
+def effective(mode, semantic, f11=False, hud=.55, pause=1.0,
+              responsive=True):
     if semantic == "overlay" and f11:
         return 1.0
     if mode == 0x12 and semantic == "overlay" and not f11 and pause > 0:
-        return max(.55, min(1.50, pause))
+        requested = max(pause, 1.25) if responsive else pause
+        return max(.55, min(1.50, requested))
     return hud
 for source_w, source_h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
     for eye_w, eye_h in ((1024,768),(2496,2688)):
         factor = max(.75, min(3.50, (source_w/source_h)/(eye_w/eye_h)))
         assert effective(0x12, "overlay") / factor > 0
-        assert effective(0x12, "overlay") == 1.
+        assert effective(0x12, "overlay") == 1.25
+        assert effective(0x12, "overlay", responsive=False) == 1.0
         assert effective(0x12, "hud") == .55
         assert effective(0x12, "world") == .55
         assert effective(0x09, "overlay") == .55
@@ -270,7 +273,7 @@ for bad, good in (
     ("*Game::current_mode == GameState::STATE_SMPAUSEMENU",
      "*Game::current_mode == GameState::STATE_GAME"),
     ("RenderScope::ScreenOverlay2D &&", "RenderScope::ScreenHud &&"),
-    ("std::clamp(Settings::VRPauseMenuScale.get(),",
+    ("std::clamp(readable,",
      "std::clamp(Settings::VRHudScale.get(),"),
 ):
     assert scope.count(bad) == 1, bad
@@ -279,7 +282,7 @@ for bad, good in (
         "ExternalOverlaySemanticDepth == 0 &&",
         "*Game::current_mode == GameState::STATE_SMPAUSEMENU",
         "RenderScope::ScreenOverlay2D &&",
-        "std::clamp(Settings::VRPauseMenuScale.get(),"))
+        "std::clamp(readable,"))
 print("PASS exact ESC pause ownership, F11/HUD/world negatives and size/aspect fixtures")
 
 
