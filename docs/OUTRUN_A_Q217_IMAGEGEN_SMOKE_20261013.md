@@ -39,7 +39,10 @@
 - 시험 결과가 확정되지 않으면 스테이징 구성을 방치하지 말고 의도한 격리 상태/복원 여부를 분명하게 기록한다.
 
 ## 5. 실행 기록
-- GitHub 코드·정책 변경 / q217 입력 SHA 검증: 2026-10-13 사전 준비.
+- GitHub 코드·정책 변경 / q217 입력 SHA 검증: 2026-10-13 사전 준비 완료.
+- **실제로 실행한 검사**: GitHub 최신 수정 코드를 N100의 `work/a_q217_smoke_preflight/` 별도 임시 경로에 작은 Python 4개만 다운로드하여 `test_controller_png_upload.py` 13/13 PASS (0.027초). 기존 운영 Docker/볼륨을 열거나 변경하지 않았다.
+- ChatGPT 자체 로컬 Chromium 실파일 시험: 정확 SHA256 `56b383...` / 3,735,331바이트 q217 PNG를 숨겨진 `input[type=file]`에 첨부하고 브라우저 File 이름/길이/MIME 확인 **PASS**. **실제 ChatGPT 프리뷰/메시지 수신 검증은 아님**.
+- 첨부·검사 결과 패키지: `OUTRUN_A_Q217_ONE_SHOT_IMAGEGEN_DOCKER_SMOKE_20261013.zip` (원본 PNG + 정확 task manifest + 사전 QA 기록).
 - 운영 Docker 재배포: **NOT_RUN (USER_MANUAL)**.
 - 운영 ChatGPT 실제 파일 업로드: **UNTESTED (manual deploy pending)**.
 - 내장 ImageGen 생성 / 결과 PNG 확보: **UNTESTED (manual deploy pending)**.
