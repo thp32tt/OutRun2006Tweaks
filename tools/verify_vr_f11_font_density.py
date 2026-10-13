@@ -680,7 +680,7 @@ def check_first_run_font_slider_commit(font: str) -> None:
     owner = font.split("static void render_first_run_intro()", 1)[1].split(
         "void ForceShowCursor", 1)[0]
     required = (
-        "if (!fontScaleHeld)\\n\\t\\tfontScale = Overlay::GlobalFontScale;",
+        "if (!fontScaleHeld)\n\t\tfontScale = Overlay::GlobalFontScale;",
         'ImGui::SliderFloat("Font Scale", &fontScale, 0.5f, 3.5f)',
         "ImGui::IsItemDeactivatedAfterEdit() ||",
         "ImGui::IsMouseReleased(ImGuiMouseButton_Left)",
@@ -688,7 +688,7 @@ def check_first_run_font_slider_commit(font: str) -> None:
         "Overlay::FontsDirty = true;",
         "Overlay::settings_write();",
         "fontScaleHeld = false;",
-        "if (sliderEditFinished)\\n\\t\\tcommitFontScale();",
+        "if (sliderEditFinished)\n\t\tcommitFontScale();",
     )
     for token in required:
         assert token in owner, "missing first-run F11 commit invariant: " + token
@@ -703,21 +703,21 @@ def check_first_run_font_slider_commit(font: str) -> None:
     close = owner.split('if (ImGui::Button("Let\'s go",', 1)[1]
     assert close.index("commitFontScale();") < close.index(
         "Overlay::IsFirstRun = false;")
-    assert "if (!fontScaleHeld)\\n\\t\\t\\treturn;" in owner
+    assert "if (!fontScaleHeld)\n\t\t\treturn;" in owner
 
     # Mutate the live source contract, including the previously failing
     # move-to-another-active-control and close-during-slider cases.
     mutations = (
-        (required[0], "if (fontScaleHeld)\\n\\t\\tfontScale = Overlay::GlobalFontScale;"),
+        (required[0], "if (fontScaleHeld)\n\t\tfontScale = Overlay::GlobalFontScale;"),
         (required[2], "false ||"),
         (required[3], "false"),
         (required[5], "Overlay::FontsDirty = false;"),
         (required[6], "/* missed disk commit */"),
-        (required[8], "if (false)\\n\\t\\tcommitFontScale();"),
-        ("\\t\\tcommitFontScale();\\n\\t\\tOverlay::IsFirstRun = false;",
-         "\\t\\tOverlay::IsFirstRun = false;"),
-        ("if (!fontScaleHeld)\\n\\t\\t\\treturn;",
-         "if (fontScaleHeld)\\n\\t\\t\\treturn;"),
+        (required[8], "if (false)\n\t\tcommitFontScale();"),
+        ("\t\tcommitFontScale();\n\t\tOverlay::IsFirstRun = false;",
+         "\t\tOverlay::IsFirstRun = false;"),
+        ("if (!fontScaleHeld)\n\t\t\treturn;",
+         "if (fontScaleHeld)\n\t\t\treturn;"),
     )
     def contract(source):
         tokens = required
@@ -725,8 +725,8 @@ def check_first_run_font_slider_commit(font: str) -> None:
                 and source.count(tokens[6]) == 1
                 and source.count("commitFontScale();") == 2
                 and "changed && !ImGui::IsAnyItemActive()" not in source
-                and "if (!fontScaleHeld)\\n\\t\\t\\treturn;" in source
-                and "\\t\\tcommitFontScale();\\n\\t\\tOverlay::IsFirstRun = false;" in source)
+                and "if (!fontScaleHeld)\n\t\t\treturn;" in source
+                and "\t\tcommitFontScale();\n\t\tOverlay::IsFirstRun = false;" in source)
     assert contract(owner)
     for original, broken in mutations:
         assert owner.count(original) == 1, original
