@@ -40,5 +40,23 @@ for path in ("src/vr/d3d9/stereo_renderer_r30.cpp",
     assert "vertices.data(), stride, nativeVertexCount," in source
     assert "const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(" in source
 assert "if (ib) ctx->DrawIndexed(indexCount, 0, 0);" in bridge
-assert "if (!diagnostic_enabled() || !game ||" in bridge
+# 00678 counts the source ordinal *before* topology/native admission.
+# Rejected game Draws must never silently join a later native scene batch.
+assert "if (!diagnostic_enabled() || !game) return;" in bridge
+observer = bridge.split("void observe(IDirect3DDevice9* game,", 1)[1].split(
+    "void observe_linear(", 1)[0]
+source_ordinal = "const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;"
+primitive_gate = "if (!game_native_primitive_element_count("
+assert source_ordinal in observer and primitive_gate in observer
+assert observer.index(source_ordinal) < observer.index(primitive_gate)
+assert "s.frameBatch.abort();" in observer[observer.index(primitive_gate):]
+removed_ordinal = observer.replace(source_ordinal, "", 1)
+assert removed_ordinal != observer and source_ordinal not in removed_ordinal
+assert "observe_unavailable_game_draw(IDirect3DDevice9* game)" in bridge
+missing = bridge.split("void observe_unavailable_game_draw(", 1)[1].split(
+    "void before_game_present(", 1)[0]
+assert "++s.sourceDrawsThisFrame;" in missing
+assert "s.frameBatch.abort();" in missing
+broken = missing.replace("++s.sourceDrawsThisFrame;", "", 1)
+assert broken != missing and "++s.sourceDrawsThisFrame;" not in broken
 print("00646 sparse indexed VB shadow -> game native DrawIndexed PASS")
