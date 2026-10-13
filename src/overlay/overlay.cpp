@@ -15,11 +15,30 @@
 #include <vector>
 #include <ini.h>
 #include "input_manager.hpp"
+#include "overlay_toggle_frame.hpp"
 
 Notifications Notifications::instance;
 
 
 bool overlay_visible = false; // user wants overlay to show?
+
+bool Overlay::will_be_visible_this_frame()
+{
+    // Capture before font-density selection; consume in render() exactly
+    // once. Legacy F11 release and the new bound-action edge get identical
+    // same-frame XR atlas/cursor/focus behavior, including CLOSE frames.
+    if (!s_toggleCaptureValid)
+    {
+        static OverlayToggleFrame frame;
+        const OverlayToggleFrame::Decision next = frame.poll(
+            InputManager_ModActionHeld(ModAction::OverlayToggle),
+            ImGui::IsKeyReleased(ImGuiKey_F11),
+            Settings::UseNewInput, IsBindingDialogActive, overlay_visible);
+        s_togglePending = next.toggle;
+        s_toggleCaptureValid = true;
+    }
+    return overlay_visible != s_togglePending;
+}
 
 Overlay::ContentRect Overlay::content_rect()
 {
@@ -840,20 +859,12 @@ bool Overlay::render()
 		s_hasInited = true;
 	}
 
-	// The bound action when the new input system is on, F11 otherwise. The
-	// binding dialog owns every input while it is up, so the action reports
-	// nothing there and the ImGui path is held off to match.
-	// The action reports held rather than an edge, so the press is taken against
-	// last frame here: the input manager updates on game ticks, which do not line
-	// up with rendered frames.
-	static bool overlayKeyHeld = false;
-	const bool overlayKeyNow = InputManager_ModActionHeld(ModAction::OverlayToggle);
-
-	bool toggleOverlay = overlayKeyNow && !overlayKeyHeld;
-	overlayKeyHeld = overlayKeyNow;
-
-	if (!Settings::UseNewInput && !Overlay::IsBindingDialogActive)
-		toggleOverlay |= ImGui::IsKeyReleased(ImGuiKey_F11);
+	// The EndScene preflight owns the exact action and legacy key edge.
+	// Consume that decision once after the font atlas has been selected.
+	will_be_visible_this_frame();
+	const bool toggleOverlay = s_togglePending;
+	s_togglePending = false;
+	s_toggleCaptureValid = false;
 
 	if (toggleOverlay)
 	{

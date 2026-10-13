@@ -1,0 +1,89 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00808",
+  "production_id": "CONVERSION-DX9EX-00808",
+  "event_id": "CONVERSION-DX9EX-00808-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:F11_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:F11_MENU",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_COMMITTED",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00808]",
+  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "changed_files": [
+    "src/overlay/overlay.cpp",
+    "src/overlay/overlay.hpp",
+    "src/overlay/hooks_overlay.cpp",
+    "src/overlay/overlay_toggle_frame.hpp",
+    "tools/verify_vr_f11_font_density.py",
+    "tools/verify_vr_f11_toggle_frame.py",
+    ".github/workflows/vr-dx9ex-active.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:F11_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+    "goal": "Finish the complete F11 input-to-font-to-shell function by synchronizing first visible legacy/new-input frame, native-eye raster density, shell/control focus and durable settings behavior through opening and closing.",
+    "scope_boundary": "F11 external ImGui overlay only: preserve gameplay HUD, R30 binocular geometry, world/vehicle rendering, SkyGlow, DX11, DXVK and FFB.",
+    "trace_stages": [
+      "F11 original Win32 release and bound action input captured before EndScene font selection",
+      "Overlay prediction drives XR eye-density font atlas and responsive shell and ImGui control state",
+      "R30 external overlay draw keeps binocular semantic projection and restores desktop presentation on close"
+    ],
+    "subcomponents": [
+      "One-poll-per-frame legacy and new-input edge with close/open and binding dialog protection",
+      "Shared visibility decision for XR raster font density, native shell layout, ImGui render and cursor ownership",
+      "Seeded mode/Reset/focus/save behavior and mutation checks integrated into exact-SHA Win32 CI"
+    ],
+    "acceptance_items": [
+      {
+        "id": "F11_FIRST_VISIBLE_EYE_ATLAS",
+        "category": "end_to_end_behavior",
+        "behavior_area": "input_font_shell",
+        "expected_behavior": "Legacy F11 and bound actions rasterise the correct XR-density atlas on the first visible frame and switch to desktop density on close."
+      },
+      {
+        "id": "F11_STABLE_FOCUS_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "dialog_reset_desktop",
+        "expected_behavior": "Held bound action never repeats; dialog suppresses legacy close; XR source/eye dropout retains atlas while desktop fallback and existing F11 persistence/focus tests remain intact."
+      },
+      {
+        "id": "F11_EXACT_SHA_WIN32",
+        "category": "integrated_validation",
+        "behavior_area": "full_host_game_package",
+        "expected_behavior": "Both source-bound F11 regression verifiers and exact-SHA DX9Ex Active/Domain/Full Source Impact Win32 gates pass, with HMD validation separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "F11_FIRST_VISIBLE_EYE_ATLAS": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "F11_STABLE_FOCUS_FALLBACK": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "F11_EXACT_SHA_WIN32": "PENDING_EXACT_SHA_GATES",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "Current D3DEndScene computes VR font density from prior overlayActive or held bound action; legacy F11 release is consumed later inside render(), so the first visible legacy frame misses the new eye atlas, and a closing bound action can still prewarm one.",
+    "root_cause": "Two independent checks drive source font density and actual F11 render visibility on different edges and frames.",
+    "source_trace": [
+      "Win32 legacy ImGui F11 release or InputManager action edge at EndScene",
+      "ImGui font density rebuild before Overlay::render() visibility/cursor change",
+      "F11 external SCREEN_OVERLAY_2D projection into eye composition"
+    ],
+    "alternatives_rejected": [
+      "Do not change eye-based rasterisation for all HUD and 3D draws.",
+      "Do not double-consume a held action edge in preflight and render.",
+      "Do not change user's accepted F11 stereo semantics or introduce new device Reset probes."
+    ],
+    "eye_ownership": "The F11 external overlay has separate ScreenOverlay2D ownership while the raster is native to source and both eyes receive the established corrected projection.",
+    "negative_test_evidence": "Source-bound seeded desktop/new-input/legacy/dialog/open/close/Reset/hysteresis cases plus mutation controls; GitHub validation pending.",
+    "fix_evidence": "Shared pure OverlayToggleFrame prediction polled only once before atlas selection and consumed in render."
+  },
+  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+}

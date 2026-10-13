@@ -40,8 +40,8 @@ def check(hook: str, font: str, header: str) -> None:
     )[0]
     for target, needles in (
         (density_guard, (
-            "overlayActive && Game::is_vr_gameplay_presentation()",
-            "InputManager_ModActionHeld(ModAction::OverlayToggle)",
+            "f11VisibleThisFrame && Game::is_vr_gameplay_presentation()",
+            "const bool f11VisibleThisFrame = Overlay::will_be_visible_this_frame();",
             "R23TryGetPublishedEyeExtent(0, lw, lh)",
             "R23TryGetPublishedEyeExtent(1, rw, rh)",
             "lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u",
@@ -292,9 +292,9 @@ def check_transient_eye_extent_dropout(hook: str) -> None:
               "\\t\\t\\t\\t\\tOverlay::VrFontMultiplier, 1.0f, 3.0f);")
     # Exact owning control flow: retention only inside active VR gameplay and
     # before either eye lookup, not a permanent desktop fallback.
-    assert "overlayActive && Game::is_vr_gameplay_presentation()" in density
+    assert "f11VisibleThisFrame && Game::is_vr_gameplay_presentation()" in density
     assert retain.replace("\\n", "\n").replace("\\t", "\t") in density
-    assert (density.index("overlayActive && Game::is_vr_gameplay_presentation()") <
+    assert (density.index("f11VisibleThisFrame && Game::is_vr_gameplay_presentation()") <
             density.index(retain.replace("\\n", "\n").replace("\\t", "\t")) <
             density.index("R23TryGetPublishedEyeExtent(0, lw, lh)"))
     assert "float vrFontMultiplier = 1.0f;" in hook
@@ -823,69 +823,63 @@ def check_first_run_font_slider_commit(font: str) -> None:
 
 
 def check_source_reset_atlas_hold(hook: str) -> None:
-    """Preserve an XR F11 font atlas when game-source size lapses on Reset."""
+    """Same-frame F11 open retains XR atlas during temporary source loss."""
     area = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
         "// Quantised quarter-steps prevent continuous atlas churn", 1)[0]
-    active = "if ((overlayActive && Game::is_vr_gameplay_presentation()) ||"
+    active = "if (f11VisibleThisFrame && Game::is_vr_gameplay_presentation())"
     size = "if (Game::screen_resolution &&"
-    retain = ("vrFontMultiplier = std::clamp(\n"
-              "\t\t\t\t\tOverlay::VrFontMultiplier, 1.0f, 3.0f);")
-    assert area.count(active) == 1
-    assert area.count(size) == 1
-    assert area.count(retain) == 1
+    retain = ("vrFontMultiplier = std::clamp(\\n"
+              "\\t\\t\\t\\t\\tOverlay::VrFontMultiplier, 1.0f, 3.0f);"
+              ).replace("\\n", "\n").replace("\\t", "\t")
+    assert area.count(active) == area.count(size) == area.count(retain) == 1
     assert area.index(active) < area.index(retain) < area.index(size)
-    assert area.index(size) < area.index(
-        "R23TryGetPublishedEyeExtent(0, lw, lh)")
-    def density(opened, held, vr, source_valid, prior, eye_factor):
-        current = 1.0
-        if vr and (opened or held):
-            current = max(1.0, min(3.0, prior))
-            if source_valid and eye_factor is not None:
-                current = max(1.0, min(3.0, eye_factor))
-        return current
-    for initial in (1.25, 2.0, 2.75, 3.0):
-        assert density(True, False, True, False, initial, None) == initial
-        assert density(False, True, True, False, initial, None) == initial
-        assert density(True, False, True, True, initial, None) == initial
-        assert density(True, False, True, True, initial, 2.25) == 2.25
-        assert density(False, False, True, False, initial, None) == 1.0
-        assert density(True, True, False, False, initial, None) == 1.0
-    assert size not in area.replace(size, "if (true &&", 1)
-    print("PASS F11 XR atlas held through Reset source-size gap; desktop negative")
+    assert area.index(size) < area.index("R23TryGetPublishedEyeExtent(0, lw, lh)")
+    def density(predicted, vr, source_ok, previous, factor):
+        if not predicted or not vr:
+            return 1.0
+        if source_ok and factor is not None:
+            return max(1.0, min(3.0, factor))
+        return max(1.0, min(3.0, previous))
+    for previous in (1.25, 2.0, 2.75, 3.0):
+        assert density(True, True, False, previous, None) == previous
+        assert density(True, True, True, previous, None) == previous
+        assert density(False, True, False, previous, None) == 1.0
+        assert density(True, False, False, previous, None) == 1.0
+    print("PASS F11 XR atlas Reset hold, closing and desktop negative")
 
 
 def check_first_visible_f11_frame(hook: str) -> None:
-    """A newly pressed bound F11 action needs its XR font on frame zero."""
-    before = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
-        "R23TryGetPublishedEyeExtent(0, lw, lh)", 1)[0]
-    original = "overlayActive && Game::is_vr_gameplay_presentation()"
-    first_press = "InputManager_ModActionHeld(ModAction::OverlayToggle)"
-    assert original in before and first_press in before
-    assert before.index(original) < before.index(first_press)
-    assert "Game::screen_resolution &&" in before
-    assert '#include "input_manager.hpp"' in hook
+    """Legacy F11 and bound action agree with render on opening/closing."""
+    call = "const bool f11VisibleThisFrame = Overlay::will_be_visible_this_frame();"
+    assert hook.count(call) == 1
+    assert hook.index(call) < hook.index("float vrFontMultiplier = 1.0f;")
     assert hook.index("float vrFontMultiplier = 1.0f;") < hook.index(
         "overlayActive = Overlay::render();")
-    # The held action is only a font-prewarm hint. Overlay::render() still
-    # owns edge detection, cursor updates, key bindings and visibility.
-    assert "InputManager_ModActionHeld(ModAction::OverlayToggle)" not in (
-        hook.split("overlayActive = Overlay::render();", 1)[1])
-    # Frames: closed, first press/open, steady open, released/open,
-    # press/close, released/closed, a desktop press. No HMD claim.
-    states = [
-        (False, False, True, False),
-        (False, True, True, True),
-        (True, True, True, True),
-        (True, False, True, True),
-        (True, True, True, True),
-        (False, False, True, False),
-        (False, True, False, False),
-    ]
-    for was_visible, held, vr, expected in states:
-        assert ((was_visible and vr) or (held and vr)) == expected
-    damaged = before.replace(first_press, "false", 1)
-    assert damaged != before and first_press not in damaged
-    print("PASS F11 first-visible-frame XR atlas prewarm, desktop and close negatives")
+    assert "if (f11VisibleThisFrame && Game::is_vr_gameplay_presentation())" in hook
+    density = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
+        "R23TryGetPublishedEyeExtent(0, lw, lh)", 1)[0]
+    assert "InputManager_ModActionHeld(ModAction::OverlayToggle)" not in density
+    assert "overlayActive &&" not in density
+    assert "Game::screen_resolution &&" in density
+    def poll(previous, held, legacy, new_input, dialog, visible):
+        edge = held and not previous
+        change = edge or (legacy and not new_input and not dialog)
+        return held, (not visible if change else visible)
+    prior, visible = False, False
+    for held, legacy, new_input, dialog, expected in (
+        (False, False, False, False, False),
+        (False, True, False, False, True), # legacy first visible frame
+        (False, False, False, False, True),
+        (False, True, False, True, True), # binding dialog suppresses F11
+        (False, True, False, False, False), # close, immediately 1x
+        (True, False, True, False, True), # bound-action first frame
+        (True, False, True, False, True), # no held-key repeat
+        (False, False, True, False, True),
+        (True, False, True, False, False),
+    ):
+        prior, visible = poll(prior, held, legacy, new_input, dialog, visible)
+        assert visible == expected
+    print("PASS F11 same-frame legacy/bound open/close and dialog regression")
 
 
 def check_f11_overlay_font_persistence(font: str, header: str) -> None:
@@ -1102,7 +1096,7 @@ def main():
     assert factor(0, 1440, 2496, 2688) == 1.0
     # Detect removal of either eye authority, desktop isolation or atlas rebuild.
     mutations = (
-        (hook, "overlayActive && Game::is_vr_gameplay_presentation()",
+        (hook, "f11VisibleThisFrame && Game::is_vr_gameplay_presentation()",
          "overlayActive || Game::is_vr_gameplay_presentation()", font, header),
         (hook, "R23TryGetPublishedEyeExtent(1, rw, rh)",
          "true", font, header),

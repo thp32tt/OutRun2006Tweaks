@@ -357,6 +357,7 @@ class D3DHooks : public Hook
 
 		if (overlayInited)
 		{
+			const bool f11VisibleThisFrame = Overlay::will_be_visible_this_frame();
 			// ImGui draws into the desktop-sized D3D9 backbuffer before the
 			// asymmetric portrait XR eye transfer. A source-aspect-sized font
 			// is visually reduced by that transfer. When the F11 shell is open
@@ -364,15 +365,11 @@ class D3DHooks : public Hook
 			// never bitmap-upscale ImGui's existing font atlas. Keep the game
 			// sprite HUD, menu, native 2D desktop UI and world passes untouched.
 			float vrFontMultiplier = 1.0f;
-			// A freshly pressed F11 action is consumed by Overlay::render()
-			// later in this SAME EndScene. Sampling only overlayActive (last
-			// frame) made the first visible Quest3 frame use the tiny desktop
-			// 13px atlas before a second-frame rebuild. Probe the live bound
-			// action here as well, without changing input ownership, toggling
-			// visibility or using this density for gameplay HUD/world draws.
-			if ((overlayActive && Game::is_vr_gameplay_presentation()) ||
-				(InputManager_ModActionHeld(ModAction::OverlayToggle) &&
-				 Game::is_vr_gameplay_presentation()))
+			// Query the exact F11 visibility transition before ImGui's first
+			// visible frame. Last-frame overlayActive misses legacy F11 release,
+			// while a held bound action incorrectly prewarms the closing frame.
+			// The later render consumes the same edge and still owns the cursor.
+			if (f11VisibleThisFrame && Game::is_vr_gameplay_presentation())
 			{
 				// A zero-sized/stale source publication during Reset is no more
 				// reason to replace a valid Quest3 atlas than a missing eye

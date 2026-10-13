@@ -135,6 +135,8 @@ private:
 	}
 
 	inline static bool s_hasInited = false;
+	inline static bool s_togglePending = false;
+	inline static bool s_toggleCaptureValid = false;
 
 	static void render_shell();
 
@@ -152,6 +154,9 @@ public:
 	// directly; D3DEndScene picks it up between frames.
 	static void rebuild_fonts();
 	inline static bool FontsDirty = false;
+
+	// Query once before XR font rasterisation; render consumes the same edge.
+	static bool will_be_visible_this_frame();
 
 	static bool settings_read();
 	static bool settings_write();

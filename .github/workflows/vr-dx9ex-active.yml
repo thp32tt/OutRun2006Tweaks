@@ -147,6 +147,8 @@ on:
       - 'tools/verify_vr_ui_matrix_safety.py'
       - 'tools/verify_vr_menu_letterbox_aspect.py'
       - 'tools/verify_vr_f11_font_density.py'
+      - 'src/overlay/overlay_toggle_frame.hpp'
+      - 'tools/verify_vr_f11_toggle_frame.py'
       - 'tools/verify_vr_custom_sprite_descriptor.py'
       - 'tools/verify_vr_producer_provenance.py'
       - 'tools/verify_vr_cross_thread_semantic_registry.py'
@@ -337,6 +339,7 @@ jobs:
             'tools/verify_vr_ui_matrix_safety.py',
             'tools/verify_vr_menu_letterbox_aspect.py',
             'tools/verify_vr_f11_font_density.py',
+            'tools/verify_vr_f11_toggle_frame.py',
             'tools/verify_vr_custom_sprite_descriptor.py',
             'tools/verify_vr_projected_marker_telemetry.py',
             'tools/verify_vr_visual_composition_p0.py',
