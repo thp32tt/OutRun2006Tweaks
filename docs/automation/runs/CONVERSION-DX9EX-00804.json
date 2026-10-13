@@ -10,12 +10,12 @@
   "feature_id": "DX9EX:PERF:R28_DIP_LOG_BACKPRESSURE",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R28_DIP_LOG_BACKPRESSURE",
-  "status": "C5_VALIDATION_PENDING",
-  "checkpoint": "C5_WAIT_EXACT_SHA_GATES",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00804]",
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r26.cpp",
     "tools/verify_vr_r28_active_frame_pacing.py",
@@ -58,9 +58,9 @@
     ]
   },
   "acceptance_results": {
-    "R28_BOUNDED_DIP_LOGGING": "PENDING_CI",
-    "R28_PEAK_ATTRIBUTION_RESET": "PENDING_CI",
-    "R28_EXACT_SHA_GATES": "PENDING_CI",
+    "R28_BOUNDED_DIP_LOGGING": "PASS_EXACT_SHA",
+    "R28_PEAK_ATTRIBUTION_RESET": "PASS_EXACT_SHA",
+    "R28_EXACT_SHA_GATES": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -81,11 +81,54 @@
   },
   "performance_evidence": "Eliminates all R28 synchronous per-frame dip warnings. End-to-end Quest3 p95/p99 remains unmeasured; no performance uplift claimed.",
   "runtime_status": "NEED_QUEST3_VDXR_P95_P99",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "material_result_sha": "5bd2fc012587b4d19baab0f407d309592ba10d4e",
+  "validation_bearing_result_sha": "5bd2fc012587b4d19baab0f407d309592ba10d4e",
+  "result_sha": "5bd2fc012587b4d19baab0f407d309592ba10d4e",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA"
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "5bd2fc012587b4d19baab0f407d309592ba10d4e",
+    "dx9ex_active": {
+      "run_id": 38476642318,
+      "head_sha": "5bd2fc012587b4d19baab0f407d309592ba10d4e",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "game": "SUCCESS",
+        "host": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38476642349,
+      "head_sha": "5bd2fc012587b4d19baab0f407d309592ba10d4e",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38476642301,
+      "head_sha": "5bd2fc012587b4d19baab0f407d309592ba10d4e",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "msvc-analyze-active-game": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "source-cross-domain": "SUCCESS"
+      }
+    },
+    "hud_inspector": {
+      "run_id": 38476642290,
+      "head_sha": "5bd2fc012587b4d19baab0f407d309592ba10d4e",
+      "conclusion": "SUCCESS"
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
   },
-  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+  "validation_evidence": {
+    "material": {
+      "sha": "5bd2fc012587b4d19baab0f407d309592ba10d4e",
+      "description": "R28 C++ worst-dip 5-second backpressure and active diagnostic verifier"
+    },
+    "targeted": "R28 active frame-pacing bounded logger, 48 seeded spike-burst models, 7 legacy destructive checks and new epoch/peak-negative guards were executed in exact-SHA policy CI.",
+    "runtime": "Quest3/VDXR hardware FPS/optical validation not performed."
+  },
+  "c6_recorded_at_utc": "2026-10-13T22:23:54.962Z"
 }
