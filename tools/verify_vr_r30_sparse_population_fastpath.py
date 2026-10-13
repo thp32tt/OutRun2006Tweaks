@@ -90,9 +90,13 @@ def valid(code):
         return False
     vb_contract = (
         "UINT knownUsedCount = cachedDecode ? decoded.knownUsedCount : 0;",
-        "scratch.used.assign(vertexCount, 0);",
         "scratch.vbTouched.size() == decoded.knownUsedCount",
+        "scratch.indexDecode.valid = false;",
+        "for (const std::uint32_t previous : scratch.vbTouched)",
+        "if (previous < scratch.used.size())",
+        "scratch.used[previous] = 0;",
         "scratch.vbTouched.clear();",
+        "scratch.used.resize(vertexCount, 0);",
         "scratch.vbTouched.push_back(",
         "if (!scratch.used[static_cast<std::size_t>(local)])",
         "++knownUsedCount;",
@@ -106,6 +110,23 @@ def valid(code):
     if ("if (!cachedDecode)" not in vb or
             "decoded.revision == scratch.indexCopy.revision" not in vb or
             "scratch.upUsed" in vb or "scratch.upTouched" in vb):
+        return False
+    # The new sparse reset must run after invalidating the IB cache but
+    # before resizing and before any newly marked index. Full-span assign
+    # would retain parity but undo the actual performance correction.
+    mask_order = (
+        "scratch.indexDecode.valid = false;",
+        "for (const std::uint32_t previous : scratch.vbTouched)",
+        "if (previous < scratch.used.size())",
+        "scratch.used[previous] = 0;",
+        "scratch.vbTouched.clear();",
+        "scratch.used.resize(vertexCount, 0);",
+        "scratch.vbTouched.push_back(",
+        "scratch.used[static_cast<std::size_t>(local)] = 1;",
+    )
+    if "scratch.used.assign(vertexCount, 0);" in vb or (
+            any(vb.index(a) >= vb.index(b) for a, b in
+                zip(mask_order, mask_order[1:]))):
         return False
     return all(t in up + vb for t in (
         "return E_NOTIMPL;", "R30ConfigureXyzrhwWorldEffect(",
@@ -178,6 +199,13 @@ def main():
         ("&scratch.upUsed, knownUsedCount, &scratch.upTouched))", "&scratch.upUsed))"),
         ("scratch.vbTouched.size() == decoded.knownUsedCount",
          "scratch.vbTouched.size() != decoded.knownUsedCount"),
+        ("for (const std::uint32_t previous : scratch.vbTouched)",
+         "for (const std::uint32_t previous : scratch.upTouched)"),
+        ("if (previous < scratch.used.size())",
+         "if (previous > scratch.used.size())"),
+        ("scratch.used[previous] = 0;", "scratch.used[previous] = 1;"),
+        ("scratch.used.resize(vertexCount, 0);",
+         "scratch.used.assign(vertexCount, 0);"),
         ("scratch.vbTouched.clear();", "scratch.vbTouched.reserve(0);"),
         ("scratch.vbTouched.push_back(", "scratch.vbTouched.pop_back("),
         ("&scratch.used, knownUsedCount, &scratch.vbTouched))",
