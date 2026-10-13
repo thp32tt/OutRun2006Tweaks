@@ -333,7 +333,12 @@ assert fallback.index(fallback_hoist) < fallback.index(
 assert "correctedY = hudScaleY * ndcY;" not in fallback
 assert "state.worldEffect ? 0.0f" in fallback
 # No new pause transform may spill into smoke/sand or unrelated render passes.
-assert "R30PauseMenuVerticalFraction()" not in code[fallback_end:shader_begin]
+# The fused world implementation sits between the independent-eye
+# fallback and paired-eye HUD path. Restrict the forbidden-ownership check
+# to these unrelated spans; the paired HUD path legitimately calls the
+# fraction once and is separately checked above.
+assert "R30PauseMenuVerticalFraction()" not in code[fallback_end:fixed_begin]
+assert "R30PauseMenuVerticalFraction()" not in code[fixed_end:shader_begin]
 for old,new in (
     ("2.0f * R30PauseMenuVerticalFraction();",
      "0.0f * R30PauseMenuVerticalFraction();"),
