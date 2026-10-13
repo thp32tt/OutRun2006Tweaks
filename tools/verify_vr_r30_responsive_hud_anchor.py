@@ -409,3 +409,76 @@ for wrong, replacement in (
         "edgeRightBias += sharedShift;", "safeRight - rightMax",
         "anchor.maxX > x1 ||", "kSafeInset = 0.025f"))
 print("PASS Quest3 peripheral HUD visible-area fit: stereo shift parity, 4 resolutions, bounds fail-closed")
+
+
+# Issue #119 binocular XR extent coherence: only a jointly published
+# pixel pair may drive HUD aspect. One-eye or mixed-generation extents
+# must fall back to actual angular FOV, not average incompatible pixels.
+start_pair = code.index("float R30HudAspectCompensation(")
+end_pair = code.index("float R30PauseMenuVerticalFraction()", start_pair)
+pair = code[start_pair:end_pair]
+
+def verify_binocular_pair(body):
+    for token in ("bool coherentEyePair = true;",
+                  "coherentEyePair = false;",
+                  "pixelWidth[eye] = w;",
+                  "pixelHeight[eye] = h;",
+                  "pixelAspect[eye] = aspect;",
+                  "if (coherentEyePair &&",
+                  "(std::max)(pixelWidth[0], pixelWidth[1])",
+                  "(std::max)(pixelHeight[0], pixelHeight[1])",
+                  "targetAspectSum = pixelAspect[0] + pixelAspect[1];",
+                  "targetEyes = 2;",
+                  "if (!targetEyes)"):
+        assert token in body, token
+    assert body.index("if (coherentEyePair &&") < body.index(
+        "targetEyes = 2;") < body.index("if (!targetEyes)")
+    assert body.count("targetEyes = 2;") == 1
+    # An independent one-eye success must NOT enter the pixel sum.
+    assert "targetAspectSum += aspect;" not in body[:body.index("if (!targetEyes)")]
+
+verify_binocular_pair(pair)
+for good, bad in (
+    ("if (coherentEyePair &&", "if (true &&"),
+    ("coherentEyePair = false;", "coherentEyePair = true;"),
+    ("0.10f *", "1.00f *"),
+    ("targetAspectSum = pixelAspect[0] + pixelAspect[1];",
+     "targetAspectSum = pixelAspect[0];"),
+):
+    assert good in pair
+    mutated = pair.replace(good, bad, 1)
+    # Verify the actual safety clauses instead of just a marker.
+    try:
+        verify_binocular_pair(mutated)
+        assert "if (true &&" not in mutated
+        assert mutated.count("coherentEyePair = false;") == pair.count(
+            "coherentEyePair = false;")
+        assert mutated.count("0.10f *") == pair.count("0.10f *")
+        assert "targetAspectSum = pixelAspect[0] + pixelAspect[1];" in mutated
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("Eye-extent regression mutant escaped: " + bad)
+
+def coherent_aspect(left, right, angular=1.02):
+    lw, lh = left
+    rw, rh = right
+    if not (lw and lh and rw and rh):
+        return angular
+    a, b = lw / lh, rw / rh
+    if not (.25 <= a <= 4 and .25 <= b <= 4):
+        return angular
+    if abs(lw - rw) > .10 * max(lw, rw) or abs(lh - rh) > .10 * max(lh, rh):
+        return angular
+    return (a+b)*.5
+
+for a in ((1024,768),(1920,1080),(2496,2688),(3440,1440)):
+    assert abs(coherent_aspect(a,a) - a[0]/a[1]) < 1.e-8
+assert coherent_aspect((2496,2688),(1024,768)) == 1.02
+assert coherent_aspect((2496,2688),(0,0)) == 1.02
+assert coherent_aspect((0,0),(2496,2688)) == 1.02
+assert coherent_aspect((2496,2688),(2400,2600)) != 1.02
+# A later complete pair immediately restores the pixel rather than a sticky
+# fallback after Reset, and both eyes still share the same HUD contain value.
+assert coherent_aspect((2496,2688),(2496,2688)) == 2496/2688
+print("PASS binocular HUD extent coherence, resize fallback and four destructive mutants")

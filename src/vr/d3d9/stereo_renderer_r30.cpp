@@ -1582,6 +1582,9 @@ namespace OutRunVRStereo
             // but on Quest/VDXR it leaves circular HUD elements slightly tall.
             float targetAspectSum = 0.0f;
             int targetEyes = 0;
+            std::uint32_t pixelWidth[2]{}, pixelHeight[2]{};
+            float pixelAspect[2]{};
+            bool coherentEyePair = true;
             for (std::uint32_t eye = 0; eye < 2; ++eye)
             {
                 std::uint32_t w = 0, h = 0;
@@ -1593,18 +1596,45 @@ namespace OutRunVRStereo
                 else
                     R29OwnerRecommendedEyeExtent(eye, w, h);
                 if (!w || !h)
+                {
+                    coherentEyePair = false;
                     continue;
+                }
                 const float aspect =
                     static_cast<float>(w) / static_cast<float>(h);
                 if (!std::isfinite(aspect) ||
                     aspect < 0.25f || aspect > 4.0f)
+                {
+                    coherentEyePair = false;
                     continue;
-                targetAspectSum += aspect;
-                ++targetEyes;
+                }
+                pixelWidth[eye] = w;
+                pixelHeight[eye] = h;
+                pixelAspect[eye] = aspect;
             }
 
-            // Fall back to the old angular estimate only if the host has not
-            // published swapchain dimensions yet (startup/recovery).
+            // VDXR may publish a new recommended extent for one eye before
+            // the other during resize/recenter. Mixing old/new pixel aspects,
+            // or using a single valid eye, causes a visible HUD size pulse
+            // and caches the wrong scale for the current Present. Accept
+            // pixel aspect only from a coherent binocular publication.
+            // Real asymmetric eye extents within 10% remain supported.
+            if (coherentEyePair &&
+                std::fabs(static_cast<float>(pixelWidth[0]) -
+                    static_cast<float>(pixelWidth[1])) <= 0.10f *
+                    static_cast<float>((std::max)(pixelWidth[0], pixelWidth[1])) &&
+                std::fabs(static_cast<float>(pixelHeight[0]) -
+                    static_cast<float>(pixelHeight[1])) <= 0.10f *
+                    static_cast<float>((std::max)(pixelHeight[0], pixelHeight[1])))
+            {
+                targetAspectSum = pixelAspect[0] + pixelAspect[1];
+                targetEyes = 2;
+            }
+
+            // A missing or mixed-generation eye pair falls back to the
+            // common FOV geometry for that frame, rather than trusting stale
+            // single-eye dimensions. When both eyes converge, pixel aspect
+            // takes precedence again without persisting an invalid cache.
             if (!targetEyes)
             {
                 for (int eye = 0; eye < 2; ++eye)
