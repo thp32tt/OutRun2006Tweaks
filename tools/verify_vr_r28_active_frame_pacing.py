@@ -14,8 +14,8 @@ required = (
     "++w.over20000;",
     "frameUs >= 25000",
     "frameUs >= 33333",
-    "nowMs - R28LastDipLogMs >= 1000",
-    "dipTier > R28LastDipLogTier",
+    "if (dipTier != 0 && elapsedMs > w.worstDip.elapsedMs)",
+    "if (w.worstDip.tier != 0)",
     "band={} prepMs={:.3f}",
     "renderTid={} marker=R28_ACTIVE",
     "VR R28 FRAME DIP: frameMs=",
@@ -73,4 +73,67 @@ for ms, below60, below50 in ((11.111, False, False), (16.667, True, False),
                              (25.0, True, True), (33.334, True, True)):
     if ((ms >= 1000.0 / 60.0), (ms >= 1000.0 / 50.0)) != (below60, below50):
         raise SystemExit(f"60/50 FPS boundary test failed: {ms}")
-print("VR R28 ACTIVE FRAME PACING + CPU BREAKDOWN: PASS (7 negative mutations + 60/50 FPS thresholds)")
+# Functional location guard: spike warning must be emitted only once the
+# 5-second window ends, never on a per-frame threshold or tier escalation.
+pacing = source[source.index("void R28RecordActiveFramePacing("):
+                source.index("void R46TraceShaderFingerprint(")]
+flush = pacing.index("if (nowMs - w.startedMs < 5000)")
+warning = pacing.index("spdlog::warn(")
+if warning <= flush or pacing.count("spdlog::warn(") != 1:
+    raise SystemExit("R28 dip log still synchronously executes in frame hot path")
+if "R28LastDipLogMs" in source or "R28LastDipLogTier" in source:
+    raise SystemExit("R28 per-spike logger state was not retired")
+if not (pacing.index("peak.elapsedMs = elapsedMs;") <
+        pacing.index("peak.serial = serial;") <
+        warning < pacing.index("w = {};")):
+    raise SystemExit("worst source frame attribution is not preserved until flush")
+for token in ("peak.presentMs", "peak.draws", "peak.serial",
+              "peak.prepMs", "peak.threadCpuMs", "peak.nonCpuMs",
+              "peak.cpuKnown", "peak.threadId"):
+    if token not in pacing[pacing.index("const auto& peak = w.worstDip;"):warning+1100]:
+        raise SystemExit("R28 worst-frame metadata dropped: " + token)
+reset = source[source.index("if (!Settings::VRTelemetry)", source.index("HRESULT __stdcall PresentDestR27(")):
+               source.index("R27TelemetryActiveOnThread = true;")]
+for token in ("R28Pacing = {};", "R28PreviousPresentEndQpc = 0;",
+              "R28PreviousThreadCpuValid = false;"):
+    if token not in reset:
+        raise SystemExit("R28 disable/enable epoch leaked: " + token)
+# Seeded 5-second burst model: if the original 1-second/tier escalation
+# reporting were restored, it would exceed the bounded one-event invariant.
+import random
+rng = random.Random(280804)
+for _case in range(48):
+    intervals = [rng.choice((11.11, 16.667, 20.0, 25.0, 33.334, 68., 305.))
+                 for _frame in range(300 + rng.randrange(400))]
+    peaks = []
+    windows = []
+    worst = None
+    for i, elapsed in enumerate(intervals):
+        if elapsed >= 1000.0 / 60.0:
+            if worst is None or elapsed > worst[0]:
+                worst = (elapsed, i)
+        if (i + 1) % 300 == 0:
+            windows.append(worst)
+            peaks.extend([worst] if worst else [])
+            worst = None
+    if len(peaks) != len([x for x in windows if x is not None]):
+        raise SystemExit("R28 burst-window logging was not bounded")
+    for k, event in enumerate(windows):
+        start = k * 300
+        expected = max(((x, j + start) for j, x in
+                        enumerate(intervals[start:start+300])
+                        if x >= 1000.0 / 60.0), default=None)
+        # Ties retain the first equal-duration frame, matching strict >.
+        expected_value = expected[0] if expected else None
+        if (event[0] if event else None) != expected_value:
+            raise SystemExit("R28 worst-frame duration lost in spike storm")
+# Destructive source checks must reject a relocated hot-path warning or
+# erased peak-frame capture/reset.
+for mutated in (
+    pacing.replace("if (nowMs - w.startedMs < 5000)", "if (false)", 1),
+    pacing.replace("peak.elapsedMs = elapsedMs;", "/* omitted */", 1),
+    pacing.replace("if (w.worstDip.tier != 0)", "if (true)", 1),
+):
+    if mutated == pacing:
+        raise SystemExit("R28 negative mutation missed source anchor")
+print("VR R28 ACTIVE PACING BOUNDED WORST-FRAME LOG: PASS (7 baseline mutations, 48 burst models, epoch and logging gates)")

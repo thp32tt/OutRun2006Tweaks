@@ -104,13 +104,27 @@ namespace OutRunVRStereo
             std::uint64_t slowNonCpuDominant = 0;
             std::uint64_t slowMixed = 0;
             std::uint64_t slowNoCpuSample = 0;
+            // Preserve the exact worst slow source frame for one bounded
+            // window report, rather than blocking the Present thread on a
+            // synchronous warning at every dip/tier escalation.
+            struct WorstDip
+            {
+                double elapsedMs = 0.0;
+                double presentMs = 0.0;
+                std::uint64_t draws = 0;
+                std::uint64_t serial = 0;
+                std::uint8_t tier = 0;
+                double prepMs = 0.0;
+                double threadCpuMs = 0.0;
+                double nonCpuMs = 0.0;
+                bool cpuKnown = false;
+                DWORD threadId = 0;
+            } worstDip{};
             ULONGLONG startedMs = 0;
         };
         thread_local R28ActivePacingWindow R28Pacing{};
         thread_local LONGLONG R28PreviousPresentEndQpc = 0;
         thread_local std::uint64_t R28PreviousDrawSerial = 0;
-        thread_local ULONGLONG R28LastDipLogMs = 0;
-        thread_local std::uint8_t R28LastDipLogTier = 0;
         thread_local std::uint64_t R28PreviousThreadCpu100ns = 0;
         thread_local bool R28PreviousThreadCpuValid = false;
         thread_local bool R27TelemetryActiveOnThread = false;
@@ -218,35 +232,46 @@ namespace OutRunVRStereo
             }
             if (frameUs >= 33333) ++w.over33333;
 
-            // 60/50/40/30 FPS thresholds. A more severe dip may log
-            // immediately even if a milder 60-FPS warning just used its slot.
-            // All qualifying frames are counted above (not log-throttled).
+            // Classify every dip, but defer the expensive logger call.
+            // Worst elapsed source-frame duration is the useful p99-tail
+            // diagnostic; do not replace it with a milder cooldown sample.
             const std::uint8_t dipTier = frameUs >= 33333 ? 4
                 : frameUs >= 25000 ? 3
                 : elapsedMs >= (1000.0 / 50.0) ? 2
                 : elapsedMs >= (1000.0 / 60.0) ? 1 : 0;
-            const bool dipCooldownExpired = R28LastDipLogMs == 0 ||
-                nowMs - R28LastDipLogMs >= 1000;
-            if (dipCooldownExpired)
-                R28LastDipLogTier = 0;
-            if (dipTier != 0 &&
-                (dipCooldownExpired || dipTier > R28LastDipLogTier))
+            if (dipTier != 0 && elapsedMs > w.worstDip.elapsedMs)
             {
-                R28LastDipLogMs = nowMs;
-                R28LastDipLogTier = dipTier;
-                static constexpr const char* DipBands[]{
-                    "NONE", "BELOW60", "BELOW50", "BELOW40", "BELOW30"
-                };
-                spdlog::warn(
-                    "VR R28 FRAME DIP: frameMs={:.3f} presentMs={:.3f} estimateFps={:.1f} draws={} frameSerial={} band={} prepMs={:.3f} threadCpuMs={:.3f} nonCpuMs={:.3f} cpuKnown={} renderTid={} marker=R28_ACTIVE",
-                    elapsedMs, presentMs, 1000.0 / elapsedMs,
-                    draws, serial, DipBands[dipTier], prepMs,
-                    threadCpuMs, nonCpuMs, cpuKnown ? 1 : 0,
-                    GetCurrentThreadId());
+                auto& peak = w.worstDip;
+                peak.elapsedMs = elapsedMs;
+                peak.presentMs = presentMs;
+                peak.draws = draws;
+                peak.serial = serial;
+                peak.tier = dipTier;
+                peak.prepMs = prepMs;
+                peak.threadCpuMs = threadCpuMs;
+                peak.nonCpuMs = nonCpuMs;
+                peak.cpuKnown = cpuKnown;
+                peak.threadId = GetCurrentThreadId();
             }
 
             if (nowMs - w.startedMs < 5000)
                 return;
+            // A single machine-parseable dip event preserves frame/CPU/draw
+            // attribution for the exact worst source frame in this window.
+            // No synchronous warning is issued inside a frame's hot path.
+            if (w.worstDip.tier != 0)
+            {
+                static constexpr const char* DipBands[]{
+                    "NONE", "BELOW60", "BELOW50", "BELOW40", "BELOW30"
+                };
+                const auto& peak = w.worstDip;
+                spdlog::warn(
+                    "VR R28 FRAME DIP: frameMs={:.3f} presentMs={:.3f} estimateFps={:.1f} draws={} frameSerial={} band={} prepMs={:.3f} threadCpuMs={:.3f} nonCpuMs={:.3f} cpuKnown={} renderTid={} marker=R28_ACTIVE",
+                    peak.elapsedMs, peak.presentMs, 1000.0 / peak.elapsedMs,
+                    peak.draws, peak.serial, DipBands[peak.tier],
+                    peak.prepMs, peak.threadCpuMs, peak.nonCpuMs,
+                    peak.cpuKnown ? 1 : 0, peak.threadId);
+            }
             // P95/P99 represent source Present-end intervals, NOT HMD
             // compositor/reprojection FPS or GPU-execution duration.
             std::array<std::uint32_t, 640> sorted = w.sampleUs;
@@ -829,8 +854,6 @@ namespace OutRunVRStereo
                     R28PreviousDrawSerial = 0;
                     R28PreviousThreadCpu100ns = 0;
                     R28PreviousThreadCpuValid = false;
-                    R28LastDipLogMs = 0;
-                    R28LastDipLogTier = 0;
                     R27PerfLastLogMs = 0;
                     R27PerfLastDrawSerial = 0;
                     R27PerfLastPresentSamples = 0;
