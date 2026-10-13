@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <cmath>
 // Opt-in center-content crop for the captured, already-letterboxed 4:3
 // OutRun menu. The LOCAL-fixed two-eye clip must use the SAME resulting
@@ -54,6 +55,59 @@ namespace OutRunVrMenuAspect
             right - left <= 0.05f || up - down <= 0.05f)
             return {};
         return { true, left, right, down, up };
+    }
+
+
+    // A 2D quad centered at NDC (0,0) is NOT centered on the forward ray
+    // when OpenXR publishes asymmetric FOV. Place the LOCAL-fixed menu on
+    // tan(angle)=0 and contain it INSIDE the remaining visible FOV. Both
+    // eyes use the same rectangle and common tangent-plane projection.
+    struct OpticalClipPlan
+    {
+        bool valid = false;
+        float centerX = 0.0f, centerY = 0.0f;
+        float halfWidth = 0.0f, halfHeight = 0.0f;
+    };
+
+    inline OpticalClipPlan PlanOpticallyCenteredClip(
+        const CommonFovTangents& fov, float sourceAspect) noexcept
+    {
+        if (!fov.valid || !std::isfinite(sourceAspect) ||
+            sourceAspect < 0.5f || sourceAspect > 5.0f ||
+            !std::isfinite(fov.left) || !std::isfinite(fov.right) ||
+            !std::isfinite(fov.down) || !std::isfinite(fov.up))
+            return {};
+
+        const float spanX = fov.right - fov.left;
+        const float spanY = fov.up - fov.down;
+        if (!std::isfinite(spanX) || !std::isfinite(spanY) ||
+            spanX <= 0.05f || spanY <= 0.05f)
+            return {};
+
+        // In an asymmetric projection, NDC of tan(X/Y)=0 is displaced.
+        // A missing forward ray (e.g. stale/invalid single-eye FOV) must
+        // not shift the quad outside the display or produce negative space.
+        const float centerX = -(fov.left + fov.right) / spanX;
+        const float centerY = -(fov.down + fov.up) / spanY;
+        const float requiredRatio = sourceAspect * (spanY / spanX);
+        if (!std::isfinite(centerX) || !std::isfinite(centerY) ||
+            !std::isfinite(requiredRatio) || requiredRatio <= 0.0f ||
+            std::fabs(centerX) >= 0.95f || std::fabs(centerY) >= 0.95f)
+            return {};
+
+        // Keep original physical content aspect (not raw NDC ratio).
+        // Shrink X and Y together into the clipped optical-centre margins;
+        // do not independently clamp axes and stretch 4:3 menus at 21:9.
+        const float usableHalfX = 1.0f - std::fabs(centerX);
+        const float usableHalfY = 1.0f - std::fabs(centerY);
+        const float halfWidth = (std::min)(
+            usableHalfX, usableHalfY * requiredRatio);
+        const float halfHeight = halfWidth / requiredRatio;
+        if (!std::isfinite(halfWidth) || !std::isfinite(halfHeight) ||
+            halfWidth < 0.05f || halfHeight < 0.05f)
+            return {};
+
+        return { true, centerX, centerY, halfWidth, halfHeight };
     }
 
     constexpr CropPlan PlanCenteredContent(

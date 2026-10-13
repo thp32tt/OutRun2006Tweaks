@@ -72,6 +72,52 @@ int main()
             (restored.up - restored.down) -
             std::tan(0.8f) / std::tan(0.7f)) > 1e-5f)
         return 6;
+
+    // Issue #119: off-axis FOV center must map to the straight-ahead ray.
+    // The old quad at NDC zero was displaced even with averaged tangents.
+    using OutRunVrMenuAspect::PlanOpticallyCenteredClip;
+    const auto optical = PlanOpticallyCenteredClip(shared, 4.0f / 3.0f);
+    if (!optical.valid || std::fabs(optical.centerX) < 0.01f ||
+        std::fabs(shared.left +
+            (optical.centerX + 1.0f) * 0.5f *
+            (shared.right - shared.left)) > 1e-5f ||
+        std::fabs(shared.down +
+            (optical.centerY + 1.0f) * 0.5f *
+            (shared.up - shared.down)) > 1e-5f)
+        return 8;
+    // Both edges remain on the visible image; physical, not NDC, aspect
+    // must equal the cropped 4:3 menu even for asymmetric Quest-style FOV.
+    if (std::fabs(optical.centerX) + optical.halfWidth > 1.00001f ||
+        std::fabs(optical.centerY) + optical.halfHeight > 1.00001f ||
+        std::fabs(optical.halfWidth / optical.halfHeight *
+            (shared.right - shared.left) / (shared.up - shared.down) -
+            4.0f / 3.0f) > 1e-5f)
+        return 9;
+    const auto centered = PlanOpticallyCenteredClip(restored, 16.0f / 9.0f);
+    if (!centered.valid || std::fabs(centered.centerX) > 1e-6f ||
+        std::fabs(centered.centerY) > 1e-6f ||
+        std::fabs(centered.halfWidth / centered.halfHeight *
+            (restored.right - restored.left) / (restored.up - restored.down) -
+            16.0f / 9.0f) > 1e-5f)
+        return 10;
+    // Reset, aspect change and transition: no cached centre or stale UV.
+    const auto ultrawide = PlanOpticallyCenteredClip(
+        shared, 3440.0f / 1440.0f);
+    if (!ultrawide.valid ||
+        !(ultrawide.halfHeight < optical.halfHeight) ||
+        std::fabs(ultrawide.centerX - optical.centerX) > 1e-6f)
+        return 11;
+    if (PlanOpticallyCenteredClip(shared,
+            std::numeric_limits<float>::quiet_NaN()).valid ||
+        PlanOpticallyCenteredClip(
+            {true, 0.10f, 0.50f, -0.7f, 0.8f},
+            4.0f / 3.0f).valid ||
+        PlanOpticallyCenteredClip(
+            {true, -0.8f, 0.8f, -0.7f,
+                std::numeric_limits<float>::infinity()},
+            4.0f / 3.0f).valid)
+        return 12;
+
     const auto nan = PlanCenteredContent(
         std::numeric_limits<float>::quiet_NaN(), 4.0f / 3.0f);
     const auto inf = PlanCenteredContent(

@@ -1411,9 +1411,6 @@ namespace
         commonFov.angleRight = std::atan(common.right);
         commonFov.angleDown = std::atan(common.down);
         commonFov.angleUp = std::atan(common.up);
-        const float spanX = common.right - common.left;
-        const float spanY = common.up - common.down;
-
         RECT cr{};
         GetClientRect(c.hwnd_, &cr);
         float sourceAspect = (cr.bottom > cr.top)
@@ -1445,22 +1442,26 @@ namespace
                 sourceAspect = plan.aspect;
             }
         }
-        const float fovAspect = spanX / spanY;
-        if (!std::isfinite(sourceAspect) || !std::isfinite(fovAspect) ||
-            sourceAspect <= 0.1f || fovAspect <= 0.1f)
+        // The forward gaze ray is not at NDC (0,0) for asymmetric
+        // projections. Center LOCAL-fixed menu content on the optical ray,
+        // then preserve its physical aspect within BOTH clipped FOV margins.
+        // Reject invalid/stale publications rather than stretching a menu.
+        const auto placement =
+            OutRunVrMenuAspect::PlanOpticallyCenteredClip(common, sourceAspect);
+        if (!placement.valid)
             return false;
-
-        // R41: preserve the desktop/menu aspect inside the HMD projection.
-        // This is a pure 2D clip-space rectangle shared by both eyes; unlike
-        // R39 there is no world plane, head pose or per-eye disparity to shear.
-        float halfWidth = 1.0f;
-        float halfHeight = 1.0f;
-        if (sourceAspect >= fovAspect)
-            halfHeight = std::clamp(fovAspect / sourceAspect, 0.05f, 1.0f);
-        else
-            halfWidth = std::clamp(sourceAspect / fovAspect, 0.05f, 1.0f);
-        const float sx[4]{ -halfWidth, halfWidth, -halfWidth, halfWidth };
-        const float sy[4]{ halfHeight, halfHeight, -halfHeight, -halfHeight };
+        const float sx[4]{
+            placement.centerX - placement.halfWidth,
+            placement.centerX + placement.halfWidth,
+            placement.centerX - placement.halfWidth,
+            placement.centerX + placement.halfWidth
+        };
+        const float sy[4]{
+            placement.centerY + placement.halfHeight,
+            placement.centerY + placement.halfHeight,
+            placement.centerY - placement.halfHeight,
+            placement.centerY - placement.halfHeight
+        };
         float clip[4][4]{};
         for (int corner = 0; corner < 4; ++corner)
         {
