@@ -730,7 +730,6 @@ static void render_first_run_intro()
 	ImGui::Spacing();
 	ImGui::TextUnformatted("If this font size isn't suitable, you can adjust it here (or in the Overlay section):");
 
-	bool changed = false;
 	static bool fontScaleHeld = false;
 	static float fontScale = Overlay::GlobalFontScale;
 	// A reopened first-run popup must show the current Overlay setting,
@@ -740,23 +739,22 @@ static void render_first_run_intro()
 		fontScale = Overlay::GlobalFontScale;
 	if (ImGui::SliderFloat("Font Scale", &fontScale, 0.5f, 3.5f))
 		fontScaleHeld = true;
-	// IsMouseReleased alone never commits keyboard/gamepad navigation edits.
-	// ImGui's item deactivation covers those inputs, while the original
-	// mouse-release path remains available. Rebuild the VR font atlas once
-	// per committed edit, not on every drag/key-repeat frame.
-	if (fontScaleHeld && (ImGui::IsItemDeactivatedAfterEdit() ||
-		ImGui::IsMouseReleased(ImGuiMouseButton_Left)))
-	{
+	// Commit on keyboard/gamepad deactivation or mouse release. A focus
+	// transition can already activate the next control in the same frame:
+	// IsAnyItemActive must NOT suppress persistence of a completed edit.
+	const bool sliderEditFinished = fontScaleHeld &&
+		(ImGui::IsItemDeactivatedAfterEdit() ||
+		 ImGui::IsMouseReleased(ImGuiMouseButton_Left));
+	auto commitFontScale = [&]() {
+		if (!fontScaleHeld)
+			return;
 		Overlay::GlobalFontScale = fontScale;
 		Overlay::FontsDirty = true;
-		changed = true;
+		Overlay::settings_write(); // Once per committed edit, never per drag frame.
 		fontScaleHeld = false;
-	}
-
-	if (changed && !ImGui::IsAnyItemActive())
-	{
-		Overlay::settings_write();
-	}
+	};
+	if (sliderEditFinished)
+		commitFontScale();
 
 	ImGui::TextUnformatted("Have fun, and enjoy the Beautiful Journey!");
 	ImGui::TextDisabled("- emoose");
@@ -768,6 +766,9 @@ static void render_first_run_intro()
 
 	if (ImGui::Button("Let's go", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
 	{
+		// A still-active slider can be dismissed by the first-run button.
+		// Persist its draft before the modal disappears; an idle close is a no-op.
+		commitFontScale();
 		Overlay::IsFirstRun = false;
 		ImGui::CloseCurrentPopup();
 	}

@@ -676,61 +676,94 @@ def check_first_run_vr_modal(font: str) -> None:
 
 
 def check_first_run_font_slider_commit(font: str) -> None:
-    """F11 first-run font scale: keyboard/gamepad commit and reopened popup sync."""
+    """F11 first-run: persist navigation commits even with another active item."""
     owner = font.split("static void render_first_run_intro()", 1)[1].split(
         "void ForceShowCursor", 1)[0]
     required = (
-        "if (!fontScaleHeld)\n\t\tfontScale = Overlay::GlobalFontScale;",
+        "if (!fontScaleHeld)\\n\\t\\tfontScale = Overlay::GlobalFontScale;",
         'ImGui::SliderFloat("Font Scale", &fontScale, 0.5f, 3.5f)',
         "ImGui::IsItemDeactivatedAfterEdit() ||",
         "ImGui::IsMouseReleased(ImGuiMouseButton_Left)",
         "Overlay::GlobalFontScale = fontScale;",
         "Overlay::FontsDirty = true;",
+        "Overlay::settings_write();",
         "fontScaleHeld = false;",
+        "if (sliderEditFinished)\\n\\t\\tcommitFontScale();",
     )
     for token in required:
-        assert token in owner, "missing first-run F11 slider invariant: " + token
+        assert token in owner, "missing first-run F11 commit invariant: " + token
     assert owner.index(required[0]) < owner.index(required[1])
     assert owner.index(required[1]) < owner.index(required[2])
     assert owner.index(required[2]) < owner.index(required[4])
+    assert owner.index(required[4]) < owner.index(required[6])
+    assert owner.count(required[6]) == 1, "must have one commit owner"
+    assert owner.count("commitFontScale();") == 2, (
+        "focus change and popup close must share one commit path")
+    assert "changed && !ImGui::IsAnyItemActive()" not in owner
+    close = owner.split('if (ImGui::Button("Let\'s go",', 1)[1]
+    assert close.index("commitFontScale();") < close.index(
+        "Overlay::IsFirstRun = false;")
+    assert "if (!fontScaleHeld)\\n\\t\\t\\treturn;" in owner
 
-    for original, bad in (
-        ("if (!fontScaleHeld)\n\t\tfontScale = Overlay::GlobalFontScale;",
-         "if (fontScaleHeld)\n\t\tfontScale = Overlay::GlobalFontScale;"),
-        ("ImGui::IsItemDeactivatedAfterEdit() ||", "false ||"),
-        ("ImGui::IsMouseReleased(ImGuiMouseButton_Left)", "false"),
-        ("Overlay::FontsDirty = true;", "Overlay::FontsDirty = false;"),
-    ):
+    # Mutate the live source contract, including the previously failing
+    # move-to-another-active-control and close-during-slider cases.
+    mutations = (
+        (required[0], "if (fontScaleHeld)\\n\\t\\tfontScale = Overlay::GlobalFontScale;"),
+        (required[2], "false ||"),
+        (required[3], "false"),
+        (required[5], "Overlay::FontsDirty = false;"),
+        (required[6], "/* missed disk commit */"),
+        (required[8], "if (false)\\n\\t\\tcommitFontScale();"),
+        ("\\t\\tcommitFontScale();\\n\\t\\tOverlay::IsFirstRun = false;",
+         "\\t\\tOverlay::IsFirstRun = false;"),
+        ("if (!fontScaleHeld)\\n\\t\\t\\treturn;",
+         "if (fontScaleHeld)\\n\\t\\t\\treturn;"),
+    )
+    def contract(source):
+        tokens = required
+        return (all(t in source for t in tokens)
+                and source.count(tokens[6]) == 1
+                and source.count("commitFontScale();") == 2
+                and "changed && !ImGui::IsAnyItemActive()" not in source
+                and "if (!fontScaleHeld)\\n\\t\\t\\treturn;" in source
+                and "\\t\\tcommitFontScale();\\n\\t\\tOverlay::IsFirstRun = false;" in source)
+    assert contract(owner)
+    for original, broken in mutations:
         assert owner.count(original) == 1, original
-        mutant = owner.replace(original, bad, 1)
-        assert any(token not in mutant for token in required), original
+        assert not contract(owner.replace(original, broken, 1)), original
 
-    def update(committed, draft, held, edited=False, deactivate=False,
-               mouse_release=False):
+    def update(committed, draft, held, writes, edited=False, deactivate=False,
+               mouse_release=False, close=False, another_active=False):
         if not held:
             draft = committed
         if edited:
             held = True
-        if held and (deactivate or mouse_release):
+        finished = held and (deactivate or mouse_release)
+        # another_active must never cancel a *finished* edit.
+        if finished or (close and held):
             committed, held = draft, False
-        return committed, draft, held
+            writes += 1
+        return committed, draft, held, writes
 
-    # External Overlay font edits must appear in the first-run slider.
-    committed, draft, held = update(2.4, 2.0, False)
-    assert (committed, draft, held) == (2.4, 2.4, False)
-    # Keyboard/gamepad edit: retain the draft across frames until focus leaves.
-    committed, draft, held = update(committed, 2.9, True, edited=True)
-    assert (committed, draft, held) == (2.4, 2.9, True)
-    committed, draft, held = update(committed, draft, held, deactivate=True)
-    assert (committed, draft, held) == (2.9, 2.9, False)
-    # Mouse drag still commits only on release, with no per-frame atlas churn.
-    committed, draft, held = update(committed, 3.1, True, edited=True)
-    assert committed == 2.9 and held
-    committed, draft, held = update(committed, draft, held, mouse_release=True)
-    assert committed == 3.1 and not held
-    # Reopening after a separate font setting change resets stale draft.
-    assert update(1.8, 3.1, False) == (1.8, 1.8, False)
-    print("PASS F11 first-run font slider nav commit/reopen sync, 4 destructive controls")
+    current = update(2.4, 2.0, False, 0)
+    assert current == (2.4, 2.4, False, 0)
+    current = update(2.4, 2.9, True, 0, edited=True, another_active=True)
+    assert current == (2.4, 2.9, True, 0)
+    current = update(*current, deactivate=True, another_active=True)
+    assert current == (2.9, 2.9, False, 1)
+    # An unrelated active button on commit frame does not lose disk storage.
+    current = update(*current, another_active=True)
+    assert current == (2.9, 2.9, False, 1)
+    current = update(2.9, 3.1, True, 1, edited=True)
+    assert current == (2.9, 3.1, True, 1)
+    current = update(*current, close=True)
+    assert current == (3.1, 3.1, False, 2)
+    assert update(*current, close=True) == (3.1, 3.1, False, 2)
+    current = update(3.1, 2.1, True, 2, mouse_release=True)
+    assert current == (2.1, 2.1, False, 3)
+    assert update(1.8, 3.1, False, 0) == (1.8, 1.8, False, 0)
+    print("PASS F11 slider focus/close save-once, 8 destructive controls")
+
 
 
 def check_source_reset_atlas_hold(hook: str) -> None:
