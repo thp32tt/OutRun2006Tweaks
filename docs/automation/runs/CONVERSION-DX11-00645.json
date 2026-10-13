@@ -11,7 +11,7 @@
   "work_key": "DX11:LIVE_GAME_POINT_TOPOLOGY",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "ab46b9b6fa96343eb7429523993ab21c700eb2e4",
-  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -64,7 +64,7 @@
     "C3_VALIDATE": "PASS_EXACT_SHA",
     "C4_COMMIT": "PASS_MATERIAL_COMMIT",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PASS_DURABLE_RESULT"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
