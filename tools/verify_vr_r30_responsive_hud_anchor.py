@@ -611,7 +611,8 @@ for w,h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
         .55,.214,(-.82,.78),3.)
     # Baseline A/B guard: default-off lacks an exact bbox, so the real
     # dispatcher does not enter the adaptive scaling path at all.
-    assert "if (!Settings::VRHudEdgeAnchors.get() ||" in helper
+    assert "(!Settings::VRHudResponsiveLayout.get() &&" in helper
+    assert "!Settings::VRHudEdgeAnchors.get()) ||" in helper
 for removed in ("eyeOffset[eye] * halfWidth", "shiftMin <= shiftMax",
                 "if (!fitsBothEyes(previousBoost))"):
     assert removed in adaptive
@@ -699,7 +700,8 @@ for dims in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
 # The full-screen/GOAL/world/F11 producers cannot enter this exact-owner
 # hot path. Retain original static scope safety predicates and baseline.
 assert "ProducerToken::OutRunHudPeripheralText" in helper
-assert "if (!Settings::VRHudEdgeAnchors.get() ||" in helper
+assert "(!Settings::VRHudResponsiveLayout.get() &&" in helper
+    assert "!Settings::VRHudEdgeAnchors.get()) ||" in helper
 print("PASS stereo analytical peripheral fit, clip bounds, two-eye constraints, bisection fallback")
 
 
