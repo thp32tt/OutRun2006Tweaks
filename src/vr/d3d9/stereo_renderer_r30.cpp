@@ -1886,6 +1886,14 @@ namespace OutRunVRStereo
             }
             if (!seen)
                 return {};
+            // Exact text may animate partly outside the source viewport.
+            // The later bilateral guard rejects shifting this geometry, so
+            // do not enlarge/re-anchor it beforehand: that caused a jump
+            // as an incoming HUD glyph crossed the screen edge. Preserve
+            // source coordinates/scale in BOTH eyes until entirely visible.
+            if (minX < x0 || maxX > x0 + width ||
+                minY < y0 || maxY > y0 + height)
+                return {};
             // One source-space group anchor for the entire draw: preserve
             // relative glyph locations, colour/UV and per-eye disparity.
             const float cx = minX + 0.5f * (maxX - minX);

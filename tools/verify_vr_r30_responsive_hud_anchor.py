@@ -651,3 +651,35 @@ for dims in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
 assert "ProducerToken::OutRunHudPeripheralText" in helper
 assert "if (!Settings::VRHudEdgeAnchors.get() ||" in helper
 print("PASS stereo analytical peripheral fit, clip bounds, two-eye constraints, bisection fallback")
+
+
+# Issue #119: partially off-viewport text must retain its source transform.
+# The bilateral correction skips this case; the preceding exact-producer
+# boost/anchor path must make the same decision or an entering glyph jumps.
+anchor_fn = code[code.index("R30HudEdgeAnchor R30GetExactHudEdgeAnchor("):
+                 code.index("float R30ExactPeripheralHudBoost(")]
+for part in ("if (minX < x0 || maxX > x0 + width ||",
+             "minY < y0 || maxY > y0 + height)",
+             "return {};"):
+    assert part in anchor_fn
+assert anchor_fn.index("if (!seen)") < anchor_fn.index(
+    "if (minX < x0 ||") < anchor_fn.index("const float cx =")
+def source_box_contained(bounds, viewport):
+    x0,y0,w,h = viewport
+    left,right,top,bottom = bounds
+    return (left >= x0 and right <= x0+w and
+            top >= y0 and bottom <= y0+h)
+for w,h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
+    assert source_box_contained((.04*w,.16*w,.05*h,.20*h),(0,0,w,h))
+    assert source_box_contained((0,w,0,h),(0,0,w,h))
+    for bad in ((-.1*w,.16*w,.05*h,.20*h),
+                (.04*w,1.08*w,.05*h,.20*h),
+                (.04*w,.16*w,-.02*h,.20*h),
+                (.04*w,.16*w,.05*h,1.02*h)):
+        assert not source_box_contained(bad,(0,0,w,h))
+    assert not source_box_contained((0,w+.5,0,h),(0,0,w,h))
+# Destructive control: dropping the protection restores old discontinuity.
+mutated = anchor_fn.replace(
+    "if (minX < x0 || maxX > x0 + width ||", "if (false ||", 1)
+assert "if (minX < x0 || maxX > x0 + width ||" not in mutated
+print("PASS exact peripheral HUD off-viewport animation excludes boost/anchor")
