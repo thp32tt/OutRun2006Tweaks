@@ -47,6 +47,15 @@ constexpr bool game_native_primitive_element_count(
     }
 }
 
+// Retry only when the original physical IB window was valid and the dense
+// epoch-checked VB copy did not yield a native vertex span. A fragmented
+// dynamic VB can have valid referenced slots separated by invalid holes.
+// This decision is shared by both R30 source paths; invalid IBs never retry.
+constexpr bool game_sparse_shadow_retry_eligible(
+    bool physicalIndicesValid, std::uint32_t denseVertexCount) noexcept {
+    return physicalIndicesValid && denseVertexCount == 0u;
+}
+
 // D3D9 can reference a few distant VB vertices in one DrawIndexedPrimitive.
 // A contiguous [min,max] shadow would overread or reject that real game draw.
 // Compact only the referenced *physical* VB slots, retaining original index order.

@@ -131,6 +131,9 @@ jobs:
       - name: Verify live game sparse indexed VB native DrawIndexed 00646
         if: startsWith(github.ref_name, 'vr-dx11-native')
         run: python tools/test_dx11_sparse_index_draw_00646.py
+      - name: Verify fragmented indexed VB shadow native DrawIndexed 00647
+        if: startsWith(github.ref_name, 'vr-dx11-native')
+        run: python tools/test_dx11_fragmented_vb_shadow_00647.py
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh

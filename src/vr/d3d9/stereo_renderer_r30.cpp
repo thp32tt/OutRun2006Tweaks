@@ -3279,7 +3279,11 @@ namespace OutRunVRStereo
                 }
                 std::vector<std::uint8_t> vertices;
                 UINT nativeVertexCount = 0u;
-                if (ok && high >= low && high-low+1u <= 1536u) {
+                // Indices were bounds-validated before the dense shadow copy.
+                // A hole in that contiguous CPU shadow must not invalidate
+                // separately valid game-referenced VB slots.
+                const bool validPhysicalIndices = ok && high >= low;
+                if (validPhysicalIndices && high-low+1u <= 1536u) {
                     // Preserve the fast path for dense/menu index buffers.
                     const std::uint64_t first =
                         static_cast<std::uint64_t>(streamOffset)+low*stride;
@@ -3294,7 +3298,12 @@ namespace OutRunVRStereo
                             i -= static_cast<std::uint32_t>(low);
                         nativeVertexCount = static_cast<UINT>(high-low+1u);
                     }
-                } else if (ok && high >= low) {
+                }
+                // Also retry a *failed dense copy* through the same bounded,
+                // epoch-validated sparse gather used for distant VB indices.
+                // Never retry a bad IB, out-of-window index or base vertex.
+                if (live::game_sparse_shadow_retry_eligible(
+                        validPhysicalIndices, nativeVertexCount)) {
                     // Distant indexed VB slots (e.g. vehicle/track meshes):
                     // gather only game-referenced vertices, at most 128, with
                     // epoch-valid shadow bytes and compact native indices.
@@ -3307,7 +3316,7 @@ namespace OutRunVRStereo
                         nativeVertexCount = static_cast<UINT>(uniquePhysical.size());
                         indices.swap(compact);
                     }
-                } else ok = false;
+                } else if (!validPhysicalIndices) ok = false;
                 ib->Release();
                 vb->Release();
                 if (ok) live::observe_indexed(device, topology, primitiveCount,

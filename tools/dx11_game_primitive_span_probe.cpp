@@ -79,5 +79,16 @@ int main() {
     assert(!game_compact_sparse_indices(distant, 0u, 3u, uniqueSlots, remapped));
     assert(!game_compact_sparse_indices(distant, 1537u, 3u, uniqueSlots, remapped));
     assert(uniqueSlots == keptSlots && remapped == keptIndices);
+    // A compact live draw can reference valid VB vertices across invalid
+    // shadow holes: dense copy fails, then bounded sparse capture is eligible.
+    using outrun::vr::dx11::live_game_frame::game_sparse_shadow_retry_eligible;
+    static_assert(game_sparse_shadow_retry_eligible(true, 0u));
+    static_assert(!game_sparse_shadow_retry_eligible(false, 0u));
+    static_assert(!game_sparse_shadow_retry_eligible(true, 3u));
+    // No data is committed on an invalid/missing sparse source.
+    const auto previouslyMapped = remapped;
+    assert(!game_compact_sparse_indices(nullptr, 3u, 3u,
+                                       uniqueSlots, remapped));
+    assert(remapped == previouslyMapped);
     return 0;
 }

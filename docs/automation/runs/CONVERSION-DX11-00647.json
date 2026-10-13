@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00647",
+  "production_id": "CONVERSION-DX11-00647",
+  "event_id": "CONVERSION-DX11-00647-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_FRAGMENTED_VB_SHADOW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "52ffc42a2b7c98e9431c8665ea62f844d5930f9f",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "game D3D9 R30 indexed VB physical index validation and dense epoch shadow attempt",
+      "failed contiguous VB shadow -> bounded sparse referenced-vertex gather -> existing native DrawIndexed opt-in inset"
+    ],
+    "batch_components": [
+      "R30 and R26-safe indexed VB dense-failure sparse retry, no bad-IB retry",
+      "portable sparse-retry predicate + positive/negative C++ probe + regression checks in GitHub gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "A valid game IB with a fragmented dynamic VB shadow retries sparse gather after dense copy fails and reaches native DrawIndexed",
+      "negative_regression": "invalid physical indices do not retry; dense-success skips sparse; failed individual-slot shadow read remains on original D3D9",
+      "component_integration": "R30 game physical IB -> VB epoch shadow dense/missing holes -> sparse exact slots -> D3D11 bridge native DrawIndexed and diagnostic inset"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_FRAGMENTED_VB_SHADOW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Automated source/probe/Gate only; Quest3/VDXR/gamepad scene optical acceptance untested",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME diagnostic opt-in, game D3D9 return and input unmodified"
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "src/vr/d3d11/live_game_primitive_span.hpp",
+    "tools/dx11_game_primitive_span_probe.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_fragmented_vb_shadow_00647.py",
+    "docs/automation/runs/CONVERSION-DX11-00647.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "PASS: dense CPU VB shadow may contain holes despite all referenced indexed slots valid",
+    "C2_IMPLEMENT": "PASS: R30 and R26-safe native DrawIndexed sparse retry after failed contiguous snapshot",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Wait for exact-SHA GitHub mandatory validation before COMPLETE_BUILD_VERIFIED; Quest3/VDXR HMD and gamepad not tested.",
+  "material_result_sha": null,
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "validation_evidence": {}
+}
