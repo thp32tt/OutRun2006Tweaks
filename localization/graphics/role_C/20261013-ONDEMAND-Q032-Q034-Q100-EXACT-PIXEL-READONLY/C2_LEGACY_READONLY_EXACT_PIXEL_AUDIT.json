@@ -1,0 +1,239 @@
+{
+  "schema": "on-demand-retired-C2-exact-DDS-static-audit-v1",
+  "date_kst": "2026-10-13",
+  "request_time_kst": "11:20",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "head_before": "090e45e439ac681a0eee5c8d8124e0dbcf49362e",
+  "policy": "C2 controller/tab/schedule retired by current docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md; user-directed supplemental audit only, not reinstatement or approval",
+  "source_documents": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md"
+  ],
+  "qa_method": "Download exact GitHub persisted DDS with sha256 check; independent SHA-pinned original DDS; compare all-channel RGBA bytes and view SOURCE/READABLE/RAW/FLIPY and 75/50 contact sheets. Inspect on-demand rendered PNG visually; q100 independently compare SOURCE→CLEAN→FINAL with original allowed/protected masks.",
+  "measurements": [
+    {
+      "queue_index": 32,
+      "source_sha256": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+      "candidate_sha256": "2bb9d21e95a99da036657da5d696982d5ee44875c91cd798dbcb7b99830757e8",
+      "source_and_saved_header": {
+        "width": 2048,
+        "height": 1024,
+        "format": "DDS_RGB32",
+        "mips": 1,
+        "source_equals_saved": true
+      },
+      "clean_sha256": null,
+      "changed_source_to_saved_rgba": 38214,
+      "changed_readable_bbox": [
+        546,
+        163,
+        1065,
+        248
+      ],
+      "source_readable_roi": [
+        500,
+        125,
+        1110,
+        277
+      ],
+      "source_raw_roi": [
+        500,
+        747,
+        1110,
+        899
+      ],
+      "evidence_png": "localization/graphics/role_C/20261013-ONDEMAND-Q032-Q034-Q100-EXACT-PIXEL-READONLY/Q032_C2_EXACT_DDS_SHEET.png",
+      "evidence_png_sha256": "15fe52276fc52118fbe2f2d07a22a5df6eb94f93935fa4233eb0e7aaec4197e9",
+      "visual_observation": "Original Total Rank and Korean 종합 랭킹 visually readable under identical FLIPY at native/75/50 with no clear malformed jamo in this examined ROI",
+      "verdict": "HOLD_MISSING_EXACT_CLEAN_AND_CELL_EVIDENCE",
+      "note": "C1 historical 550 RGBA/536 alpha outside producer glyph-effect bbox; without SOURCE->CLEAN decomposition not automatically a proved Korean overflow"
+    },
+    {
+      "queue_index": 34,
+      "source_sha256": "3d5539326e4c75877457f946622c561aa20557520007dfd5851f7fe9f2056023",
+      "candidate_sha256": "a23761d1160933d968347c87ca40496b9f8e8257a102f865b2047df2a8d92763",
+      "source_and_saved_header": {
+        "width": 4096,
+        "height": 2048,
+        "format": "DDS_RGB32",
+        "mips": 1,
+        "source_equals_saved": true
+      },
+      "clean_sha256": null,
+      "changed_source_to_saved_rgba": 40570,
+      "changed_readable_bbox": [
+        2027,
+        1179,
+        2551,
+        1276
+      ],
+      "source_readable_roi": [
+        1970,
+        1135,
+        2620,
+        1320
+      ],
+      "source_raw_roi": [
+        1970,
+        728,
+        2620,
+        913
+      ],
+      "evidence_png": "localization/graphics/role_C/20261013-ONDEMAND-Q032-Q034-Q100-EXACT-PIXEL-READONLY/Q034_C2_EXACT_DDS_SHEET.png",
+      "evidence_png_sha256": "a76285fd2559a934df253d0aa6898d3ba0931611c801c364bcc2b1a6176ba489",
+      "visual_observation": "Original Total Rank and Korean 종합 랭킹 visually readable under identical FLIPY at native/75/50 with no clear malformed jamo in this examined ROI",
+      "verdict": "HOLD_MISSING_EXACT_CLEAN_AND_CELL_EVIDENCE",
+      "note": "C1 historical changed pixels outside producer bbox 0, but source-clean proof missing"
+    },
+    {
+      "queue_index": 100,
+      "source_sha256": "cfed1de58cefd8c235fc464e27058439ffd26427294a3bce17192e584679426a",
+      "candidate_sha256": "7235731a2add8e947476cd22b971e5b57a7de390ae134609f4254a2f493a557d",
+      "source_and_saved_header": {
+        "width": 2048,
+        "height": 2048,
+        "format": "DDS_RGB32",
+        "mips": 1,
+        "source_equals_saved": true
+      },
+      "clean_sha256": "1aa25b53265d518b9ce4538c9c522ea1e7ba42408e7bb51c7b7826841fed31d0",
+      "changed_source_to_saved_rgba": 155218,
+      "changed_readable_bbox": [
+        30,
+        12,
+        1814,
+        1995
+      ],
+      "source_readable_roi": [
+        0,
+        1590,
+        1200,
+        1870
+      ],
+      "source_raw_roi": [
+        0,
+        178,
+        1200,
+        458
+      ],
+      "evidence_png": "localization/graphics/role_C/20261013-ONDEMAND-Q032-Q034-Q100-EXACT-PIXEL-READONLY/Q100_C2_EXACT_DDS_SHEET.png",
+      "evidence_png_sha256": "4b1cab6d4d1adaecc0d041f06901ba1fbd697ef4bde5472ccec16b6f57795700",
+      "visual_observation": "Shown Time Attack/Heart Attack/OutRun mode cards display readable Korean at native/75/50; wider atlas/10 C1-unchecked strings not approved",
+      "verdict": "SCOPED_STATIC_PIXEL_PASS_FULL_ATLAS_HOLD",
+      "note": "Source->CLEAN 127313, CLEAN->saved 87125, source->saved 155218 all within B30 allowed mask; 0 protected changed on all stages"
+    }
+  ],
+  "q100_mask_check": {
+    "allowed": {
+      "mode": "L",
+      "range": [
+        0,
+        255
+      ],
+      "size": [
+        2048,
+        2048
+      ],
+      "mask_nonzero": 268815,
+      "ab_changed_inside": 127313,
+      "bc_changed_inside": 87125,
+      "ac_changed_inside": 155218,
+      "ab_changed_outside": 0,
+      "bc_changed_outside": 0,
+      "ac_changed_outside": 0,
+      "mask_sha256": "eb8ad5358512ffffbb81e091c9da5667e171c803d881d8acee1d689b4cdfff1d"
+    },
+    "protected": {
+      "mode": "L",
+      "range": [
+        0,
+        255
+      ],
+      "size": [
+        2048,
+        2048
+      ],
+      "mask_nonzero": 3925489,
+      "ab_changed_inside": 0,
+      "bc_changed_inside": 0,
+      "ac_changed_inside": 0,
+      "ab_changed_outside": 127313,
+      "bc_changed_outside": 87125,
+      "ac_changed_outside": 155218,
+      "mask_sha256": "20b6fb1da7fa5c08ef0f6bbdc555cb4b3a82c8c18662c888fcaab624d2c8ba1d"
+    },
+    "source_text": {
+      "mode": "L",
+      "range": [
+        0,
+        255
+      ],
+      "size": [
+        2048,
+        2048
+      ],
+      "mask_nonzero": 127313,
+      "ab_changed_inside": 127313,
+      "bc_changed_inside": 52380,
+      "ac_changed_inside": 120473,
+      "ab_changed_outside": 0,
+      "bc_changed_outside": 34745,
+      "ac_changed_outside": 34745,
+      "mask_sha256": "4fae6ef1c1911956a1d2634526a65cb3904cb3441cdf4c9ecf15f11f88e5ceb7"
+    },
+    "target_text": {
+      "mode": "L",
+      "range": [
+        0,
+        255
+      ],
+      "size": [
+        2048,
+        2048
+      ],
+      "mask_nonzero": 87135,
+      "ab_changed_inside": 47174,
+      "bc_changed_inside": 48203,
+      "ac_changed_inside": 64065,
+      "ab_changed_outside": 80139,
+      "bc_changed_outside": 38922,
+      "ac_changed_outside": 91153,
+      "mask_sha256": "67e48a2e0d285fbcacebb37d90bdccf3f858a830395640d5c660312e346297d4"
+    },
+    "totals": {
+      "source_clean": 127313,
+      "clean_final": 87125,
+      "source_final": 155218
+    },
+    "important_note": "Masks from original B30 producer, which pins old candidate sha 08467408..., not exact current 7235731a...; outside-mask counts for current are evidence HOLD not automatic definitive defects"
+  },
+  "final_results": {
+    "reviewed": 3,
+    "whole_pass": 0,
+    "full_hold": 3,
+    "scoped_pass": 1,
+    "new_c2_approvals": 0,
+    "new_dds": 0,
+    "new_imagegen": 0
+  },
+  "restrictions": [
+    "q032/q034 exact CLEAN not materialized so no PLATE_PASS",
+    "q032 prior C1 outside producer bbox cannot confirm localized overflow without CLEAN/cell proof",
+    "q100 cropped three cards scoped readability pass, remaining ten source regions outside current scope; B30 masks are prior-producer provenance independently applied to current SHA",
+    "Full source cell/UV sampling and authored mips beyond mip1 not verified; no fake hard FAIL from underfill",
+    "C1 existing report/queue statuses untouched; same SHA recheck is NOT production",
+    "C3 not run; user in-game OPEN remains; RUNTIME_VALIDATION=UNTESTED",
+    "No C2 token or qa_evidence_gate approval; NO deployment or scheduler changes"
+  ],
+  "state_change": {
+    "asset_queue": "UNCHANGED",
+    "resume_state": "UNCHANGED",
+    "old_C2_tokens": "HISTORICAL_READ_ONLY",
+    "official_dds": "UNCHANGED",
+    "C3": "NOT_RUN",
+    "runtime": "UNTESTED"
+  }
+}
