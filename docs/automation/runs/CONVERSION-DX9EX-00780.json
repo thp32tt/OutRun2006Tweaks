@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00780",
+  "production_id": "CONVERSION-DX9EX-00780",
+  "event_id": "CONVERSION-DX9EX-00780-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+  "work_key": "DX9EX:VIS:VEHICLE_SELECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "feature_status": "IN_PROGRESS_BUILD_AND_HMD_PENDING",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00780]",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "score_delta": 0,
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_hud_dds_loader.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00780.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+    "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+    "goal": "Restore complete 32-bit opaque XRGB DDS upload compatibility for car-select/menu sprites through original decoder/VR renderer, preserving A8 alpha and original game texture fallbacks.",
+    "scope_boundary": "Only DDS format recognition, opaque B8->R8 conversion and existing UI native/original fallback; no changes to race world, UI placement, input, shadows, SkyGlow, FFB or DXVK.",
+    "trace_stages": [
+      "Game vehicle/menu DDS opaque 32bpp RGB masks and selected replacement data",
+      "D3DX fast DDS image format and per-mip upload, with MANAGED LockRect or native D3DX fallback",
+      "Vehicle-select sprite rendering/theater host transfer retaining texture color and alpha semantics"
+    ],
+    "subcomponents": [
+      "Recognize both 32-bit opaque DDS mask orders separately from A8",
+      "Normalize X8B8 to supported X8R8 and swizzle every packed mip row with pitch safety",
+      "Preserve invalid/unsupported DDS original D3DX fallback, Reset/desktop and A8 alpha rendering"
+    ],
+    "acceptance_items": [
+      {
+        "id": "VEHICLE_XRGB_ALL_MIPS",
+        "category": "end_to_end_behavior",
+        "behavior_area": "opaque_formats_and_mips",
+        "expected_behavior": "Opaque DDS RGB masks both accepted, B8 order swizzled per level with unchanged X8 texture type"
+      },
+      {
+        "id": "VEHICLE_UI_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "game_desktop_and_alpha",
+        "expected_behavior": "A8 alpha, source bounds, pitch, replacement/native/original fallback and transparent UI preserved; negative mutations caught"
+      },
+      {
+        "id": "VEHICLE_SELECT_EXACT_SHA",
+        "category": "integrated_validation",
+        "behavior_area": "win32_host_game_package",
+        "expected_behavior": "Exact SHA DX9Ex Active host/game/package, Domain and Full Source Impact succeed; Quest3 car-select white-box optical acceptance separate"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "VEHICLE_XRGB_ALL_MIPS": "SOURCE_IMPLEMENTED_AWAITING_CI",
+    "VEHICLE_UI_FALLBACK": "NEGATIVE_TEST_IMPLEMENTED_AWAITING_CI",
+    "VEHICLE_SELECT_EXACT_SHA": "PENDING",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "User reports white/missing vehicle-selection textures; currently built-in fast decoder has no branch for legal 32-bit XRGB DDS without alpha mask.",
+    "bounded_cause": "Opaque X8R8G8B8 and X8B8G8R8 RGB DDS were returned UNKNOWN, so fast upload skipped; native D3DX retry was the only path for these formats. Whether this is the Quest3 white-box root cause is NOT YET proven.",
+    "alternatives_rejected": [
+      "Do not reclassify vehicle-select preview as gameplay stereo or modify camera/host composition without evidence.",
+      "Do not convert X8 to A8 or globally change sampler state; preserve ordinary A8 sprites and replacement-to-original fallback."
+    ],
+    "source_trace": [
+      "DDS pixel mask recognition in GetD3DFormatFromPixelFormat",
+      "D3DXCreateTextureFromFileInMemoryEx_Custom first mip and subsequent mip pitched copy",
+      "UI custom/native D3DX fallback and original DDS scale/header recovery",
+      "Existing vehicle-select theater rendering and host copy"
+    ],
+    "eye_ownership": "Texture decode/source only; does not modify stereo ownership.",
+    "negative_test_evidence": "Existing HUD DDS mutation verifier extended for no-alpha XRGB masks, destination format and both channel-swap writes."
+  },
+  "validation_notes": "GitHub commit prepared without moving target ref while earlier 00779 DX9Ex Active CI is in progress. Exact-SHA validation and Quest3 test pending. Do not mark whole optical defect fixed from this code path alone."
+}

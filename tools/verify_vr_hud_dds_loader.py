@@ -21,6 +21,7 @@ def body(text,marker):
     raise ValueError("unmatched C++ braces: "+marker)
 
 def verify(text):
+    fmt=body(text,"inline D3DFORMAT GetD3DFormatFromPixelFormat(")
     loader=body(text,"HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(")
     handle=body(text,"static void HandleTexture(")
     guards=[
@@ -55,7 +56,26 @@ def verify(text):
         (handle,"file && size >= sizeof(DDS_FILE)","replacement header bounds"),
         (handle,"firstMipSize <= size - sizeof(DDS_FILE)","replacement first mip source bounds"),
     ]
-    for region,needle,label in guards:
+    # Car-selection DDS commonly uses 32-bit opaque RGB (no alpha mask).
+    # It must be recognized without treating transparent A8 textures as X8.
+    # X8B8 and A8B8 both need the same per-mip byte-order fix, but with
+    # their own opaque/alpha destination formats.
+    xrgb_checks=[
+        (fmt,"(format.dwFlags & DDPF_RGB) != 0","only 32-bit RGB can be accepted as XRGB"),
+        (fmt,"format.dwRGBBitCount == 32","opaque fast DDS must be 32 bits"),
+        (fmt,"format.dwRGBAlphaBitMask == 0","opaque source excludes alpha-mask DDS"),
+        (fmt,"format.dwRBitMask == 0x00ff0000","native X8R8 source R mask"),
+        (fmt,"format.dwRBitMask == 0x000000ff","swizzled X8B8 source R mask"),
+        (fmt,"return D3DFMT_X8R8G8B8;","native opaque RGB format"),
+        (fmt,"return D3DFMT_X8B8G8R8;","swizzled opaque RGB format"),
+        (loader,"format_orig == D3DFMT_X8B8G8R8)","XRGB included in destination normalization"),
+        (loader,"? D3DFMT_A8R8G8B8 : D3DFMT_X8R8G8B8;","alpha and opaque destination types remain distinct"),
+        (loader,"format_orig == D3DFMT_X8B8G8R8)\n\t\t\t{","XRGB uses per-mip channel swizzle"),
+        (loader,"dstRow[p] = srcRow[p + 2];","first and third channels swapped"),
+        (loader,"dstRow[p + 2] = srcRow[p];","reverse channel swap"),
+        (loader,"dstRow[p + 3] = srcRow[p + 3];","opaque X byte retained and A8 alpha preserved"),
+    ]
+    for region,needle,label in guards + xrgb_checks:
         if needle not in region:
             raise ValueError(label+" not verified")
     if not (loader.index("if (!ppTexture)") < loader.index("*ppTexture = nullptr;") <
@@ -140,7 +160,7 @@ def verify(text):
             raise ValueError(name+" UI path must snapshot original before replacement")
         if not clean.endswith(strip(sequence)):
             raise ValueError(name+" UI path must restore exact original after native replacement failure")
-    return len(guards) + len(state_guards) + 2
+    return len(guards) + len(xrgb_checks) + len(state_guards) + 2
 
 def negatives(text):
     needles=[
@@ -176,6 +196,13 @@ def negatives(text):
         "original.restoreOriginal();",
         "pDevice, original.data, original.bytes, D3DX_DEFAULT",
         "return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(",
+        "format.dwRGBAlphaBitMask == 0",
+        "return D3DFMT_X8R8G8B8;",
+        "return D3DFMT_X8B8G8R8;",
+        "? D3DFMT_A8R8G8B8 : D3DFMT_X8R8G8B8;",
+        "format_orig == D3DFMT_X8B8G8R8)\n\t\t\t{",
+        "dstRow[p] = srcRow[p + 2];",
+        "dstRow[p + 2] = srcRow[p];",
     ]
     for token in needles:
         mutant=text.replace(token,"__DDS_BAD_CONTRACT__",1)

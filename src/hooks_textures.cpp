@@ -93,6 +93,24 @@ inline D3DFORMAT GetD3DFormatFromPixelFormat(const DDPIXELFORMAT& format)
 		return D3DFMT_A8B8G8R8; // not supported by most cards, will need conversion >.>
 	}
 
+	// Opaque 32-bit DDS menus and car-selection sprites carry RGB without
+	// an alpha mask. They are valid X8 textures, not unknown fast-DDS data.
+	// Keep the original BGRA/RGBA masks distinct: the latter must swizzle
+	// to the broadly supported X8R8G8B8 destination at every mip level.
+	if ((format.dwFlags & DDPF_RGB) != 0 &&
+		format.dwRGBBitCount == 32 &&
+		format.dwRGBAlphaBitMask == 0)
+	{
+		if (format.dwRBitMask == 0x00ff0000 &&
+			format.dwGBitMask == 0x0000ff00 &&
+			format.dwBBitMask == 0x000000ff)
+			return D3DFMT_X8R8G8B8;
+		if (format.dwRBitMask == 0x000000ff &&
+			format.dwGBitMask == 0x0000ff00 &&
+			format.dwBBitMask == 0x00ff0000)
+			return D3DFMT_X8B8G8R8;
+	}
+
 	if (format.dwRGBBitCount == 16 &&
 		format.dwRBitMask == 0x0000f800 &&
 		format.dwGBitMask == 0x000007e0 &&
@@ -249,8 +267,12 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 		remainingSourceBytes -= bytes;
 	}
 	D3DFORMAT format_present = format_orig;
-	if (format_orig == D3DFMT_A8B8G8R8)
-		format_present = D3DFMT_A8R8G8B8;
+	// The same channel-order correction is needed for opaque X8B8G8R8
+	// sprites. Never promote opaque X8 to an alpha-bearing A8 destination.
+	if (format_orig == D3DFMT_A8B8G8R8 ||
+		format_orig == D3DFMT_X8B8G8R8)
+		format_present = format_orig == D3DFMT_A8B8G8R8
+			? D3DFMT_A8R8G8B8 : D3DFMT_X8R8G8B8;
 
 #ifdef _DEBUG
 	spdlog::info("Texture {}x{} mips {} fmt {}", Width, Height, MipLevels, (int)format_orig);
@@ -311,7 +333,8 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 		{
 			const uint8_t* srcRow = srcData + static_cast<size_t>(row) * rowBytes;
 			uint8_t* dstRow = dest + static_cast<size_t>(row) * dstPitch;
-			if (format_orig == D3DFMT_A8B8G8R8)
+			if (format_orig == D3DFMT_A8B8G8R8 ||
+				format_orig == D3DFMT_X8B8G8R8)
 			{
 				for (UINT x = 0; x < mipWidth; ++x)
 				{
