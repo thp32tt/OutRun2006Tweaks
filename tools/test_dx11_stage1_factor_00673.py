@@ -21,7 +21,7 @@ def integrated(source):
         "stage1FactorShader" if False else "kStage1FactorShader",
         'compile("PSStage1Modulate", "ps_4_0", stage1ModulateCode)',
         'static const std::string stage1ShaderSource = shaderSource + kStage1FactorShader;',
-        'D3DCompile(stage1ShaderSource.data(), stage1ShaderSource.size(),'
+        'D3DCompile(stage1ShaderSource.data(), stage1ShaderSource.size(),',
         "s.stage1DiffusePs.GetAddressOf()",
         "s.stage1AddPs.GetAddressOf()",
         "ctx->PSSetConstantBuffers(1, 1, &combiner)",
@@ -39,6 +39,8 @@ for label, snippet in (
     ("stage 2 disable", "stage1Result != D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE"),
     ("no unsupported stage0", "!capture.stage0FullModulate &&"),
     ("alpha source", "!stage1_alpha_supported(alphaOp, alpha1, alpha2)"),
+    ("shader append", "static const std::string stage1ShaderSource = shaderSource + kStage1FactorShader;"),
+    ("shader compilation", "D3DCompile(stage1ShaderSource.data(), stage1ShaderSource.size(),"),
     ("independent stage1 PS", "capture.stage1Enabled ?"),
     ("constant bound", "ctx->PSSetConstantBuffers(1, 1, &combiner)"),
     ("indexed GPU draw", "ctx->DrawIndexed(indexCount, 0, 0);"),
