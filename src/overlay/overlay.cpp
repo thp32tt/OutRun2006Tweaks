@@ -24,14 +24,26 @@ bool overlay_visible = false; // user wants overlay to show?
 Overlay::ContentRect Overlay::content_rect()
 {
 	const ImVec2 screen = ImGui::GetIO().DisplaySize;
+	// A reset or zero-sized backbuffer must not feed nonfinite content bounds
+	// into the saved F11 shell/window placement.
+	if (!std::isfinite(screen.x) || !std::isfinite(screen.y) ||
+		screen.x <= 0.f || screen.y <= 0.f)
+		return { 0.f, 0.f, 0.f, 0.f };
 
-	// Letterboxing only covers the sides, and only outside of gameplay unless
-	// it's set to always.
+	// Match D3DEndScene's actual letterbox draw gate, including mode 2
+	// (always) and the UIScalingMode switch. Only a wider-than-4:3 source
+	// has sidebars; portrait and exact 4:3 must use the entire viewport.
 	float border = 0.f;
-	if (Settings::UILetterboxing == 1 && !Game::is_in_game())
+	if (Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0 &&
+		(Settings::UILetterboxing == 2 || !Game::is_in_game()))
 	{
-		const float contentWidth = screen.y / (3.f / 4.f);
-		border = ((screen.x - contentWidth) / 2) + 0.5f;
+		const float contentWidth = screen.y * (4.f / 3.f);
+		if (std::isfinite(contentWidth) && screen.x > contentWidth)
+		{
+			const float candidate = (screen.x - contentWidth) * 0.5f + 0.5f;
+			if (std::isfinite(candidate) && candidate < screen.x * 0.5f)
+				border = candidate;
+		}
 	}
 
 	return { border, 0.f, screen.x - (border * 2.f), screen.y };

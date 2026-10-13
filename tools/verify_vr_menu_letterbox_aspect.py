@@ -39,6 +39,78 @@ def verify(code: str) -> None:
     assert "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);" in endscene
 
 verify(src)
+
+# The ImGui F11 shell must share the GPU bars' enablement and rect, instead
+# of using a different letterboxing mode or producing negative portrait bars.
+overlay = (Path(__file__).resolve().parents[1] / "src/overlay/overlay.cpp").read_text()
+
+def verify_shell_rect(code: str) -> None:
+    shell = code.split("Overlay::ContentRect Overlay::content_rect()", 1)[1].split(
+        "const std::vector<OverlayWindow*>& Overlay::windows()", 1)[0]
+    gate = [
+        "!std::isfinite(screen.x)", "!std::isfinite(screen.y)",
+        "screen.x <= 0.f || screen.y <= 0.f",
+        "Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0",
+        "(Settings::UILetterboxing == 2 || !Game::is_in_game())",
+        "screen.y * (4.f / 3.f)",
+        "std::isfinite(contentWidth) && screen.x > contentWidth",
+        "(screen.x - contentWidth) * 0.5f + 0.5f",
+        "std::isfinite(candidate) && candidate < screen.x * 0.5f",
+        "screen.x - (border * 2.f)",
+    ]
+    for marker in gate:
+        assert marker in shell, marker
+    assert shell.index("screen.x <= 0.f") < shell.index("float border = 0.f;")
+    assert shell.index("screen.x > contentWidth") < shell.index("border = candidate;")
+    # The UI and GPU need exactly the same mode-2 / gameplay decision.
+    assert "Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0" in endscene
+
+verify_shell_rect(overlay)
+
+def shell_rect(w, h, letterbox, ui_scaling, gameplay):
+    if not isfinite(w) or not isfinite(h) or w <= 0 or h <= 0:
+        return 0, 0
+    enabled = letterbox > 0 and ui_scaling > 0 and (letterbox == 2 or not gameplay)
+    content = h * (4/3)
+    border = (w - content)*0.5+0.5 if enabled and w > content else 0
+    return border, w - 2*border
+
+for w, h in ((1024,768), (1920,1080), (3440,1440), (2496,2688),
+             (1280,1024), (2560,1080)):
+    for letterbox in (0, 1, 2):
+        for ui_scaling in (0, 1):
+            for gameplay in (False, True):
+                border, inner = shell_rect(w,h,letterbox,ui_scaling,gameplay)
+                draw_bars = letterbox > 0 and ui_scaling > 0 and (
+                    letterbox == 2 or not gameplay) and w > h*(4/3)
+                assert (border > 0) == draw_bars
+                assert 0 <= border < w/2 and 0 < inner <= w
+                if draw_bars:
+                    assert abs(inner - (h*(4/3)-1)) < 1e-4
+                else:
+                    assert inner == w
+for size in ((0,768), (1920,0), (float("nan"),768), (1920,float("inf"))):
+    assert shell_rect(*size, 2, 1, False) == (0,0)
+
+for old, bad in (
+    ("Settings::UILetterboxing > 0", "Settings::UILetterboxing == 1"),
+    ("Settings::UIScalingMode > 0", "Settings::UIScalingMode < 0"),
+    ("Settings::UILetterboxing == 2 || !Game::is_in_game()",
+     "Settings::UILetterboxing == 1 && !Game::is_in_game()"),
+    ("screen.x > contentWidth", "screen.x < contentWidth"),
+    ("std::isfinite(candidate) && candidate < screen.x * 0.5f",
+     "std::isfinite(candidate)"),
+    ("screen.x <= 0.f || screen.y <= 0.f",
+     "screen.x < 0.f || screen.y < 0.f"),
+):
+    assert old in overlay, old
+    try:
+        verify_shell_rect(overlay.replace(old, bad, 1))
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("F11 content-rect mutant survived: " + old)
+
 for w, h in ((1024,768), (1920,1080), (3440,1440), (2496,2688),
              (1280,1024), (2560,1080)):
     inner = h * (4/3)
@@ -66,4 +138,4 @@ for old, bad in mutants:
         pass
     else:
         raise AssertionError("mutant survived: " + old)
-print("PASS menu 4:3/16:9/21:9 sidebars, reset, failed allocations, 5 destructive controls")
+print("PASS menu/F11 letterbox shared rect, portrait/reset/mode-2, 11 destructive controls")
