@@ -2,22 +2,22 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00774",
   "production_id": "CONVERSION-DX9EX-00774",
-  "event_id": "CONVERSION-DX9EX-00774-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00774-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:F11_MENU",
   "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "work_key": "DX9EX:VIS:F11_MENU",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_VALIDATION",
-  "checkpoint": "C3_VALIDATE",
-  "feature_status": "IN_PROGRESS",
-  "controller_terminal": false,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "controller_terminal": true,
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00774]",
   "material_result_sha": "a64428e4f51043cc4a2bb66ec68f24ac2d7e92ea",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "35e13f13d2ce69d3fd4695cb61aa86d5be50fb7d",
   "feature_contract": {
     "feature_id": "DX9EX:VIS:F11_MENU",
     "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
@@ -62,10 +62,10 @@
     ]
   },
   "acceptance_results": {
-    "F11_VR_RENDER_AND_INPUT": "PENDING_EXACT_SHA_CI",
-    "F11_SAVE_NAVIGATION": "PENDING_EXACT_SHA_CI",
-    "F11_NEGATIVE_FALLBACK": "PENDING_EXACT_SHA_CI",
-    "F11_EXACT_SHA_WIN32": "PENDING_EXACT_SHA_CI",
+    "F11_VR_RENDER_AND_INPUT": "PASS_EXACT_SHA",
+    "F11_SAVE_NAVIGATION": "PASS_EXACT_SHA",
+    "F11_NEGATIVE_FALLBACK": "PASS_EXACT_SHA",
+    "F11_EXACT_SHA_WIN32": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -82,7 +82,7 @@
     ],
     "eye_ownership": "The F11 ImGui DX9 draw is external ScreenOverlay2D, shared source bitmap passed through per-eye R30 correction; keyboard/INI font persistence is independent from stereo world and gameplay HUD.",
     "fix_evidence": "Frame-owned FontScalePending and FontScaleCommitRequested finalise after tab rendering, including tab-switch and close, once after editing; INI read and final scale are finite-guarded; next EndScene rebuilds DX9 font texture.",
-    "negative_test_evidence": "Existing F11 density/projection/reset negatives plus added keyboard/pad/drag/tab/close/nonfinite INI numeric and six destructive mutations; final CI still pending."
+    "negative_test_evidence": "F11 static/behavioral regression plus 6 destructive edit-lifecycle mutants, full DX9Ex policy tests, and exact-SHA policy/game/host/full-chain/package WIN32 #38393389379 SUCCESS; author-tested Quest3/VDXR not available."
   },
   "changed_files": [
     "src/overlay/overlay.cpp",
@@ -90,10 +90,10 @@
     "src/overlay/overlay_settings_ui.cpp",
     "tools/verify_vr_f11_font_density.py"
   ],
-  "automation_validation": "FAIL_POLICY_RUN_RECORD_MISSING_ON_FIRST_MATERIAL_SHA;REPAIR_PENDING",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_status": "NEED_HMD_TEST",
-  "score_delta": 0,
+  "score_delta": 1,
   "validation_runs": {
     "first_dx9ex_active": {
       "id": 38392886802,
@@ -110,7 +110,61 @@
       "id": 38392886654,
       "sha": "a64428e4f51043cc4a2bb66ec68f24ac2d7e92ea",
       "conclusion": "in_progress_at_record_creation"
+    },
+    "repaired_dx9ex_active_failure": {
+      "id": 38393176047,
+      "sha": "800ad001d7e0088127930ae59b590606a91628c9",
+      "conclusion": "failure",
+      "reason": "F11 verifier mutation replaced unrelated first-run settings_write()"
+    },
+    "final_dx9ex_active": {
+      "id": 38393389379,
+      "sha": "35e13f13d2ce69d3fd4695cb61aa86d5be50fb7d",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "final_domain_isolation": {
+      "id": 38393389507,
+      "sha": "35e13f13d2ce69d3fd4695cb61aa86d5be50fb7d",
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "id": 38392886654,
+      "sha": "a64428e4f51043cc4a2bb66ec68f24ac2d7e92ea",
+      "conclusion": "success",
+      "note": "material SHA only; exact final validation SHA differs by regression test/record changes"
     }
   },
-  "notes": "Same TASK_ID C3 source + real CI-policy failure repair; no runtime/HMD success claim or score until complete exact-SHA required gates. Original material source commit a64428e4. Existing 00772 partial ESC and 00773 complete MAIN_MENU are not rewritten."
+  "notes": "Same TASK_ID/FEATURE_ID across E001–E004. Original F11 mouse/keyboard/pad/tab/close/INI source material a64428e4f51043cc4a2bb66ec68f24ac2d7e92ea; first CI policy failed missing run record at #38392886802, E003 repaired record and unsafe render-wide order check 800ad001 but #38393176047 revealed mutation targeting first-run modal instead of font finalizer. E004 scoped mutation to edit finalizer at 35e13f13d2ce69d3fd4695cb61aa86d5be50fb7d. Final exact-SHA DX9Ex Active #38393389379 all 5 jobs SUCCESS; Domain #38393389507 SUCCESS exact SHA; Full Source Impact #38392886654 SUCCESS on material SHA only. No Quest3/VDXR runtime performed, optical legibility remains NEED_HMD_TEST, no firmware/backend promotion. Unique TASK_ID score eligible once only after scoreboard SSOT write; do not rescore retries.",
+  "ci_evidence": {
+    "dx9ex_active": {
+      "run_id": 38393389379,
+      "sha": "35e13f13d2ce69d3fd4695cb61aa86d5be50fb7d",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38393389507,
+      "sha": "35e13f13d2ce69d3fd4695cb61aa86d5be50fb7d",
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38392886654,
+      "sha": "a64428e4f51043cc4a2bb66ec68f24ac2d7e92ea",
+      "conclusion": "success",
+      "same_as_validation_sha": false
+    }
+  }
 }
