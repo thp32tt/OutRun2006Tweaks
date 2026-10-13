@@ -6,7 +6,7 @@
 // sampling uses BGRA8 so alpha and RGB expansion must preserve D3D9 texels.
 // This decoder has no Direct3D dependency and can be CPU-regression tested.
 namespace outrun::vr::dx11::live_game_frame::packed_texture16 {
-enum class Layout : std::uint8_t { rgb565, argb1555, argb4444 };
+enum class Layout : std::uint8_t { rgb565, argb1555, argb4444, xrgb1555, xrgb4444 };
 
 struct Bgra8 { std::uint8_t b, g, r, a; };
 
@@ -31,6 +31,13 @@ constexpr Bgra8 unpack(std::uint16_t value, Layout layout) noexcept {
     case Layout::argb4444:
         return {expand4(value & 15u), expand4((value >> 4u) & 15u),
                 expand4((value >> 8u) & 15u), expand4((value >> 12u) & 15u)};
+    // X1/X4 are unused source bits, never a sampled alpha channel.
+    case Layout::xrgb1555:
+        return {expand5(value & 31u), expand5((value >> 5u) & 31u),
+                expand5((value >> 10u) & 31u), 255u};
+    case Layout::xrgb4444:
+        return {expand4(value & 15u), expand4((value >> 4u) & 15u),
+                expand4((value >> 8u) & 15u), 255u};
     }
     return {0, 0, 0, 0};
 }
@@ -57,8 +64,12 @@ inline void unpack_row(const std::uint8_t* source, std::uint8_t* bgra,
         unpack_row_typed<Layout::rgb565>(source, bgra, width);
     } else if (layout == Layout::argb1555) {
         unpack_row_typed<Layout::argb1555>(source, bgra, width);
-    } else {
+    } else if (layout == Layout::argb4444) {
         unpack_row_typed<Layout::argb4444>(source, bgra, width);
+    } else if (layout == Layout::xrgb1555) {
+        unpack_row_typed<Layout::xrgb1555>(source, bgra, width);
+    } else {
+        unpack_row_typed<Layout::xrgb4444>(source, bgra, width);
     }
 }
 } // namespace outrun::vr::dx11::live_game_frame::packed_texture16

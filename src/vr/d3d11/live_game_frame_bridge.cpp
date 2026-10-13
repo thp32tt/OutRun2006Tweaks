@@ -2724,7 +2724,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                             base.Format == D3DFMT_DXT5;
     const bool packed16 = base.Format == D3DFMT_R5G6B5 ||
                           base.Format == D3DFMT_A1R5G5B5 ||
-                          base.Format == D3DFMT_A4R4G4B4;
+                          base.Format == D3DFMT_A4R4G4B4 ||
+                          base.Format == D3DFMT_X1R5G5B5 ||
+                          base.Format == D3DFMT_X4R4G4B4;
     // Live menu masks and lettering may use alpha/luminance-only D3D9 texels.
     const bool luminance = base.Format == D3DFMT_A8 ||
                            base.Format == D3DFMT_L8 ||
@@ -2812,7 +2814,11 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                 packed_texture16::Layout::rgb565 :
                 base.Format == D3DFMT_A1R5G5B5 ?
                 packed_texture16::Layout::argb1555 :
-                packed_texture16::Layout::argb4444;
+                base.Format == D3DFMT_A4R4G4B4 ?
+                packed_texture16::Layout::argb4444 :
+                base.Format == D3DFMT_X1R5G5B5 ?
+                packed_texture16::Layout::xrgb1555 :
+                packed_texture16::Layout::xrgb4444;
             for (UINT y = 0; y < rows; ++y) {
                 const auto* source = static_cast<const std::uint8_t*>(lock.pBits) +
                                      static_cast<std::size_t>(y) * lock.Pitch;

@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00661",
+  "production_id": "CONVERSION-DX11-00661",
+  "event_id": "CONVERSION-DX11-00661-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_XRGB16_MIP_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "b942b8fc52e21e50fd64310c5835c9bcd8b05eb7",
+  "status": "MATERIAL_COMMITTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "game-created D3D9 X1R5G5B5/X4R4G4B4 LockRect mip rows",
+      "portable 16-bit X RGB opaque BGRA8 conversion -> D3D11 SRV/sampler",
+      "bounded opt-in game Draw/DrawIndexed into native diagnostic Present"
+    ],
+    "batch_components": [
+      "live_game_frame_bridge.cpp format admission and mip selection",
+      "packed_texture_16bit.hpp opaque X1/X4 decoders",
+      "positive/negative C++ pixel-stride CPU tests and 17 destructive native Draw-path assertions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "LOCAL_CPP_PASS: two padded RGB rows, 1x1 mip, reserved alpha high/low values; negative original alpha formats",
+      "negative_regression": "17 destructive source/helper mutations, packed16 sRGB fail-closed, LockRect pitch, DX9Ex original Draw fallback",
+      "component_integration": "D3D9 GetLevelDesc/LockRect -> BGRA8 upload mips -> native SRV -> PSSetShaderResources -> Draw/DrawIndexed -> diagnostic Present"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_XRGB16_MIP_DRAW",
+      "src/vr/d3d11/packed_texture_16bit.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CPU_PROBE_ONLY; no real-game visible pixels or HMD proof",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only; unsupported sources or GPU failure retain original D3D9 draw and gamepad"
+  },
+  "changed_files": [
+    "src/vr/d3d11/packed_texture_16bit.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/dx11_game_xrgb16_probe.cpp",
+    "tools/test_dx11_native_xrgb16_texture_00661.py",
+    "docs/automation/runs/CONVERSION-DX11-00661.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD b942b8fc52e21e50fd64310c5835c9bcd8b05eb7; previous 00660 BUILD_VERIFIED",
+    "C1_REVIEW": "PASS X1R5G5B5/X4R4G4B4 unsupported game texture types; independent format extension",
+    "C2_IMPLEMENT": "PASS actual native D3D9 texture mirror and opaque X format decoder",
+    "C3_VALIDATE": "LOCAL_CPP_PASS, GitHub 5-gate exact-SHA PENDING",
+    "C4_COMMIT": "MATERIAL_COMMITTED",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "acceptance_results": {
+    "cpu_probe": "LOCAL_CPP_PASS",
+    "static_regression": "PENDING_EXACT_SHA",
+    "compile_build": "PENDING_EXACT_SHA",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "next_action": "Check exact-SHA five Gates; repair any actual failure without CI-skip. Hardware gameplay and Quest3/VDXR remain UNTESTED."
+}

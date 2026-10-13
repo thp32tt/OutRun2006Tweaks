@@ -174,6 +174,10 @@ jobs:
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_native_rgba_texture_00660.py
 
+      - name: Verify native X1R5G5B5/X4R4G4B4 game Draw 00661
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_native_xrgb16_texture_00661.py
+
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh
