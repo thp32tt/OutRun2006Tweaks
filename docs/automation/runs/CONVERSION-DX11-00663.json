@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_EXTENDED_LUMINANCE_MIP_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "f11615070fe272b8a3f5bf171782aa49723530b8",
-  "status": "MATERIAL_COMMITTED_AWAITING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -63,21 +63,28 @@
     "C0_RECOVER": "PASS base f11615070fe272b8a3f5bf171782aa49723530b8 last 00662 C6 verified",
     "C1_REVIEW": "PASS two separate game legacy luminance formats excluded from native SRV",
     "C2_IMPLEMENT": "PASS source decoder/mip upload and native Draw connection",
-    "C3_VALIDATE": "LOCAL_CPP_PASS; GitHub exact-SHA CI pending",
-    "C4_COMMIT": "MATERIAL_COMMITTED_AWAITING_SHA",
+    "C3_VALIDATE": "PASS exact-SHA Backend Conversion Gate #38365053993, DX11 Fast #38365053957, Build #38365062129, OpenXR #38365062021, HUD #38365062072; all SUCCESS; local C++ pix/pitch probe PASS",
+    "C4_COMMIT": "MATERIAL_COMMITTED",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_CI"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "acceptance_results": {
     "cpu_probe": "LOCAL_CPP_PASS",
-    "static_regression": "PENDING_EXACT_SHA",
-    "compile_build": "PENDING_EXACT_SHA",
+    "static_regression": "PASS_EXACT_SHA",
+    "compile_build": "SUCCESS_EXACT_SHA",
     "game_visual_parity": "NEED_HMD_TEST",
     "gamepad": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
   },
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "next_action": "Wait for one exact-SHA mandatory GitHub Gate; separate C6 [skip ci] state after exact pass only; no HMD outcome inferred."
+  "material_result_sha": "17492625390c30368f034ffebad07d08464713f8",
+  "validation_bearing_result_sha": "17492625390c30368f034ffebad07d08464713f8",
+  "result_sha": "17492625390c30368f034ffebad07d08464713f8",
+  "next_action": "C6 complete on exact validation SHA 17492625390c30368f034ffebad07d08464713f8; mandatory 5/5 GitHub Actions SUCCESS. Real menu, vehicle, race, gamepad and Quest3/VDXR remain RUNTIME_VALIDATION=UNTESTED/NEED_HMD_TEST. No retry or further score under CONVERSION-DX11-00663.",
+  "gate_runs": {
+    "Backend Conversion Gate": 38365053993,
+    "DX11 Fast Structural Checks": 38365053957,
+    "Build": 38365062129,
+    "OpenXR VR architecture": 38365062021,
+    "OutRun EXE HUD Inspector CI": 38365062072
+  }
 }
