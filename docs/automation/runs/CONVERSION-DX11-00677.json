@@ -11,9 +11,9 @@
   "work_key": "DX11:MENU_RACE_NATIVE_RAW_DRAW_ATOMIC_PUBLICATION",
   "feature_id": "MENU_RACE_NATIVE_SOURCE_CONTIGUITY_AND_ATOMIC_INSET",
   "base_head_sha": "3eb92f44654b2c42311db5cf4633854b3a3990c5",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -84,9 +84,9 @@
     ]
   },
   "acceptance_results": {
-    "source-contiguous-native-batch": "PENDING_EXACT_SHA",
-    "atomic-aborted-inset-fallback": "PENDING_EXACT_SHA",
-    "batch-pixel-path-gate": "PENDING_EXACT_SHA",
+    "source-contiguous-native-batch": "PASS_EXACT_SHA",
+    "atomic-aborted-inset-fallback": "PASS_EXACT_SHA",
+    "batch-pixel-path-gate": "PASS_EXACT_SHA",
     "quest3-menu-vehicle-race": "NEED_HMD_TEST"
   },
   "changed_files": [
@@ -100,17 +100,46 @@
     "C0_RECOVER": "PASS",
     "C1_REVIEW": "Confirmed raw source interleaving and abort-to-Present stale publication vulnerabilities in live native Draw batch",
     "C2_IMPLEMENT": "RAW_SOURCE_CONTIGUITY_AND_NATIVE_GPU_INSET_ABORT_FIX",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "MATERIAL",
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_OF_5",
+    "C4_COMMIT": "MATERIAL_EXACT_SHA_VERIFIED",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "material_result_sha": "cf708c6c0b53f24d426aebc934cd6fc57725e274",
+  "validation_bearing_result_sha": "cf708c6c0b53f24d426aebc934cd6fc57725e274",
+  "result_sha": "cf708c6c0b53f24d426aebc934cd6fc57725e274",
   "ci_evidence": {
+    "validation_bearing_result_sha": "cf708c6c0b53f24d426aebc934cd6fc57725e274",
+    "exact_sha_checks": [
+      {
+        "workflow": "DX11 Fast Structural Checks",
+        "id": 38399537286,
+        "conclusion": "SUCCESS"
+      },
+      {
+        "workflow": "Build",
+        "id": 38399547410,
+        "conclusion": "SUCCESS"
+      },
+      {
+        "workflow": "OpenXR VR architecture",
+        "id": 38399547387,
+        "conclusion": "SUCCESS"
+      },
+      {
+        "workflow": "OutRun EXE HUD Inspector CI",
+        "id": 38399547414,
+        "conclusion": "SUCCESS"
+      },
+      {
+        "workflow": "Backend Conversion Gate",
+        "id": 38399537217,
+        "conclusion": "SUCCESS"
+      }
+    ],
     "runtime_validation": "UNTESTED",
     "hmd_test_performed": false,
     "gamepad_test_performed": false
-  }
+  },
+  "next_action": "NEW_INDEPENDENT_DX11_FEATURE; Quest3/VDXR native menu/vehicle/race and gamepad remains NEED_HMD_TEST; do not rerun 00677"
 }
