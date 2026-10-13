@@ -3129,7 +3129,8 @@ namespace OutRunVRStereo
             namespace live = outrun::vr::dx11::live_game_frame;
             UINT nativeElements = 0;
             if (!live::diagnostic_enabled() || !device ||
-                (topology != D3DPT_LINELIST &&
+                (topology != D3DPT_POINTLIST &&
+                  topology != D3DPT_LINELIST &&
                   topology != D3DPT_LINESTRIP &&
                   topology != D3DPT_TRIANGLELIST &&
                   topology != D3DPT_TRIANGLESTRIP &&
@@ -3172,7 +3173,8 @@ namespace OutRunVRStereo
             namespace live = outrun::vr::dx11::live_game_frame;
             UINT nativeElements = 0;
             if (!live::diagnostic_enabled() || !device ||
-                (topology != D3DPT_LINELIST &&
+                (topology != D3DPT_POINTLIST &&
+                  topology != D3DPT_LINELIST &&
                   topology != D3DPT_LINESTRIP &&
                   topology != D3DPT_TRIANGLELIST &&
                   topology != D3DPT_TRIANGLESTRIP &&
@@ -3263,7 +3265,8 @@ namespace OutRunVRStereo
             namespace live = outrun::vr::dx11::live_game_frame;
             UINT nativeElements = 0;
             if (!live::diagnostic_enabled() || !device ||
-                (topology != D3DPT_LINELIST &&
+                (topology != D3DPT_POINTLIST &&
+                  topology != D3DPT_LINELIST &&
                   topology != D3DPT_LINESTRIP &&
                   topology != D3DPT_TRIANGLELIST &&
                   topology != D3DPT_TRIANGLESTRIP &&

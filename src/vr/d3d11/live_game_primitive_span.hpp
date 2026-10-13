@@ -19,12 +19,16 @@ constexpr bool game_primitive_element_count(bool triangleStrip,
     return true;
 }
  
-// D3DPRIMITIVETYPE values (2..6) are defined by D3D9. Keep this span
+// D3DPRIMITIVETYPE values (1..6) are defined by D3D9. Keep this span
 // validator independent of Windows headers for deterministic Linux probes.
 constexpr bool game_native_primitive_element_count(
     std::uint32_t d3d9Type, std::uint32_t primitiveCount,
     std::uint32_t& elements) noexcept {
     switch (d3d9Type) {
+    case 1u: // D3DPT_POINTLIST: one source vertex per point
+        if (primitiveCount == 0u || primitiveCount > 512u) return false;
+        elements = primitiveCount;
+        return true;
     case 2u: // D3DPT_LINELIST: P * 2 source elements
     case 3u: { // D3DPT_LINESTRIP: P + 1 source elements
         if (primitiveCount == 0u || primitiveCount > 512u) return false;
@@ -38,8 +42,23 @@ constexpr bool game_native_primitive_element_count(
     case 4u: return game_primitive_element_count(false, primitiveCount, elements); // TRIANGLELIST
     case 5u: // TRIANGLESTRIP
     case 6u: return game_primitive_element_count(true, primitiveCount, elements); // TRIANGLEFAN
-    default: return false; // POINTLIST and unknowns remain DX9Ex-only.
+    default: return false; // Unknown primitive modes remain DX9Ex-only.
     }
+}
+
+// D3D11 draws 1-pixel points, but D3D9 may enlarge each point, scale it,
+// use per-vertex PSIZE or expand texture coordinates as point sprites.
+ // Only the exact unscaled singleton form is sampled into the opt-in inset.
+ // IEEE754 positive finite float bit ordering permits these bounds without
+ // a Windows header or introducing a floating-point failure mode.
+constexpr bool game_native_unit_point_raster(
+    std::uint32_t sizeBits, std::uint32_t minBits, std::uint32_t maxBits,
+    std::uint32_t spriteEnabled, std::uint32_t scaleEnabled,
+    bool perVertexPointSize) noexcept {
+    constexpr std::uint32_t one = 0x3f800000u;
+    return !perVertexPointSize && sizeBits == one &&
+           minBits <= one && maxBits >= one && maxBits < 0x7f800000u &&
+           spriteEnabled == 0u && scaleEnabled == 0u;
 }
 
 // D3D9 fan (P+2 source elements) becomes P*3 indexed D3D11 triangles.

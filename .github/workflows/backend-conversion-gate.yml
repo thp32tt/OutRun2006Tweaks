@@ -123,6 +123,11 @@ jobs:
         shell: pwsh
         run: python tools/test_dx11_live_line_draw_00644.py
 
+      - name: Verify DX11 live 1px point Draw/DrawIndexed bridge 00645
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_live_point_draw_00645.py
+
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'
         shell: pwsh

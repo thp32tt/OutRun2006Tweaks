@@ -21,7 +21,7 @@
 namespace outrun::vr::dx11::live_game_frame {
 namespace {
 using Microsoft::WRL::ComPtr;
-static_assert(D3DPT_LINELIST == 2 && D3DPT_LINESTRIP == 3 &&
+static_assert(D3DPT_POINTLIST == 1 && D3DPT_LINELIST == 2 && D3DPT_LINESTRIP == 3 &&
               D3DPT_TRIANGLELIST == 4 && D3DPT_TRIANGLESTRIP == 5 &&
               D3DPT_TRIANGLEFAN == 6, "D3D9 primitive span enum changed");
 static_assert(kGameStage0BlendDiffuseAlpha == D3DTOP_BLENDDIFFUSEALPHA &&
@@ -1496,8 +1496,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     // Use the live game's exact FVF byte layout; avoid reading UV as
     // diffuse when a menu/sprite TEX1 vertex omits D3DFVF_DIFFUSE.
     if (!game_fvf_layout(fvf, layout)) return false;
-    // observe() admits triangle lists/strips/fans only: FVF PSIZE cannot
-    // affect triangle rasterization, but offsets for live COLOR/UV must skip it.
+    // FVF PSIZE alters point rasterization, so point-specific admission below
+    // rejects it. For lines/triangles the field only shifts COLOR/UV offsets.
     capture.enabled = layout.textured;
     // Native VS has no additive specular interpolant. Object-space NORMAL
     // is valid only when D3DRS_LIGHTING is disabled below.
@@ -1544,6 +1544,21 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         stencil || depth || !clip || fog ||
         cullMode != D3DCULL_NONE || fillMode != D3DFILL_SOLID)
         return false;
+    // Only native one-pixel points without sprites or per-vertex point sizes.
+    // All larger/scaled point raster states continue to the original D3D9
+    // Draw only; do not display a misleading native menu/effect inset.
+    if (topology == D3DPT_POINTLIST) {
+        DWORD size = 0u, minSize = 0u, maxSize = 0u;
+        DWORD sprite = TRUE, scale = TRUE;
+        if (FAILED(game->GetRenderState(D3DRS_POINTSIZE, &size)) ||
+            FAILED(game->GetRenderState(D3DRS_POINTSIZE_MIN, &minSize)) ||
+            FAILED(game->GetRenderState(D3DRS_POINTSIZE_MAX, &maxSize)) ||
+            FAILED(game->GetRenderState(D3DRS_POINTSPRITEENABLE, &sprite)) ||
+            FAILED(game->GetRenderState(D3DRS_POINTSCALEENABLE, &scale)) ||
+            !game_native_unit_point_raster(size, minSize, maxSize,
+                                           sprite, scale, layout.hasPointSize))
+            return false;
+    }
     // Lines with D3D9-specific AA/last-pixel behavior cannot be represented
     // exactly by this single-sample native diagnostic target: fail closed.
     if (topology == D3DPT_LINELIST || topology == D3DPT_LINESTRIP) {
@@ -3040,7 +3055,9 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     const UINT stride = sizeof(NativeVertex), offset = 0;
     ID3D11Buffer* boundVB = vb.Get();
     ctx->IASetInputLayout(s.layout.Get());
-    ctx->IASetPrimitiveTopology(topology == D3DPT_LINELIST ?
+    ctx->IASetPrimitiveTopology(topology == D3DPT_POINTLIST ?
+        D3D11_PRIMITIVE_TOPOLOGY_POINTLIST :
+        topology == D3DPT_LINELIST ?
         D3D11_PRIMITIVE_TOPOLOGY_LINELIST :
         topology == D3DPT_LINESTRIP ?
         D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP :
