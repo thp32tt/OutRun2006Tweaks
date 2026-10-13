@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mutation-guarded R30 VB/IB two-way shadow registry lookup regression."""
+"""Mutation-guarded four-way R30 VB/IB shadow lookup; legacy test filename kept for CI."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,7 +23,7 @@ def validate(source):
     helper = body(source, "R30ShadowPtr R30FindShadow(")
     vb = body(source, "R30ShadowPtr R30FindVertexShadow(")
     ib = body(source, "R30ShadowPtr R30FindIndexShadow(")
-    assert "Slot slots[2]{};" in decl
+    assert "Slot slots[4]{};" in decl
     assert "unsigned next = 0;" in decl
     required = (
         "if (cached.epoch == epoch)",
@@ -40,7 +40,7 @@ def validate(source):
         "cached.next = 0;",
         "registry.find(buffer)",
         "auto& slot = cached.slots[cached.next];",
-        "cached.next = (cached.next + 1u) % 2u;",
+        "cached.next = (cached.next + 1u) % 4u;",
         "slot.buffer = buffer;",
         "slot.entry = it == registry.end() ? nullptr : it->second;",
     )
@@ -63,9 +63,10 @@ def validate(source):
 
 def model():
     for kind in ("VB", "IB"):
-        slots = [(None, None), (None, None)]
+        slots = [(None, None)] * 4
         epoch, current, probes = 0, 0, 0
-        registry = {100: kind + "A", 200: kind + "B"}
+        registry = {100: kind + "A", 200: kind + "B",
+                    300: kind + "C", 400: kind + "D"}
 
         def lookup(ptr, generation):
             nonlocal slots, epoch, current, probes
@@ -75,25 +76,25 @@ def model():
                         return value
             probes += 1
             if epoch != generation:
-                slots = [(None, None), (None, None)]
+                slots = [(None, None)] * 4
                 epoch, current = generation, 0
             slots[current] = (ptr, registry.get(ptr))
-            current = (current + 1) % 2
+            current = (current + 1) % 4
             return registry.get(ptr)
 
         for i in range(4096):
-            ptr = (100, 200)[i % 2]
+            ptr = (100, 200, 300, 400)[i % 4]
             assert lookup(ptr, 1) == registry[ptr]
-        assert probes == 2, (kind, probes)
-        assert lookup(300, 1) is None
-        assert lookup(300, 1) is None
-        assert probes == 3
-        registry[300] = kind + "NEW"
-        assert lookup(300, 2) == registry[300]
-        registry[300] = kind + "RECYCLED"
-        assert lookup(300, 3) == registry[300]
-        del registry[300]
-        assert lookup(300, 4) is None
+        assert probes == 4, (kind, probes)
+        assert lookup(500, 1) is None
+        assert lookup(500, 1) is None
+        assert probes == 5
+        registry[500] = kind + "NEW"
+        assert lookup(500, 2) == registry[500]
+        registry[500] = kind + "RECYCLED"
+        assert lookup(500, 3) == registry[500]
+        del registry[500]
+        assert lookup(500, 4) is None
         registry.clear()
         assert lookup(100, 5) is None
         assert lookup(200, 5) is None
@@ -101,7 +102,7 @@ def model():
 
 def mutation_tests(source):
     mutants = (
-        ("Slot slots[2]{};", "Slot slots[1]{};"),
+        ("Slot slots[4]{};", "Slot slots[1]{};"),
         ("if (cached.epoch == epoch)", "if (cached.epoch != epoch)"),
         ("if (slot.buffer == buffer)", "if (slot.buffer != buffer)"),
         ("std::memory_order_acquire", "std::memory_order_relaxed"),
@@ -112,7 +113,7 @@ def mutation_tests(source):
         ("cached.epoch = lockedEpoch;", "cached.epoch = epoch;"),
         ("cached.next = 0;", "cached.next = 1;"),
         ("registry.find(buffer)", "registry.find(nullptr)"),
-        ("cached.next = (cached.next + 1u) % 2u;", "cached.next = 0u;"),
+        ("cached.next = (cached.next + 1u) % 4u;", "cached.next = 0u;"),
         ("slot.entry = it == registry.end() ? nullptr : it->second;",
          "slot.entry = nullptr;"),
         ("R30FindShadow(buffer, R30VertexShadows, R30VertexLookup)",
@@ -136,7 +137,7 @@ def main():
     validate(code)
     model()
     mutation_tests(code)
-    print("R30 VB/IB two-way lookup: PASS; 14 negative mutants rejected")
+    print("R30 VB/IB four-way lookup: PASS; 14 negative mutants rejected")
 
 
 if __name__ == "__main__":

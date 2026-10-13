@@ -211,9 +211,11 @@ namespace OutRunVRStereo
                 const void* buffer = nullptr;
                 R30ShadowPtr entry;
             };
-            // Two alternating VB/IB addresses share an epoch-fenced
-            // two-way cache instead of contending on the registry mutex.
-            Slot slots[2]{};
+            // A four-entry epoch-fenced working set handles interleaved static,
+            // dynamic and UI VB/IB streams without repeated registry-mutex
+            // contention. Generation fencing still invalidates positive AND
+            // negative entries on Release, Reset and pointer reuse.
+            Slot slots[4]{};
             std::uint64_t epoch = 0;
             unsigned next = 0;
         };
@@ -419,7 +421,7 @@ namespace OutRunVRStereo
 
             const auto it = registry.find(buffer);
             auto& slot = cached.slots[cached.next];
-            cached.next = (cached.next + 1u) % 2u;
+            cached.next = (cached.next + 1u) % 4u;
             slot.buffer = buffer;
             slot.entry = it == registry.end() ? nullptr : it->second;
             return slot.entry;
