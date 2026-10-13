@@ -1,0 +1,71 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00755",
+  "production_id": "CONVERSION-DX9EX-00755",
+  "event_id": "CONVERSION-DX9EX-00755-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00755",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "88c4b65f039e549d30b87331b7d8413e1d607182",
+  "material_result_sha": "7872753692f739560daf98b071ade209a4b7f054",
+  "validation_bearing_result_sha": "7872753692f739560daf98b071ade209a4b7f054",
+  "result_sha": "7872753692f739560daf98b071ade209a4b7f054",
+  "material_commits": [
+    "88c4b65f039e549d30b87331b7d8413e1d607182",
+    "f4d844358699719feb8d7f026e8f52406e08cab7",
+    "7872753692f739560daf98b071ade209a4b7f054"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 P0-A: improve F11 ImGui sharpness for a low-height D3D9 mirror mapped to high-resolution Quest3/VDXR per-eye pixels without changing gameplay HudScale, main/ESC ownership or desktop layout.",
+    "completed_scope": "F11-only raster density now chooses the greater of XR/source aspect correction and coherent binocular XR eye-pixel-height ratio, retaining quantized hysteresis and 3440x1440 source baseline. Extend owning regression with 1080p/768p to 2688p fixtures, native-size negatives and three destructive source mutations. Repair same-task real policy false-negative by scoping destructive tests to eyePixelScale owner.",
+    "remaining_acceptance": [
+      "Full Issue #119 integrated responsive driving HUD, main-menu aspect, independent ESC placement and F11 readability remain IN_PROGRESS.",
+      "Matched Quest 3/VDXR actual screen legibility, stereo and performance still require HMD test."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_F11_EYE_PIXEL_HEIGHT_3_DESTRUCTIVE_MUTANTS",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "dx9ex_full_chain": "SUCCESS_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "NOT_RUN_ON_VALIDATION_SHA_TOOL_ONLY_CHANGE; EARLIER_SOURCE_SHA_REVIEW_PENDING",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38357412776,
+      "head_sha": "7872753692f739560daf98b071ade209a4b7f054",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "policy, game, host, full-chain-compile, package: 5/5 SUCCESS"
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38357412768,
+      "head_sha": "7872753692f739560daf98b071ade209a4b7f054",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "domain-isolation SUCCESS"
+    }
+  ],
+  "score_delta": 0,
+  "score_reason": "Issue #119 remains an unfinished whole integrated feature; this build-verified partial fix and C6 bookkeeping do not earn duplicate feature completion credit.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "Separate bookkeeping-only [skip ci] commit is not validation-bearing. Source/result SHA passes DX9Ex Active 5/5 and Domain Isolation exact-SHA; full source impact is path-filtered on test-only validation commit and not claimed exact-SHA. Quest3 not tested."
+}
