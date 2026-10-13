@@ -1,3 +1,11 @@
+# 2026-10-13 USER OVERRIDE — FEATURE-SIZED AUTONOMOUS DELIVERY (ACTIVE)
+
+New DX11 production TASK_IDs from 00672 onward are **functional feature units**, not per-texture-format, per-render-state, per-helper, per-guard, or per-test microtasks. A feature is an independently meaningful integrated renderer capability with a finite end-to-end acceptance contract, its safe fallback, regression evidence, and final exact-SHA GitHub build gates. Group related formats/state permutations and their source + HLSL + Draw/DrawIndexed binding + positive/negative tests into one feature; do not allocate one new scored task for each enum/format/failure. DX11 Native A remains active, DX9Ex C independent, DXVK B frozen.
+
+Before dispatch, reconcile the previous TASK_ID, FEATURE_ID, work_key and owner lease. If the previous feature is not complete, continue it under its original TASK_ID across source subcommits, CI repairs, retries and chat rollovers. Never create a replacement TASK_ID merely because a single material commit passed CI, a different pixel format was implemented, or C6 is pending. Each new feature contract must describe a user-observable/integrated outcome and at least three independently testable acceptance items spanning end-to-end implementation, safe fallback/regression and same-SHA integrated validation, with at least two real subsystems/behavior domains. For DONE_BUILD_VERIFIED, all build-verifiable items must pass; HMD/Quest3 acceptance remains separately UNTESTED until measured. Critical crash/CI blockers can be handled separately only with concrete evidence and a bounded integrated restoration goal.
+
+**Implementation enforcement:** `docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json` and `tools/dx11_autodev_policy.py` reject incomplete micro-feature contracts for new run records from 00672, while grandfathering earlier TASK_IDs. This policy does not reload the external Docker controller; its dispatch code must also enforce the same unit/owner rules before creating IDs. A GitHub policy commit alone is not live deployment evidence.
+
 # OutRun2 VR Development Execution Contract
 
 ## DX11 first real game frame — latest user directive, 2026-10-10

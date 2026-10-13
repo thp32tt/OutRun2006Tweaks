@@ -104,6 +104,34 @@ r175_new['development_strategy'].update(
 assert not validate_task(r175_new, p), validate_task(r175_new, p)
 r175_new['development_strategy'].pop('r175_owner_handoff_evidence')
 assert validate_task(r175_new, p), 'R175 ownership takeover without evidence must fail'
+# New 00672+ feature-sized unit contract: reject per-format microtask completion.
+feature = copy.deepcopy(frame)
+feature["task_id"] = "CONVERSION-DX11-00672"
+feature["feature_id"] = "DX11-INTEGRATED-TEXTURE-MIRROR"
+feature["feature_contract"] = {
+    "feature_id": "DX11-INTEGRATED-TEXTURE-MIRROR",
+    "goal": "Integrate the real game texture family through native game-frame draws and fallbacks",
+    "acceptance_items": [
+        {"id": "end2end", "category": "end_to_end_behavior", "behavior_area": "game_capture", "expected_behavior": "Source mip rows reach native D3D11 Draw"},
+        {"id": "fallback", "category": "fallback_regression", "behavior_area": "safe_fallback", "expected_behavior": "Unsupported texture returns to D3D9 Draw"},
+        {"id": "gates", "category": "integrated_validation", "behavior_area": "game_capture", "expected_behavior": "Full exact SHA build and regression success"},
+    ],
+}
+assert not validate_task(feature, p), validate_task(feature, p)
+for label, mutate in (
+    ("no contract", lambda t: t.pop("feature_contract")),
+    ("only one acceptance", lambda t: t["feature_contract"].update(acceptance_items=t["feature_contract"]["acceptance_items"][:1])),
+    ("no fallback", lambda t: t["feature_contract"]["acceptance_items"][1].update(category="end_to_end_behavior")),
+    ("single area", lambda t: [i.update(behavior_area="same") for i in t["feature_contract"]["acceptance_items"]]),
+    ("wrong feature", lambda t: t["feature_contract"].update(feature_id="OTHER")),
+    ("one piece done", lambda t: t.update(status="COMPLETE_BUILD_VERIFIED", automation_validation="PASS_EXACT_SHA", validation_bearing_result_sha="a"*40, acceptance_results={"end2end": "PASS"})),
+):
+    bad = copy.deepcopy(feature)
+    mutate(bad)
+    assert validate_task(bad, p), "feature-sized negative admitted: " + label
+complete = copy.deepcopy(feature)
+complete.update(status="COMPLETE_BUILD_VERIFIED", automation_validation="PASS_EXACT_SHA", validation_bearing_result_sha="a"*40, acceptance_results={"end2end":"PASS", "fallback":"PASS", "gates":"PASS_EXACT_SHA"})
+assert not validate_task(complete, p), validate_task(complete, p)
 run = latest_dx11_run()
 assert run is not None, "expected durable DX11 run records"
 print("DX11 auto-development policy: 11 legacy + 9 gameplay negative mutations, 3 positive classes, pre-policy compatibility PASS")

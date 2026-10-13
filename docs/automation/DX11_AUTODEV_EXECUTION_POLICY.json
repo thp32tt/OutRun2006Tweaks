@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "effective_from_task_number": 531,
@@ -101,7 +101,10 @@
     "never_bypass_r175_or_visual_fail_closed_gate": true,
     "batch_source_and_regressions_before_full_gate": true,
     "avoid_full_build_after_each_individual_edit": true,
-    "prefer_one_material_commit_per_coherent_batch_when_possible": true
+    "prefer_one_material_commit_per_coherent_batch_when_possible": true,
+    "forbid_per_format_microtask_completion": true,
+    "require_feature_level_acceptance_contract": true,
+    "resume_unfinished_feature_same_task_id": true
   },
   "required_task_strategy_fields": [
     "work_class",
@@ -161,5 +164,28 @@
     "heavy_gate_concurrency": "one_running_plus_newest_pending_per_branch; older pending is SUPERSEDED, never PASS",
     "repair_policy": "one coherent cause-based repair batch under same TASK_ID, then revalidate new exact SHA",
     "runtime_validation_boundary": "UNTESTED until actual matching Quest3/VDXR game and fps evidence"
+  },
+  "feature_unit": {
+    "effective_from_task_number": 672,
+    "unit": "one integrated functional renderer capability, not one enum/format/guard/hook helper",
+    "minimum_acceptance_items": 3,
+    "minimum_behavior_areas": 2,
+    "required_categories": [
+      "end_to_end_behavior",
+      "fallback_regression",
+      "integrated_validation"
+    ],
+    "require_same_feature_id_across_retries": true,
+    "reuse_task_id_until_full_feature_build_verified": true,
+    "no_new_task_for_format_variant_or_single_CI_repair": true,
+    "no_new_score_for_partial_feature_commit": true,
+    "complete_only_with_all_build_acceptance_pass": true,
+    "hmd_acceptance_separate_from_build": true,
+    "exception_requires": "documented concrete crash/build/blocker evidence and integrated restoration acceptance",
+    "examples": [
+      "DX11 full texture-mirror family: related format conversions + SRV/mip binding + game Draw/DrawIndexed + unsupported fallbacks + test matrix",
+      "DX11 native gameplay frame: live D3D9 callsite→native resources/shaders/draw→visible frame, input-safe fallback and exact-SHA build",
+      "DX11 complete render-state family: coherent alpha/depth/raster states bound to game draws with positive/negative behavior tests"
+    ]
   }
 }

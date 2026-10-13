@@ -55,6 +55,16 @@ def validate_policy(policy: dict) -> list[str]:
     ):
         if rules.get(key) is not True:
             errors.append("safety/progress rule disabled: " + key)
+    unit = policy.get("feature_unit", {})
+    if unit.get("effective_from_task_number") != 672:
+        errors.append("feature-sized task threshold missing")
+    if unit.get("minimum_acceptance_items", 0) < 3 or unit.get("minimum_behavior_areas", 0) < 2:
+        errors.append("feature-sized acceptance minimum weakened")
+    if set(unit.get("required_categories", [])) != {"end_to_end_behavior", "fallback_regression", "integrated_validation"}:
+        errors.append("feature-sized acceptance categories incomplete")
+    for key in ("forbid_per_format_microtask_completion", "require_feature_level_acceptance_contract", "resume_unfinished_feature_same_task_id"):
+        if rules.get(key) is not True:
+            errors.append("feature-sized dispatch rule disabled: " + key)
     if not policy.get("required_task_strategy_fields"):
         errors.append("task strategy contract missing")
     return errors

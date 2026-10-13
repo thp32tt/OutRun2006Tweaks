@@ -1,3 +1,7 @@
+## 2026-10-13 FEATURE-SIZED DISPATCH OVERRIDE — DX11 (ACTIVE)
+
+For new TASK_ID >= CONVERSION-DX11-00672, select **one integrated functional outcome**, not a single format/state enum, isolated guard, helper or failed assertion. Create a stable `feature_id` and one `feature_contract` with a goal and >=3 finite acceptance items covering end-to-end source→native D3D11 Draw/output, fail-closed fallback/negative regression, and full exact-SHA integration CI, across >=2 genuine behavior areas. Related texture formats and render states of the same feature are internal checkpoints and must not mint fresh TASK_IDs, terminal statuses or points. Continue the original feature/task through all edits, repair, CI and C6; batch tests before final CI. This supersedes any historical one-small-fix-per-task or per-edit build guidance. Existing 00671 and older task records are unaffected. DX9Ex and DXVK isolation, ownership fencing, hardware UNTESTED and all existing mandatory CI remain intact. The GitHub verifier rejects new run records that omit this contract; live Docker enforcement requires separate deployment.
+
 ## 2026-10-13 USER OVERRIDE — COHERENT CODE BATCHES BEFORE FULL COMPILATION (ACTIVE)
 
 The user requires productive DX11 implementation toward a real game-visible native frame and **120 FPS performance objective**, not a full build per source edit. Apply to NEW and RETRY dispatches with the same original FEATURE_ID/TASK_ID and exact GitHub HEAD authority:
