@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2",
   "work_key": "DX11:GAME_BACKBUFFER_ORIGIN_DRAW_PRESENT",
   "feature_id": "GAME_BACKBUFFER_ORIGIN_NATIVE_DRAW_PRESENT",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -75,9 +75,9 @@
     ]
   },
   "acceptance_results": {
-    "game-output-source": "PENDING_EXACT_SHA",
-    "input-safe-fallback": "PENDING_EXACT_SHA",
-    "exact-sha-integration": "PENDING_EXACT_SHA"
+    "game-output-source": "PASS_EXACT_SHA",
+    "input-safe-fallback": "PASS_EXACT_SHA",
+    "exact-sha-integration": "PASS_EXACT_SHA"
   },
   "base_head_sha": "c902a314da2b5299c9cb16610d0d7c1ce405189f",
   "changed_files": [
@@ -91,10 +91,19 @@
     "C0_RECOVER": "PASS latest HEAD and 00682 exact Gate",
     "C1_REVIEW": "PASS: aux render-target accepted as same-device presentable game draw",
     "C2_IMPLEMENT": "PASS actual native game Draw backbuffer COM ownership and viewport/multisample",
-    "C3_VALIDATE": "LOCAL_CPP17_PASS; exact GitHub gates pending",
-    "C4_COMMIT": "SOURCE_COMMIT",
+    "C3_VALIDATE": "PASS exact SHA 5/5 GitHub mandatory Actions",
+    "C4_COMMIT": "PASS material 469f3bda and repaired exact SHA 97cbeda1",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_CI"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
-  "next_action": "Validate required exact material SHA CI, repair if necessary, then separate bookkeeping C6; Quest3/VDXR UNTESTED."
+  "next_action": "BUILD_VERIFIED; NEED_HMD_TEST Quest3/VDXR runtime and controller menu/car/race; select next independent feature.",
+  "validation_bearing_result_sha": "97cbeda16fe2ef2d8dbc6a227cec5014df285ed5",
+  "material_result_sha": "469f3bda9ffcff2403c389215506d83a6d2ecdaa",
+  "required_gate_runs": {
+    "Backend Conversion Gate": 38421017181,
+    "DX11 Fast Structural Checks": 38421016934,
+    "Build": 38421028386,
+    "OpenXR VR architecture": 38421028245,
+    "OutRun EXE HUD Inspector CI": 38421028660
+  }
 }
