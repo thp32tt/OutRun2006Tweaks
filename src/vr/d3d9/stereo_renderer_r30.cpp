@@ -2054,6 +2054,43 @@ namespace OutRunVRStereo
             if (fitsBothEyes(desired))
                 return desired;
 
+            // Issue #119 hot path: for a clipped peripheral group the stereo
+            // fit constraints are linear in the common boost. Derive the
+            // largest feasible scale from every cross-eye min/max pair and
+            // the source-height span. Normally this takes one validation
+            // instead of eight bisection probes per exact HUD draw. A failed
+            // or nonfinite estimate retains the original conservative search.
+            // Both eyes still share ONE shift; no per-eye recentering.
+            float cappedBoost = desired;
+            const float ySpan = anchor.maxY - anchor.minY;
+            if (ySpan > 0.0f)
+                cappedBoost = (std::min)(cappedBoost,
+                    (safeBottom - safeTop) / (hudScaleY * ySpan));
+            const float anchorCenter = centerX + halfWidth * anchor.x;
+            for (int minEye = 0; minEye < 2; ++minEye)
+            {
+                for (int maxEye = 0; maxEye < 2; ++maxEye)
+                {
+                    const float slope = hudScaleX *
+                        (eyeScale[maxEye] *
+                            (anchor.maxX - anchorCenter) -
+                         eyeScale[minEye] *
+                            (anchor.minX - anchorCenter));
+                    const float baselineSpan =
+                        (eyeOffset[maxEye] - eyeOffset[minEye]) * halfWidth;
+                    if (!std::isfinite(slope) ||
+                        !std::isfinite(baselineSpan))
+                        return previousBoost;
+                    if (slope > 0.0f)
+                        cappedBoost = (std::min)(cappedBoost,
+                            ((safeRight - safeLeft) - baselineSpan) / slope);
+                }
+            }
+            if (std::isfinite(cappedBoost) &&
+                cappedBoost > previousBoost &&
+                fitsBothEyes(cappedBoost))
+                return cappedBoost;
+
             // Only exact producer groups enter this bounded search. Never
             // permit a boost below the verified baseline; finite eight-step
             // bisection is independent of viewport resolution/eye count.

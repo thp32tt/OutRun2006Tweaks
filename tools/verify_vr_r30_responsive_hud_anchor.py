@@ -567,3 +567,87 @@ for removed in ("eyeOffset[eye] * halfWidth", "shiftMin <= shiftMax",
     assert removed in adaptive
     assert removed not in adaptive.replace(removed, "", 1)
 print("PASS adaptive Quest3 peripheral glyph sizing, bilateral safe bounds, desktop aspect/reset and negative eye fixture")
+
+
+# Issue #119 exact peripheral HUD: the bilateral safe-area fit is affine
+# in one common boost. The hot path must solve all cross-eye inequalities
+# before the existing bounded binary-search fallback. This is a real C++
+# execution path, not a review-only guard or a declared FPS speedup.
+analytical = code[code.index("float R30AdaptivePeripheralHudBoost("):
+                  code.index("bool R30TransformHudScissor(")]
+for token in (
+    "float cappedBoost = desired;",
+    "const float anchorCenter = centerX + halfWidth * anchor.x;",
+    "for (int minEye = 0; minEye < 2; ++minEye)",
+    "for (int maxEye = 0; maxEye < 2; ++maxEye)",
+    "(eyeOffset[maxEye] - eyeOffset[minEye]) * halfWidth;",
+    "((safeRight - safeLeft) - baselineSpan) / slope",
+    "if (std::isfinite(cappedBoost) &&",
+    "fitsBothEyes(cappedBoost))",
+    "if (fitsBothEyes(desired))",
+    "for (int i = 0; i < 8; ++i)",
+):
+    assert token in analytical, token
+assert analytical.index("if (fitsBothEyes(desired))") < analytical.index(
+    "float cappedBoost = desired;") < analytical.index(
+    "for (int i = 0; i < 8; ++i)")
+assert analytical.count("fitsBothEyes(cappedBoost)") == 1
+
+def stereo_safe(boost, dims, box, center_anchor, scale, offsets):
+    w, h = dims
+    x0, x1, y0, y1 = box
+    ax, ay = center_anchor
+    sx, sy, eye_scales = scale
+    cx, cy = .5*w, .5*h
+    left_min, right_max = -float("inf"), float("inf")
+    for e in range(2):
+        eff = sx * boost * eye_scales[e]
+        bias = (1-eff)*(cx + .5*w*ax) + .5*w*offsets[e]
+        left_min = max(left_min, .025*w - (eff*x0+bias))
+        right_max = min(right_max, .975*w - (eff*x1+bias))
+    vertical_span = sy*boost*(y1-y0)
+    return left_min <= right_max and vertical_span <= .95*h
+
+def algebraic_stereo_cap(desired, dims, box, anchor, scale, offsets):
+    w, h = dims
+    x0, x1, y0, y1 = box
+    sx, sy, eye_scales = scale
+    center = .5*w + .5*w*anchor[0]
+    bound = desired
+    if y1 > y0:
+        bound = min(bound, .95*h / (sy*(y1-y0)))
+    for min_eye in range(2):
+        for max_eye in range(2):
+            slope = sx * (eye_scales[max_eye]*(x1-center) -
+                          eye_scales[min_eye]*(x0-center))
+            baseline = .5*w*(offsets[max_eye]-offsets[min_eye])
+            if slope > 0.0:
+                bound = min(bound,(.95*w-baseline)/slope)
+    return bound
+
+for dims in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
+    w,h = dims
+    for anchor in ((-.82,.78),(.82,-.78)):
+        # Offset asymmetry is intentionally different between the eyes;
+        # translating each eye separately would incorrectly pass this test.
+        box=(.03*w,.23*w,.07*h,.22*h)
+        scales=(.55,.214,(1.0,1.04))
+        offsets=(-.065,.06)
+        old=1.60
+        target=3.0
+        assert stereo_safe(old,dims,box,anchor,scales,offsets)
+        capped=algebraic_stereo_cap(target,dims,box,anchor,scales,offsets)
+        assert old <= capped <= target
+        assert stereo_safe(capped-1.e-5,dims,box,anchor,scales,offsets)
+        if capped < target-1.e-3:
+            assert not stereo_safe(capped+.005,dims,box,anchor,
+                                   scales,offsets)
+        # Source-height enlargement can be the limiting constraint.
+        tall=(.08*w,.20*w,.02*h,.82*h)
+        tall_cap=algebraic_stereo_cap(target,dims,tall,anchor,scales,offsets)
+        assert tall_cap <= .95*h/(.214*(tall[3]-tall[2]))+1.e-7
+# The full-screen/GOAL/world/F11 producers cannot enter this exact-owner
+# hot path. Retain original static scope safety predicates and baseline.
+assert "ProducerToken::OutRunHudPeripheralText" in helper
+assert "if (!Settings::VRHudEdgeAnchors.get() ||" in helper
+print("PASS stereo analytical peripheral fit, clip bounds, two-eye constraints, bisection fallback")
