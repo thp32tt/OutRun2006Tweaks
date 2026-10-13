@@ -99,19 +99,27 @@ def main():
         raise SystemExit("R32 SPIKE FAIL: " + "; ".join(errors))
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert workflow.count("tools/verify_vr_r32_spike_log_backpressure.py") == 2
-    for marker in (
-        "window.worstBaselineUs = baselineBefore;",
-        "window.worstWorkload = frame;",
-        "window.worstStereo = stereo;",
-        "if (frameUs > window.maxFrameUs)",
-        "R32PerfWindowCounters.worstStereo.fastWorld",
-        "R32PerfWindowCounters = {};",
-        "R32PerfBaselineUs = 0;",
-        "if (now - R32Counters.lastLogMs < 5000)",
-    ):
-        assert violations(source.replace(marker, "DESTRUCTIVE_MUTANT", 1)), marker
+    # Mutate the *owning* function, not the first same-named reset in a
+    # different owner. A global replace used to hit R32InvalidateResetCaches
+    # instead of the logging/opt-out path and reported a false failure.
+    mutations = (
+        ("void R32FinalizeFramePerf(", "window.worstBaselineUs = baselineBefore;"),
+        ("void R32FinalizeFramePerf(", "window.worstWorkload = frame;"),
+        ("void R32FinalizeFramePerf(", "window.worstStereo = stereo;"),
+        ("void R32FinalizeFramePerf(", "if (frameUs > window.maxFrameUs)"),
+        ("void R32LogPerfWindow()", "R32PerfWindowCounters.worstStereo.fastWorld"),
+        ("void R32LogPerfWindow()", "R32PerfWindowCounters = {};"),
+        ("HRESULT R32WithPresentTelemetry(", "R32PerfWindowCounters = {};"),
+        ("HRESULT R32WithPresentTelemetry(", "R32PerfBaselineUs = 0;"),
+        ("void R32LogPerfWindow()", "if (now - R32Counters.lastLogMs < 5000)"),
+    )
+    for signature, marker in mutations:
+        owner = body(source, signature)
+        assert owner.count(marker) == 1, (signature, marker)
+        mutated = owner.replace(marker, "DESTRUCTIVE_MUTANT", 1)
+        assert violations(source.replace(owner, mutated, 1)), (signature, marker)
     numeric_model()
-    print("R32 SPIKE SOURCE PASS: eight destructive mutants, epoch, peak and full gate")
+    print("R32 SPIKE SOURCE PASS: nine scoped destructive mutants, epoch, peak and full gate")
 
 
 if __name__ == "__main__":
