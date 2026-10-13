@@ -98,7 +98,18 @@ def main():
     )
     for old, bad in changes:
         assert old in s, old
-        assert not connected(s.replace(old, bad, 1)), "escaped mutation " + old
+        # Independent alpha OM can use the same BlendOp assignment earlier
+        # in submit(). Mutate the subtractive masked descriptor itself, not
+        # that unrelated first occurrence, or this negative test is vacuous.
+        if old == "desc.RenderTarget[0].BlendOp = output.blendOp;":
+            begin = s.index("if (output.blendOp != D3D11_BLEND_OP_ADD) {")
+            end = s.index("} else if (output.inverseSourceAlphaBlend &&", begin)
+            targeted = s[begin:end]
+            assert old in targeted, "missing subtractive BlendOp bind"
+            mutant = s[:begin] + targeted.replace(old, bad, 1) + s[end:]
+        else:
+            mutant = s.replace(old, bad, 1)
+        assert not connected(mutant), "escaped mutation " + old
     # Test RGB AND alpha with the four supported factor combinations.
     # D3D11 reverse subtract is DEST*factor - SRC*factor, not swapped factors.
     combos = ("OVER", "ADD", "SOURCE_ALPHA_ADD", "PREMULTIPLIED")
