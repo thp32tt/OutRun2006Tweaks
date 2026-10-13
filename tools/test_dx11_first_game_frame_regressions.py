@@ -1299,7 +1299,15 @@ def main() -> None:
         ("packed_texture16::unpack_row(", "/* no 16-bit conversion */("),
         ("initial[level].SysMemPitch = pitches[level];", "/* wrong upload pitch */"),
     ):
-        broken = bridge.replace(original, invalid, 1)
+        # 00692 inserted equivalent format tokens in the earlier
+        # game-created DEFAULT RT admission. This legacy regression owns
+        # the original packed16 source-texture admission, not that RT path.
+        if original.startswith("base.Format == D3DFMT_"):
+            prefix, anchor, producer = bridge.partition("const bool packed16 =")
+            assert anchor and original in producer, original
+            broken = prefix + anchor + producer.replace(original, invalid, 1)
+        else:
+            broken = bridge.replace(original, invalid, 1)
         assert broken != bridge and not packed16_connected(broken, packed_header), (
             "16-bit source-to-SRV Draw mutation escaped: " + original
         )
