@@ -3763,11 +3763,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
 void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
              const void* bytes, UINT stride, UINT vertexCount,
              const std::uint32_t* indices, UINT indexCount) noexcept {
-    UINT expectedElements = 0;
-    if (!diagnostic_enabled() || !game ||
-        !game_native_primitive_element_count(static_cast<std::uint32_t>(type),
-                                             primitives, expectedElements))
-        return;
+    if (!diagnostic_enabled() || !game) return;
     try {
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
@@ -3781,6 +3777,16 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         }
         const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;
         const bool multiBatch = env_batch_opt_in();
+        UINT expectedElements = 0;
+        if (!game_native_primitive_element_count(
+                static_cast<std::uint32_t>(type), primitives, expectedElements)) {
+            // The hook saw a real game source call even when native topology
+            // translation is impossible. It must break an active scene batch.
+            if (multiBatch && s.frameBatch.submitted > 0u &&
+                s.frameBatch.submitted < GameNativeFrameBatch::kMaxDraws)
+                s.frameBatch.abort();
+            return;
+        }
         D3DVIEWPORT9 vp{};
         GameFvfLayout layout{};
         std::array<D3DMATRIX, 3> transforms{};
@@ -3901,6 +3907,27 @@ void observe_indexed(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
                      UINT vertexCount, const std::uint32_t* indices,
                      UINT indexCount) noexcept {
     observe(game, type, primitives, vertices, stride, vertexCount, indices, indexCount);
+}
+
+void observe_unavailable_game_draw(IDirect3DDevice9* game) noexcept {
+    if (!diagnostic_enabled() || !game) return;
+    try {
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        // VB/IB Lock shadow miss or an unsupported IndexedUP source must not
+        // disappear from the original game's Draw/DrawIndexed ordinal stream.
+        if (s.sourceDrawsThisFrame == (std::numeric_limits<std::uint64_t>::max)()) {
+            s.frameBatch.abort();
+            return;
+        }
+        ++s.sourceDrawsThisFrame;
+        ++s.observed;
+        if (env_batch_opt_in() && s.frameBatch.submitted > 0u &&
+            s.frameBatch.submitted < GameNativeFrameBatch::kMaxDraws)
+            s.frameBatch.abort();
+    } catch (...) {
+        // Diagnostics cannot change the game's render or gamepad behavior.
+    }
 }
 
 void before_game_present(IDirect3DDevice9* game) noexcept {

@@ -20,6 +20,11 @@ void observe_indexed(IDirect3DDevice9* gameDevice, D3DPRIMITIVETYPE topology,
                      UINT vertexCount, const std::uint32_t* rebasedIndices,
                      UINT indexCount) noexcept;
 
+// An existing game VB/IB/UP Draw whose CPU snapshot cannot be mirrored still
+// advances the raw source stream. Multi-Draw inset publication fails closed;
+// this never alters the original D3D9 HRESULT or input path.
+void observe_unavailable_game_draw(IDirect3DDevice9* gameDevice) noexcept;
+
 // Present draws an isolated inset only if native GPU pixels were produced.
 // Failure never propagates to the original game Present.
 void before_game_present(IDirect3DDevice9* gameDevice) noexcept;

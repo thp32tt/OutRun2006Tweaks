@@ -52,6 +52,56 @@ def main() -> None:
         assert "R30PresentR29Hook.stdcall<HRESULT>(" in source
 
     bridge = BRIDGE.read_text(encoding="utf-8")
+    # 00678: actual game VB/IB and IndexedUP hooks must count an attempted
+    # Draw even when CPU shadow bytes/indices are unavailable. The diagnostic
+    # native batch must never splice Draws across a failed source capture.
+    def complete_shadow_source_contract(code: str) -> bool:
+        if code.count("R30NativeGameSourceGuard nativeSource{device};") != 3:
+            return False
+        if "if (!forwarded)" not in code or \
+                "observe_unavailable_game_draw(device);" not in code:
+            return False
+        for start, end, success in (
+            ("void R30ObserveNativeLinearVB(", "void R30ObserveNativeIndexedVB(",
+             "live::observe_linear("),
+            ("void R30ObserveNativeIndexedVB(", "void R30ObserveNativeIndexedUP(",
+             "live::observe_indexed("),
+            ("void R30ObserveNativeIndexedUP(", "HRESULT __stdcall DrawPrimitiveDestR30(",
+             "live::observe_indexed("),
+        ):
+            a = code.find(start)
+            b = code.find(end, a)
+            if a < 0 or b <= a:
+                return False
+            section = code[a:b]
+            if ("R30NativeGameSourceGuard nativeSource{device};" not in section or
+                    "nativeSource.forwarded = true;" not in section or
+                    success not in section or
+                    section.index("nativeSource.forwarded = true;") > section.index(success)):
+                return False
+        return True
+
+    for renderer in RENDERERS:
+        hook_source = renderer.read_text(encoding="utf-8")
+        assert complete_shadow_source_contract(hook_source), renderer.name
+        for fault in ("R30NativeGameSourceGuard nativeSource{device};",
+                      "nativeSource.forwarded = true;",
+                      "observe_unavailable_game_draw(device);"):
+            mutated = hook_source.replace(fault, "/* missing game source */", 1)
+            assert mutated != hook_source and not complete_shadow_source_contract(mutated), fault
+
+    observer = bridge[bridge.find("void observe("):bridge.find("} // namespace", bridge.find("void observe("))]
+    ordinal = observer.find("const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;")
+    primitive = observer.find("if (!game_native_primitive_element_count(")
+    assert ordinal >= 0 and primitive > ordinal, "bad native primitive must still count as game Draw"
+    unavailable = bridge[bridge.find("void observe_unavailable_game_draw("):bridge.find("void before_game_present(")]
+    assert "++s.sourceDrawsThisFrame;" in unavailable
+    assert "s.frameBatch.abort();" in unavailable
+    assert "env_batch_opt_in()" in unavailable
+    bad_observer = observer.replace("if (!game_native_primitive_element_count(",
+                                    "if (false && !game_native_primitive_element_count(", 1)
+    assert bad_observer != observer and "if (!game_native_primitive_element_count(" not in bad_observer
+
     for evidence in (
         'GetEnvironmentVariableW(L"OUTRUN_DX11_FIRST_GAME_FRAME"',
         "GetVertexShader(vs.GetAddressOf())",

@@ -3164,13 +3164,26 @@ namespace OutRunVRStereo
         // DX11:FIRST_GAME_DRAW_FRAME. Called at the real game-authored R30
         // entrypoints (before stereo replay). All game draws still execute on
         // the original D3D9 pipeline, regardless of native diagnostic success.
+        // A failed CPU shadow capture is still one real game-authored D3D9
+        // Draw. Do not splice the next captured VB/IB draw into a native scene.
+        struct R30NativeGameSourceGuard {
+            IDirect3DDevice9* device = nullptr;
+            bool forwarded = false;
+            ~R30NativeGameSourceGuard() noexcept {
+                if (!forwarded)
+                    outrun::vr::dx11::live_game_frame::observe_unavailable_game_draw(device);
+            }
+        };
+
         void R30ObserveNativeLinearVB(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE topology, UINT firstVertex,
             UINT primitiveCount) noexcept
         {
             namespace live = outrun::vr::dx11::live_game_frame;
+            if (!live::diagnostic_enabled() || !device) return;
+            R30NativeGameSourceGuard nativeSource{device};
             UINT nativeElements = 0;
-            if (!live::diagnostic_enabled() || !device ||
+            if (
                 (topology != D3DPT_POINTLIST &&
                   topology != D3DPT_LINELIST &&
                   topology != D3DPT_LINESTRIP &&
@@ -3202,8 +3215,11 @@ namespace OutRunVRStereo
                     R30CopyVertexShadow(vb, static_cast<UINT>(firstByte),
                                         static_cast<UINT>(byteCount), bytes);
                 vb->Release();
-                if (valid) live::observe_linear(device, topology,
+                if (valid) {
+                    nativeSource.forwarded = true;
+                    live::observe_linear(device, topology,
                                 primitiveCount, bytes.data(), stride);
+                }
             } catch (...) { /* Native diagnostic must never alter game HRESULT. */ }
         }
 
@@ -3213,8 +3229,10 @@ namespace OutRunVRStereo
             UINT primitiveCount) noexcept
         {
             namespace live = outrun::vr::dx11::live_game_frame;
+            if (!live::diagnostic_enabled() || !device) return;
+            R30NativeGameSourceGuard nativeSource{device};
             UINT nativeElements = 0;
-            if (!live::diagnostic_enabled() || !device ||
+            if (
                 (topology != D3DPT_POINTLIST &&
                   topology != D3DPT_LINELIST &&
                   topology != D3DPT_LINESTRIP &&
@@ -3321,9 +3339,12 @@ namespace OutRunVRStereo
                 } else if (!validPhysicalIndices) ok = false;
                 ib->Release();
                 vb->Release();
-                if (ok) live::observe_indexed(device, topology, primitiveCount,
+                if (ok) {
+                    nativeSource.forwarded = true;
+                    live::observe_indexed(device, topology, primitiveCount,
                     vertices.data(), stride, nativeVertexCount,
                     indices.data(), count);
+                }
             } catch (...) { /* Preserve D3D9 draw even on allocation failure. */ }
         }
 
@@ -3333,8 +3354,10 @@ namespace OutRunVRStereo
             const void* vertices, UINT stride) noexcept
         {
             namespace live = outrun::vr::dx11::live_game_frame;
+            if (!live::diagnostic_enabled() || !device) return;
+            R30NativeGameSourceGuard nativeSource{device};
             UINT nativeElements = 0;
-            if (!live::diagnostic_enabled() || !device ||
+            if (
                 (topology != D3DPT_POINTLIST &&
                   topology != D3DPT_LINELIST &&
                   topology != D3DPT_LINESTRIP &&
@@ -3367,6 +3390,7 @@ namespace OutRunVRStereo
                 }
                 const auto* firstVertex = static_cast<const std::uint8_t*>(vertices) +
                     static_cast<std::size_t>(minVertex) * stride;
+                nativeSource.forwarded = true;
                 live::observe_indexed(device, topology, primitiveCount,
                     firstVertex, stride, numVertices, unpacked.data(), count);
             } catch (...) { /* Original UP path remains authoritative. */ }
