@@ -2063,7 +2063,14 @@ def main() -> None:
     rt_tokens = (
         "const bool gpuRenderTarget = base.Pool == D3DPOOL_DEFAULT &&",
         "(base.Usage & D3DUSAGE_RENDERTARGET) != 0u",
-        "(base.Format == D3DFMT_A8R8G8B8 ||\n         base.Format == D3DFMT_X8R8G8B8);",
+        "const native_rt_readback::Layout rtLayout =",
+        "base.Format == D3DFMT_A8R8G8B8 ? native_rt_readback::Layout::argb8",
+        "base.Format == D3DFMT_X8R8G8B8 ? native_rt_readback::Layout::xrgb8",
+        "base.Format == D3DFMT_A8B8G8R8 ? native_rt_readback::Layout::a8b8g8r8",
+        "base.Format == D3DFMT_X8B8G8R8 ? native_rt_readback::Layout::x8b8g8r8",
+        "base.Format == D3DFMT_A2R10G10B10 ? native_rt_readback::Layout::a2r10g10b10",
+        "base.Format == D3DFMT_A2B10G10R10 ? native_rt_readback::Layout::a2b10g10r10",
+        "native_rt_readback::sampleable(rtLayout, capture.srgbTexture);",
         "if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
         "capture.texture->GetSurfaceLevel(0, sourceSurface.GetAddressOf())",
         "sourceDesc.MultiSampleType != D3DMULTISAMPLE_NONE",
@@ -2077,6 +2084,8 @@ def main() -> None:
         "readbackSurface->LockRect(&lock, nullptr, D3DLOCK_READONLY)",
         "capture.texture->LockRect(level, &lock, nullptr, D3DLOCK_READONLY)",
         "if (gpuRenderTarget) readbackSurface->UnlockRect();",
+        "if (!native_rt_readback::unpack_row(",
+        "source, destination, desc.Width, rtLayout)",
         "else capture.texture->UnlockRect(level);",
         "desc.Usage = D3D11_USAGE_IMMUTABLE;",
         "dev->CreateShaderResourceView(texture.Get(), nullptr,",
@@ -2095,15 +2104,23 @@ def main() -> None:
     for token in rt_tokens:
         mutant = bridge.replace(token, "/* disconnected 00560 RT producer */", 1)
         assert mutant != bridge and not rt_game_native_connected(mutant), token
-    for pool, usage_rt, fmt, expected in (
-        ("DEFAULT", True, "A8R8G8B8", True),
-        ("DEFAULT", True, "X8R8G8B8", True),
-        ("DEFAULT", False, "A8R8G8B8", False),
-        ("DEFAULT", True, "DXT1", False),
-        ("DEFAULT", True, "A1R5G5B5", False),
-        ("MANAGED", True, "A8R8G8B8", False),
+    for pool, usage_rt, fmt, srgb, expected in (
+        ("DEFAULT", True, "A8R8G8B8", False, True),
+        ("DEFAULT", True, "X8R8G8B8", True, True),
+        ("DEFAULT", True, "A8B8G8R8", False, True),
+        ("DEFAULT", True, "X8B8G8R8", True, True),
+        ("DEFAULT", True, "A2R10G10B10", False, True),
+        ("DEFAULT", True, "A2B10G10R10", False, True),
+        ("DEFAULT", True, "A2R10G10B10", True, False),
+        ("DEFAULT", True, "A2B10G10R10", True, False),
+        ("DEFAULT", False, "A8B8G8R8", False, False),
+        ("DEFAULT", True, "DXT1", False, False),
+        ("DEFAULT", True, "A1R5G5B5", False, False),
+        ("MANAGED", True, "A8R8G8B8", False, False),
     ):
-        gpu_rt = pool == "DEFAULT" and usage_rt and fmt in ("A8R8G8B8", "X8R8G8B8")
+        sampleable = fmt in ("A8R8G8B8", "X8R8G8B8", "A8B8G8R8", "X8B8G8R8") or (
+            not srgb and fmt in ("A2R10G10B10", "A2B10G10R10"))
+        gpu_rt = pool == "DEFAULT" and usage_rt and sampleable
         assert gpu_rt is expected
     # Reject even a permitted DEFAULT RT without exact format and non-MSAA
     # surface metadata. The GPU readback is diagnostic opt-in, not an HMD PASS.

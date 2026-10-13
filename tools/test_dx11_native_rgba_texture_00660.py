@@ -10,7 +10,9 @@ def connected(src):
         draw = src.split("bool submit(", 1)[1].split("void before_game_present(", 1)[0]
     except IndexError:
         return False
+    rgba_branch = mirror.split("else if (rgbaSwizzle)", 1)[1].split("else if (tenBit)", 1)[0]
     return ('#include "live_game_rgba_texture.hpp"' in src
+        and "base.Format == D3DFMT_X8B8G8R8 ?" in rgba_branch
         and all(s in mirror for s in (
             "base.Format == D3DFMT_A8B8G8R8 ||",
             "base.Format == D3DFMT_X8B8G8R8;",
@@ -53,7 +55,15 @@ def main():
     )
     for old, broken in mutations:
         assert old in src, "missing original source: " + old
-        assert not connected(src.replace(old, broken, 1)), "destructive mutation escaped: " + old
+        # 00691's earlier format-to-layout ternary also names X8B8G8R8.
+        # Mutate the last occurrence, which owns the actual CPU swizzle
+        # of non-DEFAULT source mips; never mutate a different feature's gate.
+        if old == 'base.Format == D3DFMT_X8B8G8R8 ?':
+            prefix, match, suffix = src.rpartition(old)
+            mutant = prefix + broken + suffix if match else src
+        else:
+            mutant = src.replace(old, broken, 1)
+        assert not connected(mutant), "destructive mutation escaped: " + old
     print(f"00660 PASS: {len(mutations)} live RGBA/mip/Draw destructive mutations; HMD UNTESTED")
 
 
