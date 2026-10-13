@@ -12,6 +12,7 @@ def connected(code):
     observer = code[code.index("void observe(IDirect3DDevice9*"):code.index("void observe_linear(")]
     unavailable = code[code.index("void observe_unavailable_game_draw("):code.index("void before_game_present(")]
     present = code[code.index("void before_game_present("):code.index("void before_game_reset(")]
+    normal_present = present[:present.index("} catch (...)")]
     reset = code[code.index("void before_game_reset("):]
     return (
         "s.sourceGameDevice != current" in code and
@@ -24,7 +25,8 @@ def connected(code):
         "oldest.provenance.same_device(presentDevice)" in present and
         "next.provenance.sourceDevice = presentDevice;" in present and
         present.index("next.provenance.sourceDevice = presentDevice;") < present.index("ctx->End(next.fence.Get());") and
-        "s.sourceGameDevice = 0u;" in present and
+        "s.sourceGameDevice = 0u;" in normal_present and
+        "s.sourceGameDevice = 0u;" in present[present.index("} catch (...)"):] and
         "s.sourceGameDevice = 0u;" in reset
     )
 assert connected(cpp), "real game device/Draw/native GPU/Present path disconnected"

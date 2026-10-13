@@ -105,8 +105,8 @@
     "C0_RECOVER": "PASS confirmed 00680 exact-SHA 5 Gates; inspected latest GitHub HEAD",
     "C1_REVIEW": "CONFIRMED missing D3D9 source device identity on native Draw batch/readback/Present",
     "C2_IMPLEMENT": "PASS actual native draw and GPU-to-game Present integration changed",
-    "C3_VALIDATE": "First SHA 4491cc33b90fd627b730b1c04e202af00d5b0f38 DX11 Fast failed: legacy 00680 test assumed exact old if-expression. Expanded existing regression to require both freshness and same D3D9 present device; five mandatory Gate rerun on repair SHA.",
-    "C4_COMMIT": "Initial material SHA 4491cc33b90fd627b730b1c04e202af00d5b0f38; CI repair commit pending",
+    "C3_VALIDATE": "First SHA 4491cc33 failed old 00680 string binding; repair SHA bd3dc04d passed 00680 but new 00681 destructive reset mutant found a second catch reset. Strengthen normal-Present vs exception-Present reset assertions before exact-SHA five-Gate verification.",
+    "C4_COMMIT": "Initial native implementation SHA 4491cc33, old regression repair bd3dc04d; remaining destructive test repair in next commit.",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_EXACT_SHA_GATES"
   },
