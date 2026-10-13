@@ -363,10 +363,10 @@ def verify_menu_bar_clip_state(code: str) -> None:
     )
     # The live-resize predicate occurs earlier in EndScene as well. Anchor
     # the ordering check at the snapshot owner, not the first matching token.
-    clip_start = endscene.index("const bool clipStateReady =")
+    clip_start = endscene.index("bool clipStateReady =")
     order = [endscene.index(item, clip_start) for item in required]
     assert order == sorted(order) and len(set(order)) == len(order)
-    assert endscene.count("if (clipStateReady)") == 1
+    assert endscene.count("if (clipStateReady)") == 2
     # A failed state snapshot gates ALL sidebar draws, not the ImGui branch.
     assert endscene.index("if (clipStateReady)") < endscene.index(
         "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);")
@@ -477,7 +477,7 @@ def verify_menu_opaque_mask(code: str) -> None:
     assert points == sorted(points) and len(set(points)) == len(points)
     # No new state touches outside the guarded menu bar draw. Missing
     # snapshots must skip the bars, not corrupt following F11/game draws.
-    assert endscene.count("if (clipStateReady)") == 1
+    assert endscene.count("if (clipStateReady)") == 2
     assert endscene.count("d3ddev->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);") == 1
     assert endscene.count("d3ddev->SetRenderState(D3DRS_COLORWRITEENABLE, prevColorWrite);") == 1
 
