@@ -37,14 +37,22 @@ namespace OutRunVRStereo
             ageMs = INT64_MAX;
             if (sampleQpc <= 0)
                 return false;
+            // QPC frequency is invariant for the boot: avoid a second
+            // kernel query on every healthy game Present.
+            static const LONGLONG frequency = []() noexcept {
+                LARGE_INTEGER value{};
+                return QueryPerformanceFrequency(&value) != FALSE
+                    ? value.QuadPart : 0;
+            }();
             LARGE_INTEGER now{};
-            LARGE_INTEGER frequency{};
-            if (!QueryPerformanceCounter(&now) ||
-                !QueryPerformanceFrequency(&frequency) ||
-                frequency.QuadPart <= 0 || now.QuadPart < sampleQpc)
+            if (frequency <= 0 || !QueryPerformanceCounter(&now) ||
+                now.QuadPart < sampleQpc)
                 return false;
             const std::int64_t delta = now.QuadPart - sampleQpc;
-            ageMs = (delta * 1000) / frequency.QuadPart;
+            // Never mistake an overflowing stale age for a fresh frame.
+            if (delta > INT64_MAX / 1000)
+                return false;
+            ageMs = (delta * 1000) / frequency;
             return true;
         }
 
@@ -56,9 +64,7 @@ namespace OutRunVRStereo
             sampleQpc = 0;
             ageMs = INT64_MAX;
 
-            if (!SharedState || SharedState->magic != OutRunVR::SharedMagic ||
-                SharedState->protocolVersion != OutRunVR::SharedProtocolVersion ||
-                SharedState->structSize != sizeof(OutRunVR::SharedPoseState))
+            if (!SharedState)
                 return R21HostStatus::Stale;
 
             for (int attempt = 0; attempt < 4; ++attempt)
@@ -67,6 +73,11 @@ namespace OutRunVRStereo
                 if (before & 1u)
                     continue;
                 MemoryBarrier();
+                // Header and liveness must be from the same seqlock
+                // generation, including a mapping handoff or reset.
+                const std::uint32_t headerMagic = SharedState->magic;
+                const std::uint32_t headerVersion = SharedState->protocolVersion;
+                const std::uint32_t headerSize = SharedState->structSize;
                 const std::uint32_t pid = SharedState->hostPid;
                 const std::uint32_t currentFlags = SharedState->flags;
                 const std::uint32_t currentHeartbeat = SharedState->heartbeat;
@@ -75,6 +86,10 @@ namespace OutRunVRStereo
                 const std::uint32_t after = SharedState->sequence;
                 if (before != after || (after & 1u))
                     continue;
+                if (headerMagic != OutRunVR::SharedMagic ||
+                    headerVersion != OutRunVR::SharedProtocolVersion ||
+                    headerSize != sizeof(OutRunVR::SharedPoseState))
+                    return R21HostStatus::Stale;
 
                 hostPid = pid;
                 flags = currentFlags;

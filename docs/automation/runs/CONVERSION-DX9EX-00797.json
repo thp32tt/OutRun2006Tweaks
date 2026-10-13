@@ -1,0 +1,83 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00797",
+  "production_id": "CONVERSION-DX9EX-00797",
+  "event_id": "CONVERSION-DX9EX-00797-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R21_HOST_PRESENT_CLOCK_AND_COHERENCE",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R21_HOST_PRESENT_CLOCK_AND_COHERENCE",
+  "status": "NEEDS_VALIDATION",
+  "checkpoint": "C4_COMMIT",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00797]",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r21.cpp",
+    "tools/verify_vr_r21_host_clock_fastpath.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00797.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R21_HOST_PRESENT_CLOCK_AND_COHERENCE",
+    "goal": "Improve game-Present host freshness performance and correct coherent IPC liveness to retain stereo through healthy and soft-suspended frames, but fail closed for stale host.",
+    "scope_boundary": "R21 Present liveness and its automated test/workflow only; no HUD, world stereo path, SkyGlow, input/FFB, R23 draw, DX11 or DXVK changes.",
+    "special_work_evidence": "Prior source calls QueryPerformanceFrequency for every healthy host Present although it is boot invariant; schema header was read outside host heartbeat seqlock. Now the clock frequency is cached once per process and header/host fields share the same sequence generation. API-call reduction is source-derived, not a measured headset FPS gain.",
+    "trace_stages": [
+      "Host writes IPC heartbeat/flags and schema under a seqlock; R21 receives game's Present hook.",
+      "R21 captures a single coherent header and heartbeat and calculates a bounded millisecond age with cached QPC frequency.",
+      "RuntimeEligibility fresh/soft/stale transitions gate R9 and downstream R23 per-eye stereo/host transport."
+    ],
+    "subcomponents": [
+      "Move host IPC header into bounded seqlock reads, rejecting a torn/invalid header only from a stable sample.",
+      "Cache invariant QPC frequency while reading current time every Present; reject massive overflowed stale timestamps before arithmetic.",
+      "Register deterministic status/clock/mapping mutation verifier in exact-SHA Win32 workflow, preserving HMD separation."
+    ],
+    "acceptance_items": [
+      {
+        "id": "R21_PRESENT_CLOCK_FASTPATH",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_present_clock_api_calls",
+        "expected_behavior": "Each valid Present uses a fresh QPC timestamp but only one cached boot frequency query for entire process."
+      },
+      {
+        "id": "R21_SEQLock_LOSS_AND_SOFT",
+        "category": "fallback_regression",
+        "behavior_area": "ipc_schema_soft_hold_and_loss",
+        "expected_behavior": "Coherent header/host sample rejects torn/stale/overflow; fresh and shouldRender-disabled retain correct separate eligibility, transient read grace unchanged."
+      },
+      {
+        "id": "R21_EXACT_SHA_WINDOWS",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_host_package_and_domain",
+        "expected_behavior": "Negative verifier and same-SHA DX9Ex Active game/host/full-chain/package, Domain and Full Source Impact gates pass when applicable."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "R21_PRESENT_CLOCK_FASTPATH": "PENDING",
+    "R21_SEQLock_LOSS_AND_SOFT": "PENDING",
+    "R21_EXACT_SHA_WINDOWS": "PENDING",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "R21ComputeAgeMs calls QueryPerformanceFrequency for every successfully sampled Present and checks IPC schema without a sequence snapshot.",
+    "root_cause": "Immutable QPC frequency sampled per game frame and IPC schema validated independently of its current heartbeat.",
+    "source_trace": [
+      "Game R21 Present hook reads SharedState.",
+      "R21 age and schema drive fresh, soft-suspend or fail-closed RuntimeEligibility.",
+      "R9/R23 read gate decision before eye replay/host publishing."
+    ],
+    "alternatives_rejected": [
+      "Caching QPC current time would silently allow a dead host to appear fresh.",
+      "Ignoring invalid schema even after a coherent read can resume from corrupted shared memory.",
+      "Unchecked signed delta multiplication could wrap stale host timestamps to a short age."
+    ],
+    "fix_evidence": "Same-generation schema/heartbeat, cached frequency, overflow rejection, fail-closed fallback.",
+    "negative_test_evidence": "Eight independent status input cases plus eleven destructive changes registered in CI."
+  }
+}

@@ -70,6 +70,7 @@ on:
       - 'tools/verify_vr_r13_ack_fence_fastpath.py'
       - 'tools/verify_vr_r7_direct_fence_poll.py'
       - 'tools/verify_vr_r27_effect_fastpath.py'
+      - 'tools/verify_vr_r21_host_clock_fastpath.py'
       - 'tools/verify_vr_r23_host_fresh_fastpath.py'
       - 'tools/verify_vr_r23_pipeline_aggregation_fastpath.py'
       - 'tools/verify_vr_r23_direct_ring_read_fastpath.py'
@@ -343,6 +344,7 @@ jobs:
             'tools/verify_vr_capture_metadata_fastpath.py',
             'tools/verify_vr_r28_active_frame_pacing.py',
             'tools/verify_vr_r26_occlusion_present_fastpath.py',
+            'tools/verify_vr_r21_host_clock_fastpath.py',
             'tools/verify_vr_desktop_capture_reuse.py',
             'tools/verify_vr_theater_capture_once.py',
             'tools/verify_vr_final_submission_contract.py',
