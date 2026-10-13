@@ -10,14 +10,14 @@
   "feature_id": "DX9EX:PERF:R23_RT0_RASTER_FASTPATH",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R23_RT0_RASTER_FASTPATH",
-  "status": "IMPLEMENTED_WAITING_CI",
-  "checkpoint": "C4_MATERIAL",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00794]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "score_delta": 1,
+  "material_result_sha": "8d24a17b7faf03ec8e83aca91487060852370954",
+  "validation_bearing_result_sha": "8d24a17b7faf03ec8e83aca91487060852370954",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r23.cpp",
     "tools/verify_vr_r23_raster_setrt_fastpath.py",
@@ -61,9 +61,9 @@
     ]
   },
   "acceptance_results": {
-    "TRUSTED_RT0_GEOMETRY_LIVE": "PENDING_GATE",
-    "UNTRUSTED_RESET_FAILCLOSED": "PENDING_GATE",
-    "R23_EXACT_SHA_GATE": "PENDING_GATE",
+    "TRUSTED_RT0_GEOMETRY_LIVE": "PASS",
+    "UNTRUSTED_RESET_FAILCLOSED": "PASS",
+    "R23_EXACT_SHA_GATE": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -82,5 +82,43 @@
     "fix_evidence": "C++ R23 material changes capture live viewport/scissor but inherit scissor enable only under reliable tracked shadow and preserve failure/epoch logic.",
     "negative_test_evidence": "Six destructive source mutations guard shadow validity, both geometry getters, full fallback and error handling; positive model enumerates reliability, validity, enable state and simulated read failures."
   },
-  "runtime_status": "NEED_QUEST3_VDXR_SCENE_MATCHED_PERFORMANCE_TEST"
+  "runtime_status": "NEED_QUEST3_VDXR_PERFORMANCE_AND_RESET_TEST",
+  "result_sha": "8d24a17b7faf03ec8e83aca91487060852370954",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "8d24a17b7faf03ec8e83aca91487060852370954",
+    "dx9ex_active": {
+      "run_id": 38452065105,
+      "head_sha": "8d24a17b7faf03ec8e83aca91487060852370954",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "game": "SUCCESS",
+        "host": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38452065109,
+      "head_sha": "8d24a17b7faf03ec8e83aca91487060852370954",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "domain-isolation": "SUCCESS"
+      }
+    },
+    "full_source_impact": {
+      "run_id": 38452065183,
+      "head_sha": "8d24a17b7faf03ec8e83aca91487060852370954",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "source-cross-domain": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "msvc-analyze-active-game": "SUCCESS"
+      }
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+    "performance_evidence": "source API call count improves 3 to 2 getters on trusted RT0 only; p95/p99 and FPS NOT_MEASURED"
+  },
+  "validation_note": "C6 exact immutable source SHA: Active 5/5, Domain 1/1, Full Impact 3/3 all SUCCESS. Unlike existing HUD/F11 fixes, R23 RT0 raster CPU-query work is independent; score delta +1 once if scoreboard SSOT confirms no duplicate key. Quest3/VDXR UNTESTED. No CI-skip on material commit; C6 bookkeeping alone uses [skip ci]."
 }
