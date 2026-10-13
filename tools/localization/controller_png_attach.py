@@ -26,6 +26,11 @@ def load_binding(role, root=ROOT):
     """Return (binding, reason). Missing/invalid inputs MUST NOT send text only."""
     if role not in ("A", "B"):
         return None, "NOT_A_PRODUCER"
+    pilot = os.environ.get("OUTRUN_A_SINGLE_SMOKE_TASK_ID", "").strip()
+    if pilot and not TASK.fullmatch(pilot):
+        return None, "INVALID_PILOT_TASK_ID"
+    if pilot and role != "A":
+        return None, "PILOT_ROLE_BLOCKED"
     root = Path(root).resolve()
     manifest = root / ("pending_" + role + ".json")
     if not manifest.is_file() or manifest.is_symlink():
@@ -43,6 +48,8 @@ def load_binding(role, root=ROOT):
         rel = entry.get("png")
         if not isinstance(task, str) or not TASK.fullmatch(task):
             return None, "INVALID_TASK_ID"
+        if pilot and task != pilot:
+            return None, "PILOT_TASK_ID_MISMATCH"
         if not isinstance(digest, str) or not SHA.fullmatch(digest):
             return None, "INVALID_PNG_SHA"
         if not isinstance(source_digest, str) or not SHA.fullmatch(source_digest):
