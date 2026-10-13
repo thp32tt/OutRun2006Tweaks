@@ -1,0 +1,77 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00758",
+  "production_id": "CONVERSION-DX9EX-00758",
+  "event_id": "CONVERSION-DX9EX-00758-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00758",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "76ac79c094af6b6c7c98d233873bfde1085d124c",
+  "material_result_sha": "76ac79c094af6b6c7c98d233873bfde1085d124c",
+  "validation_bearing_result_sha": "76ac79c094af6b6c7c98d233873bfde1085d124c",
+  "result_sha": "76ac79c094af6b6c7c98d233873bfde1085d124c",
+  "material_commits": [
+    "76ac79c094af6b6c7c98d233873bfde1085d124c"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119: improve opt-in exact-producer driving HUD text readability without clipping either XR eye, stereo disparity drift, or altering F11, menus, world/SkyGlow/FFB and non-DX9Ex branches.",
+    "completed_scope": "Bound exact speed/rank/time HUD enlarged glyphs toward a 0.65 viewport-height legibility target using a shared binocular feasible-shift test; preserve existing 0.90 source baseline on no feasible fit. Regression tests cover 4:3/16:9/21:9, portrait XR, bilateral offset, oversized geometry and invalid eye inputs.",
+    "remaining_acceptance": [
+      "Issue #119 whole responsive HUD/main/ESC/F11 integrated acceptance remains IN_PROGRESS.",
+      "Matching Quest3/VDXR optical legibility, performance, menu, input and stereo acceptance remains NEED_HMD_TEST."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "DX9EX_POLICY_EXACT_SHA_SUCCESS",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "dx9ex_full_chain": "SUCCESS_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38362628440,
+      "head_sha": "76ac79c094af6b6c7c98d233873bfde1085d124c",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "policy, game, host, full-chain-compile, package: 5/5 SUCCESS"
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38362628408,
+      "head_sha": "76ac79c094af6b6c7c98d233873bfde1085d124c",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "domain-isolation SUCCESS"
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38362628420,
+      "head_sha": "76ac79c094af6b6c7c98d233873bfde1085d124c",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "msvc-analyze-active-game, msvc-analyze-openxr-host, source-cross-domain: 3/3 SUCCESS"
+    }
+  ],
+  "score_delta": 0,
+  "score_reason": "Continuing feature Issue #119/work_key; material improvement is one subchange of a nonterminal integrated feature, no duplicate credit for existing feature/task.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "Material SHA retained for exact GitHub Actions Gate. C6 metadata added after exact-SHA workflows completed; separate bookkeeping [skip ci] commit only. Quest3 headset/game not launched in this chat; no runtime PASS claim."
+}
