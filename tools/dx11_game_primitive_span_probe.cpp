@@ -90,5 +90,32 @@ int main() {
     assert(!game_compact_sparse_indices(nullptr, 3u, 3u,
                                        uniqueSlots, remapped));
     assert(remapped == previouslyMapped);
+    // 00672: a full 512-triangle game mesh may use 1536 non-contiguous
+    // physical VB slots. Compact the real index order without reading holes.
+    using outrun::vr::dx11::live_game_frame::kMaxNativeGameVertices;
+    static_assert(kMaxNativeGameVertices == 512u * 3u);
+    std::vector<std::uint32_t> fullMesh(kMaxNativeGameVertices);
+    for (std::uint32_t i = 0; i < kMaxNativeGameVertices; ++i)
+        fullMesh[i] = 100000u + (kMaxNativeGameVertices - 1u - i) * 7u;
+    assert(game_compact_sparse_indices(
+        fullMesh.data(), static_cast<std::uint32_t>(fullMesh.size()),
+        kMaxNativeGameVertices, uniqueSlots, remapped));
+    assert(uniqueSlots.size() == kMaxNativeGameVertices &&
+           remapped.size() == kMaxNativeGameVertices);
+    for (std::uint32_t i = 0; i < kMaxNativeGameVertices; ++i) {
+        assert(uniqueSlots[i] == 100000u + i * 7u);
+        assert(remapped[i] == kMaxNativeGameVertices - 1u - i);
+    }
+    // An oversubscribed request must leave the previously accepted native
+    // vertex/index snapshot intact; game D3D9 Draw still owns the fallback.
+    const auto fullUnique = uniqueSlots, fullRemap = remapped;
+    assert(!game_compact_sparse_indices(
+        fullMesh.data(), static_cast<std::uint32_t>(fullMesh.size()),
+        kMaxNativeGameVertices - 1u, uniqueSlots, remapped));
+    assert(uniqueSlots == fullUnique && remapped == fullRemap);
+    assert(!game_compact_sparse_indices(
+        fullMesh.data(), static_cast<std::uint32_t>(fullMesh.size()),
+        kMaxNativeGameVertices + 1u, uniqueSlots, remapped));
+    assert(uniqueSlots == fullUnique && remapped == fullRemap);
     return 0;
 }

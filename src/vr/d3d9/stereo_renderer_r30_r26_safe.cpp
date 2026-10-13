@@ -426,7 +426,8 @@ namespace OutRunVRStereo
             std::vector<std::uint8_t>& out)
         {
             if (!buffer || stride < 16u || stride > 512u ||
-                physical.empty() || physical.size() > 128u) return false;
+                physical.empty() || physical.size() >
+                    outrun::vr::dx11::live_game_frame::kMaxNativeGameVertices) return false;
             const auto entry = R30FindVertexShadow(buffer);
             if (!entry) { ++R30ShadowReadMisses; return false; }
             std::lock_guard<std::mutex> lock(entry->mutex);
@@ -4577,11 +4578,12 @@ namespace OutRunVRStereo
                 if (live::game_sparse_shadow_retry_eligible(
                         validPhysicalIndices, nativeVertexCount)) {
                     // Distant indexed VB slots (e.g. vehicle/track meshes):
-                    // gather only game-referenced vertices, at most 128, with
+                    // gather only game-referenced vertices, at most 1536, with
                     // epoch-valid shadow bytes and compact native indices.
                     std::vector<std::uint32_t> uniquePhysical, compact;
                     ok = live::game_compact_sparse_indices(
-                             indices.data(), count, 128u, uniquePhysical, compact) &&
+                             indices.data(), count,
+                             live::kMaxNativeGameVertices, uniquePhysical, compact) &&
                          R30CopySparseVertexShadow(
                              vb, streamOffset, stride, uniquePhysical, vertices);
                     if (ok) {

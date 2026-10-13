@@ -5,6 +5,10 @@
 #include <vector>
 
 namespace outrun::vr::dx11::live_game_frame {
+// A complete D3D9 DrawIndexedPrimitive TRIANGLELIST can reference up to
+// 512 * 3 distinct vertices. Bound the live sparse capture to that same
+// 1536-element native Draw input limit (not the former 128-vertex probe cap).
+inline constexpr std::uint32_t kMaxNativeGameVertices = 1536u;
 // Common bound for actual D3D9 VB/IB/UP snapshots and D3D11 Draw/DrawIndexed.
 // A strip has P+2 source elements; a list has P*3. Never infer either from
 // the other: overreading a live game pointer could break the original draw.
@@ -65,8 +69,8 @@ inline bool game_compact_sparse_indices(
     const std::uint32_t* physicalIndices, std::uint32_t count,
     std::uint32_t maxUnique, std::vector<std::uint32_t>& uniquePhysical,
     std::vector<std::uint32_t>& compactIndices) {
-    if (!physicalIndices || count == 0u || count > 1536u ||
-        maxUnique == 0u || maxUnique > 1536u) return false;
+    if (!physicalIndices || count == 0u || count > kMaxNativeGameVertices ||
+        maxUnique == 0u || maxUnique > kMaxNativeGameVertices) return false;
     std::vector<std::uint32_t> sorted(physicalIndices, physicalIndices + count);
     std::sort(sorted.begin(), sorted.end());
     sorted.erase(std::unique(sorted.begin(), sorted.end()), sorted.end());
