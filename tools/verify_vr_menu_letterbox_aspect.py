@@ -349,7 +349,7 @@ def verify_menu_bar_clip_state(code: str) -> None:
     endscene = code.split("static void D3DEndScene(", 1)[1].split(
         "if (overlayInited)", 1)[0]
     required = (
-        "const bool clipStateReady =",
+        "bool clipStateReady =",
         "(!Game::is_in_game() || Settings::UILetterboxing == 2) &&",
         "SUCCEEDED(d3ddev->GetRenderState(D3DRS_SCISSORTESTENABLE, &prevScissorTest))",
         "SUCCEEDED(d3ddev->GetRenderState(D3DRS_STENCILENABLE, &prevStencilEnable))",
@@ -559,3 +559,72 @@ for original, replacement in solid_fog_mutants:
     else:
         raise AssertionError("Fog/fill destructive mutant escaped: " + original)
 print("PASS main menu solid-fill and fog-free bars, original state restore, 6 destructive mutants")
+
+
+# Issue #119: game UI can leave the viewport clipped to the 4:3 content
+# rectangle even after restoring scissor/stencil. Full-width black bars
+# must render into the source backbuffer and restore the game viewport.
+def verify_menu_full_viewport(source: str) -> None:
+    body = source.split("static void D3DEndScene(", 1)[1].split(
+        "if (overlayInited)", 1)[0]
+    capture = body.index("D3DVIEWPORT9 previousViewport{};")
+    gate = body.index("bool clipStateReady =")
+    switch = body.index("d3ddev->SetViewport(&barViewport)")
+    draw_l = body.index("d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);")
+    draw_r = body.index("d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);")
+    restore = body.index("d3ddev->SetViewport(&previousViewport)")
+    assert capture < gate < switch < draw_l < draw_r < restore
+    for value in (
+        "currentSize->x <= 16384.0f && currentSize->y <= 16384.0f",
+        "std::floor(currentSize->x) == currentSize->x",
+        "std::floor(currentSize->y) == currentSize->y",
+        "SUCCEEDED(d3ddev->GetViewport(&previousViewport))",
+        "barViewport = previousViewport;",
+        "barViewport.X = 0;",
+        "barViewport.Y = 0;",
+        "barViewport.Width = static_cast<DWORD>(currentSize->x);",
+        "barViewport.Height = static_cast<DWORD>(currentSize->y);",
+        "if (overrideViewport)",
+        "clipStateReady = SUCCEEDED(d3ddev->SetViewport(&barViewport));",
+        "d3ddev->SetViewport(&previousViewport);",
+    ):
+        assert value in body, value
+    assert body.count("d3ddev->SetViewport(&barViewport)") == 1
+    assert body.count("d3ddev->SetViewport(&previousViewport)") == 1
+    assert body.count("if (clipStateReady)") == 2
+    assert body.index("if (clipStateReady)", switch) < draw_l
+    assert restore < len(body)
+
+verify_menu_full_viewport(src)
+for good,bad in (
+    ("SUCCEEDED(d3ddev->GetViewport(&previousViewport))", "true"),
+    ("barViewport.X = 0;", "barViewport.X = previousViewport.X;"),
+    ("barViewport.Y = 0;", "barViewport.Y = previousViewport.Y;"),
+    ("barViewport.Width = static_cast<DWORD>(currentSize->x);",
+     "barViewport.Width = previousViewport.Width;"),
+    ("barViewport.Height = static_cast<DWORD>(currentSize->y);",
+     "barViewport.Height = previousViewport.Height;"),
+    ("clipStateReady = SUCCEEDED(d3ddev->SetViewport(&barViewport));",
+     "clipStateReady = true;"),
+    ("d3ddev->SetViewport(&previousViewport);",
+     "d3ddev->SetViewport(&barViewport);"),
+):
+    assert good in src
+    try:
+        verify_menu_full_viewport(src.replace(good,bad,1))
+    except (AssertionError,ValueError):
+        pass
+    else:
+        raise AssertionError("Menu full-viewport destructive mutant survived: "+good)
+# Source & eye dimensions remain separate. The source viewport is
+# reinstated only during bars and never enlarged in portrait/no-bars mode.
+for width,height in ((1024,768),(1920,1080),(3440,1440),
+                     (2560,1080),(2496,2688)):
+    bars = width > height * (4/3)
+    previous = (max(0,(width-height*4//3)//2), 0,
+                min(width,height*4//3), height)
+    desired = (0,0,width,height)
+    if bars:
+        assert desired[2] >= previous[2] and desired[3] == previous[3]
+    assert width < 16384 and height < 16384
+print("PASS D3D9Ex full-source menu viewport and exact restore; 7 destructive mutants")

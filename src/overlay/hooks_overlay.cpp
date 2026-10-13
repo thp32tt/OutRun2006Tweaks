@@ -181,14 +181,43 @@ class D3DHooks : public Hook
 			DWORD prevColorWrite = 0;
 			DWORD prevFogEnable = FALSE;
 			DWORD prevFillMode = D3DFILL_SOLID;
-			const bool clipStateReady =
+			// The game's last menu pass may leave a centred 4:3 viewport.
+			// Scissor/stencil overrides cannot make the side rails visible
+			// outside that viewport. Capture it before drawing any opaque bars.
+			D3DVIEWPORT9 previousViewport{};
+			D3DVIEWPORT9 barViewport{};
+			bool overrideViewport = false;
+			const bool validViewportSize =
+				currentSize->x <= 16384.0f && currentSize->y <= 16384.0f &&
+				std::floor(currentSize->x) == currentSize->x &&
+				std::floor(currentSize->y) == currentSize->y;
+			bool clipStateReady =
 				(!Game::is_in_game() || Settings::UILetterboxing == 2) &&
 				SUCCEEDED(d3ddev->GetRenderState(D3DRS_SCISSORTESTENABLE, &prevScissorTest)) &&
 				SUCCEEDED(d3ddev->GetRenderState(D3DRS_STENCILENABLE, &prevStencilEnable)) &&
 				SUCCEEDED(d3ddev->GetRenderState(D3DRS_ALPHATESTENABLE, &prevAlphaTest)) &&
 				SUCCEEDED(d3ddev->GetRenderState(D3DRS_COLORWRITEENABLE, &prevColorWrite)) &&
 				SUCCEEDED(d3ddev->GetRenderState(D3DRS_FOGENABLE, &prevFogEnable)) &&
-				SUCCEEDED(d3ddev->GetRenderState(D3DRS_FILLMODE, &prevFillMode));
+				SUCCEEDED(d3ddev->GetRenderState(D3DRS_FILLMODE, &prevFillMode)) &&
+				validViewportSize &&
+				SUCCEEDED(d3ddev->GetViewport(&previousViewport));
+			if (clipStateReady)
+			{
+				barViewport = previousViewport; // Keep the game's Z range.
+				barViewport.X = 0;
+				barViewport.Y = 0;
+				barViewport.Width = static_cast<DWORD>(currentSize->x);
+				barViewport.Height = static_cast<DWORD>(currentSize->y);
+				overrideViewport =
+					previousViewport.X != barViewport.X ||
+					previousViewport.Y != barViewport.Y ||
+					previousViewport.Width != barViewport.Width ||
+					previousViewport.Height != barViewport.Height;
+				// A failed full-viewport transition must not draw clipped bars,
+				// and must never prevent the following F11 ImGui frame.
+				if (overrideViewport)
+					clipStateReady = SUCCEEDED(d3ddev->SetViewport(&barViewport));
+			}
 			if (clipStateReady)
 			{
 				// This runs after SceneControl has finished, so anything left set here carries
@@ -315,6 +344,9 @@ class D3DHooks : public Hook
 				d3ddev->SetStreamSource(0, prevStreamData, prevStreamOffset, prevStreamStride);
 				if (prevStreamData)
 					prevStreamData->Release();
+				// Restore exact X/Y/width/height and Z range for next game pass.
+				if (overrideViewport)
+					d3ddev->SetViewport(&previousViewport);
 			}
 		}
 
