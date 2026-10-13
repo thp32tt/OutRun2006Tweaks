@@ -170,8 +170,18 @@ class D3DHooks : public Hook
 		{
 			IDirect3DDevice9* d3ddev = Game::D3DDevice();
 
-			// Only show letterboxing if not in game, or UILetterboxing is 2
-			if (!Game::is_in_game() || Settings::UILetterboxing == 2)
+			// Only show letterboxing if not in game, or UILetterboxing is 2.
+			// The game can leave scissor/stencil clipping enabled after its last
+			// menu draw. Do not let that clip the 4:3 sidebars, and restore the
+			// exact game state before ImGui or the next scene. Missing GetRenderState
+			// evidence skips only the sidebars, never the F11 overlay below.
+			DWORD prevScissorTest = FALSE;
+			DWORD prevStencilEnable = FALSE;
+			const bool clipStateReady =
+				(!Game::is_in_game() || Settings::UILetterboxing == 2) &&
+				SUCCEEDED(d3ddev->GetRenderState(D3DRS_SCISSORTESTENABLE, &prevScissorTest)) &&
+				SUCCEEDED(d3ddev->GetRenderState(D3DRS_STENCILENABLE, &prevStencilEnable));
+			if (clipStateReady)
 			{
 				// This runs after SceneControl has finished, so anything left set here carries
 				// into the next frame. The game's material layer keeps its own copies of device
@@ -204,6 +214,10 @@ class D3DHooks : public Hook
 				d3ddev->GetVertexDeclaration(&prevVertexDecl);
 				d3ddev->GetStreamSource(0, &prevStreamData, &prevStreamOffset, &prevStreamStride);
 
+				// Neither the prior menu scissor nor its stencil mask owns the
+				// outer bars. Keep this change scoped to their two draw calls.
+				d3ddev->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+				d3ddev->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 				// Borders get culled without this
 				d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
@@ -236,6 +250,10 @@ class D3DHooks : public Hook
 				// Draw right border
 				d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);
 
+				// Restore before all subsequent game/ImGui draws; a latched mask
+				// from the previous scene must neither clip the bars nor be lost.
+				d3ddev->SetRenderState(D3DRS_SCISSORTESTENABLE, prevScissorTest);
+				d3ddev->SetRenderState(D3DRS_STENCILENABLE, prevStencilEnable);
 				d3ddev->SetRenderState(D3DRS_CULLMODE, prevCullMode);
 				d3ddev->SetRenderState(D3DRS_ALPHABLENDENABLE, prevAlphaBlend);
 				d3ddev->SetRenderState(D3DRS_ZENABLE, prevZEnable);

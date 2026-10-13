@@ -342,3 +342,54 @@ for w, h in ((3440, 1440), (1920, 1080), (1024, 768), (2496, 2688)):
     cached = next_size  # successful widescreen VB or completed empty bars
     assert not should_rebuild(cached, next_size)
 print("PASS D3D9Ex transient Create/Lock/Unlock retry, 4:3 no-bars cache, 4 destructive controls")
+
+# Issue #119: EndScene menu bars must ignore only inherited game clip masks.
+# Keep the original scissor/stencil states intact for the next scene and F11.
+def verify_menu_bar_clip_state(code: str) -> None:
+    endscene = code.split("static void D3DEndScene(", 1)[1].split(
+        "if (overlayInited)", 1)[0]
+    required = (
+        "const bool clipStateReady =",
+        "(!Game::is_in_game() || Settings::UILetterboxing == 2) &&",
+        "SUCCEEDED(d3ddev->GetRenderState(D3DRS_SCISSORTESTENABLE, &prevScissorTest))",
+        "SUCCEEDED(d3ddev->GetRenderState(D3DRS_STENCILENABLE, &prevStencilEnable))",
+        "if (clipStateReady)",
+        "d3ddev->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);",
+        "d3ddev->SetRenderState(D3DRS_STENCILENABLE, FALSE);",
+        "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);",
+        "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);",
+        "d3ddev->SetRenderState(D3DRS_SCISSORTESTENABLE, prevScissorTest);",
+        "d3ddev->SetRenderState(D3DRS_STENCILENABLE, prevStencilEnable);",
+    )
+    order = [endscene.index(item) for item in required]
+    assert order == sorted(order) and len(set(order)) == len(order)
+    assert endscene.count("if (clipStateReady)") == 1
+    # A failed state snapshot gates ALL sidebar draws, not the ImGui branch.
+    assert endscene.index("if (clipStateReady)") < endscene.index(
+        "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);")
+    assert endscene.index("d3ddev->SetRenderState(D3DRS_STENCILENABLE, prevStencilEnable);") < endscene.index(
+        "d3ddev->SetRenderState(D3DRS_CULLMODE, prevCullMode);")
+
+verify_menu_bar_clip_state(src)
+for original, broken in (
+    ("if (clipStateReady)", "if (true)"),
+    ("SUCCEEDED(d3ddev->GetRenderState(D3DRS_SCISSORTESTENABLE, &prevScissorTest))", "true"),
+    ("SUCCEEDED(d3ddev->GetRenderState(D3DRS_STENCILENABLE, &prevStencilEnable))", "true"),
+    ("d3ddev->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);",
+     "d3ddev->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);"),
+    ("d3ddev->SetRenderState(D3DRS_STENCILENABLE, FALSE);",
+     "d3ddev->SetRenderState(D3DRS_STENCILENABLE, TRUE);"),
+    ("d3ddev->SetRenderState(D3DRS_SCISSORTESTENABLE, prevScissorTest);",
+     "d3ddev->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);"),
+    ("d3ddev->SetRenderState(D3DRS_STENCILENABLE, prevStencilEnable);",
+     "d3ddev->SetRenderState(D3DRS_STENCILENABLE, FALSE);"),
+):
+    assert original in src
+    damaged = src.replace(original, broken, 1)
+    try:
+        verify_menu_bar_clip_state(damaged)
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("Menu clip-state destructive mutant escaped: " + original)
+print("PASS 4:3 menu bars scissor/stencil isolation, F11 continuation and 7 destructive mutants")
