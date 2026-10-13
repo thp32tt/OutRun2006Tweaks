@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00682",
+  "production_id": "CONVERSION-DX11-00682",
+  "event_id": "CONVERSION-DX11-00682-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:MENU_RACE_OUTPUT_GENERATION_DEVICE_UPLOAD",
+  "feature_id": "MENU_RACE_OUTPUT_GENERATION_AND_DEVICE_OWNED_INSET",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Real D3D9 menu/car/race Draw to native D3D11 draw batch and event-fenced output generation",
+      "Present backbuffer device/dimensions/format invalidates obsolete queued D3D11 GPU frames",
+      "Same D3D9 device recreates CPU upload surface and overlays only current frame; original gamepad/Draw/Present stays original"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_readback_provenance.hpp",
+      "tools/test_dx11_game_output_transition_00682.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++17 output signature and provenance cases with live game Draw to Present wiring",
+      "negative_regression": "six destructive renderer binding mutations plus five portable C++17 mutations",
+      "component_integration": "Game D3D9 Draw -> D3D11 CopyResource fence -> backbuffer generation -> D3D9 SYSTEMMEM UpdateSurface"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_OUTPUT_GENERATION_DEVICE_UPLOAD",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_readback_provenance.hpp",
+      "tools/test_dx11_game_output_transition_00682.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Obsolete menu-to-race GPU frames and cross-device upload surfaces never reach current game backbuffer after device/size/format changes.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME=1 only, no gameplay promotion, original D3D9 Draw/Present/gamepad untouched."
+  },
+  "feature_contract": {
+    "feature_id": "MENU_RACE_OUTPUT_GENERATION_AND_DEVICE_OWNED_INSET",
+    "goal": "Complete a safe native menu-to-vehicle-to-race frame handoff across live D3D9 output changes while retaining original Draw/Present/gamepad.",
+    "acceptance_items": [
+      {
+        "id": "gpu-output-epoch",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_gpu_readback",
+        "expected_behavior": "Native GPU frame stamped with live output generation and accepted only for same current game output"
+      },
+      {
+        "id": "device-safe-inset",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_present_input",
+        "expected_behavior": "Resize, format or device transitions invalidate old D3D9 upload while preserving original game Draw/Present and gamepad"
+      },
+      {
+        "id": "exact-sha-ci",
+        "category": "integrated_validation",
+        "behavior_area": "github_native_game_gate",
+        "expected_behavior": "Positive/destructive C++17 and source mutation tests plus all mandatory exact-SHA GitHub checks pass"
+      },
+      {
+        "id": "quest3-hmd",
+        "category": "end_to_end_behavior",
+        "behavior_area": "quest3_vdxr_runtime",
+        "expected_behavior": "Menu, car selection, race, and controller checked using actual Quest3"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "gpu-output-epoch": "PENDING_GATE",
+    "device-safe-inset": "PENDING_GATE",
+    "exact-sha-ci": "PENDING_GATE",
+    "quest3-hmd": "NEED_HMD_TEST"
+  },
+  "base_head_sha": "f0b884bf7194dce865c3852fec25c29f38bd4cd3",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_readback_provenance.hpp",
+    "tools/test_dx11_game_output_transition_00682.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00682.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS 00681 verified and current branch",
+    "C1_REVIEW": "PASS observed stale async output epoch and D3D9 CPU upload surface ownership defect",
+    "C2_IMPLEMENT": "PASS game-output epoch and device-owned CPU inset binding",
+    "C3_VALIDATE": "PENDING required GitHub Actions",
+    "C4_COMMIT": "SOURCE_COMMIT",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_CI"
+  },
+  "next_action": "Check exact SHA five GitHub Actions; fix failed tests under same TASK_ID without replay; runtime Quest3/VDXR UNTESTED."
+}

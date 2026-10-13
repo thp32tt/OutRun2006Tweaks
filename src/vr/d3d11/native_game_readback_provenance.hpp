@@ -1,6 +1,17 @@
 #pragma once
 #include <cstdint>
 namespace outrun::vr::dx11::live_game_frame {
+struct GameOutputSignature {
+    std::uintptr_t device = 0u;
+    std::uint32_t width = 0u, height = 0u, format = 0u;
+    [[nodiscard]] constexpr bool valid() const noexcept {
+        return device != 0u && width != 0u && height != 0u && format != 0u;
+    }
+    [[nodiscard]] constexpr bool same(const GameOutputSignature& other) const noexcept {
+        return valid() && other.valid() && device == other.device &&
+               width == other.width && height == other.height && format == other.format;
+    }
+};
 // A completed GPU event might contain a previous game menu/car/race scene.
 // Bound diagnostic presentation by real game Present count, without CPU waits.
 struct GameReadbackProvenance {
@@ -8,6 +19,10 @@ struct GameReadbackProvenance {
     std::uint64_t capturedAtPresent = 0u;
     std::uint64_t sourceDraws = 0u;
     std::uintptr_t sourceDevice = 0u;
+    std::uint64_t outputGeneration = 0u;
+    [[nodiscard]] constexpr bool same_output(std::uint64_t currentGeneration) const noexcept {
+        return outputGeneration != 0u && outputGeneration == currentGeneration;
+    }
     [[nodiscard]] constexpr bool same_device(std::uintptr_t presentDevice) const noexcept {
         return sourceDevice != 0u && presentDevice == sourceDevice;
     }

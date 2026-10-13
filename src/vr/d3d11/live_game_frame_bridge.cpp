@@ -839,6 +839,8 @@ struct State {
     // Non-owning identity only: reset at every Present/Reset. Never retain a
     // game D3D9 COM object or mix different device Draw calls in one GPU batch.
     std::uintptr_t sourceGameDevice = 0u;
+    GameOutputSignature previousOutput{};
+    std::uint64_t outputGeneration = 0u;
     NativeBackend backend;
     // Diagnostic-only depth is never shared with the original D3D9 renderer.
     ComPtr<ID3D11Texture2D> diagnosticDepth;
@@ -995,6 +997,7 @@ struct State {
     std::uint64_t staleReadbacks = 0;
     ComPtr<IDirect3DSurface9> insetSurface;
     D3DFORMAT insetFormat = D3DFMT_UNKNOWN;
+    std::uintptr_t insetSurfaceDevice = 0u;
     bool pending = false;
     GameNativeFrameBatch frameBatch{}; // Opt-in native only, original D3D9/input preserved.
     bool logged = false;
@@ -1136,7 +1139,10 @@ bool ensure_pipeline(State& s) noexcept {
         item.staging.Reset(); item.fence.Reset(); item.busy = false;
     }
     s.readSlot = s.writeSlot = 0;
+    s.previousOutput = {};
+    if (++s.outputGeneration == 0u) ++s.outputGeneration;
     s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
+    s.insetSurfaceDevice = 0u;
     for (auto& masked : s.maskedBlends) masked.Reset();
     for (auto& masked : s.multiplyMaskedBlends) masked.Reset();
     for (auto& masked : s.inverseDestMultiplyMaskedBlends) masked.Reset();
@@ -3965,6 +3971,28 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
         const auto presentDevice = reinterpret_cast<std::uintptr_t>(game);
+        ComPtr<IDirect3DSurface9> presentBackbuffer;
+        D3DSURFACE_DESC presentDesc{};
+        const bool backbufferKnown = SUCCEEDED(game->GetBackBuffer(
+            0, 0, D3DBACKBUFFER_TYPE_MONO, presentBackbuffer.GetAddressOf())) &&
+            presentBackbuffer && SUCCEEDED(presentBackbuffer->GetDesc(&presentDesc));
+        const GameOutputSignature outputNow = backbufferKnown
+            ? GameOutputSignature{presentDevice, presentDesc.Width, presentDesc.Height,
+                                  static_cast<std::uint32_t>(presentDesc.Format)}
+            : GameOutputSignature{};
+        if (!s.previousOutput.same(outputNow)) {
+            // Reject earlier menu/car/race readbacks and CPU uploads after output change.
+            s.previousOutput = outputNow;
+            s.insetSurface.Reset();
+            s.insetFormat = D3DFMT_UNKNOWN;
+            s.insetSurfaceDevice = 0u;
+            if (++s.outputGeneration == 0u) ++s.outputGeneration;
+        }
+        const bool outputWritable = outputNow.valid() &&
+            presentDesc.Width >= kWidth + 8u && presentDesc.Height >= kHeight + 8u &&
+            presentDesc.MultiSampleType == D3DMULTISAMPLE_NONE &&
+            (presentDesc.Format == D3DFMT_A8R8G8B8 ||
+             presentDesc.Format == D3DFMT_X8R8G8B8);
         if (s.sourceGameDevice != 0u && s.sourceGameDevice != presentDevice) {
             // Do not copy a Draw batch from another D3D9 device to this Present.
             s.frameBatch.abort();
@@ -3978,7 +4006,10 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
                 const HRESULT ready = ctx->GetData(
                     oldest.fence.Get(), nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
                 if (ready == S_OK && (!oldest.provenance.may_overlay(s.presents) ||
-                                     !oldest.provenance.same_device(presentDevice))) {
+                                     !oldest.provenance.same_device(presentDevice) ||
+                                     !oldest.provenance.same_output(s.outputGeneration) ||
+                                     !outputWritable ||
+                                     s.sourceGameDevice != presentDevice)) {
                     // A late native frame cannot overwrite a newer menu/race Present.
                     // Its GPU fence is complete; recycle without blocking D3D9/input.
                     ++s.staleReadbacks;
@@ -4001,26 +4032,25 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
                             }
                         }
                         if (changedPixels) {
-                            ComPtr<IDirect3DSurface9> back;
-                            D3DSURFACE_DESC bb{};
-                            if (SUCCEEDED(game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,
-                                                             back.GetAddressOf())) && back &&
-                                SUCCEEDED(back->GetDesc(&bb)) &&
-                                bb.Width >= kWidth + 8u && bb.Height >= kHeight + 8u &&
-                                bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
-                                (bb.Format == D3DFMT_A8R8G8B8 ||
-                                 bb.Format == D3DFMT_X8R8G8B8)) {
+                            if (outputWritable) {
+                                auto& back = presentBackbuffer;
+                                const auto& bb = presentDesc;
                                 // Cache CPU upload memory; invalidate on format/Reset.
-                                if (!s.insetSurface || s.insetFormat != bb.Format) {
+                                if (!s.insetSurface || s.insetFormat != bb.Format ||
+                                    s.insetSurfaceDevice != presentDevice) {
                                     s.insetSurface.Reset();
                                     s.insetFormat = D3DFMT_UNKNOWN;
+                                    s.insetSurfaceDevice = 0u;
                                     if (SUCCEEDED(game->CreateOffscreenPlainSurface(
                                             kWidth, kHeight, bb.Format, D3DPOOL_SYSTEMMEM,
-                                            s.insetSurface.GetAddressOf(), nullptr)))
+                                            s.insetSurface.GetAddressOf(), nullptr))) {
                                         s.insetFormat = bb.Format;
+                                        s.insetSurfaceDevice = presentDevice;
+                                    }
                                 }
                                 D3DLOCKED_RECT lockRect{};
                                 if (s.insetSurface && s.insetFormat == bb.Format &&
+                                    s.insetSurfaceDevice == presentDevice &&
                                     SUCCEEDED(s.insetSurface->LockRect(&lockRect, nullptr, 0))) {
                                     for (UINT y = 0; y < kHeight; ++y)
                                         std::memcpy(
@@ -4060,12 +4090,14 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
             // Never publish partial GPU compositing from a source draw gap,
             // a failed vertex/index translation or a failed D3D11 submit.
             // Previously s.pending survived abort() and copied corrupt insets.
-            if (s.frameBatch.publishable(s.pending)) {
+            if (s.frameBatch.publishable(s.pending) && outputWritable &&
+                s.sourceGameDevice == presentDevice) {
                 auto& next = s.readbacks[s.writeSlot];
                 if (!next.busy) {
                     ctx->CopyResource(next.staging.Get(), s.backend.color_texture());
                     next.provenance = {s.presents, s.sourceDrawsThisFrame};
                     next.provenance.sourceDevice = presentDevice;
+                    next.provenance.outputGeneration = s.outputGeneration;
                     ctx->End(next.fence.Get());
                     // A single GPU submit per diagnostic frame; never a blocking Map.
                     ctx->Flush();
@@ -4108,6 +4140,11 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         s.eligibleThisFrame = 0;
         s.sourceDrawsThisFrame = 0u;
         s.sourceGameDevice = 0u;
+        s.previousOutput = {};
+        s.insetSurface.Reset();
+        s.insetFormat = D3DFMT_UNKNOWN;
+        s.insetSurfaceDevice = 0u;
+        if (++s.outputGeneration == 0u) ++s.outputGeneration;
         s.probeSlot = 0;
     }
 }
@@ -4127,7 +4164,10 @@ void before_game_reset() noexcept {
         item.provenance = {};
     }
     s.readSlot = s.writeSlot = 0;
+    s.previousOutput = {};
+    s.outputGeneration = 0u;
     s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
+    s.insetSurfaceDevice = 0u;
     s.diagnosticDepthView.Reset(); s.diagnosticDepth.Reset();
     for (auto& depthState : s.diagnosticDepthStates) depthState.Reset();
     for (auto& depthState : s.diagnosticDepthAlwaysStates) depthState.Reset();
