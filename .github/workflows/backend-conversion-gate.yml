@@ -166,6 +166,9 @@ jobs:
       - name: Check native game A8 L8 A8L8 texture draw 00658
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_native_luminance_texture_00658.py
+      - name: Verify live RGB24 native Draw bridge 00659
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_native_rgb24_texture_00659.py
 
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'
