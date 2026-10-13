@@ -51,8 +51,11 @@ for held,key,new,dlg,expected in cases:
     assert vis==bool(expected)
     density=2.75 if vis else 1.0
     assert (density>1.0)==vis
+# The default-initialized member is intentionally false. Reject destructive
+# assignments only inside poll(), not the correct member initializer.
+poll_body = toggle.split("Decision poll(", 1)[1]
 for mutant in ("previousBoundHeld = false;", "const bool edge = boundHeld;",
                "const bool legacyEdge = false;", "const bool toggle = edge;",
                "return { toggle, visible };"):
-    assert mutant not in toggle, mutant
+    assert mutant not in poll_body, mutant
 print("PASS same-frame F11 input-to-atlas-to-render, negative/mutation cases")
