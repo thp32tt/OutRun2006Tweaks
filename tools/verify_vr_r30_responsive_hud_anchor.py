@@ -22,9 +22,10 @@ for tok in ("CurrentSpriteQueueProducer", "ProducerToken::OutRunHudPeripheralTex
     assert tok in helper, tok
 assert "usedMask, touched, knownUsedCount);" in code
 assert code.count("R30GetExactHudEdgeAnchor(") == 2
-assert code.count("edgeLeftBias") == 2
-assert code.count("edgeRightBias") == 2
-assert code.count("edgeYBias") == 2
+assert code.count("R30ConstrainHudEdgeToVisibleBounds(") == 2
+assert code.count("edgeLeftBias") >= 4
+assert code.count("edgeRightBias") >= 4
+assert code.count("edgeYBias") >= 4
 assert "R30GetExactHudEdgeAnchor(" not in code[code.index(
     "bool R30TransformXyzrhwStereo("):code.index(
     "if (!state.worldEffect)", code.index("bool R30TransformXyzrhwStereo("))]
@@ -328,3 +329,75 @@ for bad, good in (
     assert not (("height * R30PauseMenuVerticalFraction();" in mutant) and
                 ("clipCorrection._42 = -2.0f * R30PauseMenuVerticalFraction();" in mutant))
 print("PASS pause-only vertical placement, 4 source/eye resolutions, exact ownership and 5 destructive controls")
+
+# Issue #119: exact producer group must remain INSIDE the visible region
+# after the 0.55 -> 0.90 boost. A shared x correction is the only permitted
+# left/right correction; independently clamping each eye destroys disparity.
+safe_begin = code.index("void R30ConstrainHudEdgeToVisibleBounds(")
+safe_end = code.index("bool R30TransformHudScissor(", safe_begin)
+safe = code[safe_begin:safe_end]
+for token in (
+    "anchor.hasBounds", "anchor.minX < x0", "anchor.maxX > x1",
+    "anchor.minY < y0", "anchor.maxY > y1",
+    "kSafeInset = 0.025f", "safeLeft - leftMin",
+    "safeLeft - rightMin", "safeRight - leftMax",
+    "safeRight - rightMax", "shiftMin <= shiftMax",
+    "edgeLeftBias += sharedShift;", "edgeRightBias += sharedShift;",
+    "verticalMin <= verticalMax", "edgeYBias += std::clamp(",
+):
+    assert token in safe, token
+draw = code[code.index("bool R30TransformXyzrhwStereo("):
+            code.index("// This is the high-frequency indexed smoke/sand/decal path:")]
+assert "R30ConstrainHudEdgeToVisibleBounds(" in draw
+assert draw.index("R30ConstrainHudEdgeToVisibleBounds(") < draw.index("for (UINT visit = 0;")
+assert "minX, maxX, minY, maxY, true" in code
+
+def visible_fit(box, bounds, scales, biases, wanted, inset=.025):
+    lo, hi = bounds
+    amin, amax = box
+    if amin < lo or amax > hi:
+        return wanted
+    allowed_lo = max((lo + (hi-lo)*inset) - (s*amin + b + w)
+                     for s, b, w in zip(scales, biases, wanted))
+    allowed_hi = min((hi - (hi-lo)*inset) - (s*amax + b + w)
+                     for s, b, w in zip(scales, biases, wanted))
+    if allowed_lo > allowed_hi:
+        return wanted
+    delta = max(allowed_lo, min(allowed_hi, 0.0))
+    return tuple(w+delta for w in wanted)
+
+for w,h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
+    # Right-edge enlarged HUD is inset without altering binocular separation.
+    box = (.91*w, .995*w)
+    scales = (.90, .91)
+    biases = (.05*w, .045*w)
+    orig = (.042*w, .041*w)
+    shifted = visible_fit(box, (0,w), scales, biases, orig)
+    assert abs((shifted[0]-shifted[1]) - (orig[0]-orig[1])) < 1e-7*w
+    for s,base,shift in zip(scales,biases,shifted):
+        assert s*box[0]+base+shift >= .025*w - 1e-6*w
+        assert s*box[1]+base+shift <= .975*w + 1e-6*w
+    # Previous layout untouched for partially offscreen transition sprites.
+    assert visible_fit((-.1*w,.2*w),(0,w),scales,biases,orig) == orig
+    # Oversized groups have no feasible shared shift: no false correction.
+    assert visible_fit((.05*w,.95*w),(0,w),(1.4,1.4),(0,0),orig) == orig
+    # Upper HUD safe inset is symmetrical on the independent vertical axis.
+    yorig=(.04*h,)
+    yfit=visible_fit((.005*h,.10*h),(0,h),(.90,),(.05*h,),yorig)
+    assert .90*.005*h+.05*h+yfit[0] >= .025*h-1e-6*h
+
+# Destructive regression: either-eye correction, viewport bounds or the
+# source-bbox material integration must be detectably removed.
+for wrong, replacement in (
+    ("edgeRightBias += sharedShift;", "edgeRightBias += 0.0f;"),
+    ("safeRight - rightMax", "safeRight - leftMax"),
+    ("anchor.maxX > x1", "anchor.maxX > x1 + width"),
+    ("kSafeInset = 0.025f", "kSafeInset = 0.0f"),
+):
+    assert wrong in safe
+    changed = safe.replace(wrong,replacement,1)
+    assert changed != safe
+    assert not all(item in changed for item in (
+        "edgeRightBias += sharedShift;", "safeRight - rightMax",
+        "anchor.maxX > x1", "kSafeInset = 0.025f"))
+print("PASS Quest3 peripheral HUD visible-area fit: stereo shift parity, 4 resolutions, bounds fail-closed")

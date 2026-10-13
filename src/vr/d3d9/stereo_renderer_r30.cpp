@@ -1758,7 +1758,15 @@ namespace OutRunVRStereo
         // Only exact, producer-owned gameplay text may leave the common-centre
         // containment mapping. The A/B setting defaults off and the broad
         // ScreenHud/ScreenOverlay2D classifications are NOT enough evidence.
-        struct R30HudEdgeAnchor { float x = 0.0f; float y = 0.0f; };
+        struct R30HudEdgeAnchor
+        {
+            float x = 0.0f, y = 0.0f;
+            // Preserve exact-producer bounds from the existing single
+            // source walk. No additional VB/IB scan in the hot draw path.
+            float minX = 0.0f, maxX = 0.0f;
+            float minY = 0.0f, maxY = 0.0f;
+            bool hasBounds = false;
+        };
         float R30PeripheralAnchor(float ndc, float limit) noexcept
         {
             if (!std::isfinite(ndc) || std::fabs(ndc) < 0.40f ||
@@ -1830,7 +1838,8 @@ namespace OutRunVRStereo
             const float cy = minY + 0.5f * (maxY - minY);
             return {
                 R30PeripheralAnchor((cx - x0) * (2.0f / width) - 1.0f, 0.82f),
-                R30PeripheralAnchor(1.0f - (cy - y0) * (2.0f / height), 0.78f)
+                R30PeripheralAnchor(1.0f - (cy - y0) * (2.0f / height), 0.78f),
+                minX, maxX, minY, maxY, true
             };
         }
 
@@ -1850,6 +1859,72 @@ namespace OutRunVRStereo
             if (!std::isfinite(baseScale) || baseScale <= 0.0f)
                 return 1.0f;
             return std::clamp(0.90f / baseScale, 1.0f, 3.0f);
+        }
+
+
+        // Issue #119: enlarged peripheral speed/rank/time draws may extend
+        // beyond the source viewport, especially at 21:9 -> portrait XR.
+        // Fit their exact producer bounds inside a modest source-space safe
+        // inset. One SHARED horizontal correction is applied to both eyes:
+        // never clamp eyes independently and thereby change stereo disparity.
+        // Offscreen animations, centre HUD, unknown producers and oversized
+        // groups preserve the previous transform without speculative motion.
+        void R30ConstrainHudEdgeToVisibleBounds(
+            const R30HudEdgeAnchor& anchor,
+            float x0, float y0, float width, float height,
+            const float eyeScaleX[2], const float eyeBiasX[2],
+            float hudScaleY, float hudBiasY,
+            float& edgeLeftBias, float& edgeRightBias,
+            float& edgeYBias) noexcept
+        {
+            if (!anchor.hasBounds ||
+                (anchor.x == 0.0f && anchor.y == 0.0f) ||
+                !(width > 0.0f && height > 0.0f) ||
+                !std::isfinite(width) || !std::isfinite(height) ||
+                !std::isfinite(hudScaleY) || !std::isfinite(hudBiasY))
+                return;
+            const float x1 = x0 + width, y1 = y0 + height;
+            // Deliberately do not shift partially offscreen transition
+            // sprites into view or change the GOAL/results animation.
+            if (anchor.minX < x0 || anchor.maxX > x1 ||
+                anchor.minY < y0 || anchor.maxY > y1 ||
+                anchor.minX > anchor.maxX || anchor.minY > anchor.maxY)
+                return;
+
+            constexpr float kSafeInset = 0.025f;
+            const float safeLeft = x0 + width * kSafeInset;
+            const float safeRight = x1 - width * kSafeInset;
+            const float safeTop = y0 + height * kSafeInset;
+            const float safeBottom = y1 - height * kSafeInset;
+            const float leftMin =
+                eyeScaleX[0] * anchor.minX + eyeBiasX[0] + edgeLeftBias;
+            const float rightMin =
+                eyeScaleX[1] * anchor.minX + eyeBiasX[1] + edgeRightBias;
+            const float leftMax =
+                eyeScaleX[0] * anchor.maxX + eyeBiasX[0] + edgeLeftBias;
+            const float rightMax =
+                eyeScaleX[1] * anchor.maxX + eyeBiasX[1] + edgeRightBias;
+            const float shiftMin = (std::max)(
+                safeLeft - leftMin, safeLeft - rightMin);
+            const float shiftMax = (std::min)(
+                safeRight - leftMax, safeRight - rightMax);
+            if (std::isfinite(shiftMin) && std::isfinite(shiftMax) &&
+                shiftMin <= shiftMax)
+            {
+                const float sharedShift = std::clamp(0.0f, shiftMin, shiftMax);
+                edgeLeftBias += sharedShift;
+                edgeRightBias += sharedShift;
+            }
+
+            const float yMin =
+                hudScaleY * anchor.minY + hudBiasY + edgeYBias;
+            const float yMax =
+                hudScaleY * anchor.maxY + hudBiasY + edgeYBias;
+            const float verticalMin = safeTop - yMin;
+            const float verticalMax = safeBottom - yMax;
+            if (std::isfinite(verticalMin) && std::isfinite(verticalMax) &&
+                verticalMin <= verticalMax)
+                edgeYBias += std::clamp(0.0f, verticalMin, verticalMax);
         }
 
         bool R30TransformHudScissor(
@@ -3499,12 +3574,16 @@ namespace OutRunVRStereo
                     height * R30PauseMenuVerticalFraction();
                 // Bias computed once per draw. A zero (default-off) anchor
                 // reproduces the existing centre-convergent mapping.
-                const float edgeLeftBias =
+                float edgeLeftBias =
                     (1.0f - eyeScaleX[0]) * halfWidth * exactHudAnchor.x;
-                const float edgeRightBias =
+                float edgeRightBias =
                     (1.0f - eyeScaleX[1]) * halfWidth * exactHudAnchor.x;
-                const float edgeYBias =
+                float edgeYBias =
                     -(1.0f - hudScaleY) * halfHeight * exactHudAnchor.y;
+                R30ConstrainHudEdgeToVisibleBounds(
+                    exactHudAnchor, x0, y0, width, height,
+                    eyeScaleX, eyeBiasX, hudScaleY, hudBiasY,
+                    edgeLeftBias, edgeRightBias, edgeYBias);
                 // Indexed-UP and revision-fenced VB/IB builders supply a
                 // unique, mask-complete touched list. On very sparse HUD
                 // spans, visit those references rather than walking every
