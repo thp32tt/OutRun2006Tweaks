@@ -781,6 +781,7 @@ struct OutputCapture {
     bool alphaTest = false;
     bool nativeDepthTest = false;
     bool nativeDepthLessEqual = false;
+    bool nativeDepthWrite = false;
     DWORD nativeCullMode = D3DCULL_NONE; // live game face exclusion
     DWORD alphaRef = 0;
     D3DCMPFUNC alphaFunc = D3DCMP_ALWAYS;
@@ -801,7 +802,7 @@ struct State {
     // Diagnostic-only depth is never shared with the original D3D9 renderer.
     ComPtr<ID3D11Texture2D> diagnosticDepth;
     ComPtr<ID3D11DepthStencilView> diagnosticDepthView;
-    std::array<ComPtr<ID3D11DepthStencilState>, 2> diagnosticDepthStates;
+    std::array<ComPtr<ID3D11DepthStencilState>, 4> diagnosticDepthStates;
     ComPtr<ID3D11VertexShader> vs;
     ComPtr<ID3D11PixelShader> ps;
     ComPtr<ID3D11PixelShader> sampledPs;
@@ -1579,7 +1580,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     output.nativeCullMode = admittedCull.d3d9Mode;
     // Mirror only one isolated game-authored Z draw. The newly cleared DSV
     // omits earlier D3D9 occluders: this is diagnostic, NOT scene parity.
-    // W-buffering, depth-bias, missing depth, and disabled Z-writes fail closed.
+    // W-buffering, depth-bias and missing depth fail closed; depth-read-only
+    // draws keep Z comparison but never update the native diagnostic DSV.
     if (depth != D3DZB_FALSE) {
         DWORD zWrite = 0, zFunc = 0, bias = ~0u, slopeBias = ~0u;
         ComPtr<IDirect3DSurface9> gameDepth;
@@ -1598,6 +1600,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             return false;
         output.nativeDepthTest = admitted.enabled;
         output.nativeDepthLessEqual = admitted.lessEqual;
+        output.nativeDepthWrite = admitted.writeEnabled;
     }
     // Only native one-pixel points without sprites or per-vertex point sizes.
     // All larger/scaled point raster states continue to the original D3D9
@@ -3093,11 +3096,13 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             s.diagnosticDepthView = std::move(createdView);
         }
         auto& depthState =
-            s.diagnosticDepthStates[output.nativeDepthLessEqual ? 1u : 0u];
+            s.diagnosticDepthStates[(output.nativeDepthWrite ? 2u : 0u) +
+                                    (output.nativeDepthLessEqual ? 1u : 0u)];
         if (!depthState) {
             D3D11_DEPTH_STENCIL_DESC ds{};
             ds.DepthEnable = TRUE;
-            ds.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+            ds.DepthWriteMask = output.nativeDepthWrite ?
+                D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
             ds.DepthFunc = output.nativeDepthLessEqual ?
                 D3D11_COMPARISON_LESS_EQUAL : D3D11_COMPARISON_LESS;
             ds.StencilEnable = FALSE;

@@ -140,6 +140,9 @@ jobs:
       - name: Verify live game CW/CCW triangle Draw 00649
         if: startsWith(github.ref_name, 'vr-dx11-native')
         run: python tools/test_dx11_game_cull_draw_00649.py
+      - name: Verify native game depth read-only Z Draw 00650
+        if: startsWith(github.ref_name, 'vr-dx11-native')
+        run: python tools/test_dx11_readonly_depth_draw_00650.py
 
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'

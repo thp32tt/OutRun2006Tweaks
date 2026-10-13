@@ -20,7 +20,7 @@ checks = [
 ]
 assert all(x in cpp for x in checks), [x for x in checks if x not in cpp]
 assert 'stencil || depth || !clip' not in cpp
-assert 'zEnable != 1u || zWrite != 1u' in depth
+assert 'zEnable != 1u || zWrite > 1u' in depth
 assert 'zFunc != 2u && zFunc != 4u' in depth
 assert 'depthBiasBits & 0x7fffffffu' in depth
 assert 'if (!diagnostic_enabled() || !game' in cpp

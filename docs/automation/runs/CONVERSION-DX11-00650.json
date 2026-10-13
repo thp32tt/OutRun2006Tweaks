@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00650",
+  "production_id": "CONVERSION-DX11-00650",
+  "event_id": "CONVERSION-DX11-00650-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_Z_READ_ONLY_NATIVE_DSV",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "6393da180ed727249c085af05ac2551320e05b1b",
+  "status": "C4_MATERIAL_SUBMITTED",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "live R30 game-authored D3D9 Z-tested Draw/DrawIndexed with ZWRITEENABLE=FALSE",
+      "C++ depth admission -> native D3D11 read-only DSV state -> isolated game Draw visible diagnostic inset"
+    ],
+    "batch_components": [
+      "D3D9 depth admission and live D3D11 depth-state selection C++",
+      "positive/negative C++ probe plus mutation regression in exact-SHA CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "D3DZB_TRUE with LESS or LESSEQUAL and ZWRITEENABLE=FALSE uses native DSV depth test with zero writes",
+      "negative_regression": "invalid ZWRITE, W-buffer, depth bias and unsupported ZFUNC reject; source DX9Ex Draw/input retained",
+      "component_integration": "live D3D9 GetRenderState -> game_native_depth_admission -> OMSetDepthStencilState -> native Draw/DrawIndexed -> game-frame inset"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_Z_READ_ONLY_NATIVE_DSV"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "CI C++/static evidence only; game, menu, race, Quest3/VDXR UNTESTED",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only; original D3D9 call and gamepad input unchanged"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_depth_state.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_depth_probe.cpp",
+    "tools/test_dx11_race_depth_draw_00648.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_readonly_depth_draw_00650.py",
+    "docs/automation/runs/CONVERSION-DX11-00650.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "PASS: depth-read-only Draw absent",
+    "C2_IMPLEMENT": "SOURCE_AND_REGRESSION_READY",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING"
+  },
+  "packaging": {
+    "status": "NOT_REQUIRED"
+  },
+  "next_action": "Collect exact-SHA Backend Conversion Gate, DX11 Fast Structural, Windows Build, OpenXR/HUD outcomes; keep runtime UNTESTED."
+}
