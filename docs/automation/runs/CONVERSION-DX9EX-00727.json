@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00727",
+  "production_id": "CONVERSION-DX9EX-00727",
+  "event_id": "CONVERSION-DX9EX-00727-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "previous_hold_reason": "DX9Ex Active Validation run 38325114385 failed: verify_vr_f11_font_density.py mutation applied to unrelated global first occurrence of 'return 1.0f;' and failed to reject intended F11 projection mutant",
+  "base_sha": "cbb762e7bc9332901335d2c462a4cfd36cadd050",
+  "source_material_sha": "d4c8fd62ee53c5be2b271c30e3b6340cba43bd0e",
+  "material_result_sha": "8ebab0ccef79bfe1d5fc97c18965e741d6701538",
+  "validation_bearing_result_sha": "8ebab0ccef79bfe1d5fc97c18965e741d6701538",
+  "result_sha": "8ebab0ccef79bfe1d5fc97c18965e741d6701538",
+  "material_commits": [
+    "d4c8fd62ee53c5be2b271c30e3b6340cba43bd0e",
+    "8ebab0ccef79bfe1d5fc97c18965e741d6701538"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 integrated Quest3/VDXR responsive HUD anchors, original-aspect main menu, independently positioned ESC menu and readable F11 ImGui.",
+    "completed_scope": "F11 external ImGui stereo plane escapes second application of gameplay HUD scale while preserving live XR FOV/aspect and generic game HUD/menus/world mapping; targeted destructive regression repair scopes its mutations to the owning R30 functions.",
+    "remaining_acceptance": [
+      "Complete independently positioned/scaled ESC pause-menu path and remaining Issue #119 UI integration",
+      "Real Quest3/VDXR in-HMD matched-SHA optical, reset/resolution-change and 120 FPS frame-time measurements"
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_DX9EX_ACTIVE_EXACT_SHA",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_chain_win32": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38325283185,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "8ebab0ccef79bfe1d5fc97c18965e741d6701538",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "game": "success",
+        "host": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38325283098,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "8ebab0ccef79bfe1d5fc97c18965e741d6701538",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    }
+  ],
+  "failed_prior_workflow": {
+    "id": 38325114385,
+    "workflow": "DX9Ex Active Validation",
+    "head_sha": "d4c8fd62ee53c5be2b271c30e3b6340cba43bd0e",
+    "conclusion": "failure",
+    "failing_job": "policy",
+    "failing_verifier": "tools/verify_vr_f11_font_density.py",
+    "failing_assertion": "F11 scoped projection mutant survived: return 1.0f;"
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_validation_required": "No matched Quest3/VDXR HMD or game-screen test was executed. No visual correctness or 120 FPS claim.",
+  "score_delta": 0,
+  "score_awarded": false,
+  "score_policy": "Same TASK_ID retry and nonterminal Issue #119 feature integration; no duplicate credit or score mutation.",
+  "summary": "Recovered failed exact-SHA F11 destructive verifier after first scoped ImGui-plane material commit, made a real verifier repair commit without CI skip, verified full 5/5 DX9Ex Active and Domain Isolation GitHub Gate SUCCESS on the corrected exact SHA. Feature remains partial; runtime UNTESTED."
+}
