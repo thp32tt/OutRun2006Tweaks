@@ -65,5 +65,33 @@ int main() {
     assert(!b.accepts(1,0,true));
     b.reset();
     assert(b.accepts(0,0,true) && b.first_draw() && b.clear_depth());
+    // Real game call positions are independent from the eligible FVF cursor.
+    // A skipped unsupported Draw between native Draws invalidates the inset.
+    assert(b.accepts_source_draw(400u, true));
+    b.record_source_draw(400u);
+    b.succeeded(false);
+    assert(b.accepts_source_draw(401u, true));
+    assert(!b.accepts_source_draw(402u, true));
+    assert(b.accepts_source_draw(402u, false)); // Single Draw remains independent.
+    assert(b.publishable(true));
+    b.abort();
+    assert(!b.accepts_source_draw(401u, true));
+    assert(!b.publishable(true));  // A prior GPU Draw cannot leak to Present.
+    b.reset();
+    assert(!b.publishable(true) && !b.publishable(false));
+    assert(b.accepts_source_draw(0u, true));
+    b.record_source_draw(0u);
+    b.succeeded(true);
+    assert(b.accepts_source_draw(1u, true));
+    b.record_source_draw(1u);
+    b.succeeded(false);
+    assert(b.publishable(true));
+    assert(!b.publishable(false));
+    b.reset();
+    assert(b.first_draw() && b.accepts_source_draw(1500u, true));
+    b.record_source_draw(1500u);
+    b.succeeded(false);
+    assert(!b.accepts_source_draw(1502u, true)); // Missed game draw.
+    assert(!b.accepts_source_draw(1499u, true)); // Reordered game draw.
     return 0;
 }

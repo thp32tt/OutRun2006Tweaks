@@ -996,6 +996,7 @@ struct State {
     std::uint64_t presents = 0;
     std::uint64_t eligible = 0;
     UINT eligibleThisFrame = 0;
+    std::uint64_t sourceDrawsThisFrame = 0u;
     UINT probeSlot = 0;
     UINT issued = 0;
     UINT visible = 0;
@@ -3771,12 +3772,29 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
         ++s.observed;
+        // Record every observed game Draw/DrawIndexed before native state
+        // admission. Eligible-only ordinals are insufficient to establish
+        // contiguous menu, vehicle-selection or race source calls.
+        if (s.sourceDrawsThisFrame == (std::numeric_limits<std::uint64_t>::max)()) {
+            s.frameBatch.abort();
+            return;
+        }
+        const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;
+        const bool multiBatch = env_batch_opt_in();
         D3DVIEWPORT9 vp{};
         GameFvfLayout layout{};
         std::array<D3DMATRIX, 3> transforms{};
         TextureCapture capture{};
         OutputCapture output{};
-        if (!supported_game_state(game, type, vp, layout, transforms, capture, output)) return;
+        if (!supported_game_state(game, type, vp, layout, transforms, capture, output)) {
+            // Once a multi-draw scene starts, an unsupported real game Draw
+            // is not a transparent hole in the native compositor. Cancel
+            // publication without affecting the original D3D9 rendering.
+            if (multiBatch && s.frameBatch.submitted > 0u &&
+                s.frameBatch.submitted < GameNativeFrameBatch::kMaxDraws)
+                s.frameBatch.abort();
+            return;
+        }
         // Count every admitted state, including calls after this frame's one
         // native draw. Use that bounded population to rotate the next frame's
         // probe rather than sampling its same first triangle indefinitely.
@@ -3787,6 +3805,10 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         ++s.eligible;
         if (!s.frameBatch.accepts(candidateOrdinal, s.probeSlot,
                                   env_batch_opt_in())) return;
+        if (!s.frameBatch.accepts_source_draw(sourceOrdinal, multiBatch)) {
+            s.frameBatch.abort();
+            return;
+        }
         // A second depth draw with reversed Z direction cannot share the
         // previous native diagnostic DSV; fail closed, original D3D9 survives.
         if (!s.frameBatch.accepts_depth(output.nativeDepthTest,
@@ -3795,23 +3817,36 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             return;
         }
         if (indexCount && (!indices || indexCount != expectedElements ||
-                           vertexCount > kMaxVertices))
+                           vertexCount > kMaxVertices)) {
+            s.frameBatch.abort();
             return;
-        if (!indexCount && vertexCount != expectedElements) return;
+        }
+        if (!indexCount && vertexCount != expectedElements) {
+            s.frameBatch.abort();
+            return;
+        }
         std::vector<NativeVertex> vertices;
         if (!translate_vertices(bytes, vertexCount, stride, vp,
-                                layout, transforms, capture, vertices))
+                                layout, transforms, capture, vertices)) {
+            s.frameBatch.abort();
             return;
+        }
         if (indices) {
-            for (UINT i=0; i<indexCount; ++i)
-                if (indices[i] >= vertexCount) return;
+            for (UINT i=0; i<indexCount; ++i) {
+                if (indices[i] >= vertexCount) {
+                    s.frameBatch.abort();
+                    return;
+                }
+            }
         }
         if (type == D3DPT_TRIANGLEFAN) {
             // Real game VB/IB/UP data, rebased by R30. No fixture substitution.
             std::vector<std::uint32_t> fanTriangles;
             if (!game_fan_to_triangle_list(primitives, indices, indexCount,
-                                           vertexCount, fanTriangles))
+                                           vertexCount, fanTriangles)) {
+                s.frameBatch.abort();
                 return;
+            }
             if (!submit(s, vertices, fanTriangles.data(),
                         static_cast<UINT>(fanTriangles.size()),
                         D3DPT_TRIANGLELIST, capture, output)) {
@@ -3820,6 +3855,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             } else {
                 s.frameBatch.succeeded(output.nativeDepthTest,
                                        output.nativeDepthOrderingMode != 0u);
+                s.frameBatch.record_source_draw(sourceOrdinal);
             }
         } else {
             if (!submit(s, vertices, indices, indexCount, type, capture, output)) {
@@ -3828,6 +3864,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             } else {
                 s.frameBatch.succeeded(output.nativeDepthTest,
                                        output.nativeDepthOrderingMode != 0u);
+                s.frameBatch.record_source_draw(sourceOrdinal);
             }
         }
     } catch (...) {
@@ -3951,7 +3988,10 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
                     s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
                 }
             }
-            if (s.pending) {
+            // Never publish partial GPU compositing from a source draw gap,
+            // a failed vertex/index translation or a failed D3D11 submit.
+            // Previously s.pending survived abort() and copied corrupt insets.
+            if (s.frameBatch.publishable(s.pending)) {
                 auto& next = s.readbacks[s.writeSlot];
                 if (!next.busy) {
                     ctx->CopyResource(next.staging.Get(), s.backend.color_texture());
@@ -3974,6 +4014,7 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         s.probeSlot = GameNativeFrameBatch::next_probe_slot(
             s.probeSlot, s.eligibleThisFrame);
         s.eligibleThisFrame = 0;
+        s.sourceDrawsThisFrame = 0u;
         // Opt-in-only evidence: a hooked game Draw is not proof that the
         // restricted FVF subset was admitted, nor that GPU pixels became
         // visible in the game's backbuffer. Log both missing links explicitly.
@@ -3993,6 +4034,7 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         s.pending = false;
         s.frameBatch.reset();
         s.eligibleThisFrame = 0;
+        s.sourceDrawsThisFrame = 0u;
         s.probeSlot = 0;
     }
 }
@@ -4004,6 +4046,7 @@ void before_game_reset() noexcept {
     s.pending = false;
     s.frameBatch.reset();
     s.eligibleThisFrame = 0;
+    s.sourceDrawsThisFrame = 0u;
     s.probeSlot = 0;
     for (auto& item : s.readbacks) {
         item.staging.Reset(); item.fence.Reset(); item.busy = false;

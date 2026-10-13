@@ -1,0 +1,116 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00677",
+  "production_id": "CONVERSION-DX11-00677",
+  "event_id": "CONVERSION-DX11-00677-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:MENU_RACE_NATIVE_RAW_DRAW_ATOMIC_PUBLICATION",
+  "feature_id": "MENU_RACE_NATIVE_SOURCE_CONTIGUITY_AND_ATOMIC_INSET",
+  "base_head_sha": "3eb92f44654b2c42311db5cf4633854b3a3990c5",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Live D3D9 Draw/DrawIndexed callsite increments an independent raw source ordinal before FVF or fixed-function admission; eligible menu/car/race slot rotation remains intact",
+      "Native D3D11 Draw/DrawIndexed multi-call scene requires consecutive raw source ordinals, and immediately aborts on unsupported intervening game state or failed native vertex/index/texture submission",
+      "At original D3D9 Present, only a non-aborted, nonempty GPU batch enters asynchronous GPU-fenced readback/visible inset; unsupported game draws/input remain original D3D9"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/native_game_frame_batch.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_native_frame_batch_probe.cpp",
+      "tools/test_dx11_first_game_frame_regressions.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compiled C++ frame-batch probe admits a consecutive two-call raw source stream and valid pending GPU frame, while leaving single-Draw and full-scene rotating cursor behavior intact",
+      "negative_regression": "Compiled negative checks reject skipped/reordered source Draws and aborted batch publication; destructive Python regression rejects eligible-only indices, omitted raw source gate, and publication after abort",
+      "component_integration": "Real live game Draw/DrawIndexed source ordinal + native submit state machine + GPU EVENT-fenced D3D9 inset publication are coupled; missing captures preserve game Draw/Present/gamepad fallback"
+    },
+    "conflict_keys": [
+      "DX11:MENU_RACE_NATIVE_RAW_DRAW_ATOMIC_PUBLICATION",
+      "src/vr/d3d11/native_game_frame_batch.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_native_frame_batch_probe.cpp",
+      "tools/test_dx11_first_game_frame_regressions.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native inset cannot represent a spliced partial menu, vehicle-selection or race batch; Build/CI source/compiled behavior only, game runtime and Quest3 eye parity NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Native compositor requires BOTH explicit environment opt-ins for multiple calls; original DX9Ex game Draw/Present/gamepad unchanged, unsupported calls abort optional native diagnostic only"
+  },
+  "feature_contract": {
+    "feature_id": "MENU_RACE_NATIVE_SOURCE_CONTIGUITY_AND_ATOMIC_INSET",
+    "goal": "Provide an atomic opt-in native frame batch from contiguous real D3D9 game calls through D3D11 scene Draw into asynchronous visible inset, with safe DX9Ex input fallback.",
+    "acceptance_items": [
+      {
+        "id": "source-contiguous-native-batch",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_draw_to_native_d3d11",
+        "expected_behavior": "True consecutive game-authored Draw and DrawIndexed source calls compose a bounded native frame without eligible-only gaps"
+      },
+      {
+        "id": "atomic-aborted-inset-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_present_input_recovery",
+        "expected_behavior": "Unsupported intermediary Draw, invalid buffers/indices or failed native submit aborts publication and leaves original D3D9 gamepad/Present intact"
+      },
+      {
+        "id": "batch-pixel-path-gate",
+        "category": "integrated_validation",
+        "behavior_area": "native_readback_ci",
+        "expected_behavior": "Compiled positive/negative C++ native batch probe, destructive Python source mutation checks and all exact-SHA mandatory CI gates succeed"
+      },
+      {
+        "id": "quest3-menu-vehicle-race",
+        "category": "end_to_end_behavior",
+        "behavior_area": "quest3_vdxr_runtime",
+        "expected_behavior": "Actual game scene order, Quest3 VDXR display and gamepad observed on the matching binary separately from automated CI"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "source-contiguous-native-batch": "PENDING_EXACT_SHA",
+    "atomic-aborted-inset-fallback": "PENDING_EXACT_SHA",
+    "batch-pixel-path-gate": "PENDING_EXACT_SHA",
+    "quest3-menu-vehicle-race": "NEED_HMD_TEST"
+  },
+  "changed_files": [
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_native_frame_batch_probe.cpp",
+    "tools/test_dx11_first_game_frame_regressions.py",
+    "docs/automation/runs/CONVERSION-DX11-00677.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS",
+    "C1_REVIEW": "Confirmed raw source interleaving and abort-to-Present stale publication vulnerabilities in live native Draw batch",
+    "C2_IMPLEMENT": "RAW_SOURCE_CONTIGUITY_AND_NATIVE_GPU_INSET_ABORT_FIX",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "MATERIAL",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING"
+  },
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "ci_evidence": {
+    "runtime_validation": "UNTESTED",
+    "hmd_test_performed": false,
+    "gamepad_test_performed": false
+  }
+}

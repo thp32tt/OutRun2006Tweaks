@@ -7,6 +7,10 @@ struct GameNativeFrameBatch {
     std::uint32_t submitted = 0u;
     bool stopped = false;
     bool depthReady = false;
+    // Raw observed game call indices, NOT only the admitted FVF candidates.
+    // Unsupported/interleaved D3D9 draws cannot be spliced into a native scene.
+    std::uint64_t lastSourceDraw = 0u;
+    bool hasSourceDraw = false;
     // Inset Z accumulation cannot mix forward and reverse D3D9 comparisons.
     std::uint32_t depthDirection = 0u;
     constexpr bool accepts(std::uint32_t ordinal, std::uint32_t slot,
@@ -19,6 +23,20 @@ struct GameNativeFrameBatch {
         // The original D3D9 Draw always survives these admission failures.
         return submitted < kMaxDraws && ordinal >= slot &&
             ordinal - slot == submitted && ordinal - slot < kMaxDraws;
+    }
+    constexpr bool accepts_source_draw(std::uint64_t ordinal, bool multi) const noexcept {
+        return !stopped && (!multi || submitted == 0u ||
+               (hasSourceDraw && ordinal > lastSourceDraw &&
+                ordinal - lastSourceDraw == 1u));
+    }
+    constexpr void record_source_draw(std::uint64_t ordinal) noexcept {
+        lastSourceDraw = ordinal;
+        hasSourceDraw = true;
+    }
+    // An aborted batch must never reach the GPU readback/inset presenter,
+    // even if one or more of its D3D11 Draw calls already ran.
+    constexpr bool publishable(bool pending) const noexcept {
+        return pending && submitted != 0u && !stopped;
     }
     // Traverse the complete eligible game Draw population. A legacy fixed
     // 64-draw probe window starved later car-select and race-world draws.
@@ -45,6 +63,7 @@ struct GameNativeFrameBatch {
     constexpr void reset() noexcept {
         submitted = 0u; stopped = false; depthReady = false;
         depthDirection = 0u;
+        lastSourceDraw = 0u; hasSourceDraw = false;
     }
 };
 } // namespace outrun::vr::dx11::live_game_frame

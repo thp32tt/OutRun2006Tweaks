@@ -248,6 +248,45 @@ def main() -> None:
         probe = probe + 1 if probe < 256 else 0
     assert len(set(visited)) == 257 and visited[-1] == 256 and probe == 0
 
+    # 00677: end-to-end raw game Draw stream -> batch -> GPU inset delivery.
+    # Count unsupported D3D9 calls separately from eligible native samples.
+    # A batch aborted after an earlier native Draw cannot be published at Present.
+    def native_batch_publication_safe(code: str, header: str) -> bool:
+        observe = code[code.find("void observe("):code.find("} // namespace", code.find("void observe("))]
+        present = code[code.find("void before_game_present("):code.find("void before_game_reset(")]
+        return all(x in observe for x in (
+            "const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;",
+            "if (!supported_game_state(game, type, vp, layout, transforms, capture, output)) {",
+            "s.frameBatch.abort();",
+            "s.frameBatch.accepts_source_draw(sourceOrdinal, multiBatch)",
+            "s.frameBatch.record_source_draw(sourceOrdinal);",
+        )) and all(x in present for x in (
+            "s.frameBatch.publishable(s.pending)",
+            "s.sourceDrawsThisFrame = 0u;",
+        )) and all(x in header for x in (
+            "ordinal - lastSourceDraw == 1u",
+            "return pending && submitted != 0u && !stopped;",
+            "lastSourceDraw = 0u; hasSourceDraw = false;",
+        ))
+
+    assert native_batch_publication_safe(bridge, batch)
+    for original, replacement in (
+        ("const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;",
+         "const std::uint64_t sourceOrdinal = s.eligibleThisFrame;"),
+        ("s.frameBatch.accepts_source_draw(sourceOrdinal, multiBatch)",
+         "s.frameBatch.accepts_source_draw(sourceOrdinal, false)"),
+        ("s.frameBatch.publishable(s.pending)", "s.pending"),
+    ):
+        bad_bridge = bridge.replace(original, replacement, 1)
+        assert bad_bridge != bridge and not native_batch_publication_safe(bad_bridge, batch)
+    for original, replacement in (
+        ("ordinal - lastSourceDraw == 1u", "ordinal - lastSourceDraw <= 8u"),
+        ("return pending && submitted != 0u && !stopped;",
+         "return pending && submitted != 0u;"),
+    ):
+        bad_header = batch.replace(original, replacement, 1)
+        assert bad_header != batch and not native_batch_publication_safe(bridge, bad_header)
+
     # UpdateSurface requires identical source/destination formats, no MSAA,
     # and an entirely in-bounds rectangle. The game's backbuffer can be X8.
     def safe_inset_copy(code: str) -> bool:
