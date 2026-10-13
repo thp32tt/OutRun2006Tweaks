@@ -1,0 +1,67 @@
+{
+  "schema": "outrun-a-imagegen-qa-v1",
+  "task_id": "OUTRUN-A-Q217-IMG-SMOKE-20261013",
+  "run_key": "OUTRUN-KOR-A-Q217-IMG-SOURCE-BIND-20261013-1300",
+  "time": "2026-10-13 13:07 KST",
+  "role": "A",
+  "queue_index": 217,
+  "asset_key": "D1039D6F",
+  "canonical_source_dds_sha256": "d3d2d15540642d8315df8b38b77a34609e534ea042bce8e7e951e65ab219bcd0",
+  "source_readable_png": {
+    "name": "Q217_D1039D6F_BASE_READABLE_FLIPY.png",
+    "sha256": "56b3834649568383293786e862025351d0f2379ec632592cf40d78c532a50b15",
+    "size": [
+      2048,
+      2048
+    ],
+    "alpha": "RGBA",
+    "extracted_from_library_archive": true,
+    "verified": true
+  },
+  "mapping": {
+    "START": "출발",
+    "GOAL": "골"
+  },
+  "source_crops": {
+    "START": [
+      787,
+      493,
+      900,
+      548
+    ],
+    "GOAL": [
+      1327,
+      755,
+      1436,
+      811
+    ]
+  },
+  "generation": {
+    "mode": "ChatGPT native generation probe (NOT Portainer runtime)",
+    "actual_composer_source_attachment": false,
+    "actual_input_reference_bound": false,
+    "returned_image": true,
+    "output_sha256": "b884beac20e9890f3ee5f90a5d66ae5851eb417dd2bd452acc8c50a0bc7a66df",
+    "size": [
+      1230,
+      1278
+    ],
+    "classification": "NON_GLYPH_SCENE_OUTPUT",
+    "usable": false,
+    "committed_output": false
+  },
+  "qa": {
+    "status": "HOLD_SOURCE_REFERENCE_NOT_BOUND",
+    "native_75_50": "NOT_RUN_NO_VALID_KOREAN_IMAGE",
+    "original_glyph_effect_bbox": "NOT_ASSESSED",
+    "underfill_alone_is_not_fail": true,
+    "source_reference_binding": "FAIL",
+    "persisted_dds": "NONE",
+    "C1": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "runtime_validation": "UNTESTED",
+    "existing_queue_status": "REWORK_UNCHANGED",
+    "official_promotion": "NO"
+  },
+  "next": "Attach exact sha-bound English PNG to the actual ChatGPT composer; verify attachment before ImageGen; preserve previous q217 REWORK/OPEN and avoid duplicate task scoring."
+}
