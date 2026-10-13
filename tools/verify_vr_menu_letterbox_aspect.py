@@ -450,3 +450,69 @@ declaration = object()
 assert returned_vertex_input(0, declaration) == ("CUSTOM", declaration)
 assert returned_vertex_input(0, None) == ("CUSTOM", None)
 print("PASS DX9Ex menu fixed-FVF/custom-declaration restoration, 4 destructive mutants")
+
+# Issue #119: main-menu 4:3 sidebars are opaque output rather than game
+# sprites. An inherited alpha compare or disabled colour-write mask can
+# suppress both black triangles even when scissor/stencil are disabled.
+# Capture, override and restore those two distinct D3D9 states in EndScene.
+def verify_menu_opaque_mask(code: str) -> None:
+    endscene = code.split("static void D3DEndScene(", 1)[1].split(
+        "if (overlayInited)", 1)[0]
+    required = (
+        "DWORD prevAlphaTest = FALSE;",
+        "DWORD prevColorWrite = 0;",
+        "SUCCEEDED(d3ddev->GetRenderState(D3DRS_ALPHATESTENABLE, &prevAlphaTest))",
+        "SUCCEEDED(d3ddev->GetRenderState(D3DRS_COLORWRITEENABLE, &prevColorWrite))",
+        "if (clipStateReady)",
+        "d3ddev->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);",
+        "d3ddev->SetRenderState(D3DRS_COLORWRITEENABLE,\n"
+        "\t\t\t\t\tD3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |\n"
+        "\t\t\t\t\tD3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);",
+        "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);",
+        "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);",
+        "d3ddev->SetRenderState(D3DRS_ALPHATESTENABLE, prevAlphaTest);",
+        "d3ddev->SetRenderState(D3DRS_COLORWRITEENABLE, prevColorWrite);",
+    )
+    points = [endscene.index(token) for token in required]
+    assert points == sorted(points) and len(set(points)) == len(points)
+    # No new state touches outside the guarded menu bar draw. Missing
+    # snapshots must skip the bars, not corrupt following F11/game draws.
+    assert endscene.count("if (clipStateReady)") == 1
+    assert endscene.count("d3ddev->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);") == 1
+    assert endscene.count("d3ddev->SetRenderState(D3DRS_COLORWRITEENABLE, prevColorWrite);") == 1
+
+verify_menu_opaque_mask(src)
+opaque_mutants = (
+    ("DWORD prevAlphaTest = FALSE;", "DWORD prevAlphaTest = TRUE;"),
+    ("DWORD prevColorWrite = 0;", "DWORD prevColorWrite = 15;"),
+    ("SUCCEEDED(d3ddev->GetRenderState(D3DRS_ALPHATESTENABLE, &prevAlphaTest))",
+     "true"),
+    ("SUCCEEDED(d3ddev->GetRenderState(D3DRS_COLORWRITEENABLE, &prevColorWrite))",
+     "true"),
+    ("d3ddev->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);",
+     "d3ddev->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);"),
+    ("D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);",
+     "D3DCOLORWRITEENABLE_BLUE);"),
+    ("d3ddev->SetRenderState(D3DRS_ALPHATESTENABLE, prevAlphaTest);",
+     "d3ddev->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);"),
+    ("d3ddev->SetRenderState(D3DRS_COLORWRITEENABLE, prevColorWrite);",
+     "d3ddev->SetRenderState(D3DRS_COLORWRITEENABLE, 0);"),
+)
+for good, bad in opaque_mutants:
+    assert src.count(good) == 1, good
+    try:
+        verify_menu_opaque_mask(src.replace(good, bad, 1))
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("Opaque menu-sidebar mutant survived: " + good)
+# A fully disabled/alpha-rejected game draw must not suppress the sidebar,
+# and its original state must still be restored for later scene/ImGui draws.
+all_channels = 0x1 | 0x2 | 0x4 | 0x8
+for previous_alpha in (False, True):
+    for previous_mask in (0, 0x1, 0x7, all_channels):
+        bar_alpha, bar_mask = False, all_channels
+        assert not bar_alpha and bar_mask == all_channels
+        assert (previous_alpha, previous_mask) == (
+            previous_alpha, previous_mask)
+print("PASS opaque 4:3 menu bars alpha-test/colour-write isolation, 8 destructive mutants")

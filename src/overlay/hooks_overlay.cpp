@@ -177,10 +177,14 @@ class D3DHooks : public Hook
 			// evidence skips only the sidebars, never the F11 overlay below.
 			DWORD prevScissorTest = FALSE;
 			DWORD prevStencilEnable = FALSE;
+			DWORD prevAlphaTest = FALSE;
+			DWORD prevColorWrite = 0;
 			const bool clipStateReady =
 				(!Game::is_in_game() || Settings::UILetterboxing == 2) &&
 				SUCCEEDED(d3ddev->GetRenderState(D3DRS_SCISSORTESTENABLE, &prevScissorTest)) &&
-				SUCCEEDED(d3ddev->GetRenderState(D3DRS_STENCILENABLE, &prevStencilEnable));
+				SUCCEEDED(d3ddev->GetRenderState(D3DRS_STENCILENABLE, &prevStencilEnable)) &&
+				SUCCEEDED(d3ddev->GetRenderState(D3DRS_ALPHATESTENABLE, &prevAlphaTest)) &&
+				SUCCEEDED(d3ddev->GetRenderState(D3DRS_COLORWRITEENABLE, &prevColorWrite));
 			if (clipStateReady)
 			{
 				// This runs after SceneControl has finished, so anything left set here carries
@@ -219,10 +223,16 @@ class D3DHooks : public Hook
 				d3ddev->GetVertexDeclaration(&prevVertexDecl);
 				d3ddev->GetStreamSource(0, &prevStreamData, &prevStreamOffset, &prevStreamStride);
 
-				// Neither the prior menu scissor nor its stencil mask owns the
-				// outer bars. Keep this change scoped to their two draw calls.
+				// The opaque bars must not inherit the last sprite's stencil,
+				// scissor, alpha test or disabled colour channels. A prior alpha
+				// compare can discard even the XRGB-black sidebars; a zero colour
+				// mask makes both triangles invisible. Restore every state below.
 				d3ddev->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 				d3ddev->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+				d3ddev->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+				d3ddev->SetRenderState(D3DRS_COLORWRITEENABLE,
+					D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
+					D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
 				// Borders get culled without this
 				d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
@@ -259,6 +269,8 @@ class D3DHooks : public Hook
 				// from the previous scene must neither clip the bars nor be lost.
 				d3ddev->SetRenderState(D3DRS_SCISSORTESTENABLE, prevScissorTest);
 				d3ddev->SetRenderState(D3DRS_STENCILENABLE, prevStencilEnable);
+				d3ddev->SetRenderState(D3DRS_ALPHATESTENABLE, prevAlphaTest);
+				d3ddev->SetRenderState(D3DRS_COLORWRITEENABLE, prevColorWrite);
 				d3ddev->SetRenderState(D3DRS_CULLMODE, prevCullMode);
 				d3ddev->SetRenderState(D3DRS_ALPHABLENDENABLE, prevAlphaBlend);
 				d3ddev->SetRenderState(D3DRS_ZENABLE, prevZEnable);
