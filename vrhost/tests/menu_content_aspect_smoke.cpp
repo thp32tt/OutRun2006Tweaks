@@ -24,6 +24,46 @@ static_assert(!invalidTarget.crop);
 
 int main()
 {
+    using OutRunVrMenuAspect::PlanCommonFovTangents;
+    // Two asymmetric Quest-style FOVs must average the actual tangent
+    // plane. tan(mean angle) causes a different apparent menu aspect.
+    const float l0 = -0.72f, r0 = 0.81f, d0 = -0.65f, u0 = 0.83f;
+    const float l1 = -1.06f, r1 = 0.91f, d1 = -0.87f, u1 = 0.76f;
+    const auto shared = PlanCommonFovTangents(
+        l0, r0, d0, u0, l1, r1, d1, u1);
+    if (!shared.valid ||
+        std::fabs(shared.left - 0.5f * (std::tan(l0) + std::tan(l1))) > 1e-6f ||
+        std::fabs(shared.right - 0.5f * (std::tan(r0) + std::tan(r1))) > 1e-6f ||
+        std::fabs(shared.down - 0.5f * (std::tan(d0) + std::tan(d1))) > 1e-6f ||
+        std::fabs(shared.up - 0.5f * (std::tan(u0) + std::tan(u1))) > 1e-6f)
+        return 2;
+    const float oldHorizontal =
+        std::tan(0.5f * (r0 + r1)) - std::tan(0.5f * (l0 + l1));
+    if (std::fabs((shared.right - shared.left) - oldHorizontal) < 0.002f)
+        return 3;
+    const auto identical = PlanCommonFovTangents(
+        l0, r0, d0, u0, l0, r0, d0, u0);
+    if (!identical.valid ||
+        std::fabs(identical.right - std::tan(r0)) > 1e-6f)
+        return 4;
+    // One invalid or inverted eye must never authorize a distorted LOCAL
+    // projection, including during intermittent XR extent/FOV transitions.
+    if (PlanCommonFovTangents(l0, r0, d0, u0, r1, l1, d1, u1).valid ||
+        PlanCommonFovTangents(l0, r0, d0, u0, l1, r1, u1, d1).valid ||
+        PlanCommonFovTangents(l0, r0, d0, u0, l1, 1.56f, d1, u1).valid ||
+        PlanCommonFovTangents(l0, r0, d0, u0, l1, r1, d1,
+            std::numeric_limits<float>::quiet_NaN()).valid)
+        return 5;
+
+    // After Reset/recenter a new full eye pair must immediately restore
+    // the shared aspect; the routine carries no stale state or UV.
+    const auto restored = PlanCommonFovTangents(
+        -0.8f, 0.8f, -0.7f, 0.7f, -0.8f, 0.8f, -0.7f, 0.7f);
+    if (!restored.valid ||
+        std::fabs((restored.right - restored.left) /
+            (restored.up - restored.down) -
+            std::tan(0.8f) / std::tan(0.7f)) > 1e-5f)
+        return 6;
     const auto nan = PlanCenteredContent(
         std::numeric_limits<float>::quiet_NaN(), 4.0f / 3.0f);
     const auto inf = PlanCenteredContent(

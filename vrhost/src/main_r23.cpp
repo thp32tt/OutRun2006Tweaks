@@ -1391,25 +1391,20 @@ namespace
         UvRect whole{};
         if (!c.GetGameUv(whole)) return false;
 
-        XrFovf commonFov{};
-        commonFov.angleLeft = 0.5f *
-            (views[0].fov.angleLeft + views[1].fov.angleLeft);
-        commonFov.angleRight = 0.5f *
-            (views[0].fov.angleRight + views[1].fov.angleRight);
-        commonFov.angleUp = 0.5f *
-            (views[0].fov.angleUp + views[1].fov.angleUp);
-        commonFov.angleDown = 0.5f *
-            (views[0].fov.angleDown + views[1].fov.angleDown);
-
-        const float tanLeft = std::tan(commonFov.angleLeft);
-        const float tanRight = std::tan(commonFov.angleRight);
-        const float tanDown = std::tan(commonFov.angleDown);
-        const float tanUp = std::tan(commonFov.angleUp);
-        const float spanX = tanRight - tanLeft;
-        const float spanY = tanUp - tanDown;
-        if (!std::isfinite(spanX) || !std::isfinite(spanY) ||
-            spanX <= 0.05f || spanY <= 0.05f)
+        // Issue #119: average the two eye's tangent-plane extents,
+        // not their FOV angles. tan(mean(angle)) is not mean(tan(angle));
+        // the old approximation stretched LOCAL-fixed 4:3 menu content
+        // under asymmetric XR eye projections. One coherent common span
+        // remains shared by both eyes; bad eye publication fails closed.
+        const auto common = OutRunVrMenuAspect::PlanCommonFovTangents(
+            views[0].fov.angleLeft, views[0].fov.angleRight,
+            views[0].fov.angleDown, views[0].fov.angleUp,
+            views[1].fov.angleLeft, views[1].fov.angleRight,
+            views[1].fov.angleDown, views[1].fov.angleUp);
+        if (!common.valid)
             return false;
+        const float spanX = common.right - common.left;
+        const float spanY = common.up - common.down;
 
         RECT cr{};
         GetClientRect(c.hwnd_, &cr);
