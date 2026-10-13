@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00803",
+  "production_id": "CONVERSION-DX9EX-00803",
+  "event_id": "CONVERSION-DX9EX-00803-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R32_PRESENT_SPIKE_IO_COALESCING",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R32_PRESENT_SPIKE_IO_COALESCING",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
+  "checkpoint": "C3_VALIDATE",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00803]",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r32_spike_log_backpressure.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00803.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R32_PRESENT_SPIKE_IO_COALESCING",
+    "goal": "Prevent latency-amplifying synchronous per-spike disk logging on the DX9Ex Present path while retaining complete worst-frame workload, stereo routing, and spike evidence under Reset and diagnostics enable/disable.",
+    "scope_boundary": "R32 diagnostic-only Present/Reset sampling; no world/eye geometry, HUD, input, FFB, DX11 or DXVK changes.",
+    "special_work_evidence": "Before patch each >=30ms hard spike bypassed its 100ms logging cooldown, calling spdlog::warn on the render thread without limit. Coalescing eliminates per-spike I/O, preserving exact peak in the existing five-second summary. Quest3 FPS effect unmeasured.",
+    "trace_stages": [
+      "R32 draw producer counts game-side draw/primitive/alpha workload before Present.",
+      "R32FinalizeFramePerf samples source-frame QPC and current stereo routes, saves the worst window frame.",
+      "R32LogPerfWindow emits one five-second summary with worst-frame snapshot and spike count; disable and Reset isolate measurement epochs."
+    ],
+    "subcomponents": [
+      "Store accurate worst-frame Present duration, baseline, draw types and stereo route in a bounded zero-allocation window.",
+      "Eliminate synchronous per-spike logging, preserving one five-second summary and spike total.",
+      "Reset diagnostic window on enable/disable boundaries; integrate negative mutations and randomized load model into full Win32 gate."
+    ],
+    "acceptance_items": [
+      {
+        "id": "R32_BOUNDED_LOG_IO",
+        "category": "end_to_end_behavior",
+        "behavior_area": "present_latency_and_burst",
+        "expected_behavior": "No per-spike synchronous logging; one periodic report with the exact worst-frame detail during any hard spike storm."
+      },
+      {
+        "id": "R32_EPOCH_AND_PEAK_PARITY",
+        "category": "fallback_regression",
+        "behavior_area": "reset_disable_and_workload",
+        "expected_behavior": "Reset and disabled sessions never combine timing windows; all spike count, peak duration and stereo workload values survive."
+      },
+      {
+        "id": "R32_EXACT_SHA_FULL_GATE",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_host_package_domain",
+        "expected_behavior": "Destructive source/model checks, exact-SHA game/host/package DX9Ex Active, Domain Isolation and Full Source Impact succeed."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "R32_BOUNDED_LOG_IO": "PASS_SOURCE_PENDING_CI",
+    "R32_EPOCH_AND_PEAK_PARITY": "PASS_SOURCE_PENDING_CI",
+    "R32_EXACT_SHA_FULL_GATE": "PENDING",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "R32FinalizeFramePerf calls spdlog::warn on each hard spike regardless of cooldown, injecting unbounded synchronous logging into game Present.",
+    "root_cause": "Frame-spike diagnostics generate synchronous logging on the same latency-sensitive thread being measured.",
+    "source_trace": [
+      "D3D9 draw and effect workload counters",
+      "R32FinalizeFramePerf QPC and worst frame accounting",
+      "R32LogPerfWindow periodic console and disk report"
+    ],
+    "alternatives_rejected": [
+      "Just increasing a warning cooldown still incurs synchronous disk I/O inside spike bursts.",
+      "Dropping peak context would destroy attribution of user-reported 300ms transitions.",
+      "Lowering render resolution to mask stalls sacrifices visual quality."
+    ],
+    "fix_evidence": "Aggregate worst source frame, baseline, workload, and stereo route at zero extra GPU cost with one five-second log.",
+    "negative_test_evidence": "Eight destructive mutant checks and seeded 2600-frame burst model wired to exact-SHA Win32 CI."
+  },
+  "performance_evidence": "Source-confirmed removal of every synchronous per-hard-spike warning; HMD p95/p99 performance gains remain unmeasured.",
+  "runtime_status": "NEED_QUEST3_VDXR_P95_P99"
+}

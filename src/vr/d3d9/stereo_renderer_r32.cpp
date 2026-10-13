@@ -84,6 +84,18 @@ namespace OutRunVRStereo
         };
         thread_local R32FrameWorkload R32FrameWorkloadCounters{};
 
+        struct R32StereoWorkloadSnapshot
+        {
+            std::uint64_t main = 0;
+            std::uint64_t offscreen = 0;
+            std::uint64_t aux = 0;
+            std::uint64_t fastWorld = 0;
+            std::uint64_t hud = 0;
+            std::uint64_t fallback = 0;
+            std::uint64_t fragile = 0;
+            std::uint64_t unstable = 0;
+        };
+
         struct R32PerfWindow
         {
             std::uint64_t frames = 0;
@@ -101,23 +113,16 @@ namespace OutRunVRStereo
             std::uint64_t maxAlphaBlendDraws = 0;
             std::uint64_t maxParticleLikeDraws = 0;
             std::uint64_t maxParticleLikePrimitives = 0;
+            // Capture the worst frame, not a synchronous warning for each
+            // severe hitch. The five-second report keeps its full context.
+            std::uint64_t worstBaselineUs = 0;
+            std::uint64_t worstPresentUs = 0;
+            R32FrameWorkload worstWorkload{};
+            R32StereoWorkloadSnapshot worstStereo{};
         };
         thread_local R32PerfWindow R32PerfWindowCounters{};
         thread_local std::uint64_t R32PerfBaselineUs = 0;
         thread_local LONGLONG R32LastPresentEndQpc = 0;
-        thread_local ULONGLONG R32LastSpikeLogMs = 0;
-
-        struct R32StereoWorkloadSnapshot
-        {
-            std::uint64_t main = 0;
-            std::uint64_t offscreen = 0;
-            std::uint64_t aux = 0;
-            std::uint64_t fastWorld = 0;
-            std::uint64_t hud = 0;
-            std::uint64_t fallback = 0;
-            std::uint64_t fragile = 0;
-            std::uint64_t unstable = 0;
-        };
 
         LONGLONG R32PerfQpcFrequency() noexcept
         {
@@ -252,7 +257,14 @@ namespace OutRunVRStereo
             window.presentUsTotal += presentUs;
             window.drawsTotal += frame.draws;
             window.primitivesTotal += frame.primitives;
-            window.maxFrameUs = (std::max)(window.maxFrameUs, frameUs);
+            if (frameUs > window.maxFrameUs)
+            {
+                window.maxFrameUs = frameUs;
+                window.worstBaselineUs = baselineBefore;
+                window.worstPresentUs = presentUs;
+                window.worstWorkload = frame;
+                window.worstStereo = stereo;
+            }
             window.maxPresentUs = (std::max)(window.maxPresentUs, presentUs);
             window.maxDraws = (std::max)(window.maxDraws, frame.draws);
             window.maxPrimitives =
@@ -269,28 +281,8 @@ namespace OutRunVRStereo
                 window.maxParticleLikePrimitives,
                 frame.particleLikePrimitives);
 
-            if (!spike)
-                return;
-
-            const ULONGLONG nowMs = GetTickCount64();
-            const bool hardSpike = frameUs >= OutRunVR::R32::PerfSpikeHardUs;
-            if (!hardSpike && R32LastSpikeLogMs != 0 &&
-                nowMs - R32LastSpikeLogMs <
-                    OutRunVR::R32::PerfSpikeLogCooldownMs)
-                return;
-            R32LastSpikeLogMs = nowMs;
-
-            spdlog::warn(
-                "VR R32 FRAME SPIKE: frameUs={} baselineUs={} presentUs={} workload[draws={},primitives={},triangles={},indexed={},up={},alphaBlend={},alphaBlendPrimitives={},alphaTest={},particleLikeDraws={},particleLikePrimitives={},effectUnknown={}] stereo[main={},offscreen={},aux={},fastWorld={},hud={},fallback={},fragile={},unstable={}]",
-                frameUs, baselineBefore, presentUs,
-                frame.draws, frame.primitives, frame.triangles,
-                frame.indexedDraws, frame.upDraws,
-                frame.alphaBlendDraws, frame.alphaBlendPrimitives,
-                frame.alphaTestDraws, frame.particleLikeDraws,
-                frame.particleLikePrimitives, frame.effectUnknownDraws,
-                stereo.main, stereo.offscreen, stereo.aux,
-                stereo.fastWorld, stereo.hud, stereo.fallback,
-                stereo.fragile, stereo.unstable);
+            // No synchronous per-spike I/O: R32LogPerfWindow owns the
+            // bounded report, including the worst workload and spike count.
         }
 
         bool R32ReadEffectSnapshot(IDirect3DDevice9* device,
@@ -634,7 +626,6 @@ namespace OutRunVRStereo
             R32PerfWindowCounters = {};
             R32PerfBaselineUs = 0;
             R32LastPresentEndQpc = 0;
-            R32LastSpikeLogMs = 0;
         }
 
         void R32ResetAfterGameReset() noexcept
@@ -711,7 +702,7 @@ namespace OutRunVRStereo
                     R32PerfWindowCounters.frames : 0;
 
             spdlog::info(
-                "VR R32 PERF 5s: frame[frames={},spikes={},avgUs={},maxUs={},presentAvgUs={},presentMaxUs={}] workload[drawAvg={},drawMax={},primitiveAvg={},primitiveMax={},triangleMax={},upMax={},alphaBlendMax={},particleLikeDrawMax={},particleLikePrimitiveMax={}] liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},backpressure={},pendingError={}] reset[rearm={},fail={}]",
+                "VR R32 PERF 5s: frame[frames={},spikes={},avgUs={},maxUs={},presentAvgUs={},presentMaxUs={}] workload[drawAvg={},drawMax={},primitiveAvg={},primitiveMax={},triangleMax={},upMax={},alphaBlendMax={},particleLikeDrawMax={},particleLikePrimitiveMax={}] liveWvpCheck={} liveReject={} stateBlock[record={},apply={}] batchWvp[ok={},fail={}] safety[stateReadFail={},forcedZero={}] direct[probeCacheHit={},backpressure={},pendingError={}] reset[rearm={},fail={}] worst[baselineUs={},presentUs={},draws={},indexed={},up={},alphaBlend={},alphaTest={},particleLike={},effectUnknown={},stereoWorld={},stereoHud={},stereoFallback={}]",
                 R32PerfWindowCounters.frames,
                 R32PerfWindowCounters.spikes,
                 frameAvgUs,
@@ -740,7 +731,19 @@ namespace OutRunVRStereo
                     R32Counters.directBackpressure,
                 R32PendingFenceErrors - R32Counters.pendingError,
                 R32ResetEpochRearms - R32Counters.resetRearm,
-                R32ResetFailures - R32Counters.resetFail);
+                R32ResetFailures - R32Counters.resetFail,
+                R32PerfWindowCounters.worstBaselineUs,
+                R32PerfWindowCounters.worstPresentUs,
+                R32PerfWindowCounters.worstWorkload.draws,
+                R32PerfWindowCounters.worstWorkload.indexedDraws,
+                R32PerfWindowCounters.worstWorkload.upDraws,
+                R32PerfWindowCounters.worstWorkload.alphaBlendDraws,
+                R32PerfWindowCounters.worstWorkload.alphaTestDraws,
+                R32PerfWindowCounters.worstWorkload.particleLikeDraws,
+                R32PerfWindowCounters.worstWorkload.effectUnknownDraws,
+                R32PerfWindowCounters.worstStereo.fastWorld,
+                R32PerfWindowCounters.worstStereo.hud,
+                R32PerfWindowCounters.worstStereo.fallback);
 
             R32Counters.lastLogMs = now;
             R32Counters.liveWvp = R31SupportTelemetryLiveWvpChecks();
@@ -790,8 +793,11 @@ namespace OutRunVRStereo
                 }
                 else
                 {
-                    // A disabled interval cannot seed the next enabled sample.
+                    // Disable/re-enable begins a new measurement window.
                     R32FrameWorkloadCounters = {};
+                    R32PerfWindowCounters = {};
+                    R32PerfBaselineUs = 0;
+                    R32Counters = {};
                     R32LastPresentEndQpc = 0;
                 }
             }
