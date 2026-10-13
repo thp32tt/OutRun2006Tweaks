@@ -811,11 +811,26 @@ require_order(
     "ReleaseStereoResources();",
 )
 
+# The steady DirectGPU query is polled after Present without an additional
+# D3DGETDATA_FLUSH. The initial interop handshake separately retains the
+# default FLUSH; do not regress either call site's submission policy.
+event_wait_r7 = body(r7, "bool WaitForEventQuery(")
+require(
+    event_wait_r7,
+    "DirectGPU initial interop EVENT submission policy",
+    "DWORD dataFlags = D3DGETDATA_FLUSH",
+    "query->GetData(nullptr, 0, dataFlags)",
+)
+require(
+    ensure_probe,
+    "DirectGPU interop bootstrap keeps submitted EVENT probe",
+    "WaitForEventQuery(DirectInteropProbeFence,50)",
+)
 post_present_r7 = body(r7, "bool DirectTransportFrameReadyAfterPresent(")
 require_order(
     post_present_r7,
     "DirectGPU bounded post-Present publication",
-    "if(WaitForEventQuery(slot.fence,1))",
+    "if(WaitForEventQuery(slot.fence,1,0u))",
     "slot.producerPending=false;",
     "slot.pendingFrameId=0;",
     "slot.published=true;",
