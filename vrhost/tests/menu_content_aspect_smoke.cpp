@@ -29,8 +29,10 @@ constexpr auto wide219 = PlanCenteredContent(3440.0f / 1440.0f, 4.0f / 3.0f);
 static_assert(wide219.crop && wide219.width > 0.557f &&
     wide219.width < 0.559f && wide219.offsetX > 0.220f &&
     wide219.offsetX < 0.222f);
-constexpr auto portrait = PlanCenteredContent(9.0f / 16.0f, 4.0f / 3.0f);
-static_assert(!portrait.crop && portrait.width == 1.0f);
+constexpr auto portrait = PlanCenteredContent(2496.0f / 2688.0f, 4.0f / 3.0f);
+static_assert(portrait.crop && portrait.width == 1.0f &&
+    portrait.offsetY > 0.151f && portrait.offsetY < 0.153f &&
+    portrait.height > 0.696f && portrait.height < 0.697f);
 constexpr auto invalidZero = PlanCenteredContent(0.0f, 4.0f / 3.0f);
 static_assert(!invalidZero.crop);
 constexpr auto invalidTarget = PlanCenteredContent(16.0f / 9.0f, -1.0f);
@@ -132,7 +134,7 @@ int main()
         !near(partialMenu.visibleHeightScale, 0.75f) ||
         !near(partialMenu.aspect, 4.f / 3.f))
         return 21;
-    // Do not crop portrait/4:3, stale capture UV after a monitor move,
+    // Do not crop native 4:3, stale capture UV after a monitor move,
     // missing/reset source or a strip that cannot fit a coherent menu.
     if (PlanVisibleCenteredContent(
             0, 0, 1280, 960, 1920, 1080, 0, 0,
@@ -151,6 +153,36 @@ int main()
             std::numeric_limits<float>::quiet_NaN(), 0, 1, 1,
             4.f / 3.f).crop)
         return 19;
+
+    // 2496x2688 portrait menu has 408px upper/lower matte around
+    // 2496x1872 authentic 4:3 content. Remove the Y matte from the source.
+    const auto portraitFull = PlanVisibleCenteredContent(
+        0, 0, 2496, 2688, 2496, 2688, 0, 0, 1, 1, 4.f / 3.f);
+    if (!portraitFull.crop ||
+        !near(portraitFull.offsetX, 0.f) ||
+        !near(portraitFull.width, 1.f) ||
+        !near(portraitFull.offsetY, 408.f / 2688.f) ||
+        !near(portraitFull.height, 1872.f / 2688.f) ||
+        !near(portraitFull.aspect, 4.f / 3.f) ||
+        !near(portraitFull.visibleOffsetY, 0.f) ||
+        !near(portraitFull.visibleHeightScale, 1.f))
+        return 23;
+    // Moving the same client off an output top edge must show only the
+    // surviving original menu fragment, NOT zoom to a complete 4:3 quad.
+    const auto portraitClipped = PlanVisibleCenteredContent(
+        0, -800, 2496, 1888, 2496, 2688, 0, 0, 1,
+        1888.f / 2688.f, 4.f / 3.f);
+    if (!portraitClipped.crop ||
+        !near(portraitClipped.offsetY, 0.f) ||
+        !near(portraitClipped.height, 1480.f / 1888.f) ||
+        !near(portraitClipped.visibleOffsetY, 392.f / 1872.f) ||
+        !near(portraitClipped.visibleHeightScale, 1480.f / 1872.f) ||
+        !near(portraitClipped.aspect, 2496.f / 1480.f))
+        return 24;
+    if (PlanVisibleCenteredContent(
+            0, 0, 2496, 2688, 2496, 2688,
+            0, 0.22f, 1, 0.78f, 4.f / 3.f).crop)
+        return 25;
 
     using OutRunVrMenuAspect::PlanCommonFovTangents;
     // Two asymmetric Quest-style FOVs must average the actual tangent

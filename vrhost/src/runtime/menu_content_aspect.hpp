@@ -31,6 +31,9 @@ namespace OutRunVrMenuAspect
         float visibleOffsetY = 0.0f;  // positive means below authored centre
         float visibleWidthScale = 1.0f;
         float visibleHeightScale = 1.0f;
+        // Source UV cropping is independent from optical fragment placement.
+        float offsetY = 0.0f;
+        float height = 1.0f;
     };
 
     // Projection spans are linear in tan(FOV), not in the angles themselves.
@@ -164,15 +167,22 @@ namespace OutRunVrMenuAspect
     constexpr CropPlan PlanCenteredContent(
         float sourceAspect, float intendedAspect) noexcept
     {
-        // Reject NaN/Inf, invalid client sizes and nonsensical overrides.
-        // Failing closed preserves the existing complete-client projection.
+        // Horizontal sidebars on wide clients; vertical top/bottom matte
+        // on portrait sources. Leave a native 4:3 client unchanged.
         if (!(sourceAspect >= 0.5f && sourceAspect <= 5.0f) ||
             !(intendedAspect >= 0.5f && intendedAspect <= 4.0f) ||
-            sourceAspect <= intendedAspect)
+            sourceAspect == intendedAspect)
             return { false, 0.0f, 1.0f, sourceAspect };
-
-        const float width = intendedAspect / sourceAspect;
-        return { true, (1.0f - width) * 0.5f, width, intendedAspect };
+        if (sourceAspect > intendedAspect)
+        {
+            const float width = intendedAspect / sourceAspect;
+            return { true, (1.0f - width) * 0.5f, width, intendedAspect };
+        }
+        const float height = sourceAspect / intendedAspect;
+        CropPlan plan{ true, 0.0f, 1.0f, intendedAspect };
+        plan.offsetY = (1.0f - height) * 0.5f;
+        plan.height = height;
+        return plan;
     }
 
     // OutRun's authored 4:3 sidebars belong to the FULL game client, not
@@ -229,23 +239,28 @@ namespace OutRunVrMenuAspect
                 (std::min)(captureHeight, clientBottom)) > 1.0f)
             return {};
 
-        const float contentLeft =
-            clientLeft + (clientWidth - clientHeight * intendedAspect) * 0.5f;
-        const float contentRight =
-            clientRight - (clientWidth - clientHeight * intendedAspect) * 0.5f;
+        // Intersect the ORIGINAL authored 4:3 rectangle with the captured
+        // client fragment. Portrait and landscape matte use different axes.
+        const float contentWidth =
+            (std::min)(clientWidth, clientHeight * intendedAspect);
+        const float contentHeight = contentWidth / intendedAspect;
+        const float contentLeft = clientLeft + (clientWidth - contentWidth) * 0.5f;
+        const float contentTop = clientTop + (clientHeight - contentHeight) * 0.5f;
+        const float contentRight = contentLeft + contentWidth;
+        const float contentBottom = contentTop + contentHeight;
         const float visibleLeft = (std::max)(sampledLeft, contentLeft);
         const float visibleRight = (std::min)(sampledRight, contentRight);
+        const float visibleTop = (std::max)(sampledTop, contentTop);
+        const float visibleBottom = (std::min)(sampledBottom, contentBottom);
         const float visibleWidth = visibleRight - visibleLeft;
+        const float visibleHeight = visibleBottom - visibleTop;
         const float sampledWidth = sampledRight - sampledLeft;
         const float sampledHeight = sampledBottom - sampledTop;
-        const float visibleTop = (std::max)(sampledTop, clientTop);
-        const float visibleBottom = (std::min)(sampledBottom, clientBottom);
-        const float visibleHeight = visibleBottom - visibleTop;
-        const float contentWidth = clientHeight * intendedAspect;
         if (!(visibleWidth > 0.0f && visibleHeight > 0.0f &&
               sampledWidth > 0.0f && sampledHeight > 0.0f &&
-              contentWidth > 0.0f) ||
-            visibleWidth < 0.05f * sampledWidth)
+              contentWidth > 0.0f && contentHeight > 0.0f) ||
+            visibleWidth < 0.05f * sampledWidth ||
+            visibleHeight < 0.05f * sampledHeight)
             return {};
 
         const float visibleAspect = visibleWidth / visibleHeight;
@@ -253,10 +268,10 @@ namespace OutRunVrMenuAspect
             (visibleLeft + visibleRight - contentLeft - contentRight) /
             contentWidth;
         const float visibleOffsetY =
-            (visibleTop + visibleBottom - clientTop - clientBottom) /
-            clientHeight;
+            (visibleTop + visibleBottom - contentTop - contentBottom) /
+            contentHeight;
         const float widthScale = visibleWidth / contentWidth;
-        const float heightScale = visibleHeight / clientHeight;
+        const float heightScale = visibleHeight / contentHeight;
         if (!std::isfinite(visibleAspect) ||
             visibleAspect < 0.5f || visibleAspect > 5.0f ||
             !std::isfinite(visibleOffsetX) ||
@@ -264,8 +279,11 @@ namespace OutRunVrMenuAspect
             !(widthScale > 0.0f && widthScale <= 1.00001f) ||
             !(heightScale > 0.0f && heightScale <= 1.00001f))
             return {};
-        return { true, (visibleLeft - sampledLeft) / sampledWidth,
+        CropPlan result{ true, (visibleLeft - sampledLeft) / sampledWidth,
             visibleWidth / sampledWidth, visibleAspect,
             visibleOffsetX, visibleOffsetY, widthScale, heightScale };
+        result.offsetY = (visibleTop - sampledTop) / sampledHeight;
+        result.height = visibleHeight / sampledHeight;
+        return result;
     }
 }

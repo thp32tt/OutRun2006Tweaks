@@ -692,6 +692,8 @@ def verify_visible_menu_fragment(code: str) -> None:
         "std::uint32_t image = 0;", 1)[0]
     required = [
         "PlanVisibleCenteredContent(",
+        "whole.y += previousHeight * plan.offsetY;",
+        "whole.h = previousHeight * plan.height;",
         "sourceAspect = 4.0f / 3.0f;",
         "cropCentered43 && sourceAspect == 4.0f / 3.0f",
         "? 0.78f : 1.0f;",
@@ -718,10 +720,13 @@ def verify_visible_menu_fragment(code: str) -> None:
 def verify_visible_fragment_source(code: str) -> None:
     body = code.split("inline CropPlan PlanVisibleCenteredContent(", 1)[1]
     for token in (
-        "const float visibleTop = (std::max)(sampledTop, clientTop);",
-        "const float visibleBottom = (std::min)(sampledBottom, clientBottom);",
+        "const float contentHeight = contentWidth / intendedAspect;",
+        "const float visibleTop = (std::max)(sampledTop, contentTop);",
+        "const float visibleBottom = (std::min)(sampledBottom, contentBottom);",
         "visibleWidth / contentWidth;",
-        "visibleHeight / clientHeight;",
+        "visibleHeight / contentHeight;",
+        "result.offsetY = (visibleTop - sampledTop) / sampledHeight;",
+        "result.height = visibleHeight / sampledHeight;",
         "visibleOffsetX, visibleOffsetY, widthScale, heightScale"
     ):
         assert token in body, token
@@ -737,6 +742,8 @@ for old, bad in (
      "placement.centerY + placement.halfHeight * visibleOffsetY;"),
     ("placement.halfWidth * visibleWidthScale;",
      "placement.halfWidth;"),
+    ("whole.y += previousHeight * plan.offsetY;", "whole.y += 0.0f;"),
+    ("whole.h = previousHeight * plan.height;", "whole.h = previousHeight;"),
 ):
     assert old in r23
     try:
@@ -747,7 +754,11 @@ for old, bad in (
         raise AssertionError("menu fragment geometry mutation survived: " + old)
 for old, bad in (
     ("visibleWidth / contentWidth;", "sampledWidth / contentWidth;"),
-    ("visibleHeight / clientHeight;", "sampledHeight / clientHeight;"),
+    ("visibleHeight / contentHeight;", "sampledHeight / contentHeight;"),
+    ("result.offsetY = (visibleTop - sampledTop) / sampledHeight;",
+     "result.offsetY = 0.0f;"),
+    ("result.height = visibleHeight / sampledHeight;",
+     "result.height = 1.0f;"),
 ):
     assert old in menu_geometry
     try:

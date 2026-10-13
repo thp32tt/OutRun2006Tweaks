@@ -1572,8 +1572,11 @@ namespace
             if (plan.crop)
             {
                 const float previousWidth = whole.w;
+                const float previousHeight = whole.h;
                 whole.x += previousWidth * plan.offsetX;
                 whole.w = previousWidth * plan.width;
+                whole.y += previousHeight * plan.offsetY;
+                whole.h = previousHeight * plan.height;
                 // Preserve the ORIGINAL authored 4:3 optical size, then
                 // place only the visible capture fragment at its original
                 // location. Using plan.aspect here zoomed and re-centred a
