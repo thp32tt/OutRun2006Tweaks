@@ -31,7 +31,8 @@ def connected(src):
         if f"float4 c = float4(v.diffuse.rgb, saturate({scale} * t.a * v.diffuse.a));" not in code or "AlphaGate(c.a); return c;" not in code: return False
     return ("constexpr char kScaledAlphaShader[] = R\"(" in src and
             "static const std::string shaderSource = std::string(kShader) + kScaledAlphaShader;" in src and
-            "D3DCompile(shaderSource.data(), shaderSource.size()," in src and
+            "static const std::string stage1ShaderSource = shaderSource + kStage1FactorShader;" in src and
+            "D3DCompile(stage1ShaderSource.data(), stage1ShaderSource.size()," in src and
             "if (!diagnostic_enabled() || !game)" in src and all(x in draw for x in (
         "ctx->PSSetShaderResources(0, 1, &boundView)",
         "ctx->DrawIndexed(indexCount, 0, 0);", "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
@@ -74,7 +75,7 @@ def main():
     for old, bad in (
         ("static const std::string shaderSource = std::string(kShader) + kScaledAlphaShader;",
          "static const std::string shaderSource = std::string(kShader);"),
-        ("D3DCompile(shaderSource.data(), shaderSource.size(),",
+        ("D3DCompile(stage1ShaderSource.data(), stage1ShaderSource.size(),",
          "D3DCompile(kShader, sizeof(kShader) - 1,"),
     ):
         mutant = src.replace(old, bad, 1)
