@@ -10,12 +10,12 @@
   "feature_id": "DX9EX:PERF:R30_CHANGED_IB_SPARSE_MASK_RESET",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R30_CHANGED_IB_SPARSE_MASK_RESET",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_COMMIT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00801]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "tools/verify_vr_r30_index_rebase_fastpath.py",
@@ -60,7 +60,7 @@
   "acceptance_results": {
     "SPARSE_IB_MASK_PARITY": "PASS",
     "IB_SHRINK_FAILURE_FALLBACK": "PASS",
-    "IB_EXACT_SHA_GATES": "PENDING_EXACT_SHA",
+    "IB_EXACT_SHA_GATES": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -81,11 +81,42 @@
   },
   "runtime_status": "NEED_QUEST3_VDXR_P95_P99",
   "performance_evidence": "Source-level reduction only; HMD FPS not measured.",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "material_result_sha": "04eaadd91eee3568639d9cc25c72ab9d7569ce75",
+  "validation_bearing_result_sha": "82951a94391c44145a0f99b15a7c13439ffaecef",
+  "result_sha": "82951a94391c44145a0f99b15a7c13439ffaecef",
   "ci_evidence": {
-    "status": "NOT_YET_RUN",
-    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
-  }
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "82951a94391c44145a0f99b15a7c13439ffaecef",
+    "dx9ex_active": {
+      "run_id": 38469371741,
+      "head_sha": "82951a94391c44145a0f99b15a7c13439ffaecef",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "game": "SUCCESS",
+        "host": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38469371743,
+      "head_sha": "82951a94391c44145a0f99b15a7c13439ffaecef",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38468837425,
+      "head_sha": "04eaadd91eee3568639d9cc25c72ab9d7569ce75",
+      "conclusion": "SUCCESS",
+      "source_tree_unchanged_in_validation_commits": true,
+      "jobs": {
+        "msvc-analyze-active-game": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "source-cross-domain": "SUCCESS"
+      }
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+    "performance_evidence": "No headset p95/p99/FPS measurements; source-level sparse reset only"
+  },
+  "c6_recorded_at_kst": "2026-10-14 06:23 KST"
 }
