@@ -36,43 +36,57 @@ IDirect3DVertexBuffer9* LetterboxVertex = nullptr;
 
 void CreateLetterboxVertex()
 {
-	IDirect3DDevice9* d3ddev = Game::D3DDevice();
-
-	float screenWidth = float(Game::screen_resolution->x);
-	float screenHeight = float(Game::screen_resolution->y);
-	float contentWidth = screenHeight / (3.f / 4.f);
-	float borderWidth = ((screenWidth - contentWidth) / 2) + 0.5f;
-
-	// Add half-pixel offset so there's no white border...
-	screenHeight = screenHeight + 0.5f;
-	screenWidth = screenWidth + 0.5f;
-
-	CUSTOMVERTEX vertices[] =
+	// The menu is authored for a 4:3 source. Draw side bars only when the
+	// current source backbuffer is wider; 4:3 and portrait XR/mirror sources
+	// have no valid left/right bar geometry. A Reset may invalidate all of the
+	// previous dimensions and the old vertex buffer.
+	if (LetterboxVertex)
 	{
-		// Left border
+		LetterboxVertex->Release();
+		LetterboxVertex = nullptr;
+	}
+	IDirect3DDevice9* d3ddev = Game::D3DDevice();
+	if (!d3ddev || !Game::screen_resolution)
+		return;
+
+	const float sourceWidth = float(Game::screen_resolution->x);
+	const float sourceHeight = float(Game::screen_resolution->y);
+	if (!std::isfinite(sourceWidth) || !std::isfinite(sourceHeight) ||
+		sourceWidth < 1.0f || sourceHeight < 1.0f)
+		return;
+	const float contentWidth = sourceHeight * (4.0f / 3.0f);
+	if (!std::isfinite(contentWidth) || sourceWidth <= contentWidth)
+		return;
+	const float borderWidth = (sourceWidth - contentWidth) * 0.5f + 0.5f;
+	if (!std::isfinite(borderWidth) || borderWidth >= sourceWidth * 0.5f)
+		return;
+	const float screenWidth = sourceWidth + 0.5f;
+	const float screenHeight = sourceHeight + 0.5f;
+	CUSTOMVERTEX vertices[]
+	{
 		{ -0.5f, -0.5f, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
 		{ borderWidth, -0.5f, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
 		{ -0.5f, screenHeight, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
 		{ borderWidth, screenHeight, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
-
-		// Right border
 		{ (screenWidth - borderWidth), -0.5f, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
 		{ screenWidth, -0.5f, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
 		{ (screenWidth - borderWidth), screenHeight, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
 		{ screenWidth, screenHeight, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) }
 	};
 
-	d3ddev->CreateVertexBuffer(8 * sizeof(CUSTOMVERTEX),
-		0,
-		CUSTOMFVF,
-		D3DPOOL_MANAGED,
-		&LetterboxVertex,
-		NULL);
-
-	void* pVoid;
-	LetterboxVertex->Lock(0, 0, &pVoid, 0);
-	memcpy(pVoid, vertices, sizeof(vertices));
-	LetterboxVertex->Unlock();
+	IDirect3DVertexBuffer9* candidate = nullptr;
+	if (FAILED(d3ddev->CreateVertexBuffer(sizeof(vertices), 0, CUSTOMFVF,
+		D3DPOOL_MANAGED, &candidate, nullptr)) || !candidate)
+		return;
+	void* mapped = nullptr;
+	if (FAILED(candidate->Lock(0, 0, &mapped, 0)) || !mapped)
+	{
+		candidate->Release();
+		return;
+	}
+	memcpy(mapped, vertices, sizeof(vertices));
+	candidate->Unlock();
+	LetterboxVertex = candidate;
 }
 
 class D3DHooks : public Hook
@@ -100,7 +114,7 @@ class D3DHooks : public Hook
 	inline static SafetyHookMid midhook_d3dendscene{};
 	static void D3DEndScene(SafetyHookContext& ctx)
 	{
-		if (Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0)
+		if (Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0 && LetterboxVertex)
 		{
 			IDirect3DDevice9* d3ddev = Game::D3DDevice();
 
