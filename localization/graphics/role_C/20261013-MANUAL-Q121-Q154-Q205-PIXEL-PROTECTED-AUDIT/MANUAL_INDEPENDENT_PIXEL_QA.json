@@ -1,0 +1,264 @@
+{
+  "schema": "manual-independent-optical-pixel-audit-v1",
+  "date_local": "2026-10-13 13:00 KST",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "source_head": "e1f15b25bf238ce32742751130412c3ed61d2729",
+  "policy_conflict": "Operational controller_roles disables C2; this is manually requested supplemental independent QA, without C2 active role / token / automatic deployment.",
+  "source_docs": [
+    "docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md",
+    "docs/KOREAN_LOCALIZATION_EVIDENCE_GATE.md",
+    "docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md",
+    "docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md"
+  ],
+  "method": "Canonical Sonic-TV Release@3ce344e7 source SHA; saved official or trial DDS loaded as 32-bit mip1 RAW memmap; FLIPY readable transform; SOURCE/CLEAN/saved 8 or 2 exact original glyph/effect bboxes; opaque preview native/75/50 plus RAW. Never infer outside bbox change = protected damage without candidate-specific provenance; sentence width underfill only diagnostic. No actual game.",
+  "source_and_files": [
+    {
+      "q": 121,
+      "asset": "FD90AA9_1024x1024.dds",
+      "upstream_sha256": "f7847db97bedbe2168d545664b39eea77367a667dad6dbd95646888c241d4b3e",
+      "candidate_sha256": "38d5c2c30ea813202051b191dc01de9d7804e52c1cbab0f46c5372b59ed6c844",
+      "candidate_type": "official persisted",
+      "dds": "4096x4096 RGBA32 mip1",
+      "roi": "[2780,2220,4020,2720] protected vehicle names 250GTO and 512BB",
+      "protected_rgba_changed_pixels": 0,
+      "protected_alpha_changed_pixels": 0,
+      "bbox_overflow": "NOT_FULL_ATLAS_MEASURED",
+      "CLEAN": "UNBOUND",
+      "letter_layer": "UNBOUND",
+      "visual": "Vehicle names in protected ROI identical; other localized headers visible but full 30-label plate and native game sampling unresolved",
+      "verdict": "SCOPED_PROTECTED_PIXEL_EXACT_PASS__FULL_HOLD",
+      "existing_P0": "IGR030/031/040 open",
+      "runtime": "UNTESTED",
+      "no_new_pass_token": true
+    },
+    {
+      "q": 154,
+      "asset": "4D38BBB0_1024x256.dds",
+      "upstream_sha256": "15a10e6b44ca5f1267fdf24eebbe902bb18a77b3903896370e183fea8a401bcf",
+      "candidate_sha256": "4db18d96b359a0bd916a2f6bb8cd3537c5cead769b189da6cded4c5fb899ad87",
+      "candidate_type": "B355 unpromoted trial",
+      "CLEAN_SHA256": "a4d707fa4376a7db4cc04fd1de51d9dc23b1874eac9a8b4988dc44c7f4c23380",
+      "dds": "4096x1024 RGBA32 mip1",
+      "source_clean": {
+        "changed_inside_selected_source_effect_bboxes": 603843,
+        "changed_outside_selected_source_effect_bboxes": 0,
+        "alpha_changed_inside": 603843,
+        "alpha_changed_outside": 0
+      },
+      "clean_saved": {
+        "changed_inside_selected_source_effect_bboxes": 439060,
+        "changed_outside_selected_source_effect_bboxes": 0,
+        "alpha_changed_inside": 439060,
+        "alpha_changed_outside": 0
+      },
+      "per_bbox": [
+        {
+          "label": "CREATE NEW LICENSE",
+          "bbox": [
+            13,
+            548,
+            1954,
+            696
+          ],
+          "source_alpha": 142103,
+          "clean_alpha": 0,
+          "saved_alpha": 101090,
+          "source_clean_changed": 142103,
+          "clean_final_changed": 101090
+        },
+        {
+          "label": "SELECT LICENSE",
+          "bbox": [
+            2007,
+            541,
+            3468,
+            689
+          ],
+          "source_alpha": 105320,
+          "clean_alpha": 0,
+          "saved_alpha": 72921,
+          "source_clean_changed": 105320,
+          "clean_final_changed": 72921
+        },
+        {
+          "label": "SINGLE PLAYER RED",
+          "bbox": [
+            12,
+            374,
+            1388,
+            522
+          ],
+          "source_alpha": 98927,
+          "clean_alpha": 0,
+          "saved_alpha": 77318,
+          "source_clean_changed": 98927,
+          "clean_final_changed": 77318
+        },
+        {
+          "label": "DEFAULT LICENSE",
+          "bbox": [
+            1772,
+            374,
+            3316,
+            522
+          ],
+          "source_alpha": 115127,
+          "clean_alpha": 0,
+          "saved_alpha": 71820,
+          "source_clean_changed": 115127,
+          "clean_final_changed": 71820
+        },
+        {
+          "label": "MULTIPLAYER RED",
+          "bbox": [
+            15,
+            203,
+            1235,
+            347
+          ],
+          "source_alpha": 90633,
+          "clean_alpha": 0,
+          "saved_alpha": 73103,
+          "source_clean_changed": 90633,
+          "clean_final_changed": 73103
+        },
+        {
+          "label": "SINGLE PLAYER GRAY",
+          "bbox": [
+            1610,
+            286,
+            2197,
+            350
+          ],
+          "source_alpha": 19100,
+          "clean_alpha": 0,
+          "saved_alpha": 17549,
+          "source_clean_changed": 19100,
+          "clean_final_changed": 17549
+        },
+        {
+          "label": "SHOWROOM GRAY",
+          "bbox": [
+            2674,
+            288,
+            3094,
+            350
+          ],
+          "source_alpha": 15231,
+          "clean_alpha": 0,
+          "saved_alpha": 8579,
+          "source_clean_changed": 15231,
+          "clean_final_changed": 8579
+        },
+        {
+          "label": "MULTIPLAYER GRAY",
+          "bbox": [
+            2566,
+            952,
+            3086,
+            1014
+          ],
+          "source_alpha": 17402,
+          "clean_alpha": 0,
+          "saved_alpha": 16680,
+          "source_clean_changed": 17402,
+          "clean_final_changed": 16680
+        }
+      ],
+      "individual_glyph": "5 red menu translations legible at native and scaled 75/50 without forced sentence-width fit",
+      "bbox_containment": "eight source effect region union outside changed RGBA=0/alpha=0",
+      "letter_layer": "standalone separate final Korean glyph layer not independently authenticated, scope HOLD",
+      "verdict": "RED_FIVE_LABELS_SCOPED_STATIC_SIZE_PIXEL_PASS__FULL_HOLD",
+      "prior_style_rework": "gray/red family history not invalidated; C3/actual game separate",
+      "runtime": "UNTESTED",
+      "no_new_pass_token": true
+    },
+    {
+      "q": 205,
+      "asset": "ACF61D7C_1024x512.dds",
+      "upstream_sha256": "58a75fe75b5672169dcc2ed1f9993d462d80b700d4e12dad453b70f2ab701a5f",
+      "candidate_sha256": "fba4037f93f825a51834c306e8a4821791ce1ed72fc2f4304e74fd732a1891ae",
+      "candidate_type": "B303 unpromoted trial, not official",
+      "clean_sha256": "245c66e49b3b4254b5eb7043b3de1364982414ff76e7dc1c68006951f92effac",
+      "dds": "4096x2048 RGBA32 mip1",
+      "source_clean": {
+        "changed_inside_selected_source_effect_bboxes": 124730,
+        "changed_outside_selected_source_effect_bboxes": 194741,
+        "alpha_changed_inside": 124730,
+        "alpha_changed_outside": 194741
+      },
+      "clean_saved": {
+        "changed_inside_selected_source_effect_bboxes": 66077,
+        "changed_outside_selected_source_effect_bboxes": 99562,
+        "alpha_changed_inside": 27157,
+        "alpha_changed_outside": 99562
+      },
+      "per_bbox": [
+        {
+          "label": "OPTIONS",
+          "bbox": [
+            1591,
+            1423,
+            2316,
+            1568
+          ],
+          "source_alpha": 56371,
+          "clean_alpha": 0,
+          "saved_alpha": 12929,
+          "source_clean_changed": 56371,
+          "clean_final_changed": 34290
+        },
+        {
+          "label": "RANKINGS",
+          "bbox": [
+            33,
+            1245,
+            930,
+            1388
+          ],
+          "source_alpha": 68359,
+          "clean_alpha": 0,
+          "saved_alpha": 14228,
+          "source_clean_changed": 68359,
+          "clean_final_changed": 31787
+        }
+      ],
+      "individual_glyph": "옵션/랭킹 source effect boxes remain separately legible native/75/50",
+      "two_bbox_outside_change_in_clean_saved": 99562,
+      "protected_claim": "unproven; other already translated atlas cells overlap outside two header effect regions and cannot be classified as damage",
+      "verdict": "TWO_HEADINGS_VISUAL_LEGIBLE__HOLD_NONLOCAL_DELTAS",
+      "existing_P0": "IGR026/027/028 open",
+      "runtime": "UNTESTED",
+      "no_new_pass_token": true
+    }
+  ],
+  "evidence_images": [
+    "Q154_BATCH_SOURCE_CLEAN_FINAL_50.png",
+    "Q205_BATCH_SOURCE_CLEAN_FINAL_50.png",
+    "Q121_CAR_SELECT_PROTECTED_AND_HEADINGS.png",
+    "Q121_SOURCE_CLEAN_SAVED_RAW_FLIPY_75_50.png",
+    "Q154_SOURCE_CLEAN_SAVED_RAW_FLIPY_75_50.png",
+    "Q205_SOURCE_CLEAN_SAVED_RAW_FLIPY_75_50.png"
+  ],
+  "qa_summary": {
+    "assets": 3,
+    "whole_pass": 0,
+    "partial_pixel_or_size_pass": 2,
+    "full_hold": 3,
+    "new_DDS": 0,
+    "official_promotions": 0,
+    "new_C2_tokens": 0,
+    "untranslated_whole_atlas": "UNKNOWN",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "state": {
+    "asset_queue": "append evidence notes to 3 existing rows; preserve statuses",
+    "resume_state": "UNCHANGED",
+    "INGAME_REWORK_BACKLOG": "UNCHANGED",
+    "Docker": "UNCHANGED",
+    "VR_FFB_DX11_DXVK": "UNTOUCHED"
+  },
+  "duplicate_guard": "Previously reviewed hashes not claimed as newly produced. New panel independent observations on limited, declared ROIs only."
+}
