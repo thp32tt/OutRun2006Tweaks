@@ -11,9 +11,11 @@ def connected(src, hdr):
     try:
         mirror = src.split("bool mirror_texture(", 1)[1].split("bool submit(", 1)[0]
         draw = src.split("bool submit(", 1)[1].split("void before_game_present(", 1)[0]
+        tenbit_branch = mirror.split("else if (tenBit)", 1)[1].split("else\n", 1)[0]
     except IndexError:
         return False
     return ('#include "live_game_10bit_texture.hpp"' in src and
+        "base.Format == D3DFMT_A2B10G10R10 ?" in tenbit_branch and
         all(s in mirror for s in (
           "const bool tenBit = base.Format == D3DFMT_A2R10G10B10 ||",
           "base.Format == D3DFMT_A2B10G10R10;",
@@ -83,7 +85,14 @@ def main():
     )
     for old, replacement in mutants:
         assert old in src, "missing source " + old
-        assert not connected(src.replace(old, replacement, 1), hdr), "escaped " + old
+        # 00691 introduced an earlier DEFAULT RT admission ternary for
+        # this format. Mutate the last (actual texel decoder) occurrence.
+        if old == "base.Format == D3DFMT_A2B10G10R10 ?":
+            prefix, match, suffix = src.rpartition(old)
+            mutant = prefix + replacement + suffix if match else src
+        else:
+            mutant = src.replace(old, replacement, 1)
+        assert not connected(mutant, hdr), "escaped " + old
     for old, replacement in hdr_mutants:
         assert old in hdr, "missing header " + old
         assert not connected(src, hdr.replace(old, replacement, 1)), "escaped " + old
