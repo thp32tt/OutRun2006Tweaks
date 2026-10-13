@@ -3670,7 +3670,17 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             }
         }
     } catch (...) {
-        // Never interrupt the game's real draw or input on diagnostic failure.
+        // If allocation or translation throws after one native Draw, do not
+        // append subsequent game draws into a partially composed frame.
+        // Catch any diagnostic cleanup failure: D3D9 Draw/input must survive.
+        try {
+            State& s = state();
+            std::lock_guard<std::mutex> lock(s.mutex);
+            s.frameBatch.abort();
+            ++s.failed;
+        } catch (...) {
+            // Never interrupt the original D3D9 Draw/Present path.
+        }
     }
 }
 } // namespace

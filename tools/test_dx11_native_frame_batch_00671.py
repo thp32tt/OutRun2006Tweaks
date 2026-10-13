@@ -18,6 +18,15 @@ for marker in ('#include "native_game_frame_batch.hpp"',
  'output.nativeDepthOrderingMode != 0u'):
     assert marker in src, marker
 assert "s.attempted" not in src
+# Test a real exception-safety transition in the live game observer.
+# Destructive mutation to the old empty handler must be detected, while
+# preserving D3D9 fallback even if a diagnostic allocation fails.
+observer = src.split("void observe(IDirect3DDevice9*", 1)[1].split("} // namespace", 1)[0]
+observer_catch = observer.split("    } catch (...) {", 1)[1]
+exception_abort = "            s.frameBatch.abort();"
+assert exception_abort in observer_catch
+assert "std::lock_guard<std::mutex> lock(s.mutex);" in observer_catch
+assert exception_abort not in observer_catch.replace(exception_abort, "", 1)
 assert src.count("s.backend.begin_frame(kBackground)") == 1
 assert src.count("ctx->ClearDepthStencilView(s.diagnosticDepthView.Get(),") == 1
 assert header.count("kMaxDraws = 8u") == 1
