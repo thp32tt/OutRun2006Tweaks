@@ -41,7 +41,7 @@ def verify(source: str) -> None:
     ):
         assert required in body, required
     assert body.index("R30HudContain.valid = false;") < body.index(
-        "R30HudAspectCompensation(stereo)") < body.index(
+        "R30HudAspectCompensation(stereo, eyeExtent)") < body.index(
         "R30HudContain.valid = true;")
     # In a single Present/FOV epoch, XR can initially report no dimensions,
     # then publish 2496x2688 (or resize later). Every transition must break
