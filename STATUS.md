@@ -1,0 +1,18 @@
+# Fresh restart status
+
+- DATE_KST: 2026-10-13
+- BRANCH: korean-localization-clean-start-20261013
+- BASELINE: English original HD only + translation references
+- VERIFIED_ORIGINAL_HD_DDS: 18
+- ORIGINAL_SOURCE_INFO: 1
+- ENGLISH_PNG_REFERENCE_ZIP: 1
+- HD_TRANSLATION_MAPPING_CSV: 1
+- GAME_TEXT_DRAFT_JSON: 1
+- NEW_LOCALIZED_PNG: 0
+- NEW_LOCALIZED_DDS: 0
+- NEW_QA_PASS: 0
+- RUNTIME_VALIDATION: UNTESTED
+- LEGACY_ASSETS_OR_QA_STATE_IMPORTED: NO
+- DEPLOYED: NO
+
+주의: 원본 패키지 기록의 전체 289 DDS를 모두 복원한 상태가 아님. 확인된 원본 18개만 이관됨.
