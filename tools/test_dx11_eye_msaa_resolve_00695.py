@@ -4,6 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import shutil
 import subprocess
+from verify_dx11_native_transport_contract import verify_eye_pair_submission
 
 root=Path(__file__).resolve().parents[1]
 source=(root/"src/vr/d3d11/native_shared_eye_ring.cpp").read_text(encoding="utf-8")
@@ -49,6 +50,29 @@ def connected(s,h):
     )
 
 assert connected(source,header), "native game MSAA eyes not linked to safe DX11 ring"
+# Existing R306 transport lifetime check must accept the new descriptor-aware
+# MSAA source signature, but fail if any GPU preflight or either eye is removed.
+submission = source.split("bool NativeSharedEyeRing::submit_eye_pair(", 1)[1].split(
+    "bool NativeSharedEyeRing::signal_producer_fence(", 1)[0]
+verify_eye_pair_submission(submission)
+for removed in [
+    "!exact_source(left_source, leftDesc)",
+    "!exact_source(right_source, rightDesc)",
+    "producer_device_->CheckFormatSupport(format_, &formatSupport)",
+    "transfer == NativeGameEyeTransfer::Reject",
+    "native_game_eye_pair_sources_admitted(",
+    "context->ResolveSubresource(entry.eye[0].Get()",
+    "context->ResolveSubresource(entry.eye[1].Get()",
+    "context->CopyResource(entry.eye[0].Get()",
+    "context->CopyResource(entry.eye[1].Get()",
+]:
+    try:
+        verify_eye_pair_submission(submission.replace(removed, "/* mutation */", 1))
+    except SystemExit:
+        pass
+    else:
+        raise AssertionError("transport acceptance failed to reject mutation: " + removed)
+
 changes=0
 for key in [
     "desc.SampleDesc.Count == 0",
