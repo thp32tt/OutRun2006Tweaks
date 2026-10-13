@@ -14,6 +14,7 @@
 #include "live_game_rgba_texture.hpp"
 #include "live_game_render_target_readback.hpp"
 #include "live_game_float_vector_texture.hpp"
+#include "live_game_dynamic_texture.hpp"
 #include "live_game_10bit_texture.hpp"
 #include "live_game_extended_luminance_texture.hpp"
 #include "live_game_rg16_texture.hpp"
@@ -43,6 +44,9 @@
 namespace outrun::vr::dx11::live_game_frame {
 namespace {
 using Microsoft::WRL::ComPtr;
+static_assert(dynamic_texture::kDefaultPool == D3DPOOL_DEFAULT &&
+              dynamic_texture::kDynamicUsage == D3DUSAGE_DYNAMIC,
+              "D3D9 DEFAULT/DYNAMIC source texture constants changed");
 static_assert(D3DPT_POINTLIST == 1 && D3DPT_LINELIST == 2 && D3DPT_LINESTRIP == 3 &&
               D3DPT_TRIANGLELIST == 4 && D3DPT_TRIANGLESTRIP == 5 &&
               D3DPT_TRIANGLEFAN == 6, "D3D9 primitive span enum changed");
@@ -3059,7 +3063,14 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     const bool gpuRenderTarget = base.Pool == D3DPOOL_DEFAULT &&
         (base.Usage & D3DUSAGE_RENDERTARGET) != 0u &&
         native_rt_readback::sampleable(rtLayout, capture.srgbTexture);
-    if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;
+    // DEFAULT DYNAMIC textures are game-writable LockRect resources, unlike
+    // ordinary DEFAULT textures. Re-snapshot their actual contents at every
+    // observed game Draw/DrawIndexed; never reuse a stale frame or assume
+    // the driver supports a read lock. Unsupported usage remains D3D9-owned.
+    const auto sourceRoute = dynamic_texture::source_route(
+        static_cast<unsigned>(base.Pool), static_cast<unsigned>(base.Usage),
+        gpuRenderTarget);
+    if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;
     const bool usesMips = capture.mipFilter == D3DTEXF_POINT ||
                           capture.mipFilter == D3DTEXF_LINEAR;
     // AUTOGENMIPMAP exposes one level to LockRect even though the D3D9
@@ -3265,6 +3276,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         D3DSURFACE_DESC desc{};
         if (FAILED(capture.texture->GetLevelDesc(level, &desc)) ||
             desc.Format != base.Format || desc.Pool != base.Pool ||
+            (sourceRoute == dynamic_texture::SourceRoute::dynamic_default &&
+             desc.Usage != base.Usage) ||
             desc.Width != (std::max)(1u, base.Width >> level) ||
             desc.Height != (std::max)(1u, base.Height >> level))
             return false;
@@ -3283,8 +3296,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             readbackSurface->LockRect(&lock, nullptr, D3DLOCK_READONLY) :
             capture.texture->LockRect(level, &lock, nullptr, D3DLOCK_READONLY);
         if (FAILED(lockResult)) return false;
-        const bool readable = lock.pBits && lock.Pitch > 0 &&
-                              static_cast<UINT>(lock.Pitch) >= rowBytes;
+        const bool readable = lock.pBits &&
+            dynamic_texture::readable_pitch(lock.Pitch, rowBytes);
         if (readable) {
             auto& pixels = copied[level];
             pixels.resize(static_cast<std::size_t>(uploadPitch) * rows);
@@ -3355,8 +3368,11 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     pixels[p] = 0xffu;
             pitches[level] = a8p8UploadPitch;
         }
-        if (gpuRenderTarget) readbackSurface->UnlockRect();
-        else capture.texture->UnlockRect(level);
+        const HRESULT unlockResult = gpuRenderTarget ?
+            readbackSurface->UnlockRect() : capture.texture->UnlockRect(level);
+        // A failed dynamic Unlock invalidates the diagnostic snapshot even
+        // if LockRect yielded bytes. Original game Draw/input still proceed.
+        if (FAILED(unlockResult)) return false;
         if (!readable) return false;
     }
     std::vector<D3D11_SUBRESOURCE_DATA> initial(levels);

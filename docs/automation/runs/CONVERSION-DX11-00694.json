@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00694",
+  "production_id": "CONVERSION-DX11-00694",
+  "event_id": "CONVERSION-DX11-00694-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "feature_id": "GAME_AUTHORED_DEFAULT_DYNAMIC_TEXTURE_STREAM",
+  "work_key": "DX11:LIVE_DYNAMIC_TEXTURE_LOCKRECT_DRAW",
+  "status": "AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Game D3D9 DEFAULT/D3DUSAGE_DYNAMIC live LockRect mip snapshot on each Draw",
+      "Native D3D11 immutable mip SRV and sampler bound through game Draw/DrawIndexed",
+      "Reject unsupported DEFAULT textures, failed Lock/Unlock, pitch, or mismatched level usage; original game D3D9 Draw/Present/gamepad remains authoritative"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_dynamic_texture.hpp",
+      "tools/dx11_game_dynamic_texture_probe_00694.cpp",
+      "tools/test_dx11_game_dynamic_texture_00694.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Portable C++ tests changing game-created DEFAULT dynamic texture snapshots over menu/race Draw frames and pitched mip rows",
+      "negative_regression": "Unsupported DEFAULT, RT vs dynamic, conflicting usage, bad pitch and failed Lock/Unlock retain game D3D9 input/Draw; destructive integration tests",
+      "component_integration": "Live D3D9 dynamic texture LockRect mips -> new D3D11 immutable SRV -> native game Draw/Indexed; missing source never suppresses DX9Ex"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_DYNAMIC_TEXTURE_LOCKRECT_DRAW",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_dynamic_texture.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "DYNAMIC_DEFAULT_LOCKRECT",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source-level and C++ probe only until actual Quest3/VDXR menu/car/race frame and input testing",
+    "activation_guard_and_fallback": "Diagnostic opt-in off by default; no gamepad/input/Draw substitution"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_AUTHORED_DEFAULT_DYNAMIC_TEXTURE_STREAM",
+    "goal": "Bridge game-created mutable DEFAULT dynamic texture mip family across menu, vehicle and race Draw/DrawIndexed to native D3D11 diagnostics while retaining safe D3D9 fallback and input.",
+    "acceptance_items": [
+      {
+        "id": "dynamic-live-game-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "dynamic_texture_lock_rect_mip_srv_draw",
+        "expected_behavior": "D3D9 DEFAULT DYNAMIC surface snapshots on each observed game Draw produce fresh mips and native Draw/Indexed SRVs"
+      },
+      {
+        "id": "dynamic-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "read_fail_and_original_d3d9_gamepad",
+        "expected_behavior": "Unsupported usage, failed lock/unlock, bad pitch, wrong mip usage preserve source D3D9 Draw/Present/input"
+      },
+      {
+        "id": "dynamic-exact-build",
+        "category": "integrated_validation",
+        "behavior_area": "portable_cpp_probe_mutations_actions",
+        "expected_behavior": "Portable C++ mip/frame probe, destructive source mutation and exact-SHA GitHub Windows/fast gate"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "dynamic-live-game-draw": "PENDING_GATE",
+    "dynamic-fallback": "PENDING_GATE",
+    "dynamic-exact-build": "PENDING_GATE"
+  },
+  "base_head_sha": "304cdd6905341491889607a8035b2bf5b9da8f12",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_dynamic_texture.hpp",
+    "tools/dx11_game_dynamic_texture_probe_00694.cpp",
+    "tools/test_dx11_game_dynamic_texture_00694.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00694.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: current GitHub HEAD, AGENTS and DX11 policy, 00693 full C6 checked",
+    "C1_REVIEW": "PASS: DEFAULT dynamic game-authored LockRect pool rejection identified; Microsoft D3D9 API confirms DYNAMIC exception",
+    "C2_IMPLEMENT": "PASS: source usage admission, per-Draw source mip snapshot, failed-Unlock fallback, portable source probe",
+    "C3_VALIDATE": "PENDING exact-SHA GitHub Actions; prepublication source predicates",
+    "C4_COMMIT": "PENDING validation-bearing material commit",
+    "C5_PACKAGE": "NOT_REQUIRED: diagnostic opt-in only; Quest3/VDXR UNTESTED",
+    "C6_STATE": "PENDING exact-SHA verification; separate bookkeeping after verified success"
+  },
+  "next_action": "Verify exact-SHA GitHub Gates on material result; repair only failing causes, then separate [skip ci] C6. Quest3/VDXR native menu/vehicle/race and gamepad remain UNTESTED."
+}
