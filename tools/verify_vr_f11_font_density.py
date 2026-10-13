@@ -894,7 +894,11 @@ def check_f11_overlay_font_persistence(font: str, header: str) -> None:
     )
     for token in required:
         assert token in render, "F11 frame finalisation missing: " + token
-    offsets = [render.index(token) for token in (
+    # Restrict order evidence to the actual pending-edit finaliser:
+    # the separate first-run modal may legitimately call settings_write()
+    # earlier in Overlay::render(), before any F11 edit is pending.
+    finaliser = render[render.index("if (FontScalePending &&"):]
+    offsets = [finaliser.index(token) for token in (
         "if (FontScalePending &&", "FontsDirty = true;",
         "settings_write();", "FontScalePending = false;",
         "FontScaleCommitRequested = false;", "ImGui::EndFrame();")]

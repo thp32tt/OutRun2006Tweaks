@@ -1,0 +1,116 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00774",
+  "production_id": "CONVERSION-DX9EX-00774",
+  "event_id": "CONVERSION-DX9EX-00774-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:F11_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:F11_MENU",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_VALIDATION",
+  "checkpoint": "C3_VALIDATE",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00774]",
+  "material_result_sha": "a64428e4f51043cc4a2bb66ec68f24ac2d7e92ea",
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:F11_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+    "goal": "Deliver one fully usable F11 settings shell in Quest3/VDXR and desktop, with correct atlas density, responsive bounds, keyboard/gamepad/mouse editing, focus handoff and durable settings persistence.",
+    "scope_boundary": "F11 ImGui overlay and its font/input/INI lifecycle only. Gameplay HUD, ESC/pause/menu aspect, world stereo and SkyGlow remain untouched.",
+    "trace_stages": [
+      "F11 original Win32 input bound action and OverlayWindow settings slider from OverlaySettingsWindow",
+      "ImGui frame text glyph atlas producer and DX9Ex backbuffer DrawData scoped as External ScreenOverlay2D",
+      "R30 per-eye optical positioning of F11 independent from gameplay HudScale and XR full-eye font atlas density",
+      "Overlay.ini persistence, Next EndScene invalidation and Reset/reopen desktop/menu fallback"
+    ],
+    "subcomponents": [
+      "Native-eye VR readable font atlas and proportional F11 shell/control bounds across 4:3,16:9,21:9 and Reset",
+      "Mouse/keyboard/gamepad edit commit through focus, tab switch, close and ONCE-per-edit disk persistence",
+      "Valid saved font scale reload including corrupt/nonfinite INI fallback and stereo semantic isolation"
+    ],
+    "acceptance_items": [
+      {
+        "id": "F11_VR_RENDER_AND_INPUT",
+        "category": "end_to_end_behavior",
+        "behavior_area": "eye_render_and_interaction",
+        "expected_behavior": "Live F11 font density and full-screen shell follow source/eye aspect; keyboard/gamepad and mouse edits reconstruct atlas with controls still usable"
+      },
+      {
+        "id": "F11_SAVE_NAVIGATION",
+        "category": "end_to_end_behavior",
+        "behavior_area": "focus_and_persistence",
+        "expected_behavior": "Editing font with keyboard/pad, dragging and changing tabs or closing F11 saves once without losing value or writing every mouse frame"
+      },
+      {
+        "id": "F11_NEGATIVE_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "desktop_reset_invalid_settings",
+        "expected_behavior": "Nonfinite INI values, invalid source extent, desktop mode, resolution changes and closed F11 never break font atlas/layout or game sprite HUD"
+      },
+      {
+        "id": "F11_EXACT_SHA_WIN32",
+        "category": "integrated_validation",
+        "behavior_area": "game_host_package",
+        "expected_behavior": "Final DX9Ex Active Win32 host/game/full-chain/package and Domain Isolation pass same SHA; source impact passes material SHA or final SHA as applicable"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "F11_VR_RENDER_AND_INPUT": "PENDING_EXACT_SHA_CI",
+    "F11_SAVE_NAVIGATION": "PENDING_EXACT_SHA_CI",
+    "F11_NEGATIVE_FALLBACK": "PENDING_EXACT_SHA_CI",
+    "F11_EXACT_SHA_WIN32": "PENDING_EXACT_SHA_CI",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "User reported Quest3 F11 illegibly small at 3440x1440 mirror with 2496x2688 per-eye, and full F11 font/controls/persistence acceptance remains untested on headset.",
+    "source_trace": [
+      "OverlaySettingsWindow::draw_appearance() used a mouse release only commit to set FontsDirty and settingsDirty; keyboard/gamepad and tab handoff are not mouse releases",
+      "Overlay::render_shell() correctly classifies external F11 and scales shell; Overlay::render() previously lacked global finalisation when Overlay tab disappeared",
+      "D3DEndScene rebuild_fonts() and ImGui_ImplDX9_InvalidateDeviceObjects() rely on FontsDirty to rasterise the new font, then external ScreenOverlay2D semantic routes to R30 per-eye optical composition"
+    ],
+    "root_cause": "Mouse-only slider finalisation stranded keyboard/gamepad and focus/tab/close changes without font atlas rebuild or durable Overlay.ini save; an arbitrary invalid saved float could pass through std::clamp to floor() and ImGui TTF.",
+    "alternatives_rejected": [
+      "F11 external ScreenOverlay2D already bypasses gameplay HudScale, so changing HUD or per-eye world projection is not the cause of keyboard save failure",
+      "XR F11 atlas density and normalized shell layout already have tests; simply raising raster font size cannot trigger a missing keyboard release/save event"
+    ],
+    "eye_ownership": "The F11 ImGui DX9 draw is external ScreenOverlay2D, shared source bitmap passed through per-eye R30 correction; keyboard/INI font persistence is independent from stereo world and gameplay HUD.",
+    "fix_evidence": "Frame-owned FontScalePending and FontScaleCommitRequested finalise after tab rendering, including tab-switch and close, once after editing; INI read and final scale are finite-guarded; next EndScene rebuilds DX9 font texture.",
+    "negative_test_evidence": "Existing F11 density/projection/reset negatives plus added keyboard/pad/drag/tab/close/nonfinite INI numeric and six destructive mutations; final CI still pending."
+  },
+  "changed_files": [
+    "src/overlay/overlay.cpp",
+    "src/overlay/overlay.hpp",
+    "src/overlay/overlay_settings_ui.cpp",
+    "tools/verify_vr_f11_font_density.py"
+  ],
+  "automation_validation": "FAIL_POLICY_RUN_RECORD_MISSING_ON_FIRST_MATERIAL_SHA;REPAIR_PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "score_delta": 0,
+  "validation_runs": {
+    "first_dx9ex_active": {
+      "id": 38392886802,
+      "sha": "a64428e4f51043cc4a2bb66ec68f24ac2d7e92ea",
+      "conclusion": "failure",
+      "reason": "required run record did not yet exist"
+    },
+    "first_domain": {
+      "id": 38392886442,
+      "sha": "a64428e4f51043cc4a2bb66ec68f24ac2d7e92ea",
+      "conclusion": "in_progress_at_record_creation"
+    },
+    "first_fullsource": {
+      "id": 38392886654,
+      "sha": "a64428e4f51043cc4a2bb66ec68f24ac2d7e92ea",
+      "conclusion": "in_progress_at_record_creation"
+    }
+  },
+  "notes": "Same TASK_ID C3 source + real CI-policy failure repair; no runtime/HMD success claim or score until complete exact-SHA required gates. Original material source commit a64428e4. Existing 00772 partial ESC and 00773 complete MAIN_MENU are not rewritten."
+}
