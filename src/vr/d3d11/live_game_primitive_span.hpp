@@ -5,21 +5,23 @@
 #include <vector>
 
 namespace outrun::vr::dx11::live_game_frame {
-// A complete D3D9 DrawIndexedPrimitive TRIANGLELIST can reference up to
-// 512 * 3 distinct vertices. Bound the live sparse capture to that same
-// 1536-element native Draw input limit (not the former 128-vertex probe cap).
-inline constexpr std::uint32_t kMaxNativeGameVertices = 1536u;
+// Game-authored mesh snapshots can span 2048 primitives. One shared,
+ // bounded 6144-element budget covers linear, indexed, sparse shadows and
+ // native Draw/DrawIndexed. Original DX9Ex rendering stays authoritative.
+inline constexpr std::uint32_t kMaxNativeGamePrimitives = 2048u;
+inline constexpr std::uint32_t kMaxNativeGameVertices =
+    kMaxNativeGamePrimitives * 3u;
 // Common bound for actual D3D9 VB/IB/UP snapshots and D3D11 Draw/DrawIndexed.
 // A strip has P+2 source elements; a list has P*3. Never infer either from
 // the other: overreading a live game pointer could break the original draw.
 constexpr bool game_primitive_element_count(bool triangleStrip,
                                              std::uint32_t primitiveCount,
                                              std::uint32_t& elements) noexcept {
-    if (primitiveCount == 0u || primitiveCount > 512u) return false;
+    if (primitiveCount == 0u || primitiveCount > kMaxNativeGamePrimitives) return false;
     const std::uint64_t required = triangleStrip
         ? static_cast<std::uint64_t>(primitiveCount) + 2u
         : static_cast<std::uint64_t>(primitiveCount) * 3u;
-    if (required > 1536u) return false;
+    if (required > kMaxNativeGameVertices) return false;
     elements = static_cast<std::uint32_t>(required);
     return true;
 }
@@ -31,16 +33,16 @@ constexpr bool game_native_primitive_element_count(
     std::uint32_t& elements) noexcept {
     switch (d3d9Type) {
     case 1u: // D3DPT_POINTLIST: one source vertex per point
-        if (primitiveCount == 0u || primitiveCount > 512u) return false;
+        if (primitiveCount == 0u || primitiveCount > kMaxNativeGamePrimitives) return false;
         elements = primitiveCount;
         return true;
     case 2u: // D3DPT_LINELIST: P * 2 source elements
     case 3u: { // D3DPT_LINESTRIP: P + 1 source elements
-        if (primitiveCount == 0u || primitiveCount > 512u) return false;
+        if (primitiveCount == 0u || primitiveCount > kMaxNativeGamePrimitives) return false;
         const std::uint64_t required = d3d9Type == 2u
             ? static_cast<std::uint64_t>(primitiveCount) * 2u
             : static_cast<std::uint64_t>(primitiveCount) + 1u;
-        if (required > 1536u) return false;
+        if (required > kMaxNativeGameVertices) return false;
         elements = static_cast<std::uint32_t>(required);
         return true;
     }
@@ -50,6 +52,26 @@ constexpr bool game_native_primitive_element_count(
     default: return false; // Unknown primitive modes remain DX9Ex-only.
     }
 }
+
+// Compile-time edge coverage for the complete D3D9 primitive topology family.
+constexpr bool game_native_mesh_span_contract() noexcept {
+    std::uint32_t n = 0u;
+    return game_native_primitive_element_count(1u, kMaxNativeGamePrimitives, n) &&
+           n == kMaxNativeGamePrimitives &&
+           game_native_primitive_element_count(2u, kMaxNativeGamePrimitives, n) &&
+           n == 2u * kMaxNativeGamePrimitives &&
+           game_native_primitive_element_count(3u, kMaxNativeGamePrimitives, n) &&
+           n == kMaxNativeGamePrimitives + 1u &&
+           game_native_primitive_element_count(4u, kMaxNativeGamePrimitives, n) &&
+           n == kMaxNativeGameVertices &&
+           game_native_primitive_element_count(5u, kMaxNativeGamePrimitives, n) &&
+           n == kMaxNativeGamePrimitives + 2u &&
+           game_native_primitive_element_count(6u, kMaxNativeGamePrimitives, n) &&
+           n == kMaxNativeGamePrimitives + 2u &&
+           !game_native_primitive_element_count(4u, kMaxNativeGamePrimitives + 1u, n) &&
+           !game_native_primitive_element_count(6u, 0u, n);
+}
+static_assert(game_native_mesh_span_contract(), "Native mesh budget contract");
 
 // Retry only when the original physical IB window was valid and the dense
 // epoch-checked VB copy did not yield a native vertex span. A fragmented
@@ -111,7 +133,7 @@ inline bool game_fan_to_triangle_list(std::uint32_t primitiveCount,
                                      std::vector<std::uint32_t>& triangles) {
     std::uint32_t required = 0;
     if (!game_primitive_element_count(true, primitiveCount, required) ||
-        vertexCount == 0u || vertexCount > 1536u) return false;
+        vertexCount == 0u || vertexCount > kMaxNativeGameVertices) return false;
     if (sourceIndices) {
         if (sourceIndexCount != required) return false;
     } else if (sourceIndexCount != 0u || vertexCount != required) return false;

@@ -3300,7 +3300,7 @@ namespace OutRunVRStereo
                 // A hole in that contiguous CPU shadow must not invalidate
                 // separately valid game-referenced VB slots.
                 const bool validPhysicalIndices = ok && high >= low;
-                if (validPhysicalIndices && high-low+1u <= 1536u) {
+                if (validPhysicalIndices && high-low+1u <= live::kMaxNativeGameVertices) {
                     // Preserve the fast path for dense/menu index buffers.
                     const std::uint64_t first =
                         static_cast<std::uint64_t>(streamOffset)+low*stride;
@@ -3322,7 +3322,7 @@ namespace OutRunVRStereo
                 if (live::game_sparse_shadow_retry_eligible(
                         validPhysicalIndices, nativeVertexCount)) {
                     // Distant indexed VB slots (e.g. vehicle/track meshes):
-                    // gather only game-referenced vertices, at most 1536, with
+                    // gather only game-referenced vertices, within the native mesh budget, with
                     // epoch-valid shadow bytes and compact native indices.
                     std::vector<std::uint32_t> uniquePhysical, compact;
                     ok = live::game_compact_sparse_indices(
@@ -3360,8 +3360,8 @@ namespace OutRunVRStereo
                   topology != D3DPT_TRIANGLELIST &&
                   topology != D3DPT_TRIANGLESTRIP &&
                   topology != D3DPT_TRIANGLEFAN) ||
-                !numVertices || numVertices > 1536 ||
-                minVertex > 1536u - numVertices ||
+                !numVertices || numVertices > live::kMaxNativeGameVertices ||
+                minVertex > live::kMaxNativeGameVertices - numVertices ||
                 !live::game_native_primitive_element_count(
                      static_cast<std::uint32_t>(topology),
                      primitiveCount, nativeElements) ||

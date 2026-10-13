@@ -82,8 +82,8 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1Factor == D3DTA_TFACTOR);
 constexpr UINT kWidth = 256;
 constexpr UINT kHeight = 144;
-constexpr UINT kMaxVertices = 1536;
-constexpr UINT kMaxIndices = 1536;
+constexpr UINT kMaxVertices = kMaxNativeGameVertices;
+constexpr UINT kMaxIndices = kMaxNativeGameVertices;
 // Rotate through the entire eligible game Draw population, not only the first
 // 64. The per-Present native Draw budget remains 1 or an explicitly opted-in 8.
 constexpr UINT kReadbackSlots = 3; // GPU event-fenced frame copies
@@ -3898,7 +3898,12 @@ void observe_linear(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
                     UINT primitives, const void* vertices, UINT stride) noexcept {
     UINT nativeElements = 0;
     if (!game_native_primitive_element_count(static_cast<std::uint32_t>(type),
-                                             primitives, nativeElements)) return;
+                                             primitives, nativeElements)) {
+        // Oversized/invalid DrawPrimitiveUP still belongs to the original
+        // D3D9 game stream: never splice native batches across that call.
+        observe_unavailable_game_draw(game);
+        return;
+    }
     observe(game, type, primitives, vertices, stride, nativeElements, nullptr, 0);
 }
 
