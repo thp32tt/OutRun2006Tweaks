@@ -211,12 +211,85 @@ def factor(source_w, source_h, eye_w, eye_h):
         return 1.0
     return min(3.0, max(1.0, math.ceil(raw * 4.0) * 0.25))
 
+def check_font_density_hysteresis(hook: str) -> None:
+    """Do not regenerate F11's D3D9 font atlas for near-boundary XR jitter."""
+    density = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
+        "// A new atlas needs a new font texture.", 1
+    )[0]
+    required = (
+        "std::ceil(factor * 4.0f) * 0.25f",
+        "Overlay::VrFontMultiplier, 1.0f, 3.0f",
+        "constexpr float kFontAspectHysteresis = 0.03f;",
+        "stepped > previous &&",
+        "factor <= previous + kFontAspectHysteresis",
+        "stepped < previous &&",
+        "factor >= previous - 0.25f - kFontAspectHysteresis",
+        "factor > 1.0f",
+        "vrFontMultiplier = previous;",
+        "vrFontMultiplier = stepped;",
+    )
+    for token in required:
+        assert token in density, "missing F11 XR jitter guard: " + token
+    assert density.index("const float stepped") < density.index(
+        "const float previous") < density.index(
+        "constexpr float kFontAspectHysteresis")
+    # Negative mutations must break this precise owner rather than passing
+    # because unrelated HUD or standalone font code still has the tokens.
+    for a, b in (
+        ("factor <= previous + kFontAspectHysteresis",
+         "factor < previous - kFontAspectHysteresis"),
+        ("factor >= previous - 0.25f - kFontAspectHysteresis",
+         "factor <= previous + 0.25f"),
+        ("factor > 1.0f", "factor > 2.0f"),
+        ("vrFontMultiplier = previous;", "vrFontMultiplier = stepped;"),
+    ):
+        assert a in density
+        broken = density.replace(a, b, 1)
+        assert any(token not in broken for token in required), (
+            "F11 XR hysteresis mutant survived: " + a)
+
+    def next_density(current, factor, active=True):
+        if not active or not math.isfinite(factor) or factor <= 0:
+            return 1.0
+        stepped = min(3.0, max(1.0, math.ceil(factor * 4.0) * .25))
+        previous = min(3.0, max(1.0, current))
+        if stepped > previous and factor <= previous + .03:
+            return previous
+        if stepped < previous and factor >= previous - .25 - .03 and factor > 1.0:
+            return previous
+        return stepped
+
+    # Former ceil-only code ping-ponged between 2.50/2.75 during each
+    # normal near-threshold source/eye aspect update.
+    ratio = 2.50
+    jitter = (ratio - .002, ratio + .002) * 32
+    assert len(set(factor(3440, 1440, 2496, 2688) for _ in range(2))) == 1
+    old = [min(3., max(1., math.ceil(v * 4) * .25)) for v in jitter]
+    assert len(set(old)) == 2
+    density = 2.50
+    transitions = 0
+    for v in jitter:
+        new = next_density(density, v)
+        transitions += new != density
+        density = new
+    assert transitions == 0
+    assert next_density(2.50, 2.54) == 2.75
+    assert next_density(2.75, 2.50) == 2.75
+    assert next_density(2.75, 2.46) == 2.50
+    assert next_density(2.75, 1.50) == 1.50
+    assert next_density(2.75, 1.00) == 1.00
+    assert next_density(2.75, float("nan")) == 1.00
+    assert next_density(2.75, 2.49, active=False) == 1.00
+    assert next_density(1.0, 99.) == 3.0
+
+
 def main():
     hook, font, header = (p.read_text(encoding="utf-8")
                           for p in (HOOK, FONT, HEADER))
     renderer = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
     semantic = (ROOT / "src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
     check(hook, font, header)
+    check_font_density_hysteresis(hook)
     check_shell_layout_mutations(font)
     check_shell_numeric_cases()
     check_projection(renderer, semantic)

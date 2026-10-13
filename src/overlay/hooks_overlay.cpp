@@ -243,8 +243,29 @@ class D3DHooks : public Hook
 							static_cast<float>(rw) / rh);
 					const float factor = sourceAspect / eyeAspect;
 					if (std::isfinite(factor) && factor > 0.0f)
-						vrFontMultiplier = std::clamp(
+					{
+						const float stepped = std::clamp(
 							std::ceil(factor * 4.0f) * 0.25f, 1.0f, 3.0f);
+						const float previous = std::clamp(
+							Overlay::VrFontMultiplier, 1.0f, 3.0f);
+						// A rounded-up bucket changes at every quarter-aspect
+						// boundary. Tiny VDXR source/eye extent oscillations at
+						// that boundary otherwise rebuild Segoe UI + the entire
+						// DX9 font texture every other EndScene (a frame stall).
+						// Use a symmetric 0.03 aspect dead band while the F11
+						// shell is open; real resize/recenter changes still
+						// cross the band and update the atlas immediately.
+						constexpr float kFontAspectHysteresis = 0.03f;
+						if (stepped > previous &&
+							factor <= previous + kFontAspectHysteresis)
+							vrFontMultiplier = previous;
+						else if (stepped < previous &&
+							factor >= previous - 0.25f - kFontAspectHysteresis &&
+							factor > 1.0f)
+							vrFontMultiplier = previous;
+						else
+							vrFontMultiplier = stepped;
+					}
 				}
 			}
 			// Quantised quarter-steps prevent continuous atlas churn when the
