@@ -11,13 +11,13 @@
   "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
   "work_key": "DX9EX:VIS:START_SHADOW",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "COMPLETE_BUILD_VERIFIED",
-  "checkpoint": "C6_STATE",
-  "feature_status": "SOURCE_CANDIDATE_UNVERIFIED",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C5_WAIT_FULL_SOURCE_IMPACT",
+  "feature_status": "BUILD_CANDIDATE_NEED_FULL_IMPACT_AND_HMD",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00781]",
-  "material_result_sha": null,
+  "material_result_sha": "39ca3cde17b58577121429b03880349f0979ba84",
   "validation_bearing_result_sha": "a01f202655d4c0a96059f12808e0b0a8277bcbd1",
-  "automation_validation": "PASS_EXACT_SHA",
+  "automation_validation": "PARTIAL_GATES_PASS_FULL_IMPACT_PENDING",
   "runtime_validation": "UNTESTED",
   "runtime_status": "NEED_HMD_TEST",
   "score_delta": 0,
@@ -25,7 +25,9 @@
     "src/hooks_graphics.cpp",
     "tools/verify_vr_start_shadow_world_owner.py",
     ".github/workflows/vr-dx9ex-active.yml",
-    "docs/automation/runs/CONVERSION-DX9EX-00781.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00781.json",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_visual_composition_p0.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:START_SHADOW",
@@ -64,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "SHADOW_DIRECT_EYE_WORLD": "PENDING_EXACT_SHA",
-    "SHADOW_QUEUE_FALLBACK": "PENDING_EXACT_SHA",
-    "SHADOW_EXACT_SHA_GATES": "PENDING_EXACT_SHA",
+    "SHADOW_DIRECT_EYE_WORLD": "PASS_EXACT_SHA",
+    "SHADOW_QUEUE_FALLBACK": "PASS_EXACT_SHA",
+    "SHADOW_EXACT_SHA_GATES": "PENDING_FULL_SOURCE_IMPACT",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -82,8 +84,45 @@
       "ScopedExactProducerSemantic protects direct non-queue shadow WorldParticle and restores old owner before R30 per-eye replay/host; stencil duplication remains a separate runtime hypothesis."
     ],
     "eye_ownership": "Direct draw VR-only exact queue-owner rebind; live SpriteNode queue unchanged; desktop/game matrix unchanged.",
-    "fix_evidence": "C2 candidate nests scoped exact direct WorldParticle owner under existing world fallback; no additional Draw call.",
-    "negative_test_evidence": "8 source mutant probes include scope, queue, VR, 3 call, alpha and matrix; automatic GitHub policy run pending.",
+    "fix_evidence": "Original three car-shadow calls and one alpha draw preserved; direct scoped exact WorldParticle owner now also saves/clears/restores stale pending one-shot render token. Original world RAII/matrix/depth/desktop fallback retained in source SHA 64cde382; exact game/host/full-chain/package pass at a01f2026.",
+    "negative_test_evidence": "Updated start-shadow verifier 12 negative mutants PASS on exact SHA a01f2026, P0 composite structural contract PASS, HUD Inspector, Domain and DX9Ex Active green; Full Source Impact final game analysis remains in progress.",
     "unresolved": "Source-only change does not prove observed race-start diplopia cured; compare original producer draw count and per-eye stencil/depth using Quest3/VDXR."
-  }
+  },
+  "ci_evidence": {
+    "exact_sha": "a01f202655d4c0a96059f12808e0b0a8277bcbd1",
+    "material_source_shas": [
+      "39ca3cde17b58577121429b03880349f0979ba84",
+      "64cde3821ff5de789407212aff67143432621c9b"
+    ],
+    "dx9ex_active": {
+      "run_id": 38412390181,
+      "result": "SUCCESS",
+      "jobs": [
+        "policy",
+        "game",
+        "host",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "hud_inspector": {
+      "run_id": 38412389839,
+      "result": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38412389968,
+      "result": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38412389697,
+      "result": "IN_PROGRESS",
+      "completed_jobs": [
+        "source-cross-domain",
+        "msvc-analyze-openxr-host"
+      ],
+      "pending_job": "msvc-analyze-active-game"
+    },
+    "runtime": "UNTESTED"
+  },
+  "blocked_reason": "FULL_SOURCE_IMPACT_NOT_YET_COMPLETE"
 }
