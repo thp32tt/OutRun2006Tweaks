@@ -47,7 +47,7 @@ assert connected(batch, bridge, header, hook), "Clear/RT0 -> native batch -> GPU
 for name, body, token in (
     ("rt0 owner query", hook, "device->GetRenderTarget(0, &previous)"),
     ("rt0 successful switch", hook, "SUCCEEDED(hr) && nativeTargetChanged"),
-    ("clear event", hook, "// The next game scene starts with this Clear."),
+    ("clear event", hook, "outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);\n\t\t\t++R9ClearCalls;"),
     ("gpu boundary discard", bridge, "s.frameBatch.scene_boundary();"),
     ("pending upload discard", bridge, "s.pending = false;\n    } catch (...)"),
     ("frame-batch stop", batch, "if (submitted != 0u) stopped = true;"),
