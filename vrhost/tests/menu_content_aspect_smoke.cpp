@@ -221,7 +221,7 @@ int main()
             960.f / 1920.f, 960.f / 1080.f, 4.f / 3.f).crop ||
         PlanVisibleCenteredContent(
             -320, 0, 960, 960, 1920, 1080, 0, 0,
-            960.f / 1920.f, 960.f / 1080.f, 1.6f).crop)
+            960.f / 1920.f, 960.f / 1080.f, 4.1f).crop)
         return 27;
 
     using OutRunVrMenuAspect::PlanCommonFovTangents;
