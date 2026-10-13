@@ -2,25 +2,26 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00802",
   "production_id": "CONVERSION-DX9EX-00802",
-  "event_id": "CONVERSION-DX9EX-00802-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00802-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:PERF:R30_VB_IB_INCREMENTAL_SHADOW",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R30_VB_IB_INCREMENTAL_SHADOW",
-  "status": "IMPLEMENTED_NEEDS_CI",
-  "checkpoint": "C4_COMMIT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00802]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "SUCCESS",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "tools/verify_vr_r30_shadow_incremental_copy.py",
     ".github/workflows/vr-dx9ex-active.yml",
-    "docs/automation/runs/CONVERSION-DX9EX-00802.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00802.json",
+    "tools/verify_vr_r30_shadow_descriptor_fastpath.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:PERF:R30_VB_IB_INCREMENTAL_SHADOW",
@@ -59,9 +60,9 @@
     ]
   },
   "acceptance_results": {
-    "SINGLE_WRITE_VB_IB_PARITY": "PENDING_EXACT_SHA",
-    "DISCARD_MULTIGEN_FAILURE_FALLBACK": "PENDING_EXACT_SHA",
-    "EXACT_SHA_WIN32_INTEGRATION": "PENDING_EXACT_SHA",
+    "SINGLE_WRITE_VB_IB_PARITY": "PASS_EXACT_SHA",
+    "DISCARD_MULTIGEN_FAILURE_FALLBACK": "PASS_EXACT_SHA",
+    "EXACT_SHA_WIN32_INTEGRATION": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -80,9 +81,49 @@
     "fix_evidence": "Track final successful non-DISCARD write interval and gate overlap refresh on exactly one generation difference and complete coverage.",
     "negative_test_evidence": "Source structural destructive mutations and 3500 randomized interval/revision/discard/failure parity tests under exact-SHA CI."
   },
-  "performance_evidence": "Source-only reduction in bytes copied for one partial VB/IB write; no runtime FPS or frame-time improvement measured.",
+  "performance_evidence": "Source-only reduction in bytes copied for one partial VB/IB write; no runtime FPS or frame-time improvement measured. Automated copy-byte model parity succeeded; no FPS benefit claimed without HMD.",
   "runtime_status": "NEED_QUEST3_VDXR_P95_P99",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null
+  "material_result_sha": "09619ca7a2a059fdefea750d819315fb18e9e5f4",
+  "validation_bearing_result_sha": "9ae047cb344e9d3319ebf342d364f85acdc5a1b3",
+  "result_sha": "9ae047cb344e9d3319ebf342d364f85acdc5a1b3",
+  "validation_evidence": {
+    "initial_failure": {
+      "run_id": 38470938119,
+      "result_sha": "09619ca7a2a059fdefea750d819315fb18e9e5f4",
+      "conclusion": "failure",
+      "cause": "Legacy full-copy cache verifier counted new incremental helper parameter as a third VB/IB reader and targeted shared mutation tokens outside the readers."
+    },
+    "repair": {
+      "sha": "9ae047cb344e9d3319ebf342d364f85acdc5a1b3",
+      "description": "Preserve old VB/IB full-copy semantics through reader-scoped negative mutations, and explicitly verify incremental-before-full-copy ordering."
+    },
+    "dx9ex_active": {
+      "run_id": 38471375043,
+      "result_sha": "9ae047cb344e9d3319ebf342d364f85acdc5a1b3",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "game": "success",
+        "host": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38471375052,
+      "result_sha": "9ae047cb344e9d3319ebf342d364f85acdc5a1b3",
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38470938284,
+      "result_sha": "09619ca7a2a059fdefea750d819315fb18e9e5f4",
+      "conclusion": "success",
+      "jobs": {
+        "msvc-analyze-active-game": "success",
+        "msvc-analyze-openxr-host": "success",
+        "source-cross-domain": "success"
+      }
+    },
+    "runtime": "Quest3/VDXR HMD, optical appearance, FPS and p95/p99 not run. RUNTIME_VALIDATION=UNTESTED"
+  }
 }
