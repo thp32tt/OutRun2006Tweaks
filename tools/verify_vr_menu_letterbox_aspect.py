@@ -326,7 +326,7 @@ for old, bad in (
     mutated = src[:start] + body.replace(old, bad, 1) + src[end:]
     try:
         verify_transient_ex_menu_retry(mutated)
-    except (AssertionError, ValueError):
+    except (AssertionError, ValueError, IndexError):
         pass
     else:
         raise AssertionError("D3D9Ex transient cache mutant survived: " + old)
