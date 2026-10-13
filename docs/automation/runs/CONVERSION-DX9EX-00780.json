@@ -11,11 +11,11 @@
   "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
   "work_key": "DX9EX:VIS:VEHICLE_SELECT",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "feature_status": "IN_PROGRESS_BUILD_AND_HMD_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00780]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_status": "NEED_HMD_TEST",
   "score_delta": 0,
@@ -61,9 +61,9 @@
     ]
   },
   "acceptance_results": {
-    "VEHICLE_XRGB_ALL_MIPS": "SOURCE_IMPLEMENTED_AWAITING_CI",
-    "VEHICLE_UI_FALLBACK": "NEGATIVE_TEST_IMPLEMENTED_AWAITING_CI",
-    "VEHICLE_SELECT_EXACT_SHA": "PENDING",
+    "VEHICLE_XRGB_ALL_MIPS": "PASS_SOURCE_AND_GITHUB_NEGATIVE_MUTATIONS",
+    "VEHICLE_UI_FALLBACK": "PASS_EXACT_SHA_HUD_INSPECTOR_AND_CXX_BUILD",
+    "VEHICLE_SELECT_EXACT_SHA": "PASS_DX9EX_ACTIVE_38408281786_DOMAIN_38408283360_HUD_38408282683;MATERIAL_FULL_IMPACT_38407192819",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -82,5 +82,46 @@
     "eye_ownership": "Texture decode/source only; does not modify stereo ownership.",
     "negative_test_evidence": "Existing HUD DDS mutation verifier extended for no-alpha XRGB masks, destination format and both channel-swap writes."
   },
-  "validation_notes": "GitHub commit prepared without moving target ref while earlier 00779 DX9Ex Active CI is in progress. Exact-SHA validation and Quest3 test pending. Do not mark whole optical defect fixed from this code path alone.\nFirst a9c01e4d DX9Ex HUD Inspector static EXE job failed: DDS negative mutation used a prefix of an alpha hex mask, not the exact XRGB no-alpha condition. This same-task verifier repair now matches the complete alpha-mask expression, retaining A8 texture guard and source-level negative regressions."
+  "validation_notes": "GitHub commit prepared without moving target ref while earlier 00779 DX9Ex Active CI is in progress. Exact-SHA validation and Quest3 test pending. Do not mark whole optical defect fixed from this code path alone.\nFirst a9c01e4d DX9Ex HUD Inspector static EXE job failed: DDS negative mutation used a prefix of an alpha hex mask, not the exact XRGB no-alpha condition. This same-task verifier repair now matches the complete alpha-mask expression, retaining A8 texture guard and source-level negative regressions.\nExact validation-bearing SHA 0b373f76462c6b1e3a629b79b116ea45591c4acd passed DX9Ex Active 38408281786 (policy/host/game/R84 full-chain/package all success), Domain 38408283360, HUD Inspector 38408282683 including static EXE, DDS and negative mutations. Full Source Impact 38407192819 passed at same C++ material source a9c01e4dba968d5f86389c4ef64b3326a44dec57; only test/run record changed afterward. Optical Quest3 vehicle-select defect is not proven fixed; no HMD ran. C6 checkpoint only is [skip ci], kept separate from validation-bearing result.",
+  "material_result_sha": "a9c01e4dba968d5f86389c4ef64b3326a44dec57",
+  "validation_bearing_result_sha": "0b373f76462c6b1e3a629b79b116ea45591c4acd",
+  "ci_evidence": {
+    "validation_sha": "0b373f76462c6b1e3a629b79b116ea45591c4acd",
+    "dx9ex_active": {
+      "run_id": 38408281786,
+      "conclusion": "SUCCESS",
+      "required_jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38408283360,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38408282683,
+      "conclusion": "SUCCESS",
+      "required_jobs": [
+        "build-hud-inspector",
+        "static-exe-analysis"
+      ]
+    },
+    "full_source_impact": {
+      "run_id": 38407192819,
+      "conclusion": "SUCCESS",
+      "source_sha": "a9c01e4dba968d5f86389c4ef64b3326a44dec57"
+    },
+    "coordination": {
+      "run_id": 38408281969,
+      "conclusion": "SUCCESS"
+    },
+    "hmd": {
+      "status": "NOT_EXECUTED",
+      "validation": "UNTESTED"
+    }
+  }
 }
