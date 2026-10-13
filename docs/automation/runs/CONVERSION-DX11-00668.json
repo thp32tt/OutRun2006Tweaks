@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00668",
+  "production_id": "CONVERSION-DX11-00668",
+  "event_id": "CONVERSION-DX11-00668-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_P8_PALETTE_NATIVE_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "6f4dfbde6e5fa6ffc3aecac24878dda7fde124b8",
+  "status": "VALIDATING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "live OutRun game D3D9 P8 LockRect mips and current device palette/caps",
+      "per-row palette RGB plus device-dependent alpha converted to D3D11 BGRA8 immutable SRV",
+      "native Draw/DrawIndexed diagnostic frame preserves D3D9 Draw/Present/gamepad fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_p8_texture.hpp",
+      "tools/dx11_game_p8_probe.cpp",
+      "tools/test_dx11_native_p8_00668.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "CPU C++ padded two-row palette alpha, opaque fallback and last mip decoding",
+      "negative_regression": "24 destructive source/header integration mutations plus fail-closed sRGB/DEFAULT and palette-read checks",
+      "component_integration": "intercepted game P8 source -> live device palette/caps -> packed mip row -> BGRA8 SRV -> native Draw/DrawIndexed"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_P8_PALETTE_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_p8_texture.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CPU_PROBE_ONLY; game menu/race/Quest3 pixels NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in only; unsupported palette/sRGB/readback returns false; original DX9Ex Draw/Present/input retained"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_p8_texture.hpp",
+    "tools/dx11_game_p8_probe.cpp",
+    "tools/test_dx11_native_p8_00668.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00668.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS checked exact branch HEAD and 00667 C6",
+    "C1_REVIEW": "PASS live P8 texture was ineligible though A8P8 implemented",
+    "C2_IMPLEMENT": "PASS P8 mips, palette alpha caps, native SRV/Draw/fallback wired",
+    "C3_VALIDATE": "LOCAL_JS_STATIC_PREFLIGHT; GitHub exact-SHA Gates pending",
+    "C4_COMMIT": "PENDING_SHA",
+    "C5_PACKAGE": "NOT_REQUIRED; HMD not tested",
+    "C6_STATE": "PENDING_GITHUB_EXACT_SHA"
+  },
+  "acceptance_results": {
+    "cpu_probe": "PENDING_GITHUB_FAST",
+    "static_regression": "PENDING_GITHUB_FAST",
+    "compile_build": "PENDING_GITHUB_BUILD",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "next_action": "Wait for exact-SHA GitHub required Gates; fix real failures under same TASK_ID, or C6 record without rerunning successful Gate."
+}

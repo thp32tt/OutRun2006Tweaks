@@ -13,6 +13,7 @@
 #include "live_game_extended_luminance_texture.hpp"
 #include "live_game_rg16_texture.hpp"
 #include "live_game_a8p8_texture.hpp"
+#include "live_game_p8_texture.hpp"
 #include "live_game_rgb332_texture.hpp"
 
 #include <Windows.h>
@@ -2753,6 +2754,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // The native diagnostic must fetch the live game palette, not treat
     // A8P8's two bytes as a packed RGB color.
     const bool a8p8 = base.Format == D3DFMT_A8P8;
+    // P8 uses one palette index per game texel; alpha may come from the
+    // current palette only when the D3D9 device exposes ALPHAPALETTE.
+    const bool p8 = base.Format == D3DFMT_P8;
     // Packed 3:3:2 game textures carry one color byte and optional alpha.
     const bool rgb332 = base.Format == D3DFMT_R3G3B2 ||
                         base.Format == D3DFMT_A8R3G3B2;
@@ -2771,6 +2775,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     if (capture.srgbTexture && rg16) return false;
     // Palettized sRGB lookup/transfer parity is not proven on D3D9.
     if (capture.srgbTexture && a8p8) return false;
+    if (capture.srgbTexture && p8) return false;
     // No verified legacy sRGB equivalence for 3:3:2 packed color.
     if (capture.srgbTexture && rgb332) return false;
     DXGI_FORMAT nativeFormat = DXGI_FORMAT_UNKNOWN;
@@ -2792,6 +2797,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
     } else if (rgb332) {
         // One/two-byte source texels expand into four-byte BGRA8 pixels.
+        nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    } else if (p8) {
+        // Decode the active D3D9 palette, including supported palette alpha.
         nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
     } else if (a8p8) {
         // Current D3D9 palette RGB and source alpha must be decoded per texel.
@@ -2818,7 +2826,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     }
 
     std::array<a8p8_texture::Rgb, 256> activePalette{};
-    if (a8p8) {
+    std::array<p8_texture::Rgba, 256> p8Palette{};
+    if (a8p8 || p8) {
         // Palette selection is device state and can change between game
         // Draw calls. Snapshot it alongside the texture before reading mips.
         ComPtr<IDirect3DDevice9> paletteDevice;
@@ -2829,9 +2838,22 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             FAILED(paletteDevice->GetCurrentTexturePalette(&paletteNumber)) ||
             FAILED(paletteDevice->GetPaletteEntries(paletteNumber, entries.data())))
             return false;
-        for (std::size_t i = 0; i < entries.size(); ++i)
+        // The palette alpha byte is not used by A8P8 (which has per-texel
+        // alpha), but IS part of a P8 sample on ALPHAPALETTE-capable devices.
+        // Query live caps rather than assuming an opaque or alpha palette.
+        bool alphaPalette = false;
+        if (p8) {
+            D3DCAPS9 caps{};
+            if (FAILED(paletteDevice->GetDeviceCaps(&caps))) return false;
+            alphaPalette = (caps.TextureCaps & D3DPTEXTURECAPS_ALPHAPALETTE) != 0u;
+        }
+        for (std::size_t i = 0; i < entries.size(); ++i) {
             activePalette[i] = {entries[i].peRed, entries[i].peGreen,
                                 entries[i].peBlue};
+            p8Palette[i] = {entries[i].peRed, entries[i].peGreen,
+                            entries[i].peBlue,
+                            static_cast<std::uint8_t>(alphaPalette ? entries[i].peFlags : 0xffu)};
+        }
     }
 
     const auto luminanceLayout = base.Format == D3DFMT_A8 ?
@@ -2846,6 +2868,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         luminance ? luminance_texture::source_bytes_per_texel(luminanceLayout) :
         extendedLuma ? extended_luminance_texture::source_bytes_per_texel(extendedLumaLayout) :
         a8p8 ? a8p8_texture::source_bytes_per_texel() :
+        p8 ? p8_texture::source_bytes_per_texel() :
         rgb332 ? rgb332_texture::source_bytes_per_texel(rgb332Layout) :
         rgb24 ? rgb24_texture::source_bytes_per_texel() : 4u;
     std::vector<std::vector<std::uint8_t>> copied(levels);
@@ -2862,7 +2885,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             (std::max)(1u, (desc.Width + 3u) / 4u) *
                 (base.Format == D3DFMT_DXT1 ? 8u : 16u) :
             desc.Width * sourceTexelBytes;
-        const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) || extendedLuma || rgb332 ?
+        const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) || extendedLuma || rgb332 || p8 ?
             desc.Width * 4u : rowBytes;
         // Preserve existing format pitch contracts and only widen A8P8
         // (two source bytes per texel) to four-byte decoded native pixels.
@@ -2906,6 +2929,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     rg16_texture::unpack_row(source, destination, desc.Width);
                 else if (rgb332)
                     rgb332_texture::unpack_row(source, destination, desc.Width, rgb332Layout);
+                else if (p8)
+                    p8_texture::unpack_row(source, destination, desc.Width,
+                                           p8Palette.data());
                 else if (a8p8)
                     a8p8_texture::unpack_row(source, destination, desc.Width,
                                              activePalette.data());
