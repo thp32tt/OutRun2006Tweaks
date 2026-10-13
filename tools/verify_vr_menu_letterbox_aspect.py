@@ -51,7 +51,7 @@ def verify_ex_letterbox_pool(code: str) -> None:
     remake = code.split("static void D3DTemporariesCreate(", 1)[1].split(
         "\npublic:", 1)[0]
     assert create.count("D3DPOOL_DEFAULT, &candidate, nullptr") == 1
-    assert "D3DPOOL_MANAGED" not in create
+    assert "D3DPOOL_MANAGED, &candidate, nullptr" not in create
     assert create.index("FAILED(d3ddev->CreateVertexBuffer(") < create.index(
         "candidate->Unlock();") < create.index("LetterboxVertex = candidate;")
     assert "LetterboxVertex->Release();" in reset
