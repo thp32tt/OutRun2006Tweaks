@@ -10,12 +10,12 @@
   "feature_id": "DX9EX:PERF:R30_LARGE_SPARSE_PROJECTED_DEPTH",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R30_LARGE_SPARSE_PROJECTED_DEPTH",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
-  "checkpoint": "C3_LOCAL_REGRESSION",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00800]",
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "tools/verify_vr_r30_sparse_depth_classifier.py",
@@ -58,9 +58,10 @@
     ]
   },
   "acceptance_results": {
-    "LARGE_SPARSE_DEPTH_PARITY": "PENDING_CI",
-    "SMALL_DENSE_BAD_HINT_FALLBACK": "PENDING_CI",
-    "R30_EXACT_SHA_GATES": "PENDING_EXACT_SHA"
+    "LARGE_SPARSE_DEPTH_PARITY": "PASS",
+    "SMALL_DENSE_BAD_HINT_FALLBACK": "PASS",
+    "R30_EXACT_SHA_GATES": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
     "original_evidence": "Original R30 source switches to dense [0,vertexCount) traversal for >512 touched references, even when most vertices are not referenced by the current draw.",
@@ -80,7 +81,42 @@
   },
   "runtime_status": "NEED_QUEST3_VDXR_SCENE_MATCHED_P95_P99",
   "performance_evidence": "Source-level reduction in mask probes for large sparse VB windows only; no hardware FPS asserted.",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null
+  "material_result_sha": "65175bcd90b0e45bcbd72e0d0b6c6ba36b707426",
+  "validation_bearing_result_sha": "e1289d17d18ce8a4b9e764ca9baeeacb1762cbed",
+  "result_sha": "e1289d17d18ce8a4b9e764ca9baeeacb1762cbed",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "e1289d17d18ce8a4b9e764ca9baeeacb1762cbed",
+    "dx9ex_active": {
+      "run_id": 38466951557,
+      "head_sha": "e1289d17d18ce8a4b9e764ca9baeeacb1762cbed",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "host": "SUCCESS",
+        "game": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38466951490,
+      "head_sha": "e1289d17d18ce8a4b9e764ca9baeeacb1762cbed",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38466448692,
+      "head_sha": "65175bcd90b0e45bcbd72e0d0b6c6ba36b707426",
+      "conclusion": "SUCCESS",
+      "source_tree_unchanged_in_validation_commits": true,
+      "jobs": {
+        "msvc-analyze-active-game": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "source-cross-domain": "SUCCESS"
+      }
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+    "performance_evidence": "No HMD p95/p99 measurements or FPS gain proven"
+  },
+  "c6_recorded_at_kst": "2026-10-14 06:06 KST"
 }
