@@ -19,7 +19,7 @@ def connected(code):
         "s.frameBatch.abort();" in code[code.index("bool observe_source_device("):code.index("void observe(IDirect3DDevice9*")] and
         "if (!observe_source_device(s, game)) return;" in observer and
         "if (!observe_source_device(s, game)) return;" in unavailable and
-        "s.sourceGameDevice != presentDevice" in present and
+        "if (s.sourceGameDevice != 0u && s.sourceGameDevice != presentDevice)" in present and
         "s.frameBatch.abort();" in present and
         "s.pending = false;" in present and
         "oldest.provenance.same_device(presentDevice)" in present and
@@ -32,7 +32,7 @@ def connected(code):
 assert connected(cpp), "real game device/Draw/native GPU/Present path disconnected"
 for label,needle in (
     ("foreign-draw", "if (!observe_source_device(s, game)) return;"),
-    ("mismatched-present", "s.sourceGameDevice != presentDevice"),
+    ("mismatched-present", "if (s.sourceGameDevice != 0u && s.sourceGameDevice != presentDevice)"),
     ("foreign-gpu-frame", "oldest.provenance.same_device(presentDevice)"),
     ("unowned-fence", "next.provenance.sourceDevice = presentDevice;"),
     ("reset", "s.sourceGameDevice = 0u;"),

@@ -3988,11 +3988,13 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
             s.insetSurfaceDevice = 0u;
             if (++s.outputGeneration == 0u) ++s.outputGeneration;
         }
+        // Reuse the inspected game backbuffer for bounds proof and D3D9 upload.
+        const auto& bb = presentDesc;
         const bool outputWritable = outputNow.valid() &&
-            presentDesc.Width >= kWidth + 8u && presentDesc.Height >= kHeight + 8u &&
-            presentDesc.MultiSampleType == D3DMULTISAMPLE_NONE &&
-            (presentDesc.Format == D3DFMT_A8R8G8B8 ||
-             presentDesc.Format == D3DFMT_X8R8G8B8);
+            bb.Width >= kWidth + 8u && bb.Height >= kHeight + 8u &&
+            bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
+            (bb.Format == D3DFMT_A8R8G8B8 ||
+             bb.Format == D3DFMT_X8R8G8B8);
         if (s.sourceGameDevice != 0u && s.sourceGameDevice != presentDevice) {
             // Do not copy a Draw batch from another D3D9 device to this Present.
             s.frameBatch.abort();
@@ -4034,7 +4036,6 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
                         if (changedPixels) {
                             if (outputWritable) {
                                 auto& back = presentBackbuffer;
-                                const auto& bb = presentDesc;
                                 // Cache CPU upload memory; invalidate on format/Reset.
                                 if (!s.insetSurface || s.insetFormat != bb.Format ||
                                     s.insetSurfaceDevice != presentDevice) {
