@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install PyYAML==6.0.3
+      - run: python -m pip install PyYAML==6.0.3 Pillow==11.3.0
       - name: Verify original 4-part controller accepts exact build-time patch, no extra schedules
         run: |
           python - <<'PY'
@@ -87,6 +87,7 @@ jobs:
           docker=(root/"Dockerfile").read_text()
           assert "COPY controller_png_attach.py" in docker
           assert "COPY tile_batch_queue.py" in docker
+          assert "COPY tile_orientation_policy.py" in docker
           assert "tile_batch_queue.py" in (root/"Dockerfile").read_text()
           assert "COPY patch_controller_png_upload.py" in docker
           assert "RUN python /tmp/patch_controller_png_upload.py /opt/outrun/app/controller.py" in docker
@@ -113,6 +114,8 @@ jobs:
           assert c["volumes"]["outrun_chat_localization_recovery_logs"]["name"]=="outrun_chat_localization_recovery_logs"
           print("A-ONLY CONTROLLER PATCH + BUILD + NAMED VOLUMES + BIND: STATIC PASS")
           PY
+      - name: Verify upright English references and exact pixel inverse (RGBA)
+        run: python tools/chat-controller/localization-recovery-v1/tests/test_tile_orientation_policy.py
       - name: Test five-source queue isolation, idempotence and five-result gate
         run: python tools/chat-controller/localization-recovery-v1/tests/test_tile_batch_queue.py
       - name: Check distinct A inputs, SHA/CRC and duplicate-submit guard

@@ -12,6 +12,8 @@ from unittest.mock import patch
 import zlib
 
 ROOT = Path(__file__).resolve().parents[1]
+import sys
+sys.path.insert(0, str(ROOT))
 spec = importlib.util.spec_from_file_location("tile_batch_queue", ROOT / "tile_batch_queue.py")
 queue = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(queue)
@@ -50,7 +52,7 @@ class BatchTests(unittest.TestCase):
         sha = hashlib.sha256(raw).hexdigest()
         self.mapping = []
         for i in range(10):
-            name = f"asset_{i:03d}.png"
+            name = f"asset_{i:03d}_BASE_READABLE_FLIPY.png"
             (self.folder / name).write_bytes(raw)
             self.mapping.append({
                 "part_filename": name,
@@ -58,6 +60,7 @@ class BatchTests(unittest.TestCase):
                 "source_dds_path": "texture/test.dds",
                 "queue_indexes": "12",
                 "width": "1", "height": "1",
+                "orientation": "FLIP_Y_PREVIEW_PER_SPRITE_VERIFY",
             })
         self.sources = {"texture/test.dds": {"dds_sha256": "a" * 64}}
         self.translations = {"12": [("START", "출발", "[]"), ("Tuned", "튜닝", "[]")]}

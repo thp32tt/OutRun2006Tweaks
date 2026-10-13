@@ -8,6 +8,17 @@
 - `CHAT_SLOTS=1`, `OUTRUN_A_TILE_BATCH_QUEUE=true`, `AUTO_SEND=true`. B/C1/C2 inactive; VR unchanged.
 - Existing `pending_A.json` and Q217 test results are preserved; queue mode ignores that single-asset pilot.
 
+## Upright baseline normalization (2026-10-14)
+
+Visual review of original English PNG shows:
+- Q012 `...BASE_READABLE_NORMAL__r01c01...`: text `Continue?` is upside down. Make a **separate vertically-flipped upright reference**, preserving RGBA pixels and dimensions.
+- Q032 `...BASE_READABLE_FLIPY...`: `Total Rank` is already upright. Do **not** flip it again.
+- Source CSV contains 1 `NORMAL` tile and 985 `FLIP_Y_PREVIEW_PER_SPRITE_VERIFY` tiles. Review cannot infer direction from `FLIPY` label alone; the incoming readable PNG is authoritative. Any new/unknown orientation fails closed.
+
+Original English PNGs and source hash mapping stay immutable. The verified Q012 derivative is stored under `/data/imagegen/a_tile_batches/upright_sources/`, with a separate `.orientation.json` containing original and derived SHA256 and reversible transform.
+
+**ImageGen always receives the readable-upright English reference**, and must output Korean in the same upright direction. Do not feed upside-down text to ImageGen or ask it to draw upside-down Korean. On reassembly, first apply the recorded `upright_to_source` inverse (`FLIP_Y` for Q012, identity for already-upright readable FLIPY PNGs), then perform DDS-specific orientation/texture QA before changing game assets. Do not silently flip whole DDS atlases.
+
 ## Input and official translation mapping
 
 The controller builds prompts from:

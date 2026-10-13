@@ -4,6 +4,9 @@
 > and an empty `OUTRUN_A_SINGLE_SMOKE_TASK_ID` allow distinct A task manifests.
 > The historical four-lane schedule documented below is inactive for this Compose.
 > See [A_IMAGE_SRC_MOUNT_20261013.md](A_IMAGE_SRC_MOUNT_20261013.md).
+> Source PNGs are normalized to readable-upright English before ImageGen.
+> Q012 needs a lossless Y flip; readable FLIPY tiles must **not** be flipped again.
+> See [UPRIGHT_SOURCE_ORIENTATION_20261014.md](UPRIGHT_SOURCE_ORIENTATION_20261014.md).
 > Five-image HD tile batches use the official translation table and independent
 > PNG/SHA gates. See [A_HD_TILE_BATCH_10MIN_20261014.md](A_HD_TILE_BATCH_10MIN_20261014.md).
 > A successful ChatGPT upload is **not** five generated images or DDS QA PASS.

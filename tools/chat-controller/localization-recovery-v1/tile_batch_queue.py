@@ -96,6 +96,8 @@ def _source_rows(root):
 
 def _prompt(items):
     lines = [
+        "입력 영문 기준 PNG는 사람이 읽는 정방향으로 보정·검증된 이미지만 사용합니다.",
+        "상하반전되거나 거꾸로 된 한글을 만들지 마세요. 입력 영문 글자의 정방향과 같은 방향으로 한글을 출력하세요.",
         f"OutRun 2006 HD GUI 영어 원본 PNG 타일 {len(items)}개를 각각 별도의 한국어 이미지 {len(items)}장으로 편집하세요.",
         f"합성 이미지, 콜라주, 새 UI 디자인 금지. 입력 1개당 출력 1개만, 총 {len(items)}개 개별 PNG 결과.",
         "파일명을 대응시켜 정확히 영문 UI 글자만 한국어로 번역합니다.",
@@ -190,8 +192,21 @@ def prepare_next_binding(root):
                         tr.append((en, ko, protect))
             path = folder / name
             _sha_png(path, row["part_png_sha256"], (int(row["width"]), int(row["height"])))
+            try:
+                from app.tile_orientation_policy import resolve_upright_source
+            except ModuleNotFoundError:
+                from tile_orientation_policy import resolve_upright_source
+            normalized = resolve_upright_source(root, row, path)
+            _sha_png(Path(normalized["path"]), normalized["sha256"],
+                     (int(row["width"]), int(row["height"])))
             items.append({
-                "filename": name, "path": str(path), "sha256": row["part_png_sha256"],
+                "filename": name, "path": normalized["path"], "sha256": normalized["sha256"],
+                "source_png_sha256": normalized["source_png_sha256"],
+                "source_orientation": normalized["source_orientation"],
+                "working_direction": normalized["input_direction"],
+                "source_to_upright": normalized["source_to_upright"],
+                "upright_to_source": normalized["upright_to_source"],
+                "dds_orientation": normalized["dds_orientation"],
                 "source_dds_path": row["source_dds_path"],
                 "source_dds_sha256": base["dds_sha256"],
                 "queue_indexes": row["queue_indexes"], "width": int(row["width"]),
