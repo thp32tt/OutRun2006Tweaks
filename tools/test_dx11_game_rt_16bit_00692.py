@@ -20,12 +20,12 @@ def wired(s,h):
           for v in formats.values())
     c=all(x in mirror for x in (
       "native_rt_readback::sampleable(rtLayout, capture.srgbTexture)",
-      "if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
+      "if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;",
       "const UINT sourceTexelBytes = packed16 ? 2u",
       "const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle)",
       "gameDevice->GetRenderTargetData(sourceSurface.Get(), readbackSurface.Get())",
       "readbackSurface->LockRect(&lock, nullptr, D3DLOCK_READONLY)",
-      "static_cast<UINT>(lock.Pitch) >= rowBytes",
+      "dynamic_texture::readable_pitch(lock.Pitch, rowBytes)",
       "if (!native_rt_readback::unpack_row(",
       "source, destination, desc.Width, rtLayout)",
       "dev->CreateTexture2D(&desc, initial.data(), texture.GetAddressOf())",

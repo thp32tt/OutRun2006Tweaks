@@ -15,7 +15,7 @@ def connected(src, hdr):
     return '#include "live_game_p8_texture.hpp"' in src and all(s in mirror for s in (
         "const bool p8 = base.Format == D3DFMT_P8;",
         "if (capture.srgbTexture && p8) return false;",
-        "if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
+        "if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;",
         "else if (p8) {",
         "nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;",
         "if (a8p8 || p8) {",
@@ -26,7 +26,7 @@ def connected(src, hdr):
         "alphaPalette ? entries[i].peFlags : 0xffu",
         "p8 ? p8_texture::source_bytes_per_texel() :",
         "|| extendedLuma || rgb332 || p8 ?",
-        "static_cast<UINT>(lock.Pitch) >= rowBytes",
+        "dynamic_texture::readable_pitch(lock.Pitch, rowBytes)",
         "else if (p8)\n                    p8_texture::unpack_row(source, destination, desc.Width,",
         "p8Palette.data());",
         "initial[level].SysMemPitch = pitches[level];",

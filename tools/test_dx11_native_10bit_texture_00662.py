@@ -21,7 +21,7 @@ def connected(src, hdr):
           "base.Format == D3DFMT_A2B10G10R10;",
           "if (capture.srgbTexture && tenBit) return false;",
           "|| packed16 || luminance || rgb24 || rgbaSwizzle || tenBit",
-          "static_cast<UINT>(lock.Pitch) >= rowBytes",
+          "dynamic_texture::readable_pitch(lock.Pitch, rowBytes)",
           "else if (tenBit)",
           "tenbit_texture::unpack_row(source, destination, desc.Width,",
           "base.Format == D3DFMT_A2B10G10R10 ?",
@@ -30,7 +30,7 @@ def connected(src, hdr):
           "initial[level].SysMemPitch = pitches[level];",
           "dev->CreateTexture2D(&desc, initial.data(), texture.GetAddressOf())",
           "dev->CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())",
-          "if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;"))
+          "if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;"))
         and all(s in draw for s in (
           "mirror_texture(dev, capture, sampledView, sampledSampler)",
           "ctx->PSSetShaderResources(0, 1, &boundView);",
@@ -60,7 +60,7 @@ def main():
       ('if (capture.srgbTexture && tenBit) return false;', 'if (false && tenBit) return false;'),
       ('|| packed16 || luminance || rgb24 || rgbaSwizzle || tenBit',
        '|| packed16 || luminance || rgb24 || rgbaSwizzle'),
-      ('static_cast<UINT>(lock.Pitch) >= rowBytes', 'false'),
+      ('dynamic_texture::readable_pitch(lock.Pitch, rowBytes)', 'false'),
       ('else if (tenBit)', 'else if (false)'),
       ('tenbit_texture::unpack_row(source, destination, desc.Width,',
        'std::memcpy(destination, source, rowBytes); //'),
@@ -69,7 +69,7 @@ def main():
       ('tenbit_texture::Layout::a2r10g10b10);', 'tenbit_texture::Layout::a2b10g10r10);'),
       ('initial[level].SysMemPitch = pitches[level];', 'initial[level].SysMemPitch = 0;'),
       ('dev->CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())', 'false'),
-      ('if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;', 'if (false) return false;'),
+      ('if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;', 'if (false) return false;'),
       ('mirror_texture(dev, capture, sampledView, sampledSampler)', 'false'),
       ('ctx->PSSetShaderResources(0, 1, &boundView);', 'ctx->PSSetShaderResources(0, 0, &boundView);'),
       ('ctx->DrawIndexed(indexCount, 0, 0);', 'ctx->DrawIndexed(0, 0, 0);'),

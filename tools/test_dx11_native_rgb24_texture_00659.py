@@ -17,12 +17,12 @@ def connected(src):
             "rgb24 ? rgb24_texture::source_bytes_per_texel() : 4u",
             "(packed16 || luminance) || rgb24",
             "desc.Width * sourceTexelBytes",
-            "static_cast<UINT>(lock.Pitch) >= rowBytes",
+            "dynamic_texture::readable_pitch(lock.Pitch, rowBytes)",
             "else if (rgb24)",
             "rgb24_texture::unpack_row(source, destination, desc.Width);",
             "dev->CreateTexture2D(&desc, initial.data(), texture.GetAddressOf())",
             "dev->CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())",
-            "if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
+            "if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;",
         ))
         and all(s in draw for s in (
             "mirror_texture(dev, capture, sampledView, sampledSampler)",
@@ -40,10 +40,10 @@ def main():
         ("base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance || rgb24", "base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance"),
         ("rgb24 ? rgb24_texture::source_bytes_per_texel() : 4u", "4u"),
         ("(packed16 || luminance) || rgb24", "(packed16 || luminance)"),
-        ("static_cast<UINT>(lock.Pitch) >= rowBytes", "false"),
+        ("dynamic_texture::readable_pitch(lock.Pitch, rowBytes)", "false"),
         ("else if (rgb24)", "else if (false)"),
         ("rgb24_texture::unpack_row(source, destination, desc.Width);", "std::memcpy(destination, source, rowBytes);"),
-        ("if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;", "if (false) return false;"),
+        ("if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;", "if (false) return false;"),
         ("mirror_texture(dev, capture, sampledView, sampledSampler)", "false"),
         ("ctx->DrawIndexed(indexCount, 0, 0);", "ctx->DrawIndexed(0, 0, 0);"),
     )

@@ -520,7 +520,7 @@ def main() -> None:
             "(mip != D3DTEXF_NONE && mip != D3DTEXF_POINT)",
             "nextColorOp != D3DTOP_DISABLE",
         )) and all(x in mirror for x in (
-            "if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
+            "if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;",
             "sourceLevels == 0 || sourceLevels > 11u",
             "D3DFMT_A8R8G8B8", "D3DFMT_X8R8G8B8",
             "LockRect(level, &lock, nullptr, D3DLOCK_READONLY)",
@@ -558,7 +558,7 @@ def main() -> None:
          "const bool arg2Diffuse = arg2 == D3DTA_DIFFUSE;"),
         ("const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT ||\n            blendTextureAlphaPMInverseFactorArg2Alpha;",
          "const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE;"),
-        ("if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
+        ("if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;",
          "if (base.Pool == D3DPOOL_SYSTEMMEM && !gpuRenderTarget) return false;"),
         ("sourceLevels == 0 || sourceLevels > 11u", "sourceLevels != 1u"),
         ("state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;", "state.MaxLOD = D3D11_FLOAT32_MAX;"),
@@ -1205,7 +1205,7 @@ def main() -> None:
             "DXGI_FORMAT_BC3_UNORM",
             "base.Pool == D3DPOOL_DEFAULT",
             "lock.Pitch > 0",
-            "static_cast<UINT>(lock.Pitch) >= rowBytes",
+            "dynamic_texture::readable_pitch(lock.Pitch, rowBytes)",
             "static_cast<std::size_t>(uploadPitch) * rows",
             "static_cast<std::size_t>(y) * lock.Pitch",
             "static_cast<std::size_t>(y) * uploadPitch",
@@ -1229,7 +1229,7 @@ def main() -> None:
         ("(std::max)(1u, (desc.Width + 3u) / 4u) *",
          "rowBytes = desc.Width * 4u;"),
         ("const UINT rows = compressed ? (std::max)(1u, (desc.Height + 3u) / 4u) : desc.Height;", "rows = desc.Height;"),
-        ("static_cast<UINT>(lock.Pitch) >= rowBytes",
+        ("dynamic_texture::readable_pitch(lock.Pitch, rowBytes)",
          "static_cast<UINT>(lock.Pitch) > 0"),
         ("initial[level].SysMemPitch = pitches[level];", "initial[level].SysMemPitch = desc.Width * 4u;"),
         ("desc.Format = nativeFormat;", "desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;"),
@@ -1269,7 +1269,7 @@ def main() -> None:
             "desc.Width * sourceTexelBytes;",
             "const UINT uploadPitch = ((packed16 || luminance) || rgb24",
             "desc.Width * 4u : rowBytes;",
-            "static_cast<UINT>(lock.Pitch) >= rowBytes",
+            "dynamic_texture::readable_pitch(lock.Pitch, rowBytes)",
             "packed_texture16::unpack_row(",
             "initial[level].SysMemPitch = pitches[level];",
             "dev->CreateShaderResourceView(",
@@ -2067,7 +2067,7 @@ def main() -> None:
     # 00560: Real game D3D9 DEFAULT render-target texture level 0 ->
     # exact-format, non-MSAA GetRenderTargetData -> CPU BGRA snapshot ->
     # existing D3D11 SRV/sampler -> actual native Draw/DrawIndexed/inset.
-    # Non-render-target DEFAULT, compressed DEFAULT and MSAA fail closed.
+    # Ordinary non-dynamic, non-RT DEFAULT, compressed DEFAULT and MSAA fail closed.
     rt_tokens = (
         "const bool gpuRenderTarget = base.Pool == D3DPOOL_DEFAULT &&",
         "(base.Usage & D3DUSAGE_RENDERTARGET) != 0u",
@@ -2079,7 +2079,7 @@ def main() -> None:
         "base.Format == D3DFMT_A2R10G10B10 ? native_rt_readback::Layout::a2r10g10b10",
         "base.Format == D3DFMT_A2B10G10R10 ? native_rt_readback::Layout::a2b10g10r10",
         "native_rt_readback::sampleable(rtLayout, capture.srgbTexture);",
-        "if (base.Pool == D3DPOOL_DEFAULT && !gpuRenderTarget) return false;",
+        "if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;",
         "capture.texture->GetSurfaceLevel(0, sourceSurface.GetAddressOf())",
         "sourceDesc.MultiSampleType != D3DMULTISAMPLE_NONE",
         "sourceDesc.Width != base.Width || sourceDesc.Height != base.Height",
@@ -2091,10 +2091,10 @@ def main() -> None:
         "gameDevice->GetRenderTargetData(sourceSurface.Get(), readbackSurface.Get())",
         "readbackSurface->LockRect(&lock, nullptr, D3DLOCK_READONLY)",
         "capture.texture->LockRect(level, &lock, nullptr, D3DLOCK_READONLY)",
-        "if (gpuRenderTarget) readbackSurface->UnlockRect();",
+        "const HRESULT unlockResult = gpuRenderTarget ?",
         "if (!native_rt_readback::unpack_row(",
         "source, destination, desc.Width, rtLayout)",
-        "else capture.texture->UnlockRect(level);",
+        "readbackSurface->UnlockRect() : capture.texture->UnlockRect(level);",
         "desc.Usage = D3D11_USAGE_IMMUTABLE;",
         "dev->CreateShaderResourceView(texture.Get(), nullptr,",
     )
@@ -2103,7 +2103,7 @@ def main() -> None:
         draw = code[code.find("bool submit("):code.find("void observe(")]
         return (all(token in mirror for token in rt_tokens)
                 and "if (FAILED(lockResult)) return false;" in mirror
-                and "static_cast<UINT>(lock.Pitch) >= rowBytes" in mirror
+                and "dynamic_texture::readable_pitch(lock.Pitch, rowBytes)" in mirror
                 and "mirror_texture(dev, capture, sampledView, sampledSampler)" in draw
                 and "ctx->PSSetShaderResources(0, 1, &boundView)" in draw
                 and "ctx->DrawIndexed(indexCount, 0, 0);" in draw
