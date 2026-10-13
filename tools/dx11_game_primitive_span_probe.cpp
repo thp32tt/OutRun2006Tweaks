@@ -5,6 +5,10 @@
 
 int main() {
     using outrun::vr::dx11::live_game_frame::game_primitive_element_count;
+    using outrun::vr::dx11::live_game_frame::kMaxNativeGamePrimitives;
+    using outrun::vr::dx11::live_game_frame::kMaxNativeGameVertices;
+    static_assert(kMaxNativeGamePrimitives == 2048u);
+    static_assert(kMaxNativeGameVertices == kMaxNativeGamePrimitives * 3u);
     std::uint32_t elements = 0xdeadbeefu;
     assert(game_primitive_element_count(false, 1, elements) && elements == 3);
     assert(game_primitive_element_count(true, 1, elements) && elements == 3);
@@ -12,11 +16,15 @@ int main() {
     assert(game_primitive_element_count(true, 2, elements) && elements == 4);
     assert(game_primitive_element_count(false, 512, elements) && elements == 1536);
     assert(game_primitive_element_count(true, 512, elements) && elements == 514);
+    assert(game_primitive_element_count(false, kMaxNativeGamePrimitives, elements) &&
+           elements == kMaxNativeGameVertices);
+    assert(game_primitive_element_count(true, kMaxNativeGamePrimitives, elements) &&
+           elements == kMaxNativeGamePrimitives + 2u);
     const auto last = elements;
     assert(!game_primitive_element_count(false, 0, elements) && elements == last);
     assert(!game_primitive_element_count(true, 0, elements) && elements == last);
-    assert(!game_primitive_element_count(false, 513, elements) && elements == last);
-    assert(!game_primitive_element_count(true, 513, elements) && elements == last);
+    assert(!game_primitive_element_count(false, kMaxNativeGamePrimitives + 1u, elements) && elements == last);
+    assert(!game_primitive_element_count(true, kMaxNativeGamePrimitives + 1u, elements) && elements == last);
     using outrun::vr::dx11::live_game_frame::game_native_primitive_element_count;
     assert(game_native_primitive_element_count(1, 1, elements) && elements == 1);
     assert(game_native_primitive_element_count(1, 512, elements) && elements == 512);
@@ -27,6 +35,10 @@ int main() {
     assert(game_native_primitive_element_count(4, 512, elements) && elements == 1536);
     assert(game_native_primitive_element_count(5, 512, elements) && elements == 514);
     assert(game_native_primitive_element_count(6, 512, elements) && elements == 514);
+    for (unsigned kind : {1u, 2u, 3u, 4u, 5u, 6u}) {
+        assert(game_native_primitive_element_count(kind, kMaxNativeGamePrimitives, elements));
+        assert(elements <= kMaxNativeGameVertices);
+    }
     const auto retained = elements;
     for (unsigned rejected : {0u, 7u, 0xffffffffu})
         assert(!game_native_primitive_element_count(rejected, 1, elements) &&
@@ -34,7 +46,7 @@ int main() {
     for (unsigned kind : {1u, 2u, 3u, 4u, 5u, 6u}) {
         assert(!game_native_primitive_element_count(kind, 0, elements) &&
                elements == retained);
-        assert(!game_native_primitive_element_count(kind, 513, elements) &&
+        assert(!game_native_primitive_element_count(kind, kMaxNativeGamePrimitives + 1u, elements) &&
                elements == retained);
     }
     using outrun::vr::dx11::live_game_frame::game_native_unit_point_raster;
@@ -63,9 +75,10 @@ int main() {
     assert(!game_fan_to_triangle_list(2, indexed, 4, 3, fan) && fan == preserved);
     assert(!game_fan_to_triangle_list(2, nullptr, 0, 3, fan) && fan == preserved);
     assert(!game_fan_to_triangle_list(0, nullptr, 0, 0, fan) && fan == preserved);
-    assert(!game_fan_to_triangle_list(513, nullptr, 0, 515, fan) && fan == preserved);
+    assert(!game_fan_to_triangle_list(kMaxNativeGamePrimitives + 1u, nullptr, 0,
+                                     kMaxNativeGamePrimitives + 3u, fan) && fan == preserved);
     // Sparse real D3D9 VB uses absolute physical offsets far outside the
-    // 1536 contiguous-slot diagnostic bound, but only three distinct slots.
+    // native-mesh contiguous-slot diagnostic bound, but only three distinct slots.
     using outrun::vr::dx11::live_game_frame::game_compact_sparse_indices;
     const std::uint32_t distant[] = {100u, 10000u, 100u, 200000u, 10000u};
     std::vector<std::uint32_t> uniqueSlots{999u}, remapped{888u};
@@ -77,7 +90,7 @@ int main() {
     assert(uniqueSlots == keptSlots && remapped == keptIndices);
     assert(!game_compact_sparse_indices(nullptr, 5u, 3u, uniqueSlots, remapped));
     assert(!game_compact_sparse_indices(distant, 0u, 3u, uniqueSlots, remapped));
-    assert(!game_compact_sparse_indices(distant, 1537u, 3u, uniqueSlots, remapped));
+    assert(!game_compact_sparse_indices(distant, kMaxNativeGameVertices + 1u, 3u, uniqueSlots, remapped));
     assert(uniqueSlots == keptSlots && remapped == keptIndices);
     // A compact live draw can reference valid VB vertices across invalid
     // shadow holes: dense copy fails, then bounded sparse capture is eligible.
@@ -90,10 +103,8 @@ int main() {
     assert(!game_compact_sparse_indices(nullptr, 3u, 3u,
                                        uniqueSlots, remapped));
     assert(remapped == previouslyMapped);
-    // 00672: a full 512-triangle game mesh may use 1536 non-contiguous
+    // 00679: a full 2048-triangle game mesh may use 6144 non-contiguous
     // physical VB slots. Compact the real index order without reading holes.
-    using outrun::vr::dx11::live_game_frame::kMaxNativeGameVertices;
-    static_assert(kMaxNativeGameVertices == 512u * 3u);
     std::vector<std::uint32_t> fullMesh(kMaxNativeGameVertices);
     for (std::uint32_t i = 0; i < kMaxNativeGameVertices; ++i)
         fullMesh[i] = 100000u + (kMaxNativeGameVertices - 1u - i) * 7u;

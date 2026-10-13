@@ -16,7 +16,10 @@ for token in ("std::sort(sorted.begin(), sorted.end())",
     assert token in span, token
 assert "game_compact_sparse_indices(distant, 5u, 3u" in probe
 assert "game_compact_sparse_indices(distant, 5u, 2u" in probe
-assert "kMaxNativeGameVertices == 512u * 3u" in probe
+assert "kMaxNativeGamePrimitives == 2048u" in probe
+assert "kMaxNativeGameVertices == kMaxNativeGamePrimitives * 3u" in probe
+assert "game_native_primitive_element_count(kind, kMaxNativeGamePrimitives + 1u, elements)" in probe
+assert "game_compact_sparse_indices(distant, kMaxNativeGameVertices + 1u" in probe
 assert "fullMesh.data()" in probe
 assert "kMaxNativeGameVertices - 1u, uniqueSlots, remapped" in probe
 assert "uniqueSlots == fullUnique && remapped == fullRemap" in probe
@@ -30,7 +33,7 @@ for path in ("src/vr/d3d9/stereo_renderer_r30.cpp",
     assert "!R30RangeValid(entry->valid, static_cast<UINT>(offset)," in source
     assert "nativeVertexCount = static_cast<UINT>(uniquePhysical.size())" in source
     assert "indices.swap(compact)" in source
-    assert "high-low+1u <= 1536u" in source
+    assert "high-low+1u <= live::kMaxNativeGameVertices" in source
     assert "physical.size() >" in source
     assert "outrun::vr::dx11::live_game_frame::kMaxNativeGameVertices" in source
     assert "live::kMaxNativeGameVertices, uniquePhysical, compact)" in source
@@ -53,6 +56,10 @@ assert "s.frameBatch.abort();" in observer[observer.index(primitive_gate):]
 removed_ordinal = observer.replace(source_ordinal, "", 1)
 assert removed_ordinal != observer and source_ordinal not in removed_ordinal
 assert "observe_unavailable_game_draw(IDirect3DDevice9* game)" in bridge
+linear = bridge.split("void observe_linear(", 1)[1].split("void observe_indexed(", 1)[0]
+assert "if (!game_native_primitive_element_count(" in linear
+assert "observe_unavailable_game_draw(game);" in linear
+assert linear.index("if (!game_native_primitive_element_count(") < linear.index("observe_unavailable_game_draw(game);")
 missing = bridge.split("void observe_unavailable_game_draw(", 1)[1].split(
     "void before_game_present(", 1)[0]
 assert "++s.sourceDrawsThisFrame;" in missing

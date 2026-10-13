@@ -18,7 +18,7 @@ for path in ("src/vr/d3d9/stereo_renderer_r30.cpp",
     block = src.split("void R30ObserveNativeIndexedVB(", 1)[1].split(
         "void R30ObserveNativeIndexedUP(", 1)[0]
     assert "const bool validPhysicalIndices = ok && high >= low;" in block
-    assert "if (validPhysicalIndices && high-low+1u <= 1536u)" in block
+    assert "if (validPhysicalIndices && high-low+1u <= live::kMaxNativeGameVertices)" in block
     assert "R30CopyVertexShadow(vb, static_cast<UINT>(first)," in block
     assert "if (live::game_sparse_shadow_retry_eligible(" in block
     assert "validPhysicalIndices, nativeVertexCount)" in block
