@@ -11,9 +11,9 @@
   "work_key": "DX11:NATIVE_EYE_FENCE_SUBMISSION_FLUSH",
   "feature_id": "NATIVE_STEREO_EYE_OUTPUT",
   "base_head_sha": "bf1936473bd9cec32ddbfbaa9687f1c23bebc45a",
-  "status": "MATERIAL_COMMITTED_PENDING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -62,21 +62,59 @@
     "C0_RECOVER": "PASS bf1936473bd9cec32ddbfbaa9687f1c23bebc45a: 00665 A8P8 independent, existing CI in progress",
     "C1_REVIEW": "PASS producer EVENT polling DONOTFLUSH relied on probe-side Flush absent from API caller",
     "C2_IMPLEMENT": "PASS immediate producer context queues EVENT and eye writes without helper flush",
-    "C3_VALIDATE": "INITIAL_EXACT_SHA_FAIL (policy run record; verifier uninitialized probe_cpp); repaired and requeued for new exact SHA",
-    "C4_COMMIT": "MATERIAL_COMMITTED",
-    "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C3_VALIDATE": "PASS_EXACT_SHA: d8967d39e426237820dc2d7ec5638bc01966ffed Backend, Fast, Build, OpenXR, HUD and isolated Native Transport WARP all SUCCESS; first material CI failure repaired before this exact SHA",
+    "C4_COMMIT": "PASS material 43e74b61a5693a89fe9df07df298cd5ad863a5f7, validation-bearing d8967d39e426237820dc2d7ec5638bc01966ffed",
+    "C5_PACKAGE": "NOT_REQUIRED; no user HMD/gamepad runtime verification",
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "acceptance_results": {
-    "cpu_probe": "SOURCE_STATIC_PRECHECK_PASS",
-    "static_regression": "PENDING_REPAIRED_EXACT_SHA",
-    "compile_build": "PENDING_REPAIRED_EXACT_SHA",
+    "cpu_probe": "DX11_NATIVE_TRANSPORT_ISOLATED_WARP_SUCCESS",
+    "static_regression": "DX11_FAST_AND_BACKEND_EXACT_SHA_SUCCESS",
+    "compile_build": "BUILD_AND_OPENXR_EXACT_SHA_SUCCESS",
     "game_visual_parity": "NEED_HMD_TEST",
     "gamepad": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
   },
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "next_action": "Check repaired validation-bearing result SHA for mandatory exact GitHub gates and Native Transport Isolated WARP. HMD gameplay remains UNTESTED; complete C6 only after successful verification."
+  "material_result_sha": "43e74b61a5693a89fe9df07df298cd5ad863a5f7",
+  "validation_bearing_result_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+  "result_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+  "next_action": "C6 complete, HMD/Quest3/VDXR/gamepad not tested. Begin next separate independent developer work item instead of rerunning this TASK_ID.",
+  "ci_evidence": [
+    {
+      "name": "Build",
+      "run_id": 38371548610,
+      "head_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38371548624,
+      "head_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38371548658,
+      "head_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+      "conclusion": "success"
+    },
+    {
+      "name": "DX11 Native Transport Isolated WARP",
+      "run_id": 38371543363,
+      "head_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+      "conclusion": "success"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38371543364,
+      "head_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38371543361,
+      "head_sha": "d8967d39e426237820dc2d7ec5638bc01966ffed",
+      "conclusion": "success"
+    }
+  ]
 }
