@@ -78,7 +78,16 @@ def main() -> None:
          "unpack_row_typed<Layout::argb4444>(source, bgra, width);"),
     )
     for old, mutation in src_mutations:
-        assert old in src and not connected(src.replace(old, mutation, 1), decoder), old
+        assert old in src, old
+        if old == "base.Format == D3DFMT_X1R5G5B5 ?":
+            # 00692's earlier DEFAULT-RT admission checks the same D3D9
+            # format. Mutate the LAST occurrence: this regression owns the
+            # original texture packing selector inside the mip-copy loop.
+            prefix, match, suffix = src.rpartition(old)
+            mutant = prefix + mutation + suffix if match else src
+        else:
+            mutant = src.replace(old, mutation, 1)
+        assert not connected(mutant, decoder), old
     for old, mutation in decoder_mutations:
         assert old in decoder and not connected(src, decoder.replace(old, mutation, 1)), old
     print(f"00661 PASS: {len(src_mutations)+len(decoder_mutations)} X1/X4 RGB destructive live Draw mutations; HMD UNTESTED")
