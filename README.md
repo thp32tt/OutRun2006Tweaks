@@ -1,91 +1,30 @@
-# OutRun2006Tweaks
-[![GitHub Downloads](https://img.shields.io/github/downloads/emoose/OutRun2006Tweaks/total)](https://github.com/emoose/OutRun2006Tweaks/releases)
+# Korean localization controller rollback (2026-10-12)
 
-A wrapper DLL that can patch in fixes & tweaks into OutRun 2006: Coast 2 Coast.
+This minimal GitHub branch is a **GitOps deployment definition**, not a new build. It restores the existing Korean localization controller Docker image built yesterday.
 
-Latest releases can be found under the releases section: https://github.com/emoose/OutRun2006Tweaks/releases
+* Source commit in original repository: [`68e8a437cadd`](https://github.com/thp32tt/OutRun2006Tweaks/commit/68e8a437cadd429e30db25e14f8978a88d977b29).
+* Exact image tag found on the Portainer host: `outrun-kor-plate-engine:68e8a437cadd`.
+* Only one service: `controller-a`; no separate QA container.
+* Host port `6082` maps to container noVNC `6080`. Status host port: `8788`.
+* Persistent legacy browser/data directory on the host: `/home/chatgpt-runner2/work/outrun-imagegen-a/legacy-data`.
+* The new A-slot Python controller is **not** executed. The old image's embedded `/opt/outrun/entrypoint.sh` starts the old browser/controller.
 
-**Tweaks will also point the game to new multiplayer servers**, just head to the multiplayer section in-game and pick a username & password there!
+## Portainer
 
-Online games are regularly setup on the **OutRun2006Tweaks Discord**: https://discord.gg/GFjKAMg83t
+Update **Git-managed stack** settings:
+- Repository: `https://github.com/thp32tt/OutRun2006Tweaks.git`
+- Reference: `refs/heads/deploy/rollback-localization-20261012-68e8`
+- Compose path: `docker-compose.yml`
+- Environment `VNC_PASSWORD`: use the password already configured in Portainer
+- Environment `LOCALIZATION_PROJECT_URL`: the existing Korean localization ChatGPT Project URL (required for automatic sending)
+- Optionally `AUTO_SEND=false` for a login-only first run.
 
-> [!NOTE]  
-> **Releases are currently very outdated**, and missing a lot of new features (new input system, config overlay, framerate interpolation...) - if you have a GitHub account you can download the latest builds from the Actions tab at top of the page, otherwise try checking the Discord above!
+Then press **Pull and redeploy**. Access `http://192.168.0.48:6082/vnc.html`.
+Do not delete other stacks or volumes.
+Use the same Docker host that contains the image. Because `pull_policy: never` is set, a missing image will fail explicitly instead of unexpectedly downloading/building a different version.
 
-### Features
+## Limits
 
-**Bugfixes:**
-- Game is now fixed to 60Hz tickrate, running at higher framerates now interpolates to that framerate instead of speeding up gameplay
-- Prevents save corruption bug when remapping controls with many input devices connected
-- Pegasus animation's clopping sound effect will now end correctly
-- Fixed C2C ranking scoreboards not updating on Steam and other releases due to faulty anti-piracy checks
-- Automatically disables DPI scaling on the game window to fix scaling issues
-- Fixes issues with shading on certain character/stage models (eg. the ending cutscene models)
-- Allows particles like grass/gravel to be drawn correctly, like in the console versions
-- Crashes with multi-core machines are now fixed.
-- Bink movie files larger than 1024 pixels can now play without crashes
-- Game crashes will now write a crash report into CrashDumps folder (please feel free to post any crash reports to the issues page!)
-
-**Graphics:**
-- Bloom/glow effect from the console & arcade versions has been re-added
-- UI can now scale to different aspect ratios without stretching
-- Game scene & UI textures can be extracted from game, and replaced with higher-resolution versions
-- Allows disabling vehicle LODs, reducing the ugly pop-in as they get closer
-- Fixed Z-buffer precision issues that caused heavy Z-fighting and distant object pop-in
-- Lens flare effect now loads from correct path without needing to change game files
-- Stage objects such as traffic cones now only disappear once they're actually off-screen
-- Fixes certain effects like engine backfiring which failed to appear when using controllers
-- Anisotropic filtering & transparency supersampling can be forced, greatly reducing aliasing around the edges of the track
-- Reflection rendering resolution can be increased from the default 128x128
-- Restores the car base shadow from the C2C console ports, which was missing on PC for some reason
-- Allows using higher-quality models for Alberto/Clarissa/Jennifer, which were otherwise left unused
-
-**Gameplay:**
-- Points game toward new online servers, restoring the online multiplayer modes
-- Restored XInput rumble code from the Xbox release can be enabled inside INI, allowing gear shifts/drifts/crashes/etc to give feedback
-- Xbox Series impulse triggers are supported and can be tweaked inside INI
-- Steering deadzone can be customized from the default 20%
-- Horn button can be made functional during normal gameplay, outside of the "honk your horn!" girl requests
-- Allows randomizing the set of highway animations to use, instead of only using the set for the game mode being played
-- In-game HUD can be optionally toggled via bindable keypress
-- Manual Transmission (MT) can be set as the default for C2C menus
-- Passing all the C2C missions might unlock something new 🐱
-
-**Enhancements:**
-- Game can now run in borderless windowed mode; mouse cursor will now be hidden while game is active
-- Will use desktop resolution for the game if outrun2006.ini isn't present
-- Load times heavily reduced via improved framelimiter
-- Draw distance for the stage can be increased, greatly reducing pop-in/fade-ins on the level
-- Music can now be loaded from uncompressed WAV or lossless FLAC files, if they exist with the same filename
-- Allows intro splash screens to be skipped
-- Music track can be changed mid-race via Z and X buttons, or Back/RS+Back on controller (`CDSwitcher` must be enabled in INI first)
-
-All the above can be customized via the OutRun2006Tweaks.ini file.
-
-### Setup
-Since Steam/DVD releases are packed with ancient DRM that doesn't play well with DLL wrappers, this pack includes a replacement game EXE to run the game with.
-
-This EXE should be compatible with both the Steam release & the original DVD version, along with most OR2006 mods.
-
-To set it up:
-
-- Extract the files from the release ZIP into your **Outrun2006 Coast 2 Coast** folder, where **OR2006C2C.EXE** is located, replacing the original EXE.
-- Edit **OutRun2006Tweaks.ini** to customize the tweaks to your liking (by default all tweaks are enabled, other than `CDSwitcher`)
-- **Important:** Install the latest x86 VC redist from (https://aka.ms/vs/17/release/vc_redist.x86.exe), a redist from 2024 is needed for Tweaks to launch correctly (**even if you already have it installed please try installing it again**)
-- Run the game, your desktop resolution will be used by default if `outrun2006.ini` file isn't present.
-- (optional) the [SoundtrackFix package](https://github.com/emoose/OutRun2006Tweaks/releases/download/v0.3.0-release/OutRun2006Tweaks-SoundtrackFix-1.0.zip) can be applied to fix the missing first 2 seconds in "Rush a Difficulty"
-- (optional) texture improvements can be found in the texture pack releases thread (please feel free to create your own too!): https://github.com/emoose/OutRun2006Tweaks/issues/20
-
-Steam Deck/Linux users may need to run the game with `WINEDLLOVERRIDES="dinput8=n,b" %command%` launch parameters for the mod to load in.
-
-### Building
-Building requires Visual Studio 2022, CMake & git to be installed, with those setup just clone this repo and then run `generate_2022.bat`.
-
-If the batch script succeeds you should see a `build\outrun2006tweaks-proj.sln` solution file, just open that in VS and build it.
-
-(if you have issues building with this setup please let me know)
-
-### Thanks
-Thanks to [debugging.games](http://debugging.games) for hosting debug symbols for OutRun 2 SP (Lindburgh), very useful for looking into Outrun2006.
-
-(**if you own any prototype of Coast 2 Coast or Online Arcade** it may also contain debug symbols inside, which would let us improve even more on the C2C side of the game - please consider getting in touch at my email: lucknut.xbl at gmail dot com)
+This is an exact Docker image rollback to the Oct 12 image, **not a claim that its ImageGen upload logic works**.
+Browser login may be needed again because the old controller uses `/data/browser-profile` while the new controller used `/profile`.
+Runtime and Portainer deployment remain UNTESTED until manually redeployed.

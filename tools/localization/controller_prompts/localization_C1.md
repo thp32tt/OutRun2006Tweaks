@@ -1,5 +1,0 @@
-OutRun 한글화 C1 실행 — A/B 실저장 DDS 다중 항목 간이 독립 QA 전용. 이미지 생성/생산 금지.
-최신 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md 및 docs/KOREAN_LOCALIZATION_HD_PNG_IMAGEGEN_AND_FAST_QA_20261012.md 읽기. 최신 원본 HD DDS 및 A/B 결과의 정확 SHA를 확인. 매회 서로 다른 4~8개 후보(최대 8개, 부족할 때 그보다 적게)를 한 번에 모아 SOURCE/READABLE/최종 저장 DDS RAW/FLIPY/실게임 사용 크기 비교판 하나로 검사. 후보별 번역 오자·가짜 자소·깨짐·읽힘, 실제 원본 UI 칸 초과·잘림·겹침·보호 아트 훼손·DDS 포맷/방향 오류만 우선 FAIL; 원문 글자 효과 bbox만 넘고 실제 UI 칸 안이라면 허용. 미세 광택/색/폰트/기울기/여백은 PASS 가능. 결과는 후보별 SHA, 실제 결함 좌표, PASS/REWORK/HOLD 기록. 동일 SHA 반복 문서 QA 남발 금지. 과거 자신이 생산한 C1 자산 셀프 승인 금지. 실게임 P0/P1 및 공유 HUD는 고위험 C3/사용자 재테스트 경로 유지. C2 탭/작업/생성 없고 예전 C2 PASS 위조 금지. 공식 게이트에 C2 토큰이 남아 있으면 TEST_ONLY/HOLD, 무단 배포 금지. 실제 변경만 commit/push/원격 HEAD 검증, 게임 미실행 UNTESTED. VR/FFB/DX11/DXVK 제외.
-
-수동 배포 정책: GitHub 결과/정책만 반영한다. Docker/Portainer 배포·재시작, AUTO_SEND 활성화, 게임 폴더 설치·정식 릴리스는 사용자가 수행한다. 새 큐 생성·기존 결과 초기화 금지.
-C1은 SOURCE→CLEAN 검토와 FINAL DDS 검토를 각각 SHA에 묶어 기록한다. SOURCE/CLEAN이 같으면 유효한 독립 검토 재사용 가능. 실제 UI cell/UV 근거가 없으면 주변 빈칸을 사용 가능 영역으로 추정하지 않는다. BC 압축 후 보호영역 변화는 승인 근거 없는 허용치로 통과시키지 않는다. 결과에 검수 범위와 미번역 문구 수를 기록하고 일부 영역 PASS를 전체 DDS 완료로 올리지 않는다. 판정은 C1_STATIC_PASS/REWORK/HOLD이며 역사적 C2 토큰을 발급하지 않는다.

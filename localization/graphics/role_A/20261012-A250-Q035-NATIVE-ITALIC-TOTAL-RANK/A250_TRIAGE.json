@@ -1,6 +1,0 @@
-{
-  "stdout": "{\n  \"queue_file\": \"localization/graphics/asset_queue.csv\",\n  \"escalation_file\": \"localization/graphics/REWORK_ESCALATIONS.json\",\n  \"counts\": {\n    \"NORMAL_QUEUE_SELECTION\": 1\n  },\n  \"assets\": [\n    {\n      \"index\": 35,\n      \"path\": \"textures/load/spr_sprani_HOLL_RANK_Exst/E989E3B7_1024x1024.dds\",\n      \"current_status\": \"c1_20261011_q035_source_family_visual_rework\",\n      \"next_action\": \"NORMAL_QUEUE_SELECTION\",\n      \"repeated_root_causes\": [],\n      \"reason\": \"No source-visible defect determined from queue state\",\n      \"runtime_validation\": \"UNTESTED\"\n    }\n  ],\n  \"note\": \"No state transition or game QA is inferred by this read-only diagnosis.\"\n}\n",
-  "stderr": "",
-  "run_key": "OUTRUN-KOR-A250-Q035-TOTAL-RANK-ITALIC-NATIVE-20261012-0300",
-  "new_method": "new native glyph contours + source-calibrated right-italic, not same method, no previous pixels reused"
-}

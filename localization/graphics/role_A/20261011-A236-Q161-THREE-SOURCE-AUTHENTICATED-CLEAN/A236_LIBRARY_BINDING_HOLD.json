@@ -1,7 +1,0 @@
-{
-  "manifest_sha256": "caf59675820b65b4ded62b05e463bfb66c77878a4ba24a4f9ff810e36ff2b9f8",
-  "status": "CREATED_C1_REVIEW_REQUIRED",
-  "audit": "{\"integrity\": \"PASS\", \"entries\": 3, \"visual_approval\": false}",
-  "C1_PASS": false,
-  "new_trial_DDS": false
-}

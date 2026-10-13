@@ -1,9 +1,0 @@
-{
-  "run": "20261005-B-PRODUCTION51",
-  "asset": "1F5FE6E9",
-  "index": 132,
-  "status": "FAIL_CLOSED_DIAGNOSTIC",
-  "exception": "RuntimeError(('ambiguous source mask', 1, [649, 148, 756, 171], [638, 140, 770, 179], 0.43512043512043513))",
-  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 242, in <module>\n    try:main()\n        ^^^^^^\n  File \"/home/runner/work/OutRun2006Tweaks/OutRun2006Tweaks/tools/localization/cpu_jobs/B.py\", line 115, in main\n    if dens>0.55 or bb[0]<=x0+1 or bb[2]>=x1-1: raise RuntimeError((\"ambiguous source mask\",idx,cell,bb,dens))\n                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: ('ambiguous source mask', 1, [649, 148, 756, 171], [638, 140, 770, 179], 0.43512043512043513)\n",
-  "RUNTIME_VALIDATION": "UNTESTED"
-}

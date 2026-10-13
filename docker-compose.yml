@@ -1,0 +1,33 @@
+# GitOps rollback to the existing, 2026-10-12-tested Korean localization controller image.
+# Source revision: https://github.com/thp32tt/OutRun2006Tweaks/commit/68e8a437cadd429e30db25e14f8978a88d977b29
+# The image is cached on the SAME Portainer Docker host; it is not a public registry image.
+services:
+  controller-a:
+    image: outrun-kor-plate-engine:68e8a437cadd
+    pull_policy: never
+    platform: linux/amd64
+    container_name: outrun-imagegen-a
+    restart: unless-stopped
+    shm_size: "768m"
+    environment:
+      TZ: Asia/Seoul
+      CONTROLLER_MODE: "localization"
+      AUTO_SEND: "${AUTO_SEND:-true}"
+      CHAT_SLOTS: "1"
+      SCHEDULE_MINUTES: "0"
+      CHAT_DAY_ROLLOVER_HOUR: "2"
+      CHATGPT_BASE_URL: "https://chatgpt.com/"
+      CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"
+      REQUIRE_PROJECT_URL: "true"
+      PREFERRED_THINKING_LEVEL: "High"
+      STRICT_THINKING_LEVEL: "false"
+      FRESH_CHAT_EACH_RUN: "false"
+      WATCHDOG_ENABLED: "false"
+      VNC_PASSWORD: "${VNC_PASSWORD:?Set_VNC_PASSWORD_in_Portainer}"
+      STATUS_PORT: "8787"
+    ports:
+      - "6082:6080"
+      - "8788:8787"
+    volumes:
+      - /home/chatgpt-runner2/work/outrun-imagegen-a/legacy-data:/data
+      - /home/chatgpt-runner2/work/outrun-imagegen-a/logs:/logs

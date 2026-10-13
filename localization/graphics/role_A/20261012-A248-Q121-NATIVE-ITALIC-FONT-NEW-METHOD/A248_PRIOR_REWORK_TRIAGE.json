@@ -1,7 +1,0 @@
-{
-  "run": "OUTRUN-KOR-A248-Q121-P0-NATIVE-ITALIC-FONT-20261012-0100",
-  "decision": "MATERIAL_NEW_METHOD_AFTER_A241_OPTICAL_SOURCE_FAMILY_FAIL",
-  "command": "rework_triage --index 121",
-  "stdout": "{\n  \"queue_file\": \"localization/graphics/asset_queue.csv\",\n  \"escalation_file\": \"localization/graphics/REWORK_ESCALATIONS.json\",\n  \"counts\": {\n    \"MATERIAL_REWORK\": 1\n  },\n  \"assets\": [\n    {\n      \"index\": 121,\n      \"path\": \"textures/load/spr_sprani_selector_cvt_Exst/FD90AA9_1024x1024.dds\",\n      \"current_status\": \"c2_20261011_q121_a242_p0_rework_required_user_open_trial_style_hold\",\n      \"next_action\": \"MATERIAL_REWORK\",\n      \"repeated_root_causes\": [],\n      \"reason\": \"Current candidate has an actionable defect; rebuild the failed source-style stage\",\n      \"runtime_validation\": \"UNTESTED\"\n    }\n  ],\n  \"note\": \"No state transition or game QA is inferred by this read-only diagnosis.\"\n}\n",
-  "stderr": ""
-}

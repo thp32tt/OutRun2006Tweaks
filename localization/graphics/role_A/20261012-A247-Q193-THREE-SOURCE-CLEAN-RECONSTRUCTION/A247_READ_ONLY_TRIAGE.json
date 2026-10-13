@@ -1,6 +1,0 @@
-{
-  "command": "rework_triage --index 193",
-  "stdout": "{\n  \"queue_file\": \"localization/graphics/asset_queue.csv\",\n  \"escalation_file\": \"localization/graphics/REWORK_ESCALATIONS.json\",\n  \"counts\": {\n    \"EVIDENCE_ONLY_HOLD\": 1\n  },\n  \"assets\": [\n    {\n      \"index\": 193,\n      \"path\": \"textures/load/spr_sprani_sumo_fe_cvt_Exst/97E863AD_512x256.dds\",\n      \"current_status\": \"c1_20261011_q193_six_inherited_native_style_rework_goal_a_hold\",\n      \"next_action\": \"EVIDENCE_ONLY_HOLD\",\n      \"repeated_root_causes\": [],\n      \"reason\": \"Inspect unchanged DDS and complete exact-byte evidence; do not rerender without actual pixel defect\",\n      \"runtime_validation\": \"UNTESTED\"\n    }\n  ],\n  \"note\": \"No state transition or game QA is inferred by this read-only diagnosis.\"\n}\n",
-  "stderr": "",
-  "only_missing_clean_evidence_no_same_sha_rerender": true
-}
