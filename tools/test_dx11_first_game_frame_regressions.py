@@ -1158,7 +1158,9 @@ def main() -> None:
         z = source.index("HRESULT __stdcall DrawPrimitiveDestR30(", a)
         hooks = source[a:z]
         assert hooks.count("topology != D3DPT_TRIANGLEFAN") == 3
-        assert hooks.count("topology == D3DPT_TRIANGLEFAN") == 3
+        # Fan specialization now occurs after the bounded shared-span admission
+        # in the native bridge, not once per R30 VB/IB/UP source copier.
+        assert "if (type == D3DPT_TRIANGLEFAN)" in bridge
         mutated = hooks.replace("topology != D3DPT_TRIANGLEFAN", "topology == D3DPT_TRIANGLEFAN", 1)
         assert mutated != hooks and mutated.count("topology != D3DPT_TRIANGLEFAN") == 2
 
