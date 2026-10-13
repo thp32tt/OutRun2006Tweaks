@@ -52,6 +52,7 @@ namespace Settings
     extern Setting<float> VRHudScale;
     extern Setting<float> VRPauseMenuScale;
     extern Setting<float> VRPauseMenuVerticalOffset;
+    extern Setting<bool> VRHudResponsiveLayout;
     extern Setting<bool> VRHudEdgeAnchors;
     extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
@@ -1722,8 +1723,16 @@ namespace OutRunVRStereo
                 OutRunVR::GameSemantic::EffectiveScope() ==
                     OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D &&
                 Settings::VRPauseMenuScale.get() > 0.0f)
-                return std::clamp(Settings::VRPauseMenuScale.get(),
-                    0.55f, 1.50f);
+            {
+                const float requested = Settings::VRPauseMenuScale.get();
+                // The XR portrait contain map consumes Y scale. The original
+                // 1.0x pause menu still appears tiny; raise its dedicated
+                // size floor only in the reversible Quest3 responsive mode.
+                // External F11, GOAL, world and gameplay HUD remain isolated.
+                const float readable = Settings::VRHudResponsiveLayout.get()
+                    ? (std::max)(requested, 1.25f) : requested;
+                return std::clamp(readable, 0.55f, 1.50f);
+            }
             return R30HudScaleValue();
         }
 
@@ -1840,7 +1849,8 @@ namespace OutRunVRStereo
             const std::vector<std::uint32_t>* touched,
             UINT knownUsedCount) noexcept
         {
-            if (!Settings::VRHudEdgeAnchors.get() ||
+            if ((!Settings::VRHudResponsiveLayout.get() &&
+                 !Settings::VRHudEdgeAnchors.get()) ||
                 OutRunVR::GameSemantic::EffectiveScope() !=
                     OutRunVR::GameSemantic::RenderScope::ScreenHud ||
                 OutRunVR::GameSemantic::CurrentSpriteQueueProducer !=

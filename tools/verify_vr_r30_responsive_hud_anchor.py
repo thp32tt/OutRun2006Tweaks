@@ -8,6 +8,22 @@ root = Path(__file__).resolve().parents[1]
 code = (root / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text()
 settings = (root / "src/vr/settings.cpp").read_text()
 assert 'Setting<bool> VRHudEdgeAnchors{ "VR", "HudEdgeAnchors", false' in settings
+# Bundled Quest3 default-on profile: the previous flag stays false for
+# backwards-compatible A/B, while this new setting can override stale
+# HudEdgeAnchors=false saved in an existing user's VR .ini.
+assert 'Setting<bool> VRHudResponsiveLayout{ "VR", "HudResponsiveLayout", true' in settings
+assert "(!Settings::VRHudResponsiveLayout.get() &&" in code
+assert "!Settings::VRHudEdgeAnchors.get())" in code
+assert "(std::max)(requested, 1.25f)" in code
+assert "const float readable = Settings::VRHudResponsiveLayout.get()" in code
+def quest_profile(responsive, legacy, pause):
+    return responsive or legacy, max(.55, min(1.5, max(pause, 1.25) if responsive else pause))
+assert quest_profile(True, False, 1.) == (True, 1.25)
+assert quest_profile(False, False, 1.) == (False, 1.)
+assert quest_profile(False, True, .8) == (True, .8)
+assert quest_profile(True, False, 1.4) == (True, 1.4)
+print("PASS integrated Quest3 default-on/opt-out/legacy A-B and ESC size")
+
 start = code.index("R30HudEdgeAnchor R30GetExactHudEdgeAnchor(")
 end = code.index("bool R30TransformHudScissor(", start)
 helper = code[start:end]

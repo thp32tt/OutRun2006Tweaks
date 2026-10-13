@@ -60,7 +60,12 @@ namespace Settings
 	Setting<float> VRPauseMenuVerticalOffset{ "VR", "PauseMenuVerticalOffset", 0.10f,
 		"Signed fraction of viewport height to move ESC/pause menu vertically in VR (positive is down); independent of gameplay HUD and F11.", Range<float>{ -0.25f, 0.25f } };
 	Setting<bool> VRHudEdgeAnchors{ "VR", "HudEdgeAnchors", false,
-		"Quest3 experimental exact HUD text peripheral anchors; opt in for A/B only. Centre HUD, GOAL, 6th/6, F11, menus and world rays are unchanged by default." };
+		"Legacy opt-in exact HUD text anchors; set false with HudResponsiveLayout=false for the baseline A/B comparison." };
+	// Issue #119: previous HudEdgeAnchors=false persists in an existing .ini;
+	// a completed HUD code path must not remain invisible on new builds.
+	// New default-on profile remains reversible and exact-producer-only.
+	Setting<bool> VRHudResponsiveLayout{ "VR", "HudResponsiveLayout", true,
+		"Quest3 responsive driving HUD edge anchors and larger independent ESC menu; disable for original layout A/B. GOAL, world markers, front-end and desktop are unchanged." };
 	Setting<bool> VRHeadTracking{ "VR", "HeadTracking", true,
 		"Applies the OpenXR HMD orientation at OutRun's verified D3D9 WorldViewProjection upload." };
 	Setting<bool> VRStereo{ "VR", "Stereo", true,
