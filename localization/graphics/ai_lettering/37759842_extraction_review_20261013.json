@@ -1,0 +1,71 @@
+{
+  "schema": "outrun-ai-lettering-extraction-qa-v1",
+  "recorded_at_kst": "2026-10-13T16:33:00+09:00",
+  "branch": "korean-localization-clean",
+  "asset_id": "37759842",
+  "queue_index": 95,
+  "canonical_source": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+  "manifest": "localization/graphics/ai_lettering/37759842_manifest.json",
+  "tool": "tools/localization/extract_ai_korean_lettering.py",
+  "evidence": {
+    "extraction_test": "PASS local Python/Pillow real image extraction",
+    "image_verification": "sha256 checked for both 1254x1254 source sheets",
+    "approved_string_match": "3 of 3 extracted test captions equal canonical translation table strings",
+    "extracted_glyph_layers": [
+      {
+        "id": "tuned_467",
+        "word": "튜닝",
+        "size": [
+          124,
+          70
+        ],
+        "sha256": "077bc3cd3618248c4fe11b286f989e3c7e3fe420be11eac74eed700d1954e74e"
+      },
+      {
+        "id": "manual_464",
+        "word": "수동",
+        "size": [
+          71,
+          34
+        ],
+        "sha256": "b4a14ff8b11cd2e633832c3a2e678a86589eec3a1289bb4be6e24fe561dcf70b"
+      },
+      {
+        "id": "waiting_entries_443",
+        "word": "참가자를 기다리는 중입니다.",
+        "size": [
+          468,
+          49
+        ],
+        "sha256": "2bf0e36e046ffef74fae514db6d3a4a4aae42cb807950f8407e9af1f90b93501"
+      }
+    ],
+    "mismatch_exclusions": [
+      "상급차용 != 상급자용",
+      "잠시만 기다려 주세요. != 잠시 기다려 주세요.",
+      "참가 접수가 마감되었습니다. != 참가 접수가 종료되었습니다.",
+      "아니요 != 아니오",
+      "랜덤 != 무작위"
+    ],
+    "clean_plate_qa_status": "NOT_FOUND for index95 in GitHub HEAD",
+    "hd_clean_plate_available": false,
+    "actual_english_source_clean_plate_composite": false,
+    "native_hd_typography_gate": "HOLD_LOW_RES_AI_GLYPH",
+    "synthetic_test_only": {
+      "canvas": [
+        4096,
+        4096
+      ],
+      "zero_changed_pixels_outside_cell": true,
+      "preview_compositor_passed": true,
+      "production_compositor_rejected_reason": "LOW_RES_AI_GLYPH_HOLD_NO_UPSCALE",
+      "synthetic_plate_is_not_original": true
+    },
+    "output_images": "session_local_only; not committed to GitHub. GitHub has extraction tool and reproducible pixel crop manifest.",
+    "dds_candidate_created": false
+  },
+  "result": "PARTIAL_EXTRACT_ONLY__NO_ORIGINAL_CLEAN_PLATE_COMPOSITION",
+  "automation_validation": "LOCAL_EXTRACTION_PASS__PRODUCTION_HOLD",
+  "runtime_validation": "UNTESTED",
+  "next_action": "Recover/reconstruct and independently QA exact canonical 37759842 HD clean plate; re-render text at native resolution from source parameters rather than scaling this low-resolution AI sheet; run v2 zero-pixel gate and independent C QA before any DDS promotion."
+}
