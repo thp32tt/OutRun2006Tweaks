@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00702",
+  "production_id": "CONVERSION-DX11-00702",
+  "event_id": "CONVERSION-DX11-00702-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "GAME_STAGE1_ALPHA_WEIGHTED_FADES_MENU_RACE",
+  "work_key": "DX11:GAME_STAGE1_ALPHA_BLEND_FAMILY",
+  "status": "PENDING_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Real game D3D9 stage1 COLOROP/ALPHAOP FVF capture for menu, vehicle selection, and race fading",
+      "RGB and separate alpha BLENDDIFFUSEALPHA/BLENDFACTORALPHA/BLENDCURRENTALPHA across live pixel shader and D3D11 Draw/DrawIndexed",
+      "Diagnostic-only native frame Present/readback, unsupported state preserved on original D3D9 Draw and gamepad"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_stage1_blend_probe_00702.cpp",
+      "tools/test_dx11_stage1_blends_00702.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "432 RGB/alpha blend selector combinations and independent alpha weighted samples",
+      "negative_regression": "Missing required FVF diffuse, unsupported stage1 texture operands/unknown modifiers and stage2 restore original D3D9 Draw/input; no fake diffuse alpha for texture-only FVF",
+      "component_integration": "D3D9 SDK enum parity + capture -> stage1 HLSL independent RGB/alpha -> b1 cbuffer -> real Draw/DrawIndexed -> diagnostic inset with exact-SHA build gates"
+    },
+    "conflict_keys": [
+      "DX11:GAME_STAGE1_ALPHA_BLEND_FAMILY",
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_READBACK",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Integrated source and GPU shader output for real game authored stage1 fade modes; Quest3/VDXR pixel parity NEED_HMD_TEST",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME diagnostic opt-in only; original D3D9 Draw, Present and gamepad authoritative; unknown states fail closed"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_STAGE1_ALPHA_WEIGHTED_FADES_MENU_RACE",
+    "goal": "Support stage1 diffuse/factor/current alpha-weighted fades across menu, vehicle select, and race fixed function native RGB and independent alpha while preserving D3D9 input fallback.",
+    "acceptance_items": [
+      {
+        "id": "stage1-blend-rgb-alpha-native",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_native_hlsl_and_fvf",
+        "expected_behavior": "Three weighted blends in both stage1 color and alpha from D3D9 stage states and live FVF through D3D11 native shader Draw/DrawIndexed"
+      },
+      {
+        "id": "missing-diffuse-unsupported-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "game_input_dx9ex_fallback",
+        "expected_behavior": "BlendDiffuseAlpha requires live diffuse even with factor/current arguments, unsupported sources, flags and later stages keep DX9Ex/gamepad"
+      },
+      {
+        "id": "blend-432-variants-exact-sha",
+        "category": "integrated_validation",
+        "behavior_area": "portable_probe_windows_build_actions",
+        "expected_behavior": "432 combinations and independent alpha blend reference values, negative tests, destructive shader source checks, Windows build and exact-SHA Gates"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage1-blend-rgb-alpha-native": "PENDING_GATE",
+    "missing-diffuse-unsupported-fallback": "PENDING_GATE",
+    "blend-432-variants-exact-sha": "PENDING_GATE"
+  },
+  "base_head_sha": "558da685738495aae7d8219e15e2009ef166536b",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_stage1_blend_probe_00702.cpp",
+    "tools/test_dx11_stage1_blends_00702.py",
+    "docs/automation/runs/CONVERSION-DX11-00702.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "DONE: 558da685738495aae7d8219e15e2009ef166536b and 00701 done",
+    "C1_REVIEW": "DONE: three integrated stage1 alpha blending modes absent from native game draw",
+    "C2_IMPLEMENT": "DONE: D3D9 admission/HLSL/cbuffer and positive-negative test",
+    "C3_VALIDATE": "PENDING exact-SHA GitHub Actions",
+    "C4_COMMIT": "PENDING GitHub fast-forward material commit",
+    "C5_PACKAGE": "NOT_REQUIRED: no HMD verified deployment",
+    "C6_STATE": "PENDING GATES"
+  },
+  "next_action": "Inspect exact SHA DX11 Fast/Backend/Windows/OpenXR/HUD GitHub Actions, repair failures under same 00702 and record validation-bearing SHA; Quest3/VDXR UNTESTED"
+}

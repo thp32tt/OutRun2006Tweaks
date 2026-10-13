@@ -110,6 +110,8 @@ jobs:
           python tools/test_dx11_stage1_factor_00673.py
           python tools/test_dx11_stage1_operands_00700.py
           python tools/test_dx11_stage1_diffuse_00701.py
+          python tools/test_dx11_stage1_blends_00702.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_blend_probe_00702.cpp -o /tmp/dx11_stage1_blend_00702 && /tmp/dx11_stage1_blend_00702
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_factor_probe.cpp -o /tmp/dx11_stage1_00673 && /tmp/dx11_stage1_00673
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rgb332_probe.cpp -o /tmp/dx11_rgb332_00667 && /tmp/dx11_rgb332_00667
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_p8_probe.cpp -o /tmp/dx11_p8_00668 && /tmp/dx11_p8_00668

@@ -90,6 +90,9 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1Add == D3DTOP_ADD &&
               kStage1Subtract == D3DTOP_SUBTRACT &&
               kStage1AddSmooth == D3DTOP_ADDSMOOTH &&
+              kStage1BlendDiffuseAlpha == D3DTOP_BLENDDIFFUSEALPHA &&
+              kStage1BlendFactorAlpha == D3DTOP_BLENDFACTORALPHA &&
+              kStage1BlendCurrentAlpha == D3DTOP_BLENDCURRENTALPHA &&
               kStage1Current == D3DTA_CURRENT &&
               kStage1Factor == D3DTA_TFACTOR &&
               kStage1Complement == D3DTA_COMPLEMENT &&
@@ -1172,7 +1175,13 @@ float4 Stage1Source(float4 current, float4 diffuse, int source) {
     if ((source & 16) != 0) value = 1.0f - value;
     return value;
 }
-float4 Stage1Combine(float4 a, float4 b, int op) {
+float Stage1BlendWeight(int op, float4 stage0, float4 diffuse) {
+    // D3DTOP_BLEND*: ARG1 * weight + ARG2 * (1 - weight).
+    if (op == 12) return diffuse.a;       // BLENDDIFFUSEALPHA
+    if (op == 14) return stage1Factor.a;  // BLENDFACTORALPHA
+    return stage0.a;                      // 16: BLENDCURRENTALPHA; CPU-gated
+}
+float4 Stage1Combine(float4 a, float4 b, int op, float4 stage0, float4 diffuse) {
     if (op == 2) return a;
     if (op == 3) return b;
     if (op == 4) return saturate(a * b);
@@ -1180,15 +1189,17 @@ float4 Stage1Combine(float4 a, float4 b, int op) {
     if (op == 6) return saturate(4.0f * a * b);
     if (op == 7) return saturate(a + b);
     if (op == 10) return saturate(a - b);
+    if (op == 12 || op == 14 || op == 16)
+        return saturate(lerp(b, a, Stage1BlendWeight(op, stage0, diffuse)));
     return saturate(a + b * (1.0f - a)); // 11: ADDSMOOTH, CPU-gated
 }
 float4 Stage1AndAlpha(float4 stage0, float4 diffuse) {
     float4 color = Stage1Combine(
         Stage1Source(stage0, diffuse, stage1Args.x),
-        Stage1Source(stage0, diffuse, stage1Args.y), stage1Ops.x);
+        Stage1Source(stage0, diffuse, stage1Args.y), stage1Ops.x, stage0, diffuse);
     float alpha = stage1Ops.y == 1 ? stage0.a : Stage1Combine(
         Stage1Source(stage0, diffuse, stage1Args.z),
-        Stage1Source(stage0, diffuse, stage1Args.w), stage1Ops.y).a;
+        Stage1Source(stage0, diffuse, stage1Args.w), stage1Ops.y, stage0, diffuse).a;
     float4 result = float4(color.rgb, alpha);
     AlphaGate(result.a);
     return result;
@@ -2891,7 +2902,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     }
     // Real fixed-function stage 1 can combine the stage-0 CURRENT pixel
     // with D3DRS_TEXTUREFACTOR or live vertex DIFFUSE, including operand
-    // modifiers on RGB and independent alpha. No stage-1 texture, TEMP,
+    // modifiers and diffuse/factor/current-alpha blend fades for independent
+    // RGB/alpha operations. A missing required DIFFUSE remains DX9Ex-only. No stage-1 texture, TEMP,
     // unknown operand bits or stage-2 semantics are guessed; unsupported
     // stage-0 shaders never enter this path.
     if (nextColorOp != D3DTOP_DISABLE) {
