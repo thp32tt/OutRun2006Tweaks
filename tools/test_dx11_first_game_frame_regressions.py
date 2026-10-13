@@ -929,6 +929,15 @@ def main() -> None:
                         code.find("bool supported_game_state(")]
         submit = code[code.find("bool submit("):
                       code.find("void observe(")]
+        # Verify alpha-state binding in its own OM branch, not any of the
+        # other masked-blend paths that share a color-write assignment.
+        separate_start = submit.find("if (output.separateAlphaBlend) {")
+        separate_end = submit.find(
+            "} else if (output.blendOp != D3D11_BLEND_OP_ADD) {",
+            separate_start)
+        separate_om = (submit[separate_start:separate_end]
+                       if separate_start >= 0 and separate_end > separate_start
+                       else "")
         shader = code[code.find("constexpr char kShader[]"):
                       code.find(')";', code.find("constexpr char kShader[]"))]
         return (all(x in state for x in (
@@ -973,6 +982,13 @@ def main() -> None:
             "desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;",
             "maskedBlend = &independentAlphaBlend;",
             "ctx->PSSetConstantBuffers(0, 1, &alphaBuffer)",
+        )) and all(x in separate_om for x in (
+            "rgbBase->GetDesc(&desc);",
+            "desc.RenderTarget[0].SrcBlendAlpha = output.nativeSrcAlpha;",
+            "desc.RenderTarget[0].DestBlendAlpha = output.nativeDstAlpha;",
+            "desc.RenderTarget[0].BlendOpAlpha = output.nativeAlphaOp;",
+            "desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;",
+            "maskedBlend = &independentAlphaBlend;",
         )) and all(x in shader for x in (
             "cbuffer AlphaParams : register(b0)",
             "floor(saturate(alpha) * 255.0f + 0.5f)",
