@@ -679,6 +679,9 @@ class UIScaling : public Hook
 	inline static SafetyHookMid OutRunStagePrintfEnterHooks[3]{};
 	inline static SafetyHookMid OutRunStagePrintfLeaveHooks[3]{};
 	inline static thread_local unsigned OutRunStagePrintfDepth = 0;
+	inline static thread_local std::optional<
+		OutRunVR::GameSemantic::ScopedExactProducerSemantic>
+		OutRunStagePrintfDirectDrawOwner;
 	inline static thread_local
 		std::array<SpriteNode*, Game::SpritePriorityCount> OutRunStagePrintfBefore{};
 	static void OutRunStagePrintfEnter(safetyhook::Context&)
@@ -690,6 +693,12 @@ class UIScaling : public Hook
 			SpriteNode* root = Game::sprite_prio_root[p];
 			OutRunStagePrintfBefore[p] = root ? root->tail_4 : nullptr;
 		}
+        // The original Sumo_Printf may rasterize synchronously before any
+        // appended SpriteNodes can be tagged. Never steal an active queue
+        // node; ScopedExactProducerSemantic preserves that ownership.
+        if (Settings::VREnabled)
+            OutRunStagePrintfDirectDrawOwner.emplace(
+                OutRunVR::GameSemantic::RenderScope::ScreenHud);
 	}
     inline static thread_local std::uint64_t OutRunStagePrintfCompleted = 0;
 	static void OutRunStagePrintfLeave(safetyhook::Context&)
@@ -710,6 +719,8 @@ class UIScaling : public Hook
 		TagAppendedNodes(OutRunStagePrintfBefore,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
 			OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
+        // Unwind on exit even if VR mode toggles during the parent E8 call.
+        OutRunStagePrintfDirectDrawOwner.reset();
         const auto hit = ++OutRunStagePrintfCompleted;
         if (Settings::VRTelemetry && (hit & (hit - 1u)) == 0)
         {
@@ -731,6 +742,9 @@ class UIScaling : public Hook
 	inline static SafetyHookMid ResultProgressEnterB{};
 	inline static SafetyHookMid ResultProgressLeaveB{};
 	inline static thread_local unsigned ResultProgressDepth = 0;
+    inline static thread_local std::optional<
+        OutRunVR::GameSemantic::ScopedExactProducerSemantic>
+        ResultProgressDirectDrawOwner;
     // These are diagnostic counters only. The original E8->0x2D200
     // result-progress producer remains fully original and every child stays
     // on its existing exact-node ScreenHud route.
@@ -746,6 +760,12 @@ class UIScaling : public Hook
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			ResultProgressTailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
+        // 0x97BE4/0x97DEC may submit direct animated digits as well as
+        // queued sprites. The previous queue cursor must not own the direct
+        // percentage draw, but an actively replayed node keeps precedence.
+        if (Settings::VREnabled)
+            ResultProgressDirectDrawOwner.emplace(
+                OutRunVR::GameSemantic::RenderScope::ScreenHud);
 	}
 	static void ResultProgressLeave(safetyhook::Context&)
 	{
@@ -771,6 +791,7 @@ class UIScaling : public Hook
 		TagAppendedNodes(ResultProgressTailsBefore,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
 			OutRunVR::GameSemantic::ProducerToken::ResultProgress);
+        ResultProgressDirectDrawOwner.reset();
         const std::uint64_t hits = ++ResultProgressCompletedCalls;
         if (Settings::VRTelemetry && (hits & (hits - 1u)) == 0)
         {
@@ -922,7 +943,17 @@ class UIScaling : public Hook
 		// returns, preserving the exact parent producer identity.
 		auto original = reinterpret_cast<GoalTimeHelperFn>(
 			Module::exe_ptr(helperRva));
+        // 0xBEA5A / 0xBEA5F are exact safe CALL wrappers. The original
+        // helper can draw title/time immediately, before it queues siblings.
+        // Give that direct draw its own HUD cursor while preserving the
+        // previous queue scope/marker, then restore before post-call tagging.
+        std::optional<OutRunVR::GameSemantic::ScopedExactProducerSemantic>
+            goalDirectDrawOwner;
+        if (Settings::VREnabled)
+            goalDirectDrawOwner.emplace(
+                OutRunVR::GameSemantic::RenderScope::ScreenHud);
 		original();
+        goalDirectDrawOwner.reset();
 		// Both original GOAL helpers are required and intentional. The
 		// user's screen evidence suggests different visible components
 		// (course/stage name and recorded time), NOT two redundant calls

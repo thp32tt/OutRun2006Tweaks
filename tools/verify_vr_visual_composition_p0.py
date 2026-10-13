@@ -826,6 +826,70 @@ for label, corrupted in (
     else:
         raise SystemExit('result progress P0 fault survived: ' + label)
 
+
+# Separate verified GOAL boundaries can submit pixels *during* their original
+# E8 call as well as queue SpriteNodes afterward. The 19 unsafe B9200 E8
+# return midhooks remain disabled (real 0x97C5F/0x97E75 user minidumps).
+def verify_goal_transient_direct_hud_scope(ui_source, semantics_source):
+    require('active_(SpriteQueueDepth == 0 && scope != RenderScope::None)',
+            semantics_source, 'direct owner must not overwrite active queue')
+    require('CurrentQueueExactScope = RenderScope::None;',
+            semantics_source, 'clear stale queue cursor for immediate glyph')
+    require('CurrentQueueProjectedMarker = savedProjectedMarker_;',
+            semantics_source, 'direct owner must restore queue marker')
+    for name, begin, end, owner in (
+        ('stage Sumo_Printf', 'static void OutRunStagePrintfEnter(',
+         'static void OutRunStagePrintfLeave(', 'OutRunStagePrintfDirectDrawOwner'),
+        ('GOAL 0-99 progress', 'static void ResultProgressEnter(',
+         'static void ResultProgressLeave(', 'ResultProgressDirectDrawOwner'),
+    ):
+        enter = function_body(ui_source, begin)
+        leave = function_body(ui_source, end)
+        require('if (Settings::VREnabled)', enter, name + ' desktop fallback')
+        require(owner + '.emplace(', enter, name + ' direct draw activation')
+        require('RenderScope::ScreenHud', enter, name + ' exact HUD scope')
+        require('TagAppendedNodes(', leave, name + ' queued siblings')
+        require(owner + '.reset();', leave, name + ' toggle/exit restore')
+        require_order(leave, name + ' tag before semantic release',
+                      'TagAppendedNodes(', owner + '.reset();')
+    helper = function_body(ui_source, 'static void GoalTime_TagHelper(')
+    for needle in ('goalDirectDrawOwner', 'if (Settings::VREnabled)',
+                   'goalDirectDrawOwner.emplace(',
+                   'RenderScope::ScreenHud',
+                   'goalDirectDrawOwner.reset();',
+                   'TagAppendedNodes(before,'):
+        require(needle, helper, 'GOAL time/title helper direct-and-queued path')
+    require_order(helper, 'original once, release then queue sibling tag',
+                  'goalDirectDrawOwner.emplace(', 'original();',
+                  'goalDirectDrawOwner.reset();', 'TagAppendedNodes(before,')
+    for forbidden in ('ResultTextEnterHooks[i] = safetyhook::create_mid(',
+                      'ResultTextLeaveHooks[i] = safetyhook::create_mid('):
+        if forbidden in function_body(ui_source, 'bool apply() override'):
+            raise SystemExit('GOAL direct ownership cannot revive unsafe B9200 hooks')
+
+verify_goal_transient_direct_hud_scope(ui, sem)
+for label, original in (
+    ('GOAL percentage direct owner lost',
+     'ResultProgressDirectDrawOwner.emplace('),
+    ('GOAL percentage exit restore lost',
+     'ResultProgressDirectDrawOwner.reset();'),
+    ('stage time text direct owner lost',
+     'OutRunStagePrintfDirectDrawOwner.emplace('),
+    ('GOAL time helper direct owner lost',
+     'goalDirectDrawOwner.emplace('),
+    ('GOAL time helper queued sibling tagging lost',
+     'TagAppendedNodes(before,\n\t\t\tOutRunVR::GameSemantic::RenderScope::ScreenHud, producer);'),
+):
+    if original not in ui:
+        raise SystemExit('GOAL direct owner mutation fixture missing: ' + label)
+    damaged = ui.replace(original, '/* fault injected */', 1)
+    try:
+        verify_goal_transient_direct_hud_scope(damaged, sem)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('GOAL direct owner mutation escaped: ' + label)
+
 # Shader and R62 fixed-function both need the exact originating family in
 # telemetry; without this, +TIME vs final-result ambiguity returns.
 for marker in (
