@@ -11,10 +11,10 @@
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "work_key": "DX9EX:VIS:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_NEEDS_VALIDATION",
-  "checkpoint": "C3_VALIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00791]",
-  "automation_validation": "PENDING_GITHUB_CI",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_delta": 0,
   "changed_files": [
@@ -79,7 +79,13 @@
     "eye_ownership": "Original tagged gameplay HUD is mapped to both eyes by R30; only exact approved peripheral group draws receive the extra shared offset/boost."
   },
   "ci_evidence": {
-    "status": "NOT_YET_RUN"
+    "status": "SUCCESS",
+    "validation_bearing_sha": "5d460c81470f37c22a319c80bff4dbc5cf31c326",
+    "material_sha": "5d460c81470f37c22a319c80bff4dbc5cf31c326",
+    "evidence_source": "USER_REPORTED_EXACT_SHA_GITHUB_CI_SUCCESS",
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
   },
-  "runtime_status": "NEED_QUEST3_VDXR_TEST"
+  "runtime_status": "NEED_QUEST3_VDXR_TEST",
+  "validation_bearing_result_sha": "5d460c81470f37c22a319c80bff4dbc5cf31c326",
+  "material_result_sha": "5d460c81470f37c22a319c80bff4dbc5cf31c326"
 }
