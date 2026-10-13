@@ -31,8 +31,12 @@ jobs:
           assert mod.patch(result)==result, "patch must be idempotent"
           ast.parse(result)
           assert 'LOCALIZATION_SLOT_NAMES = ("A",)' in result
-          assert 'SCHEDULED_LOCALIZATION_LANES = {0: "A"}' in result
+          assert 'SCHEDULED_LOCALIZATION_LANES = {minute: "A" for minute in range(0, 60, 3)}' in result
           assert 'SCHEDULED_LOCALIZATION_LANES = {0: "A", 10:' not in result
+          schedule_assign = next(n for n in ast.parse(result).body if isinstance(n,ast.Assign) and
+              any(isinstance(t,ast.Name) and t.id=="SCHEDULED_LOCALIZATION_LANES" for t in n.targets))
+          schedule_value = eval(compile(ast.Expression(schedule_assign.value),"<controller-schedule>","eval"),{"range":range})
+          assert schedule_value == {minute:"A" for minute in range(0,60,3)}, schedule_value
           assert '("B", "C1", "C2")' in result, "ensure retired slot backup covers all disabled roles"
           # Execute the actual patched load_registry with a legacy four-lane
           # checkpoint. All non-A slot URLs and counters must be safely saved.
@@ -91,6 +95,7 @@ jobs:
           assert env["MIN_SEND_GAP_SECONDS"]=="60"
           assert env["OUTRUN_A_SINGLE_SMOKE_TASK_ID"]==""
           assert env["WATCHDOG_ENABLED"]=="false"
+          assert env["REQUIRE_PROJECT_URL"]=="false", "standalone A must not force AUTO_SEND off"
           assert svc["pull_policy"]=="build"
           vols=svc["volumes"]
           assert "outrun_chat_localization_recovery_data:/data" in vols

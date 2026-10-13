@@ -12,6 +12,8 @@
 
 - A-only 3-minute schedule at :00/:03/:06/…/:57 (KST): `AUTO_SEND=true`, `SCHEDULE_MINUTES=0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57`, `WATCHDOG_ENABLED=false`. Only **one automatic submission per unique TASK_ID** is permitted; the scheduler keeps checking every 3 minutes but does not repeat the same sent task.
 - `CHAT_SLOTS=1`: one ChatGPT A tab only. B, C1 and C2 **never open tabs, run watchdog tasks, or dispatch scheduled prompts**. Existing inactive slot records are preserved separately under `/data/state/retired_{B,C1,C2}_slot_before_a_only_20261013.json` if present; a conflicting backup stops startup rather than overwriting history.
+- `REQUIRE_PROJECT_URL=false` prevents an empty optional Project URL from disabling `AUTO_SEND`; the controller reuses the persisted A chat URL when available.
+- The role dispatcher (not only Compose) maps every 3-minute tick to A. Other roles never dispatch.
 - `OUTRUN_A_SINGLE_SMOKE_TASK_ID=""` removes Q217 task-ID pinning. The next eligible A task is read from a source manifest, not hardcoded.
 - Host `/home/chatgpt-runner2/work/image-src` is mounted RW as `/data/imagegen` with `create_host_path=false`. The directory exists on N100. The existing `/data` and `/logs` volumes, noVNC `6082`, status `8788` and VR controller are not changed.
 

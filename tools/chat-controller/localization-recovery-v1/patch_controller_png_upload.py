@@ -36,7 +36,7 @@ def patch(source):
         source,
         'SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "C1", 20: "C2",\n'
         '                                30: "B", 40: "C1", 50: "C2"}',
-        '''SCHEDULED_LOCALIZATION_LANES = {0: "A"}
+        '''SCHEDULED_LOCALIZATION_LANES = {minute: "A" for minute in range(0, 60, 3)}
 # A-only source-folder testing: manifest selects any valid A task ID.
 OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SMOKE_TASK_ID", "").strip()''',
         "minute-role-schedule",

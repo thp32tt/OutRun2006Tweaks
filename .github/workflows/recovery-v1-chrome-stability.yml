@@ -42,6 +42,7 @@ jobs:
           assert 'CHROME_RECYCLE_INTERVAL_MINUTES: "120"' in x
           assert 'CHAT_RECYCLE_RUNS: "5"' in x
           assert 'AUTO_SEND: "true"' in x
+          assert 'REQUIRE_PROJECT_URL: "false"' in x
           assert '6082:6080' in x and '8788:8787' in x
           assert 'outrun_chat_localization_recovery_data' in x
           assert 'outrun_chat_localization_recovery_logs' in x

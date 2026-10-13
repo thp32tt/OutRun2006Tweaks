@@ -22,7 +22,8 @@ services:
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
       CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"
-      REQUIRE_PROJECT_URL: "true"
+      # Standalone A test: keep the existing A chat; project URL is optional.
+      REQUIRE_PROJECT_URL: "false"
       PREFERRED_THINKING_LEVEL: "High"
       STRICT_THINKING_LEVEL: "false"
       FRESH_CHAT_EACH_RUN: "false"
