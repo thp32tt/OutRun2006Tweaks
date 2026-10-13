@@ -701,7 +701,7 @@ for dims in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
 # hot path. Retain original static scope safety predicates and baseline.
 assert "ProducerToken::OutRunHudPeripheralText" in helper
 assert "(!Settings::VRHudResponsiveLayout.get() &&" in helper
-    assert "!Settings::VRHudEdgeAnchors.get()) ||" in helper
+assert "!Settings::VRHudEdgeAnchors.get()) ||" in helper
 print("PASS stereo analytical peripheral fit, clip bounds, two-eye constraints, bisection fallback")
 
 
