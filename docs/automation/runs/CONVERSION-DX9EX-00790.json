@@ -11,12 +11,12 @@
   "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
   "work_key": "DX9EX:VIS:F11_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
-  "checkpoint": "C4_VALIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00790]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/overlay/overlay.cpp",
     "tools/verify_vr_f11_font_density.py",
@@ -58,9 +58,9 @@
     ]
   },
   "acceptance_results": {
-    "F11_SCALABLE_TYPEFACE_AND_SHELL": "PENDING_EXACT_SHA",
-    "F11_EDIT_PERSISTENCE_FALLBACK": "PENDING_EXACT_SHA",
-    "F11_EXACT_SHA_WINDOWS_GATE": "PENDING_EXACT_SHA",
+    "F11_SCALABLE_TYPEFACE_AND_SHELL": "PASS",
+    "F11_EDIT_PERSISTENCE_FALLBACK": "PASS",
+    "F11_EXACT_SHA_WINDOWS_GATE": "PASS",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -81,11 +81,37 @@
     "negative_test_evidence": "verify_vr_f11_font_density.py pins alternate candidate ordering, per-file recoverable read failures, pending-write ownership and eight first-run destructive controls."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "SUCCESS",
+    "validation_bearing_sha": "912650a4b4fa2d164c133d8a8032491c4909c192",
+    "material_sha": "912650a4b4fa2d164c133d8a8032491c4909c192",
+    "dx9ex_active": {
+      "run_id": 38440308053,
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "game",
+        "host",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38440308564,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38440308103,
+      "conclusion": "success",
+      "jobs": [
+        "msvc-analyze-openxr-host",
+        "msvc-analyze-active-game",
+        "source-cross-domain"
+      ]
+    },
     "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
   },
   "runtime_status": "NEED_QUEST3_VDXR_TEST",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null
+  "material_result_sha": "912650a4b4fa2d164c133d8a8032491c4909c192",
+  "validation_bearing_result_sha": "912650a4b4fa2d164c133d8a8032491c4909c192",
+  "result_sha": "912650a4b4fa2d164c133d8a8032491c4909c192"
 }
