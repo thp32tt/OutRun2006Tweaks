@@ -79,8 +79,8 @@ def main():
         ("dev->CreateBlendState(&blend, s.additiveBlend.GetAddressOf())", "dev->CreateBlendState(&blend, s.alphaBlend.GetAddressOf())"),
         ("dev->CreateBlendState(&blend, s.sourceAlphaAddBlend.GetAddressOf())", "dev->CreateBlendState(&blend, s.alphaBlend.GetAddressOf())"),
         ("const bool additive = src == D3DBLEND_ONE && dst == D3DBLEND_ONE;", "const bool additive = src == D3DBLEND_ONE || dst == D3DBLEND_ONE;"),
-        // 00689 expanded real game separate-alpha without changing legacy
-        // 00596 RGB blend modes. Mutation must break live producer admission.
+        # 00689 expanded real game separate-alpha without changing legacy
+        # 00596 RGB blend modes. Mutation must break live producer admission.
         ("!native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,", "/* separate-alpha source validation lost */ false &&"),
         ("output.separateAlphaBlend = true;", "output.separateAlphaBlend = false;"),
         ("!additive && !sourceAlphaAdd) return false;", "false) return false;"),
