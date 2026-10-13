@@ -1562,9 +1562,12 @@ namespace
         // Keep the independently authored menu 4:3 and optical centre,
         // but reserve 22% of the available symmetric image margin.
         // Only LOCAL theater/menu, never gameplay stereo HUD or F11.
+        const float opticalCoverage =
+            cropCentered43 && sourceAspect == 4.0f / 3.0f
+            ? 0.78f : 1.0f;
         const auto placement =
             OutRunVrMenuAspect::PlanOpticallyCenteredClip(
-                common, sourceAspect, 0.78f);
+                common, sourceAspect, opticalCoverage);
         if (!placement.valid)
             return false;
         const float visibleCenterX =

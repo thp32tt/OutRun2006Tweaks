@@ -693,7 +693,9 @@ def verify_visible_menu_fragment(code: str) -> None:
     required = [
         "PlanVisibleCenteredContent(",
         "sourceAspect = 4.0f / 3.0f;",
-        "common, sourceAspect, 0.78f);",
+        "cropCentered43 && sourceAspect == 4.0f / 3.0f",
+        "? 0.78f : 1.0f;",
+        "common, sourceAspect, opticalCoverage);",
         "visibleOffsetX = plan.visibleOffsetX;",
         "visibleOffsetY = plan.visibleOffsetY;",
         "visibleWidthScale = plan.visibleWidthScale;",
@@ -728,7 +730,9 @@ verify_visible_menu_fragment(r23)
 verify_visible_fragment_source(menu_geometry)
 for old, bad in (
     ("sourceAspect = 4.0f / 3.0f;", "sourceAspect = plan.aspect;"),
-    ("common, sourceAspect, 0.78f);", "common, sourceAspect, 1.0f);"),
+    ("? 0.78f : 1.0f;", "? 1.0f : 1.0f;"),
+    ("common, sourceAspect, opticalCoverage);",
+     "common, sourceAspect, 1.0f);"),
     ("placement.centerY - placement.halfHeight * visibleOffsetY;",
      "placement.centerY + placement.halfHeight * visibleOffsetY;"),
     ("placement.halfWidth * visibleWidthScale;",
