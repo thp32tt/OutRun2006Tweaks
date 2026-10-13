@@ -62,7 +62,13 @@ def verify(source):
                   "R9MonoBackupGap = false;", "R21HostFailClosed = true;"):
         assert token in fence, token
     assert caller.count("R21FenceHostIdentityChange(hostPid);") == 2
-    assert caller.index("R21FenceHostIdentityChange(hostPid);") < caller.index("R21LastHealthyHostPid = hostPid;")
+    # Reopening one already-fresh host can never inherit a previous host PID.
+    for state in ("Fresh", "SoftSuspend"):
+        region = caller[caller.index(f"if (status == R21HostStatus::{state})"):]
+        region = region[:region.index("return;")]
+        assert region.index("R21FenceHostIdentityChange(hostPid);") < region.index("R21LastHealthyHostPid = hostPid;")
+        assert region.index("R21FenceHostIdentityChange(hostPid);") < region.index(
+            "RuntimeEligibility::Observe" + ("FreshHost();" if state == "Fresh" else "SoftHostSuspend();"))
     assert "if (status == R21HostStatus::UnstableRead &&" in caller
     for token in ("ObserveFreshHost();", "ObserveSoftHostSuspend();", "RuntimeEligibility::FailClosed();", "nowMs - R21LastHealthyTickMs <="):
         assert token in caller, token

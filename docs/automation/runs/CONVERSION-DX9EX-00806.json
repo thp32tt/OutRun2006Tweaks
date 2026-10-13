@@ -33,6 +33,12 @@
         "behavior_area": "exact_sha_win32_game_host_package",
         "expected_behavior": "R21 negative/mutation models, DX9Ex Active five-job Win32 build, Domain Isolation and Full Source Impact pass on final result SHA."
       }
+    ],
+    "scope_boundary": "R21 host identity and IPC liveness in game Present only; no HUD/menu/world geometry, FFB, DX11, DXVK, host XR swapchain, or feature queue edits.",
+    "special_work_evidence": "Source repro: coherent Fresh or SoftSuspend from a different host PID previously retained R9StereoSeeded/RuntimeEligibility stereo WVP approval; after a host restart this could replay the old host's verified stereo baseline before R23 color/depth warmup. Also hard stale evidence incorrectly shared the transient 250ms grace.",
+    "subcomponents": [
+      "Fence R9 mono/stereo/backup and RuntimeEligibility stereo authority on different host PID in BOTH Fresh and SoftSuspend paths.",
+      "Distinguish torn or same-PID zero-QPC transient publications from coherent dead/stale/invalid protocol, with a strict 250ms grace and new baseline recovery."
     ]
   },
   "acceptance_results": {
@@ -53,7 +59,9 @@
       "R21 Present host status + PID fence",
       "RuntimeEligibility FailClosed and R9 seed reset, R23 new-baseline authority"
     ],
-    "negative_test_evidence": "11 model snapshots, 5 bounded-grace/PID transitions and destructive verifier mutations; final GitHub CI pending."
+    "negative_test_evidence": "11 model snapshots, 5 bounded-grace/PID transitions and destructive verifier mutations; final GitHub CI pending.",
+    "original_evidence": "The pre-patch R21ReadHostFreshness returned Stale for torn and coherent invalid states alike; the old R21ApplyHostFailClosedAtPresent borrowed stale baseline for 250ms without checking failure kind or replacing hostPid.",
+    "eye_ownership": "R21 revokes source/eye stereo eligibility, R9 seeds and WVP injection; R23 requires a fresh two-eye color/depth validated recovery baseline before projection resumes."
   },
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r21.cpp",
@@ -64,5 +72,8 @@
     "status": "PENDING_EXACT_SHA",
     "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
   },
-  "runtime_validation": "UNTESTED"
+  "runtime_validation": "UNTESTED",
+  "feature_id": "DX9EX:HOST_LIFECYCLE:PID_HANDOFF_SEEDED_RECOVERY",
+  "feature_class": "CRITICAL_BLOCKER",
+  "material_result_sha": "8b59eb7d847dbcabb104d6da23d54a928e68f478"
 }
