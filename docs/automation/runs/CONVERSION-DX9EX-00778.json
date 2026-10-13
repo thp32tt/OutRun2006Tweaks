@@ -65,10 +65,10 @@
     ]
   },
   "acceptance_results": {
-    "CENTRE_DIRECT_WORLD": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "OUTER_DESKTOP_FALLBACK": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "CENTRE_NEGATIVE_MUTATIONS": "TEST_WRITTEN_CI_PENDING",
-    "CENTRE_EXACT_SHA_GATE": "PENDING",
+    "CENTRE_DIRECT_WORLD": "PASS_EXACT_SHA",
+    "OUTER_DESKTOP_FALLBACK": "PASS_EXACT_SHA",
+    "CENTRE_NEGATIVE_MUTATIONS": "PASS_EXACT_SHA",
+    "CENTRE_EXACT_SHA_GATE": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -93,5 +93,40 @@
     "tools/verify_vr_visual_composition_p0.py",
     "docs/automation/runs/CONVERSION-DX9EX-00778.json"
   ],
-  "validation_notes": "Previous exact HEAD 4f9a0b84bc1c19759e5d05eca3022a1c78312ca3 DX9Ex Active policy job 115311263959 failed (missing feature_contract.feature_id/symptom_id/subcomponents); new material C++ queue separation and regression plus canonical contract correct that failure; exact validation-bearing SHA d0cbce526d96eae3f2dc28453b305d9b679ba12f has successful GitHub CI per C6 dispatch; no HMD verification.\nC6 bookkeeping only: PASS_EXACT_SHA at d0cbce526d96eae3f2dc28453b305d9b679ba12f; resolved hold TERMINAL_STATUS_NOT_COMPLETE. No source change, CI rerun, HMD test, or new score."
+  "validation_notes": "Previous exact HEAD 4f9a0b84bc1c19759e5d05eca3022a1c78312ca3 DX9Ex Active policy job 115311263959 failed (missing feature_contract.feature_id/symptom_id/subcomponents); new material C++ queue separation and regression plus canonical contract correct that failure; exact validation-bearing SHA d0cbce526d96eae3f2dc28453b305d9b679ba12f has successful GitHub CI per C6 dispatch; no HMD verification.\nC6 bookkeeping only: PASS_EXACT_SHA at d0cbce526d96eae3f2dc28453b305d9b679ba12f; resolved hold TERMINAL_STATUS_NOT_COMPLETE. No source change, CI rerun, HMD test, or new score.\nC6 metadata reconciliation: previous [skip ci] bookkeeping commit omitted terminal ci_evidence and left four acceptance results PENDING. Corrected from already-successful exact-SHA GitHub Actions, without source edit, SHA change, HMD claim or duplicate credit. Coordination preexisting stale parent queue status excluded.",
+  "ci_evidence": {
+    "dx9ex_active": {
+      "run_id": 38402433303,
+      "validation_sha": "d0cbce526d96eae3f2dc28453b305d9b679ba12f",
+      "conclusion": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38402433611,
+      "validation_sha": "d0cbce526d96eae3f2dc28453b305d9b679ba12f",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38402433131,
+      "validation_sha": "d0cbce526d96eae3f2dc28453b305d9b679ba12f",
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38402433285,
+      "validation_sha": "d0cbce526d96eae3f2dc28453b305d9b679ba12f",
+      "conclusion": "SUCCESS"
+    },
+    "active_jobs": [
+      "policy",
+      "host",
+      "game",
+      "full-chain-compile",
+      "package"
+    ],
+    "full_source_impact_jobs": [
+      "source-cross-domain",
+      "msvc-analyze-openxr-host",
+      "msvc-analyze-active-game"
+    ],
+    "package_artifact_id": 11815623591
+  }
 }
