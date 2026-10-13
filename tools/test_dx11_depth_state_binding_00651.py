@@ -18,9 +18,9 @@ def connected(cpp: str, header: str) -> bool:
     block = cpp.split("bool submit(", 1)[1].split("void before_game_present(", 1)[0]
     # Creation and OM binding MUST use the same 4-slot selector. The old
     # binding ignored nativeDepthWrite, choosing slot 0/1 for Z-write Draws.
-    selector = r"game_native_depth_slot\\(\\s*output\\.nativeDepthWrite,\\s*output\\.nativeDepthLessEqual\\s*\\)"
-    creation = r"auto& depthState\\s*=\\s*s\\.diagnosticDepthStates\\[\\s*" + selector + r"\\s*\\]"
-    binding = r"ctx->OMSetDepthStencilState\\(\\s*s\\.diagnosticDepthStates\\[\\s*" + selector + r"\\s*\\]\\.Get\\(\\),\\s*0\\s*\\)"
+    selector = r"game_native_depth_slot\(\s*output\.nativeDepthWrite,\s*output\.nativeDepthLessEqual\s*\)"
+    creation = r"auto& depthState\s*=\s*s\.diagnosticDepthStates\[\s*" + selector + r"\s*\]"
+    binding = r"ctx->OMSetDepthStencilState\(\s*s\.diagnosticDepthStates\[\s*" + selector + r"\s*\]\.Get\(\),\s*0\s*\)"
     return (bool(re.search(creation, block)) and bool(re.search(binding, block))
             and len(re.findall(selector, block)) == 2
             and 'ds.DepthWriteMask = output.nativeDepthWrite ?' in block
