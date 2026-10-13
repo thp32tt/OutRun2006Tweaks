@@ -11,9 +11,9 @@
   "work_key": "DX11:HOST_NATIVE_STEREO_PAIR_AND_OPENXR_PROJECTION",
   "feature_id": "NATIVE_HOST_STEREO_PAIR_IDENTITY_AND_PROJECTION",
   "base_head_sha": "abfecb8b04042302ec0ed90c885db19da4f045e8",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -85,9 +85,9 @@
     ]
   },
   "acceptance_results": {
-    "host-stereo-source-acceptance": "PENDING_EXACT_SHA",
-    "host-stereo-fallback": "PENDING_EXACT_SHA",
-    "host-stereo-exact-sha": "PENDING_EXACT_SHA",
+    "host-stereo-source-acceptance": "BUILD_VERIFIED",
+    "host-stereo-fallback": "BUILD_VERIFIED",
+    "host-stereo-exact-sha": "BUILD_VERIFIED",
     "host-stereo-quest3": "NEED_HMD_TEST"
   },
   "changed_files": [
@@ -103,9 +103,45 @@
     "C0_RECOVER": "PASS",
     "C1_REVIEW": "Host direct source import allowed aliased eye handles and cached pair descriptor mismatches; distinct native producer/host tests preexist but active host projection contract was weak",
     "C2_IMPLEMENT": "ACTIVE_HOST_IMPORT_AND_OPENXR_COPY_SHAPE_ENFORCEMENT",
-    "C3_VALIDATE": "RETRY_EXACT_SHA_AFTER_WORKFLOW_CONTRACT_REPAIR",
-    "C4_COMMIT": "PENDING_FAST_FORWARD",
+    "C3_VALIDATE": "PASS_EXACT_SHA_5_OF_5",
+    "C4_COMMIT": "MATERIAL_PLUS_CONTRACT_REPAIR_VALIDATED",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA"
+  },
+  "material_result_sha": "4a83d1eec22e7745b94abef5a313272c5d014ba0",
+  "validation_bearing_result_sha": "ae85c5e313ed9e26313ea16f12c927d4547b8b98",
+  "result_sha": "ae85c5e313ed9e26313ea16f12c927d4547b8b98",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "ae85c5e313ed9e26313ea16f12c927d4547b8b98",
+    "exact_sha_checks": [
+      {
+        "workflow": "DX11 Fast Structural Checks",
+        "id": 38397029077,
+        "conclusion": "SUCCESS"
+      },
+      {
+        "workflow": "Build",
+        "id": 38397036247,
+        "conclusion": "SUCCESS"
+      },
+      {
+        "workflow": "OpenXR VR architecture",
+        "id": 38397036243,
+        "conclusion": "SUCCESS"
+      },
+      {
+        "workflow": "OutRun EXE HUD Inspector CI",
+        "id": 38397036274,
+        "conclusion": "SUCCESS"
+      },
+      {
+        "workflow": "Backend Conversion Gate",
+        "id": 38397028970,
+        "conclusion": "SUCCESS"
+      }
+    ],
+    "runtime_validation": "UNTESTED",
+    "hmd_test_performed": false,
+    "gamepad_test_performed": false
   }
 }
