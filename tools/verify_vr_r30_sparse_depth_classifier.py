@@ -62,6 +62,19 @@ def static_contract(src, workflow):
     # other path still retains the same token.
     assert c.count("touched->size() <= vertexCount") == 2
     assert c.count("usedMask->size() >= vertexCount") == 2
+    direct_owner = c.split(
+        "const bool directHintOwnedByProducer = R30Scratch.busy &&", 1)[1].split(
+        "fastTouched = fastTouched && directHintOwnedByProducer;", 1)[0]
+    for required in (
+        "usedMask == &R30Scratch.upUsed",
+        "touched == &R30Scratch.upTouched",
+        "usedMask == &R30Scratch.used",
+        "touched == &R30Scratch.vbTouched",
+        "R30Scratch.indexDecode.valid &&",
+        "R30Scratch.indexDecode.vertexCount == vertexCount",
+        "R30Scratch.indexDecode.knownUsedCount == touched->size()",
+    ):
+        assert required in direct_owner, ("direct-owner", required)
     assert c.index("fastTouched = fastTouched && directHintOwnedByProducer;") < c.index(
         "for (const std::uint32_t index : *touched)")
     assert c.index("for (const std::uint32_t index : *touched)") < c.index(
@@ -101,8 +114,10 @@ def static_contract(src, workflow):
         assert token in c, ("sort lifecycle", token)
     assert c.index("if (!sortedCacheHit)") < c.index(
         "sortedTouched.assign(touched->begin(), touched->end());")
+    # Equality (==) in the cache-hit predicate is not the eventual
+    # assignment; compare against the exact multiline success publication.
     assert c.index("std::sort(sortedTouched.begin(), sortedTouched.end());") < c.index(
-        "R30Scratch.vbDepthSortedGeneration =")
+        "R30Scratch.vbDepthSortedGeneration =\n")
     assert "std::vector<std::uint32_t> vbSortedDepthTouched;" in src
     assert "std::vector<std::uint32_t> upSortedDepthTouched;" in src
     assert "std::uint64_t vbTouchGeneration = 1;" in src
