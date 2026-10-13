@@ -37,6 +37,14 @@ int main()
         std::fabs(shared.down - 0.5f * (std::tan(d0) + std::tan(d1))) > 1e-6f ||
         std::fabs(shared.up - 0.5f * (std::tan(u0) + std::tan(u1))) > 1e-6f)
         return 2;
+    // The same reconstructed common FOV must be published in each
+    // XrCompositionLayerProjectionView, otherwise the shared menu raster
+    // would be warped again by OpenXR's per-eye projection.
+    if (std::fabs(std::tan(std::atan(shared.left)) - shared.left) > 1e-6f ||
+        std::fabs(std::tan(std::atan(shared.right)) - shared.right) > 1e-6f ||
+        std::fabs(std::tan(std::atan(shared.down)) - shared.down) > 1e-6f ||
+        std::fabs(std::tan(std::atan(shared.up)) - shared.up) > 1e-6f)
+        return 7;
     const float oldHorizontal =
         std::tan(0.5f * (r0 + r1)) - std::tan(0.5f * (l0 + l1));
     if (std::fabs((shared.right - shared.left) - oldHorizontal) < 0.002f)

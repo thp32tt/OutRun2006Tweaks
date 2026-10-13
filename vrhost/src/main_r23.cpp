@@ -1403,6 +1403,14 @@ namespace
             views[1].fov.angleDown, views[1].fov.angleUp);
         if (!common.valid)
             return false;
+        // OpenXR composition uses angular FOV, whereas the menu rectangle
+        // uses tangent-plane extents. Reconstruct angles from the SAME
+        // averaged tangents so the projection view and raster stay matched.
+        XrFovf commonFov{};
+        commonFov.angleLeft = std::atan(common.left);
+        commonFov.angleRight = std::atan(common.right);
+        commonFov.angleDown = std::atan(common.down);
+        commonFov.angleUp = std::atan(common.up);
         const float spanX = common.right - common.left;
         const float spanY = common.up - common.down;
 
