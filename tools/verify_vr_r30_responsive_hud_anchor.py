@@ -182,11 +182,19 @@ for bad,good in (
         ("0.90f / baseScale", "0.55f / baseScale")):
     assert bad in code
     mutated = code.replace(bad, good, 1)
-    assert not all(t in mutated[mutated.index("float R30ExactPeripheralHudBoost("):
+    # Assert the actual owning functions. The new screen-edge safety
+    # helper legitimately checks anchor.x/y too: including it in the boost
+    # slice incorrectly lets a destroyed boost condition pass this verifier.
+    boost_segment = mutated[mutated.index("float R30ExactPeripheralHudBoost("):
+        mutated.index("void R30ConstrainHudEdgeToVisibleBounds(")]
+    draw_segment = mutated[mutated.index("bool R30TransformXyzrhwStereo("):
         mutated.index("// This is the high-frequency indexed smoke/sand/decal path:")]
-        for t in ("anchor.x == 0.0f && anchor.y == 0.0f",
-                  "0.90f / baseScale", "hudScaleX *= peripheralBoost;",
-                  "hudScaleY *= peripheralBoost;"))
+    assert not (all(t in boost_segment for t in
+                    ("anchor.x == 0.0f && anchor.y == 0.0f",
+                     "0.90f / baseScale")) and
+                all(t in draw_segment for t in
+                    ("hudScaleX *= peripheralBoost;",
+                     "hudScaleY *= peripheralBoost;")))
 print("PASS exact peripheral glyph legibility floor, aspect parity and 4 destructive mutants")
 
 
