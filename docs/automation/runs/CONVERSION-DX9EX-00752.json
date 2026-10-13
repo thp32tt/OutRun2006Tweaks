@@ -1,0 +1,77 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00752",
+  "production_id": "CONVERSION-DX9EX-00752",
+  "event_id": "CONVERSION-DX9EX-00752-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00752",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "50c9b8e6eca7c7b1c4e2182df7129d9b531a0ab7",
+  "material_result_sha": "50c9b8e6eca7c7b1c4e2182df7129d9b531a0ab7",
+  "validation_bearing_result_sha": "50c9b8e6eca7c7b1c4e2182df7129d9b531a0ab7",
+  "result_sha": "50c9b8e6eca7c7b1c4e2182df7129d9b531a0ab7",
+  "material_commits": [
+    "50c9b8e6eca7c7b1c4e2182df7129d9b531a0ab7"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119: decouple headset-density F11 external ImGui canvas from the original game 4:3 letterbox width on ultrawide VR gameplay, leaving original front-end and desktop UI untouched.",
+    "completed_scope": "In active VR gameplay with XR-density ImGui, use the full valid source backbuffer for F11 shell layout rather than the game's optional 4:3 side rails; retain 4:3 game/menu bars, disabled/nonfinite extents, desktop 2D and front-end F11; extend F11 and menu source-owner checks with 4 destructive F11 canvas mutants and 5 aspect/eye size fixtures.",
+    "remaining_acceptance": [
+      "Whole Issue #119 responsive HUD/main menu/ESC/F11 integrated visual acceptance remains IN_PROGRESS; this is one source/build checkpoint, not feature closeout.",
+      "Exact Quest3/VDXR matched game/menu/F11 optical acceptance and frame-time performance still NEED_HMD_TEST."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_POLICY_4_DESTRUCTIVE_F11_CANVAS_MUTANTS_5_NUMERIC_FIXTURES",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "dx9ex_full_chain": "SUCCESS_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38353365237,
+      "head_sha": "50c9b8e6eca7c7b1c4e2182df7129d9b531a0ab7",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "policy, host, game, full-chain-compile, package: 5/5 SUCCESS"
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38353365203,
+      "head_sha": "50c9b8e6eca7c7b1c4e2182df7129d9b531a0ab7",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "domain-isolation SUCCESS"
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38353365177,
+      "head_sha": "50c9b8e6eca7c7b1c4e2182df7129d9b531a0ab7",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "source-cross-domain, msvc-analyze-active-game, msvc-analyze-openxr-host: 3/3 SUCCESS"
+    }
+  ],
+  "score_delta": 0,
+  "score_reason": "Issue #119 is one unfinished integrated P0-A feature. This is a material implementation and exact-SHA CI checkpoint, not a newly completed distinct feature; no duplicate points.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "Material result commit has no CI skip; all three GitHub Actions Gates SUCCESS on the exact 50c9b8e6 SHA. This separate [skip ci] bookkeeping commit is not validation-bearing and does not supersede the verified result."
+}
