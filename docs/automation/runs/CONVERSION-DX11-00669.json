@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_RGBA16_UNORM_NATIVE_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "b7da5a92a67688a5b696843a8304507799b7a112",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -63,18 +63,53 @@
     "C0_RECOVER": "PASS: GitHub HEAD b7da5a92a67688a5b696843a8304507799b7a112, 00668 C6 COMPLETE_BUILD_VERIFIED and no existing 00669 claim",
     "C1_REVIEW": "PASS: actual native mirror_texture branch omitted D3DFMT_A16B16G16R16; select nonconflicting format path; no DXVK writes",
     "C2_IMPLEMENT": "PASS: preserve 16-bit RGBA channels, D3D11 SRV mip upload, opt-in native game Draw and unchanged DX9Ex fallback",
-    "C3_VALIDATE": "LOCAL_ASAN_UBSAN_CPU_PROBE_PASS; targeted destructive Python regression enrolled in DX11 Fast. Exact-SHA GitHub CI pending.",
-    "C4_COMMIT": "material source+test commit contains [AUTO:CONVERSION-DX11-00669] without CI skip",
-    "C5_PACKAGE": "NOT_REQUIRED; runtime Quest3/VDXR test not performed",
-    "C6_STATE": "PENDING_EXACT_SHA_CI; follow up with separate bookkeeping-only [skip ci] after gate"
+    "C3_VALIDATE": "PASS_EXACT_SHA at 4b9136affb5549cbfe68c048c37acf09dedca0ae: backend #38379321467 SUCCESS (validate plus readiness smoke), DX11 fast #38379321494 SUCCESS, Windows Build #38379326132 SUCCESS, OpenXR #38379326214 SUCCESS, HUD #38379326309 SUCCESS. First material SHA ab9244 Fast failure in legacy 00661 layout assertion fixed without weakening coverage.",
+    "C4_COMMIT": "PASS: material ab9244884b971ded1e9df24c4d09757941befd51, C++ source regression fix and validation-bearing 4b9136affb5549cbfe68c048c37acf09dedca0ae; both include [AUTO:CONVERSION-DX11-00669] without CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED: no HMD/game test and no release promotion; binary build output remains CI artifact.",
+    "C6_STATE": "PASS_EXACT_SHA: required 5/5 GitHub Actions full Gate succeeded for unchanged validation-bearing SHA 4b9136affb5549cbfe68c048c37acf09dedca0ae; separate bookkeeping commit [skip ci] only."
   },
   "acceptance_results": {
     "cpu_probe": "LOCAL_ASAN_UBSAN_PASS",
-    "static_regression": "PENDING_GITHUB_FAST",
-    "compile_build": "PENDING_GITHUB_BUILD",
+    "static_regression": "GITHUB_FAST_PASS_DESCTRUCTIVE_13",
+    "compile_build": "GITHUB_BUILD_SUCCESS_EXACT_SHA",
     "game_visual_parity": "NEED_HMD_TEST",
     "gamepad": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
   },
-  "next_action": "Check exact validation-bearing material SHA Backend Conversion Gate + DX11 Fast + Build + OpenXR + HUD. If passed, finish C6 separately; do not claim gameplay/HMD PASS."
+  "next_action": "C6 COMPLETE_BUILD_VERIFIED. Do not re-run task/CI. Await independent Quest3/VDXR exact-build menu/vehicle/race input and visual parity evidence; controller may allocate new DX11 independent work_key.",
+  "material_result_sha": "ab9244884b971ded1e9df24c4d09757941befd51",
+  "validation_bearing_result_sha": "4b9136affb5549cbfe68c048c37acf09dedca0ae",
+  "result_sha": "4b9136affb5549cbfe68c048c37acf09dedca0ae",
+  "ci_evidence": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38379321467,
+      "head_sha": "4b9136affb5549cbfe68c048c37acf09dedca0ae",
+      "conclusion": "success"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38379321494,
+      "head_sha": "4b9136affb5549cbfe68c048c37acf09dedca0ae",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 38379326132,
+      "head_sha": "4b9136affb5549cbfe68c048c37acf09dedca0ae",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38379326214,
+      "head_sha": "4b9136affb5549cbfe68c048c37acf09dedca0ae",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38379326309,
+      "head_sha": "4b9136affb5549cbfe68c048c37acf09dedca0ae",
+      "conclusion": "success"
+    }
+  ]
 }
