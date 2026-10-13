@@ -56,8 +56,12 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     require("game_native_primitive_element_count(static_cast<std::uint32_t>(type)," in code and
             all(f"case {kind}u:" in span for kind in (2, 3, 4, 5, 6)) and
             "default: return false;" in span and
-            "primitiveCount == 0u || primitiveCount > 512u" in span and
-            "required > 1536u" in span and
+            "kMaxNativeGamePrimitives = 2048u" in span and
+            "kMaxNativeGamePrimitives * 3u" in span and
+            "primitiveCount == 0u || primitiveCount > kMaxNativeGamePrimitives" in span and
+            "required > kMaxNativeGameVertices" in span and
+            "static_assert(game_native_mesh_span_contract()" in span and
+            "observe_unavailable_game_draw(game);" in code and
             "indexCount != expectedElements" in code and
             "vertexCount != expectedElements" in code and
             "indices[i] >= vertexCount" in code,
