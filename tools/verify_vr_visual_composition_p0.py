@@ -2184,11 +2184,56 @@ def verify_centre_actual_draw_owner(source):
     section = section.split('VRLensFlareProjected2D::instance;', 1)[0]
     for required in ('static void __cdecl DrawObjectAlphaCentre(',
                      'ScopedExactProducerSemantic semantic(',
-                     'RenderScope::ProjectedScreenEffect2D',
                      'Module::exe_ptr(0xC993), DrawObjectAlphaCentre',
                      'Module::exe_ptr(0xCABE), DrawObjectAlphaProjected'):
         require(required, section, 'centre-only independent actual draw')
+    draw = function_body(section, 'static void __cdecl DrawObjectAlphaCentre(')
+    for required in ('Settings::VREnabled && LensCentreDepth != 0',
+                     'objectId == 0x570002',
+                     'RenderScope::WorldBillboard',
+                     'RenderScope::None',
+                     'ScopedExactProducerSemantic semantic(centreScope);',
+                     'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);'):
+        require(required, draw, 'central-only world-owner and desktop fallback')
+    if 'RenderScope::ProjectedScreenEffect2D' in draw:
+        raise SystemExit('centre must not inherit the outer projection scope')
+    if draw.count('Game::DrawObjectAlpha_Internal(') != 1:
+        raise SystemExit('centre draw must submit the original game once')
+    require_order(draw, 'central predicate before exact original draw',
+                  'Settings::VREnabled && LensCentreDepth != 0',
+                  'objectId == 0x570002',
+                  'RenderScope::WorldBillboard',
+                  'RenderScope::None',
+                  'ScopedExactProducerSemantic semantic(centreScope);',
+                  'Game::DrawObjectAlpha_Internal(')
 verify_centre_actual_draw_owner(graphics)
+# Negative tests isolate the single central sun while the original CABE
+# projected outer-ring draw remains protected by its separate verifier.
+for label, before, after in (
+    ('VR disabled gate', 'Settings::VREnabled && LensCentreDepth != 0',
+     'LensCentreDepth != 0'),
+    ('original parent depth gate', 'Settings::VREnabled && LensCentreDepth != 0',
+     'Settings::VREnabled'),
+    ('original object identity', 'objectId == 0x570002', 'objectId != 0'),
+    ('restore flat/headlocked scope', 'RenderScope::WorldBillboard',
+     'RenderScope::ProjectedScreenEffect2D'),
+    ('remove desktop fallback', 'RenderScope::None;', 'RenderScope::WorldBillboard;'),
+    ('drop original game alpha draw',
+     'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);',
+     '(void)objectId;'),
+):
+    start = graphics.index('static void __cdecl DrawObjectAlphaCentre(')
+    end = graphics.index('\npublic:', start)
+    part = graphics[start:end]
+    if before not in part:
+        raise SystemExit('centre mutation setup missing: ' + label)
+    mutant = graphics[:start] + part.replace(before, after, 1) + graphics[end:]
+    try:
+        verify_centre_actual_draw_owner(mutant)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('central sun negative mutation survived: ' + label)
 try:
     verify_centre_actual_draw_owner(graphics.replace(
         'Module::exe_ptr(0xC993), DrawObjectAlphaCentre',

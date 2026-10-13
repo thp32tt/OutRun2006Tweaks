@@ -375,10 +375,18 @@ class VRLensFlareProjected2D : public Hook
     static void __cdecl DrawObjectAlphaCentre(
         int objectId, float alpha, void* work, int flags)
     {
-        // This is an original 0xC993 non-queued call; do not let a prior
-        // SpriteNode's ScreenHud/WorldBillboard scope hijack the centre sun.
-        OutRunVR::GameSemantic::ScopedExactProducerSemantic semantic(
-            OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D);
+        // D3A5 owns the 0x570002 central world sun. Previously its actual
+        // C993 DrawObjectAlpha call replaced this world owner with the flat
+        // projected screen-effect layer, defeating finite per-eye stereo.
+        // Match BOTH the active original parent and its exact sun object.
+        // Desktop, partial parent-hook install and all outer CABE rings retain
+        // their original raster classification and one game Draw call.
+        const auto centreScope =
+            Settings::VREnabled && LensCentreDepth != 0 &&
+            objectId == 0x570002
+            ? OutRunVR::GameSemantic::RenderScope::WorldBillboard
+            : OutRunVR::GameSemantic::RenderScope::None;
+        OutRunVR::GameSemantic::ScopedExactProducerSemantic semantic(centreScope);
         Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
     }
 
