@@ -1207,7 +1207,25 @@ namespace OutRunVRStereo
 		D3DFORMAT ChooseDirectTransportFormat(D3DFORMAT source){switch(source){case D3DFMT_A2B10G10R10:return D3DFMT_A2B10G10R10;case D3DFMT_A16B16G16R16F:return D3DFMT_A16B16G16R16F;case D3DFMT_A8R8G8B8:return D3DFMT_A8R8G8B8;default:return D3DFMT_A8R8G8B8;}}
 		bool CanConvertForDirectTransport(IDirect3DDevice9* device,D3DFORMAT source,D3DFORMAT target){if(!device)return false;if(source==target)return true;D3DDEVICE_CREATION_PARAMETERS cp{};if(FAILED(device->GetCreationParameters(&cp)))return false;IDirect3D9*d3d=nullptr;if(FAILED(device->GetDirect3D(&d3d))||!d3d)return false;const HRESULT hr=d3d->CheckDeviceFormatConversion(cp.AdapterOrdinal,cp.DeviceType,source,target);d3d->Release();return SUCCEEDED(hr);}
 		bool FrameIdAtOrAfter(std::uint32_t candidate,std::uint32_t reference){return reference==0||static_cast<std::int32_t>(candidate-reference)>=0;}
-		bool WaitForEventQuery(IDirect3DQuery9* query,ULONGLONG timeoutMs){if(!query)return false;const ULONGLONG deadline=GetTickCount64()+timeoutMs;for(;;){const HRESULT ready=query->GetData(nullptr,0,D3DGETDATA_FLUSH);if(ready==S_OK)return true;if(ready!=S_FALSE)return false;if(GetTickCount64()>=deadline)return false;Sleep(0);}}
+		// Initial interop verification may need FLUSH to submit the probe query.
+// The production DirectGPU post-Present path has already submitted commands:
+// repeatedly forcing D3DGETDATA_FLUSH on that 1 ms grace path risks extra
+// driver submission/stalls. Callers select the policy explicitly, while every
+// unresolved/failed query remains unpublishable and ring-owned.
+bool WaitForEventQuery(IDirect3DQuery9* query, ULONGLONG timeoutMs,
+    DWORD dataFlags = D3DGETDATA_FLUSH)
+{
+    if (!query) return false;
+    const ULONGLONG deadline = GetTickCount64() + timeoutMs;
+    for (;;)
+    {
+        const HRESULT ready = query->GetData(nullptr, 0, dataFlags);
+        if (ready == S_OK) return true;
+        if (ready != S_FALSE) return false;
+        if (GetTickCount64() >= deadline) return false;
+        Sleep(0);
+    }
+}
 
 		bool QueryGameAdapterLuid(IDirect3DDevice9* device,LUID& luid)
         {
@@ -1391,7 +1409,9 @@ namespace OutRunVRStereo
 			// Present has already flushed the frame. Allow at most 1 ms of bounded
 			// completion grace here; the old 4 ms pre-Present wait consumed a large
 			// part of a 90/120 Hz frame budget and was visible as VD hitching.
-			if(WaitForEventQuery(slot.fence,1))
+			// Present already submitted both StretchRect copies and the EVENT.
+// Never inject an extra FLUSH while waiting for the producer completion.
+if(WaitForEventQuery(slot.fence,1,0u))
 			{
 				slot.producerPending=false;
 				slot.pendingFrameId=0;
