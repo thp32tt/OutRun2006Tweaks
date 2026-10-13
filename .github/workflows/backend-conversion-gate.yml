@@ -157,6 +157,9 @@ jobs:
       - name: Verify live D3D9 anisotropic sampler in native Draw 00655
         if: github.ref_name == 'vr-dx11-native-r71'
         run: python tools/test_dx11_native_anisotropic_sampler_00655.py
+      - name: Check live MAG-anisotropic sampler -> D3D11 Draw 00656
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_native_anisotropic_mag_00656.py
 
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'

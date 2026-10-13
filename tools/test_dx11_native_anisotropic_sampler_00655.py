@@ -27,9 +27,10 @@ def connected(s: str) -> bool:
             "GetSamplerState(0, D3DSAMP_MIPFILTER, &mip)",
             "GetSamplerState(0, D3DSAMP_MAXANISOTROPY, &maxAniso)",
             "min == D3DTEXF_ANISOTROPIC &&",
-            "mag == D3DTEXF_LINEAR && mip == D3DTEXF_LINEAR &&",
+            "(mag == D3DTEXF_LINEAR || mag == D3DTEXF_ANISOTROPIC) &&",
+            "mip == D3DTEXF_LINEAR &&",
             "maxAniso >= 2u && maxAniso <= D3D11_REQ_MAXANISOTROPY;",
-            "&& !anisotropic) ||",
+            "((min != D3DTEXF_POINT && min != D3DTEXF_LINEAR) && !anisotropic) ||",
             "capture.maxAnisotropy = anisotropic ? maxAniso : 1u;",
             "capture.minFilter = static_cast<D3DTEXTUREFILTERTYPE>(min);"))
         and all(x in mirror for x in (
@@ -63,8 +64,8 @@ def main() -> None:
         ("D3DSAMP_MAXANISOTROPY, &maxAniso", "D3DSAMP_MAXANISOTROPY, &min"),
         ("maxAniso >= 2u", "maxAniso >= 0u"),
         ("maxAniso <= D3D11_REQ_MAXANISOTROPY", "maxAniso <= 255u"),
-        ("mag == D3DTEXF_LINEAR && mip == D3DTEXF_LINEAR", "mag == D3DTEXF_POINT && mip == D3DTEXF_LINEAR"),
-        ("&& !anisotropic) ||", ") ||"),
+        ("(mag == D3DTEXF_LINEAR || mag == D3DTEXF_ANISOTROPIC)", "(mag == D3DTEXF_POINT || mag == D3DTEXF_ANISOTROPIC)"),
+        ("((min != D3DTEXF_POINT && min != D3DTEXF_LINEAR) && !anisotropic) ||", "((min != D3DTEXF_POINT && min != D3DTEXF_LINEAR)) ||"),
         ("capture.maxAnisotropy = anisotropic ? maxAniso : 1u;", "capture.maxAnisotropy = 1u;"),
         ("capture.maxAnisotropy < 2u", "capture.maxAnisotropy < 0u"),
         ("capture.maxAnisotropy > D3D11_REQ_MAXANISOTROPY", "capture.maxAnisotropy > 255u"),

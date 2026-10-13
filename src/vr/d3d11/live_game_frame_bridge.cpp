@@ -1899,10 +1899,12 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         const bool validMipBias = std::isfinite(decodedMipBias) &&
                                  decodedMipBias >= kMinMipLodBias &&
                                  decodedMipBias <= kMaxMipLodBias;
-        // Native aniso mirrors the narrow game MIN-aniso/MAG-linear/MIP-linear
-        // profile; all other combinations retain the original D3D9 Draw.
+        // D3D9 MIN_ANISOTROPIC with MAG_LINEAR or MAG_ANISOTROPIC
+        // maps to D3D11 ANISOTROPIC with the full MIP_LINEAR chain.
+        // Other MAG-aniso combinations remain on the original D3D9 Draw.
         const bool anisotropic = min == D3DTEXF_ANISOTROPIC &&
-            mag == D3DTEXF_LINEAR && mip == D3DTEXF_LINEAR &&
+            (mag == D3DTEXF_LINEAR || mag == D3DTEXF_ANISOTROPIC) &&
+            mip == D3DTEXF_LINEAR &&
             maxAniso >= 2u && maxAniso <= D3D11_REQ_MAXANISOTROPY;
         // Fixed-function stage 0 CURRENT is the incoming vertex DIFFUSE.
         // With stage 1 disabled and RESULTARG=CURRENT (enforced above),
@@ -2385,7 +2387,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             ((addressV != D3DTADDRESS_WRAP && addressV != D3DTADDRESS_CLAMP &&
              addressV != D3DTADDRESS_MIRROR && addressV != D3DTADDRESS_MIRRORONCE) &&
              addressV != D3DTADDRESS_BORDER) ||
-            (mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR) ||
+            ((mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR) && !anisotropic) ||
             ((min != D3DTEXF_POINT && min != D3DTEXF_LINEAR) && !anisotropic) ||
             ((mip != D3DTEXF_NONE && mip != D3DTEXF_POINT) && mip != D3DTEXF_LINEAR) ||
             (mip == D3DTEXF_NONE && (maxMip != 0u || decodedMipBias != 0.0f)) || !validMipBias)
@@ -2682,7 +2684,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     if (!dev || !capture.enabled || !capture.texture) return false;
     // Fail closed if captured game sampler parameters no longer fit this path.
     if (capture.minFilter == D3DTEXF_ANISOTROPIC &&
-        (capture.magFilter != D3DTEXF_LINEAR ||
+        ((capture.magFilter != D3DTEXF_LINEAR &&
+          capture.magFilter != D3DTEXF_ANISOTROPIC) ||
          capture.mipFilter != D3DTEXF_LINEAR ||
          capture.maxAnisotropy < 2u ||
          capture.maxAnisotropy > D3D11_REQ_MAXANISOTROPY)) return false;
@@ -2831,7 +2834,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                 D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR :
                 D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR);
     }
-    // Mirror the full mip chain and game-authored anisotropic MIN filter.
+    // Bind the full mip chain for both captured D3D9 MAG anisotropic profiles.
     if (capture.minFilter == D3DTEXF_ANISOTROPIC)
         state.Filter = D3D11_FILTER_ANISOTROPIC;
     // D3D9 game/menu UVs may reflect outside [0,1]. Preserve their
