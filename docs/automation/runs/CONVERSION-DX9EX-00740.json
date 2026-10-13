@@ -1,0 +1,82 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00740",
+  "production_id": "CONVERSION-DX9EX-00740",
+  "event_id": "CONVERSION-DX9EX-00740-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "20684f15f591fffa8824e99bb31c8aa085074f88",
+  "material_result_sha": "20684f15f591fffa8824e99bb31c8aa085074f88",
+  "validation_bearing_result_sha": "20684f15f591fffa8824e99bb31c8aa085074f88",
+  "result_sha": "20684f15f591fffa8824e99bb31c8aa085074f88",
+  "material_commits": [
+    "20684f15f591fffa8824e99bb31c8aa085074f88"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119: improve Quest3 F11 input control legibility and fit the shell controls into changing 4:3/16:9/21:9/portrait and Reset viewports without touching gameplay HUD or desktop UI.",
+    "completed_scope": "VR-only F11 window/cell padding, indent, scroll, slider grab hit-target spacing scaled with density limited by the live usable mirror canvas; regression owner and numerical layout assertions updated.",
+    "remaining_acceptance": [
+      "Integrated Issue #119 responsive HUD, ESC/pause, main-menu and F11 visuals require matched Quest3/VDXR HMD acceptance.",
+      "No headset readability, runtime FPS or gameplay improvement is claimed from static CI."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_POLICY",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38340244912,
+      "head_sha": "20684f15f591fffa8824e99bb31c8aa085074f88",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "game",
+        "host",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38340244864,
+      "head_sha": "20684f15f591fffa8824e99bb31c8aa085074f88",
+      "conclusion": "success",
+      "jobs": [
+        "domain-isolation"
+      ]
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38340244856,
+      "head_sha": "20684f15f591fffa8824e99bb31c8aa085074f88",
+      "conclusion": "success",
+      "jobs": [
+        "msvc-analyze-active-game",
+        "msvc-analyze-openxr-host",
+        "source-cross-domain"
+      ]
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_validation_required": "Quest3/VDXR exact-build F11 font, tab readability, slider grabs and pointer hit areas across 3440x1440, 4:3/16:9/21:9, live reset; compare ESC/HUD, world, GOAL/+TIME, input and frame pacing.",
+  "c6_score_delta": 0,
+  "scoreboard_updated": false,
+  "summary": "Material Issue #119 F11 VR control DPI sizing and constrained canvas regression at exact SHA. DX9Ex Active 5/5, Domain Isolation and Full Source Impact 3/3 SUCCESS. Quest3 HMD untested; overall feature still IN_PROGRESS."
+}
