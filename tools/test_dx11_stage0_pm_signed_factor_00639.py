@@ -39,7 +39,7 @@ graph = (
     "capture.blendTextureAlphaPMSignedFactorAlpha ? s.blendTextureAlphaPmSignedFactorAlphaPs.Get() :",
     "ctx->DrawIndexed(indexCount, 0, 0);",
     "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
-    "OUTRUN_DX11_FIRST_GAME_FRAME"
+    'GetEnvironmentVariableW(L"OUTRUN_DX11_FIRST_GAME_FRAME", value, 8) == 1'
 )
 
 def connected(text):
