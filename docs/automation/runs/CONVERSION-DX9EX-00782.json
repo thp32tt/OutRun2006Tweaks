@@ -2,22 +2,22 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00782",
   "production_id": "CONVERSION-DX9EX-00782",
-  "event_id": "CONVERSION-DX9EX-00782-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00782-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "work_key": "DX9EX:VIS:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C4_COMMIT",
-  "feature_status": "SOURCE_IMPLEMENTED_EXACT_SHA_GATES_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00782]",
   "material_result_sha": "257799c2761d7b2ed678df25f02021d75bec0ba3",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "validation_bearing_result_sha": "48660263be3230a74d135b3937deb9c5badcda49",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_status": "NEED_HMD_TEST",
   "score_delta": 0,
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "HUD_SOURCE_AND_QUEUE_PARITY": "PENDING_EXACT_SHA",
-    "HUD_NO_SEMANTIC_LEAK": "PENDING_EXACT_SHA",
-    "HUD_EXACT_SHA_BUILD": "PENDING_EXACT_SHA",
+    "HUD_SOURCE_AND_QUEUE_PARITY": "PASS_EXACT_SHA",
+    "HUD_NO_SEMANTIC_LEAK": "PASS_EXACT_SHA",
+    "HUD_EXACT_SHA_BUILD": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -84,9 +84,64 @@
       "Scoped direct source owner now carries producer identity only outside queue; R30 picks active producer before source XYZRHW per-eye placement."
     ],
     "eye_ownership": "Viewport, FOV containment, symmetric horizontal displacement and bilateral bounds protection remain in R30; new selector changes only exact source ownership for qualifying original glyph draws.",
-    "fix_evidence": "Source commit 257799c2 implements separate direct token RAII and queue-precedence selector. Current commit adds run contract and negative regression assertions.",
-    "negative_test_evidence": "Existing R30 numeric 4:3/16:9/21:9 plus Quest3 extent, negative producer mutation and new direct/queue/nesting-destructive source cases; exact workflows pending.",
-    "unresolved": "Real Quest3/VDXR optical parity, legibility and game-frame pacing not established by source CI. Inspect matching build on HMD."
+    "fix_evidence": "Material C++ SHA 257799c2 carries BA9D0 immediate and queued producer attribution; policy/run-record repair bc5e0d2 and exact test correction 48660263 passed all Win32 integration gates; Quest3 remains untested.",
+    "negative_test_evidence": "Source verifier explicitly checks all three BA9D0 producer sites, one direct token, nested queue precedence, protected GOAL/+TIME, negative mutants, aspect/FOV fixtures. Exact-head Active #38415796852 5/5 SUCCESS, Domain #38415796689 SUCCESS; source SHA 257799c2 HUD #38415136814 and Full Impact #38415136196 SUCCESS.",
+    "unresolved": "Real Quest3/VDXR optical parity, legibility and game-frame pacing not established by source CI. Inspect matching build on HMD.",
+    "retry_failure_cause": "Active Validation 38415136734 policy failed because mandatory run record was missing on C++ material SHA 257799c2. Second Active 38415483223 policy failed because source verifier incorrectly expected two occurrences of the producer per owner/direct slice; actual source has three across direct+clip+sprani, one in the direct slice.",
+    "retry_resolution": "Commit bc5e0d2 added the full-feature run contract. Commit 48660263 repaired the original whole-owner 3-versus-direct-owner 1 exact identity negative tests without modifying C++ source. Exact-head Active and Domain Gates passed; material source HUD Inspector and Full Source Impact passed."
   },
-  "blocked_reason": "INITIAL_POLICY_GATE_MISSING_RUN_RECORD_REPAIR_IN_VALIDATION_SHA"
+  "blocked_reason": null,
+  "ci_evidence": {
+    "exact_sha": "48660263be3230a74d135b3937deb9c5badcda49",
+    "material_source_sha": "257799c2761d7b2ed678df25f02021d75bec0ba3",
+    "dx9ex_active": {
+      "run_id": 38415796852,
+      "result": "SUCCESS",
+      "jobs": [
+        "policy",
+        "full-chain-compile",
+        "host",
+        "game",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38415796689,
+      "result": "SUCCESS",
+      "exact_sha": "48660263be3230a74d135b3937deb9c5badcda49"
+    },
+    "hud_inspector": {
+      "run_id": 38415136814,
+      "result": "SUCCESS",
+      "source_sha": "257799c2761d7b2ed678df25f02021d75bec0ba3"
+    },
+    "full_source_impact": {
+      "run_id": 38415136196,
+      "result": "SUCCESS",
+      "source_sha": "257799c2761d7b2ed678df25f02021d75bec0ba3",
+      "jobs": [
+        "msvc-analyze-openxr-host",
+        "msvc-analyze-active-game",
+        "source-cross-domain"
+      ]
+    },
+    "package": {
+      "run_id": 38415796852,
+      "artifact_id": 11823394057,
+      "name": "OutRun2-VR-DX9EX-ACTIVE-48660263be3230a74d135b3937deb9c5badcda49"
+    },
+    "runtime": "UNTESTED"
+  },
+  "validation_evidence": {
+    "exact_sha": "48660263be3230a74d135b3937deb9c5badcda49",
+    "required_jobs": "5/5 SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "source_hud_inspector": "SUCCESS",
+    "source_full_impact": "SUCCESS",
+    "runtime": "UNTESTED"
+  },
+  "material_repair_shas": [
+    "bc5e0d2ff7868ef9bf67ba8aca03d1ada715dc84",
+    "48660263be3230a74d135b3937deb9c5badcda49"
+  ]
 }
