@@ -34,6 +34,45 @@ jobs:
           assert 'SCHEDULED_LOCALIZATION_LANES = {0: "A"}' in result
           assert 'SCHEDULED_LOCALIZATION_LANES = {0: "A", 10:' not in result
           assert '("B", "C1", "C2")' in result, "ensure retired slot backup covers all disabled roles"
+          # Execute the actual patched load_registry with a legacy four-lane
+          # checkpoint. All non-A slot URLs and counters must be safely saved.
+          from dataclasses import dataclass, asdict
+          from datetime import datetime, timedelta, timezone
+          from typing import Optional
+          from unittest.mock import Mock
+          tree = ast.parse(result)
+          wanted = {"Slot", "Registry", "logical_date", "new_registry", "load_registry", "save_registry"}
+          nodes = [n for n in tree.body if isinstance(n,(ast.FunctionDef,ast.ClassDef)) and n.name in wanted]
+          assert len(nodes) == len(wanted)
+          with tempfile.TemporaryDirectory() as tempdir:
+              home = pathlib.Path(tempdir)
+              state_file = home / "chat_registry.json"
+              now = datetime(2026,10,13,22,0,tzinfo=timezone.utc)
+              originals = [
+                  {"name": role, "url": "https://chatgpt.com/c/" + role.lower(), "runs": i+3}
+                  for i,role in enumerate(("A","B","C1","C2"))
+              ]
+              state_file.write_text(__import__("json").dumps({
+                  "logical_date": "2026-10-13", "next_slot": 2, "slots": originals,
+                  "rate_limit_attempts": 0
+              }))
+              env = {"dataclass":dataclass, "asdict":asdict, "datetime":datetime,
+                     "timedelta":timedelta, "TZ":timezone.utc,"ROLLOVER_HOUR":2,
+                     "CHAT_SLOTS":1, "CONTROLLER_MODE":"localization",
+                     "LOCALIZATION_SLOT_NAMES":("A",), "STATE_DIR":home,
+                     "REGISTRY_FILE":state_file,"json":__import__("json"),
+                     "log":Mock(),"Optional":Optional}
+              module=ast.Module(body=[ast.ImportFrom(module="__future__",names=[
+                  ast.alias(name="annotations")],level=0)]+nodes,type_ignores=[])
+              exec(compile(ast.fix_missing_locations(module),"<patched-registry>","exec"),env)
+              reg=env["load_registry"](now)
+              assert [slot.name for slot in reg.slots] == ["A"]
+              assert reg.slots[0].url == originals[0]["url"] and reg.slots[0].runs == 3
+              for old in originals[1:]:
+                  backup=home/("retired_"+old["name"]+"_slot_before_a_only_20261013.json")
+                  assert backup.is_file() and __import__("json").loads(backup.read_text())["url"]==old["url"], old
+              assert len(env["load_registry"](now).slots)==1
+              assert [item["name"] for item in __import__("json").loads(state_file.read_text())["slots"]] == ["A"]
           assert 'if CONTROLLER_MODE == "localization" and slot.name != "A":' in result
           assert "ATTACHED_PREVIEW_CONFIRMED" in result
           assert "SOURCE_REFERENCE_NOT_BOUND" in result
