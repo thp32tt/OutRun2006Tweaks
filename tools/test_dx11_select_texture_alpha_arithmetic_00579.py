@@ -41,8 +41,11 @@ def result_arg_fail_closed(source):
     return all(token in gate for token in (
         "DWORD op=0, arg=0, nextColorOp=0, resultArg=0;",
         "GetTextureStageState(0, D3DTSS_RESULTARG, &resultArg)",
-        "nextColorOp != D3DTOP_DISABLE || resultArg != D3DTA_CURRENT",
-    ))
+        # Stage0 TEMP is never a valid native input even with opt-in stage1.
+        # The stage1 result and stage2 stage are separately guarded.
+        "resultArg != D3DTA_CURRENT",
+        "stage1Result != D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE",
+    )) and gate.index("resultArg != D3DTA_CURRENT") < gate.index("if (nextColorOp != D3DTOP_DISABLE)")
 
 def run():
     src=SRC.read_text(encoding="utf8")
@@ -52,6 +55,10 @@ def run():
         ("GetTextureStageState(0, D3DTSS_RESULTARG, &resultArg)",
          "GetTextureStageState(1, D3DTSS_RESULTARG, &resultArg)"),
         ("resultArg != D3DTA_CURRENT", "resultArg == D3DTA_CURRENT"),
+        ("stage1Result != D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE",
+         "stage1Result == D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE"),
+        ("stage1Result != D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE",
+         "stage1Result != D3DTA_CURRENT || stage2Op == D3DTOP_DISABLE"),
     ):
         broken = src.replace(old, replacement, 1)
         assert broken != src and not result_arg_fail_closed(broken), old
