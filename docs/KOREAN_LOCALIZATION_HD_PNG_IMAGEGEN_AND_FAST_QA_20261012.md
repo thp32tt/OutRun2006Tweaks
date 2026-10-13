@@ -1,4 +1,6 @@
 # OutRun HD DDS→정방향 PNG→ChatGPT 이미지 생성→좌표 보정→DDS 및 간이 QA
+
+> 2026-10-13 한시적 q217 A 단건 실제 첨부/생성 시험: `docs/OUTRUN_A_Q217_IMAGEGEN_SMOKE_20261013.md`. 스테이징에는 `--single-a-smoke`를 명시해야 한다. 원본 SHA 고정, 오직 A 작업 하나, B/C1/watchdog 발송 차단. 운영 배포 및 정상 스케줄 복원은 사용자 수동이고, 시험 PASS가 CLEAN·DDS·C1/C3·실게임 합격을 뜻하지 않는다.
 적용: 2026-10-12 사용자 최신 지시. SSOT: thp32tt/OutRun2006Tweaks / korean-localization-recovery-20260928.
 
 ## 이 문서의 우선순위
