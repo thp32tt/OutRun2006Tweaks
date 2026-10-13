@@ -898,6 +898,24 @@ bool Overlay::render()
 		Overlay::RequestMouseHide = false;
 	}
 
+	// Finalise after every F11 frame, not only when the Overlay tab is
+	// visible. Mouse drags remain deferred, while keyboard/gamepad release,
+	// focus transfer, tab switch and closing F11 cannot strand an edited
+	// font size without refreshing its DX9 atlas or saving Overlay.ini.
+	// This runs after render_shell() and before ImGui::EndFrame(), so
+	// changing the atlas itself is still deferred to the next EndScene.
+	if (FontScalePending &&
+		(FontScaleCommitRequested || !overlay_visible ||
+			(!ImGui::IsMouseDown(ImGuiMouseButton_Left) &&
+			 !ImGui::IsAnyItemActive())))
+	{
+		GlobalFontScale = std::isfinite(GlobalFontScale)
+			? std::clamp(GlobalFontScale, 0.5f, 5.0f) : 2.0f;
+		FontsDirty = true;
+		settings_write();
+		FontScalePending = false;
+	}
+	FontScaleCommitRequested = false;
 	ImGui::EndFrame();
 
 	if (overlay_visible)
@@ -973,7 +991,11 @@ bool Overlay::settings_read()
 #endif
 	}
 
-	GlobalFontScale = ini.Get("Overlay", "FontScale", GlobalFontScale);
+	const float savedFontScale = ini.Get("Overlay", "FontScale", GlobalFontScale);
+	// A corrupt/NaN INI value must never reach floor(), the TrueType
+	// rasteriser, or ImGui layout. Keep valid historical 0.5..5 settings.
+	GlobalFontScale = std::isfinite(savedFontScale)
+		? std::clamp(savedFontScale, 0.5f, 5.0f) : 2.0f;
 	GlobalOpacity = ini.Get("Overlay", "Opacity", GlobalOpacity);
 	CurrentTheme = std::clamp(ini.Get("Overlay", "Theme", CurrentTheme), 0, int(Theme_Count) - 1);
 

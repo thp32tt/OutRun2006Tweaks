@@ -862,12 +862,103 @@ def check_first_visible_f11_frame(hook: str) -> None:
     assert damaged != before and first_press not in damaged
     print("PASS F11 first-visible-frame XR atlas prewarm, desktop and close negatives")
 
+
+def check_f11_overlay_font_persistence(font: str, header: str) -> None:
+    """Whole F11 edit lifecycle: keyboard, pad, drag, tab, close and corrupt INI."""
+    ui = (ROOT / "src/overlay/overlay_settings_ui.cpp").read_text(encoding="utf-8")
+    markers = (
+        "Overlay::FontScalePending = true;",
+        "ImGui::IsItemDeactivatedAfterEdit()",
+        "Overlay::FontScaleCommitRequested = true;",
+    )
+    for token in markers:
+        assert token in ui, "F11 input/edit owner missing: " + token
+    for token in ("inline static bool FontScalePending = false;",
+                  "inline static bool FontScaleCommitRequested = false;"):
+        assert token in header, token
+    render = font.split("bool Overlay::render()", 1)[1].split(
+        "// Creates a unique machine ID", 1)[0]
+    # Own both the UI action and final save in frame scope, not in the
+    # possibly hidden tab. Neither a single mouse click nor a drag writes
+    # the INI on every render frame.
+    required = (
+        "if (FontScalePending &&",
+        "FontScaleCommitRequested || !overlay_visible ||",
+        "!ImGui::IsMouseDown(ImGuiMouseButton_Left)",
+        "!ImGui::IsAnyItemActive()",
+        "FontsDirty = true;",
+        "settings_write();",
+        "FontScalePending = false;",
+        "FontScaleCommitRequested = false;",
+        "ImGui::EndFrame();",
+    )
+    for token in required:
+        assert token in render, "F11 frame finalisation missing: " + token
+    offsets = [render.index(token) for token in (
+        "if (FontScalePending &&", "FontsDirty = true;",
+        "settings_write();", "FontScalePending = false;",
+        "FontScaleCommitRequested = false;", "ImGui::EndFrame();")]
+    assert offsets == sorted(offsets), "Font scale save must precede EndFrame"
+    assert "std::isfinite(savedFontScale)" in font
+    assert "std::clamp(savedFontScale, 0.5f, 5.0f) : 2.0f" in font
+    assert "std::isfinite(GlobalFontScale)" in render
+    assert "std::clamp(GlobalFontScale, 0.5f, 5.0f) : 2.0f" in render
+
+    # Old code only detected mouse release; it failed key/gamepad edits
+    # and a pending edit whose tab stopped rendering after focus moved.
+    assert "fontScaleHeld && ImGui::IsMouseReleased" not in ui
+    def advance(pending, count, *, edit=False, requested=False,
+                visible=True, mouse=False, active=False):
+        pending = pending or edit
+        commit = pending and (requested or not visible or
+                              (not mouse and not active))
+        return (False if commit else pending, count + int(commit))
+    # Drag: dozens of frames, single save after release.
+    state = (False, 0)
+    for _ in range(40):
+        state = advance(*state, edit=True, mouse=True, active=True)
+    assert state == (True, 0)
+    state = advance(*state, mouse=False, active=False)
+    assert state == (False, 1)
+    for _ in range(40):
+        state = advance(*state)
+    assert state == (False, 1)
+    # Keyboard/controller edited slider loses focus to another active
+    # button; explicit deactivation wins that race.
+    state = advance(*state, edit=True, active=True)
+    assert state == (True, 1)
+    state = advance(*state, requested=True, active=True)
+    assert state == (False, 2)
+    # Tab switch: the old tab's control is not rendered again.
+    state = advance(*state, edit=True, mouse=True, active=True)
+    state = advance(*state, visible=True, active=False)
+    assert state == (False, 3)
+    # Close F11 while input focus is still active.
+    state = advance(*state, edit=True, active=True)
+    state = advance(*state, visible=False, active=True)
+    assert state == (False, 4)
+
+    mutations = (
+        (ui, markers[0], "Overlay::FontScalePending = false;", markers),
+        (ui, markers[1], "ImGui::IsMouseReleased(ImGuiMouseButton_Left)", markers),
+        (render, required[1], "false ||", required),
+        (render, required[2], "ImGui::IsMouseDown(ImGuiMouseButton_Left)", required),
+        (render, required[5], "/* dropped settings save */", required),
+        (render, required[6], "FontScalePending = true;", required),
+    )
+    for original, good, bad, needed in mutations:
+        assert original.count(good) >= 1
+        mutated = original.replace(good, bad, 1)
+        assert not all(token in mutated for token in needed), good
+    print("PASS F11 full edit/save/atlas lifecycle: drag, keys, pad, tab, close, invalid INI and 6 destructive mutants")
+
 def main():
     hook, font, header = (p.read_text(encoding="utf-8")
                           for p in (HOOK, FONT, HEADER))
     renderer = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
     semantic = (ROOT / "src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
     check(hook, font, header)
+    check_f11_overlay_font_persistence(font, header)
     check_font_io_cache(font)
     check_font_density_hysteresis(hook)
     check_first_visible_f11_frame(hook)

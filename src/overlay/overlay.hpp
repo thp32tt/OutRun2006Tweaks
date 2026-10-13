@@ -47,6 +47,11 @@ class Overlay
 {
 public:
 	inline static float GlobalFontScale = 2.0f;
+	// F11 font edits are finalised after the ImGui frame, even when the user
+	// switches tabs, closes F11, or edits with keyboard/controller instead of
+	// releasing a mouse button over the original slider.
+	inline static bool FontScalePending = false;
+	inline static bool FontScaleCommitRequested = false;
 	// Runtime-only VR font density; never persisted to the desktop Overlay.ini.
 	inline static float VrFontMultiplier = 1.0f;
 	inline static float GlobalOpacity = 0.8f;

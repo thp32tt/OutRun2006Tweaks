@@ -30,18 +30,16 @@ class OverlaySettingsWindow : public OverlayWindow
 			changed = true;
 		}
 
-		// The font is rasterised at whatever scale is picked, so a change means
-		// rebuilding the atlas. Only done once the slider is let go of, rather
-		// than on every frame of the drag.
-		static bool fontScaleHeld = false;
+		// A mouse-release-only commit lost keyboard/gamepad edits and
+		// edits interrupted by a tab switch or closing F11: the tab is no
+		// longer rendered when the old per-tab latch should have flushed.
+		// Own the pending edit at the overlay frame level instead. Atlas
+		// rebuild and INI write happen once after deactivation, never per
+		// mouse-drag frame or on every navigation repeat.
 		if (ImGui::SliderFloat("Font Scale", &Overlay::GlobalFontScale, 0.5f, 3.5f))
-			fontScaleHeld = true;
-		if (fontScaleHeld && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-		{
-			Overlay::FontsDirty = true;
-			changed = true;
-			fontScaleHeld = false;
-		}
+			Overlay::FontScalePending = true;
+		if (ImGui::IsItemDeactivatedAfterEdit())
+			Overlay::FontScaleCommitRequested = true;
 
 		if (ImGui::SliderFloat("Opacity", &Overlay::GlobalOpacity, 0.1f, 1.0f))
 		{
