@@ -3244,7 +3244,7 @@ def main() -> None:
         assert start >= 0 and end > start, "game IndexedUP hook not located"
         region = hook[start:end]
         required = (
-            "minVertex > 1536u - numVertices",
+            "minVertex > live::kMaxNativeGameVertices - numVertices",
             "unpacked[i] < minVertex ||",
             "unpacked[i] - minVertex >= numVertices",
             "unpacked[i] -= minVertex;",
