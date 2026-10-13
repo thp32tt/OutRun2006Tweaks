@@ -1,13 +1,12 @@
 # 이미지 생성 정책 수동 적용 절차
 
-## 2026-10-13 q217 A 단건 파일 첨부 + 내장 ImageGen 시험
+## 2026-10-13 Portainer GitHub 정책 전달 — 최신 사용자 운영 경로
 
-- 전용 설명: `docs/OUTRUN_A_Q217_IMAGEGEN_SMOKE_20261013.md`.
-- **반드시** `python tools/localization/deploy_plate_controller.py --root . --revision <FULL_40_CHAR_SHA> --stage --single-a-smoke`로 스테이징한 뒤 사용자가 Portainer에서 수동 배포한다.
-- staging은 `AUTO_SEND=true`, `CHAT_SLOTS=3`, `SCHEDULE_MINUTES=0`, `OUTRUN_A_SINGLE_SMOKE_TASK_ID=OUTRUN-A-Q217-IMG-SMOKE-20261013`만 단건 모드에 적용한다. controller 런타임 패치도 B/C1 예정 발송과 모든 watchdog을 차단한다.
-- q217 단건 첨부 PNG와 SHA-pinned `pending_A.json`을 `/data/imagegen`에 준비해야 한다. 다른 A 큐나 B로 폴백하지 않는다.
-- `sent/` 기록은 첨부된 메시지 전송 증거일 뿐 이미지 생성 성공 근거가 아니다. 다운로드한 출력 실제 PNG bytes/SHA가 없으면 `IMAGEGEN_E2E=UNTESTED`.
-- 복원: **같은 GitHub HEAD**에서 `--single-a-smoke` 없이 스테이징하고 정상 스케줄 복원 확인 후 사용자만 Portainer 재배포. 다른 자료·보안 설정·볼륨·기존 기록 보존.
+- **GitHub 정책 SSOT → 기존 Portainer Git Stack → 사용자 수동 Pull and redeploy**. 표준 경로에서 로컬 Docker CLI staging은 필수가 아니다. 세부: `docs/OUTRUN_PORTAINER_GITHUB_DELIVERY_20261013.md`.
+- q217 시험에 한해 **이미지 코드가 GitHub의 PNG 업로드 패치를 실제 포함**하고 Portainer Git Repository/ref/Compose path가 확인되면, 기존 Stack의 Additional paths에 `docker/localization-production/portainer-git-q217-a-smoke.override.yml`을 적용할 수 있다. 단독 Compose로 새 스택을 띄우지 않는다.
+- q217 단건 `/data/imagegen/inputs/A/...png` 및 `pending_A.json` 실제 바이트·SHA는 Git 정책 pull과 별개로 영구 볼륨에 공급해야 한다. 없으면 작업은 SOURCE_REFERENCE_NOT_BOUND.
+- 실험 종료 후 `docker/localization-production/portainer-git-normal.override.yml` 또는 정상 Git Compose 정책으로 복귀한 다음 사용자가 Portainer에서 수동 Pull and redeploy.
+- **현재 저장소에는 Portainer Stack의 정본 base Compose 파일을 확인하지 못했다.** 따라서 위 override가 실제 Stack에 이미 연결되어 있다거나 GitHub push만으로 ImageGen이 실행된다고 주장할 수 없다. 이미지/Stack 연결이 확인될 때까지 `UPLOAD_RUNTIME=UNTESTED`, `IMAGEGEN_E2E=UNTESTED`.
 
 ---
 
@@ -18,7 +17,7 @@
 `docker/localization-production/Dockerfile`은 CPU plate 작업 이미지이며 ChatGPT 브라우저
 컨트롤러가 아니다. 이 이미지 자체에 내장 ImageGen이 있다고 가정하지 않는다.
 
-## 사용자가 수동 배포할 때
+## 레거시 비Git형 Portainer Stack만을 위한 CLI 스테이징 (Git-connected Stack 표준 절차 아님)
 
 1. 검토한 정확한 커밋으로 checkout한다. 운영 app/controller.py, Compose 원본,
    prompt 디렉터리, 현재 image ID와 /data·/logs를 백업한다. 기존 백업 브랜치와 Git 이력을 유지한다.
