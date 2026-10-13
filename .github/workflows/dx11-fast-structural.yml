@@ -75,6 +75,7 @@ jobs:
           python tools/test_dx11_depth_ordering_draw_00654.py
           python tools/test_dx11_native_anisotropic_sampler_00655.py
           python tools/test_dx11_native_anisotropic_mag_00656.py
+          python tools/test_dx11_native_srgb_texture_00657.py
           g++ -std=c++17 -O2 -Wall -Wextra -pedantic tools/dx11_game_cull_probe.cpp -o /tmp/dx11_cull_00649 && /tmp/dx11_cull_00649
           g++ -std=c++17 -O2 -Wall -Wextra -pedantic tools/dx11_game_depth_probe.cpp -o /tmp/dx11_depth_00648 && /tmp/dx11_depth_00648
           g++ -std=c++17 -O2 -Wall -Wextra -pedantic tools/dx11_game_primitive_span_probe.cpp -o /tmp/dx11_primitive_00644 && /tmp/dx11_primitive_00644

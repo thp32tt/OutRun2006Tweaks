@@ -757,6 +757,7 @@ struct TextureCapture {
     D3DTEXTUREFILTERTYPE magFilter = D3DTEXF_POINT;
     D3DTEXTUREFILTERTYPE mipFilter = D3DTEXF_NONE;
     DWORD maxAnisotropy = 1u; // Captured live game D3D9 anisotropy.
+    bool srgbTexture = false; // Game D3DSAMP_SRGBTEXTURE: native SRGB SRV decode.
     DWORD maxMipLevel = 0u;  // D3D9's most detailed permitted mip for MIN sampling.
     float mipLodBias = 0.0f; // Signed game-authored MIPMAPLODBIAS (IEEE-754).
 };
@@ -1857,7 +1858,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         DWORD coordIndex=~0u, transformFlags=~0u;
         DWORD addressU=0, addressV=0, mag=0, min=0, mip=0, srgb=1;
         DWORD borderColor = 0u;
-        DWORD maxMip=~0u, mipBias=~0u, maxAniso=0u;
+        DWORD maxMip=~0u, mipBias=~0u, maxAniso=0u, srgbWrite=TRUE;
         if (FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG2, &arg2)) ||
             FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)) ||
             FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAARG1, &alphaArg1)) ||
@@ -1871,7 +1872,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             FAILED(game->GetSamplerState(0, D3DSAMP_MIPFILTER, &mip)) ||
             FAILED(game->GetSamplerState(0, D3DSAMP_MAXMIPLEVEL, &maxMip)) ||
             FAILED(game->GetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, &mipBias)) ||
-            FAILED(game->GetSamplerState(0, D3DSAMP_SRGBTEXTURE, &srgb)))
+            FAILED(game->GetSamplerState(0, D3DSAMP_SRGBTEXTURE, &srgb)) ||
+            FAILED(game->GetRenderState(D3DRS_SRGBWRITEENABLE, &srgbWrite)) ||
+            srgbWrite != FALSE)
             return false;
         // Capture the live D3D9 anisotropy only when the game uses it.
         if (min == D3DTEXF_ANISOTROPIC &&
@@ -2380,7 +2383,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
               !blendTextureAlphaPMFactorArg2Alpha &&
               !blendTextureAlphaPMInverseTextureArg2Alpha) && !blendTextureAlphaPMInverseDiffuseArg2Alpha) ||
             coordIndex >= layout.texcoordCount ||
-            (transformFlags != D3DTTFF_DISABLE && transformFlags != D3DTTFF_COUNT2) || srgb ||
+            (transformFlags != D3DTTFF_DISABLE && transformFlags != D3DTTFF_COUNT2) || srgb > 1u ||
             ((addressU != D3DTADDRESS_WRAP && addressU != D3DTADDRESS_CLAMP &&
              addressU != D3DTADDRESS_MIRROR && addressU != D3DTADDRESS_MIRRORONCE) &&
              addressU != D3DTADDRESS_BORDER) ||
@@ -2392,6 +2395,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             ((mip != D3DTEXF_NONE && mip != D3DTEXF_POINT) && mip != D3DTEXF_LINEAR) ||
             (mip == D3DTEXF_NONE && (maxMip != 0u || decodedMipBias != 0.0f)) || !validMipBias)
             return false;
+        // Preserve game sRGB reads only when the diagnostic UNORM target does
+        // not require sRGB writes. Incompatible output remains D3D9-owned.
+        capture.srgbTexture = srgb == TRUE;
         capture.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(mip);
         capture.maxMipLevel = maxMip;
         capture.mipLodBias = decodedMipBias;
@@ -2716,17 +2722,23 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     const bool packed16 = base.Format == D3DFMT_R5G6B5 ||
                           base.Format == D3DFMT_A1R5G5B5 ||
                           base.Format == D3DFMT_A4R4G4B4;
+    // D3D9 packed 16-bit texture formats have no equivalent sRGB D3D11 SRV.
+    // Keep their live Draw on DX9Ex; never decode as linear by mistake.
+    if (capture.srgbTexture && packed16) return false;
     DXGI_FORMAT nativeFormat = DXGI_FORMAT_UNKNOWN;
     if (compressed) {
         // A full-sized BC base level is required, but its final mips may
         // legally be 2x2 or 1x1, each occupying one compressed 4x4 block.
         if ((base.Width & 3u) || (base.Height & 3u)) return false;
-        nativeFormat = base.Format == D3DFMT_DXT1 ? DXGI_FORMAT_BC1_UNORM :
-                       base.Format == D3DFMT_DXT3 ? DXGI_FORMAT_BC2_UNORM :
-                                                     DXGI_FORMAT_BC3_UNORM;
+        nativeFormat = base.Format == D3DFMT_DXT1 ?
+            (capture.srgbTexture ? DXGI_FORMAT_BC1_UNORM_SRGB : DXGI_FORMAT_BC1_UNORM) :
+            base.Format == D3DFMT_DXT3 ?
+            (capture.srgbTexture ? DXGI_FORMAT_BC2_UNORM_SRGB : DXGI_FORMAT_BC2_UNORM) :
+            (capture.srgbTexture ? DXGI_FORMAT_BC3_UNORM_SRGB : DXGI_FORMAT_BC3_UNORM);
     } else if (base.Format == D3DFMT_A8R8G8B8 ||
                base.Format == D3DFMT_X8R8G8B8 || packed16) {
-        nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+        nativeFormat = capture.srgbTexture ?
+            DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : DXGI_FORMAT_B8G8R8A8_UNORM;
     } else return false;
 
     ComPtr<IDirect3DSurface9> readbackSurface;
