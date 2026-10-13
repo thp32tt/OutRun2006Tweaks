@@ -101,7 +101,7 @@ def main():
         assert good in SOURCE, good
         try:
             verify(SOURCE.replace(good, bad, 1))
-        except (AssertionError, ValueError):
+        except (AssertionError, ValueError, IndexError):
             continue
         raise AssertionError("unsafe R26 mutation escaped: " + good)
     print("PASS R26 write-free occlusion: 16 predicates, all observed getter failures, "

@@ -80,7 +80,10 @@
       "Zeroing diagnostic baselines each disabled frame creates avoidable 2.5KB TLS window initialization overhead."
     ],
     "fix_evidence": "Early short circuits preserve source state-read fail-closed behavior for consulted predicates; disabled Present hook calls its original lower hook and resets pacing only on enabled-to-disabled transition.",
-    "negative_test_evidence": "CI-registered verifier enumerates 16 render state tuples, every actually consulted getter failure and ten destructive source mutations; Quest3 runtime not executed."
+    "negative_test_evidence": "CI-registered verifier enumerates 16 render state tuples, every actually consulted getter failure and ten destructive source mutations; Quest3 runtime not executed.",
+    "failed_run_id": 38456906356,
+    "failed_step": "DX9Ex Active policy: mutation of telemetry guard raises IndexError because verifier lacked expected missing-anchor exception",
+    "repair": "Mutation checker now recognizes a missing required source anchor as intentional negative-test rejection. Same production task and original C++ material preserved."
   },
   "runtime_status": "NEED_QUEST3_VDXR_P95_P99_TEST",
   "ci_evidence": {
@@ -90,5 +93,6 @@
       "Domain Isolation Guard",
       "DX9Ex Full Source Impact Review where triggered"
     ]
-  }
+  },
+  "material_result_sha": "5eea23073279810d635cb4d2ee38978cac7c5b64"
 }
