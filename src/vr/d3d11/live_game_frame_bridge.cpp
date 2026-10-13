@@ -9,6 +9,7 @@
 #include "live_game_luminance_texture.hpp"
 #include "live_game_rgb24_texture.hpp"
 #include "live_game_rgba_texture.hpp"
+#include "live_game_10bit_texture.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -2736,11 +2737,16 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // Little-endian RGBA memory cannot be memcpy-ed into a BGRA8 SRV.
     const bool rgbaSwizzle = base.Format == D3DFMT_A8B8G8R8 ||
                              base.Format == D3DFMT_X8B8G8R8;
+    // Ten-bit game RGB/2-bit alpha has no BGRA8 byte-compatible memory layout.
+    const bool tenBit = base.Format == D3DFMT_A2R10G10B10 ||
+                        base.Format == D3DFMT_A2B10G10R10;
     // D3D9 packed 16-bit texture formats have no equivalent sRGB D3D11 SRV.
     // Keep their live Draw on DX9Ex; never decode as linear by mistake.
     if (capture.srgbTexture && packed16) return false;
     // Legacy alpha/luminance sRGB parity has not been proven: DX9Ex owns it.
     if (capture.srgbTexture && luminance) return false;
+    // Unproven 10-bit D3D9 sRGB transfer semantics remain on DX9Ex.
+    if (capture.srgbTexture && tenBit) return false;
     DXGI_FORMAT nativeFormat = DXGI_FORMAT_UNKNOWN;
     if (compressed) {
         // A full-sized BC base level is required, but its final mips may
@@ -2752,7 +2758,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             (capture.srgbTexture ? DXGI_FORMAT_BC2_UNORM_SRGB : DXGI_FORMAT_BC2_UNORM) :
             (capture.srgbTexture ? DXGI_FORMAT_BC3_UNORM_SRGB : DXGI_FORMAT_BC3_UNORM);
     } else if (base.Format == D3DFMT_A8R8G8B8 ||
-               base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance || rgb24 || rgbaSwizzle) {
+               base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance || rgb24 || rgbaSwizzle || tenBit) {
         nativeFormat = capture.srgbTexture ?
             DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : DXGI_FORMAT_B8G8R8A8_UNORM;
     } else return false;
@@ -2833,6 +2839,11 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     rgba_texture::unpack_row(source, destination, desc.Width,
                         base.Format == D3DFMT_X8B8G8R8 ?
                             rgba_texture::Layout::xrgb : rgba_texture::Layout::argb);
+                else if (tenBit)
+                    tenbit_texture::unpack_row(source, destination, desc.Width,
+                        base.Format == D3DFMT_A2B10G10R10 ?
+                            tenbit_texture::Layout::a2b10g10r10 :
+                            tenbit_texture::Layout::a2r10g10b10);
                 else
                     std::memcpy(destination, source, rowBytes);
             }
