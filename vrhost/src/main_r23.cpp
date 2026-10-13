@@ -1413,10 +1413,18 @@ namespace
         commonFov.angleUp = std::atan(common.up);
         RECT cr{};
         GetClientRect(c.hwnd_, &cr);
-        float sourceAspect = (cr.bottom > cr.top)
+        const float clientAspect = (cr.bottom > cr.top &&
+            cr.right > cr.left)
             ? static_cast<float>(cr.right - cr.left) /
                 static_cast<float>(cr.bottom - cr.top)
             : 16.0f / 9.0f;
+        // GetGameUv() can clip an off-desktop window to the real capture
+        // image. Use the sampled texture region's physical aspect for the
+        // LOCAL-fixed menu, not the now-larger unclipped GetClientRect().
+        // On a fully visible window this equals the original client aspect.
+        // It is independent of the eye FOV and does not alter world/HUD.
+        float sourceAspect = OutRunVrMenuAspect::PlanCapturedAspect(
+            c.sourceWidth_, c.sourceHeight_, whole.w, whole.h, clientAspect);
 
         // Issue #119: UIScalingMode=1 / UILetterboxing=1 already centers
         // original 4:3 menu content inside the 16:9 or 21:9 game client.

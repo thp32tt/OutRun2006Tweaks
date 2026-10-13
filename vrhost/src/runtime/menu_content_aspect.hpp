@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 // Opt-in center-content crop for the captured, already-letterboxed 4:3
 // OutRun menu. The LOCAL-fixed two-eye clip must use the SAME resulting
 // content aspect and UV, not the ultrawide desktop aspect with black rails.
@@ -108,6 +109,33 @@ namespace OutRunVrMenuAspect
             return {};
 
         return { true, centerX, centerY, halfWidth, halfHeight };
+    }
+
+    // The LOCAL menu samples the UV rectangle after desktop capture clipping.
+    // A partially visible game window no longer occupies its GetClientRect()
+    // width/height in the texture. Projecting that clipped UV with the full
+    // window's aspect stretches it even when the common XR FOV is correct.
+    // Derive the physical content aspect from the ACTUAL sampled pixels.
+    // Fully visible windows yield the original client aspect. Reject a stale
+    // or invalid capture publication without contaminating the menu geometry.
+    inline float PlanCapturedAspect(
+        std::uint32_t sourceWidth, std::uint32_t sourceHeight,
+        float uvWidth, float uvHeight, float fallbackAspect) noexcept
+    {
+        if (!sourceWidth || !sourceHeight ||
+            !std::isfinite(uvWidth) || !std::isfinite(uvHeight) ||
+            uvWidth <= 0.0f || uvWidth > 1.0f ||
+            uvHeight <= 0.0f || uvHeight > 1.0f)
+            return fallbackAspect;
+
+        const double sampledWidth =
+            static_cast<double>(sourceWidth) * uvWidth;
+        const double sampledHeight =
+            static_cast<double>(sourceHeight) * uvHeight;
+        const double aspect = sampledWidth / sampledHeight;
+        if (!std::isfinite(aspect) || aspect < 0.5 || aspect > 5.0)
+            return fallbackAspect;
+        return static_cast<float>(aspect);
     }
 
     constexpr CropPlan PlanCenteredContent(

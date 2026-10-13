@@ -24,6 +24,40 @@ static_assert(!invalidTarget.crop);
 
 int main()
 {
+    using OutRunVrMenuAspect::PlanCapturedAspect;
+    constexpr float desktopAspect = 3440.0f / 1440.0f;
+    // Fully visible 21:9 and 4:3 mirrors keep exact source proportions.
+    if (std::fabs(PlanCapturedAspect(3440, 1440, 1.0f, 1.0f,
+            16.0f / 9.0f) - desktopAspect) > 1e-5f ||
+        std::fabs(PlanCapturedAspect(1280, 960, 1.0f, 1.0f,
+            16.0f / 9.0f) - 4.0f / 3.0f) > 1e-5f)
+        return 13;
+    // Desktop Duplication / resolution-change: GetGameUv has clipped
+    // a half-visible source; uncorrected client aspect would stretch the
+    // LOCAL menu 2x. Recompute both portrait and landscape cropped UV.
+    if (std::fabs(PlanCapturedAspect(3440, 1440, 0.5f, 1.0f,
+            desktopAspect) - desktopAspect * 0.5f) > 1e-5f ||
+        std::fabs(PlanCapturedAspect(1920, 1080, 1.0f, 0.5f,
+            desktopAspect) - 32.0f / 9.0f) > 1e-5f ||
+        std::fabs(PlanCapturedAspect(1920, 1080, 0.5f, 1.0f,
+            desktopAspect) - 8.0f / 9.0f) > 1e-5f)
+        return 14;
+    // Reset, invalid dimensions/UVs, nonfinite and untrusted partial eye
+    // publication: never project a NaN, zero or out-of-bounds capture.
+    const float fallback = 16.0f / 9.0f;
+    const float bad = std::numeric_limits<float>::quiet_NaN();
+    const float infUv = std::numeric_limits<float>::infinity();
+    if (PlanCapturedAspect(0, 1080, 1.0f, 1.0f, fallback) != fallback ||
+        PlanCapturedAspect(1920, 0, 1.0f, 1.0f, fallback) != fallback ||
+        PlanCapturedAspect(1920, 1080, 0.0f, 1.0f, fallback) != fallback ||
+        PlanCapturedAspect(1920, 1080, 1.01f, 1.0f, fallback) != fallback ||
+        PlanCapturedAspect(1920, 1080, bad, 1.0f, fallback) != fallback ||
+        PlanCapturedAspect(1920, 1080, 1.0f, infUv, fallback) != fallback ||
+        PlanCapturedAspect(1920, 1080, 0.01f, 1.0f, fallback) != fallback ||
+        std::fabs(PlanCapturedAspect(1440, 1080, 1.0f, 1.0f,
+            fallback) - 4.0f / 3.0f) > 1e-5f)
+        return 15;
+
     using OutRunVrMenuAspect::PlanCommonFovTangents;
     // Two asymmetric Quest-style FOVs must average the actual tangent
     // plane. tan(mean angle) causes a different apparent menu aspect.
