@@ -36,6 +36,9 @@ def static_contract(src, workflow):
         "usedMask->size() >= vertexCount",
         "for (const std::uint32_t index : *touched)",
         "if (index >= vertexCount || (*usedMask)[index] == 0)",
+        "const bool directHintOwnedByProducer = R30Scratch.busy &&",
+        "fastTouched = fastTouched && directHintOwnedByProducer;",
+        "R30Scratch.indexDecode.knownUsedCount == touched->size()",
         "fastTouched = false;",
         "const UINT visitCount = fastTouched",
         "const UINT i = fastTouched ? (*touched)[visit] :",
@@ -59,6 +62,8 @@ def static_contract(src, workflow):
     # other path still retains the same token.
     assert c.count("touched->size() <= vertexCount") == 2
     assert c.count("usedMask->size() >= vertexCount") == 2
+    assert c.index("fastTouched = fastTouched && directHintOwnedByProducer;") < c.index(
+        "for (const std::uint32_t index : *touched)")
     assert c.index("for (const std::uint32_t index : *touched)") < c.index(
         "for (UINT visit = 0; visit < visitCount")
     assert "for (UINT i = 0; i < vertexCount && sampled < 512u; ++i)" not in c
@@ -116,6 +121,10 @@ def negative_mutations(src, workflow):
         ("usedMask->size() >= vertexCount", "usedMask->size() < vertexCount"),
         ("index >= vertexCount || (*usedMask)[index] == 0", "false"),
         ("fastTouched = false;", "fastTouched = true;"),
+        ("fastTouched = fastTouched && directHintOwnedByProducer;",
+         "fastTouched = true;"),
+        ("const bool directHintOwnedByProducer = R30Scratch.busy &&",
+         "const bool directHintOwnedByProducer = true &&"),
         ("sortedTouched.empty() ? visit : sortedTouched[visit]",
          "sortedTouched.empty() ? visit : visit"),
         ("std::sort(sortedTouched.begin(), sortedTouched.end());",
@@ -151,9 +160,9 @@ def negative_mutations(src, workflow):
         raise AssertionError("destructive source mutation escaped: " + old)
 
 
-def simulate(mask, touched, quality, fast):
+def simulate(mask, touched, quality, fast, trusted=True):
     n = len(mask)
-    use_touched = bool(fast and touched and len(touched) <= 512 and
+    use_touched = bool(fast and trusted and touched and len(touched) <= 512 and
                        len(touched) <= n and
                        all(0 <= i < n and mask[i] for i in touched))
     use_sorted = bool(fast and not use_touched and touched and
@@ -214,6 +223,13 @@ def parity():
                 bad = selected[:-1] + [selected[0]]
                 assert simulate(mask, bad, quality, True) == base
             if count and count <= 512:
+                # Unknown/corrupt lists may repeat a good vertex. The leased
+                # unique-index producer contract is mandatory for the fast
+                # path even if all mask members and bounds appear valid.
+                duplicate = selected[:-1] + [selected[0]]
+                assert simulate(mask, duplicate, quality, True,
+                                trusted=False) == simulate(mask, duplicate,
+                                                           quality, False)
                 # Bad bounds or mask membership reject the hint, then use dense.
                 bad = selected[:-1] + [n]
                 assert simulate(mask, bad, quality, True) == simulate(

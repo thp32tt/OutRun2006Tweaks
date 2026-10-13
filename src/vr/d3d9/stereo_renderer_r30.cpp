@@ -2588,6 +2588,20 @@ namespace OutRunVRStereo
                 touched->size() <= 512u &&
                 touched->size() <= vertexCount &&
                 usedMask->size() >= vertexCount;
+            // The <=512 direct list skips sorting. Its caller must therefore
+            // be the same leased UP or validated IB decoder that guaranteed
+            // unique referenced indices. An arbitrary list could duplicate
+            // the same vertex and change projected-depth classification.
+            // In that case retain the original dense ascending mask walk.
+            const bool directHintOwnedByProducer = R30Scratch.busy &&
+                ((usedMask == &R30Scratch.upUsed &&
+                  touched == &R30Scratch.upTouched) ||
+                 (usedMask == &R30Scratch.used &&
+                  touched == &R30Scratch.vbTouched &&
+                  R30Scratch.indexDecode.valid &&
+                  R30Scratch.indexDecode.vertexCount == vertexCount &&
+                  R30Scratch.indexDecode.knownUsedCount == touched->size()));
+            fastTouched = fastTouched && directHintOwnedByProducer;
             if (fastTouched)
             {
                 // Validate the entire bounded list before the first early
