@@ -117,14 +117,21 @@ async def prepare_a_project_target(page, project_name, allow_saved_chat=False):
             return "A_PROJECT_NAME_MISSING"
         in_project="/g/" in url.path and url.path.endswith("/project")
         if in_project:
-            in_project=any(project_name in t for t in await page.locator("h1").all_inner_texts())
+            try:
+                await page.get_by_role("heading", name=project_name, exact=True).wait_for(
+                    state="visible", timeout=20000)
+            except Exception:
+                in_project=False
         if not in_project:
             btn=page.get_by_role("button",name="New chat in "+project_name,exact=True)
             if await btn.count()!=1:
                 return "A_PROJECT_NEW_CHAT_BUTTON_NOT_FOUND"
             await btn.dispatch_event("click")
             await page.wait_for_url("**/g/*/project",timeout=18000)
-        if not any(project_name in t for t in await page.locator("h1").all_inner_texts()):
+        try:
+            await page.get_by_role("heading", name=project_name, exact=True).wait_for(
+                state="visible", timeout=20000)
+        except Exception:
             return "A_PROJECT_IDENTITY_NOT_VERIFIED"
         await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(state="visible",timeout=12000)
         return "A_PROJECT_COMPOSER_READY"
