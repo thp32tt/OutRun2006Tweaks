@@ -33,6 +33,7 @@ def connected(c: str, h: str, p: str) -> bool:
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
     )) and draw.count(slot) == 1
     and c.count("s.diagnosticDepthEqualityStates[") == 2
+    and draw.count("else if (output.nativeDepthEqualityMode != 0u)") == 2
     and c.count("for (auto& depthState : s.diagnosticDepthEqualityStates) depthState.Reset();") == 2
     and "std::array<ComPtr<ID3D11DepthStencilState>, 4> diagnosticDepthEqualityStates;" in c
     and "output.nativeDepthWrite, output.nativeDepthEqualityMode)].Get(), 0);" in draw
