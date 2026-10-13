@@ -193,6 +193,11 @@ class D3DHooks : public Hook
 				DWORD prevLighting = TRUE;
 				DWORD prevColorOp = D3DTOP_MODULATE;
 				DWORD prevAlphaOp = D3DTOP_SELECTARG1;
+				// Fixed-function FVF is a separate restorable input mode from
+				// custom vertex declarations. Save both before drawing sidebars.
+				DWORD prevFVF = 0;
+				const bool hadFixedFVF =
+					SUCCEEDED(d3ddev->GetFVF(&prevFVF)) && prevFVF != 0;
 				UINT prevStreamOffset = 0;
 				UINT prevStreamStride = 0;
 
@@ -262,8 +267,9 @@ class D3DHooks : public Hook
 				d3ddev->SetTextureStageState(0, D3DTSS_ALPHAOP, prevAlphaOp);
 
 				// A Get on a resource adds a reference, so each one is released once it's
-				// back on the device. SetFVF above replaced the vertex declaration, so
-				// restoring the declaration object covers both the FVF and non-FVF cases.
+				// back on the device. Restore the actual preceding vertex input:
+				// setting a null vertex declaration does NOT restore a previous
+				// fixed-function FVF on D3D9Ex. Keep custom declarations intact.
 				d3ddev->SetTexture(0, prevTexture);
 				if (prevTexture)
 					prevTexture->Release();
@@ -276,7 +282,10 @@ class D3DHooks : public Hook
 				if (prevPixelShader)
 					prevPixelShader->Release();
 
-				d3ddev->SetVertexDeclaration(prevVertexDecl);
+				if (hadFixedFVF)
+					d3ddev->SetFVF(prevFVF);
+				else
+					d3ddev->SetVertexDeclaration(prevVertexDecl);
 				if (prevVertexDecl)
 					prevVertexDecl->Release();
 

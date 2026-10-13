@@ -396,3 +396,57 @@ for original, broken in (
     else:
         raise AssertionError("Menu clip-state destructive mutant escaped: " + original)
 print("PASS 4:3 menu bars scissor/stencil isolation, F11 continuation and 7 destructive mutants")
+
+
+# Issue #119 00746: restoring a null vertex declaration does not restore
+# D3D9 fixed-function FVF when menu bars switched the device to CUSTOMFVF.
+# Protect the owning EndScene draw/restore and fail on destructive mutations.
+def verify_letterbox_fvf_restore(code: str) -> None:
+    endscene = code.split("static void D3DEndScene(", 1)[1].split(
+        "if (overlayInited)", 1)[0]
+    capture = endscene.index("DWORD prevFVF = 0;")
+    draw = endscene.index("d3ddev->SetFVF(CUSTOMFVF);")
+    restore = endscene.index("if (hadFixedFVF)")
+    for token in (
+        "SUCCEEDED(d3ddev->GetFVF(&prevFVF)) && prevFVF != 0;",
+        "d3ddev->GetVertexDeclaration(&prevVertexDecl);",
+        "if (hadFixedFVF)\n\t\t\t\t\td3ddev->SetFVF(prevFVF);",
+        "else\n\t\t\t\t\td3ddev->SetVertexDeclaration(prevVertexDecl);",
+        "if (prevVertexDecl)\n\t\t\t\t\tprevVertexDecl->Release();",
+    ):
+        assert token in endscene, token
+    assert capture < endscene.index("GetVertexDeclaration(&prevVertexDecl)") < draw
+    assert draw < endscene.index("DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2)") < restore
+    assert restore < endscene.index("prevVertexDecl->Release();")
+    assert endscene.count("d3ddev->SetFVF(prevFVF);") == 1
+    assert endscene.count("d3ddev->SetVertexDeclaration(prevVertexDecl);") == 1
+
+verify_letterbox_fvf_restore(src)
+for original, wrong in (
+    ("SUCCEEDED(d3ddev->GetFVF(&prevFVF)) && prevFVF != 0;",
+     "SUCCEEDED(d3ddev->GetFVF(&prevFVF)) && false;"),
+    ("if (hadFixedFVF)\n\t\t\t\t\td3ddev->SetFVF(prevFVF);",
+     "if (hadFixedFVF)\n\t\t\t\t\td3ddev->SetFVF(CUSTOMFVF);"),
+    ("else\n\t\t\t\t\td3ddev->SetVertexDeclaration(prevVertexDecl);",
+     "else\n\t\t\t\t\td3ddev->SetVertexDeclaration(nullptr);"),
+    ("if (prevVertexDecl)\n\t\t\t\t\tprevVertexDecl->Release();",
+     "if (prevVertexDecl)\n\t\t\t\t\t(void)prevVertexDecl;"),
+):
+    assert src.count(original) == 1
+    mutated = src.replace(original, wrong, 1)
+    try:
+        verify_letterbox_fvf_restore(mutated)
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("FVF/menu input restore mutation escaped: " + original)
+
+def returned_vertex_input(fvf: int, custom_decl: object):
+    return ("FVF", fvf) if fvf else ("CUSTOM", custom_decl)
+
+for fvf in (0x4, 0x40, 0x144, 0x1c4):
+    assert returned_vertex_input(fvf, object()) == ("FVF", fvf)
+declaration = object()
+assert returned_vertex_input(0, declaration) == ("CUSTOM", declaration)
+assert returned_vertex_input(0, None) == ("CUSTOM", None)
+print("PASS DX9Ex menu fixed-FVF/custom-declaration restoration, 4 destructive mutants")
