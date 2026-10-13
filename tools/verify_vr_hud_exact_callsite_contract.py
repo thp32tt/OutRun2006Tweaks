@@ -350,10 +350,14 @@ def check(ui, manifest):
             "RankMarkerProjectedInfo = saved;")
     if "RankMarkerSub_hk = safetyhook::create_inline(" not in ui:
         fail("rank sub_4BAD20 entry hook is not installed")
-    ordered(rival, "rival anchor must be consumed once",
+    ordered(rival, "rival anchor must be consumed before exact direct draw",
             "const auto projectedAnchor = RivalMarkerProjectedInfo;",
             "RivalMarkerProjectedInfo = {};",
-            "TagAppendedNodes(")
+            "ScopedExactProducerSemantic producerScope(",
+            "Game::sprani_play_ae_auth_alpha(",
+            "TagAppendedNodes(before, scope,")
+    if rival.count("projected ? &projectedAnchor : nullptr") != 2:
+        fail("rival original Draw and newly queued siblings must share exact anchor")
     tag_nodes = function_body(ui, "static void TagAppendedNodes(")
     ordered(tag_nodes, "rival multi-node producer tagging",
             "tailAfter", "node = before[prio]", "RegisterSpriteNodeScope(")
