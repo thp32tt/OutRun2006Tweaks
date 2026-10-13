@@ -11,9 +11,9 @@
   "work_key": "DX11:MAG_ANISO_GAME_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "d61b4d65df9dc31da1b58be038d2ea0eef21366a",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -53,8 +53,8 @@
     "scope": "game MAXANISOTROPY and MAG_ANISOTROPIC into real native Draw sampler"
   },
   "acceptance_results": {
-    "static_regression": "PENDING",
-    "compile_build": "PENDING",
+    "static_regression": "PASS",
+    "compile_build": "PASS_EXACT_SHA",
     "game_visual_parity": "NEED_HMD_TEST",
     "gamepad": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
@@ -68,16 +68,51 @@
     "docs/automation/runs/CONVERSION-DX11-00656.json"
   ],
   "pipeline": {
-    "C0_RECOVER": "PASS HEAD and 00655 unique work key",
-    "C1_REVIEW": "PASS missing MAG-anisotropic game path",
-    "C2_IMPLEMENT": "PASS C++ capture/mirror and tests",
-    "C3_VALIDATE": "PENDING",
-    "C4_COMMIT": "IN_PROGRESS",
+    "C0_RECOVER": "PASS latest GitHub HEAD and unique work key",
+    "C1_REVIEW": "PASS live MAG_ANISOTROPIC native Draw gap",
+    "C2_IMPLEMENT": "PASS real game C++ sampler capture+mirror+14 mutation regression",
+    "C3_VALIDATE": "PASS exact SHA 5 required GitHub Gates",
+    "C4_COMMIT": "PASS C++ material result",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING"
+    "C6_STATE": "PASS separate bookkeeping"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Review exact-SHA GitHub Gates; do not claim runtime/gamepad PASS"
+  "next_action": "Quest3/VDXR and gamepad menu->vehicle selection->race screen/pixel parity UNTESTED; DXVK frozen. Next independent DX11 feature only; do not re-run 00656.",
+  "material_result_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+  "validation_bearing_result_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+  "result_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38348259453,
+      "conclusion": "success",
+      "validation_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38348259453"
+    },
+    "dx11_fast_structural": {
+      "id": 38348259448,
+      "conclusion": "success",
+      "validation_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38348259448"
+    },
+    "windows_build": {
+      "id": 38348263359,
+      "conclusion": "success",
+      "validation_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38348263359"
+    },
+    "openxr_architecture": {
+      "id": 38348263062,
+      "conclusion": "success",
+      "validation_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38348263062"
+    },
+    "hud_inspector": {
+      "id": 38348263064,
+      "conclusion": "success",
+      "validation_sha": "f79c98f544a54d62faa0c85b653654e3312a64ad",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38348263064"
+    }
+  }
 }
