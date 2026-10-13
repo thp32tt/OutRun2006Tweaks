@@ -28,6 +28,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <limits>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -83,9 +84,8 @@ constexpr UINT kWidth = 256;
 constexpr UINT kHeight = 144;
 constexpr UINT kMaxVertices = 1536;
 constexpr UINT kMaxIndices = 1536;
-// Rotate among eligible game Draws so an off-screen first Draw cannot starve
-// later visible candidates. Exactly one native submission is allowed per Present.
-constexpr UINT kProbeSlots = 64;
+// Rotate through the entire eligible game Draw population, not only the first
+// 64. The per-Present native Draw budget remains 1 or an explicitly opted-in 8.
 constexpr UINT kReadbackSlots = 3; // GPU event-fenced frame copies
 // D3D11 sampler range: reject rather than clamp unsupported D3D9 LOD offsets.
 constexpr float kMinMipLodBias = -16.0f;
@@ -3780,6 +3780,9 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         // Count every admitted state, including calls after this frame's one
         // native draw. Use that bounded population to rotate the next frame's
         // probe rather than sampling its same first triangle indefinitely.
+        // Never let an overflowing draw ordinal wrap to zero and spoof a
+        // previously sampled Draw; original D3D9 input/Draw still execute.
+        if (s.eligibleThisFrame == (std::numeric_limits<UINT>::max)()) return;
         const UINT candidateOrdinal = s.eligibleThisFrame++;
         ++s.eligible;
         if (!s.frameBatch.accepts(candidateOrdinal, s.probeSlot,
@@ -3965,8 +3968,11 @@ void before_game_present(IDirect3DDevice9* game) noexcept {
         } else if (s.pending) ++s.failed;
         s.pending = false;
         s.frameBatch.reset();
-        const UINT window = (std::min)(s.eligibleThisFrame, kProbeSlots);
-        s.probeSlot = window ? (s.probeSlot + 1u) % window : 0u;
+        // Menu/car/race frames often have more than 64 eligible draws. The
+        // cursor advances across the actual frame population; shrinking or
+        // empty populations reset it without skipping the D3D9 fallback.
+        s.probeSlot = GameNativeFrameBatch::next_probe_slot(
+            s.probeSlot, s.eligibleThisFrame);
         s.eligibleThisFrame = 0;
         // Opt-in-only evidence: a hooked game Draw is not proof that the
         // restricted FVF subset was admitted, nor that GPU pixels became

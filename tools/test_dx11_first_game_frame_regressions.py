@@ -174,15 +174,16 @@ def main() -> None:
             "untranslated native raster/output state was not rejected: " + original
         )
 
-    # Default diagnostic still samples exactly one rotating game Draw.
-    # A second explicit opt-in has independent fail-closed eight-Draw limits.
+    # Default diagnostic samples one rotating real game Draw. The cursor must
+    # reach late menu/car/race draws (>64) without enlarging the opt-in GPU
+    # batch (still eight Draws) or replacing original D3D9 gamepad behavior.
     sampling = (
         "const UINT candidateOrdinal = s.eligibleThisFrame++;",
         "++s.eligible;",
         "s.frameBatch.accepts(candidateOrdinal, s.probeSlot,",
         "env_batch_opt_in())) return;",
-        "const UINT window = (std::min)(s.eligibleThisFrame, kProbeSlots);",
-        "s.probeSlot = window ? (s.probeSlot + 1u) % window : 0u;",
+        "s.probeSlot = GameNativeFrameBatch::next_probe_slot(",
+        "s.probeSlot, s.eligibleThisFrame);",
         "s.eligibleThisFrame = 0;",
         "s.frameBatch.reset();",
     )
@@ -192,7 +193,7 @@ def main() -> None:
     assert broken != bridge and sampling[3] not in broken
     assert "s.probeSlot = 0;" in bridge
     batch = (ROOT / "src/vr/d3d11/native_game_frame_batch.hpp").read_text()
-    for invariant in ("kMaxDraws = 8u", "if (stopped) return false;",
+    for invariant in ("kMaxDraws = 8u", "next_probe_slot(", "if (stopped) return false;",
                       "if (!multi) return submitted == 0u && ordinal == slot;",
                       "return submitted < kMaxDraws && ordinal >= slot;",
                       "return !depth || depthDirection == 0u ||"):
@@ -209,6 +210,28 @@ def main() -> None:
         chosen.extend(hits)
         slot = (slot + 1) % min(population, 64)
     assert chosen == [0, 1, 2, 0, 1, 2, 0, 1]
+    assert "kProbeSlots = 64" not in bridge
+    # Positive/negative coverage: all 257 scene draws are selectable, not
+    # just the initial 64. Check a destructive source mutation is rejected.
+    def complete_scene_cursor(code: str) -> bool:
+        return (
+            "s.probeSlot = GameNativeFrameBatch::next_probe_slot(" in code
+            and "s.probeSlot, s.eligibleThisFrame);" in code
+            and "if (s.eligibleThisFrame == (std::numeric_limits<UINT>::max)()) return;" in code
+            and "const UINT candidateOrdinal = s.eligibleThisFrame++;" in code
+            and "kProbeSlots = 64" not in code
+        )
+    assert complete_scene_cursor(bridge)
+    broken_window = bridge.replace(
+        "s.probeSlot = GameNativeFrameBatch::next_probe_slot(",
+        "s.probeSlot = legacy_first_64_probe_slot(", 1)
+    assert broken_window != bridge and not complete_scene_cursor(broken_window)
+    probe = 0
+    visited = []
+    for _ in range(257):
+        visited.append(probe)
+        probe = probe + 1 if probe < 256 else 0
+    assert len(set(visited)) == 257 and visited[-1] == 256 and probe == 0
 
     # UpdateSurface requires identical source/destination formats, no MSAA,
     # and an entirely in-bounds rectangle. The game's backbuffer can be X8.

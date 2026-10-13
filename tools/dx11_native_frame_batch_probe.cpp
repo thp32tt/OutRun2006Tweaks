@@ -1,6 +1,7 @@
 #include "native_game_frame_batch.hpp"
 #include <cassert>
 #include <cstdint>
+#include <initializer_list>
 using outrun::vr::dx11::live_game_frame::GameNativeFrameBatch;
 int main() {
     GameNativeFrameBatch b{};
@@ -29,6 +30,20 @@ int main() {
     b.reset();
     b.succeeded(true,true);
     assert(b.accepts_depth(true,true) && !b.accepts_depth(true,false));
+    // 00675: full game scene coverage, including calls beyond the old 64
+    // probe window. 257 is intentionally non-power-of-two.
+    for (std::uint32_t population : {3u, 65u, 128u, 257u, 4096u}) {
+        std::uint32_t cursor = 0u;
+        for (std::uint32_t candidate = 0u; candidate < population; ++candidate) {
+            assert(cursor == candidate);
+            assert(b.first_draw() && b.accepts(cursor, cursor, false));
+            cursor = GameNativeFrameBatch::next_probe_slot(cursor, population);
+        }
+        assert(cursor == 0u);
+        assert(GameNativeFrameBatch::next_probe_slot(population + 20u, population) == 0u);
+        assert(GameNativeFrameBatch::next_probe_slot(9u, 0u) == 0u);
+    }
+    assert(GameNativeFrameBatch::next_probe_slot(0xffffffffu, 0xffffffffu) == 0u);
     b.reset();
     b.succeeded(true); b.abort();
     assert(!b.accepts(1,0,true));

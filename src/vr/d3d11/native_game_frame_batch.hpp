@@ -15,6 +15,14 @@ struct GameNativeFrameBatch {
         if (!multi) return submitted == 0u && ordinal == slot;
         return submitted < kMaxDraws && ordinal >= slot;
     }
+    // Traverse the complete eligible game Draw population. A legacy fixed
+    // 64-draw probe window starved later car-select and race-world draws.
+    // Explicit per-frame batch limits remain separate from this CPU cursor.
+    static constexpr std::uint32_t next_probe_slot(
+        std::uint32_t current, std::uint32_t eligible) noexcept {
+        return eligible != 0u && current < eligible - 1u
+            ? current + 1u : 0u;
+    }
     constexpr bool first_draw() const noexcept { return submitted == 0u; }
     constexpr bool clear_depth() const noexcept { return !depthReady; }
     constexpr bool accepts_depth(bool depth, bool reversed) const noexcept {
