@@ -53,6 +53,12 @@ def static_contract(src, workflow):
         "sortedTouched.clear(); // original dense fallback",
     ):
         assert token in c, ("classifier", token)
+    # Two independent guarded consumers share these exact predicates:
+    # <=512 direct reference list and 513..2048 sorted reference list.
+    # A mutation removing either boundary must be rejected even when the
+    # other path still retains the same token.
+    assert c.count("touched->size() <= vertexCount") == 2
+    assert c.count("usedMask->size() >= vertexCount") == 2
     assert c.index("for (const std::uint32_t index : *touched)") < c.index(
         "for (UINT visit = 0; visit < visitCount")
     assert "for (UINT i = 0; i < vertexCount && sampled < 512u; ++i)" not in c
