@@ -181,6 +181,7 @@ class D3DHooks : public Hook
 			DWORD prevColorWrite = 0;
 			DWORD prevFogEnable = FALSE;
 			DWORD prevFillMode = D3DFILL_SOLID;
+			DWORD prevClipPlaneEnable = 0;
 			// The game's last menu pass may leave a centred 4:3 viewport.
 			// Scissor/stencil overrides cannot make the side rails visible
 			// outside that viewport. Capture it before drawing any opaque bars.
@@ -199,6 +200,7 @@ class D3DHooks : public Hook
 				SUCCEEDED(d3ddev->GetRenderState(D3DRS_COLORWRITEENABLE, &prevColorWrite)) &&
 				SUCCEEDED(d3ddev->GetRenderState(D3DRS_FOGENABLE, &prevFogEnable)) &&
 				SUCCEEDED(d3ddev->GetRenderState(D3DRS_FILLMODE, &prevFillMode)) &&
+				SUCCEEDED(d3ddev->GetRenderState(D3DRS_CLIPPLANEENABLE, &prevClipPlaneEnable)) &&
 				validViewportSize &&
 				SUCCEEDED(d3ddev->GetViewport(&previousViewport));
 			if (clipStateReady)
@@ -271,6 +273,7 @@ class D3DHooks : public Hook
 				// The two values are restored with the other captured scene states.
 				d3ddev->SetRenderState(D3DRS_FOGENABLE, FALSE);
 				d3ddev->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+				d3ddev->SetRenderState(D3DRS_CLIPPLANEENABLE, 0);
 				// Borders get culled without this
 				d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
@@ -311,6 +314,7 @@ class D3DHooks : public Hook
 				d3ddev->SetRenderState(D3DRS_COLORWRITEENABLE, prevColorWrite);
 				d3ddev->SetRenderState(D3DRS_FOGENABLE, prevFogEnable);
 				d3ddev->SetRenderState(D3DRS_FILLMODE, prevFillMode);
+				d3ddev->SetRenderState(D3DRS_CLIPPLANEENABLE, prevClipPlaneEnable);
 				d3ddev->SetRenderState(D3DRS_CULLMODE, prevCullMode);
 				d3ddev->SetRenderState(D3DRS_ALPHABLENDENABLE, prevAlphaBlend);
 				d3ddev->SetRenderState(D3DRS_ZENABLE, prevZEnable);
