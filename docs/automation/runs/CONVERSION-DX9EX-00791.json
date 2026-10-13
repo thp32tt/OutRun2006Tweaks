@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00791",
+  "production_id": "CONVERSION-DX9EX-00791",
+  "event_id": "CONVERSION-DX9EX-00791-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "work_key": "DX9EX:VIS:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_NEEDS_VALIDATION",
+  "checkpoint": "C3_VALIDATE",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00791]",
+  "automation_validation": "PENDING_GITHUB_CI",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_r30_responsive_hud_anchor.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00791.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Restore full-gameplay speed, gear, running time and position glyph ownership through nested and direct BA9D0 producers, maintaining semantic peripheral layout on the XR eyes without corrupting GOAL or world HUD.",
+    "scope_boundary": "Original driving BA9D0 glyph producer and verified periphery contract only. Keep R30 render math, menu, ESC, F11, rank world markers, SkyGlow, DX11, DXVK and FFB unchanged.",
+    "trace_stages": [
+      "Original game's gear/rev, position, time-attack parents call BA9D0 direct and sometimes through unclassified helpers.",
+      "Game BA9D0 direct/glyph queue producers carry exact ScreenHud and OutRunHudPeripheralText tokens through SpriteNodes into R30 XYZRHW draws.",
+      "R30 computes a group-safe asymmetric XR per-eye peripheral anchor for trusted owner tokens; no other HUD or world semantics receive this entitlement."
+    ],
+    "subcomponents": [
+      "Restore a nested peripheral parent's lifetime only for unclassified BA9D0 helper calls, retaining the exact authorizing parent scope until exit.",
+      "Reject inherited peripheral permissions for classified GOAL, C2C, projected world, and unrelated HUD callers; preserve the existing semantic restoration and opt-in scale path."
+    ],
+    "acceptance_items": [
+      {
+        "id": "GAMEPLAY_HUD_GLYPH_OWNER",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ba9d0_direct_nested_queue_ownership",
+        "expected_behavior": "Exact direct driving HUD remains peripheral; a nested unclassified internal BA9D0 glyph preserves its parent's peripheral token until scope unwinds."
+      },
+      {
+        "id": "NEGATIVE_GOAL_WORLD_RESET",
+        "category": "fallback_regression",
+        "behavior_area": "classified_nonperipheral_and_scope_restoration",
+        "expected_behavior": "Classified GOAL, C2C, WorldBillboard and outer unmatched callers cannot inherit an active peripheral anchor and both scope booleans restore after nested return."
+      },
+      {
+        "id": "EXACT_SHA_WIN32_DOMAIN_HMD_SEPARATE",
+        "category": "integrated_validation",
+        "behavior_area": "win32_x86_host_game_package_and_domain",
+        "expected_behavior": "New exact SHA must pass DX9Ex Active Windows host/game/package and Domain Isolation; Quest3 visual correctness is independently UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "GAMEPLAY_HUD_GLYPH_OWNER": "PENDING_CI",
+    "NEGATIVE_GOAL_WORLD_RESET": "PENDING_CI",
+    "EXACT_SHA_WIN32_DOMAIN_HMD_SEPARATE": "PENDING_CI",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "The confirmed source BA9D0 hook already preserves previous ScreenHud ownership for nested callbacks, but forcibly overwrites previous peripheral entitlement before dispatching nested glyphs.",
+    "root_cause": "The driving-producer token follows the inner helper's unclassified return site instead of inheriting the exact producer parent's bounded lifetime; exact HUD group glyphs can recenter on nested producer emission.",
+    "source_trace": [
+      "Exact OutRun desktop caller mappings classify three peripheral producer families versus GOAL/world.",
+      "The nested BA9D0 owner sets ScreenHud plus scoped exact producer for direct draw and for queued clip/sprani SpriteNodes.",
+      "The R30 exact peripheral draw accepts only ScreenHud plus OutRunHudPeripheralText and computes bilateral geometry."
+    ],
+    "alternatives_rejected": [
+      "Do not expand ScreenHud to generic overlays or infer peripheral layout merely from screen positions; known GOAL and world classes retain distinct ownership."
+    ],
+    "fix_evidence": "Restrict carry-forward to Unknown nested BA9D0 reentry under a previously verified driving parent; leave explicit classified nonperipheral cases excluded.",
+    "negative_test_evidence": "Existing and new Python contract mutants exercise direct, inherited, known GOAL, world, neutral context and scoped restoration. HMD remains pending.",
+    "eye_ownership": "Original tagged gameplay HUD is mapped to both eyes by R30; only exact approved peripheral group draws receive the extra shared offset/boost."
+  },
+  "ci_evidence": {
+    "status": "NOT_YET_RUN"
+  },
+  "runtime_status": "NEED_QUEST3_VDXR_TEST"
+}

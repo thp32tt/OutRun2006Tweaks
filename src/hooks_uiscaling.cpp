@@ -635,11 +635,18 @@ class UIScaling : public Hook
 		// Producer-callsite whitelist, not position-only inference: the
 		// generic OutRunHudText token also includes protected GOAL and other
 		// screen HUD. Preserve those sibling glyphs and their queue scopes.
+		// BA9D0 can reenter through an unclassified helper while an
+		// exact driving-HUD parent owns the glyph group. Keep that parent's
+		// peripheral identity for the nested call, then restore it at exit.
+		// A classified non-peripheral HUD (including GOAL), or world marker,
+		// must NEVER borrow a parent's edge-anchor entitlement.
 		OutRunHudPeripheralText =
-			semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud &&
-			(OutRunVRHudSemantics::InRange(caller, 0x0B9000, 0x0B9200) || // gear/REV
-			 OutRunVRHudSemantics::InRange(caller, 0x0B9E00, 0x0BA100) || // rank
-			 OutRunVRHudSemantics::InRange(caller, 0x0BE300, 0x0BEA40)); // time attack, not GOAL
+			(semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud &&
+			 (OutRunVRHudSemantics::InRange(caller, 0x0B9000, 0x0B9200) || // gear/REV
+			  OutRunVRHudSemantics::InRange(caller, 0x0B9E00, 0x0BA100) || // rank
+			  OutRunVRHudSemantics::InRange(caller, 0x0BE300, 0x0BEA40))) || // time attack
+			(previousPeripheral &&
+			 semantic.space == OutRunVRHudSemantics::SpacePolicy::Unknown);
         // BA9D0 may rasterize immediately before its exact clip/sprani
         // children enter the SpriteNode queue. Unify ownership without
         // widening GOAL/+TIME/unknown callers or changing desktop fallback.

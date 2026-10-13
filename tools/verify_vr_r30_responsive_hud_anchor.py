@@ -123,6 +123,38 @@ for original, replacement in (
     assert mutated != owner
 print("PASS exact driving peripheral producer; protected GOAL/+TIME/unknown 4 negative mutants")
 
+# A reentrant BA9D0 text emission may enter through an unclassified internal
+# helper while the exact driving-HUD parent is still active. Preserve that
+# parent only for Unknown nested callers; classified GOAL, C2C HUD and
+# projected/world markers may not borrow the peripheral anchor.
+inherit_guard = owner[owner.index("OutRunHudPeripheralText =\\n".replace("\\n", "\n")):
+                      owner.index("// BA9D0 may rasterize", owner.index("OutRunHudPeripheralText =\\n".replace("\\n", "\n")))]
+assert "previousPeripheral &&" in inherit_guard
+assert "semantic.space == OutRunVRHudSemantics::SpacePolicy::Unknown" in inherit_guard
+assert inherit_guard.count("semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud") == 1
+def nested_peripheral(parent, space, exact=False):
+    return (space == "ScreenHud" and exact) or (parent and space == "Unknown")
+assert nested_peripheral(False, "ScreenHud", True)
+assert nested_peripheral(True, "Unknown")
+assert not nested_peripheral(False, "Unknown")
+assert not nested_peripheral(True, "ScreenHud")   # GOAL/other classified HUD
+assert not nested_peripheral(True, "WorldBillboard")
+assert not nested_peripheral(False, "ScreenHud")  # unrelated text
+assert "OutRunHudPeripheralText = previousPeripheral;" in owner
+for original, wrong in (
+    ("previousPeripheral &&", "false &&"),
+    ("SpacePolicy::Unknown);", "SpacePolicy::ScreenHud);"),
+    ("SpacePolicy::ScreenHud &&", "SpacePolicy::Unknown &&"),
+):
+    assert original in inherit_guard
+    mutated = inherit_guard.replace(original, wrong, 1)
+    assert not all(x in mutated for x in (
+        "previousPeripheral &&",
+        "SpacePolicy::Unknown);",
+        "SpacePolicy::ScreenHud &&"))
+print("PASS nested driving text owner, classified GOAL/world exclusions and 3 destructive mutations")
+
+
 
 
 # Sparse semantic bbox must be identical to the masked full traversal,
