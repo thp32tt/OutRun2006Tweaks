@@ -8,7 +8,7 @@
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "ChatGPT2",
-  "feature_id": null,
+  "feature_id": "MENU_RACE_PARTIAL_VIEWPORT_NATIVE_DRAW",
   "work_key": "DX11:GAME_MENU_RACE_PARTIAL_VIEWPORT_NATIVE_DRAW",
   "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
@@ -19,7 +19,7 @@
   "material_result_sha": "d6d03e37d5a35f578990d7c8d361427eae54004d",
   "validation_bearing_result_sha": "d6d03e37d5a35f578990d7c8d361427eae54004d",
   "feature_contract": {
-    "feature_id": null,
+    "feature_id": "MENU_RACE_PARTIAL_VIEWPORT_NATIVE_DRAW",
     "goal": "Preserve real OutRun D3D9 menu, car-selection and race partial viewport/scissor coordinates when submitting the native D3D11 Draw/DrawIndexed diagnostic inset, without replacing original D3D9 input/rendering.",
     "acceptance_items": [
       {
@@ -43,8 +43,8 @@
     ]
   },
   "acceptance_results": {
-    "partial-viewport-native": "PASS_EXACT_SHA (source integration/CI; HMD runtime UNTESTED)",
-    "scissor-and-fallback": "PASS_EXACT_SHA (source assertions/CI; gamepad runtime UNTESTED)",
+    "partial-viewport-native": "PASS_EXACT_SHA",
+    "scissor-and-fallback": "PASS_EXACT_SHA",
     "exact-sha-build": "PASS_EXACT_SHA"
   },
   "changed_files": [
@@ -96,5 +96,35 @@
     "source_modifications": false,
     "ci_rerun": false
   },
-  "next_action": "C6 build-verification complete; Quest3/VDXR HMD and actual gamepad/menu/race runtime remain UNTESTED; do not rescore or rerun this TASK_ID."
+  "next_action": "C6 build-verification complete; Quest3/VDXR HMD and actual gamepad/menu/race runtime remain UNTESTED; do not rescore or rerun this TASK_ID.",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Capture real D3D9 game primary render-target and partial viewport plus scissor",
+      "Map source window to native inset and bind per native Draw/Indexed without touching D3D9 input",
+      "Preserve original DX9Ex Draw/Present/gamepad and fail closed outside valid source target"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_backbuffer_admission.hpp"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Source viewport and scissor coordinates reach native per-draw raster mapping",
+      "negative_regression": "Out of bounds or empty viewport and unsupported source target retain original game draw",
+      "component_integration": "Game D3D9 GetViewport/GetRenderTarget through native D3D11 DrawIndexed and diagnostic Present inset"
+    },
+    "conflict_keys": [
+      "DX11:GAME_MENU_RACE_PARTIAL_VIEWPORT_NATIVE_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Exact SHA prior GitHub gates succeeded; game/HMD visual parity separately UNTESTED.",
+    "activation_guard_and_fallback": "Diagnostic opt-in only; nonmatching viewport/scissor remains on original D3D9 Draw/Present/gamepad."
+  }
 }

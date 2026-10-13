@@ -1,4 +1,5 @@
 #include "native_shared_eye_ring.hpp"
+#include "native_game_eye_pair_sources.hpp"
 
 #include <dxgi.h>
 
@@ -332,8 +333,10 @@ namespace outrun::vr::dx11
                 desc.ArraySize != 1 || desc.SampleDesc.Count != 1 ||
                 desc.SampleDesc.Quality != 0 ||
                 desc.Usage != D3D11_USAGE_DEFAULT || desc.CPUAccessFlags != 0 ||
-                source == entry.eye[0].Get() ||
-                source == entry.eye[1].Get())
+                // Only a native color-output producer is eligible. SRV-only
+                // or copied staging data is not a game-authored eye draw.
+                (desc.BindFlags & D3D11_BIND_RENDER_TARGET) == 0u)
+
                 return false;
             Microsoft::WRL::ComPtr<ID3D11Device> owner;
             source->GetDevice(owner.GetAddressOf());
@@ -345,6 +348,39 @@ namespace outrun::vr::dx11
         // native GPU commands, so the original DX9Ex frame remains usable.
         if (!exact_source(left_source) || !exact_source(right_source))
             return false;
+        // Even when texture interfaces differ, both eyes may alias the same
+        // underlying COM allocation. No ring-owned output from ANY slot may
+        // become a producer source: published eyes remain immutable until ACK.
+        // Canonical IUnknown identity is stable while the ring owns resources.
+        const auto canonical_identity = [](
+            ID3D11Texture2D* source,
+            Microsoft::WRL::ComPtr<IUnknown>& identity) noexcept {
+            return source && SUCCEEDED(source->QueryInterface(
+                __uuidof(IUnknown),
+                reinterpret_cast<void**>(identity.GetAddressOf()))) &&
+                identity.Get() != nullptr;
+        };
+        Microsoft::WRL::ComPtr<IUnknown> leftIdentity, rightIdentity;
+        if (!canonical_identity(left_source, leftIdentity) ||
+            !canonical_identity(right_source, rightIdentity))
+            return false;
+        std::array<std::uintptr_t, OutRunVR::RenderFrameRingSize * 2u> owned{};
+        for (std::size_t n = 0; n < slots_.size(); ++n) {
+            for (std::size_t eyeIndex = 0; eyeIndex < 2u; ++eyeIndex) {
+                Microsoft::WRL::ComPtr<IUnknown> identity;
+                if (!canonical_identity(slots_[n].eye[eyeIndex].Get(), identity))
+                    return false;
+                owned[n * 2u + eyeIndex] =
+                    reinterpret_cast<std::uintptr_t>(identity.Get());
+            }
+        }
+        if (!native_game_eye_pair_sources_admitted(
+                reinterpret_cast<std::uintptr_t>(leftIdentity.Get()),
+                reinterpret_cast<std::uintptr_t>(rightIdentity.Get()),
+                owned))
+            return false;
+        // All rejection paths precede both GPU commands. The acquired slot
+        // remains cancelable and original D3D9 rendering/input is untouched.
         context->CopyResource(entry.eye[0].Get(), left_source);
         context->CopyResource(entry.eye[1].Get(), right_source);
         return signal_producer_fence(context, slot, frame_id);
