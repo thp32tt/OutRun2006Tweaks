@@ -292,7 +292,16 @@ class D3DHooks : public Hook
 				std::uint32_t lw = 0, lh = 0, rw = 0, rh = 0;
 				if (OutRunVRStereo::R23TryGetPublishedEyeExtent(0, lw, lh) &&
 					OutRunVRStereo::R23TryGetPublishedEyeExtent(1, rw, rh) &&
-					lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u)
+					lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u &&
+					// Eye extents are published separately during a VDXR resize.
+					// Never mix one new eye with one stale eye to rebuild the
+					// full Segoe/DX9 atlas. Retain the last VR atlas until both
+					// dimensions converge; this is a transient frame, not a
+					// real source/eye aspect change.
+					std::fabs(static_cast<float>(lw) - static_cast<float>(rw)) <=
+						0.10f * static_cast<float>((std::max)(lw, rw)) &&
+					std::fabs(static_cast<float>(lh) - static_cast<float>(rh)) <=
+						0.10f * static_cast<float>((std::max)(lh, rh)))
 				{
 					const float sourceAspect = static_cast<float>(
 						Game::screen_resolution->x) /

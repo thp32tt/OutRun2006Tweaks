@@ -347,6 +347,68 @@ def check_font_density_hysteresis(hook: str) -> None:
     assert next_density(1.0, 99.) == 3.0
 
 
+
+def check_stereo_extent_coherence(hook: str) -> None:
+    """Mixed XR resize snapshots cannot produce a transient blurry F11 atlas."""
+    density = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
+        "// A new atlas needs a new font texture.", 1)[0]
+    owner = density[density.index("R23TryGetPublishedEyeExtent(0, lw, lh)"):
+                    density.index("const float sourceAspect")]
+    guards = (
+        "lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u",
+        "std::fabs(static_cast<float>(lw) - static_cast<float>(rw)) <=",
+        "0.10f * static_cast<float>((std::max)(lw, rw))",
+        "std::fabs(static_cast<float>(lh) - static_cast<float>(rh)) <=",
+        "0.10f * static_cast<float>((std::max)(lh, rh))",
+    )
+    for marker in guards:
+        assert marker in owner, "missing owner-side binocular extent gate: " + marker
+    assert owner.index(guards[0]) < owner.index(guards[1]) < owner.index(guards[3])
+    # Exact destructive mutations on either eye axis must be rejected.
+    for broken, replacement in (
+        (guards[1], "std::fabs(static_cast<float>(lw) - static_cast<float>(rw)) >="),
+        (guards[3], "std::fabs(static_cast<float>(lh) - static_cast<float>(rh)) >="),
+        (guards[2], "1.00f * static_cast<float>((std::max)(lw, rw))"),
+        (guards[4], "1.00f * static_cast<float>((std::max)(lh, rh))"),
+    ):
+        assert owner.count(broken) == 1
+        mutant = owner.replace(broken, replacement, 1)
+        assert not all(g in mutant for g in guards), broken
+
+    def consistent(left, right):
+        lw, lh = left
+        rw, rh = right
+        return (min(lw, lh, rw, rh) >= 480 and lw >= 640 and rw >= 640
+                and abs(lw-rw) <= .10 * max(lw, rw)
+                and abs(lh-rh) <= .10 * max(lh, rh))
+
+    old_eye = (1600, 1700)
+    new_eye = (2496, 2688)
+    assert consistent(new_eye, new_eye)
+    assert consistent(old_eye, old_eye)
+    assert not consistent(old_eye, new_eye)
+    assert not consistent(new_eye, old_eye)
+    assert not consistent((2496, 2100), new_eye)  # height-only transition
+    assert not consistent((2000, 2688), new_eye)  # width-only transition
+    assert consistent((2450, 2650), new_eye)  # normal modest per-eye variance
+    assert not consistent((0, 0), new_eye)
+    # A partial left/right update holds the previous density with no atlas
+    # rebuild; only a complete pair applies the new aspect bucket.
+    for source in ((1024, 768), (1920, 1080), (3440, 1440)):
+        current = factor(*source, *old_eye)
+        expected = factor(*source, *new_eye)
+        for left, right in ((new_eye, old_eye), (old_eye, new_eye),
+                            (new_eye, new_eye)):
+            candidate = factor(*source, *((
+                (left[0]+right[0]) / 2, (left[1]+right[1]) / 2
+            ))) if consistent(left, right) else current
+            if left != right:
+                assert candidate == current, (source, left, right)
+            else:
+                assert candidate == expected
+    print("PASS F11 binocular resize coherence: 3 aspects, 4 destructive controls")
+
+
 def main():
     hook, font, header = (p.read_text(encoding="utf-8")
                           for p in (HOOK, FONT, HEADER))
@@ -354,6 +416,7 @@ def main():
     semantic = (ROOT / "src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
     check(hook, font, header)
     check_font_density_hysteresis(hook)
+    check_stereo_extent_coherence(hook)
     check_transient_eye_extent_dropout(hook)
     check_shell_layout_mutations(font)
     check_shell_numeric_cases()
