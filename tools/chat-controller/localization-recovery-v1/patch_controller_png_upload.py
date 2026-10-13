@@ -36,7 +36,7 @@ def patch(source):
         source,
         'SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "C1", 20: "C2",\n'
         '                                30: "B", 40: "C1", 50: "C2"}',
-        '''SCHEDULED_LOCALIZATION_LANES = {minute: "A" for minute in range(0, 60, 3)}
+        '''SCHEDULED_LOCALIZATION_LANES = {minute: "A" for minute in range(0, 60, 10)}
 # A-only source-folder testing: manifest selects any valid A task ID.
 OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SMOKE_TASK_ID", "").strip()''',
         "minute-role-schedule",
@@ -69,6 +69,9 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
         '''async def send_message(page: Page, message: str, png_binding=None) -> str:
     """Send the source PNG first; never submit a text-only ImageGen producer task."""
     if png_binding is not None:
+        tool_status = await ensure_image_tool(page)
+        if tool_status != "CREATE_IMAGE_TOOL_SELECTED":
+            return "IMAGE_TOOL_NOT_SELECTED:" + tool_status
         status = await attach_png(page, png_binding)
         if status != "ATTACHMENT_UPLOAD_COMPLETED":
             log.error("PNG composer attachment not proven role=%s status=%s",
@@ -115,6 +118,9 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
     # Any non-A task is prohibited regardless of the pilot task ID.
     if CONTROLLER_MODE == "localization" and slot.name != "A":
         return
+    if CONTROLLER_MODE == "localization" and slot.name == "A" and _outrun_smoke_os.environ.get("OUTRUN_A_TILE_BATCH_QUEUE", "").lower() == "true":
+        result_probe = await confirm_visible_results(page, "/data/imagegen")
+        log.info("A batch result probe: %s", result_probe)
     png_binding = None
     if CONTROLLER_MODE == "localization" and slot.name == "A":
         png_binding, png_reason = load_binding(slot.name)
@@ -138,7 +144,7 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
         '''        await page.wait_for_timeout(1500)
         if png_binding is not None:
             proof = await verify_submission_receipt(
-                page, png_binding["task_id"], _outrun_smoke_os.path.basename(png_binding["path"]))
+                page, png_binding["task_id"], [_outrun_smoke_os.path.basename(p) for p in png_binding.get("paths", [png_binding["path"]])])
             if proof != "PERSISTED_CHAT_USER_MESSAGE_WITH_IMAGE_CONFIRMED":
                 return "SEND_UNVERIFIED"
         return "sent"''',
@@ -170,7 +176,7 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
     )
     # The import must be part of controller code itself; no executable startup
     # shell monkey-patching and no separate daemon.
-    import_line = 'from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt\nimport os as _outrun_smoke_os\n'
+    import_line = 'from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt, ensure_image_tool\nfrom app.tile_batch_queue import confirm_visible_results\nimport os as _outrun_smoke_os\n'
     lines = source.splitlines(keepends=True)
     future_imports = [i for i, line in enumerate(lines)
                       if line.startswith("from __future__ import ")]

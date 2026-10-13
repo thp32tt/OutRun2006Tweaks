@@ -31,12 +31,12 @@ jobs:
           assert mod.patch(result)==result, "patch must be idempotent"
           ast.parse(result)
           assert 'LOCALIZATION_SLOT_NAMES = ("A",)' in result
-          assert 'SCHEDULED_LOCALIZATION_LANES = {minute: "A" for minute in range(0, 60, 3)}' in result
+          assert 'SCHEDULED_LOCALIZATION_LANES = {minute: "A" for minute in range(0, 60, 10)}' in result
           assert 'SCHEDULED_LOCALIZATION_LANES = {0: "A", 10:' not in result
           schedule_assign = next(n for n in ast.parse(result).body if isinstance(n,ast.Assign) and
               any(isinstance(t,ast.Name) and t.id=="SCHEDULED_LOCALIZATION_LANES" for t in n.targets))
           schedule_value = eval(compile(ast.Expression(schedule_assign.value),"<controller-schedule>","eval"),{"range":range})
-          assert schedule_value == {minute:"A" for minute in range(0,60,3)}, schedule_value
+          assert schedule_value == {minute:"A" for minute in range(0,60,10)}, schedule_value
           assert '("B", "C1", "C2")' in result, "ensure retired slot backup covers all disabled roles"
           # Execute the actual patched load_registry with a legacy four-lane
           # checkpoint. All non-A slot URLs and counters must be safely saved.
@@ -86,14 +86,18 @@ jobs:
           assert "SUBMISSION_UNVERIFIED_DO_NOT_AUTO_RETRY" in result
           docker=(root/"Dockerfile").read_text()
           assert "COPY controller_png_attach.py" in docker
+          assert "COPY tile_batch_queue.py" in docker
+          assert "tile_batch_queue.py" in (root/"Dockerfile").read_text()
           assert "COPY patch_controller_png_upload.py" in docker
           assert "RUN python /tmp/patch_controller_png_upload.py /opt/outrun/app/controller.py" in docker
           c=yaml.safe_load((root/"docker-compose.yml").read_text())
           svc=c["services"]["outrun-chat-controller-localization-recovery"]
           env=svc["environment"]
-          assert env["AUTO_SEND"]=="true" and env["SCHEDULE_MINUTES"]=="0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57"
+          assert env["AUTO_SEND"]=="true" and env["SCHEDULE_MINUTES"]=="0,10,20,30,40,50"
           assert env["CHAT_SLOTS"]=="1"
-          assert [int(x) for x in env["SCHEDULE_MINUTES"].split(",")] == list(range(0,60,3))
+          assert env["OUTRUN_A_TILE_BATCH_QUEUE"]=="true"
+          assert env["OUTRUN_A_TILE_BATCH_SIZE"]=="5"
+          assert [int(x) for x in env["SCHEDULE_MINUTES"].split(",")] == list(range(0,60,10))
           assert env["SLOT_DEDUP_SECONDS"]=="180"
           assert env["MIN_SEND_GAP_SECONDS"]=="60"
           assert env["OUTRUN_A_SINGLE_SMOKE_TASK_ID"]==""
@@ -109,6 +113,8 @@ jobs:
           assert c["volumes"]["outrun_chat_localization_recovery_logs"]["name"]=="outrun_chat_localization_recovery_logs"
           print("A-ONLY CONTROLLER PATCH + BUILD + NAMED VOLUMES + BIND: STATIC PASS")
           PY
+      - name: Test five-source queue isolation, idempotence and five-result gate
+        run: python tools/chat-controller/localization-recovery-v1/tests/test_tile_batch_queue.py
       - name: Check distinct A inputs, SHA/CRC and duplicate-submit guard
         run: |
           python - <<'PY'

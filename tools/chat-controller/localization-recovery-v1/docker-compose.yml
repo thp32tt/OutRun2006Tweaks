@@ -15,10 +15,12 @@ services:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
       AUTO_SEND: "true"
-      # One A tab every 3 minutes; B/C1/C2 disabled. A manifest task IDs are once-only.
-      SCHEDULE_MINUTES: "0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57"
+      # One A tab every 10 minutes (up to five source tiles); B/C1/C2 disabled. A manifest task IDs are once-only.
+      SCHEDULE_MINUTES: "0,10,20,30,40,50"
       CHAT_SLOTS: "1"
-      OUTRUN_A_SINGLE_SMOKE_TASK_ID: "" # No Q217 pin; pending_A.json selects the task.
+      OUTRUN_A_SINGLE_SMOKE_TASK_ID: "" # No Q217 pin; batch queue selects 5 assets.
+      OUTRUN_A_TILE_BATCH_QUEUE: "true"
+      OUTRUN_A_TILE_BATCH_SIZE: "5"
       OUTRUN_A_PROJECT_NAME: "아웃런 한글화 신규"
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
@@ -28,7 +30,7 @@ services:
       PREFERRED_THINKING_LEVEL: "High"
       STRICT_THINKING_LEVEL: "false"
       FRESH_CHAT_EACH_RUN: "false"
-      CHAT_RECYCLE_RUNS: "5"
+      CHAT_RECYCLE_RUNS: "0" # Preserve the same chat while awaiting 5 generated results.
       RETRY_BUTTON_COOLDOWN_SECONDS: "60"
       VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
       STATUS_PORT: "8787"

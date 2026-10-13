@@ -1,9 +1,12 @@
 > **Current Portainer deployment profile (2026-10-13):** A-only source-folder trial.
 > This branch mounts `/home/chatgpt-runner2/work/image-src` at `/data/imagegen`;
-> `AUTO_SEND=true`, `SCHEDULE_MINUTES=0,3,…,57` (every 3 minutes), `CHAT_SLOTS=1` (A tab only),
+> `AUTO_SEND=true`, `SCHEDULE_MINUTES=0,10,20,30,40,50` (every 10 minutes; five source PNGs per batch), `CHAT_SLOTS=1` (A tab only),
 > and an empty `OUTRUN_A_SINGLE_SMOKE_TASK_ID` allow distinct A task manifests.
 > The historical four-lane schedule documented below is inactive for this Compose.
 > See [A_IMAGE_SRC_MOUNT_20261013.md](A_IMAGE_SRC_MOUNT_20261013.md).
+> Five-image HD tile batches use the official translation table and independent
+> PNG/SHA gates. See [A_HD_TILE_BATCH_10MIN_20261014.md](A_HD_TILE_BATCH_10MIN_20261014.md).
+> A successful ChatGPT upload is **not** five generated images or DDS QA PASS.
 > Rebuild/redeployment is **manual in Portainer**.
 
 # Localization Recovery Controller v1

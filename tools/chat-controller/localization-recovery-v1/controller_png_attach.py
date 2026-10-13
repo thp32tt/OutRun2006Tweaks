@@ -4,6 +4,7 @@ Input is an operator-staged JSON manifest in /data/imagegen/pending_A.json or
 pending_B.json. This module never invokes the paid Images API, starts Docker,
 or marks an image as generated. UI attachment is not ImageGen completion.
 """
+import datetime as dt
 import hashlib
 import json
 import os
@@ -32,6 +33,9 @@ def load_binding(role, root=ROOT):
     if pilot and role != "A":
         return None, "PILOT_ROLE_BLOCKED"
     root = Path(root).resolve()
+    if role == "A" and os.environ.get("OUTRUN_A_TILE_BATCH_QUEUE", "false").lower() == "true":
+        from app.tile_batch_queue import prepare_next_binding
+        return prepare_next_binding(root)
     manifest = root / ("pending_" + role + ".json")
     if not manifest.is_file() or manifest.is_symlink():
         return None, "SOURCE_REFERENCE_NOT_BOUND"
@@ -139,8 +143,66 @@ async def prepare_a_project_target(page, project_name, allow_saved_chat=False):
         return "A_PROJECT_NAVIGATION_UNVERIFIED"
 
 
+async def ensure_image_tool(page):
+    """Prove the actual Create image tool pill in ChatGPT composer."""
+    try:
+        pill = page.locator('[data-inline-selection-pill][data-system-hint-type="picture_v2"]')
+        if await pill.count() and await pill.first.is_visible():
+            return "CREATE_IMAGE_TOOL_SELECTED"
+        menu = page.get_by_role("button", name="Add files and more")
+        if await menu.count() != 1:
+            return "IMAGE_TOOL_MENU_MISSING"
+        await menu.click(timeout=5000)
+        option = page.get_by_text("Create image", exact=True)
+        if await option.count() != 1:
+            await page.keyboard.press("Escape")
+            return "CREATE_IMAGE_OPTION_MISSING"
+        await option.click(timeout=6000)
+        await pill.first.wait_for(state="visible", timeout=5000)
+        return "CREATE_IMAGE_TOOL_SELECTED"
+    except Exception:
+        return "CREATE_IMAGE_TOOL_NOT_VERIFIED"
+
+
+async def attach_batch_pngs(page, binding):
+    """Upload exactly five individual files in one composer attachment operation."""
+    paths = binding["paths"]
+    expected = [Path(s).name for s in paths]
+    if len(paths) != 5 or len(set(expected)) != 5:
+        return "BATCH_MUST_HAVE_FIVE_DISTINCT_PNG"
+    try:
+        if not page.url.startswith("https://chatgpt.com/"):
+            return "TARGET_ORIGIN_NOT_CHATGPT"
+        await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(
+            state="visible", timeout=12000)
+        inp = page.locator('input[type="file"][aria-label="Attach files"]')
+        if await inp.count() != 1:
+            return "ATTACH_FILES_INPUT_NOT_FOUND"
+        await inp.set_input_files(paths, timeout=40000)
+        await page.wait_for_function(
+            r"""files=>{
+              const visible=e=>!!e.getClientRects().length;
+              const images=[...document.querySelectorAll('img[alt]')].filter(e=>
+                  visible(e)&&e.complete&&e.naturalWidth>0);
+              const buttons=[...document.querySelectorAll('button[aria-label]')].filter(visible);
+              const uploading=[...document.querySelectorAll('[aria-label^="Uploading "]')].filter(visible);
+              return files.every(name=>{
+                 const stem=name.replace(/\.png$/i,'');
+                 const same=x=>x===name||(x.startsWith(stem+'(')&&x.endsWith(').png'));
+                 return images.some(e=>same(e.alt))&&
+                        buttons.some(e=>same((e.getAttribute('aria-label')||'').replace(/^Remove /,'')))&&
+                        !uploading.some(e=>same((e.getAttribute('aria-label')||'').replace(/^Uploading /,'')));
+              });
+            }""", arg=expected, timeout=120000)
+        return "ATTACHMENT_UPLOAD_COMPLETED"
+    except Exception:
+        return "ATTACHMENT_UPLOAD_NOT_VERIFIED"
+
+
 async def attach_png(page,binding):
     """Wait for a completed visible named file upload, not only a spinner."""
+    if len(binding.get("paths", [])) > 1:
+        return await attach_batch_pngs(page, binding)
     filename=Path(binding["path"]).name
     try:
         await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(state="visible",timeout=12000)
@@ -179,18 +241,19 @@ async def attach_png(page,binding):
 
 
 async def verify_submission_receipt(page,task_id,filename):
-    """Require a durable chat URL and a user message with the task ID and image."""
+    """Require persisted chat URL and exact user-message image count."""
+    filenames = filename if isinstance(filename, list) else [filename]
     try:
         await page.wait_for_function(
-            """task => {
+            """({task,count}) => {
               if(location.hostname!=='chatgpt.com' ||
                  !location.pathname.includes('/c/') ||
                  location.href.includes('local-chatgpt'))return false;
               return [...document.querySelectorAll('[data-message-author-role="user"]')]
                  .some(row=>(row.innerText||'').includes('UPLOAD_TASK_ID='+task) &&
-                   [...row.querySelectorAll('img')].some(img=>img.complete &&
-                     img.naturalWidth>0 && !!img.src));
-            }""",arg=task_id,timeout=45000)
+                   [...row.querySelectorAll('img')].filter(img=>img.complete &&
+                     img.naturalWidth>0 && !!img.src).length>=count);
+            }""",arg={"task":task_id,"count":len(filenames)},timeout=45000)
         return "PERSISTED_CHAT_USER_MESSAGE_WITH_IMAGE_CONFIRMED"
     except Exception:
         return "SEND_UNVERIFIED"
@@ -206,6 +269,11 @@ def mark_sent(binding, root=ROOT, status="CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFI
         "png_sha256": binding["png_sha256"],
         "source_dds_sha256": binding["source_dds_sha256"],
         "status": status,
+        "submitted_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "tiles": [
+            {"filename": x["filename"], "png_sha256": x["sha256"]}
+            for x in binding.get("tiles", [])
+        ],
     }
     with target.open("x", encoding="utf-8") as handle:
         json.dump(payload, handle, ensure_ascii=False, indent=2)

@@ -21,6 +21,7 @@ RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.p
 # Exact pinned controller source is patched at build time; never alter a live container.
 # Build fails closed if upstream Python anchors change.
 COPY controller_png_attach.py /opt/outrun/app/controller_png_attach.py
+COPY tile_batch_queue.py /opt/outrun/app/tile_batch_queue.py
 COPY patch_controller_png_upload.py /tmp/patch_controller_png_upload.py
 RUN python /tmp/patch_controller_png_upload.py /opt/outrun/app/controller.py \
  && python -m py_compile /opt/outrun/app/controller.py /opt/outrun/app/controller_png_attach.py \

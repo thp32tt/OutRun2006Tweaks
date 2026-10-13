@@ -35,12 +35,12 @@ jobs:
           from pathlib import Path
           x=Path('tools/chat-controller/localization-recovery-v1/docker-compose.yml').read_text()
           assert 'CHAT_SLOTS: "1"' in x
-          assert 'SCHEDULE_MINUTES: "0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57"' in x
+          assert 'SCHEDULE_MINUTES: "0,10,20,30,40,50"' in x
           assert 'OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""' in x
           assert 'source: /home/chatgpt-runner2/work/image-src' in x
           assert 'target: /data/imagegen' in x
           assert 'CHROME_RECYCLE_INTERVAL_MINUTES: "120"' in x
-          assert 'CHAT_RECYCLE_RUNS: "5"' in x
+          assert 'CHAT_RECYCLE_RUNS: "0"' in x
           assert 'AUTO_SEND: "true"' in x
           assert 'REQUIRE_PROJECT_URL: "false"' in x
           assert '6082:6080' in x and '8788:8787' in x
@@ -58,7 +58,7 @@ jobs:
           set -euo pipefail
           docker run -d --name recovery-v1-smoke \
             -e AUTO_SEND=false -e REQUIRE_PROJECT_URL=false \
-            -e CHAT_SLOTS=1 -e SCHEDULE_MINUTES="0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57" \
+            -e CHAT_SLOTS=1 -e SCHEDULE_MINUTES="0,10,20,30,40,50" \
             recovery-v1-chrome:test
           trap 'docker logs recovery-v1-smoke; docker rm -f recovery-v1-smoke >/dev/null 2>&1 || true' EXIT
           ok=0
