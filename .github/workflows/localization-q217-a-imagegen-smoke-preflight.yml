@@ -78,7 +78,10 @@ jobs:
               assert len(env["load_registry"](now).slots)==1
               assert [item["name"] for item in __import__("json").loads(state_file.read_text())["slots"]] == ["A"]
           assert 'if CONTROLLER_MODE == "localization" and slot.name != "A":' in result
-          assert "ATTACHED_PREVIEW_CONFIRMED" in result
+          assert "ATTACHMENT_UPLOAD_COMPLETED" in result
+          assert "verify_submission_receipt" in result
+          assert "A_PROJECT_COMPOSER_READY" in result
+          assert "verify_task_id_missing" in result
           assert "SOURCE_REFERENCE_NOT_BOUND" in result
           assert "SUBMISSION_UNVERIFIED_DO_NOT_AUTO_RETRY" in result
           docker=(root/"Dockerfile").read_text()
@@ -94,6 +97,7 @@ jobs:
           assert env["SLOT_DEDUP_SECONDS"]=="180"
           assert env["MIN_SEND_GAP_SECONDS"]=="60"
           assert env["OUTRUN_A_SINGLE_SMOKE_TASK_ID"]==""
+          assert env["OUTRUN_A_PROJECT_NAME"]=="아웃런 한글화 신규"
           assert env["WATCHDOG_ENABLED"]=="false"
           assert env["REQUIRE_PROJECT_URL"]=="false", "standalone A must not force AUTO_SEND off"
           assert svc["pull_policy"]=="build"
@@ -132,5 +136,20 @@ jobs:
               manifest["png_sha256"]="0"*64
               (root/"pending_A.json").write_text(json.dumps(manifest),encoding="utf-8")
               assert mod.load_binding("A",root)[1]=="PNG_SHA_MISMATCH", "fail closed on stale/corrupt PNG"
-              print("TWO A SOURCE INPUTS + DUPLICATE GUARD + SHA FAIL-CLOSED: PASS")
+              # Regression: a missing persisted receipt must never count as sent.
+          import asyncio
+          class NoReceipt:
+              async def wait_for_function(self, *a, **kw):
+                  raise TimeoutError("no durable user bubble with image")
+          assert asyncio.run(mod.verify_submission_receipt(
+              NoReceipt(), "OUTRUN-A-TEST", "source.png"))=="SEND_UNVERIFIED"
+          class WrongOrigin:
+              url="https://example.invalid/"
+          assert asyncio.run(mod.prepare_a_project_target(
+              WrongOrigin(), "아웃런 한글화 신규"))=="TARGET_ORIGIN_NOT_CHATGPT"
+          assert "ATTACHMENT_UPLOAD_COMPLETED" in path.read_text()
+          assert "data-message-author-role" in path.read_text()
+          assert "location.pathname.includes('/c/')" in path.read_text()
+          print("A receipt and project-target false-success guards: PASS")
+          print("TWO A SOURCE INPUTS + DUPLICATE GUARD + SHA FAIL-CLOSED: PASS")
           PY

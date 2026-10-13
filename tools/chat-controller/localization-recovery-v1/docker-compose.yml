@@ -19,6 +19,7 @@ services:
       SCHEDULE_MINUTES: "0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57"
       CHAT_SLOTS: "1"
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: "" # No Q217 pin; pending_A.json selects the task.
+      OUTRUN_A_PROJECT_NAME: "아웃런 한글화 신규"
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
       CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"

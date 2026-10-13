@@ -51,3 +51,7 @@ After Portainer rebuild: verify mount and env values, ChatGPT authentication, ac
 ## History
 
 The Q217 one-shot pilot had a different host bind and a hard-coded `OUTRUN-A-Q217-IMG-SMOKE-20261013` gate. See `Q217_A_IMAGEGEN_SMOKE_DEPLOY_20261013.md` for historical evidence only; it is superseded by this operational procedure.
+
+## False-positive fix 2026-10-14
+
+Source upload is confirmed only after PNG thumbnail and Remove button exist and Uploading indicator disappears. A routes into the named Korean-localization project; it retains inline Create image mode while inserting text and does not mark the run as sent unless a durable chat URL, a user message with exact task ID, and a user image are all verified. Unverified submissions are held against duplicate sends. Preserve original disputed send evidence.

@@ -103,44 +103,82 @@ def load_binding(role, root=ROOT):
         return None, "INVALID_MANIFEST"
 
 
-async def attach_png(page, binding):
-    """File bytes through Playwright; require a NEW visible composer upload chip."""
-    before = await page.locator(PREVIEW).evaluate_all(
-        "nodes => nodes.filter(n => n.getClientRects().length > 0).length"
-    )
-    file_input = page.locator("input[type='file']")
+async def prepare_a_project_target(page, project_name, allow_saved_chat=False):
+    """Require the intended A project or verified existing chat before upload."""
+    from urllib.parse import urlsplit
     try:
-        if await file_input.count():
-            await file_input.last.set_input_files(binding["path"], timeout=12000)
-        else:
-            buttons = page.locator(
-                "button[aria-label*='Attach'], button[aria-label*='attach'], "
-                "button[aria-label*='Upload'], button[aria-label*='upload'], "
-                "[data-testid='composer-attach-button']"
-            )
-            if not await buttons.count():
-                return "FILE_INPUT_NOT_FOUND"
-            # A file chooser can open directly, or a menu can expose an input.
-            try:
-                async with page.expect_file_chooser(timeout=3000) as chooser:
-                    await buttons.first.click(timeout=4000)
-                await (await chooser.value).set_files(binding["path"])
-            except Exception:
-                file_input = page.locator("input[type='file']")
-                if not await file_input.count():
-                    return "FILE_CHOOSER_NOT_FOUND"
-                await file_input.last.set_input_files(binding["path"], timeout=12000)
-        await page.wait_for_function(
-            """({selector,before}) => {
-              const nodes=[...document.querySelectorAll(selector)];
-              return nodes.filter(n => n.getClientRects().length>0).length > before;
-            }""",
-            arg={"selector": PREVIEW, "before": before}, timeout=15000,
-        )
-        return "ATTACHED_PREVIEW_CONFIRMED"
+        url=urlsplit(page.url)
+        if url.scheme!="https" or url.hostname!="chatgpt.com":
+            return "TARGET_ORIGIN_NOT_CHATGPT"
+        if allow_saved_chat and "/c/" in url.path and "local-chatgpt" not in page.url:
+            await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(state="visible",timeout=12000)
+            return "A_PROJECT_COMPOSER_READY"
+        if not project_name:
+            return "A_PROJECT_NAME_MISSING"
+        in_project="/g/" in url.path and url.path.endswith("/project")
+        if in_project:
+            in_project=any(project_name in t for t in await page.locator("h1").all_inner_texts())
+        if not in_project:
+            btn=page.get_by_role("button",name="New chat in "+project_name,exact=True)
+            if await btn.count()!=1:
+                return "A_PROJECT_NEW_CHAT_BUTTON_NOT_FOUND"
+            await btn.dispatch_event("click")
+            await page.wait_for_url("**/g/*/project",timeout=18000)
+        if not any(project_name in t for t in await page.locator("h1").all_inner_texts()):
+            return "A_PROJECT_IDENTITY_NOT_VERIFIED"
+        await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(state="visible",timeout=12000)
+        return "A_PROJECT_COMPOSER_READY"
     except Exception:
-        return "ATTACHMENT_NOT_VERIFIED"
+        return "A_PROJECT_NAVIGATION_UNVERIFIED"
 
+
+async def attach_png(page,binding):
+    """Wait for a completed visible named file upload, not only a spinner."""
+    filename=Path(binding["path"]).name
+    try:
+        await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(state="visible",timeout=12000)
+        if not page.url.startswith("https://chatgpt.com/"):
+            return "TARGET_ORIGIN_NOT_CHATGPT"
+        prev=page.locator('button[aria-label="Remove '+filename+'"]')
+        if await prev.count():
+            await prev.first.dispatch_event("click")
+            await page.wait_for_timeout(500)
+        inp=page.locator('input[type="file"][aria-label="Attach files"]')
+        if await inp.count()!=1:
+            return "ATTACH_FILES_INPUT_NOT_FOUND"
+        await inp.set_input_files(binding["path"],timeout=25000)
+        await page.wait_for_function(
+            """filename => {
+             const visible=e=>!!e.getClientRects().length;
+             const image=[...document.querySelectorAll('img[alt]')].some(e=>
+                  visible(e) && e.alt===filename && e.complete && e.naturalWidth>0);
+             const remove=[...document.querySelectorAll('button[aria-label]')].some(e=>
+                  e.getAttribute('aria-label')==='Remove '+filename);
+             const loading=[...document.querySelectorAll('[aria-label]')].some(e=>
+                  e.getAttribute('aria-label')==='Uploading '+filename);
+             return image && remove && !loading;
+            }""",arg=filename,timeout=90000)
+        return "ATTACHMENT_UPLOAD_COMPLETED"
+    except Exception:
+        return "ATTACHMENT_UPLOAD_NOT_VERIFIED"
+
+
+async def verify_submission_receipt(page,task_id,filename):
+    """Require a durable chat URL and a user message with the task ID and image."""
+    try:
+        await page.wait_for_function(
+            """task => {
+              if(location.hostname!=='chatgpt.com' ||
+                 !location.pathname.includes('/c/') ||
+                 location.href.includes('local-chatgpt'))return false;
+              return [...document.querySelectorAll('[data-message-author-role="user"]')]
+                 .some(row=>(row.innerText||'').includes('UPLOAD_TASK_ID='+task) &&
+                   [...row.querySelectorAll('img')].some(img=>img.complete &&
+                     img.naturalWidth>0 && !!img.src));
+            }""",arg=task_id,timeout=45000)
+        return "PERSISTED_CHAT_USER_MESSAGE_WITH_IMAGE_CONFIRMED"
+    except Exception:
+        return "SEND_UNVERIFIED"
 
 def mark_sent(binding, root=ROOT, status="CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS"):
     """Prevent re-sending a stale source on later automatic schedules."""

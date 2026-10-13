@@ -70,7 +70,7 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
     """Send the source PNG first; never submit a text-only ImageGen producer task."""
     if png_binding is not None:
         status = await attach_png(page, png_binding)
-        if status != "ATTACHED_PREVIEW_CONFIRMED":
+        if status != "ATTACHMENT_UPLOAD_COMPLETED":
             log.error("PNG composer attachment not proven role=%s status=%s",
                       png_binding["role"], status)
             return "SOURCE_REFERENCE_NOT_BOUND:" + status
@@ -94,6 +94,16 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
         '    send_result = await send_message(page, prompt)\n'
         '    if send_result != "sent":',
         '''    # OUTRUN_PNG_UPLOAD_V1: per-role SHA-pinned source manifest, fail closed.
+    if CONTROLLER_MODE == "localization" and slot.name == "A":
+        target_status = await prepare_a_project_target(
+            page, _outrun_smoke_os.environ.get("OUTRUN_A_PROJECT_NAME", "").strip(),
+            allow_saved_chat=bool(slot.url))
+        if target_status != "A_PROJECT_COMPOSER_READY":
+            slot.last_result = "PROJECT_TARGET_BLOCKED:" + target_status
+            save_registry(reg)
+            write_runtime(status="project_target_blocked",
+                          last_action="A source withheld: " + target_status)
+            return
     # Any non-A task is prohibited regardless of the pilot task ID.
     if CONTROLLER_MODE == "localization" and slot.name != "A":
         return
@@ -119,26 +129,40 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
         '        await page.wait_for_timeout(1500)\n        return "sent"',
         '''        await page.wait_for_timeout(1500)
         if png_binding is not None:
-            # Do not mistake a preview + Enter keypress for server receipt.
-            try:
-                await page.wait_for_function(
-                    """task_id => {
-                      const draft = document.querySelector('#prompt-textarea');
-                      const draft_text = (draft?.innerText || draft?.textContent || '');
-                      const body_text = document.body?.innerText || '';
-                      return body_text.includes(task_id) && !draft_text.includes(task_id);
-                    }""",
-                    arg=png_binding["task_id"],
-                    timeout=30000,
-                )
-            except Exception:
+            proof = await verify_submission_receipt(
+                page, png_binding["task_id"], _outrun_smoke_os.path.basename(png_binding["path"]))
+            if proof != "PERSISTED_CHAT_USER_MESSAGE_WITH_IMAGE_CONFIRMED":
                 return "SEND_UNVERIFIED"
         return "sent"''',
         "post-send-confirmation",
     )
+    source = replace_once(
+        source,
+        '        try:\n'
+        '            await box.fill(message, timeout=15000)\n'
+        '        except Exception:',
+        """        try:
+            if png_binding is not None:
+                # Keep the inline Create image tool pill; fill() removes it.
+                await box.click(timeout=5000)
+                await box.press("End", timeout=3000)
+                await page.keyboard.insert_text(message)
+            else:
+                await box.fill(message, timeout=15000)
+        except Exception:""",
+        "preserve-image-tool",
+    )
+    source = replace_once(
+        source,
+        '        if ratio < 0.90 or ratio > 1.10:',
+        '        if png_binding is not None and "UPLOAD_TASK_ID=" + png_binding["task_id"] not in actual:\n'
+        '            return "verify_task_id_missing"\n'
+        '        if png_binding is None and (ratio < 0.90 or ratio > 1.10):',
+        "task-id-in-editor",
+    )
     # The import must be part of controller code itself; no executable startup
     # shell monkey-patching and no separate daemon.
-    import_line = 'from app.controller_png_attach import load_binding, attach_png, mark_sent\nimport os as _outrun_smoke_os\n'
+    import_line = 'from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt\nimport os as _outrun_smoke_os\n'
     lines = source.splitlines(keepends=True)
     future_imports = [i for i, line in enumerate(lines)
                       if line.startswith("from __future__ import ")]
