@@ -74,6 +74,38 @@ def static_contract(src, workflow):
     assert "scratch.used[static_cast<std::size_t>(local)] = 1;" in vb
     assert "scratch.indexDecode.valid = true;" not in vb  # published through next.valid
     assert "next.valid = true;" in vb
+    # Same IB mask generation may be sorted once for multiple VB updates;
+    # UP reuses capacity but never inherits the VB ordering. Unknown callers
+    # retain the original allocation/sort/dense fallback contract.
+    for token in (
+        "R30Scratch.busy &&",
+        "usedMask == &R30Scratch.used",
+        "touched == &R30Scratch.vbTouched",
+        "R30Scratch.indexDecode.valid",
+        "R30Scratch.indexDecode.vertexCount == vertexCount",
+        "R30Scratch.indexDecode.knownUsedCount == touched->size()",
+        "usedMask == &R30Scratch.upUsed",
+        "touched == &R30Scratch.upTouched",
+        "const bool sortedCacheHit = sortedCandidate && trustedVbHint &&",
+        "R30Scratch.vbDepthSortedGeneration ==",
+        "sortedTouched.size() == touched->size()",
+        "if (!sortedCacheHit)",
+        "sortedTouched.clear();",
+        "if (!sortedTouched.empty() && trustedVbHint)",
+    ):
+        assert token in c, ("sort lifecycle", token)
+    assert c.index("if (!sortedCacheHit)") < c.index(
+        "sortedTouched.assign(touched->begin(), touched->end());")
+    assert c.index("std::sort(sortedTouched.begin(), sortedTouched.end());") < c.index(
+        "R30Scratch.vbDepthSortedGeneration =")
+    assert "std::vector<std::uint32_t> vbSortedDepthTouched;" in src
+    assert "std::vector<std::uint32_t> upSortedDepthTouched;" in src
+    assert "std::uint64_t vbTouchGeneration = 1;" in src
+    assert "std::uint64_t vbDepthSortedGeneration = 0;" in src
+    decoder = vb.split("if (!cachedDecode)", 2)[-1]
+    assert "if (++scratch.vbTouchGeneration == 0)" in decoder
+    assert decoder.index("if (++scratch.vbTouchGeneration == 0)") < decoder.index(
+        "for (const std::uint32_t previous : scratch.vbTouched)")
     assert workflow.count("tools/verify_vr_r30_sparse_depth_classifier.py") == 2
 
 
@@ -92,6 +124,16 @@ def negative_mutations(src, workflow):
          "sortedTouched[n - 1u] != index"),
         ("vertexCount / touched->size() >= 8u",
          "vertexCount / touched->size() >= 0u"),
+        ("const bool sortedCacheHit = sortedCandidate && trustedVbHint &&",
+         "const bool sortedCacheHit = sortedCandidate &&"),
+        ("R30Scratch.vbDepthSortedGeneration ==",
+         "R30Scratch.vbDepthSortedGeneration !="),
+        ("usedMask == &R30Scratch.used",
+         "usedMask == &R30Scratch.upUsed"),
+        ("R30Scratch.indexDecode.valid &&",
+         "true &&"),
+        ("if (++scratch.vbTouchGeneration == 0)",
+         "if (scratch.vbTouchGeneration == 0)"),
         ("visit < visitCount && sampled < 512u", "visit < vertexCount"),
         ("baseProjection, usedMask, touched);", "baseProjection, usedMask, nullptr);"),
         ("&scratch.upUsed, nullptr, nullptr, nullptr,\n"
@@ -183,10 +225,53 @@ def parity():
                         mask, bad, quality, False)
 
 
+def cached_mask_lifecycle():
+    # Deterministic model: decoding generation changes must force a new
+    # exact ascending first-512 order; new VBs/projections with unchanged
+    # decoded IB reuse it. UP never inherits a different producer's hint.
+    rng = random.Random(805)
+    vb_sort_cache = None
+    cached_generation = 0
+    gen = 1
+    sort_count = 0
+
+    def classify_order(mask, touched, generation, source):
+        nonlocal vb_sort_cache, cached_generation, sort_count
+        stable = source == "vb"
+        if (stable and vb_sort_cache is not None and
+                cached_generation == generation and
+                len(vb_sort_cache) == len(touched)):
+            order = vb_sort_cache
+        else:
+            order = sorted(touched)
+            sort_count += 1
+            if stable:
+                vb_sort_cache, cached_generation = order, generation
+        return order[:512]
+
+    for n in (8192, 16384, 65536):
+        selected = rng.sample(range(n), 700)
+        mask = bytearray(n)
+        for i in selected:
+            mask[i] = 1
+        base = [i for i in range(n) if mask[i]][:512]
+        assert classify_order(mask, selected, gen, "vb") == base
+        for _ in range(15):
+            assert classify_order(mask, selected, gen, "vb") == base
+        assert sort_count == (n == 8192) + (n >= 16384) + (n >= 65536)
+        # UP is independent and always builds its own ascending order.
+        other = rng.sample(range(n), 700)
+        assert classify_order(mask, other, gen, "up") == sorted(other)[:512]
+        gen += 1  # decoded IB revision, span or mask changed
+        assert classify_order(mask, selected[::-1], gen, "vb") == base
+    assert sort_count == 9  # 3 VB misses + 3 UP + 3 decode invalidations
+
+
 if __name__ == "__main__":
     source = CPP.read_text(encoding="utf-8")
     workflow = WORKFLOW.read_text(encoding="utf-8")
     static_contract(source, workflow)
     negative_mutations(source, workflow)
     parity()
-    print("R30 sparse depth classifier: contract, 10 mutations, parity PASS; runtime UNTESTED")
+    cached_mask_lifecycle()
+    print("R30 sparse depth classifier: sort cache, generation invalidation, UP isolation, parity and mutations PASS; runtime UNTESTED")

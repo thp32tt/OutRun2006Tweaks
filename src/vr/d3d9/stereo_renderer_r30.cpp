@@ -295,6 +295,14 @@ namespace OutRunVRStereo
             // Reuse it across unchanged IB generations to seed sparse VB stereo
             // without scanning the full min..max vertex span per draw.
             std::vector<std::uint32_t> vbTouched;
+            // R30's 513..2048-reference depth classifier needs ascending
+            // first-512 order. Reuse scratch memory for both producers; only
+            // the VB result can survive across calls, fenced by the decoded
+            // IB mask generation. A failed/rebuilt decode must never reuse it.
+            std::vector<std::uint32_t> vbSortedDepthTouched;
+            std::vector<std::uint32_t> upSortedDepthTouched;
+            std::uint64_t vbTouchGeneration = 1;
+            std::uint64_t vbDepthSortedGeneration = 0;
             // UP has no validated IB revision and must not mutate VB masks.
             std::vector<std::uint8_t> upUsed;
             std::vector<std::uint32_t> upTouched;
@@ -2599,36 +2607,67 @@ namespace OutRunVRStereo
             // Sorting bounded unique references restores the *original*
             // ascending first-512 sample exactly (the <=512 direct path
             // remains untouched). Do not allocate for dense/small draws.
-            std::vector<std::uint32_t> sortedTouched;
-            if (!fastTouched && usedMask && touched &&
+            // The UP list changes on every call but its sort allocation can
+            // be reused while holding R30ScratchLease. The VB/IB mask stays
+            // immutable over a successful decoder generation; sorting it for
+            // every newly written VB or altered projection wasted CPU on the
+            // same large sparse index list. Never share scratch with a caller
+            // that did not acquire the lease.
+            std::vector<std::uint32_t> localSortedTouched;
+            const bool trustedVbHint = R30Scratch.busy &&
+                usedMask == &R30Scratch.used &&
+                touched == &R30Scratch.vbTouched &&
+                R30Scratch.indexDecode.valid &&
+                R30Scratch.indexDecode.vertexCount == vertexCount &&
+                R30Scratch.indexDecode.knownUsedCount == touched->size();
+            const bool trustedUpHint = R30Scratch.busy &&
+                usedMask == &R30Scratch.upUsed &&
+                touched == &R30Scratch.upTouched;
+            auto& sortedTouched = trustedVbHint
+                ? R30Scratch.vbSortedDepthTouched
+                : (trustedUpHint ? R30Scratch.upSortedDepthTouched
+                                 : localSortedTouched);
+            const bool sortedCandidate = !fastTouched && usedMask && touched &&
                 touched->size() > 512u && touched->size() <= 2048u &&
                 touched->size() <= vertexCount &&
                 usedMask->size() >= vertexCount &&
-                vertexCount / touched->size() >= 8u)
+                vertexCount / touched->size() >= 8u;
+            const bool sortedCacheHit = sortedCandidate && trustedVbHint &&
+                R30Scratch.vbDepthSortedGeneration ==
+                    R30Scratch.vbTouchGeneration &&
+                sortedTouched.size() == touched->size();
+            if (!sortedCacheHit)
             {
-                try
+                sortedTouched.clear();
+                if (sortedCandidate)
                 {
-                    sortedTouched.assign(touched->begin(), touched->end());
-                }
-                catch (...)
-                {
-                    sortedTouched.clear(); // original dense fallback
-                }
-                if (!sortedTouched.empty())
-                {
-                    std::sort(sortedTouched.begin(), sortedTouched.end());
-                    // Reject a corrupt, duplicated or incomplete hint.
-                    // Original producer owns the mask; absent membership or
-                    // duplicate references cannot change classification.
-                    for (std::size_t n = 0; n < sortedTouched.size(); ++n)
+                    try
                     {
-                        const std::uint32_t index = sortedTouched[n];
-                        if (index >= vertexCount || (*usedMask)[index] == 0 ||
-                            (n != 0u && sortedTouched[n - 1u] == index))
+                        sortedTouched.assign(touched->begin(), touched->end());
+                    }
+                    catch (...)
+                    {
+                        sortedTouched.clear(); // original dense fallback
+                    }
+                    if (!sortedTouched.empty())
+                    {
+                        std::sort(sortedTouched.begin(), sortedTouched.end());
+                        // Reject a corrupt or duplicate hint. A stale mask
+                        // always falls back to the original ascending scan.
+                        for (std::size_t n = 0; n < sortedTouched.size(); ++n)
                         {
-                            sortedTouched.clear();
-                            break;
+                            const std::uint32_t index = sortedTouched[n];
+                            if (index >= vertexCount ||
+                                (*usedMask)[index] == 0 ||
+                                (n != 0u && sortedTouched[n - 1u] == index))
+                            {
+                                sortedTouched.clear();
+                                break;
+                            }
                         }
+                        if (!sortedTouched.empty() && trustedVbHint)
+                            R30Scratch.vbDepthSortedGeneration =
+                                R30Scratch.vbTouchGeneration;
                     }
                 }
             }
@@ -4600,6 +4639,15 @@ namespace OutRunVRStereo
             if (!cachedDecode)
             {
                 scratch.indexDecode.valid = false;
+                // A new IB span/revision/local vertex range retires the
+                // previous sorted first-512 classifier hint before touching
+                // any mask bits. Wrap is fail-closed rather than matching an
+                // ancient generation after a theoretically long session.
+                if (++scratch.vbTouchGeneration == 0)
+                {
+                    scratch.vbTouchGeneration = 1;
+                    scratch.vbDepthSortedGeneration = 0;
+                }
                 // Only prior referenced mask bits can be nonzero. Clear them
                 // before resizing: shrink/grow must never revive stale bits.
                 // A failed partial decode still lists every marked index.
