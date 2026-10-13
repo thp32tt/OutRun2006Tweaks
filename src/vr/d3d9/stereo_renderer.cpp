@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "stereo_renderer_r7.inc"
+#include "vr/d3d11/live_game_frame_bridge.hpp"
 
 namespace OutRunVRStereo
 {
@@ -497,8 +498,22 @@ namespace OutRunVRStereo
 
 		HRESULT __stdcall SetRenderTargetDestR9(IDirect3DDevice9* device, DWORD index, IDirect3DSurface9* surface)
 		{
+			// A native diagnostic scene cannot span an RT0 switch, even when
+			// the game switches between equal-sized menu/car/race surfaces.
+			// Inspect only with explicit opt-in; the original COM call wins.
+			bool nativeTargetChanged = false;
+			if (index == 0 && !InternalStereoPass && IsGameDevice(device) &&
+				outrun::vr::dx11::live_game_frame::diagnostic_enabled())
+			{
+				IDirect3DSurface9* previous = nullptr;
+				const HRESULT query = device->GetRenderTarget(0, &previous);
+				nativeTargetChanged = FAILED(query) || previous != surface;
+				if (previous) previous->Release();
+			}
 			++R9RtCalls;
 			const HRESULT hr = R9SetRenderTargetCallbackHook.stdcall<HRESULT>(device, index, surface);
+			if (SUCCEEDED(hr) && nativeTargetChanged)
+				outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);
 			if (!IsGameDevice(device) || InternalStereoPass || FAILED(hr) || index != 0)
 				return hr;
 			if (surface == BackBuffer && R9DeferredDepth && TrackedDepthStencil == R9MainDepthIdentity)
@@ -515,6 +530,9 @@ namespace OutRunVRStereo
 		{
 			if (!IsGameDevice(device) || InternalStereoPass)
 				return R9ClearCallbackHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
+			// The next game scene starts with this Clear. Do not publish native
+			// Draws from the previous scene, even if the batch had reached its cap.
+			outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);
 			++R9ClearCalls;
 			const bool wanted = StereoWanted();
 			const bool mainTarget = TargetIsBackBuffer();

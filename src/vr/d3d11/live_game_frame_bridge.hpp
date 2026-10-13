@@ -25,6 +25,11 @@ void observe_indexed(IDirect3DDevice9* gameDevice, D3DPRIMITIVETYPE topology,
 // this never alters the original D3D9 HRESULT or input path.
 void observe_unavailable_game_draw(IDirect3DDevice9* gameDevice) noexcept;
 
+// A game-authored Clear or successful RT0 switch after a native Draw divides
+// a frame into incompatible surfaces. Discard the diagnostic batch; keep the
+// original D3D9 Clear, Draw, Present and gamepad dispatch untouched.
+void observe_scene_boundary(IDirect3DDevice9* gameDevice) noexcept;
+
 // Present draws an isolated inset only if native GPU pixels were produced.
 // Failure never propagates to the original game Present.
 void before_game_present(IDirect3DDevice9* gameDevice) noexcept;

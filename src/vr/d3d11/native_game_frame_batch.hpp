@@ -59,6 +59,12 @@ struct GameNativeFrameBatch {
             depthDirection = reversed ? 2u : 1u;
         }
     }
+    // A real game color/depth Clear or main render-target switch divides the
+    // Draw stream into different scenes. Even a completed eight-draw batch is
+    // invalid if its pixels were subsequently cleared before Present.
+    constexpr void scene_boundary() noexcept {
+        if (submitted != 0u) stopped = true;
+    }
     constexpr void abort() noexcept { stopped = true; }
     constexpr void reset() noexcept {
         submitted = 0u; stopped = false; depthReady = false;

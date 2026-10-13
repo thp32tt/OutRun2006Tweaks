@@ -4229,6 +4229,25 @@ void observe_indexed(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
     observe(game, type, primitives, vertices, stride, vertexCount, indices, indexCount);
 }
 
+void observe_scene_boundary(IDirect3DDevice9* game) noexcept {
+    if (!diagnostic_enabled() || !game) return;
+    try {
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        // Only the device that supplied the game-authored native Draw owns
+        // this batch. A menu/vehicle/race clear on a foreign auxiliary device
+        // cannot invalidate an unrelated game source.
+        if (s.sourceGameDevice != reinterpret_cast<std::uintptr_t>(game) ||
+            s.frameBatch.submitted == 0u) return;
+        s.frameBatch.scene_boundary();
+        // A GPU Draw may already have run, but its stale color must never be
+        // queued to the desktop backbuffer or host transport at Present.
+        s.pending = false;
+    } catch (...) {
+        // Optional diagnostic code cannot interfere with D3D9 game/input.
+    }
+}
+
 void observe_unavailable_game_draw(IDirect3DDevice9* game) noexcept {
     if (!diagnostic_enabled() || !game) return;
     try {
