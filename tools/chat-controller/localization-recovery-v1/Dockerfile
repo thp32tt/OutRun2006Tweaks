@@ -18,6 +18,14 @@ COPY chrome_maintenance.py /opt/outrun/app/chrome_maintenance.py
 COPY chrome-cache-clean.sh /opt/outrun/chrome-cache-clean.sh
 RUN cat /tmp/controller-parts/controller.py.part* > /opt/outrun/app/controller.py && python -m py_compile /opt/outrun/app/controller.py && rm -rf /tmp/controller-parts
 
+# Exact pinned controller source is patched at build time; never alter a live container.
+# Build fails closed if upstream Python anchors change.
+COPY controller_png_attach.py /opt/outrun/app/controller_png_attach.py
+COPY patch_controller_png_upload.py /tmp/patch_controller_png_upload.py
+RUN python /tmp/patch_controller_png_upload.py /opt/outrun/app/controller.py \
+ && python -m py_compile /opt/outrun/app/controller.py /opt/outrun/app/controller_png_attach.py \
+ && rm -f /tmp/patch_controller_png_upload.py
+
 COPY entrypoint.sh /opt/outrun/entrypoint.sh
 COPY prompts/localization_A.md /opt/outrun/prompts/localization_A.md
 COPY prompts/localization_B.md /opt/outrun/prompts/localization_B.md
