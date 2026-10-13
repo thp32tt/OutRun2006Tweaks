@@ -1,3 +1,11 @@
+## 2026-10-13 q217 A 단건 ChatGPT PNG/이미지 생성 실험 — 수동 Docker 배포
+
+사용자 최신 단건 시험 지시: `docs/OUTRUN_A_Q217_IMAGEGEN_SMOKE_20261013.md` 및 `--single-a-smoke` 스테이징을 사용한다. 이 모드는 기존 A/B/C1 정상 자동화 규칙을 영구 대체하지 않는 **명시적·임시 단건 모드**다. A q217의 해시 지정 PNG와 TASK_ID 하나만 송신, B/C1 스케줄 및 모든 watchdog 전송 차단, `AUTO_SEND=true` 유지, 중복 송신 차단. GitHub 변경 자체는 컨테이너 배포가 아니다. Portainer 스테이징·재배포·복원은 사용자 수동. 라이브 ChatGPT 첨부·이미지 생성·결과 PNG·DDS/게임 실기 성공은 각각 실제 증거가 생기기 전까지 UNTESTED.
+
+---
+
+# Korean Localization Automation Contract
+
 ## 2026-10-12 16:39 KST 사용자 수정: AUTO_SEND=true
 
 도커 준비 설정의 자동 전송 기본값은 `true`다. 이전 AUTO_SEND=false 강제 및 별도 수동 활성화 지시는 대체한다. 컨테이너 배포·재시작은 계속 사용자 수동이며, 설정 변경은 운영/E2E 검증 통과를 의미하지 않는다.
