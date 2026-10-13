@@ -5,9 +5,11 @@ import re
 
 NAME = 'outrun-chat-controller-localization-recovery'
 IMAGE_PREFIX = 'outrun-kor-plate-engine:'
+# Only one approved real A asset may be sent in the single-A manual-deploy pilot.
+A_SMOKE_TASK_ID = 'OUTRUN-A-Q217-IMG-SMOKE-20261013'
 
 
-def configure(compose, revision):
+def configure(compose, revision, single_a_smoke=False):
     if not re.fullmatch(r'[0-9a-f]{40}', revision):
         raise ValueError('Exact Git commit required')
     result = deepcopy(compose)
@@ -27,15 +29,19 @@ def configure(compose, revision):
         env = mapped
     if not isinstance(env, dict):
         raise ValueError('Environment must be mapping or list')
-    env.update(CHAT_SLOTS='3', SCHEDULE_MINUTES='0,10,30,40', AUTO_SEND='true')
+    env.update(CHAT_SLOTS='3', SCHEDULE_MINUTES='0' if single_a_smoke else '0,10,30,40', AUTO_SEND='true')
+    if single_a_smoke:
+        env['OUTRUN_A_SINGLE_SMOKE_TASK_ID'] = A_SMOKE_TASK_ID
+    else:
+        env.pop('OUTRUN_A_SINGLE_SMOKE_TASK_ID', None)
     service['environment'] = env
     service['image'] = IMAGE_PREFIX + revision[:12]
     return result
 
 
-def render(compose_text, revision):
+def render(compose_text, revision, single_a_smoke=False):
     import yaml
-    return yaml.safe_dump(configure(yaml.safe_load(compose_text), revision),
+    return yaml.safe_dump(configure(yaml.safe_load(compose_text), revision, single_a_smoke=single_a_smoke),
                           allow_unicode=True, sort_keys=False)
 
 
