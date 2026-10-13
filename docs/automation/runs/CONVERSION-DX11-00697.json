@@ -10,9 +10,9 @@
   "owner_id": "ChatGPT2",
   "feature_id": "GAME_OPENXR_TYPED_SRGB_STEREO_COMPOSITING",
   "work_key": "DX11:HOST_NATIVE_EYE_SRGB_XR_OUTPUT",
-  "status": "AWAITING_EXACT_SHA_GATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -85,7 +85,7 @@
   },
   "base_head_sha": "bcb92713c49f6cc3ddd52a56b39dd0c5bb49356c",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "3503193e86bfa1891e8f743b1e2da493890cfbb4",
   "changed_files": [
     "vrhost/src/runtime/native_direct_stereo_pair.hpp",
     "vrhost/src/main.cpp",
@@ -95,5 +95,6 @@
     "tools/test_dx11_host_srgb_handoff_00697.py",
     "docs/automation/runs/CONVERSION-DX11-00697.json"
   ],
-  "next_action": "Await exact-SHA full Backend Conversion Gate; runtime Quest3/VDXR and gamepad untested; no DXVK work."
+  "next_action": "C6 PASS_EXACT_SHA recorded for verified validation-bearing commit; Quest3/VDXR HMD and gamepad runtime remain UNTESTED. No re-run or source changes.",
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
