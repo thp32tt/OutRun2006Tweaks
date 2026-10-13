@@ -1,0 +1,97 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00773",
+  "production_id": "CONVERSION-DX9EX-00773",
+  "event_id": "CONVERSION-DX9EX-00773-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:MAIN_MENU",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C3_TARGETED_TEST_PENDING",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00773]",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Repair the complete Quest3 main-menu and car-select authored proportions across widescreen and clipped capture, including letterboxing, headset projection, and safe desktop/reset fallback.",
+    "scope_boundary": "Front-end and vehicle-select aspect placement only; excludes gameplay HUD, ESC controls, F11 atlas and unrelated lens effects.",
+    "trace_stages": [
+      "Original OutRun front-end texture and 4:3 UI letterbox producer",
+      "D3D9Ex game-side letterbox and Desktop Duplication sampled rectangle",
+      "R23 menu 4:3 UV extraction and OpenXR common per-eye optical projection",
+      "Host LOCAL stereo menu clip and composition to matching Quest3 eye views"
+    ],
+    "subcomponents": [
+      "4:3 menu UV cropping and source aspect selection",
+      "per-eye projected optical menu rectangle and clipped desktop fragment",
+      "capture/reset and no-crop desktop fallback"
+    ],
+    "acceptance_items": [
+      {
+        "id": "MAIN_ASPECT",
+        "category": "end_to_end_behavior",
+        "behavior_area": "menu_and_vehicle_selection",
+        "expected_behavior": "At 4:3 16:9 21:9, full authored main menu remains undistorted without sidebar zoom and with stable FOV optical center"
+      },
+      {
+        "id": "CLIPPED_CAPTURE",
+        "category": "end_to_end_behavior",
+        "behavior_area": "capture_and_projection",
+        "expected_behavior": "Partially clipped capture keeps surviving content at original relative optical position and full-authored size without distortion"
+      },
+      {
+        "id": "RESET_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "desktop_and_reset",
+        "expected_behavior": "Invalid UV, profile toggle, resolution change and portrait/desktop paths preserve safe no-crop fallback and retain accepted stereo and bars"
+      },
+      {
+        "id": "EXACT_SHA_BUILD",
+        "category": "integrated_validation",
+        "behavior_area": "game_host_package",
+        "expected_behavior": "Final exact-SHA DX9Ex Active full Win32 host/game/package, Domain Isolation and relevant Full Source Impact workflows are successful"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "MAIN_ASPECT": "PREEXISTING_BASELINE_PENDING_WHOLE_FEATURE_TEST",
+    "CLIPPED_CAPTURE": "SOURCE_FIX_AND_CXX_FIXTURE_STAGED_PENDING_CI",
+    "RESET_FALLBACK": "PREEXISTING_BASELINE_PENDING_INTEGRATED_GATE",
+    "EXACT_SHA_BUILD": "PENDING_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "User reported distorted main menu from Quest3/VDXR at 3440x1440, build 75ef9c91; no matching HMD re-test of the new source.",
+    "source_trace": [
+      "OutRun's authored 4:3 front-end with 21:9 game-produced letterbox bars",
+      "GetGameUv crops source output to visible clipped screen intersection; PlanVisibleCenteredContent extracts native authored contents",
+      "R23 host previously recomputed sourceAspect from the visible fragment and drew that fragment as the whole optically centered menu in identical left/right layers"
+    ],
+    "root_cause": "On partially visible desktop client, PlanVisibleCenteredContent produced visible fragment aspect but discarded original authored center/size. R23 re-centered/scaled fragment as a complete menu; missing rows/columns caused enlarged/misplaced UI while capture changed.",
+    "alternatives_rejected": [
+      "The game's original 4:3 sidebars are already drawn and verified by D3D9Ex letterbox code; this patch does not replace them",
+      "XR asymmetric-FOV common tangent math already maintains authored physical aspect on full captures; fragment misplacement arises after UV intersection, not eye-FOV averaging"
+    ],
+    "eye_ownership": "Main menu is one LOCAL fixed 4:3 raster shared through R23 projection to both eyes with identical UV and common FOV; game stereo HUD never enters this host fragment transform.",
+    "fix_evidence": "Keep original 4:3 optical projection and apply captured authored-fragment fractional offset/extent to the projected quad rather than using fragment aspect as a new complete menu.",
+    "negative_test_evidence": "Five source destructive controls plus C++ clipped top/dual-axis and 4:3 16:9 21:9 fixtures are added, execution by exact-SHA CI pending."
+  },
+  "changed_files": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp",
+    "tools/verify_vr_menu_letterbox_aspect.py"
+  ],
+  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "score_delta": 0,
+  "notes": "Initial nonterminal whole-function main-menu result; do not claim user-visible Quest3 fix, feature closure, scoreboard, or exact-SHA gate before workflow evidence. DXVK frozen."
+}

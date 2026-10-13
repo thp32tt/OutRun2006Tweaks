@@ -1481,6 +1481,8 @@ namespace
         // It is independent of the eye FOV and does not alter world/HUD.
         float sourceAspect = OutRunVrMenuAspect::PlanCapturedAspect(
             c.sourceWidth_, c.sourceHeight_, whole.w, whole.h, clientAspect);
+        float visibleOffsetX = 0.0f, visibleOffsetY = 0.0f;
+        float visibleWidthScale = 1.0f, visibleHeightScale = 1.0f;
 
         // Issue #119: the game's actual letterbox settings determine
         // whether the captured wide front-end has 4:3 authored content.
@@ -1518,7 +1520,15 @@ namespace
                 const float previousWidth = whole.w;
                 whole.x += previousWidth * plan.offsetX;
                 whole.w = previousWidth * plan.width;
-                sourceAspect = plan.aspect;
+                // Preserve the ORIGINAL authored 4:3 optical size, then
+                // place only the visible capture fragment at its original
+                // location. Using plan.aspect here zoomed and re-centred a
+                // clipped menu after moving the window across an output edge.
+                sourceAspect = 4.0f / 3.0f;
+                visibleOffsetX = plan.visibleOffsetX;
+                visibleOffsetY = plan.visibleOffsetY;
+                visibleWidthScale = plan.visibleWidthScale;
+                visibleHeightScale = plan.visibleHeightScale;
             }
         }
         // The forward gaze ray is not at NDC (0,0) for asymmetric
@@ -1529,17 +1539,25 @@ namespace
             OutRunVrMenuAspect::PlanOpticallyCenteredClip(common, sourceAspect);
         if (!placement.valid)
             return false;
+        const float visibleCenterX =
+            placement.centerX + placement.halfWidth * visibleOffsetX;
+        const float visibleCenterY =
+            placement.centerY - placement.halfHeight * visibleOffsetY;
+        const float visibleHalfWidth =
+            placement.halfWidth * visibleWidthScale;
+        const float visibleHalfHeight =
+            placement.halfHeight * visibleHeightScale;
         const float sx[4]{
-            placement.centerX - placement.halfWidth,
-            placement.centerX + placement.halfWidth,
-            placement.centerX - placement.halfWidth,
-            placement.centerX + placement.halfWidth
+            visibleCenterX - visibleHalfWidth,
+            visibleCenterX + visibleHalfWidth,
+            visibleCenterX - visibleHalfWidth,
+            visibleCenterX + visibleHalfWidth
         };
         const float sy[4]{
-            placement.centerY + placement.halfHeight,
-            placement.centerY + placement.halfHeight,
-            placement.centerY - placement.halfHeight,
-            placement.centerY - placement.halfHeight
+            visibleCenterY + visibleHalfHeight,
+            visibleCenterY + visibleHalfHeight,
+            visibleCenterY - visibleHalfHeight,
+            visibleCenterY - visibleHalfHeight
         };
         float clip[4][4]{};
         for (int corner = 0; corner < 4; ++corner)

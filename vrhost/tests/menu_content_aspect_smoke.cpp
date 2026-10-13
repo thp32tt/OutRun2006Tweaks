@@ -106,6 +106,32 @@ int main()
         1080.f / 1440.f, 4.f / 3.f);
     if (!offTop.crop || !near(offTop.aspect, 16.f / 9.f))
         return 18;
+    // Visible pixels are a SUB-RECTANGLE of the original authored 4:3
+    // geometry. Moving the window may clip the capture but must not zoom
+    // the surviving pixels up to the entire HMD menu plane.
+    if (!near(visible219.visibleOffsetX, 0.f) ||
+        !near(visible219.visibleOffsetY, 0.f) ||
+        !near(visible219.visibleWidthScale, 1.f) ||
+        !near(visible219.visibleHeightScale, 1.f) ||
+        !near(offLeft.visibleOffsetX, 0.f) ||
+        !near(offLeft.visibleWidthScale, 1.f) ||
+        !near(offRight.visibleOffsetX, 0.f) ||
+        !near(offRight.visibleWidthScale, 1.f) ||
+        !near(offTop.visibleOffsetY, 0.25f) ||
+        !near(offTop.visibleHeightScale, 0.75f))
+        return 20;
+    // Both edges cropped at once: check the original 4:3 centre and
+    // both XY scales, not only the sampled UV's effective aspect.
+    const auto partialMenu = PlanVisibleCenteredContent(
+        -1240, -360, 2200, 1080, 3440, 1440, 0, 0,
+        2200.f / 3440.f, 1080.f / 1440.f, 4.f / 3.f);
+    if (!partialMenu.crop ||
+        !near(partialMenu.visibleOffsetX, 0.25f) ||
+        !near(partialMenu.visibleOffsetY, 0.25f) ||
+        !near(partialMenu.visibleWidthScale, 0.75f) ||
+        !near(partialMenu.visibleHeightScale, 0.75f) ||
+        !near(partialMenu.aspect, 4.f / 3.f))
+        return 21;
     // Do not crop portrait/4:3, stale capture UV after a monitor move,
     // missing/reset source or a strip that cannot fit a coherent menu.
     if (PlanVisibleCenteredContent(

@@ -23,6 +23,14 @@ namespace OutRunVrMenuAspect
         float offsetX = 0.0f;  // fraction of the captured game client width
         float width = 1.0f;
         float aspect = 0.0f;
+        // Where the visible fragment belongs inside the ORIGINAL 4:3
+        // menu, in fractions of the full authored half-extent. A window
+        // clipped by Desktop Duplication must not zoom the surviving pixels
+        // back to the optical centre or distort their physical proportions.
+        float visibleOffsetX = 0.0f;
+        float visibleOffsetY = 0.0f;  // positive means below authored centre
+        float visibleWidthScale = 1.0f;
+        float visibleHeightScale = 1.0f;
     };
 
     // Projection spans are linear in tan(FOV), not in the angles themselves.
@@ -225,16 +233,34 @@ namespace OutRunVrMenuAspect
         const float visibleWidth = visibleRight - visibleLeft;
         const float sampledWidth = sampledRight - sampledLeft;
         const float sampledHeight = sampledBottom - sampledTop;
-        if (!(visibleWidth > 0.0f && sampledWidth > 0.0f &&
-              sampledHeight > 0.0f) ||
+        const float visibleTop = (std::max)(sampledTop, clientTop);
+        const float visibleBottom = (std::min)(sampledBottom, clientBottom);
+        const float visibleHeight = visibleBottom - visibleTop;
+        const float contentWidth = clientHeight * intendedAspect;
+        if (!(visibleWidth > 0.0f && visibleHeight > 0.0f &&
+              sampledWidth > 0.0f && sampledHeight > 0.0f &&
+              contentWidth > 0.0f) ||
             visibleWidth < 0.05f * sampledWidth)
             return {};
 
-        const float visibleAspect = visibleWidth / sampledHeight;
+        const float visibleAspect = visibleWidth / visibleHeight;
+        const float visibleOffsetX =
+            (visibleLeft + visibleRight - contentLeft - contentRight) /
+            contentWidth;
+        const float visibleOffsetY =
+            (visibleTop + visibleBottom - clientTop - clientBottom) /
+            clientHeight;
+        const float widthScale = visibleWidth / contentWidth;
+        const float heightScale = visibleHeight / clientHeight;
         if (!std::isfinite(visibleAspect) ||
-            visibleAspect < 0.5f || visibleAspect > 5.0f)
+            visibleAspect < 0.5f || visibleAspect > 5.0f ||
+            !std::isfinite(visibleOffsetX) ||
+            !std::isfinite(visibleOffsetY) ||
+            !(widthScale > 0.0f && widthScale <= 1.00001f) ||
+            !(heightScale > 0.0f && heightScale <= 1.00001f))
             return {};
         return { true, (visibleLeft - sampledLeft) / sampledWidth,
-            visibleWidth / sampledWidth, visibleAspect };
+            visibleWidth / sampledWidth, visibleAspect,
+            visibleOffsetX, visibleOffsetY, widthScale, heightScale };
     }
 }

@@ -679,3 +679,75 @@ for old, bad in (
     else:
         raise AssertionError("clip-plane restoration mutation escaped: " + old)
 print("PASS user clip plane menu isolation; 3 destructive controls")
+
+# The R23 host must apply both the ORIGINAL authored-menu crop and the
+# projected fragment position/extent. A UV-only crop followed by full-size
+# optical centering wrongly magnifies partially captured menu content.
+r23 = (Path(__file__).resolve().parents[1] / "vrhost/src/main_r23.cpp").read_text()
+menu_geometry = (Path(__file__).resolve().parents[1] /
+                 "vrhost/src/runtime/menu_content_aspect.hpp").read_text()
+
+def verify_visible_menu_fragment(code: str) -> None:
+    body = code.split("bool cropCentered43 = R23GameMenuIsLetterboxed", 1)[1].split(
+        "std::uint32_t image = 0;", 1)[0]
+    required = [
+        "PlanVisibleCenteredContent(",
+        "sourceAspect = 4.0f / 3.0f;",
+        "visibleOffsetX = plan.visibleOffsetX;",
+        "visibleOffsetY = plan.visibleOffsetY;",
+        "visibleWidthScale = plan.visibleWidthScale;",
+        "visibleHeightScale = plan.visibleHeightScale;",
+        "placement.centerX + placement.halfWidth * visibleOffsetX;",
+        "placement.centerY - placement.halfHeight * visibleOffsetY;",
+        "placement.halfWidth * visibleWidthScale;",
+        "placement.halfHeight * visibleHeightScale;",
+        "visibleCenterX - visibleHalfWidth,",
+        "visibleCenterY + visibleHalfHeight,"
+    ]
+    for token in required:
+        assert token in body, token
+    assert body.index("sourceAspect = 4.0f / 3.0f;") < body.index(
+        "PlanOpticallyCenteredClip(common, sourceAspect)")
+    assert body.index("placement.centerX + placement.halfWidth * visibleOffsetX;") < body.index(
+        "const float sx[4]")
+    assert "sourceAspect = plan.aspect;" not in body
+
+def verify_visible_fragment_source(code: str) -> None:
+    body = code.split("inline CropPlan PlanVisibleCenteredContent(", 1)[1]
+    for token in (
+        "const float visibleTop = (std::max)(sampledTop, clientTop);",
+        "const float visibleBottom = (std::min)(sampledBottom, clientBottom);",
+        "visibleWidth / contentWidth;",
+        "visibleHeight / clientHeight;",
+        "visibleOffsetX, visibleOffsetY, widthScale, heightScale"
+    ):
+        assert token in body, token
+
+verify_visible_menu_fragment(r23)
+verify_visible_fragment_source(menu_geometry)
+for old, bad in (
+    ("sourceAspect = 4.0f / 3.0f;", "sourceAspect = plan.aspect;"),
+    ("placement.centerY - placement.halfHeight * visibleOffsetY;",
+     "placement.centerY + placement.halfHeight * visibleOffsetY;"),
+    ("placement.halfWidth * visibleWidthScale;",
+     "placement.halfWidth;"),
+):
+    assert old in r23
+    try:
+        verify_visible_menu_fragment(r23.replace(old, bad, 1))
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("menu fragment geometry mutation survived: " + old)
+for old, bad in (
+    ("visibleWidth / contentWidth;", "sampledWidth / contentWidth;"),
+    ("visibleHeight / clientHeight;", "sampledHeight / clientHeight;"),
+):
+    assert old in menu_geometry
+    try:
+        verify_visible_fragment_source(menu_geometry.replace(old, bad, 1))
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("visible menu source mutation survived: " + old)
+print("PASS main-menu clipped-fragment geometry, 5 destructive controls")
