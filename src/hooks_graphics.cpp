@@ -270,10 +270,10 @@ class RestoreCarBaseShadow : public Hook
 				: OutRunVR::GameSemantic::RenderScope::None;
 			// The direct producer must not consume an unrelated pending
 			// HUD one-shot token or inherit a stale queue-owned scope.
-			OutRunVR::GameSemantic::ScopedExactProducerSemantic directWorld(
-				directWorldScope, nullptr, true);
 			// Keep the legacy RAII world scope immediately around the draw.
 			// This also preserves the original live-queue/desktop fallback.
+			OutRunVR::GameSemantic::ScopedExactProducerSemantic directWorld(
+				directWorldScope, nullptr, true);
 			OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
 				OutRunVR::GameSemantic::RenderScope::WorldParticle);
 			Game::DrawObjectAlpha_Internal(
