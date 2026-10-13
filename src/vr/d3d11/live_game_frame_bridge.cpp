@@ -2850,8 +2850,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             (std::max)(1u, (desc.Width + 3u) / 4u) *
                 (base.Format == D3DFMT_DXT1 ? 8u : 16u) :
             desc.Width * sourceTexelBytes;
-        const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) || extendedLuma || a8p8 ?
-            desc.Width * 4u : rowBytes;
+        const UINT uploadPitch = ((packed16 || luminance) || rgb24 || rgbaSwizzle) || extendedLuma ?
+            desc.Width * 4u : (a8p8 ? desc.Width * 4u : rowBytes);
         D3DLOCKED_RECT lock{};
         const HRESULT lockResult = gpuRenderTarget ?
             readbackSurface->LockRect(&lock, nullptr, D3DLOCK_READONLY) :
