@@ -146,6 +146,9 @@ jobs:
       - name: Verify native Z-write and read-only depth OM slot binding 00651
         if: startsWith(github.ref_name, 'vr-dx11-native')
         run: python tools/test_dx11_depth_state_binding_00651.py
+      - name: Verify live D3D9 ZFUNC ALWAYS native DSV 00652
+        if: github.ref_name == 'vr-dx11-native-r71'
+        run: python tools/test_dx11_depth_always_draw_00652.py
 
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'

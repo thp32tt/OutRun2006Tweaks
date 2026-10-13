@@ -29,6 +29,15 @@ int main() {
            game_native_depth_slot(true, false));
     assert(game_native_depth_slot(false, true) !=
            game_native_depth_slot(true, true));
+    // D3D9 menu/sky ALWAYS comparison admits both native Z-write modes.
+    assert(game_native_depth_admission(1,1,8,0,0,true,depth));
+    assert(depth.enabled && depth.always && depth.writeEnabled && !depth.lessEqual);
+    assert(game_native_depth_admission(1,0,8,0,0,true,depth));
+    assert(depth.enabled && depth.always && !depth.writeEnabled);
+    assert(game_native_depth_admission(1,1,2,0,0,true,depth));
+    assert(!depth.always && depth.writeEnabled && !depth.lessEqual);
+    assert(!game_native_depth_admission(1,1,8,0,0,false,depth));
+    assert(!game_native_depth_admission(1,2,8,0,0,true,depth));
     const auto retained = depth;
     for (unsigned mode : {2u, 3u, 0xffffffffu})
         assert(!game_native_depth_admission(mode,1,4,0,0,true,depth));
@@ -39,7 +48,8 @@ int main() {
     assert(!game_native_depth_admission(1,1,4,0,0,false,depth));
     assert(depth.enabled == retained.enabled &&
            depth.lessEqual == retained.lessEqual &&
-           depth.writeEnabled == retained.writeEnabled);
+           depth.writeEnabled == retained.writeEnabled &&
+           depth.always == retained.always);
     assert(game_native_depth_admission(1,1,4,0x80000000u,
                                        0x80000000u,true,depth));
     return 0;

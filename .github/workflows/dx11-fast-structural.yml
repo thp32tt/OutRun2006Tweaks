@@ -70,6 +70,7 @@ jobs:
           python tools/test_dx11_game_cull_draw_00649.py
           python tools/test_dx11_readonly_depth_draw_00650.py
           python tools/test_dx11_depth_state_binding_00651.py
+          python tools/test_dx11_depth_always_draw_00652.py
           g++ -std=c++17 -O2 -Wall -Wextra -pedantic tools/dx11_game_cull_probe.cpp -o /tmp/dx11_cull_00649 && /tmp/dx11_cull_00649
           g++ -std=c++17 -O2 -Wall -Wextra -pedantic tools/dx11_game_depth_probe.cpp -o /tmp/dx11_depth_00648 && /tmp/dx11_depth_00648
           g++ -std=c++17 -O2 -Wall -Wextra -pedantic tools/dx11_game_primitive_span_probe.cpp -o /tmp/dx11_primitive_00644 && /tmp/dx11_primitive_00644
