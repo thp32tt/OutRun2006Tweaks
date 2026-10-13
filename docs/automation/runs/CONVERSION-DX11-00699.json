@@ -88,17 +88,18 @@
     "src/vr/d3d11/native_game_texture_atlas_budget.hpp",
     "tools/test_dx11_game_texture_atlas_00699.py",
     ".github/workflows/dx11-fast-structural.yml",
-    "docs/automation/runs/CONVERSION-DX11-00699.json"
+    "docs/automation/runs/CONVERSION-DX11-00699.json",
+    "tools/test_dx11_first_game_frame_regressions.py"
   ],
   "pipeline": {
     "C0_RECOVER": "PASS GitHub HEAD 0188144 and 00698 source/gates inspected; conflict key independent 2K texture atlas",
     "C1_REVIEW": "PASS observed explicit 1024/11-mip native stage-0 game texture cap; 2K UI atlas unavailable; RT GetRenderTargetData must stay bounded",
-    "C2_IMPLEMENT": "DONE real texture-source mip capture/native SRV/Draw path and bounded 2K atlas admission, targeted C++17 regression",
-    "C3_VALIDATE": "PENDING exact-SHA GitHub gates; no Quest3/VDXR execution",
+    "C2_IMPLEMENT": "DONE initial material real 2K atlas mirror/budget; exact gate regressions now repaired in RGBA16 contract-compatible atlas pixel layout, 00699 local integration test and legacy first-game 12-mip negative mutation.",
+    "C3_VALIDATE": "REPAIR: initial 00699 exact-SHA DX11 Fast Structural #38479283318 FAILED at 00669 pre-existing destructive RGBA16 contract (duplicate source string); Build #38479288316 FAILED at obsolete 11-mip test; repair preserves negative assertions and plans recheck.",
     "C4_COMMIT": "PENDING Git tree CAS result SHA",
     "C5_PACKAGE": "NOT_REQUIRED: opt-in DX11 diagnostics; no release/HMD evidence",
     "C6_STATE": "PENDING exact-SHA CI; next action inspect branch exact-gate and append Issue #14 then record final result"
   },
-  "next_action": "Check new validation-bearing SHA Backend Conversion Gate, DX11 Fast Structural Checks, Windows Build; finish C6 with exact evidence, keep HMD/gamepad UNTESTED",
+  "next_action": "Once 00699 parent CI finishes, fast-forward repair commit without cancelling active jobs; then check exact-SHA DX11 Fast, Backend Gate, Build, complete C6/Issue #14. Quest3/VDXR UNTESTED.",
   "state_persisted": true
 }

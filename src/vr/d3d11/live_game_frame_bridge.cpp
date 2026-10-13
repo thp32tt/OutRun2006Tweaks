@@ -3215,11 +3215,14 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // converted D3D11 SRV mip payload *before* palette lookup, D3D9 readback,
     // CPU copies or GPU allocation. Packed/palette/RGB24 formats expand to
     // BGRA8, while BC and native half/full floats retain their own pitches.
-    const UINT atlasTexelBytes = floatRgba ?
-        float_rgba_texture::source_bytes_per_texel(floatLayout) :
-        floatVector ? float_vector_texture::source_bytes_per_texel(floatVectorLayout) :
-        rgba16 ? rgba16_texture::source_bytes_per_texel() :
-        4u;
+    // Use the actual destination DXGI pixel size. This keeps the existing
+    // per-format D3D9 source-byte contracts unique for destructive regression
+    // tests while correctly budgeting the converted *native* SRV payload.
+    const UINT atlasTexelBytes =
+        nativeFormat == DXGI_FORMAT_R32G32B32A32_FLOAT ? 16u :
+        (nativeFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ||
+         nativeFormat == DXGI_FORMAT_R16G16B16A16_UNORM ||
+         nativeFormat == DXGI_FORMAT_R32G32_FLOAT) ? 8u : 4u;
     const UINT atlasBlockBytes = compressed ?
         (base.Format == D3DFMT_DXT1 ? 8u : 16u) : 0u;
     if (!native_game_texture_upload_bytes(

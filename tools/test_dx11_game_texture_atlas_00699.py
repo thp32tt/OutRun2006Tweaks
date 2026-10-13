@@ -19,9 +19,10 @@ def integrated(src, budget):
         "base.Width > kMaxNativeGameAtlasDimension" in mirror,
         "base.Height > kMaxNativeGameAtlasDimension" in mirror,
         "if (gpuRenderTarget && (base.Width > 1024u || base.Height > 1024u))" in mirror,
-        "const UINT atlasTexelBytes = floatRgba ?" in mirror,
-        "floatVector ? float_vector_texture::source_bytes_per_texel(floatVectorLayout)" in mirror,
-        "rgba16 ? rgba16_texture::source_bytes_per_texel()" in mirror,
+        "nativeFormat == DXGI_FORMAT_R32G32B32A32_FLOAT ? 16u" in mirror,
+        "nativeFormat == DXGI_FORMAT_R16G16B16A16_FLOAT" in mirror,
+        "nativeFormat == DXGI_FORMAT_R16G16B16A16_UNORM" in mirror,
+        "nativeFormat == DXGI_FORMAT_R32G32_FLOAT) ? 8u : 4u;" in mirror,
         "const UINT atlasBlockBytes = compressed ?" in mirror,
         "if (!native_game_texture_upload_bytes(" in mirror,
         "compressed ? 0u : atlasTexelBytes, atlasBlockBytes))" in mirror,
@@ -35,7 +36,7 @@ def integrated(src, budget):
         "else ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in src,
         "void observe_linear(" in src and "void observe_indexed(" in src,
         "before_game_present(" in src and "s.frameBatch.publishable(s.pending)" in src,
-        "observe_unavailable_game_draw(game);" in r30,
+        "observe_unavailable_game_draw(device);" in r30,
         "kMaxNativeGameAtlasUploadBytes = 24ull * 1024ull * 1024ull" in budget,
     ))
 
