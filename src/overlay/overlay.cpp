@@ -68,6 +68,8 @@ const std::vector<OverlayWindow*>& Overlay::windows()
 void Overlay::render_shell()
 {
 	const ContentRect content = content_rect();
+	if (content.width <= 0.f || content.height <= 0.f)
+		return; // Device reset / minimized zero-extent frame.
 
 	// A 26px desktop F11 face rasterised at Quest3 eye density can be
 	// 50-75 source pixels tall. Give the shell proportional room in VR;
@@ -75,20 +77,65 @@ void Overlay::render_shell()
 	// after the sharper atlas was rebuilt. Desktop positions/sizes are
 	// unchanged; VR uses a centered size only when the window appears.
 	const float vrDensity = std::clamp(VrFontMultiplier, 1.0f, 3.0f);
+	// On a tiny reset/recreate surface, never grow beyond the real content
+	// rectangle (the former 64px floor could exceed the viewport).
+	const float maxWidth = (std::max)(1.f, content.width -
+		(std::min)(40.f, content.width * 0.1f));
+	const float maxHeight = (std::max)(1.f, content.height -
+		(std::min)(40.f, content.height * 0.1f));
 	const ImVec2 windowSize(
-		(std::min)(1130.f * vrDensity, (std::max)(64.f, content.width - 40.f)),
-		(std::min)(600.f * vrDensity, (std::max)(64.f, content.height - 40.f)));
+		(std::min)(1130.f * vrDensity, maxWidth),
+		(std::min)(600.f * vrDensity, maxHeight));
 	const ImGuiCond initialPlacement = vrDensity > 1.0f
 		? ImGuiCond_Appearing : ImGuiCond_FirstUseEver;
 
-	ImGui::SetNextWindowSize(windowSize, initialPlacement);
+	// ImGuiCond_Appearing is not reapplied while the shell stays open.
+	// A live mirror resize, menu letterbox transition or XR eye-density
+	// change otherwise leaves its saved bounds off-screen or clipped.
+	// Reflow only on a real layout transition, preserving user drag/resize
+	// across every steady desktop and VR frame.
+	static ContentRect previousContent{};
+	static float previousDensity = 1.0f;
+	static bool havePreviousLayout = false;
+	const bool layoutChanged = havePreviousLayout && (
+		std::fabs(previousContent.x - content.x) > 0.5f ||
+		std::fabs(previousContent.y - content.y) > 0.5f ||
+		std::fabs(previousContent.width - content.width) > 0.5f ||
+		std::fabs(previousContent.height - content.height) > 0.5f ||
+		std::fabs(previousDensity - vrDensity) > 0.01f);
+	previousContent = content;
+	previousDensity = vrDensity;
+	havePreviousLayout = true;
+	const ImGuiCond layoutPlacement = layoutChanged ? ImGuiCond_Always : initialPlacement;
+
+	ImGui::SetNextWindowSize(windowSize, layoutPlacement);
 	ImGui::SetNextWindowPos(
 		ImVec2(
 			content.x + (content.width - windowSize.x) * 0.5f,
 			content.y + (content.height - windowSize.y) * 0.5f
 		),
-		initialPlacement
+		layoutPlacement
 	);
+
+	// Enlarging a font atlas alone leaves keyboard/mouse hit targets and
+	// frame padding tiny at Quest3 eye density. Scale ONLY the F11 shell's
+	// controls, not notifications, game HUD, desktop style or world passes.
+	const bool vrStyle = vrDensity > 1.0f;
+	if (vrStyle)
+	{
+		const ImGuiStyle& shellStyle = ImGui::GetStyle();
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+			ImVec2(shellStyle.FramePadding.x * vrDensity,
+				shellStyle.FramePadding.y * vrDensity));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
+			ImVec2(shellStyle.ItemSpacing.x * vrDensity,
+				shellStyle.ItemSpacing.y * vrDensity));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing,
+			ImVec2(shellStyle.ItemInnerSpacing.x * vrDensity,
+				shellStyle.ItemInnerSpacing.y * vrDensity));
+		ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize,
+			shellStyle.ScrollbarSize * vrDensity);
+	}
 
 	// Tab contents scroll in a child of their own, so the tab bar stays at the top rather than
 	// sliding out of view with them.
@@ -119,6 +166,8 @@ void Overlay::render_shell()
 		}
 	}
 	ImGui::End();
+	if (vrStyle)
+		ImGui::PopStyleVar(4);
 }
 
 void Overlay::init()

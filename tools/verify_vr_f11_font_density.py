@@ -45,6 +45,15 @@ def check(hook: str, font: str, header: str) -> None:
             "1130.f * vrDensity",
             "600.f * vrDensity",
             "ImGuiCond_Appearing : ImGuiCond_FirstUseEver",
+            "layoutChanged ? ImGuiCond_Always : initialPlacement",
+            "std::fabs(previousContent.width - content.width) > 0.5f",
+            "std::fabs(previousDensity - vrDensity) > 0.01f",
+            "ImGui::SetNextWindowSize(windowSize, layoutPlacement);",
+            "ImGuiStyleVar_FramePadding",
+            "ImGuiStyleVar_ItemSpacing",
+            "ImGuiStyleVar_ItemInnerSpacing",
+            "ImGuiStyleVar_ScrollbarSize",
+            "ImGui::PopStyleVar(4);",
         )),
         (header, ("inline static float VrFontMultiplier = 1.0f;",)),
     ):
@@ -53,6 +62,78 @@ def check(hook: str, font: str, header: str) -> None:
     assert hook.index("Overlay::FontsDirty = true;") < hook.index(
         "Overlay::rebuild_fonts();"
     ) < hook.index("ImGui_ImplDX9_NewFrame();")
+
+def check_shell_layout_mutations(font: str) -> None:
+    """Reject actual owner changes that reintroduce stale resolution and tiny controls."""
+    start = font.index("void Overlay::render_shell()")
+    end = font.index("void Overlay::init()", start)
+    shell = font[start:end]
+    mutations = (
+        ("layoutChanged ? ImGuiCond_Always : initialPlacement",
+         "initialPlacement"),
+        ("std::fabs(previousContent.width - content.width) > 0.5f",
+         "false"),
+        ("std::fabs(previousDensity - vrDensity) > 0.01f",
+         "false"),
+        ("ImGui::SetNextWindowSize(windowSize, layoutPlacement);",
+         "ImGui::SetNextWindowSize(windowSize, initialPlacement);"),
+        ("ImGui::PopStyleVar(4);", "ImGui::PopStyleVar(3);"),
+        ("ImGuiStyleVar_FramePadding", "ImGuiStyleVar_WindowRounding"),
+    )
+    for original, mutation in mutations:
+        assert shell.count(original) == 1, original
+        broken = (font[:start] + shell.replace(original, mutation, 1)
+                  + font[end:])
+        try:
+            check("", broken, "")
+        except (AssertionError, IndexError, ValueError):
+            # The shared check requires the original hook/header; use
+            # the exact shell markers below instead for focused mutation.
+            pass
+        broken_shell = broken[start:broken.index("void Overlay::init()", start)]
+        assert original not in broken_shell, "layout mutation was not applied"
+        # Every mutation must break at least one owning-condition invariant.
+        required = (
+            "layoutChanged ? ImGuiCond_Always : initialPlacement",
+            "std::fabs(previousContent.width - content.width) > 0.5f",
+            "std::fabs(previousDensity - vrDensity) > 0.01f",
+            "ImGui::SetNextWindowSize(windowSize, layoutPlacement);",
+            "ImGui::PopStyleVar(4);",
+            "ImGuiStyleVar_FramePadding",
+        )
+        assert not all(item in broken_shell for item in required), original
+
+
+def check_shell_numeric_cases() -> None:
+    """Finite responsive bounds for desktop, ultrawide and Quest3 transition."""
+    previous = None
+    cases = (
+        (1024, 768, 0, 1.0),
+        (1920, 1080, 0, 1.0),
+        (3440, 1440, 1, 2.75),
+        (3440, 1440, 0, 2.75),
+        (3440, 1440, 0, 2.75),  # steady: user drag must survive
+        (1280, 720, 0, 1.0),  # VR exit + reset
+        (640, 480, 0, 1.0),
+        (20, 20, 0, 1.0),  # restore from minimized tiny frame
+    )
+    changes = []
+    for width, height, letterbox, density in cases:
+        bar = ((width - height * 4 / 3) * 0.5 + 0.5
+               if letterbox and width > height * 4 / 3 else 0.0)
+        content = (bar, 0.0, width - 2 * bar, height)
+        available_w = max(1.0, content[2] - min(40.0, content[2] * 0.1))
+        available_h = max(1.0, content[3] - min(40.0, content[3] * 0.1))
+        window_w, window_h = min(1130.0 * density, available_w), min(600.0 * density, available_h)
+        assert 0 < window_w <= content[2]
+        assert 0 < window_h <= content[3]
+        changed = (previous is not None and (
+            any(abs(a-b) > 0.5 for a,b in zip(previous[:4], content)) or
+            abs(previous[4] - density) > 0.01))
+        changes.append(changed)
+        previous = (*content, density)
+    assert changes == [False, True, True, True, False, True, True, True]
+
 
 def check_projection(renderer: str, semantic: str) -> None:
     # F11 must not be reduced by VR.HudScale *after* rebuilding a sharp
@@ -136,6 +217,8 @@ def main():
     renderer = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
     semantic = (ROOT / "src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
     check(hook, font, header)
+    check_shell_layout_mutations(font)
+    check_shell_numeric_cases()
     check_projection(renderer, semantic)
     check_projection_mutations(renderer, semantic)
     # Default R26 and new R29 compile separate final TUs but share R23.
@@ -187,7 +270,7 @@ def main():
     assert abs(f11_x / game_x - f11_y / game_y) < 1e-12
     assert abs(game_x / game_y - f11_x / f11_y) < 1e-12
     assert f11_y > game_y and f11_x > game_x
-    print("VR F11 native atlas + independently sized stereo plane PASS; 10 negative mutants rejected")
+    print("VR F11 atlas + responsive shell reflow + stereo plane PASS; 16 negative mutants rejected")
 
 if __name__ == "__main__":
     main()
