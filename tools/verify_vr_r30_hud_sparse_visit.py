@@ -39,13 +39,28 @@ def verify_source(source, workflow):
         "if (usedMask && !(*usedMask)[i])",
         "!std::isfinite(src[0]) || !std::isfinite(src[1])",
         "!std::isfinite(src[2]) || !std::isfinite(src[3])",
-        "const float transformedY = hudScaleY * src[1] + hudBiasY + edgeYBias;",
+        # Pause-menu optical correction is eye-specific; neutral FOV keeps
+        # regular ScreenHud pixels identical, including the edge Y bias.
+        "const auto pauseVertical =",
+        "R30PauseMenuVerticalAffine(state.stereo);",
+        "const float eyeScaleY[2]{",
+        "hudScaleY * pauseVertical.scale[0]",
+        "hudScaleY * pauseVertical.scale[1]",
+        "const float eyeBiasY[2]{",
+        "pauseVertical.offset[0] * halfHeight + pauseShiftY",
+        "pauseVertical.offset[1] * halfHeight + pauseShiftY",
+        "const float transformedLeftY =",
+        "eyeScaleY[0] * src[1] + eyeBiasY[0] + edgeYBias;",
+        "const float transformedRightY =",
+        "eyeScaleY[1] * src[1] + eyeBiasY[1] + edgeYBias;",
+        "!std::isfinite(transformedLeftY)",
+        "!std::isfinite(transformedRightY)",
         "eyeScaleX[0] * src[0] + eyeBiasX[0] + edgeLeftBias;",
         "eyeScaleX[1] * src[0] + eyeBiasX[1] + edgeRightBias;",
         "leftDst[0] = transformedLeftX;",
-        "leftDst[1] = transformedY;",
+        "leftDst[1] = transformedLeftY;",
         "rightDst[0] = transformedRightX;",
-        "rightDst[1] = transformedY;",
+        "rightDst[1] = transformedRightY;",
     )
     for token in required:
         assert token in hud, "missing ScreenHud invariant: " + token
@@ -75,7 +90,14 @@ def destructive_mutations(source, workflow):
         ("if (usedMask && !(*usedMask)[i])", "if (false)"),
         ("leftDst[0] = transformedLeftX;", "leftDst[0] = src[0];"),
         ("rightDst[0] = transformedRightX;", "rightDst[0] = src[0];"),
-        ("hudBiasY + edgeYBias;", "hudBiasY;"),
+        ("eyeScaleY[0] * src[1] + eyeBiasY[0] + edgeYBias;",
+         "hudScaleY * src[1] + eyeBiasY[0] + edgeYBias;"),
+        ("eyeScaleY[1] * src[1] + eyeBiasY[1] + edgeYBias;",
+         "hudScaleY * src[1] + eyeBiasY[1] + edgeYBias;"),
+        ("eyeBiasY[0] + edgeYBias;", "eyeBiasY[0];"),
+        ("eyeBiasY[1] + edgeYBias;", "eyeBiasY[1];"),
+        ("leftDst[1] = transformedLeftY;", "leftDst[1] = transformedRightY;"),
+        ("rightDst[1] = transformedRightY;", "rightDst[1] = transformedLeftY;"),
         ("eyeBiasX[0] + edgeLeftBias;", "eyeBiasX[0];"),
         ("eyeBiasX[1] + edgeRightBias;", "eyeBiasX[1];"),
     )
@@ -121,19 +143,23 @@ def numeric_parity():
             selected, sparse = visit_indices(mask, touched, count)
             assert selected is not None and set(selected) == set(touched)
             assert sparse == (count > 0 and count <= n // 4)
-            # Eye-specific edge anchoring changes only X; Y is shared, remaining
-            # Z/RHW/color/UV payload must remain bit-for-bit identical.
-            for scale, bias, edge_x in ((0.91, -2.5, -14.25), (1.08, 7.0, 10.75)):
+            # In the ESC state both X and Y may differ by eye, so sparse
+            # visitation must match the dense route independently for each
+            # eye while preserving Z/RHW/color/UV payload bytes.
+            for scale, bias, edge_x, scale_y, bias_y in (
+                (0.91, -2.5, -14.25, 0.97, -7.25),
+                (1.08, 7.0, 10.75, 1.12, 4.75),
+            ):
                 dense = list(data)
                 fast = list(data)
                 for i in range(n):
                     if mask[i]:
                         x, y, z, rhw, color, uv = dense[i]
-                        dense[i] = (scale * x + bias + edge_x, 1.05 * y + 2.0 - 8.0,
+                        dense[i] = (scale * x + bias + edge_x, scale_y * y + bias_y,
                                     z, rhw, color, uv)
                 for i in selected:
                     x, y, z, rhw, color, uv = fast[i]
-                    fast[i] = (scale * x + bias + edge_x, 1.05 * y + 2.0 - 8.0,
+                    fast[i] = (scale * x + bias + edge_x, scale_y * y + bias_y,
                                z, rhw, color, uv)
                 assert dense == fast, ("sparse/dense parity", n, count)
             if sparse:
