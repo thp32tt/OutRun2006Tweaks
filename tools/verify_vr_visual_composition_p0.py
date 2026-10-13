@@ -705,6 +705,63 @@ def verify_exact_call_window_hud_scope(source):
         if 'Settings::VREnabled' in leave:
             raise SystemExit(kind+' leaked source-time scope on mid-call VR change')
 verify_exact_call_window_hud_scope(ui)
+
+# The source-time +TIME ScreenHud scope alone is not enough when a previous
+# SpriteNode still has CurrentQueueExactScope/CurrentQueueProjectedMarker.
+# The six original 0x989xx producers must override that stale cursor for
+# synchronous glyph draws WITHOUT stealing a currently drawn SpriteNode.
+def verify_stage_extension_direct_draw_owner(source, semantics):
+    begin = function_body(source, 'static void StageExtensionEnter(')
+    end = function_body(source, 'static void StageExtensionLeave(')
+    require('std::optional<', source,
+            '+TIME direct semantic lifetime must be stack-style, not sticky')
+    require('ScopedExactProducerSemantic>', source,
+            '+TIME source must reuse queue-safe direct producer owner')
+    require_order(begin, '+TIME exact parent must scope direct glyphs in VR',
+                  'if (Settings::VREnabled)',
+                  'StageExtensionDirectDrawOwner.emplace(',
+                  'RenderScope::ScreenHud);',
+                  'CurrentScope =')
+    require_order(end, '+TIME releases direct scope even on mid-call VR toggle',
+                  'TagAppendedNodes(StageExtensionBefore,',
+                  'StageExtensionDirectDrawOwner.reset();',
+                  'CurrentScope = StageExtensionSavedScope;')
+    if 'Settings::VREnabled' in end:
+        raise SystemExit('+TIME direct scope leaked when VR toggled off')
+    helper = function_body(semantics, 'class ScopedExactProducerSemantic final')
+    for guard in ('SpriteQueueDepth == 0',
+                  'CurrentQueueExactScope = RenderScope::None;',
+                  'CurrentQueueProjectedMarker =',
+                  'CurrentQueueExactScope = savedQueueScope_;',
+                  'CurrentQueueProjectedMarker = savedProjectedMarker_;'):
+        require(guard, helper, '+TIME direct glyph may not steal a queue node')
+
+verify_stage_extension_direct_draw_owner(ui, sem)
+for label, mutant in (
+    ('missing exact glyph semantic', ui.replace(
+        'StageExtensionDirectDrawOwner.emplace(',
+        'StageExtensionUnscopedDrawOwner.emplace(', 1)),
+    ('stale scope survives end', ui.replace(
+        'StageExtensionDirectDrawOwner.reset();',
+        'StageExtensionDirectDrawOwnerLeak();', 1)),
+    ('direct scope not guarded by queue', sem.replace(
+        'SpriteQueueDepth == 0 && scope != RenderScope::None',
+        'scope != RenderScope::None', 1)),
+    ('queue projected marker not restored', sem.replace(
+        'CurrentQueueProjectedMarker = savedProjectedMarker_;',
+        'CurrentQueueProjectedMarker = {};', 1)),
+):
+    if mutant == (sem if label.startswith('direct scope not') or label.startswith('queue projected') else ui):
+        raise SystemExit('+TIME direct draw mutation did not apply: '+label)
+    try:
+        verify_stage_extension_direct_draw_owner(
+            mutant if label.startswith('missing') or label.startswith('stale') else ui,
+            mutant if label.startswith('direct scope not') or label.startswith('queue projected') else sem)
+    except SystemExit:
+        pass
+    else:
+        raise SystemExit('+TIME direct draw negative mutation survived: '+label)
+
 for name, mutant in (
     ('stage lost scope restoration', ui.replace(
         'OutRunVR::GameSemantic::CurrentScope = StageExtensionSavedScope;',

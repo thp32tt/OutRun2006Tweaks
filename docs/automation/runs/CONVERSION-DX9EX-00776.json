@@ -1,0 +1,100 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00776",
+  "production_id": "CONVERSION-DX9EX-00776",
+  "event_id": "CONVERSION-DX9EX-00776-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:EXTENDED_TIME",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "checkpoint": "C4_COMMIT",
+  "feature_status": "BUILD_PENDING_NEED_HMD_TEST",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00776]",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "score_delta": 0,
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_visual_composition_p0.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00776.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve the complete original OutRun +TIME extension sprite and numeric glyph display in a common finite stereo HUD owner, including direct draws and queued replay across gameplay transition.",
+    "scope_boundary": "Only the six canonical 0x989xx original +TIME sources; excludes GOAL/final-result, normal timer, rank markers, flare, and game timing.",
+    "trace_stages": [
+      "Original pinned E8 0x9898E/0x98A36/0x98AC6 sprite sources and 0x989AD/0x98A10/0x98A89 numeric print calls",
+      "Source-time exact producer bracket clears stale direct draw queue scope/marker without preempting active SpriteNode",
+      "Post-call six-source appended SpriteNodes get StageExtensionTime ScreenHud identity retained by Sumo replay",
+      "R30 fixed-function/VS c64 per-eye ScreenHud and OpenXR host projection remain fail-closed and unchanged"
+    ],
+    "subcomponents": [
+      "Synchronous numeric glyph render gets exact source ownership without inherited stale queue scope or marker",
+      "Deferred sprite and glyph nodes still receive six-source ScreenHud producer tags, nested calls unwind correctly",
+      "Desktop and VR-toggle fallback, protected GOAL/final text and real world SpriteNode ownership are preserved"
+    ],
+    "acceptance_items": [
+      {
+        "id": "TIME_SPRITE_AND_NUMERIC",
+        "category": "end_to_end_behavior",
+        "behavior_area": "stage_sprite_and_numeric_glyph",
+        "expected_behavior": "All six original E8 paths share ScreenHud for direct number raster and deferred +TIME sprites without modifying game clock."
+      },
+      {
+        "id": "TIME_STEREO_CURSOR_RESTORE",
+        "category": "end_to_end_behavior",
+        "behavior_area": "stereo_direct_render_and_queue",
+        "expected_behavior": "Direct numeric draw temporarily bypasses stale SpriteNode scope and projected marker, but original live queue owner remains authoritative and is restored."
+      },
+      {
+        "id": "TIME_NEGATIVE_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "desktop_goals_world_and_reset",
+        "expected_behavior": "VR toggle and desktop fallback preserve exact previous scope/marker, no GOAL/final results, world markers, or 0x989xx timer logic change."
+      },
+      {
+        "id": "TIME_EXACT_SHA_WIN32",
+        "category": "integrated_validation",
+        "behavior_area": "game_host_package_ci",
+        "expected_behavior": "Exact-SHA DX9Ex Active Win32 policy/game/host/full-chain/package, Domain Isolation and Full Source Impact succeed before C6; Quest3 remains separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "TIME_SPRITE_AND_NUMERIC": "IMPLEMENTED_PENDING_CI",
+    "TIME_STEREO_CURSOR_RESTORE": "IMPLEMENTED_PENDING_CI",
+    "TIME_NEGATIVE_FALLBACK": "IMPLEMENTED_PENDING_CI",
+    "TIME_EXACT_SHA_WIN32": "PENDING_CI",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "User Quest3 recorded transient +TIME head-following/diplopia separately from normal GOAL/final result; exact EXE 0x989xx six parent calls identified in prior pin-sha disassembly.",
+    "source_trace": [
+      "Six original x86 +TIME E8 sprani and numeric parents are bracketed by StageExtensionEnter/Leave.",
+      "Enter previously changed CurrentScope=ScreenHud, but EffectiveScope prioritized CurrentQueueExactScope from preceding SpriteNode.",
+      "Immediate glyph DRAW could use earlier queue scope/marker; post-call TagAppendedNodes correctly classified deferred nodes but could not correct raster submitted inside original E8 call.",
+      "New direct producer RAII overrides only when SpriteQueueDepth==0, restores queue scope/marker on exit; appended nodes still get explicit +TIME ScreenHud."
+    ],
+    "root_cause": "StageExtensionEnter set only CurrentScope while EffectiveScope preferred a stale CurrentQueueExactScope; immediate +TIME numeric draw could inherit prior queued ScreenHud/world projection, unlike deferred tagged sprites.",
+    "alternatives_rejected": [
+      "Globally promoting all XYZRHW or the shared original print helper would wrongly affect normal HUD, GOAL and world markers.",
+      "Changing game extension timing/expiry would not correct renderer scope precedence and violates timing invariants."
+    ],
+    "eye_ownership": "Temporary exact ScreenHud owner for nonqueue direct +TIME drawing and explicit ScreenHud for deferred sibling nodes; existing R30 stereo eye paths and world queue priorities preserved.",
+    "fix_evidence": "Add six-E8-scoped ScopedExactProducerSemantic lifetime in StageExtensionEnter/Leave and negative mutation checks of scope, queue-depth gating and projected-marker restoration.",
+    "negative_test_evidence": "Targeted source checks reject removed exact owner, missing exit reset, removed queue-depth guard and lost projected-marker restore; DX9Ex Active/Domain/Full Source Impact exact-SHA pending."
+  },
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA_ACTIONS"
+  },
+  "notes": "This candidate is a source-level closure of +TIME direct-versus-deferred semantic precedence. No Quest3/VDXR test; do not infer optical PASS from static or CI."
+}

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <optional>
 
 namespace Settings
 {
@@ -796,6 +797,12 @@ class UIScaling : public Hook
     inline static thread_local std::array<SpriteNode*, Game::SpritePriorityCount>
         StageExtensionBefore{};
     inline static thread_local std::uint64_t StageExtensionCompleted = 0;
+    // Bracket both immediate numeric glyph draws and the original sprite
+    // producer. A previous queue node's ScreenHud/World scope must not
+    // override the current exact +TIME source when it rasterizes directly.
+    inline static thread_local std::optional<
+        OutRunVR::GameSemantic::ScopedExactProducerSemantic>
+        StageExtensionDirectDrawOwner;
 
     static void StageExtensionEnter(safetyhook::Context&)
     {
@@ -811,8 +818,15 @@ class UIScaling : public Hook
         // Scope only this exact source call, never the shared text renderer.
         StageExtensionSavedScope = OutRunVR::GameSemantic::CurrentScope;
         if (Settings::VREnabled)
+        {
+            // ScopedExactProducerSemantic clears stale queue scope/marker
+            // only for non-queue immediate draws. Real SpriteNodes retain
+            // priority, while the same bracket tags deferred +TIME children.
+            StageExtensionDirectDrawOwner.emplace(
+                OutRunVR::GameSemantic::RenderScope::ScreenHud);
             OutRunVR::GameSemantic::CurrentScope =
                 OutRunVR::GameSemantic::RenderScope::ScreenHud;
+        }
     }
 
     static void StageExtensionLeave(safetyhook::Context&)
@@ -822,7 +836,9 @@ class UIScaling : public Hook
         TagAppendedNodes(StageExtensionBefore,
             OutRunVR::GameSemantic::RenderScope::ScreenHud,
             OutRunVR::GameSemantic::ProducerToken::StageExtensionTime);
-        // Always unwind even if VR enablement changes during the call.
+        // Always restore the exact direct-draw queue cursor/anchor even if
+        // VR enablement changes inside the original +TIME E8 call.
+        StageExtensionDirectDrawOwner.reset();
         OutRunVR::GameSemantic::CurrentScope = StageExtensionSavedScope;
         StageExtensionSavedScope =
             OutRunVR::GameSemantic::RenderScope::None;
