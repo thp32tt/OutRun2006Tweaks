@@ -20,7 +20,7 @@
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_status": "NEED_HMD_TEST",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/game/render_semantics.hpp",
     "src/hooks_uiscaling.cpp",
@@ -143,5 +143,7 @@
   "material_repair_shas": [
     "bc5e0d2ff7868ef9bf67ba8aca03d1ada715dc84",
     "48660263be3230a74d135b3937deb9c5badcda49"
-  ]
+  ],
+  "scoreboard_commit": "b353054b2fea0beca657fcc16a96decd44315662",
+  "scoreboard_run_key": "CONVERSION-DX9EX-00782"
 }
