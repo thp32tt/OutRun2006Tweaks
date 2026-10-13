@@ -1,0 +1,19 @@
+name: Validate legacy localization rollback Compose
+on:
+  push:
+    branches:
+      - deploy/rollback-localization-20261012-68e8
+  workflow_dispatch:
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Compose schema without pulling local-only image
+        env:
+          VNC_PASSWORD: ci-only-placeholder
+        run: |
+          docker compose -f docker-compose.yml config -q
+          test "$(docker compose -f docker-compose.yml config --services)" = "controller-a"
+          docker compose -f docker-compose.yml config | grep -q 'published: "6082"'
+          docker compose -f docker-compose.yml config | grep -q 'outrun-kor-plate-engine:68e8a437cadd'
