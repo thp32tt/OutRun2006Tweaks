@@ -198,6 +198,10 @@ def main() -> None:
                       "return submitted < kMaxDraws && ordinal >= slot &&",
                       "return !depth || depthDirection == 0u ||"):
         assert invariant in batch
+    assert "ordinal - slot == submitted && ordinal - slot < kMaxDraws;" in batch
+    # Destructive mutation: a skipped Draw must not be allowed to join a frame.
+    admits_gap = batch.replace("ordinal - slot == submitted && ", "", 1)
+    assert admits_gap != batch and "ordinal - slot == submitted && " not in admits_gap
     assert "ordinal - slot < kMaxDraws;" in batch
     # This is executable C++ source selection, not a Python-only simulation:
     # mutating to the obsolete first-64 cursor must invalidate the contract.

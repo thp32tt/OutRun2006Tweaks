@@ -14,11 +14,11 @@ struct GameNativeFrameBatch {
         if (stopped) return false;
         if (!multi) return submitted == 0u && ordinal == slot;
         // A batch represents one contiguous slice of the game draw stream:
-        // do not blend widely separated menu, vehicle and race calls into
+        // do not blend skipped, reordered, or widely separated game calls into
         // one artificial frame when intermediate native draws are rejected.
         // The original D3D9 Draw always survives these admission failures.
         return submitted < kMaxDraws && ordinal >= slot &&
-            ordinal - slot < kMaxDraws;
+            ordinal - slot == submitted && ordinal - slot < kMaxDraws;
     }
     // Traverse the complete eligible game Draw population. A legacy fixed
     // 64-draw probe window starved later car-select and race-world draws.

@@ -13,8 +13,12 @@ int main() {
     assert(!b.accepts(4,5,true) && b.accepts(5,5,true));
     b.succeeded(false);
     assert(b.clear_depth());
+    assert(!b.accepts(7u, 5u, true)); // Reject missing ordinal 6.
+    assert(b.accepts(6u, 5u, true));
     b.succeeded(true);
     assert(!b.clear_depth());
+    assert(!b.accepts(8u, 5u, true)); // Later in window is still a gap.
+    assert(b.accepts(7u, 5u, true));
     b.reset();
     for (std::uint32_t i=5; i<5+GameNativeFrameBatch::kMaxDraws; ++i) {
         assert(b.accepts(i,5,true));
@@ -23,7 +27,11 @@ int main() {
     assert(!b.accepts(13,5,true) && b.submitted==8u && !b.clear_depth());
     b.reset();
     assert(b.accepts(256u,256u,true));
-    assert(b.accepts(263u,256u,true));
+    assert(!b.accepts(263u,256u,true)); // In range but not contiguous.
+    for (std::uint32_t i=256u; i<264u; ++i) {
+        assert(b.accepts(i,256u,true));
+        b.succeeded(false);
+    }
     assert(!b.accepts(264u,256u,true));
     assert(!b.accepts(400u,256u,true));
     assert(!b.accepts(255u,256u,true));
