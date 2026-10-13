@@ -115,16 +115,25 @@ namespace
                 std::size(configName) > MAX_PATH)
             return false;
         std::memcpy(filename + 1, configName, sizeof(configName));
+        // Match Settings::UIScalingMode and Settings::UILetterboxing
+        // compiled game defaults (both 1), including a first launch whose
+        // INI exists but has no Graphics keys. The previous host-only zero
+        // defaults disabled the native 4:3 crop although the game was
+        // drawing 4:3 letterbox bars. A missing base file is not fatal when
+        // a valid .user.ini provides the effective settings.
+        int effectiveScalingMode = 1;
+        int letterboxingMode = 1;
+        bool foundConfig = false;
         const DWORD attributes = GetFileAttributesW(path);
-        if (attributes == INVALID_FILE_ATTRIBUTES ||
-            (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
-            return false;
-
-        const int scalingMode = static_cast<int>(GetPrivateProfileIntW(
-            L"Graphics", L"UIScalingMode", 0, path));
-        int letterboxingMode = static_cast<int>(GetPrivateProfileIntW(
-            L"Graphics", L"UILetterboxing", 0, path));
-        int effectiveScalingMode = scalingMode;
+        if (attributes != INVALID_FILE_ATTRIBUTES &&
+            (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+        {
+            foundConfig = true;
+            effectiveScalingMode = static_cast<int>(GetPrivateProfileIntW(
+                L"Graphics", L"UIScalingMode", effectiveScalingMode, path));
+            letterboxingMode = static_cast<int>(GetPrivateProfileIntW(
+                L"Graphics", L"UILetterboxing", letterboxingMode, path));
+        }
         // The F11 overlay persists overrides in OutRun2006Tweaks.user.ini.
         // Respect the same precedence as the game: otherwise the host may
         // crop an unletterboxed UI (or fail to crop a letterboxed one).
@@ -139,6 +148,7 @@ namespace
             if (userAttrs != INVALID_FILE_ATTRIBUTES &&
                 (userAttrs & FILE_ATTRIBUTE_DIRECTORY) == 0)
             {
+                foundConfig = true;
                 effectiveScalingMode = static_cast<int>(
                     GetPrivateProfileIntW(L"Graphics", L"UIScalingMode",
                         effectiveScalingMode, path));
@@ -147,6 +157,10 @@ namespace
                         letterboxingMode, path));
             }
         }
+        // Without either trusted game-adjacent INI, keep the historical
+        // fail-closed theater path rather than guessing a mod installation.
+        if (!foundConfig)
+            return false;
         cachedLetterbox = OutRunVrMenuAspect::ShouldCropConfiguredMenu(
             effectiveScalingMode, letterboxingMode);
         return cachedLetterbox;

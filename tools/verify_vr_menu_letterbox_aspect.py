@@ -777,3 +777,86 @@ for old, bad in (
     else:
         raise AssertionError("visible menu source mutation survived: " + old)
 print("PASS main-menu clipped-fragment geometry, 5 destructive controls")
+
+# First-run / migration regression: OutRun's compiled game defaults for
+# UIScalingMode and UILetterboxing are both 1. When the existing base INI
+# omits either key, the host must not silently substitute 0 and expose the
+# full 21:9 desktop rails in the Quest LOCAL menu. Missing base with an
+# authoritative user INI also needs to work, but NO files fail closed.
+game_scaling = (Path(__file__).resolve().parents[1] /
+                "src/hooks_uiscaling.cpp").read_text()
+assert 'Setting<int> UIScalingMode{ "Graphics", "UIScalingMode", 1,' in game_scaling
+assert 'Setting<int> UILetterboxing{ "Graphics", "UILetterboxing", 1,' in game_scaling
+
+def check_menu_ini_defaults(code: str) -> None:
+    owner = code.split("bool R23GameMenuIsLetterboxed(HWND gameWindow) noexcept", 1)[1].split(
+        "constexpr ULONGLONG R23PixelIntervalMs", 1)[0]
+    tokens = [
+        "int effectiveScalingMode = 1;",
+        "int letterboxingMode = 1;",
+        "bool foundConfig = false;",
+        "if (attributes != INVALID_FILE_ATTRIBUTES &&",
+        "(attributes & FILE_ATTRIBUTE_DIRECTORY) == 0)",
+        'L"Graphics", L"UIScalingMode", effectiveScalingMode, path)',
+        'L"Graphics", L"UILetterboxing", letterboxingMode, path)',
+        "if (userAttrs != INVALID_FILE_ATTRIBUTES &&",
+        'L"Graphics", L"UIScalingMode",',
+        'L"Graphics", L"UILetterboxing",',
+        "if (!foundConfig)",
+        "return false;",
+        "ShouldCropConfiguredMenu(",
+        "effectiveScalingMode, letterboxingMode);"
+    ]
+    for token in tokens:
+        assert token in owner, token
+    assert owner.count("foundConfig = true;") == 2
+    assert owner.index("int effectiveScalingMode = 1;") < owner.index(
+        "GetFileAttributesW(path);")
+    assert owner.index("if (!foundConfig)") < owner.index(
+        "cachedLetterbox = OutRunVrMenuAspect::ShouldCropConfiguredMenu(")
+
+check_menu_ini_defaults(r23)
+for good, bad in (
+    ("int effectiveScalingMode = 1;", "int effectiveScalingMode = 0;"),
+    ("int letterboxingMode = 1;", "int letterboxingMode = 0;"),
+    ('L"Graphics", L"UIScalingMode", effectiveScalingMode, path)',
+     'L"Graphics", L"UIScalingMode", 0, path)'),
+    ('L"Graphics", L"UILetterboxing", letterboxingMode, path)',
+     'L"Graphics", L"UILetterboxing", 0, path)'),
+    ("if (!foundConfig)", "if (foundConfig)"),
+    ("foundConfig = true;", "foundConfig = false;"),
+):
+    assert good in r23
+    mutant = r23.replace(good, bad, 1)
+    try:
+        check_menu_ini_defaults(mutant)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("INI-default/ownership mutation escaped: " + good)
+
+def effective_crop(base, user):
+    # None means missing file; {} means present but no Graphics keys.
+    if base is None and user is None:
+        return False
+    scaling, letterbox = 1, 1
+    for layer in (base, user):
+        if layer is not None:
+            scaling = layer.get("UIScalingMode", scaling)
+            letterbox = layer.get("UILetterboxing", letterbox)
+    return scaling in (1, 2) and letterbox in (1, 2)
+
+for base, user, expected in (
+    ({}, None, True), ({}, {}, True),
+    (None, {}, True), (None, None, False),
+    ({"UIScalingMode": 0}, None, False),
+    ({"UILetterboxing": 0}, None, False),
+    ({"UIScalingMode": 0}, {"UIScalingMode": 1}, True),
+    ({"UILetterboxing": 0}, {"UILetterboxing": 1}, True),
+    ({}, {"UILetterboxing": 0}, False),
+    ({}, {"UIScalingMode": 0}, False),
+    ({"UIScalingMode": 2, "UILetterboxing": 2}, None, True),
+    ({}, {"UIScalingMode": 3}, False),
+):
+    assert effective_crop(base, user) == expected, (base, user)
+print("PASS game/host default parity, absent-key/user-INI precedence and six destructive mutations")
