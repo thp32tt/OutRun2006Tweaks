@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_CW_CCW_CULL_TRIANGLE",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "89c0105bd1070e26313dfbfd522d11ff5a8df72f",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -60,17 +60,49 @@
     "C0_RECOVER": "PASS",
     "C1_REVIEW": "PASS: live CW/CCW culling excluded",
     "C2_IMPLEMENT": "PASS: native CW/CCW raster+Draw",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING",
+    "C3_VALIDATE": "PASS_EXACT_SHA",
+    "C4_COMMIT": "PASS_MATERIAL_COMMIT",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Wait exact-SHA mandatory Gates; Quest3/VDXR and gamepad UNTESTED, DXVK frozen",
-  "material_result_sha": null,
-  "result_sha": null,
-  "validation_bearing_result_sha": null,
-  "validation_evidence": {}
+  "next_action": "Implementation/build exact-SHA SUCCESS; Quest3/VDXR visual game menu/vehicle/race and gamepad optical runtime UNTESTED. Keep opt-in diagnostic, DX9Ex fallback and DXVK frozen; continue a new independent DX11 task.",
+  "material_result_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2",
+  "result_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2",
+  "validation_bearing_result_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2",
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38337793355,
+      "conclusion": "success",
+      "validation_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2",
+      "jobs": "validate+DX11 readiness smoke probes SUCCESS"
+    },
+    "dx11_fast_structural": {
+      "id": 38337793315,
+      "conclusion": "success",
+      "validation_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2"
+    },
+    "windows_build": {
+      "id": 38337796132,
+      "conclusion": "success",
+      "validation_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2"
+    },
+    "openxr_architecture_push": {
+      "id": 38337793316,
+      "conclusion": "success",
+      "validation_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2"
+    },
+    "openxr_architecture_build": {
+      "id": 38337796206,
+      "conclusion": "success",
+      "validation_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2"
+    },
+    "hud_inspector": {
+      "id": 38337796214,
+      "conclusion": "success",
+      "validation_sha": "82c91b4998cd60405d87b1a8f05cb69b99d5f0d2"
+    }
+  }
 }
