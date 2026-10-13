@@ -203,6 +203,52 @@ def check_projection_mutations(renderer: str, semantic: str) -> None:
             raise AssertionError("F11 scoped projection mutant survived: " + a)
 
 
+def check_transient_eye_extent_dropout(hook: str) -> None:
+    """Retain VR F11 density on partial XR publication, reset on VR exit."""
+    density = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
+        "// A new atlas needs a new font texture.", 1)[0]
+    retain = ("vrFontMultiplier = std::clamp(\\n"
+              "\\t\\t\\t\\t\\tOverlay::VrFontMultiplier, 1.0f, 3.0f);")
+    # Exact owning control flow: retention only inside active VR gameplay and
+    # before either eye lookup, not a permanent desktop fallback.
+    assert "overlayActive && Game::is_vr_gameplay_presentation()" in density
+    assert retain.replace("\\n", "\n").replace("\\t", "\t") in density
+    assert density.index("overlayActive && Game::is_vr_gameplay_presentation()") < \\
+           density.index(retain.replace("\\n", "\n").replace("\\t", "\t")) < \\
+           density.index("R23TryGetPublishedEyeExtent(0, lw, lh)")
+    assert "float vrFontMultiplier = 1.0f;" in hook
+    assert "lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u" in density
+    assert "if (Overlay::VrFontMultiplier != vrFontMultiplier)" in density
+    # Destructive controls: a reverted or unconditional reset must fail.
+    mutation = density.replace(retain.replace("\\n", "\n").replace("\\t", "\t"),
+                               "vrFontMultiplier = 1.0f;", 1)
+    assert retain.replace("\\n", "\n").replace("\\t", "\t") not in mutation
+    assert mutation != density
+    def transition(previous, vr, left, right, ratio):
+        if not vr:
+            return 1.0
+        if not (left and right):
+            return min(3., max(1., previous))
+        if not math.isfinite(ratio) or ratio <= 0:
+            return min(3., max(1., previous))
+        return min(3., max(1., math.ceil(ratio * 4) / 4))
+    for source in ((1024, 768), (1920, 1080), (3440, 1440), (5120, 1440)):
+        # Valid both-eye publication followed by intermittent one-eye loss.
+        ratio = (source[0] / source[1]) / (2496 / 2688)
+        expected = transition(1., True, True, True, ratio)
+        current = expected
+        for i in range(80):
+            current = transition(current, True, i % 2 == 0, i % 3 == 0, ratio)
+            assert current == expected, (source, i)
+        assert transition(current, False, False, False, ratio) == 1.
+    # Reset/zero-size and exiting the game must never preserve the VR font.
+    assert transition(2.75, False, True, True, 2.57) == 1.
+    assert transition(2.75, True, False, False, 2.57) == 2.75
+    assert transition(2.75, True, True, False, 2.57) == 2.75
+    assert transition(2.75, True, True, True, 1.0) == 1.0
+    print("PASS F11 one-eye XR publication dropout keeps last atlas; VR exit resets")
+
+
 def factor(source_w, source_h, eye_w, eye_h):
     if min(source_w, source_h, eye_w, eye_h) <= 0:
         return 1.0
@@ -294,6 +340,7 @@ def main():
     semantic = (ROOT / "src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
     check(hook, font, header)
     check_font_density_hysteresis(hook)
+    check_transient_eye_extent_dropout(hook)
     check_shell_layout_mutations(font)
     check_shell_numeric_cases()
     check_projection(renderer, semantic)

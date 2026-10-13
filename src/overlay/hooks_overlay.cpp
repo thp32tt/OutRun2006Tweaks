@@ -230,6 +230,13 @@ class D3DHooks : public Hook
 				Game::screen_resolution->x > 0 &&
 				Game::screen_resolution->y > 0)
 			{
+				// A short-lived XR publication gap is not an instruction to
+				// shrink the already-rasterised F11 shell to desktop density.
+				// Keep the last finite VR atlas until BOTH eye extents can be
+				// sampled again. Outside gameplay/F11 the 1.0 default above
+				// still restores the desktop font on the next EndScene.
+				vrFontMultiplier = std::clamp(
+					Overlay::VrFontMultiplier, 1.0f, 3.0f);
 				std::uint32_t lw = 0, lh = 0, rw = 0, rh = 0;
 				if (OutRunVRStereo::R23TryGetPublishedEyeExtent(0, lw, lh) &&
 					OutRunVRStereo::R23TryGetPublishedEyeExtent(1, rw, rh) &&
