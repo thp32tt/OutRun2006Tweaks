@@ -953,8 +953,8 @@ def check_f11_overlay_font_persistence(font: str, header: str) -> None:
     mutations = (
         (ui, markers[0], "Overlay::FontScalePending = false;", markers),
         (ui, markers[1], "ImGui::IsMouseReleased(ImGuiMouseButton_Left)", markers),
-        (finaliser, required[1], "false ||", required),
-        (finaliser, required[2], "ImGui::IsMouseDown(ImGuiMouseButton_Left)", required),
+        (finaliser, "SettingsDirtyPending = true;", "SettingsDirtyPending = false;", required),
+        (finaliser, "if (SettingsDirtyPending && canCommitSettings)", "if (false)", required),
         (finaliser, "if (settings_write())", "if (false)", required),
         (finaliser, "SettingsDirtyPending = false;", "SettingsDirtyPending = true;", required),
     )
