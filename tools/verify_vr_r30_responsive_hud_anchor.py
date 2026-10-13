@@ -482,3 +482,88 @@ assert coherent_aspect((2496,2688),(2400,2600)) != 1.02
 # fallback after Reset, and both eyes still share the same HUD contain value.
 assert coherent_aspect((2496,2688),(2496,2688)) == 2496/2688
 print("PASS binocular HUD extent coherence, resize fallback and four destructive mutants")
+
+
+# Issue #119: real source-code adaptive peripheral readability. The opt-in
+# exact gear/rank/time producer only may increase its 0.90-horizontal floor
+# toward a 0.65 vertical floor, if a SHARED bilateral viewport displacement
+# can contain the COMPLETE source bbox. A/B-off and GOAL/world/F11 remain
+# unreachable from this branch. No HMD PASS is inferred from this fixture.
+assert "float R30AdaptivePeripheralHudBoost(" in code
+assert "peripheralBoost = R30AdaptivePeripheralHudBoost(" in draw
+adaptive = code[code.index("float R30AdaptivePeripheralHudBoost("):
+                code.index("bool R30TransformHudScissor(")]
+for marker in ("anchor.hasBounds", "0.65f / hudScaleY",
+               "shiftMin <= shiftMax", "eyeScale[eye]", "eyeOffset[eye]",
+               "if (!fitsBothEyes(previousBoost))", "if (fitsBothEyes(desired))",
+               "for (int i = 0; i < 8; ++i)", "return low;"):
+    assert marker in adaptive, marker
+assert draw.index("R30GetExactHudEdgeAnchor(") < draw.index(
+    "R30ExactPeripheralHudBoost(exactHudAnchor);") < draw.index(
+    "R30AdaptivePeripheralHudBoost(") < draw.index(
+    "hudScaleX *= peripheralBoost;")
+assert draw.count("R30AdaptivePeripheralHudBoost(") == 1
+
+def adaptive_compatible_fit(box, viewport, eye_scales, eye_offsets,
+                            base_x, base_y, anchors, boost):
+    w,h = viewport
+    lo_x,hi_x,lo_y,hi_y = box
+    ax,ay = anchors
+    if w <= 0 or h <= 0 or not all(isfinite(v) for v in (
+            *box, *eye_scales, *eye_offsets, base_x, base_y, ax, ay, boost)):
+        return False
+    shift_min,shift_max = float("-inf"),float("inf")
+    for eye in range(2):
+        sx = base_x * boost * eye_scales[eye]
+        bias = (1-sx) * (.5*w + .5*w*ax) + .5*w*eye_offsets[eye]
+        if sx <= 0: return False
+        shift_min = max(shift_min, .025*w - (sx*lo_x + bias))
+        shift_max = min(shift_max, .975*w - (sx*hi_x + bias))
+    sy = base_y*boost
+    bias_y = (1-sy)*(.5*h - .5*h*ay)
+    return (shift_min <= shift_max and sy > 0 and
+            .025*h - (sy*lo_y + bias_y) <=
+            .975*h - (sy*hi_y + bias_y))
+
+def adaptive_boost(box,viewport,scales,offsets,base_x,base_y,anchors,old):
+    target = max(old,min(3.0,.65/base_y))
+    fits = lambda b: adaptive_compatible_fit(
+        box,viewport,scales,offsets,base_x,base_y,anchors,b)
+    if not fits(old): return old
+    if fits(target): return target
+    lo,hi = old,target
+    for _ in range(8):
+        mid=(lo+hi)*.5
+        if fits(mid): lo=mid
+        else: hi=mid
+    return lo
+
+for w,h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
+    box=(.03*w,.15*w,.06*h,.20*h)
+    old=readable_boost(.55,-.82,.78)
+    new=adaptive_boost(box,(w,h),(1.0,1.03),(-.035,.035),
+                       .55,.214,(-.82,.78),old)
+    assert new >= old
+    assert new > old + .1   # exact edge glyphs enlarge in portrait eye
+    assert new <= 3.
+    assert adaptive_compatible_fit(box,(w,h),(1.0,1.03),(-.035,.035),
+                                   .55,.214,(-.82,.78),new)
+    # Large edge group cannot have an unbounded boost; source stays contained.
+    wide=(0.,.95*w,0.,.80*h)
+    restricted=adaptive_boost(wide,(w,h),(1.0,1.03),(-.035,.035),
+                              .55,.214,(-.82,.78),old)
+    assert old <= restricted < new
+    assert adaptive_compatible_fit(wide,(w,h),(1.0,1.03),
+                                   (-.035,.035),.55,.214,(-.82,.78),restricted)
+    # A corrupt second eye is NOT independently re-centered.
+    assert not adaptive_compatible_fit(
+        box,(w,h),(1.0,float("nan")),(-.035,.035),
+        .55,.214,(-.82,.78),3.)
+    # Baseline A/B guard: default-off lacks an exact bbox, so the real
+    # dispatcher does not enter the adaptive scaling path at all.
+    assert "if (!Settings::VRHudEdgeAnchors.get() ||" in helper
+for removed in ("eyeOffset[eye] * halfWidth", "shiftMin <= shiftMax",
+                "if (!fitsBothEyes(previousBoost))"):
+    assert removed in adaptive
+    assert removed not in adaptive.replace(removed, "", 1)
+print("PASS adaptive Quest3 peripheral glyph sizing, bilateral safe bounds, desktop aspect/reset and negative eye fixture")

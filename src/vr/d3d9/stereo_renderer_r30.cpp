@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <atomic>
 #include <memory>
+#include <limits>
 #include <mutex>
 #include <unordered_map>
 #include <vector>
@@ -1980,6 +1981,94 @@ namespace OutRunVRStereo
                 edgeYBias += std::clamp(0.0f, verticalMin, verticalMax);
         }
 
+        // Issue #119: an exact, opt-in driving HUD group can be much too
+        // small after ultrawide desktop -> portrait XR containment. Retain
+        // the established 0.90 horizontal floor, but let the group approach
+        // 0.65 vertical source scale ONLY when its complete exact bounds can
+        // still fit both eyes after a single shared displacement. This is a
+        // bounded producer-only operation, never a global ScreenHud zoom.
+        float R30AdaptivePeripheralHudBoost(
+            const R30HudEdgeAnchor& anchor,
+            float x0, float y0, float width, float height,
+            float hudScaleX, float hudScaleY,
+            const float eyeScale[2], const float eyeOffset[2],
+            float previousBoost) noexcept
+        {
+            if (!anchor.hasBounds ||
+                (anchor.x == 0.0f && anchor.y == 0.0f) ||
+                !(width > 0.0f && height > 0.0f) ||
+                !(hudScaleX > 0.0f && hudScaleY > 0.0f) ||
+                !std::isfinite(hudScaleX) || !std::isfinite(hudScaleY) ||
+                !std::isfinite(previousBoost) || previousBoost < 1.0f ||
+                previousBoost >= 3.0f ||
+                anchor.minX < x0 || anchor.maxX > x0 + width ||
+                anchor.minY < y0 || anchor.maxY > y0 + height)
+                return previousBoost;
+
+            const float desired = std::clamp(
+                0.65f / hudScaleY, previousBoost, 3.0f);
+            if (desired <= previousBoost)
+                return previousBoost;
+
+            // A bilateral common translation is feasible iff both projected
+            // X intervals share an allowed shift and the Y interval fits.
+            // Do not discard one eye, clamp the eyes separately, or shrink a
+            // previously verified 0.90-horizontal baseline on failure.
+            const float halfWidth = width * 0.5f;
+            const float halfHeight = height * 0.5f;
+            const float centerX = x0 + halfWidth;
+            const float centerY = y0 + halfHeight;
+            const float safeLeft = x0 + 0.025f * width;
+            const float safeRight = x0 + 0.975f * width;
+            const float safeTop = y0 + 0.025f * height;
+            const float safeBottom = y0 + 0.975f * height;
+            auto fitsBothEyes = [&](float boost) noexcept {
+                float shiftMin = -std::numeric_limits<float>::infinity();
+                float shiftMax = std::numeric_limits<float>::infinity();
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    const float scale = hudScaleX * boost * eyeScale[eye];
+                    const float bias = (1.0f - scale) *
+                        (centerX + halfWidth * anchor.x) +
+                        eyeOffset[eye] * halfWidth;
+                    const float groupMin = scale * anchor.minX + bias;
+                    const float groupMax = scale * anchor.maxX + bias;
+                    if (!(scale > 0.0f) || !std::isfinite(groupMin) ||
+                        !std::isfinite(groupMax))
+                        return false;
+                    shiftMin = (std::max)(shiftMin, safeLeft - groupMin);
+                    shiftMax = (std::min)(shiftMax, safeRight - groupMax);
+                }
+                const float scaleY = hudScaleY * boost;
+                const float biasY = (1.0f - scaleY) *
+                    (centerY - halfHeight * anchor.y);
+                const float groupTop = scaleY * anchor.minY + biasY;
+                const float groupBottom = scaleY * anchor.maxY + biasY;
+                return std::isfinite(shiftMin) && std::isfinite(shiftMax) &&
+                    shiftMin <= shiftMax && scaleY > 0.0f &&
+                    std::isfinite(groupTop) && std::isfinite(groupBottom) &&
+                    safeTop - groupTop <= safeBottom - groupBottom;
+            };
+            if (!fitsBothEyes(previousBoost))
+                return previousBoost;
+            if (fitsBothEyes(desired))
+                return desired;
+
+            // Only exact producer groups enter this bounded search. Never
+            // permit a boost below the verified baseline; finite eight-step
+            // bisection is independent of viewport resolution/eye count.
+            float low = previousBoost, high = desired;
+            for (int i = 0; i < 8; ++i)
+            {
+                const float mid = low + (high - low) * 0.5f;
+                if (fitsBothEyes(mid))
+                    low = mid;
+                else
+                    high = mid;
+            }
+            return low;
+        }
+
         bool R30TransformHudScissor(
             const RECT& source, const D3DVIEWPORT9& viewport,
             float scaleX, float scaleY, float offsetX,
@@ -3606,8 +3695,12 @@ namespace OutRunVRStereo
                         x0, y0, width, height, usedMask, touched, knownUsedCount);
                 // Per-draw only: keep both eyes' sprite aspect and FOV bias
                 // paired, without touching a shared/cached gameplay scale.
-                const float peripheralBoost =
+                float peripheralBoost =
                     R30ExactPeripheralHudBoost(exactHudAnchor);
+                peripheralBoost = R30AdaptivePeripheralHudBoost(
+                    exactHudAnchor, x0, y0, width, height,
+                    hudScaleX, hudScaleY, state.eyeScale, state.eyeOffset,
+                    peripheralBoost);
                 hudScaleX *= peripheralBoost;
                 hudScaleY *= peripheralBoost;
                 const float halfWidth = width * 0.5f;
