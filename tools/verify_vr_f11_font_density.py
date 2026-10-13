@@ -101,6 +101,8 @@ def check_shell_layout_mutations(font: str) -> None:
     start = font.index("void Overlay::render_shell()")
     end = font.index("void Overlay::init()", start)
     shell = font[start:end]
+    # Mutate the exact edit-finalisation subroutine, not earlier calls
+    # in the first-run modal or unrelated F11 frame initialization.
     mutations = (
         ("layoutChanged ? ImGuiCond_Always : initialPlacement",
          "initialPlacement"),
@@ -945,10 +947,10 @@ def check_f11_overlay_font_persistence(font: str, header: str) -> None:
     mutations = (
         (ui, markers[0], "Overlay::FontScalePending = false;", markers),
         (ui, markers[1], "ImGui::IsMouseReleased(ImGuiMouseButton_Left)", markers),
-        (render, required[1], "false ||", required),
-        (render, required[2], "ImGui::IsMouseDown(ImGuiMouseButton_Left)", required),
-        (render, required[5], "/* dropped settings save */", required),
-        (render, required[6], "FontScalePending = true;", required),
+        (finaliser, required[1], "false ||", required),
+        (finaliser, required[2], "ImGui::IsMouseDown(ImGuiMouseButton_Left)", required),
+        (finaliser, required[5], "/* dropped settings save */", required),
+        (finaliser, required[6], "FontScalePending = true;", required),
     )
     for original, good, bad, needed in mutations:
         assert original.count(good) >= 1
