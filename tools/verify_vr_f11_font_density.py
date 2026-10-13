@@ -213,9 +213,9 @@ def check_transient_eye_extent_dropout(hook: str) -> None:
     # before either eye lookup, not a permanent desktop fallback.
     assert "overlayActive && Game::is_vr_gameplay_presentation()" in density
     assert retain.replace("\\n", "\n").replace("\\t", "\t") in density
-    assert density.index("overlayActive && Game::is_vr_gameplay_presentation()") < \\
-           density.index(retain.replace("\\n", "\n").replace("\\t", "\t")) < \\
-           density.index("R23TryGetPublishedEyeExtent(0, lw, lh)")
+    assert (density.index("overlayActive && Game::is_vr_gameplay_presentation()") <
+            density.index(retain.replace("\\n", "\n").replace("\\t", "\t")) <
+            density.index("R23TryGetPublishedEyeExtent(0, lw, lh)"))
     assert "float vrFontMultiplier = 1.0f;" in hook
     assert "lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u" in density
     assert "if (Overlay::VrFontMultiplier != vrFontMultiplier)" in density
