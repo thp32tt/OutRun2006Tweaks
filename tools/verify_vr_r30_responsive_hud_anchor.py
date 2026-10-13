@@ -581,6 +581,45 @@ for w,h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
     assert visible_fit((.05*h,.95*h),(0,h),
                        (1.4,1.4),(0.,0.),y_wanted)==y_wanted
 
+# Additional bilateral layout regression: swapping left/right calibration
+# must only swap the outputs, not change the shared source-space translation.
+# Exercise distinct top and bottom dominant eyes and nonidentical existing
+# per-eye biases so a future one-eye-only adjustment cannot pass by symmetry.
+for height in (768., 1080., 1440., 2688.):
+    cases = (
+        ((.005*height, .12*height), (.88, .94),
+         (.045*height, -.05*height), (.011*height, -.009*height)),
+        ((.88*height, .995*height), (.85, .96),
+         (.08*height, .055*height), (.011*height, -.009*height)),
+    )
+    for box, scales, biases, offsets in cases:
+        actual = visible_fit(box, (0., height), scales, biases, offsets)
+        reversed_eye = visible_fit(
+            box, (0., height), tuple(reversed(scales)),
+            tuple(reversed(biases)), tuple(reversed(offsets)))
+        assert abs(actual[0] - reversed_eye[1]) <= 1e-7 * height
+        assert abs(actual[1] - reversed_eye[0]) <= 1e-7 * height
+        correction = actual[0] - offsets[0]
+        assert abs(correction - (actual[1] - offsets[1])) <= 1e-7 * height
+        for s, b, offset in zip(scales, biases, actual):
+            assert s*box[0] + b + offset >= .025*height - 1e-6*height
+            assert s*box[1] + b + offset <= .975*height + 1e-6*height
+
+# A corrupt eye calibration must not silently become a unilateral HUD fit.
+# Reject replacing any paired-eye nonfinite/nonpositive validation with a no-op.
+for validation_guard in (
+    "!std::isfinite(eyeScaleY[0])",
+    "!std::isfinite(eyeScaleY[1])",
+    "!std::isfinite(eyeBiasY[0])",
+    "!std::isfinite(eyeBiasY[1])",
+    "eyeScaleY[0] <= 0.0f",
+    "eyeScaleY[1] <= 0.0f",
+):
+    assert safe.count(validation_guard) == 1, validation_guard
+    mutant = safe.replace(validation_guard, "false", 1)
+    assert mutant.count(validation_guard) == 0
+print("PASS bilateral top/bottom eye-swap invariance, disparate offsets, six invalid-calibration mutants")
+
 # Structural/mutation acceptance: both eyes are mandatory; neither the
 # pre-FOV scalar approximation nor separately clamped eye shifts is valid.
 for marker in (
