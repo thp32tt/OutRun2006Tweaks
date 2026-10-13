@@ -55,12 +55,14 @@ def linked(s):
         and "ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in consumer
         and "D3DPRIMITIVETYPE topology," in producer
         and "supported_game_state(game, type, vp, layout, transforms, capture, output)" in observer
-        and "nativeSubmitted = submit(s, vertices, fanTriangles.data()," in observer
-        and "D3DPT_TRIANGLELIST, capture, output);" in observer
-        and "nativeSubmitted = submit(s, vertices, indices, indexCount," in observer
-        and "type, capture, output);" in observer
-        and "if (nativeSubmitted)" in observer
-        and "s.frameBatch.succeeded(output.nativeDepthTest," in observer
+        # Both real native paths must fail closed independently. 00671 changed
+        # the submit consumer from one common result variable to two guarded
+        # branches so a failed fan cannot accidentally mark a later draw OK.
+        and "if (!submit(s, vertices, fanTriangles.data()," in observer
+        and "D3DPT_TRIANGLELIST, capture, output)) {" in observer
+        and "if (!submit(s, vertices, indices, indexCount, type, capture, output)) {" in observer
+        and observer.count("s.frameBatch.succeeded(output.nativeDepthTest,") == 2
+        and observer.count("s.frameBatch.abort();") >= 3
         and "return optedIn;" in s
     )
 
@@ -83,12 +85,12 @@ def main():
         ("D3DPRIMITIVETYPE topology,", "D3DPRIMITIVETYPE unusedTopology,"),
         ("ctx->DrawIndexed(indexCount, 0, 0);", "/* indexed draw dropped */"),
         ("ctx->Draw(static_cast<UINT>(vertices.size()), 0);", "/* linear draw dropped */"),
-        ("nativeSubmitted = submit(s, vertices, fanTriangles.data(),",
-         "nativeSubmitted = false /* fan submit removed */;"),
-        ("nativeSubmitted = submit(s, vertices, indices, indexCount,",
-         "nativeSubmitted = false /* indexed submit removed */;"),
+        ("if (!submit(s, vertices, fanTriangles.data(),",
+         "if (false /* fan native submit removed */"),
+        ("if (!submit(s, vertices, indices, indexCount, type, capture, output)) {",
+         "if (false /* indexed native submit removed */) {"),
         ("s.frameBatch.succeeded(output.nativeDepthTest,",
-         "s.frameBatch.abort(); /* success path removed */"),
+         "/* success path removed */"),
     ]
     for good, bad in cases:
         assert s.count(good) >= 1, good
