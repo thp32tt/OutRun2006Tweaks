@@ -10,12 +10,12 @@
   "feature_id": "DX9EX:PERF:R32_PRESENT_SPIKE_IO_COALESCING",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R32_PRESENT_SPIKE_IO_COALESCING",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
-  "checkpoint": "C3_VALIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00803]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r32.cpp",
     "tools/verify_vr_r32_spike_log_backpressure.py",
@@ -59,9 +59,9 @@
     ]
   },
   "acceptance_results": {
-    "R32_BOUNDED_LOG_IO": "PASS_SOURCE_PENDING_CI",
-    "R32_EPOCH_AND_PEAK_PARITY": "PASS_SOURCE_PENDING_CI",
-    "R32_EXACT_SHA_FULL_GATE": "PENDING",
+    "R32_BOUNDED_LOG_IO": "PASS_EXACT_SHA",
+    "R32_EPOCH_AND_PEAK_PARITY": "PASS_EXACT_SHA",
+    "R32_EXACT_SHA_FULL_GATE": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -78,8 +78,62 @@
       "Lowering render resolution to mask stalls sacrifices visual quality."
     ],
     "fix_evidence": "Aggregate worst source frame, baseline, workload, and stereo route at zero extra GPU cost with one five-second log.",
-    "negative_test_evidence": "Eight destructive mutant checks and seeded 2600-frame burst model wired to exact-SHA Win32 CI."
+    "negative_test_evidence": "Nine owner-scoped destructive source mutations and seeded 2600-frame spike-burst model; policy PASS at exact validation-bearing SHA."
   },
   "performance_evidence": "Source-confirmed removal of every synchronous per-hard-spike warning; HMD p95/p99 performance gains remain unmeasured.",
-  "runtime_status": "NEED_QUEST3_VDXR_P95_P99"
+  "runtime_status": "NEED_QUEST3_VDXR_P95_P99",
+  "material_result_sha": "11aa54ef9a1ec7acc783a04e0b1f996043a99e15",
+  "validation_bearing_result_sha": "0163bcb26237b324e5e35937421f90a5a36cecab",
+  "result_sha": "0163bcb26237b324e5e35937421f90a5a36cecab",
+  "validation_evidence": {
+    "material": {
+      "sha": "11aa54ef9a1ec7acc783a04e0b1f996043a99e15",
+      "description": "R32 Present spike log coalescing C++ plus source regression/workflow and task record"
+    },
+    "repairs": [
+      {
+        "sha": "dcdcc055a9176b2ed112c13d08ebd38f819604aa",
+        "reason": "Scope destructive tests to the correct R32 owner functions; original verifier false negative."
+      },
+      {
+        "sha": "0163bcb26237b324e5e35937421f90a5a36cecab",
+        "reason": "Make destructive anchor absence a policy violation instead of unhandled ValueError."
+      }
+    ],
+    "runtime": "Quest3/VDXR hardware optical and p95/p99 validation not performed; RUNTIME_VALIDATION=UNTESTED"
+  },
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "0163bcb26237b324e5e35937421f90a5a36cecab",
+    "dx9ex_active": {
+      "run_id": 38475329424,
+      "head_sha": "0163bcb26237b324e5e35937421f90a5a36cecab",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "game": "SUCCESS",
+        "host": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38475329653,
+      "head_sha": "0163bcb26237b324e5e35937421f90a5a36cecab",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38474867261,
+      "head_sha": "11aa54ef9a1ec7acc783a04e0b1f996043a99e15",
+      "conclusion": "SUCCESS",
+      "source_tree_unchanged_in_validation_commits": true,
+      "jobs": {
+        "msvc-analyze-active-game": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "source-cross-domain": "SUCCESS"
+      }
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  },
+  "c6_recorded_at_kst": "2026-10-14 07:12 KST"
 }
