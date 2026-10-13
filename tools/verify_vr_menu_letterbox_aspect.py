@@ -628,3 +628,39 @@ for width,height in ((1024,768),(1920,1080),(3440,1440),
         assert desired[2] >= previous[2] and desired[3] == previous[3]
     assert width < 16384 and height < 16384
 print("PASS D3D9Ex full-source menu viewport and exact restore; 7 destructive mutants")
+
+
+# World clip planes are independent of viewport/scissor/stencil. The final
+# game pass may leave one enabled; never let it cut the fixed 4:3 rails.
+def verify_menu_user_clip_planes(code: str) -> None:
+    body = code.split("static void D3DEndScene(", 1)[1].split(
+        "if (overlayInited)", 1)[0]
+    capture = body.index("DWORD prevClipPlaneEnable = 0;")
+    read = body.index("GetRenderState(D3DRS_CLIPPLANEENABLE, &prevClipPlaneEnable)")
+    off = body.index("SetRenderState(D3DRS_CLIPPLANEENABLE, 0);")
+    left = body.index("DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);")
+    right = body.index("DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);")
+    restore = body.index(
+        "SetRenderState(D3DRS_CLIPPLANEENABLE, prevClipPlaneEnable);")
+    assert capture < read < off < left < right < restore
+    assert body.count("D3DRS_CLIPPLANEENABLE") == 3
+    assert read < body.index("if (clipStateReady)")
+    assert restore < body.index("SetViewport(&previousViewport)")
+    assert "SUCCEEDED(d3ddev->GetRenderState(D3DRS_CLIPPLANEENABLE, &prevClipPlaneEnable))" in body
+
+verify_menu_user_clip_planes(src)
+for old, bad in (
+    ("SUCCEEDED(d3ddev->GetRenderState(D3DRS_CLIPPLANEENABLE, &prevClipPlaneEnable))", "true"),
+    ("SetRenderState(D3DRS_CLIPPLANEENABLE, 0);",
+     "SetRenderState(D3DRS_CLIPPLANEENABLE, 1);"),
+    ("SetRenderState(D3DRS_CLIPPLANEENABLE, prevClipPlaneEnable);",
+     "SetRenderState(D3DRS_CLIPPLANEENABLE, 0);"),
+):
+    assert old in src
+    try:
+        verify_menu_user_clip_planes(src.replace(old, bad, 1))
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("clip-plane restoration mutation escaped: " + old)
+print("PASS user clip plane menu isolation; 3 destructive controls")
