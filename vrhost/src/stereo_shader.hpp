@@ -15,7 +15,8 @@ cbuffer BlitParams : register(b0)
     float2 UvOffset;
     float SdrWhiteScale;
     float SourceIsScRgb;
-    float2 Padding;
+    float SourceIsSrgbView;
+    float Padding;
 };
 
 cbuffer MenuPlaneParams : register(b1)
@@ -63,7 +64,11 @@ float4 PSMain(VSOut input) : SV_Target
     float3 linearColor;
     if (SourceIsScRgb > 0.5)
         linearColor = max(src.rgb, 0.0) / max(SdrWhiteScale, 0.001);
+    else if (SourceIsSrgbView > 0.5)
+        // D3D11 *_SRGB SRV sampling has already linearized this source.
+        linearColor = saturate(src.rgb);
     else
+        // Legacy unorm desktop/game captures still contain encoded RGB.
         linearColor = SrgbToLinear(saturate(src.rgb));
     return float4(saturate(linearColor), 1.0);
 }

@@ -969,8 +969,10 @@ namespace
         float uvOffset[2];
         float sdrWhiteScale;
         float sourceIsScRgb;
-        float padding[2];
+        float sourceIsSrgbView;
+        float padding;
     };
+    static_assert(sizeof(BlitParams) == 32u, "Native OpenXR blit HLSL b0 ABI");
 
     struct MenuPlaneParams
     {
@@ -1363,7 +1365,7 @@ namespace
                     if (FAILED(device_->OpenSharedResource(handle, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&resource))) || !resource) return false;
                     const HRESULT q = resource->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void**>(texture)); resource->Release(); if (FAILED(q) || !*texture) return false;
                     D3D11_TEXTURE2D_DESC d{}; (*texture)->GetDesc(&d);
-                    if (d.Width != width || d.Height != height || d.SampleDesc.Count != 1 || (d.Format != DXGI_FORMAT_B8G8R8A8_UNORM && d.Format != DXGI_FORMAT_R8G8B8A8_UNORM && d.Format != DXGI_FORMAT_R10G10B10A2_UNORM && d.Format != DXGI_FORMAT_R16G16B16A16_FLOAT) || FAILED(device_->CreateShaderResourceView(*texture, nullptr, srv)) || !*srv){ReleaseCom(*texture);ReleaseCom(*srv);return false;}
+                    if (d.Width != width || d.Height != height || d.SampleDesc.Count != 1 || !OutRunVrNativeEyePair::IsSupportedSourceFormat(d.Format) || FAILED(device_->CreateShaderResourceView(*texture, nullptr, srv)) || !*srv){ReleaseCom(*texture);ReleaseCom(*srv);return false;}
                     return true;
                 };
                 if (!openOne(leftHandleValue,&directLeft_[slot],&directLeftSrv_[slot]) || !openOne(rightHandleValue,&directRight_[slot],&directRightSrv_[slot])){ReleaseCom(directLeftSrv_[slot]);ReleaseCom(directLeft_[slot]);ReleaseCom(directRightSrv_[slot]);ReleaseCom(directRight_[slot]);directLeftHandle_[slot]=directRightHandle_[slot]=directGeneration_[slot]=0;directFormat_[slot]=DXGI_FORMAT_UNKNOWN;invalidateDirect();if(!directOpenFailureLogged_){directOpenFailureLogged_=true;std::cout<<"Direct GPU eye ring open failed; host will request SBS fallback.\n";}return false;}
@@ -1527,7 +1529,10 @@ namespace
             p->sdrWhiteScale = sdrWhiteScale_;
             p->sourceIsScRgb =
                 sourceFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ? 1.f : 0.f;
-            p->padding[0] = p->padding[1] = 0;
+            // A typed sRGB SRV already returns linear values from D3D11 sampling.
+            p->sourceIsSrgbView =
+                OutRunVrNativeEyePair::IsSrgbView(sourceFormat) ? 1.f : 0.f;
+            p->padding = 0.f;
             context_->Unmap(constantBuffer_, 0);
 
             if (FAILED(context_->Map(
@@ -2203,7 +2208,10 @@ namespace
             p->uvOffset[1] = uv.y;
             p->sdrWhiteScale = sdrWhiteScale_;
             p->sourceIsScRgb = sourceFormat == DXGI_FORMAT_R16G16B16A16_FLOAT ? 1.f : 0.f;
-            p->padding[0] = p->padding[1] = 0;
+            // A typed sRGB SRV already returns linear values from D3D11 sampling.
+            p->sourceIsSrgbView =
+                OutRunVrNativeEyePair::IsSrgbView(sourceFormat) ? 1.f : 0.f;
+            p->padding = 0.f;
             context_->Unmap(constantBuffer_, 0);
 
             D3D11_VIEWPORT vp{};

@@ -51,6 +51,11 @@ jobs:
         shell: pwsh
         run: python tools/test_dx11_xr_source_resolution_policy.py
 
+      - name: Verify DX11 host game-eye SRGB to OpenXR composite
+        if: github.ref_name == 'vr-dx11-native-r71'
+        shell: pwsh
+        run: python tools/test_dx11_host_srgb_handoff_00697.py
+
       - name: Verify backend disassembly contract
         shell: pwsh
         run: python tools/verify_vr_backend_disasm_contract.py

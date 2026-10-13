@@ -4,6 +4,22 @@
 
 namespace OutRunVrNativeEyePair
 {
+    // A typed *_SRGB SRV is automatically decoded to linear RGB by D3D11
+    // texture sampling. The host compositor must not apply SrgbToLinear twice.
+    [[nodiscard]] constexpr bool IsSrgbView(DXGI_FORMAT format) noexcept
+    {
+        return format == DXGI_FORMAT_B8G8R8A8_UNORM_SRGB ||
+               format == DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    }
+
+    [[nodiscard]] constexpr bool IsSupportedSourceFormat(DXGI_FORMAT format) noexcept
+    {
+        return format == DXGI_FORMAT_B8G8R8A8_UNORM ||
+               format == DXGI_FORMAT_R8G8B8A8_UNORM ||
+               format == DXGI_FORMAT_R10G10B10A2_UNORM ||
+               format == DXGI_FORMAT_R16G16B16A16_FLOAT ||
+               IsSrgbView(format);
+    }
     // Exact two-eye source admission shared by the real x64 DirectGPU importer
     // and the R23 OpenXR projection staging path. Never treat duplicated
     // handles or incompatible CopyResource shapes as a stereo game frame.
@@ -22,10 +38,7 @@ namespace OutRunVrNativeEyePair
                 d.SampleDesc.Count == 1 && d.SampleDesc.Quality == 0 &&
                 d.Usage == D3D11_USAGE_DEFAULT && d.CPUAccessFlags == 0 &&
                 (d.BindFlags & D3D11_BIND_SHADER_RESOURCE) != 0 &&
-                (d.Format == DXGI_FORMAT_B8G8R8A8_UNORM ||
-                 d.Format == DXGI_FORMAT_R8G8B8A8_UNORM ||
-                 d.Format == DXGI_FORMAT_R10G10B10A2_UNORM ||
-                 d.Format == DXGI_FORMAT_R16G16B16A16_FLOAT);
+                IsSupportedSourceFormat(d.Format);
         };
         return usable(left) && usable(right) &&
             left.Format == right.Format;

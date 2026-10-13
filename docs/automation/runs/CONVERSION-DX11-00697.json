@@ -1,0 +1,99 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00697",
+  "production_id": "CONVERSION-DX11-00697",
+  "event_id": "CONVERSION-DX11-00697-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "feature_id": "GAME_OPENXR_TYPED_SRGB_STEREO_COMPOSITING",
+  "work_key": "DX11:HOST_NATIVE_EYE_SRGB_XR_OUTPUT",
+  "status": "AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "native_stereo_eye_transport",
+    "integration_path": [
+      "Real game Draw/DrawIndexed into native D3D11 eye producer/ring preserves typed SRGB eye identity and both color channels",
+      "R23 x64 DirectGPU importer accepts matching typed SRGB stereo pair and copies both to host-owned OpenXR eyes",
+      "Actual OpenXR menu/projection HLSL skips duplicate SRGB inverse transfer for already-decoded D3D11 SRGB texture views"
+    ],
+    "batch_components": [
+      "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+      "vrhost/src/main.cpp",
+      "vrhost/src/stereo_shader.hpp",
+      "vrhost/tests/native_direct_eye_pair_smoke.cpp",
+      "tools/test_dx11_host_srgb_handoff_00697.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Native two-eye Windows smoke plus portable actual-header C++17 probe cover BGRA/RGBA typed SRGB eye acceptance and double-decode omission in HLSL",
+      "negative_regression": "Mixed typed-SRGB/UNORM eye formats, duplicate eye handles, mismatched MSAA, and destructive host/HLSL mutation must fail; legacy UNORM and scRGB paths stay distinct",
+      "component_integration": "R23 production source includes edited compositor, R23 hold COPY uses supported typed SRGB descriptors, two active OpenXR upload sites supply SourceIsSrgbView, PSMain handles typed-SRGB without duplicate gamma"
+    },
+    "conflict_keys": [
+      "DX11:HOST_NATIVE_EYE_SRGB_XR_OUTPUT",
+      "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+      "vrhost/src/main.cpp",
+      "vrhost/src/stereo_shader.hpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "NATIVE_STEREO_EYE_OUTPUT",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_SHARED_EYE_RING",
+      "R23_DIRECT_GPU_HOST",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Typed SRGB game eye samples reach active R23 projection/menu shaders without duplicate sRGB gamma decode. In-HMD frame/color/controls require independent Quest3/VDXR test.",
+    "activation_guard_and_fallback": "DirectGPU only when existing opted-in producer and verified matching SRGB eye pair/slot; mixed eye pair rejection keeps original DX9Ex/SBS fallback and input untouched."
+  },
+  "feature_contract": {
+    "feature_id": "GAME_OPENXR_TYPED_SRGB_STEREO_COMPOSITING",
+    "goal": "Preserve real native D3D11 game stereo pixel color through host DirectGPU texture import and both OpenXR projection/menu shader paths, maintaining separate UNORM and scRGB fallback.",
+    "acceptance_items": [
+      {
+        "id": "srgb-eye-to-openxr",
+        "category": "end_to_end_behavior",
+        "behavior_area": "host_native_stereo_import_and_gpu_copy",
+        "expected_behavior": "Both same-format BGRA/RGBA SRGB game eye resources import and reach native OpenXR without applying a second sRGB decode"
+      },
+      {
+        "id": "legacy-fallback-and-input",
+        "category": "fallback_regression",
+        "behavior_area": "host_source_transfer_d3d9_fallback",
+        "expected_behavior": "Unorm keeps legacy decode, scRGB retains white scaling, bad/mixed/aliased source eyes are rejected without changing original D3D9 Draw and input"
+      },
+      {
+        "id": "host-stereo-shader-compiled-contract",
+        "category": "integrated_validation",
+        "behavior_area": "actual_r23_menu_projection_hlsl_bindings",
+        "expected_behavior": "Portable C++ source header decisions and destructive source tests plus GitHub exact SHA Gate verify both R23 shader binding sites and typed-sRGB color branch"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "srgb-eye-to-openxr": "PENDING_GATE",
+    "legacy-fallback-and-input": "PENDING_GATE",
+    "host-stereo-shader-compiled-contract": "PENDING_GATE"
+  },
+  "base_head_sha": "bcb92713c49f6cc3ddd52a56b39dd0c5bb49356c",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "vrhost/src/runtime/native_direct_stereo_pair.hpp",
+    "vrhost/src/main.cpp",
+    "vrhost/src/stereo_shader.hpp",
+    "vrhost/tests/native_direct_eye_pair_smoke.cpp",
+    ".github/workflows/backend-conversion-gate.yml",
+    "tools/test_dx11_host_srgb_handoff_00697.py",
+    "docs/automation/runs/CONVERSION-DX11-00697.json"
+  ],
+  "next_action": "Await exact-SHA full Backend Conversion Gate; runtime Quest3/VDXR and gamepad untested; no DXVK work."
+}

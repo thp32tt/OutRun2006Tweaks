@@ -62,6 +62,37 @@ int main()
     if (!require(!accepts(0x110u, 0x220u, 1u),
                  "unsampleable source must preserve classic fallback"))
         return 1;
+
+    // Same-format sRGB game eyes must traverse the real DirectGPU importer.
+    // The PS expects the D3D11 SRV's automatic decode, not a second gamma pass.
+    left = right;
+    left.Format = right.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+    left.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+    if (!require(accepts(0x110u, 0x220u, 2u),
+                 "BGRA sRGB native stereo source must enter OpenXR hold") ||
+        !require(OutRunVrNativeEyePair::IsSrgbView(left.Format),
+                 "BGRA sRGB must request already-linear shader transfer"))
+        return 1;
+    left.Format = right.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    if (!require(accepts(0x110u, 0x220u, 2u),
+                 "RGBA sRGB native stereo source must enter OpenXR hold") ||
+        !require(OutRunVrNativeEyePair::IsSrgbView(left.Format),
+                 "RGBA sRGB must bypass second shader gamma decode"))
+        return 1;
+    right.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    if (!require(!accepts(0x110u, 0x220u, 2u),
+                 "mixed encoded and sRGB eyes must stay on original fallback"))
+        return 1;
+    left.Format = right.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    if (!require(accepts(0x110u, 0x220u, 2u) &&
+                 !OutRunVrNativeEyePair::IsSrgbView(left.Format),
+                 "legacy unorm eyes still require software gamma conversion"))
+        return 1;
+    left.Format = right.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+    if (!require(accepts(0x110u, 0x220u, 2u) &&
+                 !OutRunVrNativeEyePair::IsSrgbView(left.Format),
+                 "scRGB eyes retain their independent HDR white-scale route"))
+        return 1;
     std::cout << "Native two-eye host source/projection contract PASS\n";
     return 0;
 }
