@@ -87,8 +87,10 @@ for token in (
     "OutRunHudPeripheralText = previousPeripheral;",
 ):
     assert token in owner, token
-assert owner.count("ProducerToken::OutRunHudPeripheralText") == 2
-assert owner.count("ProducerToken::OutRunHudText") == 2
+# One original direct-glyph call plus the two exact queued clip/sprani
+# producers. All three identities must remain present; a lost emitter fails.
+assert owner.count("ProducerToken::OutRunHudPeripheralText") == 3
+assert owner.count("ProducerToken::OutRunHudText") == 3
 assert "OutRunHudPeripheralText," in semantic
 assert 'case ProducerToken::OutRunHudPeripheralText: return "OUTRUN_HUD_PERIPHERAL_TEXT";' in semantic
 assert "ProducerToken::OutRunHudText ||" not in helper
@@ -846,8 +848,10 @@ assert direct.index("directHudOwner.emplace(") < direct.index("OutRunHudTextProd
 assert direct.index("OutRunHudTextProducerHook.call(") < direct.index("OutRunHudPeripheralText = previousPeripheral;")
 # Both original BA9D0 emitters stay on their exact queued-SpriteNode path
 # even if direct glyph raster occurs during the enclosing C++ CALL.
-assert direct.count("ProducerToken::OutRunHudPeripheralText") == 2
-assert direct.count("ProducerToken::OutRunHudText") == 2
+# This slice deliberately ends before clip/sprani: only the immediate
+# BA9D0 producer belongs here; the two queued emitters are asserted above.
+assert direct.count("ProducerToken::OutRunHudPeripheralText") == 1
+assert direct.count("ProducerToken::OutRunHudText") == 1
 assert direct.count("OutRunHudTextProducerHook.call(") == 1
 assert "if (Settings::VREnabled &&" in direct
 assert "R30GetExactHudEdgeAnchor(" in code
