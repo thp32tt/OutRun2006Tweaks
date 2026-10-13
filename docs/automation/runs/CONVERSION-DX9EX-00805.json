@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00805",
+  "production_id": "CONVERSION-DX9EX-00805",
+  "event_id": "CONVERSION-DX9EX-00805-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R30_SPARSE_INDEX_DEPTH_SORT_CACHE",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R30_SPARSE_INDEX_DEPTH_SORT_CACHE",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATES",
+  "checkpoint": "C3_VALIDATE",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00805]",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_sparse_depth_classifier.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00805.json"
+  ],
+  "material_result_sha": "5c8f612ee933102e3752772e9baca8d9485965c2",
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R30_SPARSE_INDEX_DEPTH_SORT_CACHE",
+    "goal": "Preserve the exact first-512 ascending projected-depth classification of OutRun smoke/sand/effect indexed XYZRHW draws while eliminating redundant full index sorts across decoder-stable VB frames and per-UP heap churn.",
+    "scope_boundary": "Limit changes to R30 leased sparse index classification and its deterministic verifier; preserve R30 HUD, world/SkyGlow, eye transforms, Reset fallback, FFB, independent DX11, and frozen DXVK.",
+    "special_work_evidence": "Quest3 trace shows up to 3298 source Draws with gameRenderCpuMs p95 11.876ms / p99 16.179ms; the existing >512-reference sparse VB classifier reallocates and comparison-sorts 513..2048 references each memo miss, even when decoded IB and referenced mask are unchanged. The specific FPS impact is unmeasured; no runtime uplift claimed.",
+    "trace_stages": [
+      "OutRun original indexed smoke/sand/spray Draw produces validated CPU-shadowed VB/IB spans and local unique index references.",
+      "R30 decoded IB tracks revision, bounded referenced mask and first-512 XYZRHW world-depth classification before game Draw and per-eye reprojection.",
+      "R33 stereo per-eye draw and OpenXR composition consume unchanged R30 projected-depth/HUD-vs-world classification; 4:3/21:9/Quest3 optics and protected visuals must not regress."
+    ],
+    "subcomponents": [
+      "Reuse exact ascending >512-reference VB sort under a validated decoded-index mask generation and invalidate it before changing mask contents.",
+      "Reuse UP-only sort capacity without borrowing any VB decoder generations; unknown or corrupt producer hints continue dense ascending fallback.",
+      "Extend the existing deterministic source verifier with cache ownership/generation structural checks, destructive mutations and seeded multi-resolution 512-prefix parity/revision scenarios."
+    ],
+    "acceptance_items": [
+      {
+        "id": "R30_INDEX_GENERATION_SORT_REUSE",
+        "category": "end_to_end_behavior",
+        "behavior_area": "decoded_ib_sparse_gpu_draw",
+        "expected_behavior": "A stable decoded IB mask with changed VB or projection reuses the same proven first-512 ascending depth reference order across R30 draws, sorting once per generation."
+      },
+      {
+        "id": "R30_UP_AND_INVALID_HINT_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "up_scratch_and_corrupt_mask",
+        "expected_behavior": "UP index batches reuse storage without adopting VB sort identity; missing, malformed, duplicate and changed-generation hints fall back to the original safe ascending depth scan."
+      },
+      {
+        "id": "R30_EXACT_SHA_WIN32_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_host_package_domain",
+        "expected_behavior": "Deterministic positive/negative depth-classifier checks and the final exact-SHA Windows DX9Ex Active policy/game/host/full-chain/package, Domain Isolation and required source-impact checks all succeed."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "R30_INDEX_GENERATION_SORT_REUSE": "PENDING_EXACT_SHA",
+    "R30_UP_AND_INVALID_HINT_FALLBACK": "PENDING_EXACT_SHA",
+    "R30_EXACT_SHA_WIN32_GATES": "PENDING_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "R30XyzrhwHasProjectedDepthSignature on >512 sparse indexed references used a local dynamic vector, assigned the complete touched list, and std::sort()ed it per classifier miss. Source already caches unchanged IB decode but the sort ignored that stable generation.",
+    "root_cause": "Projected-depth selector's sorted touched list had only invocation lifetime, so independent VB revisions with the same immutable decoded IB redundantly sorted and allocated thousands of references.",
+    "source_trace": [
+      "OutRun D3D9 IndexedPrimitive VB/IB -> R30CopyIndexShadow/revision snapshot.",
+      "R30IndexDecodeCache local mask and vbTouched unique list -> R30XyzrhwHasProjectedDepthSignature ascending first-512 classifier.",
+      "Stereo projected-depth decision feeds the R30/R33 per-eye Draw route; no world/HUD semantic or shader changes."
+    ],
+    "alternatives_rejected": [
+      "Blindly scanning only unsorted touched references >512 changes the first-512 sample for sparse smoke and potentially misclassifies the world depth signature.",
+      "Caching by IB pointer alone would accept DISCARD/moved spans and corrupt classification after Reset; new decoder mask generation and lease/producer identity are required.",
+      "Forcing lower game resolution or reducing eye quality would change visible image quality without removing the identified CPU work."
+    ],
+    "fix_evidence": "R30 scratch owns separate VB and UP sorted vectors, with guarded decoded IB generation reuse and invalidation on every decoder miss; raw/no-lease calls preserve old local fallback.",
+    "negative_test_evidence": "Extended destructive static checks and deterministic VB/UP lifecycle+generation/first-512 model; GitHub exact-SHA CI not yet confirmed."
+  },
+  "performance_evidence": "Eliminates duplicate >512 reference VB sorting between unchanged IB generations, and reuses UP scratch allocations; measurable p95/p99 Quest3 benefit remains UNTESTED.",
+  "runtime_status": "NEED_QUEST3_VDXR_SCENE_MATCHED_P95_P99",
+  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "first_failed_sha": "e66d4dfd5b0e60639830d30c2b0c0327afa513db",
+    "dx9ex_active_run_id": 38478332529,
+    "failure": "policy: run record absent before C++ jobs started",
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  }
+}
