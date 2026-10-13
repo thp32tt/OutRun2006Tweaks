@@ -1,0 +1,77 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00792",
+  "production_id": "CONVERSION-DX9EX-00792",
+  "event_id": "CONVERSION-DX9EX-00792-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:INDEXED_UP_SINGLE_PASS",
+  "symptom_id": "DX9EX:PERF:INDEXED_UP_SINGLE_PASS",
+  "work_key": "DX9EX:PERF:INDEXED_UP_SINGLE_PASS",
+  "feature_class": "PERFORMANCE_FULL_DRAW_PATH",
+  "status": "IMPLEMENTED_NEEDS_VALIDATION",
+  "checkpoint": "C3_VALIDATE",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00792]",
+  "automation_validation": "PENDING_GITHUB_CI",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_index_rebase_fastpath.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00792.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:INDEXED_UP_SINGLE_PASS",
+    "goal": "Complete DrawIndexedPrimitiveUP performance improvement by removing redundant index scanning across both 16-bit and 32-bit stereo paths while retaining correct full bilateral draw and safe original D3D9 fallback.",
+    "scope_boundary": "R30 UP producer only; do not modify VB/IB, main-menu, HUD, lens, SkyGlow, FFB, DX11 or DXVK.",
+    "trace_stages": [
+      "Original D3D9 UP supplies MinVertexIndex/NumVertices.",
+      "R30 checks the declared vertex window, builds the unique index mask once and feeds per-eye XYZRHW transforms.",
+      "R29 raw UP draw replays both eyes; malformed caller input declines the stereo override and retains original D3D9 fallback."
+    ],
+    "acceptance_items": [
+      {
+        "id": "UP_STEREO_16_32_SINGLE_WALK",
+        "category": "end_to_end_behavior",
+        "behavior_area": "r30_indexed_up_stereo_sparse",
+        "expected_behavior": "One index walk handles both supported widths while preserving left and right eye transform and touched-list semantics."
+      },
+      {
+        "id": "INVALID_RANGE_AND_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "r30_window_bounds_and_desktop_fallback",
+        "expected_behavior": "Zero, oversized, overflowing or out-of-window index declarations reject injection to original D3D9; positive and negative differential tests remain green."
+      },
+      {
+        "id": "WIN32_EXACT_SHA_INTEGRATION",
+        "category": "integrated_validation",
+        "behavior_area": "win32_x86_game_x64_host_package_domain",
+        "expected_behavior": "DX9Ex Active full Win32 game/host/package and Domain Isolation for the exact material SHA; no Quest3 visual/fps claim."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "UP_STEREO_16_32_SINGLE_WALK": "PENDING_CI",
+    "INVALID_RANGE_AND_FALLBACK": "PENDING_CI",
+    "WIN32_EXACT_SHA_INTEGRATION": "PENDING_CI",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "root_cause": "R30 UP index path loops through the same 16/32-bit index data twice: max-index scan and sparse-mask construction, despite a caller-declared valid D3D9 index window.",
+    "source_trace": [
+      "UP original call window",
+      "R30 single-pass sparse mask",
+      "R30 per-eye transforms and R29 raw left/right draw"
+    ],
+    "fix_evidence": "Replace max-index loop with a checked 64-bit declared window; validate each index while populating the sparse mask.",
+    "negative_test_evidence": "2000 deterministic randomized 16/32-bit in-range cases, outside-range and overflow fallback, six destructive source mutations.",
+    "protected_behaviors": "Stereo both eyes, legal D3D9 min/count, desktop fallback, world/HUD, SkyGlow, FFB.",
+    "measurement_limitation": "CPU loop count improved in source; Quest3/VDXR frame-time, HMD graphics and 72Hz remain untested."
+  },
+  "ci_evidence": {
+    "status": "NOT_YET_RUN"
+  },
+  "runtime_status": "NEED_QUEST3_VDXR_TEST"
+}

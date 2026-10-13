@@ -222,6 +222,65 @@ def verify_vb_touched(source, body):
           f"{len(mutations)} destructive mutations")
 
 
+
+def verify_up_single_pass(source):
+    """Full UP 16/32-bit sparse stereo, legal window, negative mutations."""
+    body = source.split("HRESULT R30TryXyzrhwIndexedPrimitiveUP(", 1)[1].split(
+        "HRESULT R30TryXyzrhwPrimitiveVB(", 1)[0]
+    required = (
+        "static_cast<std::uint64_t>(minVertexIndex) + numVertices;",
+        "if (numVertices == 0 || declaredEnd > 262144u)",
+        "if (raw < minVertexIndex || raw >= vertexCount)",
+        "scratch.upTouched.push_back(raw);",
+        "scratch.upUsed[raw] = 1;",
+        "&scratch.upUsed, knownUsedCount, &scratch.upTouched)",
+        "R30ExecuteXyzrhwStereo(",
+    )
+    assert all(token in body for token in required)
+    assert "UINT maxIndex = 0;" not in body
+    assert body.count("for (UINT i = 0; i < indexCount; ++i)") == 1
+    for original, wrong in (
+        ("numVertices == 0", "numVertices != 0"),
+        ("declaredEnd > 262144u", "declaredEnd < 262144u"),
+        ("raw < minVertexIndex", "false"),
+        ("raw >= vertexCount", "false"),
+        ("scratch.upTouched.push_back(raw);", "scratch.upTouched.clear();"),
+        ("scratch.upUsed[raw] = 1;", "scratch.upUsed[raw] = 0;"),
+    ):
+        assert original in body
+        mutant = body.replace(original, wrong, 1)
+        assert not all(token in mutant for token in required), original
+
+    def accepted(indices, minimum, count):
+        end = minimum + count
+        return (count > 0 and end <= 262144
+                and all(minimum <= index < end for index in indices))
+
+    rng = random.Random(792)
+    for bits in (16, 32):
+        max_raw = (1 << bits) - 1
+        for _ in range(1000):
+            low = rng.randint(0, 4096)
+            count = rng.randint(1, 400)
+            end = low + count
+            indices = [rng.randrange(low, end)
+                       for _ in range(rng.randint(1, 120))]
+            # In-range original max-index scan and one-pass upper bound agree.
+            old_end = max(end, max(indices) + 1)
+            assert old_end == end and accepted(indices, low, count)
+            assert set(indices) == set(indices)  # repeated index semantics
+            if low:
+                assert not accepted(indices + [low - 1], low, count)
+            if end <= max_raw:
+                assert not accepted(indices + [end], low, count)
+    assert not accepted([0], 0, 0)
+    assert not accepted([262144], 0, 262144)
+    assert not accepted([0xFFFFFFFF], 0xFFFFFFFE, 4)
+    assert accepted([0, 1, 0], 0, 2)
+    print("PASS R30 indexed-UP one-pass: 2000 randomized 16/32-bit windows, "
+          "invalid range/fallback and six destructive mutations")
+
+
 def main():
     code = SOURCE.read_text(encoding="utf-8")
     workflow = WORKFLOW.read_text(encoding="utf-8")
@@ -229,6 +288,7 @@ def main():
     assert valid(body), "scratch-free indexed draw / fallback contract broken"
     verify_decode_cache(code, body)
     verify_vb_touched(code, body)
+    verify_up_single_pass(code)
     assert workflow.count("tools/verify_vr_r30_index_rebase_fastpath.py") == 2
     assert "std::vector<std::uint32_t> physical;" not in code
     mutations = (

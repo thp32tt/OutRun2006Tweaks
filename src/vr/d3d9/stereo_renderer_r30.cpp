@@ -4118,27 +4118,14 @@ namespace OutRunVRStereo
                  indexFormat != D3DFMT_INDEX32))
                 return E_NOTIMPL;
 
-            UINT maxIndex = 0;
-            if (indexFormat == D3DFMT_INDEX16)
-            {
-                const auto* indices =
-                    static_cast<const std::uint16_t*>(indexData);
-                for (UINT i = 0; i < indexCount; ++i)
-                    maxIndex = std::max<UINT>(maxIndex, indices[i]);
-            }
-            else
-            {
-                const auto* indices =
-                    static_cast<const std::uint32_t*>(indexData);
-                for (UINT i = 0; i < indexCount; ++i)
-                    maxIndex = std::max(maxIndex, indices[i]);
-            }
-
-            const UINT vertexCount =
-                std::max<UINT>(minVertexIndex + numVertices,
-                    maxIndex + 1u);
-            if (vertexCount == 0 || vertexCount > 262144u)
+            // Use the caller-declared D3D9 index window to avoid
+            // scanning UP indices twice before each stereo draw.
+            // Invalid windows fall back to the original D3D9 draw.
+            const std::uint64_t declaredEnd =
+                static_cast<std::uint64_t>(minVertexIndex) + numVertices;
+            if (numVertices == 0 || declaredEnd > 262144u)
                 return E_NOTIMPL;
+            const UINT vertexCount = static_cast<UINT>(declaredEnd);
 
             R30ScratchLease lease;
             if (!lease)
@@ -4169,7 +4156,7 @@ namespace OutRunVRStereo
                     indexFormat == D3DFMT_INDEX16
                     ? static_cast<const std::uint16_t*>(indexData)[i]
                     : static_cast<const std::uint32_t*>(indexData)[i];
-                if (raw >= vertexCount)
+                if (raw < minVertexIndex || raw >= vertexCount)
                     return E_NOTIMPL;
                 if (!scratch.upUsed[raw])
                 {
