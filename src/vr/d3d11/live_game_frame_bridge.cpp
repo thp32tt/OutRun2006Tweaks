@@ -3645,25 +3645,30 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             for (UINT i=0; i<indexCount; ++i)
                 if (indices[i] >= vertexCount) return;
         }
-        bool nativeSubmitted = false;
         if (type == D3DPT_TRIANGLEFAN) {
             // Real game VB/IB/UP data, rebased by R30. No fixture substitution.
             std::vector<std::uint32_t> fanTriangles;
             if (!game_fan_to_triangle_list(primitives, indices, indexCount,
                                            vertexCount, fanTriangles))
                 return;
-            nativeSubmitted = submit(s, vertices, fanTriangles.data(),
-                                     static_cast<UINT>(fanTriangles.size()),
-                                     D3DPT_TRIANGLELIST, capture, output);
+            if (!submit(s, vertices, fanTriangles.data(),
+                        static_cast<UINT>(fanTriangles.size()),
+                        D3DPT_TRIANGLELIST, capture, output)) {
+                s.frameBatch.abort();
+                ++s.failed;
+            } else {
+                s.frameBatch.succeeded(output.nativeDepthTest,
+                                       output.nativeDepthOrderingMode != 0u);
+            }
         } else {
-            nativeSubmitted = submit(s, vertices, indices, indexCount,
-                                     type, capture, output);
+            if (!submit(s, vertices, indices, indexCount, type, capture, output)) {
+                s.frameBatch.abort();
+                ++s.failed;
+            } else {
+                s.frameBatch.succeeded(output.nativeDepthTest,
+                                       output.nativeDepthOrderingMode != 0u);
+            }
         }
-        // One failed native submission terminates only this diagnostic batch.
-        if (nativeSubmitted)
-            s.frameBatch.succeeded(output.nativeDepthTest,
-                                   output.nativeDepthOrderingMode != 0u);
-        else { s.frameBatch.abort(); ++s.failed; }
     } catch (...) {
         // Never interrupt the game's real draw or input on diagnostic failure.
     }

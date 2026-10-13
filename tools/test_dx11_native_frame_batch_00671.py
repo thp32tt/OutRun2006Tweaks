@@ -12,6 +12,8 @@ for marker in ('#include "native_game_frame_batch.hpp"',
  'if (s.frameBatch.first_draw()) s.backend.begin_frame(kBackground);',
  'if (s.frameBatch.clear_depth())', 's.frameBatch.succeeded(output.nativeDepthTest,',
  's.frameBatch.abort()', 's.frameBatch.reset()',
+ 'if (!submit(s, vertices, fanTriangles.data(),',
+ 'if (!submit(s, vertices, indices, indexCount, type, capture, output))',
  's.frameBatch.accepts_depth(output.nativeDepthTest,',
  'output.nativeDepthOrderingMode != 0u'):
     assert marker in src, marker
