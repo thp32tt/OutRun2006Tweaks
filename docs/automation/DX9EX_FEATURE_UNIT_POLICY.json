@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "effective_from_task_number": 772,
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "minimum_acceptance_items": 3,
+  "minimum_behavior_areas": 2,
+  "required_categories": [
+    "end_to_end_behavior",
+    "fallback_regression",
+    "integrated_validation"
+  ],
+  "no_new_task_for_subcomponent": true,
+  "same_task_id_across_retries_rollover_ci_repair": true,
+  "terminal_requires_all_build_acceptance_pass": true,
+  "terminal_requires_exact_sha_ci": true,
+  "hmd_test_separate": "UNTESTED until actual matching Quest3/VDXR evidence",
+  "feature_delivery_examples": [
+    "One Quest3 UI capability: responsive speed/time/position HUD, aspect-correct main menu, readable ESC and F11, reset/mode negative tests",
+    "One measured GPU performance optimization: dominant stereo source/capture/submit hot path, before-after p95/p99 plus quality regression tests",
+    "One coherent GOAL/+TIME/rank/lens optics correction and regression family with HMD visual acceptance separately tracked"
+  ],
+  "controller_adoption": "NOT_VERIFIED_DOCKER_RUNTIME"
+}

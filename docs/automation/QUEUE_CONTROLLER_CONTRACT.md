@@ -1,3 +1,7 @@
+## 2026-10-13 DX9Ex FEATURE-SIZED QUEUE AND TERMINAL GATE (ACTIVE)
+
+From `CONVERSION-DX9EX-00772`, dispatch one coherent functional outcome per TASK_ID: complete #119 Quest3 adaptive HUD + main menu aspect + ESC scale/position + F11 legibility and regression matrix as one active FEATURE_ID/work_key, not multiple separately terminal one-slider/one-anchor tasks. Resume original live claim/TASK_ID through revisions, grouped source/regression checks, final Win32 host/game/package CI, repairs and C6. Require `feature_contract.feature_id`, integrated goal, >=3 categorized acceptance items across >=2 behavior areas, mapped acceptance_results, and final exact-SHA gate to mark COMPLETE_BUILD_VERIFIED. Intermediate source commits are checkpoints; no per-format/per-widget scoring. DX9Ex Active CI executes `tools/verify_vr_feature_unit_policy.py` to reject new task records without these gates; it does not prove the external Docker dispatcher is updated. Previous tasks 00771 and earlier keep their existing run-record schema. Preserve DX11 parallel writer, frozen DXVK, #119 HMD test UNTESTED and P0-B independent measured performance.
+
 ## 2026-10-13 USER OVERRIDE — FEATURE-BATCH VALIDATION AND CI COALESCING (ACTIVE)
 
 The user requires **faster source development without a full compilation for every individual edit**. This section governs all new/retried DX9Ex tasks and supersedes historical micro-commit/per-edit full-build practices; it does NOT relax final acceptance.

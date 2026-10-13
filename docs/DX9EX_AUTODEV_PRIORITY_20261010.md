@@ -1,3 +1,7 @@
+# 2026-10-13 FEATURE-WIDE DX9Ex TARGET (ACTIVE)
+
+Do not assign a new completed production task for each individual Issue #119 HUD anchor, aspect crop, F11 slider, or ESC offset. Dispatch/continue the single `DX9EX-QUEST3-RESPONSIVE-UI-20261013` feature with all four user-visible outcomes + negative tests + exact-SHA Win32 build/Domain/Full Source Impact acceptance. Build-complete and matching Quest3/HMD optical acceptance remain separate. From TASK_ID 00772, the exact-SHA DX9Ex Active policy gate rejects incomplete micro-feature records; prior work is grandfathered. Performance optimization P0-B remains independent and measured, no overlapping source owner.
+
 # 2026-10-13 USER OVERRIDE — DX9Ex UI P0-A FIRST; MEASURED PERFORMANCE P0-B PARALLEL (ACTIVE)
 
 - **Immediate next DX9Ex C-lane functional development priority P0-A:** user-confirmed Quest3/VDXR **HUD responsive placement/legibility + main-menu aspect + ESC/pause-menu scale/vertical position + F11 ImGui legibility**, tracked by [Issue #119](https://github.com/thp32tt/OutRun2006Tweaks/issues/119), work key `DX9EX-QUEST3-RESPONSIVE-UI-20261013`. These defects were observed on exact DX9Ex build `75ef9c91cac1295418680c965df564372699f97a`, 3440x1440 desktop / 2496x2688 XR per eye / HudScale 0.55; do not assume any proposed root cause is already proven.

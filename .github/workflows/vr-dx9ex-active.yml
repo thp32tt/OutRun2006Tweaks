@@ -39,6 +39,9 @@ on:
       - 'docs/VR_AUTODEV_PROTOCOL.md'
       - 'docs/VR_AUTODEV_STATE.json'
       - 'docs/DX9EX_AUTODEV_PRIORITY_20261010.md' # Actual P0/P1 authority; policy guard must re-run on updates.
+      - 'tools/verify_vr_feature_unit_policy.py'
+      - 'tools/test_vr_feature_unit_policy.py'
+      - 'docs/automation/DX9EX_FEATURE_UNIT_POLICY.json'
       - 'tools/OutRunVR-TestProfiles.ps1'
       - 'tools/OutRunVR-GPU-Lab.ps1'
       - 'tools/OutRunVR-GPU-Lab.cmd'
@@ -176,6 +179,11 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
+      - name: Enforce feature-sized DX9Ex autonomous completion
+        shell: pwsh
+        run: |
+          python tools/test_vr_feature_unit_policy.py
+          python tools/verify_vr_feature_unit_policy.py --check-head
       - name: Reject broken shipped PowerShell helpers and false HUD reports
         shell: pwsh
         run: |
