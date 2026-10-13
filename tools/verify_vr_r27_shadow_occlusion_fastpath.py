@@ -33,7 +33,7 @@ def verify(text: str) -> None:
     assert indices == sorted(indices)
     # No loss of legacy hook, shader diagnostics, positive stereo World route
     # or the original snapshot override used by the normal fallback.
-    assert fn.count("return legacyR13Draw();") == 2
+    assert fn.count("return legacyR13Draw();") == 3
     assert fn.count("R28RunWithVerifiedWorldEpoch(") == 2
     assert "R46TraceShaderFingerprint(device, effect);" in fn
     assert "R13EffectOverrideScope reuse(effect);" in fn
@@ -77,7 +77,9 @@ mutations = (
 )
 for old, new in mutations:
     assert old in guard, old
-    mutated = SRC.replace(old, new, 1)
+    begin = SRC.index("HRESULT R27GuardWorldEffect(")
+    end = SRC.index("HRESULT __stdcall DrawPrimitiveDestR27Effect(", begin)
+    mutated = SRC[:begin] + guard.replace(old, new, 1) + SRC[end:]
     try:
         verify(mutated)
     except (AssertionError, ValueError):
