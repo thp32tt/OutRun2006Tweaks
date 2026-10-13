@@ -10,12 +10,12 @@
   "feature_id": "DX9EX:PERF:R21_HOST_PRESENT_CLOCK_AND_COHERENCE",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R21_HOST_PRESENT_CLOCK_AND_COHERENCE",
-  "status": "NEEDS_VALIDATION",
-  "checkpoint": "C4_COMMIT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00797]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r21.cpp",
     "tools/verify_vr_r21_host_clock_fastpath.py",
@@ -59,9 +59,9 @@
     ]
   },
   "acceptance_results": {
-    "R21_PRESENT_CLOCK_FASTPATH": "PENDING",
-    "R21_SEQLock_LOSS_AND_SOFT": "PENDING",
-    "R21_EXACT_SHA_WINDOWS": "PENDING",
+    "R21_PRESENT_CLOCK_FASTPATH": "PASS",
+    "R21_SEQLock_LOSS_AND_SOFT": "PASS",
+    "R21_EXACT_SHA_WINDOWS": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -79,5 +79,44 @@
     ],
     "fix_evidence": "Same-generation schema/heartbeat, cached frequency, overflow rejection, fail-closed fallback.",
     "negative_test_evidence": "Eight independent status input cases plus eleven destructive changes registered in CI."
+  },
+  "material_result_sha": "53c10ecd0029bffed8097602264157d9eece007a",
+  "validation_bearing_result_sha": "53c10ecd0029bffed8097602264157d9eece007a",
+  "result_sha": "53c10ecd0029bffed8097602264157d9eece007a",
+  "runtime_status": "NEED_QUEST3_VDXR_HOST_LOSS_AND_FRAME_PACING_TEST",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "53c10ecd0029bffed8097602264157d9eece007a",
+    "source_mutation_scenarios": 8,
+    "destructive_mutations": 11,
+    "dx9ex_active": {
+      "run_id": 38459216706,
+      "head_sha": "53c10ecd0029bffed8097602264157d9eece007a",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "host": "SUCCESS",
+        "game": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38459216699,
+      "head_sha": "53c10ecd0029bffed8097602264157d9eece007a",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38459216754,
+      "head_sha": "53c10ecd0029bffed8097602264157d9eece007a",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "source-cross-domain": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "msvc-analyze-active-game": "SUCCESS"
+      }
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+    "performance_evidence": "Cached QPF once per process instead of per fresh Present; source-level API call count only, no headset p95/p99 measurement"
   }
 }
