@@ -1,0 +1,83 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00786",
+  "production_id": "CONVERSION-DX9EX-00786",
+  "event_id": "CONVERSION-DX9EX-00786-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R29_STENCIL_FORMAT_READ_ELISION",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R29_STENCIL_FORMAT_READ_ELISION",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "checkpoint": "C3_VALIDATED",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00786]",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "tools/verify_vr_r29_stencil_write_fastpath.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00786.json"
+  ],
+  "score_delta": 0,
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R29_STENCIL_FORMAT_READ_ELISION",
+    "goal": "For the complete stencil read-only stereo draw path, eliminate redundant per-draw depth-surface format driver queries after a generation-fenced R29 no-write policy while preserving active stencil writes and all missing-cache/device-reset conservative paths.",
+    "scope_boundary": "R29 game-side stencil read-only depth-surface format queries only. No R30 buffer registry, HUD/menu placement, eye pose, host copy, DX11, DXVK, quality presets or FFB changes.",
+    "special_work_evidence": "R29OwnerLeftDrawMayWriteStencil previously invokes SurfaceHasStencil(TrackedDepthStencil) for every stencil-enabled stereo draw even when R29StencilWriteCacheCurrent() already guarantees mayWrite=false. The live surface format COM GetDesc is unnecessary for a provably nonwriting draw; Quest3 scene-matched savings are unmeasured.",
+    "trace_stages": [
+      "D3D9 game SetRenderState stencil enable, write mask and operations are tracked by R29 setter and StateBlock generation fences.",
+      "R29OwnerLeftDrawMayWriteStencil drives stereo main depth/stencil write accounting before R30/R33 per-eye rendering.",
+      "OpenXR host receives unchanged left/right surfaces and depth with fewer game-side live D3D9 GetDesc calls on read-only stencil draws."
+    ],
+    "subcomponents": [
+      "Fast-negative generation/epoch fenced stencil no-write route bypasses depth surface format driver query and retains the same returned write decision.",
+      "Writable stencil, stale StateBlock generations, resets, missing surface and live-read failures continue original format and lower fallback behavior; source mutation/model checker rejects unsafe bypass."
+    ],
+    "acceptance_items": [
+      {
+        "id": "READ_ONLY_STENCIL_FORMAT_ELISION",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_stereo_draw_cpu_query_path",
+        "expected_behavior": "For each current read-only stencil snapshot, classify no-write without additional per-draw depth format GetDesc; all 4, 16 and 32:9 mode timing effects are left unclaimed until hardware measurement."
+      },
+      {
+        "id": "WRITABLE_STALE_RESET_SAFE",
+        "category": "fallback_regression",
+        "behavior_area": "stencil_stateblock_generation_and_live_fallback",
+        "expected_behavior": "Writable mask/operations, expired Present/StateBlock snapshots, stale setters and missing formats follow the original SurfaceHasStencil and lower reader; destructive no-write predicate/fence mutations must be detected."
+      },
+      {
+        "id": "EXACT_SHA_FULLCHAIN_WINDOWS",
+        "category": "integrated_validation",
+        "behavior_area": "Win32_x86_game_x64_host_package_domain",
+        "expected_behavior": "Pass same exact result-SHA DX9Ex Active five jobs and Domain Isolation; full source impact when workflow applies. Quest3 frame time and optics are explicitly untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "READ_ONLY_STENCIL_FORMAT_ELISION": "SOURCE_MODEL_VERIFIED",
+    "WRITABLE_STALE_RESET_SAFE": "SOURCE_MUTATION_ADDED_PENDING_CI",
+    "EXACT_SHA_FULLCHAIN_WINDOWS": "PENDING_EXACT_SHA_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "At R29 current HEAD, the depth-surface format check precedes the available generation-fenced no-write predicate in every stencil-enabled Draw.",
+    "root_cause": "The function always runs SurfaceHasStencil, a live COM format query, before considering a previously proven no-write policy for the same Present and StateBlock generation.",
+    "source_trace": [
+      "R29 stencil state setter updates generation-coherent write policy.",
+      "R29 stereo draw uses R29OwnerLeftDrawMayWriteStencil to decide depth/stencil writes.",
+      "OpenXR host composes the produced per-eye unchanged render targets."
+    ],
+    "alternatives_rejected": [
+      "No global stencil-format memo across Release/Reset due COM pointer reuse risk.",
+      "No skipping positive format checks or stencil writes.",
+      "No unmeasured Quest3 FPS gains inferred from source-call reductions."
+    ]
+  },
+  "ci_evidence": {
+    "status": "PENDING",
+    "expected_branch": "vr-d3d9ex-focus",
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  }
+}

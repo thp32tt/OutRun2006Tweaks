@@ -1067,6 +1067,15 @@ namespace OutRunVRStereo
             return false;
         if (R29EffectCacheCurrent() && R29Effect.stencilEnable != FALSE)
         {
+            // A current R29 write-policy snapshot already proves whether any
+            // front/back stencil operation can modify the attachment. The
+            // common read-only stencil pass must not call SurfaceHasStencil
+            // (a live D3D9 surface GetDesc) on every stereo draw. Keep both
+            // the depth-format check and full live fallback for writable or
+            // generation-stale snapshots; setter/StateBlock fences still own
+            // cache invalidation.
+            if (R29StencilWriteCacheCurrent() && !R29StencilWrite.mayWrite)
+                return false;
             if (!SurfaceHasStencil(TrackedDepthStencil))
                 return false;
             if (R29SyncStencilWriteState(device))

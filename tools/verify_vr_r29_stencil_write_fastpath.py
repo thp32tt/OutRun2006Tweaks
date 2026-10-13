@@ -124,6 +124,13 @@ def verify(source):
     assert "if (R29EffectCacheCurrent() && R29Effect.stencilEnable == FALSE)" in draw
     assert "if (R29EffectCacheCurrent() && R29Effect.stencilEnable != FALSE)" in draw
     assert draw.index("if (!SurfaceHasStencil(TrackedDepthStencil))") < draw.index("return R29StencilWrite.mayWrite;")
+    # Current no-write snapshots are authoritative for this Present and may
+    # bypass the per-draw depth-surface GetDesc. Positive/stale cases retain
+    # the existing live format probe and conservative fallback.
+    no_write = "if (R29StencilWriteCacheCurrent() && !R29StencilWrite.mayWrite)"
+    assert no_write in draw
+    assert draw.index(no_write) < draw.index("if (!SurfaceHasStencil(TrackedDepthStencil))")
+    assert draw.index(no_write) < draw.index("if (R29SyncStencilWriteState(device))")
     assert "if (R29SyncStencilWriteState(device))" in draw
     assert "return LeftDrawMayWriteStencil(device);" in draw
 
@@ -158,8 +165,32 @@ def staged_policy(values):
     return bool(two and (cf or cz or cp))
 
 
+def stencil_format_read_model(cache_current, may_write, has_stencil, sync_ok, fallback):
+    """Return classification and number of live D3D9 format probes."""
+    if cache_current and not may_write:
+        return False, 0
+    if not has_stencil:
+        return False, 1
+    if sync_ok:
+        return bool(may_write), 1
+    return bool(fallback), 1
+
+
 def main():
     verify(SRC)
+    # With a coherent R29 snapshot, sync must succeed. Positive writes,
+    # stale snapshots and missing stencil formats keep identical semantics.
+    avoided_format_reads = 0
+    for current, may_write, has_stencil, fallback in product((False, True), repeat=4):
+        sync_ok = current  # cache current guarantees a successful sync
+        original = (False if not has_stencil else
+                    bool(may_write) if sync_ok else bool(fallback))
+        optimized, reads = stencil_format_read_model(
+            current, may_write, has_stencil, sync_ok, fallback)
+        assert optimized == original
+        assert reads == (0 if current and not may_write else 1)
+        avoided_format_reads += int(reads == 0)
+    assert avoided_format_reads == 4
     for values in product((0, 1, 2), repeat=8):
         assert model(values) == legacy(values), values
         assert staged_policy(values) == legacy(values), values
@@ -182,6 +213,12 @@ def main():
          "R29StencilWrite.presentEpoch != PresentEpoch"),
         ("if (!R29StencilWriteCacheCurrent())", "if (false)"),
         ("R29OnStencilWriteSetter(state, value);", "/* missing setter */"),
+        # Mutation of either lifetime fence or negative predicate must fail;
+        # a truthy OR here would incorrectly bypass live depth queries.
+        ("R29StencilWriteCacheCurrent() && !R29StencilWrite.mayWrite",
+         "R29StencilWriteCacheCurrent() || !R29StencilWrite.mayWrite"),
+        ("R29StencilWriteCacheCurrent() && !R29StencilWrite.mayWrite",
+         "R29StencilWriteCacheCurrent() && R29StencilWrite.mayWrite"),
         ("if (!SurfaceHasStencil(TrackedDepthStencil))", "if (false)"),
         ("return LeftDrawMayWriteStencil(device);", "return false;"),
         ("if (state == D3DRS_STENCILENABLE)", "if (false)"),
@@ -251,7 +288,7 @@ def main():
     else:
         raise AssertionError("unrelated setters no longer bypass cache work")
     print("PASS R29 conditional stencil policy (6561 cases), "
-          "29 negative mutations, 1/5/8 D3D9 getter paths")
+          "31 negative mutations, no-write GetDesc elision and 1/5/8 D3D9 getter paths")
 
 
 if __name__ == "__main__":
