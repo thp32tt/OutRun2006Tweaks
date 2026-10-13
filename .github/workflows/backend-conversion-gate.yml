@@ -137,6 +137,9 @@ jobs:
       - name: Verify DX11 depth-tested race Draw integration 00648
         if: startsWith(github.ref_name, 'vr-dx11-native')
         run: python tools/test_dx11_race_depth_draw_00648.py
+      - name: Verify live game CW/CCW triangle Draw 00649
+        if: startsWith(github.ref_name, 'vr-dx11-native')
+        run: python tools/test_dx11_game_cull_draw_00649.py
 
       - name: Verify DX11 source hygiene
         if: github.ref_name == 'vr-dx11-native-r71'

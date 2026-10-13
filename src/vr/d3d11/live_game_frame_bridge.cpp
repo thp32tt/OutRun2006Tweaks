@@ -1,6 +1,7 @@
 #include "live_game_frame_bridge.hpp"
 #include "live_game_primitive_span.hpp"
 #include "live_game_depth_state.hpp"
+#include "live_game_cull_state.hpp"
 #include "live_game_fvf_layout.hpp"
 #include "live_game_stage0_blend.hpp"
 #include "native_backend.hpp"
@@ -780,6 +781,7 @@ struct OutputCapture {
     bool alphaTest = false;
     bool nativeDepthTest = false;
     bool nativeDepthLessEqual = false;
+    DWORD nativeCullMode = D3DCULL_NONE; // live game face exclusion
     DWORD alphaRef = 0;
     D3DCMPFUNC alphaFunc = D3DCMP_ALWAYS;
     bool scissor = false;
@@ -897,6 +899,8 @@ struct State {
     ComPtr<ID3D11InputLayout> layout;
     ComPtr<ID3D11RasterizerState> raster;
     ComPtr<ID3D11RasterizerState> scissorRaster;
+    // CW/CCW triangle raster x diagnostic scissor OFF/ON.
+    std::array<ComPtr<ID3D11RasterizerState>, 4> diagnosticCullRasters;
     ComPtr<ID3D11BlendState> alphaBlend;
     ComPtr<ID3D11BlendState> additiveBlend;
     ComPtr<ID3D11BlendState> sourceAlphaAddBlend;
@@ -987,7 +991,9 @@ bool ensure_pipeline(State& s) noexcept {
         s.addSmoothTextureAlphaPs && s.addSmoothDiffuseAlphaPs &&
         s.blendTextureAlphaPmAddAlphaPs &&
          s.blendTextureAlphaPmSubtractAlphaPs && s.blendTextureAlphaPmModulate2XAlphaPs && s.blendTextureAlphaPmModulate4XAlphaPs && s.blendTextureAlphaPmAddSignedAlphaPs && s.blendTextureAlphaPmAddSigned2XAlphaPs && s.blendTextureAlphaPmBlendTextureAlphaPs && s.blendTextureAlphaPmBlendDiffuseAlphaPs && s.blendTextureAlphaPmBlendCurrentFactorAlphaPs && s.blendTextureAlphaPmBlendFactorAlphaPs && s.blendTextureAlphaPmAddSmoothAlphaPs &&
-        s.blendTextureAlphaPmAddFactorAlphaPs && s.blendTextureAlphaPmAddSmoothFactorAlphaPs && s.blendTextureAlphaPmSignedFactorAlphaPs && s.blendTextureAlphaPmSigned2XFactorAlphaPs && s.blendTextureAlphaPmModulateFactorAlphaPs && s.blendTextureAlphaPmModulateAlphaPs && s.blendTextureAlphaPmFactorAlphaPs && s.layout && s.raster && s.scissorRaster && s.alphaBlend &&
+        s.blendTextureAlphaPmAddFactorAlphaPs && s.blendTextureAlphaPmAddSmoothFactorAlphaPs && s.blendTextureAlphaPmSignedFactorAlphaPs && s.blendTextureAlphaPmSigned2XFactorAlphaPs && s.blendTextureAlphaPmModulateFactorAlphaPs && s.blendTextureAlphaPmModulateAlphaPs && s.blendTextureAlphaPmFactorAlphaPs && s.layout && s.raster && s.scissorRaster &&
+        s.diagnosticCullRasters[0] && s.diagnosticCullRasters[1] &&
+        s.diagnosticCullRasters[2] && s.diagnosticCullRasters[3] && s.alphaBlend &&
          s.additiveBlend && s.sourceAlphaAddBlend && s.premultipliedAlphaBlend &&
         s.inverseSourceAlphaBlend && s.multiplyBlend &&
          s.inverseDestMultiplyBlend && s.inverseSourceMultiplyBlend &&
@@ -1007,6 +1013,7 @@ bool ensure_pipeline(State& s) noexcept {
     s.blendFactorModulate2XAlphaPs.Reset(); s.blendFactorModulate4XAlphaPs.Reset();
     s.addSmoothTextureAlphaPs.Reset(); s.addSmoothDiffuseAlphaPs.Reset();
     s.layout.Reset(); s.raster.Reset(); s.scissorRaster.Reset();
+    for (auto& item : s.diagnosticCullRasters) item.Reset();
     s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset(); s.inverseSourceAlphaBlend.Reset(); s.sourceAlphaCopyBlend.Reset(); s.inverseAlphaCopyBlend.Reset(); s.inverseAlphaAddBlend.Reset(); s.sourceReplaceBlend.Reset(); s.multiplyBlend.Reset(); s.inverseDestMultiplyBlend.Reset(); s.inverseSourceMultiplyBlend.Reset(); s.destAlphaCrossfadeBlend.Reset(); s.reverseDestAlphaCrossfadeBlend.Reset(); s.sourceAlphaSaturateCopyBlend.Reset(); s.sourceAlphaSaturateAddBlend.Reset();
     s.alphaConstants.Reset();
     for (auto& item : s.readbacks) {
@@ -1343,6 +1350,18 @@ bool ensure_pipeline(State& s) noexcept {
     raster.ScissorEnable = TRUE;
     if (FAILED(dev->CreateRasterizerState(&raster, s.scissorRaster.GetAddressOf())))
         return false;
+    // D3D9 CullMode names the winding to remove, D3D11 BACK removes the
+    // opposite face of FrontCounterClockwise. Keep menu no-cull unchanged.
+    for (unsigned scissorEnabled = 0u; scissorEnabled < 2u; ++scissorEnabled) {
+        for (unsigned direction = 0u; direction < 2u; ++direction) {
+            raster.CullMode = D3D11_CULL_BACK;
+            raster.FrontCounterClockwise = direction == 0u ? TRUE : FALSE;
+            raster.ScissorEnable = scissorEnabled ? TRUE : FALSE;
+            if (FAILED(dev->CreateRasterizerState(
+                    &raster, s.diagnosticCullRasters[scissorEnabled * 2u + direction].GetAddressOf())))
+                return false;
+        }
+    }
     // Narrow D3D9 SRCALPHA/INVSRCALPHA/ADD, with the same factors
     // for destination alpha. This is a diagnostic target, not the game RT.
     D3D11_BLEND_DESC blend{};
@@ -1551,9 +1570,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cullMode)) ||
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fillMode)) ||
-        stencil || !clip || fog ||
-        cullMode != D3DCULL_NONE || fillMode != D3DFILL_SOLID)
+        stencil || !clip || fog || fillMode != D3DFILL_SOLID)
         return false;
+    GameNativeCullAdmission admittedCull{};
+    if (!game_native_cull_admission(
+            cullMode, static_cast<std::uint32_t>(topology), admittedCull))
+        return false;
+    output.nativeCullMode = admittedCull.d3d9Mode;
     // Mirror only one isolated game-authored Z draw. The newly cleared DSV
     // omits earlier D3D9 occluders: this is diagnostic, NOT scene parity.
     // W-buffering, depth-bias, missing depth, and disabled Z-writes fail closed.
@@ -3151,7 +3174,15 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                                   static_cast<LONG>(kHeight)};
     const D3D11_RECT& rect = output.scissor ? output.nativeScissor : fullScissor;
     ctx->RSSetScissorRects(1, &rect);
-    ctx->RSSetState(output.scissor ? s.scissorRaster.Get() : s.raster.Get());
+    // The R30 game Draw always survives. The native diagnostic mirrors its
+    // current face exclusion and chooses the matching scissor variant.
+    ID3D11RasterizerState* nativeRaster =
+        output.nativeCullMode == D3DCULL_CW
+            ? s.diagnosticCullRasters[output.scissor ? 2u : 0u].Get()
+            : output.nativeCullMode == D3DCULL_CCW
+                ? s.diagnosticCullRasters[output.scissor ? 3u : 1u].Get()
+                : (output.scissor ? s.scissorRaster.Get() : s.raster.Get());
+    ctx->RSSetState(nativeRaster);
     ctx->VSSetShader(s.vs.Get(), nullptr, 0);
     ctx->PSSetShader(capture.selectDiffuseTextureAlpha ? s.selectDiffuseTextureAlphaPs.Get() :
                       capture.selectDiffuseTfactorArg2Alpha ? s.selectDiffuseTfactorAlphaPs.Get() :
@@ -3482,6 +3513,7 @@ void before_game_reset() noexcept {
     s.diagnosticDepthView.Reset(); s.diagnosticDepth.Reset();
     for (auto& depthState : s.diagnosticDepthStates) depthState.Reset();
     s.raster.Reset(); s.scissorRaster.Reset(); s.layout.Reset();
+    for (auto& item : s.diagnosticCullRasters) item.Reset();
     s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset(); s.inverseSourceAlphaBlend.Reset(); s.sourceAlphaCopyBlend.Reset(); s.inverseAlphaCopyBlend.Reset(); s.inverseAlphaAddBlend.Reset(); s.sourceReplaceBlend.Reset(); s.multiplyBlend.Reset(); s.inverseDestMultiplyBlend.Reset(); s.inverseSourceMultiplyBlend.Reset(); s.destAlphaCrossfadeBlend.Reset(); s.reverseDestAlphaCrossfadeBlend.Reset(); s.sourceAlphaSaturateCopyBlend.Reset(); s.sourceAlphaSaturateAddBlend.Reset();
     s.alphaConstants.Reset();
     for (auto& masked : s.maskedBlends) masked.Reset();

@@ -152,7 +152,7 @@ def main() -> None:
             "const DWORD legalMask = D3DCOLORWRITEENABLE_RED |",
             "const DWORD visibleMask = D3DCOLORWRITEENABLE_RED |",
             "if ((colorMask & ~legalMask) || !(colorMask & visibleMask)) return false;",
-            "cullMode != D3DCULL_NONE",
+            "game_native_cull_admission(",
             "fillMode != D3DFILL_SOLID",
         ))
 
@@ -166,7 +166,7 @@ def main() -> None:
          "GetRenderState(D3DRS_FILLMODE, &colorMask)"),
         ("if ((colorMask & ~legalMask) || !(colorMask & visibleMask)) return false;",
          "if (false) return false;"),
-        ("cullMode != D3DCULL_NONE", "cullMode == D3DCULL_NONE"),
+        ("game_native_cull_admission(", "game_native_cull_unchecked("),
         ("fillMode != D3DFILL_SOLID", "fillMode == D3DFILL_SOLID"),
     ):
         bad = bridge.replace(original, mutated, 1)
@@ -875,7 +875,7 @@ def main() -> None:
         )) and all(x in submit for x in (
             "const D3D11_RECT& rect = output.scissor ? output.nativeScissor : fullScissor;",
             "ctx->RSSetScissorRects(1, &rect);",
-            "ctx->RSSetState(output.scissor ? s.scissorRaster.Get() : s.raster.Get());",
+            "ctx->RSSetState(nativeRaster);",
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
         )) and "s.scissorRaster.Reset();" in code
@@ -893,7 +893,7 @@ def main() -> None:
         ("if (nativeRight <= nativeLeft || nativeBottom <= nativeTop)", "if (false)"),
         ("raster.ScissorEnable = TRUE;", "raster.ScissorEnable = FALSE;"),
         ("ctx->RSSetScissorRects(1, &rect);", "/* omitted native clipping */"),
-        ("output.scissor ? s.scissorRaster.Get() : s.raster.Get()", "s.raster.Get()"),
+        ("ctx->RSSetState(nativeRaster);", "ctx->RSSetState(s.raster.Get());"),
     ):
         broken = bridge.replace(old, bad, 1)
         assert broken != bridge and not live_scissor_path_complete(broken), (
