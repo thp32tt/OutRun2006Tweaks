@@ -2151,6 +2151,7 @@ def verify_centre_only_lens_owner(source, analyzer):
     for needle in (
         'Settings::VREnabled', 'LensCentreSavedScope',
         'RenderScope::WorldBillboard',
+        'OutRunVR::GameSemantic::QueueRenderActive() ||',
     ):
         require(needle, body, 'central sun owner')
     for needle in (
@@ -2189,6 +2190,7 @@ def verify_centre_actual_draw_owner(source):
         require(required, section, 'centre-only independent actual draw')
     draw = function_body(section, 'static void __cdecl DrawObjectAlphaCentre(')
     for required in ('Settings::VREnabled && LensCentreDepth != 0',
+                     '!OutRunVR::GameSemantic::QueueRenderActive() &&',
                      'objectId == 0x570002',
                      'RenderScope::WorldBillboard',
                      'RenderScope::None',
@@ -2215,6 +2217,8 @@ for label, before, after in (
     ('original parent depth gate', 'Settings::VREnabled && LensCentreDepth != 0',
      'Settings::VREnabled'),
     ('original object identity', 'objectId == 0x570002', 'objectId != 0'),
+    ('prevent queued semantic hijack',
+     '!OutRunVR::GameSemantic::QueueRenderActive() &&', ''),
     ('restore flat/headlocked scope', 'RenderScope::WorldBillboard',
      'RenderScope::ProjectedScreenEffect2D'),
     ('remove desktop fallback', 'RenderScope::None;', 'RenderScope::WorldBillboard;'),
@@ -2246,6 +2250,9 @@ for label, mutant in (
     ('central hook widen 0xD3A5 to outer D5F5', graphics.replace(
         'Module::exe_ptr(0xD3A5), LensCentreEnter',
         'Module::exe_ptr(0xD5F5), LensCentreEnter', 1)),
+    ('central producer queue bypass', graphics.replace(
+        'OutRunVR::GameSemantic::QueueRenderActive() ||\n            LensCentreDepth++',
+        'LensCentreDepth++', 1)),
     ('central leave hook lost', graphics.replace(
         'Module::exe_ptr(0xD3AA), LensCentreLeave',
         'Module::exe_ptr(0xD3A9), LensCentreLeave', 1)),

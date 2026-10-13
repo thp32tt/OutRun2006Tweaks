@@ -321,7 +321,11 @@ class VRLensFlareProjected2D : public Hook
 
     static void LensCentreEnter(safetyhook::Context&)
     {
-        if (!Settings::VREnabled || LensCentreDepth++ != 0)
+        // A non-queued original producer must never overwrite a selected
+        // SpriteNode's semantic during nested queue processing.
+        if (!Settings::VREnabled ||
+            OutRunVR::GameSemantic::QueueRenderActive() ||
+            LensCentreDepth++ != 0)
             return;
         LensCentreSavedScope = OutRunVR::GameSemantic::CurrentScope;
         OutRunVR::GameSemantic::CurrentScope =
@@ -383,6 +387,7 @@ class VRLensFlareProjected2D : public Hook
         // their original raster classification and one game Draw call.
         const auto centreScope =
             Settings::VREnabled && LensCentreDepth != 0 &&
+            !OutRunVR::GameSemantic::QueueRenderActive() &&
             objectId == 0x570002
             ? OutRunVR::GameSemantic::RenderScope::WorldBillboard
             : OutRunVR::GameSemantic::RenderScope::None;

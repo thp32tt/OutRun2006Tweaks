@@ -2,9 +2,9 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00778",
   "production_id": "CONVERSION-DX9EX-00778",
-  "event_id": "CONVERSION-DX9EX-00778-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00778-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
@@ -12,10 +12,10 @@
   "work_key": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "status": "IN_PROGRESS",
-  "checkpoint": "C4_MATERIAL_COMMITTED_C5_CI_PENDING",
+  "checkpoint": "C4_SOURCE_AND_CONTRACT_REPAIRED_C5_EXACT_SHA_PENDING",
   "feature_status": "BUILD_PENDING_HMD_UNTESTED",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00778]",
-  "material_result_sha": null,
+  "material_result_sha": "4f9a0b84bc1c19759e5d05eca3022a1c78312ca3",
   "validation_bearing_result_sha": null,
   "automation_validation": "PENDING_EXACT_SHA_CI",
   "runtime_validation": "UNTESTED",
@@ -27,7 +27,8 @@
     "trace_stages": [
       "Original EXE 0xCF4E light projection -> 0xD3A5 centre -> 0xC993 alpha draw",
       "Previously D3A5 WorldBillboard parent was shadowed by actual C993 projected-screen override",
-      "Scoped exact direct producer WorldBillboard in VR active 0x570002 only -> R30 world stereo -> independent eye host"
+      "Scoped exact direct producer WorldBillboard in VR active 0x570002 only -> R30 world stereo -> independent eye host",
+      "A nested SpriteNode queue must not let central D3A5/C993 override its selected exact semantic"
     ],
     "acceptance_items": [
       {
@@ -54,6 +55,13 @@
         "behavior_area": "game_host_package",
         "expected_behavior": "Exact SHA Active/Domain/full chain Win32 tests SUCCESS separately from Quest3"
       }
+    ],
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "subcomponents": [
+      "Original 0xD3A5/0xD3AA centre producer scope lifetime, precise unwind and queue-safe bypass",
+      "Original 0xC993 exact 0x570002 alpha Draw world-stereo semantic with desktop/queued fallback",
+      "Independent 0xCABE outer projected rings and SkyGlow remain unchanged"
     ]
   },
   "acceptance_results": {
@@ -69,12 +77,21 @@
     "alternatives_rejected": [
       "Never alter outer rings or SkyGlow globally.",
       "Never suppress original alpha call or adjust fake stereo disparity."
-    ]
+    ],
+    "source_trace": [
+      "0xCF4E projects the source light and 0xD3A5 calls original 0xC980 for 0x570002 sun",
+      "0xC993 invokes original DrawObjectAlpha_Internal after the D3A5 producer",
+      "R30 consumes exact direct WorldBillboard only outside SpriteNode queue; outer 0xCABE uses ProjectedScreenEffect2D",
+      "Per-eye world classification flows into native OpenXR stereo/host draw without changing original alpha or geometry"
+    ],
+    "eye_ownership": "Exact 0x570002 direct draw uses WorldBillboard only while matching D3A5 parent and outside queue; outer CABE keeps projected layer.",
+    "fix_evidence": "C993 direct centre world owner was implemented at material 4f9a0b84bc1c19759e5d05eca3022a1c78312ca3; retry adds explicit nonqueued boundary to the original centre scope and exact Draw.",
+    "negative_test_evidence": "Mutation suite rejects loss of parent/draw nonqueue guards, VR/object identity gates, missing original draw and changed outer hook."
   },
   "changed_files": [
     "src/hooks_graphics.cpp",
     "tools/verify_vr_visual_composition_p0.py",
     "docs/automation/runs/CONVERSION-DX9EX-00778.json"
   ],
-  "validation_notes": "Material C2 code and six negative mutations prepared; exact-SHA GitHub Actions await push. Quest3/VDXR runtime UNTESTED."
+  "validation_notes": "Previous exact HEAD 4f9a0b84bc1c19759e5d05eca3022a1c78312ca3 DX9Ex Active policy job 115311263959 failed (missing feature_contract.feature_id/symptom_id/subcomponents); new material C++ queue separation and regression plus canonical contract correct that failure; awaiting new exact-SHA CI. No HMD verification."
 }
