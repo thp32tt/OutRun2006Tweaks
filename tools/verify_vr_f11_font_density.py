@@ -49,11 +49,18 @@ def check(hook: str, font: str, header: str) -> None:
             "std::fabs(previousContent.width - content.width) > 0.5f",
             "std::fabs(previousDensity - vrDensity) > 0.01f",
             "ImGui::SetNextWindowSize(windowSize, layoutPlacement);",
+            "ImGuiStyleVar_WindowPadding",
+            "ImGuiStyleVar_CellPadding",
+            "ImGuiStyleVar_IndentSpacing",
+            "ImGuiStyleVar_GrabMinSize",
+            "(std::min)(maxWidth / 1130.f, maxHeight / 600.f)",
+            "shellStyle.GrabMinSize * styleDensity",
+            "shellStyle.WindowPadding.x * styleDensity",
             "ImGuiStyleVar_FramePadding",
             "ImGuiStyleVar_ItemSpacing",
             "ImGuiStyleVar_ItemInnerSpacing",
             "ImGuiStyleVar_ScrollbarSize",
-            "ImGui::PopStyleVar(4);",
+            "ImGui::PopStyleVar(8);",
         )),
         (header, ("inline static float VrFontMultiplier = 1.0f;",)),
     ):
@@ -77,7 +84,7 @@ def check_shell_layout_mutations(font: str) -> None:
          "false"),
         ("ImGui::SetNextWindowSize(windowSize, layoutPlacement);",
          "ImGui::SetNextWindowSize(windowSize, initialPlacement);"),
-        ("ImGui::PopStyleVar(4);", "ImGui::PopStyleVar(3);"),
+        ("ImGui::PopStyleVar(8);", "ImGui::PopStyleVar(7);"),
         ("ImGuiStyleVar_FramePadding", "ImGuiStyleVar_WindowRounding"),
     )
     for original, mutation in mutations:
@@ -98,7 +105,7 @@ def check_shell_layout_mutations(font: str) -> None:
             "std::fabs(previousContent.width - content.width) > 0.5f",
             "std::fabs(previousDensity - vrDensity) > 0.01f",
             "ImGui::SetNextWindowSize(windowSize, layoutPlacement);",
-            "ImGui::PopStyleVar(4);",
+            "ImGui::PopStyleVar(8);",
             "ImGuiStyleVar_FramePadding",
         )
         assert not all(item in broken_shell for item in required), original
@@ -127,6 +134,13 @@ def check_shell_numeric_cases() -> None:
         window_w, window_h = min(1130.0 * density, available_w), min(600.0 * density, available_h)
         assert 0 < window_w <= content[2]
         assert 0 < window_h <= content[3]
+        style_density = max(1.0, min(density, available_w / 1130.0, available_h / 600.0))
+        assert 1.0 <= style_density <= max(1.0, density)
+        if available_w >= 1130.0 and available_h >= 600.0:
+            assert 1130.0 * style_density <= available_w + 1e-5
+            assert 600.0 * style_density <= available_h + 1e-5
+        if density == 1.0:
+            assert style_density == 1.0  # desktop metrics untouched
         changed = (previous is not None and (
             any(abs(a-b) > 0.5 for a,b in zip(previous[:4], content)) or
             abs(previous[4] - density) > 0.01))

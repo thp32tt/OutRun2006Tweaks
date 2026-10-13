@@ -83,6 +83,14 @@ void Overlay::render_shell()
 		(std::min)(40.f, content.width * 0.1f));
 	const float maxHeight = (std::max)(1.f, content.height -
 		(std::min)(40.f, content.height * 0.1f));
+	// Match F11-only hit-target spacing to the live usable mirror canvas.
+	// A narrow/portrait or Reset surface may cap the shell before XR atlas
+	// density is reached; never enlarge layout gaps beyond that available area.
+	// The original desktop style and actual font raster density are unchanged.
+	const float styleDensity = std::clamp(
+		(std::min)(vrDensity,
+			(std::min)(maxWidth / 1130.f, maxHeight / 600.f)),
+		1.0f, 3.0f);
 	const ImVec2 windowSize(
 		(std::min)(1130.f * vrDensity, maxWidth),
 		(std::min)(600.f * vrDensity, maxHeight));
@@ -124,17 +132,27 @@ void Overlay::render_shell()
 	if (vrStyle)
 	{
 		const ImGuiStyle& shellStyle = ImGui::GetStyle();
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,
+			ImVec2(shellStyle.WindowPadding.x * styleDensity,
+				shellStyle.WindowPadding.y * styleDensity));
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-			ImVec2(shellStyle.FramePadding.x * vrDensity,
-				shellStyle.FramePadding.y * vrDensity));
+			ImVec2(shellStyle.FramePadding.x * styleDensity,
+				shellStyle.FramePadding.y * styleDensity));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,
-			ImVec2(shellStyle.ItemSpacing.x * vrDensity,
-				shellStyle.ItemSpacing.y * vrDensity));
+			ImVec2(shellStyle.ItemSpacing.x * styleDensity,
+				shellStyle.ItemSpacing.y * styleDensity));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing,
-			ImVec2(shellStyle.ItemInnerSpacing.x * vrDensity,
-				shellStyle.ItemInnerSpacing.y * vrDensity));
+			ImVec2(shellStyle.ItemInnerSpacing.x * styleDensity,
+				shellStyle.ItemInnerSpacing.y * styleDensity));
+		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding,
+			ImVec2(shellStyle.CellPadding.x * styleDensity,
+				shellStyle.CellPadding.y * styleDensity));
+		ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing,
+			shellStyle.IndentSpacing * styleDensity);
 		ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize,
-			shellStyle.ScrollbarSize * vrDensity);
+			shellStyle.ScrollbarSize * styleDensity);
+		ImGui::PushStyleVar(ImGuiStyleVar_GrabMinSize,
+			shellStyle.GrabMinSize * styleDensity);
 	}
 
 	// Tab contents scroll in a child of their own, so the tab bar stays at the top rather than
@@ -167,7 +185,7 @@ void Overlay::render_shell()
 	}
 	ImGui::End();
 	if (vrStyle)
-		ImGui::PopStyleVar(4);
+		ImGui::PopStyleVar(8);
 }
 
 void Overlay::init()
