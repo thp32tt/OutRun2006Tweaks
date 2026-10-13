@@ -416,7 +416,7 @@ print("PASS Quest3 peripheral HUD visible-area fit: stereo shift parity, 4 resol
 # cannot authorize BOTH eyes' HUD contain aspect during VDXR recenter.
 section = code[code.index("float R30HudAspectCompensation("):
                code.index("float R30PauseMenuVerticalFraction()")]
-assert "if (targetEyes != 2)\\n                return 1.0f;" in section
+assert "if (targetEyes != 2)\n                return 1.0f;" in section
 assert section.index("targetEyes = 2;") < section.index("if (targetEyes != 2)")
 
 def fov_pair_aspect(eyes):
