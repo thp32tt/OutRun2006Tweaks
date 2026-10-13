@@ -30,7 +30,8 @@ def connected(src):
     return all(k in gate for k in (
         "arg != D3DTA_TEXTURE","(rgbNeedsDiffuse && !arg2Diffuse)",
         "(alphaNeedsDiffuse && !alphaArg2Diffuse)","alphaArg1 != D3DTA_TEXTURE",
-        "nextColorOp != D3DTOP_DISABLE || resultArg != D3DTA_CURRENT",
+        "resultArg != D3DTA_CURRENT",
+        "stage1Result != D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE",
     )) and "if (!diagnostic_enabled() || !game)" in src and all(k in draw for k in (
         "ctx->PSSetShaderResources(0, 1, &boundView)",
         "ctx->DrawIndexed(indexCount, 0, 0);",
@@ -59,6 +60,10 @@ def main():
             negatives+=1
     for old,bad in (
         ("resultArg != D3DTA_CURRENT","resultArg == D3DTA_CURRENT"),
+        ("stage1Result != D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE",
+         "stage1Result == D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE"),
+        ("stage1Result != D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE",
+         "stage1Result != D3DTA_CURRENT || stage2Op == D3DTOP_DISABLE"),
         ("(rgbNeedsDiffuse && !arg2Diffuse)","(rgbNeedsDiffuse && arg2Diffuse)"),
         ("(alphaNeedsDiffuse && !alphaArg2Diffuse)","(alphaNeedsDiffuse && alphaArg2Diffuse)"),
     ):
@@ -70,6 +75,6 @@ def main():
         assert 0<=add<=1 and 0<=subtract<=1
         if t==.9 and v==.8: assert add==1 and subtract>0
         if t==.2 and v==.6: assert subtract==0
-    assert negatives==17
-    print("00580 SELECTARG2 native alpha integration: 17 destructive mutations PASS; runtime UNTESTED")
+    assert negatives==19
+    print("00580 SELECTARG2 native alpha integration: 19 destructive mutations PASS; runtime UNTESTED")
 if __name__=="__main__":main()
