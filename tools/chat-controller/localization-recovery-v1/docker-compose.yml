@@ -15,8 +15,8 @@ services:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
       AUTO_SEND: "true"
-      # One A tab only; B/C1/C2 have no tab, scheduler, or background send.
-      SCHEDULE_MINUTES: "0"
+      # One A tab every 3 minutes; B/C1/C2 disabled. A manifest task IDs are once-only.
+      SCHEDULE_MINUTES: "0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57"
       CHAT_SLOTS: "1"
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: "" # No Q217 pin; pending_A.json selects the task.
       CHAT_DAY_ROLLOVER_HOUR: "2"
