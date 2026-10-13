@@ -2030,7 +2030,7 @@ def main() -> None:
                 original_factor_pair in intake and
                 factor_links[2] in intake and
                 "static_cast<float>(output.alphaFunc), capture.blendFactorAlphaValue" in submit and
-                "ctx->PSSetShader(capture.selectDiffuseTextureAlpha ?" in submit and
+                stage0_dispatch_with_stage1(submit) and
                 "capture.blendFactorAlpha ? s.blendFactorAlphaPs.Get() :" in submit and
                 code.count("s.blendFactorAlphaPs.Reset();") == 2 and
                 code.count("blendTextureAlpha || blendTextureAlphaPM || blendTextureAlphaPMTextureAlpha || blendDiffuseAlpha || blendFactorAlpha;") == 2)
@@ -2101,7 +2101,7 @@ def main() -> None:
                 code.count("s.blendFactorTextureAlphaPs.Reset();") == 2 and
                 code.count("s.blendFactorModulateAlphaPs.Reset();") == 2 and
                 "GetRenderState(D3DRS_TEXTUREFACTOR, &textureFactor)" in gate and
-                "ctx->PSSetShader(capture.selectDiffuseTextureAlpha ?" in draw)
+                stage0_dispatch_with_stage1(draw))
     assert mixed_factor_integrated(bridge)
     for token in mixed_factor_links[:-2]:
         broken = bridge.replace(token, "/* disconnect 00563 producer/consumer */")
