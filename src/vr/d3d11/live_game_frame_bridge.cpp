@@ -3039,7 +3039,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         base.Width == 0 || base.Height == 0 ||
         base.Width > 1024 || base.Height > 1024) return false;
     // The game can render menu, car and race textures into more than one
-    // color layout. Snapshot the real D3D9 RT before converting to a native
+    // color layout, including 16-bit game-authored render targets.
+    // Snapshot the real D3D9 RT before converting to a native
     // BGRA8 SRV; never reinterpret RGBA or packed 10-bit pixels as BGRA.
     const native_rt_readback::Layout rtLayout =
         base.Format == D3DFMT_A8R8G8B8 ? native_rt_readback::Layout::argb8 :
@@ -3048,7 +3049,12 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         base.Format == D3DFMT_X8B8G8R8 ? native_rt_readback::Layout::x8b8g8r8 :
         base.Format == D3DFMT_A2R10G10B10 ? native_rt_readback::Layout::a2r10g10b10 :
         base.Format == D3DFMT_A2B10G10R10 ? native_rt_readback::Layout::a2b10g10r10 :
-                                              native_rt_readback::Layout::unsupported;
+        base.Format == D3DFMT_R5G6B5 ? native_rt_readback::Layout::rgb565 :
+        base.Format == D3DFMT_A1R5G5B5 ? native_rt_readback::Layout::argb1555 :
+        base.Format == D3DFMT_A4R4G4B4 ? native_rt_readback::Layout::argb4444 :
+        base.Format == D3DFMT_X1R5G5B5 ? native_rt_readback::Layout::xrgb1555 :
+        base.Format == D3DFMT_X4R4G4B4 ? native_rt_readback::Layout::xrgb4444 :
+                                          native_rt_readback::Layout::unsupported;
     const bool gpuRenderTarget = base.Pool == D3DPOOL_DEFAULT &&
         (base.Usage & D3DUSAGE_RENDERTARGET) != 0u &&
         native_rt_readback::sampleable(rtLayout, capture.srgbTexture);

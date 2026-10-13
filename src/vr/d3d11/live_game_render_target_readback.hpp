@@ -1,6 +1,7 @@
 #pragma once
 #include "live_game_rgba_texture.hpp"
 #include "live_game_10bit_texture.hpp"
+#include "packed_texture_16bit.hpp"
 #include <cstdint>
 #include <cstring>
 
@@ -10,12 +11,18 @@ namespace outrun::vr::dx11::live_game_frame::native_rt_readback {
 // render-target level to an immutable native DX11 BGRA8 sampleable resource.
 // This path is diagnostic only; original D3D9 Draw and input still execute.
 enum class Layout : std::uint8_t {
-    argb8, xrgb8, a8b8g8r8, x8b8g8r8, a2r10g10b10, a2b10g10r10, unsupported
+    argb8, xrgb8, a8b8g8r8, x8b8g8r8, a2r10g10b10, a2b10g10r10,
+    rgb565, argb1555, argb4444, xrgb1555, xrgb4444, unsupported
 };
 constexpr bool sampleable(Layout layout, bool srgb) noexcept {
     return layout != Layout::unsupported &&
            (!srgb || (layout != Layout::a2r10g10b10 &&
-                      layout != Layout::a2b10g10r10));
+                      layout != Layout::a2b10g10r10 &&
+                      layout != Layout::rgb565 &&
+                      layout != Layout::argb1555 &&
+                      layout != Layout::argb4444 &&
+                      layout != Layout::xrgb1555 &&
+                      layout != Layout::xrgb4444));
 }
 inline bool unpack_row(const std::uint8_t* source, std::uint8_t* destination,
                        unsigned width, Layout layout) noexcept {
@@ -40,6 +47,25 @@ inline bool unpack_row(const std::uint8_t* source, std::uint8_t* destination,
             layout == Layout::a2b10g10r10 ? tenbit_texture::Layout::a2b10g10r10 :
                                            tenbit_texture::Layout::a2r10g10b10);
         return true;
+    case Layout::rgb565:
+    case Layout::argb1555:
+    case Layout::argb4444:
+    case Layout::xrgb1555:
+    case Layout::xrgb4444: {
+        // D3D9 RT16 is staged as SYSTEMMEM then expanded from little-endian
+        // pixels to immutable BGRA8 used in real game Draw/DrawIndexed.
+        const auto packing = layout == Layout::rgb565 ?
+            packed_texture16::Layout::rgb565 :
+            layout == Layout::argb1555 ?
+            packed_texture16::Layout::argb1555 :
+            layout == Layout::argb4444 ?
+            packed_texture16::Layout::argb4444 :
+            layout == Layout::xrgb1555 ?
+            packed_texture16::Layout::xrgb1555 :
+            packed_texture16::Layout::xrgb4444;
+        packed_texture16::unpack_row(source, destination, width, packing);
+        return true;
+    }
     default:
         return false;
     }

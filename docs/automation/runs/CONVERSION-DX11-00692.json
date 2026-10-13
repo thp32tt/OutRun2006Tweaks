@@ -1,0 +1,105 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00692",
+  "production_id": "CONVERSION-DX11-00692",
+  "event_id": "CONVERSION-DX11-00692-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "feature_id": "GAME_AUTHORED_RT16_NATIVE_DRAW_FAMILY",
+  "work_key": "DX11:GAME_RT16_NATIVE_SCENE",
+  "status": "MATERIAL_COMMITTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Snapshot actual game-created D3D9 DEFAULT render target as same-format SYSTEMMEM via GetRenderTargetData",
+      "Convert 5 source 16-bit color formats to BGRA8 SRV and issue D3D11 native Draw/DrawIndexed",
+      "Keep original D3D9 Draw, Present and gamepad on unsupported formats, sRGB and readback failure"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_render_target_readback.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_rt_16bit_probe_00692.cpp",
+      "tools/test_dx11_game_rt_16bit_00692.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compiled C++ tests all five 16-bit source color layouts/alpha; source readback and native draw integration",
+      "negative_regression": "sRGB unsupported, bad lock/format fail closed, 13 source wiring destructive mutations preserve original D3D9 Draw",
+      "component_integration": "Actual game RT16 to same-format staging to canonical BGRA8 immutable native SRV to native Draw/Indexed"
+    },
+    "conflict_keys": [
+      "DX11:GAME_RT16_NATIVE_SCENE",
+      "src/vr/d3d11/live_game_render_target_readback.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_RT_READBACK",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and automated probes only; actual Quest3/VDXR visual/gamepad runtime untested",
+    "activation_guard_and_fallback": "Diagnostic opt-in remains disabled by default, source input/Draw/Present preserved"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_AUTHORED_RT16_NATIVE_DRAW_FAMILY",
+    "goal": "Enable coherent game-created 16-bit render target family for native diagnostic menu, car and race Draw/Indexed source sampling without disrupting D3D9 input.",
+    "acceptance_items": [
+      {
+        "id": "rt16-game-native-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_rt16_staging_dx11_srv_draw",
+        "expected_behavior": "5 D3D9 render-target formats decode into BGRA8 immutable native texture for game-authored Draw/Indexed"
+      },
+      {
+        "id": "rt16-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "sRGB_descriptor_failure_d3d9_input",
+        "expected_behavior": "Invalid/sRGB/readback failures never suppress original game D3D9 Draw/Present/input"
+      },
+      {
+        "id": "rt16-exact-ci",
+        "category": "integrated_validation",
+        "behavior_area": "portable_compiled_cpp_negative_mutations_github_ci",
+        "expected_behavior": "Portable per-format pixel evidence, destructive source wiring and required GitHub Actions same SHA"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rt16-game-native-draw": "PENDING_EXACT_SHA",
+    "rt16-fallback": "PENDING_EXACT_SHA",
+    "rt16-exact-ci": "PENDING_EXACT_SHA"
+  },
+  "base_head_sha": "170f628cbb24ed8602d4d79a9f02ed3afaf10589",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_render_target_readback.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_rt_16bit_probe_00692.cpp",
+    "tools/test_dx11_game_rt_16bit_00692.py",
+    "docs/automation/runs/CONVERSION-DX11-00692.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub latest HEAD and 00691 C6; 00692 not present",
+    "C1_REVIEW": "PASS RT16 source textures supported but DEFAULT 16-bit RTs rejected",
+    "C2_IMPLEMENT": "PASS C++ source/staging/native Draw wiring and positive/negative probes",
+    "C3_VALIDATE": "PENDING_EXACT_SHA GitHub Actions; HMD UNTESTED",
+    "C4_COMMIT": "Material commit contains exact TASK_ID marker",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA"
+  },
+  "next_action": "Check mandatory exact material SHA GitHub Actions; repair regressions under same TASK_ID if failed. Separate C6 bookkeeping after success."
+}
