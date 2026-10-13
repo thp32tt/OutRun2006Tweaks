@@ -1,0 +1,9 @@
+# Normal scheduler restore; apply as Portainer Git-based stack ADDITIONAL compose path.
+# Replaces q217 smoke override. Keep all original services, environment, named volumes and images.
+services:
+  outrun-chat-controller-localization-recovery:
+    environment:
+      AUTO_SEND: "true"
+      CHAT_SLOTS: "3"
+      SCHEDULE_MINUTES: "0,10,30,40"
+      OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
