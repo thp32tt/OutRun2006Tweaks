@@ -30,6 +30,16 @@ Overlay::ContentRect Overlay::content_rect()
 		screen.x <= 0.f || screen.y <= 0.f)
 		return { 0.f, 0.f, 0.f, 0.f };
 
+	// In active VR gameplay the F11 shell is an external ImGui surface,
+	// not a game/menu sprite. A forced 4:3 game letterbox on a 21:9
+	// mirror otherwise clips its XR-density tabs to a 4:3 canvas, even
+	// though ImGui renders after the letterbox rails over the full source
+	// backbuffer. Keep desktop F11 and actual front-end menus unchanged.
+	const bool externalVrShell = VrFontMultiplier > 1.0f &&
+		Game::is_vr_gameplay_presentation();
+	if (externalVrShell)
+		return { 0.f, 0.f, screen.x, screen.y };
+
 	// Match D3DEndScene's actual letterbox draw gate, including mode 2
 	// (always) and the UIScalingMode switch. Only a wider-than-4:3 source
 	// has sidebars; portrait and exact 4:3 must use the entire viewport.

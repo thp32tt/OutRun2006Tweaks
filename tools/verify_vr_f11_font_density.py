@@ -465,6 +465,65 @@ def check_font_io_cache_contract(font: str) -> None:
     after = font.split("bool loaded = false;", 1)[1].split("if (!loaded)", 1)[0]
     assert "IM_ALLOC(fontData.size())" in after
 
+
+def check_external_vr_f11_canvas(font: str) -> None:
+    """XR-density F11 uses the whole source canvas; game 4:3 bars stay intact."""
+    shell = font.split("Overlay::ContentRect Overlay::content_rect()", 1)[1].split(
+        "const std::vector<OverlayWindow*>& Overlay::windows()", 1)[0]
+    required = (
+        "const bool externalVrShell = VrFontMultiplier > 1.0f &&",
+        "Game::is_vr_gameplay_presentation();",
+        "if (externalVrShell)",
+        "return { 0.f, 0.f, screen.x, screen.y };",
+        "Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0",
+        "(Settings::UILetterboxing == 2 || !Game::is_in_game())",
+        "return { border, 0.f, screen.x - (border * 2.f), screen.y };",
+    )
+    for token in required:
+        assert token in shell, token
+    assert shell.index("screen.x <= 0.f || screen.y <= 0.f") < (
+        shell.index("const bool externalVrShell"))
+    assert shell.index("return { 0.f, 0.f, screen.x, screen.y };") < (
+        shell.index("float border = 0.f;"))
+    assert shell.index("float border = 0.f;") < (
+        shell.index("return { border, 0.f,"))
+
+    # A real VR F11 window may use the side-rail pixels, but the original
+    # front-end and desktop F11 still respect a forced 4:3 letterbox.
+    def width(source_w, source_h, in_vr, density, force_rails):
+        if not math.isfinite(source_w) or not math.isfinite(source_h) or (
+                source_w <= 0 or source_h <= 0):
+            return 0.
+        if in_vr and density > 1.0:
+            return source_w
+        if force_rails and source_w > source_h * 4. / 3.:
+            return source_h * 4. / 3. - 1.0
+        return source_w
+
+    for w, h in ((1024, 768), (1920, 1080), (3440, 1440),
+                 (2560, 1080), (2496, 2688)):
+        normal = width(w, h, False, 1., True)
+        vr_shell = width(w, h, True, 2.75, True)
+        assert vr_shell == w
+        assert normal <= vr_shell
+        assert width(w, h, True, 1., True) == normal
+        assert width(w, h, False, 2.75, True) == normal
+        assert width(w, h, True, 2.75, False) == w
+    assert width(float("nan"), 1440, True, 2.75, True) == 0.
+
+    # Mutants must fail at the actual owner (not detached numeric fixtures).
+    for original, bad in (
+        ("VrFontMultiplier > 1.0f", "VrFontMultiplier >= 1.0f"),
+        ("Game::is_vr_gameplay_presentation();", "Game::is_in_game();"),
+        ("if (externalVrShell)", "if (false)"),
+        ("return { 0.f, 0.f, screen.x, screen.y };",
+         "return { 0.f, 0.f, screen.y * 4.f / 3.f, screen.y };"),
+    ):
+        assert shell.count(original) == 1, original
+        changed = shell.replace(original, bad, 1)
+        assert not all(x in changed for x in required), original
+    print("PASS F11 VR full-source canvas, desktop/menu 4:3 preserved, 5 sizes and 4 mutants")
+
 def main():
     hook, font, header = (p.read_text(encoding="utf-8")
                           for p in (HOOK, FONT, HEADER))
@@ -477,6 +536,7 @@ def main():
     check_transient_eye_extent_dropout(hook)
     check_shell_layout_mutations(font)
     check_shell_numeric_cases()
+    check_external_vr_f11_canvas(font)
     check_projection(renderer, semantic)
     check_projection_mutations(renderer, semantic)
     # Default R26 and new R29 compile separate final TUs but share R23.
