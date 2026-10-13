@@ -648,7 +648,9 @@ def check_first_run_vr_modal(font: str) -> None:
         "content.height * 0.90f",
         "384.0f * Overlay::GlobalFontScale * density",
         "384.0f * Overlay::GlobalFontScale;",
-        "700.0f * density, usableHeight",
+        "const float modalFontFactor = vrModal",
+        "std::clamp(Overlay::GlobalFontScale / 2.0f, 0.5f, 2.5f)",
+        "700.0f * density * modalFontFactor, usableHeight",
         "(std::min)(384.0f * Overlay::GlobalFontScale * density,",
         "ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));",
         "ImGui::SetNextWindowSize(ImVec2(popupWidth, popupHeight));",
@@ -664,17 +666,24 @@ def check_first_run_vr_modal(font: str) -> None:
         if not vr:
             return 384.0 * scale, 0.0
         atlas = min(max(density, 1.0), 3.0)
+        font_factor = min(max(scale / 2.0, 0.5), 2.5)
         return (min(384.0 * scale * atlas, max(1.0, w * 0.90)),
-                min(700.0 * atlas, max(1.0, h * 0.90)))
+                min(700.0 * atlas * font_factor, max(1.0, h * 0.90)))
 
     for w, h in ((1024, 768), (1920, 1080), (3440, 1440),
                  (2560, 1080), (2496, 2688), (768, 1024),
                  (1, 1)):
         for density in (1.0, 2.0, 2.75, 3.0):
-            pw, ph = geometry(w, h, 2.0, density, True)
-            assert 0.0 < pw <= max(1.0, w * 0.9)
-            assert 0.0 < ph <= max(1.0, h * 0.9)
+            for scale in (0.5, 1.0, 2.0, 3.5, 5.0):
+                pw, ph = geometry(w, h, scale, density, True)
+                assert 0.0 < pw <= max(1.0, w * 0.9)
+                assert 0.0 < ph <= max(1.0, h * 0.9)
             assert geometry(w, h, 2.0, density, False) == (768.0, 0.0)
+    # At 1080p and temporarily 1x XR atlas density, large live font
+    # edits must grow the first-run dialog rather than clip its controls.
+    assert geometry(1920, 1080, 4.0, 1.0, True)[1] == 972.0
+    assert geometry(1920, 1080, 4.0, 1.0, True)[1] > geometry(1920, 1080, 2.0, 1.0, True)[1]
+    assert geometry(1920, 1080, 4.0, 1.0, False) == (1536.0, 0.0)
     assert geometry(3440, 1440, 2.0, 2.75, True)[0] > 768.0
     assert geometry(3440, 1440, 2.0, 2.75, True)[1] <= 1296.0
     for original, bad in (
@@ -683,14 +692,17 @@ def check_first_run_vr_modal(font: str) -> None:
         ("content.height * 0.90f", "content.height * 4.0f"),
         ("384.0f * Overlay::GlobalFontScale * density",
          "384.0f * Overlay::GlobalFontScale"),
-        ("700.0f * density, usableHeight", "700.0f * density, 99999.0f"),
+        ("700.0f * density * modalFontFactor, usableHeight",
+         "700.0f * density, usableHeight"),
+        ("700.0f * density * modalFontFactor, usableHeight",
+         "700.0f * density * modalFontFactor, 99999.0f"),
         ("const bool vrModal = Game::is_vr_gameplay_presentation();",
          "const bool vrModal = false;"),
     ):
         assert original in modal
         mutated = modal.replace(original, bad, 1)
         assert any(token not in mutated for token in tokens), original
-    print("PASS first-run F11 modal XR density, 7 viewport sizes, scroll limit and 6 mutants")
+    print("PASS first-run F11 modal XR+font density, 7 viewport sizes, 5 font scales, scroll limit and 7 mutants")
 
 
 

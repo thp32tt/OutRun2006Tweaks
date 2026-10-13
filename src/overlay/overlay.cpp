@@ -680,6 +680,14 @@ static void render_first_run_intro()
 	const Overlay::ContentRect content = Overlay::content_rect();
 	const float density = vrModal
 		? std::clamp(Overlay::VrFontMultiplier, 1.0f, 3.0f) : 1.0f;
+	// The first-run popup is a separate ImGui window from the F11 shell.
+	// Its height must track live font-size edits too: at a low transient
+	// XR eye density a 4x font otherwise clips the confirmation controls
+	// into a 700px viewport even after the main shell has been resized.
+	// Use the shipped 2.0 font as 1x, and never change desktop sizing.
+	const float modalFontFactor = vrModal
+		? std::clamp(Overlay::GlobalFontScale / 2.0f, 0.5f, 2.5f)
+		: 1.0f;
 	const float usableWidth = (std::max)(1.0f, content.width * 0.90f);
 	const float usableHeight = (std::max)(1.0f, content.height * 0.90f);
 	const ImVec2 center = vrModal
@@ -691,7 +699,7 @@ static void render_first_run_intro()
 			usableWidth)
 		: 384.0f * Overlay::GlobalFontScale;
 	const float popupHeight = vrModal
-		? (std::min)(700.0f * density, usableHeight) : 0.0f;
+		? (std::min)(700.0f * density * modalFontFactor, usableHeight) : 0.0f;
 	ImGui::SetNextWindowPos(center, 0, ImVec2(0.5f, 0.5f));
 	ImGui::SetNextWindowSize(ImVec2(popupWidth, popupHeight));
 
