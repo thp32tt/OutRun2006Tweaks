@@ -516,3 +516,46 @@ for previous_alpha in (False, True):
         assert (previous_alpha, previous_mask) == (
             previous_alpha, previous_mask)
 print("PASS opaque 4:3 menu bars alpha-test/colour-write isolation, 8 destructive mutants")
+
+# Issue #119: The world pass can leave fog/wireframe latched after the
+# menu's last sprite. Black sidebar fill must not inherit either state;
+# preserve the game's actual states across both border triangles.
+def verify_menu_solid_fog_state(code: str) -> None:
+    menu = code.split("static void D3DEndScene(", 1)[1].split(
+        "if (overlayInited)", 1)[0]
+    tokens = (
+        "DWORD prevFogEnable = FALSE;",
+        "DWORD prevFillMode = D3DFILL_SOLID;",
+        "SUCCEEDED(d3ddev->GetRenderState(D3DRS_FOGENABLE, &prevFogEnable))",
+        "SUCCEEDED(d3ddev->GetRenderState(D3DRS_FILLMODE, &prevFillMode))",
+        "if (clipStateReady)",
+        "d3ddev->SetRenderState(D3DRS_FOGENABLE, FALSE);",
+        "d3ddev->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);",
+        "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);",
+        "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);",
+        "d3ddev->SetRenderState(D3DRS_FOGENABLE, prevFogEnable);",
+        "d3ddev->SetRenderState(D3DRS_FILLMODE, prevFillMode);",
+    )
+    offsets = [menu.index(t) for t in tokens]
+    assert offsets == sorted(offsets) and len(set(offsets)) == len(offsets)
+    assert menu.count("d3ddev->SetRenderState(D3DRS_FOGENABLE, FALSE);") == 1
+    assert menu.count("d3ddev->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);") == 1
+
+verify_menu_solid_fog_state(src)
+solid_fog_mutants = (
+    ("SUCCEEDED(d3ddev->GetRenderState(D3DRS_FOGENABLE, &prevFogEnable))", "true"),
+    ("SUCCEEDED(d3ddev->GetRenderState(D3DRS_FILLMODE, &prevFillMode))", "true"),
+    ("d3ddev->SetRenderState(D3DRS_FOGENABLE, FALSE);", "/* lost fog isolation */"),
+    ("d3ddev->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);", "/* lost solid fill */"),
+    ("d3ddev->SetRenderState(D3DRS_FOGENABLE, prevFogEnable);", "/* lost fog restore */"),
+    ("d3ddev->SetRenderState(D3DRS_FILLMODE, prevFillMode);", "/* lost fill restore */"),
+)
+for original, replacement in solid_fog_mutants:
+    assert original in src
+    try:
+        verify_menu_solid_fog_state(src.replace(original, replacement, 1))
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("Fog/fill destructive mutant escaped: " + original)
+print("PASS main menu solid-fill and fog-free bars, original state restore, 6 destructive mutants")

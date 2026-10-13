@@ -179,12 +179,16 @@ class D3DHooks : public Hook
 			DWORD prevStencilEnable = FALSE;
 			DWORD prevAlphaTest = FALSE;
 			DWORD prevColorWrite = 0;
+			DWORD prevFogEnable = FALSE;
+			DWORD prevFillMode = D3DFILL_SOLID;
 			const bool clipStateReady =
 				(!Game::is_in_game() || Settings::UILetterboxing == 2) &&
 				SUCCEEDED(d3ddev->GetRenderState(D3DRS_SCISSORTESTENABLE, &prevScissorTest)) &&
 				SUCCEEDED(d3ddev->GetRenderState(D3DRS_STENCILENABLE, &prevStencilEnable)) &&
 				SUCCEEDED(d3ddev->GetRenderState(D3DRS_ALPHATESTENABLE, &prevAlphaTest)) &&
-				SUCCEEDED(d3ddev->GetRenderState(D3DRS_COLORWRITEENABLE, &prevColorWrite));
+				SUCCEEDED(d3ddev->GetRenderState(D3DRS_COLORWRITEENABLE, &prevColorWrite)) &&
+				SUCCEEDED(d3ddev->GetRenderState(D3DRS_FOGENABLE, &prevFogEnable)) &&
+				SUCCEEDED(d3ddev->GetRenderState(D3DRS_FILLMODE, &prevFillMode));
 			if (clipStateReady)
 			{
 				// This runs after SceneControl has finished, so anything left set here carries
@@ -233,6 +237,11 @@ class D3DHooks : public Hook
 				d3ddev->SetRenderState(D3DRS_COLORWRITEENABLE,
 					D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
 					D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
+				// Fixed-function black rails must be solid and fog-free even when
+				// the previous world pass left wireframe or coloured fog enabled.
+				// The two values are restored with the other captured scene states.
+				d3ddev->SetRenderState(D3DRS_FOGENABLE, FALSE);
+				d3ddev->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 				// Borders get culled without this
 				d3ddev->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
@@ -271,6 +280,8 @@ class D3DHooks : public Hook
 				d3ddev->SetRenderState(D3DRS_STENCILENABLE, prevStencilEnable);
 				d3ddev->SetRenderState(D3DRS_ALPHATESTENABLE, prevAlphaTest);
 				d3ddev->SetRenderState(D3DRS_COLORWRITEENABLE, prevColorWrite);
+				d3ddev->SetRenderState(D3DRS_FOGENABLE, prevFogEnable);
+				d3ddev->SetRenderState(D3DRS_FILLMODE, prevFillMode);
 				d3ddev->SetRenderState(D3DRS_CULLMODE, prevCullMode);
 				d3ddev->SetRenderState(D3DRS_ALPHABLENDENABLE, prevAlphaBlend);
 				d3ddev->SetRenderState(D3DRS_ZENABLE, prevZEnable);
