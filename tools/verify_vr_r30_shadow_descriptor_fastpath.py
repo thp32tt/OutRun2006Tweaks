@@ -279,12 +279,12 @@ def test_shadow_copy_cache_mutations(source):
 
 
 def validate_shadow_registry_lookup(source):
-    """Validate the epoch-fenced two-way VB/IB lookup shared by both wrappers."""
+    """Validate the epoch-fenced four-way VB/IB lookup shared by both wrappers."""
     find_v = body(source, "R30ShadowPtr R30FindVertexShadow(")
     find_i = body(source, "R30ShadowPtr R30FindIndexShadow(")
     common = body(source, "R30ShadowPtr R30FindShadow(")
     assert "std::atomic<std::uint64_t> R30ShadowRegistryEpoch{1};" in source
-    assert "Slot slots[2]{};" in source
+    assert "Slot slots[4]{};" in source
     assert "unsigned next = 0;" in source
     assert "return R30FindShadow(buffer, R30VertexShadows, R30VertexLookup);" in find_v
     assert "return R30FindShadow(buffer, R30IndexShadows, R30IndexLookup);" in find_i
@@ -304,7 +304,7 @@ def validate_shadow_registry_lookup(source):
         "cached.next = 0;",
         "registry.find(buffer)",
         "auto& slot = cached.slots[cached.next];",
-        "cached.next = (cached.next + 1u) % 2u;",
+        "cached.next = (cached.next + 1u) % 4u;",
         "slot.buffer = buffer;",
         "slot.entry = it == registry.end() ? nullptr : it->second;",
     ):
@@ -340,7 +340,7 @@ def validate_shadow_registry_lookup(source):
 def exercise_shadow_negative_lookup_model():
     """Alternating positive/negative entries survive hits; lifetime epochs do not."""
     membership = {}
-    caches = {kind: {"epoch": 0, "slots": [(None, None)] * 2, "next": 0}
+    caches = {kind: {"epoch": 0, "slots": [(None, None)] * 4, "next": 0}
               for kind in ("VB", "IB")}
     epoch = 1
     lock_lookups = 0
@@ -354,12 +354,12 @@ def exercise_shadow_negative_lookup_model():
                     return value
         lock_lookups += 1
         if cache["epoch"] != epoch:
-            cache["slots"] = [(None, None)] * 2
+            cache["slots"] = [(None, None)] * 4
             cache["epoch"] = epoch
             cache["next"] = 0
         value = membership.get((kind, pointer))
         cache["slots"][cache["next"]] = (pointer, value)
-        cache["next"] = (cache["next"] + 1) % 2
+        cache["next"] = (cache["next"] + 1) % 4
         return value
 
     def register(kind, pointer, value):
@@ -376,17 +376,17 @@ def exercise_shadow_negative_lookup_model():
             epoch += 1
 
     for kind in ("VB", "IB"):
-        # Two alternating untracked addresses should incur only two misses.
+        # Four alternating untracked addresses should incur only four misses.
         first = lock_lookups
         for i in range(512):
-            assert find(kind, (0x1234, 0x2345)[i % 2]) is None
-        assert lock_lookups == first + 2, (kind, "negative-cache thrash")
+            assert find(kind, (0x1234, 0x2345, 0x3456, 0x4567)[i % 4]) is None
+        assert lock_lookups == first + 4, (kind, "negative-cache thrash")
         register(kind, 0x1234, "old")
         first = lock_lookups
         for i in range(512):
-            assert find(kind, (0x1234, 0x2345)[i % 2]) == (
-                "old" if i % 2 == 0 else None)
-        assert lock_lookups == first + 2, (kind, "mixed-cache thrash")
+            assert find(kind, (0x1234, 0x2345, 0x3456, 0x4567)[i % 4]) == (
+                "old" if i % 4 == 0 else None)
+        assert lock_lookups == first + 4, (kind, "mixed-cache thrash")
         release(kind, 0x1234)
         assert find(kind, 0x1234) is None
         register(kind, 0x1234, "recycled")
@@ -407,7 +407,7 @@ def test_shadow_registry_lookup_mutations(source):
     # Keep the legacy descriptor gate's independent lifecycle coverage after
     # the single-slot lookup was replaced by a shared two-way helper.
     edits = (
-        ("Slot slots[2]{};", "Slot slots[1]{};"),
+        ("Slot slots[4]{};", "Slot slots[1]{};"),
         ("if (cached.epoch == epoch)", "if (cached.epoch != epoch)"),
         ("if (slot.buffer == buffer)", "if (slot.buffer == buffer && slot.entry)"),
         ("R30ShadowRegistryEpoch.load(std::memory_order_acquire)",
@@ -417,7 +417,7 @@ def test_shadow_registry_lookup_mutations(source):
         ("if (cached.epoch != lockedEpoch)", "if (cached.epoch == lockedEpoch)"),
         ("slot = {};", "/* retain stale slot */"),
         ("cached.epoch = lockedEpoch;", "cached.epoch = epoch;"),
-        ("cached.next = (cached.next + 1u) % 2u;", "cached.next = 0u;"),
+        ("cached.next = (cached.next + 1u) % 4u;", "cached.next = 0u;"),
         ("slot.entry = it == registry.end() ? nullptr : it->second;",
          "slot.entry = nullptr;"),
         ("if (inserted)\n                R30ShadowRegistryEpoch.fetch_add(1, std::memory_order_release);",
