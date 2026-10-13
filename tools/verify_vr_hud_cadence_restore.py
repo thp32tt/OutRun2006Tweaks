@@ -115,15 +115,18 @@ if "WorldBillboard" in screen_hud or "ScreenOverlay2D" in screen_hud:
 
 rival_body = function_body(uiscale, "static int __cdecl RivalMarker_sprani(")
 rival_markers = [
-    "Game::sprani_play_ae_auth_alpha(",
     "const auto projectedAnchor = RivalMarkerProjectedInfo;",
     "RivalMarkerProjectedInfo = {};",
-    "TagAppendedNodes(",
     "OutRunVR::GameSemantic::RenderScope::WorldBillboard",
+    "ScopedExactProducerSemantic producerScope(",
+    "Game::sprani_play_ae_auth_alpha(",
+    "TagAppendedNodes(before, scope,",
 ]
 rival_pos = [rival_body.find(m) for m in rival_markers]
 if min(rival_pos) < 0 or rival_pos != sorted(rival_pos):
-    fail("rival marker must tag appended nodes as WorldBillboard after the exact producer")
+    fail("rival must consume exact view anchor, scope original draw and then tag queued children")
+if rival_body.count("projected ? &projectedAnchor : nullptr") != 2:
+    fail("rival must preserve one frozen exact projected anchor for direct and queued draws")
 if "ScreenHud" in rival_body or "ScreenOverlay2D" in rival_body:
     fail("rival marker wrapper must remain spatial and exact-only")
 

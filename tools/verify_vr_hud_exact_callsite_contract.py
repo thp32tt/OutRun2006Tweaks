@@ -299,17 +299,28 @@ def check(ui, manifest):
         chunk = function_body(ui, func)
         if token == "RankMarkerSprani":
             ordered(chunk, "rank screen-vs-world precedence",
+                    "const auto projectedAnchor = RankMarkerProjectedInfo;",
                     "if (RankMarkerSubScreenHudDepth != 0)", "RenderScope::ScreenHud",
-                    "const bool projected = RankMarkerProjectedInfo.valid",
-                    "RenderScope::ProjectedWorldMarker2D", "RenderScope::WorldBillboard")
+                    "const bool projected = projectedAnchor.valid",
+                    "RenderScope::ProjectedWorldMarker2D", "RenderScope::WorldBillboard",
+                    "ScopedExactProducerSemantic producerScope(",
+                    "Game::sprani_play_ae_auth_alpha(",
+                    "TagAppendedNodes(tailsBefore, scope,")
+            if chunk.count("&projectedAnchor") < 2:
+                fail("rank immediate draw and queued siblings must share frozen anchor")
             if "TagAppendedNodes(tailsBefore, scope," not in chunk:
                 fail("rank sprani lost all-node exact producer tagging")
         else:
             ordered(chunk, "4th+ rank clip screen-vs-world precedence",
+                    "const auto projectedAnchor = RankMarkerProjectedInfo;",
                     "const bool screenHud = RankMarkerSubScreenHudDepth != 0;",
-                    "const bool projected = !screenHud && RankMarkerProjectedInfo.valid;",
+                    "const bool projected = !screenHud && projectedAnchor.valid;",
                     "RenderScope::ScreenHud", "RenderScope::ProjectedWorldMarker2D",
-                    "RenderScope::WorldBillboard", "TagAppendedNodes(tailsBefore, scope,")
+                    "RenderScope::WorldBillboard",
+                    "ScopedExactProducerSemantic producerScope(",
+                    "Game::put_clip_sprite(", "TagAppendedNodes(tailsBefore, scope,")
+            if chunk.count("&projectedAnchor") < 2:
+                fail("rank clip direct and sibling anchors must remain identical")
             if "node->args_10.float24 += RankMarkerFracX" not in chunk or (
                 "node->args_10.float28 += RankMarkerFracY" not in chunk):
                 fail("4th+ digit siblings lost subpixel restoration")
@@ -362,6 +373,15 @@ def test_mutations(ui, manifest):
                                                "ProducerToken::RankMarkerClipSprite", 1))
     must_fail("rank world first", ui.replace("if (RankMarkerSubScreenHudDepth != 0)",
                                             "if (RankMarkerSubScreenHudDepth == 0)", 1))
+    must_fail("rank producer loses local anchor freeze",
+              ui.replace("const bool projected = projectedAnchor.valid;",
+                         "const bool projected = RankMarkerProjectedInfo.valid;", 1))
+    must_fail("rank clip reuses mutable TLS after draw",
+              ui.replace("const bool projected = !screenHud && projectedAnchor.valid;",
+                         "const bool projected = !screenHud && RankMarkerProjectedInfo.valid;", 1))
+    must_fail("rival exact source-time semantic removed",
+              ui.replace("ScopedExactProducerSemantic producerScope(\n\t\t\t\tscope, projected ? &projectedAnchor : nullptr);",
+                         "ScopedRenderSemantic producerScope(\n\t\t\t\tscope);", 1))
     must_fail("R64 DispRank source accidentally shares TimeAttack owner",
               ui.replace("IsExactDispRankRightClipRva(addr)",
                          "false", 1))

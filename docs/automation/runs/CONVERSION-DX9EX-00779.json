@@ -22,7 +22,9 @@
   "changed_files": [
     "src/hooks_uiscaling.cpp",
     "tools/verify_vr_projected_marker_anchor.py",
-    "docs/automation/runs/CONVERSION-DX9EX-00779.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00779.json",
+    "tools/verify_vr_hud_exact_callsite_contract.py",
+    "tools/verify_vr_hud_cadence_restore.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:RANK_MARKERS",
@@ -89,5 +91,5 @@
     "eye_ownership": "Exact projected marker scope only when matching recovered view anchor is valid; invalid anchor follows existing WorldBillboard fallback, with no generic sprite ownership expansion.",
     "negative_test_evidence": "Four destructive source mutations for source snapshot, direct semantic scope, one-time rival anchor consume, queued fallback classification."
   },
-  "validation_notes": "This C4 commit is material C++ and targeted regression work. Automated exact-SHA gate pending; no HMD evidence and no SCORE until whole feature acceptance and source/CI are verified."
+  "validation_notes": "This C4 commit is material C++ and targeted regression work. Automated exact-SHA gate pending; no HMD evidence and no SCORE until whole feature acceptance and source/CI are verified.\nC5 first exact-SHA policy/EXE Inspector regression checks failed because two existing verifier contracts assumed the obsolete live-TLS anchor and post-call-only rival order; same-task source-contract repair now validates the snapshot and scoped direct drawing, with three new negative mutations. New exact-SHA CI required."
 }
