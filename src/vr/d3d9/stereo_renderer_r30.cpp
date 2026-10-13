@@ -1630,12 +1630,28 @@ namespace OutRunVRStereo
             return std::clamp(compensation, 0.75f, 3.50f);
         }
 
+        // F11's ImGui shell is rasterised and sized independently for the
+        // published XR eye density. Reapplying the *gameplay* HudScale here
+        // double-shrinks its glyphs and window after that expensive rebuild.
+        // Scope is explicit, thread-local and lasts only for RenderDrawData:
+        // canonical SpriteNode HUD, pause/menu, world and SkyGlow remain on
+        // the original contain mapping. The per-eye aspect and FOV affine
+        // below are still applied so glyphs keep their original proportions.
+        float R30HudScopeScale() noexcept
+        {
+            if (OutRunVR::GameSemantic::ExternalOverlaySemanticDepth != 0 &&
+                OutRunVR::GameSemantic::EffectiveScope() ==
+                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D)
+                return 1.0f;
+            return R30HudScaleValue();
+        }
+
         void R30HudContainScale(
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
             float& scaleX, float& scaleY) noexcept
         {
             const auto frame = R29OwnerCaptureFrameSnapshot();
-            const float userScale = R30HudScaleValue();
+            const float userScale = R30HudScopeScale();
             const float fov[8]{
                 stereo.eyeFov[0].angleLeft,
                 stereo.eyeFov[0].angleRight,

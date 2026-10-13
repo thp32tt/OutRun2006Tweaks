@@ -54,6 +54,57 @@ def check(hook: str, font: str, header: str) -> None:
         "Overlay::rebuild_fonts();"
     ) < hook.index("ImGui_ImplDX9_NewFrame();")
 
+def check_projection(renderer: str, semantic: str) -> None:
+    # F11 must not be reduced by VR.HudScale *after* rebuilding a sharp
+    # source-resolution font atlas. The external semantic is not permission
+    # to relax generic game ScreenOverlay2D/menu or projected-world content.
+    start = renderer.index("float R30HudScopeScale() noexcept")
+    end = renderer.index("void R30HudContainScale(", start)
+    scope = renderer[start:end]
+    for token in (
+        "ExternalOverlaySemanticDepth != 0",
+        "EffectiveScope() ==",
+        "RenderScope::ScreenOverlay2D",
+        "return 1.0f;",
+        "return R30HudScaleValue();",
+    ):
+        assert token in scope, token
+    assert scope.index("ExternalOverlaySemanticDepth != 0") < scope.index(
+        "return 1.0f;") < scope.index("return R30HudScaleValue();")
+    contain = renderer[end:renderer.index("bool R30TransformHudScissor(", end)]
+    assert "const float userScale = R30HudScopeScale();" in contain
+    assert "R30HudContain.userScale == userScale" in contain
+    assert "scaleY = userScale / sourceOverTarget;" in contain
+    assert "scaleX = userScale * sourceOverTarget;" in contain
+    for marker in (
+        "inline thread_local unsigned ExternalOverlaySemanticDepth = 0;",
+        "++ExternalOverlaySemanticDepth;",
+        "--ExternalOverlaySemanticDepth;",
+        "if (ExternalOverlaySemanticDepth != 0)",
+    ):
+        assert marker in semantic, marker
+
+
+def check_projection_mutations(renderer: str, semantic: str) -> None:
+    mutants = (
+        ("ExternalOverlaySemanticDepth != 0", "ExternalOverlaySemanticDepth == 0"),
+        ("RenderScope::ScreenOverlay2D)", "RenderScope::ScreenHud)"),
+        ("return 1.0f;", "return R30HudScaleValue();"),
+        ("const float userScale = R30HudScopeScale();",
+         "const float userScale = R30HudScaleValue();"),
+        ("R30HudContain.userScale == userScale",
+         "R30HudContain.userScale == 1.0f"),
+    )
+    for a, b in mutants:
+        assert a in renderer
+        try:
+            check_projection(renderer.replace(a, b, 1), semantic)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("F11 scoped projection mutant survived: " + a)
+
+
 def factor(source_w, source_h, eye_w, eye_h):
     if min(source_w, source_h, eye_w, eye_h) <= 0:
         return 1.0
@@ -65,7 +116,11 @@ def factor(source_w, source_h, eye_w, eye_h):
 def main():
     hook, font, header = (p.read_text(encoding="utf-8")
                           for p in (HOOK, FONT, HEADER))
+    renderer = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
+    semantic = (ROOT / "src/vr/game/render_semantics.hpp").read_text(encoding="utf-8")
     check(hook, font, header)
+    check_projection(renderer, semantic)
+    check_projection_mutations(renderer, semantic)
     # Default R26 and new R29 compile separate final TUs but share R23.
     common = COMMON.read_text(encoding="utf-8")
     api = EYE_API.read_text(encoding="utf-8")
@@ -105,7 +160,17 @@ def main():
         except AssertionError:
             continue
         raise AssertionError(f"F11 regression mutant {index} survived")
-    print("VR F11 native font-density guard PASS; 5 negative mutants rejected")
+    # 3440x1440 desktop -> 2496x2688 XR eye. The source/eye
+    # aspect compensation remains identical in both paths; only F11 escapes
+    # the gameplay scale of 0.55. This is geometry, not headset optical PASS.
+    aspect = (3440 / 1440) / (2496 / 2688)
+    assert 2.5 < aspect < 2.6
+    game_x, game_y = 0.55, 0.55 / aspect
+    f11_x, f11_y = 1.0, 1.0 / aspect
+    assert abs(f11_x / game_x - f11_y / game_y) < 1e-12
+    assert abs(game_x / game_y - f11_x / f11_y) < 1e-12
+    assert f11_y > game_y and f11_x > game_x
+    print("VR F11 native atlas + independently sized stereo plane PASS; 10 negative mutants rejected")
 
 if __name__ == "__main__":
     main()
