@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_SPARSE_INDEXED_VB",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "e46f21d3d1aa7c2d855c80d9b024c1325bac9c40",
-  "status": "MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -60,13 +60,48 @@
     "C0_RECOVER": "PASS",
     "C1_REVIEW": "PASS: large indexed VB span rejected despite few used vertices",
     "C2_IMPLEMENT": "PASS: sparse remap and epoch-fenced VB gather",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "MATERIAL_COMMIT",
+    "C3_VALIDATE": "PASS_EXACT_SHA",
+    "C4_COMMIT": "PASS_MATERIAL_COMMIT",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Inspect exact SHA GitHub Actions and only then mark C6; HMD/game+gamepad UNTESTED."
+  "next_action": "All GitHub exact-SHA Gates SUCCESS; Quest3/VDXR menu, vehicle, race, gamepad runtime evidence remains UNTESTED. Start distinct DX11 code item without reopening this one. DXVK frozen.",
+  "material_result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9",
+  "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9",
+  "validation_bearing_result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9",
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38332577605,
+      "conclusion": "success",
+      "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9"
+    },
+    "dx11_fast_structural": {
+      "id": 38332577606,
+      "conclusion": "success",
+      "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9"
+    },
+    "windows_build": {
+      "id": 38332582698,
+      "conclusion": "success",
+      "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9"
+    },
+    "openxr_architecture_push": {
+      "id": 38332577447,
+      "conclusion": "success",
+      "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9"
+    },
+    "openxr_architecture_pr": {
+      "id": 38332582681,
+      "conclusion": "success",
+      "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9"
+    },
+    "optional_hud_inspector": {
+      "id": 38332582676,
+      "conclusion": "success",
+      "result_sha": "7a5c702ab7f8e71a00a4788b79d198c507578ca9"
+    }
+  }
 }
