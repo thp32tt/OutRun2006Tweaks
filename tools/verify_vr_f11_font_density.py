@@ -538,12 +538,33 @@ def check_font_io_cache(font: str) -> None:
         assert token in block, token
     assert block.index("fileBytes <= 0") < block.index("bytes(static_cast")
     assert "std::vector<uint8_t> fontData;" not in block
+    # The first failed font must not degrade to an enlarged bitmap when a
+    # second valid scalable face is present on Windows/Wine.
+    for face in ('L"segoeui.ttf"', 'L"tahoma.ttf"', 'L"arial.ttf"'):
+        assert face in block, face
+    assert "for (const wchar_t* family : fontFiles)" in block
+    assert block.count("continue;") >= 3
+    assert block.index('L"segoeui.ttf"') < block.index('L"tahoma.ttf"') < block.index('L"arial.ttf"')
+    # One bad font cannot poison the whole search; only all failures
+    # legitimately reach the default bitmap face.
+    for good, bad in (
+        ('L"tahoma.ttf"', 'L"segoeui.ttf"'),
+        ('L"arial.ttf"', 'L"segoeui.ttf"'),
+        ("for (const wchar_t* family : fontFiles)", "if (true)"),
+        ("if (!file)\n\t\t\t\tcontinue;", "if (!file)\n\t\t\t\treturn {};"),
+    ):
+        assert good in block
+        broken = block.replace(good, bad, 1)
+        assert (any(face not in broken for face in (
+            'L"segoeui.ttf"', 'L"tahoma.ttf"', 'L"arial.ttf"'))
+            or "for (const wchar_t* family : fontFiles)" not in broken
+            or broken.count("continue;") < 3)
     # Ensure the cached ORIGINAL bytes are copied to the separately-owned
     # ImGui buffer after every Clear(), not transferred to ImGui once.
     after = font.split("bool loaded = false;", 1)[1].split("if (!loaded)", 1)[0]
     for token in ("if (!fontData.empty())", "IM_ALLOC(fontData.size())",
-                  "memcpy(owned, fontData.data(), fontData.size())",
-                  "io.Fonts->AddFontFromMemoryTTF(owned, int(fontData.size()), sizePixels)"):
+                  "if (owned)", "memcpy(owned, fontData.data(), fontData.size())",
+                  "owned, int(fontData.size()), sizePixels)"):
         assert token in after
     for old, bad in (
         ("static const std::vector<uint8_t> fontData", "const std::vector<uint8_t> fontData"),
@@ -718,8 +739,8 @@ def check_first_run_font_slider_commit(font: str) -> None:
         "ImGui::IsItemDeactivatedAfterEdit() ||",
         "ImGui::IsMouseReleased(ImGuiMouseButton_Left)",
         "Overlay::GlobalFontScale = fontScale;",
-        "Overlay::FontsDirty = true;",
-        "Overlay::settings_write();",
+        "Overlay::FontScalePending = true;",
+        "Overlay::FontScaleCommitRequested = true;",
         "fontScaleHeld = false;",
         "if (sliderEditFinished)\n\t\tcommitFontScale();",
     )
@@ -730,6 +751,8 @@ def check_first_run_font_slider_commit(font: str) -> None:
     assert owner.index(required[2]) < owner.index(required[4])
     assert owner.index(required[4]) < owner.index(required[6])
     assert owner.count(required[6]) == 1, "must have one commit owner"
+    assert "Overlay::settings_write();" not in owner, (
+        "First-run must use the retriable F11 frame-finaliser")
     assert owner.count("commitFontScale();") == 2, (
         "focus change and popup close must share one commit path")
     assert "changed && !ImGui::IsAnyItemActive()" not in owner
@@ -744,8 +767,8 @@ def check_first_run_font_slider_commit(font: str) -> None:
         (required[0], "if (fontScaleHeld)\n\t\tfontScale = Overlay::GlobalFontScale;"),
         (required[2], "false ||"),
         (required[3], "false"),
-        (required[5], "Overlay::FontsDirty = false;"),
-        (required[6], "/* missed disk commit */"),
+        (required[5], "Overlay::FontScalePending = false;"),
+        (required[6], "Overlay::FontScaleCommitRequested = false;"),
         (required[8], "if (false)\n\t\tcommitFontScale();"),
         ("\t\tcommitFontScale();\n\t\tOverlay::IsFirstRun = false;",
          "\t\tOverlay::IsFirstRun = false;"),

@@ -278,23 +278,31 @@ void Overlay::rebuild_fonts()
 		const UINT pathLength = GetWindowsDirectoryW(windowsDir, MAX_PATH);
 		if (pathLength == 0 || pathLength >= MAX_PATH)
 			return std::vector<uint8_t>{};
-		const std::filesystem::path fontPath =
-			std::filesystem::path(windowsDir) / "Fonts" / "segoeui.ttf";
-		std::ifstream file(fontPath, std::ios::binary | std::ios::ate);
-		if (!file)
-			return std::vector<uint8_t>{};
-		// tellg can return -1 for an unreadable file. Do not turn it into
-		// size_t(-1) on the render thread; ordinary Windows Segoe UI TTFs
-		// are far below this generous 16 MiB upper bound.
-		const std::streamoff fileBytes = file.tellg();
-		if (fileBytes <= 0 || fileBytes > 16 * 1024 * 1024)
-			return std::vector<uint8_t>{};
-		std::vector<uint8_t> bytes(static_cast<std::size_t>(fileBytes));
-		file.seekg(0);
-		if (!file.read(reinterpret_cast<char*>(bytes.data()),
-				static_cast<std::streamsize>(fileBytes)))
-			return std::vector<uint8_t>{};
-		return bytes;
+		// Missing or corrupt Segoe UI must not force a stretched 13px
+		// bitmap atlas in Quest3. Try other scalable system fonts first.
+		// Cache the first valid TrueType face across all eye resizes.
+		constexpr const wchar_t* fontFiles[] = {
+			L"segoeui.ttf", L"tahoma.ttf", L"arial.ttf"
+		};
+		for (const wchar_t* family : fontFiles)
+		{
+			const std::filesystem::path fontPath =
+				std::filesystem::path(windowsDir) / "Fonts" / family;
+			std::ifstream file(fontPath, std::ios::binary | std::ios::ate);
+			if (!file)
+				continue;
+			// Failed/oversized font reads do not suppress later candidates.
+			const std::streamoff fileBytes = file.tellg();
+			if (fileBytes <= 0 || fileBytes > 16 * 1024 * 1024)
+				continue;
+			std::vector<uint8_t> bytes(static_cast<std::size_t>(fileBytes));
+			file.seekg(0);
+			if (!file.read(reinterpret_cast<char*>(bytes.data()),
+					static_cast<std::streamsize>(fileBytes)))
+				continue;
+			return bytes;
+		}
+		return std::vector<uint8_t>{};
 	}();
 
 	bool loaded = false;
@@ -303,9 +311,12 @@ void Overlay::rebuild_fonts()
 		// AddFontFromMemoryTTF takes ownership and frees with ImGui's allocator,
 		// so it gets a buffer allocated by the same one.
 		void* owned = IM_ALLOC(fontData.size());
-		memcpy(owned, fontData.data(), fontData.size());
-
-		loaded = io.Fonts->AddFontFromMemoryTTF(owned, int(fontData.size()), sizePixels) != nullptr;
+		if (owned)
+		{
+			memcpy(owned, fontData.data(), fontData.size());
+			loaded = io.Fonts->AddFontFromMemoryTTF(
+				owned, int(fontData.size()), sizePixels) != nullptr;
+		}
 	}
 
 	if (!loaded)
@@ -766,8 +777,10 @@ static void render_first_run_intro()
 		if (!fontScaleHeld)
 			return;
 		Overlay::GlobalFontScale = fontScale;
-		Overlay::FontsDirty = true;
-		Overlay::settings_write(); // Once per committed edit, never per drag frame.
+		// Reuse the frame-finaliser's atlas rebuild and retriable INI write.
+		// An immediate popup write discarded locked/read-only-file failures.
+		Overlay::FontScalePending = true;
+		Overlay::FontScaleCommitRequested = true;
 		fontScaleHeld = false;
 	};
 	if (sliderEditFinished)
