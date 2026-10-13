@@ -333,9 +333,14 @@ namespace outrun::vr::dx11
                 desc.ArraySize != 1 || desc.SampleDesc.Count != 1 ||
                 desc.SampleDesc.Quality != 0 ||
                 desc.Usage != D3D11_USAGE_DEFAULT || desc.CPUAccessFlags != 0 ||
-                // Only a native color-output producer is eligible. SRV-only
-                // or copied staging data is not a game-authored eye draw.
-                (desc.BindFlags & D3D11_BIND_RENDER_TARGET) == 0u)
+                // Accept only a locally owned color target, not a shared handle
+                // that could alias an in-flight OpenXR ring eye allocation.
+                !native_game_eye_local_render_target_admitted(
+                    desc.BindFlags, desc.MiscFlags,
+                    D3D11_BIND_RENDER_TARGET,
+                    D3D11_RESOURCE_MISC_SHARED |
+                    D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX |
+                    D3D11_RESOURCE_MISC_SHARED_NTHANDLE))
 
                 return false;
             Microsoft::WRL::ComPtr<ID3D11Device> owner;

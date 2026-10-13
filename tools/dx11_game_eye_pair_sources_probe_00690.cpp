@@ -2,6 +2,17 @@
 #include <array>
 #include <cstdint>
 using outrun::vr::dx11::native_game_eye_pair_sources_admitted;
+using outrun::vr::dx11::native_game_eye_local_render_target_admitted;
+// D3D11_BIND_RENDER_TARGET=0x20; SHARED/KEYEDMUTEX/NTHANDLE=0x902.
+constexpr std::uint32_t kColorRt = 0x20u;
+constexpr std::uint32_t kShared = 0x902u;
+static_assert(native_game_eye_local_render_target_admitted(kColorRt, 0u, kColorRt, kShared));
+static_assert(native_game_eye_local_render_target_admitted(kColorRt | 0x8u, 1u, kColorRt, kShared));
+static_assert(!native_game_eye_local_render_target_admitted(0x8u, 0u, kColorRt, kShared));
+static_assert(!native_game_eye_local_render_target_admitted(kColorRt, 0x2u, kColorRt, kShared));
+static_assert(!native_game_eye_local_render_target_admitted(kColorRt, 0x100u, kColorRt, kShared));
+static_assert(!native_game_eye_local_render_target_admitted(kColorRt, 0x800u, kColorRt, kShared));
+static_assert(!native_game_eye_local_render_target_admitted(kColorRt, 0u, 0u, kShared));
 constexpr std::array<std::uintptr_t, 8> kRing{11, 12, 13, 14, 15, 16, 17, 18};
 static_assert(native_game_eye_pair_sources_admitted(101, 102, kRing));
 static_assert(!native_game_eye_pair_sources_admitted(101, 101, kRing));

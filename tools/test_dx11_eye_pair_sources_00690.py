@@ -12,13 +12,18 @@ required = [
     '#include "native_game_eye_pair_sources.hpp"',
     "source->QueryInterface(",
     "for (std::size_t n = 0; n < slots_.size(); ++n)",
-    "(desc.BindFlags & D3D11_BIND_RENDER_TARGET) == 0u",
+    "native_game_eye_local_render_target_admitted(",
+    "D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX",
+    "D3D11_RESOURCE_MISC_SHARED_NTHANDLE",
     "native_game_eye_pair_sources_admitted(",
     "context->CopyResource(entry.eye[0].Get(), left_source);",
     "context->CopyResource(entry.eye[1].Get(), right_source);",
 ]
 for marker in required:
     assert marker in source, f"producer source link lost: {marker}"
+assert source.index("native_game_eye_local_render_target_admitted(") < source.index(
+    "context->CopyResource(entry.eye[0].Get(), left_source);"
+), "shared or non-render-target source must fail before GPU copy"
 assert source.index("native_game_eye_pair_sources_admitted(") < source.index(
     "context->CopyResource(entry.eye[0].Get(), left_source);"
 ), "unsafe GPU copy scheduled before canonical source ownership validation"
