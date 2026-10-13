@@ -46,8 +46,8 @@ cases=((0,0,0,0,0),(0,1,0,0,1),(0,0,0,0,1),(0,1,0,1,1),(0,1,0,0,0),
 for held,key,new,dlg,expected in cases:
     edge=bool(held) and not p
     p=bool(held)
-    toggle=edge or (not new and not dlg and bool(key))
-    vis=not vis if toggle else vis
+    toggle_event=edge or (not new and not dlg and bool(key))
+    vis=not vis if toggle_event else vis
     assert vis==bool(expected)
     density=2.75 if vis else 1.0
     assert (density>1.0)==vis
