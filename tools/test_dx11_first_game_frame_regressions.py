@@ -199,6 +199,11 @@ def main() -> None:
                       "return !depth || depthDirection == 0u ||"):
         assert invariant in batch
     assert "ordinal - slot < kMaxDraws;" in batch
+    # This is executable C++ source selection, not a Python-only simulation:
+    # mutating to the obsolete first-64 cursor must invalidate the contract.
+    assert "current < eligible - 1u" in batch
+    starved_cursor = batch.replace("current < eligible - 1u", "current < 64u", 1)
+    assert starved_cursor != batch and "current < eligible - 1u" not in starved_cursor
     assert "kMaxDraws = 8u" not in batch.replace("kMaxDraws = 8u",
                                                  "kMaxDraws = 0u", 1)
     # Negative regression: a late accepted draw outside the contiguous
