@@ -20,6 +20,7 @@
 #include "live_game_float_rgba_texture.hpp"
 #include "native_game_frame_batch.hpp"
 #include "native_game_readback_provenance.hpp"
+#include "native_game_backbuffer_admission.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -1646,6 +1647,39 @@ bool ensure_pipeline(State& s) noexcept {
     return true;
 }
 
+// A native diagnostic draw must originate in the same primary game backbuffer
+// to which before_game_present() will upload its GPU-fenced inset. An auxiliary
+// render-to-texture pass cannot be promoted solely by D3D9 device identity.
+bool game_native_backbuffer_ready(IDirect3DDevice9* game,
+                                  const D3DVIEWPORT9& viewport) noexcept {
+    ComPtr<IDirect3DSurface9> target, backbuffer;
+    D3DSURFACE_DESC targetDesc{}, bbDesc{};
+    if (!game ||
+        FAILED(game->GetRenderTarget(0, target.GetAddressOf())) || !target ||
+        FAILED(game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,
+                                   backbuffer.GetAddressOf())) || !backbuffer ||
+        FAILED(target->GetDesc(&targetDesc)) ||
+        FAILED(backbuffer->GetDesc(&bbDesc)))
+        return false;
+    // Canonical COM identity avoids false positives from interface aliases.
+    ComPtr<IUnknown> targetIdentity, backbufferIdentity;
+    if (FAILED(target.As(&targetIdentity)) ||
+        FAILED(backbuffer.As(&backbufferIdentity)))
+        return false;
+    const GameNativeBackbufferAdmission admission{
+        reinterpret_cast<std::uintptr_t>(targetIdentity.Get()),
+        reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()),
+        targetDesc.Width, targetDesc.Height, bbDesc.Width, bbDesc.Height,
+        viewport.X, viewport.Y, viewport.Width, viewport.Height,
+        targetDesc.Format == bbDesc.Format,
+        bbDesc.Format == D3DFMT_A8R8G8B8 ||
+            bbDesc.Format == D3DFMT_X8R8G8B8,
+        targetDesc.MultiSampleType == D3DMULTISAMPLE_NONE &&
+            bbDesc.MultiSampleType == D3DMULTISAMPLE_NONE
+    };
+    return admission.accepts(kWidth, kHeight, 8u);
+}
+
 // Read the current game device, not a WARP fixture's manufactured state.
 // COM getters AddRef; local ComPtrs always release before reset/return.
 bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
@@ -2746,6 +2780,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             FAILED(game->GetTransform(D3DTS_PROJECTION, &transforms[2])))
             return false;
     }
+    if (!game_native_backbuffer_ready(game, viewport)) return false;
     return true;
 }
 

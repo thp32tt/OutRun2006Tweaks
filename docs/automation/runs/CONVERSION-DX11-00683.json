@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00683",
+  "production_id": "CONVERSION-DX11-00683",
+  "event_id": "CONVERSION-DX11-00683-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:GAME_BACKBUFFER_ORIGIN_DRAW_PRESENT",
+  "feature_id": "GAME_BACKBUFFER_ORIGIN_NATIVE_DRAW_PRESENT",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Read live D3D9 menu/car/race Draw source render target plus default Present backbuffer COM identities",
+      "Admit only same-surface viewport/format/MSAA compatible game Draw into native D3D11 Draw/DrawIndexed",
+      "Present current fenced native frame via device-owned D3D9 CPU upload to matching backbuffer"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_backbuffer_admission.hpp",
+      "tools/test_dx11_game_backbuffer_admission_00683.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real Draw->native D3D11->Present binding; portable 3440x1440 and letterbox 1920x1080 C++17 probe",
+      "negative_regression": "Auxiliary render target, inconsistent size/format, MSAA, viewport out-of-bounds and insufficient inset area, 8 source + 6 C++ mutations",
+      "component_integration": "Game GetRenderTarget/GetBackBuffer IUnknown identity -> supported_game_state -> native GPU Draw/Indexed -> fenced Present UpdateSurface"
+    },
+    "conflict_keys": [
+      "DX11:GAME_BACKBUFFER_ORIGIN_DRAW_PRESENT",
+      "src/vr/d3d11/native_game_backbuffer_admission.hpp",
+      "tools/test_dx11_game_backbuffer_admission_00683.py"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Never present a native inset from a game-authored auxiliary RT or non-presentable target; preserve correct game backbuffer draw sourcing through scene transitions.",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in diagnostic only; original game D3D9 Draw, Present and gamepad untouched; no HMD promotion"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_BACKBUFFER_ORIGIN_NATIVE_DRAW_PRESENT",
+    "goal": "Admit real menu-to-race native D3D11 diagnostic Draws only when originating in the exact D3D9 presentation backbuffer with correct viewport, format and sample count.",
+    "acceptance_items": [
+      {
+        "id": "game-output-source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_gpu_draw",
+        "expected_behavior": "Real game authored Draw enters native GPU output only when current source and primary game Present backbuffer identities match."
+      },
+      {
+        "id": "input-safe-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_present_controller",
+        "expected_behavior": "Offscreen or invalid game render targets stay original D3D9, with unmodified Present and controller path."
+      },
+      {
+        "id": "exact-sha-integration",
+        "category": "integrated_validation",
+        "behavior_area": "github_actions_windows",
+        "expected_behavior": "Portable regression and mandatory GitHub Actions succeed on exactly the material result SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "game-output-source": "PENDING_EXACT_SHA",
+    "input-safe-fallback": "PENDING_EXACT_SHA",
+    "exact-sha-integration": "PENDING_EXACT_SHA"
+  },
+  "base_head_sha": "c902a314da2b5299c9cb16610d0d7c1ce405189f",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_backbuffer_admission.hpp",
+    "tools/test_dx11_game_backbuffer_admission_00683.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00683.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS latest HEAD and 00682 exact Gate",
+    "C1_REVIEW": "PASS: aux render-target accepted as same-device presentable game draw",
+    "C2_IMPLEMENT": "PASS actual native game Draw backbuffer COM ownership and viewport/multisample",
+    "C3_VALIDATE": "LOCAL_CPP17_PASS; exact GitHub gates pending",
+    "C4_COMMIT": "SOURCE_COMMIT",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_CI"
+  },
+  "next_action": "Validate required exact material SHA CI, repair if necessary, then separate bookkeeping C6; Quest3/VDXR UNTESTED."
+}
