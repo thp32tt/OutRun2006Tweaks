@@ -26,6 +26,7 @@
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "vr_shared.hpp"
+#include "game_addrs.hpp"
 #include <spdlog/spdlog.h>
 #include <d3dcompiler.h>
 #include <algorithm>
@@ -48,6 +49,7 @@ namespace Settings
     extern Setting<bool> VRTelemetry;
     extern Setting<float> VRWorldScale;
     extern Setting<float> VRHudScale;
+    extern Setting<float> VRPauseMenuScale;
     extern Setting<bool> VRHudEdgeAnchors;
     extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
@@ -1639,10 +1641,24 @@ namespace OutRunVRStereo
         // below are still applied so glyphs keep their original proportions.
         float R30HudScopeScale() noexcept
         {
+            // F11 rasterises its atlas independently of gameplay HudScale.
             if (OutRunVR::GameSemantic::ExternalOverlaySemanticDepth != 0 &&
                 OutRunVR::GameSemantic::EffectiveScope() ==
                     OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D)
                 return 1.0f;
+
+            // Only a genuine original-game ESC/pause state, drawing generic
+            // ScreenOverlay2D, gets its own centre-anchored legible scale.
+            // Never enlarge gameplay ScreenHud, world, +TIME/GOAL or front-end.
+            // A missing game-state pointer retains the baseline HUD setting.
+            if (OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
+                Game::current_mode &&
+                *Game::current_mode == GameState::STATE_SMPAUSEMENU &&
+                OutRunVR::GameSemantic::EffectiveScope() ==
+                    OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D &&
+                Settings::VRPauseMenuScale.get() > 0.0f)
+                return std::clamp(Settings::VRPauseMenuScale.get(),
+                    0.55f, 1.50f);
             return R30HudScaleValue();
         }
 

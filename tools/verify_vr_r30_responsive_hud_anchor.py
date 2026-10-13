@@ -133,3 +133,71 @@ for bad,good in (
                   "0.90f / baseScale", "hudScaleX *= peripheralBoost;",
                   "hudScaleY *= peripheralBoost;"))
 print("PASS exact peripheral glyph legibility floor, aspect parity and 4 destructive mutants")
+
+
+# Issue #119 independent ESC/pause menu: do not inherit the gameplay HudScale.
+# Pin the original game state AND its generic 2D semantic producer boundary.
+scope_begin = code.index("float R30HudScopeScale() noexcept")
+scope_end = code.index("void R30HudContainScale(", scope_begin)
+scope = code[scope_begin:scope_end]
+for token in (
+    "ExternalOverlaySemanticDepth != 0 &&",
+    "ExternalOverlaySemanticDepth == 0 &&",
+    "Game::current_mode &&",
+    "*Game::current_mode == GameState::STATE_SMPAUSEMENU",
+    "RenderScope::ScreenOverlay2D &&",
+    "Settings::VRPauseMenuScale.get()",
+    "std::clamp(Settings::VRPauseMenuScale.get(),",
+    "0.55f, 1.50f",
+    "return R30HudScaleValue();",
+):
+    assert token in scope, token
+assert scope.index("return 1.0f;") < scope.index(
+    "*Game::current_mode == GameState::STATE_SMPAUSEMENU") < scope.index(
+    "return R30HudScaleValue();")
+assert '#include "game_addrs.hpp"' in code
+assert 'extern Setting<float> VRPauseMenuScale;' in code
+assert 'Setting<float> VRPauseMenuScale{ "VR", "PauseMenuScale", 1.0f' in settings
+assert 'Range<float>{ 0.55f, 1.50f }' in settings
+# Menu, HUD and F11 scale switches invalidate the per-Present containment
+# cache because it keys by the computed user scale, even before Reset.
+contain = code[scope_end:code.index("R30HudEdgeAnchor R30GetExactHudEdgeAnchor(", scope_end)]
+assert "const float userScale = R30HudScopeScale();" in contain
+assert "R30HudContain.userScale == userScale" in contain
+assert "R30HudContain.userScale = userScale;" in contain
+def effective(mode, semantic, f11=False, hud=.55, pause=1.0):
+    if semantic == "overlay" and f11:
+        return 1.0
+    if mode == 0x12 and semantic == "overlay" and not f11 and pause > 0:
+        return max(.55, min(1.50, pause))
+    return hud
+for source_w, source_h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
+    for eye_w, eye_h in ((1024,768),(2496,2688)):
+        factor = max(.75, min(3.50, (source_w/source_h)/(eye_w/eye_h)))
+        assert effective(0x12, "overlay") / factor > 0
+        assert effective(0x12, "overlay") == 1.
+        assert effective(0x12, "hud") == .55
+        assert effective(0x12, "world") == .55
+        assert effective(0x09, "overlay") == .55
+        assert effective(0x10, "overlay") == .55
+        assert effective(0x12, "overlay", f11=True) == 1.
+        assert effective(0x12, "overlay", pause=9.) == 1.50
+        assert effective(0x12, "overlay", pause=-1.) == .55
+# A real destructive swap in the scope function must invalidate these guards.
+for bad, good in (
+    ("ExternalOverlaySemanticDepth == 0 &&",
+     "ExternalOverlaySemanticDepth != 0 &&"),
+    ("*Game::current_mode == GameState::STATE_SMPAUSEMENU",
+     "*Game::current_mode == GameState::STATE_GAME"),
+    ("RenderScope::ScreenOverlay2D &&", "RenderScope::ScreenHud &&"),
+    ("std::clamp(Settings::VRPauseMenuScale.get(),",
+     "std::clamp(Settings::VRHudScale.get(),"),
+):
+    assert scope.count(bad) == 1, bad
+    mutant = scope.replace(bad, good, 1)
+    assert not all(token in mutant for token in (
+        "ExternalOverlaySemanticDepth == 0 &&",
+        "*Game::current_mode == GameState::STATE_SMPAUSEMENU",
+        "RenderScope::ScreenOverlay2D &&",
+        "std::clamp(Settings::VRPauseMenuScale.get(),"))
+print("PASS exact ESC pause ownership, F11/HUD/world negatives and size/aspect fixtures")
