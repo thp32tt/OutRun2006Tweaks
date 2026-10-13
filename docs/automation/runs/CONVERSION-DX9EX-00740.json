@@ -78,5 +78,6 @@
   "runtime_validation_required": "Quest3/VDXR exact-build F11 font, tab readability, slider grabs and pointer hit areas across 3440x1440, 4:3/16:9/21:9, live reset; compare ESC/HUD, world, GOAL/+TIME, input and frame pacing.",
   "c6_score_delta": 0,
   "scoreboard_updated": false,
+  "run_record_recovery_reason": "RUN_RECORD_NOT_FOUND",
   "summary": "Material Issue #119 F11 VR control DPI sizing and constrained canvas regression at exact SHA. DX9Ex Active 5/5, Domain Isolation and Full Source Impact 3/3 SUCCESS. Quest3 HMD untested; overall feature still IN_PROGRESS."
 }
