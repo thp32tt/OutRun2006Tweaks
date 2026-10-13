@@ -14,6 +14,27 @@ param(
 
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
+
+# GUI starts this script in a hidden PowerShell child. Without an explicit
+# failure channel, a missing EXE, wrong binary hash, or copy/launch exception
+# causes a silent return to the minimized selector and looks like "no launch".
+# A successful session remains noninteractive; only failures show a dialog.
+trap {
+    $launchError = ($_ | Out-String).Trim()
+    $errorFile = Join-Path $root 'OUTRUNVR_LAUNCH_ERROR.txt'
+    $details = "UTC=$((Get-Date).ToUniversalTime().ToString('o'))" +
+        [Environment]::NewLine + "TASK=CONVERSION-DX9EX-00783" +
+        [Environment]::NewLine + $launchError
+    try { Set-Content -LiteralPath $errorFile -Value $details -Encoding UTF8 } catch {}
+    try {
+        Add-Type -AssemblyName System.Windows.Forms
+        [void][System.Windows.Forms.MessageBox]::Show(
+            "OutRun DX9Ex launch failed. See OUTRUNVR_LAUNCH_ERROR.txt in the game folder." +
+            [Environment]::NewLine + $launchError,
+            "OutRun VR launch error")
+    } catch { Write-Host $details }
+    exit 1
+}
 $active=Join-Path $root 'ACTIVE_VR_BACKEND.txt'
 $current=Join-Path $root 'CURRENT_VR_SESSION.json'
 $collector=Join-Path $root 'Collect-OutRunVRLogs.ps1'

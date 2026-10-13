@@ -29,10 +29,12 @@ function Get-Active {
 function Prepare-Slot([string]$slot){
     if(!$slots.Contains($slot)){throw "Unknown slot: $slot"}
     $cfg=$slots[$slot]
-    $args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$selector,
-        '-Backend',$cfg.Backend,'-TestProfile',$cfg.Profile,'-VariantId',$slot)
-    $p=Start-Process powershell -Wait -PassThru -WindowStyle Hidden -ArgumentList $args
-    if($p.ExitCode -ne 0){throw "Slot preparation failed: $slot"}
+    # Direct script invocation preserves spaces in the game path and surfaces
+    # actual backend/payload errors in the existing GUI catch block.
+    & $selector -Backend $cfg.Backend -TestProfile $cfg.Profile -VariantId $slot
+    if(-not (Test-Path (Join-Path $root 'CURRENT_VR_SESSION.json'))){
+        throw "Slot preparation did not create a session: $slot"
+    }
 }
 
 function Start-Slot([string]$slot){
@@ -41,7 +43,12 @@ function Start-Slot([string]$slot){
     $gpuSetting = if ($gpuCheck.Checked) { 'ON' } else { 'OFF' }
     if ($gpuSetting -eq 'ON' -and $cfg.Backend -ne 'd3d9') { throw 'GPU detailed profiling is DX9Ex-only.' }
     $args=@('-NoProfile','-ExecutionPolicy','Bypass','-File',$runner,'-TestProfile',$cfg.Profile,'-GpuDiagnostics',$gpuSetting)
-    Start-Process powershell -ArgumentList $args -WorkingDirectory $root -WindowStyle Hidden
+    # Start-Process joins string[] arguments without quoting the -File value.
+    # Quote the full script path; OutRun is often installed under a folder
+    # containing spaces. The runner trap writes a launch error + modal dialog.
+    $quotedRunner = '"' + $runner + '"'
+    $launchArgs = "-NoProfile -ExecutionPolicy Bypass -File $quotedRunner -TestProfile $($cfg.Profile) -GpuDiagnostics $gpuSetting"
+    Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $launchArgs -WorkingDirectory $root -WindowStyle Hidden -ErrorAction Stop
 }
 
 $form=New-Object System.Windows.Forms.Form
@@ -92,7 +99,10 @@ foreach($slot in $slots.Keys){
     # Enable a button only when its *effective* payload can actually launch.
     $slotPath=Join-Path $root ("slots/"+$slot)
     $backendPath=Join-Path $root 'backends/d3d9'
-    $effectivePath=if($slot -ne 'CURRENT_FOCUS' -and (Test-Path $slotPath)) {
+    $effectivePath=if($cfg.Backend -eq 'd3d9') {
+        # Same canonical payload the backend selector installs for ALL DX9Ex slots.
+        $backendPath
+    } elseif(Test-Path $slotPath) {
         $slotPath
     } else {
         $backendPath

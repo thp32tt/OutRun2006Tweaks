@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00783",
+  "production_id": "CONVERSION-DX9EX-00783",
+  "event_id": "CONVERSION-DX9EX-00783-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:BLOCKER:DX9EX_PACKAGE_LAUNCH",
+  "symptom_id": "DX9EX:SYMPTOM:PACKAGE_LAUNCH",
+  "work_key": "DX9EX:BLOCKER:DX9EX_PACKAGE_LAUNCH",
+  "feature_class": "CRITICAL_BLOCKER",
+  "status": "IMPLEMENTING",
+  "checkpoint": "C2_MATERIAL_COMMIT",
+  "feature_status": "NEED_EXACT_SHA_WINDOWS_GATE",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00783]",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_USER_LAUNCH_AND_QUEST3",
+  "score_delta": 0,
+  "changed_files": [
+    "tools/Select-OutRunVRBackend.ps1",
+    "tools/OutRunVR-Slot-Selector.ps1",
+    "tools/Run-OutRunVRTest.ps1",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "tools/verify_vr_dx9ex_launch_paths.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00783.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:BLOCKER:DX9EX_PACKAGE_LAUNCH",
+    "goal": "Restore the complete shipped DX9Ex package startup path: all profile buttons select the current DLL/host, PowerShell works with spaces in the game folder, and blocking startup failures surface a persistent and visible reason.",
+    "scope_boundary": "Launch PowerShell scripts and their DX9Ex Active package verifier only; no HMD optical or world/FFB/DX11/DXVK changes.",
+    "special_work_evidence": "User reported twice on 2026-10-13 that the packaged DX9Ex executable did not launch. Static inspection shows Start-Process -File received an unquoted script path and stale slots shadow canonical DX9Ex binaries.",
+    "trace_stages": [
+      "Packaged ZIP installs current game x86 dinput8.dll and x64 helper beneath backends/d3d9.",
+      "Slot selector resolves effective source and copies the selected pair into the game folder.",
+      "GUI prepares launch through PowerShell -File then runner validates canonical executable and invokes the game and OpenXR host."
+    ],
+    "subcomponents": [
+      "Unify current profile selection and GUI eligibility on the canonical DX9Ex payload despite stale old slots.",
+      "Fix spaces in PowerShell -File and propagate the exact cause of failed launch into a visible dialog and persisted text.",
+      "Run targeted destructive-mutation source test and Windows PowerShell parser with exact-SHA full game/host/package CI."
+    ],
+    "acceptance_items": [
+      {
+        "id": "LAUNCH_CURRENT_PAYLOAD",
+        "category": "end_to_end_behavior",
+        "behavior_area": "backend_and_variant_selection",
+        "expected_behavior": "All DX9Ex profiles use the same current game DLL and host, ignoring stale slots and avoiding silent wrong-build selection."
+      },
+      {
+        "id": "LAUNCH_SAFE_PATH_AND_FAILURE",
+        "category": "fallback_regression",
+        "behavior_area": "windows_game_path_and_error_reporting",
+        "expected_behavior": "Space-containing game paths launch with a correctly quoted script; missing files, hash mismatch, and other failures display and persist the real failure instead of silently vanishing."
+      },
+      {
+        "id": "LAUNCH_EXACT_SHA_GATE",
+        "category": "integrated_validation",
+        "behavior_area": "windows_build_and_active_package",
+        "expected_behavior": "Targeted negative tests, Windows PowerShell parse, full DX9Ex Active host/game/package and Domain Isolation succeed on exact validation commit; real Quest3 remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "LAUNCH_CURRENT_PAYLOAD": "PENDING_CI",
+    "LAUNCH_SAFE_PATH_AND_FAILURE": "PENDING_CI",
+    "LAUNCH_EXACT_SHA_GATE": "PENDING_CI",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "2026-10-13 reported packaged DX9Ex run failure without log or actual on-disk game path; static launch defect demonstrable in source.",
+    "root_cause": "GUI assembled an unquoted powershell -File value through Start-Process ArgumentList; DX9Ex non-CURRENT_FOCUS slots could select stale old DLL and host directories.",
+    "alternatives_rejected": [
+      "No evidence current game native render path is responsible for process bootstrap; avoid changing renderer, hooking, or VR projection without runtime logs.",
+      "Do not blindly change original EXE hash/accept unknown binaries to mask launch mismatches."
+    ],
+    "source_trace": [
+      "DX9Ex Active package publishes backends/d3d9/dinput8.dll and outrun-vr-host.exe.",
+      "Select-OutRunVRBackend.ps1 previously favored existing slots/VARIANT directories; game DLL identity could be stale.",
+      "OutRunVR-Slot-Selector.ps1 previously started hidden powershell with unquoted -File path; Run-OutRunVRTest.ps1 had no top-level visible error channel."
+    ],
+    "eye_ownership": "No per-eye changes; preserve original stereo composition and Quest3 untested state.",
+    "fix_evidence": "Canonical payload selection and GUI alignment, correctly quoted launcher, durable error dialog/log; Windows integration pending.",
+    "negative_test_evidence": "Five destructive mutations built into targeted regression verifier; exact Windows gate pending."
+  },
+  "blocked_reason": null,
+  "ci_evidence": {
+    "exact_sha": null,
+    "runtime": "UNTESTED"
+  }
+}

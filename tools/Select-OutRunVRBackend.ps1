@@ -43,10 +43,10 @@ $variant = if ($requestedVariant -eq "AUTO") { $defaultVariant } else { $request
 
 $slotPayload = Join-Path $root ("slots/" + $variant)
 $backendPayload = Join-Path $backendRoot $payloadBackend
-# CURRENT_FOCUS is the canonical shipped DX9Ex payload. Older overlays may
-# leave slots/CURRENT_FOCUS behind; never allow that stale directory to
-# shadow backends/d3d9 from the new package.
-$src = if ($Backend -eq "d3d9" -and $variant -eq "CURRENT_FOCUS") {
+# The ACTIVE ZIP ships one canonical DX9Ex game/host pair for ALL current
+# profiles. Ignore stale slots/B_HUD, slots/D_PERF, etc. left from old ZIPs:
+# choosing one would silently install a different dinput8.dll/host.
+$src = if ($Backend -eq "d3d9") {
     $backendPayload
 } elseif (Test-Path $slotPayload) {
     $slotPayload
