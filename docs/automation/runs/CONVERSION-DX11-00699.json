@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00699",
+  "production_id": "CONVERSION-DX11-00699",
+  "event_id": "CONVERSION-DX11-00699-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "feature_id": "GAME_LIVE_D3D9_2K_TEXTURE_ATLAS_NATIVE_DRAW",
+  "work_key": "DX11:GAME_NATIVE_2K_TEXTURE_ATLAS",
+  "status": "AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Observed real game menu/vehicle/race D3D9 Draw/DrawIndexed FVF source captures stage-0 atlas and mip sampler identity",
+      "Real D3D9 texture levels up to 2K/12 mips convert under a 24MiB native payload budget into D3D11 immutable SRV, binding PS sampler to native Draw/DrawIndexed",
+      "Native GPU-readback diagnostic inset remains source-crop-safe at real Present, with original D3D9 Draw/Present/gamepad always authoritative"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_texture_atlas_budget.hpp",
+      "tools/test_dx11_game_texture_atlas_00699.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real game FVF texture mirror allows 2048x2048 BGRA8 full 12-level mip chain; actual native SRV and Draw/DrawIndexed integration plus C++17 upload-byte positive proof",
+      "negative_regression": "24MiB budget rejects oversized 2K float and >2K data before D3D9 LockRect/readback; 2K live RT fallback protected at 1K; malformed BC/levels rejected",
+      "component_integration": "Source capture->converted mip upload->native SRV/sampler binding->Draw/IndexedDraw->async Present inset; CI runs destructive integration mutations and portable C++17 proof"
+    },
+    "conflict_keys": [
+      "DX11:GAME_NATIVE_2K_TEXTURE_ATLAS",
+      "src/vr/d3d11/native_game_texture_atlas_budget.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_READBACK",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source-level 2K menu/vehicle atlas follows native Draw and source-crop-safe Present; live game pixels and Quest3/VDXR hardware still UNTESTED.",
+    "activation_guard_and_fallback": "Existing environment opt-in diagnostic only; refused 2K RT, oversized/invalid 2K format and budget remain original DX9Ex Draw and gamepad; never enable native production path."
+  },
+  "feature_contract": {
+    "feature_id": "GAME_LIVE_D3D9_2K_TEXTURE_ATLAS_NATIVE_DRAW",
+    "goal": "Mirror bounded game-authored 2K menu/car/race atlases (including 12-level mip chain) into real native D3D11 Draw/DrawIndexed without rendering corruption or altering DX9Ex/gamepad.",
+    "acceptance_items": [
+      {
+        "id": "game-2k-atlas-native-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_game_texture_to_native_dx11_srv_and_draw",
+        "expected_behavior": "2K static BGRA/BC/palette and full mip chain run through native Draw/DrawIndexed and diagnostic Present path"
+      },
+      {
+        "id": "budget-and-gpu-rt-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "game_mip_memory_and_d3d9_runtime_safety",
+        "expected_behavior": "Native uploaded payload <=24 MiB and 2K GPU readback rejected; malformed dimensions/block/mip/float atlas never disrupt DX9Ex Draw/Present/input"
+      },
+      {
+        "id": "actual-mirror-integration-ci",
+        "category": "integrated_validation",
+        "behavior_area": "real_cpp_texture_path_and_portable_cpp17_probe",
+        "expected_behavior": "Destructive source wiring and C++17 positive/negative atlas budget checks run on exact-SHA CI with Windows build"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "game-2k-atlas-native-draw": "PENDING_GATE",
+    "budget-and-gpu-rt-fallback": "PENDING_GATE",
+    "actual-mirror-integration-ci": "PENDING_GATE"
+  },
+  "base_head_sha": "018814465092233eded1fa16d204c236b502da20",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_texture_atlas_budget.hpp",
+    "tools/test_dx11_game_texture_atlas_00699.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00699.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD 0188144 and 00698 source/gates inspected; conflict key independent 2K texture atlas",
+    "C1_REVIEW": "PASS observed explicit 1024/11-mip native stage-0 game texture cap; 2K UI atlas unavailable; RT GetRenderTargetData must stay bounded",
+    "C2_IMPLEMENT": "DONE real texture-source mip capture/native SRV/Draw path and bounded 2K atlas admission, targeted C++17 regression",
+    "C3_VALIDATE": "PENDING exact-SHA GitHub gates; no Quest3/VDXR execution",
+    "C4_COMMIT": "PENDING Git tree CAS result SHA",
+    "C5_PACKAGE": "NOT_REQUIRED: opt-in DX11 diagnostics; no release/HMD evidence",
+    "C6_STATE": "PENDING exact-SHA CI; next action inspect branch exact-gate and append Issue #14 then record final result"
+  },
+  "next_action": "Check new validation-bearing SHA Backend Conversion Gate, DX11 Fast Structural Checks, Windows Build; finish C6 with exact evidence, keep HMD/gamepad UNTESTED",
+  "state_persisted": true
+}

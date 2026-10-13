@@ -27,6 +27,7 @@
 #include "native_game_readback_provenance.hpp"
 #include "native_game_present_region.hpp"
 #include "native_game_backbuffer_admission.hpp"
+#include "native_game_texture_atlas_budget.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -3039,11 +3040,13 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
          capture.maxAnisotropy < 2u ||
          capture.maxAnisotropy > D3D11_REQ_MAXANISOTROPY)) return false;
     const UINT sourceLevels = capture.texture->GetLevelCount();
-    if (sourceLevels == 0 || sourceLevels > 11u) return false;
+    // A complete 2048x2048 menu/vehicle atlas has twelve mip levels.
+    if (sourceLevels == 0 || sourceLevels > 12u) return false;
     D3DSURFACE_DESC base{};
     if (FAILED(capture.texture->GetLevelDesc(0, &base)) ||
         base.Width == 0 || base.Height == 0 ||
-        base.Width > 1024 || base.Height > 1024) return false;
+        base.Width > kMaxNativeGameAtlasDimension ||
+        base.Height > kMaxNativeGameAtlasDimension) return false;
     // The game can render menu, car and race textures into more than one
     // color layout, including 16-bit game-authored render targets.
     // Snapshot the real D3D9 RT before converting to a native
@@ -3064,6 +3067,11 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     const bool gpuRenderTarget = base.Pool == D3DPOOL_DEFAULT &&
         (base.Usage & D3DUSAGE_RENDERTARGET) != 0u &&
         native_rt_readback::sampleable(rtLayout, capture.srgbTexture);
+    // A 2K immutable atlas is manageable, but a 2K live render target would
+    // synchronously GetRenderTargetData in every game Draw: retain the prior
+    // 1K GPU-source bound to protect menu/race input and frame pacing.
+    if (gpuRenderTarget && (base.Width > 1024u || base.Height > 1024u))
+        return false;
     // DEFAULT DYNAMIC textures are game-writable LockRect resources, unlike
     // ordinary DEFAULT textures. Re-snapshot their actual contents at every
     // observed game Draw/DrawIndexed; never reuse a stale frame or assume
@@ -3202,6 +3210,22 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         // Current D3D9 palette RGB and source alpha must be decoded per texel.
         nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
     } else return false;
+
+    // Real D3D9 menu/car atlases can be 2048 square. Budget the complete
+    // converted D3D11 SRV mip payload *before* palette lookup, D3D9 readback,
+    // CPU copies or GPU allocation. Packed/palette/RGB24 formats expand to
+    // BGRA8, while BC and native half/full floats retain their own pitches.
+    const UINT atlasTexelBytes = floatRgba ?
+        float_rgba_texture::source_bytes_per_texel(floatLayout) :
+        floatVector ? float_vector_texture::source_bytes_per_texel(floatVectorLayout) :
+        rgba16 ? rgba16_texture::source_bytes_per_texel() :
+        4u;
+    const UINT atlasBlockBytes = compressed ?
+        (base.Format == D3DFMT_DXT1 ? 8u : 16u) : 0u;
+    if (!native_game_texture_upload_bytes(
+            base.Width, base.Height, levels,
+            compressed ? 0u : atlasTexelBytes, atlasBlockBytes))
+        return false;
 
     ComPtr<IDirect3DSurface9> readbackSurface;
     if (gpuRenderTarget) {
