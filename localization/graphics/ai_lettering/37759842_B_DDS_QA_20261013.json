@@ -1,0 +1,103 @@
+{
+  "schema": "outrun-index95-ai-B-dds-qa-v1",
+  "task_id": "LOCALIZATION-AI-B-DDS-QA-20261013",
+  "recorded_at_kst": "2026-10-13T17:18:00+09:00",
+  "branch": "korean-localization-clean",
+  "target": "37759842",
+  "input": "2026-10-13 ImageGen B-option high-resolution Korean lettering (튜닝; 참가자를 기다리는 중입니다.)",
+  "source": {
+    "repository": "envido32/OR2006Sprites",
+    "ref": "55f67a813dd3603d201d0be0da47c071965f53a4",
+    "release_tag": "v0.25.10a",
+    "path": "Release/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+    "git_blob_sha": "eeecec9ecd494270932ce97a6c38dfd05205eb24",
+    "sha256": "7b41a04e2b0736717dd0da4d82f9e18f3aac7c469a5738848c5cfa6bf28e15b5",
+    "dimensions": [
+      4096,
+      4096
+    ],
+    "pixel_format": "RGBA32",
+    "mipmap_count": 1,
+    "raw_to_readable": "FLIP_Y",
+    "acquisition": "read-only pinned GitHub raw-file download via N100; no N100 clone or worktree"
+  },
+  "proof_artifacts": [
+    {
+      "asset": "tuned_467",
+      "cell": [
+        2976,
+        40,
+        3368,
+        160
+      ],
+      "proof_dds_sha256": "d134101deb859a84ec5ac22fa8e242605b44a8596f07a1c5a7cf9acdb7c15da7",
+      "source_effect_bbox_cell": [
+        27,
+        1,
+        365,
+        113
+      ],
+      "proof_letter_bbox_cell": [
+        87,
+        4,
+        304,
+        116
+      ],
+      "introduced_alpha_outside_english_effect_bbox": 236,
+      "strict_source_effect_bbox": "FAIL",
+      "dds_roundtrip": "PASS"
+    },
+    {
+      "asset": "waiting_entries_443",
+      "cell": [
+        0,
+        728,
+        1560,
+        944
+      ],
+      "proof_dds_sha256": "06ef266bcfe81c3042154ff1070a34d60fe50f31c5d9d9d8f24a05c39861f8c0",
+      "source_effect_bbox_cell": [
+        4,
+        9,
+        1547,
+        201
+      ],
+      "proof_letter_bbox_cell": [
+        4,
+        25,
+        1556,
+        191
+      ],
+      "introduced_alpha_outside_english_effect_bbox": 278,
+      "strict_source_effect_bbox": "FAIL",
+      "dds_roundtrip": "PASS"
+    }
+  ],
+  "full_atlas_proof": {
+    "name": "37759842_UNSAFE_MISSING_ORIGINAL_ATLAS_PROOF_ONLY.dds",
+    "sha256": "ecff193dbe078cfd89372417550f28120a15a9bf0271332a2a7416a24f51a670",
+    "bytes": 67108992,
+    "source_preserved": false,
+    "warning": "DO NOT INSTALL. Other original sprites are missing."
+  },
+  "local_zip": {
+    "name": "37759842_B_DDS_PROOF_ONLY.zip",
+    "sha256": "18cb286fe88062e86f0abee6a2d10b62cd5e189c45ca3d4173c81c06325075d4",
+    "location": "conversation local artifact; not committed to GitHub"
+  },
+  "qa": {
+    "dds_encode_decode_exact": "PASS",
+    "letter_alpha_inside_assigned_cells": "PASS",
+    "zero_outside_exact_english_effect_bbox": "FAIL",
+    "original_dds_rgb_channel_masks": "FAIL_proof_uses_BGRA32_while_original_RGBA32",
+    "original_dds_raw_orientation": "FAIL_proof_not_raw_flip_y",
+    "preserve_unchanged_original_atlas": "FAIL_proof_blank_canvas",
+    "native_HD_lettering_style": "HOLD",
+    "english_clean_plate_approved": "NO",
+    "static_qa": "REWORK_REQUIRED",
+    "automation_validation": "NOT_RUN",
+    "runtime_validation": "UNTESTED",
+    "final_dds_created": false
+  },
+  "next_action": "Preserve exact original DDS header/pixels; create source-backed text-only clean plate for sprite_467 and sprite_443 in confirmed FLIP_Y display orientation; regenerate B artwork to source-effect-safe bbox with native font/effect geometry and unmodified original atlas outside exact glyph masks; encode original RGBA mask ordering and strict C QA."
+}
