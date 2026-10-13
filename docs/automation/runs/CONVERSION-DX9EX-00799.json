@@ -11,12 +11,12 @@
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "work_key": "DX9EX:VIS:MAIN_MENU",
-  "status": "IMPLEMENTED_NEEDS_EXACT_SHA_CI",
-  "checkpoint": "C3_VALIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00799]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "vrhost/src/runtime/menu_content_aspect.hpp",
     "vrhost/tests/menu_content_aspect_smoke.cpp",
@@ -60,9 +60,9 @@
     ]
   },
   "acceptance_results": {
-    "MAIN_NATIVE_CLIP": "PENDING_CI",
-    "MAIN_CROP_RESET_FALLBACK": "PENDING_CI",
-    "MAIN_EXACT_SHA_GATE": "PENDING_EXACT_SHA",
+    "MAIN_NATIVE_CLIP": "PASS",
+    "MAIN_CROP_RESET_FALLBACK": "PASS",
+    "MAIN_EXACT_SHA_GATE": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -83,7 +83,39 @@
   },
   "runtime_status": "NEED_QUEST3_VDXR_OPTICAL_TEST",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "37024bf8a85d72021af92b37251efd19c89410e2",
+    "dx9ex_active": {
+      "run_id": 38464407212,
+      "head_sha": "37024bf8a85d72021af92b37251efd19c89410e2",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "host": "SUCCESS",
+        "game": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38464407219,
+      "head_sha": "37024bf8a85d72021af92b37251efd19c89410e2",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38464407232,
+      "head_sha": "37024bf8a85d72021af92b37251efd19c89410e2",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "source-cross-domain": "SUCCESS",
+        "msvc-analyze-active-game": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS"
+      }
+    },
     "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
-  }
+  },
+  "material_result_sha": "7b7ced5c7a18530fa02346bf8bba829616714145",
+  "validation_bearing_result_sha": "37024bf8a85d72021af92b37251efd19c89410e2",
+  "result_sha": "37024bf8a85d72021af92b37251efd19c89410e2",
+  "c6_recorded_at_kst": "2026-10-14 05:47 KST"
 }
