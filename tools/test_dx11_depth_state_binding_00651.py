@@ -42,9 +42,12 @@ for broken in (
     BRIDGE.replace(
         'output.nativeDepthWrite, output.nativeDepthLessEqual)].Get(), 0);',
         'output.nativeDepthWrite, false)].Get(), 0);', 1),
+    # Mutate BOTH state creators: ZFUNC ALWAYS is instantiated before the
+    # original LESS/LEQUAL family. Mutating only the first occurrence no
+    # longer tests the legacy read-only OM write-mask assertion.
     BRIDGE.replace(
         'D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO',
-        'D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ALL', 1),
+        'D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ALL'),
 ):
     assert broken != BRIDGE and not connected(broken, DEPTH)
 broken_header = DEPTH.replace(
