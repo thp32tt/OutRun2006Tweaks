@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "feature_id": "GAME_STAGE1_OPERAND_MODIFIERS_MENU_RACE",
   "work_key": "DX11:GAME_STAGE1_CURRENT_TFACTOR_MODIFIERS",
-  "status": "IN_PROGRESS_GATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_GATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -75,13 +75,13 @@
     ]
   },
   "acceptance_results": {
-    "native-stage1-rgb-alpha-modifiers": "PENDING_GATE",
-    "unknown-operand-original-d3d9": "PENDING_GATE",
-    "integrated-512-case-ci": "PENDING_GATE"
+    "native-stage1-rgb-alpha-modifiers": "PASS",
+    "unknown-operand-original-d3d9": "PASS",
+    "integrated-512-case-ci": "PASS"
   },
   "base_head_sha": "b6c3b2b92ee7f874f2f286cf5ed4cc7c6049fe80",
   "material_result_sha": "0a635524c587561a23aef4a29760d5833d8c8563",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "40d7537e519e3e2966669ddc4b4e00b1ebf5eeaf",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/live_game_stage1_factor.hpp",
@@ -93,11 +93,40 @@
     "C0_RECOVER": "DONE head b6c3b2b; 00699 gates confirmed",
     "C1_REVIEW": "DONE stage1 operand modifier fallback gap",
     "C2_IMPLEMENT": "DONE C++/HLSL/native Draw integration at 0a635524c587561a23aef4a29760d5833d8c8563",
-    "C3_VALIDATE": "IN_PROGRESS exact-SHA GitHub jobs",
-    "C4_COMMIT": "DONE material 0a635524c587561a23aef4a29760d5833d8c8563",
-    "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_GATE"
+    "C3_VALIDATE": "PASS same validation-bearing exact SHA 40d7537e519e3e2966669ddc4b4e00b1ebf5eeaf: DX11 Fast #38482318823; Backend #38482318812 validate+readiness smoke; Windows Build #38482323949; OpenXR #38482325268; HUD #38482323758, all SUCCESS. HMD/gamepad UNTESTED.",
+    "C4_COMMIT": "PASS material 0a635524c587561a23aef4a29760d5833d8c8563, validation-bearing 40d7537e519e3e2966669ddc4b4e00b1ebf5eeaf (no CI skip)",
+    "C5_PACKAGE": "NOT_REQUIRED: no user HMD/runtime validation or deployable package claim",
+    "C6_STATE": "COMPLETE BUILD_VERIFIED; 3/3 build acceptance PASS, 5/5 exact SHA Actions SUCCESS, Quest3/VDXR/gamepad UNTESTED; later C6 documentation commit separately [skip ci] without changing result SHA."
   },
-  "next_action": "Inspect DX11 Fast, Backend Conversion Gate, Windows, OpenXR, HUD for validation-bearing commit; retain RUNTIME_VALIDATION=UNTESTED",
-  "state_persisted": true
+  "next_action": "Start the next independent DX11 real menu/vehicle/race Draw/DrawIndexed incomplete integration feature under a new task; original D3D9 gamepad and native diagnostic safe fallback remain authoritative. Quest3/VDXR runtime is NEED_HMD_TEST, not a development blocker.",
+  "state_persisted": true,
+  "gate_evidence": {
+    "validation_bearing_sha": "40d7537e519e3e2966669ddc4b4e00b1ebf5eeaf",
+    "dx11_fast_structural_checks": {
+      "id": 38482318823,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38482318812,
+      "conclusion": "SUCCESS",
+      "jobs": [
+        "validate SUCCESS",
+        "DX11 readiness smoke probes SUCCESS"
+      ]
+    },
+    "windows_build": {
+      "id": 38482323949,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38482325268,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38482323758,
+      "conclusion": "SUCCESS"
+    },
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  }
 }
