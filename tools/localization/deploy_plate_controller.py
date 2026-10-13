@@ -24,7 +24,7 @@ def run(args, **kwargs):
     return subprocess.run(args, check=True, capture_output=True, text=True, **kwargs).stdout
 
 
-def deploy(root, revision):
+def deploy(root, revision, single_a_smoke=False):
     import yaml
     if not re.fullmatch('[0-9a-f]{40}', revision):
         raise ValueError('Exact Git commit required')
@@ -51,7 +51,7 @@ print(json.dumps({{'compose':(b/{SUBDIR!r}/'docker-compose.yml').read_text(),'en
 """
     payload = json.loads(run(['docker', 'run', '--rm', '--entrypoint', 'python', '-v',
                              'portainer_data:/pdata:ro', BASE, '-c', code]))
-    staged_compose = render(payload['compose'], revision)
+    staged_compose = render(payload['compose'], revision, single_a_smoke=single_a_smoke)
     compose = yaml.safe_load(staged_compose)
     service = compose['services'][NAME]
     environment = {}
@@ -147,6 +147,8 @@ if p.exists():
             'preserved_volumes': ['outrun_chat_localization_recovery_data',
                                   'outrun_chat_localization_recovery_logs'],
             'auto_send': True, 'deployment_mode': 'MANUAL_ONLY',
+            'single_a_smoke': bool(single_a_smoke),
+            'single_a_task_id': 'OUTRUN-A-Q217-IMG-SMOKE-20261013' if single_a_smoke else None,
             'runtime_schedule_verified': False, 'imagegen_e2e': 'UNTESTED',
             'game_validation': 'UNTESTED'}
 
@@ -156,8 +158,9 @@ if __name__ == '__main__':
     p.add_argument('--root', type=Path, default=Path('.'))
     p.add_argument('--revision', required=True)
     p.add_argument('--stage', action='store_true', help='Explicitly build image and stage Compose; never redeploys')
+    p.add_argument('--single-a-smoke', action='store_true', help='Stage A q217 one-shot smoke only: B/C1 schedules and watchdog sends suppressed')
     a = p.parse_args()
     if not a.stage:
         p.error('--stage is required; this command never deploys/restarts the running controller')
-    print(json.dumps(deploy(a.root, a.revision), ensure_ascii=False))
+    print(json.dumps(deploy(a.root, a.revision, single_a_smoke=a.single_a_smoke), ensure_ascii=False))
 
