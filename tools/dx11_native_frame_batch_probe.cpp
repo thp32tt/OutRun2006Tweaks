@@ -36,6 +36,8 @@ int main() {
     b.reset();
     b.succeeded(true,true);
     assert(b.accepts_depth(true,true) && !b.accepts_depth(true,false));
+    // End the previous depth-positive case before testing empty rotating frames.
+    b.reset();
     // 00675: full game scene coverage, including calls beyond the old 64
     // probe window. 257 is intentionally non-power-of-two.
     for (std::uint32_t population : {3u, 65u, 128u, 257u, 4096u}) {
