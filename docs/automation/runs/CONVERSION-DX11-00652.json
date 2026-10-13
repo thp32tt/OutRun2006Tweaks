@@ -11,9 +11,9 @@
   "work_key": "DX11:GAME_ALWAYS_Z_DSV",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "9acab987a8c6e0be54a35a36cb80c10ba971762e",
-  "status": "AWAIT_EXACT_SHA_GATES",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -63,13 +63,55 @@
     "C0_RECOVER": "PASS prior 00651 exact-SHA Gate",
     "C1_REVIEW": "PASS native ALWAYS Z missing",
     "C2_IMPLEMENT": "PASS C++ depth admission and OM binding with tests",
-    "C3_VALIDATE": "PENDING",
-    "C4_COMMIT": "PENDING_MATERIAL",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Backend conversion validate+readiness, DX11 fast, Win32 Build, OpenXR architecture, HUD Inspector all success on 20ee6e5dd4f42aef928f653becabc9e575d1199c",
+    "C4_COMMIT": "PASS: source material 89712d3e, CI verifier repair and validation-bearing 20ee6e5dd4f42aef928f653becabc9e575d1199c",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_GATE"
+    "C6_STATE": "PASS_EXACT_SHA: record finalized separately from gated source commit"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Verify exact SHA Backend/DX11 Fast/Windows Build/OpenXR/HUD; HMD remains UNTESTED"
+  "next_action": "C6 PASS_EXACT_SHA for material/repair SHA; Quest 3, VDXR, menu/vehicle/race real pixels, real gamepad input remain RUNTIME_VALIDATION=UNTESTED. No backend promotion. Next independent DX11 scope assigned by controller.",
+  "material_result_sha": "89712d3ef1c82d79dae2a4b17c5a7aaba86ad070",
+  "validation_bearing_result_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+  "result_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+  "validation_evidence": {
+    "backend_conversion_gate": {
+      "id": 38342300734,
+      "conclusion": "success",
+      "validation_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38342300734"
+    },
+    "dx11_fast_structural": {
+      "id": 38342300766,
+      "conclusion": "success",
+      "validation_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38342300766"
+    },
+    "windows_build": {
+      "id": 38342304347,
+      "conclusion": "success",
+      "validation_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38342304347"
+    },
+    "openxr_architecture": {
+      "id": 38342304267,
+      "conclusion": "success",
+      "validation_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38342304267"
+    },
+    "hud_inspector": {
+      "id": 38342304213,
+      "conclusion": "success",
+      "validation_sha": "20ee6e5dd4f42aef928f653becabc9e575d1199c",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38342304213"
+    }
+  },
+  "failure_repair": {
+    "initial_material_sha": "89712d3ef1c82d79dae2a4b17c5a7aaba86ad070",
+    "initial_dx11_fast_failure_run_id": 38342224129,
+    "initial_backend_failure_run_id": 38342224254,
+    "cause": "legacy 00651 destructive test modified only the first depth-write-mask descriptor; new ALWAYS comparator adds a preceding descriptor; destructive assertion made false negative",
+    "repair_commit": "20ee6e5dd4f42aef928f653becabc9e575d1199c"
+  }
 }
