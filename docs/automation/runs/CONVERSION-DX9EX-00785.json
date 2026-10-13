@@ -2,25 +2,26 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00785",
   "production_id": "CONVERSION-DX9EX-00785",
-  "event_id": "CONVERSION-DX9EX-00785-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00785-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:PERF:R30_VB_IB_SHADOW_WORKING_SET",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R30_VB_IB_SHADOW_WORKING_SET",
-  "status": "C3_IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C3_VALIDATE",
+  "status": "C6_BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00785]",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "SUCCESS_EXACT_SHA_5_OF_5",
   "runtime_validation": "UNTESTED",
   "runtime_status": "NEED_SCENE_MATCHED_QUEST3_FRAME_TIMING",
-  "score_delta": 0,
+  "score_delta": 1,
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "tools/verify_vr_r30_shadow_two_way_lookup.py",
-    "docs/automation/runs/CONVERSION-DX9EX-00785.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00785.json",
+    "tools/verify_vr_r30_shadow_descriptor_fastpath.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:PERF:R30_VB_IB_SHADOW_WORKING_SET",
@@ -58,9 +59,9 @@
     ]
   },
   "acceptance_results": {
-    "FOUR_BUFFER_SHADOW_HOTPATH": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "RESET_RELEASE_NEGATIVE_SAFETY": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "WIN32_EXACT_SHA_INTEGRATION": "CI_PENDING",
+    "FOUR_BUFFER_SHADOW_HOTPATH": "SOURCE_REGRESSION_VERIFIED",
+    "RESET_RELEASE_NEGATIVE_SAFETY": "SOURCE_MUTATION_VERIFIED",
+    "WIN32_EXACT_SHA_INTEGRATION": "BUILD_VERIFIED_5_OF_5_PLUS_DOMAIN_AND_IMPACT",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -77,10 +78,38 @@
     ]
   },
   "ci_evidence": {
-    "status": "PENDING",
-    "head_before": "124a6fca98502a47db63e22e9e91c3c01d6aebd0",
-    "expected_workflow": "DX9Ex Active Validation + Domain Isolation Guard",
-    "local_model": "JS four-address cache miss model=4 for 4096 repeated requests",
-    "static_sources_modified": true
-  }
+    "status": "SUCCESS",
+    "material_sha": "70b8c0b563d7c3db9867448342fdbc757b4833a3",
+    "validation_bearing_sha": "fb83796bd39dd0cfe679e1592fb35a8583b4d13f",
+    "dx9ex_active": {
+      "run_id": 38425058578,
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "game",
+        "host",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38425058923,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38424770345,
+      "conclusion": "success",
+      "source_sha": "70b8c0b563d7c3db9867448342fdbc757b4833a3"
+    },
+    "failed_prior_run": {
+      "run_id": 38424770283,
+      "conclusion": "failure",
+      "cause": "stale descriptor verifier required two-way VB/IB cache rather than four-way"
+    },
+    "repaired_file": "tools/verify_vr_r30_shadow_descriptor_fastpath.py",
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+    "performance_evidence": "four-way shadow lookup source/model only; no runtime FPS uplift claimed"
+  },
+  "result_sha": "fb83796bd39dd0cfe679e1592fb35a8583b4d13f",
+  "material_sha": "70b8c0b563d7c3db9867448342fdbc757b4833a3"
 }
