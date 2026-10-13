@@ -21,7 +21,8 @@ def wired(s: str) -> bool:
         "capture.addressU = static_cast<D3DTEXTUREADDRESS>(addressU);",
         "capture.addressV = static_cast<D3DTEXTUREADDRESS>(addressV);",
         "(mip == D3DTEXF_NONE && (maxMip != 0u || decodedMipBias != 0.0f)) || !validMipBias",
-        "srgb ||",
+        "srgb > 1u ||",
+        "capture.srgbTexture = srgb == TRUE;",
     ]
     sampler_required = [
         "case D3DTADDRESS_WRAP: return D3D11_TEXTURE_ADDRESS_WRAP;",
@@ -63,6 +64,7 @@ def main() -> None:
     s = SOURCE.read_text(encoding="utf-8")
     assert wired(s), "game UV state -> D3D11 sampler -> Draw/DrawIndexed disconnected"
     mutations = [
+        ("srgb > 1u ||", "srgb > 2u ||"),
         ("addressU != D3DTADDRESS_MIRROR && addressU != D3DTADDRESS_MIRRORONCE)", "false)"),
         ("addressV != D3DTADDRESS_MIRROR && addressV != D3DTADDRESS_MIRRORONCE)", "false)"),
         ("case D3DTADDRESS_MIRROR: return D3D11_TEXTURE_ADDRESS_MIRROR;", "case D3DTADDRESS_MIRROR: return D3D11_TEXTURE_ADDRESS_CLAMP;"),

@@ -22,7 +22,8 @@ def wired(s: str) -> bool:
         "capture.borderColor = borderColor;",
         "capture.addressU = static_cast<D3DTEXTUREADDRESS>(addressU);",
         "capture.addressV = static_cast<D3DTEXTUREADDRESS>(addressV);",
-        "srgb ||"
+        "srgb > 1u ||",
+        "capture.srgbTexture = srgb == TRUE;"
     )) and all(t in sampler for t in (
         "case D3DTADDRESS_BORDER: return D3D11_TEXTURE_ADDRESS_BORDER;",
         "default: return static_cast<D3D11_TEXTURE_ADDRESS_MODE>(0);",
@@ -48,6 +49,7 @@ def main() -> None:
     s = SOURCE.read_text(encoding="utf-8")
     assert wired(s), "D3D9 BORDER sampler did not reach native Draw/DrawIndexed"
     bad = [
+        ("srgb > 1u ||", "srgb > 2u ||"),
         ("DWORD borderColor = 0u; // Live game", "DWORD wrongBorder = 0u; // Live game"),
         ("(addressU == D3DTADDRESS_BORDER || addressV == D3DTADDRESS_BORDER) &&", "false &&"),
         ("FAILED(game->GetSamplerState(0, D3DSAMP_BORDERCOLOR, &borderColor))", "false"),
