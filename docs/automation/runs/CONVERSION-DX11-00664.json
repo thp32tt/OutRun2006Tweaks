@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_RG16_MIP_DRAW",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "fa47b7f3fd340addeab187409b99dd3be4bdfc26",
-  "status": "MATERIAL_COMMITTED_AWAITING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -63,10 +63,10 @@
     "C0_RECOVER": "PASS fa47b7f3fd340addeab187409b99dd3be4bdfc26 after 00663 C6",
     "C1_REVIEW": "PASS G16R16 real game-texture source format currently absent from native mirror",
     "C2_IMPLEMENT": "PASS RG16 C++ decoder + game all-mip native Draw integration",
-    "C3_VALIDATE": "LOCAL_RG16_CPP_PASS; CI PENDING_EXACT_SHA",
+    "C3_VALIDATE": "PASS_EXACT_SHA: GitHub CI SUCCESS on validation-bearing SHA 00e720a5e5b5a904926a6ee5f13f23341c272250; local C++ pixel/pitch probe PASS",
     "C4_COMMIT": "MATERIAL_COMMITTED",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "acceptance_results": {
     "cpu_probe": "LOCAL_RG16_CPP_PASS",
@@ -77,7 +77,7 @@
     "quest3_vdxr": "UNTESTED"
   },
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "next_action": "Consume GitHub five exact SHA gates; after success separate C6 bookkeeping. No Quest 3/VDXR/gamepad proof."
+  "validation_bearing_result_sha": "00e720a5e5b5a904926a6ee5f13f23341c272250",
+  "result_sha": "00e720a5e5b5a904926a6ee5f13f23341c272250",
+  "next_action": "C6 complete: validated SHA 00e720a5e5b5a904926a6ee5f13f23341c272250 (GitHub CI SUCCESS); real Quest 3/VDXR, gameplay visual parity and gamepad remain UNTESTED / NEED_HMD_TEST. No additional score or CI rerun for CONVERSION-DX11-00664."
 }
