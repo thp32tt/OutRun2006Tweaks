@@ -1772,7 +1772,22 @@ def main() -> None:
     assert "alphaArg1 != D3DTA_TEXTURE" in state_section
     assert "AlphaGate(c.a); return c;" in shader_section
     assert "mirror_texture(dev, capture, sampledView, sampledSampler)" in submit_section
-    assert "ctx->PSSetShader(capture.selectDiffuseTextureAlpha ?" in submit_section
+    # Stage 1 is an opt-in first shader, not a replacement for stage 0.
+    # Both the stage-1 branch and legacy stage-0 alpha blend dispatch must
+    # remain connected to the native Draw/DrawIndexed submission.
+    def stage0_dispatch_with_stage1(code: str) -> bool:
+        return ("ctx->PSSetShader(capture.stage1Enabled ?" in code and
+                "capture.selectDiffuseTextureAlpha ? s.selectDiffuseTextureAlphaPs.Get() :" in code and
+                "capture.blendTextureAlpha ? s.blendTextureAlphaPs.Get() :" in code and
+                "capture.blendDiffuseAlpha ? s.blendDiffuseAlphaPs.Get() :" in code)
+    assert stage0_dispatch_with_stage1(submit_section)
+    for dispatch in (
+        "capture.stage1Enabled ?",
+        "capture.selectDiffuseTextureAlpha ? s.selectDiffuseTextureAlphaPs.Get() :",
+        "capture.blendTextureAlpha ? s.blendTextureAlphaPs.Get() :",
+        "capture.blendDiffuseAlpha ? s.blendDiffuseAlphaPs.Get() :",
+    ):
+        assert not stage0_dispatch_with_stage1(submit_section.replace(dispatch, "/* removed fallback dispatch */", 1))
     for link in blend_links[:-2]:
         if "blendTextureAlpha && !blendDiffuseAlpha)" in link:
             continue
