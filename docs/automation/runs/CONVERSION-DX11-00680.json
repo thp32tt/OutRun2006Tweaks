@@ -11,9 +11,9 @@
   "work_key": "DX11:MENU_RACE_FENCED_GPU_READBACK",
   "feature_id": "MENU_RACE_FENCED_GPU_READBACK_AND_D3D9_PRESENT_CONTINUITY",
   "base_head_sha": "48c9e050d60ef2a30e61c50b5dac03d03cdf7b4f",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA_5_OF_5",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -84,9 +84,9 @@
     ]
   },
   "acceptance_results": {
-    "native-fence-draw-stamp": "PENDING_EXACT_SHA",
-    "late-frame-input-safe-drop": "PENDING_EXACT_SHA",
-    "exact-sha-scene-test": "PENDING_EXACT_SHA",
+    "native-fence-draw-stamp": "PASS_BUILD",
+    "late-frame-input-safe-drop": "PASS_BUILD",
+    "exact-sha-scene-test": "PASS_EXACT_SHA",
     "quest3-real-scene": "NEED_HMD_TEST"
   },
   "changed_files": [
@@ -100,13 +100,51 @@
     "C0_RECOVER": "PASS previous 00679 five CI Gates success",
     "C1_REVIEW": "PASS confirmed async readback lacks scene Present provenance",
     "C2_IMPLEMENT": "NATIVE_SCENE_FENCE_FRESH_PRESENT",
-    "C3_VALIDATE": "C++17 portable probe PASS, exact SHA CI pending",
-    "C4_COMMIT": "PENDING_SHA",
+    "C3_VALIDATE": "PASS portable C++ positive+7 destructive regressions; exact-SHA five GitHub Actions Gates success",
+    "C4_COMMIT": "PASS material+validation SHA 07790eb1dee1ed35b2d98632d9f132e0b3333b07",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_CI"
+    "C6_STATE": "DONE_BUILD_VERIFIED; HMD/gamepad NEED_HMD_TEST"
   },
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
-  "next_action": "Exact-SHA five Gates; repair failures under same task; Quest3/VDXR UNTESTED."
+  "material_result_sha": "07790eb1dee1ed35b2d98632d9f132e0b3333b07",
+  "validation_bearing_result_sha": "07790eb1dee1ed35b2d98632d9f132e0b3333b07",
+  "result_sha": "07790eb1dee1ed35b2d98632d9f132e0b3333b07",
+  "next_action": "Feature build verified. Quest3/VDXR menu/vehicle/race/input parity remains NEED_HMD_TEST; controller selects next independent feature, never replay 00680.",
+  "verified_utc": "2026-10-13T14:02:30Z",
+  "exact_sha_workflow_gates": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38408291854,
+      "result": "success",
+      "head_sha": "07790eb1dee1ed35b2d98632d9f132e0b3333b07",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38408291854"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38408292036,
+      "result": "success",
+      "head_sha": "07790eb1dee1ed35b2d98632d9f132e0b3333b07",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38408292036"
+    },
+    {
+      "name": "Build",
+      "run_id": 38408301066,
+      "result": "success",
+      "head_sha": "07790eb1dee1ed35b2d98632d9f132e0b3333b07",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38408301066"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38408291690,
+      "result": "success",
+      "head_sha": "07790eb1dee1ed35b2d98632d9f132e0b3333b07",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38408291690"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38408301065,
+      "result": "success",
+      "head_sha": "07790eb1dee1ed35b2d98632d9f132e0b3333b07",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38408301065"
+    }
+  ]
 }
