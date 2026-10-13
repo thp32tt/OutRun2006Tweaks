@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00669",
+  "production_id": "CONVERSION-DX11-00669",
+  "event_id": "CONVERSION-DX11-00669-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:LIVE_GAME_RGBA16_UNORM_NATIVE_DRAW",
+  "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
+  "base_head_sha": "b7da5a92a67688a5b696843a8304507799b7a112",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "intercepted OutRun D3D9 managed/systemmem A16B16G16R16 LockRect mip source",
+      "preserve all little-endian R16/G16/B16/A16 bytes and padded source pitches in DXGI R16G16B16A16_UNORM immutable mip SRV",
+      "bind native SRV and sampler in guarded game-originated Draw/DrawIndexed; original DX9Ex game Draw/Present/input survive"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_rgba16_texture.hpp",
+      "tools/dx11_game_rgba16_probe.cpp",
+      "tools/test_dx11_native_rgba16_00669.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Local ASan/UBSan C++ CPU source row probe PASS: 2x2 padded A16B16G16R16, 64-bit channel byte-preservation and 1x1 mip",
+      "negative_regression": "13 destructive source/header mutations; DEFAULT pool and unsupported sRGB remain fail-closed on original D3D9 draw",
+      "component_integration": "game LockRect multi-mip -> source pitch bytes -> full-precision DXGI R16G16B16A16_UNORM native SRV -> PSSetShaderResources -> Draw/DrawIndexed diagnostic frame"
+    },
+    "conflict_keys": [
+      "DX11:LIVE_GAME_RGBA16_UNORM_NATIVE_DRAW",
+      "src/vr/d3d11/live_game_rgba16_texture.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "SOURCE_AND_CPU_PROBE_ONLY; real menu/vehicle/race pixels and Quest3/VDXR require hardware test",
+    "activation_guard_and_fallback": "OUTRUN_DX11_FIRST_GAME_FRAME opt-in, no gameplay promotion; unproven sRGB, DEFAULT/unreadable texture fail closed; original D3D9 Draw/Present and gamepad path untouched"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_rgba16_texture.hpp",
+    "tools/dx11_game_rgba16_probe.cpp",
+    "tools/test_dx11_native_rgba16_00669.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00669.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub HEAD b7da5a92a67688a5b696843a8304507799b7a112, 00668 C6 COMPLETE_BUILD_VERIFIED and no existing 00669 claim",
+    "C1_REVIEW": "PASS: actual native mirror_texture branch omitted D3DFMT_A16B16G16R16; select nonconflicting format path; no DXVK writes",
+    "C2_IMPLEMENT": "PASS: preserve 16-bit RGBA channels, D3D11 SRV mip upload, opt-in native game Draw and unchanged DX9Ex fallback",
+    "C3_VALIDATE": "LOCAL_ASAN_UBSAN_CPU_PROBE_PASS; targeted destructive Python regression enrolled in DX11 Fast. Exact-SHA GitHub CI pending.",
+    "C4_COMMIT": "material source+test commit contains [AUTO:CONVERSION-DX11-00669] without CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED; runtime Quest3/VDXR test not performed",
+    "C6_STATE": "PENDING_EXACT_SHA_CI; follow up with separate bookkeeping-only [skip ci] after gate"
+  },
+  "acceptance_results": {
+    "cpu_probe": "LOCAL_ASAN_UBSAN_PASS",
+    "static_regression": "PENDING_GITHUB_FAST",
+    "compile_build": "PENDING_GITHUB_BUILD",
+    "game_visual_parity": "NEED_HMD_TEST",
+    "gamepad": "UNTESTED",
+    "quest3_vdxr": "UNTESTED"
+  },
+  "next_action": "Check exact validation-bearing material SHA Backend Conversion Gate + DX11 Fast + Build + OpenXR + HUD. If passed, finish C6 separately; do not claim gameplay/HMD PASS."
+}

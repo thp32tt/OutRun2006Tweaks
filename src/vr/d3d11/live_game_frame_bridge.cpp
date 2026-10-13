@@ -15,6 +15,7 @@
 #include "live_game_a8p8_texture.hpp"
 #include "live_game_p8_texture.hpp"
 #include "live_game_rgb332_texture.hpp"
+#include "live_game_rgba16_texture.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -2750,6 +2751,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                               base.Format == D3DFMT_L16;
     // D3D9 G16R16 is a four-byte, two-channel texture, not BGRA8.
     const bool rg16 = base.Format == D3DFMT_G16R16;
+    // Game-authored 64-bit RGBA UNORM mips are byte-compatible with DXGI RGBA16.
+    const bool rgba16 = base.Format == D3DFMT_A16B16G16R16;
     // Some legacy menu/text atlases encode palette index and per-texel alpha.
     // The native diagnostic must fetch the live game palette, not treat
     // A8P8's two bytes as a packed RGB color.
@@ -2773,6 +2776,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     if (capture.srgbTexture && extendedLuma) return false;
     // Do not assume D3D9 sRGB transfer for high precision RG; DX9Ex owns it.
     if (capture.srgbTexture && rg16) return false;
+    // No sRGB view exists for 16-bit UNORM: never silently sample as linear.
+    if (capture.srgbTexture && rgba16) return false;
     // Palettized sRGB lookup/transfer parity is not proven on D3D9.
     if (capture.srgbTexture && a8p8) return false;
     if (capture.srgbTexture && p8) return false;
@@ -2792,6 +2797,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                base.Format == D3DFMT_X8R8G8B8 || packed16 || luminance || rgb24 || rgbaSwizzle || tenBit || extendedLuma) {
         nativeFormat = capture.srgbTexture ?
             DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : DXGI_FORMAT_B8G8R8A8_UNORM;
+    } else if (rgba16) {
+        // Preserve all game R/G/B/A 16-bit channels in a native UNORM SRV.
+        nativeFormat = DXGI_FORMAT_R16G16B16A16_UNORM;
     } else if (rg16) {
         // RG16 is converted to BGRA8 per row; no native format reinterpretation.
         nativeFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -2864,7 +2872,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     const auto extendedLumaLayout = base.Format == D3DFMT_L16 ?
         extended_luminance_texture::Layout::luminance16 :
         extended_luminance_texture::Layout::alpha4_luminance4;
-    const UINT sourceTexelBytes = packed16 ? 2u :
+    const UINT sourceTexelBytes = rgba16 ? rgba16_texture::source_bytes_per_texel() :
+        packed16 ? 2u :
         luminance ? luminance_texture::source_bytes_per_texel(luminanceLayout) :
         extendedLuma ? extended_luminance_texture::source_bytes_per_texel(extendedLumaLayout) :
         a8p8 ? a8p8_texture::source_bytes_per_texel() :
@@ -2927,6 +2936,8 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     rgb24_texture::unpack_row(source, destination, desc.Width);
                 else if (rg16)
                     rg16_texture::unpack_row(source, destination, desc.Width);
+                else if (rgba16)
+                    rgba16_texture::copy_row(source, destination, desc.Width);
                 else if (rgb332)
                     rgb332_texture::unpack_row(source, destination, desc.Width, rgb332Layout);
                 else if (p8)
