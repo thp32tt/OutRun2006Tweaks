@@ -16,7 +16,17 @@ for topology in ("LINELIST", "LINESTRIP", "TRIANGLELIST", "TRIANGLESTRIP"):
 assert "supported_game_state(game, type, vp, layout, transforms, capture, output)" in bridge
 assert "D3DRS_ANTIALIASEDLINEENABLE" in bridge and "lineAA != FALSE" in bridge
 assert "D3DRS_LASTPIXEL" in bridge and "lastPixel != TRUE" in bridge
-assert "if (!diagnostic_enabled() || !game ||" in bridge
+# Native source ordinals are recorded before primitive topology admission:
+# a rejected game line/triangle cannot disappear between two accepted draws.
+assert "if (!diagnostic_enabled() || !game) return;" in bridge
+observe = bridge[bridge.find("void observe("):bridge.find("} // namespace", bridge.find("void observe("))]
+source_ordinal = observe.find("const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;")
+topology_gate = observe.find("if (!game_native_primitive_element_count(")
+assert source_ordinal >= 0 and topology_gate > source_ordinal
+assert "s.frameBatch.abort();" in observe[source_ordinal:topology_gate + 650]
+# Negative control must fail if the raw game ordinal is removed or moved behind admission.
+mutated = observe.replace("const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;", "", 1)
+assert mutated != observe and "const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;" not in mutated
 assert "if (ib) ctx->DrawIndexed(indexCount, 0, 0);" in bridge
 assert "else ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in bridge
 for name in ("src/vr/d3d9/stereo_renderer_r30.cpp",
