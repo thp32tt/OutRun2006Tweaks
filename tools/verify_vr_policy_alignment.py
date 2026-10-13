@@ -20,16 +20,38 @@ def violations(state, queue, docs):
                     if item.get("id") == "ARCH-V3-GATE-001"), None)
     v3_start = next((item for item in queue.get("items", [])
                      if item.get("id") == "ARCH-V3-001"), None)
+    # The 2026-10-13 whole-defect override decomposes Issue #119 into
+    # four independently owned, dispatchable visual functions. The umbrella
+    # remains a tracking-only parent; making it READY creates two writers
+    # for the same renderer paths and invalidates the live child claims.
+    child_keys = (
+        "DX9EX:VIS:HUD_GAMEPLAY", "DX9EX:VIS:F11_MENU",
+        "DX9EX:VIS:ESC_MENU", "DX9EX:VIS:MAIN_MENU",
+    )
+    child_items = [item for item in queue.get("items", [])
+                   if item.get("workKey") in child_keys]
+    child_dispatch_ok = (
+        p0_ui is not None and
+        p0_ui.get("status") == "DECOMPOSED_PARENT_TRACKING_ONLY" and
+        p0_ui.get("workKey") == "DX9EX-QUEST3-RESPONSIVE-UI-20261013" and
+        p0_ui.get("issue") == 119 and
+        sorted(p0_ui.get("childFeatureIds", [])) == sorted(child_keys) and
+        len(p0_ui.get("childFeatureIds", [])) == len(child_keys) and
+        len(child_items) == len(child_keys) and
+        all(item.get("featureId") == item.get("workKey") and
+            item.get("id") == "DX9EX-FEATURE-" + item["workKey"].rsplit(":", 1)[-1] and
+            item.get("status") in ("READY", "IMPLEMENT_NEXT", "NEEDS_VALIDATION", "IN_PROGRESS") and
+            item.get("priority", 0) >= 120 and not item.get("blockedBy")
+            for item in child_items)
+    )
     checks = (
         (sa == qa, "DX9Ex state/queue diverged"),
         (sa["roles"]["A"]["status"] == "ACTIVE" and sa["roles"]["A"]["globalPriority"] == 0, "DX11 A not first-priority ACTIVE"),
         (sa["roles"]["C"]["status"] == "ACTIVE" and sa["roles"]["C"]["effortTargetPercent"] == 50, "DX9Ex C allocation/state changed"),
         (sa["roles"]["B"]["status"] == "FROZEN" and not sa["autoThawDxvk"], "DXVK B thawed"),
         (sa["dx9exPriority"] == STAGES, "2026-10-13 P0-A responsive UI / P0-B performance priority lost"),
-        (p0_ui is not None and p0_ui.get("status") in ("READY", "IMPLEMENT_NEXT", "NEEDS_VALIDATION")
-         and p0_ui.get("priority", 0) >= 100
-         and p0_ui.get("workKey") == "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
-         "P0-A issue 119 must remain dispatchable with stable work key"),
+        (child_dispatch_ok,
+         "P0-A issue 119 must keep a tracking-only parent and four independent dispatchable child work keys"),
         (visual is not None and visual.get("status") == "READY"
          and not visual.get("blockedBy")
          and "non-overlapping active claim" in visual.get("nextAction", ""),
@@ -76,6 +98,11 @@ def main():
         lambda s, q: s["policy"]["executionAuthority"]["roles"]["C"].update(effortTargetPercent=10),
         lambda s, q: s["policy"]["executionAuthority"]["dx9exPriority"].reverse(),
         lambda s, q: next(item for item in q["items"] if item["id"] == "DX9EX-QUEST3-RESPONSIVE-UI-20261013").update(status="BLOCKED"),
+        lambda s, q: next(item for item in q["items"] if item["id"] == "DX9EX-QUEST3-RESPONSIVE-UI-20261013").update(status="READY"),
+        lambda s, q: next(item for item in q["items"] if item["id"] == "DX9EX-FEATURE-MAIN_MENU").update(status="BLOCKED"),
+        lambda s, q: next(item for item in q["items"] if item["id"] == "DX9EX-FEATURE-F11_MENU").update(workKey="DX9EX:VIS:MAIN_MENU"),
+        lambda s, q: next(item for item in q["items"] if item["id"] == "DX9EX-FEATURE-ESC_MENU").update(blockedBy="HMD"),
+        lambda s, q: next(item for item in q["items"] if item["id"] == "DX9EX-QUEST3-RESPONSIVE-UI-20261013").update(childFeatureIds=["DX9EX:VIS:MAIN_MENU"]),
         lambda s, q: next(item for item in q["items"] if item["id"] == "DX9EX-P0-VISUAL-COMPOSITION-20261007").update(status="BLOCKED"),
         lambda s, q: next(item for item in q["items"] if item["id"] == "DX9EX-P0-VISUAL-COMPOSITION-20261007").update(blockedBy="R84"),
         lambda s, q: next(item for item in q["items"] if item["id"] == "ARCH-V3-001").update(status="READY"),
