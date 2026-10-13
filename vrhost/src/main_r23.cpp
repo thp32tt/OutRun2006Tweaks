@@ -1014,6 +1014,16 @@ namespace
             c.BindCaptureOutput(false);
 
         CaptureStatus status{};
+        // A failed acquisition/release may leave a stale Desktop Duplication
+        // frame; never present or publish that generation as fresh stereo.
+        auto invalidateCaptureTransaction = [&]() {
+            c.haveFrame_ = false;
+            c.stereoSourceValid_ = false;
+            c.BindCaptureOutput(false);
+            status.available = false;
+            status.fresh = false;
+            status.accumulatedFrames = 0;
+        };
         status.available = c.haveFrame_;
         status.lastPresentQpc = c.lastCapturePresentQpc_;
         status.lastPresentQpcLow = c.lastCapturePresentQpcLow_;
@@ -1042,11 +1052,20 @@ namespace
             return status;
         if (FAILED(hr) || !resource)
         {
-            if (hr == DXGI_ERROR_ACCESS_LOST)
+            // Release an unexpected failure-returned COM resource. An
+            // anomalous success without a resource still acquired a frame:
+            // pair it with ReleaseFrame before rebuilding duplication.
+            if (resource)
+                resource->Release();
+            if (SUCCEEDED(hr))
             {
-                c.haveFrame_ = false;
-                c.stereoSourceValid_ = false;
-                c.BindCaptureOutput(false);
+                c.duplication_->ReleaseFrame();
+                invalidateCaptureTransaction();
+            }
+            else if (hr == DXGI_ERROR_ACCESS_LOST ||
+                     hr == DXGI_ERROR_INVALID_CALL)
+            {
+                invalidateCaptureTransaction();
             }
             status.available = c.haveFrame_;
             return status;
@@ -1062,7 +1081,12 @@ namespace
                 fi.AccumulatedFrames, fi.LastPresentTime.QuadPart))
         {
             resource->Release();
-            c.duplication_->ReleaseFrame();
+            const HRESULT releaseHr = c.duplication_->ReleaseFrame();
+            if (FAILED(releaseHr))
+            {
+                invalidateCaptureTransaction();
+                return status;
+            }
             status.available = true;
             status.fresh = false;
             status.accumulatedFrames = 0;
@@ -1123,7 +1147,14 @@ namespace
             }
             texture->Release();
         }
-        c.duplication_->ReleaseFrame();
+        const HRESULT releaseHr = c.duplication_->ReleaseFrame();
+        if (FAILED(releaseHr))
+        {
+            // The copy is already queued, but cannot be declared a fresh
+            // captured desktop frame when DXGI did not release ownership.
+            invalidateCaptureTransaction();
+            return status;
+        }
 
         if (copied)
         {

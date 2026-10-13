@@ -35,7 +35,26 @@ def verify(source: str, header: str) -> None:
     ):
         assert token in gate, f"pointer event fast path missing: {token}"
     assert gate.index("resource->Release();") < gate.index("c.duplication_->ReleaseFrame();") < gate.index("return status;")
-    assert capture.count("c.duplication_->ReleaseFrame();") == 2
+    assert capture.count("c.duplication_->ReleaseFrame();") == 3
+    recovery = capture.split("auto invalidateCaptureTransaction = [&]() {", 1)[1].split("};", 1)[0]
+    for token in ("c.haveFrame_ = false;", "c.stereoSourceValid_ = false;",
+                  "c.BindCaptureOutput(false);", "status.available = false;",
+                  "status.fresh = false;", "status.accumulatedFrames = 0;"):
+        assert token in recovery
+    bad_acquire = capture.split("if (FAILED(hr) || !resource)", 1)[1].split(
+        "// Pointer-only DXGI events", 1)[0]
+    for token in ("if (resource)", "resource->Release();",
+                  "if (SUCCEEDED(hr))", "c.duplication_->ReleaseFrame();",
+                  "hr == DXGI_ERROR_ACCESS_LOST", "hr == DXGI_ERROR_INVALID_CALL",
+                  "invalidateCaptureTransaction();"):
+        assert token in bad_acquire
+    assert "const HRESULT releaseHr = c.duplication_->ReleaseFrame();" in gate
+    assert "if (FAILED(releaseHr))" in gate
+    assert "invalidateCaptureTransaction();" in gate
+    assert capture.count("if (FAILED(releaseHr))") == 2
+    final_release = capture.split("const HRESULT releaseHr = c.duplication_->ReleaseFrame();", 2)[2]
+    assert final_release.index("if (FAILED(releaseHr))") < final_release.index("if (copied)")
+    assert final_release.index("invalidateCaptureTransaction();") < final_release.index("if (copied)")
     assert "status.fresh = fi.AccumulatedFrames > 0;" in capture
     assert "OutRunVrSbsCaptureOverride::PublishProductionCapture(" in capture
     assert "R23Pixels.ScheduleSource(c);" in capture
@@ -59,8 +78,15 @@ verify(source, header)
 mutations = (
     (source.replace("status.fresh = false;", "status.fresh = true;", 1), header),
     (source.replace("c.sourceSrv_ != nullptr,", "true,", 1), header),
-    (source.replace("resource->Release();\n            c.duplication_->ReleaseFrame();",
-                    "c.duplication_->ReleaseFrame();", 1), header),
+    (source.replace("resource->Release();\n            const HRESULT releaseHr = c.duplication_->ReleaseFrame();",
+                    "const HRESULT releaseHr = c.duplication_->ReleaseFrame();", 1), header),
+    (source.replace("hr == DXGI_ERROR_ACCESS_LOST ||\n                     hr == DXGI_ERROR_INVALID_CALL",
+                    "hr == DXGI_ERROR_ACCESS_LOST", 1), header),
+    (source.replace("if (SUCCEEDED(hr))\n            {", "if (false)\n            {", 1), header),
+    (source.replace("if (FAILED(releaseHr))", "if (false)", 1), header),
+    (source.replace("if (FAILED(releaseHr))", "if (true)", 1), header),
+    (source.replace("c.BindCaptureOutput(false);\n            status.available = false;",
+                    "status.available = false;", 1), header),
     (source.replace("status.accumulatedFrames = 0;", "status.accumulatedFrames = 1;", 1), header),
     (source, header.replace("accumulatedFrames == 0 && lastPresentTime == 0",
                             "accumulatedFrames == 0")),
@@ -74,4 +100,4 @@ for i, (bad_source, bad_header) in enumerate(mutations):
     except (AssertionError, ValueError):
         continue
     raise AssertionError(f"pointer-only capture mutation {i} escaped")
-print("DX9Ex R23 pointer-only GPU-copy elision PASS (6 negative mutations)")
+print(f"DX9Ex R23 DXGI capture transaction and pointer-only reuse PASS ({len(mutations)} negative mutations)")
