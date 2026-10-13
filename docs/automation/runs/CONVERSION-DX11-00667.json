@@ -57,14 +57,15 @@
     "tools/dx11_game_rgb332_probe.cpp",
     "tools/test_dx11_native_rgb332_00667.py",
     ".github/workflows/dx11-fast-structural.yml",
-    "docs/automation/runs/CONVERSION-DX11-00667.json"
+    "docs/automation/runs/CONVERSION-DX11-00667.json",
+    "tools/test_dx11_native_extended_luminance_00663.py"
   ],
   "pipeline": {
     "C0_RECOVER": "PASS head e323a02d26d9521d8ddedcce5ee78e1178b2d02e; 00666 C6 complete; new independent RGB332 work key",
     "C1_REVIEW": "PASS R3G3B2 and A8R3G3B2 unsupported by native mirror_texture; no palette dependence",
     "C2_IMPLEMENT": "PASS source format eligibility, mip conversion, BGRA8 SRV live native Draw, fail-closed sRGB",
     "C3_VALIDATE": "PASS_EXACT_SHA: 450a6e9cf7197d0c7852dd1c0a782fa556849dce; Backend Conversion Gate, DX11 Fast Structural Checks, Build, OpenXR VR architecture and HUD Inspector SUCCESS (VR PC Fast Test Build skipped)",
-    "C4_COMMIT": "PASS material committed; validation-bearing SHA 450a6e9cf7197d0c7852dd1c0a782fa556849dce; material_result_sha preserved from existing record",
+    "C4_COMMIT": "PASS material c0c64fd38b167b8790d50c631e3e7385ab73f8d4, validation-bearing regression repair 450a6e9cf7197d0c7852dd1c0a782fa556849dce",
     "C5_PACKAGE": "NOT_REQUIRED; Quest3 not tested",
     "C6_STATE": "PASS_EXACT_SHA"
   },
@@ -76,8 +77,40 @@
     "gamepad": "UNTESTED",
     "quest3_vdxr": "UNTESTED"
   },
-  "material_result_sha": null,
+  "material_result_sha": "c0c64fd38b167b8790d50c631e3e7385ab73f8d4",
   "validation_bearing_result_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
   "result_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
-  "next_action": "C6 COMPLETE_BUILD_VERIFIED. No repeat build/CI or source modification for this TASK_ID; HMD/Quest3/VDXR/gamepad runtime UNTESTED."
+  "next_action": "C6 COMPLETE_BUILD_VERIFIED. No repeat build/CI or source modification for this TASK_ID; HMD/Quest3/VDXR/gamepad runtime UNTESTED.",
+  "ci_evidence": [
+    {
+      "name": "Backend Conversion Gate",
+      "run_id": 38374075633,
+      "head_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+      "conclusion": "success"
+    },
+    {
+      "name": "DX11 Fast Structural Checks",
+      "run_id": 38374075577,
+      "head_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+      "conclusion": "success"
+    },
+    {
+      "name": "Build",
+      "run_id": 38374081475,
+      "head_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+      "conclusion": "success"
+    },
+    {
+      "name": "OpenXR VR architecture",
+      "run_id": 38374081420,
+      "head_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+      "conclusion": "success"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38374081499,
+      "head_sha": "450a6e9cf7197d0c7852dd1c0a782fa556849dce",
+      "conclusion": "success"
+    }
+  ]
 }
