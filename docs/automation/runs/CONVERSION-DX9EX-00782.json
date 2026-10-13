@@ -1,0 +1,92 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00782",
+  "production_id": "CONVERSION-DX9EX-00782",
+  "event_id": "CONVERSION-DX9EX-00782-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "work_key": "DX9EX:VIS:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C4_COMMIT",
+  "feature_status": "SOURCE_IMPLEMENTED_EXACT_SHA_GATES_PENDING",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00782]",
+  "material_result_sha": "257799c2761d7b2ed678df25f02021d75bec0ba3",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "score_delta": 0,
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_responsive_hud_anchor.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00782.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Restore complete source-time and deferred-frame periphery geometry ownership for native original OutRun speed/time/rank HUD text without affecting protected center/GOAL/+TIME/world/menu producers.",
+    "scope_boundary": "Only original exact BA9D0 HUD text renderer and its two canonical clip/sprani append sites plus R30 semantic consumer; excludes GOAL, +TIME, ESC, F11, main-menu, lens, DX11, DXVK, SkyGlow and input.",
+    "trace_stages": [
+      "Canonical 0xBA9D0 C++ inline hook resolves exact calling RVA for OutRun HUD peripheral versus protected result/GOAL siblings.",
+      "Original immediate raster can draw before BA9D0's exact clip/sprani calls append SpriteNodes, therefore stale queue token cannot identify the direct glyph.",
+      "New bounded scoped exact owner advertises only the active direct token and restores nested state; queue-selected SpriteNode identity stays authoritative.",
+      "R30 finite binocular XYZRHW viewport/FOV/per-eye mapping uses active producer from direct or queue while protected compositing and desktop fallback remain unchanged."
+    ],
+    "subcomponents": [
+      "Source-time direct glyph semantic and exact producer owner with scoped state restoration, narrow VR predicate and preserved original call.",
+      "Queued clip and sprani children retain prior append tags, explicit effective producer selects live queue token over direct token in replay.",
+      "Integrated source regression protects destructive mutations of direct/queue precedence, domain boundaries and full Win32 DX9Ex build."
+    ],
+    "acceptance_items": [
+      {
+        "id": "HUD_SOURCE_AND_QUEUE_PARITY",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_text_direct_and_deferred",
+        "expected_behavior": "BA9D0 immediate speed/rank/time text is ScreenHud and eligible for existing R30 responsive anchors, while its clip/sprani deferred children keep exact prior queue producer."
+      },
+      {
+        "id": "HUD_NO_SEMANTIC_LEAK",
+        "category": "fallback_regression",
+        "behavior_area": "nested_queue_and_unrelated_producers",
+        "expected_behavior": "Queue depth wins over direct source token, nested direct producers restore previous token, desktop game/GOAL/+TIME/world/F11/menu semantics remain unchanged."
+      },
+      {
+        "id": "HUD_EXACT_SHA_BUILD",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_host_package_and_domain",
+        "expected_behavior": "Python focused source/negative regression and exact validation-bearing SHA DX9Ex Active game/host/package, Domain Isolation and Full Source Impact GitHub Actions success; HMD separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "HUD_SOURCE_AND_QUEUE_PARITY": "PENDING_EXACT_SHA",
+    "HUD_NO_SEMANTIC_LEAK": "PENDING_EXACT_SHA",
+    "HUD_EXACT_SHA_BUILD": "PENDING_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "Quest3 user HUD positioned too centrally and tiny at 3440x1440 desktop and 2496x2688 XR eye; OutRunHudTextProducer_dest emitted exact queue tokens but lacked a scoped token for synchronous glyph submission.",
+    "root_cause": "The queue-only CurrentSpriteQueueProducer token could not identify direct glyph draw submissions before SpriteNode append; scoped screen ownership alone cannot trigger narrow responsive peripheral grouping.",
+    "alternatives_rejected": [
+      "Do not infer edge alignment from arbitrary screen coordinates or promote GOAL/+TIME/world sprites to screen-peripheral.",
+      "Do not overwrite the queue producer globally because stale nodes and nested original draws require distinct authority."
+    ],
+    "source_trace": [
+      "Original BA9D0 source-callsite classifier recognizes three peripheral ranges and excludes the GOAL/result source map.",
+      "Original clip and sprani wrappers register all deferred nodes with exact ScreenHud producer provenance.",
+      "Scoped direct source owner now carries producer identity only outside queue; R30 picks active producer before source XYZRHW per-eye placement."
+    ],
+    "eye_ownership": "Viewport, FOV containment, symmetric horizontal displacement and bilateral bounds protection remain in R30; new selector changes only exact source ownership for qualifying original glyph draws.",
+    "fix_evidence": "Source commit 257799c2 implements separate direct token RAII and queue-precedence selector. Current commit adds run contract and negative regression assertions.",
+    "negative_test_evidence": "Existing R30 numeric 4:3/16:9/21:9 plus Quest3 extent, negative producer mutation and new direct/queue/nesting-destructive source cases; exact workflows pending.",
+    "unresolved": "Real Quest3/VDXR optical parity, legibility and game-frame pacing not established by source CI. Inspect matching build on HMD."
+  },
+  "blocked_reason": "INITIAL_POLICY_GATE_MISSING_RUN_RECORD_REPAIR_IN_VALIDATION_SHA"
+}

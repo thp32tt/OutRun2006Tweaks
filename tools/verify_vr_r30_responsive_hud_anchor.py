@@ -844,6 +844,15 @@ for x in ("semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud",
     assert x in direct, x
 assert direct.index("directHudOwner.emplace(") < direct.index("OutRunHudTextProducerHook.call(")
 assert direct.index("OutRunHudTextProducerHook.call(") < direct.index("OutRunHudPeripheralText = previousPeripheral;")
+# Both original BA9D0 emitters stay on their exact queued-SpriteNode path
+# even if direct glyph raster occurs during the enclosing C++ CALL.
+assert direct.count("ProducerToken::OutRunHudPeripheralText") == 2
+assert direct.count("ProducerToken::OutRunHudText") == 2
+assert direct.count("OutRunHudTextProducerHook.call(") == 1
+assert "if (Settings::VREnabled &&" in direct
+assert "R30GetExactHudEdgeAnchor(" in code
+assert "CurrentRenderProducerToken() !=" in code
+
 def select(depth, queue, direct):
     return queue if depth else direct
 assert select(0, "stale_goal", "peripheral") == "peripheral"
