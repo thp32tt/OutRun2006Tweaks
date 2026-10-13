@@ -23,7 +23,10 @@ REQUIRED = {
     "bool supported_game_state(": [
         "GetRenderState(D3DRS_SRCBLEND, &src)",
         "GetRenderState(D3DRS_DESTBLEND, &dst)",
-        "blendOp != D3DBLENDOP_ADD || separate",
+        "if (separate != FALSE) {",
+        "!native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,",
+        "output.separateAlphaBlend = true;",
+        "if (blendOp != D3DBLENDOP_ADD) {",
         "const bool additive = src == D3DBLEND_ONE && dst == D3DBLEND_ONE;",
         "const bool sourceAlphaAdd = src == D3DBLEND_SRCALPHA",
         "!additive && !sourceAlphaAdd) return false;",
@@ -76,6 +79,10 @@ def main():
         ("dev->CreateBlendState(&blend, s.additiveBlend.GetAddressOf())", "dev->CreateBlendState(&blend, s.alphaBlend.GetAddressOf())"),
         ("dev->CreateBlendState(&blend, s.sourceAlphaAddBlend.GetAddressOf())", "dev->CreateBlendState(&blend, s.alphaBlend.GetAddressOf())"),
         ("const bool additive = src == D3DBLEND_ONE && dst == D3DBLEND_ONE;", "const bool additive = src == D3DBLEND_ONE || dst == D3DBLEND_ONE;"),
+        // 00689 expanded real game separate-alpha without changing legacy
+        // 00596 RGB blend modes. Mutation must break live producer admission.
+        ("!native_game_separate_alpha(srcAlpha, dstAlpha, opAlpha,", "/* separate-alpha source validation lost */ false &&"),
+        ("output.separateAlphaBlend = true;", "output.separateAlphaBlend = false;"),
         ("!additive && !sourceAlphaAdd) return false;", "false) return false;"),
         ("output.additiveBlend = additive;", "output.additiveBlend = false;"),
         ("output.sourceAlphaAddBlend = sourceAlphaAdd;", "output.sourceAlphaAddBlend = false;"),
