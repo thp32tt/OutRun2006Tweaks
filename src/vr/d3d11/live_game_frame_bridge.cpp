@@ -128,7 +128,9 @@ constexpr bool native_game_separate_alpha_contract() noexcept {
             D3DBLENDOP_REVSUBTRACT, src, dst, op) ||
         src != D3D11_BLEND_SRC_ALPHA || dst != D3D11_BLEND_DEST_ALPHA ||
         op != D3D11_BLEND_OP_REV_SUBTRACT) return false;
-    const auto oldSrc = src, oldDst = dst, oldOp = op;
+    const auto oldSrc = src;
+    const auto oldDst = dst;
+    const auto oldOp = op;
     return !native_game_separate_alpha(D3DBLEND_SRCALPHASAT, D3DBLEND_ONE,
                 D3DBLENDOP_ADD, src, dst, op) &&
            !native_game_separate_alpha(D3DBLEND_ONE, D3DBLEND_ONE,
