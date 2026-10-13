@@ -41,6 +41,23 @@ constexpr std::uint32_t kGameFvfTexcoordSize1_4 = 0x03000000u;
 constexpr std::uint32_t kGameFvfTexcoordSize1_5 = 0x0c000000u;
 constexpr std::uint32_t kGameFvfTexcoordSize1_6 = 0x30000000u;
 constexpr std::uint32_t kGameFvfTexcoordSize1_7 = 0xc0000000u;
+// Real untextured D3D9 menu/vehicle-select FVF DIFFUSE stage semantics.
+// COLOROP=DISABLE also disables alpha and all subsequent stages; in enabled
+// color operations ALPHAOP=DISABLE is undefined and is never admitted.
+constexpr bool game_fvf_untextured_stage0(
+    std::uint32_t op, std::uint32_t arg1, std::uint32_t arg2,
+    std::uint32_t alphaOp, std::uint32_t alpha1, std::uint32_t alpha2,
+    std::uint32_t nextOp, bool diffuse) noexcept {
+    if (!diffuse) return false;
+    if (op == 1u) return nextOp == 1u;
+    const bool rgb = (op == 2u && (arg1 == 0u || arg1 == 1u)) ||
+                     (op == 3u && (arg2 == 0u || arg2 == 1u));
+    const bool a = (alphaOp == 2u && (alpha1 == 0u || alpha1 == 1u)) ||
+                   (alphaOp == 3u && (alpha2 == 0u || alpha2 == 1u));
+    return rgb && a;
+}
+static_assert(game_fvf_untextured_stage0(1, ~0u, ~0u, 4, ~0u, ~0u, 1, true));
+static_assert(!game_fvf_untextured_stage0(1, 0, 0, 4, 0, 0, 4, true));
 struct GameFvfLayout {
     bool pretransformed = false;
     bool textured = false;

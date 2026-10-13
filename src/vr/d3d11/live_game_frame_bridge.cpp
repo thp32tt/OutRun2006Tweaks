@@ -1997,17 +1997,12 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAARG1, &alphaArg1)) ||
             FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAARG2, &alphaArg2)))
             return false;
-        const bool rgbDiffuse =
-            (op == D3DTOP_SELECTARG1 &&
-             (arg == D3DTA_DIFFUSE || arg == D3DTA_CURRENT)) ||
-            (op == D3DTOP_SELECTARG2 &&
-             (arg2 == D3DTA_DIFFUSE || arg2 == D3DTA_CURRENT));
-        const bool alphaDiffuse =
-            (alphaOp == D3DTOP_SELECTARG1 &&
-             (alphaArg1 == D3DTA_DIFFUSE || alphaArg1 == D3DTA_CURRENT)) ||
-            (alphaOp == D3DTOP_SELECTARG2 &&
-             (alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT));
-        if (!rgbDiffuse || !alphaDiffuse) return false;
+        // D3D9 stage-0 COLOROP DISABLE ends downstream texture stages
+        // and implicitly disables alpha, leaving the vertex diffuse RGBA.
+        // Connect real untextured menu/car-selection FVF to native Draw.
+        if (!game_fvf_untextured_stage0(
+                op, arg, arg2, alphaOp, alphaArg1, alphaArg2,
+                nextColorOp, layout.hasDiffuse)) return false;
     }
     if (capture.enabled) {
         DWORD arg2=0, alphaOp=0, alphaArg1=0, alphaArg2=0;

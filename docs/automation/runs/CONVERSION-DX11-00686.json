@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00686",
+  "production_id": "CONVERSION-DX11-00686",
+  "event_id": "CONVERSION-DX11-00686-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "ChatGPT2",
+  "work_key": "DX11:MENU_CAR_UNTEXTURED_NATIVE_DRAW",
+  "feature_id": "MENU_CAR_UNTEXTURED_NATIVE_DRAW",
+  "status": "MATERIAL_COMMITTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Actual D3D9 FVF DIFFUSE and stage0 state captured from menu/car draw",
+      "Native shader RGB/alpha mapping to D3D11 Draw and DrawIndexed",
+      "Fenced GPU native backbuffer diagnostic inset on D3D9 Present with original gamepad fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_fvf_layout.hpp",
+      "tools/dx11_untextured_game_probe_00686.cpp",
+      "tools/test_dx11_untextured_draw_00686.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++17 source FVF RGBA packing and valid stage0 disabled/selector matrix",
+      "negative_regression": "Missing diffuse, invalid alpha, complement, stage1 activation fail closed and original D3D9 input survives",
+      "component_integration": "D3D9 live state and vertices to native pixel shader to Draw/Indexed and current readback Present"
+    },
+    "conflict_keys": [
+      "DX11:MENU_CAR_UNTEXTURED_NATIVE_DRAW",
+      "tools/dx11_untextured_game_probe_00686.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Diagnostic untextured menu and car selection Draw admitted to native indexed/linear GPU; Quest3 image not tested.",
+    "activation_guard_and_fallback": "Native gameplay remains opt-in only; original DX9Ex Draw, Present and gamepad untouched."
+  },
+  "feature_contract": {
+    "feature_id": "MENU_CAR_UNTEXTURED_NATIVE_DRAW",
+    "goal": "Extend native game frame from fixed-function game menu through car selection by translating real untextured stage0 disabled vertex diffuse RGBA to D3D11 native Draw/Indexed, preserving input fallback.",
+    "acceptance_items": [
+      {
+        "id": "menu-car-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_fvf_stage0",
+        "expected_behavior": "Original untextured D3D9 FVF menu and vehicle selection Draw and DrawIndexed diffuse RGBA reaches native D3D11 shader and GPU."
+      },
+      {
+        "id": "gamepad-dx9ex-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_input_and_fallback",
+        "expected_behavior": "Unsupported missing diffuse, later texture stage, complemented arguments or undefined alpha mode retains D3D9 Draw/Present/gamepad."
+      },
+      {
+        "id": "same-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_visible_output_and_ci",
+        "expected_behavior": "Real FVF decoding and stage0 C++17 positive/negative cases, source integration regressions and required same SHA GitHub CI."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "menu-car-draw": "PENDING_EXACT_SHA",
+    "gamepad-dx9ex-fallback": "PENDING_EXACT_SHA",
+    "same-sha-gates": "PENDING_EXACT_SHA"
+  },
+  "base_head_sha": "f7288d3bae14b6492c847f9db54a4fa502561f6a",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_fvf_layout.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_untextured_game_probe_00686.cpp",
+    "tools/test_dx11_untextured_draw_00686.py",
+    "docs/automation/runs/CONVERSION-DX11-00686.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS HEAD and 00685 C6 confirmed",
+    "C1_REVIEW": "PASS fixed-function disabled stage excludes native menu",
+    "C2_IMPLEMENT": "PASS source integration and portable C++ probe",
+    "C3_VALIDATE": "PENDING exact SHA CI",
+    "C4_COMMIT": "MATERIAL_RESULT",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING"
+  },
+  "next_action": "Verify same-SHA mandatory GitHub Actions and fix failures in task; Quest3/HMD remains UNTESTED."
+}
