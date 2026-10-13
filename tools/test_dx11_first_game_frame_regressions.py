@@ -174,21 +174,32 @@ def main() -> None:
             "untranslated native raster/output state was not rejected: " + original
         )
 
-    # A static guard plus a deterministic negative mutation for sampling.
-    # It is not GPU/Quest3 evidence. Each frame is still limited to one
-    # native submit but cannot permanently pick only the first eligible Draw.
+    # Default diagnostic still samples exactly one rotating game Draw.
+    # A second explicit opt-in has independent fail-closed eight-Draw limits.
     sampling = (
         "const UINT candidateOrdinal = s.eligibleThisFrame++;",
         "++s.eligible;",
-        "if (s.attempted || candidateOrdinal != s.probeSlot) return;",
+        "s.frameBatch.accepts(candidateOrdinal, s.probeSlot,",
+        "env_batch_opt_in())) return;",
         "const UINT window = (std::min)(s.eligibleThisFrame, kProbeSlots);",
         "s.probeSlot = window ? (s.probeSlot + 1u) % window : 0u;",
         "s.eligibleThisFrame = 0;",
+        "s.frameBatch.reset();",
     )
     assert all(item in bridge for item in sampling)
-    broken = bridge.replace("candidateOrdinal != s.probeSlot",
-                            "candidateOrdinal != 0u", 1)
-    assert broken != bridge and sampling[2] not in broken
+    broken = bridge.replace("env_batch_opt_in())) return;",
+                            "true)) return;", 1)
+    assert broken != bridge and sampling[3] not in broken
+    assert "s.probeSlot = 0;" in bridge
+    batch = (ROOT / "src/vr/d3d11/native_game_frame_batch.hpp").read_text()
+    for invariant in ("kMaxDraws = 8u", "if (stopped) return false;",
+                      "if (!multi) return submitted == 0u && ordinal == slot;",
+                      "return submitted < kMaxDraws && ordinal >= slot;",
+                      "return !depth || depthDirection == 0u ||"):
+        assert invariant in batch
+    assert "kMaxDraws = 8u" not in batch.replace("kMaxDraws = 8u",
+                                                 "kMaxDraws = 0u", 1)
+    # Rotation reaches eligible menu, vehicle selection and race candidates.
     slot = 0
     chosen = []
     for _ in range(8):
@@ -198,7 +209,6 @@ def main() -> None:
         chosen.extend(hits)
         slot = (slot + 1) % min(population, 64)
     assert chosen == [0, 1, 2, 0, 1, 2, 0, 1]
-    assert "s.probeSlot = 0;" in bridge  # Reset and failure rollback
 
     # UpdateSurface requires identical source/destination formats, no MSAA,
     # and an entirely in-bounds rectangle. The game's backbuffer can be X8.

@@ -3626,6 +3626,13 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         ++s.eligible;
         if (!s.frameBatch.accepts(candidateOrdinal, s.probeSlot,
                                   env_batch_opt_in())) return;
+        // A second depth draw with reversed Z direction cannot share the
+        // previous native diagnostic DSV; fail closed, original D3D9 survives.
+        if (!s.frameBatch.accepts_depth(output.nativeDepthTest,
+                                        output.nativeDepthOrderingMode != 0u)) {
+            s.frameBatch.abort();
+            return;
+        }
         if (indexCount && (!indices || indexCount != expectedElements ||
                            vertexCount > kMaxVertices))
             return;
@@ -3653,7 +3660,9 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                                      type, capture, output);
         }
         // One failed native submission terminates only this diagnostic batch.
-        if (nativeSubmitted) s.frameBatch.succeeded(output.nativeDepthTest);
+        if (nativeSubmitted)
+            s.frameBatch.succeeded(output.nativeDepthTest,
+                                   output.nativeDepthOrderingMode != 0u);
         else { s.frameBatch.abort(); ++s.failed; }
     } catch (...) {
         // Never interrupt the game's real draw or input on diagnostic failure.

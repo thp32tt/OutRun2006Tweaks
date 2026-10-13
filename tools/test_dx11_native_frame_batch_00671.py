@@ -11,7 +11,9 @@ for marker in ('#include "native_game_frame_batch.hpp"',
  'OUTRUN_DX11_FRAME_BATCH', 's.frameBatch.accepts(candidateOrdinal, s.probeSlot,',
  'if (s.frameBatch.first_draw()) s.backend.begin_frame(kBackground);',
  'if (s.frameBatch.clear_depth())', 's.frameBatch.succeeded(output.nativeDepthTest)',
- 's.frameBatch.abort()', 's.frameBatch.reset()'):
+ 's.frameBatch.abort()', 's.frameBatch.reset()',
+ 's.frameBatch.accepts_depth(output.nativeDepthTest,',
+ 'output.nativeDepthOrderingMode != 0u'):
     assert marker in src, marker
 assert "s.attempted" not in src
 assert src.count("s.backend.begin_frame(kBackground)") == 1

@@ -29,11 +29,12 @@
       "src/vr/d3d11/live_game_frame_bridge.cpp",
       "src/vr/d3d11/native_game_frame_batch.hpp",
       "tools/dx11_native_frame_batch_probe.cpp",
-      "tools/test_dx11_native_frame_batch_00671.py"
+      "tools/test_dx11_native_frame_batch_00671.py",
+      "depth-order direction integration in native frame"
     ],
     "acceptance_proof": {
       "positive_probe": "C++17 admission, first frame color and depth clear, 8 draw limit",
-      "negative_regression": "destructive kMaxDraws=1 mutant must fail",
+      "negative_regression": "8-to-1 draw mutant must fail; reject direction-incompatible Z comparisons between game native Draw calls",
       "component_integration": "real Draw/DrawIndexed->same native target->one Present readback"
     },
     "conflict_keys": [
@@ -43,21 +44,27 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
     "visible_frame_acceptance": "NEED_HMD_TEST; menu/vehicle/race pixels unverified",
-    "activation_guard_and_fallback": "both OUTRUN_DX11_FIRST_GAME_FRAME=1 and OUTRUN_DX11_FRAME_BATCH=1; D3D9 Draw/Present and gamepad input original"
+    "activation_guard_and_fallback": "both OUTRUN_DX11_FIRST_GAME_FRAME=1 and OUTRUN_DX11_FRAME_BATCH=1; D3D9 Draw/Present and gamepad input original",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ]
   },
   "changed_files": [
-    "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_frame_batch.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tools/dx11_native_frame_batch_probe.cpp",
     "tools/test_dx11_native_frame_batch_00671.py",
-    ".github/workflows/dx11-fast-structural.yml",
-    "docs/automation/runs/CONVERSION-DX11-00671.json"
+    "docs/automation/runs/CONVERSION-DX11-00671.json",
+    "tools/verify_dx11_first_game_frame_boundary.py",
+    "tools/test_dx11_first_game_frame_regressions.py"
   ],
   "pipeline": {
     "C0_RECOVER": "PASS",
     "C1_REVIEW": "single native Draw per Present prevented menu/race element composition",
     "C2_IMPLEMENT": "bounded opt-in live native multi-Draw C++",
-    "C3_VALIDATE": "PENDING_EXACT_SHA_CI",
+    "C3_VALIDATE": "REPAIR_POLICY_METADATA_AND_BOUNDED_COMPOSITOR_CONTRACT_PENDING_GATE",
     "C4_COMMIT": "MATERIAL_COMMIT",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_EXACT_SHA"
@@ -68,7 +75,9 @@
     "compile_build": "PENDING_GITHUB_BUILD",
     "game_visual_parity": "NEED_HMD_TEST",
     "gamepad": "UNTESTED",
-    "quest3_vdxr": "UNTESTED"
+    "quest3_vdxr": "UNTESTED",
+    "first_fast": "FAILED_POLICY_MISSING_LIVE_GAME_DRAW_PATH",
+    "first_build_gate": "FAILED_EXISTING_SINGLE_DRAW_BOUNDARY_STATIC_GUARD"
   },
   "material_result_sha": null,
   "validation_bearing_result_sha": null,

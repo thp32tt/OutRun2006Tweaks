@@ -7,6 +7,8 @@ struct GameNativeFrameBatch {
     std::uint32_t submitted = 0u;
     bool stopped = false;
     bool depthReady = false;
+    // Inset Z accumulation cannot mix forward and reverse D3D9 comparisons.
+    std::uint32_t depthDirection = 0u;
     constexpr bool accepts(std::uint32_t ordinal, std::uint32_t slot,
                            bool multi) const noexcept {
         if (stopped) return false;
@@ -15,12 +17,21 @@ struct GameNativeFrameBatch {
     }
     constexpr bool first_draw() const noexcept { return submitted == 0u; }
     constexpr bool clear_depth() const noexcept { return !depthReady; }
-    constexpr void succeeded(bool depth) noexcept {
-        ++submitted; if (depth) depthReady = true;
+    constexpr bool accepts_depth(bool depth, bool reversed) const noexcept {
+        return !depth || depthDirection == 0u ||
+               depthDirection == (reversed ? 2u : 1u);
+    }
+    constexpr void succeeded(bool depth, bool reversed = false) noexcept {
+        ++submitted;
+        if (depth) {
+            depthReady = true;
+            depthDirection = reversed ? 2u : 1u;
+        }
     }
     constexpr void abort() noexcept { stopped = true; }
     constexpr void reset() noexcept {
         submitted = 0u; stopped = false; depthReady = false;
+        depthDirection = 0u;
     }
 };
 } // namespace outrun::vr::dx11::live_game_frame

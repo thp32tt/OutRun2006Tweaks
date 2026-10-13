@@ -121,12 +121,28 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     scoped = re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", match.group(1))
     require(len(dispatch) == len(scoped) == 2,
             "native Draw escapes the explicitly admitted diagnostic submit")
-    require("s.attempted = true;" in code and
-            "if (s.attempted || candidateOrdinal != s.probeSlot) return;" in code and
-            "const UINT candidateOrdinal = s.eligibleThisFrame++;" in code and
+    # Production behavior is still one sampled game Draw. An additional
+    # exact opt-in can composite at most eight game-authored Draws; verify BOTH
+    # opt-ins, the bounded admission, and one color/Z initialization per frame.
+    batch_source = (DX11.parent / "native_game_frame_batch.hpp").read_text(encoding="utf-8")
+    require("const UINT candidateOrdinal = s.eligibleThisFrame++;" in code and
             "const UINT window = (std::min)(s.eligibleThisFrame, kProbeSlots);" in code and
-            "s.probeSlot = window ? (s.probeSlot + 1u) % window : 0u;" in code,
-            "must bound native GPU work to one sampled live Draw per game frame")
+            "s.probeSlot = window ? (s.probeSlot + 1u) % window : 0u;" in code and
+            'GetEnvironmentVariableW(L"OUTRUN_DX11_FIRST_GAME_FRAME"' in code and
+            'GetEnvironmentVariableW(L"OUTRUN_DX11_FRAME_BATCH"' in code and
+            "s.frameBatch.accepts(candidateOrdinal, s.probeSlot," in code and
+            "env_batch_opt_in())) return;" in code and
+            "if (s.frameBatch.first_draw()) s.backend.begin_frame(kBackground);" in code and
+            "if (s.frameBatch.clear_depth())" in code and
+            "s.frameBatch.accepts_depth(output.nativeDepthTest," in code and
+            "s.frameBatch.abort();" in code and
+            code.count("s.frameBatch.reset();") >= 3 and
+            "static constexpr std::uint32_t kMaxDraws = 8u;" in batch_source and
+            "if (!multi) return submitted == 0u && ordinal == slot;" in batch_source and
+            "return submitted < kMaxDraws && ordinal >= slot;" in batch_source and
+            "if (stopped) return false;" in batch_source and
+            "return !depth || depthDirection == 0u ||" in batch_source,
+            "must preserve default single Draw, double opt-in, bounded native GPU work and Z isolation")
     require("return R30PresentR29Hook.stdcall<HRESULT>(" in caller,
             "game Present must retain the D3D9 path")
 

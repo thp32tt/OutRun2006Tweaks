@@ -21,6 +21,15 @@ int main() {
     }
     assert(!b.accepts(13,5,true) && b.submitted==8u && !b.clear_depth());
     b.reset();
+    assert(b.accepts_depth(true,false) && b.accepts_depth(true,true));
+    b.succeeded(true,false);
+    assert(b.accepts_depth(true,false));
+    assert(!b.accepts_depth(true,true));
+    assert(b.accepts_depth(false,true));
+    b.reset();
+    b.succeeded(true,true);
+    assert(b.accepts_depth(true,true) && !b.accepts_depth(true,false));
+    b.reset();
     b.succeeded(true); b.abort();
     assert(!b.accepts(1,0,true));
     b.reset();
