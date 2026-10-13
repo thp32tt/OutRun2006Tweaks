@@ -11,9 +11,9 @@
   "work_key": "DX11:LIVE_GAME_Z_READ_ONLY_NATIVE_DSV",
   "feature_id": "MENU_TO_RACE_NATIVE_FRAME",
   "base_head_sha": "6393da180ed727249c085af05ac2551320e05b1b",
-  "status": "C4_MATERIAL_SUBMITTED",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -60,13 +60,14 @@
     "C0_RECOVER": "PASS",
     "C1_REVIEW": "PASS: depth-read-only Draw absent",
     "C2_IMPLEMENT": "SOURCE_AND_REGRESSION_READY",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "PENDING",
+    "C3_VALIDATE": "PASS_EXACT_SHA",
+    "C4_COMMIT": "PASS",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING"
+    "C6_STATE": "PASS_EXACT_SHA"
   },
   "packaging": {
     "status": "NOT_REQUIRED"
   },
-  "next_action": "Collect exact-SHA Backend Conversion Gate, DX11 Fast Structural, Windows Build, OpenXR/HUD outcomes; keep runtime UNTESTED."
+  "next_action": "C6 complete: exact-SHA GitHub CI SUCCESS; HMD/game runtime validation remains UNTESTED.",
+  "validation_bearing_result_sha": "4310c0ce4aedc63864d39a7e6e110b75dd045114"
 }
