@@ -240,8 +240,14 @@ def check_projection(renderer: str, semantic: str) -> None:
     contain = renderer[end:renderer.index("bool R30TransformHudScissor(", end)]
     assert "const float userScale = R30HudScopeScale();" in contain
     assert "R30HudContain.userScale == userScale" in contain
-    assert "scaleY = userScale / sourceOverTarget;" in contain
-    assert "scaleX = userScale * sourceOverTarget;" in contain
+    # F11 must not borrow the ESC optical boost, and that difference is
+    # part of the contain cache identity across the same Present.
+    assert "const bool pauseResponsive = R30IsPauseMenuElement() &&" in contain
+    assert "R30HudContain.pauseResponsive == pauseResponsive" in contain
+    assert "OutRunVrPauseEye::ResponsiveMenuScale(" in contain
+    assert "userScale, sourceOverTarget, pauseResponsive);" in contain
+    assert "scaleY = opticalScale / sourceOverTarget;" in contain
+    assert "scaleX = opticalScale * sourceOverTarget;" in contain
     for marker in (
         "inline thread_local unsigned ExternalOverlaySemanticDepth = 0;",
         "++ExternalOverlaySemanticDepth;",
@@ -260,6 +266,10 @@ def check_projection_mutations(renderer: str, semantic: str) -> None:
          "const float userScale = R30HudScaleValue();"),
         ("R30HudContain.userScale == userScale",
          "R30HudContain.userScale == 1.0f"),
+        ("R30HudContain.pauseResponsive == pauseResponsive",
+         "R30HudContain.pauseResponsive == true"),
+        ("userScale, sourceOverTarget, pauseResponsive);",
+         "userScale, sourceOverTarget, true);"),
     )
     # Mutate the owning function, never an earlier unrelated occurrence
     # of a generic token (e.g. 'return 1.0f;' in the aspect helper).
