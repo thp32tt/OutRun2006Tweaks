@@ -25,7 +25,9 @@ int main() {
             }
         }
     }
-    for (std::uint32_t bad : {0u, 1u, 8u, 9u, 12u, 255u})
+    // The stage-1 alpha fade family admits op 12/14/16; retain genuinely
+    // unsupported operations and source selectors as negative cases.
+    for (std::uint32_t bad : {0u, 1u, 8u, 9u, 13u, 15u, 17u, 255u})
         if (stage1_combiner_supported(bad,kStage1Current,kStage1Factor))
             return 2;
     if (!stage1_alpha_supported(kStage1Disable,0xffu,0xffu) ||
