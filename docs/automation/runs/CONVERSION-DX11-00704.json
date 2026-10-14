@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "feature_id": "GAME_STAGE1_CROSS_CHANNEL_RGB_MENU_RACE",
   "work_key": "DX11:GAME_STAGE1_CROSS_CHANNEL_RGB",
-  "status": "IMPLEMENTED_PENDING_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -77,13 +77,13 @@
     ]
   },
   "acceptance_results": {
-    "live-cross-channel-rgb": "PENDING_GATE",
-    "independent-alpha-fallback": "PENDING_GATE",
-    "integrated-build-gates": "PENDING_GATE"
+    "live-cross-channel-rgb": "PASS",
+    "independent-alpha-fallback": "PASS",
+    "integrated-build-gates": "PASS"
   },
   "base_head_sha": "79c372403010ae88858e4d34881f0cbc57e69441",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "a3e03fc8829cafe510a4ab4d288efd83f686cc81",
+  "validation_bearing_result_sha": "a3e03fc8829cafe510a4ab4d288efd83f686cc81",
   "changed_files": [
     "src/vr/d3d11/live_game_stage1_factor.hpp",
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -96,11 +96,37 @@
     "C0_RECOVER": "DONE preceding 00703 complete; 00704 unowned",
     "C1_REVIEW": "DONE documented D3D9 COLOROP-only missing Stage1 18..21",
     "C2_IMPLEMENT": "DONE CPU admission and native HLSL integration with focused probes",
-    "C3_VALIDATE": "PENDING exact SHA Actions; HMD unavailable",
-    "C4_COMMIT": "PENDING atomic material CAS",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Fast #38492231485, Backend #38492231534, Win32 Build #38492238363, OpenXR #38492238367, HUD #38492238354 all SUCCESS at a3e03fc8829cafe510a4ab4d288efd83f686cc81. Quest3/VDXR and gamepad UNTESTED",
+    "C4_COMMIT": "PASS: material 6 file SHA a3e03fc8829cafe510a4ab4d288efd83f686cc81 without CI-skip, exact SHA 5/5 Gates",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING exact SHA gates"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: 5/5 exact-SHA Gates SUCCESS; C6 separate [skip ci] bookkeeping; no HMD/gamepad validation"
   },
-  "next_action": "Verify all exact-SHA GitHub CI; repair failure under same TASK_ID; do not promote runtime without Quest3 tests",
-  "state_persisted": true
+  "next_action": "Feature BUILD_VERIFIED. Controller choose new non-overlapping DX11 native rendering/input feature. Do not rerun/score this TASK_ID; Quest3/VDXR runtime remains UNTESTED.",
+  "state_persisted": true,
+  "gate_evidence": {
+    "validation_bearing_sha": "a3e03fc8829cafe510a4ab4d288efd83f686cc81",
+    "exact_sha": true,
+    "dx11_fast_structural_checks": {
+      "id": 38492231485,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38492231534,
+      "conclusion": "SUCCESS"
+    },
+    "windows_build": {
+      "id": 38492238363,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38492238367,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38492238354,
+      "conclusion": "SUCCESS"
+    },
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  }
 }
