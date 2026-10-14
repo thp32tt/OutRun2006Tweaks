@@ -961,6 +961,48 @@ namespace OutRunVRStereo
     // F11 is compiled even in the default R26 safe-draw comparison, where
     // the R29 owner translation unit does not exist. Both chains include R23.
     // Export only two published sizes, never a shared-memory pointer or owner.
+    // Read one complete OpenXR host publication while source geometry changes.
+    // Both R26 comparison and R29 full backend compile this common R23 owner.
+    bool R23TryGetPublishedEyeExtentPair(std::uint32_t out[4]) noexcept
+    {
+        if (!out)
+            return false;
+        out[0] = out[1] = out[2] = out[3] = 0;
+        const auto* shared = SharedState;
+        if (!shared)
+            return false;
+        for (unsigned attempt = 0; attempt < 4u; ++attempt)
+        {
+            const std::uint32_t before = shared->sequence;
+            if (before & 1u)
+                continue;
+            MemoryBarrier();
+            const auto magic = shared->magic;
+            const auto version = shared->protocolVersion;
+            const auto size = shared->structSize;
+            const auto lw = shared->recommendedWidth[0];
+            const auto lh = shared->recommendedHeight[0];
+            const auto rw = shared->recommendedWidth[1];
+            const auto rh = shared->recommendedHeight[1];
+            MemoryBarrier();
+            const std::uint32_t after = shared->sequence;
+            if (before != after || (after & 1u))
+                continue;
+            if (magic != OutRunVR::SharedMagic ||
+                version != OutRunVR::SharedProtocolVersion ||
+                size != sizeof(OutRunVR::SharedPoseState) ||
+                lw < 640u || lh < 480u || rw < 640u || rh < 480u ||
+                lw > 8192u || lh > 8192u || rw > 8192u || rh > 8192u)
+                return false;
+            out[0] = lw;
+            out[1] = lh;
+            out[2] = rw;
+            out[3] = rh;
+            return true;
+        }
+        return false;
+    }
+
     bool R23TryGetPublishedEyeExtent(std::uint32_t eye,
         std::uint32_t& width, std::uint32_t& height) noexcept
     {

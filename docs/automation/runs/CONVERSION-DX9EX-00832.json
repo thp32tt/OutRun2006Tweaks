@@ -1,0 +1,81 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00832",
+  "production_id": "CONVERSION-DX9EX-00832",
+  "event_id": "CONVERSION-DX9EX-00832-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "feature_id": "DX9EX:VIS:F11_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:F11_MENU",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "phase": "C2_IMPLEMENT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:F11_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+    "goal": "Complete F11 menu font-density and control layout resilience to XR resize/recenter while preserving readable glyph raster, gameplay/menu focus, inputs, persistent font settings and desktop fallback.",
+    "scope_boundary": "R23 common binocular XR extent reader and ImGui F11 density consumer only; does not modify gameplay HUD, ESC, world, SkyGlow, FFB, DX11 or DXVK.",
+    "trace_stages": [
+      "XR host publishes recommended widths and heights for both eyes inside a shared pose seqlock.",
+      "R23 common R26/R29 game bridge reads one complete even-sequence four-field XR publication.",
+      "F11 EndScene chooses ImGui font glyph density, uploads D3D9 atlas and displays through external UI eye projection."
+    ],
+    "subcomponents": [
+      "Introduce coherent pair-size R23 API, valid in R26 safe-comparison and full R29 backends, with odd-sequence retry and bounds checks.",
+      "Consume pair atomically for F11 atlas density without losing existing 10 percent geometry guard, reset retention or desktop font size; extend active mutation gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "F11_ATLAS_COHERENT",
+        "category": "end_to_end_behavior",
+        "behavior_area": "f11_font_atlas",
+        "expected_behavior": "No mixed-generation F11 atlas rebuild at resize/recenter; use only coherent binocular XR extents."
+      },
+      {
+        "id": "F11_TRANSITIONS_SAFE",
+        "category": "fallback_regression",
+        "behavior_area": "reset_desktop_input",
+        "expected_behavior": "Bad/odd host publication retains current VR atlas while original desktop close, shell hitboxes and focus remain unchanged."
+      },
+      {
+        "id": "WIN32_EXACT_SHA",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_host",
+        "expected_behavior": "Same result SHA must pass DX9Ex Active host/game/package and Domain Isolation and source-impact gates."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "F11 independently queried R23 left/right eye extents; a 10% geometric tolerance can still accept values from different host publication generations.",
+    "source_trace": [
+      "XR host publishes four eye extents between sequence even/odd generation boundaries.",
+      "F11 EndScene reads separate left/right values with a heuristic that cannot prove one publication.",
+      "A plausible mixed pair changes ImGui font density bucket and forces GPU atlas texture rebuild even without a true coherent resize."
+    ],
+    "root_cause": "No generation-fenced binocular extent read existed in R23 overlay-facing API, despite HUD R29 owning a separate seqlock-safe path.",
+    "alternatives_rejected": [
+      "R29 owner API cannot be linked by the R26 safe-draw F11 comparison target.",
+      "Disabling XR-responsive atlas regeneration would regress Quest3 font legibility.",
+      "Removing the existing 10% per-eye geometry tolerance would admit malformed eye extents."
+    ],
+    "fix_evidence": "R23 provides a bounded even/unmodified-sequence pair read; F11 consumes it once per EndScene before unchanged font bucket and shell sizing logic.",
+    "negative_test_evidence": "Existing F11 destructive verifier updated for coherent pair and pinned sequence, all four axis reads, 640/480..8192 bounds and output mapping.",
+    "eye_ownership": "Both eyes now share one stable host publication epoch for F11 density; stereo transforms remain independent and unchanged."
+  },
+  "changed_files": [
+    "src/vr/core/r23_eye_extent_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "src/overlay/hooks_overlay.cpp",
+    "tools/verify_vr_f11_font_density.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00832.json"
+  ],
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; not tested on Quest3/VDXR. Optical readability, focus and frame-time acceptance pending.",
+  "base_sha": "5690753e0d136553fb07972e1ee6bb795f119c61",
+  "next_action": "Exact-SHA Win32 Active, Domain Isolation and Full Source Impact required; repair failures on this task without new score."
+}

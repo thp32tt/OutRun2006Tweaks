@@ -382,12 +382,15 @@ class D3DHooks : public Hook
 					Game::screen_resolution->x > 0 &&
 					Game::screen_resolution->y > 0)
 				{
-				std::uint32_t lw = 0, lh = 0, rw = 0, rh = 0;
-				if (OutRunVRStereo::R23TryGetPublishedEyeExtent(0, lw, lh) &&
-					OutRunVRStereo::R23TryGetPublishedEyeExtent(1, rw, rh) &&
+				std::uint32_t extent[4]{};
+                const bool extentPairValid =
+                    OutRunVRStereo::R23TryGetPublishedEyeExtentPair(extent);
+                const std::uint32_t lw = extent[0], lh = extent[1];
+                const std::uint32_t rw = extent[2], rh = extent[3];
+                if (extentPairValid &&
 					lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u &&
-					// Eye extents are published separately during a VDXR resize.
-					// Never mix one new eye with one stale eye to rebuild the
+					// Host generations are now atomic. Independently reject
+                    // geometrically inconsistent extents before rebuilding the
 					// full Segoe/DX9 atlas. Retain the last VR atlas until both
 					// dimensions converge; this is a transient frame, not a
 					// real source/eye aspect change.

@@ -41,8 +41,8 @@ def check(hook: str, font: str, header: str) -> None:
     for target, needles in (
         (density_guard, (
             "f11VisibleThisFrame && Game::is_vr_gameplay_presentation()",
-            "R23TryGetPublishedEyeExtent(0, lw, lh)",
-            "R23TryGetPublishedEyeExtent(1, rw, rh)",
+            "R23TryGetPublishedEyeExtentPair(extent)",
+            "R23TryGetPublishedEyeExtentPair(extent)",
             "lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u",
             "std::isfinite(factor) && factor > 0.0f",
             "std::ceil(factor * 4.0f) * 0.25f, 1.0f, 3.0f",
@@ -306,7 +306,7 @@ def check_transient_eye_extent_dropout(hook: str) -> None:
     assert retain.replace("\\n", "\n").replace("\\t", "\t") in density
     assert (density.index("f11VisibleThisFrame && Game::is_vr_gameplay_presentation()") <
             density.index(retain.replace("\\n", "\n").replace("\\t", "\t")) <
-            density.index("R23TryGetPublishedEyeExtent(0, lw, lh)"))
+            density.index("R23TryGetPublishedEyeExtentPair(extent)"))
     assert "float vrFontMultiplier = 1.0f;" in hook
     assert "lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u" in density
     assert "if (Overlay::VrFontMultiplier != vrFontMultiplier)" in density
@@ -471,7 +471,7 @@ def check_stereo_extent_coherence(hook: str) -> None:
     """Mixed XR resize snapshots cannot produce a transient blurry F11 atlas."""
     density = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
         "// A new atlas needs a new font texture.", 1)[0]
-    owner = density[density.index("R23TryGetPublishedEyeExtent(0, lw, lh)"):
+    owner = density[density.index("R23TryGetPublishedEyeExtentPair(extent)"):
                     density.index("const float sourceAspect")]
     guards = (
         "lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u",
@@ -843,7 +843,7 @@ def check_source_reset_atlas_hold(hook: str) -> None:
               ).replace("\\n", "\n").replace("\\t", "\t")
     assert area.count(active) == area.count(size) == area.count(retain) == 1
     assert area.index(active) < area.index(retain) < area.index(size)
-    assert area.index(size) < area.index("R23TryGetPublishedEyeExtent(0, lw, lh)")
+    assert area.index(size) < area.index("R23TryGetPublishedEyeExtentPair(extent)")
     def density(predicted, vr, source_ok, previous, factor):
         if not predicted or not vr:
             return 1.0
@@ -867,7 +867,7 @@ def check_first_visible_f11_frame(hook: str) -> None:
         "overlayActive = Overlay::render();")
     assert "if (f11VisibleThisFrame && Game::is_vr_gameplay_presentation())" in hook
     density = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
-        "R23TryGetPublishedEyeExtent(0, lw, lh)", 1)[0]
+        "R23TryGetPublishedEyeExtentPair(extent)", 1)[0]
     assert "InputManager_ModActionHeld(ModAction::OverlayToggle)" not in density
     assert "overlayActive &&" not in density
     assert "Game::screen_resolution &&" in density
@@ -1095,6 +1095,36 @@ def main():
     assert "R29OwnerRecommendedEyeExtent" not in hook
     assert "R23TryGetPublishedEyeExtent(" in common
     assert "bool R23TryGetPublishedEyeExtent(" in api
+    assert "bool R23TryGetPublishedEyeExtentPair(std::uint32_t out[4]) noexcept;" in api
+    assert "R23TryGetPublishedEyeExtentPair(extent)" in hook
+    pair = common.split("bool R23TryGetPublishedEyeExtentPair(", 1)[1].split(
+        "bool R23TryGetPublishedEyeExtent(", 1)[0]
+    paired_guards = (
+        "out[0] = out[1] = out[2] = out[3] = 0;",
+        "const std::uint32_t before = shared->sequence;",
+        "if (before & 1u)",
+        "MemoryBarrier();",
+        "const std::uint32_t after = shared->sequence;",
+        "if (before != after || (after & 1u))",
+        "shared->recommendedWidth[0]", "shared->recommendedHeight[0]",
+        "shared->recommendedWidth[1]", "shared->recommendedHeight[1]",
+        "size != sizeof(OutRunVR::SharedPoseState)",
+        "lw < 640u || lh < 480u || rw < 640u || rh < 480u",
+        "lw > 8192u || lh > 8192u || rw > 8192u || rh > 8192u",
+        "out[0] = lw;", "out[1] = lh;", "out[2] = rw;", "out[3] = rh;"
+    )
+    for required in paired_guards:
+        assert required in pair, "unsafe R23 pair snapshot: " + required
+    for required, mutant in (
+        ("if (before & 1u)", "if (false)"),
+        ("if (before != after || (after & 1u))", "if (false)"),
+        ("out[2] = rw;", "out[2] = lw;"),
+        ("out[3] = rh;", "out[3] = lh;"),
+        ("size != sizeof(OutRunVR::SharedPoseState)", "false"),
+    ):
+        broken = pair.replace(required, mutant, 1)
+        assert required in pair and required not in broken, (
+            "R23 source destructive mutation did not touch the owner")
     assert "SharedState->structSize != sizeof(OutRunVR::SharedPoseState)" in common
     assert "SharedState->recommendedWidth[eye]" in common
     assert "SharedState->recommendedHeight[eye]" in common
@@ -1108,7 +1138,7 @@ def main():
     mutations = (
         (hook, "f11VisibleThisFrame && Game::is_vr_gameplay_presentation()",
          "overlayActive || Game::is_vr_gameplay_presentation()", font, header),
-        (hook, "R23TryGetPublishedEyeExtent(1, rw, rh)",
+        (hook, "R23TryGetPublishedEyeExtentPair(extent)",
          "true", font, header),
         (hook, "Overlay::FontsDirty = true;",
          "Overlay::FontsDirty = false;", font, header),
