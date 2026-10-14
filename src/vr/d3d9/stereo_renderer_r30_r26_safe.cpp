@@ -12,6 +12,7 @@
 // perspective effects remain entirely owned by R29/R13.
 
 #include "stereo_renderer_r26.cpp"
+#include "lens_centre_source_provenance.hpp"
 #include "vr/game/render_semantics.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
@@ -30,6 +31,7 @@ namespace Settings
 
 namespace OutRunVRRenderer
 {
+    std::uint64_t GetLastGameWvpLensCentreCallEpoch() noexcept;
     bool GetLastRawGameWvpWrite(float outConstants[16],
         std::uint64_t& writeSerial, std::uint64_t& topLevelDrawSerial,
         std::uintptr_t& shaderIdentity, std::uint64_t& shaderSerial) noexcept;
@@ -1910,6 +1912,41 @@ namespace OutRunVRStereo
             return true;
         }
 
+
+        // Strict original-game C993 source proof. The same shader, short draw
+        // distance, or a live (possibly already head-injected) GPU c64 do not
+        // establish which original sun/halo uploaded these constants.
+        bool R30GetExactLensCentreRawWvp(float out[16]) noexcept
+        {
+            using namespace OutRunVR::GameSemantic;
+            if (!out || QueueRenderActive() ||
+                EffectiveScope() != RenderScope::WorldBillboard ||
+                CurrentRenderProducerToken() != ProducerToken::LensFlareCentre)
+                return false;
+            std::uint64_t writeSerial = 0, writeDraw = 0;
+            std::uintptr_t writeShader = 0, currentShader = 0;
+            std::uint64_t writeShaderEpoch = 0, currentShaderEpoch = 0;
+            RenderScope sourceScope = RenderScope::None;
+            std::uint64_t queueEpoch = 0;
+            const void* queueNode = nullptr;
+            ProducerToken sourceProducer = ProducerToken::None;
+            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                    out, writeSerial, writeDraw, writeShader, writeShaderEpoch) ||
+                !OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                    sourceScope, queueEpoch, queueNode, sourceProducer) ||
+                !GetCurrentShaderEpoch(currentShader, currentShaderEpoch))
+                return false;
+            return OutRunVR::LensCentre::OwnsRawWvp({
+                CurrentLensCentreCallEpoch,
+                OutRunVRRenderer::GetLastGameWvpLensCentreCallEpoch(),
+                TopLevelDrawSerial() + 1u, writeDraw,
+                currentShader, writeShader, currentShaderEpoch, writeShaderEpoch,
+                sourceScope == RenderScope::WorldBillboard,
+                sourceProducer == ProducerToken::LensFlareCentre,
+                queueNode == nullptr
+            });
+        }
+
         enum class R44OverlayMatrixKind : std::uint8_t
         {
             Unknown,
@@ -2183,6 +2220,15 @@ namespace OutRunVRStereo
                     if (R28CanRebindVerifiedWorld(
                             device, reboundShader, reboundSerial))
                         return R30ScreenSpaceKind::None;
+                    // Only a raw c64 from THIS original D3A5 central sun
+                    // may enter the packaged R26+HUD R30 stereo eye transform.
+                    if (OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                            OutRunVR::GameSemantic::ProducerToken::LensFlareCentre)
+                    {
+                        float ownedRaw[16]{};
+                        if (!R30GetExactLensCentreRawWvp(ownedRaw))
+                            return R30ScreenSpaceKind::None;
+                    }
                     ++R44SpatialBillboardClassifications;
                     return R30ScreenSpaceKind::WorldBillboard;
                 }
@@ -4252,7 +4298,18 @@ namespace OutRunVRStereo
                 // R44: glyph/billboard batches commonly reuse one game c64 for
                 // several consecutive draws. Use the original game upload, not
                 // a live register that may already contain our head correction.
-                if (!R44GetOwnedRawOverlayWvp(original))
+                // Central lens must never rebuild WorldView from live c64
+                // left behind by an earlier eye or a different alpha object.
+                const bool exactCentre =
+                    screenKind == R30ScreenSpaceKind::WorldBillboard &&
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                        OutRunVR::GameSemantic::ProducerToken::LensFlareCentre;
+                if (exactCentre)
+                {
+                    if (!R30GetExactLensCentreRawWvp(original))
+                        return false;
+                }
+                else if (!R44GetOwnedRawOverlayWvp(original))
                 {
                     if (screenKind == R30ScreenSpaceKind::PerspectiveHud)
                     {

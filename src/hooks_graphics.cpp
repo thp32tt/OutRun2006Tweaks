@@ -333,6 +333,9 @@ class VRLensFlareProjected2D : public Hook
     inline static thread_local unsigned LensCentreOwnerDepth = 0;
     inline static thread_local OutRunVR::GameSemantic::RenderScope
         LensCentreSavedScope = OutRunVR::GameSemantic::RenderScope::None;
+    inline static thread_local OutRunVR::GameSemantic::ProducerToken
+        LensCentreSavedProducer = OutRunVR::GameSemantic::ProducerToken::None;
+    inline static thread_local std::uint64_t LensCentreSavedEpoch = 0;
 
     static void LensCentreEnter(safetyhook::Context&)
     {
@@ -349,6 +352,14 @@ class VRLensFlareProjected2D : public Hook
             return;
         LensCentreOwnerDepth = LensCentreDepth;
         LensCentreSavedScope = OutRunVR::GameSemantic::CurrentScope;
+        LensCentreSavedProducer = OutRunVR::GameSemantic::CurrentDirectExactProducer;
+        LensCentreSavedEpoch = OutRunVR::GameSemantic::CurrentLensCentreCallEpoch;
+        auto& next = OutRunVR::GameSemantic::NextLensCentreCallEpoch;
+        if (++next == 0)
+            ++next;
+        OutRunVR::GameSemantic::CurrentLensCentreCallEpoch = next;
+        OutRunVR::GameSemantic::CurrentDirectExactProducer =
+            OutRunVR::GameSemantic::ProducerToken::LensFlareCentre;
         OutRunVR::GameSemantic::CurrentScope =
             OutRunVR::GameSemantic::RenderScope::WorldBillboard;
     }
@@ -365,6 +376,10 @@ class VRLensFlareProjected2D : public Hook
         if (LensCentreOwnerDepth == LensCentreDepth)
         {
             OutRunVR::GameSemantic::CurrentScope = LensCentreSavedScope;
+            OutRunVR::GameSemantic::CurrentDirectExactProducer = LensCentreSavedProducer;
+            OutRunVR::GameSemantic::CurrentLensCentreCallEpoch = LensCentreSavedEpoch;
+            LensCentreSavedProducer = OutRunVR::GameSemantic::ProducerToken::None;
+            LensCentreSavedEpoch = 0;
             LensCentreSavedScope =
                 OutRunVR::GameSemantic::RenderScope::None;
             LensCentreOwnerDepth = 0;
@@ -425,7 +440,10 @@ class VRLensFlareProjected2D : public Hook
         // Keep its token intact for the original later owner, and leave all
         // C993 desktop/non-centre calls unchanged when centreScope is None.
         OutRunVR::GameSemantic::ScopedExactProducerSemantic semantic(
-            centreScope, nullptr, true);
+            centreScope, nullptr, true,
+            centreScope != OutRunVR::GameSemantic::RenderScope::None
+                ? OutRunVR::GameSemantic::ProducerToken::LensFlareCentre
+                : OutRunVR::GameSemantic::ProducerToken::None);
         // The exact token is one-shot. Retain the centre's world scope for
         // ALL nested GPU draws, then restore the previous SceneEffect owner.
         // When this is not our centre, preserve the original caller scope.

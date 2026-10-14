@@ -181,7 +181,8 @@ namespace OutRunVRRenderer
 			OutRunVR::GameSemantic::RenderScope::None;
 		std::uint64_t LastGameWvpQueueNodeEpoch = 0;
 		const void* LastGameWvpQueueNode = nullptr;
-		OutRunVR::GameSemantic::ProducerToken LastGameWvpProducerToken =
+		std::uint64_t LastGameWvpLensCentreCallEpoch = 0;
+	OutRunVR::GameSemantic::ProducerToken LastGameWvpProducerToken =
 			OutRunVR::GameSemantic::ProducerToken::None;
 		std::uint32_t LoggedProducerC64Mask = 0;
 
@@ -1560,6 +1561,7 @@ namespace OutRunVRRenderer
 			LastGameWvpSemanticScope = OutRunVR::GameSemantic::RenderScope::None;
 			LastGameWvpQueueNodeEpoch = 0;
 			LastGameWvpQueueNode = nullptr;
+			LastGameWvpLensCentreCallEpoch = 0;
 			LastGameWvpProducerToken =
 				OutRunVR::GameSemantic::ProducerToken::None;
 		}
@@ -1593,8 +1595,14 @@ namespace OutRunVRRenderer
 				OutRunVR::GameSemantic::CurrentQueueNodeEpoch();
 			LastGameWvpQueueNode =
 				OutRunVR::GameSemantic::CurrentQueueNode();
+			// Queue nodes win over direct callers; capture direct C993 WVP too.
 			LastGameWvpProducerToken =
-				OutRunVR::GameSemantic::CurrentQueueProducerToken();
+				OutRunVR::GameSemantic::CurrentRenderProducerToken();
+			LastGameWvpLensCentreCallEpoch =
+				LastGameWvpProducerToken ==
+					OutRunVR::GameSemantic::ProducerToken::LensFlareCentre &&
+				!OutRunVR::GameSemantic::QueueRenderActive()
+				? OutRunVR::GameSemantic::CurrentLensCentreCallEpoch : 0;
 			LastGameWvpWriteValid = true;
 
 			if (Settings::VRTelemetry &&
@@ -2039,6 +2047,11 @@ namespace OutRunVRRenderer
 		queueNode = LastGameWvpQueueNode;
 		producerToken = LastGameWvpProducerToken;
 		return true;
+	}
+
+	std::uint64_t GetLastGameWvpLensCentreCallEpoch() noexcept
+	{
+		return LastGameWvpWriteValid ? LastGameWvpLensCentreCallEpoch : 0;
 	}
 
 	bool GetLastRawGameWvpWrite(float outConstants[16],

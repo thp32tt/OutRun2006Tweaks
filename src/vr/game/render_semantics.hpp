@@ -80,6 +80,7 @@ namespace OutRunVR::GameSemantic
         DispRankClipSprite,
         // Append-only: retain existing numeric producer tokens in IPC/debug logs.
         OutRunHudPeripheralText,
+        LensFlareCentre, // Exact D3A5 -> C993 central sun, never CABE discs.
     };
 
     inline thread_local RenderScope CurrentScope = RenderScope::None;
@@ -127,6 +128,7 @@ namespace OutRunVR::GameSemantic
         case ProducerToken::GoalTime020: return "GOAL_TIME_HELPER_020";
         case ProducerToken::GoalTime150: return "GOAL_TIME_HELPER_150";
         case ProducerToken::DispRankClipSprite: return "DISPRANK_KIND0_CLIP";
+        case ProducerToken::LensFlareCentre: return "LENS_FLARE_CENTRE_C993";
         default: return "NONE";
         }
     }
@@ -346,6 +348,10 @@ namespace OutRunVR::GameSemantic
     // exist. Its token must never overwrite the active queue cursor.
     inline thread_local ProducerToken CurrentDirectExactProducer =
         ProducerToken::None;
+    // Source-call identity: raw c64 from a previous identical shader is not
+    // owned by this original central sun. Each D3A5 invocation gets an epoch.
+    inline thread_local std::uint64_t CurrentLensCentreCallEpoch = 0;
+    inline thread_local std::uint64_t NextLensCentreCallEpoch = 0;
     inline thread_local ProjectedMarkerInfo CurrentQueueProjectedMarker{};
 
     inline const void* CurrentQueueNode() noexcept

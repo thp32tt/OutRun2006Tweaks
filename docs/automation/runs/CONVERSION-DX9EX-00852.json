@@ -1,0 +1,88 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00852",
+  "production_id": "CONVERSION-DX9EX-00852",
+  "event_id": "CONVERSION-DX9EX-00852-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00852",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Restore original central sun's finite world binocular ownership without duplicating head correction, accepting WVP from prior sun/outer halos, or hiding any effects.",
+    "scope_boundary": "Exact D3A5 parent to C993 central object 0x570002 only; preserve CABE outer halo, SkyGlow, other HUD, original game Draw, FFB/input and separate DX11/DXVK branches.",
+    "trace_stages": [
+      "Exact original EXE D3A5 central source and C993 object owner with reentrant call epoch.",
+      "Raw game WVP c64 setter records direct producer, original shader epoch and corresponding original parent epoch.",
+      "Actual packaged R26+HUD renderer reconstructs world per-eye correction only from call-proven original c64, else lower draw fallback."
+    ],
+    "subcomponents": [
+      "Restore direct parent producer lifetime across c64 source recording and exact C993 draw.",
+      "Use same-call, original shader, draw-age and queue-free proof for the actual packaged R26+HUD world-eye stereo.",
+      "Reject stale and unproven matrices without replacing world, halo, UI, SkyGlow or original game raster."
+    ],
+    "acceptance_items": [
+      {
+        "id": "source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original producer and source c64 lifetime",
+        "expected_behavior": "D3A5 and C993 share a unique epoch recorded at original WVP write and restored on nested or VR-disabled leave."
+      },
+      {
+        "id": "stereo",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R26 HUD packaged stereo and fallback",
+        "expected_behavior": "Exact centre uses raw source world matrix for both eyes; unproven central raw never triggers unsafe live-c64 repeated head inverse."
+      },
+      {
+        "id": "negative",
+        "category": "fallback_regression",
+        "behavior_area": "Outer halo and cross-frame negative test",
+        "expected_behavior": "Age 128 passes with same source; 129, prior sun, shader switch, queued sprite and outer disc fail."
+      },
+      {
+        "id": "exactsha",
+        "category": "integrated_validation",
+        "behavior_area": "Game host package Domain and impact",
+        "expected_behavior": "Exact SHA Windows x86 game+x64 host+package, Domain and applicable tests green; HMD reported separately."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "R26+HUD R30 WorldBillboard fallback reads live c64 after the owned raw 12-draw window; original c64 recorder captured queue producer only, so C993 direct owner was lost.",
+    "source_trace": [
+      "D3A5 call pairs with D3AA around sub_40C980 and exact C993 draw of 0x570002.",
+      "Source raw WVP upload recorded shader and scope but only queue producer token.",
+      "R30 WorldBillboard per-eye WorldView rebuild could reread live GPU c64 after earlier eye injection."
+    ],
+    "root_cause": "Exact central call identity was missing from original WVP provenance, allowing unrelated recent/same shader c64 or live already-injected c64 to be treated as a fresh central-sun world transform.",
+    "alternatives_rejected": [
+      "Do not install duplicate C993 hook or modify outer CABE halo geometry.",
+      "Increasing raw c64 age alone lacks object provenance; alpha state is not centre identity.",
+      "Do not globally suppress effects, flush unrelated D3DX or alter VR head pose."
+    ],
+    "fix_evidence": "D3A5 parent epoch/direct producer captured at original c64 write; packaged R30 validates source epoch, producer, queue/shader/draw and consumes raw c64 only.",
+    "negative_test_evidence": "11 C++ constexpr positive/negative test conditions compile with packaged R26+HUD owner at identical SHA.",
+    "eye_ownership": "Proven raw original WorldView receives the existing single head inverse and per-eye transform; unproven raw falls to existing lower original raster route."
+  },
+  "status": "IMPLEMENTED_VALIDATION_PENDING",
+  "phase": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "No actual matching Quest3/VDXR game runtime evidence. Central dot's visual acceptance requires matching installed DLL and runtime log.",
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_graphics.cpp",
+    "src/vr/game/outrun_renderer.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00852.json"
+  ],
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "score_once": false
+}
