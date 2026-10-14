@@ -1,0 +1,100 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00826",
+  "production_id": "CONVERSION-DX9EX-00826",
+  "event_id": "CONVERSION-DX9EX-00826-E001",
+  "event_type": "material_validation_pending",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R30_TELEMETRY_COUNTER_OPT_OUT",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R30_TELEMETRY_COUNTER_OPT_OUT",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C4_MATERIAL_C3_REGRESSION_VERIFIER_PENDING_EXACT_SHA",
+  "automation_validation": "STATIC_SOURCE_CHECK_ONLY_CI_PENDING",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00826]",
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R30_TELEMETRY_COUNTER_OPT_OUT",
+    "goal": "Eliminate all diagnostic-only R30 counter cache-line writes from the disabled-telemetry stereo CPU-shadow, XYZRHW and SkyGlow paths without changing visible stereo, game state or the enabled statistics.",
+    "scope_boundary": "Only R30 diagnostic counters on DX9Ex. No game/eye projection math, SkyGlow effect processing, DX11, DXVK, menu, FFB, transport or resource ownership changes.",
+    "special_work_evidence": "Remote R30 source at task dispatch had 33 unconditional shared counter increments in CPU-shadow Lock/Unlock/Draw and XYZRHW/ScreenSpace per-primitive fallback paths, despite Present reporting telemetry only under VRTelemetry. Predictable redundant writes and possible cache-line contention are removed; FPS/p95 benefit must be measured on hardware separately.",
+    "trace_stages": [
+      "Original OutRun D3D9 CPU buffer and UI/world draw submits write shadow bytes and per-primitive XYZRHW stereo decisions.",
+      "R30 buffers, stereo world/HUD/ScreenSpace fallback and SkyGlow update purely diagnostic shared counter totals at each invocation.",
+      "R30 Present reports the counters every five seconds only with VRTelemetry enabled; OpenXR eye composition and actual game drawing remain unchanged."
+    ],
+    "subcomponents": [
+      "Retain all 16 stereo, shadow and SkyGlow counter sites under a single telemetry-enabled writer, with no writes on the off route.",
+      "Retain equal enabled-telemetry counts and original Present report, while preserving the original fallback, world stereo and SkyGlow pipelines.",
+      "Deterministically reject raw increment, missing counter call, forced-always-on writer and forced Present logging mutations."
+    ],
+    "acceptance_items": [
+      {
+        "id": "OFF_ROUTE_NO_DIAGNOSTIC_WRITES",
+        "category": "end_to_end_behavior",
+        "behavior_area": "vb_ib_shadow_xyzrhw_skyglow",
+        "expected_behavior": "All 33 diagnostic-only updates across 16 counters bypass their writes when VRTelemetry is disabled."
+      },
+      {
+        "id": "ENABLED_ROUTE_AND_NEGATIVES",
+        "category": "fallback_regression",
+        "behavior_area": "telemetry_state_and_negative_mutations",
+        "expected_behavior": "Enabled logging retains every original counter and report, while guard removal/raw updates/lost routes trigger deterministic verifier failures."
+      },
+      {
+        "id": "WIN32_EXACT_SHA",
+        "category": "integrated_validation",
+        "behavior_area": "game_host_package_ci",
+        "expected_behavior": "Exact-SHA DX9Ex Active policy, host, full-chain Win32 game compile and package plus Domain Isolation and material source impact complete without CI skip."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "OFF_ROUTE_NO_DIAGNOSTIC_WRITES": "STATIC_SOURCE_MATCH_PENDING_CI",
+    "ENABLED_ROUTE_AND_NEGATIVES": "VERIFY_SCRIPT_PENDING_CI",
+    "WIN32_EXACT_SHA": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "16 R30 diagnostic counters were incremented 33 times throughout CPU-shadow and stereo draw paths even when Settings::VRTelemetry was false; output uses a guarded five-second Present report.",
+    "source_trace": [
+      "CPU Lock/Unlock and shadow hit/miss use plain shared counters while synthesizing CPU copies of VB and IB data.",
+      "R30 per-eye XYZRHW world/HUD and ScreenSpace fallback branches increment diagnostics before subsequent stereo or fail-closed routing.",
+      "R30 SkyGlow success/failure updates diagnostic totals separately from the actual optical two-eye composite and Present telemetry report."
+    ],
+    "root_cause": "Instrumentation counters were not gated at their producer sites. Disabling the Present report alone did not stop hot-path diagnostic writes.",
+    "alternatives_rejected": [
+      "Suppressing only the Present log does not eliminate per-draw counter writes; that was already in place.",
+      "Disabling stereo classification or SkyGlow processing would change visuals and falsely improve performance.",
+      "Replacing counters with atomics would increase expensive writes on the off route, not remove them."
+    ],
+    "fix_evidence": "One R30RecordTelemetryCounter helper gates updates for all 16 diagnostic counters; 33 source increments are replaced without touching rendering decisions or resource lifetimes.",
+    "negative_test_evidence": "Four destructive source mutations cover disabled guard, raw shadow increment, dropped XYZRHW fallback and removed Present opt-out; exact-SHA CI still pending.",
+    "eye_ownership": "Original left/right game draws, direct transport, native HUD/ScreenSpace eye affine, SkyGlow and world-depth ownership are unchanged."
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_telemetry_counter_optout.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00826.json"
+  ],
+  "base_sha": "412a57529c525d941a898f1d4fe792b2af7a9b6a",
+  "material_result_sha": "f86c22ca2914dbf8458b60dedf0d588222a741ba",
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "ci_evidence": {
+    "dx9ex_active": {
+      "status": "PENDING"
+    },
+    "domain_isolation": {
+      "status": "PENDING"
+    },
+    "full_source_impact": {
+      "status": "PENDING"
+    }
+  },
+  "runtime_gate": "No Quest3 / VDXR headset, screenshot or FPS frame pacing test was run. RUNTIME_VALIDATION=UNTESTED.",
+  "next_action": "Integrate focused negative verifier into canonical exact-SHA policy gate; inspect full Win32 host/game/package, Domain, Full Source Impact on the same validation-bearing SHA. Correct actual failure under task 00826. Do not count score or claim speedup until successful gates."
+}
