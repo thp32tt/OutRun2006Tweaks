@@ -334,6 +334,8 @@ def verify_up_single_pass(source):
     )
     assert all(token not in body for token in forbidden)
     assert body.count("for (UINT i = 0; i < indexCount; ++i)") == 3
+    assert body.count("device, type, 0u, numVertices,") == 2
+    assert body.count("primitiveCount, drawIndexData, indexFormat,") == 2
 
     # Destructive source mutations must invalidate the static contract rather
     # than silently restoring the old absolute-base scratch/upload behavior.
@@ -357,9 +359,15 @@ def verify_up_single_pass(source):
         ("primitiveCount, drawIndexData, indexFormat,",
          "primitiveCount, indexData, indexFormat,"),
     )
+    repeated_eye_tokens = {
+        "device, type, 0u, numVertices,",
+        "primitiveCount, drawIndexData, indexFormat,",
+    }
     for original, broken in mutations:
         assert original in body, original
-        mutant = body.replace(original, broken, 1)
+        mutant = (body.replace(original, broken)
+                  if original in repeated_eye_tokens
+                  else body.replace(original, broken, 1))
         assert not all(token in mutant for token in required), original
 
     def old_accept(indices, minimum, count):
