@@ -1,3 +1,15 @@
+## 2026-10-15 C-SALVAGE 오프라인 자동화 추가 — 운영 배포는 사용자 수동
+
+신규 생산자 \`C\`는 ChatGPT ImageGen을 호출하지 않는 **별도 오프라인 파일 복구 작업자**이다. 기존 A/B 브라우저 생산과 C1 독립 QA **3탭/분별 dispatch는 변경하지 않는다**. C2도 재활성화하지 않는다.
+
+- 실행 코드: \`tools/localization/c_salvage_worker.py\`, \`c_salvage_plate.py\`, \`c_salvage_compose.py\`; SHA 고정 입력/중복방지, PSD 우선 검색 및 선택 레이어를 사용한 CLEAN 후보, PSD 부재 시 검수된 영문 제거 마스크와 정본 HD DDS 기반 투명 배경 CLEAN, 읽기 방향 좌표 합성, 지원 BGRA32 단일 mip 시험 DDS. 불투명 배경·불명확한 마스크·비지원 DDS 압축·이미지 원본 부재는 HOLD 처리.
+- Portainer 추가 서비스는 \`docker/localization-production/portainer-git-c-salvage.override.yml\`이며 독립 볼륨 입력 read-only/출력 rw, 자체 네트워크 없음, CPU 제한, **사용자가 기존 Git 기반 Stack 확인 후 수동 Pull and redeploy한 때부터 30분/최대 10개 자동 실행**. GitHub commit이나 GitHub 테스트 워크플로 자체는 배포가 아니다.
+- 기존 사용자 A/B 이미지 출력 변경·게임 패치 적용·QA 상태 자동 승격·ImageGen 추가 시도 금지. C가 산출한 레이어/플레이트/중간 DDS는 \`TEST_ONLY\`; 독립 C1 및 고위험 C3, 사용자 실게임까지 분리.
+- 정확한 준비·배포·검증 지침: \`docs/OUTRUN_C_SALVAGE_AUTOMATION_MANUAL_DEPLOY_20261015.md\`.
+- 실제 Portainer build/redeploy와 live DDS·실기 전체 체인은 검증 전까지 \`UNTESTED\`.
+
+---
+
 ## 2026-10-13 11:03 KST 사용자 운영 경로 확정: Portainer ← GitHub
 
 운영 Docker lifecycle은 Portainer가 관리하며 GitHub가 정책 정본이다. q217 단건 A 이미지 생성 smoke의 최신 전달 정본은 `docs/OUTRUN_PORTAINER_GITHUB_DELIVERY_20261013.md`. 기존 Git 연결 Stack인 경우 Portainer의 지정 Git repository/ref/Compose path가 실제 반영 경로이며 사용자가 **Portainer에서 수동 Pull and redeploy** 한다. 기존 `deploy_plate_controller.py --stage`는 레거시 비Git Stack 지원 수단일 뿐 이 경로의 필수 단계로 제시하지 않는다. 현 브랜치의 Portainer base Compose와 사용 중 이미지/입력 PNG 자동 공급이 확인되지 않았으므로 GitHub 정책 commit만으로 live 이미지 첨부·ImageGen이 작동한다고 주장하지 않는다. 단건 Compose override는 기존 Git Stack에만 선택 적용하며 다른 Stack·볼륨/서비스/이미지를 훼손하지 않는다. 실제 upload/generation/DDS/game은 증거 전까지 UNTESTED. Portainer 자동 GitOps 재배포는 사용자 수동 배포 승인과 별개다.
