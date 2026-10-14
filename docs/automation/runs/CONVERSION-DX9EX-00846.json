@@ -3,7 +3,7 @@
   "task_id": "CONVERSION-DX9EX-00846",
   "production_id": "CONVERSION-DX9EX-00846",
   "event_id": "CONVERSION-DX9EX-00846-E001",
-  "event_type": "dispatch",
+  "event_type": "c6_result_only",
   "run_key": "CONVERSION-DX9EX-00846",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
@@ -67,13 +67,13 @@
     "negative_test_evidence": "Portable C++ static assertions, Python routing negative/mutation cases and fail-closed PowerShell feature-record runner guards.",
     "eye_ownership": "F11 remains an external ScreenOverlay2D ImGui composition, not an original game sprite; this edit changes only input ownership, not the already existing per-eye rendering transform."
   },
-  "status": "C3_VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "material_result_sha": "6322fdca342bad6946833d498fec5016e80853b4",
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "validation_bearing_result_sha": "1ccc1d78461b27bd40272682a1f1f52ef8f015b2",
+  "result_sha": "1ccc1d78461b27bd40272682a1f1f52ef8f015b2",
   "changed_files": [
     "src/overlay/f11_input_routing.hpp",
     "src/overlay/hooks_overlay.cpp",
@@ -82,11 +82,36 @@
     "tools/test_vr_feature_unit_policy.py"
   ],
   "acceptance_results": {
-    "f11_input": "SOURCE_VERIFIED",
-    "f11_layout": "INTEGRATED_PREEXISTING_NEED_HMD_TEST",
-    "f11_fallback": "STATIC_REGRESSION_ADDED",
-    "f11_exact_sha": "PENDING"
+    "f11_input": "PASS",
+    "f11_layout": "PASS_BUILD",
+    "f11_fallback": "PASS",
+    "f11_exact_sha": "PASS_EXACT_SHA"
   },
-  "runtime_evidence": "OutRun2006 and Quest3/VDXR HMD gameplay were not exercised in this session. Functional and binocular correctness cannot be asserted.",
-  "controller_note": "The first material SHA 6322fdca has a swallowed intermediate PowerShell policy error for a missing run record. This update supplies that record and makes every feature verifier exit fail-closed. Only a new exact SHA where all required Windows jobs pass is validation-bearing."
+  "runtime_evidence": "NO on-device OutRun 2006/Quest3/VDXR test. Binocular F11 optics and gameplay input remain RUNTIME_VALIDATION=UNTESTED until matching hardware evidence.",
+  "controller_note": "The final exact validation-bearing result commit is 1ccc1d78461b27bd40272682a1f1f52ef8f015b2. C6 bookkeeping uses skip-ci separately. Do not rerun, rescore or conflate the C6 SHA with the material/validated SHA.",
+  "checkpoint": "C6_STATE",
+  "ci_evidence": {
+    "exact_sha": "1ccc1d78461b27bd40272682a1f1f52ef8f015b2",
+    "active_validation": {
+      "run_id": 38583836873,
+      "conclusion": "SUCCESS",
+      "jobs": "policy/game/full-chain-compile/host/package 5/5 SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38583836846,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38583836895,
+      "conclusion": "SUCCESS",
+      "jobs": "static-exe-analysis/build-hud-inspector 2/2 SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38583836858,
+      "conclusion": "SUCCESS",
+      "jobs": "source-cross-domain/msvc-analyze-active-game/msvc-analyze-openxr-host 3/3 SUCCESS"
+    }
+  },
+  "score_once": true,
+  "c6_score_delta": 0
 }
