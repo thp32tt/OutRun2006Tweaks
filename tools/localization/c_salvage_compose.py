@@ -191,7 +191,8 @@ def encode_bgra_single_mip_if_exact(source, native):
     width, height = native.size
     if struct.unpack_from("<I", source, 4)[0] != 124:
         return None
-    h, w, mips = struct.unpack_from("<III", source, 12)
+    h, w = struct.unpack_from("<II", source, 12)
+    mips = struct.unpack_from("<I", source, 28)[0]
     pf_size, pf_flags = struct.unpack_from("<II", source, 76)
     fourcc = source[84:88]
     depth = struct.unpack_from("<I", source, 88)[0]
