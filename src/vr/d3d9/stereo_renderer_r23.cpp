@@ -14,6 +14,7 @@
 
 #include "stereo_renderer_r22.cpp"
 #include "../core/r23_eye_extent_api.hpp"
+#include "../ipc/qpc_freshness.hpp"
 #include <cstddef>
 
 namespace OutRunVRStereo
@@ -688,8 +689,13 @@ namespace OutRunVRStereo
             if (!QueryPerformanceCounter(&now) ||
                 frequency <= 0 || now.QuadPart < snap.sampleQpc)
                 return "qpc-invalid";
-            ageMs = ((now.QuadPart - snap.sampleQpc) * 1000) /
-                frequency;
+            // Preserve the exact seqlock/QPC sample, but compute the age without
+            // multiplying potentially multi-day QPC ticks by 1000 first.
+            // Overflow would incorrectly treat a stale host as fresh.
+            ageMs = OutRunVR::Ipc::ElapsedQpcMilliseconds(
+                snap.sampleQpc, now.QuadPart, frequency);
+            if (ageMs < 0)
+                return "qpc-invalid";
             if (ageMs > OutRunVR::RuntimeEligibility::HostStaleMs)
                 return "sample-stale";
             return "fresh";

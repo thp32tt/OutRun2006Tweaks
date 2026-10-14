@@ -74,6 +74,7 @@ on:
       - 'tools/verify_vr_r27_shadow_occlusion_fastpath.py'
       - 'tools/verify_vr_r21_host_clock_fastpath.py'
       - 'tools/verify_vr_r23_host_fresh_fastpath.py'
+      - 'tools/verify_vr_qpc_freshness.py'
       - 'tools/verify_vr_r23_pipeline_aggregation_fastpath.py'
       - 'tools/verify_vr_r23_direct_ring_read_fastpath.py'
       - 'tools/verify_vr_r23_shared_eye_cache.py'
@@ -280,6 +281,7 @@ jobs:
             'tools/verify_vr_r27_effect_fastpath.py',
             'tools/verify_vr_r27_shadow_occlusion_fastpath.py',
             'tools/verify_vr_r23_host_fresh_fastpath.py',
+            'tools/verify_vr_qpc_freshness.py',
             'tools/verify_vr_r23_pipeline_aggregation_fastpath.py',
             'tools/verify_vr_r23_direct_ring_read_fastpath.py',
             'tools/verify_vr_r23_shared_eye_cache.py',
