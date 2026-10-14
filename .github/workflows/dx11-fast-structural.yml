@@ -6,6 +6,7 @@ on:
       - vr-dx11-native-r71
     paths:
       - 'src/vr/d3d11/**'
+      - 'src/vr/d3d9/stereo_renderer_r30.cpp'
       - 'tools/dx11_autodev_policy.py'
       # Native stereo producer contract repairs must trigger a fresh exact-SHA Fast Gate.
       - 'tools/verify_dx11_native_transport_contract.py'
@@ -112,6 +113,8 @@ jobs:
           python tools/test_dx11_eye_msaa_resolve_00695.py
           python tools/test_dx11_game_scene_boundary_00696.py
           python tools/test_dx11_failed_clear_boundary_00729.py
+          python tools/test_dx11_failed_game_draw_00730.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_failed_game_draw_probe_00730.cpp -o /tmp/dx11_failed_draw_00730 && /tmp/dx11_failed_draw_00730
           python tools/test_dx11_game_present_crop_00698.py
           python tools/test_dx11_full_frame_fallback_00724.py
           python tools/test_dx11_full_frame_same_present_00726.py

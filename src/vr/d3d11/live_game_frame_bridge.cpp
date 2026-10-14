@@ -4882,6 +4882,22 @@ void observe_unavailable_game_draw(IDirect3DDevice9* game) noexcept {
     }
 }
 
+void observe_failed_game_draw(IDirect3DDevice9* game) noexcept {
+    if (!diagnostic_enabled() || !game) return;
+    try {
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        // R30 has already observed this exact source call. A failed native
+        // source Draw cannot become a visible successful D3D9 menu/race Draw.
+        // Do not increment its ordinal twice or affect a foreign game device.
+        if (s.sourceGameDevice != reinterpret_cast<std::uintptr_t>(game)) return;
+        s.frameBatch.abort();
+        s.pending = false;
+    } catch (...) {
+        // Original game HRESULT, drawing and controller input win.
+    }
+}
+
 void before_game_present(IDirect3DDevice9* game,
                          const RECT* sourceRect, const RGNDATA* dirtyRegion) noexcept {
     if (!diagnostic_enabled() || !game) return;

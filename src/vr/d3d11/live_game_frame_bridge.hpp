@@ -25,6 +25,11 @@ void observe_indexed(IDirect3DDevice9* gameDevice, D3DPRIMITIVETYPE topology,
 // this never alters the original D3D9 HRESULT or input path.
 void observe_unavailable_game_draw(IDirect3DDevice9* gameDevice) noexcept;
 
+// Called after each intercepted original D3D9 Draw/DrawIndexed returns.
+// If it failed, invalidate its speculative native Draw and the entire
+// same-Present batch without modifying the original D3D9 HRESULT/input.
+void observe_failed_game_draw(IDirect3DDevice9* gameDevice) noexcept;
+
 // A game-authored Clear or successful RT0 switch after a native Draw divides
 // a frame into incompatible surfaces. Discard the diagnostic batch; keep the
 // original D3D9 Clear, Draw, Present and gamepad dispatch untouched.
