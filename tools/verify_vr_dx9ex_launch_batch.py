@@ -19,7 +19,8 @@ def check(c,p,g,w):
               'DX9EX_LAUNCH_HEALTH.txt','OUTRUNVR_LAUNCH_ERROR.txt',
               'runtimeValidation=UNTESTED','exit 5',
               'gameExitCode=$gameExitCode',"'GAME_NONZERO_EXIT'",
-              'if($gameExitCode -ne 0){','exit 7'):
+              'if($gameExitCode -ne 0){','exit 7',
+              'Copy-Item -LiteralPath (Join-Path $root 'OUTRUNVR_LAUNCH_ERROR.txt') -Destination (Join-Path $sessionRoot 'OUTRUNVR_LAUNCH_ERROR.txt') -Force' ):
         assert s in p, 'OpenXR host check missing: '+s
     start=g.split('function Start-Slot(',1)[1].split('$form=New-Object',1)[0]
     assert '-WindowStyle Hidden' not in start, 'hidden child masks launch errors'
@@ -36,6 +37,7 @@ if __name__ == '__main__':
        ('missing host lifecycle',CMD,PS.replace('HOST_NEVER_STARTED','HOST_UNKNOWN'),GUI,WF),
        ('silenced game failure',CMD,PS.replace('exit 7','exit 0'),GUI,WF),
        ('erased failure health',CMD,PS.replace("'GAME_NONZERO_EXIT'","'PROCESS_OBSERVED_NOT_HMD_VERIFIED'"),GUI,WF),
+       ('missing ZIP failure evidence',CMD,PS.replace("Copy-Item -LiteralPath (Join-Path $root 'OUTRUNVR_LAUNCH_ERROR.txt') -Destination (Join-Path $sessionRoot 'OUTRUNVR_LAUNCH_ERROR.txt') -Force",'# removed session error archive copy'),GUI,WF),
        ('hidden runner',CMD,PS,GUI.replace('-WindowStyle Normal','-WindowStyle Hidden',1),WF),
        ('missing packaged entry',CMD,PS,GUI,WF.replace('if ($launchers.Count -ne 2','if ($launchers.Count -ne 1',1)),
     ]

@@ -471,6 +471,12 @@ try{
         ) | Set-Content -LiteralPath (Join-Path $root 'OUTRUNVR_LAUNCH_ERROR.txt') -Encoding UTF8
         Write-Warning "Game exited with $gameExitCode; collecting failure logs."
     }
+    if($backend -eq 'd3d9' -and ($xrHostFailure -or $gameExitCode -ne 0)){
+        # The collector archives the session directory, not arbitrary root
+        # text files. Preserve the visible root error and put its identical
+        # bytes in the session ZIP for host-loss and native-game crashes.
+        Copy-Item -LiteralPath (Join-Path $root 'OUTRUNVR_LAUNCH_ERROR.txt') -Destination (Join-Path $sessionRoot 'OUTRUNVR_LAUNCH_ERROR.txt') -Force
+    }
 } finally {
     # Stop only the sampler started by this run, never a user's other nvidia-smi.
     if ($gpuCaptureRequested) {
