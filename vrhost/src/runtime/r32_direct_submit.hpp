@@ -16,6 +16,7 @@
 // so normal command batching is preserved without weakening reuse safety.
 
 #include "r26_recenter_hardening.hpp"
+#include "direct_ack_device_epoch.hpp"
 
 #ifdef xrEndFrame
 #undef xrEndFrame
@@ -66,6 +67,10 @@ namespace OutRunVrR32DirectSubmit
     inline std::array<std::uint32_t, OutRunVR::RenderFrameRingSize> AckedGeneration{};
     // Immediate-context thread only; skip idle ACK ring scans.
     inline std::uint32_t PendingAckCount = 0;
+    // Retain strong COM owners: pointer addresses cannot alias a new device
+    // after a destroyed device/context is recycled by the graphics runtime.
+    inline ID3D11Device* AckFenceDevice = nullptr;
+    inline ID3D11DeviceContext* AckFenceContext = nullptr;
     inline std::uint64_t FastDirectSubmits = 0;
     inline std::uint64_t FastDirectRejects = 0;
     inline std::uint64_t AckArmed = 0;
@@ -133,6 +138,39 @@ namespace OutRunVrR32DirectSubmit
         ActiveAckGamePid = 0;
         AckSameFramePendingReuse = 0;
         RejectReasons.fill(0);
+        if (AckFenceContext)
+        {
+            AckFenceContext->Release();
+            AckFenceContext = nullptr;
+        }
+        if (AckFenceDevice)
+        {
+            AckFenceDevice->Release();
+            AckFenceDevice = nullptr;
+        }
+    }
+
+    // The SafeEye/producer cache has its own device-epoch fence. The final
+    // OpenXR asynchronous ACK owner also needs one: an EVENT created on an
+    // old D3D11 device or issued on an old immediate context cannot release
+    // a freshly rebound producer slot. Drop old ACKs WITHOUT publishing
+    // them, rebuild queries, and fail closed while either owner is absent.
+    inline bool SyncAckDeviceOwner() noexcept
+    {
+        auto* device = OutRunVrFinalTest::Device;
+        auto* context = OutRunVrFinalTest::Context;
+        if (OutRunVrDirectAckDeviceEpoch::Changed(
+                AckFenceDevice, AckFenceContext, device, context))
+        {
+            ReleasePending();
+            if (!OutRunVrDirectAckDeviceEpoch::Ready(device, context))
+                return false;
+            device->AddRef();
+            context->AddRef();
+            AckFenceDevice = device;
+            AckFenceContext = context;
+        }
+        return OutRunVrDirectAckDeviceEpoch::Ready(device, context);
     }
 
     inline void ObserveAckIdentity(
@@ -285,6 +323,10 @@ namespace OutRunVrR32DirectSubmit
         if (slot >= Pending.size() || !generation || !runGeneration || !gamePid)
             return false;
 
+        // Every pending EVENT must belong to the active D3D11 context before
+        // same-frame shortcuts, old ACKs or newly armed queries are examined.
+        if (!SyncAckDeviceOwner())
+            return false;
         // EndFrame reads the verified bundle twice: once to classify pending
         // completions, then again for the actual projection submission. A game
         // restart can publish a new run between those reads while reusing the
@@ -508,24 +550,31 @@ namespace OutRunVrR32DirectSubmit
     inline XrResult XRAPI_CALL EndFrame(
         XrSession session, const XrFrameEndInfo* endInfo) noexcept
     {
+        // Reconcile GPU query ownership BEFORE polling. A Device/Context
+        // replacement can occur without an OpenXR session destruction; old
+        // EVENT queries and ACKedFrame identities then become invalid.
+        const bool ackDeviceReady = SyncAckDeviceOwner();
         // Learn the newest committed DirectGPU run identity before polling
         // older EVENT queries. ArmConsumptionFence rebinds once more to the
         // exact submission snapshot to close the double-ReadFresh TOCTOU window.
         OutRunVrR23VerifiedBundle::Snapshot observed{};
-        if (OutRunVrR23VerifiedBundle::ReadFresh(observed) &&
+        if (ackDeviceReady &&
+            OutRunVrR23VerifiedBundle::ReadFresh(observed) &&
             observed.kind ==
                 OutRunVrR23VerifiedBundle::SourceKind::DirectGpu &&
             MetadataValid(observed.frame))
         {
             ObserveAckIdentity(observed.frame);
         }
-        PollCompletedAcks();
+        if (ackDeviceReady)
+            PollCompletedAcks();
 
         OutRunVrR23VerifiedBundle::Snapshot verified{};
         FastRejectReason reject = FastRejectReason::None;
         const bool fastEligible = CanFastSubmit(endInfo, verified, reject);
         const bool ackReady =
-            fastEligible && ArmConsumptionFence(verified.frame);
+            ackDeviceReady && fastEligible &&
+            ArmConsumptionFence(verified.frame);
         if (fastEligible && ackReady)
         {
             const XrResult result =
