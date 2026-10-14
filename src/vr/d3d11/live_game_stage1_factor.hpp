@@ -34,6 +34,14 @@ constexpr bool stage1_cross_channel_color_operation(std::uint32_t op) noexcept {
            op == kStage1ModulateInvAlphaAddColor ||
            op == kStage1ModulateInvColorAddAlpha;
 }
+// The two three-input texture transitions are an integrated stage-1 RGB/alpha
+// family. The third D3D9 operand is COLORARG0/ALPHAARG0 (not a stage-1 texture).
+// Dot product and bump-map operations remain fail-closed.
+constexpr std::uint32_t kStage1MultiplyAdd = 25u;
+constexpr std::uint32_t kStage1Lerp = 26u;
+constexpr bool stage1_three_source_operation(std::uint32_t op) noexcept {
+    return op == kStage1MultiplyAdd || op == kStage1Lerp;
+}
 constexpr bool stage1_alpha_blend_operation(std::uint32_t operation) noexcept {
     return operation == kStage1BlendDiffuseAlpha ||
            operation == kStage1BlendFactorAlpha ||
@@ -73,6 +81,36 @@ constexpr bool stage1_alpha_supported(std::uint32_t operation,
         (!stage1_cross_channel_color_operation(operation) &&
          stage1_combiner_supported(operation, arg1, arg2));
 }
+// Neither the existing two-source admission nor its unused-argument checks
+// may accidentally admit a three-source operation without reading ARG0.
+constexpr bool stage1_three_source_supported(std::uint32_t operation,
+                                             std::uint32_t arg0,
+                                             std::uint32_t arg1,
+                                             std::uint32_t arg2) noexcept {
+    return stage1_three_source_operation(operation) &&
+           stage1_operand_supported(arg0) &&
+           stage1_operand_supported(arg1) &&
+           stage1_operand_supported(arg2);
+}
+constexpr bool stage1_three_source_reads_diffuse(std::uint32_t operation,
+                                                 std::uint32_t arg0,
+                                                 std::uint32_t arg1,
+                                                 std::uint32_t arg2) noexcept {
+    return stage1_three_source_operation(operation) &&
+           ((arg0 & kStage1ArgMask) == kStage1Diffuse ||
+            (arg1 & kStage1ArgMask) == kStage1Diffuse ||
+            (arg2 & kStage1ArgMask) == kStage1Diffuse);
+}
+static_assert(stage1_three_source_supported(kStage1MultiplyAdd, kStage1Factor,
+                                             kStage1Current, kStage1Diffuse));
+static_assert(stage1_three_source_supported(kStage1Lerp, kStage1Current,
+                                             kStage1Factor, kStage1Current));
+static_assert(!stage1_three_source_supported(kStage1MultiplyAdd, 2u,
+                                              kStage1Current, kStage1Factor));
+static_assert(!stage1_combiner_supported(kStage1MultiplyAdd,
+                                         kStage1Current, kStage1Factor));
+static_assert(!stage1_three_source_supported(24u, kStage1Current,
+                                              kStage1Current, kStage1Factor));
 // Evaluate only active operands: a disabled alpha stage or an unused
 // SELECTARG operand must not require a vertex DIFFUSE channel.
 constexpr bool stage1_operation_reads_diffuse(std::uint32_t operation,

@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00705",
+  "production_id": "CONVERSION-DX11-00705",
+  "event_id": "CONVERSION-DX11-00705-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "GAME_STAGE1_TRIADIC_RGB_ALPHA_MENU_RACE",
+  "work_key": "DX11:GAME_STAGE1_THREE_OPERAND",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Observe real game-authored D3D9 Stage1 RGB/alpha three-input COLORARG0/ALPHAARG0 with strict missing-DIFFUSE and unsupported-source fallback",
+      "Capture third source into b1 64-byte constant buffer and execute D3DTOP_MULTIPLYADD/LERP for independent native HLSL RGB/alpha",
+      "Native diagnostic Draw/DrawIndexed and present keep original D3D9 input/visual fallback and independent real-game/HMD acceptance"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_stage1_triop_probe_00705.cpp",
+      "tools/test_dx11_stage1_triop_00705.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "3456 arg0/arg1/arg2 x modifier admission combinations; signed operation equations with RGB and alpha sources",
+      "negative_regression": "Reject absent diffuse, unsupported D3DTA selectors, D3DTOP_DOTPRODUCT3/bump/unknown, missing ARG0 GetTextureStageState, preserve DX9Ex and gamepad",
+      "component_integration": "Live game D3D9 stage snapshot -> GPU b1 constant buffer -> HLSL three-input independent color/alpha -> Draw/DrawIndexed diagnostic output, exact-SHA GitHub gates"
+    },
+    "conflict_keys": [
+      "DX11:GAME_STAGE1_THREE_OPERAND",
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_READBACK",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Windows build/portable C++ and GitHub exact SHA; actual menu/race+Quest3 frames NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Diagnostic opt-in only; failed source/texture/state captures remain original D3D9 Draw/Present/gamepad"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_STAGE1_TRIADIC_RGB_ALPHA_MENU_RACE",
+    "goal": "Mirror the full RGB and independent alpha three-input native Stage1 transition family into real game Draw/DrawIndexed while preserving unsupported DX9Ex/gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "live-three-operand-rgb-alpha",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_hlsl_native_draw",
+        "expected_behavior": "D3DTOP_MULTIPLYADD and D3DTOP_LERP for RGB and alpha independently capture ARG0 and draw through native diagnostic frame"
+      },
+      {
+        "id": "failed-source-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9_input_and_fvf",
+        "expected_behavior": "Unsupported operands, missing diffuse and failed ARG0 queries reject entire native path and preserve input/DX9Ex"
+      },
+      {
+        "id": "same-sha-build-regression",
+        "category": "integrated_validation",
+        "behavior_area": "cpp_python_windows_git_gates",
+        "expected_behavior": "3456-variant portable matrix plus structural mutation tests and required exact-SHA GitHub Windows/renderer gates"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live-three-operand-rgb-alpha": "PENDING_GATES",
+    "failed-source-fallback": "PENDING_GATES",
+    "same-sha-build-regression": "PENDING_GATES"
+  },
+  "base_head_sha": "3dd4a14373aec9ad0b08c50944edbf15e31c4ba3",
+  "changed_files": [
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_stage1_triop_probe_00705.cpp",
+    "tools/test_dx11_stage1_triop_00705.py",
+    "docs/automation/runs/CONVERSION-DX11-00705.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "DONE 00704 complete and no task 00705 branch state",
+    "C1_REVIEW": "DONE three-input stage1 missing from supported_game_state/HLSL",
+    "C2_IMPLEMENT": "DONE RGB/independent alpha ARG0 capture and GPU shader and portable probes",
+    "C3_VALIDATE": "PENDING exact-SHA gates",
+    "C4_COMMIT": "PENDING publish",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING"
+  },
+  "next_action": "Verify exact-SHA Fast, Backend, Windows build, OpenXR, HUD inspector. Quest3 VDXR and gamepad UNTESTED."
+}

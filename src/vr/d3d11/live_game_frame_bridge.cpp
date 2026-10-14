@@ -99,6 +99,8 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1ModulateColorAddAlpha == D3DTOP_MODULATECOLOR_ADDALPHA &&
               kStage1ModulateInvAlphaAddColor == D3DTOP_MODULATEINVALPHA_ADDCOLOR &&
               kStage1ModulateInvColorAddAlpha == D3DTOP_MODULATEINVCOLOR_ADDALPHA &&
+              kStage1MultiplyAdd == D3DTOP_MULTIPLYADD &&
+              kStage1Lerp == D3DTOP_LERP &&
               kStage1Current == D3DTA_CURRENT &&
               kStage1Factor == D3DTA_TFACTOR &&
               kStage1Complement == D3DTA_COMPLEMENT &&
@@ -810,6 +812,7 @@ struct TextureCapture {
     DWORD stage1ColorOp = D3DTOP_DISABLE;
     DWORD stage1AlphaOp = D3DTOP_DISABLE;
     std::array<DWORD, 4> stage1Args{};
+    std::array<DWORD, 2> stage1ArgZero{}; // COLORARG0, ALPHAARG0 for 25/26
     std::array<float, 4> stage1Factor{};
 
     bool selectTexture = false;
@@ -1170,6 +1173,7 @@ cbuffer Stage1FactorParams : register(b1) {
     float4 stage1Factor;
     int4 stage1Ops;  // color op, alpha op, reserved, reserved
     int4 stage1Args; // color arg1/2, alpha arg1/2
+    int4 stage1ArgZero; // color arg0, alpha arg0, reserved, reserved
 };
 float4 Stage1Source(float4 current, float4 diffuse, int source) {
     // D3DTA_MASK=0x0f; DIFFUSE=0, CURRENT=1, TFACTOR=3. CPU admission owns the
@@ -1207,13 +1211,31 @@ float4 Stage1Combine(float4 a, float4 b, int op, float4 stage0, float4 diffuse) 
         return saturate(lerp(b, a, Stage1BlendWeight(op, stage0, diffuse)));
     return saturate(a + b * (1.0f - a)); // 11: ADDSMOOTH, CPU-gated
 }
+// D3DTOP_MULTIPLYADD = ARG1 + ARG2*ARG0;
+ // D3DTOP_LERP = ARG0*ARG1 + (1-ARG0)*ARG2.
+ // The source selector resolves vertex/current/factor and complement/alpha
+ // replicate for all three inputs, with the original D3D9 path as fallback.
+float4 Stage1ThreeSource(float4 stage0, float4 diffuse,
+                         int op, int arg0, int arg1, int arg2) {
+    float4 a0 = Stage1Source(stage0, diffuse, arg0);
+    float4 a1 = Stage1Source(stage0, diffuse, arg1);
+    float4 a2 = Stage1Source(stage0, diffuse, arg2);
+    if (op == 25) return saturate(a1 + a2 * a0);
+    return saturate(lerp(a2, a1, a0)); // 26, CPU-gated
+}
 float4 Stage1AndAlpha(float4 stage0, float4 diffuse) {
     float4 color = Stage1Combine(
         Stage1Source(stage0, diffuse, stage1Args.x),
         Stage1Source(stage0, diffuse, stage1Args.y), stage1Ops.x, stage0, diffuse);
+    if (stage1Ops.x == 25 || stage1Ops.x == 26)
+        color = Stage1ThreeSource(stage0, diffuse, stage1Ops.x,
+                                  stage1ArgZero.x, stage1Args.x, stage1Args.y);
     float alpha = stage1Ops.y == 1 ? stage0.a : Stage1Combine(
         Stage1Source(stage0, diffuse, stage1Args.z),
         Stage1Source(stage0, diffuse, stage1Args.w), stage1Ops.y, stage0, diffuse).a;
+    if (stage1Ops.y == 25 || stage1Ops.y == 26)
+        alpha = Stage1ThreeSource(stage0, diffuse, stage1Ops.y,
+                                  stage1ArgZero.y, stage1Args.z, stage1Args.w).a;
     float4 result = float4(color.rgb, alpha);
     AlphaGate(result.a);
     return result;
@@ -2922,21 +2944,38 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     // stage-0 shaders never enter this path.
     if (nextColorOp != D3DTOP_DISABLE) {
         DWORD color1=~0u, color2=~0u, alphaOp=~0u, alpha1=~0u, alpha2=~0u;
+        DWORD color0=~0u, alpha0=~0u;
         DWORD stage1Result=~0u, stage2Op=~0u, factor=0u;
+        // ARG0 is required only for the actual three-operand instructions.
+        // A failed D3D9 state query must not turn into a guessed zero.
+        if (stage1_three_source_operation(nextColorOp) &&
+            FAILED(game->GetTextureStageState(1, D3DTSS_COLORARG0, &color0)))
+            return false;
+        // ALPHAOP can be independently three-source with two-source COLOROP.
+        if (FAILED(game->GetTextureStageState(1, D3DTSS_ALPHAOP, &alphaOp)))
+            return false;
+        if (stage1_three_source_operation(alphaOp) &&
+            FAILED(game->GetTextureStageState(1, D3DTSS_ALPHAARG0, &alpha0)))
+            return false;
         if (FAILED(game->GetTextureStageState(1, D3DTSS_COLORARG1, &color1)) ||
             FAILED(game->GetTextureStageState(1, D3DTSS_COLORARG2, &color2)) ||
-            FAILED(game->GetTextureStageState(1, D3DTSS_ALPHAOP, &alphaOp)) ||
             FAILED(game->GetTextureStageState(1, D3DTSS_ALPHAARG1, &alpha1)) ||
             FAILED(game->GetTextureStageState(1, D3DTSS_ALPHAARG2, &alpha2)) ||
             FAILED(game->GetTextureStageState(1, D3DTSS_RESULTARG, &stage1Result)) ||
             FAILED(game->GetTextureStageState(2, D3DTSS_COLOROP, &stage2Op)) ||
             FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &factor)) ||
             stage1Result != D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE ||
-            !stage1_combiner_supported(nextColorOp, color1, color2) ||
-            !stage1_alpha_supported(alphaOp, alpha1, alpha2) ||
+            (stage1_three_source_operation(nextColorOp)
+                 ? !stage1_three_source_supported(nextColorOp, color0, color1, color2)
+                 : !stage1_combiner_supported(nextColorOp, color1, color2)) ||
+            (stage1_three_source_operation(alphaOp)
+                 ? !stage1_three_source_supported(alphaOp, alpha0, alpha1, alpha2)
+                 : !stage1_alpha_supported(alphaOp, alpha1, alpha2)) ||
             (!layout.hasDiffuse &&
              (stage1_operation_reads_diffuse(nextColorOp, color1, color2) ||
-              stage1_operation_reads_diffuse(alphaOp, alpha1, alpha2))) ||
+              stage1_operation_reads_diffuse(alphaOp, alpha1, alpha2) ||
+              stage1_three_source_reads_diffuse(nextColorOp, color0, color1, color2) ||
+              stage1_three_source_reads_diffuse(alphaOp, alpha0, alpha1, alpha2))) ||
             (capture.enabled && !capture.stage0FullModulate &&
              !capture.selectTexture && !capture.additive))
             return false;
@@ -2944,6 +2983,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         capture.stage1ColorOp = nextColorOp;
         capture.stage1AlphaOp = alphaOp;
         capture.stage1Args = {color1, color2, alpha1, alpha2};
+        capture.stage1ArgZero = {color0, alpha0};
         constexpr float kByteScale = 1.0f / 255.0f;
         capture.stage1Factor = {
             static_cast<float>((factor >> 16) & 255u) * kByteScale,
@@ -3544,8 +3584,9 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             float factor[4];
             std::int32_t operations[4];
             std::int32_t arguments[4];
+            std::int32_t argZero[4];
         };
-        static_assert(sizeof(Stage1Upload) == 48u);
+        static_assert(sizeof(Stage1Upload) == 64u);
         Stage1Upload payload{};
         std::copy(capture.stage1Factor.begin(), capture.stage1Factor.end(),
                   payload.factor);
@@ -3553,6 +3594,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         payload.operations[1] = static_cast<std::int32_t>(capture.stage1AlphaOp);
         for (std::size_t i = 0; i < 4; ++i)
             payload.arguments[i] = static_cast<std::int32_t>(capture.stage1Args[i]);
+        for (std::size_t i = 0; i < 2; ++i)
+            payload.argZero[i] = static_cast<std::int32_t>(capture.stage1ArgZero[i]);
         D3D11_BUFFER_DESC cb{};
         cb.ByteWidth = sizeof(payload);
         cb.Usage = D3D11_USAGE_IMMUTABLE;
