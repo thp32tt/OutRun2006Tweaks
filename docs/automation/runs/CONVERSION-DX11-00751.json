@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULLFRAME_CROPPED_CPU_UPLOAD",
   "feature_id": "DX11-MENU-RACE-NATIVE-CROPPED-BGRA-PUBLICATION",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -55,9 +55,9 @@
     ]
   },
   "acceptance_results": {
-    "actual-game-crop-transfer": "SOURCE_IMPLEMENTED_PENDING_CI",
-    "preserve-fallback-on-invalid-copy": "SOURCE_IMPLEMENTED_PENDING_CI",
-    "exact-sha-build-ci": "PENDING_EXACT_SHA"
+    "actual-game-crop-transfer": "PASS",
+    "preserve-fallback-on-invalid-copy": "PASS",
+    "exact-sha-build-ci": "PASS_EXACT_SHA"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -94,10 +94,35 @@
     "C0_RECOVER": "PASS remote HEAD and 00750 owner/C6 inspected",
     "C1_REVIEW": "PASS unneeded full physical framebuffer CPU copies found in verified cropped Present",
     "C2_IMPLEMENT": "PASS header + live C++ crop wire, fallback and two regression probes",
-    "C3_VALIDATE": "Portable C++ probe PASS; corrected 00747 legacy row fallback mutation test; mandatory exact-SHA CI gates pending",
+    "C3_VALIDATE": "PASS_EXACT_SHA: GitHub Actions exact validation SHA 9e736598be5e4ab672a2220c4279578ee21ae8c3 SUCCESS; verified OpenXR #38654755549, Windows Build #38654755527 and HUD #38654755521 via connected GitHub; DX11 Fast and Backend Conversion exact-SHA SUCCESS attested by user. No CI rerun.",
     "C4_COMMIT": "Material code commit with AUTO marker",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING exact-SHA Gates; hardware UNTESTED"
+    "C6_STATE": "PASS_EXACT_SHA: separate [skip ci] C6 bookkeeping only; result-bearing SHA unchanged, source and CI untouched; Quest3/VDXR/gamepad RUNTIME_VALIDATION=UNTESTED."
   },
-  "next_action": "Check five required exact-SHA GitHub Gates for updated source and required DX11 feature policy. No runtime PASS without Quest3/VDXR."
+  "next_action": "C6 COMPLETE_BUILD_VERIFIED at exact result-bearing SHA. No source or CI rerun for 00751; runtime Quest3/VDXR and gamepad UNTESTED; next independent implementation task is controller-selected.",
+  "validation_bearing_result_sha": "9e736598be5e4ab672a2220c4279578ee21ae8c3",
+  "c6_prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_acceptance_reconciliation": "2026-10-15: retain the original acceptance item identities and feature contract; promote previously pending end-to-end/fallback evidence to PASS and exact-SHA integrated acceptance to PASS_EXACT_SHA after user-confirmed same-SHA SUCCESS. No new implementation, no new score.",
+  "ci_evidence": {
+    "exact_sha": {
+      "sha": "9e736598be5e4ab672a2220c4279578ee21ae8c3",
+      "result_basis": "User confirmed exact-SHA CI SUCCESS; connected GitHub independently confirmed three reported workflow completions. No new CI triggered.",
+      "conclusion": "success",
+      "verified_runs": {
+        "windows_build": {
+          "run_id": 38654755527,
+          "conclusion": "success"
+        },
+        "openxr_architecture": {
+          "run_id": 38654755549,
+          "conclusion": "success"
+        },
+        "hud_inspector": {
+          "run_id": 38654755521,
+          "conclusion": "success"
+        }
+      },
+      "other_mandatory_gates": "DX11 Fast and Backend Conversion: exact-SHA SUCCESS per explicit user confirmation; run IDs not independently observed by connector."
+    }
+  }
 }
