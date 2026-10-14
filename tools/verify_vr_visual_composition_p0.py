@@ -2640,8 +2640,7 @@ def check_skyglow_clean_screen_source(source):
         '!IsGameDevice(device)',
         'InternalStereoPass',
         '!TargetIsBackBuffer()',
-        'CorroboratesHud(scope)',
-        'CorroboratesScreenOverlay2D(scope)',
+        '!OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(scope)',
         'R30SkyGlowScreenDrawEpoch == PresentEpoch',
     ):
         require(token, observe, 'exact game screen owner-only bloom guard')
@@ -2738,6 +2737,11 @@ for label, damaged in (
          r30, 'bool R30ApplyStereoSkyGlow(',
          'R30SkyGlowScreenDrawEpoch == PresentEpoch)',
          'R30SkyGlowScreenDrawEpoch != PresentEpoch)')),
+    ('world draw promoted to pre-HUD snapshot',
+     inject_one_function_token(
+         r30, 'void R30BeforeScreenDrawForSkyGlow(',
+         '!OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(scope)',
+         'false /* invalid blanket pre-HUD capture */')),
     ('capture taken before frame screen draw flag',
      inject_one_function_token(
          r30, 'void R30BeforeScreenDrawForSkyGlow(',

@@ -20,12 +20,12 @@ def check(renderer: str, semantic: str) -> None:
     assert "!OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(scope)" in outer
     assert "R30SkyGlowScreenDrawEpoch = PresentEpoch;" in outer
     assert "R30CaptureSkyGlowSceneBeforeHud(device);" in outer
-    owned = renderer.split("HRESULT R30TryScreenSpaceFovDraw(", 1)[1].split("D3DVIEWPORT9 savedViewport", 1)[0]
+    owned = renderer.split("HRESULT R30TryScreenSpaceFovDraw(", 1)[1].split("// From this point the draw is owned by R30.", 1)[0]
     boundary = "if (OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(semanticScope))"
     assert boundary in owned
     assert owned.index(boundary) < owned.index("R30CaptureSkyGlowSceneBeforeHud(device);")
     assert owned.count("R30CaptureSkyGlowSceneBeforeHud(device);") == 1
-    assert "R30CaptureSkyGlowSceneBeforeHud(device);\n\n            // From this point" not in owned
+    assert owned.count(boundary) == 1  # forbid duplicate or unrelated ownership gates
 
 source=RENDER.read_text(encoding="utf-8")
 semantic=SEMANTIC.read_text(encoding="utf-8")
