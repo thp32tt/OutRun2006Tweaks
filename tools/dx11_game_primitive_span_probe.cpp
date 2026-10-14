@@ -119,6 +119,42 @@ int main() {
     }
     // An oversubscribed request must leave the previously accepted native
     // vertex/index snapshot intact; game D3D9 Draw still owns the fallback.
+
+    // 00737 game IndexedUP: scattered original MinVertexIndex >= 6144 is
+    // compacted, never read as a dense 40k-vertex source window.
+    using outrun::vr::dx11::live_game_frame::game_gather_indexed_up_vertices;
+    constexpr std::uint32_t sparseStride = 16u, sparseMin = 9000u;
+    std::vector<std::uint8_t> upSource(11001u * sparseStride, 0u);
+    upSource[9000u * sparseStride] = 0x41u;
+    upSource[10000u * sparseStride] = 0x72u;
+    const std::uint32_t upIndices[] = {10000u, 9000u, 10000u};
+    std::vector<std::uint8_t> upPacked{0xccu};
+    std::vector<std::uint32_t> upRemapped{888u};
+    assert(game_gather_indexed_up_vertices(
+        upSource.data(), sparseStride, upIndices, 3u, sparseMin, 40000u,
+        upPacked, upRemapped));
+    assert(upPacked.size() == 2u * sparseStride &&
+           upPacked[0] == 0x41u && upPacked[sparseStride] == 0x72u);
+    assert((upRemapped == std::vector<std::uint32_t>{1u, 0u, 1u}));
+    const auto keptUp = upPacked, keptUpIndices = upRemapped;
+    const std::uint32_t badUp[] = {10000u, 8999u, 10000u};
+    assert(!game_gather_indexed_up_vertices(
+        upSource.data(), sparseStride, badUp, 3u, sparseMin, 40000u,
+        upPacked, upRemapped));
+    assert(!game_gather_indexed_up_vertices(
+        upSource.data(), sparseStride, upIndices, 3u, 0xfffffffcu, 8u,
+        upPacked, upRemapped));
+    assert(!game_gather_indexed_up_vertices(
+        nullptr, sparseStride, upIndices, 3u, sparseMin, 40000u,
+        upPacked, upRemapped));
+    assert(!game_gather_indexed_up_vertices(
+        upSource.data(), 0u, upIndices, 3u, sparseMin, 40000u,
+        upPacked, upRemapped));
+    assert(!game_gather_indexed_up_vertices(
+        upSource.data(), sparseStride, upIndices,
+        kMaxNativeGameVertices + 1u, sparseMin, 40000u,
+        upPacked, upRemapped));
+    assert(upPacked == keptUp && upRemapped == keptUpIndices);
     const auto fullUnique = uniqueSlots, fullRemap = remapped;
     assert(!game_compact_sparse_indices(
         fullMesh.data(), static_cast<std::uint32_t>(fullMesh.size()),

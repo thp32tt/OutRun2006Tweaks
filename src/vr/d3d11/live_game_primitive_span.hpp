@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <cstring>
+#include <limits>
 #include <vector>
 
 namespace outrun::vr::dx11::live_game_frame {
@@ -108,6 +110,52 @@ inline bool game_compact_sparse_indices(
     compactIndices.swap(remapped);
     return true;
 }
+
+ // DX11 real game IndexedUP: a large absolute D3D9 source vertex window can
+ // contain only a handful of referenced vertices. Capture only those source
+ // bytes before the UP pointers expire, preserving source index winding.
+ inline bool game_gather_indexed_up_vertices(
+     const void* vertexBase, std::uint32_t stride,
+     const std::uint32_t* absoluteIndices, std::uint32_t indexCount,
+     std::uint32_t minVertex, std::uint32_t numVertices,
+     std::vector<std::uint8_t>& packedVertices,
+     std::vector<std::uint32_t>& packedIndices) {
+     if (!vertexBase || !absoluteIndices || !numVertices ||
+         stride < 16u || stride > 512u || !indexCount ||
+         indexCount > kMaxNativeGameVertices ||
+         minVertex > (std::numeric_limits<std::uint32_t>::max)() - numVertices)
+         return false;
+     for (std::uint32_t i = 0; i < indexCount; ++i) {
+         if (absoluteIndices[i] < minVertex ||
+             absoluteIndices[i] - minVertex >= numVertices)
+             return false;
+     }
+     std::vector<std::uint32_t> physical, remapped;
+     if (!game_compact_sparse_indices(
+             absoluteIndices, indexCount, kMaxNativeGameVertices,
+             physical, remapped))
+         return false;
+     const auto base = reinterpret_cast<std::uintptr_t>(vertexBase);
+     const auto available = (std::numeric_limits<std::uintptr_t>::max)() - base;
+     // No UP pointer wrap, including the last byte of every referenced vertex.
+     // The original D3D9 game caller owns source readability.
+     for (const auto index : physical) {
+         const std::uint64_t offset = static_cast<std::uint64_t>(index) * stride;
+         if (offset > available || stride > available - offset)
+             return false;
+     }
+     std::vector<std::uint8_t> vertices(
+         physical.size() * static_cast<std::size_t>(stride));
+     for (std::size_t i = 0; i < physical.size(); ++i) {
+         const auto offset = static_cast<std::uintptr_t>(
+             static_cast<std::uint64_t>(physical[i]) * stride);
+         std::memcpy(vertices.data() + i * stride,
+                     reinterpret_cast<const void*>(base + offset), stride);
+     }
+     packedVertices.swap(vertices);
+     packedIndices.swap(remapped);
+     return true;
+ }
 
 // D3D11 draws 1-pixel points, but D3D9 may enlarge each point, scale it,
 // use per-vertex PSIZE or expand texture coordinates as point sprites.

@@ -39,6 +39,17 @@ for path in ("src/vr/d3d9/stereo_renderer_r30.cpp",
     assert "live::kMaxNativeGameVertices, uniquePhysical, compact)" in source
     assert "physical.size() > 128u" not in source
     assert "indices.data(), count, 128u" not in source
+    # 00737: actual R30 IndexedUP branch must forward the owned, sparse
+    # vertex/index snapshot to the native DrawIndexed observer.
+    up = source.split("void R30ObserveNativeIndexedUP(", 1)[1].split(
+        "HRESULT __stdcall DrawPrimitiveDestR30(", 1)[0]
+    for token in ("const bool sparseWindow =",
+                  "numVertices > live::kMaxNativeGameVertices",
+                  "live::game_gather_indexed_up_vertices(",
+                  "compactVertices.data()", "compactIndices.data()",
+                  "if (!sparseWindow) unpacked[i] -= minVertex;",
+                  "firstVertex, stride, numVertices, unpacked.data(), count"):
+        assert token in up, (path, token)
     assert "if (ok) live::observe_indexed(device, topology, primitiveCount," in source
     assert "vertices.data(), stride, nativeVertexCount," in source
     assert "const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(" in source

@@ -3360,8 +3360,7 @@ namespace OutRunVRStereo
                   topology != D3DPT_TRIANGLELIST &&
                   topology != D3DPT_TRIANGLESTRIP &&
                   topology != D3DPT_TRIANGLEFAN) ||
-                !numVertices || numVertices > live::kMaxNativeGameVertices ||
-                minVertex > live::kMaxNativeGameVertices - numVertices ||
+                !numVertices ||
                 !live::game_native_primitive_element_count(
                      static_cast<std::uint32_t>(topology),
                      primitiveCount, nativeElements) ||
@@ -3370,6 +3369,12 @@ namespace OutRunVRStereo
                 return;
             try {
                 const UINT count=nativeElements;
+                // Source address/window size is not the bounded native Draw
+                // vertex count. Large menu/vehicle/race IndexedUP windows can
+                // be compacted to only the game-referenced source vertices.
+                const bool sparseWindow =
+                    numVertices > live::kMaxNativeGameVertices ||
+                    minVertex > live::kMaxNativeGameVertices - numVertices;
                 std::vector<std::uint32_t> unpacked(count);
                 const UINT unit=format == D3DFMT_INDEX16 ? 2u : 4u;
                 for (UINT i=0; i<count; ++i) {
@@ -3378,11 +3383,23 @@ namespace OutRunVRStereo
                     if (unit == 2) {
                         std::uint16_t x=0; std::memcpy(&x,p,2); unpacked[i]=x;
                     } else std::memcpy(&unpacked[i],p,4);
-                    // D3D9's UP indices are absolute; the native VB begins
-                    // at MinVertexIndex, so rebase every supplied index.
                     if (unpacked[i] < minVertex ||
                         unpacked[i] - minVertex >= numVertices) return;
-                    unpacked[i] -= minVertex;
+                    if (!sparseWindow) unpacked[i] -= minVertex;
+                }
+                if (sparseWindow) {
+                    std::vector<std::uint8_t> compactVertices;
+                    std::vector<std::uint32_t> compactIndices;
+                    if (!live::game_gather_indexed_up_vertices(
+                            vertices, stride, unpacked.data(), count,
+                            minVertex, numVertices, compactVertices, compactIndices))
+                        return; // Keep the original D3D9 Draw/input intact.
+                    nativeSource.forwarded = true;
+                    live::observe_indexed(
+                        device, topology, primitiveCount, compactVertices.data(),
+                        stride, static_cast<UINT>(compactVertices.size() / stride),
+                        compactIndices.data(), count);
+                    return;
                 }
                 const auto* firstVertex = static_cast<const std::uint8_t*>(vertices) +
                     static_cast<std::size_t>(minVertex) * stride;
