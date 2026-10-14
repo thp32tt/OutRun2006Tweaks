@@ -28,7 +28,10 @@ def check(s: str) -> None:
         "0.50999999 / (double)v25.Height",
         "float scaleY = screenScaleY;",
         "scaleY = min(screenScaleX, screenScaleY);",
-        "Game::D3DDevice()->DrawPrimitiveUP",
+        "auto* device = Game::D3DDevice();",
+        "if (!device)",
+        "std::copy(quad.begin(), quad.end(), g_spriteVertexStream);",
+        "device->DrawPrimitiveUP",
     ]
     for marker in markers:
         if marker not in mid:
@@ -39,10 +42,13 @@ def check(s: str) -> None:
         "a1->d3dtexture_ptr_C->GetLevelDesc(0, &v25);",
         "FAILED(descHr) || v25.Width == 0 || v25.Height == 0",
         "0.50999999 / (double)v25.Width",
-        "Game::D3DDevice()->DrawPrimitiveUP",
+        "device->DrawPrimitiveUP",
     )]
     if ordering != sorted(ordering) or len(set(ordering)) != len(ordering):
         raise AssertionError("Texture/scale guards must precede UV writes and draw")
+    if mid.index("if (!device)") >= mid.index("device->DrawPrimitiveUP") or \
+            mid.index("std::copy(quad.begin(), quad.end(), g_spriteVertexStream);") >= mid.index("device->DrawPrimitiveUP"):
+        raise AssertionError("Device guard and complete quad publication must precede DrawPrimitiveUP")
     if mid.count("D3DSURFACE_DESC v25{};") != 1 or mid.count("GetLevelDesc(0, &v25)") != 1:
         raise AssertionError("Uninitialized or duplicate texture descriptor query")
     if "float scaleY = Game::screen_scale->y;" in mid:
