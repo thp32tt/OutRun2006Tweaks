@@ -403,6 +403,15 @@ jobs:
             'tools/verify_vr_dx9ex_launch_paths.py',
             'tools/verify_vr_dx9ex_launch_batch.py'
           )
+          # Parse the REAL installed PowerShell entrypoint, not just markers.
+          $launchScript = Resolve-Path tools/Run-OutRunVRTest.ps1
+          $parseTokens = $null
+          $parseErrors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            $launchScript.Path, [ref]$parseTokens, [ref]$parseErrors) | Out-Null
+          if ($parseErrors.Count -gt 0) {
+            throw ("DX9Ex launch PowerShell syntax invalid: " + ($parseErrors -join '; '))
+          }
           foreach ($verifier in $verifiers) {
             python $verifier
             if ($LASTEXITCODE -ne 0) {

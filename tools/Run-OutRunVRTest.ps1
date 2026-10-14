@@ -413,6 +413,9 @@ $xrHostEverSeen=$false
 $xrHostFailure=$false
 $xrHostFailureReason=''
 $xrHostMissingSince=$null
+$xrHostRetryAttempted=$false
+$xrHostRetryStartedAt=$null
+$xrHostRetryError=''
 $gameStartedAt=Get-Date
 try{
     $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru -ErrorAction Stop
@@ -422,8 +425,49 @@ try{
             if($xrHostAlive){$xrHostEverSeen=$true; $xrHostMissingSince=$null}
             else{
                 if($null -eq $xrHostMissingSince){$xrHostMissingSince=Get-Date}
-                if(((Get-Date)-$gameStartedAt).TotalSeconds -ge 15 -and
-                   ((Get-Date)-$xrHostMissingSince).TotalSeconds -ge 10){
+                # A user test observed a live game but no OpenXR host.
+                # After sustained absence, request ONE bounded restart using
+                # the same isolated VR policy as the initial prewarm.
+                # Start-Process success never counts as a live XR session.
+                $hostCheckNow=Get-Date
+                if(-not $xrHostRetryAttempted -and
+                   ($hostCheckNow-$gameStartedAt).TotalSeconds -ge 8 -and
+                   ($hostCheckNow-$xrHostMissingSince).TotalSeconds -ge 6){
+                    $xrHostRetryAttempted=$true
+                    $xrHostRetryStartedAt=$hostCheckNow
+                    if($xrHost -and $prewarmEnvironment -and
+                       (Test-Path -LiteralPath $xrHost) -and
+                       -not (Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue)){
+                        $retrySavedEnvironment=@{}
+                        try {
+                            foreach($entry in $prewarmEnvironment.GetEnumerator()){
+                                $retrySavedEnvironment[$entry.Key]=[Environment]::GetEnvironmentVariable($entry.Key,'Process')
+                                [Environment]::SetEnvironmentVariable($entry.Key,[string]$entry.Value,'Process')
+                            }
+                            $retryProcess=Start-Process -FilePath $xrHost -WorkingDirectory $root -WindowStyle Hidden -PassThru -ErrorAction Stop
+                            Write-Warning "OpenXR host recovery requested once (PID=$($retryProcess.Id)); checking real process life."
+                        } catch {
+                            $xrHostRetryError=$_.Exception.Message
+                            Write-Warning "OpenXR host recovery launch failed: $xrHostRetryError"
+                        } finally {
+                            foreach($entry in $prewarmEnvironment.GetEnumerator()){
+                                [Environment]::SetEnvironmentVariable($entry.Key,$retrySavedEnvironment[$entry.Key],'Process')
+                            }
+                        }
+                    } else {
+                        $xrHostRetryError='No installed host/policy available for recovery'
+                    }
+                }
+                # Keep the game running; permit ten seconds after a retry,
+                # then report the original absence as a real failure. Never
+                # retry a second time if this process also disappears.
+                $hostGraceElapsed=if($xrHostRetryStartedAt){
+                    ($hostCheckNow-$xrHostRetryStartedAt).TotalSeconds -ge 10
+                } else {
+                    ($hostCheckNow-$gameStartedAt).TotalSeconds -ge 15
+                }
+                if($hostGraceElapsed -and
+                   ($hostCheckNow-$xrHostMissingSince).TotalSeconds -ge 10){
                     $xrHostFailure=$true
                     $xrHostFailureReason=if($xrHostEverSeen){'HOST_DISAPPEARED_DURING_GAME'}else{'HOST_NEVER_STARTED'}
                     Write-Warning "DX9Ex OpenXR host missing ($xrHostFailureReason). Leave game running until normal exit to collect logs."
@@ -446,6 +490,8 @@ try{
           "gamePid=$($p.Id)",
           "gameExitCode=$gameExitCode",
           "hostProcessEverSeen=$xrHostEverSeen",
+          "hostRecoveryAttempted=$xrHostRetryAttempted",
+          "hostRecoveryLaunchError=$xrHostRetryError",
           "status=$(if($xrHostFailure){$xrHostFailureReason}elseif($gameExitCode -ne 0){'GAME_NONZERO_EXIT'}else{'PROCESS_OBSERVED_NOT_HMD_VERIFIED'})",
           "runtimeValidation=UNTESTED"
         ) | Set-Content -LiteralPath (Join-Path $sessionRoot 'DX9EX_LAUNCH_HEALTH.txt') -Encoding UTF8
@@ -453,6 +499,8 @@ try{
             @(
               'DX9Ex OpenXR host missing during game.',
               "reason=$xrHostFailureReason",
+              "hostRecoveryAttempted=$xrHostRetryAttempted",
+              "hostRecoveryLaunchError=$xrHostRetryError",
               "gamePid=$($p.Id)",
               "session=$sessionRoot",
               'Check Virtual Desktop/VDXR OpenXR runtime and host log.',

@@ -17,7 +17,14 @@ def check(c,p,g,w):
               "Get-Process -Name 'outrun-vr-host'",
               'HOST_NEVER_STARTED','HOST_DISAPPEARED_DURING_GAME',
               'DX9EX_LAUNCH_HEALTH.txt','OUTRUNVR_LAUNCH_ERROR.txt',
-              'runtimeValidation=UNTESTED','exit 5',
+              'runtimeValidation=UNTESTED',
+              'if(-not $xrHostRetryAttempted -and',
+              "($hostCheckNow-$xrHostMissingSince).TotalSeconds -ge 6",
+              "($hostCheckNow-$xrHostRetryStartedAt).TotalSeconds -ge 10",
+              "hostRecoveryAttempted=$xrHostRetryAttempted",
+              "hostRecoveryLaunchError=$xrHostRetryError",
+              'foreach($entry in $prewarmEnvironment.GetEnumerator())',
+              'exit 5',
               'gameExitCode=$gameExitCode',"'GAME_NONZERO_EXIT'",
               'if($gameExitCode -ne 0){','exit 7',
               "Copy-Item -LiteralPath (Join-Path $root 'OUTRUNVR_LAUNCH_ERROR.txt') -Destination (Join-Path $sessionRoot 'OUTRUNVR_LAUNCH_ERROR.txt') -Force"):
@@ -40,9 +47,13 @@ if __name__ == '__main__':
        ('missing ZIP failure evidence',CMD,PS.replace("Copy-Item -LiteralPath (Join-Path $root 'OUTRUNVR_LAUNCH_ERROR.txt') -Destination (Join-Path $sessionRoot 'OUTRUNVR_LAUNCH_ERROR.txt') -Force",'# removed session error archive copy'),GUI,WF),
        ('hidden runner',CMD,PS,GUI.replace('-WindowStyle Normal','-WindowStyle Hidden',1),WF),
        ('missing packaged entry',CMD,PS,GUI,WF.replace('if ($launchers.Count -ne 2','if ($launchers.Count -ne 1',1)),
+       ('unbounded host retry',CMD,PS.replace('if(-not $xrHostRetryAttempted -and','if($true -and',1),GUI,WF),
+       ('no retry observation grace',CMD,PS.replace('($hostCheckNow-$xrHostRetryStartedAt).TotalSeconds -ge 10','($hostCheckNow-$xrHostRetryStartedAt).TotalSeconds -ge 0',1),GUI,WF),
+       ('no recovered host evidence',CMD,PS.replace('hostRecoveryAttempted=$xrHostRetryAttempted','hostRecoveryAttempted=UNKNOWN'),GUI,WF),
+       ('lost retry failure evidence',CMD,PS.replace('hostRecoveryLaunchError=$xrHostRetryError','hostRecoveryLaunchError=UNKNOWN'),GUI,WF),
     ]
     for name,c,p,g,w in mutants:
         try:check(c,p,g,w)
         except AssertionError:continue
         raise AssertionError('negative mutation survived: '+name)
-    print('PASS DX9Ex visible batch, real OpenXR host health and six mutations; HMD UNTESTED')
+    print('PASS DX9Ex visible batch, real OpenXR host health and bounded host-retry mutations; HMD UNTESTED')
