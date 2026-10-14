@@ -20,7 +20,7 @@ def linked(cpp, hdr):
         "s.frameBatch.reset();",
     )) and all(token in hdr for token in (
         "bool opaqueDestinationAlpha = false;",
-        "opaqueDestinationAlpha = false;",
+        "argb = 0u;\n        opaqueDestinationAlpha = false;\n        valid = false;",
         "opaqueDestinationAlpha = opaqueBackbuffer;",
         "opaqueDestinationAlpha ? 1.0f :",
         "native_write_mask(",
