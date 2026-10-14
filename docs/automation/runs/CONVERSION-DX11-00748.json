@@ -92,12 +92,27 @@
     "C0_RECOVER": "PASS GitHub authoritative branch HEAD, AGENTS, policy, 00747 material+5/5 result reviewed",
     "C1_REVIEW": "PASS verified whole-backbuffer dirty Present was rejected solely because dirtyRegion pointer nonnull",
     "C2_IMPLEMENT": "PASS source integrated whole-coverage native publication and fail-closed fallback, executable and destructive probes",
-    "C3_VALIDATE": "PENDING exact-SHA five mandatory workflows",
+    "C3_VALIDATE": "REPAIR: Windows Build #38644587249 failed legacy source test before compiler acceptance was complete; updated fail-closed full dirty-region mutation verifier. All exact-SHA Gates pending rerun.",
     "C4_COMMIT": "PENDING result SHA",
     "C5_PACKAGE": "NOT_REQUIRED; user owns release",
     "C6_STATE": "PENDING verified GitHub results, runtime UNTESTED"
   },
-  "blocking_evidence": "Full native same-Present outputWritable unconditionally required !outputNow.hasDirtyRegion, even if RGNDATA correctly marked the whole backbuffer; unchanged fallback protected partial dirty regions.",
-  "next_action": "Validate exact result SHA on all five mandatory workflows, repair causal failures under 00748; only then mark BUILD_VERIFIED and score. Never claim HMD PASS.",
-  "recorded_at_kst": "2026-10-15 07:00 KST"
+  "blocking_evidence": "Full native same-Present outputWritable unconditionally required !outputNow.hasDirtyRegion, even if RGNDATA correctly marked the whole backbuffer; unchanged fallback protected partial dirty regions. Same-SHA Win32 Build #38644587249 failed a legacy pre-00748 destructive verifier: safe_inset_copy required literal !outputNow.hasDirtyRegion &&, excluding newly verified fullDirtyCoverage despite real guarded implementation.",
+  "next_action": "Check all five mandatory workflows on next exact SHA. Further failed Gates require causal repair under same TASK. No HMD/gamepad verification.",
+  "recorded_at_kst": "2026-10-15 07:00 KST",
+  "material_result_sha": "1bf0e2962b891059a8bfb8adb68f27c4aff535a7",
+  "ci_evidence": {
+    "initial_sha": {
+      "sha": "1bf0e2962b891059a8bfb8adb68f27c4aff535a7",
+      "fast": {
+        "run_id": 38644579708,
+        "conclusion": "success"
+      },
+      "windows_build": {
+        "run_id": 38644587249,
+        "conclusion": "failure",
+        "failure_cause": "obsolete dirty region rejection literal in inherited source verifier"
+      }
+    }
+  }
 }
