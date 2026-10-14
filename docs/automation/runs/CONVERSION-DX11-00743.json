@@ -1,0 +1,137 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00743",
+  "production_id": "CONVERSION-DX11-00743",
+  "event_id": "CONVERSION-DX11-00743-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_FRAME_GPU_SLOT_REUSE",
+  "feature_id": "DX11-MENU-RACE-FULL-FRAME-STAGING-CONTINUITY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "base_head_sha": "c59bd9d52d0d0a98b8d1b1e6ef2f833814f1a1dd",
+  "material_result_sha": "03ab5135f0bffc0a015df1f8052303c46d44d3ba",
+  "validation_bearing_result_sha": "03ab5135f0bffc0a015df1f8052303c46d44d3ba",
+  "result_sha": "03ab5135f0bffc0a015df1f8052303c46d44d3ba",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "change_summary": "When a live native D3D11 menu/vehicle/race same-Present GPU readback finds the preferred staging slot busy, choose another free ring slot and publish its matching GPU-fenced frame. Preserve D3D9 original full game image and input on all-busy/not-ready paths.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_publication.hpp",
+    "tools/dx11_full_frame_slot_reuse_probe_00743.cpp",
+    "tools/test_dx11_full_frame_slot_reuse_00743.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "real source D3D9 Draw/DrawIndexed to native D3D11 game full-frame RTV and fenced GPU staging",
+      "free-slot recovery in full-size same-Present readback ring without old-frame substitution",
+      "D3D9 backbuffer game image and controller input retained on all-staging-busy or fence-not-ready failure"
+    ],
+    "batch_components": [
+      "D3D11 native frame readback and same-Present D3D9 presentation",
+      "GPU staging ring slot election and provenance tracking",
+      "portable C++ GPU-ring probe plus destructive Python wiring/CI integration regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00743 constexpr C++ test verifies preferred-busy recovery and ring wraparound in 3 staging slots; GitHub DX11 Fast SUCCESS.",
+      "negative_regression": "00743 Python mutation probe rejects occupied slot selection, wrong selected-slot polling, unchecked slot or false publication; all-busy returns sentinel; original D3D9 path unaffected.",
+      "component_integration": "Live native Draw->CopyResource from current game RTV into selected free staging texture->same-Present GPU fence->current-frame D3D9 upload while gamepad/DX9Ex Draw and Present stay authoritative."
+    },
+    "conflict_keys": [
+      "DX11:FULL_FRAME_GPU_SLOT_REUSE"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native game full-frame staging slot reuse is build-verified; real Quest3/VDXR view is UNTESTED.",
+    "activation_guard_and_fallback": "Explicit opt-in diagnostic native pipeline only; drop native copy if full ring busy; never replace original D3D9 render HRESULT, game Present or input."
+  },
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-FULL-FRAME-STAGING-CONTINUITY",
+    "goal": "Recover otherwise lost same-Present native full game frames when GPU readback ring contains an occupied preferred slot, without ever reusing a busy texture or delaying original input and D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "full-frame-idle-slot-reuse",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_rendering",
+        "expected_behavior": "Native full-size scene chooses next available staging slot instead of losing an eligible menu/car/race frame because preferred slot is busy."
+      },
+      {
+        "id": "all-slots-busy-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "source_fallback_input_and_transport",
+        "expected_behavior": "No queued native pixel replacement or spin-wait if all staging resources are busy; original D3D9 game frame and controller input survive."
+      },
+      {
+        "id": "exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "build_ci_openxr_hud",
+        "expected_behavior": "Exact SHA passes DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "full-frame-idle-slot-reuse": "PASS_STATIC_AND_BUILD",
+    "all-slots-busy-fallback": "PASS_STATIC_AND_BUILD",
+    "exact-sha-gates": "PASS_EXACT_SHA"
+  },
+  "blocking_evidence": "Previously before_game_present only inspected s.readbacks[s.writeSlot]; when it was busy, s.droppedCopies increased even if another staging resource was free. All native full frame pixels skipped current Present, despite room in ring.",
+  "ci_evidence": {
+    "dx11_fast": {
+      "run_id": 38625740967,
+      "conclusion": "success",
+      "head_sha": "03ab5135f0bffc0a015df1f8052303c46d44d3ba"
+    },
+    "backend_conversion": {
+      "run_id": 38625741359,
+      "conclusion": "success",
+      "head_sha": "03ab5135f0bffc0a015df1f8052303c46d44d3ba"
+    },
+    "windows_build": {
+      "run_id": 38625750374,
+      "conclusion": "success",
+      "head_sha": "03ab5135f0bffc0a015df1f8052303c46d44d3ba"
+    },
+    "openxr_architecture": {
+      "run_id": 38625741074,
+      "conclusion": "success",
+      "head_sha": "03ab5135f0bffc0a015df1f8052303c46d44d3ba"
+    },
+    "openxr_architecture_second": {
+      "run_id": 38625750320,
+      "conclusion": "success",
+      "head_sha": "03ab5135f0bffc0a015df1f8052303c46d44d3ba"
+    },
+    "hud_inspector": {
+      "run_id": 38625750480,
+      "conclusion": "success",
+      "head_sha": "03ab5135f0bffc0a015df1f8052303c46d44d3ba"
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: Authenticated GitHub branch HEAD and prior 00742 material source/CI verified; separate readback publication ownership selected.",
+    "C1_REVIEW": "PASS: confirmed single-preferred-slot ring starvation in live same-Present full frame bridge, disjoint from 00742 RT mip source.",
+    "C2_IMPLEMENT": "PASS: native C++ readback free slot reuse, frame ring helper, portable positive/negative regressions, CI wiring.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: DX11 Fast 38625740967, Backend 38625741359, Windows Build 38625750374, OpenXR 38625741074/38625750320, HUD 38625750480 all SUCCESS.",
+    "C4_COMMIT": "PASS: material C++/test commit 03ab5135f0bffc0a015df1f8052303c46d44d3ba published nonforce with no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED: Quest3/VDXR hardware runtime untested; deployment user-owned.",
+    "C6_STATE": "PASS: recorded exact SHA validation in separate bookkeeping only; no additional score on checkpoint."
+  },
+  "result_note": "COMPLETE_BUILD_VERIFIED for exact-SHA source/CI, not game/HMD/runtime acceptance. DX11 opt-in original gamepad and D3D9 fallback retained; DXVK untouched.",
+  "packaging_reason": "No user-ready release required and actual Quest3/VDXR test not performed."
+}
