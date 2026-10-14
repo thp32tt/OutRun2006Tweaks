@@ -15,13 +15,23 @@ def integrated(cpp: str, r9: str, clear: str) -> bool:
         "void observe_unavailable_game_draw(", 1)[0]
     submit = cpp.split("bool submit(", 1)[-1].split("bool observe_source_device(", 1)[0]
     return all(x in callback for x in (
-        "if (SUCCEEDED(result) && (flags & D3DCLEAR_TARGET))",
+        // 00729: the successful HRESULT is the outer scene boundary guard;
+        // only color Clears reseed native D3D11 game-source background.
+        "if (SUCCEEDED(result)) {",
+        "if ((flags & (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |",
+        "live_game_frame::observe_scene_boundary(device)",
+        "if (flags & D3DCLEAR_TARGET)",
         "live_game_frame::observe_game_clear(",
         "return finishNativeClear(stereoHr);",
         "return finishNativeClear(hr);",
         "return finishNativeClear(ClearHook.stdcall<HRESULT>(",
         "return finishNativeClear(R9ClearCallbackHook.stdcall<HRESULT>(",
-    )) and all(x in observe for x in (
+    )) and (
+        0 <= callback.find("if (SUCCEEDED(result)) {") <
+        callback.find("live_game_frame::observe_scene_boundary(device)") <
+        callback.find("if (flags & D3DCLEAR_TARGET)") <
+        callback.find("live_game_frame::observe_game_clear(")
+    ) and all(x in observe for x in (
         "s.clearColor.discard();", "GameNativeClearCoverage::covers_whole(",
         "game->GetRenderTarget(0,", "game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,",
         "targetIdentity.Get() == backbufferIdentity.Get()",
@@ -42,12 +52,17 @@ def integrated(cpp: str, r9: str, clear: str) -> bool:
 assert "void observe_game_clear(IDirect3DDevice9* gameDevice" in hdr
 assert integrated(src, hook, helper), "R9 Clear -> native Draw integration disconnected"
 for old, new in (
-    ("if (SUCCEEDED(result) && (flags & D3DCLEAR_TARGET))",
-     "if (FAILED(result) && (flags & D3DCLEAR_TARGET))"),
+    ("if (SUCCEEDED(result)) {", "if (FAILED(result)) {"),
+    ("if (flags & D3DCLEAR_TARGET)", "if (false)"),
+    ("live_game_frame::observe_scene_boundary(device)", "/* lost boundary */"),
     ("return finishNativeClear(stereoHr);", "return stereoHr;"),
     ("return finishNativeClear(hr);", "return hr;"),
 ):
-    mutant = hook.replace(old, new, 1)
+    # Mutate the intended callback, not an unrelated earlier HRESULT check.
+    start = hook.index("HRESULT __stdcall ClearDestR9(")
+    stop = hook.index("template <typename ActualDraw, typename LegacyDraw>", start)
+    mutated = hook[start:stop].replace(old, new, 1)
+    mutant = hook[:start] + mutated + hook[stop:]
     assert mutant != hook and not integrated(src, mutant, helper), old
 for old, new in (
     ("GameNativeClearCoverage::covers_whole(", "if (count == 0u && rects == nullptr) return;"),
