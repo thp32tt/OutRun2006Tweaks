@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "feature_id": "LIVE_STAGE1_INDEPENDENT_SAMPLER_RGB_ALPHA_GAME_DRAW",
   "work_key": "DX11:STAGE1_GAME_INDEPENDENT_SAMPLER",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -75,9 +75,9 @@
     ]
   },
   "acceptance_results": {
-    "live-independent-sampler-draw": "PENDING",
-    "unsupported-input-safe-fallback": "PENDING",
-    "same-sha-integrated-gates": "PENDING"
+    "live-independent-sampler-draw": "PASS",
+    "unsupported-input-safe-fallback": "PASS",
+    "same-sha-integrated-gates": "PASS_EXACT_SHA"
   },
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -89,12 +89,45 @@
   ],
   "base_head_sha": "9249036467cef0985fe61dac058a35aead8cb3cc",
   "material_result_sha": "a4ae55f4ba502a2016dfc5bd1d801b9988528215",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "afd89594029e6837df0697f8c8fef98adf4aab15",
   "prior_gate_failure": {
     "run_id": 38516151119,
     "cause": "Prior 00713 record missing acceptance_results despite five verified exact-SHA 00713 gates",
     "repair": "Reconcile historical PASS results from 00713 existing gate_runs; 00714 remains PENDING"
   },
-  "next_action": "Verify new source with DX11 fast structural C++ and Python probes and five exact SHA GitHub gates. Fix actual failures under same TASK_ID. Runtime Quest3/VDXR UNTESTED.",
-  "state_persisted": true
+  "next_action": "Five exact-SHA mandatory GitHub gates SUCCESS at afd89594029e6837df0697f8c8fef98adf4aab15. Quest3/VDXR game menu/car/race and gamepad HMD tests NOT performed; RUNTIME_VALIDATION=UNTESTED and NEED_HMD_TEST. No further replay or additional score for this RUN_KEY. Controller may assign next independent DX11 work.",
+  "state_persisted": true,
+  "gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38516730238,
+      "conclusion": "success",
+      "head_sha": "afd89594029e6837df0697f8c8fef98adf4aab15"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38516730208,
+      "conclusion": "success",
+      "head_sha": "afd89594029e6837df0697f8c8fef98adf4aab15"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38516735772,
+      "conclusion": "success",
+      "head_sha": "afd89594029e6837df0697f8c8fef98adf4aab15"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38516735819,
+      "conclusion": "success",
+      "head_sha": "afd89594029e6837df0697f8c8fef98adf4aab15"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38516735754,
+      "conclusion": "success",
+      "head_sha": "afd89594029e6837df0697f8c8fef98adf4aab15"
+    }
+  ],
+  "known_gate_note": "Second duplicate Build run 38517515934 was cancelled; exact-SHA Build run 38516735772 succeeded and is the validation-bearing Build gate."
 }
