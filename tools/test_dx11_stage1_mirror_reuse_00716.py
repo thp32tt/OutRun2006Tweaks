@@ -34,6 +34,15 @@ def integrated(s, m, h, g, src):
         "stage0UsesMips == stage1UsesMips && stage0NativeViewReady",
     )) and src.count("stage1GameTexture.Sample(stage1GameSampler, v.uvStage1)") == 3
 assert integrated(submit, mirror, sampler, helper, shader)
+# Regression: every native sampler creation must issue a real D3D11 API call,
+# not recursively invoke the helper and overflow on the first Stage1 Draw.
+assert "return create_game_sampler(" not in sampler
+assert sampler.count("D3D11_SAMPLER_DESC state{};") == 1
+assert sampler.count("CreateSamplerState(&state, sampler.GetAddressOf())") == 1
+assert "capture.maxAnisotropy < 2u" in sampler
+for poison in ("D3D11_SAMPLER_DESC state{};",
+               "CreateSamplerState(&state, sampler.GetAddressOf())"):
+    assert not integrated(submit, mirror, sampler.replace(poison, "", 1), helper, shader)
 for poison in ("stage1View = sampledView;", "capture.srgbTexture == second.srgbTexture",
                "second.mipFilter != D3DTEXF_NONE",
                "create_game_sampler(dev, second, mirroredLevels, stage1Sampler)",

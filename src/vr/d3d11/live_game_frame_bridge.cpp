@@ -3422,20 +3422,72 @@ bool create_game_sampler(ID3D11Device* dev, const TextureCapture& capture,
     const bool usesMips = capture.mipFilter == D3DTEXF_POINT ||
                           capture.mipFilter == D3DTEXF_LINEAR;
     if (usesMips && capture.maxMipLevel >= levels) return false;
-    return create_game_sampler(dev, capture, levels, sampler);
+    D3D11_SAMPLER_DESC state{};
+    // Independent D3D9 MIN/MAG filtering with point or linear mip selection. For
+    // MIPFILTER=NONE force LOD 0 even if the source has additional mips.
+    state.Filter = capture.minFilter == D3DTEXF_LINEAR ?
+        (capture.magFilter == D3DTEXF_LINEAR ?
+            D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT :
+            D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT) :
+        (capture.magFilter == D3DTEXF_LINEAR ?
+            D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :
+            D3D11_FILTER_MIN_MAG_MIP_POINT);
+    // Preserve trilinear and mixed MIN/MAG sampling for game textures:
+    // DX9Ex uses two adjacent mip levels when MIPFILTER is LINEAR.
+    if (capture.mipFilter == D3DTEXF_LINEAR) {
+        state.Filter = capture.minFilter == D3DTEXF_LINEAR ?
+            (capture.magFilter == D3DTEXF_LINEAR ?
+                D3D11_FILTER_MIN_MAG_MIP_LINEAR :
+                D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR) :
+            (capture.magFilter == D3DTEXF_LINEAR ?
+                D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR :
+                D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR);
+    }
+    // Bind the full mip chain for both captured D3D9 MAG anisotropic profiles.
+    if (capture.minFilter == D3DTEXF_ANISOTROPIC)
+        state.Filter = D3D11_FILTER_ANISOTROPIC;
+    // D3D9 game/menu UVs may reflect outside [0,1]. Preserve their
+    // addressing semantics through the native pixel sampler; never silently
+    // clamp an unknown D3D9 state, which would mislabel a diagnostic frame.
+    const auto translateAddress = [](D3DTEXTUREADDRESS address) noexcept {
+        switch (address) {
+        case D3DTADDRESS_WRAP: return D3D11_TEXTURE_ADDRESS_WRAP;
+        case D3DTADDRESS_CLAMP: return D3D11_TEXTURE_ADDRESS_CLAMP;
+        case D3DTADDRESS_MIRROR: return D3D11_TEXTURE_ADDRESS_MIRROR;
+        case D3DTADDRESS_MIRRORONCE: return D3D11_TEXTURE_ADDRESS_MIRROR_ONCE;
+        case D3DTADDRESS_BORDER: return D3D11_TEXTURE_ADDRESS_BORDER;
+        default: return static_cast<D3D11_TEXTURE_ADDRESS_MODE>(0);
+        }
+    };
+    state.AddressU = translateAddress(capture.addressU);
+    state.AddressV = translateAddress(capture.addressV);
+    if (!state.AddressU || !state.AddressV) return false;
+    state.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    // D3D9 COLORREF-like D3DCOLOR is 0xAARRGGBB; native BorderColor is RGBA.
+    state.BorderColor[0] = static_cast<float>((capture.borderColor >> 16) & 0xffu) / 255.0f;
+    state.BorderColor[1] = static_cast<float>((capture.borderColor >> 8) & 0xffu) / 255.0f;
+    state.BorderColor[2] = static_cast<float>(capture.borderColor & 0xffu) / 255.0f;
+    state.BorderColor[3] = static_cast<float>((capture.borderColor >> 24) & 0xffu) / 255.0f;
+    // Recheck captured source state before CreateSamplerState; no silent
+    // D3D11 driver clamp or NaN/Inf propagation in the diagnostic image.
+    if (!std::isfinite(capture.mipLodBias) ||
+        capture.mipLodBias < kMinMipLodBias || capture.mipLodBias > kMaxMipLodBias ||
+        (!usesMips && capture.mipLodBias != 0.0f)) return false;
+    // D3D9 MAXMIPLEVEL discards finer (lower-indexed) mip levels.
+    // D3D11 MinLOD clamps to that same source level; all levels are mirrored.
+    state.MinLOD = usesMips ? static_cast<float>(capture.maxMipLevel) : 0.0f;
+    state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;
+    state.MipLODBias = usesMips ? capture.mipLodBias : 0.0f;
+    state.MaxAnisotropy = capture.minFilter == D3DTEXF_ANISOTROPIC ?
+        capture.maxAnisotropy : 1u;
+    state.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    return SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));
 }
 
 bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     ComPtr<ID3D11ShaderResourceView>& view,
                     ComPtr<ID3D11SamplerState>& sampler) noexcept {
     if (!dev || !capture.enabled || !capture.texture) return false;
-    // Fail closed if captured game sampler parameters no longer fit this path.
-    if (capture.minFilter == D3DTEXF_ANISOTROPIC &&
-        ((capture.magFilter != D3DTEXF_LINEAR &&
-          capture.magFilter != D3DTEXF_ANISOTROPIC) ||
-         capture.mipFilter != D3DTEXF_LINEAR ||
-         capture.maxAnisotropy < 2u ||
-         capture.maxAnisotropy > D3D11_REQ_MAXANISOTROPY)) return false;
     const UINT sourceLevels = capture.texture->GetLevelCount();
     // A complete 2048x2048 menu/vehicle atlas has twelve mip levels.
     if (sourceLevels == 0 || sourceLevels > 12u) return false;
@@ -3816,66 +3868,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     if (FAILED(dev->CreateTexture2D(&desc, initial.data(), texture.GetAddressOf())) ||
         FAILED(dev->CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())))
         return false;
-    D3D11_SAMPLER_DESC state{};
-    // Independent D3D9 MIN/MAG filtering with point or linear mip selection. For
-    // MIPFILTER=NONE force LOD 0 even if the source has additional mips.
-    state.Filter = capture.minFilter == D3DTEXF_LINEAR ?
-        (capture.magFilter == D3DTEXF_LINEAR ?
-            D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT :
-            D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT) :
-        (capture.magFilter == D3DTEXF_LINEAR ?
-            D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT :
-            D3D11_FILTER_MIN_MAG_MIP_POINT);
-    // Preserve trilinear and mixed MIN/MAG sampling for game textures:
-    // DX9Ex uses two adjacent mip levels when MIPFILTER is LINEAR.
-    if (capture.mipFilter == D3DTEXF_LINEAR) {
-        state.Filter = capture.minFilter == D3DTEXF_LINEAR ?
-            (capture.magFilter == D3DTEXF_LINEAR ?
-                D3D11_FILTER_MIN_MAG_MIP_LINEAR :
-                D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR) :
-            (capture.magFilter == D3DTEXF_LINEAR ?
-                D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR :
-                D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR);
-    }
-    // Bind the full mip chain for both captured D3D9 MAG anisotropic profiles.
-    if (capture.minFilter == D3DTEXF_ANISOTROPIC)
-        state.Filter = D3D11_FILTER_ANISOTROPIC;
-    // D3D9 game/menu UVs may reflect outside [0,1]. Preserve their
-    // addressing semantics through the native pixel sampler; never silently
-    // clamp an unknown D3D9 state, which would mislabel a diagnostic frame.
-    const auto translateAddress = [](D3DTEXTUREADDRESS address) noexcept {
-        switch (address) {
-        case D3DTADDRESS_WRAP: return D3D11_TEXTURE_ADDRESS_WRAP;
-        case D3DTADDRESS_CLAMP: return D3D11_TEXTURE_ADDRESS_CLAMP;
-        case D3DTADDRESS_MIRROR: return D3D11_TEXTURE_ADDRESS_MIRROR;
-        case D3DTADDRESS_MIRRORONCE: return D3D11_TEXTURE_ADDRESS_MIRROR_ONCE;
-        case D3DTADDRESS_BORDER: return D3D11_TEXTURE_ADDRESS_BORDER;
-        default: return static_cast<D3D11_TEXTURE_ADDRESS_MODE>(0);
-        }
-    };
-    state.AddressU = translateAddress(capture.addressU);
-    state.AddressV = translateAddress(capture.addressV);
-    if (!state.AddressU || !state.AddressV) return false;
-    state.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-    // D3D9 COLORREF-like D3DCOLOR is 0xAARRGGBB; native BorderColor is RGBA.
-    state.BorderColor[0] = static_cast<float>((capture.borderColor >> 16) & 0xffu) / 255.0f;
-    state.BorderColor[1] = static_cast<float>((capture.borderColor >> 8) & 0xffu) / 255.0f;
-    state.BorderColor[2] = static_cast<float>(capture.borderColor & 0xffu) / 255.0f;
-    state.BorderColor[3] = static_cast<float>((capture.borderColor >> 24) & 0xffu) / 255.0f;
-    // Recheck captured source state before CreateSamplerState; no silent
-    // D3D11 driver clamp or NaN/Inf propagation in the diagnostic image.
-    if (!std::isfinite(capture.mipLodBias) ||
-        capture.mipLodBias < kMinMipLodBias || capture.mipLodBias > kMaxMipLodBias ||
-        (!usesMips && capture.mipLodBias != 0.0f)) return false;
-    // D3D9 MAXMIPLEVEL discards finer (lower-indexed) mip levels.
-    // D3D11 MinLOD clamps to that same source level; all levels are mirrored.
-    state.MinLOD = usesMips ? static_cast<float>(capture.maxMipLevel) : 0.0f;
-    state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;
-    state.MipLODBias = usesMips ? capture.mipLodBias : 0.0f;
-    state.MaxAnisotropy = capture.minFilter == D3DTEXF_ANISOTROPIC ?
-        capture.maxAnisotropy : 1u;
-    state.ComparisonFunc = D3D11_COMPARISON_NEVER;
-    return SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));
+    return create_game_sampler(dev, capture, levels, sampler);
 }
 
 bool submit(State& s, const std::vector<NativeVertex>& vertices,
