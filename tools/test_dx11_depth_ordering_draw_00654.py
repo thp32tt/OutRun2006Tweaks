@@ -21,8 +21,9 @@ def integrated(c,h,p):
         "else if (output.nativeDepthOrderingMode != 0u)",
         "D3D11_COMPARISON_GREATER : D3D11_COMPARISON_GREATER_EQUAL;",
         "D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO",
-        "output.nativeDepthOrderingMode != 0u ? 0.0f : 1.0f;",
-        "D3D11_CLEAR_DEPTH, diagnosticDepthClear, 0);",
+        "s.frameBatch.depth_clear_value(output.nativeDepthOrderingMode != 0u), 0);",
+        "s.frameBatch.consume_depth_clear();",
+        "ctx->ClearDepthStencilView(s.diagnosticDepthView.Get(), D3D11_CLEAR_DEPTH,",
         "ctx->OMSetRenderTargets(1, &rtv, s.diagnosticDepthView.Get());",
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"))
@@ -45,7 +46,8 @@ for old,bad in (
     ("D3D11_COMPARISON_GREATER : D3D11_COMPARISON_GREATER_EQUAL;","D3D11_COMPARISON_GREATER : D3D11_COMPARISON_GREATER;"),
     ("output.nativeDepthWrite, output.nativeDepthOrderingMode)].Get(), 0);","false, output.nativeDepthOrderingMode)].Get(), 0);"),
     ("output.nativeDepthWrite, output.nativeDepthOrderingMode)].Get(), 0);","output.nativeDepthWrite, 5u)].Get(), 0);"),
-    ("output.nativeDepthOrderingMode != 0u ? 0.0f : 1.0f;","output.nativeDepthOrderingMode != 0u ? 1.0f : 1.0f;"),
+    ("s.frameBatch.depth_clear_value(output.nativeDepthOrderingMode != 0u)","s.frameBatch.depth_clear_value(false)"),
+    ("s.frameBatch.consume_depth_clear();","/* deleted clear consumption */"),
     ("for (auto& depthState : s.diagnosticDepthOrderingStates) depthState.Reset();",""),
     ("else if (output.nativeDepthOrderingMode != 0u)","else if (false)"),
 ):
