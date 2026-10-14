@@ -21,4 +21,10 @@ int main()
         (std::numeric_limits<std::int64_t>::max)());
     const auto high = (std::numeric_limits<std::int64_t>::max)() / 2 - 1;
     assert(ElapsedQpcMilliseconds(1, 1 + high / 2, high) == 500);
+    // Above INT64_MAX/1000, old floating point fallback rounded the value
+    // immediately below a millisecond boundary up to the next millisecond.
+    constexpr std::int64_t huge = 9'000'000'000'000'000'000LL;
+    assert(ElapsedQpcMilliseconds(1, 1 + huge / 500 - 1, huge) == 1);
+    assert(ElapsedQpcMilliseconds(1, 1 + huge / 500, huge) == 2);
+    assert(ElapsedQpcMilliseconds(1, huge, huge) == 999);
 }

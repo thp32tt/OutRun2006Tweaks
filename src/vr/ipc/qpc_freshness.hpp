@@ -19,18 +19,29 @@ namespace OutRunVR::Ipc
         if (wholeSeconds > limit / 1000)
             return limit;
 
-        // Normal QPC frequencies are far below this bound. Keep ordinary
-        // per-Present arithmetic integer-exact; the rare impossible-for-a-PC
-        // frequency branch also avoids overflow rather than wrapping stale.
+        // QPC is normally far below this frequency, so keep the common path
+        // a single exact integer division.  For extremely high frequencies
+        // where remainder*1000 overflows, compute the same floor division by
+        // bounded modular addition.  Unlike floating point this preserves the
+        // stale/fresh boundary even if long double is only 64-bit on MSVC.
         std::int64_t partial = 0;
         if (remainder <= limit / 1000)
             partial = (remainder * 1000) / frequency;
         else
-            partial = static_cast<std::int64_t>(
-                (static_cast<long double>(remainder) * 1000.0L) /
-                static_cast<long double>(frequency));
-        if (partial > 999)
-            partial = 999;
+        {
+            const std::int64_t wrapThreshold = frequency - remainder;
+            std::int64_t residual = 0;
+            for (int step = 0; step < 1000; ++step)
+            {
+                if (residual >= wrapThreshold)
+                {
+                    residual -= wrapThreshold;
+                    ++partial;
+                }
+                else
+                    residual += remainder; // Sum remains < frequency.
+            }
+        }
         const std::int64_t base = wholeSeconds * 1000;
         return base > limit - partial ? limit : base + partial;
     }
