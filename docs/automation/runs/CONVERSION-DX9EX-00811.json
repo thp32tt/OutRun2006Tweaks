@@ -2,19 +2,19 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00811",
   "production_id": "CONVERSION-DX9EX-00811",
-  "event_id": "CONVERSION-DX9EX-00811-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00811-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:PERF:R33_SINGLE_DRAW_TELEMETRY_SNAPSHOT",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R33_SINGLE_DRAW_TELEMETRY_SNAPSHOT",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00811]",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r33.cpp",
@@ -58,9 +58,9 @@
     ]
   },
   "acceptance_results": {
-    "DRAW_ENTRY_PARITY": "LOCAL_SOURCE_ASSERTIONS_ONLY",
-    "DISPATCH_SAFE_FALLBACK": "LOCAL_SOURCE_ASSERTIONS_ONLY",
-    "EXACT_SHA_WIN32_GATES": "PENDING"
+    "DRAW_ENTRY_PARITY": "PASS_EXACT_SHA",
+    "DISPATCH_SAFE_FALLBACK": "PASS_EXACT_SHA",
+    "EXACT_SHA_WIN32_GATES": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "R33 DrawPrimitive, DrawIndexedPrimitive and UP hooks read R33TelemetryEnabled before workload observation; R33Dispatch rereads it for a second R32ReviewTelemetryEnabled call.",
@@ -76,13 +76,24 @@
       "Do not skip R32 workload observer or query once per Present because different physical Draws may use different diagnostic settings."
     ],
     "negative_test_evidence": "Updated existing CI verifier to enforce one entry sampling and dispatch propagation with destructive per-API mutations; exact GitHub gates pending.",
-    "fix_evidence": "Thread the existing entry telemetry boolean through the four R33Dispatch calls rather than making a second cross-TU query."
+    "fix_evidence": "Thread the existing entry telemetry boolean through the four R33Dispatch calls rather than making a second cross-TU query.",
+    "repair_evidence": "First CI run 38490186779 failed R33 single-classification resync argument verifier after Draw dispatch acquired telemetry argument. Fixed recovery-flag verifier; corrected new telemetry verifier source newline/regex escapes and per-Draw negative mutations. Exact-SHA follow-up 38490566051 PASS."
   },
   "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
-  "runtime_status": "BUILD_PENDING_NEED_HMD_TEST",
+  "runtime_status": "BUILD_VERIFIED_NEED_HMD_TEST",
   "base_sha": "3268a767efc8f762bb09a64b1f15f42e372db5c7",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
-    "head_sha": null
-  }
+    "status": "PASS_EXACT_SHA",
+    "head_sha": "05ce87d782d8ca3af5d4631c1f1dfa094b7d25c0",
+    "material_result_sha": "e23ee3ccfbed0ebf4c8d982c75c06e0b9f802548",
+    "dx9ex_active_run_id": 38490566051,
+    "dx9ex_active_jobs": "5/5 SUCCESS",
+    "domain_isolation_run_id": 38490566035,
+    "domain_isolation": "SUCCESS",
+    "original_material_full_source_impact_run_id": 38490186816,
+    "original_material_full_source_impact": "3/3 SUCCESS",
+    "runtime_validation": "UNTESTED"
+  },
+  "material_result_sha": "e23ee3ccfbed0ebf4c8d982c75c06e0b9f802548",
+  "validation_bearing_result_sha": "05ce87d782d8ca3af5d4631c1f1dfa094b7d25c0"
 }
