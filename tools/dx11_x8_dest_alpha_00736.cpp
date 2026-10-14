@@ -3,12 +3,18 @@
 #include <array>
 #include <cassert>
 using namespace outrun::vr::dx11::live_game_frame;
+constexpr bool equal_color(const std::array<float, 4>& lhs,
+                           const std::array<float, 4>& rhs) noexcept {
+    for (std::size_t i = 0; i < lhs.size(); ++i)
+        if (lhs[i] != rhs[i]) return false;
+    return true;
+}
 constexpr bool proof() {
     constexpr std::uintptr_t device = 0x100u, target = 0x200u;
     constexpr std::array<float, 4> fallback{0.03f, 0.04f, 0.05f, 1.0f};
     GameNativeClearColor clear{};
     GameNativeFrameBatch frame{};
-    if (clear.native_color(device, target, fallback) != fallback) return false;
+    if (!equal_color(clear.native_color(device, target, fallback), fallback)) return false;
     clear.record(device, target, 0x00112233u, true, false); // A8, zero alpha
     if (clear.native_color(device, target, fallback)[3] != 0.0f) return false;
     clear.record(device, target, 0x00112233u, true, true);  // X8, reserved alpha=0
@@ -25,15 +31,15 @@ constexpr bool proof() {
     if (!frame.accepts_full_seeded(0u, clear.matches(device, target))) return false;
     frame.succeeded(false); frame.record_source_draw(0u);
     if (!frame.accepts_full_seeded(1u, false)) return false; // next indexed Draw
-    if (clear.native_color(device, target + 1u, fallback) != fallback ||
-        clear.native_color(device + 1u, target, fallback) != fallback) return false;
+    if (!equal_color(clear.native_color(device, target + 1u, fallback), fallback) ||
+        !equal_color(clear.native_color(device + 1u, target, fallback), fallback)) return false;
     clear.record(device, target, 0x80112233u, true, false); // A8 retained
     if (clear.native_color(device, target, fallback)[3] != 128.0f/255.0f ||
         clear.native_write_mask(device, target, 0x0fu) != 0x0fu) return false;
     clear.record(device, target, 0x00112233u, false, true); // partial Clear rejects seed
     if (clear.opaqueDestinationAlpha || clear.matches(device, target) ||
         clear.native_write_mask(device, target, 0x0fu) != 0x0fu) return false;
-    if (clear.native_color(device, target, fallback) != fallback) return false;
+    if (!equal_color(clear.native_color(device, target, fallback), fallback)) return false;
     clear.record(device, target, 0x00112233u, true, true);
     clear.discard(); // Reset/Present flushes stale source format
     return !clear.opaqueDestinationAlpha && !clear.matches(device, target);

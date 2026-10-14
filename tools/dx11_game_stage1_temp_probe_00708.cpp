@@ -1,5 +1,6 @@
 #include "../src/vr/d3d11/live_game_stage1_factor.hpp"
 #include <cstdio>
+#include <initializer_list>
 using namespace outrun::vr::dx11::live_game_frame;
 int main() {
     unsigned pass=0, reject=0;

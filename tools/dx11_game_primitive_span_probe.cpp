@@ -136,7 +136,8 @@ int main() {
     assert(upPacked.size() == 2u * sparseStride &&
            upPacked[0] == 0x41u && upPacked[sparseStride] == 0x72u);
     assert((upRemapped == std::vector<std::uint32_t>{1u, 0u, 1u}));
-    const auto keptUp = upPacked, keptUpIndices = upRemapped;
+    const auto keptUp = upPacked;
+    const auto keptUpIndices = upRemapped;
     const std::uint32_t badUp[] = {10000u, 8999u, 10000u};
     assert(!game_gather_indexed_up_vertices(
         upSource.data(), sparseStride, badUp, 3u, sparseMin, 40000u,
