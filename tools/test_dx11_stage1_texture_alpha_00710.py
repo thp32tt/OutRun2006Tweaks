@@ -18,7 +18,7 @@ def integrated(h,b):
         "stage1_matched_texture_alpha_blend_supported(",
         "tex1.Get() != tex.Get()",
         "uv1 != capture.coordIndex",
-        "transform1 != (capture.transformUv ? D3DTTFF_COUNT2 : D3DTTFF_DISABLE)",
+        "capture.stage1TransformUv = transform1 == D3DTTFF_COUNT2;",
         "std::memcmp(&capture.uvTransform, &matrix1, sizeof(matrix1)) != 0",
         "game->GetSamplerState(0, states[i], &s0)",
         "game->GetSamplerState(1, states[i], &s1)",
@@ -41,7 +41,7 @@ def integrated(h,b):
 # sampled alpha independently for RGB and alpha; detect loss of either path.
 assert integrated(h,b)
 for s in ("if (states[i] == D3DSAMP_ADDRESSW && s0 != s1) return false;", "tex1.Get() != tex.Get()","uv1 != capture.coordIndex",
-          "samplerDiff |= s0 != s1;", "stage1Ops.x == 13","stage1Ops.y == 13",
+          "samplerDiff |= s0 != s1;", "capture.stage1TransformUv = transform1 == D3DTTFF_COUNT2;", "stage1Ops.x == 13","stage1Ops.y == 13",
           "stage1TextureAlpha));","stage1TextureAlpha)).a;","ctx->DrawIndexed(indexCount, 0, 0);"):
     assert not integrated(h,b.replace(s,"",1)),s
 assert not integrated(h.replace("matchedTextureSampler &&","true &&",1),b)
