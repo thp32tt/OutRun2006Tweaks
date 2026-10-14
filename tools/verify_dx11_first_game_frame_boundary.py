@@ -76,7 +76,9 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     # Validate the complete source-to-inset chain. A bounded, fenced,
     # nonblocking copy is stricter than the old synchronous staging Map:
     # no CPU wait, no unread-slot overwrite, and checked RGB pixel evidence.
-    require("s.backend.begin_frame(kBackground);" in code and
+    require("s.backend.begin_frame(env_full_game_opt_in()" in code and
+            "s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)" in code and
+            ": kBackground);" in code and
             "ctx->CopyResource(next.staging.Get(), s.backend.color_texture())" in code and
             "ctx->End(next.fence.Get());" in code and
             "D3D11_QUERY_EVENT" in code and
