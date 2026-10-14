@@ -2,20 +2,20 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00834",
   "production_id": "CONVERSION-DX9EX-00834",
-  "event_id": "CONVERSION-DX9EX-00834-E003",
-  "event_type": "retry",
+  "event_id": "CONVERSION-DX9EX-00834-E004",
+  "event_type": "result",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
-  "attempt": "2/3",
+  "attempt": "3/3",
   "feature_id": "DX9EX:CRITICAL:R23_QPC_HOST_FRESHNESS",
   "feature_class": "CRITICAL_BLOCKER",
   "work_key": "DX9EX:CRITICAL:R23_QPC_HOST_FRESHNESS",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "SOURCE_REPAIR_READY",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "feature_contract": {
     "feature_id": "DX9EX:CRITICAL:R23_QPC_HOST_FRESHNESS",
     "goal": "Preserve the entire R23 DirectGPU host sample freshness decision from the original seqlock publication through millisecond age conversion and safe stale/invalid fallback even after long uptime and with extremely high QPC frequencies.",
@@ -53,9 +53,9 @@
     ]
   },
   "acceptance_results": {
-    "HOST_QPC_AGE_EXACT": "PASS_BUILD",
-    "INVALID_STALE_FALLBACK": "PASS_BUILD",
-    "FINAL_EXACT_SHA_GATES": "PENDING_EXACT_SHA"
+    "HOST_QPC_AGE_EXACT": "PASS_EXACT_SHA",
+    "INVALID_STALE_FALLBACK": "PASS_EXACT_SHA",
+    "FINAL_EXACT_SHA_GATES": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "At material 7119ed3 R23 originally converted (now-sample)*1000 in signed 64-bit; run 38537820149 then failed policy on absent 00834 run record before compilation. The first R23 QPC helper still used floating-point fallback for huge frequencies.",
@@ -84,17 +84,47 @@
   ],
   "runtime_note": "RUNTIME_VALIDATION=UNTESTED: no actual Quest3/VDXR game/HMD test or Windows host timing capture.",
   "ci_evidence": {
+    "validation_bearing_result_sha": "ec19ce68d784c09bb07d34970e9579a7430e50aa",
     "failed_initial_run": {
       "run_id": 38537820149,
       "failed_job": "policy",
-      "root_cause": "Missing docs/automation/runs/CONVERSION-DX9EX-00834.json before compilation"
+      "root_cause": "Missing docs/automation/runs/CONVERSION-DX9EX-00834.json"
+    },
+    "failed_first_repair_run": {
+      "run_id": 38538513621,
+      "attempt": 1,
+      "failed_job": "policy",
+      "root_cause": "Transient upstream GitHub release download connection timeout; no binary identity validation bypass"
+    },
+    "dx9ex_active": {
+      "run_id": 38538513621,
+      "attempt": 2,
+      "conclusion": "success",
+      "passed_jobs": 5,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38538513621"
+    },
+    "domain_isolation": {
+      "run_id": 38538513629,
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38538513629"
+    },
+    "full_source_impact": {
+      "run_id": 38538513679,
+      "conclusion": "success",
+      "passed_jobs": 3,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38538513679"
     },
     "local_cpp20_smoke": {
-      "status": "PASS",
-      "compiler": "g++",
-      "flags": "-std=c++20 -Wall -Wextra -Werror -fsanitize=undefined -fno-sanitize-recover=all",
-      "scope": "Pure helper with 9e18 boundary, old tests, no HMD"
+      "conclusion": "pass",
+      "scope": "Reconstructed exact helper logic compiled with local g++ -std=c++20 -Wall -Wextra -Werror -fsanitize=undefined; original smoke and high-frequency edge cases"
+    },
+    "local_property_reference": {
+      "conclusion": "pass",
+      "scope": "300,000 randomized QPC samples checked against independent __int128 millisecond reference under UBSan"
     }
   },
-  "next_action": "Await exact new GitHub Actions gates; repair any failure using this same TASK_ID. Do not claim HMD PASS."
+  "next_action": "Quest3/VDXR original game/HMD runtime check remains untested. Next independent DX9Ex feature work uses a new TASK_ID; do not rerun 00834 or award additional points.",
+  "validation_bearing_result_sha": "ec19ce68d784c09bb07d34970e9579a7430e50aa",
+  "result_sha": "ec19ce68d784c09bb07d34970e9579a7430e50aa",
+  "complete_build_verified_at_kst": "2026-10-14T18:04:06+09:00"
 }
