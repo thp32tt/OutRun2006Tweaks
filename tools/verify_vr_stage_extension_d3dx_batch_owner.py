@@ -64,7 +64,9 @@ def check(code: str, header: str) -> list[str]:
          "only exact D3DX sprite may invalidate stale device-loss batch")
     for method, slot in (("LostDevice", 12), ("ResetDevice", 13)):
         need(f"static HRESULT __stdcall {method}Dest(void* self)" in lifecycle and
-             f"const HRESULT hr = {method}_hk.stdcall<HRESULT>(self);" in lifecycle and
+             (f"const HRESULT hr = {method}_hk.stdcall<HRESULT>(self);\n"
+              "        InvalidateForDeviceLifecycle(self);\n"
+              "        return hr;") in lifecycle and
              lifecycle.count("InvalidateForDeviceLifecycle(self);") == 2 and
              f"vtable[{slot}]" in hook and
              f"reinterpret_cast<void*>(&{method}Dest)" in hook and
@@ -223,6 +225,18 @@ def main() -> int:
         "reset-hook-absent":
             code.replace("ResetDevice_hk.enable().has_value()",
                          "false", 1),
+        "lost-must-propagate-original-error":
+            code.replace(
+                "InvalidateForDeviceLifecycle(self);\n        return hr;\n"
+                "    }\n\n    static HRESULT __stdcall ResetDeviceDest",
+                "InvalidateForDeviceLifecycle(self);\n        return D3D_OK;\n"
+                "    }\n\n    static HRESULT __stdcall ResetDeviceDest", 1),
+        "reset-must-propagate-original-error":
+            code.replace(
+                "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);\n"
+                "        InvalidateForDeviceLifecycle(self);\n        return hr;",
+                "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);\n"
+                "        InvalidateForDeviceLifecycle(self);\n        return D3D_OK;", 1),
     }
     for label, mutated in mutations.items():
         if mutated == code or not check(mutated, header):
