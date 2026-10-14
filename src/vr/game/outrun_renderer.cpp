@@ -377,9 +377,24 @@ namespace OutRunVRRenderer
 		{
 			D3DMATRIX out{};
 			for (int row = 0; row < 4; ++row)
+			{
+				const float a0 = a.m[row][0];
+				const float a1 = a.m[row][1];
+				const float a2 = a.m[row][2];
+				const float a3 = a.m[row][3];
 				for (int col = 0; col < 4; ++col)
-					for (int k = 0; k < 4; ++k)
-						out.m[row][col] += a.m[row][k] * b.m[k][col];
+				{
+					// Keep the original zero-initialized, left-to-right float
+					// accumulation; only move repeated matrix loads/writes out
+					// of the inner loop (no transform or routing changes).
+					float sum = 0.0f;
+					sum += a0 * b.m[0][col];
+					sum += a1 * b.m[1][col];
+					sum += a2 * b.m[2][col];
+					sum += a3 * b.m[3][col];
+					out.m[row][col] = sum;
+				}
+			}
 			return out;
 		}
 
@@ -548,6 +563,16 @@ namespace OutRunVRRenderer
 				SharedState->structSize == sizeof(SharedPoseState);
 		}
 
+		// The host may clear clientPid on recovery. Restore it if needed,
+		// without issuing a locked write to the shared header every frame.
+		void PublishClientPidIfChanged() noexcept
+		{
+			static const LONG selfPid = static_cast<LONG>(GetCurrentProcessId());
+			if (SharedState->clientPid != static_cast<std::uint32_t>(selfPid))
+				InterlockedExchange(
+					reinterpret_cast<volatile LONG*>(&SharedState->clientPid), selfPid);
+		}
+
 		bool EnsureSharedState()
 		{
 			if (SharedState)
@@ -556,8 +581,7 @@ namespace OutRunVRRenderer
 					return false;
 				if (QpcFrequency.QuadPart <= 0)
 					QueryPerformanceFrequency(&QpcFrequency);
-				InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientPid),
-					static_cast<LONG>(GetCurrentProcessId()));
+				PublishClientPidIfChanged();
 				return true;
 			}
 
@@ -594,8 +618,7 @@ namespace OutRunVRRenderer
 			}
 
 			QueryPerformanceFrequency(&QpcFrequency);
-			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientPid),
-				static_cast<LONG>(GetCurrentProcessId()));
+			PublishClientPidIfChanged();
 			spdlog::info("VR renderer: shared pose bridge ready (protocol {}, client pid={})",
 				SharedProtocolVersion, GetCurrentProcessId());
 			return true;
@@ -631,8 +654,7 @@ namespace OutRunVRRenderer
 			const std::uint32_t gameState = Game::current_mode
 				? static_cast<std::uint32_t>(*Game::current_mode) : 0xFFFFFFFFu;
 
-			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->clientPid),
-				static_cast<LONG>(GetCurrentProcessId()));
+			// EnsureSharedState already refreshes clientPid (including host resets).
 			InterlockedIncrement(reinterpret_cast<volatile LONG*>(&SharedState->reserved[ClientHeartbeatIndex]));
 			InterlockedExchange(reinterpret_cast<volatile LONG*>(&SharedState->reserved[ClientFlagsIndex]),
 				static_cast<LONG>(flags));
