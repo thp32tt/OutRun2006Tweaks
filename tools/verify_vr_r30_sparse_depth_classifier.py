@@ -4,7 +4,8 @@
 The UP and shadowed VB/IB indexed producers publish unique touched indices
 and a matching mask. For <=512 references the classifier visits only those
 indices; 513..2048 sparse references use a bounded ascending sort to retain
-the original first-512 sample. Leased 2049..16384 references quick-select\nthe same first 512; dense/untrusted hints scan as before.
+the original first-512 sample. Leased 2049..16384 references quick-select
+ the same first 512; dense/untrusted hints scan as before.
 This tests both the classification result and fail-closed hint rejection.
 """
 from pathlib import Path
@@ -120,6 +121,7 @@ def static_contract(src, workflow):
         "largeSparseSample ? 512u : touched->size()",
         "if (!sortedCacheHit)",
         "sortedTouched.clear();",
+        "sortedTouched.size() ==\n                    (largeSparseSample ? 512u : touched->size());",
         "if (!sortedTouched.empty() && trustedVbHint)",
     ):
         assert token in c, ("sort lifecycle", token)
@@ -316,20 +318,27 @@ def cached_mask_lifecycle():
         stable = source == "vb"
         if (stable and vb_sort_cache is not None and
                 cached_generation == generation and
-                len(vb_sort_cache) == len(touched)):
+                len(vb_sort_cache) == (512 if len(touched) > 2048 else
+                                        len(touched))):
             order = vb_sort_cache
         else:
             order = sorted(touched)
+            if len(touched) > 2048:
+                # nth_element + sort stores only the first 512 values.
+                # Model the same observable cache payload/order.
+                order = order[:512]
             sort_count += 1
             if stable:
                 vb_sort_cache, cached_generation = order, generation
         return order[:512]
 
-    for generation_index, n in enumerate((8192, 16384, 65536)):
+    for generation_index, (n, count) in enumerate(
+            ((8192, 700), (65536, 4096), (131072, 8192))):
         # Each new vertex span comes from a different decoded IB mask;
-        # invalidate the previous generation even when its cardinality is 700.
+        # invalidate the previous generation across full and 512-entry
+        # quick-select cache payloads.
         gen += 1
-        selected = rng.sample(range(n), 700)
+        selected = rng.sample(range(n), count)
         mask = bytearray(n)
         for i in selected:
             mask[i] = 1
@@ -338,11 +347,16 @@ def cached_mask_lifecycle():
         for _ in range(15):
             assert classify_order(mask, selected, gen, "vb") == base
         assert sort_count == 3 * generation_index + 1
+        if count > 2048:
+            assert len(vb_sort_cache) == 512
+        else:
+            assert len(vb_sort_cache) == count
         # UP is independent and always builds its own ascending order.
-        other = rng.sample(range(n), 700)
+        other = rng.sample(range(n), count)
         assert classify_order(mask, other, gen, "up") == sorted(other)[:512]
         gen += 1  # decoded IB revision, span or mask changed
         assert classify_order(mask, selected[::-1], gen, "vb") == base
+        assert sort_count == 3 * (generation_index + 1)
     assert sort_count == 9  # 3 VB misses + 3 UP + 3 decode invalidations
 
 
