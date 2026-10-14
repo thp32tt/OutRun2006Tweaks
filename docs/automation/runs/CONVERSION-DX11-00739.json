@@ -1,0 +1,112 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00739",
+  "production_id": "CONVERSION-DX11-00739",
+  "event_id": "CONVERSION-DX11-00739-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_FULL_FRAME_MODE_AND_UPLOAD_EXTENT",
+  "feature_id": "DX11-FULL-FRAME-MODE-OWNERSHIP-AND-RESIZE-UPLOAD",
+  "status": "C6_COMPLETE_BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
+  "base_head_sha": "b17b0c9a348a2a84c2fc027d3c6dfe46b079572d",
+  "material_result_sha": "c18b38be661001617c8d507eef823baf7fdb6a5b",
+  "validation_bearing_result_sha": "d44c3576f107b379c55198a3d176a4bdf6bfdf4d",
+  "automation_validation": "PASS_5_OF_5",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "change_summary": "Fix live menu/vehicle/race native full-frame versus inset mode ownership across real D3D9 Draw/DrawIndexed, unavailable source paths, and same-source Present; retire stale cross-mode readback provenance, recreate system-memory upload surface when actual game output dimensions change. Preserve original game HRESULT, D3D9 Present/gamepad, and opt-in-only DX11 fallback.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_readback_provenance.hpp",
+    "src/vr/d3d11/native_game_frame_publication.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_output_mode_transition_00739.py",
+    "tools/test_dx11_game_device_handoff_00681.py"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "game D3D9 Draw/DrawIndexed source-mode record and fail-closed mixed-mode rejection",
+      "output signature/generation and owner Present source-mode validation",
+      "D3D11 readback -> exact-extent D3D9 system-memory UpdateSurface; original fallback and gamepad retained"
+    ],
+    "batch_components": [
+      "live_game_frame_bridge real game Draw/Present",
+      "GameOutputSignature/FramePublication source-mode and dimensions",
+      "portable compile/source mutation CI and exact-SHA Windows/OpenXR/HUD checks"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00739 source integration and portable C++ mode/extent invariant plus same-sha full build succeeds.",
+      "negative_regression": "00739 destructive cross-mode/extent mutations and existing 00681 foreign Present ownership negative checks pass.",
+      "component_integration": "Real native game Draw/DrawIndexed -> per-frame provenance -> same-device Present upload and safe D3D9 fallback."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_FULL_FRAME_MODE_AND_UPLOAD_EXTENT"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "blocking_evidence": "Prior game output signature compared only source backbuffer/crop/dirty fields; system-memory surface cache compared only format/device, allowing mode/extent reuse.",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Cross-mode full-frame/inset pixels never share stale readback; current upload matches dimensions and source device. HMD pixels remain UNTESTED.",
+    "activation_guard_and_fallback": "Env opt-in remains required, original D3D9 render/HRESULT/input/Present preserved without native-promotion claim."
+  },
+  "feature_contract": {
+    "feature_id": "DX11-FULL-FRAME-MODE-OWNERSHIP-AND-RESIZE-UPLOAD",
+    "goal": "Preserve continuous native frame mode and D3D9 output-surface ownership across real menu/car-select/race Draw/Present and resize transitions.",
+    "acceptance_items": [
+      {
+        "id": "native-source-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_rendering",
+        "expected_behavior": "All actual admitted/unavailable D3D9 source calls and owning Present preserve one native output mode; source-matched same-Present full-frame remains possible."
+      },
+      {
+        "id": "upload-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "game_source_output_and_input",
+        "expected_behavior": "Cross-mode or mismatched upload dimensions abort optional native publication without changing original game/pad/fallback, with destructive regressions."
+      },
+      {
+        "id": "exact-sha-integration",
+        "category": "integrated_validation",
+        "behavior_area": "automated_windows_openxr_hud",
+        "expected_behavior": "Exact d44c3576 result SHA passes mandatory Fast, Backend, Windows Build, OpenXR and HUD workflows."
+      }
+    ]
+  },
+  "ci_evidence": {
+    "dx11_fast": {
+      "run_id": 38609822204,
+      "conclusion": "success"
+    },
+    "backend_conversion": {
+      "run_id": 38609822470,
+      "conclusion": "success"
+    },
+    "windows_build": {
+      "run_id": 38609830925,
+      "conclusion": "success"
+    },
+    "openxr_architecture": {
+      "run_id": 38609830795,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38609830900,
+      "conclusion": "success"
+    }
+  },
+  "result_note": "Five required GitHub Actions at exact validation-bearing source/test SHA succeeded. Quest3/VDXR, actual game/visible pixels/gamepad and frame pacing are not tested. This is a separate C6 checkpoint and carries no CI gate ownership or additional AI score."
+}
