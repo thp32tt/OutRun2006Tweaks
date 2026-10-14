@@ -308,7 +308,17 @@ namespace OutRunVRStereo
                 return true;
             }
 
-            if (FAILED(device->GetRenderState(D3DRS_ZENABLE, &next.zEnable)) ||
+            // When Z testing is off, ZWRITEENABLE cannot modify depth.
+            // Defer that driver read until ZENABLE is restored; the tracked
+            // setter invalidates this partial snapshot on the transition.
+            if (FAILED(device->GetRenderState(D3DRS_ZENABLE, &next.zEnable)))
+            {
+                if (R33TelemetryEnabled())
+                    ++R33DepthStencilReadFailures;
+                R33InvalidateDepthStencilCache();
+                return false;
+            }
+            if (next.zEnable != D3DZB_FALSE &&
                 FAILED(device->GetRenderState(D3DRS_ZWRITEENABLE, &next.zWrite)))
             {
                 if (R33TelemetryEnabled())
@@ -351,13 +361,24 @@ namespace OutRunVRStereo
                             FAILED(device->GetRenderState(
                                 D3DRS_STENCILPASS, &next.stencilPass)) ||
                             FAILED(device->GetRenderState(
-                                D3DRS_TWOSIDEDSTENCILMODE, &next.twoSided)) ||
-                            FAILED(device->GetRenderState(
+                                D3DRS_TWOSIDEDSTENCILMODE, &next.twoSided)))
+                        {
+                            if (R33TelemetryEnabled())
+                                ++R33DepthStencilReadFailures;
+                            R33InvalidateDepthStencilCache();
+                            return false;
+                        }
+                        // Single-sided stencil cannot execute the CCW ops.
+                        // Save three live driver reads until two-sided mode
+                        // is enabled; that tracked transition invalidates
+                        // the partial snapshot before any stereo draw.
+                        if (next.twoSided != FALSE &&
+                            (FAILED(device->GetRenderState(
                                 D3DRS_CCW_STENCILFAIL, &next.ccwStencilFail)) ||
-                            FAILED(device->GetRenderState(
+                             FAILED(device->GetRenderState(
                                 D3DRS_CCW_STENCILZFAIL, &next.ccwStencilZFail)) ||
-                            FAILED(device->GetRenderState(
-                                D3DRS_CCW_STENCILPASS, &next.ccwStencilPass)))
+                             FAILED(device->GetRenderState(
+                                D3DRS_CCW_STENCILPASS, &next.ccwStencilPass))))
                         {
                             if (R33TelemetryEnabled())
                                 ++R33DepthStencilReadFailures;
@@ -489,6 +510,11 @@ namespace OutRunVRStereo
             case D3DRS_ZENABLE:
                 if (R33DepthStencilState.zEnable == value)
                     return hr;
+                // ZWRITEENABLE was intentionally not read under disabled Z.
+                // Transitioning to live depth tests must resample the device.
+                if (R33DepthStencilState.zEnable == D3DZB_FALSE &&
+                    value != D3DZB_FALSE)
+                    R33InvalidateDepthStencilCache();
                 R33DepthStencilState.zEnable = value;
                 break;
             case D3DRS_ZWRITEENABLE:
@@ -532,6 +558,9 @@ namespace OutRunVRStereo
             case D3DRS_TWOSIDEDSTENCILMODE:
                 if (R33DepthStencilState.twoSided == value)
                     return hr;
+                // The CCW ops are not sampled under single-sided stencil.
+                if (R33DepthStencilState.twoSided == FALSE && value != FALSE)
+                    R33InvalidateDepthStencilCache();
                 R33DepthStencilState.twoSided = value;
                 break;
             case D3DRS_CCW_STENCILFAIL:

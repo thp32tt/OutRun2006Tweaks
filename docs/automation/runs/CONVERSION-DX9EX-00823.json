@@ -1,0 +1,74 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00823",
+  "production_id": "CONVERSION-DX9EX-00823",
+  "event_id": "CONVERSION-DX9EX-00823-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R33_LAZY_DEPTH_STENCIL_READBACK",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R33_LAZY_DEPTH_STENCIL_READBACK",
+  "status": "FEATURE_READY",
+  "checkpoint": "C2_IMPLEMENT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00823]",
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R33_LAZY_DEPTH_STENCIL_READBACK",
+    "goal": "Avoid unnecessary synchronous D3D9 render-state driver readback on normal depth-disabled and single-sided-stencil world/HUD stereo rendering while preserving exact right-eye depth and stencil write safety.",
+    "scope_boundary": "R33 final stereo draw owner depth/stencil lazy snapshot and its negative regression verifier only; do not alter drawing, GPU sync, protected SkyGlow, optics, FFB, or other backend branches.",
+    "special_work_evidence": "Static hot-path inspection showed R33 cold-cache refresh always requests ZWRITEENABLE despite disabled Z and three CCW stencil ops despite single-sided mode; optimization removes these unnecessary getter calls during material/stateblock invalidation rebuilds. Actual FPS remains unmeasured.",
+    "trace_stages": [
+      "Original game SetRenderState and StateBlock::Apply drive the authoritative D3D9 state with tracked setter/generation fences.",
+      "R33ReadDepthStencilWriteState rebuilds the per-draw depth/stencil write shadow only when cache invalidated or ownership changed.",
+      "R33GetWriteFlags and R33TryFastWorld/R33TryHud gate right-eye depth/stencil sync, preserving original and per-eye Draw/DrawIndexed behavior."
+    ],
+    "subcomponents": [
+      "Skip ZWRITEENABLE read under disabled Z, invalidate and resample on ZENABLE activation including reset/Apply generations.",
+      "Skip three CCW operation reads under one-sided stencil, invalidate and resample on two-sided enable; retain stencil enable/mask/format and failure fences.",
+      "Extend R33 source contract with destructive mutation tests for both lazy predicates, both invalidation transitions and depth/stencil fail-closed reads."
+    ],
+    "acceptance_items": [
+      {
+        "id": "DEPTH_OFF_LAZY",
+        "category": "end_to_end_behavior",
+        "behavior_area": "depth_disabled_eye_draw",
+        "expected_behavior": "Disabled depth testing skips the ZWRITEENABLE driver read until a tracked depth-enable transition, with no world/HUD stereo write-flag changes."
+      },
+      {
+        "id": "ONE_SIDED_LAZY",
+        "category": "fallback_regression",
+        "behavior_area": "one_two_sided_stencil_transitions",
+        "expected_behavior": "One-sided stencil skips CCW reads, two-sided reenable invalidates stale snapshot, getter failures and StateBlock reset remain fail closed."
+      },
+      {
+        "id": "FULL_WIN32_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_host_package",
+        "expected_behavior": "Negative-mutation source policy, exact-SHA Windows game and OpenXR host builds, package, Domain Isolation and source impact all pass before build acceptance."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "DEPTH_OFF_LAZY": "PENDING_CI",
+    "ONE_SIDED_LAZY": "PENDING_CI",
+    "FULL_WIN32_GATES": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "R33 makes four avoidable driver calls while repopulating a fully invalidated depth/stencil cache for common disabled/one-sided passes.",
+    "alternatives_rejected": [
+      "Do not skip depth enable or stencil mode live authority on cached invalidation.",
+      "Do not omit any full state read while two-sided stencil or depth tests are enabled."
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_r33_stencil_snapshot_fastpath.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00823.json"
+  ],
+  "base_sha": "fa0233e35a3f923a3042ae15950b7e60a608b3a9",
+  "runtime_gate": "No Quest3/VDXR run. RUNTIME_VALIDATION=UNTESTED."
+}

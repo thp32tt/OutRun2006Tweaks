@@ -26,16 +26,19 @@ def verify(src: str) -> None:
     flags = function_body(src, "void R33RefreshWriteFlags(")
     current = function_body(src, "bool R33DepthStencilCacheCurrent(")
 
-    # Z readback is always needed on a tracked depth target. Stencil only
+    # ZENABLE is always read on a tracked depth target; ZWRITEENABLE is
+    # sampled only when depth testing can write. Stencil only
     # needs its enable bit on the common disabled path, the mask on the
     # enabled-but-zero-mask path and all ops on the potentially writing path.
     required = (
-        "D3DRS_ZENABLE", "D3DRS_ZWRITEENABLE",
+        "D3DRS_ZENABLE", "if (next.zEnable != D3DZB_FALSE &&",
+        "D3DRS_ZWRITEENABLE",
         "if (R32ReviewMainDepthHasStencil())",
         "D3DRS_STENCILENABLE", "if (next.stencilEnable != FALSE)",
         "D3DRS_STENCILWRITEMASK", "if (next.stencilWriteMask != 0)",
         "D3DRS_STENCILFAIL", "D3DRS_STENCILZFAIL", "D3DRS_STENCILPASS",
-        "D3DRS_TWOSIDEDSTENCILMODE", "D3DRS_CCW_STENCILFAIL",
+        "D3DRS_TWOSIDEDSTENCILMODE", "if (next.twoSided != FALSE &&",
+        "D3DRS_CCW_STENCILFAIL",
         "D3DRS_CCW_STENCILZFAIL", "D3DRS_CCW_STENCILPASS",
         "next.valid = true;",
     )
@@ -45,7 +48,7 @@ def verify(src: str) -> None:
         assert nxt > at, "stencil read gate missing or out of order: " + token
         at = nxt
     assert read.count("device->GetRenderState(") == 11, "unexpected D3D9 readback coverage"
-    assert read.count("R33InvalidateDepthStencilCache();") == 4, "read-failure fail-closed path lost"
+    assert read.count("R33InvalidateDepthStencilCache();") == 6, "read-failure fail-closed path lost"
     # An untracked depth target legitimately publishes an early empty-state cache.
     # Check the *tracked* read path independently, after every failed getter
     # and fail-closed return, rather than comparing its returns with that early
@@ -63,12 +66,14 @@ def verify(src: str) -> None:
     for field, previous, enabled in (
         ("D3DRS_STENCILENABLE", "stencilEnable", "FALSE"),
         ("D3DRS_STENCILWRITEMASK", "stencilWriteMask", "0"),
+        ("D3DRS_ZENABLE", "zEnable", "D3DZB_FALSE"),
+        ("D3DRS_TWOSIDEDSTENCILMODE", "twoSided", "FALSE"),
     ):
         pattern = (
             r"case " + field + r":\s*"
             r"(?:(?!case ).)*?"
             r"if \(R33DepthStencilState\." + previous +
-            r" == " + enabled + r" && value != " + enabled + r"\)\s*"
+            r" == " + enabled + r" &&\s*value != " + enabled + r"\)\s*"
             r"R33InvalidateDepthStencilCache\(\);\s*"
             r"R33DepthStencilState\." + previous + r" = value;"
         )
@@ -107,6 +112,10 @@ def main() -> None:
     verify(src)
     mutations = [
         ("no_disabled_gate", "if (next.stencilEnable != FALSE)", "if (true)"),
+        ("no_z_disabled_gate", "if (next.zEnable != D3DZB_FALSE &&", "if (true &&"),
+        ("no_two_sided_gate", "if (next.twoSided != FALSE &&", "if (true &&"),
+        ("no_z_restore_invalidation", "if (R33DepthStencilState.zEnable == D3DZB_FALSE &&\n                    value != D3DZB_FALSE)\n                    R33InvalidateDepthStencilCache();", "if (false)\n                    R33InvalidateDepthStencilCache();"),
+        ("no_two_sided_restore_invalidation", "if (R33DepthStencilState.twoSided == FALSE && value != FALSE)\n                    R33InvalidateDepthStencilCache();", "if (false)\n                    R33InvalidateDepthStencilCache();"),
         ("inverted_enable", "if (next.stencilEnable != FALSE)", "if (next.stencilEnable == FALSE)"),
         ("no_mask_gate", "if (next.stencilWriteMask != 0)", "if (true)"),
         ("inverted_mask", "if (next.stencilWriteMask != 0)", "if (next.stencilWriteMask == 0)"),
