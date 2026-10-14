@@ -68,16 +68,19 @@
     "fix_evidence": "Bounded exact +TIME queue boundary protects homogeneous prior owner and exact staged batch with Begin/End-aware fail-closed behavior.",
     "eye_ownership": "Exact stage ScreenHud reaches existing R26+HUD full stereo paths; numeric direct D3DX ownership still requires cross-path check before feature closeout."
   },
-  "status": "C2_SOURCE_CANDIDATE_PENDING_GATES",
-  "phase": "C2_IMPLEMENT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "runtime_evidence": "Quest3/VDXR test not performed. This is a source candidate; direct numeric batching and HMD visibility not yet verified.",
+  "runtime_evidence": "GitHub exact-SHA CI SUCCESS was provided for f405557925b07e78bee45661e624d360245d0d37. No Quest3/VDXR HMD runtime test was performed; optical result remains UNTESTED.",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
     "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
     ".github/workflows/vr-dx9ex-active.yml",
     "docs/automation/runs/CONVERSION-DX9EX-00853.json"
   ],
-  "score_once": false
+  "score_once": false,
+  "checkpoint": "C6_STATE",
+  "validation_bearing_result_sha": "f405557925b07e78bee45661e624d360245d0d37",
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
