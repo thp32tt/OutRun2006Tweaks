@@ -34,6 +34,8 @@ services:
       - /repo
       - --recipes-dir
       - /data/c-salvage/recipes
+      - --bundle-root
+      - /data/c-salvage/bundles
       - --masks-dir
       - /data/c-salvage/masks
       - --max-per-cycle
