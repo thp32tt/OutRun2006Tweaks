@@ -11,6 +11,9 @@ def integrated(src, hdr):
     end = src.find("void before_game_reset(", start)
     if not 0 <= start < end: return False
     code = src[start:end]
+    partition_start = hdr.find("static constexpr bool covers_partition(")
+    if partition_start < 0: return False
+    partition_hdr = hdr[partition_start:]
     partition = code.find("const bool boundedPartition =")
     read = code.find("std::memcpy(&part, dirtyRegion->Buffer + i * sizeof(RECT), sizeof(part));", partition)
     cover = code.find("GameNativeDirtyRegionCoverage::covers_partition(", read)
@@ -27,11 +30,11 @@ def integrated(src, hdr):
         "(boundedPartition &&" in code[read:cover],
         "(!outputNow.hasDirtyRegion || fullDirtyCoverage)" in code[writable:gpu],
         "GameNativeDirtyRegionCoverage::covers_full_backbuffer(" in code[read:cover],
-        "area > total - covered" in hdr,
-        "r.left < p.right && p.left < r.right" in hdr,
-        "r.top < p.bottom && p.top < r.bottom" in hdr,
-        "covered == total" in hdr,
-        "rectangleCount < 2u || rectangleCount > kMaxPartitionRects" in hdr,
+        "area > total - covered" in partition_hdr,
+        "r.left < p.right && p.left < r.right" in partition_hdr,
+        "r.top < p.bottom && p.top < r.bottom" in partition_hdr,
+        "covered == total" in partition_hdr,
+        "rectangleCount < 2u || rectangleCount > kMaxPartitionRects" in partition_hdr,
     ))
 
 assert integrated(SRC, HDR), "partitioned full D3D9 Present must enter safe native publication"
@@ -51,7 +54,13 @@ for old, new in (
     ("covered == total", "true /* holes allowed */"),
     ("rectangleCount < 2u || rectangleCount > kMaxPartitionRects", "false /* unlimited */"),
 ):
-    changed = HDR.replace(old, new, 1)
+    # Preserve earlier crop-partition coverage: mutate only the legacy
+    # full-backbuffer proof this regression actually owns (00749).
+    start = HDR.find("static constexpr bool covers_partition(")
+    assert start >= 0
+    prefix, partition_code = HDR[:start], HDR[start:]
+    assert old in partition_code, old
+    changed = prefix + partition_code.replace(old, new, 1)
     assert changed != HDR and not integrated(SRC, changed), old
 assert "python tools/test_dx11_full_dirty_partition_00749.py" in WF
 assert "tools/dx11_full_dirty_partition_probe_00749.cpp" in WF
