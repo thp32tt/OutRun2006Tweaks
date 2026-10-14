@@ -47,9 +47,10 @@ for old, new in (
     ("oldest.quarantined = true;", "oldest.busy = false;"),
     ("prior.quarantined ||", "false ||"),
 ):
-    # 00745 adds an earlier Map failure quarantine. Mutate the LAST
-    # same-string site, which belongs to 00744 GetData(EVENT) failure.
-    if old == "oldest.quarantined = true;":
+    # 00745/00746 add earlier map-failure quarantine paths for both
+    # the current and previously pending slots. Mutate the LAST matching
+    # site to test this legacy EVENT-failure-specific branch.
+    if old in ("oldest.quarantined = true;", "prior.quarantined = true;"):
         at = SOURCE.rfind(old)
         assert at >= 0, old
         mutant = SOURCE[:at] + new + SOURCE[at + len(old):]
