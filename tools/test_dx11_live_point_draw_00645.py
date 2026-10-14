@@ -38,7 +38,11 @@ for source in ("src/vr/d3d9/stereo_renderer_r30.cpp",
         assert "R30CompleteNativeGameSource(device, gameHr);" in caller
         assert "return gameHr;" in caller
     else:
-        assert "return R30GuardScreenSpace(" in caller
+        # R26-safe cannot return the guard immediately: R30 HUD rollback may
+        # fail before original D3D9 Draw, requiring native frame revocation.
+        assert "const HRESULT gameHr = R30GuardScreenSpace(" in caller
+        assert "R30CompleteNativeGameSourceR26Safe(device, gameHr);" in caller
+        assert "return gameHr;" in caller
 assert "game_native_primitive_element_count(1, 512, elements)" in probe
 assert "game_native_unit_point_raster" in probe
 for negative in ("maximum, 1, 0, false", "maximum, 0, 1, false",
