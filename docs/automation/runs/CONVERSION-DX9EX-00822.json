@@ -1,0 +1,76 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00822",
+  "production_id": "CONVERSION-DX9EX-00822",
+  "event_id": "CONVERSION-DX9EX-00822-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:SPARSE_DEPTH_LARGE_BATCH",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:SPARSE_DEPTH_LARGE_BATCH",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00822]",
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:SPARSE_DEPTH_LARGE_BATCH",
+    "goal": "Reduce sparse sand/particle projected-depth classification work for original D3D9 indexed UP and VB/IB batches beyond 2048 unique vertices without changing stereo world/HUD decisions.",
+    "scope_boundary": "Only R30 source depth classifier for 2049..16384 sparse trusted indices and its destructive/parity tests. No shader, visual tuning, FFB, DX11, DXVK, localization or HUD offset changes.",
+    "special_work_evidence": "Current source falls back to a dense traversal for >2048 touched vertices even with decoded unique UP/VB indices, up to 262144 candidates before 512 actual samples. Count-based source analysis only; actual Quest3 CPU/FPS improvement is NOT measured.",
+    "trace_stages": [
+      "Original DrawIndexedPrimitiveUP and indexed VB/IB decode publish exact unique touched indices and a matching used mask.",
+      "R30XyzrhwHasProjectedDepthSignature preserves ascending first-512 source depth decisions by partitioning trusted large lists then sorting only 512.",
+      "WorldParticle versus HUD stereo selection, shader/projection, per-eye output and fallback draw behavior remain unchanged, including reset and invalid metadata fallback."
+    ],
+    "subcomponents": [
+      "UP large sparse list can quick-select the same first 512 referenced source vertices without a dense 262K-hole traversal.",
+      "VB/IB decoder generation reuses the selected subset until the index mask changes, while invalid or foreign hints retain existing dense fallback.",
+      "Source negative mutation, randomized mask/draw parity and full exact-SHA Win32 host/game/packaging, Domain Isolation and Full Source Impact validation."
+    ],
+    "acceptance_items": [
+      {
+        "id": "LARGE_UP_ORDER",
+        "category": "end_to_end_behavior",
+        "behavior_area": "indexed_up_particle_depth",
+        "expected_behavior": "For 2049 to 16384 trusted UP sparse references, first-512 indices and world/HUD depth classification match the old ascending dense scan."
+      },
+      {
+        "id": "LARGE_VB_SAFETY",
+        "category": "fallback_regression",
+        "behavior_area": "decoded_vb_mask_and_unknown_hint",
+        "expected_behavior": "VB generation cache stores 512 bounded entries, invalid/out-of-range hints reject quick-select and unowned/dense/unsupported masks fall back unchanged."
+      },
+      {
+        "id": "INTEGRATED_BUILD",
+        "category": "integrated_validation",
+        "behavior_area": "win32_host_game_package_and_domain",
+        "expected_behavior": "All existing R30 classifier negative tests, exact-SHA DX9Ex Active full Win32 build, Domain Isolation, HUD Inspector and source impact complete before claiming build verified."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "LARGE_UP_ORDER": "PENDING_EXACT_SHA",
+    "LARGE_VB_SAFETY": "PENDING_EXACT_SHA",
+    "INTEGRATED_BUILD": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "Current branch sorts only up to 2048 touched indices. Larger sparse scenes discard the trusted list and densely walk a vertex range of up to 262144 for 512 depth samples.",
+    "alternatives_rejected": [
+      "Do not unconditionally sort all 16K indices, replace exact ascending first-512 ordering, or admit arbitrary unowned hint pointers.",
+      "Do not change texture sampling, projection matrices, FOV, render scope, desktop fallback or original D3D9 draw semantics."
+    ],
+    "fix_evidence": "Bounded nth_element of trusted 2049..16384 lists followed by sort of first 512, validity and VB generation cache reuse.",
+    "negative_test_evidence": "Extended classifier source mutants and randomized ascending first-512 parity across 32K..262K source spans, including untrusted and invalid indices."
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_sparse_depth_classifier.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00822.json"
+  ],
+  "base_sha": "903e73263e6cf7ef18ea9b676a7a647a1e74c3d2",
+  "runtime_gate": "Quest3/VDXR gameplay CPU/GPU pacing and actual optics not yet tested."
+}

@@ -4,7 +4,7 @@
 The UP and shadowed VB/IB indexed producers publish unique touched indices
 and a matching mask. For <=512 references the classifier visits only those
 indices; 513..2048 sparse references use a bounded ascending sort to retain
-the original first-512 sample, while dense/untrusted hints scan as before.
+the original first-512 sample. Leased 2049..16384 references quick-select\nthe same first 512; dense/untrusted hints scan as before.
 This tests both the classification result and fail-closed hint rejection.
 """
 from pathlib import Path
@@ -48,7 +48,18 @@ def static_contract(src, workflow):
         "const float projectionDepthScale =",
         "if (!projectionDepthFast || !std::isfinite(depthDelta) ||",
         "return sampled >= 3u && valid >= 3u",
-        "touched->size() > 512u && touched->size() <= 2048u",
+        "touched->size() > 512u &&",
+        "touched->size() <= 2048u",
+        "touched->size() <= 16384u",
+        "const bool largeSparseSample = sortedCandidate &&",
+        "touched->size() > 2048u;",
+        "largeSparseSample ? 512u : touched->size()",
+        "if (largeSparseSample)",
+        "for (const std::uint32_t index : sortedTouched)",
+        "if (!membershipValid)",
+        "std::nth_element(",
+        "sortedTouched.begin() + 512u,",
+        "sortedTouched.resize(512u);",
         "vertexCount / touched->size() >= 8u",
         "sortedTouched.assign(touched->begin(), touched->end());",
         "std::sort(sortedTouched.begin(), sortedTouched.end());",
@@ -148,6 +159,12 @@ def negative_mutations(src, workflow):
          "sortedTouched[n - 1u] != index"),
         ("vertexCount / touched->size() >= 8u",
          "vertexCount / touched->size() >= 0u"),
+        ("touched->size() <= 16384u", "touched->size() <= 65536u"),
+        ("largeSparseSample ? 512u : touched->size()",
+         "largeSparseSample ? 0u : touched->size()"),
+        ("std::nth_element(", "std::reverse("),
+        ("sortedTouched.resize(512u);", "sortedTouched.clear();"),
+        ("if (!membershipValid)", "if (false)"),
         ("const bool sortedCacheHit = sortedCandidate && trustedVbHint &&",
          "const bool sortedCacheHit = sortedCandidate &&"),
         ("R30Scratch.vbDepthSortedGeneration ==",
@@ -181,7 +198,8 @@ def simulate(mask, touched, quality, fast, trusted=True):
                        len(touched) <= n and
                        all(0 <= i < n and mask[i] for i in touched))
     use_sorted = bool(fast and not use_touched and touched and
-                      512 < len(touched) <= 2048 and len(touched) <= n and
+                      512 < len(touched) <= 16384 and len(touched) <= n and
+                      (len(touched) <= 2048 or trusted) and
                       n // len(touched) >= 8 and
                       len(set(touched)) == len(touched) and
                       all(0 <= i < n and mask[i] for i in touched))
@@ -256,6 +274,33 @@ def parity():
                         mask, bad, quality, False)
 
 
+def large_sparse_parity():
+    # Sand/particle-like sparse spans previously fell back to a full 64K+
+    # mask traversal above 2048 touched vertices. The first 512 referenced
+    # vertices must remain EXACTLY those from the old ascending dense walk.
+    rng = random.Random(822)
+    for n, count in ((32768, 2500), (65536, 4096),
+                     (131072, 8192), (262144, 16384)):
+        touched = rng.sample(range(n), count)
+        mask = bytearray(n)
+        for index in touched:
+            mask[index] = 1
+        first512 = sorted(touched)[:512]
+        assert first512 == [i for i in range(n) if mask[i]][:512]
+        quality = [(True, bool((i * 13) % 5)) for i in range(n)]
+        assert simulate(mask, touched, quality, True) == simulate(
+            mask, touched, quality, False)
+        assert simulate(mask, touched[::-1], quality, True) == simulate(
+            mask, touched, quality, False)
+        # A list not owned by the UP/VB decoder may not take the new path.
+        assert simulate(mask, touched, quality, True, trusted=False) == (
+            simulate(mask, touched, quality, False))
+        damaged = touched[:]
+        damaged[-1] = n
+        assert simulate(mask, damaged, quality, True) == simulate(
+            mask, damaged, quality, False)
+
+
 def cached_mask_lifecycle():
     # Deterministic model: decoding generation changes must force a new
     # exact ascending first-512 order; new VBs/projections with unchanged
@@ -307,5 +352,6 @@ if __name__ == "__main__":
     static_contract(source, workflow)
     negative_mutations(source, workflow)
     parity()
+    large_sparse_parity()
     cached_mask_lifecycle()
     print("R30 sparse depth classifier: sort cache, generation invalidation, UP isolation, parity and mutations PASS; runtime UNTESTED")

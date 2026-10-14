@@ -2679,15 +2679,25 @@ namespace OutRunVRStereo
                 ? R30Scratch.vbSortedDepthTouched
                 : (trustedUpHint ? R30Scratch.upSortedDepthTouched
                                  : localSortedTouched);
+            // Above 2048 sparse references, the old dense fallback visits
+            // tens of thousands of empty vertices before the first 512.
+            // Only a leased, uniquely decoded UP or VB/IB list may use the
+            // bounded larger path; unknown hints retain the old fallback.
             const bool sortedCandidate = !fastTouched && usedMask && touched &&
-                touched->size() > 512u && touched->size() <= 2048u &&
+                touched->size() > 512u &&
+                (touched->size() <= 2048u ||
+                 (touched->size() <= 16384u &&
+                  (trustedVbHint || trustedUpHint))) &&
                 touched->size() <= vertexCount &&
                 usedMask->size() >= vertexCount &&
                 vertexCount / touched->size() >= 8u;
+            const bool largeSparseSample = sortedCandidate &&
+                touched->size() > 2048u;
             const bool sortedCacheHit = sortedCandidate && trustedVbHint &&
                 R30Scratch.vbDepthSortedGeneration ==
                     R30Scratch.vbTouchGeneration &&
-                sortedTouched.size() == touched->size();
+                sortedTouched.size() ==
+                    (largeSparseSample ? 512u : touched->size());
             if (!sortedCacheHit)
             {
                 sortedTouched.clear();
@@ -2700,6 +2710,37 @@ namespace OutRunVRStereo
                     catch (...)
                     {
                         sortedTouched.clear(); // original dense fallback
+                    }
+                    if (!sortedTouched.empty())
+                    {
+                        if (largeSparseSample)
+                        {
+                            // A decoded list is unique, but reject invalid
+                            // bounds/membership before quick-select. Sorting
+                            // every one of 16K indices defeats the benefit;
+                            // nth_element keeps exactly the ascending first
+                            // 512 after the final bounded sort.
+                            bool membershipValid = true;
+                            for (const std::uint32_t index : sortedTouched)
+                            {
+                                if (index >= vertexCount ||
+                                    (*usedMask)[index] == 0)
+                                {
+                                    membershipValid = false;
+                                    break;
+                                }
+                            }
+                            if (!membershipValid)
+                                sortedTouched.clear();
+                            else
+                            {
+                                std::nth_element(
+                                    sortedTouched.begin(),
+                                    sortedTouched.begin() + 512u,
+                                    sortedTouched.end());
+                                sortedTouched.resize(512u);
+                            }
+                        }
                     }
                     if (!sortedTouched.empty())
                     {
