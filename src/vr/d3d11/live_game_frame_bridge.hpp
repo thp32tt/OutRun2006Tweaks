@@ -25,6 +25,10 @@ void observe_indexed(IDirect3DDevice9* gameDevice, D3DPRIMITIVETYPE topology,
 // this never alters the original D3D9 HRESULT or input path.
 void observe_unavailable_game_draw(IDirect3DDevice9* gameDevice) noexcept;
 
+// The R30 source hook transaction arms native full-frame publishing only
+// after BOTH game Clear and RT0 hooks are installed. Disabled by default.
+void set_scene_boundary_hooks_ready(bool ready) noexcept;
+
 // A game-authored Clear or successful RT0 switch after a native Draw divides
 // a frame into incompatible surfaces. Discard the diagnostic batch; keep the
 // original D3D9 Clear, Draw, Present and gamepad dispatch untouched.
