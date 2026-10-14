@@ -63,7 +63,7 @@ def verify(s):
          getter.count("owner = acquireCachedOwner();") == 3 and
          getter.find("fileRequestLock.lock();") <
          getter.find("owner = acquireCachedOwner();",
-                     getter.find("auto owner = acquireCachedOwner();") + 1) <
+                     getter.find("fileRequestLock.lock();")) <
          getter.find("cacheFile(filename);")),
         ("transient oversized DDS remains miss-lock protected",
          getter.find("fileRequestLock.lock();") <
