@@ -68,7 +68,7 @@
     "eye_ownership": "The previous direct batch stays with the old eye scope until flushed; only the subsequent producer-authenticated +TIME queue draws receive ScreenHud stereo presentation."
   },
   "status": "IMPLEMENTING",
-  "checkpoint": "C2_SOURCE_MATERIAL",
+  "checkpoint": "C3_EXACT_SHA_MATRIX_PENDING",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No Quest3/VDXR gameplay test; binocular image and FPS not proven.",
@@ -78,7 +78,7 @@
     "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
     "vrhost/tests/stage_extension_direct_owner_smoke.cpp"
   ],
-  "material_result_sha": null,
+  "material_result_sha": "d23309b6f589d38cd10cb1760b79324358f91663",
   "validation_bearing_result_sha": null,
   "acceptance_results": {
     "sources": "SOURCE_PATCHED",
@@ -87,8 +87,10 @@
     "integration": "PENDING_EXACT_SHA"
   },
   "ci_evidence": {
-    "dx9ex_active": "PENDING",
-    "domain_isolation": "PENDING"
+    "status": "PENDING_FINAL_EXACT_SHA",
+    "previous_material_sha": "d23309b6f589d38cd10cb1760b79324358f91663",
+    "previous_test_repair_sha": "6e24f30988aba3551ae7adc94f989b6a3016a103",
+    "note": "Original material policy failed due stale inline-guard verifier; second SHA policy SUCCESS but affected Full Source/HUD also require integrated same-SHA matrix; do not count score until all exact gates pass."
   },
   "score_once": false
 }
