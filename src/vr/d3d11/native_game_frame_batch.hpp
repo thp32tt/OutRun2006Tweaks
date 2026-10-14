@@ -81,6 +81,14 @@ struct GameNativeFrameBatch {
         lastSourceDraw = ordinal;
         hasSourceDraw = true;
     }
+    // Whole game TARGET then separate whole ZBUFFER Clear can initialize DSV
+    // before the first native Draw/DrawIndexed. Never cross an unsupported
+    // source Draw or a stopped/partial/foreign game scene.
+    [[nodiscard]] constexpr bool can_seed_pre_draw_depth(
+        bool sameSourceFullColorClear, bool noSourceDraws) const noexcept {
+        return sameSourceFullColorClear && noSourceDraws && !stopped &&
+            submitted == 0u && !hasSourceDraw;
+    }
     // An aborted batch must never reach the GPU readback/inset presenter,
     // even if one or more of its D3D11 Draw calls already ran.
     constexpr bool publishable(bool pending) const noexcept {

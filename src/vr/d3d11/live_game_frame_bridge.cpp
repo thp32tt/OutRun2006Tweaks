@@ -4817,8 +4817,12 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
         const auto owner = reinterpret_cast<std::uintptr_t>(game);
-        if (s.sourceGameDevice != owner || !s.pending ||
-            s.frameBatch.submitted == 0u || s.frameBatch.stopped) return false;
+        // A full original TARGET Clear can precede a separate Z-only Clear
+        // before the first game-authored Draw; that is a valid native DSV seed.
+        // Keep the existing post-Draw depth-only continuation unchanged.
+        if (s.sourceGameDevice != 0u && s.sourceGameDevice != owner) return false;
+        const bool continuingFullNativeDraw = s.sourceGameDevice == owner &&
+            s.pending && s.frameBatch.submitted != 0u;
         ComPtr<IDirect3DSurface9> target, backbuffer, depth;
         D3DSURFACE_DESC rtDesc{}, bbDesc{}, dsDesc{};
         D3DVIEWPORT9 vp{};
@@ -4842,8 +4846,21 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
             !GameNativeClearCoverage::covers_whole(
                 bbDesc.Width, bbDesc.Height, vp.X, vp.Y, vp.Width, vp.Height,
                 count, rects)) return false;
-        // Next real native depth Draw clears DSV to the original D3D9 Z;
-        // preceding same-frame native RTV game/menu pixels remain intact.
+        // Prove the same canonical D3D9 backbuffer/color Clear before
+        // admitting a separate full Z Clear with zero native game Draws.
+        // This covers menu->vehicle->race startup where TARGET and ZBUFFER
+        // are cleared by separate successful game calls.
+        const bool beforeFirstGameDraw = !s.pending &&
+            s.frameBatch.can_seed_pre_draw_depth(
+                s.clearColor.matches(owner, reinterpret_cast<std::uintptr_t>(
+                    backbufferIdentity.Get())),
+                s.sourceDrawsThisFrame == 0u);
+        if ((s.frameBatch.submitted == 0u || s.frameBatch.stopped) &&
+            !beforeFirstGameDraw) return false;
+        if (s.frameBatch.submitted != 0u && !continuingFullNativeDraw)
+            return false;
+        // The next real native depth Draw clears the DSV to the exact game
+        // Z while keeping the native RTV color; DX9Ex/input are untouched.
         s.frameBatch.note_full_depth_clear(z);
         return true;
     } catch (...) {
