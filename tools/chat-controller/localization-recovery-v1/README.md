@@ -5,9 +5,10 @@
 > and up to **five attached source images**, requesting the same number of
 > **separate** ImageGen Korean results (no collage).
 >
-> The user-specified ChatGPT Library folder **`outrun_kor` is a mandatory
-> completion gate**. ChatGPT's model text cannot prove the Library folder was
-> actually populated; without independent evidence, the slot **remains HOLD**.
+> The existing **`아웃런 한글화 신규` project Library** is the mandatory
+> image-save completion gate (separate `outrun_kor` folder deprecated).
+> The new browser verifier checks all generated PNG content SHA256 against
+> distinct actual Library `libfile_` items. Missing / mismatched output is HOLD.
 > The candidate exporter uses `_k.png` suffix on local output only and records
 > original/generated sizes. Original English PNGs, DDS hashes, and orientation
 > transformation remain unchanged. One corrupt PNG source stays quarantined.

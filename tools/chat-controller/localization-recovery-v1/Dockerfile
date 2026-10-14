@@ -24,9 +24,10 @@ COPY controller_png_attach.py /opt/outrun/app/controller_png_attach.py
 COPY tile_batch_queue.py /opt/outrun/app/tile_batch_queue.py
 COPY tile_orientation_policy.py /opt/outrun/app/tile_orientation_policy.py
 COPY ab_batch_queue.py /opt/outrun/app/ab_batch_queue.py
+COPY project_library_gate.py /opt/outrun/app/project_library_gate.py
 COPY patch_controller_png_upload.py /tmp/patch_controller_png_upload.py
 RUN python /tmp/patch_controller_png_upload.py /opt/outrun/app/controller.py \
- && python -m py_compile /opt/outrun/app/controller.py /opt/outrun/app/controller_png_attach.py /opt/outrun/app/ab_batch_queue.py /opt/outrun/app/tile_orientation_policy.py \
+ && python -m py_compile /opt/outrun/app/controller.py /opt/outrun/app/controller_png_attach.py /opt/outrun/app/ab_batch_queue.py /opt/outrun/app/tile_orientation_policy.py /opt/outrun/app/project_library_gate.py \
  && rm -f /tmp/patch_controller_png_upload.py
 
 COPY entrypoint.sh /opt/outrun/entrypoint.sh

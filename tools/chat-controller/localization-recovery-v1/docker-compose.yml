@@ -22,7 +22,8 @@ services:
       OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
       OUTRUN_AB_BATCH_QUEUE: "true"
       OUTRUN_AB_BATCH_SIZE: "5"
-      OUTRUN_AB_LIBRARY_FOLDER: "outrun_kor"
+      OUTRUN_AB_LIBRARY_FOLDER: "아웃런 한글화 신규" # Existing project Library; no separate folder.
+      OUTRUN_AB_PROJECT_LIBRARY_NAME: "아웃런 한글화 신규"
       OUTRUN_AB_PROJECT_NAME: "아웃런 한글화 신규"
       OUTRUN_A_PROJECT_NAME: "아웃런 한글화 신규"
       CHAT_DAY_ROLLOVER_HOUR: "2"

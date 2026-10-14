@@ -28,7 +28,7 @@ except ImportError:
 
 SOURCE_DIR = "inputs/A/HD_EN_TILES_20261014"
 STATE_DIR = "ab_batches"
-LIBRARY_FOLDER = "outrun_kor"
+LIBRARY_FOLDER = "아웃런 한글화 신규"
 QUARANTINED = "Q046_AA04D779_BASE_READABLE_FLIPY__r03c01__x0_y1340__683x708.png"
 RANGES = {"A": (1, 500), "B": (501, 986)}
 SLOTS = {"A": (0, 10, 20, 30, 40, 50), "B": (5, 15, 25, 35, 45, 55)}
@@ -137,8 +137,9 @@ def _prompt(role, batch_id, tiles, translations):
         "자동차 제조사명, 자동차 모델, 브랜드 로고, 노래 제목, 고유명사는 원문 그대로 보존하세요.",
         "글자가 다른 UI를 침범하거나 원래 글자 영역 밖으로 1px이라도 벗어나지 않게 하세요. 글자끼리 겹치면 안 됩니다.",
         "참조 이미지는 사람이 읽는 정방향입니다. 한국어 글자도 동일하게 정상 방향으로 생성하세요. 새 상하반전 금지.",
-        f"생성한 각각의 이미지가 ChatGPT 라이브러리의 '{LIBRARY_FOLDER}' 폴더에 저장되도록 처리하세요.",
-        "생성 이미지가 Library에 저장되지 않았다면 저장되었다고 주장하지 말고 저장 실패 여부를 알려주세요.",
+        f"이 채팅이 속한 프로젝트 '{LIBRARY_FOLDER}'의 프로젝트 라이브러리에 생성한 PNG 이미지를 각각 저장하세요.",
+        "별도의 outrun_kor 라이브러리 폴더를 생성하거나 이동하려 하지 마세요. 기존 프로젝트 라이브러리를 사용합니다.",
+        "이미지가 프로젝트 라이브러리에 실제 기록되지 않았다면 저장 성공이라고 주장하지 마세요.",
         "저장 이름은 원본 영문 파일명에서 .png 앞에 소문자 _k를 삽입하세요. 이름 변경이 불가능하면 실제 이름을 알려주세요.",
         "결과를 단순 설명문이나 코드로 대체하지 마세요. 총 결과 이미지 개수를 우선 충족해야 합니다.",
         "입력/생성 수량·라이브러리 저장이 불충분하면 임의 성공 선언 금지.",
@@ -164,7 +165,7 @@ def _prompt(role, batch_id, tiles, translations):
             if protected not in ("", "[]"):
                 p.append("  보호 문구 원문 유지: " + protected)
     p.append("")
-    p.append(f"최종 확인: {len(tiles)}개 입력 각각 별개 이미지 {len(tiles)}장. 결합하지 말 것. ChatGPT Library '{LIBRARY_FOLDER}' 저장을 확인할 것.")
+    p.append(f"최종 확인: {len(tiles)}개 입력 각각 별개 이미지 {len(tiles)}장. 결합하지 말 것. 프로젝트 '{LIBRARY_FOLDER}'의 Library에 각 이미지 저장을 확인할 것.")
     prompt = "\n".join(p)
     if len(prompt) > 26000:
         raise ValueError("BATCH_PROMPT_TOO_LONG")
@@ -283,34 +284,44 @@ def _library_evidence_path(root, task):
     return Path(root) / STATE_DIR / "library_evidence" / (task + ".json")
 
 def _library_confirmed(root, active):
-    """Explicit, auditable verification; prompt text is never proof of Library save.
+    """Read *content-hash-matched* existing project Library proof.
 
-    Until Library folder/file UI verification is implemented, an operator may
-    provide 5 uniquely identified Library objects, chat/folder URL and evidence.
+    Naming or text saying 'saved' cannot substitute for actual PNG hash matching
+    between the finished ChatGPT turn and N separately stored project files.
     """
-    p=_library_evidence_path(root, active["task_id"])
-    if not p.is_file():
-        return False, "LIBRARY_OUTRUN_KOR_UNVERIFIED"
+    path=_library_evidence_path(root,active["task_id"])
+    if not path.is_file():
+        return False,"PROJECT_LIBRARY_NOT_VERIFIED"
     try:
-        data=json.loads(p.read_text(encoding="utf-8"))
-        ids=data.get("library_item_ids")
-        if (data.get("task_id") != active["task_id"] or
-            data.get("slot") != active["role"] or
-            data.get("folder") != LIBRARY_FOLDER or
-            data.get("verification_method") not in ("manual_ui_verified","browser_ui_verified") or
-            data.get("folder_visible_label") != LIBRARY_FOLDER or
-            not isinstance(data.get("verified_at"),str) or
-            not re.fullmatch(r"\d{4}-\d{2}-\d{2}T[^ ]{8,}",data["verified_at"]) or
-            not isinstance(ids,list) or len(ids) != active["count"] or
-            any(not isinstance(k,str) or not k.strip() for k in ids) or
-            len(set(ids)) != active["count"] or
-            not isinstance(data.get("library_folder_url"), str) or
-            not re.match(r"^https://chatgpt\.com/library(?:[/?#].*)?$",
-                         data["library_folder_url"])):
-            return False, "LIBRARY_EVIDENCE_INCOMPLETE"
-        return True, "LIBRARY_FOLDER_CONFIRMED"
+        record=json.loads(path.read_text(encoding="utf-8"))
+        ids=record.get("library_item_ids")
+        source_shas=record.get("generated_image_sha256")
+        saved_shas=record.get("library_content_sha256")
+        count=active["count"]
+        if (
+            record.get("task_id")!=active["task_id"] or
+            record.get("slot")!=active["role"] or
+            record.get("folder")!=LIBRARY_FOLDER or
+            record.get("folder_visible_label")!=LIBRARY_FOLDER or
+            record.get("verification_method")!="browser_content_sha256_match" or
+            record.get("match_status")!="EXACT_GENERATED_LIBRARY_PNG_SHA256_MATCH" or
+            not isinstance(record.get("verified_at"),str) or
+            not isinstance(ids,list) or len(ids)!=count or
+            len(set(ids))!=count or not all(isinstance(x,str) and
+                                            re.fullmatch(r"libfile_[a-zA-Z0-9]+",x) for x in ids) or
+            not isinstance(source_shas,list) or len(source_shas)!=count or
+            not isinstance(saved_shas,list) or len(saved_shas)!=count or
+            len(set(source_shas))!=count or source_shas!=saved_shas or
+            not all(isinstance(x,str) and re.fullmatch(r"[0-9a-f]{64}",x) for x in source_shas) or
+            not isinstance(record.get("library_folder_url"),str) or
+            not re.fullmatch(r"https://chatgpt\.com/library/d/[0-9a-zA-Z_-]+",
+                             record["library_folder_url"])
+        ):
+            return False,"PROJECT_LIBRARY_EVIDENCE_INCOMPLETE"
+        return True,"PROJECT_LIBRARY_IMAGE_HASHES_CONFIRMED"
     except (OSError,ValueError,TypeError):
-        return False, "LIBRARY_EVIDENCE_INVALID"
+        return False,"PROJECT_LIBRARY_EVIDENCE_INVALID"
+
 
 async def export_unapproved_k_candidates(page, active, root):
     """Copy generated browser images into deterministic _k.png local filenames.
@@ -503,7 +514,20 @@ async def inspect_slot(role, page, root="/data/imagegen"):
                            "export_status":export_status,"checked_at":_now().isoformat()})
     verified, reason=_library_confirmed(root,active)
     if not verified:
-        return False, reason
+        # Inspect ChatGPT's actual existing project Library (no extra folder).
+        # The verifier opens a disposable read-only tab and matches every PNG
+        # by full SHA256 to this batch's five generated image carousel blobs.
+        try:
+            from app.project_library_gate import verify_project_library_images
+        except ModuleNotFoundError:
+            from project_library_gate import verify_project_library_images
+        proof, error = await verify_project_library_images(page,active)
+        if error or not proof:
+            return False,"PROJECT_LIBRARY_NOT_VERIFIED:"+str(error or "NO_PROOF")
+        _atomic_json(_library_evidence_path(root,task),proof)
+        verified,reason=_library_confirmed(root,active)
+        if not verified:
+            return False,reason
     st["next_ordinal"]=active["next_ordinal_after"]
     st["completed_files"]+=active["count"]
     st["completed_batches"]+=1

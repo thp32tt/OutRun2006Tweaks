@@ -12,6 +12,7 @@ BASE = Path(__file__).resolve().parents[1]
 sp=importlib.util.spec_from_file_location("ab_queue",BASE/"ab_batch_queue.py")
 import sys
 sys.path.insert(0,str(BASE))
+import project_library_gate as project_gate
 ab=importlib.util.module_from_spec(sp)
 sp.loader.exec_module(ab)
 
@@ -78,7 +79,8 @@ class ABTest(unittest.TestCase):
         self.assertEqual(len(b["paths"]),5)
         self.assertEqual(a["expected_images"],5)
         self.assertIn("입력 이미지 5개 → 서로 분리된 결과 이미지 정확히 5개",a["prompt"])
-        self.assertIn("outrun_kor",a["prompt"])
+        self.assertIn("아웃런 한글화 신규",a["prompt"])
+        self.assertIn("별도의 outrun_kor 라이브러리 폴더를 생성하거나 이동하려 하지 마세요",a["prompt"])
         self.assertIn("_k.png",a["prompt"])
         self.assertIn("상하반전 금지",a["prompt"])
         self.assertIn("콜라주",a["prompt"])
@@ -139,32 +141,48 @@ class ABTest(unittest.TestCase):
            "status":"CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS"
         }),encoding="utf-8")
 
+    def proof(self,task):
+        sources=[str(i+1)*64 for i in range(5)]
+        return {
+            "task_id":task,"slot":"A","folder":"아웃런 한글화 신규",
+            "folder_visible_label":"아웃런 한글화 신규",
+            "verification_method":"browser_content_sha256_match",
+            "verified_at":"2026-10-14T12:45:00+09:00",
+            "library_folder_url":"https://chatgpt.com/library/d/abcdef123456",
+            "library_item_ids":["libfile_"+str(i+1).zfill(10) for i in range(5)],
+            "generated_image_sha256":sources,
+            "library_content_sha256":sources.copy(),
+            "match_status":"EXACT_GENERATED_LIBRARY_PNG_SHA256_MATCH",
+        }
+
     def test_library_is_mandatory_even_when_five_images_exist(self):
         a,_=ab.next_binding("A",self.root)
         self.assertEqual(ab.stage_submission("A",a["task_id"],self.root),"SUBMITTING")
         self.assertEqual(ab.record_chat_url("A",a["task_id"],CHAT,self.root),"URL_RECORDED")
         self._make_sent(a["task_id"],"A")
-        with patch.object(ab,"export_unapproved_k_candidates",new_callable=AsyncMock,return_value="TEST_CANDIDATE_EXPORT"):
+        with patch.object(ab,"export_unapproved_k_candidates",new_callable=AsyncMock,
+                          return_value="TEST_CANDIDATE_EXPORT"), \
+             patch.object(project_gate,"verify_project_library_images",new_callable=AsyncMock,
+                          return_value=(None,"FOLDER_LOADING")) as verifier:
             ok,msg=asyncio.run(ab.inspect_slot("A",StubPage(5),self.root))
-            self.assertFalse(ok);self.assertEqual(msg,"LIBRARY_OUTRUN_KOR_UNVERIFIED")
+            self.assertFalse(ok)
+            self.assertEqual(msg,"PROJECT_LIBRARY_NOT_VERIFIED:FOLDER_LOADING")
             self.assertEqual(ab._state(self.root,"A")["next_ordinal"],1)
+            verifier.assert_awaited_once()
             evidence=ab._library_evidence_path(self.root,a["task_id"])
             evidence.parent.mkdir(parents=True,exist_ok=True)
-            evidence.write_text(json.dumps({
-              "task_id":a["task_id"],"slot":"A","folder":"outrun_kor",
-              "verification_method":"manual_ui_verified",
-              "folder_visible_label":"outrun_kor",
-              "verified_at":"2026-10-14T09:24:00+09:00",
-              "library_folder_url":"https://chatgpt.com/library",
-              "library_item_ids":["item-"+str(i) for i in range(4)]
-            }))
-            ok,msg=asyncio.run(ab.inspect_slot("A",StubPage(5),self.root))
-            self.assertFalse(ok);self.assertEqual(msg,"LIBRARY_EVIDENCE_INCOMPLETE")
-            record=json.loads(evidence.read_text())
-            record["library_item_ids"].append("item-4")
+            record=self.proof(a["task_id"])
+            record["library_content_sha256"][1]="f"*64
+            evidence.write_text(json.dumps(record))
+            ok,reason=ab._library_confirmed(self.root,ab._state(self.root,"A")["active"])
+            self.assertFalse(ok)
+            self.assertEqual(reason,"PROJECT_LIBRARY_EVIDENCE_INCOMPLETE")
+            self.assertEqual(ab._state(self.root,"A")["next_ordinal"],1)
+            record=self.proof(a["task_id"])
             evidence.write_text(json.dumps(record))
             ok,msg=asyncio.run(ab.inspect_slot("A",StubPage(5),self.root))
-            self.assertTrue(ok);self.assertEqual(msg,"BATCH_COMPLETE_LIBRARY_VERIFIED")
+            self.assertTrue(ok)
+            self.assertEqual(msg,"BATCH_COMPLETE_LIBRARY_VERIFIED")
             st=ab._state(self.root,"A")
             self.assertEqual(st["next_ordinal"],6)
             self.assertEqual(st["completed_files"],5)
@@ -173,6 +191,24 @@ class ABTest(unittest.TestCase):
             nb,reason=ab.next_binding("A",self.root)
             self.assertIsNone(reason)
             self.assertEqual([x["ordinal"] for x in nb["items"]],[6,7,8,9,10])
+
+    def test_browser_sha_matching_populates_library_evidence_automatically(self):
+        a,_=ab.next_binding("A",self.root)
+        ab.stage_submission("A",a["task_id"],self.root)
+        ab.record_chat_url("A",a["task_id"],CHAT,self.root)
+        self._make_sent(a["task_id"],"A")
+        proof=self.proof(a["task_id"])
+        with patch.object(ab,"export_unapproved_k_candidates",new_callable=AsyncMock,
+                          return_value="UNAPPROVED"), \
+             patch.object(project_gate,"verify_project_library_images",new_callable=AsyncMock,
+                          return_value=(proof,None)) as verified:
+            ok,msg=asyncio.run(ab.inspect_slot("A",StubPage(5),self.root))
+            self.assertTrue(ok)
+            self.assertEqual(msg,"BATCH_COMPLETE_LIBRARY_VERIFIED")
+            verified.assert_awaited_once()
+        evidence=ab._library_evidence_path(self.root,a["task_id"])
+        self.assertTrue(evidence.exists())
+        self.assertEqual(json.loads(evidence.read_text())["library_item_ids"],proof["library_item_ids"])
 
     def test_collage_or_partial_generation_cannot_progress(self):
         a,_=ab.next_binding("A",self.root)

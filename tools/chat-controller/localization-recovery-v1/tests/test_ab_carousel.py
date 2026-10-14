@@ -89,7 +89,7 @@ class CarouselExportTests(unittest.TestCase):
         asyncio.run(queue.export_unapproved_k_candidates(StubCarouselPage(),batch_active(),self.root))
         ok,why=queue._library_confirmed(self.root,batch_active())
         self.assertFalse(ok)
-        self.assertEqual(why,"LIBRARY_OUTRUN_KOR_UNVERIFIED")
+        self.assertEqual(why,"PROJECT_LIBRARY_NOT_VERIFIED")
 
 if __name__=="__main__":
     unittest.main()

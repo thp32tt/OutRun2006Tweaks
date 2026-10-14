@@ -78,7 +78,8 @@ jobs:
           assert e['CHAT_RECYCLE_RUNS']=='0'
           assert e['OUTRUN_AB_BATCH_QUEUE']=='true'
           assert e['OUTRUN_AB_BATCH_SIZE']=='5'
-          assert e['OUTRUN_AB_LIBRARY_FOLDER']=='outrun_kor'
+          assert e['OUTRUN_AB_LIBRARY_FOLDER']=='아웃런 한글화 신규'
+          assert e['OUTRUN_AB_PROJECT_LIBRARY_NAME']=='아웃런 한글화 신규'
           assert e['OUTRUN_AB_PROJECT_NAME']=='아웃런 한글화 신규'
           assert e['OUTRUN_A_TILE_BATCH_QUEUE']=='false'
           assert e['WATCHDOG_ENABLED']=='false'
@@ -92,7 +93,8 @@ jobs:
           assert 'outrun_chat_localization_recovery_data:/data' in c['volumes']
           assert 'outrun_chat_localization_recovery_logs:/logs' in c['volumes']
           docker=(root/'Dockerfile').read_text()
-          for module in ['ab_batch_queue.py','controller_png_attach.py','tile_orientation_policy.py']:
+          for module in ['ab_batch_queue.py','controller_png_attach.py',
+                         'tile_orientation_policy.py','project_library_gate.py']:
              assert 'COPY '+module+' /opt/outrun/app/'+module in docker
           print('A/B Compose, mounts, service isolation and Docker copies: PASS')
           PY
@@ -100,6 +102,7 @@ jobs:
         run: |
           python tools/chat-controller/localization-recovery-v1/tests/test_ab_batch_queue.py
           python tools/chat-controller/localization-recovery-v1/tests/test_ab_carousel.py
+          python tools/chat-controller/localization-recovery-v1/tests/test_project_library_gate.py
           python tools/chat-controller/localization-recovery-v1/tests/test_tile_orientation_policy.py
           python tools/chat-controller/localization-recovery-v1/tests/test_tile_batch_queue.py
       - name: Verify live-message DOM receipt selector without sending a message
@@ -132,5 +135,11 @@ jobs:
                        'LIBRARY_OUTRUN_KOR_UNVERIFIED'):
             assert mark in src,mark
           assert src.count('button[aria-label^="Show generated image "]') >= 2
-          print('PASS: full carousel (not first preview) is counted and exported; Library gate retained')
+          library=(root/'project_library_gate.py').read_text(encoding='utf-8')
+          assert 'GENERATED_PNG_HASHES_JS' in library
+          assert 'LIBRARY_CARD_DIGEST_JS' in library
+          assert 'browser_content_sha256_match' in library
+          assert 'PROJECT_LIBRARY_HASH_MATCH_INCOMPLETE' in library
+          assert 'outrun_kor' not in library
+          print('PASS: distinct carousel outputs + cryptographic project Library verification')
           PY
