@@ -999,6 +999,10 @@ struct ReadbackSlot {
     ComPtr<ID3D11Texture2D> staging;
     ComPtr<ID3D11Query> fence;
     bool busy = false;
+    // A failed GPU EVENT query cannot prove that the asynchronous CopyResource
+    // stopped writing. Keep this staging allocation out of the free ring until
+    // a real source-device Reset recreates the entire readback pipeline.
+    bool quarantined = false;
     bool completeFullFrame = false;
     GameReadbackProvenance provenance{};
 };
@@ -1492,7 +1496,7 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset(); s.inverseSourceAlphaBlend.Reset(); s.sourceAlphaCopyBlend.Reset(); s.inverseAlphaCopyBlend.Reset(); s.inverseAlphaAddBlend.Reset(); s.sourceReplaceBlend.Reset(); s.multiplyBlend.Reset(); s.inverseDestMultiplyBlend.Reset(); s.inverseSourceMultiplyBlend.Reset(); s.destAlphaCrossfadeBlend.Reset(); s.reverseDestAlphaCrossfadeBlend.Reset(); s.sourceAlphaSaturateCopyBlend.Reset(); s.sourceAlphaSaturateAddBlend.Reset();
     s.alphaConstants.Reset();
     for (auto& item : s.readbacks) {
-        item.staging.Reset(); item.fence.Reset(); item.busy = false;
+        item.staging.Reset(); item.fence.Reset(); item.busy = false; item.quarantined = false;
     }
     s.readSlot = s.writeSlot = 0;
     s.previousOutput = {};
@@ -5169,13 +5173,21 @@ void before_game_present(IDirect3DDevice9* game,
             UINT fullSlot = s.writeSlot;
             if (fullMode) {
                 for (auto& prior : s.readbacks) {
-                    if (!prior.busy || prior.provenance.capturedAtPresent >= s.presents)
+                    if (!prior.busy || prior.quarantined ||
+                        prior.provenance.capturedAtPresent >= s.presents)
                         continue;
                     const HRESULT done = ctx->GetData(prior.fence.Get(), nullptr, 0,
                         D3D11_ASYNC_GETDATA_DONOTFLUSH);
-                    if (done == S_OK || FAILED(done)) {
+                    const auto fenceResult = GameNativeFramePublication::classify_fence(
+                        static_cast<std::int32_t>(done));
+                    if (fenceResult == GameNativeReadbackFence::Complete) {
                         prior.busy = false;
                         ++s.staleReadbacks;
+                    } else if (fenceResult == GameNativeReadbackFence::Failed) {
+                        // Device loss/unknown completion is not a free-slot
+                        // signal. Original D3D9 Present and gamepad remain live.
+                        prior.quarantined = true;
+                        ++s.failed;
                     }
                 }
                 if (complete && outputWritable &&
@@ -5215,7 +5227,8 @@ void before_game_present(IDirect3DDevice9* game,
             // ONLY its newly enqueued same-Present fence; if not ready, keep
             // the original D3D9 game frame and gamepad response unmodified.
             auto& oldest = s.readbacks[fullMode ? fullSlot : s.readSlot];
-            if (oldest.busy && (!fullMode || fullQueued)) {
+            if (oldest.busy && !oldest.quarantined &&
+                (!fullMode || fullQueued)) {
                 HRESULT ready = ctx->GetData(
                     oldest.fence.Get(), nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
                 // In full-size mode this is the only valid publication slot:
@@ -5358,10 +5371,13 @@ void before_game_present(IDirect3DDevice9* game,
                         oldest.busy = false;
                         if (!fullMode) s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
                     }
-                } else if (FAILED(ready)) {
+                } else if (GameNativeFramePublication::classify_fence(
+                               static_cast<std::int32_t>(ready)) ==
+                           GameNativeReadbackFence::Failed) {
+                    // Never recycle a staging texture on an unconfirmed GPU
+                    // fence failure; wait for a source-device Reset to retire it.
+                    oldest.quarantined = true;
                     ++s.failed;
-                    oldest.busy = false;
-                    if (!fullMode) s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
                 }
             }
             // Never publish partial GPU compositing from a source draw gap,
@@ -5452,7 +5468,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.sourceGameDevice = 0u;
     s.probeSlot = 0;
     for (auto& item : s.readbacks) {
-        item.staging.Reset(); item.fence.Reset(); item.busy = false;
+        item.staging.Reset(); item.fence.Reset(); item.busy = false; item.quarantined = false;
         item.provenance = {};
     }
     s.readSlot = s.writeSlot = 0;

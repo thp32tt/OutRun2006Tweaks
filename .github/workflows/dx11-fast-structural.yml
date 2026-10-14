@@ -138,6 +138,8 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_same_present_fence_probe_00731.cpp -o /tmp/dx11_fence_00731 && /tmp/dx11_fence_00731
           python tools/test_dx11_full_frame_slot_reuse_00743.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_frame_slot_reuse_probe_00743.cpp -o /tmp/dx11_full_frame_slot_00743 && /tmp/dx11_full_frame_slot_00743
+          python tools/test_dx11_readback_quarantine_00744.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_readback_quarantine_probe_00744.cpp -o /tmp/dx11_readback_quarantine_00744 && /tmp/dx11_readback_quarantine_00744
           python tools/test_dx11_game_frame_publication_00727.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_frame_publication_probe_00727.cpp -o /tmp/dx11_publication_00727 && /tmp/dx11_publication_00727
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_frame_same_present_probe_00726.cpp -o /tmp/dx11_same_present_00726 && /tmp/dx11_same_present_00726

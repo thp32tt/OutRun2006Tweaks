@@ -6,7 +6,18 @@ namespace outrun::vr::dx11::live_game_frame {
 // Full-resolution publication is based on complete real game-source draws,
 // same-Present fence provenance and valid output, not an arbitrary pixel
 // difference from the old diagnostic inset's constant clear sentinel.
+// D3D11 GetData(EVENT) has three materially different outcomes. Only S_OK
+// (HRESULT 0) proves that a staging texture is no longer GPU-owned. S_FALSE
+// (HRESULT 1) remains in flight; a device error or unexpected status must
+// quarantine the resource rather than letting the next game Draw overwrite it.
+enum class GameNativeReadbackFence : std::uint8_t { Complete, Pending, Failed };
 struct GameNativeFramePublication {
+    [[nodiscard]] static constexpr GameNativeReadbackFence classify_fence(
+        std::int32_t result) noexcept {
+        return result == 0 ? GameNativeReadbackFence::Complete :
+               result == 1 ? GameNativeReadbackFence::Pending :
+                             GameNativeReadbackFence::Failed;
+    }
     [[nodiscard]] static constexpr bool source_mode_contiguous(
         bool sourceObserved, bool sourceFullMode, bool presentFullMode) noexcept {
         return !sourceObserved || sourceFullMode == presentFullMode;
