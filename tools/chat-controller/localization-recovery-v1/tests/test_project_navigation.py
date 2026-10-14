@@ -29,11 +29,15 @@ class FakeLocator:
         return self
 
     def nth(self, i):
+        if self.kind == "rows":
+            return FakeLocator(self.page, "row", self.page.rows[i])
         return FakeLocator(self.page, "link", self.page.links[i])
 
     async def count(self):
         if self.kind == "links":
             return len(self.page.links)
+        if self.kind == "rows":
+            return len(self.page.rows)
         if self.kind == "button":
             return int(self.item in self.page.buttons)
         if self.kind == "text":
@@ -47,7 +51,9 @@ class FakeLocator:
         return self.item["title"]
 
     async def get_attribute(self, attr):
-        return self.item.get({"href": "href", "aria-label": "aria"}.get(attr))
+        return self.item.get({"href": "href", "aria-label": "aria",
+                              "data-app-action-sidebar-project-id": "id",
+                              "data-app-action-sidebar-project-label": "label"}.get(attr))
 
     async def wait_for(self, **kwargs):
         if self.kind == "text" and not self.page.text_present:
@@ -64,9 +70,10 @@ class FakeLocator:
 
 
 class FakePage:
-    def __init__(self, links=None, buttons=None, text_present=True, identity=True):
+    def __init__(self, links=None, buttons=None, text_present=True, identity=True, rows=None):
         self.url = "https://chatgpt.com/"
         self.links = links or []
+        self.rows = rows or []
         self.buttons = set(buttons or [])
         self.text_present = text_present
         self.identity = identity
@@ -84,6 +91,8 @@ class FakePage:
         return FakeLocator(self, "heading")
 
     def locator(self, css):
+        if css.startswith('[data-app-action-sidebar-project-id]'):
+            return FakeLocator(self, "rows")
         if css.startswith("a[href"):
             return FakeLocator(self, "links")
         assert css == '[role="textbox"][contenteditable="true"]'
@@ -106,6 +115,32 @@ class ProjectNavigationTests(unittest.TestCase):
 
     def execute(self, page):
         return asyncio.run(module.prepare_a_project_target(page, NAME, allow_saved_chat=False))
+
+    def test_actual_chatgpt_div_project_row_direct_route(self):
+        # Observed in the authorized 2026-10-14 N100 Chrome DOM:
+        # project row is a DIV; clicking expands but never navigates.
+        page = FakePage(rows=[
+            {"id": "g-p-other", "label": "다른 프로젝트"},
+            {"id": "g-p-correct", "label": NAME},
+        ], text_present=True)
+        self.assertEqual(self.execute(page), "A_PROJECT_COMPOSER_READY")
+        self.assertEqual(page.navigation, [PROJECT])
+        self.assertEqual(page.clicked, [])
+
+    def test_duplicate_same_name_project_rows_are_blocked(self):
+        page = FakePage(rows=[
+            {"id": "g-p-correct", "label": NAME},
+            {"id": "g-p-other", "label": NAME},
+        ])
+        self.assertEqual(self.execute(page), "A_PROJECT_LINK_AMBIGUOUS")
+        self.assertEqual(page.navigation, [])
+
+    def test_untrusted_project_row_id_is_blocked(self):
+        page = FakePage(rows=[
+            {"id": "../../outside", "label": NAME},
+        ])
+        self.assertEqual(self.execute(page), "A_PROJECT_ID_INVALID")
+        self.assertEqual(page.navigation, [])
 
     def test_fresh_root_exact_sidebar_link(self):
         page = FakePage(links=[
