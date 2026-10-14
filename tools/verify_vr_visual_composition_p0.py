@@ -2027,7 +2027,7 @@ for marker, d3dx_call in (
     ),
     (
         'static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Orig_dest(',
-        'return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(',
+        'const HRESULT nativeResult = D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(',
     ),
     (
         'static HRESULT __stdcall D3DXCreateTextureFromFileInMemoryEx_Custom_dest(',
