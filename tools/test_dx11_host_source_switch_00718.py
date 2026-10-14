@@ -33,15 +33,30 @@ def wired(source, logic):
         "const auto sourceRoute = StereoSource();" in projection and
         "sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu" in projection and
         "sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::None" in projection and
-        "ctx->Draw" not in projection and
-        "context_->Draw" in projection)
+        "RenderTo(projection_.rtvs[image][0]" in projection and
+        "RenderTo(projection_.rtvs[image][1]" in projection)
 
 assert wired(host,helper), "host must display the last successful direct/SBS frame"
-for token in ("stereoSourceValid_ = false;", "directFrameValid_ = false;",
-              "directTransportReady_ = false;",
-              "const auto sourceRoute = StereoSource();",
-              "sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu"):
-    assert not wired(host.replace(token, "/* removed */",1),helper), token
+# Mutate the target routine, not an unrelated earlier Reset() assignment.
+def remove_from_routine(source, begin, end, token):
+    prefix, tail = source.split(begin, 1)
+    section, suffix = tail.split(end, 1)
+    assert token in section, token
+    return prefix + begin + section.replace(token, "/* removed */", 1) + end + suffix
+
+for begin, end, token in (
+    ("bool CommitDirectStereoSource(", "bool DirectTransportReady()",
+     "stereoSourceValid_ = false;"),
+    ("bool CommitStereoSource()", "OutRunVrNativeEyePair::StereoSourceRoute StereoSource()",
+     "directFrameValid_ = false;"),
+    ("bool CommitStereoSource()", "OutRunVrNativeEyePair::StereoSourceRoute StereoSource()",
+     "directTransportReady_ = false;"),
+    ("bool RenderProjection(", "bool RenderMenuPlaneTo(",
+     "const auto sourceRoute = StereoSource();"),
+    ("bool RenderProjection(", "bool RenderMenuPlaneTo(",
+     "sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu"),
+):
+    assert not wired(remove_from_routine(host, begin, end, token), helper), token
 assert "StereoSourceRoute::Sbs" in helper
 assert "StereoSourceRoute::None" in helper
 assert "ChooseStereoSource(false,true,true,true,true)" in smoke
