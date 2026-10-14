@@ -98,7 +98,10 @@ namespace outrun::vr::dx11
             case D3DDECLTYPE_FLOAT4:
                 return { DXGI_FORMAT_R32G32B32A32_FLOAT, 16, true };
             case D3DDECLTYPE_D3DCOLOR:
-                return { DXGI_FORMAT_B8G8R8A8_UNORM, 4, true };
+                // Keep declaration COLOR input consistent with FVF COLOR input:
+                // IA reads D3DCOLOR memory as R8G8B8A8, then the fixed-function
+                // shader applies the single required .bgra channel swizzle.
+                return { DXGI_FORMAT_R8G8B8A8_UNORM, 4, true };
             case D3DDECLTYPE_UBYTE4:
                 return { DXGI_FORMAT_R8G8B8A8_UINT, 4, true };
             case D3DDECLTYPE_SHORT2:
