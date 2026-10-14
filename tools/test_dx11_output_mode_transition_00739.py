@@ -18,13 +18,14 @@ WF = (ROOT / ".github/workflows/dx11-fast-structural.yml").read_text(encoding="u
 
 def connected(code: str) -> bool:
     draw = code[code.index("void observe(IDirect3DDevice9*"):code.index("void observe_scene_boundary(")]
+    unavailable = code[code.index("void observe_unavailable_game_draw("):code.index("void observe_failed_game_draw(")]
     present = code[code.index("void before_game_present("):code.index("void before_game_reset()")]
     reset = code[code.index("void before_game_reset()"):]
     return all((
         "bool sourceModeKnown = false;" in code,
         "bool sourceWasFullMode = false;" in code,
         "if (!observe_source_frame_mode(s, fullMode)) return;" in draw,
-        "if (!observe_source_frame_mode(s, env_full_game_opt_in())) return;" in draw,
+        "if (!observe_source_frame_mode(s, env_full_game_opt_in())) return;" in unavailable,
         "const bool fullMode = env_full_game_opt_in();" in present,
         "outputNow.nativeFullFrame = fullMode;" in present,
         present.index("outputNow.nativeFullFrame = fullMode;") < present.index("!s.previousOutput.same(outputNow)"),
