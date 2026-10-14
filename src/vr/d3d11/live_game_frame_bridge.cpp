@@ -5166,7 +5166,7 @@ void before_game_present(IDirect3DDevice9* game,
             // Present, not uploaded one or two frames later. Retire older GPU
             // copies only once their fences complete, never reuse busy memory.
             bool fullQueued = false;
-            const UINT fullSlot = s.writeSlot;
+            UINT fullSlot = s.writeSlot;
             if (fullMode) {
                 for (auto& prior : s.readbacks) {
                     if (!prior.busy || prior.provenance.capturedAtPresent >= s.presents)
@@ -5180,8 +5180,20 @@ void before_game_present(IDirect3DDevice9* game,
                 }
                 if (complete && outputWritable &&
                     s.sourceGameDevice == presentDevice) {
-                    auto& next = s.readbacks[s.writeSlot];
-                    if (!next.busy) {
+                    // Stale GPU readbacks can occupy the preferred ring slot
+                    // while another staging resource is already free. Prefer the
+                    // next free resource rather than dropping a valid full-size
+                    // current-Present menu/car/race frame unnecessarily.
+                    std::uint32_t occupiedSlots = 0u;
+                    for (UINT i = 0u; i < kReadbackSlots; ++i) {
+                        if (s.readbacks[i].busy) occupiedSlots |= (1u << i);
+                    }
+                    const UINT availableSlot =
+                        GameNativeFramePublication::select_available_slot(
+                            occupiedSlots, kReadbackSlots, s.writeSlot);
+                    if (availableSlot < kReadbackSlots) {
+                        fullSlot = availableSlot;
+                        auto& next = s.readbacks[fullSlot];
                         ctx->CopyResource(next.staging.Get(), s.backend.color_texture());
                         next.provenance = {s.presents, s.sourceDrawsThisFrame};
                         next.completeFullFrame = true;
@@ -5191,8 +5203,12 @@ void before_game_present(IDirect3DDevice9* game,
                         ctx->Flush(); // one fence submission, never block D3D9
                         next.busy = true;
                         fullQueued = true;
-                        s.writeSlot = (s.writeSlot + 1u) % kReadbackSlots;
-                    } else ++s.droppedCopies;
+                        s.writeSlot = (fullSlot + 1u) % kReadbackSlots;
+                    } else {
+                        // All fences are still owned by the GPU: do not wait,
+                        // reuse a busy staging resource, or stall gamepad input.
+                        ++s.droppedCopies;
+                    }
                 }
             }
             // Insets retain the bounded asynchronous ring. Full-frame polls

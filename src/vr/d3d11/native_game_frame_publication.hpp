@@ -22,6 +22,21 @@ struct GameNativeFramePublication {
         std::uint32_t changedPixels) noexcept {
         return complete && outputWritable && (fullMode || changedPixels != 0u);
     }
+    // Real full-size frames may finish out of order in the async staging ring.
+    // Select any free staging slot, starting at the next preferred position.
+    // An occupied preferred slot must not discard the current menu/race frame
+    // when another slot is free; all-busy still preserves original D3D9 input.
+    [[nodiscard]] static constexpr std::uint32_t select_available_slot(
+        std::uint32_t occupiedMask, std::uint32_t slotCount,
+        std::uint32_t preferred) noexcept {
+        if (slotCount == 0u || slotCount > 32u || preferred >= slotCount)
+            return slotCount;
+        for (std::uint32_t offset = 0u; offset < slotCount; ++offset) {
+            const std::uint32_t slot = (preferred + offset) % slotCount;
+            if ((occupiedMask & (1u << slot)) == 0u) return slot;
+        }
+        return slotCount;
+    }
     // A full-size game image is only useful if its GPU fence completes before
     // this *same* D3D9 Present. Give the already-flushed native submission a
     // bounded opportunity to finish; never wait indefinitely, poll a delayed
