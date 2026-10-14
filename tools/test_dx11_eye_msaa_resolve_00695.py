@@ -32,7 +32,9 @@ def connected(s,h):
         "context->ResolveSubresource(entry.eye[1].Get(), 0u, right_source, 0u, format_);",
         "context->CopyResource(entry.eye[0].Get(), left_source);",
         "context->CopyResource(entry.eye[1].Get(), right_source);",
-        "return signal_producer_fence(context, slot, frame_id);",
+        "entry.gpu_copy_queued = true;",
+        "if (!signal_producer_fence(context, slot, frame_id))",
+        "synchronization_faulted_ = true;",
     ]
     hchecks=[
         "leftSamples == 0u || leftSamples > 32u",
@@ -46,7 +48,7 @@ def connected(s,h):
         fn.index("native_game_eye_transfer(") <
         fn.index("native_game_eye_pair_sources_admitted(") <
         fn.index("context->ResolveSubresource(") <
-        fn.index("return signal_producer_fence(")
+        fn.index("if (!signal_producer_fence(")
     )
 
 assert connected(source,header), "native game MSAA eyes not linked to safe DX11 ring"
@@ -55,6 +57,20 @@ assert connected(source,header), "native game MSAA eyes not linked to safe DX11 
 submission = source.split("bool NativeSharedEyeRing::submit_eye_pair(", 1)[1].split(
     "bool NativeSharedEyeRing::signal_producer_fence(", 1)[0]
 verify_eye_pair_submission(submission)
+# Negative controls must reject removal of queued-eye provenance, the guarded
+# EVENT call, or the failure-path quarantine. Do not allow legacy direct-return
+# fallback to pass after GPU commands are already recorded.
+for removed in [
+    "entry.gpu_copy_queued = true;",
+    "if (!signal_producer_fence(context, slot, frame_id))",
+    "synchronization_faulted_ = true;",
+]:
+    try:
+        verify_eye_pair_submission(submission.replace(removed, "/* unsafe removal */", 1))
+    except SystemExit:
+        pass
+    else:
+        raise AssertionError("queued native stereo eye safety mutation accepted: " + removed)
 for removed in [
     "!exact_source(left_source, leftDesc)",
     "!exact_source(right_source, rightDesc)",

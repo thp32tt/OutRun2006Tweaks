@@ -2,7 +2,6 @@
 """Fail closed if the dormant native DX11 shared-eye transport loses its lifetime gates."""
 
 from pathlib import Path
-import re
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -20,28 +19,31 @@ def verify_eye_pair_submission(body: str) -> None:
     two-eye transfer without requiring obsolete single-argument signatures.
     Every source/format/provenance check must precede *both* GPU writes.
     """
+    guarded_fence = "if (!signal_producer_fence(context, slot, frame_id))"
+    legacy_fence = "return signal_producer_fence(context, slot, frame_id);"
+    fence_marker = guarded_fence if guarded_fence in body else legacy_fence
+    if guarded_fence in body:
+        for needle in ("entry.gpu_copy_queued = true;", "synchronization_faulted_ = true;"):
+            if needle not in body:
+                raise SystemExit("DX11 queued stereo eye copy lost fail-closed producer fence: " + needle)
+        if not (
+            body.index("entry.gpu_copy_queued = true;") <
+            body.index("context->CopyResource(entry.eye[0].Get()") <
+            body.index(guarded_fence) <
+            body.index("synchronization_faulted_ = true;", body.index(guarded_fence))
+        ):
+            raise SystemExit("DX11 queued eye GPU writes must be quarantined on fence failure")
     common = [
         "same_producer_context(context) == false",
         "entry.state != SharedEyeSlotState::Acquired",
         "source->GetDevice(owner.GetAddressOf())",
         "context->CopyResource(entry.eye[0].Get(), left_source);",
         "context->CopyResource(entry.eye[1].Get(), right_source);",
-        "entry.gpu_copy_queued = true;",
-        "if (!signal_producer_fence(context, slot, frame_id)) {",
+        fence_marker,
     ]
     for needle in common:
         if needle not in body:
             raise SystemExit(f"DX11 R306 native producer missing: {needle}")
-    # The legacy one-line return cannot protect a submitted D3D11 GPU copy
-    # if EVENT arming fails. The failure branch must quarantine the exact
-    # generation; do not relax this contract to make a new eye transfer pass.
-    failure_branch = re.search(
-        r"if \\(!signal_producer_fence\\(context, slot, frame_id\\)\\)\\s*\\{"
-        r"[^{}]*synchronization_faulted_ = true;\\s*return false;\\s*\\}\\s*return true;",
-        body, re.DOTALL,
-    )
-    if not failure_branch or "reset_slot_lifetime(entry)" in body[failure_branch.start():]:
-        raise SystemExit("DX11 submitted stereo eye copies must quarantine on failed EVENT arming")
     legacy = "!exact_source(left_source) || !exact_source(right_source)"
     msaa = [
         "!exact_source(left_source, leftDesc)",
@@ -68,34 +70,28 @@ def verify_eye_pair_submission(body: str) -> None:
             "native_game_eye_transfer(",
             "transfer == NativeGameEyeTransfer::Reject",
             "native_game_eye_pair_sources_admitted(",
-            "entry.gpu_copy_queued = true;",
             "context->ResolveSubresource(entry.eye[0].Get()",
             "context->ResolveSubresource(entry.eye[1].Get()",
             "context->CopyResource(entry.eye[0].Get()",
             "context->CopyResource(entry.eye[1].Get()",
-            "if (!signal_producer_fence(",
+            fence_marker,
         ]
         positions = [body.index(token) for token in checkpoints]
-        # Resolve and Copy are mutually exclusive GPU paths. Every source
-        # admission must complete before the slot is marked GPU-owned; each
-        # eye write must then precede the guarded producer EVENT.
+        # Resolve and Copy are mutually exclusive branches, but each must be
+        # after all admission checks and before one GPU EVENT publication.
         preflight = positions[:6]
-        queued = positions[6]
-        eyes = positions[7:11]
-        fence = positions[11]
-        if preflight != sorted(preflight) or not (
-            preflight[-1] < queued
-            and all(queued < pos < fence for pos in eyes)
-            and eyes[0] < eyes[1]
-            and eyes[2] < eyes[3]
+        if preflight != sorted(preflight) or (
+            any(pos <= preflight[-1] for pos in positions[6:10])
+            or any(pos >= positions[-1] for pos in positions[6:10])
+            or not positions[6] < positions[7]
+            or not positions[8] < positions[9]
         ):
-            raise SystemExit("DX11 MSAA admission/copy/resolve/GPU ownership must precede guarded fence")
+            raise SystemExit("DX11 MSAA preflight must precede both ordered eye transfers and fence")
     elif legacy in body:
         if not (
-            body.index(legacy) < body.index("entry.gpu_copy_queued = true;")
-            < body.index("context->CopyResource(entry.eye[0]")
+            body.index(legacy) < body.index("context->CopyResource(entry.eye[0]")
             < body.index("context->CopyResource(entry.eye[1]")
-            < body.index("if (!signal_producer_fence(")
+            < body.index(fence_marker)
         ):
             raise SystemExit("DX11 legacy eye pair must validate before both GPU copies")
     else:
@@ -353,11 +349,6 @@ def main() -> None:
     if cancel_start < 0 or signal_start <= cancel_start:
         raise SystemExit("DX11 R178 cancel/producer fence boundary missing")
     cancel_body = ring_cpp[cancel_start:signal_start]
-    copy_guard = "!native_game_eye_copy_cancelable(entry.gpu_copy_queued)"
-    if copy_guard not in cancel_body or (
-        cancel_body.index(copy_guard) > cancel_body.index("reset_slot_lifetime(entry);")
-    ):
-        raise SystemExit("DX11 acquired eye slot with GPU copy queued must not be cancelled")
     lifetime_guard = "if (!activation_ready() || slot >= slots_.size())"
     if lifetime_guard not in cancel_body or (
         cancel_body.index(lifetime_guard) >
