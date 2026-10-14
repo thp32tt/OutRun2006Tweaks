@@ -50,7 +50,10 @@ def check(r33, r29):
             probe = "R32ReviewTryXyzrhw" + path + "("
             assert draw.count(probe) == 1
             assert "auto call = [&](bool resyncAlreadyFlushed)" in draw
-            assert "const HRESULT xyzrhw = resyncAlreadyFlushed\n                    ? " + probe in draw
+            assert "const bool tryXyzrhw = resyncAlreadyFlushed &&" in draw
+            assert "(!OutRunVR::State::StateBlockTracker::Reliable() ||" in draw
+            assert "R32ReviewCurrentVertexShaderIdentity() == 0);" in draw
+            assert "const HRESULT xyzrhw = tryXyzrhw\n                    ? " + probe in draw
             assert ": E_NOTIMPL;" in draw
             assert "if (xyzrhw != E_NOTIMPL)\n                    return xyzrhw;" in draw
             assert "R32ReviewCallRaw" + raw + "(" in draw
@@ -73,11 +76,15 @@ def main():
         probe = "R32ReviewTryXyzrhw" + path + "("
         cases += [
             r33.replace(
-                "const HRESULT xyzrhw = resyncAlreadyFlushed\n                    ? " + probe,
-                "const HRESULT xyzrhw = true\n                    ? " + probe, 1),
+                "const bool tryXyzrhw = resyncAlreadyFlushed &&",
+                "const bool tryXyzrhw = true &&", 1),
             r33.replace(
-                "? " + probe, "? " + probe, 1).replace(
-                ": E_NOTIMPL;", ": D3D_OK;", 1),
+                "R32ReviewCurrentVertexShaderIdentity() == 0);",
+                "true);", 1),
+            r33.replace(
+                "StateBlockTracker::Reliable() ||",
+                "StateBlockTracker::Reliable() &&", 1),
+            r33.replace(": E_NOTIMPL;", ": D3D_OK;", 1),
         ]
     cases += [
         r33.replace("if (!gameDevice || internalPass ||",
