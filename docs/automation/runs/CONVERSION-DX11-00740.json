@@ -10,12 +10,12 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:GAME_SOURCE_OWNER_FULL_CLEAR_REACQUISITION",
   "feature_id": "DX11-LIVE-DRAW-PRESENT-DEVICE-OWNERSHIP-RECOVERY",
-  "status": "C3_VALIDATION_PENDING",
-  "checkpoint": "C3_VALIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "base_head_sha": "f84701451090e659379cdaaacd44a5623bdb716b",
   "material_result_sha": "f0750c775995a7ab205e426b6e3af69c9a21cad3",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "PENDING_EXACT_SHA",
+  "validation_bearing_result_sha": "2b7fcc9ce719a6d9166464572878b4ce9b631502",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -85,9 +85,32 @@
     ]
   },
   "acceptance_results": {
-    "draw-present-owner": "PENDING",
-    "fallback-and-stale-eye": "PENDING",
-    "exact-sha-gates": "PENDING"
+    "draw-present-owner": "PASS",
+    "fallback-and-stale-eye": "PASS",
+    "exact-sha-gates": "PASS_EXACT_SHA"
   },
-  "blocking_evidence": "A first-frame auxiliary Draw claims sourceGameDevice before the actual primary game backbuffer Clear; later main-game Draw or Present is rejected. Previous presentOutput owner affinity was not used in the source claim and foreign full Clear always returned before proof."
+  "blocking_evidence": "A first-frame auxiliary Draw claims sourceGameDevice before the actual primary game backbuffer Clear; later main-game Draw or Present is rejected. Previous presentOutput owner affinity was not used in the source claim and foreign full Clear always returned before proof.",
+  "ci_evidence": {
+    "dx11_fast": {
+      "run_id": 38613456934,
+      "conclusion": "success"
+    },
+    "backend_conversion": {
+      "run_id": 38613456817,
+      "conclusion": "success"
+    },
+    "windows_build": {
+      "run_id": 38613463801,
+      "conclusion": "success"
+    },
+    "openxr_architecture": {
+      "run_id": 38613463753,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38613463858,
+      "conclusion": "success"
+    }
+  },
+  "result_note": "Five mandatory GitHub Actions succeeded on exact validation-bearing SHA 2b7fcc9ce719a6d9166464572878b4ce9b631502. Material source commit f0750c775995a7ab205e426b6e3af69c9a21cad3. Verified build/source integration only; no actual Quest3/VDXR, real game pixels, gamepad or frame pacing evidence. No automatic backend promotion. C6 bookkeeping has no CI ownership or separate score."
 }
