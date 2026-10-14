@@ -909,7 +909,8 @@ namespace OutRunVRStereo
         template <typename ActualDraw, typename LowerR29Draw>
         HRESULT R33Dispatch(IDirect3DDevice9* device,
             ActualDraw&& actualDraw, LowerR29Draw&& lowerR29Draw,
-            const char* site, bool resyncAlreadyFlushed) noexcept
+            const char* site, bool resyncAlreadyFlushed,
+            bool telemetry) noexcept
         {
             // Only the early raster-guard bypass reaches this path without an
             // earlier flush; keep StateBlock recovery there, including when
@@ -917,7 +918,8 @@ namespace OutRunVRStereo
             if (!resyncAlreadyFlushed &&
                 !OutRunVR::State::StateBlockTracker::Recording())
                 OutRunVR::State::StateBlockRecovery::FlushPendingResync(device);
-            const bool telemetry = R33TelemetryEnabled();
+            // Use the same per-draw diagnostics publication as the workload
+            // observer: do not call across the R32 TU a second time.
             if (telemetry)
                 R32ReviewObserveDispatchDraw(device);
 
@@ -973,7 +975,8 @@ namespace OutRunVRStereo
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
             // No cross-TU workload observer call when diagnostics are off.
-            if (R33TelemetryEnabled())
+            const bool telemetry = R33TelemetryEnabled();
+            if (telemetry)
                 R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, false);
             auto call = [&](bool resyncAlreadyFlushed) {
                 // The outer raster guard already rejected non-game, aux RT,
@@ -995,7 +998,7 @@ namespace OutRunVRStereo
                     return R32ReviewCallLowerDrawPrimitive(
                         device, type, startVertex, primitiveCount);
                 };
-                return R33Dispatch(device, actual, lower, "R33/DrawPrimitive", resyncAlreadyFlushed);
+                return R33Dispatch(device, actual, lower, "R33/DrawPrimitive", resyncAlreadyFlushed, telemetry);
             };
             const bool gpuTimed = GpuWaterProbe::Enabled() &&
                 GpuWaterProbe::instance().beforeDraw(device, primitiveCount);
@@ -1012,7 +1015,8 @@ namespace OutRunVRStereo
             UINT startIndex, UINT primitiveCount)
         {
             // No cross-TU workload observer call when diagnostics are off.
-            if (R33TelemetryEnabled())
+            const bool telemetry = R33TelemetryEnabled();
+            if (telemetry)
                 R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, false);
             auto call = [&](bool resyncAlreadyFlushed) {
                 // The outer raster guard already rejected non-game, aux RT,
@@ -1038,7 +1042,7 @@ namespace OutRunVRStereo
                         startIndex, primitiveCount);
                 };
                 return R33Dispatch(device, actual, lower,
-                    "R33/DrawIndexedPrimitive", resyncAlreadyFlushed);
+                    "R33/DrawIndexedPrimitive", resyncAlreadyFlushed, telemetry);
             };
             const bool gpuTimed = GpuWaterProbe::Enabled() &&
                 GpuWaterProbe::instance().beforeDraw(device, primitiveCount);
@@ -1054,7 +1058,8 @@ namespace OutRunVRStereo
             UINT stride)
         {
             // No cross-TU workload observer call when diagnostics are off.
-            if (R33TelemetryEnabled())
+            const bool telemetry = R33TelemetryEnabled();
+            if (telemetry)
                 R32ReviewObserveFrameWorkload(device, type, primitiveCount, false, true);
             auto call = [&](bool resyncAlreadyFlushed) {
                 // The outer raster guard already rejected non-game, aux RT,
@@ -1076,7 +1081,7 @@ namespace OutRunVRStereo
                     return R32ReviewCallLowerDrawPrimitiveUP(
                         device, type, primitiveCount, data, stride);
                 };
-                return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP", resyncAlreadyFlushed);
+                return R33Dispatch(device, actual, lower, "R33/DrawPrimitiveUP", resyncAlreadyFlushed, telemetry);
             };
             const bool gpuTimed = GpuWaterProbe::Enabled() &&
                 GpuWaterProbe::instance().beforeDraw(device, primitiveCount);
@@ -1094,7 +1099,8 @@ namespace OutRunVRStereo
             const void* vertexData, UINT stride)
         {
             // No cross-TU workload observer call when diagnostics are off.
-            if (R33TelemetryEnabled())
+            const bool telemetry = R33TelemetryEnabled();
+            if (telemetry)
                 R32ReviewObserveFrameWorkload(device, type, primitiveCount, true, true);
             auto call = [&](bool resyncAlreadyFlushed) {
                 // The outer raster guard already rejected non-game, aux RT,
@@ -1120,7 +1126,7 @@ namespace OutRunVRStereo
                         indexData, indexFormat, vertexData, stride);
                 };
                 return R33Dispatch(device, actual, lower,
-                    "R33/DrawIndexedPrimitiveUP", resyncAlreadyFlushed);
+                    "R33/DrawIndexedPrimitiveUP", resyncAlreadyFlushed, telemetry);
             };
             const bool gpuTimed = GpuWaterProbe::Enabled() &&
                 GpuWaterProbe::instance().beforeDraw(device, primitiveCount);

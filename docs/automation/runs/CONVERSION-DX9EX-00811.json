@@ -1,0 +1,88 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00811",
+  "production_id": "CONVERSION-DX9EX-00811",
+  "event_id": "CONVERSION-DX9EX-00811-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R33_SINGLE_DRAW_TELEMETRY_SNAPSHOT",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R33_SINGLE_DRAW_TELEMETRY_SNAPSHOT",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00811]",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_r33_telemetry_draw_hotpath.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00811.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R33_SINGLE_DRAW_TELEMETRY_SNAPSHOT",
+    "goal": "Keep game primitive workload and routing telemetry coherent within each DX9Ex physical Draw, and remove the second cross-translation-unit telemetry-enable query from the R33 dispatch hot path for all four primitive APIs.",
+    "scope_boundary": "Only R33 game Draw telemetry dispatch, not visual stereo transforms, device loss, FFB, original game hooks or any DX11/DXVK/localization source.",
+    "special_work_evidence": "The 2026-10-14 Quest3 frame capture reported up to 3298 draws per frame and 11.876ms game render p95. Source shows one R33TelemetryEnabled() query at each primitive entry and a second unconditional query in R33Dispatch for the same physical draw; this reduces repeated cross-TU state reads without claiming measured FPS improvement.",
+    "trace_stages": [
+      "The original OutRun D3D9 draw reaches one of the four R33 interceptors.",
+      "R32 workload observer counts primitive classes only when telemetry is enabled before the draw.",
+      "R33 dispatch previously rereads the same enable state before recording HUD/world/legacy route statistics; both eyes reuse existing draw routing and fallback."
+    ],
+    "subcomponents": [
+      "Snapshot telemetry enable at four physical Draw entrypoints and use it for the workload counter without touching D3D9 draw decisions.",
+      "Pass that draw-scoped publication through R33Dispatch and preserve fallback/recording, per-eye and Present reset routing.",
+      "Strengthen the exact-SHA existing R33 telemetry source/mutation verifier to reject stale or forced-false dispatch counters."
+    ],
+    "acceptance_items": [
+      {
+        "id": "DRAW_ENTRY_PARITY",
+        "category": "end_to_end_behavior",
+        "behavior_area": "workload_primitive_counter",
+        "expected_behavior": "Exactly one telemetry-enabled publication per original Draw and the same indexed/UP classification across four APIs."
+      },
+      {
+        "id": "DISPATCH_SAFE_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "stereo_routing_and_disabled_telemetry",
+        "expected_behavior": "Use the same snapshot at dispatch without changing StateBlock recording, mono/aux fallback, stereo draw calls or disabled-telemetry no-observer behavior."
+      },
+      {
+        "id": "EXACT_SHA_WIN32_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_host_package",
+        "expected_behavior": "Run existing negative mutations plus GitHub exact SHA DX9Ex Active Win32 game/host/package, Domain Isolation and Full Source Impact."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "DRAW_ENTRY_PARITY": "LOCAL_SOURCE_ASSERTIONS_ONLY",
+    "DISPATCH_SAFE_FALLBACK": "LOCAL_SOURCE_ASSERTIONS_ONLY",
+    "EXACT_SHA_WIN32_GATES": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "R33 DrawPrimitive, DrawIndexedPrimitive and UP hooks read R33TelemetryEnabled before workload observation; R33Dispatch rereads it for a second R32ReviewTelemetryEnabled call.",
+    "root_cause": "Two cross-TU diagnostic enable queries per eligible physical Draw; a mid-draw toggle can also make workload and route counter decisions disagree.",
+    "source_trace": [
+      "D3D9 physical game DrawPrimitive/Indexed/UP hooks in R33.",
+      "R32 workload classification with R29 effect snapshot used for sand/alpha-like diagnostics.",
+      "R33 route classification and HUD/world/fallback counters share the same Draw and do not change per-eye render state."
+    ],
+    "alternatives_rejected": [
+      "Never cache telemetry across frames or Reset because live diagnostic toggles must remain responsive.",
+      "Do not change the existing stereo routing, right-eye projection, HUD scaling or protected SkyGlow.",
+      "Do not skip R32 workload observer or query once per Present because different physical Draws may use different diagnostic settings."
+    ],
+    "negative_test_evidence": "Updated existing CI verifier to enforce one entry sampling and dispatch propagation with destructive per-API mutations; exact GitHub gates pending.",
+    "fix_evidence": "Thread the existing entry telemetry boolean through the four R33Dispatch calls rather than making a second cross-TU query."
+  },
+  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+  "runtime_status": "BUILD_PENDING_NEED_HMD_TEST",
+  "base_sha": "3268a767efc8f762bb09a64b1f15f42e372db5c7",
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "head_sha": null
+  }
+}
