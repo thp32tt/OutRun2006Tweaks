@@ -230,16 +230,23 @@ def main() -> None:
         "const UINT candidateOrdinal = s.eligibleThisFrame++;",
         "++s.eligible;",
         "s.frameBatch.accepts(candidateOrdinal, s.probeSlot,",
-        "env_batch_opt_in())) return;",
+        "env_batch_opt_in());",
+        "if (!admitted)",
+        "s.frameBatch.accepts_full(sourceOrdinal)",
+        "s.frameBatch.must_abort_unsupported(fullMode, multiBatch)",
         "s.probeSlot = GameNativeFrameBatch::next_probe_slot(",
         "s.probeSlot, s.eligibleThisFrame);",
         "s.eligibleThisFrame = 0;",
         "s.frameBatch.reset();",
     )
     assert all(item in bridge for item in sampling)
-    broken = bridge.replace("env_batch_opt_in())) return;",
-                            "true)) return;", 1)
+    broken = bridge.replace("env_batch_opt_in());",
+                            "true);", 1)
     assert broken != bridge and sampling[3] not in broken
+    # Removing the new full-frame admission must also fail the source contract.
+    missing_full = bridge.replace("s.frameBatch.accepts_full(sourceOrdinal)",
+                                  "false", 1)
+    assert missing_full != bridge and sampling[5] not in missing_full
     assert "s.probeSlot = 0;" in bridge
     batch = (ROOT / "src/vr/d3d11/native_game_frame_batch.hpp").read_text()
     for invariant in ("kMaxDraws = 8u", "next_probe_slot(", "if (stopped) return false;",

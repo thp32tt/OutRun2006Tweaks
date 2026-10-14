@@ -93,6 +93,9 @@ int main() {
     b.succeeded(false);
     assert(!b.accepts_source_draw(1502u, true)); // Missed game draw.
     assert(!b.accepts_source_draw(1499u, true)); // Reordered game draw.
+    // A destructive 4096 -> 8 capacity mutation must not shrink the C++ test
+    // loop itself and thereby masquerade as a successful full-frame test.
+    assert(GameNativeFrameBatch::kMaxFullFrameDraws == 4096u);
     // 00720 full game native capture must include every original Draw ordinal.
     // A rejected frame must not survive after >8 already-submitted native draws.
     b.reset();
