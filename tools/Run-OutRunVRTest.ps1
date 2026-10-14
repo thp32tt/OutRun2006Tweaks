@@ -566,6 +566,6 @@ if($xrHostFailure){
 if($gameExitCode -ne 0){
     # Windows exception NTSTATUS may be signed negative. Use a POSITIVE
     # errorlevel, so the visible CMD 'if errorlevel 1' never reports OK.
-    Write-Warning "OutRun game exit $gameExitCode: DX9Ex test FAILED (logs collected)."
+    Write-Warning "OutRun game exit ${gameExitCode}: DX9Ex test FAILED (logs collected)."
     exit 7
 }
