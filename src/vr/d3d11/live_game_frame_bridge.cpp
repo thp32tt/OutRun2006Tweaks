@@ -2323,14 +2323,14 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         output.reverseDestAlphaCrossfadeBlend = reverseDestAlphaCrossfade;
         output.sourceAlphaSaturateCopyBlend = sourceAlphaSaturateCopy;
         output.sourceAlphaSaturateAddBlend = sourceAlphaSaturateAdd;
-        output.blendOp = blendOp == D3DBLENDOP_MIN ?
-            D3D11_BLEND_OP_MIN :
-            blendOp == D3DBLENDOP_MAX ?
-            D3D11_BLEND_OP_MAX :
-            blendOp == D3DBLENDOP_SUBTRACT ?
+        output.blendOp = blendOp == D3DBLENDOP_SUBTRACT ?
             D3D11_BLEND_OP_SUBTRACT :
             blendOp == D3DBLENDOP_REVSUBTRACT ?
             D3D11_BLEND_OP_REV_SUBTRACT : D3D11_BLEND_OP_ADD;
+        // Preserve independent SUBTRACT/REVSUBTRACT mapping, then override
+        // only the newly admitted extrema RGB/alpha operator.
+        if (extrema) output.blendOp = blendOp == D3DBLENDOP_MIN ?
+            D3D11_BLEND_OP_MIN : D3D11_BLEND_OP_MAX;
     }
     if (alpha) {
         DWORD func = 0, reference = ~0u;

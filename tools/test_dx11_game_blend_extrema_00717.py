@@ -9,7 +9,7 @@ capture = bridge.split("bool supported_game_state(",1)[1].split("bool translate_
 submit = bridge.split("bool submit(",1)[1].split("bool observe_source_device(",1)[0]
 def integrated(c,s,h):
     gate = c.split("const bool extrema =",1)[1].split("// Only exact known-good",1)[0]
-    mapping = c.split("output.blendOp = blendOp",1)[1].split(";",1)[0]
+    mapping = c.split("if (extrema) output.blendOp = blendOp",1)[1].split(";",1)[0]
     om = s.split("} else if (output.blendOp == D3D11_BLEND_OP_MIN",1)[1].split(
         "} else if (output.blendOp != D3D11_BLEND_OP_ADD)",1)[0]
     return all(x in gate for x in (
