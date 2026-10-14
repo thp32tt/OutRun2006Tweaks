@@ -10,8 +10,8 @@
   "feature_id": "DX9EX:PERF:SPARSE_DEPTH_LARGE_BATCH",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:SPARSE_DEPTH_LARGE_BATCH",
-  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
-  "checkpoint": "C6_RESULT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_delta": 1,
@@ -110,5 +110,8 @@
       "note": "No actual headset runtime pass claimed"
     }
   },
-  "c6_status": "BUILD_VERIFIED_NEED_HMD_TEST"
+  "c6_status": "COMPLETE_BUILD_VERIFIED",
+  "validation_bearing_result_sha": "930e6736c48aa2d39f51e03e15b699f67e860c72",
+  "material_result_sha": "06ea254d2f78d5646e88aa992642d314e4f6e353",
+  "hold_resolution": "TERMINAL_STATUS_NOT_COMPLETE resolved: existing exact-SHA GitHub CI SUCCESS; C6 bookkeeping only. Quest3/VDXR runtime validation remains UNTESTED."
 }
