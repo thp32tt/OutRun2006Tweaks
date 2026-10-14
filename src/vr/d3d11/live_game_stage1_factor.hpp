@@ -84,8 +84,8 @@ constexpr bool stage1_combiner_supported(std::uint32_t operation,
             operation == kStage1AddSigned || operation == kStage1AddSigned2X ||
             operation == kStage1Subtract || operation == kStage1AddSmooth ||
             stage1_alpha_blend_operation(operation) ||
-            (stage1_cross_channel_color_operation(operation) ||
-             stage1_dotproduct_color_operation(operation))) &&
+            stage1_dotproduct_color_operation(operation) ||
+            stage1_cross_channel_color_operation(operation)) &&
             stage1_operand_supported(arg1) && stage1_operand_supported(arg2);
 }
 constexpr bool stage1_alpha_supported(std::uint32_t operation,
@@ -257,8 +257,8 @@ constexpr bool stage1_combiner_supported_with_temp(std::uint32_t op,
             op == kStage1AddSigned || op == kStage1AddSigned2X ||
             op == kStage1Subtract || op == kStage1AddSmooth ||
             stage1_alpha_blend_operation(op) ||
-            (stage1_cross_channel_color_operation(op) ||
-             stage1_dotproduct_color_operation(op))) &&
+            stage1_dotproduct_color_operation(op) ||
+            stage1_cross_channel_color_operation(op)) &&
             stage1_operand_supported_with_temp(a,true) &&
             stage1_operand_supported_with_temp(b,true);
 }
