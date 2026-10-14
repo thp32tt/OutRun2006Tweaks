@@ -23,7 +23,7 @@ def check(src):
         (gui, r'\$active\.backend -ne \$cfg\.Backend', "active backend marker must agree with the manifest"),
         (gui, r'\$quotedRunner\s*=\s*\x27"\x27 \+ \$runner \+ \x27"\x27', "PowerShell -File value must be explicitly quoted"),
         (gui, r'Start-Process -FilePath \(Join-Path \$PSHOME \'powershell.exe\'\) -ArgumentList \$launchArgs', "quoted runner must be launched, not the unquoted array"),
-        (runner, r'trap\s*\{.*?OUTRUNVR_LAUNCH_ERROR\.txt.*?MessageBox\]::Show', "early launcher failures need a durable error and visible dialog"),
+        (runner, r"trap\s*\{.*?\$errorFile\s*=\s*Join-Path\s+\$root\s+'OUTRUNVR_LAUNCH_ERROR\.txt'.*?Set-Content\s+-LiteralPath\s+\$errorFile.*?MessageBox\]::Show", "early launcher failures need durable error-path creation, file write and visible dialog"),
         (workflow, r'verify_vr_dx9ex_launch_paths\.py', "negative regression verifier must run in the Active Gate"),
     ]
     for value, pattern, label in expected:
