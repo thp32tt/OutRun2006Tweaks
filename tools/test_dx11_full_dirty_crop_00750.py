@@ -13,16 +13,21 @@ def integrated(source, header):
     gate=code.find("GameNativeDirtyRegionCoverage::covers_present_crop(")
     bound=code.find("const bool outputWritable =",gate)
     queued=code.find("ctx->CopyResource(next.staging.Get(), s.backend.color_texture());",bound)
+    tiled=code.find("GameNativeDirtyRegionCoverage::covers_partition_crop(",gate)
     crop=code.find("const RECT uploadSourceCrop{",queued)
     dest=code.find("destination.x = uploadSourceCrop.left;",crop)
     submit=code.find("game->UpdateSurface(",dest)
     return all((
         '#include "native_game_dirty_region.hpp"' in source,
-        0<=gate<bound<queued<crop<dest<submit,
+        0<=gate<tiled<bound<queued<crop<dest<submit,
         "oneBoundedDirtyRect &&" in code[:gate],
         "dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top" in code[gate:bound],
         "dirtyRect.left, dirtyRect.top, dirtyRect.right, dirtyRect.bottom" in code[gate:bound],
         "croppedNativeUpload && fullPlacement.valid" in code[bound:queued],
+        "boundedPartition &&" in code[gate:bound],
+        "(cropDirtyCoverage || partitionCropCoverage) && !fullDirtyCoverage" in code[tiled:bound],
+        "partitionRects);" in code[tiled:bound],
+        "const bool partitionCropCoverage = fullMode && backbufferKnown &&" in code[gate:tiled],
         "(!outputNow.hasDirtyRegion || fullDirtyCoverage) &&" in code[bound:queued],
         "croppedNativeUpload ? &uploadSourceCrop : nullptr" in code[submit:submit+220],
         "destination.y = uploadSourceCrop.top;" in code[crop:submit],
@@ -31,6 +36,11 @@ def integrated(source, header):
         "cropBottom > static_cast<std::int64_t>(height)" in header,
         "rectangleCount != 1u || bufferBytes < 16u" in header,
         "boundLeft == cropLeft && boundTop == cropTop" in header,
+        "static constexpr bool covers_partition_crop(" in header,
+        "bufferBytes < rectangleCount * 16u" in header,
+        "boundLeft != cropLeft || boundTop != cropTop" in header,
+        "if (area > total - covered) return false;" in header,
+        "r.left < p.right && p.left < r.right" in header,
         "rectRight == cropRight && rectBottom == cropBottom" in header,
         "(cropLeft == 0 && cropTop == 0 &&" in header,
     ))
@@ -42,6 +52,10 @@ for old,new in (
     ("croppedNativeUpload ? &uploadSourceCrop : nullptr","nullptr /* full overwrite */"),
     ("destination.x = uploadSourceCrop.left;","destination.x = 0;"),
     ("destination.y = uploadSourceCrop.top;","destination.y = 0;"),
+    ("(cropDirtyCoverage || partitionCropCoverage) && !fullDirtyCoverage",
+     "cropDirtyCoverage && !fullDirtyCoverage"),
+    ("boundedPartition &&\n            GameNativeDirtyRegionCoverage::covers_partition_crop(",
+     "true /* unsafe partial tiles */ &&\n            GameNativeDirtyRegionCoverage::covers_partition_crop("),
 ):
     mutant=SRC.replace(old,new,1)
     assert mutant!=SRC and not integrated(mutant,HDR),old
@@ -51,6 +65,8 @@ for old,new in (
     ("rectRight == cropRight && rectBottom == cropBottom","true /* partial dirty */"),
     ("cropRight > static_cast<std::int64_t>(width)","false /* OOB x */"),
     ("cropBottom > static_cast<std::int64_t>(height)","false /* OOB y */"),
+    ("boundLeft != cropLeft || boundTop != cropTop", "false /* unchecked tiled bounds */"),
+    ("static constexpr bool covers_partition_crop(", "static constexpr bool unchecked_partition_crop("),
 ):
     mutant=HDR.replace(old,new,1)
     assert mutant!=HDR and not integrated(SRC,mutant),old

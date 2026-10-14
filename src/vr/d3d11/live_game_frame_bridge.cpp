@@ -5175,7 +5175,21 @@ void before_game_present(IDirect3DDevice9* game,
                 dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top,
                 dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
                 dirtyRect.left, dirtyRect.top, dirtyRect.right, dirtyRect.bottom);
-        const bool croppedNativeUpload = cropDirtyCoverage && !fullDirtyCoverage;
+        // A tiled source crop is publishable only when every visible pixel is
+        // covered once. Partial menus, overlaps and invalid region metadata
+        // continue through untouched D3D9 drawing, Present and input.
+        const bool partitionCropCoverage = fullMode && backbufferKnown &&
+            boundedPartition &&
+            GameNativeDirtyRegionCoverage::covers_partition_crop(
+                presentDesc.Width, presentDesc.Height,
+                dirtyRegion->rdh.nCount, dirtyRegion->rdh.nRgnSize,
+                presentRegion.left, presentRegion.top,
+                presentRegion.right, presentRegion.bottom,
+                dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top,
+                dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
+                partitionRects);
+        const bool croppedNativeUpload =
+            (cropDirtyCoverage || partitionCropCoverage) && !fullDirtyCoverage;
         if (!s.previousOutput.same(outputNow)) {
             // Also reject earlier GPU readbacks if the Present backbuffer COM identity
             // changed while the device, dimensions and format stayed identical.

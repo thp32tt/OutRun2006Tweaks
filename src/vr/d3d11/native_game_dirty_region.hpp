@@ -59,6 +59,52 @@ struct GameNativeDirtyRegionCoverage {
             rectLeft == cropLeft && rectTop == cropTop &&
             rectRight == cropRight && rectBottom == cropBottom;
     }
+
+    // 2..8 non-overlapping dirty tiles may fill the *visible* source crop
+    // rather than the physical backbuffer. Require exact area and no overlap:
+    // a hole must keep the original D3D9 Present pixels and gamepad path.
+    [[nodiscard]] static constexpr bool covers_partition_crop(
+        std::uint32_t width, std::uint32_t height,
+        std::uint32_t rectangleCount, std::uint32_t bufferBytes,
+        std::int64_t cropLeft, std::int64_t cropTop,
+        std::int64_t cropRight, std::int64_t cropBottom,
+        std::int64_t boundLeft, std::int64_t boundTop,
+        std::int64_t boundRight, std::int64_t boundBottom,
+        const GameNativeDirtyRectangle* rectangles) noexcept {
+        if (!rectangles || !width || !height ||
+            width > static_cast<std::uint32_t>((std::numeric_limits<std::int32_t>::max)()) ||
+            height > static_cast<std::uint32_t>((std::numeric_limits<std::int32_t>::max)()) ||
+            rectangleCount < 2u || rectangleCount > kMaxPartitionRects ||
+            bufferBytes < rectangleCount * 16u ||
+            cropLeft < 0 || cropTop < 0 || cropRight <= cropLeft ||
+            cropBottom <= cropTop || cropRight > static_cast<std::int64_t>(width) ||
+            cropBottom > static_cast<std::int64_t>(height) ||
+            (cropLeft == 0 && cropTop == 0 &&
+             cropRight == static_cast<std::int64_t>(width) &&
+             cropBottom == static_cast<std::int64_t>(height)) ||
+            boundLeft != cropLeft || boundTop != cropTop ||
+            boundRight != cropRight || boundBottom != cropBottom)
+            return false;
+        const std::uint64_t total = static_cast<std::uint64_t>(cropRight - cropLeft) *
+                                    static_cast<std::uint64_t>(cropBottom - cropTop);
+        std::uint64_t covered = 0u;
+        for (std::uint32_t i = 0u; i < rectangleCount; ++i) {
+            const auto& r = rectangles[i];
+            if (r.left < cropLeft || r.top < cropTop ||
+                r.right <= r.left || r.bottom <= r.top ||
+                r.right > cropRight || r.bottom > cropBottom) return false;
+            const std::uint64_t area = static_cast<std::uint64_t>(r.right - r.left) *
+                                       static_cast<std::uint64_t>(r.bottom - r.top);
+            if (area > total - covered) return false;
+            for (std::uint32_t j = 0u; j < i; ++j) {
+                const auto& p = rectangles[j];
+                if (r.left < p.right && p.left < r.right &&
+                    r.top < p.bottom && p.top < r.bottom) return false;
+            }
+            covered += area;
+        }
+        return covered == total;
+    }
     // Multiple disjoint D3D9 dirty RECTs may describe the entire game frame.
     // The exact union must cover every pixel before native full-frame publication;
     // rcBound alone never proves it (gaps/overlaps retain D3D9 and gamepad).
