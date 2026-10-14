@@ -67,9 +67,9 @@
     "negative_test_evidence": "Portable smoke verifies 16:9 left/bottom, 21:9 corner, native full client, binocular physical aspect and bad/stale reset capture; existing 4:3 regressions kept.",
     "eye_ownership": "R23 LOCAL-fixed stereo only, shared clip/UV and one two-slice image; original D3D9 stereo world, normal HUD and F11 ownership unchanged."
   },
-  "status": "IMPLEMENTED_PENDING_GATES",
-  "phase": "C4_MATERIAL_COMMITTED",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No actual Quest3/VDXR or game runtime session performed.",
   "changed_files": [
@@ -77,20 +77,43 @@
     "vrhost/tests/menu_content_aspect_smoke.cpp"
   ],
   "acceptance_results": {
-    "source_native": "PENDING",
-    "eye_optical": "PENDING",
-    "fallback": "PENDING",
-    "windows_exact_sha": "PENDING"
+    "source_native": "PASS_BUILD",
+    "eye_optical": "PASS_BUILD",
+    "fallback": "PASS_BUILD",
+    "windows_exact_sha": "PASS_EXACT_SHA"
   },
   "material_result_sha": "b6e87d4b773cb18deec90198f0d47a458f23aae7",
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "validation_bearing_result_sha": "2f4723e754485ba7f7c7d1ca0786d43dbcee9c31",
+  "result_sha": "2f4723e754485ba7f7c7d1ca0786d43dbcee9c31",
   "ci_evidence": {
     "first_material_exact_sha": "b6e87d4b773cb18deec90198f0d47a458f23aae7",
     "first_active_run_id": 38591923188,
-    "first_policy_failure": "MISSING_REQUIRED_RUN_RECORD"
+    "first_policy_failure": "MISSING_REQUIRED_RUN_RECORD",
+    "exact_sha": "2f4723e754485ba7f7c7d1ca0786d43dbcee9c31",
+    "active_validation": {
+      "run_id": 38592712558,
+      "conclusion": "SUCCESS",
+      "jobs": "policy/game/full-chain-compile/host/package 5/5 SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38592712266,
+      "conclusion": "SUCCESS"
+    },
+    "material_full_source_impact": {
+      "run_id": 38591923049,
+      "exact_source_sha": "b6e87d4b773cb18deec90198f0d47a458f23aae7",
+      "conclusion": "SUCCESS",
+      "jobs": "source-cross-domain/msvc-analyze-active-game/msvc-analyze-openxr-host 3/3 SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38592276987,
+      "exact_source_sha": "a48f0fa2af025690f45db111ee75f8767b1f8ad4",
+      "conclusion": "SUCCESS",
+      "jobs": "static-exe-analysis/build-hud-inspector 2/2 SUCCESS"
+    }
   },
   "score_once": false,
   "c6_score_delta": 0,
-  "checkpoint": "C4_MATERIAL_COMMITTED"
+  "checkpoint": "C6_STATE",
+  "controller_note": "C6 bookkeeping is separate from immutable validation-bearing 2f4723e7. Original game source material remains b6e87d4b. The same task had one missing run-record failure and one 4:3-only source verifier repair; these are not independent scored work. Quest3/VDXR not tested."
 }
