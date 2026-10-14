@@ -53,7 +53,7 @@ for before, after in (
     end = bridge.index("void observe_unavailable_game_draw(", start)
     clear = bridge[start:end]
     assert before in clear, before
-    bad = bridge[:start] + clear.replace(before, after, 1) + bridge[end:]
+    bad = bridge[:start] + clear.replace(before, after) + bridge[end:]
     assert bad != bridge and not linked(bad, helper), before
 for before, after in (
     ("opaqueDestinationAlpha = opaqueBackbuffer;", "opaqueDestinationAlpha = false;"),
@@ -67,7 +67,9 @@ for before, after in (
     ("output.colorWriteMask = s.clearColor.native_write_mask(", "output.colorWriteMask = ("),
     ("desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;", "desc.RenderTarget[0].RenderTargetWriteMask = 0;"),
 ):
-    bad = bridge.replace(before, after, 1)
+    # OM applies the same write-mask contract in multiple blend families.
+    # Mutate every occurrence or a different family can hide a broken path.
+    bad = bridge.replace(before, after)
     assert bad != bridge and not linked(bad, helper), before
 assert "python tools/test_dx11_x8_dest_alpha_00736.py" in workflow
 assert "tools/dx11_x8_dest_alpha_00736.cpp" in workflow
