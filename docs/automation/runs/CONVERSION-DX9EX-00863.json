@@ -35,7 +35,7 @@
         "id": "diagnostic",
         "category": "end_to_end_behavior",
         "behavior_area": "DX9Ex session log archive",
-        "expected_behavior": "GAME_NONZERO_EXIT status, original exit code and PID are recorded and an error file is written before log collection."
+        "expected_behavior": "GAME_NONZERO_EXIT or the original host failure is preserved with native game exit/PID and the root OUTRUNVR_LAUNCH_ERROR.txt is mirrored into the matching session ZIP before collection."
       },
       {
         "id": "fallback",
@@ -64,8 +64,8 @@
       "Do not skip archive or terminate a running game to report error",
       "Do not change SkyGlow, game rendering or backend selection"
     ],
-    "fix_evidence": "Preserve native ExitCode, mark GAME_NONZERO_EXIT, persist pre-archive error and return positive 7 after log collector.",
-    "negative_test_evidence": "Extended launcher verifier mutations reject restoring exit 0 or erasing GAME_NONZERO_EXIT."
+    "fix_evidence": "Actual launch runner preserves signed native ExitCode and emits explicit crash failure 7 after original logs are collected. The collector packages session files, not root error text, so host/game failure root diagnostic is mirrored into session first.",
+    "negative_test_evidence": "Launcher verifier has destructive mutations for suppressed failure exit, erased GAME_NONZERO_EXIT health, and removed pre-collector copy of OUTRUNVR_LAUNCH_ERROR into session ZIP."
   },
   "status": "SOURCE_MATERIAL_AWAITING_EXACT_SHA_CI",
   "phase": "C3_VALIDATE",
@@ -78,5 +78,12 @@
     "docs/automation/runs/CONVERSION-DX9EX-00863.json"
   ],
   "score_once": false,
-  "score_delta_this_retry": 0
+  "score_delta_this_retry": 0,
+  "material_result_sha": "e2f3b893d57ba889a72736a8792c4877e2dfafae",
+  "material_followup_shas": [
+    "2886f599fc0a7fb7e5bd0fa63c4f017030dc6c27",
+    "17d9969ae723b926824929fbca910ae6a90b65c7",
+    "be7b20c6955ecbcd330dd1a2b08e09bd60460fe2"
+  ],
+  "unchanged_scope": "Only launch/reporting path; no game renderer C++ or visual source changed. This is a release-blocking launch false-PASS fix, not binocular display pass."
 }
