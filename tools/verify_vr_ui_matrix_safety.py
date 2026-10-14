@@ -205,3 +205,52 @@ assert not exact_native_identity(2.0, 2.0, 640, 480, 1280, 961)
 assert not exact_native_identity(2.0, 2.0, 640, 480, 1279, 960)
 
 print("DX9Ex menu multi-sprite native XY aspect PASS (9 negative controls, native fastpath)")
+
+
+# The custom-matrix/menu path must never submit a half-mutated global quad
+# when a device reset or malformed sprite matrix yields a bad vertex.
+def require_atomic_custom_matrix(source: str) -> None:
+    body = source.split("static void __cdecl draw_sprite_custom_matrix_mid(", 1)[1].split(
+        "// Adjust positions of sprites in 3d space", 1)[0]
+    for required in (
+        "std::array<float, 28> quad{};",
+        "if (!device)",
+        "FAILED(descHr) || v25.Width == 0 || v25.Height == 0",
+        "const std::size_t base = i * 7;",
+        "!std::isfinite(quad[base])",
+        "!std::isfinite(quad[base + 1])",
+        "!std::isfinite(quad[base + 2])",
+        "!std::isfinite(quad[base + 5])",
+        "!std::isfinite(quad[base + 6])",
+        "std::copy(quad.begin(), quad.end(), g_spriteVertexStream);",
+        "device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2u, g_spriteVertexStream, 0x1Cu);",
+    ):
+        if required not in body:
+            raise AssertionError("custom matrix atomic quad missing: " + required)
+    assert "g_spriteVertexStream[" not in body
+    assert body.index("FAILED(descHr)") < body.index("std::array<float, 28> quad{};")
+    assert body.index("const std::size_t base = i * 7;") < body.index(
+        "std::copy(quad.begin(), quad.end(), g_spriteVertexStream);")
+    assert body.index("std::copy(quad.begin(), quad.end(), g_spriteVertexStream);") < body.index(
+        "device->DrawPrimitiveUP(")
+    assert body.count("quad[") >= 28
+
+require_atomic_custom_matrix(text)
+for good, bad in (
+    ("std::copy(quad.begin(), quad.end(), g_spriteVertexStream);",
+     "std::copy(quad.begin(), quad.begin(), g_spriteVertexStream);"),
+    ("!std::isfinite(quad[base + 1])",
+     "!std::isfinite(quad[base + 1]) && false"),
+    ("!std::isfinite(quad[base + 6])",
+     "!std::isfinite(quad[base + 6]) && false"),
+    ("std::array<float, 28> quad{};",
+     "std::array<float, 27> quad{};"),
+):
+    assert good in text
+    try:
+        require_atomic_custom_matrix(text.replace(good, bad, 1))
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("unsafe custom matrix mutation escaped: " + bad)
+print("DX9Ex custom matrix complete quad publishing PASS (4 negative controls)")

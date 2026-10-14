@@ -296,6 +296,14 @@ class UIScaling : public Hook
 			a1->d3dtexture_ptr_C->GetLevelDesc(0, &v25);
 		if (FAILED(descHr) || v25.Width == 0 || v25.Height == 0)
 			return;
+		// Validate and stage the entire original game menu/car-selection quad.
+		// A failed eye/reset transform must not publish half of a quad into
+		// the shared game vertex stream or submit non-finite screen vertices.
+		auto* device = Game::D3DDevice();
+		if (!device)
+			return;
+		std::array<float, 28> quad{};
+
 		float v21 = 0.50999999 / (double)v25.Width;
 		float v22 = 0.50999999 / (double)v25.Height;
 
@@ -331,12 +339,12 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&topLeft, &vec, &pM);
 
-		g_spriteVertexStream[1] = scaleY * topLeft.y + verticalCenter + 0.5;
-		g_spriteVertexStream[2] = topLeft.z;
-		g_spriteVertexStream[3] = 1.0;
-		g_spriteVertexStream[4] = a1->color_4;
-		g_spriteVertexStream[5] = v21 + a1->top_9C;
-		g_spriteVertexStream[6] = -v22 + a1->left_A0;
+		quad[1] = scaleY * topLeft.y + verticalCenter + 0.5;
+		quad[2] = topLeft.z;
+		quad[3] = 1.0;
+		quad[4] = a1->color_4;
+		quad[5] = v21 + a1->top_9C;
+		quad[6] = -v22 + a1->left_A0;
 
 		// BottomLeft
 		vec.x = a1->BottomLeft_60.x;
@@ -345,12 +353,12 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&bottomLeft, &vec, &pM);
 
-		g_spriteVertexStream[8] = scaleY * bottomLeft.y + verticalCenter + 0.5;
-		g_spriteVertexStream[9] = bottomLeft.z;
-		g_spriteVertexStream[0xA] = 1.0;
-		g_spriteVertexStream[0xB] = a1->color_4;
-		g_spriteVertexStream[0xC] = v21 + a1->top_94;
-		g_spriteVertexStream[0xD] = v22 + a1->right_98;
+		quad[8] = scaleY * bottomLeft.y + verticalCenter + 0.5;
+		quad[9] = bottomLeft.z;
+		quad[0xA] = 1.0;
+		quad[0xB] = a1->color_4;
+		quad[0xC] = v21 + a1->top_94;
+		quad[0xD] = v22 + a1->right_98;
 
 		// TopRight
 		vec.x = a1->TopRight_6C.x;
@@ -359,12 +367,12 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&topRight, &vec, &pM);
 
-		g_spriteVertexStream[0xF] = scaleY * topRight.y + verticalCenter + 0.5;
-		g_spriteVertexStream[0x10] = topRight.z;
-		g_spriteVertexStream[0x11] = 1.0;
-		g_spriteVertexStream[0x12] = a1->color_4;
-		g_spriteVertexStream[0x13] = -v21 + a1->bottom_84;
-		g_spriteVertexStream[0x14] = -v22 + a1->left_88;
+		quad[0xF] = scaleY * topRight.y + verticalCenter + 0.5;
+		quad[0x10] = topRight.z;
+		quad[0x11] = 1.0;
+		quad[0x12] = a1->color_4;
+		quad[0x13] = -v21 + a1->bottom_84;
+		quad[0x14] = -v22 + a1->left_88;
 
 		// BottomRight
 		vec.x = a1->BottomRight_78.x;
@@ -373,37 +381,51 @@ class UIScaling : public Hook
 		vec.w = 1.0;
 		Game::D3DXVec4Transform(&bottomRight, &vec, &pM);
 
-		g_spriteVertexStream[0x16] = scaleY * bottomRight.y + verticalCenter + 0.5;
-		g_spriteVertexStream[0x17] = bottomRight.z;
-		g_spriteVertexStream[0x18] = 1.0;
-		g_spriteVertexStream[0x19] = a1->color_4;
-		g_spriteVertexStream[0x1A] = -v21 + a1->bottom_8C;
-		g_spriteVertexStream[0x1B] = v22 + a1->right_90;
+		quad[0x16] = scaleY * bottomRight.y + verticalCenter + 0.5;
+		quad[0x17] = bottomRight.z;
+		quad[0x18] = 1.0;
+		quad[0x19] = a1->color_4;
+		quad[0x1A] = -v21 + a1->bottom_8C;
+		quad[0x1B] = v22 + a1->right_90;
 
 		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
 		{
 			float add = (Game::screen_resolution->x - (Game::original_resolution.x * scaleY)) / 2;
 
-			g_spriteVertexStream[0] = (scaleY * topLeft.x) + add;
-			g_spriteVertexStream[7] = (scaleY * bottomLeft.x) + add;
-			g_spriteVertexStream[0xE] = (scaleY * topRight.x) + add;
-			g_spriteVertexStream[0x15] = (scaleY * bottomRight.x) + add;
+			quad[0] = (scaleY * topLeft.x) + add;
+			quad[7] = (scaleY * bottomLeft.x) + add;
+			quad[0xE] = (scaleY * topRight.x) + add;
+			quad[0x15] = (scaleY * bottomRight.x) + add;
 		}
 		else // if (mode == Mode::Vanilla)
 		{
-			g_spriteVertexStream[0] = (screenScaleY * topLeft.x);
-			g_spriteVertexStream[7] = (screenScaleY * bottomLeft.x);
-			g_spriteVertexStream[0xE] = (screenScaleY * topRight.x);
-			g_spriteVertexStream[0x15] = (screenScaleY * bottomRight.x);
+			quad[0] = (screenScaleY * topLeft.x);
+			quad[7] = (screenScaleY * bottomLeft.x);
+			quad[0xE] = (screenScaleY * topRight.x);
+			quad[0x15] = (screenScaleY * bottomRight.x);
 		}
 
 		// Game seems to add these, half-pixel offset?
-		g_spriteVertexStream[0] += 0.5f;
-		g_spriteVertexStream[7] += 0.5f;
-		g_spriteVertexStream[0xE] += 0.5f;
-		g_spriteVertexStream[0x15] += 0.5f;
+		quad[0] += 0.5f;
+		quad[7] += 0.5f;
+		quad[0xE] += 0.5f;
+		quad[0x15] += 0.5f;
 
-		Game::D3DDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2u, g_spriteVertexStream, 0x1Cu);
+		// Validate every transformed vertex/UV before publishing anything.
+		// Keep packed diffuse color bits as-is: its float representation may
+		// legally look like NaN, but it is a D3DCOLOR, not a coordinate.
+		for (std::size_t i = 0; i < 4; ++i)
+		{
+			const std::size_t base = i * 7;
+			if (!std::isfinite(quad[base]) ||
+				!std::isfinite(quad[base + 1]) ||
+				!std::isfinite(quad[base + 2]) ||
+				!std::isfinite(quad[base + 5]) ||
+				!std::isfinite(quad[base + 6]))
+				return;
+		}
+		std::copy(quad.begin(), quad.end(), g_spriteVertexStream);
+		device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2u, g_spriteVertexStream, 0x1Cu);
 	}
 
 	// Adjust positions of sprites in 3d space (eg 1st/2nd/etc markers)
