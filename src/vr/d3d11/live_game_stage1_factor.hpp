@@ -23,6 +23,17 @@ constexpr std::uint32_t kStage1AddSmooth = 11u;
 constexpr std::uint32_t kStage1BlendDiffuseAlpha = 12u;
 constexpr std::uint32_t kStage1BlendFactorAlpha = 14u;
 constexpr std::uint32_t kStage1BlendCurrentAlpha = 16u;
+// Cross-channel RGB operators are COLOROP-only. ALPHAOP must never admit 18..21.
+constexpr std::uint32_t kStage1ModulateAlphaAddColor = 18u;
+constexpr std::uint32_t kStage1ModulateColorAddAlpha = 19u;
+constexpr std::uint32_t kStage1ModulateInvAlphaAddColor = 20u;
+constexpr std::uint32_t kStage1ModulateInvColorAddAlpha = 21u;
+constexpr bool stage1_cross_channel_color_operation(std::uint32_t op) noexcept {
+    return op == kStage1ModulateAlphaAddColor ||
+           op == kStage1ModulateColorAddAlpha ||
+           op == kStage1ModulateInvAlphaAddColor ||
+           op == kStage1ModulateInvColorAddAlpha;
+}
 constexpr bool stage1_alpha_blend_operation(std::uint32_t operation) noexcept {
     return operation == kStage1BlendDiffuseAlpha ||
            operation == kStage1BlendFactorAlpha ||
@@ -51,14 +62,16 @@ constexpr bool stage1_combiner_supported(std::uint32_t operation,
             operation == kStage1Modulate4X || operation == kStage1Add ||
             operation == kStage1AddSigned || operation == kStage1AddSigned2X ||
             operation == kStage1Subtract || operation == kStage1AddSmooth ||
-            stage1_alpha_blend_operation(operation)) &&
+            stage1_alpha_blend_operation(operation) ||
+            stage1_cross_channel_color_operation(operation)) &&
             stage1_operand_supported(arg1) && stage1_operand_supported(arg2);
 }
 constexpr bool stage1_alpha_supported(std::uint32_t operation,
                                        std::uint32_t arg1,
                                        std::uint32_t arg2) noexcept {
     return operation == kStage1Disable ||
-        stage1_combiner_supported(operation, arg1, arg2);
+        (!stage1_cross_channel_color_operation(operation) &&
+         stage1_combiner_supported(operation, arg1, arg2));
 }
 // Evaluate only active operands: a disabled alpha stage or an unused
 // SELECTARG operand must not require a vertex DIFFUSE channel.
@@ -83,6 +96,14 @@ static_assert(stage1_alpha_blend_operation(kStage1BlendDiffuseAlpha) &&
               stage1_alpha_blend_operation(kStage1BlendFactorAlpha) &&
               stage1_alpha_blend_operation(kStage1BlendCurrentAlpha));
 static_assert(!stage1_alpha_blend_operation(kStage1Add));
+static_assert(stage1_combiner_supported(kStage1ModulateAlphaAddColor,
+                                        kStage1Current, kStage1Factor));
+static_assert(stage1_combiner_supported(kStage1ModulateInvColorAddAlpha,
+                                        kStage1Diffuse, kStage1Current));
+static_assert(!stage1_alpha_supported(kStage1ModulateAlphaAddColor,
+                                      kStage1Current, kStage1Factor));
+static_assert(!stage1_alpha_supported(kStage1ModulateInvColorAddAlpha,
+                                      kStage1Current, kStage1Factor));
 static_assert(stage1_combiner_supported(kStage1BlendDiffuseAlpha,
                                         kStage1Current, kStage1Factor));
 static_assert(stage1_alpha_supported(kStage1BlendCurrentAlpha,

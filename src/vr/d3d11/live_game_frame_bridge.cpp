@@ -95,6 +95,10 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1BlendDiffuseAlpha == D3DTOP_BLENDDIFFUSEALPHA &&
               kStage1BlendFactorAlpha == D3DTOP_BLENDFACTORALPHA &&
               kStage1BlendCurrentAlpha == D3DTOP_BLENDCURRENTALPHA &&
+              kStage1ModulateAlphaAddColor == D3DTOP_MODULATEALPHA_ADDCOLOR &&
+              kStage1ModulateColorAddAlpha == D3DTOP_MODULATECOLOR_ADDALPHA &&
+              kStage1ModulateInvAlphaAddColor == D3DTOP_MODULATEINVALPHA_ADDCOLOR &&
+              kStage1ModulateInvColorAddAlpha == D3DTOP_MODULATEINVCOLOR_ADDALPHA &&
               kStage1Current == D3DTA_CURRENT &&
               kStage1Factor == D3DTA_TFACTOR &&
               kStage1Complement == D3DTA_COMPLEMENT &&
@@ -1193,6 +1197,12 @@ float4 Stage1Combine(float4 a, float4 b, int op, float4 stage0, float4 diffuse) 
     if (op == 8) return saturate(a + b - 0.5f);     // ADDSIGNED
     if (op == 9) return saturate(2.0f * (a + b - 0.5f)); // ADDSIGNED2X
     if (op == 10) return saturate(a - b);
+    // D3D9 COLOROP-only 18..21: ARG1 alpha and RGB are distinct inputs.
+    // The CPU gate rejects these operators from independent ALPHAOP.
+    if (op == 18) return saturate(a + a.aaaa * b);
+    if (op == 19) return saturate(a * b + a.aaaa);
+    if (op == 20) return saturate(a + (1.0f - a.aaaa) * b);
+    if (op == 21) return saturate((1.0f - a) * b + a.aaaa);
     if (op == 12 || op == 14 || op == 16)
         return saturate(lerp(b, a, Stage1BlendWeight(op, stage0, diffuse)));
     return saturate(a + b * (1.0f - a)); // 11: ADDSMOOTH, CPU-gated
@@ -2906,7 +2916,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     }
     // Real fixed-function stage 1 can combine the stage-0 CURRENT pixel
     // with D3DRS_TEXTUREFACTOR or live vertex DIFFUSE, including operand
-    // modifiers, signed-add transitions and diffuse/factor/current-alpha fades
+    // modifiers, signed-add/cross-channel RGB transitions and diffuse/factor/current-alpha fades
     // for independent RGB/alpha operations. A missing required DIFFUSE remains DX9Ex-only. No stage-1 texture, TEMP,
     // unknown operand bits or stage-2 semantics are guessed; unsupported
     // stage-0 shaders never enter this path.
