@@ -149,7 +149,9 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "s.frameBatch.must_abort_unsupported(fullMode, multiBatch)" in code and
             "env_full_game_opt_in(), env_batch_opt_in()))" in code and
             'GetEnvironmentVariableW(L"OUTRUN_DX11_FULL_GAME_FRAME"' in code and
-            "s.frameBatch.accepts_full(sourceOrdinal)" in code and
+            "s.frameBatch.accepts_full_seeded(" in code and
+            "s.clearColor.matches(reinterpret_cast<std::uintptr_t>(game)," in code and
+            "return accepts_full(ordinal) && (submitted != 0u || sameSourceFullClear);" in batch_source and
             "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in code and
             "kMaxFullFrameDraws = 4096u" in batch_source and
             "if (s.frameBatch.first_draw()) {" in code and
