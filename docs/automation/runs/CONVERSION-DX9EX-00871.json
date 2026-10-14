@@ -62,10 +62,10 @@
     "fix_evidence": "Both shipped R26+HUD interval write and read now delegate to one portable C++ helper with tail fast-path, binary search and one coalesced erase.",
     "negative_test_evidence": "Portable smoke asserts invalid gaps, empty/inverted updates, out-of-order joins, all prior ranges invalid after clear, and deterministic 4000-update differential model."
   },
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_STATE",
-  "automation_validation": "PENDING_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No Quest3/VDXR testing; portable/CI results cannot prove user-observed frame pacing or FPS.",
   "source_parent_sha": "afea0c9fcd20b1e62d238b72d3f28681c4af3555",
@@ -78,11 +78,39 @@
     "docs/automation/runs/CONVERSION-DX9EX-00871.json"
   ],
   "acceptance_results": {
-    "ranges": "PENDING_CI",
-    "fallback": "PENDING_CI",
-    "ci": "PENDING_CI"
+    "ranges": "PASS",
+    "fallback": "PASS",
+    "ci": "PASS_EXACT_SHA"
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "EXACT_SHA_GITHUB_ACTIONS_PENDING"
+  "hold_reason": "HMD_QUEST3_VDXR_RUNTIME_NOT_EXECUTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "validation_bearing_result_sha": "215a7c2218746d0ca8d666032bde68dc96ad31ad",
+  "material_result_sha": "215a7c2218746d0ca8d666032bde68dc96ad31ad",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "215a7c2218746d0ca8d666032bde68dc96ad31ad",
+    "dx9ex_active": {
+      "run_id": 38656340258,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy/game/host/full-chain-compile/package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38656340138,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38656340188,
+      "conclusion": "SUCCESS",
+      "required_jobs": "msvc-analyze-active-game/source-cross-domain/msvc-analyze-openxr-host (3/3)"
+    },
+    "hud_inspector": {
+      "run_id": 38656340142,
+      "conclusion": "SUCCESS"
+    },
+    "runtime": "UNTESTED"
+  },
+  "result_commit_ci_skip": false,
+  "c6_bookkeeping_ci_skip": true
 }
