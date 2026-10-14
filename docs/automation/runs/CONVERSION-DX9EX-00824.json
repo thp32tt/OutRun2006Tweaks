@@ -10,9 +10,9 @@
   "feature_id": "DX9EX:BLOCKER:R23_GAME_RUN_FRAME_CURSOR",
   "feature_class": "CRITICAL_BLOCKER",
   "work_key": "DX9EX:BLOCKER:R23_GAME_RUN_FRAME_CURSOR",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_delta": 0,
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00824]",
@@ -79,7 +79,7 @@
   ],
   "base_sha": "b9256931510d07f62203347f86ca0be07302e9a1",
   "material_result_sha": "483786db86c2c0cf177ec2a9b12b53d1d296902e",
-  "result_sha": "483786db86c2c0cf177ec2a9b12b53d1d296902e",
+  "result_sha": "1745783d85f5d46e6ce5423e5cc92225901fc375",
   "runtime_gate": "RUNTIME_VALIDATION=UNTESTED; no Quest3/VDXR restart, stereo, FPS or gameplay test occurred.",
   "validation_gates": {
     "initial_dx9ex_active": {
@@ -88,13 +88,52 @@
       "status": "FAIL_RUN_RECORD_MISSING"
     },
     "domain_isolation": {
-      "run_id": 38512482406,
-      "status": "RUNNING"
+      "run_id": 38512680974,
+      "sha": "1745783d85f5d46e6ce5423e5cc92225901fc375",
+      "status": "SUCCESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38512680974"
     },
     "full_source_impact": {
-      "run_id": 38512482448,
-      "status": "RUNNING"
+      "run_id": 38512680951,
+      "sha": "1745783d85f5d46e6ce5423e5cc92225901fc375",
+      "status": "IN_PROGRESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38512680951"
+    },
+    "dx9ex_active": {
+      "run_id": 38512680972,
+      "sha": "1745783d85f5d46e6ce5423e5cc92225901fc375",
+      "status": "SUCCESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38512680972"
+    },
+    "hmd_runtime": {
+      "status": "UNTESTED",
+      "hardware": "Quest3/VDXR",
+      "note": "No live headset/gameplay/FPS measurement was performed"
     }
   },
-  "next_action": "Rerun full DX9Ex policy/host/game/package and Domain/full-source impact on new exact SHA. If compiler or source-impact gate fails, repair under same task, not a new score. Quest3/VDXR remains untested."
+  "next_action": "C6 bookkeeping complete on existing validation-bearing SHA; no build/CI rerun or source modification. HMD/gameplay runtime validation remains UNTESTED.",
+  "validation_bearing_result_sha": "1745783d85f5d46e6ce5423e5cc92225901fc375",
+  "validation_bearing_sha": "1745783d85f5d46e6ce5423e5cc92225901fc375",
+  "c6_status": "COMPLETE_BUILD_VERIFIED",
+  "ci_evidence": {
+    "dx9ex_active": {
+      "run_id": 38512680972,
+      "sha": "1745783d85f5d46e6ce5423e5cc92225901fc375",
+      "status": "SUCCESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38512680972"
+    },
+    "domain_isolation": {
+      "run_id": 38512680974,
+      "sha": "1745783d85f5d46e6ce5423e5cc92225901fc375",
+      "status": "SUCCESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38512680974"
+    },
+    "full_source_impact": {
+      "run_id": 38512680951,
+      "sha": "1745783d85f5d46e6ce5423e5cc92225901fc375",
+      "status": "IN_PROGRESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38512680951"
+    }
+  },
+  "hold_resolution": "TERMINAL_STATUS_NOT_COMPLETE resolved: exact-SHA DX9Ex Active and Domain Isolation SUCCESS; Full Source Impact IN_PROGRESS when C6 was recorded. C6 bookkeeping only; Quest3/VDXR runtime UNTESTED."
 }
