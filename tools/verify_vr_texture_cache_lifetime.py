@@ -53,7 +53,21 @@ def verify(s):
         ("publish lock acquired only after read", background.rfind("std::lock_guard cacheLock(mtx1);") > background.find("if (!file.read(")),
         ("never open file with cache lock held", "}\n\n\t\tstd::ifstream file(" in background),
         ("cache budget protected", "std::lock_guard _(mtx1);" in budget),
-        ("file loads serialized", "std::lock_guard fileRequestLock(mtx2);" in getter),
+        ("only cache misses serialize file loads",
+         "std::unique_lock<std::mutex> fileRequestLock(mtx2, std::defer_lock);" in getter
+         and "fileRequestLock.lock();" in getter),
+        ("cached hit does not acquire the file-request lock",
+         getter.find("auto owner = acquireCachedOwner();") <
+         getter.find("fileRequestLock.lock();")),
+        ("a raced preload is double-checked before disk access",
+         getter.count("owner = acquireCachedOwner();") == 3 and
+         getter.find("fileRequestLock.lock();") <
+         getter.find("owner = acquireCachedOwner();",
+                     getter.find("auto owner = acquireCachedOwner();") + 1) <
+         getter.find("cacheFile(filename);")),
+        ("transient oversized DDS remains miss-lock protected",
+         getter.find("fileRequestLock.lock();") <
+         getter.find("std::ifstream file(filename, std::ios::binary | std::ios::ate);")),
         ("all cached read+LRU under same mutex", "std::lock_guard cacheLock(mtx1);" in getter),
         ("cache ref returned", "return found->second.data;" in getter),
         ("cache miss read outside cache lock", "cacheFile(filename);" in getter),
@@ -82,7 +96,9 @@ def mutations(s):
         "std::lock_guard populationLock(cachePopulationMutex);",
         "evictToFit(size);\n\t\t}\n\t\tfile.seekg(0, std::ios::beg);",
         "std::ifstream file(filename, std::ios::binary | std::ios::ate);",
-        "std::lock_guard fileRequestLock(mtx2);",
+        "std::unique_lock<std::mutex> fileRequestLock(mtx2, std::defer_lock);",
+        "fileRequestLock.lock();",
+        "owner = acquireCachedOwner();",
         "std::lock_guard cacheLock(mtx1);",
         "*transientOwner = std::move(owner);",
         "return (*transientOwner)->data();",
@@ -106,7 +122,15 @@ def mutations(s):
     try:verify(corrupt)
     except ValueError:pass
     else:raise ValueError("failed to catch orphaned source fragment")
-    return len(tokens)+1
+    # A removed post-lock recheck would cause redundant disk reads even
+    # when another render/preload caller has already filled the LRU.
+    race_token = ("fileRequestLock.lock();\n\t\t\towner = acquireCachedOwner();")
+    assert race_token in s
+    corrupt = s.replace(race_token, "fileRequestLock.lock();\n\t\t\t/* no raced-preload check */", 1)
+    try:verify(corrupt)
+    except ValueError:pass
+    else:raise ValueError("missed raced-preload recheck mutation")
+    return len(tokens)+2
 
 if __name__=="__main__":
     code=(ROOT/"src/hooks_textures.cpp").read_text(encoding="utf-8")
@@ -115,4 +139,4 @@ if __name__=="__main__":
         p=mutations(code) if "--self-test" in sys.argv[1:] else 0
     except ValueError as exc:
         sys.exit("DDS CACHE LIFETIME FAIL: "+str(exc))
-    print(f"DDS CACHE cross-thread PASS: {n} ownership contracts; negatives={p}/17; runtime UNTESTED")
+    print(f"DDS CACHE cross-thread PASS: {n} ownership contracts; negatives={p}/20; runtime UNTESTED")

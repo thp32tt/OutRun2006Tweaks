@@ -515,7 +515,10 @@ public:
 		if (!transientOwner)
 			return nullptr; // Never publish an unowned cache pointer.
 		transientOwner->reset();
-		std::lock_guard fileRequestLock(mtx2);
+		// A cached DDS is already protected by mtx1 and returned with a
+		// shared owner. Do not serialize every render-thread hit on mtx2;
+		// reserve the second lock for real cache misses and transient loads.
+		std::unique_lock<std::mutex> fileRequestLock(mtx2, std::defer_lock);
 
 		// All cache/LRU accesses, including background cacheFile(), use mtx1.
 		// Do not hold it while calling cacheFile(): that routine locks mtx1.
@@ -534,8 +537,15 @@ public:
 		auto owner = acquireCachedOwner();
 		if (!owner)
 		{
-			cacheFile(filename);
+			// Only a miss enters the serialized disk-load path. A concurrent
+			// caller may have populated the LRU while we acquired mtx2.
+			fileRequestLock.lock();
 			owner = acquireCachedOwner();
+			if (!owner)
+			{
+				cacheFile(filename);
+				owner = acquireCachedOwner();
+			}
 		}
 		if (owner)
 		{

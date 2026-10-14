@@ -1,0 +1,82 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00821",
+  "production_id": "CONVERSION-DX9EX-00821",
+  "event_id": "CONVERSION-DX9EX-00821-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:DDS_CACHE_HIT_MISS_LOCK",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:DDS_CACHE_HIT_MISS_LOCK",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00821]",
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:DDS_CACHE_HIT_MISS_LOCK",
+    "goal": "Avoid redundant exclusive file-request locking for already resident replacement DDS textures while preserving cache-miss preload race safety, bounded LRU source lifetime and Win32 game's native fallback.",
+    "scope_boundary": "Only FileDataCache::getFileData lock scheduling and targeted source regression verifier; no DDS bytes, formats, scene/HUD scale, FFB, DX11/DXVK or localization changes.",
+    "special_work_evidence": "getFileData acquires mtx2 before the first LRU lookup despite mtx1 independently protecting all LRU operations and shared_ptr returning a call-scoped owner. The unnecessary serializing acquisition occurs even on hits; no unmeasured FPS gain is claimed.",
+    "trace_stages": [
+      "Original game requests UI/vehicle or stage DDS through D3DX texture-replacement loader.",
+      "FileDataCache returns shared-owned source bytes; cache hits use mtx1 alone, misses serialize disk read with mtx2 and recheck after racing preload.",
+      "Both fast and native D3D9 texture upload paths retain the same buffer across the D3DX call; resulting graphics are unchanged in XR host composition."
+    ],
+    "subcomponents": [
+      "Cache-hit read path bypasses mtx2 but retains LRU mutex and shared_ptr ownership.",
+      "Miss path double-checks after taking mtx2, loading exactly once or retaining oversized transient DDS through upload.",
+      "Source and destructive mutation verifier plus exact SHA Win32 host/game/package/domain/source impact validation."
+    ],
+    "acceptance_items": [
+      {
+        "id": "DDS_HIT_FASTPATH",
+        "category": "end_to_end_behavior",
+        "behavior_area": "resident_texture_reads",
+        "expected_behavior": "A present DDS gets the same shared byte owner and updates LRU with no mtx2 acquisition."
+      },
+      {
+        "id": "DDS_MISS_RACE_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "concurrent_miss_preload_and_large_dds",
+        "expected_behavior": "A real miss acquires mtx2, rechecks after waiting, avoids duplicate cacheFile I/O and retains the transient fallback across D3DX."
+      },
+      {
+        "id": "DDS_EXACT_SHA_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "win32_host_game_package_and_domain",
+        "expected_behavior": "Source mutation verifier and exact-SHA DX9Ex Active, Domain Isolation and Full Source Impact must all succeed without claiming HMD FPS."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "DDS_HIT_FASTPATH": "STATIC_CHANGE_PENDING_CI",
+    "DDS_MISS_RACE_FALLBACK": "STATIC_CHANGE_PENDING_CI",
+    "DDS_EXACT_SHA_GATES": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "Unconditional mtx2 lock was acquired before every cache lookup, serializing shared-owner LRU hits which need only the existing mtx1 protection.",
+    "alternatives_rejected": [
+      "Do not remove mtx1 around cache/LRU publication or return bare evictable data.",
+      "Do not eliminate mtx2 on misses: native oversized transient and competing disk loads still require serialization.",
+      "Do not change texture formats, mip uploads, sampler state or protected visual content."
+    ],
+    "fix_evidence": "Use deferred unique_lock for mtx2, acquire only after first LRU miss, recheck after acquiring and before loading; preserve original call-scoped owner and disk-fallback lifetime.",
+    "negative_test_evidence": "Existing cache lifetime verifier extended for hit-before-lock, post-lock double check, oversized transient protection and destructive mutations."
+  },
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_texture_cache_lifetime.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00821.json"
+  ],
+  "base_sha": "f14d83045a2703a6679a40f17684b35f8e255f71",
+  "validation_bearing_result_sha": null,
+  "material_result_sha": null,
+  "ci_evidence": {
+    "status": "PENDING"
+  },
+  "runtime_gate": "Quest 3/VDXR exact package texture correctness and per-frame timing untested."
+}
