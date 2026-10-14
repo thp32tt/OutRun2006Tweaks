@@ -34,7 +34,7 @@ mutations=[
     (source.replace("if (OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(semanticScope))", "if (true)",1),semantic),
     (source.replace("!OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(scope)", "false",1),semantic),
     (source.replace("if (OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(semanticScope))\n                R30CaptureSkyGlowSceneBeforeHud(device);", "R30CaptureSkyGlowSceneBeforeHud(device);",1),semantic),
-    (source,semantic.replace("scope == RenderScope::ScreenOverlay2D;", "scope == RenderScope::WorldBillboard;",1)),
+    (source,semantic.replace("return scope == RenderScope::ScreenHud ||\n            scope == RenderScope::ScreenOverlay2D;", "return scope == RenderScope::ScreenHud ||\n            scope == RenderScope::WorldBillboard;",1)),
 ]
 for bad_r,bad_s in mutations:
     try:
