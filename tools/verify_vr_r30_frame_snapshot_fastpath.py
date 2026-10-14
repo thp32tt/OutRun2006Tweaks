@@ -23,7 +23,6 @@ def verify(text):
     for name in (
         "R30EnsureSkyGlowResources",
         "PresentDestR30",
-        "R30PrepareXyzrhwState",
         "R30CaptureSkyGlowSceneBeforeHud",
         "R30ApplyStereoSkyGlow",
         "R30ExecuteXyzrhwStereo",
@@ -32,6 +31,13 @@ def verify(text):
         assert part.count("R29OwnerCaptureFrameSnapshot()") == 1, name
         assert "const auto frame = R29OwnerCaptureFrameSnapshot();" in part, name
         assert "R29OwnerCaptureFrameSnapshot()." not in part, name
+    # A hot XYZRHW draw uses the existing scalar fence, not a full
+    # copied frame snapshot with borrowed render-target pointers.
+    prepare = block(text, "R30PrepareXyzrhwState")
+    assert prepare.count("R29OwnerFrameStereoPoseSequence()") == 1
+    assert "R29OwnerCaptureFrameSnapshot()" not in prepare
+    assert "(framePoseSequence != 0 &&" in prepare
+    assert "framePoseSequence != state.stereo.poseSequence" in prepare
     # R30HudAspectCompensation now BORROWS source width/height from the
     # caller's single Present snapshot. Capturing again here could interleave
     # a game Reset and store the wrong source ratio under the old HUD key.
@@ -99,6 +105,10 @@ if __name__ == "__main__":
                 src[scope_start + len(scope):])
 
     negatives = (
+        ("R30PrepareXyzrhwState",
+         "R29OwnerFrameStereoPoseSequence()", "0u"),
+        ("R30PrepareXyzrhwState",
+         "framePoseSequence != state.stereo.poseSequence", "false"),
         ("R30HudAspectCompensation",
          "static_cast<float>(sourceWidth) /",
          "static_cast<float>(sourceHeight) /"),

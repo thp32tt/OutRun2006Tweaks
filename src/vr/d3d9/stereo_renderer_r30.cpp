@@ -2600,12 +2600,14 @@ namespace OutRunVRStereo
                 return false;
             state.depthTestEnabled = zEnable != D3DZB_FALSE;
 
-            // One phase-stable R29 view avoids redundant cross-TU POD assembly.
-            const auto frame = R29OwnerCaptureFrameSnapshot();
+            // This XYZRHW draw needs only the R29-owned pose fence.
+            // Zero/unlatched and mismatched-pose decisions stay unchanged.
+            const std::uint32_t framePoseSequence =
+                R29OwnerFrameStereoPoseSequence();
             if (!OutRunVRRenderer::GetLatchedStereoFrame(state.stereo) ||
                 state.stereo.poseSequence == 0 ||
-                (frame.poseSequence != 0 &&
-                 frame.poseSequence != state.stereo.poseSequence) ||
+                (framePoseSequence != 0 &&
+                 framePoseSequence != state.stereo.poseSequence) ||
                 !R30BuildEyeAffine(state.stereo,
                     state.eyeScale, state.eyeOffset))
                 return false;

@@ -33,6 +33,7 @@ def contract(s):
     sync = body(s, "bool R29SyncEffectState(")
     setter = body(s, "HRESULT __stdcall SetRenderStateDestR29(")
     telemetry = body(s, "inline bool TryGetEffectTelemetrySnapshot(")
+    warm_owner = body(s, "bool R29OwnerTryGetEffectTelemetrySnapshot(")
     depth_owner = body(s, "bool R29OwnerLeftDrawMayWriteDepth(")
     stencil_owner = body(s, "bool R29OwnerLeftDrawMayWriteStencil(")
     effect_state = body(s, "struct R29EffectState")
@@ -100,6 +101,15 @@ def contract(s):
         "R29Effect.applyGeneration !=" in setter,
         "R29Effect.recordingGeneration !=" in setter,
         "if (!R29EffectCacheCurrent())" in telemetry,
+        # The R30/R33 classification-only consumer fills the state once
+        # before depth-off effects, but only under a trustworthy generation.
+        "if (!TryGetEffectTelemetrySnapshot(lower))" in warm_owner,
+        "!OutRunVR::State::StateBlockTracker::Reliable()" in warm_owner,
+        "OutRunVR::State::StateBlockTracker::Recording()" in warm_owner,
+        "InternalStereoPass" in warm_owner,
+        "IDirect3DDevice9* const device = R29OwnerGameDevice();" in warm_owner,
+        "!R29SyncEffectState(device)" in warm_owner,
+        "!TryGetEffectTelemetrySnapshot(lower)" in warm_owner,
         sync.find("recordingGenerationBefore") < sync.find("device->GetRenderState(")
             < sync.find("StateBlockTracker::RecordingGeneration() !="),
         setter.find("StateBlockTracker::Recording()") <

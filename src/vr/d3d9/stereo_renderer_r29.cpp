@@ -1659,8 +1659,23 @@ namespace OutRunVRStereo
         R29EffectTelemetrySnapshot lower{};
         if (!TryGetEffectTelemetrySnapshot(lower))
         {
-            out = {};
-            return false;
+            // R33 may classify depth-off screen/particle draws before reaching
+            // R29's world sync. Warm this cache only with complete R22/R31
+            // coverage; uncertain recording/replay keeps R30's live fallback.
+            if (!OutRunVR::State::StateBlockTracker::Reliable() ||
+                OutRunVR::State::StateBlockTracker::Recording() ||
+                InternalStereoPass)
+            {
+                out = {};
+                return false;
+            }
+            IDirect3DDevice9* const device = R29OwnerGameDevice();
+            if (!device || !R29SyncEffectState(device) ||
+                !TryGetEffectTelemetrySnapshot(lower))
+            {
+                out = {};
+                return false;
+            }
         }
         out.alphaBlend = lower.alphaBlend;
         out.alphaTest = lower.alphaTest;
