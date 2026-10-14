@@ -2163,7 +2163,7 @@ def main() -> None:
     # Runtime visuals, gamepad and Quest3 have not been exercised here.
     def mixed_filter_draw_connected(code: str) -> bool:
         admission = code[code.find("bool supported_game_state("):code.find("bool translate_vertices(")]
-        mirror = code[code.find("bool mirror_texture("):code.find("bool submit(")]
+        mirror = code[code.find("bool create_game_sampler("):code.find("bool submit(")]
         submit = code[code.find("bool submit("):code.find("void observe(")]
         return all(token in admission for token in (
             "GetSamplerState(0, D3DSAMP_MAGFILTER, &mag)",
@@ -2173,7 +2173,7 @@ def main() -> None:
             "(mip != D3DTEXF_NONE && mip != D3DTEXF_POINT)",
             "capture.minFilter = static_cast<D3DTEXTUREFILTERTYPE>(min);",
             "capture.magFilter = static_cast<D3DTEXTUREFILTERTYPE>(mag);",
-        )) and all(token in mirror for token in (
+        )) and "return create_game_sampler(dev, capture, levels, sampler);" in mirror and all(token in mirror for token in (
             "state.Filter = capture.minFilter == D3DTEXF_LINEAR ?",
             "(capture.magFilter == D3DTEXF_LINEAR ?",
             "D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT :",
