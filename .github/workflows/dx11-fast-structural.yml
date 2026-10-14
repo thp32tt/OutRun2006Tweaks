@@ -127,6 +127,8 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_pre_draw_depth_clear_00734.cpp -o /tmp/dx11_pre_draw_depth_00734 && /tmp/dx11_pre_draw_depth_00734
           python tools/test_dx11_full_frame_color_seed_00735.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_frame_color_seed_00735.cpp -o /tmp/dx11_color_seed_00735 && /tmp/dx11_color_seed_00735
+          python tools/test_dx11_x8_dest_alpha_00736.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_x8_dest_alpha_00736.cpp -o /tmp/dx11_x8_dest_alpha_00736 && /tmp/dx11_x8_dest_alpha_00736
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_same_present_fence_probe_00731.cpp -o /tmp/dx11_fence_00731 && /tmp/dx11_fence_00731
           python tools/test_dx11_game_frame_publication_00727.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_frame_publication_probe_00727.cpp -o /tmp/dx11_publication_00727 && /tmp/dx11_publication_00727

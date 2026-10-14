@@ -4919,7 +4919,8 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             (bbDesc.Format == D3DFMT_A8R8G8B8 || bbDesc.Format == D3DFMT_X8R8G8B8);
         s.clearColor.record(sourceDevice,
             reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()),
-            static_cast<std::uint32_t>(color), wholeBackbuffer);
+            static_cast<std::uint32_t>(color), wholeBackbuffer,
+            bbDesc.Format == D3DFMT_X8R8G8B8);
         if (wholeBackbuffer && env_full_game_opt_in()) {
             // Original successful whole Clear makes earlier menu/offscreen
             // Draws invisible. Restart source continuity at the first real
