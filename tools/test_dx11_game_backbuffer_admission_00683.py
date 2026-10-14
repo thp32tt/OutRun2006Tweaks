@@ -15,12 +15,16 @@ def connected(code):
         "game->GetRenderTarget(0,", "game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,",
         "target.As(&targetIdentity)", "backbuffer.As(&backbufferIdentity)",
         "targetDesc.Format == bbDesc.Format", "bbDesc.MultiSampleType == D3DMULTISAMPLE_NONE",
-        "admission.accepts(kWidth, kHeight, 8u)")) and all(p in draw for p in (
+        "admission.accepts(kWidth, kHeight, 8u)",
+        "admission.accepts(bbDesc.Width, bbDesc.Height, 0u)",
+        "return env_full_game_opt_in()")) and all(p in draw for p in (
         "if (!game_native_backbuffer_ready(game, viewport)) return false;",
         "return true;")) and all(p in src for p in (
         "if (!supported_game_state(game, type, vp, layout, transforms, capture, output))",
         "ctx->DrawIndexed(indexCount, 0, 0);", "ctx->Draw(static_cast<UINT>(vertices.size()), 0);")) and (
-        "s.frameBatch.publishable(s.pending) && outputWritable" in present and
+        "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in present and
+        ": s.frameBatch.publishable(s.pending);" in present and
+        "if (complete && outputWritable &&" in present and
         "game->UpdateSurface(" in present and "s.sourceGameDevice == presentDevice" in present)
 assert connected(src), "Draw to native GPU to actual Present bridge disconnected"
 for token in (
@@ -28,6 +32,7 @@ for token in (
     "target.As(&targetIdentity)", "backbuffer.As(&backbufferIdentity)",
     "targetDesc.Format == bbDesc.Format", "bbDesc.MultiSampleType == D3DMULTISAMPLE_NONE",
     "admission.accepts(kWidth, kHeight, 8u)",
+    "admission.accepts(bbDesc.Width, bbDesc.Height, 0u)",
     "if (!game_native_backbuffer_ready(game, viewport)) return false;"):
     mutated = src.replace(token,"/* regression */",1)
     assert mutated != src and not connected(mutated), token
