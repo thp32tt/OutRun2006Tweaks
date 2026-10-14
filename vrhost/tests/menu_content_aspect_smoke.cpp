@@ -463,6 +463,54 @@ int main()
             0, 0, 1280, 960, 0, 1080, 0, 0, 1, 1).valid)
         return 30;
 
+    // Unletterboxed vanilla 16:9 and 21:9 menus also retain full-client
+    // placement when capture supplies only a visible part of the window.
+    const auto vanillaFull = PlanVisibleCenteredContent(
+        0, 0, 1920, 1080, 1920, 1080, 0, 0, 1, 1, 16.f / 9.f);
+    const auto vanillaLeft = PlanVisibleCenteredContent(
+        -320, 0, 1600, 1080, 1920, 1080,
+        0, 0, 1600.f / 1920.f, 1, 16.f / 9.f);
+    const auto vanillaBottom = PlanVisibleCenteredContent(
+        0, 270, 1920, 1350, 1920, 1080,
+        0, 270.f / 1080.f, 1, 810.f / 1080.f, 16.f / 9.f);
+    const auto vanillaCorner219 = PlanVisibleCenteredContent(
+        -440, -180, 3000, 1260, 3440, 1440,
+        0, 0, 3000.f / 3440.f, 1260.f / 1440.f,
+        3440.f / 1440.f);
+    if (vanillaFull.crop || !vanillaLeft.crop ||
+        !vanillaBottom.crop || !vanillaCorner219.crop ||
+        !near(vanillaLeft.visibleOffsetX, 320.f / 1920.f) ||
+        !near(vanillaLeft.visibleWidthScale, 1600.f / 1920.f) ||
+        !near(vanillaBottom.visibleOffsetY, -270.f / 1080.f) ||
+        !near(vanillaBottom.visibleHeightScale, 810.f / 1080.f) ||
+        !near(vanillaCorner219.visibleOffsetX, 440.f / 3440.f) ||
+        !near(vanillaCorner219.visibleOffsetY, 180.f / 1440.f) ||
+        !near(vanillaCorner219.visibleWidthScale, 3000.f / 3440.f) ||
+        !near(vanillaCorner219.visibleHeightScale, 1260.f / 1440.f))
+        return 31;
+    // The composed binocular quad must have the physical aspect of the
+    // surviving pixels without stretching or optical recentring.
+    const auto nativeOptical = PlanOpticallyCenteredClip(
+        shared, 16.f / 9.f);
+    if (!nativeOptical.valid ||
+        !near(nativeOptical.halfWidth * vanillaLeft.visibleWidthScale /
+            (nativeOptical.halfHeight * vanillaLeft.visibleHeightScale) *
+            (shared.right - shared.left) / (shared.up - shared.down),
+            1600.f / 1080.f) ||
+        !near(nativeOptical.halfWidth * vanillaBottom.visibleWidthScale /
+            (nativeOptical.halfHeight * vanillaBottom.visibleHeightScale) *
+            (shared.right - shared.left) / (shared.up - shared.down),
+            1920.f / 810.f))
+        return 32;
+    // After reset/output move, stale UV or invalid capture is not a crop.
+    if (PlanVisibleCenteredContent(
+            -320, 0, 1600, 1080, 1920, 1080,
+            0.1f, 0, 1600.f / 1920.f, 1, 16.f / 9.f).crop ||
+        PlanVisibleCenteredContent(
+            0, 0, 1920, 1080, 0, 1080, 0, 0, 1, 1,
+            16.f / 9.f).crop)
+        return 33;
+
     const auto nan = PlanCenteredContent(
         std::numeric_limits<float>::quiet_NaN(), 4.0f / 3.0f);
     const auto inf = PlanCenteredContent(

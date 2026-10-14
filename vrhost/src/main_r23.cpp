@@ -1574,40 +1574,38 @@ namespace
             else if (std::strcmp(overrideValue, "0") == 0)
                 cropCentered43 = false;
         }
-        if (cropCentered43)
+        // The entire native-aspect menu, not just letterboxed 4:3,
+        // is the reference optical plane. A partially off-output vanilla
+        // window otherwise zooms/recentres title and car-selection pixels.
+        // Both paths use one validated original client/UV intersection.
+        RECT fullClient{};
+        c.GetGameClientOutputRect(fullClient);
+        const float authoredAspect =
+            cropCentered43 ? 4.0f / 3.0f : clientAspect;
+        const auto plan = OutRunVrMenuAspect::PlanVisibleCenteredContent(
+            static_cast<float>(fullClient.left),
+            static_cast<float>(fullClient.top),
+            static_cast<float>(fullClient.right),
+            static_cast<float>(fullClient.bottom),
+            static_cast<float>(c.sourceWidth_),
+            static_cast<float>(c.sourceHeight_),
+            whole.x, whole.y, whole.w, whole.h, authoredAspect);
+        if (plan.crop)
         {
-            RECT fullClient{};
-            // The API still supplies original, unclipped client bounds when
-            // a window partly leaves the output (its boolean then is false).
-            // Use those bounds only through the validated visible-UV
-            // intersection. A false/zero/stale rect keeps the baseline UV.
-            c.GetGameClientOutputRect(fullClient);
-            const auto plan = OutRunVrMenuAspect::PlanVisibleCenteredContent(
-                static_cast<float>(fullClient.left),
-                static_cast<float>(fullClient.top),
-                static_cast<float>(fullClient.right),
-                static_cast<float>(fullClient.bottom),
-                static_cast<float>(c.sourceWidth_),
-                static_cast<float>(c.sourceHeight_),
-                whole.x, whole.y, whole.w, whole.h, 4.0f / 3.0f);
-            if (plan.crop)
-            {
-                const float previousWidth = whole.w;
-                const float previousHeight = whole.h;
-                whole.x += previousWidth * plan.offsetX;
-                whole.w = previousWidth * plan.width;
-                whole.y += previousHeight * plan.offsetY;
-                whole.h = previousHeight * plan.height;
-                // Preserve the ORIGINAL authored 4:3 optical size, then
-                // place only the visible capture fragment at its original
-                // location. Using plan.aspect here zoomed and re-centred a
-                // clipped menu after moving the window across an output edge.
-                sourceAspect = 4.0f / 3.0f;
-                visibleOffsetX = plan.visibleOffsetX;
-                visibleOffsetY = plan.visibleOffsetY;
-                visibleWidthScale = plan.visibleWidthScale;
-                visibleHeightScale = plan.visibleHeightScale;
-            }
+            const float previousWidth = whole.w;
+            const float previousHeight = whole.h;
+            whole.x += previousWidth * plan.offsetX;
+            whole.w = previousWidth * plan.width;
+            whole.y += previousHeight * plan.offsetY;
+            whole.h = previousHeight * plan.height;
+            // Render the captured fragment in the full authored 4:3
+            // or vanilla client plane. Do not use fragment aspect to
+            // project a new, larger menu. Both eyes share this placement.
+            sourceAspect = authoredAspect;
+            visibleOffsetX = plan.visibleOffsetX;
+            visibleOffsetY = plan.visibleOffsetY;
+            visibleWidthScale = plan.visibleWidthScale;
+            visibleHeightScale = plan.visibleHeightScale;
         }
         // The forward gaze ray is not at NDC (0,0) for asymmetric
         // projections. Center LOCAL-fixed menu content on the optical ray,
