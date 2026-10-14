@@ -10,6 +10,12 @@ def integrated(source, header):
     b=source.find("void before_game_reset(",a)
     if a<0 or b<=a: return False
     code=source[a:b]
+    single_start=header.find("static constexpr bool covers_present_crop(")
+    tile_start=header.find("static constexpr bool covers_partition_crop(", single_start)
+    full_partition_start=header.find("static constexpr bool covers_partition(", tile_start)
+    if not 0<=single_start<tile_start<full_partition_start: return False
+    single_hdr=header[single_start:tile_start]
+    tiled_hdr=header[tile_start:full_partition_start]
     crop_admission=code.find("const bool cropDirtyCoverage =")
     gate=code.find("GameNativeDirtyRegionCoverage::covers_present_crop(")
     bound=code.find("const bool outputWritable =",gate)
@@ -35,17 +41,17 @@ def integrated(source, header):
         "croppedNativeUpload ? &uploadSourceCrop : nullptr" in code[submit:submit+220],
         "destination.y = uploadSourceCrop.top;" in code[crop:submit],
         "s.insetSurface.Get()" in code[submit:submit+220],
-        "cropRight > static_cast<std::int64_t>(width)" in header,
-        "cropBottom > static_cast<std::int64_t>(height)" in header,
-        "rectangleCount != 1u || bufferBytes < 16u" in header,
-        "boundLeft == cropLeft && boundTop == cropTop" in header,
-        "static constexpr bool covers_partition_crop(" in header,
-        "bufferBytes < rectangleCount * 16u" in header,
-        "boundLeft != cropLeft || boundTop != cropTop" in header,
-        "if (area > total - covered) return false;" in header,
-        "r.left < p.right && p.left < r.right" in header,
-        "rectRight == cropRight && rectBottom == cropBottom" in header,
-        "(cropLeft == 0 && cropTop == 0 &&" in header,
+        "cropRight > static_cast<std::int64_t>(width)" in single_hdr,
+        "cropBottom > static_cast<std::int64_t>(height)" in single_hdr,
+        "rectangleCount != 1u || bufferBytes < 16u" in single_hdr,
+        "boundLeft == cropLeft && boundTop == cropTop" in single_hdr,
+        "static constexpr bool covers_partition_crop(" in tiled_hdr,
+        "bufferBytes < rectangleCount * 16u" in tiled_hdr,
+        "boundLeft != cropLeft || boundTop != cropTop" in tiled_hdr,
+        "if (area > total - covered) return false;" in tiled_hdr,
+        "r.left < p.right && p.left < r.right" in tiled_hdr,
+        "rectRight == cropRight && rectBottom == cropBottom" in single_hdr,
+        "(cropLeft == 0 && cropTop == 0 &&" in single_hdr,
     ))
 assert integrated(SRC,HDR), "crop must bind region proof -> admission -> bounded UpdateSurface"
 for old,new in (
