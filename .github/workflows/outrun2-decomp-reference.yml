@@ -1,0 +1,38 @@
+name: OutRun2 Decomp Reference Contract
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'review/outrun2-decomp-*'
+    paths:
+      - 'src/hooks_uiscaling.cpp'
+      - 'src/vr/game/disasm_render_contract.hpp'
+      - 'src/vr/d3d11/live_game_stage1_factor.hpp'
+      - 'docs/references/outrun2_decomp_sources.json'
+      - 'docs/references/OUTRUN2_DECOMP_CROSS_REFERENCE_20261014.md'
+      - 'tools/test_outrun2_decomp_reference.py'
+      - 'tools/verify_outrun2_decomp_contract.cpp'
+      - '.github/workflows/outrun2-decomp-reference.yml'
+  pull_request:
+    paths:
+      - 'src/hooks_uiscaling.cpp'
+      - 'src/vr/game/disasm_render_contract.hpp'
+      - 'src/vr/d3d11/live_game_stage1_factor.hpp'
+      - 'docs/references/**'
+      - 'tools/test_outrun2_decomp_reference.py'
+      - 'tools/verify_outrun2_decomp_contract.cpp'
+      - '.github/workflows/outrun2-decomp-reference.yml'
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pure-Python reference and local-source verification
+        run: python tools/test_outrun2_decomp_reference.py
+      - name: C++17 shader/HUD and dormant-state gate
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic -Isrc tools/verify_outrun2_decomp_contract.cpp -o /tmp/outrun2_decomp_contract
+          /tmp/outrun2_decomp_contract

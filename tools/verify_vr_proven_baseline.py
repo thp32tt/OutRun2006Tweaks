@@ -94,15 +94,40 @@ else:
     passes.append("P3_HUD_PROBE_OFF")
 
 # PASS 4 — exact world-rank and POSITION producers cannot be dropped.
-require_all("src/hooks_uiscaling.cpp", [
-    'RankMarker_SpraniCalls[] = { 0xBB0FB, 0xBB133, 0xBB16C, 0xBB1A5 }',
-    'RankMarker_ClipSpriteCalls[] = { 0xBB21F, 0xBB241, 0xBB271, 0xBB2BC, 0xBB2D0 }',
+# The first 4 sprite calls and next 5 clip calls are one HMD-proven
+# canonical RVA table after r4dius/outrun2-decomp source corroboration.
+# Inspect actual call routing, not a duplicated text-only array; this keeps
+# the original safety condition strict even when the owner changes.
+rank_hook = read("src/hooks_uiscaling.cpp")
+rank_contract = read("src/vr/game/disasm_render_contract.hpp")
+rank_match = re.search(
+    r"RankMarkerCallRvas\s*=\s*\{([^}]+)\}", rank_contract, re.S
+)
+rank_expected = [0xBB0FB, 0xBB133, 0xBB16C, 0xBB1A5,
+                 0xBB21F, 0xBB241, 0xBB271, 0xBB2BC, 0xBB2D0]
+rank_actual = ([int(v, 16) for v in re.findall(r"0x[0-9A-Fa-f]+", rank_match.group(1))]
+               if rank_match else [])
+rank_other = [
     'DispRank_SpraniCall = 0xB9DA6',
     '0xB9F3A, 0xB9F5E, 0xB9F81, 0xB9FD0',
     '0xB9FFC, 0xBA01E, 0xBA035, 0xBA052',
     'SpriteNodeOwner::DispRank',
     'RenderScope::ProjectedWorldMarker2D',
-], "P4_RANK_AND_POSITION_OWNERS")
+]
+rank_hooks_valid = (
+    "const auto& rankCalls = OutRunVR::DisasmContract::RankMarkerCallRvas;" in rank_hook
+    and re.search(r"for \(std::size_t i = 0; i < 4; \+\+i\)[\s\S]{0,200}RankMarker_sprani", rank_hook)
+    and re.search(r"for \(std::size_t i = 4; i < rankCalls.size\(\); \+\+i\)[\s\S]{0,200}RankMarker_putClipSprite", rank_hook)
+    and not re.search(r"RankMarker_(Sprani|ClipSprite)Calls\[\]", rank_hook)
+)
+if rank_actual != rank_expected or not rank_hooks_valid or any(
+        token not in rank_hook for token in rank_other):
+    errors.append(
+        "P4_RANK_AND_POSITION_OWNERS: canonical 9-call rank routing, "
+        "4 SPRANI / 5 clip hooks or DispRank/HUD ownership missing"
+    )
+else:
+    passes.append("P4_RANK_AND_POSITION_OWNERS")
 
 # PASS 5 — canonical font glyph and exact option arrows remain exact, never broad.
 require_all("src/hooks_uiscaling.cpp", [
