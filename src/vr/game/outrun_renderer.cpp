@@ -175,6 +175,7 @@ namespace OutRunVRRenderer
 		bool LastGameWvpWriteValid = false;
 		std::uint64_t LastGameWvpWriteSerial = 0;
 		std::uint64_t LastGameWvpTopLevelDrawSerial = 0;
+		std::uint64_t LastGameWvpPoseEpoch = 0;
 		std::uintptr_t LastGameWvpShaderIdentity = 0;
 		std::uint64_t LastGameWvpShaderSerial = 0;
 		OutRunVR::GameSemantic::RenderScope LastGameWvpSemanticScope =
@@ -1193,6 +1194,10 @@ namespace OutRunVRRenderer
 		{
 			if (++LatchedPoseEpoch == 0)
 				++LatchedPoseEpoch;
+			// A previous scene's original c64 cannot represent this new pose,
+			// including failed BeginScene and recenter before a successful Present.
+			LastGameWvpWriteValid = false;
+			LastGameWvpPoseEpoch = 0;
 			LatchedHeadInverseValid = false;
 			LatchedStereo = {};
 			LastVerifiedWvpValid = false;
@@ -1556,6 +1561,7 @@ namespace OutRunVRRenderer
 		{
 			LastGameWvpWriteValid = false;
 			LastGameWvpTopLevelDrawSerial = 0;
+			LastGameWvpPoseEpoch = 0;
 			LastGameWvpShaderIdentity = 0;
 			LastGameWvpShaderSerial = 0;
 			LastGameWvpSemanticScope = OutRunVR::GameSemantic::RenderScope::None;
@@ -1588,6 +1594,7 @@ namespace OutRunVRRenderer
 			if (++LastGameWvpWriteSerial == 0)
 				++LastGameWvpWriteSerial;
 			LastGameWvpTopLevelDrawSerial = OutRunVRStereo::GetTopLevelDrawSerial();
+			LastGameWvpPoseEpoch = LatchedPoseEpoch;
 			LastGameWvpShaderIdentity = shaderIdentity;
 			LastGameWvpShaderSerial = shaderSerial;
 			LastGameWvpSemanticScope = OutRunVR::GameSemantic::EffectiveScope();
@@ -2052,6 +2059,16 @@ namespace OutRunVRRenderer
 	std::uint64_t GetLastGameWvpLensCentreCallEpoch() noexcept
 	{
 		return LastGameWvpWriteValid ? LastGameWvpLensCentreCallEpoch : 0;
+	}
+
+	std::uint64_t GetCurrentLatchedPoseEpoch() noexcept
+	{
+		return LatchedPoseEpoch;
+	}
+
+	std::uint64_t GetLastGameWvpPoseEpoch() noexcept
+	{
+		return LastGameWvpWriteValid ? LastGameWvpPoseEpoch : 0;
 	}
 
 	bool GetLastRawGameWvpWrite(float outConstants[16],

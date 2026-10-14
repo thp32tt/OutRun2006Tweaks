@@ -32,6 +32,8 @@ namespace Settings
 namespace OutRunVRRenderer
 {
     std::uint64_t GetLastGameWvpLensCentreCallEpoch() noexcept;
+    std::uint64_t GetCurrentLatchedPoseEpoch() noexcept;
+    std::uint64_t GetLastGameWvpPoseEpoch() noexcept;
     bool GetLastRawGameWvpWrite(float outConstants[16],
         std::uint64_t& writeSerial, std::uint64_t& topLevelDrawSerial,
         std::uintptr_t& shaderIdentity, std::uint64_t& shaderSerial) noexcept;
@@ -1913,7 +1915,10 @@ namespace OutRunVRStereo
         }
 
 
-        // Strict original-game C993 source proof. The same shader, short draw
+        // Strict original-game C993 source proof. Bind the captured game c64
+        // to the pose generation that produced it; a failed BeginScene or a
+        // re-latch can occur without a successful Present invalidating c64.
+        // The same shader, short draw
         // distance, or a live (possibly already head-injected) GPU c64 do not
         // establish which original sun/halo uploaded these constants.
         bool R30GetExactLensCentreRawWvp(float out[16]) noexcept
@@ -1939,6 +1944,8 @@ namespace OutRunVRStereo
             return OutRunVR::LensCentre::OwnsRawWvp({
                 CurrentLensCentreCallEpoch,
                 OutRunVRRenderer::GetLastGameWvpLensCentreCallEpoch(),
+                OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
                 TopLevelDrawSerial() + 1u, writeDraw,
                 currentShader, writeShader, currentShaderEpoch, writeShaderEpoch,
                 sourceScope == RenderScope::WorldBillboard,
