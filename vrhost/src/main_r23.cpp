@@ -41,6 +41,7 @@
 #include "runtime/desktop_capture_descriptor_cache.hpp"
 #include "runtime/direct_hold_frame_reuse.hpp"
 #include "runtime/direct_ring_latest.hpp"
+#include "runtime/direct_run_epoch.hpp"
 #include "runtime/theater_capture_reuse.hpp"
 #include "runtime/menu_projection_slice_copy.hpp"
 #include "runtime/menu_content_aspect.hpp"
@@ -2513,6 +2514,7 @@ int main(int argc, char** argv)
         std::array<XrView, 2> matchedViews{};
         bool matchedStereoValid = false;
         std::uint32_t lastProcessedStereoFrame = 0;
+        OutRunVrDirectRunEpoch::Cursor directRunEpoch{};
         ULONGLONG lastStereoMatchMs = 0;
         std::array<XrCompositionLayerProjectionView, 2>
             cachedProjectionViews{};
@@ -2803,6 +2805,33 @@ int main(int argc, char** argv)
                         bool foundDirect = false;
                         if (renderFrames.ReadHistory(history, historyCount))
                         {
+                            // The Frame.v2 reader filters stale game-run
+                            // identities. The host, however, may still hold a
+                            // larger displayed frameId from a previous PID/
+                            // runGeneration. Bind that cursor to this producer
+                            // run before applying R37FrameIdBefore; otherwise
+                            // the restarted game can never deliver fresh eyes.
+                            // A same-run Reset/recenter does not clear cadence.
+                            for (std::size_t i = 0; i < historyCount; ++i)
+                            {
+                                const auto& frame = history[i];
+                                if (!frame.frameId ||
+                                    frame.state != OutRunVR::StereoSbsActive ||
+                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
+                                    continue;
+                                if (directRunEpoch.Observe({
+                                        frame.reserved[OutRunVR::RenderFrameRunGenerationIndex],
+                                        frame.clientPid }))
+                                {
+                                    lastProcessedStereoFrame = 0;
+                                    matchedStereoValid = false;
+                                    cachedProjectionValid = false;
+                                    cachedProjectionRenderedMs = 0;
+                                    lastStereoMatchMs = 0;
+                                    OutRunVrR23VerifiedBundle::Invalidate();
+                                }
+                                break;
+                            }
                             // R41: one pass identifies the newest valid producer
                             // generation and its newest unconsumed frame. This
                             // eliminates a redundant ring scan each XR tick;

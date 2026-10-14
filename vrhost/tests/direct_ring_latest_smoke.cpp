@@ -1,4 +1,5 @@
 #include "runtime/direct_ring_latest.hpp"
+#include "runtime/direct_run_epoch.hpp"
 #include <array>
 #include <cstdint>
 using namespace OutRunVrDirectRingLatest;
@@ -55,5 +56,25 @@ int main() {
         {0xffffffffU,7,2,true,true},{0,7,3,true,true}}};
     EXPECT(Select(wrap).index == 1);
     EXPECT(Select(wrap,0xffffffffU).index == 1);
+    // Real host/game restart: Frame.v2 reader has switched to a new
+    // runGeneration/PID, but last displayed frame belonged to the old run.
+    // Reusing frameId 1..2 must not be suppressed behind old frame 9000.
+    OutRunVrDirectRunEpoch::Cursor epoch{};
+    std::uint32_t displayed = 9000;
+    EXPECT(!epoch.Observe({77, 4200}));
+    EXPECT(!epoch.Observe({77, 4200}));
+    EXPECT(!epoch.Observe({0, 0})); // malformed publication is ignored
+    const std::array<Frame, 2> restarted{{
+        {1,1,0,true,true},{2,1,1,true,true}}};
+    EXPECT(Select(restarted, displayed).index == NoIndex);
+    if (epoch.Observe({78, 4300})) displayed = 0;
+    EXPECT(displayed == 0);
+    EXPECT(Select(restarted, displayed).index == 1);
+    displayed = 2;
+    EXPECT(Select(restarted, displayed).index == NoIndex);
+    EXPECT(!epoch.Observe({78, 4300})); // same-run duplicate suppressed
+    EXPECT(displayed == 2);
+    if (epoch.Observe({78, 4400})) displayed = 0; // PID reuse/restart
+    EXPECT(displayed == 0 && epoch.active.gamePid == 4400);
     return 0;
 }
