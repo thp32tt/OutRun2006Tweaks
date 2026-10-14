@@ -14,6 +14,14 @@ on:
       - 'docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json'
       - 'docs/automation/runs/CONVERSION-DX11-*.json'
       - '.github/workflows/dx11-fast-structural.yml'
+  pull_request:
+    branches:
+      - vr-dx11-native-r71
+    paths:
+      - 'src/vr/d3d11/**'
+      - 'tools/test_dx11_*.py'
+      - 'tools/dx11_game_stream_capacity_probe.cpp'
+      - '.github/workflows/dx11-fast-structural.yml'
   workflow_dispatch:
 
 concurrency:
@@ -37,6 +45,7 @@ jobs:
           python tools/dx11_autodev_policy.py --check-latest
       - name: Run focused DX11 source-only regression checks
         run: |
+          python tools/test_dx11_live_shader_lifecycle_review.py
           python tools/test_dx11_linear_predication_r230.py
           python tools/test_dx11_linear_stream_output_r232.py
           python tools/test_dx11_linear_buffer_owner_r183.py
@@ -128,6 +137,8 @@ jobs:
           python tools/test_dx11_stage1_independent_sampler_00714.py
           python tools/test_dx11_stage1_uv_00715.py
           python tools/test_dx11_stage1_mirror_reuse_00716.py
+          python tools/test_dx11_live_stream_buffer_reuse.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stream_capacity_probe.cpp -o /tmp/dx11_stream_capacity && /tmp/dx11_stream_capacity
           python tools/test_dx11_game_blend_extrema_00717.py
           python tools/test_dx11_host_source_switch_00718.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_blend_probe_00702.cpp -o /tmp/dx11_stage1_blend_00702 && /tmp/dx11_stage1_blend_00702
