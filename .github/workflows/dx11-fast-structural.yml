@@ -8,6 +8,9 @@ on:
       - 'src/vr/d3d11/**'
       - 'tools/dx11_autodev_policy.py'
       - 'tools/test_dx11_*.py'
+      # Stage-1 portable C++ probe changes must re-run the fast exact-SHA gate,
+      # not leave the preceding shader result as the last tested revision.
+      - 'tools/dx11_game_stage1_*probe*.cpp'
       - 'docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json'
       - 'docs/automation/runs/CONVERSION-DX11-*.json'
       - '.github/workflows/dx11-fast-structural.yml'
