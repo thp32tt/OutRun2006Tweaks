@@ -24,12 +24,12 @@ def integrated(h,c):
         "float4 Stage1AndAlphaTextured(", "float4 Stage1SourceTextured(",
         "float4 Stage1ThreeSourceTextured(", "(source & 15) != 2",
         "stage1TextureColor", "if (stage1Ops.w != 0)")) and all(s in draw for s in (
-        "payload.operations[3] = capture.stage1TextureOperands ? 1 : 0;",
+        "capture.stage1SeparateTexture ? 2 :", "capture.stage1TextureOperands ? 1 : 0",
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"))
 assert integrated(h,c)
 for s in ("stage1NeedsMatchedTexture","s0 != s1","tex1.Get() != tex.Get()",
-          "payload.operations[3] = capture.stage1TextureOperands ? 1 : 0;",
+          "capture.stage1SeparateTexture ? 2 :", "capture.stage1TextureOperands ? 1 : 0",
           "float4 Stage1ThreeSourceTextured(","constexpr bool stage1_matched_texture_two_source_supported("):
     if s in h: assert not integrated(h.replace(s,"",1),c),s
     else: assert not integrated(h,c.replace(s,"",1)),s

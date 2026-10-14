@@ -28,7 +28,9 @@ assert complete(g,h,d)
 for a in ("stage1_dual_texture_compatible(","s0 != s1"):
     assert not complete(g.replace(a,"",1),h,d)
 for a in ("stage1GameTexture.Sample(stage1GameSampler, v.uv)","if (stage1Ops.w == 2)"):
-    assert not complete(g,h.replace(a,"",1),d)
+    # Three game-stage PS entrypoints each sample the second real texture.
+    # Remove the shared semantic link from ALL three to prove fail-closed coverage.
+    assert not complete(g,h.replace(a,""),d)
 for a in ("mirror_texture(dev, second, stage1View, stage1Sampler)","PSSetShaderResources(1, 1, &boundStage1View)"):
     assert not complete(g,h,d.replace(a,"",1))
 assert "test_dx11_stage1_dual_game_texture_00713.py" in w
