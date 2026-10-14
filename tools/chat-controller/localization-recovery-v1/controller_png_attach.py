@@ -148,57 +148,85 @@ async def prepare_a_project_target(page, project_name, allow_saved_chat=False):
                     return "A_PROJECT_URL_INVALID"
                 await page.goto(configured, wait_until="domcontentloaded", timeout=30000)
             else:
-                # Project navigation, not the global "New chat" action.
-                # Wait briefly for the sidebar's asynchronous project list.
-                exact = page.get_by_text(project_name, exact=True)
-                try:
-                    await exact.first.wait_for(state="visible", timeout=12000)
-                except Exception:
-                    return "A_PROJECT_LINK_NOT_FOUND"
-
-                project_links = page.locator('a[href*="/g/"][href*="/project"]')
-                target_urls = []
-                untrusted_name_matches = 0
-                for idx in range(min(await project_links.count(), 100)):
-                    link = project_links.nth(idx)
-                    title = (await link.inner_text()).strip()
-                    aria = (await link.get_attribute("aria-label") or "").strip()
-                    if title == project_name or aria == project_name:
-                        href = await link.get_attribute("href") or ""
-                        target = urljoin(page.url, href)
-                        if _project_url(target):
-                            target_urls.append(target.split("?")[0])
-                        else:
-                            untrusted_name_matches += 1
-                if untrusted_name_matches:
-                    return "A_PROJECT_LINK_UNTRUSTED"
-                target_urls = list(dict.fromkeys(target_urls))
-                if len(target_urls) == 1:
-                    await page.goto(target_urls[0], wait_until="domcontentloaded", timeout=30000)
-                elif len(target_urls) > 1:
+                # The current ChatGPT sidebar renders project rows as DIVs
+                # (role=button) with an explicit stable project ID, not an
+                # anchor to the project home. Clicking the row only expands it.
+                # Read the exact ID/label pair and navigate to the verified
+                # project-home route; never click the global new-chat button.
+                project_rows = page.locator(
+                    '[data-app-action-sidebar-project-id]'
+                    '[data-app-action-sidebar-project-label]')
+                project_matches = []
+                for idx in range(min(await project_rows.count(), 100)):
+                    row = project_rows.nth(idx)
+                    label = await row.get_attribute(
+                        'data-app-action-sidebar-project-label')
+                    if label != project_name:
+                        continue
+                    project_id = await row.get_attribute(
+                        'data-app-action-sidebar-project-id')
+                    if not project_id or not re.fullmatch(
+                            r'g-p-[A-Za-z0-9_-]+', project_id):
+                        return "A_PROJECT_ID_INVALID"
+                    project_matches.append(project_id)
+                if len(project_matches) > 1:
                     return "A_PROJECT_LINK_AMBIGUOUS"
+                if len(project_matches) == 1:
+                    exact_project_url = (
+                        "https://chatgpt.com/g/" + project_matches[0] + "/project")
+                    await page.goto(exact_project_url,
+                                    wait_until="domcontentloaded", timeout=30000)
                 else:
-                    # Some ChatGPT sidebar versions use a project button/div
-                    # rather than a link. A click is accepted only when the
-                    # resulting URL is the project home and identity is proven.
-                    candidates = (
-                        page.get_by_role("button", name="New chat in " + project_name, exact=True),
-                        page.get_by_role("button", name=project_name, exact=True),
-                        exact,
-                    )
-                    clicked = False
-                    for candidate in candidates:
-                        if await candidate.count() == 1 and await candidate.first.is_visible():
-                            await candidate.first.click(timeout=10000)
-                            clicked = True
-                            break
-                    if not clicked:
-                        return "A_PROJECT_LINK_NOT_FOUND"
+                    # Compatibility with older anchor-based sidebar UI.
+                    exact = page.get_by_text(project_name, exact=True)
                     try:
-                        await page.wait_for_url("**/g/*/project", timeout=18000)
+                        await exact.first.wait_for(state="visible", timeout=12000)
                     except Exception:
-                        return "A_PROJECT_NAVIGATION_UNVERIFIED"
-
+                        return "A_PROJECT_LINK_NOT_FOUND"
+    
+                    project_links = page.locator('a[href*="/g/"][href*="/project"]')
+                    target_urls = []
+                    untrusted_name_matches = 0
+                    for idx in range(min(await project_links.count(), 100)):
+                        link = project_links.nth(idx)
+                        title = (await link.inner_text()).strip()
+                        aria = (await link.get_attribute("aria-label") or "").strip()
+                        if title == project_name or aria == project_name:
+                            href = await link.get_attribute("href") or ""
+                            target = urljoin(page.url, href)
+                            if _project_url(target):
+                                target_urls.append(target.split("?")[0])
+                            else:
+                                untrusted_name_matches += 1
+                    if untrusted_name_matches:
+                        return "A_PROJECT_LINK_UNTRUSTED"
+                    target_urls = list(dict.fromkeys(target_urls))
+                    if len(target_urls) == 1:
+                        await page.goto(target_urls[0], wait_until="domcontentloaded", timeout=30000)
+                    elif len(target_urls) > 1:
+                        return "A_PROJECT_LINK_AMBIGUOUS"
+                    else:
+                        # Some ChatGPT sidebar versions use a project button/div
+                        # rather than a link. A click is accepted only when the
+                        # resulting URL is the project home and identity is proven.
+                        candidates = (
+                            page.get_by_role("button", name="New chat in " + project_name, exact=True),
+                            page.get_by_role("button", name=project_name, exact=True),
+                            exact,
+                        )
+                        clicked = False
+                        for candidate in candidates:
+                            if await candidate.count() == 1 and await candidate.first.is_visible():
+                                await candidate.first.click(timeout=10000)
+                                clicked = True
+                                break
+                        if not clicked:
+                            return "A_PROJECT_LINK_NOT_FOUND"
+                        try:
+                            await page.wait_for_url("**/g/*/project", timeout=18000)
+                        except Exception:
+                            return "A_PROJECT_NAVIGATION_UNVERIFIED"
+    
         if not _project_url(page.url):
             return "A_PROJECT_ROUTE_NOT_VERIFIED"
         try:
