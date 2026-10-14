@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <iostream>
 #include "runtime/native_direct_stereo_pair.hpp"
+#include "runtime/native_stereo_source_route.hpp"
 
 int main()
 {
@@ -92,6 +93,26 @@ int main()
     if (!require(accepts(0x110u, 0x220u, 2u) &&
                  !OutRunVrNativeEyePair::IsSrgbView(left.Format),
                  "scRGB eyes retain their independent HDR white-scale route"))
+        return 1;
+    // The last successfully copied frame wins over the preceding path.
+    // Test both transition directions and incomplete native eye snapshots.
+    using OutRunVrNativeEyePair::StereoSourceRoute;
+    using OutRunVrNativeEyePair::ChooseStereoSource;
+    if (!require(ChooseStereoSource(true,true,true,false,false) ==
+                     StereoSourceRoute::DirectGpu,
+                 "native direct game eyes must reach OpenXR projection") ||
+        !require(ChooseStereoSource(false,true,true,true,true) ==
+                     StereoSourceRoute::Sbs,
+                 "DirectGPU to SBS fallback must display the NEW SBS capture") ||
+        !require(ChooseStereoSource(true,true,true,false,true) ==
+                     StereoSourceRoute::DirectGpu,
+                 "SBS to DirectGPU recovery must display two new game eyes") ||
+        !require(ChooseStereoSource(true,false,true,false,false) ==
+                     StereoSourceRoute::None,
+                 "missing DirectGPU left eye must fail closed") ||
+        !require(ChooseStereoSource(false,false,false,true,false) ==
+                     StereoSourceRoute::None,
+                 "missing SBS view must never submit an OpenXR layer"))
         return 1;
     std::cout << "Native two-eye host source/projection contract PASS\n";
     return 0;

@@ -26,6 +26,7 @@
 #include "vr_shared.hpp"
 #include "stereo_shader.hpp"
 #include "runtime/native_direct_stereo_pair.hpp"
+#include "runtime/native_stereo_source_route.hpp"
 
 namespace
 {
@@ -1415,6 +1416,10 @@ namespace
             context_->CopyResource(directSnapshotLeft_,directLeft_[slot]);context_->CopyResource(directSnapshotRight_,directRight_[slot]);
             ID3D11Query* copyFence=nullptr;D3D11_QUERY_DESC q{};q.Query=D3D11_QUERY_EVENT;if(FAILED(device_->CreateQuery(&q,&copyFence))||!copyFence){invalidateDirect();return false;}context_->End(copyFence);context_->Flush();const ULONGLONG deadline=GetTickCount64()+DirectCopyFenceBudgetMs;HRESULT ready=S_FALSE;do{ready=context_->GetData(copyFence,nullptr,0,D3D11_ASYNC_GETDATA_DONOTFLUSH);if(ready==S_OK||FAILED(ready))break;Sleep(0);}while(GetTickCount64()<deadline);copyFence->Release();
             if(ready!=S_OK){invalidateDirect();if(!directCopyFenceFailureLogged_){directCopyFenceFailureLogged_=true;std::cout<<"Direct GPU private snapshot copy did not complete inside the safety budget; ACK withheld and SBS fallback requested.\n";}return false;}
+            // This GPU-fenced direct snapshot is now the authoritative stereo
+            // source. An older SBS capture must not be reused if a later
+            // DirectGPU transfer fails before the next matching frame.
+            stereoSourceValid_ = false;
             directActiveSlot_=slot;directFrameValid_=true;directTransportReady_=true;return true;
         }
 
@@ -1452,20 +1457,38 @@ namespace
                 stereoSourceFormat_ = sourceFormat_;
             }
             context_->CopyResource(stereoSource_, source_);
+            // A successful SBS fallback replaces any previous DirectGPU eye
+            // snapshot. Otherwise the live menu->race transport switch keeps
+            // showing stale direct left/right pixels despite the new capture.
+            directFrameValid_ = false;
+            directTransportReady_ = false;
             stereoSourceValid_ = true;
             return true;
         }
 
-        bool HasStereoSource() const { return directFrameValid_ || (stereoSourceValid_ && stereoSourceSrv_); }
+        OutRunVrNativeEyePair::StereoSourceRoute StereoSource() const
+        {
+            return OutRunVrNativeEyePair::ChooseStereoSource(
+                directFrameValid_, directSnapshotLeftSrv_ != nullptr,
+                directSnapshotRightSrv_ != nullptr,
+                stereoSourceValid_, stereoSourceSrv_ != nullptr);
+        }
+
+        bool HasStereoSource() const
+        {
+            return StereoSource() != OutRunVrNativeEyePair::StereoSourceRoute::None;
+        }
 
         bool RenderProjection(const std::array<XrView, 2>& views,
             std::array<XrCompositionLayerProjectionView, 2>& pv)
         {
-            if (!HasStereoSource()) return false;
+            const auto sourceRoute = StereoSource();
+            if (sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::None)
+                return false;
             UvRect eyes[2]{};
             ID3D11ShaderResourceView* eyeSrv[2]{};
             DXGI_FORMAT eyeFormat[2]{ DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN };
-            if (directFrameValid_ && directSnapshotLeftSrv_ && directSnapshotRightSrv_)
+            if (sourceRoute == OutRunVrNativeEyePair::StereoSourceRoute::DirectGpu)
             {
                 eyes[0] = eyes[1] = { 0.f, 0.f, 1.f, 1.f };
                 eyeSrv[0] = directSnapshotLeftSrv_; eyeSrv[1] = directSnapshotRightSrv_;
