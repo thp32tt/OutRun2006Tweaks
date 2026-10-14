@@ -2418,7 +2418,18 @@ namespace OutRunVRStereo
 
             if (zEnable == D3DZB_FALSE &&
                 (alphaBlend != FALSE || alphaTest != FALSE))
+            {
+                // A positively tagged world particle/billboard is not a 2.50m
+                // projected UI plane. Keep its authored geometry and let R29's
+                // existing depth-off stereo/zero-disparity policy decide.
+                // Untagged smoke, explicit lens, SkyGlow and HUD retain the
+                // conservative flat-effect route; a stale verified WVP alone
+                // cannot promote a draw to world ownership.
+                const auto scope = OutRunVR::GameSemantic::EffectiveScope();
+                if (OutRunVR::GameSemantic::CorroboratesWorld(scope))
+                    return R30ScreenSpaceKind::None;
                 return R30ScreenSpaceKind::FlatPerspectiveEffect;
+            }
             return R30ScreenSpaceKind::None;
         }
 

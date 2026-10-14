@@ -44,6 +44,26 @@ def source_contract(renderer=RENDERER, r30=R30):
                   "D3DRS_ALPHATESTENABLE"):
         require(guard in cls, "HUD / fragile effect fallback lost: " + guard)
 
+    # The narrow world-effect exception only fires on the original depth-off
+    # alpha branch and positive producer semantic. It must not promote an
+    # untagged smoke sprite or steal projected lens/ScreenHud ownership.
+    depth_off = cls.split("if (zEnable == D3DZB_FALSE &&", 1)
+    require(len(depth_off) == 2, "depth-off alpha gate lost")
+    depth_off = depth_off[1]
+    for token in ("(alphaBlend != FALSE || alphaTest != FALSE)",
+                  "const auto scope = OutRunVR::GameSemantic::EffectiveScope();",
+                  "if (OutRunVR::GameSemantic::CorroboratesWorld(scope))",
+                  "return R30ScreenSpaceKind::None;",
+                  "return R30ScreenSpaceKind::FlatPerspectiveEffect;"):
+        require(token in depth_off, "world/effect owner gate missing: " + token)
+    require(depth_off.index("const auto scope =") <
+            depth_off.index("CorroboratesWorld(scope)") <
+            depth_off.index("return R30ScreenSpaceKind::None;") <
+            depth_off.index("return R30ScreenSpaceKind::FlatPerspectiveEffect;"),
+            "world owner must veto flattening, not bypass screen scope")
+    require("GetLastVerifiedWvp(" not in cls,
+            "stale WVP shader epoch must never become world ownership")
+
 
 def classify(m34, m44):
     near = lambda v, ref: abs(v - ref) <= 0.05
@@ -74,6 +94,47 @@ def model_cases():
         projection[3] = math.nan
         require(not all(math.isfinite(v) for v in projection),
                 "full matrix validation cannot be replaced by pair-only finiteness")
+
+
+def classify_effect_route(projection, z_enabled, alpha_blend, alpha_test, scope):
+    """Model only the dispatch gate changed by the world semantic exception."""
+    if projection == "orthographic":
+        return "hud"
+    if projection != "perspective":
+        return "none"
+    if not z_enabled and (alpha_blend or alpha_test):
+        return "none" if scope in ("WorldParticle", "WorldBillboard") else "flat"
+    return "none"
+
+
+def effect_scope_model_cases():
+    for scope in ("WorldParticle", "WorldBillboard"):
+        for alpha_blend, alpha_test in ((True, False), (False, True), (True, True)):
+            require(classify_effect_route("perspective", False,
+                    alpha_blend, alpha_test, scope) == "none",
+                    "tagged spatial effect must not become a 2.5m HUD plane")
+    for scope in ("None", "ScreenHud", "ScreenOverlay2D",
+                  "ProjectedScreenEffect2D", "ProjectedWorldMarker2D", "SkyGlow"):
+        require(classify_effect_route("perspective", False, True, False, scope) == "flat",
+                "unknown/exact screen effect must retain flat fallback: " + scope)
+    for scope in ("WorldParticle", "WorldBillboard", "ProjectedScreenEffect2D"):
+        require(classify_effect_route("perspective", True, True, False, scope) == "none",
+                "depth-enabled effect must not be taken by depth-off HUD")
+        require(classify_effect_route("orthographic", False, True, False, scope) == "hud",
+                "original orthographic HUD ownership must win")
+    require(classify_effect_route("unknown", False, True, False, "WorldParticle") == "none",
+            "unknown projection must stay conservative")
+
+
+def mutate_classifier(old, new):
+    begin = "R30ScreenSpaceKind R30ClassifyScreenSpacePass("
+    end = "// Only the OpenXR pose/FOV"
+    require(R30.count(begin) == 1, "ambiguous R30 screen-space classifier")
+    first = R30.index(begin)
+    last = R30.index(end, first)
+    part = R30[first:last]
+    require(part.count(old) == 1, "mutation target missing or nonunique: " + old)
+    return R30[:first] + part.replace(old, new, 1) + R30[last:]
 
 
 def mutate_accessor(old, new):
@@ -113,10 +174,30 @@ def negative_mutations():
         pass
     else:
         raise AssertionError("swapped projection classification survived")
+    for label, mutation in (
+        ("remove world exception",
+         mutate_classifier("if (OutRunVR::GameSemantic::CorroboratesWorld(scope))",
+                           "if (false)")),
+        ("promote screen overlay",
+         mutate_classifier("CorroboratesWorld(scope)",
+                           "CorroboratesScreenOverlay2D(scope)")),
+        ("promote unknown world",
+         mutate_classifier("CorroboratesWorld(scope)", "true")),
+        ("break flat fallback",
+         mutate_classifier("return R30ScreenSpaceKind::FlatPerspectiveEffect;",
+                           "return R30ScreenSpaceKind::None;")),
+    ):
+        try:
+            source_contract(r30=mutation)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("world-effect mutation survived: " + label)
 
 
 if __name__ == "__main__":
     source_contract()
     model_cases()
+    effect_scope_model_cases()
     negative_mutations()
-    print("PASS: R30 projection signature, 4009 matrix cases, 5 negative mutations")
+    print("PASS: R30 projection signature, world-effect semantic ownership, 4009 matrix cases, 9 negative mutations")
