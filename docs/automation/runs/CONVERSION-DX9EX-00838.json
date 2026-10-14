@@ -101,5 +101,8 @@
     "score_once": true,
     "c6_bookkeeping_only": true,
     "no_ci_suppression_on_result": true
-  }
+  },
+  "checkpoint": "C6_STATE",
+  "hold_reason": "C6_NOT_COMPLETE",
+  "c6_score_delta": 0
 }
