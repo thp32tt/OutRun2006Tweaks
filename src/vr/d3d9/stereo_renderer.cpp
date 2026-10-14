@@ -547,6 +547,12 @@ namespace OutRunVRStereo
 		{
 			if (!IsGameDevice(device) || InternalStereoPass)
 				return R9ClearCallbackHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
+			auto finishNativeClear = [&](HRESULT result) noexcept -> HRESULT {
+				if (SUCCEEDED(result) && (flags & D3DCLEAR_TARGET))
+					outrun::vr::dx11::live_game_frame::observe_game_clear(
+						device, count, rects, flags, color);
+				return result;
+			};
 			// The next game scene starts with this Clear. Do not publish native
 			// Draws from the previous scene, even if the batch had reached its cap.
 			// D3D9 Clear with no color/depth/stencil flags cannot mutate the
@@ -558,20 +564,20 @@ namespace OutRunVRStereo
 			const bool wanted = StereoWanted();
 			const bool mainTarget = TargetIsBackBuffer();
 			if (!wanted || !mainTarget)
-				return R9ClearCallbackHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
+				return finishNativeClear(R9ClearCallbackHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil));
 
 			if (R9DeferredDepth || !R9CurrentDepthCanMirror())
 			{
 				const HRESULT hr = ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
 				if (FrameHadDuplicatedDraw && SUCCEEDED(hr))
 					R9Poison(OutRunVR::StereoFailureDepthStateChanged, "Clear/transient-depth", hr);
-				return hr;
+				return finishNativeClear(hr);
 			}
 
 			if (!R9EnsureMonoResources(device))
 			{
 				R9Poison(OutRunVR::StereoFailureResourceUnavailable, "Clear/mono-resources");
-				return ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
+				return finishNativeClear(ClearHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil));
 			}
 
 			HRESULT monoHr = E_FAIL;
@@ -602,7 +608,7 @@ namespace OutRunVRStereo
 				R9MonoBackupGap = true;
 				R9Poison(OutRunVR::StereoFailureClearFailed, "Clear/mono-shadow", monoHr);
 			}
-			return stereoHr;
+			return finishNativeClear(stereoHr);
 		}
 
 		template <typename ActualDraw, typename LegacyDraw>

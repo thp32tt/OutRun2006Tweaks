@@ -1,0 +1,97 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00725",
+  "production_id": "CONVERSION-DX11-00725",
+  "event_id": "CONVERSION-DX11-00725-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:GAME_FULL_FRAME_CLEAR_COLOR",
+  "feature_id": "DX11-FULL-FRAME-SOURCE-CLEAR-COLOR",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "base_head_sha": "8c23dc44dba29f6abc99ec2260329d4b41c2ca73",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "D3D9 game backbuffer successful real Clear through existing R9 hook with original HRESULT/input retained",
+      "canonical full-viewport RT0 Clear RGB/alpha to DX11 first native full-resolution Draw/DrawIndexed target",
+      "native frame GPU readback and original D3D9 game Present/fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d9/stereo_renderer.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.hpp",
+      "src/vr/d3d11/native_game_clear_color.hpp",
+      "tools/dx11_game_clear_color_probe_00725.cpp",
+      "tools/test_dx11_game_clear_color_00725.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "A successful full-viewport game-origin Clear seeds exact ARGB into native D3D11 game RT before Draw/Indexed with same backbuffer identity",
+      "negative_regression": "Partial/foreign RT/color Clear, prior Present/Reset, changed COM backbuffer identity do not supply incorrect frame; original D3D9 return/input survives",
+      "component_integration": "real shared R9 Clear -> D3D11 bridge CPU color provenance -> native backend begin_frame -> guarded full-size game Draw/Present"
+    },
+    "conflict_keys": [
+      "DX11:GAME_FULL_FRAME_CLEAR_COLOR",
+      "src/vr/d3d9/stereo_renderer.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "GAME_D3D9_CLEAR",
+      "GAME_D3D9_DRAW",
+      "D3D11_NATIVE_FULL_FRAME",
+      "GAME_PRESENT_BACKBUFFER"
+    ],
+    "visible_frame_acceptance": "only automated source/C++ and exact-SHA gates; no Quest3/VDXR screen test",
+    "activation_guard_and_fallback": "native full-frame explicit opt-in only, game Clear/Draw/Present/gamepad preserved"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-FULL-FRAME-SOURCE-CLEAR-COLOR",
+    "goal": "Complete actual D3D9 full-frame source Clear color propagation through native DX11 full-size game Draw/DrawIndexed across menu/car/race while retaining D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "A1",
+        "category": "end_to_end_behavior",
+        "behavior_area": "real_game_native_frame",
+        "expected_behavior": "successful original game Clear supplies exact full-frame native RGB and alpha before native Draw"
+      },
+      {
+        "id": "A2",
+        "category": "fallback_regression",
+        "behavior_area": "game_clear_present_input",
+        "expected_behavior": "partial/failed/auxiliary game Clears never populate another backbuffer's native frame and original D3D9 HRESULT/input remains authoritative"
+      },
+      {
+        "id": "A3",
+        "category": "integrated_validation",
+        "behavior_area": "gpu_frame_color_pipeline",
+        "expected_behavior": "portable C++ full color/negative test, destructive hook-to-native source regression, same-SHA DX11 Fast/Backend/Win32/OpenXR/HUD gates"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/native_game_clear_color.hpp",
+    "tools/dx11_game_clear_color_probe_00725.cpp",
+    "tools/test_dx11_game_clear_color_00725.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00725.json"
+  ],
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "exact_sha_gates": {},
+  "runtime_gate": "NEED_HMD_TEST",
+  "packaging_status": "NOT_REQUIRED"
+}

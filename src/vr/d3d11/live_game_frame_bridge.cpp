@@ -30,6 +30,7 @@
 #include "native_game_frame_batch.hpp"
 #include "native_game_readback_provenance.hpp"
 #include "native_game_present_region.hpp"
+#include "native_game_clear_color.hpp"
 #include "native_game_backbuffer_admission.hpp"
 #include "native_game_texture_atlas_budget.hpp"
 
@@ -986,6 +987,7 @@ struct OutputCapture {
     D3D11_RECT nativeScissor{};
     D3D11_VIEWPORT nativeViewport{}; // Original game backbuffer-relative raster region.
     UINT nativeWidth = kWidth, nativeHeight = kHeight;
+    std::uintptr_t targetIdentity = 0u; // Live source RT0 IUnknown.
     // Only source RGB-visible masks are eligible for the diagnostic inset.
     std::uint8_t colorWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 };
@@ -1003,6 +1005,7 @@ struct State {
     // game D3D9 COM object or mix different device Draw calls in one GPU batch.
     std::uintptr_t sourceGameDevice = 0u;
     GameOutputSignature previousOutput{};
+    GameNativeClearColor clearColor{};
     std::uint64_t outputGeneration = 0u;
     NativeBackend backend;
     UINT nativeWidth = 0u, nativeHeight = 0u;
@@ -2053,6 +2056,10 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     if (FAILED(game->GetRenderTarget(0, sourceTarget.GetAddressOf())) ||
         !sourceTarget || FAILED(sourceTarget->GetDesc(&sourceDesc)))
         return false;
+    ComPtr<IUnknown> sourceTargetIdentity;
+    if (FAILED(sourceTarget.As(&sourceTargetIdentity)) || !sourceTargetIdentity)
+        return false;
+    output.targetIdentity = reinterpret_cast<std::uintptr_t>(sourceTargetIdentity.Get());
     GameNativeInsetRect nativeRect{};
     const bool fullFrame = env_full_game_opt_in();
     output.nativeWidth = fullFrame ? sourceDesc.Width : kWidth;
@@ -4377,7 +4384,13 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     }
     ctx->UpdateSubresource(s.alphaConstants.Get(), 0, nullptr, alphaParams, 0, 0);
     // Only the first live game Draw clears the native diagnostic color.
-    if (s.frameBatch.first_draw()) s.backend.begin_frame(kBackground);
+    if (s.frameBatch.first_draw()) {
+        // The original D3D9 game Clear supplies the native full-size background
+        // only when its device and canonical backbuffer still match this Draw.
+        s.backend.begin_frame(env_full_game_opt_in()
+            ? s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)
+            : kBackground);
+    }
     if (output.nativeDepthTest) {
         ID3D11RenderTargetView* rtv = s.backend.color_rtv();
         ctx->OMSetRenderTargets(1, &rtv, s.diagnosticDepthView.Get());
@@ -4791,6 +4804,45 @@ void observe_scene_boundary(IDirect3DDevice9* game) noexcept {
     }
 }
 
+void observe_game_clear(IDirect3DDevice9* game, DWORD count,
+                        const D3DRECT* rects, DWORD flags, D3DCOLOR color) noexcept {
+    if (!diagnostic_enabled() || !game || !(flags & D3DCLEAR_TARGET)) return;
+    try {
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        const auto sourceDevice = reinterpret_cast<std::uintptr_t>(game);
+        if (s.sourceGameDevice != 0u && s.sourceGameDevice != sourceDevice) return;
+        // Only the original successful game Clear reaches this callback.
+        // Partial rectangle and partial viewport Clears cannot seed a frame.
+        s.clearColor.discard();
+        if (count != 0u || rects != nullptr) return;
+        ComPtr<IDirect3DSurface9> target, backbuffer;
+        D3DSURFACE_DESC targetDesc{}, bbDesc{};
+        D3DVIEWPORT9 viewport{};
+        if (FAILED(game->GetRenderTarget(0, target.GetAddressOf())) || !target ||
+            FAILED(game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,
+                                       backbuffer.GetAddressOf())) || !backbuffer ||
+            FAILED(target->GetDesc(&targetDesc)) ||
+            FAILED(backbuffer->GetDesc(&bbDesc)) ||
+            FAILED(game->GetViewport(&viewport))) return;
+        ComPtr<IUnknown> targetIdentity, backbufferIdentity;
+        if (FAILED(target.As(&targetIdentity)) ||
+            FAILED(backbuffer.As(&backbufferIdentity)) || !targetIdentity ||
+            !backbufferIdentity) return;
+        const bool wholeBackbuffer = targetIdentity.Get() == backbufferIdentity.Get() &&
+            targetDesc.Width == bbDesc.Width && targetDesc.Height == bbDesc.Height &&
+            viewport.X == 0u && viewport.Y == 0u &&
+            viewport.Width == bbDesc.Width && viewport.Height == bbDesc.Height &&
+            bbDesc.MultiSampleType == D3DMULTISAMPLE_NONE &&
+            (bbDesc.Format == D3DFMT_A8R8G8B8 || bbDesc.Format == D3DFMT_X8R8G8B8);
+        s.clearColor.record(sourceDevice,
+            reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()),
+            static_cast<std::uint32_t>(color), wholeBackbuffer);
+    } catch (...) {
+        // D3D9 Clear, input and Present always remain authoritative.
+    }
+}
+
 void observe_unavailable_game_draw(IDirect3DDevice9* game) noexcept {
     if (!diagnostic_enabled() || !game) return;
     try {
@@ -5028,6 +5080,7 @@ void before_game_present(IDirect3DDevice9* game,
         } else if (s.pending) ++s.failed;
         s.pending = false;
         s.frameBatch.reset();
+        s.clearColor.discard();
         // Menu/car/race frames often have more than 64 eligible draws. The
         // cursor advances across the actual frame population; shrinking or
         // empty populations reset it without skipping the D3D9 fallback.
@@ -5058,6 +5111,7 @@ void before_game_present(IDirect3DDevice9* game,
         s.sourceDrawsThisFrame = 0u;
         s.sourceGameDevice = 0u;
         s.previousOutput = {};
+        s.clearColor.discard();
         s.insetSurface.Reset();
         s.insetFormat = D3DFMT_UNKNOWN;
         s.insetSurfaceDevice = 0u;
@@ -5082,6 +5136,7 @@ void before_game_reset() noexcept {
     }
     s.readSlot = s.writeSlot = 0;
     s.previousOutput = {};
+    s.clearColor.discard();
     s.outputGeneration = 0u;
     s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
     s.insetSurfaceDevice = 0u;
