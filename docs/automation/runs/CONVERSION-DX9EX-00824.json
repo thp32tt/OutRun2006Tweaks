@@ -96,7 +96,7 @@
     "full_source_impact": {
       "run_id": 38512680951,
       "sha": "1745783d85f5d46e6ce5423e5cc92225901fc375",
-      "status": "IN_PROGRESS",
+      "status": "SUCCESS",
       "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38512680951"
     },
     "dx9ex_active": {
@@ -131,9 +131,9 @@
     "full_source_impact": {
       "run_id": 38512680951,
       "sha": "1745783d85f5d46e6ce5423e5cc92225901fc375",
-      "status": "IN_PROGRESS",
+      "status": "SUCCESS",
       "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38512680951"
     }
   },
-  "hold_resolution": "TERMINAL_STATUS_NOT_COMPLETE resolved: exact-SHA DX9Ex Active and Domain Isolation SUCCESS; Full Source Impact IN_PROGRESS when C6 was recorded. C6 bookkeeping only; Quest3/VDXR runtime UNTESTED."
+  "hold_resolution": "EXACT_SHA_GATES_SUCCESS: DX9Ex Active #38512680972 5/5, Domain Isolation #38512680974 SUCCESS, Full Source Impact #38512680951 3/3 SUCCESS on 1745783d85f5d46e6ce5423e5cc92225901fc375. Material remains 483786db86c2c0cf177ec2a9b12b53d1d296902e; C6 bookkeeping scores +0 separately; RUNTIME_VALIDATION=UNTESTED."
 }
