@@ -300,6 +300,8 @@ namespace OutRunVR::GameSemantic
     static_assert(!IsSkyGlowPreHudBoundary(RenderScope::ProjectedWorldMarker2D));
     static_assert(!IsSkyGlowPreHudBoundary(RenderScope::ProjectedScreenEffect2D));
     static_assert(!IsSkyGlowPreHudBoundary(RenderScope::SkyGlow));
+    static_assert(!IsSkyGlowPreHudBoundary(RenderScope::WorldParticle));
+    static_assert(!IsSkyGlowPreHudBoundary(RenderScope::None));
 
     // Canonical OR2006C2C.EXE queue renderer recovered by static reverse analysis:
     //   0x42D734 enters the per-priority SpriteNode walk,
