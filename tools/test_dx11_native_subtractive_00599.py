@@ -98,14 +98,28 @@ def main():
     )
     for old, bad in changes:
         assert old in s, old
-        # Independent alpha OM can use the same BlendOp assignment earlier
-        # in submit(). Mutate the subtractive masked descriptor itself, not
-        # that unrelated first occurrence, or this negative test is vacuous.
-        if old == "desc.RenderTarget[0].BlendOp = output.blendOp;":
+        # Game-extrema and independent-alpha OM branches now legitimately
+        # share factor variant names, descriptor and write-mask bindings.
+        # Destructive mutations must target the *subtractive* OM producer,
+        # not an unrelated earlier MIN/MAX descriptor. Keep this test strict.
+        subtractive_overlap = (
+            "output.additiveBlend ? 1u :",
+            "output.sourceAlphaAddBlend ? 2u :",
+            "output.premultipliedAlphaBlend ? 3u : 0u;",
+            "base->GetDesc(&desc);",
+            "desc.RenderTarget[0].BlendOp = output.blendOp;",
+            "desc.RenderTarget[0].BlendOpAlpha = output.blendOp;",
+            "desc.RenderTarget[0].BlendOpAlpha = output.blendOp;\n"
+            "            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;",
+            "desc.RenderTarget[0].BlendOpAlpha = output.blendOp;\n"
+            "            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;\n"
+            "            if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf())))",
+        )
+        if old in subtractive_overlap:
             begin = s.index("if (output.blendOp != D3D11_BLEND_OP_ADD) {")
             end = s.index("} else if (output.inverseSourceAlphaBlend &&", begin)
             targeted = s[begin:end]
-            assert old in targeted, "missing subtractive BlendOp bind"
+            assert old in targeted, "missing subtractive bind: " + old
             mutant = s[:begin] + targeted.replace(old, bad, 1) + s[end:]
         else:
             mutant = s.replace(old, bad, 1)
