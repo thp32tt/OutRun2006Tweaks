@@ -212,6 +212,10 @@ namespace OutRunVRStereo
         using R30ShadowPtr = std::shared_ptr<R30BufferShadow>;
         std::mutex R30ShadowRegistryMutex;
         std::mutex R30ShadowHookMutex;
+        // Both Create{Vertex,Index}Buffer detours must be committed together.
+        // Acquire avoids the installation mutex on a steady-state retry;
+        // Reset/rollback clears the publication under the same mutex.
+        std::atomic<bool> R30BufferCreationHooksReady{false};
         // Published once all three hooks are installed: steady VB/IB draws
         // need no install mutex, while partial installs still retry under lock.
         std::atomic<bool> R30VertexBufferHooksReady{false};
@@ -925,7 +929,14 @@ namespace OutRunVRStereo
 
         void R30InstallBufferCreationHooks(IDirect3DDevice9* device)
         {
-            if (!device)
+            if (!device ||
+                R30BufferCreationHooksReady.load(std::memory_order_acquire))
+                return;
+            // The R30 async install worker and Reset/rollback can race. Both
+            // creation detours, the VB/IB Lock hooks and teardown share this
+            // mutex: never publish a half-installed creation hook pair.
+            std::lock_guard<std::mutex> creationInstallLock(R30ShadowHookMutex);
+            if (R30BufferCreationHooksReady.load(std::memory_order_relaxed))
                 return;
             auto** vtable = *reinterpret_cast<void***>(device);
             if (!R30CreateVertexBufferHook)
@@ -936,9 +947,17 @@ namespace OutRunVRStereo
                 R30CreateIndexBufferHook = safetyhook::create_inline(
                     vtable[R30CreateIndexBufferVtableIndex],
                     R30CreateIndexBufferDest);
-            if (!R30CreateVertexBufferHook || !R30CreateIndexBufferHook)
-                spdlog::warn(
-                    "VR R30.6 BUFFER SHADOW: creation hook incomplete; existing/dynamic buffers still register lazily on draw/Lock");
+            if (R30CreateVertexBufferHook && R30CreateIndexBufferHook)
+            {
+                R30BufferCreationHooksReady.store(
+                    true, std::memory_order_release);
+                return;
+            }
+            // Leave readiness false on a failed half-install so a later
+            // attempt retries only the missing hook rather than losing the
+            // VB/IB shadow producer for the remainder of this device life.
+            spdlog::warn(
+                "VR R30.6 BUFFER SHADOW: creation hook incomplete; existing/dynamic buffers still register lazily on draw/Lock");
         }
 
         void R30RollbackBufferShadowHooks() noexcept
@@ -946,6 +965,7 @@ namespace OutRunVRStereo
             // Serialize teardown with the slow install path; a later retry
             // must not observe the previously published ready flags.
             std::lock_guard<std::mutex> hookInstallLock(R30ShadowHookMutex);
+            R30BufferCreationHooksReady.store(false, std::memory_order_release);
             R30VertexBufferHooksReady.store(false, std::memory_order_release);
             R30IndexBufferHooksReady.store(false, std::memory_order_release);
             // Unhook entry points before dropping registry ownership. Any draw
