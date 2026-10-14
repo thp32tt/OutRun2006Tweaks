@@ -27,7 +27,8 @@
     ".github/workflows/dx11-fast-structural.yml",
     "tools/dx11_cropped_cpu_upload_probe_00751.cpp",
     "tools/test_dx11_cropped_cpu_upload_00751.py",
-    "docs/automation/runs/CONVERSION-DX11-00751.json"
+    "docs/automation/runs/CONVERSION-DX11-00751.json",
+    "tools/test_dx11_frame_upload_00747.py"
   ],
   "feature_contract": {
     "feature_id": "DX11-MENU-RACE-NATIVE-CROPPED-BGRA-PUBLICATION",
@@ -68,16 +69,35 @@
       "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "Full-res source-crop helper and callsite implemented; Quest3/game screen UNTESTED",
-    "activation_guard_and_fallback": "Opt-in disabled by default; source-crop validity and D3D9 UpdateSurface/UnlockRect remain fail closed; always retain original D3D9 Present/input."
+    "activation_guard_and_fallback": "Opt-in disabled by default; source-crop validity and D3D9 UpdateSurface/UnlockRect remain fail closed; always retain original D3D9 Present/input.",
+    "integration_path": [
+      "Actual D3D9 menu/car/race Draw and DrawIndexed -> guarded full-size native D3D11 color target and same-Present GPU readback",
+      "Verified D3D9 Present source crop -> precisely bounded BGRA row copy into the D3D9 SYSTEMMEM backbuffer-coordinates surface -> cropped UpdateSurface",
+      "Invalid source rectangles or D3D11/D3D9 row pitch -> no native publication; original D3D9 gamepad, Draw, and Present remain active"
+    ],
+    "batch_components": [
+      "C++ GameNativeFrameUpload memory-bounded frame crop transfer and original full-row path",
+      "Live C++ native GPU Map to D3D9 cropped UpdateSurface selection in game frame bridge",
+      "C++ positive/negative pitched crop probe and Python destructive integration regression in mandatory DX11 fast CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00751 portable C++ pitched BGRA source crop exact pixel/padding preservation plus live same-Present native Draw->D3D9 UpdateSurface integration",
+      "negative_regression": "Out-of-range crop, reversed bounds, zero area, null pointer, bad row pitch and arithmetic overflow fail with D3D9 pixel buffer unchanged; unchanged full gamepad/Present fallback",
+      "component_integration": "Real intercepted game Draw/DrawIndexed -> full native D3D11 RT -> fence and Map -> bounded crop system-memory copy -> same-game Present; all 5 exact-SHA required Gates pending"
+    },
+    "conflict_keys": [
+      "DX11:FULLFRAME_CROPPED_CPU_UPLOAD"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
   },
   "pipeline": {
     "C0_RECOVER": "PASS remote HEAD and 00750 owner/C6 inspected",
     "C1_REVIEW": "PASS unneeded full physical framebuffer CPU copies found in verified cropped Present",
     "C2_IMPLEMENT": "PASS header + live C++ crop wire, fallback and two regression probes",
-    "C3_VALIDATE": "Local portable C++ proof PASS; exact SHA GitHub Gates pending",
+    "C3_VALIDATE": "Portable C++ probe PASS; corrected 00747 legacy row fallback mutation test; mandatory exact-SHA CI gates pending",
     "C4_COMMIT": "Material code commit with AUTO marker",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING exact-SHA Gates; hardware UNTESTED"
   },
-  "next_action": "Check exact SHA DX11 Fast, Backend Conversion, Win32 Build, OpenXR and HUD; repair concrete failure only, preserve Quest3/VDXR UNTESTED."
+  "next_action": "Check five required exact-SHA GitHub Gates for updated source and required DX11 feature policy. No runtime PASS without Quest3/VDXR."
 }
