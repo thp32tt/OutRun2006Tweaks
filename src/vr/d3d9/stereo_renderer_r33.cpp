@@ -415,6 +415,16 @@ namespace OutRunVRStereo
                 R33DepthStencilState.stateBlockApplies == OutRunVR::State::StateBlockTracker::ApplyGeneration();
         }
 
+        // Keep the per-world-draw right-eye attachment snapshot single-use.
+        // The fragile-alpha promotion gate can check the generation-fenced
+        // depth eligibility independently of the post-left-draw snapshot.
+        bool R33FragileWorldDepthEligible() noexcept
+        {
+            return R32ReviewTrackedDepthStencil() &&
+                R33DepthStencilCacheCurrent() &&
+                R33DepthStencilState.zEnable != D3DZB_FALSE;
+        }
+
         bool R33GetWriteFlags(IDirect3DDevice9* device,
             bool& mayWriteDepth, bool& mayWriteStencil) noexcept
         {
@@ -659,10 +669,7 @@ namespace OutRunVRStereo
                 return {};
             // Fast-path promotion only with a current depth attachment and
             // non-disabled Z; other alpha effects stay on the legacy route.
-            if (fragile &&
-                (!R32ReviewTrackedDepthStencil() ||
-                 !R33DepthStencilCacheCurrent() ||
-                 R33DepthStencilState.zEnable == D3DZB_FALSE))
+            if (fragile && !R33FragileWorldDepthEligible())
             {
                 if (R33TelemetryEnabled())
                     R32ReviewNoteDispatchFragile();
