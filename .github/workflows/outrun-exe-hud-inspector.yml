@@ -18,6 +18,7 @@ on:
       - 'src/hooks_bugfixes.cpp'
       - 'src/hooks_graphics.cpp'
       - 'src/hooks_uiscaling.cpp'
+      - 'docs/automation/runs/CONVERSION-DX9EX-*.json' # Required per-task feature-unit input must trigger exact-SHA gates.
       - 'src/hooks_framerate.cpp'
       - 'tools/verify_vr_sumo_replay_semantics.py'
       - 'src/vr/d3d9/stereo_renderer_r33.cpp'
@@ -68,6 +69,7 @@ on:
       - 'src/hooks_bugfixes.cpp'
       - 'src/hooks_graphics.cpp'
       - 'src/hooks_uiscaling.cpp'
+      - 'docs/automation/runs/CONVERSION-DX9EX-*.json' # Required per-task feature-unit input must trigger exact-SHA gates.
       - 'src/hooks_framerate.cpp'
       - 'tools/verify_vr_sumo_replay_semantics.py'
       - 'src/vr/d3d9/stereo_renderer_r33.cpp'

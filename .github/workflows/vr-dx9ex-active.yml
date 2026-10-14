@@ -44,6 +44,7 @@ on:
       - 'tools/dx9ex_function_dispatch.py'
       - 'tools/test_dx9ex_function_dispatch.py'
       - 'docs/automation/DX9EX_FEATURE_UNIT_POLICY.json'
+      - 'docs/automation/runs/CONVERSION-DX9EX-*.json' # Required per-task feature-unit input must trigger exact-SHA gates.
       - 'tools/OutRunVR-TestProfiles.ps1'
       - 'tools/OutRunVR-GPU-Lab.ps1'
       - 'tools/OutRunVR-GPU-Lab.cmd'
