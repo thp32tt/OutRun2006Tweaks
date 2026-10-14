@@ -3,10 +3,10 @@
 from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
-routing = (root / "src/overlay/f11_input_routing.hpp").read_text()
-hook = (root / "src/overlay/hooks_overlay.cpp").read_text()
-overlay = (root / "src/overlay/overlay.cpp").read_text()
-workflow = (root / ".github/workflows/vr-dx9ex-active.yml").read_text()
+routing = (root / "src/overlay/f11_input_routing.hpp").read_text(encoding="utf-8")
+hook = (root / "src/overlay/hooks_overlay.cpp").read_text(encoding="utf-8")
+overlay = (root / "src/overlay/overlay.cpp").read_text(encoding="utf-8")
+workflow = (root / ".github/workflows/vr-dx9ex-active.yml").read_text(encoding="utf-8")
 wnd = hook.split("class WndprocHook : public Hook", 1)[1].split("public:", 1)[0]
 shell = overlay.split("void Overlay::render_shell()", 1)[1].split("void Overlay::init()", 1)[0]
 
