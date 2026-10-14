@@ -114,36 +114,95 @@ def load_binding(role, root=ROOT):
 
 
 async def prepare_a_project_target(page, project_name, allow_saved_chat=False):
-    """Require the intended A project or verified existing chat before upload."""
-    from urllib.parse import urlsplit
+    """Find the exact ChatGPT project before starting a fresh A/B image chat.
+
+    A new tab starts at chatgpt.com/, where the project-specific "New chat in"
+    button does not exist. Resolve the configured project URL or discover the
+    exact project in the sidebar, then verify BOTH its route and visible heading.
+    Never fall back to a global new chat (which could send outside the project).
+    """
+    from urllib.parse import urljoin, urlsplit
+
+    def _project_url(value):
+        parsed = urlsplit(value)
+        return (parsed.scheme == "https" and parsed.hostname == "chatgpt.com"
+                and parsed.username is None and parsed.password is None
+                and re.fullmatch(r"/g/[^/]+/project/?", parsed.path) is not None)
+
     try:
-        url=urlsplit(page.url)
-        if url.scheme!="https" or url.hostname!="chatgpt.com":
+        current = urlsplit(page.url)
+        if current.scheme != "https" or current.hostname != "chatgpt.com":
             return "TARGET_ORIGIN_NOT_CHATGPT"
-        if allow_saved_chat and "/c/" in url.path and "local-chatgpt" not in page.url:
-            await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(state="visible",timeout=12000)
+        if allow_saved_chat and "/c/" in current.path and "local-chatgpt" not in page.url:
+            await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(
+                state="visible", timeout=12000)
             return "A_PROJECT_COMPOSER_READY"
         if not project_name:
             return "A_PROJECT_NAME_MISSING"
-        in_project="/g/" in url.path and url.path.endswith("/project")
-        if in_project:
-            try:
-                await page.get_by_role("heading", name=project_name, exact=True).wait_for(
-                    state="visible", timeout=20000)
-            except Exception:
-                in_project=False
-        if not in_project:
-            btn=page.get_by_role("button",name="New chat in "+project_name,exact=True)
-            if await btn.count()!=1:
-                return "A_PROJECT_NEW_CHAT_BUTTON_NOT_FOUND"
-            await btn.dispatch_event("click")
-            await page.wait_for_url("**/g/*/project",timeout=18000)
+
+        if not _project_url(page.url):
+            configured = (os.environ.get("CHATGPT_PROJECT_URL", "").strip()
+                          or os.environ.get("LOCALIZATION_PROJECT_URL", "").strip())
+            if configured:
+                if not _project_url(configured):
+                    return "A_PROJECT_URL_INVALID"
+                await page.goto(configured, wait_until="domcontentloaded", timeout=30000)
+            else:
+                # Project navigation, not the global "New chat" action.
+                # Wait briefly for the sidebar's asynchronous project list.
+                exact = page.get_by_text(project_name, exact=True)
+                try:
+                    await exact.first.wait_for(state="visible", timeout=12000)
+                except Exception:
+                    return "A_PROJECT_LINK_NOT_FOUND"
+
+                project_links = page.locator('a[href*="/g/"][href*="/project"]')
+                target_urls = []
+                for idx in range(min(await project_links.count(), 100)):
+                    link = project_links.nth(idx)
+                    title = (await link.inner_text()).strip()
+                    aria = (await link.get_attribute("aria-label") or "").strip()
+                    if title == project_name or aria == project_name:
+                        href = await link.get_attribute("href") or ""
+                        target = urljoin(page.url, href)
+                        if _project_url(target):
+                            target_urls.append(target.split("?")[0])
+                target_urls = list(dict.fromkeys(target_urls))
+                if len(target_urls) == 1:
+                    await page.goto(target_urls[0], wait_until="domcontentloaded", timeout=30000)
+                elif len(target_urls) > 1:
+                    return "A_PROJECT_LINK_AMBIGUOUS"
+                else:
+                    # Some ChatGPT sidebar versions use a project button/div
+                    # rather than a link. A click is accepted only when the
+                    # resulting URL is the project home and identity is proven.
+                    candidates = (
+                        page.get_by_role("button", name="New chat in " + project_name, exact=True),
+                        page.get_by_role("button", name=project_name, exact=True),
+                        exact,
+                    )
+                    clicked = False
+                    for candidate in candidates:
+                        if await candidate.count() == 1 and await candidate.first.is_visible():
+                            await candidate.first.click(timeout=10000)
+                            clicked = True
+                            break
+                    if not clicked:
+                        return "A_PROJECT_LINK_NOT_FOUND"
+                    try:
+                        await page.wait_for_url("**/g/*/project", timeout=18000)
+                    except Exception:
+                        return "A_PROJECT_NAVIGATION_UNVERIFIED"
+
+        if not _project_url(page.url):
+            return "A_PROJECT_ROUTE_NOT_VERIFIED"
         try:
             await page.get_by_role("heading", name=project_name, exact=True).wait_for(
                 state="visible", timeout=20000)
         except Exception:
             return "A_PROJECT_IDENTITY_NOT_VERIFIED"
-        await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(state="visible",timeout=12000)
+        await page.locator('[role="textbox"][contenteditable="true"]').first.wait_for(
+            state="visible", timeout=12000)
         return "A_PROJECT_COMPOSER_READY"
     except Exception:
         return "A_PROJECT_NAVIGATION_UNVERIFIED"
