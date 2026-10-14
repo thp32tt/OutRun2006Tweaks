@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00715",
+  "production_id": "CONVERSION-DX11-00715",
+  "event_id": "CONVERSION-DX11-00715-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "LIVE_STAGE1_INDEPENDENT_UV_TRANSFORM_GAME_DRAW",
+  "work_key": "DX11:STAGE1_GAME_INDEPENDENT_FVF_UV",
+  "status": "C4_COMMITTED_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "real D3D9 menu/vehicle/race Stage1 GetTextureStageState(1) independent FVF coord index/COUNT2 transform capture",
+      "decode both game-authored FVF UV channels, preserve distinct COUNT2 matrix and native TEXCOORD0/1 interpolation",
+      "HLSL t1/s1 Stage1 sample to D3D11 game Draw/DrawIndexed diagnostic inset; invalid coordinates/texture leave original D3D9 gamepad/Draw untouched"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_stage1_uv.hpp",
+      "src/vr/d3d11/live_game_stage1_dual_texture.hpp",
+      "tools/dx11_game_stage1_uv_probe_00715.cpp",
+      "tools/test_dx11_stage1_uv_00715.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "two independent game FVF UV streams and Stage1 COUNT2 transform through real PS t1/s1 and indexed/nonindexed Draw",
+      "negative_regression": "absent FVF slots, generated texture coordinates, projected and nonfinite transforms fail closed preserving original game Draw/input",
+      "component_integration": "D3D9 stage1 FVF states -> CPU owned NativeVertex TEXCOORD1 -> D3D11 IA/VS/PS Stage1 Draw/DrawIndexed and exact SHA gates"
+    },
+    "conflict_keys": [
+      "DX11:STAGE1_GAME_INDEPENDENT_FVF_UV",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native diagnostic inset game menu/car/race and Quest3/VDXR remain UNTESTED until actual HMD/in-game test.",
+    "activation_guard_and_fallback": "explicit diagnostic opt-in only, unsupported source FVF/texture/sampler/transform returns without altering original D3D9 Draw or gamepad"
+  },
+  "feature_contract": {
+    "feature_id": "LIVE_STAGE1_INDEPENDENT_UV_TRANSFORM_GAME_DRAW",
+    "goal": "Route real game Stage1 independent FVF texture-coordinate channel and independently transformed COUNT2 texture coordinates through native D3D11 Draw/DrawIndexed while keeping D3D9 gamepad/input fail-closed.",
+    "acceptance_items": [
+      {
+        "id": "stage1-distinct-fvf-uv-native-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_fvf_capture_native_vertex_shader",
+        "expected_behavior": "Game TEX2 plus distinct Stage1 UV/COUNT2 reaches TEXCOORD1 and independent native t1/s1 shader sample on real Draw/Indexed"
+      },
+      {
+        "id": "invalid-uv-d3d9-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "gamepad_original_d3d9",
+        "expected_behavior": "Invalid index, generated/projected stage1 UV, failed transform or nonfinite UV reject diagnostic Draw with original D3D9 Draw/input unchanged"
+      },
+      {
+        "id": "exact-sha-regressions",
+        "category": "integrated_validation",
+        "behavior_area": "portable_cpp_python_windows_ci",
+        "expected_behavior": "Portable positive-negative C++ FVF UV model, destructive Python integration test and five mandatory exact-SHA GitHub gates pass"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_stage1_dual_texture.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/test_dx11_stage1_dual_game_texture_00713.py",
+    "tools/test_dx11_stage1_independent_sampler_00714.py",
+    "src/vr/d3d11/live_game_stage1_uv.hpp",
+    "tools/dx11_game_stage1_uv_probe_00715.cpp",
+    "tools/test_dx11_stage1_uv_00715.py",
+    "docs/automation/runs/CONVERSION-DX11-00715.json"
+  ],
+  "base_head_sha": "ab8f0dcbb99d5644ac6521e297593306cd1085ed",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "acceptance_results": {},
+  "next_action": "Run exact SHA DX11 Fast, Backend Conversion, Build, OpenXR VR architecture, HUD Inspector; preserve UNTESTED hardware status."
+}

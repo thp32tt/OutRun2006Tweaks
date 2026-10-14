@@ -26,7 +26,7 @@ def integrated(g,d,s):
         "PSSetSamplers(1, 1, &boundStage1Sampler)",
         "ctx->DrawIndexed(indexCount, 0, 0)",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0)")) and all(t in s for t in (
-        "stage1GameTexture.Sample(stage1GameSampler, v.uv)",
+        "stage1GameTexture.Sample(stage1GameSampler, v.uvStage1)",
         "SamplerState stage1GameSampler : register(s1);"))
 assert integrated(g,d,s)
 for token in ("stage1_game_sampler_supported(", "tex1.Get() != tex.Get() || samplerDiff"):

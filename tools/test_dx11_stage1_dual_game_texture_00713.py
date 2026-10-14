@@ -15,7 +15,7 @@ def complete(g,h,d):
        "uv1 != capture.coordIndex")) and all(t in h for t in (
        "Texture2D stage1GameTexture : register(t1);",
        "SamplerState stage1GameSampler : register(s1);",
-       "stage1GameTexture.Sample(stage1GameSampler, v.uv)",
+       "stage1GameTexture.Sample(stage1GameSampler, v.uvStage1)",
        "if (stage1Ops.w == 2)")) and all(t in d for t in (
        "TextureCapture second = capture;",
        "second.texture = capture.stage1SeparateTexture;",
@@ -29,7 +29,7 @@ assert complete(g,h,d)
 for a in ("stage1_dual_texture_compatible(","samplerDiff |= s0 != s1;",
           "if (states[i] == D3DSAMP_ADDRESSW && s0 != s1) return false;"):
     assert not complete(g.replace(a,"",1),h,d)
-for a in ("stage1GameTexture.Sample(stage1GameSampler, v.uv)","if (stage1Ops.w == 2)"):
+for a in ("stage1GameTexture.Sample(stage1GameSampler, v.uvStage1)","if (stage1Ops.w == 2)"):
     # Three game-stage PS entrypoints each sample the second real texture.
     # Remove the shared semantic link from ALL three to prove fail-closed coverage.
     assert not complete(g,h.replace(a,""),d)

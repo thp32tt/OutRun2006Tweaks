@@ -8,6 +8,7 @@
 #include "live_game_stage0_blend.hpp"
 #include "live_game_stage1_factor.hpp"
 #include "live_game_stage1_dual_texture.hpp"
+#include "live_game_stage1_uv.hpp"
 #include "native_backend.hpp"
 #include "packed_texture_16bit.hpp"
 #include "live_game_luminance_texture.hpp"
@@ -231,8 +232,8 @@ constexpr float kMaxMipLodBias = 15.99f;
 
 constexpr std::array<float, 4> kBackground{0.035f, 0.035f, 0.08f, 1.0f};
 constexpr char kShader[] = R"(
-struct VIn { float4 clip : POSITION; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; float4 specular : COLOR1; };
-struct VOut { float4 clip : SV_Position; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; float4 specular : COLOR1; };
+struct VIn { float4 clip : POSITION; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; float4 specular : COLOR1; float2 uvStage1 : TEXCOORD1; };
+struct VOut { float4 clip : SV_Position; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; float4 specular : COLOR1; float2 uvStage1 : TEXCOORD1; };
 Texture2D gameTexture : register(t0);
 SamplerState gameSampler : register(s0);
 cbuffer AlphaParams : register(b0) { float4 alphaParams; };
@@ -249,7 +250,7 @@ void AlphaGate(float alpha) {
         clip(pass ? 1.0f : -1.0f);
     }
 }
-VOut VS(VIn v) { VOut o; o.clip = v.clip; o.diffuse = v.diffuse; o.uv = v.uv; o.specular = v.specular; return o; }
+VOut VS(VIn v) { VOut o; o.clip = v.clip; o.diffuse = v.diffuse; o.uv = v.uv; o.specular = v.specular; o.uvStage1 = v.uvStage1; return o; }
 float4 PS(VOut v) : SV_Target { float4 c = v.diffuse; AlphaGate(c.a); return c; }
 float4 PSTextured(VOut v) : SV_Target { float4 c = gameTexture.Sample(gameSampler, v.uv) * v.diffuse; AlphaGate(c.a); return c; }
 float4 PSTextureOnly(VOut v) : SV_Target { float4 c = gameTexture.Sample(gameSampler, v.uv); AlphaGate(c.a); return c; }
@@ -808,6 +809,7 @@ struct NativeVertex {
     float diffuse[4];
     float uv[2];
     float specular[4]; // Packed D3D9 FVF SPECULAR, never aliased with DIFFUSE.
+    float uvStage1[2]; // Independently selected and COUNT2-transformed game Stage1 UV.
 };
 
 // Narrow fixed-function stage-0 textured subset for real game menu/vehicle/race
@@ -820,6 +822,9 @@ struct TextureCapture {
     // ADDRESSU/V/W, BORDER, MAG, MIN, MIP, LODBIAS, MAXMIP, ANISO, SRGB.
     std::array<DWORD, 11> stage1SamplerStates{};
     bool stage1IndependentSampler = false; // Same texture can still need a distinct native s1.
+    UINT stage1CoordIndex = 0u; // D3DTSS_TEXCOORDINDEX(1), independent of Stage0.
+    bool stage1TransformUv = false;
+    D3DMATRIX stage1UvTransform{};
     bool stage0ResultTemp = false; // RESULTARG=TEMP, CURRENT remains vertex DIFFUSE.
     bool stage0FullModulate = false;
     DWORD stage1ColorOp = D3DTOP_DISABLE;
@@ -1364,7 +1369,7 @@ float4 PSStage1Diffuse(VOut v) : SV_Target {
 float4 PSStage1Modulate(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
     if (stage1Ops.w == 2) {
-        float4 stage1Sample = stage1GameTexture.Sample(stage1GameSampler, v.uv);
+        float4 stage1Sample = stage1GameTexture.Sample(stage1GameSampler, v.uvStage1);
         return Stage1AndAlphaTextured(t * v.diffuse, v.diffuse, v.specular,
                                       stage1Sample.a, stage1Sample);
     }
@@ -1374,7 +1379,7 @@ float4 PSStage1Modulate(VOut v) : SV_Target {
 float4 PSStage1TextureOnly(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
     if (stage1Ops.w == 2) {
-        float4 stage1Sample = stage1GameTexture.Sample(stage1GameSampler, v.uv);
+        float4 stage1Sample = stage1GameTexture.Sample(stage1GameSampler, v.uvStage1);
         return Stage1AndAlphaTextured(t, v.diffuse, v.specular,
                                       stage1Sample.a, stage1Sample);
     }
@@ -1384,7 +1389,7 @@ float4 PSStage1TextureOnly(VOut v) : SV_Target {
 float4 PSStage1Add(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
     if (stage1Ops.w == 2) {
-        float4 stage1Sample = stage1GameTexture.Sample(stage1GameSampler, v.uv);
+        float4 stage1Sample = stage1GameTexture.Sample(stage1GameSampler, v.uvStage1);
         return Stage1AndAlphaTextured(saturate(t + v.diffuse), v.diffuse, v.specular,
                                       stage1Sample.a, stage1Sample);
     }
@@ -1792,10 +1797,12 @@ bool ensure_pipeline(State& s) noexcept {
         {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 32,
          D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"COLOR", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 40,
+         D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT, 0, 56,
          D3D11_INPUT_PER_VERTEX_DATA, 0}
     };
-    static_assert(sizeof(NativeVertex) == 56u, "Native vertex/IA color1 mismatch");
-    if (FAILED(dev->CreateInputLayout(elements, 4,
+    static_assert(sizeof(NativeVertex) == 64u, "Native vertex/IA Stage1 UV mismatch");
+    if (FAILED(dev->CreateInputLayout(elements, 5,
         vcode->GetBufferPointer(), vcode->GetBufferSize(), s.layout.GetAddressOf())))
         return false;
     D3D11_RASTERIZER_DESC raster{};
@@ -3166,15 +3173,22 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
                 !tex1 || tex1->GetType() != D3DRTYPE_TEXTURE ||
                 FAILED(game->GetTextureStageState(1, D3DTSS_TEXCOORDINDEX, &uv1)) ||
                 FAILED(game->GetTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS, &transform1)) ||
-                uv1 != capture.coordIndex ||
-                transform1 != (capture.transformUv ? D3DTTFF_COUNT2 : D3DTTFF_DISABLE))
+                !stage1_game_uv_supported(uv1, layout.texcoordCount, transform1))
                 return false;
-            if (capture.transformUv) {
-                D3DMATRIX matrix1{};
-                if (FAILED(game->GetTransform(D3DTS_TEXTURE1, &matrix1)) ||
-                    std::memcmp(&capture.uvTransform, &matrix1, sizeof(matrix1)) != 0)
+            D3DMATRIX matrix1{};
+            bool stage1AlternateUv =
+                uv1 != capture.coordIndex ||
+                (transform1 == D3DTTFF_COUNT2) != capture.transformUv;
+            if (transform1 == D3DTTFF_COUNT2) {
+                if (FAILED(game->GetTransform(D3DTS_TEXTURE1, &matrix1)))
                     return false;
+                if (capture.transformUv &&
+                    std::memcmp(&capture.uvTransform, &matrix1, sizeof(matrix1)) != 0)
+                    stage1AlternateUv = true;
             }
+            capture.stage1CoordIndex = uv1;
+            capture.stage1TransformUv = transform1 == D3DTTFF_COUNT2;
+            if (capture.stage1TransformUv) capture.stage1UvTransform = matrix1;
             constexpr std::array<D3DSAMPLERSTATETYPE, 11> states{{
                 D3DSAMP_ADDRESSU, D3DSAMP_ADDRESSV, D3DSAMP_ADDRESSW,
                 D3DSAMP_BORDERCOLOR, D3DSAMP_MAGFILTER, D3DSAMP_MINFILTER,
@@ -3204,14 +3218,16 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
                 s1[0],s1[1],s1[5],s1[4],s1[6],s1[8],stage1MipBias,s1[9],s1[10]);
             if (!stage1_dual_texture_compatible(
                     capture.enabled, tex1 != nullptr, tex1->GetType() == D3DRTYPE_TEXTURE,
-                    uv1 == capture.coordIndex,
-                    transform1 == (capture.transformUv ? D3DTTFF_COUNT2 : D3DTTFF_DISABLE),
+                    stage1_game_uv_supported(uv1, layout.texcoordCount, transform1),
+                    transform1 == D3DTTFF_DISABLE || transform1 == D3DTTFF_COUNT2,
                     stage1SamplerSupported))
                 return false;
             capture.stage1IndependentSampler = samplerDiff;
             // Even the same D3D9 texture must bind t1/s1 when sampler 1
             // differs, otherwise the stage-0 texture sample changes pixels.
-            if ((tex1.Get() != tex.Get() || samplerDiff) &&
+            // Different game UV slots or COUNT2 matrices need a separate
+            // t1/s1 sample even when texture object and sampler match Stage0.
+            if ((tex1.Get() != tex.Get() || samplerDiff || stage1AlternateUv) &&
                 FAILED(tex1.As(&capture.stage1SeparateTexture)))
                 return false;
         }
@@ -3304,6 +3320,27 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
             if (!std::isfinite(texU) || !std::isfinite(texV)) return false;
             output[i].uv[0] = texU;
             output[i].uv[1] = texV;
+        }
+        // Native TEXCOORD1 is always initialized. Stage1 may read a distinct
+        // FVF UV stream or an independently transformed D3DTS_TEXTURE1 matrix.
+        // The per-vertex finite check prevents undefined native GPU samples;
+        // original D3D9 Draw/input stays unmodified on failure.
+        output[i].uvStage1[0] = output[i].uv[0];
+        output[i].uvStage1[1] = output[i].uv[1];
+        if (capture.stage1SeparateTexture) {
+            if (!game_fvf_select_uv(decoded, layout, capture.stage1CoordIndex,
+                                    output[i].uvStage1))
+                return false;
+            if (capture.stage1TransformUv) {
+                const float u = output[i].uvStage1[0];
+                const float v = output[i].uvStage1[1];
+                const auto& m = capture.stage1UvTransform;
+                output[i].uvStage1[0] = u * m._11 + v * m._21 + m._31;
+                output[i].uvStage1[1] = u * m._12 + v * m._22 + m._32;
+            }
+            if (!std::isfinite(output[i].uvStage1[0]) ||
+                !std::isfinite(output[i].uvStage1[1]))
+                return false;
         }
         if (!std::isfinite(xyz[0]) || !std::isfinite(xyz[1]) ||
             !std::isfinite(xyz[2]) ||

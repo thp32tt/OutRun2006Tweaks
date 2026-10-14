@@ -2,13 +2,13 @@
 #include <cstdint>
 namespace outrun::vr::dx11::live_game_frame {
 // Stage0/Stage1 may use distinct game-authored textures and native samplers,
-// but only with the same proven UV/transform. Any unsupported stage-1 sampler
+// with distinct game FVF UV streams/COUNT2 matrices when both are proven. Any unsupported stage-1 sampler
 // state fails closed to the original D3D9 Draw/input.
 constexpr bool stage1_dual_texture_compatible(
-    bool stage0, bool stage1, bool stage1Texture2D, bool sameUv,
-    bool sameTransform, bool nativeSamplerCompatible) noexcept {
+    bool stage0, bool stage1, bool stage1Texture2D, bool validUv,
+    bool validTransform, bool nativeSamplerCompatible) noexcept {
     return stage0 && stage1 && stage1Texture2D &&
-           sameUv && sameTransform && nativeSamplerCompatible;
+           validUv && validTransform && nativeSamplerCompatible;
 }
 // Match D3D9 sampler enums without requiring identical Stage0/Stage1 values.
 // The caller still rejects ADDRESSW mismatches and exact sampler query failure.
