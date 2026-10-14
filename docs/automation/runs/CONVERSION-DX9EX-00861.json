@@ -2,9 +2,9 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00861",
   "production_id": "CONVERSION-DX9EX-00861",
-  "event_id": "CONVERSION-DX9EX-00861-E003",
+  "event_id": "CONVERSION-DX9EX-00861-E004",
   "event_type": "retry",
-  "attempt": "2/3",
+  "attempt": "3/3",
   "run_key": "CONVERSION-DX9EX-00861",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
@@ -69,10 +69,10 @@
     "fix_evidence": "Material source commit 47750dd2896872569624e7a9f5dfe23bf09d8809 changes hooks_uiscaling.cpp and extends tools/verify_vr_stage_extension_d3dx_batch_owner.py mutation checks for direct old-batch ordering and mixed-batch fallback.",
     "negative_test_evidence": "Changed-area verifier rejects omitted direct preflush, ownership acquisition before flush, and forced homogeneous promotion; these are static mutation regressions, not a real D3D/Quest3 execution."
   },
-  "status": "VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No Quest3/VDXR/gameplay optical test was performed for this task; Windows CI alone cannot establish +TIME HUD stereo single image.",
   "changed_files": [
@@ -81,20 +81,63 @@
     "docs/automation/runs/CONVERSION-DX9EX-00861.json"
   ],
   "material_result_sha": "47750dd2896872569624e7a9f5dfe23bf09d8809",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "2bd349ab95c055af9f00876a9d3ddc72df64e554",
   "acceptance_results": {
-    "direct_batch_order": "SOURCE_PATCHED_MUTATION_CHECK_ADDED",
-    "mixed_batch_fallback": "SOURCE_PATCHED_MUTATION_CHECK_ADDED",
-    "queued_compatibility": "SOURCE_PRESERVED",
-    "integration": "PENDING_EXACT_SHA"
+    "direct_batch_order": "PASS_BUILD",
+    "mixed_batch_fallback": "PASS_BUILD",
+    "queued_compatibility": "PASS_BUILD",
+    "integration": "PASS_EXACT_SHA"
   },
   "ci_evidence": {
-    "previous_failed_run_id": 38628543145,
-    "previous_failed_head_sha": "47750dd2896872569624e7a9f5dfe23bf09d8809",
-    "failure_stage": "policy",
-    "failure_reason": "verify_vr_feature_unit_policy.py --check-head rejected missing docs/automation/runs/CONVERSION-DX9EX-00861.json; game/host/package skipped; no compilation failure established.",
-    "next_action": "Run exact-SHA mandatory Windows and affected gates on this record-bearing commit; do not claim CI PASS before success."
+    "status": "PASS_EXACT_SHA",
+    "material_sha": "47750dd2896872569624e7a9f5dfe23bf09d8809",
+    "exact_sha": "2bd349ab95c055af9f00876a9d3ddc72df64e554",
+    "failed_predecessors": [
+      {
+        "sha": "47750dd2896872569624e7a9f5dfe23bf09d8809",
+        "run_id": 38628543145,
+        "reason": "missing feature run JSON; no game/host/package attempted"
+      },
+      {
+        "sha": "864e08f005d159e53e707832cb0ff0b3705f55cb",
+        "run_id": 38628882784,
+        "reason": "static mutation false negative in direct batch outgoing producer proof; corrected"
+      }
+    ],
+    "exact_sha_workflows": {
+      "dx9ex_active": {
+        "run_id": 38629146802,
+        "conclusion": "success",
+        "policy": "SUCCESS",
+        "host": "SUCCESS",
+        "game": "SUCCESS",
+        "full_chain_compile": "SUCCESS",
+        "package": "SUCCESS"
+      },
+      "domain_isolation": {
+        "run_id": 38629146796,
+        "conclusion": "success"
+      }
+    },
+    "affected_material_sha_workflows": {
+      "full_source_impact": {
+        "run_id": 38628543162,
+        "conclusion": "success",
+        "sha": "47750dd2896872569624e7a9f5dfe23bf09d8809"
+      },
+      "hud_inspector": {
+        "run_id": 38628543228,
+        "conclusion": "success",
+        "sha": "47750dd2896872569624e7a9f5dfe23bf09d8809"
+      }
+    },
+    "runtime_caveat": "No real Quest3/VDXR gameplay visual test. Static/Windows CI is not optical evidence for single +TIME or stable stereo.",
+    "source_material_changes": [
+      "src/hooks_uiscaling.cpp",
+      "tools/verify_vr_stage_extension_d3dx_batch_owner.py"
+    ],
+    "duplicate_score_prevention_key": "CONVERSION-DX9EX-00861"
   },
-  "score_once": false,
-  "score_delta_this_retry": 0
+  "score_once": true,
+  "score_delta_this_retry": 1
 }
