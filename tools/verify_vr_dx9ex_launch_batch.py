@@ -20,7 +20,7 @@ def check(c,p,g,w):
               'runtimeValidation=UNTESTED','exit 5',
               'gameExitCode=$gameExitCode',"'GAME_NONZERO_EXIT'",
               'if($gameExitCode -ne 0){','exit 7',
-              'Copy-Item -LiteralPath (Join-Path $root 'OUTRUNVR_LAUNCH_ERROR.txt') -Destination (Join-Path $sessionRoot 'OUTRUNVR_LAUNCH_ERROR.txt') -Force' ):
+              "Copy-Item -LiteralPath (Join-Path $root 'OUTRUNVR_LAUNCH_ERROR.txt') -Destination (Join-Path $sessionRoot 'OUTRUNVR_LAUNCH_ERROR.txt') -Force"):
         assert s in p, 'OpenXR host check missing: '+s
     start=g.split('function Start-Slot(',1)[1].split('$form=New-Object',1)[0]
     assert '-WindowStyle Hidden' not in start, 'hidden child masks launch errors'
