@@ -57,7 +57,7 @@ namespace Settings
 		"Fixes certain stage objects disappearing before they reach edge of screen, when playing at non-4:3 aspect ratio." };
 	Setting<bool> DisableVehicleLODs{ "Graphics", "DisableVehicleLODs", true,
 		"Disables LODs on vehicles, reducing the ugly pop-in they have." };
-	Setting<bool> DisableStageCulling{ "Graphics", "DisableStageCulling", false,
+	Setting<bool> DisableStageCulling{ "Graphics", "DisableStageCulling", true,
 		"Disables culling of certain stage objects, so most distant objects won't obviously pop in to view." };
 	Setting<bool> FixZBufferPrecision{ "Graphics", "FixZBufferPrecision", true,
 		"Fixes Z-Buffer precision issues, greatly reducing z-fighting and distant object drawing issues "
@@ -1359,9 +1359,9 @@ public:
 	{
 		// Patch "if (CheckCulling(...))" -> no-op
 		static TogglePatch patch(Module::exe_ptr(CalcCulling_PatchAddr), { 0x90, 0x90 });
-		// Retain original stage visibility pruning for stereo VR.
-		patch.set(Settings::DisableStageCulling.get() &&
-			!Settings::VREnabled.get());
+		// The original 4:3 stage visibility test may cull buildings and lamps
+		// across wide stereo FOV and head motion. Honour this setting in VR.
+		patch.set(Settings::DisableStageCulling.get());
 		return true;
 	}
 

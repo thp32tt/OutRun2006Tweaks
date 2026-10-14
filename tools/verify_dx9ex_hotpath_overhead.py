@@ -43,3 +43,25 @@ assert "R30SkyGlowSceneCaptureEpoch = frame.presentEpoch;" in capture
 assert "R30SkyGlowSceneCaptureEpoch = 0;" in r30
 assert "GetVertexShaderConstantF(" in r30  # Unsafe raw-WVP shortcut deliberately NOT installed.
 print("DX9Ex hotpath source guard PASS (runtime/Quest3 untested)")
+
+# User-observed building/lamp flicker regression gates: fail closed until HMD A/B.
+r33 = (ROOT / "src/vr/d3d9/stereo_renderer_r33.cpp").read_text(encoding="utf-8")
+assert 'Setting<bool> DisableStageCulling{ "Graphics", "DisableStageCulling", true,' in graphics
+culling = graphics.split("class DisableStageCulling : public Hook", 1)[1].split("class DisableVehicleLODs", 1)[0]
+assert "patch.set(Settings::DisableStageCulling.get());" in culling
+assert "!Settings::VREnabled.get()" not in culling
+fast = r33.split("R32ReviewOwnedResult R33TryFastWorld(", 1)[1].split("R32ReviewEnsureStereoResources", 1)[0]
+assert "if (fragile)\n            {\n                if (R33TelemetryEnabled())\n                    R32ReviewNoteDispatchFragile();\n                return {};\n            }" in fast
+screen = r30.split("R30ScreenSpaceKind R30ClassifyScreenSpacePass(", 1)[1].split("struct R30EyeAffineCache", 1)[0]
+assert "!OutRunVR::GameSemantic::QueueRenderActive()" in screen
+assert "scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard" in screen
+assert "OutRunVR::GameSemantic::CorroboratesWorld(scope)" not in screen
+assert "MultiplyMatrix(worldView, LatchedHeadInverse), projection);" in renderer
+assert "cachedHeadProjection" not in renderer
+assert "GetVertexShaderConstantF(" in r30
+assert "device->SetRenderState(D3DRS_ALPHAREF, alphaRef);" in graphics
+# Mutation of the protected if-condition cannot satisfy this source contract.
+assert "patch.set(Settings::DisableStageCulling.get());" not in culling.replace(
+    "patch.set(Settings::DisableStageCulling.get());",
+    "patch.set(Settings::DisableStageCulling.get() && !Settings::VREnabled.get());")
+print("DX9Ex flicker fail-closed source guard PASS; HMD UNTESTED")
