@@ -51,8 +51,8 @@ assert all(x in header for x in ("kStage1Modulate2X", "kStage1Modulate4X",
     "kStage1AddSmooth", "stage1_operand_supported(arg1)",
     "stage1_operand_supported(arg2)"))
 assert all(x in shader for x in (
-    "stage1Ops.x", "stage1Ops.y == 1", "Stage1Source(stage0, diffuse, stage1Args.x)",
-    "Stage1Source(stage0, diffuse, stage1Args.w)", "AlphaGate(result.a);",
+    "stage1Ops.x", "stage1Ops.y == 1", "Stage1Source(stage0, diffuse, specular, stage1Args.x)",
+    "Stage1Source(stage0, diffuse, specular, stage1Args.w)", "AlphaGate(result.a);",
     "float4 PSStage1Diffuse", "float4 PSStage1Modulate",
     "float4 PSStage1TextureOnly", "float4 PSStage1Add",
     "return saturate(a - b);", "return saturate(a + b * (1.0f - a));"))
