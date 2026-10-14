@@ -2,19 +2,19 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00833",
   "production_id": "CONVERSION-DX9EX-00833",
-  "event_id": "CONVERSION-DX9EX-00833-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX9EX-00833-E006",
+  "event_type": "result",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
   "feature_id": "DX9EX:RESET:HOST_R32_ASYNC_ACK_CONTEXT_EPOCH",
   "feature_class": "CRITICAL_BLOCKER",
   "work_key": "DX9EX:RESET:HOST_R32_ASYNC_ACK_CONTEXT_EPOCH",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "phase": "C2_IMPLEMENT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "feature_contract": {
     "feature_id": "DX9EX:RESET:HOST_R32_ASYNC_ACK_CONTEXT_EPOCH",
     "goal": "Prevent R32 host final asynchronous DirectGPU consumption ACK queries and published slot acknowledgments from surviving a D3D11 device or immediate-context replacement within one OpenXR session, while retaining ordinary zero-wait presentation.",
@@ -52,9 +52,9 @@
     ]
   },
   "acceptance_results": {
-    "CONTEXT_REBIND_CLEARS_OLD_ACK": "PENDING_CI",
-    "NULL_STABLE_AND_FALLBACK_SAFE": "PENDING_CI",
-    "EXACT_SHA_WIN32_GATES": "PENDING"
+    "CONTEXT_REBIND_CLEARS_OLD_ACK": "PASS_EXACT_SHA",
+    "NULL_STABLE_AND_FALLBACK_SAFE": "PASS_EXACT_SHA",
+    "EXACT_SHA_WIN32_GATES": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "R32 direct-submit Pending per-slot D3D11Query and AckedFrame cache were reset by DestroySession only; neither EndFrame polling nor same-frame ArmConsumptionFence guarded current host D3D11 device/context epoch.",
@@ -72,9 +72,9 @@
     "negative_test_evidence": "New native C++ epoch-policy smoke covers device-only, context-only, pair changes, null, stable and rebind behavior."
   },
   "base_sha": "d5ded11781dea1597dcf9af0567fac40270fa7ab",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "material_result_sha": "c7a7a96d971e3b9a5b72c7ee8f739ff93e8f0918",
+  "validation_bearing_result_sha": "c7a7a96d971e3b9a5b72c7ee8f739ff93e8f0918",
+  "result_sha": "c7a7a96d971e3b9a5b72c7ee8f739ff93e8f0918",
   "changed_files": [
     "vrhost/src/runtime/direct_ack_device_epoch.hpp",
     "vrhost/src/runtime/r32_direct_submit.hpp",
@@ -83,5 +83,31 @@
     ".github/workflows/vr-dx9ex-active.yml",
     "docs/automation/runs/CONVERSION-DX9EX-00833.json"
   ],
-  "runtime_note": "RUNTIME_VALIDATION=UNTESTED: no Quest3/VDXR gameplay or host D3D11 runtime swap hardware validation. Static/pure C++ and Win32 compile cannot prove HMD correctness."
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED: no Quest3/VDXR gameplay or host D3D11 runtime swap hardware validation. Static/pure C++ and Win32 compile cannot prove HMD correctness.",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "c7a7a96d971e3b9a5b72c7ee8f739ff93e8f0918",
+    "dx9ex_active": {
+      "run_id": 38535002635,
+      "conclusion": "success",
+      "passed_jobs": 5,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38535002635"
+    },
+    "domain_isolation": {
+      "run_id": 38535002620,
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38535002620"
+    },
+    "full_source_impact": {
+      "run_id": 38535002594,
+      "conclusion": "success",
+      "passed_jobs": 3,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38535002594"
+    },
+    "local_cpp20_smoke": {
+      "conclusion": "pass",
+      "scope": "Independent reconstructed pure epoch helper check using local g++; exact-source Win32 host smoke also passed in DX9Ex Active."
+    }
+  },
+  "complete_build_verified_at_kst": "2026-10-14T17:34:25+09:00",
+  "next_action": "Quest3/VDXR game/runtime check when user tests matching deployed build; continue independent future new feature work without reusing 00833 TASK_ID."
 }
