@@ -1,17 +1,17 @@
 {
   "task_id": "CONVERSION-DX9EX-00831",
   "production_id": "CONVERSION-DX9EX-00831",
-  "event_id": "CONVERSION-DX9EX-00831-E001",
-  "event_type": "material_implementation",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00831-E002",
+  "event_type": "ci_repair",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:PERF:R30_INDEXED_UP_LOCAL_WINDOW",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R30_INDEXED_UP_LOCAL_WINDOW",
-  "status": "IMPLEMENTED_PENDING_CI",
+  "status": "REPAIRED_PENDING_CI",
   "phase": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PENDING_RETRY_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_delta": 0,
   "feature_contract": {
@@ -58,6 +58,7 @@
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "tools/verify_vr_r30_index_rebase_fastpath.py",
+    "tools/verify_vr_r30_sparse_population_fastpath.py",
     "docs/automation/runs/CONVERSION-DX9EX-00831.json"
   ],
   "diagnosis": {
@@ -77,5 +78,13 @@
   "material_result_sha": null,
   "result_sha": null,
   "validation_bearing_result_sha": null,
-  "next_action": "Run exact-SHA DX9Ex Active, Domain Isolation and Full Source Impact; repair only under 00831 if a genuine verifier/build failure appears, then C6 and score once."
+  "next_action": "Run exact-SHA DX9Ex Active, Domain Isolation and Full Source Impact on the verifier-repaired result; repair only same 00831 if it exposes a genuine failure. HMD remains UNTESTED.",
+  "failure_recovery": {
+    "failed_run_id": 38531382587,
+    "failed_sha": "5690753e0d136553fb07972e1ee6bb795f119c61",
+    "failed_job": "policy",
+    "root_cause": "Existing verify_vr_r30_sparse_population_fastpath.py still required the pre-00831 absolute UP used-mask/touched semantics (raw index and raw>=vertexCount), so it rejected the intentional local-window rebase before any host/game/package build.",
+    "repair": "Update only the stale verifier to require declaredEnd validation plus local=raw-minVertexIndex mask/touched semantics; no renderer source change.",
+    "no_duplicate_score_on_retry": true
+  }
 }
