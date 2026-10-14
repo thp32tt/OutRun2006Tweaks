@@ -12,11 +12,13 @@ def integrated(src):
     producer = src.split("bool supported_game_state(", 1)[1].split("bool translate_vertices(", 1)[0]
     consumer = src.split("bool submit(", 1)[1].split("bool observe_source_device(", 1)[0]
     shader = src.split('constexpr char kStage1FactorShader[] = R"(', 1)[1].split(')";', 1)[0]
+    # Ordinary combiner + BLENDTEXTUREALPHA + premultiplied PM each read
+    # the active RGB and ALPHA sources. Keep destructive checks for all.
     return all((
         "if ((source & 15) == 0) value = diffuse;" in shader,
         "float4 Stage1AndAlpha(float4 stage0, float4 diffuse, float4 specular," in shader,
         all(shader.count(
-            "Stage1Source(stage0, diffuse, specular, stage1Args." + ch + ")") == 2
+            "Stage1Source(stage0, diffuse, specular, stage1Args." + ch + ")") == 3
             for ch in "xyzw"),
         all("return Stage1AndAlpha(" in shader and
             "v.diffuse, v.specular," in line for line in shader.splitlines()
