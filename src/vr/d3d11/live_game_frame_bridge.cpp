@@ -183,13 +183,16 @@ constexpr bool game_native_inset_viewport(
     std::uint32_t x, std::uint32_t y,
     std::uint32_t width, std::uint32_t height,
     std::uint32_t sourceWidth, std::uint32_t sourceHeight,
-    GameNativeInsetRect& result) noexcept {
+    GameNativeInsetRect& result,
+    std::uint32_t destinationWidth = kWidth,
+    std::uint32_t destinationHeight = kHeight) noexcept {
     if (!width || !height || !sourceWidth || !sourceHeight ||
+        !destinationWidth || !destinationHeight ||
         static_cast<std::uint64_t>(x) + width > sourceWidth ||
         static_cast<std::uint64_t>(y) + height > sourceHeight)
         return false;
-    const double dx = static_cast<double>(kWidth) / sourceWidth;
-    const double dy = static_cast<double>(kHeight) / sourceHeight;
+    const double dx = static_cast<double>(destinationWidth) / sourceWidth;
+    const double dy = static_cast<double>(destinationHeight) / sourceHeight;
     const GameNativeInsetRect mapped{
         static_cast<float>(x * dx),
         static_cast<float>(y * dy),
@@ -200,7 +203,7 @@ constexpr bool game_native_inset_viewport(
         mapped.right - mapped.left < 1.0f ||
         mapped.bottom - mapped.top < 1.0f ||
         mapped.left < 0.0f || mapped.top < 0.0f ||
-        mapped.right > kWidth || mapped.bottom > kHeight)
+        mapped.right > destinationWidth || mapped.bottom > destinationHeight)
         return false;
     result = mapped;
     return true;
@@ -982,6 +985,7 @@ struct OutputCapture {
     bool scissor = false;
     D3D11_RECT nativeScissor{};
     D3D11_VIEWPORT nativeViewport{}; // Original game backbuffer-relative raster region.
+    UINT nativeWidth = kWidth, nativeHeight = kHeight;
     // Only source RGB-visible masks are eligible for the diagnostic inset.
     std::uint8_t colorWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 };
@@ -990,6 +994,7 @@ struct ReadbackSlot {
     ComPtr<ID3D11Texture2D> staging;
     ComPtr<ID3D11Query> fence;
     bool busy = false;
+    bool completeFullFrame = false;
     GameReadbackProvenance provenance{};
 };
 struct State {
@@ -1000,6 +1005,7 @@ struct State {
     GameOutputSignature previousOutput{};
     std::uint64_t outputGeneration = 0u;
     NativeBackend backend;
+    UINT nativeWidth = 0u, nativeHeight = 0u;
     // Diagnostic-only depth is never shared with the original D3D9 renderer.
     ComPtr<ID3D11Texture2D> diagnosticDepth;
     ComPtr<ID3D11DepthStencilView> diagnosticDepthView;
@@ -1181,6 +1187,12 @@ bool env_opt_in() noexcept {
         && value[0] == L'1';
 }
 
+bool env_full_game_opt_in() noexcept {
+    wchar_t value[8]{};
+    return env_opt_in() &&
+        GetEnvironmentVariableW(L"OUTRUN_DX11_FULL_GAME_FRAME", value, 8) == 1 &&
+        value[0] == L'1';
+}
 bool env_batch_opt_in() noexcept {
     wchar_t value[8]{};
     // Requires primary diagnostic opt-in in the outer capture path.
@@ -1413,10 +1425,13 @@ bool compile(const char* entry, const char* profile, ComPtr<ID3DBlob>& blob) noe
         0, blob.GetAddressOf(), errors.GetAddressOf())) && blob;
 }
 
-bool ensure_pipeline(State& s) noexcept {
+bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
+    if (!width || !height || width > 4096u || height > 4096u ||
+        static_cast<std::uint64_t>(width) * height > 8388608u) return false;
     const bool readbackReady = std::all_of(s.readbacks.begin(), s.readbacks.end(),
         [](const ReadbackSlot& item) { return item.staging && item.fence; });
-    if (s.backend.ready() && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.selectDiffuseTextureAlphaPs && s.selectDiffuseModulateAlphaPs && s.selectDiffuseAddAlphaPs && s.selectDiffuseSubtractAlphaPs && s.selectDiffuseModulate2XAlphaPs && s.selectDiffuseModulate4XAlphaPs && s.additivePs && s.subtractPs &&
+    if (s.backend.ready() && s.nativeWidth == width &&
+        s.nativeHeight == height && s.vs && s.ps && s.sampledPs && s.textureOnlyPs && s.selectDiffuseTextureAlphaPs && s.selectDiffuseModulateAlphaPs && s.selectDiffuseAddAlphaPs && s.selectDiffuseSubtractAlphaPs && s.selectDiffuseModulate2XAlphaPs && s.selectDiffuseModulate4XAlphaPs && s.additivePs && s.subtractPs &&
         s.stage1DiffusePs && s.stage1ModulatePs &&
         s.stage1TextureOnlyPs && s.stage1AddPs && s.selectTextureAddSmoothAlphaPs && s.selectDiffuseAddSmoothAlphaPs && s.selectTextureFactorAlphaPs && s.selectTextureTfactorAlphaPs && s.selectDiffuseFactorAlphaPs && s.selectDiffuseTfactorAlphaPs && s.selectTextureBlendTextureAlphaPs && s.selectDiffuseBlendTextureAlphaPs && s.selectTextureBlendDiffuseAlphaPs && s.selectDiffuseBlendDiffuseAlphaPs && s.selectTextureModulate2XAlphaPs && s.selectTextureModulate4XAlphaPs && s.selectTextureDiffuseAlphaPs && s.selectTextureModulateAlphaPs && s.selectTextureAddAlphaPs && s.selectTextureSubtractAlphaPs &&
         s.subtractTextureAlphaPs && s.subtractDiffuseAlphaPs && s.subtractModulateAlphaPs && s.addSmoothPs && s.modulate2xPs && s.modulate4xPs &&
@@ -1454,6 +1469,7 @@ bool ensure_pipeline(State& s) noexcept {
     for (auto& depthState : s.diagnosticDepthEqualityStates) depthState.Reset();
     for (auto& depthState : s.diagnosticDepthOrderingStates) depthState.Reset();
     s.backend.shutdown();
+    s.nativeWidth = s.nativeHeight = 0u;
     s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset();
     s.stage1DiffusePs.Reset(); s.stage1ModulatePs.Reset();
     s.stage1TextureOnlyPs.Reset(); s.stage1AddPs.Reset(); s.textureOnlyPs.Reset(); s.selectTextureDiffuseAlphaPs.Reset(); s.selectTextureModulateAlphaPs.Reset(); s.selectTextureModulate2XAlphaPs.Reset(); s.selectTextureModulate4XAlphaPs.Reset(); s.selectTextureAddAlphaPs.Reset(); s.selectTextureSubtractAlphaPs.Reset(); s.selectDiffuseTextureAlphaPs.Reset(); s.selectDiffuseModulateAlphaPs.Reset(); s.selectDiffuseAddAlphaPs.Reset(); s.selectDiffuseSubtractAlphaPs.Reset(); s.selectDiffuseModulate2XAlphaPs.Reset(); s.selectDiffuseModulate4XAlphaPs.Reset(); s.selectTextureAddSmoothAlphaPs.Reset(); s.selectDiffuseAddSmoothAlphaPs.Reset(); s.selectTextureFactorAlphaPs.Reset(); s.selectTextureTfactorAlphaPs.Reset(); s.selectDiffuseFactorAlphaPs.Reset(); s.selectDiffuseTfactorAlphaPs.Reset(); s.selectTextureBlendTextureAlphaPs.Reset(); s.selectDiffuseBlendTextureAlphaPs.Reset(); s.selectTextureBlendDiffuseAlphaPs.Reset(); s.selectDiffuseBlendDiffuseAlphaPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset();
@@ -1489,10 +1505,11 @@ bool ensure_pipeline(State& s) noexcept {
     for (auto& masked : s.subtractiveMaskedBlends) masked.Reset();
     for (auto& masked : s.extremumMaskedBlends) masked.Reset();
     NativeBackendConfig cfg{};
-    cfg.width = kWidth;
-    cfg.height = kHeight;
+    cfg.width = width;
+    cfg.height = height;
     cfg.color_format = DXGI_FORMAT_B8G8R8A8_UNORM;
     if (!s.backend.initialize(cfg)) return false;
+    s.nativeWidth = width; s.nativeHeight = height;
     auto* dev = s.backend.device();
     ComPtr<ID3DBlob> vcode, pcode, sampledCode, textureOnlyCode, additiveCode, subtractCode, addSmoothCode, modulate2xCode, modulate4xCode, modulate2xTextureCode, modulate2xDiffuseCode, modulate4xTextureCode, modulate4xDiffuseCode, subtractTextureCode, subtractDiffuseCode, subtractModulateCode, mixedTextureCode, mixedDiffuseCode, mixedAddTextureCode, mixedAddDiffuseCode, blendTextureCode, blendTexturePmCode, blendTexturePmTextureAlphaCode, blendTexturePmInverseTextureAlphaCode, blendTexturePmInverseDiffuseAlphaCode, blendTexturePmDiffuseAlphaCode, blendTexturePmModulateAlphaCode, blendTexturePmFactorAlphaCode, blendDiffuseCode, blendTexturePmAddAlphaCode, blendTexturePmSubtractAlphaCode, blendTexturePmModulate2XAlphaCode, blendTexturePmModulate4XAlphaCode, blendTexturePmAddSignedAlphaCode, blendTexturePmAddSigned2XAlphaCode, blendTexturePmBlendTextureAlphaCode, blendTexturePmBlendDiffuseAlphaCode, blendTexturePmBlendCurrentFactorAlphaCode, blendTexturePmBlendFactorAlphaCode, blendTexturePmAddSmoothAlphaCode, blendTextureSelectedTextureAlphaCode, blendTextureSelectedDiffuseAlphaCode, blendDiffuseSelectedTextureAlphaCode, blendDiffuseSelectedDiffuseAlphaCode, blendTextureModulate2XCode, blendTextureModulate4XCode, blendDiffuseModulate2XCode, blendDiffuseModulate4XCode, blendTextureModulateCode, blendDiffuseModulateCode, blendTextureAddCode, blendDiffuseAddCode, blendTextureSubtractCode, blendDiffuseSubtractCode, blendTextureAddSmoothCode, blendDiffuseAddSmoothCode, blendFactorCode, blendFactorTextureCode, blendFactorModulateCode, blendFactorDiffuseCode, blendFactorAddCode, blendFactorSubtractCode, blendFactorAddSmoothCode, blendFactorModulate2XCode, blendFactorModulate4XCode, smoothTextureCode, smoothDiffuseCode, selectDiffuseTextureCode, selectDiffuseModulateCode, selectTextureDiffuseCode, selectTextureModulateCode, selectTextureModulate2XCode, selectTextureModulate4XCode, selectTextureAddCode, selectTextureSubtractCode, selectDiffuseAddCode, selectDiffuseSubtractCode, selectDiffuseModulate2XCode, selectDiffuseModulate4XCode, selectTextureAddSmoothCode, selectDiffuseAddSmoothCode, selectTextureFactorCode, selectDiffuseFactorCode, selectTextureBlendTextureCode, selectDiffuseBlendTextureCode; ComPtr<ID3DBlob> selectTextureBlendDiffuseCode, selectDiffuseBlendDiffuseCode, selectTextureTfactorCode, selectDiffuseTfactorCode;
     ComPtr<ID3DBlob> stage1DiffuseCode, stage1ModulateCode;
@@ -2012,7 +2029,9 @@ bool game_native_backbuffer_ready(IDirect3DDevice9* game,
         targetDesc.MultiSampleType == D3DMULTISAMPLE_NONE &&
             bbDesc.MultiSampleType == D3DMULTISAMPLE_NONE
     };
-    return admission.accepts(kWidth, kHeight, 8u);
+    return env_full_game_opt_in()
+        ? admission.accepts(bbDesc.Width, bbDesc.Height, 0u)
+        : admission.accepts(kWidth, kHeight, 8u);
 }
 
 // Read the current game device, not a WARP fixture's manufactured state.
@@ -2035,9 +2054,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         !sourceTarget || FAILED(sourceTarget->GetDesc(&sourceDesc)))
         return false;
     GameNativeInsetRect nativeRect{};
+    const bool fullFrame = env_full_game_opt_in();
+    output.nativeWidth = fullFrame ? sourceDesc.Width : kWidth;
+    output.nativeHeight = fullFrame ? sourceDesc.Height : kHeight;
     if (!game_native_inset_viewport(
             viewport.X, viewport.Y, viewport.Width, viewport.Height,
-            sourceDesc.Width, sourceDesc.Height, nativeRect))
+            sourceDesc.Width, sourceDesc.Height, nativeRect,
+            output.nativeWidth, output.nativeHeight))
         return false;
     output.nativeViewport = {
         nativeRect.left, nativeRect.top,
@@ -2190,13 +2213,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         // rectangle would draw pixels the original source scissor excluded.
         // This is conservative pixel sampling, not D3D9 screen parity proof.
         const LONG nativeLeft = static_cast<LONG>(std::ceil(
-            static_cast<double>(left) * kWidth / sourceDesc.Width));
+            static_cast<double>(left) * output.nativeWidth / sourceDesc.Width));
         const LONG nativeTop = static_cast<LONG>(std::ceil(
-            static_cast<double>(top) * kHeight / sourceDesc.Height));
+            static_cast<double>(top) * output.nativeHeight / sourceDesc.Height));
         const LONG nativeRight = static_cast<LONG>(std::floor(
-            static_cast<double>(right) * kWidth / sourceDesc.Width));
+            static_cast<double>(right) * output.nativeWidth / sourceDesc.Width));
         const LONG nativeBottom = static_cast<LONG>(std::floor(
-            static_cast<double>(bottom) * kHeight / sourceDesc.Height));
+            static_cast<double>(bottom) * output.nativeHeight / sourceDesc.Height));
         if (nativeRight <= nativeLeft || nativeBottom <= nativeTop)
             return false;
         output.scissor = true;
@@ -3892,7 +3915,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             const std::uint32_t* indices, UINT indexCount,
             D3DPRIMITIVETYPE topology, const TextureCapture& capture,
             const OutputCapture& output) noexcept {
-    if (!ensure_pipeline(s)) return false;
+    if (!ensure_pipeline(s, output.nativeWidth, output.nativeHeight)) return false;
     auto* dev = s.backend.device();
     auto* ctx = s.backend.context();
     if (!dev || !ctx) return false;
@@ -4266,8 +4289,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     if (output.nativeDepthTest) {
         if (!s.diagnosticDepthView) {
             D3D11_TEXTURE2D_DESC depthDesc{};
-            depthDesc.Width = kWidth;
-            depthDesc.Height = kHeight;
+            depthDesc.Width = s.nativeWidth;
+            depthDesc.Height = s.nativeHeight;
             depthDesc.MipLevels = 1;
             depthDesc.ArraySize = 1;
             depthDesc.Format = DXGI_FORMAT_D32_FLOAT;
@@ -4440,8 +4463,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     ctx->IASetVertexBuffers(0, 1, &boundVB, &stride, &offset);
     if (ib) ctx->IASetIndexBuffer(ib.Get(), DXGI_FORMAT_R32_UINT, 0);
-    const D3D11_RECT fullScissor{0, 0, static_cast<LONG>(kWidth),
-                                  static_cast<LONG>(kHeight)};
+    const D3D11_RECT fullScissor{0, 0, static_cast<LONG>(s.nativeWidth),
+                                  static_cast<LONG>(s.nativeHeight)};
     // NativeBackend::begin_frame installs a full-inset viewport. Restore
     // the captured game viewport for EACH draw, including indexed draws,
     // so the diagnostic frame keeps original menu/race layout coordinates.
@@ -4603,14 +4626,15 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             return;
         }
         const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;
-        const bool multiBatch = env_batch_opt_in();
+        const bool fullMode = env_full_game_opt_in();
+        const bool multiBatch = fullMode || env_batch_opt_in();
         UINT expectedElements = 0;
         if (!game_native_primitive_element_count(
                 static_cast<std::uint32_t>(type), primitives, expectedElements)) {
             // The hook saw a real game source call even when native topology
             // translation is impossible. It must break an active scene batch.
-            if (multiBatch && s.frameBatch.submitted > 0u &&
-                s.frameBatch.submitted < GameNativeFrameBatch::kMaxDraws)
+            if (fullMode || (multiBatch && s.frameBatch.submitted > 0u &&
+                s.frameBatch.submitted < GameNativeFrameBatch::kMaxDraws))
                 s.frameBatch.abort();
             return;
         }
@@ -4633,11 +4657,20 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         // probe rather than sampling its same first triangle indefinitely.
         // Never let an overflowing draw ordinal wrap to zero and spoof a
         // previously sampled Draw; original D3D9 input/Draw still execute.
-        if (s.eligibleThisFrame == (std::numeric_limits<UINT>::max)()) return;
+        if (s.eligibleThisFrame == (std::numeric_limits<UINT>::max)()) {
+            if (fullMode) s.frameBatch.abort();
+            return;
+        }
         const UINT candidateOrdinal = s.eligibleThisFrame++;
         ++s.eligible;
-        if (!s.frameBatch.accepts(candidateOrdinal, s.probeSlot,
-                                  env_batch_opt_in())) return;
+        const bool admitted = fullMode
+            ? s.frameBatch.accepts_full(sourceOrdinal)
+            : s.frameBatch.accepts(candidateOrdinal, s.probeSlot,
+                                  env_batch_opt_in());
+        if (!admitted) {
+            if (fullMode) s.frameBatch.abort();
+            return;
+        }
         if (!s.frameBatch.accepts_source_draw(sourceOrdinal, multiBatch)) {
             s.frameBatch.abort();
             return;
@@ -4776,8 +4809,9 @@ void observe_unavailable_game_draw(IDirect3DDevice9* game) noexcept {
         }
         ++s.sourceDrawsThisFrame;
         ++s.observed;
-        if (env_batch_opt_in() && s.frameBatch.submitted > 0u &&
-            s.frameBatch.submitted < GameNativeFrameBatch::kMaxDraws)
+        if (env_full_game_opt_in() ||
+            (env_batch_opt_in() && s.frameBatch.submitted > 0u &&
+             s.frameBatch.submitted < GameNativeFrameBatch::kMaxDraws))
             s.frameBatch.abort();
     } catch (...) {
         // Diagnostics cannot change the game's render or gamepad behavior.
@@ -4845,10 +4879,17 @@ void before_game_present(IDirect3DDevice9* game,
         const auto& bb = presentDesc;
         // Place the inset inside the actual Present source, rather than always
         // at the backbuffer's top-right (which cropped menus may not show).
-        // Dirty/invalid/small crops still preserve the original D3D9 Present.
+        // Only a full-size native frame can cover a full D3D9 Present.
+        const bool fullMode = env_full_game_opt_in();
+        const UINT surfaceWidth = fullMode ? s.nativeWidth : kWidth;
+        const UINT surfaceHeight = fullMode ? s.nativeHeight : kHeight;
+        const bool nativeExtentMatches = !fullMode ||
+            (surfaceWidth == bb.Width && surfaceHeight == bb.Height &&
+             presentRegion.left == 0 && presentRegion.top == 0 &&
+             presentRegion.right == bb.Width && presentRegion.bottom == bb.Height);
         const auto insetPlacement = presentRegion.inset_placement(
-            bb.Width, bb.Height, kWidth, kHeight, 8u);
-        const bool outputWritable = outputNow.valid() &&
+            bb.Width, bb.Height, surfaceWidth, surfaceHeight, fullMode ? 0u : 8u);
+        const bool outputWritable = outputNow.valid() && nativeExtentMatches &&
             !outputNow.hasDirtyRegion && insetPlacement.valid &&
             bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
             (bb.Format == D3DFMT_A8R8G8B8 ||
@@ -4862,6 +4903,7 @@ void before_game_present(IDirect3DDevice9* game,
                     oldest.fence.Get(), nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
                 if (ready == S_OK && (!oldest.provenance.may_overlay(s.presents) ||
                                      !oldest.provenance.same_device(presentDevice) ||
+                                      oldest.completeFullFrame != fullMode ||
                                      !oldest.provenance.same_output(s.outputGeneration) ||
                                      !outputWritable ||
                                      s.sourceGameDevice != presentDevice)) {
@@ -4876,10 +4918,10 @@ void before_game_present(IDirect3DDevice9* game,
                         D3D11_MAP_READ, D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped);
                     if (SUCCEEDED(mapStatus)) {
                         UINT changedPixels = 0;
-                        for (UINT y = 0; y < kHeight; ++y) {
+                        for (UINT y = 0; y < surfaceHeight; ++y) {
                             const auto* row = static_cast<const std::uint8_t*>(mapped.pData) +
                                 static_cast<std::size_t>(y) * mapped.RowPitch;
-                            for (UINT x = 0; x < kWidth; ++x) {
+                            for (UINT x = 0; x < surfaceWidth; ++x) {
                                 const auto* p = row + 4 * x;
                                 if (std::abs(int(p[0])-20) > 3 ||
                                     std::abs(int(p[1])-9) > 3 ||
@@ -4896,7 +4938,7 @@ void before_game_present(IDirect3DDevice9* game,
                                     s.insetFormat = D3DFMT_UNKNOWN;
                                     s.insetSurfaceDevice = 0u;
                                     if (SUCCEEDED(game->CreateOffscreenPlainSurface(
-                                            kWidth, kHeight, bb.Format, D3DPOOL_SYSTEMMEM,
+                                            surfaceWidth, surfaceHeight, bb.Format, D3DPOOL_SYSTEMMEM,
                                             s.insetSurface.GetAddressOf(), nullptr))) {
                                         s.insetFormat = bb.Format;
                                         s.insetSurfaceDevice = presentDevice;
@@ -4906,13 +4948,13 @@ void before_game_present(IDirect3DDevice9* game,
                                 if (s.insetSurface && s.insetFormat == bb.Format &&
                                     s.insetSurfaceDevice == presentDevice &&
                                     SUCCEEDED(s.insetSurface->LockRect(&lockRect, nullptr, 0))) {
-                                    for (UINT y = 0; y < kHeight; ++y)
+                                    for (UINT y = 0; y < surfaceHeight; ++y)
                                         std::memcpy(
                                             static_cast<std::uint8_t*>(lockRect.pBits) +
                                                 static_cast<std::size_t>(y)*lockRect.Pitch,
                                             static_cast<const std::uint8_t*>(mapped.pData) +
                                                 static_cast<std::size_t>(y)*mapped.RowPitch,
-                                            kWidth*4);
+                                            static_cast<std::size_t>(surfaceWidth)*4u);
                                     s.insetSurface->UnlockRect();
                                     POINT destination{
                                         static_cast<LONG>(insetPlacement.left),
@@ -4922,7 +4964,7 @@ void before_game_present(IDirect3DDevice9* game,
                                         ++s.visible;
                                         if (!s.logged) {
                                             spdlog::info("DX11 FIRST_GAME_DRAW_FRAME async game-origin FVF native Draw: {} changed pixels, {}x{} desktop inset; original D3D9 draw/input untouched; Quest3 UNTESTED",
-                                                changedPixels, kWidth, kHeight);
+                                                changedPixels, surfaceWidth, surfaceHeight);
                                             s.logged = true;
                                         }
                                     } else ++s.failed;
@@ -4946,12 +4988,16 @@ void before_game_present(IDirect3DDevice9* game,
             // Never publish partial GPU compositing from a source draw gap,
             // a failed vertex/index translation or a failed D3D11 submit.
             // Previously s.pending survived abort() and copied corrupt insets.
-            if (s.frameBatch.publishable(s.pending) && outputWritable &&
+            const bool complete = fullMode
+                ? s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)
+                : s.frameBatch.publishable(s.pending);
+            if (complete && outputWritable &&
                 s.sourceGameDevice == presentDevice) {
                 auto& next = s.readbacks[s.writeSlot];
                 if (!next.busy) {
                     ctx->CopyResource(next.staging.Get(), s.backend.color_texture());
                     next.provenance = {s.presents, s.sourceDrawsThisFrame};
+                    next.completeFullFrame = fullMode;
                     next.provenance.sourceDevice = presentDevice;
                     next.provenance.outputGeneration = s.outputGeneration;
                     ctx->End(next.fence.Get());
@@ -5055,5 +5101,6 @@ void before_game_reset() noexcept {
     s.textureOnlyPs.Reset(); s.selectTextureDiffuseAlphaPs.Reset(); s.selectTextureModulateAlphaPs.Reset(); s.selectTextureModulate2XAlphaPs.Reset(); s.selectTextureModulate4XAlphaPs.Reset(); s.selectTextureAddAlphaPs.Reset(); s.selectTextureSubtractAlphaPs.Reset(); s.selectDiffuseTextureAlphaPs.Reset(); s.selectDiffuseModulateAlphaPs.Reset(); s.selectDiffuseAddAlphaPs.Reset(); s.selectDiffuseSubtractAlphaPs.Reset(); s.selectDiffuseModulate2XAlphaPs.Reset(); s.selectDiffuseModulate4XAlphaPs.Reset(); s.selectTextureAddSmoothAlphaPs.Reset(); s.selectDiffuseAddSmoothAlphaPs.Reset(); s.selectTextureFactorAlphaPs.Reset(); s.selectTextureTfactorAlphaPs.Reset(); s.selectDiffuseFactorAlphaPs.Reset(); s.selectDiffuseTfactorAlphaPs.Reset(); s.selectTextureBlendTextureAlphaPs.Reset(); s.selectDiffuseBlendTextureAlphaPs.Reset(); s.selectTextureBlendDiffuseAlphaPs.Reset(); s.selectDiffuseBlendDiffuseAlphaPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset();
     s.subtractTextureAlphaPs.Reset(); s.subtractDiffuseAlphaPs.Reset(); s.subtractModulateAlphaPs.Reset(); s.modulate2xPs.Reset(); s.modulate4xPs.Reset(); s.modulate2xTextureAlphaPs.Reset(); s.modulate2xDiffuseAlphaPs.Reset(); s.modulate4xTextureAlphaPs.Reset(); s.modulate4xDiffuseAlphaPs.Reset(); s.mixedTextureAlphaPs.Reset(); s.mixedDiffuseAlphaPs.Reset(); s.mixedAddTextureAlphaPs.Reset(); s.mixedAddDiffuseAlphaPs.Reset(); s.blendTextureAlphaPs.Reset(); s.blendTextureAlphaPmPs.Reset(); s.blendTextureAlphaPmTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmFactorAlphaPs.Reset(); s.blendTextureAlphaPmSignedFactorAlphaPs.Reset(); s.blendTextureAlphaPmSigned2XFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateAlphaPs.Reset(); s.blendTextureAlphaPmAddAlphaPs.Reset(); s.blendTextureAlphaPmSubtractAlphaPs.Reset(); s.blendTextureAlphaPmModulate2XAlphaPs.Reset(); s.blendTextureAlphaPmModulate4XAlphaPs.Reset(); s.blendTextureAlphaPmAddSignedAlphaPs.Reset(); s.blendTextureAlphaPmAddSigned2XAlphaPs.Reset(); s.blendTextureAlphaPmBlendTextureAlphaPs.Reset(); s.blendTextureAlphaPmBlendDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmBlendCurrentFactorAlphaPs.Reset(); s.blendTextureAlphaPmBlendFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothAlphaPs.Reset(); s.blendDiffuseAlphaPs.Reset(); s.blendTextureSelectedTextureAlphaPs.Reset(); s.blendTextureSelectedDiffuseAlphaPs.Reset(); s.blendDiffuseSelectedTextureAlphaPs.Reset(); s.blendDiffuseSelectedDiffuseAlphaPs.Reset(); s.blendTextureModulateAlphaPs.Reset(); s.blendDiffuseModulateAlphaPs.Reset(); s.blendTextureModulate2XAlphaPs.Reset(); s.blendTextureModulate4XAlphaPs.Reset(); s.blendDiffuseModulate2XAlphaPs.Reset(); s.blendDiffuseModulate4XAlphaPs.Reset(); s.blendTextureAddAlphaPs.Reset(); s.blendDiffuseAddAlphaPs.Reset(); s.blendTextureSubtractAlphaPs.Reset(); s.blendDiffuseSubtractAlphaPs.Reset(); s.blendTextureAddSmoothAlphaPs.Reset(); s.blendDiffuseAddSmoothAlphaPs.Reset(); s.blendFactorAlphaPs.Reset(); s.blendFactorTextureAlphaPs.Reset(); s.blendFactorModulateAlphaPs.Reset(); s.blendFactorDiffuseAlphaPs.Reset(); s.blendFactorAddAlphaPs.Reset(); s.blendFactorSubtractAlphaPs.Reset(); s.blendFactorAddSmoothAlphaPs.Reset(); s.blendFactorModulate2XAlphaPs.Reset(); s.blendFactorModulate4XAlphaPs.Reset(); s.addSmoothTextureAlphaPs.Reset(); s.addSmoothDiffuseAlphaPs.Reset(); s.vs.Reset();
     s.backend.shutdown();
+    s.nativeWidth = s.nativeHeight = 0u;
 }
 } // namespace outrun::vr::dx11::live_game_frame

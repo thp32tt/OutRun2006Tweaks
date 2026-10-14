@@ -93,5 +93,26 @@ int main() {
     b.succeeded(false);
     assert(!b.accepts_source_draw(1502u, true)); // Missed game draw.
     assert(!b.accepts_source_draw(1499u, true)); // Reordered game draw.
+    // 00720 full game native capture must include every original Draw ordinal.
+    b.reset();
+    assert(b.accepts_full(0u));
+    b.succeeded(false); b.record_source_draw(0u);
+    assert(!b.publishable_full(true, 2u));
+    assert(b.accepts_full(1u));
+    b.succeeded(false); b.record_source_draw(1u);
+    assert(b.publishable_full(true, 2u));
+    assert(!b.publishable_full(false, 2u));
+    assert(!b.accepts_full(3u));
+    b.abort();
+    assert(!b.publishable_full(true, 2u) && !b.accepts_full(2u));
+    b.reset();
+    for (std::uint32_t i=0; i<GameNativeFrameBatch::kMaxFullFrameDraws; ++i) {
+        assert(b.accepts_full(i));
+        b.succeeded(false); b.record_source_draw(i);
+    }
+    assert(b.publishable_full(true, GameNativeFrameBatch::kMaxFullFrameDraws));
+    assert(!b.accepts_full(GameNativeFrameBatch::kMaxFullFrameDraws));
+    b.reset();
+    assert(!b.accepts_full(1u) && !b.publishable_full(true, 0u));
     return 0;
 }
