@@ -80,6 +80,8 @@ namespace OutRunVR::GameSemantic
         DispRankClipSprite,
         // Append-only: retain existing numeric producer tokens in IPC/debug logs.
         OutRunHudPeripheralText,
+        // Append-only: exact original 0xB9096/0xB90B3 gear/REV clips.
+        DispGearRevClipSprite,
     };
 
     inline thread_local RenderScope CurrentScope = RenderScope::None;
@@ -123,6 +125,7 @@ namespace OutRunVR::GameSemantic
         case ProducerToken::GoalTimeHelper: return "GOAL_TIME_HELPER";
         case ProducerToken::OutRunHudText: return "OUTRUN_HUD_TEXT";
         case ProducerToken::OutRunHudPeripheralText: return "OUTRUN_HUD_PERIPHERAL_TEXT";
+        case ProducerToken::DispGearRevClipSprite: return "DISP_GEAR_REV_CLIP";
         case ProducerToken::DispRankFirst: return "DISPLAY_RANK_FIRST";
         case ProducerToken::GoalTime020: return "GOAL_TIME_HELPER_020";
         case ProducerToken::GoalTime150: return "GOAL_TIME_HELPER_150";

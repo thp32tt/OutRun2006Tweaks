@@ -916,7 +916,7 @@
     {
       "id": "DX9EX-FEATURE-HUD_GAMEPLAY",
       "priority": 125,
-      "status": "READY",
+      "status": "IMPLEMENT_NEXT",
       "preferredRole": "C_DX9EX",
       "featureId": "DX9EX:VIS:HUD_GAMEPLAY",
       "workKey": "DX9EX:VIS:HUD_GAMEPLAY",
@@ -948,7 +948,16 @@
         "DX9EX:SHARED_R30_HUD_RENDERER",
         "DX9EX:SYMPTOM:HUD_GAMEPLAY"
       ],
-      "nextAction": "Reconcile existing live work_key and TASK_ID; claim one coherent whole defect, trace and reject hypotheses, implement full fix, run grouped negative regressions and exact-SHA CI, then HMD separately. Never finish on a tiny micro-patch."
+      "nextAction": "Integrate source candidate after active CONVERSION-DX9EX-00820 rank-markers exact-SHA CI and exclusive source ownership resolve; validate exact GAME-only gear/REV, rank and speed/time producer routing, negative ESC/GOAL/F11/world, 4:3/16:9/21:9/reset, full Win32 host/game/package, Domain Isolation and Full Source Impact on final target SHA. Do not double-score existing 00820 or declare HMD PASS.",
+      "candidateBranch": "feature/dx9ex-gameplay-hud-20261014",
+      "candidateBaseSha": "cf6f1276f054745919267461ac7a6813073beb94",
+      "candidateSourceScope": [
+        "src/vr/game/render_semantics.hpp",
+        "src/hooks_uiscaling.cpp",
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "tools/verify_vr_r30_responsive_hud_anchor.py"
+      ],
+      "candidateRuntimeValidation": "UNTESTED"
     },
     {
       "id": "DX9EX-FEATURE-F11_MENU",
