@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULL_GAME_COLOR_SEED_PRE_DRAW_INVALIDATION",
   "feature_id": "DX11-FULL-GAME-COLOR-SEED",
-  "status": "C4_PENDING_EXACT_SHA",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -76,9 +76,9 @@
     ]
   },
   "acceptance_results": {
-    "A1": "SOURCE_IMPLEMENTED",
-    "A2": "SOURCE_IMPLEMENTED",
-    "A3": "CI_PENDING"
+    "A1": "PASS",
+    "A2": "PASS",
+    "A3": "PASS_EXACT_SHA"
   },
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -90,8 +90,34 @@
   ],
   "packaging_status": "NOT_REQUIRED",
   "runtime_gate": "NEED_HMD_TEST",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "ci_evidence": {},
-  "validation_note": "Awaiting full exact-SHA five gates; Quest3/VDXR/gamepad not run."
+  "material_result_sha": "4d9e8b93e4f3336651866da25c2ac20b6f0bd7aa",
+  "validation_bearing_result_sha": "a8808e0c0e50a01b2ad58afd68f4de2b1174fbad",
+  "ci_evidence": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38594582132,
+      "status": "success",
+      "head_sha": "a8808e0c0e50a01b2ad58afd68f4de2b1174fbad"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38594582124,
+      "status": "success",
+      "head_sha": "a8808e0c0e50a01b2ad58afd68f4de2b1174fbad"
+    },
+    "Build": {
+      "run_id": 38594594021,
+      "status": "success",
+      "head_sha": "a8808e0c0e50a01b2ad58afd68f4de2b1174fbad"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38594596660,
+      "status": "success",
+      "head_sha": "a8808e0c0e50a01b2ad58afd68f4de2b1174fbad"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38594594115,
+      "status": "success",
+      "head_sha": "a8808e0c0e50a01b2ad58afd68f4de2b1174fbad"
+    }
+  },
+  "validation_note": "Five mandatory GitHub Actions gates passed on exactly a8808e0c0e50a01b2ad58afd68f4de2b1174fbad; actual Quest3/VDXR/gamepad run not performed, no gameplay/HMD PASS, no backend promotion. Same-TASK verifier repairs are not independent accomplishments."
 }
