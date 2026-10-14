@@ -118,7 +118,7 @@ def safe_integrated(source: str) -> bool:
             return False
     # The sprite-specialized indexed Draw returns before XYZRHW and R29.
     # That original HRESULT is equally authoritative for native publication.
-    indexed_begin = source.find("HRESULT __stdcall DrawIndexedPrimitiveDestR30(", helper_end)
+    indexed_begin = source.find("HRESULT __stdcall DrawIndexedPrimitiveDestR30(", end)
     indexed_end = source.find("HRESULT __stdcall DrawPrimitiveUPDestR30(", indexed_begin)
     if indexed_begin < 0 or indexed_end < 0:
         return False
