@@ -4,8 +4,8 @@
   "event_id": "CONVERSION-DX9EX-00829-E001",
   "lane": "DX9EX",
   "branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_NEEDS_CI",
-  "phase": "C3_VALIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
   "feature_id": "DX9EX:RESET:R32_DIRECTGPU_DEVICE_EPOCH",
   "feature_class": "CRITICAL_BLOCKER",
   "feature_contract": {
@@ -44,9 +44,9 @@
     ]
   },
   "acceptance_results": {
-    "DEVICE_EPOCH_OWNER_REBUILD": "IMPLEMENTED_PENDING_CI",
-    "OLD_DEVICE_FASTPATH_REJECT": "IMPLEMENTED_PENDING_CI",
-    "WIN32_EXACT_SHA_GATES": "PENDING"
+    "DEVICE_EPOCH_OWNER_REBUILD": "PASS_EXACT_SHA",
+    "OLD_DEVICE_FASTPATH_REJECT": "PASS_EXACT_SHA",
+    "WIN32_EXACT_SHA_GATES": "PASS_EXACT_SHA"
   },
   "changed_files": [
     "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp",
@@ -54,7 +54,7 @@
     "docs/automation/runs/CONVERSION-DX9EX-00829.json"
   ],
   "runtime_validation": "UNTESTED",
-  "automation_validation": "PENDING",
+  "automation_validation": "PASS_EXACT_SHA",
   "diagnosis": {
     "original_evidence": "Existing R32OpenSharedSlot cache identity omitted host ID3D11Device and EnsureSafeFrameR32 checked SafeEyesOwnFrame before any device-epoch invalidation.",
     "source_trace": [
@@ -69,5 +69,29 @@
     ],
     "fix_evidence": "R32SyncDirectDeviceOwner resets active, inactive, shared and query resources before reuse; individual slot and inactive cache hits also check owner pointer.",
     "negative_test_evidence": "Existing R32 descriptor verifier extended with device identity and destructive old-SafeEye/old-fence/old-slot mutations."
+  },
+  "material_result_sha": "e779149567023320f0946af9e1f5509335d40ec4",
+  "validation_bearing_result_sha": "e779149567023320f0946af9e1f5509335d40ec4",
+  "result_sha": "e779149567023320f0946af9e1f5509335d40ec4",
+  "runtime_note": "Quest3/VDXR physical game/HMD recovery not exercised: exact-SHA Win32 compile, static mutation tests and source impact gates cannot establish headset correctness or frame pacing.",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "e779149567023320f0946af9e1f5509335d40ec4",
+    "dx9ex_active": {
+      "run_id": 38521391819,
+      "conclusion": "success",
+      "passed_jobs": 5,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38521391819"
+    },
+    "domain_isolation": {
+      "run_id": 38521391705,
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38521391705"
+    },
+    "full_source_impact": {
+      "run_id": 38521391831,
+      "conclusion": "success",
+      "passed_jobs": 3,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38521391831"
+    }
   }
 }
