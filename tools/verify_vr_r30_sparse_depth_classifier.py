@@ -96,8 +96,11 @@ def static_contract(src, workflow):
     assert "const std::vector<std::uint32_t>* touched = nullptr" in setup
     assert ("&scratch.upUsed, nullptr, nullptr, nullptr,\n"
             "                    &scratch.upTouched))") in up
-    assert "scratch.upTouched.push_back(raw);" in up
-    assert "scratch.upUsed[raw] = 1;" in up
+    assert "if (raw < minVertexIndex || raw >= declaredEnd)" in up
+    assert "const std::uint32_t local = raw - minVertexIndex;" in up
+    assert "if (local >= vertexCount)" in up
+    assert "scratch.upTouched.push_back(local);" in up
+    assert "scratch.upUsed[local] = 1;" in up
     assert "&scratch.indexCopy, &scratch.depthSignature," in vb
     assert "&scratch.vbTouched) ||" in vb
     assert "scratch.vbTouched.push_back(" in vb
@@ -179,6 +182,12 @@ def negative_mutations(src, workflow):
          "if (scratch.vbTouchGeneration == 0)"),
         ("visit < visitCount && sampled < 512u", "visit < vertexCount"),
         ("baseProjection, usedMask, touched);", "baseProjection, usedMask, nullptr);"),
+        ("const std::uint32_t local = raw - minVertexIndex;",
+         "const std::uint32_t local = raw;"),
+        ("scratch.upTouched.push_back(local);",
+         "scratch.upTouched.push_back(raw);"),
+        ("scratch.upUsed[local] = 1;",
+         "scratch.upUsed[raw] = 1;"),
         ("&scratch.upUsed, nullptr, nullptr, nullptr,\n"
          "                    &scratch.upTouched))",
          "&scratch.upUsed, nullptr, nullptr, nullptr,\n"

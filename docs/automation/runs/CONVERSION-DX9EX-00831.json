@@ -1,9 +1,9 @@
 {
   "task_id": "CONVERSION-DX9EX-00831",
   "production_id": "CONVERSION-DX9EX-00831",
-  "event_id": "CONVERSION-DX9EX-00831-E002",
+  "event_id": "CONVERSION-DX9EX-00831-E003",
   "event_type": "ci_repair",
-  "attempt": "2/3",
+  "attempt": "3/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:PERF:R30_INDEXED_UP_LOCAL_WINDOW",
@@ -11,7 +11,7 @@
   "work_key": "DX9EX:PERF:R30_INDEXED_UP_LOCAL_WINDOW",
   "status": "REPAIRED_PENDING_CI",
   "phase": "C3_VALIDATE",
-  "automation_validation": "PENDING_RETRY_EXACT_SHA",
+  "automation_validation": "PENDING_FINAL_RETRY_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_delta": 0,
   "feature_contract": {
@@ -59,6 +59,7 @@
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "tools/verify_vr_r30_index_rebase_fastpath.py",
     "tools/verify_vr_r30_sparse_population_fastpath.py",
+    "tools/verify_vr_r30_sparse_depth_classifier.py",
     "docs/automation/runs/CONVERSION-DX9EX-00831.json"
   ],
   "diagnosis": {
@@ -78,13 +79,18 @@
   "material_result_sha": null,
   "result_sha": null,
   "validation_bearing_result_sha": null,
-  "next_action": "Run exact-SHA DX9Ex Active, Domain Isolation and Full Source Impact on the verifier-repaired result; repair only same 00831 if it exposes a genuine failure. HMD remains UNTESTED.",
+  "next_action": "Final same-task exact-SHA validation: DX9Ex Active must reach policy+host+full-chain+game+package; Domain Isolation and material Full Source Impact must succeed. Do not rescore verifier repairs; HMD remains UNTESTED.",
   "failure_recovery": {
     "failed_run_id": 38531382587,
     "failed_sha": "5690753e0d136553fb07972e1ee6bb795f119c61",
     "failed_job": "policy",
     "root_cause": "Existing verify_vr_r30_sparse_population_fastpath.py still required the pre-00831 absolute UP used-mask/touched semantics (raw index and raw>=vertexCount), so it rejected the intentional local-window rebase before any host/game/package build.",
     "repair": "Update only the stale verifier to require declaredEnd validation plus local=raw-minVertexIndex mask/touched semantics; no renderer source change.",
-    "no_duplicate_score_on_retry": true
+    "no_duplicate_score_on_retry": true,
+    "second_failed_run_id": 38531752234,
+    "second_failed_sha": "5d2426383b171ab62112c85f94557af669ded447",
+    "second_failed_job": "policy",
+    "second_root_cause": "After the sparse-population verifier repair passed, verify_vr_r30_sparse_depth_classifier.py still pinned scratch.upTouched/raw and scratch.upUsed/raw. It rejected the same intentional local-window producer contract before host/game/package build.",
+    "second_repair": "Update sparse-depth static/destructive checks to declaredEnd + local=raw-minVertexIndex and local mask/touched semantics; renderer source remains unchanged."
   }
 }
