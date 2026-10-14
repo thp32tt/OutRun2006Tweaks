@@ -5146,7 +5146,8 @@ namespace OutRunVRStereo
                 spdlog::info(
                     "VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}",
                     eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
-                    R30HudAspectCompensation(stereo));
+                    R30HudAspectCompensation(
+                        stereo, frame.width, frame.height));
             }
             if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect &&
                 !R30FirstFlatPerspectiveLogged)

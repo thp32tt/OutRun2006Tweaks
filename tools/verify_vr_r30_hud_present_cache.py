@@ -125,6 +125,11 @@ def verify_source_aspect_snapshot(source: str) -> None:
     assert "R30HudContain.sourceWidth = frame.width;" in contain
     assert "R30HudContain.sourceHeight = frame.height;" in contain
     assert "R30HudContain.valid = false;" in contain
+    # A one-time HUD diagnostic log is also compiled into the independent
+    # R29-R33 Win32 TU. It must follow the widened signature and reuse the
+    # already-captured frame rather than leaving an orphan one-arg call.
+    assert "R30HudAspectCompensation(\\n                        stereo, frame.width, frame.height));" in source
+    assert "R30HudAspectCompensation(stereo)" not in source
 
 if __name__ == "__main__":
     source = SOURCE.read_text(encoding="utf-8")
