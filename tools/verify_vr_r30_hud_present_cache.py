@@ -25,6 +25,7 @@ def verify(source: str) -> None:
         "R30HudContain.sourceWidth == frame.width",
         "R30HudContain.sourceHeight == frame.height",
         "R30HudContain.userScale == userScale",
+        "R30HudContain.pauseResponsive == pauseResponsive",
         "R30HudContain.eyeFov[i] == fov[i]",
         "std::uint32_t eyeExtent[4]{};",
         "R29OwnerRecommendedEyeExtent(eye,",
@@ -34,10 +35,16 @@ def verify(source: str) -> None:
         "R30HudContain.valid = false;",
         "R30HudContain.valid = true;",
         "R30HudAspectCompensation(\n                    stereo, frame.width, frame.height, eyeExtent)",
-        "scaleX = userScale;",
-        "scaleY = userScale / sourceOverTarget;",
-        "scaleX = userScale * sourceOverTarget;",
-        "scaleY = userScale;",
+        "const bool pauseResponsive = R30IsPauseMenuElement() &&",
+        "std::isfinite(Settings::VRPauseMenuScale.get()) &&",
+        "R30HudContain.pauseResponsive = pauseResponsive;",
+        "const float opticalScale =",
+        "OutRunVrPauseEye::ResponsiveMenuScale(",
+        "userScale, sourceOverTarget, pauseResponsive);",
+        "scaleX = opticalScale;",
+        "scaleY = opticalScale / sourceOverTarget;",
+        "scaleX = opticalScale * sourceOverTarget;",
+        "scaleY = opticalScale;",
     ):
         assert required in body, required
     assert body.index("R30HudContain.valid = false;") < body.index(
@@ -85,6 +92,7 @@ if __name__ == "__main__":
         ("R30HudContain.sourceWidth == frame.width", "true"),
         ("R30HudContain.sourceHeight == frame.height", "true"),
         ("R30HudContain.userScale == userScale", "true"),
+        ("R30HudContain.pauseResponsive == pauseResponsive", "true"),
         ("R30HudContain.eyeFov[i] == fov[i]", "true"),
         ("R30HudContain.eyeExtent[i] == eyeExtent[i]", "true"),
         ("canCache && extentMatches && R30HudContain.valid",
@@ -94,8 +102,14 @@ if __name__ == "__main__":
          "R30HudAspectCompensation(stereo)"),
         ("R30HudContain.valid = false;", "// no invalidation"),
         ("R30HudContain.valid = true;", "// no publication"),
-        ("scaleY = userScale / sourceOverTarget;", "scaleY = userScale;"),
-        ("scaleX = userScale * sourceOverTarget;", "scaleX = userScale;"),
+        ("R30HudContain.pauseResponsive = pauseResponsive;",
+         "R30HudContain.pauseResponsive = false;"),
+        ("userScale, sourceOverTarget, pauseResponsive);",
+         "userScale, sourceOverTarget, false);"),
+        ("scaleX = opticalScale;", "scaleX = userScale;"),
+        ("scaleY = opticalScale / sourceOverTarget;", "scaleY = userScale / sourceOverTarget;"),
+        ("scaleX = opticalScale * sourceOverTarget;", "scaleX = userScale * sourceOverTarget;"),
+        ("scaleY = opticalScale;", "scaleY = userScale;"),
     )
     for original, broken in mutations:
         assert original in content, original
