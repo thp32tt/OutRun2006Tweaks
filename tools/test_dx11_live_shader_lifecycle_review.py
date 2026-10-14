@@ -6,7 +6,7 @@ import re
 source = Path("src/vr/d3d11/live_game_frame_bridge.cpp").read_text(encoding="utf-8")
 ready = source.split("bool ensure_pipeline(State& s) noexcept {", 1)[1].split("return true;", 1)[0]
 reset = source.split("void before_game_reset() noexcept {", 1)[1].split("s.backend.shutdown();", 1)[0]
-reinit = source.split("bool ensure_pipeline(State& s) noexcept {", 1)[1].split("s.backend.shutdown();", 1)[0]
+reinit = source.split("bool ensure_pipeline(State& s) noexcept {", 1)[1].split("s.readSlot = s.writeSlot = 0;", 1)[0]
 checks = {
     "blendTextureAlphaPmInverseTextureAlphaPs": True,
     "blendTextureAlphaPmAddFactorAlphaPs": True,
