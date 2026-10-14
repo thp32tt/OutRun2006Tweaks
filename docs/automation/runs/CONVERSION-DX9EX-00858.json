@@ -85,7 +85,7 @@
     "fallback": "PASS_PORTABLE_AND_WINDOWS",
     "integration": "PASS_EXACT_SHA"
   },
-  "score_once": false,
+  "score_once": true,
   "ci_evidence": {
     "status": "SUCCESS_EXACT_SHA",
     "exact_sha": "76273e26f6daa4b400d315b99a0c8553a1f6f7f7",
@@ -112,5 +112,10 @@
     },
     "runtime_caveat": "Quest3/VDXR runtime evidence absent; binocular lens convergence and real hardware FPS not asserted."
   },
-  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "scoreboard_ai_2_before": 1330,
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1331,
+  "scoreboard_commit_sha": "9f68834237d15fa34923fe127c7691cd77125d4c",
+  "score_basis": "New independent functional C++ implementation, exact-SHA four required workflow groups SUCCESS. Same TASK_ID retries, C6 and bookkeeping yield +0 additional."
 }
