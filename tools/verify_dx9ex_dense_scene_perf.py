@@ -52,22 +52,24 @@ def verify(hook: str, r30: str, r33: str) -> None:
     assert "R30SkyGlowSceneCaptureEpoch != frame.presentEpoch" in composite
 
     world = between(r33, "R32ReviewOwnedResult R33TryFastWorld(", "R32ReviewOwnedResult R33TryHud(")
-    helper = between(r33, "bool R33FragileWorldDepthEligible()", "bool R33GetWriteFlags(")
-    assert "R32ReviewTrackedDepthStencil()" in helper
-    assert "R33DepthStencilCacheCurrent()" in helper
-    assert "R33DepthStencilState.zEnable != D3DZB_FALSE" in helper
+    # The conservative translucent route is an explicit visual rollback.
+    # Do not permit any alpha/disabled-ZWRITE draw through R33's fast WVP.
     assert "OutRunVR::State::StateBlockTracker::Reliable()" in world
-    assert "OutRunVR::GameSemantic::ForceZeroDisparity(scope)" in world
-    assert "!OutRunVR::GameSemantic::CorroboratesWorld(scope)" in world
-    assert world.index("R32ReviewBuildFastWorldConstants(") < world.index("R33FragileWorldDepthEligible()")
-    assert world.index("R33GetWriteFlags(") < world.index("R33FragileWorldDepthEligible()")
-    assert "return {};" in world.split("if (fragile && !R33FragileWorldDepthEligible())", 1)[1]
+    fragile_guard = ("if (fragile)\n            {\n"
+                     "                if (R33TelemetryEnabled())\n"
+                     "                    R32ReviewNoteDispatchFragile();\n"
+                     "                return {};\n            }")
+    assert fragile_guard in world
+    assert world.index(fragile_guard) < world.index("R32ReviewEnsureStereoResources(")
+    assert "R33FragileWorldDepthEligible()" not in world
+    assert "OutRunVR::GameSemantic::CorroboratesWorld(scope)" not in world
     # Preserve only one in-function right-pass attachment query.
     assert world.count("R32ReviewTrackedDepthStencil()") == 1
 
     cull = between(hook, "class DisableStageCulling : public Hook", "class DisableVehicleLODs")
-    assert 'Setting<bool> DisableStageCulling{ "Graphics", "DisableStageCulling", false,' in hook
-    assert "!Settings::VREnabled.get()" in cull
+    assert 'Setting<bool> DisableStageCulling{ "Graphics", "DisableStageCulling", true,' in hook
+    assert "patch.set(Settings::DisableStageCulling.get());" in cull
+    assert "!Settings::VREnabled.get()" not in cull
     anis = between(hook, "class AnisotropicFiltering : public Hook", "class VSyncOverride")
     assert "static bool PreserveScreenTextureFiltering() noexcept" in anis
     assert "RenderScope::ScreenHud" in anis
@@ -89,17 +91,19 @@ def main() -> None:
         (h.replace("frameSpike ? 2 : 3", "frameSpike ? 6 : 6", 1), t, w),
         (h.replace("std::clamp(dt * 60.0, 0.0, 1.0)",
                    "std::clamp(dt * 60.0, 0.0, 2.0)", 1), t, w),
-        (h.replace("!Settings::VREnabled.get()", "Settings::VREnabled.get()", 1), t, w),
+        (h.replace("patch.set(Settings::DisableStageCulling.get());",
+                   "patch.set(Settings::DisableStageCulling.get() && !Settings::VREnabled.get());", 1), t, w),
         (h.replace("RenderScope::ScreenHud", "RenderScope::None", 1), t, w),
         (h, t.replace("desc.FVF != 0", "desc.FVF == 0", 1), w),
         (h, t.replace("!= D3DFVF_XYZRHW", "== D3DFVF_XYZRHW", 1), w),
         (h, t.replace("0x4A8C40) != 0", "0x4A8C40) == 0", 1), w),
         (h, t.replace("!R30GameGlowActive()", "false", 1), w),
-        (h, t, w.replace("R33DepthStencilState.zEnable != D3DZB_FALSE",
-                          "R33DepthStencilState.zEnable == D3DZB_FALSE", 1)),
-        (h, t, w.replace("!R33FragileWorldDepthEligible()", "true", 1)),
-        (h, t, w.replace("!OutRunVR::GameSemantic::CorroboratesWorld(scope)",
-                          "OutRunVR::GameSemantic::CorroboratesWorld(scope)", 1)),
+        (h, t, w.replace("if (fragile)\n            {",
+                          "if (false)\n            {", 1)),
+        (h, t, w.replace("R32ReviewNoteDispatchFragile();\n                return {};",
+                          "R32ReviewNoteDispatchFragile();\n                /* unsafe promoted alpha */", 1)),
+        (h.replace('Setting<bool> DisableStageCulling{ "Graphics", "DisableStageCulling", true,',
+                   'Setting<bool> DisableStageCulling{ "Graphics", "DisableStageCulling", false,', 1), t, w),
     ]
     for i, altered in enumerate(mutations, 1):
         assert altered != original, f"mutation {i} missed"
