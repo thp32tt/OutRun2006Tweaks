@@ -216,8 +216,11 @@ def main() -> int:
         "stale-shared-batch":
             code.replace("PendingHomogeneous = false;", "PendingHomogeneous = true;", 1),
         "missing-old-owner-proof":
-            code.replace("PendingScope, PendingProducer,",
-                         "PendingScope, ProducerToken::None,", 1),
+            code.replace(
+                "false, true, PendingHomogeneous,\n"
+                "                PendingScope, PendingProducer,",
+                "false, true, PendingHomogeneous,\n"
+                "                PendingScope, ProducerToken::None,", 1),
         "unproven-direct-batch":
             code.replace("!QueueRenderActive() && PendingDraws == 1u",
                          "false", 1),
