@@ -304,8 +304,13 @@ namespace OutRunVrMenuAspect
             contentHeight;
         const float widthScale = visibleWidth / contentWidth;
         const float heightScale = visibleHeight / contentHeight;
-        if (!std::isfinite(visibleAspect) ||
-            visibleAspect < 0.5f || visibleAspect > 5.0f ||
+        // The visible part may be a very thin but valid slice of the
+        // original 4:3 menu. Limits for a FULL source aspect do not apply
+        // to its clipped fragment: rejecting <0.5 or >5 here makes R23
+        // project that surviving strip at the wrong full-menu size.
+        // Physical slice size and position are instead recovered from the
+        // original content rectangle, with a nonzero finite aspect.
+        if (!std::isfinite(visibleAspect) || visibleAspect <= 0.0f ||
             !std::isfinite(visibleOffsetX) ||
             !std::isfinite(visibleOffsetY) ||
             !(widthScale > 0.0f && widthScale <= 1.00001f) ||

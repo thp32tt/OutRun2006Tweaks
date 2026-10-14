@@ -173,6 +173,47 @@ int main()
             4.f / 3.f).crop)
         return 19;
 
+    // Severe edge clipping can legitimately leave an aspect outside the
+    // 0.5..5 FULL-CLIENT range. Never drop the menu's original optical
+    // rectangle and inflate these surviving pixels to the full quad.
+    // 3440x1440 authored content width is 1920, centred in the client:
+    // after shifting left by 2300, only x=[0,380] of the authored content
+    // remains visible in the 1140-pixel captured strip.
+    const auto narrowLeft = PlanVisibleCenteredContent(
+        -2300, 0, 1140, 1440, 3440, 1440, 0, 0,
+        1140.f / 3440.f, 1, 4.f / 3.f);
+    if (!narrowLeft.crop ||
+        !near(narrowLeft.aspect, 380.f / 1440.f) ||
+        !near(narrowLeft.offsetX, 0.f) ||
+        !near(narrowLeft.width, 380.f / 1140.f) ||
+        !near(narrowLeft.visibleOffsetX, 1540.f / 1920.f) ||
+        !near(narrowLeft.visibleWidthScale, 380.f / 1920.f) ||
+        !near(narrowLeft.visibleHeightScale, 1.f))
+        return 31;
+    // The corresponding portrait case leaves only 230 of 1872 content
+    // rows; its valid tall sampled aspect is >5. This must not zoom or
+    // re-centre the strip after a desktop move or recenter.
+    const auto narrowTop = PlanVisibleCenteredContent(
+        0, -2050, 2496, 638, 2496, 2688, 0, 0,
+        1, 638.f / 2688.f, 4.f / 3.f);
+    if (!narrowTop.crop ||
+        !near(narrowTop.aspect, 2496.f / 230.f) ||
+        !near(narrowTop.offsetY, 0.f) ||
+        !near(narrowTop.height, 230.f / 638.f) ||
+        !near(narrowTop.visibleOffsetY, 1642.f / 1872.f) ||
+        !near(narrowTop.visibleHeightScale, 230.f / 1872.f) ||
+        !near(narrowTop.visibleWidthScale, 1.f))
+        return 32;
+    // Even a plausible UV must be rejected if it is stale after a move;
+    // the full unclipped 4:3, portrait and 21:9 cases above still apply.
+    if (PlanVisibleCenteredContent(
+            -2300, 0, 1140, 1440, 3440, 1440, 0.02f, 0,
+            1140.f / 3440.f, 1, 4.f / 3.f).crop ||
+        PlanVisibleCenteredContent(
+            0, -2050, 2496, 638, 2496, 2688, 0, 0.02f,
+            1, 638.f / 2688.f, 4.f / 3.f).crop)
+        return 33;
+
     // 2496x2688 portrait menu has 408px upper/lower matte around
     // 2496x1872 authentic 4:3 content. Remove the Y matte from the source.
     const auto portraitFull = PlanVisibleCenteredContent(

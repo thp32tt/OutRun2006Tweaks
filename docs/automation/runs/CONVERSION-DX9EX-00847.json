@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00847",
+  "production_id": "CONVERSION-DX9EX-00847",
+  "event_id": "CONVERSION-DX9EX-00847-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00847",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Restore the whole captured OutRun main/menu authored 4:3 rectangle and its optical position when Desktop Duplication exposes extremely narrow horizontal or vertical valid fragments.",
+    "scope_boundary": "Only the LOCAL fixed-menu 4:3 captured content rectangle and paired-eye menu raster; no ESC, gameplay HUD, F11, lens effects, SkyGlow, wheel input, FFB, DX11 or DXVK.",
+    "trace_stages": [
+      "Original OutRun widescreen letterbox/4:3 content and GetGameClientOutputRect client-output intersection",
+      "R23 PlanVisibleCenteredContent UV clipping, optical size and content offset recovery",
+      "R23 RenderMenuPlaneTo shared LOCAL clip, two-slice second-eye reuse and untouched mono fallback"
+    ],
+    "subcomponents": [
+      "Accept real narrow/tall visible client slices independent of full-client aspect range",
+      "Preserve original menu width/height and directional offset through UV and optical geometry, rejecting stale capture after resize",
+      "Keep full-client native 4:3, wide 21:9, portrait, desktop fallback and source-size transition invariants"
+    ],
+    "acceptance_items": [
+      {
+        "id": "narrow_horizontal",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Source capture and 4:3 crop",
+        "expected_behavior": "Valid 0.264 aspect narrow left fragment keeps visible crop and exact original optical centre/width rather than uncropped zoom."
+      },
+      {
+        "id": "narrow_vertical",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Portrait crop and stereo pair",
+        "expected_behavior": "Valid >5 aspect top fragment retains original authored menu height and position in both LOCAL eyes."
+      },
+      {
+        "id": "reject_stale",
+        "category": "fallback_regression",
+        "behavior_area": "Desktop resize, capture and original visuals",
+        "expected_behavior": "Invalid UV intersections still reject; fully visible 4:3, 16:9, 21:9, portrait and mono theater fallback behavior is unchanged."
+      },
+      {
+        "id": "integrated_windows",
+        "category": "integrated_validation",
+        "behavior_area": "Windows game plus OpenXR host",
+        "expected_behavior": "Existing menu native smoke, game/host/package DX9Ex Active, Domain and relevant Full Source Impact gates pass on immutable exact source SHA."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "PlanVisibleCenteredContent limits visibleAspect to 0.5..5, even though this is a partial captured optical fragment rather than a complete window source aspect.",
+    "source_trace": [
+      "Original 3440x1440 game 4:3 visible rectangle is centred within the full game client while the desktop capture samples only output intersection.",
+      "Client shifted left 2300px yields 380x1440 valid part whose sampled visibleAspect is 0.264, previously causing an invalid CropPlan return.",
+      "R23 uses the plan to crop UV and preserve original 4:3 optical quad size with visibleScale and offset in the shared two-eye projection; invalid plans keep incorrectly sampled client aspect."
+    ],
+    "root_cause": "A full-client source aspect validation threshold was applied to a post-intersection fragment, which can be arbitrarily thin or tall but physically valid.",
+    "alternatives_rejected": [
+      "The XR FOV tangent averaging and common stereo clip are already aspect-correct for valid plans; the error occurs before either eye render, not at SkyGlow or F11."
+    ],
+    "fix_evidence": "Remove inappropriate clipped-fragment aspect bounds but still reject nonfinite/zero dimensions; authored content scale/offset and UV intersection logic remain unchanged.",
+    "negative_test_evidence": "Native C++ smoke covers 380x1440 horizontal and 2496x230 vertical surviving fragments plus stale UV negative controls, and retains original full/asymmetric scenarios.",
+    "eye_ownership": "Only the two-eye LOCAL-fixed menu path consumes the corrected crop/optical plan; game world/HUD and separate mono theater and SBS paths are not modified."
+  },
+  "status": "IMPLEMENTED_BUILD_PENDING",
+  "phase": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "No Quest3/VDXR hardware test performed. Build and source-only validation do not prove live binocular imagery.",
+  "changed_files": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp"
+  ],
+  "acceptance_results": {
+    "narrow_horizontal": "PENDING",
+    "narrow_vertical": "PENDING",
+    "reject_stale": "PENDING",
+    "integrated_windows": "PENDING"
+  }
+}
