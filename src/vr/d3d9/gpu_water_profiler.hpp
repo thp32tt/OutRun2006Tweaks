@@ -9,6 +9,11 @@
 #include <cstdlib>
 #include <cstring>
 namespace OutRunVRStereo::GpuWaterProbe {
+// Diagnostic dispatch categories, NOT confirmed material/producers.
+enum class DrawRoute : std::size_t {
+    Xyzrhw = 0, ScreenHud, FastWorld, R29Fallback, RecordingRaw,
+    Count
+};
 inline bool Enabled() noexcept {
     static const bool on=[] { const char* v=std::getenv("OUTRUN_VR_GPU_PROFILE"); return v && std::strcmp(v,"1")==0; }();
     return on;
@@ -47,6 +52,10 @@ class Meter {
     std::uint64_t frame_=0, samples_=0, alpha_=0, alphaTest_=0, frames_=0, dropped_=0, invalid_=0, timedBlend_=0, timedOpaque_=0;
     std::uint64_t noDepthWrite_=0, depthDisabled_=0, stencil_=0, pixelShader_=0, fixedFunction_=0;
     std::uint64_t rtSamples_=0, offscreenRtSamples_=0, multisampleRtSamples_=0;
+    // Logical R33 hook calls versus routes taken. Unclassified calls include
+    // raster-guard bypasses; they must NOT be called glass/water by inference.
+    std::uint64_t logicalDrawCalls_=0;
+    std::array<std::uint64_t,static_cast<std::size_t>(DrawRoute::Count)> routeCounts_{};
     UINT referenceWidth_=0, referenceHeight_=0;
     double sumFrame_=0,maxFrame_=0,sumBlend_=0,sumOpaque_=0;
     // No GPU stalls and no per-frame heap allocation: window-only sorting.
@@ -99,28 +108,44 @@ class Meter {
             return gpuSpans_[(std::max)(size_t{1},n)-1];
         };
         const char* scene=std::getenv("OUTRUN_VR_GPU_SCENE");
-        spdlog::info("VR GPU WATER 5s: scene={} gpuIntervals={} gpuSpanAvgMs={:.3f} gpuSpanP50Ms={:.3f} gpuSpanP95Ms={:.3f} gpuSpanP99Ms={:.3f} gpuSpanMaxMs={:.3f} gpuSpanSampleCount={} gpuSpanOverflow={} sampledBlendDrawAvgMs={:.4f} sampledOpaqueDrawAvgMs={:.4f} blendDraws={} opaqueDraws={} stateSamples={} alphaBlendSamples={} alphaTestSamples={} noZWriteSamples={} zDisabledSamples={} stencilSamples={} programmablePsSamples={} fixedFnPsSamples={} renderTargetSamples={} offscreenRtSamples={} multisampleRtSamples={} dropped={} invalid={} waterAttribution=UNPROVEN",
+        spdlog::info("VR GPU WATER 5s: scene={} gpuIntervals={} gpuSpanAvgMs={:.3f} gpuSpanP50Ms={:.3f} gpuSpanP95Ms={:.3f} gpuSpanP99Ms={:.3f} gpuSpanMaxMs={:.3f} gpuSpanSampleCount={} gpuSpanOverflow={} sampledBlendDrawAvgMs={:.4f} sampledOpaqueDrawAvgMs={:.4f} blendDraws={} opaqueDraws={} stateSamples={} alphaBlendSamples={} alphaTestSamples={} noZWriteSamples={} zDisabledSamples={} stencilSamples={} programmablePsSamples={} fixedFnPsSamples={} renderTargetSamples={} offscreenRtSamples={} multisampleRtSamples={} dropped={} invalid={} logicalDrawCalls={} xyzhwRoutes={} hudRoutes={} fastWorldRoutes={} r29FallbackRoutes={} stateBlockRawRoutes={} otherGuardRoutes={} waterAttribution=UNPROVEN",
             scene?scene:"NONE",frames_,frames_?sumFrame_/frames_:0.0,
             percentile(0.50),percentile(0.95),percentile(0.99),maxFrame_,
             gpuSpanCount_,gpuSpanOverflow_,
             timedBlend_?sumBlend_/timedBlend_:0.0,timedOpaque_?sumOpaque_/timedOpaque_:0.0,
             timedBlend_,timedOpaque_,samples_,alpha_,alphaTest_,
             noDepthWrite_,depthDisabled_,stencil_,pixelShader_,fixedFunction_,
-            rtSamples_,offscreenRtSamples_,multisampleRtSamples_,dropped_,invalid_);
+            rtSamples_,offscreenRtSamples_,multisampleRtSamples_,dropped_,invalid_,
+            logicalDrawCalls_,routeCounts_[0],routeCounts_[1],routeCounts_[2],
+            routeCounts_[3],routeCounts_[4],
+            logicalDrawCalls_ >= (routeCounts_[0]+routeCounts_[1]+routeCounts_[2]+
+                routeCounts_[3]+routeCounts_[4])
+                ? logicalDrawCalls_ - (routeCounts_[0]+routeCounts_[1]+routeCounts_[2]+
+                    routeCounts_[3]+routeCounts_[4]) : 0);
         samples_=alpha_=alphaTest_=frames_=dropped_=invalid_=timedBlend_=timedOpaque_=0;
         noDepthWrite_=depthDisabled_=stencil_=pixelShader_=fixedFunction_=0;
         rtSamples_=offscreenRtSamples_=multisampleRtSamples_=0;
         sumFrame_=maxFrame_=sumBlend_=sumOpaque_=0;
+        logicalDrawCalls_=0;
+        routeCounts_.fill(0);
         gpuSpanCount_=gpuSpanOverflow_=0; logAt_=now;
     }
 public:
+    // Record only while the opt-in profiler is enabled, one route per
+    // top-level logical Draw, without GPU queries or COM calls here.
+    void noteRoute(DrawRoute route) noexcept {
+        const std::size_t i=static_cast<std::size_t>(route);
+        if(i<routeCounts_.size()) ++routeCounts_[i];
+    }
     void reset() noexcept {
         active_=nullptr; for(Slot& s:ring_) s.release();
         game_=nullptr; unsupported_=skip_=false;
         referenceWidth_=referenceHeight_=0;
     }
     bool beforeDraw(IDirect3DDevice9* d,UINT /*primitives*/) noexcept {
-        if(!Enabled()||!d||unsupported_||skip_) return false;
+        if(!Enabled()||!d) return false;
+        ++logicalDrawCalls_;
+        if(unsupported_||skip_) return false;
         if(game_&&game_!=d) reset();
         game_=d;
         if(!active_) {

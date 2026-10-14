@@ -984,6 +984,9 @@ namespace OutRunVRStereo
             {
                 if (telemetry)
                     R32ReviewNoteDispatchFallback();
+                if (GpuWaterProbe::Enabled())
+                    GpuWaterProbe::instance().noteRoute(
+                        GpuWaterProbe::DrawRoute::RecordingRaw);
                 return actualDraw();
             }
 
@@ -997,6 +1000,9 @@ namespace OutRunVRStereo
                 R32ReviewDiscardUnreliableDrawCaches();
                 if (telemetry)
                     R32ReviewNoteDispatchFallback();
+                if (GpuWaterProbe::Enabled())
+                    GpuWaterProbe::instance().noteRoute(
+                        GpuWaterProbe::DrawRoute::R29Fallback);
                 return R32ReviewRunLowerFailClosed(device,
                     std::forward<LowerR29Draw>(lowerR29Draw));
             };
@@ -1013,14 +1019,24 @@ namespace OutRunVRStereo
                 const auto hud = R33TryHud(device, screenKind,
                     std::forward<ActualDraw>(actualDraw), site);
                 if (hud.handled)
+                {
+                    if (GpuWaterProbe::Enabled())
+                        GpuWaterProbe::instance().noteRoute(
+                            GpuWaterProbe::DrawRoute::ScreenHud);
                     return hud.hr;
+                }
             }
             else
             {
                 const auto fast = R33TryFastWorld(device,
                     std::forward<ActualDraw>(actualDraw), site);
                 if (fast.handled)
+                {
+                    if (GpuWaterProbe::Enabled())
+                        GpuWaterProbe::instance().noteRoute(
+                            GpuWaterProbe::DrawRoute::FastWorld);
                     return fast.hr;
+                }
             }
 
             // Preserve the same lower R29 fail-closed policy when neither
@@ -1051,7 +1067,12 @@ namespace OutRunVRStereo
                     device, type, startVertex, primitiveCount)
                     : E_NOTIMPL;
                 if (xyzrhw != E_NOTIMPL)
+                {
+                    if (GpuWaterProbe::Enabled())
+                        GpuWaterProbe::instance().noteRoute(
+                            GpuWaterProbe::DrawRoute::Xyzrhw);
                     return xyzrhw;
+                }
 
                 auto actual = [&]() {
                     return R32ReviewCallRawDrawPrimitive(
@@ -1098,7 +1119,12 @@ namespace OutRunVRStereo
                     numVertices, startIndex, primitiveCount)
                     : E_NOTIMPL;
                 if (xyzrhw != E_NOTIMPL)
+                {
+                    if (GpuWaterProbe::Enabled())
+                        GpuWaterProbe::instance().noteRoute(
+                            GpuWaterProbe::DrawRoute::Xyzrhw);
                     return xyzrhw;
+                }
 
                 auto actual = [&]() {
                     return R32ReviewCallRawDrawIndexedPrimitive(device, type,
@@ -1146,7 +1172,12 @@ namespace OutRunVRStereo
                     device, type, primitiveCount, data, stride)
                     : E_NOTIMPL;
                 if (xyzrhw != E_NOTIMPL)
+                {
+                    if (GpuWaterProbe::Enabled())
+                        GpuWaterProbe::instance().noteRoute(
+                            GpuWaterProbe::DrawRoute::Xyzrhw);
                     return xyzrhw;
+                }
 
                 auto actual = [&]() {
                     return R32ReviewCallRawDrawPrimitiveUP(
@@ -1194,7 +1225,12 @@ namespace OutRunVRStereo
                     indexData, indexFormat, vertexData, stride)
                     : E_NOTIMPL;
                 if (xyzrhw != E_NOTIMPL)
+                {
+                    if (GpuWaterProbe::Enabled())
+                        GpuWaterProbe::instance().noteRoute(
+                            GpuWaterProbe::DrawRoute::Xyzrhw);
                     return xyzrhw;
+                }
 
                 auto actual = [&]() {
                     return R32ReviewCallRawDrawIndexedPrimitiveUP(device, type,
