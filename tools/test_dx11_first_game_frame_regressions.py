@@ -1969,7 +1969,7 @@ def main() -> None:
         "s.blendDiffuseAlphaPs.GetAddressOf()",
         "s.blendTextureAlphaPs.Reset();",
         "s.blendDiffuseAlphaPs.Reset();",
-        "s.blendTextureAlphaPs && s.blendTextureAlphaPmPs && s.blendTextureAlphaPmTextureAlphaPs && s.blendTextureAlphaPmInverseDiffuseAlphaPs && s.blendTextureAlphaPmDiffuseAlphaPs && s.blendDiffuseAlphaPs",
+        "s.blendTextureAlphaPs && s.blendTextureAlphaPmPs && s.blendTextureAlphaPmTextureAlphaPs && s.blendTextureAlphaPmInverseTextureAlphaPs && s.blendTextureAlphaPmInverseDiffuseAlphaPs && s.blendTextureAlphaPmDiffuseAlphaPs && s.blendDiffuseAlphaPs",
         "capture.blendTextureAlpha ? s.blendTextureAlphaPs.Get() :",
         "capture.blendDiffuseAlpha ? s.blendDiffuseAlphaPs.Get() :",
         "ctx->DrawIndexed(indexCount, 0, 0);",

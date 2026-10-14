@@ -32,6 +32,7 @@
 #include "native_game_present_region.hpp"
 #include "native_game_backbuffer_admission.hpp"
 #include "native_game_texture_atlas_budget.hpp"
+#include "native_game_stream_capacity.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -992,6 +993,16 @@ struct ReadbackSlot {
     bool busy = false;
     GameReadbackProvenance provenance{};
 };
+// Ring slots isolate each admitted source Draw until the native diagnostic GPU
+// consumes it; WRITE_DISCARD safely renames in-flight resources across frames.
+struct NativeGameStreamSlot {
+    ComPtr<ID3D11Buffer> vertex;
+    ComPtr<ID3D11Buffer> index;
+    ComPtr<ID3D11Buffer> stage1;
+    UINT vertexCapacity = 0u;
+    UINT indexCapacity = 0u;
+    UINT stage1Capacity = 0u;
+};
 struct State {
     std::mutex mutex;
     // Non-owning identity only: reset at every Present/Reset. Never retain a
@@ -1151,6 +1162,9 @@ struct State {
     // never collide with SUBTRACT/REVSUBTRACT under changing color masks.
     std::array<ComPtr<ID3D11BlendState>, 128> extremumMaskedBlends{};
     ComPtr<ID3D11Buffer> alphaConstants;
+    // Eight bounded slots (one for normal single-draw mode); allocated lazily
+    // and reused by both source Draw and DrawIndexed with matching batch ordinal.
+    std::array<NativeGameStreamSlot, GameNativeFrameBatch::kMaxDraws> streamSlots{};
     std::array<ReadbackSlot, kReadbackSlots> readbacks{};
     UINT readSlot = 0;
     UINT writeSlot = 0;
@@ -1425,7 +1439,7 @@ bool ensure_pipeline(State& s) noexcept {
         s.modulate4xTextureAlphaPs &&
         s.modulate4xDiffuseAlphaPs && s.mixedTextureAlphaPs && s.mixedDiffuseAlphaPs &&
         s.mixedAddTextureAlphaPs && s.mixedAddDiffuseAlphaPs &&
-        s.blendTextureAlphaPs && s.blendTextureAlphaPmPs && s.blendTextureAlphaPmTextureAlphaPs && s.blendTextureAlphaPmInverseDiffuseAlphaPs && s.blendTextureAlphaPmDiffuseAlphaPs && s.blendDiffuseAlphaPs && s.blendTextureSelectedTextureAlphaPs && s.blendTextureSelectedDiffuseAlphaPs && s.blendDiffuseSelectedTextureAlphaPs && s.blendDiffuseSelectedDiffuseAlphaPs && s.blendTextureModulateAlphaPs && s.blendDiffuseModulateAlphaPs && s.blendTextureModulate2XAlphaPs && s.blendTextureModulate4XAlphaPs && s.blendDiffuseModulate2XAlphaPs && s.blendDiffuseModulate4XAlphaPs && s.blendTextureAddAlphaPs && s.blendDiffuseAddAlphaPs &&
+        s.blendTextureAlphaPs && s.blendTextureAlphaPmPs && s.blendTextureAlphaPmTextureAlphaPs && s.blendTextureAlphaPmInverseTextureAlphaPs && s.blendTextureAlphaPmInverseDiffuseAlphaPs && s.blendTextureAlphaPmDiffuseAlphaPs && s.blendDiffuseAlphaPs && s.blendTextureSelectedTextureAlphaPs && s.blendTextureSelectedDiffuseAlphaPs && s.blendDiffuseSelectedTextureAlphaPs && s.blendDiffuseSelectedDiffuseAlphaPs && s.blendTextureModulateAlphaPs && s.blendDiffuseModulateAlphaPs && s.blendTextureModulate2XAlphaPs && s.blendTextureModulate4XAlphaPs && s.blendDiffuseModulate2XAlphaPs && s.blendDiffuseModulate4XAlphaPs && s.blendTextureAddAlphaPs && s.blendDiffuseAddAlphaPs &&
         s.blendTextureSubtractAlphaPs && s.blendDiffuseSubtractAlphaPs &&
         s.blendTextureAddSmoothAlphaPs && s.blendDiffuseAddSmoothAlphaPs && s.blendFactorAlphaPs &&
         s.blendFactorTextureAlphaPs && s.blendFactorModulateAlphaPs &&
@@ -3888,6 +3902,39 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     return create_game_sampler(dev, capture, levels, sampler);
 }
 
+// Dynamic upload replaces per-draw IMMUTABLE resource construction. A failed
+// allocation/Map leaves the original D3D9 draw and gamepad path untouched.
+// No suballocation/NO_OVERWRITE: each slot is written with WRITE_DISCARD,
+// including reuse in a later frame while the previous GPU work is in flight.
+bool upload_native_stream(ID3D11Device* device, ID3D11DeviceContext* context,
+                          ComPtr<ID3D11Buffer>& buffer, UINT& capacity,
+                          UINT bytes, UINT bindFlags, const void* source) noexcept {
+    if (!device || !context || !source || !bytes) return false;
+    if (!buffer || capacity < bytes) {
+        const UINT proposed = next_native_stream_capacity(bytes, capacity);
+        if (!proposed) return false;
+        D3D11_BUFFER_DESC desc{};
+        desc.ByteWidth = proposed;
+        desc.Usage = D3D11_USAGE_DYNAMIC;
+        desc.BindFlags = bindFlags;
+        desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        ComPtr<ID3D11Buffer> replacement;
+        if (FAILED(device->CreateBuffer(&desc, nullptr, replacement.GetAddressOf())))
+            return false;
+        buffer = replacement;
+        capacity = proposed;
+    }
+    D3D11_MAPPED_SUBRESOURCE mapped{};
+    if (FAILED(context->Map(buffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD,
+                            0u, &mapped))) return false;
+    // Defensive balance even for a malformed success result: never leave an
+    // otherwise mapped native diagnostic buffer locked on the failure path.
+    if (!mapped.pData) { context->Unmap(buffer.Get(), 0u); return false; }
+    std::memcpy(mapped.pData, source, bytes);
+    context->Unmap(buffer.Get(), 0u);
+    return true;
+}
+
 bool submit(State& s, const std::vector<NativeVertex>& vertices,
             const std::uint32_t* indices, UINT indexCount,
             D3DPRIMITIVETYPE topology, const TextureCapture& capture,
@@ -3895,7 +3942,9 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     if (!ensure_pipeline(s)) return false;
     auto* dev = s.backend.device();
     auto* ctx = s.backend.context();
-    if (!dev || !ctx) return false;
+    if (!dev || !ctx || s.frameBatch.submitted >= s.streamSlots.size())
+        return false;
+    auto& stream = s.streamSlots[s.frameBatch.submitted];
     ComPtr<ID3D11ShaderResourceView> sampledView;
     ComPtr<ID3D11SamplerState> sampledSampler;
     if (capture.enabled &&
@@ -3965,29 +4014,25 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             payload.arguments[i] = static_cast<std::int32_t>(capture.stage1Args[i]);
         for (std::size_t i = 0; i < 2; ++i)
             payload.argZero[i] = static_cast<std::int32_t>(capture.stage1ArgZero[i]);
-        D3D11_BUFFER_DESC cb{};
-        cb.ByteWidth = sizeof(payload);
-        cb.Usage = D3D11_USAGE_IMMUTABLE;
-        cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        D3D11_SUBRESOURCE_DATA data{};
-        data.pSysMem = &payload;
-        if (FAILED(dev->CreateBuffer(&cb, &data, stage1Constants.GetAddressOf())))
+        if (!upload_native_stream(dev, ctx, stream.stage1,
+                                  stream.stage1Capacity,
+                                  static_cast<UINT>(sizeof(payload)),
+                                  D3D11_BIND_CONSTANT_BUFFER, &payload))
             return false;
+        stage1Constants = stream.stage1;
     }
-    D3D11_BUFFER_DESC bd{};
-    bd.ByteWidth = static_cast<UINT>(vertices.size() * sizeof(NativeVertex));
-    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    bd.Usage = D3D11_USAGE_IMMUTABLE;
-    D3D11_SUBRESOURCE_DATA initial{};
-    initial.pSysMem = vertices.data();
-    ComPtr<ID3D11Buffer> vb;
-    if (FAILED(dev->CreateBuffer(&bd, &initial, vb.GetAddressOf()))) return false;
+    const UINT vertexBytes = static_cast<UINT>(vertices.size() * sizeof(NativeVertex));
+    if (!upload_native_stream(dev, ctx, stream.vertex, stream.vertexCapacity,
+                              vertexBytes, D3D11_BIND_VERTEX_BUFFER,
+                              vertices.data())) return false;
+    ComPtr<ID3D11Buffer> vb = stream.vertex;
     ComPtr<ID3D11Buffer> ib;
     if (indices && indexCount) {
-        bd.ByteWidth = indexCount * sizeof(std::uint32_t);
-        bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-        initial.pSysMem = indices;
-        if (FAILED(dev->CreateBuffer(&bd, &initial, ib.GetAddressOf()))) return false;
+        const UINT indexBytes = indexCount * sizeof(std::uint32_t);
+        if (!upload_native_stream(dev, ctx, stream.index, stream.indexCapacity,
+                                  indexBytes, D3D11_BIND_INDEX_BUFFER,
+                                  indices)) return false;
+        ib = stream.index;
     }
 
     // Pixel shader alpha test and OM alpha blend are bound to this same
@@ -5032,6 +5077,9 @@ void before_game_reset() noexcept {
     for (auto& item : s.diagnosticCullRasters) item.Reset();
     s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset(); s.inverseSourceAlphaBlend.Reset(); s.sourceAlphaCopyBlend.Reset(); s.inverseAlphaCopyBlend.Reset(); s.inverseAlphaAddBlend.Reset(); s.sourceReplaceBlend.Reset(); s.multiplyBlend.Reset(); s.inverseDestMultiplyBlend.Reset(); s.inverseSourceMultiplyBlend.Reset(); s.destAlphaCrossfadeBlend.Reset(); s.reverseDestAlphaCrossfadeBlend.Reset(); s.sourceAlphaSaturateCopyBlend.Reset(); s.sourceAlphaSaturateAddBlend.Reset();
     s.alphaConstants.Reset();
+    // Reset invalidates native device ownership. Recreate each dynamic slot
+    // lazily on the next opted-in Draw, never reuse a prior-device buffer.
+    for (auto& stream : s.streamSlots) stream = {};
     for (auto& masked : s.maskedBlends) masked.Reset();
     for (auto& masked : s.multiplyMaskedBlends) masked.Reset();
     for (auto& masked : s.inverseDestMultiplyMaskedBlends) masked.Reset();
@@ -5052,7 +5100,7 @@ void before_game_reset() noexcept {
     s.stage1DiffusePs.Reset(); s.stage1ModulatePs.Reset();
     s.stage1TextureOnlyPs.Reset(); s.stage1AddPs.Reset();
     s.textureOnlyPs.Reset(); s.selectTextureDiffuseAlphaPs.Reset(); s.selectTextureModulateAlphaPs.Reset(); s.selectTextureModulate2XAlphaPs.Reset(); s.selectTextureModulate4XAlphaPs.Reset(); s.selectTextureAddAlphaPs.Reset(); s.selectTextureSubtractAlphaPs.Reset(); s.selectDiffuseTextureAlphaPs.Reset(); s.selectDiffuseModulateAlphaPs.Reset(); s.selectDiffuseAddAlphaPs.Reset(); s.selectDiffuseSubtractAlphaPs.Reset(); s.selectDiffuseModulate2XAlphaPs.Reset(); s.selectDiffuseModulate4XAlphaPs.Reset(); s.selectTextureAddSmoothAlphaPs.Reset(); s.selectDiffuseAddSmoothAlphaPs.Reset(); s.selectTextureFactorAlphaPs.Reset(); s.selectTextureTfactorAlphaPs.Reset(); s.selectDiffuseFactorAlphaPs.Reset(); s.selectDiffuseTfactorAlphaPs.Reset(); s.selectTextureBlendTextureAlphaPs.Reset(); s.selectDiffuseBlendTextureAlphaPs.Reset(); s.selectTextureBlendDiffuseAlphaPs.Reset(); s.selectDiffuseBlendDiffuseAlphaPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset();
-    s.subtractTextureAlphaPs.Reset(); s.subtractDiffuseAlphaPs.Reset(); s.subtractModulateAlphaPs.Reset(); s.modulate2xPs.Reset(); s.modulate4xPs.Reset(); s.modulate2xTextureAlphaPs.Reset(); s.modulate2xDiffuseAlphaPs.Reset(); s.modulate4xTextureAlphaPs.Reset(); s.modulate4xDiffuseAlphaPs.Reset(); s.mixedTextureAlphaPs.Reset(); s.mixedDiffuseAlphaPs.Reset(); s.mixedAddTextureAlphaPs.Reset(); s.mixedAddDiffuseAlphaPs.Reset(); s.blendTextureAlphaPs.Reset(); s.blendTextureAlphaPmPs.Reset(); s.blendTextureAlphaPmTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmFactorAlphaPs.Reset(); s.blendTextureAlphaPmSignedFactorAlphaPs.Reset(); s.blendTextureAlphaPmSigned2XFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateAlphaPs.Reset(); s.blendTextureAlphaPmAddAlphaPs.Reset(); s.blendTextureAlphaPmSubtractAlphaPs.Reset(); s.blendTextureAlphaPmModulate2XAlphaPs.Reset(); s.blendTextureAlphaPmModulate4XAlphaPs.Reset(); s.blendTextureAlphaPmAddSignedAlphaPs.Reset(); s.blendTextureAlphaPmAddSigned2XAlphaPs.Reset(); s.blendTextureAlphaPmBlendTextureAlphaPs.Reset(); s.blendTextureAlphaPmBlendDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmBlendCurrentFactorAlphaPs.Reset(); s.blendTextureAlphaPmBlendFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothAlphaPs.Reset(); s.blendDiffuseAlphaPs.Reset(); s.blendTextureSelectedTextureAlphaPs.Reset(); s.blendTextureSelectedDiffuseAlphaPs.Reset(); s.blendDiffuseSelectedTextureAlphaPs.Reset(); s.blendDiffuseSelectedDiffuseAlphaPs.Reset(); s.blendTextureModulateAlphaPs.Reset(); s.blendDiffuseModulateAlphaPs.Reset(); s.blendTextureModulate2XAlphaPs.Reset(); s.blendTextureModulate4XAlphaPs.Reset(); s.blendDiffuseModulate2XAlphaPs.Reset(); s.blendDiffuseModulate4XAlphaPs.Reset(); s.blendTextureAddAlphaPs.Reset(); s.blendDiffuseAddAlphaPs.Reset(); s.blendTextureSubtractAlphaPs.Reset(); s.blendDiffuseSubtractAlphaPs.Reset(); s.blendTextureAddSmoothAlphaPs.Reset(); s.blendDiffuseAddSmoothAlphaPs.Reset(); s.blendFactorAlphaPs.Reset(); s.blendFactorTextureAlphaPs.Reset(); s.blendFactorModulateAlphaPs.Reset(); s.blendFactorDiffuseAlphaPs.Reset(); s.blendFactorAddAlphaPs.Reset(); s.blendFactorSubtractAlphaPs.Reset(); s.blendFactorAddSmoothAlphaPs.Reset(); s.blendFactorModulate2XAlphaPs.Reset(); s.blendFactorModulate4XAlphaPs.Reset(); s.addSmoothTextureAlphaPs.Reset(); s.addSmoothDiffuseAlphaPs.Reset(); s.vs.Reset();
+    s.subtractTextureAlphaPs.Reset(); s.subtractDiffuseAlphaPs.Reset(); s.subtractModulateAlphaPs.Reset(); s.modulate2xPs.Reset(); s.modulate4xPs.Reset(); s.modulate2xTextureAlphaPs.Reset(); s.modulate2xDiffuseAlphaPs.Reset(); s.modulate4xTextureAlphaPs.Reset(); s.modulate4xDiffuseAlphaPs.Reset(); s.mixedTextureAlphaPs.Reset(); s.mixedDiffuseAlphaPs.Reset(); s.mixedAddTextureAlphaPs.Reset(); s.mixedAddDiffuseAlphaPs.Reset(); s.blendTextureAlphaPs.Reset(); s.blendTextureAlphaPmPs.Reset(); s.blendTextureAlphaPmTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothFactorAlphaPs.Reset(); s.blendTextureAlphaPmSignedFactorAlphaPs.Reset(); s.blendTextureAlphaPmSigned2XFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateAlphaPs.Reset(); s.blendTextureAlphaPmAddAlphaPs.Reset(); s.blendTextureAlphaPmSubtractAlphaPs.Reset(); s.blendTextureAlphaPmModulate2XAlphaPs.Reset(); s.blendTextureAlphaPmModulate4XAlphaPs.Reset(); s.blendTextureAlphaPmAddSignedAlphaPs.Reset(); s.blendTextureAlphaPmAddSigned2XAlphaPs.Reset(); s.blendTextureAlphaPmBlendTextureAlphaPs.Reset(); s.blendTextureAlphaPmBlendDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmBlendCurrentFactorAlphaPs.Reset(); s.blendTextureAlphaPmBlendFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothAlphaPs.Reset(); s.blendDiffuseAlphaPs.Reset(); s.blendTextureSelectedTextureAlphaPs.Reset(); s.blendTextureSelectedDiffuseAlphaPs.Reset(); s.blendDiffuseSelectedTextureAlphaPs.Reset(); s.blendDiffuseSelectedDiffuseAlphaPs.Reset(); s.blendTextureModulateAlphaPs.Reset(); s.blendDiffuseModulateAlphaPs.Reset(); s.blendTextureModulate2XAlphaPs.Reset(); s.blendTextureModulate4XAlphaPs.Reset(); s.blendDiffuseModulate2XAlphaPs.Reset(); s.blendDiffuseModulate4XAlphaPs.Reset(); s.blendTextureAddAlphaPs.Reset(); s.blendDiffuseAddAlphaPs.Reset(); s.blendTextureSubtractAlphaPs.Reset(); s.blendDiffuseSubtractAlphaPs.Reset(); s.blendTextureAddSmoothAlphaPs.Reset(); s.blendDiffuseAddSmoothAlphaPs.Reset(); s.blendFactorAlphaPs.Reset(); s.blendFactorTextureAlphaPs.Reset(); s.blendFactorModulateAlphaPs.Reset(); s.blendFactorDiffuseAlphaPs.Reset(); s.blendFactorAddAlphaPs.Reset(); s.blendFactorSubtractAlphaPs.Reset(); s.blendFactorAddSmoothAlphaPs.Reset(); s.blendFactorModulate2XAlphaPs.Reset(); s.blendFactorModulate4XAlphaPs.Reset(); s.addSmoothTextureAlphaPs.Reset(); s.addSmoothDiffuseAlphaPs.Reset(); s.vs.Reset();
     s.backend.shutdown();
 }
 } // namespace outrun::vr::dx11::live_game_frame
