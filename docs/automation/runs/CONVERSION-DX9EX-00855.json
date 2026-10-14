@@ -69,9 +69,9 @@
     "negative_test_evidence": "C++ constexpr asserts preserve distinct F11 0.55/1.5 scale and regular game scaling; workflow-wired F11 Python verifier checks exact packaged owner calls, both scale components, strict admission, order before projection, negative mutations and numeric resolution cases.",
     "eye_ownership": "R30PrepareExternalImGuiProjection has strict exact F11 scope/orthographic/fixedfn gates, computes each eye's head-inverse, relative pose, FOV, viewport and per-command scissor with original state restoration, without borrowing normal game ScreenHud scale."
   },
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
-  "phase": "C4_COMMIT_C3_VALIDATION_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No matching Quest3/VDXR game test performed; F11 optical size/placement and interaction remain NEED_HMD_TEST even if Windows CI passes.",
   "changed_files": [
@@ -80,7 +80,7 @@
     "docs/automation/runs/CONVERSION-DX9EX-00855.json"
   ],
   "material_result_sha": "02cd1c8aafaccb079f0ea53eb3fd52582e1b9a32",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "d902cb89562c8955017a8a937177bae56c38ce3b",
   "acceptance_results": {
     "native_size": "SOURCE_PATCHED_CI_PENDING",
     "independent": "SOURCE_PATCHED_CI_PENDING",
@@ -93,5 +93,7 @@
     "prior_gate_failure": "RUN_RECORD_MISSING; code compilation not reached",
     "runtime_validation": "UNTESTED"
   },
-  "score_once": false
+  "score_once": false,
+  "checkpoint": "C6_STATE",
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
