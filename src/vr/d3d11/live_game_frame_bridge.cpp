@@ -32,6 +32,7 @@
 #include "native_game_readback_provenance.hpp"
 #include "native_game_present_region.hpp"
 #include "native_game_clear_color.hpp"
+#include "native_game_clear_coverage.hpp"
 #include "native_game_backbuffer_admission.hpp"
 #include "native_game_texture_atlas_budget.hpp"
 
@@ -4814,9 +4815,9 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
         const auto sourceDevice = reinterpret_cast<std::uintptr_t>(game);
         if (s.sourceGameDevice != 0u && s.sourceGameDevice != sourceDevice) return;
         // Only the original successful game Clear reaches this callback.
-        // Partial rectangle and partial viewport Clears cannot seed a frame.
+        // Entire game backbuffer may be cleared by a union of D3DRECTs.
+        // An incomplete Clear may not seed a native game frame.
         s.clearColor.discard();
-        if (count != 0u || rects != nullptr) return;
         ComPtr<IDirect3DSurface9> target, backbuffer;
         D3DSURFACE_DESC targetDesc{}, bbDesc{};
         D3DVIEWPORT9 viewport{};
@@ -4834,11 +4835,24 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             targetDesc.Width == bbDesc.Width && targetDesc.Height == bbDesc.Height &&
             viewport.X == 0u && viewport.Y == 0u &&
             viewport.Width == bbDesc.Width && viewport.Height == bbDesc.Height &&
+            GameNativeClearCoverage::covers_whole(
+                bbDesc.Width, bbDesc.Height, viewport.X, viewport.Y,
+                viewport.Width, viewport.Height, count, rects) &&
             bbDesc.MultiSampleType == D3DMULTISAMPLE_NONE &&
             (bbDesc.Format == D3DFMT_A8R8G8B8 || bbDesc.Format == D3DFMT_X8R8G8B8);
         s.clearColor.record(sourceDevice,
             reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()),
             static_cast<std::uint32_t>(color), wholeBackbuffer);
+        if (wholeBackbuffer && env_full_game_opt_in()) {
+            // Original successful whole Clear makes earlier menu/offscreen
+            // Draws invisible. Restart source continuity at the first real
+            // post-Clear Draw/DrawIndexed on this SAME game device/Present.
+            // Never revive a batch after a partial or foreign Clear.
+            s.frameBatch.reset();
+            s.pending = false;
+            s.sourceDrawsThisFrame = 0u;
+            s.eligibleThisFrame = 0u;
+        }
     } catch (...) {
         // D3D9 Clear, input and Present always remain authoritative.
     }

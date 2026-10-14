@@ -22,7 +22,7 @@ def integrated(cpp: str, r9: str, clear: str) -> bool:
         "return finishNativeClear(ClearHook.stdcall<HRESULT>(",
         "return finishNativeClear(R9ClearCallbackHook.stdcall<HRESULT>(",
     )) and all(x in observe for x in (
-        "s.clearColor.discard();", "if (count != 0u || rects != nullptr) return;",
+        "s.clearColor.discard();", "GameNativeClearCoverage::covers_whole(",
         "game->GetRenderTarget(0,", "game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,",
         "targetIdentity.Get() == backbufferIdentity.Get()",
         "viewport.Width == bbDesc.Width && viewport.Height == bbDesc.Height",
@@ -50,7 +50,7 @@ for old, new in (
     mutant = hook.replace(old, new, 1)
     assert mutant != hook and not integrated(src, mutant, helper), old
 for old, new in (
-    ("if (count != 0u || rects != nullptr) return;", "if (count == 0u && rects == nullptr) return;"),
+    ("GameNativeClearCoverage::covers_whole(", "if (count == 0u && rects == nullptr) return;"),
     ("targetIdentity.Get() == backbufferIdentity.Get()",
      "targetIdentity.Get() != backbufferIdentity.Get()"),
     ("s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)",
