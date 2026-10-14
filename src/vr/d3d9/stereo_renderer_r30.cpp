@@ -2087,10 +2087,17 @@ namespace OutRunVRStereo
             const float transitionWeight = (std::max)(
                 OutRunVrHudEdge::PeripheralWeight(rawAnchorX),
                 OutRunVrHudEdge::PeripheralWeight(rawAnchorY));
+            // Partially offscreen animated HUD text keeps neutral placement.
+            // Without an entry envelope, the next fully visible frame
+            // suddenly applies the entire peripheral displacement and zoom.
+            const float fullyVisibleWeight = OutRunVrHudEdge::FullyVisibleWeight(
+                minX - x0, (x0 + width) - maxX,
+                minY - y0, (y0 + height) - maxY, width, height);
             return {
-                R30PeripheralAnchor(rawAnchorX, 0.82f),
-                R30PeripheralAnchor(rawAnchorY, 0.78f),
-                minX, maxX, minY, maxY, true, transitionWeight
+                R30PeripheralAnchor(rawAnchorX, 0.82f) * fullyVisibleWeight,
+                R30PeripheralAnchor(rawAnchorY, 0.78f) * fullyVisibleWeight,
+                minX, maxX, minY, maxY, true,
+                transitionWeight * fullyVisibleWeight
             };
         }
 

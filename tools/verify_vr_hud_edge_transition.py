@@ -77,3 +77,46 @@ assert anchor(float("nan"),.82)==0 and anchor(.2,.82)==0
 assert "4.0f/3.0f" in smoke and "16.0f/9.0f" in smoke and "21.0f/9.0f" in smoke
 assert "PeripheralAnchor(nan,.82f)" in smoke
 print("DX9Ex HUD edge continuity 4:3/16:9/21:9, 9 destructive mutations PASS")
+
+// Exact producer HUD: all four source clip edges must smoothly gate both
+// geometry placement and optical-size enlargement. Other owners never enter
+// this producer gate. Mutation controls protect the source, not just a model.
+visibility_tokens = (
+    'OutRunVrHudEdge::FullyVisibleWeight(',
+    'minX - x0, (x0 + width) - maxX,',
+    'minY - y0, (y0 + height) - maxY, width, height);',
+    'R30PeripheralAnchor(rawAnchorX, 0.82f) * fullyVisibleWeight',
+    'R30PeripheralAnchor(rawAnchorY, 0.78f) * fullyVisibleWeight',
+    'transitionWeight * fullyVisibleWeight',
+)
+for token in visibility_tokens:
+    assert token in src, token
+for token in ('inline float FullyVisibleWeight(', '0.015f * sourceWidth',
+              '0.015f * sourceHeight', 'const float t = (std::min)(x, y);'):
+    assert token in hdr, token
+for token in ('FullyVisibleWeight(', 'return 8;', 'return 9;', 'return 10;'):
+    assert token in smoke, token
+for original, mutant in (
+    ('R30PeripheralAnchor(rawAnchorX, 0.82f) * fullyVisibleWeight',
+     'R30PeripheralAnchor(rawAnchorX, 0.82f)'),
+    ('R30PeripheralAnchor(rawAnchorY, 0.78f) * fullyVisibleWeight',
+     'R30PeripheralAnchor(rawAnchorY, 0.78f)'),
+    ('transitionWeight * fullyVisibleWeight', 'transitionWeight'),
+):
+    assert original in src
+    assert not all(t in src.replace(original, mutant, 1)
+                   for t in visibility_tokens)
+def visible(inset,width):
+    if not math.isfinite(inset) or width<=0: return 0.
+    t=max(0.,min(1.,inset/(.015*width)))
+    return t*t*(3.-2.*t)
+for width in (640.,1920.,3440.):
+    prev=0.
+    for i in range(-10,111):
+        a=visible(i*.00015*width,width)
+        if i>=0: assert 0<=a-prev<=.016
+        prev=a
+    assert visible(-1.,width)==0.
+    assert visible(0.,width)==0.
+    assert visible(.015*width,width)==1.
+print('PASS HUD source-boundary visibility ramp + 3 negative mutations')

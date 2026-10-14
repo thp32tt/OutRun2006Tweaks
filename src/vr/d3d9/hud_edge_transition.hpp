@@ -31,6 +31,27 @@ namespace OutRunVrHudEdge
         return std::clamp(ndc, -limit, limit) * weight;
     }
 
+    // Smooth each exact gameplay glyph group's entrance/exit over a bounded
+    // fraction of source space before the stereo-common anchor/zoom engages.
+    inline float FullyVisibleWeight(
+        float leftInset, float rightInset, float topInset, float bottomInset,
+        float sourceWidth, float sourceHeight) noexcept
+    {
+        if (!std::isfinite(leftInset) || !std::isfinite(rightInset) ||
+            !std::isfinite(topInset) || !std::isfinite(bottomInset) ||
+            !std::isfinite(sourceWidth) || !std::isfinite(sourceHeight) ||
+            sourceWidth <= 0.0f || sourceHeight <= 0.0f)
+            return 0.0f;
+        const float x = std::clamp(
+            (std::min)(leftInset, rightInset) / (0.015f * sourceWidth),
+            0.0f, 1.0f);
+        const float y = std::clamp(
+            (std::min)(topInset, bottomInset) / (0.015f * sourceHeight),
+            0.0f, 1.0f);
+        const float t = (std::min)(x, y);
+        return t * t * (3.0f - 2.0f * t);
+    }
+
     inline float BlendBoost(float lower, float upper, float weight) noexcept
     {
         if (!std::isfinite(lower) || !std::isfinite(upper) ||
