@@ -63,7 +63,19 @@ def check(r29, api, r30):
         shader_gate = xyz.index(
             "if (!OutRunVR::State::StateBlockTracker::Reliable())")
         shader_live = xyz.index("FAILED(device->GetVertexShader(&shader))")
-        fvf_gate = xyz.index("DWORD fvf = 0;")
+        # The common XYZRHW gate now validates a declaration-only POSITIONT
+        # input in a separate helper before any eye replay. Keep the
+        # expensive live shader fallback ordered BEFORE that helper call.
+        fvf_gate = xyz.index("if (!R30HasXyzrhwInputLayout(device))")
+        layout = body(r30, "bool R30HasXyzrhwInputLayout(")
+        if not all(token in layout for token in (
+            "device->GetFVF(&fvf)", "D3DFVF_POSITION_MASK",
+            "device->GetVertexDeclaration(&declaration)",
+            "declaration->GetDeclaration(elements, &count)",
+            "declaration->Release();",
+            "D3DDECLUSAGE_POSITIONT",
+            "D3DDECLTYPE_FLOAT4")):
+            return False
         if not (xyz.index("R29OwnerCurrentVertexShaderIdentity() != 0")
                 < shader_gate < shader_live < fvf_gate):
             return False
@@ -160,13 +172,19 @@ def main():
             "R29OwnerCurrentVertexShaderIdentity() != 0",
             "false", 1)),
         (r29, api, r30.replace(
+            "if (!R30HasXyzrhwInputLayout(device))",
+            "if (false)", 1)),
+        (r29, api, r30.replace(
+            "declaration->GetDeclaration(elements, &count)",
+            "D3D_OK", 1)),
+        (r29, api, r30.replace(
             '#include "../state/state_block_tracker.hpp"',
             '// removed explicit StateBlockTracker include', 1)),
     )
     for i, candidate in enumerate(changes, 1):
         assert candidate != (r29, api, r30), f"mutation {i} not applied"
         assert not check(*candidate), f"mutation {i} escaped"
-    print("PASS DX9Ex R30 cached raster hotpath + 17 destructive regressions")
+    print("PASS DX9Ex R30 cached raster hotpath + 19 destructive regressions")
 
 
 if __name__ == "__main__":
