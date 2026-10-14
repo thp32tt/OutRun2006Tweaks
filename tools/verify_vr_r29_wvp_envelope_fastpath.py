@@ -265,8 +265,9 @@ for label, old, new in (
      "r23Ready && !stereoEligible)"),
     ("removed partial guard", "SUCCEEDED(hr) && partialWvp && R28RawWvpComplete() &&",
      "SUCCEEDED(hr) && R28RawWvpComplete() &&"),
-    ("removed failure invalidation", "R29InvalidateRawWvpGenerationImpl();",
-     "/* invalidation removed */"),
+    ("removed failure invalidation",
+     "if (FAILED(hr))\n                {\n                    InvalidateVerifiedWvp();\n                    R29InvalidateRawWvpGenerationImpl();\n                }\n                return hr;",
+     "if (FAILED(hr))\n                {\n                    InvalidateVerifiedWvp();\n                    /* invalidation removed */\n                }\n                return hr;"),
 ):
     upload_source = function(source, "HRESULT __stdcall SetVertexShaderConstantFDestR29(")
     assert old in upload_source, label
