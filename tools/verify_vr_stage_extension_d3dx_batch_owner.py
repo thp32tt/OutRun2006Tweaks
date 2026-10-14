@@ -46,7 +46,7 @@ def check(code: str, header: str) -> list[str]:
          "ForgetBatch();" in hook,
          "Begin/End/failed-Flush state invalidation missing")
     need("PendingHomogeneous = false" in hook and
-         "!PendingHomogeneous" in hook and
+         "CanFlushD3DXPreQueueStageBatch(" in hook and
          "!QueueRenderActive()" in hook,
          "mixed/unknown owner fail-closed fallback missing")
     need("CanFlushD3DXPreQueueStageBatch(" in hook and
