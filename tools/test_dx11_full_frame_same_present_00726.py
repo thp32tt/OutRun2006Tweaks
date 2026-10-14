@@ -21,7 +21,7 @@ def integrated(src: str, provenance: str) -> bool:
     return all((
         0 <= capture < queue < poll < getdata < fallback,
         "fullQueued = true;" in section[queue:poll],
-        "if (oldest.busy && (!fullMode || fullQueued))" in section[poll:getdata],
+        "if (oldest.busy && !oldest.quarantined &&" in section[poll:getdata],
         "!oldest.provenance.may_present(s.presents, fullMode)" in section,
         "s.sourceGameDevice == presentDevice && !fullMode" in section[fallback:],
         "if (!fullMode) s.readSlot = (s.readSlot + 1u) % kReadbackSlots;" in section,

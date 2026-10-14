@@ -27,7 +27,7 @@ def integrated(source: str, header: str) -> bool:
         "fullSlot = availableSlot;" in body[admission:copy],
         "s.writeSlot = (fullSlot + 1u) % kReadbackSlots;" in body[fence:publish],
         "++s.droppedCopies;" in body[fence:publish],
-        "if (oldest.busy && (!fullMode || fullQueued))" in body[publish:],
+        "if (oldest.busy && !oldest.quarantined &&" in body[publish:],
         "oldest.provenance.may_present(s.presents, fullMode)" in body,
         "return slotCount;" in header,
         "(occupiedMask & (1u << slot)) == 0u" in header,
@@ -41,7 +41,7 @@ for old, new in (
     ("if (availableSlot < kReadbackSlots)", "if (availableSlot <= kReadbackSlots)"),
     ("if (s.readbacks[i].busy) occupiedSlots", "if (!s.readbacks[i].busy) occupiedSlots"),
     ("s.writeSlot = (fullSlot + 1u) % kReadbackSlots;", "s.writeSlot = (s.writeSlot + 1u) % kReadbackSlots;"),
-    ("if (oldest.busy && (!fullMode || fullQueued))", "if (oldest.busy)"),
+    ("if (oldest.busy && !oldest.quarantined &&", "if (oldest.busy)"),
 ):
     mutant = SOURCE.replace(old, new, 1)
     assert mutant != SOURCE and not integrated(mutant, HEADER), old
