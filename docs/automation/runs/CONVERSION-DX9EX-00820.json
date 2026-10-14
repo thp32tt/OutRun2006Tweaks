@@ -2,9 +2,9 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00820",
   "production_id": "CONVERSION-DX9EX-00820",
-  "event_id": "CONVERSION-DX9EX-00820-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00820-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:RANK_MARKERS",
@@ -12,7 +12,7 @@
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "work_key": "DX9EX:VIS:RANK_MARKERS",
   "status": "IMPLEMENTED_PENDING_EXACT_SHA",
-  "checkpoint": "C2_IMPLEMENT",
+  "checkpoint": "C3_VALIDATE",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_delta": 0,
@@ -50,7 +50,8 @@
         "behavior_area": "win32_host_game_package_domain",
         "expected_behavior": "Rank destructive mutations plus full exact-SHA DX9Ex Active, Domain Isolation and Full Source Impact succeed; Quest3/VDXR runtime remains separate."
       }
-    ]
+    ],
+    "scope_boundary": "Only ordinal and rival vehicle rank markers sourced by 0xBAD20, 0xBAEE2 and 0xBB796 and their projected sprite queue/Draw ownership. Exclude NaviPub HUD rank, global +TIME/GOAL titles, lens flare, start shadow, menu/UI, DX11/DXVK and SkyGlow; preserve existing stereo and pending Draw behavior for adjacent unrelated producers."
   },
   "acceptance_results": {
     "RANK_SOURCE_AND_QUEUE": "PENDING_CI",
@@ -72,7 +73,8 @@
     ],
     "fix_evidence": "Exact three producer wrappers isolate and restore pending Draw only in VR mode, tag source provenance and freeze ordinal digit sibling offsets before original clip call.",
     "negative_test_evidence": "Gated rank-anchor verifier enforces owner/direct/tag ordering and injects five independent destructive source mutations.",
-    "eye_ownership": "Original Calc3D2D view-space point copied to source, sibling sprites, R30 per-eye; unrelated NextDrawScope preserved for its following original consumer."
+    "eye_ownership": "Original Calc3D2D view-space point copied to source, sibling sprites, R30 per-eye; unrelated NextDrawScope preserved for its following original consumer.",
+    "ci_failure": "DX9Ex Active run 38505077572 on original material e7eff23b769893500f092d3b8a62d89f830fd283 stopped before compile in feature policy: missing feature_contract.scope_boundary; this retry adds a specific enforceable boundary while keeping original rank source implementation and negative mutation tests."
   },
   "changed_files": [
     "src/hooks_uiscaling.cpp",
