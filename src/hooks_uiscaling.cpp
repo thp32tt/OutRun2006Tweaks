@@ -35,6 +35,26 @@ enum class ScalingMode
 #define SCREEN_ONE_THIRD 213
 #define SCREEN_TWO_THIRD 426
 
+namespace
+{
+    constexpr float CenterMultiSpriteAxis(
+    	float pixel, float axisScale, float containScale,
+    	float screenExtent, float originalExtent) noexcept
+    {
+    	return (pixel / axisScale) * containScale +
+    		(screenExtent - originalExtent * containScale) * 0.5f;
+    }
+
+    // Deterministic Win32 compile-time coordinate regressions: native 4:3,
+    // 16:9, 21:9 and portrait XR (including top/bottom Y letterbox).
+    static_assert(CenterMultiSpriteAxis(640.0f, 2.0f, 2.0f, 1280.0f, 640.0f) == 640.0f);
+    static_assert(CenterMultiSpriteAxis(960.0f, 3.0f, 2.25f, 1920.0f, 640.0f) == 960.0f);
+    static_assert(CenterMultiSpriteAxis(1280.0f, 4.0f, 2.25f, 2560.0f, 640.0f) == 1280.0f);
+    static_assert(CenterMultiSpriteAxis(0.0f, 2.5f, 1.25f, 1200.0f, 480.0f) == 300.0f);
+    static_assert(CenterMultiSpriteAxis(1200.0f, 2.5f, 1.25f, 1200.0f, 480.0f) == 900.0f);
+
+}
+
 class UIScaling : public Hook
 {
 	const static int D3DXMatrixTransformation2D_Addr = 0x39400;
@@ -1265,22 +1285,6 @@ class UIScaling : public Hook
 	// stretched scale and the menu quad lost its native 4:3 proportions.
 	// Use the same contain scale/centering for BOTH axes, exclusively for
 	// KeepCentered/OnlineArcade UI sprites (never world, Vanilla or F11).
-	static constexpr float CenterMultiSpriteAxis(
-		float pixel, float axisScale, float containScale,
-		float screenExtent, float originalExtent) noexcept
-	{
-		return (pixel / axisScale) * containScale +
-			(screenExtent - originalExtent * containScale) * 0.5f;
-	}
-
-	// Deterministic Win32 compile-time coordinate regressions: native 4:3,
-	// 16:9, 21:9 and portrait XR (including top/bottom Y letterbox).
-	static_assert(CenterMultiSpriteAxis(640.0f, 2.0f, 2.0f, 1280.0f, 640.0f) == 640.0f);
-	static_assert(CenterMultiSpriteAxis(960.0f, 3.0f, 2.25f, 1920.0f, 640.0f) == 960.0f);
-	static_assert(CenterMultiSpriteAxis(1280.0f, 4.0f, 2.25f, 2560.0f, 640.0f) == 1280.0f);
-	static_assert(CenterMultiSpriteAxis(0.0f, 2.5f, 1.25f, 1200.0f, 480.0f) == 300.0f);
-	static_assert(CenterMultiSpriteAxis(1200.0f, 2.5f, 1.25f, 1200.0f, 480.0f) == 900.0f);
-
 	static void CenterMultiSpriteQuad(float* vertices, int stride) noexcept
 	{
 		if (!vertices || !Game::screen_scale || !Game::screen_resolution)
