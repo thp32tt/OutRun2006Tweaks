@@ -1013,8 +1013,8 @@ for label, bad in (
         'vtable[9], reinterpret_cast<void*>(&DrawDest)',
         'vtable[8], reinterpret_cast<void*>(&DrawDest)', 1)),
     ('D3DX Flush missing', ui.replace(
-        'reinterpret_cast<FlushFn>(vtable[10])(self)',
-        'D3D_OK', 1)),
+        'const HRESULT flushHr = reinterpret_cast<FlushFn>(vtable[10])(self);',
+        'const HRESULT flushHr = D3D_OK;', 1)),
     ('6th kind0 exact call omitted', ui.replace(
         'case 0xB9F3A:', 'case 0xBADDD:', 1)),
     ('DispRank right glyph aliases arbitrary text', ui.replace(

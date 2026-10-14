@@ -55,7 +55,7 @@ def check(code: str) -> list[str]:
          "StageOwner(nextScope, nextProducer)" in hook,
          "next node must have exact +TIME tag before promotion")
     need("StageOwner(scope, source) && PendingHomogeneous" in hook and
-         "StageBoundaryReady &&" in hook and
+         "queuedStageIsolated || directStageIsolated" in hook and
          "FlushTracked(self)" in hook,
          "+TIME submission must flush only under proven ScreenHud producer")
     need("StageBoundaryReady = false" in hook and
@@ -75,7 +75,8 @@ def check(code: str) -> list[str]:
     finish = queue.find("OutRunVR::GameSemantic::EndSpriteQueueRender();")
     need(0 <= node < select and 0 <= leave < finish,
          "prior producer must flush BEFORE queue ownership is replaced")
-    need("if (QueueRenderActive() && StageBoundaryReady &&" in hook and
+    need("QueueRenderActive() && StageBoundaryReady" in hook and
+         "!QueueRenderActive() && PendingDraws == 1u" in hook and
          "if (FlushTracked(self))" in hook,
          "post-Draw +TIME flush not constrained to queue-owned proof")
     return errors
@@ -100,6 +101,9 @@ def main() -> int:
         "missing-old-owner-proof":
             code.replace("PendingProducer != CurrentRenderProducerToken()",
                          "PendingProducer == CurrentRenderProducerToken()", 1),
+        "unproven-direct-batch":
+            code.replace("!QueueRenderActive() && PendingDraws == 1u",
+                         "false", 1),
         "missing-end-boundary":
             code.replace("VRProjectedD3DXSpriteIsolationR64::BeforeQueueEnd();",
                          "// no end flush", 1),
@@ -111,7 +115,7 @@ def main() -> int:
         if mutated == code or not check(mutated):
             print("DX9Ex +TIME D3DX FAIL: mutation not detected:", label)
             return 1
-    print("DX9Ex +TIME D3DX batch boundary and 5 negative regressions PASS")
+    print("DX9Ex +TIME D3DX batch boundary and 6 negative regressions PASS")
     return 0
 
 

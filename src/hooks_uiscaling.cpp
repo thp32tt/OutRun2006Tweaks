@@ -2233,7 +2233,15 @@ private:
         // exact queue owner still exists; a later End cannot head-lock it.
         // Numeric direct glyph callers retain their existing exact scope;
         // never silently adopt their unknown preceding D3DX buffer.
-        if (QueueRenderActive() && StageBoundaryReady &&
+        const bool queuedStageIsolated =
+            QueueRenderActive() && StageBoundaryReady;
+        // The three original numeric E8 callers can use D3DX directly
+        // without creating a SpriteNode. Submit their exact batch only if
+        // the observed Begin contains no earlier Draw of another owner.
+        // Unknown/mixed buffers retain the original D3DX End behavior.
+        const bool directStageIsolated =
+            !QueueRenderActive() && PendingDraws == 1u;
+        if ((queuedStageIsolated || directStageIsolated) &&
             BatchActive && self == TrackedSprite &&
             StageOwner(scope, source) && PendingHomogeneous &&
             PendingScope == scope && PendingProducer == source)
@@ -2244,7 +2252,8 @@ private:
                     1, std::memory_order_relaxed) + 1;
                 if ((n & (n - 1)) == 0)
                     spdlog::info(
-                        "VR P0 +TIME D3DX batch: exact queued stage separated; flushes={} fallback={}",
+                        "VR P0 +TIME D3DX batch: exact {} stage submitted; flushes={} fallback={}",
+                        queuedStageIsolated ? "queued" : "direct",
                         n, StageFallbacks.load(std::memory_order_relaxed));
             }
             else
