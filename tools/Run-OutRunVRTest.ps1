@@ -14,6 +14,7 @@ param(
 
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $MyInvocation.MyCommand.Path
+Set-Location -LiteralPath $root
 
 # GUI starts this script in a hidden PowerShell child. Without an explicit
 # failure channel, a missing EXE, wrong binary hash, or copy/launch exception
@@ -49,6 +50,7 @@ if(!(Test-Path $collector)){throw 'Collect-OutRunVRLogs.ps1 not found.'}
 if(!(Test-Path $selector)){throw 'Select-OutRunVRBackend.ps1 not found.'}
 if(!(Test-Path $profileLib)){throw 'OutRunVR-TestProfiles.ps1 not found.'}
 if(!(Test-Path $game)){throw "Game executable not found: $game"}
+if(!(Test-Path -LiteralPath (Join-Path $root 'OutRun2006Tweaks.ini'))){throw 'INI missing; extract full ZIP into the game folder.'}
 . $profileLib
 
 $running=Get-Process -ErrorAction SilentlyContinue|Where-Object{
@@ -60,6 +62,11 @@ $kv=@{}
 Get-Content $active|ForEach-Object{if($_ -match '^([^=]+)=(.*)$'){$kv[$matches[1]]=$matches[2]}}
 $backend=$kv.backend
 if(!$backend){throw 'Active backend identity is missing.'}
+if($backend -eq 'd3d9'){
+  foreach($required in @('dinput8.dll','outrun-vr-host.exe')){
+    if(!(Test-Path -LiteralPath (Join-Path $root $required))){throw "Installed DX9Ex backend missing $required in game folder."}
+  }
+}
 $variant=if($kv.variant){[string]$kv.variant}else{'AUTO'}
 
 # Packages are commonly extracted over an older test directory. Treat session
@@ -400,9 +407,57 @@ if ($backend -eq 'd3d9') {
     }
 }
 
+# The OpenXR v3 shadow and a successful prewarm do not prove v2 host life.
+# Never terminate the user's game merely because the host is missing.
+$xrHostEverSeen=$false
+$xrHostFailure=$false
+$xrHostFailureReason=''
+$xrHostMissingSince=$null
+$gameStartedAt=Get-Date
 try{
-    $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru
+    $p=Start-Process -FilePath $game -ArgumentList $gameArgs -WorkingDirectory $root -PassThru -ErrorAction Stop
+    while(-not $p.HasExited){
+        if($backend -eq 'd3d9'){
+            $xrHostAlive=@(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue).Count -gt 0
+            if($xrHostAlive){$xrHostEverSeen=$true; $xrHostMissingSince=$null}
+            else{
+                if($null -eq $xrHostMissingSince){$xrHostMissingSince=Get-Date}
+                if(((Get-Date)-$gameStartedAt).TotalSeconds -ge 15 -and
+                   ((Get-Date)-$xrHostMissingSince).TotalSeconds -ge 10){
+                    $xrHostFailure=$true
+                    $xrHostFailureReason=if($xrHostEverSeen){'HOST_DISAPPEARED_DURING_GAME'}else{'HOST_NEVER_STARTED'}
+                    Write-Warning "DX9Ex OpenXR host missing ($xrHostFailureReason). Leave game running until normal exit to collect logs."
+                    break
+                }
+            }
+        }
+        Start-Sleep -Seconds 2
+    }
     $p.WaitForExit()
+    if($backend -eq 'd3d9'){
+        if(-not $xrHostEverSeen -and -not $xrHostFailure){
+            $xrHostFailure=$true
+            $xrHostFailureReason='GAME_EXITED_WITHOUT_HOST'
+        }
+        @(
+          "sourceSha=$sourceSha",
+          "gamePid=$($p.Id)",
+          "gameExitCode=$($p.ExitCode)",
+          "hostProcessEverSeen=$xrHostEverSeen",
+          "status=$(if($xrHostFailure){$xrHostFailureReason}else{'PROCESS_OBSERVED_NOT_HMD_VERIFIED'})",
+          "runtimeValidation=UNTESTED"
+        ) | Set-Content -LiteralPath (Join-Path $sessionRoot 'DX9EX_LAUNCH_HEALTH.txt') -Encoding UTF8
+        if($xrHostFailure){
+            @(
+              'DX9Ex OpenXR host missing during game.',
+              "reason=$xrHostFailureReason",
+              "gamePid=$($p.Id)",
+              "session=$sessionRoot",
+              'Check Virtual Desktop/VDXR OpenXR runtime and host log.',
+              'A missing process does not establish the underlying runtime cause.'
+            ) | Set-Content -LiteralPath (Join-Path $root 'OUTRUNVR_LAUNCH_ERROR.txt') -Encoding UTF8
+        }
+    }
 } finally {
     # Stop only the sampler started by this run, never a user's other nvidia-smi.
     if ($gpuCaptureRequested) {
@@ -487,3 +542,11 @@ if(Get-Process -Name 'outrun-vr-host' -ErrorAction SilentlyContinue){
 
 & $collector
 if($LASTEXITCODE -and $LASTEXITCODE -ne 0){exit $LASTEXITCODE}
+if($xrHostFailure){
+    Write-Warning 'OpenXR host failure: see OUTRUNVR_LAUNCH_ERROR.txt and DX9EX_LAUNCH_HEALTH.txt in session logs.'
+    try {
+       Add-Type -AssemblyName System.Windows.Forms
+       [void][System.Windows.Forms.MessageBox]::Show('OpenXR host missing. See OUTRUNVR_LAUNCH_ERROR.txt; logs were collected.','DX9Ex VR launch failure')
+    } catch {}
+    exit 5
+}

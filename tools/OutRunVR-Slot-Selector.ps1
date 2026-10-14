@@ -81,7 +81,7 @@ function Start-Slot([string]$slot){
     # containing spaces. The runner trap writes a launch error + modal dialog.
     $quotedRunner = '"' + $runner + '"'
     $launchArgs = "-NoProfile -ExecutionPolicy Bypass -File $quotedRunner -TestProfile $($cfg.Profile) -GpuDiagnostics $gpuSetting"
-    Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $launchArgs -WorkingDirectory $root -WindowStyle Hidden -ErrorAction Stop
+    Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $launchArgs -WorkingDirectory $root -WindowStyle Normal -ErrorAction Stop
 }
 
 $form=New-Object System.Windows.Forms.Form
