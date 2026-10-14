@@ -15,8 +15,8 @@ def integrated(cpp: str, r9: str, clear: str) -> bool:
         "void observe_unavailable_game_draw(", 1)[0]
     submit = cpp.split("bool submit(", 1)[-1].split("bool observe_source_device(", 1)[0]
     return all(x in callback for x in (
-        // 00729: the successful HRESULT is the outer scene boundary guard;
-        // only color Clears reseed native D3D11 game-source background.
+        # 00729: the successful HRESULT is the outer scene boundary guard;
+        # only color Clears reseed native D3D11 game-source background.
         "if (SUCCEEDED(result)) {",
         "if ((flags & (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |",
         "live_game_frame::observe_scene_boundary(device)",
