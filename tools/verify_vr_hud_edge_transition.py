@@ -78,9 +78,9 @@ assert "4.0f/3.0f" in smoke and "16.0f/9.0f" in smoke and "21.0f/9.0f" in smoke
 assert "PeripheralAnchor(nan,.82f)" in smoke
 print("DX9Ex HUD edge continuity 4:3/16:9/21:9, 9 destructive mutations PASS")
 
-// Exact producer HUD: all four source clip edges must smoothly gate both
-// geometry placement and optical-size enlargement. Other owners never enter
-// this producer gate. Mutation controls protect the source, not just a model.
+# Exact producer HUD: all four source clip edges must smoothly gate both
+# geometry placement and optical-size enlargement. Other owners never enter
+# this producer gate. Mutation controls protect the source, not just a model.
 visibility_tokens = (
     'OutRunVrHudEdge::FullyVisibleWeight(',
     'minX - x0, (x0 + width) - maxX,',
