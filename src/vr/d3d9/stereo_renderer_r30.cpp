@@ -97,6 +97,16 @@ namespace OutRunVRStereo
         std::atomic<OutRunVR::RuntimeEligibility::InstallState> R30InstallState{
             OutRunVR::RuntimeEligibility::InstallState::Pending };
 
+        // R30 owns per-draw stereo decisions independently of instrumentation.
+        // Shadow, XYZRHW and sky-glow counters are only read by the optional
+        // Present telemetry report. Do not dirty the shared counter cache lines
+        // for every draw/Lock/Unlock when the diagnostics toggle is off.
+        inline void R30RecordTelemetryCounter(std::uint64_t& counter) noexcept
+        {
+            if (Settings::VRTelemetry)
+                ++counter;
+        }
+
         std::uint64_t R30ScreenSpaceFovDraws = 0;
         std::uint64_t R30ScreenSpaceFallbacks = 0;
         std::uint64_t R30ScreenSpaceBuildFailures = 0;
@@ -519,7 +529,7 @@ namespace OutRunVRStereo
             {
                 entry->valid.clear();
                 ++entry->revision;
-                ++R30ShadowDiscardInvalidations;
+                R30RecordTelemetryCounter(R30ShadowDiscardInvalidations);
             }
         }
 
@@ -547,7 +557,7 @@ namespace OutRunVRStereo
                     entry->lastWriteEnd = entry->lockOffset + entry->lockSize;
                     entry->lastWriteSafe =
                         (entry->lockFlags & D3DLOCK_DISCARD) == 0;
-                    ++R30ShadowWrites;
+                    R30RecordTelemetryCounter(R30ShadowWrites);
                 }
                 catch (...)
                 {
@@ -610,7 +620,7 @@ namespace OutRunVRStereo
                 // Drop old scratch ownership if the buffer registry no longer
                 // provides a live shadow (e.g. Release/Reset).
                 cache.entry.reset();
-                ++R30ShadowReadMisses;
+                R30RecordTelemetryCounter(R30ShadowReadMisses);
                 return false;
             }
             std::lock_guard<std::mutex> lock(entry->mutex);
@@ -624,12 +634,12 @@ namespace OutRunVRStereo
                 cache.offset == offset && cache.size == size &&
                 cache.revision == entry->revision && out.size() == size)
             {
-                ++R30ShadowReadHits;
+                R30RecordTelemetryCounter(R30ShadowReadHits);
                 return true;
             }
             if (R30TryIncrementalShadowCopy(entry, offset, size, out, cache))
             {
-                ++R30ShadowReadHits;
+                R30RecordTelemetryCounter(R30ShadowReadHits);
                 return true;
             }
             // A cache miss must prove current coverage before reading bytes.
@@ -640,7 +650,7 @@ namespace OutRunVRStereo
                 // A DISCARD or failed Unlock must not pin stale shadow bytes
                 // in the thread-local scratch until some later valid draw.
                 cache.entry.reset();
-                ++R30ShadowReadMisses;
+                R30RecordTelemetryCounter(R30ShadowReadMisses);
                 if (!R30FirstShadowMissLogged)
                 {
                     R30FirstShadowMissLogged = true;
@@ -663,7 +673,7 @@ namespace OutRunVRStereo
             cache.offset = offset;
             cache.size = size;
             cache.revision = entry->revision;
-            ++R30ShadowReadHits;
+            R30RecordTelemetryCounter(R30ShadowReadHits);
             return true;
         }
 
@@ -676,7 +686,7 @@ namespace OutRunVRStereo
                 // Drop old scratch ownership if the buffer registry no longer
                 // provides a live shadow (e.g. Release/Reset).
                 cache.entry.reset();
-                ++R30ShadowReadMisses;
+                R30RecordTelemetryCounter(R30ShadowReadMisses);
                 return false;
             }
             std::lock_guard<std::mutex> lock(entry->mutex);
@@ -690,12 +700,12 @@ namespace OutRunVRStereo
                 cache.offset == offset && cache.size == size &&
                 cache.revision == entry->revision && out.size() == size)
             {
-                ++R30ShadowReadHits;
+                R30RecordTelemetryCounter(R30ShadowReadHits);
                 return true;
             }
             if (R30TryIncrementalShadowCopy(entry, offset, size, out, cache))
             {
-                ++R30ShadowReadHits;
+                R30RecordTelemetryCounter(R30ShadowReadHits);
                 return true;
             }
             // A cache miss must prove current coverage before reading bytes.
@@ -706,7 +716,7 @@ namespace OutRunVRStereo
                 // A DISCARD or failed Unlock must not pin stale shadow bytes
                 // in the thread-local scratch until some later valid draw.
                 cache.entry.reset();
-                ++R30ShadowReadMisses;
+                R30RecordTelemetryCounter(R30ShadowReadMisses);
                 return false;
             }
             try
@@ -723,7 +733,7 @@ namespace OutRunVRStereo
             cache.offset = offset;
             cache.size = size;
             cache.revision = entry->revision;
-            ++R30ShadowReadHits;
+            R30RecordTelemetryCounter(R30ShadowReadHits);
             return true;
         }
 
@@ -1534,7 +1544,7 @@ namespace OutRunVRStereo
 
             if (ok && restoreOk)
             {
-                ++R30SkyGlowFrames;
+                R30RecordTelemetryCounter(R30SkyGlowFrames);
                 if (!R30FirstSkyGlowLogged)
                 {
                     R30FirstSkyGlowLogged = true;
@@ -1549,7 +1559,7 @@ namespace OutRunVRStereo
                 return true;
             }
 
-            ++R30SkyGlowFailures;
+            R30RecordTelemetryCounter(R30SkyGlowFailures);
             if (!R30FirstSkyGlowFailureLogged)
             {
                 R30FirstSkyGlowFailureLogged = true;
@@ -3090,7 +3100,7 @@ namespace OutRunVRStereo
 
             if (state.rhwDepthEvidence && !state.depthTestEnabled)
             {
-                ++R30XyzrhwRhwWorldPromotions;
+                R30RecordTelemetryCounter(R30XyzrhwRhwWorldPromotions);
                 if (!R30FirstXyzrhwRhwPromotionLogged)
                 {
                     R30FirstXyzrhwRhwPromotionLogged = true;
@@ -3621,7 +3631,7 @@ namespace OutRunVRStereo
                     }
                     else
                     {
-                        ++R30XyzrhwDepthPreserveFallbacks;
+                        R30RecordTelemetryCounter(R30XyzrhwDepthPreserveFallbacks);
                     }
                     if (!std::isfinite(transformedX) ||
                         !std::isfinite(transformedY) ||
@@ -3644,7 +3654,7 @@ namespace OutRunVRStereo
                     return true;
                 }
 
-                ++R30XyzrhwAtomicFallbacks;
+                R30RecordTelemetryCounter(R30XyzrhwAtomicFallbacks);
                 if (!R30FirstXyzrhwAtomicFallbackLogged)
                 {
                     R30FirstXyzrhwAtomicFallbackLogged = true;
@@ -4186,7 +4196,7 @@ namespace OutRunVRStereo
 
             if (leftFull != rightFull)
             {
-                ++R30XyzrhwBilateralFallbacks;
+                R30RecordTelemetryCounter(R30XyzrhwBilateralFallbacks);
                 if (!R30FirstXyzrhwBilateralFallbackLogged)
                 {
                     R30FirstXyzrhwBilateralFallbackLogged = true;
@@ -4264,7 +4274,7 @@ namespace OutRunVRStereo
             R29OwnerNoteStableTwoEyeDraw();
             if (state.worldEffect)
             {
-                ++R30XyzrhwWorldEffectDraws;
+                R30RecordTelemetryCounter(R30XyzrhwWorldEffectDraws);
                 R29OwnerRecordXyzrhwWorldStereoDuplicate(
                     state.stereo.poseSequence, state.stereo);
                 if (!R30FirstXyzrhwWorldLogged)
@@ -4277,7 +4287,7 @@ namespace OutRunVRStereo
             else
             {
                 R29OwnerRecordHudStereoDuplicate();
-                ++R30XyzrhwHudDraws;
+                R30RecordTelemetryCounter(R30XyzrhwHudDraws);
                 if (!R30FirstXyzrhwHudLogged)
                 {
                     R30FirstXyzrhwHudLogged = true;
@@ -4316,7 +4326,7 @@ namespace OutRunVRStereo
             if (!R30ConfigureXyzrhwWorldEffect(
                     device, data, vertexCount, stride, state))
             {
-                ++R30XyzrhwFallbacks;
+                R30RecordTelemetryCounter(R30XyzrhwFallbacks);
                 return E_NOTIMPL;
             }
 
@@ -4328,7 +4338,7 @@ namespace OutRunVRStereo
                     data, vertexCount, stride, state,
                     scratch.left, scratch.right))
             {
-                ++R30XyzrhwFallbacks;
+                R30RecordTelemetryCounter(R30XyzrhwFallbacks);
                 return E_NOTIMPL;
             }
 
@@ -4433,7 +4443,7 @@ namespace OutRunVRStereo
                     &scratch.upUsed, nullptr, nullptr, nullptr,
                     &scratch.upTouched))
             {
-                ++R30XyzrhwFallbacks;
+                R30RecordTelemetryCounter(R30XyzrhwFallbacks);
                 return E_NOTIMPL;
             }
 
@@ -4442,7 +4452,7 @@ namespace OutRunVRStereo
                     scratch.left, scratch.right,
                     &scratch.upUsed, knownUsedCount, &scratch.upTouched))
             {
-                ++R30XyzrhwFallbacks;
+                R30RecordTelemetryCounter(R30XyzrhwFallbacks);
                 return E_NOTIMPL;
             }
 
@@ -4523,7 +4533,7 @@ namespace OutRunVRStereo
                     scratch.vertexCopy))
             {
                 vb->Release();
-                ++R30XyzrhwFallbacks;
+                R30RecordTelemetryCounter(R30XyzrhwFallbacks);
                 return E_NOTIMPL;
             }
 
@@ -4536,7 +4546,7 @@ namespace OutRunVRStereo
                     scratch.left, scratch.right))
             {
                 vb->Release();
-                ++R30XyzrhwFallbacks;
+                R30RecordTelemetryCounter(R30XyzrhwFallbacks);
                 return E_NOTIMPL;
             }
 
@@ -4637,7 +4647,7 @@ namespace OutRunVRStereo
             {
                 ib->Release();
                 vb->Release();
-                ++R30XyzrhwFallbacks;
+                R30RecordTelemetryCounter(R30XyzrhwFallbacks);
                 return E_NOTIMPL;
             }
 
@@ -4720,7 +4730,7 @@ namespace OutRunVRStereo
             {
                 ib->Release();
                 vb->Release();
-                ++R30XyzrhwFallbacks;
+                R30RecordTelemetryCounter(R30XyzrhwFallbacks);
                 return E_NOTIMPL;
             }
 
@@ -4834,7 +4844,7 @@ namespace OutRunVRStereo
             {
                 ib->Release();
                 vb->Release();
-                ++R30XyzrhwFallbacks;
+                R30RecordTelemetryCounter(R30XyzrhwFallbacks);
                 return E_NOTIMPL;
             }
 
@@ -5109,7 +5119,7 @@ namespace OutRunVRStereo
                     screenKind, original, eyeConstants,
                     eyeScale, eyeOffset))
             {
-                ++R30ScreenSpaceBuildFailures;
+                R30RecordTelemetryCounter(R30ScreenSpaceBuildFailures);
                 return E_NOTIMPL;
             }
 
@@ -5213,7 +5223,7 @@ namespace OutRunVRStereo
 
             R29OwnerRecordHudStereoDuplicate();
             R29OwnerNoteStableTwoEyeDraw();
-            ++R30ScreenSpaceFovDraws;
+            R30RecordTelemetryCounter(R30ScreenSpaceFovDraws);
 
             if (!R30FirstScreenSpaceLogged)
             {
@@ -5257,7 +5267,7 @@ namespace OutRunVRStereo
                 device, std::forward<ActualDraw>(actualDraw), site);
             if (hr != E_NOTIMPL)
                 return hr;
-            ++R30ScreenSpaceFallbacks;
+            R30RecordTelemetryCounter(R30ScreenSpaceFallbacks);
             return r29Draw();
         }
 
@@ -5533,7 +5543,7 @@ namespace OutRunVRStereo
 
     inline void R30TelemetryNoteScreenSpaceFovDraw() noexcept
     {
-        ++R30ScreenSpaceFovDraws;
+        R30RecordTelemetryCounter(R30ScreenSpaceFovDraws);
     }
 
 
