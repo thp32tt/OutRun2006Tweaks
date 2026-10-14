@@ -229,7 +229,7 @@ def negatives(text):
         "if (SUCCEEDED(nativeResult) || !original.replacementSelected(pSrcData))",
         "original.restoreOriginal();",
         "pDevice, original.data, original.bytes, D3DX_DEFAULT",
-        "return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(",
+        "const HRESULT originalResult = D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(",
         "format.dwRGBAlphaBitMask == 0)",
         "return D3DFMT_X8R8G8B8;",
         "return D3DFMT_X8B8G8R8;",
