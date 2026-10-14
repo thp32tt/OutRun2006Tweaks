@@ -191,4 +191,56 @@ if hud_telemetry_guard < 0:
 if not (hud_telemetry_guard < accepted_counter < same_node_counter):
     fail("semantic HUD telemetry counters escaped their telemetry guard")
 
+
+# The original +TIME sprani and numeric/print E8 parents must share one
+# exact ScreenHud identity across both direct immediate Draw and appended
+# SpriteNodes. An old pending world Draw must survive rather than hijack the
+# immediate number glyph; an already active SpriteQueue must retain its scope.
+def check_stage_extension_direct_owner(text: str) -> None:
+    enter = function_body(text, "static void StageExtensionEnter(")
+    leave = function_body(text, "static void StageExtensionLeave(")
+    install = function_body(text, "static void Install") if "static void Install" in text else text
+    expected = (
+        "Settings::VREnabled &&",
+        "GameSemantic::SpriteQueueDepth == 0",
+        "StageExtensionDirectDrawOwner.emplace(",
+        "RenderScope::ScreenHud,",
+        "nullptr, true,",
+        "ProducerToken::StageExtensionTime",
+    )
+    for marker in expected:
+        if marker not in enter:
+            fail("stage +TIME immediate parent lost ownership: " + marker)
+    if "GameSemantic::CurrentScope =" in enter:
+        fail("stage +TIME immediate parent overrides an active sprite queue")
+    for marker in (
+        "TagAppendedNodes(StageExtensionBefore,",
+        "RenderScope::ScreenHud,",
+        "ProducerToken::StageExtensionTime",
+        "StageExtensionDirectDrawOwner.reset();",
+        "CurrentScope = StageExtensionSavedScope;",
+    ):
+        if marker not in leave:
+            fail("stage +TIME deferred/restore path regressed: " + marker)
+    if "StageExtensionSpraniCalls[i]" not in install or \
+       "StageExtensionPrintCalls[i]" not in install:
+        fail("original +TIME decoration and number producers must both be hooked")
+
+check_stage_extension_direct_owner(ui)
+for old, replacement in (
+    ("SpriteQueueDepth == 0", "SpriteQueueDepth != 0"),
+    ("nullptr, true,", "nullptr, false,"),
+    ("ProducerToken::StageExtensionTime);", "ProducerToken::None);"),
+    ("StageExtensionDirectDrawOwner.reset();", "/* missing reset */"),
+):
+    mutant = ui.replace(old, replacement, 1)
+    if mutant == ui:
+        fail("stage +TIME mutation could not be constructed: " + old)
+    try:
+        check_stage_extension_direct_owner(mutant)
+    except SystemExit:
+        pass
+    else:
+        fail("unsafe stage +TIME ownership mutation escaped: " + old)
+
 print("VR producer provenance contract PASS")

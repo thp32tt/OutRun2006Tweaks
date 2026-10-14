@@ -897,15 +897,19 @@ class UIScaling : public Hook
         // well as enqueue sprites. Post-call node tags only cover the latter.
         // Scope only this exact source call, never the shared text renderer.
         StageExtensionSavedScope = OutRunVR::GameSemantic::CurrentScope;
-        if (Settings::VREnabled)
+        if (Settings::VREnabled &&
+            OutRunVR::GameSemantic::SpriteQueueDepth == 0)
         {
-            // ScopedExactProducerSemantic clears stale queue scope/marker
-            // only for non-queue immediate draws. Real SpriteNodes retain
-            // priority, while the same bracket tags deferred +TIME children.
+            // Immediate +TIME numerals must not consume a prior queued
+            // world's pending Draw token. Shield it until this original
+            // E8 caller returns, and carry the exact same source identity
+            // as the separately tagged deferred sprani/number siblings.
+            // ScopedExactProducerSemantic restores the previous scope,
+            // pending Draw and direct producer on every return path.
             StageExtensionDirectDrawOwner.emplace(
-                OutRunVR::GameSemantic::RenderScope::ScreenHud);
-            OutRunVR::GameSemantic::CurrentScope =
-                OutRunVR::GameSemantic::RenderScope::ScreenHud;
+                OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                nullptr, true,
+                OutRunVR::GameSemantic::ProducerToken::StageExtensionTime);
         }
     }
 
