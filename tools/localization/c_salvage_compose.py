@@ -95,7 +95,7 @@ def compose(root, manifest, out):
     alpha = ImageChops.multiply(generated.getchannel("A"), generated_mask)
     isolated = generated.copy()
     isolated.putalpha(alpha)
-    bounds = isolated.getbbox()
+    bounds = alpha.getbbox()  # RGB outside alpha may retain opaque scene colors
     if bounds is None:
         raise ValueError("Generated mask yielded no visible alpha")
     single_phrase = isolated.crop(bounds)
