@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00819",
+  "production_id": "CONVERSION-DX9EX-00819",
+  "event_id": "CONVERSION-DX9EX-00819-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00819]",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Repair the complete central sun lens-flare draw owner so nested or VR-disabled original call edges never leak ownership and the direct world sun consumes no stale pending Draw; keep all exterior discs and SkyGlow identical.",
+    "scope_boundary": "Only original central EXE 0xD3A5..0xD3AA source and independent 0xC993 actual sun draw. Exclude EXE 0xCABE projected outer rings, SceneEffect Z-near, GOAL/+TIME, rank, menus, world/road/vehicle, SkyGlow, DX11 and DXVK.",
+    "trace_stages": [
+      "Original EXE 0xD3A5/0xD3AA paired sun parent, 0x570002 object and exact 0xC993 actual DrawObjectAlpha_Internal source, versus 0xCABE outer rings.",
+      "GameSemantic direct exact WorldBillboard draw temporarily removes stale NextDrawScope, restores prior token and saves/restores queue semantic while preserving non-queue parent depth.",
+      "R33 physical Draw consumes correct direct scope, R30 WVP/semantic per-eye pass routes the world sun; protected outer ProjectedScreenEffect2D and SkyGlow remain unchanged in compositor."
+    ],
+    "subcomponents": [
+      "Balance every original sun enter/leave across disabled VR, nested call, and live SpriteNode queue without a premature outer-scope restore or inherited stale owner.",
+      "Guard 0xC993 by verified active parent depth, sun object identity, non-queue and VR mode; isolate pending HUD/world one-shot semantic only for the exact sun, preserving its later owner.",
+      "Reject destructive mutation of depth accounting, pending token isolation, object identity and outer-ring callsite; require exact-SHA Win32 host/game/package + Domain/Impact Gates before declaring build-verified."
+    ],
+    "acceptance_items": [
+      {
+        "id": "SUN_PAIRED_OWNER_AND_DIRECT_DRAW",
+        "category": "end_to_end_behavior",
+        "behavior_area": "exact_original_sun_parent_and_direct_draw",
+        "expected_behavior": "Only 0x570002 during balanced non-queue D3A5/0xD3AA parent gets WorldBillboard stereo provenance, with unrelated pending Draw consumed by its own later owner."
+      },
+      {
+        "id": "SUN_NESTED_AND_OUTER_PROTECTION",
+        "category": "fallback_regression",
+        "behavior_area": "nested_queue_vr_toggle_and_exterior_visuals",
+        "expected_behavior": "Every nested skipped entry has a matching leave; VR-off and queue paths preserve original; outer CABE discs, SkyGlow, scene effects, and world matrices are not changed."
+      },
+      {
+        "id": "SUN_FULL_DX9EX_INTEGRATION",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_win32_host_game_packaging_domain",
+        "expected_behavior": "Destructive source mutants fail and full exact SHA DX9Ex Active, Domain Isolation, EXE HUD Inspector and Full Source Impact succeed; HMD optical correctness stays UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "SUN_PAIRED_OWNER_AND_DIRECT_DRAW": "PENDING_CI",
+    "SUN_NESTED_AND_OUTER_PROTECTION": "PENDING_CI",
+    "SUN_FULL_DX9EX_INTEGRATION": "PENDING_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "User Quest3 visual feedback 2026-10-14: central flare doubled while surrounding 3-4 rings remain acceptable; canonical 0xD3A5/0xD3AA and exact C993 disassembly source exists.",
+    "root_cause": "Parent-entry guard previously incremented depth only for enabled non-queue paths while every leave decremented; a skipped nested call can pop active outer owner. Direct actual sun constructor also did not isolate a pending one-shot Draw, so prior world/HUD provenance can override central stereo.",
+    "source_trace": [
+      "0xD3A5 callsite and 0xD3AA leave on original sub_40C980 source, independent of outer 0xCABE",
+      "0xC993 direct DrawObjectAlpha_Internal receives 0x570002 with WorldBillboard via exact producer RAII and pending token preservation",
+      "R33 ConsumeForDraw -> R30 screen/world classification -> DX9Ex per-eye draw -> OpenXR host stereo; no outer CABE modifications"
+    ],
+    "alternatives_rejected": [
+      "Do not apply global lens disparity scalar or promote outer CABE rings to world; HMD reported outer rings acceptable.",
+      "Do not mark flat ScreenHud for central world source; that removes finite parallax and is known wrong.",
+      "Do not suppress one of the original alpha draw calls or alter SkyGlow/near plane to hide double image."
+    ],
+    "eye_ownership": "WorldBillboard central owner only after exact parent/object proof, protected original per-eye WVP; outer rings retain ProjectedScreenEffect2D.",
+    "validation_level": "SOURCE_CANDIDATE_UNTESTED_HMD"
+  },
+  "changed_files": [
+    "src/hooks_graphics.cpp",
+    "tools/verify_vr_visual_composition_p0.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00819.json"
+  ],
+  "ci_evidence": {
+    "status": "PENDING_VALIDATION_BEARING_RESULT_SHA"
+  }
+}

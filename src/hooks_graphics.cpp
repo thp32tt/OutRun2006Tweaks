@@ -327,6 +327,10 @@ class VRLensFlareProjected2D : public Hook
     inline static SafetyHookMid LensCentreEnterHook{};
     inline static SafetyHookMid LensCentreLeaveHook{};
     inline static thread_local unsigned LensCentreDepth = 0;
+    // This is the depth at which a non-queue, VR-enabled centre became the
+    // owner. Count every D3A5 entry, even when skipped, so each D3AA exit
+    // balances its own call without restoring an outer centre prematurely.
+    inline static thread_local unsigned LensCentreOwnerDepth = 0;
     inline static thread_local OutRunVR::GameSemantic::RenderScope
         LensCentreSavedScope = OutRunVR::GameSemantic::RenderScope::None;
 
@@ -334,10 +338,16 @@ class VRLensFlareProjected2D : public Hook
     {
         // A non-queued original producer must never overwrite a selected
         // SpriteNode's semantic during nested queue processing.
+        ++LensCentreDepth;
+        // Original 0xD3A5/0xD3AA are paired call edges, including nested
+        // and disabled-VR paths. An ignored nested queue call must still
+        // consume exactly one depth on its matching leave, not pop the
+        // active outer sun's saved render scope.
         if (!Settings::VREnabled ||
             OutRunVR::GameSemantic::QueueRenderActive() ||
-            LensCentreDepth++ != 0)
+            LensCentreDepth != 1)
             return;
+        LensCentreOwnerDepth = LensCentreDepth;
         LensCentreSavedScope = OutRunVR::GameSemantic::CurrentScope;
         OutRunVR::GameSemantic::CurrentScope =
             OutRunVR::GameSemantic::RenderScope::WorldBillboard;
@@ -348,11 +358,18 @@ class VRLensFlareProjected2D : public Hook
         // A captured render scope must be restored even if VR is disabled
         // during the original draw; gating exit on the current VR setting
         // would leak the central WorldBillboard semantic into later effects.
-        if (!LensCentreDepth || --LensCentreDepth != 0)
+        if (!LensCentreDepth)
             return;
-        OutRunVR::GameSemantic::CurrentScope = LensCentreSavedScope;
-        LensCentreSavedScope =
-            OutRunVR::GameSemantic::RenderScope::None;
+        // Only the precise enter which acquired ownership may restore it.
+        // Preserve that restore even if VREnabled toggles during the call.
+        if (LensCentreOwnerDepth == LensCentreDepth)
+        {
+            OutRunVR::GameSemantic::CurrentScope = LensCentreSavedScope;
+            LensCentreSavedScope =
+                OutRunVR::GameSemantic::RenderScope::None;
+            LensCentreOwnerDepth = 0;
+        }
+        --LensCentreDepth;
     }
 
 	static void __cdecl DrawObjectAlphaProjected(
@@ -398,11 +415,17 @@ class VRLensFlareProjected2D : public Hook
         // their original raster classification and one game Draw call.
         const auto centreScope =
             Settings::VREnabled && LensCentreDepth != 0 &&
+            LensCentreOwnerDepth == LensCentreDepth &&
             !OutRunVR::GameSemantic::QueueRenderActive() &&
             objectId == 0x570002
             ? OutRunVR::GameSemantic::RenderScope::WorldBillboard
             : OutRunVR::GameSemantic::RenderScope::None;
-        OutRunVR::GameSemantic::ScopedExactProducerSemantic semantic(centreScope);
+        // An unrelated one-shot producer (for example an earlier queued
+        // HUD/world draw) must not replace this exact C993 centre draw.
+        // Keep its token intact for the original later owner, and leave all
+        // C993 desktop/non-centre calls unchanged when centreScope is None.
+        OutRunVR::GameSemantic::ScopedExactProducerSemantic semantic(
+            centreScope, nullptr, true);
         Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
     }
 

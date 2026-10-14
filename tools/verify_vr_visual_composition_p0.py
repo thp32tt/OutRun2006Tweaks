@@ -2183,12 +2183,16 @@ def verify_centre_only_lens_owner(source, analyzer):
         'Settings::VREnabled', 'LensCentreSavedScope',
         'RenderScope::WorldBillboard',
         'OutRunVR::GameSemantic::QueueRenderActive() ||',
+        '++LensCentreDepth;', 'LensCentreDepth != 1',
+        'LensCentreOwnerDepth = LensCentreDepth;',
     ):
-        require(needle, body, 'central sun owner')
+        require(needle, body, 'central sun balanced owner')
     for needle in (
         'LensCentreDepth', 'CurrentScope = LensCentreSavedScope',
+        'LensCentreOwnerDepth == LensCentreDepth',
+        'LensCentreOwnerDepth = 0;', '--LensCentreDepth;',
     ):
-        require(needle, leave, 'central sun scope restore')
+        require(needle, leave, 'central sun balanced scope restore')
     if 'Settings::VREnabled' in leave:
         raise SystemExit('central lens exit must restore active scope even after VR toggle')
     owner = source.split('class VRLensFlareProjected2D : public Hook', 1)[1]
@@ -2216,16 +2220,19 @@ def verify_centre_actual_draw_owner(source):
     section = section.split('VRLensFlareProjected2D::instance;', 1)[0]
     for required in ('static void __cdecl DrawObjectAlphaCentre(',
                      'ScopedExactProducerSemantic semantic(',
+                     'centreScope, nullptr, true);',
                      'Module::exe_ptr(0xC993), DrawObjectAlphaCentre',
                      'Module::exe_ptr(0xCABE), DrawObjectAlphaProjected'):
         require(required, section, 'centre-only independent actual draw')
     draw = function_body(section, 'static void __cdecl DrawObjectAlphaCentre(')
     for required in ('Settings::VREnabled && LensCentreDepth != 0',
+                     'LensCentreOwnerDepth == LensCentreDepth',
                      '!OutRunVR::GameSemantic::QueueRenderActive() &&',
                      'objectId == 0x570002',
                      'RenderScope::WorldBillboard',
                      'RenderScope::None',
-                     'ScopedExactProducerSemantic semantic(centreScope);',
+                     'ScopedExactProducerSemantic semantic(',
+                     'centreScope, nullptr, true);',
                      'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);'):
         require(required, draw, 'central-only world-owner and desktop fallback')
     if 'RenderScope::ProjectedScreenEffect2D' in draw:
@@ -2237,7 +2244,8 @@ def verify_centre_actual_draw_owner(source):
                   'objectId == 0x570002',
                   'RenderScope::WorldBillboard',
                   'RenderScope::None',
-                  'ScopedExactProducerSemantic semantic(centreScope);',
+                  'ScopedExactProducerSemantic semantic(',
+                  'centreScope, nullptr, true);',
                   'Game::DrawObjectAlpha_Internal(')
 verify_centre_actual_draw_owner(graphics)
 # Negative tests isolate the single central sun while the original CABE
@@ -2248,6 +2256,11 @@ for label, before, after in (
     ('original parent depth gate', 'Settings::VREnabled && LensCentreDepth != 0',
      'Settings::VREnabled'),
     ('original object identity', 'objectId == 0x570002', 'objectId != 0'),
+    ('unowned nested original parent',
+     'LensCentreOwnerDepth == LensCentreDepth', 'LensCentreDepth > 0'),
+    ('direct owner failed pending token isolation',
+     'centreScope, nullptr, true);',
+     'centreScope, nullptr, false);'),
     ('prevent queued semantic hijack',
      '!OutRunVR::GameSemantic::QueueRenderActive() &&', ''),
     ('restore flat/headlocked scope', 'RenderScope::WorldBillboard',
@@ -2282,14 +2295,21 @@ for label, mutant in (
         'Module::exe_ptr(0xD3A5), LensCentreEnter',
         'Module::exe_ptr(0xD5F5), LensCentreEnter', 1)),
     ('central producer queue bypass', graphics.replace(
-        'OutRunVR::GameSemantic::QueueRenderActive() ||\n            LensCentreDepth++',
-        'LensCentreDepth++', 1)),
+        'OutRunVR::GameSemantic::QueueRenderActive() ||\n            LensCentreDepth != 1',
+        'LensCentreDepth != 1', 1)),
+    ('skipped nested enter unbalanced', graphics.replace(
+        '++LensCentreDepth;', '/* unbalanced enter */', 1)),
+    ('nested scope popped early', graphics.replace(
+        'LensCentreOwnerDepth == LensCentreDepth',
+        'LensCentreDepth > 0', 1)),
+    ('skipped nested leave unbalanced', graphics.replace(
+        '--LensCentreDepth;', '/* unbalanced leave */', 1)),
     ('central leave hook lost', graphics.replace(
         'Module::exe_ptr(0xD3AA), LensCentreLeave',
         'Module::exe_ptr(0xD3A9), LensCentreLeave', 1)),
     ('VR toggled off before central leave', graphics.replace(
-        'if (!LensCentreDepth || --LensCentreDepth != 0)',
-        'if (!Settings::VREnabled || !LensCentreDepth || --LensCentreDepth != 0)', 1)),
+        'if (!LensCentreDepth)',
+        'if (!Settings::VREnabled || !LensCentreDepth)', 1)),
     ('world scope lost', graphics.replace(
         'RenderScope::WorldBillboard;', 'RenderScope::ScreenHud;', 1)),
 ):
