@@ -1,8 +1,10 @@
 #include "native_game_frame_batch.hpp"
+#include "native_game_present_region.hpp"
 #include <cassert>
 #include <cstdint>
 #include <initializer_list>
 using outrun::vr::dx11::live_game_frame::GameNativeFrameBatch;
+using outrun::vr::dx11::live_game_frame::GameNativePresentRegion;
 int main() {
     GameNativeFrameBatch b{};
     assert(!b.accepts(0,2,false) && b.accepts(2,2,false));
@@ -129,5 +131,21 @@ int main() {
     assert(!b.accepts_full(GameNativeFrameBatch::kMaxFullFrameDraws));
     b.reset();
     assert(!b.accepts_full(1u) && !b.publishable_full(true, 0u));
+    // A full native game frame covers the original backbuffer: cropping
+    // Present must not suppress it or relocate its D3D9 upload origin.
+    const GameNativePresentRegion cropped{120, 40, 1200, 760};
+    const auto fullCrop = cropped.full_frame_placement(1920, 1080, 1920, 1080);
+    assert(fullCrop.valid && fullCrop.left == 0u && fullCrop.top == 0u);
+    assert(!cropped.inset_placement(1920, 1080, 1920, 1080, 0).valid);
+    assert((GameNativePresentRegion{0, 0, 1920, 1080}
+               .full_frame_placement(1920, 1080, 1920, 1080).valid));
+    assert(!cropped.full_frame_placement(1920, 1080, 1920, 1079).valid);
+    assert(!cropped.full_frame_placement(0, 1080, 0, 1080).valid);
+    assert((!GameNativePresentRegion{0, 0, 1921, 1080}
+                .full_frame_placement(1920, 1080, 1920, 1080).valid));
+    assert((!GameNativePresentRegion{-1, 40, 1200, 760}
+                .full_frame_placement(1920, 1080, 1920, 1080).valid));
+    assert((!GameNativePresentRegion{120, 40, 120, 760}
+                .full_frame_placement(1920, 1080, 1920, 1080).valid));
     return 0;
 }

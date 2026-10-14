@@ -31,6 +31,22 @@ struct GameNativePresentRegion {
         return {static_cast<std::uint32_t>(right - margin - insetWidth),
                 static_cast<std::uint32_t>(top + margin), true};
     }
+    // The full-resolution native backbuffer is uploaded at (0,0) even when
+    // the game's menu, car-selection or race Present crops its source RECT.
+    // Present applies the crop after upload; only a small diagnostic inset
+    // must be moved inside the visible source rectangle.
+    [[nodiscard]] constexpr GameNativeInsetPlacement full_frame_placement(
+        std::uint32_t backbufferWidth, std::uint32_t backbufferHeight,
+        std::uint32_t nativeWidth, std::uint32_t nativeHeight) const noexcept {
+        if (!backbufferWidth || !backbufferHeight ||
+            backbufferWidth > 0x7fffffffU || backbufferHeight > 0x7fffffffU ||
+            nativeWidth != backbufferWidth || nativeHeight != backbufferHeight ||
+            left < 0 || top < 0 || right <= left || bottom <= top ||
+            right > static_cast<std::int64_t>(backbufferWidth) ||
+            bottom > static_cast<std::int64_t>(backbufferHeight))
+            return {};
+        return {0u, 0u, true};
+    }
     [[nodiscard]] constexpr bool allows_inset(
         std::uint32_t backbufferWidth, std::uint32_t backbufferHeight,
         std::uint32_t insetWidth, std::uint32_t insetHeight,

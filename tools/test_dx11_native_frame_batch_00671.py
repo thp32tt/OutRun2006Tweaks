@@ -7,6 +7,7 @@ import subprocess
 root=Path(__file__).resolve().parents[1]
 src=(root/"src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
 header=(root/"src/vr/d3d11/native_game_frame_batch.hpp").read_text()
+region=(root/"src/vr/d3d11/native_game_present_region.hpp").read_text()
 for marker in ('#include "native_game_frame_batch.hpp"',
  'OUTRUN_DX11_FRAME_BATCH', 's.frameBatch.accepts(candidateOrdinal, s.probeSlot,',
  'if (s.frameBatch.first_draw()) s.backend.begin_frame(kBackground);',
@@ -39,18 +40,33 @@ for marker in ("OUTRUN_DX11_FULL_GAME_FRAME", "accepts_full(sourceOrdinal)",
                "oldest.completeFullFrame != fullMode"):
     assert marker in src, marker
 assert "kMaxFullFrameDraws = 4096u" in header
+# Real-game full-size Draw/Present must survive valid D3D9 source crops
+# without admitting mismatched dimensions, empty crops or offscreen bounds.
+assert "presentRegion.full_frame_placement(" in src
+assert "fullMode ? fullPlacement.valid : insetPlacement.valid" in src
+assert "fullMode ? fullPlacement.left : insetPlacement.left" in src
+assert "fullMode ? fullPlacement.top : insetPlacement.top" in src
+assert "nativeWidth != backbufferWidth || nativeHeight != backbufferHeight" in region
 cxx=shutil.which("g++") or shutil.which("clang++")
 assert cxx
 probe=(root/"tools/dx11_native_frame_batch_probe.cpp").read_text()
 with TemporaryDirectory(prefix="dx11-native-frame-") as work:
     folder=Path(work)
     (folder/"probe.cpp").write_text(probe)
-    for tag,text,passes in (("positive",header,True),
-                            ("negative_mutant",header.replace("kMaxDraws = 8u","kMaxDraws = 1u"),False),
-                            ("full_limit_mutant",header.replace("kMaxFullFrameDraws = 4096u","kMaxFullFrameDraws = 8u"),False),
-                            ("full_contiguity_mutant",header.replace("ordinal == submitted","ordinal >= submitted"),False),
-                            ("full_unsupported_mutant",header.replace("return fullMode ||","return (fullMode && false) ||"),False)):
+    for tag,text,region_text,passes in (("positive",header,region,True),
+                            ("negative_mutant",header.replace("kMaxDraws = 8u","kMaxDraws = 1u"),region,False),
+                            ("full_limit_mutant",header.replace("kMaxFullFrameDraws = 4096u","kMaxFullFrameDraws = 8u"),region,False),
+                            ("full_contiguity_mutant",header.replace("ordinal == submitted","ordinal >= submitted"),region,False),
+                            ("full_unsupported_mutant",header.replace("return fullMode ||","return (fullMode && false) ||"),region,False),
+                            ("cropped_native_disabled",header,region.replace("return {0u, 0u, true};","return {};"),False),
+                            ("cropped_native_wrong_extent",header,region.replace(
+                                "nativeWidth != backbufferWidth || nativeHeight != backbufferHeight ||",
+                                "false ||"),False),
+                            ("cropped_native_out_of_bounds",header,region.replace(
+                                "right > static_cast<std::int64_t>(backbufferWidth) ||",
+                                "false ||"),False)):
         (folder/"native_game_frame_batch.hpp").write_text(text)
+        (folder/"native_game_present_region.hpp").write_text(region_text)
         binary=folder/tag
         subprocess.run([cxx,"-std=c++17","-O2","-Wall","-Wextra","-Werror","-pedantic",
                         "-I",str(folder),str(folder/"probe.cpp"),"-o",str(binary)],check=True)

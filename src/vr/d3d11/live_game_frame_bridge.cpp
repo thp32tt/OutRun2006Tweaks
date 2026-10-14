@@ -4882,12 +4882,17 @@ void before_game_present(IDirect3DDevice9* game,
         const UINT surfaceHeight = fullMode ? s.nativeHeight : kHeight;
         const bool nativeExtentMatches = !fullMode ||
             (surfaceWidth == bb.Width && surfaceHeight == bb.Height &&
-             presentRegion.left == 0 && presentRegion.top == 0 &&
-             presentRegion.right == bb.Width && presentRegion.bottom == bb.Height);
+             bb.Width != 0u && bb.Height != 0u);
         const auto insetPlacement = presentRegion.inset_placement(
             bb.Width, bb.Height, surfaceWidth, surfaceHeight, fullMode ? 0u : 8u);
+        // A source-RECT crop changes what Present reveals, not where the
+        // full-resolution native pixels belong in the original backbuffer.
+        // Preserve the inset-only placement for the smaller debug output.
+        const auto fullPlacement = presentRegion.full_frame_placement(
+            bb.Width, bb.Height, surfaceWidth, surfaceHeight);
         const bool outputWritable = outputNow.valid() && nativeExtentMatches &&
-            !outputNow.hasDirtyRegion && insetPlacement.valid &&
+            !outputNow.hasDirtyRegion &&
+            (fullMode ? fullPlacement.valid : insetPlacement.valid) &&
             bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
             (bb.Format == D3DFMT_A8R8G8B8 ||
              bb.Format == D3DFMT_X8R8G8B8);
@@ -4954,8 +4959,8 @@ void before_game_present(IDirect3DDevice9* game,
                                             static_cast<std::size_t>(surfaceWidth)*4u);
                                     s.insetSurface->UnlockRect();
                                     POINT destination{
-                                        static_cast<LONG>(insetPlacement.left),
-                                        static_cast<LONG>(insetPlacement.top)};
+                                        static_cast<LONG>(fullMode ? fullPlacement.left : insetPlacement.left),
+                                        static_cast<LONG>(fullMode ? fullPlacement.top : insetPlacement.top)};
                                     if (SUCCEEDED(game->UpdateSurface(
                                             s.insetSurface.Get(), nullptr, back.Get(), &destination))) {
                                         ++s.visible;
