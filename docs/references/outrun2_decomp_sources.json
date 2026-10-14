@@ -31,7 +31,7 @@
     },
     {
       "path": "src/platform/pc_sprite_2d.cpp",
-      "blob_sha": "4a3ea1ca378d44373f0d9ffddc1400947cc3727",
+      "blob_sha": "4a3ea1ca378d44373f0d9dffddc1400947cc3727",
       "purpose": "2D sprite D3D9 draw",
       "priority": "P0",
       "url": "https://github.com/r4dius/outrun2-decomp/blob/main/src/platform/pc_sprite_2d.cpp"
