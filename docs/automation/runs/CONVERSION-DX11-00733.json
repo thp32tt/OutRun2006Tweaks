@@ -1,0 +1,96 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00733",
+  "production_id": "CONVERSION-DX11-00733",
+  "event_id": "CONVERSION-DX11-00733-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_GAME_COMBINED_COLOR_Z_CLEAR",
+  "feature_id": "DX11-FULL-GAME-COMBINED-COLOR-Z-CLEAR",
+  "status": "IN_PROGRESS_CI_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "base_head_sha": "584086c73f2e8250f1f259549fb240a7d925da9b",
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Successful intercepted original D3D9 game TARGET|ZBUFFER Clear forwards actual Z to native bridge",
+      "Proven full-backbuffer color and compatible depth seed next real D3D11 Draw/DrawIndexed DSV before guarded same-Present publication",
+      "Unverifiable depth or stencil fails closed without changing original D3D9 output/gamepad"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_frame_bridge.hpp",
+      "src/vr/d3d9/stereo_renderer.cpp",
+      "src/vr/d3d11/native_game_full_color_depth.hpp",
+      "tools/dx11_full_color_depth_clear_00733.cpp",
+      "tools/test_dx11_full_color_depth_clear_00733.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++ verifies source 0.325 Z survives reset and feeds native Draw; Python observes hook->bridge->DSV path",
+      "negative_regression": "Incompatible/stencil/NaN/out-of-range depth cannot seed native frame; game Draw/Present remain authoritative",
+      "component_integration": "D3D9 Clear interceptor, D3D11 game frame bridge, portable Clear/DSV batch and source mutation checks"
+    },
+    "conflict_keys": [
+      "DX11:FULL_GAME_COMBINED_COLOR_Z_CLEAR",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and CI only; original menus/vehicle/race and Quest3 output not tested",
+    "activation_guard_and_fallback": "Diagnostic opt-in only; no native frame if surface/stencil/Z cannot mirror; D3D9/controls untouched"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-COMBINED-COLOR-Z-CLEAR",
+    "goal": "Connect real game full-backbuffer color+depth Clears to the following native full-resolution game Draw using the actual D3D9 depth value with safe fallback.",
+    "acceptance_items": [
+      {
+        "id": "A1",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_z_after_color",
+        "expected_behavior": "Matching game Clear Z seeds native full-size DSV before Draw/DrawIndexed"
+      },
+      {
+        "id": "A2",
+        "category": "fallback_regression",
+        "behavior_area": "renderer_input_fallback",
+        "expected_behavior": "Unsupported depth/stencil/NaN safely abort speculative frame while D3D9 rendering and input continue"
+      },
+      {
+        "id": "A3",
+        "category": "integrated_validation",
+        "behavior_area": "same_sha_ci",
+        "expected_behavior": "Portable C++ positive/negative cases, Python mutation tests and all five exact-SHA GitHub Gates"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "A1": "SOURCE_IMPLEMENTED",
+    "A2": "SOURCE_IMPLEMENTED",
+    "A3": "CI_PENDING"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d9/stereo_renderer.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/native_game_full_color_depth.hpp",
+    "tools/dx11_full_color_depth_clear_00733.cpp",
+    "tools/test_dx11_full_color_depth_clear_00733.py",
+    "docs/automation/runs/CONVERSION-DX11-00733.json"
+  ],
+  "runtime_gate": "NEED_HMD_TEST",
+  "packaging_status": "NOT_REQUIRED"
+}

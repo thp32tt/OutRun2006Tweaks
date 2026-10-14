@@ -562,7 +562,7 @@ namespace OutRunVRStereo
                         outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);
 					if (flags & D3DCLEAR_TARGET)
 						outrun::vr::dx11::live_game_frame::observe_game_clear(
-							device, count, rects, flags, color);
+							device, count, rects, flags, color, z);
 				}
 				return result;
 			};

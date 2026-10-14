@@ -33,6 +33,7 @@
 #include "native_game_present_region.hpp"
 #include "native_game_clear_color.hpp"
 #include "native_game_clear_coverage.hpp"
+#include "native_game_full_color_depth.hpp"
 #include "native_game_backbuffer_admission.hpp"
 #include "native_game_texture_atlas_budget.hpp"
 
@@ -4851,7 +4852,7 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
 }
 
 void observe_game_clear(IDirect3DDevice9* game, DWORD count,
-                        const D3DRECT* rects, DWORD flags, D3DCOLOR color) noexcept {
+                        const D3DRECT* rects, DWORD flags, D3DCOLOR color, float z) noexcept {
     if (!diagnostic_enabled() || !game || !(flags & D3DCLEAR_TARGET)) return;
     try {
         State& s = state();
@@ -4896,6 +4897,27 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             s.pending = false;
             s.sourceDrawsThisFrame = 0u;
             s.eligibleThisFrame = 0u;
+            // After a successful full TARGET|ZBUFFER game Clear, initialize
+            // the first native Draw's DSV from the game's actual Z value.
+            // Without depth COM/extent compatibility, retain DX9Ex fallback.
+            if ((flags & (D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL)) != 0u) {
+                ComPtr<IDirect3DSurface9> depth;
+                D3DSURFACE_DESC depthDesc{};
+                const bool depthMatches =
+                    SUCCEEDED(game->GetDepthStencilSurface(depth.GetAddressOf())) &&
+                    depth && SUCCEEDED(depth->GetDesc(&depthDesc)) &&
+                    depthDesc.Width == bbDesc.Width &&
+                    depthDesc.Height == bbDesc.Height &&
+                    depthDesc.MultiSampleType == D3DMULTISAMPLE_NONE;
+                if (GameNativeFullColorDepthClear::can_mirror(
+                        (flags & D3DCLEAR_ZBUFFER) != 0u,
+                        (flags & D3DCLEAR_STENCIL) != 0u,
+                        depthMatches, z)) {
+                    s.frameBatch.note_full_depth_clear(z);
+                } else {
+                    s.frameBatch.abort(); // fail closed: D3D9 game unchanged
+                }
+            }
         }
     } catch (...) {
         // D3D9 Clear, input and Present always remain authoritative.

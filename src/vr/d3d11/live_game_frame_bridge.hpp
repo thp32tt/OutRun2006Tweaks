@@ -41,7 +41,7 @@ bool observe_game_depth_clear(IDirect3DDevice9* gameDevice, DWORD count,
 // Called only after a successful original game Clear; preserve its full-RT
 // background color for a same-device/backbuffer native Draw/DrawIndexed.
 void observe_game_clear(IDirect3DDevice9* gameDevice, DWORD count,
-                        const D3DRECT* rects, DWORD flags, D3DCOLOR color) noexcept;
+                        const D3DRECT* rects, DWORD flags, D3DCOLOR color, float z) noexcept;
 
 // Present draws an isolated inset only if native GPU pixels were produced.
 // Failure never propagates to the original game Present.
