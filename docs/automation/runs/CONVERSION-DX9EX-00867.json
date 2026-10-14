@@ -68,8 +68,8 @@
     "eye_ownership": "R26_HUD_COMPARE=ON packages stereo_renderer_r30_r26_safe and preserves existing original ScreenHud c64/left-right eye routes; no optical HMD claim without Quest3."
   },
   "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "phase": "C4_COMMIT",
+  "checkpoint": "C5_EXACT_SHA_GATE",
+  "phase": "C5_VALIDATE",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No original game or Quest3/VDXR run during task. Visible +TIME sprite/numeric stereo correction and timing remain NEED_HMD_TEST.",
@@ -90,5 +90,12 @@
   "score_once": false,
   "score_delta_this_attempt": 0,
   "continuation_feature_note": "Same DX9EX:VIS:EXTENDED_TIME as previous material tasks; no duplicate completion or point on this source checkpoint.",
-  "source_parent_sha": "800269103ce137b4292127af03bc29a494fc5c05"
+  "source_parent_sha": "800269103ce137b4292127af03bc29a494fc5c05",
+  "validation_notes": "C2 source includes homogeneous exact-source exit submission; C3 targeted mutation verifier was repaired at 3bbd26f/c714761 so its entry guard cannot be falsely matched by the new exit function. Four same-SHA Windows/DX9Ex/Domain/HUD/FullSource workflows are requested by this non-CI-skip validation-bearing record update. No Quest3/VDXR execution.",
+  "pending_gates": [
+    "dx9ex_active",
+    "domain_isolation",
+    "hud_inspector",
+    "full_source_impact"
+  ]
 }
