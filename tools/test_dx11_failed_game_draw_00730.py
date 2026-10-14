@@ -116,6 +116,20 @@ def safe_integrated(source: str) -> bool:
             return False
         if "return gameHr;" not in block[complete_at:]:
             return False
+    # The sprite-specialized indexed Draw returns before XYZRHW and R29.
+    # That original HRESULT is equally authoritative for native publication.
+    indexed_begin = source.find("HRESULT __stdcall DrawIndexedPrimitiveDestR30(", helper_end)
+    indexed_end = source.find("HRESULT __stdcall DrawPrimitiveUPDestR30(", indexed_begin)
+    if indexed_begin < 0 or indexed_end < 0:
+        return False
+    indexed = source[indexed_begin:indexed_end]
+    sprite = indexed.find("const HRESULT fixedFnSprite =")
+    sprite_check = indexed.find("R30CompleteNativeGameSourceR26Safe(device, fixedFnSprite);")
+    xyz = indexed.find("const HRESULT xyzrhw =")
+    if not (0 <= sprite < sprite_check < xyz):
+        return False
+    if "if (fixedFnSprite != E_NOTIMPL) {" not in indexed or "return fixedFnSprite;" not in indexed[sprite_check:xyz]:
+        return False
     return True
 
 assert safe_integrated(safe_hook), "R26-safe failed game Draw must quarantine native frame"
@@ -125,6 +139,10 @@ for old, new in (
 ):
     damaged = safe_hook.replace(old, new, 1)
     assert damaged != safe_hook and not safe_integrated(damaged), old
+sprite_mutated = safe_hook.replace(
+    "R30CompleteNativeGameSourceR26Safe(device, fixedFnSprite);",
+    "/* lost fixed-function sprite failure */", 1)
+assert sprite_mutated != safe_hook and not safe_integrated(sprite_mutated)
 for name in ("DrawPrimitive", "DrawIndexedPrimitive", "DrawPrimitiveUP", "DrawIndexedPrimitiveUP"):
     begin = safe_hook.index("HRESULT __stdcall " + name + "DestR30(")
     finish = safe_hook.find("HRESULT __stdcall ", begin + 10)

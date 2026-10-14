@@ -4746,8 +4746,10 @@ namespace OutRunVRStereo
                 R62TryFixedFunctionSpriteIndexed(
                     device, type, baseVertexIndex, minVertexIndex,
                     numVertices, startIndex, primitiveCount);
-            if (fixedFnSprite != E_NOTIMPL)
+            if (fixedFnSprite != E_NOTIMPL) {
+                R30CompleteNativeGameSourceR26Safe(device, fixedFnSprite);
                 return fixedFnSprite;
+            }
 
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
