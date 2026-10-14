@@ -288,7 +288,8 @@ def main() -> None:
         return (
             "s.probeSlot = GameNativeFrameBatch::next_probe_slot(" in code
             and "s.probeSlot, s.eligibleThisFrame);" in code
-            and "if (s.eligibleThisFrame == (std::numeric_limits<UINT>::max)()) return;" in code
+            and "if (s.eligibleThisFrame == (std::numeric_limits<UINT>::max)()) {" in code
+            and "if (fullMode) s.frameBatch.abort();" in code
             and "const UINT candidateOrdinal = s.eligibleThisFrame++;" in code
             and "kProbeSlots = 64" not in code
         )
@@ -353,14 +354,16 @@ def main() -> None:
         section = code[start:end]
         return all(token in section for token in (
             "const auto insetPlacement = presentRegion.inset_placement(",
-            "bb.Width, bb.Height, kWidth, kHeight, 8u);",
+            "bb.Width, bb.Height, surfaceWidth, surfaceHeight, fullMode ? 0u : 8u);",
+            "nativeExtentMatches &&",
+            "surfaceWidth == bb.Width && surfaceHeight == bb.Height &&",
             "!outputNow.hasDirtyRegion && insetPlacement.valid",
             "static_cast<LONG>(insetPlacement.left)",
             "static_cast<LONG>(insetPlacement.top)",
             "bb.MultiSampleType == D3DMULTISAMPLE_NONE",
             "bb.Format == D3DFMT_A8R8G8B8",
             "bb.Format == D3DFMT_X8R8G8B8",
-            "kWidth, kHeight, bb.Format, D3DPOOL_SYSTEMMEM",
+            "surfaceWidth, surfaceHeight, bb.Format, D3DPOOL_SYSTEMMEM",
             "game->UpdateSurface(",
         ))
 
@@ -368,8 +371,9 @@ def main() -> None:
         "native inset copy must match the actual D3D9 backbuffer and stay in bounds"
     )
     for vulnerable, replacement in (
-        ("kWidth, kHeight, bb.Format, D3DPOOL_SYSTEMMEM",
-         "kWidth, kHeight, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM"),
+        ("surfaceWidth, surfaceHeight, bb.Format, D3DPOOL_SYSTEMMEM",
+         "surfaceWidth, surfaceHeight, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM"),
+        ("nativeExtentMatches &&", "true &&"),
         ("bb.MultiSampleType == D3DMULTISAMPLE_NONE",
          "bb.MultiSampleType != D3DMULTISAMPLE_NONE"),
         ("const auto insetPlacement = presentRegion.inset_placement(",
