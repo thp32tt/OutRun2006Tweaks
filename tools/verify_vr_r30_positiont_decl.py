@@ -19,6 +19,7 @@ def check(s):
       "e.Type != D3DDECLTYPE_FLOAT4", "e.UsageIndex != 0u",
       "e.Offset < 4u * sizeof(float)", "e.Usage == D3DDECLUSAGE_POSITION"):
         assert token in h,token
+    assert h.count("declaration->Release();") == 2  # failure path and success path
     assert "if (!R30HasXyzrhwInputLayout(device))" in p
     assert "device->GetFVF(&fvf)" not in p
 
