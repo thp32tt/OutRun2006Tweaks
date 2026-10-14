@@ -17,7 +17,9 @@ def check(c,p,g,w):
               "Get-Process -Name 'outrun-vr-host'",
               'HOST_NEVER_STARTED','HOST_DISAPPEARED_DURING_GAME',
               'DX9EX_LAUNCH_HEALTH.txt','OUTRUNVR_LAUNCH_ERROR.txt',
-              'runtimeValidation=UNTESTED','exit 5'):
+              'runtimeValidation=UNTESTED','exit 5',
+              'gameExitCode=$gameExitCode',"'GAME_NONZERO_EXIT'",
+              'if($gameExitCode -ne 0){','exit 7'):
         assert s in p, 'OpenXR host check missing: '+s
     start=g.split('function Start-Slot(',1)[1].split('$form=New-Object',1)[0]
     assert '-WindowStyle Hidden' not in start, 'hidden child masks launch errors'
@@ -32,6 +34,8 @@ if __name__ == '__main__':
        ('missing original EXE preflight',CMD.replace('OR2006C2C.EXE','OTHER.EXE'),PS,GUI,WF),
        ('missing host payload',CMD.replace('backends\\d3d9\\outrun-vr-host.exe','missing.exe'),PS,GUI,WF),
        ('missing host lifecycle',CMD,PS.replace('HOST_NEVER_STARTED','HOST_UNKNOWN'),GUI,WF),
+       ('silenced game failure',CMD,PS.replace('exit 7','exit 0'),GUI,WF),
+       ('erased failure health',CMD,PS.replace("'GAME_NONZERO_EXIT'","'PROCESS_OBSERVED_NOT_HMD_VERIFIED'"),GUI,WF),
        ('hidden runner',CMD,PS,GUI.replace('-WindowStyle Normal','-WindowStyle Hidden',1),WF),
        ('missing packaged entry',CMD,PS,GUI,WF.replace('if ($launchers.Count -ne 2','if ($launchers.Count -ne 1',1)),
     ]

@@ -1,0 +1,82 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00863",
+  "production_id": "CONVERSION-DX9EX-00863",
+  "event_id": "CONVERSION-DX9EX-00863-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00863",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:LAUNCH:GAME_EXIT_PROPAGATION",
+  "feature_class": "CRITICAL_BLOCKER",
+  "feature_contract": {
+    "feature_id": "DX9EX:LAUNCH:GAME_EXIT_PROPAGATION",
+    "goal": "Propagate any nonzero original OutRun game exit as DX9Ex test failure after collecting logs, rather than treating an observed OpenXR host as successful gameplay.",
+    "scope_boundary": "Packaged direct DX9Ex launcher and its test runner only; preserve the game process, OpenXR host, telemetry, DX9Ex renderer, FFB and other branches.",
+    "special_work_evidence": "Source-confirmed release-blocking failure: gameExitCode was recorded by Run-OutRunVRTest.ps1 but ignored after the collector when an OpenXR host process had been observed; START_DX9EX_TEST.cmd could falsely report OK.",
+    "trace_stages": [
+      "START_DX9EX_TEST.cmd selects CURRENT_FOCUS CORRECTNESS and calls Run-OutRunVRTest.ps1",
+      "The runner waits for native OR2006C2C.EXE and observes live host process",
+      "Game exit health is collected and translated to positive CMD-readable errorlevel only after log archive"
+    ],
+    "subcomponents": [
+      "Persist original game exit and classify nonzero game crash in DX9EX_LAUNCH_HEALTH independently of host visibility",
+      "Write session error evidence before collector and emit positive status safe for signed Windows exception return values"
+    ],
+    "acceptance_items": [
+      {
+        "id": "exit",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Native game and one-click CMD",
+        "expected_behavior": "Nonzero original game exit, including signed negative crash NTSTATUS, produces positive errorlevel 7 after logs are archived."
+      },
+      {
+        "id": "diagnostic",
+        "category": "end_to_end_behavior",
+        "behavior_area": "DX9Ex session log archive",
+        "expected_behavior": "GAME_NONZERO_EXIT status, original exit code and PID are recorded and an error file is written before log collection."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Zero-exit and host-failure isolation",
+        "expected_behavior": "Normal zero-exit sessions remain valid when host was observed, missing-host failure remains prioritized and the user's game is never killed."
+      },
+      {
+        "id": "ci",
+        "category": "integrated_validation",
+        "behavior_area": "Exact SHA GitHub CI and mutation",
+        "expected_behavior": "DX9Ex Active Windows game, host, package, Domain Isolation and changed-area mutation guard pass on the material result SHA; Quest3 remains untested."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "The original shipped runner recorded p.ExitCode but used only xrHostFailure to determine success; observed prewarmed OpenXR host could mask an abnormally terminated game.",
+    "source_trace": [
+      "Visible CMD invokes selected DX9Ex test runner",
+      "Game Start-Process -PassThru and WaitForExit gives a real exit code",
+      "Game exit failure health and original exit are written before collector then positive CMD errorlevel is returned"
+    ],
+    "root_cause": "Game exit code was a log field instead of success gate; passing a negative NTSTATUS directly would also evade CMD if errorlevel 1.",
+    "alternatives_rejected": [
+      "Do not rely on OpenXR helper existence to prove native game success",
+      "Do not skip archive or terminate a running game to report error",
+      "Do not change SkyGlow, game rendering or backend selection"
+    ],
+    "fix_evidence": "Preserve native ExitCode, mark GAME_NONZERO_EXIT, persist pre-archive error and return positive 7 after log collector.",
+    "negative_test_evidence": "Extended launcher verifier mutations reject restoring exit 0 or erasing GAME_NONZERO_EXIT."
+  },
+  "status": "SOURCE_MATERIAL_AWAITING_EXACT_SHA_CI",
+  "phase": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "Windows native game and Quest3/VDXR not executed in this session.",
+  "changed_files": [
+    "tools/Run-OutRunVRTest.ps1",
+    "tools/verify_vr_dx9ex_launch_batch.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00863.json"
+  ],
+  "score_once": false,
+  "score_delta_this_retry": 0
+}

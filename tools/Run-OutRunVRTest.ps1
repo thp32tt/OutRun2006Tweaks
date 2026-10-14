@@ -434,6 +434,8 @@ try{
         Start-Sleep -Seconds 2
     }
     $p.WaitForExit()
+    # A live OpenXR host does not mean the original game exited normally.
+    $gameExitCode=$p.ExitCode
     if($backend -eq 'd3d9'){
         if(-not $xrHostEverSeen -and -not $xrHostFailure){
             $xrHostFailure=$true
@@ -442,9 +444,9 @@ try{
         @(
           "sourceSha=$sourceSha",
           "gamePid=$($p.Id)",
-          "gameExitCode=$($p.ExitCode)",
+          "gameExitCode=$gameExitCode",
           "hostProcessEverSeen=$xrHostEverSeen",
-          "status=$(if($xrHostFailure){$xrHostFailureReason}else{'PROCESS_OBSERVED_NOT_HMD_VERIFIED'})",
+          "status=$(if($xrHostFailure){$xrHostFailureReason}elseif($gameExitCode -ne 0){'GAME_NONZERO_EXIT'}else{'PROCESS_OBSERVED_NOT_HMD_VERIFIED'})",
           "runtimeValidation=UNTESTED"
         ) | Set-Content -LiteralPath (Join-Path $sessionRoot 'DX9EX_LAUNCH_HEALTH.txt') -Encoding UTF8
         if($xrHostFailure){
@@ -457,6 +459,17 @@ try{
               'A missing process does not establish the underlying runtime cause.'
             ) | Set-Content -LiteralPath (Join-Path $root 'OUTRUNVR_LAUNCH_ERROR.txt') -Encoding UTF8
         }
+    }
+    if($gameExitCode -ne 0 -and -not $xrHostFailure){
+        # Write before the collector archives the failed session.
+        @(
+          'OutRun 2006 native game exited with a nonzero status.',
+          "gameExitCode=$gameExitCode",
+          "gamePid=$($p.Id)",
+          "session=$sessionRoot",
+          'An observed OpenXR host is not proof of game success.'
+        ) | Set-Content -LiteralPath (Join-Path $root 'OUTRUNVR_LAUNCH_ERROR.txt') -Encoding UTF8
+        Write-Warning "Game exited with $gameExitCode; collecting failure logs."
     }
 } finally {
     # Stop only the sampler started by this run, never a user's other nvidia-smi.
@@ -549,4 +562,10 @@ if($xrHostFailure){
        [void][System.Windows.Forms.MessageBox]::Show('OpenXR host missing. See OUTRUNVR_LAUNCH_ERROR.txt; logs were collected.','DX9Ex VR launch failure')
     } catch {}
     exit 5
+}
+if($gameExitCode -ne 0){
+    # Windows exception NTSTATUS may be signed negative. Use a POSITIVE
+    # errorlevel, so the visible CMD 'if errorlevel 1' never reports OK.
+    Write-Warning "OutRun game exit $gameExitCode: DX9Ex test FAILED (logs collected)."
+    exit 7
 }
