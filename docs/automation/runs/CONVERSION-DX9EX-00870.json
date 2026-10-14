@@ -54,10 +54,10 @@
       "No generic state changes, alpha suppression, reduced resolution or speculative HMD acceptance."
     ]
   },
-  "status": "IMPLEMENTED_VALIDATION_PENDING",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_STATE",
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No Quest3/VDXR or original game session on this SHA.",
   "source_parent_sha": "4e2ef763da1056ce44944d7d9b316c71f42ff4a9",
@@ -71,10 +71,35 @@
     "docs/automation/runs/CONVERSION-DX9EX-00870.json"
   ],
   "acceptance_results": {
-    "stereo": "PENDING_EXACT_SHA_CI",
-    "fallback": "PORTABLE_SMOKE_TO_RUN",
-    "ci": "PENDING_EXACT_SHA_CI"
+    "stereo": "BUILD_VERIFIED_NEED_HMD_TEST",
+    "fallback": "PASS_PORTABLE_SMOKE_AND_WINDOWS_BUILD",
+    "ci": "PASS_EXACT_SHA"
   },
   "score_once": false,
-  "score_delta_this_attempt": 0
+  "score_delta_this_attempt": 0,
+  "material_result_sha": "48a3283bc3aa4343a6fe6af3443831bb24a2d176",
+  "validation_bearing_result_sha": "e8b775188a02d2289e8d4c5e8f744852ce3fe845",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "hold_reason": "HMD_QUEST3_VDXR_RUNTIME_NOT_EXECUTED",
+  "validation_evidence": {
+    "sha": "e8b775188a02d2289e8d4c5e8f744852ce3fe845",
+    "dx9ex_active": {
+      "run_id": 38655029586,
+      "result": "SUCCESS",
+      "jobs_passed": "5/5"
+    },
+    "domain_isolation": {
+      "run_id": 38655029517,
+      "result": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38655029652,
+      "result": "SUCCESS"
+    },
+    "runtime": "UNTESTED",
+    "notes": "No game/HMD execution on this SHA; static build and policy gates are not Quest3 gameplay certification."
+  },
+  "validation_record_kind": "C6_BOOKKEEPING_SKIP_CI",
+  "result_commit_ci_skip": false,
+  "c6_bookkeeping_ci_skip": true
 }
