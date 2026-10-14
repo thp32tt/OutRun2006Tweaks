@@ -982,6 +982,15 @@ namespace OutRunVRStereo
     {
         return FrameStereoPoseSequence;
     }
+    bool R29OwnerSkyGlowCaptureStillValid(std::uint64_t capturedEpoch) noexcept
+    {
+        // Preserve the eligibility checks that preceded the old epoch hit.
+        // Failure, Reset or a new Present must never reuse a stale scene.
+        return capturedEpoch != 0 && capturedEpoch == PresentEpoch &&
+            FrameHadWorldStereo && FrameHadDuplicatedDraw &&
+            !FrameRightDrawFailed && !FrameStereoIncomplete &&
+            BackBuffer != nullptr && RightEyeSurface != nullptr;
+    }
     R29OwnerFrameSnapshot R29OwnerCaptureFrameSnapshot() noexcept
     {
         R29OwnerFrameSnapshot view{};

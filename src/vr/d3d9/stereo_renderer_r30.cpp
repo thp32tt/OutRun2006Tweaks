@@ -1357,6 +1357,11 @@ namespace OutRunVRStereo
             if (!device || Settings::SkyGlowFactor <= 0 ||
                 !R30GameGlowActive())
                 return false;
+            // Most HUD draws arrive after the first successful scene copy.
+            // Recheck *all* live R29 eligibility flags, not just the epoch:
+            // a right-eye failure in this Present must invalidate reuse.
+            if (R29OwnerSkyGlowCaptureStillValid(R30SkyGlowSceneCaptureEpoch))
+                return true;
             const auto frame = R29OwnerCaptureFrameSnapshot();
             if (!frame.hadWorldStereo || !frame.hadDuplicatedDraw ||
                 frame.rightDrawFailed || frame.stereoIncomplete ||

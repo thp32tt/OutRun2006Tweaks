@@ -523,15 +523,19 @@ namespace OutRunVRRenderer
 			return true;
 		}
 
-		bool ReadRendererMatrices(D3DMATRIX& view, D3DMATRIX& projection, D3DMATRIX& worldView)
+		bool ReadRendererMatrices(D3DMATRIX& view, D3DMATRIX& projection, D3DMATRIX& worldView, bool needView)
 		{
 			if (!ValidateRendererGlobals())
 				return false;
-			std::memcpy(&view, RendererView, sizeof(view));
+			// VRMatrixOrder 0 composes WorldView directly; no consumer reads
+			// View on that path. Keep full validation for the other order.
+			if (needView)
+				std::memcpy(&view, RendererView, sizeof(view));
 			if (CullingProjectionOverridden) projection = CullingProjectionSaved;
 			else std::memcpy(&projection, RendererProjection, sizeof(projection));
 			std::memcpy(&worldView, RendererWorldView, sizeof(worldView));
-			return MatrixFinite(view) && MatrixFinite(projection) && MatrixFinite(worldView);
+			return (!needView || MatrixFinite(view)) &&
+				MatrixFinite(projection) && MatrixFinite(worldView);
 		}
 
 		bool SharedHeaderValid()
@@ -1474,7 +1478,8 @@ namespace OutRunVRRenderer
 			D3DMATRIX view{};
 			D3DMATRIX projection{};
 			D3DMATRIX worldView{};
-			if (!ReadRendererMatrices(view, projection, worldView))
+			if (!ReadRendererMatrices(view, projection, worldView,
+				Settings::VRMatrixOrder != 0))
 			{
 				++UnsafeAddressRejects;
 				if (!FirstUnsafeAddressLogged)
@@ -1536,7 +1541,10 @@ namespace OutRunVRRenderer
 			if (!MatrixFinite(correctedWvp))
 				return false;
 
-			std::memcpy(patchedData, constantData, sizeof(float) * vector4fCount * 4);
+			// A four-register c64..c67 update is wholly replaced below.
+			// Larger uploads retain all untouched original shader registers.
+			if (vector4fCount > OutRunWvpRegisterCount)
+				std::memcpy(patchedData, constantData, sizeof(float) * vector4fCount * 4);
 			const D3DMATRIX transposed = TransposeMatrix(correctedWvp);
 			std::memcpy(patchedData + wvpOffsetRegisters * 4, &transposed, sizeof(transposed));
 
@@ -1780,7 +1788,10 @@ namespace OutRunVRRenderer
 				return result;
 			}
 
-			float patchedData[256 * 4];
+			// Avoid a 4 KiB local stack frame on every c64-containing upload.
+			// TLS keeps independent buffers across game render threads. The
+			// original call consumes these constants synchronously.
+			static thread_local float patchedData[256 * 4];
 			const bool prepared = TryPrepareOutRunWvp(
 				startRegister, constantData, vector4fCount, patchedData);
 			const float* uploadedData = prepared ? patchedData : constantData;

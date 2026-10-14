@@ -44,6 +44,9 @@ namespace OutRunVRStereo
         bool rightStencilSynchronized = false;
     };
     R29OwnerFrameSnapshot R29OwnerCaptureFrameSnapshot() noexcept;
+    // Hot HUD fast path: test the already-captured SkyGlow epoch against
+    // current owner state without constructing the full frame POD.
+    bool R29OwnerSkyGlowCaptureStillValid(std::uint64_t presentEpoch) noexcept;
     // R33 world/HUD pose fence is checked per draw. Return only the owned
     // sequence instead of assembling the unrelated render-target frame POD.
     std::uint32_t R29OwnerFrameStereoPoseSequence() noexcept;

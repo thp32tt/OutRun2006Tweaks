@@ -566,6 +566,18 @@ public:
 		return "RestoreXboxBrightness";
 	}
 
+	// Never install the irreversible NOPs or per-material hooks when off.
+	// This option changes executable shader code and requires a restart.
+	bool validate() override
+	{
+		return Settings::RestoreXboxBrightness;
+	}
+
+	void declare_settings() override
+	{
+		Settings::RestoreXboxBrightness.needs_restart();
+	}
+
 	bool apply() override
 	{
 		Memory::VP::Patch(Module::exe_ptr<uint8_t>(Modulate2xShift_ps11_Addr), uint8_t(0x81));
@@ -1837,17 +1849,11 @@ class AnisotropicFiltering : public Hook
 		if (Settings::AnisotropicFiltering <= 0 ||
 			PreserveScreenTextureFiltering())
 			return;
+		// Preserve the existing MIN/MAG anisotropic selection for world
+		// materials. destination at 0x9AD8 is the sole MAXANISOTROPY
+		// driver write; repeating it here once more on MIN is redundant.
 		if (ctx.edi == D3DSAMP_MINFILTER || ctx.edi == D3DSAMP_MAGFILTER)
-		{
 			ctx.esi = D3DTEXF_ANISOTROPIC;
-			// ChangeTexAttribute also sets MAG: avoid its redundant update.
-			if (ctx.edi == D3DSAMP_MINFILTER)
-			{
-				const int sampler = *reinterpret_cast<int*>(ctx.esp + 0xC);
-				Game::D3DDevice()->SetSamplerState(sampler,
-					D3DSAMP_MAXANISOTROPY, Settings::AnisotropicFiltering.get());
-			}
-		}
 	}
 
 public:
