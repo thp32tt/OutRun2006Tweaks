@@ -69,11 +69,11 @@
     "negative_test_evidence": "11 C++ constexpr positive/negative test conditions compile with packaged R26+HUD owner at identical SHA.",
     "eye_ownership": "Proven raw original WorldView receives the existing single head inverse and per-eye transform; unproven raw falls to existing lower original raster route."
   },
-  "status": "IMPLEMENTED_VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA_5_OF_5",
   "runtime_validation": "UNTESTED",
-  "runtime_evidence": "No actual matching Quest3/VDXR game runtime evidence. Central dot's visual acceptance requires matching installed DLL and runtime log.",
+  "runtime_evidence": "BUILD_VERIFIED only. No matching Quest3/VDXR HMD visual/session test was performed. Exact central lens flare visual fix remains NEED_HMD_TEST.",
   "changed_files": [
     "src/vr/game/render_semantics.hpp",
     "src/hooks_graphics.cpp",
@@ -82,7 +82,27 @@
     "src/vr/d3d9/lens_centre_source_provenance.hpp",
     "docs/automation/runs/CONVERSION-DX9EX-00852.json"
   ],
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "score_once": false
+  "material_result_sha": "255c818eb06820175ee16c266e4b20acf0b241b3",
+  "validation_bearing_result_sha": "e2f2b7b66fc07ae836eb2796c9b70b53957f4a2a",
+  "score_once": true,
+  "scoreboard_commit_sha": "bfde6ffd56a70fee96f25d0a132b0cbe96120a33",
+  "scoreboard_ai_2_before": 1322,
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1323,
+  "ci_validation": {
+    "active_workflow_run": 38604198585,
+    "active_jobs": {
+      "policy": "SUCCESS",
+      "host": "SUCCESS",
+      "game": "SUCCESS",
+      "full-chain-compile": "SUCCESS",
+      "package": "SUCCESS"
+    },
+    "domain_isolation_workflow_run": 38604198972,
+    "domain_isolation": "SUCCESS",
+    "hud_inspector_workflow_run": 38603767670,
+    "hud_inspector": "SUCCESS",
+    "material_full_source_impact_workflow_run": 38602947221,
+    "material_full_source_impact": "SUCCESS_3_OF_3"
+  }
 }
