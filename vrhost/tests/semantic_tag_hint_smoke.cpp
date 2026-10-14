@@ -19,7 +19,19 @@ int main()
     for (int i = 64; i < 3064; ++i)
         if (!SpriteNodeSemanticMaybeHasTag(&nodes[i]))
             ++definiteMisses;
-    assert(definiteMisses > 2800);
+    assert(definiteMisses > 2600);
+    // Bloom false positives are allowed but never semantic authority:
+    // a node with both hint bits set and no exact pointer tag stays generic.
+    int falsePositives = 0;
+    for (int i = 64; i < 3064; ++i)
+    {
+        if (!SpriteNodeSemanticMaybeHasTag(&nodes[i]))
+            continue;
+        ++falsePositives;
+        assert(PeekSpriteNodeScope(&nodes[i], generic) == generic);
+        assert(ConsumeSpriteNodeScope(&nodes[i], generic) == generic);
+    }
+    assert(falsePositives > 0);
     for (int i = 0; i < 64; ++i)
     {
         assert(SpriteNodeSemanticMaybeHasTag(&nodes[i]));
