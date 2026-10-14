@@ -10,12 +10,12 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULLFRAME_BGRA_D3D9_UPLOAD_LIFETIME",
   "feature_id": "DX11-MENU-RACE-NATIVE-FRAME-BGRA-UPLOAD",
-  "status": "IMPLEMENTED_GATE_PENDING",
-  "checkpoint": "C4_COMMIT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "base_head_sha": "0e9acc952a8d6a16946821a61b74958429035b29",
   "material_result_sha": "cd4b6c7a0e8f0628b0613b62405a8c465825f68b",
-  "validation_bearing_result_sha": null,
-  "automation_validation": "IN_PROGRESS",
+  "validation_bearing_result_sha": "c88e930e1db7a89397a083845357830342fbb11b",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -44,7 +44,7 @@
       "Executable C++ nontrivial pitched buffer probe and Python integrated destructive regressions wired to exact-SHA CI"
     ],
     "acceptance_proof": {
-      "positive_probe": "00747 standalone C++ padded stride BGRA output bytewise comparison and native before_game_present D3D9 UpdateSurface integrated source; exact CI pending.",
+      "positive_probe": "GitHub DX11 Fast #38641768824 5/5 SUCCESS at exact validation SHA c88e930e; live C++ integration plus BGRA padding executable test.",
       "negative_regression": "00747 invalid pitch/null/overflow no-write probe plus destructive source mutation on failed UnlockRect and stale upload cache; original D3D9 gamepad fallback.",
       "component_integration": "Native D3D11 Draw/DrawIndexed/color texture -> CopyResource/EVENT/Map -> pitched BGRA full-frame upload -> D3D9 UpdateSurface before same Present."
     },
@@ -58,7 +58,7 @@
       "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "Source and CI integration pending exact 5/5 SHA; full desktop menu/car/race gameplay and Quest3/VDXR parity cannot be asserted without runtime.",
+    "visible_frame_acceptance": "Exact SHA c88e930e DX11 Fast/Backend/Win32 Build/OpenXR/HUD all SUCCESS; Quest3/VDXR and actual gameplay screen parity UNTESTED.",
     "activation_guard_and_fallback": "Native full frame remains explicit opt-in; malformed copy or failed D3D9 unlock discards upload and keeps original D3D9 Present/gamepad."
   },
   "feature_contract": {
@@ -86,19 +86,48 @@
     ]
   },
   "acceptance_results": {
-    "native-pitched-bgra-frame-transfer": "PENDING_CI",
-    "original-d3d9-input-safe-fallback": "PENDING_CI",
-    "same-sha-integration-and-ci": "PENDING_EXACT_SHA"
+    "native-pitched-bgra-frame-transfer": "PASS",
+    "original-d3d9-input-safe-fallback": "PASS",
+    "same-sha-integration-and-ci": "PASS_EXACT_SHA"
   },
   "blocking_evidence": "Before this source commit, successful D3D9 LockRect with malformed nonnull mapping assumptions reached memcpy and D3D9 UnlockRect failure was ignored before UpdateSurface, allowing invalid native full-frame output rather than fail-closed original D3D9 game Present.",
-  "ci_evidence": {},
+  "ci_evidence": {
+    "dx11_fast": {
+      "run_id": 38641768824,
+      "conclusion": "success",
+      "head_sha": "c88e930e1db7a89397a083845357830342fbb11b"
+    },
+    "backend_conversion": {
+      "run_id": 38641768825,
+      "conclusion": "success",
+      "head_sha": "c88e930e1db7a89397a083845357830342fbb11b"
+    },
+    "windows_build": {
+      "run_id": 38641775822,
+      "conclusion": "success",
+      "head_sha": "c88e930e1db7a89397a083845357830342fbb11b"
+    },
+    "openxr_architecture": {
+      "run_id": 38641775486,
+      "conclusion": "success",
+      "head_sha": "c88e930e1db7a89397a083845357830342fbb11b"
+    },
+    "hud_inspector": {
+      "run_id": 38641775579,
+      "conclusion": "success",
+      "head_sha": "c88e930e1db7a89397a083845357830342fbb11b"
+    }
+  },
   "pipeline": {
     "C0_RECOVER": "PASS GitHub exact DX11 branch, AGENTS, policy and prior 00746 COMPLETE 5/5.",
     "C1_REVIEW": "PASS native full-frame CPU mapping copy/UnlockRect loss and missing prior 00746 policy acceptance fields identified.",
     "C2_IMPLEMENT": "PASS material C++ pitched BGRA Map->D3D9 upload/UnlockRect fallback and executable source probes.",
-    "C3_VALIDATE": "PENDING exact SHA 5 required GitHub gates; original material commit blocked only by prior 00746 invalid record.",
-    "C4_COMMIT": "PASS material SHA cd4b6c7a no skip CI",
+    "C3_VALIDATE": "PASS_EXACT_SHA: DX11 Fast #38641768824, Backend #38641768825, Build #38641775822, OpenXR #38641775486, HUD #38641775579 all SUCCESS on c88e930e.",
+    "C4_COMMIT": "PASS: source material cd4b6c7; subsequent source+regressions validation SHA c88e930e, no CI skip.",
     "C5_PACKAGE": "NOT_REQUIRED user-controlled distribution; no HMD",
-    "C6_RESULT": "PENDING CI"
-  }
+    "C6_RESULT": "PASS: exact SHA 5/5 source/build validated; separate C6 bookkeeping, RUNTIME_VALIDATION=UNTESTED, no automatic HMD promotion."
+  },
+  "result_sha": "c88e930e1db7a89397a083845357830342fbb11b",
+  "result_note": "Integrated native BGRA D3D11-to-D3D9 full-backbuffer pitch-aware copy and UnlockRect/UpdateSurface fail-closed recovery; exact SHA five mandatory CI workflows SUCCESS. No real Quest3/VDXR/gamepad gameplay verification.",
+  "recorded_at_kst": "2026-10-15 06:50 KST"
 }
