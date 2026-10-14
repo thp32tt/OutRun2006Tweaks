@@ -1,10 +1,12 @@
 # OPTIONAL Portainer Additional compose path for the EXISTING Git-based localization Stack.
 # Manual Pull and redeploy by the user only. No existing service is overwritten.
 # Configure BOTH host paths first. This service never invokes ChatGPT/ImageGen/API.
+# Build context relative to the FIRST compose file at tools/chat-controller/localization-recovery-v1/;
+# this only works if that Git Stack actually contains this repository checkout.
 services:
   outrun-c-salvage-offline:
     build:
-      context: ../..
+      context: ../../..
       dockerfile: docker/localization-production/Dockerfile.c-salvage
     restart: unless-stopped
     init: true
