@@ -43,3 +43,7 @@ for old,new in [
 ('if(s.pending) { ++dropped_; skip_=true; return false; }','if(s.pending) { s.pending=false; }')]:
     assert not good(hdr.replace(old,new,1)),old
 print('PASS GPU timing opt-in, nonblocking reads, alpha census, draw/reset/present wiring, 9 mutants')
+
+# End-to-end dispatch histogram coverage: executed by the existing Active GPU gate.
+from runpy import run_path
+run_path(str(root/'tools/verify_dx9ex_translucent_route_profile.py'), run_name='__main__')
