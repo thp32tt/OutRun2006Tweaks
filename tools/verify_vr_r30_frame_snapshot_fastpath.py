@@ -26,13 +26,26 @@ def verify(text):
         "R30PrepareXyzrhwState",
         "R30CaptureSkyGlowSceneBeforeHud",
         "R30ApplyStereoSkyGlow",
-        "R30HudAspectCompensation",
         "R30ExecuteXyzrhwStereo",
     ):
         part = block(text, name)
         assert part.count("R29OwnerCaptureFrameSnapshot()") == 1, name
         assert "const auto frame = R29OwnerCaptureFrameSnapshot();" in part, name
         assert "R29OwnerCaptureFrameSnapshot()." not in part, name
+    # R30HudAspectCompensation now BORROWS source width/height from the
+    # caller's single Present snapshot. Capturing again here could interleave
+    # a game Reset and store the wrong source ratio under the old HUD key.
+    aspect = block(text, "R30HudAspectCompensation")
+    assert "R29OwnerCaptureFrameSnapshot()" not in aspect
+    assert "if (!sourceWidth || !sourceHeight)" in aspect
+    assert "static_cast<float>(sourceWidth) /" in aspect
+    assert "static_cast<float>(sourceHeight)" in aspect
+    hud = block(text, "R30HudContainScale")
+    assert hud.count("R29OwnerCaptureFrameSnapshot()") == 1
+    assert "stereo, frame.width, frame.height, eyeExtent)" in hud
+    assert "R30HudContain.sourceWidth = frame.width;" in hud
+    assert "R30HudContain.sourceHeight = frame.height;" in hud
+    # Existing world/SkyGlow/eye RT snapshot ownership remains unchanged.
     for name, expected in (
         ("R30ConfigureXyzrhwWorldEffect", 2),
         ("R30TryScreenSpaceFovDraw", 3),
@@ -86,6 +99,15 @@ if __name__ == "__main__":
                 src[scope_start + len(scope):])
 
     negatives = (
+        ("R30HudAspectCompensation",
+         "static_cast<float>(sourceWidth) /",
+         "static_cast<float>(sourceHeight) /"),
+        ("R30HudAspectCompensation",
+         "if (!sourceWidth || !sourceHeight)",
+         "if (false)"),
+        ("R30HudContainScale",
+         "stereo, frame.width, frame.height, eyeExtent)",
+         "stereo, frame.height, frame.width, eyeExtent)"),
         ("R30EnsureSkyGlowResources",
          "const auto frame = R29OwnerCaptureFrameSnapshot();",
          "const auto frame = {};"),
