@@ -61,10 +61,10 @@ with TemporaryDirectory(prefix="dx11-native-frame-") as work:
                             ("cropped_native_disabled",header,region.replace("return {0u, 0u, true};","return {};"),False),
                             ("cropped_native_wrong_extent",header,region.replace(
                                 "nativeWidth != backbufferWidth || nativeHeight != backbufferHeight ||",
-                                "false ||"),False),
+                                "(nativeWidth == 0u && nativeHeight == 0u) ||"),False),
                             ("cropped_native_out_of_bounds",header,region.replace(
-                                "right > static_cast<std::int64_t>(backbufferWidth) ||",
-                                "false ||"),False)):
+                                "right > static_cast<std::int64_t>(backbufferWidth) ||\n            bottom > static_cast<std::int64_t>(backbufferHeight))",
+                                "false ||\n            bottom > static_cast<std::int64_t>(backbufferHeight))"),False)):
         (folder/"native_game_frame_batch.hpp").write_text(text)
         (folder/"native_game_present_region.hpp").write_text(region_text)
         binary=folder/tag
