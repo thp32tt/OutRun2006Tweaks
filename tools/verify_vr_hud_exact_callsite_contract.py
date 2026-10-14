@@ -285,8 +285,26 @@ def check(ui, manifest):
             r"\);\s*return ExactScreenHud_putClipSprite\(\s*"
             r"xstnum,\s*x,\s*y,\s*flags,\s*priority,\s*color\);"
         )
-        if not re.fullmatch(direct_bridge, wrapper, re.S):
-            fail(side + " HUD spacing/forwarding must use the exact ScreenHud owner")
+        if right:
+            # Existing right-side TimeAttack/C2C clips retain their original
+            # generic HUD bridge and spacing; do not broaden the token.
+            if not re.fullmatch(direct_bridge, wrapper, re.S):
+                fail("Right HUD spacing/forwarding must use the exact ScreenHud owner")
+        else:
+            # The two original REV/gear left CALLs now own an append-only
+            # source token. Preserve positional spacing, exactly one game
+            # put_clip_sprite, all newly queued children and ScreenHud scope.
+            ordered(wrapper, "left gear/REV exact producer",
+                    "AddSpriteSpacing(&x, true);",
+                    "std::array<SpriteNode*, Game::SpritePriorityCount> before{}",
+                    "const int result = Game::put_clip_sprite(",
+                    "TagAppendedNodes(before,", "return result;")
+            if (wrapper.count("Game::put_clip_sprite(") != 1 or
+                    "ProducerToken::DispGearRevClipSprite" not in wrapper or
+                    "RenderScope::ScreenHud" not in wrapper or
+                    "return ExactScreenHud_putClipSprite(" in wrapper or
+                    "ProducerToken::ExactScreenHudClipSprite" in wrapper):
+                fail("Left gear/REV owner must keep one Draw and exact ScreenHud sibling scope")
 
     sub = function_body(ui, "static int __cdecl RankMarkerSubSemanticDest(")
     ordered(sub, "NaviPub scope owner before original draw",
