@@ -3593,7 +3593,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     // Reject invalid game mip requests rather than silently clamping a native sampler.
     if (usesMips && capture.maxMipLevel >= sourceLevels) return false;
     const UINT levels = usesMips ? sourceLevels : 1u;
-    if (gpuRenderTarget && levels != 1u) return false;
+    // A game-created mipmapped render target needs one D3D9 GPU readback per
+    // sampled mip. Each source level is independently validated and captured
+    // before creating the immutable DX11 SRV; failure stays on DX9Ex.
     const bool compressed = base.Format == D3DFMT_DXT1 ||
                             base.Format == D3DFMT_DXT3 ||
                             base.Format == D3DFMT_DXT5;
@@ -3735,23 +3737,10 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
         return false;
 
     ComPtr<IDirect3DSurface9> readbackSurface;
-    if (gpuRenderTarget) {
-        ComPtr<IDirect3DSurface9> sourceSurface;
-        ComPtr<IDirect3DDevice9> gameDevice;
-        D3DSURFACE_DESC sourceDesc{};
-        if (FAILED(capture.texture->GetSurfaceLevel(0, sourceSurface.GetAddressOf())) ||
-            FAILED(sourceSurface->GetDesc(&sourceDesc)) ||
-            sourceDesc.MultiSampleType != D3DMULTISAMPLE_NONE ||
-            sourceDesc.Width != base.Width || sourceDesc.Height != base.Height ||
-            sourceDesc.Format != base.Format ||
-            !(sourceDesc.Usage & D3DUSAGE_RENDERTARGET) ||
-            FAILED(capture.texture->GetDevice(gameDevice.GetAddressOf())) ||
-            FAILED(gameDevice->CreateOffscreenPlainSurface(
-                base.Width, base.Height, base.Format, D3DPOOL_SYSTEMMEM,
-                readbackSurface.GetAddressOf(), nullptr)) ||
-            FAILED(gameDevice->GetRenderTargetData(sourceSurface.Get(), readbackSurface.Get())))
-            return false;
-    }
+    ComPtr<IDirect3DDevice9> gameDevice;
+    if (gpuRenderTarget &&
+        (FAILED(capture.texture->GetDevice(gameDevice.GetAddressOf())) ||
+         !gameDevice)) return false;
 
     std::array<a8p8_texture::Rgb, 256> activePalette{};
     std::array<p8_texture::Rgba, 256> p8Palette{};
@@ -3813,6 +3802,29 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
             desc.Width != (std::max)(1u, base.Width >> level) ||
             desc.Height != (std::max)(1u, base.Height >> level))
             return false;
+        if (gpuRenderTarget) {
+            // Reading base mip 0 repeatedly into smaller upload pitches would
+            // corrupt the vehicle/race sampler. Snapshot this exact D3D9
+            // render-target mip into a same-size SYSTEMMEM surface instead.
+            readbackSurface.Reset();
+            ComPtr<IDirect3DSurface9> sourceSurface;
+            D3DSURFACE_DESC sourceDesc{};
+            if (FAILED(capture.texture->GetSurfaceLevel(level, sourceSurface.GetAddressOf())) ||
+                !sourceSurface ||
+                FAILED(sourceSurface->GetDesc(&sourceDesc)) ||
+                sourceDesc.Format != desc.Format ||
+                sourceDesc.Pool != desc.Pool ||
+                !(sourceDesc.Usage & D3DUSAGE_RENDERTARGET) ||
+                sourceDesc.MultiSampleType != D3DMULTISAMPLE_NONE ||
+                !native_rt_readback::matching_mip_extent(
+                    base.Width, base.Height, level, sourceDesc.Width, sourceDesc.Height) ||
+                sourceDesc.Width != desc.Width || sourceDesc.Height != desc.Height ||
+                FAILED(gameDevice->CreateOffscreenPlainSurface(
+                    desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM,
+                    readbackSurface.GetAddressOf(), nullptr)) ||
+                FAILED(gameDevice->GetRenderTargetData(sourceSurface.Get(), readbackSurface.Get())))
+                return false;
+        }
         const UINT rows = compressed ? (std::max)(1u, (desc.Height + 3u) / 4u) : desc.Height;
         const UINT rowBytes = compressed ?
             (std::max)(1u, (desc.Width + 3u) / 4u) *
