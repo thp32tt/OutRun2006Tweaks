@@ -44,8 +44,7 @@
     "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
-      "NATIVE_D3D11_SAMPLED_STAGE1",
-      "D3D11_DRAW_DRAWINDEXED",
+      "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "Quest3/VDXR HMD/real game not run; needs HMD tests",
@@ -86,6 +85,6 @@
   "base_head_sha": "a9a65339a1c0b53cd4fe263b6c38d884e3b1f9b5",
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
-  "next_action": "Wait for exact-SHA GitHub gates; Quest3/VDXR/real gamepad remain RUNTIME_VALIDATION=UNTESTED",
+  "next_action": "Same TASK repair: exact live game path token and preserve strict pre-00712 mutation-count proofs; wait five required GitHub gates before C6. Quest3/VDXR runtime UNTESTED.",
   "state_persisted": true
 }
