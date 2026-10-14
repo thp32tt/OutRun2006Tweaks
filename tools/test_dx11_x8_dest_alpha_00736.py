@@ -12,7 +12,9 @@ def linked(cpp, hdr):
     callback = hook.split("HRESULT __stdcall ClearDestR9(", 1)[1].split("template <typename ActualDraw, typename LegacyDraw>", 1)[0]
     drawing = cpp.split("void observe(", 1)[1].split("} // namespace", 1)[0]
     return all(token in clear for token in (
-        "if (s.sourceGameDevice != 0u && s.sourceGameDevice != sourceDevice) return;",
+        "const bool foreignSource = s.sourceGameDevice != 0u &&",
+        "s.sourceGameDevice != sourceDevice;",
+        "if (foreignSource && !sourceReacquired) return;",
         "targetIdentity.Get() == backbufferIdentity.Get()",
         "s.clearColor.record(sourceDevice,",
         "static_cast<std::uint32_t>(color), wholeBackbuffer,",
