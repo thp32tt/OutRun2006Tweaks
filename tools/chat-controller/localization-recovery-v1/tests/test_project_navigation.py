@@ -139,12 +139,14 @@ class ProjectNavigationTests(unittest.TestCase):
         self.assertEqual(page.navigation, [])
         self.assertEqual(page.clicked, [])
 
-    def test_disguised_external_link_is_not_followed(self):
-        page = FakePage(links=[{"title": NAME, "aria": "", "href": "https://example.net/g/foo/project"}])
-        self.assertEqual(self.execute(page), "A_PROJECT_COMPOSER_READY" if False else "A_PROJECT_LINK_NOT_FOUND")
-        # The project-name-only text itself is clickable in our fallback stub,
-        # but a real page still MUST pass route and heading checks.
-        
+    def test_disguised_external_link_is_rejected(self):
+        page = FakePage(links=[
+            {"title": NAME, "aria": "", "href": "https://example.net/g/foo/project"}
+        ])
+        self.assertEqual(self.execute(page), "A_PROJECT_LINK_UNTRUSTED")
+        self.assertEqual(page.navigation, [])
+        self.assertEqual(page.clicked, [])
+
     def test_invalid_explicit_url_blocks(self):
         with patch.dict(os.environ, {"CHATGPT_PROJECT_URL": "https://example.net/g/foo/project"}):
             page = FakePage()
