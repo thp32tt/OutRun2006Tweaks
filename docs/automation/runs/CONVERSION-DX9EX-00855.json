@@ -69,11 +69,11 @@
     "negative_test_evidence": "C++ constexpr asserts preserve distinct F11 0.55/1.5 scale and regular game scaling; workflow-wired F11 Python verifier checks exact packaged owner calls, both scale components, strict admission, order before projection, negative mutations and numeric resolution cases.",
     "eye_ownership": "R30PrepareExternalImGuiProjection has strict exact F11 scope/orthographic/fixedfn gates, computes each eye's head-inverse, relative pose, FOV, viewport and per-command scissor with original state restoration, without borrowing normal game ScreenHud scale."
   },
-  "status": "COMPLETE_BUILD_VERIFIED",
+  "status": "COMPLETE_BUILD_VERIFIED_NEED_HMD_TEST",
   "phase": "C6_RESULT",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "runtime_evidence": "No matching Quest3/VDXR game test performed; F11 optical size/placement and interaction remain NEED_HMD_TEST even if Windows CI passes.",
+  "runtime_evidence": "Exact-SHA DX9Ex Active 5/5, Domain Isolation, HUD Inspector 2/2, Full Source Impact 3/3 Windows CI verified. No Quest3/VDXR real headset/game-session F11 size, placement or controller/input check; no runtime or deployment upgrade.",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
     "tools/verify_vr_f11_font_density.py",
@@ -82,18 +82,34 @@
   "material_result_sha": "02cd1c8aafaccb079f0ea53eb3fd52582e1b9a32",
   "validation_bearing_result_sha": "d902cb89562c8955017a8a937177bae56c38ce3b",
   "acceptance_results": {
-    "native_size": "SOURCE_PATCHED_CI_PENDING",
-    "independent": "SOURCE_PATCHED_CI_PENDING",
-    "fallback": "REGRESSION_PENDING",
-    "integration": "PENDING_EXACT_SHA"
+    "native_size": "PASS_EXACT_SHA",
+    "independent": "PASS_EXACT_SHA",
+    "fallback": "PASS_EXACT_SHA",
+    "integration": "PASS_EXACT_SHA"
   },
   "ci_evidence": {
-    "prior_candidate": "70f77164242b32dd1f64bad2da62dcd8b3cddce6",
-    "prior_gate_run": 38612021387,
-    "prior_gate_failure": "RUN_RECORD_MISSING; code compilation not reached",
-    "runtime_validation": "UNTESTED"
+    "exact_sha": "d902cb89562c8955017a8a937177bae56c38ce3b",
+    "active_workflow_run": 38612500925,
+    "active_jobs": {
+      "policy": "SUCCESS",
+      "game": "SUCCESS",
+      "full-chain-compile": "SUCCESS",
+      "host": "SUCCESS",
+      "package": "SUCCESS"
+    },
+    "domain_isolation_workflow_run": 38612501354,
+    "domain_isolation": "SUCCESS",
+    "hud_inspector_workflow_run": 38612500940,
+    "hud_inspector": "SUCCESS_2_OF_2",
+    "full_source_impact_workflow_run": 38612500584,
+    "full_source_impact": "SUCCESS_3_OF_3",
+    "validation_scope": "Windows x86 game DLL / x64 OpenXR host / both full-chain & packaged source / MSVC source impact / F11 negative regressions, HMD runtime UNTESTED"
   },
-  "score_once": false,
+  "score_once": true,
   "checkpoint": "C6_STATE",
-  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "scoreboard_commit_sha": "c61896b37e828e9ad59275a9578ce5a7fd17889f",
+  "scoreboard_ai_2_before": 1327,
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1328
 }
