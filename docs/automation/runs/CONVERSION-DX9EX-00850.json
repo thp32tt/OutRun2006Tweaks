@@ -67,9 +67,9 @@
     "negative_test_evidence": "Portable C++ eye-pair equation comparison and unity/nonpause invariants, plus source integration checks and mutation tests in existing ESC verifier.",
     "eye_ownership": "Both left and right eyes use their own verified eyeScale and eyeOffset on exact paused screen producers; unrelated F11 and world/UI draws keep previous shader correction."
   },
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "phase": "C3_VALIDATE_PENDING",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "changed_files": [
     "src/vr/d3d9/pause_menu_eye_affine.hpp",
@@ -78,12 +78,43 @@
     "tools/verify_vr_pause_menu_eye_affine.py",
     "docs/automation/runs/CONVERSION-DX9EX-00850.json"
   ],
-  "score_once": false,
+  "score_once": true,
   "acceptance_results": {
-    "pause_shader_shell": "PENDING_CI",
-    "pause_arrow_parity": "PENDING_CI",
-    "safe_legacy": "PENDING_CI",
-    "exact_windows_gate": "PENDING_CI"
+    "pause_shader_shell": "PASS_BUILD",
+    "pause_arrow_parity": "PASS_BUILD",
+    "safe_legacy": "PASS_BUILD",
+    "exact_windows_gate": "PASS_EXACT_SHA"
   },
-  "runtime_evidence": "Quest3/VDXR and OutRun 2006 actual runtime not tested on this material."
+  "runtime_evidence": "Quest3/VDXR and OutRun 2006 actual runtime not tested on this material.",
+  "material_result_sha": "5d81e5178e9440658945c26206f14ce4ac5f4a9d",
+  "validation_bearing_result_sha": "5d81e5178e9440658945c26206f14ce4ac5f4a9d",
+  "result_sha": "5d81e5178e9440658945c26206f14ce4ac5f4a9d",
+  "ci_evidence": {
+    "exact_sha": "5d81e5178e9440658945c26206f14ce4ac5f4a9d",
+    "active_validation": {
+      "run_id": 38594951222,
+      "conclusion": "SUCCESS",
+      "jobs": "policy/game/full-chain-compile/host/package 5/5 SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38594951179,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38594951206,
+      "conclusion": "SUCCESS",
+      "jobs": "source-cross-domain/msvc-analyze-active-game/msvc-analyze-openxr-host 3/3 SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38594951214,
+      "conclusion": "SUCCESS",
+      "jobs": "static-exe-analysis/build-hud-inspector 2/2 SUCCESS"
+    }
+  },
+  "c6_score_delta": 0,
+  "scoreboard_commit": "49e550e2a6c25b08bac9bb138f177a72d0afb2a4",
+  "scoreboard_ai2_previous": 1317,
+  "scoreboard_ai2_delta": 1,
+  "scoreboard_ai2_confirmed": 1318,
+  "controller_note": "One actual C++ ESC source repair at immutable material/validation-bearing exact SHA 5d81e517; the four independent required workflow gates passed. C6 bookkeeping has [skip ci] only to avoid re-running prior exact-SHA checks. Quest3/VDXR RUNTIME_VALIDATION=UNTESTED; no HMD optical pass claimed. One new independent scored outcome recorded in external SSOT; retries and checkpoint +0."
 }
