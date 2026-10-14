@@ -4,7 +4,7 @@
   "event_id": "CONVERSION-DX9EX-00828-E001",
   "lane": "DX9EX",
   "branch": "vr-d3d9ex-focus",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATES",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
@@ -44,9 +44,9 @@
     ]
   },
   "acceptance_results": {
-    "XR_BINOCULAR_HUD_SIZE": "IMPLEMENTED_SOURCE",
-    "RESET_RESTART_FOV_FALLBACK": "IMPLEMENTED_SOURCE",
-    "EXACT_SHA_WIN32_GATES": "PENDING"
+    "XR_BINOCULAR_HUD_SIZE": "PASS_EXACT_SHA",
+    "RESET_RESTART_FOV_FALLBACK": "PASS_EXACT_SHA",
+    "EXACT_SHA_WIN32_GATES": "PASS_EXACT_SHA"
   },
   "changed_files": [
     "src/vr/core/r29_owner_api.hpp",
@@ -56,8 +56,8 @@
     "docs/automation/runs/CONVERSION-DX9EX-00828.json"
   ],
   "runtime_validation": "UNTESTED",
-  "automation_validation": "PENDING",
-  "runtime_note": "No actual Quest3/VDXR test; no visual or frame-rate success assertion.",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; CI establishes static verification, Win32 build/link and packaging only, not physical Quest3/VDXR HUD/eye quality or FPS.",
   "diagnosis": {
     "original_evidence": "Host publishes both recommendedWidth/Height arrays under one SharedPoseState Begin/End seqlock; prior R30 did two unsynchronized R29OwnerRecommendedEyeExtent per-eye calls.",
     "source_trace": [
@@ -73,5 +73,34 @@
     "fix_evidence": "R29 consumes one coherent four-field seqlock snapshot; R30 caches or falls back as a unit.",
     "negative_test_evidence": "Verifier adds odd/changed sequence, partial right eye, invalid header, reset and 7 destructive mutation checks.",
     "eye_ownership": "R30 HUD containment applies a synchronized extent to each eye without changing unrelated game-world projection."
+  },
+  "phase": "C6_RESULT",
+  "material_result_sha": "105d88259120fa0f44878ff4d0cafdeb30b2f140",
+  "validation_bearing_result_sha": "105d88259120fa0f44878ff4d0cafdeb30b2f140",
+  "result_sha": "105d88259120fa0f44878ff4d0cafdeb30b2f140",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "105d88259120fa0f44878ff4d0cafdeb30b2f140",
+    "dx9ex_active": {
+      "run_id": 38518433153,
+      "conclusion": "success",
+      "passed_jobs": 5,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38518433153"
+    },
+    "domain_isolation": {
+      "run_id": 38518433148,
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38518433148"
+    },
+    "full_source_impact": {
+      "run_id": 38518433102,
+      "conclusion": "success",
+      "passed_jobs": 3,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38518433102"
+    },
+    "hud_inspector": {
+      "run_id": 38518433226,
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38518433226"
+    }
   }
 }
