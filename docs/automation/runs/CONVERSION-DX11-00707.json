@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00707",
+  "production_id": "CONVERSION-DX11-00707",
+  "event_id": "CONVERSION-DX11-00707-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "GAME_STAGE1_CONSTANT_RGBA_MENU_RACE",
+  "work_key": "DX11:GAME_STAGE1_CONSTANT_RGBA",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Read D3DTSS_CONSTANT from live game Stage1 active RGB,alpha and ARG0 selectors",
+      "Upload per-stage ARGB through 80-byte b1 constant buffer and HLSL independent RGB/alpha operators",
+      "Native Draw/DrawIndexed into diagnostic output with original D3D9/gamepad fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_stage1_factor_probe.cpp",
+      ".github/workflows/dx11-fast-structural.yml",
+      "tools/dx11_game_stage1_constant_probe_00707.cpp",
+      "tools/test_dx11_stage1_constant_00707.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "400 two-source and 16000 three-source Stage1 constant modifier variants",
+      "negative_regression": "Inactive sources require no query, failed active D3D9 GetTextureStageState, malformed operands reject native path",
+      "component_integration": "Live D3D9 Stage1 state -> b1 D3D11 PS RGB/alpha -> native Draw/Indexed -> inset Present"
+    },
+    "conflict_keys": [
+      "DX11:GAME_STAGE1_CONSTANT_RGBA",
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "GitHub exact-SHA build; Quest3 actual menu/race NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Opt-in native diagnostic only; failed game CONSTANT read leaves original Draw/Present/gamepad intact"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_STAGE1_CONSTANT_RGBA_MENU_RACE",
+    "goal": "Deliver live per-stage D3D9 CONSTANT to native RGB and independent alpha menu/race Draw with DX9Ex fallback.",
+    "acceptance_items": [
+      {
+        "id": "constant-native-rgb-alpha",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_d3d9_to_hlsl_draw",
+        "expected_behavior": "Read active RGB/alpha Stage1 state and bind native b1 and Draw/Indexed"
+      },
+      {
+        "id": "constant-query-fail-closed",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_input",
+        "expected_behavior": "Failed read/invalid operands leave DX9Ex/gamepad unaffected"
+      },
+      {
+        "id": "same-sha-build",
+        "category": "integrated_validation",
+        "behavior_area": "cpp_python_windows_ci",
+        "expected_behavior": "16400 portable cases/destructive tests and exact-SHA gates"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "constant-native-rgb-alpha": "PENDING_CI",
+    "constant-query-fail-closed": "PENDING_CI",
+    "same-sha-build": "PENDING_CI"
+  },
+  "base_head_sha": "589f248e7f4136ed72858247c318834250a8e985",
+  "changed_files": [
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_stage1_factor_probe.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_stage1_constant_probe_00707.cpp",
+    "tools/test_dx11_stage1_constant_00707.py",
+    "docs/automation/runs/CONVERSION-DX11-00707.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "DONE",
+    "C1_REVIEW": "DONE",
+    "C2_IMPLEMENT": "DONE",
+    "C3_VALIDATE": "PENDING",
+    "C4_COMMIT": "PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING"
+  },
+  "next_action": "Verify exact SHA GitHub checks; HMD and gamepad UNTESTED"
+}

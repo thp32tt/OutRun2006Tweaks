@@ -103,6 +103,7 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1Lerp == D3DTOP_LERP &&
               kStage1Current == D3DTA_CURRENT &&
               kStage1Specular == D3DTA_SPECULAR &&
+              kStage1Constant == D3DTA_CONSTANT &&
               kStage1Factor == D3DTA_TFACTOR &&
               kStage1Complement == D3DTA_COMPLEMENT &&
               kStage1AlphaReplicate == D3DTA_ALPHAREPLICATE);
@@ -816,6 +817,7 @@ struct TextureCapture {
     std::array<DWORD, 4> stage1Args{};
     std::array<DWORD, 2> stage1ArgZero{}; // COLORARG0, ALPHAARG0 for 25/26
     std::array<float, 4> stage1Factor{};
+    std::array<float, 4> stage1Constant{};
 
     bool selectTexture = false;
     bool selectTextureDiffuseAlpha = false;
@@ -1176,6 +1178,7 @@ cbuffer Stage1FactorParams : register(b1) {
     int4 stage1Ops;  // color op, alpha op, reserved, reserved
     int4 stage1Args; // color arg1/2, alpha arg1/2
     int4 stage1ArgZero; // color arg0, alpha arg0, reserved, reserved
+float4 stage1Constant; // D3DTSS_CONSTANT, not texture factor
 };
 float4 Stage1Source(float4 current, float4 diffuse, float4 specular, int source) {
     // D3DTA_MASK=0x0f; DIFFUSE=0, CURRENT=1, TFACTOR=3. CPU admission owns the
@@ -1184,6 +1187,7 @@ float4 Stage1Source(float4 current, float4 diffuse, float4 specular, int source)
     float4 value = (source & 15) == 3 ? stage1Factor : current;
     if ((source & 15) == 0) value = diffuse;
     if ((source & 15) == 4) value = specular;
+    if ((source & 15) == 6) value = stage1Constant;
     if ((source & 32) != 0) value = value.aaaa;
     if ((source & 16) != 0) value = 1.0f - value;
     return value;
@@ -2952,6 +2956,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         DWORD color1=~0u, color2=~0u, alphaOp=~0u, alpha1=~0u, alpha2=~0u;
         DWORD color0=~0u, alpha0=~0u;
         DWORD stage1Result=~0u, stage2Op=~0u, factor=0u;
+        DWORD stageConstant=0u;
         // ARG0 is required only for the actual three-operand instructions.
         // A failed D3D9 state query must not turn into a guessed zero.
         if (stage1_three_source_operation(nextColorOp) &&
@@ -2990,6 +2995,16 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             (capture.enabled && !capture.stage0FullModulate &&
              !capture.selectTexture && !capture.additive))
             return false;
+        // Only read stage-local CONSTANT when active COLOR/ALPHA/ARG0 needs it.
+        // A failed query preserves D3D9 Draw/Present and gamepad unchanged.
+        const bool needsStageConstant =
+            stage1_operation_reads_constant(nextColorOp,color1,color2) ||
+            stage1_operation_reads_constant(alphaOp,alpha1,alpha2) ||
+            stage1_three_source_reads_constant(nextColorOp,color0,color1,color2) ||
+            stage1_three_source_reads_constant(alphaOp,alpha0,alpha1,alpha2);
+        if (needsStageConstant &&
+            FAILED(game->GetTextureStageState(1,D3DTSS_CONSTANT,&stageConstant)))
+            return false;
         capture.stage1Enabled = true;
         capture.stage1ColorOp = nextColorOp;
         capture.stage1AlphaOp = alphaOp;
@@ -3001,6 +3016,12 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             static_cast<float>((factor >> 8) & 255u) * kByteScale,
             static_cast<float>(factor & 255u) * kByteScale,
             static_cast<float>((factor >> 24) & 255u) * kByteScale
+        };
+        capture.stage1Constant = {
+            static_cast<float>((stageConstant >> 16) & 255u) * kByteScale,
+            static_cast<float>((stageConstant >> 8) & 255u) * kByteScale,
+            static_cast<float>(stageConstant & 255u) * kByteScale,
+            static_cast<float>((stageConstant >> 24) & 255u) * kByteScale
         };
     }
     // Custom clip planes are not implemented by the native shader. The
@@ -3601,11 +3622,14 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             std::int32_t operations[4];
             std::int32_t arguments[4];
             std::int32_t argZero[4];
+            float stageConstant[4];
         };
-        static_assert(sizeof(Stage1Upload) == 64u);
+        static_assert(sizeof(Stage1Upload) == 80u);
         Stage1Upload payload{};
         std::copy(capture.stage1Factor.begin(), capture.stage1Factor.end(),
                   payload.factor);
+        std::copy(capture.stage1Constant.begin(), capture.stage1Constant.end(),
+                  payload.stageConstant);
         payload.operations[0] = static_cast<std::int32_t>(capture.stage1ColorOp);
         payload.operations[1] = static_cast<std::int32_t>(capture.stage1AlphaOp);
         for (std::size_t i = 0; i < 4; ++i)

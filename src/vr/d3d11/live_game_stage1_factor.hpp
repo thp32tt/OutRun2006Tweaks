@@ -52,6 +52,8 @@ constexpr std::uint32_t kStage1Current = 1u;
 constexpr std::uint32_t kStage1Factor = 3u;
 // Game FVF SPECULAR is a distinct interpolated vertex channel; no synthetic white.
 constexpr std::uint32_t kStage1Specular = 4u;
+// Stage-local constant is independent of D3DRS_TEXTUREFACTOR.
+constexpr std::uint32_t kStage1Constant = 6u;
 constexpr std::uint32_t kStage1ArgMask = 0x0fu;
 constexpr std::uint32_t kStage1Complement = 0x10u;
 constexpr std::uint32_t kStage1AlphaReplicate = 0x20u;
@@ -61,7 +63,8 @@ constexpr bool stage1_operand_supported(std::uint32_t operand) noexcept {
     const auto source = operand & kStage1ArgMask;
     return (operand & ~allowedBits) == 0u &&
            (source == kStage1Diffuse || source == kStage1Current ||
-            source == kStage1Factor || source == kStage1Specular);
+            source == kStage1Factor || source == kStage1Specular ||
+            source == kStage1Constant);
 }
 constexpr bool stage1_combiner_supported(std::uint32_t operation,
                                           std::uint32_t arg1,
@@ -123,6 +126,25 @@ constexpr bool stage1_three_source_reads_specular(std::uint32_t op,
             (arg1 & kStage1ArgMask) == kStage1Specular ||
             (arg2 & kStage1ArgMask) == kStage1Specular);
 }
+// SELECTARG and disabled alpha do not consume inactive operands.
+constexpr bool stage1_operation_reads_constant(std::uint32_t op,
+                                               std::uint32_t arg1, std::uint32_t arg2) noexcept {
+    if (op == kStage1Disable) return false;
+    if (op == kStage1SelectArg1) return (arg1 & kStage1ArgMask) == kStage1Constant;
+    if (op == kStage1SelectArg2) return (arg2 & kStage1ArgMask) == kStage1Constant;
+    return (arg1 & kStage1ArgMask) == kStage1Constant ||
+           (arg2 & kStage1ArgMask) == kStage1Constant;
+}
+constexpr bool stage1_three_source_reads_constant(std::uint32_t op,
+    std::uint32_t arg0, std::uint32_t arg1, std::uint32_t arg2) noexcept {
+    return stage1_three_source_operation(op) &&
+        ((arg0 & kStage1ArgMask) == kStage1Constant ||
+         (arg1 & kStage1ArgMask) == kStage1Constant ||
+         (arg2 & kStage1ArgMask) == kStage1Constant);
+}
+static_assert(stage1_operation_reads_constant(kStage1SelectArg1,kStage1Constant,kStage1Current));
+static_assert(!stage1_operation_reads_constant(kStage1SelectArg1,kStage1Current,kStage1Constant));
+static_assert(stage1_three_source_reads_constant(kStage1Lerp,kStage1Constant,kStage1Current,kStage1Factor));
 static_assert(stage1_combiner_supported(kStage1Add, kStage1Specular,
                                         kStage1Current));
 static_assert(stage1_alpha_supported(kStage1SelectArg1, kStage1Specular,

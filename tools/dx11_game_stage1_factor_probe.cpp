@@ -36,7 +36,7 @@ int main() {
         !stage1_operand_supported(kStage1Factor | kStage1Complement |
                                  kStage1AlphaReplicate))
         return 3;
-    for (std::uint32_t bad : {2u, 5u, 6u, 0x12u, 0x15u, 0x43u, 0x81u, 0x103u})
+    for (std::uint32_t bad : {2u, 5u, 7u, 0x12u, 0x15u, 0x43u, 0x81u, 0x103u})
         if (stage1_operand_supported(bad) ||
             stage1_combiner_supported(kStage1Modulate,kStage1Current,bad))
             return 5;
