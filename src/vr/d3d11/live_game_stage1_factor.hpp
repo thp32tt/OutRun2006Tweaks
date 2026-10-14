@@ -59,6 +59,7 @@ constexpr bool stage1_alpha_blend_operation(std::uint32_t operation) noexcept {
 }
 constexpr std::uint32_t kStage1Diffuse = 0u;
 constexpr std::uint32_t kStage1Current = 1u;
+constexpr std::uint32_t kStage1Texture = 2u; // game-authored D3DTA_TEXTURE, stage-1 matched sampler only
 constexpr std::uint32_t kStage1Factor = 3u;
 // Game FVF SPECULAR is a distinct interpolated vertex channel; no synthetic white.
 constexpr std::uint32_t kStage1Specular = 4u;
@@ -322,4 +323,67 @@ static_assert(stage1_three_source_supported_with_temp(
     kStage1Lerp,kStage1Temp,kStage1Factor,kStage1Diffuse,true));
 static_assert(!stage1_alpha_supported_with_temp(
     kStage1ModulateAlphaAddColor,kStage1Temp,kStage1Factor,true));
+
+// Matched stage-1 D3DTA_TEXTURE is an actual sampled operand, not CURRENT.
+// Only the exact same stage-0 texture, UV transform and sampler may reuse t0/s0.
+// The caller verifies resource identity before either native Draw variant.
+constexpr bool stage1_matched_texture_operand_supported(
+    std::uint32_t arg, bool producerTemp) noexcept {
+    constexpr auto mask = kStage1ArgMask | kStage1Complement | kStage1AlphaReplicate;
+    return stage1_operand_supported_with_temp(arg,producerTemp) ||
+        ((arg & ~mask) == 0u && (arg & kStage1ArgMask) == kStage1Texture);
+}
+constexpr bool stage1_matched_texture_two_source_supported(
+    std::uint32_t op, std::uint32_t a, std::uint32_t b,
+    bool matched, bool producerTemp, bool alphaChannel) noexcept {
+    if (!matched || (alphaChannel &&
+        (stage1_cross_channel_color_operation(op) || stage1_dotproduct_color_operation(op))))
+        return false;
+    if (op == kStage1Disable) return alphaChannel;
+    if (op == kStage1SelectArg1)
+        return stage1_matched_texture_operand_supported(a,producerTemp);
+    if (op == kStage1SelectArg2)
+        return stage1_matched_texture_operand_supported(b,producerTemp);
+    const bool known = stage1_combiner_supported(
+        op,kStage1Current,kStage1Current) ||
+        op == kStage1BlendTextureAlpha || op == kStage1BlendTextureAlphaPM;
+    return known && stage1_matched_texture_operand_supported(a,producerTemp) &&
+        stage1_matched_texture_operand_supported(b,producerTemp);
+}
+constexpr bool stage1_matched_texture_three_source_supported(
+    std::uint32_t op, std::uint32_t a0, std::uint32_t a1, std::uint32_t a2,
+    bool matched, bool producerTemp) noexcept {
+    return matched && stage1_three_source_operation(op) &&
+        stage1_matched_texture_operand_supported(a0,producerTemp) &&
+        stage1_matched_texture_operand_supported(a1,producerTemp) &&
+        stage1_matched_texture_operand_supported(a2,producerTemp);
+}
+constexpr bool stage1_operation_reads_texture(
+    std::uint32_t op, std::uint32_t a, std::uint32_t b) noexcept {
+    if (op == kStage1Disable) return false;
+    if (op == kStage1SelectArg1) return (a & kStage1ArgMask) == kStage1Texture;
+    if (op == kStage1SelectArg2) return (b & kStage1ArgMask) == kStage1Texture;
+    return (a & kStage1ArgMask) == kStage1Texture ||
+        (b & kStage1ArgMask) == kStage1Texture;
+}
+constexpr bool stage1_three_source_reads_texture(
+    std::uint32_t op, std::uint32_t a0, std::uint32_t a1, std::uint32_t a2) noexcept {
+    return stage1_three_source_operation(op) &&
+        ((a0 & kStage1ArgMask) == kStage1Texture ||
+         (a1 & kStage1ArgMask) == kStage1Texture ||
+         (a2 & kStage1ArgMask) == kStage1Texture);
+}
+static_assert(stage1_matched_texture_two_source_supported(
+    kStage1Modulate,kStage1Texture,kStage1Current,true,false,false));
+static_assert(stage1_matched_texture_two_source_supported(
+    kStage1SelectArg1,kStage1Texture,0x43u,true,false,false));
+static_assert(!stage1_matched_texture_two_source_supported(
+    kStage1SelectArg1,kStage1Texture,kStage1Current,false,false,false));
+static_assert(!stage1_matched_texture_two_source_supported(
+    kStage1DotProduct3,kStage1Texture,kStage1Current,true,false,true));
+static_assert(!stage1_matched_texture_operand_supported(0x42u,true));
+static_assert(stage1_matched_texture_three_source_supported(
+    kStage1Lerp,kStage1Texture,kStage1Factor,kStage1Current,true,false));
+static_assert(!stage1_matched_texture_three_source_supported(
+    kStage1Lerp,kStage1Texture,kStage1Factor,kStage1Current,false,false));
 } // namespace outrun::vr::dx11::live_game_frame

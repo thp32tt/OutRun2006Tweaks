@@ -814,6 +814,7 @@ struct NativeVertex {
 struct TextureCapture {
     bool enabled = false;
     bool stage1Enabled = false;
+    bool stage1TextureOperands = false; // Stage1 D3DTA_TEXTURE in actual RGB/alpha operands.
     bool stage0ResultTemp = false; // RESULTARG=TEMP, CURRENT remains vertex DIFFUSE.
     bool stage0FullModulate = false;
     DWORD stage1ColorOp = D3DTOP_DISABLE;
@@ -1290,19 +1291,83 @@ float4 Stage1AndAlpha(float4 stage0, float4 diffuse, float4 specular,
     AlphaGate(result.a);
     return result;
 }
+// Stage-1 TEXTURE operand reads an exact matched sample, including D3DTA flags.
+// Keep the legacy non-texture stage-1 shader unchanged for proven draws.
+float4 Stage1SourceTextured(float4 current, float4 diffuse, float4 specular,
+                            float4 stage1TextureColor, int source) {
+    if ((source & 15) != 2) return Stage1Source(current, diffuse, specular, source);
+    float4 value = stage1TextureColor;
+    if ((source & 32) != 0) value = value.aaaa;
+    if ((source & 16) != 0) value = 1.0f - value;
+    return value;
+}
+float4 Stage1ThreeSourceTextured(float4 current, float4 diffuse, float4 specular,
+    float4 stage1TextureColor, int op, int arg0, int arg1, int arg2) {
+    float4 a0 = Stage1SourceTextured(current,diffuse,specular,stage1TextureColor,arg0);
+    float4 a1 = Stage1SourceTextured(current,diffuse,specular,stage1TextureColor,arg1);
+    float4 a2 = Stage1SourceTextured(current,diffuse,specular,stage1TextureColor,arg2);
+    if (op == 25) return saturate(a1 + a2 * a0);
+    return saturate(lerp(a2,a1,a0));
+}
+float4 Stage1AndAlphaTextured(float4 stage0, float4 diffuse, float4 specular,
+                      float stage1TextureAlpha, float4 stage1TextureColor) {
+    float4 color = Stage1Combine(
+        Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.x),
+        Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.y), stage1Ops.x, stage0, diffuse);
+    if (stage1Ops.x == 25 || stage1Ops.x == 26)
+        color = Stage1ThreeSourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Ops.x,
+                                  stage1ArgZero.x, stage1Args.x, stage1Args.y);
+    // Only admitted when D3D9 stage 1 samples exactly the mirrored stage-0
+    // texture at identical coordinates with identical sampling parameters.
+    if (stage1Ops.x == 13)
+        color = saturate(lerp(
+            Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.y),
+            Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.x),
+            stage1TextureAlpha));
+    // D3D9 premultiplied ARG1 is already weighted, unlike ordinary lerp.
+    if (stage1Ops.x == 15) {
+        float4 pmColor1 = Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.x);
+        float4 pmColor2 = Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.y);
+        color = saturate(pmColor1 + pmColor2 * (1.0f - stage1TextureAlpha));
+    }
+    float alpha = stage1Ops.y == 1 ?
+        (stage1Ops.z != 0 ? diffuse.a : stage0.a) : Stage1Combine(
+        Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.z),
+        Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.w), stage1Ops.y, stage0, diffuse).a;
+    if (stage1Ops.y == 25 || stage1Ops.y == 26)
+        alpha = Stage1ThreeSourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Ops.y,
+                                  stage1ArgZero.y, stage1Args.z, stage1Args.w).a;
+    if (stage1Ops.y == 13)
+        alpha = saturate(lerp(
+            Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.w),
+            Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.z),
+            stage1TextureAlpha)).a;
+    // ALPHAOP reads separate D3D9 operands, never the RGB PM output alpha.
+    if (stage1Ops.y == 15) {
+        float4 pmAlpha1 = Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.z);
+        float4 pmAlpha2 = Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.w);
+        alpha = saturate(pmAlpha1 + pmAlpha2 * (1.0f - stage1TextureAlpha)).a;
+    }
+    float4 result = float4(color.rgb, alpha);
+    AlphaGate(result.a);
+    return result;
+}
 float4 PSStage1Diffuse(VOut v) : SV_Target {
     return Stage1AndAlpha(v.diffuse, v.diffuse, v.specular, 0.0f);
 }
 float4 PSStage1Modulate(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
+    if (stage1Ops.w != 0) return Stage1AndAlphaTextured(t * v.diffuse, v.diffuse, v.specular, t.a, t);
     return Stage1AndAlpha(t * v.diffuse, v.diffuse, v.specular, t.a);
 }
 float4 PSStage1TextureOnly(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
+    if (stage1Ops.w != 0) return Stage1AndAlphaTextured(t, v.diffuse, v.specular, t.a, t);
     return Stage1AndAlpha(t, v.diffuse, v.specular, t.a);
 }
 float4 PSStage1Add(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
+    if (stage1Ops.w != 0) return Stage1AndAlphaTextured(saturate(t + v.diffuse), v.diffuse, v.specular, t.a, t);
     return Stage1AndAlpha(saturate(t + v.diffuse), v.diffuse, v.specular, t.a);
 }
 )";
@@ -3028,18 +3093,22 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             stage1Result != D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE ||
             (stage1_three_source_operation(nextColorOp)
                  ? (!stage1_three_source_supported(nextColorOp, color0, color1, color2) &&
-                    !stage1_three_source_supported_with_temp(nextColorOp, color0, color1, color2, stage0WritesTemp))
+                    !stage1_three_source_supported_with_temp(nextColorOp, color0, color1, color2, stage0WritesTemp) &&
+                     !stage1_matched_texture_three_source_supported(nextColorOp,color0,color1,color2,true,stage0WritesTemp))
                  : (!stage1_combiner_supported(nextColorOp, color1, color2) &&
                     !stage1_combiner_supported_with_temp(nextColorOp, color1, color2, stage0WritesTemp) &&
                      !stage1_matched_texture_alpha_blend_supported(
-                         nextColorOp, color1, color2, true, stage0WritesTemp))) ||
+                         nextColorOp, color1, color2, true, stage0WritesTemp) &&
+                      !stage1_matched_texture_two_source_supported(nextColorOp,color1,color2,true,stage0WritesTemp,false))) ||
             (stage1_three_source_operation(alphaOp)
                  ? (!stage1_three_source_supported(alphaOp, alpha0, alpha1, alpha2) &&
-                    !stage1_three_source_supported_with_temp(alphaOp, alpha0, alpha1, alpha2, stage0WritesTemp))
+                    !stage1_three_source_supported_with_temp(alphaOp, alpha0, alpha1, alpha2, stage0WritesTemp) &&
+                     !stage1_matched_texture_three_source_supported(alphaOp,alpha0,alpha1,alpha2,true,stage0WritesTemp))
                  : (!stage1_alpha_supported(alphaOp, alpha1, alpha2) &&
                     !stage1_alpha_supported_with_temp(alphaOp, alpha1, alpha2, stage0WritesTemp) &&
                      !stage1_matched_texture_alpha_blend_supported(
-                         alphaOp, alpha1, alpha2, true, stage0WritesTemp))) ||
+                         alphaOp, alpha1, alpha2, true, stage0WritesTemp) &&
+                      !stage1_matched_texture_two_source_supported(alphaOp,alpha1,alpha2,true,stage0WritesTemp,true))) ||
             (!layout.hasDiffuse &&
              (stage1_operation_reads_diffuse(nextColorOp, color1, color2) ||
               stage1_operation_reads_diffuse(alphaOp, alpha1, alpha2) ||
@@ -3053,13 +3122,22 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             (capture.enabled && !capture.stage0FullModulate &&
              !capture.selectTexture && !capture.additive))
             return false;
+        // Stage1 TEXTURE is a separate D3D9 operand for arbitrary RGB/alpha
+        // and three-input combiners; never substitute stage0 CURRENT for it.
+        const bool stage1UsesTextureOperand =
+            stage1_operation_reads_texture(nextColorOp,color1,color2) ||
+            stage1_operation_reads_texture(alphaOp,alpha1,alpha2) ||
+            stage1_three_source_reads_texture(nextColorOp,color0,color1,color2) ||
+            stage1_three_source_reads_texture(alphaOp,alpha0,alpha1,alpha2);
+        const bool stage1NeedsMatchedTexture = stage1UsesTextureOperand ||
+            nextColorOp == D3DTOP_BLENDTEXTUREALPHA ||
+            nextColorOp == D3DTOP_BLENDTEXTUREALPHAPM ||
+            alphaOp == D3DTOP_BLENDTEXTUREALPHA ||
+            alphaOp == D3DTOP_BLENDTEXTUREALPHAPM;
         // D3D9 Stage1 BLENDTEXTUREALPHA and PM read sampler/texture 1. It may
         // reuse the native stage-0 sample only when resource, UV and all
         // relevant sampler state agree; otherwise preserve original D3D9.
-        if (nextColorOp == D3DTOP_BLENDTEXTUREALPHA ||
-            nextColorOp == D3DTOP_BLENDTEXTUREALPHAPM ||
-            alphaOp == D3DTOP_BLENDTEXTUREALPHA ||
-            alphaOp == D3DTOP_BLENDTEXTUREALPHAPM) {
+        if (stage1NeedsMatchedTexture) {
             if (!capture.enabled || !tex) return false;
             ComPtr<IDirect3DBaseTexture9> tex1;
             DWORD uv1 = ~0u, transform1 = ~0u;
@@ -3101,6 +3179,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             FAILED(game->GetTextureStageState(1,D3DTSS_CONSTANT,&stageConstant)))
             return false;
         capture.stage1Enabled = true;
+        capture.stage1TextureOperands = stage1UsesTextureOperand;
         capture.stage0ResultTemp = stage0WritesTemp;
         capture.stage1ColorOp = nextColorOp;
         capture.stage1AlphaOp = alphaOp;
@@ -3729,6 +3808,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         payload.operations[0] = static_cast<std::int32_t>(capture.stage1ColorOp);
         payload.operations[1] = static_cast<std::int32_t>(capture.stage1AlphaOp);
         payload.operations[2] = capture.stage0ResultTemp ? 1 : 0; // shader CURRENT/TEMP route.
+        payload.operations[3] = capture.stage1TextureOperands ? 1 : 0; // matched stage1 texture operand.
         for (std::size_t i = 0; i < 4; ++i)
             payload.arguments[i] = static_cast<std::int32_t>(capture.stage1Args[i]);
         for (std::size_t i = 0; i < 2; ++i)
