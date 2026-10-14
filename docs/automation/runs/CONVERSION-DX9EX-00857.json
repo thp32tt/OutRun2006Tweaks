@@ -68,9 +68,9 @@
     "negative_test_evidence": "Portable C++ verifies config-vs-matte truth table; existing menu geometry/source mutation verifier now rejects auto-crop false-to-true and coverage 0.78-to-1.0, with native/clipped aspect and reset fixtures preserved.",
     "eye_ownership": "R23 LOCAL-fixed projection uses common FOV, identical 0.78 optical containment and common captured UV in both eyes; no change to gameplay stereo eyes."
   },
-  "status": "NEEDS_VALIDATION",
-  "checkpoint": "C2_SOURCE_PATCHED",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No matching Quest3/VDXR session on the new build; visual menu correctness is not yet proven.",
   "changed_files": [
@@ -81,7 +81,7 @@
     "docs/automation/runs/CONVERSION-DX9EX-00857.json"
   ],
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "51910d56817a25c6c5ab4684b5d37211b5e7e79e",
   "acceptance_results": {
     "native_content": "SOURCE_PATCHED",
     "optical_scale": "SOURCE_PATCHED",
@@ -89,9 +89,10 @@
     "integration": "PENDING_EXACT_SHA"
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
-    "note": "No CI outcome assumed for the prospective material commit."
+    "status": "SUCCESS",
+    "validation_sha": "51910d56817a25c6c5ab4684b5d37211b5e7e79e",
+    "note": "Exact-SHA GitHub CI SUCCESS per C6 handoff; no build or CI was rerun in this bookkeeping step."
   },
   "score_once": false,
-  "phase": "C2_IMPLEMENT"
+  "phase": "C6_RESULT"
 }
