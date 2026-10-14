@@ -101,3 +101,85 @@ for old, bad in (
     else:
         raise AssertionError("Portrait Y regression not detected")
 print("DX9Ex UI matrix and portrait containment PASS (6 negative controls)")
+
+# Original multi-sprite GUI vertex streams have three independently hooked
+# stride layouts: one already-scaled X/Y pair at the start of every vertex.
+# Ensure the main/car-selection screen preserves its authored XY ratio, not
+# just X centre placement (which stretched Y on portrait XR render targets).
+def require_multi_sprite_native_aspect(source: str) -> None:
+    group = source.split("static void CenterMultiSpriteQuad(", 1)[1].split(
+        "static void SpriteSpacingEnable(", 1)[0]
+    for needle in (
+        "vertices[i * stride]",
+        "vertices[i * stride + 1]",
+        "transformedX[i] = CenterMultiSpriteAxis(",
+        "x, sx, contain, width, originalWidth);",
+        "transformedY[i] = CenterMultiSpriteAxis(",
+        "y, sy, contain, height, originalHeight);",
+        "vertices[i * stride] = transformedX[i];",
+        "vertices[i * stride + 1] = transformedY[i];",
+        "if (!std::isfinite(transformedX[i]) ||",
+        "!std::isfinite(transformedY[i]))",
+        "mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade",
+        "CenterMultiSpriteQuad(reinterpret_cast<float*>(ctx.ecx), 9);",
+        "CenterMultiSpriteQuad(reinterpret_cast<float*>(ctx.esp + 0x80), 11);",
+        "CenterMultiSpriteQuad(reinterpret_cast<float*>(ctx.edx), 13);",
+    ):
+        if needle not in group:
+            raise AssertionError("multi-sprite XY aspect: " + needle)
+    # All four corners must be checked before any output vertex is touched.
+    assert group.index("if (!std::isfinite(transformedX[i]) ||") < group.index(
+        "vertices[i * stride] = transformedX[i];"
+    )
+    assert group.count("CenterMultiSpriteQuad(reinterpret_cast<float*>") == 3
+
+
+require_multi_sprite_native_aspect(text)
+
+def axis(pixel, axis_scale, contain, extent, authored_extent):
+    return pixel / axis_scale * contain + (extent - authored_extent * contain) / 2.0
+
+# Width/height-independent containment for full native 640x480 4:3 quads.
+# 16:9 and 21:9 remain unchanged in Y, while 2496x2688 must letterbox Y
+# rather than stretch an authored rectangle to the portrait eye height.
+for width, height in ((1280, 960), (1920, 1080),
+                      (2560, 1080), (2496, 2688)):
+    sx, sy = width / 640, height / 480
+    contain = min(sx, sy)
+    x0 = axis(0, sx, contain, width, 640)
+    x1 = axis(width, sx, contain, width, 640)
+    y0 = axis(0, sy, contain, height, 480)
+    y1 = axis(height, sy, contain, height, 480)
+    assert abs((x1-x0)/(y1-y0) - 640/480) < 1e-6
+    assert abs((x0+x1)/2 - width/2) < 1e-6
+    assert abs((y0+y1)/2 - height/2) < 1e-6
+assert axis(0, 5.6, 3.9, 2688, 480) == 408
+assert axis(2688, 5.6, 3.9, 2688, 480) == 2280
+
+for good, bad in (
+    ("vertices[i * stride + 1] = transformedY[i];",
+     "vertices[i * stride + 1] = vertices[i * stride + 1];"),
+    ("y, sy, contain, height, originalHeight);",
+     "y, sx, contain, height, originalHeight);"),
+    ("CenterMultiSpriteQuad(reinterpret_cast<float*>(ctx.ecx), 9);",
+     "CenterMultiSpriteQuad(reinterpret_cast<float*>(ctx.ecx), 11);"),
+    ("CenterMultiSpriteQuad(reinterpret_cast<float*>(ctx.esp + 0x80), 11);",
+     "CenterMultiSpriteQuad(reinterpret_cast<float*>(ctx.esp + 0x80), 9);"),
+    ("CenterMultiSpriteQuad(reinterpret_cast<float*>(ctx.edx), 13);",
+     "CenterMultiSpriteQuad(reinterpret_cast<float*>(ctx.edx), 9);"),
+    ("mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade",
+     "mode == ScalingMode::Vanilla || mode == ScalingMode::OnlineArcade"),
+    ("!std::isfinite(transformedY[i]))",
+     "false)"),
+):
+    assert good in text, "mutation source anchor missing: " + good
+    before, group = text.split("static void CenterMultiSpriteQuad(", 1)
+    mutant = before + "static void CenterMultiSpriteQuad(" + group.replace(good, bad, 1)
+    try:
+        require_multi_sprite_native_aspect(mutant)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("undetected multi-sprite XY regression: " + bad)
+
+print("DX9Ex menu multi-sprite native XY aspect PASS (7 negative controls)")
