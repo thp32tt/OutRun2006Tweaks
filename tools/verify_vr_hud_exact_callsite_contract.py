@@ -389,7 +389,7 @@ def test_mutations(ui, manifest):
               ui.replace("const bool projected = !screenHud && projectedAnchor.valid;",
                          "const bool projected = !screenHud && RankMarkerProjectedInfo.valid;", 1))
     must_fail("rival exact source-time semantic removed",
-              ui.replace("ScopedExactProducerSemantic producerScope(\n                scope, projected ? &projectedAnchor : nullptr,\n                Settings::VREnabled,\n                OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani);",
+              ui.replace("ScopedExactProducerSemantic producerScope(\n                scope, projected ? &projectedAnchor : nullptr, Settings::VREnabled,\n                OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani);",
                          "ScopedRenderSemantic producerScope(\n                scope);", 1))
     must_fail("R64 DispRank source accidentally shares TimeAttack owner",
               ui.replace("IsExactDispRankRightClipRva(addr)",
