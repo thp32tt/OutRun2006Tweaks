@@ -122,6 +122,7 @@ on:
       - 'tools/verify_vr_r31_live_wvp_consistency.py'
       - 'tools/verify_vr_r31_window_telemetry.py'
       - 'tools/verify_vr_r31_r32_telemetry_hotpath.py'
+      - 'tools/verify_vr_r31_r32_off_counters.py'
       - 'tools/verify_vr_r32_spike_log_backpressure.py'
       - 'tools/verify_vr_r32_perf_optout_fastpath.py'
       - 'tools/verify_vr_helper_probe_host_identity.py'
@@ -195,7 +196,9 @@ on:
 
 concurrency:
   group: vr-dx9ex-active-${{ github.ref_name }}
-  cancel-in-progress: true
+  # Preserve an already-running exact-SHA Win32 gate on independent commits.
+  # GitHub keeps at most one successor pending in this branch group.
+  cancel-in-progress: false
 
 jobs:
   policy:
@@ -321,6 +324,7 @@ jobs:
             'tools/verify_vr_r31_live_wvp_consistency.py',
             'tools/verify_vr_r31_window_telemetry.py',
             'tools/verify_vr_r31_r32_telemetry_hotpath.py',
+            'tools/verify_vr_r31_r32_off_counters.py',
             'tools/verify_vr_r32_spike_log_backpressure.py',
             'tools/verify_vr_r32_perf_optout_fastpath.py',
             'tools/verify_vr_helper_probe_host_identity.py',

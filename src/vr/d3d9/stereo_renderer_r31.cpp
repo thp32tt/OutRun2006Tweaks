@@ -388,18 +388,19 @@ namespace OutRunVRStereo
                 !OutRunVR::D3D9::LiveVertexShaderMatches(device, verifiedShader))
                 return false;
 
+            // Correctness: keep the validation cadence even when telemetry is off.
             ++R31FastWorldCandidates;
             float live[16]{};
             bool liveValidated = false;
             if (!OutRunVR::State::StateBlockTracker::Reliable() ||
                 (R31FastWorldCandidates % LiveWvpValidationInterval) == 0)
             {
-                ++R31FastWorldLiveValidations;
+                if (R30SupportTelemetryEnabled()) ++R31FastWorldLiveValidations;
                 if (!R30SupportValidateVerifiedWvp(
                         device, verified, live))
                 {
                     R31BlockedVerifiedGeneration = generation;
-                    ++R31FastWorldValidationRejects;
+                    if (R30SupportTelemetryEnabled()) ++R31FastWorldValidationRejects;
                     return false;
                 }
                 liveValidated = true;

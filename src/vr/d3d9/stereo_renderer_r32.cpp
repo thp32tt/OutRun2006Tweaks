@@ -296,6 +296,8 @@ namespace OutRunVRStereo
             // bounded report, including the worst workload and spike count.
         }
 
+        // Only diagnostics are opt-in: snapshot failures still fail closed and
+        // the first actionable error is logged regardless of telemetry state.
         bool R32ReadEffectSnapshot(IDirect3DDevice9* device,
             OutRunVR::D3D9::LiveEffectRenderStateSnapshot& out) noexcept
         {
@@ -303,7 +305,7 @@ namespace OutRunVRStereo
                 OutRunVR::D3D9::ReadLiveEffectRenderStateSnapshot(device, out);
             if (!ok)
             {
-                ++R32StateSnapshotFailures;
+                if (R30SupportTelemetryEnabled()) ++R32StateSnapshotFailures;
                 if (!R32FirstStateSnapshotFailureLogged)
                 {
                     R32FirstStateSnapshotFailureLogged = true;
@@ -341,7 +343,7 @@ namespace OutRunVRStereo
                     device, R30SupportWvpFirstRegister, constants,
                     R30SupportWvpRegisterCount))
             {
-                ++R32BatchWvpFailures;
+                if (R30SupportTelemetryEnabled()) ++R32BatchWvpFailures;
                 return false;
             }
             if (R30SupportTelemetryEnabled() && !R32FirstBatchWvpLogged)
@@ -423,7 +425,7 @@ namespace OutRunVRStereo
                 R30SupportExchangeVertexShaderIdentity(0);
             const HRESULT hr = lowerDraw();
             R30SupportRestoreVertexShaderIdentityIfEmpty(savedIdentity);
-            ++R32FailClosedZeroDisparityDraws;
+            if (R30SupportTelemetryEnabled()) ++R32FailClosedZeroDisparityDraws;
             return hr;
         }
 
@@ -454,7 +456,7 @@ namespace OutRunVRStereo
             R32DirectCopyRejectHr = D3D_OK;
             R30SupportReleaseDirectTransportInterop();
             R32ForgetDirectIdentity();
-            ++R32DirectIdentityInvalidations;
+            if (R30SupportTelemetryEnabled()) ++R32DirectIdentityInvalidations;
         }
 
         bool R32EnsureDirectResources(IDirect3DDevice9* device) noexcept
@@ -655,7 +657,7 @@ namespace OutRunVRStereo
             R30SupportSetStereoRecoverySafetyThroughEpoch(
                 OutRunVR::R32::RearmMonoSafetyEpoch(R30SupportPresentEpoch()));
             R32InvalidateResetCaches();
-            ++R32ResetEpochRearms;
+            if (R30SupportTelemetryEnabled()) ++R32ResetEpochRearms;
             if (!R32FirstResetRearmLogged)
             {
                 R32FirstResetRearmLogged = true;
@@ -677,7 +679,7 @@ namespace OutRunVRStereo
                 else
                 {
                     R32InvalidateResetCaches();
-                    ++R32ResetFailures;
+                    if (R30SupportTelemetryEnabled()) ++R32ResetFailures;
                 }
             }
             return hr;
