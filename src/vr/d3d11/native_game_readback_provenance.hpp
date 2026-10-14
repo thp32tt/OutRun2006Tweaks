@@ -13,6 +13,9 @@ struct GameOutputSignature {
     std::int64_t sourceLeft = 0, sourceTop = 0;
     std::int64_t sourceRight = 0, sourceBottom = 0;
     bool hasDirtyRegion = false;
+    // The native full-frame endpoint and the delayed diagnostic inset
+    // must never share a readback/output generation on the same backbuffer.
+    bool nativeFullFrame = false;
     [[nodiscard]] constexpr bool valid() const noexcept {
         return device != 0u && width != 0u && height != 0u && format != 0u &&
                backbufferIdentity != 0u;
@@ -25,7 +28,8 @@ struct GameOutputSignature {
                sourceTop == other.sourceTop &&
                sourceRight == other.sourceRight &&
                sourceBottom == other.sourceBottom &&
-               hasDirtyRegion == other.hasDirtyRegion;
+               hasDirtyRegion == other.hasDirtyRegion &&
+               nativeFullFrame == other.nativeFullFrame;
     }
 };
 // A completed GPU event might contain a previous game menu/car/race scene.

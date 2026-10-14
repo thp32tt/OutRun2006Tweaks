@@ -1171,6 +1171,8 @@ struct State {
     ComPtr<IDirect3DSurface9> insetSurface;
     D3DFORMAT insetFormat = D3DFMT_UNKNOWN;
     std::uintptr_t insetSurfaceDevice = 0u;
+    // D3D9 SYSTEMMEM uploads are dimension-owned independently of their format.
+    UINT insetSurfaceWidth = 0u, insetSurfaceHeight = 0u;
     bool pending = false;
     GameNativeFrameBatch frameBatch{}; // Opt-in native only, original D3D9/input preserved.
     bool logged = false;
@@ -1179,6 +1181,8 @@ struct State {
     std::uint64_t eligible = 0;
     UINT eligibleThisFrame = 0;
     std::uint64_t sourceDrawsThisFrame = 0u;
+    bool sourceModeKnown = false;
+    bool sourceWasFullMode = false;
     UINT probeSlot = 0;
     UINT issued = 0;
     UINT visible = 0;
@@ -1495,6 +1499,7 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     if (++s.outputGeneration == 0u) ++s.outputGeneration;
     s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
     s.insetSurfaceDevice = 0u;
+    s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;
     for (auto& masked : s.maskedBlends) masked.Reset();
     for (auto& masked : s.multiplyMaskedBlends) masked.Reset();
     for (auto& masked : s.inverseDestMultiplyMaskedBlends) masked.Reset();
@@ -4625,6 +4630,21 @@ bool observe_source_device(State& s, IDirect3DDevice9* game) noexcept {
     return true;
 }
 
+// A native full-size Draw and a diagnostic inset Draw cannot describe the
+// same source frame. Mode flips are fail-closed until a new full TARGET Clear
+// or Present, preserving every original D3D9 Draw and controller event.
+bool observe_source_frame_mode(State& s, bool fullMode) noexcept {
+    if (!s.sourceModeKnown) {
+        s.sourceModeKnown = true;
+        s.sourceWasFullMode = fullMode;
+        return true;
+    }
+    if (s.sourceWasFullMode == fullMode) return true;
+    s.frameBatch.abort();
+    s.pending = false;
+    return false;
+}
+
 void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
              const void* bytes, UINT stride, UINT vertexCount,
              const std::uint32_t* indices, UINT indexCount) noexcept {
@@ -4643,6 +4663,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         }
         const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;
         const bool fullMode = env_full_game_opt_in();
+        if (!observe_source_frame_mode(s, fullMode)) return;
         const bool multiBatch = fullMode || env_batch_opt_in();
         UINT expectedElements = 0;
         if (!game_native_primitive_element_count(
@@ -4937,6 +4958,7 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             s.frameBatch.reset();
             s.pending = false;
             s.sourceDrawsThisFrame = 0u;
+    s.sourceModeKnown = false;
             s.eligibleThisFrame = 0u;
             // After a successful full TARGET|ZBUFFER game Clear, initialize
             // the first native Draw's DSV from the game's actual Z value.
@@ -4981,6 +5003,7 @@ void observe_unavailable_game_draw(IDirect3DDevice9* game) noexcept {
         }
         ++s.sourceDrawsThisFrame;
         ++s.observed;
+        if (!observe_source_frame_mode(s, env_full_game_opt_in())) return;
         if (s.frameBatch.must_abort_unsupported(
                 env_full_game_opt_in(), env_batch_opt_in()))
             s.frameBatch.abort();
@@ -5034,6 +5057,8 @@ void before_game_present(IDirect3DDevice9* game,
                                   reinterpret_cast<std::uintptr_t>(
                                       presentBackbufferIdentity.Get())}
             : GameOutputSignature{};
+        const bool fullMode = env_full_game_opt_in();
+        outputNow.nativeFullFrame = fullMode;
         // D3D9 can crop Present during menu, car selection and race transitions.
         // An UpdateSurface into the backbuffer is not proof of a visible inset
         // unless the *actual source rectangle* includes all native pixels.
@@ -5060,6 +5085,7 @@ void before_game_present(IDirect3DDevice9* game,
             s.insetSurface.Reset();
             s.insetFormat = D3DFMT_UNKNOWN;
             s.insetSurfaceDevice = 0u;
+    s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;
             if (++s.outputGeneration == 0u) ++s.outputGeneration;
         }
         // Reuse the inspected game backbuffer for bounds proof and D3D9 upload.
@@ -5067,7 +5093,6 @@ void before_game_present(IDirect3DDevice9* game,
         // Place the inset inside the actual Present source, rather than always
         // at the backbuffer's top-right (which cropped menus may not show).
         // Only a full-size native frame can cover a full D3D9 Present.
-        const bool fullMode = env_full_game_opt_in();
         const UINT surfaceWidth = fullMode ? s.nativeWidth : kWidth;
         const UINT surfaceHeight = fullMode ? s.nativeHeight : kHeight;
         const bool nativeExtentMatches = !fullMode ||
@@ -5092,6 +5117,11 @@ void before_game_present(IDirect3DDevice9* game,
         // or cleared. Invalidate the entire queued provenance generation,
         // including copies whose GPU fences are not ready yet. Insets may
         // still show their bounded, diagnostic delayed sample.
+        if (!GameNativeFramePublication::source_mode_contiguous(
+                s.sourceModeKnown, s.sourceWasFullMode, fullMode)) {
+            s.frameBatch.abort();
+            s.pending = false;
+        }
         const bool currentFullFrameComplete =
             s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame) &&
             s.sourceGameDevice == presentDevice;
@@ -5219,20 +5249,29 @@ void before_game_present(IDirect3DDevice9* game,
                                 auto& back = presentBackbuffer;
                                 // Cache CPU upload memory; invalidate on format/Reset.
                                 if (!s.insetSurface || s.insetFormat != bb.Format ||
-                                    s.insetSurfaceDevice != presentDevice) {
+                                    s.insetSurfaceDevice != presentDevice ||
+                                    !GameNativeFramePublication::matching_upload_extent(
+                                        s.insetSurfaceWidth, s.insetSurfaceHeight,
+                                        surfaceWidth, surfaceHeight)) {
                                     s.insetSurface.Reset();
                                     s.insetFormat = D3DFMT_UNKNOWN;
                                     s.insetSurfaceDevice = 0u;
+    s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;
                                     if (SUCCEEDED(game->CreateOffscreenPlainSurface(
                                             surfaceWidth, surfaceHeight, bb.Format, D3DPOOL_SYSTEMMEM,
                                             s.insetSurface.GetAddressOf(), nullptr))) {
                                         s.insetFormat = bb.Format;
                                         s.insetSurfaceDevice = presentDevice;
+                                        s.insetSurfaceWidth = surfaceWidth;
+                                        s.insetSurfaceHeight = surfaceHeight;
                                     }
                                 }
                                 D3DLOCKED_RECT lockRect{};
                                 if (s.insetSurface && s.insetFormat == bb.Format &&
                                     s.insetSurfaceDevice == presentDevice &&
+                                    GameNativeFramePublication::matching_upload_extent(
+                                        s.insetSurfaceWidth, s.insetSurfaceHeight,
+                                        surfaceWidth, surfaceHeight) &&
                                     SUCCEEDED(s.insetSurface->LockRect(&lockRect, nullptr, 0))) {
                                     // Refuse malformed D3D9 lock pitches
                                     // before copying a full game backbuffer.
@@ -5316,6 +5355,7 @@ void before_game_present(IDirect3DDevice9* game,
             s.probeSlot, s.eligibleThisFrame);
         s.eligibleThisFrame = 0;
         s.sourceDrawsThisFrame = 0u;
+    s.sourceModeKnown = false;
         s.sourceGameDevice = 0u;
         // Opt-in-only evidence: a hooked game Draw is not proof that the
         // restricted FVF subset was admitted, nor that GPU pixels became
@@ -5337,12 +5377,14 @@ void before_game_present(IDirect3DDevice9* game,
         s.frameBatch.reset();
         s.eligibleThisFrame = 0;
         s.sourceDrawsThisFrame = 0u;
+    s.sourceModeKnown = false;
         s.sourceGameDevice = 0u;
         s.previousOutput = {};
         s.clearColor.discard();
         s.insetSurface.Reset();
         s.insetFormat = D3DFMT_UNKNOWN;
         s.insetSurfaceDevice = 0u;
+    s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;
         if (++s.outputGeneration == 0u) ++s.outputGeneration;
         s.probeSlot = 0;
     }
@@ -5356,6 +5398,7 @@ void before_game_reset() noexcept {
     s.frameBatch.reset();
     s.eligibleThisFrame = 0;
     s.sourceDrawsThisFrame = 0u;
+    s.sourceModeKnown = false;
     s.sourceGameDevice = 0u;
     s.probeSlot = 0;
     for (auto& item : s.readbacks) {
@@ -5368,6 +5411,7 @@ void before_game_reset() noexcept {
     s.outputGeneration = 0u;
     s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
     s.insetSurfaceDevice = 0u;
+    s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;
     s.diagnosticDepthView.Reset(); s.diagnosticDepth.Reset();
     for (auto& depthState : s.diagnosticDepthStates) depthState.Reset();
     for (auto& depthState : s.diagnosticDepthAlwaysStates) depthState.Reset();

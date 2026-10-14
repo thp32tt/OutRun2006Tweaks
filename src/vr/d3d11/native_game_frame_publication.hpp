@@ -7,6 +7,16 @@ namespace outrun::vr::dx11::live_game_frame {
 // same-Present fence provenance and valid output, not an arbitrary pixel
 // difference from the old diagnostic inset's constant clear sentinel.
 struct GameNativeFramePublication {
+    [[nodiscard]] static constexpr bool source_mode_contiguous(
+        bool sourceObserved, bool sourceFullMode, bool presentFullMode) noexcept {
+        return !sourceObserved || sourceFullMode == presentFullMode;
+    }
+    [[nodiscard]] static constexpr bool matching_upload_extent(
+        std::uint32_t cachedWidth, std::uint32_t cachedHeight,
+        std::uint32_t outputWidth, std::uint32_t outputHeight) noexcept {
+        return outputWidth != 0u && outputHeight != 0u &&
+            cachedWidth == outputWidth && cachedHeight == outputHeight;
+    }
     [[nodiscard]] static constexpr bool should_upload(
         bool fullMode, bool complete, bool outputWritable,
         std::uint32_t changedPixels) noexcept {
