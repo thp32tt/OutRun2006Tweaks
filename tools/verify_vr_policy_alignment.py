@@ -46,6 +46,13 @@ def violations(state, queue, docs):
     )
     checks = (
         (sa == qa, "DX9Ex state/queue diverged"),
+        (sa.get("dx9exSourceFirst", {}).get("status") == "ACTIVE" and
+         sa["dx9exSourceFirst"].get("mode") == "SOURCE_FIRST" and
+         sa["dx9exSourceFirst"].get("controller_deployment") == "NOT_VERIFIED",
+         "DX9Ex source-first dispatch mode lost or external controller adoption falsely claimed"),
+        (all("DX9Ex REAL SOURCE DEVELOPMENT FIRST" in docs[key]
+             for key in ("agents", "priority", "controller")),
+         "DX9Ex source-first latest override missing from controller/agent/priority docs"),
         (sa["roles"]["A"]["status"] == "ACTIVE" and sa["roles"]["A"]["globalPriority"] == 0, "DX11 A not first-priority ACTIVE"),
         (sa["roles"]["C"]["status"] == "ACTIVE" and sa["roles"]["C"]["effortTargetPercent"] == 50, "DX9Ex C allocation/state changed"),
         (sa["roles"]["B"]["status"] == "FROZEN" and not sa["autoThawDxvk"], "DXVK B thawed"),

@@ -27,6 +27,24 @@ def _substantive(value: object, length: int = 12) -> bool:
     return isinstance(value, str) and len(value.strip()) >= length
 
 
+def validate_source_first_override(policy: dict) -> list[str]:
+    """Fail closed if the latest user's DX9Ex source-first execution rule vanishes."""
+    active = policy.get("user_override_20261014") or {}
+    cadence = policy.get("validation_cadence_20261014") or {}
+    errors = []
+    if (active.get("status") != "ACTIVE" or
+        active.get("dispatch_order") != "SOURCE_IMPLEMENTATION_FIRST" or
+        not active.get("no_checklist_only_completion") or
+        not active.get("no_policy_only_score")):
+        errors.append("DX9Ex source-first implementation override missing")
+    if (not cadence.get("implementation_first") or
+        not cadence.get("no_repeated_full_build_per_microedit") or
+        not cadence.get("final_full_exact_sha_preserved") or
+        not cadence.get("mandatory_acceptance_still_required")):
+        errors.append("DX9Ex fast development/final exact-SHA validation contract changed")
+    return errors
+
+
 def validate(record: dict, policy: dict) -> list[str]:
     task_id = record.get("task_id", "")
     match = re.fullmatch(r"CONVERSION-DX9EX-(\d{5})", str(task_id))
@@ -149,6 +167,10 @@ def main() -> int:
     policy = json.loads(POLICY.read_text(encoding="utf-8"))
     if policy.get("schema_version") != 2 or len(policy.get("feature_catalog", [])) < 6:
         print("DX9Ex feature catalog FAIL: missing per-function granular policy")
+        return 1
+    override_errors = validate_source_first_override(policy)
+    if override_errors:
+        print("DX9Ex latest user policy FAIL: " + "; ".join(override_errors))
         return 1
     if args.check_head:
         message = subprocess.check_output(

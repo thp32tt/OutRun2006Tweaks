@@ -161,7 +161,20 @@
       ],
       "protectedBaseline": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
       "hmdScope": "DX9EX_RUNTIME_ACCEPTANCE_NOT_DX11_SOURCE_GATE",
-      "autoThawDxvk": false
+      "autoThawDxvk": false,
+      "dx9exSourceFirst": {
+        "effective_at_kst": "2026-10-14 17:22 KST",
+        "status": "ACTIVE",
+        "mode": "SOURCE_FIRST",
+        "primary_action": "Implement concrete C++ HUD/visual/performance source for highest actionable claimed DX9Ex feature before repeated reviews, audits, probes, status-only updates.",
+        "work_unit": "one complete user-visible function/visual defect or independently measured coherent performance feature, same original TASK_ID",
+        "c0_c1_budget": "one focused source hypothesis pass; expand only when code change blocked by new evidence",
+        "c2_priority": "source implementation until materially integrated feature, preserve DX9Ex protected behavior and leased owner",
+        "while_editing_checks": "changed-component fast/static/smoke only if useful; batch tests with source",
+        "full_validation": "one final exact-SHA DX9Ex Active + Domain Isolation + Full Source Impact when applicable; same task repair then revalidate",
+        "runtime_validation": "UNTESTED until matching Quest3/VDXR",
+        "controller_deployment": "NOT_VERIFIED"
+      }
     },
     "performancePriorityOverride": {
       "effectiveDate": "2026-10-11",

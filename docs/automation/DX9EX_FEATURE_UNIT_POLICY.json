@@ -223,5 +223,30 @@
   },
   "terminal_requires_source_changes": true,
   "terminal_requires_diagnosis_evidence": true,
-  "runtime_failure_reopens_same_symptom_id": true
+  "runtime_failure_reopens_same_symptom_id": true,
+  "user_override_20261014": {
+    "effective_at_kst": "2026-10-14 17:22 KST",
+    "status": "ACTIVE",
+    "dispatch_order": "SOURCE_IMPLEMENTATION_FIRST",
+    "developer_goal": "Actual C++ gameplay HUD/menu/visual or measured p95/p99 render-path source fix under the existing coherent FEATURE_ID/TASK_ID; C2 source implementation before repeated analysis and validation.",
+    "owner_safety": "Original leased owner, same task on repairs/rollover, never overlapping DX11/DXVK/FFB",
+    "c0_c1": "Read current GitHub state, previous HMD/CI evidence and specific affected source once; one hypothesis-driven targeted review, not fixed-count repeated review cycles.",
+    "c2": "Write and integrate coherent material C++ source fixes as dominant work; trace enough to fix actual bug, not endlessly examine unrelated files.",
+    "intermediate_validation": "Changed-area local/static/targeted checks ONLY when needed to guide code changes; no full CI per small edit and no new source commit for unchanged tests/reviews.",
+    "final_validation": "Once per cohesive function at exact validation-bearing source SHA require complete existing DX9Ex Active Win32 x86 game + x64 OpenXR host/package, Domain Isolation and Full Source Impact/HUD Inspector when affected; all relevant negative/fallback checks.",
+    "on_failure": "Repair actual code or specific wrong verifier under same TASK_ID, then revalidate new exact SHA; no skipped/disabled mandatory gates.",
+    "runtime": "RUNTIME_VALIDATION=UNTESTED without matching Quest3/VDXR proof",
+    "no_policy_only_score": true,
+    "no_checklist_only_completion": true,
+    "do_not_pause_C2_for_5min_checkpoint": true,
+    "controller_rollout": "GitHub source of truth only; Docker/Portainer runtime reload is unverified without separate evidence"
+  },
+  "validation_cadence_20261014": {
+    "implementation_first": true,
+    "required_material_code_before_terminal": true,
+    "no_repeated_full_build_per_microedit": true,
+    "final_full_exact_sha_preserved": true,
+    "do_not_require_hmd_per_commit": true,
+    "mandatory_acceptance_still_required": true
+  }
 }

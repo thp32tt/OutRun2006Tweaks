@@ -2,10 +2,19 @@
 """Destructive unit tests: each visual defect stays whole, not a tiny patch or umbrella."""
 import copy
 import json
-from verify_vr_feature_unit_policy import POLICY, validate, printable_diagnostic
+from verify_vr_feature_unit_policy import POLICY, validate, printable_diagnostic, validate_source_first_override
 
 p = json.loads(POLICY.read_text(encoding="utf-8"))
 assert p["schema_version"] == 2
+assert not validate_source_first_override(p)
+for label, change in (
+    ("review-first", lambda q: q["user_override_20261014"].update(dispatch_order="REVIEW_FIRST")),
+    ("skip-final-gate", lambda q: q["validation_cadence_20261014"].update(final_full_exact_sha_preserved=False)),
+    ("allow-micro-builds", lambda q: q["validation_cadence_20261014"].update(no_repeated_full_build_per_microedit=False)),
+):
+    bad = copy.deepcopy(p)
+    change(bad)
+    assert validate_source_first_override(bad), "DX9Ex source-first guard failed: " + label
 features = {x["id"]: x for x in p["feature_catalog"]}
 assert {"HUD_GAMEPLAY", "F11_MENU", "ESC_MENU", "MAIN_MENU",
         "LENS_FLARE_CENTRE", "EXTENDED_TIME", "GOAL_PROGRESS"}.issubset(features)
