@@ -11,12 +11,23 @@ namespace outrun::vr::dx11::live_game_frame {
 // (HRESULT 1) remains in flight; a device error or unexpected status must
 // quarantine the resource rather than letting the next game Draw overwrite it.
 enum class GameNativeReadbackFence : std::uint8_t { Complete, Pending, Failed };
+// A completed GPU EVENT does not imply CPU Map returned usable pixels.
+// A failed Map leaves the staging slot quarantined until the owning D3D9
+// device Reset; WAS_STILL_DRAWING stays busy but is not an error.
+enum class GameNativeReadbackMap : std::uint8_t { Ready, Pending, Failed };
 struct GameNativeFramePublication {
     [[nodiscard]] static constexpr GameNativeReadbackFence classify_fence(
         std::int32_t result) noexcept {
         return result == 0 ? GameNativeReadbackFence::Complete :
                result == 1 ? GameNativeReadbackFence::Pending :
                              GameNativeReadbackFence::Failed;
+    }
+    [[nodiscard]] static constexpr GameNativeReadbackMap classify_map(
+        std::int32_t status, std::int32_t stillDrawingStatus,
+        bool hasPixels, std::uint32_t width, std::uint32_t rowPitch) noexcept {
+        if (status == stillDrawingStatus) return GameNativeReadbackMap::Pending;
+        return status == 0 && hasPixels && valid_readback_pitch(width, rowPitch)
+            ? GameNativeReadbackMap::Ready : GameNativeReadbackMap::Failed;
     }
     [[nodiscard]] static constexpr bool source_mode_contiguous(
         bool sourceObserved, bool sourceFullMode, bool presentFullMode) noexcept {

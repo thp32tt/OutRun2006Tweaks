@@ -5274,7 +5274,11 @@ void before_game_present(IDirect3DDevice9* game,
                     D3D11_MAPPED_SUBRESOURCE mapped{};
                     const HRESULT mapStatus = ctx->Map(oldest.staging.Get(), 0,
                         D3D11_MAP_READ, D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped);
-                    if (SUCCEEDED(mapStatus)) {
+                    const auto mapResult = GameNativeFramePublication::classify_map(
+                        static_cast<std::int32_t>(mapStatus),
+                        static_cast<std::int32_t>(DXGI_ERROR_WAS_STILL_DRAWING),
+                        mapped.pData != nullptr, surfaceWidth, mapped.RowPitch);
+                    if (mapResult == GameNativeReadbackMap::Ready) {
                         // A complete same-Present full-resolution frame is
                         // valid even when its pixels match the old debug clear
                         // sentinel (for example a dark menu or fade frame).
@@ -5366,10 +5370,14 @@ void before_game_present(IDirect3DDevice9* game,
                         ctx->Unmap(oldest.staging.Get(), 0);
                         oldest.busy = false;
                         if (!fullMode) s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
-                    } else if (mapStatus != DXGI_ERROR_WAS_STILL_DRAWING) {
+                    } else if (mapResult == GameNativeReadbackMap::Failed) {
+                        // Even with a completed EVENT, an unexpected Map status,
+                        // invalid row stride or missing pixel pointer cannot be
+                        // published. Never recycle the failed staging allocation
+                        // into another menu/car/race CopyResource before Reset.
+                        if (mapStatus == S_OK) ctx->Unmap(oldest.staging.Get(), 0);
+                        oldest.quarantined = true;
                         ++s.failed;
-                        oldest.busy = false;
-                        if (!fullMode) s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
                     }
                 } else if (GameNativeFramePublication::classify_fence(
                                static_cast<std::int32_t>(ready)) ==
