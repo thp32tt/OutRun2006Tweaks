@@ -224,16 +224,23 @@ namespace OutRunVRRenderer
             // During installation/recovery retain all R23 bookkeeping and its
             // stock-visible warmup policy. Because R29 pre-tracked the write,
             // R23 can no longer resurrect rows from an earlier generation.
-            if (!R23WvpEligibilityReady.load(std::memory_order_acquire) ||
-                !OutRunVR::RuntimeEligibility::MayInjectStereo())
+            const bool r23Ready =
+                R23WvpEligibilityReady.load(std::memory_order_acquire);
+            const bool stereoEligible =
+                OutRunVR::RuntimeEligibility::MayInjectStereo();
+            if (!r23Ready || !stereoEligible)
             {
                 HRESULT hr = R29WvpR23Hook.stdcall<HRESULT>(
                     device, startRegister, constantData, vector4fCount);
+                // A ready R23 handler already performs the complete stock
+                // c64..c67 restore for partial writes while stereo is gated
+                // off. A second R29 restore submitted the same four GPU
+                // shader registers again per partial UI/theater/recovery draw.
+                // Before R23 is ready it only forwards the incoming range:
+                // R29 must retain the full-block restore in that case.
                 if (SUCCEEDED(hr) && partialWvp && R28RawWvpComplete() &&
-                    !OutRunVR::RuntimeEligibility::MayInjectStereo())
+                    !r23Ready && !stereoEligible)
                 {
-                    // Make recovery/warmup coherent even if only one row was
-                    // written after a previously head-patched device state.
                     hr = R28RestoreStockWvp(device);
                 }
                 if (FAILED(hr))

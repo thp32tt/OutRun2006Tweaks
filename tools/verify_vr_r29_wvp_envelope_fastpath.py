@@ -213,3 +213,73 @@ for _ in range(15000):
     r28_cases += 1
 print(f"PASS R28 contiguous stock WVP shadow copy: {r28_cases} "
       f"full/partial/boundary randomized cases, {len(r28_mutations)} mutations")
+
+
+# C1/C2 theater/recovery draw path: R23 owns exactly one c64..c67
+# stock restore once its WVP hook is READY. An earlier R29 copy submitted
+# an identical 4-register D3D9 setter a second time for every partial
+# c64 write while stereo was closed. When R23 is NOT ready its early
+# forwarding path requires the single R29 recovery restore instead.
+r23_wvp = function(r28_src, "HRESULT __stdcall SetVertexShaderConstantFDestR23(")
+
+def stock_restore_contract(r29: str, r23: str) -> None:
+    assert "if (!R23WvpEligibilityReady.load(std::memory_order_acquire))" in r23
+    assert "if (SUCCEEDED(hr) && partialWvp && R28RawWvpComplete())" in r23
+    assert "hr = R28RestoreStockWvp(device);" in r23
+    body = function(r29, "HRESULT __stdcall SetVertexShaderConstantFDestR29(")
+    assert "const bool r23Ready =" in body
+    assert "const bool stereoEligible =" in body
+    assert "if (!r23Ready || !stereoEligible)" in body
+    fallback = body.split("if (!r23Ready || !stereoEligible)", 1)[1].split(
+        "// R13 is again the only authority", 1)[0]
+    assert "R29WvpR23Hook.stdcall<HRESULT>(" in fallback
+    assert fallback.count("R28RestoreStockWvp(device)") == 1
+    assert "SUCCEEDED(hr) && partialWvp && R28RawWvpComplete() &&" in fallback
+    assert "!r23Ready && !stereoEligible)" in fallback
+    assert fallback.index("R29WvpR23Hook.stdcall<HRESULT>(") < fallback.index(
+        "!r23Ready && !stereoEligible)") < fallback.index("R28RestoreStockWvp(device)")
+    assert "if (FAILED(hr))" in fallback
+    assert "R29InvalidateRawWvpGenerationImpl();" in fallback
+
+stock_restore_contract(source, r23_wvp)
+
+# Model exact D3D9 constant calls (not HMD visuals). R23-ready/closed
+# must issue one restore, never two. R23-not-ready/closed must recover
+# the four rows in R29. Eligible stereo must not execute either fallback.
+for ready in (False, True):
+    for eligible in (False, True):
+        for partial in (False, True):
+            for shadow in (False, True):
+                if ready and eligible:
+                    continue  # full R13 world classification, not this branch
+                r23_restores = int(ready and not eligible and partial and shadow)
+                r29_restores = int(
+                    not ready and not eligible and partial and shadow)
+                assert r23_restores + r29_restores == int(
+                    not eligible and partial and shadow)
+
+for label, old, new in (
+    ("duplicate ready R23 restore", "!r23Ready && !stereoEligible)",
+     "!stereoEligible)"),
+    ("lost preinstall fallback", "!r23Ready && !stereoEligible)",
+     "r23Ready && !stereoEligible)"),
+    ("removed partial guard", "SUCCEEDED(hr) && partialWvp && R28RawWvpComplete() &&",
+     "SUCCEEDED(hr) && R28RawWvpComplete() &&"),
+    ("removed failure invalidation", "R29InvalidateRawWvpGenerationImpl();",
+     "/* invalidation removed */"),
+):
+    upload_source = function(source, "HRESULT __stdcall SetVertexShaderConstantFDestR29(")
+    assert old in upload_source, label
+    # Limit mutation to the WVP upload function; unrelated generation
+    # helpers are not the intended negative-control targets.
+    begin = source.index("HRESULT __stdcall SetVertexShaderConstantFDestR29(")
+    mutated = source[:begin] + source[begin:].replace(old, new, 1)
+    try:
+        stock_restore_contract(mutated, r23_wvp)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("R29 stock-replay regression escaped: " + label)
+
+print("PASS R29/R23 partial-WVP theater/recovery single-stock-restore "
+      "and four negative controls (Quest3 runtime untested)")
