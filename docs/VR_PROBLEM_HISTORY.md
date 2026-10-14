@@ -1,3 +1,9 @@
+# 2026-10-15 lens/+TIME source-path development handoff
+
+User request at 01:36:52 KST. See [development guide](DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md). Reuses DX9EX:SYMPTOM:LENS_FLARE_CENTRE and DX9EX:SYMPTOM:EXTENDED_TIME; preserves prior HMD failures and known-good categories. No new HMD observation, recurrence count or optical FIXED claim.
+
+Review of 56 source files plus build/package contracts found a consequential owner distinction: Active ZIP selects R26+HUD; the independently compiled ordinary R30/R33 source is not automatically that DLL. Existing central C993 scope and all six +TIME source hooks are present. Next source work must isolate raw-c64 provenance for the centre and actual GPU submission lifetime for +TIME. A compiled real-semantics counterexample shows direct producer scope alone cannot survive delayed submission; actual failing game batch remains unconfirmed. The guide provides fix branches, negative cases, exact package checks and later HMD acceptance. Runtime C++ unchanged by this handoff; no completion score.
+
 # VR Runtime Problem / Regression History
 
 ## 2026-10-09 F11 gameplay overlay user acceptance

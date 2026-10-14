@@ -21,6 +21,23 @@
       "failedRuntimeTestPreservesLastKnownGood": true,
       "candidateRequirement": "BASELINE_DELTA required for runtime-risking candidates",
       "integrationRequirement": "all triggered protected invariants must pass deterministic revalidation or remain explicitly NEED_HMD_TEST without contradicting a known USER_RUNTIME_VERIFIED invariant"
+    },
+    "visualRepairDirective20261015": {
+      "guide": "docs/DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md",
+      "reviewBaseSha": "837550addbd7ec26bee680c0f39f9abb5077dde9",
+      "knownFailedRuntimeSha": "1d161a18efcfe4ddf3cad318ea6be50102458ac3",
+      "symptomIds": [
+        "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+        "DX9EX:SYMPTOM:EXTENDED_TIME"
+      ],
+      "sourceFindings": [
+        "Active packaging selects R26_HUD_COMPARE=ON; full-chain compile success alone is not deployment evidence.",
+        "R26+HUD WorldBillboard owned-raw-c64 miss can fall through to live c64; exact failing-frame path unproven.",
+        "Direct +TIME RAII ownership alone does not survive deferred batch submission; actual game D3DX route unproven."
+      ],
+      "runtimeStatus": "KNOWN_USER_REPORTED_FAIL_NEW_FIX_NOT_IMPLEMENTED",
+      "counterexample": "docs/automation/reviews/DX9EX_BATCH_OWNER_COUNTEREXAMPLE_20261015.cpp",
+      "noRecurrenceIncrementForSameReport": true
     }
   },
   "cases": [

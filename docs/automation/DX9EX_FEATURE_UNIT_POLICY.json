@@ -105,7 +105,7 @@
       "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
       "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
       "title": "렌즈플레어 중심점 중복",
-      "priority": 119,
+      "priority": 128,
       "goal": "Repair and validate the complete visible function: Duplicated/headlocked centre lens flare dot only; preserve accepted 3–4 outer discs and SkyGlow.",
       "trace_stages": [
         "canonical original EXE 0xD3A5→0xC980 centre vs 0xD5F5..0xD796 outer flare chain",
@@ -116,14 +116,16 @@
         "central dot single/scene-attached, outer discs unchanged, negative source-scope mutation",
         "prove source-cause correction with mutation/negative regression",
         "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
-      ]
+      ],
+      "development_guide": "docs/DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md",
+      "next_source_action": "Confirm packaged R26+HUD vs full-chain owner; preserve existing D3A5/C993 exact centre hook. Trace same-object raw c64 provenance and 12-draw fallback before any single head/eye transform. Follow guide section 3; preserve CABE outer discs and SkyGlow."
     },
     {
       "id": "EXTENDED_TIME",
       "feature_id": "DX9EX:VIS:EXTENDED_TIME",
       "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
       "title": "연장시간 +TIME 화면오류",
-      "priority": 118,
+      "priority": 127,
       "goal": "Repair and validate the complete visible function: Entire +TIME stage extension including sprite and numeric text producer; avoid headlock/double in eyes.",
       "trace_stages": [
         "canonical original EXE sprite CALL 0x9898E/0x98A36/0x98AC6 and glyph 0x989AD/0x98A89/0x98A10",
@@ -134,7 +136,9 @@
         "sprite+number one-image during stage transition, ordinary timer/GOAL/final results preserved",
         "prove source-cause correction with mutation/negative regression",
         "pass exact-SHA DX9Ex Win32 host/game/package + Domain/Full Source Impact as applicable; Quest3 separate"
-      ]
+      ],
+      "development_guide": "docs/DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md",
+      "next_source_action": "Trace all six original sprite/numeric sources through immediate/queued/D3DX delayed submission. Prove actual Flush/End owner and shader/FVF0x142/XYZRHW routes; repair proven batch lifetime at exact boundaries without flushing unrelated sprites. Follow guide section 4; preserve timer and GOAL."
     },
     {
       "id": "GOAL_PROGRESS",
@@ -248,5 +252,18 @@
     "final_full_exact_sha_preserved": true,
     "do_not_require_hmd_per_commit": true,
     "mandatory_acceptance_still_required": true
+  },
+  "user_visual_repair_directive_20261015": {
+    "requested_at_kst": "2026-10-15T01:36:52+09:00",
+    "guide": "docs/DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md",
+    "next_available_p0a_features": [
+      "DX9EX:VIS:LENS_FLARE_CENTRE",
+      "DX9EX:VIS:EXTENDED_TIME"
+    ],
+    "preserve_active_claim_and_ci": true,
+    "packaged_compile_owner_must_match_changed_function": true,
+    "runtime_validation": "UNTESTED",
+    "controller_adoption": "NOT_VERIFIED",
+    "no_documentation_completion_score": true
   }
 }

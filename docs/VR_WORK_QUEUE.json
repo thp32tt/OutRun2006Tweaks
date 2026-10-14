@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "integrationBranch": "vr-d3d9ex-focus",
   "owner": "D_INTEGRATION_PLANNER",
-  "updatedKst": "2026-10-13T20:15:00+09:00",
+  "updatedKst": "2026-10-15T01:36:52+09:00",
   "policy": {
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
@@ -204,6 +204,19 @@
       "hardwareAcceptanceSeparate": true,
       "reopenSameFeatureAfterHmdFailure": true,
       "liveDockerAdoption": "NOT_VERIFIED"
+    },
+    "visualRepairDirective20261015": {
+      "requested_at_kst": "2026-10-15T01:36:52+09:00",
+      "guide": "docs/DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md",
+      "next_available_p0a_features": [
+        "DX9EX:VIS:LENS_FLARE_CENTRE",
+        "DX9EX:VIS:EXTENDED_TIME"
+      ],
+      "preserve_active_claim_and_ci": true,
+      "packaged_compile_owner_must_match_changed_function": true,
+      "runtime_validation": "UNTESTED",
+      "controller_adoption": "NOT_VERIFIED",
+      "no_documentation_completion_score": true
     }
   },
   "candidateWip": {
@@ -1063,7 +1076,7 @@
     },
     {
       "id": "DX9EX-FEATURE-LENS_FLARE_CENTRE",
-      "priority": 119,
+      "priority": 128,
       "status": "READY",
       "preferredRole": "C_DX9EX",
       "featureId": "DX9EX:VIS:LENS_FLARE_CENTRE",
@@ -1081,6 +1094,7 @@
         "per-eye perspective/depth, camera and host stereo"
       ],
       "requiredStaticClosure": [
+        "Prove selected packaged DLL compile owner/flags matches changed source; distinguish R26+HUD artifact from full-chain compile-only gate.",
         "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
         "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
         "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",
@@ -1096,11 +1110,12 @@
         "DX9EX:SHARED_R30_HUD_RENDERER",
         "DX9EX:SYMPTOM:LENS_FLARE_CENTRE"
       ],
-      "nextAction": "Reconcile existing live work_key and TASK_ID; claim one coherent whole defect, trace and reject hypotheses, implement full fix, run grouped negative regressions and exact-SHA CI, then HMD separately. Never finish on a tiny micro-patch."
+      "nextAction": "Confirm packaged R26+HUD vs full-chain owner; preserve existing D3A5/C993 exact centre hook. Trace same-object raw c64 provenance and 12-draw fallback before any single head/eye transform. Follow guide section 3; preserve CABE outer discs and SkyGlow. Reconcile existing live claim; same feature/task across retry; no optical DONE from source-only evidence.",
+      "developmentGuide": "docs/DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md"
     },
     {
       "id": "DX9EX-FEATURE-EXTENDED_TIME",
-      "priority": 118,
+      "priority": 127,
       "status": "READY",
       "preferredRole": "C_DX9EX",
       "featureId": "DX9EX:VIS:EXTENDED_TIME",
@@ -1118,6 +1133,7 @@
         "stereo screen-HUD layer vs world and host composition"
       ],
       "requiredStaticClosure": [
+        "Prove selected packaged DLL compile owner/flags matches changed source; distinguish R26+HUD artifact from full-chain compile-only gate.",
         "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
         "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
         "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",
@@ -1133,7 +1149,8 @@
         "DX9EX:SHARED_R30_HUD_RENDERER",
         "DX9EX:SYMPTOM:EXTENDED_TIME"
       ],
-      "nextAction": "Reconcile existing live work_key and TASK_ID; claim one coherent whole defect, trace and reject hypotheses, implement full fix, run grouped negative regressions and exact-SHA CI, then HMD separately. Never finish on a tiny micro-patch."
+      "nextAction": "Trace all six original sprite/numeric sources through immediate/queued/D3DX delayed submission. Prove actual Flush/End owner and shader/FVF0x142/XYZRHW routes; repair proven batch lifetime at exact boundaries without flushing unrelated sprites. Follow guide section 4; preserve timer and GOAL. Reconcile existing live claim; same feature/task across retry; no optical DONE from source-only evidence.",
+      "developmentGuide": "docs/DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md"
     },
     {
       "id": "DX9EX-FEATURE-GOAL_PROGRESS",
