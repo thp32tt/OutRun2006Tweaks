@@ -1066,7 +1066,8 @@ class UIScaling : public Hook
         int result = 0;
         {
             OutRunVR::GameSemantic::ScopedExactProducerSemantic producerScope(
-                scope, marker);
+                scope, marker, Settings::VREnabled,
+                OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani);
             result = Game::sprani_play_ae_auth_alpha(
                 spriteId, x + RankMarkerFracX, y + RankMarkerFracY,
                 a4, a5, alpha);
@@ -1099,6 +1100,10 @@ class UIScaling : public Hook
 		// Preserve the same per-car anchor through direct draw and post-call
 		// queue tagging, even if a nested producer updates the live TLS state.
 		const auto projectedAnchor = RankMarkerProjectedInfo;
+        // Snapshot this vehicle's fractional screen position before the
+        // original producer can reenter and change its thread-local owner.
+        const float frozenFractionX = RankMarkerFracX;
+        const float frozenFractionY = RankMarkerFracY;
 		const bool screenHud = RankMarkerSubScreenHudDepth != 0;
 		const bool projected = !screenHud && projectedAnchor.valid;
 		const auto scope = screenHud
@@ -1109,7 +1114,8 @@ class UIScaling : public Hook
         int result = 0;
         {
             OutRunVR::GameSemantic::ScopedExactProducerSemantic producerScope(
-                scope, projected ? &projectedAnchor : nullptr);
+                scope, projected ? &projectedAnchor : nullptr, Settings::VREnabled,
+                OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite);
             result = Game::put_clip_sprite(
                 xstnum, x, y, flags, priority, color);
         }
@@ -1132,8 +1138,8 @@ class UIScaling : public Hook
 				// emitted through put_sprite_ex2 owns args2_58 instead.
 				if (node->kind_C == 0)
 				{
-					node->args_10.float24 += RankMarkerFracX;
-					node->args_10.float28 += RankMarkerFracY;
+					node->args_10.float24 += frozenFractionX;
+					node->args_10.float28 += frozenFractionY;
 				}
 				if (node == tailAfter)
 					break;
@@ -1211,7 +1217,8 @@ class UIScaling : public Hook
 		int result = 0;
 		{
 			OutRunVR::GameSemantic::ScopedExactProducerSemantic producerScope(
-				scope, projected ? &projectedAnchor : nullptr);
+                scope, projected ? &projectedAnchor : nullptr, Settings::VREnabled,
+                OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani);
 			result = Game::sprani_play_ae_auth_alpha(
 				spriteId, x, y, a4, a5, alpha);
 		}

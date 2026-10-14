@@ -529,4 +529,57 @@ if "ProducerToken::RankMarkerSprani" in classify or    "ProducerToken::RankMarke
 if "return scope == RenderScope::ScreenOverlay2D ||" in semantics:
     fail("generic ScreenOverlay2D was widened into projected-world ownership")
 
+
+# The three exact vehicle-marker producers may synchronously Draw before
+# queuing their sprites. Preserve any previous one-shot Draw token for its
+# original owner, and freeze the 4th+ ordinal digits through nested producers.
+def require_rank_direct_isolation(source: str) -> None:
+    for func, token in (
+        ("static int __cdecl RankMarker_sprani(", "RankMarkerSprani"),
+        ("static int __cdecl RankMarker_putClipSprite(", "RankMarkerClipSprite"),
+        ("static int __cdecl RivalMarker_sprani(", "RivalMarkerSprani"),
+    ):
+        body = function_body(source, func)
+        begin = body.find("ScopedExactProducerSemantic producerScope(")
+        end = body.find(");", begin)
+        direct = body.find("Game::put_clip_sprite(" if token ==
+                           "RankMarkerClipSprite" else
+                           "Game::sprani_play_ae_auth_alpha(")
+        tag = body.find("TagAppendedNodes(")
+        if min(begin, end, direct, tag) < 0 or not (
+            begin < end < direct < tag):
+            fail("marker source/queue ordering changed: " + token)
+        owner = body[begin:end]
+        if ("Settings::VREnabled" not in owner or
+            "ProducerToken::" + token not in owner or
+            "scope," not in owner):
+            fail("exact direct marker pending-token isolation lost: " + token)
+    clip = function_body(source, "static int __cdecl RankMarker_putClipSprite(")
+    a = clip.find("const float frozenFractionX = RankMarkerFracX;")
+    b = clip.find("const float frozenFractionY = RankMarkerFracY;")
+    c = clip.find("Game::put_clip_sprite(")
+    d = clip.find("node->args_10.float24 += frozenFractionX;")
+    e = clip.find("node->args_10.float28 += frozenFractionY;")
+    if min(a,b,c,d,e)<0 or not(a<b<c<d<e):
+        fail("nested 4th+ rank glyph offsets not snapshotted before call")
+
+require_rank_direct_isolation(ui)
+for name, original, replacement in (
+    ("rank sprani pending", "Settings::VREnabled,\n                OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani", "false,\n                OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani"),
+    ("rank clip direct", "ProducerToken::RankMarkerClipSprite);", "ProducerToken::RivalMarkerSprani);"),
+    ("rival direct", "ProducerToken::RivalMarkerSprani);", "ProducerToken::RankMarkerSprani);"),
+    ("digit X", "node->args_10.float24 += frozenFractionX;", "node->args_10.float24 += RankMarkerFracX;"),
+    ("digit Y", "node->args_10.float28 += frozenFractionY;", "node->args_10.float28 += RankMarkerFracY;"),
+):
+    changed = ui.replace(original, replacement, 1)
+    if changed == ui:
+        fail("mutation setup failed: " + name)
+    try:
+        require_rank_direct_isolation(changed)
+    except SystemExit:
+        pass
+    else:
+        fail("destructive marker owner mutant escaped: " + name)
+
+
 print("VR projected marker anchor contract PASS")
