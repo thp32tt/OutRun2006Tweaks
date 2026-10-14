@@ -16,7 +16,7 @@ def wired(code):
         and "GameReadbackProvenance provenance{};" in code
         and "ready == S_OK && (!oldest.provenance.may_present(s.presents, fullMode) ||" in x
         and "!oldest.provenance.same_device(presentDevice)" in x
-        and "++s.staleReadbacks;" in x
+        and "++s.staleReadbacks;" in x[x.index("const HRESULT ready = ctx->GetData("):]
         and "next.provenance = {s.presents, s.sourceDrawsThisFrame};" in x
         and "ctx->CopyResource(next.staging.Get(), s.backend.color_texture());" in x
         and "D3D11_ASYNC_GETDATA_DONOTFLUSH" in x
@@ -31,7 +31,16 @@ assert wired(src)
 for token in ("!oldest.provenance.may_present(s.presents, fullMode)",
               "next.provenance = {s.presents, s.sourceDrawsThisFrame};",
               "++s.staleReadbacks;", "item.provenance = {};"):
-    mutant = src.replace(token, "/* removed game GPU scene link */", 1)
+    if token == "++s.staleReadbacks;":
+        # The full-frame pre-poll fence recycler now has another counter;
+        # mutate the asynchronous upload rejection, not the recycler.
+        marker = "const HRESULT ready = ctx->GetData("
+        front, tail = src.split(marker, 1)
+        assert token in tail
+        mutant = front + marker + tail.replace(
+            token, "/* removed game GPU scene link */", 1)
+    else:
+        mutant = src.replace(token, "/* removed game GPU scene link */", 1)
     assert mutant != src and not wired(mutant), token
 
 cxx = shutil.which("g++") or shutil.which("clang++")
