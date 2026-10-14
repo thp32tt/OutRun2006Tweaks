@@ -123,6 +123,10 @@ namespace OutRunVRStereo
         thread_local R32PerfWindow R32PerfWindowCounters{};
         thread_local std::uint64_t R32PerfBaselineUs = 0;
         thread_local LONGLONG R32LastPresentEndQpc = 0;
+        // Remember whether a real sampled Present owns an active diagnostic
+        // window. Steady telemetry-off frames need no repeated bulk zeroing.
+        // This flag belongs to the same Present thread as both windows.
+        thread_local bool R32PerfWindowActive = false;
 
         LONGLONG R32PerfQpcFrequency() noexcept
         {
@@ -227,8 +231,15 @@ namespace OutRunVRStereo
         {
             if (!R30SupportTelemetryEnabled())
             {
+                // A toggle during the lower Present invalidates the entire
+                // measurement epoch, not only the current workload. Without
+                // this, a fast disable/re-enable can reuse the old p95 window.
                 R32FrameWorkloadCounters = {};
+                R32PerfWindowCounters = {};
+                R32PerfBaselineUs = 0;
+                R32Counters = {};
                 R32LastPresentEndQpc = 0;
+                R32PerfWindowActive = false;
                 return;
             }
 
@@ -635,6 +646,8 @@ namespace OutRunVRStereo
             R32PerfWindowCounters = {};
             R32PerfBaselineUs = 0;
             R32LastPresentEndQpc = 0;
+            R32Counters = {};
+            R32PerfWindowActive = false;
         }
 
         void R32ResetAfterGameReset() noexcept
@@ -786,6 +799,7 @@ namespace OutRunVRStereo
                 // while telemetry is disabled on the gameplay Present path.
                 stereo = R32CaptureStereoWorkload();
                 QueryPerformanceCounter(&presentStart);
+                R32PerfWindowActive = true;
             }
 
             const HRESULT hr = lowerPresent();
@@ -800,14 +814,19 @@ namespace OutRunVRStereo
                         presentStart.QuadPart, presentEnd.QuadPart, stereo);
                     R32LogPerfWindow();
                 }
-                else
+                else if (R32PerfWindowActive ||
+                    R32FrameWorkloadCounters.draws != 0)
                 {
-                    // Disable/re-enable begins a new measurement window.
+                    // On the first telemetry-off Present, or after a same-
+                    // frame toggle that observed draws but produced no sampled
+                    // Present, discard the old epoch once. Subsequent disabled
+                    // Presents are entirely write-free on this large TLS path.
                     R32FrameWorkloadCounters = {};
                     R32PerfWindowCounters = {};
                     R32PerfBaselineUs = 0;
                     R32Counters = {};
                     R32LastPresentEndQpc = 0;
+                    R32PerfWindowActive = false;
                 }
             }
             return hr;

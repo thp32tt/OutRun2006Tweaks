@@ -57,8 +57,16 @@ def violations(source):
         check(x in log, "aggregate detail " + x)
     for x in ("R32FrameWorkloadCounters = {};", "R32PerfWindowCounters = {};",
               "R32PerfBaselineUs = 0;", "R32Counters = {};",
-              "R32LastPresentEndQpc = 0;"):
+              "R32LastPresentEndQpc = 0;", "R32PerfWindowActive = false;"):
         check(x in present, "diagnostic opt-out " + x)
+    check("else if (R32PerfWindowActive ||" in present and
+          "R32FrameWorkloadCounters.draws != 0" in present,
+          "only transition/dangling-draw clears inactive diagnostic window")
+    check("R32PerfWindowActive = true;" in present,
+          "a real sampled Present opens exactly one resettable window")
+    check("R32PerfWindowActive = false;" in body(
+          source, "void R32InvalidateResetCaches()"),
+          "Reset invalidates active diagnostic ownership")
     # During a destructive mutation either anchor can disappear; that is
     # a negative-test violation, never a Python ValueError.
     check("spdlog::info(" in log and
