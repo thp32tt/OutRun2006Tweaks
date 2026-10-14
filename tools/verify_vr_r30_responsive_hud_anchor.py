@@ -1024,7 +1024,7 @@ direct = src[src.index("static void __cdecl OutRunHudTextProducer_dest("):
              src.index("static int __cdecl OutRunHudText_clip(")]
 for x in ("semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud",
           "std::optional<OutRunVR::GameSemantic::ScopedExactProducerSemantic>",
-          "directHudOwner.emplace(", "nullptr, false, token);",
+          "directHudOwner.emplace(", "nullptr, true, token);",
           "OutRunHudTextProducerHook.call("):
     assert x in direct, x
 assert direct.index("directHudOwner.emplace(") < direct.index("OutRunHudTextProducerHook.call(")
@@ -1055,6 +1055,14 @@ assert "SpriteQueueDepth != 0" not in sel.replace(
     "SpriteQueueDepth != 0", "SpriteQueueDepth == 0", 1)
 assert "directHudOwner.emplace(" not in direct.replace(
     "directHudOwner.emplace(", "/* missing exact owner */(", 1)
+# The former false path let a preceding world Draw's NextDrawScope win over
+# direct BA9D0 ScreenHud. Verify the old value is a failing mutation, while
+# preserving queue priority and the original text producer entrypoint.
+assert "nullptr, false, token);" not in direct
+direct_isolation_mutant = direct.replace(
+    "nullptr, true, token);", "nullptr, false, token);", 1)
+assert direct_isolation_mutant != direct
+assert "nullptr, true, token);" not in direct_isolation_mutant
 print("PASS immediate/queued BA9D0 VR HUD source ownership and four destructive regressions")
 
 
