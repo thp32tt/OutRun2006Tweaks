@@ -19,7 +19,8 @@ def proves_current_frame_quarantine(source: str, header: str) -> bool:
     mapping = p.find("ctx->Map(")
     return (
         "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in p
-        and "s.sourceGameDevice == presentDevice" in p
+        and ("s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame) &&\n"
+             "            s.sourceGameDevice == presentDevice;") in p
         and "fullMode, currentFullFrameComplete, outputWritable" in p
         and 0 <= call < invalidate < getdata < mapping
         and "oldest.provenance.same_output(s.outputGeneration)" in p
