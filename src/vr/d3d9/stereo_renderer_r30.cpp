@@ -16,6 +16,7 @@
 // Default behavior retains the validated textual chain until link verification.
 #ifndef OUTRUN_VR_REFACTOR_SPLIT_R30_R29
 #include "stereo_renderer_r29.cpp"
+#include "r30_indexed_up_bounds.hpp"
 #endif
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
@@ -3231,16 +3232,10 @@ namespace OutRunVRStereo
         UINT R30PrimitiveElementCount(
             D3DPRIMITIVETYPE type, UINT primitiveCount) noexcept
         {
-            switch (type)
-            {
-            case D3DPT_POINTLIST: return primitiveCount;
-            case D3DPT_LINELIST: return primitiveCount * 2u;
-            case D3DPT_LINESTRIP: return primitiveCount + 1u;
-            case D3DPT_TRIANGLELIST: return primitiveCount * 3u;
-            case D3DPT_TRIANGLESTRIP:
-            case D3DPT_TRIANGLEFAN: return primitiveCount + 2u;
-            default: return 0;
-            }
+            // Never treat wrapped primitive counts as a small valid draw.
+            // Zero returns E_NOTIMPL to preserve the game's raw draw fallback.
+            return OutRunVR::R30IndexedUpBounds::PrimitiveElements(
+                static_cast<std::uint32_t>(type), primitiveCount);
         }
 
         // For unusual world projections with no authoritative per-eye inverse,
@@ -4487,6 +4482,7 @@ namespace OutRunVRStereo
             const UINT indexCount =
                 R30PrimitiveElementCount(type, primitiveCount);
             if (!indexData || !vertexData || indexCount == 0 ||
+                indexCount > OutRunVR::R30IndexedUpBounds::MaxIndices ||
                 (indexFormat != D3DFMT_INDEX16 &&
                  indexFormat != D3DFMT_INDEX32))
                 return E_NOTIMPL;

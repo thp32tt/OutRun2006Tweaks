@@ -12,6 +12,7 @@
 // perspective effects remain entirely owned by R29/R13.
 
 #include "stereo_renderer_r26.cpp"
+#include "r30_indexed_up_bounds.hpp"
 #include "lens_centre_source_provenance.hpp"
 #include "r30_early_rhw_shadow.hpp"
 #include "vr/game/render_semantics.hpp"
@@ -3328,16 +3329,10 @@ namespace OutRunVRStereo
         UINT R30PrimitiveElementCount(
             D3DPRIMITIVETYPE type, UINT primitiveCount) noexcept
         {
-            switch (type)
-            {
-            case D3DPT_POINTLIST: return primitiveCount;
-            case D3DPT_LINELIST: return primitiveCount * 2u;
-            case D3DPT_LINESTRIP: return primitiveCount + 1u;
-            case D3DPT_TRIANGLELIST: return primitiveCount * 3u;
-            case D3DPT_TRIANGLESTRIP:
-            case D3DPT_TRIANGLEFAN: return primitiveCount + 2u;
-            default: return 0;
-            }
+            // Never treat wrapped primitive counts as a small valid draw.
+            // Zero returns E_NOTIMPL to preserve the game's raw draw fallback.
+            return OutRunVR::R30IndexedUpBounds::PrimitiveElements(
+                static_cast<std::uint32_t>(type), primitiveCount);
         }
 
         bool R30TransformXyzrhwVertices(
@@ -3914,31 +3909,29 @@ namespace OutRunVRStereo
             const UINT indexCount =
                 R30PrimitiveElementCount(type, primitiveCount);
             if (!indexData || !vertexData || indexCount == 0 ||
+                indexCount > OutRunVR::R30IndexedUpBounds::MaxIndices ||
+                stride < sizeof(float) * 4 ||
                 (indexFormat != D3DFMT_INDEX16 &&
                  indexFormat != D3DFMT_INDEX32))
                 return E_NOTIMPL;
 
-            UINT maxIndex = 0;
-            if (indexFormat == D3DFMT_INDEX16)
-            {
-                const auto* indices =
-                    static_cast<const std::uint16_t*>(indexData);
-                for (UINT i = 0; i < indexCount; ++i)
-                    maxIndex = std::max<UINT>(maxIndex, indices[i]);
-            }
-            else
-            {
-                const auto* indices =
-                    static_cast<const std::uint32_t*>(indexData);
-                for (UINT i = 0; i < indexCount; ++i)
-                    maxIndex = std::max(maxIndex, indices[i]);
-            }
-
-            const UINT vertexCount =
-                std::max<UINT>(minVertexIndex + numVertices,
-                    maxIndex + 1u);
-            if (vertexCount == 0 || vertexCount > 262144u)
+            // The D3D9 UP stream is addressed by absolute indices. Restrict
+            // stereo scratch data to the exact declared vertex window and
+            // reject overflow before reading any source vertex or index.
+            UINT declaredEnd = 0;
+            if (!OutRunVR::R30IndexedUpBounds::DeclaredWindow(
+                    minVertexIndex, numVertices, declaredEnd))
                 return E_NOTIMPL;
+            const UINT vertexCount = numVertices;
+            const std::uint64_t byteOffset =
+                static_cast<std::uint64_t>(minVertexIndex) * stride;
+            if (byteOffset >
+                static_cast<std::uint64_t>(
+                    (std::numeric_limits<std::size_t>::max)()))
+                return E_NOTIMPL;
+            const auto* windowVertexData =
+                static_cast<const std::uint8_t*>(vertexData) +
+                static_cast<std::size_t>(byteOffset);
 
             R30ScratchLease lease;
             if (!lease)
@@ -3958,13 +3951,15 @@ namespace OutRunVRStereo
                     indexFormat == D3DFMT_INDEX16
                     ? static_cast<const std::uint16_t*>(indexData)[i]
                     : static_cast<const std::uint32_t*>(indexData)[i];
-                if (raw >= vertexCount)
+                std::uint32_t local = 0;
+                if (!OutRunVR::R30IndexedUpBounds::LocalIndex(
+                        raw, minVertexIndex, declaredEnd, local))
                     return E_NOTIMPL;
-                scratch.used[raw] = 1;
+                scratch.used[local] = 1;
             }
 
             if (!R30ConfigureXyzrhwWorldEffect(
-                    device, vertexData, vertexCount, stride, state,
+                    device, windowVertexData, vertexCount, stride, state,
                     &scratch.used))
             {
                 ++R30XyzrhwFallbacks;
@@ -3972,23 +3967,64 @@ namespace OutRunVRStereo
             }
 
             if (!R30TransformXyzrhwStereo(
-                    vertexData, vertexCount, stride, state,
+                    windowVertexData, vertexCount, stride, state,
                     scratch.left, scratch.right, &scratch.used))
             {
                 ++R30XyzrhwFallbacks;
                 return E_NOTIMPL;
             }
 
+            const void* drawIndices = indexData;
+            UINT drawMinVertex = minVertexIndex;
+            if (minVertexIndex != 0)
+            {
+                // D3D9 sees the compacted source window as vertex zero.
+                // Rebase each index once and share it across both eye draws.
+                const UINT indexBytes =
+                    indexFormat == D3DFMT_INDEX16 ? 2u : 4u;
+                try
+                {
+                    scratch.indexSource.resize(
+                        static_cast<std::size_t>(indexCount) * indexBytes);
+                }
+                catch (...)
+                {
+                    return E_NOTIMPL;
+                }
+                for (UINT i = 0; i < indexCount; ++i)
+                {
+                    const std::uint32_t raw =
+                        indexFormat == D3DFMT_INDEX16
+                        ? static_cast<const std::uint16_t*>(indexData)[i]
+                        : static_cast<const std::uint32_t*>(indexData)[i];
+                    const std::uint32_t local = raw - minVertexIndex;
+                    if (indexBytes == 2u)
+                    {
+                        const auto v = static_cast<std::uint16_t>(local);
+                        std::memcpy(scratch.indexSource.data() +
+                            static_cast<std::size_t>(i) * indexBytes,
+                            &v, sizeof(v));
+                    }
+                    else
+                    {
+                        std::memcpy(scratch.indexSource.data() +
+                            static_cast<std::size_t>(i) * indexBytes,
+                            &local, sizeof(local));
+                    }
+                }
+                drawMinVertex = 0;
+                drawIndices = scratch.indexSource.data();
+            }
             auto leftDraw = [&]() {
                 return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
-                    device, type, minVertexIndex, numVertices,
-                    primitiveCount, indexData, indexFormat,
+                    device, type, drawMinVertex, numVertices,
+                    primitiveCount, drawIndices, indexFormat,
                     scratch.left.data(), stride);
             };
             auto rightDraw = [&]() {
                 return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(
-                    device, type, minVertexIndex, numVertices,
-                    primitiveCount, indexData, indexFormat,
+                    device, type, drawMinVertex, numVertices,
+                    primitiveCount, drawIndices, indexFormat,
                     scratch.right.data(), stride);
             };
             return R30ExecuteXyzrhwStereo(
