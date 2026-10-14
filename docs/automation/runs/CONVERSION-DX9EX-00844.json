@@ -1,0 +1,77 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00844",
+  "production_id": "CONVERSION-DX9EX-00844",
+  "event_id": "CONVERSION-DX9EX-00844-E001",
+  "event_type": "c6_result_only",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "1fe1f6266d262b39c48f86ba100664d567ead7e7",
+  "validation_bearing_result_sha": "1d161a18efcfe4ddf3cad318ea6be50102458ac3",
+  "result_sha": "1d161a18efcfe4ddf3cad318ea6be50102458ac3",
+  "feature_contract": {
+    "goal": "Repair stale UI/vehicle-selection DDS sprite scale when a previously replaced xstset slot reloads the original texture, preserving original headers, active slot state and native/fast decoder fallback.",
+    "acceptance_items": [
+      "A successful unmodified/original UI DDS reload clears an older replacement scaling ratio in both fast allocator and original D3DX allocators.",
+      "A valid selected replacement preserves its new scale; failed decoder restores game header/old scale and failed original retry keeps prior live slot untouched.",
+      "Per-method destructive mutations and negative/positive UI DDS loader and visual composition checks pass without weakening scene textures, game input, original D3D9 fallbacks.",
+      "Final exact-SHA Win32 x86 game and x64 OpenXR host/full-chain/package plus Domain Isolation, HUD Inspector, and Full Source Impact all succeed."
+    ]
+  },
+  "acceptance_results": {
+    "successful_original_reload": "SOURCE_VERIFIED",
+    "fallback_and_failed_retry": "SOURCE_VERIFIED",
+    "fast_and_native_allocators": "SOURCE_VERIFIED",
+    "negative_mutation": "PASS",
+    "dx9ex_active_win32_integration": "PASS_5_OF_5",
+    "domain_isolation": "PASS",
+    "hud_inspector": "PASS_2_OF_2",
+    "full_source_impact": "PASS_3_OF_3",
+    "quest3_vdxr_visual": "NEED_HMD_TEST"
+  },
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_hud_dds_loader.py",
+    "tools/verify_vr_visual_composition_p0.py",
+    ".github/workflows/dx9ex-fullsource-impact-review.yml"
+  ],
+  "ci_evidence": {
+    "active_validation": {
+      "run_id": 38576426705,
+      "sha": "1d161a18efcfe4ddf3cad318ea6be50102458ac3",
+      "jobs": "policy/host/game/full-chain-compile/package",
+      "result": "5/5 SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38576426583,
+      "sha": "1d161a18efcfe4ddf3cad318ea6be50102458ac3",
+      "result": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38576426651,
+      "sha": "1d161a18efcfe4ddf3cad318ea6be50102458ac3",
+      "result": "2/2 SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38576426666,
+      "sha": "1d161a18efcfe4ddf3cad318ea6be50102458ac3",
+      "result": "3/3 SUCCESS"
+    }
+  },
+  "runtime_evidence": "No matching OutRun 2006 / Quest3 / VDXR actual runtime test was performed; no visual, FPS, or headset PASS claimed.",
+  "duplication_guard": {
+    "task_id": "CONVERSION-DX9EX-00844",
+    "run_key": "CONVERSION-DX9EX-00844",
+    "score_once": true,
+    "c6_bookkeeping_only": true,
+    "do_not_reaward": true
+  },
+  "score_delta": 0,
+  "c6_score_delta": 0
+}
