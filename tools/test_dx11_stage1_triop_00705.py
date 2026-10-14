@@ -25,8 +25,10 @@ hlsl = ("int4 stage1ArgZero;", "Stage1Source(stage0, diffuse, specular, arg0)",
         "stage1ArgZero.x, stage1Args.x, stage1Args.y",
         "stage1ArgZero.y, stage1Args.z, stage1Args.w",
         "AlphaGate(result.a);")
-uploads = ("static_assert(sizeof(Stage1Upload) == 64u);",
+uploads = ("static_assert(sizeof(Stage1Upload) == 80u);",
            "payload.argZero[i] = static_cast<std::int32_t>(capture.stage1ArgZero[i]);",
+           "float stageConstant[4];", // The triadic arg0 offsets remain intact after new RGBA CB field.
+           "payload.stageConstant);",
            "ctx->PSSetConstantBuffers(1, 1, &combiner)",
            "ctx->DrawIndexed(indexCount, 0, 0);",
            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);")
