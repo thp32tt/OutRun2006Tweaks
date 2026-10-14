@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "feature_id": "LIVE_STAGE1_MATCHED_TEXTURE_ALPHA_MENU_RACE",
   "work_key": "DX11:STAGE1_MATCHED_TEXTURE_ALPHA",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -83,7 +83,50 @@
     "docs/automation/runs/CONVERSION-DX11-00710.json"
   ],
   "base_head_sha": "c8a5194bc434f4e76e5582724c9861fe47aaf6fd",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "next_action": "Run exact-SHA Actions, repair same feature if needed; Quest3/VDXR untested."
+  "material_result_sha": "18d6929712b21e7c1c091ed5aec6bccbfc5ffd1e",
+  "validation_bearing_result_sha": "e0b48a14df18cbacbdd36f7f4a59e33807420b04",
+  "next_action": "00710 5/5 BUILD_VERIFIED, NEED_HMD_TEST only for visual/gamepad promotion; new independent feature delegated to next controller dispatch, DXVK frozen; do not rescore 00710.",
+  "acceptance_results": {
+    "native-game-alpha": "PASS",
+    "fallback": "PASS",
+    "exact-sha": "PASS"
+  },
+  "pipeline": {
+    "C0_RECOVER": "DONE: baseline c8a5194b 00709 exact-SHA closure, DX11 policy and ledger, disjoint Stage1 resource/sampler alpha feature",
+    "C1_REVIEW": "DONE: Stage1 BLENDTEXTUREALPHA lacked game-authored sampler1 capture/native HLSL path, preserve original DX9Ex gamepad fallback",
+    "C2_IMPLEMENT": "DONE: live game Stage1 texture/UV/sampler exact match; native RGB and independent alpha sampled blend plus 400+160 C++ and structural negative regressions",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Fast #38505596404 SUCCESS; Backend #38505596362 validate+smoke SUCCESS; Windows Build #38505600737 SUCCESS; OpenXR #38505600797 SUCCESS; HUD #38505600700 SUCCESS at e0b48a14df18cbacbdd36f7f4a59e33807420b04; Quest3/VDXR/gamepad UNTESTED",
+    "C4_COMMIT": "DONE: original material 18d6929712b21e7c1c091ed5aec6bccbfc5ffd1e; same TASK legacy signature and new negative-check repairs 9cdd596a, a70cf6c, e0b48a14; validation-bearing SHA e0b48a14df18cbacbdd36f7f4a59e33807420b04 (no CI skip)",
+    "C5_PACKAGE": "NOT_REQUIRED: user-controlled runtime deployment and no HMD visual promotion",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED exact-SHA 5/5; separate [skip ci] bookkeeping commit, no runtime promotion"
+  },
+  "gate_evidence": {
+    "initial_material_sha": "18d6929712b21e7c1c091ed5aec6bccbfc5ffd1e",
+    "validation_bearing_sha": "e0b48a14df18cbacbdd36f7f4a59e33807420b04",
+    "exact_sha": true,
+    "dx11_fast_structural_checks": {
+      "id": 38505596404,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38505596362,
+      "conclusion": "SUCCESS",
+      "validation_and_smoke": "PASS"
+    },
+    "windows_build": {
+      "id": 38505600737,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38505600797,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38505600700,
+      "conclusion": "SUCCESS"
+    },
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  },
+  "state_persisted": true
 }
