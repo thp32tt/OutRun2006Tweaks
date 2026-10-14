@@ -99,6 +99,7 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1ModulateColorAddAlpha == D3DTOP_MODULATECOLOR_ADDALPHA &&
               kStage1ModulateInvAlphaAddColor == D3DTOP_MODULATEINVALPHA_ADDCOLOR &&
               kStage1ModulateInvColorAddAlpha == D3DTOP_MODULATEINVCOLOR_ADDALPHA &&
+              kStage1DotProduct3 == D3DTOP_DOTPRODUCT3 &&
               kStage1MultiplyAdd == D3DTOP_MULTIPLYADD &&
               kStage1Lerp == D3DTOP_LERP &&
               kStage1Current == D3DTA_CURRENT &&
@@ -1220,6 +1221,14 @@ float4 Stage1Combine(float4 a, float4 b, int op, float4 stage0, float4 diffuse) 
     if (op == 19) return saturate(a * b + a.aaaa);
     if (op == 20) return saturate(a + (1.0f - a.aaaa) * b);
     if (op == 21) return saturate((1.0f - a) * b + a.aaaa);
+    if (op == 24) {
+        // D3D9 signed DOTPRODUCT3: remap two RGB operands from [0,1] to [-1,1].
+        // Its saturated scalar is RGB only; ALPHAOP below stays independent.
+        float3 signedA = a.rgb * 2.0f - 1.0f;
+        float3 signedB = b.rgb * 2.0f - 1.0f;
+        float signedDot = saturate(dot(signedA, signedB));
+        return float4(signedDot, signedDot, signedDot, signedDot);
+    }
     if (op == 12 || op == 14 || op == 16)
         return saturate(lerp(b, a, Stage1BlendWeight(op, stage0, diffuse)));
     return saturate(a + b * (1.0f - a)); // 11: ADDSMOOTH, CPU-gated

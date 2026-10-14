@@ -36,7 +36,13 @@ constexpr bool stage1_cross_channel_color_operation(std::uint32_t op) noexcept {
 }
 // The two three-input texture transitions are an integrated stage-1 RGB/alpha
 // family. The third D3D9 operand is COLORARG0/ALPHAARG0 (not a stage-1 texture).
-// Dot product and bump-map operations remain fail-closed.
+// Second-texture and bump-map operations remain fail-closed. Signed RGB
+// DOTPRODUCT3 is allowed only with captured Stage1 non-texture operands.
+// D3D9 d3d9types.h: DOTPRODUCT3 is COLOROP-only; ALPHAOP stays separate.
+constexpr std::uint32_t kStage1DotProduct3 = 24u;
+constexpr bool stage1_dotproduct_color_operation(std::uint32_t op) noexcept {
+    return op == kStage1DotProduct3;
+}
 constexpr std::uint32_t kStage1MultiplyAdd = 25u;
 constexpr std::uint32_t kStage1Lerp = 26u;
 constexpr bool stage1_three_source_operation(std::uint32_t op) noexcept {
@@ -78,7 +84,8 @@ constexpr bool stage1_combiner_supported(std::uint32_t operation,
             operation == kStage1AddSigned || operation == kStage1AddSigned2X ||
             operation == kStage1Subtract || operation == kStage1AddSmooth ||
             stage1_alpha_blend_operation(operation) ||
-            stage1_cross_channel_color_operation(operation)) &&
+            (stage1_cross_channel_color_operation(operation) ||
+             stage1_dotproduct_color_operation(operation))) &&
             stage1_operand_supported(arg1) && stage1_operand_supported(arg2);
 }
 constexpr bool stage1_alpha_supported(std::uint32_t operation,
@@ -86,6 +93,7 @@ constexpr bool stage1_alpha_supported(std::uint32_t operation,
                                        std::uint32_t arg2) noexcept {
     return operation == kStage1Disable ||
         (!stage1_cross_channel_color_operation(operation) &&
+         !stage1_dotproduct_color_operation(operation) &&
          stage1_combiner_supported(operation, arg1, arg2));
 }
 // Neither the existing two-source admission nor its unused-argument checks
@@ -249,7 +257,8 @@ constexpr bool stage1_combiner_supported_with_temp(std::uint32_t op,
             op == kStage1AddSigned || op == kStage1AddSigned2X ||
             op == kStage1Subtract || op == kStage1AddSmooth ||
             stage1_alpha_blend_operation(op) ||
-            stage1_cross_channel_color_operation(op)) &&
+            (stage1_cross_channel_color_operation(op) ||
+             stage1_dotproduct_color_operation(op))) &&
             stage1_operand_supported_with_temp(a,true) &&
             stage1_operand_supported_with_temp(b,true);
 }
@@ -257,6 +266,7 @@ constexpr bool stage1_alpha_supported_with_temp(std::uint32_t op,
     std::uint32_t a, std::uint32_t b, bool producerTemp) noexcept {
     return stage1_alpha_supported(op,a,b) ||
         (producerTemp && !stage1_cross_channel_color_operation(op) &&
+         !stage1_dotproduct_color_operation(op) &&
          stage1_combiner_supported_with_temp(op,a,b,true));
 }
 constexpr bool stage1_three_source_supported_with_temp(std::uint32_t op,
@@ -267,6 +277,10 @@ constexpr bool stage1_three_source_supported_with_temp(std::uint32_t op,
         stage1_operand_supported_with_temp(a1,producerTemp) &&
         stage1_operand_supported_with_temp(a2,producerTemp);
 }
+static_assert(stage1_combiner_supported(kStage1DotProduct3,kStage1Current,kStage1Specular));
+static_assert(!stage1_alpha_supported(kStage1DotProduct3,kStage1Current,kStage1Specular));
+static_assert(!stage1_combiner_supported(kStage1DotProduct3,kStage1Current,2u));
+static_assert(!stage1_alpha_supported_with_temp(kStage1DotProduct3,kStage1Temp,kStage1Factor,true));
 static_assert(!stage1_operand_supported(kStage1Temp));
 static_assert(!stage1_operand_supported_with_temp(kStage1Temp,false));
 static_assert(stage1_operand_supported_with_temp(
