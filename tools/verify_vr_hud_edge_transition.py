@@ -22,6 +22,7 @@ def check(s,h):
     ):
         assert token in s, token
     for token in (
+        'distance <= 0.35f',  # guard the 0.35 NDC entry boundary against mutations
         'const float t = (distance - 0.35f) / 0.25f;',
         'return t * t * (3.0f - 2.0f * t);',
         'if (weight == 0.0f)',
