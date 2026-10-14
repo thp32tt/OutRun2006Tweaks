@@ -75,7 +75,8 @@ def verify(hook: str, r30: str, r33: str) -> None:
     assert anis.count("PreserveScreenTextureFiltering()") >= 4
     second = between(anis, "static void destination2(", "\npublic:")
     assert "if (ctx.edi == D3DSAMP_MINFILTER)" in second
-    assert second.index("if (ctx.edi == D3DSAMP_MINFILTER)") < second.index("D3DSAMP_MAXANISOTROPY")
+    assert second.index("if (ctx.edi == D3DSAMP_MINFILTER)") < second.index("ctx.esi = D3DTEXF_ANISOTROPIC;")
+    assert "D3DSAMP_MAXANISOTROPY" not in second  # single setter remains in destination
 
 
 def main() -> None:
