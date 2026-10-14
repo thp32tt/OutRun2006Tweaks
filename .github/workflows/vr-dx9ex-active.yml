@@ -172,6 +172,7 @@ on:
       - 'tools/verify_vr_projected_marker_anchor.py'
       - 'tools/verify_vr_projected_marker_telemetry.py'
       - 'tools/verify_vr_visual_composition_p0.py'
+      - 'tools/verify_vr_stage_extension_d3dx_batch_owner.py'
       - 'tools/audit_vr_result_full_source.py'
       - 'tools/verify_vr_hud_dds_loader.py'
       - 'tools/verify_vr_texture_scene_contract.py'
@@ -228,6 +229,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex HUD edge contract failed' }
           python tools/verify_vr_r30_positiont_decl.py
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex R30 POSITIONT input regression failed' }
+          python tools/verify_vr_stage_extension_d3dx_batch_owner.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex +TIME D3DX batch isolation failed' }
       - name: Reject broken shipped PowerShell helpers and false HUD reports
         shell: pwsh
         run: |

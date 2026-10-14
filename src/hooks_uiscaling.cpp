@@ -2043,123 +2043,321 @@ UIScaling UIScaling::instance;
 // original callsites; never flush unrelated menu, GOAL, +TIME or HUD sprites.
 class VRProjectedD3DXSpriteIsolationR64 : public Hook
 {
-	inline static SafetyHookInline Draw_hk{};
-	inline static std::atomic<std::uint64_t> Flushes{ 0 };
-	inline static std::atomic<std::uint64_t> Failures{ 0 };
+    inline static SafetyHookInline Begin_hk{};
+    inline static SafetyHookInline Draw_hk{};
+    inline static SafetyHookInline Flush_hk{};
+    inline static SafetyHookInline End_hk{};
+    inline static std::atomic<std::uint64_t> Flushes{ 0 };
+    inline static std::atomic<std::uint64_t> Failures{ 0 };
+    inline static std::atomic<std::uint64_t> StageFlushes{ 0 };
+    inline static std::atomic<std::uint64_t> StageFallbacks{ 0 };
 
-	static HRESULT __stdcall DrawDest(
-		void* self, IDirect3DTexture9* texture, const RECT* rect,
-		const D3DVECTOR* center, const D3DVECTOR* pos, D3DCOLOR color)
-	{
-		const HRESULT hr = Draw_hk.stdcall<HRESULT>(
-			self, texture, rect, center, pos, color);
-		if (FAILED(hr) || !self ||
-			!OutRunVR::GameSemantic::QueueRenderActive())
-			return hr;
+    // A D3DXSprite::Draw may queue triangles until Flush/End. A source-call
+    // scope is NOT sufficient ownership for a deferred GPU Draw. We only
+    // isolate +TIME on a known, single-owner active Begin/Draw batch, never
+    // reassign an unknown pre-hook/mixed buffer to ScreenHud.
+    inline static thread_local void* TrackedSprite = nullptr;
+    inline static thread_local bool BatchActive = false;
+    inline static thread_local bool PendingHomogeneous = true;
+    inline static thread_local bool StageBoundaryReady = false;
+    inline static thread_local unsigned PendingDraws = 0;
+    inline static thread_local OutRunVR::GameSemantic::RenderScope PendingScope =
+        OutRunVR::GameSemantic::RenderScope::None;
+    inline static thread_local OutRunVR::GameSemantic::ProducerToken PendingProducer =
+        OutRunVR::GameSemantic::ProducerToken::None;
 
-		const auto scope = OutRunVR::GameSemantic::EffectiveScope();
-		const auto* marker =
-			OutRunVR::GameSemantic::CurrentProjectedMarker();
-		const auto source =
-			OutRunVR::GameSemantic::CurrentQueueProducerToken();
-		// Modern R84 also uses ProjectedWorldMarker2D for the rival-car
-		// icon, which was already HMD-correct and must NOT receive an
-		// unrelated new Flush. R64's old broad projected scope was
-		// primarily the car rank 1..5 owner; here prove the exact original
-		// rank E8 source to avoid widening the restored old batch policy.
-		const bool projectedRank =
-			OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
-				scope) && marker && marker->valid &&
-			(source ==
-				OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||
-				source ==
-				OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite);
-		const bool dispRankHud =
-			OutRunVR::GameSemantic::CorroboratesHud(scope) &&
-			(source ==
-				OutRunVR::GameSemantic::ProducerToken::DispRankFirst ||
-				source ==
-				OutRunVR::GameSemantic::ProducerToken::DispRankClipSprite);
-		if (!projectedRank && !dispRankHud)
-			return hr;
+    static bool IsExactSprite(void* self) noexcept
+    {
+        return self && self == *Module::exe_ptr<void*>(0x55B218);
+    }
 
-		void** vtable = *reinterpret_cast<void***>(self);
-		if (!vtable || !vtable[10])
-			return hr;
+    static bool StageOwner(
+        OutRunVR::GameSemantic::RenderScope scope,
+        OutRunVR::GameSemantic::ProducerToken source) noexcept
+    {
+        return scope == OutRunVR::GameSemantic::RenderScope::ScreenHud &&
+            source == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime;
+    }
 
-		using FlushFn = HRESULT(__stdcall*)(void*);
-		const HRESULT flushHr =
-			reinterpret_cast<FlushFn>(vtable[10])(self);
-		const auto count = Flushes.fetch_add(
-			1, std::memory_order_relaxed) + 1;
-		if (FAILED(flushHr))
-			Failures.fetch_add(1, std::memory_order_relaxed);
-		if ((count & (count - 1)) == 0)
-			spdlog::info(
-				"VR R64 D3DX ISOLATE RESTORED: owner={} producer={} flushes={} failures={} markerValid={}",
-				projectedRank ? "projected-rank" : "disprank-hud",
-				OutRunVR::GameSemantic::Name(source),
-				count, Failures.load(std::memory_order_relaxed),
-				marker && marker->valid ? 1 : 0);
-		return hr;
-	}
+    static void ForgetBatch() noexcept
+    {
+        PendingDraws = 0;
+        PendingHomogeneous = true;
+        PendingScope = OutRunVR::GameSemantic::RenderScope::None;
+        PendingProducer = OutRunVR::GameSemantic::ProducerToken::None;
+    }
 
-	static DWORD WINAPI InstallThread(void*)
-	{
-		// This is the original HMD-verified R64 D3DXSprite pointer/ABI and
-		// method layout on the canonical replacement EXE, not a global
-		// ID3DXSprite trampoline for unrelated assets.
-		for (int attempt = 0; attempt < 7200; ++attempt)
-		{
-			void* sprite = *Module::exe_ptr<void*>(0x55B218);
-			if (sprite)
-			{
-				void** vtable = *reinterpret_cast<void***>(sprite);
-				if (vtable && vtable[9] && vtable[10])
-				{
-					const auto disabled =
-						safetyhook::InlineHook::StartDisabled;
-					Draw_hk = safetyhook::create_inline(
-						vtable[9], reinterpret_cast<void*>(&DrawDest),
-						disabled);
-					if (Draw_hk && Draw_hk.enable().has_value())
-					{
-						spdlog::info(
-							"VR R64 D3DX ISOLATE RESTORED: only projected rank + exact DispRank kind0/kind1 post-Draw Flush; result/+TIME and generic HUD excluded");
-						return 0;
-					}
-					Draw_hk = {};
-				}
-			}
-			Sleep(25);
-		}
-		spdlog::warn(
-			"VR R64 D3DX ISOLATE: exact ID3DXSprite Draw hook unavailable; original no-flush behavior retained");
-		return 0;
-	}
+    static HRESULT __stdcall BeginDest(void* self, DWORD flags)
+    {
+        const HRESULT hr = Begin_hk.stdcall<HRESULT>(self, flags);
+        if (IsExactSprite(self))
+        {
+            TrackedSprite = self;
+            BatchActive = SUCCEEDED(hr);
+            StageBoundaryReady = false;
+            ForgetBatch();
+        }
+        return hr;
+    }
+
+    static HRESULT __stdcall FlushDest(void* self)
+    {
+        const HRESULT hr = Flush_hk.stdcall<HRESULT>(self);
+        if (self == TrackedSprite)
+        {
+            if (SUCCEEDED(hr))
+                ForgetBatch();
+            else
+            {
+                // A failed flush is not proof that the old draw buffer was
+                // submitted. Preserve the game HRESULT and cease promotion.
+                BatchActive = false;
+                StageBoundaryReady = false;
+            }
+        }
+        return hr;
+    }
+
+    static HRESULT __stdcall EndDest(void* self)
+    {
+        const HRESULT hr = End_hk.stdcall<HRESULT>(self);
+        if (self == TrackedSprite)
+        {
+            BatchActive = false;
+            StageBoundaryReady = false;
+            ForgetBatch();
+        }
+        return hr;
+    }
+
+    static bool FlushTracked(void* self) noexcept
+    {
+        if (!BatchActive || self != TrackedSprite)
+            return false;
+        void** vtable = *reinterpret_cast<void***>(self);
+        if (!vtable || !vtable[10])
+            return false;
+        using FlushFn = HRESULT(__stdcall*)(void*);
+        return SUCCEEDED(reinterpret_cast<FlushFn>(vtable[10])(self));
+    }
 
 public:
-	std::string_view description() override
-	{
-		return "VRProjectedD3DXSpriteIsolationR64";
-	}
-	bool validate() override
-	{
-		return Settings::VREnabled.get();
-	}
-	bool apply() override
-	{
-		HANDLE thread = CreateThread(
-			nullptr, 0, InstallThread, nullptr, 0, nullptr);
-		if (!thread)
-			return false;
-		CloseHandle(thread);
-		return true;
-	}
-	static VRProjectedD3DXSpriteIsolationR64 instance;
+    // Called BEFORE SelectSpriteQueueNode replaces the outgoing producer.
+    // Any prior homogeneous batch flushes under its ORIGINAL queue owner;
+    // only then may the incoming +TIME owner start a separate batch.
+    static void BeforeQueueNode(const void* nextNode) noexcept
+    {
+        using namespace OutRunVR::GameSemantic;
+        ProducerToken nextProducer = ProducerToken::None;
+        const auto nextScope =
+            PeekSpriteNodeScope(nextNode, RenderScope::None, &nextProducer);
+        const bool enteringStage = StageOwner(nextScope, nextProducer);
+        const bool leavingStage = QueueRenderActive() &&
+            StageOwner(EffectiveScope(), CurrentRenderProducerToken());
+        if (enteringStage == leavingStage)
+            return;
+
+        void* sprite = *Module::exe_ptr<void*>(0x55B218);
+        if (!BatchActive || sprite != TrackedSprite)
+        {
+            StageBoundaryReady = false;
+            return;
+        }
+        if (PendingDraws != 0)
+        {
+            // First-node/past-frame and mixed-owner buffers cannot be
+            // reassigned safely; leave the original D3DX batching untouched.
+            if (!QueueRenderActive() || !PendingHomogeneous ||
+                PendingScope != EffectiveScope() ||
+                PendingProducer != CurrentRenderProducerToken() ||
+                !FlushTracked(sprite))
+            {
+                StageBoundaryReady = false;
+                StageFallbacks.fetch_add(1, std::memory_order_relaxed);
+                return;
+            }
+            StageFlushes.fetch_add(1, std::memory_order_relaxed);
+        }
+        StageBoundaryReady = enteringStage;
+    }
+
+    static void BeforeQueueEnd() noexcept
+    {
+        using namespace OutRunVR::GameSemantic;
+        if (StageBoundaryReady && QueueRenderActive() &&
+            StageOwner(EffectiveScope(), CurrentRenderProducerToken()) &&
+            PendingDraws != 0 && PendingHomogeneous &&
+            PendingScope == EffectiveScope() &&
+            PendingProducer == CurrentRenderProducerToken())
+        {
+            if (FlushTracked(TrackedSprite))
+                StageFlushes.fetch_add(1, std::memory_order_relaxed);
+            else
+                StageFallbacks.fetch_add(1, std::memory_order_relaxed);
+        }
+        StageBoundaryReady = false;
+    }
+
+private:
+    static HRESULT __stdcall DrawDest(
+        void* self, IDirect3DTexture9* texture, const RECT* rect,
+        const D3DVECTOR* center, const D3DVECTOR* pos, D3DCOLOR color)
+    {
+        const HRESULT hr = Draw_hk.stdcall<HRESULT>(
+            self, texture, rect, center, pos, color);
+        if (FAILED(hr) || !self)
+            return hr;
+
+        using namespace OutRunVR::GameSemantic;
+        const auto scope = EffectiveScope();
+        const auto source = CurrentRenderProducerToken();
+        if (BatchActive && self == TrackedSprite)
+        {
+            if (PendingDraws == 0)
+            {
+                PendingScope = scope;
+                PendingProducer = source;
+                PendingHomogeneous = true;
+            }
+            else if (PendingScope != scope || PendingProducer != source)
+            {
+                PendingHomogeneous = false;
+            }
+            if (PendingDraws != ~0u)
+                ++PendingDraws;
+        }
+
+        // Entire +TIME stage sprite queue: the pre-node boundary already
+        // submitted the previous producer's homogeneous D3DX batch BEFORE
+        // the stage tag became active. Submit this stage batch while the
+        // exact queue owner still exists; a later End cannot head-lock it.
+        // Numeric direct glyph callers retain their existing exact scope;
+        // never silently adopt their unknown preceding D3DX buffer.
+        if (QueueRenderActive() && StageBoundaryReady &&
+            BatchActive && self == TrackedSprite &&
+            StageOwner(scope, source) && PendingHomogeneous &&
+            PendingScope == scope && PendingProducer == source)
+        {
+            if (FlushTracked(self))
+            {
+                const auto n = StageFlushes.fetch_add(
+                    1, std::memory_order_relaxed) + 1;
+                if ((n & (n - 1)) == 0)
+                    spdlog::info(
+                        "VR P0 +TIME D3DX batch: exact queued stage separated; flushes={} fallback={}",
+                        n, StageFallbacks.load(std::memory_order_relaxed));
+            }
+            else
+            {
+                StageBoundaryReady = false;
+                StageFallbacks.fetch_add(1, std::memory_order_relaxed);
+            }
+            return hr;
+        }
+
+        // Preserve HMD-verified R64 rank isolation unchanged in scope.
+        if (!QueueRenderActive())
+            return hr;
+        const auto* marker = CurrentProjectedMarker();
+        const auto queuedSource = CurrentQueueProducerToken();
+        const bool projectedRank =
+            CorroboratesProjectedWorldMarker(scope) && marker && marker->valid &&
+            (queuedSource == ProducerToken::RankMarkerSprani ||
+             queuedSource == ProducerToken::RankMarkerClipSprite);
+        const bool dispRankHud =
+            CorroboratesHud(scope) &&
+            (queuedSource == ProducerToken::DispRankFirst ||
+             queuedSource == ProducerToken::DispRankClipSprite);
+        if (!projectedRank && !dispRankHud)
+            return hr;
+
+        void** vtable = *reinterpret_cast<void***>(self);
+        if (!vtable || !vtable[10])
+            return hr;
+        using FlushFn = HRESULT(__stdcall*)(void*);
+        const HRESULT flushHr = reinterpret_cast<FlushFn>(vtable[10])(self);
+        const auto count = Flushes.fetch_add(
+            1, std::memory_order_relaxed) + 1;
+        if (FAILED(flushHr))
+            Failures.fetch_add(1, std::memory_order_relaxed);
+        if ((count & (count - 1)) == 0)
+            spdlog::info(
+                "VR R64 D3DX ISOLATE RESTORED: owner={} producer={} flushes={} failures={} markerValid={}",
+                projectedRank ? "projected-rank" : "disprank-hud",
+                Name(queuedSource), count,
+                Failures.load(std::memory_order_relaxed),
+                marker && marker->valid ? 1 : 0);
+        return hr;
+    }
+
+    static DWORD WINAPI InstallThread(void*)
+    {
+        for (int attempt = 0; attempt < 7200; ++attempt)
+        {
+            void* sprite = *Module::exe_ptr<void*>(0x55B218);
+            if (sprite)
+            {
+                void** vtable = *reinterpret_cast<void***>(sprite);
+                if (vtable && vtable[8] && vtable[9] &&
+                    vtable[10] && vtable[11])
+                {
+                    const auto disabled =
+                        safetyhook::InlineHook::StartDisabled;
+                    Begin_hk = safetyhook::create_inline(
+                        vtable[8], reinterpret_cast<void*>(&BeginDest), disabled);
+                    Draw_hk = safetyhook::create_inline(
+                        vtable[9], reinterpret_cast<void*>(&DrawDest), disabled);
+                    Flush_hk = safetyhook::create_inline(
+                        vtable[10], reinterpret_cast<void*>(&FlushDest), disabled);
+                    End_hk = safetyhook::create_inline(
+                        vtable[11], reinterpret_cast<void*>(&EndDest), disabled);
+                    if (Begin_hk && Draw_hk && Flush_hk && End_hk &&
+                        Begin_hk.enable().has_value() &&
+                        Flush_hk.enable().has_value() &&
+                        End_hk.enable().has_value() &&
+                        Draw_hk.enable().has_value())
+                    {
+                        spdlog::info(
+                            "VR R64 D3DX: exact +TIME queue batch boundary plus original rank isolate; unknown/mixed batches fail closed");
+                        return 0;
+                    }
+                    // Hook installation is atomic: no partially active
+                    // Begin/Draw/Flush/End ownership on failure.
+                    Draw_hk = {};
+                    End_hk = {};
+                    Flush_hk = {};
+                    Begin_hk = {};
+                }
+            }
+            Sleep(25);
+        }
+        spdlog::warn(
+            "VR R64 D3DX: exact sprite Begin/Draw/Flush/End hooks unavailable; original no-flush behavior retained");
+        return 0;
+    }
+
+public:
+    std::string_view description() override
+    {
+        return "VRProjectedD3DXSpriteIsolationR64";
+    }
+    bool validate() override
+    {
+        return Settings::VREnabled.get();
+    }
+    bool apply() override
+    {
+        HANDLE thread = CreateThread(
+            nullptr, 0, InstallThread, nullptr, 0, nullptr);
+        if (!thread)
+            return false;
+        CloseHandle(thread);
+        return true;
+    }
+    static VRProjectedD3DXSpriteIsolationR64 instance;
 };
 VRProjectedD3DXSpriteIsolationR64
-	VRProjectedD3DXSpriteIsolationR64::instance;
+    VRProjectedD3DXSpriteIsolationR64::instance;
 
 // VR semantic bridge for the game's canonical queued 2D renderer.
 // Canonical replacement EXE SHA256:
@@ -2182,12 +2380,14 @@ class VRHudQueueSemanticBridge : public Hook
 
 	static void QueueNode(SafetyHookContext& ctx)
 	{
-		OutRunVR::GameSemantic::SelectSpriteQueueNode(
-			reinterpret_cast<const void*>(ctx.edi));
+        const void* node = reinterpret_cast<const void*>(ctx.edi);
+        VRProjectedD3DXSpriteIsolationR64::BeforeQueueNode(node);
+		OutRunVR::GameSemantic::SelectSpriteQueueNode(node);
 	}
 
 	static void QueueEnd(SafetyHookContext&)
 	{
+        VRProjectedD3DXSpriteIsolationR64::BeforeQueueEnd();
 		OutRunVR::GameSemantic::EndSpriteQueueRender();
 	}
 
