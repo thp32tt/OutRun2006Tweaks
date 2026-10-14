@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULL_GAME_PRE_DRAW_SEPARATE_Z_CLEAR",
   "feature_id": "DX11-FULL-GAME-PRE_DRAW-SEPARATE-Z-CLEAR",
-  "status": "C4_MATERIAL_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -78,7 +78,7 @@
   "acceptance_results": {
     "A1": "SOURCE_IMPLEMENTED",
     "A2": "SOURCE_IMPLEMENTED",
-    "A3": "CI_PENDING"
+    "A3": "PASS_EXACT_SHA"
   },
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -89,5 +89,35 @@
     "docs/automation/runs/CONVERSION-DX11-00734.json"
   ],
   "packaging_status": "NOT_REQUIRED",
-  "runtime_gate": "NEED_HMD_TEST"
+  "runtime_gate": "NEED_HMD_TEST",
+  "material_result_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708",
+  "validation_bearing_result_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708",
+  "ci_evidence": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38590405531,
+      "status": "success",
+      "head_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38590405495,
+      "status": "success",
+      "head_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708"
+    },
+    "Build": {
+      "run_id": 38590414967,
+      "status": "success",
+      "head_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38590414896,
+      "status": "success",
+      "head_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38590415078,
+      "status": "success",
+      "head_sha": "7015fbebf44c1c62e4295dab17e116cb8882e708"
+    }
+  },
+  "validation_note": "Five mandatory GitHub Gate runs passed for the exact material commit. No Quest3/VDXR/gamepad runtime run; no backend promotion."
 }
