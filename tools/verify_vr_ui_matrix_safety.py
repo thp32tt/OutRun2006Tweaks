@@ -218,10 +218,10 @@ def require_atomic_custom_matrix(source: str) -> None:
         "FAILED(descHr) || v25.Width == 0 || v25.Height == 0",
         "const std::size_t base = i * 7;",
         "!std::isfinite(quad[base])",
-        "!std::isfinite(quad[base + 1])",
+        "!std::isfinite(quad[base + 1]) ||",
         "!std::isfinite(quad[base + 2])",
         "!std::isfinite(quad[base + 5])",
-        "!std::isfinite(quad[base + 6])",
+        "!std::isfinite(quad[base + 6]))",
         "std::copy(quad.begin(), quad.end(), g_spriteVertexStream);",
         "device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2u, g_spriteVertexStream, 0x1Cu);",
     ):
