@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULLFRAME_PARTITIONED_PRESENT",
   "feature_id": "DX11-MENU-RACE-NATIVE-PARTITIONED-DIRTY-PRESENT",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -93,12 +93,52 @@
     "C0_RECOVER": "PASS branch 21750d512a69cad3404670d170b395c409aa1cc8, 00748 C6 verified, 00749 absent",
     "C1_REVIEW": "PASS single full dirty rectangle already supported, partitioned exact union rejected by nCount==1",
     "C2_IMPLEMENT": "PASS C++ game path+geometry+positive/negative probes",
-    "C3_VALIDATE": "GitHub DX11 Fast #38647656559 FAILED inherited 00748 destructive RDH_RECTANGLES condition search allowed the new partition branch to mask a mutation; repaired to assert original one-RECT path before memcpy. New exact-SHA Gates pending.",
-    "C4_COMMIT": "MATERIAL: badb7e108e99e9d8e7816616e6785bbd982432f7; verifier repair material pending new SHA.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: inherited single-RECT mutation verifier repaired after Fast #38647656559 failure; exact SHA ea717d6e8b2d660f4d95d8c3c20e599396f36be8 DX11 Fast #38647792443, Backend #38647792406, Windows Build #38647798966, OpenXR #38647798867, HUD #38647798876 all SUCCESS.",
+    "C4_COMMIT": "MATERIAL badb7e108e99e9d8e7816616e6785bbd982432f7; validation-bearing verifier-repair commit ea717d6e8b2d660f4d95d8c3c20e599396f36be8.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "AWAIT_EXACT_SHA"
+    "C6_STATE": "PASS_EXACT_SHA: exact validation SHA ea717d6e8b2d660f4d95d8c3c20e599396f36be8 GitHub required CI 5/5 SUCCESS; separate [skip ci] bookkeeping; HMD/gamepad runtime UNTESTED."
   },
-  "next_action": "Verify new exact validation-bearing SHA in five required GitHub Actions; no CI-skip; Quest3/VDXR runtime UNTESTED.",
-  "recorded_at_kst": "2026-10-15 07:24 KST",
-  "blocking_evidence": "Fast #38647656559 failure in tools/test_dx11_full_dirty_present_00748.py assertion: RDH_RECTANGLES: source acquired a second safe D3D9 multi-RECT partition check, and inherited test did not constrain search to the original single-RECT branch."
+  "next_action": "C6 exact-SHA build verification recorded. HMD/gamepad runtime remains UNTESTED; packaging by user. No source modification or CI rerun required.",
+  "recorded_at_kst": "2026-10-15 07:51 KST",
+  "blocking_evidence": "Fast #38647656559 failure in tools/test_dx11_full_dirty_present_00748.py assertion: RDH_RECTANGLES: source acquired a second safe D3D9 multi-RECT partition check, and inherited test did not constrain search to the original single-RECT branch.",
+  "material_result_sha": "badb7e108e99e9d8e7816616e6785bbd982432f7",
+  "validation_bearing_result_sha": "ea717d6e8b2d660f4d95d8c3c20e599396f36be8",
+  "ci_evidence": {
+    "initial_sha": {
+      "sha": "badb7e108e99e9d8e7816616e6785bbd982432f7",
+      "fast": {
+        "run_id": 38647656559,
+        "conclusion": "failure",
+        "failure_cause": "inherited 00748 RDH_RECTANGLES mutation verifier mismatch, repaired in validation-bearing commit"
+      }
+    },
+    "exact_sha": {
+      "sha": "ea717d6e8b2d660f4d95d8c3c20e599396f36be8",
+      "conclusion": "success",
+      "result_basis": "GitHub connector independently verified all five required workflow runs with exact matching head_sha.",
+      "verified_runs": {
+        "dx11_fast": {
+          "run_id": 38647792443,
+          "conclusion": "success"
+        },
+        "backend_conversion": {
+          "run_id": 38647792406,
+          "conclusion": "success"
+        },
+        "windows_build": {
+          "run_id": 38647798966,
+          "conclusion": "success"
+        },
+        "openxr_architecture": {
+          "run_id": 38647798867,
+          "conclusion": "success"
+        },
+        "hud_inspector": {
+          "run_id": 38647798876,
+          "conclusion": "success"
+        }
+      }
+    }
+  },
+  "c6_prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
