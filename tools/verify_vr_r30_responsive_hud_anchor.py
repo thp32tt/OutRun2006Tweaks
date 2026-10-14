@@ -161,7 +161,7 @@ print("PASS nested driving text owner, classified GOAL/world exclusions and 3 de
 # The exact gear/REV clips are appended-only and cannot alter pre-existing
 # numeric token identities or the R64 kind0/kind1 post-Draw Flush owner.
 for exact in (
-    "Game::current_mode &&" if False else "*Game::current_mode != GameState::STATE_GAME",
+    "*Game::current_mode != GameState::STATE_GAME",
     "RenderScope::ScreenHud",
     "Token::OutRunHudPeripheralText",
     "Token::DispRankFirst",
@@ -184,7 +184,10 @@ assert "Game::put_clip_sprite(" in left
 assert "TagAppendedNodes(before," in left
 assert "ProducerToken::DispGearRevClipSprite" in left
 assert "return ExactScreenHud_putClipSprite(" not in left
-assert "ExactScreenHudLeft_ClipSpriteCalls[] = { 0xB9096, 0xB90B3 };" in producer
+assert "ExactScreenHudLeft_ClipSpriteCalls[] = {" in producer
+left_calls = producer[producer.index("ExactScreenHudLeft_ClipSpriteCalls[] = {"):]
+left_calls = left_calls[:left_calls.index("};")]
+assert "0xB9096, 0xB90B3" in left_calls
 assert "Module::exe_ptr(addr), ExactScreenHudLeft_putClipSprite" in producer
 for mode, scope, tok, expected in (
     ("GAME","ScreenHud","OutRunHudPeripheralText",True),
