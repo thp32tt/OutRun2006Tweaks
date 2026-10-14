@@ -1,0 +1,94 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00867",
+  "production_id": "CONVERSION-DX9EX-00867",
+  "event_id": "CONVERSION-DX9EX-00867-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00867",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Keep the entire user-visible +TIME extension decoration and numeral animation owned by one original ScreenHud producer from all six exact EXE E8 sources through synchronous D3DX deferred GPU flush, sibling SpriteNode queue and both-eye stereo composition; never inherit unrelated batches.",
+    "scope_boundary": "Only six original stage-extension caller parents, their exact StageExtensionTime Draw/Flush and queued sprites. Never flush generic HUD, GOAL results, rival markers, F11, SkyGlow, DX11, DXVK, game clock or mixed/foreign texture batches.",
+    "trace_stages": [
+      "Original sprite E8 0x9898E/0x98A36/0x98AC6 and numeric E8 0x989AD/0x98A10/0x98A89 bracket direct source and append queued sprites.",
+      "Direct ScopedExactProducerSemantic and D3DX Begin/Draw/Flush/End attach StageExtensionTime/ScreenHud; exit closes remaining homogeneous same-owner GPU batch before previous owner resumes, while queue path retains exact node ownership.",
+      "Selected R26+HUD packaged game renderer consumes original ScreenHud c64/vertex forms and applies left/right eye projection; OpenXR host remains separate and original gameplay timer is not modified."
+    ],
+    "subcomponents": [
+      "Prevent deferred D3DX +TIME numerals from leaking into next original producer by flushing only tracked homogeneous exact stage batches under the current source before its RAII unwind.",
+      "Keep old-owner-first pre-source split, six exact sibling source tags, queue flush boundaries, device loss/reset invalidation and original D3DX errors and fail-closed behavior; exercise positive and negative portable/mutation guards."
+    ],
+    "acceptance_items": [
+      {
+        "id": "direct_source_exit",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Synchronous numeric +TIME original caller and GPU batch exit",
+        "expected_behavior": "A pending homogeneous StageExtensionTime D3DX batch is submitted inside the exact source lifetime and never after restoring the prior world/HUD owner."
+      },
+      {
+        "id": "queued_siblings",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Queued sprite and numeric sibling submissions",
+        "expected_behavior": "All six original source tags remain ScreenHud; exact queue owner overrides nested producer; no generic D3DX promotion."
+      },
+      {
+        "id": "foreign_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Other producers, failed D3DX/Reset, mixed and foreign sprites",
+        "expected_behavior": "Do not flush mixed/unknown/outgoing world or GOAL batches, and retain original End/HRESULT, FFB, SkyGlow and gameplay timer."
+      },
+      {
+        "id": "integration",
+        "category": "integrated_validation",
+        "behavior_area": "Required same SHA Win32 DX9Ex game, x64 host, shipped package, Domain and affected source gates",
+        "expected_behavior": "All required GitHub Actions succeed on one validation SHA before BUILD_VERIFIED; physical Quest3/VDXR acceptance remains independently UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Current R64 D3DX Draw runs the original ID3DXSprite Draw first and marks batches after it returns. Initial call-entry drains prior producer and Draw attempts exact immediate Flush, but StageExtensionLeave resets direct producer without any final submission gate for a still-pending homogeneous +TIME batch.",
+    "root_cause": "Source-confirmed lifecycle gap: D3DX deferred submission can outlive its exact direct E8 owner if a same-owner batch remains at the end of a numeric source call; whether this caused the user-visible +TIME optical duplication requires actual game/HMD verification.",
+    "source_trace": [
+      "All six E8 original parents share StageExtensionEnter/Leave and capture existing queued SpriteNode siblings.",
+      "Existing R64 vtable Begin/Draw/Flush/End hook tracks homogeneous PendingScope and PendingProducer but the source Leave restored direct semantic without checking leftover pending D3DX Draws.",
+      "New direct source exit calls AfterDirectStageSource before RAII cleanup; the strict portable predicate admits only active exact GameSprite, nonqueue, nonzero homogeneous StageExtensionTime/ScreenHud scope/source and successful Flush."
+    ],
+    "alternatives_rejected": [
+      "Do not add an unconditional ID3DXSprite Flush on every Draw, reclassify unknown batches, alter time logic, drop effects or borrow GOAL/world producer ownership."
+    ],
+    "fix_evidence": "Added exact source-exit batch flush in hooks_uiscaling and CanFlushD3DXDirectStageAtExit in render_semantics; previous entry and queue boundaries remain intact.",
+    "negative_test_evidence": "Portable C++ positive and eight negative source-exit cases, constexpr compile-time cases, and Python mutation guards for missing exit flush, owner order, mixed batch and wrong source.",
+    "eye_ownership": "R26_HUD_COMPARE=ON packages stereo_renderer_r30_r26_safe and preserves existing original ScreenHud c64/left-right eye routes; no optical HMD claim without Quest3."
+  },
+  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "phase": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "No original game or Quest3/VDXR run during task. Visible +TIME sprite/numeric stereo correction and timing remain NEED_HMD_TEST.",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "vrhost/tests/stage_extension_direct_owner_smoke.cpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00867.json"
+  ],
+  "acceptance_results": {
+    "direct_source_exit": "PENDING_CI",
+    "queued_siblings": "PENDING_CI",
+    "foreign_fallback": "PENDING_CI",
+    "integration": "PENDING_CI"
+  },
+  "material_result_sha": "e2a20e4d09a6de980b15840cb0715ef4c8c28a11",
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "continuation_feature_note": "Same DX9EX:VIS:EXTENDED_TIME as previous material tasks; no duplicate completion or point on this source checkpoint.",
+  "source_parent_sha": "800269103ce137b4292127af03bc29a494fc5c05"
+}
