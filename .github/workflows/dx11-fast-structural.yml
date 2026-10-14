@@ -111,6 +111,7 @@ jobs:
           python tools/test_dx11_game_dynamic_texture_00694.py
           python tools/test_dx11_eye_msaa_resolve_00695.py
           python tools/test_dx11_game_scene_boundary_00696.py
+          python tools/test_dx11_failed_clear_boundary_00729.py
           python tools/test_dx11_game_present_crop_00698.py
           python tools/test_dx11_full_frame_fallback_00724.py
           python tools/test_dx11_full_frame_same_present_00726.py

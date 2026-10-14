@@ -547,19 +547,23 @@ namespace OutRunVRStereo
 		{
 			if (!IsGameDevice(device) || InternalStereoPass)
 				return R9ClearCallbackHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
+			// Only the successful original D3D9 Clear invalidates earlier native
+			// color/depth. A failed menu/race Clear leaves the real D3D9 Draw
+			// stream intact, so its DX11 mirror must remain publishable as well.
+			// Keep the scene boundary BEFORE successful color-Clear seeding,
+			// including full tiled Clears that restart post-Clear native Draws.
 			auto finishNativeClear = [&](HRESULT result) noexcept -> HRESULT {
-				if (SUCCEEDED(result) && (flags & D3DCLEAR_TARGET))
-					outrun::vr::dx11::live_game_frame::observe_game_clear(
-						device, count, rects, flags, color);
+				if (SUCCEEDED(result)) {
+					// Zero-flags Clears do not change game color/depth/stencil.
+					if ((flags & (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |
+						D3DCLEAR_STENCIL)) != 0u)
+						outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);
+					if (flags & D3DCLEAR_TARGET)
+						outrun::vr::dx11::live_game_frame::observe_game_clear(
+							device, count, rects, flags, color);
+				}
 				return result;
 			};
-			// The next game scene starts with this Clear. Do not publish native
-			// Draws from the previous scene, even if the batch had reached its cap.
-			// D3D9 Clear with no color/depth/stencil flags cannot mutate the
-			// native game's framebuffer; do not abort a complete Draw batch.
-			if ((flags & (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |
-				D3DCLEAR_STENCIL)) != 0u)
-				outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);
 			++R9ClearCalls;
 			const bool wanted = StereoWanted();
 			const bool mainTarget = TargetIsBackBuffer();

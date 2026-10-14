@@ -42,8 +42,10 @@ def connected(b, c, h, r):
         "live_game_frame::observe_scene_boundary(device)" in rt,
         "if (!IsGameDevice(device) || InternalStereoPass)" in clear,
         "live_game_frame::observe_scene_boundary(device)" in clear,
-        0 <= clear.find("live_game_frame::observe_scene_boundary(device)") <
-            clear.find("++R9ClearCalls;"),
+        0 <= clear.find("if (SUCCEEDED(result)) {") <
+            clear.find("live_game_frame::observe_scene_boundary(device)") <
+            clear.find("live_game_frame::observe_game_clear(") <
+            clear.find("return result;"),
         "void observe_scene_boundary(IDirect3DDevice9* gameDevice) noexcept;" in h,
         "if (!diagnostic_enabled() || !game) return;" in event,
         "s.sourceGameDevice != reinterpret_cast<std::uintptr_t>(game)" in event,
@@ -63,7 +65,7 @@ for name, body, token in (
     ("rt0 canonical COM alias", hook, "previousIdentity != nextIdentity"),
     ("rt0 identity lifetime", hook, "if (nextIdentity) nextIdentity->Release();"),
     ("zero-flags Clear survives", hook, "if ((flags & (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |"),
-    ("clear event", hook, "outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);\n\t\t\t++R9ClearCalls;"),
+    ("clear event", hook, "outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);\n\t\t\t\t\tif (flags & D3DCLEAR_TARGET)"),
     ("gpu boundary discard", bridge, "s.frameBatch.scene_boundary();"),
     ("pending upload discard", bridge, "s.pending = false;\n    } catch (...)"),
     ("frame-batch stop", batch, "if (submitted != 0u) stopped = true;"),
