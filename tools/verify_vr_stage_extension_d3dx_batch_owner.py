@@ -56,7 +56,7 @@ def check(code: str, header: str) -> list[str]:
     lifecycle_end = hook.find("static bool FlushTracked(", lifecycle_start)
     lifecycle = hook[lifecycle_start:lifecycle_end] if (
         lifecycle_start >= 0 and lifecycle_end > lifecycle_start) else ""
-    need("if (!IsExactSprite(self))" in lifecycle and
+    need("if (!wasExactGameSprite)" in lifecycle and
          "BatchActive = false;" in lifecycle and
          "StageBoundaryReady = false;" in lifecycle and
          "ForgetBatch();" in lifecycle and
@@ -64,10 +64,11 @@ def check(code: str, header: str) -> list[str]:
          "only exact D3DX sprite may invalidate stale device-loss batch")
     for method, slot in (("LostDevice", 12), ("ResetDevice", 13)):
         need(f"static HRESULT __stdcall {method}Dest(void* self)" in lifecycle and
-             (f"const HRESULT hr = {method}_hk.stdcall<HRESULT>(self);\n"
-              "        InvalidateForDeviceLifecycle(self);\n"
+             (f"const bool wasExactGameSprite = IsExactSprite(self);\n"
+              f"        const HRESULT hr = {method}_hk.stdcall<HRESULT>(self);\n"
+              "        InvalidateForDeviceLifecycle(wasExactGameSprite);\n"
               "        return hr;") in lifecycle and
-             lifecycle.count("InvalidateForDeviceLifecycle(self);") == 2 and
+             lifecycle.count("InvalidateForDeviceLifecycle(wasExactGameSprite);") == 2 and
              f"vtable[{slot}]" in hook and
              f"reinterpret_cast<void*>(&{method}Dest)" in hook and
              f"{method}_hk.enable().has_value()" in hook and
@@ -209,34 +210,46 @@ def main() -> int:
         "lost-device-invalidates-no-batch":
             code.replace(
                 "const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);\n"
-                "        InvalidateForDeviceLifecycle(self);",
+                "        InvalidateForDeviceLifecycle(wasExactGameSprite);",
                 "const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);", 1),
         "reset-device-invalidates-no-batch":
             code.replace(
                 "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);\n"
-                "        InvalidateForDeviceLifecycle(self);",
+                "        InvalidateForDeviceLifecycle(wasExactGameSprite);",
                 "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);", 1),
         "reset-must-not-promote-stale-owner":
             code.replace("        TrackedSprite = nullptr;",
                          "        TrackedSprite = self;", 1),
         "reset-must-not-include-foreign-sprite":
-            code.replace("        if (!IsExactSprite(self))\n            return;",
-                         "        if (self)\n            return;", 1),
+            code.replace("        if (!wasExactGameSprite)\n            return;",
+                         "        if (false)\n            return;", 1),
         "reset-hook-absent":
             code.replace("ResetDevice_hk.enable().has_value()",
                          "false", 1),
         "lost-must-propagate-original-error":
             code.replace(
-                "InvalidateForDeviceLifecycle(self);\n        return hr;\n"
+                "InvalidateForDeviceLifecycle(wasExactGameSprite);\n        return hr;\n"
                 "    }\n\n    static HRESULT __stdcall ResetDeviceDest",
-                "InvalidateForDeviceLifecycle(self);\n        return D3D_OK;\n"
+                "InvalidateForDeviceLifecycle(wasExactGameSprite);\n        return D3D_OK;\n"
                 "    }\n\n    static HRESULT __stdcall ResetDeviceDest", 1),
         "reset-must-propagate-original-error":
             code.replace(
                 "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);\n"
-                "        InvalidateForDeviceLifecycle(self);\n        return hr;",
+                "        InvalidateForDeviceLifecycle(wasExactGameSprite);\n        return hr;",
                 "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);\n"
-                "        InvalidateForDeviceLifecycle(self);\n        return D3D_OK;", 1),
+                "        InvalidateForDeviceLifecycle(wasExactGameSprite);\n        return D3D_OK;", 1),
+        "lost-must-capture-exact-before-original":
+            code.replace(
+                "const bool wasExactGameSprite = IsExactSprite(self);\n"
+                "        const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);",
+                "const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);\n"
+                "        const bool wasExactGameSprite = IsExactSprite(self);", 1),
+        "reset-must-capture-exact-before-original":
+            code.replace(
+                "const bool wasExactGameSprite = IsExactSprite(self);\n"
+                "        const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);",
+                "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);\n"
+                "        const bool wasExactGameSprite = IsExactSprite(self);", 1),
     }
     for label, mutated in mutations.items():
         if mutated == code or not check(mutated, header):

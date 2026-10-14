@@ -2163,9 +2163,11 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     // D3D9 Reset. OnLostDevice can fail or arrive without a successful End;
     // neither event proves the prior Draws were submitted. Never let stale
     // +TIME/GOAL ownership trigger a Flush after the device changes.
-    static void InvalidateForDeviceLifecycle(void* self) noexcept
+    static void InvalidateForDeviceLifecycle(bool wasExactGameSprite) noexcept
     {
-        if (!IsExactSprite(self))
+        // The original OnLost/OnReset may replace the global sprite pointer.
+        // Take exact ownership evidence BEFORE invoking the original vtable.
+        if (!wasExactGameSprite)
             return;
         BatchActive = false;
         StageBoundaryReady = false;
@@ -2175,15 +2177,17 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 
     static HRESULT __stdcall LostDeviceDest(void* self)
     {
+        const bool wasExactGameSprite = IsExactSprite(self);
         const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);
-        InvalidateForDeviceLifecycle(self);
+        InvalidateForDeviceLifecycle(wasExactGameSprite);
         return hr;
     }
 
     static HRESULT __stdcall ResetDeviceDest(void* self)
     {
+        const bool wasExactGameSprite = IsExactSprite(self);
         const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);
-        InvalidateForDeviceLifecycle(self);
+        InvalidateForDeviceLifecycle(wasExactGameSprite);
         return hr;
     }
 
