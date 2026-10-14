@@ -1022,17 +1022,17 @@ namespace OutRunVRStereo
     {
         width = 0;
         height = 0;
-        if (eye >= 2 || !SharedState ||
-            SharedState->magic != OutRunVR::SharedMagic ||
-            SharedState->protocolVersion != OutRunVR::SharedProtocolVersion ||
-            SharedState->structSize != sizeof(OutRunVR::SharedPoseState))
+        if (eye >= 2u)
             return false;
-        const auto w = SharedState->recommendedWidth[eye];
-        const auto h = SharedState->recommendedHeight[eye];
-        if (w < 640u || h < 480u || w > 8192u || h > 8192u)
+        // The single-eye helper cannot read a producer-mutated SharedPoseState
+        // directly: ResetEx/resize might join a width and height from different
+        // publication epochs. Pair read validates protocol/bounds and one
+        // complete even seqlock generation before exposing either eye.
+        std::uint32_t pair[4]{};
+        if (!R23TryGetPublishedEyeExtentPair(pair))
             return false;
-        width = w;
-        height = h;
+        width = pair[eye * 2u];
+        height = pair[eye * 2u + 1u];
         return true;
     }
 }

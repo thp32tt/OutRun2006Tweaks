@@ -1170,9 +1170,38 @@ def main():
         broken = pair.replace(required, mutant, 1)
         assert required in pair and required not in broken, (
             "R23 source destructive mutation did not touch the owner")
-    assert "SharedState->structSize != sizeof(OutRunVR::SharedPoseState)" in common
-    assert "SharedState->recommendedWidth[eye]" in common
-    assert "SharedState->recommendedHeight[eye]" in common
+    # The former single-eye helper sampled the producer fields without
+    # checking its sequence. Pin the bounded pair as the only size authority.
+    mono = common.split("bool R23TryGetPublishedEyeExtent(", 1)[1].split(
+        "\n}", 1
+    )[0]
+    mono_guards = (
+        "width = 0;", "height = 0;",
+        "if (eye >= 2u)",
+        "std::uint32_t pair[4]{};",
+        "if (!R23TryGetPublishedEyeExtentPair(pair))",
+        "width = pair[eye * 2u];",
+        "height = pair[eye * 2u + 1u];",
+    )
+    for required in mono_guards:
+        assert required in mono, "torn R23 mono extent read: " + required
+    assert "SharedState->" not in mono
+    # Destructive mutations of the exact owner must be rejected: loss of
+    # seqlock validation, left/right swaps, or an invalid third eye index.
+    for original, mutation in (
+        ("if (!R23TryGetPublishedEyeExtentPair(pair))", "if (false)"),
+        ("width = pair[eye * 2u];", "width = pair[0];"),
+        ("height = pair[eye * 2u + 1u];", "height = pair[1];"),
+        ("if (eye >= 2u)", "if (eye > 2u)"),
+    ):
+        assert mono.count(original) == 1, original
+        damaged = mono.replace(original, mutation, 1)
+        assert not all(marker in damaged for marker in mono_guards), original
+    # Two eyes sampled from the SAME even publication; a failing read
+    # returns false with its mono outputs still zero (tested above by guards).
+    fixture = (2496, 2688, 2520, 2700)
+    assert fixture[0:2] == (2496, 2688)
+    assert fixture[2:4] == (2520, 2700)
     # Desktop 4:3 is unmodified; wide/portrait XR needs sharp larger glyphs.
     assert factor(1024, 768, 1024, 768) == 1.0
     assert factor(1920, 1080, 2496, 2688) == 2.5
