@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULL_FRAME_SAME_PRESENT_READBACK",
   "feature_id": "DX11-FULL-FRAME-SAME-PRESENT-NATIVE-PUBLISH",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "DONE_BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "SUCCESS_EXACT_SHA_5_OF_5",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -83,9 +83,38 @@
     ".github/workflows/dx11-fast-structural.yml",
     "docs/automation/runs/CONVERSION-DX11-00726.json"
   ],
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "exact_sha_gates": {},
+  "material_result_sha": "a24787aef3f4aee3de1aeb3f26d84f2997ce593c",
+  "validation_bearing_result_sha": "7a0ec7475f6ee4aa2e06c6beb54a7a0ac4848b05",
+  "exact_sha_gates": {
+    "DX11 Fast": {
+      "run_id": 38558296020,
+      "conclusion": "success",
+      "head_sha": "7a0ec7475f6ee4aa2e06c6beb54a7a0ac4848b05"
+    },
+    "Backend Conversion": {
+      "run_id": 38558295804,
+      "conclusion": "success",
+      "head_sha": "7a0ec7475f6ee4aa2e06c6beb54a7a0ac4848b05"
+    },
+    "Windows Build": {
+      "run_id": 38558301448,
+      "conclusion": "success",
+      "head_sha": "7a0ec7475f6ee4aa2e06c6beb54a7a0ac4848b05"
+    },
+    "OpenXR": {
+      "run_id": 38558301401,
+      "conclusion": "success",
+      "head_sha": "7a0ec7475f6ee4aa2e06c6beb54a7a0ac4848b05"
+    },
+    "HUD Inspector": {
+      "run_id": 38558301417,
+      "conclusion": "success",
+      "head_sha": "7a0ec7475f6ee4aa2e06c6beb54a7a0ac4848b05"
+    }
+  },
   "runtime_gate": "NEED_HMD_TEST",
-  "packaging_status": "NOT_REQUIRED"
+  "packaging_status": "NOT_REQUIRED",
+  "completed_utc": "2026-10-14T11:56:00Z",
+  "resume_cursor": "Next independent DX11 full-size native game Draw integration; do not rerun 00726. Quest3/VDXR menu/vehicle/race and gamepad remains NEED_HMD_TEST for this exact candidate.",
+  "c6_score_ref": "thp32tt/ai-dev-lab/AI_SCOREBOARD.md RUN_KEY=CONVERSION-DX11-00726"
 }
