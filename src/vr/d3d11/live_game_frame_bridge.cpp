@@ -4677,8 +4677,14 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         }
         const UINT candidateOrdinal = s.eligibleThisFrame++;
         ++s.eligible;
+        // A full-resolution menu/vehicle/race output needs the original
+        // game's verified color baseline, not a synthetic inset background.
+        // Verify same device and canonical D3D9 surface on the first Draw.
         const bool admitted = fullMode
-            ? s.frameBatch.accepts_full(sourceOrdinal)
+            ? s.frameBatch.accepts_full_seeded(
+                  sourceOrdinal,
+                  s.clearColor.matches(reinterpret_cast<std::uintptr_t>(game),
+                                       output.targetIdentity))
             : s.frameBatch.accepts(candidateOrdinal, s.probeSlot,
                                   env_batch_opt_in());
         if (!admitted) {
@@ -4796,9 +4802,18 @@ void observe_scene_boundary(IDirect3DDevice9* game) noexcept {
         // Only the device that supplied the game-authored native Draw owns
         // this batch. A menu/vehicle/race clear on a foreign auxiliary device
         // cannot invalidate an unrelated game source.
-        if (s.sourceGameDevice != reinterpret_cast<std::uintptr_t>(game) ||
-            s.frameBatch.submitted == 0u) return;
+        const auto owner = reinterpret_cast<std::uintptr_t>(game);
+        const bool ownsDraw = s.sourceGameDevice == owner &&
+            s.frameBatch.submitted != 0u;
+        // Prior to the first Draw, the full game TARGET Clear already owns
+        // the scene. An intervening partial/unsupported successful Clear on
+        // that device invalidates the seed even if no native Draw ran yet.
+        const bool ownsPreDrawColor = env_full_game_opt_in() &&
+            s.clearColor.valid && s.clearColor.sourceDevice == owner;
+        if (!ownsDraw && !ownsPreDrawColor) return;
         s.frameBatch.scene_boundary();
+        if (ownsPreDrawColor && s.frameBatch.submitted == 0u)
+            s.frameBatch.abort();
         // A GPU Draw may already have run, but its stale color must never be
         // queued to the desktop backbuffer or host transport at Present.
         s.pending = false;

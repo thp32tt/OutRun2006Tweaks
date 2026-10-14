@@ -11,6 +11,13 @@ struct GameNativeFrameBatch {
             ordinal == submitted &&
             (submitted == 0u || (hasSourceDraw && lastSourceDraw + 1u == ordinal));
     }
+    // A full-resolution image cannot start from a synthetic diagnostic
+    // background; require a successful D3D9 full TARGET Clear from the
+    // exact source device and render target. Continuing draws keep that seed.
+    [[nodiscard]] constexpr bool accepts_full_seeded(
+        std::uint64_t ordinal, bool sameSourceFullClear) const noexcept {
+        return accepts_full(ordinal) && (submitted != 0u || sameSourceFullClear);
+    }
     // A missing/unsupported D3D9 Draw invalidates the full native scene even
     // after the legacy eight-draw inset cap. In diagnostic batch mode, only
     // incomplete inset batches need invalidation; the original D3D9 path
