@@ -70,27 +70,66 @@
     "negative_test_evidence": "Active R64 source/mutation verifier checks both lifecycle slot callbacks, trampoline rollback, exact sprite predicate, stale pointer reset, missed invalidation, and legacy stage/GOAL ownership.",
     "eye_ownership": "Avoids stale producer-driven R26+HUD per-eye selection after a D3D9 device generation change; does not demonstrate that the original +TIME sprite and numeric images converge visually in Quest3."
   },
-  "status": "C2_MATERIAL_IMPLEMENTED_PENDING_CI",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "POLICY_GATE_CONTRACT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "runtime_evidence": "No original game or Quest3/VDXR HMD execution in this dispatch; no runtime PASS or lens/+TIME optical fix claim.",
+  "runtime_evidence": "No actual OR2006C2C.EXE/Quest3/VDXR session in this dispatch. CI verifies compiled game/host/package and source regressions, not binocular stage +TIME/GOAL visual convergence or lens optical FIXED.",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
     "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
     "docs/automation/runs/CONVERSION-DX9EX-00864.json"
   ],
   "material_result_sha": "adec0441b8cde782cce86e013146c49fb3997c60",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "ddaaae14e3abec37038c8c92b0c844f1f4c590c1",
   "acceptance_results": {
-    "reset": "PENDING_CI",
-    "producer": "PENDING_CI",
-    "fallback": "PENDING_CI",
-    "integrated": "PENDING_CI"
+    "reset": "PASS_BUILD",
+    "producer": "PASS_BUILD",
+    "fallback": "PASS_BUILD",
+    "integrated": "PASS_EXACT_SHA"
   },
-  "score_once": false,
-  "score_delta_this_retry": 0,
-  "scoreboard_ai_2_before": 1339,
-  "score_basis": "Material source change awaiting exact-SHA Windows/host/package/Domain/HUD/FullSource verification; no reward before completion."
+  "score_once": true,
+  "score_delta_this_retry": 1,
+  "scoreboard_ai_2_before": 1340,
+  "score_basis": "One independent native C++ exact game ID3DXSprite device-loss/reset source-batch lifecycle repair plus exact final SHA four mandatory GitHub Action workflow groups success; original stage +TIME visual optical acceptance remains untested. Same TASK_ID retry or C6 receives no further score.",
+  "material_followup_shas": [
+    "d612ade68f5545a7f1d7262dd9b3b9bb776d8df0",
+    "ddaaae14e3abec37038c8c92b0c844f1f4c590c1"
+  ],
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "ddaaae14e3abec37038c8c92b0c844f1f4c590c1",
+    "material_sha": "adec0441b8cde782cce86e013146c49fb3997c60",
+    "dx9ex_active": {
+      "run_id": 38638934772,
+      "conclusion": "SUCCESS",
+      "policy": "SUCCESS",
+      "host": "SUCCESS",
+      "game": "SUCCESS",
+      "full_chain_compile": "SUCCESS",
+      "package": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38638934467,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38638934529,
+      "conclusion": "SUCCESS",
+      "build_hud_inspector": "SUCCESS",
+      "static_exe_analysis": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38638934752,
+      "conclusion": "SUCCESS",
+      "msvc_analyze_active_game": "SUCCESS",
+      "msvc_analyze_openxr_host": "SUCCESS",
+      "source_cross_domain": "SUCCESS"
+    },
+    "runtime_caveat": "No matching user Quest3/VDXR optical test; original stage +TIME visual symptom remains NEED_HMD_TEST. This change addresses device lifecycle state ownership, not guaranteed whole-feature HMD optics."
+  },
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1341,
+  "scoreboard_commit_sha": "538a89b4173070385b9d2e54cc5097d8ded7bb0f"
 }
