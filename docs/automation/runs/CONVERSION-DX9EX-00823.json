@@ -2,8 +2,8 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00823",
   "production_id": "CONVERSION-DX9EX-00823",
-  "event_id": "CONVERSION-DX9EX-00823-E002",
-  "event_type": "gate_verified",
+  "event_id": "CONVERSION-DX9EX-00823-E003",
+  "event_type": "c6_result",
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
@@ -141,5 +141,6 @@
       "status": "SUCCESS",
       "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38511008963"
     }
-  }
+  },
+  "hold_resolution": "TERMINAL_STATUS_NOT_COMPLETE resolved: existing exact-SHA GitHub CI SUCCESS; C6 bookkeeping only. Quest3/VDXR runtime validation remains UNTESTED."
 }
