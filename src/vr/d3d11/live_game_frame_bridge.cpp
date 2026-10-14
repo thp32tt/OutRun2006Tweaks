@@ -28,6 +28,7 @@
 #include "live_game_rgba16_texture.hpp"
 #include "live_game_float_rgba_texture.hpp"
 #include "native_game_frame_batch.hpp"
+#include "native_game_frame_publication.hpp"
 #include "native_game_readback_provenance.hpp"
 #include "native_game_present_region.hpp"
 #include "native_game_clear_color.hpp"
@@ -5022,18 +5023,33 @@ void before_game_present(IDirect3DDevice9* game,
                     const HRESULT mapStatus = ctx->Map(oldest.staging.Get(), 0,
                         D3D11_MAP_READ, D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped);
                     if (SUCCEEDED(mapStatus)) {
-                        UINT changedPixels = 0;
-                        for (UINT y = 0; y < surfaceHeight; ++y) {
-                            const auto* row = static_cast<const std::uint8_t*>(mapped.pData) +
-                                static_cast<std::size_t>(y) * mapped.RowPitch;
-                            for (UINT x = 0; x < surfaceWidth; ++x) {
-                                const auto* p = row + 4 * x;
-                                if (std::abs(int(p[0])-20) > 3 ||
-                                    std::abs(int(p[1])-9) > 3 ||
-                                    std::abs(int(p[2])-9) > 3) ++changedPixels;
+                        // A complete same-Present full-resolution frame is
+                        // valid even when its pixels match the old debug clear
+                        // sentinel (for example a dark menu or fade frame).
+                        // Only the delayed diagnostic inset needs a pixel
+                        // difference probe; scanning the entire game image
+                        // adds unnecessary CPU work to gamepad frame pacing.
+                        const bool sourcePitchValid =
+                            GameNativeFramePublication::valid_readback_pitch(
+                                surfaceWidth, mapped.RowPitch);
+                        if (!sourcePitchValid) ++s.failed;
+                        UINT changedPixels = 0u;
+                        if (sourcePitchValid && !fullMode) {
+                            for (UINT y = 0; y < surfaceHeight; ++y) {
+                                const auto* row = static_cast<const std::uint8_t*>(mapped.pData) +
+                                    static_cast<std::size_t>(y) * mapped.RowPitch;
+                                for (UINT x = 0; x < surfaceWidth; ++x) {
+                                    const auto* p = row + 4 * x;
+                                    if (std::abs(int(p[0])-20) > 3 ||
+                                        std::abs(int(p[1])-9) > 3 ||
+                                        std::abs(int(p[2])-9) > 3) ++changedPixels;
+                                }
                             }
                         }
-                        if (changedPixels) {
+                        if (sourcePitchValid &&
+                            GameNativeFramePublication::should_upload(
+                                fullMode, !fullMode || complete, outputWritable,
+                                changedPixels)) {
                             if (outputWritable) {
                                 auto& back = presentBackbuffer;
                                 // Cache CPU upload memory; invalidate on format/Reset.
@@ -5053,26 +5069,36 @@ void before_game_present(IDirect3DDevice9* game,
                                 if (s.insetSurface && s.insetFormat == bb.Format &&
                                     s.insetSurfaceDevice == presentDevice &&
                                     SUCCEEDED(s.insetSurface->LockRect(&lockRect, nullptr, 0))) {
-                                    for (UINT y = 0; y < surfaceHeight; ++y)
-                                        std::memcpy(
-                                            static_cast<std::uint8_t*>(lockRect.pBits) +
-                                                static_cast<std::size_t>(y)*lockRect.Pitch,
-                                            static_cast<const std::uint8_t*>(mapped.pData) +
-                                                static_cast<std::size_t>(y)*mapped.RowPitch,
-                                            static_cast<std::size_t>(surfaceWidth)*4u);
-                                    s.insetSurface->UnlockRect();
-                                    POINT destination{
-                                        static_cast<LONG>(fullMode ? fullPlacement.left : insetPlacement.left),
-                                        static_cast<LONG>(fullMode ? fullPlacement.top : insetPlacement.top)};
-                                    if (SUCCEEDED(game->UpdateSurface(
-                                            s.insetSurface.Get(), nullptr, back.Get(), &destination))) {
-                                        ++s.visible;
-                                        if (!s.logged) {
-                                            spdlog::info("DX11 FIRST_GAME_DRAW_FRAME async game-origin FVF native Draw: {} changed pixels, {}x{} desktop inset; original D3D9 draw/input untouched; Quest3 UNTESTED",
-                                                changedPixels, surfaceWidth, surfaceHeight);
-                                            s.logged = true;
-                                        }
-                                    } else ++s.failed;
+                                    // Refuse malformed D3D9 lock pitches
+                                    // before copying a full game backbuffer.
+                                    // Keep the D3D9 frame/input untouched.
+                                    if (!GameNativeFramePublication::valid_upload_pitch(
+                                            surfaceWidth, lockRect.Pitch)) {
+                                        s.insetSurface->UnlockRect();
+                                        ++s.failed;
+                                    } else {
+                                        for (UINT y = 0; y < surfaceHeight; ++y)
+                                            std::memcpy(
+                                                static_cast<std::uint8_t*>(lockRect.pBits) +
+                                                    static_cast<std::size_t>(y)*lockRect.Pitch,
+                                                static_cast<const std::uint8_t*>(mapped.pData) +
+                                                    static_cast<std::size_t>(y)*mapped.RowPitch,
+                                                static_cast<std::size_t>(surfaceWidth)*4u);
+                                        s.insetSurface->UnlockRect();
+                                        POINT destination{
+                                            static_cast<LONG>(fullMode ? fullPlacement.left : insetPlacement.left),
+                                            static_cast<LONG>(fullMode ? fullPlacement.top : insetPlacement.top)};
+                                        if (SUCCEEDED(game->UpdateSurface(
+                                                s.insetSurface.Get(), nullptr, back.Get(), &destination))) {
+                                            ++s.visible;
+                                            if (!s.logged) {
+                                                spdlog::info("DX11 FIRST_GAME_DRAW_FRAME async game-origin FVF native Draw: {} changed pixels, {}x{} {} output; original D3D9 draw/input untouched; Quest3 UNTESTED",
+                                                    changedPixels, surfaceWidth, surfaceHeight,
+                                                    fullMode ? "full-frame" : "inset");
+                                                s.logged = true;
+                                            }
+                                        } else ++s.failed;
+                                    }
                                 } else ++s.failed;
                             } else ++s.failed;
                         }
