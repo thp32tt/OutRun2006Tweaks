@@ -181,6 +181,52 @@ for old, bad in (
         pass
     else:
         raise AssertionError("Portrait Y regression not detected")
+# Regression: OutRun can retain and reuse the same source matrix values
+# across menu -> car selection -> pause -> menu, even if the desktop mirror
+# changes aspect between calls. Only the caller's raw source (not our prior
+# forwarded D3DX scratch values) may be the starting point on the next draw.
+source_scale = [1.25, 0.75]
+source_offset = [187.0, 119.0]
+source_bytes = (tuple(source_scale), tuple(source_offset))
+cycle = ((640, 480), (3440, 1440), (2496, 2688),
+         (1920, 1080), (640, 480))
+for output in cycle:
+    projected = staged_menu_matrix(output, scale=source_scale,
+                                   translation=source_offset)
+    assert projected == staged_menu_matrix(output,
+        scale=source_scale, translation=source_offset)
+    assert (tuple(source_scale), tuple(source_offset)) == source_bytes
+assert staged_menu_matrix(cycle[0], scale=source_scale,
+    translation=source_offset) == staged_menu_matrix(
+        cycle[-1], scale=source_scale, translation=source_offset)
+
+# An invalid/zero device scale and nonfinite original input have to retain
+# untouched pointers for the original D3DX fallback; they must never cause
+# partial source overwrites (or stage only one of scale and translation).
+def would_stage_for_d3dx(screen, scaling, translation):
+    if scaling is None or translation is None:
+        return False
+    if screen is None or not all(isfinite(v) and v > 0.0 for v in screen):
+        return False
+    sx, sy = screen[0] / 640.0, screen[1] / 480.0
+    return (sx > 1.0e-6 and sy > 1.0e-6 and
+            all(isfinite(v) for v in (*scaling, *translation)))
+
+assert would_stage_for_d3dx((3440, 1440), source_scale, source_offset)
+for size, scaling, offset in (
+    (None, source_scale, source_offset),
+    ((0, 1440), source_scale, source_offset),
+    ((3440, 0), source_scale, source_offset),
+    ((float("nan"), 1440), source_scale, source_offset),
+    ((3440, 1440), None, source_offset),
+    ((3440, 1440), source_scale, None),
+    ((3440, 1440), [float("inf"), 0.75], source_offset),
+    ((3440, 1440), source_scale, [187.0, float("nan")]),
+):
+    assert not would_stage_for_d3dx(size, scaling, offset)
+assert (tuple(source_scale), tuple(source_offset)) == source_bytes
+print("DX9Ex reusable menu source vectors and invalid D3DX fallback PASS")
+
 print("DX9Ex UI matrix and portrait containment PASS (6 negative controls)")
 
 # Original multi-sprite GUI vertex streams have three independently hooked
