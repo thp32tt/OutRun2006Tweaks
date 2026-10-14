@@ -116,5 +116,10 @@
   "packaging_status": "NOT_REQUIRED",
   "completed_utc": "2026-10-14T11:56:00Z",
   "resume_cursor": "Next independent DX11 full-size native game Draw integration; do not rerun 00726. Quest3/VDXR menu/vehicle/race and gamepad remains NEED_HMD_TEST for this exact candidate.",
-  "c6_score_ref": "thp32tt/ai-dev-lab/AI_SCOREBOARD.md RUN_KEY=CONVERSION-DX11-00726"
+  "c6_score_ref": "thp32tt/ai-dev-lab/AI_SCOREBOARD.md RUN_KEY=CONVERSION-DX11-00726",
+  "acceptance_results": {
+    "A1": "PASS",
+    "A2": "PASS",
+    "A3": "PASS_EXACT_SHA"
+  }
 }
