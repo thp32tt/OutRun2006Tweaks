@@ -52,6 +52,28 @@ def check(code: str, header: str) -> list[str]:
          "BatchActive = false" in hook and
          "ForgetBatch();" in hook,
          "Begin/End/failed-Flush state invalidation missing")
+    lifecycle_start = hook.find("static void InvalidateForDeviceLifecycle(")
+    lifecycle_end = hook.find("static bool FlushTracked(", lifecycle_start)
+    lifecycle = hook[lifecycle_start:lifecycle_end] if (
+        lifecycle_start >= 0 and lifecycle_end > lifecycle_start) else ""
+    need("if (!IsExactSprite(self))" in lifecycle and
+         "BatchActive = false;" in lifecycle and
+         "StageBoundaryReady = false;" in lifecycle and
+         "ForgetBatch();" in lifecycle and
+         "TrackedSprite = nullptr;" in lifecycle,
+         "only exact D3DX sprite may invalidate stale device-loss batch")
+    for method, slot in (("LostDevice", 12), ("ResetDevice", 13)):
+        need(f"static HRESULT __stdcall {method}Dest(void* self)" in lifecycle and
+             f"const HRESULT hr = {method}_hk.stdcall<HRESULT>(self);" in lifecycle and
+             lifecycle.count("InvalidateForDeviceLifecycle(self);") == 2 and
+             f"vtable[{slot}]" in hook and
+             f"reinterpret_cast<void*>(&{method}Dest)" in hook and
+             f"{method}_hk.enable().has_value()" in hook and
+             f"{method}_hk = {{}};" in hook,
+             f"{method} exact D3DX lifecycle trampoline missing")
+    need("LostDevice_hk && ResetDevice_hk" in hook and
+         "vtable[12] && vtable[13]" in hook,
+         "batch hook installation must include both reset edges")
     direct_begin = hook.find("static void BeforeDirectStageSource() noexcept")
     direct_end = hook.find("static void BeforeQueueNode(", direct_begin)
     direct_stage = hook[direct_begin:direct_end] if 0 <= direct_begin < direct_end else ""
@@ -182,6 +204,25 @@ def main() -> int:
         "goal-progress-owner-lost":
             code.replace("source == ProducerToken::ResultProgress",
                          "source == ProducerToken::None", 1),
+        "lost-device-invalidates-no-batch":
+            code.replace(
+                "const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);\n"
+                "        InvalidateForDeviceLifecycle(self);",
+                "const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);", 1),
+        "reset-device-invalidates-no-batch":
+            code.replace(
+                "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);\n"
+                "        InvalidateForDeviceLifecycle(self);",
+                "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);", 1),
+        "reset-must-not-promote-stale-owner":
+            code.replace("        TrackedSprite = nullptr;",
+                         "        TrackedSprite = self;", 1),
+        "reset-must-not-include-foreign-sprite":
+            code.replace("        if (!IsExactSprite(self))\n            return;",
+                         "        if (self)\n            return;", 1),
+        "reset-hook-absent":
+            code.replace("ResetDevice_hk.enable().has_value()",
+                         "false", 1),
     }
     for label, mutated in mutations.items():
         if mutated == code or not check(mutated, header):

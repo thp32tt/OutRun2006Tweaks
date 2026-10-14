@@ -2057,6 +2057,8 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     inline static SafetyHookInline Draw_hk{};
     inline static SafetyHookInline Flush_hk{};
     inline static SafetyHookInline End_hk{};
+    inline static SafetyHookInline LostDevice_hk{};
+    inline static SafetyHookInline ResetDevice_hk{};
     inline static std::atomic<std::uint64_t> Flushes{ 0 };
     inline static std::atomic<std::uint64_t> Failures{ 0 };
     inline static std::atomic<std::uint64_t> StageFlushes{ 0 };
@@ -2154,6 +2156,34 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
             StageBoundaryReady = false;
             ForgetBatch();
         }
+        return hr;
+    }
+
+    // ID3DXSprite slots 12/13 invalidate its internal GPU batch across a
+    // D3D9 Reset. OnLostDevice can fail or arrive without a successful End;
+    // neither event proves the prior Draws were submitted. Never let stale
+    // +TIME/GOAL ownership trigger a Flush after the device changes.
+    static void InvalidateForDeviceLifecycle(void* self) noexcept
+    {
+        if (!IsExactSprite(self))
+            return;
+        BatchActive = false;
+        StageBoundaryReady = false;
+        ForgetBatch();
+        TrackedSprite = nullptr;
+    }
+
+    static HRESULT __stdcall LostDeviceDest(void* self)
+    {
+        const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);
+        InvalidateForDeviceLifecycle(self);
+        return hr;
+    }
+
+    static HRESULT __stdcall ResetDeviceDest(void* self)
+    {
+        const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);
+        InvalidateForDeviceLifecycle(self);
         return hr;
     }
 
@@ -2385,7 +2415,8 @@ private:
             {
                 void** vtable = *reinterpret_cast<void***>(sprite);
                 if (vtable && vtable[8] && vtable[9] &&
-                    vtable[10] && vtable[11])
+                    vtable[10] && vtable[11] &&
+                    vtable[12] && vtable[13])
                 {
                     const auto disabled =
                         safetyhook::InlineHook::StartDisabled;
@@ -2397,18 +2428,27 @@ private:
                         vtable[10], reinterpret_cast<void*>(&FlushDest), disabled);
                     End_hk = safetyhook::create_inline(
                         vtable[11], reinterpret_cast<void*>(&EndDest), disabled);
+                    LostDevice_hk = safetyhook::create_inline(
+                        vtable[12], reinterpret_cast<void*>(&LostDeviceDest), disabled);
+                    ResetDevice_hk = safetyhook::create_inline(
+                        vtable[13], reinterpret_cast<void*>(&ResetDeviceDest), disabled);
                     if (Begin_hk && Draw_hk && Flush_hk && End_hk &&
+                        LostDevice_hk && ResetDevice_hk &&
                         Begin_hk.enable().has_value() &&
                         Flush_hk.enable().has_value() &&
                         End_hk.enable().has_value() &&
-                        Draw_hk.enable().has_value())
+                        Draw_hk.enable().has_value() &&
+                        LostDevice_hk.enable().has_value() &&
+                        ResetDevice_hk.enable().has_value())
                     {
                         spdlog::info(
-                            "VR R64 D3DX: exact +TIME/GOAL queue batch boundaries plus original rank isolate; unknown/mixed batches fail closed");
+                            "VR R64 D3DX: +TIME/GOAL batch ownership plus device-loss/reset invalidation and original rank isolate; unknown/mixed batches fail closed");
                         return 0;
                     }
-                    // Hook installation is atomic: no partially active
-                    // Begin/Draw/Flush/End ownership on failure.
+                    // Tear down all trampolines on a partial hook install;
+                    // lifecycle invalidation must never run in isolation.
+                    ResetDevice_hk = {};
+                    LostDevice_hk = {};
                     Draw_hk = {};
                     End_hk = {};
                     Flush_hk = {};
@@ -2418,7 +2458,7 @@ private:
             Sleep(25);
         }
         spdlog::warn(
-            "VR R64 D3DX: exact sprite Begin/Draw/Flush/End hooks unavailable; original no-flush behavior retained");
+            "VR R64 D3DX: exact sprite batch/lifecycle hook set unavailable; original no-flush behavior retained");
         return 0;
     }
 
