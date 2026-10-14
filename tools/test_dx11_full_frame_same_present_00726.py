@@ -16,7 +16,7 @@ def integrated(src: str, provenance: str) -> bool:
     # The full-resolution source must enqueue first and poll its own fence.
     queue = section.find("ctx->CopyResource(next.staging.Get(), s.backend.color_texture());", capture)
     poll = section.find("auto& oldest = s.readbacks[fullMode ? fullSlot : s.readSlot];")
-    getdata = section.find("const HRESULT ready = ctx->GetData(", poll)
+    getdata = section.find("HRESULT ready = ctx->GetData(", poll)
     fallback = section.find("if (complete && outputWritable &&", getdata)
     return all((
         0 <= capture < queue < poll < getdata < fallback,
