@@ -104,6 +104,29 @@ int main()
         !(ResponsiveMenuScale(1.5f, 9.0f, true) >
           ResponsiveMenuScale(1.25f, 9.0f, true)))
         return 11;
+    // ESC shell (VS) and original YES/NO arrows (XYZRHW) must agree in
+    // both eyes even when the headset's horizontal FOV differs per eye.
+    const float eyeScale[2]{0.87f, 1.14f};
+    const float eyeOffset[2]{-0.06f, 0.04f};
+    for (int eye = 0; eye < 2; ++eye)
+    {
+        const float commonScale = 1.35f;
+        const float sourceNdc = 0.42f;
+        const float vsNdc = ShaderHorizontalScale(
+            commonScale, eyeScale[eye], true) * sourceNdc +
+            eyeOffset[eye];
+        const float xyzrhwNdc = commonScale * eyeScale[eye] * sourceNdc +
+            eyeOffset[eye];
+        if (!Near(vsNdc, xyzrhwNdc)) return 15;
+        // Exclude gameplay HUD and F11: their VS scale stays exactly as it
+        // was even though the independent XYZRHW route still uses eye FOV.
+        if (!Near(ShaderHorizontalScale(commonScale, eyeScale[eye], false),
+                  commonScale)) return 16;
+    }
+    // Equal-FOV eyes are bit-for-bit equivalent to the old ESC transform.
+    if (!Near(ShaderHorizontalScale(1.25f, 1.0f, true), 1.25f) ||
+        !Near(ShaderHorizontalScale(1.25f, 0.87f, true),
+              1.25f * 0.87f)) return 17;
     std::cout << "DX9Ex pause vertical affine + responsive optical size PASS\n";
     return 0;
 }

@@ -1,0 +1,89 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00850",
+  "production_id": "CONVERSION-DX9EX-00850",
+  "event_id": "CONVERSION-DX9EX-00850-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00850",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:ESC_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:ESC_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+    "goal": "Preserve the complete visible ESC pause/options shell and YES-NO arrow optical alignment in both eyes under asymmetric horizontal FOV, without changing readable scale and vertical placement.",
+    "scope_boundary": "Only original STATE_SMPAUSEMENU shell and exact option-arrow stereo rendering. Preserve other gameplay HUD/F11, world draw, SkyGlow, GOAL/+TIME, input and frozen DXVK.",
+    "trace_stages": [
+      "Original game STATE_SMPAUSEMENU produces generic ScreenOverlay2D pause shell and exact ScreenHud YES-NO arrow SpriteNodes.",
+      "R30 semantic scope selects only original pause draws; R30HudContainScale provides the shared optical size, while shader and XYZRHW code paths separately apply horizontal per-eye FOV.",
+      "The shader path formerly ignored eyeScale where XYZRHW multiplied hudScaleX by eyeScale; matching the two restores eye-specific horizontal placement while retaining shared vertical affine and UV/color."
+    ],
+    "subcomponents": [
+      "Shader-backed shell uses identical horizontal per-eye FOV scale as the XYZRHW original pause arrow producer.",
+      "Preserve independent pause menu size, vertical offset, and binocular FOV asymmetry in both renderer paths.",
+      "Keep ordinary gameplay shader HUD, external F11, desktop, reset fallback and scene rendering untouched; mutation/portable smoke cover the optical transformation."
+    ],
+    "acceptance_items": [
+      {
+        "id": "pause_shader_shell",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ESC original shader-backed shell",
+        "expected_behavior": "For a nonunity left/right eyeScale, pause shader clip scale equals the already-applied CPU XYZRHW per-eye HUD containment factor."
+      },
+      {
+        "id": "pause_arrow_parity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ESC original XYZRHW option arrows and binocular alignment",
+        "expected_behavior": "The original ESC shell and exact arrow producers share per-eye horizontal optical dilation and stereo offsets without diverging on asymmetric eye FOV."
+      },
+      {
+        "id": "safe_legacy",
+        "category": "fallback_regression",
+        "behavior_area": "Non-pause F11/gameplay shader HUD and equal-FOV neutral mode",
+        "expected_behavior": "Non-pause shader retains identical original horizontal scale; unity per-eye FOV and existing vertical/desktop/Reset behavior remain unchanged."
+      },
+      {
+        "id": "exact_windows_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Source regression and Windows x86 game/x64 host and package",
+        "expected_behavior": "Focused portable/negative tests, full DX9Ex Active exact SHA, Domain Isolation and Full Source Impact when applicable must pass before build-verified completion."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "The source currently assigns clipCorrection._11=hudScaleX in R30BuildScreenSpaceEyeConstants while R30TransformXyzrhwStereo and paired-eye UP use hudScaleX*state.eyeScale[eye] for identical paused overlay ownership.",
+    "source_trace": [
+      "Original STATE_SMPAUSEMENU produces generic ScreenOverlay2D shell with Shader WVP and ExactScreenHudClipSprite YES/NO arrows with XYZRHW.",
+      "R30IsPauseMenuElement gates both producers and R30HudContainScale calculates same common optical size with vertical FOV adjustment.",
+      "R30BuildEyeAffine yields per-eye horizontal dilation and offset, consumed by XYZRHW but only offset consumed by shader WVP, causing per-eye differential X scaling."
+    ],
+    "root_cause": "Shader-backed ESC shell lacks the per-eye horizontal FOV dilation that exact original pause option arrows already get on XYZRHW, so asymmetric headset eye FOV separates their geometry despite common scale and vertical placement.",
+    "alternatives_rejected": [
+      "Do not change `R30BuildEyeAffine` which is shared across gameplay/world and tested; preserving its eyeScale/offset and correcting only opt-in pause shader fixes the asymmetric horizontal mismatch without affecting nonpause HUD."
+    ],
+    "fix_evidence": "Add explicit pause-owned shader eye-FOV horizontal scale path, match XYZRHW equivalent under nonunity eyeScale while retaining existing non-pause shader scale.",
+    "negative_test_evidence": "Portable C++ eye-pair equation comparison and unity/nonpause invariants, plus source integration checks and mutation tests in existing ESC verifier.",
+    "eye_ownership": "Both left and right eyes use their own verified eyeScale and eyeOffset on exact paused screen producers; unrelated F11 and world/UI draws keep previous shader correction."
+  },
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "phase": "C3_VALIDATE_PENDING",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "src/vr/d3d9/pause_menu_eye_affine.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/pause_menu_eye_affine_smoke.cpp",
+    "tools/verify_vr_pause_menu_eye_affine.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00850.json"
+  ],
+  "score_once": false,
+  "acceptance_results": {
+    "pause_shader_shell": "PENDING_CI",
+    "pause_arrow_parity": "PENDING_CI",
+    "safe_legacy": "PENDING_CI",
+    "exact_windows_gate": "PENDING_CI"
+  },
+  "runtime_evidence": "Quest3/VDXR and OutRun 2006 actual runtime not tested on this material."
+}

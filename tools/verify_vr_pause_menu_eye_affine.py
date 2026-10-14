@@ -24,6 +24,14 @@ def check(s: str, h: str) -> None:
         'rightDst[1] = transformedRightY;',
     ):
         assert required in s, required
+    # Asymmetric horizontal eye FOV must not detach the shader shell from
+    # XYZRHW arrows; ordinary HUD/F11 remain on their old shader scale.
+    assert 'const bool pauseOwned = R30IsPauseMenuElement();' in s
+    assert 'clipCorrection._11 = OutRunVrPauseEye::ShaderHorizontalScale(' in s
+    assert 'hudScaleX, eyeScale[eye], pauseOwned);' in s
+    assert 'inline float ShaderHorizontalScale(' in h
+    assert 'return pauseOwned ? commonScale * eyeFovScale : commonScale;' in h
+    assert 'ShaderHorizontalScale(' in tests and 'xyzrhwNdc' in tests
     assert 'const float o = -sum[eye] / span[eye];' in h
     assert 'span[eye] <= 0.05f || span[eye] > 10.0f' in h
     assert 'return {};' in h
@@ -57,6 +65,12 @@ def check(s: str, h: str) -> None:
 
 check(source, helper)
 for mutant in (
+    source.replace('hudScaleX, eyeScale[eye], pauseOwned);',
+                   'hudScaleX, eyeScale[eye], false);', 1),
+    source.replace('const bool pauseOwned = R30IsPauseMenuElement();',
+                   'const bool pauseOwned = false;', 1),
+    source.replace('clipCorrection._11 = OutRunVrPauseEye::ShaderHorizontalScale(',
+                   'clipCorrection._11 = (', 1),
     source.replace('const float readable = OutRunVrPauseEye::ResponsiveUserScale(',
                    'const float readable = (std::max)(', 1),
     source.replace('requested, Settings::VRHudResponsiveLayout.get());',
@@ -89,4 +103,15 @@ for mutant in (
     except AssertionError:
         continue
     raise AssertionError("unsafe ESC mutation escaped verification")
+for bad_helper in (
+    helper.replace('pauseOwned ? commonScale * eyeFovScale : commonScale',
+                   'commonScale'),
+    helper.replace('pauseOwned ? commonScale * eyeFovScale : commonScale',
+                   'commonScale * eyeFovScale'),
+):
+    try:
+        check(source, bad_helper)
+    except AssertionError:
+        continue
+    raise AssertionError("shader/XYZRHW pause scale mutation escaped verification")
 print("DX9Ex ESC vertical affine source/mutation PASS")

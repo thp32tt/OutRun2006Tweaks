@@ -60,6 +60,15 @@ namespace OutRunVrPauseEye
         return shoulder + headroom * excess / (headroom + excess);
     }
 
+    // Shader-backed ESC shell must share the same horizontal per-eye FOV
+    // dilation as the XYZRHW arrows. Keep legacy gameplay HUD and F11
+    // shader transforms untouched; this is an exact pause-state opt-in.
+    inline float ShaderHorizontalScale(
+        float commonScale, float eyeFovScale, bool pauseOwned) noexcept
+    {
+        return pauseOwned ? commonScale * eyeFovScale : commonScale;
+    }
+
     inline VerticalAffine Compute(
         float leftDown, float leftUp, float rightDown, float rightUp) noexcept
     {

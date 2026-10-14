@@ -5159,12 +5159,17 @@ namespace OutRunVRStereo
             float hudScaleY = 1.0f;
             R30HudContainScale(stereo, hudScaleX, hudScaleY);
             const auto pauseVertical = R30PauseMenuVerticalAffine(stereo);
+            const bool pauseOwned = R30IsPauseMenuElement();
             for (int eye = 0; eye < 2; ++eye)
             {
                 D3DMATRIX clipCorrection{};
                 // Keep the already-verified ordinary HUD mapping unchanged.
                 // Only FlatPerspectiveEffect uses the finite 3D plane above.
-                clipCorrection._11 = hudScaleX;
+                // The paused shell can use the VS path while its original
+                // option arrows use XYZRHW; match XYZRHW eyeScaleX in each
+                // eye, including asymmetric FOV. Non-pause HUD remains exact.
+                clipCorrection._11 = OutRunVrPauseEye::ShaderHorizontalScale(
+                    hudScaleX, eyeScale[eye], pauseOwned);
                 clipCorrection._22 =
                     hudScaleY * pauseVertical.scale[eye];
                 clipCorrection._33 = 1.0f;
