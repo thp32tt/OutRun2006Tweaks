@@ -66,4 +66,46 @@ for original in ("notificationMouseCapture", "legacyF11Key"):
     assert original not in route_args.replace(original, "false", 1)
 assert "ImGui::SetNextWindowSizeConstraints(" not in shell.replace(
     "ImGui::SetNextWindowSizeConstraints(", "/* removed */", 1)
-print("PASS F11 hidden-input isolation, input/focus negative cases and VR shell bounds")
+# F11 input ownership: classify ordinary key/character/IME and pointer
+# messages, consume only while an interactive overlay owns them, preserve
+# legacy F11, OS shortcuts, focus and game input with a closed overlay.
+for required in (
+    "constexpr bool ShouldConsumeFromGame(",
+    "if (legacyF11Key)", "interactiveShell && (keyboardMessage || mouseMessage)",
+    "mouseMessage && notificationMouseCapture",
+):
+    assert required in routing, required
+for required in (
+    "msg == WM_KEYDOWN || msg == WM_KEYUP",
+    "msg == WM_CHAR || msg == WM_DEADCHAR",
+    "msg == WM_IME_CHAR || msg == WM_IME_COMPOSITION",
+    "OutRunF11Input::ShouldConsumeFromGame(",
+    "legacyF11Key, keyboardMessage, mouseMessage,",
+    "notificationMouseCapture))",
+):
+    assert required in wnd, required
+assert wnd.index("ImGui_ImplWin32_WndProcHandler(") < wnd.index(
+    "OutRunF11Input::ShouldConsumeFromGame(")
+assert wnd.count("OutRunF11Input::ShouldConsumeFromGame(") == 1
+assert "msg == WM_SYSKEYDOWN ||" not in wnd.split("const bool keyboardMessage =", 1)[1].split(";", 1)[0]
+assert "msg == WM_SYSCOMMAND" not in wnd.split("const bool keyboardMessage =", 1)[1].split(";", 1)[0]
+def consumes(shell, dialog, f11, keyboard, mouse, notification):
+    return not f11 and ((shell or dialog) and (keyboard or mouse) or
+                        mouse and notification)
+for state, expected in (
+    ((True, False, False, True, False, False), True),
+    ((True, False, False, False, True, False), True),
+    ((False, True, False, True, False, False), True),
+    ((False, False, False, False, True, True), True),
+    ((True, False, True, True, False, False), False),
+    ((False, False, False, True, False, False), False),
+    ((False, False, False, False, True, False), False),
+    ((True, False, False, False, False, False), False),
+):
+    assert consumes(*state) is expected, state
+# Destructive regressions must fail, not simply observe presence of a helper.
+assert "interactiveShell && (keyboardMessage || mouseMessage)" not in routing.replace(
+    "interactiveShell && (keyboardMessage || mouseMessage)", "false", 1)
+assert "legacyF11Key, keyboardMessage, mouseMessage," not in wnd.replace(
+    "legacyF11Key, keyboardMessage, mouseMessage,", "false, false, false,", 1)
+print("PASS F11 hidden-input isolation, F11/game ownership and VR shell bounds")

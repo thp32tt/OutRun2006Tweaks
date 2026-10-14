@@ -11,6 +11,40 @@ namespace OutRunF11Input
             focusTransition || notificationMouseCapture;
     }
 
+    // ImGui's Win32 backend commonly returns zero for keyboard and mouse
+    // events even after enqueueing them. Forwarding them to the original
+    // WndProc while F11 owns the UI leaks key/click/wheel input into racing.
+    // Keep legacy F11 toggles in the original path and never intercept a
+    // closed menu's gameplay input. Notification hit targets may own pointer
+    // input independently of the F11 shell.
+    constexpr bool ShouldConsumeFromGame(bool shellVisible,
+        bool bindingDialogVisible, bool legacyF11Key,
+        bool keyboardMessage, bool mouseMessage,
+        bool notificationMouseCapture) noexcept
+    {
+        if (legacyF11Key)
+            return false;
+        const bool interactiveShell = shellVisible || bindingDialogVisible;
+        return (interactiveShell && (keyboardMessage || mouseMessage)) ||
+            (mouseMessage && notificationMouseCapture);
+    }
+
+    static_assert(ShouldConsumeFromGame(true, false, false, true, false, false),
+        "F11 keyboard navigation must not reach original gameplay WndProc");
+    static_assert(ShouldConsumeFromGame(true, false, false, false, true, false),
+        "F11 pointer/wheel UI events must not reach game controls");
+    static_assert(ShouldConsumeFromGame(false, true, false, true, false, false),
+        "Open binding dialog owns its keyboard editing");
+    static_assert(ShouldConsumeFromGame(false, false, false, false, true, true),
+        "Clickable notification HUD owns its hovered pointer input");
+    static_assert(!ShouldConsumeFromGame(true, false, true, true, false, false),
+        "Legacy F11 toggle must reach the original game handler");
+    static_assert(!ShouldConsumeFromGame(false, false, false, true, false, false) &&
+                  !ShouldConsumeFromGame(false, false, false, false, true, false),
+        "Closed F11 must not suppress gameplay controls");
+    static_assert(!ShouldConsumeFromGame(true, false, false, false, false, false),
+        "Focus and system messages must follow the original WndProc");
+
     static_assert(!ShouldForwardToImGui(false, false, false, false, false),
         "Closed F11 must not intercept gameplay mouse/keyboard input");
     static_assert(ShouldForwardToImGui(true, false, false, false, false),

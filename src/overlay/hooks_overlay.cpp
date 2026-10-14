@@ -577,6 +577,13 @@ class WndprocHook : public Hook
 		const bool mouseMessage =
 			(msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST) ||
 			msg == WM_SETCURSOR;
+		// Only ordinary key/character/IME UI input is consumed. WM_SYSKEY*
+		// and WM_SYSCOMMAND (Alt+F4, task switching, window actions) remain
+		// on the game's original WndProc and OS system path.
+		const bool keyboardMessage =
+			msg == WM_KEYDOWN || msg == WM_KEYUP ||
+			msg == WM_CHAR || msg == WM_DEADCHAR ||
+			msg == WM_IME_CHAR || msg == WM_IME_COMPOSITION;
 		const bool notificationMouseCapture =
 			overlayInited && mouseMessage && ImGui::GetCurrentContext() &&
 			ImGui::GetIO().WantCaptureMouse;
@@ -586,6 +593,19 @@ class WndprocHook : public Hook
 				legacyF11Key, focusTransition, notificationMouseCapture);
 		if (overlayInited && forwardImGui &&
 			ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+			return 1;
+
+		// ImGui's event handler returns 0 for many valid keyboard/pointer
+		// messages after queuing them. While F11 (or the binding dialog) owns
+		// editing, do not feed a second copy into the original game's controls.
+		// Keep legacy F11 key toggles, hidden gameplay, focus and OS shortcuts
+		// on their established paths. Notification hover remains independently
+		// clickable even with the main shell closed.
+		if (overlayInited && ImGui::GetCurrentContext() &&
+			OutRunF11Input::ShouldConsumeFromGame(
+				overlayActive, Overlay::IsBindingDialogActive,
+				legacyF11Key, keyboardMessage, mouseMessage,
+				notificationMouseCapture))
 			return 1;
 
 		if (Settings::WindowedHideMouseCursor && !overlayActive)
