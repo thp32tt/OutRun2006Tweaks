@@ -29,6 +29,7 @@
 #include "live_game_float_rgba_texture.hpp"
 #include "native_game_frame_batch.hpp"
 #include "native_game_frame_publication.hpp"
+#include "native_game_frame_upload.hpp"
 #include "native_game_readback_provenance.hpp"
 #include "native_game_present_region.hpp"
 #include "native_game_clear_color.hpp"
@@ -5373,19 +5374,28 @@ void before_game_present(IDirect3DDevice9* game,
                                     // Refuse malformed D3D9 lock pitches
                                     // before copying a full game backbuffer.
                                     // Keep the D3D9 frame/input untouched.
-                                    if (!GameNativeFramePublication::valid_upload_pitch(
-                                            surfaceWidth, lockRect.Pitch)) {
-                                        s.insetSurface->UnlockRect();
+                                    // Transfer native BGRA pixels only while both CPU
+                                    // mappings remain valid. A failed UnlockRect must
+                                    // never submit partially updated menu/race pixels.
+                                    const bool copied =
+                                        GameNativeFramePublication::valid_upload_pitch(
+                                            surfaceWidth, lockRect.Pitch) &&
+                                        GameNativeFrameUpload::copy_rows(
+                                            lockRect.pBits, lockRect.Pitch,
+                                            mapped.pData, mapped.RowPitch,
+                                            surfaceWidth, surfaceHeight);
+                                    const HRESULT unlockStatus = s.insetSurface->UnlockRect();
+                                    if (!copied || FAILED(unlockStatus)) {
                                         ++s.failed;
+                                        if (FAILED(unlockStatus)) {
+                                            // Drop the invalid D3D9 CPU upload cache.
+                                            // Original game Present/input still proceed.
+                                            s.insetSurface.Reset();
+                                            s.insetFormat = D3DFMT_UNKNOWN;
+                                            s.insetSurfaceDevice = 0u;
+                                            s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;
+                                        }
                                     } else {
-                                        for (UINT y = 0; y < surfaceHeight; ++y)
-                                            std::memcpy(
-                                                static_cast<std::uint8_t*>(lockRect.pBits) +
-                                                    static_cast<std::size_t>(y)*lockRect.Pitch,
-                                                static_cast<const std::uint8_t*>(mapped.pData) +
-                                                    static_cast<std::size_t>(y)*mapped.RowPitch,
-                                                static_cast<std::size_t>(surfaceWidth)*4u);
-                                        s.insetSurface->UnlockRect();
                                         POINT destination{
                                             static_cast<LONG>(fullMode ? fullPlacement.left : insetPlacement.left),
                                             static_cast<LONG>(fullMode ? fullPlacement.top : insetPlacement.top)};

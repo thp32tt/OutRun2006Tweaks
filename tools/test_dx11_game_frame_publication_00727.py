@@ -16,12 +16,14 @@ def integrated(src: str, header: str) -> bool:
     body = src[a:b]
     probe = body.find("if (sourcePitchValid && !fullMode) {")
     publish = body.find("GameNativeFramePublication::should_upload(", probe)
-    copy = body.find("std::memcpy(", publish)
+    copy = body.find("GameNativeFrameUpload::copy_rows(", publish)
     update = body.find("game->UpdateSurface(", copy)
     reset = body.find("s.frameBatch.reset();", update)
     return all((
         '#include "native_game_frame_publication.hpp"' in src,
         0 <= probe < publish < copy < update < reset,
+        "const HRESULT unlockStatus = s.insetSurface->UnlockRect();" in body[copy:update],
+        "FAILED(unlockStatus)" in body[copy:update],
         "valid_readback_pitch(" in body[:publish],
         "valid_upload_pitch(" in body[publish:copy],
         "fullMode, !fullMode || complete, outputWritable," in body[publish:],
@@ -42,6 +44,7 @@ for old, new in (
     ("GameNativeFramePublication::valid_readback_pitch(", "true /* bypassed */ ("),
     ("GameNativeFramePublication::valid_upload_pitch(", "true /* bypassed */ ("),
     ("game->UpdateSurface(", "/* no game backbuffer publication */ ("),
+    ("GameNativeFrameUpload::copy_rows(", "/* no native pixel transfer */ ("),
 ):
     mutant = CPP.replace(old, new, 1)
     assert mutant != CPP and not integrated(mutant, HDR), old
