@@ -45,8 +45,8 @@ for old, new in (
     # The cropped fast path precedes copy_rows in the same callsite.
     # Mutate the *legacy full-backbuffer* branch so this test still proves
     # uncropped D3D9 publication fails closed independently of crop tests.
-    ("GameNativeFrameUpload::copy_rows(\\n                                                lockRect.pBits, lockRect.Pitch,",
-     "GameNativeFrameUpload::copy_rows(\\n                                                mapped.pData, lockRect.Pitch,"),
+    ("GameNativeFrameUpload::copy_rows(\n                                                lockRect.pBits, lockRect.Pitch,",
+     "GameNativeFrameUpload::copy_rows(\n                                                mapped.pData, lockRect.Pitch,"),
     ("if (FAILED(unlockStatus))", "if (false /* ignore unlock */)"),
     ("if (fullMode) {\n                                                s.insetSurface.Reset();", "if (false) {\n                                                s.insetSurface.Reset();"),
 ):
