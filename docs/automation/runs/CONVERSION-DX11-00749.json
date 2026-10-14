@@ -1,0 +1,102 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00749",
+  "production_id": "CONVERSION-DX11-00749",
+  "event_id": "CONVERSION-DX11-00749-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULLFRAME_PARTITIONED_PRESENT",
+  "feature_id": "DX11-MENU-RACE-NATIVE-PARTITIONED-DIRTY-PRESENT",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "21750d512a69cad3404670d170b395c409aa1cc8",
+  "change_summary": "Extend actual full-resolution native menu/car/race output to D3D9 Present with 2-8 disjoint whole-backbuffer dirty RECT tiles, checking exact coverage without overlaps/holes; otherwise preserve original D3D9 game drawing and gamepad.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_dirty_region.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_full_dirty_partition_probe_00749.cpp",
+    "tools/test_dx11_full_dirty_partition_00749.py",
+    "docs/automation/runs/CONVERSION-DX11-00749.json"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "D3D9 full game Draw/DrawIndexed -> native full-size D3D11 frame resource/readback",
+      "Validated partitioned D3D9 dirty RGNDATA -> same-Present native D3D9 UpdateSurface",
+      "Unbounded/hole/overlap/partial partition -> existing D3D9 Present/controller fallback"
+    ],
+    "batch_components": [
+      "Native game Present RGNDATA capture and producer/consumer output decision in C++",
+      "Exact bounded rectangle-union proof with no overlap/hole across menu/vehicle/race",
+      "Portable C++ positive/negative probe and GitHub CI destructive source integration regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "C++17 full-frame 2/4 tile partition exact coverage PASS locally; GitHub same-SHA integration pending",
+      "negative_regression": "Reject holes, overlap, excess area, bad bounds, 9+ rectangles, short buffer, null/invalid source; original D3D9 Present and gamepad",
+      "component_integration": "Game Draw -> D3D11 full-color RT -> ring readback fence/Map -> D3D9 same-Present UpdateSurface after whole RGNDATA coverage proof"
+    },
+    "conflict_keys": [
+      "DX11:FULLFRAME_PARTITIONED_PRESENT"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Await exactly matching DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Gates; Quest3/VDXR remains untested",
+    "activation_guard_and_fallback": "Requires existing dual opt-in and complete source Draw batch; only fully disjoint bounded regions publish native pixels; otherwise D3D9 drawing/Present/input unchanged"
+  },
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-NATIVE-PARTITIONED-DIRTY-PRESENT",
+    "goal": "Render supported real native D3D11 full-resolution menu/vehicle/race game frames through D3D9 Present even with safe multi-RECT whole dirty coverage while preserving gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "partitioned-full-frame-publish",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_menu_vehicle_race_present",
+        "expected_behavior": "Two through eight valid disjoint dirty rectangles with exact full-backbuffer union admit same-Present native game output."
+      },
+      {
+        "id": "partial-overlap-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_gamepad_fallback",
+        "expected_behavior": "Hole, overlap, invalid dimensions/count/bytes prevent D3D11 overwrite, retain D3D9 Present and gamepad unchanged."
+      },
+      {
+        "id": "same-sha-integrated-gates",
+        "category": "integrated_validation",
+        "behavior_area": "github_win32_openxr_hud",
+        "expected_behavior": "Portable C++ geometry probe plus destructive C++ source binding regression and all five mandatory Gates validate the same result SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "partitioned-full-frame-publish": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "partial-overlap-fallback": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "same-sha-integrated-gates": "PENDING_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS branch 21750d512a69cad3404670d170b395c409aa1cc8, 00748 C6 verified, 00749 absent",
+    "C1_REVIEW": "PASS single full dirty rectangle already supported, partitioned exact union rejected by nCount==1",
+    "C2_IMPLEMENT": "PASS C++ game path+geometry+positive/negative probes",
+    "C3_VALIDATE": "PASS scoped local portable C++17 check; GitHub five-gate pending",
+    "C4_COMMIT": "MATERIAL_COMMIT_PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "AWAIT_EXACT_SHA"
+  },
+  "next_action": "Wait for five exact-SHA GitHub Actions; repair causal failure within same TASK_ID, record C6 separately without rerunning unchanged source.",
+  "recorded_at_kst": "2026-10-15 07:24 KST"
+}

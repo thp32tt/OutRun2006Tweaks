@@ -5128,14 +5128,40 @@ void before_game_present(IDirect3DDevice9* game,
             dirtyRegion->rdh.nRgnSize >= sizeof(RECT);
         if (oneBoundedDirtyRect)
             std::memcpy(&dirtyRect, dirtyRegion->Buffer, sizeof(dirtyRect));
+        // D3D9 can also describe a complete menu/car/race repaint as several
+        // disjoint dirty rectangles. Verify exact, nonoverlapping full coverage
+        // before native publication, never use a full rcBound as proof by itself.
+        // Limit inspection to eight RECTs and a verified header/buffer extent.
+        GameNativeDirtyRectangle partitionRects[
+            GameNativeDirtyRegionCoverage::kMaxPartitionRects]{};
+        const bool boundedPartition = fullMode && backbufferKnown && dirtyRegion &&
+            dirtyRegion->rdh.dwSize == sizeof(RGNDATAHEADER) &&
+            dirtyRegion->rdh.iType == RDH_RECTANGLES &&
+            dirtyRegion->rdh.nCount >= 2u &&
+            dirtyRegion->rdh.nCount <= GameNativeDirtyRegionCoverage::kMaxPartitionRects &&
+            dirtyRegion->rdh.nRgnSize >= dirtyRegion->rdh.nCount * sizeof(RECT);
+        if (boundedPartition) {
+            for (std::uint32_t i = 0u; i < dirtyRegion->rdh.nCount; ++i) {
+                RECT part{};
+                std::memcpy(&part, dirtyRegion->Buffer + i * sizeof(RECT), sizeof(part));
+                partitionRects[i] = {part.left, part.top, part.right, part.bottom};
+            }
+        }
         const bool fullDirtyCoverage = fullMode && backbufferKnown && dirtyRegion &&
-            oneBoundedDirtyRect &&
-            GameNativeDirtyRegionCoverage::covers_full_backbuffer(
-                presentDesc.Width, presentDesc.Height,
-                dirtyRegion->rdh.nCount, dirtyRegion->rdh.nRgnSize,
-                dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top,
-                dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
-                dirtyRect.left, dirtyRect.top, dirtyRect.right, dirtyRect.bottom);
+            ((oneBoundedDirtyRect &&
+              GameNativeDirtyRegionCoverage::covers_full_backbuffer(
+                  presentDesc.Width, presentDesc.Height,
+                  dirtyRegion->rdh.nCount, dirtyRegion->rdh.nRgnSize,
+                  dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top,
+                  dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
+                  dirtyRect.left, dirtyRect.top, dirtyRect.right, dirtyRect.bottom)) ||
+             (boundedPartition &&
+              GameNativeDirtyRegionCoverage::covers_partition(
+                  presentDesc.Width, presentDesc.Height,
+                  dirtyRegion->rdh.nCount, dirtyRegion->rdh.nRgnSize,
+                  dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top,
+                  dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
+                  partitionRects)));
         if (!s.previousOutput.same(outputNow)) {
             // Also reject earlier GPU readbacks if the Present backbuffer COM identity
             // changed while the device, dimensions and format stayed identical.

@@ -124,6 +124,8 @@ jobs:
           python tools/test_dx11_game_present_crop_00698.py
           python tools/test_dx11_full_dirty_present_00748.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_dirty_present_probe_00748.cpp -o /tmp/dx11_dirty_present_00748 && /tmp/dx11_dirty_present_00748
+          python tools/test_dx11_full_dirty_partition_00749.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_dirty_partition_probe_00749.cpp -o /tmp/dx11_dirty_partition_00749 && /tmp/dx11_dirty_partition_00749
           python tools/test_dx11_full_frame_fallback_00724.py
           python tools/test_dx11_full_frame_same_present_00726.py
           python tools/test_dx11_same_present_fence_00731.py
