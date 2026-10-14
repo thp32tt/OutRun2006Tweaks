@@ -2118,7 +2118,7 @@ def main() -> None:
     print("DX11 stage0 ADDSMOOTH source-to-game-native-Draw PASS (static only)")
 
 
-    # 00560: Real game D3D9 DEFAULT render-target texture level 0 ->
+    # 00560/00742: Real game D3D9 DEFAULT render-target texture levels ->
     # exact-format, non-MSAA GetRenderTargetData -> CPU BGRA snapshot ->
     # existing D3D11 SRV/sampler -> actual native Draw/DrawIndexed/inset.
     # Ordinary non-dynamic, non-RT DEFAULT, compressed DEFAULT and MSAA fail closed.
@@ -2134,15 +2134,16 @@ def main() -> None:
         "base.Format == D3DFMT_A2B10G10R10 ? native_rt_readback::Layout::a2b10g10r10",
         "native_rt_readback::sampleable(rtLayout, capture.srgbTexture);",
         "if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;",
-        "capture.texture->GetSurfaceLevel(0, sourceSurface.GetAddressOf())",
+        "capture.texture->GetSurfaceLevel(level, sourceSurface.GetAddressOf())",
         "sourceDesc.MultiSampleType != D3DMULTISAMPLE_NONE",
-        "sourceDesc.Width != base.Width || sourceDesc.Height != base.Height",
-        "sourceDesc.Format != base.Format",
+        "sourceDesc.Width != desc.Width || sourceDesc.Height != desc.Height",
+        "sourceDesc.Format != desc.Format",
         "!(sourceDesc.Usage & D3DUSAGE_RENDERTARGET)",
         "capture.texture->GetDevice(gameDevice.GetAddressOf())",
         "gameDevice->CreateOffscreenPlainSurface(",
-        "base.Width, base.Height, base.Format, D3DPOOL_SYSTEMMEM,",
+        "desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM,",
         "gameDevice->GetRenderTargetData(sourceSurface.Get(), readbackSurface.Get())",
+        "native_rt_readback::matching_mip_extent(",
         "readbackSurface->LockRect(&lock, nullptr, D3DLOCK_READONLY)",
         "capture.texture->LockRect(level, &lock, nullptr, D3DLOCK_READONLY)",
         "const HRESULT unlockResult = gpuRenderTarget ?",
