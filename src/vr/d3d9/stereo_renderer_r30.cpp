@@ -4375,21 +4375,33 @@ namespace OutRunVRStereo
                  indexFormat != D3DFMT_INDEX32))
                 return E_NOTIMPL;
 
-            // Use the caller-declared D3D9 index window to avoid
-            // scanning UP indices twice before each stereo draw.
-            // Invalid windows fall back to the original D3D9 draw.
+            // D3D9 supplies a legal [minVertexIndex, minVertexIndex+numVertices)
+            // window for UP indices. R30 used to preserve that absolute base in
+            // both eye scratch buffers, so a large non-zero minimum inflated the
+            // transformed/uploaded vertex span even though the prefix could never
+            // be referenced. Rebase only that declared window to zero. The common
+            // min==0 path keeps the caller's index array without an extra copy.
             const std::uint64_t declaredEnd =
                 static_cast<std::uint64_t>(minVertexIndex) + numVertices;
             if (numVertices == 0 || declaredEnd > 262144u)
                 return E_NOTIMPL;
-            const UINT vertexCount = static_cast<UINT>(declaredEnd);
+            const std::uint64_t firstVertexByte =
+                static_cast<std::uint64_t>(minVertexIndex) * stride;
+            if (firstVertexByte >
+                static_cast<std::uint64_t>(
+                    (std::numeric_limits<std::size_t>::max)()))
+                return E_NOTIMPL;
+            const auto* windowVertexData =
+                static_cast<const std::uint8_t*>(vertexData) +
+                static_cast<std::size_t>(firstVertexByte);
+            const UINT vertexCount = numVertices;
 
             R30ScratchLease lease;
             if (!lease)
                 return E_NOTIMPL;
             auto& scratch = *lease.buffers;
-            // Reuse a UP-only mask. Clearing last draw's actual indices
-            // avoids zero-filling a huge sparse vertex span on every draw.
+            // Reuse a UP-only local mask. Clearing only last draw's referenced
+            // vertices avoids zero-filling the whole declared window.
             scratch.indexDecode.valid = false;
             for (const std::uint32_t previous : scratch.upTouched)
                 scratch.upUsed[previous] = 0;
@@ -4403,31 +4415,30 @@ namespace OutRunVRStereo
             {
                 return E_NOTIMPL;
             }
-            // Count only first references while writing the used-mask.
-            // Both eyes can then choose sparse copying without recounting
-            // the entire potentially large vertex span.
+
             UINT knownUsedCount = 0;
-            // Choose the index width once per draw, not for each index.
-            // Each typed walk fills the same sparse mask for both eyes.
             const auto collectUsed = [&](const auto* typedIndices) {
                 for (UINT i = 0; i < indexCount; ++i)
                 {
                     const std::uint32_t raw = typedIndices[i];
-                    if (raw < minVertexIndex || raw >= vertexCount)
+                    if (raw < minVertexIndex || raw >= declaredEnd)
                         return false;
-                    if (!scratch.upUsed[raw])
+                    const std::uint32_t local = raw - minVertexIndex;
+                    if (local >= vertexCount)
+                        return false;
+                    if (!scratch.upUsed[local])
                     {
-                        // Append first: failed allocation cannot strand
-                        // a dirty bit outside the next draw's clear list.
+                        // Append first: failed allocation cannot strand a dirty
+                        // mask bit outside the next draw's sparse clear list.
                         try
                         {
-                            scratch.upTouched.push_back(raw);
+                            scratch.upTouched.push_back(local);
                         }
                         catch (...)
                         {
                             return false;
                         }
-                        scratch.upUsed[raw] = 1;
+                        scratch.upUsed[local] = 1;
                         ++knownUsedCount;
                     }
                 }
@@ -4439,8 +4450,45 @@ namespace OutRunVRStereo
             if (!validIndices)
                 return E_NOTIMPL;
 
+            const void* drawIndexData = indexData;
+            if (minVertexIndex != 0)
+            {
+                // Only the non-zero-base path pays this second compact index
+                // walk. It removes minVertexIndex vertices from each eye's
+                // scratch/upload span, which dominates the extra index copy for
+                // the particle/decal batches this path targets.
+                try
+                {
+                    if (indexFormat == D3DFMT_INDEX16)
+                    {
+                        scratch.indices16.resize(indexCount);
+                        const auto* source =
+                            static_cast<const std::uint16_t*>(indexData);
+                        for (UINT i = 0; i < indexCount; ++i)
+                            scratch.indices16[i] =
+                                static_cast<std::uint16_t>(
+                                    source[i] - minVertexIndex);
+                        drawIndexData = scratch.indices16.data();
+                    }
+                    else
+                    {
+                        scratch.indices32.resize(indexCount);
+                        const auto* source =
+                            static_cast<const std::uint32_t*>(indexData);
+                        for (UINT i = 0; i < indexCount; ++i)
+                            scratch.indices32[i] =
+                                source[i] - minVertexIndex;
+                        drawIndexData = scratch.indices32.data();
+                    }
+                }
+                catch (...)
+                {
+                    return E_NOTIMPL;
+                }
+            }
+
             if (!R30ConfigureXyzrhwWorldEffect(
-                    device, vertexData, vertexCount, stride, state,
+                    device, windowVertexData, vertexCount, stride, state,
                     &scratch.upUsed, nullptr, nullptr, nullptr,
                     &scratch.upTouched))
             {
@@ -4449,7 +4497,7 @@ namespace OutRunVRStereo
             }
 
             if (!R30TransformXyzrhwStereo(
-                    vertexData, vertexCount, stride, state,
+                    windowVertexData, vertexCount, stride, state,
                     scratch.left, scratch.right,
                     &scratch.upUsed, knownUsedCount, &scratch.upTouched))
             {
@@ -4459,21 +4507,20 @@ namespace OutRunVRStereo
 
             auto leftDraw = [&]() {
                 return R29OwnerCallRawDrawIndexedPrimitiveUP(
-                    device, type, minVertexIndex, numVertices,
-                    primitiveCount, indexData, indexFormat,
+                    device, type, 0u, numVertices,
+                    primitiveCount, drawIndexData, indexFormat,
                     scratch.left.data(), stride);
             };
             auto rightDraw = [&]() {
                 return R29OwnerCallRawDrawIndexedPrimitiveUP(
-                    device, type, minVertexIndex, numVertices,
-                    primitiveCount, indexData, indexFormat,
+                    device, type, 0u, numVertices,
+                    primitiveCount, drawIndexData, indexFormat,
                     scratch.right.data(), stride);
             };
             return R30ExecuteXyzrhwStereo(
                 device, state, leftDraw, rightDraw,
                 "R30.6/DrawIndexedPrimitiveUP-XYZRHW");
         }
-
 
         HRESULT R30TryXyzrhwPrimitiveVB(
             IDirect3DDevice9* device, D3DPRIMITIVETYPE type,

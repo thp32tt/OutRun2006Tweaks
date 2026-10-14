@@ -293,83 +293,128 @@ def verify_vb_mask_reuse(body):
 
 
 def verify_up_single_pass(source):
-    """Full UP 16/32-bit sparse stereo, legal window, negative mutations."""
+    """Indexed UP compacts non-zero declared bases without changing draw semantics."""
     body = source.split("HRESULT R30TryXyzrhwIndexedPrimitiveUP(", 1)[1].split(
         "HRESULT R30TryXyzrhwPrimitiveVB(", 1)[0]
+
     required = (
         "static_cast<std::uint64_t>(minVertexIndex) + numVertices;",
         "if (numVertices == 0 || declaredEnd > 262144u)",
-        "if (raw < minVertexIndex || raw >= vertexCount)",
-        "const auto collectUsed = [&](const auto* typedIndices)",
-        "const std::uint32_t raw = typedIndices[i];",
-        "collectUsed(static_cast<const std::uint16_t*>(indexData))",
-        "collectUsed(static_cast<const std::uint32_t*>(indexData))",
-        "if (!validIndices)",
-        "scratch.upTouched.push_back(raw);",
-        "scratch.upUsed[raw] = 1;",
+        "static_cast<std::uint64_t>(minVertexIndex) * stride;",
+        "(std::numeric_limits<std::size_t>::max)()",
+        "const auto* windowVertexData =",
+        "static_cast<const std::uint8_t*>(vertexData) +",
+        "const UINT vertexCount = numVertices;",
+        "if (raw < minVertexIndex || raw >= declaredEnd)",
+        "const std::uint32_t local = raw - minVertexIndex;",
+        "if (local >= vertexCount)",
+        "scratch.upTouched.push_back(local);",
+        "scratch.upUsed[local] = 1;",
+        "const void* drawIndexData = indexData;",
+        "if (minVertexIndex != 0)",
+        "scratch.indices16.resize(indexCount);",
+        "source[i] - minVertexIndex);",
+        "scratch.indices32.resize(indexCount);",
+        "drawIndexData = scratch.indices16.data();",
+        "drawIndexData = scratch.indices32.data();",
+        "device, windowVertexData, vertexCount, stride, state,",
+        "windowVertexData, vertexCount, stride, state,",
+        "device, type, 0u, numVertices,",
+        "primitiveCount, drawIndexData, indexFormat,",
         "&scratch.upUsed, knownUsedCount, &scratch.upTouched)",
         "R30ExecuteXyzrhwStereo(",
     )
     assert all(token in body for token in required)
-    assert "UINT maxIndex = 0;" not in body
-    assert body.count("for (UINT i = 0; i < indexCount; ++i)") == 1
-    assert body.index("for (UINT i = 0; i < indexCount; ++i)") < body.index(
-        "const bool validIndices = indexFormat == D3DFMT_INDEX16")
-    for original, wrong in (
-        ("numVertices == 0", "numVertices != 0"),
-        ("declaredEnd > 262144u", "declaredEnd < 262144u"),
-        ("raw < minVertexIndex", "false"),
-        ("raw >= vertexCount", "false"),
-        ("scratch.upTouched.push_back(raw);", "scratch.upTouched.clear();"),
-        ("scratch.upUsed[raw] = 1;", "scratch.upUsed[raw] = 0;"),
-        ("collectUsed(static_cast<const std::uint16_t*>(indexData))",
-         "collectUsed(static_cast<const std::uint32_t*>(indexData))"),
-        ("collectUsed(static_cast<const std::uint32_t*>(indexData))",
-         "collectUsed(static_cast<const std::uint16_t*>(indexData))"),
-    ):
-        assert original in body
-        mutant = body.replace(original, wrong, 1)
+    forbidden = (
+        "const UINT vertexCount = static_cast<UINT>(declaredEnd);",
+        "scratch.upTouched.push_back(raw);",
+        "scratch.upUsed[raw] = 1;",
+        "device, type, minVertexIndex, numVertices,",
+        "primitiveCount, indexData, indexFormat,\n                    scratch.left.data()",
+    )
+    assert all(token not in body for token in forbidden)
+    assert body.count("for (UINT i = 0; i < indexCount; ++i)") == 3
+
+    # Destructive source mutations must invalidate the static contract rather
+    # than silently restoring the old absolute-base scratch/upload behavior.
+    mutations = (
+        ("const UINT vertexCount = numVertices;",
+         "const UINT vertexCount = static_cast<UINT>(declaredEnd);"),
+        ("const std::uint32_t local = raw - minVertexIndex;",
+         "const std::uint32_t local = raw;"),
+        ("scratch.upTouched.push_back(local);",
+         "scratch.upTouched.push_back(raw);"),
+        ("scratch.upUsed[local] = 1;",
+         "scratch.upUsed[raw] = 1;"),
+        ("if (minVertexIndex != 0)", "if (false)"),
+        ("source[i] - minVertexIndex);", "source[i]);"),
+        ("device, windowVertexData, vertexCount, stride, state,",
+         "device, vertexData, vertexCount, stride, state,"),
+        ("windowVertexData, vertexCount, stride, state,",
+         "vertexData, vertexCount, stride, state,"),
+        ("device, type, 0u, numVertices,",
+         "device, type, minVertexIndex, numVertices,"),
+        ("primitiveCount, drawIndexData, indexFormat,",
+         "primitiveCount, indexData, indexFormat,"),
+    )
+    for original, broken in mutations:
+        assert original in body, original
+        mutant = body.replace(original, broken, 1)
         assert not all(token in mutant for token in required), original
 
-    def accepted(indices, minimum, count):
+    def old_accept(indices, minimum, count):
         end = minimum + count
         return (count > 0 and end <= 262144
                 and all(minimum <= index < end for index in indices))
 
-    rng = random.Random(792)
+    def compact(indices, minimum, count, bits):
+        if not old_accept(indices, minimum, count):
+            return None
+        locals_ = [index - minimum for index in indices]
+        if bits == 16 and any(local > 0xFFFF for local in locals_):
+            return None
+        return count, locals_
+
+    rng = random.Random(831)
+    cases = 0
+    saved_vertices = 0
     for bits in (16, 32):
         max_raw = (1 << bits) - 1
-        for _ in range(1000):
-            low = rng.randint(0, 4096)
-            count = rng.randint(1, 400)
-            end = low + count
-            indices = [rng.randrange(low, end)
-                       for _ in range(rng.randint(1, 120))]
-            # In-range original max-index scan and one-pass upper bound agree.
-            old_end = max(end, max(indices) + 1)
-            assert old_end == end and accepted(indices, low, count)
-            # Compare the populated touched list/mask with a separate
-            # reference to detect loss or duplicate counting of indices.
-            reference = set(indices)
-            touched = []
-            used = set()
-            for raw in indices:
-                if raw not in used:
-                    touched.append(raw)
-                    used.add(raw)
-            assert used == reference
-            assert len(touched) == len(reference)
-            assert len(touched) == len(set(touched))
-            if low:
-                assert not accepted(indices + [low - 1], low, count)
+        for _ in range(1400):
+            maximum_min = min(8192, max_raw - 1)
+            minimum = rng.randint(0, maximum_min)
+            max_count = min(800, max_raw - minimum + 1)
+            count = rng.randint(1, max_count)
+            end = minimum + count
+            indices = [rng.randrange(minimum, end)
+                       for _ in range(rng.randint(1, 160))]
+            result = compact(indices, minimum, count, bits)
+            assert result is not None
+            compact_count, locals_ = result
+            assert compact_count == count
+            assert [local + minimum for local in locals_] == indices
+            assert all(0 <= local < count for local in locals_)
+            old_span = minimum + count
+            new_span = count
+            assert new_span <= old_span
+            saved_vertices += old_span - new_span
+            cases += 1
+            if minimum:
+                assert not old_accept(indices + [minimum - 1], minimum, count)
             if end <= max_raw:
-                assert not accepted(indices + [end], low, count)
-    assert not accepted([0], 0, 0)
-    assert not accepted([262144], 0, 262144)
-    assert not accepted([0xFFFFFFFF], 0xFFFFFFFE, 4)
-    assert accepted([0, 1, 0], 0, 2)
-    print("PASS R30 indexed-UP one-pass: 2000 randomized 16/32-bit windows, "
-          "invalid range/fallback and six destructive mutations")
+                assert not old_accept(indices + [end], minimum, count)
+
+    # Zero-base calls preserve the caller index data and exact vertex span.
+    assert compact([0, 2, 1, 2], 0, 3, 16) == (3, [0, 2, 1, 2])
+    # Non-zero base is mathematically equivalent after rebase.
+    assert compact([400, 403, 401, 403], 400, 4, 16) == (4, [0, 3, 1, 3])
+    assert compact([70000, 70002], 70000, 3, 32) == (3, [0, 2])
+    assert not old_accept([99], 100, 2)
+    assert not old_accept([102], 100, 2)
+
+    print(f"PASS R30 indexed-UP local-window compaction: {cases + 5} cases, "
+          f"{saved_vertices} scratch vertices avoided in non-zero-base models, "
+          f"{len(mutations)} destructive mutations")
 
 
 def main():

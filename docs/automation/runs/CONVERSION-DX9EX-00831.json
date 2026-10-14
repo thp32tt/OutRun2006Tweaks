@@ -1,0 +1,81 @@
+{
+  "task_id": "CONVERSION-DX9EX-00831",
+  "production_id": "CONVERSION-DX9EX-00831",
+  "event_id": "CONVERSION-DX9EX-00831-E001",
+  "event_type": "material_implementation",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R30_INDEXED_UP_LOCAL_WINDOW",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R30_INDEXED_UP_LOCAL_WINDOW",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "phase": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R30_INDEXED_UP_LOCAL_WINDOW",
+    "goal": "Reduce CPU scratch transformation and D3D9 UP submission span for non-zero-base indexed XYZRHW smoke/sand/decal draws without changing the visible vertex/index set or zero-base fast path.",
+    "scope_boundary": "Only R30 DrawIndexedPrimitiveUP XYZRHW world/HUD conversion; no alpha quality reduction, no render-order batching, no DX11/DXVK, SkyGlow, FFB, DirectGPU transport or user input changes.",
+    "special_work_evidence": "Before this task R30 sizes both eye scratch buffers to minVertexIndex+numVertices and resubmits original absolute indices. The D3D9 declared index window permits an equivalent zero-based local window of exactly numVertices with indices rebased by minVertexIndex.",
+    "trace_stages": [
+      "Game DrawIndexedPrimitiveUP declares a legal minVertexIndex/numVertices window and particle/decal index list.",
+      "R30 validates original indices, maps them to local window indices, transforms only numVertices for both eyes, and submits the same triangles at minVertexIndex=0.",
+      "R30ExecuteXyzrhwStereo keeps existing left/right render-target ordering, depth ownership, alpha blend state and OpenXR composition."
+    ],
+    "subcomponents": [
+      "Offset source vertex pointer by minVertexIndex*stride with 32-bit-build overflow guard and size scratch to numVertices.",
+      "Keep one-pass sparse local used-mask; copy/rebase index data only when minVertexIndex is non-zero so common zero-base UP calls add no index-copy pass.",
+      "Extend the existing exact-SHA R30 index-rebase verifier with 2800 randomized 16/32-bit equivalence models and destructive mutations."
+    ],
+    "acceptance_items": [
+      {
+        "id": "LOCAL_WINDOW_EQUIVALENCE",
+        "category": "end_to_end_behavior",
+        "behavior_area": "particle_decal_indexed_up",
+        "expected_behavior": "Non-zero-base indexed UP renders the same vertex/index sequence while removing the unreachable prefix from both eye scratch/upload spans."
+      },
+      {
+        "id": "ZERO_BASE_AND_INVALID_FALLBACK_SAFE",
+        "category": "fallback_regression",
+        "behavior_area": "zero_base_and_invalid_windows",
+        "expected_behavior": "minVertexIndex=0 retains original index pointer/single scan behavior; invalid/overflowing windows fail open to the original D3D9 path."
+      },
+      {
+        "id": "EXACT_SHA_WIN32_INTEGRATION",
+        "category": "integrated_validation",
+        "behavior_area": "windows_game_host_package",
+        "expected_behavior": "Final exact-SHA DX9Ex Active, Domain Isolation and relevant Full Source Impact workflows succeed."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "LOCAL_WINDOW_EQUIVALENCE": "PASS_STATIC_MODEL_PENDING_CI",
+    "ZERO_BASE_AND_INVALID_FALLBACK_SAFE": "PASS_STATIC_MODEL_PENDING_CI",
+    "EXACT_SHA_WIN32_INTEGRATION": "PENDING"
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_index_rebase_fastpath.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00831.json"
+  ],
+  "diagnosis": {
+    "original_evidence": "R30TryXyzrhwIndexedPrimitiveUP used vertexCount=minVertexIndex+numVertices, absolute used-mask indices and original min/index data for both transformed UP eye draws.",
+    "root_cause": "The legal D3D9 minimum vertex index was treated as required scratch prefix rather than an address base, amplifying CPU copy/transform and driver UP upload span for non-zero-base particle/decal draws.",
+    "alternatives_rejected": [
+      "Changing transparency resolution or alpha quality is not justified without GPU timing and would alter visuals.",
+      "Batching render-target transitions across transparent draws risks alpha ordering and state lifetime, so it is not mixed into this source-safe optimization."
+    ],
+    "fix_evidence": "The transformed source pointer advances by minVertexIndex*stride, all used-mask indices become raw-minVertexIndex, and submitted indices are rebased only for non-zero minimums; zero-base caller index data is reused unchanged."
+  },
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no Quest3/VDXR FPS/p95/p99 measurement yet. This specifically targets CPU/driver submission amplification and does not claim to solve pure GPU overdraw from glass/water/smoke.",
+  "schema": 2,
+  "checkpoint": "C3_VALIDATE",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00831]",
+  "base_sha": "cafa3c6f2d41ea07e5f562187a3c48d05237f35c",
+  "material_result_sha": null,
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "next_action": "Run exact-SHA DX9Ex Active, Domain Isolation and Full Source Impact; repair only under 00831 if a genuine verifier/build failure appears, then C6 and score once."
+}
