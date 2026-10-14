@@ -152,7 +152,10 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "s.frameBatch.accepts_full(sourceOrdinal)" in code and
             "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in code and
             "kMaxFullFrameDraws = 4096u" in batch_source and
-            "if (s.frameBatch.first_draw()) s.backend.begin_frame(kBackground);" in code and
+            "if (s.frameBatch.first_draw()) {" in code and
+            "s.backend.begin_frame(env_full_game_opt_in()" in code and
+            "s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)" in code and
+            ": kBackground);" in code and
             "if (s.frameBatch.clear_depth())" in code and
             "s.frameBatch.accepts_depth(output.nativeDepthTest," in code and
             "s.frameBatch.abort();" in code and
