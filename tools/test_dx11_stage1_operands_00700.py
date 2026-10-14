@@ -20,10 +20,10 @@ def integrated(source):
         "(source & 15) == 3 ? stage1Factor : current" in hlsl,
         "if ((source & 32) != 0) value = value.aaaa;" in hlsl,
         "if ((source & 16) != 0) value = 1.0f - value;" in hlsl,
-        "Stage1Source(stage0, diffuse, stage1Args.x)" in hlsl,
-        "Stage1Source(stage0, diffuse, stage1Args.y)" in hlsl,
-        "Stage1Source(stage0, diffuse, stage1Args.z)" in hlsl,
-        "Stage1Source(stage0, diffuse, stage1Args.w)" in hlsl,
+        "Stage1Source(stage0, diffuse, specular, stage1Args.x)" in hlsl,
+        "Stage1Source(stage0, diffuse, specular, stage1Args.y)" in hlsl,
+        "Stage1Source(stage0, diffuse, specular, stage1Args.z)" in hlsl,
+        "Stage1Source(stage0, diffuse, specular, stage1Args.w)" in hlsl,
         "stage1_combiner_supported(nextColorOp, color1, color2)" in producer,
         "stage1_alpha_supported(alphaOp, alpha1, alpha2)" in producer,
         "stage1Result != D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE" in producer,
@@ -42,7 +42,7 @@ for token in (
     "kStage1Modulate2X", "kStage1Modulate4X", "kStage1Subtract",
     "kStage1AddSmooth"):
     assert token in header, token
-for token in ("512u", "0x14u", "0x43u", "0x81u", "0x103u",
+for token in ("512u", "0x15u", "0x43u", "0x81u", "0x103u",
               "kStage1Complement | kStage1AlphaReplicate"):
     assert token in probe, token
 # Fault injection: these are actual source→cbuffer→shader→Draw integration checks,

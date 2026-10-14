@@ -14,11 +14,11 @@ def integrated(src):
     shader = src.split('constexpr char kStage1FactorShader[] = R"(', 1)[1].split(')";', 1)[0]
     return all((
         "if ((source & 15) == 0) value = diffuse;" in shader,
-        "float4 Stage1AndAlpha(float4 stage0, float4 diffuse)" in shader,
-        all("Stage1Source(stage0, diffuse, stage1Args." + ch + ")" in shader
+        "float4 Stage1AndAlpha(float4 stage0, float4 diffuse, float4 specular)" in shader,
+        all("Stage1Source(stage0, diffuse, specular, stage1Args." + ch + ")" in shader
             for ch in "xyzw"),
         all("return Stage1AndAlpha(" in shader and
-            "v.diffuse);" in line for line in shader.splitlines()
+            "v.diffuse, v.specular);" in line for line in shader.splitlines()
             if "return Stage1AndAlpha(" in line),
         shader.count("return Stage1AndAlpha(") == 4,
         "stage1_operation_reads_diffuse(nextColorOp, color1, color2)" in producer,
@@ -53,8 +53,8 @@ assert "python tools/test_dx11_stage1_diffuse_00701.py" in workflow
 # RGB and alpha operands, and BOTH native draw paths, not an inert helper.
 for snippet in (
     "if ((source & 15) == 0) value = diffuse;",
-    "Stage1Source(stage0, diffuse, stage1Args.x)",
-    "Stage1Source(stage0, diffuse, stage1Args.w)",
+    "Stage1Source(stage0, diffuse, specular, stage1Args.x)",
+    "Stage1Source(stage0, diffuse, specular, stage1Args.w)",
     "stage1_operation_reads_diffuse(nextColorOp, color1, color2)",
     "stage1_operation_reads_diffuse(alphaOp, alpha1, alpha2)",
     "(!layout.hasDiffuse &&\n             (stage1_operation_reads_diffuse",
