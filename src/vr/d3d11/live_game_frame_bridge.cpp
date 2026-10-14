@@ -3909,7 +3909,10 @@ bool upload_native_stream(ID3D11Device* device, ID3D11DeviceContext* context,
     }
     D3D11_MAPPED_SUBRESOURCE mapped{};
     if (FAILED(context->Map(buffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD,
-                            0u, &mapped)) || !mapped.pData) return false;
+                            0u, &mapped))) return false;
+    // Defensive balance even for a malformed success result: never leave an
+    // otherwise mapped native diagnostic buffer locked on the failure path.
+    if (!mapped.pData) { context->Unmap(buffer.Get(), 0u); return false; }
     std::memcpy(mapped.pData, source, bytes);
     context->Unmap(buffer.Get(), 0u);
     return true;
