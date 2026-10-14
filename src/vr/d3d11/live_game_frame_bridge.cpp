@@ -93,6 +93,7 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1Subtract == D3DTOP_SUBTRACT &&
               kStage1AddSmooth == D3DTOP_ADDSMOOTH &&
               kStage1BlendDiffuseAlpha == D3DTOP_BLENDDIFFUSEALPHA &&
+              kStage1BlendTextureAlpha == D3DTOP_BLENDTEXTUREALPHA &&
               kStage1BlendFactorAlpha == D3DTOP_BLENDFACTORALPHA &&
               kStage1BlendCurrentAlpha == D3DTOP_BLENDCURRENTALPHA &&
               kStage1ModulateAlphaAddColor == D3DTOP_MODULATEALPHA_ADDCOLOR &&
@@ -1245,13 +1246,21 @@ float4 Stage1ThreeSource(float4 stage0, float4 diffuse, float4 specular,
     if (op == 25) return saturate(a1 + a2 * a0);
     return saturate(lerp(a2, a1, a0)); // 26, CPU-gated
 }
-float4 Stage1AndAlpha(float4 stage0, float4 diffuse, float4 specular) {
+float4 Stage1AndAlpha(float4 stage0, float4 diffuse, float4 specular,
+                      float stage1TextureAlpha) {
     float4 color = Stage1Combine(
         Stage1Source(stage0, diffuse, specular, stage1Args.x),
         Stage1Source(stage0, diffuse, specular, stage1Args.y), stage1Ops.x, stage0, diffuse);
     if (stage1Ops.x == 25 || stage1Ops.x == 26)
         color = Stage1ThreeSource(stage0, diffuse, specular, stage1Ops.x,
                                   stage1ArgZero.x, stage1Args.x, stage1Args.y);
+    // Only admitted when D3D9 stage 1 samples exactly the mirrored stage-0
+    // texture at identical coordinates with identical sampling parameters.
+    if (stage1Ops.x == 13)
+        color = saturate(lerp(
+            Stage1Source(stage0, diffuse, specular, stage1Args.y),
+            Stage1Source(stage0, diffuse, specular, stage1Args.x),
+            stage1TextureAlpha));
     float alpha = stage1Ops.y == 1 ?
         (stage1Ops.z != 0 ? diffuse.a : stage0.a) : Stage1Combine(
         Stage1Source(stage0, diffuse, specular, stage1Args.z),
@@ -1259,21 +1268,29 @@ float4 Stage1AndAlpha(float4 stage0, float4 diffuse, float4 specular) {
     if (stage1Ops.y == 25 || stage1Ops.y == 26)
         alpha = Stage1ThreeSource(stage0, diffuse, specular, stage1Ops.y,
                                   stage1ArgZero.y, stage1Args.z, stage1Args.w).a;
+    if (stage1Ops.y == 13)
+        alpha = saturate(lerp(
+            Stage1Source(stage0, diffuse, specular, stage1Args.w),
+            Stage1Source(stage0, diffuse, specular, stage1Args.z),
+            stage1TextureAlpha)).a;
     float4 result = float4(color.rgb, alpha);
     AlphaGate(result.a);
     return result;
 }
 float4 PSStage1Diffuse(VOut v) : SV_Target {
-    return Stage1AndAlpha(v.diffuse, v.diffuse, v.specular);
+    return Stage1AndAlpha(v.diffuse, v.diffuse, v.specular, 0.0f);
 }
 float4 PSStage1Modulate(VOut v) : SV_Target {
-    return Stage1AndAlpha(gameTexture.Sample(gameSampler, v.uv) * v.diffuse, v.diffuse, v.specular);
+    float4 t = gameTexture.Sample(gameSampler, v.uv);
+    return Stage1AndAlpha(t * v.diffuse, v.diffuse, v.specular, t.a);
 }
 float4 PSStage1TextureOnly(VOut v) : SV_Target {
-    return Stage1AndAlpha(gameTexture.Sample(gameSampler, v.uv), v.diffuse, v.specular);
+    float4 t = gameTexture.Sample(gameSampler, v.uv);
+    return Stage1AndAlpha(t, v.diffuse, v.specular, t.a);
 }
 float4 PSStage1Add(VOut v) : SV_Target {
-    return Stage1AndAlpha(saturate(gameTexture.Sample(gameSampler, v.uv) + v.diffuse), v.diffuse, v.specular);
+    float4 t = gameTexture.Sample(gameSampler, v.uv);
+    return Stage1AndAlpha(saturate(t + v.diffuse), v.diffuse, v.specular, t.a);
 }
 )";
 
@@ -3000,12 +3017,16 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
                  ? (!stage1_three_source_supported(nextColorOp, color0, color1, color2) &&
                     !stage1_three_source_supported_with_temp(nextColorOp, color0, color1, color2, stage0WritesTemp))
                  : (!stage1_combiner_supported(nextColorOp, color1, color2) &&
-                    !stage1_combiner_supported_with_temp(nextColorOp, color1, color2, stage0WritesTemp))) ||
+                    !stage1_combiner_supported_with_temp(nextColorOp, color1, color2, stage0WritesTemp) &&
+                     !stage1_matched_texture_alpha_blend_supported(
+                         nextColorOp, color1, color2, true, stage0WritesTemp))) ||
             (stage1_three_source_operation(alphaOp)
                  ? (!stage1_three_source_supported(alphaOp, alpha0, alpha1, alpha2) &&
                     !stage1_three_source_supported_with_temp(alphaOp, alpha0, alpha1, alpha2, stage0WritesTemp))
                  : (!stage1_alpha_supported(alphaOp, alpha1, alpha2) &&
-                    !stage1_alpha_supported_with_temp(alphaOp, alpha1, alpha2, stage0WritesTemp))) ||
+                    !stage1_alpha_supported_with_temp(alphaOp, alpha1, alpha2, stage0WritesTemp) &&
+                     !stage1_matched_texture_alpha_blend_supported(
+                         alphaOp, alpha1, alpha2, true, stage0WritesTemp))) ||
             (!layout.hasDiffuse &&
              (stage1_operation_reads_diffuse(nextColorOp, color1, color2) ||
               stage1_operation_reads_diffuse(alphaOp, alpha1, alpha2) ||
@@ -3019,6 +3040,41 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             (capture.enabled && !capture.stage0FullModulate &&
              !capture.selectTexture && !capture.additive))
             return false;
+        // D3D9 Stage1 BLENDTEXTUREALPHA reads sampler/texture 1. It may
+        // reuse the native stage-0 sample only when resource, UV and all
+        // relevant sampler state agree; otherwise preserve original D3D9.
+        if (nextColorOp == D3DTOP_BLENDTEXTUREALPHA ||
+            alphaOp == D3DTOP_BLENDTEXTUREALPHA) {
+            if (!capture.enabled || !tex) return false;
+            ComPtr<IDirect3DBaseTexture9> tex1;
+            DWORD uv1 = ~0u, transform1 = ~0u;
+            if (FAILED(game->GetTexture(1, tex1.GetAddressOf())) ||
+                !tex1 || tex1.Get() != tex.Get() ||
+                FAILED(game->GetTextureStageState(1, D3DTSS_TEXCOORDINDEX, &uv1)) ||
+                FAILED(game->GetTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS, &transform1)) ||
+                uv1 != capture.coordIndex ||
+                transform1 != (capture.transformUv ? D3DTTFF_COUNT2 : D3DTTFF_DISABLE))
+                return false;
+            if (capture.transformUv) {
+                D3DMATRIX matrix1{};
+                if (FAILED(game->GetTransform(D3DTS_TEXTURE1, &matrix1)) ||
+                    std::memcmp(&capture.uvTransform, &matrix1, sizeof(matrix1)) != 0)
+                    return false;
+            }
+            constexpr std::array<D3DSAMPLERSTATETYPE, 11> states{{
+                D3DSAMP_ADDRESSU, D3DSAMP_ADDRESSV, D3DSAMP_ADDRESSW,
+                D3DSAMP_BORDERCOLOR, D3DSAMP_MAGFILTER, D3DSAMP_MINFILTER,
+                D3DSAMP_MIPFILTER, D3DSAMP_MIPMAPLODBIAS,
+                D3DSAMP_MAXMIPLEVEL, D3DSAMP_MAXANISOTROPY,
+                D3DSAMP_SRGBTEXTURE
+            }};
+            for (auto state : states) {
+                DWORD s0 = ~0u, s1 = ~0u;
+                if (FAILED(game->GetSamplerState(0, state, &s0)) ||
+                    FAILED(game->GetSamplerState(1, state, &s1)) || s0 != s1)
+                    return false;
+            }
+        }
         // Only read stage-local CONSTANT when active COLOR/ALPHA/ARG0 needs it.
         // A failed query preserves D3D9 Draw/Present and gamepad unchanged.
         const bool needsStageConstant =

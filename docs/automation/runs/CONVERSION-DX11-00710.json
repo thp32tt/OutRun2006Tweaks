@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00710",
+  "production_id": "CONVERSION-DX11-00710",
+  "event_id": "CONVERSION-DX11-00710-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "LIVE_STAGE1_MATCHED_TEXTURE_ALPHA_MENU_RACE",
+  "work_key": "DX11:STAGE1_MATCHED_TEXTURE_ALPHA",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "D3D9 Stage1 texture/UV/sampler identity",
+      "D3D11 Stage1 shader RGB and alpha to native Draw/Indexed",
+      "unmatched state original D3D9 Draw and gamepad fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_stage1_texture_alpha_probe_00710.cpp",
+      "tools/test_dx11_stage1_texture_alpha_00710.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "400 regular and 160 TEMP combinations; five alpha weight samples",
+      "negative_regression": "different texture, texcoords/transform/filter/LOD/sRGB or bad source remains original D3D9",
+      "component_integration": "live game Stage1 capture to mirrored native pixel alpha and native Draw/Indexed"
+    },
+    "conflict_keys": [
+      "DX11:STAGE1_MATCHED_TEXTURE_ALPHA",
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Quest3/VDXR image still untested",
+    "activation_guard_and_fallback": "diagnostic-only native opt-in; original D3D9/gamepad authoritative"
+  },
+  "feature_contract": {
+    "feature_id": "LIVE_STAGE1_MATCHED_TEXTURE_ALPHA_MENU_RACE",
+    "goal": "Carry same-texture Stage1 alpha blends from real game D3D9 menu/race states to native DX11 Draw and preserve fail-closed fallback",
+    "acceptance_items": [
+      {
+        "id": "native-game-alpha",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_state_to_HLSL_native",
+        "expected_behavior": "Stage1 RGB and independent alpha use matched game-texture alpha"
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "DX9Ex_original_gamepad",
+        "expected_behavior": "unmatched sampler, UV, texture or source rejected without disturbing original draw"
+      },
+      {
+        "id": "exact-sha",
+        "category": "integrated_validation",
+        "behavior_area": "C++_Python_GitHub_Actions",
+        "expected_behavior": "560 source combinations, mutation checks, complete exact SHA gates"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_stage1_texture_alpha_probe_00710.cpp",
+    "tools/test_dx11_stage1_texture_alpha_00710.py",
+    "docs/automation/runs/CONVERSION-DX11-00710.json"
+  ],
+  "base_head_sha": "c8a5194bc434f4e76e5582724c9861fe47aaf6fd",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "next_action": "Run exact-SHA Actions, repair same feature if needed; Quest3/VDXR untested."
+}
