@@ -15,7 +15,8 @@ def integrated(src):
     return all((
         "if ((source & 15) == 0) value = diffuse;" in shader,
         "float4 Stage1AndAlpha(float4 stage0, float4 diffuse, float4 specular," in shader,
-        all("Stage1Source(stage0, diffuse, specular, stage1Args." + ch + ")" in shader
+        all(shader.count(
+            "Stage1Source(stage0, diffuse, specular, stage1Args." + ch + ")") == 2
             for ch in "xyzw"),
         all("return Stage1AndAlpha(" in shader and
             "v.diffuse, v.specular," in line for line in shader.splitlines()
