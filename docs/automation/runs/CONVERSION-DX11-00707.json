@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "feature_id": "GAME_STAGE1_CONSTANT_RGBA_MENU_RACE",
   "work_key": "DX11:GAME_STAGE1_CONSTANT_RGBA",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -77,9 +77,9 @@
     ]
   },
   "acceptance_results": {
-    "constant-native-rgb-alpha": "PENDING_CI",
-    "constant-query-fail-closed": "PENDING_CI",
-    "same-sha-build": "PENDING_CI"
+    "constant-native-rgb-alpha": "PASS",
+    "constant-query-fail-closed": "PASS",
+    "same-sha-build": "PASS"
   },
   "base_head_sha": "589f248e7f4136ed72858247c318834250a8e985",
   "changed_files": [
@@ -94,11 +94,40 @@
   "pipeline": {
     "C0_RECOVER": "DONE",
     "C1_REVIEW": "DONE",
-    "C2_IMPLEMENT": "DONE",
-    "C3_VALIDATE": "PENDING",
-    "C4_COMMIT": "PENDING",
+    "C2_IMPLEMENT": "DONE D3D9 Stage1 CONSTANT native RGB/alpha and 16400-variant probe",
+    "C3_VALIDATE": "PASS_EXACT_SHA Fast 38498633674 Backend 38498633623 Build 38498638621 OpenXR 38498638599 HUD 38498638674 all success at 5e96146d53ce61890cd5de18f44b985df35e4fd7; HMD/gamepad UNTESTED",
+    "C4_COMMIT": "PASS material b08bf513fd9196952fc6de20e3c9b47ab558de5b, validation-bearing 5e96146d53ce61890cd5de18f44b985df35e4fd7 no CI skip",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED exact SHA 5/5; bookkeeping separate [skip ci] and HMD UNTESTED"
   },
-  "next_action": "Verify exact SHA GitHub checks; HMD and gamepad UNTESTED"
+  "next_action": "BUILD_VERIFIED, NEED_HMD_TEST for actual menu/car/race Quest3/VDXR and gamepad. Controller may select another independent DX11 feature; do not rescore 00707.",
+  "material_result_sha": "b08bf513fd9196952fc6de20e3c9b47ab558de5b",
+  "validation_bearing_result_sha": "5e96146d53ce61890cd5de18f44b985df35e4fd7",
+  "state_persisted": true,
+  "gate_evidence": {
+    "validation_bearing_sha": "5e96146d53ce61890cd5de18f44b985df35e4fd7",
+    "exact_sha": true,
+    "dx11_fast_structural_checks": {
+      "id": 38498633674,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38498633623,
+      "conclusion": "SUCCESS"
+    },
+    "windows_build": {
+      "id": 38498638621,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38498638599,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38498638674,
+      "conclusion": "SUCCESS"
+    },
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  }
 }
