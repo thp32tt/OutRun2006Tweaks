@@ -2,8 +2,8 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00835",
   "production_id": "CONVERSION-DX9EX-00835",
-  "event_id": "CONVERSION-DX9EX-00835-E001",
-  "event_type": "dispatch_material",
+  "event_id": "CONVERSION-DX9EX-00835-E002",
+  "event_type": "result",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
@@ -11,11 +11,11 @@
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "work_key": "DX9EX:VIS:MAIN_MENU",
-  "status": "C2_SOURCE_IMPLEMENTED_C3_EXACT_SHA_PENDING",
-  "phase": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "material_result_sha": "73d9feb842edaa6b41d5342c3229a5146efae291",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
@@ -57,9 +57,9 @@
     ]
   },
   "acceptance_results": {
-    "MAIN_MENU_COMPLETE_QUAD": "SOURCE_IMPLEMENTED",
-    "RESET_NONFINITE_ATOMIC_FALLBACK": "SOURCE_TEST_SUBMITTED",
-    "FINAL_INTEGRATED_EXACT_SHA": "PENDING"
+    "MAIN_MENU_COMPLETE_QUAD": "PASS_EXACT_SHA",
+    "RESET_NONFINITE_ATOMIC_FALLBACK": "PASS_EXACT_SHA",
+    "FINAL_INTEGRATED_EXACT_SHA": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "At GitHub material parent, original src/hooks_uiscaling.cpp draw_sprite_custom_matrix_mid wrote four transformed vertices incrementally to global g_spriteVertexStream and then issued DrawPrimitiveUP with no complete-quad finite validation.",
@@ -78,10 +78,40 @@
     "eye_ownership": "Scope stays entirely within the original D3D9 menu producer; no changes to R30 semantic ownership, per-eye affine, headset host or stereo world matrices."
   },
   "ci_evidence": {
-    "initial_material_sha": "73d9feb842edaa6b41d5342c3229a5146efae291",
-    "domain_isolation_run": 38541853346,
-    "domain_isolation": "SUCCESS",
-    "full_accepted_sha": "PENDING"
+    "material_result_sha": "73d9feb842edaa6b41d5342c3229a5146efae291",
+    "validation_bearing_result_sha": "6a5b484406602728f14f915104ffcc62dfaf8b80",
+    "dx9ex_active": {
+      "run_id": 38543658807,
+      "conclusion": "SUCCESS",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ],
+      "success_jobs": 5,
+      "total_jobs": 5
+    },
+    "domain_isolation": {
+      "run_id": 38543658855,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38543658836,
+      "conclusion": "SUCCESS",
+      "success_jobs": 3,
+      "total_jobs": 3
+    },
+    "hud_inspector": {
+      "run_id": 38543658828,
+      "conclusion": "SUCCESS"
+    },
+    "exact_sha_confirmed": true,
+    "runtime_validation": "UNTESTED"
   },
-  "remaining": "Exact-SHA gate and matching Quest3/VDXR main-menu/car-selection visual verification remain; this source repair alone does not prove the observed white texture or aspect symptom is fixed."
+  "remaining": "Source and static Win32/host/package gates passed at the exact SHA; main-menu/car-selection visual appearance and any white-texture symptom still NEED_HMD_TEST on Quest3/VDXR. No hardware visual PASS or backend promotion is asserted.",
+  "checkpoint": "C6_STATE",
+  "validation_bearing_result_sha": "6a5b484406602728f14f915104ffcc62dfaf8b80",
+  "result_notes": "The four-vertex D3D9 custom-matrix menu producer now stages/validates the entire XYZ/UV quad and device before touching the shared buffer. Three verifier corrections repaired obsolete early-write, weak mutation, and Draw owner expectations. The source change is independently material; all four required workflow groups confirmed SUCCESS."
 }
