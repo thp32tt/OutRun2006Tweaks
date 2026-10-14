@@ -52,14 +52,22 @@ def check(code: str, header: str) -> list[str]:
          "BatchActive = false" in hook and
          "ForgetBatch();" in hook,
          "Begin/End/failed-Flush state invalidation missing")
-    need("static void BeforeDirectStageSource() noexcept" in hook and
-         "false, true, PendingHomogeneous" in hook and
-         "StageBoundaryReady = false;" in hook and
-         "StageFlushes.fetch_add" in hook and
-         "StageFallbacks.fetch_add" in hook and
+    direct_begin = hook.find("static void BeforeDirectStageSource() noexcept")
+    direct_end = hook.find("static void BeforeQueueNode(", direct_begin)
+    direct_stage = hook[direct_begin:direct_end] if 0 <= direct_begin < direct_end else ""
+    # Match the exact direct producer boundary, not the separate queued path.
+    # A global PendingScope/Producer substring can accidentally survive when
+    # the direct source starts using ProducerToken::None (regression 00861).
+    need("false, true, PendingHomogeneous," in direct_stage and
+         "PendingScope, PendingProducer," in direct_stage and
+         "EffectiveScope(), CurrentRenderProducerToken()" in direct_stage and
+         "||" in direct_stage and "!FlushTracked(sprite)" in direct_stage and
+         "StageBoundaryReady = false;" in direct_stage and
+         "StageFlushes.fetch_add" in direct_stage and
+         "StageFallbacks.fetch_add" in direct_stage and
          "static void FlushD3DXBeforeDirectStageSource() noexcept" in code[end-1800:] and
          "VRProjectedD3DXSpriteIsolationR64::BeforeDirectStageSource();" in code,
-         "direct +TIME must split the old homogeneous D3DX batch under outgoing owner")
+         "direct +TIME must split only a proven homogeneous batch under its exact outgoing scope and producer")
     need("PendingHomogeneous = false" in hook and
          "CanFlushD3DXPreQueueStageBatch(" in hook and
          "!QueueRenderActive()" in hook,
