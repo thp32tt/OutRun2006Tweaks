@@ -8,7 +8,7 @@ WF = (ROOT / ".github/workflows/dx11-fast-structural.yml").read_text()
 
 def integrated(source: str, header: str) -> bool:
     a = source.find("void before_game_present(")
-    b = source.find("void before_game_reset()", a)
+    b = source.find("void before_game_reset(IDirect3DDevice9* game) noexcept {", a)
     if a < 0 or b <= a:
         return False
     section = source[a:b]

@@ -9,7 +9,7 @@ HDR = ROOT / "src/vr/d3d11/native_game_readback_provenance.hpp"
 
 def proves_current_frame_quarantine(source: str, header: str) -> bool:
     start = source.find("void before_game_present(")
-    end = source.find("void before_game_reset()", start)
+    end = source.find("void before_game_reset(IDirect3DDevice9* game) noexcept {", start)
     if start < 0 or end <= start:
         return False
     p = source[start:end]
@@ -41,7 +41,7 @@ def main() -> None:
          "/* incomplete full frames keep old output generation */"),
     ):
         p = src.index("void before_game_present(")
-        e = src.index("void before_game_reset()", p)
+        e = src.index("void before_game_reset(IDirect3DDevice9* game) noexcept {", p)
         before, body, after = src[:p], src[p:e], src[e:]
         call = body.index("GameReadbackProvenance::quarantine_full_frame(")
         if old.startswith("if (++s.outputGeneration"):

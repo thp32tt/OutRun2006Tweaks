@@ -10,7 +10,7 @@ WF = (ROOT / ".github/workflows/dx11-fast-structural.yml").read_text(encoding="u
 
 def integrated(src: str, header: str) -> bool:
     a = src.find("void before_game_present(")
-    b = src.find("void before_game_reset()", a)
+    b = src.find("void before_game_reset(IDirect3DDevice9* game) noexcept {", a)
     if a < 0 or b <= a:
         return False
     body = src[a:b]
