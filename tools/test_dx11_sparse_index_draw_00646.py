@@ -14,6 +14,35 @@ for token in ("std::sort(sorted.begin(), sorted.end())",
               "compactIndices.swap(remapped)",
               "maxUnique == 0u || maxUnique > kMaxNativeGameVertices"):
     assert token in span, token
+# 00737 negative controls: the real transient game IndexedUP source must
+# validate all absolute indices before any game-owned UP byte copy, bound each
+# referenced pointer, and commit compact buffers only on complete success.
+up_capture = span.split("inline bool game_gather_indexed_up_vertices(", 1)[1].split(
+    "} // namespace", 1)[0]
+up_safe_tokens = (
+    "minVertex > (std::numeric_limits<std::uint32_t>::max)() - numVertices",
+    "absoluteIndices[i] < minVertex",
+    "absoluteIndices[i] - minVertex >= numVertices",
+    "indexCount > kMaxNativeGameVertices",
+    "offset > available || stride > available - offset",
+    "game_compact_sparse_indices(",
+    "packedVertices.swap(vertices);",
+    "packedIndices.swap(remapped);",
+)
+def exact_up_capture(candidate):
+    return all(t in candidate for t in up_safe_tokens) and (
+        candidate.index("absoluteIndices[i] < minVertex") <
+        candidate.index("std::memcpy(vertices.data()")
+    ) and (
+        candidate.index("offset > available || stride > available - offset") <
+        candidate.index("std::memcpy(vertices.data()")
+    )
+assert exact_up_capture(up_capture)
+for token in up_safe_tokens:
+    damaged = up_capture.replace(token, "/* invalid indexed UP source */", 1)
+    assert damaged != up_capture and not exact_up_capture(damaged), token
+assert "game_gather_indexed_up_vertices(" in probe
+assert "upPacked == keptUp && upRemapped == keptUpIndices" in probe
 assert "game_compact_sparse_indices(distant, 5u, 3u" in probe
 assert "game_compact_sparse_indices(distant, 5u, 2u" in probe
 assert "kMaxNativeGamePrimitives == 2048u" in probe
