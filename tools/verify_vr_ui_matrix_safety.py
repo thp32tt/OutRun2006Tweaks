@@ -110,6 +110,8 @@ def require_multi_sprite_native_aspect(source: str) -> None:
     group = source.split("static void CenterMultiSpriteQuad(", 1)[1].split(
         "static void SpriteSpacingEnable(", 1)[0]
     for needle in (
+        "if (sx == sy && originalWidth * sx == width &&",
+        "originalHeight * sy == height)",
         "vertices[i * stride]",
         "vertices[i * stride + 1]",
         "transformedX[i] = CenterMultiSpriteAxis(",
@@ -157,6 +159,10 @@ assert axis(0, 5.6, 3.9, 2688, 480) == 408
 assert axis(2688, 5.6, 3.9, 2688, 480) == 2280
 
 for good, bad in (
+    ("if (sx == sy && originalWidth * sx == width &&",
+     "if (sx == sy && originalWidth * sx != width &&"),
+    ("originalHeight * sy == height)",
+     "originalHeight * sy != height)"),
     ("vertices[i * stride + 1] = transformedY[i];",
      "vertices[i * stride + 1] = vertices[i * stride + 1];"),
     ("y, sy, contain, height, originalHeight);",
@@ -182,4 +188,17 @@ for good, bad in (
     else:
         raise AssertionError("undetected multi-sprite XY regression: " + bad)
 
-print("DX9Ex menu multi-sprite native XY aspect PASS (7 negative controls)")
+# Zero-work path must cover exact native 4:3 and proportional 16:9 sources
+# with a uniform authored coordinate scale; any rounded/anisotropic target
+# still requires geometry normalization.
+def exact_native_identity(sx, sy, src_width, src_height, width, height):
+    return sx == sy and src_width * sx == width and src_height * sy == height
+
+assert exact_native_identity(2.0, 2.0, 640, 480, 1280, 960)
+assert exact_native_identity(1.0, 1.0, 640, 480, 640, 480)
+assert not exact_native_identity(3.0, 2.25, 640, 480, 1920, 1080)
+assert not exact_native_identity(3.9, 5.6, 640, 480, 2496, 2688)
+assert not exact_native_identity(2.0, 2.0, 640, 480, 1280, 961)
+assert not exact_native_identity(2.0, 2.0, 640, 480, 1279, 960)
+
+print("DX9Ex menu multi-sprite native XY aspect PASS (9 negative controls, native fastpath)")

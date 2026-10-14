@@ -1303,6 +1303,14 @@ class UIScaling : public Hook
 			originalWidth <= 0.0f || originalHeight <= 0.0f)
 			return;
 
+		// A uniformly scaled native quad is already centered and aspect-
+		// correct. Preserve its original vertex bits rather than dividing and
+		// multiplying every corner on desktop 4:3 and unchanged Reset sizes.
+		// Rounded or nonuniform target sizes must still use the contain path.
+		if (sx == sy && originalWidth * sx == width &&
+			originalHeight * sy == height)
+			return;
+
 		const float contain = (std::min)(sx, sy);
 		float transformedX[4]{};
 		float transformedY[4]{};
