@@ -103,6 +103,9 @@ on:
       - 'tools/verify_vr_r30_flat_effect_geometry_fastpath.py'
       - 'tools/verify_vr_r30_hud_contain_draw_fastpath.py'
       - 'tools/verify_vr_r30_responsive_hud_anchor.py'
+      - 'tools/verify_vr_hud_edge_transition.py'
+      - 'src/vr/d3d9/hud_edge_transition.hpp'
+      - 'vrhost/tests/hud_edge_transition_smoke.cpp'
       - 'tools/verify_vr_pause_menu_eye_affine.py'
       - 'src/vr/d3d9/pause_menu_eye_affine.hpp'
       - 'vrhost/tests/pause_menu_eye_affine_smoke.cpp'
@@ -215,6 +218,7 @@ jobs:
           python tools/test_vr_feature_unit_policy.py
           python tools/test_dx9ex_function_dispatch.py
           python tools/verify_vr_feature_unit_policy.py --check-head
+          python tools/verify_vr_hud_edge_transition.py
       - name: Reject broken shipped PowerShell helpers and false HUD reports
         shell: pwsh
         run: |

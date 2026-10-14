@@ -24,6 +24,7 @@
 #include "../state/state_block_tracker.hpp"
 #include "vr_pass_policy.hpp"
 #include "pause_menu_eye_affine.hpp"
+#include "hud_edge_transition.hpp"
 #include "hook_mgr.hpp"
 #include "plugin.hpp"
 #include "vr_shared.hpp"
@@ -1979,13 +1980,11 @@ namespace OutRunVRStereo
             float minX = 0.0f, maxX = 0.0f;
             float minY = 0.0f, maxY = 0.0f;
             bool hasBounds = false;
+            float weight = 0.0f;
         };
         float R30PeripheralAnchor(float ndc, float limit) noexcept
         {
-            if (!std::isfinite(ndc) || std::fabs(ndc) < 0.40f ||
-                std::fabs(ndc) > 1.20f)
-                return 0.0f;
-            return std::clamp(ndc, -limit, limit);
+            return OutRunVrHudEdge::PeripheralAnchor(ndc, limit);
         }
         R30HudEdgeAnchor R30GetExactHudEdgeAnchor(
             const void* source, UINT count, UINT stride,
@@ -2058,10 +2057,15 @@ namespace OutRunVRStereo
             // relative glyph locations, colour/UV and per-eye disparity.
             const float cx = minX + 0.5f * (maxX - minX);
             const float cy = minY + 0.5f * (maxY - minY);
+            const float rawAnchorX = (cx - x0) * (2.0f / width) - 1.0f;
+            const float rawAnchorY = 1.0f - (cy - y0) * (2.0f / height);
+            const float transitionWeight = (std::max)(
+                OutRunVrHudEdge::PeripheralWeight(rawAnchorX),
+                OutRunVrHudEdge::PeripheralWeight(rawAnchorY));
             return {
-                R30PeripheralAnchor((cx - x0) * (2.0f / width) - 1.0f, 0.82f),
-                R30PeripheralAnchor(1.0f - (cy - y0) * (2.0f / height), 0.78f),
-                minX, maxX, minY, maxY, true
+                R30PeripheralAnchor(rawAnchorX, 0.82f),
+                R30PeripheralAnchor(rawAnchorY, 0.78f),
+                minX, maxX, minY, maxY, true, transitionWeight
             };
         }
 
@@ -2080,7 +2084,9 @@ namespace OutRunVRStereo
             const float baseScale = R30HudScaleValue();
             if (!std::isfinite(baseScale) || baseScale <= 0.0f)
                 return 1.0f;
-            return std::clamp(0.90f / baseScale, 1.0f, 3.0f);
+            const float targetBoost =
+                std::clamp(0.90f / baseScale, 1.0f, 3.0f);
+            return OutRunVrHudEdge::BlendBoost(1.0f, targetBoost, anchor.weight);
         }
 
 
@@ -2190,8 +2196,10 @@ namespace OutRunVRStereo
                 anchor.minY < y0 || anchor.maxY > y0 + height)
                 return previousBoost;
 
-            const float desired = std::clamp(
+            const float fullDesired = std::clamp(
                 0.65f / hudScaleY, previousBoost, 3.0f);
+            const float desired = OutRunVrHudEdge::BlendBoost(
+                previousBoost, fullDesired, anchor.weight);
             // A bilateral common translation is feasible iff both projected
             // X intervals share an allowed shift and the Y interval fits.
             // Do not discard one eye, clamp the eyes separately, or shrink a
