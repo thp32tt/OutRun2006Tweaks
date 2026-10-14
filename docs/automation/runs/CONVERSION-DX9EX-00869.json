@@ -67,10 +67,10 @@
     "fix_evidence": "PowerShell host-health loop now includes exactly one bounded process-restart attempt; archive stores recovery state.",
     "negative_test_evidence": "Launch verifier has destructive mutations for retry guard, grace timing and missing health evidence plus Windows AST syntax parse."
   },
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "phase": "C2_IMPLEMENT",
-  "checkpoint": "C2_SOURCE",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "Quest3/VDXR not executed on this commit; startup retry is not an OpenXR session or binocular proof.",
   "changed_files": [
@@ -87,5 +87,32 @@
     "ci": "PENDING_CI"
   },
   "score_once": false,
-  "score_delta_this_attempt": 0
+  "score_delta_this_attempt": 0,
+  "validation_bearing_result_sha": "f53ad2735b6d677e0164124c679fc1ffb1f1143f",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "hold_resolution": "C6_PASS_EXACT_SHA_RECORDED",
+  "material_result_sha": "f53ad2735b6d677e0164124c679fc1ffb1f1143f",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "f53ad2735b6d677e0164124c679fc1ffb1f1143f",
+    "dx9ex_active": {
+      "run_id": 38652283416,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, game, host, full-chain-compile, package"
+    },
+    "domain_isolation": {
+      "run_id": 38652283442,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38652283343,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38652283579,
+      "conclusion": "SUCCESS"
+    },
+    "runtime_caveat": "Quest3/VDXR HMD not executed; RUNTIME_VALIDATION=UNTESTED."
+  },
+  "c6_record_reconciliation": "Resolved prior TERMINAL_STATUS_NOT_COMPLETE hold with exact-SHA required Actions SUCCESS; original feature_contract and C2 acceptance_results snapshot preserved without overwriting per-item pending values. No source rebuild or duplicate score."
 }
