@@ -19,13 +19,13 @@ def connected(code):
         and "s.insetSurfaceDevice = presentDevice;" in present
         and "!oldest.provenance.same_output(s.outputGeneration)" in present
         and "s.sourceGameDevice != presentDevice" in present
-        and "next.provenance.outputGeneration = s.outputGeneration;" in present
+        and present.count("next.provenance.outputGeneration = s.outputGeneration;") == 2
         and present.index("next.provenance.outputGeneration = s.outputGeneration;")
             < present.index("ctx->End(next.fence.Get());")
         and "const bool complete = fullMode" in present
         and "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in present
         and ": s.frameBatch.publishable(s.pending);" in present
-        and "if (complete && outputWritable &&" in present
+        and present.count("if (complete && outputWritable &&") == 2
         and "game->CreateOffscreenPlainSurface(" in present
         and "game->UpdateSurface(" in present
         and "s.outputGeneration = 0u;" in reset
