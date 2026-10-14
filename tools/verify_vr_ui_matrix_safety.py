@@ -90,10 +90,11 @@ for size in ((640, 480), (1024, 768), (1920, 1080),
     assert source_offset == (200.0, 100.0)
     # The transform changes for a different output size, but the INPUT
     # remains the original asset. This protects reset/resize transitions.
-    assert staged_menu_matrix((1280, 960), scale=source_scale,
-                              translation=source_offset) == \\
-           staged_menu_matrix((1280, 960), scale=source_scale,
-                              translation=source_offset)
+    resized = staged_menu_matrix((1280, 960), scale=source_scale,
+                                 translation=source_offset)
+    assert resized[0] == source_scale
+    assert source_scale == (1.0, 1.0)
+    assert source_offset == (200.0, 100.0)
 
 # Negative controls: old direct input mutation, missing local forwarding,
 # and an invalid intermediate that must use the untouched legacy call.
