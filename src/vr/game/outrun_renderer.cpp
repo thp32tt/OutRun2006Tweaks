@@ -156,6 +156,9 @@ namespace OutRunVRRenderer
 		std::uint32_t FrameTelemetryFlags = ClientHookAlive;
 		float LatchedRelativeAngleDeg = 0.0f;
 		std::uint32_t LatchedPoseSequence = 0;
+		// Changes on every frame/scene reset, even if host seqlock sequence
+		// repeats after recenter, host restart or device reset.
+		std::uint64_t LatchedPoseEpoch = 1;
 		bool PresentPoseLocked = false;
 		bool LastPoseSourceV3 = false;
 
@@ -1182,6 +1185,8 @@ namespace OutRunVRRenderer
 
 		void ResetFrameState()
 		{
+			if (++LatchedPoseEpoch == 0)
+				++LatchedPoseEpoch;
 			LatchedHeadInverseValid = false;
 			LatchedStereo = {};
 			LastVerifiedWvpValid = false;
@@ -1505,7 +1510,21 @@ namespace OutRunVRRenderer
 			D3DMATRIX correctedWvp{};
 			if (Settings::VRMatrixOrder == 0)
 			{
-				correctedWvp = MultiplyMatrix(MultiplyMatrix(worldView, LatchedHeadInverse), projection);
+				// Projection and head pose are stable across most world draws.
+				// The epoch (not just the host pose sequence) also invalidates
+				// on scene/reset/recenter. Projection changes invalidate within
+				// a scene, without retaining stale GPU resources or COM pointers.
+				static thread_local std::uint64_t cachedPoseEpoch = 0;
+				static thread_local D3DMATRIX cachedProjection{};
+				static thread_local D3DMATRIX cachedHeadProjection{};
+				if (cachedPoseEpoch != LatchedPoseEpoch ||
+					std::memcmp(&cachedProjection, &projection, sizeof(projection)) != 0)
+				{
+					cachedHeadProjection = MultiplyMatrix(LatchedHeadInverse, projection);
+					cachedProjection = projection;
+					cachedPoseEpoch = LatchedPoseEpoch;
+				}
+				correctedWvp = MultiplyMatrix(worldView, cachedHeadProjection);
 			}
 			else
 			{

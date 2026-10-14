@@ -2541,8 +2541,10 @@ namespace OutRunVRStereo
         bool R30PrepareXyzrhwState(
             IDirect3DDevice9* device, R30XyzrhwState& state) noexcept
         {
-            if (!R29OwnerStableStereoBase(device) ||
-                R29OwnerCurrentVertexShaderIdentity() != 0)
+            // World VS draws cannot be XYZRHW; skip the expensive stable
+            // stereo checks before crossing the per-draw fast-world path.
+            if (R29OwnerCurrentVertexShaderIdentity() != 0 ||
+                !R29OwnerStableStereoBase(device))
                 return false;
 
             // R33's final dispatcher and R29's setter/StateBlock shader

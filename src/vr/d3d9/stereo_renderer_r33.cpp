@@ -1040,7 +1040,13 @@ namespace OutRunVRStereo
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
                 // would reject those same draws in the lower R29 stable-stereo gate;
                 // bypass its cross-TU checks on the large mono/aux workload.
-                const HRESULT xyzrhw = resyncAlreadyFlushed
+                // Reliable setter/StateBlock tracking proves a bound VS is
+                // not an XYZRHW fixed-function draw. Unreliable tracking must
+                // retain R30's live shader fallback, never assume VS identity.
+                const bool tryXyzrhw = resyncAlreadyFlushed &&
+                    (!OutRunVR::State::StateBlockTracker::Reliable() ||
+                     R32ReviewCurrentVertexShaderIdentity() == 0);
+                const HRESULT xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwPrimitiveVB(
                     device, type, startVertex, primitiveCount)
                     : E_NOTIMPL;
@@ -1080,7 +1086,13 @@ namespace OutRunVRStereo
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
                 // would reject those same draws in the lower R29 stable-stereo gate;
                 // bypass its cross-TU checks on the large mono/aux workload.
-                const HRESULT xyzrhw = resyncAlreadyFlushed
+                // Reliable setter/StateBlock tracking proves a bound VS is
+                // not an XYZRHW fixed-function draw. Unreliable tracking must
+                // retain R30's live shader fallback, never assume VS identity.
+                const bool tryXyzrhw = resyncAlreadyFlushed &&
+                    (!OutRunVR::State::StateBlockTracker::Reliable() ||
+                     R32ReviewCurrentVertexShaderIdentity() == 0);
+                const HRESULT xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwIndexedPrimitiveVB(
                     device, type, baseVertexIndex, minVertexIndex,
                     numVertices, startIndex, primitiveCount)
@@ -1123,7 +1135,13 @@ namespace OutRunVRStereo
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
                 // would reject those same draws in the lower R29 stable-stereo gate;
                 // bypass its cross-TU checks on the large mono/aux workload.
-                const HRESULT xyzrhw = resyncAlreadyFlushed
+                // Reliable setter/StateBlock tracking proves a bound VS is
+                // not an XYZRHW fixed-function draw. Unreliable tracking must
+                // retain R30's live shader fallback, never assume VS identity.
+                const bool tryXyzrhw = resyncAlreadyFlushed &&
+                    (!OutRunVR::State::StateBlockTracker::Reliable() ||
+                     R32ReviewCurrentVertexShaderIdentity() == 0);
+                const HRESULT xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwPrimitiveUP(
                     device, type, primitiveCount, data, stride)
                     : E_NOTIMPL;
@@ -1164,7 +1182,13 @@ namespace OutRunVRStereo
                 // mono and StateBlock-recording calls. R30PrepareXyzrhwState
                 // would reject those same draws in the lower R29 stable-stereo gate;
                 // bypass its cross-TU checks on the large mono/aux workload.
-                const HRESULT xyzrhw = resyncAlreadyFlushed
+                // Reliable setter/StateBlock tracking proves a bound VS is
+                // not an XYZRHW fixed-function draw. Unreliable tracking must
+                // retain R30's live shader fallback, never assume VS identity.
+                const bool tryXyzrhw = resyncAlreadyFlushed &&
+                    (!OutRunVR::State::StateBlockTracker::Reliable() ||
+                     R32ReviewCurrentVertexShaderIdentity() == 0);
+                const HRESULT xyzrhw = tryXyzrhw
                     ? R32ReviewTryXyzrhwIndexedPrimitiveUP(
                     device, type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride)

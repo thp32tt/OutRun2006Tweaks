@@ -73,8 +73,18 @@ namespace OutRunVRHudSemantics
         if (InRange(callRva, 0x096A80, 0x096D00))
             return { "C2CSpeechBubble", "HUD_GF_SPEECH", SpacePolicy::ScreenHud };
 
+        // 0x97xxx result/GOAL digits and 0x989xx stage-extension text
+        // enter the shared BA9D0 glyph producer without an executable midhook.
+        // Classify the producer only; do not install the unsafe 0x97C57+5 hook.
+        if (InRange(callRva, 0x097300, 0x098B00))
+            return { "ResultAndStageExtText", "HUD_RESULT_EXT_TEXT", SpacePolicy::ScreenHud };
+
         if (InRange(callRva, 0x0B9000, 0x0B9200))
             return { "DispGearPosition", "HUD_GEAR_REV", SpacePolicy::ScreenHud };
+        // sub_4B9200: shared result-number formatter calls BA9D0.
+        // Keep this disjoint from the preceding gear and later rank producers.
+        if (InRange(callRva, 0x0B9200, 0x0B9500))
+            return { "DispResultNum_B9200", "HUD_RESULT_NUM", SpacePolicy::ScreenHud };
         if (InRange(callRva, 0x0B9E00, 0x0BA100))
             return { "DispRank", "HUD_RANK", SpacePolicy::ScreenHud };
 
@@ -188,6 +198,18 @@ namespace OutRunVRHudSemantics
         {0x0FCB20, "HUD_GF_SPEECH", SpacePolicy::ScreenHud, "speech initial position #4"},
     }};
 
+    // Exact endpoints and negative neighbours guard against generic 2D
+    // or later game text being accidentally promoted into ScreenHud.
+    static_assert(ClassifyCaller(0x0972FF).space == SpacePolicy::Unknown);
+    static_assert(ClassifyCaller(0x097300).space == SpacePolicy::ScreenHud);
+    static_assert(ClassifyCaller(0x097BE4).space == SpacePolicy::ScreenHud);
+    static_assert(ClassifyCaller(0x098A89).space == SpacePolicy::ScreenHud);
+    static_assert(ClassifyCaller(0x098AFF).space == SpacePolicy::ScreenHud);
+    static_assert(ClassifyCaller(0x098B00).space == SpacePolicy::Unknown);
+    static_assert(ClassifyCaller(0x0B91FF).space == SpacePolicy::ScreenHud);
+    static_assert(ClassifyCaller(0x0B9200).space == SpacePolicy::ScreenHud);
+    static_assert(ClassifyCaller(0x0B94FF).space == SpacePolicy::ScreenHud);
+    static_assert(ClassifyCaller(0x0B9500).space == SpacePolicy::Unknown);
     static_assert(ClassifyCaller(0x060D40).space == SpacePolicy::ScreenHud);
     static_assert(ClassifyCaller(0x0BBA89).space == SpacePolicy::ScreenHud);
     static_assert(ClassifyCaller(0x0B9F3A).space == SpacePolicy::ScreenHud);
