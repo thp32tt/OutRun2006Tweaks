@@ -919,11 +919,15 @@ for marker in (
 
 for label, corrupt in (
     ("result parent no provenance",
-     ui.replace("ProducerToken::ResultProgress);",
-                "ProducerToken::None);", 1)),
+     inject_one_function_token(
+         ui, "static void ResultProgressLeave(",
+         "ProducerToken::ResultProgress);",
+         "ProducerToken::None);")),
     ("GOAL parent no provenance",
-     ui.replace("ProducerToken::GoalTimeHelper);",
-                "ProducerToken::None);", 1)),
+     inject_one_function_token(
+         ui, "static void GoalTime_TagHelper(",
+         "ProducerToken::GoalTimeHelper);",
+         "ProducerToken::None);")),
     ("result parent token dropped at enum",
      sem.replace("        ResultProgress,\n", "", 1)),
 ):

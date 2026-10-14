@@ -75,7 +75,9 @@
     "failed_gate": "DX9Ex Active run 38501883000 policy: missing symptom_id/trace_stages/subcomponents in feature_contract; cp1252 diagnostic emitted UnicodeEncodeError before reporting errors",
     "retry_repair": "Align E003 nonterminal GOAL producer work contract to registered symptom and 3-stage/two-subcomponent validation, fix codepage-safe diagnostic and add Windows cp1252 regression assertions.",
     "second_failed_gate": "DX9Ex Active run 38502219943: verify_vr_producer_provenance.py global first-encounter 'nullptr, true,' mutated earlier GOAL block instead of StageExtensionEnter, falsely escaping +TIME mutation",
-    "second_retry_repair": "Generate +TIME negative mutants against exact StageExtensionEnter or StageExtensionLeave function body so GOAL prior markers cannot alias mutation; source checks still fail for real mutated +TIME."
+    "second_retry_repair": "Generate +TIME negative mutants against exact StageExtensionEnter or StageExtensionLeave function body so GOAL prior markers cannot alias mutation; source checks still fail for real mutated +TIME.",
+    "third_failed_gate": "DX9Ex Active run 38502407276: visual composition negative test replaced first global ProducerToken::ResultProgress (new direct glyph owner), leaving deferred result parent intact; false pass on intentional corruption",
+    "third_retry_repair": "Restrict result/GOAL parent negative mutants to ResultProgressLeave and GoalTime_TagHelper exact body, preserving unrelated immediate producer and proving queue-token regression would be caught"
   },
   "changed_files": [
     "tools/verify_vr_producer_provenance.py",
@@ -85,7 +87,8 @@
     "vrhost/tests/goal_progress_owner_smoke.cpp",
     "docs/automation/runs/CONVERSION-DX9EX-00818.json",
     "tools/verify_vr_feature_unit_policy.py",
-    "tools/test_vr_feature_unit_policy.py"
+    "tools/test_vr_feature_unit_policy.py",
+    "tools/verify_vr_visual_composition_p0.py"
   ],
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
