@@ -26,8 +26,9 @@ def integrated(layout,header,bridge,producer,decoder,vs,ps):
         "kStage1Specular == D3DTA_SPECULAR",
         "float specular[4];",
         "DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 40",
-        "CreateInputLayout(elements, 4",
-        "static_assert(sizeof(NativeVertex) == 56u")) and
+        "\"TEXCOORD\", 1, DXGI_FORMAT_R32G32_FLOAT, 0, 56",
+        "CreateInputLayout(elements, 5",
+        "static_assert(sizeof(NativeVertex) == 64u")) and
       all(s in producer for s in (
         "!layout.hasSpecular",
         "stage1_operation_reads_specular(nextColorOp, color1, color2)",

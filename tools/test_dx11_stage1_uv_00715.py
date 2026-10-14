@@ -33,7 +33,7 @@ def integrated(c, v, h, ps, a):
 assert integrated(capture, vertex, shader, stage1, ia)
 for poison in ("stage1_game_uv_supported(uv1, layout.texcoordCount, transform1)",
                "samplerDiff || stage1AlternateUv"):
-    assert not integrated(capture.replace(poison,"",1),vertex,shader,stage1,ia)
+    assert not integrated(capture.replace(poison,""),vertex,shader,stage1,ia)
 for poison in ("game_fvf_select_uv(decoded, layout, capture.stage1CoordIndex,",
                "!std::isfinite(output[i].uvStage1[0])"):
     assert not integrated(capture,vertex.replace(poison,"",1),shader,stage1,ia)
