@@ -14,19 +14,21 @@ def wired(code):
     x = code[a:b]
     return (code.count('#include "native_game_readback_provenance.hpp"') == 1
         and "GameReadbackProvenance provenance{};" in code
-        and "ready == S_OK && (!oldest.provenance.may_overlay(s.presents) ||" in x
+        and "ready == S_OK && (!oldest.provenance.may_present(s.presents, fullMode) ||" in x
         and "!oldest.provenance.same_device(presentDevice)" in x
         and "++s.staleReadbacks;" in x
         and "next.provenance = {s.presents, s.sourceDrawsThisFrame};" in x
         and "ctx->CopyResource(next.staging.Get(), s.backend.color_texture());" in x
         and "D3D11_ASYNC_GETDATA_DONOTFLUSH" in x
+        and "fullMode ? fullSlot : s.readSlot" in x
+        and "fullMode ? capturedAtPresent == currentPresent" in header
         and "D3D11_MAP_FLAG_DO_NOT_WAIT" in x
         and "game->UpdateSurface(" in x
-        and x.index("!oldest.provenance.may_overlay(s.presents)") < x.index("ctx->Map(oldest.staging.Get()")
+        and x.index("!oldest.provenance.may_present(s.presents, fullMode)") < x.index("ctx->Map(oldest.staging.Get()")
         and x.index("next.provenance = {s.presents, s.sourceDrawsThisFrame};") < x.index("ctx->End(next.fence.Get());")
         and "item.provenance = {};" in code[b:])
 assert wired(src)
-for token in ("!oldest.provenance.may_overlay(s.presents)",
+for token in ("!oldest.provenance.may_present(s.presents, fullMode)",
               "next.provenance = {s.presents, s.sourceDrawsThisFrame};",
               "++s.staleReadbacks;", "item.provenance = {};"):
     mutant = src.replace(token, "/* removed game GPU scene link */", 1)
@@ -53,7 +55,8 @@ with TemporaryDirectory(prefix="game-dx11-readback-") as tmp:
     for name,data,positive in (
         ("exact",header,True),
         ("late",header.replace("kMaxPresentLag = 2u","kMaxPresentLag = 999u"),False),
-        ("unowned",header.replace("sourceDraws != 0u","sourceDraws >= 0u"),False),
+        ("unowned",header.replace("return sourceDraws != 0u && currentPresent > capturedAtPresent",
+                                   "return sourceDraws >= 0u && currentPresent > capturedAtPresent"),False),
         ("same-frame",header.replace("currentPresent > capturedAtPresent","currentPresent >= capturedAtPresent"),False)):
         (d/"native_game_readback_provenance.hpp").write_text(data)
         result=subprocess.run(cmd,capture_output=True,text=True)
