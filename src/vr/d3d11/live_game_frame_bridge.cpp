@@ -2205,7 +2205,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         FAILED(game->GetTextureStageState(1, D3DTSS_COLOROP, &nextColorOp)) ||
         FAILED(game->GetTextureStageState(0, D3DTSS_RESULTARG, &resultArg)) ||
         (resultArg != D3DTA_CURRENT &&
-         !(resultArg == D3DTA_TEMP && nextColorOp != D3DTOP_DISABLE && layout.hasDiffuse)))
+         !(resultArg == D3DTA_TEMP && nextColorOp > D3DTOP_DISABLE && layout.hasDiffuse)))
         return false;
     // The native PS writes the stage-0 result directly to the frame.
     // D3DTA_TEMP would leave CURRENT unchanged, so this diagnostic must

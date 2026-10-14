@@ -13,7 +13,7 @@ def connected(header,bridge):
     return all(x in header for x in ("kStage1Temp = 5u","stage1_operand_supported_with_temp",
         "stage1_combiner_supported_with_temp","stage1_alpha_supported_with_temp",
         "stage1_three_source_supported_with_temp","!stage1_operand_supported(kStage1Temp)")) and all(
-        x in capture for x in ("resultArg == D3DTA_TEMP && nextColorOp != D3DTOP_DISABLE && layout.hasDiffuse",
+        x in capture for x in ("resultArg == D3DTA_TEMP && nextColorOp > D3DTOP_DISABLE && layout.hasDiffuse",
         "stage0WritesTemp && !capture.enabled","stage1_three_source_supported_with_temp(nextColorOp",
         "stage1_combiner_supported_with_temp(nextColorOp","stage1_three_source_supported_with_temp(alphaOp",
         "stage1_alpha_supported_with_temp(alphaOp","stage1Result != D3DTA_CURRENT",

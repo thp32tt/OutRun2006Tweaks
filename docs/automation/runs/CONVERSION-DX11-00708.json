@@ -92,11 +92,25 @@
     "C0_RECOVER": "DONE branch HEAD and 00707 C6 inspected",
     "C1_REVIEW": "DONE Stage0 TEMP native register path missing",
     "C2_IMPLEMENT": "DONE C++ state capture/HLSL register and test",
-    "C3_VALIDATE": "PENDING exact-SHA GitHub gates; runtime UNTESTED",
-    "C4_COMMIT": "PENDING",
+    "C3_VALIDATE": "Fast Structural SUCCESS on 9b91925ecd1120d744c60c93be608bbdd9d8dffb; Windows Build failed due preexisting Stage1 mutation check first-occurrence duplicate, repaired in same TASK; exact-SHA revalidation pending",
+    "C4_COMMIT": "Material 9b91925ecd1120d744c60c93be608bbdd9d8dffb; same-TASK source/regression repair pending validation-bearing SHA",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING"
   },
   "next_action": "Check exact SHA gates, same TASK repair if failed, separate C6 bookkeeping only after PASS; HMD UNTESTED.",
-  "state_persisted": true
+  "state_persisted": true,
+  "base_head_sha": "8df54579838399be55c74c6c93c4156d6dd1c006",
+  "material_result_sha": "9b91925ecd1120d744c60c93be608bbdd9d8dffb",
+  "gate_evidence": {
+    "initial_material_sha": "9b91925ecd1120d744c60c93be608bbdd9d8dffb",
+    "fast_structural_initial": {
+      "id": 38500847665,
+      "conclusion": "SUCCESS"
+    },
+    "windows_build_initial": {
+      "id": 38500852045,
+      "conclusion": "FAILURE",
+      "cause": "First-occurrence Stage1 fail-closed static negative-control collided with new TEMP predicate"
+    }
+  }
 }
