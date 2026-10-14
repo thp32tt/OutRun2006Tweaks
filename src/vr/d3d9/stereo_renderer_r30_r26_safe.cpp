@@ -13,6 +13,7 @@
 
 #include "stereo_renderer_r26.cpp"
 #include "r30_indexed_up_bounds.hpp"
+#include "r30_shadow_ranges.hpp"
 #include "lens_centre_source_provenance.hpp"
 #include "r30_early_rhw_shadow.hpp"
 #include "vr/game/render_semantics.hpp"
@@ -331,11 +332,9 @@ namespace OutRunVRStereo
         SafetyHookInline R30IndexBufferLockHook{};
         SafetyHookInline R30IndexBufferUnlockHook{};
 
-        struct R30ByteRange
-        {
-            UINT begin = 0;
-            UINT end = 0; // exclusive
-        };
+        // R26+HUD is the shipped owner; reuse the portable interval invariant
+        // rather than its old erase-per-overlap and linear draw-time scans.
+        using R30ByteRange = OutRunVR::R30ShadowRanges::ByteRange;
 
         struct R30BufferShadow
         {
@@ -409,34 +408,13 @@ namespace OutRunVRStereo
         void R30MergeValidRange(std::vector<R30ByteRange>& ranges,
             UINT begin, UINT end)
         {
-            if (begin >= end)
-                return;
-            R30ByteRange merged{ begin, end };
-            auto it = ranges.begin();
-            while (it != ranges.end() && it->end < merged.begin)
-                ++it;
-            while (it != ranges.end() && it->begin <= merged.end)
-            {
-                merged.begin = std::min(merged.begin, it->begin);
-                merged.end = std::max(merged.end, it->end);
-                it = ranges.erase(it);
-            }
-            ranges.insert(it, merged);
+            OutRunVR::R30ShadowRanges::Merge(ranges, begin, end);
         }
 
         bool R30RangeValid(const std::vector<R30ByteRange>& ranges,
             UINT begin, UINT end) noexcept
         {
-            if (begin >= end)
-                return false;
-            for (const auto& range : ranges)
-            {
-                if (range.begin <= begin && range.end >= end)
-                    return true;
-                if (range.begin > begin)
-                    break;
-            }
-            return false;
+            return OutRunVR::R30ShadowRanges::Contains(ranges, begin, end);
         }
 
         R30ShadowPtr R30FindVertexShadow(IDirect3DVertexBuffer9* buffer)
