@@ -16,6 +16,7 @@
 #include <ini.h>
 #include "input_manager.hpp"
 #include "overlay_toggle_frame.hpp"
+#include "f11_responsive_fit.hpp"
 
 Notifications Notifications::instance;
 
@@ -124,14 +125,14 @@ void Overlay::render_shell()
 		(std::min)(40.f, content.width * 0.1f));
 	const float maxHeight = (std::max)(1.f, content.height -
 		(std::min)(40.f, content.height * 0.1f));
-	// Match F11-only hit-target spacing to the live usable mirror canvas.
-	// A narrow/portrait or Reset surface may cap the shell before XR atlas
-	// density is reached; never enlarge layout gaps beyond that available area.
-	// The original desktop style and actual font raster density are unchanged.
-	const float styleDensity = std::clamp(
-		(std::min)(vrDensity,
-			(std::min)(maxWidth / 1130.f, maxHeight / 600.f)),
-		1.0f, 3.0f);
+	// Window bounds, legible glyph size and clickable controls have one
+	// responsive budget. Previously the window shrank at 600p/portrait
+	// while fonts stayed at full Quest3 raster density and style spacing
+	// was forced to >=1x; the F11 tabs/buttons were then visibly clipped.
+	// Keep the full-resolution atlas, scale only this VR ImGui shell.
+	const auto responsiveFit =
+		OutRunF11ResponsiveFit::Compute(maxWidth, maxHeight, vrDensity);
+	const float styleDensity = responsiveFit.styleDensity;
 	const ImVec2 windowSize(
 		(std::min)(1130.f * vrDensity, maxWidth),
 		(std::min)(600.f * vrDensity, maxHeight));
@@ -214,6 +215,10 @@ void Overlay::render_shell()
 	// sliding out of view with them.
 	if (ImGui::Begin("OutRun2006Tweaks", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
 	{
+		// Restore 1x on a live VR->desktop transition: per-window font
+		// scale otherwise persists in the ImGui window instance. Do not
+		// touch the global font atlas, HUD draw scope or input focus.
+		ImGui::SetWindowFontScale(externalVrShell ? responsiveFit.fontScale : 1.0f);
 		if (ImGui::BeginTabBar("##shell"))
 		{
 			for (OverlayWindow* window : windows())

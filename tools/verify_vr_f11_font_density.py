@@ -24,6 +24,7 @@ FONT = ROOT / "src/overlay/overlay.cpp"
 HEADER = ROOT / "src/overlay/overlay.hpp"
 COMMON = ROOT / "src/vr/d3d9/stereo_renderer_r23.cpp"
 EYE_API = ROOT / "src/vr/core/r23_eye_extent_api.hpp"
+FIT = ROOT / "src/overlay/f11_responsive_fit.hpp"
 
 def check(hook: str, font: str, header: str) -> None:
     # Pin actual owning scopes. Searching whole files misses destructive
@@ -74,7 +75,8 @@ def check(hook: str, font: str, header: str) -> None:
             "ImGuiStyleVar_CellPadding",
             "ImGuiStyleVar_IndentSpacing",
             "ImGuiStyleVar_GrabMinSize",
-            "(std::min)(maxWidth / 1130.f, maxHeight / 600.f)",
+            "OutRunF11ResponsiveFit::Compute(maxWidth, maxHeight, vrDensity)",
+            "ImGui::SetWindowFontScale(externalVrShell ? responsiveFit.fontScale : 1.0f);",
             "shellStyle.GrabMinSize * styleDensity",
             "shellStyle.WindowPadding.x * styleDensity",
             "const bool externalVrShell = Game::is_vr_gameplay_presentation();",
@@ -162,19 +164,61 @@ def check_shell_numeric_cases() -> None:
         window_w, window_h = min(1130.0 * density, available_w), min(600.0 * density, available_h)
         assert 0 < window_w <= content[2]
         assert 0 < window_h <= content[3]
-        style_density = max(1.0, min(density, available_w / 1130.0, available_h / 600.0))
-        assert 1.0 <= style_density <= max(1.0, density)
-        if available_w >= 1130.0 and available_h >= 600.0:
-            assert 1130.0 * style_density <= available_w + 1e-5
-            assert 600.0 * style_density <= available_h + 1e-5
-        if density == 1.0:
-            assert style_density == 1.0  # desktop metrics untouched
+        raw_fit = min(1.0, available_w / (1130.0 * density),
+                      available_h / (600.0 * density))
+        font_fit = max(0.25, min(1.0, raw_fit))
+        style_density = max(0.25, min(3.0, density * font_fit))
+        assert 0.25 <= font_fit <= 1.0
+        assert 0.25 <= style_density <= 3.0
+        if raw_fit >= 0.25:
+            assert 1130.0 * style_density <= available_w + 1e-5 or style_density == 3.0
+            assert 600.0 * style_density <= available_h + 1e-5 or style_density == 3.0
+        # This dynamic budget is applied exclusively to VR, never desktop.
         changed = (previous is not None and (
             any(abs(a-b) > 0.5 for a,b in zip(previous[:4], content)) or
             abs(previous[4] - density) > 0.01))
         changes.append(changed)
         previous = (*content, density)
     assert changes == [False, True, True, True, False, True, True, True]
+
+
+def check_responsive_font_fit(font: str, fit_header: str) -> None:
+    """Require real F11 font AND hit-target fitting, not merely a capped window."""
+    shell = font.split("void Overlay::render_shell()", 1)[1].split(
+        "void Overlay::init()", 1)[0]
+    required = (
+        "OutRunF11ResponsiveFit::Compute(maxWidth, maxHeight, vrDensity)",
+        "const float styleDensity = responsiveFit.styleDensity;",
+        "ImGui::SetWindowFontScale(externalVrShell ? responsiveFit.fontScale : 1.0f);",
+    )
+    for token in required:
+        assert token in shell, token
+        mutant = shell.replace(token, "// removed responsive owner", 1)
+        assert token not in mutant, "font/spacing fitting mutation survived"
+    for token in ("availableWidth / desiredWidth",
+                  "availableHeight / desiredHeight",
+                  "std::clamp(rawFit, 0.25f, 1.0f)",
+                  "std::clamp(density * fontFit, 0.25f, 3.0f)"):
+        assert token in fit_header, token
+        mutant = fit_header.replace(token, "0.0f", 1)
+        assert token not in mutant
+    for width, height, density in ((3440, 1440, 3.0),
+                                   (800, 600, 2.75),
+                                   (720, 1280, 2.0),
+                                   (1280, 720, 1.0)):
+        usable_w = max(1.0, width - min(40.0, width * 0.1))
+        usable_h = max(1.0, height - min(40.0, height * 0.1))
+        raw = min(1.0, usable_w / (1130.0 * density),
+                  usable_h / (600.0 * density))
+        scale = max(0.25, min(1.0, raw))
+        style = max(0.25, min(3.0, density * scale))
+        assert 0.25 <= scale <= 1.0
+        assert 0.25 <= style <= 3.0
+        if 0.25 <= raw <= 1.0:
+            assert 1130.0 * density * scale <= usable_w + 1e-4
+            assert 600.0 * density * scale <= usable_h + 1e-4
+    assert "externalVrShell ? responsiveFit.fontScale : 1.0f" in shell
+    print("PASS VR F11 live shell glyph/control responsive fit and desktop restore")
 
 
 def check_shell_vr_mode_transitions(font: str) -> None:
@@ -1082,6 +1126,7 @@ def main():
     check_transient_eye_extent_dropout(hook)
     check_shell_layout_mutations(font)
     check_shell_numeric_cases()
+    check_responsive_font_fit(font, FIT.read_text(encoding="utf-8"))
     check_shell_vr_mode_transitions(font)
     check_external_vr_f11_canvas(font)
     check_first_run_vr_modal(font)
