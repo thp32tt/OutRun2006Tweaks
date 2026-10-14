@@ -78,11 +78,13 @@
     "src/hooks_uiscaling.cpp",
     "vrhost/tests/goal_progress_owner_smoke.cpp",
     "tools/verify_vr_producer_provenance.py",
-    "docs/automation/runs/CONVERSION-DX9EX-00865.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00865.json",
+    "tools/verify_vr_r30_responsive_hud_anchor.py"
   ],
   "material_result_sha": "508955a4e63edd86bf5b76bdd8484ec81df2beba",
   "material_followup_shas": [
-    "fecda429f711d1d534ceb862a1c938910ee28ef9"
+    "fecda429f711d1d534ceb862a1c938910ee28ef9",
+    "2d78792ee3ef19b13c9bf5c2801006ddf7d2ccc5"
   ],
   "validation_bearing_result_sha": null,
   "acceptance_results": {
@@ -93,8 +95,26 @@
   },
   "ci_evidence": {
     "status": "PENDING_EXACT_SHA",
-    "prior_failed_run": 38641595662,
-    "prior_failure": "Exact-HEAD policy gate rejected missing run JSON before the C++ game/host jobs; this source repair retains same TASK_ID and must be revalidated on the next SHA."
+    "prior_failed_runs": [
+      {
+        "run_id": 38641595662,
+        "sha": "fecda429f711d1d534ceb862a1c938910ee28ef9",
+        "cause": "Missing per-task feature JSON (policy gate)"
+      },
+      {
+        "run_id": 38641938581,
+        "sha": "1e38974f85e102f830a921c54f1e4fc94a9d8a70",
+        "cause": "Outdated responsive-HUD source verifier expected prior nullptr,false,token exact call; corrected test to new strict source isolation and destructive negative check"
+      }
+    ],
+    "latest_code_and_test_sha": "2d78792ee3ef19b13c9bf5c2801006ddf7d2ccc5",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "runtime_caveat": "No Quest3/VDXR source matching hardware test."
   },
   "score_once": false,
   "score_delta_this_retry": 0
