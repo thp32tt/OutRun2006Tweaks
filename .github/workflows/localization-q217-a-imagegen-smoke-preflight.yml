@@ -99,6 +99,7 @@ jobs:
       - name: Execute role queue, Library gate and orientation unit tests
         run: |
           python tools/chat-controller/localization-recovery-v1/tests/test_ab_batch_queue.py
+          python tools/chat-controller/localization-recovery-v1/tests/test_ab_carousel.py
           python tools/chat-controller/localization-recovery-v1/tests/test_tile_orientation_policy.py
           python tools/chat-controller/localization-recovery-v1/tests/test_tile_batch_queue.py
       - name: Verify live-message DOM receipt selector without sending a message
@@ -116,4 +117,20 @@ jobs:
              async def wait_for_function(self,*a,**kwargs):raise TimeoutError('not sent')
           assert asyncio.run(mod.verify_submission_receipt(NoReceipt(),'TASK','f.png'))=='SEND_UNVERIFIED'
           print('Receipt fails closed on missing durable user bubble')
+          PY
+      - name: Verify carousel result selection and distinct blob gate
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path('tools/chat-controller/localization-recovery-v1')
+          src=(root/'ab_batch_queue.py').read_text(encoding='utf-8')
+          for mark in ('button[aria-label^="Show generated image "]',
+                       'CAROUSEL_DISTINCT_IMAGE_BLOBS',
+                       'DUPLICATED_IMAGE_PREVIEWS',
+                       'IMAGE_BLOB_NOT_READY',
+                       'OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED',
+                       'LIBRARY_OUTRUN_KOR_UNVERIFIED'):
+            assert mark in src,mark
+          assert src.count('button[aria-label^="Show generated image "]') >= 2
+          print('PASS: full carousel (not first preview) is counted and exported; Library gate retained')
           PY

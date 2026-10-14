@@ -332,13 +332,31 @@ async def export_unapproved_k_candidates(page, active, root):
             if not target.is_file() or hashlib.sha256(target.read_bytes()).hexdigest()!=row["sha256"]:
                 raise ValueError("EXISTING_CANDIDATE_HASH_CHANGED")
         return "EXISTING_CANDIDATES_VERIFIED"
-    entries=await page.evaluate("""task=>{
+    entries=await page.evaluate(r"""task=>{
       const text=[...document.querySelectorAll('[data-markdown-text-tone="user-message"]')]
        .find(n=>(n.innerText||'').includes('UPLOAD_TASK_ID='+task));
       const turn=text?.closest('[data-turn-key]');
-      return turn?[...turn.querySelectorAll('[data-testid="generated-image-preview"] img[alt^="Generated image"]')]
+      if(!turn)return[];
+      // ChatGPT renders N generated images as ONE large preview plus N image
+      // selector buttons. The button thumbnail blobs contain the distinct
+      // full-resolution images; never count the preview itself as a second image.
+      const selectors=[...turn.querySelectorAll('button[aria-label^="Show generated image "]')];
+      if(selectors.length){
+        const listed=selectors.map(button=>{
+          const label=button.getAttribute('aria-label')||'';
+          const m=label.match(/^Show generated image ([1-9][0-9]*)$/);
+          const im=button.querySelector('img');
+          return m&&im?{index:Number(m[1]),src:im.currentSrc||im.src,
+                         width:im.naturalWidth,height:im.naturalHeight}:null;
+        });
+        if(listed.some(item=>!item))return[];
+        listed.sort((a,b)=>a.index-b.index);
+        if(listed.some((it,i)=>it.index!==i+1))return[];
+        return listed;
+      }
+      return [...turn.querySelectorAll('[data-testid="generated-image-preview"] img[alt^="Generated image"]')]
        .filter(x=>x.complete&&x.naturalWidth>0&&x.naturalHeight>0)
-       .map(x=>({src:x.currentSrc||x.src,width:x.naturalWidth,height:x.naturalHeight})):[];
+       .map((x,i)=>({index:i+1,src:x.currentSrc||x.src,width:x.naturalWidth,height:x.naturalHeight}));
     }""",active["task_id"])
     sources=[e["src"] for e in entries]
     if len(sources)!=expected or len(set(sources))!=expected:
@@ -426,17 +444,44 @@ async def inspect_slot(role, page, root="/data/imagegen"):
         return False, "ACTIVE_CHAT_NOT_OPEN"
     expected=active["count"]
     try:
-        result=await page.evaluate("""({task,expected})=>{
+        result=await page.evaluate(r"""async ({task,expected})=>{
           if(location.hostname!=='chatgpt.com'|| !location.pathname.includes('/c/'))return{error:'NOT_CHAT'};
           const usr=[...document.querySelectorAll('[data-markdown-text-tone="user-message"]')]
             .find(n=>(n.innerText||'').includes('UPLOAD_TASK_ID='+task));
           const turn=usr?.closest('[data-turn-key]');
           if(!turn)return{error:'USER_TURN_MISSING'};
-          const all=[...turn.querySelectorAll('[data-testid="generated-image-preview"] img[alt^="Generated image"]')]
+          const buttons=[...turn.querySelectorAll('button[aria-label^="Show generated image "]')];
+          if(buttons.length){
+            const items=buttons.map(b=>{
+              const m=(b.getAttribute('aria-label')||'').match(/^Show generated image ([1-9][0-9]*)$/);
+              const img=b.querySelector('img');
+              return m&&img?{index:Number(m[1]),src:img.currentSrc||img.src}:null;
+            });
+            if(items.some(x=>!x))return{error:'BROKEN_IMAGE_SELECTOR'};
+            items.sort((a,b)=>a.index-b.index);
+            if(items.some((x,i)=>x.index!==i+1))return{error:'NONCONSECUTIVE_GENERATED_IMAGES'};
+            const sources=[...new Set(items.map(x=>x.src))];
+            if(sources.length!==items.length)return{error:'DUPLICATED_IMAGE_PREVIEWS'};
+            // A thumbnail may have naturalWidth=0 until selected. Fetch its
+            // blob instead; this confirms a real, distinct generated image.
+            const checks=await Promise.all(sources.map(async url=>{
+              if(!url||!url.startsWith('blob:'))return false;
+              try{
+                const res=await fetch(url);
+                if(!res.ok)return false;
+                const blob=await res.blob();
+                return blob.size>100&&blob.size<=30000000&&blob.type.startsWith('image/');
+              }catch(e){return false;}
+            }));
+            if(checks.some(ok=>!ok))return{error:'IMAGE_BLOB_NOT_READY'};
+            return {count:sources.length,expected,busy:!!turn.querySelector('[data-talvt-turn-state="in_progress"]'),
+                    verified_by:'CAROUSEL_DISTINCT_IMAGE_BLOBS',error:null};
+          }
+          const full=[...turn.querySelectorAll('[data-testid="generated-image-preview"] img[alt^="Generated image"]')]
             .filter(i=>i.complete&&i.naturalWidth>0&&i.naturalHeight>0&&!!i.getClientRects().length);
-          const sources=[...new Set(all.map(i=>i.currentSrc||i.src))];
-          const busy=!!turn.querySelector('[data-talvt-turn-state="in_progress"]');
-          return {count:sources.length, expected, busy, error:null};
+          const sources=[...new Set(full.map(i=>i.currentSrc||i.src))];
+          return{count:sources.length,expected,busy:!!turn.querySelector('[data-talvt-turn-state="in_progress"]'),
+                 verified_by:'SINGLE_VISIBLE_PREVIEW_FALLBACK',error:null};
         }""",{"task":task,"expected":expected})
     except Exception:
         return False, "IMAGEGEN_RESULT_UI_NOT_VERIFIED"
@@ -452,7 +497,10 @@ async def inspect_slot(role, page, root="/data/imagegen"):
         return False, "GENERATED_CANDIDATE_EXPORT_UNVERIFIED:"+str(exc)[:110]
     evidence=root/STATE_DIR/"generated_visible"/(task+".json")
     evidence.parent.mkdir(parents=True,exist_ok=True)
-    _atomic_json(evidence,{"task_id":task,"role":role,"distinct_generated_images":expected,"status":"IMAGES_VISIBLE_NOT_LIBRARY_PROOF","export_status":export_status,"checked_at":_now().isoformat()})
+    _atomic_json(evidence,{"task_id":task,"role":role,"distinct_generated_images":expected,
+                           "verification_method":result.get("verified_by"),
+                           "status":"IMAGES_VISIBLE_NOT_LIBRARY_PROOF",
+                           "export_status":export_status,"checked_at":_now().isoformat()})
     verified, reason=_library_confirmed(root,active)
     if not verified:
         return False, reason

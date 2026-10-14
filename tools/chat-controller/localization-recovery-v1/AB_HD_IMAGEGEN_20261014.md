@@ -68,6 +68,39 @@ A prompt cannot guarantee that ChatGPT currently supports creating a user-define
    Replace sample IDs and folder URL with **real, distinct items/URL observed in UI**, or don't create the file. Future verified browser automation may write the same evidence shape with `verification_method="browser_ui_verified"`. Supplying a fabricated JSON file is not verification.
 7. Only after the above gates: increment this slot's completed count/next ordinal and permit next new chat. Separate independent QA of Korean glyphs, layout, alpha and final DDS/game runtime remains required.
 
+## 2026-10-14 live ImageGen and project-Library correction
+
+The B first batch `OUTRUN-AB-B-0001-20261014` (source ordinal 501–505)
+**really generated five independent images**. ChatGPT's updated UI uses one
+large `generated-image-preview` followed by **five**
+`Show generated image N` carousel selectors with distinct full PNG blobs.
+The former controller counted only the large preview and falsely reported
+`IMAGEGEN_OUTPUT_COUNT_MISMATCH:1/5`. The new `ab_batch_queue.py` detects
+the five distinct carousel items, verifies each Blob is fetchable with image
+type and nonzero byte length, and exports images 1–5 in carousel order. The
+new regression test `tests/test_ab_carousel.py` covers 5-output export,
+incomplete batches, duplicate images, immutable candidates and Library gate.
+
+The actual ChatGPT Library **project folder** `아웃런 한글화 신규`
+(`https://chatgpt.com/library/d/6acdbd67ad70819199e61e4c9f323019`)
+contains images named `image-gen-1(2).png` through `image-gen-5(2).png`.
+This positively verifies project Library save, **not** the user-requested
+**separate folder named `outrun_kor`**; the separate folder did not appear
+under Library Folders during this review. Do not fabricate `outrun_kor`
+evidence or advance the B slot until its mandatory folder criterion is met
+or explicitly revised by the user.
+
+Real generated PNGs were also exported without overwriting input files to
+`/data/imagegen/ab_batches/candidate_outputs/B/`, with hashes and
+provenance in `/data/imagegen/ab_batches/export_evidence/OUTRUN-AB-B-0001-20261014.json`.
+All five are **REWORK_DIMENSIONS** (e.g. English source 683×256 vs
+generated 2048×768). Output-to-source assignment uses display order only;
+independent semantic matching and DDS/runtime QA remain UNTESTED.
+GitHub-only controller selector fix needs a separate user Portainer redeploy;
+the currently running N100 container retains the old first-preview selector
+until redeployed. No forced resends, Library evidence fabrication, or
+automatic DDS changes.
+
 ## Persistent state and backward compatibility
 
 - `/data/imagegen/ab_batches/A_state.json` and `B_state.json` — disjoint original ordinal ranges and one in-flight batch per slot.
