@@ -32,6 +32,8 @@ services:
       - /data/c-salvage
       - --repo-root
       - /repo
+      - --plate-jobs-dir
+      - /data/c-salvage/plate_jobs
       - --recipes-dir
       - /data/c-salvage/recipes
       - --bundle-root
