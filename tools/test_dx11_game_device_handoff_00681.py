@@ -14,7 +14,10 @@ def connected(code):
     present = code[code.index("void before_game_present("):code.index("void before_game_reset(")]
     normal_present = present[:present.index("} catch (...)")]
     reset = code[code.index("void before_game_reset("):]
-    foreign_observer = code[code.index("bool observe_source_device("):code.index("void observe(IDirect3DDevice9*")]
+    # Only device selection is required to remain side-effect-free. A
+    # separate, later source-mode guard may legitimately abort a mixed
+    # native scene without touching the original game Draw or input.
+    foreign_observer = code[code.index("bool observe_source_device("):code.index("bool observe_source_frame_mode(")]
     owner_gate = "if (GameNativeFrameBatch::foreign_present("
     return (
         "s.sourceGameDevice != current" in foreign_observer and
@@ -27,7 +30,9 @@ def connected(code):
         present.index(owner_gate) < present.index("game->GetBackBuffer(") and
         "s.previousOutput.valid() ? s.previousOutput.device : 0u" in present and
         "presentDevice)) return;" in present and
-        "s.frameBatch.abort();" not in present and
+        # Reject mutations before the foreign Present guard has returned,
+        # not deliberate frame-mode rollback after owning-device validation.
+        "s.frameBatch.abort();" not in present[:present.index("game->GetBackBuffer(")] and
         "s.pending = false;" in present and
         "oldest.provenance.same_device(presentDevice)" in present and
         "next.provenance.sourceDevice = presentDevice;" in present and
