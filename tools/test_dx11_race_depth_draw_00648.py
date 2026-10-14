@@ -25,5 +25,8 @@ assert 'zFunc != 2u && zFunc != 4u' in depth
 assert 'depthBiasBits & 0x7fffffffu' in depth
 assert 'if (!diagnostic_enabled() || !game' in cpp
 assert 'void before_game_reset() noexcept' in cpp
-assert 's.backend.begin_frame(kBackground);' in cpp
+assert 'if (s.frameBatch.first_draw()) {' in cpp
+assert 's.backend.begin_frame(env_full_game_opt_in()' in cpp
+assert 's.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)' in cpp
+assert ': kBackground);' in cpp
 print("DX11 00648 real game depth Draw source/fallback regression: PASS")
