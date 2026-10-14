@@ -14,7 +14,17 @@ no_claim=choose(queue,policy,[],None)
 assert no_claim["action"]=="HOLD_OWNER_UNCONFIRMED"
 next_job=choose(queue,policy,[],[])
 assert next_job["action"]=="PROPOSE_NEW_FUNCTIONAL_FEATURE",next_job
-assert next_job["feature_id"]=="DX9EX:VIS:HUD_GAMEPLAY",next_job
+# The queue is mutable authority. Test selection order from *current* priority,
+# rather than freezing the former HUD-first value after lens/+TIME were raised.
+catalog_ids={f["feature_id"] for f in policy["feature_catalog"]}
+ordered=sorted((x for x in queue["items"]
+                if x.get("featureId") in catalog_ids
+                and x.get("status") in {"READY","NEEDS_VALIDATION","IN_PROGRESS"}),
+               key=lambda x:(-int(x.get("priority",0)),x["id"]))
+assert len(ordered)>=2
+assert next_job["feature_id"]==ordered[0]["featureId"],next_job
+assert next_job["symptom_id"]==ordered[0].get("symptomId"),next_job
+assert no_claim["candidate"]==ordered[0]["featureId"],no_claim
 assert next_job["new_task_allowed"] is False, "selection cannot itself create a task"
 rec={"task_id":"CONVERSION-DX9EX-00772",
      "feature_id":"DX9EX:VIS:F11_MENU",
@@ -32,7 +42,18 @@ assert unknown["action"]=="HOLD_OWNER_UNCERTAIN"
 complete=copy.deepcopy(rec)
 complete.update(status="COMPLETE_BUILD_VERIFIED",automation_validation="PASS_EXACT_SHA")
 post=choose(queue,policy,[complete],[])
-assert post["feature_id"]=="DX9EX:VIS:HUD_GAMEPLAY",post
+assert post["feature_id"]==ordered[0]["featureId"],post
+assert not post["new_task_allowed"]
+# BUILD_VERIFIED/HMD-UNTESTED at the top of the queue must advance to the
+# next independent visible feature, not stall or reissue the same scored task.
+completed_top={"task_id":"CONVERSION-DX9EX-00800",
+               "feature_id":ordered[0]["featureId"],
+               "symptom_id":ordered[0].get("symptomId"),
+               "status":"COMPLETE_BUILD_VERIFIED",
+               "runtime_validation":"UNTESTED"}
+next_after=choose(queue,policy,[complete,completed_top],[])
+assert next_after["feature_id"]==ordered[1]["featureId"],next_after
+assert not next_after["new_task_allowed"]
 complete["runtime_validation"]="USER_REPORTED_FAIL"
 reopen=choose(queue,policy,[complete],[])
 assert reopen["action"]=="REOPEN_SAME_SYMPTOM" and reopen["task_id"]==rec["task_id"]
