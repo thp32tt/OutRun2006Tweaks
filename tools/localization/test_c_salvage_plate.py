@@ -80,6 +80,17 @@ def trial():
             assert "conflicting" in str(err)
         else:
             raise AssertionError("Protected English overlap bypass")
+        import c_salvage_worker as worker
+        jobs=root/"plate_jobs"
+        jobs.mkdir()
+        spec=jobs/"sample.json"
+        spec.write_text(json.dumps(recipe,ensure_ascii=False))
+        queue=root/"job_queue"
+        status,changed=worker.handle_plate_job(spec,root,queue)
+        assert status=="CLEAN_CANDIDATE_REQUIRES_INDEPENDENT_C1_PLATE_REVIEW" and changed
+        status2,changed2=worker.handle_plate_job(spec,root,queue)
+        assert status2=="ALREADY_RECORDED" and not changed2
+        assert len(list((queue/"plates").glob("*/receipt.json")))==1
         print(json.dumps({"test":"C_PLATE", "result":"PASS", "cases":3,
                           "psd_missing_fallback":"TEST_ONLY", "unreviewed":"HOLD",
                           "source_pixels_outside_removal_changed":0, "runtime":"UNTESTED"}))
