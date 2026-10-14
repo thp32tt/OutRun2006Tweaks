@@ -1311,43 +1311,43 @@ float4 Stage1ThreeSourceTextured(float4 current, float4 diffuse, float4 specular
 float4 Stage1AndAlphaTextured(float4 stage0, float4 diffuse, float4 specular,
                       float stage1TextureAlpha, float4 stage1TextureColor) {
     float4 color = Stage1Combine(
-        Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.x),
-        Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.y), stage1Ops.x, stage0, diffuse);
-    if (stage1Ops.x == 25 || stage1Ops.x == 26)
-        color = Stage1ThreeSourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Ops.x,
-                                  stage1ArgZero.x, stage1Args.x, stage1Args.y);
+        Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Args.x)),
+        Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Args.y)), (stage1Ops.x), stage0, diffuse);
+    if ((stage1Ops.x) == 25 || (stage1Ops.x) == 26)
+        color = Stage1ThreeSourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Ops.x),
+                                  (stage1ArgZero.x), (stage1Args.x), (stage1Args.y));
     // Only admitted when D3D9 stage 1 samples exactly the mirrored stage-0
     // texture at identical coordinates with identical sampling parameters.
-    if (13 == stage1Ops.x)
+    if (13 == (stage1Ops.x))
         color = saturate(lerp(
-            Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.y),
-            Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.x),
+            Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Args.y)),
+            Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Args.x)),
             stage1TextureAlpha * 1.0f));
     // D3D9 premultiplied ARG1 is already weighted, unlike ordinary lerp.
-    if (15 == stage1Ops.x) {
-        float4 texturePmColor1 = Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.x);
-        float4 texturePmColor2 = Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.y);
+    if (15 == (stage1Ops.x)) {
+        float4 texturePmColor1 = Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Args.x));
+        float4 texturePmColor2 = Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Args.y));
         color = saturate(texturePmColor1 + texturePmColor2 * (1.0f - stage1TextureAlpha * 1.0f));
     }
-    float alpha = stage1Ops.y == 1 ?
-        (stage1Ops.z != 0 ? diffuse.a : stage0.a) : Stage1Combine(
-        Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.z),
-        Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.w), stage1Ops.y, stage0, diffuse).w;
-    if (stage1Ops.y == 25 || stage1Ops.y == 26)
-        alpha = Stage1ThreeSourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Ops.y,
-                                  stage1ArgZero.y, stage1Args.z, stage1Args.w).a;
-    if (13 == stage1Ops.y)
+    float alpha = (stage1Ops.y) == 1 ?
+        ((stage1Ops.z) != 0 ? diffuse.a : stage0.a) : Stage1Combine(
+        Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Args.z)),
+        Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Args.w)), (stage1Ops.y), stage0, diffuse).w;
+    if ((stage1Ops.y) == 25 || (stage1Ops.y) == 26)
+        alpha = Stage1ThreeSourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Ops.y),
+                                  (stage1ArgZero.y), (stage1Args.z), (stage1Args.w)).a;
+    if (13 == (stage1Ops.y))
         alpha = saturate(lerp(
-            Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.w),
-            Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.z),
+            Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Args.w)),
+            Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Args.z)),
             stage1TextureAlpha * 1.0f)).a;
     // ALPHAOP reads separate D3D9 operands, never the RGB PM output alpha.
-    if (15 == stage1Ops.y) {
-        float4 texturePmAlpha1 = Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.z);
-        float4 texturePmAlpha2 = Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, stage1Args.w);
+    if (15 == (stage1Ops.y)) {
+        float4 texturePmAlpha1 = Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Args.z));
+        float4 texturePmAlpha2 = Stage1SourceTextured(stage0, diffuse, specular, stage1TextureColor, (stage1Args.w));
         alpha = saturate(texturePmAlpha1 + texturePmAlpha2 * (1.0f - stage1TextureAlpha * 1.0f)).a;
     }
-    float4 result = float4(color.rgb, alpha);
+    float4 result = float4(color.xyz, alpha);
     AlphaGate(result.w);
     return result;
 }
