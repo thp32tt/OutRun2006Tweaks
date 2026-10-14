@@ -4578,11 +4578,9 @@ bool observe_source_device(State& s, IDirect3DDevice9* game) noexcept {
     const auto current = reinterpret_cast<std::uintptr_t>(game);
     if (s.sourceGameDevice == 0u) s.sourceGameDevice = current;
     else if (s.sourceGameDevice != current) {
-        // A second D3D9 device (menu/race transition or auxiliary swapchain)
-        // cannot append to the first device's native draw batch. Original
-        // D3D9 draw/gamepad still run; no ownership of either device is held.
-        s.frameBatch.abort();
-        s.pending = false;
+        // An auxiliary D3D9 device must not splice its Draw into the
+        // source game's native batch OR destroy that batch. Its original
+        // D3D9 Draw/input still execute. Reset releases source ownership.
         return false;
     }
     return true;
@@ -4793,6 +4791,14 @@ void before_game_present(IDirect3DDevice9* game,
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
         const auto presentDevice = reinterpret_cast<std::uintptr_t>(game);
+        // The x86 game can Present an auxiliary/menu D3D9 device between
+        // game-authored Draw and its owner's Present. Ignore that Present
+        // entirely: it must not rotate the game source probe, retire a native
+        // readback or replace the owner's output generation.
+        if (GameNativeFrameBatch::foreign_present(
+                s.sourceGameDevice,
+                s.previousOutput.valid() ? s.previousOutput.device : 0u,
+                presentDevice)) return;
         ComPtr<IDirect3DSurface9> presentBackbuffer;
         D3DSURFACE_DESC presentDesc{};
         ComPtr<IUnknown> presentBackbufferIdentity;
@@ -4847,11 +4853,6 @@ void before_game_present(IDirect3DDevice9* game,
             bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
             (bb.Format == D3DFMT_A8R8G8B8 ||
              bb.Format == D3DFMT_X8R8G8B8);
-        if (s.sourceGameDevice != 0u && s.sourceGameDevice != presentDevice) {
-            // Do not copy a Draw batch from another D3D9 device to this Present.
-            s.frameBatch.abort();
-            s.pending = false;
-        }
         if (s.backend.ready() && s.backend.context()) {
             auto* ctx = s.backend.context();
             // Poll the oldest GPU fence without implicit flushing or CPU waits.

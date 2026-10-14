@@ -4,6 +4,20 @@ namespace outrun::vr::dx11::live_game_frame {
 // Diagnostic compositing only; original D3D9 Draw/Present/input remain intact.
 struct GameNativeFrameBatch {
     static constexpr std::uint32_t kMaxDraws = 8u;
+    // Game-created native Draws belong to their source D3D9 device. A
+    // foreign Present cannot close the owner's frame or consume its GPU
+    // readback. After the owner's Present resets the per-frame draw identity,
+    // retain the last valid backbuffer owner for late asynchronous uploads.
+    // Without any owner yet, allow probing the first game Present.
+    [[nodiscard]] static constexpr bool foreign_present(
+        std::uintptr_t sourceDevice, std::uintptr_t lastOutputDevice,
+        std::uintptr_t presentingDevice) noexcept {
+        return presentingDevice == 0u ||
+            (sourceDevice != 0u
+                ? sourceDevice != presentingDevice
+                : lastOutputDevice != 0u &&
+                    lastOutputDevice != presentingDevice);
+    }
     std::uint32_t submitted = 0u;
     bool stopped = false;
     bool depthReady = false;
