@@ -133,6 +133,25 @@ def verify(text):
     for guard in state_guards:
         if strip(guard) not in state_clean:
             raise ValueError("UI replacement rollback lacks "+guard)
+    # Identical erase statements exist in three mutually exclusive paths.
+    # A region-wide substring check wrongly accepts a broken original
+    # rollback because the new successful-load helpers still contain erase.
+    for method, obligations in (
+        ("void restoreOriginal() const", (
+            "memcpy(data, &header, sizeof(DDS_FILE));",
+            "if (hadScale)", "sprite_scales[scaleKey] = previousScale;",
+            "else", "sprite_scales.erase(scaleKey);")),
+        ("void commitUnreplacedSuccessfulLoad(const void* selectedData) const", (
+            "snapshotted && !replacementSelected(selectedData)",
+            "sprite_scales.erase(scaleKey);")),
+        ("void finishOriginalRetry(HRESULT result) const", (
+            "snapshotted && SUCCEEDED(result)",
+            "sprite_scales.erase(scaleKey);")),
+    ):
+        method_body = strip(body(state, method))
+        for obligation in obligations:
+            if strip(obligation) not in method_body:
+                raise ValueError("UI DDS scale lifecycle " + method + " lacks " + obligation)
     fast=(
         "const HRESULT fastResult = D3DXCreateTextureFromFileInMemoryEx_Custom("
         "pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,"
