@@ -917,17 +917,24 @@ for marker in (
 ):
     require(marker, r30, 'result sink provenance / R62 fixedfn telemetry')
 
+def mutate_exact_result_parent(source, signature, old_token):
+    """Mutate a matched deferred GOAL parent, not an earlier direct owner."""
+    body = function_body(source, signature)
+    if old_token not in body:
+        raise SystemExit("GOAL result parent fault injection missing: " + old_token)
+    return source.replace(body, body.replace(
+        old_token, "ProducerToken::None);", 1), 1)
+
+
 for label, corrupt in (
     ("result parent no provenance",
-     inject_one_function_token(
+     mutate_exact_result_parent(
          ui, "static void ResultProgressLeave(",
-         "ProducerToken::ResultProgress);",
-         "ProducerToken::None);")),
+         "ProducerToken::ResultProgress);")),
     ("GOAL parent no provenance",
-     inject_one_function_token(
+     mutate_exact_result_parent(
          ui, "static void GoalTime_TagHelper(",
-         "ProducerToken::GoalTimeHelper);",
-         "ProducerToken::None);")),
+         "ProducerToken::GoalTimeHelper);")),
     ("result parent token dropped at enum",
      sem.replace("        ResultProgress,\n", "", 1)),
 ):
