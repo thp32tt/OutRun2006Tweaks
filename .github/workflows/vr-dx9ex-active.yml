@@ -394,7 +394,8 @@ jobs:
             'tools/verify_vr_desktop_capture_reuse.py',
             'tools/verify_vr_theater_capture_once.py',
             'tools/verify_vr_final_submission_contract.py',
-            'tools/verify_vr_dx9ex_launch_paths.py'
+            'tools/verify_vr_dx9ex_launch_paths.py',
+            'tools/verify_vr_dx9ex_launch_batch.py'
           )
           foreach ($verifier in $verifiers) {
             python $verifier
@@ -592,20 +593,21 @@ jobs:
           Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
           # Keep one GUI launcher. The slot selector invokes the PowerShell
           # test runner directly; duplicate batch entrypoints are not needed.
-          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1')) {
+          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd','START_DX9EX_TEST.cmd','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1')) {
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
           Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
+          Copy-Item docs/DX9EX_TEST_LAUNCH_CONTRACT.md (Join-Path $dir 'DX9EX_TEST_LAUNCH_CONTRACT.md')
           Copy-Item docs/VR_HUD_NIGHT_TEST_20261009.md (Join-Path $dir 'HUD_NIGHT_TEST_GUIDE.md')
           @(
             'OUTRUN 2006 VR DX9EX - START HERE / 실행 방법'
             ''
             '1. Extract ZIP contents into the folder containing OR2006C2C.EXE.'
             '   ZIP 내용물을 OR2006C2C.EXE가 있는 게임 폴더에 풀어주세요.'
-            '2. Double-click OutRunVR-Slot-Selector.cmd (the only included CMD launcher).'
-            '   OutRunVR-Slot-Selector.cmd를 더블클릭하세요.'
-            '3. CURRENT FOCUS / CORRECTNESS -> 설정 + 바로 실행.'
-            '   첫 행 CURRENT FOCUS 오른쪽의 설정 + 바로 실행을 누르세요.'
+            '2. Double-click START_DX9EX_TEST.cmd (visible direct launch; optional GUI selector available).'
+            '   START_DX9EX_TEST.cmd를 더블클릭하세요. 실패 원인과 로그 위치가 표시됩니다.'
+            '3. CURRENT FOCUS / CORRECTNESS is selected automatically.'
+            '   GUI는 OutRunVR-Slot-Selector.cmd에서 선택적으로 사용할 수 있습니다.'
             '4. The selector configures the DX9Ex backend and runs OR2006C2C.EXE.'
             '   설정 후 실제 게임 실행 파일은 OR2006C2C.EXE입니다.'
             '5. After the game closes, its diagnostic ZIP is auto-collected.'
@@ -671,16 +673,21 @@ jobs:
           $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
           if (-not $zip) { throw 'active DX9Ex ZIP missing' }
           Expand-Archive $zip.FullName verify
-          foreach ($file in @('OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1','SHA256SUMS.txt','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md')) {
+          foreach ($file in @('START_DX9EX_TEST.cmd','DX9EX_TEST_LAUNCH_CONTRACT.md','OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1','SHA256SUMS.txt','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md')) {
             if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
           }
-          # Exactly one usable CMD entrypoint, no unused BAT/CMD scripts.
+          # Both one-click visible and optional GUI launchers are required.
           $launchers = @(Get-ChildItem verify -Recurse -File | Where-Object { $_.Extension -in @('.cmd','.bat') })
-          if ($launchers.Count -ne 1 -or $launchers[0].Name -ne 'OutRunVR-Slot-Selector.cmd') {
-            throw "Unexpected launch batch files in ZIP: $($launchers.Name -join ', ')"
+          if ($launchers.Count -ne 2 -or
+              @($launchers | Where-Object { $_.Name -notin @('START_DX9EX_TEST.cmd','OutRunVR-Slot-Selector.cmd') }).Count -ne 0) {
+            throw "Invalid DX9Ex launchers: $($launchers.Name -join ', ')"
           }
-          $launcherText = Get-Content (Join-Path verify 'OutRunVR-Slot-Selector.cmd') -Raw
-          if ($launcherText -notlike '*OutRunVR-Slot-Selector.ps1*') { throw 'Main launcher no longer opens slot selector' }
+          $launcherText = Get-Content (Join-Path verify 'START_DX9EX_TEST.cmd') -Raw
+          foreach ($item in @('pushd "%~dp0"','OR2006C2C.EXE','backends\d3d9\dinput8.dll','backends\d3d9\outrun-vr-host.exe','-Backend d3d9','-VariantId CURRENT_FOCUS','Run-OutRunVRTest.ps1','if errorlevel 1','pause')) {
+            if (-not $launcherText.Contains($item)) { throw "Direct batch launch contract missing $item" }
+          }
+          $guiLauncherText = Get-Content (Join-Path verify 'OutRunVR-Slot-Selector.cmd') -Raw
+          if ($guiLauncherText -notlike '*OutRunVR-Slot-Selector.ps1*') { throw 'Optional GUI launcher invalid' }
           $slotText = Get-Content (Join-Path verify 'OutRunVR-Slot-Selector.ps1') -Raw
           foreach ($marker in @('CURRENT_FOCUS','Run-OutRunVRTest.ps1','Start-Slot','설정 + 바로 실행')) {
             if ($slotText -notlike "*$marker*") { throw "Slot selector marker missing: $marker" }
