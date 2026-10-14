@@ -11,7 +11,7 @@
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R31_R32_OPTIONAL_DIAGNOSTIC_WRITES",
   "status": "COMPLETE_BUILD_VERIFIED",
-  "checkpoint": "C6_RESULT_PASS_EXACT_SHA",
+  "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_delta": 1,
