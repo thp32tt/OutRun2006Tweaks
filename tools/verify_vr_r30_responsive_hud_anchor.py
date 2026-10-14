@@ -1038,3 +1038,83 @@ assert "SpriteQueueDepth != 0" not in sel.replace(
 assert "directHudOwner.emplace(" not in direct.replace(
     "directHudOwner.emplace(", "/* missing exact owner */(", 1)
 print("PASS immediate/queued BA9D0 VR HUD source ownership and four destructive regressions")
+
+
+# Exact peripheral fallback: if the ordinary 0.90x boosted sprite would
+# clip across asymmetric Quest eyes, solve the largest common safe multiplier
+# down to 1x. The old return(previousBoost) exposed a clipped glyph group.
+adaptive = code[code.index("float R30AdaptivePeripheralHudBoost("):
+                code.index("bool R30TransformHudScissor(")]
+assert "previousBoost > 3.0f" in adaptive
+assert "previousBoost >= 3.0f" not in adaptive
+assert "if (!fitsBothEyes(previousBoost))" in adaptive
+assert "if (!fitsBothEyes(1.0f))" in adaptive
+assert "float low = 1.0f, high = previousBoost;" in adaptive
+assert "for (int i = 0; i < 10; ++i)" in adaptive
+assert adaptive.index("if (!fitsBothEyes(previousBoost))") < adaptive.index(
+    "if (desired <= previousBoost)")
+assert adaptive.index("if (!fitsBothEyes(1.0f))") < adaptive.index(
+    "float low = 1.0f, high = previousBoost;") < adaptive.index(
+    "if (fitsBothEyes(desired))")
+
+def bilateral_fits(b, width, height, bounds, anchor_xy, eye_offset, scale_x=.55, scale_y=.35):
+    min_x, max_x, min_y, max_y = bounds
+    ax, ay = anchor_xy
+    midx, midy = width * .5, height * .5
+    min_shift, max_shift = -math.inf, math.inf
+    for offset in eye_offset:
+        sx = scale_x*b
+        bias_x = (1.-sx)*(midx + midx*ax) + offset*midx
+        min_shift = max(min_shift, .025*width - (sx*min_x + bias_x))
+        max_shift = min(max_shift, .975*width - (sx*max_x + bias_x))
+    sy = scale_y*b
+    by = (1.-sy)*(midy - midy*ay)
+    ymin = sy*min_y + by
+    ymax = sy*max_y + by
+    return (min_shift <= max_shift and
+            .025*height - ymin <= .975*height - ymax)
+
+def fallback_bilateral(previous, fits):
+    if fits(previous):
+        return previous
+    if not fits(1.):
+        return 1.
+    low, high = 1., previous
+    for _ in range(10):
+        mid = low + (high-low)*.5
+        if fits(mid):
+            low = mid
+        else:
+            high = mid
+    return low
+
+for w,h in ((1024,768), (1920,1080), (3440,1440)):
+    box = (0., .4*w, .6*h, .7*h)
+    fits = lambda b: bilateral_fits(
+        b, w, h, box, (-.6,.45), (-.6,.6))
+    original_boost = .90/.55
+    assert fits(1.) and not fits(original_boost)
+    repaired = fallback_bilateral(original_boost, fits)
+    assert 1. < repaired < original_boost and fits(repaired)
+    assert not fits(min(original_boost, repaired + .01))
+    assert fallback_bilateral(1., fits) == 1.
+    assert fallback_bilateral(3., lambda b: False) == 1.
+    assert fallback_bilateral(3., lambda b: True) == 3.
+# Mutation cases must break exact owning source and not merely comments or
+# a Python-only model.
+for before, after in (
+    ("if (!fitsBothEyes(previousBoost))", "if (fitsBothEyes(previousBoost))"),
+    ("if (!fitsBothEyes(1.0f))", "if (fitsBothEyes(1.0f))"),
+    ("float low = 1.0f, high = previousBoost;",
+     "float low = previousBoost, high = previousBoost;"),
+    ("return low;\n            }\n            if (desired <= previousBoost)",
+     "return previousBoost;\n            }\n            if (desired <= previousBoost)"),
+):
+    assert before in adaptive
+    mutant = adaptive.replace(before, after, 1)
+    assert not all(t in mutant for t in (
+        "if (!fitsBothEyes(previousBoost))",
+        "if (!fitsBothEyes(1.0f))",
+        "float low = 1.0f, high = previousBoost;",
+        "return low;\n            }\n            if (desired <= previousBoost)"))
+print("PASS opt-in stereo HUD bilateral clip recovery, 4:3/16:9/21:9 and 4 negative mutations")

@@ -2159,16 +2159,13 @@ namespace OutRunVRStereo
                 !(hudScaleX > 0.0f && hudScaleY > 0.0f) ||
                 !std::isfinite(hudScaleX) || !std::isfinite(hudScaleY) ||
                 !std::isfinite(previousBoost) || previousBoost < 1.0f ||
-                previousBoost >= 3.0f ||
+                previousBoost > 3.0f ||
                 anchor.minX < x0 || anchor.maxX > x0 + width ||
                 anchor.minY < y0 || anchor.maxY > y0 + height)
                 return previousBoost;
 
             const float desired = std::clamp(
                 0.65f / hudScaleY, previousBoost, 3.0f);
-            if (desired <= previousBoost)
-                return previousBoost;
-
             // A bilateral common translation is feasible iff both projected
             // X intervals share an allowed shift and the Y interval fits.
             // Do not discard one eye, clamp the eyes separately, or shrink a
@@ -2209,6 +2206,26 @@ namespace OutRunVRStereo
                     safeTop - groupTop <= safeBottom - groupBottom;
             };
             if (!fitsBothEyes(previousBoost))
+            {
+                // The old 0.90x glyph floor can clip one eye when the
+                // asymmetric FOV/optical offsets leave no common bilateral
+                // shift. Keep the original draw visible instead of keeping
+                // a known-unfit enlargement. Never shrink below the ordinary
+                // unboosted HUD size; preserve zero-disparity shared motion.
+                if (!fitsBothEyes(1.0f))
+                    return 1.0f;
+                float low = 1.0f, high = previousBoost;
+                for (int i = 0; i < 10; ++i)
+                {
+                    const float mid = low + (high - low) * 0.5f;
+                    if (fitsBothEyes(mid))
+                        low = mid;
+                    else
+                        high = mid;
+                }
+                return low;
+            }
+            if (desired <= previousBoost)
                 return previousBoost;
             if (fitsBothEyes(desired))
                 return desired;
