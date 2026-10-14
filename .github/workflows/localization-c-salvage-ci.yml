@@ -29,6 +29,8 @@ jobs:
         run: python tools/localization/test_c_salvage_compose.py
       - name: C worker synthetic QA only
         run: python tools/localization/test_c_salvage_worker.py
+      - name: C PSD/source plate preparation synthetic QA only
+        run: python tools/localization/test_c_salvage_plate.py
       - name: Verify deployment is manual and existing controller unchanged
         run: |
           python - <<'PY'
