@@ -47,10 +47,9 @@
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
-      "GAME_D3D9_CLEAR",
-      "GAME_D3D9_DRAW",
-      "D3D11_NATIVE_FULL_FRAME",
-      "GAME_PRESENT_BACKBUFFER"
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "only automated source/C++ and exact-SHA gates; no Quest3/VDXR screen test",
     "activation_guard_and_fallback": "native full-frame explicit opt-in only, game Clear/Draw/Present/gamepad preserved"
