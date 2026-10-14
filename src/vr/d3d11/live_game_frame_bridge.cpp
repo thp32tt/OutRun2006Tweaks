@@ -5035,8 +5035,36 @@ void before_game_present(IDirect3DDevice9* game,
             // the original D3D9 game frame and gamepad response unmodified.
             auto& oldest = s.readbacks[fullMode ? fullSlot : s.readSlot];
             if (oldest.busy && (!fullMode || fullQueued)) {
-                const HRESULT ready = ctx->GetData(
+                HRESULT ready = ctx->GetData(
                     oldest.fence.Get(), nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
+                // In full-size mode this is the only valid publication slot:
+                // previous-Present copies are stale, while a single immediate
+                // S_FALSE often races a healthy but unfinished GPU submission.
+                // Re-poll the already-flushed *same* fence for at most 0.5 ms
+                // and 512 calls. Timeout/errors always keep the original D3D9
+                // backbuffer and gamepad path, without a delayed native upload.
+                if (fullMode && fullQueued && ready == S_FALSE) {
+                    LARGE_INTEGER frequency{}, started{}, now{};
+                    if (QueryPerformanceFrequency(&frequency) &&
+                        frequency.QuadPart > 0 &&
+                        QueryPerformanceCounter(&started)) {
+                        std::uint64_t elapsedTicks = 0u;
+                        for (std::uint32_t retry = 0u;
+                             ready == S_FALSE &&
+                             GameNativeFramePublication::retry_same_present_fence(
+                                 fullMode, fullQueued, retry, elapsedTicks,
+                                 static_cast<std::uint64_t>(frequency.QuadPart));
+                             ++retry) {
+                            ready = ctx->GetData(oldest.fence.Get(), nullptr, 0,
+                                                 D3D11_ASYNC_GETDATA_DONOTFLUSH);
+                            if (ready != S_FALSE) break;
+                            if (!QueryPerformanceCounter(&now) ||
+                                now.QuadPart < started.QuadPart) break;
+                            elapsedTicks = static_cast<std::uint64_t>(
+                                now.QuadPart - started.QuadPart);
+                        }
+                    }
+                }
                 if (ready == S_OK && (!oldest.provenance.may_present(s.presents, fullMode) ||
                                      !oldest.provenance.same_device(presentDevice) ||
                                       oldest.completeFullFrame != fullMode ||

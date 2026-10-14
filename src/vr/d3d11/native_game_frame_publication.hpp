@@ -12,6 +12,20 @@ struct GameNativeFramePublication {
         std::uint32_t changedPixels) noexcept {
         return complete && outputWritable && (fullMode || changedPixels != 0u);
     }
+    // A full-size game image is only useful if its GPU fence completes before
+    // this *same* D3D9 Present. Give the already-flushed native submission a
+    // bounded opportunity to finish; never wait indefinitely, poll a delayed
+    // inset, or substitute an older frame for live game/input.
+    static constexpr std::uint32_t kMaxSamePresentExtraPolls = 512u;
+    static constexpr std::uint64_t kSamePresentBudgetDivisor = 2000u; // 0.5 ms
+    [[nodiscard]] static constexpr bool retry_same_present_fence(
+        bool fullMode, bool queuedNow, std::uint32_t extraPolls,
+        std::uint64_t elapsedTicks, std::uint64_t frequencyTicks) noexcept {
+        return fullMode && queuedNow &&
+            extraPolls < kMaxSamePresentExtraPolls &&
+            frequencyTicks >= kSamePresentBudgetDivisor &&
+            elapsedTicks < frequencyTicks / kSamePresentBudgetDivisor;
+    }
     [[nodiscard]] static constexpr bool valid_readback_pitch(
         std::uint32_t width, std::uint32_t rowPitch) noexcept {
         return width != 0u &&
