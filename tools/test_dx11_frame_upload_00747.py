@@ -18,10 +18,14 @@ def integrated(src, hdr):
     discard = code.find("s.insetSurface.Reset();", fail)
     good = code.find("} else {", discard)
     upload = code.find("game->UpdateSurface(", good)
+    upload_error = code.find("} else {", upload)
+    retry_cache = code.find("s.insetSurface.Reset();", upload_error)
     unmap = code.find("ctx->Unmap(oldest.staging.Get(), 0);", upload)
     return all((
         '#include "native_game_frame_upload.hpp"' in src,
-        0 <= lock < copy < unlk < fail < discard < good < upload < unmap,
+        0 <= lock < copy < unlk < fail < discard < good < upload < upload_error < retry_cache < unmap,
+        "if (fullMode) {" in code[upload_error:retry_cache],
+        "s.insetFormat = D3DFMT_UNKNOWN;" in code[retry_cache:unmap],
         "lockRect.pBits, lockRect.Pitch," in code[copy:unlk],
         "mapped.pData, mapped.RowPitch," in code[copy:unlk],
         "surfaceWidth, surfaceHeight" in code[copy:unlk],
@@ -40,6 +44,7 @@ for old, new in (
     ("GameNativeFrameUpload::copy_rows(", "/* missing native copy */("),
     ("lockRect.pBits, lockRect.Pitch,", "mapped.pData, lockRect.Pitch,"),
     ("if (FAILED(unlockStatus))", "if (false /* ignore unlock */)"),
+    ("if (fullMode) {\n                                                s.insetSurface.Reset();", "if (false) {\n                                                s.insetSurface.Reset();"),
 ):
     mutant = SRC.replace(old, new, 1)
     assert mutant != SRC and not integrated(mutant, HDR), old

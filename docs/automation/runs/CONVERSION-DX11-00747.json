@@ -1,0 +1,104 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00747",
+  "production_id": "CONVERSION-DX11-00747",
+  "event_id": "CONVERSION-DX11-00747-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULLFRAME_BGRA_D3D9_UPLOAD_LIFETIME",
+  "feature_id": "DX11-MENU-RACE-NATIVE-FRAME-BGRA-UPLOAD",
+  "status": "IMPLEMENTED_GATE_PENDING",
+  "checkpoint": "C4_COMMIT",
+  "base_head_sha": "0e9acc952a8d6a16946821a61b74958429035b29",
+  "material_result_sha": "cd4b6c7a0e8f0628b0613b62405a8c465825f68b",
+  "validation_bearing_result_sha": null,
+  "automation_validation": "IN_PROGRESS",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "change_summary": "Real native full-game D3D11 Map to D3D9 SYSTEMMEM UpdateSurface now copies tightly visible BGRA pixels between independent row pitches; detects null, malformed, overflow, and failed D3D9 UnlockRect. Broken upload cache never publishes stale/partial menu/car/race pixels; original D3D9 Present/input retained.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_upload.hpp",
+    "tools/dx11_frame_upload_probe_00747.cpp",
+    "tools/test_dx11_frame_upload_00747.py",
+    "tools/test_dx11_game_frame_publication_00727.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Intercept genuine D3D9 menu/vehicle/race Draw/DrawIndexed and execute native D3D11 full-resolution output",
+      "D3D11 GPU fence and valid BGRA staging Map -> pitch-aware per-row copy into D3D9 CPU upload surface",
+      "Validated D3D9 UnlockRect -> backbuffer UpdateSurface or fail closed to original D3D9 Present/controller"
+    ],
+    "batch_components": [
+      "Live C++ native gameplay frame upload callsite and cache invalidation on failed D3D9 UnlockRect",
+      "Independent BGRA D3D11-to-D3D9 row transfer helper with overflow/pitch guards",
+      "Executable C++ nontrivial pitched buffer probe and Python integrated destructive regressions wired to exact-SHA CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00747 standalone C++ padded stride BGRA output bytewise comparison and native before_game_present D3D9 UpdateSurface integrated source; exact CI pending.",
+      "negative_regression": "00747 invalid pitch/null/overflow no-write probe plus destructive source mutation on failed UnlockRect and stale upload cache; original D3D9 gamepad fallback.",
+      "component_integration": "Native D3D11 Draw/DrawIndexed/color texture -> CopyResource/EVENT/Map -> pitched BGRA full-frame upload -> D3D9 UpdateSurface before same Present."
+    },
+    "conflict_keys": [
+      "DX11:FULLFRAME_BGRA_D3D9_UPLOAD_LIFETIME"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source and CI integration pending exact 5/5 SHA; full desktop menu/car/race gameplay and Quest3/VDXR parity cannot be asserted without runtime.",
+    "activation_guard_and_fallback": "Native full frame remains explicit opt-in; malformed copy or failed D3D9 unlock discards upload and keeps original D3D9 Present/gamepad."
+  },
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-NATIVE-FRAME-BGRA-UPLOAD",
+    "goal": "Reliably present full-resolution native D3D11 menu/car/race BGRA pixels through D3D9 game backbuffer despite differing CPU row pitches while preserving original Present/gamepad on upload failure.",
+    "acceptance_items": [
+      {
+        "id": "native-pitched-bgra-frame-transfer",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_rendering",
+        "expected_behavior": "Each full-size D3D11 mapped BGRA row copies into D3D9 upload staging without leaking source/destination padding and publishes only after successful UnlockRect."
+      },
+      {
+        "id": "original-d3d9-input-safe-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "input_and_fallback",
+        "expected_behavior": "Null/undersized/overflow mappings or failed D3D9 UnlockRect never invoke UpdateSurface and leave original D3D9 backbuffer and controller Present valid."
+      },
+      {
+        "id": "same-sha-integration-and-ci",
+        "category": "integrated_validation",
+        "behavior_area": "build_and_openxr",
+        "expected_behavior": "Executable padded-row copy tests, destructive source integration tests, and all mandatory exact SHA DX11 Fast, Backend, Build, OpenXR and HUD Gates SUCCESS."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-pitched-bgra-frame-transfer": "PENDING_CI",
+    "original-d3d9-input-safe-fallback": "PENDING_CI",
+    "same-sha-integration-and-ci": "PENDING_EXACT_SHA"
+  },
+  "blocking_evidence": "Before this source commit, successful D3D9 LockRect with malformed nonnull mapping assumptions reached memcpy and D3D9 UnlockRect failure was ignored before UpdateSurface, allowing invalid native full-frame output rather than fail-closed original D3D9 game Present.",
+  "ci_evidence": {},
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub exact DX11 branch, AGENTS, policy and prior 00746 COMPLETE 5/5.",
+    "C1_REVIEW": "PASS native full-frame CPU mapping copy/UnlockRect loss and missing prior 00746 policy acceptance fields identified.",
+    "C2_IMPLEMENT": "PASS material C++ pitched BGRA Map->D3D9 upload/UnlockRect fallback and executable source probes.",
+    "C3_VALIDATE": "PENDING exact SHA 5 required GitHub gates; original material commit blocked only by prior 00746 invalid record.",
+    "C4_COMMIT": "PASS material SHA cd4b6c7a no skip CI",
+    "C5_PACKAGE": "NOT_REQUIRED user-controlled distribution; no HMD",
+    "C6_RESULT": "PENDING CI"
+  }
+}

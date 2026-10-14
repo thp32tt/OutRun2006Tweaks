@@ -38,7 +38,29 @@
     "activation_guard_and_fallback": "Native full frame opt-in. Stale Map never uploaded to a newer Present; D3D9 original screen and controller path retain ownership.",
     "conflict_keys": [
       "DX11:FULLFRAME_STALE_PENDING_MAP_OWNERSHIP"
-    ]
+    ],
+    "integration_path": [
+      "Observed D3D9 game Draw/DrawIndexed -> native D3D11 full-resolution color RT and GPU EVENT",
+      "Pending same-Present CPU Map -> stale completed EVENT re-Map/Unmap before staging slot reuse",
+      "Verified mapped pixels -> D3D9 backbuffer UpdateSurface or original D3D9 Present/gamepad fallback"
+    ],
+    "batch_components": [
+      "live_game_frame_bridge.cpp GPU fence and delayed Map ownership C++",
+      "stale full-frame staging resource lifecycle with safe original D3D9 output/input fallback",
+      "00746 destructive mutation tests, DX11 Fast and exact SHA integrated Windows/OpenXR/HUD Gates"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Real C++ pending Map/Unmap flow with prior exact SHA DX11 Fast #38636575227 and Backend #38636575147 SUCCESS on 13dfba52.",
+      "negative_regression": "00746 destructive source regression covers stale Map pending, EVENT completion without CPU ownership, unexpected Map failure and quarantine; gamepad source D3D9 unchanged.",
+      "component_integration": "Captured game Draw -> native D3D11 staging CopyResource/Event -> nonblocking CPU Map -> D3D9 UpdateSurface; rejects obsolete frame safely."
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Full-resolution game-source native staging safety build/source and exact-SHA 5/5 verified on 13dfba52; no actual Quest3/VDXR screen evidence, RUNTIME_VALIDATION=UNTESTED."
   },
   "feature_contract": {
     "feature_id": "DX11-MENU-RACE-PENDING-MAP-SAFE-REUSE",
@@ -66,7 +88,7 @@
   },
   "acceptance_results": {
     "map-ownership-source-integration": "PASS",
-    "d3d9-original-fallback": "PASS_SOURCE_VALIDATED",
+    "d3d9-original-fallback": "PASS",
     "five-required-exact-sha-gates": "PASS_EXACT_SHA"
   },
   "blocking_evidence": "Before fix, current frame Map WAS_STILL_DRAWING kept slot busy but next full-mode Present recycled old slot merely because GPU EVENT returned S_OK, without retrying CPU Map, allowing CopyResource staging overwrite while CPU availability remained unconfirmed.",

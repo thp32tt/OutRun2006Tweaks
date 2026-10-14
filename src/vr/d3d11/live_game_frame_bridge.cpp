@@ -5408,7 +5408,20 @@ void before_game_present(IDirect3DDevice9* game,
                                                     fullMode ? "full-frame" : "inset");
                                                 s.logged = true;
                                             }
-                                        } else ++s.failed;
+                                        } else {
+                                            ++s.failed;
+                                            // A D3D9 UpdateSurface failure may invalidate
+                                            // the CPU upload surface across menu, car or
+                                            // race backbuffer transitions. Release it and
+                                            // rebuild on a subsequent eligible full frame.
+                                            // Never alter the original game Present/input.
+                                            if (fullMode) {
+                                                s.insetSurface.Reset();
+                                                s.insetFormat = D3DFMT_UNKNOWN;
+                                                s.insetSurfaceDevice = 0u;
+                                                s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;
+                                            }
+                                        }
                                     }
                                 } else ++s.failed;
                             } else ++s.failed;
