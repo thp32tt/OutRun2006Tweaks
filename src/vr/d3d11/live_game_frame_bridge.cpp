@@ -2232,9 +2232,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         if (extrema && !game_native_extremum_admission(
                 blendOp, src, dst, separate != FALSE, colorMask))
             return false;
-        if (blendOp != D3DBLENDOP_ADD && !extrema) {
+        if (blendOp != D3DBLENDOP_ADD) {
             if (blendOp != D3DBLENDOP_SUBTRACT &&
-                blendOp != D3DBLENDOP_REVSUBTRACT) return false;
+                blendOp != D3DBLENDOP_REVSUBTRACT && !extrema) return false;
         }
         // Only exact known-good over/ONE+ONE/SRCALPHA+ONE game combinations.
         const bool additive = src == D3DBLEND_ONE && dst == D3DBLEND_ONE;

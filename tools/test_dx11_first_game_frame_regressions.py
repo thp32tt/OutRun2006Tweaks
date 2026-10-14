@@ -945,8 +945,11 @@ def main() -> None:
         # Verify alpha-state binding in its own OM branch, not any of the
         # other masked-blend paths that share a color-write assignment.
         separate_start = submit.find("if (output.separateAlphaBlend) {")
+        # Scope the independent alpha OM only to its actual branch.
+        # Native MIN/MAX adds a separate intervening branch whose valid
+        # write-mask binding must not hide destructive alpha mutations.
         separate_end = submit.find(
-            "} else if (output.blendOp != D3D11_BLEND_OP_ADD) {",
+            "} else if (output.blendOp == D3D11_BLEND_OP_MIN",
             separate_start)
         separate_om = (submit[separate_start:separate_end]
                        if separate_start >= 0 and separate_end > separate_start
