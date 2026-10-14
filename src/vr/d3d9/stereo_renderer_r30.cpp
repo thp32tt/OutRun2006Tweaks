@@ -1961,6 +1961,25 @@ namespace OutRunVRStereo
                 return 0.0f;
             return std::clamp(ndc, -limit, limit);
         }
+        // Issue #119: a GAME-state and exact-producer gate, never generic
+        // ScreenHud. 6th/6 DispRank ownership stays intact; GOAL, ESC,
+        // +TIME, unknown and world sprites cannot borrow the edge layout.
+        bool R30IsDrivingPeripheralHud() noexcept
+        {
+            if (!Game::current_mode ||
+                *Game::current_mode != GameState::STATE_GAME ||
+                OutRunVR::GameSemantic::EffectiveScope() !=
+                    OutRunVR::GameSemantic::RenderScope::ScreenHud)
+                return false;
+            using Token = OutRunVR::GameSemantic::ProducerToken;
+            const Token token =
+                OutRunVR::GameSemantic::CurrentRenderProducerToken();
+            return token == Token::OutRunHudPeripheralText ||
+                token == Token::DispRankFirst ||
+                token == Token::DispRankClipSprite ||
+                token == Token::DispGearRevClipSprite;
+        }
+
         R30HudEdgeAnchor R30GetExactHudEdgeAnchor(
             const void* source, UINT count, UINT stride,
             float x0, float y0, float width, float height,
@@ -1970,10 +1989,7 @@ namespace OutRunVRStereo
         {
             if ((!Settings::VRHudResponsiveLayout.get() &&
                  !Settings::VRHudEdgeAnchors.get()) ||
-                OutRunVR::GameSemantic::EffectiveScope() !=
-                    OutRunVR::GameSemantic::RenderScope::ScreenHud ||
-                OutRunVR::GameSemantic::CurrentRenderProducerToken() !=
-                    OutRunVR::GameSemantic::ProducerToken::OutRunHudPeripheralText ||
+                !R30IsDrivingPeripheralHud() ||
                 !source || !count || stride < 4u * sizeof(float) ||
                 !(width > 0.0f && height > 0.0f))
                 return {};

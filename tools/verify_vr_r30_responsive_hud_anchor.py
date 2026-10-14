@@ -27,8 +27,9 @@ print("PASS integrated Quest3 default-on/opt-out/legacy A-B and ESC size")
 start = code.index("R30HudEdgeAnchor R30GetExactHudEdgeAnchor(")
 end = code.index("bool R30TransformHudScissor(", start)
 helper = code[start:end]
-for tok in ("CurrentRenderProducerToken()", "ProducerToken::OutRunHudPeripheralText",
-            "EffectiveScope()", "RenderScope::ScreenHud",
+drive_start = code.index("bool R30IsDrivingPeripheralHud() noexcept")
+driving = code[drive_start:code.index("R30HudEdgeAnchor R30GetExactHudEdgeAnchor(", drive_start)]
+for tok in ("!R30IsDrivingPeripheralHud()",
             "Settings::VRHudEdgeAnchors.get()", "if (!seen)",
             "std::isfinite(xy[0])", "std::isfinite(xy[1])",
             "knownUsedCount == touched->size()",
@@ -156,6 +157,54 @@ print("PASS nested driving text owner, classified GOAL/world exclusions and 3 de
 
 
 
+
+# The exact gear/REV clips are appended-only and cannot alter pre-existing
+# numeric token identities or the R64 kind0/kind1 post-Draw Flush owner.
+for exact in (
+    "Game::current_mode &&" if False else "*Game::current_mode != GameState::STATE_GAME",
+    "RenderScope::ScreenHud",
+    "Token::OutRunHudPeripheralText",
+    "Token::DispRankFirst",
+    "Token::DispRankClipSprite",
+    "Token::DispGearRevClipSprite",
+    "CurrentRenderProducerToken()",
+):
+    assert exact in driving, exact
+for forbidden in ("Token::ExactScreenHudClipSprite", "Token::ResultTextB9200",
+                  "Token::OutRunHudText", "Token::GoalTimeHelper"):
+    assert forbidden not in driving, forbidden
+assert "DispGearRevClipSprite," in semantic
+assert semantic.index("OutRunHudPeripheralText,") < semantic.index("DispGearRevClipSprite,")
+assert 'case ProducerToken::DispGearRevClipSprite: return "DISP_GEAR_REV_CLIP";' in semantic
+left_start = producer.index("static int __cdecl ExactScreenHudLeft_putClipSprite(")
+left_end = producer.index("// PutGhostGapInfo", left_start)
+left = producer[left_start:left_end]
+assert "AddSpriteSpacing(&x, true);" in left
+assert "Game::put_clip_sprite(" in left
+assert "TagAppendedNodes(before," in left
+assert "ProducerToken::DispGearRevClipSprite" in left
+assert "return ExactScreenHud_putClipSprite(" not in left
+assert "ExactScreenHudLeft_ClipSpriteCalls[] = { 0xB9096, 0xB90B3 };" in producer
+assert "Module::exe_ptr(addr), ExactScreenHudLeft_putClipSprite" in producer
+for mode, scope, tok, expected in (
+    ("GAME","ScreenHud","OutRunHudPeripheralText",True),
+    ("GAME","ScreenHud","DispRankFirst",True),
+    ("GAME","ScreenHud","DispRankClipSprite",True),
+    ("GAME","ScreenHud","DispGearRevClipSprite",True),
+    ("PAUSE","ScreenHud","DispGearRevClipSprite",False),
+    ("GOAL","ScreenHud","DispRankClipSprite",False),
+    ("GAME","ScreenHud","ExactScreenHudClipSprite",False),
+    ("GAME","WorldBillboard","DispGearRevClipSprite",False),
+    ("GAME","ScreenHud","ResultProgress",False),
+):
+    assert (mode == "GAME" and scope == "ScreenHud" and tok in {
+        "OutRunHudPeripheralText", "DispRankFirst", "DispRankClipSprite",
+        "DispGearRevClipSprite"}) is expected
+for bad in ("*Game::current_mode != GameState::STATE_GAME",
+            "Token::DispRankFirst", "Token::DispRankClipSprite",
+            "Token::DispGearRevClipSprite"):
+    assert bad in driving and bad not in driving.replace(bad, "false", 1)
+print("PASS exact gameplay HUD gear/rank/time producer, pause/GOAL/world negatives and four source mutations")
 
 # Sparse semantic bbox must be identical to the masked full traversal,
 # regardless of draw/index ordering. Corrupt metadata fails closed.
@@ -949,7 +998,7 @@ for dims in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
         assert tall_cap <= .95*h/(.214*(tall[3]-tall[2]))+1.e-7
 # The full-screen/GOAL/world/F11 producers cannot enter this exact-owner
 # hot path. Retain original static scope safety predicates and baseline.
-assert "ProducerToken::OutRunHudPeripheralText" in helper
+assert "Token::OutRunHudPeripheralText" in driving
 assert "(!Settings::VRHudResponsiveLayout.get() &&" in helper
 assert "!Settings::VRHudEdgeAnchors.get()) ||" in helper
 print("PASS stereo analytical peripheral fit, clip bounds, two-eye constraints, bisection fallback")
@@ -1020,7 +1069,8 @@ assert direct.count("ProducerToken::OutRunHudText") == 1
 assert direct.count("OutRunHudTextProducerHook.call(") == 1
 assert "if (Settings::VREnabled &&" in direct
 assert "R30GetExactHudEdgeAnchor(" in code
-assert "CurrentRenderProducerToken() !=" in code
+assert "!R30IsDrivingPeripheralHud()" in helper
+assert "CurrentRenderProducerToken()" in driving
 
 def select(depth, queue, direct):
     return queue if depth else direct

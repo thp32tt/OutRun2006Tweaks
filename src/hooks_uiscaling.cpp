@@ -1513,13 +1513,26 @@ class UIScaling : public Hook
 		return result;
 	}
 
+	// Exactly two original driving gear/REV CALL edges (0xB9096, 0xB90B3).
+	// Keep source spacing and original draw count; do not inherit the generic
+	// clip owner shared by options, GOAL and result screens.
 	static int __cdecl ExactScreenHudLeft_putClipSprite(
 		int xstnum, int x, int y, uint32_t flags,
 		float priority, uint32_t color)
 	{
 		AddSpriteSpacing(&x, true);
-		return ExactScreenHud_putClipSprite(
+		std::array<SpriteNode*, Game::SpritePriorityCount> before{};
+		for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+		{
+			SpriteNode* root = Game::sprite_prio_root[prio];
+			before[prio] = root ? root->tail_4 : nullptr;
+		}
+		const int result = Game::put_clip_sprite(
 			xstnum, x, y, flags, priority, color);
+		TagAppendedNodes(before,
+			OutRunVR::GameSemantic::RenderScope::ScreenHud,
+			OutRunVR::GameSemantic::ProducerToken::DispGearRevClipSprite);
+		return result;
 	}
 
 	// PutGhostGapInfo
