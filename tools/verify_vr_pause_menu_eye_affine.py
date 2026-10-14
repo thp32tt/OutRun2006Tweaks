@@ -33,6 +33,9 @@ def check(s: str, h: str) -> None:
     assert 'menuScale * std::sqrt(boundedAspect)' in h
     assert 'return boosted < 2.25f ? boosted : 2.25f;' in h
     assert 'const bool pauseResponsive = R30IsPauseMenuElement() &&' in s
+    assert 'if (!std::isfinite(requested) || requested <= 0.0f)' in s
+    assert 'std::isfinite(Settings::VRPauseMenuScale.get()) &&' in s
+    assert 'Settings::VRPauseMenuScale.get() > 0.0f;' in s
     assert 'R30HudContain.pauseResponsive == pauseResponsive' in s
     assert 'R30HudContain.pauseResponsive = pauseResponsive;' in s
     assert 'OutRunVrPauseEye::ResponsiveMenuScale(' in s
@@ -54,6 +57,12 @@ for mutant in (
                    'clipCorrection._42 =', 1),
     source.replace('ExternalOverlaySemanticDepth == 0',
                    'ExternalOverlaySemanticDepth != 0', 1),
+    source.replace('std::isfinite(Settings::VRPauseMenuScale.get()) &&',
+                   'true &&', 1),
+    source.replace('Settings::VRPauseMenuScale.get() > 0.0f;',
+                   'true;', 1),
+    source.replace('if (!std::isfinite(requested) || requested <= 0.0f)',
+                   'if (false)', 1),
     source.replace('R30HudContain.pauseResponsive == pauseResponsive',
                    'R30HudContain.pauseResponsive == false', 1),
     source.replace('R30HudContain.pauseResponsive = pauseResponsive;',

@@ -1823,10 +1823,13 @@ namespace OutRunVRStereo
             // ScreenOverlay2D, gets its own centre-anchored legible scale.
             // Never enlarge gameplay ScreenHud, world, +TIME/GOAL or front-end.
             // A missing game-state pointer retains the baseline HUD setting.
-            if (R30IsPauseMenuElement() &&
-                Settings::VRPauseMenuScale.get() > 0.0f)
+            if (R30IsPauseMenuElement())
             {
                 const float requested = Settings::VRPauseMenuScale.get();
+                // A nonfinite/disabled pause setting is NOT permission to
+                // magnify the generic gameplay HUD optical containment.
+                if (!std::isfinite(requested) || requested <= 0.0f)
+                    return R30HudScaleValue();
                 // The XR portrait contain map consumes Y scale. The original
                 // 1.0x pause menu still appears tiny; raise its dedicated
                 // size floor only in the reversible Quest3 responsive mode.
@@ -1847,7 +1850,9 @@ namespace OutRunVRStereo
             // The exact pause owner is scoped to its native ESC state and
             // screen sprites; never let a generic HUD or F11 borrow its scale.
             const bool pauseResponsive = R30IsPauseMenuElement() &&
-                Settings::VRHudResponsiveLayout.get();
+                Settings::VRHudResponsiveLayout.get() &&
+                std::isfinite(Settings::VRPauseMenuScale.get()) &&
+                Settings::VRPauseMenuScale.get() > 0.0f;
             const float fov[8]{
                 stereo.eyeFov[0].angleLeft,
                 stereo.eyeFov[0].angleRight,
