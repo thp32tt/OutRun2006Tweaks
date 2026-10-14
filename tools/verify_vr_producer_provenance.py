@@ -386,4 +386,57 @@ for func, old, replacement in (
     else:
         fail("GOAL negative mutation escaped: " + old)
 
+# The three 0x97xxx original Sumo_Printf result parents render glyphs
+# synchronously, before their queued SpriteNode children acquire source tags.
+# CurrentScope alone loses to NextDrawScope (and carries no direct producer);
+# require bounded RAII ownership for BOTH the direct GPU path and the queue.
+def verify_result_stage_print_owner(source: str) -> None:
+    enter = function_body(source, "static void OutRunStagePrintfEnter(")
+    leave = function_body(source, "static void OutRunStagePrintfLeave(")
+    expected = (
+        "OutRunStagePrintfDirectDrawOwner.emplace(",
+        "RenderScope::ScreenHud,",
+        "nullptr, true,",
+        "ProducerToken::OutRunStagePrintf",
+    )
+    for marker in expected:
+        if marker not in enter:
+            fail("result stage Sumo_Printf synchronous owner missing: " + marker)
+    if "GameSemantic::CurrentScope =" in enter or "ArmNextDraw(" in enter:
+        fail("result stage direct source bypasses bounded owner or queue priority")
+    for marker in (
+        "TagAppendedNodes(OutRunStagePrintfBefore,",
+        "RenderScope::ScreenHud,",
+        "ProducerToken::OutRunStagePrintf",
+        "OutRunStagePrintfDirectDrawOwner.reset();",
+    ):
+        if marker not in leave:
+            fail("result stage Sumo_Printf queued sibling/restore missing: " + marker)
+    if "OutRunStagePrintfCalls[] = {" not in source:
+        fail("original stage-print CALL array lost")
+    for rva in ("0x975EE", "0x97727", "0x977FB"):
+        if rva not in source:
+            fail("original Sumo_Printf E8 caller lost: " + rva)
+    if "OutRunStagePrintfCalls[i] + 5" not in source:
+        fail("original result Sumo_Printf parent leave scope absent")
+
+
+verify_result_stage_print_owner(ui)
+for seam, replacement in (
+    ("nullptr, true,", "nullptr, false,"),
+    ("ProducerToken::OutRunStagePrintf);", "ProducerToken::None);"),
+    ("OutRunStagePrintfDirectDrawOwner.emplace(", "/* removed direct owner */ ("),
+):
+    body = function_body(ui, "static void OutRunStagePrintfEnter(")
+    if seam not in body:
+        fail("result stage mutation lacks actual source: " + seam)
+    mutant = ui.replace(body, body.replace(seam, replacement, 1), 1)
+    try:
+        verify_result_stage_print_owner(mutant)
+    except SystemExit:
+        pass
+    else:
+        fail("unsafe result stage source mutation escaped: " + seam)
+
+
 print("VR producer provenance contract PASS")

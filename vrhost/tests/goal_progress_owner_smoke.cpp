@@ -37,7 +37,10 @@ int main()
         // Both exact in-game HUD text families can rasterize immediately
         // during gameplay/GOAL without consuming an earlier world token.
         !CheckDirectGoal(ProducerToken::OutRunHudText) ||
-        !CheckDirectGoal(ProducerToken::OutRunHudPeripheralText)) return 1;
+        !CheckDirectGoal(ProducerToken::OutRunHudPeripheralText) ||
+        // Original result Sumo_Printf parents 0x975EE/0x97727/0x977FB
+        // need the same pending-world isolation and exact direct provenance.
+        !CheckDirectGoal(ProducerToken::OutRunStagePrintf)) return 1;
     // Nested GOAL producer cannot hijack the current real world queue.
     SpriteQueueDepth = 1;
     CurrentScope = RenderScope::WorldParticle;

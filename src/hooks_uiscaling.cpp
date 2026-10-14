@@ -797,12 +797,18 @@ class UIScaling : public Hook
 			SpriteNode* root = Game::sprite_prio_root[p];
 			OutRunStagePrintfBefore[p] = root ? root->tail_4 : nullptr;
 		}
-        // The original Sumo_Printf may rasterize synchronously before any
-        // appended SpriteNodes can be tagged. Never steal an active queue
-        // node; ScopedExactProducerSemantic preserves that ownership.
+        // Each of the three exact 0x97xxx Sumo_Printf result producers can
+        // rasterize before its SpriteNodes exist. A prior world/rank
+        // NextDrawScope wins over CurrentScope unless we isolate it here.
+        // Record the SAME provenance as the subsequently tagged children so
+        // the raw game c64 / ScreenHud GPU route cannot borrow a prior owner.
+        // An active queue node remains authoritative, and RAII restores the
+        // pending token, projection anchor and source on exit / VR toggle.
         if (Settings::VREnabled)
             OutRunStagePrintfDirectDrawOwner.emplace(
-                OutRunVR::GameSemantic::RenderScope::ScreenHud);
+                OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                nullptr, true,
+                OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
 	}
     inline static thread_local std::uint64_t OutRunStagePrintfCompleted = 0;
 	static void OutRunStagePrintfLeave(safetyhook::Context&)
