@@ -334,7 +334,7 @@ def check(ui, manifest, fraction_header=None):
                     "*node, frozenFractionX, frozenFractionY);" not in chunk or
                     '#include "vr/game/rank_marker_fraction.hpp"' not in ui):
                 fail("4th+ digit siblings lost subpixel restoration")
-            for token in (
+            for needle in (
                 "if (node.kind_C == 0u)",
                 "x = &node.args_10.float24;",
                 "y = &node.args_10.float28;",
@@ -348,8 +348,8 @@ def check(ui, manifest, fraction_header=None):
                 "*x = nextX;",
                 "*y = nextY;",
             ):
-                if token not in fraction_header:
-                    fail("rank kind0/kind1 guarded coordinate bridge lost: " + token)
+                if needle not in fraction_header:
+                    fail("rank kind0/kind1 guarded coordinate bridge lost: " + needle)
         if "ProducerToken::" + token not in chunk:
             fail(func + " producer identity missing")
     rank = function_body(ui, "static int __cdecl RankMarker_sprani(")
