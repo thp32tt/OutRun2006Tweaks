@@ -28,6 +28,37 @@ struct GameNativeDirtyRegionCoverage {
             rectLeft == boundLeft && rectTop == boundTop &&
             rectRight == boundRight && rectBottom == boundBottom;
     }
+
+    // An exact dirty RECT that fills the *visible* Present source crop is
+    // safe for a bounded source-only UpdateSurface. Do not overwrite pixels
+    // outside that crop: later menu/car/race partial Presents may reuse them.
+    // A whole-backbuffer region stays on covers_full_backbuffer() instead.
+    [[nodiscard]] static constexpr bool covers_present_crop(
+        std::uint32_t width, std::uint32_t height,
+        std::uint32_t rectangleCount, std::uint32_t bufferBytes,
+        std::int64_t cropLeft, std::int64_t cropTop,
+        std::int64_t cropRight, std::int64_t cropBottom,
+        std::int64_t boundLeft, std::int64_t boundTop,
+        std::int64_t boundRight, std::int64_t boundBottom,
+        std::int64_t rectLeft, std::int64_t rectTop,
+        std::int64_t rectRight, std::int64_t rectBottom) noexcept {
+        if (!width || !height ||
+            width > static_cast<std::uint32_t>((std::numeric_limits<std::int32_t>::max)()) ||
+            height > static_cast<std::uint32_t>((std::numeric_limits<std::int32_t>::max)()) ||
+            rectangleCount != 1u || bufferBytes < 16u ||
+            cropLeft < 0 || cropTop < 0 ||
+            cropRight <= cropLeft || cropBottom <= cropTop ||
+            cropRight > static_cast<std::int64_t>(width) ||
+            cropBottom > static_cast<std::int64_t>(height) ||
+            (cropLeft == 0 && cropTop == 0 &&
+             cropRight == static_cast<std::int64_t>(width) &&
+             cropBottom == static_cast<std::int64_t>(height)))
+            return false;
+        return boundLeft == cropLeft && boundTop == cropTop &&
+            boundRight == cropRight && boundBottom == cropBottom &&
+            rectLeft == cropLeft && rectTop == cropTop &&
+            rectRight == cropRight && rectBottom == cropBottom;
+    }
     // Multiple disjoint D3D9 dirty RECTs may describe the entire game frame.
     // The exact union must cover every pixel before native full-frame publication;
     // rcBound alone never proves it (gaps/overlaps retain D3D9 and gamepad).

@@ -5162,6 +5162,20 @@ void before_game_present(IDirect3DDevice9* game,
                   dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top,
                   dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
                   partitionRects)));
+        // A cropped menu/car/race Present may dirty its *entire visible*
+        // source RECT without dirtying the rest of the physical backbuffer.
+        // Publish only inside that crop; never replace untouched D3D9 pixels.
+        const bool cropDirtyCoverage = fullMode && backbufferKnown &&
+            oneBoundedDirtyRect &&
+            GameNativeDirtyRegionCoverage::covers_present_crop(
+                presentDesc.Width, presentDesc.Height,
+                dirtyRegion->rdh.nCount, dirtyRegion->rdh.nRgnSize,
+                presentRegion.left, presentRegion.top,
+                presentRegion.right, presentRegion.bottom,
+                dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top,
+                dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
+                dirtyRect.left, dirtyRect.top, dirtyRect.right, dirtyRect.bottom);
+        const bool croppedNativeUpload = cropDirtyCoverage && !fullDirtyCoverage;
         if (!s.previousOutput.same(outputNow)) {
             // Also reject earlier GPU readbacks if the Present backbuffer COM identity
             // changed while the device, dimensions and format stayed identical.
@@ -5191,8 +5205,9 @@ void before_game_present(IDirect3DDevice9* game,
         const auto fullPlacement = presentRegion.full_frame_placement(
             bb.Width, bb.Height, surfaceWidth, surfaceHeight);
         const bool outputWritable = outputNow.valid() && nativeExtentMatches &&
-            (!outputNow.hasDirtyRegion || fullDirtyCoverage) &&
-            (fullMode ? fullPlacement.valid : insetPlacement.valid) &&
+            (((!outputNow.hasDirtyRegion || fullDirtyCoverage) &&
+              (fullMode ? fullPlacement.valid : insetPlacement.valid)) ||
+             (croppedNativeUpload && fullPlacement.valid)) &&
             bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
             (bb.Format == D3DFMT_A8R8G8B8 ||
              bb.Format == D3DFMT_X8R8G8B8);
@@ -5446,8 +5461,22 @@ void before_game_present(IDirect3DDevice9* game,
                                         POINT destination{
                                             static_cast<LONG>(fullMode ? fullPlacement.left : insetPlacement.left),
                                             static_cast<LONG>(fullMode ? fullPlacement.top : insetPlacement.top)};
+                                        const RECT uploadSourceCrop{
+                                            static_cast<LONG>(presentRegion.left),
+                                            static_cast<LONG>(presentRegion.top),
+                                            static_cast<LONG>(presentRegion.right),
+                                            static_cast<LONG>(presentRegion.bottom)};
+                                        if (croppedNativeUpload) {
+                                            destination.x = uploadSourceCrop.left;
+                                            destination.y = uploadSourceCrop.top;
+                                        }
+                                        // Restrict the GPU upload to the exact
+                                        // dirty source crop. The other backbuffer
+                                        // pixels retain the original D3D9 scene.
                                         if (SUCCEEDED(game->UpdateSurface(
-                                                s.insetSurface.Get(), nullptr, back.Get(), &destination))) {
+                                                s.insetSurface.Get(),
+                                                croppedNativeUpload ? &uploadSourceCrop : nullptr,
+                                                back.Get(), &destination))) {
                                             ++s.visible;
                                             if (!s.logged) {
                                                 spdlog::info("DX11 FIRST_GAME_DRAW_FRAME async game-origin FVF native Draw: {} changed pixels, {}x{} {} output; original D3D9 draw/input untouched; Quest3 UNTESTED",
