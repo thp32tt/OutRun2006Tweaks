@@ -68,7 +68,7 @@
     "negative_test_evidence": "Changed-area producer verifier validates the exact classified glyph source and mutates pending isolation and token; host goal/HUD owner smoke covers ordinary and peripheral HUD texts with prior world Draw and restores saved token.",
     "eye_ownership": "Existing compiled R26+HUD renderer constructs per-eye HUD planes from trusted source; this change only fixes original ScreenHud selection, not a user-observed Quest3 display result."
   },
-  "status": "COMPLETE_BUILD_VERIFIED_NEED_HMD_TEST",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "phase": "C6_RESULT",
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
