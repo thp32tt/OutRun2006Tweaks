@@ -350,6 +350,8 @@ namespace OutRunVRStereo
             UINT lockSize = 0;
             DWORD lockFlags = 0;
             bool writeLock = false;
+            // This is set before CreateVertexBuffer returns to its caller.
+            std::atomic<bool> createdWithXyzrhwFvf{ false };
         };
 
         using R30ShadowPtr = std::shared_ptr<R30BufferShadow>;
@@ -650,7 +652,9 @@ namespace OutRunVRStereo
                     std::memory_order_acquire)
                 ? R30FindVertexShadow(buffer) : R30ShadowPtr{};
             if (OutRunVR::R30EarlyRhwShadow::ObserveVertexLock(
-                    fullCapture, earlyShadow != nullptr,
+                    fullCapture,
+                    earlyShadow && earlyShadow->createdWithXyzrhwFvf.load(
+                        std::memory_order_acquire),
                     OutRunVR::GameSemantic::ExternalOverlaySemanticDepth != 0,
                     SUCCEEDED(hr), data && *data))
                 R30BeginObservedLock(
@@ -807,8 +811,16 @@ namespace OutRunVRStereo
                     OutRunVR::R30EarlyRhwShadow::ExplicitXyzrhwFvf(
                         fvf, D3DFVF_POSITION_MASK, D3DFVF_XYZRHW) &&
                     R30EnsureVertexShadow(*out))
-                    R30EarlyRhwRegistered.store(
-                        true, std::memory_order_release);
+                {
+                    const auto registered = R30FindVertexShadow(*out);
+                    if (registered)
+                    {
+                        registered->createdWithXyzrhwFvf.store(
+                            true, std::memory_order_release);
+                        R30EarlyRhwRegistered.store(
+                            true, std::memory_order_release);
+                    }
+                }
                 else if (gameOwner &&
                     R30BufferShadowCaptureArmed.load(
                         std::memory_order_acquire))
