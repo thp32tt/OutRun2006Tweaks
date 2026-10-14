@@ -13,7 +13,7 @@ checks = {
     "blendTextureAlphaPmAddSmoothFactorAlphaPs": True,
 }
 for name in checks:
-    assert re.search(r"\\bs\\." + name + r"\\b", ready), f"{name}: missing from ready gate"
+    assert re.search(r"\bs\." + name + r"\b", ready), f"{name}: missing from ready gate"
     assert f"s.{name}.Reset();" in reset, f"{name}: missing from before_game_reset"
     assert f"s.{name}.Reset();" in reinit, f"{name}: missing from ensure_pipeline rebuild"
 print("DX11 live-game shader readiness and Reset parity: PASS")
