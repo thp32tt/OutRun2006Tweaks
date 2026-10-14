@@ -997,6 +997,7 @@ namespace OutRunVRStereo
             UINT sourceWidth = 0;
             UINT sourceHeight = 0;
             float userScale = 0.0f;
+            bool pauseResponsive = false;
             float eyeFov[8]{};
             // XR recommended extents can publish independently of FOV/pose.
             std::uint32_t eyeExtent[4]{};
@@ -1843,6 +1844,10 @@ namespace OutRunVRStereo
         {
             const auto frame = R29OwnerCaptureFrameSnapshot();
             const float userScale = R30HudScopeScale();
+            // The exact pause owner is scoped to its native ESC state and
+            // screen sprites; never let a generic HUD or F11 borrow its scale.
+            const bool pauseResponsive = R30IsPauseMenuElement() &&
+                Settings::VRHudResponsiveLayout.get();
             const float fov[8]{
                 stereo.eyeFov[0].angleLeft,
                 stereo.eyeFov[0].angleRight,
@@ -1880,6 +1885,7 @@ namespace OutRunVRStereo
                 R30HudContain.sourceWidth == frame.width &&
                 R30HudContain.sourceHeight == frame.height &&
                 R30HudContain.userScale == userScale &&
+                R30HudContain.pauseResponsive == pauseResponsive &&
                 fovMatches)
             {
                 scaleX = R30HudContain.scaleX;
@@ -1894,17 +1900,22 @@ namespace OutRunVRStereo
                 R30HudAspectCompensation(
                     stereo, frame.width, frame.height, eyeExtent);
 
-            // The existing contain math is unchanged: eye offset, Z/RHW,
-            // source HUD geometry and SkyGlow are outside this CPU fastpath.
+            // Preserve the native sprite aspect: apply one shared optical
+            // enlargement before the existing X/Y contain split. Only ESC
+            // shell and exact arrows receive this correction; all other
+            // world, HUD, menu and external overlay paths stay unchanged.
+            const float opticalScale =
+                OutRunVrPauseEye::ResponsiveMenuScale(
+                    userScale, sourceOverTarget, pauseResponsive);
             if (sourceOverTarget >= 1.0f)
             {
-                scaleX = userScale;
-                scaleY = userScale / sourceOverTarget;
+                scaleX = opticalScale;
+                scaleY = opticalScale / sourceOverTarget;
             }
             else
             {
-                scaleX = userScale * sourceOverTarget;
-                scaleY = userScale;
+                scaleX = opticalScale * sourceOverTarget;
+                scaleY = opticalScale;
             }
             if (!canCache || !std::isfinite(scaleX) ||
                 !std::isfinite(scaleY))
@@ -1915,6 +1926,7 @@ namespace OutRunVRStereo
             R30HudContain.sourceWidth = frame.width;
             R30HudContain.sourceHeight = frame.height;
             R30HudContain.userScale = userScale;
+            R30HudContain.pauseResponsive = pauseResponsive;
             for (int i = 0; i < 8; ++i)
                 R30HudContain.eyeFov[i] = fov[i];
             for (int i = 0; i < 4; ++i)

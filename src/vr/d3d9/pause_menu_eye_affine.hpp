@@ -13,6 +13,30 @@ namespace OutRunVrPauseEye
         bool valid = false;
     };
 
+    // The original pause shell occupies only a narrow central portion of
+    // the widescreen source. A portrait XR eye needs a larger optical scale
+    // after aspect-preserving containment; otherwise the menu remains tiny
+    // even at PauseMenuScale=1.25. Do not stretch X and Y independently.
+    // Caller authorizes only the exact original ESC/pause producer, and the
+    // normal desktop/legacy paths must remain bit-identical.
+    inline float ResponsiveMenuScale(
+        float menuScale, float sourceOverEyeAspect, bool responsive) noexcept
+    {
+        if (!responsive || !std::isfinite(menuScale) || menuScale <= 0.0f ||
+            !std::isfinite(sourceOverEyeAspect) ||
+            sourceOverEyeAspect <= 1.0f)
+            return menuScale;
+        // Preserve the original aspect compensation while offsetting the
+        // portrait containment shrink by its geometric mean. The 2.25 cap
+        // also protects the pause option arrows from huge malformed extents.
+        const float boundedAspect =
+            sourceOverEyeAspect < 3.50f ? sourceOverEyeAspect : 3.50f;
+        const float boosted = menuScale * std::sqrt(boundedAspect);
+        if (!std::isfinite(boosted))
+            return menuScale;
+        return boosted < 2.25f ? boosted : 2.25f;
+    }
+
     inline VerticalAffine Compute(
         float leftDown, float leftUp, float rightDown, float rightUp) noexcept
     {

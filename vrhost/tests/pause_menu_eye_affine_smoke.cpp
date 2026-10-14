@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <initializer_list>
 
 static bool Near(float a, float b, float tolerance = 0.0002f)
 {
@@ -42,6 +43,37 @@ int main()
     if (inverted.valid || !Near(inverted.scale[0], 1.0f)) return 6;
     const auto extreme = Compute(-1.42f, 1.42f, -0.3f, 0.3f);
     if (extreme.valid || !Near(extreme.scale[1], 1.0f)) return 7;
-    std::cout << "DX9Ex pause vertical affine PASS: stereo/forward/invalid\n";
+    // Source 3440x1440 -> Quest3 recommended per-eye 2496x2688:
+    // retain X/Y aspect while reversing part of the portrait-size loss.
+    const float questAspect = (3440.0f / 1440.0f) /
+                              (2496.0f / 2688.0f);
+    const float questScale = ResponsiveMenuScale(1.25f, questAspect, true);
+    if (!(questScale > 1.90f && questScale < 2.10f) ||
+        !Near(questScale / questAspect,
+              1.25f / std::sqrt(questAspect))) return 8;
+
+    // 4:3, 16:9 and 21:9 keep a monotonic, bounded pause-only boost.
+    const float portraitEye = 2496.0f / 2688.0f;
+    const float s43 = ResponsiveMenuScale(
+        1.25f, (4.0f/3.0f)/portraitEye, true);
+    const float s169 = ResponsiveMenuScale(
+        1.25f, (16.0f/9.0f)/portraitEye, true);
+    const float s219 = ResponsiveMenuScale(
+        1.25f, (21.0f/9.0f)/portraitEye, true);
+    if (!(1.25f < s43 && s43 < s169 && s169 < s219 &&
+          s219 <= 2.25f)) return 9;
+
+    // Gameplay HUD, F11, GOAL/+TIME, desktop and explicit legacy opt-out:
+    // caller must leave their already-tested containment exactly untouched.
+    for (float factor : {0.75f, 1.0f, 1.5f, questAspect, 9.0f})
+        if (!Near(ResponsiveMenuScale(1.25f, factor, false), 1.25f))
+            return 10;
+    if (!Near(ResponsiveMenuScale(1.25f, 0.0f, true), 1.25f) ||
+        !Near(ResponsiveMenuScale(1.25f, 1.0f, true), 1.25f) ||
+        !Near(ResponsiveMenuScale(1.25f,
+              std::numeric_limits<float>::quiet_NaN(), true), 1.25f) ||
+        !Near(ResponsiveMenuScale(1.5f, 9.0f, true), 2.25f))
+        return 11;
+    std::cout << "DX9Ex pause vertical affine + responsive optical size PASS\n";
     return 0;
 }

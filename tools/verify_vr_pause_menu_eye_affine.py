@@ -28,6 +28,21 @@ def check(s: str, h: str) -> None:
     assert 'span[eye] <= 0.05f || span[eye] > 10.0f' in h
     assert 'return {};' in h
     assert 'failOne.valid' in tests and 'extreme.valid' in tests
+    # Full ESC optical-size ownership is independent of gameplay HUD and F11.
+    assert 'inline float ResponsiveMenuScale(' in h
+    assert 'menuScale * std::sqrt(boundedAspect)' in h
+    assert 'return boosted < 2.25f ? boosted : 2.25f;' in h
+    assert 'const bool pauseResponsive = R30IsPauseMenuElement() &&' in s
+    assert 'R30HudContain.pauseResponsive == pauseResponsive' in s
+    assert 'R30HudContain.pauseResponsive = pauseResponsive;' in s
+    assert 'OutRunVrPauseEye::ResponsiveMenuScale(' in s
+    assert 'userScale, sourceOverTarget, pauseResponsive);' in s
+    assert 'scaleX = opticalScale;' in s
+    assert 'scaleY = opticalScale / sourceOverTarget;' in s
+    assert 'scaleX = opticalScale * sourceOverTarget;' in s
+    assert 'scaleY = opticalScale;' in s
+    assert 'const float questScale = ResponsiveMenuScale(' in tests
+    assert 'ResponsiveMenuScale(1.25f, factor, false)' in tests
 
 check(source, helper)
 for mutant in (
@@ -39,6 +54,14 @@ for mutant in (
                    'clipCorrection._42 =', 1),
     source.replace('ExternalOverlaySemanticDepth == 0',
                    'ExternalOverlaySemanticDepth != 0', 1),
+    source.replace('R30HudContain.pauseResponsive == pauseResponsive',
+                   'R30HudContain.pauseResponsive == false', 1),
+    source.replace('R30HudContain.pauseResponsive = pauseResponsive;',
+                   'R30HudContain.pauseResponsive = false;', 1),
+    source.replace('userScale, sourceOverTarget, pauseResponsive);',
+                   'userScale, sourceOverTarget, false);', 1),
+    source.replace('scaleY = opticalScale / sourceOverTarget;',
+                   'scaleY = userScale / sourceOverTarget;', 1),
 ):
     try:
         check(mutant, helper)
