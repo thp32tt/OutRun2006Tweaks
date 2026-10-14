@@ -694,7 +694,10 @@ def verify_visible_menu_fragment(code: str) -> None:
         "PlanVisibleCenteredContent(",
         "whole.y += previousHeight * plan.offsetY;",
         "whole.h = previousHeight * plan.height;",
-        "sourceAspect = 4.0f / 3.0f;",
+        "const float authoredAspect =",
+        "cropCentered43 ? 4.0f / 3.0f : clientAspect;",
+        "GetGameClientOutputRect(fullClient);",
+        "sourceAspect = authoredAspect;",
         "cropCentered43 && sourceAspect == 4.0f / 3.0f",
         "? 0.78f : 1.0f;",
         "common, sourceAspect, opticalCoverage);",
@@ -711,7 +714,15 @@ def verify_visible_menu_fragment(code: str) -> None:
     ]
     for token in required:
         assert token in body, token
-    assert body.index("sourceAspect = 4.0f / 3.0f;") < body.index(
+    # Recover the complete authored menu plane for BOTH 4:3 and native
+    # unletterboxed 16:9/21:9. A source crop behind if(cropCentered43)
+    # silently reintroduces the native-menu edge zoom.
+    assert body.index("const float authoredAspect =") < body.index(
+        "PlanVisibleCenteredContent(") < body.index("if (plan.crop)")
+    assert "if (cropCentered43)" not in body.split("PlanVisibleCenteredContent(", 1)[0]
+    assert body.index("GetGameClientOutputRect(fullClient);") < body.index(
+        "PlanVisibleCenteredContent(")
+    assert body.index("sourceAspect = authoredAspect;") < body.index(
         "PlanOpticallyCenteredClip(")
     assert body.index("placement.centerX + placement.halfWidth * visibleOffsetX;") < body.index(
         "const float sx[4]")
@@ -737,7 +748,13 @@ def verify_visible_fragment_source(code: str) -> None:
 verify_visible_menu_fragment(r23)
 verify_visible_fragment_source(menu_geometry)
 for old, bad in (
-    ("sourceAspect = 4.0f / 3.0f;", "sourceAspect = plan.aspect;"),
+    ("cropCentered43 ? 4.0f / 3.0f : clientAspect;",
+     "cropCentered43 ? 4.0f / 3.0f : 4.0f / 3.0f;"),
+    ("cropCentered43 ? 4.0f / 3.0f : clientAspect;",
+     "cropCentered43 ? clientAspect : 4.0f / 3.0f;"),
+    ("sourceAspect = authoredAspect;", "sourceAspect = plan.aspect;"),
+    ("GetGameClientOutputRect(fullClient);",
+     "GetClientRect(c.hwnd_, &fullClient);"),
     ("? 0.78f : 1.0f;", "? 1.0f : 1.0f;"),
     ("common, sourceAspect, opticalCoverage);",
      "common, sourceAspect, 1.0f);"),
@@ -776,7 +793,7 @@ for old, bad in (
         pass
     else:
         raise AssertionError("visible menu source mutation survived: " + old)
-print("PASS main-menu clipped-fragment geometry, 5 destructive controls")
+print("PASS main-menu 4:3/native clipped-fragment geometry, 10 destructive controls")
 
 # First-run / migration regression: OutRun's compiled game defaults for
 # UIScalingMode and UILetterboxing are both 1. When the existing base INI
