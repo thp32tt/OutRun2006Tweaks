@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FAILED_ORIGINAL_DRAW_FRAME_INTEGRITY",
   "feature_id": "DX11-NATIVE-GAME-DRAW-HRESULT-FALLBACK",
-  "status": "BUILD_PENDING",
-  "checkpoint": "C4_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -78,9 +78,9 @@
     ]
   },
   "acceptance_results": {
-    "A1": "PENDING",
-    "A2": "PENDING",
-    "A3": "PENDING"
+    "A1": "PASS",
+    "A2": "PASS",
+    "A3": "PASS_EXACT_SHA"
   },
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -93,6 +93,39 @@
   ],
   "runtime_gate": "NEED_HMD_TEST",
   "material_result_sha": "28728de8590f3069dc2f26ec21c3cb17cebb896c",
-  "validation_bearing_result_sha": null,
-  "packaging_status": "NOT_REQUIRED"
+  "validation_bearing_result_sha": "782a990c8227b7de9e1b80840af654625a552378",
+  "packaging_status": "NOT_REQUIRED",
+  "evidence": {
+    "exact_sha": "782a990c8227b7de9e1b80840af654625a552378",
+    "mandatory_actions": {
+      "fast": {
+        "run_id": 38574145298,
+        "conclusion": "success",
+        "head_sha": "782a990c8227b7de9e1b80840af654625a552378"
+      },
+      "backend": {
+        "run_id": 38574145313,
+        "conclusion": "success",
+        "head_sha": "782a990c8227b7de9e1b80840af654625a552378"
+      },
+      "windows_build": {
+        "run_id": 38574152010,
+        "conclusion": "success",
+        "head_sha": "782a990c8227b7de9e1b80840af654625a552378"
+      },
+      "openxr": {
+        "run_id": 38574152083,
+        "conclusion": "success",
+        "head_sha": "782a990c8227b7de9e1b80840af654625a552378"
+      },
+      "hud_inspector": {
+        "run_id": 38574152024,
+        "conclusion": "success",
+        "head_sha": "782a990c8227b7de9e1b80840af654625a552378"
+      }
+    },
+    "all_five_same_sha": "SUCCESS",
+    "runtime_note": "No actual Quest3/VDXR game, display or controller test was performed; source/CI only",
+    "repair_note": "Same TASK 00730 inherited line/point static verifier updated after first Fast failure; material SHA differs from validated source+verifier SHA"
+  }
 }
