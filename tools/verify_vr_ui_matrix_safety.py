@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Single-pass DX9Ex UI matrix safety invariant, with 3 distinct mutants."""
 from pathlib import Path
+from math import isfinite
 
 text = (Path(__file__).resolve().parents[1] / "src/hooks_uiscaling.cpp").read_text(encoding="utf-8")
 
