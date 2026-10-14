@@ -16,8 +16,9 @@
 // Default behavior retains the validated textual chain until link verification.
 #ifndef OUTRUN_VR_REFACTOR_SPLIT_R30_R29
 #include "stereo_renderer_r29.cpp"
-#include "r30_indexed_up_bounds.hpp"
 #endif
+// Needed by independent R30 TU as well as textual R29/R30 owner.
+#include "r30_indexed_up_bounds.hpp"
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
 #include "../game/render_semantics.hpp"
