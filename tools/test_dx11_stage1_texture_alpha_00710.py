@@ -22,7 +22,8 @@ def integrated(h,b):
         "std::memcmp(&capture.uvTransform, &matrix1, sizeof(matrix1)) != 0",
         "game->GetSamplerState(0, states[i], &s0)",
         "game->GetSamplerState(1, states[i], &s1)",
-        "s0 != s1",
+        "if (states[i] == D3DSAMP_ADDRESSW && s0 != s1) return false;", "samplerDiff |= s0 != s1;",
+        "stage1_game_sampler_supported(",
         "D3DSAMP_SRGBTEXTURE",
         "capture.stage1ColorOp = nextColorOp;",
         "capture.stage1AlphaOp = alphaOp;")) and all(s in sh for s in (
@@ -39,8 +40,8 @@ def integrated(h,b):
 # Ordinary TEXTUREALPHA and premultiplied TEXTUREALPHAPM consume the same
 # sampled alpha independently for RGB and alpha; detect loss of either path.
 assert integrated(h,b)
-for s in ("tex1.Get() != tex.Get()","uv1 != capture.coordIndex",
-          "s0 != s1","stage1Ops.x == 13","stage1Ops.y == 13",
+for s in ("if (states[i] == D3DSAMP_ADDRESSW && s0 != s1) return false;", "tex1.Get() != tex.Get()","uv1 != capture.coordIndex",
+          "samplerDiff |= s0 != s1;", "stage1Ops.x == 13","stage1Ops.y == 13",
           "stage1TextureAlpha));","stage1TextureAlpha)).a;","ctx->DrawIndexed(indexCount, 0, 0);"):
     assert not integrated(h,b.replace(s,"",1)),s
 assert not integrated(h.replace("matchedTextureSampler &&","true &&",1),b)

@@ -22,7 +22,8 @@ def integrated(h,b):
         "tex1.Get() != tex.Get()","uv1 != capture.coordIndex",
         "std::memcmp(&capture.uvTransform, &matrix1, sizeof(matrix1)) != 0",
         "game->GetSamplerState(0, states[i], &s0)","game->GetSamplerState(1, states[i], &s1)",
-        "s0 != s1","D3DSAMP_SRGBTEXTURE")) and all(x in draw for x in (
+        "if (states[i] == D3DSAMP_ADDRESSW && s0 != s1) return false;", "samplerDiff |= s0 != s1;",
+        "stage1_game_sampler_supported(", "D3DSAMP_SRGBTEXTURE")) and all(x in draw for x in (
         "ctx->PSSetConstantBuffers(1, 1, &combiner)","ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"))
 assert integrated(h,b)
@@ -31,7 +32,8 @@ for s in ("op == kStage1BlendTextureAlphaPM) && matchedTextureSampler &&",
     "if (stage1Ops.x == 15)","if (stage1Ops.y == 15)",
     "color = saturate(pmColor1 + pmColor2 * (1.0f - stage1TextureAlpha));",
     "alpha = saturate(pmAlpha1 + pmAlpha2 * (1.0f - stage1TextureAlpha)).a;",
-    "tex1.Get() != tex.Get()","s0 != s1"):
+    "tex1.Get() != tex.Get()", "samplerDiff |= s0 != s1;",
+    "if (states[i] == D3DSAMP_ADDRESSW && s0 != s1) return false;"):
     if s in h: assert not integrated(h.replace(s,"",1),b),s
     else: assert not integrated(h,b.replace(s,"",1)),s
 assert "regular!=400u || temp!=160u || pairs!=4u" in p

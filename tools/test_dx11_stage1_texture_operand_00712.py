@@ -18,7 +18,8 @@ def integrated(h,c):
         "stage1_matched_texture_operand_supported(a,producerTemp)")) and all(s in gate for s in (
         "const bool stage1NeedsMatchedTexture =", "stage1UsesTextureOperand",
         "tex1.Get() != tex.Get()", "uv1 != capture.coordIndex",
-        "s0 != s1", "stage1_matched_texture_two_source_supported(",
+        "if (states[i] == D3DSAMP_ADDRESSW && s0 != s1) return false;", "samplerDiff |= s0 != s1;",
+        "stage1_game_sampler_supported(", "stage1_matched_texture_two_source_supported(",
         "stage1_matched_texture_three_source_supported(",
         "capture.stage1TextureOperands = stage1UsesTextureOperand")) and all(s in shader for s in (
         "float4 Stage1AndAlphaTextured(", "float4 Stage1SourceTextured(",
@@ -28,7 +29,8 @@ def integrated(h,c):
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"))
 assert integrated(h,c)
-for s in ("stage1NeedsMatchedTexture","s0 != s1","tex1.Get() != tex.Get()",
+for s in ("stage1NeedsMatchedTexture","samplerDiff |= s0 != s1;",
+          "if (states[i] == D3DSAMP_ADDRESSW && s0 != s1) return false;", "tex1.Get() != tex.Get()",
           "capture.stage1SeparateTexture ? 2 :", "capture.stage1TextureOperands ? 1 : 0",
           "float4 Stage1ThreeSourceTextured(","constexpr bool stage1_matched_texture_two_source_supported("):
     if s in h: assert not integrated(h.replace(s,"",1),c),s

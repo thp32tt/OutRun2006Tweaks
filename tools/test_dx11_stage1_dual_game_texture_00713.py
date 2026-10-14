@@ -10,7 +10,8 @@ d=c.split("bool submit(",1)[1].split("bool observe_source_device(",1)[0]
 def complete(g,h,d):
     return all(t in g for t in (
        "tex1.Get() != tex.Get()","stage1_dual_texture_compatible(",
-       "tex1.As(&capture.stage1SeparateTexture)","s0 != s1",
+       "tex1.As(&capture.stage1SeparateTexture)", "if (states[i] == D3DSAMP_ADDRESSW && s0 != s1) return false;",
+       "samplerDiff |= s0 != s1;", "stage1_game_sampler_supported(",
        "uv1 != capture.coordIndex")) and all(t in h for t in (
        "Texture2D stage1GameTexture : register(t1);",
        "SamplerState stage1GameSampler : register(s1);",
@@ -25,7 +26,8 @@ def complete(g,h,d):
        "ctx->DrawIndexed(indexCount, 0, 0);",
        "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"))
 assert complete(g,h,d)
-for a in ("stage1_dual_texture_compatible(","s0 != s1"):
+for a in ("stage1_dual_texture_compatible(","samplerDiff |= s0 != s1;",
+          "if (states[i] == D3DSAMP_ADDRESSW && s0 != s1) return false;"):
     assert not complete(g.replace(a,"",1),h,d)
 for a in ("stage1GameTexture.Sample(stage1GameSampler, v.uv)","if (stage1Ops.w == 2)"):
     # Three game-stage PS entrypoints each sample the second real texture.
