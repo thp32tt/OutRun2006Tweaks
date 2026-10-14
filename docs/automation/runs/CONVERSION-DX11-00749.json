@@ -26,7 +26,8 @@
     ".github/workflows/dx11-fast-structural.yml",
     "tools/dx11_full_dirty_partition_probe_00749.cpp",
     "tools/test_dx11_full_dirty_partition_00749.py",
-    "docs/automation/runs/CONVERSION-DX11-00749.json"
+    "docs/automation/runs/CONVERSION-DX11-00749.json",
+    "tools/test_dx11_full_dirty_present_00748.py"
   ],
   "development_strategy": {
     "work_class": "integration",
@@ -92,11 +93,12 @@
     "C0_RECOVER": "PASS branch 21750d512a69cad3404670d170b395c409aa1cc8, 00748 C6 verified, 00749 absent",
     "C1_REVIEW": "PASS single full dirty rectangle already supported, partitioned exact union rejected by nCount==1",
     "C2_IMPLEMENT": "PASS C++ game path+geometry+positive/negative probes",
-    "C3_VALIDATE": "PASS scoped local portable C++17 check; GitHub five-gate pending",
-    "C4_COMMIT": "MATERIAL_COMMIT_PENDING",
+    "C3_VALIDATE": "GitHub DX11 Fast #38647656559 FAILED inherited 00748 destructive RDH_RECTANGLES condition search allowed the new partition branch to mask a mutation; repaired to assert original one-RECT path before memcpy. New exact-SHA Gates pending.",
+    "C4_COMMIT": "MATERIAL: badb7e108e99e9d8e7816616e6785bbd982432f7; verifier repair material pending new SHA.",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "AWAIT_EXACT_SHA"
   },
-  "next_action": "Wait for five exact-SHA GitHub Actions; repair causal failure within same TASK_ID, record C6 separately without rerunning unchanged source.",
-  "recorded_at_kst": "2026-10-15 07:24 KST"
+  "next_action": "Verify new exact validation-bearing SHA in five required GitHub Actions; no CI-skip; Quest3/VDXR runtime UNTESTED.",
+  "recorded_at_kst": "2026-10-15 07:24 KST",
+  "blocking_evidence": "Fast #38647656559 failure in tools/test_dx11_full_dirty_present_00748.py assertion: RDH_RECTANGLES: source acquired a second safe D3D9 multi-RECT partition check, and inherited test did not constrain search to the original single-RECT branch."
 }

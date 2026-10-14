@@ -21,7 +21,7 @@ def integrated(src, hdr):
         0 <= read < covered < writable < enqueue < upload,
         "dirtyRegion->rdh.nCount == 1u" in code[:read],
         "dirtyRegion->rdh.nRgnSize >= sizeof(RECT)" in code[:read],
-        "dirtyRegion->rdh.iType == RDH_RECTANGLES" in code[:covered],
+        "dirtyRegion->rdh.iType == RDH_RECTANGLES" in code[:read],
         "fullMode && backbufferKnown && dirtyRegion" in code[:covered],
         "(!outputNow.hasDirtyRegion || fullDirtyCoverage)" in code[writable:enqueue],
         "fullDirtyCoverage" not in code[enqueue:upload],
