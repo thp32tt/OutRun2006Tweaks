@@ -15,7 +15,7 @@ def integrated(h,c):
         "stage1_operation_reads_texture(",
         "stage1_three_source_reads_texture(",
         "kStage1Texture = 2u",
-        "stage1_matched_texture_operand_supported(arg,producerTemp)")) and all(s in gate for s in (
+        "stage1_matched_texture_operand_supported(a,producerTemp)")) and all(s in gate for s in (
         "const bool stage1NeedsMatchedTexture =", "stage1UsesTextureOperand",
         "tex1.Get() != tex.Get()", "uv1 != capture.coordIndex",
         "s0 != s1", "stage1_matched_texture_two_source_supported(",
