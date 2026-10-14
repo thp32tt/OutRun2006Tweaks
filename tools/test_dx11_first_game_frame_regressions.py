@@ -499,7 +499,9 @@ def main() -> None:
     def texture_path_complete(code: str) -> bool:
         state = code[code.find("bool supported_game_state("):
                      code.find("bool translate_vertices(")]
-        mirror = code[code.find("bool mirror_texture("):
+        # Stage0 texture upload and Stage1 sampler translation are separate
+        # functions; the compiled game draw requires both and the delegation.
+        mirror = code[code.find("bool create_game_sampler("):
                       code.find("bool submit(")]
         submit = code[code.find("bool submit("):
                       code.find("void observe(")]
@@ -528,7 +530,7 @@ def main() -> None:
             "(mag != D3DTEXF_POINT && mag != D3DTEXF_LINEAR)",
             "(mip != D3DTEXF_NONE && mip != D3DTEXF_POINT)",
             "nextColorOp != D3DTOP_DISABLE",
-        )) and all(x in mirror for x in (
+        )) and "return create_game_sampler(dev, capture, levels, sampler);" in mirror and all(x in mirror for x in (
             "if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;",
             "sourceLevels == 0 || sourceLevels > 12u",
             "D3DFMT_A8R8G8B8", "D3DFMT_X8R8G8B8",
@@ -571,6 +573,8 @@ def main() -> None:
          "if (base.Pool == D3DPOOL_SYSTEMMEM && !gpuRenderTarget) return false;"),
         ("sourceLevels == 0 || sourceLevels > 12u", "sourceLevels != 1u"),
         ("state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;", "state.MaxLOD = D3D11_FLOAT32_MAX;"),
+        ("return create_game_sampler(dev, capture, levels, sampler);",
+         "return false;"),
         ("capture.texture->UnlockRect(level)", "/* missing texture unlock */"),
         ("ctx->PSSetShaderResources(0, 1, &boundView)",
          "/* no native shader texture binding */"),
