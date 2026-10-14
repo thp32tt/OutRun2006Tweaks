@@ -817,7 +817,10 @@ jobs:
           $short = $env:GITHUB_SHA.Substring(0,12)
           $dir = 'gpu-measurement'
           Copy-Item package $dir -Recurse
+          # GPU measurement has its own GUI-only entrypoint; keep the primary
+          # DX9Ex direct CMD in the regular Active ZIP, not the special lab ZIP.
           Remove-Item (Join-Path $dir 'OutRunVR-Slot-Selector.cmd') -Force
+          Remove-Item (Join-Path $dir 'START_DX9EX_TEST.cmd') -Force
           foreach ($file in @('OutRunVR-GPU-Lab.cmd','OutRunVR-GPU-Lab.ps1','OutRunVR-GPU-Lab-Settings.ps1')) {
             Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
           }
