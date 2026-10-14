@@ -2,9 +2,9 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00863",
   "production_id": "CONVERSION-DX9EX-00863",
-  "event_id": "CONVERSION-DX9EX-00863-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00863-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "run_key": "CONVERSION-DX9EX-00863",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
@@ -67,23 +67,69 @@
     "fix_evidence": "Actual launch runner preserves signed native ExitCode and emits explicit crash failure 7 after original logs are collected. The collector packages session files, not root error text, so host/game failure root diagnostic is mirrored into session first.",
     "negative_test_evidence": "Launcher verifier has destructive mutations for suppressed failure exit, erased GAME_NONZERO_EXIT health, and removed pre-collector copy of OUTRUNVR_LAUNCH_ERROR into session ZIP."
   },
-  "status": "SOURCE_MATERIAL_AWAITING_EXACT_SHA_CI",
-  "phase": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "runtime_evidence": "Windows native game and Quest3/VDXR not executed in this session.",
+  "runtime_evidence": "Exact GitHub Windows game, x64 host, package and static gates passed; no original game session or Quest3/VDXR runtime test in this task.",
   "changed_files": [
     "tools/Run-OutRunVRTest.ps1",
     "tools/verify_vr_dx9ex_launch_batch.py",
     "docs/automation/runs/CONVERSION-DX9EX-00863.json"
   ],
-  "score_once": false,
-  "score_delta_this_retry": 0,
+  "score_once": true,
+  "score_delta_this_retry": 1,
   "material_result_sha": "e2f3b893d57ba889a72736a8792c4877e2dfafae",
   "material_followup_shas": [
     "2886f599fc0a7fb7e5bd0fa63c4f017030dc6c27",
     "17d9969ae723b926824929fbca910ae6a90b65c7",
     "be7b20c6955ecbcd330dd1a2b08e09bd60460fe2"
   ],
-  "unchanged_scope": "Only launch/reporting path; no game renderer C++ or visual source changed. This is a release-blocking launch false-PASS fix, not binocular display pass."
+  "unchanged_scope": "Only launch/reporting path; no game renderer C++ or visual source changed. This is a release-blocking launch false-PASS fix, not binocular display pass.",
+  "checkpoint": "C6_STATE",
+  "validation_bearing_result_sha": "585fc86cd0099f4a443679b620f65eee47850659",
+  "acceptance_results": {
+    "exit": "PASS_BUILD",
+    "diagnostic": "PASS_BUILD",
+    "fallback": "PASS_BUILD",
+    "ci": "PASS_EXACT_SHA"
+  },
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "585fc86cd0099f4a443679b620f65eee47850659",
+    "material_sha": "e2f3b893d57ba889a72736a8792c4877e2dfafae",
+    "parser_failure": {
+      "run_id": 38633566940,
+      "step": "Reject broken shipped PowerShell helpers and false HUD reports",
+      "root_cause": "PowerShell bare $gameExitCode: variable caused Parser::ParseFile error line 569",
+      "fixed_sha": "2886f599fc0a7fb7e5bd0fa63c4f017030dc6c27"
+    },
+    "dx9ex_active": {
+      "run_id": 38634226624,
+      "conclusion": "SUCCESS",
+      "policy": "SUCCESS",
+      "host": "SUCCESS",
+      "game": "SUCCESS",
+      "full_chain_compile": "SUCCESS",
+      "package": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38634226710,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38634226666,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38634226732,
+      "conclusion": "SUCCESS"
+    },
+    "runtime_caveat": "Release launcher only. No Quest3 binocular, lens, HUD or FPS pass."
+  },
+  "scoreboard_ai_2_before": 1338,
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1339,
+  "scoreboard_commit_sha": "423e5e2f58c5f9e21df677d080638f644461d138",
+  "score_basis": "One distinct functionality correction of DX9Ex native game exit handling, correct nonzero CMD semantics and preserved diagnostic ZIP validated by exact-SHA required Gates; retry and C6 counted once."
 }
