@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULL_RESOLUTION_FRAME_FALLBACK_PROVENANCE",
   "feature_id": "DX11-FULL-FRAME-READBACK-FAIL-CLOSED",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "status": "DONE_BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -82,5 +82,41 @@
     "tools/test_dx11_full_frame_fallback_00724.py",
     ".github/workflows/dx11-fast-structural.yml"
   ],
-  "runtime_gate": "NEED_HMD_TEST"
+  "runtime_gate": "NEED_HMD_TEST",
+  "material_result_sha": "a2a9d0ad9a11b7521034ac3357894473d3824901",
+  "intermediate_repair_sha": "cf7cb3be75adb4684a33cc84fd9ac8990803008a",
+  "validation_bearing_result_sha": "cf7cb3be75adb4684a33cc84fd9ac8990803008a",
+  "acceptance_results": {
+    "A1": "PASS_EXACT_SHA",
+    "A2": "PASS_EXACT_SHA",
+    "A3": "PASS_EXACT_SHA"
+  },
+  "exact_sha_gates": {
+    "dx11_fast": {
+      "run_id": 38549743485,
+      "conclusion": "success"
+    },
+    "backend_conversion": {
+      "run_id": 38549743450,
+      "conclusion": "success",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ]
+    },
+    "windows_build": {
+      "run_id": 38549749925,
+      "conclusion": "success"
+    },
+    "openxr": {
+      "run_id": 38549749909,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38549750024,
+      "conclusion": "success"
+    }
+  },
+  "packaging_status": "NOT_REQUIRED",
+  "note": "C6: Full-resolution DX11 native async game Present source fallback provenance fix on a2a9d0ad; causal 00724 regression mutation test repair cf7cb3be; exact SHA five required GitHub Gate SUCCESS; Quest3/VDXR/game/menu-to-race/gamepad runtime not exercised. DXVK frozen. Original D3D9 fallback preserved. No further scoring for retry/C6."
 }
