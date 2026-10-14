@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "feature_id": "GAME_STAGE1_ALPHA_WEIGHTED_FADES_MENU_RACE",
   "work_key": "DX11:GAME_STAGE1_ALPHA_BLEND_FAMILY",
-  "status": "PENDING_EXACT_SHA_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -83,7 +83,7 @@
   },
   "base_head_sha": "558da685738495aae7d8219e15e2009ef166536b",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "35926b31b6bb39e3b03853c1c636325e44be3f7e",
   "changed_files": [
     "src/vr/d3d11/live_game_stage1_factor.hpp",
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -99,7 +99,7 @@
     "C3_VALIDATE": "PENDING exact-SHA GitHub Actions",
     "C4_COMMIT": "PENDING GitHub fast-forward material commit",
     "C5_PACKAGE": "NOT_REQUIRED: no HMD verified deployment",
-    "C6_STATE": "PENDING GATES"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: PASS_EXACT_SHA on 35926b31b6bb39e3b03853c1c636325e44be3f7e (GitHub CI SUCCESS); C6 bookkeeping only, HMD runtime UNTESTED; prior feature_contract/acceptance_results and material_result_sha preserved"
   },
-  "next_action": "Inspect exact SHA DX11 Fast/Backend/Windows/OpenXR/HUD GitHub Actions, repair failures under same 00702 and record validation-bearing SHA; Quest3/VDXR UNTESTED"
+  "next_action": "C6 terminal status recorded at exact validation-bearing SHA 35926b31b6bb39e3b03853c1c636325e44be3f7e. Do not rerun build/CI, change source, or double-score this task. Quest3/VDXR HMD/runtime validation remains UNTESTED."
 }
