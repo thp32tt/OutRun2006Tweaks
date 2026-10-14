@@ -33,7 +33,7 @@ if __name__ == '__main__':
        ('missing host payload',CMD.replace('backends\\d3d9\\outrun-vr-host.exe','missing.exe'),PS,GUI,WF),
        ('missing host lifecycle',CMD,PS.replace('HOST_NEVER_STARTED','HOST_UNKNOWN'),GUI,WF),
        ('hidden runner',CMD,PS,GUI.replace('-WindowStyle Normal','-WindowStyle Hidden',1),WF),
-       ('missing packaged entry',CMD,PS,GUI,WF.replace("'OutRunVR-Slot-Selector.cmd','START_DX9EX_TEST.cmd'","'OutRunVR-Slot-Selector.cmd'",1).replace("'START_DX9EX_TEST.cmd','Start-OutRunVRPacing.ps1'","'Start-OutRunVRPacing.ps1'",1).replace("'START_DX9EX_TEST.cmd','DX9EX_TEST_LAUNCH_CONTRACT.md'","'DX9EX_TEST_LAUNCH_CONTRACT.md'",1)),
+       ('missing packaged entry',CMD,PS,GUI,WF.replace('if ($launchers.Count -ne 2','if ($launchers.Count -ne 1',1)),
     ]
     for name,c,p,g,w in mutants:
         try:check(c,p,g,w)
