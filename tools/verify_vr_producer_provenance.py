@@ -291,7 +291,7 @@ def hud_text_direct_binding_ok(source: str) -> bool:
         and "ProducerToken::OutRunHudPeripheralText" in body
         and "ProducerToken::OutRunHudText" in body
         and "RenderScope::ScreenHud" in scope
-        and re.search(r"nullptr,\\s*true,\\s*token", scope) is not None
+        and re.search(r"nullptr,\s*true,\s*token", scope) is not None
         and "OutRunHudTextProducerHook.call(" in body
         and "OutRunHudPeripheralText = previousPeripheral;" in ui
         and "OutRunHudTextScreenHud = previous;" in ui
