@@ -1631,17 +1631,20 @@ namespace OutRunVRStereo
             return std::clamp(Settings::VRHudScale.get(), 0.30f, 1.20f);
         }
 
+        // Reuse exactly the same Present source geometry as the HUD cache
+        // key. A second R29 snapshot could cross Reset/resize and cache the
+        // new aspect ratio under previous-generation width/height.
         float R30HudAspectCompensation(
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
+            std::uint32_t sourceWidth, std::uint32_t sourceHeight,
             const std::uint32_t* publishedExtent = nullptr) noexcept
         {
-            const auto frame = R29OwnerCaptureFrameSnapshot();
-            if (!frame.width || !frame.height)
+            if (!sourceWidth || !sourceHeight)
                 return 1.0f;
 
             const float sourceAspect =
-                static_cast<float>(frame.width) /
-                static_cast<float>(frame.height);
+                static_cast<float>(sourceWidth) /
+                static_cast<float>(sourceHeight);
 
             // R35.4: SharedPoseState already carries the runtime's actual
             // recommended per-eye render-target size. That pixel aspect is the
@@ -1888,7 +1891,8 @@ namespace OutRunVRStereo
             // previous eye extent. The next Present always samples XR again.
             R30HudContain.valid = false;
             const float sourceOverTarget =
-                R30HudAspectCompensation(stereo, eyeExtent);
+                R30HudAspectCompensation(
+                    stereo, frame.width, frame.height, eyeExtent);
 
             // The existing contain math is unchanged: eye offset, Z/RHW,
             // source HUD geometry and SkyGlow are outside this CPU fastpath.

@@ -1,0 +1,83 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00810",
+  "production_id": "CONVERSION-DX9EX-00810",
+  "event_id": "CONVERSION-DX9EX-00810-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R30_HUD_SOURCE_ASPECT_COHERENCE",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R30_HUD_SOURCE_ASPECT_COHERENCE",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_COMMITTED",
+  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00810]",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_hud_present_cache.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00810.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R30_HUD_SOURCE_ASPECT_COHERENCE",
+    "goal": "Keep original OutRun Present source aspect and both-eye HUD containment coherent across Reset and resize while eliminating duplicate R29 state snapshot on cache misses.",
+    "scope_boundary": "DX9Ex R30 HUD cache and source aspect only. World, SkyGlow, menus, FFB, DX11 and DXVK unaffected.",
+    "special_work_evidence": "R30 HUD cache misses capture full frame twice: one read for cache identity and another for aspect. Game resize between reads risks mixed-generation ratio; prior Quest3 trace showed maximum 3929.3 draw calls per Present. FPS benefit unmeasured.",
+    "trace_stages": [
+      "Original OutRun D3D9 backbuffer updates dimensions during Present and Reset.",
+      "R29 HUD frame snapshot publishes cache identity including game source width height and epoch.",
+      "R30 ratio maps game source aspect to both XR eye extents in XYZRHW and shader draw paths."
+    ],
+    "subcomponents": [
+      "Use original cache-key width and height for all R30 aspect calculations and remove redundant second frame capture.",
+      "Preserve per-eye XR extent reevaluation and zero-size/reset fallback rather than freezing VR pose or viewport.",
+      "Extend existing CI HUD verifier with aspect math and five negative source mutations."
+    ],
+    "acceptance_items": [
+      {
+        "id": "R30_SOURCE_EPOCH_PARITY",
+        "category": "end_to_end_behavior",
+        "behavior_area": "present_to_stereo_hud",
+        "expected_behavior": "Cache key and computed aspect refer to identical Present source dimensions."
+      },
+      {
+        "id": "R30_RESET_AND_EXTENT_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "resize_reset_eye_extent",
+        "expected_behavior": "Zero-size frame and Reset reject stale cache while live XR eye-extent/FOV changes remain effective."
+      },
+      {
+        "id": "R30_EXACT_SHA_BUILD",
+        "category": "integrated_validation",
+        "behavior_area": "win32_host_game_package",
+        "expected_behavior": "Existing/new regression scripts and exact-SHA DX9Ex Active, Domain Isolation, Full Source Impact must pass."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "R30_SOURCE_EPOCH_PARITY": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "R30_RESET_AND_EXTENT_FALLBACK": "SOURCE_IMPLEMENTED_PENDING_GATE",
+    "R30_EXACT_SHA_BUILD": "PENDING_EXACT_SHA_GATES",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "R30HudContainScale calls R29OwnerCaptureFrameSnapshot and R30HudAspectCompensation independently called it again.",
+    "root_cause": "A game Reset/resize can interleave reads and persist a new-generation aspect under an old source-dimension cache key.",
+    "source_trace": [
+      "OutRun original D3D9 game RT source and Present epoch",
+      "R29 captured frame for R30 HUD cache identity",
+      "R30 source/eye aspect applied to both stereo HUD render paths"
+    ],
+    "alternatives_rejected": [
+      "Never freeze host XR recommended eye extent when it changes without game Present.",
+      "Never change world draw stereo or SkyGlow effects.",
+      "Never modify menus and F11 external ImGui render source."
+    ],
+    "negative_test_evidence": "3 source aspect seeds, 5 destructive mutations and old cache checks; exact-SHA CI pending.",
+    "fix_evidence": "Forward caller frame dimensions and eliminate second full frame snapshot call."
+  },
+  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+}
