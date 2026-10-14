@@ -134,14 +134,22 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     # beyond the former first-64 limit. Preserve bounds, Z and fallback.
     batch_source = (DX11.parent / "native_game_frame_batch.hpp").read_text(encoding="utf-8")
     require("const UINT candidateOrdinal = s.eligibleThisFrame++;" in code and
-            "if (s.eligibleThisFrame == (std::numeric_limits<UINT>::max)()) return;" in code and
+            "if (s.eligibleThisFrame == (std::numeric_limits<UINT>::max)()) {" in code and
+            "if (fullMode) s.frameBatch.abort();" in code and
             "s.probeSlot = GameNativeFrameBatch::next_probe_slot(" in code and
             "s.probeSlot, s.eligibleThisFrame);" in code and
             "kProbeSlots = 64" not in code and
             'GetEnvironmentVariableW(L"OUTRUN_DX11_FIRST_GAME_FRAME"' in code and
             'GetEnvironmentVariableW(L"OUTRUN_DX11_FRAME_BATCH"' in code and
             "s.frameBatch.accepts(candidateOrdinal, s.probeSlot," in code and
-            "env_batch_opt_in())) return;" in code and
+            "env_batch_opt_in());" in code and
+            "if (!admitted)" in code and
+            "s.frameBatch.must_abort_unsupported(fullMode, multiBatch)" in code and
+            "env_full_game_opt_in(), env_batch_opt_in()))" in code and
+            'GetEnvironmentVariableW(L"OUTRUN_DX11_FULL_GAME_FRAME"' in code and
+            "s.frameBatch.accepts_full(sourceOrdinal)" in code and
+            "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in code and
+            "kMaxFullFrameDraws = 4096u" in batch_source and
             "if (s.frameBatch.first_draw()) s.backend.begin_frame(kBackground);" in code and
             "if (s.frameBatch.clear_depth())" in code and
             "s.frameBatch.accepts_depth(output.nativeDepthTest," in code and

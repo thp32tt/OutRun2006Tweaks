@@ -4633,8 +4633,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
                 static_cast<std::uint32_t>(type), primitives, expectedElements)) {
             // The hook saw a real game source call even when native topology
             // translation is impossible. It must break an active scene batch.
-            if (fullMode || (multiBatch && s.frameBatch.submitted > 0u &&
-                s.frameBatch.submitted < GameNativeFrameBatch::kMaxDraws))
+            if (s.frameBatch.must_abort_unsupported(fullMode, multiBatch))
                 s.frameBatch.abort();
             return;
         }
@@ -4647,8 +4646,7 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             // Once a multi-draw scene starts, an unsupported real game Draw
             // is not a transparent hole in the native compositor. Cancel
             // publication without affecting the original D3D9 rendering.
-            if (multiBatch && s.frameBatch.submitted > 0u &&
-                s.frameBatch.submitted < GameNativeFrameBatch::kMaxDraws)
+            if (s.frameBatch.must_abort_unsupported(fullMode, multiBatch))
                 s.frameBatch.abort();
             return;
         }
@@ -4809,9 +4807,8 @@ void observe_unavailable_game_draw(IDirect3DDevice9* game) noexcept {
         }
         ++s.sourceDrawsThisFrame;
         ++s.observed;
-        if (env_full_game_opt_in() ||
-            (env_batch_opt_in() && s.frameBatch.submitted > 0u &&
-             s.frameBatch.submitted < GameNativeFrameBatch::kMaxDraws))
+        if (s.frameBatch.must_abort_unsupported(
+                env_full_game_opt_in(), env_batch_opt_in()))
             s.frameBatch.abort();
     } catch (...) {
         // Diagnostics cannot change the game's render or gamepad behavior.

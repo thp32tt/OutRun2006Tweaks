@@ -11,6 +11,15 @@ struct GameNativeFrameBatch {
             ordinal == submitted &&
             (submitted == 0u || (hasSourceDraw && lastSourceDraw + 1u == ordinal));
     }
+    // A missing/unsupported D3D9 Draw invalidates the full native scene even
+    // after the legacy eight-draw inset cap. In diagnostic batch mode, only
+    // incomplete inset batches need invalidation; the original D3D9 path
+    // remains authoritative regardless of native admission.
+    [[nodiscard]] constexpr bool must_abort_unsupported(
+        bool fullMode, bool diagnosticBatch) const noexcept {
+        return fullMode ||
+            (diagnosticBatch && submitted > 0u && submitted < kMaxDraws);
+    }
     [[nodiscard]] constexpr bool publishable_full(
         bool pending, std::uint64_t sourceDraws) const noexcept {
         return publishable(pending) && hasSourceDraw &&

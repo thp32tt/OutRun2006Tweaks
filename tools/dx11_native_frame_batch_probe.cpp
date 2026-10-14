@@ -94,6 +94,18 @@ int main() {
     assert(!b.accepts_source_draw(1502u, true)); // Missed game draw.
     assert(!b.accepts_source_draw(1499u, true)); // Reordered game draw.
     // 00720 full game native capture must include every original Draw ordinal.
+    // A rejected frame must not survive after >8 already-submitted native draws.
+    b.reset();
+    assert(!b.must_abort_unsupported(false, false));
+    assert(!b.must_abort_unsupported(false, true));
+    assert(b.must_abort_unsupported(true, false));
+    for (std::uint32_t i = 0; i < GameNativeFrameBatch::kMaxDraws + 1u; ++i)
+        b.succeeded(false);
+    assert(!b.must_abort_unsupported(false, true));
+    assert(b.must_abort_unsupported(true, true));
+    b.abort();
+    assert(!b.publishable_full(true, GameNativeFrameBatch::kMaxDraws + 1u));
+    b.reset();
     b.reset();
     assert(b.accepts_full(0u));
     b.succeeded(false); b.record_source_draw(0u);

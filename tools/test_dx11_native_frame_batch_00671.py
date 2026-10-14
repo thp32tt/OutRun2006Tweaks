@@ -15,7 +15,9 @@ for marker in ('#include "native_game_frame_batch.hpp"',
  'if (!submit(s, vertices, fanTriangles.data(),',
  'if (!submit(s, vertices, indices, indexCount, type, capture, output))',
  's.frameBatch.accepts_depth(output.nativeDepthTest,',
- 'output.nativeDepthOrderingMode != 0u'):
+ 'output.nativeDepthOrderingMode != 0u',
+ 's.frameBatch.must_abort_unsupported(fullMode, multiBatch)',
+ 's.frameBatch.must_abort_unsupported('):
     assert marker in src, marker
 assert "s.attempted" not in src
 # Test a real exception-safety transition in the live game observer.
@@ -46,7 +48,8 @@ with TemporaryDirectory(prefix="dx11-native-frame-") as work:
     for tag,text,passes in (("positive",header,True),
                             ("negative_mutant",header.replace("kMaxDraws = 8u","kMaxDraws = 1u"),False),
                             ("full_limit_mutant",header.replace("kMaxFullFrameDraws = 4096u","kMaxFullFrameDraws = 8u"),False),
-                            ("full_contiguity_mutant",header.replace("ordinal == submitted","ordinal >= submitted"),False)):
+                            ("full_contiguity_mutant",header.replace("ordinal == submitted","ordinal >= submitted"),False),
+                            ("full_unsupported_mutant",header.replace("return fullMode ||","return false && fullMode ||"),False)):
         (folder/"native_game_frame_batch.hpp").write_text(text)
         binary=folder/tag
         subprocess.run([cxx,"-std=c++17","-O2","-Wall","-Wextra","-Werror","-pedantic",
