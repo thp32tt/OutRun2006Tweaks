@@ -156,8 +156,15 @@ class UIScaling : public Hook
 	// Addresses of the draw calls sub_4BAD20 makes. sprani_play_ae_auth_alpha
 	// and put_clip_sprite are both used throughout the game, so each call site
 	// is redirected on its own rather than hooking either function.
-	static constexpr int RankMarker_SpraniCalls[] = { 0xBB0FB, 0xBB133, 0xBB16C, 0xBB1A5 };
-	static constexpr int RankMarker_ClipSpriteCalls[] = { 0xBB21F, 0xBB241, 0xBB271, 0xBB2BC, 0xBB2D0 };
+	// r4dius/outrun2-decomp confirms the 4BAD20 producer projects a
+	// rival-car position onto the 640x480 SPRANI/clip-sprite plane.
+	// Both submission families must use one verified canonical EXE callsite list.
+	// R57 HMD-proven mode 6 and runtime eye-space ownership remain unchanged.
+	static_assert(OutRunVR::DisasmContract::RankMarkerCallRvas.size() == 9);
+	static_assert(OutRunVR::DisasmContract::RankMarkerCallRvas[0] == 0xBB0FB);
+	static_assert(OutRunVR::DisasmContract::RankMarkerCallRvas[3] == 0xBB1A5);
+	static_assert(OutRunVR::DisasmContract::RankMarkerCallRvas[4] == 0xBB21F);
+	static_assert(OutRunVR::DisasmContract::RankMarkerCallRvas[8] == 0xBB2D0);
 	static constexpr int DispRank_SpraniCall = 0xB9DA6;
 	static constexpr int DispRank_ClipSpriteCalls[] = {
 		0xB9F3A, 0xB9F5E, 0xB9F81, 0xB9FD0,
@@ -1421,10 +1428,14 @@ public:
 		Calc3D2D_hk = safetyhook::create_inline(Module::exe_ptr(Calc3D2D_Addr), Calc3D2D_dest);
 
 		RankMarker_Truncate_hk = safetyhook::create_mid(Module::exe_ptr(RankMarker_Truncate), RankMarker_Truncate_dest);
-		for (int addr : RankMarker_SpraniCalls)
-			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_sprani, Memory::HookType::Call);
-		for (int addr : RankMarker_ClipSpriteCalls)
-			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_putClipSprite, Memory::HookType::Call);
+		// The first four 4BAD20 callsites produce SPRANI nodes; the next five
+		// emit clip sprites. Preserve both hook types while eliminating a
+		// divergent duplicate address table (DisasmContract is the SSOT).
+		const auto& rankCalls = OutRunVR::DisasmContract::RankMarkerCallRvas;
+		for (std::size_t i = 0; i < 4; ++i)
+			Memory::VP::InjectHook(Module::exe_ptr(static_cast<int>(rankCalls[i])), RankMarker_sprani, Memory::HookType::Call);
+		for (std::size_t i = 4; i < rankCalls.size(); ++i)
+			Memory::VP::InjectHook(Module::exe_ptr(static_cast<int>(rankCalls[i])), RankMarker_putClipSprite, Memory::HookType::Call);
 		for (int addr : OptionArrow_ClipSpriteCalls)
 			Memory::VP::InjectHook(
 				Module::exe_ptr(addr), OptionArrow_putClipSprite,
