@@ -14,14 +14,29 @@ assert 'Setting<bool> VRHudEdgeAnchors{ "VR", "HudEdgeAnchors", false' in settin
 assert 'Setting<bool> VRHudResponsiveLayout{ "VR", "HudResponsiveLayout", true' in settings
 assert "(!Settings::VRHudResponsiveLayout.get() &&" in code
 assert "!Settings::VRHudEdgeAnchors.get())" in code
-assert "(std::max)(requested, 1.25f)" in code
-assert "const float readable = Settings::VRHudResponsiveLayout.get()" in code
+# ESC owner no longer hides the lower slider beneath a hard 1.25 floor.
+# Preserve a 1.0 -> 1.25 readable default while all finite settings move.
+assert "const float readable = OutRunVrPauseEye::ResponsiveUserScale(" in code
+assert "requested, Settings::VRHudResponsiveLayout.get());" in code
+pause_helper = (root / "src/vr/d3d9/pause_menu_eye_affine.hpp").read_text()
+assert "inline float ResponsiveUserScale(" in pause_helper
+assert "0.55f + (bounded - 0.55f) * (0.70f / 0.45f)" in pause_helper
+assert "1.25f + (bounded - 1.0f) * 0.50f" in pause_helper
+def responsive_pause(requested):
+    bounded = max(.55, min(1.50, requested))
+    return (.55 + (bounded - .55) * (.70 / .45) if bounded <= 1.
+            else 1.25 + (bounded - 1.) * .50)
 def quest_profile(responsive, legacy, pause):
-    return responsive or legacy, max(.55, min(1.5, max(pause, 1.25) if responsive else pause))
+    if responsive:
+        pause = responsive_pause(pause)
+    return responsive or legacy, max(.55, min(1.5, pause))
 assert quest_profile(True, False, 1.) == (True, 1.25)
 assert quest_profile(False, False, 1.) == (False, 1.)
 assert quest_profile(False, True, .8) == (True, .8)
-assert quest_profile(True, False, 1.4) == (True, 1.4)
+assert quest_profile(True, False, 1.4) == (True, 1.45)
+assert quest_profile(True, False, .55) == (True, .55)
+assert quest_profile(True, False, .75)[1] < quest_profile(True, False, 1.0)[1]
+assert quest_profile(True, False, 1.0)[1] < quest_profile(True, False, 1.5)[1]
 print("PASS integrated Quest3 default-on/opt-out/legacy A-B and ESC size")
 
 start = code.index("R30HudEdgeAnchor R30GetExactHudEdgeAnchor(")
@@ -288,7 +303,7 @@ def effective(mode, semantic, f11=False, hud=.55, pause=1.0,
     pause_owned = semantic == "overlay" or (
         semantic == "hud" and producer == "exact_menu_arrow")
     if mode == 0x12 and pause_owned and not f11 and math.isfinite(pause) and pause > 0:
-        requested = max(pause, 1.25) if responsive else pause
+        requested = responsive_pause(pause) if responsive else pause
         return max(.55, min(1.50, requested))
     return hud
 for source_w, source_h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
@@ -305,6 +320,9 @@ for source_w, source_h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
         assert effective(0x09, "overlay") == .55
         assert effective(0x10, "overlay") == .55
         assert effective(0x12, "overlay", f11=True) == 1.
+        assert effective(0x12, "overlay", pause=.55) == .55
+        assert effective(0x12, "overlay", pause=.75) < effective(0x12, "overlay", pause=1.)
+        assert effective(0x12, "overlay", pause=1.5) == 1.50
         assert effective(0x12, "overlay", pause=9.) == 1.50
         assert effective(0x12, "overlay", pause=-1.) == .55
         assert effective(0x12, "overlay", pause=float('nan')) == .55
