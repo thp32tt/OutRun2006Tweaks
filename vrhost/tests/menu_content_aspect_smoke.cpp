@@ -355,6 +355,70 @@ int main()
             4.0f / 3.0f).valid)
         return 12;
 
+
+    // Mono recovery theater is a distinct path from the shared-eye menu
+    // projection. A partially off-output window must retain the original
+    // content's physical pixel scale and camera-local fragment position.
+    using OutRunVrMenuAspect::PlanVisibleMonoTheaterFragment;
+    const auto theaterFull = PlanVisibleMonoTheaterFragment(
+        0, 0, 1280, 960, 1920, 1080, 0, 0,
+        1280.f / 1920.f, 960.f / 1080.f);
+    const auto theaterLeft = PlanVisibleMonoTheaterFragment(
+        -320, 0, 960, 960, 1920, 1080, 0, 0,
+        960.f / 1920.f, 960.f / 1080.f);
+    const auto theaterRight = PlanVisibleMonoTheaterFragment(
+        1280, 0, 2560, 960, 1920, 1080,
+        1280.f / 1920.f, 0, 640.f / 1920.f, 960.f / 1080.f);
+    const auto theaterTop = PlanVisibleMonoTheaterFragment(
+        0, -240, 1280, 720, 1920, 1080, 0, 0,
+        1280.f / 1920.f, 720.f / 1080.f);
+    if (!theaterFull.valid || theaterFull.partial ||
+        !near(theaterFull.quadWidth, 2.f) ||
+        !near(theaterFull.quadHeight, 1.5f) ||
+        !theaterLeft.valid || !theaterLeft.partial ||
+        !near(theaterLeft.quadWidth, 1.5f) ||
+        !near(theaterLeft.quadHeight, 1.5f) ||
+        !near(theaterLeft.offsetRight, 0.25f) ||
+        !near(theaterLeft.offsetUp, 0.f) ||
+        !theaterRight.valid || !theaterRight.partial ||
+        !near(theaterRight.quadWidth, 1.f) ||
+        !near(theaterRight.offsetRight, -0.5f) ||
+        !theaterTop.valid || !theaterTop.partial ||
+        !near(theaterTop.quadWidth, 2.f) ||
+        !near(theaterTop.quadHeight, 1.125f) ||
+        !near(theaterTop.offsetRight, 0.f) ||
+        !near(theaterTop.offsetUp, -0.1875f))
+        return 28;
+
+    // Both axes clipped: the fragment's apparent aspect equals the actual
+    // sampled pixels, and its local offset is NOT reset to the gaze centre.
+    const auto theaterCorner = PlanVisibleMonoTheaterFragment(
+        -320, -240, 960, 720, 1920, 1080, 0, 0,
+        960.f / 1920.f, 720.f / 1080.f);
+    if (!theaterCorner.valid || !theaterCorner.partial ||
+        !near(theaterCorner.quadWidth, 1.5f) ||
+        !near(theaterCorner.quadHeight, 1.125f) ||
+        !near(theaterCorner.offsetRight, 0.25f) ||
+        !near(theaterCorner.offsetUp, -0.1875f) ||
+        !near(theaterCorner.quadWidth / theaterCorner.quadHeight,
+            960.f / 720.f))
+        return 29;
+
+    // Invalid, nonfinite, stale or no-intersection capture must leave the
+    // existing mono fallback in control. The separate SBS path never opts in.
+    if (PlanVisibleMonoTheaterFragment(
+            -320, 0, 960, 960, 1920, 1080, 0.1f, 0,
+            960.f / 1920.f, 960.f / 1080.f).valid ||
+        PlanVisibleMonoTheaterFragment(
+            -320, 0, 960, 960, 1920, 1080,
+            std::numeric_limits<float>::quiet_NaN(), 0,
+            960.f / 1920.f, 960.f / 1080.f).valid ||
+        PlanVisibleMonoTheaterFragment(
+            2500, 0, 3780, 960, 1920, 1080, 0, 0, 1, 1).valid ||
+        PlanVisibleMonoTheaterFragment(
+            0, 0, 1280, 960, 0, 1080, 0, 0, 1, 1).valid)
+        return 30;
+
     const auto nan = PlanCenteredContent(
         std::numeric_limits<float>::quiet_NaN(), 4.0f / 3.0f);
     const auto inf = PlanCenteredContent(

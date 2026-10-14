@@ -1763,6 +1763,40 @@ namespace
             : 16.f / 9.f;
         quad.size.width = 2.f;
         quad.size.height = 2.f / aspect;
+
+        // Unlike the LOCAL-fixed 4:3 menu path, the mono recovery theater
+        // formerly stretched and recentred an off-output game window's
+        // surviving capture to the whole original client. Keep its real
+        // authored pixel density and place the fragment relative to the
+        // original theater anchor in LOCAL space, so F12/recenter rotates
+        // the offset together with the recovered picture.
+        // Game SBS uses a different split seam; its established safe
+        // fallback is unchanged.
+        if (!sourceIsSbs)
+        {
+            RECT clientOnOutput{};
+            c.GetGameClientOutputRect(clientOnOutput);
+            const auto fragment =
+                OutRunVrMenuAspect::PlanVisibleMonoTheaterFragment(
+                    static_cast<float>(clientOnOutput.left),
+                    static_cast<float>(clientOnOutput.top),
+                    static_cast<float>(clientOnOutput.right),
+                    static_cast<float>(clientOnOutput.bottom),
+                    static_cast<float>(c.sourceWidth_),
+                    static_cast<float>(c.sourceHeight_),
+                    whole.x, whole.y, whole.w, whole.h);
+            if (fragment.valid && fragment.partial)
+            {
+                quad.size.width = fragment.quadWidth;
+                quad.size.height = fragment.quadHeight;
+                const XrVector3f offset = RotateVector(
+                    quad.pose.orientation,
+                    { fragment.offsetRight, fragment.offsetUp, 0.f });
+                quad.pose.position.x += offset.x;
+                quad.pose.position.y += offset.y;
+                quad.pose.position.z += offset.z;
+            }
+        }
         return true;
     }
 

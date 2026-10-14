@@ -318,4 +318,89 @@ namespace OutRunVrMenuAspect
         result.height = visibleHeight / sampledHeight;
         return result;
     }
+
+    // LOCAL mono theater fallback (including a recovered menu) may sample a
+    // clipped desktop window. GetGameUv() contains only the surviving pixels;
+    // assigning those pixels the old FULL client quad zooms/recenters them.
+    // Keep a full-size original client coordinate plane and render its actual
+    // captured fragment in that plane. SBS has a different centre seam and
+    // deliberately does not use this mono-only plan.
+    struct MonoTheaterFragment
+    {
+        bool valid = false;
+        bool partial = false;
+        float quadWidth = 2.0f;
+        float quadHeight = 0.0f;
+        float offsetRight = 0.0f;
+        float offsetUp = 0.0f;
+    };
+
+    inline MonoTheaterFragment PlanVisibleMonoTheaterFragment(
+        float clientLeft, float clientTop,
+        float clientRight, float clientBottom,
+        float captureWidth, float captureHeight,
+        float uvX, float uvY, float uvWidth, float uvHeight) noexcept
+    {
+        const float inputs[]{
+            clientLeft, clientTop, clientRight, clientBottom,
+            captureWidth, captureHeight, uvX, uvY, uvWidth, uvHeight
+        };
+        for (float v : inputs)
+            if (!std::isfinite(v))
+                return {};
+
+        const float width = clientRight - clientLeft;
+        const float height = clientBottom - clientTop;
+        if (!(width > 0.0f && height > 0.0f &&
+              captureWidth > 0.0f && captureHeight > 0.0f &&
+              uvX >= 0.0f && uvY >= 0.0f &&
+              uvWidth > 0.0f && uvHeight > 0.0f &&
+              uvX + uvWidth <= 1.00001f &&
+              uvY + uvHeight <= 1.00001f) ||
+            width / height < 0.5f || width / height > 5.0f)
+            return {};
+
+        const float left = (std::max)(0.0f, clientLeft);
+        const float right = (std::min)(captureWidth, clientRight);
+        const float top = (std::max)(0.0f, clientTop);
+        const float bottom = (std::min)(captureHeight, clientBottom);
+        if (!(right > left && bottom > top))
+            return {};
+
+        // Require the CURRENT captured UV to describe the original
+        // client/output intersection; reject stale capture after a
+        // move, Reset or output switch. Use the same one-pixel tolerance as
+        // the world-locked menu crop.
+        if (std::fabs(uvX * captureWidth - left) > 1.0f ||
+            std::fabs((uvX + uvWidth) * captureWidth - right) > 1.0f ||
+            std::fabs(uvY * captureHeight - top) > 1.0f ||
+            std::fabs((uvY + uvHeight) * captureHeight - bottom) > 1.0f)
+            return {};
+
+        MonoTheaterFragment result{};
+        result.valid = true;
+        result.partial =
+            std::fabs(left - clientLeft) > 1.0f ||
+            std::fabs(right - clientRight) > 1.0f ||
+            std::fabs(top - clientTop) > 1.0f ||
+            std::fabs(bottom - clientBottom) > 1.0f;
+        // The original authored theater has width 2 and height
+        // 2*clientHeight/clientWidth. Scale BOTH axes by the same physical
+        // pixel density, but retain the captured rectangle's true centre.
+        result.quadWidth = 2.0f * (right - left) / width;
+        result.quadHeight = 2.0f * (bottom - top) / width;
+        result.offsetRight =
+            (left + right - clientLeft - clientRight) / width;
+        result.offsetUp =
+            -(top + bottom - clientTop - clientBottom) / width;
+        if (!std::isfinite(result.quadWidth) ||
+            !std::isfinite(result.quadHeight) ||
+            !std::isfinite(result.offsetRight) ||
+            !std::isfinite(result.offsetUp) ||
+            result.quadWidth <= 0.0f || result.quadWidth > 2.00001f ||
+            result.quadHeight <= 0.0f || result.quadHeight > 4.00001f)
+            return {};
+        return result;
+    }
+
 }

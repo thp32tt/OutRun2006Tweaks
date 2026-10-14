@@ -1,0 +1,77 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00837",
+  "production_id": "CONVERSION-DX9EX-00837",
+  "event_id": "CONVERSION-DX9EX-00837-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:MAIN_MENU",
+  "status": "BUILD_PENDING",
+  "phase": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "changed_files": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Complete the visible OutRun front-end menu picture aspect and placement across normal LOCAL projection and mono recovery theater when the original game window is partially outside a duplicated display.",
+    "scope_boundary": "Only mono fallback window-fragment projection changes; existing full-window menu optics, stereo SBS seam, 3D world, F11, ESC, HUD, SkyGlow, input and DX11/DXVK are untouched.",
+    "trace_stages": [
+      "Original game menu client bounds are transformed to the selected DXGI output and clipped into GetGameUv.",
+      "The R23 mono recovery theater blits those captured UV pixels, while the normal LOCAL menu uses authored 4:3 optical coordinates.",
+      "The recovered mono XrCompositionLayerQuad now retains visible fragment physical scale and camera-local translation under the existing theater anchor/recenter."
+    ],
+    "subcomponents": [
+      "Preserve original full-client optical scale for both axes of a partly captured mono theater quad and correct its projected physical aspect.",
+      "Translate only the surviving pixel fragment along the existing world-locked LOCAL theater axes while preserving clean full-window, stale-capture and SBS fallback."
+    ],
+    "acceptance_items": [
+      {
+        "id": "THEATER_ORIGINAL_FRAGMENT",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_client_to_mono_xr_quad",
+        "expected_behavior": "Fully visible 4:3 and ultrawide menu retains baseline; left/right/top/corner clipped original menu pixels have correct physical size and stable offset under an existing optical anchor."
+      },
+      {
+        "id": "THEATER_NEGATIVE_RESET_SBS",
+        "category": "fallback_regression",
+        "behavior_area": "stale_output_sbs_and_non_menu",
+        "expected_behavior": "Stale/invalid/nonfinite/no-output capture is rejected; SBS half-view, world stereo, gameplay HUD, F11, SkyGlow and desktop full-window paths do not use mono fragment rebasing."
+      },
+      {
+        "id": "DX9EX_WINDOWS_EXACT_SHA",
+        "category": "integrated_validation",
+        "behavior_area": "win32_x86_game_x64_host_package",
+        "expected_behavior": "Canonical exact-SHA DX9Ex Active policy/host/game/full-chain/package plus Domain and relevant Full Source Impact succeed without claiming Quest3 runtime."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Source R23RenderTheater used complete GetClientRect aspect for an image cropped by GetGameUv when the menu/game window was partly off the duplicated output; full theater quad recentered the remaining pixels.",
+    "source_trace": [
+      "Original menu/game pixel client rectangle is returned in selected DXGI output coordinates by GetGameClientOutputRect.",
+      "GetGameUv clips that rectangle to output bounds and RenderTo blits only surviving image pixels into theater swapchain.",
+      "R23RenderTheater submits an XrCompositionLayerQuad in LOCAL space using a reused theaterAnchor; this change scales and offsets exactly that visible fragment."
+    ],
+    "root_cause": "The fallback render path derived quad aspect/centre from the original full window but sampled a partially clipped UV, so the surviving pixels stretched and shifted to the original full quad.",
+    "alternatives_rejected": [
+      "The main LOCAL-fixed menu crop already accounts for clipped UV and must not be reimplemented here.",
+      "Global OpenXR projection or eye extent changes risk normal 3D stereo and do not repair mono theater geometry.",
+      "SBS source split has a distinct virtual centre seam; retain its established unchanged fallback."
+    ],
+    "fix_evidence": "New pure C++ fragment plan computes full-client normalized per-axis physical scale and local translation; R23RenderTheater applies it only for verified clipped mono capture.",
+    "negative_test_evidence": "Expanded existing menu-content-aspect portable smoke with full, left/right/top/corner, stale UV, zero size, no-intersection and NaN invalid cases; exact-SHA Windows CI pending.",
+    "eye_ownership": "R23 mono fallback is XR_EYE_VISIBILITY_BOTH from one original client fragment and unchanged LOCAL theaterAnchor. The regular two-eye LOCAL menu, SBS and world stereo are not touched."
+  },
+  "remaining": "Exact-SHA Windows DX9Ex Active and Domain gate pending; Quest3/VDXR mono recovery visual acceptance and runtime FPS untested."
+}
