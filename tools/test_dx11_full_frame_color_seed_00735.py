@@ -42,5 +42,11 @@ for token,mut in (
     assert token in bridge
     assert not linked(bridge.replace(token,mut,1),batch,hook),token
 assert not linked(bridge,batch.replace("return accepts_full(ordinal) && (submitted != 0u || sameSourceFullClear);","return accepts_full(ordinal);"),hook)
-assert not linked(bridge,batch,hook.replace("observe_scene_boundary(device)","ignore_scene_boundary(device)",1))
+clear_start=hook.index("HRESULT __stdcall ClearDestR9(")
+clear_end=hook.index("template <typename ActualDraw, typename LegacyDraw>",clear_start)
+clear_section=hook[clear_start:clear_end]
+assert "observe_scene_boundary(device)" in clear_section
+mutated_clear=hook[:clear_start]+clear_section.replace(
+    "observe_scene_boundary(device)","ignore_scene_boundary(device)",1)+hook[clear_end:]
+assert not linked(bridge,batch,mutated_clear)
 print("00735 full Clear seed and pre-Draw abort / original game+gamepad fallback PASS")
