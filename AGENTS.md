@@ -1,3 +1,20 @@
+# 2026-10-14 USER OVERRIDE — DX11 FULL GAME SOURCE FIRST (HIGHEST PRIORITY)
+
+**Authoritative for DX11 Native A / `vr-dx11-native-r71`.** Supersedes older DX11 task-selection, review-frequency and diagnostic-inset priorities where they conflict. Keep domain isolation, task/owner leases, honest runtime status and final exact-SHA safety/compile Gates.
+
+## Actual deliverable, not diagnostic churn
+1. **P0: IMPLEMENT full-resolution native D3D11 game output first.** Replace the opt-in 256x144 inset-only endpoint with a guarded real-game D3D9 Draw/DrawIndexed -> D3D11 resource/shader/RT -> native full-frame output/presentation path. Connect menu -> vehicle selection -> sustained race in one integrated feature-sized source batch. An inset/WARP probe, one enum/format, a new guard or a passed CI alone is never "DX11 conversion completed."
+2. **P1: Close ONLY confirmed blockers of the full-frame pipeline.** Bind real programmable VS/PS, constants, buffers/textures, alpha/depth/blend and Reset/lifetime needed by live Draw/Present. Handle inherited R175 shader parity as a blocking dependency when relevant; honor owner handoff. No speculative standalone R-series probes, speculative micro-optimizations or redundant research ahead of P0.
+3. **P2: Connect native L/R eye targets to OpenXR, then preserve gamepad, HUD/marker/flare/shadow/camera and performance.** Real Quest3/VDXR parity and 72Hz frame pacing are acceptance checks, never inferred from source/CI success.
+4. Existing unfinished TASK_ID/FEATURE_ID retains ownership across commits, CI repairs, retries and chat rollover. Prioritize meaningful C++/HLSL/host source diffs rather than check-only, planning-only or bookkeeping-only runs. Do not create new scored IDs for individual state variants/tests.
+
+## Faster validation cadence without false success
+- **C2 implementation first:** review only confirmed source blockers. During a cohesive source batch use narrow compile/static/unit checks **when necessary**; do not launch the expensive full Windows/OpenXR/HUD matrix after every micro-edit or repeat an unchanged review/CI SHA.
+- **One final exact-SHA integration gate per cohesive feature:** retain all mandatory DX11 Fast, Backend, Win32 Build, OpenXR and HUD checks with positive/negative fallback tests. Failed Gates require a causal code/test repair under the SAME TASK_ID and one new validation-bearing SHA; never skip required CI, weaken guards, or label partial results complete.
+- Keep C0-C6 as compact durable checkpoints, not separate source-development deliverables. Lightweight five-minute persistence may continue without triggering heavy validation or interrupting C2. Package only a user-testable candidate; no forced HMD run after every code change.
+- **Safe promotion:** `NativeDrawPathActive=false`/opt-in until actual full-game output and hardware parity are demonstrated; existing D3D9/DX9Ex Draw/Present/input must remain valid fallback. `RUNTIME_VALIDATION=UNTESTED` until a matching real game/Quest3 run is documented. DX9Ex C isolated, DXVK B frozen, DX12 excluded.
+- **Source-only policy edits do not deploy an external Docker controller.** Any controller selecting future tasks must apply this ordering/cadence explicitly. Never claim deployment without proof.
+
 # 2026-10-13 USER OVERRIDE — FEATURE-SIZED AUTONOMOUS DELIVERY (ACTIVE)
 
 New DX11 production TASK_IDs from 00672 onward are **functional feature units**, not per-texture-format, per-render-state, per-helper, per-guard, or per-test microtasks. A feature is an independently meaningful integrated renderer capability with a finite end-to-end acceptance contract, its safe fallback, regression evidence, and final exact-SHA GitHub build gates. Group related formats/state permutations and their source + HLSL + Draw/DrawIndexed binding + positive/negative tests into one feature; do not allocate one new scored task for each enum/format/failure. DX11 Native A remains active, DX9Ex C independent, DXVK B frozen.

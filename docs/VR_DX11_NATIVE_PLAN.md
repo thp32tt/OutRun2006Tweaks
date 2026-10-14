@@ -4,6 +4,23 @@ Baseline: `vr-r70-structure-squash` at `b6c208bbc9a411b9c035be26f9e1e9c014028738
 
 Development branch: `vr-dx11-native-r71`
 
+## 2026-10-14 16:45 KST — FULL-RESOLUTION GAME DX11 FIRST (LATEST OVERRIDE)
+
+**Current implementation is opt-in 256x144 diagnostic DX11 inset, NOT game renderer replacement.** This is the top priority until the full game display is actually produced by D3D11. Earlier R71-R79 lists and 2026-10-10 diagnostic/WARP priorities are history, not dispatch order.
+
+**Source-first delivery order:**
+1. Write actual C++/HLSL/host changes joining intercepted D3D9 game Draw/DrawIndexed to native D3D11 shaders/resources, a full game-sized owned RT and visible Present; target menu -> car selection -> active race without using the inset as final output.
+2. Resolve only blocking shader, texel, IA/OM, depth, alpha, mutable buffers, graphics lifecycle/Reset and R175 correctness in that source path. R175 owner fences remain binding.
+3. Connect L/R native eye targets and OpenXR fence/ACK/source generation; preserve original gamepad, HUD/world semantic ownership and DX9Ex return path.
+4. Once visible game output is established, do GPU memory/copy/frame-timing optimizations and Quest3/VDXR stereo, UI and HUD parity validation.
+
+**Cut repeat validation overhead:** code batch before extensive review; targeted checks during implementation only as needed; required DX11 Fast + Backend + Windows Build + OpenXR + HUD exact-SHA checks once at final integrated material SHA (and after causal fixes). No repeated unchanged CI, no separate score for repairs or C6, no shortening final safety Gates. Compact GitHub checkpoints do not replace source delivery.
+
+Acceptance is **three separate states**: FULL_FRAME_CODE_COMPLETE (native full-size frame and fallback code integrated, mandatory CI passed); FRAME_OBSERVED (real game screenshot/telemetry of full native menu/car/race output); QUEST3_PLAYABLE (verified L/R 3D, HUD, car/rank marker, reset, input, sustained race and frame-time on matching build). No code-only PASS is runtime evidence and production default remains fail-closed until tested.
+
+Explicit source and dispatch policy: `AGENTS.md` and `docs/automation/DX11_AUTODEV_EXECUTION_POLICY.json`. External Docker controller adoption is not established by this repository edit.
+
+
 ## 2026-10-10 20:39 KST — user-mandated gameplay-first correction (DX11 00537+)
 
 This section supersedes earlier R71-R239 dormant WARP vertical-slice priorities. The next deliverable is a **real OutRun 2006 game-generated frame drawn with native D3D11**, not another isolated test triangle. WARP smoke fixtures and readiness guards support but do not complete this milestone.

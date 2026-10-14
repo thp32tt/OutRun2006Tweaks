@@ -33,6 +33,16 @@ def validate_policy(policy: dict) -> list[str]:
         errors.append("missing end-to-end native Draw or known R175 dependency")
     if "first_live_game_draw" not in ids:
         errors.append("missing actual game Draw milestone")
+    if "full_resolution_native_game_frame" not in ids:
+        errors.append("2026-10-14 override requires full-resolution game output milestone")
+    override = policy.get("user_override_20261014") or {}
+    if (override.get("status") != "ACTIVE" or
+        override.get("immediate_delivery") != "FULL_RESOLUTION_GAME_FRAME" or
+        not override.get("no_inset_only_completion") or
+        not override.get("source_first_validation")):
+        errors.append("missing active DX11 source-first full-frame user override")
+    if "FULL_RESOLUTION_GAME_FRAME" not in policy.get("gameplay_delivery_targets", []):
+        errors.append("missing full-resolution game output delivery target")
     if policy.get("gameplay_direction_effective_from_task_number") != 537:
         errors.append("gameplay-first threshold missing or changed")
     if not policy.get("gameplay_delivery_targets") or "FIRST_GAME_DRAW_FRAME" not in policy["gameplay_delivery_targets"]:
@@ -113,6 +123,7 @@ def validate_task(task: dict, policy: dict) -> list[str]:
             errors.append("blocker/regression/CI work requires measurable evidence")
     if kind == "vertical_slice" and milestone not in {
         "mono_native_draw", "programmable_shader_path", "first_live_game_draw",
+        "full_resolution_native_game_frame",
     }:
         errors.append("vertical slice does not lead toward an actual native draw")
     # From 00537 onwards, a tiny dormant WARP probe is not a feature.
@@ -128,7 +139,7 @@ def validate_task(task: dict, policy: dict) -> list[str]:
                 errors.append("R175 repair must resolve the shader parity blocker")
             if not isinstance(strategy.get("r175_owner_handoff_evidence"), str) or not strategy["r175_owner_handoff_evidence"].strip():
                 errors.append("R175 owner must be released or handed off explicitly before edits")
-        elif delivery in {"FIRST_GAME_DRAW_FRAME", "MENU_TO_RACE_NATIVE_FRAME", "NATIVE_STEREO_EYE_OUTPUT"}:
+        elif delivery in {"FIRST_GAME_DRAW_FRAME", "FULL_RESOLUTION_GAME_FRAME", "MENU_TO_RACE_NATIVE_FRAME", "NATIVE_STEREO_EYE_OUTPUT"}:
             stages = strategy.get("live_game_draw_path")
             expected = ["LIVE_D3D9_CALLSITE", "D3D11_NATIVE_DRAW", "VISIBLE_FRAME_OUTPUT"]
             if not isinstance(stages, list) or any(stage not in stages for stage in expected) or [stages.index(stage) for stage in expected] != sorted(stages.index(stage) for stage in expected):
