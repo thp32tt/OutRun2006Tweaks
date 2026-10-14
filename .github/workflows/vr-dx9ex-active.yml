@@ -90,6 +90,7 @@ on:
       - 'tools/verify_vr_r32_lazy_source_snapshot.py'
       - 'tools/verify_vr_r30_support_api_seam.py'
       - 'tools/verify_vr_r30_eye_affine_fastpath.py'
+      - 'tools/verify_vr_r30_positiont_decl.py'
       - 'tools/verify_vr_r30_projection_signature_fastpath.py'
       - 'tools/verify_vr_r30_rhw_perspective_fastpath.py'
       - 'tools/verify_vr_r30_world_seed_fastpath.py'
@@ -225,6 +226,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex exact-HEAD feature record missing or invalid' }
           python tools/verify_vr_hud_edge_transition.py
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex HUD edge contract failed' }
+          python tools/verify_vr_r30_positiont_decl.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex R30 POSITIONT input regression failed' }
       - name: Reject broken shipped PowerShell helpers and false HUD reports
         shell: pwsh
         run: |

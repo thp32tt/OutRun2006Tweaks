@@ -1,0 +1,83 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00851",
+  "production_id": "CONVERSION-DX9EX-00851",
+  "event_id": "CONVERSION-DX9EX-00851-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00851",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:R30:POSITIONT_STEREO",
+  "feature_class": "CRITICAL_BLOCKER",
+  "feature_contract": {
+    "feature_id": "DX9EX:R30:POSITIONT_STEREO",
+    "goal": "Restore full fixed-function transformed POSITIONT stereo eligibility for declaration-backed UP and VB primitives without changing legacy FVF or unrecognized vertex declarations.",
+    "scope_boundary": "Only D3D9 R30 XYZRHW input declaration admission. Preserve renderer, eye state, HUD, SkyGlow, DX11, frozen DXVK and all existing safe fallback behavior.",
+    "special_work_evidence": "R30 creates VB/IB CPU shadows for FVF-zero layouts but R30PrepareXyzrhwState rejected FVF-zero unconditionally; valid declaration-only POSITIONT never reached its CPU two-eye replay.",
+    "trace_stages": [
+      "Original D3D9 fixed-function draw can bind a POSITIONT vertex declaration whose GetFVF is zero.",
+      "R33 delegates transformed XYZRHW UP/VB draws to R30PrepareXyzrhwState, where the old FVF-only check rejects the entire declaration class.",
+      "Strict byte-zero stream-zero FLOAT4 POSITIONT validation opens the existing bilateral transform while unknown vertex declarations retain original conservative fallback."
+    ],
+    "subcomponents": [
+      "Allow exact declaration-backed transformed UP and indexed UP draw data into existing R30 stereo.",
+      "Allow exact declaration-backed VB/IB drawing via existing revision-fenced CPU shadows.",
+      "Reject unsupported streams/types/offsets/malformed termination and release COM declaration in all cases."
+    ],
+    "acceptance_items": [
+      {
+        "id": "up_path",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Transformed UP primitives",
+        "expected_behavior": "Valid declaration-only POSITIONT reaches existing atomic left/right R30 per-eye UP transport."
+      },
+      {
+        "id": "buffer_path",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Bound vertex and index buffers",
+        "expected_behavior": "Valid declaration-backed transformed VB/IB uses original shadow buffer and stereo eye transform."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Unknown declaration and legacy FVF",
+        "expected_behavior": "Legacy FVF is bitwise unchanged; unknown FVF, declaration stream/offset/type/method and missing terminator fail closed."
+      },
+      {
+        "id": "ci_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Exact SHA Windows/host/package",
+        "expected_behavior": "Mutation guard plus DX9Ex Active Win32 game/host/package, Domain, affected impact and HUD inspectors pass at one exact result SHA."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "R30EnsureVertexShadow accepted zero-FVF buffers, while R30PrepareXyzrhwState rejected all GetFVF=0; this is a static reproducible route gap.",
+    "source_trace": [
+      "Original fixed-function POSITIONT declaration is equivalent to transformed XYZRHW float4 at byte zero.",
+      "R30PrepareXyzrhwState is common entry for R30 stereo UP/VB.",
+      "Existing R30 CPU transform supports float4 XYZRHW independently of FVF metadata."
+    ],
+    "root_cause": "Input layout gate assumes all transformed fixed-function D3D9 vertices are representable as FVF.",
+    "alternatives_rejected": [
+      "Unconditionally enabling FVF=0 is unsafe: unrelated declarations cannot be interpreted as XYZRHW."
+    ],
+    "fix_evidence": "Strict GetVertexDeclaration/GetDeclaration validation, ref-balanced release and old nonzero FVF path preserved.",
+    "negative_test_evidence": "Source integration with 11 portable fail-closed model cases and 7 negative source mutations.",
+    "eye_ownership": "No change to draw ownership or eye transforms; shared gate runs before any left/right physical replay."
+  },
+  "status": "IMPLEMENTED_VALIDATION_PENDING",
+  "phase": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "No actual Quest3/VDXR/game testing and no evidence yet that this original game exercises the declaration-only path.",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_positiont_decl.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00851.json"
+  ],
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "score_once": false
+}

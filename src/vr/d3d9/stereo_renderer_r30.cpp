@@ -2579,6 +2579,56 @@ namespace OutRunVRStereo
             R30XyzrhwWorldGeometry = {};
         }
 
+        // GetFVF is zero for valid declaration-only fixed-function layouts.
+        // Accept only an exact float4 POSITIONT header at byte zero: all
+        // stereo decoders read the first four floats as X/Y/Z/RHW.
+        // Unknown streams, offsets and overlapping attributes fail closed.
+        bool R30HasXyzrhwInputLayout(IDirect3DDevice9* device) noexcept
+        {
+            DWORD fvf = 0;
+            if (!device || FAILED(device->GetFVF(&fvf)))
+                return false;
+            if (fvf != 0)
+                return (fvf & D3DFVF_POSITION_MASK) == D3DFVF_XYZRHW;
+
+            IDirect3DVertexDeclaration9* declaration = nullptr;
+            if (FAILED(device->GetVertexDeclaration(&declaration)) ||
+                !declaration)
+            {
+                if (declaration)
+                    declaration->Release();
+                return false;
+            }
+            D3DVERTEXELEMENT9 elements[MAXD3DDECLLENGTH]{};
+            UINT count = MAXD3DDECLLENGTH;
+            const HRESULT hr = declaration->GetDeclaration(elements, &count);
+            declaration->Release();
+            if (FAILED(hr) || count < 2u || count > MAXD3DDECLLENGTH)
+                return false;
+
+            bool positionT = false;
+            for (UINT i = 0; i < count; ++i)
+            {
+                const auto& e = elements[i];
+                if (e.Stream == 0xFFu && e.Type == D3DDECLTYPE_UNUSED)
+                    return i + 1u == count && positionT;
+                if (e.Stream != 0u || e.Method != D3DDECLMETHOD_DEFAULT)
+                    return false;
+                if (e.Usage == D3DDECLUSAGE_POSITIONT)
+                {
+                    if (positionT || i != 0u || e.Offset != 0u ||
+                        e.Type != D3DDECLTYPE_FLOAT4 ||
+                        e.UsageIndex != 0u)
+                        return false;
+                    positionT = true;
+                }
+                else if (e.Offset < 4u * sizeof(float) ||
+                         e.Usage == D3DDECLUSAGE_POSITION)
+                    return false;
+            }
+            return false;
+        }
+
         bool R30PrepareXyzrhwState(
             IDirect3DDevice9* device, R30XyzrhwState& state) noexcept
         {
@@ -2605,9 +2655,7 @@ namespace OutRunVRStereo
                 }
             }
 
-            DWORD fvf = 0;
-            if (FAILED(device->GetFVF(&fvf)) ||
-                (fvf & D3DFVF_POSITION_MASK) != D3DFVF_XYZRHW)
+            if (!R30HasXyzrhwInputLayout(device))
                 return false;
 
             if (!R29OwnerEnsureStereoResources(device) ||
