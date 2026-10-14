@@ -34,6 +34,10 @@ void observe_failed_game_draw(IDirect3DDevice9* gameDevice) noexcept;
 // a frame into incompatible surfaces. Discard the diagnostic batch; keep the
 // original D3D9 Clear, Draw, Present and gamepad dispatch untouched.
 void observe_scene_boundary(IDirect3DDevice9* gameDevice) noexcept;
+// Preserve a complete live native game color batch across a verified depth-only
+// Clear; return false to use unchanged D3D9 scene-boundary fallback.
+bool observe_game_depth_clear(IDirect3DDevice9* gameDevice, DWORD count,
+                              const D3DRECT* rects, DWORD flags, float z) noexcept;
 // Called only after a successful original game Clear; preserve its full-RT
 // background color for a same-device/backbuffer native Draw/DrawIndexed.
 void observe_game_clear(IDirect3DDevice9* gameDevice, DWORD count,

@@ -4398,12 +4398,12 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         ctx->OMSetRenderTargets(1, &rtv, s.diagnosticDepthView.Get());
         // Independent diagnostic depth cannot reuse earlier D3D9 history.
         // Reversed ordering needs a zero baseline to show positive fragments.
-        const float diagnosticDepthClear =
-            output.nativeDepthOrderingMode != 0u ? 0.0f : 1.0f;
-        // Clear native Z once, when the first DEPTH draw is submitted.
-        if (s.frameBatch.clear_depth())
-            ctx->ClearDepthStencilView(s.diagnosticDepthView.Get(),
-                                       D3D11_CLEAR_DEPTH, diagnosticDepthClear, 0);
+        // Mirror first game Z and later verified Z-only Clears before next depth Draw.
+        if (s.frameBatch.clear_depth()) {
+            ctx->ClearDepthStencilView(s.diagnosticDepthView.Get(), D3D11_CLEAR_DEPTH,
+                s.frameBatch.depth_clear_value(output.nativeDepthOrderingMode != 0u), 0);
+            s.frameBatch.consume_depth_clear();
+        }
         if (output.nativeDepthAlways)
             ctx->OMSetDepthStencilState(
                 s.diagnosticDepthAlwaysStates[output.nativeDepthWrite ? 1u : 0u].Get(), 0);
@@ -4803,6 +4803,50 @@ void observe_scene_boundary(IDirect3DDevice9* game) noexcept {
         s.pending = false;
     } catch (...) {
         // Optional diagnostic code cannot interfere with D3D9 game/input.
+    }
+}
+
+bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
+                              const D3DRECT* rects, DWORD flags, float z) noexcept {
+    if (!diagnostic_enabled() || !env_full_game_opt_in() || !game ||
+        (flags & D3DCLEAR_ZBUFFER) == 0u ||
+        (flags & (D3DCLEAR_TARGET | D3DCLEAR_STENCIL)) != 0u ||
+        !(z >= 0.0f && z <= 1.0f)) return false;
+    try {
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        const auto owner = reinterpret_cast<std::uintptr_t>(game);
+        if (s.sourceGameDevice != owner || !s.pending ||
+            s.frameBatch.submitted == 0u || s.frameBatch.stopped) return false;
+        ComPtr<IDirect3DSurface9> target, backbuffer, depth;
+        D3DSURFACE_DESC rtDesc{}, bbDesc{}, dsDesc{};
+        D3DVIEWPORT9 vp{};
+        if (FAILED(game->GetRenderTarget(0, target.GetAddressOf())) || !target ||
+            FAILED(game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,
+                                      backbuffer.GetAddressOf())) || !backbuffer ||
+            FAILED(game->GetDepthStencilSurface(depth.GetAddressOf())) || !depth ||
+            FAILED(target->GetDesc(&rtDesc)) ||
+            FAILED(backbuffer->GetDesc(&bbDesc)) ||
+            FAILED(depth->GetDesc(&dsDesc)) ||
+            FAILED(game->GetViewport(&vp))) return false;
+        ComPtr<IUnknown> targetIdentity, backbufferIdentity;
+        if (FAILED(target.As(&targetIdentity)) ||
+            FAILED(backbuffer.As(&backbufferIdentity)) ||
+            !targetIdentity || !backbufferIdentity ||
+            targetIdentity.Get() != backbufferIdentity.Get() ||
+            rtDesc.Width != bbDesc.Width || rtDesc.Height != bbDesc.Height ||
+            dsDesc.Width != bbDesc.Width || dsDesc.Height != bbDesc.Height ||
+            bbDesc.MultiSampleType != D3DMULTISAMPLE_NONE ||
+            dsDesc.MultiSampleType != D3DMULTISAMPLE_NONE ||
+            !GameNativeClearCoverage::covers_whole(
+                bbDesc.Width, bbDesc.Height, vp.X, vp.Y, vp.Width, vp.Height,
+                count, rects)) return false;
+        // Next real native depth Draw clears DSV to the original D3D9 Z;
+        // preceding same-frame native RTV game/menu pixels remain intact.
+        s.frameBatch.note_full_depth_clear(z);
+        return true;
+    } catch (...) {
+        return false; // Never change original game Draw/Present/gamepad.
     }
 }
 

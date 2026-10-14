@@ -42,6 +42,19 @@ struct GameNativeFrameBatch {
     std::uint32_t submitted = 0u;
     bool stopped = false;
     bool depthReady = false;
+    // Full game Z-only Clear replaces DSV content without discarding RTV color.
+    bool depthClearPending = false;
+    float depthClearValue = 1.0f;
+    constexpr void note_full_depth_clear(float z) noexcept {
+        depthClearPending = true;
+        depthClearValue = z;
+        depthReady = false;
+        depthDirection = 0u;
+    }
+    [[nodiscard]] constexpr float depth_clear_value(bool reversed) const noexcept {
+        return depthClearPending ? depthClearValue : (reversed ? 0.0f : 1.0f);
+    }
+    constexpr void consume_depth_clear() noexcept { depthClearPending = false; }
     // Raw observed game call indices, NOT only the admitted FVF candidates.
     // Unsupported/interleaved D3D9 draws cannot be spliced into a native scene.
     std::uint64_t lastSourceDraw = 0u;
@@ -99,10 +112,12 @@ struct GameNativeFrameBatch {
     // invalid if its pixels were subsequently cleared before Present.
     constexpr void scene_boundary() noexcept {
         if (submitted != 0u) stopped = true;
+        depthClearPending = false;
     }
-    constexpr void abort() noexcept { stopped = true; }
+    constexpr void abort() noexcept { stopped = true; depthClearPending = false; }
     constexpr void reset() noexcept {
         submitted = 0u; stopped = false; depthReady = false;
+        depthClearPending = false; depthClearValue = 1.0f;
         depthDirection = 0u;
         lastSourceDraw = 0u; hasSourceDraw = false;
     }
