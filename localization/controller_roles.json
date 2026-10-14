@@ -51,14 +51,14 @@
       "new_dds_production_enabled": false
     },
     "C": {
-      "mode": "manual_offline_no_imagegen",
+      "mode": "scheduled_offline_after_manual_deploy_no_imagegen",
       "purpose": "salvage_existing_A_B_PNG_lettering_PSD_first_clean_plate_native_composite_test_DDS",
       "browser_tab_required": false,
       "independent_qa_owner": "C1",
       "image_generation_enabled": false,
       "paid_api_fallback": false,
       "new_dds_production_enabled": true,
-      "output_scope": "isolated_C_DDS_TEST_ONLY_not_official_promoted",
+      "output_scope": "separate_C_volume_PROPOSALS_C_DDS_TEST_ONLY_not_official_promoted",
       "upstream_read_only": [
         "A",
         "B"
@@ -75,10 +75,28 @@
         "C3_if_required",
         "user_ingame"
       ],
-      "schedule": "MANUAL_ONLY",
+      "schedule": "30_MINUTE_POLL_AFTER_MANUAL_PORTAINER_DEPLOY",
       "data_source": "GitHub/local_staged_files_only; no live Portainer volume mutation",
-      "runtime_status": "DESIGN_ONLY_NOT_DEPLOYED",
-      "runtime_validation": "UNTESTED"
+      "runtime_status": "GITHUB_CODE_STAGED_NOT_DEPLOYED",
+      "runtime_validation": "UNTESTED",
+      "worker": "tools/localization/c_salvage_worker.py",
+      "dockerfile": "docker/localization-production/Dockerfile.c-salvage",
+      "manual_portainer_compose_override": "docker/localization-production/portainer-git-c-salvage.override.yml",
+      "input_scope": "read_only_existing_ab_generated_pngs",
+      "offline_auto_work": {
+        "enabled_only_after_manual_deploy": true,
+        "interval_seconds": 1800,
+        "max_new_images_per_cycle": 10,
+        "psd_catalog": "localization/graphics/plate_library/PSD_UPSTREAM_FULL_INDEX.json",
+        "transparent_letter_proposal": true,
+        "opaque_requires_manual_text_mask": true,
+        "compose_only_with_reviewed_sha_pinned_recipe": true,
+        "reviewed_bundle_directory": "/data/c-salvage/bundles",
+        "psd_missing_fallback": "canonical_HD_DDS_exact_mask_or_HOLD",
+        "idempotent_image_sha": true,
+        "reserved_QA_role": "C1",
+        "native_imagegen_calls": 0
+      }
     }
   },
   "legacy_C2": {
@@ -143,5 +161,5 @@
     "automatic_pipeline_status": "E2E_UNVERIFIED"
   },
   "policy_review_record": "localization/policy_reviews/OUTRUN-HD-IMAGEGEN-POLICY-MANUAL-20261012-1333.json",
-  "policy_review_record_C": "docs/OUTRUN_C_SALVAGE_SLOT_20261015.md"
+  "policy_review_record_C": "docs/OUTRUN_C_SALVAGE_AUTOMATION_MANUAL_DEPLOY_20261015.md"
 }
