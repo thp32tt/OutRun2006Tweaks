@@ -2,8 +2,8 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00837",
   "production_id": "CONVERSION-DX9EX-00837",
-  "event_id": "CONVERSION-DX9EX-00837-E002",
-  "event_type": "validated_result",
+  "event_id": "CONVERSION-DX9EX-00837-E003",
+  "event_type": "c6_result_only",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "attempt": "1/3",
@@ -11,7 +11,7 @@
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "work_key": "DX9EX:VIS:MAIN_MENU",
-  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "phase": "C6_RESULT",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -73,9 +73,9 @@
     "negative_test_evidence": "Expanded portable menu-content-aspect smoke covers full/left/right/top/corner and stale/nonfinite/no-intersection UV; exact-SHA DX9Ex Active host smoke and full Win32 game/host/package all SUCCESS at material SHA.",
     "eye_ownership": "R23 mono fallback is XR_EYE_VISIBILITY_BOTH from one original client fragment and unchanged LOCAL theaterAnchor. The regular two-eye LOCAL menu, SBS and world stereo are not touched."
   },
-  "remaining": "All mandatory automated source/package gates PASS on validation-bearing material SHA; Quest3/VDXR mono recovery/menu visual, FPS and headset recenter acceptance remain NEED_HMD_TEST. No runtime PASS claimed.",
+  "remaining": "C6 COMPLETE_BUILD_VERIFIED for the user-specified exact validation SHA 84bc9d62. Automated gates 5/5 + Domain + HUD 2/2 + Full Source Impact 3/3 SUCCESS; Quest3/VDXR mono theater/menu visual quality, recenter and FPS still RUNTIME_VALIDATION=UNTESTED.",
   "material_result_sha": "b30060d97e57bfbc75416c4b4693d3ad44e05059",
-  "validation_bearing_result_sha": "b30060d97e57bfbc75416c4b4693d3ad44e05059",
+  "validation_bearing_result_sha": "84bc9d6217c09652b265c3ac448536afa8bfa20c",
   "acceptance_results": {
     "THEATER_ORIGINAL_FRAGMENT": "PASS_EXACT_SHA",
     "THEATER_NEGATIVE_RESET_SBS": "PASS_EXACT_SHA",
@@ -83,9 +83,9 @@
   },
   "ci_evidence": {
     "material_result_sha": "b30060d97e57bfbc75416c4b4693d3ad44e05059",
-    "validation_bearing_result_sha": "b30060d97e57bfbc75416c4b4693d3ad44e05059",
+    "validation_bearing_result_sha": "84bc9d6217c09652b265c3ac448536afa8bfa20c",
     "dx9ex_active": {
-      "run_id": 38549389947,
+      "run_id": 38550505853,
       "conclusion": "SUCCESS",
       "success_jobs": 5,
       "total_jobs": 5,
@@ -98,29 +98,33 @@
       ]
     },
     "domain_isolation": {
-      "run_id": 38549389807,
+      "run_id": 38550506067,
       "conclusion": "SUCCESS"
     },
     "hud_inspector": {
-      "run_id": 38549389977,
+      "run_id": 38550505963,
       "conclusion": "SUCCESS",
+      "success_jobs": 2,
+      "total_jobs": 2,
       "jobs": [
-        "build-hud-inspector",
-        "static-exe-analysis"
+        "static-exe-analysis",
+        "build-hud-inspector"
       ]
     },
     "full_source_impact": {
-      "run_id": 38549389834,
+      "run_id": 38550505868,
       "conclusion": "SUCCESS",
       "success_jobs": 3,
       "total_jobs": 3,
       "jobs": [
         "msvc-analyze-openxr-host",
-        "msvc-analyze-active-game",
-        "source-cross-domain"
+        "source-cross-domain",
+        "msvc-analyze-active-game"
       ]
     },
     "runtime_validation": "UNTESTED"
   },
-  "checkpoint": "C6_BOOKKEEPING_SEPARATE_FROM_MATERIAL_VALIDATION_BEARING_SHA"
+  "checkpoint": "C6_STATE",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_score_delta": 0
 }
