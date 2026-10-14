@@ -112,6 +112,7 @@ on:
       - 'tools/verify_vr_r30_index_rebase_fastpath.py'
       - 'tools/verify_vr_r30_shadow_incremental_copy.py'
       - 'tools/verify_vr_r30_buffer_hook_install_fastpath.py'
+      - 'tools/verify_vr_r30_telemetry_counter_optout.py'
       - 'tools/verify_vr_r30_skyglow_fastpath.py'
       - 'tools/verify_vr_r32_runtime_support_seam.py'
       - 'tools/verify_vr_r31_support_api_seam.py'
@@ -310,6 +311,7 @@ jobs:
             'tools/verify_vr_r30_index_rebase_fastpath.py',
             'tools/verify_vr_r30_shadow_incremental_copy.py',
             'tools/verify_vr_r30_buffer_hook_install_fastpath.py',
+            'tools/verify_vr_r30_telemetry_counter_optout.py',
             'tools/verify_vr_r30_skyglow_fastpath.py',
             'tools/verify_vr_r32_runtime_support_seam.py',
             'tools/verify_vr_r31_support_api_seam.py',
