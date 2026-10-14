@@ -38,13 +38,21 @@ def connected(bridge=BRIDGE, batch=BATCH, api=API, hooks=HOOKS, wf=WF):
     return ("python tools/test_dx11_source_reset_00741.py" in wf and
             "tools/dx11_source_reset_probe_00741.cpp" in wf)
 
+def in_reset(source: str, original: str, replacement: str) -> str:
+    # Several earlier source-owner checks use the same Present expression.
+    # Change the Reset body itself or this negative case would be a false PASS.
+    start = source.index("void before_game_reset(IDirect3DDevice9* game) noexcept {")
+    assert original in source[start:], "Reset mutation target missing"
+    return source[:start] + source[start:].replace(original, replacement, 1)
+
 assert connected(), "game device->Reset ownership->native scene fallback disconnected"
 # Mutations: each change must fail, so the probe rejects a bookkeeping-only edit.
 mutants = [
     dict(bridge=BRIDGE.replace("if (!GameNativeFrameBatch::reset_belongs_to_game_source(",
                                "if (GameNativeFrameBatch::reset_belongs_to_game_source(", 1)),
-    dict(bridge=BRIDGE.replace("s.previousOutput.valid() ? s.previousOutput.device : 0u",
-                               "0u", 1)),
+    dict(bridge=in_reset(BRIDGE,
+                         "s.previousOutput.valid() ? s.previousOutput.device : 0u",
+                         "0u")),
     dict(batch=BATCH.replace("sourceOwner != 0u ? resettingDevice == sourceOwner",
                              "sourceOwner != 0u ? resettingDevice != sourceOwner", 1)),
     dict(batch=BATCH.replace("resettingDevice == lastPresentOwner",
