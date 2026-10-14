@@ -13,6 +13,21 @@ namespace OutRunVrPauseEye
         bool valid = false;
     };
 
+    // The legacy 1.0 setting corresponded to a 1.25 optical floor, making
+    // 0.55..1.24 completely unresponsive in portrait XR mode. Preserve that
+    // readable default while granting the full slider a monotone mapping.
+    // Nonresponsive desktop/legacy configurations retain the exact request.
+    inline float ResponsiveUserScale(float requested, bool responsive) noexcept
+    {
+        if (!responsive || !std::isfinite(requested) || requested <= 0.0f)
+            return requested;
+        const float bounded = requested < 0.55f ? 0.55f :
+            (requested > 1.50f ? 1.50f : requested);
+        return bounded <= 1.0f
+            ? 0.55f + (bounded - 0.55f) * (0.70f / 0.45f)
+            : 1.25f + (bounded - 1.0f) * 0.50f;
+    }
+
     // The original pause shell occupies only a narrow central portion of
     // the widescreen source. A portrait XR eye needs a larger optical scale
     // after aspect-preserving containment; otherwise the menu remains tiny
@@ -34,7 +49,15 @@ namespace OutRunVrPauseEye
         const float boosted = menuScale * std::sqrt(boundedAspect);
         if (!std::isfinite(boosted))
             return menuScale;
-        return boosted < 2.25f ? boosted : 2.25f;
+        // Smoothly reserve the last 0.30x of the safe optical budget.
+        // A hard clamp made the larger slider positions indistinguishable;
+        // the rational shoulder remains strictly increasing below 2.25x.
+        constexpr float shoulder = 1.95f;
+        constexpr float headroom = 0.30f;
+        if (boosted <= shoulder)
+            return boosted;
+        const float excess = boosted - shoulder;
+        return shoulder + headroom * excess / (headroom + excess);
     }
 
     inline VerticalAffine Compute(

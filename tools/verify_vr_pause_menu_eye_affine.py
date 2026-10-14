@@ -29,9 +29,17 @@ def check(s: str, h: str) -> None:
     assert 'return {};' in h
     assert 'failOne.valid' in tests and 'extreme.valid' in tests
     # Full ESC optical-size ownership is independent of gameplay HUD and F11.
+    assert 'inline float ResponsiveUserScale(' in h
+    assert '0.55f + (bounded - 0.55f) * (0.70f / 0.45f)' in h
+    assert '1.25f + (bounded - 1.0f) * 0.50f' in h
+    assert 'const float readable = OutRunVrPauseEye::ResponsiveUserScale(' in s
+    assert 'requested, Settings::VRHudResponsiveLayout.get());' in s
+    assert 'return shoulder + headroom * excess / (headroom + excess);' in h
+    assert 'const float smallOptical = ResponsiveMenuScale(' in tests
+    assert 'defaultOptical < largeOptical && largeOptical < 2.25f' in tests
     assert 'inline float ResponsiveMenuScale(' in h
     assert 'menuScale * std::sqrt(boundedAspect)' in h
-    assert 'return boosted < 2.25f ? boosted : 2.25f;' in h
+    assert 'constexpr float shoulder = 1.95f;' in h
     assert 'const bool pauseResponsive = R30IsPauseMenuElement() &&' in s
     assert 'if (!std::isfinite(requested) || requested <= 0.0f)' in s
     assert 'std::isfinite(Settings::VRPauseMenuScale.get()) &&' in s
@@ -49,6 +57,10 @@ def check(s: str, h: str) -> None:
 
 check(source, helper)
 for mutant in (
+    source.replace('const float readable = OutRunVrPauseEye::ResponsiveUserScale(',
+                   'const float readable = (std::max)(', 1),
+    source.replace('requested, Settings::VRHudResponsiveLayout.get());',
+                   'requested, 1.25f);', 1),
     source.replace('hudScaleY * pauseVertical.scale[eye] * ndcY',
                    'hudScaleY * ndcY', 1),
     source.replace('rightDst[1] = transformedRightY;',

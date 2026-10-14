@@ -1856,12 +1856,12 @@ namespace OutRunVRStereo
                 // magnify the generic gameplay HUD optical containment.
                 if (!std::isfinite(requested) || requested <= 0.0f)
                     return R30HudScaleValue();
-                // The XR portrait contain map consumes Y scale. The original
-                // 1.0x pause menu still appears tiny; raise its dedicated
-                // size floor only in the reversible Quest3 responsive mode.
+                // The XR portrait contain map consumes Y scale. In
+                // responsive mode retain the legible original 1.0 -> 1.25
+                // effective default without disabling smaller slider values.
                 // External F11, GOAL, world and gameplay HUD remain isolated.
-                const float readable = Settings::VRHudResponsiveLayout.get()
-                    ? (std::max)(requested, 1.25f) : requested;
+                const float readable = OutRunVrPauseEye::ResponsiveUserScale(
+                    requested, Settings::VRHudResponsiveLayout.get());
                 return std::clamp(readable, 0.55f, 1.50f);
             }
             return R30HudScaleValue();
