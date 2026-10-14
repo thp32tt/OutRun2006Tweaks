@@ -6,6 +6,20 @@
 #include <cstring>
 
 namespace outrun::vr::dx11::live_game_frame::native_rt_readback {
+// A mipmapped DEFAULT-pool render target has a distinct GPU surface at each
+// mip level. The readback surface must match that level, never the base level.
+// D3D9's 1x1 terminal mip is valid even for non-square textures.
+[[nodiscard]] constexpr bool matching_mip_extent(
+    std::uint32_t baseWidth, std::uint32_t baseHeight,
+    std::uint32_t level, std::uint32_t levelWidth,
+    std::uint32_t levelHeight) noexcept {
+    if (!baseWidth || !baseHeight || !levelWidth || !levelHeight ||
+        level >= 32u) return false;
+    const auto expectedWidth = baseWidth >> level;
+    const auto expectedHeight = baseHeight >> level;
+    return levelWidth == (expectedWidth ? expectedWidth : 1u) &&
+           levelHeight == (expectedHeight ? expectedHeight : 1u);
+}
 // D3D9 DEFAULT-pool render targets cannot use Texture::LockRect. After
 // GetRenderTargetData snapshots a same-format SYSTEMMEM surface, expand one
 // render-target level to an immutable native DX11 BGRA8 sampleable resource.
