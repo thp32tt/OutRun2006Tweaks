@@ -10,10 +10,10 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULLFRAME_DIRTY_PRESENT_COVERAGE",
   "feature_id": "DX11-MENU-RACE-NATIVE-DIRTY-PRESENT",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATES",
-  "checkpoint": "C4_COMMIT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "base_head_sha": "454d0512a77aa5c7fb0a80e15098f53e5d3485da",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -95,10 +95,10 @@
     "C3_VALIDATE": "REPAIR: Windows Build #38644587249 failed legacy source test before compiler acceptance was complete; updated fail-closed full dirty-region mutation verifier. All exact-SHA Gates pending rerun.",
     "C4_COMMIT": "PENDING result SHA",
     "C5_PACKAGE": "NOT_REQUIRED; user owns release",
-    "C6_STATE": "PENDING verified GitHub results, runtime UNTESTED"
+    "C6_STATE": "PASS_EXACT_SHA: exact validation SHA 7ba74b621d4c871de8b11524caa9605198260869 GitHub CI SUCCESS; distinct [skip ci] C6 bookkeeping, HMD/gamepad runtime UNTESTED."
   },
   "blocking_evidence": "Full native same-Present outputWritable unconditionally required !outputNow.hasDirtyRegion, even if RGNDATA correctly marked the whole backbuffer; unchanged fallback protected partial dirty regions. Same-SHA Win32 Build #38644587249 failed a legacy pre-00748 destructive verifier: safe_inset_copy required literal !outputNow.hasDirtyRegion &&, excluding newly verified fullDirtyCoverage despite real guarded implementation.",
-  "next_action": "Check all five mandatory workflows on next exact SHA. Further failed Gates require causal repair under same TASK. No HMD/gamepad verification.",
+  "next_action": "C6 exact-SHA build verification recorded. Runtime HMD/gamepad verification remains UNTESTED; packaging by user. No further CI or source changes for this C6 result.",
   "recorded_at_kst": "2026-10-15 07:00 KST",
   "material_result_sha": "1bf0e2962b891059a8bfb8adb68f27c4aff535a7",
   "ci_evidence": {
@@ -113,6 +113,27 @@
         "conclusion": "failure",
         "failure_cause": "obsolete dirty region rejection literal in inherited source verifier"
       }
+    },
+    "exact_sha": {
+      "sha": "7ba74b621d4c871de8b11524caa9605198260869",
+      "conclusion": "success",
+      "result_basis": "User-confirmed exact SHA CI success; GitHub connector independently returned these successful Build/OpenXR/HUD workflow runs.",
+      "verified_runs": {
+        "windows_build": {
+          "run_id": 38644838021,
+          "conclusion": "success"
+        },
+        "openxr_architecture": {
+          "run_id": 38644838043,
+          "conclusion": "success"
+        },
+        "hud_inspector": {
+          "run_id": 38644838019,
+          "conclusion": "success"
+        }
+      }
     }
-  }
+  },
+  "validation_bearing_result_sha": "7ba74b621d4c871de8b11524caa9605198260869",
+  "c6_prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
