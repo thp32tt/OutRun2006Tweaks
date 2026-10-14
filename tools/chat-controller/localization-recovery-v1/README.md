@@ -1,17 +1,22 @@
-> **Current Portainer deployment profile (2026-10-13):** A-only source-folder trial.
-> This branch mounts `/home/chatgpt-runner2/work/image-src` at `/data/imagegen`;
-> `AUTO_SEND=true`, `SCHEDULE_MINUTES=0,10,20,30,40,50` (every 10 minutes; five source PNGs per batch), `CHAT_SLOTS=1` (A tab only),
-> and an empty `OUTRUN_A_SINGLE_SMOKE_TASK_ID` allow distinct A task manifests.
-> The historical four-lane schedule documented below is inactive for this Compose.
-> See [A_IMAGE_SRC_MOUNT_20261013.md](A_IMAGE_SRC_MOUNT_20261013.md).
-> Source PNGs are normalized to readable-upright English before ImageGen.
-> Q012 needs a lossless Y flip; readable FLIPY tiles must **not** be flipped again.
-> See [UPRIGHT_SOURCE_ORIENTATION_20261014.md](UPRIGHT_SOURCE_ORIENTATION_20261014.md).
-> Five-image HD tile batches use the official translation table and independent
-> PNG/SHA gates. See [A_HD_TILE_BATCH_10MIN_20261014.md](A_HD_TILE_BATCH_10MIN_20261014.md).
-> A successful ChatGPT upload is **not** five generated images or DDS QA PASS.
-> Rebuild/redeployment is **manual in Portainer**.
-
+> **Next deployment profile (GitHub-only until user manually redeploys Portainer; 2026-10-14):**
+> **A/B image translation slots** with `CHAT_SLOTS=2`. A runs :00/:10/:20/:30/:40/:50
+> on original PNG ordinals **1–500**; B runs :05/:15/:25/:35/:45/:55 on
+> original ordinals **501–986**. Each accepted batch gets its **own new chat**
+> and up to **five attached source images**, requesting the same number of
+> **separate** ImageGen Korean results (no collage).
+>
+> The user-specified ChatGPT Library folder **`outrun_kor` is a mandatory
+> completion gate**. ChatGPT's model text cannot prove the Library folder was
+> actually populated; without independent evidence, the slot **remains HOLD**.
+> The candidate exporter uses `_k.png` suffix on local output only and records
+> original/generated sizes. Original English PNGs, DDS hashes, and orientation
+> transformation remain unchanged. One corrupt PNG source stays quarantined.
+>
+> See **[AB_HD_IMAGEGEN_20261014.md](AB_HD_IMAGEGEN_20261014.md)** for the
+> authoritative current schedule, prompt, safety checks and deployment guidance.
+> A-only material in this README and older documents below is **historical**.
+> The currently running N100 container is **not** changed by a GitHub commit.
+>
 # Localization Recovery Controller v1
 
 Purpose: run the compact 2026-09-28 localization workflow on a fresh ChatGPT account/project without importing later accumulated controller requirements.
@@ -28,7 +33,7 @@ The controller started from the stable historical snapshot. Recovery-specific ch
 
 A/B/C1 production/self-QA, C2 independent QA and subsequent C3 strict checks all follow the GitHub branch canonical `docs/KOREAN_LOCALIZATION_GLYPH_SCALE_POLICY.md`. Translation-dependent whole-sentence width/height/aspect/glyph-count differences are not defects. Smaller legible Korean glyphs and shorter translated phrases PASS size criterion. Each glyph still needs intact strokes/counters/readability at native/75/50, and any 1px original source glyph/effect bbox growth remains FAIL; remaining independent QA, C3 and actual in-game status are not bypassed. The new Git policy takes effect on reading latest contract; use user-rebuilt Docker image only to refresh the bundled short prompts.
 
-## Schedule
+## Historical schedule (not current — consult AB_HD_IMAGEGEN_20261014.md)
 
 - :00 — A production/self-QA
 - :10 / :40 — C1 ChatGPT ImageGen production/self-QA (new even indexes % 4 == 2)
@@ -59,7 +64,7 @@ Side-by-side test ports:
 - noVNC: `http://<N100-IP>:6082/vnc.html`
 - status: `http://<N100-IP>:8788/`
 
-## First deployment rule
+## Historical first deployment rule (not current AB workflow)
 
 1. Create a new ChatGPT Project on the other account.
 2. Do not copy old project instructions or memories.
@@ -76,7 +81,7 @@ Do not add queue engines, Production/Event ID systems, C0-C6 state machines, VR 
 
 The Portainer branch/reference and Compose path at the top remain unchanged.
 
-- Every 30 seconds, inspect each of the four tabs independently for closed/missing tabs, renderer crash, Chromium error screen (two checks), or an unresponsive page (three failed probes). Replace only the affected tab and reopen its saved project/chat URL. Never auto-send a duplicate task.
+- Every 30 seconds, inspect each configured tab independently (A/B after the new Compose deployment) for closed/missing tabs, renderer crash, Chromium error screen (two checks), or an unresponsive page (three failed probes). Replace only the affected tab and reopen its saved project/chat URL. Never auto-send a duplicate task.
 - Every 120 minutes, recycle the **whole Chrome/controller container**. If ChatGPT is responding, defer up to 30 extra minutes; after the maximum deadline a running answer may be interrupted, but its saved URL/slot state is kept. The previous Chrome instance is fully stopped before profile cache maintenance.
 - Delete only disposable Chrome disk/code/GPU/shader caches. Preserve profile Cookies, Network/Cookies, Local Storage, IndexedDB, Login Data, Session Storage, Sessions and Service Worker data. **No automatic logout or profile volume removal.** ChatGPT server-side session expiry may nevertheless require manual login.
 - Existing separate data and log volumes, Portainer VNC/status ports (6082/8788), role schedules, High preference and restart policy are retained.

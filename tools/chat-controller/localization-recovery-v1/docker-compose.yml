@@ -15,22 +15,25 @@ services:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
       AUTO_SEND: "true"
-      # One A tab every 10 minutes (up to five source tiles); B/C1/C2 disabled. A manifest task IDs are once-only.
-      SCHEDULE_MINUTES: "0,10,20,30,40,50"
-      CHAT_SLOTS: "1"
-      OUTRUN_A_SINGLE_SMOKE_TASK_ID: "" # No Q217 pin; batch queue selects 5 assets.
-      OUTRUN_A_TILE_BATCH_QUEUE: "true"
-      OUTRUN_A_TILE_BATCH_SIZE: "5"
+      # Staggered two-tab HD ImageGen: A at :00/:10/... and B at :05/:15/...
+      SCHEDULE_MINUTES: "0,5,10,15,20,25,30,35,40,45,50,55"
+      CHAT_SLOTS: "2"
+      OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
+      OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
+      OUTRUN_AB_BATCH_QUEUE: "true"
+      OUTRUN_AB_BATCH_SIZE: "5"
+      OUTRUN_AB_LIBRARY_FOLDER: "outrun_kor"
+      OUTRUN_AB_PROJECT_NAME: "아웃런 한글화 신규"
       OUTRUN_A_PROJECT_NAME: "아웃런 한글화 신규"
       CHAT_DAY_ROLLOVER_HOUR: "2"
       CHATGPT_BASE_URL: "https://chatgpt.com/"
       CHATGPT_PROJECT_URL: "${LOCALIZATION_PROJECT_URL:-}"
-      # Standalone A test: keep the existing A chat; project URL is optional.
+      # Project name is required and verified per fresh A/B chat; optional direct URL.
       REQUIRE_PROJECT_URL: "false"
       PREFERRED_THINKING_LEVEL: "High"
       STRICT_THINKING_LEVEL: "false"
-      FRESH_CHAT_EACH_RUN: "false"
-      CHAT_RECYCLE_RUNS: "0" # Preserve the same chat while awaiting 5 generated results.
+      FRESH_CHAT_EACH_RUN: "true"
+      CHAT_RECYCLE_RUNS: "0" # Fresh chat at each accepted new A/B launch; hold if previous unverified.
       RETRY_BUTTON_COOLDOWN_SECONDS: "60"
       VNC_PASSWORD: "${VNC_PASSWORD:-change-me}"
       STATUS_PORT: "8787"
@@ -60,7 +63,7 @@ services:
       - "8788:8787"
     volumes:
       - outrun_chat_localization_recovery_data:/data
-      # Host stages source PNGs in inputs/A/ and current work in pending_A.json.
+      # Read original 986 tiles from inputs/A/HD_EN_TILES_20261014 for both roles.
       # Overlay ONLY /data/imagegen; browser profile, state and logs stay on named volumes.
       # Docker daemon host path must exist; do not silently create an empty bind directory.
       - type: bind

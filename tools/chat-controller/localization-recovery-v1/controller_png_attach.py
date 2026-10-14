@@ -33,6 +33,12 @@ def load_binding(role, root=ROOT):
     if pilot and role != "A":
         return None, "PILOT_ROLE_BLOCKED"
     root = Path(root).resolve()
+    if os.environ.get("OUTRUN_AB_BATCH_QUEUE", "false").lower() == "true":
+        try:
+            from app.ab_batch_queue import next_binding
+        except ModuleNotFoundError:
+            from ab_batch_queue import next_binding
+        return next_binding(role, root)
     if role == "A" and os.environ.get("OUTRUN_A_TILE_BATCH_QUEUE", "false").lower() == "true":
         from app.tile_batch_queue import prepare_next_binding
         return prepare_next_binding(root)
@@ -240,23 +246,35 @@ async def attach_png(page,binding):
         return "ATTACHMENT_UPLOAD_NOT_VERIFIED"
 
 
-async def verify_submission_receipt(page,task_id,filename):
-    """Require persisted chat URL and exact user-message image count."""
+async def verify_submission_receipt(page, task_id, filename):
+    """Require an actual persisted ChatGPT user turn with N uploaded PNGs.
+
+    Current project UI uses data-markdown-text-tone=user-message and
+    data-chatgpt-search-unit-key, not the old data-message-author-role.
+    Neither a typed prompt nor the composer preview is proof of submission.
+    """
     filenames = filename if isinstance(filename, list) else [filename]
+    count = len(filenames)
     try:
         await page.wait_for_function(
             """({task,count}) => {
-              if(location.hostname!=='chatgpt.com' ||
-                 !location.pathname.includes('/c/') ||
-                 location.href.includes('local-chatgpt'))return false;
-              return [...document.querySelectorAll('[data-message-author-role="user"]')]
-                 .some(row=>(row.innerText||'').includes('UPLOAD_TASK_ID='+task) &&
-                   [...row.querySelectorAll('img')].filter(img=>img.complete &&
-                     img.naturalWidth>0 && !!img.src).length>=count);
-            }""",arg={"task":task_id,"count":len(filenames)},timeout=45000)
+                if(location.hostname!=='chatgpt.com' ||
+                   !location.pathname.includes('/c/') ||
+                   location.href.includes('local-chatgpt'))return false;
+                const target=[...document.querySelectorAll('[data-markdown-text-tone="user-message"]')]
+                    .find(n=>(n.innerText||'').includes('UPLOAD_TASK_ID='+task));
+                const user=target?.closest('[data-chatgpt-search-unit-key]') ||
+                           target?.closest('[data-content-search-unit-key]');
+                if(!user)return false;
+                const thumbs=[...user.querySelectorAll('img[alt="User attachment"]')]
+                    .filter(img=>img.complete && img.naturalWidth>0 && img.naturalHeight>0 &&
+                           !!img.getClientRects().length && !!(img.currentSrc||img.src));
+                return thumbs.length===count;
+            }""", arg={"task":task_id,"count":count}, timeout=45000)
         return "PERSISTED_CHAT_USER_MESSAGE_WITH_IMAGE_CONFIRMED"
     except Exception:
         return "SEND_UNVERIFIED"
+
 
 def mark_sent(binding, root=ROOT, status="CHAT_MESSAGE_SENT_ATTACHMENT_UI_VERIFIED_NOT_IMAGEGEN_PASS"):
     """Prevent re-sending a stale source on later automatic schedules."""

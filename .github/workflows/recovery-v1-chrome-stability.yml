@@ -1,4 +1,4 @@
-name: Recovery v1 Chrome Stability / A source-folder
+name: Recovery v1 Chrome Stability / A+B 5-minute stagger
 
 on:
   push:
@@ -28,19 +28,21 @@ jobs:
         run: python tools/chat-controller/localization-recovery-v1/tests/test_recovery_maintenance.py
       - name: Prove Chrome cookies and session files survive cleaning
         run: bash tools/chat-controller/localization-recovery-v1/tests/test_chrome_cache_clean.sh
-      - name: Check active A-only Compose and exact mount contract
+      - name: Check active A+B Compose and exact mount contract
         run: |
           docker compose -f tools/chat-controller/localization-recovery-v1/docker-compose.yml config --quiet
           python - <<'PY'
           from pathlib import Path
           x=Path('tools/chat-controller/localization-recovery-v1/docker-compose.yml').read_text()
-          assert 'CHAT_SLOTS: "1"' in x
-          assert 'SCHEDULE_MINUTES: "0,10,20,30,40,50"' in x
+          assert 'CHAT_SLOTS: "2"' in x
+          assert 'SCHEDULE_MINUTES: "0,5,10,15,20,25,30,35,40,45,50,55"' in x
           assert 'OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""' in x
           assert 'source: /home/chatgpt-runner2/work/image-src' in x
           assert 'target: /data/imagegen' in x
           assert 'CHROME_RECYCLE_INTERVAL_MINUTES: "120"' in x
           assert 'CHAT_RECYCLE_RUNS: "0"' in x
+          assert 'FRESH_CHAT_EACH_RUN: "true"' in x
+          assert 'OUTRUN_AB_BATCH_QUEUE: "true"' in x
           assert 'AUTO_SEND: "true"' in x
           assert 'REQUIRE_PROJECT_URL: "false"' in x
           assert '6082:6080' in x and '8788:8787' in x
@@ -48,17 +50,17 @@ jobs:
           assert 'outrun_chat_localization_recovery_logs' in x
           src=''.join(p.read_text() for p in sorted(Path('tools/chat-controller/localization-recovery-v1/src').glob('controller.py.part*')))
           assert 'next_production_id' not in src and 'task_events' not in src
-          print("PASS active A-only image-src deployment and original v1 source contract")
+          print("PASS A/B image-src Compose predeployment and original v1 source contract")
           PY
-      - name: Build patched A-only recovery image
+      - name: Build patched A+B recovery image
         run: docker build -t recovery-v1-chrome:test tools/chat-controller/localization-recovery-v1
-      - name: Container startup, A dispatch and retired C2
+      - name: Container startup, A+B slots and retired C1/C2
         shell: bash
         run: |
           set -euo pipefail
           docker run -d --name recovery-v1-smoke \
             -e AUTO_SEND=false -e REQUIRE_PROJECT_URL=false \
-            -e CHAT_SLOTS=1 -e SCHEDULE_MINUTES="0,10,20,30,40,50" \
+            -e CHAT_SLOTS=2 -e SCHEDULE_MINUTES="0,5,10,15,20,25,30,35,40,45,50,55" \
             recovery-v1-chrome:test
           trap 'docker logs recovery-v1-smoke; docker rm -f recovery-v1-smoke >/dev/null 2>&1 || true' EXIT
           ok=0
@@ -77,8 +79,8 @@ jobs:
           match = re.search(r'<h2>Registry</h2><pre>(.*?)</pre>', body, flags=re.S)
           assert match, 'status page missing registry block'
           registry = json.loads(html.unescape(match.group(1)))
-          assert [slot['name'] for slot in registry['slots']] == ['A'], registry['slots']
+          assert [slot['name'] for slot in registry['slots']] == ['A','B'], registry['slots']
           assert registry['next_slot'] == 0
-          print('PASS actual runtime status: A only; B/C1/C2 absent')
+          print('PASS actual runtime status: A/B only, retired C1/C2 absent')
           PY
           docker exec recovery-v1-smoke curl -fsS http://127.0.0.1:9222/json/version

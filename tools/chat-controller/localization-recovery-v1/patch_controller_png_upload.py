@@ -21,23 +21,23 @@ def patch(source):
     source = replace_once(
         source,
         'LOCALIZATION_SLOT_NAMES = ("A", "B", "C1", "C2")',
-        'LOCALIZATION_SLOT_NAMES = ("A",)',
+        'LOCALIZATION_SLOT_NAMES = ("A", "B")',
         "role-tab-list",
     )
     source = replace_once(
         source,
         'if CONTROLLER_MODE == "localization" and CHAT_SLOTS != 4:\n'
         '    raise ValueError("Recovery localization requires CHAT_SLOTS=4 (A/B/C1/C2)")',
-        'if CONTROLLER_MODE == "localization" and CHAT_SLOTS != 1:\n'
-        '    raise ValueError("Recovery A-only mode requires CHAT_SLOTS=1")',
+        'if CONTROLLER_MODE == "localization" and CHAT_SLOTS != 2:\n'
+        '    raise ValueError("Recovery A/B mode requires CHAT_SLOTS=2")',
         "slot-count",
     )
     source = replace_once(
         source,
         'SCHEDULED_LOCALIZATION_LANES = {0: "A", 10: "C1", 20: "C2",\n'
         '                                30: "B", 40: "C1", 50: "C2"}',
-        '''SCHEDULED_LOCALIZATION_LANES = {minute: "A" for minute in range(0, 60, 10)}
-# A-only source-folder testing: manifest selects any valid A task ID.
+        '''SCHEDULED_LOCALIZATION_LANES = {minute: ("A" if minute % 10 == 0 else "B") for minute in range(0, 60, 5)}
+# A/B queues use the original 1..500 and 501..986 ordinals respectively.
 OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SMOKE_TASK_ID", "").strip()''',
         "minute-role-schedule",
     )
@@ -46,7 +46,7 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
         '        unexpected = set(existing) - set(LOCALIZATION_SLOT_NAMES)',
         '''        # Back up all inactive lanes before dropping their live registry slots.
         # Never overwrite a different historical record without operator review.
-        for retired_name in ("B", "C1", "C2"):
+        for retired_name in ("C1", "C2"):
             if retired_name not in existing:
                 continue
             retired = STATE_DIR / ("retired_" + retired_name + "_slot_before_a_only_20261013.json")
@@ -96,45 +96,42 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
         source,
         '    send_result = await send_message(page, prompt)\n'
         '    if send_result != "sent":',
-        '''    # No automatic upload without an explicit destination.
-    if CONTROLLER_MODE == "localization" and slot.name == "A":
-        if not slot.url and not _outrun_smoke_os.environ.get("OUTRUN_A_PROJECT_NAME", "").strip():
-            slot.last_result = "NO_TARGET_CHAT_URL"
+        '''    # OUTRUN_PNG_UPLOAD_V1: strict source-bound A/B ImageGen jobs only.
+    if CONTROLLER_MODE == "localization" and slot.name not in ("A", "B"):
+        return
+    if CONTROLLER_MODE == "localization":
+        project_name = _outrun_smoke_os.environ.get("OUTRUN_AB_PROJECT_NAME", "").strip()
+        if not project_name:
+            slot.last_result = "NO_TARGET_PROJECT"
             save_registry(reg)
             write_runtime(status="target_missing",
-                          last_action="A upload blocked: no saved chat URL or project target")
+                          last_action="A/B upload blocked: no explicit project")
             return
-    # OUTRUN_PNG_UPLOAD_V1: per-role SHA-pinned source manifest, fail closed.
-    if CONTROLLER_MODE == "localization" and slot.name == "A":
-        target_status = await prepare_a_project_target(
-            page, _outrun_smoke_os.environ.get("OUTRUN_A_PROJECT_NAME", "").strip(),
-            allow_saved_chat=bool(slot.url))
+        target_status = await prepare_a_project_target(page, project_name, allow_saved_chat=False)
         if target_status != "A_PROJECT_COMPOSER_READY":
             slot.last_result = "PROJECT_TARGET_BLOCKED:" + target_status
             save_registry(reg)
-            write_runtime(status="project_target_blocked",
-                          last_action="A source withheld: " + target_status)
+            write_runtime(status="project_target_blocked", last_action=slot.name+": "+target_status)
             return
-    # Any non-A task is prohibited regardless of the pilot task ID.
-    if CONTROLLER_MODE == "localization" and slot.name != "A":
-        return
-    if CONTROLLER_MODE == "localization" and slot.name == "A" and _outrun_smoke_os.environ.get("OUTRUN_A_TILE_BATCH_QUEUE", "").lower() == "true":
-        result_probe = await confirm_visible_results(page, "/data/imagegen")
-        log.info("A batch result probe: %s", result_probe)
-    png_binding = None
-    if CONTROLLER_MODE == "localization" and slot.name == "A":
         png_binding, png_reason = load_binding(slot.name)
         if png_reason is not None:
             send_result = "SOURCE_REFERENCE_NOT_BOUND:" + png_reason
         else:
-            send_result = await send_message(page, png_binding["prompt"], png_binding)
+            start_status = stage_submission(slot.name, png_binding["task_id"])
+            if start_status != "SUBMITTING":
+                send_result = "BATCH_SUBMISSION_BLOCKED:" + start_status
+            else:
+                send_result = await send_message(page, png_binding["prompt"], png_binding)
+        if png_binding is not None and send_result == "sent":
+            mark_sent(png_binding)
+            url_status = record_chat_url(slot.name, png_binding["task_id"], page.url)
+            if url_status != "URL_RECORDED":
+                send_result = "CHAT_URL_NOT_RECORDED:" + url_status
+        elif png_binding is not None and send_result == "SEND_UNVERIFIED":
+            mark_sent(png_binding, status="SUBMISSION_UNVERIFIED_DO_NOT_AUTO_RETRY")
     else:
+        png_binding = None
         send_result = await send_message(page, prompt)
-    if send_result == "sent" and png_binding is not None:
-        mark_sent(png_binding)
-    elif send_result == "SEND_UNVERIFIED" and png_binding is not None:
-        # Preserve uncertain turn as a hold, never automatically duplicate it.
-        mark_sent(png_binding, status="SUBMISSION_UNVERIFIED_DO_NOT_AUTO_RETRY")
     if send_result != "sent":''',
         "scheduled-attachment",
     )
@@ -174,9 +171,29 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
         '        if png_binding is None and (ratio < 0.90 or ratio > 1.10):',
         "task-id-in-editor",
     )
+    source = replace_once(
+        source,
+        '    slot = reg.slots[reg.next_slot]\n    if FRESH_CHAT_EACH_RUN:',
+        '''    slot = reg.slots[reg.next_slot]
+    if CONTROLLER_MODE == "localization" and _outrun_smoke_os.environ.get("OUTRUN_AB_BATCH_QUEUE", "").lower() == "true":
+        previous = pages.get(slot.name)
+        if previous is None or previous.is_closed():
+            slot.last_result = "PREVIOUS_TAB_UNAVAILABLE"
+            save_registry(reg)
+            write_runtime(status="ab_batch_hold",last_action=slot.name+": previous tab unavailable")
+            return
+        can_continue, pre_status = await inspect_slot(slot.name, previous)
+        if not can_continue:
+            slot.last_result = "AB_BATCH_HOLD:" + pre_status
+            save_registry(reg)
+            write_runtime(status="ab_batch_hold",last_action=slot.name+": "+pre_status)
+            return
+    if FRESH_CHAT_EACH_RUN:''',
+        "ab-pre-fresh-library-result-gate",
+    )
     # The import must be part of controller code itself; no executable startup
     # shell monkey-patching and no separate daemon.
-    import_line = 'from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt, ensure_image_tool\nfrom app.tile_batch_queue import confirm_visible_results\nimport os as _outrun_smoke_os\n'
+    import_line = 'from app.controller_png_attach import load_binding, attach_png, mark_sent, prepare_a_project_target, verify_submission_receipt, ensure_image_tool\nfrom app.ab_batch_queue import inspect_slot, stage_submission, record_chat_url\nimport os as _outrun_smoke_os\n'
     lines = source.splitlines(keepends=True)
     future_imports = [i for i, line in enumerate(lines)
                       if line.startswith("from __future__ import ")]
