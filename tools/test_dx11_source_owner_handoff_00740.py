@@ -12,7 +12,7 @@ def connected(source: str, header: str) -> bool:
     clear_begin = source.find("void observe_game_clear(")
     unavailable_begin = source.find("void observe_unavailable_game_draw(", clear_begin)
     present_begin = source.find("void before_game_present(", unavailable_begin)
-    reset_begin = source.find("void before_game_reset()", present_begin)
+    reset_begin = source.find("void before_game_reset(IDirect3DDevice9* game) noexcept {", present_begin)
     if min(owner_begin, mode_begin, clear_begin, unavailable_begin, present_begin, reset_begin) < 0:
         return False
     owner = source[owner_begin:mode_begin]

@@ -48,7 +48,7 @@ def main() -> None:
             f"{path.name}: unsafe descriptor-read negative control was missed"
         )
         assert "live_game_frame::before_game_present(device, sourceRect, dirtyRegion);" in source
-        assert "live_game_frame::before_game_reset();" in source
+        assert "live_game_frame::before_game_reset(device);" in source
         assert "R30PresentR29Hook.stdcall<HRESULT>(" in source
 
     bridge = BRIDGE.read_text(encoding="utf-8")

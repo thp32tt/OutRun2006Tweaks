@@ -19,8 +19,8 @@ WF = (ROOT / ".github/workflows/dx11-fast-structural.yml").read_text(encoding="u
 def connected(code: str) -> bool:
     draw = code[code.index("void observe(IDirect3DDevice9*"):code.index("void observe_scene_boundary(")]
     unavailable = code[code.index("void observe_unavailable_game_draw("):code.index("void observe_failed_game_draw(")]
-    present = code[code.index("void before_game_present("):code.index("void before_game_reset()")]
-    reset = code[code.index("void before_game_reset()"):]
+    present = code[code.index("void before_game_present("):code.index("void before_game_reset(IDirect3DDevice9* game) noexcept {")]
+    reset = code[code.index("void before_game_reset(IDirect3DDevice9* game) noexcept {"):]
     signature_pos = present.find("outputNow.nativeFullFrame = fullMode;")
     generation_pos = present.find("!s.previousOutput.same(outputNow)")
     mode_pos = present.find("GameNativeFramePublication::source_mode_contiguous(")
