@@ -58,7 +58,7 @@
   },
   "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
   "phase": "C4_COMMIT",
-  "checkpoint": "C4_SOURCE_WITH_SMOKE",
+  "checkpoint": "C4_RELEASE_ACTIVE_SMOKE_FIXED",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No live game/Quest3/VDXR test in this job; first-frame optical correction and hardware FPS impact not verified.",
@@ -70,7 +70,7 @@
     "vrhost/tests/r30_early_rhw_shadow_smoke.cpp",
     "docs/automation/runs/CONVERSION-DX9EX-00860.json"
   ],
-  "material_result_sha": null,
+  "material_result_sha": "c00443ce19a9e2c5cfdd9208bec74dd5cd43adf4",
   "validation_bearing_result_sha": null,
   "acceptance_results": {
     "first_frame": "SOURCE_PATCHED_PORTABLE_SMOKE_ADDED",
@@ -78,7 +78,8 @@
     "integration": "PENDING_EXACT_SHA"
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA"
+    "status": "PENDING_EXACT_SHA",
+    "note": "Portable smoke uses live CHECK in MSVC Release/NDEBUG; exact-SHA required Gates still pending."
   },
   "score_once": false,
   "score_delta_this_retry": 0
