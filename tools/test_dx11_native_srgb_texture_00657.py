@@ -13,7 +13,11 @@ SOURCE = ROOT / "src/vr/d3d11/live_game_frame_bridge.cpp"
 def connected(source: str) -> bool:
     try:
         cap = source.split("bool supported_game_state(", 1)[1].split("bool translate_vertices(", 1)[0]
-        mirror = source.split("bool mirror_texture(", 1)[1].split("bool submit(", 1)[0]
+        mirror = source.split("bool create_game_sampler(", 1)[1].split("bool submit(", 1)[0]
+        # Sampler state now lives in create_game_sampler, while mirror_texture
+        # uploads texture pixels and delegates to the shared native sampler.
+        if "return create_game_sampler(dev, capture, levels, sampler);" not in mirror:
+            return False
         draw = source.split("bool submit(", 1)[1].split("void before_game_present(", 1)[0]
     except IndexError:
         return False
@@ -81,6 +85,8 @@ def main() -> None:
         ("DXGI_FORMAT_BC2_UNORM_SRGB : DXGI_FORMAT_BC2_UNORM", "DXGI_FORMAT_BC2_UNORM : DXGI_FORMAT_BC2_UNORM"),
         ("DXGI_FORMAT_BC3_UNORM_SRGB : DXGI_FORMAT_BC3_UNORM", "DXGI_FORMAT_BC3_UNORM : DXGI_FORMAT_BC3_UNORM"),
         ("DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : DXGI_FORMAT_B8G8R8A8_UNORM", "DXGI_FORMAT_B8G8R8A8_UNORM : DXGI_FORMAT_B8G8R8A8_UNORM"),
+        ("return create_game_sampler(dev, capture, levels, sampler);", "return false;"),
+        ("dev->CreateSamplerState(&state, sampler.GetAddressOf())", "false"),
         ("mirror_texture(dev, capture, sampledView, sampledSampler)", "false"),
         ("ctx->PSSetShaderResources(0, 1, &boundView);", "ctx->PSSetShaderResources(0, 0, &boundView);"),
         ("ctx->PSSetSamplers(0, 1, &boundSampler);", "ctx->PSSetSamplers(0, 0, &boundSampler);"),
