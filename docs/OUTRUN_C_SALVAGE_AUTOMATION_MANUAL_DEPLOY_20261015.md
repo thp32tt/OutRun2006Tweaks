@@ -1,3 +1,14 @@
+## 2026-10-15 08:35 KST — 사용자 수동 배포 후 N100 읽기 전용 검증
+
+- N100 Docker 데몬 정상 응답. `outrun-kor` 프로젝트의 컨트롤러 `outrun-chat-controller-localization-recovery`는 **2026-10-15 08:32:42 KST 재생성되어 실행 중**임.
+- `docker ps -a` 및 `docker inspect outrun-c-salvage-offline` 결과 **C 별도 컨테이너 없음**. `docker compose ls --all`의 `outrun-kor` 설정 파일 표시는 `/data/compose/56/tools/chat-controller/localization-recovery-v1/docker-compose.yml` **단일 파일**뿐. Additional paths C override가 운영 compose에 적용되었다는 증거가 없음.
+- 기존 컨트롤러 실제 환경은 `AUTO_SEND=true`, `CHAT_SLOTS=2`, `SCHEDULE_MINUTES=0,5,10,15,20,25,30,35,40,45,50,55`. 원래 계획된 A/B/C1 3탭 스케줄과도 다르므로 별도 운영 검증 필요. 새로운 C 서비스 실행을 확인하지 못한 상태에서 배포 성공이라 표시하지 않음.
+- GitHub 정본 `OutRun2006Tweaks@korean-localization-recovery-20260928`에는 위 Portainer base Compose 경로 파일이 **존재하지 않음(404)**. 따라서 그 Stack이 이 Git 저장소에서 직접 C override를 읽는다고 추정하지 않는다. Portainer Stack UI의 실제 **Git URL/ref/Compose path/Additional paths** 확인이 후속 조치의 시작.
+- 발견된 설정 문제 수정: C override의 빌드 context가 base Compose 위치에 대해 `../..`였으나 실제 표기 경로 `tools/chat-controller/localization-recovery-v1` 기준 repo root는 `../../..`; [GitHub C override](../docker/localization-production/portainer-git-c-salvage.override.yml)에 수정 반영. 단 **base Compose가 실제로 같은 repo를 사용하는 경우에만 유효**. 기존 운영 Stack의 별도 repo는 해당 repo에 코드를 이식해야 한다.
+- 배포/재시작/Compose 조작을 하지 않았고 파일/메타데이터를 읽기만 했다. **운영 C 상태: NOT_RUNNING / FIRST_CYCLE_NOT_VERIFIED**. 사용자만 Portainer에서 수정 후 Pull and redeploy.
+
+---
+
 # C-SALVAGE 자동작업 적용 / 사용자 수동 Portainer 배포
 
 적용 범위: \`thp32tt/OutRun2006Tweaks@korean-localization-recovery-20260928\`  
