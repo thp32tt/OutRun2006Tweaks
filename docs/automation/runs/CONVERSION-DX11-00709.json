@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "feature_id": "LIVE_STAGE1_SIGNED_DP3_MENU_RACE",
   "work_key": "DX11:STAGE1_SIGNED_DP3",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -83,14 +83,49 @@
     "docs/automation/runs/CONVERSION-DX11-00709.json"
   ],
   "pipeline": {
-    "C0_RECOVER": "DONE",
-    "C1_REVIEW": "DONE",
-    "C2_IMPLEMENT": "DONE new C++ HLSL and regression",
-    "C3_VALIDATE": "PENDING exact SHA CI; runtime UNTESTED",
-    "C4_COMMIT": "material pending",
+    "C0_RECOVER": "DONE branch 482f58f7, prior 00708 scope and active work reviewed",
+    "C1_REVIEW": "DONE Stage1 native DOTPRODUCT3 RGB missing (independent alpha retained)",
+    "C2_IMPLEMENT": "DONE C++ admission+HLSL DOTPRODUCT3 and 560-case C++/Python regressions",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Fast 38502675564; Backend 38502675524 (validate+smoke); Build 38502680647; OpenXR 38502680660; HUD 38502680675 all SUCCESS at ece36d166fd94e8c0af1e4c06a34881bd33eb16b; Quest3 UNTESTED",
+    "C4_COMMIT": "PASS original material f6665b69a60f6688c65047df6adcf887a3397c29; same TASK legacy-negative regression repair validation-bearing ece36d166fd94e8c0af1e4c06a34881bd33eb16b; no CI-skip on validation SHA",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED exact-SHA 5/5; separate [skip ci] checkpoint; runtime UNTESTED"
   },
   "base_head_sha": "482f58f729b4c819875d70569e78e73f3298407a",
-  "next_action": "Validate 5 exact-SHA gates; later state/score only after successful gates"
+  "next_action": "Build verified at validation-bearing SHA; original DX9Ex/gamepad authoritative. NEED_HMD_TEST for Quest3/VDXR menu/vehicle/race; controller select next independent feature; no rescore 00709.",
+  "material_result_sha": "f6665b69a60f6688c65047df6adcf887a3397c29",
+  "validation_bearing_result_sha": "ece36d166fd94e8c0af1e4c06a34881bd33eb16b",
+  "acceptance_results": {
+    "game-dp3": "PASS",
+    "game-fallback": "PASS",
+    "exact-sha": "PASS"
+  },
+  "gate_evidence": {
+    "initial_material_sha": "f6665b69a60f6688c65047df6adcf887a3397c29",
+    "validation_bearing_sha": "ece36d166fd94e8c0af1e4c06a34881bd33eb16b",
+    "exact_sha": true,
+    "dx11_fast_structural_checks": {
+      "id": 38502675564,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38502675524,
+      "conclusion": "SUCCESS"
+    },
+    "windows_build": {
+      "id": 38502680647,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38502680660,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38502680675,
+      "conclusion": "SUCCESS"
+    },
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  },
+  "state_persisted": true
 }
