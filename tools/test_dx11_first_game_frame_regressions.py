@@ -403,16 +403,25 @@ def main() -> None:
         if start < 0 or end <= start:
             return False
         section = code[start:end]
+        # Full-frame same-Present fence recycling is a separate producer.
+        # The inset must retain its independent async poll and submit path.
+        poll = section.find("const HRESULT ready = ctx->GetData(")
+        map_at = section.find("ctx->Map(oldest.staging.Get()", poll)
+        inset_at = section.find("// Native full-frame was already enqueued", map_at)
+        if not (0 <= poll < map_at < inset_at):
+            return False
+        inset = section[inset_at:]
         return all(x in section for x in (
-            "D3D11_QUERY_EVENT",
-            "D3D11_ASYNC_GETDATA_DONOTFLUSH",
-            "D3D11_MAP_FLAG_DO_NOT_WAIT",
-            "ctx->End(next.fence.Get());",
-            "if (!next.busy)",
-            "++s.droppedCopies;",
-            "s.insetFormat != bb.Format",
+            "D3D11_QUERY_EVENT", "s.insetFormat != bb.Format",
             "s.insetSurface.GetAddressOf(), nullptr",
-        )) and "ctx->Flush();\\n    s.pending = true;" not in section
+        )) and all((
+            "D3D11_ASYNC_GETDATA_DONOTFLUSH" in section[poll:map_at],
+            "D3D11_MAP_FLAG_DO_NOT_WAIT" in section[map_at:inset_at],
+            "ctx->End(next.fence.Get());" in inset,
+            "if (!next.busy)" in inset,
+            "++s.droppedCopies;" in inset,
+            "ctx->Flush();\\n    s.pending = true;" not in section,
+        ))
 
     assert deferred_inset_contract(bridge)
     for original, wrong in (
@@ -422,7 +431,13 @@ def main() -> None:
         ("if (!next.busy)", "if (next.busy)"),
         ("s.insetFormat != bb.Format", "s.insetFormat == bb.Format"),
     ):
-        mutated = bridge.replace(original, wrong, 1)
+        # Change the inset's own async path. Mutating the earlier full-frame
+        # recycler/submit would leave the async inset intact (false-negative).
+        start = (bridge.index("const HRESULT ready = ctx->GetData(")
+                 if original == "D3D11_ASYNC_GETDATA_DONOTFLUSH" else
+                 bridge.index("// Native full-frame was already enqueued")
+                 if original in ("ctx->End(next.fence.Get());", "if (!next.busy)") else 0)
+        mutated = bridge[:start] + bridge[start:].replace(original, wrong, 1)
         assert mutated != bridge and not deferred_inset_contract(mutated), (
             "deferred readback negative mutation passed unexpectedly: " + original
         )
