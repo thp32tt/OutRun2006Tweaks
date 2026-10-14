@@ -1559,13 +1559,16 @@ namespace
         float visibleOffsetX = 0.0f, visibleOffsetY = 0.0f;
         float visibleWidthScale = 1.0f, visibleHeightScale = 1.0f;
 
-        // Issue #119: the game's actual letterbox settings determine
-        // whether the captured wide front-end has 4:3 authored content.
-        // Never crop a vanilla/stretched or unletterboxed UI. A/B override:
-        // OUTRUN_VR_MENU_CENTER_4_3=1 forces the old explicit opt-in;
-        // =0 preserves the complete-client legacy projection.
-        // The crop affects only the LOCAL menu UV, shared by both eyes.
-        bool cropCentered43 = R23GameMenuIsLetterboxed(c.hwnd_);
+        // Quest3 native menu/car-select A/B: requested 4:3 letterbox
+        // flags do not prove the surrounding pixels are matte. The Ferrari
+        // and right-hand selection list extend outside that region, so
+        // automatic 4:3 cropping loses authored content. Until a live image
+        // matte check exists, use the complete native-aspect client.
+        // OUTRUN_VR_MENU_CENTER_4_3=1 explicitly opts into the historical
+        // centre crop; =0 forces the uncut complete-client view.
+        // Both eyes use the same UV and menu projection.
+        bool cropCentered43 = OutRunVrMenuAspect::ShouldAutoCropVerifiedFourThree(
+            R23GameMenuIsLetterboxed(c.hwnd_), false);
         if (const char* overrideValue =
                 std::getenv("OUTRUN_VR_MENU_CENTER_4_3"))
         {
@@ -1611,13 +1614,13 @@ namespace
         // projections. Center LOCAL-fixed menu content on the optical ray,
         // then preserve its physical aspect within BOTH clipped FOV margins.
         // Reject invalid/stale publications rather than stretching a menu.
-        // User Quest3 2026-10-13: full-FOV menu is excessively wide/tall.
-        // Keep the independently authored menu 4:3 and optical centre,
-        // but reserve 22% of the available symmetric image margin.
-        // Only LOCAL theater/menu, never gameplay stereo HUD or F11.
-        const float opticalCoverage =
-            cropCentered43 && sourceAspect == 4.0f / 3.0f
-            ? 0.78f : 1.0f;
+        // User A/B: non-cropped 21:9 must NOT inflate back to a full-FOV
+        // theater. Apply the same 22% symmetric optical margin to the
+        // complete native-aspect menu and explicit 4:3 crop. The existing
+        // tangent-space containment retains a uniform physical aspect,
+        // optical centre, both-eye placement and clipped-fragment geometry.
+        // Gameplay stereo HUD, F11 and desktop presentation are untouched.
+        constexpr float opticalCoverage = 0.78f;
         const auto placement =
             OutRunVrMenuAspect::PlanOpticallyCenteredClip(
                 common, sourceAspect, opticalCoverage);

@@ -4,6 +4,14 @@
 
 using OutRunVrMenuAspect::PlanCenteredContent;
 using OutRunVrMenuAspect::ShouldCropConfiguredMenu;
+using OutRunVrMenuAspect::ShouldAutoCropVerifiedFourThree;
+// Requested letterboxing is only an INI condition, never proof that actual
+// right/left captured pixels are empty. Native 21:9 car-selection content
+// must survive with either historical UILetterboxing=1 or 2.
+static_assert(!ShouldAutoCropVerifiedFourThree(true, false));
+static_assert(!ShouldAutoCropVerifiedFourThree(false, true));
+static_assert(!ShouldAutoCropVerifiedFourThree(false, false));
+static_assert(ShouldAutoCropVerifiedFourThree(true, true));
 // Live Quest3 user profile (UIScalingMode=1, UILetterboxing=1) must crop
 // the game's 4:3 letterbox by default, not require a manual environment flag.
 static_assert(ShouldCropConfiguredMenu(1, 1));

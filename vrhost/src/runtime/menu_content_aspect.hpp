@@ -17,6 +17,18 @@ namespace OutRunVrMenuAspect
             letterboxingMode >= 1 && letterboxingMode <= 2;
     }
 
+    // Configured 4:3 letterboxing is NOT evidence that the captured window's
+    // side regions are empty. Quest3 A/B showed authored car-selection
+    // geometry and a vehicle list beyond the nominal 4:3 centre. Cropping
+    // those pixels based on an INI flag loses real content. Only enable the
+    // automatic centre crop after independent image/matte verification.
+    // The separate explicit user A/B override remains available.
+    constexpr bool ShouldAutoCropVerifiedFourThree(
+        bool configuredLetterbox, bool imageMatteVerified) noexcept
+    {
+        return configuredLetterbox && imageMatteVerified;
+    }
+
     // OutRun may restart with a recycled numeric HWND but a new game PID.
     // A cached 4:3 crop must never be reused for another process.
     // Preserve the bounded INI polling interval within the same process.

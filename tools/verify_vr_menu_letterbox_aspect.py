@@ -688,7 +688,7 @@ menu_geometry = (Path(__file__).resolve().parents[1] /
                  "vrhost/src/runtime/menu_content_aspect.hpp").read_text()
 
 def verify_visible_menu_fragment(code: str) -> None:
-    body = code.split("bool cropCentered43 = R23GameMenuIsLetterboxed", 1)[1].split(
+    body = code.split("bool cropCentered43 = OutRunVrMenuAspect::ShouldAutoCropVerifiedFourThree(", 1)[1].split(
         "std::uint32_t image = 0;", 1)[0]
     required = [
         "PlanVisibleCenteredContent(",
@@ -698,8 +698,8 @@ def verify_visible_menu_fragment(code: str) -> None:
         "cropCentered43 ? 4.0f / 3.0f : clientAspect;",
         "GetGameClientOutputRect(fullClient);",
         "sourceAspect = authoredAspect;",
-        "cropCentered43 && sourceAspect == 4.0f / 3.0f",
-        "? 0.78f : 1.0f;",
+        "R23GameMenuIsLetterboxed(c.hwnd_), false);",
+        "constexpr float opticalCoverage = 0.78f;",
         "common, sourceAspect, opticalCoverage);",
         "visibleOffsetX = plan.visibleOffsetX;",
         "visibleOffsetY = plan.visibleOffsetY;",
@@ -745,6 +745,25 @@ def verify_visible_fragment_source(code: str) -> None:
     ):
         assert token in body, token
 
+# A configured letterbox is not a verified empty matte. Reject any
+# accidental reintroduction of auto crop based on the INI alone.
+def verify_safe_menu_crop_source(code: str) -> None:
+    assert "constexpr bool ShouldAutoCropVerifiedFourThree(" in code
+    owner = code.split("constexpr bool ShouldAutoCropVerifiedFourThree(", 1)[1].split(
+        "    // OutRun may restart", 1)[0]
+    assert "configuredLetterbox && imageMatteVerified;" in owner
+    assert "configuredLetterbox || imageMatteVerified;" not in owner
+
+verify_safe_menu_crop_source(menu_geometry)
+try:
+    verify_safe_menu_crop_source(menu_geometry.replace(
+        "configuredLetterbox && imageMatteVerified;",
+        "configuredLetterbox || imageMatteVerified;", 1))
+except AssertionError:
+    pass
+else:
+    raise AssertionError("unverified menu crop OR mutation escaped")
+
 verify_visible_menu_fragment(r23)
 verify_visible_fragment_source(menu_geometry)
 for old, bad in (
@@ -755,7 +774,10 @@ for old, bad in (
     ("sourceAspect = authoredAspect;", "sourceAspect = plan.aspect;"),
     ("GetGameClientOutputRect(fullClient);",
      "GetClientRect(c.hwnd_, &fullClient);"),
-    ("? 0.78f : 1.0f;", "? 1.0f : 1.0f;"),
+    ("R23GameMenuIsLetterboxed(c.hwnd_), false);",
+     "R23GameMenuIsLetterboxed(c.hwnd_), true);"),
+    ("constexpr float opticalCoverage = 0.78f;",
+     "constexpr float opticalCoverage = 1.0f;"),
     ("common, sourceAspect, opticalCoverage);",
      "common, sourceAspect, 1.0f);"),
     ("placement.centerY - placement.halfHeight * visibleOffsetY;",
