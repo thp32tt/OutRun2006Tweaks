@@ -1,0 +1,56 @@
+{
+  "status": "C_COMPOSITE_TEST_ONLY_NOT_FINAL_APPROVED",
+  "queue_index": 12,
+  "source_text": "Continue?",
+  "korean_text": "계속?",
+  "source_png": "Q012_D6DC1380_BASE_READABLE_NORMAL__r01c01__x0_y0__256x64.png",
+  "source_png_sha256": "48cedd9621577ce8a5d97227150105a0d2f5092c8109abdfe4f25f0ac14c8ad5",
+  "generated_candidate_png": "Q012_D6DC1380_BASE_READABLE_NORMAL__r01c01__x0_y0__256x64_k.png",
+  "generated_sha256": "2e265ae38eedc1ca3cc99c2fca49d4fc99d656208bef8e2f8dd7485a6807d474",
+  "generated_korean_alpha_bbox": [
+    476,
+    103,
+    1770,
+    609
+  ],
+  "source_english_alpha_bbox": [
+    8,
+    20,
+    248,
+    54
+  ],
+  "source_native_dimensions": [
+    256,
+    64
+  ],
+  "generated_dimensions": [
+    2172,
+    724
+  ],
+  "korean_text_native_xywh": [
+    87,
+    21,
+    82,
+    32
+  ],
+  "source_outside_target_bbox_changed_px": 0,
+  "source_clean_method": "SOURCE_TRANSPARENT_ALPHA_ERASURE",
+  "clean_status": "CLEAN_TEST_ONLY_PENDING_INDEPENDENT_C1",
+  "preserves_visible_source_positive_alpha_outside_target": true,
+  "outputs": {
+    "clean_candidate_ALPHA_TEST_ONLY.png": "069daa9063ebb657a043756be1bd99f5f998628fb4012fef73b04b2b272c4269",
+    "intermediate_readable_256x64_TEST_ONLY.png": "c2aa80fa17b95db02c8f14b71a7b813f96dbd62384739948315950e9de7c2d99",
+    "korean_letter_native_256x64_TEST_ONLY.png": "c2aa80fa17b95db02c8f14b71a7b813f96dbd62384739948315950e9de7c2d99",
+    "korean_letter_only_HIRES.png": "cd1be883b39bc1bb2cd207ad47362943f446e04d130045fd417046b86dcdd526"
+  },
+  "DDS": "NOT_GENERATED_NO_CANONICAL_BINARY_SOURCE_BOUND",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "output_storage": {
+    "type": "N100_ISOLATED_LOCAL",
+    "path": "work/c-salvage-q012-20261015",
+    "images_committed_to_GitHub": false
+  },
+  "qa_narrative": "Producer first visual checked at native 256x64; source and result externally independently QA UNTESTED. Korean glyph layer is real non-ImageGen output derived from previously generated A-0001 PNG. Does not supersede official q012 REWORK."
+}
