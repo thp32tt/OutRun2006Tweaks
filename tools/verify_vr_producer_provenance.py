@@ -136,8 +136,8 @@ if "node, entry.vrScope, entry.vrProducer" not in replay:
 # before a direct token, but a queue-free central sun has no queue token.
 producer_selector = function_body(semantics, "inline ProducerToken CurrentRenderProducerToken()")
 if not re.search(
-    r"return\\s+SpriteQueueDepth\\s*!=\\s*0\\s*\\?\\s*"
-    r"CurrentSpriteQueueProducer\\s*:\\s*CurrentDirectExactProducer\\s*;",
+    r"return\s+SpriteQueueDepth\s*!=\s*0\s*\?\s*"
+    r"CurrentSpriteQueueProducer\s*:\s*CurrentDirectExactProducer\s*;",
     producer_selector,
 ):
     fail("render producer selector lost queue priority or direct fallback")
