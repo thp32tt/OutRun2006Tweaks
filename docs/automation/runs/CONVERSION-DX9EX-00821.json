@@ -10,11 +10,11 @@
   "feature_id": "DX9EX:PERF:DDS_CACHE_HIT_MISS_LOCK",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:DDS_CACHE_HIT_MISS_LOCK",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00821]",
   "feature_contract": {
     "feature_id": "DX9EX:PERF:DDS_CACHE_HIT_MISS_LOCK",
@@ -53,9 +53,9 @@
     ]
   },
   "acceptance_results": {
-    "DDS_HIT_FASTPATH": "STATIC_CHANGE_PENDING_CI",
-    "DDS_MISS_RACE_FALLBACK": "STATIC_CHANGE_PENDING_CI",
-    "DDS_EXACT_SHA_GATES": "PENDING_EXACT_SHA"
+    "DDS_HIT_FASTPATH": "PASS_EXACT_SHA",
+    "DDS_MISS_RACE_FALLBACK": "PASS_EXACT_SHA",
+    "DDS_EXACT_SHA_GATES": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "Unconditional mtx2 lock was acquired before every cache lookup, serializing shared-owner LRU hits which need only the existing mtx1 protection.",
@@ -75,15 +75,38 @@
     "docs/automation/runs/CONVERSION-DX9EX-00821.json"
   ],
   "base_sha": "f14d83045a2703a6679a40f17684b35f8e255f71",
-  "validation_bearing_result_sha": null,
-  "material_result_sha": null,
+  "validation_bearing_result_sha": "c6164f7a779b30d0c98f6694ae1b6b8eb2af14f9",
+  "material_result_sha": "5ee9233e6f5f1c8ab6566315a998852f6d169ca2",
   "ci_evidence": {
-    "status": "PENDING_RETRY_EXACT_SHA",
-    "failure": {
-      "run_id": 38507105336,
-      "stage": "static-exe-analysis",
-      "reason": "bad verifier substring start anchor"
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "c6164f7a779b30d0c98f6694ae1b6b8eb2af14f9",
+    "original_material_sha": "5ee9233e6f5f1c8ab6566315a998852f6d169ca2",
+    "DX9Ex Active Validation": {
+      "run_id": 38507203912,
+      "head_sha": "c6164f7a779b30d0c98f6694ae1b6b8eb2af14f9",
+      "status": "SUCCESS",
+      "jobs": "5/5 SUCCESS"
+    },
+    "Domain Isolation Guard": {
+      "run_id": 38507203829,
+      "head_sha": "c6164f7a779b30d0c98f6694ae1b6b8eb2af14f9",
+      "status": "SUCCESS"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38507204168,
+      "head_sha": "c6164f7a779b30d0c98f6694ae1b6b8eb2af14f9",
+      "status": "SUCCESS",
+      "jobs": "2/2 SUCCESS",
+      "dds_verifier": "26 source ownership obligations and 20/20 negative mutations PASS"
+    },
+    "DX9Ex Full Source Impact Review": {
+      "run_id": 38507105283,
+      "head_sha": "5ee9233e6f5f1c8ab6566315a998852f6d169ca2",
+      "status": "SUCCESS",
+      "jobs": "3/3 SUCCESS",
+      "note": "Original game C++ material commit, subsequent same-TASK retry changes only verifier and run record."
     }
   },
-  "runtime_gate": "Quest 3/VDXR exact package texture correctness and per-frame timing untested."
+  "runtime_gate": "Quest 3/VDXR exact package texture correctness and per-frame timing untested.",
+  "hold_resolution": "All four scoped Gate families SUCCESS on specified exact source/validation SHAs; no HMD or gameplay FPS test performed."
 }
