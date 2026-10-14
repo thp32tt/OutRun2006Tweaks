@@ -1003,6 +1003,10 @@ struct ReadbackSlot {
     // stopped writing. Keep this staging allocation out of the free ring until
     // a real source-device Reset recreates the entire readback pipeline.
     bool quarantined = false;
+    // A completed EVENT does not prove CPU Map(DO_NOT_WAIT) succeeded.
+    // Keep this slot GPU/CPU-owned until its pending Map can be retired
+    // on a later Present, without ever uploading that stale game image.
+    bool mapPending = false;
     bool completeFullFrame = false;
     GameReadbackProvenance provenance{};
 };
@@ -1497,6 +1501,7 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     s.alphaConstants.Reset();
     for (auto& item : s.readbacks) {
         item.staging.Reset(); item.fence.Reset(); item.busy = false; item.quarantined = false;
+        item.mapPending = false;
     }
     s.readSlot = s.writeSlot = 0;
     s.previousOutput = {};
@@ -5181,8 +5186,38 @@ void before_game_present(IDirect3DDevice9* game,
                     const auto fenceResult = GameNativeFramePublication::classify_fence(
                         static_cast<std::int32_t>(done));
                     if (fenceResult == GameNativeReadbackFence::Complete) {
-                        prior.busy = false;
-                        ++s.staleReadbacks;
+                        if (prior.mapPending) {
+                            // This same-Present frame could not be mapped before
+                            // its D3D9 Present. A subsequent completed GPU EVENT
+                            // alone is not enough to recycle a previously
+                            // WOULD_STILL_DRAW Map: recheck CPU map ownership,
+                            // then discard its stale bytes without ever painting
+                            // them over the next menu/car/race game frame.
+                            D3D11_MAPPED_SUBRESOURCE staleMap{};
+                            const HRESULT staleStatus = ctx->Map(
+                                prior.staging.Get(), 0, D3D11_MAP_READ,
+                                D3D11_MAP_FLAG_DO_NOT_WAIT, &staleMap);
+                            const auto staleResult = GameNativeFramePublication::classify_map(
+                                static_cast<std::int32_t>(staleStatus),
+                                static_cast<std::int32_t>(DXGI_ERROR_WAS_STILL_DRAWING),
+                                staleMap.pData != nullptr,
+                                prior.completeFullFrame ? s.nativeWidth : kWidth,
+                                staleMap.RowPitch);
+                            if (staleResult == GameNativeReadbackMap::Ready) {
+                                ctx->Unmap(prior.staging.Get(), 0);
+                                prior.mapPending = false;
+                                prior.busy = false;
+                                ++s.staleReadbacks;
+                            } else if (staleResult == GameNativeReadbackMap::Failed) {
+                                if (staleStatus == S_OK) ctx->Unmap(prior.staging.Get(), 0);
+                                prior.quarantined = true;
+                                ++s.failed;
+                            }
+                            // Still drawing: keep busy, never reissue CopyResource.
+                        } else {
+                            prior.busy = false;
+                            ++s.staleReadbacks;
+                        }
                     } else if (fenceResult == GameNativeReadbackFence::Failed) {
                         // Device loss/unknown completion is not a free-slot
                         // signal. Original D3D9 Present and gamepad remain live.
@@ -5208,6 +5243,7 @@ void before_game_present(IDirect3DDevice9* game,
                         auto& next = s.readbacks[fullSlot];
                         ctx->CopyResource(next.staging.Get(), s.backend.color_texture());
                         next.provenance = {s.presents, s.sourceDrawsThisFrame};
+                        next.mapPending = false;
                         next.completeFullFrame = true;
                         next.provenance.sourceDevice = presentDevice;
                         next.provenance.outputGeneration = s.outputGeneration;
@@ -5368,14 +5404,21 @@ void before_game_present(IDirect3DDevice9* game,
                             } else ++s.failed;
                         }
                         ctx->Unmap(oldest.staging.Get(), 0);
+                        oldest.mapPending = false;
                         oldest.busy = false;
                         if (!fullMode) s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
+                    } else if (mapResult == GameNativeReadbackMap::Pending) {
+                        // The completed EVENT raced a DO_NOT_WAIT Map. Keep the
+                        // staging slot occupied; a future Present must confirm
+                        // a successful Map/Unmap before it can be reused.
+                        oldest.mapPending = true;
                     } else if (mapResult == GameNativeReadbackMap::Failed) {
                         // Even with a completed EVENT, an unexpected Map status,
                         // invalid row stride or missing pixel pointer cannot be
                         // published. Never recycle the failed staging allocation
                         // into another menu/car/race CopyResource before Reset.
                         if (mapStatus == S_OK) ctx->Unmap(oldest.staging.Get(), 0);
+                        oldest.mapPending = false;
                         oldest.quarantined = true;
                         ++s.failed;
                     }
@@ -5399,6 +5442,7 @@ void before_game_present(IDirect3DDevice9* game,
                 if (!next.busy) {
                     ctx->CopyResource(next.staging.Get(), s.backend.color_texture());
                     next.provenance = {s.presents, s.sourceDrawsThisFrame};
+                    next.mapPending = false;
                     next.completeFullFrame = fullMode;
                     next.provenance.sourceDevice = presentDevice;
                     next.provenance.outputGeneration = s.outputGeneration;
@@ -5477,6 +5521,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.probeSlot = 0;
     for (auto& item : s.readbacks) {
         item.staging.Reset(); item.fence.Reset(); item.busy = false; item.quarantined = false;
+        item.mapPending = false;
         item.provenance = {};
     }
     s.readSlot = s.writeSlot = 0;
