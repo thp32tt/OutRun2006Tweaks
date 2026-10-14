@@ -158,6 +158,7 @@ async def prepare_a_project_target(page, project_name, allow_saved_chat=False):
 
                 project_links = page.locator('a[href*="/g/"][href*="/project"]')
                 target_urls = []
+                untrusted_name_matches = 0
                 for idx in range(min(await project_links.count(), 100)):
                     link = project_links.nth(idx)
                     title = (await link.inner_text()).strip()
@@ -167,6 +168,10 @@ async def prepare_a_project_target(page, project_name, allow_saved_chat=False):
                         target = urljoin(page.url, href)
                         if _project_url(target):
                             target_urls.append(target.split("?")[0])
+                        else:
+                            untrusted_name_matches += 1
+                if untrusted_name_matches:
+                    return "A_PROJECT_LINK_UNTRUSTED"
                 target_urls = list(dict.fromkeys(target_urls))
                 if len(target_urls) == 1:
                     await page.goto(target_urls[0], wait_until="domcontentloaded", timeout=30000)
