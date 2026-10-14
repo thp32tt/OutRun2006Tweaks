@@ -14,6 +14,7 @@
 
 #include "stereo_renderer_r22.cpp"
 #include "../core/r23_eye_extent_api.hpp"
+#include "../core/r23_target_owner_api.hpp"
 #include "../ipc/qpc_freshness.hpp"
 #include <cstddef>
 
@@ -962,6 +963,13 @@ namespace OutRunVRStereo
     std::uint64_t GetTopLevelDrawSerial() noexcept
     {
         return TopLevelDrawSerial();
+    }
+    // R23 is common to both R26+HUD safety and the native R29/R33 chain.
+    // Keep COM surfaces private: the renderer receives a single fail-closed
+    // ownership result, not a cached backbuffer pointer.
+    bool R23GameWvpTargetEligible() noexcept
+    {
+        return TargetIsBackBuffer() && !AnyAuxRenderTargetActive();
     }
 
     // F11 is compiled even in the default R26 safe-draw comparison, where

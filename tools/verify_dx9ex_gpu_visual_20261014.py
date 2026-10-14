@@ -5,6 +5,8 @@ root = Path(__file__).resolve().parents[1]
 read = lambda p: (root / p).read_text(encoding="utf-8")
 g = read("src/hooks_graphics.cpp")
 r = read("src/vr/game/outrun_renderer.cpp")
+r23 = read("src/vr/d3d9/stereo_renderer_r23.cpp")
+ownerApi = read("src/vr/core/r23_target_owner_api.hpp")
 u = read("src/hooks_uiscaling.cpp")
 s = read("src/vr/d3d9/stereo_renderer_r30.cpp")
 f = read("src/hooks_framerate.cpp")
@@ -12,15 +14,15 @@ f = read("src/hooks_framerate.cpp")
 def verify(g, r, u, s, f):
     wvp = r.split("HRESULT __stdcall SetVertexShaderConstantFDest(", 1)[1].split(
         "bool InstallD3D9Hooks(", 1)[0]
-    assert "#include \"../core/r29_owner_api.hpp\"" in r
-    a = wvp.index("if (!OutRunVRStereo::R29OwnerTargetIsBackBuffer() ||")
+    assert "#include \"../core/r23_target_owner_api.hpp\"" in r
+    a = wvp.index("if (!OutRunVRStereo::R23GameWvpTargetEligible())")
     assert wvp.index("InvalidateVerifiedWvp();") < a
     assert wvp.index("InvalidateGameWvpWrite();") < a
     assert wvp.index("UploadContainsOutRunWvp(") < a
     assert wvp.index("const auto semanticScope =") > a
     assert wvp.index("TryPrepareOutRunWvp(") > a
     b = wvp[a:wvp.index("// R51 ownership split:", a)]
-    assert "OutRunVRStereo::R29OwnerAnyAuxRenderTargetActive()" in b
+    assert "OutRunVRStereo::R23GameWvpTargetEligible()" in b
     assert "SetVertexShaderConstantFHook.stdcall<HRESULT>(" in b
     assert "device, startRegister, constantData, vector4fCount);" in b
     centre = g.split("static void __cdecl DrawObjectAlphaCentre(", 1)[1].split(
@@ -49,10 +51,13 @@ def verify(g, r, u, s, f):
     assert "vertices[i * stride + 1] = transformedY[i];" in u
     assert "vrCadenceFallback ? 60 : Settings::FramerateLimit.get()" in f
 
+assert "bool R23GameWvpTargetEligible() noexcept" in ownerApi
+assert "bool R23GameWvpTargetEligible() noexcept" in r23
+assert "return TargetIsBackBuffer() && !AnyAuxRenderTargetActive();" in r23
 verify(g, r, u, s, f)
 for name, gg, rr in (
-    ("aux", g, r.replace("OutRunVRStereo::R29OwnerAnyAuxRenderTargetActive()", "false", 1)),
-    ("backbuffer", g, r.replace("!OutRunVRStereo::R29OwnerTargetIsBackBuffer()", "false", 1)),
+    ("aux/owner", g, r.replace("!OutRunVRStereo::R23GameWvpTargetEligible()", "false", 1)),
+    ("target owner", g, r.replace("R23GameWvpTargetEligible()", "WrongTargetOwner()", 1)),
     ("centre", g.replace("ScopedRenderSemantic centreDrawScope(", "ScopedRenderSemantic lostScope(", 1), r),
     ("MAG", g.replace("if (ctx.edi == D3DSAMP_MINFILTER)\n\t\t\tctx.esi",
                        "if (ctx.edi == D3DSAMP_MINFILTER || ctx.edi == D3DSAMP_MAGFILTER)\n\t\t\tctx.esi", 1), r),
