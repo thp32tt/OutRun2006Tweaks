@@ -10,13 +10,13 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULLFRAME_READBACK_MAP_FAILURE_ISOLATION",
   "feature_id": "DX11-MENU-RACE-READBACK-MAP-PRESENT-SAFETY",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C3_VALIDATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
   "base_head_sha": "35cb76be32aa976fd1349a49cdc5e35070f744a0",
   "material_result_sha": "f3d5f1c8487214d83297e7584fb3ccaf9c724874",
-  "validation_bearing_result_sha": null,
-  "result_sha": "f3d5f1c8487214d83297e7584fb3ccaf9c724874",
-  "automation_validation": "PENDING_CI",
+  "validation_bearing_result_sha": "2a1c89610388a5f70f098add9db9847f9df1d3f0",
+  "result_sha": "2a1c89610388a5f70f098add9db9847f9df1d3f0",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -44,7 +44,7 @@
       "C++ constexpr and Python destructive CI tests"
     ],
     "acceptance_proof": {
-      "positive_probe": "00745 portable C++ exact-success/pending/invalid Map probe and full-game Map C++ source wiring; DX11 CI pending.",
+      "positive_probe": "C++ Map HRESULT/pointer/pitch probe and live D3D9 source integration exact SHA DX11 Fast #38632429250 SUCCESS.",
       "negative_regression": "00745 destructive source regression rejects unsafe SUCCEEDED(Map), missing quarantine, failure misclassification. Original D3D9 input path unaffected.",
       "component_integration": "Live menu/car/race D3D9 Draw -> D3D11 render/copy/query/Map -> D3D9 UpdateSurface gated by trusted mapped bytes."
     },
@@ -58,7 +58,7 @@
       "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT"
     ],
-    "visible_frame_acceptance": "Native full-frame mapped output guarded; exact-SHA GitHub build and real Quest3/VDXR view pending.",
+    "visible_frame_acceptance": "Native full-resolution game Map->D3D9 backbuffer source/build verification complete, actual Quest3/VDXR screen parity UNTESTED.",
     "activation_guard_and_fallback": "Native output only opt-in. Invalid mapping never overwrites original D3D9 game backbuffer; controller Present survives."
   },
   "feature_contract": {
@@ -86,20 +86,47 @@
     ]
   },
   "acceptance_results": {
-    "map-present-trusted-bytes": "PENDING_CI",
-    "map-error-gamepad-fallback": "PENDING_CI",
-    "exact-sha-integrated-build": "PENDING_CI"
+    "map-present-trusted-bytes": "PASS",
+    "map-error-gamepad-fallback": "PASS",
+    "exact-sha-integrated-build": "PASS_EXACT_SHA"
   },
   "blocking_evidence": "Previously SUCCEEDED(Map) admitted non-S_OK map results without checking pData; unexpected HRESULT released readback slot, risking a null copy, faulty output and repeated allocation reuse.",
-  "ci_evidence": {},
+  "ci_evidence": {
+    "dx11_fast": {
+      "run_id": 38632429250,
+      "conclusion": "success",
+      "head_sha": "2a1c89610388a5f70f098add9db9847f9df1d3f0"
+    },
+    "backend_conversion": {
+      "run_id": 38632429113,
+      "conclusion": "success",
+      "head_sha": "2a1c89610388a5f70f098add9db9847f9df1d3f0"
+    },
+    "windows_build": {
+      "run_id": 38632438437,
+      "conclusion": "success",
+      "head_sha": "2a1c89610388a5f70f098add9db9847f9df1d3f0"
+    },
+    "openxr_architecture": {
+      "run_id": 38632438884,
+      "conclusion": "success",
+      "head_sha": "2a1c89610388a5f70f098add9db9847f9df1d3f0"
+    },
+    "hud_inspector": {
+      "run_id": 38632438559,
+      "conclusion": "success",
+      "head_sha": "2a1c89610388a5f70f098add9db9847f9df1d3f0"
+    }
+  },
   "pipeline": {
     "C0_RECOVER": "PASS: recovered latest GitHub HEAD and no 00745 claim.",
     "C1_REVIEW": "PASS: identified invalid native Map output acceptance in game Present.",
     "C2_IMPLEMENT": "PASS: live C++ Map admission/quarantine and targeted new regressions.",
-    "C3_VALIDATE": "PENDING: exact-SHA mandatory CI.",
-    "C4_COMMIT": "PASS material source f3d5f1c8487214d83297e7584fb3ccaf9c724874",
+    "C3_VALIDATE": "PASS_EXACT_SHA: DX11 Fast #38632429250, Backend Conversion #38632429113, Windows Build #38632438437, OpenXR #38632438884, HUD Inspector #38632438559 all SUCCESS on 2a1c89610388a5f70f098add9db9847f9df1d3f0",
+    "C4_COMMIT": "PASS: material f3d5f1c8487214d83297e7584fb3ccaf9c724874, regression repair validation-bearing 2a1c89610388a5f70f098add9db9847f9df1d3f0, no CI skip on validation source commits.",
     "C5_PACKAGE": "NOT_REQUIRED: hardware runtime pending.",
-    "C6_STATE": "PENDING until exact-SHA Gates."
+    "C6_STATE": "PASS: preserve validation-bearing source SHA separately from this bookkeeping commit; gamepad/HMD UNTESTED, no duplicate scoring."
   },
-  "result_note": "New material code awaits GitHub exact-SHA CI; RUNTIME_VALIDATION=UNTESTED."
+  "result_note": "COMPLETE_BUILD_VERIFIED exact SHA five mandatory GitHub Actions SUCCESS, never claimed real gamepad/Quest3/VDXR runtime parity. Native opt-in and D3D9 fallback preserved, DXVK untouched.",
+  "recorded_at_kst": "2026-10-15 05:50 KST"
 }
