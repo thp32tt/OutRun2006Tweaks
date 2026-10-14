@@ -17,7 +17,12 @@ def validate(source: str) -> None:
     setup = body.split(
         "if (state.worldEffect && state.fullWorldReprojection &&", 1
     )[0]
-    affine = body.split("++R30XyzrhwAtomicFallbacks;", 1)[1]
+    # R30 diagnostic writes are now conditional on VRTelemetry; do not
+    # use the pre-optout bare increment as a structural anchor. Preserve
+    # the atomic fallback boundary and reject a missing route explicitly.
+    fallback = "R30RecordTelemetryCounter(R30XyzrhwAtomicFallbacks);"
+    assert fallback in body, "R30 atomic fallback telemetry route missing"
+    affine = body.split(fallback, 1)[1]
 
     # Latched stereo/eye extent and HUD configuration do not change per vertex.
     # The legacy code repeated up to eight FOV tan() calls and eye-extent
