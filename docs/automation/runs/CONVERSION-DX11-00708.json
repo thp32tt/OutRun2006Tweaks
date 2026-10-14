@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "feature_id": "GAME_STAGE0_TEMP_STAGE1_RGBA_MENU_RACE",
   "work_key": "DX11:GAME_STAGE0_TEMP_STAGE1_RGBA",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -76,9 +76,9 @@
     ]
   },
   "acceptance_results": {
-    "register-native-rgba": "IMPLEMENTED_PENDING_CI",
-    "register-fallback": "IMPLEMENTED_PENDING_CI",
-    "register-same-sha": "PENDING_CI"
+    "register-native-rgba": "PASS",
+    "register-fallback": "PASS",
+    "register-same-sha": "PASS"
   },
   "changed_files": [
     "src/vr/d3d11/live_game_stage1_factor.hpp",
@@ -92,12 +92,12 @@
     "C0_RECOVER": "DONE branch HEAD and 00707 C6 inspected",
     "C1_REVIEW": "DONE Stage0 TEMP native register path missing",
     "C2_IMPLEMENT": "DONE C++ state capture/HLSL register and test",
-    "C3_VALIDATE": "Fast Structural SUCCESS on 9b91925ecd1120d744c60c93be608bbdd9d8dffb; Windows Build failed due preexisting Stage1 mutation check first-occurrence duplicate, repaired in same TASK; exact-SHA revalidation pending",
-    "C4_COMMIT": "Material 9b91925ecd1120d744c60c93be608bbdd9d8dffb; same-TASK source/regression repair pending validation-bearing SHA",
+    "C3_VALIDATE": "PASS_EXACT_SHA: Fast 38501024891, Backend 38501024868, Build 38501030161, OpenXR 38501029999, HUD 38501030185 all SUCCESS at d19f0444340420600a44ff048bea572e44033986; HMD UNTESTED",
+    "C4_COMMIT": "PASS original material 9b91925ecd1120d744c60c93be608bbdd9d8dffb; same-TASK repair validation-bearing d19f0444340420600a44ff048bea572e44033986 (no CI skip)",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED exact SHA 5/5; separate [skip ci] bookkeeping; HMD UNTESTED"
   },
-  "next_action": "Check exact SHA gates, same TASK repair if failed, separate C6 bookkeeping only after PASS; HMD UNTESTED.",
+  "next_action": "BUILD_VERIFIED and NEED_HMD_TEST for real menu/vehicle/race Quest3/VDXR and gamepad; controller may select new independent DX11 feature, no rescore 00708.",
   "state_persisted": true,
   "base_head_sha": "8df54579838399be55c74c6c93c4156d6dd1c006",
   "material_result_sha": "9b91925ecd1120d744c60c93be608bbdd9d8dffb",
@@ -111,6 +111,31 @@
       "id": 38500852045,
       "conclusion": "FAILURE",
       "cause": "First-occurrence Stage1 fail-closed static negative-control collided with new TEMP predicate"
-    }
-  }
+    },
+    "validation_bearing_sha": "d19f0444340420600a44ff048bea572e44033986",
+    "exact_sha": true,
+    "dx11_fast_structural_checks": {
+      "id": 38501024891,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38501024868,
+      "conclusion": "SUCCESS"
+    },
+    "windows_build": {
+      "id": 38501030161,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38501029999,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38501030185,
+      "conclusion": "SUCCESS"
+    },
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  },
+  "validation_bearing_result_sha": "d19f0444340420600a44ff048bea572e44033986"
 }
