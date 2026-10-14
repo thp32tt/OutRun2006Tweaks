@@ -38,6 +38,25 @@ static_assert(!invalidZero.crop);
 constexpr auto invalidTarget = PlanCenteredContent(16.0f / 9.0f, -1.0f);
 static_assert(!invalidTarget.crop);
 
+// Recycled game HWND must not reuse a different process's menu crop.
+// Existing same-run INI polling and invalid-window fallback remain bounded.
+using OutRunVrMenuAspect::ShouldRefreshMenuLetterboxConfig;
+static_assert(ShouldRefreshMenuLetterboxConfig(0, 0, 0, 0x1234u, 101, 10));
+static_assert(!ShouldRefreshMenuLetterboxConfig(
+    0x1234u, 101, 2510, 0x1234u, 101, 2509));
+static_assert(ShouldRefreshMenuLetterboxConfig(
+    0x1234u, 101, 2510, 0x1234u, 102, 200));
+static_assert(ShouldRefreshMenuLetterboxConfig(
+    0x1234u, 101, 2510, 0x4567u, 101, 200));
+static_assert(ShouldRefreshMenuLetterboxConfig(
+    0x1234u, 101, 2510, 0x1234u, 0, 200));
+static_assert(ShouldRefreshMenuLetterboxConfig(
+    0x1234u, 101, 2510, 0, 0, 200));
+static_assert(ShouldRefreshMenuLetterboxConfig(
+    0x1234u, 101, 2510, 0x1234u, 101, 2510));
+static_assert(!ShouldRefreshMenuLetterboxConfig(
+    0x1234u, 102, 2700, 0x1234u, 102, 2510));
+
 int main()
 {
     using OutRunVrMenuAspect::PlanCapturedAspect;

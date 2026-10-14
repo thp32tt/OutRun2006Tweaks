@@ -83,19 +83,25 @@ namespace
     bool R23GameMenuIsLetterboxed(HWND gameWindow) noexcept
     {
         static HWND cachedWindow = nullptr;
+        static DWORD cachedPid = 0;
         static ULONGLONG nextCheckMs = 0;
         static bool cachedLetterbox = false;
         const ULONGLONG now = GetTickCount64();
-        if (gameWindow == cachedWindow && now < nextCheckMs)
+        // The cache belongs to the current owning game process, not just
+        // the HWND: Windows can recycle an HWND across game restarts.
+        // This cheap owner query avoids rereading INI files per XR frame.
+        DWORD gamePid = 0;
+        if (gameWindow)
+            GetWindowThreadProcessId(gameWindow, &gamePid);
+        if (!OutRunVrMenuAspect::ShouldRefreshMenuLetterboxConfig(
+                reinterpret_cast<std::uintptr_t>(cachedWindow), cachedPid,
+                nextCheckMs, reinterpret_cast<std::uintptr_t>(gameWindow),
+                gamePid, now))
             return cachedLetterbox;
         cachedWindow = gameWindow;
+        cachedPid = gamePid;
         nextCheckMs = now + 2500;
         cachedLetterbox = false;
-        if (!gameWindow || !IsWindow(gameWindow))
-            return false;
-
-        DWORD gamePid = 0;
-        GetWindowThreadProcessId(gameWindow, &gamePid);
         if (!gamePid)
             return false;
         HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION,

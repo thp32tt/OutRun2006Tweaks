@@ -1,0 +1,88 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00825",
+  "production_id": "CONVERSION-DX9EX-00825",
+  "event_id": "CONVERSION-DX9EX-00825-E001",
+  "event_type": "implementation",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:MAIN_MENU",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C2_IMPLEMENT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00825]",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Preserve the intended 4:3 menu and car-select aspect across 4:3, 16:9 and 21:9 source windows and a game process restart that recycles the HWND with a different letterbox configuration.",
+    "scope_boundary": "R23 local-fixed menu letterbox config cache and native aspect planner smoke only. No gameplay HUD, F11, ESC, world stereo, SkyGlow, FFB or other backend.",
+    "trace_stages": [
+      "Game EXE menu producer and UIScalingMode/UILetterboxing settings from the game process config generate the authored 4:3 content.",
+      "R23 validates current HWND and PID before choosing cached letterbox policy, then PlanVisibleCenteredContent crops source UV and preserves desktop fallback.",
+      "R23 optically centered LOCAL menu projection samples the crop identically in two OpenXR eye slices without touching game-world stereo and HUD."
+    ],
+    "subcomponents": [
+      "Bind cache identity to HWND and owning PID, immediately invalidating missing owners and recycled handles before optical crop selection.",
+      "Preserve normal 2.5-second same-process INI polling, native desktop and 4:3/16:9/21:9 menu aspect mapping and no-crop fallback."
+    ],
+    "acceptance_items": [
+      {
+        "id": "RESTART_MENU_ASPECT",
+        "category": "end_to_end_behavior",
+        "behavior_area": "producer_config_and_restart",
+        "expected_behavior": "When a new process reuses the prior HWND, the new PID immediately invalidates cached menu letterboxing and the current game INI controls the cropped LOCAL menu."
+      },
+      {
+        "id": "SAME_RUN_AND_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "config_poll_desktop_geometry_reset",
+        "expected_behavior": "Identical HWND/PID retains bounded INI polling; invalid owner and HWND fail closed, and the preexisting 4:3/16:9/21:9 native aspect, clipping and desktop fallback continue unchanged."
+      },
+      {
+        "id": "WIN32_EXACT_SHA",
+        "category": "integrated_validation",
+        "behavior_area": "game_host_package_ci",
+        "expected_behavior": "Menu native static assertions and exact-SHA GitHub DX9Ex Active host/game/package, Domain Isolation, and Full Source Impact gates pass."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "RESTART_MENU_ASPECT": "SOURCE_IMPLEMENTED_TEST_PENDING",
+    "SAME_RUN_AND_FALLBACK": "SOURCE_IMPLEMENTED_TEST_PENDING",
+    "WIN32_EXACT_SHA": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "The original R23GameMenuIsLetterboxed checks only gameWindow==cachedWindow and now<nextCheckMs before reading the HWND-owning PID. Recycled Win32 HWND values can reuse an obsolete menu crop for 2.5 seconds.",
+    "source_trace": [
+      "The game process loads UI letterbox overrides from OutRun2006Tweaks.ini and .user.ini.",
+      "Host R23 game HWND cache feeds cropCentered43 before validating current game PID; wrong owner policy enters the source UV cropping plan.",
+      "Fixed LOCAL menu clip and per-eye OpenXR projection preserve those chosen coordinates and may show the wrong menu aspect."
+    ],
+    "root_cause": "The menu configuration cache was keyed only by HWND value; PID changes between restarts did not invalidate the cached letterbox result.",
+    "alternatives_rejected": [
+      "Forcing a universal 4:3 crop cuts the unletterboxed original full-width desktop menu.",
+      "Removing the 2.5-second INI cache would move game-process filesystem reads onto each XR tick."
+    ],
+    "fix_evidence": "Read owning PID before the cache hit; use a constexpr HWND/PID/deadline predicate to invalidate on new process, replaced HWND, invalid owner or time expiry.",
+    "negative_test_evidence": "Compile-time positive/negative assertions cover same-run cached use, recycled HWND with changed PID, replaced HWND, missing HWND/PID, deadline expiry and first poll.",
+    "eye_ownership": "The existing same-raster LOCAL menu projection is shared across both eye slices; gameplay sprite stereo and protected world/HUD draws are not modified."
+  },
+  "changed_files": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00825.json"
+  ],
+  "base_sha": "bd2ec16b14cd49cd53393871df66c0b60b8f344c",
+  "material_result_sha": null,
+  "result_sha": null,
+  "validation_bearing_result_sha": null,
+  "runtime_gate": "No Quest3/VDXR test performed; menu optical correctness remains RUNTIME_VALIDATION=UNTESTED.",
+  "next_action": "Verify exact SHA in DX9Ex Active full host/game/package, Domain Isolation and Full Source Impact; fix any failure under the same TASK_ID."
+}

@@ -17,6 +17,19 @@ namespace OutRunVrMenuAspect
             letterboxingMode >= 1 && letterboxingMode <= 2;
     }
 
+    // OutRun may restart with a recycled numeric HWND but a new game PID.
+    // A cached 4:3 crop must never be reused for another process.
+    // Preserve the bounded INI polling interval within the same process.
+    constexpr bool ShouldRefreshMenuLetterboxConfig(
+        std::uintptr_t cachedWindow, std::uint32_t cachedPid,
+        std::uint64_t nextCheckMs, std::uintptr_t observedWindow,
+        std::uint32_t observedPid, std::uint64_t nowMs) noexcept
+    {
+        return observedWindow == 0 || observedPid == 0 ||
+            cachedWindow != observedWindow || cachedPid != observedPid ||
+            nowMs >= nextCheckMs;
+    }
+
     struct CropPlan
     {
         bool crop = false;
