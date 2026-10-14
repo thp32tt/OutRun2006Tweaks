@@ -159,6 +159,8 @@ add_executable(outrun-vr-menu-content-aspect-smoke tests/menu_content_aspect_smo
 add_executable(outrun-vr-pause-eye-affine-smoke tests/pause_menu_eye_affine_smoke.cpp)
 add_executable(outrun-vr-stage-extension-owner-smoke tests/stage_extension_direct_owner_smoke.cpp)
 add_executable(outrun-vr-rank-marker-fraction-smoke tests/rank_marker_fraction_smoke.cpp)
+add_executable(outrun-vr-r30-early-rhw-shadow-smoke tests/r30_early_rhw_shadow_smoke.cpp)
+target_include_directories(outrun-vr-r30-early-rhw-shadow-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 target_include_directories(outrun-vr-rank-marker-fraction-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 add_executable(outrun-vr-goal-progress-owner-smoke tests/goal_progress_owner_smoke.cpp)
 add_executable(outrun-vr-semantic-tag-hint-smoke tests/semantic_tag_hint_smoke.cpp)
@@ -209,6 +211,7 @@ foreach(target
     outrun-vr-pause-eye-affine-smoke
     outrun-vr-stage-extension-owner-smoke
     outrun-vr-rank-marker-fraction-smoke
+    outrun-vr-r30-early-rhw-shadow-smoke
     outrun-vr-goal-progress-owner-smoke
     outrun-vr-semantic-tag-hint-smoke
     outrun-vr-capture-descriptor-smoke

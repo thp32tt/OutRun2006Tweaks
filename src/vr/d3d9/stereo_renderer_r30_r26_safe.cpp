@@ -13,6 +13,7 @@
 
 #include "stereo_renderer_r26.cpp"
 #include "lens_centre_source_provenance.hpp"
+#include "r30_early_rhw_shadow.hpp"
 #include "vr/game/render_semantics.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
@@ -363,6 +364,9 @@ namespace OutRunVRStereo
         std::uint64_t R30ShadowReadMisses = 0;
         std::uint64_t R30ShadowDiscardInvalidations = 0;
         std::atomic<bool> R30BufferShadowCaptureArmed{ false };
+        // A known XYZ/RHW FVF may be written before the first eligible Draw.
+        // Keep its CPU shadow ready without arming capture of every world VB.
+        std::atomic<bool> R30EarlyRhwRegistered{ false };
         bool R30FirstShadowMissLogged = false;
         bool R30FirstShadowArmLogged = false;
 
@@ -636,12 +640,22 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30VertexBufferLockHook.stdcall<HRESULT>(
                 buffer, offset, size, data, flags);
-            if (R30BufferShadowCaptureArmed.load(
-                    std::memory_order_acquire) &&
-                OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0 &&
-                SUCCEEDED(hr) && data && *data)
+            const bool fullCapture = R30BufferShadowCaptureArmed.load(
+                std::memory_order_acquire);
+            // Explicit XYZ/RHW FVF buffers are registered when created, before
+            // their first Lock. Do not shadow unrelated world VB writes until
+            // the normal lazy XYZRHW draw enables full capture.
+            const auto earlyShadow =
+                !fullCapture && R30EarlyRhwRegistered.load(
+                    std::memory_order_acquire)
+                ? R30FindVertexShadow(buffer) : R30ShadowPtr{};
+            if (OutRunVR::R30EarlyRhwShadow::ObserveVertexLock(
+                    fullCapture, earlyShadow != nullptr,
+                    OutRunVR::GameSemantic::ExternalOverlaySemanticDepth != 0,
+                    SUCCEEDED(hr), data && *data))
                 R30BeginObservedLock(
-                    R30EnsureVertexShadow(buffer), offset, size, *data, flags);
+                    fullCapture ? R30EnsureVertexShadow(buffer) : earlyShadow,
+                    offset, size, *data, flags);
             return hr;
         }
 
@@ -782,10 +796,22 @@ namespace OutRunVRStereo
                 device, length, usage, fvf, pool, out, shared);
             if (SUCCEEDED(hr) && out && *out)
             {
-                R30EnsureVertexBufferHooks(*out);
-                if (R30BufferShadowCaptureArmed.load(
-                        std::memory_order_acquire) &&
-                    OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0)
+                const bool hooksReady = R30EnsureVertexBufferHooks(*out);
+                const bool gameOwner =
+                    OutRunVR::GameSemantic::ExternalOverlaySemanticDepth == 0;
+                // D3D9 FVF gives us positive POSITIONT provenance at buffer
+                // creation. Snapshot its first game Lock/Unlock so the first
+                // eligible Draw can stereo-convert without a GPU readback.
+                // FVF=0/declaration and ordinary world buffers remain lazy.
+                if (hooksReady && gameOwner && Settings::VREnabled &&
+                    OutRunVR::R30EarlyRhwShadow::ExplicitXyzrhwFvf(
+                        fvf, D3DFVF_POSITION_MASK, D3DFVF_XYZRHW) &&
+                    R30EnsureVertexShadow(*out))
+                    R30EarlyRhwRegistered.store(
+                        true, std::memory_order_release);
+                else if (gameOwner &&
+                    R30BufferShadowCaptureArmed.load(
+                        std::memory_order_acquire))
                     R30EnsureVertexShadow(*out);
             }
             return hr;
@@ -847,6 +873,8 @@ namespace OutRunVRStereo
                 R30IndexShadows.clear();
                 R30VertexShadows.clear();
                 R30ShadowReservedBytes = 0;
+                R30EarlyRhwRegistered.store(
+                    false, std::memory_order_release);
             }
         }
 
