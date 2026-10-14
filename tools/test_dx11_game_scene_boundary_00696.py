@@ -17,8 +17,11 @@ def connected(b, c, h, r):
         "HRESULT __stdcall ClearDestR9(", 1)[0]
     clear = r.split("HRESULT __stdcall ClearDestR9(", 1)[-1].split(
         "HRESULT __stdcall ", 1)[0]
+    # Keep the historical boundary assertion scoped to that callback. The
+    # 00728 full-Clear restart legitimately has another s.pending=false in
+    # observe_game_clear(), which must not mask a broken scene boundary.
     event = c.split("void observe_scene_boundary(", 1)[-1].split(
-        "void observe_unavailable_game_draw(", 1)[0]
+        "void observe_game_clear(", 1)[0]
     present = c.split("void before_game_present(", 1)[-1].split(
         "void before_game_reset(", 1)[0]
     return all((
