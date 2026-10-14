@@ -70,12 +70,12 @@
     "negative_test_evidence": "vrhost/tests/rank_marker_fraction_smoke.cpp checks both node layouts, affine translation with unchanged basis, infinite input, greater-than-one fraction, unsupported node kind and nonfinite source X with unchanged Y.",
     "eye_ownership": "Per-eye stereo reprojects each tagged ProjectedWorldMarker2D using its existing Calc3D2D vehicle-relative semantic; code changes producer-space source positions only. Matching Quest3/VDXR visual acceptance remains untested."
   },
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_MATERIAL_EXISTING_RETRY_GATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "runtime_evidence": "No direct Quest3/VDXR game/HMD optical run performed in this retry. Moving car marker stability not runtime proven.",
+  "runtime_evidence": "Quest3/VDXR real HMD/game stereoscopy and timing test not performed for this validation SHA. Build gate does not establish optical correctness.",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
     "src/vr/game/rank_marker_fraction.hpp",
@@ -84,21 +84,42 @@
     "docs/automation/runs/CONVERSION-DX9EX-00859.json"
   ],
   "material_result_sha": "39aa05402fb3fd5327a66c3f30a95474d4e18589",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "3a8034e3d462452e52a22e15a2ec63158c933e14",
   "acceptance_results": {
-    "clip_anchor": "SOURCE_PATCHED",
-    "affine_siblings": "SOURCE_PATCHED",
-    "safe_fallback": "PORTABLE_SMOKE_ADDED",
-    "integration": "PENDING_EXACT_SHA"
+    "clip_anchor": "PASS_BUILD",
+    "affine_siblings": "PASS_BUILD",
+    "safe_fallback": "PASS_BUILD",
+    "integration": "PASS_EXACT_SHA"
   },
   "ci_evidence": {
-    "status": "FAILED_POLICY_MISSING_RECORD",
-    "failed_run_id": 38623009127,
-    "failed_sha": "39aa05402fb3fd5327a66c3f30a95474d4e18589",
-    "failed_step": "policy: verify_vr_feature_unit_policy.py --check-head",
-    "failure_root_cause": "No docs/automation/runs/CONVERSION-DX9EX-00859.json at material SHA; all downstream jobs skipped.",
-    "next_action": "Evaluate required exact-SHA gates on record-bearing commit without ci-skip."
+    "status": "SUCCESS_EXACT_SHA",
+    "exact_sha": "3a8034e3d462452e52a22e15a2ec63158c933e14",
+    "dx9ex_active_run_id": 38623954203,
+    "dx9ex_active": {
+      "policy": "SUCCESS",
+      "host": "SUCCESS",
+      "game": "SUCCESS",
+      "full_chain_compile": "SUCCESS",
+      "package": "SUCCESS"
+    },
+    "domain_isolation_run_id": 38623954131,
+    "domain_isolation": "SUCCESS",
+    "hud_inspector_run_id": 38623954137,
+    "hud_inspector": {
+      "static_exe_analysis": "SUCCESS",
+      "build_hud_inspector": "SUCCESS"
+    },
+    "full_source_impact_run_id": 38623008928,
+    "full_source_impact_material_sha": "39aa05402fb3fd5327a66c3f30a95474d4e18589",
+    "full_source_impact_material": "SUCCESS",
+    "runtime_caveat": "Quest3/VDXR UNTESTED; no stereo convergence or FPS hardware claim."
   },
-  "score_once": false,
-  "score_delta_this_retry": 0
+  "score_once": true,
+  "score_delta_this_retry": 0,
+  "scoreboard_ai_2_before": 1331,
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1332,
+  "scoreboard_commit_sha": "9d5f4e7eb5f465aac50b6c522087ef492117031b",
+  "score_basis": "Unique original rank-marker C++ material improvement at 39aa0540, validated by complete exact-SHA 3a8034e3 Gates. Retry/checkpoint do not increment score.",
+  "resolved_hold_reason": "MISSING_RECORD_AND_OBSOLETE_RANK_VERIFIER_ASSERTIONS"
 }
