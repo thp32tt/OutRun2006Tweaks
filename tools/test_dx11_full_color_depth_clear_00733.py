@@ -28,7 +28,7 @@ def valid(cpp,hook,policy):
    "GameNativeFullColorDepthClear::can_mirror(" in s,
    "s.frameBatch.note_full_depth_clear(z);" in s,
    "s.frameBatch.abort();" in s,
-   s.index("s.frameBatch.reset();") < s.index("s.frameBatch.note_full_depth_clear(z);"),
+   0 <= s.find("s.frameBatch.reset();") < s.find("s.frameBatch.note_full_depth_clear(z);"),
    "s.frameBatch.depth_clear_value(output.nativeDepthOrderingMode != 0u)" in draw,
    "s.frameBatch.consume_depth_clear();" in draw,
    "depthCleared && !stencilCleared && depthCompatible &&" in policy,
