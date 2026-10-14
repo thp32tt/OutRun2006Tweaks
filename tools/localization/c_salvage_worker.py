@@ -222,6 +222,27 @@ def handle_recipe(p: Path, root: Path, output: Path):
         return "HOLD_RECIPE_FAIL_CLOSED", True
 
 
+def handle_plate_job(p: Path, root: Path, output: Path):
+    import c_salvage_plate
+    blob = p.read_bytes()
+    if len(blob) > 2_000_000:
+        return "HOLD_PLATE_JOB_SIZE", False
+    key = re.sub(r"[^a-zA-Z0-9_.-]", "_", p.stem) + "-" + sha(blob)[:16]
+    done = output / "plates" / key
+    held = output / "plate_failures" / (key + ".json")
+    if (done / "receipt.json").exists() or held.exists():
+        return "ALREADY_RECORDED", False
+    try:
+        spec = json.loads(blob)
+        result = c_salvage_plate.prepare_plate(root, spec, done)
+        return result["status"], True
+    except Exception as e:
+        store_json(held, {"schema": SCHEMA, "job": p.name, "sha256": sha(blob),
+                          "status": "HOLD_PLATE_PREPARATION", "reason": str(e),
+                          "C1": "NOT_RUN", "RUNTIME_VALIDATION": "UNTESTED"})
+        return "HOLD_PLATE_PREPARATION", True
+
+
 def run_once(args):
     root = Path(args.input_root).resolve()
     out = Path(args.output_root).resolve()
@@ -251,6 +272,15 @@ def run_once(args):
                 counts[status] = counts.get(status, 0) + 1
             added += int(changed)
         if added >= args.max_per_cycle: break
+    if getattr(args, "plate_jobs_dir", None):
+        plate_dir = Path(args.plate_jobs_dir).resolve()
+        if plate_dir.is_dir():
+            for job in sorted(plate_dir.glob("*.json")):
+                if added >= args.max_per_cycle: break
+                status, changed = handle_plate_job(job, bundle_root, out)
+                if status != "ALREADY_RECORDED":
+                    counts[status] = counts.get(status, 0) + 1
+                added += int(changed)
     if args.recipes_dir:
         recipe_dir = Path(args.recipes_dir).resolve()
         if recipe_dir.is_dir():
@@ -281,6 +311,7 @@ def main():
     p.add_argument("--repo-root", default=None)
     p.add_argument("--recipes-dir", default=None)
     p.add_argument("--bundle-root", default=None, help="Optional isolated reviewed source/DDS/PSD/CLEAN bundle; never A/B live data")
+    p.add_argument("--plate-jobs-dir", default=None, help="Reviewed PSD/source English-removal jobs")
     p.add_argument("--masks-dir", default=None)
     p.add_argument("--max-per-cycle", type=int, default=10)
     p.add_argument("--interval-seconds", type=int, default=1800)
