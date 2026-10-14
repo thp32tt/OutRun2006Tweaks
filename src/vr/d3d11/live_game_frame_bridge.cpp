@@ -5456,10 +5456,19 @@ void before_game_present(IDirect3DDevice9* game,
                                     const bool copied =
                                         GameNativeFramePublication::valid_upload_pitch(
                                             surfaceWidth, lockRect.Pitch) &&
-                                        GameNativeFrameUpload::copy_rows(
-                                            lockRect.pBits, lockRect.Pitch,
-                                            mapped.pData, mapped.RowPitch,
-                                            surfaceWidth, surfaceHeight);
+                                        (croppedNativeUpload
+                                            ? GameNativeFrameUpload::copy_rect(
+                                                lockRect.pBits, lockRect.Pitch,
+                                                mapped.pData, mapped.RowPitch,
+                                                surfaceWidth, surfaceHeight,
+                                                static_cast<std::uint32_t>(presentRegion.left),
+                                                static_cast<std::uint32_t>(presentRegion.top),
+                                                static_cast<std::uint32_t>(presentRegion.right),
+                                                static_cast<std::uint32_t>(presentRegion.bottom))
+                                            : GameNativeFrameUpload::copy_rows(
+                                                lockRect.pBits, lockRect.Pitch,
+                                                mapped.pData, mapped.RowPitch,
+                                                surfaceWidth, surfaceHeight));
                                     const HRESULT unlockStatus = s.insetSurface->UnlockRect();
                                     if (!copied || FAILED(unlockStatus)) {
                                         ++s.failed;

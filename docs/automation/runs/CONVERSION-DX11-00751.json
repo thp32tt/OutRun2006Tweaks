@@ -1,0 +1,83 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00751",
+  "production_id": "CONVERSION-DX11-00751",
+  "event_id": "CONVERSION-DX11-00751-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULLFRAME_CROPPED_CPU_UPLOAD",
+  "feature_id": "DX11-MENU-RACE-NATIVE-CROPPED-BGRA-PUBLICATION",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "a7ff6f40ea91d3a178c1716f0ede88c1791098b6",
+  "material_result_sha": null,
+  "change_summary": "Actual native full-size menu/vehicle/race D3D11 BGRA GPU readback -> D3D9 CPU upload now copies only the verified Present source crop, preserving untouched D3D9 pixels outside crop and unchanged full-size path. Invalid source coordinates, strides and arithmetic refuse partial publishing and retain D3D9/gamepad fallback.",
+  "changed_files": [
+    "src/vr/d3d11/native_game_frame_upload.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_cropped_cpu_upload_probe_00751.cpp",
+    "tools/test_dx11_cropped_cpu_upload_00751.py",
+    "docs/automation/runs/CONVERSION-DX11-00751.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-NATIVE-CROPPED-BGRA-PUBLICATION",
+    "goal": "Transfer precisely the verified cropped source of an actual full-resolution D3D11 menu/vehicle/race game frame to the matching D3D9 Present while keeping uncropped pixels and gamepad path intact.",
+    "acceptance_items": [
+      {
+        "id": "actual-game-crop-transfer",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_gpu_to_d3d9_present",
+        "expected_behavior": "Same-Present native full-size GPU readback copies exactly the source crop into D3D9 SYSTEMMEM backbuffer coordinates and uses bounded UpdateSurface."
+      },
+      {
+        "id": "preserve-fallback-on-invalid-copy",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_gamepad_and_original_present",
+        "expected_behavior": "Invalid crop/pitches/source buffers never write or publish a partial native surface; original D3D9 game and gamepad remain authoritative."
+      },
+      {
+        "id": "exact-sha-build-ci",
+        "category": "integrated_validation",
+        "behavior_area": "fullframe_dx11_windows_openxr_hud",
+        "expected_behavior": "Portable positive/negative C++ probe and destructive integration regression plus exact-SHA mandatory five Gates."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "actual-game-crop-transfer": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "preserve-fallback-on-invalid-copy": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "exact-sha-build-ci": "PENDING_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Full-res source-crop helper and callsite implemented; Quest3/game screen UNTESTED",
+    "activation_guard_and_fallback": "Opt-in disabled by default; source-crop validity and D3D9 UpdateSurface/UnlockRect remain fail closed; always retain original D3D9 Present/input."
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS remote HEAD and 00750 owner/C6 inspected",
+    "C1_REVIEW": "PASS unneeded full physical framebuffer CPU copies found in verified cropped Present",
+    "C2_IMPLEMENT": "PASS header + live C++ crop wire, fallback and two regression probes",
+    "C3_VALIDATE": "Local portable C++ proof PASS; exact SHA GitHub Gates pending",
+    "C4_COMMIT": "Material code commit with AUTO marker",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING exact-SHA Gates; hardware UNTESTED"
+  },
+  "next_action": "Check exact SHA DX11 Fast, Backend Conversion, Win32 Build, OpenXR and HUD; repair concrete failure only, preserve Quest3/VDXR UNTESTED."
+}

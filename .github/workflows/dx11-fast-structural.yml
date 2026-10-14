@@ -128,6 +128,8 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_dirty_partition_probe_00749.cpp -o /tmp/dx11_dirty_partition_00749 && /tmp/dx11_dirty_partition_00749
           python tools/test_dx11_full_dirty_crop_00750.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_dirty_crop_probe_00750.cpp -o /tmp/dx11_dirty_crop_00750 && /tmp/dx11_dirty_crop_00750
+          python tools/test_dx11_cropped_cpu_upload_00751.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_cropped_cpu_upload_probe_00751.cpp -o /tmp/dx11_cropped_upload_00751 && /tmp/dx11_cropped_upload_00751
           python tools/test_dx11_full_frame_fallback_00724.py
           python tools/test_dx11_full_frame_same_present_00726.py
           python tools/test_dx11_same_present_fence_00731.py
