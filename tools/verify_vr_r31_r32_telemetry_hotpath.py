@@ -44,10 +44,29 @@ def check(r31, r32):
             "R32FinalizeFramePerf(", "R32LogPerfWindow()", "else",
             "R32FrameWorkloadCounters = {};", "R32LastPresentEndQpc = 0;")]
         if indices != sorted(indices): return False
+        # The opt-out reset is now guarded by a Present transition. Verify
+        # that the guard clears the QPC baseline and window ownership together.
+        transition = after[after.index("else if (R32PerfWindowActive ||"):]
+        if not all(x in transition for x in (
+            "R32FrameWorkloadCounters.draws != 0)",
+            "R32FrameWorkloadCounters = {};",
+            "R32PerfWindowCounters = {};",
+            "R32PerfBaselineUs = 0;",
+            "R32Counters = {};",
+            "R32LastPresentEndQpc = 0;",
+            "R32PerfWindowActive = false;")):
+            return False
+        if not (transition.index("R32LastPresentEndQpc = 0;") <
+                transition.index("R32PerfWindowActive = false;")):
+            return False
         disabled = finalize[
             finalize.index("if (!R30SupportTelemetryEnabled())"):
             finalize.index("auto frame = ")]
-        return "R32LastPresentEndQpc = 0;" in disabled
+        return all(x in disabled for x in (
+            "R32LastPresentEndQpc = 0;",
+            "R32PerfWindowActive = false;",
+            "R32PerfWindowCounters = {};",
+            "R32PerfBaselineUs = 0;"))
     except ValueError:
         return False
 
@@ -62,8 +81,12 @@ def main():
         (r31.replace("R31Window = {};\n                }\n                return;", "R31Window = {};\n                }\n                ++R31Frame.draws;", 1), r32),
         (r31.replace("if (R30SupportTelemetryEnabled())", "if (true)", 1), r32),
         (r31, r32.replace("stereo = R32CaptureStereoWorkload();", "stereo = {};", 1)),
-        (r31, r32.replace("R32LastPresentEndQpc = 0;\n                }", "R32LastPresentEndQpc = presentStart.QuadPart;\n                }", 1)),
-        (r31, r32.replace("R32LastPresentEndQpc = 0;\n                return;", "R32LastPresentEndQpc = presentEndQpc;\n                return;", 1)),
+        (r31, r32.replace(
+            "R32LastPresentEndQpc = 0;\n                    R32PerfWindowActive = false;",
+            "R32LastPresentEndQpc = presentStart.QuadPart;\n                    R32PerfWindowActive = false;", 1)),
+        (r31, r32.replace(
+            "R32LastPresentEndQpc = 0;\n                R32PerfWindowActive = false;\n                return;",
+            "R32LastPresentEndQpc = presentEndQpc;\n                R32PerfWindowActive = false;\n                return;", 1)),
     )
     for i, (left, right) in enumerate(candidates):
         assert left != r31 or right != r32, f"mutation {i} not applied"
