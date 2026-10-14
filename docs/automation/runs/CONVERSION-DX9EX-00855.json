@@ -1,0 +1,97 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00855",
+  "production_id": "CONVERSION-DX9EX-00855",
+  "event_id": "CONVERSION-DX9EX-00855-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00855",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:F11_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:F11_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+    "goal": "Restore the complete visible F11 external Dear ImGui window to a legible, independently sized binocular gameplay interface without inheriting the game's small HudScale, while retaining its original shell hit targets, game input routing, and safe eye projection.",
+    "scope_boundary": "Only proven F11 external ImGui fixed-function XYZ/orthographic, per-eye matrix and matching scissor projection in the actually packaged R26+HUD renderer; no generic queue sprites, world billboards, GOAL, lens, ordinary HUD scaling, gamepad/FFB, SkyGlow, DX11 or DXVK.",
+    "trace_stages": [
+      "Original F11 toggle and Win32 input routing select the external native-density ImGui shell, without turning its source into an original game SpriteNode.",
+      "ScopedExternalOverlaySemantic ScreenOverlay2D encloses ImGui_ImplDX9_RenderDrawData at game EndScene, and exact F11 fixed-function XYZ/null-VS/orthographic admission identifies per-draw ownership.",
+      "Packaged R26+HUD R30PrepareExternalImGuiProjection reconstructs native-sized finite left/right eye projection and matching scissor and restores original state; OpenXR host composes the eye output."
+    ],
+    "subcomponents": [
+      "Remove second 0.55x gameplay HudScale shrink only from the external F11 XY Z ImGui eye-plane builder, in both X and Y while retaining its native-density font and existing centered shell.",
+      "Preserve game SpriteNode ScreenHud size, zero/unknown source fallback, separate original scissor ownership and restore, and desktop F11 input/scale unchanged.",
+      "Compile positive and negative C++ scale assertions in the packaged owner and run destructive Python tests for producer boundaries, unchanged main HUD, both-eye native scaling and default R30 full-chain parity."
+    ],
+    "acceptance_items": [
+      {
+        "id": "native_size",
+        "category": "end_to_end_behavior",
+        "behavior_area": "F11 ImGui raster and eye-projection",
+        "expected_behavior": "Native-sized F11 original orthographic pixels and source font are not multiplied by game HudScale when independently projected into both VR eyes."
+      },
+      {
+        "id": "independent",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Packaged R26 eye scissor and game HUD ownership",
+        "expected_behavior": "Proven F11 and original game sprites have separate scale policies; both eye matrices and scissor remain paired with original scope and render-state restoration."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Desktop/game/unknown controls",
+        "expected_behavior": "Ordinary game HUD still honors 0.55 and 1.5 HudScale; non-ImGui world/effects and desktop ImGui do not enter the external stereo path or change original input."
+      },
+      {
+        "id": "integration",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA Windows game+host+package, source-domain gate and F11 tests",
+        "expected_behavior": "Packaged Windows x86 game and x64 host plus full-chain compile, Domain Isolation and existing F11 scoped mutation verifier pass on the final validation-bearing exact SHA."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Quest3/VDXR user reported F11 tiny and upper-right on earlier installed DX9Ex payload; code proves F11 native-density font and full shell are independently scaled but packaged R26+HUD subsequently applies global gameplay HudScale to both eye-plane axes.",
+    "root_cause": "Packaged R26 R30BuildHudPlaneCoefficients called R30HudContainScale for every flat pass, including external F11's independently rasterised ImGui fixed-function XYZ overlay, multiplying its left/right native glyph and hit-target plane size by game HudScale again.",
+    "source_trace": [
+      "src/overlay/overlay.cpp::render_shell and hooks_overlay.cpp::D3DEndScene create and render F11 with native-density font, live viewport-centered interactive bounds and external ScreenOverlay2D scope.",
+      "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp::R30PrepareExternalImGuiProjection admits only exact source external fixedfn XYZ/orthographic/scissor, then invokes R30BuildHudPlaneCoefficients.",
+      "R30BuildHudPlaneCoefficients previously applied gameplay R30HudContainScale for both F11 and game sprites; per-eye hudClipX/hudClipY/hudClipW and transformed per-eye scissor receive the mistakenly shrunken F11 projection."
+    ],
+    "alternatives_rejected": [
+      "Do not globally enlarge HudScale: the game speed/time/rank HUD would change and historical head/world semantics would risk regression.",
+      "Do not rebuild the font atlas every draw: source glyphs were already enlarged and GPU eye projection later reduced them.",
+      "Do not force all null-VS or alpha sprites to external F11: precise ExternalOverlaySemanticDepth, XYZ FVF, orthographic projection and game state remain the sole admissions."
+    ],
+    "fix_evidence": "In actual packaged R26+HUD C++ the F11-specific coefficient call passes false and uses unity for both native eye axes, while the normal game HUD call passes true and retains original settings. The general R30 full-chain independent F11 override remains untouched.",
+    "negative_test_evidence": "C++ constexpr asserts preserve distinct F11 0.55/1.5 scale and regular game scaling; workflow-wired F11 Python verifier checks exact packaged owner calls, both scale components, strict admission, order before projection, negative mutations and numeric resolution cases.",
+    "eye_ownership": "R30PrepareExternalImGuiProjection has strict exact F11 scope/orthographic/fixedfn gates, computes each eye's head-inverse, relative pose, FOV, viewport and per-command scissor with original state restoration, without borrowing normal game ScreenHud scale."
+  },
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
+  "phase": "C4_COMMIT_C3_VALIDATION_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "No matching Quest3/VDXR game test performed; F11 optical size/placement and interaction remain NEED_HMD_TEST even if Windows CI passes.",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/verify_vr_f11_font_density.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00855.json"
+  ],
+  "material_result_sha": "02cd1c8aafaccb079f0ea53eb3fd52582e1b9a32",
+  "validation_bearing_result_sha": null,
+  "acceptance_results": {
+    "native_size": "SOURCE_PATCHED_CI_PENDING",
+    "independent": "SOURCE_PATCHED_CI_PENDING",
+    "fallback": "REGRESSION_PENDING",
+    "integration": "PENDING_EXACT_SHA"
+  },
+  "ci_evidence": {
+    "prior_candidate": "70f77164242b32dd1f64bad2da62dcd8b3cddce6",
+    "prior_gate_run": 38612021387,
+    "prior_gate_failure": "RUN_RECORD_MISSING; code compilation not reached",
+    "runtime_validation": "UNTESTED"
+  },
+  "score_once": false
+}
