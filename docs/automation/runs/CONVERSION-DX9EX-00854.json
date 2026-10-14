@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00854",
+  "production_id": "CONVERSION-DX9EX-00854",
+  "event_id": "CONVERSION-DX9EX-00854-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00854",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Restore the complete pre-restart GOAL title/time and percentage animation to one binocular HUD presentation by keeping exact producers across deferred D3DX GPU submission without changing the original race clock.",
+    "scope_boundary": "Only the proven original two GOAL time helper E8 calls and two result-progress E8 parents at exact D3DX batch boundaries; no generic white/translucent effect, unsafe B9200 return hook, 6th/6, lens, SkyGlow, or world promotion.",
+    "trace_stages": [
+      "Original GOAL calls 0xBEA5A and 0xBEA5F and result-progress calls 0x97BE4 and 0x97DEC own exact source time and queued SpriteNodes.",
+      "D3DX Begin/Draw batches retain homogeneous GOAL producer through source transitions until exact GPU Flush/End.",
+      "R26+HUD packaged fixed-function/VS eye ownership and host composition require exact Windows CI followed by Quest3/VDXR runtime validation."
+    ],
+    "subcomponents": [
+      "Flush prior homogeneous D3DX batch before changing from a previous queue producer or GOAL helper to the next GOAL ScreenHud owner.",
+      "Submit homogeneous queued and pristine direct GOAL D3DX batch while the exact GOAL source remains alive, rejecting mixed/unknown buffers.",
+      "Preserve +TIME and 6th/6 rank paths; verify independent final result/title/text and HMD before optical completion."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GOAL original helper and percentage producers",
+        "expected_behavior": "Two original GOAL helpers and result-progress producers retain unique ScreenHud/producer ownership across original direct and queue calls."
+      },
+      {
+        "id": "gpu_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3DX deferred GPU batching",
+        "expected_behavior": "GOAL helper transitions and finite direct glyphs force GPU Flush only when batch source is fully proven and prior queue owner is preserved."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Unknown, world, rank and +TIME protected effects",
+        "expected_behavior": "Unknown or heterogeneous buffers are never promoted to GOAL; rank 6th/6, stage +TIME and world/SkyGlow paths preserve prior behavior."
+      },
+      {
+        "id": "integrate",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA Windows game host and package",
+        "expected_behavior": "DX9Ex Active Windows x86 game and x64 host package plus Domain and changed-area checks all succeed on the exact validation-bearing SHA."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Current GOAL E8 helpers and 0x2D200 result progress producers tag their direct and queued source scopes but the existing D3DX hook only flushes exact +TIME and rank owners.",
+    "root_cause": "When GOAL D3DXSprite triangles remain deferred past the source E8 return or queue node boundary, the actual GPU Draw can execute with the next semantic owner instead of the original GOAL ScreenHud.",
+    "source_trace": [
+      "Game GOAL E8 helper wrappers scope GoalTime020/150 and append sibling nodes tagged with exact tokens.",
+      "Selected SpriteNode changes EffectiveScope and producer before a D3DX End/Flush can submit prior geometry.",
+      "Packaged R26+HUD consumes semantic ownership at actual draw; the existing R64 hook had StageOwner only."
+    ],
+    "alternatives_rejected": [
+      "Global unconditional D3DX Flush risks alpha batching/performance and rank/world rendering.",
+      "Tagging every white alpha Draw as GOAL would corrupt SkyGlow/world and non-GOAL HUD.",
+      "Reinstalling 19 historically crashing 0x97xxx text return hooks is unsafe without ABI-proof."
+    ],
+    "fix_evidence": "GOAL-only finite owner and old-producer-first queue boundary added to the existing R64 D3DX Begin/Draw/Flush/End hook, with new negative-source verifier conditions.",
+    "negative_test_evidence": "Changed-area verifier now rejects lost GOAL source, helper switch, queue admission and percentage source mutations while retaining +TIME existing negatives.",
+    "eye_ownership": "Only exact GOAL ScreenHud source transitions are submitted before their owning queue scope exits; same R26+HUD existing per-eye transforms handle raster."
+  },
+  "status": "C5_VALIDATION_PENDING",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "No Quest3/VDXR game/HMD test for this source change. CI must not be interpreted as stereo optical PASS.",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00854.json"
+  ],
+  "score_once": false,
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "acceptance_results": {
+    "goal_source": "PENDING",
+    "gpu_owner": "PENDING",
+    "fallback": "PENDING",
+    "integrate": "PENDING"
+  }
+}

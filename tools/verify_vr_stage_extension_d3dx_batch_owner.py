@@ -54,6 +54,24 @@ def check(code: str) -> list[str]:
     need("PeekSpriteNodeScope(nextNode, RenderScope::None, &nextProducer)" in hook and
          "StageOwner(nextScope, nextProducer)" in hook,
          "next node must have exact +TIME tag before promotion")
+    need("GoalTimeHelperCallA = 0xBEA5A" in source and
+         "GoalTimeHelperCallB = 0xBEA5F" in source and
+         "ProducerToken::GoalTime020" in source and
+         "ProducerToken::GoalTime150" in source and
+         "ProducerToken::ResultProgress" in source,
+         "finite GOAL production source calls missing")
+    need("GoalOwner(nextScope, nextProducer)" in hook and
+         "GoalOwner(EffectiveScope(), CurrentRenderProducerToken())" in hook and
+         "nextProducer != CurrentRenderProducerToken()" in hook and
+         "StageBoundaryReady = enteringStage || enteringGoal" in hook,
+         "GOAL queue enter/leave and two-helper switching must isolate old batch")
+    need("GoalOwner(scope, source) && PendingHomogeneous" in hook and
+         "(exactStage || exactGoal)" in hook and
+         "GoalFlushes" in hook and "GoalFallbacks" in hook,
+         "GOAL direct and deferred GPU submission requires exact source proof")
+    for token in ("GoalTime020", "GoalTime150", "ResultProgress"):
+        need(f"source == ProducerToken::{token}" in hook,
+             f"GOAL token {token} missing")
     need("StageOwner(scope, source) && PendingHomogeneous" in hook and
          "queuedStageIsolated || directStageIsolated" in hook and
          "FlushTracked(self)" in hook,
@@ -110,12 +128,24 @@ def main() -> int:
         "lost-rank-exact-source":
             code.replace("queuedSource == ProducerToken::DispRankClipSprite",
                          "queuedSource == ProducerToken::None", 1),
+        "goal-batch-source-lost":
+            code.replace("GoalOwner(scope, source) && PendingHomogeneous",
+                         "false && PendingHomogeneous", 1),
+        "goal-helper-boundary-lost":
+            code.replace("nextProducer != CurrentRenderProducerToken()",
+                         "false", 1),
+        "goal-queue-admission-lost":
+            code.replace("StageBoundaryReady = enteringStage || enteringGoal",
+                         "StageBoundaryReady = enteringStage;", 1),
+        "goal-progress-owner-lost":
+            code.replace("source == ProducerToken::ResultProgress",
+                         "source == ProducerToken::None", 1),
     }
     for label, mutated in mutations.items():
         if mutated == code or not check(mutated):
             print("DX9Ex +TIME D3DX FAIL: mutation not detected:", label)
             return 1
-    print("DX9Ex +TIME D3DX batch boundary and 6 negative regressions PASS")
+    print("DX9Ex +TIME/GOAL D3DX batch boundaries and 10 negative regressions PASS")
     return 0
 
 

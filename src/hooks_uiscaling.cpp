@@ -2051,6 +2051,8 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     inline static std::atomic<std::uint64_t> Failures{ 0 };
     inline static std::atomic<std::uint64_t> StageFlushes{ 0 };
     inline static std::atomic<std::uint64_t> StageFallbacks{ 0 };
+    inline static std::atomic<std::uint64_t> GoalFlushes{ 0 };
+    inline static std::atomic<std::uint64_t> GoalFallbacks{ 0 };
 
     // A D3DXSprite::Draw may queue triangles until Flush/End. A source-call
     // scope is NOT sufficient ownership for a deferred GPU Draw. We only
@@ -2077,6 +2079,21 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     {
         return scope == OutRunVR::GameSemantic::RenderScope::ScreenHud &&
             source == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime;
+    }
+
+    // GOAL finish-time helpers and percentage sprites also enqueue D3DX
+    // triangles beyond their original E8 call. Only these verified source
+    // tokens may use the finite HUD batch isolation, not white/alpha draws
+    // in general or the crash-prone B9200 return-hook family.
+    static bool GoalOwner(
+        OutRunVR::GameSemantic::RenderScope scope,
+        OutRunVR::GameSemantic::ProducerToken source) noexcept
+    {
+        using namespace OutRunVR::GameSemantic;
+        return scope == RenderScope::ScreenHud &&
+            (source == ProducerToken::GoalTime020 ||
+             source == ProducerToken::GoalTime150 ||
+             source == ProducerToken::ResultProgress);
     }
 
     static void ForgetBatch() noexcept
@@ -2154,7 +2171,17 @@ public:
         const bool enteringStage = StageOwner(nextScope, nextProducer);
         const bool leavingStage = QueueRenderActive() &&
             StageOwner(EffectiveScope(), CurrentRenderProducerToken());
-        if (enteringStage == leavingStage)
+        const bool enteringGoal = GoalOwner(nextScope, nextProducer);
+        const bool leavingGoal = QueueRenderActive() &&
+            GoalOwner(EffectiveScope(), CurrentRenderProducerToken());
+        // A pair of GOAL E8 helpers have different source tokens even
+        // though both are ScreenHud. The outgoing GPU batch must be
+        // submitted before the queue selects the new helper.
+        const bool goalBoundary =
+            (enteringGoal != leavingGoal) ||
+            (enteringGoal && leavingGoal &&
+             nextProducer != CurrentRenderProducerToken());
+        if (enteringStage == leavingStage && !goalBoundary)
             return;
 
         void* sprite = *Module::exe_ptr<void*>(0x55B218);
@@ -2178,14 +2205,15 @@ public:
             }
             StageFlushes.fetch_add(1, std::memory_order_relaxed);
         }
-        StageBoundaryReady = enteringStage;
+        StageBoundaryReady = enteringStage || enteringGoal;
     }
 
     static void BeforeQueueEnd() noexcept
     {
         using namespace OutRunVR::GameSemantic;
         if (StageBoundaryReady && QueueRenderActive() &&
-            StageOwner(EffectiveScope(), CurrentRenderProducerToken()) &&
+            (StageOwner(EffectiveScope(), CurrentRenderProducerToken()) ||
+             GoalOwner(EffectiveScope(), CurrentRenderProducerToken())) &&
             PendingDraws != 0 && PendingHomogeneous &&
             PendingScope == EffectiveScope() &&
             PendingProducer == CurrentRenderProducerToken())
@@ -2241,25 +2269,33 @@ private:
         // Unknown/mixed buffers retain the original D3DX End behavior.
         const bool directStageIsolated =
             !QueueRenderActive() && PendingDraws == 1u;
+        // GOAL uses the SAME fail-closed Begin/Draw provenance and exact
+        // queue boundary as +TIME. Never label a preexisting mixed/unknown
+        // sprite batch as a GOAL glyph, even with a matching current token.
+        const bool exactStage = StageOwner(scope, source) && PendingHomogeneous;
+        const bool exactGoal = GoalOwner(scope, source) && PendingHomogeneous;
         if ((queuedStageIsolated || directStageIsolated) &&
             BatchActive && self == TrackedSprite &&
-            StageOwner(scope, source) && PendingHomogeneous &&
+            (exactStage || exactGoal) &&
             PendingScope == scope && PendingProducer == source)
         {
             if (FlushTracked(self))
             {
-                const auto n = StageFlushes.fetch_add(
-                    1, std::memory_order_relaxed) + 1;
+                const auto n = (exactGoal ? GoalFlushes : StageFlushes)
+                    .fetch_add(1, std::memory_order_relaxed) + 1;
                 if ((n & (n - 1)) == 0)
                     spdlog::info(
-                        "VR P0 +TIME D3DX batch: exact {} stage submitted; flushes={} fallback={}",
+                        "VR P0 {} D3DX batch: exact {} submission; flushes={} fallback={}",
+                        exactGoal ? "GOAL" : "+TIME",
                         queuedStageIsolated ? "queued" : "direct",
-                        n, StageFallbacks.load(std::memory_order_relaxed));
+                        n, (exactGoal ? GoalFallbacks : StageFallbacks)
+                            .load(std::memory_order_relaxed));
             }
             else
             {
                 StageBoundaryReady = false;
-                StageFallbacks.fetch_add(1, std::memory_order_relaxed);
+                (exactGoal ? GoalFallbacks : StageFallbacks)
+                    .fetch_add(1, std::memory_order_relaxed);
             }
             return hr;
         }
@@ -2327,7 +2363,7 @@ private:
                         Draw_hk.enable().has_value())
                     {
                         spdlog::info(
-                            "VR R64 D3DX: exact +TIME queue batch boundary plus original rank isolate; unknown/mixed batches fail closed");
+                            "VR R64 D3DX: exact +TIME/GOAL queue batch boundaries plus original rank isolate; unknown/mixed batches fail closed");
                         return 0;
                     }
                     // Hook installation is atomic: no partially active
