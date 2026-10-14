@@ -264,6 +264,69 @@ namespace OutRunVR::GameSemantic
     inline std::size_t SpriteNodeSemanticCount = 0;
     inline std::atomic<std::size_t> SpriteNodeSemanticPublishedCount{ 0 };
     inline std::mutex SpriteNodeSemanticMutex;
+    // Definite-miss filter for dense SpriteNode queues. Positive hints still
+    // take the original locked exact-pointer path; hash bits never grant HUD,
+    // world or per-eye ownership. Writers update bit counts under the mutex.
+    inline constexpr unsigned SpriteNodeSemanticHintBits = 256;
+    inline std::array<std::atomic<std::uint64_t>, 4>
+        SpriteNodeSemanticHintWords{};
+    inline std::array<std::uint16_t, SpriteNodeSemanticHintBits>
+        SpriteNodeSemanticHintRefCounts{};
+
+    struct SpriteNodeHintPair { unsigned first; unsigned second; };
+
+    inline SpriteNodeHintPair SpriteNodeSemanticHintFor(
+        const void* node) noexcept
+    {
+        std::uint64_t key = static_cast<std::uint64_t>(
+            reinterpret_cast<std::uintptr_t>(node)) >> 3;
+        key ^= key >> 32;
+        std::uint32_t h = static_cast<std::uint32_t>(key);
+        h ^= h >> 16;
+        h *= 0x7feb352du;
+        h ^= h >> 15;
+        h *= 0x846ca68bu;
+        h ^= h >> 16;
+        return { h & 255u, (h >> 8) & 255u };
+    }
+
+    inline bool SpriteNodeSemanticMaybeHasTag(const void* node) noexcept
+    {
+        const auto bits = SpriteNodeSemanticHintFor(node);
+        const auto has = [](unsigned bit) noexcept {
+            return (SpriteNodeSemanticHintWords[bit >> 6].load(
+                std::memory_order_acquire) & (1ull << (bit & 63u))) != 0;
+        };
+        return has(bits.first) && has(bits.second);
+    }
+
+    inline void SpriteNodeSemanticRememberHint(const void* node) noexcept
+    {
+        const auto bits = SpriteNodeSemanticHintFor(node);
+        const auto add = [](unsigned bit) noexcept {
+            if (SpriteNodeSemanticHintRefCounts[bit]++ == 0)
+                SpriteNodeSemanticHintWords[bit >> 6].fetch_or(
+                    1ull << (bit & 63u), std::memory_order_release);
+        };
+        add(bits.first);
+        if (bits.second != bits.first)
+            add(bits.second);
+    }
+
+    inline void SpriteNodeSemanticForgetHint(const void* node) noexcept
+    {
+        const auto bits = SpriteNodeSemanticHintFor(node);
+        const auto remove = [](unsigned bit) noexcept {
+            auto& count = SpriteNodeSemanticHintRefCounts[bit];
+            if (count != 0 && --count == 0)
+                SpriteNodeSemanticHintWords[bit >> 6].fetch_and(
+                    ~(1ull << (bit & 63u)), std::memory_order_release);
+        };
+        remove(bits.first);
+        if (bits.second != bits.first)
+            remove(bits.second);
+    }
+
     inline std::atomic<std::uint64_t> SpriteNodeSemanticNextSerial{ 1 };
     inline std::atomic<std::uint64_t> SpriteNodeSemanticRegistered{ 0 };
     inline std::atomic<std::uint64_t> SpriteNodeSemanticConsumed{ 0 };
@@ -418,6 +481,7 @@ namespace OutRunVR::GameSemantic
             SpriteNodeSemanticTags[SpriteNodeSemanticCount++] =
                 { node, scope, producer, serial,
                   projectedMarker ? *projectedMarker : ProjectedMarkerInfo{} };
+            SpriteNodeSemanticRememberHint(node);
             SpriteNodeSemanticPublishedCount.store(
                 SpriteNodeSemanticCount, std::memory_order_release);
             SpriteNodeSemanticRegistered.fetch_add(
@@ -435,9 +499,11 @@ namespace OutRunVR::GameSemantic
                 SpriteNodeSemanticTags[oldest].serial)
                 oldest = i;
         }
+        SpriteNodeSemanticForgetHint(SpriteNodeSemanticTags[oldest].node);
         SpriteNodeSemanticTags[oldest] =
             { node, scope, producer, serial,
               projectedMarker ? *projectedMarker : ProjectedMarkerInfo{} };
+        SpriteNodeSemanticRememberHint(node);
         SpriteNodeSemanticRegistered.fetch_add(
             1, std::memory_order_relaxed);
         SpriteNodeSemanticStaleCleared.fetch_add(
@@ -456,7 +522,8 @@ namespace OutRunVR::GameSemantic
             *projectedMarker = {};
         if (!node ||
             SpriteNodeSemanticPublishedCount.load(
-                std::memory_order_acquire) == 0)
+                std::memory_order_acquire) == 0 ||
+            !SpriteNodeSemanticMaybeHasTag(node))
             return fallback;
 
         std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
@@ -494,7 +561,8 @@ namespace OutRunVR::GameSemantic
             *exactTag = false;
         if (!node ||
             SpriteNodeSemanticPublishedCount.load(
-                std::memory_order_acquire) == 0)
+                std::memory_order_acquire) == 0 ||
+            !SpriteNodeSemanticMaybeHasTag(node))
             return fallback;
 
         std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);
@@ -510,6 +578,7 @@ namespace OutRunVR::GameSemantic
                 *producer = SpriteNodeSemanticTags[i].producer;
             CurrentQueueProjectedMarker =
                 SpriteNodeSemanticTags[i].projectedMarker;
+            SpriteNodeSemanticForgetHint(node);
             SpriteNodeSemanticTags[i] =
                 SpriteNodeSemanticTags[--SpriteNodeSemanticCount];
             SpriteNodeSemanticTags[SpriteNodeSemanticCount] = {};
@@ -605,6 +674,7 @@ namespace OutRunVR::GameSemantic
                 if (tag.serial != 0 &&
                     tag.serial <= SpriteQueueSemanticCutoff)
                 {
+                    SpriteNodeSemanticForgetHint(tag.node);
                     SpriteNodeSemanticStaleCleared.fetch_add(
                         1, std::memory_order_relaxed);
                     continue;

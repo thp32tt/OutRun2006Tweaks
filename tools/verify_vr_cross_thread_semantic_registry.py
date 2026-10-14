@@ -173,4 +173,105 @@ for mark in (
 if mutations!=3:fail("epoch negatives must be 3/3")
 print(f"VR semantic tag epoch ordering PASS: {checked} sources, {mutations}/3 lock faults detected")
 
+
+# P0-B: a source-confirmed producer does not make 3298 unrelated queue nodes
+# contend on the registry mutex. Negative hints never authorize stereo: a
+# positive hint still needs the locked, exact-pointer semantic comparison.
+for label, body in (("peek", peek), ("consume", consume)):
+    hint = body.find("!SpriteNodeSemanticMaybeHasTag(node)")
+    lock = body.find("std::lock_guard<std::mutex> lock(SpriteNodeSemanticMutex);")
+    if hint < 0 or lock < 0 or hint >= lock:
+        fail(f"{label}: untagged node still takes the registry mutex")
+for marker in (
+    "SpriteNodeSemanticRememberHint(node);",
+    "SpriteNodeSemanticForgetHint(SpriteNodeSemanticTags[oldest].node);",
+):
+    if marker not in register:
+        fail("tag publication/overwrite lost pre-lock hint accounting: " + marker)
+if "SpriteNodeSemanticForgetHint(node);" not in consume:
+    fail("tag consumption leaks a ref-counted hint")
+if "SpriteNodeSemanticForgetHint(tag.node);" not in end:
+    fail("queue-end stale sweep leaks a ref-counted hint")
+hint = function_body(s, "inline bool SpriteNodeSemanticMaybeHasTag(")
+for marker in ("std::memory_order_acquire", "has(bits.first) && has(bits.second)"):
+    if marker not in hint:
+        fail("invalid two-hash negative-hint contract: " + marker)
+
+# Positive and collision/overflow/expiry negative models. Regressions in
+# deletion accounting can cause a real exact HUD/rank tag to be lost.
+def filter_bits(pointer):
+    key = pointer >> 3
+    key ^= key >> 32
+    h = key & 0xffffffff
+    h ^= h >> 16
+    h = (h * 0x7feb352d) & 0xffffffff
+    h ^= h >> 15
+    h = (h * 0x846ca68b) & 0xffffffff
+    h ^= h >> 16
+    return h & 255, (h >> 8) & 255
+
+refs = [0] * 256
+active = set()
+def add(pointer):
+    if pointer not in active:
+        active.add(pointer)
+        for bit in set(filter_bits(pointer)):
+            refs[bit] += 1
+def remove(pointer):
+    if pointer in active:
+        active.remove(pointer)
+        for bit in set(filter_bits(pointer)):
+            refs[bit] -= 1
+            assert refs[bit] >= 0
+def might_match(pointer):
+    return all(refs[bit] > 0 for bit in filter_bits(pointer))
+
+add(0x420100)
+misses = [0x500000 + i * 32 for i in range(3298)]
+assert sum(not might_match(p) for p in misses) > 3100
+seen = {}
+collision = None
+for i in range(16384):
+    pointer = 0x600000 + i * 16
+    pair = tuple(sorted(filter_bits(pointer)))
+    if pair in seen:
+        collision = seen[pair], pointer
+        break
+    seen[pair] = pointer
+assert collision
+a, b = collision
+add(a)
+add(b)
+remove(a)
+assert might_match(b)
+for i in range(560):
+    add(0x700000 + i * 16)
+add(0x900010)
+for p in tuple(active):
+    if p != 0x900010:
+        remove(p)
+assert active == {0x900010} and might_match(0x900010)
+remove(0x900010)
+assert not active and all(v == 0 for v in refs)
+print("VR 3298-node negative filter, collision, expiry and refcount recovery PASS")
+
+# Mutation controls: dropping the filter or any removal site must be caught
+# before a green exact-SHA result can be accepted.
+for token in (
+    "!SpriteNodeSemanticMaybeHasTag(node)",
+    "SpriteNodeSemanticForgetHint(node);",
+    "SpriteNodeSemanticForgetHint(tag.node);",
+):
+    assert token in s
+    mutated = s.replace(token, "/* removed hint contract */", 1)
+    assert mutated != s
+    if token.startswith("!"):
+        assert any(token not in function_body(mutated, mark) for mark in (
+            "inline RenderScope PeekSpriteNodeScope(",
+            "inline RenderScope ConsumeSpriteNodeScope(",
+        ))
+    else:
+        assert mutated.count(token) == s.count(token) - 1
+print("VR semantic hint 3 destructive source mutations detected")
+
 print("VR cross-thread semantic registry contract PASS")

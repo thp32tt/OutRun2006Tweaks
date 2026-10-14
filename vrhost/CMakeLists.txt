@@ -159,6 +159,7 @@ add_executable(outrun-vr-menu-content-aspect-smoke tests/menu_content_aspect_smo
 add_executable(outrun-vr-pause-eye-affine-smoke tests/pause_menu_eye_affine_smoke.cpp)
 add_executable(outrun-vr-stage-extension-owner-smoke tests/stage_extension_direct_owner_smoke.cpp)
 add_executable(outrun-vr-goal-progress-owner-smoke tests/goal_progress_owner_smoke.cpp)
+add_executable(outrun-vr-semantic-tag-hint-smoke tests/semantic_tag_hint_smoke.cpp)
 target_include_directories(outrun-vr-menu-content-aspect-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
 add_executable(outrun-vr-capture-descriptor-smoke tests/desktop_capture_descriptor_cache_smoke.cpp)
 target_include_directories(outrun-vr-capture-descriptor-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
