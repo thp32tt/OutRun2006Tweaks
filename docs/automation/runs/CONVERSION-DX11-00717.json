@@ -41,7 +41,13 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
-    "activation_guard_and_fallback": "Explicit opt-in diagnostic only; original D3D9 Draw and gamepad always run; no gameplay promotion"
+    "activation_guard_and_fallback": "Explicit opt-in diagnostic only; original D3D9 Draw and gamepad always run; no gameplay promotion",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Live D3D9 menu/vehicle/race Draw/DrawIndexed -> native diagnostic 256x144 desktop inset; GPU/Quest3/VDXR pixels need actual runtime, RUNTIME_VALIDATION=UNTESTED"
   },
   "feature_contract": {
     "goal": "Native MIN/MAX RGBA blended menu, vehicle-selection and race overlay Draw/Indexed diagnostic with bounded cache and robust original game fallback",
@@ -49,19 +55,23 @@
       {
         "category": "end_to_end_behavior",
         "behavior_area": "d3d9_capture_d3d11_om",
-        "expected_behavior": "real MIN/MAX RGBA native OM masked Draw/Indexed"
+        "expected_behavior": "real MIN/MAX RGBA native OM masked Draw/Indexed",
+        "id": "native-menu-race-rgba-extrema"
       },
       {
         "category": "fallback_regression",
         "behavior_area": "d3d9_gamepad_original",
-        "expected_behavior": "unsupported operations, alpha modes and allocation failures return safely to D3D9"
+        "expected_behavior": "unsupported operations, alpha modes and allocation failures return safely to D3D9",
+        "id": "fallback-unsupported-alpha-and-input"
       },
       {
         "category": "integrated_validation",
         "behavior_area": "portable_cpp_and_exact_sha_actions",
-        "expected_behavior": "portable probe, destructive integration regressions, exact SHA 5 mandatory Gates"
+        "expected_behavior": "portable probe, destructive integration regressions, exact SHA 5 mandatory Gates",
+        "id": "portable-build-and-exact-sha-gates"
       }
-    ]
+    ],
+    "feature_id": "LIVE_GAME_MENU_RACE_MINMAX_RGBA_BLEND"
   },
   "base_head_sha": "badb047e2af58574c9e2dda2ac40de86bf0b1fd4",
   "material_result_sha": null,
