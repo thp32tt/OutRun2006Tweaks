@@ -11,11 +11,11 @@
   "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "work_key": "DX9EX:VIS:RANK_MARKERS",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00820]",
   "feature_contract": {
     "feature_id": "DX9EX:VIS:RANK_MARKERS",
@@ -54,9 +54,9 @@
     "scope_boundary": "Only ordinal and rival vehicle rank markers sourced by 0xBAD20, 0xBAEE2 and 0xBB796 and their projected sprite queue/Draw ownership. Exclude NaviPub HUD rank, global +TIME/GOAL titles, lens flare, start shadow, menu/UI, DX11/DXVK and SkyGlow; preserve existing stereo and pending Draw behavior for adjacent unrelated producers."
   },
   "acceptance_results": {
-    "RANK_SOURCE_AND_QUEUE": "PENDING_CI",
-    "RANK_REENTRANCY_AND_FALLBACK": "PENDING_CI",
-    "RANK_EXACT_SHA_GATES": "PENDING_CI"
+    "RANK_SOURCE_AND_QUEUE": "PASS_EXACT_SHA",
+    "RANK_REENTRANCY_AND_FALLBACK": "PASS_EXACT_SHA",
+    "RANK_EXACT_SHA_GATES": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "User-reported vehicle rank marker detachment and head-locking in Quest3; exact source map exists but wrappers lacked pending-Draw shielding and 4th+ digit offsets were read after game call.",
@@ -71,15 +71,55 @@
       "Do not change EXE draw count or camera/HMD eye offset to hide duplicates.",
       "Do not alter already accepted NaviPub screen rank or SkyGlow."
     ],
-    "fix_evidence": "Exact three producer wrappers isolate and restore pending Draw only in VR mode, tag source provenance and freeze ordinal digit sibling offsets before original clip call.",
-    "negative_test_evidence": "Gated rank-anchor verifier enforces owner/direct/tag ordering and injects five independent destructive source mutations.",
+    "fix_evidence": "Exact three producer wrappers isolate and restore pending Draw only in VR mode, tag source provenance and freeze ordinal digit sibling offsets before original clip call. GitHub validation-bearing cf6f1276: DX9Ex Active policy/game/full-chain/host/package all green; physical HMD remains untested.",
+    "negative_test_evidence": "Gated rank-anchor verifier enforces owner/direct/tag ordering and injects five independent destructive source mutations. Legacy EXE HUD Inspector source matcher/negative mutant repaired and passed exact SHA.",
     "eye_ownership": "Original Calc3D2D view-space point copied to source, sibling sprites, R30 per-eye; unrelated NextDrawScope preserved for its following original consumer.",
     "ci_failure": "DX9Ex Active run 38505077572 on original material e7eff23b769893500f092d3b8a62d89f830fd283 stopped before compile in feature policy: missing feature_contract.scope_boundary; this retry adds a specific enforceable boundary while keeping original rank source implementation and negative mutation tests."
   },
   "changed_files": [
     "src/hooks_uiscaling.cpp",
     "tools/verify_vr_projected_marker_anchor.py",
-    "docs/automation/runs/CONVERSION-DX9EX-00820.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00820.json",
+    "tools/verify_vr_hud_exact_callsite_contract.py"
   ],
-  "validation_bearing_result_sha": null
+  "validation_bearing_result_sha": "cf6f1276f054745919267461ac7a6813073beb94",
+  "material_result_sha": "e7eff23b769893500f092d3b8a62d89f830fd283",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "cf6f1276f054745919267461ac7a6813073beb94",
+    "material_result_sha": "e7eff23b769893500f092d3b8a62d89f830fd283",
+    "DX9Ex Active Validation": {
+      "run_id": 38505639038,
+      "head_sha": "cf6f1276f054745919267461ac7a6813073beb94",
+      "status": "SUCCESS",
+      "jobs": "5/5 SUCCESS",
+      "run_attempt": 1
+    },
+    "Domain Isolation Guard": {
+      "run_id": 38505638850,
+      "head_sha": "cf6f1276f054745919267461ac7a6813073beb94",
+      "status": "SUCCESS"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38505638901,
+      "head_sha": "cf6f1276f054745919267461ac7a6813073beb94",
+      "status": "SUCCESS",
+      "jobs": "2/2 SUCCESS"
+    },
+    "DX9Ex Full Source Impact Review": {
+      "run_id": 38505077465,
+      "head_sha": "e7eff23b769893500f092d3b8a62d89f830fd283",
+      "status": "SUCCESS",
+      "jobs": "3/3 SUCCESS",
+      "note": "Original material SHA source-impact 3/3; subsequent same TASK_ID commits update verifier/policy only."
+    },
+    "General Build (non-DX9Ex gate)": {
+      "run_id": 38505820483,
+      "head_sha": "cf6f1276f054745919267461ac7a6813073beb94",
+      "status": "FAIL_UNRELATED_FFB_BASELINE",
+      "reason": "Missing docs/reverse/LINDBERGH_FFB_MAP.md in tools/verify_wheel_ffb_current.py, independent of DX9Ex rank source; no FFB changes."
+    }
+  },
+  "runtime_gate": "Matching Quest3/VDXR user test required to establish projected rank attachment, clip digits and stereoscopy; HMD was not executed.",
+  "resolved_hold_reason": "Exact-SHA policy failure and legacy HUD Inspector source-signature/negative mutant repaired; all four scoped mandatory DX9Ex gate families now SUCCESS.",
+  "hold_resolution": "C6 bookkeeping only; validation-bearing result SHA remains cf6f1276; no additional CI-skip on result commit."
 }
