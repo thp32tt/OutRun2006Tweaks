@@ -133,6 +133,9 @@ def require_multi_sprite_native_aspect(source: str) -> None:
     assert group.index("if (!std::isfinite(transformedX[i]) ||") < group.index(
         "vertices[i * stride] = transformedX[i];"
     )
+    # Every stride owner must independently protect the same two UI modes;
+    # finding one surviving guard must not hide mutation of another hook.
+    assert group.count("mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade") == 3
     assert group.count("CenterMultiSpriteQuad(reinterpret_cast<float*>") == 3
 
 
