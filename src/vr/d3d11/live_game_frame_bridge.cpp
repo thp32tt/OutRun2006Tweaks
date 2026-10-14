@@ -4961,14 +4961,52 @@ void before_game_present(IDirect3DDevice9* game,
                 fullMode, currentFullFrameComplete, outputWritable)) {
             if (++s.outputGeneration == 0u) ++s.outputGeneration;
         }
+        const bool complete = fullMode
+            ? currentFullFrameComplete
+            : s.frameBatch.publishable(s.pending);
         if (s.backend.ready() && s.backend.context()) {
             auto* ctx = s.backend.context();
-            // Poll the oldest GPU fence without implicit flushing or CPU waits.
-            auto& oldest = s.readbacks[s.readSlot];
-            if (oldest.busy) {
+            // Full-resolution publication must be sampled before THIS D3D9
+            // Present, not uploaded one or two frames later. Retire older GPU
+            // copies only once their fences complete, never reuse busy memory.
+            bool fullQueued = false;
+            const UINT fullSlot = s.writeSlot;
+            if (fullMode) {
+                for (auto& prior : s.readbacks) {
+                    if (!prior.busy || prior.provenance.capturedAtPresent >= s.presents)
+                        continue;
+                    const HRESULT done = ctx->GetData(prior.fence.Get(), nullptr, 0,
+                        D3D11_ASYNC_GETDATA_DONOTFLUSH);
+                    if (done == S_OK || FAILED(done)) {
+                        prior.busy = false;
+                        ++s.staleReadbacks;
+                    }
+                }
+                if (complete && outputWritable &&
+                    s.sourceGameDevice == presentDevice) {
+                    auto& next = s.readbacks[s.writeSlot];
+                    if (!next.busy) {
+                        ctx->CopyResource(next.staging.Get(), s.backend.color_texture());
+                        next.provenance = {s.presents, s.sourceDrawsThisFrame};
+                        next.completeFullFrame = true;
+                        next.provenance.sourceDevice = presentDevice;
+                        next.provenance.outputGeneration = s.outputGeneration;
+                        ctx->End(next.fence.Get());
+                        ctx->Flush(); // one fence submission, never block D3D9
+                        next.busy = true;
+                        fullQueued = true;
+                        s.writeSlot = (s.writeSlot + 1u) % kReadbackSlots;
+                    } else ++s.droppedCopies;
+                }
+            }
+            // Insets retain the bounded asynchronous ring. Full-frame polls
+            // ONLY its newly enqueued same-Present fence; if not ready, keep
+            // the original D3D9 game frame and gamepad response unmodified.
+            auto& oldest = s.readbacks[fullMode ? fullSlot : s.readSlot];
+            if (oldest.busy && (!fullMode || fullQueued)) {
                 const HRESULT ready = ctx->GetData(
                     oldest.fence.Get(), nullptr, 0, D3D11_ASYNC_GETDATA_DONOTFLUSH);
-                if (ready == S_OK && (!oldest.provenance.may_overlay(s.presents) ||
+                if (ready == S_OK && (!oldest.provenance.may_present(s.presents, fullMode) ||
                                      !oldest.provenance.same_device(presentDevice) ||
                                       oldest.completeFullFrame != fullMode ||
                                      !oldest.provenance.same_output(s.outputGeneration) ||
@@ -4978,7 +5016,7 @@ void before_game_present(IDirect3DDevice9* game,
                     // Its GPU fence is complete; recycle without blocking D3D9/input.
                     ++s.staleReadbacks;
                     oldest.busy = false;
-                    s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
+                    if (!fullMode) s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
                 } else if (ready == S_OK) {
                     D3D11_MAPPED_SUBRESOURCE mapped{};
                     const HRESULT mapStatus = ctx->Map(oldest.staging.Get(), 0,
@@ -5040,26 +5078,25 @@ void before_game_present(IDirect3DDevice9* game,
                         }
                         ctx->Unmap(oldest.staging.Get(), 0);
                         oldest.busy = false;
-                        s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
+                        if (!fullMode) s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
                     } else if (mapStatus != DXGI_ERROR_WAS_STILL_DRAWING) {
                         ++s.failed;
                         oldest.busy = false;
-                        s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
+                        if (!fullMode) s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
                     }
                 } else if (FAILED(ready)) {
                     ++s.failed;
                     oldest.busy = false;
-                    s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
+                    if (!fullMode) s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
                 }
             }
             // Never publish partial GPU compositing from a source draw gap,
             // a failed vertex/index translation or a failed D3D11 submit.
             // Previously s.pending survived abort() and copied corrupt insets.
-            const bool complete = fullMode
-                ? currentFullFrameComplete
-                : s.frameBatch.publishable(s.pending);
+            // Native full-frame was already enqueued and opportunistically
+            // polled for this Present. Never enqueue a second lagged copy.
             if (complete && outputWritable &&
-                s.sourceGameDevice == presentDevice) {
+                s.sourceGameDevice == presentDevice && !fullMode) {
                 auto& next = s.readbacks[s.writeSlot];
                 if (!next.busy) {
                     ctx->CopyResource(next.staging.Get(), s.backend.color_texture());

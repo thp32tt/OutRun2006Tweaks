@@ -45,6 +45,15 @@ struct GameReadbackProvenance {
         bool outputWritable) noexcept {
         return fullMode && (!currentFullFrameComplete || !outputWritable);
     }
+    // Full-resolution output replaces the entire game backbuffer. Unlike the
+    // diagnostic inset, it must originate from THIS Present, not one or two
+    // game frames ago with a still-matching COM backbuffer identity.
+    [[nodiscard]] constexpr bool may_present(
+        std::uint64_t currentPresent, bool fullMode) const noexcept {
+        return sourceDraws != 0u &&
+            (fullMode ? capturedAtPresent == currentPresent
+                      : may_overlay(currentPresent));
+    }
     [[nodiscard]] constexpr bool same_output(std::uint64_t currentGeneration) const noexcept {
         return outputGeneration != 0u && outputGeneration == currentGeneration;
     }
