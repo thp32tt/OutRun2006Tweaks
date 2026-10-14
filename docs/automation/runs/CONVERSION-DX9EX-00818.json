@@ -2,9 +2,9 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00818",
   "production_id": "CONVERSION-DX9EX-00818",
-  "event_id": "CONVERSION-DX9EX-00818-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00818-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
@@ -41,6 +41,17 @@
         "behavior_area": "full_win32_source_domain_and_result_text",
         "expected_behavior": "Exact SHA host/game/package and Domain+Impact gates pass, then safely scope all 19 original B9200 text parents with verified ABI (never crash-prone post-CALL midhooks)."
       }
+    ],
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "trace_stages": [
+      "Original 0x97BE4/0x97DEC animated progress calls and 0xBEA5A/0xBEA5F goal title/time E8 parents",
+      "Direct ScreenHud glyph rasterization and newly enqueued SpriteNode children with separate producer tokens",
+      "R30 fixedfn/VS Draw per-eye classification and OpenXR host composition, preserving world and pending queue ownership"
+    ],
+    "subcomponents": [
+      "Immediate 0-99 progress percent plus both independent original GOAL title/time glyph parents",
+      "Deferred sibling SpriteNode semantic tagging and nested world queue fallback after original producer returns",
+      "Separate nineteen B9200 record result text parents held for verified crash-safe ABI, not falsely declared complete"
     ]
   },
   "acceptance_results": {
@@ -60,7 +71,9 @@
       "Original E8 to progress 0x2D200 and time helpers 0xBE020/0xBE150",
       "ScopedExactProducerSemantic before immediate glyph Draw; TagAppendedNodes for deferred children",
       "R30 per-eye fixedfn/VS Draw, Sumo replay and host composition left unchanged"
-    ]
+    ],
+    "failed_gate": "DX9Ex Active run 38501883000 policy: missing symptom_id/trace_stages/subcomponents in feature_contract; cp1252 diagnostic emitted UnicodeEncodeError before reporting errors",
+    "retry_repair": "Align E003 nonterminal GOAL producer work contract to registered symptom and 3-stage/two-subcomponent validation, fix codepage-safe diagnostic and add Windows cp1252 regression assertions."
   },
   "changed_files": [
     "tools/verify_vr_producer_provenance.py",
@@ -68,7 +81,9 @@
     "vrhost/CMakeLists.txt",
     ".github/workflows/vr-dx9ex-active.yml",
     "vrhost/tests/goal_progress_owner_smoke.cpp",
-    "docs/automation/runs/CONVERSION-DX9EX-00818.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00818.json",
+    "tools/verify_vr_feature_unit_policy.py",
+    "tools/test_vr_feature_unit_policy.py"
   ],
   "material_result_sha": null,
   "validation_bearing_result_sha": null,

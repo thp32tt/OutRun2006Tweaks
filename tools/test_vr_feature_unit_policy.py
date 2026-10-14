@@ -2,7 +2,7 @@
 """Destructive unit tests: each visual defect stays whole, not a tiny patch or umbrella."""
 import copy
 import json
-from verify_vr_feature_unit_policy import POLICY, validate
+from verify_vr_feature_unit_policy import POLICY, validate, printable_diagnostic
 
 p = json.loads(POLICY.read_text(encoding="utf-8"))
 assert p["schema_version"] == 2
@@ -111,4 +111,11 @@ perf.update(feature_id="DX9EX:PERF:FRAME_PACING",symptom_id="NA",feature_class="
 perf["feature_contract"].update(feature_id="DX9EX:PERF:FRAME_PACING",
     special_work_evidence="Measured R23/GPU p95 frame time exceeds XR 72 Hz budget")
 assert not validate(perf,p),validate(perf,p)
+# Reproduce the failing Windows-2022 PowerShell runner's cp1252 stdout.
+# The actual validation errors must survive even when the JSON contains
+# a non-ASCII original-to-Draw-to-eye trace.
+diagnostic = "original\u2192Draw\u2192eye"
+assert printable_diagnostic(diagnostic, "cp1252") == r"original\u2192Draw\u2192eye"
+assert printable_diagnostic(diagnostic, "utf-8") == diagnostic
+assert printable_diagnostic(diagnostic, None) == diagnostic
 print(f"DX9Ex full-function/visual-defect policy PASS: {len(features)} feature classes, 10+ negative cases, terminal root-cause gate, legacy and performance")

@@ -11,6 +11,7 @@ import argparse
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -134,6 +135,12 @@ def validate(record: dict, policy: dict) -> list[str]:
     return errors
 
 
+def printable_diagnostic(message: str, encoding: str | None) -> str:
+    """Retain policy errors even on Windows runner's strict cp1252 stdout."""
+    preferred = encoding or "utf-8"
+    return message.encode(preferred, errors="backslashreplace").decode(preferred)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check-head", action="store_true")
@@ -162,7 +169,7 @@ def main() -> int:
         return 0
     errors = validate(json.loads(run_path.read_text(encoding="utf-8")), policy)
     if errors:
-        print("DX9Ex whole-function policy FAIL:", "; ".join(errors))
+        print(printable_diagnostic("DX9Ex whole-function policy FAIL: " + "; ".join(errors), sys.stdout.encoding))
         return 1
     print("DX9Ex whole-function policy PASS:", run_path.name)
     return 0
