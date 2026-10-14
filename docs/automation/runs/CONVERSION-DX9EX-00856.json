@@ -67,9 +67,9 @@
     "negative_test_evidence": "C++ static asserts and Python destructive checks for first queued +TIME, stale/mixed/mismatched, unrelated first queue, original GOAL/rank hooks.",
     "eye_ownership": "The previous direct batch stays with the old eye scope until flushed; only the subsequent producer-authenticated +TIME queue draws receive ScreenHud stereo presentation."
   },
-  "status": "IMPLEMENTING",
-  "checkpoint": "C3_EXACT_SHA_MATRIX_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No Quest3/VDXR gameplay test; binocular image and FPS not proven.",
   "changed_files": [
@@ -79,7 +79,7 @@
     "vrhost/tests/stage_extension_direct_owner_smoke.cpp"
   ],
   "material_result_sha": "d23309b6f589d38cd10cb1760b79324358f91663",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "bd393929446c19755282014d7f6accaf70d69d97",
   "acceptance_results": {
     "sources": "SOURCE_PATCHED",
     "stereo": "BUILD_PENDING",
@@ -87,10 +87,15 @@
     "integration": "PENDING_EXACT_SHA"
   },
   "ci_evidence": {
-    "status": "PENDING_FINAL_EXACT_SHA",
+    "status": "SUCCESS_EXACT_SHA",
     "previous_material_sha": "d23309b6f589d38cd10cb1760b79324358f91663",
     "previous_test_repair_sha": "6e24f30988aba3551ae7adc94f989b6a3016a103",
-    "note": "Original material policy failed due stale inline-guard verifier; second SHA policy SUCCESS but affected Full Source/HUD also require integrated same-SHA matrix; do not count score until all exact gates pass."
+    "note": "Original material policy failed due stale inline-guard verifier; second SHA policy SUCCESS but affected Full Source/HUD also require integrated same-SHA matrix; do not count score until all exact gates pass.",
+    "exact_sha": "bd393929446c19755282014d7f6accaf70d69d97",
+    "c6_evidence_source": "USER_CONFIRMED_GITHUB_CI_SUCCESS",
+    "c6_note": "Exact-SHA GitHub CI SUCCESS asserted by user; existing workflows not rerun. Quest3/VDXR HMD runtime untested."
   },
-  "score_once": false
+  "score_once": false,
+  "phase": "C6_RESULT",
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
