@@ -3,6 +3,7 @@
 from pathlib import Path
 import subprocess
 import tempfile
+from verify_dx11_native_transport_contract import verify_eye_pair_submission
 
 ROOT = Path(__file__).resolve().parent.parent
 ring = (ROOT / "src/vr/d3d11/native_shared_eye_ring.cpp").read_text(encoding="utf-8")
@@ -36,6 +37,25 @@ def linked(source: str, header: str) -> bool:
     )
 
 assert linked(ring, slot), "native stereo GPU command or cancellation link missing"
+# The mandatory Backend Conversion verifier must accept the guarded EVENT
+# producer and reject destructive changes to GPU ownership/fence semantics.
+submit = ring[ring.index("bool NativeSharedEyeRing::submit_eye_pair("):
+              ring.index("bool NativeSharedEyeRing::signal_producer_fence(")]
+verify_eye_pair_submission(submit)
+for label, before, after in [
+    ("missing GPU-queued ownership", "entry.gpu_copy_queued = true;", "/* unsafe */"),
+    ("missing second eye copy", "context->CopyResource(entry.eye[1].Get(), right_source);", "/* unsafe */"),
+    ("missing fence quarantine", "synchronization_faulted_ = true;", "/* unsafe */"),
+    ("inverted EVENT failure", "if (!signal_producer_fence(context, slot, frame_id)) {",
+     "if (signal_producer_fence(context, slot, frame_id)) {"),
+]:
+    assert before in submit, label
+    try:
+        verify_eye_pair_submission(submit.replace(before, after, 1))
+    except SystemExit:
+        pass
+    else:
+        raise AssertionError("native transport verifier accepted unsafe mutant: " + label)
 # Destructive regression: dropping the cancellation veto or GPU-queued mark
 # must fail the checker, not merely compile an unused helper.
 assert not linked(ring.replace("!native_game_eye_copy_cancelable(entry.gpu_copy_queued)", "false"), slot)
