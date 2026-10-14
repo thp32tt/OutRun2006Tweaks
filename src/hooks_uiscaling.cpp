@@ -1259,73 +1259,94 @@ class UIScaling : public Hook
 			m[12] = x + add;
 		}
 	}
+	// The original custom-matrix multi-sprite producers submit four vertices
+	// already scaled in screen pixels. Old centre hooks adjusted only X: on a
+	// portrait XR eye, screen_scale.y > screen_scale.x, so Y retained the
+	// stretched scale and the menu quad lost its native 4:3 proportions.
+	// Use the same contain scale/centering for BOTH axes, exclusively for
+	// KeepCentered/OnlineArcade UI sprites (never world, Vanilla or F11).
+	static constexpr float CenterMultiSpriteAxis(
+		float pixel, float axisScale, float containScale,
+		float screenExtent, float originalExtent) noexcept
+	{
+		return (pixel / axisScale) * containScale +
+			(screenExtent - originalExtent * containScale) * 0.5f;
+	}
+
+	// Deterministic Win32 compile-time coordinate regressions: native 4:3,
+	// 16:9, 21:9 and portrait XR (including top/bottom Y letterbox).
+	static_assert(CenterMultiSpriteAxis(640.0f, 2.0f, 2.0f, 1280.0f, 640.0f) == 640.0f);
+	static_assert(CenterMultiSpriteAxis(960.0f, 3.0f, 2.25f, 1920.0f, 640.0f) == 960.0f);
+	static_assert(CenterMultiSpriteAxis(1280.0f, 4.0f, 2.25f, 2560.0f, 640.0f) == 1280.0f);
+	static_assert(CenterMultiSpriteAxis(0.0f, 2.5f, 1.25f, 1200.0f, 480.0f) == 300.0f);
+	static_assert(CenterMultiSpriteAxis(1200.0f, 2.5f, 1.25f, 1200.0f, 480.0f) == 900.0f);
+
+	static void CenterMultiSpriteQuad(float* vertices, int stride) noexcept
+	{
+		if (!vertices || !Game::screen_scale || !Game::screen_resolution)
+			return;
+		const float sx = Game::screen_scale->x;
+		const float sy = Game::screen_scale->y;
+		const float width = Game::screen_resolution->x;
+		const float height = Game::screen_resolution->y;
+		const float originalWidth = Game::original_resolution.x;
+		const float originalHeight = Game::original_resolution.y;
+		if (!std::isfinite(sx) || !std::isfinite(sy) ||
+			!std::isfinite(width) || !std::isfinite(height) ||
+			!std::isfinite(originalWidth) || !std::isfinite(originalHeight) ||
+			sx <= 1.0e-6f || sy <= 1.0e-6f ||
+			width <= 0.0f || height <= 0.0f ||
+			originalWidth <= 0.0f || originalHeight <= 0.0f)
+			return;
+
+		const float contain = (std::min)(sx, sy);
+		float transformedX[4]{};
+		float transformedY[4]{};
+		// All-or-nothing: reject a nonfinite vertex or overflow before
+		// modifying the original stream; device-loss continuations remain safe.
+		for (int i = 0; i < 4; ++i)
+		{
+			const float x = vertices[i * stride];
+			const float y = vertices[i * stride + 1];
+			if (!std::isfinite(x) || !std::isfinite(y))
+				return;
+			transformedX[i] = CenterMultiSpriteAxis(
+				x, sx, contain, width, originalWidth);
+			transformedY[i] = CenterMultiSpriteAxis(
+				y, sy, contain, height, originalHeight);
+			if (!std::isfinite(transformedX[i]) ||
+				!std::isfinite(transformedY[i]))
+				return;
+		}
+		for (int i = 0; i < 4; ++i)
+		{
+			vertices[i * stride] = transformedX[i];
+			vertices[i * stride + 1] = transformedY[i];
+		}
+	}
+
 	static inline SafetyHookMid draw_sprite_custom_matrix_multi_CenterSprite_hk{};
 	static void draw_sprite_custom_matrix_multi_CenterSprite(safetyhook::Context& ctx)
 	{
-		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
-		if (mode != ScalingMode::KeepCentered && mode != ScalingMode::OnlineArcade)
-			return;
-
-		float* vtxStream = (float*)(ctx.ecx);
-
-		float scale = min(Game::screen_scale->x, Game::screen_scale->y);
-		float centering = (Game::screen_resolution->x - (Game::original_resolution.x * scale)) / 2;
-
-		float x1 = vtxStream[0];
-		float x2 = vtxStream[9];
-		float x3 = vtxStream[18];
-		float x4 = vtxStream[27];
-
-		vtxStream[0] = ((vtxStream[0] / Game::screen_scale->x) * scale) + centering;
-		vtxStream[9] = ((vtxStream[9] / Game::screen_scale->x) * scale) + centering;
-		vtxStream[18] = ((vtxStream[18] / Game::screen_scale->x) * scale) + centering;
-		vtxStream[27] = ((vtxStream[27] / Game::screen_scale->x) * scale) + centering;
+		const ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
+			CenterMultiSpriteQuad(reinterpret_cast<float*>(ctx.ecx), 9);
 	}
 
 	static inline SafetyHookMid draw_sprite_custom_matrix_multi_CenterSprite2_hk{};
 	static void draw_sprite_custom_matrix_multi_CenterSprite2(safetyhook::Context& ctx)
 	{
-		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
-		if (mode != ScalingMode::KeepCentered && mode != ScalingMode::OnlineArcade)
-			return;
-
-		float* vtxStream = (float*)(ctx.esp + 0x80);
-
-		float scale = min(Game::screen_scale->x, Game::screen_scale->y);
-		float centering = (Game::screen_resolution->x - (Game::original_resolution.x * scale)) / 2;
-
-		float x1 = vtxStream[0];
-		float x2 = vtxStream[11];
-		float x3 = vtxStream[22];
-		float x4 = vtxStream[33];
-
-		vtxStream[0] = ((vtxStream[0] / Game::screen_scale->x) * scale) + centering;
-		vtxStream[11] = ((vtxStream[11] / Game::screen_scale->x) * scale) + centering;
-		vtxStream[22] = ((vtxStream[22] / Game::screen_scale->x) * scale) + centering;
-		vtxStream[33] = ((vtxStream[33] / Game::screen_scale->x) * scale) + centering;
+		const ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
+			CenterMultiSpriteQuad(reinterpret_cast<float*>(ctx.esp + 0x80), 11);
 	}
 
 	static inline SafetyHookMid draw_sprite_custom_matrix_multi_CenterSprite3_hk{};
 	static void draw_sprite_custom_matrix_multi_CenterSprite3(safetyhook::Context& ctx)
 	{
-		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
-		if (mode != ScalingMode::KeepCentered && mode != ScalingMode::OnlineArcade)
-			return;
-
-		float* vtxStream = (float*)(ctx.edx);
-
-		float scale = min(Game::screen_scale->x, Game::screen_scale->y);
-		float centering = (Game::screen_resolution->x - (Game::original_resolution.x * scale)) / 2;
-
-		float x1 = vtxStream[0];
-		float x2 = vtxStream[13];
-		float x3 = vtxStream[26];
-		float x4 = vtxStream[39];
-
-		vtxStream[0] = ((vtxStream[0] / Game::screen_scale->x) * scale) + centering;
-		vtxStream[13] = ((vtxStream[13] / Game::screen_scale->x) * scale) + centering;
-		vtxStream[26] = ((vtxStream[26] / Game::screen_scale->x) * scale) + centering;
-		vtxStream[39] = ((vtxStream[39] / Game::screen_scale->x) * scale) + centering;
+		const ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+		if (mode == ScalingMode::KeepCentered || mode == ScalingMode::OnlineArcade)
+			CenterMultiSpriteQuad(reinterpret_cast<float*>(ctx.edx), 13);
 	}
 
 	static void SpriteSpacingEnable(safetyhook::Context& ctx)
