@@ -131,15 +131,62 @@ replay = function_body(framerate, "static void replay()")
 if "node, entry.vrScope, entry.vrProducer" not in replay:
     fail("Sumo replay must restore scope and producer token on the fresh node")
 
-# c64 upload is the first durable renderer boundary after queue ownership.
+# c64 upload is the first durable renderer boundary after queue OR a
+# direct original producer. The renderer must save the selected queue token
+# before a direct token, but a queue-free central sun has no queue token.
+producer_selector = function_body(semantics, "inline ProducerToken CurrentRenderProducerToken()")
+if not re.search(
+    r"return\\s+SpriteQueueDepth\\s*!=\\s*0\\s*\\?\\s*"
+    r"CurrentSpriteQueueProducer\\s*:\\s*CurrentDirectExactProducer\\s*;",
+    producer_selector,
+):
+    fail("render producer selector lost queue priority or direct fallback")
 record = function_body(renderer, "void RecordGameWvpWrite(")
 for marker in (
-    "CurrentQueueProducerToken()",
+    "CurrentRenderProducerToken()",
     "LastGameWvpProducerToken",
     "VR R51 C64 FINGERPRINT:",
+    "LastGameWvpLensCentreCallEpoch",
+    "CurrentLensCentreCallEpoch",
+    "QueueRenderActive()",
 ):
     if marker not in record:
-        fail(f"c64 provenance capture missing: {marker}")
+        fail(f"c64 producer or lens-call provenance capture missing: {marker}")
+if "LastGameWvpProducerToken =" not in record:
+    fail("c64 recorder no longer saves the unified renderer producer")
+if "CurrentQueueProducerToken()" in record:
+    fail("c64 recorder reverted to queue-only provenance, losing direct lens source")
+
+# Exact original central sun consumes only its own raw c64; this deliberate
+# exception must NOT give all diagnostic producer families render authority.
+centre = function_body(r30, "bool R30GetExactLensCentreRawWvp(")
+for marker in (
+    "QueueRenderActive()",
+    "CurrentRenderProducerToken() != ProducerToken::LensFlareCentre",
+    "GetLastRawGameWvpWrite(",
+    "GetLastGameWvpLensCentreCallEpoch()",
+    "CurrentLensCentreCallEpoch",
+    "OwnsRawWvp({",
+    "sourceProducer == ProducerToken::LensFlareCentre",
+    "queueNode == nullptr",
+):
+    if marker not in centre:
+        fail(f"central sun raw matrix provenance missing: {marker}")
+enter = function_body(read(ROOT / "src/hooks_graphics.cpp"), "static void LensCentreEnter(")
+leave = function_body(read(ROOT / "src/hooks_graphics.cpp"), "static void LensCentreLeave(")
+for marker in (
+    "CurrentLensCentreCallEpoch = next;",
+    "CurrentDirectExactProducer =",
+    "ProducerToken::LensFlareCentre;",
+):
+    if marker not in enter:
+        fail(f"central source entry epoch/direct owner lost: {marker}")
+for marker in (
+    "CurrentDirectExactProducer = LensCentreSavedProducer;",
+    "CurrentLensCentreCallEpoch = LensCentreSavedEpoch;",
+):
+    if marker not in leave:
+        fail(f"central source leave no longer restores nested owner: {marker}")
 
 getter = function_body(renderer, "bool GetLastGameWvpSemanticProvenance(")
 if "ProducerToken& producerToken" not in renderer:
