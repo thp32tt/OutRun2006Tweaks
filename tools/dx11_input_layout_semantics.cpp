@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cstring>
+#include <initializer_list>
 #include <iostream>
 
 #include "vr/d3d11/pipeline_translation.hpp"
