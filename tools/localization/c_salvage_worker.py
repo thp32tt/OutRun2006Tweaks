@@ -134,7 +134,13 @@ def handle_png(role: str, p: Path, output: Path, source_dirs: list[Path],
     mask_blob, manual_mask = mask_input(p, masks, dimensions)
     rawsha = sha(raw)
     masksha = sha(mask_blob)[:10] if mask_blob is not None else "autoalpha"
-    key = f"{role}-{match.group('index')}-{rawsha[:16]}-{masksha}"
+    source_ev = source_tile_evidence(p, source_dirs)
+    psd_ev = psd_evidence(int(match.group("index")), match.group("hash"), catalog, repo_root)
+    # A formerly missing source/PSD may be staged after the first HOLD. It must
+    # cause a new receipt without overwriting the historical inspection.
+    inputs_fingerprint = sha(json.dumps({"source": source_ev, "psd": psd_ev},
+                                        sort_keys=True).encode())[:12]
+    key = f"{role}-{match.group('index')}-{rawsha[:16]}-{masksha}-{inputs_fingerprint}"
     target = output / "candidates" / key
     if (target / "receipt.json").is_file():
         return "ALREADY_RECORDED", False
@@ -149,8 +155,8 @@ def handle_png(role: str, p: Path, output: Path, source_dirs: list[Path],
                       "dimensions": list(dimensions), "positive_alpha_pixels": positive,
                       "transparent_fraction": round(transparent_fraction, 6)},
         "queue_index": int(match.group("index")), "texture_hash": match.group("hash"),
-        "source": source_tile_evidence(p, source_dirs),
-        "psd_sources": psd_evidence(int(match.group("index")), match.group("hash"), catalog, repo_root),
+        "source": source_ev,
+        "psd_sources": psd_ev,
         "generated_text_mask": {"kind": "REVIEW_PENDING", "manual_mask_sha256": sha(mask_blob) if mask_blob else None},
         "C1": "NOT_RUN", "C3": "NOT_RUN", "RUNTIME_VALIDATION": "UNTESTED",
         "official_promoted": False,
@@ -258,7 +264,7 @@ def run_once(args):
               "new_processed_items": added, "counts": counts,
               "source_root": str(root), "output_root": str(out),
               "mode": "OFFLINE_NO_IMAGEGEN_TEST_ONLY",
-              "C1": "NOT_RUN", "game": "UNTESTED", "Portainer_deployed": False}
+              "C1": "NOT_RUN", "game": "UNTESTED", "deployment_attestation": "NOT_CHECKED_BY_WORKER"}
     # Atomic current snapshot; not an official queue/approval record.
     out.mkdir(parents=True, exist_ok=True)
     tmp = out / ".last_cycle.tmp"
