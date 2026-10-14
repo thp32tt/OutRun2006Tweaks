@@ -260,7 +260,8 @@ for token in (
     "Game::current_mode &&",
     "*Game::current_mode == GameState::STATE_SMPAUSEMENU",
     "R30IsPauseMenuExactArrow());",
-    "if (R30IsPauseMenuElement() &&",
+    "if (R30IsPauseMenuElement())",
+    "if (!std::isfinite(requested) || requested <= 0.0f)",
     "Settings::VRPauseMenuScale.get()",
     "std::clamp(readable,",
     "0.55f, 1.50f",
@@ -268,7 +269,7 @@ for token in (
 ):
     assert token in scope, token
 assert scope.index("return 1.0f;") < scope.index(
-    "if (R30IsPauseMenuElement() &&") < scope.index(
+    "if (R30IsPauseMenuElement())") < scope.index(
     "return R30HudScaleValue();")
 assert '#include "game_addrs.hpp"' in code
 assert 'extern Setting<float> VRPauseMenuScale;' in code
@@ -286,7 +287,7 @@ def effective(mode, semantic, f11=False, hud=.55, pause=1.0,
         return 1.0
     pause_owned = semantic == "overlay" or (
         semantic == "hud" and producer == "exact_menu_arrow")
-    if mode == 0x12 and pause_owned and not f11 and pause > 0:
+    if mode == 0x12 and pause_owned and not f11 and math.isfinite(pause) and pause > 0:
         requested = max(pause, 1.25) if responsive else pause
         return max(.55, min(1.50, requested))
     return hud
@@ -306,6 +307,20 @@ for source_w, source_h in ((1024,768),(1920,1080),(3440,1440),(2496,2688)):
         assert effective(0x12, "overlay", f11=True) == 1.
         assert effective(0x12, "overlay", pause=9.) == 1.50
         assert effective(0x12, "overlay", pause=-1.) == .55
+        assert effective(0x12, "overlay", pause=float('nan')) == .55
+        assert effective(0x12, "overlay", pause=float('inf')) == .55
+# Reject a source mutation that bypasses disabled/nonfinite pause fallback.
+assert "if (!std::isfinite(requested) || requested <= 0.0f)" in scope
+assert "std::isfinite(Settings::VRPauseMenuScale.get()) &&" in contain
+assert "Settings::VRPauseMenuScale.get() > 0.0f;" in contain
+for fragment in (
+    "if (!std::isfinite(requested) || requested <= 0.0f)",
+    "std::isfinite(Settings::VRPauseMenuScale.get()) &&",
+    "Settings::VRPauseMenuScale.get() > 0.0f;",
+):
+    original = scope if fragment in scope else contain
+    assert fragment in original
+    assert fragment not in original.replace(fragment, "false", 1)
 # A real destructive swap in the scope function must invalidate these guards.
 for bad, good in (
     ("ExternalOverlaySemanticDepth == 0 &&",
