@@ -31,7 +31,7 @@ int main() {
     if(cases!=3456u)return 4;
     for(auto op:ops) {
         if(stage1_three_source_supported(op,2u,kStage1Current,kStage1Factor) ||
-           stage1_three_source_supported(op,kStage1Current,4u,kStage1Factor) ||
+           stage1_three_source_supported(op,kStage1Current,5u,kStage1Factor) ||
            stage1_three_source_supported(op,kStage1Current,kStage1Factor,0x40u))return 5;
     }
     if(stage1_three_source_supported(24u,kStage1Current,kStage1Current,kStage1Factor) ||

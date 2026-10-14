@@ -19,7 +19,7 @@ checks = (
     "stage1_three_source_reads_diffuse(alphaOp, alpha0, alpha1, alpha2)",
     "capture.stage1ArgZero = {color0, alpha0};",
 )
-hlsl = ("int4 stage1ArgZero;", "Stage1Source(stage0, diffuse, arg0)",
+hlsl = ("int4 stage1ArgZero;", "Stage1Source(stage0, diffuse, specular, arg0)",
         "if (op == 25) return saturate(a1 + a2 * a0);",
         "return saturate(lerp(a2, a1, a0));",
         "stage1ArgZero.x, stage1Args.x, stage1Args.y",

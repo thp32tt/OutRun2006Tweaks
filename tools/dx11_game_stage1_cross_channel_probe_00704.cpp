@@ -34,7 +34,7 @@ int main() {
         if(!stage1_alpha_supported(kStage1Add,kStage1Current,kStage1Factor) ||
            !stage1_alpha_supported(kStage1Disable,0xffu,0xffu))return 2;
         if(stage1_combiner_supported(op,2u,kStage1Factor) ||
-           stage1_combiner_supported(op,4u,kStage1Factor) ||
+           stage1_combiner_supported(op,5u,kStage1Factor) ||
            stage1_combiner_supported(op,kStage1Current,0x40u|kStage1Factor))return 3;
         if(!stage1_operation_reads_diffuse(op,kStage1Diffuse,kStage1Factor) ||
            stage1_operation_reads_diffuse(op,kStage1Current,kStage1Factor))return 4;

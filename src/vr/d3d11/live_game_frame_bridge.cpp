@@ -102,6 +102,7 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1MultiplyAdd == D3DTOP_MULTIPLYADD &&
               kStage1Lerp == D3DTOP_LERP &&
               kStage1Current == D3DTA_CURRENT &&
+              kStage1Specular == D3DTA_SPECULAR &&
               kStage1Factor == D3DTA_TFACTOR &&
               kStage1Complement == D3DTA_COMPLEMENT &&
               kStage1AlphaReplicate == D3DTA_ALPHAREPLICATE);
@@ -225,8 +226,8 @@ constexpr float kMaxMipLodBias = 15.99f;
 
 constexpr std::array<float, 4> kBackground{0.035f, 0.035f, 0.08f, 1.0f};
 constexpr char kShader[] = R"(
-struct VIn { float4 clip : POSITION; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; };
-struct VOut { float4 clip : SV_Position; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; };
+struct VIn { float4 clip : POSITION; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; float4 specular : COLOR1; };
+struct VOut { float4 clip : SV_Position; float4 diffuse : COLOR0; float2 uv : TEXCOORD0; float4 specular : COLOR1; };
 Texture2D gameTexture : register(t0);
 SamplerState gameSampler : register(s0);
 cbuffer AlphaParams : register(b0) { float4 alphaParams; };
@@ -243,7 +244,7 @@ void AlphaGate(float alpha) {
         clip(pass ? 1.0f : -1.0f);
     }
 }
-VOut VS(VIn v) { VOut o; o.clip = v.clip; o.diffuse = v.diffuse; o.uv = v.uv; return o; }
+VOut VS(VIn v) { VOut o; o.clip = v.clip; o.diffuse = v.diffuse; o.uv = v.uv; o.specular = v.specular; return o; }
 float4 PS(VOut v) : SV_Target { float4 c = v.diffuse; AlphaGate(c.a); return c; }
 float4 PSTextured(VOut v) : SV_Target { float4 c = gameTexture.Sample(gameSampler, v.uv) * v.diffuse; AlphaGate(c.a); return c; }
 float4 PSTextureOnly(VOut v) : SV_Target { float4 c = gameTexture.Sample(gameSampler, v.uv); AlphaGate(c.a); return c; }
@@ -801,6 +802,7 @@ struct NativeVertex {
     float clip[4];
     float diffuse[4];
     float uv[2];
+    float specular[4]; // Packed D3D9 FVF SPECULAR, never aliased with DIFFUSE.
 };
 
 // Narrow fixed-function stage-0 textured subset for real game menu/vehicle/race
@@ -1165,7 +1167,7 @@ bool env_batch_opt_in() noexcept {
 }
 
 constexpr char kStage1FactorShader[] = R"(
-// Stage 1 accepts raw vertex DIFFUSE, stage-0 CURRENT and TFACTOR with
+// Stage 1 accepts raw vertex DIFFUSE/SPECULAR, stage-0 CURRENT and TFACTOR with
 // D3DTA_COMPLEMENT/ALPHAREPLICATE. Unsupported sources
 // are CPU-rejected before either native Draw or DrawIndexed is submitted.
 // Separate RGB and alpha instructions run before native alpha-test/OM blend.
@@ -1175,12 +1177,13 @@ cbuffer Stage1FactorParams : register(b1) {
     int4 stage1Args; // color arg1/2, alpha arg1/2
     int4 stage1ArgZero; // color arg0, alpha arg0, reserved, reserved
 };
-float4 Stage1Source(float4 current, float4 diffuse, int source) {
+float4 Stage1Source(float4 current, float4 diffuse, float4 specular, int source) {
     // D3DTA_MASK=0x0f; DIFFUSE=0, CURRENT=1, TFACTOR=3. CPU admission owns the
     // strict selector/flag allowlist. Apply alpha replication before optional
     // complement, identically for RGB and independent stage-1 alpha.
     float4 value = (source & 15) == 3 ? stage1Factor : current;
     if ((source & 15) == 0) value = diffuse;
+    if ((source & 15) == 4) value = specular;
     if ((source & 32) != 0) value = value.aaaa;
     if ((source & 16) != 0) value = 1.0f - value;
     return value;
@@ -1215,42 +1218,42 @@ float4 Stage1Combine(float4 a, float4 b, int op, float4 stage0, float4 diffuse) 
  // D3DTOP_LERP = ARG0*ARG1 + (1-ARG0)*ARG2.
  // The source selector resolves vertex/current/factor and complement/alpha
  // replicate for all three inputs, with the original D3D9 path as fallback.
-float4 Stage1ThreeSource(float4 stage0, float4 diffuse,
+float4 Stage1ThreeSource(float4 stage0, float4 diffuse, float4 specular,
                          int op, int arg0, int arg1, int arg2) {
-    float4 a0 = Stage1Source(stage0, diffuse, arg0);
-    float4 a1 = Stage1Source(stage0, diffuse, arg1);
-    float4 a2 = Stage1Source(stage0, diffuse, arg2);
+    float4 a0 = Stage1Source(stage0, diffuse, specular, arg0);
+    float4 a1 = Stage1Source(stage0, diffuse, specular, arg1);
+    float4 a2 = Stage1Source(stage0, diffuse, specular, arg2);
     if (op == 25) return saturate(a1 + a2 * a0);
     return saturate(lerp(a2, a1, a0)); // 26, CPU-gated
 }
-float4 Stage1AndAlpha(float4 stage0, float4 diffuse) {
+float4 Stage1AndAlpha(float4 stage0, float4 diffuse, float4 specular) {
     float4 color = Stage1Combine(
-        Stage1Source(stage0, diffuse, stage1Args.x),
-        Stage1Source(stage0, diffuse, stage1Args.y), stage1Ops.x, stage0, diffuse);
+        Stage1Source(stage0, diffuse, specular, stage1Args.x),
+        Stage1Source(stage0, diffuse, specular, stage1Args.y), stage1Ops.x, stage0, diffuse);
     if (stage1Ops.x == 25 || stage1Ops.x == 26)
-        color = Stage1ThreeSource(stage0, diffuse, stage1Ops.x,
+        color = Stage1ThreeSource(stage0, diffuse, specular, stage1Ops.x,
                                   stage1ArgZero.x, stage1Args.x, stage1Args.y);
     float alpha = stage1Ops.y == 1 ? stage0.a : Stage1Combine(
-        Stage1Source(stage0, diffuse, stage1Args.z),
-        Stage1Source(stage0, diffuse, stage1Args.w), stage1Ops.y, stage0, diffuse).a;
+        Stage1Source(stage0, diffuse, specular, stage1Args.z),
+        Stage1Source(stage0, diffuse, specular, stage1Args.w), stage1Ops.y, stage0, diffuse).a;
     if (stage1Ops.y == 25 || stage1Ops.y == 26)
-        alpha = Stage1ThreeSource(stage0, diffuse, stage1Ops.y,
+        alpha = Stage1ThreeSource(stage0, diffuse, specular, stage1Ops.y,
                                   stage1ArgZero.y, stage1Args.z, stage1Args.w).a;
     float4 result = float4(color.rgb, alpha);
     AlphaGate(result.a);
     return result;
 }
 float4 PSStage1Diffuse(VOut v) : SV_Target {
-    return Stage1AndAlpha(v.diffuse, v.diffuse);
+    return Stage1AndAlpha(v.diffuse, v.diffuse, v.specular);
 }
 float4 PSStage1Modulate(VOut v) : SV_Target {
-    return Stage1AndAlpha(gameTexture.Sample(gameSampler, v.uv) * v.diffuse, v.diffuse);
+    return Stage1AndAlpha(gameTexture.Sample(gameSampler, v.uv) * v.diffuse, v.diffuse, v.specular);
 }
 float4 PSStage1TextureOnly(VOut v) : SV_Target {
-    return Stage1AndAlpha(gameTexture.Sample(gameSampler, v.uv), v.diffuse);
+    return Stage1AndAlpha(gameTexture.Sample(gameSampler, v.uv), v.diffuse, v.specular);
 }
 float4 PSStage1Add(VOut v) : SV_Target {
-    return Stage1AndAlpha(saturate(gameTexture.Sample(gameSampler, v.uv) + v.diffuse), v.diffuse);
+    return Stage1AndAlpha(saturate(gameTexture.Sample(gameSampler, v.uv) + v.diffuse), v.diffuse, v.specular);
 }
 )";
 
@@ -1651,9 +1654,12 @@ bool ensure_pipeline(State& s) noexcept {
         {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16,
          D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 32,
+         D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"COLOR", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 40,
          D3D11_INPUT_PER_VERTEX_DATA, 0}
     };
-    if (FAILED(dev->CreateInputLayout(elements, 3,
+    static_assert(sizeof(NativeVertex) == 56u, "Native vertex/IA color1 mismatch");
+    if (FAILED(dev->CreateInputLayout(elements, 4,
         vcode->GetBufferPointer(), vcode->GetBufferSize(), s.layout.GetAddressOf())))
         return false;
     D3D11_RASTERIZER_DESC raster{};
@@ -2976,6 +2982,11 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
               stage1_operation_reads_diffuse(alphaOp, alpha1, alpha2) ||
               stage1_three_source_reads_diffuse(nextColorOp, color0, color1, color2) ||
               stage1_three_source_reads_diffuse(alphaOp, alpha0, alpha1, alpha2))) ||
+            (!layout.hasSpecular &&
+             (stage1_operation_reads_specular(nextColorOp, color1, color2) ||
+              stage1_operation_reads_specular(alphaOp, alpha1, alpha2) ||
+              stage1_three_source_reads_specular(nextColorOp, color0, color1, color2) ||
+              stage1_three_source_reads_specular(alphaOp, alpha0, alpha1, alpha2))) ||
             (capture.enabled && !capture.stage0FullModulate &&
              !capture.selectTexture && !capture.additive))
             return false;
@@ -3030,6 +3041,7 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
             return false;
         const float* xyz = decoded.position;
         const DWORD diffuse = decoded.diffuse;
+        const DWORD specular = decoded.specular;
         // TEXCOORDSIZE3/4 stores (u,v,extra...); native untransformed 2D UV consumes (u,v).
         // TEXCOORDSIZE1(0..7) U-only streams get V=0; later UV sets
         // retain packed game byte offsets through native Draw/DrawIndexed.
@@ -3102,6 +3114,10 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
         v.diffuse[1] = static_cast<float>((diffuse >> 8) & 255) / 255.0f;
         v.diffuse[2] = static_cast<float>(diffuse & 255) / 255.0f;
         v.diffuse[3] = static_cast<float>((diffuse >> 24) & 255) / 255.0f;
+        v.specular[0] = static_cast<float>((specular >> 16) & 255) / 255.0f;
+        v.specular[1] = static_cast<float>((specular >> 8) & 255) / 255.0f;
+        v.specular[2] = static_cast<float>(specular & 255) / 255.0f;
+        v.specular[3] = static_cast<float>((specular >> 24) & 255) / 255.0f;
     }
     return true;
 }

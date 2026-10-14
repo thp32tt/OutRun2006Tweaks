@@ -32,7 +32,7 @@ def integrated(header,bridge):
      "capture.stage1ColorOp = nextColorOp;",
      "capture.stage1AlphaOp = alphaOp;",
      "capture.stage1Args = {color1, color2, alpha1, alpha2};")) and all(s in shader for s in (
-     "Stage1Source(stage0, diffuse, stage1Args.x)",
+     "Stage1Source(stage0, diffuse, specular, stage1Args.x)",
      "stage1Ops.x, stage0, diffuse);",
      "stage1Ops.y, stage0, diffuse).a;")) and all(s in submit for s in (
      "ctx->PSSetConstantBuffers(1, 1, &combiner)",
@@ -42,7 +42,7 @@ assert integrated(h,c)
 for x in codes+sdks: assert not integrated(h,c.replace(x,"",1)),x
 assert not integrated(h.replace("!stage1_cross_channel_color_operation(operation)","true",1),c)
 for x in ("variants!=576u","stage1_alpha_supported(op,a,b)","stage1_operation_reads_diffuse",
-          "0x40u|kStage1Factor","stage1_combiner_supported(op,2u","stage1_combiner_supported(op,4u"):
+          "0x40u|kStage1Factor","stage1_combiner_supported(op,2u","stage1_combiner_supported(op,5u"):
  assert x in p,x
 assert "python tools/test_dx11_stage1_cross_channel_00704.py" in w
 assert "tools/dx11_game_stage1_cross_channel_probe_00704.cpp" in w

@@ -202,6 +202,7 @@ constexpr bool game_fvf_layout(std::uint32_t fvf, GameFvfLayout& layout) noexcep
 struct GameFvfSample {
     float position[4] = {0.f, 0.f, 0.f, 1.f};
     std::uint32_t diffuse = 0xffffffffu;
+    std::uint32_t specular = 0u;
     float uv[2] = {0.f, 0.f};
     float uv1[2] = {0.f, 0.f};
     float uv2[2] = {0.f, 0.f};
@@ -257,6 +258,9 @@ inline bool game_fvf_decode_vertex(const void* bytes, std::uint32_t stride,
     std::memcpy(candidate.position, data, layout.positionBytes);
     if (layout.hasDiffuse)
         std::memcpy(&candidate.diffuse, data + layout.diffuseOffset, 4u);
+    if (layout.hasSpecular)
+        std::memcpy(&candidate.specular, data + layout.diffuseOffset +
+            (layout.hasDiffuse ? 4u : 0u), 4u);
     if (layout.texcoordCount >= 1u)
         std::memcpy(candidate.uv, data + layout.texcoordOffset,
                     layout.firstTexcoord1D ? 4u : 8u);
