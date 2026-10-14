@@ -1,0 +1,43 @@
+name: Localization C salvage offline validation
+on:
+  push:
+    branches:
+      - korean-localization-recovery-20260928
+    paths:
+      - 'tools/localization/c_salvage_*.py'
+      - 'tools/localization/test_c_salvage_*.py'
+      - 'docker/localization-production/Dockerfile.c-salvage'
+      - 'docker/localization-production/portainer-git-c-salvage.override.yml'
+      - '.github/workflows/localization-c-salvage-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: localization-c-salvage-ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  offline-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check numpy==2.3.5 Pillow==12.3.0
+      - name: C compositor synthetic QA only
+        run: python tools/localization/test_c_salvage_compose.py
+      - name: C worker synthetic QA only
+        run: python tools/localization/test_c_salvage_worker.py
+      - name: Verify deployment is manual and existing controller unchanged
+        run: |
+          python - <<'PY'
+          import pathlib
+          d=pathlib.Path('docker/localization-production/portainer-git-c-salvage.override.yml').read_text()
+          assert 'outrun-c-salvage-offline:' in d
+          assert 'network_mode: none' in d
+          assert 'read_only: true' in d
+          assert 'C_SALVAGE_INPUT_HOST_PATH:?' in d
+          assert 'AUTO_SEND' not in d and 'outrun-chat-controller-localization-recovery' not in d
+          print('PASS: isolated C service; existing A/B/C1 untouched')
+          PY
