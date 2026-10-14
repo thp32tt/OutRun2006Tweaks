@@ -42,5 +42,9 @@ for name in ("src/vr/d3d9/stereo_renderer_r30.cpp",
         assert "R30CompleteNativeGameSource(device, gameHr);" in caller
         assert "return gameHr;" in caller
     else:
-        assert "return R30GuardScreenSpace(" in caller
+        # R26-safe must check the final guard HRESULT, not return it early:
+        # stereo/HUD setup can itself fail before invoking the original Draw.
+        assert "const HRESULT gameHr = R30GuardScreenSpace(" in caller
+        assert "R30CompleteNativeGameSourceR26Safe(device, gameHr);" in caller
+        assert "return gameHr;" in caller
 print("00644 live game line VB/IB/UP / native D3D11 Draw graph: PASS")
