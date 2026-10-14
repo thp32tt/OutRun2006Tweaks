@@ -11,11 +11,11 @@
   "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "work_key": "DX9EX:VIS:ESC_MENU",
-  "status": "NEEDS_EXACT_SHA_VALIDATION",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00812]",
   "changed_files": [
     "src/vr/d3d9/pause_menu_eye_affine.hpp",
@@ -61,9 +61,9 @@
     ]
   },
   "acceptance_results": {
-    "ESC_OPTICAL_READABILITY": "PENDING_EXACT_SHA",
-    "ESC_OWNER_DESKTOP_FALLBACK": "PENDING_EXACT_SHA",
-    "ESC_EXACT_SHA_GATES": "PENDING_EXACT_SHA"
+    "ESC_OPTICAL_READABILITY": "PASS_EXACT_SHA",
+    "ESC_OWNER_DESKTOP_FALLBACK": "PASS_EXACT_SHA",
+    "ESC_EXACT_SHA_GATES": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "User's Quest3/VDXR 2026-10-13 test of exact build 75ef9c91 reports the native ESC pause menu much too small and upward shifted at 3440x1440 source, XR recommended per-eye 2496x2688.",
@@ -81,17 +81,49 @@
     "eye_ownership": "Only responsive native ESC sprite owner and its associated option arrows may use the enlarged but aspect-preserving common binocular optical containment; leave per-eye world projections and F11 external draws unchanged.",
     "negative_test_evidence": "Existing smoke adds Quest3 3440x1440→2496x2688 and 4:3/16:9/21:9 bounded monotonic expectations; Python source guard performs independent cache/owner/scaling destructive mutations and preserves legacy opt-out.",
     "fix_evidence": "Existing task material SHA 0b8d84ff54cec5bd6da5fe254c37ae71ac6d9829 modifies native pause scaling helper, R30 Draw containment and focused C++/Python tests.",
-    "repair_evidence": "Prior DX9Ex Active 38491931096 failed solely in policy: missing docs/automation/runs/CONVERSION-DX9EX-00812.json prevented game/host/full-chain/package stages. This resumed run restores required feature record for policy verification."
+    "repair_evidence": "Prior DX9Ex Active 38491931096 failed solely in policy: missing docs/automation/runs/CONVERSION-DX9EX-00812.json prevented game/host/full-chain/package stages. This resumed run restores required feature record for policy verification. Final original material 279488cf adds finite/positive ESC setting gating; validation-bearing 09a4373b fixes old responsive/contain/F11 source test assertions. Exact SHA DX9Ex Active 38492968313 all 5 jobs SUCCESS, Domain 38492968312 SUCCESS; original C++ material Full Impact 38492390036 all 3 SUCCESS."
   },
   "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
-  "runtime_status": "BUILD_PENDING_NEED_HMD_TEST",
+  "runtime_status": "BUILD_VERIFIED_NEED_HMD_TEST",
   "base_sha": "7dd572b9e025430722ea7b09d24304e6ef11a8ac",
-  "material_result_sha": "0b8d84ff54cec5bd6da5fe254c37ae71ac6d9829",
+  "material_result_sha": "279488cf54ca4ddc9e7a5ea9d8301daaa6362efd",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
-    "failed_diagnostic_run_id": 38491931096,
-    "failed_job_id": 115618901168,
-    "failed_cause": "Missing per-feature run JSON; not a C++ compiler failure.",
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "09a4373b8b04330621c9be508bdab45165350eef",
+    "material_result_sha": "279488cf54ca4ddc9e7a5ea9d8301daaa6362efd",
+    "dx9ex_active": {
+      "run_id": 38492968313,
+      "head_sha": "09a4373b8b04330621c9be508bdab45165350eef",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "host": "SUCCESS",
+        "game": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      },
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38492968313"
+    },
+    "domain_isolation": {
+      "run_id": 38492968312,
+      "head_sha": "09a4373b8b04330621c9be508bdab45165350eef",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38492968312"
+    },
+    "full_source_impact": {
+      "run_id": 38492390036,
+      "head_sha": "279488cf54ca4ddc9e7a5ea9d8301daaa6362efd",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "source-cross-domain": "SUCCESS",
+        "msvc-analyze-active-game": "SUCCESS"
+      },
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38492390036"
+    },
     "runtime_validation": "UNTESTED"
-  }
+  },
+  "validation_bearing_result_sha": "09a4373b8b04330621c9be508bdab45165350eef",
+  "result_sha": "09a4373b8b04330621c9be508bdab45165350eef",
+  "c6_recorded_at_utc": "2026-10-14T01:07:00Z"
 }
