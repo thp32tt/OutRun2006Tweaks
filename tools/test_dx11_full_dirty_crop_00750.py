@@ -10,6 +10,7 @@ def integrated(source, header):
     b=source.find("void before_game_reset(",a)
     if a<0 or b<=a: return False
     code=source[a:b]
+    crop_admission=code.find("const bool cropDirtyCoverage =")
     gate=code.find("GameNativeDirtyRegionCoverage::covers_present_crop(")
     bound=code.find("const bool outputWritable =",gate)
     queued=code.find("ctx->CopyResource(next.staging.Get(), s.backend.color_texture());",bound)
@@ -19,8 +20,10 @@ def integrated(source, header):
     submit=code.find("game->UpdateSurface(",dest)
     return all((
         '#include "native_game_dirty_region.hpp"' in source,
-        0<=gate<tiled<bound<queued<crop<dest<submit,
-        "oneBoundedDirtyRect &&" in code[:gate],
+        0<=crop_admission<gate<tiled<bound<queued<crop<dest<submit,
+        # Do not match the earlier *whole-backbuffer* oneBoundedDirtyRect.
+        # This guard must belong to the cropped-source admission itself.
+        "oneBoundedDirtyRect &&" in code[crop_admission:gate],
         "dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top" in code[gate:bound],
         "dirtyRect.left, dirtyRect.top, dirtyRect.right, dirtyRect.bottom" in code[gate:bound],
         "croppedNativeUpload && fullPlacement.valid" in code[bound:queued],
