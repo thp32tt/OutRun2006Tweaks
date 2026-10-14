@@ -263,14 +263,15 @@ def test_shadow_copy_cache_mutations(source):
         ("cache.entry = entry;", "cache.entry.reset();"),
         ("cache.revision = entry->revision;", "cache.revision = 0;"),
         ("std::memcpy(out.data(), entry->bytes.data() + offset, size)", "// missing CPU shadow refresh"),
-        ("++entry->revision;\n                ++R30ShadowDiscardInvalidations;", "++R30ShadowDiscardInvalidations;"),
+        ("++entry->revision;\n                R30RecordTelemetryCounter(R30ShadowDiscardInvalidations);",
+         "R30RecordTelemetryCounter(R30ShadowDiscardInvalidations);"),
         ("++entry->revision;\n                    entry->lastWriteRevision = entry->revision;",
          "entry->lastWriteRevision = entry->revision;"),
         ("entry->valid.clear();\n                ++entry->revision;\n            }\n            return hr;", "entry->valid.clear();\n            }\n            return hr;"),
         ("static_cast<UINT>(indexBytes), scratch.indexSource,\n                    scratch.indexCopy))",
          "static_cast<UINT>(indexBytes), scratch.indexSource,\n                    scratch.vertexCopy))"),
-        ("cache.entry.reset();\n                ++R30ShadowReadMisses;",
-         "++R30ShadowReadMisses;"),
+        ("cache.entry.reset();\n                R30RecordTelemetryCounter(R30ShadowReadMisses);",
+         "R30RecordTelemetryCounter(R30ShadowReadMisses);"),
     )
     for index, (needle, changed) in enumerate(changes, 1):
         assert needle in source, (index, needle)
