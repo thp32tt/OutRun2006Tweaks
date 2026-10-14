@@ -1297,8 +1297,8 @@ float4 Stage1SourceTextured(float4 current, float4 diffuse, float4 specular,
                             float4 stage1TextureColor, int source) {
     if ((source & 15) != 2) return Stage1Source(current, diffuse, specular, source);
     float4 value = stage1TextureColor;
-    if ((source & 32) != 0) value = value.aaaa;
-    if ((source & 16) != 0) value = 1.0f - value;
+    value = (source & 32) != 0 ? value.aaaa : value;
+    value = (source & 16) != 0 ? 1.0f - value : value;
     return value;
 }
 float4 Stage1ThreeSourceTextured(float4 current, float4 diffuse, float4 specular,
