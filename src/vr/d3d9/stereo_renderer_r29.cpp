@@ -1005,6 +1005,48 @@ namespace OutRunVRStereo
         return width != 0 && height != 0;
     }
 
+    bool R29OwnerReadCoherentEyeExtentPair(std::uint32_t out[4]) noexcept
+    {
+        if (!out)
+            return false;
+        out[0] = out[1] = out[2] = out[3] = 0;
+        const auto* shared = SharedState;
+        if (!shared)
+            return false;
+        // Host Publish/SetAllocatedEyeExtent writes both eyes between its
+        // odd/even sequence transitions.  Reading four independent extents
+        // can mix two generations even when both pairs differ by <10%.
+        for (unsigned attempt = 0; attempt < 4u; ++attempt)
+        {
+            const std::uint32_t before = shared->sequence;
+            if (before & 1u)
+                continue;
+            MemoryBarrier();
+            const std::uint32_t magic = shared->magic;
+            const std::uint32_t version = shared->protocolVersion;
+            const std::uint32_t size = shared->structSize;
+            const std::uint32_t leftW = shared->recommendedWidth[0];
+            const std::uint32_t leftH = shared->recommendedHeight[0];
+            const std::uint32_t rightW = shared->recommendedWidth[1];
+            const std::uint32_t rightH = shared->recommendedHeight[1];
+            MemoryBarrier();
+            const std::uint32_t after = shared->sequence;
+            if (before != after || (after & 1u))
+                continue;
+            if (magic != OutRunVR::SharedMagic ||
+                version != OutRunVR::SharedProtocolVersion ||
+                size != sizeof(OutRunVR::SharedPoseState) ||
+                !leftW || !leftH || !rightW || !rightH)
+                return false;
+            out[0] = leftW;
+            out[1] = leftH;
+            out[2] = rightW;
+            out[3] = rightH;
+            return true;
+        }
+        return false;
+    }
+
     bool R29OwnerTryGetDirectTransportIdentity(
         R29OwnerTransportIdentity& out) noexcept
     {

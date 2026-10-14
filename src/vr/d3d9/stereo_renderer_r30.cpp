@@ -1877,9 +1877,10 @@ namespace OutRunVRStereo
             // publication must not reuse a stale target pixel aspect even
             // when the Present epoch, pose and FOV have not advanced.
             std::uint32_t eyeExtent[4]{};
-            for (std::uint32_t eye = 0; eye < 2u; ++eye)
-                R29OwnerRecommendedEyeExtent(eye,
-                    eyeExtent[eye * 2u], eyeExtent[eye * 2u + 1u]);
+            // Reject an in-progress host publication as a whole; never
+            // combine the left-eye old size with the right-eye new size.
+            // Empty dimensions follow the existing coherent-FOV fallback.
+            R29OwnerReadCoherentEyeExtentPair(eyeExtent);
             bool canCache = frame.presentEpoch != 0 &&
                 frame.width != 0 && frame.height != 0 &&
                 std::isfinite(userScale);

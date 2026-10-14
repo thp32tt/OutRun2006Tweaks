@@ -6,7 +6,11 @@ DX9Ex Active Gate. Neither establishes Quest3/VDXR image or FPS acceptance.
 """
 from pathlib import Path
 
-SOURCE = Path(__file__).resolve().parents[1] / "src/vr/d3d9/stereo_renderer_r30.cpp"
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE = ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp"
+R29_SOURCE = ROOT / "src/vr/d3d9/stereo_renderer_r29.cpp"
+R29_API = ROOT / "src/vr/core/r29_owner_api.hpp"
+HOST_SOURCE = ROOT / "vrhost/src/main.cpp"
 
 
 def verify(source: str) -> None:
@@ -28,7 +32,7 @@ def verify(source: str) -> None:
         "R30HudContain.pauseResponsive == pauseResponsive",
         "R30HudContain.eyeFov[i] == fov[i]",
         "std::uint32_t eyeExtent[4]{};",
-        "R29OwnerRecommendedEyeExtent(eye,",
+        "R29OwnerReadCoherentEyeExtentPair(eyeExtent);",
         "R30HudContain.eyeExtent[i] == eyeExtent[i]",
         "canCache && extentMatches && R30HudContain.valid",
         "R30HudContain.eyeExtent[i] = eyeExtent[i]",
@@ -173,3 +177,81 @@ if __name__ == "__main__":
             continue
         raise AssertionError("HUD source generation mutant survived: " + correct)
     print("PASS R30 same-source cache, 3 aspect scenarios, 5 negative mutants")
+
+
+# 00828: host's two recommended eye extents must be read under ONE
+# SharedPoseState seqlock epoch, not as four unrelated width/height loads.
+def verify_coherent_eye_extent_pair(r29: str, api: str, host: str, r30: str) -> None:
+    assert "bool R29OwnerReadCoherentEyeExtentPair(std::uint32_t out[4]) noexcept;" in api
+    body = r29.split("bool R29OwnerReadCoherentEyeExtentPair(", 1)[1].split(
+        "bool R29OwnerTryGetDirectTransportIdentity(", 1
+    )[0]
+    for token in (
+        "out[0] = out[1] = out[2] = out[3] = 0;",
+        "for (unsigned attempt = 0; attempt < 4u; ++attempt)",
+        "const std::uint32_t before = shared->sequence;",
+        "if (before & 1u)",
+        "const std::uint32_t leftW = shared->recommendedWidth[0];",
+        "const std::uint32_t leftH = shared->recommendedHeight[0];",
+        "const std::uint32_t rightW = shared->recommendedWidth[1];",
+        "const std::uint32_t rightH = shared->recommendedHeight[1];",
+        "const std::uint32_t after = shared->sequence;",
+        "if (before != after || (after & 1u))",
+        "size != sizeof(OutRunVR::SharedPoseState)",
+        "!leftW || !leftH || !rightW || !rightH",
+        "out[0] = leftW;", "out[1] = leftH;",
+        "out[2] = rightW;", "out[3] = rightH;",
+    ):
+        assert token in body, token
+    assert body.count("MemoryBarrier();") == 2
+    assert body.index("const std::uint32_t before") < body.index("const std::uint32_t leftW")
+    assert body.index("const std::uint32_t rightH") < body.index("const std::uint32_t after")
+    assert body.index("if (before != after") < body.index("out[0] = leftW;")
+    assert host.count("state_->recommendedWidth[eye] =") >= 2
+    assert host.count("state_->recommendedHeight[eye] =") >= 2
+    assert "Begin();" in host and "End();" in host
+    hud = r30.split("void R30HudContainScale(", 1)[1].split(
+        "// Only exact, producer-owned gameplay text", 1
+    )[0]
+    assert hud.count("R29OwnerReadCoherentEyeExtentPair(eyeExtent);") == 1
+    assert "R29OwnerRecommendedEyeExtent(eye," not in hud
+    assert "R30HudContain.eyeExtent[i] == eyeExtent[i]" in hud
+    assert "R30HudAspectCompensation(\n                    stereo, frame.width, frame.height, eyeExtent)" in hud
+
+
+if __name__ == "__main__":
+    r29 = R29_SOURCE.read_text(encoding="utf-8")
+    api = R29_API.read_text(encoding="utf-8")
+    host = HOST_SOURCE.read_text(encoding="utf-8")
+    r30 = SOURCE.read_text(encoding="utf-8")
+    verify_coherent_eye_extent_pair(r29, api, host, r30)
+    mutations = (
+        ("if (before & 1u)", "if (false)"),
+        ("if (before != after || (after & 1u))", "if (false)"),
+        ("const std::uint32_t rightW = shared->recommendedWidth[1];",
+         "const std::uint32_t rightW = shared->recommendedWidth[0];"),
+        ("const std::uint32_t rightH = shared->recommendedHeight[1];",
+         "const std::uint32_t rightH = shared->recommendedHeight[0];"),
+        ("out[0] = out[1] = out[2] = out[3] = 0;", "/* stale eye extents */"),
+        ("!leftW || !leftH || !rightW || !rightH", "false"),
+        ("size != sizeof(OutRunVR::SharedPoseState)", "false"),
+    )
+    for original, mutant in mutations:
+        assert original in r29, original
+        try:
+            verify_coherent_eye_extent_pair(r29.replace(original, mutant, 1), api, host, r30)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("Eye extent seqlock mutant survived: " + original)
+    # Resize, recenter, absent host and desktop FOV-only fallback contract.
+    def accept(before, after, four, good_header=True):
+        return four if before % 2 == 0 and before == after and good_header and all(four) else (0,0,0,0)
+    quest=(2496,2688,2496,2688)
+    resized=(3000,2800,3000,2800)
+    assert accept(12,12,quest) == quest
+    assert accept(12,14,(quest[0],quest[1],resized[2],resized[3])) == (0,0,0,0)
+    assert accept(13,14,resized) == (0,0,0,0)
+    assert accept(12,12,(2496,2688,0,0)) == (0,0,0,0)
+    assert accept(12,12,quest,False) == (0,0,0,0)
+    print(f"PASS: XR binocular seqlock, reset/FOV fallback, {len(mutations)} negative mutations")

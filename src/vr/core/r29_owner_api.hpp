@@ -51,6 +51,10 @@ namespace OutRunVRStereo
     // Consumers receive copied dimensions/identity, never the shared pointer.
     bool R29OwnerRecommendedEyeExtent(std::uint32_t eye,
         std::uint32_t& width, std::uint32_t& height) noexcept;
+    // One seqlock-consistent XR publication for both HUD eyes.  The output
+    // order matches R30's {leftW, leftH, rightW, rightH} cache key.  On
+    // host resize/recenter races, output remains zero for FOV fallback.
+    bool R29OwnerReadCoherentEyeExtentPair(std::uint32_t out[4]) noexcept;
     struct R29OwnerTransportIdentity
     {
         std::uint32_t hostPid = 0;
