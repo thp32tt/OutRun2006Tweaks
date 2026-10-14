@@ -21,5 +21,21 @@ int main()
     auto queued = raw;
     queued.noQueue = false;
     assert(!OwnsRawWvp(queued));
+
+    // The whole centre draw is exclusive: both source-owned and unknown
+    // C993 c64 bypass the earlier road-shader and R28 world rebind owner.
+    assert(SelectWorldRoute(true, OwnsRawWvp(raw)) ==
+        WorldRoute::ExactCentreStereo);
+    assert(SelectWorldRoute(true, OwnsRawWvp(relatch)) ==
+        WorldRoute::PreserveOriginal);
+    assert(SelectWorldRoute(true, OwnsRawWvp(shader)) ==
+        WorldRoute::PreserveOriginal);
+    assert(SelectWorldRoute(true, OwnsRawWvp(ring)) ==
+        WorldRoute::PreserveOriginal);
+    assert(SelectWorldRoute(true, OwnsRawWvp(queued)) ==
+        WorldRoute::PreserveOriginal);
+    // Ordinary shader world draw path and CABE outer effect remain unchanged.
+    assert(SelectWorldRoute(false, false) ==
+        WorldRoute::HistoricalWorld);
     return 0;
 }

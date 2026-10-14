@@ -23,6 +23,27 @@ namespace OutRunVR::LensCentre
             e.shaderEpoch != 0 && e.shaderEpoch == e.writtenShaderEpoch &&
             e.spatialCentreSource && e.exactCentreProducer && e.noQueue;
     }
+    // A central C993 sun must never be consumed by the historic verified
+    // world shader / rebind path before its own game-upload proof is checked.
+    // Missing source evidence is not permission to borrow a previous road WVP.
+    enum class WorldRoute : std::uint8_t
+    {
+        HistoricalWorld,
+        ExactCentreStereo,
+        PreserveOriginal
+    };
+    constexpr WorldRoute SelectWorldRoute(bool exactCentre, bool rawOwned) noexcept
+    {
+        if (!exactCentre)
+            return WorldRoute::HistoricalWorld;
+        return rawOwned ? WorldRoute::ExactCentreStereo
+                        : WorldRoute::PreserveOriginal;
+    }
+    static_assert(SelectWorldRoute(true, true) == WorldRoute::ExactCentreStereo);
+    static_assert(SelectWorldRoute(true, false) == WorldRoute::PreserveOriginal);
+    static_assert(SelectWorldRoute(false, true) == WorldRoute::HistoricalWorld);
+    static_assert(SelectWorldRoute(false, false) == WorldRoute::HistoricalWorld);
+
     // These constexpr positive/negative regressions compile in the actual
     // R26+HUD Windows game DLL, not merely in an unrelated test executable.
     static_assert(OwnsRawWvp({7,7,9,9,40,27,0x100,0x100,11,11,true,true,true}),

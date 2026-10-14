@@ -447,6 +447,13 @@ namespace OutRunVRStereo
                 return false;
             if (CurrentVertexShaderIdentity.load(std::memory_order_acquire) == 0)
                 return false;
+            // R26/R28 is the fallback owner for ordinary world draws, not
+            // the C993 sun. A centre with missing raw-c64 provenance must
+            // retain the original draw instead of rebinding road/vehicle WVP.
+            if (!OutRunVR::GameSemantic::QueueRenderActive() &&
+                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::LensFlareCentre)
+                return false;
             if (!OutRunVRRenderer::R28PerspectiveWorldSemantic())
             {
                 ++R28RebindSemanticReject;

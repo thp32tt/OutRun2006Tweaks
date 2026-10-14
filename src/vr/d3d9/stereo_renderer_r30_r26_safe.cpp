@@ -2260,6 +2260,35 @@ namespace OutRunVRStereo
                 if (projectionClass ==
                     OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
                 {
+                    // C993's centre is an independently sourced original
+                    // game c64. A previously verified road shader/epoch is NOT
+                    // ownership evidence for this different sun object.
+                    // Route the exact centre before both historical world
+                    // gates, or leave its original game draw untouched when
+                    // the source/pose proof is missing. Do not promote CABE
+                    // outer discs or queued/other world billboards.
+                    const bool exactCentre =
+                        !OutRunVR::GameSemantic::QueueRenderActive() &&
+                        OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                            OutRunVR::GameSemantic::ProducerToken::LensFlareCentre;
+                    float centreRaw[16]{};
+                    const bool exactRawOwned =
+                        exactCentre && R30GetExactLensCentreRawWvp(centreRaw);
+                    const auto centreRoute =
+                        OutRunVR::LensCentre::SelectWorldRoute(
+                            exactCentre, exactRawOwned);
+                    if (centreRoute ==
+                        OutRunVR::LensCentre::WorldRoute::PreserveOriginal)
+                        return R30ScreenSpaceKind::None;
+                    if (centreRoute ==
+                        OutRunVR::LensCentre::WorldRoute::ExactCentreStereo)
+                    {
+                        ++R44SpatialBillboardClassifications;
+                        return R30ScreenSpaceKind::WorldBillboard;
+                    }
+
+                    // Ordinary confirmed world geometry retains the original
+                    // verified/rebindable R26/R28 lower-owner fast path.
                     if (CurrentDrawMatchesVerifiedWorld(device))
                         return R30ScreenSpaceKind::None;
                     std::uintptr_t reboundShader = 0;
@@ -2267,15 +2296,6 @@ namespace OutRunVRStereo
                     if (R28CanRebindVerifiedWorld(
                             device, reboundShader, reboundSerial))
                         return R30ScreenSpaceKind::None;
-                    // Only a raw c64 from THIS original D3A5 central sun
-                    // may enter the packaged R26+HUD R30 stereo eye transform.
-                    if (OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                            OutRunVR::GameSemantic::ProducerToken::LensFlareCentre)
-                    {
-                        float ownedRaw[16]{};
-                        if (!R30GetExactLensCentreRawWvp(ownedRaw))
-                            return R30ScreenSpaceKind::None;
-                    }
                     ++R44SpatialBillboardClassifications;
                     return R30ScreenSpaceKind::WorldBillboard;
                 }
