@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULL_GAME_COMBINED_COLOR_Z_CLEAR",
   "feature_id": "DX11-FULL-GAME-COMBINED-COLOR-Z-CLEAR",
-  "status": "IN_PROGRESS_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -92,5 +92,6 @@
     "docs/automation/runs/CONVERSION-DX11-00733.json"
   ],
   "runtime_gate": "NEED_HMD_TEST",
-  "packaging_status": "NOT_REQUIRED"
+  "packaging_status": "NOT_REQUIRED",
+  "validation_bearing_result_sha": "b2a4613b498f968d7d1ceb78d3e0162d6a83e710"
 }
