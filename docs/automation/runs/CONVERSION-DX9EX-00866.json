@@ -68,7 +68,7 @@
     "negative_test_evidence": "Verifier checks original three E8 parents, source/direct token, appended queue/RAII unwind and negative mutation of pending guard and producer; C++ host smoke adds OutRunStagePrintf pending-world restoration/queue priority.",
     "eye_ownership": "Selected R26+HUD game build routes exact ScreenHud through existing per-eye HUD projection; no claim about actual Quest3 visual correction without HMD."
   },
-  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "checkpoint": "C6_STATE",
   "phase": "C6_RESULT",
   "automation_validation": "PASS_EXACT_SHA",
@@ -93,12 +93,7 @@
     "exact_sha": "cb67efc36f6b7124fe27884fbced012d95e83104",
     "dx9ex_active": {
       "run_id": 38645396774,
-      "conclusion": "SUCCESS",
-      "policy": "SUCCESS",
-      "host": "SUCCESS",
-      "game": "SUCCESS",
-      "full_chain_compile": "SUCCESS",
-      "package": "SUCCESS"
+      "conclusion": "SUCCESS"
     },
     "domain_isolation": {
       "run_id": 38645396640,
@@ -110,12 +105,9 @@
     },
     "full_source_impact": {
       "run_id": 38645397025,
-      "conclusion": "SUCCESS",
-      "host_analyze": "SUCCESS",
-      "game_analyze": "SUCCESS",
-      "source_cross_domain": "SUCCESS"
+      "conclusion": "SUCCESS"
     },
-    "runtime_caveat": "No Quest3 HMD; build success not an optical verification."
+    "runtime_caveat": "No physical HMD / original game runtime verification. RUNTIME_VALIDATION=UNTESTED."
   },
   "score_once": true,
   "score_delta_this_attempt": 1,
@@ -124,5 +116,6 @@
   "scoreboard_ai_2_delta": 1,
   "scoreboard_ai_2_after": 1344,
   "scoreboard_commit_sha": "a204ffcecb3c9d4b354f8189c199c7fce5b1e766",
-  "score_basis": "One distinct original GOAL stage-result synchronous/queued source ownership fix, compiled regression, mutation verifier and four exact-SHA required workflow groups success; retry/C6 no duplicate."
+  "score_basis": "One distinct original GOAL stage-result synchronous/queued source ownership fix, compiled regression, mutation verifier and four exact-SHA required workflow groups success; retry/C6 no duplicate.",
+  "c6_prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
