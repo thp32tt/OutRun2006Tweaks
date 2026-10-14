@@ -66,9 +66,9 @@
     "negative_test_evidence": "Source integration with 11 portable fail-closed model cases and 7 negative source mutations.",
     "eye_ownership": "No change to draw ownership or eye transforms; shared gate runs before any left/right physical replay."
   },
-  "status": "IMPLEMENTED_VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No actual Quest3/VDXR/game testing and no evidence yet that this original game exercises the declaration-only path.",
   "changed_files": [
@@ -77,7 +77,41 @@
     ".github/workflows/vr-dx9ex-active.yml",
     "docs/automation/runs/CONVERSION-DX9EX-00851.json"
   ],
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "score_once": false
+  "material_result_sha": "cb9267b5b6969effdc4139a6256e2373c2a78919",
+  "validation_bearing_result_sha": "14a1e3a0179cc2268c778edc9ad5dcef31165c16",
+  "score_once": true,
+  "last_event_id": "CONVERSION-DX9EX-00851-E004",
+  "last_event_type": "retry",
+  "validation_runs": {
+    "dx9ex_active": {
+      "run_id": 38601602950,
+      "head_sha": "14a1e3a0179cc2268c778edc9ad5dcef31165c16",
+      "conclusion": "success",
+      "jobs": "policy,game,host,full-chain-compile,package 5/5"
+    },
+    "domain_isolation": {
+      "run_id": 38601602924,
+      "head_sha": "14a1e3a0179cc2268c778edc9ad5dcef31165c16",
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38599761496,
+      "head_sha": "cb9267b5b6969effdc4139a6256e2373c2a78919",
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38599761397,
+      "head_sha": "cb9267b5b6969effdc4139a6256e2373c2a78919",
+      "conclusion": "success"
+    }
+  },
+  "closeout_notes": "Validation-bearing result SHA is 14a1e3a0; following C6 [skip ci] checkpoint must not replace exact-SHA gate proof. No Quest3/VDXR testing performed. Default R26+HUD package vs independent R30 full-chain source ownership remains distinct.",
+  "scoreboard": {
+    "repository": "thp32tt/ai-dev-lab",
+    "commit_sha": "9e71337eafe6f3b5aa486a9439c9c9904b5224af",
+    "previous": 1320,
+    "delta": 1,
+    "cumulative": 1321,
+    "run_key": "CONVERSION-DX9EX-00851"
+  }
 }
