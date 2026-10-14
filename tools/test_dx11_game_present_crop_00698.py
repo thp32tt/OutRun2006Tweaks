@@ -25,13 +25,15 @@ def connected(hook, hdr, impl, prov):
         "sourceRect ? static_cast<std::int64_t>(sourceRect->right)" in present,
         "sourceRect ? static_cast<std::int64_t>(sourceRect->bottom)" in present,
         "presentRegion.inset_placement(" in present,
+        "presentRegion.full_frame_placement(" in present,
+        "fullMode ? fullPlacement.valid : insetPlacement.valid" in present,
         "bb.Width, bb.Height, surfaceWidth, surfaceHeight, fullMode ? 0u : 8u)" in present,
         "nativeExtentMatches &&" in present,
         "surfaceWidth == bb.Width && surfaceHeight == bb.Height" in present,
         "insetPlacement.valid" in present,
         "POINT destination{" in present,
-        "static_cast<LONG>(insetPlacement.left)" in present,
-        "static_cast<LONG>(insetPlacement.top)" in present,
+        "static_cast<LONG>(fullMode ? fullPlacement.left : insetPlacement.left)" in present,
+        "static_cast<LONG>(fullMode ? fullPlacement.top : insetPlacement.top)" in present,
         "!outputNow.hasDirtyRegion" in present,
         "outputNow.hasDirtyRegion = dirtyRegion != nullptr;" in present,
         "outputNow.sourceLeft = presentRegion.left;" in present,
@@ -54,10 +56,12 @@ for label, i, token in (
      "before_game_present(device, sourceRect, dirtyRegion)"),
     ("crop relocation", 2, "presentRegion.inset_placement("),
     ("crop bound", 2, "insetPlacement.valid"),
+    ("full native placement", 2, "presentRegion.full_frame_placement("),
+    ("full native crop validation", 2, "fullMode ? fullPlacement.valid : insetPlacement.valid"),
     ("full output ownership", 2, "nativeExtentMatches &&"),
     ("complete native stream", 2, "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)"),
-    ("dynamic x destination", 2, "static_cast<LONG>(insetPlacement.left)"),
-    ("dynamic y destination", 2, "static_cast<LONG>(insetPlacement.top)"),
+    ("dynamic x destination", 2, "static_cast<LONG>(fullMode ? fullPlacement.left : insetPlacement.left)"),
+    ("dynamic y destination", 2, "static_cast<LONG>(fullMode ? fullPlacement.top : insetPlacement.top)"),
     ("dirty rectangle rejection", 2, "!outputNow.hasDirtyRegion"),
     ("async generation change", 2, "!s.previousOutput.same(outputNow)"),
     ("late readback owner", 2, "!oldest.provenance.same_output(s.outputGeneration)"),
@@ -100,6 +104,13 @@ static_assert(!GameNativePresentRegion{0,0,3441,1440}.inset_placement(3440,1440,
 static_assert(!GameNativePresentRegion{1,0,0,1440}.inset_placement(3440,1440,256,144,8).valid);
 static_assert(!GameNativePresentRegion{0,0,3440,1440}.inset_placement(0xffffffffU,1440,256,144,8).valid);
 static_assert(!full.inset_placement(3440,1440,256,144,4000).valid);
+// A full-size D3D9 native upload stays at (0,0) even for a cropped Present.
+constexpr auto nativeCrop = GameNativePresentRegion{200,100,1000,400}
+    .full_frame_placement(3440,1440,3440,1440);
+static_assert(nativeCrop.valid && nativeCrop.left == 0 && nativeCrop.top == 0);
+static_assert(!GameNativePresentRegion{0,0,3441,1440}
+    .full_frame_placement(3440,1440,3440,1440).valid);
+static_assert(!full.full_frame_placement(3440,1440,3440,1439).valid);
 constexpr GameOutputSignature a{0x10u,3440u,1440u,21u,0xabcdu,0,0,3440,1440,false};
 static_assert(a.valid());
 static_assert(a.same(GameOutputSignature{0x10u,3440u,1440u,21u,0xabcdu,0,0,3440,1440,false}));
