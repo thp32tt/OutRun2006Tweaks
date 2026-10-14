@@ -132,7 +132,7 @@ jobs:
                        'DUPLICATED_IMAGE_PREVIEWS',
                        'IMAGE_BLOB_NOT_READY',
                        'OUTPUT_ORDER_ONLY_NOT_VISUALLY_VERIFIED',
-                       'LIBRARY_OUTRUN_KOR_UNVERIFIED'):
+                       'PROJECT_LIBRARY_NOT_VERIFIED'):
             assert mark in src,mark
           assert src.count('button[aria-label^="Show generated image "]') >= 2
           library=(root/'project_library_gate.py').read_text(encoding='utf-8')
