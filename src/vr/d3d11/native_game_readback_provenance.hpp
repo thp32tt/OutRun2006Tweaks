@@ -36,6 +36,15 @@ struct GameReadbackProvenance {
     std::uint64_t sourceDraws = 0u;
     std::uintptr_t sourceDevice = 0u;
     std::uint64_t outputGeneration = 0u;
+    // Native full-backbuffer readbacks replace the whole game image. If the
+    // *current* D3D9 draw stream was not fully mirrored, retire even pending
+    // GPU-fenced copies from earlier Presents by advancing outputGeneration.
+    // The bounded inset remains diagnostic and may use a lagged sample.
+    [[nodiscard]] static constexpr bool quarantine_full_frame(
+        bool fullMode, bool currentFullFrameComplete,
+        bool outputWritable) noexcept {
+        return fullMode && (!currentFullFrameComplete || !outputWritable);
+    }
     [[nodiscard]] constexpr bool same_output(std::uint64_t currentGeneration) const noexcept {
         return outputGeneration != 0u && outputGeneration == currentGeneration;
     }

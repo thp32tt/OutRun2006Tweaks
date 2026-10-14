@@ -4896,6 +4896,19 @@ void before_game_present(IDirect3DDevice9* game,
             bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
             (bb.Format == D3DFMT_A8R8G8B8 ||
              bb.Format == D3DFMT_X8R8G8B8);
+        // A ready asynchronous full-screen GPU copy belongs to an earlier
+        // Present. It must not replace today's D3D9 menu, car-selection or
+        // race fallback when any *current* game Draw was unsupported, aborted
+        // or cleared. Invalidate the entire queued provenance generation,
+        // including copies whose GPU fences are not ready yet. Insets may
+        // still show their bounded, diagnostic delayed sample.
+        const bool currentFullFrameComplete =
+            s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame) &&
+            s.sourceGameDevice == presentDevice;
+        if (GameReadbackProvenance::quarantine_full_frame(
+                fullMode, currentFullFrameComplete, outputWritable)) {
+            if (++s.outputGeneration == 0u) ++s.outputGeneration;
+        }
         if (s.backend.ready() && s.backend.context()) {
             auto* ctx = s.backend.context();
             // Poll the oldest GPU fence without implicit flushing or CPU waits.
@@ -4991,7 +5004,7 @@ void before_game_present(IDirect3DDevice9* game,
             // a failed vertex/index translation or a failed D3D11 submit.
             // Previously s.pending survived abort() and copied corrupt insets.
             const bool complete = fullMode
-                ? s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)
+                ? currentFullFrameComplete
                 : s.frameBatch.publishable(s.pending);
             if (complete && outputWritable &&
                 s.sourceGameDevice == presentDevice) {
