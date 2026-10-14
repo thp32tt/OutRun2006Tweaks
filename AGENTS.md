@@ -1,3 +1,11 @@
+# 2026-10-15 USER OVERRIDE: DX9Ex TEST ZIP LAUNCH IS A RELEASE-BLOCKING CONTRACT
+
+The uploaded user's diagnostic ZIP for f91edcf357b8 showed gamePid=3728 but hostPid=0, hostReason=host-pid-missing and stereoAllowed=0. Windows builds and a ZIP do NOT prove VR launched. For every future DX9Ex test build, ship root `START_DX9EX_TEST.cmd` as a single-double-click, visible console entrypoint (GUI slot selector optional); do not ship only a silent GUI/hidden PowerShell child.
+
+The batch MUST quote paths including spaces, use `pushd "%~dp0"` and the original game's `OR2006C2C.EXE` folder, check game EXE, x86 `backends/d3d9/dinput8.dll`, x64 `backends/d3d9/outrun-vr-host.exe`, INI, PowerShell and PS1 helpers, select D3D9/CURRENT_FOCUS/CORRECTNESS, install correct selected DLL and host, start and wait for the game, propagate nonzero status, pause on failure and show diagnostics. Runner MUST observe the actual `outrun-vr-host` process during gameplay, not infer success from Start-Process or v3 shadow. Host-never-started / host-disappeared errors must write `DX9EX_LAUNCH_HEALTH.txt` and `OUTRUNVR_LAUNCH_ERROR.txt`, collect logs on normal game exit, and return nonzero while preserving user's running game. Do not skip canonical EXE SHA validation or install DXVK `d3d9.dll` for DX9Ex.
+
+GitHub exact-SHA Windows package CI MUST reject omitted/broken direct launchers, verify both paths, required helpers/payload and negative regressions. Do NOT declare runnable VR based on a compile-only ZIP. HMD Quest3/VDXR test remains RUNTIME_VALIDATION=UNTESTED unless physically verified. Policy/docs-only work is not a scored functional renderer completion; this Git commit does not imply Docker controller hot reload.
+
 # 2026-10-15 01:36 KST — USER LENS CENTRE / +TIME WHOLE-PATH REPAIR DIRECTIVE
 
 Read `docs/DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md` before the next DX9Ex visual repair. User explicitly requests actionable fixes for all screen faults, especially lens centre and stage +TIME, with whole-source-path review where necessary. Next available P0-A dispatch prioritizes existing `DX9EX:VIS:LENS_FLARE_CENTRE` and `DX9EX:VIS:EXTENDED_TIME`; keep the original TASK_ID/lease and do not interrupt active exact-SHA CI or steal shared renderer ownership.
