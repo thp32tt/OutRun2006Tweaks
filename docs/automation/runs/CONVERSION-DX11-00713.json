@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00713",
+  "production_id": "CONVERSION-DX11-00713",
+  "event_id": "CONVERSION-DX11-00713-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "LIVE_STAGE1_DUAL_TEXTURE_RGB_ALPHA_GAME_DRAW",
+  "work_key": "DX11:STAGE1_INDEPENDENT_REAL_GAME_TEXTURE",
+  "status": "BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "EXACT_SHA_GATES_5_OF_5_SUCCESS",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "live D3D9 game texture0 and independently bound Stage1 texture1 from menu/car/race Draw/DrawIndexed",
+      "exact UV/texture-transform/11-sampler compatibility and native t0/s0+t1/s1 mirrors",
+      "Stage1 RGB and independently selected alpha/PM/two-/three-input HLSL to D3D11 game diagnostic Draw/DrawIndexed; original D3D9 Draw/input fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_stage1_dual_texture.hpp",
+      "tools/dx11_game_stage1_dual_texture_probe_00713.cpp",
+      "tools/test_dx11_stage1_dual_game_texture_00713.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "64 native dual-texture state combinations; independently sampled t1 RGB/alpha, PM and 3-operand combiners",
+      "negative_regression": "stage1 non-2D, UV transform, sampler mismatch, failed resource conversion and unsupported operands preserve original D3D9",
+      "component_integration": "real D3D9 GetTexture(1) -> copied source1 native mirror -> HLSL t1/s1 -> Draw/DrawIndexed; exact SHA Windows/VR/CI"
+    },
+    "conflict_keys": [
+      "DX11:STAGE1_INDEPENDENT_REAL_GAME_TEXTURE",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Quest3/VDXR real game not run; HMD testing required before gameplay PASS",
+    "activation_guard_and_fallback": "diagnostic opt-in; input-safe D3D9 preserved if second game texture or filter/UV mismatch"
+  },
+  "feature_contract": {
+    "feature_id": "LIVE_STAGE1_DUAL_TEXTURE_RGB_ALPHA_GAME_DRAW",
+    "goal": "Native Draw/DrawIndexed samples two actual game-authored D3D9 textures for Stage1 RGB and independent alpha while maintaining input-safe D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "live-dual-texture-rgba",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_capture_shader_draw",
+        "expected_behavior": "real D3D9 stage0/stage1 distinct resources become bound native t0/s0 and t1/s1 and shade RGB/alpha"
+      },
+      {
+        "id": "invalid-state-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9_gamepad",
+        "expected_behavior": "state mismatch and missing supported mirrors fail closed without swallowing original game draw/input"
+      },
+      {
+        "id": "exact-sha-ci",
+        "category": "integrated_validation",
+        "behavior_area": "cpp_python_windows_openxr_ci",
+        "expected_behavior": "new source/model regressions and all five mandatory exact-SHA GitHub gates SUCCESS"
+      }
+    ]
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_stage1_dual_texture.hpp",
+    "tools/dx11_game_stage1_dual_texture_probe_00713.cpp",
+    "tools/test_dx11_stage1_dual_game_texture_00713.py",
+    "tools/test_dx11_stage1_texture_operand_00712.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00713.json"
+  ],
+  "base_head_sha": "4af87fb585eb458dcd89a534fb336d029978dabe",
+  "material_result_sha": "5af15888850ee761db14cf9f0417f313fab8d8d9",
+  "validation_bearing_result_sha": "ddd3190479246482ad4956a6a0e791c6b46c9ff5",
+  "gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38513926963,
+      "conclusion": "success",
+      "head_sha": "ddd3190479246482ad4956a6a0e791c6b46c9ff5"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38513927108,
+      "conclusion": "success",
+      "jobs": [
+        "validate",
+        "DX11 readiness smoke probes"
+      ],
+      "head_sha": "ddd3190479246482ad4956a6a0e791c6b46c9ff5"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38513931717,
+      "conclusion": "success",
+      "head_sha": "ddd3190479246482ad4956a6a0e791c6b46c9ff5"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38513931525,
+      "conclusion": "success",
+      "head_sha": "ddd3190479246482ad4956a6a0e791c6b46c9ff5"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38513931667,
+      "conclusion": "success",
+      "head_sha": "ddd3190479246482ad4956a6a0e791c6b46c9ff5"
+    }
+  ],
+  "known_ci_warning": "Preexisting 00708 TEMP C++ source probe emits GCC missing <initializer_list> errors inside a non-fatal 'g++ && executable' line. 00713 C++ and Python probes PASS; 00708 should be fixed as a separate real regression repair. Gate-level conclusions listed above are the actual GitHub verdict.",
+  "next_action": "BUILD_VERIFIED. NEED_HMD_TEST for Quest3/VDXR visuals/gamepad; no HMD parity claim. Controller may assign next independent DX11 feature. DXVK remains frozen.",
+  "state_persisted": true
+}
