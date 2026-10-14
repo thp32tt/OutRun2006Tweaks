@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "feature_id": "LIVE_STAGE1_INDEPENDENT_UV_TRANSFORM_GAME_DRAW",
   "work_key": "DX11:STAGE1_GAME_INDEPENDENT_FVF_UV",
-  "status": "C4_COMMITTED_CI_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -87,8 +87,46 @@
     "docs/automation/runs/CONVERSION-DX11-00715.json"
   ],
   "base_head_sha": "ab8f0dcbb99d5644ac6521e297593306cd1085ed",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
-  "acceptance_results": {},
-  "next_action": "Run exact SHA DX11 Fast, Backend Conversion, Build, OpenXR VR architecture, HUD Inspector; preserve UNTESTED hardware status."
+  "material_result_sha": "813e84474d211e65950d432e197d18b88f16a72e",
+  "validation_bearing_result_sha": "a526c3347d6b3fb5b3c243be2f1007a43df8af5e",
+  "acceptance_results": {
+    "stage1-distinct-fvf-uv-native-draw": "PASS",
+    "invalid-uv-d3d9-fallback": "PASS",
+    "exact-sha-regressions": "PASS_EXACT_SHA"
+  },
+  "next_action": "Five exact-SHA mandatory gates SUCCESS on a526c3347d6b3fb5b3c243be2f1007a43df8af5e. Real Quest3/VDXR menu/vehicle/race/gamepad untested; NEED_HMD_TEST, no DXVK promotion. Continue next independent DX11 feature via controller.",
+  "gate_runs": [
+    {
+      "workflow": "DX11 Fast Structural Checks",
+      "run_id": 38519560013,
+      "conclusion": "success",
+      "head_sha": "a526c3347d6b3fb5b3c243be2f1007a43df8af5e"
+    },
+    {
+      "workflow": "Backend Conversion Gate",
+      "run_id": 38519560018,
+      "conclusion": "success",
+      "head_sha": "a526c3347d6b3fb5b3c243be2f1007a43df8af5e"
+    },
+    {
+      "workflow": "Build",
+      "run_id": 38519566024,
+      "conclusion": "success",
+      "head_sha": "a526c3347d6b3fb5b3c243be2f1007a43df8af5e"
+    },
+    {
+      "workflow": "OpenXR VR architecture",
+      "run_id": 38519566067,
+      "conclusion": "success",
+      "head_sha": "a526c3347d6b3fb5b3c243be2f1007a43df8af5e"
+    },
+    {
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "run_id": 38519566019,
+      "conclusion": "success",
+      "head_sha": "a526c3347d6b3fb5b3c243be2f1007a43df8af5e"
+    }
+  ],
+  "state_persisted": true,
+  "known_gate_note": "DX11 Fast success had pre-existing ignored 00708 C++ initializer_list include diagnostics; separate task, not 00715 regression. Verified new 00715 C++ probe and source mutation PASS."
 }
