@@ -23,7 +23,7 @@
     "subcomponents": [
       "Pre-submit previous homogeneous D3DXSprite batch under its old queue producer BEFORE selecting exact stage node; reject unknown owner.",
       "Flush exact queued +TIME sprite batch while its ScreenHud producer remains active, preserving HRESULT and legacy rank isolation.",
-      "Continue investigating direct numeric D3DX/VS/XYZRHW and Quest3 stereo before optical closure."
+      "Separate direct numeric D3DX Draw only when the original Begin contains exactly this one source-owned item; otherwise preserve original End/fallback."
     ],
     "acceptance_items": [
       {
@@ -66,21 +66,58 @@
       "HMD causality remains unproven until actual stage rendering with matching installed DLL."
     ],
     "fix_evidence": "Bounded exact +TIME queue boundary protects homogeneous prior owner and exact staged batch with Begin/End-aware fail-closed behavior.",
-    "eye_ownership": "Exact stage ScreenHud reaches existing R26+HUD full stereo paths; numeric direct D3DX ownership still requires cross-path check before feature closeout."
+    "eye_ownership": "Exact stage ScreenHud reaches existing R26+HUD full stereo paths; numeric direct D3DX ownership still requires cross-path check before feature closeout.",
+    "negative_test_evidence": "Exact +TIME changed-area verifier rejects six destructive source/ownership mutations; original R64 scope/Flush regression now mutates the actual rank Flush. Source outcomes statically checked and Windows built; not a live HMD proof."
   },
   "status": "COMPLETE_BUILD_VERIFIED",
   "phase": "C6_RESULT",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "runtime_evidence": "GitHub exact-SHA CI SUCCESS was provided for f405557925b07e78bee45661e624d360245d0d37. No Quest3/VDXR HMD runtime test was performed; optical result remains UNTESTED.",
+  "runtime_evidence": "Exact-SHA Windows/Domain/HUD/Full Source CI passed; game input and Quest3/VDXR stereo/+TIME optical output NOT runtime tested. HMD confirmation remains NEED_HMD_TEST.",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
     "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
     ".github/workflows/vr-dx9ex-active.yml",
     "docs/automation/runs/CONVERSION-DX9EX-00853.json"
   ],
-  "score_once": false,
-  "checkpoint": "C6_STATE",
+  "score_once": true,
+  "checkpoint": "C6_VERIFIED_EXACT_SHA",
   "validation_bearing_result_sha": "f405557925b07e78bee45661e624d360245d0d37",
-  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "material_result_sha": "ddfee4a47dc074d5b6ded5d9b553e9a8ce3131b8",
+  "acceptance_results": {
+    "producer": "PASS",
+    "gpu": "PASS_BUILD",
+    "fallback": "PASS",
+    "integration": "PASS_EXACT_SHA"
+  },
+  "ci_evidence": {
+    "exact_sha": "f405557925b07e78bee45661e624d360245d0d37",
+    "dx9ex_active_run_id": 38607371377,
+    "dx9ex_active": {
+      "policy": "SUCCESS",
+      "game": "SUCCESS",
+      "host": "SUCCESS",
+      "full_chain_compile": "SUCCESS",
+      "package": "SUCCESS"
+    },
+    "domain_isolation_run_id": 38607371343,
+    "domain_isolation": "SUCCESS",
+    "hud_inspector_run_id": 38607371358,
+    "hud_inspector": {
+      "static_exe_analysis": "SUCCESS",
+      "build_hud_inspector": "SUCCESS"
+    },
+    "full_source_impact_run_id": 38607371203,
+    "full_source_impact": {
+      "msvc_analyze_active_game": "SUCCESS",
+      "msvc_analyze_openxr_host": "SUCCESS",
+      "source_cross_domain": "SUCCESS"
+    }
+  },
+  "scoreboard_ai_2_before": 1324,
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1325,
+  "scoreboard_commit_sha": "712ed106f89bb29d16ab255758f43c129709b8d9",
+  "score_basis": "Independently implemented exact +TIME D3DX C++ batch ownership; gates passed; one unique RUN_KEY; no score for C6/checkpoint itself."
 }
