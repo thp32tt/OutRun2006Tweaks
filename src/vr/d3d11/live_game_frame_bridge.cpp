@@ -7,6 +7,7 @@
 #include "live_game_viewport_depth.hpp"
 #include "live_game_stage0_blend.hpp"
 #include "live_game_stage1_factor.hpp"
+#include "live_game_stage1_dual_texture.hpp"
 #include "native_backend.hpp"
 #include "packed_texture_16bit.hpp"
 #include "live_game_luminance_texture.hpp"
@@ -815,6 +816,7 @@ struct TextureCapture {
     bool enabled = false;
     bool stage1Enabled = false;
     bool stage1TextureOperands = false; // Stage1 D3DTA_TEXTURE in actual RGB/alpha operands.
+    ComPtr<IDirect3DTexture9> stage1SeparateTexture; // Independent live D3D9 texture -> native t1/s1.
     bool stage0ResultTemp = false; // RESULTARG=TEMP, CURRENT remains vertex DIFFUSE.
     bool stage0FullModulate = false;
     DWORD stage1ColorOp = D3DTOP_DISABLE;
@@ -1174,6 +1176,8 @@ bool env_batch_opt_in() noexcept {
 }
 
 constexpr char kStage1FactorShader[] = R"(
+Texture2D stage1GameTexture : register(t1);
+SamplerState stage1GameSampler : register(s1);
 // Stage 1 accepts raw vertex DIFFUSE/SPECULAR, stage-0 CURRENT and TFACTOR with
 // D3DTA_COMPLEMENT/ALPHAREPLICATE. Unsupported sources
 // are CPU-rejected before either native Draw or DrawIndexed is submitted.
@@ -1356,16 +1360,31 @@ float4 PSStage1Diffuse(VOut v) : SV_Target {
 }
 float4 PSStage1Modulate(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
+    if (stage1Ops.w == 2) {
+        float4 stage1Sample = stage1GameTexture.Sample(stage1GameSampler, v.uv);
+        return Stage1AndAlphaTextured(t * v.diffuse, v.diffuse, v.specular,
+                                      stage1Sample.a, stage1Sample);
+    }
     if (stage1Ops.w != 0) return Stage1AndAlphaTextured(t * v.diffuse, v.diffuse, v.specular, t.a, t);
     return Stage1AndAlpha(t * v.diffuse, v.diffuse, v.specular, t.a);
 }
 float4 PSStage1TextureOnly(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
+    if (stage1Ops.w == 2) {
+        float4 stage1Sample = stage1GameTexture.Sample(stage1GameSampler, v.uv);
+        return Stage1AndAlphaTextured(t, v.diffuse, v.specular,
+                                      stage1Sample.a, stage1Sample);
+    }
     if (stage1Ops.w != 0) return Stage1AndAlphaTextured(t, v.diffuse, v.specular, t.a, t);
     return Stage1AndAlpha(t, v.diffuse, v.specular, t.a);
 }
 float4 PSStage1Add(VOut v) : SV_Target {
     float4 t = gameTexture.Sample(gameSampler, v.uv);
+    if (stage1Ops.w == 2) {
+        float4 stage1Sample = stage1GameTexture.Sample(stage1GameSampler, v.uv);
+        return Stage1AndAlphaTextured(saturate(t + v.diffuse), v.diffuse, v.specular,
+                                      stage1Sample.a, stage1Sample);
+    }
     if (stage1Ops.w != 0) return Stage1AndAlphaTextured(saturate(t + v.diffuse), v.diffuse, v.specular, t.a, t);
     return Stage1AndAlpha(saturate(t + v.diffuse), v.diffuse, v.specular, t.a);
 }
@@ -3141,7 +3160,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             ComPtr<IDirect3DBaseTexture9> tex1;
             DWORD uv1 = ~0u, transform1 = ~0u;
             if (FAILED(game->GetTexture(1, tex1.GetAddressOf())) ||
-                !tex1 || tex1.Get() != tex.Get() ||
+                !tex1 || tex1->GetType() != D3DRTYPE_TEXTURE ||
                 FAILED(game->GetTextureStageState(1, D3DTSS_TEXCOORDINDEX, &uv1)) ||
                 FAILED(game->GetTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS, &transform1)) ||
                 uv1 != capture.coordIndex ||
@@ -3166,6 +3185,17 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
                     FAILED(game->GetSamplerState(1, state, &s1)) || s0 != s1)
                     return false;
             }
+            // The second texture must share the proven UV/transform/sampler;
+            // the original game D3D9 Draw is retained on all failures.
+            if (!stage1_dual_texture_compatible(
+                    capture.enabled, tex1 != nullptr, tex1->GetType() == D3DRTYPE_TEXTURE,
+                    uv1 == capture.coordIndex,
+                    transform1 == (capture.transformUv ? D3DTTFF_COUNT2 : D3DTTFF_DISABLE),
+                    true))
+                return false;
+            if (tex1.Get() != tex.Get() &&
+                FAILED(tex1.As(&capture.stage1SeparateTexture)))
+                return false;
         }
         // Only read stage-local CONSTANT when active COLOR/ALPHA/ARG0 needs it.
         // A failed query preserves D3D9 Draw/Present and gamepad unchanged.
@@ -3786,6 +3816,13 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     ComPtr<ID3D11SamplerState> sampledSampler;
     if (capture.enabled &&
         !mirror_texture(dev, capture, sampledView, sampledSampler)) return false;
+    ComPtr<ID3D11ShaderResourceView> stage1View;
+    ComPtr<ID3D11SamplerState> stage1Sampler;
+    if (capture.stage1SeparateTexture) {
+        TextureCapture second = capture;
+        second.texture = capture.stage1SeparateTexture;
+        if (!mirror_texture(dev, second, stage1View, stage1Sampler)) return false;
+    }
     // Stage-1 combiner is an isolated game-authored PS constant (b1).
     // Create before issuing any Draw: failure preserves the original D3D9
     // renderer and never partially publishes a new native frame.
@@ -3807,7 +3844,8 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         payload.operations[0] = static_cast<std::int32_t>(capture.stage1ColorOp);
         payload.operations[1] = static_cast<std::int32_t>(capture.stage1AlphaOp);
         payload.operations[2] = capture.stage0ResultTemp ? 1 : 0; // shader CURRENT/TEMP route.
-        payload.operations[3] = capture.stage1TextureOperands ? 1 : 0; // matched stage1 texture operand.
+        payload.operations[3] = capture.stage1SeparateTexture ? 2 :
+            (capture.stage1TextureOperands ? 1 : 0); // 2=second live game sample, 1=matched stage0.
         for (std::size_t i = 0; i < 4; ++i)
             payload.arguments[i] = static_cast<std::int32_t>(capture.stage1Args[i]);
         for (std::size_t i = 0; i < 2; ++i)
@@ -4381,6 +4419,10 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     ID3D11SamplerState* boundSampler = sampledSampler.Get();
     ctx->PSSetShaderResources(0, 1, &boundView);
     ctx->PSSetSamplers(0, 1, &boundSampler);
+    ID3D11ShaderResourceView* boundStage1View = stage1View.Get();
+    ID3D11SamplerState* boundStage1Sampler = stage1Sampler.Get();
+    ctx->PSSetShaderResources(1, 1, &boundStage1View);
+    ctx->PSSetSamplers(1, 1, &boundStage1Sampler);
     if (ib) ctx->DrawIndexed(indexCount, 0, 0);
     else ctx->Draw(static_cast<UINT>(vertices.size()), 0);
     // GPU submission is paired with the queued readback at Present.
