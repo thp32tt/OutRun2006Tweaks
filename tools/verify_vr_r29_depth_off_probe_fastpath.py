@@ -42,11 +42,20 @@ def contract(s: str) -> bool:
     second = """if (fragile && !forceZeroDisparity && !worldGateChecked &&
                 r27DepthCandidate &&
                 R27ShouldBypassLegacyZeroDisparity(device))"""
+    # This complete block must be present. Searching only for the if-condition
+    # with find() allowed a missing guard (-1) to compare before valid anchors.
+    fail_closed = """bool fragile = true;
+            if (!R29FragileEffectCached(device, fragile))
+            {
+                ++R29SafetyFallbackDraws;
+                return legacyR13Draw();
+            }"""
     return all((
         "if (!R29SyncEffectState(device))" in sync,
         "fragile = R29Effect.fragileWorld;" in sync,
-        guard.find("if (!R29FragileEffectCached(device, fragile))")
-          < guard.find(needle)
+        fail_closed in guard and needle in guard
+          and "const auto semanticScope" in guard
+          and guard.find(fail_closed) < guard.find(needle)
           < guard.find("const auto semanticScope"),
         needle in guard,
         first in guard,
@@ -97,11 +106,18 @@ mutations = [
     ("remove positive world guard", "worldGateChecked = true;", "worldGateChecked = false;"),
     ("remove semantic world proof", "else if (OutRunVR::GameSemantic::CorroboratesWorld(semanticScope))", "else if (true)"),
     ("remove generation-certified snapshot", "if (!R29FragileEffectCached(device, fragile))", "if (false)"),
-    ("remove safe legacy fallback", "return legacyR13Draw();", "return D3D_OK;"),
+    ("remove safe legacy fallback", "++R29SafetyFallbackDraws;\n                return legacyR13Draw();", "++R29SafetyFallbackDraws;\n                return D3D_OK;"),
     ("remove depth snapshot", "R29Effect.zEnable != D3DZB_FALSE;", "true;"),
 ]
+# Mutate only the owning guard body, never the first matching source token
+# elsewhere in this large translation unit. A mutation outside the guard
+# would not exercise the production branch and could give false failures.
+guard_src = body(src, "HRESULT R29GuardStableDraw(")
+assert src.count(guard_src) == 1, "unique R29 draw guard"
 for label, before, after in mutations:
-    assert before in src, ("mutation anchor missing", label)
-    broken = src.replace(before, after, 1)
+    assert before in guard_src, ("mutation anchor missing in guard", label)
+    broken_guard = guard_src.replace(before, after, 1)
+    assert broken_guard != guard_src, ("mutation did not change guard", label)
+    broken = src.replace(guard_src, broken_guard, 1)
     assert not contract(broken), ("mutation escaped", label)
 print(f"PASS R29 depth-off R27 hotpath: 16 decision combinations, {len(mutations)} destructive mutations; RUNTIME_VALIDATION=UNTESTED")
