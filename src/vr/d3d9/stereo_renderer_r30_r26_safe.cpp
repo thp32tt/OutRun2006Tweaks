@@ -2568,11 +2568,31 @@ namespace OutRunVRStereo
                 maxZ - minZ <= 0.0025f;
         }
 
-        bool R30BuildHudPlaneCoefficients(R30XyzrhwState& state) noexcept
+        // The game HUD obeys HudScale, but F11 ImGui already owns an
+        // independently rasterised eye-density atlas and a native-sized shell.
+        // R26+HUD's fixed-function external draw used to apply the gameplay
+        // HudScale (typically 0.55) *again* during the final per-eye projection.
+        // Keep both X/Y unchanged only for the explicitly proven F11 producer.
+        constexpr float R30PlaneScaleForOwner(
+            float gameHudScale, bool gameplayHudOwner) noexcept
+        {
+            return gameplayHudOwner ? gameHudScale : 1.0f;
+        }
+        static_assert(R30PlaneScaleForOwner(0.55f, false) == 1.0f,
+            "F11 must not inherit 0.55 gameplay HUD shrink");
+        static_assert(R30PlaneScaleForOwner(0.55f, true) == 0.55f,
+            "original gameplay HUD scale must survive");
+        static_assert(R30PlaneScaleForOwner(1.5f, false) == 1.0f,
+            "F11 must also ignore enlarged gameplay HUD settings");
+
+        bool R30BuildHudPlaneCoefficients(
+            R30XyzrhwState& state, bool gameplayHudOwner) noexcept
         {
             constexpr float HudPlaneViewZ = -2.50f;
             float scaleX = 1.0f, scaleY = 1.0f;
             R30HudContainScale(state.stereo, scaleX, scaleY);
+            scaleX = R30PlaneScaleForOwner(scaleX, gameplayHudOwner);
+            scaleY = R30PlaneScaleForOwner(scaleY, gameplayHudOwner);
             const D3DMATRIX& bp = state.baseProjection;
             const float clipW = HudPlaneViewZ * bp._34 + bp._44;
             const float cx = HudPlaneViewZ * bp._31 + bp._41;
@@ -2733,7 +2753,9 @@ namespace OutRunVRStereo
                 if (!MatrixFinite(state.hudViewProjection[eye]))
                     return false;
             }
-            if (!R30BuildHudPlaneCoefficients(state))
+            // External F11: correct the source ImGui orthographic pixels into
+            // a finite stereo plane without the game's HUD size setting.
+            if (!R30BuildHudPlaneCoefficients(state, false))
                 return false;
 
             // Compose the stock orthographic pixel->NDC projection with the
@@ -3106,7 +3128,8 @@ namespace OutRunVRStereo
                     if (!MatrixFinite(state.hudViewProjection[eye]))
                         return false;
                 }
-                if (!R30BuildHudPlaneCoefficients(state))
+                // Game SpriteNode HUD retains its saved gameplay HudScale.
+                if (!R30BuildHudPlaneCoefficients(state, true))
                     return false;
                 state.hudWorldLockValid = true;
                 return true;

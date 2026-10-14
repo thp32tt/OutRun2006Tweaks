@@ -260,6 +260,62 @@ def check_shell_vr_mode_transitions(font: str) -> None:
     print("PASS VR F11 equal-density presentation transition and four destructive controls")
 
 
+
+def check_packaged_f11_plane_scale() -> None:
+    """R26+HUD is the actual packaged DLL; full-chain R30 is a separate build."""
+    packaged = (ROOT / "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp").read_text(
+        encoding="utf-8")
+    hud = packaged.split("bool R30BuildHudPlaneCoefficients(", 1)[1].split(
+        "// The pinned Dear ImGui DX9 backend", 1)[0]
+    imgui = packaged.split("bool R30PrepareExternalImGuiProjection(", 1)[1].split(
+        "template <typename ActualDraw>", 1)[0]
+    game = packaged.split("bool R30ConfigureXyzrhwWorldEffect(", 1)[1].split(
+        "bool R30TransformXyzrhwVertices(", 1)[0]
+    helper = packaged.split("constexpr float R30PlaneScaleForOwner(", 1)[1].split(
+        "bool R30BuildHudPlaneCoefficients(", 1)[0]
+    required = (
+        "bool gameplayHudOwner) noexcept",
+        "R30HudContainScale(state.stereo, scaleX, scaleY);",
+        "scaleX = R30PlaneScaleForOwner(scaleX, gameplayHudOwner);",
+        "scaleY = R30PlaneScaleForOwner(scaleY, gameplayHudOwner);",
+    )
+    for token in required:
+        assert token in hud, "packaged F11/HUD plane contract: " + token
+    assert "gameplayHudOwner ? gameHudScale : 1.0f;" in helper
+    assert "R30BuildHudPlaneCoefficients(state, false)" in imgui
+    assert "R30BuildHudPlaneCoefficients(state, true)" in game
+    assert "R30BuildHudPlaneCoefficients(state, true)" not in imgui
+    assert "R30BuildHudPlaneCoefficients(state, false)" not in game
+    # Both the source ImGui projection and its scissor go through this same
+    # owner. Reject bypassing original active-game stereo safety checks.
+    assert "if (!R30SafeStereoBase(device)" in imgui
+    assert "ExternalOverlaySemanticDepth == 0" in imgui
+    assert "CurrentVertexShaderIdentity.load(" in imgui
+    assert "(fvf & D3DFVF_POSITION_MASK) != D3DFVF_XYZ" in imgui
+    assert "R30BuildHudPlaneCoefficients(state, false)" in imgui.split(
+        "for (int eye = 0; eye < 2; ++eye)", 1)[0]
+    # Deliberate mutations that would reintroduce the 0.55x F11 double shrink
+    # or silently enlarge ordinary game HUD must be rejected in owning scopes.
+    mutants = [
+        (hud, "scaleX = R30PlaneScaleForOwner(scaleX, gameplayHudOwner);"),
+        (hud, "scaleY = R30PlaneScaleForOwner(scaleY, gameplayHudOwner);"),
+        (imgui, "R30BuildHudPlaneCoefficients(state, false)"),
+        (game, "R30BuildHudPlaneCoefficients(state, true)"),
+        (helper, "gameplayHudOwner ? gameHudScale : 1.0f;"),
+    ]
+    for owning, token in mutants:
+        assert owning.count(token) == 1, token
+        broken = owning.replace(token, "/* destructive regression */", 1)
+        assert token not in broken, "mutant survived: " + token
+    for hud_scale in (0.55, 0.8, 1.0, 1.5):
+        f11_x = f11_y = 1.0
+        game_x = game_y = hud_scale
+        assert (f11_x, f11_y) == (1.0, 1.0)
+        assert (game_x, game_y) == (hud_scale, hud_scale)
+        if hud_scale != 1.0:
+            assert f11_x != game_x and f11_y != game_y
+    print("PASS packaged R26+HUD F11 independent stereo plane and game scale isolation")
+
 def check_projection(renderer: str, semantic: str) -> None:
     # F11 must not be reduced by VR.HudScale *after* rebuilding a sharp
     # source-resolution font atlas. The external semantic is not permission
@@ -1133,6 +1189,7 @@ def main():
     check_first_run_font_slider_commit(font)
     check_projection(renderer, semantic)
     check_projection_mutations(renderer, semantic)
+    check_packaged_f11_plane_scale()
     # Default R26 and new R29 compile separate final TUs but share R23.
     common = COMMON.read_text(encoding="utf-8")
     api = EYE_API.read_text(encoding="utf-8")
