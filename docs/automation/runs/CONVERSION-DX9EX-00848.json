@@ -2,8 +2,8 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00848",
   "production_id": "CONVERSION-DX9EX-00848",
-  "event_id": "CONVERSION-DX9EX-00848-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX9EX-00848-E003",
+  "event_type": "retry",
   "run_key": "CONVERSION-DX9EX-00848",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
@@ -67,9 +67,9 @@
     "negative_test_evidence": "Portable native C++ smoke tests 4:3/16:9/21:9 rising envelopes and negative inputs. Source verification includes three destructive mutations removing X, Y or boost envelope separately.",
     "eye_ownership": "Only exact R30 owned ScreenHud/OutRunHudPeripheralText group changes; both eyes share one fully-visible weight and retain existing relative IPD/FOV transforms."
   },
-  "status": "IMPLEMENTED_PENDING_GATES",
-  "phase": "C4_MATERIAL_COMMITTED",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No Quest3/VDXR hardware or actual OutRun gameplay test. C++ and GitHub Actions alone cannot prove stereo optical acceptance.",
   "changed_files": [
@@ -79,23 +79,52 @@
     "tools/verify_vr_hud_edge_transition.py"
   ],
   "acceptance_results": {
-    "boundary_continuity": "PENDING",
-    "paired_optical_scale": "PENDING",
-    "negative_fallback": "PENDING",
-    "exact_sha_windows": "PENDING"
+    "boundary_continuity": "PASS",
+    "paired_optical_scale": "PASS",
+    "negative_fallback": "PASS",
+    "exact_sha_windows": "PASS_EXACT_SHA"
   },
   "material_result_sha": "868450ca31be70dd2a84d44f8119696764400829",
-  "validation_bearing_result_sha": null,
-  "result_sha": null,
+  "validation_bearing_result_sha": "3cab6747cd05b54be1cacfd1403f4dcef72e3295",
+  "result_sha": "3cab6747cd05b54be1cacfd1403f4dcef72e3295",
   "ci_evidence": {
     "source_material_sha": "868450ca31be70dd2a84d44f8119696764400829",
     "material_ci_policy": {
       "run_id": 38589768076,
       "conclusion": "FAILED_MISSING_RUN_RECORD_CORRECTED_ON_NEXT_SHA"
     },
-    "other_material_gates": "IN_PROGRESS"
+    "other_material_gates": "IN_PROGRESS",
+    "validation_bearing_result_sha": "3cab6747cd05b54be1cacfd1403f4dcef72e3295",
+    "active_validation": {
+      "run_id": 38590706455,
+      "exact_sha": "3cab6747cd05b54be1cacfd1403f4dcef72e3295",
+      "conclusion": "SUCCESS",
+      "jobs": "policy/full-chain-compile/game/host/package 5/5 SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38590706084,
+      "exact_sha": "3cab6747cd05b54be1cacfd1403f4dcef72e3295",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38589768111,
+      "source_material_sha": "868450ca31be70dd2a84d44f8119696764400829",
+      "conclusion": "SUCCESS",
+      "note": "Original C++ source-triggered exact material SHA; later corrections touched validation record and test only."
+    },
+    "hud_inspector_intermediate": {
+      "run_id": 38590343923,
+      "sha": "43709c6480d3f0d8eaeb2d25d737e566470f6850",
+      "conclusion": "SUCCESS",
+      "note": "Intermediate source-identical run; not mislabeled final exact SHA."
+    }
   },
   "runtime_claim": "HMD UNTESTED; DO NOT PROMOTE",
-  "score_once": false,
-  "c6_score_delta": 0
+  "score_once": true,
+  "c6_score_delta": 0,
+  "previous_event_id": "CONVERSION-DX9EX-00848-E001",
+  "checkpoint": "C6_STATE",
+  "score_delta": 1,
+  "scoreboard_commit": "22d164609f4fc981ec3afe02ac65383ebc37df77",
+  "controller_note": "Original C++ material 868450ca and immutable exact-SHA validation-bearing 3cab6747 (Active 5/5; Domain success) are distinct from this bookkeeping HEAD. Same task source verifier repair does not rescore; subsequent independent 00849 material SHA is untouched."
 }
