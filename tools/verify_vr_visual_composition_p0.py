@@ -1163,7 +1163,7 @@ def check_f11_xyz_owner(source):
         'stockProjection._34',
         'stockProjection._44',
         'GetLatchedHeadInverse(',
-        'R30BuildHudPlaneCoefficients(state)',
+        'R30BuildHudPlaneCoefficients(state, false)',
         'projected.m[row][3]',
         'eyeScissors[eye]',
         'FrameHadWorldStereo',
@@ -1187,6 +1187,8 @@ def check_f11_xyz_owner(source):
             'F11 owner must be reached from actual indexed draw')
     require('if (externalImGui != E_NOTIMPL)', indexed,
             'F11 owner result must bypass stock R26')
+    require('R30BuildHudPlaneCoefficients(state, true)', world,
+            'regular game sprites must retain the configured HudScale')
     require('R30XyzrhwLooksLikeHudPlane(', world,
             'untagged flat RHW=1 world evidence must be checked')
     require('state.worldEvidenceAuthoritative', world,
@@ -1217,7 +1219,8 @@ for label, needle in (
     ('broad external scope', 'ExternalOverlaySemanticDepth == 0'),
     ('XYZ vertex gate', 'D3DFVF_XYZ'),
     ('per-eye scissor', 'device->SetScissorRect(&eyeScissors[eye])'),
-    ('fixed pose plane', 'R30BuildHudPlaneCoefficients(state)'),
+    ('fixed pose plane', 'R30BuildHudPlaneCoefficients(state, false)'),
+    ('game sprite scale isolation', 'R30BuildHudPlaneCoefficients(state, true)'),
     ('host world authority', 'if (state.worldEvidenceAuthoritative)'),
     ('global shadow budget', 'R30TotalShadowBudgetBytes'),
 ):
