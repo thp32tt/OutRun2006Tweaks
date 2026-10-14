@@ -23,6 +23,8 @@ constexpr std::uint32_t kStage1AddSmooth = 11u;
 constexpr std::uint32_t kStage1BlendDiffuseAlpha = 12u;
 // Texture alpha comes from the bound stage-1 resource, never a guessed white.
 constexpr std::uint32_t kStage1BlendTextureAlpha = 13u;
+// Premultiplied Stage1 blending: ARG1 + ARG2 * (1 - sampled texture alpha).
+constexpr std::uint32_t kStage1BlendTextureAlphaPM = 15u;
 constexpr std::uint32_t kStage1BlendFactorAlpha = 14u;
 constexpr std::uint32_t kStage1BlendCurrentAlpha = 16u;
 // Cross-channel RGB operators are COLOROP-only. ALPHAOP must never admit 18..21.
@@ -276,7 +278,8 @@ constexpr bool stage1_alpha_supported_with_temp(std::uint32_t op,
 constexpr bool stage1_matched_texture_alpha_blend_supported(
     std::uint32_t op, std::uint32_t a, std::uint32_t b,
     bool matchedTextureSampler, bool producerTemp) noexcept {
-    return op == kStage1BlendTextureAlpha && matchedTextureSampler &&
+    return (op == kStage1BlendTextureAlpha ||
+            op == kStage1BlendTextureAlphaPM) && matchedTextureSampler &&
         stage1_combiner_supported_with_temp(
             kStage1BlendCurrentAlpha, a, b, producerTemp);
 }
@@ -288,6 +291,12 @@ static_assert(!stage1_matched_texture_alpha_blend_supported(
     kStage1BlendTextureAlpha, kStage1Temp, kStage1Factor, true, false));
 static_assert(stage1_matched_texture_alpha_blend_supported(
     kStage1BlendTextureAlpha, kStage1Temp, kStage1Factor, true, true));
+static_assert(stage1_matched_texture_alpha_blend_supported(
+    kStage1BlendTextureAlphaPM, kStage1Current, kStage1Factor, true, false));
+static_assert(!stage1_matched_texture_alpha_blend_supported(
+    kStage1BlendTextureAlphaPM, kStage1Current, kStage1Factor, false, false));
+static_assert(!stage1_combiner_supported(
+    kStage1BlendTextureAlphaPM, kStage1Current, kStage1Factor));
 constexpr bool stage1_three_source_supported_with_temp(std::uint32_t op,
     std::uint32_t a0, std::uint32_t a1, std::uint32_t a2,
     bool producerTemp) noexcept {

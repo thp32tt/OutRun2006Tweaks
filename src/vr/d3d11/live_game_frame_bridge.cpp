@@ -94,6 +94,7 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1AddSmooth == D3DTOP_ADDSMOOTH &&
               kStage1BlendDiffuseAlpha == D3DTOP_BLENDDIFFUSEALPHA &&
               kStage1BlendTextureAlpha == D3DTOP_BLENDTEXTUREALPHA &&
+              kStage1BlendTextureAlphaPM == D3DTOP_BLENDTEXTUREALPHAPM &&
               kStage1BlendFactorAlpha == D3DTOP_BLENDFACTORALPHA &&
               kStage1BlendCurrentAlpha == D3DTOP_BLENDCURRENTALPHA &&
               kStage1ModulateAlphaAddColor == D3DTOP_MODULATEALPHA_ADDCOLOR &&
@@ -1261,6 +1262,12 @@ float4 Stage1AndAlpha(float4 stage0, float4 diffuse, float4 specular,
             Stage1Source(stage0, diffuse, specular, stage1Args.y),
             Stage1Source(stage0, diffuse, specular, stage1Args.x),
             stage1TextureAlpha));
+    // D3D9 premultiplied ARG1 is already weighted, unlike ordinary lerp.
+    if (stage1Ops.x == 15) {
+        float4 pmColor1 = Stage1Source(stage0, diffuse, specular, stage1Args.x);
+        float4 pmColor2 = Stage1Source(stage0, diffuse, specular, stage1Args.y);
+        color = saturate(pmColor1 + pmColor2 * (1.0f - stage1TextureAlpha));
+    }
     float alpha = stage1Ops.y == 1 ?
         (stage1Ops.z != 0 ? diffuse.a : stage0.a) : Stage1Combine(
         Stage1Source(stage0, diffuse, specular, stage1Args.z),
@@ -1273,6 +1280,12 @@ float4 Stage1AndAlpha(float4 stage0, float4 diffuse, float4 specular,
             Stage1Source(stage0, diffuse, specular, stage1Args.w),
             Stage1Source(stage0, diffuse, specular, stage1Args.z),
             stage1TextureAlpha)).a;
+    // ALPHAOP reads separate D3D9 operands, never the RGB PM output alpha.
+    if (stage1Ops.y == 15) {
+        float4 pmAlpha1 = Stage1Source(stage0, diffuse, specular, stage1Args.z);
+        float4 pmAlpha2 = Stage1Source(stage0, diffuse, specular, stage1Args.w);
+        alpha = saturate(pmAlpha1 + pmAlpha2 * (1.0f - stage1TextureAlpha)).a;
+    }
     float4 result = float4(color.rgb, alpha);
     AlphaGate(result.a);
     return result;
@@ -3040,11 +3053,13 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             (capture.enabled && !capture.stage0FullModulate &&
              !capture.selectTexture && !capture.additive))
             return false;
-        // D3D9 Stage1 BLENDTEXTUREALPHA reads sampler/texture 1. It may
+        // D3D9 Stage1 BLENDTEXTUREALPHA and PM read sampler/texture 1. It may
         // reuse the native stage-0 sample only when resource, UV and all
         // relevant sampler state agree; otherwise preserve original D3D9.
         if (nextColorOp == D3DTOP_BLENDTEXTUREALPHA ||
-            alphaOp == D3DTOP_BLENDTEXTUREALPHA) {
+            nextColorOp == D3DTOP_BLENDTEXTUREALPHAPM ||
+            alphaOp == D3DTOP_BLENDTEXTUREALPHA ||
+            alphaOp == D3DTOP_BLENDTEXTUREALPHAPM) {
             if (!capture.enabled || !tex) return false;
             ComPtr<IDirect3DBaseTexture9> tex1;
             DWORD uv1 = ~0u, transform1 = ~0u;
