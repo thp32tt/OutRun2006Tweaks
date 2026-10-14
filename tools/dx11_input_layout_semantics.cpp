@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cstring>
+#include <initializer_list>
 #include <iostream>
 
 #include "vr/d3d11/pipeline_translation.hpp"
@@ -142,6 +143,32 @@ int main()
         const auto shortStride = translate(D3DFVF_XYZB5, 28);
         require(!shortStride.exact && shortStride.fvfPending,
                 "short XYZB5 stride must fail closed");
+    }
+
+
+    // D3DCOLOR memory is BGRA. Both input paths must decode the same
+    // R8G8B8A8 IA stream before the fixed-function shader's single .bgra swizzle.
+    {
+        const auto fvfLayout = translate(
+            D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_SPECULAR, 20);
+        const D3DVERTEXELEMENT9 declaration[] = {
+            {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+            {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+            {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 1},
+            D3DDECL_END()
+        };
+        const auto declaredLayout =
+            translate_vertex_input_layout(declaration, 4, 0, 20);
+        require(fvfLayout.exact && declaredLayout.exact,
+                "D3DCOLOR FVF/declaration layouts must both be exact");
+        for (const auto* layout : {&fvfLayout, &declaredLayout}) {
+            require(layout->elementCount == 3,
+                    "D3DCOLOR layout must contain POSITION/COLOR0/COLOR1");
+            require_element(*layout, 1, "COLOR", 0,
+                            DXGI_FORMAT_R8G8B8A8_UNORM, 12);
+            require_element(*layout, 2, "COLOR", 1,
+                            DXGI_FORMAT_R8G8B8A8_UNORM, 16);
+        }
     }
 
     std::cout << "DX11 input layout semantics smoke R88: PASS\n";

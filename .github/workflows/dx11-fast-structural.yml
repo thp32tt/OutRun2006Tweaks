@@ -37,6 +37,7 @@ jobs:
           python tools/dx11_autodev_policy.py --check-latest
       - name: Run focused DX11 source-only regression checks
         run: |
+          python tools/test_dx11_live_shader_lifecycle_review.py
           python tools/test_dx11_linear_predication_r230.py
           python tools/test_dx11_linear_stream_output_r232.py
           python tools/test_dx11_linear_buffer_owner_r183.py
