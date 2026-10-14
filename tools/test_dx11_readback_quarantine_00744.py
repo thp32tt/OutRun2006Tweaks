@@ -47,7 +47,14 @@ for old, new in (
     ("oldest.quarantined = true;", "oldest.busy = false;"),
     ("prior.quarantined ||", "false ||"),
 ):
-    mutant = SOURCE.replace(old, new, 1)
+    # 00745 adds an earlier Map failure quarantine. Mutate the LAST
+    # same-string site, which belongs to 00744 GetData(EVENT) failure.
+    if old == "oldest.quarantined = true;":
+        at = SOURCE.rfind(old)
+        assert at >= 0, old
+        mutant = SOURCE[:at] + new + SOURCE[at + len(old):]
+    else:
+        mutant = SOURCE.replace(old, new, 1)
     assert mutant != SOURCE and not integrated(mutant, HEADER), old
 for old, new in (
     ("result == 0 ? GameNativeReadbackFence::Complete",
