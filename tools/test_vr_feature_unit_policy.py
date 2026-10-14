@@ -141,4 +141,21 @@ if rank_run_path.is_file():
     rank_errors = validate(rank_without_boundary, p)
     assert "scope_boundary must exclude adjacent unrelated features" in rank_errors, rank_errors
 
+# The Windows pwsh job must fail-closed on every Python verifier. PowerShell
+# does not automatically propagate a failing *intermediate* python process:
+# a later successful check previously hid "run record missing" at exact HEAD.
+workflow = (POLICY.parents[2] / ".github/workflows/vr-dx9ex-active.yml").read_text(encoding="utf-8")
+step = workflow.split("- name: Enforce feature-sized DX9Ex autonomous completion", 1)[1].split("- name:", 1)[0]
+for command in (
+    "python tools/test_vr_feature_unit_policy.py",
+    "python tools/test_dx9ex_function_dispatch.py",
+    "python tools/verify_vr_feature_unit_policy.py --check-head",
+    "python tools/verify_vr_hud_edge_transition.py",
+):
+    pos = step.index(command)
+    rest = step[pos + len(command):].split("\n", 2)
+    assert len(rest) > 1 and "if ($LASTEXITCODE -ne 0)" in rest[1], command
+mutant = step.replace("if ($LASTEXITCODE -ne 0)", "# swallow verifier errors", 1)
+assert mutant.count("if ($LASTEXITCODE -ne 0)") == 3
+assert step.count("if ($LASTEXITCODE -ne 0)") == 4
 print(f"DX9Ex full-function/visual-defect policy PASS: {len(features)} feature classes, 10+ negative cases, terminal root-cause gate, legacy and performance")

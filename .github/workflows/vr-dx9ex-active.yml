@@ -218,9 +218,13 @@ jobs:
         shell: pwsh
         run: |
           python tools/test_vr_feature_unit_policy.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex feature contract tests failed' }
           python tools/test_dx9ex_function_dispatch.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex dispatcher tests failed' }
           python tools/verify_vr_feature_unit_policy.py --check-head
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex exact-HEAD feature record missing or invalid' }
           python tools/verify_vr_hud_edge_transition.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex HUD edge contract failed' }
       - name: Reject broken shipped PowerShell helpers and false HUD reports
         shell: pwsh
         run: |
