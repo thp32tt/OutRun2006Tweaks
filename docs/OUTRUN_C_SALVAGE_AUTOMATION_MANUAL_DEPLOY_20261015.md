@@ -18,9 +18,27 @@
 3. 독립 실행 이미지: \`docker/localization-production/Dockerfile.c-salvage\`.
 4. 기존 Git 기반 Portainer Stack의 추가 서비스 override: \`docker/localization-production/portainer-git-c-salvage.override.yml\`.
 5. 정책: \`localization/controller_roles.json\`; 기존 활성 A/B/C1 탭 순서/분별 dispatch를 유지.
-6. 테스트 전용 CI: \`.github/workflows/localization-c-salvage-ci.yml\` (production run 아님).
+6. PSD/source 플레이트 작업자: `tools/localization/c_salvage_plate.py`, `plate_jobs/*.json` 처리.
+7. 테스트 전용 CI: \`.github/workflows/localization-c-salvage-ci.yml\` (production run 아님).
 
 ## 실제 자동 반복 작업: 30분마다 최대 10개 신규 후보
+
+### 검토된 plate_jobs 자동 처리
+
+\`plate_jobs/*.json\`이 추가되면 동일한 30분 순환의 나머지 최대 10건 작업 슬롯에서 \`tools/localization/c_salvage_plate.py\`를 수행한다. 파일은 \`outrun-c-salvage-plate-v1\` 스키마이며 \`bundles/\` 아래 입력 파일에 대한 상대경로와 실제 SHA256을 명시해야 한다.
+
+\`\`\`json
+{
+  "schema": "outrun-c-salvage-plate-v1",
+  "orientation": "IDENTITY",
+  "source_dds": {"path": "Q012/canonical.dds", "sha256": "<actual DDS SHA256>"},
+  "removal_mask": {"path": "Q012/english_removal_mask.png", "sha256": "<actual PNG SHA256>"},
+  "protected_mask": {"path": "Q012/protected_mask.png", "sha256": "<actual PNG SHA256>"},
+  "source_transparent_under_english_reviewed": true
+}
+\`\`\`
+
+PSD가 있는 경우 선택된 PSD 원본 SHA와 \`english_layer_paths\`를 추가하면 원본 Photoshop 레이어를 격리 내보내기 한다. 원본 native DDS 크기/보호 픽셀/제거 범위와 불일치하는 PSD는 그대로 합성하지 않는다. PSD가 없거나 canonical 원본과 일치하지 않는 경우 위처럼 **사전 검토된 source-transparent 마스크**가 있을 때만 source fallback CLEAN 후보를 만든다. 불투명 배경은 복원 가능한 원본 계층이 없으면 HOLD한다. 생성되는 \`plates/<SHA>/clean_candidate.png\`는 항상 \`CLEAN_CANDIDATE_REQUIRES_INDEPENDENT_C1_PLATE_REVIEW\`이며, \`recipes/\`의 별도 승인된 native 합성 recipe로 이후 단계에서 사용한다. 실제 PSD 레이어 경로를 추측해 자동으로 선택하지 않는다.
 
 - **READ ONLY**: A/B가 이미 저장한 \`ab_batches/candidate_outputs/{A,B}/*.png\`를 실물 SHA256/실제 PNG 헤더로 검증하고 중복 항목 건너뜀. 갱신된 마스크/후보 SHA는 새 작업으로 인식.
 - 추출: 알파 투명도가 뚜렷한 후보는 알파 기반 글자/효과 *후보*만 crop → \`lettering_PROPOSAL.png\`, 정확 SHAs, 원본 경로, 좌표, \`receipt.json\` 보관. 투명 PNG에도 원본 로고/아이콘이 섞였을 수 있으므로 **\`LAYER_PROPOSAL_REVIEW_REQUIRED\`**로만 보관. 이미지 속 글자 정확성은 C1/수동 확인 대상.
@@ -57,6 +75,12 @@ candidates/<role-queue-generatedSHA-maskSHA>/
   lettering_PROPOSAL.png  # 가능한 경우에만
   receipt.json            # 항상
 masks/<generated-stem>.mask.png
+plate_jobs/<asset-id>.json
+plates/<plate-job-sha>/
+  english_original_readable.png
+  clean_candidate.png
+  english_removal_mask.png
+  receipt.json
 recipes/<asset-id>.json
 bundles/<asset-id>/...      # 별도 정본 DDS/PNG/CLEAN/승인 마스크
 composites/<recipe-sha>/
