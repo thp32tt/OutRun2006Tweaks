@@ -67,12 +67,12 @@
     "negative_test_evidence": "Portable C++ positive and eight negative source-exit cases, constexpr compile-time cases, and Python mutation guards for missing exit flush, owner order, mixed batch and wrong source.",
     "eye_ownership": "R26_HUD_COMPARE=ON packages stereo_renderer_r30_r26_safe and preserves existing original ScreenHud c64/left-right eye routes; no optical HMD claim without Quest3."
   },
-  "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C5_EXACT_SHA_GATE",
-  "phase": "C5_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "runtime_evidence": "No original game or Quest3/VDXR run during task. Visible +TIME sprite/numeric stereo correction and timing remain NEED_HMD_TEST.",
+  "runtime_evidence": "No original OR2006C2C.EXE/Quest3/VDXR HMD runtime test. Build/CI success confirms exact SHA compile, package and static gates only; user-visible +TIME binocular duplication and head-lock need matching Quest3 optical verification. RUNTIME_VALIDATION=UNTESTED; NEED_HMD_TEST.",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
     "src/vr/game/render_semantics.hpp",
@@ -81,21 +81,43 @@
     "docs/automation/runs/CONVERSION-DX9EX-00867.json"
   ],
   "acceptance_results": {
-    "direct_source_exit": "PENDING_CI",
-    "queued_siblings": "PENDING_CI",
-    "foreign_fallback": "PENDING_CI",
-    "integration": "PENDING_CI"
+    "direct_source_exit": "PASS_BUILD",
+    "queued_siblings": "PASS_BUILD",
+    "foreign_fallback": "PASS_BUILD",
+    "integration": "PASS_EXACT_SHA"
   },
   "material_result_sha": "e2a20e4d09a6de980b15840cb0715ef4c8c28a11",
-  "score_once": false,
-  "score_delta_this_attempt": 0,
+  "score_once": true,
+  "score_delta_this_attempt": 1,
   "continuation_feature_note": "Same DX9EX:VIS:EXTENDED_TIME as previous material tasks; no duplicate completion or point on this source checkpoint.",
   "source_parent_sha": "800269103ce137b4292127af03bc29a494fc5c05",
   "validation_notes": "C2 source includes homogeneous exact-source exit submission; C3 targeted mutation verifier was repaired at 3bbd26f/c714761 so its entry guard cannot be falsely matched by the new exit function. Four same-SHA Windows/DX9Ex/Domain/HUD/FullSource workflows are requested by this non-CI-skip validation-bearing record update. No Quest3/VDXR execution.",
-  "pending_gates": [
-    "dx9ex_active",
-    "domain_isolation",
-    "hud_inspector",
-    "full_source_impact"
-  ]
+  "validation_bearing_result_sha": "66e83817191866c596ea4029bf610c3d5830ea6a",
+  "scoreboard_ai_2_before": 1344,
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1345,
+  "scoreboard_commit_sha": "3e49d207bbe49cc383095aa1055c11f03ca65808",
+  "score_basis": "New independent source-owner GPU lifetime repair: exact +TIME deferred direct D3DX batch submission before E8 scope RAII unwinds; material C++ implementation plus positive/negative regression and final four exact-SHA workflow successes, no Quest3 claim; one RUN_KEY credit, retries/C6 score +0.",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "66e83817191866c596ea4029bf610c3d5830ea6a",
+    "dx9ex_active": {
+      "run_id": 38647437930,
+      "conclusion": "SUCCESS",
+      "policy_host_game_fullchain_package": "5/5 SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38647438024,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38647438206,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38647437909,
+      "conclusion": "SUCCESS"
+    },
+    "runtime_caveat": "No original game/HMD physical validation, RUNTIME_VALIDATION=UNTESTED."
+  }
 }
