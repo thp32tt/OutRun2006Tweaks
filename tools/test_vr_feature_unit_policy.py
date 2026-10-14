@@ -152,6 +152,7 @@ for command in (
     "python tools/verify_vr_feature_unit_policy.py --check-head",
     "python tools/verify_vr_hud_edge_transition.py",
     "python tools/verify_vr_r30_positiont_decl.py",
+    "python tools/verify_vr_stage_extension_d3dx_batch_owner.py",
 ):
     pos = step.index(command)
     rest = step[pos + len(command):].split("\n", 2)
@@ -159,7 +160,7 @@ for command in (
 # Keep the expected guard count tied to the enumerated commands. A new
 # verifier must be guarded too, without making this mutation test stale.
 guard_count = step.count("if ($LASTEXITCODE -ne 0)")
-assert guard_count == 5, "all five policy verifiers must fail closed"
+assert guard_count == 6, "all six policy verifiers must fail closed"
 mutant = step.replace("if ($LASTEXITCODE -ne 0)", "# swallow verifier errors", 1)
 assert mutant.count("if ($LASTEXITCODE -ne 0)") == guard_count - 1
 print(f"DX9Ex full-function/visual-defect policy PASS: {len(features)} feature classes, 10+ negative cases, terminal root-cause gate, legacy and performance")
