@@ -2,6 +2,7 @@
 #include "plugin.hpp"
 #include "game_addrs.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/rank_marker_fraction.hpp"
 #include "vr/hud_semantics.hpp"
 
 #include <algorithm>
@@ -1167,14 +1168,13 @@ class UIScaling : public Hook
 				? tailsBefore[prio]->next_0 : root->next_0;
 			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
 			{
-				// Only kind_C==0 stores SPRARGS at args_10. The original
-				// clip producer had modified a single SPRARGS tail; a sibling
-				// emitted through put_sprite_ex2 owns args2_58 instead.
-				if (node->kind_C == 0)
-				{
-					node->args_10.float24 += frozenFractionX;
-					node->args_10.float28 += frozenFractionY;
-				}
+				// The exact rank clip producer can expand to kind-0
+				// SPRARGS or kind-1 SPRARGS2 siblings. Both need the
+				// same Calc3D2D subpixel remainder, but kind-1
+				// positions live in the affine quad's translation.
+				// Unknown/nonfinite layouts remain untouched.
+				OutRunVR::RankMarker::RestoreFraction(
+					*node, frozenFractionX, frozenFractionY);
 				if (node == tailAfter)
 					break;
 				node = node->next_0;
