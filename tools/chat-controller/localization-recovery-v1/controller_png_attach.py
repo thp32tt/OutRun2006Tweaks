@@ -156,6 +156,13 @@ async def prepare_a_project_target(page, project_name, allow_saved_chat=False):
                 project_rows = page.locator(
                     '[data-app-action-sidebar-project-id]'
                     '[data-app-action-sidebar-project-label]')
+                # The sidebar hydrates after DOMContentLoaded. A zero-count
+                # immediately after navigation is not evidence of absence.
+                try:
+                    await project_rows.first.wait_for(
+                        state="attached", timeout=12000)
+                except Exception:
+                    pass  # Older sidebar UI might expose links instead.
                 project_matches = []
                 for idx in range(min(await project_rows.count(), 100)):
                     row = project_rows.nth(idx)
