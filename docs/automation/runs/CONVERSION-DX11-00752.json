@@ -19,7 +19,7 @@
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
   "base_head_sha": "cf35219c0d33c99558747207ce9cd6e18fe15c12",
-  "material_result_sha": null,
+  "material_result_sha": "a385ab65023bd59633f0f876215425a2fc8f43ce",
   "change_summary": "Actual native full-size menu/vehicle/race frame Present now copies only the visible D3D9 source RECT when dirty metadata is absent or whole-backbuffer, preserving untouched original D3D9 pixels and gamepad fallback.",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -82,17 +82,22 @@
       "C++ partial Present source geometry selection",
       "Native D3D11 frame readback to original D3D9 cropped Present integration",
       "Portable pixel test and destructive integration regression"
-    ]
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00752 native_game_present_region C++ source-crop geometry static_assert and pitched BGRA pixel test: null/full-backbuffer dirty cropped game Present updates only exact [left,right)x[top,bottom) visible source; untouched D3D9 pixels and pitch padding remain unchanged. Live before_game_present -> copy_rect -> bounded UpdateSurface source RECT integration guarded by 00752 destructive Python regression.",
+      "negative_regression": "00752 portable C++ test rejects negative/reversed/out-of-bounds source crops with unchanged destination bytes; Python destructive mutations reject unchecked crop geometry, downgraded dirty handling, unbounded UpdateSurface source, and lost destination crop offset; D3D9 original Draw, Present and gamepad remain authoritative fallback.",
+      "component_integration": "Real intercepted game Draw/DrawIndexed -> native full-resolution D3D11 color/readback -> GameNativePresentRegion partial source -> GameNativeFrameUpload::copy_rect -> D3D9 SYSTEMMEM lock/unlock -> UpdateSurface bounded source crop -> original D3D9 Present; source test registered in DX11 Fast structural and final exact-SHA Backend/Windows Build/OpenXR/HUD gates."
+    }
   },
   "pipeline": {
     "C0_RECOVER": "PASS GitHub HEAD and 00751 C6 verified",
     "C1_REVIEW": "PASS identified native full-backbuffer overwrite on cropped null/full-dirty Present",
     "C2_IMPLEMENT": "PASS source, native Present upload integration and tests",
-    "C3_VALIDATE": "PENDING exact SHA GitHub Actions",
-    "C4_COMMIT": "PENDING non-CI-skipping material commit",
+    "C3_VALIDATE": "PENDING: initial exact SHA a385ab65023bd59633f0f876215425a2fc8f43ce Backend Conversion Gate 38656660382 failed policy acceptance_proof missing before compile; same-TASK required acceptance evidence supplied; await repair SHA five GitHub Actions gates.",
+    "C4_COMMIT": "PASS actual C++ implementation material commit a385ab65023bd59633f0f876215425a2fc8f43ce; follow-up same-TASK policy failure repair commit without CI skip.",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING five exact-SHA Gates"
   },
-  "next_action": "Check exact-result SHA GitHub Actions; on failure repair same TASK_ID; Quest3/VDXR and gamepad RUNTIME_VALIDATION UNTESTED.",
+  "next_action": "Verify all five required Actions at repair validation-bearing SHA; record C6 separately only after exact-SHA SUCCESS. Real Quest3/VDXR/gamepad RUNTIME_VALIDATION=UNTESTED.",
   "validation_bearing_result_sha": null
 }
