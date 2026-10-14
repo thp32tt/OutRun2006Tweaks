@@ -30,6 +30,10 @@ def check(s,h):
         'std::clamp(weight, 0.0f, 1.0f)',
     ):
         assert token in h, token
+    # PeripheralWeight and FullyVisibleWeight intentionally own independent
+    # C1 easing. Presence-only matching misses a mutation of the first one
+    # while the second still contains the same return expression.
+    assert h.count('return t * t * (3.0f - 2.0f * t);') == 2
     assert 'const float rawAnchorX = ' in s
     assert 'const float rawAnchorY = ' in s
     assert 'std::clamp(0.90f / baseScale, 1.0f, 3.0f)' in s
