@@ -160,6 +160,15 @@ void Overlay::render_shell()
 	havePreviousLayout = true;
 	const ImGuiCond layoutPlacement = layoutChanged ? ImGuiCond_Always : initialPlacement;
 
+	// An F11 shell can also be resized manually after it appeared. The
+	// initial centered bounds are insufficient: without live constraints a
+	// later resize can leave tabs and the close/drag controls outside the VR
+	// mirror on a subsequent source/eye size transition. Apply only to the
+	// external VR shell; preserve native desktop saved window geometry.
+	if (externalVrShell)
+		ImGui::SetNextWindowSizeConstraints(
+			ImVec2((std::min)(240.f, maxWidth), (std::min)(140.f, maxHeight)),
+			ImVec2(maxWidth, maxHeight));
 	ImGui::SetNextWindowSize(windowSize, layoutPlacement);
 	ImGui::SetNextWindowPos(
 		ImVec2(

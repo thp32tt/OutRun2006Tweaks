@@ -8,6 +8,7 @@
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx9.h>
 #include "overlay.hpp"
+#include "f11_input_routing.hpp"
 #include "input_manager.hpp"
 #include "vr/game/render_semantics.hpp"
 #include "vr/core/r23_eye_extent_api.hpp"
@@ -558,7 +559,30 @@ class WndprocHook : public Hook
 			SetCursor(LoadCursorA(nullptr, IDC_ARROW));
 			return TRUE;
 		}
-		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+		// The external F11 shell owns ImGui input only while visible. The old
+		// unconditional Win32 forwarding also fed hidden mouse-wheel/cursor
+		// input into ImGui during racing. Keep legacy F11 down/up events so
+		// IsKeyReleased still opens the menu; preserve focus-release cleanup,
+		// binding dialogs and clickable notification HUD capture.
+		const bool legacyF11Key =
+			(wParam == VK_F11) &&
+			(msg == WM_KEYDOWN || msg == WM_KEYUP ||
+			 msg == WM_SYSKEYDOWN || msg == WM_SYSKEYUP);
+		const bool focusTransition =
+			msg == WM_KILLFOCUS || msg == WM_SETFOCUS ||
+			msg == WM_ACTIVATEAPP || msg == WM_ACTIVATE;
+		const bool mouseMessage =
+			(msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST) ||
+			msg == WM_SETCURSOR;
+		const bool notificationMouseCapture =
+			overlayInited && mouseMessage && ImGui::GetCurrentContext() &&
+			ImGui::GetIO().WantCaptureMouse;
+		const bool forwardImGui =
+			OutRunF11Input::ShouldForwardToImGui(
+				overlayActive, Overlay::IsBindingDialogActive,
+				legacyF11Key, focusTransition, notificationMouseCapture);
+		if (overlayInited && forwardImGui &&
+			ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
 			return 1;
 
 		if (Settings::WindowedHideMouseCursor && !overlayActive)
