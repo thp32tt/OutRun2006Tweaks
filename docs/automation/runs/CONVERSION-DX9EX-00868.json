@@ -72,7 +72,7 @@
   "phase": "C6_RESULT",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "runtime_evidence": "No game or Quest3/VDXR HMD execution; source-proven world/HUD capture boundary only. Original lens center diplopia remains NEED_HMD_TEST.",
+  "runtime_evidence": "No local original game, Quest 3 or Virtual Desktop VDXR session was executed during this task. Build and static source ownership passed; central lens optical double/ghosting and bloom appearance NEED_HMD_TEST.",
   "source_parent_sha": "be7ee34f2e021928789ecc7ad46d9cabd7014296",
   "changed_files": [
     "src/vr/game/render_semantics.hpp",
@@ -80,15 +80,46 @@
     "vrhost/tests/stage_extension_direct_owner_smoke.cpp",
     "tools/verify_vr_skyglow_capture_boundary.py",
     ".github/workflows/vr-dx9ex-active.yml",
-    "docs/automation/runs/CONVERSION-DX9EX-00868.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00868.json",
+    "tools/test_vr_feature_unit_policy.py",
+    "tools/verify_vr_visual_composition_p0.py"
   ],
   "acceptance_results": {
-    "world_lens": "PENDING_CI",
-    "hud_cutoff": "PENDING_CI",
-    "fallback": "PENDING_CI",
-    "integration": "PENDING_CI"
+    "world_lens": "PASS_BUILD",
+    "hud_cutoff": "PASS_BUILD",
+    "fallback": "PASS_BUILD",
+    "integration": "PASS_EXACT_SHA"
   },
-  "score_once": false,
-  "score_delta_this_attempt": 0,
-  "validation_bearing_result_sha": "d618f7136b14aa76e7280b64c6b104041df19be1"
+  "score_once": true,
+  "score_delta_this_attempt": 1,
+  "validation_bearing_result_sha": "d618f7136b14aa76e7280b64c6b104041df19be1",
+  "material_result_sha": "9dcfb132a48937b21bd6bf747fda4e70ea4fd58e",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "d618f7136b14aa76e7280b64c6b104041df19be1",
+    "dx9ex_active": {
+      "run_id": 38650258273,
+      "conclusion": "SUCCESS",
+      "required_jobs": "5/5 policy, host, game, full-chain-compile, package"
+    },
+    "domain_isolation": {
+      "run_id": 38650258491,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38650258452,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38650258220,
+      "conclusion": "SUCCESS"
+    },
+    "runtime_caveat": "No original OR2006C2C.EXE plus Quest3/VDXR live session; RUNTIME_VALIDATION=UNTESTED."
+  },
+  "scoreboard_ai_2_before": 1345,
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1346,
+  "scoreboard_commit_sha": "e8c6f227034f1223c6caf29533512cbcedd630ef",
+  "score_basis": "One independent packaged R26+HUD SkyGlow UI cutoff source fix with C++ negative smoke, four negative mutations and same exact-SHA four workflow groups SUCCESS. Reused task retries/C6 do not re-score.",
+  "c6_record_reconciliation": "Earlier C6 bookkeeping had marked PASS_EXACT_SHA without material_result_sha, pending acceptance results, or workflow evidence. This post-completion metadata-only reconciliation records the four checked exact-SHA SUCCESS gates; no source change and no new score."
 }
