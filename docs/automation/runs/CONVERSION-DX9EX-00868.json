@@ -67,10 +67,10 @@
     "negative_test_evidence": "WorldBillboard, SceneEffect, WorldParticle, projected marker/effect, SkyGlow and None all deny UI snapshot; ScreenHud and ScreenOverlay2D allow; four fail-after mutations guard both call paths.",
     "eye_ownership": "Left and right reduced source surfaces are copied by unchanged R30CaptureSkyGlowSceneBeforeHud; first actual screen producer cuts off both eyes and original world FOV drawing and SkyGlow composite remain unchanged."
   },
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
-  "checkpoint": "C4_MATERIAL_COMMIT",
-  "phase": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No game or Quest3/VDXR HMD execution; source-proven world/HUD capture boundary only. Original lens center diplopia remains NEED_HMD_TEST.",
   "source_parent_sha": "be7ee34f2e021928789ecc7ad46d9cabd7014296",
@@ -89,5 +89,6 @@
     "integration": "PENDING_CI"
   },
   "score_once": false,
-  "score_delta_this_attempt": 0
+  "score_delta_this_attempt": 0,
+  "validation_bearing_result_sha": "d618f7136b14aa76e7280b64c6b104041df19be1"
 }
