@@ -51,7 +51,7 @@
     ],
     "visible_frame_acceptance": "Full-frame source and CI only; game menu/vehicle/race and Quest3 screen visual parity not runtime-tested",
     "activation_guard_and_fallback": "Native rendering opt-in only; original D3D9 HRESULT, Draw/Present and gamepad unchanged on native abort",
-    "blocking_evidence": "At prior HEAD real R30 live game Draw/DrawIndexed native mirror is submitted before R30TryXyzrhw/GuardScreenSpace returns the original HRESULT. Failed D3D9 Draw can leave a complete native batch marked publishable and overwrite successful D3D9 menu/vehicle/race fallback; this change notifies native frame of every failed original draw."
+    "blocking_evidence": "At prior HEAD real R30 live game Draw/DrawIndexed native mirror is submitted before R30TryXyzrhw/GuardScreenSpace returns the original HRESULT. Failed D3D9 Draw can leave a complete native batch marked publishable and overwrite successful D3D9 menu/vehicle/race fallback; this change notifies native frame of every failed original draw. DX11 Fast #38573559962 found inherited 00644/00645 source-only probes assumed legacy direct `return R30GuardScreenSpace` despite correctly preserving gameHr for HRESULT-based fail-closed behavior; assertions now accept newer return value and verify failure callback, without weakening source continuity."
   },
   "feature_contract": {
     "feature_id": "DX11-NATIVE-GAME-DRAW-HRESULT-FALLBACK",
@@ -92,7 +92,7 @@
     "docs/automation/runs/CONVERSION-DX11-00730.json"
   ],
   "runtime_gate": "NEED_HMD_TEST",
-  "material_result_sha": null,
+  "material_result_sha": "28728de8590f3069dc2f26ec21c3cb17cebb896c",
   "validation_bearing_result_sha": null,
   "packaging_status": "NOT_REQUIRED"
 }

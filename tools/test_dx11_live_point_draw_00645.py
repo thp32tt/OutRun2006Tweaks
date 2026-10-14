@@ -33,7 +33,12 @@ for source in ("src/vr/d3d9/stereo_renderer_r30.cpp",
     assert caller.count("game_native_primitive_element_count(") == 3, source
     assert "R30CopyVertexShadow" in caller and "R30CopyIndexShadow" in caller
     assert "live::observe_linear" in caller and "live::observe_indexed" in caller
-    assert "return R30GuardScreenSpace(" in caller
+    if source == "src/vr/d3d9/stereo_renderer_r30.cpp":
+        assert "const HRESULT gameHr = R30GuardScreenSpace(" in caller
+        assert "R30CompleteNativeGameSource(device, gameHr);" in caller
+        assert "return gameHr;" in caller
+    else:
+        assert "return R30GuardScreenSpace(" in caller
 assert "game_native_primitive_element_count(1, 512, elements)" in probe
 assert "game_native_unit_point_raster" in probe
 for negative in ("maximum, 1, 0, false", "maximum, 0, 1, false",

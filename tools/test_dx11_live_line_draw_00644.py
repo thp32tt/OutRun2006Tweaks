@@ -37,5 +37,10 @@ for name in ("src/vr/d3d9/stereo_renderer_r30.cpp",
     assert caller.count("topology != D3DPT_LINESTRIP") == 3
     assert "R30CopyVertexShadow" in caller and "R30CopyIndexShadow" in caller
     assert "live::observe_linear" in caller and "live::observe_indexed" in caller
-    assert "return R30GuardScreenSpace(" in caller
+    if name == "src/vr/d3d9/stereo_renderer_r30.cpp":
+        assert "const HRESULT gameHr = R30GuardScreenSpace(" in caller
+        assert "R30CompleteNativeGameSource(device, gameHr);" in caller
+        assert "return gameHr;" in caller
+    else:
+        assert "return R30GuardScreenSpace(" in caller
 print("00644 live game line VB/IB/UP / native D3D11 Draw graph: PASS")
