@@ -16,9 +16,18 @@ int main() {
                     !stage1_combiner_supported_with_temp(op,other,temp,true) ||
                     !stage1_alpha_supported_with_temp(op,temp,other,true) ||
                     !stage1_alpha_supported_with_temp(op,other,temp,true) ||
-                    stage1_combiner_supported_with_temp(op,temp,other,false) ||
-                    stage1_alpha_supported_with_temp(op,other,temp,false)) return 1;
-                pass+=4; reject+=2;
+                    // SELECTARG2 ignores ARG1; SELECTARG1 ignores ARG2.
+                    // An unused TEMP does not require a stage0 producer.
+                    stage1_combiner_supported_with_temp(op,temp,other,false) !=
+                        (op == kStage1SelectArg2) ||
+                    stage1_alpha_supported_with_temp(op,other,temp,false) !=
+                        (op == kStage1SelectArg1)) return 1;
+                // Four producer-backed positives plus one unused-operand
+                // positive for SELECTARG1/2; active TEMP still fails closed.
+                const bool unusedTempAllowed =
+                    op == kStage1SelectArg1 || op == kStage1SelectArg2;
+                pass += unusedTempAllowed ? 5u : 4u;
+                reject += unusedTempAllowed ? 1u : 2u;
             }
         }
     }
@@ -46,5 +55,5 @@ int main() {
         stage1_combiner_supported_with_temp(kStage1Modulate,
                                             kStage1Temp,kStage1Current,false)) return 4;
     std::printf("Stage0 TEMP -> Stage1 RGB/alpha: pass=%u fallback=%u\n",pass,reject);
-    return pass==504u && reject==258u ? 0 : 5;
+    return pass==544u && reject==218u ? 0 : 5;
 }
