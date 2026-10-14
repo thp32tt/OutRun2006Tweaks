@@ -4030,6 +4030,13 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         static_cast<float>(output.alphaRef),
         static_cast<float>(output.alphaFunc), capture.blendFactorAlphaValue
     };
+    // X8 game backbuffers cannot store alpha: preserve the opaque alpha
+    // seeded by the matching D3D9 full Clear across subsequent Draw/Indexed.
+    // Keep captured RGB masks, A8 alpha and original game/input fallback.
+    const UINT nativeColorWriteMask = env_full_game_opt_in() ?
+        s.clearColor.native_write_mask(s.sourceGameDevice,
+            output.targetIdentity, output.colorWriteMask) :
+        output.colorWriteMask;
     // D3D11 default OM state writes all channels. Even when blending is off,
     // a partial D3D9 COLORWRITEENABLE requires a real blend-state object.
     // Copy the validated alpha blend descriptor rather than approximating
@@ -4065,7 +4072,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         desc.RenderTarget[0].SrcBlendAlpha = output.nativeSrcAlpha;
         desc.RenderTarget[0].DestBlendAlpha = output.nativeDstAlpha;
         desc.RenderTarget[0].BlendOpAlpha = output.nativeAlphaOp;
-        desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+        desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
         if (FAILED(dev->CreateBlendState(&desc,
                                         independentAlphaBlend.GetAddressOf())))
             return false;
@@ -4080,7 +4087,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                              output.premultipliedAlphaBlend ? 3u : 0u;
         const UINT slot = game_native_extremum_slot(
             output.blendOp == D3D11_BLEND_OP_MAX, variant,
-            output.colorWriteMask);
+            nativeColorWriteMask);
         if (slot >= s.extremumMaskedBlends.size()) return false;
         auto& cached = s.extremumMaskedBlends[slot];
         if (!cached) {
@@ -4093,7 +4100,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             base->GetDesc(&desc);
             desc.RenderTarget[0].BlendOp = output.blendOp;
             desc.RenderTarget[0].BlendOpAlpha = output.blendOp;
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf())))
                 return false; // Original D3D9 Draw/input remain authoritative.
         }
@@ -4110,7 +4117,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         const UINT direction = output.blendOp == D3D11_BLEND_OP_REV_SUBTRACT ?
                                1u : 0u;
         const UINT slot = (direction * 4u + variant) * 16u +
-                          output.colorWriteMask;
+                          nativeColorWriteMask;
         if (slot >= s.subtractiveMaskedBlends.size()) return false;
         auto& cached = s.subtractiveMaskedBlends[slot];
         if (!cached) {
@@ -4123,144 +4130,144 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             base->GetDesc(&desc);
             desc.RenderTarget[0].BlendOp = output.blendOp;
             desc.RenderTarget[0].BlendOpAlpha = output.blendOp;
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf())))
                 return false;
         }
         maskedBlend = &cached;
     } else if (output.inverseSourceAlphaBlend &&
-               output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+               nativeColorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
         // Dedicated inverse-over mask slots prevent reuse of standard-over OM.
-        auto& cached = s.inverseSourceAlphaMaskedBlends[output.colorWriteMask];
+        auto& cached = s.inverseSourceAlphaMaskedBlends[nativeColorWriteMask];
         if (!cached) {
             D3D11_BLEND_DESC desc{};
             s.inverseSourceAlphaBlend->GetDesc(&desc);
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf())))
                 return false;
         }
         maskedBlend = &cached;
-    } else if (output.multiplyBlend && output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+    } else if (output.multiplyBlend && nativeColorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
         // Multiplicative overlays must not reuse over/additive masked states.
-        auto& cached = s.multiplyMaskedBlends[output.colorWriteMask];
+        auto& cached = s.multiplyMaskedBlends[nativeColorWriteMask];
         if (!cached) {
             D3D11_BLEND_DESC desc{};
             s.multiplyBlend->GetDesc(&desc);
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf())))
                 return false;
         }
         maskedBlend = &cached;
     } else if (output.inverseDestMultiplyBlend &&
-               output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
-        auto& cached = s.inverseDestMultiplyMaskedBlends[output.colorWriteMask];
+               nativeColorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+        auto& cached = s.inverseDestMultiplyMaskedBlends[nativeColorWriteMask];
         if (!cached) {
             D3D11_BLEND_DESC desc{};
             s.inverseDestMultiplyBlend->GetDesc(&desc);
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf())))
                 return false;
         }
         maskedBlend = &cached;
     } else if (output.inverseSourceMultiplyBlend &&
-               output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
-        auto& cached = s.inverseSourceMultiplyMaskedBlends[output.colorWriteMask];
+               nativeColorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+        auto& cached = s.inverseSourceMultiplyMaskedBlends[nativeColorWriteMask];
         if (!cached) {
             D3D11_BLEND_DESC desc{};
             s.inverseSourceMultiplyBlend->GetDesc(&desc);
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf())))
                 return false;
         }
         maskedBlend = &cached;
     } else if (output.sourceAlphaSaturateCopyBlend &&
-               output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
-        auto& cached = s.sourceAlphaSaturateCopyMaskedBlends[output.colorWriteMask];
+               nativeColorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+        auto& cached = s.sourceAlphaSaturateCopyMaskedBlends[nativeColorWriteMask];
         if (!cached) {
             D3D11_BLEND_DESC desc{};
             s.sourceAlphaSaturateCopyBlend->GetDesc(&desc);
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf()))) return false;
         }
         maskedBlend = &cached;
     } else if (output.sourceAlphaSaturateAddBlend &&
-               output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
-        auto& cached = s.sourceAlphaSaturateAddMaskedBlends[output.colorWriteMask];
+               nativeColorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+        auto& cached = s.sourceAlphaSaturateAddMaskedBlends[nativeColorWriteMask];
         if (!cached) {
             D3D11_BLEND_DESC desc{};
             s.sourceAlphaSaturateAddBlend->GetDesc(&desc);
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf()))) return false;
         }
         maskedBlend = &cached;
     } else if (output.destAlphaCrossfadeBlend &&
-               output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
-        auto& cached = s.destAlphaCrossfadeMaskedBlends[output.colorWriteMask];
+               nativeColorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+        auto& cached = s.destAlphaCrossfadeMaskedBlends[nativeColorWriteMask];
         if (!cached) {
             D3D11_BLEND_DESC desc{};
             s.destAlphaCrossfadeBlend->GetDesc(&desc);
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf()))) return false;
         }
         maskedBlend = &cached;
     } else if (output.reverseDestAlphaCrossfadeBlend &&
-               output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
-        auto& cached = s.reverseDestAlphaCrossfadeMaskedBlends[output.colorWriteMask];
+               nativeColorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+        auto& cached = s.reverseDestAlphaCrossfadeMaskedBlends[nativeColorWriteMask];
         if (!cached) {
             D3D11_BLEND_DESC desc{};
             s.reverseDestAlphaCrossfadeBlend->GetDesc(&desc);
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf()))) return false;
         }
         maskedBlend = &cached;
     } else if (output.sourceAlphaCopyBlend &&
-               output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+               nativeColorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
         // Preserve source-owned per-channel color writes for SRCALPHA/ZERO.
         // Never alias the standard-over, inverse-over or multiply caches.
-        auto& cached = s.sourceAlphaCopyMaskedBlends[output.colorWriteMask];
+        auto& cached = s.sourceAlphaCopyMaskedBlends[nativeColorWriteMask];
         if (!cached) {
             D3D11_BLEND_DESC desc{};
             s.sourceAlphaCopyBlend->GetDesc(&desc);
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf())))
                 return false;
         }
         maskedBlend = &cached;
     } else if (output.inverseAlphaCopyBlend &&
-               output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
-        auto& cached = s.inverseAlphaCopyMaskedBlends[output.colorWriteMask];
+               nativeColorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+        auto& cached = s.inverseAlphaCopyMaskedBlends[nativeColorWriteMask];
         if (!cached) {
             D3D11_BLEND_DESC desc{};
             s.inverseAlphaCopyBlend->GetDesc(&desc);
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf()))) return false;
         }
         maskedBlend = &cached;
     } else if (output.inverseAlphaAddBlend &&
-               output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
-        auto& cached = s.inverseAlphaAddMaskedBlends[output.colorWriteMask];
+               nativeColorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+        auto& cached = s.inverseAlphaAddMaskedBlends[nativeColorWriteMask];
         if (!cached) {
             D3D11_BLEND_DESC desc{};
             s.inverseAlphaAddBlend->GetDesc(&desc);
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf()))) return false;
         }
         maskedBlend = &cached;
     } else if (output.sourceReplaceBlend &&
-               output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+               nativeColorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
         // The original D3D9 draw overwrites only enabled channels. Keep the
         // other diagnostic target components untouched, including alpha.
-        auto& cached = s.sourceReplaceMaskedBlends[output.colorWriteMask];
+        auto& cached = s.sourceReplaceMaskedBlends[nativeColorWriteMask];
         if (!cached) {
             D3D11_BLEND_DESC desc{};
             s.sourceReplaceBlend->GetDesc(&desc);
-            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf())))
                 return false;
         }
         maskedBlend = &cached;
-    } else if (output.colorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
-        const UINT baseSlot = (output.alphaBlend ? 16u : 0u) + output.colorWriteMask;
+    } else if (nativeColorWriteMask != D3D11_COLOR_WRITE_ENABLE_ALL) {
+        const UINT baseSlot = (output.alphaBlend ? 16u : 0u) + nativeColorWriteMask;
         const UINT slot = baseSlot + (output.additiveBlend ? 16u :
                                      output.sourceAlphaAddBlend ? 32u : 0u) +
                                      (output.premultipliedAlphaBlend ? 48u : 0u);
@@ -4288,7 +4295,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                     output.additiveBlend ? D3D11_BLEND_ONE : D3D11_BLEND_SRC_ALPHA;
                 maskDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
             }
-            maskDesc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            maskDesc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;
             if (FAILED(dev->CreateBlendState(&maskDesc, cached.GetAddressOf())))
                 return false;
         }

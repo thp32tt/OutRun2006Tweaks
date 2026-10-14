@@ -2,9 +2,9 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00736",
   "production_id": "CONVERSION-DX11-00736",
-  "event_id": "CONVERSION-DX11-00736-E001",
-  "event_type": "dispatch",
-  "attempt": 1,
+  "event_id": "CONVERSION-DX11-00736-E003",
+  "event_type": "retry",
+  "attempt": 2,
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "AI2-ChatGPT2",
@@ -26,10 +26,31 @@
       "Game-created contiguous Draw/Indexed, actual D3D9 Present/gamepad unchanged; invalid/partial Clear fails closed"
     ],
     "conflict_keys": [
-      "DX11:X8_DESTINATION_ALPHA_FULL_FRAME"
+      "DX11:X8_DESTINATION_ALPHA_FULL_FRAME",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_clear_color.hpp"
     ],
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
-    "activation_guard_and_fallback": "Explicit full opt-in, exact same source Clear; D3D9 native rendering and input fallback remain primary"
+    "activation_guard_and_fallback": "Explicit full opt-in, exact same source Clear; D3D9 native rendering and input fallback remain primary",
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/native_game_clear_color.hpp",
+      "tools/dx11_x8_dest_alpha_00736.cpp",
+      "tools/test_dx11_x8_dest_alpha_00736.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Game X8 Clear seeds opaque alpha; native full-frame Draw/DrawIndexed masks alpha writes across subsequent Draws; portable constexpr and destructive hook/OM probes",
+      "negative_regression": "A8 retains alpha writes and source Clear alpha; partial, foreign or invalid Clear leaves source mask; original D3D9 Present/input remains authoritative",
+      "component_integration": "Original successful D3D9 Clear -> A8/X8 canonical source -> D3D11 full frame initial color -> per-native-Draw masked RGB OM -> guarded frame publication"
+    },
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/native OM integration and exact-SHA five Actions required; game/Quest3 visual parity remains untested"
   },
   "feature_contract": {
     "feature_id": "DX11-OPAQUE-X8-FULL-FRAME-BLEND",
@@ -61,17 +82,17 @@
     "A3": "CI_PENDING"
   },
   "changed_files": [
-    "src/vr/d3d11/native_game_clear_color.hpp",
     "src/vr/d3d11/live_game_frame_bridge.cpp",
-    ".github/workflows/dx11-fast-structural.yml",
+    "src/vr/d3d11/native_game_clear_color.hpp",
     "tools/dx11_x8_dest_alpha_00736.cpp",
     "tools/test_dx11_x8_dest_alpha_00736.py",
-    "docs/automation/runs/CONVERSION-DX11-00736.json"
+    "docs/automation/runs/CONVERSION-DX11-00736.json",
+    ".github/workflows/dx11-fast-structural.yml"
   ],
   "packaging_status": "NOT_REQUIRED",
   "runtime_gate": "NEED_HMD_TEST",
-  "material_result_sha": null,
+  "material_result_sha": "222bfab92025dcdd546dbfa95ea39950982367bf",
   "validation_bearing_result_sha": null,
   "ci_evidence": {},
-  "validation_note": "Exact SHA Actions pending; no Quest3/VDXR game or gamepad testing performed."
+  "validation_note": "Retry E003 repairs acceptance policy omissions from failed Backend Conversion #38599016924 and fixes consecutive X8 Draw alpha writes with source integration tests. Exact-SHA five gates pending. RUNTIME_VALIDATION=UNTESTED."
 }

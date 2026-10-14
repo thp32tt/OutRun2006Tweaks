@@ -34,6 +34,14 @@ struct GameNativeClearColor {
         return valid && device != 0u && backbuffer != 0u &&
                sourceDevice == device && backbufferIdentity == backbuffer;
     }
+    // Disable writes to the absent X8 alpha plane for every native draw.
+    // Mismatched or partial/invalid clears and A8 retain source write masks.
+    [[nodiscard]] constexpr std::uint32_t native_write_mask(
+        std::uintptr_t device, std::uintptr_t backbuffer,
+        std::uint32_t requested) const noexcept {
+        return matches(device, backbuffer) && opaqueDestinationAlpha
+            ? requested & ~std::uint32_t{0x08u} : requested;
+    }
     [[nodiscard]] constexpr std::array<float, 4> native_color(
         std::uintptr_t device, std::uintptr_t backbuffer,
         const std::array<float, 4>& fallback) const noexcept {
