@@ -117,7 +117,7 @@ def static_contract(src, workflow):
         "touched == &R30Scratch.upTouched",
         "const bool sortedCacheHit = sortedCandidate && trustedVbHint &&",
         "R30Scratch.vbDepthSortedGeneration ==",
-        "sortedTouched.size() == touched->size()",
+        "largeSparseSample ? 512u : touched->size()",
         "if (!sortedCacheHit)",
         "sortedTouched.clear();",
         "if (!sortedTouched.empty() && trustedVbHint)",
