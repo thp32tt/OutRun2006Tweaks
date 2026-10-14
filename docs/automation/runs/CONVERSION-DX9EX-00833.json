@@ -12,6 +12,7 @@
   "work_key": "DX9EX:RESET:HOST_R32_ASYNC_ACK_CONTEXT_EPOCH",
   "status": "COMPLETE_BUILD_VERIFIED",
   "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_delta": 1,
