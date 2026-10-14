@@ -164,9 +164,12 @@ int main()
         PlanVisibleCenteredContent(
             0, 0, 3440, 1440, 0, 1440, 0, 0, 1, 1,
             4.f / 3.f).crop ||
+        // Only a genuine <5%-of-sampled-width content sliver is too
+        // small to keep; the old -2400 offset still exposes a valid
+        // 280px-wide authored fragment and must no longer be rejected.
         PlanVisibleCenteredContent(
-            -2400, 0, 1040, 1440, 3440, 1440, 0, 0,
-            1040.f / 3440.f, 1, 4.f / 3.f).crop ||
+            -2660, 0, 780, 1440, 3440, 1440, 0, 0,
+            780.f / 3440.f, 1, 4.f / 3.f).crop ||
         PlanVisibleCenteredContent(
             0, 0, 3440, 1440, 3440, 1440,
             std::numeric_limits<float>::quiet_NaN(), 0, 1, 1,
