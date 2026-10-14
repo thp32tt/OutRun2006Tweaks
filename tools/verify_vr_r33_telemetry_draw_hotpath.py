@@ -34,10 +34,9 @@ def body(src: str, signature: str) -> str:
 def valid(src: str) -> bool:
     try:
         dispatch = body(src, "HRESULT R33Dispatch(")
-        assert "bool resyncAlreadyFlushed,\\n            bool telemetry) noexcept" not in dispatch
         assert "const bool telemetry = R33TelemetryEnabled();" not in dispatch
-        assert "if (telemetry)\\n                R32ReviewObserveDispatchDraw(device);" in dispatch
-        assert "const char* site, bool resyncAlreadyFlushed,\\n            bool telemetry) noexcept" in src
+        assert "if (telemetry)\n                R32ReviewObserveDispatchDraw(device);" in dispatch
+        assert "const char* site, bool resyncAlreadyFlushed,\n            bool telemetry) noexcept" in src
         guard = body(src, "HRESULT R33GuardStereoRasterState(")
         active = body(guard, "auto onGuardActive =")
         assert re.search(
@@ -53,9 +52,9 @@ def valid(src: str) -> bool:
             assert before.count(observer) == 1
             assert before.count("const bool telemetry = R33TelemetryEnabled();") == 1
             assert re.search(
-                r"if\\s*\\(telemetry\\)\\s*" + re.escape(observer), before)
-            assert re.search(r"R33Dispatch\\(device, actual, lower,.*?"
-                r"resyncAlreadyFlushed,\\s*telemetry\\);", draw, re.S)
+                r"if\s*\(telemetry\)\s*" + re.escape(observer), before)
+            assert re.search(r"R33Dispatch\(device, actual, lower,.*?"
+                r"resyncAlreadyFlushed,\s*telemetry\);", draw, re.S)
             assert "R33GuardStereoRasterState(" in draw
             assert "R33Dispatch(" in draw
             assert "GpuWaterProbe::Enabled()" in draw
@@ -97,9 +96,14 @@ def main() -> None:
                            + src[end:])
         draw = body(src, signature)
         assert "resyncAlreadyFlushed, telemetry);" in draw
-        mutants.append(src.replace(
+        # Mutate the owning Draw, not always the first Draw in the file.
+        draw_begin = src.index(signature)
+        draw_end = src.index("const bool gpuTimed", draw_begin)
+        draw_block = src[draw_begin:draw_end]
+        assert draw_block.count("resyncAlreadyFlushed, telemetry);") == 1
+        mutants.append(src[:draw_begin] + draw_block.replace(
             "resyncAlreadyFlushed, telemetry);",
-            "resyncAlreadyFlushed, false);", 1))
+            "resyncAlreadyFlushed, false);", 1) + src[draw_end:])
     for i, changed in enumerate(mutants, 1):
         assert changed != src, "unchanged mutant " + str(i)
         assert not valid(changed), "escaped mutant " + str(i)

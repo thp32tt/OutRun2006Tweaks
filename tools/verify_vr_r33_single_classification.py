@@ -148,7 +148,7 @@ def check_resync_single_flush(text: str) -> None:
     )
     assert len(re.findall(
         r"R33Dispatch\(device, actual, lower,\s*\"R33/[^\"]+\",\s*"
-        r"resyncAlreadyFlushed\)", text
+        r"resyncAlreadyFlushed,\s*telemetry\)", text
     )) == 4, "every physical draw must forward the recovery flag"
 
 
@@ -407,9 +407,10 @@ def main() -> None:
         src.replace("return drawCall(false);", "return drawCall(true);", 1),
         src.replace("return drawCall(true);", "return drawCall(false);", 1),
         src.replace("if (!resyncAlreadyFlushed &&", "if (", 1),
-        src.replace("resyncAlreadyFlushed);", "false);", 1),
+        src.replace("resyncAlreadyFlushed, telemetry);", "false, telemetry);", 1),
     ]
     for i, mutant in enumerate(resync_mutants, 1):
+        assert mutant != src, f"resync mutation {i} did not change source"
         try:
             check_resync_single_flush(mutant)
         except (AssertionError, ValueError):
