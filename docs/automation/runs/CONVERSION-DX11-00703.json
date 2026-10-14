@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "feature_id": "GAME_STAGE1_SIGNED_FADES_MENU_RACE",
   "work_key": "DX11:GAME_STAGE1_SIGNED_ADD_RGB_ALPHA",
-  "status": "IMPLEMENTED_PENDING_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -78,13 +78,13 @@
     ]
   },
   "acceptance_results": {
-    "signed-stage1-live-rgb-alpha": "PENDING_GATE",
-    "signed-fallback-unsupported-dx9ex": "PENDING_GATE",
-    "signed-288-exact-sha-gates": "PENDING_GATE"
+    "signed-stage1-live-rgb-alpha": "PASS",
+    "signed-fallback-unsupported-dx9ex": "PASS",
+    "signed-288-exact-sha-gates": "PASS"
   },
   "base_head_sha": "62abb8a8f64baeeaffc2375958887baf63961141",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "a8d4a955f36e879c94096abedb3dc830a74a03d3",
+  "validation_bearing_result_sha": "a8d4a955f36e879c94096abedb3dc830a74a03d3",
   "changed_files": [
     "src/vr/d3d11/live_game_stage1_factor.hpp",
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -98,10 +98,41 @@
     "C0_RECOVER": "DONE previous 00702 terminal",
     "C1_REVIEW": "DONE unsupported signed Stage1 operation family",
     "C2_IMPLEMENT": "DONE signed RGB/alpha native shader and source probe",
-    "C3_VALIDATE": "PENDING exact-SHA GitHub Gates",
-    "C4_COMMIT": "PENDING atomic branch CAS",
+    "C3_VALIDATE": "PASS_EXACT_SHA: DX11 Fast, Backend validate+smoke, Win32 Build, OpenXR, HUD all 5/5 SUCCESS at a8d4a955f36e879c94096abedb3dc830a74a03d3; Quest3/VDXR UNTESTED",
+    "C4_COMMIT": "PASS: material code, shader, tests, execution run a8d4a955f36e879c94096abedb3dc830a74a03d3 (no CI-skip), exact-SHA Gates complete",
     "C5_PACKAGE": "NOT_REQUIRED without HMD runtime evidence",
-    "C6_STATE": "PENDING exact-SHA gate"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED: exact SHA 5/5 Gate SUCCESS; new C6 [skip ci] bookkeeping only; HMD/gamepad UNTESTED"
   },
-  "next_action": "Read GitHub Actions for material result SHA; repair actual gate regression under same TASK_ID; after PASS_EXACT_SHA create separate C6 bookkeeping [skip ci], HMD remains UNTESTED."
+  "next_action": "Feature build-verified at a8d4a955f36e879c94096abedb3dc830a74a03d3. Do not requeue or double-score CONVERSION-DX11-00703. Controller choose separate unowned DX11 rendering/input feature; Quest3/VDXR HMD result remains UNTESTED.",
+  "gate_evidence": {
+    "validation_bearing_sha": "a8d4a955f36e879c94096abedb3dc830a74a03d3",
+    "exact_sha": true,
+    "dx11_fast_structural_checks": {
+      "id": 38490277771,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38490277781,
+      "conclusion": "SUCCESS"
+    },
+    "windows_build": {
+      "id": 38490282468,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38490282504,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38490282489,
+      "conclusion": "SUCCESS"
+    },
+    "backend_jobs": [
+      "validate SUCCESS",
+      "DX11 readiness smoke probes SUCCESS"
+    ],
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  },
+  "state_persisted": true
 }
