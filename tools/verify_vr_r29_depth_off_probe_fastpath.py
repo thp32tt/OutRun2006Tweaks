@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+"""R29 depth-disabled translucent fast-path with fail-closed regressions.
+
+A synchronized R29 depth-off effect cannot satisfy R27's independently
+required zEnabled==true predicate. Avoid its five-state R13 live read, but
+preserve depth-on candidates, semantic force-zero, recovery and live fallback.
+"""
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src/vr/d3d9/stereo_renderer_r29.cpp"
+R26 = ROOT / "src/vr/d3d9/stereo_renderer_r26.cpp"
+POLICY = ROOT / "src/vr/d3d9/vr_pass_policy.hpp"
+
+
+def body(s: str, marker: str) -> str:
+    start = s.find(marker)
+    assert start >= 0, marker
+    opening = s.find("{", start)
+    depth = 0
+    for i in range(opening, len(s)):
+        depth += (s[i] == "{") - (s[i] == "}")
+        if depth == 0:
+            return s[start:i + 1]
+    raise AssertionError("unclosed " + marker)
+
+
+def contract(s: str) -> bool:
+    sync = body(s, "bool R29FragileEffectCached(")
+    guard = body(s, "HRESULT R29GuardStableDraw(")
+    direct = body(s, "HRESULT R29DirectTwoEye(")
+    needle = "const bool r27DepthCandidate =\n                R29Effect.zEnable != D3DZB_FALSE;"
+    first = """if (r27DepthCandidate)
+                {
+                    if (R27ShouldBypassLegacyZeroDisparity(device))"""
+    second = """if (fragile && !forceZeroDisparity && !worldGateChecked &&
+                r27DepthCandidate &&
+                R27ShouldBypassLegacyZeroDisparity(device))"""
+    return all((
+        "if (!R29SyncEffectState(device))" in sync,
+        "fragile = R29Effect.fragileWorld;" in sync,
+        guard.find("if (!R29FragileEffectCached(device, fragile))")
+          < guard.find(needle)
+          < guard.find("const auto semanticScope"),
+        needle in guard,
+        first in guard,
+        second in guard,
+        guard.count("R27ShouldBypassLegacyZeroDisparity(device)") == 2,
+        guard.find("worldGateChecked = true;") < guard.find(first),
+        "OutRunVR::GameSemantic::ForceZeroDisparity(semanticScope)" in guard,
+        "if (forceZeroDisparity)" in guard,
+        "return legacyR13Draw();" in guard,
+        "return R29DirectTwoEye(device," in guard,
+        "R29OwnerLeftDrawMayWriteDepth(device)" in direct,
+        "R29OwnerLeftDrawMayWriteStencil(device)" in direct,
+    ))
+
+
+def candidate(cached_synced: bool, z_enabled: bool,
+              fragile: bool, force_zero: bool) -> bool:
+    # Test the two R27 call guards as an independently modeled decision.
+    if not cached_synced:
+        return False  # The enclosing R29 fallback, never this hot path.
+    depth_gate = z_enabled
+    first = fragile and not force_zero and depth_gate
+    second = fragile and not force_zero and depth_gate
+    return first or second
+
+
+src = SRC.read_text(encoding="utf-8")
+r26 = R26.read_text(encoding="utf-8")
+policy = POLICY.read_text(encoding="utf-8")
+assert contract(src), "R29 translucent R27 gate"
+assert "if (!depthTestEnabled)" in policy and "EffectStereoPolicy::ZeroDisparity" in policy
+assert "effect.classification != R13EffectClass::Flat ||" in r26
+assert "!effect.zKnown || !effect.zEnabled" in r26
+assert "const R13EffectSnapshot effect =\n                R13CaptureDrawTimeEffect(device);" in r26
+for synced in (False, True):
+    for depth in (False, True):
+        for fragile in (False, True):
+            for forced in (False, True):
+                checked = candidate(synced, depth, fragile, forced)
+                assert not checked if (not synced or not depth or forced or not fragile) else checked
+mutations = [
+    ("remove depth predicate", "r27DepthCandidate &&\n                R27ShouldBypass", "R27ShouldBypass"),
+    ("invert cached depth", "R29Effect.zEnable != D3DZB_FALSE;", "R29Effect.zEnable == D3DZB_FALSE;"),
+    ("allow unconditional scope probe", "if (r27DepthCandidate)", "if (true)"),
+    ("remove forced-zero veto", "fragile && !forceZeroDisparity && !worldGateChecked", "fragile && !worldGateChecked"),
+    ("remove positive world guard", "worldGateChecked = true;", "worldGateChecked = false;"),
+    ("remove generation-certified snapshot", "if (!R29FragileEffectCached(device, fragile))", "if (false)"),
+    ("remove safe legacy fallback", "return legacyR13Draw();", "return D3D_OK;"),
+    ("remove depth snapshot", "R29Effect.zEnable != D3DZB_FALSE;", "true;"),
+]
+for label, before, after in mutations:
+    assert before in src, ("mutation anchor missing", label)
+    broken = src.replace(before, after, 1)
+    assert not contract(broken), ("mutation escaped", label)
+print(f"PASS R29 depth-off R27 hotpath: 16 decision combinations, {len(mutations)} destructive mutations; RUNTIME_VALIDATION=UNTESTED")

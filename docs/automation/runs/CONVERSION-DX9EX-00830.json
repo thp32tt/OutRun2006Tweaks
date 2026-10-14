@@ -1,0 +1,80 @@
+{
+  "task_id": "CONVERSION-DX9EX-00830",
+  "production_id": "CONVERSION-DX9EX-00830",
+  "event_id": "CONVERSION-DX9EX-00830-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R29_DEPTH_OFF_ALPHA_R27_PROBE",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R29_DEPTH_OFF_ALPHA_R27_PROBE",
+  "status": "VALIDATION_PENDING",
+  "phase": "C4_COMMIT_PENDING",
+  "automation_validation": "PENDING_GITHUB_ACTIONS",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R29_DEPTH_OFF_ALPHA_R27_PROBE",
+    "goal": "Eliminate unnecessary synchronous D3D9 R13 effect-state readback for depth-disabled translucent stereo draws while preserving the exact depth-on R27 world probe and fail-closed mono/recovery behavior.",
+    "scope_boundary": "Only R29 cached depth-off world exception eligibility, not R27 classifier, shader WVP, HUD, SkyGlow, DirectGPU, FFB or any DX11/DXVK branch.",
+    "special_work_evidence": "R29's generation-fenced six-field cached effect says Z disabled, whereas R27ShouldBypassLegacyZeroDisparity requires a fresh R13 snapshot proving depth enabled; before this patch every fragile alpha/sand/flare draw could still request five live render-state getters only to return false. Improvement is workload-dependent, not an HMD FPS measurement.",
+    "trace_stages": [
+      "Original game alpha/smoke/sand depth-disabled Draw enters R29 state-cached stereo guard.",
+      "R29 effect state synchronizes six D3D9 fields and chooses direct left+right or legacy R13 fallback; depth-off R27 live snapshot redundantly reads states.",
+      "Both eyes render through unchanged R29DirectTwoEye and original OpenXR compositor; depth-enabled WorldBillboard maintains validated R27 recheck."
+    ],
+    "subcomponents": [
+      "Skip first semantic corroborated R27 probe for generation-synchronized depth-disabled Draw while preserving the force-zero veto.",
+      "Skip second generic R27 probe on the same no-depth state, leaving depth-enabled strict R27 and recovery/legacy fail-closed routes intact.",
+      "Install an exact-SHA 16-case and destructive-mutation verifier before Windows host/game/package integration."
+    ],
+    "acceptance_items": [
+      {
+        "id": "DEPTH_OFF_NO_SYNC_GETTERS",
+        "category": "end_to_end_behavior",
+        "behavior_area": "transparent_stereo_draw",
+        "expected_behavior": "Depth-disabled alpha/particle and untagged stereo draws never pay the redundant R27 live R13 render-state snapshot."
+      },
+      {
+        "id": "DEPTH_ON_AND_RECOVERY_SAFE",
+        "category": "fallback_regression",
+        "behavior_area": "depth_semantics_and_recovery",
+        "expected_behavior": "Depth-tested effects retain original positive R27 probe; forced zero, failed sync, StateBlock changes and legacy fail-closed behavior are unchanged."
+      },
+      {
+        "id": "EXACT_SHA_WIN32_INTEGRATION",
+        "category": "integrated_validation",
+        "behavior_area": "windows_game_host_package",
+        "expected_behavior": "Final same-SHA DX9Ex Active host/game/package, Domain Isolation and relevant Full Source Impact workflows succeed."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "DEPTH_OFF_NO_SYNC_GETTERS": "STATIC_VERIFIER_PENDING",
+    "DEPTH_ON_AND_RECOVERY_SAFE": "STATIC_VERIFIER_PENDING",
+    "EXACT_SHA_WIN32_INTEGRATION": "PENDING"
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "tools/verify_vr_r29_depth_off_probe_fastpath.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00830.json"
+  ],
+  "diagnosis": {
+    "original_evidence": "Original source R29GuardStableDraw calls R27ShouldBypassLegacyZeroDisparity in both semantic/generic branches for fragile depth-off draws, even though R27 hard-rejects !effect.zEnabled.",
+    "source_trace": [
+      "R29SyncEffectState reads cached ZENABLE inside tracked StateBlock generation.",
+      "R29GuardStableDraw evaluates cached fragility then calls the no-snapshot R27 overload.",
+      "R27 no-snapshot overload captures five D3D9 render states, rejects !zEnabled, and cannot promote zero-depth effects to world stereo."
+    ],
+    "root_cause": "Redundant independent live sampling after a fully synchronized depth-disabled result was already known, with no possible affirmative R27 classification for that state.",
+    "alternatives_rejected": [
+      "Skipping the R27 gate for depth-enabled world sprites could break spatially anchored cutouts and is rejected.",
+      "Bypassing R29 mono/recovery fallback or forced-semantic zero would risk HMD safety and is rejected."
+    ],
+    "fix_evidence": "Two original positive R27 paths remain behind an R29 synchronized ZENABLE candidate guard; both-eye rendering and legacy fallbacks are unchanged.",
+    "negative_test_evidence": "Verifier checks cached StateBlock precondition, both probes, unchanged semantic fallback, 16 modeled decisions and 8 destructive source mutations."
+  },
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no physical Quest3/VDXR or frame-time benchmark; measured hardware FPS improvement not asserted."
+}

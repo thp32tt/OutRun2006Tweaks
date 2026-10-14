@@ -561,6 +561,14 @@ namespace OutRunVRStereo
                 return legacyR13Draw();
             }
 
+            // R27's depth-tested world exception cannot accept a cached
+            // Z-disabled draw. The R29 cache was synchronized immediately
+            // above under Present/StateBlock generation fences, so skip the
+            // expensive R13 live effect snapshot on every depth-off alpha
+            // particle/smoke/flare draw without weakening its mono safety.
+            // Enabled depth still takes the original R27 probe unchanged.
+            const bool r27DepthCandidate =
+                R29Effect.zEnable != D3DZB_FALSE;
             const auto semanticScope = OutRunVR::GameSemantic::EffectiveScope();
             const bool forceZeroDisparity =
                 OutRunVR::GameSemantic::ForceZeroDisparity(semanticScope);
@@ -578,12 +586,14 @@ namespace OutRunVRStereo
             else if (OutRunVR::GameSemantic::CorroboratesWorld(semanticScope))
             {
                 worldGateChecked = true;
-                if (R27ShouldBypassLegacyZeroDisparity(device))
+                if (r27DepthCandidate)
                 {
-                    // Still require the proven R27 world gate. A failed
-                    // candidate must not retry identical live state reads.
-                    fragile = false;
-                    ++R29FragileWorldRetries;
+                    if (R27ShouldBypassLegacyZeroDisparity(device))
+                    {
+                        // The proven R27 gate still owns depth-tested effects.
+                        fragile = false;
+                        ++R29FragileWorldRetries;
+                    }
                 }
             }
 
@@ -591,6 +601,7 @@ namespace OutRunVRStereo
             // For untagged draws, retain exactly one conservative R27 probe;
             // forced-zero semantic draws never enter this world fallback.
             if (fragile && !forceZeroDisparity && !worldGateChecked &&
+                r27DepthCandidate &&
                 R27ShouldBypassLegacyZeroDisparity(device))
             {
                 fragile = false;
