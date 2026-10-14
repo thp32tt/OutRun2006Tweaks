@@ -426,6 +426,12 @@ class VRLensFlareProjected2D : public Hook
         // C993 desktop/non-centre calls unchanged when centreScope is None.
         OutRunVR::GameSemantic::ScopedExactProducerSemantic semantic(
             centreScope, nullptr, true);
+        // The exact token is one-shot. Retain the centre's world scope for
+        // ALL nested GPU draws, then restore the previous SceneEffect owner.
+        // When this is not our centre, preserve the original caller scope.
+        OutRunVR::GameSemantic::ScopedRenderSemantic centreDrawScope(
+            centreScope != OutRunVR::GameSemantic::RenderScope::None
+                ? centreScope : OutRunVR::GameSemantic::CurrentScope);
         Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
     }
 
@@ -1849,10 +1855,10 @@ class AnisotropicFiltering : public Hook
 		if (Settings::AnisotropicFiltering <= 0 ||
 			PreserveScreenTextureFiltering())
 			return;
-		// Preserve the existing MIN/MAG anisotropic selection for world
-		// materials. destination at 0x9AD8 is the sole MAXANISOTROPY
-		// driver write; repeating it here once more on MIN is redundant.
-		if (ctx.edi == D3DSAMP_MINFILTER || ctx.edi == D3DSAMP_MAGFILTER)
+		// Only minification needs forced anisotropy for 3D materials.
+		// MAGFILTER retains the game's requested value. All ScreenHud and
+		// 2D overlays still bypass this hook via PreserveScreenTextureFiltering.
+		if (ctx.edi == D3DSAMP_MINFILTER)
 			ctx.esi = D3DTEXF_ANISOTROPIC;
 	}
 

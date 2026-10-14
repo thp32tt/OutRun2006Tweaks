@@ -20,6 +20,7 @@
 #include "vr/ipc/cadence_v1.hpp"
 #include "vr/ipc/frame_pacing_diagnostics.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "../core/r29_owner_api.hpp"
 
 // Authoritative renderer-side OpenXR head-pose injector for OutRun 2006.
 //
@@ -1745,6 +1746,17 @@ namespace OutRunVRRenderer
 			InvalidateVerifiedWvp();
 			InvalidateGameWvpWrite();
 			if (!UploadContainsOutRunWvp(startRegister, vector4fCount))
+			{
+				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+					device, startRegister, constantData, vector4fCount);
+			}
+
+			// Only the main game backbuffer receives head-tracked WVP. Auxiliary
+			// cubemap/reflection/unknown targets preserve unmodified game c64.
+			// The preceding invalidation must run even when a later auxiliary
+			// write supersedes a verified main-eye matrix.
+			if (!OutRunVRStereo::R29OwnerTargetIsBackBuffer() ||
+				OutRunVRStereo::R29OwnerAnyAuxRenderTargetActive())
 			{
 				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
 					device, startRegister, constantData, vector4fCount);

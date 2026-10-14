@@ -121,6 +121,7 @@ on:
       - 'tools/verify_vr_r30_telemetry_counter_optout.py'
       - 'tools/verify_vr_r30_skyglow_fastpath.py'
       - 'tools/verify_dx9ex_hotpath_overhead.py'
+      - 'tools/verify_dx9ex_gpu_visual_20261014.py'
       - 'tools/verify_vr_r32_runtime_support_seam.py'
       - 'tools/verify_vr_r31_support_api_seam.py'
       - 'tools/verify_vr_r31_eye_tail_cache.py'
@@ -328,6 +329,7 @@ jobs:
             'tools/verify_vr_r30_telemetry_counter_optout.py',
             'tools/verify_vr_r30_skyglow_fastpath.py',
             'tools/verify_dx9ex_hotpath_overhead.py',
+            'tools/verify_dx9ex_gpu_visual_20261014.py',
             'tools/verify_vr_r32_runtime_support_seam.py',
             'tools/verify_vr_r31_support_api_seam.py',
             'tools/verify_vr_r31_eye_tail_cache.py',

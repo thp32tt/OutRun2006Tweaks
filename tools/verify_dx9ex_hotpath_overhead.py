@@ -19,7 +19,8 @@ assert brightness.index("bool validate() override") < brightness.index("bool app
 assert "Memory::VP::Nop(Module::exe_ptr(IntensityLatch_Addr), 6)" in brightness
 assert anisotropic.count("SetSamplerState(sampler,") == 1
 assert "SetSamplerState(" not in destination2
-assert "ctx.edi == D3DSAMP_MINFILTER || ctx.edi == D3DSAMP_MAGFILTER" in destination2
+assert "if (ctx.edi == D3DSAMP_MINFILTER)" in destination2
+assert "ctx.edi == D3DSAMP_MINFILTER || ctx.edi == D3DSAMP_MAGFILTER" not in destination2
 assert "PreserveScreenTextureFiltering()" in destination2
 
 assert "static thread_local float patchedData[256 * 4];" in renderer
