@@ -31,7 +31,7 @@ def integrated(h,b):
         "stage1TextureAlpha));",
         "float4 t = gameTexture.Sample(gameSampler, v.uv);",
         "v.diffuse, v.specular, t.a);",
-        "AlphaGate(result.a);")) and sh.count("stage1TextureAlpha));") == 2 and all(s in draw for s in (
+        "AlphaGate(result.a);")) and sh.count("stage1TextureAlpha));") == 1 and sh.count("stage1TextureAlpha)).a;") == 1 and all(s in draw for s in (
         "ctx->PSSetConstantBuffers(1, 1, &combiner)",
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);")) and (
@@ -39,7 +39,7 @@ def integrated(h,b):
 assert integrated(h,b)
 for s in ("tex1.Get() != tex.Get()","uv1 != capture.coordIndex",
           "s0 != s1","stage1Ops.x == 13","stage1Ops.y == 13",
-          "stage1TextureAlpha));","ctx->DrawIndexed(indexCount, 0, 0);"):
+          "stage1TextureAlpha));","stage1TextureAlpha)).a;","ctx->DrawIndexed(indexCount, 0, 0);"):
     assert not integrated(h,b.replace(s,"",1)),s
 assert not integrated(h.replace("matchedTextureSampler &&","true &&",1),b)
 assert "regular!=400u || temp!=160u" in p
