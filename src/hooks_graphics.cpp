@@ -57,7 +57,7 @@ namespace Settings
 		"Fixes certain stage objects disappearing before they reach edge of screen, when playing at non-4:3 aspect ratio." };
 	Setting<bool> DisableVehicleLODs{ "Graphics", "DisableVehicleLODs", true,
 		"Disables LODs on vehicles, reducing the ugly pop-in they have." };
-	Setting<bool> DisableStageCulling{ "Graphics", "DisableStageCulling", true,
+	Setting<bool> DisableStageCulling{ "Graphics", "DisableStageCulling", false,
 		"Disables culling of certain stage objects, so most distant objects won't obviously pop in to view." };
 	Setting<bool> FixZBufferPrecision{ "Graphics", "FixZBufferPrecision", true,
 		"Fixes Z-Buffer precision issues, greatly reducing z-fighting and distant object drawing issues "
@@ -1201,6 +1201,7 @@ class ReflectionUpdateRate : public Hook
 		static LARGE_INTEGER frequency{};
 
 		float frameScale60 = 1.0f;
+		bool frameSpike = false;
 		if (Settings::VREnabled && Settings::VRNormalizeReflectionRate)
 		{
 			if (frequency.QuadPart <= 0)
@@ -1213,7 +1214,9 @@ class ReflectionUpdateRate : public Hook
 				const double dt = static_cast<double>(now.QuadPart - lastCounter.QuadPart) /
 					static_cast<double>(frequency.QuadPart);
 				// Avoid a long pause/load screen producing a one-frame cubemap spike.
-				frameScale60 = static_cast<float>(std::clamp(dt * 60.0, 0.0, 2.0));
+				frameSpike = dt > 0.018;
+				frameScale60 = frameSpike ? 0.5f :
+					static_cast<float>(std::clamp(dt * 60.0, 0.0, 1.0));
 			}
 			lastCounter = now;
 		}
@@ -1223,9 +1226,13 @@ class ReflectionUpdateRate : public Hook
 		}
 
 		pendingFaces += FacesPerCubemap * Settings::ReflectionUpdateRate.get() * frameScale60;
-		const int faces = (std::min)(FacesPerCubemap, int(pendingFaces));
-		pendingFaces -= float(faces);
-		pendingFaces = (std::min)(pendingFaces, float(FacesPerCubemap));
+		// Do not repay stalled 1024x1024 cube-face work in a catch-up burst.
+		const bool vrNormalized =
+			Settings::VREnabled && Settings::VRNormalizeReflectionRate;
+		const int maxFaces = vrNormalized ? (frameSpike ? 2 : 3) : FacesPerCubemap;
+		const int faces = (std::min)(maxFaces, int(pendingFaces));
+		pendingFaces = std::clamp(pendingFaces - float(faces), 0.0f,
+			vrNormalized ? 1.0f : float(FacesPerCubemap));
 
 		ctx.eax = faces;
 	}
@@ -1334,7 +1341,9 @@ public:
 	{
 		// Patch "if (CheckCulling(...))" -> no-op
 		static TogglePatch patch(Module::exe_ptr(CalcCulling_PatchAddr), { 0x90, 0x90 });
-		patch.set(Settings::DisableStageCulling);
+		// Retain original stage visibility pruning for stereo VR.
+		patch.set(Settings::DisableStageCulling.get() &&
+			!Settings::VREnabled.get());
 		return true;
 	}
 
@@ -1778,14 +1787,24 @@ class AnisotropicFiltering : public Hook
 	const static int ChangeTexAttribute_HookAddr2 = 0x8960;
 
 	inline static SafetyHookMid dest_hook = {};
+	static bool PreserveScreenTextureFiltering() noexcept
+	{
+		if (!Settings::VREnabled.get())
+			return false;
+		const auto scope = OutRunVR::GameSemantic::EffectiveScope();
+		return scope == OutRunVR::GameSemantic::RenderScope::ScreenHud ||
+			scope == OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D ||
+			scope == OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D ||
+			scope == OutRunVR::GameSemantic::RenderScope::ProjectedWorldMarker2D;
+	}
 	static void destination(safetyhook::Context& ctx)
 	{
-		if (Settings::AnisotropicFiltering <= 0)
-			return; // leave the games own filtering alone
-
-		int Sampler = ctx.ebp;
-
-		Game::D3DDevice()->SetSamplerState(Sampler, D3DSAMP_MAXANISOTROPY, Settings::AnisotropicFiltering);
+		if (Settings::AnisotropicFiltering <= 0 ||
+			PreserveScreenTextureFiltering())
+			return; // preserve exact 2D/sprite filtering
+		const int sampler = ctx.ebp;
+		Game::D3DDevice()->SetSamplerState(sampler,
+			D3DSAMP_MAXANISOTROPY, Settings::AnisotropicFiltering.get());
 	}
 
 	// ChangeTexAttribute reads the mip filter from bits 19-20 of the material and
@@ -1800,7 +1819,8 @@ class AnisotropicFiltering : public Hook
 	inline static SafetyHookMid mip_hook = {};
 	static void mip_destination(safetyhook::Context& ctx)
 	{
-		if (Settings::AnisotropicFiltering <= 0)
+		if (Settings::AnisotropicFiltering <= 0 ||
+			PreserveScreenTextureFiltering())
 			return;
 
 		// Only upgrade POINT. A material that asked for no mipmapping at all is
@@ -1814,16 +1834,19 @@ class AnisotropicFiltering : public Hook
 	{
 		// Checked before the filter is forced below, so 0 really does leave the
 		// games filtering untouched rather than only skipping the level.
-		if (Settings::AnisotropicFiltering <= 0)
+		if (Settings::AnisotropicFiltering <= 0 ||
+			PreserveScreenTextureFiltering())
 			return;
-
-		int Sampler = *(int*)(ctx.esp + 0xC);
-
 		if (ctx.edi == D3DSAMP_MINFILTER || ctx.edi == D3DSAMP_MAGFILTER)
 		{
 			ctx.esi = D3DTEXF_ANISOTROPIC;
-
-			Game::D3DDevice()->SetSamplerState(Sampler, D3DSAMP_MAXANISOTROPY, Settings::AnisotropicFiltering);
+			// ChangeTexAttribute also sets MAG: avoid its redundant update.
+			if (ctx.edi == D3DSAMP_MINFILTER)
+			{
+				const int sampler = *reinterpret_cast<int*>(ctx.esp + 0xC);
+				Game::D3DDevice()->SetSamplerState(sampler,
+					D3DSAMP_MAXANISOTROPY, Settings::AnisotropicFiltering.get());
+			}
 		}
 	}
 

@@ -611,9 +611,19 @@ namespace OutRunVRStereo
                 return {};
             if (fragile)
             {
-                if (R33TelemetryEnabled())
-                    R32ReviewNoteDispatchFragile();
-                return {};
+                const auto scope = OutRunVR::GameSemantic::EffectiveScope();
+                // No screen/effect/forced-zero route may acquire world stereo.
+                // Untagged/world-tagged draw still needs a verified shader-epoch
+                // WVP plus the generation-fenced Z-enabled depth gate below.
+                if (!stateBlocksReliable ||
+                    OutRunVR::GameSemantic::ForceZeroDisparity(scope) ||
+                    (scope != OutRunVR::GameSemantic::RenderScope::None &&
+                     !OutRunVR::GameSemantic::CorroboratesWorld(scope)))
+                {
+                    if (R33TelemetryEnabled())
+                        R32ReviewNoteDispatchFragile();
+                    return {};
+                }
             }
 
             if (!R32ReviewEnsureStereoResources(device))
@@ -647,6 +657,17 @@ namespace OutRunVRStereo
             bool mayWriteStencil = false;
             if (!R33GetWriteFlags(device, mayWriteDepth, mayWriteStencil))
                 return {};
+            // Fast-path promotion only with a current depth attachment and
+            // non-disabled Z; other alpha effects stay on the legacy route.
+            if (fragile &&
+                (!R32ReviewTrackedDepthStencil() ||
+                 !R33DepthStencilCacheCurrent() ||
+                 R33DepthStencilState.zEnable == D3DZB_FALSE))
+            {
+                if (R33TelemetryEnabled())
+                    R32ReviewNoteDispatchFragile();
+                return {};
+            }
 
             bool leftWvpOk = false;
             {

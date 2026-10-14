@@ -473,6 +473,10 @@ namespace OutRunVRStereo
             if (FAILED(buffer->GetDesc(&desc)) || !desc.Size ||
                 desc.Size > R30MaxShadowBytes)
                 return nullptr;
+            // XYZRHW needs a shadow; FVF=0 declaration layouts stay eligible.
+            if (desc.FVF != 0 &&
+                (desc.FVF & D3DFVF_POSITION_MASK) != D3DFVF_XYZRHW)
+                return nullptr;
             auto entry = std::make_shared<R30BufferShadow>();
             entry->size = desc.Size;
             entry->usage = desc.Usage;
@@ -1339,12 +1343,21 @@ namespace OutRunVRStereo
             return SUCCEEDED(hr);
         }
 
+        bool R30GameGlowActive() noexcept
+        {
+            // Original EXE reducer's render-mode and glow-amount gate.
+            return (*Module::exe_ptr<std::uint8_t>(0x39FCD5) & 3) == 2 &&
+                *Module::exe_ptr<int>(0x4A8C40) != 0;
+        }
+
         bool R30CaptureSkyGlowSceneBeforeHud(
             IDirect3DDevice9* device)
         {
-            const auto frame = R29OwnerCaptureFrameSnapshot();
             if (!device || Settings::SkyGlowFactor <= 0 ||
-                !frame.hadWorldStereo || !frame.hadDuplicatedDraw ||
+                !R30GameGlowActive())
+                return false;
+            const auto frame = R29OwnerCaptureFrameSnapshot();
+            if (!frame.hadWorldStereo || !frame.hadDuplicatedDraw ||
                 frame.rightDrawFailed || frame.stereoIncomplete ||
                 !frame.backBuffer || !frame.rightEyeSurface)
                 return false;
@@ -1373,9 +1386,11 @@ namespace OutRunVRStereo
 
         bool R30ApplyStereoSkyGlow(IDirect3DDevice9* device)
         {
-            const auto frame = R29OwnerCaptureFrameSnapshot();
             if (!device || Settings::SkyGlowFactor <= 0 ||
-                !R29OwnerStereoWanted() || !frame.hadWorldStereo ||
+                !R30GameGlowActive())
+                return true;
+            const auto frame = R29OwnerCaptureFrameSnapshot();
+            if (!R29OwnerStereoWanted() || !frame.hadWorldStereo ||
                 !frame.hadDuplicatedDraw || frame.rightDrawFailed ||
                 frame.stereoIncomplete || !frame.backBuffer ||
                 !frame.rightEyeSurface)
