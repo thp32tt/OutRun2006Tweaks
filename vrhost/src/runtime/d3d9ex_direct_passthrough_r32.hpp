@@ -34,6 +34,9 @@ namespace OutRunVrD3D9ExDirectPassthrough
         // Reuse it for subsequent frames instead of a per-frame COM GetDesc call.
         D3D11_TEXTURE2D_DESC validatedDesc{};
         ID3D11Texture2D* eye[2]{};
+        // The same numeric producer handle can be opened against a new host
+        // device after recovery. Device ownership is part of cache identity.
+        ID3D11Device* device = nullptr;
     };
 
     inline std::array<R32SharedSlotCache,
@@ -43,6 +46,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
     inline DXGI_FORMAT R32InactiveFormat = DXGI_FORMAT_UNKNOWN;
     inline std::uint32_t R32InactiveWidth = 0;
     inline std::uint32_t R32InactiveHeight = 0;
+    inline ID3D11Device* R32InactiveDevice = nullptr;
+    inline ID3D11Device* R32DirectDeviceOwner = nullptr;
 
     inline std::uint64_t R32SharedCacheHits = 0;
     inline std::uint64_t R32SharedCacheMisses = 0;
@@ -67,6 +72,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
         R32InactiveFormat = DXGI_FORMAT_UNKNOWN;
         R32InactiveWidth = 0;
         R32InactiveHeight = 0;
+        R32InactiveDevice = nullptr;
     }
 
     inline void R32ResetDirectCaches() noexcept
@@ -78,6 +84,22 @@ namespace OutRunVrD3D9ExDirectPassthrough
         R32SharedCacheMisses = 0;
         R32SafeSwaps = 0;
         R32SafeTimeoutPreserves = 0;
+    }
+
+    // A host D3D11 device replacement invalidates all previously opened
+    // textures, SRVs, and the D3D11 EVENT query even when producer frame ID,
+    // ring generation and numeric handles happen to match. Synchronize BEFORE
+    // SafeEyesOwnFrame so an old-device SafeEye cannot be accepted as current.
+    inline void R32SyncDirectDeviceOwner() noexcept
+    {
+        ID3D11Device* const current = OutRunVrFinalTest::Device;
+        if (R32DirectDeviceOwner == current)
+            return;
+        R32ResetDirectCaches();
+        ResetSafeEyes();
+        ResetSharedEyeCache();
+        ReleaseCom(CopyFence);
+        R32DirectDeviceOwner = current;
     }
 
     inline bool R32OpenSharedSlot(
@@ -118,7 +140,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
             cache.gamePid == gamePid &&
             cache.leftHandle == left && cache.rightHandle == right &&
             cache.width == width && cache.height == height &&
-            cache.format == declared)
+            cache.format == declared &&
+            cache.device == OutRunVrFinalTest::Device)
         {
             ++R32SharedCacheHits;
             out = &cache;
@@ -177,6 +200,7 @@ namespace OutRunVrD3D9ExDirectPassthrough
         cache.width = width;
         cache.height = height;
         cache.format = declared;
+        cache.device = OutRunVrFinalTest::Device;
         out = &cache;
         return true;
     }
@@ -188,7 +212,8 @@ namespace OutRunVrD3D9ExDirectPassthrough
             R32InactiveSrv[0] && R32InactiveSrv[1] &&
             R32InactiveWidth == source.Width &&
             R32InactiveHeight == source.Height &&
-            R32InactiveFormat == source.Format)
+            R32InactiveFormat == source.Format &&
+            R32InactiveDevice == OutRunVrFinalTest::Device)
             return true;
 
         R32ReleaseInactiveEyes();
@@ -218,13 +243,16 @@ namespace OutRunVrD3D9ExDirectPassthrough
         R32InactiveWidth = safe.Width;
         R32InactiveHeight = safe.Height;
         R32InactiveFormat = safe.Format;
+        R32InactiveDevice = OutRunVrFinalTest::Device;
         return true;
     }
 
     inline bool CopySharedFrameToSafeEyesR32(
         const OutRunVR::SharedRenderFrameState& frame) noexcept
     {
-        if (!OutRunVrFinalTest::Context || !EnsureCopyFence())
+        R32SyncDirectDeviceOwner();
+        if (!OutRunVrFinalTest::Device ||
+            !OutRunVrFinalTest::Context || !EnsureCopyFence())
             return false;
 
         R32SharedSlotCache* source = nullptr;
@@ -291,6 +319,10 @@ namespace OutRunVrD3D9ExDirectPassthrough
 
     inline bool EnsureSafeFrameR32(std::uint32_t frameId) noexcept
     {
+        // Do this before the early SafeEyesOwnFrame() success path.
+        R32SyncDirectDeviceOwner();
+        if (!OutRunVrFinalTest::Device)
+            return false;
         OutRunVR::SharedRenderFrameState frame{};
         if (!ReadFrameById(frameId, frame))
             return false;

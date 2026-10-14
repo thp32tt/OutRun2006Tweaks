@@ -27,8 +27,19 @@ def verify(source: str) -> None:
     reset = body(source, "inline void R32ResetDirectCaches(")
     inactive = body(source, "inline bool R32EnsureInactiveEyes(")
     copied = body(source, "inline bool CopySharedFrameToSafeEyesR32(")
+    synchronized = body(source, "inline void R32SyncDirectDeviceOwner(")
+    fastpath = body(source, "inline bool EnsureSafeFrameR32(")
 
     assert "D3D11_TEXTURE2D_DESC validatedDesc{};" in slot
+    assert "ID3D11Device* device = nullptr;" in slot
+    for token in ("R32ResetDirectCaches();", "ResetSafeEyes();",
+                  "ResetSharedEyeCache();", "ReleaseCom(CopyFence);"):
+        assert token in synchronized, "old-device resource survived epoch: " + token
+    assert synchronized.index("R32ResetDirectCaches();") < synchronized.index("R32DirectDeviceOwner = current;")
+    assert "R32DirectDeviceOwner == current" in synchronized
+    assert fastpath.index("R32SyncDirectDeviceOwner();") < fastpath.index("SafeEyesOwnFrame(frame)")
+    assert copied.index("R32SyncDirectDeviceOwner();") < copied.index("EnsureCopyFence()")
+    assert "if (!OutRunVrFinalTest::Device)" in fastpath
     assert "slot = {};" in released, "eviction must drop both identities and descriptor"
     assert "R32ReleaseSharedSlot(slot);" in reset, "device/session reset must evict slots"
 
@@ -41,8 +52,10 @@ def verify(source: str) -> None:
         "cache.leftHandle == left && cache.rightHandle == right",
         "cache.width == width && cache.height == height",
         "cache.format == declared",
+        "cache.device == OutRunVrFinalTest::Device",
     ):
         assert token in hit, "stale slot descriptor reuse: " + token
+    assert "cache.device = OutRunVrFinalTest::Device;" in opened
     assert "R32ReleaseSharedSlot(cache);" in opened
     assert opened.count("->GetDesc(") == 2, "descriptor reads must occur only on cache miss"
     for token in (
@@ -58,6 +71,9 @@ def verify(source: str) -> None:
     assert "R32InactiveWidth == source.Width" in inactive
     assert "R32InactiveHeight == source.Height" in inactive
     assert "R32InactiveFormat == source.Format" in inactive
+    assert "R32InactiveDevice == OutRunVrFinalTest::Device" in inactive
+    assert "R32InactiveDevice = OutRunVrFinalTest::Device;" in inactive
+    assert "R32InactiveDevice = nullptr;" in body(source, "inline void R32ReleaseInactiveEyes(")
 
     assert "GetDesc(" not in copied, "hot-frame D3D11 GetDesc round trip returned"
     assert "R32EnsureInactiveEyes(source->validatedDesc)" in copied
@@ -78,6 +94,13 @@ def main() -> None:
     verify(source)
     mutations = (
         ("no_descriptor", "D3D11_TEXTURE2D_DESC validatedDesc{};", ""),
+        ("ignore_slot_device", "cache.device == OutRunVrFinalTest::Device", "true"),
+        ("ignore_inactive_device", "R32InactiveDevice == OutRunVrFinalTest::Device", "true"),
+        ("keep_fence_after_reset", "ReleaseCom(CopyFence);", "/* stale D3D11 fence */"),
+        ("keep_active_pair_after_reset", "ResetSafeEyes();", "/* stale active pair */"),
+        ("keep_slot_cache_after_reset", "R32ResetDirectCaches();", "/* stale producer slots */"),
+        ("accept_old_safeeye_frame", "R32SyncDirectDeviceOwner();\n        if (!OutRunVrFinalTest::Device)", "if (!OutRunVrFinalTest::Device)"),
+        ("reuse_old_copy_fence", "R32SyncDirectDeviceOwner();\n        if (!OutRunVrFinalTest::Device ||", "if (!OutRunVrFinalTest::Device ||"),
         ("no_identity_generation", "cache.generation == generation", "true"),
         ("no_identity_pid", "cache.gamePid == gamePid", "true"),
         ("no_identity_handle", "cache.leftHandle == left && cache.rightHandle == right", "true"),
