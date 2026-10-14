@@ -233,9 +233,16 @@ for old, replacement in (
     ("ProducerToken::StageExtensionTime);", "ProducerToken::None);"),
     ("StageExtensionDirectDrawOwner.reset();", "/* missing reset */"),
 ):
-    mutant = ui.replace(old, replacement, 1)
-    if mutant == ui:
+    # Mutate the selected +TIME function, not the first matching marker
+    # elsewhere in the file (GOAL progress now owns the same direct flag).
+    # A global replace silently mutated GOAL and falsely failed this gate.
+    function_marker = ("static void StageExtensionLeave("
+                       if old == "StageExtensionDirectDrawOwner.reset();"
+                       else "static void StageExtensionEnter(")
+    body = function_body(ui, function_marker)
+    if old not in body:
         fail("stage +TIME mutation could not be constructed: " + old)
+    mutant = ui.replace(body, body.replace(old, replacement, 1), 1)
     try:
         check_stage_extension_direct_owner(mutant)
     except SystemExit:

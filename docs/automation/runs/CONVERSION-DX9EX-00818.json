@@ -73,7 +73,9 @@
       "R30 per-eye fixedfn/VS Draw, Sumo replay and host composition left unchanged"
     ],
     "failed_gate": "DX9Ex Active run 38501883000 policy: missing symptom_id/trace_stages/subcomponents in feature_contract; cp1252 diagnostic emitted UnicodeEncodeError before reporting errors",
-    "retry_repair": "Align E003 nonterminal GOAL producer work contract to registered symptom and 3-stage/two-subcomponent validation, fix codepage-safe diagnostic and add Windows cp1252 regression assertions."
+    "retry_repair": "Align E003 nonterminal GOAL producer work contract to registered symptom and 3-stage/two-subcomponent validation, fix codepage-safe diagnostic and add Windows cp1252 regression assertions.",
+    "second_failed_gate": "DX9Ex Active run 38502219943: verify_vr_producer_provenance.py global first-encounter 'nullptr, true,' mutated earlier GOAL block instead of StageExtensionEnter, falsely escaping +TIME mutation",
+    "second_retry_repair": "Generate +TIME negative mutants against exact StageExtensionEnter or StageExtensionLeave function body so GOAL prior markers cannot alias mutation; source checks still fail for real mutated +TIME."
   },
   "changed_files": [
     "tools/verify_vr_producer_provenance.py",
