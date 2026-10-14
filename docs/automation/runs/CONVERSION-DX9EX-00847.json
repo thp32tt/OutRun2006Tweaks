@@ -3,7 +3,7 @@
   "task_id": "CONVERSION-DX9EX-00847",
   "production_id": "CONVERSION-DX9EX-00847",
   "event_id": "CONVERSION-DX9EX-00847-E001",
-  "event_type": "dispatch",
+  "event_type": "c6_result_only",
   "run_key": "CONVERSION-DX9EX-00847",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
@@ -67,19 +67,49 @@
     "negative_test_evidence": "Native C++ smoke covers 380x1440 horizontal and 2496x230 vertical surviving fragments plus stale UV negative controls, and retains original full/asymmetric scenarios.",
     "eye_ownership": "Only the two-eye LOCAL-fixed menu path consumes the corrected crop/optical plan; game world/HUD and separate mono theater and SBS paths are not modified."
   },
-  "status": "IMPLEMENTED_BUILD_PENDING",
-  "phase": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "runtime_evidence": "No Quest3/VDXR hardware test performed. Build and source-only validation do not prove live binocular imagery.",
+  "runtime_evidence": "No Quest3/VDXR on-device test. Automated native build and geometry assertions cannot prove real binocular menu alignment.",
   "changed_files": [
     "vrhost/src/runtime/menu_content_aspect.hpp",
     "vrhost/tests/menu_content_aspect_smoke.cpp"
   ],
   "acceptance_results": {
-    "narrow_horizontal": "PENDING",
-    "narrow_vertical": "PENDING",
-    "reject_stale": "PENDING",
-    "integrated_windows": "PENDING"
-  }
+    "narrow_horizontal": "PASS",
+    "narrow_vertical": "PASS",
+    "reject_stale": "PASS",
+    "integrated_windows": "PASS_EXACT_SHA"
+  },
+  "material_result_sha": "255339e674a7faf31a051d9f28d7f5047580aaba",
+  "validation_bearing_result_sha": "12ed254b5652a8988440f06c3d4b3f0fe4f190ba",
+  "result_sha": "12ed254b5652a8988440f06c3d4b3f0fe4f190ba",
+  "ci_evidence": {
+    "exact_sha": "12ed254b5652a8988440f06c3d4b3f0fe4f190ba",
+    "active_validation": {
+      "run_id": 38586796819,
+      "conclusion": "SUCCESS",
+      "jobs": "policy/game/full-chain-compile/host/package 5/5 SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38586797440,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38586796937,
+      "conclusion": "SUCCESS",
+      "jobs": "source-cross-domain/msvc-analyze-active-game/msvc-analyze-openxr-host 3/3 SUCCESS"
+    },
+    "hud_inspector_source_material": {
+      "run_id": 38586073999,
+      "exact_source_sha": "255339e674a7faf31a051d9f28d7f5047580aaba",
+      "conclusion": "SUCCESS",
+      "note": "HUD Inspector was triggered for original material/source SHA; test-only validated SHA did not retrigger this path-filtered workflow."
+    }
+  },
+  "controller_note": "Validation-bearing RESULT_SHA 12ed254b5652a8988440f06c3d4b3f0fe4f190ba is immutable and contains source, positive/negative tests and required passing exact-SHA gates; C6 bookkeeping HEAD must not replace it. First SHA host smoke failed because legacy exit-19 negative fixture treated a valid 280px fragment as invalid; same-task repair changed negative fixture to 20px truly invalid fragment. No new score for repair or C6.",
+  "score_once": true,
+  "c6_score_delta": 0,
+  "checkpoint": "C6_STATE"
 }
