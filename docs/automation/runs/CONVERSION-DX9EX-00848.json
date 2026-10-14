@@ -1,0 +1,101 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00848",
+  "production_id": "CONVERSION-DX9EX-00848",
+  "event_id": "CONVERSION-DX9EX-00848-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00848",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Remove visible jumps of the complete source-owned gameplay HUD speed, rank and running-time glyph groups when their last animated vertex enters or exits the viewport, while keeping both XR eyes optically consistent.",
+    "scope_boundary": "Only confirmed producer-tagged gameplay HUD peripheral text; GOAL/+TIME/result, F11/ESC/menu, world/rival markers, SkyGlow, input, FFB, DX11, DXVK unchanged.",
+    "trace_stages": [
+      "Original OutRun FUN_004BA9D0 gear/REV, rank and time-attack producer caller ranges yield exact OutRunHudPeripheralText ownership across child clip/sprani tags.",
+      "R30 R30GetExactHudEdgeAnchor scans the original exact source-position vertex bounds; preexisting all-visible binary gate jumped to full peripheral offset on the first wholly visible sprite.",
+      "R30 stereo XYZ/RHW source transform uses common HudEdgeAnchor and adaptive peripheral optical boost before paired-eye affine and common visibility correction; host receives the unchanged stereo per-eye layout."
+    ],
+    "subcomponents": [
+      "Smooth every source viewport boundary of the whole glyph group with finite C1 easing from neutral to peripheral anchor.",
+      "Gate visual size as well as X/Y placement with identical visibility weight before paired-eye composition.",
+      "Preserve offscreen neutral fallback and game/non-game producer isolation; add portable source/aspect and destructive tests."
+    ],
+    "acceptance_items": [
+      {
+        "id": "boundary_continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original gameplay glyph producer and source bounds",
+        "expected_behavior": "A partly offscreen group remains at neutral geometry, then all four viewport edges smoothly restore peripheral placement with no full-step pop."
+      },
+      {
+        "id": "paired_optical_scale",
+        "category": "end_to_end_behavior",
+        "behavior_area": "XR binocular HUD draw composition",
+        "expected_behavior": "Anchor X/Y and zoom boost use the same source-space monotone envelope for both eyes; world markers, UV and eye disparity stay unchanged."
+      },
+      {
+        "id": "negative_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "GOAL, menus and desktop/invalid-source regressions",
+        "expected_behavior": "NaN/invalid and partially outside source bounds retain neutral fallback; GOAL/+TIME, menu, F11, world, SkyGlow and original input are untouched."
+      },
+      {
+        "id": "exact_sha_windows",
+        "category": "integrated_validation",
+        "behavior_area": "C++ native smoke, Windows game and OpenXR host",
+        "expected_behavior": "Changed-area destructive source checks and native 4:3/16:9/21:9 smoke, DX9Ex Active five jobs, Domain Isolation and Full Source Impact pass at one final exact SHA."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "R30GetExactHudEdgeAnchor previously returned empty when any glyph vertex crossed the source viewport. The next valid draw immediately applied near-full peripheral anchor and boost, producing a source-level transform step.",
+    "source_trace": [
+      "Original OutRunHudTextProducer_dest tags caller-gated speed/REV, rank and time attack glyphs and children with OutRunHudPeripheralText.",
+      "R30 GetExactHudEdgeAnchor computes complete source bounds from known used vertices, fails closed while any vertex is beyond the viewport, and formerly returned max peripheral anchor as soon as all were in bounds.",
+      "R30 R30TransformXyzrhwStereo applies the returned X/Y anchors and adaptive boost in paired-eye transforms; new common-source visibility weight interpolates both quantities at the eligibility boundary."
+    ],
+    "root_cause": "The fully-visible check was a discontinuous binary eligibility gate even though the peripheral-position blend itself had a continuous NDC interpolation. A glyph entering viewport could change from neutral transform to full offset in one frame.",
+    "alternatives_rejected": [
+      "F11 overlay and original front-end menu have distinct render producers and do not reach this exact HUD token gate; eye FOV and SkyGlow handling occur later and cannot remove this abrupt source eligibility step."
+    ],
+    "fix_evidence": "Bounded normalized C1 source-inset ramp over each of four boundaries applied to both exact anchor axes and optical boost weight; no new GPU state, depth manipulation or alternate per-eye owner.",
+    "negative_test_evidence": "Portable native C++ smoke tests 4:3/16:9/21:9 rising envelopes and negative inputs. Source verification includes three destructive mutations removing X, Y or boost envelope separately.",
+    "eye_ownership": "Only exact R30 owned ScreenHud/OutRunHudPeripheralText group changes; both eyes share one fully-visible weight and retain existing relative IPD/FOV transforms."
+  },
+  "status": "IMPLEMENTED_PENDING_GATES",
+  "phase": "C4_MATERIAL_COMMITTED",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "No Quest3/VDXR hardware or actual OutRun gameplay test. C++ and GitHub Actions alone cannot prove stereo optical acceptance.",
+  "changed_files": [
+    "src/vr/d3d9/hud_edge_transition.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/hud_edge_transition_smoke.cpp",
+    "tools/verify_vr_hud_edge_transition.py"
+  ],
+  "acceptance_results": {
+    "boundary_continuity": "PENDING",
+    "paired_optical_scale": "PENDING",
+    "negative_fallback": "PENDING",
+    "exact_sha_windows": "PENDING"
+  },
+  "material_result_sha": "868450ca31be70dd2a84d44f8119696764400829",
+  "validation_bearing_result_sha": null,
+  "result_sha": null,
+  "ci_evidence": {
+    "source_material_sha": "868450ca31be70dd2a84d44f8119696764400829",
+    "material_ci_policy": {
+      "run_id": 38589768076,
+      "conclusion": "FAILED_MISSING_RUN_RECORD_CORRECTED_ON_NEXT_SHA"
+    },
+    "other_material_gates": "IN_PROGRESS"
+  },
+  "runtime_claim": "HMD UNTESTED; DO NOT PROMOTE",
+  "score_once": false,
+  "c6_score_delta": 0
+}
