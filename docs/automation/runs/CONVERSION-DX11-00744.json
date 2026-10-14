@@ -54,7 +54,7 @@
     "conflict_keys": [
       "DX11:FULLFRAME_GPU_FENCE_ERROR_QUARANTINE"
     ],
-    "full_gate_plan": "single_validation_bearing_sha",
+    "full_gate_plan": "one_validation_bearing_sha",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",

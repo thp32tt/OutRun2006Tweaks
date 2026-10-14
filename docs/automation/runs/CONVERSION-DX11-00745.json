@@ -1,0 +1,105 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00745",
+  "production_id": "CONVERSION-DX11-00745",
+  "event_id": "CONVERSION-DX11-00745-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULLFRAME_READBACK_MAP_FAILURE_ISOLATION",
+  "feature_id": "DX11-MENU-RACE-READBACK-MAP-PRESENT-SAFETY",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C3_VALIDATE",
+  "base_head_sha": "35cb76be32aa976fd1349a49cdc5e35070f744a0",
+  "material_result_sha": "f3d5f1c8487214d83297e7584fb3ccaf9c724874",
+  "validation_bearing_result_sha": null,
+  "result_sha": "f3d5f1c8487214d83297e7584fb3ccaf9c724874",
+  "automation_validation": "PENDING_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "change_summary": "Fix real menu/car/race full-frame D3D11 staging Map-to-D3D9 Present publication: exact S_OK, valid pixels and stride; quarantine invalid mappings, preserve D3D9 Present/input.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_frame_publication.hpp",
+    "tools/dx11_readback_map_probe_00745.cpp",
+    "tools/test_dx11_readback_map_00745.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "integration_path": [
+      "Live D3D9 Draw/Indexed -> native D3D11 GPU CopyResource and EVENT fence",
+      "Exact Map HRESULT/pointer/pitch admission -> D3D9 full-resolution UpdateSurface",
+      "Invalid Map quarantine through owning D3D9 Reset with game Present/gamepad fallback"
+    ],
+    "batch_components": [
+      "native GPU staging Map and frame publication C++",
+      "D3D9 full-frame desktop upload and gamepad fallback",
+      "C++ constexpr and Python destructive CI tests"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "00745 portable C++ exact-success/pending/invalid Map probe and full-game Map C++ source wiring; DX11 CI pending.",
+      "negative_regression": "00745 destructive source regression rejects unsafe SUCCEEDED(Map), missing quarantine, failure misclassification. Original D3D9 input path unaffected.",
+      "component_integration": "Live menu/car/race D3D9 Draw -> D3D11 render/copy/query/Map -> D3D9 UpdateSurface gated by trusted mapped bytes."
+    },
+    "conflict_keys": [
+      "DX11:FULLFRAME_READBACK_MAP_FAILURE_ISOLATION"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native full-frame mapped output guarded; exact-SHA GitHub build and real Quest3/VDXR view pending.",
+    "activation_guard_and_fallback": "Native output only opt-in. Invalid mapping never overwrites original D3D9 game backbuffer; controller Present survives."
+  },
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-READBACK-MAP-PRESENT-SAFETY",
+    "goal": "Maintain live native D3D11 menu, car-selection and race full-frame D3D9 Present while isolating failed or malformed staging Map outputs and retaining original gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "map-present-trusted-bytes",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_rendering",
+        "expected_behavior": "Only exact Map S_OK with non-null pixel source and sufficient row pitch reaches D3D9 UpdateSurface."
+      },
+      {
+        "id": "map-error-gamepad-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "source_fallback_input_and_transport",
+        "expected_behavior": "Unexpected error/invalid map pointer isolates GPU staging without replacing original D3D9 Present or input."
+      },
+      {
+        "id": "exact-sha-integrated-build",
+        "category": "integrated_validation",
+        "behavior_area": "build_ci_openxr_hud",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector all pass exact validation SHA."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "map-present-trusted-bytes": "PENDING_CI",
+    "map-error-gamepad-fallback": "PENDING_CI",
+    "exact-sha-integrated-build": "PENDING_CI"
+  },
+  "blocking_evidence": "Previously SUCCEEDED(Map) admitted non-S_OK map results without checking pData; unexpected HRESULT released readback slot, risking a null copy, faulty output and repeated allocation reuse.",
+  "ci_evidence": {},
+  "pipeline": {
+    "C0_RECOVER": "PASS: recovered latest GitHub HEAD and no 00745 claim.",
+    "C1_REVIEW": "PASS: identified invalid native Map output acceptance in game Present.",
+    "C2_IMPLEMENT": "PASS: live C++ Map admission/quarantine and targeted new regressions.",
+    "C3_VALIDATE": "PENDING: exact-SHA mandatory CI.",
+    "C4_COMMIT": "PASS material source f3d5f1c8487214d83297e7584fb3ccaf9c724874",
+    "C5_PACKAGE": "NOT_REQUIRED: hardware runtime pending.",
+    "C6_STATE": "PENDING until exact-SHA Gates."
+  },
+  "result_note": "New material code awaits GitHub exact-SHA CI; RUNTIME_VALIDATION=UNTESTED."
+}
