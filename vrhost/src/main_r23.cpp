@@ -2817,7 +2817,10 @@ int main(int argc, char** argv)
                                 const auto& frame = history[i];
                                 if (!frame.frameId ||
                                     frame.state != OutRunVR::StereoSbsActive ||
-                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0)
+                                    (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
+                                    (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
+                                    !frame.reserved[OutRunVR::RenderFrameRunGenerationIndex] ||
+                                    !frame.clientPid)
                                     continue;
                                 if (directRunEpoch.Observe({
                                         frame.reserved[OutRunVR::RenderFrameRunGenerationIndex],
