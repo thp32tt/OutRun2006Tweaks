@@ -125,6 +125,10 @@ def verify(text):
         "memcpy(data, &header, sizeof(DDS_FILE));",
         "sprite_scales[scaleKey] = previousScale;",
         "sprite_scales.erase(scaleKey);",
+        "void commitUnreplacedSuccessfulLoad(const void* selectedData) const",
+        "if (snapshotted && !replacementSelected(selectedData))",
+        "void finishOriginalRetry(HRESULT result) const",
+        "if (snapshotted && SUCCEEDED(result))",
     ]
     for guard in state_guards:
         if strip(guard) not in state_clean:
@@ -135,8 +139,10 @@ def verify(text):
         "D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, ppTexture);"
     )
     gated=(
-        "if (SUCCEEDED(fastResult) || !pDevice || !pSrcData || !SrcDataSize || !ppTexture)"
-        "return fastResult;"
+        "if (SUCCEEDED(fastResult) || !pDevice || !pSrcData || !SrcDataSize || !ppTexture){"
+        "if (SUCCEEDED(fastResult))original.commitUnreplacedSuccessfulLoad(pSrcData);"
+        "else if (original.replacementSelected(pSrcData))original.restoreOriginal();"
+        "return fastResult;}"
     )
     native=(
         "const HRESULT nativeResult = D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>("
@@ -144,14 +150,16 @@ def verify(text):
         "D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);"
     )
     failed=(
-        "if (SUCCEEDED(nativeResult) || !original.replacementSelected(pSrcData))"
-        "return nativeResult;"
+        "if (SUCCEEDED(nativeResult) || !original.replacementSelected(pSrcData)){"
+        "if (SUCCEEDED(nativeResult))original.commitUnreplacedSuccessfulLoad(pSrcData);"
+        "return nativeResult;}"
         "original.restoreOriginal();"
     )
     fallback=(
-        "return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>("
+        "const HRESULT originalResult = D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>("
         "pDevice, original.data, original.bytes, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,"
         "D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);"
+        "original.finishOriginalRetry(originalResult);return originalResult;"
     )
     for name,clean,sequence in (
         ("fast",ui_clean,fast+gated+native+failed+fallback),
@@ -160,8 +168,11 @@ def verify(text):
         if strip("const UiDdsOriginalState original(pSrcData, SrcDataSize);") not in clean:
             raise ValueError(name+" UI path must snapshot original before replacement")
         if not clean.endswith(strip(sequence)):
-            raise ValueError(name+" UI path must restore exact original after native replacement failure")
-    return len(guards) + len(xrgb_checks) + len(state_guards) + 2
+            raise ValueError(name+" UI path must restore original and clear scale only after successful fallback")
+    if "if (snapshotted && SUCCEEDED(result))" not in state:
+        raise ValueError("failed original retry must preserve the previous live scale")
+    return len(guards) + len(xrgb_checks) + len(state_guards) + 4
+
 
 def negatives(text):
     needles=[
@@ -193,6 +204,9 @@ def negatives(text):
         "previousScale = found->second;",
         "memcpy(data, &header, sizeof(DDS_FILE));",
         "sprite_scales.erase(scaleKey);",
+        "original.commitUnreplacedSuccessfulLoad(pSrcData);",
+        "if (snapshotted && SUCCEEDED(result))",
+        "original.finishOriginalRetry(originalResult);",
         "if (SUCCEEDED(nativeResult) || !original.replacementSelected(pSrcData))",
         "original.restoreOriginal();",
         "pDevice, original.data, original.bytes, D3DX_DEFAULT",

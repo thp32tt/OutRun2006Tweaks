@@ -1103,6 +1103,22 @@ class TextureReplacement : public Hook
 			else
 				sprite_scales.erase(scaleKey);
 		}
+
+		// A reloaded xstset slot can still have the scale of an earlier DDS.
+		// Loading the original game sprite must revoke that old ratio.
+		void commitUnreplacedSuccessfulLoad(const void* selectedData) const
+		{
+			if (snapshotted && !replacementSelected(selectedData))
+				sprite_scales.erase(scaleKey);
+		}
+
+		// Preserve the old slot on a failed decode/retry. Only a successful
+		// original-DDS retry retires its previous replacement's scale.
+		void finishOriginalRetry(HRESULT result) const
+		{
+			if (snapshotted && SUCCEEDED(result))
+				sprite_scales.erase(scaleKey);
+		}
 	};
 
 	// Two versions of the func depending on Settings::UseNewTextureAllocator, to reduce branching
@@ -1124,16 +1140,28 @@ class TextureReplacement : public Hook
 			pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,
 			D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, ppTexture);
 		if (SUCCEEDED(fastResult) || !pDevice || !pSrcData || !SrcDataSize || !ppTexture)
+		{
+			if (SUCCEEDED(fastResult))
+				original.commitUnreplacedSuccessfulLoad(pSrcData);
+			else if (original.replacementSelected(pSrcData))
+				original.restoreOriginal();
 			return fastResult;
+		}
 		const HRESULT nativeResult = D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
 			pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,
 			D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);
 		if (SUCCEEDED(nativeResult) || !original.replacementSelected(pSrcData))
+		{
+			if (SUCCEEDED(nativeResult))
+				original.commitUnreplacedSuccessfulLoad(pSrcData);
 			return nativeResult;
+		}
 		original.restoreOriginal();
-		return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
+		const HRESULT originalResult = D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
 			pDevice, original.data, original.bytes, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,
 			D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);
+		original.finishOriginalRetry(originalResult);
+		return originalResult;
 	}
 	static HRESULT __stdcall D3DXCreateTextureFromFileInMemory_Orig_dest(LPDIRECT3DDEVICE9 pDevice, void* pSrcData, UINT SrcDataSize, LPDIRECT3DTEXTURE9* ppTexture)
 	{
@@ -1149,11 +1177,17 @@ class TextureReplacement : public Hook
 			pDevice, pSrcData, SrcDataSize, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,
 			D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);
 		if (SUCCEEDED(nativeResult) || !original.replacementSelected(pSrcData))
+		{
+			if (SUCCEEDED(nativeResult))
+				original.commitUnreplacedSuccessfulLoad(pSrcData);
 			return nativeResult;
+		}
 		original.restoreOriginal();
-		return D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
+		const HRESULT originalResult = D3DXCreateTextureFromFileInMemoryEx.stdcall<HRESULT>(
 			pDevice, original.data, original.bytes, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,
 			D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 1, 3, 0, nullptr, nullptr, ppTexture);
+		original.finishOriginalRetry(originalResult);
+		return originalResult;
 	}
 
 
