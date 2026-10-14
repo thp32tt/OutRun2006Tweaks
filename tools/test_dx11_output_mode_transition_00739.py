@@ -62,7 +62,7 @@ for bad, replacement in (
     # occurrence of the same expression.
     if bad == "s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;":
         offset = SRC.index("void before_game_present(")
-        changed = SRC[:offset] + SRC[offset:].replace(bad, replacement, 1)
+        changed = SRC[:offset] + SRC[offset:].replace(bad, replacement)
     else:
         changed = SRC.replace(bad, replacement, 1)
     assert changed != SRC and not connected(changed), bad
