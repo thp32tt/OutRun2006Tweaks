@@ -121,6 +121,7 @@ on:
       - 'tools/verify_vr_r30_buffer_hook_install_fastpath.py'
       - 'tools/verify_vr_r30_telemetry_counter_optout.py'
       - 'tools/verify_vr_r30_skyglow_fastpath.py'
+      - 'tools/verify_vr_skyglow_capture_boundary.py'
       - 'tools/verify_dx9ex_hotpath_overhead.py'
       - 'tools/verify_dx9ex_gpu_visual_20261014.py'
       - 'tools/verify_vr_r32_runtime_support_seam.py'
@@ -231,6 +232,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex R30 POSITIONT input regression failed' }
           python tools/verify_vr_stage_extension_d3dx_batch_owner.py
           if ($LASTEXITCODE -ne 0) { throw 'DX9Ex +TIME D3DX batch isolation failed' }
+          python tools/verify_vr_skyglow_capture_boundary.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex R26+HUD world/SkyGlow cutoff regression failed' }
       - name: Reject broken shipped PowerShell helpers and false HUD reports
         shell: pwsh
         run: |

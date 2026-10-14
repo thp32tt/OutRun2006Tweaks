@@ -96,6 +96,19 @@ int main()
         exactExit(false, true, true, 2, true, hud,
                   ProducerToken::GoalTime020, hud, stage))
         return 6;
-    std::cout << "DX9Ex stage +TIME direct/queued owner PASS\n";
+    // Source-order regression: the exact C993 sun and other world/scene
+    // effects must stay eligible for SkyGlow before the HUD cutoff, while
+    // both direct +TIME glyphs and generic 2D queue overlays set the cutoff.
+    if (!IsSkyGlowPreHudBoundary(RenderScope::ScreenHud) ||
+        !IsSkyGlowPreHudBoundary(RenderScope::ScreenOverlay2D) ||
+        IsSkyGlowPreHudBoundary(RenderScope::WorldBillboard) ||
+        IsSkyGlowPreHudBoundary(RenderScope::WorldParticle) ||
+        IsSkyGlowPreHudBoundary(RenderScope::SceneEffect) ||
+        IsSkyGlowPreHudBoundary(RenderScope::ProjectedWorldMarker2D) ||
+        IsSkyGlowPreHudBoundary(RenderScope::ProjectedScreenEffect2D) ||
+        IsSkyGlowPreHudBoundary(RenderScope::SkyGlow) ||
+        IsSkyGlowPreHudBoundary(RenderScope::None))
+        return 7;
+    std::cout << "DX9Ex stage +TIME direct/queued owner and SkyGlow UI cutoff PASS\n";
     return 0;
 }

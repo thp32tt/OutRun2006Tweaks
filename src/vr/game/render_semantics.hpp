@@ -283,6 +283,24 @@ namespace OutRunVR::GameSemantic
         return scope == RenderScope::ScreenHud;
     }
 
+    // The stereo SkyGlow source must be captured before a real screen/UI
+    // producer, NOT before an exact world-space sun, marker, or scene effect.
+    // The outer draw hooks and the successful per-eye path must agree on this
+    // boundary; otherwise the lens centre can prematurely freeze both bloom
+    // source eyes and exclude later genuine world lighting from the snapshot.
+    constexpr bool IsSkyGlowPreHudBoundary(RenderScope scope) noexcept
+    {
+        return scope == RenderScope::ScreenHud ||
+            scope == RenderScope::ScreenOverlay2D;
+    }
+    static_assert(IsSkyGlowPreHudBoundary(RenderScope::ScreenHud));
+    static_assert(IsSkyGlowPreHudBoundary(RenderScope::ScreenOverlay2D));
+    static_assert(!IsSkyGlowPreHudBoundary(RenderScope::WorldBillboard));
+    static_assert(!IsSkyGlowPreHudBoundary(RenderScope::SceneEffect));
+    static_assert(!IsSkyGlowPreHudBoundary(RenderScope::ProjectedWorldMarker2D));
+    static_assert(!IsSkyGlowPreHudBoundary(RenderScope::ProjectedScreenEffect2D));
+    static_assert(!IsSkyGlowPreHudBoundary(RenderScope::SkyGlow));
+
     // Canonical OR2006C2C.EXE queue renderer recovered by static reverse analysis:
     //   0x42D734 enters the per-priority SpriteNode walk,
     //   0x42D762 begins one node, and

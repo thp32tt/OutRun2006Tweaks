@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00868",
+  "production_id": "CONVERSION-DX9EX-00868",
+  "event_id": "CONVERSION-DX9EX-00868-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00868",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Keep the complete central C993 sun and surrounding spatial/scene lights in both eyes of the pre-HUD SkyGlow source, and exclude only actual screen HUD and overlay from bloom without altering original flare geometry or shader ownership.",
+    "scope_boundary": "Selected R26+HUD SkyGlow frame snapshot and its exact UI cutoff; preserve central-sun source matrix handling, outer rings, SkyGlow factor/blur, +TIME producer timing, 3D world, FFB, input, DX11, DXVK.",
+    "trace_stages": [
+      "Original D3A5/C993 central lens producer is a scoped WorldBillboard until its source draw completes.",
+      "R26+HUD stereo_renderer_r30_r26_safe.cpp previously unconditionally captured reduced SkyGlow eyes on any R30 FOV draw even when semanticScope was WorldBillboard.",
+      "R30 outer draw and per-eye draw now share exactly the real ScreenHud or ScreenOverlay2D pre-bloom boundary; Present retains previously captured pre-HUD stereo eyes."
+    ],
+    "subcomponents": [
+      "Keep exact central lens/world/scene-effect stereo lights in scene during world eye draws, rather than freezing bloom before their submission.",
+      "Capture clean scene before any direct or queued ScreenHud and ScreenOverlay2D draw even when that draw later delegates to R29, preventing +TIME/F11/HUD brightness bleeding into SkyGlow."
+    ],
+    "acceptance_items": [
+      {
+        "id": "world_lens",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Exact C993 world sun and scene-effect draw order",
+        "expected_behavior": "WorldBillboard/SceneEffect/ProjectedWorldMarker2D never freeze the SkyGlow pre-HUD snapshot when R30 stereo-per-eye draw succeeds."
+      },
+      {
+        "id": "hud_cutoff",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Direct and queued HUD and overlay bloom cutoff",
+        "expected_behavior": "ScreenHud and ScreenOverlay2D always preserve early pre-HUD capture under both outer and owned-eye routes."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Invalid/none/world scope, desktop, SkyGlow disabled and delegated R29 paths",
+        "expected_behavior": "Negative/mutation guards reject false UI ownership and retain original early catch for delegated exact HUD, original capture failures and SkyGlow settings."
+      },
+      {
+        "id": "integration",
+        "category": "integrated_validation",
+        "behavior_area": "Same SHA Windows x86 game, host, package and impacted gate suite",
+        "expected_behavior": "One exact-SHA DX9Ex Active, Domain, Full Source Impact and affected HUD Inspector workflow gate matrix before BUILD_VERIFIED; Quest3 visual approval separately UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "At exact current head, R30BeforeScreenDrawForSkyGlow correctly checks ScreenHud/ScreenOverlay2D; later R30TryScreenSpaceFovDraw unconditionally calls R30CaptureSkyGlowSceneBeforeHud for even exact C993 WorldBillboard. In a world-first presentation that may freeze pre-HUD stereo bloom before the central sun is drawn.",
+    "root_cause": "Owned-eye path used an unconditional pre-HUD SkyGlow snapshot where the outer/delegated draw path already demanded actual UI semantics. The conflicting boundaries cut world lens contributions out of the captured bloom source.",
+    "source_trace": [
+      "D3A5 source -> exact C993 LensFlareCentre -> WorldBillboard semantic selects R26+HUD R30 FOV per-eye Draw.",
+      "R30BeforeScreenDrawForSkyGlow classified only ScreenHud/ScreenOverlay2D, but R30TryScreenSpaceFovDraw captured unconditionally ahead of first world/scene effect.",
+      "Both now share IsSkyGlowPreHudBoundary, leaving world billboards and effects to accumulate until first actual screen UI; SkyGlow Present unchanged."
+    ],
+    "alternatives_rejected": [
+      "Do not promote all alpha world effects into ScreenHud, force lens alpha to zero, globally disable SkyGlow, change time logic, or claim central optical diplopia fixed without HMD."
+    ],
+    "fix_evidence": "R30 selected packaged renderer gates owned-eye capture by same semantic as outer entry; constexpr compiled policy + host runtime negative assertions + four source mutations in exact-SHA active CI.",
+    "negative_test_evidence": "WorldBillboard, SceneEffect, WorldParticle, projected marker/effect, SkyGlow and None all deny UI snapshot; ScreenHud and ScreenOverlay2D allow; four fail-after mutations guard both call paths.",
+    "eye_ownership": "Left and right reduced source surfaces are copied by unchanged R30CaptureSkyGlowSceneBeforeHud; first actual screen producer cuts off both eyes and original world FOV drawing and SkyGlow composite remain unchanged."
+  },
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA",
+  "checkpoint": "C4_MATERIAL_COMMIT",
+  "phase": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "No game or Quest3/VDXR HMD execution; source-proven world/HUD capture boundary only. Original lens center diplopia remains NEED_HMD_TEST.",
+  "source_parent_sha": "be7ee34f2e021928789ecc7ad46d9cabd7014296",
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "vrhost/tests/stage_extension_direct_owner_smoke.cpp",
+    "tools/verify_vr_skyglow_capture_boundary.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00868.json"
+  ],
+  "acceptance_results": {
+    "world_lens": "PENDING_CI",
+    "hud_cutoff": "PENDING_CI",
+    "fallback": "PENDING_CI",
+    "integration": "PENDING_CI"
+  },
+  "score_once": false,
+  "score_delta_this_attempt": 0
+}

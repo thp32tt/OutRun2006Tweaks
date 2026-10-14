@@ -1207,8 +1207,7 @@ namespace OutRunVRStereo
             if (!device || Settings::SkyGlowFactor <= 0 ||
                 !IsGameDevice(device) || InternalStereoPass ||
                 !TargetIsBackBuffer() ||
-                (!OutRunVR::GameSemantic::CorroboratesHud(scope) &&
-                 !OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(scope)) ||
+                !OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(scope) ||
                 R30SkyGlowScreenDrawEpoch == PresentEpoch)
                 return;
 
@@ -4784,10 +4783,13 @@ namespace OutRunVRStereo
             if (FAILED(device->GetViewport(&savedViewport)))
                 return E_NOTIMPL;
 
-            // Capture the completed world eyes before the first recognized HUD
-            // draw. Present then extracts glow from this snapshot, so bright HUD
-            // text/icons are never themselves bloom sources.
-            R30CaptureSkyGlowSceneBeforeHud(device);
+            // The screen's first exact HUD/overlay draw is the bloom cutoff.
+            // The outer hook also guards delegated draws, but this owned-eye
+            // path must NOT snapshot world billboards such as the central sun
+            // or non-HUD SceneEffect; world lighting still belongs to the
+            // scene until an actual screen producer starts.
+            if (OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(semanticScope))
+                R30CaptureSkyGlowSceneBeforeHud(device);
 
             // From this point the draw is owned by R30. The steady-state frame
             // intentionally has no complete independent mono history.
