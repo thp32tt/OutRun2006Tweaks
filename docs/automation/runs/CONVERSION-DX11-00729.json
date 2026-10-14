@@ -41,16 +41,17 @@
       "DX11:FAILED_CLEAR_FRAME_CONTINUITY",
       "src/vr/d3d9/stereo_renderer.cpp"
     ],
-    "full_gate_plan": "one_validation_bearing_sha"
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Source/CI only; Quest3 game output and controller response not tested",
+    "activation_guard_and_fallback": "DX11 full rendering remains opt-in, original D3D9 Draw/Present/input authoritative; failed/no-op Clear preserves last successful DX11 scene",
+    "blocking_evidence": "Confirmed at 0939fad parent: src/vr/d3d9/stereo_renderer.cpp ClearDestR9 previously called observe_scene_boundary before invoking original Clear; a failed HRESULT therefore set GameNativeFrameBatch::stopped and pending=false before same-Present full-resolution Draw publication, despite D3D9 state remaining unchanged. 00729 fixes the actual hook and the negative/positive source mutations check successful/failed HRESULT and three D3D9 Clear paths."
   },
-  "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
-  "live_game_draw_path": [
-    "LIVE_D3D9_CALLSITE",
-    "D3D11_NATIVE_DRAW",
-    "VISIBLE_FRAME_OUTPUT"
-  ],
-  "visible_frame_acceptance": "Source/CI only; Quest3 game output and controller response not tested",
-  "activation_guard_and_fallback": "DX11 full rendering remains opt-in, original D3D9 Draw/Present/input authoritative; failed/no-op Clear preserves last successful DX11 scene",
   "feature_contract": {
     "feature_id": "DX11-NATIVE-FAILED-CLEAR-FRAME-INTEGRITY",
     "goal": "Keep an intact menu/vehicle/race native game frame when original D3D9 Clear fails, and restart correctly only after successful full Clear, preserving DX9Ex/gamepad fallback.",
