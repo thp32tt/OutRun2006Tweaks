@@ -25,6 +25,10 @@ namespace outrun::vr::dx11
         Microsoft::WRL::ComPtr<ID3D11Query> producer_fence;
         HANDLE shared_handle[2]{};
         std::uint64_t frame_id{};
+        // Once the producer schedules native GPU eye copies, the allocation
+        // cannot be cancelled as a CPU-only reservation until its EVENT fence
+        // completes, even if fence arming later fails.
+        bool gpu_copy_queued{};
         SharedEyeSlotState state{SharedEyeSlotState::Free};
     };
 

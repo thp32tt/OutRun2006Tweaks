@@ -191,6 +191,7 @@ namespace outrun::vr::dx11
         SharedEyeSlot& slot) noexcept
     {
         slot.frame_id = 0;
+        slot.gpu_copy_queued = false;
         slot.state = SharedEyeSlotState::Free;
     }
 
@@ -297,8 +298,8 @@ namespace outrun::vr::dx11
             return false;
         auto& entry = slots_[slot];
         if (entry.state != SharedEyeSlotState::Acquired ||
-            entry.frame_id != frame_id ||
-            frame_id == 0)
+            entry.frame_id != frame_id || frame_id == 0 ||
+            !native_game_eye_copy_cancelable(entry.gpu_copy_queued))
             return false;
 
         reset_slot_lifetime(entry);
@@ -322,7 +323,7 @@ namespace outrun::vr::dx11
         auto& entry = slots_[slot];
         if (entry.state != SharedEyeSlotState::Acquired ||
             entry.frame_id != frame_id || !entry.producer_fence ||
-            !entry.eye[0] || !entry.eye[1])
+            entry.gpu_copy_queued || !entry.eye[0] || !entry.eye[1])
             return false;
 
         const auto exact_source = [&](ID3D11Texture2D* source,
@@ -401,8 +402,10 @@ namespace outrun::vr::dx11
                 reinterpret_cast<std::uintptr_t>(rightIdentity.Get()),
                 owned))
             return false;
-        // All rejection paths precede both GPU commands. The acquired slot
-        // remains cancelable and original D3D9 rendering/input is untouched.
+        // All rejection paths precede both GPU commands. After this point
+        // a failed fence arm must quarantine, not cancel/reissue, the slot:
+        // the D3D11 command stream may still write either shared eye.
+        entry.gpu_copy_queued = true;
         if (transfer == NativeGameEyeTransfer::Resolve) {
             context->ResolveSubresource(entry.eye[0].Get(), 0u, left_source, 0u, format_);
             context->ResolveSubresource(entry.eye[1].Get(), 0u, right_source, 0u, format_);
@@ -410,7 +413,14 @@ namespace outrun::vr::dx11
             context->CopyResource(entry.eye[0].Get(), left_source);
             context->CopyResource(entry.eye[1].Get(), right_source);
         }
-        return signal_producer_fence(context, slot, frame_id);
+        if (!signal_producer_fence(context, slot, frame_id)) {
+            // GPU copies/resolves have already been recorded; a failed
+            // fence arm cannot prove they finished. Quarantine this ring
+            // until shutdown retires the shared allocations.
+            synchronization_faulted_ = true;
+            return false;
+        }
+        return true;
     }
 
     bool NativeSharedEyeRing::signal_producer_fence(

@@ -20,6 +20,11 @@ namespace outrun::vr::dx11 {
 // mismatched eye sample modes and missing format resolve support before any
 // GPU commands, leaving the acquired slot and original D3D9 frame intact.
 enum class NativeGameEyeTransfer : std::uint8_t { Reject, Copy, Resolve };
+// A slot with either eye GPU write already enqueued is not safely cancelable.
+// This preserves original DX9Ex rendering and avoids aliasing late OpenXR eyes.
+[[nodiscard]] constexpr bool native_game_eye_copy_cancelable(bool copyQueued) noexcept {
+    return !copyQueued;
+}
 [[nodiscard]] constexpr NativeGameEyeTransfer native_game_eye_transfer(
     std::uint32_t leftSamples, std::uint32_t leftQuality,
     std::uint32_t rightSamples, std::uint32_t rightQuality,
