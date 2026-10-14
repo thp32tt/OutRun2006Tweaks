@@ -113,6 +113,7 @@ jobs:
           python tools/test_dx11_eye_pair_sources_00690.py
           python tools/test_dx11_eye_copy_lifetime_00721.py
           python tools/test_dx11_game_rt_16bit_00692.py
+          python tools/test_dx11_game_rt_mips_00742.py
           python tools/test_dx11_game_float_vector_00693.py
           python tools/test_dx11_game_dynamic_texture_00694.py
           python tools/test_dx11_eye_msaa_resolve_00695.py
