@@ -86,7 +86,9 @@ def check(code: str, header: str) -> list[str]:
          "vtable[12] && vtable[13]" in hook,
          "batch hook installation must include both reset edges")
     direct_begin = hook.find("static void BeforeDirectStageSource() noexcept")
-    direct_end = hook.find("static void BeforeQueueNode(", direct_begin)
+    # The new exit hook also uses PendingScope/PendingProducer. Keep the
+    # OLD entry admission check bounded to its own function, not both hooks.
+    direct_end = hook.find("static void AfterDirectStageSource() noexcept", direct_begin)
     direct_stage = hook[direct_begin:direct_end] if 0 <= direct_begin < direct_end else ""
     # Match the exact direct producer boundary, not the separate queued path.
     # A global PendingScope/Producer substring can accidentally survive when
