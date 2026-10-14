@@ -309,7 +309,8 @@ def check(ui, manifest):
             # The rank sprani wrapper passes one frozen marker pointer through
             # the local 'marker' alias to both synchronous and deferred draws.
             if ("marker = projected ? &projectedAnchor : nullptr;" not in chunk or
-                    "scope, marker);" not in chunk or
+                    "scope, marker, Settings::VREnabled," not in chunk or
+                    "ProducerToken::RankMarkerSprani);" not in chunk or
                     "ProducerToken::RankMarkerSprani, marker)" not in chunk):
                 fail("rank immediate draw and queued siblings must share frozen anchor")
             if "TagAppendedNodes(tailsBefore, scope," not in chunk:
@@ -325,8 +326,8 @@ def check(ui, manifest):
                     "Game::put_clip_sprite(", "TagAppendedNodes(tailsBefore, scope,")
             if chunk.count("&projectedAnchor") < 2:
                 fail("rank clip direct and sibling anchors must remain identical")
-            if "node->args_10.float24 += RankMarkerFracX" not in chunk or (
-                "node->args_10.float28 += RankMarkerFracY" not in chunk):
+            if "node->args_10.float24 += frozenFractionX" not in chunk or (
+                "node->args_10.float28 += frozenFractionY" not in chunk):
                 fail("4th+ digit siblings lost subpixel restoration")
         if "ProducerToken::" + token not in chunk:
             fail(func + " producer identity missing")
@@ -388,8 +389,8 @@ def test_mutations(ui, manifest):
               ui.replace("const bool projected = !screenHud && projectedAnchor.valid;",
                          "const bool projected = !screenHud && RankMarkerProjectedInfo.valid;", 1))
     must_fail("rival exact source-time semantic removed",
-              ui.replace("ScopedExactProducerSemantic producerScope(\n\t\t\t\tscope, projected ? &projectedAnchor : nullptr);",
-                         "ScopedRenderSemantic producerScope(\n\t\t\t\tscope);", 1))
+              ui.replace("ScopedExactProducerSemantic producerScope(\n                scope, projected ? &projectedAnchor : nullptr,\n                Settings::VREnabled,\n                OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani);",
+                         "ScopedRenderSemantic producerScope(\n                scope);", 1))
     must_fail("R64 DispRank source accidentally shares TimeAttack owner",
               ui.replace("IsExactDispRankRightClipRva(addr)",
                          "false", 1))
