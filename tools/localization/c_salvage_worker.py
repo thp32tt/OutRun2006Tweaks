@@ -220,6 +220,7 @@ def run_once(args):
     root = Path(args.input_root).resolve()
     out = Path(args.output_root).resolve()
     repo_root = Path(args.repo_root).resolve() if args.repo_root else None
+    bundle_root = Path(args.bundle_root).resolve() if getattr(args, 'bundle_root', None) else root
     catalog = inspect_psd_catalog(
         repo_root / "localization/graphics/plate_library/PSD_UPSTREAM_FULL_INDEX.json"
         if repo_root else None)
@@ -249,7 +250,7 @@ def run_once(args):
         if recipe_dir.is_dir():
             for manifest in sorted(recipe_dir.glob("*.json")):
                 if added >= args.max_per_cycle: break
-                status, changed = handle_recipe(manifest, root, out)
+                status, changed = handle_recipe(manifest, bundle_root, out)
                 if status not in ("ALREADY_COMPOSED", "ALREADY_HELD"):
                     counts[status] = counts.get(status, 0) + 1
                 added += int(changed)
@@ -273,6 +274,7 @@ def main():
     p.add_argument("--output-root", required=True)
     p.add_argument("--repo-root", default=None)
     p.add_argument("--recipes-dir", default=None)
+    p.add_argument("--bundle-root", default=None, help="Optional isolated reviewed source/DDS/PSD/CLEAN bundle; never A/B live data")
     p.add_argument("--masks-dir", default=None)
     p.add_argument("--max-per-cycle", type=int, default=10)
     p.add_argument("--interval-seconds", type=int, default=1800)
