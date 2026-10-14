@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "feature_id": "GAME_STAGE1_TRIADIC_RGB_ALPHA_MENU_RACE",
   "work_key": "DX11:GAME_STAGE1_THREE_OPERAND",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -77,9 +77,9 @@
     ]
   },
   "acceptance_results": {
-    "live-three-operand-rgb-alpha": "PENDING_GATES",
-    "failed-source-fallback": "PENDING_GATES",
-    "same-sha-build-regression": "PENDING_GATES"
+    "live-three-operand-rgb-alpha": "PASS",
+    "failed-source-fallback": "PASS",
+    "same-sha-build-regression": "PASS"
   },
   "base_head_sha": "3dd4a14373aec9ad0b08c50944edbf15e31c4ba3",
   "changed_files": [
@@ -91,13 +91,42 @@
     "docs/automation/runs/CONVERSION-DX11-00705.json"
   ],
   "pipeline": {
-    "C0_RECOVER": "DONE 00704 complete and no task 00705 branch state",
-    "C1_REVIEW": "DONE three-input stage1 missing from supported_game_state/HLSL",
-    "C2_IMPLEMENT": "DONE RGB/independent alpha ARG0 capture and GPU shader and portable probes",
-    "C3_VALIDATE": "PENDING exact-SHA gates",
-    "C4_COMMIT": "PENDING publish",
+    "C0_RECOVER": "DONE previous 00704 complete, exact base HEAD 3dd4a14373aec9ad0b08c50944edbf15e31c4ba3",
+    "C1_REVIEW": "DONE missing D3D9 three-input Stage1 COLORARG0/ALPHAARG0 producer/consumer supported path",
+    "C2_IMPLEMENT": "DONE real RGB and independent alpha MULTIPLYADD/LERP, b1 GPU CB, Draw/DrawIndexed, fail-closed and 3456-case regression",
+    "C3_VALIDATE": "PASS_EXACT_SHA Fast 38493704073; Backend 38493704146; Win32 38493710003; OpenXR 38493710006; HUD 38493710000 all SUCCESS. Quest3/VDXR and gamepad UNTESTED",
+    "C4_COMMIT": "PASS material 7d1c212e2b02f8a97b3ecce9f2f83d0510dce7a2 without CI-skip; 5/5 exact-SHA Gates",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED exact-SHA 5/5, separate [skip ci] bookkeeping, HMD/gamepad UNTESTED"
   },
-  "next_action": "Verify exact-SHA Fast, Backend, Windows build, OpenXR, HUD inspector. Quest3 VDXR and gamepad UNTESTED."
+  "next_action": "Feature BUILD_VERIFIED. Controller select next disjoint DX11 native gameplay feature; do not re-score/retry 00705. Quest3/VDXR menu/race and gamepad NEED_HMD_TEST.",
+  "material_result_sha": "7d1c212e2b02f8a97b3ecce9f2f83d0510dce7a2",
+  "validation_bearing_result_sha": "7d1c212e2b02f8a97b3ecce9f2f83d0510dce7a2",
+  "state_persisted": true,
+  "gate_evidence": {
+    "validation_bearing_sha": "7d1c212e2b02f8a97b3ecce9f2f83d0510dce7a2",
+    "exact_sha": true,
+    "dx11_fast_structural_checks": {
+      "id": 38493704073,
+      "conclusion": "SUCCESS"
+    },
+    "backend_conversion_gate": {
+      "id": 38493704146,
+      "conclusion": "SUCCESS"
+    },
+    "windows_build": {
+      "id": 38493710003,
+      "conclusion": "SUCCESS"
+    },
+    "openxr_architecture": {
+      "id": 38493710006,
+      "conclusion": "SUCCESS"
+    },
+    "outrun_hud_inspector": {
+      "id": 38493710000,
+      "conclusion": "SUCCESS"
+    },
+    "quest3_vdxr": "UNTESTED",
+    "gamepad_live": "UNTESTED"
+  }
 }
