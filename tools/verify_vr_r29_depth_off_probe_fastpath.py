@@ -30,7 +30,13 @@ def contract(s: str) -> bool:
     guard = body(s, "HRESULT R29GuardStableDraw(")
     direct = body(s, "HRESULT R29DirectTwoEye(")
     needle = "const bool r27DepthCandidate =\n                R29Effect.zEnable != D3DZB_FALSE;"
-    first = """if (r27DepthCandidate)
+    # Pin the *whole* positive world branch, not only its inner probe.
+    # A missing find() returns -1 and incorrectly passes an ordering check.
+    # Requiring this exact chain prevents that false-positive regression.
+    first = """else if (OutRunVR::GameSemantic::CorroboratesWorld(semanticScope))
+            {
+                worldGateChecked = true;
+                if (r27DepthCandidate)
                 {
                     if (R27ShouldBypassLegacyZeroDisparity(device))"""
     second = """if (fragile && !forceZeroDisparity && !worldGateChecked &&
@@ -46,7 +52,9 @@ def contract(s: str) -> bool:
         first in guard,
         second in guard,
         guard.count("R27ShouldBypassLegacyZeroDisparity(device)") == 2,
-        guard.find("worldGateChecked = true;") < guard.find(first),
+        # Both probes must be present before their ordering can be trusted.
+        # The previous -1 < position test let a missing worldGateChecked pass.
+        first in guard and second in guard and guard.find(first) < guard.find(second),
         "OutRunVR::GameSemantic::ForceZeroDisparity(semanticScope)" in guard,
         "if (forceZeroDisparity)" in guard,
         "return legacyR13Draw();" in guard,
@@ -87,6 +95,7 @@ mutations = [
     ("allow unconditional scope probe", "if (r27DepthCandidate)", "if (true)"),
     ("remove forced-zero veto", "fragile && !forceZeroDisparity && !worldGateChecked", "fragile && !worldGateChecked"),
     ("remove positive world guard", "worldGateChecked = true;", "worldGateChecked = false;"),
+    ("remove semantic world proof", "else if (OutRunVR::GameSemantic::CorroboratesWorld(semanticScope))", "else if (true)"),
     ("remove generation-certified snapshot", "if (!R29FragileEffectCached(device, fragile))", "if (false)"),
     ("remove safe legacy fallback", "return legacyR13Draw();", "return D3D_OK;"),
     ("remove depth snapshot", "R29Effect.zEnable != D3DZB_FALSE;", "true;"),
