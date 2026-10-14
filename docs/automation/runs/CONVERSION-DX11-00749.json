@@ -85,9 +85,9 @@
     ]
   },
   "acceptance_results": {
-    "partitioned-full-frame-publish": "SOURCE_IMPLEMENTED_PENDING_CI",
-    "partial-overlap-fallback": "SOURCE_IMPLEMENTED_PENDING_CI",
-    "same-sha-integrated-gates": "PENDING_EXACT_SHA"
+    "partitioned-full-frame-publish": "PASS",
+    "partial-overlap-fallback": "PASS",
+    "same-sha-integrated-gates": "PASS_EXACT_SHA"
   },
   "pipeline": {
     "C0_RECOVER": "PASS branch 21750d512a69cad3404670d170b395c409aa1cc8, 00748 C6 verified, 00749 absent",
@@ -140,5 +140,6 @@
       }
     }
   },
-  "c6_prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
+  "c6_prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "c6_acceptance_reconciliation": "2026-10-15: reconcile stale pre-C6 pending acceptance_results to the previously recorded same-SHA 5/5 SUCCESS and passing source/fallback regressions; no new score, no new validation SHA."
 }
