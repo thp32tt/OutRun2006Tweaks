@@ -147,8 +147,23 @@ right_clip = function_body(uiscale, "static int __cdecl ExactScreenHudRight_putC
 if "AddSpriteSpacing(&x, false);" not in right_clip or "ExactScreenHud_putClipSprite(" not in right_clip:
     fail("right-side exact HUD wrapper must preserve spacing then register ScreenHud")
 left_clip = function_body(uiscale, "static int __cdecl ExactScreenHudLeft_putClipSprite(")
-if "AddSpriteSpacing(&x, true);" not in left_clip or "ExactScreenHud_putClipSprite(" not in left_clip:
-    fail("left-side exact HUD wrapper must preserve spacing then register ScreenHud")
+# Unlike generic right-side HUD, the two exact left gear/REV CALLs now
+# record a dedicated append-only producer ID for the opt-in GAME edge layout.
+# Retain original spacing, exactly one engine call, bounded all-node tags,
+# and ScreenHud scope; never allow GOAL/ESC or generic clip ownership here.
+for marker in (
+    "AddSpriteSpacing(&x, true);",
+    "std::array<SpriteNode*, Game::SpritePriorityCount> before{}",
+    "const int result = Game::put_clip_sprite(",
+    "TagAppendedNodes(before,",
+    "RenderScope::ScreenHud",
+    "ProducerToken::DispGearRevClipSprite",
+    "return result;",
+):
+    if marker not in left_clip:
+        fail("left gear/REV exact HUD producer missing " + marker)
+if left_clip.count("Game::put_clip_sprite(") != 1 or "return ExactScreenHud_putClipSprite(" in left_clip:
+    fail("left gear/REV must retain one original game sprite emission")
 
 apply_body = function_body(uiscale, "bool apply() override")
 for marker in (
