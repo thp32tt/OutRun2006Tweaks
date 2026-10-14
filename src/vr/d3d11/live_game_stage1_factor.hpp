@@ -54,6 +54,8 @@ constexpr std::uint32_t kStage1Factor = 3u;
 constexpr std::uint32_t kStage1Specular = 4u;
 // Stage-local constant is independent of D3DRS_TEXTUREFACTOR.
 constexpr std::uint32_t kStage1Constant = 6u;
+// D3DTA_TEMP is valid only after stage0 RESULTARG=TEMP writes it.
+constexpr std::uint32_t kStage1Temp = 5u;
 constexpr std::uint32_t kStage1ArgMask = 0x0fu;
 constexpr std::uint32_t kStage1Complement = 0x10u;
 constexpr std::uint32_t kStage1AlphaReplicate = 0x20u;
@@ -227,4 +229,55 @@ static_assert(stage1_alpha_supported(
 static_assert(!stage1_combiner_supported(kStage1Modulate, kStage1Current, 0x15u));
 static_assert(!stage1_combiner_supported(kStage1Modulate, kStage1Current, 0x43u));
 static_assert(!stage1_combiner_supported(kStage1SelectArg1, 0x12u, kStage1Factor));
+// The existing admission still rejects TEMP without a producing stage0.
+// For a producing stage0, retain the same exact operand-bit allowlist.
+constexpr bool stage1_operand_supported_with_temp(std::uint32_t arg,
+                                                   bool producerTemp) noexcept {
+    const auto allowed = kStage1ArgMask | kStage1Complement | kStage1AlphaReplicate;
+    return stage1_operand_supported(arg) ||
+        (producerTemp && (arg & ~allowed) == 0u &&
+         (arg & kStage1ArgMask) == kStage1Temp);
+}
+constexpr bool stage1_combiner_supported_with_temp(std::uint32_t op,
+    std::uint32_t a, std::uint32_t b, bool producerTemp) noexcept {
+    if (stage1_combiner_supported(op,a,b)) return true;
+    if (!producerTemp) return false;
+    if (op == kStage1SelectArg1) return stage1_operand_supported_with_temp(a,true);
+    if (op == kStage1SelectArg2) return stage1_operand_supported_with_temp(b,true);
+    return (op == kStage1Modulate || op == kStage1Modulate2X ||
+            op == kStage1Modulate4X || op == kStage1Add ||
+            op == kStage1AddSigned || op == kStage1AddSigned2X ||
+            op == kStage1Subtract || op == kStage1AddSmooth ||
+            stage1_alpha_blend_operation(op) ||
+            stage1_cross_channel_color_operation(op)) &&
+            stage1_operand_supported_with_temp(a,true) &&
+            stage1_operand_supported_with_temp(b,true);
+}
+constexpr bool stage1_alpha_supported_with_temp(std::uint32_t op,
+    std::uint32_t a, std::uint32_t b, bool producerTemp) noexcept {
+    return stage1_alpha_supported(op,a,b) ||
+        (producerTemp && !stage1_cross_channel_color_operation(op) &&
+         stage1_combiner_supported_with_temp(op,a,b,true));
+}
+constexpr bool stage1_three_source_supported_with_temp(std::uint32_t op,
+    std::uint32_t a0, std::uint32_t a1, std::uint32_t a2,
+    bool producerTemp) noexcept {
+    return stage1_three_source_operation(op) &&
+        stage1_operand_supported_with_temp(a0,producerTemp) &&
+        stage1_operand_supported_with_temp(a1,producerTemp) &&
+        stage1_operand_supported_with_temp(a2,producerTemp);
+}
+static_assert(!stage1_operand_supported(kStage1Temp));
+static_assert(!stage1_operand_supported_with_temp(kStage1Temp,false));
+static_assert(stage1_operand_supported_with_temp(
+    kStage1Temp|kStage1Complement|kStage1AlphaReplicate,true));
+static_assert(!stage1_operand_supported_with_temp(0x45u,true));
+static_assert(stage1_combiner_supported_with_temp(
+    kStage1Modulate,kStage1Temp,kStage1Current,true));
+static_assert(!stage1_combiner_supported_with_temp(
+    kStage1Modulate,kStage1Temp,kStage1Current,false));
+static_assert(stage1_three_source_supported_with_temp(
+    kStage1Lerp,kStage1Temp,kStage1Factor,kStage1Diffuse,true));
+static_assert(!stage1_alpha_supported_with_temp(
+    kStage1ModulateAlphaAddColor,kStage1Temp,kStage1Factor,true));
 } // namespace outrun::vr::dx11::live_game_frame

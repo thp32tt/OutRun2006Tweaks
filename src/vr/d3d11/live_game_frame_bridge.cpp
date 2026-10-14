@@ -811,6 +811,7 @@ struct NativeVertex {
 struct TextureCapture {
     bool enabled = false;
     bool stage1Enabled = false;
+    bool stage0ResultTemp = false; // RESULTARG=TEMP, CURRENT remains vertex DIFFUSE.
     bool stage0FullModulate = false;
     DWORD stage1ColorOp = D3DTOP_DISABLE;
     DWORD stage1AlphaOp = D3DTOP_DISABLE;
@@ -1188,6 +1189,10 @@ float4 Stage1Source(float4 current, float4 diffuse, float4 specular, int source)
     if ((source & 15) == 0) value = diffuse;
     if ((source & 15) == 4) value = specular;
     if ((source & 15) == 6) value = stage1Constant;
+    // Stage0 TEMP producer keeps CURRENT at the incoming DIFFUSE.
+    // Stage1 TEMP sees the separately produced stage0 result.
+    if ((source & 15) == 1 && stage1Ops.z != 0) value = diffuse;
+    if ((source & 15) == 5) value = current;
     if ((source & 32) != 0) value = value.aaaa;
     if ((source & 16) != 0) value = 1.0f - value;
     return value;
@@ -1196,6 +1201,7 @@ float Stage1BlendWeight(int op, float4 stage0, float4 diffuse) {
     // D3DTOP_BLEND*: ARG1 * weight + ARG2 * (1 - weight).
     if (op == 12) return diffuse.a;       // BLENDDIFFUSEALPHA
     if (op == 14) return stage1Factor.a;  // BLENDFACTORALPHA
+    if (stage1Ops.z != 0) return diffuse.a; // CURRENT from vertex after TEMP write.
     return stage0.a;                      // 16: BLENDCURRENTALPHA; CPU-gated
 }
 float4 Stage1Combine(float4 a, float4 b, int op, float4 stage0, float4 diffuse) {
@@ -1237,7 +1243,8 @@ float4 Stage1AndAlpha(float4 stage0, float4 diffuse, float4 specular) {
     if (stage1Ops.x == 25 || stage1Ops.x == 26)
         color = Stage1ThreeSource(stage0, diffuse, specular, stage1Ops.x,
                                   stage1ArgZero.x, stage1Args.x, stage1Args.y);
-    float alpha = stage1Ops.y == 1 ? stage0.a : Stage1Combine(
+    float alpha = stage1Ops.y == 1 ?
+        (stage1Ops.z != 0 ? diffuse.a : stage0.a) : Stage1Combine(
         Stage1Source(stage0, diffuse, specular, stage1Args.z),
         Stage1Source(stage0, diffuse, specular, stage1Args.w), stage1Ops.y, stage0, diffuse).a;
     if (stage1Ops.y == 25 || stage1Ops.y == 26)
@@ -2197,7 +2204,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG1, &arg)) ||
         FAILED(game->GetTextureStageState(1, D3DTSS_COLOROP, &nextColorOp)) ||
         FAILED(game->GetTextureStageState(0, D3DTSS_RESULTARG, &resultArg)) ||
-        resultArg != D3DTA_CURRENT)
+        (resultArg != D3DTA_CURRENT &&
+         !(resultArg == D3DTA_TEMP && nextColorOp != D3DTOP_DISABLE && layout.hasDiffuse)))
         return false;
     // The native PS writes the stage-0 result directly to the frame.
     // D3DTA_TEMP would leave CURRENT unchanged, so this diagnostic must
@@ -2957,6 +2965,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         DWORD color0=~0u, alpha0=~0u;
         DWORD stage1Result=~0u, stage2Op=~0u, factor=0u;
         DWORD stageConstant=0u;
+        const bool stage0WritesTemp = resultArg == D3DTA_TEMP;
+        // Only a captured textured producer is allowed to supply TEMP.
+        if (stage0WritesTemp && !capture.enabled) return false;
         // ARG0 is required only for the actual three-operand instructions.
         // A failed D3D9 state query must not turn into a guessed zero.
         if (stage1_three_source_operation(nextColorOp) &&
@@ -2977,11 +2988,15 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             FAILED(game->GetRenderState(D3DRS_TEXTUREFACTOR, &factor)) ||
             stage1Result != D3DTA_CURRENT || stage2Op != D3DTOP_DISABLE ||
             (stage1_three_source_operation(nextColorOp)
-                 ? !stage1_three_source_supported(nextColorOp, color0, color1, color2)
-                 : !stage1_combiner_supported(nextColorOp, color1, color2)) ||
+                 ? (!stage1_three_source_supported(nextColorOp, color0, color1, color2) &&
+                    !stage1_three_source_supported_with_temp(nextColorOp, color0, color1, color2, stage0WritesTemp))
+                 : (!stage1_combiner_supported(nextColorOp, color1, color2) &&
+                    !stage1_combiner_supported_with_temp(nextColorOp, color1, color2, stage0WritesTemp))) ||
             (stage1_three_source_operation(alphaOp)
-                 ? !stage1_three_source_supported(alphaOp, alpha0, alpha1, alpha2)
-                 : !stage1_alpha_supported(alphaOp, alpha1, alpha2)) ||
+                 ? (!stage1_three_source_supported(alphaOp, alpha0, alpha1, alpha2) &&
+                    !stage1_three_source_supported_with_temp(alphaOp, alpha0, alpha1, alpha2, stage0WritesTemp))
+                 : (!stage1_alpha_supported(alphaOp, alpha1, alpha2) &&
+                    !stage1_alpha_supported_with_temp(alphaOp, alpha1, alpha2, stage0WritesTemp))) ||
             (!layout.hasDiffuse &&
              (stage1_operation_reads_diffuse(nextColorOp, color1, color2) ||
               stage1_operation_reads_diffuse(alphaOp, alpha1, alpha2) ||
@@ -3006,6 +3021,7 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
             FAILED(game->GetTextureStageState(1,D3DTSS_CONSTANT,&stageConstant)))
             return false;
         capture.stage1Enabled = true;
+        capture.stage0ResultTemp = stage0WritesTemp;
         capture.stage1ColorOp = nextColorOp;
         capture.stage1AlphaOp = alphaOp;
         capture.stage1Args = {color1, color2, alpha1, alpha2};
@@ -3632,6 +3648,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                   payload.stageConstant);
         payload.operations[0] = static_cast<std::int32_t>(capture.stage1ColorOp);
         payload.operations[1] = static_cast<std::int32_t>(capture.stage1AlphaOp);
+        payload.operations[2] = capture.stage0ResultTemp ? 1 : 0; // shader CURRENT/TEMP route.
         for (std::size_t i = 0; i < 4; ++i)
             payload.arguments[i] = static_cast<std::int32_t>(capture.stage1Args[i]);
         for (std::size_t i = 0; i < 2; ++i)

@@ -119,12 +119,14 @@ jobs:
           python tools/test_dx11_stage1_triop_00705.py
           python tools/test_dx11_stage1_specular_00706.py
           python tools/test_dx11_stage1_constant_00707.py
+          python tools/test_dx11_stage1_temp_00708.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_blend_probe_00702.cpp -o /tmp/dx11_stage1_blend_00702 && /tmp/dx11_stage1_blend_00702
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_signed_probe_00703.cpp -o /tmp/dx11_stage1_signed_00703 && /tmp/dx11_stage1_signed_00703
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_cross_channel_probe_00704.cpp -o /tmp/dx11_stage1_cross_00704 && /tmp/dx11_stage1_cross_00704
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_triop_probe_00705.cpp -o /tmp/dx11_stage1_triop_00705 && /tmp/dx11_stage1_triop_00705
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_specular_probe_00706.cpp -o /tmp/dx11_stage1_specular_00706 && /tmp/dx11_stage1_specular_00706
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_constant_probe_00707.cpp -o /tmp/dx11_stage1_constant_00707 && /tmp/dx11_stage1_constant_00707
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_temp_probe_00708.cpp -o /tmp/dx11_stage1_temp_00708 && /tmp/dx11_stage1_temp_00708
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_factor_probe.cpp -o /tmp/dx11_stage1_00673 && /tmp/dx11_stage1_00673
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rgb332_probe.cpp -o /tmp/dx11_rgb332_00667 && /tmp/dx11_rgb332_00667
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_p8_probe.cpp -o /tmp/dx11_p8_00668 && /tmp/dx11_p8_00668
