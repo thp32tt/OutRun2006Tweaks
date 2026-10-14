@@ -90,8 +90,19 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "game->UpdateSurface(" in code and
             "s.insetFormat != bb.Format" in code,
             "native frame must reach checked nonblocking desktop output")
-    require("void before_game_reset()" in code and "s.backend.shutdown();" in code,
-            "reset must invalidate native device owner")
+    # A foreign menu/video Reset must not dispose the game-owned full-frame
+    # Draw/DrawIndexed scene, while an owning Reset must still release its GPU.
+    reset = code.partition("void before_game_reset(IDirect3DDevice9* game) noexcept {")[2]
+    gate = reset.find("if (!GameNativeFrameBatch::reset_belongs_to_game_source(")
+    teardown = reset.find("s.pending = false;")
+    shutdown = reset.find("s.backend.shutdown();")
+    require(reset and 0 <= gate < teardown < shutdown and
+            "s.previousOutput.valid() ? s.previousOutput.device : 0u" in
+                reset[gate:teardown] and
+            "return;" in reset[gate:teardown] and
+            "s.frameBatch.reset();" in reset[teardown:shutdown] and
+            "void before_game_reset(IDirect3DDevice9* gameDevice) noexcept;" in header,
+            "device-owned Reset must preserve auxiliary scene and retire owned GPU")
     require("ctx->IASetVertexBuffers" in code and
             "ctx->IASetInputLayout" in code and
             "ctx->VSSetShader" in code and
@@ -114,7 +125,11 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(" in caller and
             "R30DrawIndexedPrimitiveUPR29Hook.stdcall<HRESULT>(" in caller,
             "DX9Ex fallback must retain the established D3D9 caller")
-    require("before_game_reset();" in caller and
+    reset_hook = caller.partition("HRESULT __stdcall ResetDestR30(")[2]
+    require(reset_hook and
+            "live_game_frame::before_game_reset(device);" in
+                reset_hook.partition("return R30Reset")[0] and
+            "live_game_frame::before_game_reset();" not in reset_hook and
             "before_game_present(device, sourceRect, dirtyRegion);" in caller and
             "const RECT* sourceRect, const RGNDATA* dirtyRegion" in header and
             "const auto insetPlacement = presentRegion.inset_placement(" in code and

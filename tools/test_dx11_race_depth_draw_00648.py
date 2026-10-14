@@ -24,7 +24,17 @@ assert 'zEnable != 1u || zWrite > 1u' in depth
 assert 'zFunc != 2u && zFunc != 4u' in depth
 assert 'depthBiasBits & 0x7fffffffu' in depth
 assert 'if (!diagnostic_enabled() || !game' in cpp
-assert 'void before_game_reset() noexcept' in cpp
+# The native device is retired only for the Reset owner; auxiliary menu/video
+# devices must not discard an active depth-tested race frame or readback.
+reset = cpp.partition('void before_game_reset(IDirect3DDevice9* game) noexcept {')[2]
+assert reset, "device-aware game Reset implementation missing"
+reset_guard = reset.find('if (!GameNativeFrameBatch::reset_belongs_to_game_source(')
+reset_clear = reset.find('s.pending = false;')
+reset_shutdown = reset.find('s.backend.shutdown();')
+assert 0 <= reset_guard < reset_clear < reset_shutdown, "Reset ownership must precede depth/GPU teardown"
+assert 's.previousOutput.valid() ? s.previousOutput.device : 0u' in reset[reset_guard:reset_clear]
+assert 'return;' in reset[reset_guard:reset_clear]
+assert 's.diagnosticDepthView.Reset(); s.diagnosticDepth.Reset();' in reset[reset_clear:reset_shutdown]
 assert 'if (s.frameBatch.first_draw()) {' in cpp
 assert 's.backend.begin_frame(env_full_game_opt_in()' in cpp
 assert 's.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)' in cpp
