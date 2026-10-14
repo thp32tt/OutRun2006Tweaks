@@ -1,0 +1,43 @@
+# OPTIONAL Portainer Additional compose path for the EXISTING Git-based localization Stack.
+# Manual Pull and redeploy by the user only. No existing service is overwritten.
+# Configure BOTH host paths first. This service never invokes ChatGPT/ImageGen/API.
+services:
+  outrun-c-salvage-offline:
+    build:
+      context: ../..
+      dockerfile: docker/localization-production/Dockerfile.c-salvage
+    restart: unless-stopped
+    init: true
+    read_only: true
+    network_mode: none
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 512m
+    cpus: 0.5
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    user: "${C_SALVAGE_RUN_AS:-1000:1000}"
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - "${C_SALVAGE_INPUT_HOST_PATH:?set real A/B image-src folder}:/data/image-src:ro"
+      - "${C_SALVAGE_OUTPUT_HOST_PATH:?set separate writable C output folder}:/data/c-salvage:rw"
+    command:
+      - --input-root
+      - /data/image-src
+      - --output-root
+      - /data/c-salvage
+      - --repo-root
+      - /repo
+      - --recipes-dir
+      - /data/c-salvage/recipes
+      - --masks-dir
+      - /data/c-salvage/masks
+      - --max-per-cycle
+      - "10"
+      - --interval-seconds
+      - "1800"
+      - --loop
