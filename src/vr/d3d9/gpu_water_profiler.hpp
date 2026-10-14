@@ -108,7 +108,7 @@ class Meter {
             return gpuSpans_[(std::max)(size_t{1},n)-1];
         };
         const char* scene=std::getenv("OUTRUN_VR_GPU_SCENE");
-        spdlog::info("VR GPU WATER 5s: scene={} gpuIntervals={} gpuSpanAvgMs={:.3f} gpuSpanP50Ms={:.3f} gpuSpanP95Ms={:.3f} gpuSpanP99Ms={:.3f} gpuSpanMaxMs={:.3f} gpuSpanSampleCount={} gpuSpanOverflow={} sampledBlendDrawAvgMs={:.4f} sampledOpaqueDrawAvgMs={:.4f} blendDraws={} opaqueDraws={} stateSamples={} alphaBlendSamples={} alphaTestSamples={} noZWriteSamples={} zDisabledSamples={} stencilSamples={} programmablePsSamples={} fixedFnPsSamples={} renderTargetSamples={} offscreenRtSamples={} multisampleRtSamples={} dropped={} invalid={} logicalDrawCalls={} xyzhwRoutes={} hudRoutes={} fastWorldRoutes={} r29FallbackRoutes={} stateBlockRawRoutes={} otherGuardRoutes={} waterAttribution=UNPROVEN",
+        spdlog::info("VR GPU WATER 5s: scene={} gpuIntervals={} gpuSpanAvgMs={:.3f} gpuSpanP50Ms={:.3f} gpuSpanP95Ms={:.3f} gpuSpanP99Ms={:.3f} gpuSpanMaxMs={:.3f} gpuSpanSampleCount={} gpuSpanOverflow={} sampledBlendDrawAvgMs={:.4f} sampledOpaqueDrawAvgMs={:.4f} blendDraws={} opaqueDraws={} stateSamples={} alphaBlendSamples={} alphaTestSamples={} noZWriteSamples={} zDisabledSamples={} stencilSamples={} programmablePsSamples={} fixedFnPsSamples={} renderTargetSamples={} offscreenRtSamples={} multisampleRtSamples={} dropped={} invalid={} logicalDrawCalls={} xyzrhwRoutes={} hudRoutes={} fastWorldRoutes={} r29FallbackRoutes={} stateBlockRawRoutes={} otherGuardRoutes={} waterAttribution=UNPROVEN",
             scene?scene:"NONE",frames_,frames_?sumFrame_/frames_:0.0,
             percentile(0.50),percentile(0.95),percentile(0.99),maxFrame_,
             gpuSpanCount_,gpuSpanOverflow_,

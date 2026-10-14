@@ -1018,25 +1018,21 @@ namespace OutRunVRStereo
             {
                 const auto hud = R33TryHud(device, screenKind,
                     std::forward<ActualDraw>(actualDraw), site);
+                if (GpuWaterProbe::Enabled() && hud.handled)
+                    GpuWaterProbe::instance().noteRoute(
+                        GpuWaterProbe::DrawRoute::ScreenHud);
                 if (hud.handled)
-                {
-                    if (GpuWaterProbe::Enabled())
-                        GpuWaterProbe::instance().noteRoute(
-                            GpuWaterProbe::DrawRoute::ScreenHud);
                     return hud.hr;
-                }
             }
             else
             {
                 const auto fast = R33TryFastWorld(device,
                     std::forward<ActualDraw>(actualDraw), site);
+                if (GpuWaterProbe::Enabled() && fast.handled)
+                    GpuWaterProbe::instance().noteRoute(
+                        GpuWaterProbe::DrawRoute::FastWorld);
                 if (fast.handled)
-                {
-                    if (GpuWaterProbe::Enabled())
-                        GpuWaterProbe::instance().noteRoute(
-                            GpuWaterProbe::DrawRoute::FastWorld);
                     return fast.hr;
-                }
             }
 
             // Preserve the same lower R29 fail-closed policy when neither
@@ -1066,13 +1062,11 @@ namespace OutRunVRStereo
                     ? R32ReviewTryXyzrhwPrimitiveVB(
                     device, type, startVertex, primitiveCount)
                     : E_NOTIMPL;
+                if (GpuWaterProbe::Enabled() && xyzrhw != E_NOTIMPL)
+                    GpuWaterProbe::instance().noteRoute(
+                        GpuWaterProbe::DrawRoute::Xyzrhw);
                 if (xyzrhw != E_NOTIMPL)
-                {
-                    if (GpuWaterProbe::Enabled())
-                        GpuWaterProbe::instance().noteRoute(
-                            GpuWaterProbe::DrawRoute::Xyzrhw);
                     return xyzrhw;
-                }
 
                 auto actual = [&]() {
                     return R32ReviewCallRawDrawPrimitive(
@@ -1118,13 +1112,11 @@ namespace OutRunVRStereo
                     device, type, baseVertexIndex, minVertexIndex,
                     numVertices, startIndex, primitiveCount)
                     : E_NOTIMPL;
+                if (GpuWaterProbe::Enabled() && xyzrhw != E_NOTIMPL)
+                    GpuWaterProbe::instance().noteRoute(
+                        GpuWaterProbe::DrawRoute::Xyzrhw);
                 if (xyzrhw != E_NOTIMPL)
-                {
-                    if (GpuWaterProbe::Enabled())
-                        GpuWaterProbe::instance().noteRoute(
-                            GpuWaterProbe::DrawRoute::Xyzrhw);
                     return xyzrhw;
-                }
 
                 auto actual = [&]() {
                     return R32ReviewCallRawDrawIndexedPrimitive(device, type,
@@ -1171,13 +1163,11 @@ namespace OutRunVRStereo
                     ? R32ReviewTryXyzrhwPrimitiveUP(
                     device, type, primitiveCount, data, stride)
                     : E_NOTIMPL;
+                if (GpuWaterProbe::Enabled() && xyzrhw != E_NOTIMPL)
+                    GpuWaterProbe::instance().noteRoute(
+                        GpuWaterProbe::DrawRoute::Xyzrhw);
                 if (xyzrhw != E_NOTIMPL)
-                {
-                    if (GpuWaterProbe::Enabled())
-                        GpuWaterProbe::instance().noteRoute(
-                            GpuWaterProbe::DrawRoute::Xyzrhw);
                     return xyzrhw;
-                }
 
                 auto actual = [&]() {
                     return R32ReviewCallRawDrawPrimitiveUP(
@@ -1224,13 +1214,11 @@ namespace OutRunVRStereo
                     device, type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride)
                     : E_NOTIMPL;
+                if (GpuWaterProbe::Enabled() && xyzrhw != E_NOTIMPL)
+                    GpuWaterProbe::instance().noteRoute(
+                        GpuWaterProbe::DrawRoute::Xyzrhw);
                 if (xyzrhw != E_NOTIMPL)
-                {
-                    if (GpuWaterProbe::Enabled())
-                        GpuWaterProbe::instance().noteRoute(
-                            GpuWaterProbe::DrawRoute::Xyzrhw);
                     return xyzrhw;
-                }
 
                 auto actual = [&]() {
                     return R32ReviewCallRawDrawIndexedPrimitiveUP(device, type,
