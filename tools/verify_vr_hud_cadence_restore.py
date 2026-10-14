@@ -251,9 +251,14 @@ cadence_order = (
     "if (wait != WAIT_OBJECT_0)",
     "if (foundNewRequest)",
 )
-cadence_positions = [cadence_wait.find(marker) for marker in cadence_order]
-if min(cadence_positions) < 0 or cadence_positions != sorted(cadence_positions):
-    fail("cadence auto-reset drain / re-read / bounded new-token order changed")
+# Search each marker AFTER its predecessor: ReadCadenceHost(host) also
+# appears once in the initial eligibility check before the event drain.
+cadence_position = 0
+for marker in cadence_order:
+    index = cadence_wait.find(marker, cadence_position)
+    if index < 0:
+        fail(f"cadence auto-reset drain / re-read / bounded new-token order changed: {marker}")
+    cadence_position = index + len(marker)
 for marker in (
     "host.hostPid != CadenceHostProcessPid",
     "after.hostPid == host.hostPid",
