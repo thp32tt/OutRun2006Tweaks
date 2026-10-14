@@ -45,7 +45,7 @@ def verify(hook: str, r30: str, r33: str) -> None:
     assert "(*Module::exe_ptr<std::uint8_t>(0x39FCD5) & 3) == 2" in active
     assert "*Module::exe_ptr<int>(0x4A8C40) != 0" in active
     capture = between(r30, "bool R30CaptureSkyGlowSceneBeforeHud(", "bool R30ApplyStereoSkyGlow(")
-    composite = between(r30, "bool R30ApplyStereoSkyGlow(", "bool R30Present")
+    composite = between(r30, "bool R30ApplyStereoSkyGlow(", "ULONGLONG R30LastTelemetryMs")
     assert capture.index("!R30GameGlowActive()") < capture.index("R29OwnerCaptureFrameSnapshot()")
     assert capture.index("R29OwnerCaptureFrameSnapshot()") < capture.index("device->StretchRect(")
     assert composite.index("!R30GameGlowActive()") < composite.index("R29OwnerCaptureFrameSnapshot()")
@@ -90,8 +90,8 @@ def main() -> None:
                    "std::clamp(dt * 60.0, 0.0, 2.0)", 1), t, w),
         (h.replace("!Settings::VREnabled.get()", "Settings::VREnabled.get()", 1), t, w),
         (h.replace("RenderScope::ScreenHud", "RenderScope::None", 1), t, w),
-        (t.replace("desc.FVF != 0", "desc.FVF == 0", 1), w),
-        (t.replace("!= D3DFVF_XYZRHW", "== D3DFVF_XYZRHW", 1), w),
+        (h, t.replace("desc.FVF != 0", "desc.FVF == 0", 1), w),
+        (h, t.replace("!= D3DFVF_XYZRHW", "== D3DFVF_XYZRHW", 1), w),
         (h, t.replace("0x4A8C40) != 0", "0x4A8C40) == 0", 1), w),
         (h, t.replace("!R30GameGlowActive()", "false", 1), w),
         (h, t, w.replace("R33DepthStencilState.zEnable != D3DZB_FALSE",
