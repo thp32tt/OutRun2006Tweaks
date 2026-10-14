@@ -9,6 +9,7 @@
 #include "live_game_stage1_factor.hpp"
 #include "live_game_stage1_dual_texture.hpp"
 #include "live_game_stage1_uv.hpp"
+#include "live_game_stage1_mirror_reuse.hpp"
 #include "native_backend.hpp"
 #include "packed_texture_16bit.hpp"
 #include "live_game_luminance_texture.hpp"
@@ -3406,6 +3407,24 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
 // source asks for MIP_POINT or MIP_LINEAR, upload every readable mip rather than binding
 // level 0 and silently changing the game's minification result. All error
 // paths preserve the original D3D9 Draw/Present/gamepad behavior.
+// Build sampler state independently from a mirrored D3D11 texture. Stage1 may
+// use the same D3D9 pixels with different game-authored sampler state; doing
+// so must not re-read or re-upload the live source texture.
+bool create_game_sampler(ID3D11Device* dev, const TextureCapture& capture,
+                         UINT levels, ComPtr<ID3D11SamplerState>& sampler) noexcept {
+    if (!dev || levels == 0u) return false;
+    if (capture.minFilter == D3DTEXF_ANISOTROPIC &&
+        ((capture.magFilter != D3DTEXF_LINEAR &&
+          capture.magFilter != D3DTEXF_ANISOTROPIC) ||
+         capture.mipFilter != D3DTEXF_LINEAR ||
+         capture.maxAnisotropy < 2u ||
+         capture.maxAnisotropy > D3D11_REQ_MAXANISOTROPY)) return false;
+    const bool usesMips = capture.mipFilter == D3DTEXF_POINT ||
+                          capture.mipFilter == D3DTEXF_LINEAR;
+    if (usesMips && capture.maxMipLevel >= levels) return false;
+    return create_game_sampler(dev, capture, levels, sampler);
+}
+
 bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     ComPtr<ID3D11ShaderResourceView>& view,
                     ComPtr<ID3D11SamplerState>& sampler) noexcept {
@@ -3889,7 +3908,25 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             second.maxAnisotropy = ss[9];
             second.srgbTexture = ss[10] != FALSE;
         }
-        if (!mirror_texture(dev, second, stage1View, stage1Sampler)) return false;
+        // An independently addressed/sampled Stage1 may still reference the
+        // exact Stage0 game texture. Reuse the already captured native SRV and
+        // create only a distinct sampler; this avoids a second D3D9 LockRect/
+        // GetRenderTargetData and D3D11 upload on each real game Draw.
+        // Changed mip-chain or sRGB views require the full separate mirror.
+        if (stage1_game_mirror_reusable(
+                capture.texture.Get() == second.texture.Get(),
+                capture.srgbTexture == second.srgbTexture,
+                capture.mipFilter != D3DTEXF_NONE,
+                second.mipFilter != D3DTEXF_NONE,
+                sampledView.Get() != nullptr && sampledSampler.Get() != nullptr)) {
+            const UINT sourceLevels = capture.texture->GetLevelCount();
+            const UINT mirroredLevels =
+                capture.mipFilter != D3DTEXF_NONE ? sourceLevels : 1u;
+            if (!create_game_sampler(dev, second, mirroredLevels, stage1Sampler))
+                return false;
+            stage1View = sampledView;
+        } else if (!mirror_texture(dev, second, stage1View, stage1Sampler))
+            return false;
     }
     // Stage-1 combiner is an isolated game-authored PS constant (b1).
     // Create before issuing any Draw: failure preserves the original D3D9

@@ -127,6 +127,7 @@ jobs:
            python tools/test_dx11_stage1_dual_game_texture_00713.py
           python tools/test_dx11_stage1_independent_sampler_00714.py
           python tools/test_dx11_stage1_uv_00715.py
+          python tools/test_dx11_stage1_mirror_reuse_00716.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_blend_probe_00702.cpp -o /tmp/dx11_stage1_blend_00702 && /tmp/dx11_stage1_blend_00702
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_signed_probe_00703.cpp -o /tmp/dx11_stage1_signed_00703 && /tmp/dx11_stage1_signed_00703
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_cross_channel_probe_00704.cpp -o /tmp/dx11_stage1_cross_00704 && /tmp/dx11_stage1_cross_00704
@@ -141,6 +142,7 @@ jobs:
            g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_dual_texture_probe_00713.cpp -o /tmp/dx11_dual_00713 && /tmp/dx11_dual_00713
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_sampler_probe_00714.cpp -o /tmp/dx11_sampler_00714 && /tmp/dx11_sampler_00714
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_uv_probe_00715.cpp -o /tmp/dx11_uv_00715 && /tmp/dx11_uv_00715
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_mirror_reuse_probe_00716.cpp -o /tmp/dx11_mirror_reuse_00716 && /tmp/dx11_mirror_reuse_00716
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_factor_probe.cpp -o /tmp/dx11_stage1_00673 && /tmp/dx11_stage1_00673
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_rgb332_probe.cpp -o /tmp/dx11_rgb332_00667 && /tmp/dx11_rgb332_00667
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_p8_probe.cpp -o /tmp/dx11_p8_00668 && /tmp/dx11_p8_00668
