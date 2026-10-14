@@ -21,6 +21,10 @@ def connected(code: str) -> bool:
     unavailable = code[code.index("void observe_unavailable_game_draw("):code.index("void observe_failed_game_draw(")]
     present = code[code.index("void before_game_present("):code.index("void before_game_reset()")]
     reset = code[code.index("void before_game_reset()"):]
+    signature_pos = present.find("outputNow.nativeFullFrame = fullMode;")
+    generation_pos = present.find("!s.previousOutput.same(outputNow)")
+    mode_pos = present.find("GameNativeFramePublication::source_mode_contiguous(")
+    complete_pos = present.find("currentFullFrameComplete =")
     return all((
         "bool sourceModeKnown = false;" in code,
         "bool sourceWasFullMode = false;" in code,
@@ -28,10 +32,11 @@ def connected(code: str) -> bool:
         "if (!observe_source_frame_mode(s, env_full_game_opt_in())) return;" in unavailable,
         "const bool fullMode = env_full_game_opt_in();" in present,
         "outputNow.nativeFullFrame = fullMode;" in present,
-        present.index("outputNow.nativeFullFrame = fullMode;") < present.index("!s.previousOutput.same(outputNow)"),
+        0 <= signature_pos < generation_pos,
         "GameNativeFramePublication::source_mode_contiguous(" in present,
-        present.index("GameNativeFramePublication::source_mode_contiguous(") < present.index("currentFullFrameComplete ="),
-        "s.frameBatch.abort();" in present[present.index("GameNativeFramePublication::source_mode_contiguous("):present.index("currentFullFrameComplete =")],
+        0 <= mode_pos < complete_pos,
+        mode_pos >= 0 and complete_pos > mode_pos and
+        "s.frameBatch.abort();" in present[mode_pos:complete_pos],
         present.count("GameNativeFramePublication::matching_upload_extent(") == 2,
         "s.insetSurfaceWidth = surfaceWidth;" in present,
         "s.insetSurfaceHeight = surfaceHeight;" in present,
@@ -53,7 +58,13 @@ for bad, replacement in (
     ("s.insetSurfaceWidth = surfaceWidth;", "/* width cache omitted */"),
     ("s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;", "/* stale upload dimensions */"),
 ):
-    changed = SRC.replace(bad, replacement, 1)
+    # Mutate the owned Present branch instead of an earlier pipeline-reset
+    # occurrence of the same expression.
+    if bad == "s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;":
+        offset = SRC.index("void before_game_present(")
+        changed = SRC[:offset] + SRC[offset:].replace(bad, replacement, 1)
+    else:
+        changed = SRC.replace(bad, replacement, 1)
     assert changed != SRC and not connected(changed), bad
 
 PROBE = r"""
