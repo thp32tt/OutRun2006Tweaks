@@ -22,7 +22,10 @@ def connected(code):
         and "next.provenance.outputGeneration = s.outputGeneration;" in present
         and present.index("next.provenance.outputGeneration = s.outputGeneration;")
             < present.index("ctx->End(next.fence.Get());")
-        and "s.frameBatch.publishable(s.pending) && outputWritable" in present
+        and "const bool complete = fullMode" in present
+        and "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in present
+        and ": s.frameBatch.publishable(s.pending);" in present
+        and "if (complete && outputWritable &&" in present
         and "game->CreateOffscreenPlainSurface(" in present
         and "game->UpdateSurface(" in present
         and "s.outputGeneration = 0u;" in reset
@@ -34,7 +37,8 @@ for label, token in (
     ("lost GPU stamp", "next.provenance.outputGeneration = s.outputGeneration;"),
     ("foreign D3D9 surface", "s.insetSurfaceDevice != presentDevice"),
     ("unsafe D3D9 UpdateSurface", "s.insetSurfaceDevice == presentDevice"),
-    ("unsupported output", "s.frameBatch.publishable(s.pending) && outputWritable"),
+    ("unsupported output", "if (complete && outputWritable &&"),
+    ("incomplete full game", "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)"),
 ):
     mutated = src.replace(token, "/* missing output ownership */", 1)
     assert mutated != src and not connected(mutated), label
