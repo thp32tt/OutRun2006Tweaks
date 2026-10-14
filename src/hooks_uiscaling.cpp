@@ -719,9 +719,14 @@ class UIScaling : public Hook
                 const auto token = OutRunHudPeripheralText
                     ? OutRunVR::GameSemantic::ProducerToken::OutRunHudPeripheralText
                     : OutRunVR::GameSemantic::ProducerToken::OutRunHudText;
+                // This original exact HUD call may emit a synchronous
+                // glyph Draw before any SpriteNode is queued. A pending
+                // world/marker Draw from the preceding producer must not
+                // steal its scope. The RAII owner preserves and restores
+                // that token; a live SpriteNode queue still takes priority.
                 directHudOwner.emplace(
                     OutRunVR::GameSemantic::RenderScope::ScreenHud,
-                    nullptr, false, token);
+                    nullptr, true, token);
             }
             OutRunHudTextProducerHook.call(
                 glyphSet, x, y, text, a4, alpha);

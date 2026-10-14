@@ -33,7 +33,11 @@ int main()
 {
     if (!CheckDirectGoal(ProducerToken::ResultProgress) ||
         !CheckDirectGoal(ProducerToken::GoalTime020) ||
-        !CheckDirectGoal(ProducerToken::GoalTime150)) return 1;
+        !CheckDirectGoal(ProducerToken::GoalTime150) ||
+        // Both exact in-game HUD text families can rasterize immediately
+        // during gameplay/GOAL without consuming an earlier world token.
+        !CheckDirectGoal(ProducerToken::OutRunHudText) ||
+        !CheckDirectGoal(ProducerToken::OutRunHudPeripheralText)) return 1;
     // Nested GOAL producer cannot hijack the current real world queue.
     SpriteQueueDepth = 1;
     CurrentScope = RenderScope::WorldParticle;

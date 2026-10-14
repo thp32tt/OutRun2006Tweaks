@@ -273,6 +273,40 @@ def check_stage_extension_direct_owner(text: str) -> None:
        "StageExtensionPrintCalls[i]" not in install:
         fail("original +TIME decoration and number producers must both be hooked")
 
+
+# The live exact BA9D0 HUD text call can draw before the clip/sprani nodes
+# exist. Distinct from the six stage +TIME sources, this caller also produces
+# ordinary HUD and some GOAL glyphs. Keep its direct token and isolate a
+# previously armed world/marker Draw only inside the exact ScreenHud scope.
+# The queue and unclassified callers must never be promoted.
+def hud_text_direct_binding_ok(source: str) -> bool:
+    body = function_body(source, "static void __cdecl OutRunHudTextProducer_dest(")
+    start = body.find("directHudOwner.emplace(")
+    end = body.find("OutRunHudTextProducerHook.call(", start)
+    scope = body[start:end] if start >= 0 and end > start else ""
+    return (
+        "semantic.space == OutRunVRHudSemantics::SpacePolicy::ScreenHud" in body
+        and "Settings::VREnabled" in body
+        and "ScopedExactProducerSemantic" in body
+        and "ProducerToken::OutRunHudPeripheralText" in body
+        and "ProducerToken::OutRunHudText" in body
+        and "RenderScope::ScreenHud" in scope
+        and re.search(r"nullptr,\\s*true,\\s*token", scope) is not None
+        and "OutRunHudTextProducerHook.call(" in body
+        and "OutRunHudPeripheralText = previousPeripheral;" in ui
+        and "OutRunHudTextScreenHud = previous;" in ui
+    )
+
+if not hud_text_direct_binding_ok(ui):
+    fail("exact BA9D0 direct HUD glyph must isolate prior pending world Draw")
+for before, after in (
+    ("nullptr, true, token", "nullptr, false, token"),
+    ("nullptr, true, token", "nullptr, true, ProducerToken::None"),
+):
+    mutated = ui.replace(before, after, 1)
+    if mutated == ui or hud_text_direct_binding_ok(mutated):
+        fail("HUD text owner verifier failed negative mutation: " + after)
+
 check_stage_extension_direct_owner(ui)
 for old, replacement in (
     ("SpriteQueueDepth == 0", "SpriteQueueDepth != 0"),
