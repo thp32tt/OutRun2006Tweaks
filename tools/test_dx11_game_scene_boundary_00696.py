@@ -39,7 +39,9 @@ def connected(b, c, h, r):
         "s.frameBatch.scene_boundary();" in event,
         "s.pending = false;" in event,
         "if (submitted != 0u) stopped = true;" in b,
-        "s.frameBatch.publishable(s.pending) && outputWritable" in present,
+        "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in present,
+        ": s.frameBatch.publishable(s.pending);" in present,
+        "if (complete && outputWritable &&" in present,
         "ctx->CopyResource(next.staging.Get(), s.backend.color_texture())" in present,
     ))
 

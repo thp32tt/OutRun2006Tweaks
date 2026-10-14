@@ -18,7 +18,9 @@ required = (
     "++s.outputGeneration",
     "s.insetSurface.Reset();",
     "!oldest.provenance.same_output(s.outputGeneration)",
-    "s.frameBatch.publishable(s.pending) && outputWritable",
+    "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)",
+    ": s.frameBatch.publishable(s.pending);",
+    "if (complete && outputWritable &&",
     "game->UpdateSurface(",
 )
 assert all(token in present for token in required), "source Present/COM identity-to-GPU readback-to-D3D9 upload incomplete"
@@ -26,7 +28,8 @@ assert all(token in present for token in required), "source Present/COM identity
 for removed in ("presentBackbuffer.As(&presentBackbufferIdentity)",
                 "presentBackbufferIdentity.Get()",
                 "!s.previousOutput.same(outputNow)",
-                "!oldest.provenance.same_output(s.outputGeneration)"):
+                "!oldest.provenance.same_output(s.outputGeneration)",
+                "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)"):
     assert removed in present
     assert not all(token in present.replace(removed, "/* removed */", 1)
                    for token in required), removed
