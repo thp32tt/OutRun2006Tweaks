@@ -10,6 +10,7 @@
 #include "live_game_stage1_dual_texture.hpp"
 #include "live_game_stage1_uv.hpp"
 #include "live_game_stage1_mirror_reuse.hpp"
+#include "live_game_blend_extrema.hpp"
 #include "native_backend.hpp"
 #include "packed_texture_16bit.hpp"
 #include "live_game_luminance_texture.hpp"
@@ -1146,6 +1147,9 @@ struct State {
     // Four admitted factor pairs x subtract/reverse-subtract x 16 write masks.
     // Create on demand; never alias normal ADD or multiply blend descriptors.
     std::array<ComPtr<ID3D11BlendState>, 128> subtractiveMaskedBlends{};
+    // D3D9 MIN/MAX game/menu blending has separate native OM cache slots:
+    // never collide with SUBTRACT/REVSUBTRACT under changing color masks.
+    std::array<ComPtr<ID3D11BlendState>, 128> extremumMaskedBlends{};
     ComPtr<ID3D11Buffer> alphaConstants;
     std::array<ReadbackSlot, kReadbackSlots> readbacks{};
     UINT readSlot = 0;
@@ -1483,6 +1487,7 @@ bool ensure_pipeline(State& s) noexcept {
     for (auto& masked : s.inverseAlphaAddMaskedBlends) masked.Reset();
     for (auto& masked : s.sourceReplaceMaskedBlends) masked.Reset();
     for (auto& masked : s.subtractiveMaskedBlends) masked.Reset();
+    for (auto& masked : s.extremumMaskedBlends) masked.Reset();
     NativeBackendConfig cfg{};
     cfg.width = kWidth;
     cfg.height = kHeight;
@@ -2219,7 +2224,15 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
                 return false;
             output.separateAlphaBlend = true;
         }
-        if (blendOp != D3DBLENDOP_ADD) {
+        // Real D3D9 menu/car overlay MIN/MAX ignores the blend factors;
+        // D3D11 has the same RGB/alpha extrema operations. Admit only
+        // separately tested common factor pairs with no independent alpha.
+        const bool extrema = blendOp == D3DBLENDOP_MIN ||
+                             blendOp == D3DBLENDOP_MAX;
+        if (extrema && !game_native_extremum_admission(
+                blendOp, src, dst, separate != FALSE, colorMask))
+            return false;
+        if (blendOp != D3DBLENDOP_ADD && !extrema) {
             if (blendOp != D3DBLENDOP_SUBTRACT &&
                 blendOp != D3DBLENDOP_REVSUBTRACT) return false;
         }
@@ -2310,7 +2323,11 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         output.reverseDestAlphaCrossfadeBlend = reverseDestAlphaCrossfade;
         output.sourceAlphaSaturateCopyBlend = sourceAlphaSaturateCopy;
         output.sourceAlphaSaturateAddBlend = sourceAlphaSaturateAdd;
-        output.blendOp = blendOp == D3DBLENDOP_SUBTRACT ?
+        output.blendOp = blendOp == D3DBLENDOP_MIN ?
+            D3D11_BLEND_OP_MIN :
+            blendOp == D3DBLENDOP_MAX ?
+            D3D11_BLEND_OP_MAX :
+            blendOp == D3DBLENDOP_SUBTRACT ?
             D3D11_BLEND_OP_SUBTRACT :
             blendOp == D3DBLENDOP_REVSUBTRACT ?
             D3D11_BLEND_OP_REV_SUBTRACT : D3D11_BLEND_OP_ADD;
@@ -4020,6 +4037,34 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
                                         independentAlphaBlend.GetAddressOf())))
             return false;
         maskedBlend = &independentAlphaBlend;
+    } else if (output.blendOp == D3D11_BLEND_OP_MIN ||
+               output.blendOp == D3D11_BLEND_OP_MAX) {
+        // Both RGBA extrema are separate non-directional D3D11 OM states.
+        // Keep the game-authored color-write mask and known-good alpha
+        // factor family, without aliasing either subtractive cache.
+        const UINT variant = output.additiveBlend ? 1u :
+                             output.sourceAlphaAddBlend ? 2u :
+                             output.premultipliedAlphaBlend ? 3u : 0u;
+        const UINT slot = game_native_extremum_slot(
+            output.blendOp == D3D11_BLEND_OP_MAX, variant,
+            output.colorWriteMask);
+        if (slot >= s.extremumMaskedBlends.size()) return false;
+        auto& cached = s.extremumMaskedBlends[slot];
+        if (!cached) {
+            ID3D11BlendState* base = output.additiveBlend ? s.additiveBlend.Get() :
+                output.sourceAlphaAddBlend ? s.sourceAlphaAddBlend.Get() :
+                output.premultipliedAlphaBlend ? s.premultipliedAlphaBlend.Get() :
+                s.alphaBlend.Get();
+            if (!base) return false;
+            D3D11_BLEND_DESC desc{};
+            base->GetDesc(&desc);
+            desc.RenderTarget[0].BlendOp = output.blendOp;
+            desc.RenderTarget[0].BlendOpAlpha = output.blendOp;
+            desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;
+            if (FAILED(dev->CreateBlendState(&desc, cached.GetAddressOf())))
+                return false; // Original D3D9 Draw/input remain authoritative.
+        }
+        maskedBlend = &cached;
     } else if (output.blendOp != D3D11_BLEND_OP_ADD) {
         // The native game draw uses the original captured factor pair and
         // requested direction. Copy proven ADD factors; change BOTH RGB and
@@ -5001,6 +5046,7 @@ void before_game_reset() noexcept {
     for (auto& masked : s.inverseAlphaAddMaskedBlends) masked.Reset();
     for (auto& masked : s.sourceReplaceMaskedBlends) masked.Reset();
     for (auto& masked : s.subtractiveMaskedBlends) masked.Reset();
+    for (auto& masked : s.extremumMaskedBlends) masked.Reset();
     s.ps.Reset(); s.sampledPs.Reset();
     // The four stage-1 pixel shaders must not outlive their native device.
     s.stage1DiffusePs.Reset(); s.stage1ModulatePs.Reset();
