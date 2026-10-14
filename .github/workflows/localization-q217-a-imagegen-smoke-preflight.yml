@@ -103,6 +103,7 @@ jobs:
           python tools/chat-controller/localization-recovery-v1/tests/test_ab_batch_queue.py
           python tools/chat-controller/localization-recovery-v1/tests/test_ab_carousel.py
           python tools/chat-controller/localization-recovery-v1/tests/test_project_library_gate.py
+          python tools/chat-controller/localization-recovery-v1/tests/test_project_navigation.py
           python tools/chat-controller/localization-recovery-v1/tests/test_tile_orientation_policy.py
           python tools/chat-controller/localization-recovery-v1/tests/test_tile_batch_queue.py
       - name: Verify live-message DOM receipt selector without sending a message
