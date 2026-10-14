@@ -40,8 +40,8 @@ def integrated(layout,header,bridge,producer,decoder,vs,ps):
                            "o.specular = v.specular;")) and
       all(s in ps for s in ("value = specular;",
           "Stage1Source(stage0, diffuse, specular, arg0)",
-          "Stage1AndAlpha(float4 stage0, float4 diffuse, float4 specular)",
-          "Stage1AndAlpha(v.diffuse, v.diffuse, v.specular)",
+          "Stage1AndAlpha(float4 stage0, float4 diffuse, float4 specular,",
+          "Stage1AndAlpha(v.diffuse, v.diffuse, v.specular, 0.0f)",
           "Stage1ThreeSource(stage0, diffuse, specular, stage1Ops")) and
       "ctx->DrawIndexed(indexCount, 0, 0);" in bridge and
       "ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in bridge and
@@ -51,7 +51,7 @@ for target in ("!layout.hasSpecular","stage1_operation_reads_specular(alphaOp, a
                "stage1_three_source_reads_specular(nextColorOp, color0, color1, color2)"):
     assert not integrated(f,h,b,cap.replace(target,"",1),translate,base,shader),target
 assert not integrated(f,h,b,cap,translate.replace("v.specular[3] =","",1),base,shader)
-for target in ("value = specular;","Stage1AndAlpha(v.diffuse, v.diffuse, v.specular)"):
+for target in ("value = specular;","Stage1AndAlpha(v.diffuse, v.diffuse, v.specular, 0.0f)"):
     assert not integrated(f,h,b,cap,translate,base,shader.replace(target,"",1))
 assert "rgbAlpha!=256u" in p and "triadic!=4096u" in p
 assert "python tools/test_dx11_stage1_specular_00706.py" in w

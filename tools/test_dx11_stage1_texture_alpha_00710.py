@@ -31,7 +31,7 @@ def integrated(h,b):
         "stage1TextureAlpha));",
         "float4 t = gameTexture.Sample(gameSampler, v.uv);",
         "v.diffuse, v.specular, t.a);",
-        "AlphaGate(result.a);")) and all(s in draw for s in (
+        "AlphaGate(result.a);")) and sh.count("stage1TextureAlpha));") == 2 and all(s in draw for s in (
         "ctx->PSSetConstantBuffers(1, 1, &combiner)",
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);")) and (
