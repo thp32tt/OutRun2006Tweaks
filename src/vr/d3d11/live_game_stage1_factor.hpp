@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 namespace outrun::vr::dx11::live_game_frame {
-// D3D9 stage-1 DIFFUSE/CURRENT/TFACTOR arithmetic and three alpha-weighted blend ops, no second texture.
+// D3D9 stage-1 DIFFUSE/CURRENT/TFACTOR arithmetic, signed-add pair and alpha-weighted blends, no second texture.
 // Complement and alpha-replicate modifiers are native only for these three
 // sources; TEXTURE/TEMP/unsupported bits and stage 2 fall back
 // to the original D3D9 Draw/DrawIndexed and gamepad path.
@@ -12,6 +12,10 @@ constexpr std::uint32_t kStage1Modulate = 4u;
 constexpr std::uint32_t kStage1Modulate2X = 5u;
 constexpr std::uint32_t kStage1Modulate4X = 6u;
 constexpr std::uint32_t kStage1Add = 7u;
+// Stage-1 transition brightness: signed add offsets the sum by one half;
+// the 2X variant scales BEFORE clamping, for RGB and independent alpha.
+constexpr std::uint32_t kStage1AddSigned = 8u;
+constexpr std::uint32_t kStage1AddSigned2X = 9u;
 constexpr std::uint32_t kStage1Subtract = 10u;
 constexpr std::uint32_t kStage1AddSmooth = 11u;
 // Game-authored menu/race RGB and independent alpha fades.
@@ -45,6 +49,7 @@ constexpr bool stage1_combiner_supported(std::uint32_t operation,
     if (operation == kStage1SelectArg2) return stage1_operand_supported(arg2);
     return (operation == kStage1Modulate || operation == kStage1Modulate2X ||
             operation == kStage1Modulate4X || operation == kStage1Add ||
+            operation == kStage1AddSigned || operation == kStage1AddSigned2X ||
             operation == kStage1Subtract || operation == kStage1AddSmooth ||
             stage1_alpha_blend_operation(operation)) &&
             stage1_operand_supported(arg1) && stage1_operand_supported(arg2);
@@ -71,6 +76,9 @@ constexpr bool stage1_operation_reads_diffuse(std::uint32_t operation,
     return (arg1 & kStage1ArgMask) == kStage1Diffuse ||
            (arg2 & kStage1ArgMask) == kStage1Diffuse;
 }
+static_assert(stage1_combiner_supported(kStage1AddSigned, kStage1Current, kStage1Factor));
+static_assert(stage1_alpha_supported(kStage1AddSigned2X, kStage1Diffuse, kStage1Factor));
+static_assert(!stage1_combiner_supported(13u, kStage1Current, kStage1Factor));
 static_assert(stage1_alpha_blend_operation(kStage1BlendDiffuseAlpha) &&
               stage1_alpha_blend_operation(kStage1BlendFactorAlpha) &&
               stage1_alpha_blend_operation(kStage1BlendCurrentAlpha));

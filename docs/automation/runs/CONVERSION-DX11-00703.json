@@ -1,0 +1,107 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00703",
+  "production_id": "CONVERSION-DX11-00703",
+  "event_id": "CONVERSION-DX11-00703-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "GAME_STAGE1_SIGNED_FADES_MENU_RACE",
+  "work_key": "DX11:GAME_STAGE1_SIGNED_ADD_RGB_ALPHA",
+  "status": "IMPLEMENTED_PENDING_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Real game D3D9 stage1 COLOROP/ALPHAOP signed arithmetic capture for menu/vehicle/race",
+      "Native HLSL independently evaluates signed RGB and alpha before D3D11 Draw/DrawIndexed",
+      "Diagnostic readback/visible inset and original DX9Ex Present/gamepad fallback"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "tools/dx11_game_stage1_factor_probe.cpp",
+      "tools/dx11_game_stage1_signed_probe_00703.cpp",
+      "tools/test_dx11_stage1_signed_00703.py",
+      ".github/workflows/dx11-fast-structural.yml"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "288 signed add/2X selector permutations RGB and alpha; edge clamping and independent alpha arithmetic",
+      "negative_regression": "Unknown ops 13/15/17, unsupported texture/temp, invalid operand flags, absent FVF diffuse keep native admission closed and original D3D9 input",
+      "component_integration": "SDK op parity -> real stage1 D3D9 producer -> HLSL independent signed RGB/alpha -> b1 cbuffer -> native Draw/DrawIndexed + exact-SHA Actions"
+    },
+    "conflict_keys": [
+      "DX11:GAME_STAGE1_SIGNED_ADD_RGB_ALPHA",
+      "src/vr/d3d11/live_game_stage1_factor.hpp",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "GPU_READBACK",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Native shader/backbuffer path source and Windows build gate evidence; actual menu/race and Quest3 pixels NEED_HMD_TEST",
+    "activation_guard_and_fallback": "Explicit OUTRUN_DX11_FIRST_GAME_FRAME only, source D3D9 Draw/Present/gamepad unmodified and unsupported stages fail closed"
+  },
+  "feature_contract": {
+    "feature_id": "GAME_STAGE1_SIGNED_FADES_MENU_RACE",
+    "goal": "Mirror the full signed-add Stage1 transition family into live game-native menu, car-selection and race Draw RGB plus independently combined alpha, without losing D3D9 fallback.",
+    "acceptance_items": [
+      {
+        "id": "signed-stage1-live-rgb-alpha",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_source_hlsl_native_draw",
+        "expected_behavior": "COLOROP and ALPHAOP signed add and signed add 2X reach live native Draw/DrawIndexed with correct independent channel saturation"
+      },
+      {
+        "id": "signed-fallback-unsupported-dx9ex",
+        "category": "fallback_regression",
+        "behavior_area": "game_input_native_admission",
+        "expected_behavior": "Unsupported stage1 selectors/modifiers, absent diffuse and stage2 preserve D3D9 Draw/Present/gamepad"
+      },
+      {
+        "id": "signed-288-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "portable_probe_ci_windows_actions",
+        "expected_behavior": "288 signed combinations, independent alpha boundary values, source mutation checks and exact-SHA GitHub Windows/DX11 build gates"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "signed-stage1-live-rgb-alpha": "PENDING_GATE",
+    "signed-fallback-unsupported-dx9ex": "PENDING_GATE",
+    "signed-288-exact-sha-gates": "PENDING_GATE"
+  },
+  "base_head_sha": "62abb8a8f64baeeaffc2375958887baf63961141",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_stage1_factor.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_game_stage1_factor_probe.cpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_game_stage1_signed_probe_00703.cpp",
+    "tools/test_dx11_stage1_signed_00703.py",
+    "docs/automation/runs/CONVERSION-DX11-00703.json"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "DONE previous 00702 terminal",
+    "C1_REVIEW": "DONE unsupported signed Stage1 operation family",
+    "C2_IMPLEMENT": "DONE signed RGB/alpha native shader and source probe",
+    "C3_VALIDATE": "PENDING exact-SHA GitHub Gates",
+    "C4_COMMIT": "PENDING atomic branch CAS",
+    "C5_PACKAGE": "NOT_REQUIRED without HMD runtime evidence",
+    "C6_STATE": "PENDING exact-SHA gate"
+  },
+  "next_action": "Read GitHub Actions for material result SHA; repair actual gate regression under same TASK_ID; after PASS_EXACT_SHA create separate C6 bookkeeping [skip ci], HMD remains UNTESTED."
+}

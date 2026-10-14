@@ -88,6 +88,8 @@ static_assert(kStage1Disable == D3DTOP_DISABLE &&
               kStage1Modulate2X == D3DTOP_MODULATE2X &&
               kStage1Modulate4X == D3DTOP_MODULATE4X &&
               kStage1Add == D3DTOP_ADD &&
+              kStage1AddSigned == D3DTOP_ADDSIGNED &&
+              kStage1AddSigned2X == D3DTOP_ADDSIGNED2X &&
               kStage1Subtract == D3DTOP_SUBTRACT &&
               kStage1AddSmooth == D3DTOP_ADDSMOOTH &&
               kStage1BlendDiffuseAlpha == D3DTOP_BLENDDIFFUSEALPHA &&
@@ -1188,6 +1190,8 @@ float4 Stage1Combine(float4 a, float4 b, int op, float4 stage0, float4 diffuse) 
     if (op == 5) return saturate(2.0f * a * b);
     if (op == 6) return saturate(4.0f * a * b);
     if (op == 7) return saturate(a + b);
+    if (op == 8) return saturate(a + b - 0.5f);     // ADDSIGNED
+    if (op == 9) return saturate(2.0f * (a + b - 0.5f)); // ADDSIGNED2X
     if (op == 10) return saturate(a - b);
     if (op == 12 || op == 14 || op == 16)
         return saturate(lerp(b, a, Stage1BlendWeight(op, stage0, diffuse)));
@@ -2902,8 +2906,8 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     }
     // Real fixed-function stage 1 can combine the stage-0 CURRENT pixel
     // with D3DRS_TEXTUREFACTOR or live vertex DIFFUSE, including operand
-    // modifiers and diffuse/factor/current-alpha blend fades for independent
-    // RGB/alpha operations. A missing required DIFFUSE remains DX9Ex-only. No stage-1 texture, TEMP,
+    // modifiers, signed-add transitions and diffuse/factor/current-alpha fades
+    // for independent RGB/alpha operations. A missing required DIFFUSE remains DX9Ex-only. No stage-1 texture, TEMP,
     // unknown operand bits or stage-2 semantics are guessed; unsupported
     // stage-0 shaders never enter this path.
     if (nextColorOp != D3DTOP_DISABLE) {
