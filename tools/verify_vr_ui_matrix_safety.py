@@ -31,17 +31,97 @@ def require_safe(source: str) -> None:
         "sx > 1.0e-6f && sy > 1.0e-6f",
         "pScaling->x / sx",
         "std::isfinite(centeredX) && std::isfinite(centeredY)",
-        "pScaling->x = xScale;",
+        "localScaling.x = xScale;",
+        "forwardedScaling = &localScaling;",
+        "forwardedTranslation = &localTranslation;",
         "D3DXMatrixTransformation2D.stdcall<int>",
     ]
     indices = [s.index(k) for k in order]
     if indices != sorted(indices) or len(set(indices)) != len(indices):
         raise AssertionError("Null/finite/zero-scale checks must precede divide and writes")
-    if s.count("pScaling->x = xScale;") != 1 or s.count("pTranslation->y = centeredY;") != 1:
-        raise AssertionError("Non-atomic or duplicated UI transform mutation")
+    # D3DX reads these arguments; mutating the caller's vectors introduces
+    # another scaling/centering pass if the native game reuses them.
+    if "pScaling->x =" in s or "pScaling->y =" in s or \
+       "pTranslation->x =" in s or "pTranslation->y =" in s:
+        raise AssertionError("Original game menu matrix arguments mutated")
+    for needle in ("D3DXVECTOR2 localScaling{};",
+                   "D3DXVECTOR2 localTranslation{};",
+                   "D3DXVECTOR2* forwardedScaling = pScaling;",
+                   "D3DXVECTOR2* forwardedTranslation = pTranslation;",
+                   "localScaling.x = xScale;", "localScaling.y = yScale;",
+                   "localTranslation.x = centeredX;",
+                   "localTranslation.y = centeredY;",
+                   "forwardedScaling = &localScaling;",
+                   "forwardedTranslation = &localTranslation;",
+                   "forwardedScaling, pRotationCenter, Rotation, forwardedTranslation);"):
+        if needle not in s:
+            raise AssertionError("Staged menu matrix forwarding missing: " + needle)
+    assert s.index("std::isfinite(centeredX) && std::isfinite(centeredY)") < \
+        s.index("forwardedScaling = &localScaling;") < \
+        s.index("D3DXMatrixTransformation2D.stdcall<int>")
 
 
 require_safe(text)
+
+# The native sprite producer may reuse the SAME vector for several draws.
+# Corrected matrix inputs must be derived from an immutable original on
+# each invocation, including ultrawide and portrait viewport changes.
+def staged_menu_matrix(screen, authored=(640.0, 480.0), scale=(1.0, 1.0),
+                       translation=(200.0, 100.0)):
+    width, height = screen
+    sx, sy = width / authored[0], height / authored[1]
+    contain = min(sx, sy)
+    scaling = (scale[0] / sx * contain, scale[1] / sy * contain)
+    position = (translation[0] / sx * contain +
+                (width - authored[0] * contain) / 2,
+                translation[1] / sy * contain +
+                (height - authored[1] * contain) / 2)
+    return scaling, position
+
+for size in ((640, 480), (1024, 768), (1920, 1080),
+             (3440, 1440), (2496, 2688)):
+    source_scale, source_offset = (1.0, 1.0), (200.0, 100.0)
+    first = staged_menu_matrix(size, scale=source_scale,
+                               translation=source_offset)
+    second = staged_menu_matrix(size, scale=source_scale,
+                                translation=source_offset)
+    assert first == second
+    assert source_scale == (1.0, 1.0)
+    assert source_offset == (200.0, 100.0)
+    # The transform changes for a different output size, but the INPUT
+    # remains the original asset. This protects reset/resize transitions.
+    assert staged_menu_matrix((1280, 960), scale=source_scale,
+                              translation=source_offset) == \\
+           staged_menu_matrix((1280, 960), scale=source_scale,
+                              translation=source_offset)
+
+# Negative controls: old direct input mutation, missing local forwarding,
+# and an invalid intermediate that must use the untouched legacy call.
+def require_staged_inputs(code: str) -> None:
+    require_safe(code)
+    owner = code.split("static int __stdcall D3DXMatrixTransformation2D_dest(", 1)[1].split(
+        "static inline SafetyHookMid draw_sprite_custom_matrix_hk", 1)[0]
+    assert "forwardedScaling = &localScaling;" in owner
+    assert "forwardedTranslation = &localTranslation;" in owner
+    assert "pScaling->x = xScale;" not in owner
+    assert "pTranslation->x = centeredX;" not in owner
+    assert "D3DXVECTOR2* forwardedScaling = pScaling;" in owner
+    assert "D3DXVECTOR2* forwardedTranslation = pTranslation;" in owner
+
+for good, bad in (
+    ("localScaling.x = xScale;", "pScaling->x = xScale;"),
+    ("forwardedScaling = &localScaling;", "forwardedScaling = pScaling;"),
+    ("forwardedTranslation = &localTranslation;", "forwardedTranslation = pTranslation;"),
+    ("D3DXVECTOR2* forwardedScaling = pScaling;",
+     "D3DXVECTOR2* forwardedScaling = nullptr;"),
+):
+    assert good in text, good
+    try:
+        require_staged_inputs(text.replace(good, bad, 1))
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("Reused menu-vector mutation escaped: " + bad)
 
 
 def require_portrait_center(code):

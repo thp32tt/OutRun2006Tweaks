@@ -214,6 +214,13 @@ class UIScaling : public Hook
 		D3DXVECTOR2* pScaling, D3DXVECTOR2* pRotationCenter, float Rotation, D3DXVECTOR2* pTranslation)
 	{
 		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
+		// D3DX treats these input vectors as read-only. The game may reuse
+		// the same source sprite matrix across menu/car-selection draws;
+		// do not accumulate our aspect correction in the caller's storage.
+		D3DXVECTOR2 localScaling{};
+		D3DXVECTOR2 localTranslation{};
+		D3DXVECTOR2* forwardedScaling = pScaling;
+		D3DXVECTOR2* forwardedTranslation = pTranslation;
 
 		// D3DX allows optional 2D scaling/translation inputs. During resolution
 		// or device reset the game scale may also be invalid. Preserve input
@@ -250,15 +257,20 @@ class UIScaling : public Hook
 				if (std::isfinite(xScale) && std::isfinite(yScale) &&
 				    std::isfinite(centeredX) && std::isfinite(centeredY))
 				{
-					pScaling->x = xScale;
-					pScaling->y = yScale;
-					pTranslation->x = centeredX;
-					pTranslation->y = centeredY;
+					// Publish both derived vectors only after every component is
+					// finite. The game's original vectors remain byte-for-byte stable.
+					localScaling.x = xScale;
+					localScaling.y = yScale;
+					localTranslation.x = centeredX;
+					localTranslation.y = centeredY;
+					forwardedScaling = &localScaling;
+					forwardedTranslation = &localTranslation;
 				}
 			}
 		}
 
-		return D3DXMatrixTransformation2D.stdcall<int>(pOut, pScalingCenter, pScalingRotation, pScaling, pRotationCenter, Rotation, pTranslation);
+		return D3DXMatrixTransformation2D.stdcall<int>(pOut, pScalingCenter, pScalingRotation,
+			forwardedScaling, pRotationCenter, Rotation, forwardedTranslation);
 	}
 
 	static inline SafetyHookMid draw_sprite_custom_matrix_hk = {};
