@@ -816,7 +816,10 @@ struct TextureCapture {
     bool enabled = false;
     bool stage1Enabled = false;
     bool stage1TextureOperands = false; // Stage1 D3DTA_TEXTURE in actual RGB/alpha operands.
-    ComPtr<IDirect3DTexture9> stage1SeparateTexture; // Independent live D3D9 texture -> native t1/s1.
+    ComPtr<IDirect3DTexture9> stage1SeparateTexture; // Independent live D3D9 texture/sampler -> native t1/s1.
+    // ADDRESSU/V/W, BORDER, MAG, MIN, MIP, LODBIAS, MAXMIP, ANISO, SRGB.
+    std::array<DWORD, 11> stage1SamplerStates{};
+    bool stage1IndependentSampler = false; // Same texture can still need a distinct native s1.
     bool stage0ResultTemp = false; // RESULTARG=TEMP, CURRENT remains vertex DIFFUSE.
     bool stage0FullModulate = false;
     DWORD stage1ColorOp = D3DTOP_DISABLE;
@@ -3179,21 +3182,36 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
                 D3DSAMP_MAXMIPLEVEL, D3DSAMP_MAXANISOTROPY,
                 D3DSAMP_SRGBTEXTURE
             }};
-            for (auto state : states) {
+            bool samplerDiff = false;
+            for (std::size_t i = 0; i < states.size(); ++i) {
                 DWORD s0 = ~0u, s1 = ~0u;
-                if (FAILED(game->GetSamplerState(0, state, &s0)) ||
-                    FAILED(game->GetSamplerState(1, state, &s1)) || s0 != s1)
+                if (FAILED(game->GetSamplerState(0, states[i], &s0)) ||
+                    FAILED(game->GetSamplerState(1, states[i], &s1)))
                     return false;
+                // ADDRESSW is not modeled for a 2D texture. Keep it equal
+                // rather than silently discarding a game-authored difference.
+                if (states[i] == D3DSAMP_ADDRESSW && s0 != s1) return false;
+                samplerDiff |= s0 != s1;
+                capture.stage1SamplerStates[i] = s1;
             }
-            // The second texture must share the proven UV/transform/sampler;
-            // the original game D3D9 Draw is retained on all failures.
+            const auto& s1 = capture.stage1SamplerStates;
+            float stage1MipBias = 0.0f;
+            static_assert(sizeof(stage1MipBias) == sizeof(DWORD));
+            std::memcpy(&stage1MipBias, &s1[7], sizeof(stage1MipBias));
+            // Preserve independent game-authored addressing, filter, mip and
+            // sRGB. Unrepresentable profiles retain the original D3D9 draw.
+            const bool stage1SamplerSupported = stage1_game_sampler_supported(
+                s1[0],s1[1],s1[5],s1[4],s1[6],s1[8],stage1MipBias,s1[9],s1[10]);
             if (!stage1_dual_texture_compatible(
                     capture.enabled, tex1 != nullptr, tex1->GetType() == D3DRTYPE_TEXTURE,
                     uv1 == capture.coordIndex,
                     transform1 == (capture.transformUv ? D3DTTFF_COUNT2 : D3DTTFF_DISABLE),
-                    true))
+                    stage1SamplerSupported))
                 return false;
-            if (tex1.Get() != tex.Get() &&
+            capture.stage1IndependentSampler = samplerDiff;
+            // Even the same D3D9 texture must bind t1/s1 when sampler 1
+            // differs, otherwise the stage-0 texture sample changes pixels.
+            if ((tex1.Get() != tex.Get() || samplerDiff) &&
                 FAILED(tex1.As(&capture.stage1SeparateTexture)))
                 return false;
         }
@@ -3821,6 +3839,19 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     if (capture.stage1SeparateTexture) {
         TextureCapture second = capture;
         second.texture = capture.stage1SeparateTexture;
+        if (capture.stage1IndependentSampler) {
+            const auto& ss = capture.stage1SamplerStates;
+            second.addressU = static_cast<D3DTEXTUREADDRESS>(ss[0]);
+            second.addressV = static_cast<D3DTEXTUREADDRESS>(ss[1]);
+            second.borderColor = ss[3];
+            second.magFilter = static_cast<D3DTEXTUREFILTERTYPE>(ss[4]);
+            second.minFilter = static_cast<D3DTEXTUREFILTERTYPE>(ss[5]);
+            second.mipFilter = static_cast<D3DTEXTUREFILTERTYPE>(ss[6]);
+            std::memcpy(&second.mipLodBias, &ss[7], sizeof(second.mipLodBias));
+            second.maxMipLevel = ss[8];
+            second.maxAnisotropy = ss[9];
+            second.srgbTexture = ss[10] != FALSE;
+        }
         if (!mirror_texture(dev, second, stage1View, stage1Sampler)) return false;
     }
     // Stage-1 combiner is an isolated game-authored PS constant (b1).
