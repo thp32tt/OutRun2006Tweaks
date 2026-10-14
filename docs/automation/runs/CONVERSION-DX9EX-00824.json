@@ -2,8 +2,8 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00824",
   "production_id": "CONVERSION-DX9EX-00824",
-  "event_id": "CONVERSION-DX9EX-00824-E001",
-  "event_type": "implementation",
+  "event_id": "CONVERSION-DX9EX-00824-E004",
+  "event_type": "c6_gate_evidence_correction",
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
@@ -14,7 +14,7 @@
   "checkpoint": "C6_STATE",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00824]",
   "feature_contract": {
     "feature_id": "DX9EX:BLOCKER:R23_GAME_RUN_FRAME_CURSOR",
@@ -52,9 +52,9 @@
     ]
   },
   "acceptance_results": {
-    "GAME_RESTART_RECOVERY": "IMPLEMENTED_TEST_PENDING_CI",
-    "SAME_RUN_SAFE_FALLBACK": "IMPLEMENTED_TEST_PENDING_CI",
-    "WIN32_EXACT_SHA": "PENDING_EXACT_SHA"
+    "GAME_RESTART_RECOVERY": "PASS_BUILD",
+    "SAME_RUN_SAFE_FALLBACK": "PASS_BUILD",
+    "WIN32_EXACT_SHA": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "The R23 RenderFrameReader is run-identity aware, but lastProcessedStereoFrame remains a host-loop uint32_t across game process restarts.",
@@ -111,7 +111,7 @@
       "note": "No live headset/gameplay/FPS measurement was performed"
     }
   },
-  "next_action": "C6 bookkeeping complete on existing validation-bearing SHA; no build/CI rerun or source modification. HMD/gameplay runtime validation remains UNTESTED.",
+  "next_action": "C6 exact-SHA automatic acceptance complete. Runtime HMD game-restart behavior remains UNTESTED; no additional C++/CI rerun needed for this task.",
   "validation_bearing_result_sha": "1745783d85f5d46e6ce5423e5cc92225901fc375",
   "validation_bearing_sha": "1745783d85f5d46e6ce5423e5cc92225901fc375",
   "c6_status": "COMPLETE_BUILD_VERIFIED",
@@ -135,5 +135,5 @@
       "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38512680951"
     }
   },
-  "hold_resolution": "EXACT_SHA_GATES_SUCCESS: DX9Ex Active #38512680972 5/5, Domain Isolation #38512680974 SUCCESS, Full Source Impact #38512680951 3/3 SUCCESS on 1745783d85f5d46e6ce5423e5cc92225901fc375. Material remains 483786db86c2c0cf177ec2a9b12b53d1d296902e; C6 bookkeeping scores +0 separately; RUNTIME_VALIDATION=UNTESTED."
+  "hold_resolution": "All exact-SHA gates confirmed SUCCESS: DX9Ex Active 5/5 #38512680972, Domain Isolation #38512680974, Full Source Impact 3/3 #38512680951 on validation-bearing result 1745783d85f5d46e6ce5423e5cc92225901fc375. Quest3/VDXR runtime UNTESTED; same TASK credit only once."
 }
