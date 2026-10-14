@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:X8_DESTINATION_ALPHA_FULL_FRAME",
   "feature_id": "DX11-OPAQUE-X8-FULL-FRAME-BLEND",
-  "status": "C4_PENDING_EXACT_SHA",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
@@ -77,9 +77,9 @@
     ]
   },
   "acceptance_results": {
-    "A1": "SOURCE_IMPLEMENTED",
-    "A2": "SOURCE_IMPLEMENTED",
-    "A3": "CI_PENDING"
+    "A1": "PASS",
+    "A2": "PASS",
+    "A3": "PASS_EXACT_SHA"
   },
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -91,8 +91,34 @@
   ],
   "packaging_status": "NOT_REQUIRED",
   "runtime_gate": "NEED_HMD_TEST",
-  "material_result_sha": "222bfab92025dcdd546dbfa95ea39950982367bf",
-  "validation_bearing_result_sha": null,
-  "ci_evidence": {},
-  "validation_note": "Retry E003 source repair 2: Fast #38599854404 failed test 00736 Clear mutation scoped to wrong section; Backend #38599854340 failed legacy 00598 literal output.colorWriteMask source expectation. Apply X8 native mask to captured OutputCapture before native submit, preserving existing OM states/test contracts. Exact SHA Gate pending; RUNTIME_VALIDATION=UNTESTED."
+  "material_result_sha": "140d08b4074b5a19578e09118a6d4028ecf571eb",
+  "validation_bearing_result_sha": "947b7c32e3332ddc55b9ca900cb60b8aff49ca6e",
+  "ci_evidence": {
+    "DX11 Fast Structural Checks": {
+      "run_id": 38600987619,
+      "status": "success",
+      "head_sha": "947b7c32e3332ddc55b9ca900cb60b8aff49ca6e"
+    },
+    "Backend Conversion Gate": {
+      "run_id": 38600987567,
+      "status": "success",
+      "head_sha": "947b7c32e3332ddc55b9ca900cb60b8aff49ca6e"
+    },
+    "Build": {
+      "run_id": 38600997375,
+      "status": "success",
+      "head_sha": "947b7c32e3332ddc55b9ca900cb60b8aff49ca6e"
+    },
+    "OpenXR VR architecture": {
+      "run_id": 38600997457,
+      "status": "success",
+      "head_sha": "947b7c32e3332ddc55b9ca900cb60b8aff49ca6e"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38600997393,
+      "status": "success",
+      "head_sha": "947b7c32e3332ddc55b9ca900cb60b8aff49ca6e"
+    }
+  },
+  "validation_note": "Retry E003 causal policy record + X8 full-frame native OM alpha-write lifetime fix, source and destructive test repairs. All five mandatory GitHub Actions at exact SHA 947b7c32e3332ddc55b9ca900cb60b8aff49ca6e SUCCESS, including Backend readiness smoke. Actual game/Quest3/VDXR/controller runtime UNTESTED; no runtime promotion. Same TASK retries/C6 are not independent score events."
 }
