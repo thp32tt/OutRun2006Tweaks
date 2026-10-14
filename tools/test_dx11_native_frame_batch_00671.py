@@ -10,7 +10,10 @@ header=(root/"src/vr/d3d11/native_game_frame_batch.hpp").read_text()
 region=(root/"src/vr/d3d11/native_game_present_region.hpp").read_text()
 for marker in ('#include "native_game_frame_batch.hpp"',
  'OUTRUN_DX11_FRAME_BATCH', 's.frameBatch.accepts(candidateOrdinal, s.probeSlot,',
- 'if (s.frameBatch.first_draw()) s.backend.begin_frame(kBackground);',
+ 'if (s.frameBatch.first_draw()) {',
+ 's.backend.begin_frame(env_full_game_opt_in()',
+ 's.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)',
+ ': kBackground);',
  'if (s.frameBatch.clear_depth())', 's.frameBatch.succeeded(output.nativeDepthTest,',
  's.frameBatch.abort()', 's.frameBatch.reset()',
  'if (!submit(s, vertices, fanTriangles.data(),',
@@ -30,7 +33,8 @@ exception_abort = "            s.frameBatch.abort();"
 assert exception_abort in observer_catch
 assert "std::lock_guard<std::mutex> lock(s.mutex);" in observer_catch
 assert exception_abort not in observer_catch.replace(exception_abort, "", 1)
-assert src.count("s.backend.begin_frame(kBackground)") == 1
+assert src.count("s.backend.begin_frame(env_full_game_opt_in()") == 1
+assert src.count("s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)") == 1
 assert src.count("ctx->ClearDepthStencilView(s.diagnosticDepthView.Get(),") == 1
 assert header.count("kMaxDraws = 8u") == 1
 for marker in ("OUTRUN_DX11_FULL_GAME_FRAME", "accepts_full(sourceOrdinal)",
