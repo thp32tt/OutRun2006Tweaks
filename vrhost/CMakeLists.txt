@@ -207,6 +207,7 @@ foreach(target
     outrun-vr-pause-eye-affine-smoke
     outrun-vr-stage-extension-owner-smoke
     outrun-vr-goal-progress-owner-smoke
+    outrun-vr-semantic-tag-hint-smoke
     outrun-vr-capture-descriptor-smoke
     outrun-vr-r32-policy-smoke
     outrun-vr-frame-pacing-smoke
