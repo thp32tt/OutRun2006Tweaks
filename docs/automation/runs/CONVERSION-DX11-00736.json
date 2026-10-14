@@ -94,5 +94,5 @@
   "material_result_sha": "222bfab92025dcdd546dbfa95ea39950982367bf",
   "validation_bearing_result_sha": null,
   "ci_evidence": {},
-  "validation_note": "Retry E003 repairs acceptance policy omissions from failed Backend Conversion #38599016924 and fixes consecutive X8 Draw alpha writes with source integration tests. Exact-SHA five gates pending. RUNTIME_VALIDATION=UNTESTED."
+  "validation_note": "Retry E003 source repair 2: Fast #38599854404 failed test 00736 Clear mutation scoped to wrong section; Backend #38599854340 failed legacy 00598 literal output.colorWriteMask source expectation. Apply X8 native mask to captured OutputCapture before native submit, preserving existing OM states/test contracts. Exact SHA Gate pending; RUNTIME_VALIDATION=UNTESTED."
 }

@@ -10,7 +10,7 @@ def linked(cpp, hdr):
     clear = cpp.split("void observe_game_clear(", 1)[1].split("void observe_unavailable_game_draw(", 1)[0]
     submit = cpp.split("bool submit(", 1)[1].split("bool observe_source_device(", 1)[0]
     callback = hook.split("HRESULT __stdcall ClearDestR9(", 1)[1].split("template <typename ActualDraw, typename LegacyDraw>", 1)[0]
-    drawing = cpp.split("bool submit(", 1)[1].split("bool observe_source_device(", 1)[0]
+    drawing = cpp.split("void observe(", 1)[1].split("} // namespace", 1)[0]
     return all(token in clear for token in (
         "if (s.sourceGameDevice != 0u && s.sourceGameDevice != sourceDevice) return;",
         "targetIdentity.Get() == backbufferIdentity.Get()",
@@ -27,12 +27,15 @@ def linked(cpp, hdr):
         "requested & ~std::uint32_t{0x08u}",
         "if (!matches(device, backbuffer)) return fallback;",
     )) and all(token in drawing for token in (
-        "const UINT nativeColorWriteMask = env_full_game_opt_in() ?",
-        "s.clearColor.native_write_mask(s.sourceGameDevice,",
-        "output.targetIdentity, output.colorWriteMask)",
-        "desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;",
-        "s.destAlphaCrossfadeMaskedBlends[nativeColorWriteMask]",
+        "if (fullMode) {",
+        "output.colorWriteMask = s.clearColor.native_write_mask(",
+        "reinterpret_cast<std::uintptr_t>(game), output.targetIdentity,",
+        "output.colorWriteMask);",
+        "D3DPT_TRIANGLELIST, capture, output)",
+        "indexCount, type, capture, output)",
     )) and all(token in submit for token in (
+        "desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;",
+        "s.destAlphaCrossfadeMaskedBlends[output.colorWriteMask]",
         "s.frameBatch.first_draw()",
         "s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)",
         "s.backend.begin_frame(",
@@ -46,7 +49,11 @@ for before, after in (
     ("bbDesc.Format == D3DFMT_X8R8G8B8);", "false);"),
     ("static_cast<std::uint32_t>(color), wholeBackbuffer,", "static_cast<std::uint32_t>(color), false,"),
 ):
-    bad = bridge.replace(before, after, 1)
+    start = bridge.index("void observe_game_clear(")
+    end = bridge.index("void observe_unavailable_game_draw(", start)
+    clear = bridge[start:end]
+    assert before in clear, before
+    bad = bridge[:start] + clear.replace(before, after, 1) + bridge[end:]
     assert bad != bridge and not linked(bad, helper), before
 for before, after in (
     ("opaqueDestinationAlpha = opaqueBackbuffer;", "opaqueDestinationAlpha = false;"),
@@ -57,8 +64,8 @@ for before, after in (
     bad = helper.replace(before, after, 1)
     assert bad != helper and not linked(bridge, bad), before
 for before, after in (
-    ("const UINT nativeColorWriteMask = env_full_game_opt_in() ?", "const UINT nativeColorWriteMask = false ?"),
-    ("desc.RenderTarget[0].RenderTargetWriteMask = nativeColorWriteMask;", "desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;"),
+    ("output.colorWriteMask = s.clearColor.native_write_mask(", "output.colorWriteMask = ("),
+    ("desc.RenderTarget[0].RenderTargetWriteMask = output.colorWriteMask;", "desc.RenderTarget[0].RenderTargetWriteMask = 0;"),
 ):
     bad = bridge.replace(before, after, 1)
     assert bad != bridge and not linked(bad, helper), before
