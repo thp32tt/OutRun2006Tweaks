@@ -439,10 +439,13 @@ def main() -> None:
         ("if (!next.busy)", "if (next.busy)"),
         ("s.insetFormat != bb.Format", "s.insetFormat == bb.Format"),
     ):
-        # Change the inset's own async path. Mutating the earlier full-frame
-        # recycler/submit would leave the async inset intact (false-negative).
+        # Change the inset's own async path. Full-frame stale pending Map
+        # handling is earlier than this producer and must not be mistaken for
+        # the inset's nonblocking Map (false-negative mutation).
         start = (bridge.index("HRESULT ready = ctx->GetData(")
                  if original == "D3D11_ASYNC_GETDATA_DONOTFLUSH" else
+                 bridge.index("ctx->Map(oldest.staging.Get()")
+                 if original == "D3D11_MAP_FLAG_DO_NOT_WAIT" else
                  bridge.index("// Native full-frame was already enqueued")
                  if original in ("ctx->End(next.fence.Get());", "if (!next.busy)") else 0)
         mutated = bridge[:start] + bridge[start:].replace(original, wrong, 1)
