@@ -24,8 +24,8 @@ constexpr bool stage1_game_sampler_supported(
         (magFilter == 2u || magFilter == 3u) &&
         mipFilter == 2u && maxAniso >= 2u && maxAniso <= 16u;
     return address(u) && address(v) &&
-        ((minFilter == 1u || minFilter == 2u) &&
-         (magFilter == 1u || magFilter == 2u) || aniso) &&
+        (((minFilter == 1u || minFilter == 2u) &&
+          (magFilter == 1u || magFilter == 2u)) || aniso) &&
         mipFilter <= 2u && srgb <= 1u &&
         (mipFilter != 0u || (maxMipLevel == 0u && mipBias == 0.0f)) &&
         mipBias >= -16.0f && mipBias <= 15.99f;

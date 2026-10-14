@@ -21,7 +21,7 @@ def integrated(h,b):
         "stage1_matched_texture_alpha_blend_supported(",
         "tex1.Get() != tex.Get()","uv1 != capture.coordIndex",
         "std::memcmp(&capture.uvTransform, &matrix1, sizeof(matrix1)) != 0",
-        "game->GetSamplerState(0, state, &s0)","game->GetSamplerState(1, state, &s1)",
+        "game->GetSamplerState(0, states[i], &s0)","game->GetSamplerState(1, states[i], &s1)",
         "s0 != s1","D3DSAMP_SRGBTEXTURE")) and all(x in draw for x in (
         "ctx->PSSetConstantBuffers(1, 1, &combiner)","ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"))

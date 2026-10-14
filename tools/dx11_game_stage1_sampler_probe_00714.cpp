@@ -8,7 +8,7 @@ int main() {
         for (unsigned mag=0; mag<5; ++mag)
           for (unsigned mip=0; mip<4; ++mip) {
             bool expected=address>=1 && address<=5 &&
-                ((min==1 || min==2) && (mag==1 || mag==2) ||
+                (((min==1 || min==2) && (mag==1 || mag==2)) ||
                  (min==3 && (mag==2 || mag==3) && mip==2)) && mip<=2;
             auto good=stage1_game_sampler_supported(address,3,min,mag,mip,0,
                 0.0f,min==3?8:1,0);
