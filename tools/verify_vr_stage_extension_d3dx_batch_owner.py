@@ -38,6 +38,14 @@ def check(code: str, header: str) -> list[str]:
          stage_enter.find("StageExtensionDirectDrawOwner.emplace(") and
          "static void FlushD3DXBeforeDirectStageSource() noexcept;" in source,
          "direct +TIME must drain proven prior D3DX batch before new ScreenHud owner")
+    stage_leave = source[source.find("static void StageExtensionLeave("):
+                         source.find("inline static SafetyHookMid ResultTextEnterHooks")]
+    need("static void FlushD3DXAtDirectStageSourceExit() noexcept;" in source and
+         "FlushD3DXAtDirectStageSourceExit();" in stage_leave and
+         stage_leave.find("TagAppendedNodes(StageExtensionBefore") <
+         stage_leave.find("FlushD3DXAtDirectStageSourceExit();") <
+         stage_leave.find("StageExtensionDirectDrawOwner.reset();"),
+         "direct +TIME source exit must submit owned batch before RAII restores prior owner")
     need("ScopedExactProducerSemantic" in source and
          "ProducerToken::StageExtensionTime" in source and
          "TagAppendedNodes(StageExtensionBefore" in source,
@@ -93,6 +101,18 @@ def check(code: str, header: str) -> list[str]:
          "static void FlushD3DXBeforeDirectStageSource() noexcept" in code[end-1800:] and
          "VRProjectedD3DXSpriteIsolationR64::BeforeDirectStageSource();" in code,
          "direct +TIME must split only a proven homogeneous batch under its exact outgoing scope and producer")
+    need("static void AfterDirectStageSource() noexcept" in hook and
+         "CanFlushD3DXDirectStageAtExit(" in hook and
+         "PendingDraws, PendingHomogeneous, PendingScope, PendingProducer," in hook and
+         "EffectiveScope(), CurrentRenderProducerToken()" in hook and
+         "if (FlushTracked(sprite))" in hook and
+         "VRProjectedD3DXSpriteIsolationR64::AfterDirectStageSource();" in code,
+         "source exit must flush only proven homogeneous live +TIME D3DX batch")
+    need("pendingDraws != 0 && homogeneous" in header and
+         "pendingProducer == ProducerToken::StageExtensionTime" in header and
+         "currentScope == pendingScope" in header and
+         "currentProducer == pendingProducer" in header,
+         "direct source-exit predicate may not promote unrelated batches")
     need("PendingHomogeneous = false" in hook and
          "CanFlushD3DXPreQueueStageBatch(" in hook and
          "!QueueRenderActive()" in hook,
@@ -163,6 +183,18 @@ def main() -> int:
         print("DX9Ex +TIME D3DX FAIL: " + "; ".join(errors))
         return 1
     mutations = {
+        "missing-direct-exit-flush":
+            code.replace("        FlushD3DXAtDirectStageSourceExit();",
+                         "        // delayed source batch ignored", 1),
+        "direct-exit-after-restore":
+            code.replace(
+                "        FlushD3DXAtDirectStageSourceExit();\n"
+                "        // Always restore",
+                "        // Always restore", 1),
+        "missing-direct-exit-owner":
+            code.replace(
+                "VRProjectedD3DXSpriteIsolationR64::AfterDirectStageSource();",
+                "// no source exit hook", 1),
         "lost-direct-old-batch-isolation":
             code.replace("            FlushD3DXBeforeDirectStageSource();",
                          "            // direct GPU submission not isolated", 1),
@@ -256,6 +288,13 @@ def main() -> int:
             print("DX9Ex +TIME D3DX FAIL: mutation not detected:", label)
             return 1
     for label, altered in {
+        "exit-permit-mixed": header.replace(
+            "pendingDraws != 0 && homogeneous", "pendingDraws != 0 && true", 1),
+        "exit-permit-foreign": header.replace(
+            "pendingProducer == ProducerToken::StageExtensionTime",
+            "pendingProducer != ProducerToken::StageExtensionTime", 1),
+        "exit-permit-owner-swap": header.replace(
+            "currentProducer == pendingProducer", "true", 1),
         "lost-first-stage": header.replace(
             "(wasQueueActive || enteringExactStage)", "wasQueueActive", 1),
         "permit-any-first-node": header.replace(

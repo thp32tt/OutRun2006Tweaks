@@ -96,6 +96,40 @@ namespace OutRunVR::GameSemantic
             pendingProducer == outgoingProducer;
     }
 
+    // A source-scope exit is the last safe GPU submission boundary for
+    // deferred numeric +TIME sprites. Reject prior/foreign/mixed batches:
+    // End() must keep its original failure and batching behavior otherwise.
+    inline constexpr bool CanFlushD3DXDirectStageAtExit(
+        bool queueActive, bool batchActive, bool exactSprite,
+        unsigned pendingDraws, bool homogeneous,
+        RenderScope pendingScope, ProducerToken pendingProducer,
+        RenderScope currentScope, ProducerToken currentProducer) noexcept
+    {
+        return !queueActive && batchActive && exactSprite &&
+            pendingDraws != 0 && homogeneous &&
+            pendingScope == RenderScope::ScreenHud &&
+            pendingProducer == ProducerToken::StageExtensionTime &&
+            currentScope == pendingScope &&
+            currentProducer == pendingProducer;
+    }
+
+    static_assert(CanFlushD3DXDirectStageAtExit(
+        false, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanFlushD3DXDirectStageAtExit(
+        false, true, true, 2, false,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanFlushD3DXDirectStageAtExit(
+        false, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(!CanFlushD3DXDirectStageAtExit(
+        true, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+
     inline thread_local RenderScope CurrentScope = RenderScope::None;
     // An explicit SpriteNode producer owns its render space through the
     // complete queue draw. Temporary helper scopes must not replace it.

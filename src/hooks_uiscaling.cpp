@@ -60,6 +60,7 @@ namespace
 // Split any proven previous batch BEFORE the original direct glyph obtains
 // ScreenHud ownership, not after its Draw may have submitted old triangles.
 static void FlushD3DXBeforeDirectStageSource() noexcept;
+static void FlushD3DXAtDirectStageSourceExit() noexcept;
 
 class UIScaling : public Hook
 {
@@ -978,6 +979,11 @@ class UIScaling : public Hook
         TagAppendedNodes(StageExtensionBefore,
             OutRunVR::GameSemantic::RenderScope::ScreenHud,
             OutRunVR::GameSemantic::ProducerToken::StageExtensionTime);
+        // D3DX Draw can defer triangles beyond the original numeric CALL.
+        // Close only a still-homogeneous +TIME batch while the exact direct
+        // source is alive, before restoring the previous shader/HUD owner.
+        // Failed/unknown/mixed batches retain normal D3DX End behavior.
+        FlushD3DXAtDirectStageSourceExit();
         // Always restore the exact direct-draw queue cursor/anchor even if
         // VR enablement changes inside the original +TIME E8 call.
         StageExtensionDirectDrawOwner.reset();
@@ -2240,6 +2246,29 @@ public:
         StageFlushes.fetch_add(1, std::memory_order_relaxed);
     }
 
+    // The E8 parent can return without an intervening D3DX Draw flush
+    // (including reentrant draw and internal texture batching). Keep the
+    // exact semantic alive through the final GPU submission. This is not a
+    // global Flush: an unknown, mixed, foreign or queued batch is untouched.
+    static void AfterDirectStageSource() noexcept
+    {
+        using namespace OutRunVR::GameSemantic;
+        void* sprite = *Module::exe_ptr<void*>(0x55B218);
+        if (!CanFlushD3DXDirectStageAtExit(
+                QueueRenderActive(), BatchActive,
+                sprite != nullptr && sprite == TrackedSprite,
+                PendingDraws, PendingHomogeneous, PendingScope, PendingProducer,
+                EffectiveScope(), CurrentRenderProducerToken()))
+            return;
+        if (FlushTracked(sprite))
+            StageFlushes.fetch_add(1, std::memory_order_relaxed);
+        else
+        {
+            StageBoundaryReady = false;
+            StageFallbacks.fetch_add(1, std::memory_order_relaxed);
+        }
+    }
+
     // Called BEFORE SelectSpriteQueueNode replaces the outgoing producer.
     // Any prior homogeneous batch flushes under its ORIGINAL queue owner;
     // only then may the incoming +TIME owner start a separate batch.
@@ -2503,6 +2532,11 @@ VRProjectedD3DXSpriteIsolationR64
 static void FlushD3DXBeforeDirectStageSource() noexcept
 {
     VRProjectedD3DXSpriteIsolationR64::BeforeDirectStageSource();
+}
+
+static void FlushD3DXAtDirectStageSourceExit() noexcept
+{
+    VRProjectedD3DXSpriteIsolationR64::AfterDirectStageSource();
 }
 
 // VR semantic bridge for the game's canonical queued 2D renderer.

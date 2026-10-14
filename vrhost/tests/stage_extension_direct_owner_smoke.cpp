@@ -70,6 +70,32 @@ int main()
     static_assert(!CanFlushD3DXPreQueueStageBatch(
         false, true, true, RenderScope::ScreenOverlay2D, ProducerToken::None,
         RenderScope::ScreenOverlay2D, ProducerToken::StageExtensionTime));
+    // A deferred Draw may still remain when the numeric E8 parent returns.
+    // Only the same homogeneous +TIME source may submit before RAII restore.
+    auto exactExit = [](bool queued, bool active, bool sprite,
+                        unsigned draws, bool homogeneous,
+                        RenderScope pendingScope, ProducerToken pendingSource,
+                        RenderScope currentScope, ProducerToken currentSource) {
+        return CanFlushD3DXDirectStageAtExit(
+            queued, active, sprite, draws, homogeneous,
+            pendingScope, pendingSource, currentScope, currentSource);
+    };
+    const auto hud = RenderScope::ScreenHud;
+    const auto stage = ProducerToken::StageExtensionTime;
+    if (!exactExit(false, true, true, 2, true, hud, stage, hud, stage))
+        return 5;
+    if (exactExit(true, true, true, 2, true, hud, stage, hud, stage) ||
+        exactExit(false, false, true, 2, true, hud, stage, hud, stage) ||
+        exactExit(false, true, false, 2, true, hud, stage, hud, stage) ||
+        exactExit(false, true, true, 0, true, hud, stage, hud, stage) ||
+        exactExit(false, true, true, 2, false, hud, stage, hud, stage) ||
+        exactExit(false, true, true, 2, true, hud, stage,
+                  RenderScope::WorldBillboard, stage) ||
+        exactExit(false, true, true, 2, true, hud, stage, hud,
+                  ProducerToken::GoalTime020) ||
+        exactExit(false, true, true, 2, true, hud,
+                  ProducerToken::GoalTime020, hud, stage))
+        return 6;
     std::cout << "DX9Ex stage +TIME direct/queued owner PASS\n";
     return 0;
 }
