@@ -31,6 +31,7 @@
 #include "native_game_present_region.hpp"
 #include "native_game_backbuffer_admission.hpp"
 #include "native_game_texture_atlas_budget.hpp"
+#include "native_game_stream_capacity.hpp"
 
 #include <Windows.h>
 #include <d3dcompiler.h>
@@ -991,6 +992,16 @@ struct ReadbackSlot {
     bool busy = false;
     GameReadbackProvenance provenance{};
 };
+// Ring slots isolate each admitted source Draw until the native diagnostic GPU
+// consumes it; WRITE_DISCARD safely renames in-flight resources across frames.
+struct NativeGameStreamSlot {
+    ComPtr<ID3D11Buffer> vertex;
+    ComPtr<ID3D11Buffer> index;
+    ComPtr<ID3D11Buffer> stage1;
+    UINT vertexCapacity = 0u;
+    UINT indexCapacity = 0u;
+    UINT stage1Capacity = 0u;
+};
 struct State {
     std::mutex mutex;
     // Non-owning identity only: reset at every Present/Reset. Never retain a
@@ -1147,6 +1158,9 @@ struct State {
     // Create on demand; never alias normal ADD or multiply blend descriptors.
     std::array<ComPtr<ID3D11BlendState>, 128> subtractiveMaskedBlends{};
     ComPtr<ID3D11Buffer> alphaConstants;
+    // Eight bounded slots (one for normal single-draw mode); allocated lazily
+    // and reused by both source Draw and DrawIndexed with matching batch ordinal.
+    std::array<NativeGameStreamSlot, GameNativeFrameBatch::kMaxDraws> streamSlots{};
     std::array<ReadbackSlot, kReadbackSlots> readbacks{};
     UINT readSlot = 0;
     UINT writeSlot = 0;
@@ -3871,6 +3885,36 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     return create_game_sampler(dev, capture, levels, sampler);
 }
 
+// Dynamic upload replaces per-draw IMMUTABLE resource construction. A failed
+// allocation/Map leaves the original D3D9 draw and gamepad path untouched.
+// No suballocation/NO_OVERWRITE: each slot is written with WRITE_DISCARD,
+// including reuse in a later frame while the previous GPU work is in flight.
+bool upload_native_stream(ID3D11Device* device, ID3D11DeviceContext* context,
+                          ComPtr<ID3D11Buffer>& buffer, UINT& capacity,
+                          UINT bytes, UINT bindFlags, const void* source) noexcept {
+    if (!device || !context || !source || !bytes) return false;
+    if (!buffer || capacity < bytes) {
+        const UINT proposed = next_native_stream_capacity(bytes, capacity);
+        if (!proposed) return false;
+        D3D11_BUFFER_DESC desc{};
+        desc.ByteWidth = proposed;
+        desc.Usage = D3D11_USAGE_DYNAMIC;
+        desc.BindFlags = bindFlags;
+        desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        ComPtr<ID3D11Buffer> replacement;
+        if (FAILED(device->CreateBuffer(&desc, nullptr, replacement.GetAddressOf())))
+            return false;
+        buffer = replacement;
+        capacity = proposed;
+    }
+    D3D11_MAPPED_SUBRESOURCE mapped{};
+    if (FAILED(context->Map(buffer.Get(), 0u, D3D11_MAP_WRITE_DISCARD,
+                            0u, &mapped)) || !mapped.pData) return false;
+    std::memcpy(mapped.pData, source, bytes);
+    context->Unmap(buffer.Get(), 0u);
+    return true;
+}
+
 bool submit(State& s, const std::vector<NativeVertex>& vertices,
             const std::uint32_t* indices, UINT indexCount,
             D3DPRIMITIVETYPE topology, const TextureCapture& capture,
@@ -3878,7 +3922,9 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     if (!ensure_pipeline(s)) return false;
     auto* dev = s.backend.device();
     auto* ctx = s.backend.context();
-    if (!dev || !ctx) return false;
+    if (!dev || !ctx || s.frameBatch.submitted >= s.streamSlots.size())
+        return false;
+    auto& stream = s.streamSlots[s.frameBatch.submitted];
     ComPtr<ID3D11ShaderResourceView> sampledView;
     ComPtr<ID3D11SamplerState> sampledSampler;
     if (capture.enabled &&
@@ -3948,29 +3994,25 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             payload.arguments[i] = static_cast<std::int32_t>(capture.stage1Args[i]);
         for (std::size_t i = 0; i < 2; ++i)
             payload.argZero[i] = static_cast<std::int32_t>(capture.stage1ArgZero[i]);
-        D3D11_BUFFER_DESC cb{};
-        cb.ByteWidth = sizeof(payload);
-        cb.Usage = D3D11_USAGE_IMMUTABLE;
-        cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        D3D11_SUBRESOURCE_DATA data{};
-        data.pSysMem = &payload;
-        if (FAILED(dev->CreateBuffer(&cb, &data, stage1Constants.GetAddressOf())))
+        if (!upload_native_stream(dev, ctx, stream.stage1,
+                                  stream.stage1Capacity,
+                                  static_cast<UINT>(sizeof(payload)),
+                                  D3D11_BIND_CONSTANT_BUFFER, &payload))
             return false;
+        stage1Constants = stream.stage1;
     }
-    D3D11_BUFFER_DESC bd{};
-    bd.ByteWidth = static_cast<UINT>(vertices.size() * sizeof(NativeVertex));
-    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    bd.Usage = D3D11_USAGE_IMMUTABLE;
-    D3D11_SUBRESOURCE_DATA initial{};
-    initial.pSysMem = vertices.data();
-    ComPtr<ID3D11Buffer> vb;
-    if (FAILED(dev->CreateBuffer(&bd, &initial, vb.GetAddressOf()))) return false;
+    const UINT vertexBytes = static_cast<UINT>(vertices.size() * sizeof(NativeVertex));
+    if (!upload_native_stream(dev, ctx, stream.vertex, stream.vertexCapacity,
+                              vertexBytes, D3D11_BIND_VERTEX_BUFFER,
+                              vertices.data())) return false;
+    ComPtr<ID3D11Buffer> vb = stream.vertex;
     ComPtr<ID3D11Buffer> ib;
     if (indices && indexCount) {
-        bd.ByteWidth = indexCount * sizeof(std::uint32_t);
-        bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-        initial.pSysMem = indices;
-        if (FAILED(dev->CreateBuffer(&bd, &initial, ib.GetAddressOf()))) return false;
+        const UINT indexBytes = indexCount * sizeof(std::uint32_t);
+        if (!upload_native_stream(dev, ctx, stream.index, stream.indexCapacity,
+                                  indexBytes, D3D11_BIND_INDEX_BUFFER,
+                                  indices)) return false;
+        ib = stream.index;
     }
 
     // Pixel shader alpha test and OM alpha blend are bound to this same
@@ -4987,6 +5029,9 @@ void before_game_reset() noexcept {
     for (auto& item : s.diagnosticCullRasters) item.Reset();
     s.alphaBlend.Reset(); s.additiveBlend.Reset(); s.sourceAlphaAddBlend.Reset(); s.premultipliedAlphaBlend.Reset(); s.inverseSourceAlphaBlend.Reset(); s.sourceAlphaCopyBlend.Reset(); s.inverseAlphaCopyBlend.Reset(); s.inverseAlphaAddBlend.Reset(); s.sourceReplaceBlend.Reset(); s.multiplyBlend.Reset(); s.inverseDestMultiplyBlend.Reset(); s.inverseSourceMultiplyBlend.Reset(); s.destAlphaCrossfadeBlend.Reset(); s.reverseDestAlphaCrossfadeBlend.Reset(); s.sourceAlphaSaturateCopyBlend.Reset(); s.sourceAlphaSaturateAddBlend.Reset();
     s.alphaConstants.Reset();
+    // Reset invalidates native device ownership. Recreate each dynamic slot
+    // lazily on the next opted-in Draw, never reuse a prior-device buffer.
+    for (auto& stream : s.streamSlots) stream = {};
     for (auto& masked : s.maskedBlends) masked.Reset();
     for (auto& masked : s.multiplyMaskedBlends) masked.Reset();
     for (auto& masked : s.inverseDestMultiplyMaskedBlends) masked.Reset();

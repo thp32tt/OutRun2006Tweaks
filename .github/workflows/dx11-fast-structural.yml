@@ -128,6 +128,8 @@ jobs:
           python tools/test_dx11_stage1_independent_sampler_00714.py
           python tools/test_dx11_stage1_uv_00715.py
           python tools/test_dx11_stage1_mirror_reuse_00716.py
+          python tools/test_dx11_live_stream_buffer_reuse.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stream_capacity_probe.cpp -o /tmp/dx11_stream_capacity && /tmp/dx11_stream_capacity
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_blend_probe_00702.cpp -o /tmp/dx11_stage1_blend_00702 && /tmp/dx11_stage1_blend_00702
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_signed_probe_00703.cpp -o /tmp/dx11_stage1_signed_00703 && /tmp/dx11_stage1_signed_00703
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_stage1_cross_channel_probe_00704.cpp -o /tmp/dx11_stage1_cross_00704 && /tmp/dx11_stage1_cross_00704
