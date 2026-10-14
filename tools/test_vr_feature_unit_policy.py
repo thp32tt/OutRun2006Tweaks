@@ -118,4 +118,18 @@ diagnostic = "original\u2192Draw\u2192eye"
 assert printable_diagnostic(diagnostic, "cp1252") == r"original\u2192Draw\u2192eye"
 assert printable_diagnostic(diagnostic, "utf-8") == diagnostic
 assert printable_diagnostic(diagnostic, None) == diagnostic
+# Regression for CONVERSION-DX9EX-00820: the original material commit
+# failed before Windows compile because the rank feature omitted its explicit
+# neighbor-exclusion boundary. Verify the actual record and remove the field
+# destructively: the same policy error must be observable, not silently skipped.
+rank_run_path = POLICY.parent / "runs" / "CONVERSION-DX9EX-00820.json"
+if rank_run_path.is_file():
+    rank_run = json.loads(rank_run_path.read_text(encoding="utf-8"))
+    assert rank_run["feature_id"] == features["RANK_MARKERS"]["feature_id"]
+    assert not validate(rank_run, p), validate(rank_run, p)
+    rank_without_boundary = copy.deepcopy(rank_run)
+    rank_without_boundary["feature_contract"].pop("scope_boundary", None)
+    rank_errors = validate(rank_without_boundary, p)
+    assert "scope_boundary must exclude adjacent unrelated features" in rank_errors, rank_errors
+
 print(f"DX9Ex full-function/visual-defect policy PASS: {len(features)} feature classes, 10+ negative cases, terminal root-cause gate, legacy and performance")
