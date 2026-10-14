@@ -234,6 +234,41 @@ for marker in (
 
 if "OpenProcess(" in cadence_wait or "CloseHandle(" in cadence_wait:
     fail("cadence wait path regressed to per-frame process-handle churn")
+
+# An auto-reset event does NOT consume the SetEvent corresponding to a
+# request accepted by the fast path. Reset-before-read must close that race.
+# Waking is not acceptance: only a valid NEW request advances the game, and
+# all spurious wakeups share one bounded deadline (including 100ms recovery).
+cadence_order = (
+    "ResetEvent(CadenceRequestEvent)",
+    "!ReadCadenceHost(host)",
+    "if (host.requestId && host.requestId != current)",
+    "const LONGLONG deadlineQpc",
+    "for (;;)",
+    "WaitForSingleObject(CadenceRequestEvent, remainingMs)",
+    "if (ReadCadenceHost(after) && after.requestId",
+    "foundNewRequest = true;",
+    "if (wait != WAIT_OBJECT_0)",
+    "if (foundNewRequest)",
+)
+cadence_positions = [cadence_wait.find(marker) for marker in cadence_order]
+if min(cadence_positions) < 0 or cadence_positions != sorted(cadence_positions):
+    fail("cadence auto-reset drain / re-read / bounded new-token order changed")
+for marker in (
+    "host.hostPid != CadenceHostProcessPid",
+    "after.hostPid == host.hostPid",
+    "(after.flags & required) == required",
+    "end.QuadPart >= deadlineQpc",
+    "wait == WAIT_FAILED",
+    "CadenceTimedOutRequestId = 0;",
+    "CadencePacingActive.store(false, std::memory_order_release);",
+):
+    if marker not in cadence_wait:
+        fail(f"cadence host generation or fail-open contract missing: {marker}")
+if cadence_wait.count("WaitForSingleObject(CadenceRequestEvent,") != 1:
+    fail("cadence must have exactly one event wait inside the bounded loop")
+if "WaitForSingleObject(CadenceRequestEvent, timeoutMs)" in cadence_wait:
+    fail("cadence reverted to a one-shot wait that consumes stale signals")
 for marker in (
     "CadenceHostProcessAlive(host.hostPid)",
     "CloseCadenceHostProcess();",

@@ -1051,6 +1051,19 @@ namespace OutRunVRRenderer
             QueryPerformanceCounter(&start);
             QueryPerformanceFrequency(&frequency);
 
+            // The named RequestEvent is auto-reset, but a token accepted
+            // via the fast path leaves its SetEvent signal pending. Drain BEFORE
+            // rereading the shared request: a host publish racing this reset is
+            // either visible in the seqlock snapshot or leaves a new wakeup.
+            // Never reset after the snapshot, or that new wake could be lost.
+            if (!ResetEvent(CadenceRequestEvent) ||
+                !ReadCadenceHost(host) ||
+                host.hostPid != CadenceHostProcessPid ||
+                (host.flags & required) != required)
+            {
+                CadencePacingActive.store(false, std::memory_order_release);
+                return;
+            }
             if (host.requestId && host.requestId != current)
             {
                 CadenceTimedOutRequestId = 0;
@@ -1091,7 +1104,42 @@ namespace OutRunVRRenderer
                     : configuredTimeoutMs);
             const DWORD timeoutMs = static_cast<DWORD>(std::clamp(
                 waitBudgetMs, 5.0, 100.0));
-            const DWORD wait = WaitForSingleObject(CadenceRequestEvent, timeoutMs);
+            // A wake is only a hint: a stale signal or a seqlock read
+            // collision does not mean that a NEW request was published.
+            // Retry inside one absolute QPC budget (never one timeout per
+            // spurious wake) and accept only the next valid host token.
+            const LONGLONG deadlineQpc = frequency.QuadPart > 0
+                ? start.QuadPart +
+                    (frequency.QuadPart * static_cast<LONGLONG>(timeoutMs) +
+                        999ll) / 1000ll
+                : start.QuadPart;
+            DWORD wait = WAIT_TIMEOUT;
+            bool foundNewRequest = false;
+            OutRunVR::CadenceV1::HostState after{};
+            for (;;)
+            {
+                LARGE_INTEGER now{};
+                QueryPerformanceCounter(&now);
+                if (frequency.QuadPart <= 0 || now.QuadPart >= deadlineQpc)
+                    break;
+                const LONGLONG remainingTicks = deadlineQpc - now.QuadPart;
+                const DWORD remainingMs = static_cast<DWORD>(
+                    std::max<LONGLONG>(1ll, std::min<LONGLONG>(
+                        static_cast<LONGLONG>(timeoutMs),
+                        (remainingTicks * 1000ll + frequency.QuadPart - 1ll) /
+                            frequency.QuadPart)));
+                wait = WaitForSingleObject(CadenceRequestEvent, remainingMs);
+                if (ReadCadenceHost(after) && after.requestId &&
+                    after.requestId != current &&
+                    after.hostPid == host.hostPid &&
+                    (after.flags & required) == required)
+                {
+                    foundNewRequest = true;
+                    break;
+                }
+                if (wait != WAIT_OBJECT_0)
+                    break;
+            }
             QueryPerformanceCounter(&end);
             const std::uint32_t waitUs =
                 frequency.QuadPart > 0 && end.QuadPart >= start.QuadPart
@@ -1100,11 +1148,7 @@ namespace OutRunVRRenderer
                     ((end.QuadPart - start.QuadPart) * 1000000ll) /
                         frequency.QuadPart))
                 : 0u;
-
-            OutRunVR::CadenceV1::HostState after{};
-            if (ReadCadenceHost(after) && after.requestId &&
-                after.requestId != current &&
-                (after.flags & required) == required)
+            if (foundNewRequest)
             {
                 CadenceTimedOutRequestId = 0;
                 AcceptCadenceRequest(after.requestId, waitUs);
@@ -1112,7 +1156,8 @@ namespace OutRunVRRenderer
             }
 
             CadenceLastWaitUs = waitUs;
-            if (wait == WAIT_TIMEOUT)
+            if (wait == WAIT_TIMEOUT || wait == WAIT_FAILED ||
+                end.QuadPart >= deadlineQpc)
             {
                 ++CadenceTimeoutCount;
                 CadenceTimedOutRequestId =
