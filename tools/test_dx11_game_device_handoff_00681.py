@@ -20,7 +20,9 @@ def connected(code):
     foreign_observer = code[code.index("bool observe_source_device("):code.index("bool observe_source_frame_mode(")]
     owner_gate = "if (GameNativeFrameBatch::foreign_present("
     return (
-        "s.sourceGameDevice != current" in foreign_observer and
+        "GameNativeFrameBatch::admits_game_source(" in foreign_observer and
+        "s.previousOutput.valid()" in foreign_observer and
+        "s.previousOutput.device : 0u" in foreign_observer and
         "return false;" in foreign_observer and
         "s.frameBatch.abort();" not in foreign_observer and
         "s.pending = false;" not in foreign_observer and

@@ -29,8 +29,8 @@ def connected(source: str, header: str) -> bool:
         "GameNativeFrameBatch::can_reacquire_full_clear(" in clear,
         "if (foreignSource && !sourceReacquired) return;" in clear,
         "if (foreignSource) s.clearColor.discard();" in clear,
-        clear.index("if (foreignSource && !sourceReacquired) return;") <
-            clear.index("s.clearColor.record("),
+        0 <= clear.find("if (foreignSource && !sourceReacquired) return;") <
+            clear.find("s.clearColor.record("),
         "if (sourceReacquired || s.sourceGameDevice == 0u)" in clear,
         "s.sourceGameDevice = sourceDevice;" in clear,
         "if (++s.outputGeneration == 0u) ++s.outputGeneration;" in clear,
@@ -50,7 +50,7 @@ for old, new in (
     ("s.previousOutput.device : 0u", "0u : 0u"),
     ("if (foreignSource && !sourceReacquired) return;", "if (false) return;"),
     ("if (sourceReacquired || s.sourceGameDevice == 0u)", "if (false)"),
-    ("s.sourceDevice = sourceDevice;", "s.sourceDevice = 0u;"),
+    ("s.sourceGameDevice = sourceDevice;", "s.sourceGameDevice = 0u;"),
     ("if (!foreignSource) s.clearColor.discard();", "if (false) s.clearColor.discard();"),
 ):
     changed = BRIDGE.replace(old, new, 1)
