@@ -2192,11 +2192,16 @@ public:
         }
         if (PendingDraws != 0)
         {
-            // First-node/past-frame and mixed-owner buffers cannot be
-            // reassigned safely; leave the original D3DX batching untouched.
-            if (!QueueRenderActive() || !PendingHomogeneous ||
-                PendingScope != EffectiveScope() ||
-                PendingProducer != CurrentRenderProducerToken() ||
+            // Before SelectSpriteQueueNode, a homogeneous PRE-QUEUE
+            // direct buffer can still be submitted with its OLD scope.
+            // The old unconditional !QueueRenderActive() guard missed this
+            // first +TIME edge and let later End outlive ScreenHud source.
+            // Mixed, unknown prehook and mismatched buffers still fail closed;
+            // ordinary first-queue GOAL/unrelated entries keep the old rule.
+            if (!CanFlushD3DXPreQueueStageBatch(
+                    QueueRenderActive(), enteringStage, PendingHomogeneous,
+                    PendingScope, PendingProducer,
+                    EffectiveScope(), CurrentRenderProducerToken()) ||
                 !FlushTracked(sprite))
             {
                 StageBoundaryReady = false;

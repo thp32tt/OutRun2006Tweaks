@@ -49,6 +49,27 @@ int main()
     SpriteQueueDepth = 0;
     CurrentQueueExactScope = RenderScope::None;
     NextDrawScope = RenderScope::None;
+    // Used verbatim by the live D3DX hook; test old-owner-first before
+    // first +TIME queue, old queued owner, and all negative admissions.
+    static_assert(CanFlushD3DXPreQueueStageBatch(
+        false, true, true, RenderScope::ScreenOverlay2D, ProducerToken::None,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+    static_assert(CanFlushD3DXPreQueueStageBatch(
+        true, false, true, RenderScope::WorldBillboard,
+        ProducerToken::RankMarkerSprani, RenderScope::WorldBillboard,
+        ProducerToken::RankMarkerSprani));
+    static_assert(!CanFlushD3DXPreQueueStageBatch(
+        false, false, true, RenderScope::ScreenOverlay2D, ProducerToken::None,
+        RenderScope::ScreenOverlay2D, ProducerToken::None));
+    static_assert(!CanFlushD3DXPreQueueStageBatch(
+        false, true, false, RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanFlushD3DXPreQueueStageBatch(
+        false, true, true, RenderScope::SceneEffect, ProducerToken::None,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanFlushD3DXPreQueueStageBatch(
+        false, true, true, RenderScope::ScreenOverlay2D, ProducerToken::None,
+        RenderScope::ScreenOverlay2D, ProducerToken::StageExtensionTime));
     std::cout << "DX9Ex stage +TIME direct/queued owner PASS\n";
     return 0;
 }

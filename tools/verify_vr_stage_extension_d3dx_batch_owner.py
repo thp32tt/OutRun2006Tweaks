@@ -10,9 +10,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "src/hooks_uiscaling.cpp"
+SEMANTICS = ROOT / "src/vr/game/render_semantics.hpp"
 
 
-def check(code: str) -> list[str]:
+def check(code: str, header: str) -> list[str]:
     errors: list[str] = []
     def need(ok: bool, name: str) -> None:
         if not ok:
@@ -48,9 +49,15 @@ def check(code: str) -> list[str]:
          "!PendingHomogeneous" in hook and
          "!QueueRenderActive()" in hook,
          "mixed/unknown owner fail-closed fallback missing")
-    need("PendingScope != EffectiveScope()" in hook and
-         "PendingProducer != CurrentRenderProducerToken()" in hook,
-         "previous owner provenance is not compared")
+    need("CanFlushD3DXPreQueueStageBatch(" in hook and
+         "QueueRenderActive(), enteringStage, PendingHomogeneous" in hook and
+         "PendingScope, PendingProducer" in hook and
+         "EffectiveScope(), CurrentRenderProducerToken()" in hook,
+         "first +TIME queue old-direct-source boundary not wired")
+    need("homogeneous && (wasQueueActive || enteringExactStage)" in header and
+         "pendingScope == outgoingScope" in header and
+         "pendingProducer == outgoingProducer" in header,
+         "pre-queue predicate must reject mixed or stale source")
     need("PeekSpriteNodeScope(nextNode, RenderScope::None, &nextProducer)" in hook and
          "StageOwner(nextScope, nextProducer)" in hook,
          "next node must have exact +TIME tag before promotion")
@@ -102,7 +109,8 @@ def check(code: str) -> list[str]:
 
 def main() -> int:
     code = SOURCE.read_text(encoding="utf-8")
-    errors = check(code)
+    header = SEMANTICS.read_text(encoding="utf-8")
+    errors = check(code, header)
     if errors:
         print("DX9Ex +TIME D3DX FAIL: " + "; ".join(errors))
         return 1
@@ -117,8 +125,8 @@ def main() -> int:
         "stale-shared-batch":
             code.replace("PendingHomogeneous = false;", "PendingHomogeneous = true;", 1),
         "missing-old-owner-proof":
-            code.replace("PendingProducer != CurrentRenderProducerToken()",
-                         "PendingProducer == CurrentRenderProducerToken()", 1),
+            code.replace("PendingScope, PendingProducer,",
+                         "PendingScope, ProducerToken::None,", 1),
         "unproven-direct-batch":
             code.replace("!QueueRenderActive() && PendingDraws == 1u",
                          "false", 1),
@@ -142,10 +150,24 @@ def main() -> int:
                          "source == ProducerToken::None", 1),
     }
     for label, mutated in mutations.items():
-        if mutated == code or not check(mutated):
+        if mutated == code or not check(mutated, header):
             print("DX9Ex +TIME D3DX FAIL: mutation not detected:", label)
             return 1
-    print("DX9Ex +TIME/GOAL D3DX batch boundaries and 10 negative regressions PASS")
+    for label, altered in {
+        "lost-first-stage": header.replace(
+            "(wasQueueActive || enteringExactStage)", "wasQueueActive", 1),
+        "permit-any-first-node": header.replace(
+            "(wasQueueActive || enteringExactStage)", "true", 1),
+        "permit-mixed": header.replace(
+            "homogeneous && (wasQueueActive", "true && (wasQueueActive", 1),
+        "permit-wrong-producer": header.replace(
+            "pendingProducer == outgoingProducer",
+            "pendingProducer != outgoingProducer", 1),
+    }.items():
+        if altered == header or not check(code, altered):
+            print("DX9Ex +TIME D3DX FAIL: header mutation", label)
+            return 1
+    print("DX9Ex +TIME/GOAL D3DX first-queue source and 14 negative regressions PASS")
     return 0
 
 

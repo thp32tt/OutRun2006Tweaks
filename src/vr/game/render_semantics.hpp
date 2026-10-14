@@ -83,6 +83,19 @@ namespace OutRunVR::GameSemantic
         LensFlareCentre, // Exact D3A5 -> C993 central sun, never CABE discs.
     };
 
+    // Previous direct D3DX triangles must be submitted under their OLD
+    // owner before the first exact +TIME SpriteNode becomes current.
+    // This is never permission to relabel an unknown or mixed batch.
+    inline constexpr bool CanFlushD3DXPreQueueStageBatch(
+        bool wasQueueActive, bool enteringExactStage, bool homogeneous,
+        RenderScope pendingScope, ProducerToken pendingProducer,
+        RenderScope outgoingScope, ProducerToken outgoingProducer) noexcept
+    {
+        return homogeneous && (wasQueueActive || enteringExactStage) &&
+            pendingScope == outgoingScope &&
+            pendingProducer == outgoingProducer;
+    }
+
     inline thread_local RenderScope CurrentScope = RenderScope::None;
     // An explicit SpriteNode producer owns its render space through the
     // complete queue draw. Temporary helper scopes must not replace it.
