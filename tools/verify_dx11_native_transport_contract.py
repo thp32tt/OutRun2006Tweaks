@@ -36,8 +36,8 @@ def verify_eye_pair_submission(body: str) -> None:
     # if EVENT arming fails. The failure branch must quarantine the exact
     # generation; do not relax this contract to make a new eye transfer pass.
     failure_branch = re.search(
-        r"if \\(!signal_producer_fence\\(context, slot, frame_id\\)\\)\\s*\\{"
-        r"[^{}]*synchronization_faulted_ = true;\\s*return false;\\s*\\}\\s*return true;",
+        r"if \(!signal_producer_fence\(context, slot, frame_id\)\)\s*\{"
+        r"[^{}]*synchronization_faulted_ = true;\s*return false;\s*\}\s*return true;",
         body, re.DOTALL,
     )
     if not failure_branch or "reset_slot_lifetime(entry)" in body[failure_branch.start():]:
