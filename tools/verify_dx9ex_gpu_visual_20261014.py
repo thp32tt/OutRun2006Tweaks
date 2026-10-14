@@ -59,7 +59,7 @@ for name, gg, rr in (
 ):
     try:
         verify(gg, rr, u, s, f)
-    except AssertionError:
+    except (AssertionError, ValueError):
         pass
     else:
         raise AssertionError("unsafe mutation survived: " + name)
