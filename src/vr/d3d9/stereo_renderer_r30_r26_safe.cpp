@@ -4681,6 +4681,16 @@ namespace OutRunVRStereo
             } catch (...) { /* Original UP path remains authoritative. */ }
         }
 
+        // The R26-safe hook observes a native game Draw before its original
+        // D3D9 result. Never present speculative pixels after a failed draw.
+        // Preserve the original HRESULT, R29/R26 fallback, and gamepad input.
+        void R30CompleteNativeGameSourceR26Safe(IDirect3DDevice9* device,
+            HRESULT gameHr) noexcept
+        {
+            if (FAILED(gameHr))
+                outrun::vr::dx11::live_game_frame::observe_failed_game_draw(device);
+        }
+
         HRESULT __stdcall DrawPrimitiveDestR30(IDirect3DDevice9* device,
             D3DPRIMITIVETYPE type, UINT startVertex, UINT primitiveCount)
         {
@@ -4696,8 +4706,10 @@ namespace OutRunVRStereo
                 R30ObserveNativeLinearVB(device, type, startVertex, primitiveCount);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveVB(
                 device, type, startVertex, primitiveCount);
-            if (xyzrhw != E_NOTIMPL)
+            if (xyzrhw != E_NOTIMPL) {
+                R30CompleteNativeGameSourceR26Safe(device, xyzrhw);
                 return xyzrhw;
+            }
 
             auto actual = [&]() {
                 return DrawPrimitiveHook.stdcall<HRESULT>(
@@ -4707,8 +4719,10 @@ namespace OutRunVRStereo
                 return R30DrawPrimitiveR29Hook.stdcall<HRESULT>(
                     device, type, startVertex, primitiveCount);
             };
-            return R30GuardScreenSpace(
+            const HRESULT gameHr = R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawPrimitive");
+            R30CompleteNativeGameSourceR26Safe(device, gameHr);
+            return gameHr;
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveDestR30(
@@ -4738,8 +4752,10 @@ namespace OutRunVRStereo
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveVB(
                 device, type, baseVertexIndex, minVertexIndex, numVertices,
                 startIndex, primitiveCount);
-            if (xyzrhw != E_NOTIMPL)
+            if (xyzrhw != E_NOTIMPL) {
+                R30CompleteNativeGameSourceR26Safe(device, xyzrhw);
                 return xyzrhw;
+            }
 
             auto actual = [&]() {
                 return DrawIndexedPrimitiveHook.stdcall<HRESULT>(device, type,
@@ -4751,8 +4767,10 @@ namespace OutRunVRStereo
                     baseVertexIndex, minVertexIndex, numVertices, startIndex,
                     primitiveCount);
             };
-            return R30GuardScreenSpace(
+            const HRESULT gameHr = R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawIndexedPrimitive");
+            R30CompleteNativeGameSourceR26Safe(device, gameHr);
+            return gameHr;
         }
 
         HRESULT __stdcall DrawPrimitiveUPDestR30(
@@ -4773,8 +4791,10 @@ namespace OutRunVRStereo
                     device, type, primitiveCount, data, stride);
             const HRESULT xyzrhw = R30TryXyzrhwPrimitiveUP(
                 device, type, primitiveCount, data, stride);
-            if (xyzrhw != E_NOTIMPL)
+            if (xyzrhw != E_NOTIMPL) {
+                R30CompleteNativeGameSourceR26Safe(device, xyzrhw);
                 return xyzrhw;
+            }
 
             auto actual = [&]() {
                 return DrawPrimitiveUPHook.stdcall<HRESULT>(
@@ -4784,8 +4804,10 @@ namespace OutRunVRStereo
                 return R30DrawPrimitiveUPR29Hook.stdcall<HRESULT>(
                     device, type, primitiveCount, data, stride);
             };
-            return R30GuardScreenSpace(
+            const HRESULT gameHr = R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawPrimitiveUP");
+            R30CompleteNativeGameSourceR26Safe(device, gameHr);
+            return gameHr;
         }
 
         HRESULT __stdcall DrawIndexedPrimitiveUPDestR30(
@@ -4808,8 +4830,10 @@ namespace OutRunVRStereo
             const HRESULT xyzrhw = R30TryXyzrhwIndexedPrimitiveUP(
                 device, type, minVertexIndex, numVertices, primitiveCount,
                 indexData, indexFormat, vertexData, stride);
-            if (xyzrhw != E_NOTIMPL)
+            if (xyzrhw != E_NOTIMPL) {
+                R30CompleteNativeGameSourceR26Safe(device, xyzrhw);
                 return xyzrhw;
+            }
 
             auto actual = [&]() {
                 return DrawIndexedPrimitiveUPHook.stdcall<HRESULT>(device, type,
@@ -4821,8 +4845,10 @@ namespace OutRunVRStereo
                     type, minVertexIndex, numVertices, primitiveCount,
                     indexData, indexFormat, vertexData, stride);
             };
-            return R30GuardScreenSpace(
+            const HRESULT gameHr = R30GuardScreenSpace(
                 device, actual, r29, "R30/DrawIndexedPrimitiveUP");
+            R30CompleteNativeGameSourceR26Safe(device, gameHr);
+            return gameHr;
         }
 
         void R30RollbackHooks() noexcept

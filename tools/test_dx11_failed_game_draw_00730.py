@@ -4,6 +4,7 @@ from pathlib import Path
 
 root = Path(__file__).resolve().parents[1]
 hook = (root / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
+safe_hook = (root / "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp").read_text(encoding="utf-8")
 api = (root / "src/vr/d3d11/live_game_frame_bridge.hpp").read_text(encoding="utf-8")
 bridge = (root / "src/vr/d3d11/live_game_frame_bridge.cpp").read_text(encoding="utf-8")
 workflow = (root / ".github/workflows/dx11-fast-structural.yml").read_text(encoding="utf-8")
@@ -76,6 +77,66 @@ for original, mutant in (
     mutated = fragment.replace(original, mutant, 1)
     assert mutated != fragment
     assert not integrated(hook, api, bridge[:start] + mutated + bridge[end:]), original
+
+# 00738: R26-safe game hooks also draw speculatively before D3D9 completes.
+# Failure on the XYZRHW direct path OR R29/R26 delegated path must revoke
+# the full native menu/vehicle/race batch without replacing the HRESULT.
+def safe_integrated(source: str) -> bool:
+    start = source.find("void R30CompleteNativeGameSourceR26Safe(")
+    end = source.find("HRESULT __stdcall DrawPrimitiveDestR30(", start)
+    if start < 0 or end < 0:
+        return False
+    helper = source[start:end]
+    if "if (FAILED(gameHr))" not in helper or "observe_failed_game_draw(device);" not in helper:
+        return False
+    expected = (
+        ("DrawPrimitive", "R30ObserveNativeLinearVB("),
+        ("DrawIndexedPrimitive", "R30ObserveNativeIndexedVB("),
+        ("DrawPrimitiveUP", "live_game_frame::observe_linear("),
+        ("DrawIndexedPrimitiveUP", "R30ObserveNativeIndexedUP("),
+    )
+    for name, observed in expected:
+        begin = source.find("HRESULT __stdcall " + name + "DestR30(", end)
+        if begin < 0:
+            return False
+        finish = source.find("HRESULT __stdcall ", begin + 10)
+        if finish < 0:
+            finish = source.find("void R30RollbackHooks()", begin)
+        if finish <= begin:
+            return False
+        block = source[begin:finish]
+        observed_at = block.find(observed)
+        native_at = block.find("const HRESULT xyzrhw =")
+        early_at = block.find("R30CompleteNativeGameSourceR26Safe(device, xyzrhw);")
+        fallback_at = block.find("const HRESULT gameHr = R30GuardScreenSpace(")
+        complete_at = block.find("R30CompleteNativeGameSourceR26Safe(device, gameHr);")
+        if not (0 <= observed_at < native_at < early_at < fallback_at < complete_at):
+            return False
+        if "if (xyzrhw != E_NOTIMPL) {" not in block or "return xyzrhw;" not in block[early_at:fallback_at]:
+            return False
+        if "return gameHr;" not in block[complete_at:]:
+            return False
+    return True
+
+assert safe_integrated(safe_hook), "R26-safe failed game Draw must quarantine native frame"
+for old, new in (
+    ("if (FAILED(gameHr))", "if (SUCCEEDED(gameHr))"),
+    ("observe_failed_game_draw(device);", "observe_unavailable_game_draw(device);"),
+):
+    damaged = safe_hook.replace(old, new, 1)
+    assert damaged != safe_hook and not safe_integrated(damaged), old
+for name in ("DrawPrimitive", "DrawIndexedPrimitive", "DrawPrimitiveUP", "DrawIndexedPrimitiveUP"):
+    begin = safe_hook.index("HRESULT __stdcall " + name + "DestR30(")
+    finish = safe_hook.find("HRESULT __stdcall ", begin + 10)
+    if finish < 0:
+        finish = safe_hook.index("void R30RollbackHooks()", begin)
+    block = safe_hook[begin:finish]
+    for call in ("R30CompleteNativeGameSourceR26Safe(device, xyzrhw);",
+                 "R30CompleteNativeGameSourceR26Safe(device, gameHr);"):
+        damaged = block.replace(call, "/* dropped original failure result */", 1)
+        assert damaged != block
+        assert not safe_integrated(safe_hook[:begin] + damaged + safe_hook[finish:]), (name, call)
+
 assert "python tools/test_dx11_failed_game_draw_00730.py" in workflow
 assert "tools/dx11_failed_game_draw_probe_00730.cpp" in workflow
-print("PASS 00730: failed original D3D9 VB/IB/UP Draw quarantines native full frame without altering gamepad/fallback")
+print("PASS 00730/00738: both R30 and R26-safe VB/IB/UP failure paths quarantine native full frame; original gamepad/fallback preserved")
