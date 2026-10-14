@@ -52,10 +52,10 @@ def require_portrait_center(code):
         "!std::isfinite(Game::original_resolution.y)",
         "const float verticalCenter =",
         "Game::original_resolution.y * scaleY) / 2",
-        "g_spriteVertexStream[1] = scaleY * topLeft.y + verticalCenter + 0.5;",
-        "g_spriteVertexStream[8] = scaleY * bottomLeft.y + verticalCenter + 0.5;",
-        "g_spriteVertexStream[0xF] = scaleY * topRight.y + verticalCenter + 0.5;",
-        "g_spriteVertexStream[0x16] = scaleY * bottomRight.y + verticalCenter + 0.5;",
+        "quad[1] = scaleY * topLeft.y + verticalCenter + 0.5;",
+        "quad[8] = scaleY * bottomLeft.y + verticalCenter + 0.5;",
+        "quad[0xF] = scaleY * topRight.y + verticalCenter + 0.5;",
+        "quad[0x16] = scaleY * bottomRight.y + verticalCenter + 0.5;",
     ):
         if token not in sprite:
             raise AssertionError(token)
@@ -88,8 +88,8 @@ for old, bad in (
      "Game::original_resolution.y * scale) * 0"),
     ("Game::original_resolution.y * scaleY) / 2",
      "Game::original_resolution.y * scaleY) * 0"),
-    ("g_spriteVertexStream[8] = scaleY * bottomLeft.y + verticalCenter + 0.5;",
-     "g_spriteVertexStream[8] = scaleY * bottomLeft.y + 0.5;"),
+    ("quad[8] = scaleY * bottomLeft.y + verticalCenter + 0.5;",
+     "quad[8] = scaleY * bottomLeft.y + 0.5;"),
 ):
     assert old in text
     broken = text.replace(old, bad, 1)
