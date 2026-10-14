@@ -28,7 +28,9 @@ def integrated(text):
         'D3D11_MAP_WRITE_DISCARD','device->CreateBuffer(',
         'context->Unmap(buffer.Get(), 0u)',
         'return false;',
-    )) and 'for (auto& stream : s.streamSlots) stream = {};' in reset
+    )) and upload.count('context->Unmap(buffer.Get(), 0u)') == 2 and (
+        'if (!mapped.pData) { context->Unmap(buffer.Get(), 0u); return false; }'
+        in upload) and 'for (auto& stream : s.streamSlots) stream = {};' in reset
 assert integrated(src)
 for term in ('stream.indexCapacity','stream.stage1Capacity',
              's.frameBatch.submitted >= s.streamSlots.size()',
