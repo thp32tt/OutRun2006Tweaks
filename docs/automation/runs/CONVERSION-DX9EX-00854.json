@@ -69,23 +69,42 @@
     "negative_test_evidence": "Changed-area verifier now rejects lost GOAL source, helper switch, queue admission and percentage source mutations while retaining +TIME existing negatives.",
     "eye_ownership": "Only exact GOAL ScreenHud source transitions are submitted before their owning queue scope exits; same R26+HUD existing per-eye transforms handle raster."
   },
-  "status": "C5_VALIDATION_PENDING",
-  "checkpoint": "C5_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "runtime_evidence": "No Quest3/VDXR game/HMD test for this source change. CI must not be interpreted as stereo optical PASS.",
+  "runtime_evidence": "Exact-SHA Windows CI, Domain, Full Source Impact and HUD Inspector PASS; actual Quest3/VDXR optical GOAL time/percentage test not performed. No runtime correctness or release/upgrade claim.",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
     "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
     "docs/automation/runs/CONVERSION-DX9EX-00854.json"
   ],
-  "score_once": false,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "score_once": true,
+  "material_result_sha": "eb01d856387eab2aab6e582a0f2de7cb513810b4",
+  "validation_bearing_result_sha": "eb01d856387eab2aab6e582a0f2de7cb513810b4",
   "acceptance_results": {
-    "goal_source": "PENDING",
-    "gpu_owner": "PENDING",
-    "fallback": "PENDING",
-    "integrate": "PENDING"
+    "goal_source": "PASS_EXACT_SHA",
+    "gpu_owner": "PASS_EXACT_SHA",
+    "fallback": "PASS_EXACT_SHA",
+    "integrate": "PASS_EXACT_SHA"
+  },
+  "phase": "C6_RESULT",
+  "ci_evidence": {
+    "exact_sha": "eb01d856387eab2aab6e582a0f2de7cb513810b4",
+    "active_workflow_run": 38609694552,
+    "active_jobs": {
+      "policy": "SUCCESS",
+      "host": "SUCCESS",
+      "game": "SUCCESS",
+      "full-chain-compile": "SUCCESS",
+      "package": "SUCCESS"
+    },
+    "domain_isolation_workflow_run": 38609694960,
+    "domain_isolation": "SUCCESS",
+    "full_source_impact_workflow_run": 38609694846,
+    "full_source_impact": "SUCCESS_3_OF_3",
+    "hud_inspector_workflow_run": 38609694639,
+    "hud_inspector": "SUCCESS_2_OF_2",
+    "validation_scope": "Windows x86 game DLL + x64 OpenXR host and package, cross-domain and source impact; not real Quest3/VDXR testing"
   }
 }
