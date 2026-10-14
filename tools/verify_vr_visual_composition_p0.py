@@ -695,10 +695,24 @@ def verify_exact_call_window_hud_scope(source):
         saved = f'{kind}SavedScope'
         require(f'{saved} = OutRunVR::GameSemantic::CurrentScope;',
                 enter, kind+' saves original render semantic')
-        require('if (Settings::VREnabled)', enter,
-                kind+' scope only overrides in VR')
-        require('OutRunVR::GameSemantic::RenderScope::ScreenHud;',
-                enter, kind+' synchronous draw owner')
+        if kind == 'StageExtension':
+            # +TIME's immediate source is a scoped producer; the old direct
+            # CurrentScope assignment stole an active SpriteQueue's owner.
+            require('if (Settings::VREnabled &&', enter,
+                    kind+' scope only overrides in VR')
+            require('GameSemantic::SpriteQueueDepth == 0', enter,
+                    kind+' must not override a live queued sprite')
+            require('StageExtensionDirectDrawOwner.emplace(', enter,
+                    kind+' immediate glyph RAII owner')
+            require('ProducerToken::StageExtensionTime', enter,
+                    kind+' immediate numeric glyph token')
+            if 'OutRunVR::GameSemantic::CurrentScope =' in enter:
+                raise SystemExit(kind+' reassigned a live queue scope')
+        else:
+            require('if (Settings::VREnabled)', enter,
+                    kind+' scope only overrides in VR')
+            require('OutRunVR::GameSemantic::RenderScope::ScreenHud;',
+                    enter, kind+' synchronous draw owner')
         require(f'OutRunVR::GameSemantic::CurrentScope = {saved};',
                 leave, kind+' must restore former owner')
         require(f'{saved} =', leave, kind+' resets saved scope')
@@ -718,10 +732,12 @@ def verify_stage_extension_direct_draw_owner(source, semantics):
     require('ScopedExactProducerSemantic>', source,
             '+TIME source must reuse queue-safe direct producer owner')
     require_order(begin, '+TIME exact parent must scope direct glyphs in VR',
-                  'if (Settings::VREnabled)',
+                  'if (Settings::VREnabled &&',
+                  'GameSemantic::SpriteQueueDepth == 0',
                   'StageExtensionDirectDrawOwner.emplace(',
-                  'RenderScope::ScreenHud);',
-                  'CurrentScope =')
+                  'RenderScope::ScreenHud,',
+                  'nullptr, true,',
+                  'ProducerToken::StageExtensionTime')
     require_order(end, '+TIME releases direct scope even on mid-call VR toggle',
                   'TagAppendedNodes(StageExtensionBefore,',
                   'StageExtensionDirectDrawOwner.reset();',
