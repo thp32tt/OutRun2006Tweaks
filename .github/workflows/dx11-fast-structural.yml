@@ -101,6 +101,8 @@ jobs:
           python tools/test_dx11_game_device_handoff_00681.py
           python tools/test_dx11_game_output_transition_00682.py
           python tools/test_dx11_output_mode_transition_00739.py
+          python tools/test_dx11_source_owner_handoff_00740.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_source_owner_handoff_probe_00740.cpp -o /tmp/dx11_source_owner_00740 && /tmp/dx11_source_owner_00740
           python tools/test_dx11_game_backbuffer_admission_00683.py
           python tools/test_dx11_same_mode_swapchain_transition_00684.py
           python tools/test_dx11_object_clip_draw_00685.py

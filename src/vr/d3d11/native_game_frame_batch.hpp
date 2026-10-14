@@ -46,6 +46,29 @@ struct GameNativeFrameBatch {
                 : lastOutputDevice != 0u &&
                     lastOutputDevice != presentingDevice);
     }
+    // Keep menu/car/race Draw ownership tied to the device which last
+    // actually presented a game frame. An auxiliary D3D9 device may draw
+    // first after Present, but must not hijack this frame's native batch.
+    [[nodiscard]] static constexpr bool admits_game_source(
+        std::uintptr_t candidate, std::uintptr_t currentOwner,
+        std::uintptr_t lastPresentOwner) noexcept {
+        return candidate != 0u &&
+            (currentOwner != 0u ? candidate == currentOwner
+                               : lastPresentOwner == 0u ||
+                                 candidate == lastPresentOwner);
+    }
+    // At startup no output owner may be known; an auxiliary device can then
+    // claim the first source Draw. A VERIFIED successful full-backbuffer Clear
+    // on the real game device starts a fresh scene and may recover ownership,
+    // but only before any speculative native Draw or pending output.
+    [[nodiscard]] static constexpr bool can_reacquire_full_clear(
+        std::uintptr_t candidate, std::uintptr_t currentOwner,
+        bool fullMode, bool wholeBackbuffer,
+        bool nativeSubmitted, bool nativePending) noexcept {
+        return fullMode && wholeBackbuffer && candidate != 0u &&
+            currentOwner != 0u && candidate != currentOwner &&
+            !nativeSubmitted && !nativePending;
+    }
     std::uint32_t submitted = 0u;
     bool stopped = false;
     bool depthReady = false;

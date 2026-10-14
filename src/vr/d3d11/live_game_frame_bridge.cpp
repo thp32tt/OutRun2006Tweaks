@@ -4620,13 +4620,16 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
 
 bool observe_source_device(State& s, IDirect3DDevice9* game) noexcept {
     const auto current = reinterpret_cast<std::uintptr_t>(game);
-    if (s.sourceGameDevice == 0u) s.sourceGameDevice = current;
-    else if (s.sourceGameDevice != current) {
-        // An auxiliary D3D9 device must not splice its Draw into the
-        // source game's native batch OR destroy that batch. Its original
-        // D3D9 Draw/input still execute. Reset releases source ownership.
+    const auto lastPresentDevice = s.previousOutput.valid()
+        ? s.previousOutput.device : 0u;
+    if (!GameNativeFrameBatch::admits_game_source(
+            current, s.sourceGameDevice, lastPresentDevice)) {
+        // Exclude an early auxiliary/menu device Draw without advancing
+        // the real game's source ordinal or aborting its existing batch.
+        // The original D3D9 Draw and gamepad input are unaffected.
         return false;
     }
+    if (s.sourceGameDevice == 0u) s.sourceGameDevice = current;
     return true;
 }
 
@@ -4919,11 +4922,13 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
         const auto sourceDevice = reinterpret_cast<std::uintptr_t>(game);
-        if (s.sourceGameDevice != 0u && s.sourceGameDevice != sourceDevice) return;
-        // Only the original successful game Clear reaches this callback.
-        // Entire game backbuffer may be cleared by a union of D3DRECTs.
-        // An incomplete Clear may not seed a native game frame.
-        s.clearColor.discard();
+        const bool foreignSource = s.sourceGameDevice != 0u &&
+            s.sourceGameDevice != sourceDevice;
+        if (foreignSource && !env_full_game_opt_in()) return;
+        // The previous owner's seed survives an unverified foreign Clear;
+        // the real owner still invalidates its own old seed immediately.
+        // Only a successful whole-backbuffer Clear may rebind ownership.
+        if (!foreignSource) s.clearColor.discard();
         ComPtr<IDirect3DSurface9> target, backbuffer;
         D3DSURFACE_DESC targetDesc{}, bbDesc{};
         D3DVIEWPORT9 viewport{};
@@ -4946,11 +4951,22 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
                 viewport.Width, viewport.Height, count, rects) &&
             bbDesc.MultiSampleType == D3DMULTISAMPLE_NONE &&
             (bbDesc.Format == D3DFMT_A8R8G8B8 || bbDesc.Format == D3DFMT_X8R8G8B8);
+        const bool sourceReacquired = GameNativeFrameBatch::can_reacquire_full_clear(
+            sourceDevice, s.sourceGameDevice, env_full_game_opt_in(),
+            wholeBackbuffer, s.frameBatch.submitted != 0u, s.pending);
+        if (foreignSource && !sourceReacquired) return;
+        if (foreignSource) s.clearColor.discard();
         s.clearColor.record(sourceDevice,
             reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()),
             static_cast<std::uint32_t>(color), wholeBackbuffer,
             bbDesc.Format == D3DFMT_X8R8G8B8);
         if (wholeBackbuffer && env_full_game_opt_in()) {
+            if (sourceReacquired || s.sourceGameDevice == 0u) {
+                // Genuine full game Clear starts a new native source epoch.
+                // Invalidate any readback from an auxiliary/older Present.
+                s.sourceGameDevice = sourceDevice;
+                if (++s.outputGeneration == 0u) ++s.outputGeneration;
+            }
             // Original successful whole Clear makes earlier menu/offscreen
             // Draws invisible. Restart source continuity at the first real
             // post-Clear Draw/DrawIndexed on this SAME game device/Present.
