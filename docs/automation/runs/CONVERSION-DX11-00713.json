@@ -124,5 +124,10 @@
   ],
   "known_ci_warning": "Preexisting 00708 TEMP C++ source probe emits GCC missing <initializer_list> errors inside a non-fatal 'g++ && executable' line. 00713 C++ and Python probes PASS; 00708 should be fixed as a separate real regression repair. Gate-level conclusions listed above are the actual GitHub verdict.",
   "next_action": "C6 PASS_EXACT_SHA recorded; TERMINAL_STATUS_NOT_COMPLETE resolved. Exact-SHA GitHub CI 5/5 success at ddd3190479246482ad4956a6a0e791c6b46c9ff5. Quest3/VDXR HMD and live gamepad remain UNTESTED / NEED_HMD_TEST. No new CI or score; controller may select the next independent DX11 task.",
-  "state_persisted": true
+  "state_persisted": true,
+  "acceptance_results": {
+    "live-dual-texture-rgba": "PASS",
+    "invalid-state-fallback": "PASS",
+    "exact-sha-ci": "PASS_EXACT_SHA"
+  }
 }

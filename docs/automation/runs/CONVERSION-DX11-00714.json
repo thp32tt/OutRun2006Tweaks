@@ -1,0 +1,100 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX11-00714",
+  "production_id": "CONVERSION-DX11-00714",
+  "event_id": "CONVERSION-DX11-00714-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "feature_id": "LIVE_STAGE1_INDEPENDENT_SAMPLER_RGB_ALPHA_GAME_DRAW",
+  "work_key": "DX11:STAGE1_GAME_INDEPENDENT_SAMPLER",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "menu_to_race_native_frame",
+    "integration_path": [
+      "Capture live Stage1 D3D9 texture and independently indexed sampler1 from real game menu/vehicle/race Draw/Indexed, including equal texture identity with different filters",
+      "Validate address/filter/mip/anisotropy/sRGB and upload native Stage1 mirror t1/s1 with independent sampler state, including original DX9Ex Draw/gamepad fail-closed fallback",
+      "Stage1 native HLSL samples t1/s1 with RGB and independent alpha through real Draw/DrawIndexed, visible frame diagnostic opt-in and exact SHA CI"
+    ],
+    "batch_components": [
+      "src/vr/d3d11/live_game_frame_bridge.cpp",
+      "src/vr/d3d11/live_game_stage1_dual_texture.hpp",
+      "tools/dx11_game_stage1_sampler_probe_00714.cpp",
+      "tools/test_dx11_stage1_independent_sampler_00714.py"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Stage1 t1/s1 independent address/filter/mip/sRGB including same D3D9 texture identity; portable C++ matrix and native binding",
+      "negative_regression": "Unrepresentable sampler1 modes/LOD, ADDRESSW mismatch, missing texture, UV or transform mismatch must retain game authored D3D9 draw and input",
+      "component_integration": "D3D9 GetSamplerState(1) -> TextureCapture -> D3D11 immutable mirror sampler and t1/s1 -> HLSL Stage1 game Draw/Indexed and exact SHA Windows/GitHub gates"
+    },
+    "conflict_keys": [
+      "DX11:STAGE1_GAME_INDEPENDENT_SAMPLER",
+      "src/vr/d3d11/live_game_frame_bridge.cpp"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "gameplay_delivery_target": "MENU_TO_RACE_NATIVE_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Quest3/VDXR actual menu/vehicle/race frame remains UNTESTED; do not promote until game/HMD measurements",
+    "activation_guard_and_fallback": "Explicit diagnostic opt-in remains required; original D3D9 gamepad/draw continues when Stage1 sampler cannot mirror exactly"
+  },
+  "feature_contract": {
+    "feature_id": "LIVE_STAGE1_INDEPENDENT_SAMPLER_RGB_ALPHA_GAME_DRAW",
+    "goal": "Real game-authored menu, vehicle selection and race Draw/Indexed render independent Stage1 sampler1 textures and alpha without borrowing Stage0 filter state or altering original D3D9 input fallback.",
+    "acceptance_items": [
+      {
+        "id": "live-independent-sampler-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_texture_sampler_shader_draw",
+        "expected_behavior": "The game captured Stage1 t1/s1 address, filter, mip, sRGB sampler overrides bind correctly on native Draw/Indexed even for the same t0 texture object"
+      },
+      {
+        "id": "unsupported-input-safe-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "d3d9_input_ownership",
+        "expected_behavior": "Unmappable game sampler, UV, filter or resource keeps game D3D9 Draw and gamepad unmodified"
+      },
+      {
+        "id": "same-sha-integrated-gates",
+        "category": "integrated_validation",
+        "behavior_area": "cpp_python_windows_vr_ci",
+        "expected_behavior": "Feature C++ model, Python mutation regressions, and all five mandatory GitHub gates on exact validation SHA pass"
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live-independent-sampler-draw": "PENDING",
+    "unsupported-input-safe-fallback": "PENDING",
+    "same-sha-integrated-gates": "PENDING"
+  },
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_stage1_dual_texture.hpp",
+    "tools/dx11_game_stage1_sampler_probe_00714.cpp",
+    "tools/test_dx11_stage1_independent_sampler_00714.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00714.json"
+  ],
+  "base_head_sha": "9249036467cef0985fe61dac058a35aead8cb3cc",
+  "material_result_sha": "a4ae55f4ba502a2016dfc5bd1d801b9988528215",
+  "validation_bearing_result_sha": null,
+  "prior_gate_failure": {
+    "run_id": 38516151119,
+    "cause": "Prior 00713 record missing acceptance_results despite five verified exact-SHA 00713 gates",
+    "repair": "Reconcile historical PASS results from 00713 existing gate_runs; 00714 remains PENDING"
+  },
+  "next_action": "Verify new source with DX11 fast structural C++ and Python probes and five exact SHA GitHub gates. Fix actual failures under same TASK_ID. Runtime Quest3/VDXR UNTESTED.",
+  "state_persisted": true
+}
