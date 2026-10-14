@@ -86,8 +86,8 @@
     ]
   },
   "acceptance_results": {
-    "full-frame-idle-slot-reuse": "PASS_STATIC_AND_BUILD",
-    "all-slots-busy-fallback": "PASS_STATIC_AND_BUILD",
+    "full-frame-idle-slot-reuse": "PASS",
+    "all-slots-busy-fallback": "PASS",
     "exact-sha-gates": "PASS_EXACT_SHA"
   },
   "blocking_evidence": "Previously before_game_present only inspected s.readbacks[s.writeSlot]; when it was busy, s.droppedCopies increased even if another staging resource was free. All native full frame pixels skipped current Present, despite room in ring.",
