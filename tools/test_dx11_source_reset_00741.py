@@ -30,7 +30,11 @@ def connected(bridge=BRIDGE, batch=BATCH, api=API, hooks=HOOKS, wf=WF):
         part = hook[hook.index("HRESULT __stdcall ResetDestR30("):]
         if part.count("live_game_frame::before_game_reset(device);") < 1: return False
         if "live_game_frame::before_game_reset();" in part: return False
-        if part.index("before_game_reset(device);") > part.index("return R30Reset"): return False
+        original = "R30ResetR29Hook.stdcall<HRESULT>(device, params);"
+        if part.count(original) != 1: return False
+        if part.index("before_game_reset(device);") >= part.index(original): return False
+        # The native owner cleanup must never replace the original D3D9 Reset.
+        if "return hr;" not in part[part.index(original):]: return False
     return ("python tools/test_dx11_source_reset_00741.py" in wf and
             "tools/dx11_source_reset_probe_00741.cpp" in wf)
 
@@ -51,8 +55,12 @@ mutants = [
                                 "before_game_reset();", 1), HOOKS[1]]),
     dict(hooks=[HOOKS[0], HOOKS[1].replace("before_game_reset(device);",
                                          "before_game_reset();", 1)]),
+    dict(hooks=[HOOKS[0].replace("R30ResetR29Hook.stdcall<HRESULT>(device, params);",
+                                "E_FAIL;", 1), HOOKS[1]]),
+    dict(hooks=[HOOKS[0], HOOKS[1].replace(
+        "R30ResetR29Hook.stdcall<HRESULT>(device, params);", "E_FAIL;", 1)]),
     dict(wf=WF.replace("python tools/test_dx11_source_reset_00741.py", "")),
 ]
 for i, mutation in enumerate(mutants):
     assert not connected(**mutation), f"Reset ownership regression mutation {i} escaped"
-print("PASS: game/aux Reset source continuity, native readback fallback, 8 destructive mutations")
+print("PASS: game/aux Reset source continuity, native readback fallback, 10 destructive mutations")
