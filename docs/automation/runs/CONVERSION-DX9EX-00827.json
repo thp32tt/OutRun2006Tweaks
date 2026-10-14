@@ -3,18 +3,18 @@
   "task_id": "CONVERSION-DX9EX-00827",
   "production_id": "CONVERSION-DX9EX-00827",
   "event_id": "CONVERSION-DX9EX-00827-E001",
-  "event_type": "material_validation_pending",
+  "event_type": "c6_pass_exact_sha",
   "attempt": "1/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:PERF:R31_R32_OPTIONAL_DIAGNOSTIC_WRITES",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R31_R32_OPTIONAL_DIAGNOSTIC_WRITES",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C4_MATERIAL_C5_EXACT_SHA_GATES_PENDING",
-  "automation_validation": "STATIC_SOURCE_CHECK_ONLY_CI_PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT_PASS_EXACT_SHA",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00827]",
   "feature_contract": {
     "feature_id": "DX9EX:PERF:R31_R32_OPTIONAL_DIAGNOSTIC_WRITES",
@@ -53,9 +53,9 @@
     ]
   },
   "acceptance_results": {
-    "R31_SAFE_WVP_COUNTER_OPT_OUT": "STATIC_SOURCE_MATCH_PENDING_CI",
-    "R32_FAIL_CLOSED_AND_RESET_OPT_OUT": "STATIC_SOURCE_MATCH_PENDING_CI",
-    "EXACT_SHA_WIN32_INTEGRATION": "PENDING"
+    "R31_SAFE_WVP_COUNTER_OPT_OUT": "PASS_EXACT_SHA",
+    "R32_FAIL_CLOSED_AND_RESET_OPT_OUT": "PASS_EXACT_SHA",
+    "EXACT_SHA_WIN32_INTEGRATION": "PASS_EXACT_SHA"
   },
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r31.cpp",
@@ -63,5 +63,44 @@
     "tools/verify_vr_r31_r32_off_counters.py",
     ".github/workflows/vr-dx9ex-active.yml"
   ],
-  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no Quest3/VDXR hardware session performed."
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED: no Quest3/VDXR/gameplay session or FPS p95 measurement; code/build CI success is not HMD correctness or speed proof.",
+  "material_result_sha": "f561b231a705dca79188f9da7f35d2dc85caeac3",
+  "validation_bearing_result_sha": "f561b231a705dca79188f9da7f35d2dc85caeac3",
+  "result_sha": "f561b231a705dca79188f9da7f35d2dc85caeac3",
+  "diagnosis": {
+    "original_evidence": "GitHub target branch 0a895d3a at dispatch: R31 WVP live-check/reject counters and six R32 snapshot, WVP upload failure, fail-closed, host identity, Reset rearm/failure statistics were incremented independently of VRTelemetry.",
+    "source_trace": [
+      "Original game D3D9 shader c64..c67 and StateBlock-authoritative live WVP sampling enter R31Draw fast world stereo route.",
+      "R31 shader/pose-generation checks plus 16-candidate live validation and R32 SetWvpBatch/LiveEffectSnapshot/DirectGPU/Reset execute fail-closed safety decisions.",
+      "R32 five-second opt-in telemetry consumes R31 WVP validation counters and R32 batch/snapshot/DirectGPU/Reset failure counters while x64 OpenXR host continues right-eye composition."
+    ],
+    "root_cause": "Counters served only R32's opt-in reporting, yet their hot-path producers performed unnecessary writes while telemetry was disabled. WVP cadence and fail-closed decisions depend on other state, so diagnostic writes can be gated without changing safety.",
+    "alternatives_rejected": [
+      "Turning off five-second logging alone leaves the counter writes on every eligible draw or fault.",
+      "Removing WVP candidate cadence or ignoring rejection would undermine rendering correctness and is explicitly rejected by negative mutations.",
+      "Suppressing fallback/Reset/DirectGPU state mutation would break recovery; only the diagnostic ++ operations are gated."
+    ],
+    "fix_evidence": "Changed R31/R32 C++ only for 8 diagnostic counter sites. Original validation cadence, generation quarantine, snapshot fallback, shader identity restore, host interop release and Reset invalidation remain. Full game/host/package DX9Ex Active Win32 run #38516866234 5/5 SUCCESS.",
+    "negative_test_evidence": "tools/verify_vr_r31_r32_off_counters.py executes 30 destructive mutations for lost/forced counters and safety invariants; exact-SHA DX9Ex Active policy passed. Domain Isolation #38516866810 and Full Source Impact #38516866128 succeeded."
+  },
+  "ci_evidence": {
+    "validation_bearing_result_sha": "f561b231a705dca79188f9da7f35d2dc85caeac3",
+    "dx9ex_active": {
+      "run_id": 38516866234,
+      "conclusion": "success",
+      "passed_jobs": 5,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38516866234"
+    },
+    "domain_isolation": {
+      "run_id": 38516866810,
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38516866810"
+    },
+    "full_source_impact": {
+      "run_id": 38516866128,
+      "conclusion": "success",
+      "passed_jobs": 3,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38516866128"
+    }
+  }
 }
