@@ -20,7 +20,8 @@ constexpr bool proof() {
     clear.record(device, target, 0x00112233u, true, true);  // X8, reserved alpha=0
     auto x8 = clear.native_color(device, target, fallback);
     if (x8[3] != 1.0f || x8[0] != float(0x11u)/255.0f ||
-        x8[1] != float(0x22u)/255.0f || x8[2] != float(0x33u)/255.0f) return false;
+        x8[1] != float(0x22u)*(1.0f/255.0f) ||
+        x8[2] != float(0x33u)*(1.0f/255.0f)) return false;
     // RGB writes stay enabled; X8 cannot mutate alpha after native Draw.
     if (clear.native_write_mask(device, target, 0x0fu) != 0x07u ||
         clear.native_write_mask(device, target, 0x08u) != 0u ||
