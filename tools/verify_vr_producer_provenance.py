@@ -243,4 +243,59 @@ for old, replacement in (
     else:
         fail("unsafe stage +TIME ownership mutation escaped: " + old)
 
+
+# GOAL progress, title/time synchronous glyphs and their queued siblings
+# must share exact provenance without consuming an earlier world Draw.
+def verify_goal_owner(source: str) -> None:
+    progress = function_body(source, "static void ResultProgressEnter(")
+    leave = function_body(source, "static void ResultProgressLeave(")
+    goal = function_body(source, "static void GoalTime_TagHelper(")
+    for marker in ("Settings::VREnabled", "ResultProgressDirectDrawOwner.emplace(",
+                   "RenderScope::ScreenHud,", "nullptr, true,",
+                   "ProducerToken::ResultProgress"):
+        if marker not in progress:
+            fail("GOAL progress direct producer lost: " + marker)
+    for marker in ("TagAppendedNodes(ResultProgressTailsBefore,",
+                   "ProducerToken::ResultProgress",
+                   "ResultProgressDirectDrawOwner.reset();"):
+        if marker not in leave:
+            fail("GOAL progress deferred producer lost: " + marker)
+    for marker in ("helperRva == 0xBE020", "ProducerToken::GoalTime020",
+                   "helperRva == 0xBE150", "ProducerToken::GoalTime150",
+                   "goalDirectDrawOwner.emplace(", "nullptr, true, producer",
+                   "original();", "goalDirectDrawOwner.reset();",
+                   "TagAppendedNodes(before,", "RenderScope::ScreenHud, producer"):
+        if marker not in goal:
+            fail("GOAL title/time owner lost: " + marker)
+    if goal.index("const auto producer") > goal.index("original();"):
+        fail("GOAL direct producer identity assigned after glyph Draw")
+    if "GameSemantic::CurrentScope =" in goal:
+        fail("GOAL time helper overrides an active queue")
+    for marker in ("ResultProgressCallA + 5", "ResultProgressCallB + 5",
+                   "GoalTime_Help020, Memory::HookType::Call",
+                   "GoalTime_Help150, Memory::HookType::Call"):
+        if marker not in source:
+            fail("an exact original GOAL E8 producer disappeared: " + marker)
+    if "ResultTextEnterHooks[i] = safetyhook::create_mid" in source:
+        fail("crash-prone 19 GOAL result-text return detours re-enabled")
+
+verify_goal_owner(ui)
+for func, old, replacement in (
+    ("static void ResultProgressEnter(", "nullptr, true,", "nullptr, false,"),
+    ("static void ResultProgressEnter(", "ProducerToken::ResultProgress", "ProducerToken::None"),
+    ("static void GoalTime_TagHelper(", "nullptr, true, producer", "nullptr, false, producer"),
+    ("static void GoalTime_TagHelper(", "ProducerToken::GoalTime020", "ProducerToken::None"),
+    ("static void GoalTime_TagHelper(", "goalDirectDrawOwner.reset();", "/* missing reset */"),
+):
+    body = function_body(ui, func)
+    if old not in body:
+        fail("GOAL mutation has no source: " + old)
+    mutant = ui.replace(body, body.replace(old, replacement, 1), 1)
+    try:
+        verify_goal_owner(mutant)
+    except SystemExit:
+        pass
+    else:
+        fail("GOAL negative mutation escaped: " + old)
+
 print("VR producer provenance contract PASS")

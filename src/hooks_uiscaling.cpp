@@ -819,12 +819,14 @@ class UIScaling : public Hook
 			SpriteNode* root = Game::sprite_prio_root[prio];
 			ResultProgressTailsBefore[prio] = root ? root->tail_4 : nullptr;
 		}
-        // 0x97BE4/0x97DEC may submit direct animated digits as well as
-        // queued sprites. The previous queue cursor must not own the direct
-        // percentage draw, but an actively replayed node keeps precedence.
+        // 0x97BE4/0x97DEC submit synchronous animated digits plus queued
+        // siblings. Shield stale world Draws; reentrant live queues retain
+        // their semantic authority, and old pending state is restored.
         if (Settings::VREnabled)
             ResultProgressDirectDrawOwner.emplace(
-                OutRunVR::GameSemantic::RenderScope::ScreenHud);
+                OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                nullptr, true,
+                OutRunVR::GameSemantic::ProducerToken::ResultProgress);
 	}
 	static void ResultProgressLeave(safetyhook::Context&)
 	{
@@ -1006,30 +1008,24 @@ class UIScaling : public Hook
 		// returns, preserving the exact parent producer identity.
 		auto original = reinterpret_cast<GoalTimeHelperFn>(
 			Module::exe_ptr(helperRva));
-        // 0xBEA5A / 0xBEA5F are exact safe CALL wrappers. The original
-        // helper can draw title/time immediately, before it queues siblings.
-        // Give that direct draw its own HUD cursor while preserving the
-        // previous queue scope/marker, then restore before post-call tagging.
+        // The two original GOAL E8 helper calls are independent title/time
+        // outputs. The same exact token must cover both synchronous glyph
+        // Draws and deferred sibling SpriteNodes; never deduplicate them.
+        const auto producer = helperRva == 0xBE020
+            ? OutRunVR::GameSemantic::ProducerToken::GoalTime020
+            : (helperRva == 0xBE150
+                ? OutRunVR::GameSemantic::ProducerToken::GoalTime150
+                : OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper);
+        // An old world/GOAL pending Draw must not steal the current exact
+        // time/title glyph. Active SpriteNode queue ownership outranks us.
         std::optional<OutRunVR::GameSemantic::ScopedExactProducerSemantic>
             goalDirectDrawOwner;
         if (Settings::VREnabled)
             goalDirectDrawOwner.emplace(
-                OutRunVR::GameSemantic::RenderScope::ScreenHud);
-		original();
+                OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                nullptr, true, producer);
+        original();
         goalDirectDrawOwner.reset();
-		// Both original GOAL helpers are required and intentional. The
-		// user's screen evidence suggests different visible components
-		// (course/stage name and recorded time), NOT two redundant calls
-		// rendering one time glyph. Exact component-to-address mapping remains
-		// unproven until original function disassembly or a matching HMD trace.
-		// Always execute EACH original exactly once and keep all siblings.
-		// Distinct producer tokens are diagnostic only: do not suppress,
-		// merge or deduplicate either helper, even if both draw white/alpha.
-		const auto producer = helperRva == 0xBE020
-			? OutRunVR::GameSemantic::ProducerToken::GoalTime020
-			: (helperRva == 0xBE150
-				? OutRunVR::GameSemantic::ProducerToken::GoalTime150
-				: OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper);
 		TagAppendedNodes(before,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud, producer);
 	}
