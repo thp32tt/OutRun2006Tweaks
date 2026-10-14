@@ -73,7 +73,14 @@ for old, new in (
     ("s.clearColor.discard();\n        // Menu/car/race frames often",
      "// missing frame discard\n        // Menu/car/race frames often"),
 ):
-    mutant = src.replace(old, new, 1)
+    # 00732 adds an earlier depth-only Clear observer with its own coverage
+    # guard. Mutate the COLOR Clear observer rather than that unrelated path.
+    start = src.index("void observe_game_clear(") if old == "GameNativeClearCoverage::covers_whole(" else 0
+    at = src.find(old, start)
+    assert at >= 0, old
+    if old == "GameNativeClearCoverage::covers_whole(":
+        assert at < src.index("void observe_unavailable_game_draw(", start), old
+    mutant = src[:at] + new + src[at + len(old):]
     assert mutant != src and not integrated(mutant, hook, helper), old
 mutant = helper.replace("if (!matches(device, backbuffer)) return fallback;",
                         "if (matches(device, backbuffer)) return fallback;")
