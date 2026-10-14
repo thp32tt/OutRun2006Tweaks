@@ -112,8 +112,17 @@
       "jobs": "static-exe-analysis/build-hud-inspector 2/2 SUCCESS"
     }
   },
-  "score_once": false,
+  "score_once": true,
   "c6_score_delta": 0,
   "checkpoint": "C6_STATE",
-  "controller_note": "C6 bookkeeping is separate from immutable validation-bearing 2f4723e7. Original game source material remains b6e87d4b. The same task had one missing run-record failure and one 4:3-only source verifier repair; these are not independent scored work. Quest3/VDXR not tested."
+  "controller_note": "C6 bookkeeping is separate from immutable validation-bearing 2f4723e7. Original game source material remains b6e87d4b. The same task had one missing run-record failure and one 4:3-only source verifier repair; these are not independent scored work. Quest3/VDXR not tested.",
+  "scoreboard_award": {
+    "run_key": "CONVERSION-DX9EX-00849",
+    "awarded_once": true,
+    "previous_score": 1316,
+    "delta": 1,
+    "new_cumulative_score": 1317,
+    "scoreboard_commit_sha": "f4cb8eac609d29413ca6b57e17d3261664d71142",
+    "note": "One independent game/host C++ functional outcome. Material repair/retry/C6 bookkeeping never scores separately."
+  }
 }
