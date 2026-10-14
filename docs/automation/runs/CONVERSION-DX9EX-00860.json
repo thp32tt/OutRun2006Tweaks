@@ -56,10 +56,10 @@
     ],
     "measured_evidence": "Issue #119 reports user-observed flicker/stability issues and game frame sampling, but exact GPU-frame causation awaits matching HMD profiling."
   },
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_FINAL_EXACT_SHA_VALIDATION_REQUESTED",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_evidence": "No live game/Quest3/VDXR test in this job; first-frame optical correction and hardware FPS impact not verified.",
   "changed_files": [
@@ -71,20 +71,44 @@
     "docs/automation/runs/CONVERSION-DX9EX-00860.json"
   ],
   "material_result_sha": "e7c8ee8384d02e2c0a53439c999441628e99f25c",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "ef17c8aae2f448c42b3b795b5b06b0b643137d93",
   "acceptance_results": {
     "first_frame": "SOURCE_PATCHED_PORTABLE_SMOKE_ADDED",
     "non_game_fallback": "SOURCE_PATCHED_PORTABLE_SMOKE_ADDED",
     "integration": "PENDING_EXACT_SHA"
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
+    "validation_sha": "ef17c8aae2f448c42b3b795b5b06b0b643137d93",
     "material_sha": "e7c8ee8384d02e2c0a53439c999441628e99f25c",
+    "reason_resolved": "TERMINAL_STATUS_NOT_COMPLETE",
+    "workflows": {
+      "dx9ex_active": {
+        "run_id": 38625756242,
+        "conclusion": "success"
+      },
+      "domain_isolation": {
+        "run_id": 38625756299,
+        "conclusion": "success"
+      },
+      "full_source_impact": {
+        "run_id": 38625756209,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 38625756146,
+        "conclusion": "success"
+      },
+      "autodev_coordination": {
+        "run_id": 38625756178,
+        "conclusion": "success"
+      }
+    },
     "previous_nonfinal_shas": [
       "c00443ce19a9e2c5cfdd9208bec74dd5cd43adf4",
       "7181485a7338311baf5074f98150abe31c04ccf5"
     ],
-    "note": "CI results for the eventual result-bearing record SHA required; no live Quest3/VDXR test or score award."
+    "note": "Exact-SHA deterministic GitHub Actions verified; no new build, source change, HMD run or score credit at C6."
   },
   "score_once": false,
   "score_delta_this_retry": 0
