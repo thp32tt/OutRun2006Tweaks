@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "feature_id": "LIVE_STAGE1_DUAL_TEXTURE_RGB_ALPHA_GAME_DRAW",
   "work_key": "DX11:STAGE1_INDEPENDENT_REAL_GAME_TEXTURE",
-  "status": "BUILD_VERIFIED",
-  "checkpoint": "C6_RESULT",
-  "automation_validation": "EXACT_SHA_GATES_5_OF_5_SUCCESS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -123,6 +123,6 @@
     }
   ],
   "known_ci_warning": "Preexisting 00708 TEMP C++ source probe emits GCC missing <initializer_list> errors inside a non-fatal 'g++ && executable' line. 00713 C++ and Python probes PASS; 00708 should be fixed as a separate real regression repair. Gate-level conclusions listed above are the actual GitHub verdict.",
-  "next_action": "BUILD_VERIFIED. NEED_HMD_TEST for Quest3/VDXR visuals/gamepad; no HMD parity claim. Controller may assign next independent DX11 feature. DXVK remains frozen.",
+  "next_action": "C6 PASS_EXACT_SHA recorded; TERMINAL_STATUS_NOT_COMPLETE resolved. Exact-SHA GitHub CI 5/5 success at ddd3190479246482ad4956a6a0e791c6b46c9ff5. Quest3/VDXR HMD and live gamepad remain UNTESTED / NEED_HMD_TEST. No new CI or score; controller may select the next independent DX11 task.",
   "state_persisted": true
 }
