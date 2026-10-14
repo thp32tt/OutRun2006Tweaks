@@ -405,17 +405,20 @@ def main() -> None:
         section = code[start:end]
         # Full-frame same-Present fence recycling is a separate producer.
         # The inset must retain its independent async poll and submit path.
-        poll = section.find("const HRESULT ready = ctx->GetData(")
+        poll = section.find("HRESULT ready = ctx->GetData(")
+        first_done = section.find("if (fullMode && fullQueued && ready == S_FALSE)", poll)
         map_at = section.find("ctx->Map(oldest.staging.Get()", poll)
         inset_at = section.find("// Native full-frame was already enqueued", map_at)
-        if not (0 <= poll < map_at < inset_at):
+        if not (0 <= poll < first_done < map_at < inset_at):
             return False
         inset = section[inset_at:]
         return all(x in section for x in (
             "D3D11_QUERY_EVENT", "s.insetFormat != bb.Format",
             "s.insetSurface.GetAddressOf(), nullptr",
         )) and all((
-            "D3D11_ASYNC_GETDATA_DONOTFLUSH" in section[poll:map_at],
+            "D3D11_ASYNC_GETDATA_DONOTFLUSH" in section[poll:first_done],
+            "GameNativeFramePublication::retry_same_present_fence(" in section[first_done:map_at],
+            "QueryPerformanceCounter(&now)" in section[first_done:map_at],
             "D3D11_MAP_FLAG_DO_NOT_WAIT" in section[map_at:inset_at],
             "ctx->End(next.fence.Get());" in inset,
             "if (!next.busy)" in inset,
@@ -433,7 +436,7 @@ def main() -> None:
     ):
         # Change the inset's own async path. Mutating the earlier full-frame
         # recycler/submit would leave the async inset intact (false-negative).
-        start = (bridge.index("const HRESULT ready = ctx->GetData(")
+        start = (bridge.index("HRESULT ready = ctx->GetData(")
                  if original == "D3D11_ASYNC_GETDATA_DONOTFLUSH" else
                  bridge.index("// Native full-frame was already enqueued")
                  if original in ("ctx->End(next.fence.Get());", "if (!next.busy)") else 0)

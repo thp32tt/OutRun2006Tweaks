@@ -16,9 +16,10 @@ def wired(code):
         and "GameReadbackProvenance provenance{};" in code
         and "ready == S_OK && (!oldest.provenance.may_present(s.presents, fullMode) ||" in x
         and "!oldest.provenance.same_device(presentDevice)" in x
-        and "++s.staleReadbacks;" in x[x.index("const HRESULT ready = ctx->GetData("):]
+        and "++s.staleReadbacks;" in x[x.index("HRESULT ready = ctx->GetData("):]
         and "next.provenance = {s.presents, s.sourceDrawsThisFrame};" in x
         and "ctx->CopyResource(next.staging.Get(), s.backend.color_texture());" in x
+        and "GameNativeFramePublication::retry_same_present_fence(" in x
         and "D3D11_ASYNC_GETDATA_DONOTFLUSH" in x
         and "fullMode ? fullSlot : s.readSlot" in x
         and "fullMode ? capturedAtPresent == currentPresent" in header
@@ -34,7 +35,7 @@ for token in ("!oldest.provenance.may_present(s.presents, fullMode)",
     if token == "++s.staleReadbacks;":
         # The full-frame pre-poll fence recycler now has another counter;
         # mutate the asynchronous upload rejection, not the recycler.
-        marker = "const HRESULT ready = ctx->GetData("
+        marker = "HRESULT ready = ctx->GetData("
         front, tail = src.split(marker, 1)
         assert token in tail
         mutant = front + marker + tail.replace(
