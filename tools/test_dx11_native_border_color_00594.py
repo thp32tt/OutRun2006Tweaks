@@ -8,7 +8,11 @@ def wired(s: str) -> bool:
     try:
         cap = s.split("struct TextureCapture {", 1)[1].split("struct OutputCapture {", 1)[0]
         gate = s.split("bool supported_game_state(", 1)[1].split("bool translate_vertices(", 1)[0]
-        sampler = s.split("bool mirror_texture(", 1)[1].split("bool submit(", 1)[0]
+        sampler = s.split("bool create_game_sampler(", 1)[1].split("bool submit(", 1)[0]
+        # Both the standalone Stage1 sampler and the Stage0 game texture
+        # mirror must remain connected after 00716 sampler extraction.
+        if "return create_game_sampler(dev, capture, levels, sampler);" not in sampler:
+            return False
         draw = s.split("bool submit(", 1)[1].split("void observe(", 1)[0]
     except IndexError:
         return False

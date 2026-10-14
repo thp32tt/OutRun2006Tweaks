@@ -9,7 +9,11 @@ SRC = Path(__file__).resolve().parents[1] / "src/vr/d3d11/live_game_frame_bridge
 def wired(s):
     try:
         gate = s.split("bool supported_game_state(", 1)[1].split("bool translate_vertices(", 1)[0]
-        mirror = s.split("bool mirror_texture(", 1)[1].split("bool submit(", 1)[0]
+        mirror = s.split("bool create_game_sampler(", 1)[1].split("bool submit(", 1)[0]
+        # Both the standalone Stage1 sampler and the Stage0 game texture
+        # mirror must remain connected after 00716 sampler extraction.
+        if "return create_game_sampler(dev, capture, levels, sampler);" not in mirror:
+            return False
         draw = s.split("bool submit(", 1)[1].split("void observe(", 1)[0]
         capture = s.split("struct TextureCapture {", 1)[1].split("struct OutputCapture {", 1)[0]
     except IndexError:
