@@ -10,15 +10,16 @@
   "feature_id": "DX9EX:PERF:R30_HUD_SOURCE_ASPECT_COHERENCE",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R30_HUD_SOURCE_ASPECT_COHERENCE",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
-  "checkpoint": "C4_COMMITTED",
-  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00810]",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "tools/verify_vr_r30_hud_present_cache.py",
+    "tools/verify_vr_r30_frame_snapshot_fastpath.py",
     "docs/automation/runs/CONVERSION-DX9EX-00810.json"
   ],
   "feature_contract": {
@@ -58,9 +59,9 @@
     ]
   },
   "acceptance_results": {
-    "R30_SOURCE_EPOCH_PARITY": "SOURCE_IMPLEMENTED_PENDING_GATE",
-    "R30_RESET_AND_EXTENT_FALLBACK": "SOURCE_IMPLEMENTED_PENDING_GATE",
-    "R30_EXACT_SHA_BUILD": "PENDING_EXACT_SHA_GATES",
+    "R30_SOURCE_EPOCH_PARITY": "PASS_EXACT_SHA",
+    "R30_RESET_AND_EXTENT_FALLBACK": "PASS_EXACT_SHA",
+    "R30_EXACT_SHA_BUILD": "PASS_EXACT_SHA",
     "runtime_validation": "UNTESTED"
   },
   "diagnosis": {
@@ -76,8 +77,50 @@
       "Never change world draw stereo or SkyGlow effects.",
       "Never modify menus and F11 external ImGui render source."
     ],
-    "negative_test_evidence": "3 source aspect seeds, 5 destructive mutations and old cache checks; exact-SHA CI pending.",
+    "negative_test_evidence": "Verified on exact-SHA DX9Ex Active policy: 3 source aspect seeds; 5 negative snapshot/cache mutants; amended legacy R30 snapshot owner guard, plus existing comprehensive HUD, world and eye-context regressions.",
     "fix_evidence": "Forward caller frame dimensions and eliminate second full frame snapshot call."
   },
-  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+  "initial_material_sha": "1c8af9808358db5f77e5355dd7d393073998c00b",
+  "material_result_sha": "485988407d57ff763a2efe7f75adf0442c038466",
+  "validation_bearing_result_sha": "f541895999d9adf71c2c5cc20224c5734df289a5",
+  "result_sha": "f541895999d9adf71c2c5cc20224c5734df289a5",
+  "runtime_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "c6_recorded_at_utc": "2026-10-14T00:18:48Z",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "f541895999d9adf71c2c5cc20224c5734df289a5",
+    "dx9ex_active": {
+      "run_id": 38488683406,
+      "head_sha": "f541895999d9adf71c2c5cc20224c5734df289a5",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "game": "SUCCESS",
+        "host": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      },
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38488683406"
+    },
+    "domain_isolation": {
+      "run_id": 38488683521,
+      "head_sha": "f541895999d9adf71c2c5cc20224c5734df289a5",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38488683521"
+    },
+    "full_source_impact": {
+      "run_id": 38488640670,
+      "head_sha": "485988407d57ff763a2efe7f75adf0442c038466",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "source-cross-domain": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "msvc-analyze-active-game": "SUCCESS"
+      },
+      "note": "Source-impact review ran on latest C++ material repair SHA. Subsequent validation-bearing change updates only the Python verifier; compiled C++ matches material SHA.",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38488640670"
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  }
 }
