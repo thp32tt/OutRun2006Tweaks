@@ -69,6 +69,19 @@ struct GameNativeFrameBatch {
             currentOwner != 0u && candidate != currentOwner &&
             !nativeSubmitted && !nativePending;
     }
+    // A menu/auxiliary D3D9 device can Reset while the game's full-size
+    // D3D11 Draw and fenced output belong to a different D3D9 device.
+    // Never discard the actual game frame, GPU readbacks or input-safe
+    // Present continuity in response to that foreign Reset. Before any
+    // source/Present owner is known a Reset may still clean startup state.
+    [[nodiscard]] static constexpr bool reset_belongs_to_game_source(
+        std::uintptr_t resettingDevice, std::uintptr_t sourceOwner,
+        std::uintptr_t lastPresentOwner) noexcept {
+        return resettingDevice != 0u &&
+            (sourceOwner != 0u ? resettingDevice == sourceOwner
+                               : lastPresentOwner == 0u ||
+                                 resettingDevice == lastPresentOwner);
+    }
     std::uint32_t submitted = 0u;
     bool stopped = false;
     bool depthReady = false;

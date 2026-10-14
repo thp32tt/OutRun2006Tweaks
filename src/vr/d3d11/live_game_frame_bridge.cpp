@@ -5406,10 +5406,16 @@ void before_game_present(IDirect3DDevice9* game,
     }
 }
 
-void before_game_reset() noexcept {
-    if (!diagnostic_enabled()) return;
+void before_game_reset(IDirect3DDevice9* game) noexcept {
+    if (!diagnostic_enabled() || !game) return;
     State& s = state();
     std::lock_guard<std::mutex> lock(s.mutex);
+    // D3D9 Reset is per-device: an auxiliary menu/video device's Reset
+    // must not discard the primary game's native Draw/Present GPU batch.
+    if (!GameNativeFrameBatch::reset_belongs_to_game_source(
+            reinterpret_cast<std::uintptr_t>(game), s.sourceGameDevice,
+            s.previousOutput.valid() ? s.previousOutput.device : 0u))
+        return;
     s.pending = false;
     s.frameBatch.reset();
     s.eligibleThisFrame = 0;

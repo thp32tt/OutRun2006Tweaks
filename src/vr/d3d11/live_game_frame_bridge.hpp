@@ -47,5 +47,7 @@ void observe_game_clear(IDirect3DDevice9* gameDevice, DWORD count,
 // Failure never propagates to the original game Present.
 void before_game_present(IDirect3DDevice9* gameDevice,
                          const RECT* sourceRect, const RGNDATA* dirtyRegion) noexcept;
-void before_game_reset() noexcept;
+// Called before the original D3D9 Reset; only its owning game device may
+// retire the native frame and associated D3D11 resources.
+void before_game_reset(IDirect3DDevice9* gameDevice) noexcept;
 } // namespace outrun::vr::dx11::live_game_frame

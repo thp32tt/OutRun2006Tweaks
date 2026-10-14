@@ -1415,7 +1415,7 @@ namespace OutRunVRStereo
             IDirect3DDevice9* device,
             D3DPRESENT_PARAMETERS* params)
         {
-            outrun::vr::dx11::live_game_frame::before_game_reset();
+            outrun::vr::dx11::live_game_frame::before_game_reset(device);
             R30ReleaseSkyGlowResources();
             R30SkyGlowSceneCaptureEpoch = 0;
             R67StageIdentitySeen = false;
