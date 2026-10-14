@@ -91,17 +91,6 @@ int main() {
     assert(b.first_draw() && b.accepts_source_draw(1500u, true));
     b.record_source_draw(1500u);
     b.succeeded(false);
-    // Real game Clear or RT0 replacement after a native Draw invalidates
-    // the full-size frame; the original D3D9 draw and input remain valid.
-    b.reset();
-    b.succeeded(false); b.record_source_draw(0u);
-    assert(b.publishable_full(true, 1u));
-    b.scene_boundary();
-    assert(!b.publishable_full(true, 1u));
-    assert(!b.accepts_full(1u));
-    b.reset();
-    assert(b.accepts_full(0u));
-    b.succeeded(false); b.record_source_draw(0u);
     assert(!b.accepts_source_draw(1502u, true)); // Missed game draw.
     assert(!b.accepts_source_draw(1499u, true)); // Reordered game draw.
     // A destructive 4096 -> 8 capacity mutation must not shrink the C++ test

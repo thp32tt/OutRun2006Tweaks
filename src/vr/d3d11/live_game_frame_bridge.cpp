@@ -37,7 +37,6 @@
 #include <d3dcompiler.h>
 #include <wrl/client.h>
 #include <algorithm>
-#include <atomic>
 #include <array>
 #include <cmath>
 #include <cstdint>
@@ -50,7 +49,6 @@
 
 namespace outrun::vr::dx11::live_game_frame {
 namespace {
-std::atomic<bool> g_scene_boundary_hooks_ready{false};
 using Microsoft::WRL::ComPtr;
 static_assert(dynamic_texture::kDefaultPool == D3DPOOL_DEFAULT &&
               dynamic_texture::kDynamicUsage == D3DUSAGE_DYNAMIC,
@@ -4749,10 +4747,6 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
 }
 } // namespace
 
-void set_scene_boundary_hooks_ready(bool ready) noexcept {
-    g_scene_boundary_hooks_ready.store(ready, std::memory_order_release);
-}
-
 bool diagnostic_enabled() noexcept {
     static const bool optedIn = env_opt_in();
     return optedIn;
@@ -4991,14 +4985,8 @@ void before_game_present(IDirect3DDevice9* game,
             // Never publish partial GPU compositing from a source draw gap,
             // a failed vertex/index translation or a failed D3D11 submit.
             // Previously s.pending survived abort() and copied corrupt insets.
-            // A Clear/RT0 transition can erase the original game color
-            // between captured Draws. Never publish a full-size DX11 frame
-            // unless R30 observes BOTH source-side scene boundaries.
-            const bool boundaryHooksReady =
-                g_scene_boundary_hooks_ready.load(std::memory_order_acquire);
             const bool complete = fullMode
-                ? boundaryHooksReady &&
-                  s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)
+                ? s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)
                 : s.frameBatch.publishable(s.pending);
             if (complete && outputWritable &&
                 s.sourceGameDevice == presentDevice) {

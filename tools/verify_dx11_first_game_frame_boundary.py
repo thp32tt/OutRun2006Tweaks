@@ -163,25 +163,6 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "if (stopped) return false;" in batch_source and
             "return !depth || depthDirection == 0u ||" in batch_source,
             "must preserve default single Draw, double opt-in, bounded native GPU work and Z isolation")
-    require("R30SceneSetRtVtableIndex = 37" in caller and
-            "R30SceneClearVtableIndex = 43" in caller and
-            "R30SceneSetRtHook = safetyhook::create_inline(" in caller and
-            "R30SceneClearHook = safetyhook::create_inline(" in caller and
-            "HRESULT __stdcall R30SceneClearDest(" in caller and
-            "HRESULT __stdcall R30SceneSetRtDest(" in caller and
-            caller.count("observe_scene_boundary(device);") == 2 and
-            "!InternalStereoPass && IsGameDevice(device)" in caller and
-            "if (SUCCEEDED(hr) && index == 0u" in caller and
-            "R30SceneClearHook.stdcall<HRESULT>(" in caller and
-            "R30SceneSetRtHook.stdcall<HRESULT>(" in caller and
-            "set_scene_boundary_hooks_ready(false);" in caller and
-            "static_cast<bool>(R30SceneClearHook)" in caller and
-            "static_cast<bool>(R30SceneSetRtHook)" in caller and
-            "g_scene_boundary_hooks_ready.load(std::memory_order_acquire)" in code and
-            "const bool complete = fullMode" in code and
-            "? boundaryHooksReady &&" in code and
-            "void set_scene_boundary_hooks_ready(bool ready) noexcept;" in header,
-            "source Clear/RT0 hooks and full-frame fail-closed gate must be connected")
     require("return R30PresentR29Hook.stdcall<HRESULT>(" in caller,
             "game Present must retain the D3D9 path")
 

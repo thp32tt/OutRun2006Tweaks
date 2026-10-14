@@ -508,6 +508,23 @@ namespace OutRunVRStereo
 				IDirect3DSurface9* previous = nullptr;
 				const HRESULT query = device->GetRenderTarget(0, &previous);
 				nativeTargetChanged = FAILED(query) || previous != surface;
+				// Surface interface pointers may be distinct COM aliases of the
+				// same RT0. Preserve an in-progress native menu/race frame when
+				// both interfaces resolve to the same controlling IUnknown.
+				// A failed identity query still fails closed; the D3D9 call wins.
+				if (SUCCEEDED(query) && previous && surface && previous != surface)
+				{
+					IUnknown* previousIdentity = nullptr;
+					IUnknown* nextIdentity = nullptr;
+					const HRESULT previousHr = previous->QueryInterface(
+						IID_IUnknown, reinterpret_cast<void**>(&previousIdentity));
+					const HRESULT nextHr = surface->QueryInterface(
+						IID_IUnknown, reinterpret_cast<void**>(&nextIdentity));
+					nativeTargetChanged = FAILED(previousHr) || FAILED(nextHr) ||
+						previousIdentity != nextIdentity;
+					if (previousIdentity) previousIdentity->Release();
+					if (nextIdentity) nextIdentity->Release();
+				}
 				if (previous) previous->Release();
 			}
 			++R9RtCalls;
@@ -532,7 +549,11 @@ namespace OutRunVRStereo
 				return R9ClearCallbackHook.stdcall<HRESULT>(device, count, rects, flags, color, z, stencil);
 			// The next game scene starts with this Clear. Do not publish native
 			// Draws from the previous scene, even if the batch had reached its cap.
-			outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);
+			// D3D9 Clear with no color/depth/stencil flags cannot mutate the
+			// native game's framebuffer; do not abort a complete Draw batch.
+			if ((flags & (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |
+				D3DCLEAR_STENCIL)) != 0u)
+				outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);
 			++R9ClearCalls;
 			const bool wanted = StereoWanted();
 			const bool mainTarget = TargetIsBackBuffer();

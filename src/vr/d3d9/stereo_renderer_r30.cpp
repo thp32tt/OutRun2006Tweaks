@@ -69,11 +69,6 @@ namespace OutRunVRStereo
         // Observe the game's own Lock/Unlock writes instead and keep the exact
         // CPU byte ranges that are known current. Draw then consumes only this
         // shadow and fails open to R29 when a range was never observed.
-        // D3D9 Device9 vtable: RT0 swap and Clear are real game scene
-        // boundaries, not just Draw state changes. Observe only for
-        // explicit DX11 diagnostics; never change the game HRESULT.
-        constexpr std::size_t R30SceneSetRtVtableIndex = 37;
-        constexpr std::size_t R30SceneClearVtableIndex = 43;
         constexpr std::size_t R30CreateTextureVtableIndex = 23;
         constexpr std::size_t R30CreateVertexBufferVtableIndex = 26;
         constexpr std::size_t R30CreateIndexBufferVtableIndex = 27;
@@ -87,8 +82,6 @@ namespace OutRunVRStereo
         constexpr std::size_t R30TextureUnlockRectVtableIndex = 20;
         constexpr UINT R30MaxShadowBytes = 16u * 1024u * 1024u;
 
-        SafetyHookInline R30SceneSetRtHook{};
-        SafetyHookInline R30SceneClearHook{};
         SafetyHookInline R30CreateTextureHook{};
         SafetyHookInline R30UpdateSurfaceHook{};
         SafetyHookInline R30UpdateTextureHook{};
@@ -696,51 +689,11 @@ namespace OutRunVRStereo
             return hr;
         }
 
-        HRESULT __stdcall R30SceneSetRtDest(
-            IDirect3DDevice9* device, DWORD index, IDirect3DSurface9* surface)
-        {
-            const HRESULT hr = R30SceneSetRtHook.stdcall<HRESULT>(
-                device, index, surface);
-            if (SUCCEEDED(hr) && index == 0u &&
-                !InternalStereoPass && IsGameDevice(device))
-                outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);
-            return hr;
-        }
-
-        HRESULT __stdcall R30SceneClearDest(
-            IDirect3DDevice9* device, DWORD rectCount,
-            const D3DRECT* rects, DWORD flags, D3DCOLOR color,
-            float depth, DWORD stencil)
-        {
-            const HRESULT hr = R30SceneClearHook.stdcall<HRESULT>(
-                device, rectCount, rects, flags, color, depth, stencil);
-            if (SUCCEEDED(hr) &&
-                (flags & (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |
-                          D3DCLEAR_STENCIL)) != 0u &&
-                !InternalStereoPass && IsGameDevice(device))
-                outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);
-            return hr;
-        }
-
         void R30InstallBufferCreationHooks(IDirect3DDevice9* device)
         {
             if (!device)
                 return;
             auto** vtable = *reinterpret_cast<void***>(device);
-            if (outrun::vr::dx11::live_game_frame::diagnostic_enabled())
-            {
-                if (!R30SceneSetRtHook)
-                    R30SceneSetRtHook = safetyhook::create_inline(
-                        vtable[R30SceneSetRtVtableIndex], R30SceneSetRtDest);
-                if (!R30SceneClearHook)
-                    R30SceneClearHook = safetyhook::create_inline(
-                        vtable[R30SceneClearVtableIndex], R30SceneClearDest);
-                // Incomplete hook installation must block the full-size
-                // native backbuffer overlay; D3D9 Draw/Present continue.
-                outrun::vr::dx11::live_game_frame::set_scene_boundary_hooks_ready(
-                    static_cast<bool>(R30SceneSetRtHook) &&
-                    static_cast<bool>(R30SceneClearHook));
-            }
             if (!R30CreateTextureHook)
                 R30CreateTextureHook = safetyhook::create_inline(
                     vtable[R30CreateTextureVtableIndex],
@@ -770,9 +723,6 @@ namespace OutRunVRStereo
 
         void R30RollbackBufferShadowHooks() noexcept
         {
-            outrun::vr::dx11::live_game_frame::set_scene_boundary_hooks_ready(false);
-            R30SceneClearHook = {};
-            R30SceneSetRtHook = {};
             // Unhook entry points before dropping registry ownership. Any draw
             // holding a COM reference also holds a shared_ptr acquired from the
             // registry, so clearing the maps cannot invalidate an in-flight
