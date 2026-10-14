@@ -31,6 +31,13 @@ def check(code: str, header: str) -> list[str]:
          "StageExtensionPrintCalls[]" in source and
          "0x989AD, 0x98A10, 0x98A89" in source,
          "six original source edges are not preserved")
+    stage_enter = source[source.find("static void StageExtensionEnter("):
+                         source.find("static void StageExtensionLeave(")]
+    need("FlushD3DXBeforeDirectStageSource();" in stage_enter and
+         stage_enter.find("FlushD3DXBeforeDirectStageSource();") <
+         stage_enter.find("StageExtensionDirectDrawOwner.emplace(") and
+         "static void FlushD3DXBeforeDirectStageSource() noexcept;" in source,
+         "direct +TIME must drain proven prior D3DX batch before new ScreenHud owner")
     need("ScopedExactProducerSemantic" in source and
          "ProducerToken::StageExtensionTime" in source and
          "TagAppendedNodes(StageExtensionBefore" in source,
@@ -45,6 +52,14 @@ def check(code: str, header: str) -> list[str]:
          "BatchActive = false" in hook and
          "ForgetBatch();" in hook,
          "Begin/End/failed-Flush state invalidation missing")
+    need("static void BeforeDirectStageSource() noexcept" in hook and
+         "false, true, PendingHomogeneous" in hook and
+         "StageBoundaryReady = false;" in hook and
+         "StageFlushes.fetch_add" in hook and
+         "StageFallbacks.fetch_add" in hook and
+         "static void FlushD3DXBeforeDirectStageSource() noexcept" in code[end-1800:] and
+         "VRProjectedD3DXSpriteIsolationR64::BeforeDirectStageSource();" in code,
+         "direct +TIME must split the old homogeneous D3DX batch under outgoing owner")
     need("PendingHomogeneous = false" in hook and
          "CanFlushD3DXPreQueueStageBatch(" in hook and
          "!QueueRenderActive()" in hook,
@@ -115,6 +130,17 @@ def main() -> int:
         print("DX9Ex +TIME D3DX FAIL: " + "; ".join(errors))
         return 1
     mutations = {
+        "lost-direct-old-batch-isolation":
+            code.replace("            FlushD3DXBeforeDirectStageSource();",
+                         "            // direct GPU submission not isolated", 1),
+        "premature-direct-owner":
+            code.replace(
+                "            FlushD3DXBeforeDirectStageSource();\n"
+                "            StageExtensionDirectDrawOwner.emplace(",
+                "            StageExtensionDirectDrawOwner.emplace(", 1),
+        "direct-mixed-batch-promoted":
+            code.replace("false, true, PendingHomogeneous,",
+                         "false, true, true,", 1),
         "wrong-before-after-node-order":
             code.replace(
                 "VRProjectedD3DXSpriteIsolationR64::BeforeQueueNode(node);\n"

@@ -56,6 +56,11 @@ namespace
 
 }
 
+// The exact D3DX sprite hook is declared below the original +TIME source.
+// Split any proven previous batch BEFORE the original direct glyph obtains
+// ScreenHud ownership, not after its Draw may have submitted old triangles.
+static void FlushD3DXBeforeDirectStageSource() noexcept;
+
 class UIScaling : public Hook
 {
 	const static int D3DXMatrixTransformation2D_Addr = 0x39400;
@@ -943,6 +948,11 @@ class UIScaling : public Hook
             // as the separately tagged deferred sprani/number siblings.
             // ScopedExactProducerSemantic restores the previous scope,
             // pending Draw and direct producer on every return path.
+            // Unlike a queued node, the original numeric +TIME E8 can
+            // submit D3DX work synchronously. Any *proven* preexisting
+            // homogeneous batch belongs to the outgoing producer; flush it
+            // before the new ScreenHud scope can relabel its GPU submission.
+            FlushD3DXBeforeDirectStageSource();
             StageExtensionDirectDrawOwner.emplace(
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 nullptr, true,
@@ -2159,6 +2169,32 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     }
 
 public:
+    // Direct +TIME numeric glyphs do not pass through QueueNode. D3DX may
+    // submit the previous Draw batch while the first new glyph is queued.
+    // Split only a complete, homogeneous, already-tracked batch with the
+    // currently live outgoing scope+producer. Never flush an unknown batch
+    // or broaden HUD ownership; the existing fail-closed path remains.
+    static void BeforeDirectStageSource() noexcept
+    {
+        using namespace OutRunVR::GameSemantic;
+        if (QueueRenderActive())
+            return;
+        StageBoundaryReady = false;
+        void* sprite = *Module::exe_ptr<void*>(0x55B218);
+        if (!BatchActive || sprite != TrackedSprite || PendingDraws == 0)
+            return;
+        if (!CanFlushD3DXPreQueueStageBatch(
+                false, true, PendingHomogeneous,
+                PendingScope, PendingProducer,
+                EffectiveScope(), CurrentRenderProducerToken()) ||
+            !FlushTracked(sprite))
+        {
+            StageFallbacks.fetch_add(1, std::memory_order_relaxed);
+            return;
+        }
+        StageFlushes.fetch_add(1, std::memory_order_relaxed);
+    }
+
     // Called BEFORE SelectSpriteQueueNode replaces the outgoing producer.
     // Any prior homogeneous batch flushes under its ORIGINAL queue owner;
     // only then may the incoming +TIME owner start a separate batch.
@@ -2408,6 +2444,11 @@ public:
 };
 VRProjectedD3DXSpriteIsolationR64
     VRProjectedD3DXSpriteIsolationR64::instance;
+
+static void FlushD3DXBeforeDirectStageSource() noexcept
+{
+    VRProjectedD3DXSpriteIsolationR64::BeforeDirectStageSource();
+}
 
 // VR semantic bridge for the game's canonical queued 2D renderer.
 // Canonical replacement EXE SHA256:
