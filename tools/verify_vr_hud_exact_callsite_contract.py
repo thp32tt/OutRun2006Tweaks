@@ -167,7 +167,11 @@ def check_disprank_first(ui, contracts):
         fail('first DispRank must remain disjoint from eight kind0 clips')
 
 
-def check(ui, manifest):
+def check(ui, manifest, fraction_header=None):
+    if fraction_header is None:
+        fraction_header = (
+            ROOT / "src/vr/game/rank_marker_fraction.hpp"
+        ).read_text(encoding="utf-8")
     if manifest.get("canonicalExe", {}).get("sha256") != EXE_SHA:
         fail("wrong canonical EXE identity")
     contracts = manifest.get("contracts")
@@ -326,9 +330,26 @@ def check(ui, manifest):
                     "Game::put_clip_sprite(", "TagAppendedNodes(tailsBefore, scope,")
             if chunk.count("&projectedAnchor") < 2:
                 fail("rank clip direct and sibling anchors must remain identical")
-            if "node->args_10.float24 += frozenFractionX" not in chunk or (
-                "node->args_10.float28 += frozenFractionY" not in chunk):
+            if ("OutRunVR::RankMarker::RestoreFraction(" not in chunk or
+                    "*node, frozenFractionX, frozenFractionY);" not in chunk or
+                    '#include "vr/game/rank_marker_fraction.hpp"' not in ui):
                 fail("4th+ digit siblings lost subpixel restoration")
+            for token in (
+                "if (node.kind_C == 0u)",
+                "x = &node.args_10.float24;",
+                "y = &node.args_10.float28;",
+                "else if (node.kind_C == 1u)",
+                "x = &node.args2_58.mtx_14._41;",
+                "y = &node.args2_58.mtx_14._42;",
+                "!std::isfinite(dx) || !std::isfinite(dy)",
+                "const float nextX = *x + dx;",
+                "const float nextY = *y + dy;",
+                "if (!std::isfinite(nextX) || !std::isfinite(nextY))",
+                "*x = nextX;",
+                "*y = nextY;",
+            ):
+                if token not in fraction_header:
+                    fail("rank kind0/kind1 guarded coordinate bridge lost: " + token)
         if "ProducerToken::" + token not in chunk:
             fail(func + " producer identity missing")
     rank = function_body(ui, "static int __cdecl RankMarker_sprani(")
@@ -366,9 +387,13 @@ def check(ui, manifest):
 
 
 def test_mutations(ui, manifest):
-    def must_fail(label, changed_ui=ui, changed_manifest=None):
+    fraction = (
+        ROOT / "src/vr/game/rank_marker_fraction.hpp"
+    ).read_text(encoding="utf-8")
+    def must_fail(label, changed_ui=ui, changed_manifest=None, changed_fraction=None):
         try:
-            check(changed_ui, manifest if changed_manifest is None else changed_manifest)
+            check(changed_ui, manifest if changed_manifest is None else changed_manifest,
+                  fraction if changed_fraction is None else changed_fraction)
         except ValueError:
             return
         fail("undetected mutation " + label)
@@ -388,6 +413,21 @@ def test_mutations(ui, manifest):
     must_fail("rank clip reuses mutable TLS after draw",
               ui.replace("const bool projected = !screenHud && projectedAnchor.valid;",
                          "const bool projected = !screenHud && RankMarkerProjectedInfo.valid;", 1))
+    must_fail("rank correction call disconnected",
+              ui.replace("OutRunVR::RankMarker::RestoreFraction(",
+                         "OutRunVR::RankMarker::NoRestore(", 1))
+    must_fail("rank kind1 X mapped onto old kind0",
+              changed_fraction=fraction.replace(
+                  "x = &node.args2_58.mtx_14._41;",
+                  "x = &node.args_10.float24;", 1))
+    must_fail("rank kind1 Y mapped onto old kind0",
+              changed_fraction=fraction.replace(
+                  "y = &node.args2_58.mtx_14._42;",
+                  "y = &node.args_10.float28;", 1))
+    must_fail("rank nonfinite transaction guard removed",
+              changed_fraction=fraction.replace(
+                  "if (!std::isfinite(nextX) || !std::isfinite(nextY))",
+                  "if (false)", 1))
     must_fail("rival exact source-time semantic removed",
               ui.replace("ScopedExactProducerSemantic producerScope(\n                scope, projected ? &projectedAnchor : nullptr, Settings::VREnabled,\n                OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani);",
                          "ScopedRenderSemantic producerScope(\n                scope);", 1))

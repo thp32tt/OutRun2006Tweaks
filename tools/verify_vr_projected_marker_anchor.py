@@ -4,6 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SEMANTICS = ROOT / "src/vr/game/render_semantics.hpp"
 UI = ROOT / "src/hooks_uiscaling.cpp"
+RANK_FRACTION = ROOT / "src/vr/game/rank_marker_fraction.hpp"
 FRAMERATE = ROOT / "src/hooks_framerate.cpp"
 R30 = ROOT / "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp"
 
@@ -42,6 +43,7 @@ def function_body(source: str, marker: str) -> str:
 
 semantics = read(SEMANTICS)
 ui = read(UI)
+rank_fraction = read(RANK_FRACTION)
 framerate = read(FRAMERATE)
 r30 = read(R30)
 
@@ -533,7 +535,7 @@ if "return scope == RenderScope::ScreenOverlay2D ||" in semantics:
 # The three exact vehicle-marker producers may synchronously Draw before
 # queuing their sprites. Preserve any previous one-shot Draw token for its
 # original owner, and freeze the 4th+ ordinal digits through nested producers.
-def require_rank_direct_isolation(source: str) -> None:
+def require_rank_direct_isolation(source: str, helper: str = rank_fraction) -> None:
     for func, token in (
         ("static int __cdecl RankMarker_sprani(", "RankMarkerSprani"),
         ("static int __cdecl RankMarker_putClipSprite(", "RankMarkerClipSprite"),
@@ -558,18 +560,37 @@ def require_rank_direct_isolation(source: str) -> None:
     a = clip.find("const float frozenFractionX = RankMarkerFracX;")
     b = clip.find("const float frozenFractionY = RankMarkerFracY;")
     c = clip.find("Game::put_clip_sprite(")
-    d = clip.find("node->args_10.float24 += frozenFractionX;")
-    e = clip.find("node->args_10.float28 += frozenFractionY;")
-    if min(a,b,c,d,e)<0 or not(a<b<c<d<e):
+    d = clip.find("OutRunVR::RankMarker::RestoreFraction(")
+    e = clip.find("*node, frozenFractionX, frozenFractionY);", d)
+    if min(a,b,c,d,e) < 0 or not (a < b < c < d < e):
         fail("nested 4th+ rank glyph offsets not snapshotted before call")
+    if '#include "vr/game/rank_marker_fraction.hpp"' not in source:
+        fail("rank caller not using shared two-layout correction")
+    for required in (
+        "if (node.kind_C == 0u)",
+        "x = &node.args_10.float24;",
+        "y = &node.args_10.float28;",
+        "else if (node.kind_C == 1u)",
+        "x = &node.args2_58.mtx_14._41;",
+        "y = &node.args2_58.mtx_14._42;",
+        "!std::isfinite(dx) || !std::isfinite(dy)",
+        "std::fabs(dx) > 1.0f || std::fabs(dy) > 1.0f",
+        "const float nextX = *x + dx;",
+        "const float nextY = *y + dy;",
+        "if (!std::isfinite(nextX) || !std::isfinite(nextY))",
+        "*x = nextX;",
+        "*y = nextY;",
+    ):
+        if required not in helper:
+            fail("rank affine/clip atomic correction changed: " + required)
 
 require_rank_direct_isolation(ui)
 for name, original, replacement in (
     ("rank sprani pending", "Settings::VREnabled,\n                OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani", "false,\n                OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani"),
     ("rank clip direct", "ProducerToken::RankMarkerClipSprite);", "ProducerToken::RivalMarkerSprani);"),
     ("rival direct", "ProducerToken::RivalMarkerSprani);", "ProducerToken::RankMarkerSprani);"),
-    ("digit X", "node->args_10.float24 += frozenFractionX;", "node->args_10.float24 += RankMarkerFracX;"),
-    ("digit Y", "node->args_10.float28 += frozenFractionY;", "node->args_10.float28 += RankMarkerFracY;"),
+    ("digit producer frozen X", "*node, frozenFractionX, frozenFractionY);", "*node, RankMarkerFracX, frozenFractionY);"),
+    ("digit producer frozen Y", "*node, frozenFractionX, frozenFractionY);", "*node, frozenFractionX, RankMarkerFracY);"),
 ):
     changed = ui.replace(original, replacement, 1)
     if changed == ui:
@@ -581,5 +602,20 @@ for name, original, replacement in (
     else:
         fail("destructive marker owner mutant escaped: " + name)
 
+for name, old, new in (
+    ("kind0 X", "x = &node.args_10.float24;", "x = &node.args2_58.mtx_14._41;"),
+    ("kind1 X", "x = &node.args2_58.mtx_14._41;", "x = &node.args_10.float24;"),
+    ("kind1 Y", "y = &node.args2_58.mtx_14._42;", "y = &node.args_10.float28;"),
+    ("overflow guard", "if (!std::isfinite(nextX) || !std::isfinite(nextY))", "if (false)"),
+):
+    changed = rank_fraction.replace(old, new, 1)
+    if changed == rank_fraction:
+        fail("rank correction negative setup failed: " + name)
+    try:
+        require_rank_direct_isolation(ui, changed)
+    except SystemExit:
+        pass
+    else:
+        fail("rank correction negative mutation escaped: " + name)
 
 print("VR projected marker anchor contract PASS")
