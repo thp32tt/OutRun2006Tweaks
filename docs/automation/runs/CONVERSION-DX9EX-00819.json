@@ -11,9 +11,9 @@
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "work_key": "DX9EX:VIS:LENS_FLARE_CENTRE",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "score_delta": 0,
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00819]",
@@ -80,6 +80,35 @@
     "docs/automation/runs/CONVERSION-DX9EX-00819.json"
   ],
   "ci_evidence": {
-    "status": "PENDING_VALIDATION_BEARING_RESULT_SHA"
-  }
+    "validation_bearing_result_sha": "da4fa7ae5bb75e541decf7dc71c664427571232c",
+    "DX9Ex Active Validation": {
+      "run_id": 38503470970,
+      "status": "SUCCESS",
+      "jobs": "5/5 SUCCESS",
+      "head_sha": "da4fa7ae5bb75e541decf7dc71c664427571232c",
+      "run_attempt": 1
+    },
+    "Domain Isolation Guard": {
+      "run_id": 38503470920,
+      "status": "SUCCESS",
+      "jobs": "1/1 SUCCESS",
+      "head_sha": "da4fa7ae5bb75e541decf7dc71c664427571232c",
+      "run_attempt": 1
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38503470939,
+      "status": "SUCCESS",
+      "jobs": "2/2 SUCCESS",
+      "head_sha": "da4fa7ae5bb75e541decf7dc71c664427571232c",
+      "run_attempt": 1
+    },
+    "DX9Ex Full Source Impact Review": {
+      "run_id": 38503471005,
+      "status": "IN_PROGRESS_AT_C6_RECORD",
+      "jobs": "2/3 SUCCESS; 1/3 IN_PROGRESS",
+      "head_sha": "da4fa7ae5bb75e541decf7dc71c664427571232c",
+      "run_attempt": 1
+    }
+  },
+  "validation_bearing_result_sha": "da4fa7ae5bb75e541decf7dc71c664427571232c"
 }
