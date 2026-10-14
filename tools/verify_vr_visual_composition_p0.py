@@ -2220,7 +2220,8 @@ def verify_centre_actual_draw_owner(source):
     section = section.split('VRLensFlareProjected2D::instance;', 1)[0]
     for required in ('static void __cdecl DrawObjectAlphaCentre(',
                      'ScopedExactProducerSemantic semantic(',
-                     'centreScope, nullptr, true);',
+                     'centreScope, nullptr, true,',
+                     'ProducerToken::LensFlareCentre',
                      'Module::exe_ptr(0xC993), DrawObjectAlphaCentre',
                      'Module::exe_ptr(0xCABE), DrawObjectAlphaProjected'):
         require(required, section, 'centre-only independent actual draw')
@@ -2232,7 +2233,8 @@ def verify_centre_actual_draw_owner(source):
                      'RenderScope::WorldBillboard',
                      'RenderScope::None',
                      'ScopedExactProducerSemantic semantic(',
-                     'centreScope, nullptr, true);',
+                     'centreScope, nullptr, true,',
+                     'ProducerToken::LensFlareCentre',
                      'Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);'):
         require(required, draw, 'central-only world-owner and desktop fallback')
     if 'RenderScope::ProjectedScreenEffect2D' in draw:
@@ -2245,7 +2247,8 @@ def verify_centre_actual_draw_owner(source):
                   'RenderScope::WorldBillboard',
                   'RenderScope::None',
                   'ScopedExactProducerSemantic semantic(',
-                  'centreScope, nullptr, true);',
+                  'centreScope, nullptr, true,',
+                  'ProducerToken::LensFlareCentre',
                   'Game::DrawObjectAlpha_Internal(')
 verify_centre_actual_draw_owner(graphics)
 # Negative tests isolate the single central sun while the original CABE
@@ -2259,10 +2262,14 @@ for label, before, after in (
     ('unowned nested original parent',
      'LensCentreOwnerDepth == LensCentreDepth', 'LensCentreDepth > 0'),
     ('direct owner failed pending token isolation',
-     'centreScope, nullptr, true);',
-     'centreScope, nullptr, false);'),
+     'centreScope, nullptr, true,',
+     'centreScope, nullptr, false,'),
     ('prevent queued semantic hijack',
      '!OutRunVR::GameSemantic::QueueRenderActive() &&', ''),
+    ('centre C993 direct token lost', 'ProducerToken::LensFlareCentre',
+     'ProducerToken::None'),
+    ('centre C993 direct token aliased', 'ProducerToken::LensFlareCentre',
+     'ProducerToken::RivalMarkerSprani'),
     ('restore flat/headlocked scope', 'RenderScope::WorldBillboard',
      'RenderScope::ProjectedScreenEffect2D'),
     ('remove desktop fallback', 'RenderScope::None;', 'RenderScope::WorldBillboard;'),
