@@ -1,0 +1,73 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00843",
+  "production_id": "CONVERSION-DX9EX-00843",
+  "event_id": "CONVERSION-DX9EX-00843-E001",
+  "event_type": "c6_result_only",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "f743da4197f0b0ac9155bdd5963eb1e8adf0c0f7",
+  "validation_bearing_result_sha": "f743da4197f0b0ac9155bdd5963eb1e8adf0c0f7",
+  "result_sha": "f743da4197f0b0ac9155bdd5963eb1e8adf0c0f7",
+  "feature_contract": null,
+  "acceptance_results": {},
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_cross_thread_semantic_registry.py",
+    "vrhost/CMakeLists.txt",
+    "vrhost/tests/semantic_tag_hint_smoke.cpp"
+  ],
+  "ci_evidence": {
+    "exact_sha": {
+      "source_sha": "f743da4197f0b0ac9155bdd5963eb1e8adf0c0f7",
+      "conclusion": "SUCCESS",
+      "provenance": "existing_GitHub_Actions",
+      "rerun_performed": false
+    },
+    "active_validation": {
+      "run_id": 38571736179,
+      "sha": "f743da4197f0b0ac9155bdd5963eb1e8adf0c0f7",
+      "conclusion": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38571736263,
+      "sha": "f743da4197f0b0ac9155bdd5963eb1e8adf0c0f7",
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38571736287,
+      "sha": "f743da4197f0b0ac9155bdd5963eb1e8adf0c0f7",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38571736122,
+      "sha": "f743da4197f0b0ac9155bdd5963eb1e8adf0c0f7",
+      "conclusion": "SUCCESS"
+    }
+  },
+  "hold_reason": "RUN_RECORD_NOT_FOUND",
+  "record_recovery": {
+    "source": "material commit f743da4197f0b0ac9155bdd5963eb1e8adf0c0f7 and existing GitHub Actions outcome",
+    "material_sha_basis": "material C++ source modified in validation SHA",
+    "previous_run_record": "NOT_FOUND on target branch, validation SHA, and repository default branch",
+    "prior_feature_contract_and_acceptance_results": "UNAVAILABLE_NOT_RECONSTRUCTED",
+    "original_source_modified": false,
+    "build_or_ci_rerun": false
+  },
+  "runtime_evidence": "No HMD execution was performed in C6; optical and headset FPS runtime validation UNTESTED",
+  "duplication_guard": {
+    "task_id": "CONVERSION-DX9EX-00843",
+    "run_key": "CONVERSION-DX9EX-00843",
+    "score_once": true,
+    "c6_bookkeeping_only": true,
+    "do_not_reaward": true
+  },
+  "score_delta": 0,
+  "c6_score_delta": 0
+}
