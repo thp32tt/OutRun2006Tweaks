@@ -1,0 +1,98 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00752",
+  "production_id": "CONVERSION-DX11-00752",
+  "event_id": "CONVERSION-DX11-00752-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULLFRAME_VISIBLE_CROP_OWNERSHIP",
+  "feature_id": "DX11-MENU-RACE-VISIBLE-PRESENT-SOURCE-OWNERSHIP",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "cf35219c0d33c99558747207ce9cd6e18fe15c12",
+  "material_result_sha": null,
+  "change_summary": "Actual native full-size menu/vehicle/race frame Present now copies only the visible D3D9 source RECT when dirty metadata is absent or whole-backbuffer, preserving untouched original D3D9 pixels and gamepad fallback.",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_present_region.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_visible_source_crop_probe_00752.cpp",
+    "tools/test_dx11_visible_source_crop_00752.py",
+    "docs/automation/runs/CONVERSION-DX11-00752.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-VISIBLE-PRESENT-SOURCE-OWNERSHIP",
+    "goal": "Keep precisely the D3D9 visible Present source rectangle owned by the real full-size D3D11 game render, including no-dirty and full-dirty cropped transitions, without overwriting original D3D9 pixels outside the crop or altering gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "native-visible-crop-publication",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_gpu_to_d3d9_present",
+        "expected_behavior": "Actual game full-resolution D3D11 BGRA readback copies only the source crop and submits bounded D3D9 UpdateSurface even with absent or full dirty metadata."
+      },
+      {
+        "id": "original-d3d9-input-and-pixel-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "original_d3d9_gamepad_and_scene",
+        "expected_behavior": "Invalid source bounds and incomplete dirty coverage are rejected; D3D9 original Draw/Present and gamepad remain untouched, including pixels outside the crop."
+      },
+      {
+        "id": "exact-sha-renderer-ci",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_windows_openxr_hud_gates",
+        "expected_behavior": "C++ positive/negative pixel and source rectangle test, destructive Python integration regression, and exact SHA mandatory DX11 Fast, Backend, Windows Build, OpenXR and HUD actions."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "native-visible-crop-publication": "PENDING_EXACT_SHA",
+    "original-d3d9-input-and-pixel-fallback": "PENDING_EXACT_SHA",
+    "exact-sha-renderer-ci": "PENDING_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "Live full-resolution Draw/DrawIndexed source -> cropped native Present source pixel preservation; Quest3 visual proof pending.",
+    "activation_guard_and_fallback": "Dual native opt-in disabled by default; any unsupported source/dirty region remains original D3D9/ gamepad output.",
+    "conflict_keys": [
+      "DX11:FULLFRAME_VISIBLE_CROP_OWNERSHIP"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "integration_path": [
+      "Intercepted real menu/vehicle/race game Draw/DrawIndexed -> native full-resolution D3D11 render target",
+      "Cropped D3D9 Present source -> matching bounded BGRA native readback CPU upload -> bounded UpdateSurface",
+      "Invalid Present source or incomplete dirty coverage -> unchanged D3D9 original graphics/gamepad"
+    ],
+    "batch_components": [
+      "C++ partial Present source geometry selection",
+      "Native D3D11 frame readback to original D3D9 cropped Present integration",
+      "Portable pixel test and destructive integration regression"
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD and 00751 C6 verified",
+    "C1_REVIEW": "PASS identified native full-backbuffer overwrite on cropped null/full-dirty Present",
+    "C2_IMPLEMENT": "PASS source, native Present upload integration and tests",
+    "C3_VALIDATE": "PENDING exact SHA GitHub Actions",
+    "C4_COMMIT": "PENDING non-CI-skipping material commit",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING five exact-SHA Gates"
+  },
+  "next_action": "Check exact-result SHA GitHub Actions; on failure repair same TASK_ID; Quest3/VDXR and gamepad RUNTIME_VALIDATION UNTESTED.",
+  "validation_bearing_result_sha": null
+}

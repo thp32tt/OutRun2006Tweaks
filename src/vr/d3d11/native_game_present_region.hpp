@@ -47,6 +47,15 @@ struct GameNativePresentRegion {
             return {};
         return {0u, 0u, true};
     }
+    // A valid but partially visible D3D9 Present source rectangle.
+    // Invalid extents or overflow must never authorize native publication.
+    [[nodiscard]] constexpr bool partial_backbuffer_source(
+        std::uint32_t width, std::uint32_t height) const noexcept {
+        return full_frame_placement(width, height, width, height).valid &&
+            (left != 0 || top != 0 ||
+             right != static_cast<std::int64_t>(width) ||
+             bottom != static_cast<std::int64_t>(height));
+    }
     [[nodiscard]] constexpr bool allows_inset(
         std::uint32_t backbufferWidth, std::uint32_t backbufferHeight,
         std::uint32_t insetWidth, std::uint32_t insetHeight,

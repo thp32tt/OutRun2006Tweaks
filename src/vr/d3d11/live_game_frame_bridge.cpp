@@ -5188,8 +5188,15 @@ void before_game_present(IDirect3DDevice9* game,
                 dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top,
                 dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
                 partitionRects);
-        const bool croppedNativeUpload =
+        // A cropped D3D9 menu/vehicle/race Present only exposes its source
+        // rectangle. Native pixels outside it must never replace D3D9 pixels,
+        // even when the dirty region is absent or covers the whole backbuffer.
+        // An explicitly cropped dirty region still needs complete tile proof.
+        const bool provenCroppedDirty =
             (cropDirtyCoverage || partitionCropCoverage) && !fullDirtyCoverage;
+        const bool croppedNativeUpload = fullMode && backbufferKnown &&
+            presentRegion.partial_backbuffer_source(presentDesc.Width, presentDesc.Height) &&
+            (!dirtyRegion || fullDirtyCoverage || provenCroppedDirty);
         if (!s.previousOutput.same(outputNow)) {
             // Also reject earlier GPU readbacks if the Present backbuffer COM identity
             // changed while the device, dimensions and format stayed identical.
