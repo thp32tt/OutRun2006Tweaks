@@ -30,6 +30,7 @@
 #include "native_game_frame_batch.hpp"
 #include "native_game_frame_publication.hpp"
 #include "native_game_frame_upload.hpp"
+#include "native_game_dirty_region.hpp"
 #include "native_game_readback_provenance.hpp"
 #include "native_game_present_region.hpp"
 #include "native_game_clear_color.hpp"
@@ -5115,6 +5116,26 @@ void before_game_present(IDirect3DDevice9* game,
         outputNow.sourceRight = presentRegion.right;
         outputNow.sourceBottom = presentRegion.bottom;
         outputNow.hasDirtyRegion = dirtyRegion != nullptr;
+        // Some D3D9 Present calls explicitly mark the *entire* source
+        // backbuffer dirty. Preserve full-frame native menu/race output in
+        // that supported case, but never overlay a partially dirty D3D9
+        // frame or an unbounded/malformed region. Insets remain conservative.
+        RECT dirtyRect{};
+        const bool oneBoundedDirtyRect = dirtyRegion &&
+            dirtyRegion->rdh.dwSize == sizeof(RGNDATAHEADER) &&
+            dirtyRegion->rdh.iType == RDH_RECTANGLES &&
+            dirtyRegion->rdh.nCount == 1u &&
+            dirtyRegion->rdh.nRgnSize >= sizeof(RECT);
+        if (oneBoundedDirtyRect)
+            std::memcpy(&dirtyRect, dirtyRegion->Buffer, sizeof(dirtyRect));
+        const bool fullDirtyCoverage = fullMode && backbufferKnown && dirtyRegion &&
+            oneBoundedDirtyRect &&
+            GameNativeDirtyRegionCoverage::covers_full_backbuffer(
+                presentDesc.Width, presentDesc.Height,
+                dirtyRegion->rdh.nCount, dirtyRegion->rdh.nRgnSize,
+                dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top,
+                dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
+                dirtyRect.left, dirtyRect.top, dirtyRect.right, dirtyRect.bottom);
         if (!s.previousOutput.same(outputNow)) {
             // Also reject earlier GPU readbacks if the Present backbuffer COM identity
             // changed while the device, dimensions and format stayed identical.
@@ -5144,7 +5165,7 @@ void before_game_present(IDirect3DDevice9* game,
         const auto fullPlacement = presentRegion.full_frame_placement(
             bb.Width, bb.Height, surfaceWidth, surfaceHeight);
         const bool outputWritable = outputNow.valid() && nativeExtentMatches &&
-            !outputNow.hasDirtyRegion &&
+            (!outputNow.hasDirtyRegion || fullDirtyCoverage) &&
             (fullMode ? fullPlacement.valid : insetPlacement.valid) &&
             bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
             (bb.Format == D3DFMT_A8R8G8B8 ||
