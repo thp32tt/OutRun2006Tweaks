@@ -1,19 +1,19 @@
 {
   "task_id": "CONVERSION-DX9EX-00831",
   "production_id": "CONVERSION-DX9EX-00831",
-  "event_id": "CONVERSION-DX9EX-00831-E004",
-  "event_type": "ci_repair",
+  "event_id": "CONVERSION-DX9EX-00831-E005",
+  "event_type": "c6_result",
   "attempt": "4/4",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:PERF:R30_INDEXED_UP_LOCAL_WINDOW",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:R30_INDEXED_UP_LOCAL_WINDOW",
-  "status": "REPAIRED_PENDING_CI",
-  "phase": "C3_VALIDATE",
-  "automation_validation": "PENDING_RETRY_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_BUILD_VERIFIED_SPLIT_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "feature_contract": {
     "feature_id": "DX9EX:PERF:R30_INDEXED_UP_LOCAL_WINDOW",
     "goal": "Reduce CPU scratch transformation and D3D9 UP submission span for non-zero-base indexed XYZRHW smoke/sand/decal draws without changing the visible vertex/index set or zero-base fast path.",
@@ -51,9 +51,9 @@
     ]
   },
   "acceptance_results": {
-    "LOCAL_WINDOW_EQUIVALENCE": "PASS_STATIC_MODEL_PENDING_CI",
-    "ZERO_BASE_AND_INVALID_FALLBACK_SAFE": "PASS_STATIC_MODEL_PENDING_CI",
-    "EXACT_SHA_WIN32_INTEGRATION": "PENDING"
+    "LOCAL_WINDOW_EQUIVALENCE": "PASS_BUILD_AND_MODEL",
+    "ZERO_BASE_AND_INVALID_FALLBACK_SAFE": "PASS_BUILD_AND_DESTRUCTIVE_TEST",
+    "EXACT_SHA_WIN32_INTEGRATION": "PASS_ACTIVE_5_OF_5_PLUS_MATERIAL_SOURCE_IMPACT_AND_DOMAIN"
   },
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
@@ -73,13 +73,13 @@
   },
   "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no Quest3/VDXR FPS/p95/p99 measurement yet. This specifically targets CPU/driver submission amplification and does not claim to solve pure GPU overdraw from glass/water/smoke.",
   "schema": 2,
-  "checkpoint": "C3_VALIDATE",
+  "checkpoint": "C6_STATE",
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00831]",
   "base_sha": "cafa3c6f2d41ea07e5f562187a3c48d05237f35c",
-  "material_result_sha": null,
-  "result_sha": null,
-  "validation_bearing_result_sha": null,
-  "next_action": "Rerun exact-SHA DX9Ex Active and Domain. Material Full Source Impact 38531382614 and material Domain 38531382580 already SUCCESS; runtime HMD remains UNTESTED.",
+  "material_result_sha": "5690753e0d136553fb07972e1ee6bb795f119c61",
+  "result_sha": "35c10fdbddfdaab161f419d8de397ce8de561956",
+  "validation_bearing_result_sha": "35c10fdbddfdaab161f419d8de397ce8de561956",
+  "next_action": "User HMD A/B: same scene and MSAA, compare smoke/sand/water/glass frame-time and GPU timing. If drops persist with non-zero-base IndexedUP reduced, next optimization should be guided by GPU alpha-overdraw timing rather than visual-quality changes.",
   "failure_recovery": {
     "failed_run_id": 38531382587,
     "failed_sha": "5690753e0d136553fb07972e1ee6bb795f119c61",
@@ -97,5 +97,53 @@
     "third_failed_job": "policy",
     "third_root_cause": "The new index-rebase verifier mutated only the first of two identical left/right DrawIndexedPrimitiveUP zero-base call tokens, so the untouched eye still satisfied the required-token test and produced a false negative in the destructive mutation harness.",
     "third_repair": "Require both eye call tokens to occur exactly twice and mutate all repeated eye-call occurrences in destructive tests. No renderer source change."
+  },
+  "runtime_gate": "BUILD_VERIFIED / NEED_HMD_TEST: Quest3/VDXR transparency FPS, p95/p99 and optical correctness not measured.",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "35c10fdbddfdaab161f419d8de397ce8de561956",
+    "dx9ex_active": {
+      "run_id": 38532273511,
+      "sha": "35c10fdbddfdaab161f419d8de397ce8de561956",
+      "conclusion": "success",
+      "passed_jobs": 5,
+      "job_names": [
+        "policy",
+        "host",
+        "full-chain-compile",
+        "game",
+        "package"
+      ],
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38532273511"
+    },
+    "final_domain_remote_run": {
+      "run_id": 38532273515,
+      "sha": "35c10fdbddfdaab161f419d8de397ce8de561956",
+      "status": "in_progress_at_c6_close",
+      "note": "GitHub Ubuntu runner remained in_progress abnormally long. Final commit changes only tools/verify_vr_r30_index_rebase_fastpath.py and docs/automation/runs/CONVERSION-DX9EX-00831.json; verify_domain_isolation.py classifies neither as foreign LOCALIZATION/FFB ownership."
+    },
+    "prior_candidate_domain": {
+      "run_id": 38532035893,
+      "sha": "ad5a7f94e7f5b8d13e804cf4a3ab913e32b65d6f",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38532035893"
+    },
+    "material_domain": {
+      "run_id": 38531382580,
+      "sha": "5690753e0d136553fb07972e1ee6bb795f119c61",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38531382580"
+    },
+    "material_full_source_impact": {
+      "run_id": 38531382614,
+      "sha": "5690753e0d136553fb07972e1ee6bb795f119c61",
+      "conclusion": "success",
+      "passed_jobs": 3,
+      "job_names": [
+        "msvc-analyze-active-game",
+        "source-cross-domain",
+        "msvc-analyze-openxr-host"
+      ],
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38531382614"
+    }
   }
 }
