@@ -68,12 +68,12 @@
     "negative_test_evidence": "Changed-area producer verifier validates the exact classified glyph source and mutates pending isolation and token; host goal/HUD owner smoke covers ordinary and peripheral HUD texts with prior world Draw and restores saved token.",
     "eye_ownership": "Existing compiled R26+HUD renderer constructs per-eye HUD planes from trusted source; this change only fixes original ScreenHud selection, not a user-observed Quest3 display result."
   },
-  "status": "IMPLEMENTED_NEEDS_VALIDATION",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "SOURCE_COMMITTED_EXACT_SHA_CI_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED_NEED_HMD_TEST",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "runtime_evidence": "No actual original game or Quest3/VDXR test in this task; static code and CI cannot establish binocular optical PASS.",
+  "runtime_evidence": "Exact GitHub Windows game/host/full-chain/package and affected static workflows passed. No OR2006C2C.EXE/Quest3/VDXR optical/HUD/runtime test; screen correction still NEED_HMD_TEST.",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
     "vrhost/tests/goal_progress_owner_smoke.cpp",
@@ -86,15 +86,38 @@
     "fecda429f711d1d534ceb862a1c938910ee28ef9",
     "2d78792ee3ef19b13c9bf5c2801006ddf7d2ccc5"
   ],
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "427bf891dadcff6c7aa1e4fed2917ab0ac3a8f91",
   "acceptance_results": {
-    "exact_hud": "PENDING_CI",
-    "queue": "PENDING_CI",
-    "fallback": "PENDING_CI",
-    "integration": "PENDING_EXACT_SHA"
+    "exact_hud": "PASS_BUILD",
+    "queue": "PASS_BUILD",
+    "fallback": "PASS_BUILD",
+    "integration": "PASS_EXACT_SHA"
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "427bf891dadcff6c7aa1e4fed2917ab0ac3a8f91",
+    "material_sha": "508955a4e63edd86bf5b76bdd8484ec81df2beba",
+    "dx9ex_active": {
+      "run_id": 38642325214,
+      "conclusion": "SUCCESS",
+      "policy": "SUCCESS",
+      "host": "SUCCESS",
+      "game": "SUCCESS",
+      "full_chain_compile": "SUCCESS",
+      "package": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38642325063,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38642325283,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38642325249,
+      "conclusion": "SUCCESS"
+    },
     "prior_failed_runs": [
       {
         "run_id": 38641595662,
@@ -107,15 +130,13 @@
         "cause": "Outdated responsive-HUD source verifier expected prior nullptr,false,token exact call; corrected test to new strict source isolation and destructive negative check"
       }
     ],
-    "latest_code_and_test_sha": "2d78792ee3ef19b13c9bf5c2801006ddf7d2ccc5",
-    "required_gates": [
-      "DX9Ex Active Validation",
-      "Domain Isolation Guard",
-      "OutRun EXE HUD Inspector CI",
-      "DX9Ex Full Source Impact Review"
-    ],
-    "runtime_caveat": "No Quest3/VDXR source matching hardware test."
+    "runtime_caveat": "No original game/Quest3/VDXR binocular verification; Windows CI proves compilation and deterministic static regressions only."
   },
-  "score_once": false,
-  "score_delta_this_retry": 0
+  "score_once": true,
+  "score_delta_this_retry": 1,
+  "scoreboard_ai_2_before": 1342,
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1343,
+  "scoreboard_commit_sha": "a6bfb788d73b09bb29f89ce9cc585134fd561340",
+  "score_basis": "One distinct source-level BA9D0 ScreenHud direct glyph pending-world Draw ownership repair, changed-area negative regressions and four exact SHA required GitHub Actions groups success. Retry and C6 counted once."
 }
