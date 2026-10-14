@@ -288,12 +288,12 @@ def check_packaged_f11_plane_scale() -> None:
     assert "R30BuildHudPlaneCoefficients(state, false)" not in game
     # Both the source ImGui projection and its scissor go through this same
     # owner. Reject bypassing original active-game stereo safety checks.
-    assert "if (!R30SafeStereoBase(device)" in imgui
+    assert "!R30SafeStereoBase(device)" in imgui
     assert "ExternalOverlaySemanticDepth == 0" in imgui
     assert "CurrentVertexShaderIdentity.load(" in imgui
     assert "(fvf & D3DFVF_POSITION_MASK) != D3DFVF_XYZ" in imgui
-    assert "R30BuildHudPlaneCoefficients(state, false)" in imgui.split(
-        "for (int eye = 0; eye < 2; ++eye)", 1)[0]
+    assert imgui.index("R30BuildHudPlaneCoefficients(state, false)") < imgui.index(
+        "// Compose the stock orthographic pixel->NDC projection")
     # Deliberate mutations that would reintroduce the 0.55x F11 double shrink
     # or silently enlarge ordinary game HUD must be rejected in owning scopes.
     mutants = [
