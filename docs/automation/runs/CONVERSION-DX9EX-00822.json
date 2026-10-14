@@ -2,19 +2,19 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00822",
   "production_id": "CONVERSION-DX9EX-00822",
-  "event_id": "CONVERSION-DX9EX-00822-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00822-E003",
+  "event_type": "retry_recovery",
+  "attempt": "2/3",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:PERF:SPARSE_DEPTH_LARGE_BATCH",
   "feature_class": "MEASURED_PERFORMANCE",
   "work_key": "DX9EX:PERF:SPARSE_DEPTH_LARGE_BATCH",
-  "status": "IMPLEMENTED_PENDING_CI",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
-  "score_delta": 0,
+  "score_delta": 1,
   "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00822]",
   "feature_contract": {
     "feature_id": "DX9EX:PERF:SPARSE_DEPTH_LARGE_BATCH",
@@ -53,9 +53,9 @@
     ]
   },
   "acceptance_results": {
-    "LARGE_UP_ORDER": "PENDING_EXACT_SHA",
-    "LARGE_VB_SAFETY": "PENDING_EXACT_SHA",
-    "INTEGRATED_BUILD": "PENDING_EXACT_SHA"
+    "LARGE_UP_ORDER": "PASS_BUILD_VERIFIED",
+    "LARGE_VB_SAFETY": "PASS_BUILD_VERIFIED",
+    "INTEGRATED_BUILD": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "Current branch sorts only up to 2048 touched indices. Larger sparse scenes discard the trusted list and densely walk a vertex range of up to 262144 for 512 depth samples.",
@@ -72,5 +72,43 @@
     "docs/automation/runs/CONVERSION-DX9EX-00822.json"
   ],
   "base_sha": "903e73263e6cf7ef18ea9b676a7a647a1e74c3d2",
-  "runtime_gate": "Quest3/VDXR gameplay CPU/GPU pacing and actual optics not yet tested."
+  "runtime_gate": "No Quest3/VDXR session; shader/stereo optics and FPS not runtime validated. Preserve original baselines.",
+  "result_sha": "930e6736c48aa2d39f51e03e15b699f67e860c72",
+  "material_sha": "06ea254d2f78d5646e88aa992642d314e4f6e353",
+  "validation_bearing_sha": "930e6736c48aa2d39f51e03e15b699f67e860c72",
+  "validation_gates": {
+    "dx9ex_active": {
+      "run_id": 38508640428,
+      "sha": "930e6736c48aa2d39f51e03e15b699f67e860c72",
+      "status": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "host": "SUCCESS",
+        "game": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38508640316,
+      "sha": "930e6736c48aa2d39f51e03e15b699f67e860c72",
+      "status": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38508413786,
+      "sha": "06ea254d2f78d5646e88aa992642d314e4f6e353",
+      "status": "SUCCESS",
+      "jobs": {
+        "source-cross-domain": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "msvc-analyze-active-game": "SUCCESS"
+      }
+    },
+    "hmd_runtime": {
+      "status": "UNTESTED",
+      "hardware": "Quest3/VDXR",
+      "note": "No actual headset runtime pass claimed"
+    }
+  },
+  "c6_status": "BUILD_VERIFIED_NEED_HMD_TEST"
 }
