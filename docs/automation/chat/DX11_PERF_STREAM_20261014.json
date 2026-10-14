@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "source_mode": "CHAT_DIRECT",
+  "feature_id": "DX11_NATIVE_LIVE_DRAW_STREAMING_BUFFERS",
+  "workspace_branch": "dx11-perf-stream-buffer-reuse-20261014",
+  "target_branch": "vr-dx11-native-r71",
+  "source_base_sha": "7b673376b443583f0140bd0b4b51164c01bd3ef9",
+  "author": "AI2-ChatGPT2",
+  "work_key": "DX11:PERF_NATIVE_DRAW_STREAMING_VB_IB_STAGE1",
+  "c0": "RECOVERED_2026-10-14",
+  "c1": "SOURCE_REVIEW_CONFIRMED_CREATEBUFFER_EACH_GAME_DRAW",
+  "c2": "DYNAMIC_RING_SLOT_VB_IB_STAGE1_AND_GROWTH_POLICY",
+  "c3": "PENDING_EXACT_SHA_GITHUB_GATES",
+  "c4": "CANDIDATE_BRANCH_COMMIT_PENDING",
+  "c5": "NOT_REQUIRED_SOURCE_ONLY_NO_RUNTIME_PACKAGE",
+  "c6": "INTEGRATION_PENDING",
+  "validation": "UNTESTED",
+  "runtime_validation": "UNTESTED",
+  "acceptance": [
+    "Live real-game Draw + DrawIndexed use 8 bounded per-draw dynamic slots and persist resource allocations",
+    "Original D3D9 fallback, Map-failure abort, frame GPU DISCARD lifetime and Reset invalidation",
+    "C++/Python positive-negative source checks and five exact-SHA GitHub build gates"
+  ],
+  "next_action": "Check previously active DX11 00716 full exact-SHA gate and owner release, then integrate candidate without cancelling active run; verify own exact-SHA gates and append Issue #14."
+}
