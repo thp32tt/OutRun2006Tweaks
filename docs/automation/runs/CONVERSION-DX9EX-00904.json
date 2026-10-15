@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "CI_REPAIR_PENDING_EXACT_SHA",
-  "phase": "C3_VALIDATE_REPAIR",
-  "checkpoint": "C3_STATE",
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "ab5b1786c4da5a8738a225586017bcd46919e80c",
   "material_result_sha": "d5ce11f572b7b3f5a0fe392979f82a63253eecd1",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "db468195dd43050d401cbf77c118f378fbd6e587",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp"
   ],
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "c993_exact_source_stereo": "PENDING_EXACT_SHA_CI",
-    "c993_unowned_fallback": "PENDING_EXACT_SHA_CI",
-    "c993_exact_ci": "PENDING_EXACT_SHA_CI"
+    "c993_exact_source_stereo": "PASS_EXACT_SHA",
+    "c993_unowned_fallback": "PASS_EXACT_SHA",
+    "c993_exact_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "source_evidence": "The only ExactLensCentreWorld branch was nested after zEnable==D3DZB_FALSE and alphaBlend||alphaTest, rather than being selected by already-proven direct centre raw WVP.",
@@ -82,8 +82,8 @@
     ]
   },
   "score_delta_this_attempt": 0,
-  "score_once": false,
-  "hold_reason": "REVALIDATE_EXACT_SHA_AFTER_ARCHITECTURE_GATE_REPAIR; NEED_HMD_TEST",
+  "score_once": true,
+  "hold_reason": "NEED_HMD_TEST (runtime-only; build-verified, no unconfirmed optical-acceptance claim)",
   "ci_evidence": {
     "first_attempt_sha": "d5ce11f572b7b3f5a0fe392979f82a63253eecd1",
     "active_run_id": 38757676538,
@@ -98,6 +98,35 @@
     "third_attempt_sha": "9f13dc46c225341b2d50e4463eb2eaad10b6ec28",
     "third_active_run_id": 38758420431,
     "third_policy_failure": "C993 source verifier still required old ProducerToken::LensFlareCentre) from depth-off nested branch; current exact ownedLensCentre predicate uses ProducerToken::LensFlareCentre; and admits verified centre before raster inference.",
-    "fourth_repair": "Update exact centre verifier token to new ownedLensCentre source-authority classifier and require explicit ownership branch; retain strict raw WVP, shader/pose, physical R33 per-eye and mutation gates."
-  }
+    "fourth_repair": "Update exact centre verifier token to new ownedLensCentre source-authority classifier and require explicit ownership branch; retain strict raw WVP, shader/pose, physical R33 per-eye and mutation gates.",
+    "final_validation_bearing_result_sha": "db468195dd43050d401cbf77c118f378fbd6e587",
+    "required": {
+      "active_validation": {
+        "sha": "db468195dd43050d401cbf77c118f378fbd6e587",
+        "run_id": 38759654490,
+        "conclusion": "success",
+        "jobs": "policy, full-chain-compile, game, host, package 5/5"
+      },
+      "domain_isolation": {
+        "sha": "db468195dd43050d401cbf77c118f378fbd6e587",
+        "run_id": 38759654607,
+        "conclusion": "success"
+      },
+      "source_impact": {
+        "sha": "d5ce11f572b7b3f5a0fe392979f82a63253eecd1",
+        "run_id": 38757676574,
+        "conclusion": "success",
+        "note": "material C++ exact SHA; source unchanged across verifier repairs"
+      },
+      "hud_inspector": {
+        "sha": "d5ce11f572b7b3f5a0fe392979f82a63253eecd1",
+        "run_id": 38757677604,
+        "conclusion": "success",
+        "note": "material C++ exact SHA; source unchanged across verifier repairs"
+      }
+    }
+  },
+  "runtime_evidence": "No Quest 3/VDXR physical binocular game test executed on exact build; expected C993 stereo path and fallback are source/CI validated only. Real flare overlap/reticle optical quality remains UNTESTED.",
+  "score_awarded_for_unique_material": 1,
+  "scoreboard_commit_sha": "f48fabe5f534ee2c667088b548eaf0a54cbeba38"
 }
