@@ -93,28 +93,68 @@ def check(code: str, header: str) -> list[str]:
          "ForgetBatch();" in draw_path and
          draw_path.find("if (FAILED(hr))") < draw_path.find("using namespace OutRunVR::GameSemantic;"),
          "failed D3DX Draw must invalidate untrusted +TIME/GOAL batch ownership")
+    # The tracked object can outlive the mutable 0x55B218 global sprite.
+    # Verify BOTH the old owner reset path and live-sprite Flush identity.
+    lifetime_start = code.find("namespace DX9ExD3DXSpriteLifetime")
+    lifetime_guard = code[lifetime_start:start] if 0 <= lifetime_start < start else ""
+    need("constexpr bool CanFlush(" in lifetime_guard and
+         "candidate != nullptr && candidate == tracked &&" in lifetime_guard and
+         "candidate == live;" in lifetime_guard and
+         "static_assert(CanFlush(&OldSprite, &OldSprite, &OldSprite));" in lifetime_guard and
+         "static_assert(!CanFlush(&OldSprite, &OldSprite, &NewSprite));" in lifetime_guard and
+         "static_assert(!CanFlush(&OldSprite, nullptr, &OldSprite));" in lifetime_guard,
+         "Flush requires non-null same tracked and live D3DXSprite object")
+    need("constexpr bool OwnsLifecycle(" in lifetime_guard and
+         "callback != nullptr &&" in lifetime_guard and
+         "(callback == tracked || callback == live);" in lifetime_guard and
+         "static_assert(OwnsLifecycle(&OldSprite, &OldSprite, nullptr));" in lifetime_guard and
+         "static_assert(!OwnsLifecycle(&ForeignSprite, &OldSprite, &NewSprite));" in lifetime_guard,
+         "device loss must invalidate the tracked old sprite or current live sprite, not foreign sprites")
     lifecycle_start = hook.find("static void InvalidateForDeviceLifecycle(")
     lifecycle_end = hook.find("static bool FlushTracked(", lifecycle_start)
     lifecycle = hook[lifecycle_start:lifecycle_end] if (
         lifecycle_start >= 0 and lifecycle_end > lifecycle_start) else ""
-    need("if (!wasExactGameSprite)" in lifecycle and
+    need("if (!wasTrackedOrExactGameSprite)" in lifecycle and
          "BatchActive = false;" in lifecycle and
          "StageBoundaryReady = false;" in lifecycle and
          "ForgetBatch();" in lifecycle and
          "TrackedSprite = nullptr;" in lifecycle,
-         "only exact D3DX sprite may invalidate stale device-loss batch")
+         "tracked/live D3DX sprite must revoke pending batch on device loss")
     for method, slot in (("LostDevice", 12), ("ResetDevice", 13)):
-        need(f"static HRESULT __stdcall {method}Dest(void* self)" in lifecycle and
-             (f"const bool wasExactGameSprite = IsExactSprite(self);\n"
-              f"        const HRESULT hr = {method}_hk.stdcall<HRESULT>(self);\n"
-              "        InvalidateForDeviceLifecycle(wasExactGameSprite);\n"
-              "        return hr;") in lifecycle and
-             lifecycle.count("InvalidateForDeviceLifecycle(wasExactGameSprite);") == 2 and
+        begin = lifecycle.find(f"static HRESULT __stdcall {method}Dest(void* self)")
+        end = lifecycle.find("\n    }", begin)
+        callback = lifecycle[begin:end] if begin >= 0 and end > begin else ""
+        owner = "const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle("
+        live_argument = "self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218));"
+        trampoline = f"const HRESULT hr = {method}_hk.stdcall<HRESULT>(self);"
+        invalidate = "InvalidateForDeviceLifecycle(ownsBatch);"
+        need(owner in callback and live_argument in callback and
+             trampoline in callback and invalidate in callback and
+             "return hr;" in callback and
+             callback.index(owner) < callback.index(trampoline) <
+             callback.index(invalidate) < callback.index("return hr;") and
+             lifecycle.count(invalidate) == 2 and
              f"vtable[{slot}]" in hook and
              f"reinterpret_cast<void*>(&{method}Dest)" in hook and
              f"{method}_hk.enable().has_value()" in hook and
              f"{method}_hk = {{}};" in hook,
-             f"{method} exact D3DX lifecycle trampoline missing")
+             f"{method} old/live sprite lifecycle callback must preserve original HRESULT")
+    flush_start = hook.find("static bool FlushTracked(")
+    flush_end = hook.find("\npublic:", flush_start)
+    flush = hook[flush_start:flush_end] if (
+        flush_start >= 0 and flush_end > flush_start) else ""
+    read_live = "void* liveSprite = *Module::exe_ptr<void*>(0x55B218);"
+    predicate = "!DX9ExD3DXSpriteLifetime::CanFlush("
+    invalidate_stale = "if (self && self == TrackedSprite && self != liveSprite)"
+    dereference = "void** vtable = *reinterpret_cast<void***>(self);"
+    need(read_live in flush and "if (!BatchActive ||" in flush and
+         predicate in flush and "self, TrackedSprite, liveSprite)" in flush and
+         invalidate_stale in flush and "InvalidateForDeviceLifecycle(true);" in flush and
+         "return false;" in flush and dereference in flush and
+         flush.find(read_live) < flush.find(predicate) <
+         flush.find(invalidate_stale) < flush.find(dereference) and
+         flush.find("return false;") < flush.find(dereference),
+         "FlushTracked must prevent stale vtable dereference and forget replaced D3DX batch")
     need("LostDevice_hk && ResetDevice_hk" in hook and
          "vtable[12] && vtable[13]" in hook,
          "batch hook installation must include both reset edges")
@@ -408,46 +448,69 @@ def main() -> int:
         "lost-device-invalidates-no-batch":
             code.replace(
                 "const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);\n"
-                "        InvalidateForDeviceLifecycle(wasExactGameSprite);",
+                "        InvalidateForDeviceLifecycle(ownsBatch);",
                 "const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);", 1),
         "reset-device-invalidates-no-batch":
             code.replace(
                 "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);\n"
-                "        InvalidateForDeviceLifecycle(wasExactGameSprite);",
+                "        InvalidateForDeviceLifecycle(ownsBatch);",
                 "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);", 1),
         "reset-must-not-promote-stale-owner":
             code.replace("        TrackedSprite = nullptr;",
                          "        TrackedSprite = self;", 1),
         "reset-must-not-include-foreign-sprite":
-            code.replace("        if (!wasExactGameSprite)\n            return;",
+            code.replace("        if (!wasTrackedOrExactGameSprite)\n            return;",
                          "        if (false)\n            return;", 1),
         "reset-hook-absent":
-            code.replace("ResetDevice_hk.enable().has_value()",
-                         "false", 1),
+            code.replace("ResetDevice_hk.enable().has_value()", "false", 1),
         "lost-must-propagate-original-error":
             code.replace(
-                "InvalidateForDeviceLifecycle(wasExactGameSprite);\n        return hr;\n"
+                "InvalidateForDeviceLifecycle(ownsBatch);\n        return hr;\n"
                 "    }\n\n    static HRESULT __stdcall ResetDeviceDest",
-                "InvalidateForDeviceLifecycle(wasExactGameSprite);\n        return D3D_OK;\n"
+                "InvalidateForDeviceLifecycle(ownsBatch);\n        return D3D_OK;\n"
                 "    }\n\n    static HRESULT __stdcall ResetDeviceDest", 1),
         "reset-must-propagate-original-error":
             code.replace(
                 "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);\n"
-                "        InvalidateForDeviceLifecycle(wasExactGameSprite);\n        return hr;",
+                "        InvalidateForDeviceLifecycle(ownsBatch);\n        return hr;",
                 "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);\n"
-                "        InvalidateForDeviceLifecycle(wasExactGameSprite);\n        return D3D_OK;", 1),
+                "        InvalidateForDeviceLifecycle(ownsBatch);\n        return D3D_OK;", 1),
         "lost-must-capture-exact-before-original":
             code.replace(
-                "const bool wasExactGameSprite = IsExactSprite(self);\n"
+                "const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(\n"
+                "            self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218));\n"
                 "        const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);",
                 "const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);\n"
-                "        const bool wasExactGameSprite = IsExactSprite(self);", 1),
+                "        const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(\n"
+                "            self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218));", 1),
         "reset-must-capture-exact-before-original":
             code.replace(
-                "const bool wasExactGameSprite = IsExactSprite(self);\n"
+                "const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(\n"
+                "            self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218));\n"
                 "        const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);",
                 "const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);\n"
-                "        const bool wasExactGameSprite = IsExactSprite(self);", 1),
+                "        const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(\n"
+                "            self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218));", 1),
+        "lost-old-tracked-sprite-missed":
+            code.replace("(callback == tracked || callback == live);",
+                         "(callback == live);", 1),
+        "foreign-sprite-revokes-old-batch":
+            code.replace("callback != nullptr &&",
+                         "true &&", 1),
+        "flush-live-instance-proof-missing":
+            code.replace("candidate == live;", "true;", 1),
+        "flush-allows-null-candidate":
+            code.replace("candidate != nullptr && candidate == tracked &&",
+                         "candidate == tracked &&", 1),
+        "flush-dead-instance-promoted":
+            code.replace("!DX9ExD3DXSpriteLifetime::CanFlush(",
+                         "DX9ExD3DXSpriteLifetime::CanFlush(", 1),
+        "flush-old-owner-not-revoked":
+            code.replace("InvalidateForDeviceLifecycle(true);",
+                         "// stale owner retained", 1),
+        "flush-skips-live-identity-read":
+            code.replace("void* liveSprite = *Module::exe_ptr<void*>(0x55B218);",
+                         "void* liveSprite = TrackedSprite;", 1),
     }
     for label, mutated in mutations.items():
         if mutated == code or not check(mutated, header):
