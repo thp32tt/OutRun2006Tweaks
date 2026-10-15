@@ -33,6 +33,12 @@ def load_binding(role, root=ROOT):
     if pilot and role != "A":
         return None, "PILOT_ROLE_BLOCKED"
     root = Path(root).resolve()
+    if os.environ.get("OUTRUN_AB_TEXT_ROI_QUEUE", "false").lower() == "true":
+        try:
+            from app.text_roi_queue import next_binding as roi_next_binding
+        except ModuleNotFoundError:
+            from text_roi_queue import next_binding as roi_next_binding
+        return roi_next_binding(role, root)
     if os.environ.get("OUTRUN_AB_BATCH_QUEUE", "false").lower() == "true":
         try:
             from app.ab_batch_queue import next_binding
@@ -273,8 +279,8 @@ async def attach_batch_pngs(page, binding):
     """Upload exactly five individual files in one composer attachment operation."""
     paths = binding["paths"]
     expected = [Path(s).name for s in paths]
-    if len(paths) != 5 or len(set(expected)) != 5:
-        return "BATCH_MUST_HAVE_FIVE_DISTINCT_PNG"
+    if not (2 <= len(paths) <= 5) or len(set(expected)) != len(paths):
+        return "BATCH_MUST_HAVE_TWO_TO_FIVE_DISTINCT_PNG"
     try:
         if not page.url.startswith("https://chatgpt.com/"):
             return "TARGET_ORIGIN_NOT_CHATGPT"
