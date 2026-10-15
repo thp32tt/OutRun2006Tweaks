@@ -16,6 +16,7 @@
 #include "vr/ipc/protocol.hpp"
 #include "vr/ipc/protocol_v3.hpp"
 #include "vr/ipc/shadow_legacy_v2.hpp"
+#include "vr/ipc/shadow_progress.hpp"
 #include "vr/ipc/win32_channel.hpp"
 #include "vr/ipc/shadow_lifetime_bridge.hpp"
 
@@ -383,11 +384,9 @@ namespace OutRunVR::IpcV3
             std::unique_ptr<FrameRingWriter> frameWriter;
 
             std::uint32_t lastLegacyPoseSequence = 0;
-            std::uint32_t lastLegacyHeartbeat = 0;
-            std::uint64_t lastLegacyFrameId = 0;
-            std::uint64_t lastClientPublishedFrameId = 0;
-            std::uint32_t lastClientPresentation = UINT32_MAX;
-            std::uint32_t lastClientStereoState = UINT32_MAX;
+            ShadowFrameStamp lastPublishedFrame{};
+            ClientState lastPublishedClient{};
+            bool havePublishedClient = false;
             std::uint32_t lastFailureReason = StereoFailureNone;
             ULONGLONG nextWriterRetryMs = 0;
             ULONGLONG lastSummaryMs = 0;
@@ -427,29 +426,43 @@ namespace OutRunVR::IpcV3
                     if (frameWriter && !frameWriter->Ready())
                         frameWriter.reset();
                     if (!clientWriter)
+                    {
                         clientWriter = std::make_unique<ClientStateWriter>();
+                        // A new mapping must receive the complete current state,
+                        // even when v2 client fields have not changed.
+                        havePublishedClient = false;
+                    }
                     if (!frameWriter)
+                    {
                         frameWriter = std::make_unique<FrameRingWriter>();
+                        // Never carry a previous writer's publication cursor.
+                        lastPublishedFrame = {};
+                    }
                     nextWriterRetryMs = loopNow + ShadowRetryMs;
                 }
 
                 SharedRenderFrameState latestFrame{};
+                ShadowFrameStamp observedFrame{};
                 bool haveLatestFrame = false;
                 if (legacyFrameMapping.EnsureOpen(RenderFrameMemoryName))
                 {
                     SharedRenderFrameRing ring{};
                     if (ShadowV2::StableReadFrameRing(legacyFrameMapping.Get(), ring))
+                    {
                         haveLatestFrame = ShadowV2::LatestFrame(ring, latestFrame);
+                        if (haveLatestFrame)
+                            observedFrame = {ring.clientPid, ring.reserved0, latestFrame.frameId};
+                    }
                 }
 
                 const bool frameChanged = haveLatestFrame &&
-                    latestFrame.frameId != lastLegacyFrameId;
-                if (frameChanged)
+                    ShadowFrameNeedsPublish(observedFrame, lastPublishedFrame);
+                if (frameChanged && frameWriter && frameWriter->Ready())
                 {
-                    lastLegacyFrameId = latestFrame.frameId;
-                    if (frameWriter && frameWriter->Ready())
+                    const auto descriptor = ShadowV2::FrameDescriptorFromV2(latestFrame);
+                    if (frameWriter->Publish(descriptor) != 0)
                     {
-                        frameWriter->Publish(ShadowV2::FrameDescriptorFromV2(latestFrame));
+                        lastPublishedFrame = observedFrame;
                         ++framePublishes;
                     }
                     if (latestFrame.failureReason != StereoFailureNone &&
@@ -465,24 +478,16 @@ namespace OutRunVR::IpcV3
                     lastFailureReason = latestFrame.failureReason;
                 }
 
-                const std::uint32_t heartbeat = pose.reserved[ClientHeartbeatIndex];
-                const std::uint32_t presentation = pose.reserved[ClientPresentationModeIndex];
-                const std::uint32_t stereoState = pose.reserved[ClientStereoStateIndex];
-                const std::uint64_t currentFrameId = haveLatestFrame ? latestFrame.frameId : 0;
-                const bool clientChanged = heartbeat != lastLegacyHeartbeat ||
-                    currentFrameId != lastClientPublishedFrameId ||
-                    presentation != lastClientPresentation ||
-                    stereoState != lastClientStereoState;
-                if (clientChanged && clientWriter && clientWriter->Ready())
+                const ClientState client = ShadowV2::ClientStateFromV2(
+                    pose, haveLatestFrame ? &latestFrame : nullptr);
+                if ((!havePublishedClient ||
+                     !ShadowClientEqual(client, lastPublishedClient)) &&
+                    clientWriter && clientWriter->Ready() &&
+                    clientWriter->Publish(client) != 0)
                 {
-                    ClientState client = ShadowV2::ClientStateFromV2(
-                        pose, haveLatestFrame ? &latestFrame : nullptr);
-                    clientWriter->Publish(client);
+                    lastPublishedClient = client;
+                    havePublishedClient = true;
                     ++clientPublishes;
-                    lastLegacyHeartbeat = heartbeat;
-                    lastClientPublishedFrameId = currentFrameId;
-                    lastClientPresentation = presentation;
-                    lastClientStereoState = stereoState;
                 }
 
                 const std::uint32_t directGeneration = haveLatestFrame &&

@@ -435,8 +435,8 @@ require(
     "src/vr/ipc/v3_game_shadow_bridge.cpp",
     "ShadowIdlePollMs = 8",
     "ShadowRetryMs = 250",
-    "lastClientPublishedFrameId",
-    "clientChanged",
+    "ShadowFrameNeedsPublish",
+    "ShadowClientEqual",
 )
 require(
     "vrhost/src/ipc/v3_shadow_bridge.cpp",

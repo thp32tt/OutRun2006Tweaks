@@ -107,7 +107,7 @@ jobs:
             # and the lower implementation, not stale private textual-chain names.
             'src/vr/d3d9/stereo_renderer_r30.cpp' = @(
               'R30SupportGetVerifiedProjection(',
-              'OutRunVRRenderer::GetR28VerifiedProjection(',
+              'R29OwnerGetR28VerifiedProjection(',
               'R30SupportPollDirectTransportSlotProducer(',
               'target.fence->GetData(nullptr, 0, 0)',
               'target.producerPending = false;',
@@ -169,8 +169,8 @@ jobs:
             )
             'src/vr/ipc/v3_game_shadow_bridge.cpp' = @(
               'ShadowIdlePollMs = 8',
-              'lastClientPublishedFrameId',
-              'clientChanged',
+              'ShadowFrameNeedsPublish',
+              'ShadowClientEqual',
               'ShadowRetryMs'
             )
             'vrhost/src/ipc/v3_shadow_bridge.cpp' = @(
