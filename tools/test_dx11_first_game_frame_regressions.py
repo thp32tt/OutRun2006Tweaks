@@ -528,7 +528,10 @@ def main() -> None:
                        code.find("} // namespace", code.find("void observe("))]
         required_state = (
             "if (!game_fvf_layout(fvf, layout)) return false;",
-            "capture.enabled = layout.textured;",
+            "game_fvf_diffuse_only_inactive_texture(",
+            "capture.enabled = layout.textured && !diffuseOnly;",
+            "capture.inactiveStage0TextureBypass = diffuseOnly && layout.textured;",
+            "else if (tex && !diffuseOnly)",
             "GetRenderState(D3DRS_CLIPPLANEENABLE, &clipPlanes)",
             "GetRenderState(D3DRS_LIGHTING, &lighting)",
             "GetRenderState(D3DRS_VERTEXBLEND, &vertexBlend)",
@@ -610,7 +613,10 @@ def main() -> None:
                       code.find("void observe(")]
         return all(x in state for x in (
             "if (!game_fvf_layout(fvf, layout)) return false;",
-            "capture.enabled = layout.textured;",
+            "game_fvf_diffuse_only_inactive_texture(",
+            "capture.enabled = layout.textured && !diffuseOnly;",
+            "capture.inactiveStage0TextureBypass = diffuseOnly && layout.textured;",
+            "else if (tex && !diffuseOnly)",
             "if (!layout.hasDiffuse && !selectTexture) return false;",
             "GetTexture(0, tex.GetAddressOf())",
             "tex.As(&capture.texture)",
@@ -653,7 +659,10 @@ def main() -> None:
     assert texture_path_complete(bridge)
     for old, bad in (
         ("srgb > 1u ||", "srgb > 2u ||"),
-        ("capture.enabled = layout.textured;", "capture.enabled = false;"),
+        ("capture.enabled = layout.textured && !diffuseOnly;", "capture.enabled = false;"),
+        ("capture.inactiveStage0TextureBypass = diffuseOnly && layout.textured;",
+         "capture.inactiveStage0TextureBypass = false;"),
+        ("else if (tex && !diffuseOnly)", "else if (tex)"),
         ("if (!layout.hasDiffuse && !selectTexture) return false;",
          "if (layout.hasDiffuse && !selectTexture) return false;"),
         ("const bool modulate = op == D3DTOP_MODULATE && alphaOp == D3DTOP_MODULATE;",
@@ -1551,7 +1560,10 @@ def main() -> None:
         observe = code[code.index("void observe(IDirect3DDevice9* game", z):]
         return all(v in body for v in (
             "if (!game_fvf_layout(fvf, layout)) return false;",
-            "capture.enabled = layout.textured;",
+            "game_fvf_diffuse_only_inactive_texture(",
+            "capture.enabled = layout.textured && !diffuseOnly;",
+            "capture.inactiveStage0TextureBypass = diffuseOnly && layout.textured;",
+            "else if (tex && !diffuseOnly)",
             "if (!layout.hasDiffuse && !selectTexture) return false;",
             "if (!game_fvf_decode_vertex(data, stride, layout, decoded))",
             "const DWORD diffuse = decoded.diffuse;",
