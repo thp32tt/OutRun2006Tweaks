@@ -84,6 +84,25 @@ namespace OutRunVR::GameSemantic
         CarBaseShadow, // Direct original player-car contact shadow.
     };
 
+    // The actual ID3DXSprite::Draw HRESULT is part of submission
+    // provenance: a rejected draw is NOT a successfully enqueued +TIME or
+    // GOAL triangle. Preserve native End/Flush semantics, but invalidate
+    // our privilege to force an exact-owner Flush in an ambiguous batch.
+    inline constexpr bool D3DXSpriteFailedDrawQuarantinesExactBatch(
+        bool batchActive, bool exactTrackedSprite,
+        bool drawSucceeded) noexcept
+    {
+        return batchActive && exactTrackedSprite && !drawSucceeded;
+    }
+    static_assert(D3DXSpriteFailedDrawQuarantinesExactBatch(true, true, false),
+        "failed exact-owner Draw cannot submit a claimed +TIME/GOAL batch");
+    static_assert(!D3DXSpriteFailedDrawQuarantinesExactBatch(true, true, true),
+        "successful Draw retains the existing homogeneous fast path");
+    static_assert(!D3DXSpriteFailedDrawQuarantinesExactBatch(true, false, false),
+        "failed foreign sprite must not poison the game-owned sprite");
+    static_assert(!D3DXSpriteFailedDrawQuarantinesExactBatch(false, true, false),
+        "failed Draw after End/Reset cannot resurrect a stale batch");
+
     // Previous direct D3DX triangles must be submitted under their OLD
     // owner before the first exact +TIME SpriteNode becomes current.
     // This is never permission to relabel an unknown or mixed batch.

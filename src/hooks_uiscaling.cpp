@@ -2524,7 +2524,14 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         if (self == TrackedSprite)
         {
             if (SUCCEEDED(hr))
+            {
+                // An explicit game Flush physically consumes the current
+                // D3DX batch. A queue-exit boundary from the previous +TIME
+                // or GOAL Draw cannot authorize the *next* producer's Draw.
+                // Its first successful exact-owner Draw will re-arm normally.
                 ForgetBatch();
+                StageBoundaryReady = false;
+            }
             else
             {
                 // A failed flush is not proof that the old draw buffer was
@@ -2794,10 +2801,20 @@ private:
             }
             return hr;
         }
-        if (!self)
+        using namespace OutRunVR::GameSemantic;
+        if (D3DXSpriteFailedDrawQuarantinesExactBatch(
+                BatchActive, self == TrackedSprite, SUCCEEDED(hr)))
+        {
+            // D3DX rejected this Draw. It did not prove a new triangle was
+            // enqueued; a partial device failure also does not prove that
+            // an existing native batch is still homogeneous. Let the game's
+            // own End/Flush decide, never submit it under +TIME/GOAL by force.
+            PendingHomogeneous = false;
+            StageBoundaryReady = false;
+        }
+        if (FAILED(hr) || !self)
             return hr;
 
-        using namespace OutRunVR::GameSemantic;
         const auto scope = EffectiveScope();
         const auto source = CurrentRenderProducerToken();
         if (BatchActive && self == TrackedSprite)
