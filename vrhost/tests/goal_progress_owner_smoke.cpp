@@ -29,8 +29,35 @@ static bool CheckDirectGoal(ProducerToken token)
         CurrentProjectedMarker()->viewX == 3.0f &&
         ConsumeForDraw() == RenderScope::ProjectedWorldMarker2D;
 }
+static bool CheckStagePrintfBatch()
+{
+    constexpr auto hud = RenderScope::ScreenHud;
+    constexpr auto result = ProducerToken::OutRunStagePrintf;
+    constexpr auto progress = ProducerToken::ResultProgress;
+    // Direct Sumo_Printf draw: submit under the same source BEFORE its
+    // parent E8 returns; never promote an unrelated or mixed buffer.
+    return CanFlushD3DXDirectGoalAtExit(
+               false, true, true, 2, true, hud, result, hud, result) &&
+        !CanFlushD3DXDirectGoalAtExit(
+               false, true, true, 2, false, hud, result, hud, result) &&
+        !CanFlushD3DXDirectGoalAtExit(
+               false, true, true, 2, true, hud, result, hud, progress) &&
+        !CanFlushD3DXDirectGoalAtExit(
+               true, true, true, 1, true, hud, result, hud, result) &&
+        // Queue Begin can occur after the Sumo_Printf SpriteNode select:
+        // only its first homogeneous draw may rearm submission.
+        CanArmD3DXQueueGoalAfterDraw(
+            true, true, true, 1, true, hud, result, hud, result) &&
+        !CanArmD3DXQueueGoalAfterDraw(
+            true, true, true, 2, true, hud, result, hud, result) &&
+        !CanArmD3DXQueueGoalAfterDraw(
+            true, true, true, 1, true, hud, result, hud, progress) &&
+        !CanArmD3DXQueueGoalAfterDraw(
+            false, true, true, 1, true, hud, result, hud, result);
+}
 int main()
 {
+    if (!CheckStagePrintfBatch()) return 4;
     if (!CheckDirectGoal(ProducerToken::ResultProgress) ||
         !CheckDirectGoal(ProducerToken::GoalTime020) ||
         !CheckDirectGoal(ProducerToken::GoalTime150) ||

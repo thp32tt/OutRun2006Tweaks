@@ -1003,10 +1003,18 @@ class UIScaling : public Hook
         // An active queue node remains authoritative, and RAII restores the
         // pending token, projection anchor and source on exit / VR toggle.
         if (Settings::VREnabled)
+        {
+            // The three proven Sumo_Printf GOAL result parents may emit
+            // D3DXSprite::Draw work as well as queue SpriteNodes. Submit
+            // any homogeneous outgoing batch under its OLD producer before
+            // accepting the result text's ScreenHud owner.
+            if (!OutRunVR::GameSemantic::QueueRenderActive())
+                FlushD3DXBeforeDirectGoalSource();
             OutRunStagePrintfDirectDrawOwner.emplace(
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 nullptr, true,
                 OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
+        }
 	}
     inline static thread_local std::uint64_t OutRunStagePrintfCompleted = 0;
 	static void OutRunStagePrintfLeave(safetyhook::Context&)
@@ -1027,6 +1035,11 @@ class UIScaling : public Hook
 		TagAppendedNodes(OutRunStagePrintfBefore,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
 			OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf);
+        // D3DX can defer the record/stage glyph draw beyond its original
+        // Sumo_Printf E8. Drain only this exact homogeneous live source
+        // before RAII restores the previous world/queue identity. Mixed or
+        // foreign batches keep the game's original End/Flush behavior.
+        FlushD3DXAtDirectGoalSourceExit();
         // Unwind on exit even if VR mode toggles during the parent E8 call.
         OutRunStagePrintfDirectDrawOwner.reset();
         const auto hit = ++OutRunStagePrintfCompleted;
@@ -2419,10 +2432,10 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
             source == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime;
     }
 
-    // GOAL finish-time helpers and percentage sprites also enqueue D3DX
-    // triangles beyond their original E8 call. Only these verified source
-    // tokens may use the finite HUD batch isolation, not white/alpha draws
-    // in general or the crash-prone B9200 return-hook family.
+    // GOAL finish-time helpers, progress sprites and the three verified
+    // Sumo_Printf result parents enqueue D3DX triangles beyond their E8.
+    // Scope only those existing hooked sources, never arbitrary white/alpha
+    // draws or the unsafe nineteen B9200 result return-hook family.
     static bool GoalOwner(
         OutRunVR::GameSemantic::RenderScope scope,
         OutRunVR::GameSemantic::ProducerToken source) noexcept
@@ -2431,7 +2444,8 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
         return scope == RenderScope::ScreenHud &&
             (source == ProducerToken::GoalTime020 ||
              source == ProducerToken::GoalTime150 ||
-             source == ProducerToken::ResultProgress);
+             source == ProducerToken::ResultProgress ||
+             source == ProducerToken::OutRunStagePrintf);
     }
 
     static void ForgetBatch() noexcept
