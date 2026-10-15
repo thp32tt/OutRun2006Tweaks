@@ -111,12 +111,16 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
             "R30SupportWvpFirstRegister, original",
             "R30ScreenSpaceKind::ExactLensCentreWorld",
         ) else marker in lens, "exact C993 per-eye transform lost: " + marker
+    # R84 now contains an additional separately source-proven HUD plane
+    # ahead of C993. Check C993's OWN scoped transform ordering; matching
+    # rawUploadedT in the earlier HUD cannot be mistaken for lens execution.
     assert (bld.index("GetVertexShaderConstantF(") <
-        bld.index("if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld)") <
-        bld.index("R29OwnerTransposeMatrix(rawUploadedT)") <
-        bld.index("R29OwnerMultiplyMatrix(stockRawWvp,") <
-        bld.index("R29OwnerMultiplyMatrix(worldView, headInverse)") <
-        bld.index("R29OwnerProjectionFromFov(baseProjection,"))
+        bld.index("if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld)"))
+    assert (lens.index("R30HasExactLensCentreRawWvp(rawGameWvp)") <
+        lens.index("R29OwnerTransposeMatrix(rawUploadedT)") <
+        lens.index("R29OwnerMultiplyMatrix(stockRawWvp,") <
+        lens.index("R29OwnerMultiplyMatrix(worldView, headInverse)") <
+        lens.index("R29OwnerProjectionFromFov(baseProjection,"))
     # The original GPU constants are needed to restore the source draw;
     # replacing `original` with a stock raw WVP would corrupt D3D9 state.
     assert "headPoseSequence != stereo.poseSequence" in lens
