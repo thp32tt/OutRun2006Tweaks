@@ -75,7 +75,7 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         route.rindex("return R30ScreenSpaceKind::None;"))
     # Source-proven C993 classification precedes alpha and depth queries:
     # depth-enabled and non-blended variants must still reach R33 stereo.
-    assert route.index("if (ownedLensCentre)") < (
+    assert (route.index("if (ownedLensCentre)") <
         route.index("R30HasExactLensCentreRawWvp(originalGameWvp)") <
         route.index("return R30ScreenSpaceKind::ExactLensCentreWorld;") <
         route.index("R29OwnerTryGetEffectTelemetrySnapshot(effect)"))
