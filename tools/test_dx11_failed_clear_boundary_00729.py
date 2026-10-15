@@ -19,10 +19,11 @@ def valid(h):
     boundary = finish.find("live_game_frame::observe_scene_boundary(device)")
     color = finish.find("live_game_frame::observe_game_clear(")
     result = finish.find("return result;")
-    mask = finish.find("if ((flags & (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |")
+    mask = finish.find("if (!nativePartialClear &&")
     return all((
         0 <= gate < mask < boundary < color < result,
-        "if (flags & D3DCLEAR_TARGET)" in finish,
+        "preserve_game_partial_target_clear(" in finish,
+        "if ((flags & D3DCLEAR_TARGET) && !nativePartialClear)" in finish,
         "finishNativeClear(R9ClearCallbackHook.stdcall<HRESULT>(" in h,
         "finishNativeClear(ClearHook.stdcall<HRESULT>(" in h,
         "return finishNativeClear(stereoHr);" in h,
@@ -37,7 +38,7 @@ for old, new in (
     ("if (SUCCEEDED(result)) {", "if (true) {"),
     ("if (SUCCEEDED(result)) {", "if (FAILED(result)) {"),
     ("live_game_frame::observe_scene_boundary(device)", "/* omitted boundary */"),
-    ("if (flags & D3DCLEAR_TARGET)", "if (false)"),
+    ("if ((flags & D3DCLEAR_TARGET) && !nativePartialClear)", "if (false)"),
     ("return finishNativeClear(stereoHr);", "return stereoHr;"),
 ):
     mutant = hook.replace(old, new, 1)

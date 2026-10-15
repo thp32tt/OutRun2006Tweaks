@@ -18,9 +18,10 @@ def integrated(cpp: str, r9: str, clear: str) -> bool:
         # 00729: the successful HRESULT is the outer scene boundary guard;
         # only color Clears reseed native D3D11 game-source background.
         "if (SUCCEEDED(result)) {",
-        "if ((flags & (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |",
+        "if (!nativePartialClear &&",
+        "preserve_game_partial_target_clear(",
         "live_game_frame::observe_scene_boundary(device)",
-        "if (flags & D3DCLEAR_TARGET)",
+        "if ((flags & D3DCLEAR_TARGET) && !nativePartialClear)",
         "live_game_frame::observe_game_clear(",
         "return finishNativeClear(stereoHr);",
         "return finishNativeClear(hr);",
@@ -29,7 +30,7 @@ def integrated(cpp: str, r9: str, clear: str) -> bool:
     )) and (
         0 <= callback.find("if (SUCCEEDED(result)) {") <
         callback.find("live_game_frame::observe_scene_boundary(device)") <
-        callback.find("if (flags & D3DCLEAR_TARGET)") <
+        callback.find("if ((flags & D3DCLEAR_TARGET) && !nativePartialClear)") <
         callback.find("live_game_frame::observe_game_clear(")
     ) and all(x in observe for x in (
         "s.clearColor.discard();", "GameNativeClearCoverage::covers_whole(",
@@ -53,7 +54,7 @@ assert "void observe_game_clear(IDirect3DDevice9* gameDevice" in hdr
 assert integrated(src, hook, helper), "R9 Clear -> native Draw integration disconnected"
 for old, new in (
     ("if (SUCCEEDED(result)) {", "if (FAILED(result)) {"),
-    ("if (flags & D3DCLEAR_TARGET)", "if (false)"),
+    ("if ((flags & D3DCLEAR_TARGET) && !nativePartialClear)", "if (false)"),
     ("live_game_frame::observe_scene_boundary(device)", "/* lost boundary */"),
     ("return finishNativeClear(stereoHr);", "return stereoHr;"),
     ("return finishNativeClear(hr);", "return hr;"),
