@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:NATIVE_FULLFRAME_PARTIAL_DEPTH_AND_COLOR_Z_CLEAR_CONTINUITY",
   "feature_id": "DX11-LIVE-PARTIAL-DEPTH-COMBINED-CLEAR-FULLFRAME",
-  "status": "VALIDATING_EXACT_SHA",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "FAILED_PRIOR_SHA_REPAIR_SUBMITTED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -20,7 +20,7 @@
   "packaging_status": "NOT_REQUIRED",
   "base_sha": "425d2572cf1d0bcfbd49688fb484fc764f508bac",
   "material_result_sha": "dae1401ab1010e0a7224f7138d71138b9de0defe",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "a2d5f87228ce5bffb8b3c22f9d702a5121e41d19",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/live_game_frame_bridge.hpp",
@@ -94,19 +94,19 @@
     "activation_guard_and_fallback": "Existing diagnostic opt-in, no native automatic promotion; fail-closed for unsupported Z/stencil/MRT/context; original D3D9 Present/input/FFB/SkyGlow and DX9Ex fallback retained; DXVK frozen."
   },
   "acceptance_results": {
-    "native-partial-main-z-clear": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "native-combined-color-z": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "unsafe-clear-and-game-input-fallback": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "five-required-exact-sha-gates": "PENDING"
+    "native-partial-main-z-clear": "PASS_BUILD",
+    "native-combined-color-z": "PASS_BUILD",
+    "unsafe-clear-and-game-input-fallback": "PASS_BUILD",
+    "five-required-exact-sha-gates": "PASS_EXACT_SHA"
   },
   "pipeline": {
     "C0_RECOVER": "Reused existing actual 00795 C++ material commit at dae1401ab; resumed from explicit Backend Conversion Gate failure run 38820167191, not a new task.",
     "C1_REVIEW": "Failed Backend and Fast checks identify latest run 00794 lacking development_strategy; 00795 material had no run record; policy checks highest-numbered run. This repair publishes 00795 feature acceptance using truthful in-flight status.",
     "C2_IMPLEMENT": "Existing 00795 material commit implemented partial depth and combined TARGET|Z R9->D3D11.1 native ClearView and portable C++ regressions; this repair modifies no game source and makes no extra feature or score.",
-    "C3_VALIDATE": "Original exact SHA dae1401ab Fast run 38820167173 and Backend run 38820167191 FAILED at policy acceptance; new validation-bearing SHA mandatory; keep game/HMD UNTESTED.",
-    "C4_COMMIT": "Existing source material commit dae1401ab; separate policy-failure repair commit creates reconstructed missing 00795 acceptance record without CI skip.",
+    "C3_VALIDATE": "Initial material dae1401a failed Fast/Backend due missing latest run strategy; new 00795 acceptance 4758e6a fixed policy. Historical destructive source tests 00733, 00777, 00782 had stale hook/function-scope expectations and were repaired without weakening their negative assertions at 42d4230a, 3bdae178, a2d5f872. All five required GitHub Actions completed SUCCESS at the exact final a2d5f87228ce5bffb8b3c22f9d702a5121e41d19 SHA. No HMD/gamepad test.",
+    "C4_COMMIT": "Original substantive C++/hook/probe material dae1401ab; source-preserving exact-Gate causal repair commits 4758e6a6 (missing run/contract), 42d4230a (00733 targeted Z mutation), 3bdae178 (00777 function-scoped depth owner), a2d5f872 (00782 partial/full Z negative regressions). No force or CI skip on Gate-bearing SHAs.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA_GATES"
+    "C6_STATE": "PASS_EXACT_SHA on one validation-bearing SHA a2d5f872; separate C6 bookkeeping [skip ci] only, no independent feature or extra score; Quest3/VDXR HMD and physical gamepad UNTESTED."
   },
   "evidence": {
     "material_commit": "dae1401ab1010e0a7224f7138d71138b9de0defe",
@@ -118,13 +118,51 @@
     "failure_signature": "DX11 task acceptance FAIL ... CONVERSION-DX11-00794.json: development_strategy missing after structural policy effective date",
     "cause": "00795 material commit lacked run record, so latest-run check fell back to reconstructed 00794 C6 record; 00794 lacks feature ID and development strategy.",
     "source_change_in_current_retry": false,
-    "real_game_quest3_test": false
+    "real_game_quest3_test": false,
+    "validation_bearing_result_sha": "a2d5f87228ce5bffb8b3c22f9d702a5121e41d19",
+    "same_sha_verified": true,
+    "ci_repair_commits": [
+      "4758e6a6bc1f69722bed5b474484b34864fae182",
+      "42d4230a94335a016d87ef198116851559ea70ba",
+      "3bdae178fb60cf52db7324a1ea11d7a0ca1fb2e6",
+      "a2d5f87228ce5bffb8b3c22f9d702a5121e41d19"
+    ],
+    "exact_sha_workflow_runs": {
+      "DX11 Fast Structural Checks": {
+        "run_id": 38821072226,
+        "conclusion": "success",
+        "head_sha": "a2d5f87228ce5bffb8b3c22f9d702a5121e41d19"
+      },
+      "Backend Conversion Gate": {
+        "run_id": 38821072217,
+        "conclusion": "success",
+        "head_sha": "a2d5f87228ce5bffb8b3c22f9d702a5121e41d19"
+      },
+      "Build": {
+        "run_id": 38821078845,
+        "conclusion": "success",
+        "head_sha": "a2d5f87228ce5bffb8b3c22f9d702a5121e41d19"
+      },
+      "OpenXR VR architecture": {
+        "run_id": 38821078832,
+        "conclusion": "success",
+        "head_sha": "a2d5f87228ce5bffb8b3c22f9d702a5121e41d19"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "run_id": 38821078841,
+        "conclusion": "success",
+        "head_sha": "a2d5f87228ce5bffb8b3c22f9d702a5121e41d19"
+      }
+    },
+    "runtime_testing": "HMD/Quest3/VDXR, gamepad, and physical game menu/vehicle/race output not run; source/CI success is not visual parity."
   },
   "score": {
     "run_key": "CONVERSION-DX11-00795",
     "prior_material_commit_existing": true,
     "repair_is_not_new_feature": true,
     "score_change": 0,
-    "duplicate_credit_prohibited": true
+    "duplicate_credit_prohibited": true,
+    "bookkeeping_only": true,
+    "score_status": "Independent substantive material eligible for one score only, recorded separately in ai-dev-lab SSOT if not previously credited; C6/CI-repairs are zero-score."
   }
 }
