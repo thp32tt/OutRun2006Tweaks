@@ -399,12 +399,12 @@ def require_partial_menu_vectors(code: str) -> None:
         "pScaling ? pScaling->x : 1.0f",
         "pTranslation ? pTranslation->x : 0.0f",
         "CenterMultiSpriteAxis(",
-        "forwardedScaling = (&localScaling;",
-        "forwardedTranslation = (&localTranslation;",
+        "forwardedScaling = (&localScaling);",
+        "forwardedTranslation = (&localTranslation);",
     ):
         assert required in body, "partial menu matrix path missing: " + required
     assert body.index("sourceSx > 1.0e-6f") < body.index(
-        "inputSx / sourceSx") < body.index("forwardedScaling = (&localScaling;")
+        "inputSx / sourceSx") < body.index("forwardedScaling = (&localScaling);")
 
 require_partial_menu_vectors(text)
 for old, bad in (

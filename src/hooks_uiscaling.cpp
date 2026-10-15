@@ -331,8 +331,8 @@ class UIScaling : public Hook
                     localScaling.y = nextSy;
                     localTranslation.x = nextTx;
                     localTranslation.y = nextTy;
-                    forwardedScaling = (&localScaling;
-                    forwardedTranslation = (&localTranslation;
+                    forwardedScaling = (&localScaling);
+                    forwardedTranslation = (&localTranslation);
                 }
             }
         }

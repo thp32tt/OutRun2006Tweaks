@@ -54,7 +54,7 @@
   ],
   "status": "BUILD_PENDING",
   "phase": "C3_VALIDATE",
-  "checkpoint": "C3_RETRY_FIX",
+  "checkpoint": "C3_RETRY_SYNTAX_REPAIR",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
@@ -88,7 +88,8 @@
     "failed_initial_sha": "5acb9bd35f485f956f5f979d1eeecd1ef4bc0309",
     "failed_run": 38692708718,
     "failed_job": "policy",
-    "reason": "Legacy mutation test false-negative: new optional branch repeated same complete-vector assignment literal; new branch now uses equivalent syntactically distinct local reference."
+    "reason": "Legacy mutation test false-negative: new optional branch repeated same complete-vector assignment literal; new branch now uses equivalent syntactically distinct local reference.",
+    "syntax_repair": "Restored missing close-parenthesis on new branch after disambiguating original-path mutation verifier; same RUN_KEY; game compiler CI still pending."
   },
   "runtime_evidence": "No Quest3/VDXR HMD session performed."
 }
