@@ -10,21 +10,23 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:GAME_4K_ATLAS_MIP_TO_NATIVE_DRAW",
   "feature_id": "DX11-GAME-LARGE-ATLAS-FULL-MIP-NATIVE-DRAW",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
   "base_sha": "6220f54c8b4d4c8cbf04afe65620ec9d1b86366d",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "05b825648d85d335e27bcee03d34d814aff73a8c",
+  "validation_bearing_result_sha": "fd257b6e5486c9ad036e21ab14d46b8506c28d10",
   "changed_files": [
     "src/vr/d3d11/native_game_texture_atlas_budget.hpp",
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "tools/test_dx11_game_texture_atlas_00699.py",
+    "tools/test_dx11_game_rt_mips_00742.py",
+    "tools/test_dx11_first_game_frame_regressions.py",
     "docs/automation/runs/CONVERSION-DX11-00783.json"
   ],
   "feature_contract": {
@@ -85,17 +87,36 @@
     "activation_guard_and_fallback": "NativeFullMode still opt-in; original D3D9 Draw/Present/gamepad/FFB/SkyGlow and DX9Ex remain, DXVK frozen."
   },
   "acceptance_results": {
-    "full-native-game-atlas-binding": "PENDING",
-    "bounded-atlas-original-fallback": "PENDING",
-    "same-sha-gate": "PENDING"
+    "full-native-game-atlas-binding": "PASS_BUILD",
+    "bounded-atlas-original-fallback": "PASS_BUILD",
+    "same-sha-gate": "PASS_EXACT_SHA"
   },
   "pipeline": {
     "C0_RECOVER": "Confirmed HEAD and 00782 CI success; selected nonoverlapping texture-mirror scope.",
     "C1_REVIEW": "2K dimension/12-level cap rejected valid 4K D3D9 game atlas before native SRV and Draw.",
     "C2_IMPLEMENT": "4K/13 levels with natural-mip/24MiB bounds + legacy D3D9 fallback.",
-    "C3_VALIDATE": "Existing 00699 compiled game-native regression extended; final exact SHA CI pending.",
-    "C4_COMMIT": "Source/test commit with task marker and no CI skip",
+    "C3_VALIDATE": "Exact validation-bearing SHA fd257b6e: Fast 38777012095, Backend 38777012373, Windows 38777021691, OpenXR 38777021607, HUD 38777021579: 5/5 SUCCESS.",
+    "C4_COMMIT": "Material 05b82564; narrowly scoped obsolete-mip-limit CI repairs fa88caed and fd257b6e (latter validation-bearing).",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_RESULT": "PENDING"
+    "C6_RESULT": "5/5 exact SHA CI success; Quest3/VDXR/real-game/gamepad untested. C6 bookkeeping separate [skip ci]."
+  },
+  "evidence": {
+    "material_commit": "05b825648d85d335e27bcee03d34d814aff73a8c",
+    "ci_repairs": [
+      "fa88caed4fd4d15d7209cc72654da3f5e76fe742",
+      "fd257b6e5486c9ad036e21ab14d46b8506c28d10"
+    ],
+    "fast_gate_run_id": 38777012095,
+    "backend_gate_run_id": 38777012373,
+    "windows_build_run_id": 38777021691,
+    "openxr_gate_run_id": 38777021607,
+    "hud_gate_run_id": 38777021579,
+    "fast_gate_conclusion": "success",
+    "backend_gate_conclusion": "success",
+    "windows_build_conclusion": "success",
+    "openxr_gate_conclusion": "success",
+    "hud_gate_conclusion": "success",
+    "same_sha_verified": true,
+    "quest3_vdxr": "UNTESTED"
   }
 }
