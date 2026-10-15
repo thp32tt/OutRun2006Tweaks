@@ -1,0 +1,46 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "queue_id": "Q095",
+  "region_id": "please_stand_by",
+  "source_png": "37759842_FULL_ENGLISH_ORIGINAL_FLIPY_1024x1024.png",
+  "source_png_sha256": "8b78a092b5ca82276076cc5d99b05afd0831651ae2d4afbbcf7486f4693fa7c9",
+  "source_kind": "FULL_HD_PNG_FROM_DIRECT_ORIGINAL_DDS_PIXEL_EXACT_FLIPY",
+  "source_dds_path": "localization/validation/binary_compare/pairs/37759842/original/37759842_1024x1024.dds",
+  "original_dimensions": [
+    1024,
+    1024
+  ],
+  "bbox_xyxy": [
+    35,
+    132,
+    349,
+    181
+  ],
+  "english": "Please stand by.",
+  "korean": "잠시 기다려 주세요.",
+  "isolation": "alpha",
+  "scale": 4,
+  "native_dimensions": [
+    314,
+    49
+  ],
+  "imagegen_dimensions": [
+    1256,
+    196
+  ],
+  "native_png_sha256": "0fe49531e8f86694e3a176f9ce98a999b9913c0f65dc8792d2fc084a7e9c6b08",
+  "imagegen_input_sha256": "f35c179cf04384e24742e42b44835a4660ba8958e08f3dbcd663044dd8e56b60",
+  "alpha_crop_margin_checked": true,
+  "status": "IMAGEGEN_REFERENCE_TEST_ONLY",
+  "generate_output": "ONE_KOREAN_TEXT_ONLY_TRANSPARENT_PNG",
+  "required_review": [
+    "KOREAN_GLYPHS",
+    "SOURCE_EFFECT",
+    "CLEAN_PLATE",
+    "NATIVE_ROI_FIT",
+    "C1",
+    "C3_IF_REQUIRED",
+    "USER_GAME"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

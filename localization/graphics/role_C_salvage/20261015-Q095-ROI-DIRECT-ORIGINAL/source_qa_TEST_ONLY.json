@@ -1,0 +1,66 @@
+{
+  "schema": "outrun-c-roi-source-qa-v1",
+  "task_id": "OUTRUN-C-ROI-SOURCE-20261015-Q095-PLEASE-STAND-BY-1933",
+  "status": "SOURCE_VERIFIED_TEST_ONLY",
+  "queue_id": "Q095",
+  "source": {
+    "repo": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-recovery-20260928",
+    "pinned_commit": "47ea3b5b21d23077badce0cdd5f61ae5ea81a9ca",
+    "full_png_path": "localization/graphics/reference_packs/full_dds_test/37759842_FULL_ENGLISH_ORIGINAL_FLIPY_1024x1024.png",
+    "full_png_sha256": "8b78a092b5ca82276076cc5d99b05afd0831651ae2d4afbbcf7486f4693fa7c9",
+    "actual_original_dds": "localization/validation/binary_compare/pairs/37759842/original/37759842_1024x1024.dds",
+    "dds_sha256": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0",
+    "game_asset_path": "textures/load/spr_sprani_selector_cvt_Exst/37759842_1024x1024.dds",
+    "platform": "original PC DDS comparison; no cross-platform DDS substitutions",
+    "orientation": "vertical-flip full original for readable coordinates",
+    "dds_png_pixel_equal": true,
+    "difference_pixels": 0
+  },
+  "roi": {
+    "english": "Please stand by.",
+    "korean": "잠시 기다려 주세요.",
+    "mapping": "localization/graphics/transcriptions.jsonl index=95, transcribed_reviewed",
+    "bbox_xyxy": [
+      35,
+      132,
+      349,
+      181
+    ],
+    "source_dimensions": [
+      1024,
+      1024
+    ],
+    "native_dimensions": [
+      314,
+      49
+    ],
+    "upscaled_dimensions": [
+      1256,
+      196
+    ],
+    "scale": 4,
+    "alpha_only": true,
+    "alpha_safety_margin_px": {
+      "left": 6,
+      "top": 2,
+      "right": 5,
+      "bottom": 2
+    },
+    "native_png_sha256": "0fe49531e8f86694e3a176f9ce98a999b9913c0f65dc8792d2fc084a7e9c6b08",
+    "upscaled_png_sha256": "f35c179cf04384e24742e42b44835a4660ba8958e08f3dbcd663044dd8e56b60",
+    "inspected_phrase_complete": true
+  },
+  "return_policy": "Preserve aspect ratio and fit Korean alpha/effects inside independently verified original UI cell and UV safe bounds. Do not automatically reject changed Korean width. Do not composite without exact reviewed English removal mask/clean plate.",
+  "ui_uv_safe_area": "PENDING_INDEPENDENT_REVIEW",
+  "clean_plate": "NOT_BUILT",
+  "legacy_tiles_used": false,
+  "AB_QUEUE_MODIFIED": false,
+  "AB_AUTOSEND_ACTIVATED": false,
+  "IMAGEGEN_CALLED": false,
+  "qa": "TEST_ONLY",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "DDS": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
