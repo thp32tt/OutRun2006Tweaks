@@ -312,8 +312,11 @@ namespace OutRunVRStereo
             // Revision and covered-byte checks still gate every shadow copy.
             OutRunVR::R30ScratchBytes::WriteOnlyByteScratch source;
             OutRunVR::R30ScratchBytes::WriteOnlyByteScratch indexSource;
-            std::vector<std::uint8_t> left;
-            std::vector<std::uint8_t> right;
+            // Port 00874's independently allocated write-only eye outputs:
+            // every draw seeds validated source bytes before per-eye changes;
+            // no growth-time vector zero fill. Masks guard sparse untouched slots.
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch left;
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch right;
             std::vector<std::uint8_t> used;
             // Cached IB local-index order; only the first references are touched.
             // Reuse it across unchanged IB generations to seed sparse VB stereo
@@ -3256,8 +3259,8 @@ namespace OutRunVRStereo
         bool R30TransformWorldAffineStereo(
             const void* source, UINT vertexCount, UINT stride,
             const R30XyzrhwState& state,
-            std::vector<std::uint8_t>& left,
-            std::vector<std::uint8_t>& right,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& left,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& right,
             const std::vector<std::uint8_t>* usedMask,
             UINT knownUsedCount,
             const std::vector<std::uint32_t>* touched) noexcept
@@ -3381,8 +3384,8 @@ namespace OutRunVRStereo
         // used by the revision-cached VB/IB path or by unknown mask owners.
         bool R30SeedTouchedXyzrhwVertices(
             const std::uint8_t* source, UINT vertexCount, UINT stride,
-            std::vector<std::uint8_t>& left,
-            std::vector<std::uint8_t>* right,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& left,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch* right,
             const std::vector<std::uint8_t>& usedMask,
             const std::vector<std::uint32_t>* touched,
             std::size_t selectedCount) noexcept
@@ -3410,8 +3413,8 @@ namespace OutRunVRStereo
 
         bool R30SeedWorldXyzrhwBuffers(
             const void* source, UINT vertexCount, UINT stride,
-            std::vector<std::uint8_t>& left,
-            std::vector<std::uint8_t>* right,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& left,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch* right,
             const std::vector<std::uint8_t>* usedMask,
             UINT knownUsedCount = UINT_MAX,
             const std::vector<std::uint32_t>* touched = nullptr) noexcept
@@ -3490,7 +3493,7 @@ namespace OutRunVRStereo
         bool R30TransformXyzrhwVertices(
             const void* source, UINT vertexCount, UINT stride,
             const R30XyzrhwState& state, int eye,
-            std::vector<std::uint8_t>& out,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out,
             const std::vector<std::uint8_t>* usedMask,
             bool allowFullReprojection, bool& usedFullReprojection,
             bool preseeded) noexcept
@@ -3880,8 +3883,8 @@ namespace OutRunVRStereo
         bool R30TryFusedWorldXyzrhwProjection(
             const void* source, UINT vertexCount, UINT stride,
             const R30XyzrhwState& state,
-            std::vector<std::uint8_t>& left,
-            std::vector<std::uint8_t>& right,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& left,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& right,
             const std::vector<std::uint8_t>* usedMask,
             UINT knownUsedCount,
             const std::vector<std::uint32_t>* touched) noexcept
@@ -4084,8 +4087,8 @@ namespace OutRunVRStereo
         bool R30TransformXyzrhwStereo(
             const void* source, UINT vertexCount, UINT stride,
             const R30XyzrhwState& state,
-            std::vector<std::uint8_t>& left,
-            std::vector<std::uint8_t>& right,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& left,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& right,
             const std::vector<std::uint8_t>* usedMask = nullptr,
             UINT knownUsedCount = UINT_MAX,
             const std::vector<std::uint32_t>* touched = nullptr) noexcept
