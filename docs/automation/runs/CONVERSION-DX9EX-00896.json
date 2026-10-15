@@ -86,12 +86,12 @@
     "eye_ownership": "Direct+queued source semantic must survive until the physical GPU Draw consumed by R84 R30/R33 per-eye processing; failure invalidates source claims, not original game raster submission."
   },
   "runtime_evidence": "Quest3/VDXR and original-game D3DX fault injection not executed.",
-  "score_once": false,
-  "score_delta_this_attempt": 0,
-  "hold_reason": null,
+  "score_once": true,
+  "score_delta_this_attempt": 1,
+  "hold_reason": "NEED_HMD_TEST",
   "result_commit_ci_skip": true,
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "source_material_sha": "ae74b18e95c928077e8a8e079669c14c02511952",
     "failed_first_candidate": {
       "id": 38731320516,
@@ -126,11 +126,19 @@
     },
     "full_source_impact": {
       "id": 38731778450,
-      "status": "in_progress",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "success",
       "sha": "83d235f58721454ae062884f80f86610d4b67d93"
     },
-    "c6_result": "PASS_EXACT_SHA"
+    "c6_result": "PASS_EXACT_SHA",
+    "scoreboard": {
+      "repo": "thp32tt/ai-dev-lab",
+      "scoreboard_commit": "57f7a44af3ccee786843a9271f6f39814f0f3588",
+      "run_key": "CONVERSION-DX9EX-00896",
+      "ai2_previous": 1373,
+      "delta": 1,
+      "ai2_current": 1374
+    }
   },
   "previous_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
