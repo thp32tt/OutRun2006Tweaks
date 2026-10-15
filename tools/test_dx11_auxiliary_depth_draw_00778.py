@@ -25,7 +25,7 @@ def integrated(source, depth):
         "stencilEnabled != FALSE, stencilMaskKnown, stencilWriteMask)" in source,
         "noExtraRenderTargets, s.frameBatch.stopped" in source,
         "if (isolated && depthWrites && isolatedDepthWrite)" in source,
-        "s.clearColor.note_auxiliary_depth_write()" in source,
+        "if (isolated && depthWrites && isolatedDepthWrite)\n        s.clearColor.note_auxiliary_depth_write()" in source,
         "void note_auxiliary_depth_write()" in clear,
         "provenAuxiliaryDepth = false" in depth,
         "!depthEnabled || !depthWritesEnabled || provenAuxiliaryDepth" in depth,
