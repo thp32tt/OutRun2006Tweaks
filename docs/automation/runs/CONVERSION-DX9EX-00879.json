@@ -52,10 +52,10 @@
     "tools/verify_vr_f11_font_density.py",
     "docs/automation/runs/CONVERSION-DX9EX-00879.json"
   ],
-  "status": "VALIDATING_CI",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "acceptance_results": {
@@ -65,7 +65,7 @@
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "EXACT_SHA_CI_PENDING",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
   "material_result_sha": "2a0662646ca4b377d842d5617b3b54cf4efe2839",
   "diagnosis": {
     "original_evidence": "Source diff at 2a066264 shows F11 height fitting against 600 multiplied by XR density even though ImGui BeginChild tabbody provides independent scrolling; the source 3440x1440 Quest3-mirror numeric case downscaled fonts to about 0.78.",
@@ -85,7 +85,28 @@
     "failed_initial_run": 38690329417,
     "failed_job": "policy",
     "reason": "verify_vr_feature_unit_policy.py --check-head: docs/automation/runs/CONVERSION-DX9EX-00879.json missing",
-    "status": "RECOVERY_PENDING",
-    "runtime": "UNTESTED"
-  }
+    "status": "PASS_EXACT_SHA",
+    "runtime": "UNTESTED",
+    "exact_sha": "58440341a77402f14f1182d98d8e63f043ea3f8a",
+    "dx9ex_active": {
+      "run_id": 38690564358,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, host, game, full-chain-compile, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38690564438,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38690564380,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38690564446,
+      "conclusion": "IN_PROGRESS_AT_C6_RECORDING"
+    }
+  },
+  "validation_bearing_result_sha": "58440341a77402f14f1182d98d8e63f043ea3f8a",
+  "result_commit_ci_skip": true,
+  "runtime_evidence": "GitHub exact-SHA DX9Ex Active Validation (policy, host, game, full-chain-compile, package 5/5), Domain Isolation Guard and OutRun EXE HUD Inspector CI SUCCESS; physical Quest3/VDXR HMD not executed. Full Source Impact review remained in_progress at C6 recording."
 }
