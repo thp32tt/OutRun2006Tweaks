@@ -843,8 +843,14 @@ class UIScaling : public Hook
 			if (!root || !tailAfter || tailAfter == before[prio])
 				continue;
 
-			SpriteNode* node = before[prio]
-				? before[prio]->next_0 : root->next_0;
+			// Preserve the fast path for ordinary HUD/rank sprites. The
+            // six +TIME sources can run across a nested queue rebuild:
+            // only they require proof that the old tail is still live.
+            SpriteNode* node =
+                producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime
+                ? StageFirstAppendedNode(
+                    root, before[prio], tailAfter, Game::SpriteNodeMax)
+                : (before[prio] ? before[prio]->next_0 : root->next_0);
 			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
@@ -857,32 +863,7 @@ class UIScaling : public Hook
 	}
 
 
-	    // +TIME only: validate the old tail against the current queue before
-    // tagging new sprites. Ordinary high-frequency HUD/rank producers retain
-    // their existing fast O(new nodes) TagAppendedNodes() implementation.
-    static void TagStageExtensionAppendedNodes(
-        const std::array<SpriteNode*, Game::SpritePriorityCount>& before)
-    {
-        for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
-        {
-            SpriteNode* root = Game::sprite_prio_root[prio];
-            SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
-            SpriteNode* node = StageFirstAppendedNode(
-                root, before[prio], tailAfter, Game::SpriteNodeMax);
-            for (unsigned guard = 0;
-                 node && guard < Game::SpriteNodeMax; ++guard)
-            {
-                OutRunVR::GameSemantic::RegisterSpriteNodeScope(
-                    node, OutRunVR::GameSemantic::RenderScope::ScreenHud,
-                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime);
-                if (node == tailAfter)
-                    break;
-                node = node->next_0;
-            }
-        }
-    }
-
-    // Exact FUN_004BA9D0 caller identity is lost after the child E8 CALLs.
+// Exact FUN_004BA9D0 caller identity is lost after the child E8 CALLs.
 	// Restore the historical source-map bridge, but persist semantics on the
 	// actual newly queued sprite nodes, not in retired ScopedProducerSemantic.
 	static std::uint32_t OutRunHudTextCallerRva(const void* address) noexcept
@@ -1197,7 +1178,9 @@ class UIScaling : public Hook
     {
         if (!StageExtensionDepth || --StageExtensionDepth != 0)
             return;
-        TagStageExtensionAppendedNodes(StageExtensionBefore);
+        TagAppendedNodes(StageExtensionBefore,
+            OutRunVR::GameSemantic::RenderScope::ScreenHud,
+            OutRunVR::GameSemantic::ProducerToken::StageExtensionTime);
         // D3DX Draw can defer triangles beyond the original numeric CALL.
         // Close only a still-homogeneous +TIME batch while the exact direct
         // source is alive, before restoring the previous shader/HUD owner.
