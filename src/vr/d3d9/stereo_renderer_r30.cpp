@@ -163,6 +163,9 @@ namespace OutRunVRStereo
         struct R30FlatEffectGeometryCache
         {
             bool valid = false;
+            // The direct Calc3D2D flare-ring route already consumed the
+            // camera orientation; never cache it as a generic world effect.
+            bool directProjected2D = false;
             std::uint32_t poseSequence = 0;
             float worldScale = 0.0f;
             D3DMATRIX baseProjection{};
@@ -5457,12 +5460,14 @@ namespace OutRunVRStereo
         const R30FlatEffectGeometryCache* R30PrepareFlatEffectGeometry(
             const OutRunVRRenderer::LatchedStereoFrame& stereo,
             const D3DMATRIX& baseProjection,
-            const D3DMATRIX& headInverse) noexcept
+            const D3DMATRIX& headInverse,
+            bool directProjected2D) noexcept
         {
             auto& cache = R30FlatEffectGeometry;
             const float worldScale =
                 Settings::VRWorldScale * Settings::VRStereoDepth;
             if (cache.valid && cache.poseSequence == stereo.poseSequence &&
+                cache.directProjected2D == directProjected2D &&
                 cache.worldScale == worldScale &&
                 std::memcmp(&cache.baseProjection, &baseProjection,
                     sizeof(baseProjection)) == 0 &&
@@ -5483,6 +5488,7 @@ namespace OutRunVRStereo
                 return nullptr;
 
             R30FlatEffectGeometryCache next{};
+            next.directProjected2D = directProjected2D;
             next.poseSequence = stereo.poseSequence;
             next.worldScale = worldScale;
             next.baseProjection = baseProjection;
@@ -5507,11 +5513,28 @@ namespace OutRunVRStereo
             if (!std::isfinite(next.planeNdcZ))
                 return nullptr;
 
+            // The direct 0xCABE rings are already CPU-projected by
+            // Calc3D2D using the game camera. Reapplying the full HMD
+            // orientation would rotate the same screen-space source twice.
+            // Retain only each eye's translation relative to the centre.
+            const float eyeCentre[3]{
+                0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
+                0.5f * (stereo.eyeOffset[0][1] + stereo.eyeOffset[1][1]),
+                0.5f * (stereo.eyeOffset[0][2] + stereo.eyeOffset[1][2])
+            };
+            const float identityOrientation[4]{0.0f, 0.0f, 0.0f, 1.0f};
             for (int eye = 0; eye < 2; ++eye)
             {
+                const float relativeEye[3]{
+                    stereo.eyeOffset[eye][0] - eyeCentre[0],
+                    stereo.eyeOffset[eye][1] - eyeCentre[1],
+                    stereo.eyeOffset[eye][2] - eyeCentre[2]
+                };
                 const D3DMATRIX eyePose =
                     R29OwnerMatrixFromQuaternionTranslation(
-                        stereo.eyeOrientation[eye], stereo.eyeOffset[eye],
+                        directProjected2D ? identityOrientation
+                                          : stereo.eyeOrientation[eye],
+                        directProjected2D ? relativeEye : stereo.eyeOffset[eye],
                         worldScale);
                 next.eyeInverse[eye] = R29OwnerInverseRigid(eyePose);
                 next.eyeProjection[eye] = R29OwnerProjectionFromFov(
@@ -5792,8 +5815,15 @@ namespace OutRunVRStereo
                     return false;
                 std::memcpy(&baseProjection, baseRaw, sizeof(baseProjection));
                 std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+                // The direct 0xCABE flare-ring producer is already
+                // camera-projected. Other queued/scene effects still need
+                // the original full HMD world-lock transformation.
+                const bool directProjected2D =
+                    !OutRunVR::GameSemantic::QueueRenderActive() &&
+                    OutRunVR::GameSemantic::EffectiveScope() ==
+                        OutRunVR::GameSemantic::RenderScope::ProjectedScreenEffect2D;
                 const auto* geometry = R30PrepareFlatEffectGeometry(
-                    stereo, baseProjection, headInverse);
+                    stereo, baseProjection, headInverse, directProjected2D);
                 if (!geometry)
                     return false;
 
@@ -5814,7 +5844,8 @@ namespace OutRunVRStereo
                 // multiply out of the two-eye loop without reassociating any
                 // matrix products (preserves the previous FP order/optics).
                 const D3DMATRIX headRelativePlane =
-                    R29OwnerMultiplyMatrix(commonViewPlane, headInverse);
+                    directProjected2D ? commonViewPlane
+                        : R29OwnerMultiplyMatrix(commonViewPlane, headInverse);
                 for (int eye = 0; eye < 2; ++eye)
                 {
                     const D3DMATRIX corrected =
