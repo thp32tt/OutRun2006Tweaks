@@ -39,7 +39,10 @@ def integrated(b, h, c, o):
         "mainDepthIdentity = 0u;" in c,
         "auxiliaryDepthCleared = false;" in c,
         "bool isolated_auxiliary_clear(" in o,
-        "sourceSeeded && offscreenRt0 && extraMrtUnbound && !stopped" in o,
+        "sourceSeeded && !stopped" in o,
+        "(!clearsColor || (offscreenRt0 && extraMrtUnbound))" in o,
+        "const bool clearsColor = (flags & D3DCLEAR_TARGET) != 0u" in aux,
+        "s.frameBatch.stopped, clearsColor)" in aux,
         "(!depthOrStencilClear || separateDepth)" in o,
     ))
 assert integrated(bridge, hook, clear, offscreen)
@@ -49,7 +52,8 @@ for text, orig, fake in (
     ("bridge", "s.clearColor.note_auxiliary_depth_clear();", "/* missed auxiliary depth */"),
     ("bridge", "auxiliaryDepthCleared && output.nativeDepthTest", "false && output.nativeDepthTest"),
     ("bridge", "mainDepthIdentity = reinterpret_cast<std::uintptr_t>", "mainDepthIdentity = 0 * reinterpret_cast<std::uintptr_t>"),
-    ("offscreen", "extraMrtUnbound && !stopped", "true && !stopped"),
+    ("offscreen", "offscreenRt0 && extraMrtUnbound",
+     "true /* bypass TARGET RT/MRT isolation */"),
 ):
     args={"bridge":bridge, "hook":hook, "clear":clear, "offscreen":offscreen}
     if text == "bridge" and orig in (
