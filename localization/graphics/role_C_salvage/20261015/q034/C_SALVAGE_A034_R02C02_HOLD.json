@@ -1,0 +1,78 @@
+{
+  "schema": "outrun-c-salvage-manual-hold-v1",
+  "task_id": "OUTRUN-C-SALVAGE-20261015-Q034-A-R02C02",
+  "status": "HOLD_OPAQUE_GENERATED_REQUIRES_EXPLICIT_GLYPH_MASK",
+  "qa_status": "TEST_ONLY_HOLD_NO_VISUAL_OR_NATIVE_PASS",
+  "note": "One previously unprocessed A generated tile inspected in isolated C-SALVAGE worker. No ImageGen or A/B mutation.",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "queue_index": 34,
+  "texture_hash": "B7E25BAD",
+  "generated": {
+    "role": "A",
+    "path_on_n100": "work/image-src/ab_batches/candidate_outputs/A/Q034_B7E25BAD_BASE_READABLE_FLIPY__r02c02__x819_y681__819x684_k.png",
+    "sha256": "a4df93a5b8b57df7b029357209eb12fe2cceaa0cdc3c9e42e3f0dd0fc386de98",
+    "dimensions": [
+      1372,
+      1146
+    ],
+    "positive_alpha_pixels": 1572312,
+    "transparent_fraction": 0,
+    "text_mask_sha256": null,
+    "korean_layer_sha256": null
+  },
+  "original_png": {
+    "path_on_n100": "work/image-src/inputs/A/HD_EN_TILES_20261014/Q034_B7E25BAD_BASE_READABLE_FLIPY__r02c02__x819_y681__819x684.png",
+    "sha256": "2a8c6ad74d1a93ba4d98ce5a246a8d660f06de66f2385e7d0186a4bcade718fc",
+    "dimensions": [
+      819,
+      684
+    ],
+    "mode": "RGBA",
+    "provenance": "ACTUAL_N100_FILE_SHA256_VERIFIED; NOT FULL DDS DECODE PROOF"
+  },
+  "original_dds": {
+    "repo_queue_path": "textures/load/spr_sprani_HOLL_RANK_Exst/B7E25BAD_1024x512.dds",
+    "sha256": null,
+    "actual_file_verified": false,
+    "reason": "Source DDS physical bytes not staged in isolated C run; no corresponding filename found under N100 work glob **/*B7E25BAD*.dds. Historical sha in queue notes is not substituted for byte-level verification."
+  },
+  "psd": {
+    "catalog_path": "localization/graphics/plate_library/PSD_UPSTREAM_FULL_INDEX.json",
+    "catalog_git_blob_sha": "51c47d3f19e78c356c7d72b0f09b59361a6346da",
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "file": "PSDs, XCFs, SVGs, and other Working Source Assets/Characters/holly/B7E25BAD_1024x512.psd",
+    "upstream_blob_sha": "3f7944dfbb98393e3cc6788f88c75a596c4c3dd4",
+    "copied_into_branch": false,
+    "layer_paths_selected": [],
+    "clean_status": "HOLD_PSD_NOT_LOCAL_OR_LAYER_REVIEWED"
+  },
+  "output": {
+    "c_worker_receipt_path_on_n100": "work/c-salvage-q034-isolated-20261015/output/candidates/A-034-a4df93a5b8b57df7-autoalpha-b0a5bb530983/receipt.json",
+    "created_korean_layers": [],
+    "created_clean": [],
+    "created_dds": [],
+    "other_artifacts": [
+      "receipt.json",
+      "last_cycle.json"
+    ]
+  },
+  "gates": {
+    "visual_qa": "NOT_RUN_GLYPH_MASK_ABSENT",
+    "english_removal": "NOT_RUN",
+    "source_orientation": "FLIP_Y_FROM_FILENAME_ONLY_NOT_DDS_VERIFIED",
+    "original_dimensions": "819x684_SOURCE_TILE_vs_1372x1146_GENERATED_NO_SCENE_RESIZE_ALLOWED",
+    "protected_icons": "NOT_TESTED",
+    "clipping_overlap": "NOT_TESTED",
+    "italic_color_hangul": "NOT_TESTED",
+    "clean": "HOLD",
+    "dds_format": "UNKNOWN_UNVERIFIED",
+    "C1": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "official_promoted": false
+  },
+  "followup": "Acquire SHA verified canonical DDS + reviewed original English removal mask; source-aligned PSD layer inspection or manually reviewed Korean-only mask on opaque 1372x1146 generated PNG before any clean or native DDS. No automatic background removal.",
+  "work_isolation": "C only, no A/B queue/status or original file mutated; no runtime deployment."
+}
