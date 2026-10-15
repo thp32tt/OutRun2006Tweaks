@@ -1,0 +1,27 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "assets": [
+    {
+      "queue_id": "Q060",
+      "source_png": "q060_A064FDFC_FLIPY_CHECK_ORIENTATION.png",
+      "source_sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+      "source_kind": "PIXEL_EXACT_FLIPY_OF_GITHUB_PINNED_FULL_HD_DDS",
+      "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+      "regions": [
+        {
+          "id": "easy",
+          "english": "EASY",
+          "korean": "쉬움",
+          "bbox": [
+            3250,
+            823,
+            3650,
+            980
+          ],
+          "scale": 4,
+          "isolation": "reference_crop"
+        }
+      ]
+    }
+  ]
+}
