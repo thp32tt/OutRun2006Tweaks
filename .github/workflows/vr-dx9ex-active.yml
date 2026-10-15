@@ -209,6 +209,9 @@ on:
       - 'tools/Test-VRDXVKBackendContract.ps1'
       - '.github/workflows/outrun-exe-hud-inspector.yml'
       - '.github/workflows/vr-dx9ex-active.yml'
+      - '.github/workflows/vr-openxr.yml'
+      - '.github/workflows/vr-unified-backends.yml'
+      - 'docs/DX9EX_R84_MAINLINE_CONTRACT.md'
 
 concurrency:
   group: vr-dx9ex-active-${{ github.ref_name }}

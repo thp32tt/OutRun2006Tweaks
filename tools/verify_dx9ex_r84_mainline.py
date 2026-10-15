@@ -14,6 +14,8 @@ TOML = ROOT / "cmake.toml"
 ACTIVE = ROOT / ".github/workflows/vr-dx9ex-active.yml"
 LAUNCH = ROOT / "tools/START_DX9EX_TEST.cmd"
 SELECT = ROOT / "tools/Select-OutRunVRBackend.ps1"
+OPENXR = ROOT / ".github/workflows/vr-openxr.yml"
+MATRIX = ROOT / ".github/workflows/vr-unified-backends.yml"
 
 _SPLITS = (
     "OUTRUN_VR_REFACTOR_SPLIT_R33_R32",
@@ -29,7 +31,8 @@ _COMPARISONS = (
 )
 
 
-def check(cmake: str, toml: str, ci: str, launcher: str, select: str) -> None:
+def check(cmake: str, toml: str, ci: str, launcher: str, select: str,
+          openxr: str, manual: str) -> None:
     # cmkr is a source, CMakeLists the generated build owner. A build without
     # overrides must compile all five independent R29-R33 game TUs.
     for source in (cmake, toml):
@@ -110,6 +113,22 @@ def check(cmake: str, toml: str, ci: str, launcher: str, select: str) -> None:
     assert "R84_SPLIT_R33_R32_R31_R30_R29" in select
     assert "ACTIVE_R26_R43_R44" in select
 
+    # Remaining build/test entrypoints must agree: no R26 production graph
+    # behind an apparently option-free cmake invocation.
+    assert "cmake -S . -B build-vr-game -G" in openxr
+    assert "- name: Verify regenerated R84 MAIN independent game graph" in openxr
+    assert "- name: Verify Win32 R84 MAIN x86 binary identity" in openxr
+    assert "OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=ON" in openxr
+    assert "R26 fallback compiled into R84 MAIN" in openxr
+    assert "VR R33 DISPATCH: final Reset/Present/DirectGPU/draw physical ownership READY" in openxr
+    assert "P3_R84_MAIN" in manual and "P3_FULL_R34" not in manual
+    assert re.search(r'- variant: P3_R84_MAIN\s+flags: ""', manual)
+    assert "name: dx9ex-game-P3_R84_MAIN" in manual
+    for trigger in (".github/workflows/vr-openxr.yml",
+                    ".github/workflows/vr-unified-backends.yml",
+                    "tools/verify_dx9ex_r84_mainline.py"):
+        assert trigger in ci, "mainline CI misses build contract change: " + trigger
+
 
 def main() -> None:
     originals = [
@@ -118,6 +137,8 @@ def main() -> None:
         ACTIVE.read_text(encoding="utf-8-sig"),
         LAUNCH.read_text(encoding="utf-8-sig"),
         SELECT.read_text(encoding="utf-8-sig"),
+        OPENXR.read_text(encoding="utf-8-sig"),
+        MATRIX.read_text(encoding="utf-8-sig"),
     ]
     check(*originals)
     mutations = [
@@ -132,6 +153,9 @@ def main() -> None:
         (2, "Copy-Item payload/game/dinput8.dll (Join-Path $r26 'dinput8.dll')", "Copy-Item payload/r84/dinput8.dll (Join-Path $r26 'dinput8.dll')"),
         (2, "DefaultBuildMode = 'R84_DEFAULT_CMAKE_OPTIONS'", "DefaultBuildMode = 'UNVERIFIED'"),
         (4, '$variant -eq "R26_SAFE" -or $variant -eq "R84_TEST"', '$variant -eq "R84_TEST"'),
+        (5, "Verify regenerated R84 MAIN independent game graph", "Verify regenerated R26 safe production source graph"),
+        (5, "OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=ON", "OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=OFF"),
+        (6, 'P3_R84_MAIN', 'P3_FULL_R34'),
     ]
     for idx, old, new in mutations:
         assert old in originals[idx], "missing negative fixture: " + old
