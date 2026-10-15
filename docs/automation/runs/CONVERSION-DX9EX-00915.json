@@ -85,56 +85,50 @@
   },
   "ci_evidence": {
     "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
     "required_gates": [
       "DX9Ex Active Validation",
       "Domain Isolation Guard",
       "DX9Ex Full Source Impact Review",
       "OutRun EXE HUD Inspector CI"
     ],
-    "validation_bearing_result_sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
-    "material_result_sha": "2859f8ea9938db5a35cf779764540bf896129662",
     "exact_sha_gate_runs": [
       {
         "name": "DX9Ex Active Validation",
         "run_id": 38798233917,
         "sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
         "conclusion": "success",
-        "status": "completed"
+        "jobs": "policy/game/host/full-chain-compile/package 5/5"
       },
       {
         "name": "Domain Isolation Guard",
         "run_id": 38798234034,
         "sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
         "conclusion": "success",
-        "status": "completed"
+        "jobs": "domain-isolation 1/1"
       },
       {
         "name": "DX9Ex Full Source Impact Review",
         "run_id": 38798234451,
         "sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
         "conclusion": "success",
-        "status": "completed"
+        "jobs": "source-cross-domain/msvc-analyze-active-game/msvc-analyze-openxr-host 3/3"
       },
       {
         "name": "OutRun EXE HUD Inspector CI",
         "run_id": 38798234206,
         "sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
         "conclusion": "success",
-        "status": "completed"
+        "jobs": "build-hud-inspector/static-exe-analysis 2/2"
       }
     ],
-    "initial_failed_gate": {
-      "run_id": 38798036808,
-      "sha": "2859f8ea9938db5a35cf779764540bf896129662",
-      "reason": "Noncanonical symptom_id and visual feature_class in feature record; compiled source not evaluated by failed policy gate"
-    },
-    "repair_sha": "f66f2f9441c4052760b0a16250b194859cb3d9f2",
-    "record_note": "C6 bookkeeping-only [skip ci] after four exact-SHA SUCCESS workflows; preserve original C++ material commit and no duplicate score."
+    "note": "All required GitHub Actions success at exact input SHA. No repeat workflow invocation, no headset/game validation. Material commit stays immutable; C6 is a separate [skip ci] bookkeeping record."
   },
-  "runtime_evidence": "Quest3/VDXR HMD gameplay has not been executed for this exact-SHA build; visual/optical and FPS correctness remain UNTESTED.",
+  "runtime_evidence": "No actual Quest3/VDXR/HMD game launch or stereo/menu visual acceptance; this C6 proves only deterministic build and analysis acceptance for the exact corrected front-end affine source.",
   "score_delta_this_attempt": 0,
   "score_once": false,
   "ci_repair_note": "Exact-SHA 2859f8e policy gate rejected noncanonical symptom_id and visual feature_class before any compilation. Canonicalized existing MAIN_MENU symptom and class, retained unchanged material source and all gate coverage.",
   "retry_recovered_event_id": "CONVERSION-DX9EX-00915-E003",
-  "retry_recovered_attempt": 2
+  "retry_recovered_attempt": 2,
+  "score_note": "No new score for this scoped optional-argument subcase; registered MAIN_MENU optical whole-function acceptance remains user-HMD unverified and no second score or complete menu fix claimed."
 }
