@@ -29,7 +29,7 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
     assert "return GetTopLevelDrawSerial();" in r29
     assert '#include "lens_centre_source_provenance.hpp"' in r30
     owned = r30.split("bool R30HasExactLensCentreRawWvp(", 1)[1].split(
-        "R30ScreenSpaceKind R30ClassifyScreenSpacePass(", 1)[0]
+        "bool R30GetRecentOriginalHudWvp(", 1)[0]
     for marker in (
         "QueueRenderActive()",
         "EffectiveScope() != RenderScope::WorldBillboard",
@@ -248,7 +248,7 @@ def main():
             "sourceProducer == ProducerToken::LensFlareCentre",
         ):
             start = mod[2].index("bool R30HasExactLensCentreRawWvp(")
-            end = mod[2].index("R30ScreenSpaceKind R30ClassifyScreenSpacePass(", start)
+            end = mod[2].index("bool R30GetRecentOriginalHudWvp(", start)
             owned = mod[2][start:end]
             assert old in owned, "C993 provenance mutant missing exact owner: " + old
             mod[2] = (mod[2][:start] + owned.replace(old, new, 1) +
