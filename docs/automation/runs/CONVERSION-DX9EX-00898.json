@@ -86,12 +86,20 @@
   "ci_evidence": {
     "workflow": "DX9Ex Active Validation",
     "status": "PASS_EXACT_SHA",
-    "head": null,
+    "head": "49faa56bffda30daa38f42e7aca019a0cd924646",
     "validation_sha": "49faa56bffda30daa38f42e7aca019a0cd924646",
     "active_run_id": 38736827010,
     "domain_run_id": 38736827248,
     "hud_inspector_run_id": 38736827053,
     "full_source_impact_run_id": 38736827070
   },
-  "score_delta": 0
+  "score_delta": 1,
+  "score_evidence": {
+    "run_key": "CONVERSION-DX9EX-00898",
+    "scoreboard_repository": "thp32tt/ai-dev-lab",
+    "scoreboard_commit_sha": "991ccc261ad6ea51778d1f3ccce37e8364b02a66",
+    "previous_confirmed_score": 1375,
+    "score_change": 1,
+    "new_confirmed_score": 1376
+  }
 }
