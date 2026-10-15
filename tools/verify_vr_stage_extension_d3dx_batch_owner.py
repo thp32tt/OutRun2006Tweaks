@@ -143,7 +143,7 @@ def check(code: str, header: str) -> list[str]:
          "StageBoundaryReady = enteringStage || enteringGoal" in hook,
          "GOAL queue enter/leave and two-helper switching must isolate old batch")
     need("GoalOwner(scope, source) && PendingHomogeneous" in hook and
-         "(exactStage || exactGoal)" in hook and
+         "exactGoal &&\n            PendingScope == scope" in hook and
          "GoalFlushes" in hook and "GoalFallbacks" in hook,
          "GOAL direct and deferred GPU submission requires exact source proof")
     for token in ("GoalTime020", "GoalTime150", "ResultProgress"):
