@@ -108,7 +108,7 @@ def check(code: str, header: str) -> list[str]:
          "BatchActive = false;" in failed_draw and
          "StageBoundaryReady = false;" in failed_draw and
          "ForgetBatch();" in failed_draw and
-         failed_start < draw_path.find("using namespace OutRunVR::GameSemantic;"),
+         failed_end < draw_path.find("const auto scope = EffectiveScope();"),
          "failed D3DX Draw must invalidate untrusted +TIME/GOAL batch ownership")
     # Inspect the actual HRESULT-accepted, tracked Draw's mixed-owner branch.
     # A matching assignment in lifecycle/queue/failure handling is not proof
