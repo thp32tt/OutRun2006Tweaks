@@ -2565,11 +2565,13 @@ namespace OutRunVRStereo
                 !ownedLensCentre)
                 return R30ScreenSpaceKind::None;
 
-            // Exact source-owned screen passes outrank the leftover
-            // perspective projection state; never flatten HUD overlays.
-            if (ownedHud || ownedOverlay)
-                return R30ScreenSpaceKind::Hud2D;
-
+            // R84 regression guard: an untagged SpriteNode defaults to
+            // ScreenOverlay2D, but that fallback is NOT evidence that a
+            // perspective/3D draw is safe to flatten into the HMD HUD plane.
+            // R30's verified XYZRHW path still handles generic 2D sprites.
+            // ScreenHud is an exact producer-owned semantic, not this fallback.
+            // Classify the original game's projection before accepting any
+            // shader-based screen pass.
             float m34 = 0.0f;
             float m44 = 0.0f;
             if (!OutRunVRRenderer::GetRendererProjectionSignature(m34, m44))
@@ -2585,6 +2587,15 @@ namespace OutRunVRStereo
 
             if (projectionClass !=
                 OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
+                return R30ScreenSpaceKind::None;
+
+            // A positively identified HUD producer can use its original-game
+            // raw c64 and finite view-plane transform even with a perspective
+            // projection. A generic ScreenOverlay2D has no equivalent proof:
+            // never treat a queue fallback as a perspective HUD/scene effect.
+            if (ownedHud)
+                return R30ScreenSpaceKind::Hud2D;
+            if (ownedOverlay)
                 return R30ScreenSpaceKind::None;
 
             // A source-owned direct C993 centre is a spatial WorldBillboard,
