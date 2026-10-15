@@ -36,12 +36,18 @@ def check(hook: str, font: str, header: str) -> None:
     shell_guard = font.split("void Overlay::render_shell()", 1)[1].split(
         "void Overlay::init()", 1
     )[0]
+    # The F11 cursor/atlas path snapshots the gameplay predicate once before
+    # both ImGui NewFrame and font-density evaluation. Guard it at the owner
+    # instead of requiring the old duplicated call expression.
+    vr_predicate = "const bool vrGameplay = Game::is_vr_gameplay_presentation();"
+    assert hook.count(vr_predicate) == 1
+    assert hook.index(vr_predicate) < hook.index("float vrFontMultiplier = 1.0f;")
     density_guard = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
         "// A new atlas needs a new font texture.", 1
     )[0]
     for target, needles in (
         (density_guard, (
-            "f11VisibleThisFrame && Game::is_vr_gameplay_presentation()",
+            "f11VisibleThisFrame && vrGameplay",
             "R23TryGetPublishedEyeExtentPair(extent)",
             "R23TryGetPublishedEyeExtentPair(extent)",
             "lw >= 640u && lh >= 480u && rw >= 640u && rh >= 480u",
@@ -414,9 +420,9 @@ def check_transient_eye_extent_dropout(hook: str) -> None:
               "\\t\\t\\t\\t\\tOverlay::VrFontMultiplier, 1.0f, 3.0f);")
     # Exact owning control flow: retention only inside active VR gameplay and
     # before either eye lookup, not a permanent desktop fallback.
-    assert "f11VisibleThisFrame && Game::is_vr_gameplay_presentation()" in density
+    assert "f11VisibleThisFrame && vrGameplay" in density
     assert retain.replace("\\n", "\n").replace("\\t", "\t") in density
-    assert (density.index("f11VisibleThisFrame && Game::is_vr_gameplay_presentation()") <
+    assert (density.index("f11VisibleThisFrame && vrGameplay") <
             density.index(retain.replace("\\n", "\n").replace("\\t", "\t")) <
             density.index("R23TryGetPublishedEyeExtentPair(extent)"))
     assert "float vrFontMultiplier = 1.0f;" in hook
@@ -949,7 +955,7 @@ def check_source_reset_atlas_hold(hook: str) -> None:
     """Same-frame F11 open retains XR atlas during temporary source loss."""
     area = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
         "// Quantised quarter-steps prevent continuous atlas churn", 1)[0]
-    active = "if (f11VisibleThisFrame && Game::is_vr_gameplay_presentation())"
+    active = "if (f11VisibleThisFrame && vrGameplay)"
     size = "if (Game::screen_resolution &&"
     retain = ("vrFontMultiplier = std::clamp(\\n"
               "\\t\\t\\t\\t\\tOverlay::VrFontMultiplier, 1.0f, 3.0f);"
@@ -978,7 +984,7 @@ def check_first_visible_f11_frame(hook: str) -> None:
     assert hook.index(call) < hook.index("float vrFontMultiplier = 1.0f;")
     assert hook.index("float vrFontMultiplier = 1.0f;") < hook.index(
         "overlayActive = Overlay::render();")
-    assert "if (f11VisibleThisFrame && Game::is_vr_gameplay_presentation())" in hook
+    assert "if (f11VisibleThisFrame && vrGameplay)" in hook
     density = hook.split("float vrFontMultiplier = 1.0f;", 1)[1].split(
         "R23TryGetPublishedEyeExtentPair(extent)", 1)[0]
     assert "InputManager_ModActionHeld(ModAction::OverlayToggle)" not in density
@@ -1280,7 +1286,7 @@ def main():
     assert factor(0, 1440, 2496, 2688) == 1.0
     # Detect removal of either eye authority, desktop isolation or atlas rebuild.
     mutations = (
-        (hook, "f11VisibleThisFrame && Game::is_vr_gameplay_presentation()",
+        (hook, "f11VisibleThisFrame && vrGameplay",
          "overlayActive || Game::is_vr_gameplay_presentation()", font, header),
         (hook, "R23TryGetPublishedEyeExtentPair(extent)",
          "true", font, header),
