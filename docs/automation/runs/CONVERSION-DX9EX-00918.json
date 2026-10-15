@@ -1,0 +1,109 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00918",
+  "production_id": "CONVERSION-DX9EX-00918",
+  "event_id": "CONVERSION-DX9EX-00918-E002",
+  "event_type": "retry",
+  "attempt": 2,
+  "run_key": "CONVERSION-DX9EX-00918",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:ESC_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "CI_REPAIR_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "EXACT_SHA_GATE_REPAIR",
+  "automation_validation": "FAILED_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "84c4c71b5b0bcde7816151635d6b87afc1386d4e",
+  "material_result_sha": "4cdc45823d50635a189a156dfa87b4b8b3a9706d",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00918.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:ESC_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+    "goal": "Restore independent ESC pause shell and exact arrow optical scale and vertical position across the R84 shader-backed HUD plane and XYZRHW paths, while preserving original options navigation, controls, and safe mono desktop behavior.",
+    "scope_boundary": "The real original STATE_SMPAUSEMENU only; preserve F11 overlay, gameplay HUD, GOAL/+TIME, title and car selection, lens/SkyGlow, original input and FFB, R26_SAFE rollback and frozen DXVK.",
+    "trace_stages": [
+      "Game STATE_SMPAUSEMENU shell uses generic ScreenOverlay2D while the exact queued options arrows and YES/NO sprites use ScreenHud/ExactScreenHudClipSprite producer.",
+      "R30IsPauseMenuElement admits exact ESC ownership; the R84 shader-backed HUD plane uses R30PauseShaderPlaneScale and R30PauseShaderPlaneNdcShift with finite bounded settings.",
+      "Original clip matrix is scaled and vertically shifted before per-eye head/eye world-plane reconstruction; XYZRHW sibling uses the existing pause transforms and fallback."
+    ],
+    "subcomponents": [
+      "Make R84 shader-world pause sprites use the independent VRPauseMenuScale with finite bounded fallback instead of accidentally inheriting gameplay VRHudScale.",
+      "Apply user-requested signed pause-menu vertical fraction to original shader clip-plane translation while excluding unrelated HUD and preserving original ESC exact-arrow semantic ownership.",
+      "Preserve the original-game options navigation, shader/XYZRHW alignment and R26_SAFE fallback without mutating other renderer routes."
+    ],
+    "acceptance_items": [
+      {
+        "id": "esc_shader_pause_scale_and_position",
+        "category": "end_to_end_behavior",
+        "behavior_area": "ESC exact-arrow and pause shell binocular placement",
+        "expected_behavior": "In STATE_SMPAUSEMENU, shader-backed exact arrows use the same independently adjustable pause optical size and vertical position as the XYZRHW shell before left/right reconstruction."
+      },
+      {
+        "id": "preserve_non_pause_and_control",
+        "category": "fallback_regression",
+        "behavior_area": "Non-ESC draw safety and original controls",
+        "expected_behavior": "Gameplay HUD, +TIME, GOAL, F11, world, input and FFB retain original behavior; nonfinite settings fall back conservatively, and R26_SAFE remains separately selectable."
+      },
+      {
+        "id": "required_exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 and x64 host plus release packaging",
+        "expected_behavior": "DX9Ex Active Windows full-chain game/host/package and Domain/Full Source/HUD Inspector required gates succeed at one validation-bearing exact SHA, separate from actual Quest3 runtime testing."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "esc_shader_pause_scale_and_position": "PENDING_CI",
+    "preserve_non_pause_and_control": "PENDING_CI",
+    "required_exact_sha_ci": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "The R84 shader-backed HUD world-plane branch used gameplay HudScale and omitted signed pause vertical clip translation although the existing XYZRHW pause shell already honored independent VRPauseMenuScale and VRPauseMenuVerticalOffset. This is a source-level candidate until actual Quest3 testing.",
+    "original_evidence": "Original game ESC shell uses ScreenOverlay2D while exact queued options arrows use exact ScreenHud producer; R30 admission restricts both to STATE_SMPAUSEMENU and excludes external ImGui overlay.",
+    "source_trace": [
+      "ESC source mode/semantic owners gate only original pause shell and exact arrows.",
+      "R30 original HUD WVP is converted to common finite world plane with bounded per-eye projection; the old branch applied VRHudScale only.",
+      "Material SHA applies pause scale and signed clip Y shift before reconstruction, retaining untouched non-ESC HUD paths."
+    ],
+    "alternatives_rejected": [
+      "Do not globally scale ScreenHud and GOAL/+TIME or change gameplay HUD dimensions.",
+      "Do not globally transform F11 overlay or adjust user input, FFB, SkyGlow, world stereo or stage timer."
+    ],
+    "eye_ownership": "Existing R84 physical left/right eye submission uses one corrected original clip-plane matrix per permitted pause producer; unknown and nonpause content keeps prior conservative fallback."
+  },
+  "ci_evidence": {
+    "status": "FAILED_EXACT_SHA",
+    "material_sha": "4cdc45823d50635a189a156dfa87b4b8b3a9706d",
+    "failed_run_id": 38809988413,
+    "failed_job": "policy",
+    "failure": "verify_vr_feature_unit_policy.py --check-head: run record missing docs/automation/runs/CONVERSION-DX9EX-00918.json; host, game, full-chain-compile and package skipped, not build verified.",
+    "remediation": "Supply exact TASK_ID feature record with factual nonterminal state; do not downgrade verifier or mark unexecuted gates PASS.",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "exact_sha_gate_runs": []
+  },
+  "next_action": "Re-run required GitHub exact SHA gates on this record-bearing candidate; update terminal evidence only after all pass; no Quest3 runtime claim or added score for this bookkeeping/CI repair.",
+  "score_delta_this_attempt": 0,
+  "ci_repair_history": [
+    {
+      "sha": "4cdc45823d50635a189a156dfa87b4b8b3a9706d",
+      "run_id": 38809988413,
+      "failure": "Missing head-matched per-feature run JSON blocked policy and skipped all builds."
+    }
+  ]
+}
