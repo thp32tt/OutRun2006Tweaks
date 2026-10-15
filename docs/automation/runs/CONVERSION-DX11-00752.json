@@ -2,17 +2,17 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00752",
   "production_id": "CONVERSION-DX11-00752",
-  "event_id": "CONVERSION-DX11-00752-E001",
-  "event_type": "dispatch",
-  "attempt": 1,
+  "event_id": "CONVERSION-DX11-00752-E003",
+  "event_type": "retry",
+  "attempt": 2,
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULLFRAME_VISIBLE_CROP_OWNERSHIP",
   "feature_id": "DX11-MENU-RACE-VISIBLE-PRESENT-SOURCE-OWNERSHIP",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_GATES",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -54,9 +54,9 @@
     ]
   },
   "acceptance_results": {
-    "native-visible-crop-publication": "PENDING_EXACT_SHA",
-    "original-d3d9-input-and-pixel-fallback": "PENDING_EXACT_SHA",
-    "exact-sha-renderer-ci": "PENDING_EXACT_SHA"
+    "native-visible-crop-publication": "PASS",
+    "original-d3d9-input-and-pixel-fallback": "PASS",
+    "exact-sha-renderer-ci": "PASS_EXACT_SHA"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -93,11 +93,42 @@
     "C0_RECOVER": "PASS GitHub HEAD and 00751 C6 verified",
     "C1_REVIEW": "PASS identified native full-backbuffer overwrite on cropped null/full-dirty Present",
     "C2_IMPLEMENT": "PASS source, native Present upload integration and tests",
-    "C3_VALIDATE": "PENDING: initial exact SHA a385ab65023bd59633f0f876215425a2fc8f43ce Backend Conversion Gate 38656660382 failed policy acceptance_proof missing before compile; same-TASK required acceptance evidence supplied; await repair SHA five GitHub Actions gates.",
-    "C4_COMMIT": "PASS actual C++ implementation material commit a385ab65023bd59633f0f876215425a2fc8f43ce; follow-up same-TASK policy failure repair commit without CI skip.",
+    "C3_VALIDATE": "PASS_EXACT_SHA: exact 26335fa59a6c48eaed43bdd67d8d7ce2147c0a49; DX11 Fast #38656930210, Backend #38656930284, Windows Build #38656937344, OpenXR #38656937361, HUD #38656937341 all SUCCESS; originally failed Backend run #38656660382 repaired by explicit acceptance_proof. Runtime HMD/gamepad UNTESTED.",
+    "C4_COMMIT": "PASS: actual native D3D11/D3D9 game Present crop C++ material a385ab65023bd59633f0f876215425a2fc8f43ce; non-CI-skip policy repair validation-bearing 26335fa59a6c48eaed43bdd67d8d7ce2147c0a49.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING five exact-SHA Gates"
+    "C6_STATE": "PASS_EXACT_SHA: five mandatory exact SHA 26335fa59a6c48eaed43bdd67d8d7ce2147c0a49 Gate SUCCESS, separate [skip ci] C6 bookkeeping only. Quest3/VDXR and gamepad RUNTIME_VALIDATION=UNTESTED; no hardware promotion."
   },
-  "next_action": "Verify all five required Actions at repair validation-bearing SHA; record C6 separately only after exact-SHA SUCCESS. Real Quest3/VDXR/gamepad RUNTIME_VALIDATION=UNTESTED.",
-  "validation_bearing_result_sha": null
+  "next_action": "COMPLETE_BUILD_VERIFIED for 00752; no retry, rebuild or duplicate score. Quest3/VDXR/gamepad actual run NEED_HMD_TEST. Next independent native DX11 feature via controller.",
+  "validation_bearing_result_sha": "26335fa59a6c48eaed43bdd67d8d7ce2147c0a49",
+  "ci_evidence": {
+    "exact_sha": {
+      "sha": "26335fa59a6c48eaed43bdd67d8d7ce2147c0a49",
+      "result_basis": "Five mandatory exact-SHA GitHub workflow success verified through connected GitHub Actions",
+      "conclusion": "success",
+      "verified_runs": {
+        "dx11_fast": {
+          "run_id": 38656930210,
+          "conclusion": "success"
+        },
+        "backend_conversion": {
+          "run_id": 38656930284,
+          "conclusion": "success"
+        },
+        "windows_build": {
+          "run_id": 38656937344,
+          "conclusion": "success"
+        },
+        "openxr_architecture": {
+          "run_id": 38656937361,
+          "conclusion": "success"
+        },
+        "hud_inspector": {
+          "run_id": 38656937341,
+          "conclusion": "success"
+        }
+      }
+    },
+    "initial_failed_backend_run": 38656660382,
+    "initial_failure": "Missing development_strategy.acceptance_proof; source material retained and required positive/negative/integration evidence supplied."
+  }
 }
