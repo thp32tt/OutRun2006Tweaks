@@ -39,6 +39,7 @@
 #include "native_game_multi_dirty_upload.hpp"
 #include "native_game_clear_color.hpp"
 #include "native_game_masked_draw.hpp"
+#include "native_game_fragment_reject.hpp"
 #include "native_game_scissor_clip.hpp"
 #include "native_game_offscreen_pass.hpp"
 #include "native_game_clear_coverage.hpp"
@@ -4889,7 +4890,7 @@ bool proven_game_draw_no_target_writes(IDirect3DDevice9* game, const State& s) n
     if (!game || !env_full_game_opt_in() || s.frameBatch.stopped) return false;
     DWORD colorMask = 0xffffffffu;
     if (FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
-        (colorMask & ~0x0fu) != 0u || (colorMask & 0x07u) != 0u) return false;
+        (colorMask & ~0x0fu) != 0u) return false;
     DWORD zEnabled = D3DZB_TRUE, zWrite = TRUE, stencilEnabled = TRUE;
     if (FAILED(game->GetRenderState(D3DRS_ZENABLE, &zEnabled)) ||
         FAILED(game->GetRenderState(D3DRS_ZWRITEENABLE, &zWrite)) ||
@@ -4926,14 +4927,32 @@ bool proven_game_draw_no_target_writes(IDirect3DDevice9* game, const State& s) n
     // blending, and must never be dropped. No speculative native Draw is
     // issued for the proved X8 no-write call; the original D3D9 draw and
     // gamepad path remain completely unchanged.
-    return GameNativeMaskedDraw::no_visible_target_write_source_draw(
-        true,
-        s.clearColor.matches(reinterpret_cast<std::uintptr_t>(game),
-                             reinterpret_cast<std::uintptr_t>(identity.Get())),
-        static_cast<std::uint32_t>(colorMask),
-        backbufferDesc.Format == D3DFMT_A8R8G8B8,
-        zEnabled != D3DZB_FALSE, zWrite != FALSE,
-        stencilEnabled != FALSE, false);
+    const bool sameClearedGameBackbuffer = s.clearColor.matches(
+        reinterpret_cast<std::uintptr_t>(game),
+        reinterpret_cast<std::uintptr_t>(identity.Get()));
+    // Preserve the existing COLORWRITEENABLE/ZWRITEENABLE no-op path without
+    // adding GetRenderState costs or changing its admitted D3D9 behavior.
+    if (GameNativeMaskedDraw::no_visible_target_write_source_draw(
+            true, sameClearedGameBackbuffer,
+            static_cast<std::uint32_t>(colorMask),
+            backbufferDesc.Format == D3DFMT_A8R8G8B8,
+            zEnabled != D3DZB_FALSE, zWrite != FALSE,
+            stencilEnabled != FALSE, false)) return true;
+    // Menu fades and race passes sometimes issue real Draw/DrawIndexed calls
+    // with an unconditional D3D9 alpha or Z rejection. They write neither
+    // RGB/alpha nor Z even with write masks ON; they must consume a precise
+    // source ordinal instead of aborting later full-resolution native draws.
+    // Stencil, MRT, foreign RT0, unknown state and missing clear fail closed.
+    DWORD alphaTest = FALSE, alphaFunc = 0u, depthFunc = 0u;
+    if (FAILED(game->GetRenderState(D3DRS_ALPHATESTENABLE, &alphaTest)) ||
+        FAILED(game->GetRenderState(D3DRS_ALPHAFUNC, &alphaFunc)) ||
+        FAILED(game->GetRenderState(D3DRS_ZFUNC, &depthFunc)))
+        return false;
+    return GameNativeFragmentReject::no_target_write(
+        true, sameClearedGameBackbuffer, true, true,
+        stencilEnabled == FALSE, alphaTest == TRUE,
+        static_cast<std::uint32_t>(alphaFunc),
+        zEnabled != D3DZB_FALSE, static_cast<std::uint32_t>(depthFunc));
 }
 void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
              const void* bytes, UINT stride, UINT vertexCount,
