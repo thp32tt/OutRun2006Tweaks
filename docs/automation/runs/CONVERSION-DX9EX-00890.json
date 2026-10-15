@@ -1,0 +1,105 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00890",
+  "production_id": "CONVERSION-DX9EX-00890",
+  "event_id": "CONVERSION-DX9EX-00890-E003",
+  "event_type": "retry",
+  "run_key": "CONVERSION-DX9EX-00890",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "phase": "C4_COMMIT",
+  "checkpoint": "C4_MATERIAL_CI_REPAIR",
+  "automation_validation": "IN_PROGRESS",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "f9fb7429231b6c6689e58f678299b73cc93a01ef",
+  "material_result_sha": "3b36a6b38ef05373301ce00d296ed8fb69d26b09",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00890.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Preserve the entire GOAL progress 0–99% source's original animated digits and title as a single binocular HUD graphic by carrying exact producer ownership through direct D3DX deferred GPU submission and queued SpriteNode presentation, while preserving other GOAL clocks and result screens.",
+    "scope_boundary": "Only exact original ResultProgress E8 producer and homogeneous native D3DXSprite batches carrying its own ScreenHud source. Do not globally flush D3DX or retag mixed buffers, mutate game timer/results, steal SpriteNode queue scopes, change lens or SkyGlow or touch DX11/DXVK.",
+    "trace_stages": [
+      "Original GOAL animation parent 0x2D200 and its 0x97BE4/0x97DEC hooks synchronously create direct digits alongside appended SpriteNodes; ResultProgressEnter and Leave bracket the native producer.",
+      "FlushD3DXBeforeDirectGoalSource splits an outgoing proven direct batch before the producer scope, and FlushD3DXAtDirectGoalSourceExit submits the owned homogeneous result-progress batch before scoped producer restoration; TagAppendedNodes handles deferred nodes separately.",
+      "Effective ScreenHud source follows c64/D3DX/fixed-function draw semantics into the R84 R33→R32→R31→R30→R29 left/right stereo path and x64 OpenXR host, with exact Quest3/VDXR eye verification still required."
+    ],
+    "subcomponents": [
+      "Guard the full exact GOAL 0–99% parent E8 with a direct ScreenHud ResultProgress owner while retaining nested depth and queue-first precedence.",
+      "Split earlier direct D3DX contents before acquiring the progress owner, then flush only an exact, homogeneous progress batch before that owner is released; preserve native behavior for unknown and mixed buffers.",
+      "Keep post-call per-priority appended node tags and add C++ predicate allow/deny compile assertions and destructive regression mutations for both pre- and post-flush owner gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_progress_gpu_owner",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original GOAL 0–99% animated digits and queued sprites through R84 binocular GPU submission",
+        "expected_behavior": "Exact native progress source retains ScreenHud across deferred homogeneous D3DX submission and separately tags its new SpriteNodes without a stale world or generic overlay owner."
+      },
+      {
+        "id": "goal_unknown_queue_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Unrelated +TIME, GOAL time, result clocks and foreign/mixed D3DX or queue batches",
+        "expected_behavior": "Only exact producer-matched pending batches flush; active SpriteNode queue, mixed/foreign buffers, failed sprite identification and original HRESULT semantics remain unchanged."
+      },
+      {
+        "id": "goal_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 default R84 game, R26_SAFE fallback, x64 host, package and cross-domain source tests",
+        "expected_behavior": "Final GitHub DX9Ex Active policy/game/host/full-chain/package and relevant Domain/Inspector/Full Source gates pass on coherent exact-SHA inputs; physical Quest3/VDXR correctness is separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_progress_gpu_owner": "SOURCE_IMPLEMENTED",
+    "goal_unknown_queue_fallback": "SOURCE_IMPLEMENTED",
+    "goal_exact_sha_gates": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "Before 3b36a6b38ef05373301ce00d296ed8fb69d26b09, the exact ResultProgress parent tagged appended queue nodes but a direct D3DXSprite Draw could remain buffered beyond the producer exit and lose its original semantic at actual GPU submission.",
+    "root_cause": "The native D3DX sprite batch GPU lifetime outlived the GOAL progress E8 scope. Its inherited c64/ScreenHud identity could be wrong even when the parent and queued children were correctly tagged.",
+    "source_trace": [
+      "src/hooks_uiscaling.cpp exact ResultProgressEnter/Leave around original 0x2D200 parent and its synchronous 0x97BE4/0x97DEC output.",
+      "src/hooks_uiscaling.cpp direct D3DX isolation helper flushes proven old batch before owner acquisition and exact current progress batch before owner release, preserving native queue path.",
+      "src/vr/game/render_semantics.hpp CanFlushD3DXDirectGoalAtExit admits only exact original GOAL time or ResultProgress matching producer and homogeneous ScreenHud, consumed by the R84 draw and eye path."
+    ],
+    "alternatives_rejected": [
+      "Global D3DXSprite Flush, unconditional ScreenHud tagging, and changing original GOAL/timer state would risk unrelated visual effects and unknown native buffers.",
+      "Repeating previous +TIME/GOAL helper hooks does not protect the separate animated ResultProgress GPU lifetime."
+    ],
+    "fix_evidence": "Material commit 3b36a6b38ef05373301ce00d296ed8fb69d26b09 adds exact pre-owner split and post-owner direct GPU flush around ResultProgress, extends strict producer admission and verifies missing/reordered admission with targeted source mutations.",
+    "negative_test_evidence": "Source includes constexpr rejection of mixed, foreign, queue-owned and producer-mismatched batch cases plus source-negative mutations. First Active run 38713028962 failed in policy only because this required run record was absent; no Windows game/host/package stages executed.",
+    "eye_ownership": "R84 original game semantic ScreenHud is consumed by the existing R30 classifier and R33-owned two physical eye Draws, then x64 OpenXR host; hardware outcome is not inferred from source inspection.",
+    "evidence_limits": "Exact original callsite and scope are statically confirmed; no evidence yet that the observed 0–99% duplicate disappears in the user's Quest3, and Windows exact-SHA full gate is pending."
+  },
+  "runtime_evidence": "No Windows game or Quest3/VDXR headset visual test was performed for this retry.",
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "result_commit_ci_skip": false,
+  "failure_context": {
+    "active_run_id": 38713028962,
+    "failed_job": "policy",
+    "error": "missing docs/automation/runs/CONVERSION-DX9EX-00890.json",
+    "skipped_jobs": [
+      "full-chain-compile",
+      "package",
+      "host",
+      "game"
+    ]
+  }
+}
