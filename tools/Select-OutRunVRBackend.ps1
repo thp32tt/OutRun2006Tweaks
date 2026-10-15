@@ -230,7 +230,30 @@ function Seal-PendingSessionLogs {
 function Copy-Required([string]$name) {
     $p = Join-Path $src $name
     if (-not (Test-Path $p)) { throw "Required backend file missing: $p" }
-    Copy-Item $p (Join-Path $root $name) -Force
+    $installed = Join-Path $root $name
+    if ($name -notin @('dinput8.dll','outrun-vr-host.exe')) {
+        Copy-Item -LiteralPath $p -Destination $installed -Force
+        return
+    }
+    # Stage on the SAME volume and verify the complete file before replacing
+    # the runnable x86 DLL or x64 host. The old executable survives a failed
+    # write/hash check, and the game/host running guard is enforced above.
+    $staged = Join-Path $root (".$name.stage.$PID.$([guid]::NewGuid().ToString('N'))")
+    try {
+        Copy-Item -LiteralPath $p -Destination $staged -Force
+        if ((Get-Sha256Lower $p) -ne (Get-Sha256Lower $staged)) {
+            throw "Staged $name hash mismatch; existing installation preserved."
+        }
+        if (Test-Path -LiteralPath $installed) {
+            [System.IO.File]::Replace($staged, $installed, $null, $true)
+        } else {
+            [System.IO.File]::Move($staged, $installed)
+        }
+    } finally {
+        if (Test-Path -LiteralPath $staged) {
+            Remove-Item -LiteralPath $staged -Force
+        }
+    }
 }
 
 function Remove-RootVerified([string]$name) {
