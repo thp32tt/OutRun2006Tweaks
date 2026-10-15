@@ -26,11 +26,12 @@ def linked(h, b, d, r, p, w):
         "s.clearColor.record(sourceDevice," in color,
         "s.frameBatch.note_full_depth_clear(z);" in depth,
         "s.frameBatch.accepts_full_on_source_target(" in draw,
+        "return matchesClearedBackbuffer &&" in d,
         "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in b,
         "observe_game_clear(" in clear,
         "observe_scene_boundary(device)" in clear,
         "batch.publishable_full(true,2u)" in p,
-        "!full(oversize,1u)" not in p,
+        "if (!full(nullptr,0u) || !full(oversize,1u) ||" in p,
         "full(incomplete,2u)" in p,
         "full(badOrder,2u)" in p,
         "test_dx11_full_clear_clipped_00762.py" in w,
@@ -45,6 +46,6 @@ for old,new in (
 ):
     assert old in coverage and not linked(coverage.replace(old,new,1),bridge,batch,hook,probe,workflow)
 assert not linked(coverage,bridge.replace("GameNativeClearCoverage::covers_whole(", "/* native full color clear removed */",1),batch,hook,probe,workflow)
-assert not linked(coverage,bridge, batch.replace("return matchesClearedBackbuffer &&","return true &&",1),hook,probe,workflow) if "return matchesClearedBackbuffer &&" in batch else True
+assert not linked(coverage,bridge,batch.replace("return matchesClearedBackbuffer &&","return true &&",1),hook,probe,workflow)
 assert not linked(coverage,bridge,batch,hook.replace("observe_scene_boundary(device)","/* boundary bypass */",1),probe,workflow)
 print("PASS 00762 clipped D3D9 whole-target color/depth Clear -> native full Draw/Indexed + fallback (source only)")
