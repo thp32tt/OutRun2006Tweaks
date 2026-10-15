@@ -34,6 +34,18 @@ struct GameNativeClearColor {
         return valid && device != 0u && backbuffer != 0u &&
                sourceDevice == device && backbufferIdentity == backbuffer;
     }
+    // Menu and vehicle-preview passes may Clear an auxiliary RT0 using the
+    // game device. A color-only offscreen Clear does not modify the previously
+    // verified full-size game backbuffer. Keep its native Draw batch intact,
+    // but never carry it over a main-target, Z or stencil Clear.
+    [[nodiscard]] constexpr bool preserves_offscreen_color_only(
+        std::uintptr_t device, std::uintptr_t backbuffer,
+        std::uintptr_t target, bool colorOnly,
+        bool batchStopped) const noexcept {
+        return colorOnly && !batchStopped &&
+            matches(device, backbuffer) &&
+            target != 0u && target != backbuffer;
+    }
     // Disable writes to the absent X8 alpha plane for every native draw.
     // Mismatched or partial/invalid clears and A8 retain source write masks.
     [[nodiscard]] constexpr std::uint32_t native_write_mask(

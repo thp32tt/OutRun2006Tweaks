@@ -15,7 +15,13 @@ def linked(b,h,r):
         "if (SUCCEEDED(result)) {" in clear,
         "observe_scene_boundary(device)" in clear,
         "observe_game_clear(" in clear,
+        "preserve_offscreen_color_only_clear(" in clear,
+        "&&\n                        !outrun::vr::dx11::live_game_frame::preserve_offscreen_color_only_clear(" in clear,
         "s.clearColor.record(sourceDevice," in gameclear,
+        "if (preserve_offscreen_color_only_clear(game, flags)) return;" in gameclear,
+        "flags != D3DCLEAR_TARGET" in b,
+        "s.clearColor.preserves_offscreen_color_only(" in b,
+        "targetIdentity.Get()" in b,
         "s.frameBatch.reset();" in gameclear,
         "const bool ownsPreDrawColor = env_full_game_opt_in()" in boundary,
         "s.clearColor.valid && s.clearColor.sourceDevice == owner" in boundary,
@@ -38,10 +44,18 @@ for token,mut in (
     ("if (ownsPreDrawColor && s.frameBatch.submitted == 0u)","if (false)"),
     ("s.frameBatch.accepts_full_on_source_target(","s.frameBatch.accepts_full("),
     ("const bool sameClearedGameTarget = s.clearColor.matches(","const bool sameClearedGameTarget = false && s.clearColor.matches("),
+    ("if (preserve_offscreen_color_only_clear(game, flags)) return;",
+     "if (false) return;"),
+    ("flags != D3DCLEAR_TARGET","flags == D3DCLEAR_TARGET"),
 ):
     assert token in bridge
     assert not linked(bridge.replace(token,mut,1),batch,hook),token
 assert not linked(bridge,batch.replace("return matchesClearedBackbuffer &&","return true &&",1),hook)
+assert not linked(bridge.replace("s.clearColor.preserves_offscreen_color_only(",
+                               "s.clearColor.matches(",1),batch,hook)
+assert not linked(bridge,batch,hook.replace(
+    "!outrun::vr::dx11::live_game_frame::preserve_offscreen_color_only_clear(",
+    "/* bypassed auxiliary RT0 color clear */ false && (",1))
 clear_start=hook.index("HRESULT __stdcall ClearDestR9(")
 clear_end=hook.index("template <typename ActualDraw, typename LegacyDraw>",clear_start)
 clear_section=hook[clear_start:clear_end]

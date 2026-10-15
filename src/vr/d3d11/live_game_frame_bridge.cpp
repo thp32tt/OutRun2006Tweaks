@@ -4976,6 +4976,34 @@ void observe_indexed(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
     observe(game, type, primitives, vertices, stride, vertexCount, indices, indexCount);
 }
 
+bool preserve_offscreen_color_only_clear(IDirect3DDevice9* game,
+                                         DWORD flags) noexcept {
+    if (!diagnostic_enabled() || !env_full_game_opt_in() || !game ||
+        flags != D3DCLEAR_TARGET) return false;
+    try {
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        const auto owner = reinterpret_cast<std::uintptr_t>(game);
+        if ((s.sourceGameDevice != 0u && s.sourceGameDevice != owner) ||
+            s.frameBatch.stopped || !s.clearColor.valid) return false;
+        ComPtr<IDirect3DSurface9> target, backbuffer;
+        ComPtr<IUnknown> targetIdentity, backbufferIdentity;
+        if (FAILED(game->GetRenderTarget(0, target.GetAddressOf())) || !target ||
+            FAILED(game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,
+                                      backbuffer.GetAddressOf())) || !backbuffer ||
+            FAILED(target.As(&targetIdentity)) ||
+            FAILED(backbuffer.As(&backbufferIdentity)) ||
+            !targetIdentity || !backbufferIdentity) return false;
+        return s.clearColor.preserves_offscreen_color_only(
+            owner, reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()),
+            reinterpret_cast<std::uintptr_t>(targetIdentity.Get()),
+            true, s.frameBatch.stopped);
+    } catch (...) {
+        // No unproved native publication may change the original D3D9 game.
+        return false;
+    }
+}
+
 void observe_scene_boundary(IDirect3DDevice9* game) noexcept {
     if (!diagnostic_enabled() || !game) return;
     try {
@@ -5068,6 +5096,11 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
 void observe_game_clear(IDirect3DDevice9* game, DWORD count,
                         const D3DRECT* rects, DWORD flags, D3DCOLOR color, float z) noexcept {
     if (!diagnostic_enabled() || !game || !(flags & D3DCLEAR_TARGET)) return;
+    // The original successful offscreen TARGET-only Clear cannot erase the
+    // canonical game backbuffer. Keep its verified color seed for the next
+    // contiguous menu/vehicle/race Draw, including an already active batch.
+    // The Clear hook has skipped scene_boundary only for this exact case.
+    if (preserve_offscreen_color_only_clear(game, flags)) return;
     try {
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);

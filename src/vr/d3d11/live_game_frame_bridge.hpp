@@ -35,6 +35,13 @@ void observe_unavailable_game_draw(IDirect3DDevice9* gameDevice) noexcept;
 // same-Present batch without modifying the original D3D9 HRESULT/input.
 void observe_failed_game_draw(IDirect3DDevice9* gameDevice) noexcept;
 
+// Return true only for a successful D3D9 TARGET-only Clear of an auxiliary
+// RT0, with a still-verified same-device main-backbuffer color seed. This
+// color-only operation must not abort menu/car/race native Draw continuity.
+// Unknown surface, depth or stencil state continues to fail closed.
+bool preserve_offscreen_color_only_clear(IDirect3DDevice9* gameDevice,
+                                         DWORD flags) noexcept;
+
 // A game-authored Clear or successful RT0 switch after a native Draw divides
 // a frame into incompatible surfaces. Discard the diagnostic batch; keep the
 // original D3D9 Clear, Draw, Present and gamepad dispatch untouched.

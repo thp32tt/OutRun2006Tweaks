@@ -558,7 +558,9 @@ namespace OutRunVRStereo
 					if ((flags & (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |
                         D3DCLEAR_STENCIL)) != 0u &&
                         !outrun::vr::dx11::live_game_frame::observe_game_depth_clear(
-                            device, count, rects, flags, z))
+                            device, count, rects, flags, z) &&
+                        !outrun::vr::dx11::live_game_frame::preserve_offscreen_color_only_clear(
+                            device, flags))
                         outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);
 					if (flags & D3DCLEAR_TARGET)
 						outrun::vr::dx11::live_game_frame::observe_game_clear(
