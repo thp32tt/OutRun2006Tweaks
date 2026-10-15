@@ -30,7 +30,9 @@
     "src/vr/d3d9/pause_menu_eye_affine.hpp",
     "vrhost/tests/pause_menu_eye_affine_smoke.cpp",
     "tools/verify_vr_pause_menu_eye_affine.py",
-    "docs/automation/runs/CONVERSION-DX9EX-00888.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00888.json",
+    "tools/verify_vr_hud_exact_callsite_contract.py",
+    "tools/verify_vr_r30_responsive_hud_anchor.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:ESC_MENU",
@@ -69,9 +71,9 @@
     ]
   },
   "acceptance_results": {
-    "esc_direct_deferred_eye_consistency": "SOURCE_IMPLEMENTED",
-    "isolated_nonpause_fallback": "SOURCE_IMPLEMENTED",
-    "r84_exact_sha_quality_gates": "PASS_EXACT_SHA"
+    "esc_direct_deferred_eye_consistency": "PASS",
+    "isolated_nonpause_fallback": "PASS",
+    "r84_exact_sha_quality_gates": "PASS"
   },
   "diagnosis": {
     "original_evidence": "The exact ESC option E8 hooks had only post-call TagAppendedNodes ScreenHud assignment; R84 classifier admitted only CurrentSpriteQueueProducer. An immediate Draw inside the original producer could be unowned despite subsequent deferred arrows being tagged.",
@@ -87,37 +89,54 @@
       "Do not force D3DX Flush or broaden semantic ownership to every ClipSprite; leave native batch timing and input/FFB untouched."
     ],
     "fix_evidence": "Exact direct E8 RAII wrapper scopes only VR pause-arrow original calls and retains prior queued node tags. R84 classifier checks CurrentRenderProducerToken, which keeps queue priority and direct fallback. Added portable predicate negative cases and source mutation regressions.",
-    "negative_test_evidence": "Portable C++ ExactArrowOwner true/false table plus destructive test mutation of R84 authoritative producer lookup; exact-GitHub Actions pending.",
+    "negative_test_evidence": "Active exact validation SHA b7520556 policy/game/host/full-chain/package 5/5 SUCCESS, Domain exact SHA SUCCESS; earlier identical C++ sources at df8b7df EXE HUD Inspector 2/2 SUCCESS and at 2f99a4e1 full-source MSVC 3/3 SUCCESS. Original hook and R30 strict source-negative tests updated. Quest3/VDXR not tested.",
     "eye_ownership": "Native R84 R30 owner applies the same pause-state responsive optical transform to original ESC shell and exact option-arrow ScreenHud sprites through left/right eye shader or XYZRHW drawing; external F11 excluded.",
     "evidence_limits": "Source inspection and source-bound tests do not prove the runtime game submits arrows directly in any measured frame or that both Quest3 eye images are correct."
   },
   "runtime_evidence": "Quest3 / Virtual Desktop VDXR HMD and Windows game were not run in this transaction.",
   "hold_reason": "NEED_HMD_TEST",
-  "score_once": false,
-  "score_delta_this_attempt": 0,
+  "score_once": true,
+  "score_delta_this_attempt": 1,
   "ci_evidence": {
     "status": "PASS_EXACT_SHA",
+    "exact_sha": "b7520556d547385b23d2397131c8cdbda76ad550",
     "material_sha": "5e571a2fe0040469107554d8e7e8b4954b2fffec",
-    "runtime": "UNTESTED",
-    "validation_bearing_result_sha": "b7520556d547385b23d2397131c8cdbda76ad550",
-    "active_validation": {
+    "dx9ex_active": {
       "run_id": 38710247258,
-      "conclusion": "success",
-      "jobs": [
-        "policy",
-        "host",
-        "game",
-        "full-chain-compile",
-        "package"
-      ],
-      "head_sha": "b7520556d547385b23d2397131c8cdbda76ad550"
+      "head_sha": "b7520556d547385b23d2397131c8cdbda76ad550",
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy/game/host/full-chain-compile/package 5/5"
     },
     "domain_isolation": {
       "run_id": 38710247191,
-      "conclusion": "success",
-      "head_sha": "b7520556d547385b23d2397131c8cdbda76ad550"
+      "head_sha": "b7520556d547385b23d2397131c8cdbda76ad550",
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38710079136,
+      "head_sha": "df8b7df58981c4a0567334f868861c1398cac78e",
+      "conclusion": "SUCCESS",
+      "required_jobs": "static-exe-analysis/build-hud-inspector 2/2",
+      "source_difference": "Subsequent only Python R30 verifier changed, original exact E8 and GPU C++ unchanged."
+    },
+    "full_source_impact": {
+      "run_id": 38709916419,
+      "head_sha": "2f99a4e1b824ce0f4d2fd2f11c7936f3d025ad57",
+      "conclusion": "SUCCESS",
+      "required_jobs": "MSVC active game/MSVC OpenXR host/source-cross-domain 3/3",
+      "source_difference": "All later commits change Python verification code only; source C++ unchanged."
+    },
+    "runtime": "UNTESTED",
+    "scoreboard": {
+      "repo": "thp32tt/ai-dev-lab",
+      "file": "AI_SCOREBOARD.md",
+      "commit_sha": "c494cd58fa4b95b61b3ff93decdae5dbff6f017c",
+      "previous": 1366,
+      "delta": 1,
+      "total": 1367
     }
   },
   "result_commit_ci_skip": false,
-  "checkpoint_commit_ci_skip": true
+  "checkpoint_commit_ci_skip": true,
+  "bookkeeping_ci_skip": true
 }
