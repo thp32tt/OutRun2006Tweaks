@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00923",
+  "production_id": "CONVERSION-DX9EX-00923",
+  "event_id": "CONVERSION-DX9EX-00923-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "run_key": "CONVERSION-DX9EX-00923",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PACE:SOFTWARE_LIMITER_XR_HANDOFF",
+  "feature_class": "CRITICAL_BLOCKER",
+  "status": "NEEDS_VALIDATION",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_PENDING_EXACT_SHA",
+  "automation_validation": "FAILED_POLICY_MISSING_RUN_RECORD",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_paths": [
+    "src/hooks_framerate.cpp",
+    "src/vr/ipc/software_limiter_transition.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_framerate.cpp",
+    "src/vr/ipc/software_limiter_transition.hpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00923.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PACE:SOFTWARE_LIMITER_XR_HANDOFF",
+    "goal": "Keep complete software Present-frame limiting coherent across initial VR 60-Hz startup fallback, OpenXR xrWaitFrame takeover, unlimited fast loading and live cap switches; prevent stale QPC deadlines from releasing the first returned frame without pacing while preserving steady-state timing and game input.",
+    "scope_boundary": "Only R84/shared legacy game software limiter transition and its QPC deadline; never change OpenXR xrWaitFrame cadence, normal 60-Hz game simulation, fast-load loader pumping, FFB, SkyGlow, device recovery or DXVK.",
+    "special_work_evidence": "Source-confirmed stale FramelimiterPrevCounter is retained while xrWaitFrame or unlimited loading skips limiter; a return to 60/90 Hz previously compares against an obsolete ideal deadline, causing an unpaced return frame. Startup fallback guards a known white-screen risk, but new Quest3 runtime behavior was not tested.",
+    "trace_stages": [
+      "Original game STATE_START and FastLoad plus Settings::VREnabled and VRFrameCadenceMode decide whether legacy software limiting should own Present.",
+      "ReplaceGameUpdateLoop::destination observes xrWaitFrame ownership and effective 60/90 Hz cap, then rebases FramelimiterPrevCounter using QueryPerformanceCounter on the first software-owned frame.",
+      "Existing game tick/Present and R84 renderer x86 DLL yield to x64 OpenXR host cadence while fallback retains the original game simulation, input and FFB."
+    ],
+    "subcomponents": [
+      "Observe all first-entry, XR takeover, unlimited fast-load and 60-to-90 Hz limit changes in a shared constexpr state helper, rebasing only the first eligible deadline.",
+      "Preserve steady-state ideal-time drift correction and unlimited/host-cadenced no-sleep behavior using positive/negative compile-time regression cases in the Windows x86 game source.",
+      "Integrate final exact-SHA DX9Ex Active x86 game/x64 host/rollback package plus Domain and source-impact validation without asserting HMD success."
+    ],
+    "acceptance_items": [
+      {
+        "id": "limiter_owner_handoff_pacing",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game loop limiter ownership and QPC deadline",
+        "expected_behavior": "Initial VR fallback and the first frame after OpenXR or unlimited load hands back ownership establish a current QPC deadline at their requested cap, while ordinary capped steady frames preserve the prior drift-corrected ideal schedule."
+      },
+      {
+        "id": "xr_fastload_cap_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "OpenXR handoff, desktop unlimited mode, fast-loading and protected original game clock",
+        "expected_behavior": "Software limiter stays disabled during xrWaitFrame ownership or unlimited loading, rebases exactly once on 60/90-Hz re-entry and cap changes, and leaves loader pumping, normal game simulation and native FFB untouched."
+      },
+      {
+        "id": "exact_sha_full_dx9ex_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Windows x86 game x64 OpenXR host and regression/package CI",
+        "expected_behavior": "DX9Ex Active game host package full-chain compile and required Domain plus affected source regression workflows pass on one final exact commit SHA with headset runtime status UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "limiter_owner_handoff_pacing": "SOURCE_IMPLEMENTED",
+    "xr_fastload_cap_fallback": "SOURCE_IMPLEMENTED",
+    "exact_sha_full_dx9ex_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "Legacy ideal deadline used FramelimiterPrevCounter from a prior software-owned frame even after unlimited or XR-owned Present pauses, so the first capped frame after re-entry can run without pacing.",
+    "source_trace": [
+      "Game mode/VRFrameCadenceMode/FramerateFastLoad compute skipFrameLimiter and effectiveFramerateLimit in ReplaceGameUpdateLoop::destination.",
+      "Previously deadline was always FramelimiterPrevCounter plus a cap interval regardless of skipped software-limiter frames.",
+      "The material C++ change tracks limiter ownership transitions and rebases the first return's QPC deadline without changing the steady loop."
+    ],
+    "alternatives_rejected": [
+      "Restarting every frame would lose the original ideal-timeline correction; overriding XR cadence would double wait and worsen frame timing."
+    ],
+    "runtime_evidence": "No Quest3/VDXR game or HMD session performed; pacing and screen behavior remain untested on real hardware."
+  },
+  "failed_ci_evidence": {
+    "run_id": 38823092830,
+    "head_sha": "e44593c917243ddc46ea71dba41d4297b4b3932e",
+    "job_id": 116724326012,
+    "step": "Enforce feature-sized DX9Ex autonomous completion",
+    "cause": "missing required docs/automation/runs/CONVERSION-DX9EX-00923.json",
+    "game_host_package": "SKIPPED_BY_POLICY"
+  },
+  "material_result_sha": "e44593c917243ddc46ea71dba41d4297b4b3932e",
+  "validation_bearing_result_sha": null,
+  "score_delta_this_attempt": 0,
+  "next_action": "Run required GitHub Actions once for this new validation-bearing result SHA; if they pass record a separate C6 bookkeeping update preserving the original material SHA; do not score retry separately."
+}
