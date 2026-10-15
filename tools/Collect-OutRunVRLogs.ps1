@@ -106,6 +106,9 @@ if(!(Test-Path $sessionState)){throw 'CURRENT_VR_SESSION.json not found; select 
 $state=Get-Content $sessionState -Raw|ConvertFrom-Json
 $session=$state.SessionId
 if(!$session -or $state.Backend -ne $backend -or $state.BuildMatrixId -ne $matrix -or ($state.TestProfile -and $state.TestProfile -ne $profile)){throw 'Current session identity does not match the active backend/profile/matrix.'}
+if($state.VariantId -and $state.VariantId -ne $variant){
+    throw 'Collector variant differs from CURRENT_VR_SESSION.json; refusing mixed R84/R26 evidence.'
+}
 $startedUtc=[datetime]::Parse($state.StartedUtc).ToUniversalTime()
 
 $base=Join-Path $root "logs/$matrix"
@@ -168,8 +171,14 @@ if(Test-Path $gameExe){
 # Record the installed game DLL bytes, not only the package's declarative
 # source SHA. This catches stale root DLLs surviving extraction/selection.
 $installedDll=Join-Path $root 'dinput8.dll'
+# The selected payload depends on the actual variant. Comparing a valid
+# R26_SAFE installation against R84 CURRENT_FOCUS falsely reports mismatch;
+# only these two literal opt-in DX9Ex variants may resolve through slots/.
 $selectedDll=Join-Path $root 'backends/d3d9/dinput8.dll'
 if($backend -eq '2d'){$selectedDll=Join-Path $root 'backends/2d/dinput8.dll'}
+if($backend -eq 'd3d9' -and ($variant -eq 'R26_SAFE' -or $variant -eq 'R84_TEST')){
+    $selectedDll=Join-Path $root ("slots/{0}/dinput8.dll" -f $variant)
+}
 $installedHash=if(Test-Path $installedDll){(Get-FileHash $installedDll -Algorithm SHA256).Hash.ToLowerInvariant()}else{'MISSING'}
 $selectedHash=if(Test-Path $selectedDll){(Get-FileHash $selectedDll -Algorithm SHA256).Hash.ToLowerInvariant()}else{'MISSING'}
 $expectedHash=if($kv.gameDllSha256){[string]$kv.gameDllSha256}else{'NOT_RECORDED'}
@@ -181,6 +190,7 @@ $gameDllMatches=($installedHash -ne 'MISSING' -and
     "session=$session"
     "sourceShaDeclared=$activeSourceSha"
     "installedDllSha256=$installedHash"
+    "selectedVariant=$variant"
     "selectedPayloadDllSha256=$selectedHash"
     "launchSelectionDllSha256=$expectedHash"
     "installedMatchesSelected=$gameDllMatches"

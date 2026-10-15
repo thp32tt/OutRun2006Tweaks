@@ -64,6 +64,8 @@ on:
       - 'tools/verify_vr_r84_focus_inventory.py'
       - 'tools/verify_dx9ex_r84_mainline.py'
       - 'tools/verify_dx9ex_r84_lens_source.py'
+      - 'tools/verify_dx9ex_r84_log_identity.py'
+      - 'tools/Collect-OutRunVRLogs.ps1'
       - 'tools/verify_vr_r29_effect_cache_generation.py'
       - 'tools/verify_vr_r29_depth_off_probe_fastpath.py'
       - 'tools/verify_vr_r29_stencil_write_fastpath.py'
@@ -434,6 +436,9 @@ jobs:
       - name: Verify R84 C993 original-WVP source proof and conservative optics
         shell: pwsh
         run: python tools/verify_dx9ex_r84_lens_source.py
+      - name: Verify R84/R26 runtime collector selected DLL identity
+        shell: pwsh
+        run: python tools/verify_dx9ex_r84_log_identity.py
       - name: Verify near-plane active stereo eligibility
         shell: pwsh
         run: python tools/verify_vr_nearplane_active_gate.py
