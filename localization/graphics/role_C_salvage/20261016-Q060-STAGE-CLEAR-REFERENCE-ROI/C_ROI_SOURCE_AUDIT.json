@@ -1,0 +1,78 @@
+{
+  "schema": "outrun-c-roi-source-audit-v1",
+  "task_id": "C-ROI-SOURCE-Q060-STAGE-CLEAR-20261016T0133KST",
+  "source": {
+    "platform": "PC-HD",
+    "source_kind": "PIXEL_EXACT_FLIPY_OF_GITHUB_PINNED_FULL_DDS",
+    "pinned_git_commit": "e680f79e7d04c0a38fab1c5d5d72ac3307305288",
+    "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+    "source_dds_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "source_dds_format": "RGB32",
+    "original_dds_dimensions": [
+      4096,
+      2048
+    ],
+    "dds_mipmaps": 1,
+    "source_png": "q060_A064FDFC_FLIPY_CHECK_ORIENTATION.png",
+    "source_png_sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+    "source_png_dimensions": [
+      4096,
+      2048
+    ],
+    "full_dds_vs_png_rgba_diff_pixels_flipy": 0,
+    "full_dds_vs_png_rgba_pixels_compared": 8388608,
+    "orientation": "FLIPY_READABLE"
+  },
+  "roi": {
+    "english": "STAGE CLEAR",
+    "korean": "스테이지 클리어",
+    "translation_evidence": "localization/graphics/role_C_salvage/20261015-text-roi-pilot/FULL_HD_108_SOURCE_INVENTORY.json Q060",
+    "bbox_native_xyxy": [
+      3428,
+      336,
+      3990,
+      480
+    ],
+    "native_dimensions": [
+      562,
+      144
+    ],
+    "native_sha256": "53496635631a8a0ef97f19ce70662d29031e0ee154d52c29677c67fc15e93473",
+    "upscale": 4,
+    "imagegen_input_dimensions": [
+      2248,
+      576
+    ],
+    "imagegen_input_sha256": "284236a8834565a2607ff17e2f73c25dcca3c738d82f27ff8d369c0fa84f5e0b",
+    "native_full_source_pixel_diff": 0,
+    "upscaled_lanczos_pixel_diff": 0,
+    "isolation": "reference_crop",
+    "glyph_layer": "HOLD_PLATE_MASK_UNVERIFIED",
+    "clean_plate": "NOT_CREATED",
+    "alpha_nonzero_fraction_including_plate": 0.585137,
+    "alpha_margin_validated_for_glyph_only": false,
+    "visually_observed": "STAGE CLEAR complete lettering+outline+glow; orange plaque remains in reference; no neighboring phrase within crop",
+    "fit_policy": "PRESERVE_ASPECT_RATIO_INSIDE_REVIEWED_UI_CELL_UV_SAFE_AREA; WIDTH_DIFFERENCE_ALONE_NOT_REJECT",
+    "ui_safe_cell": "UNREVIEWED"
+  },
+  "production": {
+    "extractor": "tools/localization/text_roi_source_pack.py",
+    "schema": "outrun-hd-text-roi-v1",
+    "imagegen": "NOT_RUN",
+    "legacy_986_tiles_used": false,
+    "old_AB_queue_state_modified": false,
+    "new_AB_dispatch_enabled": false,
+    "portainer": "NOT_DEPLOYED"
+  },
+  "qa": {
+    "TEST_ONLY": true,
+    "source_dds_equivalence": "PASS",
+    "native_crop_pixel_equal": true,
+    "enlarge_pixel_verified": true,
+    "C1": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "game": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "status": "REFERENCE_ROI_CREATED_TEST_ONLY_GLYPH_ISOLATION_HOLD"
+}\n

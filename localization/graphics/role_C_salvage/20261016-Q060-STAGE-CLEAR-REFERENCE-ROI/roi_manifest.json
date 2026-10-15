@@ -1,0 +1,46 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "queue_id": "Q060",
+  "region_id": "stage_clear_full_phrase_direct_dds_reference",
+  "source_png": "q060_A064FDFC_FLIPY_CHECK_ORIENTATION.png",
+  "source_png_sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+  "source_kind": "FULL_HD_PNG_PIXEL_EXACT_FLIPY_OF_GITHUB_PINNED_DDS",
+  "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "original_dimensions": [
+    4096,
+    2048
+  ],
+  "bbox_xyxy": [
+    3428,
+    336,
+    3990,
+    480
+  ],
+  "english": "STAGE CLEAR",
+  "korean": "스테이지 클리어",
+  "isolation": "reference_crop",
+  "scale": 4,
+  "native_dimensions": [
+    562,
+    144
+  ],
+  "imagegen_dimensions": [
+    2248,
+    576
+  ],
+  "native_png_sha256": "53496635631a8a0ef97f19ce70662d29031e0ee154d52c29677c67fc15e93473",
+  "imagegen_input_sha256": "284236a8834565a2607ff17e2f73c25dcca3c738d82f27ff8d369c0fa84f5e0b",
+  "alpha_crop_margin_checked": false,
+  "status": "IMAGEGEN_REFERENCE_TEST_ONLY",
+  "generate_output": "ONE_KOREAN_TEXT_ONLY_TRANSPARENT_PNG",
+  "required_review": [
+    "KOREAN_GLYPHS",
+    "SOURCE_EFFECT",
+    "CLEAN_PLATE",
+    "NATIVE_ROI_FIT",
+    "C1",
+    "C3_IF_REQUIRED",
+    "USER_GAME"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
