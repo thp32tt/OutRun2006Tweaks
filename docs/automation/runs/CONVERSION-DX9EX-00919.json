@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "C2_IMPLEMENTED_CI_PENDING",
-  "phase": "C2_IMPLEMENT",
-  "checkpoint": "C2_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "f98132bbfd02dbea96b964ab71185b0e57d57845",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "b1ef6c770a91245c0c3567394e1109edc8b73ce9",
+  "validation_bearing_result_sha": "b1ef6c770a91245c0c3567394e1109edc8b73ce9",
   "source_paths": [
     "src/hooks_uiscaling.cpp"
   ],
@@ -65,9 +65,9 @@
     ]
   },
   "acceptance_results": {
-    "d3dx_direct_and_queue_lifetime": "PENDING_CI",
-    "d3dx_fallback_and_goal_regression": "PENDING_CI",
-    "required_exact_sha_gate": "PENDING_CI"
+    "d3dx_direct_and_queue_lifetime": "PASS_BUILD",
+    "d3dx_fallback_and_goal_regression": "PASS_BUILD",
+    "required_exact_sha_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "ID3DXSprite::Flush success discarded PendingDraws/producer with ForgetBatch(), but did not clear StageBoundaryReady previously armed by queued +TIME/GOAL, allowing a later Draw in the same queue to encounter an obsolete submission privilege.",
@@ -81,12 +81,62 @@
       "Do not add unconditional per-sprite Flush or relabel mixed unknown D3DX batches.",
       "Do not suppress +TIME/GOAL effects, globally tag alpha/XYZRHW or change timer/game logic."
     ],
-    "fix_evidence": "Source now resets StageBoundaryReady on successful native Flush; old Draw failure code remains unchanged. Scope-limited changed-area verifier asserts boundary retirement and mutation detects its removal.",
-    "negative_test_evidence": "Unchanged failure-injection and stale-shared-batch negatives remain in the full +TIME/GOAL verifier; new native-flush-keeps-stale-queue-boundary mutation must be rejected. Windows full gate not yet verified.",
+    "fix_evidence": "In the final C++ source at b1ef6c77, successful original ID3DXSprite::Flush retires PendingDraws, producer provenance and StageBoundaryReady together. The existing failed-Draw quarantine is unchanged. Changed-area positive and destructive-mutation regression is active on later test-only 9db61c7f.",
+    "negative_test_evidence": "Changed-area +TIME/GOAL ownership verifier including successful Flush stale-boundary mutation and failed/mixed/stale/foreign native D3DX Draw paths passed; four required full GitHub Actions workflows all succeeded on material source SHA b1ef6c77. Follow-up test-only 9db61c7f passed DX9Ex Active 5/5 and Domain 1/1 without changing C++ runtime sources.",
     "eye_ownership": "Only successfully drawn, source-owned homogeneous stage batches can carry ScreenHud semantics into R84 left/right rendering; failed or foreign GPU batches fall back to original D3DX semantics."
   },
-  "ci_evidence": null,
-  "next_action": "Run one exact-SHA DX9Ex Active Windows game/host/package, Domain, Full Source Impact, HUD Inspector after repairing the source mutation contract. Keep BUILD_VERIFIED and Quest3 HMD acceptance separate; do not award separate metadata/CI score.",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "material_sha": "b1ef6c770a91245c0c3567394e1109edc8b73ce9",
+    "validation_bearing_result_sha": "b1ef6c770a91245c0c3567394e1109edc8b73ce9",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "exact_sha_gate_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38813534815,
+        "sha": "b1ef6c770a91245c0c3567394e1109edc8b73ce9",
+        "conclusion": "success",
+        "jobs": "policy/game/full-chain-compile/host/package 5/5"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38813534267,
+        "sha": "b1ef6c770a91245c0c3567394e1109edc8b73ce9",
+        "conclusion": "success",
+        "jobs": "domain-isolation 1/1"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38813534441,
+        "sha": "b1ef6c770a91245c0c3567394e1109edc8b73ce9",
+        "conclusion": "success",
+        "jobs": "source-cross-domain/msvc-analyze-active-game/msvc-analyze-openxr-host 3/3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38813534511,
+        "sha": "b1ef6c770a91245c0c3567394e1109edc8b73ce9",
+        "conclusion": "success",
+        "jobs": "static-exe-analysis/build-hud-inspector 2/2"
+      }
+    ],
+    "following_test_only_commit": {
+      "sha": "9db61c7ffd7da16a495771525f4e6458738a23f4",
+      "source_diff": "tools/verify_vr_stage_extension_d3dx_batch_owner.py only; no C++ source differences from validation-bearing material SHA",
+      "active_run_id": 38813636547,
+      "active_conclusion": "success",
+      "domain_run_id": 38813636570,
+      "domain_conclusion": "success",
+      "note": "Full Source Impact and HUD Inspector run on material source SHA, not redundantly on test-only follow-up SHA. Do not treat test-only SHA as a second validated material feature."
+    },
+    "notes": "4 mandatory workflows success exactly on b1ef6c77, verified by GitHub Actions. This is source/build validation, not Quest3 visual confirmation."
+  },
+  "next_action": "BUILD_VERIFIED under exact source SHA, Quest3/VDXR HMD +TIME sprite/numeric stereo correctness still untested. Do not assume the visible effect or FPS is fixed. Preserve original GOAL/SkyGlow/FFB and DXVK freeze; do not count C6, test-only SHA or retries as new scored feature.",
   "score_delta_this_attempt": 0,
   "ci_repair_history": [
     {
@@ -95,5 +145,12 @@
       "failed_job": "policy",
       "reason": "Already-present Draw failure guard was redundantly shadowed by an unreachable new branch, so stale-shared-batch mutation no longer hit the actual first implementation. Removed duplicate and added targeted native-Flush boundary mutation."
     }
-  ]
+  ],
+  "bookkeeping": {
+    "commit_kind": "C6_RESULT_ONLY",
+    "skip_ci": true,
+    "validation_bearing_result_sha": "b1ef6c770a91245c0c3567394e1109edc8b73ce9",
+    "material_result_sha": "b1ef6c770a91245c0c3567394e1109edc8b73ce9",
+    "no_additional_score": true
+  }
 }
