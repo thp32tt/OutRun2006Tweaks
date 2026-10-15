@@ -43,7 +43,7 @@ def integrated(cpp: str, r9: str, clear: str) -> bool:
         "s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)",
         "env_full_game_opt_in()")) and all(x in cpp for x in (
         "output.targetIdentity = reinterpret_cast<std::uintptr_t>(sourceTargetIdentity.Get());",
-        "s.clearColor.discard();\n        // Menu/car/race frames often",
+        "s.clearColor.discard();\n        s.preDrawFills.discard();\n        // Menu/car/race frames often",
     )) and all(x in clear for x in (
         "wholeBackbuffer && device != 0u && backbuffer != 0u",
         "sourceDevice == device && backbufferIdentity == backbuffer",
@@ -71,7 +71,7 @@ for old, new in (
      "targetIdentity.Get() != backbufferIdentity.Get()"),
     ("s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)",
      "kBackground"),
-    ("s.clearColor.discard();\n        // Menu/car/race frames often",
+    ("s.clearColor.discard();\n        s.preDrawFills.discard();\n        // Menu/car/race frames often",
      "// missing frame discard\n        // Menu/car/race frames often"),
 ):
     # 00732 adds an earlier depth-only Clear observer with its own coverage
