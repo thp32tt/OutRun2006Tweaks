@@ -11,7 +11,7 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "status": "COMPLETE_BUILD_VERIFIED",
   "phase": "C6_RESULT",
   "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
@@ -84,7 +84,7 @@
   "score_once": false,
   "material_result_sha": "f790ea9bbea07c4be51a52a911e13f5ba19723da",
   "targeted_validation_repair_sha": "b4f3d6451bd17c98641cb312ec26578dce98c717",
-  "checkpoint": "EXACT_SHA_GATES_PASS_RUNTIME_UNTESTED",
+  "checkpoint": "C6_STATE",
   "ci_evidence": {
     "material_source_commit": "f790ea9bbea07c4be51a52a911e13f5ba19723da",
     "initial_active_run_id": 38788130938,
@@ -131,7 +131,7 @@
     ],
     "verification_note": "Exact-SHA four workflow conclusions checked completed/success; this C6 checkpoint is bookkeeping-only and is deliberately not a new Gate input."
   },
-  "hold_reason": "BUILD_VERIFIED for exact C993 unready-raster original-draw safety. Only Quest3/VDXR gameplay can validate one centred spatial lens, binocular correctness, surrounding halos, SkyGlow and other effects; no runtime optical FIXED claim.",
+  "hold_reason": "NEED_HMD_TEST: exact-SHA CI build verified, but Quest3/VDXR gameplay and visual lens-centre acceptance were not executed. Previous TERMINAL_STATUS_NOT_COMPLETE record status reconciled.",
   "validation_bearing_result_sha": "49322b82c10279248c9e3aba4de95a3894f7e2f4",
   "acceptance_results": {
     "centre_unready_preserves_original": "PASS_BUILD",
@@ -146,5 +146,6 @@
     "delta": 0,
     "new_ai2_score": 1391,
     "reason": "Same previously tracked DX9EX:VIS:LENS_FLARE_CENTRE visual feature, scoped raster-bypass restoration only; no distinct complete HMD-validated feature or new score."
-  }
+  },
+  "resolved_prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
