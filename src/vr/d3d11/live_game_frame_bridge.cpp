@@ -4769,32 +4769,6 @@ bool observe_source_frame_mode(State& s, bool fullMode) noexcept {
     return false;
 }
 
-// A successful R9 RT0 switch to/from a verified auxiliary game target
-// changes no backbuffer pixels on its own. Preserve full-frame draw ownership;
-// actual offscreen Draws must pass the independent no-Z/stencil/MRT proof below.
-bool preserve_game_target_transition(IDirect3DDevice9* game) noexcept {
-    if (!diagnostic_enabled() || !env_full_game_opt_in() || !game) return false;
-    try {
-        State& s = state();
-        std::lock_guard<std::mutex> lock(s.mutex);
-        const auto owner = reinterpret_cast<std::uintptr_t>(game);
-        ComPtr<IDirect3DSurface9> target, backbuffer;
-        ComPtr<IUnknown> targetIdentity, backbufferIdentity;
-        if (FAILED(game->GetRenderTarget(0, target.GetAddressOf())) || !target ||
-            FAILED(game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,
-                                      backbuffer.GetAddressOf())) || !backbuffer ||
-            FAILED(target.As(&targetIdentity)) ||
-            FAILED(backbuffer.As(&backbufferIdentity))) return false;
-        return GameNativeOffscreenPass::preserve_transition(
-            true, s.clearColor.matches(owner, reinterpret_cast<std::uintptr_t>(
-                backbufferIdentity.Get())),
-            s.sourceGameDevice == 0u || s.sourceGameDevice == owner,
-            s.frameBatch.stopped, targetIdentity != nullptr);
-    } catch (...) {
-        return false; // Unproved RT changes follow original fail-closed boundary.
-    }
-}
-
 // An offscreen D3D9 Draw must not be counted as a native backbuffer Draw.
 // Check the current COM backbuffer identity, Z/stencil and all extra MRTs;
 // a failed query, shared main RT or depth/stencil write aborts the native batch.
@@ -5060,6 +5034,32 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
     }
 }
 } // namespace
+
+// A successful R9 RT0 switch to/from a verified auxiliary game target
+// changes no backbuffer pixels on its own. Preserve full-frame draw ownership;
+// actual offscreen Draws must pass the independent no-Z/stencil/MRT proof below.
+bool preserve_game_target_transition(IDirect3DDevice9* game) noexcept {
+    if (!diagnostic_enabled() || !env_full_game_opt_in() || !game) return false;
+    try {
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        const auto owner = reinterpret_cast<std::uintptr_t>(game);
+        ComPtr<IDirect3DSurface9> target, backbuffer;
+        ComPtr<IUnknown> targetIdentity, backbufferIdentity;
+        if (FAILED(game->GetRenderTarget(0, target.GetAddressOf())) || !target ||
+            FAILED(game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,
+                                      backbuffer.GetAddressOf())) || !backbuffer ||
+            FAILED(target.As(&targetIdentity)) ||
+            FAILED(backbuffer.As(&backbufferIdentity))) return false;
+        return GameNativeOffscreenPass::preserve_transition(
+            true, s.clearColor.matches(owner, reinterpret_cast<std::uintptr_t>(
+                backbufferIdentity.Get())),
+            s.sourceGameDevice == 0u || s.sourceGameDevice == owner,
+            s.frameBatch.stopped, targetIdentity != nullptr);
+    } catch (...) {
+        return false; // Unproved RT changes follow original fail-closed boundary.
+    }
+}
 
 bool diagnostic_enabled() noexcept {
     static const bool optedIn = env_opt_in();

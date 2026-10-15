@@ -154,6 +154,7 @@ jobs:
           python tools/test_dx11_pre_draw_depth_clear_00734.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_pre_draw_depth_clear_00734.cpp -o /tmp/dx11_pre_draw_depth_00734 && /tmp/dx11_pre_draw_depth_00734
           python tools/test_dx11_full_frame_color_seed_00735.py
+          python tools/test_dx11_game_target_linkage_00766.py
           python tools/test_dx11_game_offscreen_pass_00765.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_offscreen_pass_00765.cpp -o /tmp/dx11_offscreen_00765 && /tmp/dx11_offscreen_00765
           python tools/test_dx11_game_clipped_draw_00764.py
