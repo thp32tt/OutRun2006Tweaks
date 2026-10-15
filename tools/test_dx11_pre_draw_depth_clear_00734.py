@@ -11,6 +11,7 @@ def linked(b, h, r):
     start = b.index("bool observe_game_depth_clear(")
     end = b.index("void observe_game_clear(", start)
     observer = b[start:end]
+    pre_seed = observer.split("s.frameBatch.can_seed_pre_draw_depth(",1)[1].split(");",1)[0]
     color = b[b.index("void observe_game_clear("):b.index("void observe_unavailable_game_draw(")]
     draw = b[b.index("bool submit("):b.index("bool observe_source_device(")]
     entry = r[r.index("HRESULT __stdcall ClearDestR9("):r.index(
@@ -23,9 +24,9 @@ def linked(b, h, r):
         "s.frameBatch.reset();" in color,
         "const bool beforeFirstGameDraw = !s.pending &&" in observer,
         "s.frameBatch.can_seed_pre_draw_depth(" in observer,
-        "s.clearColor.matches(owner," in observer,
-        "backbufferIdentity.Get()))" in observer,
-        "s.sourceDrawsThisFrame == 0u" in observer,
+        "s.clearColor.matches(owner," in pre_seed,
+        "backbufferIdentity.Get()))" in pre_seed,
+        "s.sourceDrawsThisFrame == 0u" in pre_seed,
         "if ((s.frameBatch.submitted == 0u || s.frameBatch.stopped) &&" in observer,
         "!beforeFirstGameDraw) return false;" in observer,
         "s.frameBatch.submitted != 0u && !continuingFullNativeDraw" in observer,
@@ -53,7 +54,14 @@ for old, new in (
     z = bridge.index("void observe_game_clear(", a)
     segment = bridge[a:z]
     assert old in segment, old
-    mutated = bridge[:a] + segment.replace(old, new, 1) + bridge[z:]
+    # Main STENCIL safety also probes this owner's color identity earlier.
+    # Mutate this test's exact pre-first-Draw Z seed, not the stencil gate.
+    if old == "s.clearColor.matches(owner,":
+        anchor = segment.index("s.frameBatch.can_seed_pre_draw_depth(")
+        segment = segment[:anchor] + segment[anchor:].replace(old, new, 1)
+    else:
+        segment = segment.replace(old, new, 1)
+    mutated = bridge[:a] + segment + bridge[z:]
     assert not linked(mutated, batch, hook), old
 assert "(!noSourceDraws && onlyLeadingEmpty)) && !stopped &&" in batch
 assert not linked(bridge, batch.replace(
