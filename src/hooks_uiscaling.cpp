@@ -2351,9 +2351,16 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 
     static HRESULT __stdcall BeginDest(void* self, DWORD flags)
     {
+        // A re-entrant Begin on an already-active ID3DXSprite fails with
+        // INVALIDCALL; it does NOT close the previous Begin/Draw batch.
+        // Keep its exact +TIME/GOAL provenance for the eventual Flush/End.
+        const bool existingBatch =
+            BatchActive && self == TrackedSprite && IsExactSprite(self);
         const HRESULT hr = Begin_hk.stdcall<HRESULT>(self, flags);
         if (IsExactSprite(self))
         {
+            if (FAILED(hr) && existingBatch)
+                return hr;
             TrackedSprite = self;
             BatchActive = SUCCEEDED(hr);
             StageBoundaryReady = false;
@@ -2607,7 +2614,21 @@ private:
     {
         const HRESULT hr = Draw_hk.stdcall<HRESULT>(
             self, texture, rect, center, pos, color);
-        if (FAILED(hr) || !self)
+        if (FAILED(hr))
+        {
+            // D3DX can have submitted part of the pending batch before a
+            // failed Draw. Its GPU ownership is now unknown: never submit
+            // stale +TIME/GOAL provenance under a later queue/source scope.
+            // Preserve the game's HRESULT and its original Flush/End path.
+            if (self && self == TrackedSprite)
+            {
+                BatchActive = false;
+                StageBoundaryReady = false;
+                ForgetBatch();
+            }
+            return hr;
+        }
+        if (!self)
             return hr;
 
         using namespace OutRunVR::GameSemantic;
