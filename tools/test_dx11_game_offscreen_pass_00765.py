@@ -11,6 +11,8 @@ def integrated(hook, body):
     rt = rt.split("HRESULT __stdcall ClearDestR9(", 1)[0]
     normal = body.split("void observe(IDirect3DDevice9* game,", 1)[1]
     normal = normal.split("bool preserve_offscreen_color_only_clear(", 1)[0]
+    offscreen = body.split("bool isolated_offscreen_game_draw(", 1)[1].split(
+        "void observe(IDirect3DDevice9* game,", 1)[0]
     absent = body.split("void observe_unavailable_game_draw(", 1)[1]
     absent = absent.split("void observe_failed_game_draw(", 1)[0]
     return (
@@ -20,10 +22,10 @@ def integrated(hook, body):
         'GameNativeOffscreenPass::preserve_transition(' in body and
         'GetRenderState(D3DRS_ZENABLE, &zEnabled)' in body and
         'GetRenderState(D3DRS_STENCILENABLE, &stencilEnabled)' in body and
-        'GetDeviceCaps(&caps)' in body and
-        'GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs)' in body and
-        'for (DWORD i = 1u; i < caps.NumSimultaneousRTs; ++i)' in body and
-        'GetRenderTarget(i, extra.GetAddressOf())' in body and
+        'GetDeviceCaps(&caps)' in offscreen and
+        'GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs)' in offscreen and
+        'for (DWORD i = 1u; i < caps.NumSimultaneousRTs; ++i)' in offscreen and
+        'GetRenderTarget(i, extra.GetAddressOf())' in offscreen and
         'GameNativeOffscreenPass::source_has_no_main_writes(' in body and
         'isolated_offscreen_game_draw(game, s)' in normal and
         's.frameBatch.absorb_empty_source_draw(' in normal and
