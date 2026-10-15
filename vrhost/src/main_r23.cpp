@@ -1523,11 +1523,10 @@ namespace
         UvRect whole{};
         if (!c.GetGameUv(whole)) return false;
 
-        // Issue #119: average the two eye's tangent-plane extents,
-        // not their FOV angles. tan(mean(angle)) is not mean(tan(angle));
-        // the old approximation stretched LOCAL-fixed 4:3 menu content
-        // under asymmetric XR eye projections. One coherent common span
-        // remains shared by both eyes; bad eye publication fails closed.
+        // Issue #119: intersect the two eyes' tangent-plane FOV extents.
+        // Mean eye edges can extend outside one real eye frustum and clip
+        // car-selection/menu content. A shared valid overlap is projected
+        // to both eyes; disjoint or invalid pairs retain mono fallback.
         const auto common = OutRunVrMenuAspect::PlanCommonFovTangents(
             views[0].fov.angleLeft, views[0].fov.angleRight,
             views[0].fov.angleDown, views[0].fov.angleUp,
@@ -1535,9 +1534,9 @@ namespace
             views[1].fov.angleDown, views[1].fov.angleUp);
         if (!common.valid)
             return false;
-        // OpenXR composition uses angular FOV, whereas the menu rectangle
-        // uses tangent-plane extents. Reconstruct angles from the SAME
-        // averaged tangents so the projection view and raster stay matched.
+        // OpenXR composition uses angular FOV, whereas menu placement uses
+        // tangent extents. Reconstruct from the SAME intersected tangents
+        // so the shared raster fits both eyes' actual visible FOV.
         XrFovf commonFov{};
         commonFov.angleLeft = std::atan(common.left);
         commonFov.angleRight = std::atan(common.right);

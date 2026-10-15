@@ -62,8 +62,8 @@ namespace OutRunVrMenuAspect
     };
 
     // Projection spans are linear in tan(FOV), not in the angles themselves.
-    // Averaging angles before tan() changes apparent menu aspect when OpenXR
-    // publishes asymmetric left/right eye tangents (Quest3/VDXR).
+    // A shared menu projection must intersect both eye frusta: averaging
+    // their tangent-space edges can clip pixels in one physical eye.
     struct CommonFovTangents
     {
         bool valid = false;
@@ -103,10 +103,14 @@ namespace OutRunVrMenuAspect
               spanY1 > 0.05f && spanY1 <= 10.0f))
             return {};
 
-        const float left = 0.5f * (l0 + l1);
-        const float right = 0.5f * (r0 + r1);
-        const float down = 0.5f * (d0 + d1);
-        const float up = 0.5f * (u0 + u1);
+        // Both OpenXR eyes display ONE common LOCAL-fixed menu projection.
+        // Mean tangent edges may extend beyond the true bounds of either eye,
+        // clipping the car selector/menu despite a centered common NDC quad.
+        // Intersect instead; disjoint or degenerate eye frusta fail closed.
+        const float left = (std::max)(l0, l1);
+        const float right = (std::min)(r0, r1);
+        const float down = (std::max)(d0, d1);
+        const float up = (std::min)(u0, u1);
         if (!std::isfinite(left) || !std::isfinite(right) ||
             !std::isfinite(down) || !std::isfinite(up) ||
             right - left <= 0.05f || up - down <= 0.05f)
