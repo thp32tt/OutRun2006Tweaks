@@ -1,0 +1,74 @@
+name: Localization C salvage predeploy validation
+
+on:
+  push:
+    branches:
+      - localization-controller-recovery-20260928
+    paths:
+      - 'tools/chat-controller/localization-recovery-v1/c_salvage/**'
+      - 'tools/chat-controller/localization-recovery-v1/docker-compose.yml'
+      - '.github/workflows/localization-c-salvage-predeploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    name: C offline QA and Docker image build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install C testing requirements
+        run: python -m pip install --disable-pip-version-check -r tools/chat-controller/localization-recovery-v1/c_salvage/requirements.txt
+      - name: Validate C compositor and DDS safety tests
+        run: python tools/chat-controller/localization-recovery-v1/c_salvage/test_c_salvage_compose.py
+      - name: Validate C scan/idempotence tests
+        run: python tools/chat-controller/localization-recovery-v1/c_salvage/test_c_salvage_worker.py
+      - name: Validate PSD-first/native CLEAN safety tests
+        run: python tools/chat-controller/localization-recovery-v1/c_salvage/test_c_salvage_plate.py
+      - name: Validate actual Portainer Compose without deploying
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker compose -f tools/chat-controller/localization-recovery-v1/docker-compose.yml config --quiet
+          SERVICES="$(docker compose -f tools/chat-controller/localization-recovery-v1/docker-compose.yml config --services)"
+          printf '%s\n' "$SERVICES"
+          printf '%s\n' "$SERVICES" | grep -qx 'outrun-chat-controller-localization-recovery'
+          printf '%s\n' "$SERVICES" | grep -qx 'outrun-c-salvage-offline'
+          test "$(printf '%s\n' "$SERVICES" | wc -l)" -eq 2
+      - name: Verify offline C is isolated and A/B retained
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+          p = Path("tools/chat-controller/localization-recovery-v1/docker-compose.yml")
+          obj = yaml.safe_load(p.read_text())
+          a = obj["services"]["outrun-chat-controller-localization-recovery"]
+          c = obj["services"]["outrun-c-salvage-offline"]
+          assert a["environment"]["CHAT_SLOTS"] == "2"
+          assert a["environment"]["AUTO_SEND"] == "true"
+          assert a["environment"]["OUTRUN_AB_BATCH_QUEUE"] == "true"
+          assert c["network_mode"] == "none"
+          assert c["read_only"] is True
+          assert c["cpus"] <= 0.5
+          assert c["cap_drop"] == ["ALL"]
+          assert c["build"]["context"] == "./c_salvage"
+          vols = c["volumes"]
+          assert len(vols) == 2
+          assert vols[0]["read_only"] is True
+          assert vols[0]["bind"]["create_host_path"] is False
+          assert vols[1]["bind"]["create_host_path"] is False
+          assert vols[0]["source"] != vols[1]["source"]
+          print("PASS: A/B unchanged; C read-only inputs, limited resources, manual deployment")
+          PY
+      - name: Build offline C Docker image (not deployed)
+        run: |
+          docker build --pull \
+            -f tools/chat-controller/localization-recovery-v1/c_salvage/Dockerfile \
+            -t outrun-c-salvage:predeploy \
+            tools/chat-controller/localization-recovery-v1/c_salvage
