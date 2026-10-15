@@ -7,6 +7,18 @@ namespace outrun::vr::dx11::live_game_frame {
 // mirror must retain those operations so later menu/car/race passes can use
 // their destination-alpha blend and depth-test results.
 struct GameNativeMaskedDraw {
+    // A real D3D9 Draw/DrawIndexed with no color, depth or stencil writes
+    // consumes a source ordinal but contributes no backbuffer pixels. Treat
+    // it like a zero-primitive call only after all writable MRTs are excluded.
+    // Never invent a native GPU Draw or skip an unproved depth/stencil pass.
+    [[nodiscard]] static constexpr bool no_target_write_source_draw(
+        bool fullMode, bool clearedGameBackbuffer, std::uint32_t colorMask,
+        bool depthEnabled, bool depthWriteEnabled, bool stencilEnabled,
+        bool extraRenderTargetBound) noexcept {
+        return fullMode && clearedGameBackbuffer && colorMask == 0u &&
+            (!depthEnabled || !depthWriteEnabled) && !stencilEnabled &&
+            !extraRenderTargetBound;
+    }
     [[nodiscard]] static constexpr bool accepts_source_mask(
         std::uint32_t d3d9Mask, bool fullFrame, bool targetHasAlpha,
         bool nativeDepthWrite) noexcept {

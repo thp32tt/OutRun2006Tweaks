@@ -4813,6 +4813,47 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, const State& s) noexce
         noExtraRenderTargets, s.frameBatch.stopped);
 }
 
+// Preserve the complete game Draw/DrawIndexed source stream when a successful
+// call has no possible output write. Menu/car-selection setup draws frequently
+// disable color and Z writes; treating them as unsupported used to abort the
+// subsequent full-resolution native game Present despite correct GPU pixels.
+// Fail closed on unknown state, stencil writes or any bound extra MRT. The
+// original D3D9 Draw (and gamepad/input) always executes independently.
+bool proven_game_draw_no_target_writes(IDirect3DDevice9* game, const State& s) noexcept {
+    if (!game || !env_full_game_opt_in() || s.frameBatch.stopped) return false;
+    DWORD colorMask = 0xffffffffu;
+    if (FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
+        colorMask != 0u) return false;
+    DWORD zEnabled = D3DZB_TRUE, zWrite = TRUE, stencilEnabled = TRUE;
+    if (FAILED(game->GetRenderState(D3DRS_ZENABLE, &zEnabled)) ||
+        FAILED(game->GetRenderState(D3DRS_ZWRITEENABLE, &zWrite)) ||
+        FAILED(game->GetRenderState(D3DRS_STENCILENABLE, &stencilEnabled)))
+        return false;
+    D3DCAPS9 caps{};
+    if (FAILED(game->GetDeviceCaps(&caps)) ||
+        !GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs))
+        return false;
+    for (DWORD i = 1u; i < caps.NumSimultaneousRTs; ++i) {
+        ComPtr<IDirect3DSurface9> extra;
+        const HRESULT status = game->GetRenderTarget(i, extra.GetAddressOf());
+        // A bound MRT can write with COLORWRITEENABLE1..3 even when RT0
+        // is masked. A failed/unknown query cannot certify a no-op draw.
+        if (status != D3DERR_NOTFOUND) return false;
+    }
+    ComPtr<IDirect3DSurface9> backbuffer;
+    ComPtr<IUnknown> identity;
+    if (FAILED(game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,
+                                   backbuffer.GetAddressOf())) || !backbuffer ||
+        FAILED(backbuffer.As(&identity)) || !identity)
+        return false;
+    return GameNativeMaskedDraw::no_target_write_source_draw(
+        true,
+        s.clearColor.matches(reinterpret_cast<std::uintptr_t>(game),
+                             reinterpret_cast<std::uintptr_t>(identity.Get())),
+        static_cast<std::uint32_t>(colorMask), zEnabled != D3DZB_FALSE,
+        zWrite != FALSE, stencilEnabled != FALSE, false);
+}
+
 void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
              const void* bytes, UINT stride, UINT vertexCount,
              const std::uint32_t* indices, UINT indexCount) noexcept {
@@ -4895,6 +4936,20 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         if (fullMode && isolated_offscreen_game_draw(game, s)) {
             const bool sameSourceFullClear = s.clearColor.valid &&
                 s.clearColor.sourceDevice == reinterpret_cast<std::uintptr_t>(game);
+            if (!s.frameBatch.absorb_empty_source_draw(
+                    sourceOrdinal, sameSourceFullClear))
+                s.frameBatch.abort();
+            return;
+        }
+        // A real Draw/DrawIndexed with RT0 color writes disabled, no Z
+        // writes, no stencil writes and no bound MRT is pixel-neutral.
+        // Consume its exact source ordinal without dropping the later native
+        // menu/car/race frame. Any unproven state follows normal admission
+        // and aborts the native copy while D3D9 Draw/input stay intact.
+        if (fullMode && proven_game_draw_no_target_writes(game, s)) {
+            const bool sameSourceFullClear = s.clearColor.valid &&
+                s.clearColor.sourceDevice ==
+                    reinterpret_cast<std::uintptr_t>(game);
             if (!s.frameBatch.absorb_empty_source_draw(
                     sourceOrdinal, sameSourceFullClear))
                 s.frameBatch.abort();
