@@ -19,7 +19,7 @@
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
   "base_sha": "c08878760a1131bf2fdae7e74981a197dd5dc225",
-  "material_result_sha": null,
+  "material_result_sha": "81460e0e85152b9ac3a439c52db67e8e6f01c25a",
   "validation_bearing_result_sha": null,
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -77,7 +77,7 @@
     ],
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
-      "D3D11_NATIVE_DRAW_INDEXED",
+      "D3D11_NATIVE_DRAW",
       "VISIBLE_FRAME_OUTPUT",
       "D3D9_PRESENT",
       "DX9EX_INPUT_FALLBACK"
@@ -89,7 +89,7 @@
     "C0_RECOVER": "HEAD c08878760a1131bf2fdae7e74981a197dd5dc225 and AGENTS/policy/00772 reviewed",
     "C1_REVIEW": "Native Draw XYZRHW/WVP had uncorrected D3D9 integer vs D3D11 half-integer raster pixel centers.",
     "C2_IMPLEMENT": "Shared live FVF bridge homogeneous half-pixel correction with helper and compiled destructive test.",
-    "C3_VALIDATE": "Added C++17 test to DX11 Fast; exact-SHA CI must execute.",
+    "C3_VALIDATE": "DX11 Fast CI failed: invalid literal game path. Corrected policy stage and strengthened native Present integration regression.",
     "C4_COMMIT": "This material source commit, no skip-ci.",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING exact-SHA CI, HMD UNTESTED."

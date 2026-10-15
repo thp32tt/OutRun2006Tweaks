@@ -26,12 +26,17 @@ def integrated(s):
             "translate_vertices(bytes, vertexCount, stride, vp," in s and
             "ctx->DrawIndexed(indexCount, 0, 0);" in s and
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in s and
+            "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)" in s and
+            "GameNativeFrameUpload::copy_rows(" in s and
+            "game->UpdateSurface(" in s and
             "python tools/test_dx11_pixel_center_game_draw_00773.py" in workflow)
 
 assert integrated(source), "shared real game Draw/Indexed XYZRHW + WVP path disconnected"
 for token in ('#include "live_game_pixel_center.hpp"',
               "game_native_d3d9_raster_center(", "static_cast<float>(vp.Width)",
-              "static_cast<float>(vp.Height)"):
+              "static_cast<float>(vp.Height)",
+              "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)",
+              "GameNativeFrameUpload::copy_rows(", "game->UpdateSurface("):
     mutated = source.replace(token, "/* stripped for negative regression */", 1)
     assert mutated != source and not integrated(mutated), token
 
