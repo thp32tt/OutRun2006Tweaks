@@ -22,6 +22,8 @@ def integrated(hook, body):
         'native_game_offscreen_pass.hpp' in body and
         'GameNativeOffscreenPass::preserve_transition(' in body and
         'GetRenderState(D3DRS_ZENABLE, &zEnabled)' in offscreen and
+        'GetRenderState(D3DRS_ZWRITEENABLE, &zWriteEnabled)' in offscreen and
+        'GameNativeOffscreenPass::no_main_depth_write(' in offscreen and
         'GetRenderState(D3DRS_STENCILENABLE, &stencilEnabled)' in offscreen and
         'GetDeviceCaps(&caps)' in offscreen and
         'GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs)' in offscreen and
@@ -39,6 +41,8 @@ for original, replacement in (
     ('!outrun::vr::dx11::live_game_frame::preserve_game_target_transition(device)',
      'false /* break RT continuity */'),
     ('GetRenderState(D3DRS_ZENABLE, &zEnabled)', 'GetRenderState(D3DRS_ZWRITEENABLE, &zEnabled)'),
+    ('GetRenderState(D3DRS_ZWRITEENABLE, &zWriteEnabled)',
+     'GetRenderState(D3DRS_ZENABLE, &zWriteEnabled)'),
     ('GetDeviceCaps(&caps)', 'GetDeviceCaps(nullptr)'),
     ('for (DWORD i = 1u; i < caps.NumSimultaneousRTs; ++i)', 'for (DWORD i = 1u; i <= 3u; ++i)'),
     ('GameNativeOffscreenPass::source_has_no_main_writes(', 'GameNativeOffscreenPass::unsafe_unproven_main_writes('),
@@ -46,7 +50,8 @@ for original, replacement in (
     h, b = r9, bridge
     if original in h:
         h = h.replace(original, replacement, 1)
-    elif original == 'GetDeviceCaps(&caps)':
+    elif original in ('GetDeviceCaps(&caps)',
+                      'GetRenderState(D3DRS_ZWRITEENABLE, &zWriteEnabled)'):
         # Other game-state admission also queries caps: damage this exact
         # offscreen source predicate rather than an unrelated earlier caller.
         start = b.index('bool isolated_offscreen_game_draw(')

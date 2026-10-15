@@ -2,9 +2,11 @@
 #include <cstdint>
 namespace outrun::vr::dx11::live_game_frame {
 // Offscreen menu/vehicle texture passes may be interleaved with main-backbuffer
-// Draws. They do not touch its native RTV/DSV only if color is routed away,
-// D3D9 Z/stencil are disabled and no extra MRT is bound. This is not an
-// assertion about texture parity: any subsequent unsupported main Draw aborts.
+// Draws. They do not touch the native main RTV when color is routed away,
+// nor the main DSV when Z is disabled OR enabled read-only (ZWRITEENABLE=FALSE),
+// stencil is disabled and no extra MRT is bound. The original D3D9 offscreen
+// texture still renders; subsequent main draws must independently pass native
+// texture/state admission. An unproved main writer aborts the full frame.
 struct GameNativeOffscreenPass {
     // D3D9 supports up to four simultaneous render targets. An adapter may
     // expose only one; its nonexistent extra slots must never be queried.
@@ -18,12 +20,16 @@ struct GameNativeOffscreenPass {
         return fullMode && wholeBackbufferSeeded && sameOwner &&
             !stopped && targetKnown;
     }
+    [[nodiscard]] static constexpr bool no_main_depth_write(
+        bool depthEnabled, bool depthWritesEnabled) noexcept {
+        return !depthEnabled || !depthWritesEnabled;
+    }
     [[nodiscard]] static constexpr bool source_has_no_main_writes(
         bool fullMode, bool wholeBackbufferSeeded, bool targetIsOffscreen,
-        bool depthDisabled, bool stencilDisabled, bool noExtraRenderTargets,
+        bool noMainDepthWrites, bool stencilDisabled, bool noExtraRenderTargets,
         bool stopped) noexcept {
         return fullMode && wholeBackbufferSeeded && targetIsOffscreen &&
-            depthDisabled && stencilDisabled && noExtraRenderTargets && !stopped;
+            noMainDepthWrites && stencilDisabled && noExtraRenderTargets && !stopped;
     }
 };
 } // namespace outrun::vr::dx11::live_game_frame

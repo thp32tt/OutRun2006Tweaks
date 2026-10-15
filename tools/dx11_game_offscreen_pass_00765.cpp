@@ -53,12 +53,37 @@ constexpr bool unsupported_writes_fallback() {
     return !batch.absorb_empty_source_draw(1u) &&
         !batch.publishable_full(true, 2u);
 }
+// A read-only-depth offscreen Draw/DrawIndexed can interleave with genuine
+// menu/vehicle/race game backbuffer Draws without changing native main depth.
+constexpr bool offscreen_readonly_depth_continuity() {
+    if (!GameNativeOffscreenPass::no_main_depth_write(false, true) ||
+        !GameNativeOffscreenPass::no_main_depth_write(true, false) ||
+        !GameNativeOffscreenPass::no_main_depth_write(false, false) ||
+        GameNativeOffscreenPass::no_main_depth_write(true, true)) return false;
+    GameNativeFrameBatch batch{};
+    if (!batch.accepts_full_on_source_target(0u, true)) return false;
+    batch.succeeded(true); batch.record_source_draw(0u);
+    if (!GameNativeOffscreenPass::source_has_no_main_writes(
+            true, true, true,
+            GameNativeOffscreenPass::no_main_depth_write(true, false),
+            true, true, false)) return false;
+    if (!batch.absorb_empty_source_draw(1u)) return false;
+    if (!batch.accepts_full_on_source_target(2u, true)) return false;
+    batch.succeeded(true); batch.record_source_draw(2u);
+    if (!batch.publishable_full(true, 3u)) return false;
+    return !GameNativeOffscreenPass::source_has_no_main_writes(
+        true, true, true,
+        GameNativeOffscreenPass::no_main_depth_write(true, true),
+        true, true, false);
+}
+static_assert(offscreen_readonly_depth_continuity());
 static_assert(hardware_mrt_slot_boundaries());
 static_assert(game_offscreen_interleave());
 static_assert(leading_offscreen_then_game());
 static_assert(unsupported_writes_fallback());
 int main() {
     assert(hardware_mrt_slot_boundaries());
+    assert(offscreen_readonly_depth_continuity());
     assert(game_offscreen_interleave());
     assert(leading_offscreen_then_game());
     assert(unsupported_writes_fallback());

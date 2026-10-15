@@ -4842,8 +4842,9 @@ bool observe_source_frame_mode(State& s, bool fullMode) noexcept {
 bool isolated_offscreen_game_draw(IDirect3DDevice9* game, const State& s) noexcept {
     if (!env_full_game_opt_in() || !game || s.frameBatch.stopped) return false;
     const auto owner = reinterpret_cast<std::uintptr_t>(game);
-    DWORD zEnabled = D3DZB_TRUE, stencilEnabled = TRUE;
+    DWORD zEnabled = D3DZB_TRUE, zWriteEnabled = TRUE, stencilEnabled = TRUE;
     if (FAILED(game->GetRenderState(D3DRS_ZENABLE, &zEnabled)) ||
+        FAILED(game->GetRenderState(D3DRS_ZWRITEENABLE, &zWriteEnabled)) ||
         FAILED(game->GetRenderState(D3DRS_STENCILENABLE, &stencilEnabled)))
         return false;
     ComPtr<IDirect3DSurface9> target, backbuffer;
@@ -4876,8 +4877,9 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, const State& s) noexce
         true, s.clearColor.matches(owner, reinterpret_cast<std::uintptr_t>(
             backbufferIdentity.Get())),
         targetIdentity.Get() != backbufferIdentity.Get(),
-        zEnabled == D3DZB_FALSE, stencilEnabled == FALSE,
-        noExtraRenderTargets, s.frameBatch.stopped);
+        GameNativeOffscreenPass::no_main_depth_write(
+            zEnabled != D3DZB_FALSE, zWriteEnabled != FALSE),
+        stencilEnabled == FALSE, noExtraRenderTargets, s.frameBatch.stopped);
 }
 
 // Preserve the complete game Draw/DrawIndexed source stream when a successful
