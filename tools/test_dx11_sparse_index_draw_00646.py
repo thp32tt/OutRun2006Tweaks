@@ -102,8 +102,12 @@ assert "observe_unavailable_game_draw(game);" in linear
 assert linear.index("if (!game_native_primitive_element_count(") < linear.index("observe_unavailable_game_draw(game);")
 missing = bridge.split("void observe_unavailable_game_draw(", 1)[1].split(
     "void before_game_present(", 1)[0]
-assert "++s.sourceDrawsThisFrame;" in missing
+# 00765 preserves the same exact raw-game ordinal, but also passes it
+# into the guarded offscreen no-pixel source accounting. Do not demand the
+# obsolete preincrement spelling or accidentally allow an uncounted Draw.
+assert source_ordinal in missing
 assert "s.frameBatch.abort();" in missing
-broken = missing.replace("++s.sourceDrawsThisFrame;", "", 1)
-assert broken != missing and "++s.sourceDrawsThisFrame;" not in broken
+assert missing.index(source_ordinal) < missing.index("if (!observe_source_frame_mode(")
+broken = missing.replace(source_ordinal, "", 1)
+assert broken != missing and source_ordinal not in broken
 print("00646 sparse indexed VB shadow -> game native DrawIndexed PASS")
