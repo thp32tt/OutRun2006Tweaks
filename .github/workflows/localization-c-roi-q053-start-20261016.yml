@@ -89,7 +89,7 @@ jobs:
             if not np.any(a): raise RuntimeError('HOLD_SOURCE_REGION_ALPHA_EMPTY')
             # Text isolation must not be claimed on an opaque plate or on touching alpha.
             if np.all(a==255): raise RuntimeError('HOLD_OPAQUE_PLATE_NO_REVIEWED_TEXT_MASK')
-            if any(np.any(e) for e in (a[:2],a[-2:],a[:,:2],a[:,-2:])):
+            audit['alpha_edge_2px_nonzero_counts']={\n              'top':int(np.count_nonzero(a[:2])),\n              'bottom':int(np.count_nonzero(a[-2:])),\n              'left':int(np.count_nonzero(a[:,:2])),\n              'right':int(np.count_nonzero(a[:,-2:]))}\n            if any(audit['alpha_edge_2px_nonzero_counts'].values()):
               raise RuntimeError('HOLD_ORIGINAL_ALPHA_TOUCHES_CROP_EDGE_EXTEND_ROI')
             audit['edge_2px_alpha_pixels']=0
             audit['source_isolation']='alpha'
@@ -144,7 +144,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add localization/graphics/role_C_salvage/20261016-Q053-START-DIRECT-ROI/
+          git add --sparse localization/graphics/role_C_salvage/20261016-Q053-START-DIRECT-ROI/
           if ! git diff --cached --quiet; then
             git commit -m "localization: Q053 START direct full DDS ROI or explicit hold [skip ci]"
             git push origin HEAD:korean-localization-recovery-20260928
