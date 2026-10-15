@@ -885,18 +885,26 @@ class UIScaling : public Hook
 			if (!root || !tailAfter || tailAfter == before[prio])
 				continue;
 
-			// Preserve the fast path for ordinary HUD/rank sprites. The
-            // six +TIME sources can run across a nested queue rebuild:
-            // only they require proof that the old tail is still live.
+			// Preserve ordinary HUD fast tagging; exact rank/GOAL/+TIME
+            // producers can rebuild the queue, so prove old/new tail
+            // reachability before dereferencing the old tail.
             SpriteNode* node = nullptr;
-            if (producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime)
+            if (producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime ||
+                producer == OutRunVR::GameSemantic::ProducerToken::OutRunStagePrintf ||
+                producer == OutRunVR::GameSemantic::ProducerToken::ResultProgress ||
+                producer == OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper ||
+                producer == OutRunVR::GameSemantic::ProducerToken::GoalTime020 ||
+                producer == OutRunVR::GameSemantic::ProducerToken::GoalTime150 ||
+                producer == OutRunVR::GameSemantic::ProducerToken::RankMarkerSprani ||
+                producer == OutRunVR::GameSemantic::ProducerToken::RankMarkerClipSprite ||
+                producer == OutRunVR::GameSemantic::ProducerToken::RivalMarkerSprani)
             {
                 node = StageFirstAppendedNode(
                     root, before[prio], tailAfter, Game::SpriteNodeMax);
             }
             else
             {
-                // Unchanged fast path for existing rank, rival, GOAL, and HUD.
+                // O(1) path only for the non-rebuilding ordinary HUD.
                 node = before[prio]
                     ? before[prio]->next_0 : root->next_0;
             }
