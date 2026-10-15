@@ -1,0 +1,27 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "assets": [
+    {
+      "queue_id": "Q053",
+      "source_png": "q053_568D3696_FLIPY_CHECK_ORIENTATION.png",
+      "source_sha256": "0893c0676397aee9cdf12b436f8d1e18eff55eccac55f1e4349e744c34b0478f",
+      "source_kind": "FULL_HD_PNG_PIXEL_EXACT_FLIPY_OF_GITHUB_PINNED_DDS",
+      "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+      "regions": [
+        {
+          "id": "answer_full_phrase_direct_dds",
+          "english": "ANSWER",
+          "korean": "정답",
+          "bbox": [
+            1910,
+            2490,
+            3410,
+            2845
+          ],
+          "isolation": "alpha",
+          "scale": 2
+        }
+      ]
+    }
+  ]
+}

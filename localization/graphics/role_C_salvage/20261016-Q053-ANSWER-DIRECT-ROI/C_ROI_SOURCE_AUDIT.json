@@ -1,0 +1,85 @@
+{
+  "schema": "outrun-c-roi-source-audit-v1",
+  "task_id": "C-ROI-SOURCE-Q053-ANSWER-20261016T0046KST",
+  "status": "ROI_SOURCE_READY_TEST_ONLY",
+  "real_imagegen": "NOT_RUN",
+  "ab_send": "DISABLED_NOT_TOUCHED",
+  "source": {
+    "kind": "FULL_HD_PNG_PIXEL_EXACT_FLIPY_OF_DIRECT_GITHUB_DDS",
+    "platform": "PC HD OR2-HD-GUI-v0.25.10a",
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "source_commit": "e680f79e7d04c0a38fab1c5d5d72ac3307305288",
+    "dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+    "dds_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+    "dds_format": "DXT5",
+    "dds_mipmaps": 13,
+    "dds_dimensions": [
+      4096,
+      4096
+    ],
+    "original_readable_png": "q053_568D3696_FLIPY_CHECK_ORIENTATION.png",
+    "original_png_sha256": "0893c0676397aee9cdf12b436f8d1e18eff55eccac55f1e4349e744c34b0478f",
+    "decoded_dds_vs_png": {
+      "normal_rgba_mismatched_pixels": 15411804,
+      "flipy_rgba_mismatched_pixels": 0,
+      "compared_pixel_count": 16777216
+    }
+  },
+  "roi": {
+    "english": "ANSWER",
+    "korean": "정답",
+    "official_mapping_evidence": "localization/graphics/role_C_salvage/20261015-text-roi-pilot/FULL_HD_108_SOURCE_INVENTORY.json Q053",
+    "native_xyxy": [
+      1910,
+      2490,
+      3410,
+      2845
+    ],
+    "native_dimensions": [
+      1500,
+      355
+    ],
+    "scale": 2,
+    "imagegen_dimensions": [
+      3000,
+      710
+    ],
+    "isolation": "alpha",
+    "alpha_nonzero_fraction": 0.4517,
+    "alpha_margin_pixels": {
+      "top": 69,
+      "bottom": 45,
+      "left": 247,
+      "right": 193
+    },
+    "edge_2px_alpha_pixels": {
+      "top": 0,
+      "bottom": 0,
+      "left": 0,
+      "right": 0
+    },
+    "native_png_sha256": "9726678263e3609a16727d5100e020bb23dbab3928a2490e24834a78619bbef0",
+    "enlarged_png_sha256": "be0d7ee9f05e54ef0fa8d0103d4db5c7d643fd496c0fc1fdeaa0aed03cc06f24"
+  },
+  "implementation": {
+    "extractor": "tools/localization/text_roi_source_pack.py",
+    "extractor_source_commit": "e680f79e7d04c0a38fab1c5d5d72ac3307305288",
+    "manifest_schema": "outrun-hd-text-roi-v1",
+    "output_mode": "TEST_ONLY",
+    "legacy_tiles_used": false,
+    "old_ab_queue_state_modified": false,
+    "output_pngs_are_input_candidates_only": true,
+    "clean_plate": "NOT_CREATED",
+    "korean_fit": "PRESERVE_ASPECT_RATIO_INSIDE_REVIEWED_UI_CELL_OR_UV_SAFE_REGION",
+    "ui_safe_cell": "UNREVIEWED"
+  },
+  "qa": {
+    "static_full_phrase_readable": "REVIEWED_AS_ENGLISH_ANSWER",
+    "alpha_border": "PASS",
+    "source_dds_equivalence": "PASS",
+    "C1": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "dds_output": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  }
+}

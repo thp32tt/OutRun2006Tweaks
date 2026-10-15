@@ -1,0 +1,46 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "queue_id": "Q053",
+  "region_id": "answer_full_phrase_direct_dds",
+  "source_png": "q053_568D3696_FLIPY_CHECK_ORIENTATION.png",
+  "source_png_sha256": "0893c0676397aee9cdf12b436f8d1e18eff55eccac55f1e4349e744c34b0478f",
+  "source_kind": "FULL_HD_PNG_PIXEL_EXACT_FLIPY_OF_GITHUB_PINNED_DDS",
+  "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+  "original_dimensions": [
+    4096,
+    4096
+  ],
+  "bbox_xyxy": [
+    1910,
+    2490,
+    3410,
+    2845
+  ],
+  "english": "ANSWER",
+  "korean": "정답",
+  "isolation": "alpha",
+  "scale": 2,
+  "native_dimensions": [
+    1500,
+    355
+  ],
+  "imagegen_dimensions": [
+    3000,
+    710
+  ],
+  "native_png_sha256": "9726678263e3609a16727d5100e020bb23dbab3928a2490e24834a78619bbef0",
+  "imagegen_input_sha256": "be0d7ee9f05e54ef0fa8d0103d4db5c7d643fd496c0fc1fdeaa0aed03cc06f24",
+  "alpha_crop_margin_checked": true,
+  "status": "IMAGEGEN_REFERENCE_TEST_ONLY",
+  "generate_output": "ONE_KOREAN_TEXT_ONLY_TRANSPARENT_PNG",
+  "required_review": [
+    "KOREAN_GLYPHS",
+    "SOURCE_EFFECT",
+    "CLEAN_PLATE",
+    "NATIVE_ROI_FIT",
+    "C1",
+    "C3_IF_REQUIRED",
+    "USER_GAME"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
