@@ -6,6 +6,35 @@
 #include <initializer_list>
 using outrun::vr::dx11::live_game_frame::GameNativeFrameBatch;
 using outrun::vr::dx11::live_game_frame::GameNativeSourceMutation;
+using outrun::vr::dx11::live_game_frame::GameNativePreDrawFills;
+constexpr bool native_predraw_color_fill_regression() {
+    GameNativePreDrawFills queue{};
+    if (!queue.record(11, 101, 4, 6, 100, 40, 640, 480, 0xff102030u) ||
+        !queue.record(11, 101, 8, 10, 120, 60, 640, 480, 0xffabcdefu) ||
+        !queue.belongs_to(11, 101) || queue.count != 2u ||
+        queue.entries[0].argb != 0xff102030u ||
+        queue.entries[1].left != 8 ||
+        queue.entries[1].argb != 0xffabcdefu)
+        return false;
+    // A foreign game device/backbuffer, an invalid tile, or a failed batch
+    // cannot masquerade as a complete pre-Draw native menu/race image.
+    if (queue.record(22, 101, 1, 1, 3, 3, 640, 480, 0) ||
+        queue.record(11, 102, 1, 1, 3, 3, 640, 480, 0) ||
+        queue.record(11, 101, -1, 0, 3, 3, 640, 480, 0) ||
+        queue.record(11, 101, 1, 1, 641, 3, 640, 480, 0) ||
+        queue.count != 2u) return false;
+    for (std::uint32_t i = 2; i < GameNativePreDrawFills::kCapacity; ++i)
+        if (!queue.record(11, 101, 1, 1, 3, 3, 640, 480, i))
+            return false;
+    if (queue.count != GameNativePreDrawFills::kCapacity ||
+        queue.record(11, 101, 1, 1, 3, 3, 640, 480, 999))
+        return false;
+    queue.discard(); // new full TARGET Clear / Reset / Present
+    return queue.count == 0u && !queue.belongs_to(11, 101) &&
+        queue.record(33, 303, 0, 0, 640, 480, 640, 480, 0xff010203u) &&
+        queue.belongs_to(33, 303);
+}
+static_assert(native_predraw_color_fill_regression());
 constexpr bool native_non_draw_surface_mutation_regression() {
     using M = GameNativeSourceMutation;
     // Live menu Draw -> ColorFill/StretchRect/UpdateSurface to the seeded

@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <cstdint>
 
 namespace outrun::vr::dx11::live_game_frame {
@@ -106,6 +107,47 @@ struct GameNativeSourceMutation {
         bool destinationIsClearedBackbuffer, bool selfUpload) noexcept {
         return fullMode && succeeded && gameOwner &&
             destinationIsClearedBackbuffer && !selfUpload;
+    }
+};
+// D3D9 can ColorFill several rectangles after its whole-backbuffer Clear but
+// before the first Draw. Replay those game-authored fills IN ORDER after the
+// native full-frame clear and before the first native Draw. Entries bind to
+// the exact canonical backbuffer; overflow/foreign writes fail closed.
+struct GameNativePreDrawFills {
+    struct Fill {
+        std::int64_t left{}, top{}, right{}, bottom{};
+        std::uint32_t argb{};
+    };
+    static constexpr std::uint32_t kCapacity = 16u;
+    std::array<Fill, kCapacity> entries{};
+    std::uintptr_t device{}, backbuffer{};
+    std::uint32_t count{};
+    constexpr void discard() noexcept {
+        device = backbuffer = 0u;
+        count = 0u;
+    }
+    [[nodiscard]] constexpr bool belongs_to(
+        std::uintptr_t currentDevice, std::uintptr_t currentBackbuffer) const noexcept {
+        return count != 0u && device != 0u && backbuffer != 0u &&
+            currentDevice == device && currentBackbuffer == backbuffer;
+    }
+    [[nodiscard]] constexpr bool record(
+        std::uintptr_t currentDevice, std::uintptr_t currentBackbuffer,
+        std::int64_t left, std::int64_t top,
+        std::int64_t right, std::int64_t bottom,
+        std::uint32_t width, std::uint32_t height,
+        std::uint32_t color) noexcept {
+        if (!currentDevice || !currentBackbuffer || count >= kCapacity ||
+            (count && !belongs_to(currentDevice, currentBackbuffer)) ||
+            !GameNativeSourceMutation::bounded_color_fill_rect(
+                left, top, right, bottom, width, height))
+            return false;
+        if (!count) {
+            device = currentDevice;
+            backbuffer = currentBackbuffer;
+        }
+        entries[count++] = {left, top, right, bottom, color};
+        return true;
     }
 };
 } // namespace outrun::vr::dx11::live_game_frame

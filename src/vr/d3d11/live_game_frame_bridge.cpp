@@ -1056,6 +1056,7 @@ struct State {
     std::uintptr_t sourceGameDevice = 0u;
     GameOutputSignature previousOutput{};
     GameNativeClearColor clearColor{};
+    GameNativePreDrawFills preDrawFills{};
     std::uint64_t outputGeneration = 0u;
     NativeBackend backend;
     // Persistent native D3D11 upload buffers for a whole real game frame.
@@ -4626,13 +4627,41 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         }
     }
     ctx->UpdateSubresource(s.alphaConstants.Get(), 0, nullptr, alphaParams, 0, 0);
-    // Only the first live game Draw clears the native diagnostic color.
+    // The first real game Draw consumes a whole Clear and any intervening
+    // game-authored partial ColorFills in their original order. Do not issue
+    // native commands if the remembered fills cannot be replayed atomically.
     if (s.frameBatch.first_draw()) {
-        // The original D3D9 game Clear supplies the native full-size background
-        // only when its device and canonical backbuffer still match this Draw.
+        ComPtr<ID3D11DeviceContext1> replayContext;
+        if (s.preDrawFills.count != 0u &&
+            (!env_full_game_opt_in() ||
+             !s.clearColor.matches(s.sourceGameDevice, output.targetIdentity) ||
+             !s.preDrawFills.belongs_to(s.sourceGameDevice, output.targetIdentity) ||
+             !s.backend.color_rtv() ||
+             FAILED(ctx->QueryInterface(IID_PPV_ARGS(replayContext.GetAddressOf()))) ||
+             !replayContext)) {
+            s.preDrawFills.discard();
+            return false; // original D3D9 Draw/Present/input remain authoritative
+        }
         s.backend.begin_frame(env_full_game_opt_in()
             ? s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)
             : kBackground);
+        if (replayContext) {
+            constexpr float scale = 1.0f / 255.0f;
+            for (std::uint32_t i = 0; i < s.preDrawFills.count; ++i) {
+                const auto& fill = s.preDrawFills.entries[i];
+                const float rgba[4]{
+                    float((fill.argb >> 16) & 255u) * scale,
+                    float((fill.argb >> 8) & 255u) * scale,
+                    float(fill.argb & 255u) * scale,
+                    s.clearColor.opaqueDestinationAlpha ? 1.0f :
+                        float((fill.argb >> 24) & 255u) * scale};
+                const D3D11_RECT area{
+                    static_cast<LONG>(fill.left), static_cast<LONG>(fill.top),
+                    static_cast<LONG>(fill.right), static_cast<LONG>(fill.bottom)};
+                replayContext->ClearView(s.backend.color_rtv(), rgba, &area, 1u);
+            }
+        }
+        s.preDrawFills.discard();
     }
     if (output.nativeDepthTest) {
         ID3D11RenderTargetView* rtv = s.backend.color_rtv();
@@ -5530,6 +5559,7 @@ void observe_game_surface_mutation(
         // overwrite any part of that original menu/vehicle/race image.
         s.frameBatch.abort();
         s.pending = false;
+        s.preDrawFills.discard();
         s.clearColor.discard();
         if (++s.outputGeneration == 0u) ++s.outputGeneration;
     } catch (...) {
@@ -5721,6 +5751,18 @@ bool preserve_game_color_fill(
             s.backend.context() && s.nativeWidth == desc.Width &&
             s.nativeHeight == desc.Height;
         if (!wholeSurface) {
+            // Save successful pre-Draw partial fills so the initial native
+            // full-resolution scene includes the same menu/vehicle background.
+            // No native GPU command runs until the first actual game Draw.
+            if (!alreadyDrawn) {
+                return s.sourceGameDevice == owner && !s.frameBatch.stopped &&
+                    sameGameBackbuffer && desc.Width <= 0x7fffffffu &&
+                    desc.Height <= 0x7fffffffu && rect &&
+                    s.preDrawFills.record(owner,
+                        reinterpret_cast<std::uintptr_t>(surfaceIdentity.Get()),
+                        rect->left, rect->top, rect->right, rect->bottom,
+                        desc.Width, desc.Height, color);
+            }
             // ClearView is optional on D3D11.0 hardware/runtime. Only mutate
             // the native target when every admission check passes, otherwise
             // retire the batch and leave the original D3D9 pixels untouched.
@@ -5756,6 +5798,7 @@ bool preserve_game_color_fill(
                 true, SUCCEEDED(originalResult), sameGameBackbuffer,
                 sameGameBackbuffer, true, !s.frameBatch.stopped,
                 wholeTargetReady)) return false;
+        s.preDrawFills.discard(); // whole ColorFill supersedes prior tiles
         s.clearColor.argb = color;
         s.clearColor.opaqueDestinationAlpha =
             desc.Format == D3DFMT_X8R8G8B8;
@@ -5790,6 +5833,7 @@ void observe_scene_boundary(IDirect3DDevice9* game) noexcept {
             s.clearColor.valid && s.clearColor.sourceDevice == owner;
         if (!ownsDraw && !ownsPreDrawColor) return;
         s.frameBatch.scene_boundary();
+        s.preDrawFills.discard();
         if (ownsPreDrawColor && s.frameBatch.submitted == 0u)
             s.frameBatch.abort();
         // A GPU Draw may already have run, but its stale color must never be
@@ -5962,7 +6006,10 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
         // The previous owner's seed survives an unverified foreign Clear;
         // the real owner still invalidates its own old seed immediately.
         // Only a successful whole-backbuffer Clear may rebind ownership.
-        if (!foreignSource) s.clearColor.discard();
+        if (!foreignSource) {
+            s.clearColor.discard();
+            s.preDrawFills.discard();
+        }
         ComPtr<IDirect3DSurface9> target, backbuffer;
         D3DSURFACE_DESC targetDesc{}, bbDesc{};
         D3DVIEWPORT9 viewport{};
@@ -5989,7 +6036,10 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             sourceDevice, s.sourceGameDevice, env_full_game_opt_in(),
             wholeBackbuffer, s.frameBatch.submitted != 0u, s.pending);
         if (foreignSource && !sourceReacquired) return;
-        if (foreignSource) s.clearColor.discard();
+        if (foreignSource) {
+            s.clearColor.discard();
+            s.preDrawFills.discard();
+        }
         std::uintptr_t mainDepthIdentity = 0u;
         if (wholeBackbuffer) {
             ComPtr<IDirect3DSurface9> mainDepth;
@@ -6822,6 +6872,7 @@ void before_game_present(IDirect3DDevice9* game,
         s.pending = false;
         s.frameBatch.reset();
         s.clearColor.discard();
+        s.preDrawFills.discard();
         // Menu/car/race frames often have more than 64 eligible draws. The
         // cursor advances across the actual frame population; shrinking or
         // empty populations reset it without skipping the D3D9 fallback.
@@ -6857,6 +6908,7 @@ void before_game_present(IDirect3DDevice9* game,
         s.sourceGameDevice = 0u;
         s.previousOutput = {};
         s.clearColor.discard();
+        s.preDrawFills.discard();
         s.insetSurface.Reset();
         s.insetFormat = D3DFMT_UNKNOWN;
         s.insetSurfaceDevice = 0u;
@@ -6891,6 +6943,7 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.readSlot = s.writeSlot = 0;
     s.previousOutput = {};
     s.clearColor.discard();
+    s.preDrawFills.discard();
     s.outputGeneration = 0u;
     s.insetSurface.Reset(); s.insetFormat = D3DFMT_UNKNOWN;
     s.insetSurfaceDevice = 0u;
