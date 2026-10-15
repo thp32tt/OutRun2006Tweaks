@@ -1,0 +1,81 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00892",
+  "production_id": "CONVERSION-DX9EX-00892",
+  "event_id": "CONVERSION-DX9EX-00892-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00892",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_PERIPHERAL_EDGE_SNAP",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "e6ddbe60e8b47dd3aceae4d3b161f5c0be58d83a",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/hud_edge_transition.hpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/hud_edge_transition.hpp",
+    "vrhost/tests/hud_edge_transition_smoke.cpp",
+    "tools/verify_vr_hud_edge_transition.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00892.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_PERIPHERAL_EDGE_SNAP",
+    "goal": "Preserve smoothly responsive exact-producer gameplay HUD location/size as icons approach and pass the original source-space edge; avoid a discontinuous snap of binocular anchors/zoom while preserving native center and non-gameplay overlays.",
+    "scope_boundary": "Exact R84 R30 gameplay HUD peripheral source-space easing only; never change F11/ESC/+TIME/GOAL, world markers, SkyGlow, R26_SAFE, DX11 or DXVK.",
+    "trace_stages": [
+      "Canonical OutRunHudPeripheralText producers reach R84 R30 ScreenHud source-space anchor/size via OutRunVrHudEdge::PeripheralWeight and PeripheralAnchor.",
+      "The prior code returned full peripheral transform for |NDC|=1.20 then switched instantly to zero for |NDC|>1.20; anchors and sizing both used the same discontinuous weight.",
+      "A C1-continuous outgoing 1.00-1.20 envelope now returns smoothly to neutral; R33 draw and per-eye FOV remain unchanged."
+    ],
+    "subcomponents": [
+      "Retain original C1 entry over 0.35-0.60 and full plateau 0.60-1.00; create smooth outbound transition to exactly neutral by 1.20.",
+      "Verify positive/negative symmetric C++ source-space numeric cases, outgoing gradient bounds, native 4:3/16:9/21:9 entry and source mutation negatives.",
+      "Use exact-SHA R84 Active game/host/package, R26_SAFE, Domain and impacted HUD/Full Source Gates before marking build verified."
+    ],
+    "acceptance_items": [
+      {
+        "id": "hud_edge_visual_continuity",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "HUD source-space peripheral anchor and boost smoothly transition at both 1.0 and 1.2 NDC, without an abrupt 1.2 exit."
+      },
+      {
+        "id": "hud_edge_scope_preservation",
+        "category": "fallback_regression",
+        "expected_behavior": "Central/ordinary HUD, native/desktop baselines and non-HUD producers retain original routing."
+      },
+      {
+        "id": "hud_edge_exact_gates",
+        "category": "integrated_validation",
+        "expected_behavior": "Exact SHA R84 Active/Domain/affected HUD/Full Source passes, runtime gated on Quest3."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "hud_edge_visual_continuity": "SOURCE_IMPLEMENTED",
+    "hud_edge_scope_preservation": "SOURCE_UNCHANGED",
+    "hud_edge_exact_gates": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "At source HEAD, PeripheralWeight holds 1.0 to 1.20 inclusive and returns 0.0 for >1.20, while R30 applies this weight to both anchor and optical boost.",
+    "root_cause": "A discontinuous visibility cutoff in exact gameplay HUD peripheral motion rather than an optical FOV or per-eye pose error.",
+    "fix_evidence": "Replace cutoff with bounded C1 smooth outgoing envelope over 1.0..1.2; retain central/plateau behavior and strict nonfinite/outside fallback.",
+    "negative_test_evidence": "Extend portable C++ smoke and Python source/mutation validator with bidirectional outgoing sweep, boundary and exact neutral cases.",
+    "evidence_limits": "No physical Quest3/VDXR or game test; actual visible defect confirmation requires HMD runtime validation."
+  },
+  "runtime_evidence": "No physical Quest3/VDXR game execution in this task.",
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "result_commit_ci_skip": false,
+  "hold_reason": "EXACT_SHA_CI_PENDING"
+}

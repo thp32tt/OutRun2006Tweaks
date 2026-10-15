@@ -24,6 +24,32 @@ int main()
         if(!Near(PeripheralAnchor(.72f,.82f)*aspect,
                  PeripheralAnchor(.72f,.82f)*aspect)) return 2;
     }
+    // A HUD glyph returning past the 1.0 NDC source edge must ease back to
+    // its neutral anchor and size, not snap at the historical 1.20 cutoff.
+    for (int side : {-1, 1})
+    {
+        float lastWeight = 1.0f;
+        float lastAnchor = .82f;
+        for (int i = 1000; i <= 1200; ++i)
+        {
+            const float ndc = side * (i / 1000.0f);
+            const float weight = PeripheralWeight(ndc);
+            const float anchor = std::fabs(PeripheralAnchor(ndc, .82f));
+            if (weight > lastWeight + 0.00001f || weight < 0.0f ||
+                lastWeight - weight > 0.008f || anchor > lastAnchor + 0.00001f ||
+                lastAnchor - anchor > 0.007f)
+                return 11;
+            lastWeight = weight;
+            lastAnchor = anchor;
+        }
+        if (!Near(lastWeight, 0.f) || !Near(lastAnchor, 0.f))
+            return 12;
+    }
+    if(!Near(PeripheralWeight(1.0f),1.f) ||
+       !Near(PeripheralWeight(1.10f),.5f) ||
+       !Near(PeripheralWeight(1.20f),0.f) ||
+       !Near(PeripheralWeight(1.201f),0.f) ||
+       !Near(PeripheralWeight(-1.10f),.5f)) return 13;
     if(!Near(PeripheralAnchor(-.70f,.82f),-PeripheralAnchor(.70f,.82f))) return 3;
     if(!Near(PeripheralWeight(.35f),0.f) || !Near(PeripheralWeight(.60f),1.f) ||
        !Near(PeripheralWeight(.475f),.5f)) return 4;

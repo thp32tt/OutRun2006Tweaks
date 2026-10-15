@@ -11,8 +11,17 @@ namespace OutRunVrHudEdge
         if (!std::isfinite(ndc))
             return 0.0f;
         const float distance = std::fabs(ndc);
-        if (distance <= 0.35f || distance > 1.20f)
+        if (distance <= 0.35f || distance >= 1.20f)
             return 0.0f;
+        // The old >1.20 cutoff changed a full peripheral anchor/zoom to
+        // zero in one draw. Ease the exact gameplay-HUD owner back to neutral
+        // outside the visible source instead of snapping at the crop edge.
+        // Keep the central 0.35..0.60 entry and 0.60..1.00 core unchanged.
+        if (distance >= 1.0f)
+        {
+            const float t = (distance - 1.0f) / 0.20f;
+            return 1.0f - t * t * (3.0f - 2.0f * t);
+        }
         if (distance >= 0.60f)
             return 1.0f;
         const float t = (distance - 0.35f) / 0.25f;

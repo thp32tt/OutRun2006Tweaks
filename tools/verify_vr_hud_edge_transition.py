@@ -23,6 +23,10 @@ def check(s,h):
         assert token in s, token
     for token in (
         'distance <= 0.35f',  # guard the 0.35 NDC entry boundary against mutations
+        'distance >= 1.20f',
+        'const float t = (distance - 1.0f) / 0.20f;',
+        'return 1.0f - t * t * (3.0f - 2.0f * t);',
+        'if (distance >= 0.60f)',
         'const float t = (distance - 0.35f) / 0.25f;',
         'return t * t * (3.0f - 2.0f * t);',
         'if (weight == 0.0f)',
@@ -55,13 +59,19 @@ for original,wrong in (
     ('t * t * (3.0f - 2.0f * t)','t'),
     ('std::clamp(weight, 0.0f, 1.0f)','weight'),
     ('distance <= 0.35f','distance <= 0.60f'),
+    ('distance >= 1.20f','distance >= 1.00f'),
+    ('const float t = (distance - 1.0f) / 0.20f;', 'const float t = (distance - 1.0f) / 0.10f;'),
+    ('return 1.0f - t * t * (3.0f - 2.0f * t);', 'return 1.0f;'),
 ):
     assert original in hdr
     try: check(src,hdr.replace(original,wrong,1))
     except AssertionError: pass
     else: raise AssertionError("HUD helper mutation escaped: "+original)
 def weight(x):
-    if not math.isfinite(x) or abs(x)<=.35 or abs(x)>1.2: return 0.
+    if not math.isfinite(x) or abs(x)<=.35 or abs(x)>=1.2: return 0.
+    if abs(x)>=1.:
+        t=(abs(x)-1.)/.2
+        return 1.-t*t*(3.-2.*t)
     if abs(x)>=.60: return 1.
     t=(abs(x)-.35)/.25
     return t*t*(3-2*t)
@@ -78,6 +88,17 @@ for aspect in (4/3,16/9,21/9):
         prev_a,prev_b=a,b
     assert anchor(.72,.82)*aspect==anchor(.72,.82)*aspect
 assert anchor(float("nan"),.82)==0 and anchor(.2,.82)==0
+for direction in (-1,1):
+    previous_w,previous_a=1.,.82
+    for i in range(1000,1201):
+        w=weight(direction*i/1000.)
+        a=abs(anchor(direction*i/1000.,.82))
+        assert 0<=previous_w-w<=.0081 and 0<=previous_a-a<=.007
+        previous_w,previous_a=w,a
+    assert previous_w==0 and previous_a==0
+assert weight(1.0)==1. and abs(weight(1.1)-.5)<1e-6
+assert weight(1.2)==0. and weight(1.201)==0. and weight(-1.1)>.49
+assert 'PeripheralWeight(1.10f)' in smoke and 'PeripheralAnchor(ndc, .82f)' in smoke
 assert "4.0f/3.0f" in smoke and "16.0f/9.0f" in smoke and "21.0f/9.0f" in smoke
 assert "PeripheralAnchor(nan,.82f)" in smoke
 print("DX9Ex HUD edge continuity 4:3/16:9/21:9, 9 destructive mutations PASS")
