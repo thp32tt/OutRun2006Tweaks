@@ -66,11 +66,12 @@ int main() {
                 const auto& r=clipped.regions[i];
                 if(x>=r.left&&x<r.right&&y>=r.top&&y<r.bottom) covered=true;
             }
-            for(std::uint32_t c=0;c<4;++c)
+            for(std::uint32_t c=0;c<4;++c) {
                 assert(target[y*writePitch+x*4+c]==
                     (covered?source[y*readPitch+x*4+c]:0x31));
                 assert(published[y*writePitch+x*4+c]==
                     (covered?source[y*readPitch+x*4+c]:0x31));
+            }
         }
     for (std::uint32_t y=0;y<height;++y)
         for (std::uint32_t x=width*4;x<static_cast<std::uint32_t>(writePitch);++x)

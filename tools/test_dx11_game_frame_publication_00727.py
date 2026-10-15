@@ -46,7 +46,10 @@ for old, new in (
     ("game->UpdateSurface(", "/* no game backbuffer publication */ ("),
     ("GameNativeFrameUpload::copy_rows(", "/* no native pixel transfer */ ("),
 ):
-    mutant = CPP.replace(old, new, 1)
+    # Full-frame and multi-dirty publication each own an UpdateSurface call.
+    # Mutating one call is insufficient to prove publication was removed;
+    # disable both only for this specific negative test.
+    mutant = CPP.replace(old, new) if old == "game->UpdateSurface(" else CPP.replace(old, new, 1)
     assert mutant != CPP and not integrated(mutant, HDR), old
 for old, new in (
     ("fullMode || changedPixels != 0u", "changedPixels != 0u"),
