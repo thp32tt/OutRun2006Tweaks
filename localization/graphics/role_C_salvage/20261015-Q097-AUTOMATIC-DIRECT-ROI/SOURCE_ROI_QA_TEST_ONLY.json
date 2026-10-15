@@ -1,0 +1,79 @@
+{
+  "task_id": "OUTRUN-C-ROI-SOURCE-Q097-AUTOMATIC-20261015-2033",
+  "schema": "outrun-hd-text-roi-v1",
+  "status": "TEST_ONLY_SOURCE_READY",
+  "source_kind": "DIRECT_ORIGINAL_GITHUB_HD_DDS_NOT_TILES",
+  "source_branch": "korean-localization-recovery-20260928",
+  "dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+  "dds_git_blob_sha": "d488d1a0ccd71b0f38410ece0b90e530e2c8ff71",
+  "dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+  "source_full_png_sha256": "2ecc253ac9db49a9c1189f1f814d562a45462b660af94877ce1f66737cfe58af",
+  "source_full_dimensions": [
+    2048,
+    2048
+  ],
+  "dds_header_actual_dimensions": [
+    2048,
+    2048
+  ],
+  "dds_filename_dimension_suffix_is_legacy": true,
+  "pixel_exact_flipy_vs_original_dds": true,
+  "pixel_exact_vs_manual_full_reference_png": true,
+  "original_phrase": "Automatic",
+  "approved_translation": "자동",
+  "mapping": "Reviewed Q097 transcription (index 97); music, brand and Ferrari names excluded",
+  "native_bbox_xyxy": [
+    0,
+    170,
+    552,
+    296
+  ],
+  "glyph_effect_alpha_bbox_xyxy": [
+    6,
+    178,
+    543,
+    288
+  ],
+  "alpha_margin_pixels": {
+    "left": 6,
+    "right": 9,
+    "top": 8,
+    "bottom": 8
+  },
+  "alpha_positive_pixels": 48080,
+  "two_pixel_crop_border_alpha": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "native_dimensions": [
+    552,
+    126
+  ],
+  "native_png_sha256": "0cb0cdd7150d9caaaed9a273afdb609d910b00e9ad144aeb87efcac79b4d0454",
+  "upscale": 4,
+  "imagegen_input_dimensions": [
+    2208,
+    504
+  ],
+  "imagegen_input_sha256": "8a2c9028672c1497fe2d71af3ccbc5039f2050e777586424ce27734678c95263",
+  "extractor_repo_blob_sha": "84f19692fd757ef688e6aacb2107815626c4151e",
+  "isolation": "alpha",
+  "alpha_isolation_check": "PASS",
+  "image_generation": "NOT_RUN",
+  "ui_cell_uv_safe_fit": "NOT_TESTED_REQUIRE_MEASUREMENT",
+  "composition_policy": "Preserve aspect ratio; localized width may differ, but text/effects must remain within measured UI-cell/UV safe area and avoid protected art; no inferred clean plate",
+  "clean_plate": "NOT_RUN",
+  "dds_composition": "NOT_RUN",
+  "independent_C1_QA": "NOT_RUN",
+  "C3_QA": "NOT_RUN",
+  "game_validation": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "AB_queue_state": "UNTOUCHED",
+  "legacy_986_tiles_input": "FORBIDDEN_NOT_USED",
+  "legacy_artifacts": "PRESERVED",
+  "roi_new_queue": "NOT_ENABLED",
+  "portainer_manual_deployment": "NOT_RUN",
+  "production_dispatch": "DISABLED"
+}

@@ -1,0 +1,27 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "assets": [
+    {
+      "queue_id": "Q097",
+      "source_png": "Q097_411827E_FULL_ORIGINAL_FLIPY_2048.png",
+      "source_sha256": "2ecc253ac9db49a9c1189f1f814d562a45462b660af94877ce1f66737cfe58af",
+      "source_kind": "FULL_HD_PNG_FROM_DIRECT_GITHUB_DDS_PIXEL_EXACT_FLIPY",
+      "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+      "regions": [
+        {
+          "id": "automatic",
+          "english": "Automatic",
+          "korean": "자동",
+          "bbox": [
+            0,
+            170,
+            552,
+            296
+          ],
+          "isolation": "alpha",
+          "scale": 4
+        }
+      ]
+    }
+  ]
+}
