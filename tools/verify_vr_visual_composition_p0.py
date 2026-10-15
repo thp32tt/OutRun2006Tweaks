@@ -188,10 +188,14 @@ def verify_goal_helper_source_variants(ui_source, sem_source, r30_source):
 
 verify_goal_helper_source_variants(ui, sem, r30)
 for name, corrupt in (
+    # Mutate the actual GOAL helper's ternary, not a preceding exact
+    # producer whitelist. The latter may legitimately name both tokens.
     ('BEA5A helper source lost', ui.replace(
-        'ProducerToken::GoalTime020', 'ProducerToken::GoalTimeHelper', 1)),
+        '? OutRunVR::GameSemantic::ProducerToken::GoalTime020\n            :',
+        '? OutRunVR::GameSemantic::ProducerToken::GoalTimeHelper\n            :', 1)),
     ('BEA5F wrongly aliased to first helper', ui.replace(
-        'ProducerToken::GoalTime150', 'ProducerToken::GoalTime020', 1)),
+        '? OutRunVR::GameSemantic::ProducerToken::GoalTime150\n                :',
+        '? OutRunVR::GameSemantic::ProducerToken::GoalTime020\n                :', 1)),
 ):
     if corrupt == ui:
         raise SystemExit('GOAL source fault not injected: ' + name)
