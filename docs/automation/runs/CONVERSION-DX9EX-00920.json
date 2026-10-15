@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "NEEDS_VALIDATION",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "3912f82f983ba2a818587cd38b0075e3a31bf53d",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "e5dd3c6f96793c010bcfeec52dc218beec2942dd",
+  "validation_bearing_result_sha": "e5dd3c6f96793c010bcfeec52dc218beec2942dd",
   "source_paths": [
     "src/vr/game/lens_centre_partial_wvp.hpp",
     "src/vr/game/outrun_renderer.cpp"
@@ -67,14 +67,57 @@
     ]
   },
   "acceptance_results": {
-    "central_sun_per_draw_source_provenance": "SOURCE_IMPLEMENTED_PENDING_CI",
-    "lens_optics_fallback_and_outer_discs": "SOURCE_IMPLEMENTED_PENDING_CI",
-    "exact_sha_active_source_hud_gate": "PENDING_EXACT_SHA"
+    "central_sun_per_draw_source_provenance": "PASS_BUILD",
+    "lens_optics_fallback_and_outer_discs": "PASS_BUILD",
+    "exact_sha_active_source_hud_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "PartialWvpUpload keyed accumulated c64 rows by producer call/pose/shader/device but not by physical top-level Draw serial or overlapping row revisions. Nested draws can therefore create a false complete original centre matrix under unchanged source identity.",
     "evidence": "R23 SetVertexShaderConstantFDest records a complete split c64 result only when Append covers four rows; R84 R30 trusts that source evidence for stereo; independent R29 physical Draw serial already exists.",
     "next_action": "Run changed-area portable C++ regression then verify one exact-SHA GitHub Actions gate. HMD central dot/outer rings not yet physically observed."
   },
-  "score_delta_this_attempt": 0
+  "score_delta_this_attempt": 0,
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "material_sha": "e5dd3c6f96793c010bcfeec52dc218beec2942dd",
+    "validation_bearing_result_sha": "e5dd3c6f96793c010bcfeec52dc218beec2942dd",
+    "required_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38816725119,
+        "sha": "e5dd3c6f96793c010bcfeec52dc218beec2942dd",
+        "conclusion": "success",
+        "jobs": "5/5"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38816724962,
+        "sha": "e5dd3c6f96793c010bcfeec52dc218beec2942dd",
+        "conclusion": "success",
+        "jobs": "1/1"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38816724924,
+        "sha": "e5dd3c6f96793c010bcfeec52dc218beec2942dd",
+        "conclusion": "success",
+        "jobs": "3/3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38816724934,
+        "sha": "e5dd3c6f96793c010bcfeec52dc218beec2942dd",
+        "conclusion": "success",
+        "jobs": "2/2"
+      }
+    ]
+  },
+  "next_action": "Automated Windows game, host, package and mandatory exact-SHA gates PASS; Quest3 VDXR lens optic result NEED_HMD_TEST.",
+  "bookkeeping": {
+    "commit_kind": "C6_RESULT_ONLY",
+    "skip_ci": true,
+    "material_result_sha": "e5dd3c6f96793c010bcfeec52dc218beec2942dd",
+    "validation_bearing_result_sha": "e5dd3c6f96793c010bcfeec52dc218beec2942dd",
+    "no_additional_score": true
+  }
 }
