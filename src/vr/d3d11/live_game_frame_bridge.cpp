@@ -5539,13 +5539,43 @@ void observe_game_surface_mutation(
 
 
 
+// Validate the actual main depth surface and the native D32 view *before*
+// issuing either half of a combined TARGET|Z Clear. The original game D3D9
+// Clear always runs first and remains the authoritative fallback.
+bool native_game_partial_depth_ready(
+    State& s, IDirect3DDevice9* game,
+    std::uint32_t width, std::uint32_t height) noexcept {
+    if (!s.frameBatch.depthReady || s.frameBatch.depthClearPending ||
+        !s.diagnosticDepthView || !s.backend.context() ||
+        s.nativeWidth != width || s.nativeHeight != height)
+        return false;
+    ComPtr<IDirect3DSurface9> depth;
+    ComPtr<IUnknown> depthIdentity;
+    D3DSURFACE_DESC desc{};
+    if (FAILED(game->GetDepthStencilSurface(depth.GetAddressOf())) ||
+        !depth || FAILED(depth->GetDesc(&desc)) ||
+        FAILED(depth.As(&depthIdentity)) || !depthIdentity ||
+        desc.Width != width || desc.Height != height ||
+        desc.MultiSampleType != D3DMULTISAMPLE_NONE ||
+        !s.clearColor.main_depth_still_bound(
+            reinterpret_cast<std::uintptr_t>(depthIdentity.Get())))
+        return false;
+    D3D11_DEPTH_STENCIL_VIEW_DESC nativeDesc{};
+    s.diagnosticDepthView->GetDesc(&nativeDesc);
+    return nativeDesc.Format == DXGI_FORMAT_D32_FLOAT;
+}
+
 bool preserve_game_partial_target_clear(
     IDirect3DDevice9* game, DWORD count, const D3DRECT* rects,
-    DWORD flags, D3DCOLOR color) noexcept {
-    // Called only AFTER successful original D3D9 Clear; no synthetic Clears.
-    // Do not silently translate depth, stencil, MRT or foreign game surfaces.
+    DWORD flags, D3DCOLOR color, float z) noexcept {
+    // Called only AFTER successful original D3D9 Clear. The same native
+    // region may update RTV and the live depth-only DSV; unproved Z writes
+    // must not leave half of a combined color/depth Clear applied.
+    const bool clearZ = (flags & D3DCLEAR_ZBUFFER) != 0u;
     if (!diagnostic_enabled() || !env_full_game_opt_in() || !game ||
-        flags != D3DCLEAR_TARGET ||
+        (flags != D3DCLEAR_TARGET &&
+         flags != (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER)) ||
+        (clearZ && !(z >= 0.0f && z <= 1.0f)) ||
         count > GameNativeSourceMutation::kMaxPartialTargetClearRects ||
         (count != 0u && !rects)) return false;
     try {
@@ -5622,8 +5652,13 @@ bool preserve_game_partial_target_clear(
                 static_cast<LONG>(clipped.right),
                 static_cast<LONG>(clipped.bottom)};
         }
-        // An entirely off-viewport successful D3D9 Clear did not touch the
-        // original frame. Keep the existing native RTV/DSV and Draw ordinals.
+        // Check the D3D9 main Z owner, extents and native D32 attachment
+        // before changing even the color RTV of a combined TARGET|Z Clear.
+        if (clearZ && !native_game_partial_depth_ready(
+                s, game, backbufferDesc.Width, backbufferDesc.Height))
+            return false;
+        // An entirely off-viewport successful D3D9 Clear wrote neither
+        // color nor Z. Retain the native frame and exact Draw ordinals.
         if (nativeRegionCount == 0u) return true;
         ComPtr<ID3D11DeviceContext1> ctx1;
         if (FAILED(s.backend.context()->QueryInterface(
@@ -5639,7 +5674,14 @@ bool preserve_game_partial_target_clear(
         };
         ctx1->ClearView(s.backend.color_rtv(), rgba, regions.data(),
                         nativeRegionCount);
-        // No Draw ordinal, DSV, original D3D9 Present, FFB or SkyGlow change.
+        if (clearZ) {
+            // D32_FLOAT has no stencil component, which is required for
+            // ClearView's depth-rectangle support. Preserve all other Z.
+            const float depthValue[4] = {z, 0.0f, 0.0f, 0.0f};
+            ctx1->ClearView(s.diagnosticDepthView.Get(), depthValue,
+                            regions.data(), nativeRegionCount);
+        }
+        // Neither command consumes a game Draw ordinal or alters D3D9 input.
         return true;
     } catch (...) { return false; }
 }
@@ -5817,7 +5859,9 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
         if (FAILED(depth.As(&depthIdentity)) || !depthIdentity) return false;
         const bool sameMainDepthStencil = s.clearColor.main_depth_still_bound(
             reinterpret_cast<std::uintptr_t>(depthIdentity.Get()));
-        if (!sameMainDepthStencil || (clearZ && !compatibleCoverage))
+        const bool partialDepth = clearZ && !coversDepth;
+        if (!sameMainDepthStencil ||
+            (clearZ && !compatibleCoverage && !partialDepth))
             return false;
         if (clearStencil &&
             !GameNativeMainStencilClear::may_ignore(
@@ -5826,6 +5870,56 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
                 sameMainDepthStencil, compatibleCoverage,
                 !s.frameBatch.stopped))
             return false;
+        // D3D9 supports viewport-scissored Z Clears during a live menu/race
+        // frame. D3D11 ClearDepthStencilView would erase *all* prior depth:
+        // use D3D11.1 ClearView on our D32_FLOAT-only DSV instead. Verify
+        // every rectangle before mutating the GPU. No native depth owner or
+        // D3D11.0-only context means unchanged DX9Ex and batch retirement.
+        if (partialDepth) {
+            if (clearStencil || !continuingFullNativeDraw ||
+                !GameNativeSourceMutation::mirrors_partial_depth_clear(
+                    env_full_game_opt_in(), sameMainDepthStencil,
+                    s.pending && !s.frameBatch.stopped &&
+                        s.frameBatch.submitted != 0u,
+                    s.frameBatch.depthReady,
+                    native_game_partial_depth_ready(s, game, bbDesc.Width, bbDesc.Height),
+                    s.backend.context() != nullptr) ||
+                count > GameNativeSourceMutation::kMaxPartialTargetClearRects ||
+                (count != 0u && !rects))
+                return false;
+            std::array<D3D11_RECT,
+                GameNativeSourceMutation::kMaxPartialTargetClearRects> regions{};
+            const std::uint32_t n = count ? count : 1u;
+            std::uint32_t used = 0u;
+            for (std::uint32_t i = 0u; i < n; ++i) {
+                const std::int64_t l = count ? rects[i].x1 : vp.X;
+                const std::int64_t t = count ? rects[i].y1 : vp.Y;
+                const std::int64_t r = count ? rects[i].x2 :
+                    static_cast<std::int64_t>(vp.X) + vp.Width;
+                const std::int64_t b = count ? rects[i].y2 :
+                    static_cast<std::int64_t>(vp.Y) + vp.Height;
+                GameNativeSourceMutation::TargetClearRect clipped{};
+                const auto kind = GameNativeSourceMutation::classify_target_clear_rect(
+                    l, t, r, b, vp.X, vp.Y, vp.Width, vp.Height,
+                    bbDesc.Width, bbDesc.Height, clipped);
+                if (kind == GameNativeSourceMutation::TargetClearClip::Invalid)
+                    return false;
+                if (kind == GameNativeSourceMutation::TargetClearClip::Empty)
+                    continue;
+                regions[used++] = {
+                    static_cast<LONG>(clipped.left), static_cast<LONG>(clipped.top),
+                    static_cast<LONG>(clipped.right), static_cast<LONG>(clipped.bottom)};
+            }
+            if (used == 0u) return true;
+            ComPtr<ID3D11DeviceContext1> context1;
+            if (FAILED(s.backend.context()->QueryInterface(
+                    IID_PPV_ARGS(context1.GetAddressOf()))) || !context1)
+                return false;
+            const float depthValue[4] = {z, 0.0f, 0.0f, 0.0f};
+            context1->ClearView(s.diagnosticDepthView.Get(), depthValue,
+                                regions.data(), used);
+            return true; // Keep RTV, previously drawn Z and source ordinals.
+        }
         // Prove the same canonical D3D9 backbuffer/color Clear before
         // admitting a separate full Z Clear with zero native game Draws.
         // This covers menu->vehicle->race startup where TARGET and ZBUFFER

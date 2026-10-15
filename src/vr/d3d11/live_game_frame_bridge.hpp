@@ -62,7 +62,7 @@ void observe_game_surface_mutation(IDirect3DDevice9* gameDevice,
 // Unknown/unsupported writes still invalidate and retain original D3D9 output.
 bool preserve_game_partial_target_clear(
     IDirect3DDevice9* gameDevice, DWORD count, const D3DRECT* rects,
-    DWORD flags, D3DCOLOR color) noexcept;
+    DWORD flags, D3DCOLOR color, float z) noexcept;
 bool preserve_game_color_fill(IDirect3DDevice9* gameDevice,
                                    IDirect3DSurface9* destination,
                                    const RECT* rect, D3DCOLOR color,

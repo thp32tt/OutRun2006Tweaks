@@ -557,7 +557,7 @@ namespace OutRunVRStereo
 				if (SUCCEEDED(result)) {
                     const bool nativePartialClear =
                         outrun::vr::dx11::live_game_frame::preserve_game_partial_target_clear(
-                            device, count, rects, flags, color);
+                            device, count, rects, flags, color, z);
 					// Zero-flags Clears do not change game color/depth/stencil.
 					if (!nativePartialClear &&
                         (flags & (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |

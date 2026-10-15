@@ -45,7 +45,18 @@ struct GameNativeSourceMutation {
                targetReady && boundedRect;
     }
 
-    // Exact D3D9 TARGET-only Clear region replay in an already live DX11
+    // Only a live full-frame Draw with matching canonical Z and an allocated
+    // depth-only D32 native DSV may replay clipped D3D9 Z rectangles. Unlike
+    // ClearDepthStencilView, D3D11.1 ClearView accepts bounded rectangles on
+    // depth-only resources. Missing depth/owner/context must preserve DX9Ex.
+    [[nodiscard]] static constexpr bool mirrors_partial_depth_clear(
+        bool full, bool sameMainDepth, bool activeBatch,
+        bool nativeDepthReady, bool d32DepthView, bool context1Ready) noexcept {
+        return full && sameMainDepth && activeBatch && nativeDepthReady &&
+               d32DepthView && context1Ready;
+    }
+    // Exact D3D9 TARGET and optional simultaneous Z region replay in an
+    // already live DX11 menu/car/race Draw batch.
     // menu/car/race Draw batch. D3D11.1 ClearView updates only clipped pixels.
     static constexpr std::uint32_t kMaxPartialTargetClearRects = 32u;
     struct TargetClearRect { std::int64_t left{}, top{}, right{}, bottom{}; };

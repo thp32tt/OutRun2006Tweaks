@@ -180,6 +180,42 @@ constexpr bool native_target_clear_disjoint_batch_regression() {
 }
 static_assert(native_target_clear_disjoint_batch_regression());
 
+
+constexpr bool native_live_partial_depth_clear_regression() {
+    using M = GameNativeSourceMutation;
+    using Clip = M::TargetClearClip;
+    // Live menu/race D32 depth can preserve clipped Z and color+Z regions.
+    if (!M::mirrors_partial_depth_clear(true,true,true,true,true,true) ||
+        M::mirrors_partial_depth_clear(false,true,true,true,true,true) ||
+        M::mirrors_partial_depth_clear(true,false,true,true,true,true) ||
+        M::mirrors_partial_depth_clear(true,true,false,true,true,true) ||
+        M::mirrors_partial_depth_clear(true,true,true,false,true,true) ||
+        M::mirrors_partial_depth_clear(true,true,true,true,false,true) ||
+        M::mirrors_partial_depth_clear(true,true,true,true,true,false))
+        return false;
+    M::TargetClearRect rect{};
+    if (M::classify_target_clear_rect(20, 15, 90, 90,
+        10, 10, 100, 80, 640, 480, rect) != Clip::Pixels ||
+        rect.left != 20 || rect.top != 15 ||
+        rect.right != 90 || rect.bottom != 90)
+        return false;
+    if (M::classify_target_clear_rect(200, 200, 220, 250,
+        10, 10, 100, 80, 640, 480, rect) != Clip::Empty ||
+        M::classify_target_clear_rect(40, 50, 30, 70,
+        10, 10, 100, 80, 640, 480, rect) != Clip::Invalid)
+        return false;
+    GameNativeFrameBatch scene{};
+    scene.succeeded(true);
+    scene.record_source_draw(0u);
+    const auto before = scene.submitted;
+    // Partial Z replaces a region of an existing DSV; no whole depth reset.
+    return scene.depthReady && scene.accepts_full(1u) &&
+        M::mirrors_partial_depth_clear(true,true,scene.publishable_full(true,1u),
+                                       scene.depthReady,true,true) &&
+        scene.submitted == before && scene.publishable_full(true,1u);
+}
+static_assert(native_live_partial_depth_clear_regression());
+
 using outrun::vr::dx11::live_game_frame::GameNativePresentRegion;
 int main() {
     GameNativeFrameBatch b{};
