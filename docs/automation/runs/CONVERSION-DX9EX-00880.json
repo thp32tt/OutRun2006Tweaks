@@ -53,8 +53,8 @@
     "docs/automation/runs/CONVERSION-DX9EX-00880.json"
   ],
   "status": "BUILD_PENDING",
-  "phase": "C2_IMPLEMENT",
-  "checkpoint": "C2_MATERIAL_RESULT",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_RETRY_FIX",
   "automation_validation": "PENDING",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
@@ -65,7 +65,7 @@
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "EXACT_SHA_CI_PENDING",
+  "hold_reason": "EXACT_SHA_CI_RETRY",
   "material_result_sha": null,
   "validation_bearing_result_sha": null,
   "diagnosis": {
@@ -84,8 +84,11 @@
     "eye_ownership": "The original 2D sprite coordinates change only before R84 physical stereo handling; exact per-eye renderer/hmd optical acceptance remains separate."
   },
   "ci_evidence": {
-    "status": "PENDING",
-    "exact_sha": null
+    "status": "REVALIDATION_PENDING",
+    "failed_initial_sha": "5acb9bd35f485f956f5f979d1eeecd1ef4bc0309",
+    "failed_run": 38692708718,
+    "failed_job": "policy",
+    "reason": "Legacy mutation test false-negative: new optional branch repeated same complete-vector assignment literal; new branch now uses equivalent syntactically distinct local reference."
   },
   "runtime_evidence": "No Quest3/VDXR HMD session performed."
 }
