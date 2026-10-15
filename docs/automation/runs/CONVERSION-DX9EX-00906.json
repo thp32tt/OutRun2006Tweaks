@@ -1,0 +1,92 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00906",
+  "production_id": "CONVERSION-DX9EX-00906",
+  "event_id": "CONVERSION-DX9EX-00906-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00906",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:STARTUP:LIVE_XR_EYE_SOURCE",
+  "feature_class": "CRITICAL_BLOCKER",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "phase": "C2_IMPLEMENT",
+  "checkpoint": "C2_SOURCE_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "71880b1c929786e19a8498e4b02ca2d7b0c677cc",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_misc.cpp",
+    "src/vr/d3d9/ex_device_upgrade.cpp",
+    "src/vr/ipc/xr_eye_extent.hpp",
+    "src/vr/ipc/host_process_liveness.hpp"
+  ],
+  "changed_files": [
+    "src/vr/ipc/xr_eye_extent.hpp",
+    "src/hooks_misc.cpp",
+    "src/vr/d3d9/ex_device_upgrade.cpp",
+    "vrhost/tests/xr_eye_extent_smoke.cpp",
+    "src/vr/ipc/host_process_liveness.hpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:STARTUP:LIVE_XR_EYE_SOURCE",
+    "goal": "Prevent dead OpenXR host persistent IPC state from changing OutRun original menu/game pixels while D3D9Ex CreateDevice retains a different stereo source size.",
+    "scope_boundary": "Opt-in VRAutoRenderResolution only: game config through R84 CreateDevice, preserving explicit manual/CLI sizes, R26_SAFE rollback, original input/FFB/SkyGlow, DX11 and DXVK freeze.",
+    "special_work_evidence": "Verified source discrepancy on GitHub head: hooks_misc.cpp trusts nonzero hostPid and persistent HostAlive flag without verifying that the process still exists, but ex_device_upgrade.cpp refuses dead host PID at D3D9Ex CreateDevice. A crashed host leaves a mapping with stale XR resolution; early menu gets wrong aspect and late source stays original.",
+    "trace_stages": [
+      "Game config reads a persistent HostState.v3 eye extent after host launch request but before original menu resources are authored.",
+      "Shared nonblocking Win32 process-liveness and binocular coherent extent check now admits XR pixels at game-config and CreateDevice boundaries.",
+      "Valid XR source proceeds to R84 independent R29-R33 stereo renderer and per-eye OpenXR host, with desktop/manual and classic D3D9 fallback retained."
+    ],
+    "subcomponents": [
+      "Repair early menu/game original screen_resolution assignment with real OS host PID and binocular eye extent ownership.",
+      "Preserve late D3D9Ex device-caps admission using the same helper and validate dead PID, cleared flags, malformed pixel pair, good paired PID regressions."
+    ],
+    "acceptance_items": [
+      {
+        "id": "startup_menu",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original game config/menu and XR eye-source selection",
+        "expected_behavior": "Dead host process cannot resize OutRun screen_resolution; a live OS host and coherent binocular XR pixels can."
+      },
+      {
+        "id": "device_rollback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9Ex CreateDevice and non-VR/CLI/manual fallback",
+        "expected_behavior": "Live PID and coherent pixels are required at both boundaries and invalid XR data leaves original source and classic fallback intact."
+      },
+      {
+        "id": "integration",
+        "category": "integrated_validation",
+        "behavior_area": "Windows game R84 x86 and x64 OpenXR host package",
+        "expected_behavior": "All exact-SHA required DX9Ex Active, Domain, source impact gates pass; Quest3 hardware stays untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "startup_menu": "PENDING_EXACT_SHA_CI",
+    "device_rollback": "PENDING_EXACT_SHA_CI",
+    "integration": "PENDING_EXACT_SHA_CI"
+  },
+  "diagnosis": {
+    "observed_defect": "Proven inconsistent source configuration after stale persistent host flags; no HMD repro claimed.",
+    "source_trace": [
+      "Game INI uses persistent HostState without OS liveness",
+      "Original menu screen_resolution changed before CreateDevice",
+      "D3D9Ex CreateDevice separately rejects dead PID resulting in inconsistent native source."
+    ],
+    "alternatives_rejected": [
+      "Explicit CLI/manual override already handled, and DXVK/FFB/SkyGlow are unrelated to this source configuration mismatch."
+    ],
+    "original_evidence": "Source-confirmed mismatch in GitHub at 2026-10-16, independent of any Quest3 optical claim."
+  },
+  "ci_evidence": {
+    "status": "PENDING"
+  },
+  "score_delta_this_attempt": 0,
+  "score_once": false
+}

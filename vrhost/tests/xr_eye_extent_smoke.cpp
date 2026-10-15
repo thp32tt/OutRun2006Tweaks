@@ -35,6 +35,31 @@ int main(int argc, char** argv)
     REQUIRE(!Valid(ResolveGame(nominal,{2048,4096})));
     REQUIRE(!Valid(ResolveGame({0,2284},{4096,4096})));
     REQUIRE(!Valid(ResolveGame({9000,1},{10000,10000})));
+    // Early config and late CreateDevice must agree on live XR ownership.
+    unsigned liveChecks = 0;
+    const auto pidProbe = [&](std::uint32_t pid) noexcept {
+        ++liveChecks;
+        return pid == 1234u;
+    };
+    REQUIRE(Equal(ResolveStartupForLiveHost(
+        {2496,2688}, {2496,2688}, 1234u, true, pidProbe),
+        {2496,2688}));
+    REQUIRE(!Valid(ResolveStartupForLiveHost(
+        {2496,2688}, {2496,2688}, 2222u, true, pidProbe)));
+    REQUIRE(liveChecks == 2);
+    REQUIRE(!Valid(ResolveStartupForLiveHost(
+        {2496,2688}, {2496,2688}, 1234u, false, pidProbe)));
+    REQUIRE(!Valid(ResolveStartupForLiveHost(
+        {2496,2688}, {2496,2688}, 0u, true, pidProbe)));
+    REQUIRE(!Valid(ResolveStartupForLiveHost(
+        {2496,2688}, {2048,2400}, 1234u, true, pidProbe)));
+    REQUIRE(!Valid(ResolveStartupForLiveHost(
+        {0,2688}, {2496,2688}, 1234u, true, pidProbe)));
+    REQUIRE(liveChecks == 2); // no handle acquisition on invalid pixels
+    REQUIRE(Equal(ResolveStartupForLiveHost(
+        {1920,1080}, {1920,1080}, 1234u, true, pidProbe),
+        {1920,1080}));
+    REQUIRE(liveChecks == 3);
     Generation generation;
     REQUIRE(generation.NeedsAllocation(nominal));
     REQUIRE(!generation.Matches(nominal));

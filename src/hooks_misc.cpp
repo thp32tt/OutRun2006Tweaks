@@ -15,6 +15,7 @@
 #include <wincrypt.h>
 #include "vr/ipc/host_state_v3_reader.hpp"
 #include "vr/ipc/xr_eye_extent.hpp"
+#include "vr/ipc/host_process_liveness.hpp"
 
 namespace OutRunVR { void RequestVRHostStartup() noexcept; }
 
@@ -850,12 +851,16 @@ namespace
         OutRunVR::RequestVRHostStartup();
         OutRunVR::IpcV3::HostStateReader reader;
         OutRunVR::IpcV3::HostState host{};
-        if (reader.Read(host) && host.hostPid != 0 &&
-            (host.flags & OutRunVR::IpcV3::HostAlive) != 0)
+        if (reader.Read(host))
         {
-            const auto extent = OutRunVR::EyeExtent::ResolveStartup(
+            // A crashed host can leave HostAlive and dimensions in shared
+            // memory. Never distort the menu before a valid Ex source exists.
+            const auto extent = OutRunVR::EyeExtent::ResolveStartupForLiveHost(
                 {host.recommendedWidth[0], host.recommendedHeight[0]},
-                {host.recommendedWidth[1], host.recommendedHeight[1]});
+                {host.recommendedWidth[1], host.recommendedHeight[1]},
+                host.hostPid,
+                (host.flags & OutRunVR::IpcV3::HostAlive) != 0,
+                OutRunVR::HostProcess::IsAlive);
             if (OutRunVR::EyeExtent::Valid(extent))
             {
                 Game::screen_resolution->x = static_cast<int>(extent.width);

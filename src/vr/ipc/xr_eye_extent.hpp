@@ -55,6 +55,21 @@ namespace OutRunVR::EyeExtent
             return {};
         return left;
     }
+    // Persistent HostState can retain HostAlive after a host crash. Both
+    // original-game config and R84 D3D9Ex CreateDevice must admit an XR eye
+    // source only when the same OS host PID is still running (no wait).
+    template <typename LivePidProbe>
+    inline Size ResolveStartupForLiveHost(
+        Size left, Size right, std::uint32_t hostPid, bool flaggedAlive,
+        LivePidProbe&& livePidProbe) noexcept
+    {
+        if (!flaggedAlive || hostPid == 0)
+            return {};
+        const Size extent = ResolveStartup(left, right);
+        if (!Valid(extent) || !livePidProbe(hostPid))
+            return {};
+        return extent;
+    }
     class Generation
     {
         Size active_{};

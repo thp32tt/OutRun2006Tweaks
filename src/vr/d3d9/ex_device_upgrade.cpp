@@ -21,6 +21,7 @@
 #include "game_addrs.hpp"
 #include "vr/ipc/host_state_v3_reader.hpp"
 #include "vr/ipc/xr_eye_extent.hpp"
+#include "vr/ipc/host_process_liveness.hpp"
 
 namespace Settings
 {
@@ -81,19 +82,18 @@ namespace OutRunVRD3D9ExUpgrade
 
             OutRunVR::IpcV3::HostStateReader reader;
             OutRunVR::IpcV3::HostState host{};
-            if (!reader.Read(host) || host.hostPid == 0 ||
-                (host.flags & OutRunVR::IpcV3::HostAlive) == 0)
+            if (!reader.Read(host))
                 return {};
-            HANDLE process = OpenProcess(SYNCHRONIZE, FALSE, host.hostPid);
-            if (!process)
-                return {};
-            const DWORD status = WaitForSingleObject(process, 0);
-            CloseHandle(process);
-            if (status != WAIT_TIMEOUT)
-                return {};
-            const auto extent = OutRunVR::EyeExtent::ResolveStartup(
+            // Identical zero-wait admission at menu config and device init.
+            // Keep the additional GPU caps check only at CreateDevice.
+            const auto extent = OutRunVR::EyeExtent::ResolveStartupForLiveHost(
                 {host.recommendedWidth[0], host.recommendedHeight[0]},
-                {host.recommendedWidth[1], host.recommendedHeight[1]});
+                {host.recommendedWidth[1], host.recommendedHeight[1]},
+                host.hostPid,
+                (host.flags & OutRunVR::IpcV3::HostAlive) != 0,
+                OutRunVR::HostProcess::IsAlive);
+            if (!OutRunVR::EyeExtent::Valid(extent))
+                return {};
             D3DCAPS9 caps{};
             if (FAILED(ex->GetDeviceCaps(adapter, type, &caps)))
                 return {};
