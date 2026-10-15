@@ -1,0 +1,65 @@
+{
+  "schema": "outrun-hd-text-roi-source-qa-v1",
+  "TASK_ID": "OUTRUN-C-ROI-SOURCE-Q095-ENTRY-CLOSED-20261015-2103",
+  "queue_id": "Q095",
+  "region_id": "entry_has_been_closed",
+  "platform": "PC",
+  "source_dds_path": "localization/validation/binary_compare/pairs/37759842/original/37759842_1024x1024.dds",
+  "source_dds_sha256": "ec69c95e638f6ba1ef2c23db173462adb26ad0d10caed28f1c83b7d1d15658f0",
+  "source_dds_dimensions": [
+    1024,
+    1024
+  ],
+  "source_dds_format": "RGBA32_uncompressed",
+  "source_png_sha256": "8b78a092b5ca82276076cc5d99b05afd0831651ae2d4afbbcf7486f4693fa7c9",
+  "source_pixel_equal_direct_dds_vertical_flip": true,
+  "native_crop_pixel_equal_source": true,
+  "xyxy": [
+    403,
+    183,
+    842,
+    239
+  ],
+  "english": "Entry has been closed.",
+  "korean": "참가 접수가 종료되었습니다.",
+  "alpha_bbox_xyxy": [
+    411,
+    188,
+    828,
+    233
+  ],
+  "alpha_nonzero_pixels": 12786,
+  "alpha_margin_left_top_right_bottom": [
+    8,
+    5,
+    14,
+    6
+  ],
+  "border_2px_nonzero_counts_top_bottom_left_right": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "source_roi_native_sha256": "f8c3cdcbc862b36403b8af802c4b940c3af60e751c49a1284393f1aa816dac2e",
+  "imagegen_input_4x_sha256": "86d657659b1f678049d198a818a49de5fa9dba005a88a74b277099dc88bc126c",
+  "upscale": 4,
+  "imagegen_png_dimensions": [
+    1756,
+    224
+  ],
+  "old_tiles_used": false,
+  "imagegen_called": false,
+  "ab_state_modified": false,
+  "source_integrity": "PASS_TEST_ONLY",
+  "text_visual_review": "SINGLE_COMPLETE_PHRASE_NO_ADJACENT_TEXT",
+  "source_isolation": "ALPHA",
+  "clean_plate": "NOT_ATTEMPTED",
+  "korean_output": "NOT_GENERATED",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "DDS_COMPOSE": "NOT_RUN",
+  "USER_GAME": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "TEST_ONLY"
+}
