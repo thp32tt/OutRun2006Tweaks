@@ -13,15 +13,18 @@ assert "ComPtr<ID3D11Buffer> fullGameIndexUpload;" in head
 assert "s.fullGameVertexUpload.Reset();" in head
 assert "s.fullGameIndexUpload.Reset();" in head
 assert "bool ensure_full_game_upload_buffer(" in head
-assert "desc.Usage = D3D11_USAGE_DEFAULT;" in head
+assert "desc.Usage = D3D11_USAGE_DYNAMIC;" in head
+assert "desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;" in head
+assert "context->Map(buffer, 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mapped)" in head
+assert "context->Unmap(buffer, 0u);" in head
 assert "if (env_full_game_opt_in()) {" in start
 for token in (
     "s.fullGameVertexCapacity, vertexSize,",
     "s.fullGameIndexCapacity, indexSize,",
-    "ctx->UpdateSubresource(s.fullGameVertexUpload.Get(), 0u,",
-    "ctx->UpdateSubresource(s.fullGameIndexUpload.Get(), 0u,",
-    "const D3D11_BOX vertexRange{0u, 0u, 0u, vertexSize, 1u, 1u};",
-    "const D3D11_BOX indexRange{0u, 0u, 0u, indexSize, 1u, 1u};",
+    "upload_full_game_stream(ctx, s.fullGameVertexUpload.Get(),",
+    "upload_full_game_stream(ctx, s.fullGameIndexUpload.Get(),",
+    "s.fullGameVertexCapacity,\n                                     vertices.data(), vertexSize)",
+    "s.fullGameIndexCapacity,\n                                         indices, indexSize)",
     "if (FAILED(dev->GetDeviceRemovedReason())) return false;",
     "bd.Usage = D3D11_USAGE_IMMUTABLE;",  # diagnostic fallback
     "dev->CreateBuffer(&bd, &initial, vb.GetAddressOf())",
@@ -31,6 +34,8 @@ assert "ctx->DrawIndexed(indexCount, 0, 0);" in submit
 assert "ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in submit
 assert "mirror_texture(dev, capture, sampledView, sampledSampler)" in submit
 # Destructive mutation: a missing live vertex upload cannot satisfy the contract.
-assert "ctx->UpdateSubresource(s.fullGameVertexUpload.Get(), 0u," not in start.replace(
-    "ctx->UpdateSubresource(s.fullGameVertexUpload.Get(), 0u,", "// detached", 1)
-print("PASS: live native full-game geometry uploads, separate VB/IB, device-loss reset and diagnostic fallback")
+assert "upload_full_game_stream(ctx, s.fullGameVertexUpload.Get()," not in start.replace(
+    "upload_full_game_stream(ctx, s.fullGameVertexUpload.Get(),", "// detached", 1)
+assert "ctx->UpdateSubresource(s.fullGameVertexUpload.Get()" not in start
+assert "ctx->UpdateSubresource(s.fullGameIndexUpload.Get()" not in start
+print("PASS: live full-game DISCARD-renamed VB/IB uploads and original D3D9 fallback")

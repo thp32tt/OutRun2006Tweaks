@@ -23,8 +23,9 @@ def require_source_ownership(source: str) -> None:
     assert "dev->CreateBuffer(&bd, &initial, vb.GetAddressOf())" in diagnostic
     assert "dev->CreateBuffer(&bd, &initial, ib.GetAddressOf())" in diagnostic
     assert "bd.Usage = D3D11_USAGE_IMMUTABLE;" in diagnostic
-    assert "ctx->UpdateSubresource(s.fullGameVertexUpload.Get()" in full
-    assert "ctx->UpdateSubresource(s.fullGameIndexUpload.Get()" in full
+    assert "upload_full_game_stream(ctx, s.fullGameVertexUpload.Get()" in full
+    assert "upload_full_game_stream(ctx, s.fullGameIndexUpload.Get()" in full
+    assert "D3D11_MAP_WRITE_DISCARD" in source
     guard = "if (!vb || (indices && indexCount && !ib)) return false;"
     assert guard in submit, "failed GPU source must preserve original D3D9 fallback"
     assert submit.index(guard) < submit.index("ctx->IASetVertexBuffers(")

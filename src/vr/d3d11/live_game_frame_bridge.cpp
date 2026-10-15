@@ -5,6 +5,7 @@
 #include "live_game_fvf_layout.hpp"
 #include "live_game_object_clip.hpp"
 #include "live_game_pixel_center.hpp"
+#include "native_game_dynamic_stream.hpp"
 #include "live_game_viewport_depth.hpp"
 #include "live_game_stage0_blend.hpp"
 #include "live_game_stage1_factor.hpp"
@@ -4058,13 +4059,34 @@ bool ensure_full_game_upload_buffer(ID3D11Device* dev,
     D3D11_BUFFER_DESC desc{};
     desc.ByteWidth = allocation;
     desc.BindFlags = bindFlags;
-    desc.Usage = D3D11_USAGE_DEFAULT;
+    // WRITE_DISCARD renames GPU storage when a previous menu/race Draw still
+    // references the old contents. DEFAULT/UpdateSubresource may require
+    // hidden staging and an extra dependent copy for every source Draw.
+    desc.Usage = D3D11_USAGE_DYNAMIC;
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     ComPtr<ID3D11Buffer> candidate;
     if (FAILED(dev->CreateBuffer(&desc, nullptr, candidate.GetAddressOf())) ||
         !candidate) return false;
     resource = std::move(candidate);
     capacity = allocation;
     return true;
+}
+
+// Upload both real-game streams before IA binding. Map/Unmap is a transaction:
+// failed mapping/copy leaves native publication aborted; original D3D9
+// Draw/DrawIndexed and gamepad never depend on this optional path.
+bool upload_full_game_stream(ID3D11DeviceContext* context,
+                             ID3D11Buffer* buffer, UINT capacity,
+                             const void* source, UINT bytes) noexcept {
+    if (!context || !buffer || !source || bytes == 0u || bytes > capacity)
+        return false;
+    D3D11_MAPPED_SUBRESOURCE mapped{};
+    if (FAILED(context->Map(buffer, 0u, D3D11_MAP_WRITE_DISCARD, 0u, &mapped)))
+        return false;
+    const bool copied = game_native_copy_dynamic_stream(
+        mapped.pData, capacity, source, bytes);
+    context->Unmap(buffer, 0u);
+    return copied;
 }
 
 bool submit(State& s, const std::vector<NativeVertex>& vertices,
@@ -4154,9 +4176,9 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         if (!ensure_full_game_upload_buffer(dev, s.fullGameVertexUpload,
                                             s.fullGameVertexCapacity, vertexSize,
                                             D3D11_BIND_VERTEX_BUFFER)) return false;
-        const D3D11_BOX vertexRange{0u, 0u, 0u, vertexSize, 1u, 1u};
-        ctx->UpdateSubresource(s.fullGameVertexUpload.Get(), 0u,
-                               &vertexRange, vertices.data(), 0u, 0u);
+        if (!upload_full_game_stream(ctx, s.fullGameVertexUpload.Get(),
+                                     s.fullGameVertexCapacity,
+                                     vertices.data(), vertexSize)) return false;
         vb = s.fullGameVertexUpload;
         if (indices && indexCount) {
             if (indexCount > (std::numeric_limits<UINT>::max)() / sizeof(std::uint32_t))
@@ -4165,9 +4187,9 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             if (!ensure_full_game_upload_buffer(dev, s.fullGameIndexUpload,
                                                 s.fullGameIndexCapacity, indexSize,
                                                 D3D11_BIND_INDEX_BUFFER)) return false;
-            const D3D11_BOX indexRange{0u, 0u, 0u, indexSize, 1u, 1u};
-            ctx->UpdateSubresource(s.fullGameIndexUpload.Get(), 0u,
-                                   &indexRange, indices, 0u, 0u);
+            if (!upload_full_game_stream(ctx, s.fullGameIndexUpload.Get(),
+                                         s.fullGameIndexCapacity,
+                                         indices, indexSize)) return false;
             ib = s.fullGameIndexUpload;
         }
         if (FAILED(dev->GetDeviceRemovedReason())) return false;

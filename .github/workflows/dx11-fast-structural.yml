@@ -143,6 +143,8 @@ jobs:
           python tools/test_dx11_x8_alpha_only_game_draw_00770.py
           python tools/test_dx11_inactive_texture_game_frame_00771.py
           python tools/test_dx11_pixel_center_game_draw_00773.py
+          python tools/test_dx11_dynamic_stream_game_frame_00774.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_dynamic_stream_probe_00774.cpp -o /tmp/dx11_dynamic_stream_00774 && /tmp/dx11_dynamic_stream_00774
           python tools/test_dx11_full_frame_empty_draw_00755.py
           python tools/test_dx11_zero_source_hook_00756.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_zero_source_hook_probe_00756.cpp -o /tmp/dx11_zero_hook_00756 && /tmp/dx11_zero_hook_00756
