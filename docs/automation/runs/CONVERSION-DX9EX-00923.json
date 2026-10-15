@@ -10,10 +10,10 @@
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:PACE:SOFTWARE_LIMITER_XR_HANDOFF",
   "feature_class": "CRITICAL_BLOCKER",
-  "status": "NEEDS_VALIDATION",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_PENDING_EXACT_SHA",
-  "automation_validation": "FAILED_POLICY_MISSING_RUN_RECORD",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_paths": [
@@ -87,7 +87,7 @@
     "game_host_package": "SKIPPED_BY_POLICY"
   },
   "material_result_sha": "e44593c917243ddc46ea71dba41d4297b4b3932e",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "e58d8ed504f20240e35d1f9565ced85102d43b86",
   "score_delta_this_attempt": 0,
-  "next_action": "Run required GitHub Actions once for this new validation-bearing result SHA; if they pass record a separate C6 bookkeeping update preserving the original material SHA; do not score retry separately."
+  "next_action": "C6 exact-SHA GitHub Actions gates SUCCESS; Quest3/VDXR runtime HMD remains UNTESTED. Do not rerun validated build/CI or award duplicate score on this retry."
 }
