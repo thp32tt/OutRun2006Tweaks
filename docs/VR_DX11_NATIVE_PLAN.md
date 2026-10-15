@@ -4,6 +4,42 @@ Baseline: `vr-r70-structure-squash` at `b6c208bbc9a411b9c035be26f9e1e9c014028738
 
 Development branch: `vr-dx11-native-r71`
 
+## 2026-10-15 — native-first runtime reset (test packages)
+
+The shipped DX11 evaluation previously set only OUTRUN_DX11_FIRST_GAME_FRAME=1. That
+exercised a 256x144 diagnostic inset rather than the full game frame, while the
+normal "dx11" backend selector referred to the OpenXR host transport over
+D3D9Ex. Those results must not be represented as D3D11 game-renderer parity.
+
+The test-bundle constructor now emits two distinct launchers:
+
+- DX9EX_CONTROL: both native opt-ins explicitly cleared; known-good baseline.
+- NATIVE_FULL_FRAME: BOTH first-game-frame and full-game-frame opt-ins enabled,
+  with full game VB/IB -> D3D11 Draw/DrawIndexed -> GPU target -> fenced readback
+  -> D3D9 backbuffer and original game Present.
+  Every test is genuinely native-Draw-enabled, never just an inactive census.
+
+A packaged runtime verifier searches captured game logs for game-authored
+Draws, issued native Draws, and native backbuffer publications. It emits
+DX11_NATIVE_EVIDENCE.txt and exits nonzero after archiving if absent. A positive
+counter proof only establishes *some* native pixels were published; it does not
+establish scene completeness, menu/car/race parity, Quest 3 stereo, or 72Hz.
+
+Architecture delivery gates (no calendar-based completion claim):
+1. **FRAME_RUNTIME_OBSERVED:** candidate with native mode ON; successful
+   publication; screenshots of menu, vehicle selection and sustained race,
+   negative fallback check; no unsupported per-frame omissions.
+2. **NATIVE_STEREO_OBSERVED:** send actual native D3D11 left/right eye render
+   targets to OpenXR with correct generation/fence/ACK. Eliminate the
+   D3D11->CPU->D3D9 presentation bridge as production output.
+3. **PLAYABLE_BETA:** verify input, shadows, flares, HUD/markers, recenter,
+   reset/restore and p95/p99 pacing on exact same build/Quest 3/VDXR.
+
+Block new independent micro-feature dispatches while P0 is incomplete. The
+existing branch task owners keep their source leases; source/CI success and
+runtime acceptance are separate. Do not release an arbitrary November target
+without evidence from these gates.
+
 ## 2026-10-14 16:45 KST — FULL-RESOLUTION GAME DX11 FIRST (LATEST OVERRIDE)
 
 **Current implementation is opt-in 256x144 diagnostic DX11 inset, NOT game renderer replacement.** This is the top priority until the full game display is actually produced by D3D11. Earlier R71-R79 lists and 2026-10-10 diagnostic/WARP priorities are history, not dispatch order.

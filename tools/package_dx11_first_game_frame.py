@@ -43,12 +43,57 @@ def session_labeled_runner(runner):
         b"throw 'DX11 test session selector missing or invalid' }\n"
         b'$variant = "${variant}-${dx11TestCase}"'
     )
-    return runner.replace(anchor, anchor + suffix, 1)
+    staged = runner.replace(anchor, anchor + suffix, 1)
+    archiver = b"Compress-Archive -Path (Join-Path $session '*') -DestinationPath $zip -Force"
+    if staged.count(archiver) != 1:
+        raise ValueError("session log archive anchor changed")
+    # Fail the *test session*, not the game. Always archive logs before a failed
+    # verdict, and leave the stock D3D9 game renderer completely untouched.
+    evidence = r"""
+$nativeFrameEvidenceOk = $false
+if ($dx11TestCase -eq 'NATIVE_FULL_FRAME') {
+    $seen = $false
+    $gameDraws = 0L
+    $nativeDraws = 0L
+    $published = 0L
+    foreach ($file in @(Get-ChildItem -Path $session -Filter 'OutRun2006Tweaks*.log' -File -ErrorAction SilentlyContinue)) {
+        foreach ($line in [System.IO.File]::ReadLines($file.FullName)) {
+            $hit = [regex]::Match($line, 'DX11 FIRST_GAME_DRAW_FRAME progress: game_tri_draws=(\d+) native_draws=(\d+) desktop_insets=(\d+)')
+            if (!$hit.Success) { continue }
+            $seen = $true
+            $gameDraws = [Math]::Max($gameDraws, [long]$hit.Groups[1].Value)
+            $nativeDraws = [Math]::Max($nativeDraws, [long]$hit.Groups[2].Value)
+            $published = [Math]::Max($published, [long]$hit.Groups[3].Value)
+        }
+    }
+    $nativeFrameEvidenceOk = $env:OUTRUN_DX11_FIRST_GAME_FRAME -eq '1' -and
+        $env:OUTRUN_DX11_FULL_GAME_FRAME -eq '1' -and $seen -and
+        $gameDraws -gt 0 -and $nativeDraws -gt 0 -and $published -gt 0
+    $verdict = if ($nativeFrameEvidenceOk) { 'NATIVE_FULL_FRAME_GPU_COPYBACK_OBSERVED' } else { 'NO_NATIVE_FULL_FRAME_EVIDENCE' }
+    @(
+        "verdict=$verdict",
+        "gameDraws=$gameDraws",
+        "nativeDraws=$nativeDraws",
+        "publishedBackbufferFrames=$published",
+        "nativeModeRequested=$($env:OUTRUN_DX11_FULL_GAME_FRAME)",
+        "outputRoute=D3D11_GPU_TO_CPU_TO_D3D9_BACKBUFFER",
+        "menuVehicleRaceVisualParity=UNTESTED",
+        "quest3Stereo=UNTESTED",
+        "note=Nonzero counters do not prove menu, vehicle, race or stereo parity"
+    ) | Set-Content (Join-Path $session 'DX11_NATIVE_EVIDENCE.txt') -Encoding UTF8
+}
+""".encode("ascii")
+    failure = b"\nif ($dx11TestCase -eq 'NATIVE_FULL_FRAME' -and -not $nativeFrameEvidenceOk) { throw 'DX11 full native game frame NOT observed; examine DX11_NATIVE_EVIDENCE.txt inside the saved log ZIP.' }\n"
+    return staged.replace(archiver, evidence + b"\n" + archiver + failure, 1)
 
 
 def construct(game, host, ini, lods, runner, build_sha, feature_sha):
-    if pe_machine(game) != 0x14c or len(game) < 1000000 or MARKER not in game:
-        raise ValueError("missing valid x86 game DLL with native diagnostic")
+    # D3D11 full-frame opt-in is a UTF-16 Windows environment-variable literal.
+    # Reject stale binaries that only implement the old 256x144 inset path.
+    full_frame_marker = "OUTRUN_DX11_FULL_GAME_FRAME".encode("utf-16-le")
+    if (pe_machine(game) != 0x14c or len(game) < 1000000 or
+            MARKER not in game or full_frame_marker not in game):
+        raise ValueError("missing x86 native full-frame game implementation")
     if pe_machine(host) != 0x8664 or len(host) < 10000:
         raise ValueError("missing valid x64 host")
     for value in (build_sha, feature_sha):
@@ -61,8 +106,9 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
         return ("\r\n".join((
             "@echo off", "setlocal", 'cd /d "%~dp0"',
             'set "OUTRUN_DX11_FIRST_GAME_FRAME=' + value + '"',
+            'set "OUTRUN_DX11_FULL_GAME_FRAME=' + value + '"',
             'set "OUTRUN_DX11_TEST_CASE=' +
-            ("DIAGNOSTIC" if opt_in else "CONTROL") + '"',
+            ("NATIVE_FULL_FRAME" if opt_in else "CONTROL") + '"',
             'powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0Run-DX9ExFocusTest.ps1"',
             "exit /b %ERRORLEVEL%", ""
         ))).encode("ascii")
@@ -70,7 +116,10 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
         feature_id="DX11:FIRST_GAME_DRAW_FRAME",
         build_source_sha=build_sha, feature_head_sha=feature_sha,
         build_source_is_feature_head=(build_sha == feature_sha),
-        default_backend="DX9Ex", diagnostic_opt_in="OUTRUN_DX11_FIRST_GAME_FRAME=1",
+        default_backend="DX9Ex",
+        test_mode="NATIVE_FULL_FRAME_D3D11_GPU_COPYBACK_D3D9",
+        native_test_environment=["OUTRUN_DX11_FIRST_GAME_FRAME=1",
+                                 "OUTRUN_DX11_FULL_GAME_FRAME=1"],
         runtime_validation="UNTESTED", feature_ready=False)
     return {
         "dinput8.dll": game, "outrun-vr-host.exe": host,
@@ -78,24 +127,29 @@ def construct(game, host, ini, lods, runner, build_sha, feature_sha):
         "Run-DX9ExFocusTest.ps1": session_labeled_runner(runner),
         "RUN_DX11_FIRST_GAME_FRAME.cmd": launcher(True),
         "RUN_DX9EX_CONTROL.cmd": launcher(False),
-        "DX9EX_VARIANT.txt": ("variant=DX11_FIRST_GAME_FRAME_DIAGNOSTIC\n"
+        "DX9EX_VARIANT.txt": ("variant=DX11_NATIVE_FULL_FRAME\n"
             "buildSourceSha=" + build_sha + "\nfeatureHeadSha=" + feature_sha +
             "\nruntime=PreferD3D9Ex=true\n").encode("ascii"),
         "DX11_TEST_README.txt": (
-            "DX11 FIRST_GAME_DRAW_FRAME - DIAGNOSTIC ONLY\n"
-            "Extract all files beside your own OR2006C2C.EXE (not bundled).\n"
-            "Run RUN_DX9EX_CONTROL.cmd for default DX9Ex and then\n"
-            "RUN_DX11_FIRST_GAME_FRAME.cmd for explicit native diagnostic.\n"
-            "Keep the same gameplay section, then exit normally.\n"
-            "Both launchers call Run-DX9ExFocusTest.ps1 and automatically collect\n"
-            "the session log archive in DX9EX_LOGS. Compare both archives.\n"
-            "Look for game_tri_draws, native_draws, desktop_insets counters.\n"
-            "Eligible subset: untextured/unlit XYZ+DIFFUSE (object-space)\n"
-            "or XYZRHW+DIFFUSE (pretransformed) triangle lists.\n"
-            "Unsupported states preserve the DX9Ex draw and input path.\n"
-            "Separate log ZIPs end in -CONTROL or -DIAGNOSTIC.\n"
-            "An inset does not prove HMD rendering or full native gameplay.\n"
-            "Runtime validation remains UNTESTED; do not promote this build.\n"
+            "DX11 NATIVE FULL GAME FRAME - EXPERIMENTAL TEST\n"
+            "Extract all files beside your OWN OR2006C2C.EXE (not bundled).\n"
+            "RUN_DX9EX_CONTROL.cmd: stock D3D9/DX9Ex reference, native OFF.\n"
+            "RUN_DX11_FIRST_GAME_FRAME.cmd: EXPLICITLY enables both native\n"
+            "D3D11 first game draw AND full-game-size frame on every run.\n"
+            "No automatic DX11 production promotion; unsupported drawings\n"
+            "retain original D3D9/gamepad fallback to avoid blank screens.\n"
+            "On exit the log ZIP contains DX11_NATIVE_EVIDENCE.txt.\n"
+            "The DX11 runner returns FAILURE if the captured log has no\n"
+            "game Draw, native Draw and published backbuffer frame evidence.\n"
+            "Allow 300+ Present calls before exiting (several seconds).\n"
+            "A PASS proves only some GPU-drawn pixels copied back into the\n"
+            "D3D9 backbuffer. It does NOT prove full scene completeness,\n"
+            "menu/vehicle/race visual parity, native OpenXR L/R eyes or 72Hz.\n"
+            "Compare the same menu, vehicle and racing sections against\n"
+            "CONTROL. Keep both ZIPs and screenshots for manual inspection.\n"
+            "Native output is currently D3D11 -> CPU -> D3D9 Present,\n"
+            "not direct D3D11 OpenXR swapchain presentation.\n"
+            "Runtime validation remains UNTESTED until actual game/HMD run.\n"
         ).encode("utf-8"),
         "BUILD_IDENTITY.json": (json.dumps(identity, indent=2)+"\n").encode("utf-8"),
     }
