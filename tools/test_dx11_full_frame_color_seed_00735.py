@@ -45,8 +45,8 @@ def linked(b,h,r):
         "&&\n                        !outrun::vr::dx11::live_game_frame::preserve_offscreen_color_only_clear(" in clear,
         "s.clearColor.record(sourceDevice," in gameclear,
         "if (preserve_offscreen_color_only_clear(game, flags)) return;" in gameclear,
-        "flags != D3DCLEAR_TARGET" in b,
-        "s.clearColor.preserves_offscreen_color_only(" in b,
+        "(flags & clearBits) == 0u || (flags & ~clearBits) != 0u" in b,
+        "GameNativeOffscreenPass::isolated_auxiliary_clear(" in b,
         "targetIdentity.Get()" in b,
         "s.frameBatch.reset();" in gameclear,
         "const bool ownsPreDrawColor = env_full_game_opt_in()" in boundary,
@@ -72,12 +72,12 @@ for token,mut in (
     ("const bool sameClearedGameTarget = s.clearColor.matches(","const bool sameClearedGameTarget = false && s.clearColor.matches("),
     ("if (preserve_offscreen_color_only_clear(game, flags)) return;",
      "if (false) return;"),
-    ("flags != D3DCLEAR_TARGET","flags == D3DCLEAR_TARGET"),
+    ("(flags & ~clearBits) != 0u","false /* unexpected flags */"),
 ):
     assert token in bridge
     assert not linked(bridge.replace(token,mut,1),batch,hook),token
 assert not linked(bridge,batch.replace("return matchesClearedBackbuffer &&","return true &&",1),hook)
-assert not linked(bridge.replace("s.clearColor.preserves_offscreen_color_only(",
+assert not linked(bridge.replace("GameNativeOffscreenPass::isolated_auxiliary_clear(",
                                "s.clearColor.matches(",1),batch,hook)
 assert not linked(bridge,batch,hook.replace(
     "!outrun::vr::dx11::live_game_frame::preserve_offscreen_color_only_clear(",
