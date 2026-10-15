@@ -1,0 +1,49 @@
+{
+  "schema": "outrun-phrase-roi-source-qa-v1",
+  "asset": "Q116",
+  "original_dds_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+  "original_direct_png_sha256": "81bb279e1f9f6304bdc286dbeaaa0eac71832bb8b7eeb9e932972dedce5b3248",
+  "direct_dds_readable_png_pixel_equal": true,
+  "source_full_dimensions": [
+    2048,
+    256
+  ],
+  "source_alpha_bbox": [
+    393,
+    54,
+    1628,
+    200
+  ],
+  "source_roi_bbox": [
+    389,
+    50,
+    1632,
+    204
+  ],
+  "native_dimensions": [
+    1243,
+    154
+  ],
+  "input_dimensions": [
+    2486,
+    308
+  ],
+  "effect_alpha_margin_ltrb_pixels": [
+    4,
+    4,
+    4,
+    4
+  ],
+  "roi_byte_exact_to_native_full_source": true,
+  "input_alpha_safe_margin": true,
+  "native_roi_sha256": "4fbe3c95680b1876324fd7eb4dc6fff4e3f3883b6f06a9a1e8382bc314d51011",
+  "upscaled_input_sha256": "879929e7532c71598f891b23ac8c77f08dd12f84d1c007ee99046fd374ab8e11",
+  "source_preserved": true,
+  "legacy_986_tile_inputs_used": false,
+  "status": "SOURCE_ROI_PREPARATION_PASS_TEST_ONLY",
+  "generator_upload_proof": "NOT_RUN",
+  "generated_korean_layer": "NOT_RUN",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
