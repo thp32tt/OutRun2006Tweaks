@@ -1,47 +1,17 @@
-OutRun 2006 한글화 C-SALVAGE 실행 — 기존 A/B 자동화의 3번째 ChatGPT 탭
-프로젝트: 기존 "아웃런 한글화 신규" 프로젝트. VR 프로젝트로 이동하지 마.
-
+OutRun 2006 한글화 C-ROI-SOURCE 실행 — 기존 A/B 자동화의 제3 ChatGPT 탭
+프로젝트: "아웃런 한글화 신규" (VR 프로젝트 금지)
 소스 저장소: thp32tt/OutRun2006Tweaks
-한글화 자산 브랜치: korean-localization-recovery-20260928
+자산 브랜치: korean-localization-recovery-20260928
 컨트롤러 브랜치: localization-controller-recovery-20260928
 
-1. 첫 작업으로 한글화 자산 브랜치 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md,
-   docs/OUTRUN_C_SALVAGE_SLOT_20261015.md,
-   docs/OUTRUN_C_SALVAGE_AUTOMATION_MANUAL_DEPLOY_20261015.md를 확인해.
-2. A/B가 이미 생성·다운로드한 기존 PNG를 재사용하되 새 이미지를 생성하지 마.
-   ChatGPT Create image/ImageGen, 외부 유료 이미지 API 및 계정/한도 우회 시도 금지.
-   A/B용 생성 작업이나 상태/queue를 소비하거나 A/B 탭을 바꾸지 마.
-3. **반드시 가장 먼저 전체 원본 텍스처 재조립부터 수행해.** 분할 타일
-   1장만 독립 원본으로 간주하여 C 작업을 끝내는 과거 방식은 금지.
-   읽기 전용 N100 image-src/inputs/A/HD_EN_TILES_20261014/ALL_TILE_MAPPING.csv의
-   source_png + source_dds_path + source_png_sha256 단위로 모든 타일을 묶고,
-   part_png_sha256, x/y/width/height, source_width/source_height, RGBA,
-   누락·중복·좌표 겹침·빈 공간 여부를 검증해서 1개의 native-size
-   source_reassembled_readable.png로 정확히 복원해.
-   관련 도구: 자산 브랜치 tools/localization/c_salvage_atlas.py.
-   오류가 있는 그룹은 HOLD_ATLAS_REASSEMBLY, 완료된 그룹은 TEST_ONLY.
-   DDS 실제 픽셀 비교 전에는 DDS_EQUIVALENCE=UNVERIFIED. 한 번 실행에서는
-   미완료 원본 *그룹* 하나(그룹의 타일 전체)를 처리하고 검증해.
-4. 위 전체 원본 조립이 성공한 그룹에 한해서만 A/B가 생성한 해당
-   타일 한글 PNG들의 SHA·텍스트 마스크와 PSD 인덱스를 비교해.
-   각 타일의 x/y 오프셋으로 전체 atlas 좌표로 옮겨 글자만 분리하고,
-   원본 크기·RGBA·원래 영문 영역의 CLEAN/보호 픽셀을 유지해야 해.
-   PSD가 있으면 정본과 비교해 영어 레이어 제거 CLEAN을 우선 검토하고,
-   없으면 정본 HD DDS의 배경/투명도를 검증한 mask CLEAN만 시험해.
-   관련 도구: c_salvage_worker.py, c_salvage_plate.py, c_salvage_compose.py.
-   부분 타일 한 장으로 만든 PNG를 DDS 완성본이라고 보고하지 마.
-5. 검증 가능한 샘플의 글자층/영문 제거 CLEAN 후보를 기존 A/B 결과와
-   분리하여 TEST_ONLY로 남기고 원래 크기·좌표·방향·보호 아이콘·텍스트
-   잘림/겹침/영문 잔상/기울기/한글 깨짐을 검사해.
-   실물을 확보한 지원 DDS 포맷에 한해 별도 DDS 시험본을 만들 수 있어.
-   DXT/BC 비지원 포맷, 누락 원본·검수되지 않은 PSD 레이어는 HOLD해.
-6. C가 스스로 C1_PASS/C3_PASS/실게임 PASS를 표시하거나 완성 DDS를
-   정식 승격하면 안 돼. 게임 검증하지 않았다면 RUNTIME_VALIDATION=UNTESTED.
-7. GitHub 작업/자체 실행이 가능한 경우 먼저 사용하고 불가능한 실물 파일
-   접근은 연결된 MCP N100을 사용해. RDC는 사용하지 마.
-   완료된 항목 중복 작업 금지. 실제 변경이 있다면 자산 브랜치에
-   증빙·상태를 기록해 커밋/push하고 원격 HEAD를 확인해.
-8. 한 번 실행할 때 미완료 원본 전체 그룹 하나의 재조립 또는 명시적 HOLD 원인 정리를
-   끝내고 Q-ID, 원본 SHA, 생성한 파일, QA 결과, 원격 커밋을 짧게 보고해.
+1. 첫 작업으로 자산 브랜치 docs/KOREAN_LOCALIZATION_AUTOMATION_CONTRACT.md와 docs/OUTRUN_TEXT_ROI_IMAGEGEN_20261015.md를 읽고 최신 사용자 지시를 우선 적용해.
+2. **이전 986개 분할 타일은 새 이미지생성 입력으로 사용하지 마.** 기존 A/B 한글 생성 결과의 분할 이미지·조합·재활용 및 1장씩 재조립 작업은 신규 생산 우선순위에서 제외해. 과거 SHA/아티팩트는 삭제하지 말고 기록으로 보존해. 이미 진행 중인 A/B 배치·큐·상태를 소비하거나 변경하지 마.
+3. GitHub의 버전 고정된 원본 HD 전체 PNG, 또는 실제 원본 DDS/검증된 PSD에서 **완전한 영어 원문 전체**를 확보해. 전체 영어 PNG가 없다면 N100의 기존 타일을 대신 사용하지 말고 `HOLD_FULL_SOURCE_MISSING`으로 분리해. 실제 원본 DDS/플랫폼/좌표의 일치 여부를 확인해.
+4. 기존 타일 경계와 무관하게 한글화할 영어 **한 문구 전체** 및 외곽선·그림자·빛 효과까지 포함한 1개 ROI를 정방향으로 지정해. 복수 문구는 별도 ROI. 테두리 접촉/잘린 영문이 있으면 보류하고 ROI를 확장해. 번역은 원본 공식 매핑 기준, 음악 제목은 영어 그대로 유지.
+5. `tools/localization/text_roi_source_pack.py`와 `outrun-hd-text-roi-v1` ROI manifest로 네이티브 글자 ROI와 2~4배 확대 ImageGen 입력 PNG를 만들어. 원본 전체 PNG SHA, native xyxy, 확대 배율, PNG SHA, 정확한 원문/번역, 원본 DDS 경로를 기록해. 투명 source는 글자 alpha를 사용하고 불투명 배경은 리뷰된 PSD/정확 마스크가 없으면 글자층/CLEAN 완성을 주장하지 마.
+6. C에서는 ChatGPT 이미지 생성 도구나 외부 이미지 생성 API를 호출하지 마. 새 글자 ROI PNG를 기존 A/B ImageGen용 **별도 출처 검증된 입력 후보**로만 남겨. 원본 영역보다 한글 결과의 폭이 달라도 자동 반려하지 말고 UI cell/UV 안전영역에 비율 보존 후 복귀하도록 기록해. 마스크 없이 이미지를 추측 합성하지 마.
+7. 한 번의 C 실행에서 새로운 문구 ROI 1개를 실제 제작·검증하거나 명확한 HOLD 사유를 기록해. QA는 `TEST_ONLY`이며 C1/C3/실게임 PASS를 선언하지 마. RUNTIME_VALIDATION=UNTESTED.
+8. GitHub/ChatGPT 로컬 작업 우선, 실제 원본 파일에만 연결된 MCP N100을 보조로 이용해. RDC 사용 금지. 실물 증빙을 자산 브랜치에 반영한다면 commit/push 후 정확한 원격 HEAD를 확인해.
+9. A/B 기존 자동생성 전송을 다시 활성화하려면 검증된 ROI 입력 인덱스, 새 state/queue 및 Portainer 사용자 수동 배포가 별도로 필요하다. 기존 `ab_batch_queue.py`의 986 타일 자동전송을 그대로 부활시키지 마.
 
-VR/FFB/DX11/DXVK 작업은 하지 마. 음악 제목은 영문 그대로 유지해.
+VR/FFB/DX11/DXVK 금지. 사용자 번역/검수 정책 우선.
