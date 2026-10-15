@@ -200,6 +200,37 @@ def verify(text):
             raise ValueError(name+" UI path must restore original and clear scale only after successful fallback")
     if "if (snapshotted && SUCCEEDED(result))" not in state:
         raise ValueError("failed original retry must preserve the previous live scale")
+    # Runtime UITextureReplacement toggle must revoke previous ratios for
+    # BOTH sprite paths and their mask, and original DDS reloads must clear
+    # a previously cached slot even while replacement is disabled.
+    policy=body(text,"static constexpr bool ShouldApplyUIScale(")
+    if "return enabled && matches;" not in policy:
+        raise ValueError("live UI replacement preference is not authoritative")
+    if ("static_assert(ShouldApplyUIScale(true, true)" not in text or
+        "!ShouldApplyUIScale(false, true)" not in text or
+        "!ShouldApplyUIScale(true, false)" not in text):
+        raise ValueError("UI scale enable/disable and identity compile regressions missing")
+    if "|| !Settings::UITextureReplacement" in state.split("memcpy(&header",1)[0]:
+        raise ValueError("disabled replacement skipped old-slot scale retirement")
+    lookup=body(text,"static void* __cdecl get_texture_dest(")
+    spr2=body(text,"static int __cdecl put_sprite_ex2_dest(")
+    spr1=body(text,"static int __cdecl put_sprite_ex_dest(")
+    obligations=[
+        (lookup,"ShouldApplyUIScale(Settings::UITextureReplacement, ret != nullptr)"),
+        (spr2,"if (!Settings::UITextureReplacement)"),
+        (spr2,"prevMaskTexture = nullptr;"),
+        (spr2,"ShouldApplyUIScale(Settings::UITextureReplacement,\n\t\t\ta1->d3dtexture_ptr_C == prevTexture)"),
+        (spr2,"ShouldApplyUIScale(Settings::UITextureReplacement,\n\t\t\t\t\ta1->child_B4->d3dtexture_ptr_C == prevMaskTexture)"),
+        (spr2,"sprite_scales.find(prevTextureId)"),
+        (spr2,"sprite_scales.find(prevMaskTextureId)"),
+        (spr1,"ShouldApplyUIScale(Settings::UITextureReplacement, true)"),
+        (spr1,"sprite_scales.find(xstnum)"),
+    ]
+    for region,needle in obligations:
+        if needle not in region:
+            raise ValueError("UI runtime toggle or single-lookup guard missing: "+needle)
+    if any(x in spr2+spr1 for x in ("sprite_scales[prevTextureId]","sprite_scales[prevMaskTextureId]","sprite_scales[xstnum]")):
+        raise ValueError("sprite scaling hot path resumed repeated map lookups")
     return len(guards) + len(xrgb_checks) + len(state_guards) + 4
 
 
@@ -253,6 +284,13 @@ def negatives(text):
         "format_orig == D3DFMT_X8B8G8R8)\n\t\t\t{",
         "dstRow[p] = srcRow[p + 2];",
         "dstRow[p + 2] = srcRow[p];",
+        "return enabled && matches;",
+        "if (!Settings::UITextureReplacement)",
+        "ShouldApplyUIScale(Settings::UITextureReplacement, ret != nullptr)",
+        "ShouldApplyUIScale(Settings::UITextureReplacement, true)",
+        "sprite_scales.find(prevTextureId)",
+        "sprite_scales.find(prevMaskTextureId)",
+        "sprite_scales.find(xstnum)",
     ]
     for token in needles:
         mutant=text.replace(token,"__DDS_BAD_CONTRACT__",1)

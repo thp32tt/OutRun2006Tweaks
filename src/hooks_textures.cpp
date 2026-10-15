@@ -698,6 +698,19 @@ class TextureReplacement : public Hook
 
 	inline static std::unordered_map<int, std::pair<float, float>> sprite_scales;
 
+	// Ratio tables can outlive a live preference toggle. A game sprite must
+	// never inherit a replacement crop when the player switches back to its
+	// original DDS; the exact texture pointer still guards ex2 ownership.
+	static constexpr bool ShouldApplyUIScale(bool enabled, bool matches) noexcept
+	{
+		return enabled && matches;
+	}
+	static_assert(ShouldApplyUIScale(true, true) &&
+		!ShouldApplyUIScale(false, true) &&
+		!ShouldApplyUIScale(true, false) &&
+		!ShouldApplyUIScale(false, false),
+		"UI replacement scale must follow both the live toggle and source identity");
+
 	// put_sprite_ex2 usually doesn't have the proper textureId set inside SPRARGS2, only the d3dtexture_ptr_C
 	// we could store each d3dtexture ptr somewhere when they're created, and then check against them later to find the scale
 	// but that's not really ideal since pointers could get freed, with new texture using same address
@@ -721,7 +734,8 @@ class TextureReplacement : public Hook
 		prevMaskTexture = prevTexture;
 		prevMaskTextureId = prevTextureId;
 
-		if (ret && sprite_scales.contains(textureId))
+		if (ShouldApplyUIScale(Settings::UITextureReplacement, ret != nullptr) &&
+			sprite_scales.contains(textureId))
 		{
 			prevTexture = ret;
 			prevTextureId = textureId;
@@ -848,13 +862,27 @@ class TextureReplacement : public Hook
 		OutRunVRHudInspector::TracePutSprite2(a1, a2, returnAddress);
 		int xstnum = a1->xstnum_0;
 
-		if (a1->d3dtexture_ptr_C == prevTexture && sprite_scales.contains(prevTextureId))
+		// The active option may change while these get_texture hooks stay
+		// installed. Discard pending pointer/ID bindings on disable, including
+		// the independent mask owner, before handling any new sprite.
+		if (!Settings::UITextureReplacement)
 		{
-			auto scaleX = std::get<0>(sprite_scales[prevTextureId]);
-			auto scaleY = std::get<1>(sprite_scales[prevTextureId]);
-			RescaleSprArgs2(a1, scaleX, scaleY);
 			prevTexture = nullptr;
 			prevTextureId = 0;
+			prevMaskTexture = nullptr;
+			prevMaskTextureId = 0;
+		}
+
+		if (ShouldApplyUIScale(Settings::UITextureReplacement,
+			a1->d3dtexture_ptr_C == prevTexture))
+		{
+			const auto scale = sprite_scales.find(prevTextureId);
+			if (scale != sprite_scales.end())
+			{
+				RescaleSprArgs2(a1, scale->second.first, scale->second.second);
+				prevTexture = nullptr;
+				prevTextureId = 0;
+			}
 		}
 
 		if (a1->child_B4)
@@ -862,13 +890,16 @@ class TextureReplacement : public Hook
 			int spr_mask_flag = *Module::exe_ptr<int>(0x586B28);
 			if (spr_mask_flag)
 			{
-				if (a1->child_B4->d3dtexture_ptr_C == prevMaskTexture && sprite_scales.contains(prevMaskTextureId))
+				if (ShouldApplyUIScale(Settings::UITextureReplacement,
+					a1->child_B4->d3dtexture_ptr_C == prevMaskTexture))
 				{
-					auto scaleX = std::get<0>(sprite_scales[prevMaskTextureId]);
-					auto scaleY = std::get<1>(sprite_scales[prevMaskTextureId]);
-					RescaleSprArgs2(a1->child_B4, scaleX, scaleY);
-					prevMaskTexture = nullptr;
-					prevMaskTextureId = 0;
+					const auto scale = sprite_scales.find(prevMaskTextureId);
+					if (scale != sprite_scales.end())
+					{
+						RescaleSprArgs2(a1->child_B4, scale->second.first, scale->second.second);
+						prevMaskTexture = nullptr;
+						prevMaskTextureId = 0;
+					}
 				}
 			}
 		}
@@ -885,16 +916,20 @@ class TextureReplacement : public Hook
 		const auto vrTailsBefore = SnapshotVrSpriteTails();
 		OutRunVRHudInspector::TracePutSprite(a1, a2, returnAddress);
 		int xstnum = a1->xstnum_0;
-		if (sprite_scales.contains(xstnum))
+		if (ShouldApplyUIScale(Settings::UITextureReplacement, true))
 		{
-			auto scaleX = std::get<0>(sprite_scales[xstnum]);
-			auto scaleY = std::get<1>(sprite_scales[xstnum]);
-			a1->top_4 = a1->top_4 * scaleY;
-			a1->left_8 = a1->left_8 * scaleX;
-			a1->bottom_C = a1->bottom_C * scaleY;
-			a1->right_10 = a1->right_10 * scaleX;
-			a1->scaleX = a1->scaleX / scaleX;
-			a1->scaleY = a1->scaleY / scaleY;
+			const auto scale = sprite_scales.find(xstnum);
+			if (scale != sprite_scales.end())
+			{
+				const auto scaleX = scale->second.first;
+				const auto scaleY = scale->second.second;
+				a1->top_4 = a1->top_4 * scaleY;
+				a1->left_8 = a1->left_8 * scaleX;
+				a1->bottom_C = a1->bottom_C * scaleY;
+				a1->right_10 = a1->right_10 * scaleX;
+				a1->scaleX = a1->scaleX / scaleX;
+				a1->scaleY = a1->scaleY / scaleY;
+			}
 		}
 		const int result = put_sprite_ex.call<int>(a1, a2);
 		TagDirectVrSpriteNodes(vrTailsBefore, returnAddress);
@@ -1099,7 +1134,9 @@ class TextureReplacement : public Hook
 		UiDdsOriginalState(void* originalData, UINT originalBytes)
 			: data(originalData), bytes(originalBytes)
 		{
-			if (!data || bytes < sizeof(DDS_FILE) || !Settings::UITextureReplacement)
+			// Even with replacement OFF, a successful original texture reload
+			// must retire any ratio cached for this reused xstset texture slot.
+			if (!data || bytes < sizeof(DDS_FILE))
 				return;
 			memcpy(&header, data, sizeof(DDS_FILE));
 			const int textureNum = *Module::exe_ptr<int>(0x55B25C);

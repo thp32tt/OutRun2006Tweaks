@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00891",
+  "production_id": "CONVERSION-DX9EX-00891",
+  "event_id": "CONVERSION-DX9EX-00891-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00891",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "86093634738ce8a753b078294d74be8dc9e3c4ac",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_textures.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_hud_dds_loader.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00891.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+    "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+    "goal": "Keep the complete car selection and original front-end sprite and mask appearance consistent when UITextureReplacement switches between custom DDS and original textures, including live toggle, successful reload, and independent shader/VR-eye presentation.",
+    "scope_boundary": "Only UI replacement DDS ratio ownership, the original xstset texture slots, put_sprite_ex and put_sprite_ex2/mask producer hooks and their source semantics. Leave DDS decode formats, world textures, SkyGlow, OpenXR eye WVP, R26_SAFE and DX11/DXVK untouched.",
+    "trace_stages": [
+      "The original UI DDS hook selects texture replacements and caches source-to-replacement ratios keyed by xstset slot in HandleTexture; a live preference change can retain prior ratios.",
+      "get_texture binds sprite texture identity for put_sprite_ex2 and its independent mask, while put_sprite_ex applies the same cached ratio directly to SPRARGS; both previously ignored the live UITextureReplacement flag.",
+      "The original game sprite queue and exact VR semantic registration hand these vertices through R84 R33/R30 binocular HUD or frontend scene rendering and host, while native original-DDS reload retires stale slot ratios."
+    ],
+    "subcomponents": [
+      "Revoke stale get_texture and mask pointer provenance on live disable and gate both pointer-based put_sprite_ex2 and direct put_sprite_ex scale transformations on the effective setting.",
+      "Track xstset slot DDS load even when replacement was turned off so a successful native sprite reload clears its prior ratio; retain failed decode restoration and replace repeated hot-path map probes with one lookup per consumer.",
+      "Extend existing DDS source-mutation regression verifier and compile-time positive/negative ratio eligibility cases without changing native sprite producer geometry or world/VR eye transforms."
+    ],
+    "acceptance_items": [
+      {
+        "id": "vehicle_select_toggle_sprite",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Car selection and front-end SPRARGS/SPRARGS2/mask geometry after live replacement toggle",
+        "expected_behavior": "Disabling UI replacement immediately stops applying stale sprite and mask ratios and revokes pending get_texture provenance while keeping original game producer and stereo semantics unchanged."
+      },
+      {
+        "id": "vehicle_select_original_reload",
+        "category": "fallback_regression",
+        "behavior_area": "Original DDS reload and malformed/failed optional replacement with recycled xstset slots",
+        "expected_behavior": "Successful original texture load retires stale scale even with preference disabled; failed decode keeps prior valid state and native fallback; live enabled scaling uses exactly one cached ratio lookup."
+      },
+      {
+        "id": "vehicle_select_exact_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Default R84 Win32 game DLL, R26_SAFE, x64 host, package and affected HUD/Domain/static checks",
+        "expected_behavior": "Changed-area source mutation regression and exact-SHA GitHub Active/Domain/Full Source gate run without CI skip; Quest3 selection colors, screen ratio and eye overlays remain separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "vehicle_select_toggle_sprite": "SOURCE_IMPLEMENTED",
+    "vehicle_select_original_reload": "SOURCE_IMPLEMENTED",
+    "vehicle_select_exact_gates": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "At the verified base source, get_texture_dest and both put_sprite_ex paths applied cached replacement ratios without consulting the live UITextureReplacement setting. UiDdsOriginalState returned early on disabled replacement, leaving stale ratios when original DDS was subsequently reloaded.",
+    "root_cause": "The ratio cache and pending pointer provenance outlived a live UI replacement preference change. Fast texture creation and sprite drawing used separate setting eligibility, so native car-selection sprites could inherit a previous replacement's crop dimensions.",
+    "source_trace": [
+      "src/hooks_textures.cpp HandleTexture caches ratios and UiDdsOriginalState snapshots/resets xstset scale slots before and after DDS replacement and original fallback.",
+      "src/hooks_textures.cpp get_texture_dest provides source texture pointer identity; put_sprite_ex2 and mask rescale and put_sprite_ex direct rectangle rescale are gated by the same live option and one map lookup.",
+      "The original SpriteNode/Sumo queue tagging remains unchanged through VR semantic assignment to R84 main renderer and OpenXR host; per-eye HMD outcome still needs an actual Quest3 test."
+    ],
+    "alternatives_rejected": [
+      "Changing global HUD scale, VR eye matrix or forcing menu cropping cannot fix stale CPU sprite UV transformations when texture replacement is disabled.",
+      "Clearing every scale map on a failed DDS load would corrupt still valid replacement sprites; successful original reload alone may retire stale slot ratios."
+    ],
+    "fix_evidence": "Patch gates all get_texture/SPRARGS/SPRARGS2/mask ratio paths on live UITextureReplacement and retires recycled xstset slot scale after successful original DDS load, preserving the original texture fallback.",
+    "negative_test_evidence": "C++ static_assert covers live setting on/off and source identity; the existing HUD DDS verifier gains source obligations and destructive mutations for the toggle, independent mask, and single-lookup paths.",
+    "eye_ownership": "Existing queue registration and R84 stereo renderer own per-eye rendering; this patch changes only the original-game CPU sprite texture scale, not eye-specific matrices.",
+    "evidence_limits": "No matching Quest3/VDXR hardware test or Windows CI result at commit creation; BUILD_VERIFIED and visible selection success are not asserted."
+  },
+  "runtime_evidence": "No matching Quest3/VDXR or physical game execution performed.",
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "result_commit_ci_skip": false,
+  "hold_reason": "EXACT_SHA_CI_PENDING"
+}
