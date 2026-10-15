@@ -418,7 +418,7 @@ def check_exact_goal_xyzrhw_plane(renderer: str, semantics: str) -> list[str]:
     generic = renderer.find("// Smoke/sand can redraw", physical)
     section = renderer[physical:generic] if 0 <= begin < physical < generic else ""
     predicate = semantics[semantics.find("inline constexpr bool CanReprojectFiniteResultHudPlane("):
-                          semantics.find("// Previous direct D3DX triangles must be submitted")]
+                          semantics.find("    static_assert(CanReprojectFiniteResultHudPlane(")]
     required = ("StageExtensionTime", "GoalTime020", "GoalTime150",
                 "ResultProgress", "OutRunStagePrintf")
     if not all(("producer == ProducerToken::" + token) in predicate for token in required):
