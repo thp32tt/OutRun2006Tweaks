@@ -1,0 +1,101 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00914",
+  "production_id": "CONVERSION-DX9EX-00914",
+  "event_id": "CONVERSION-DX9EX-00914-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00914",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:RANK_MARKER_SPARSE_STEREO",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "symptom_id": "DX9EX:PERF:SPARSE_RANK_STEREO_CPU_COPY",
+  "status": "IMPLEMENTED_VALIDATION_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "fa72ddd6a0890d5b7fec3cace3260cd28b87b34d",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/game/rank_marker_sparse.hpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/game/rank_marker_sparse.hpp",
+    "vrhost/tests/r84_rank_marker_stereo_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00914.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:RANK_MARKER_SPARSE_STEREO",
+    "symptom_id": "DX9EX:PERF:SPARSE_RANK_STEREO_CPU_COPY",
+    "goal": "Avoid copying and transforming untouched indexed vehicle/rival rank vertices for both R84 stereoscopic eyes while preserving identical referenced marker geometry, visual attachment and fallback across reset/unknown decoders.",
+    "scope_boundary": "Only exact ProjectedWorldMarker2D rank/rival XYZRHW CPU stereo copy and transform; do not touch GOAL, +TIME, lens, game input/FFB, SkyGlow, regular HUD, DX11, R26_SAFE or frozen DXVK.",
+    "special_work_evidence": "Source-established redundant two-eye 4-MiB-bounded VB/IB copies and full vertexCount transform in exact rank path, even with sparse decoded usedMask and touched list; targeted portable comparison checks same selected XY and validates sparse bypass. Runtime FPS gain unmeasured.",
+    "trace_stages": [
+      "Original Calc3D2D vehicle/rival screen-space rank sprites retain exact per-node view anchor and SpriteNode semantic.",
+      "R84 R30 XYZRHW draw receives leased VB/IB or indexed-UP reference mask and unique touched list with knownUsedCount.",
+      "Reproject the GPU-referenced vertices to two eyes only; unknown or inconsistent reference hints return to original dense baseline and D3D9 draw fallback."
+    ],
+    "subcomponents": [
+      "Avoid both full-span vertex memcpy operations when a verified sparse ranked sprite index list allows per-reference copying of all stride attributes.",
+      "Restrict dual-eye rank XY reprojection loop to exactly those references, leaving other UI/world routing and original Z/RHW/UV/alpha intact."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_sparse_two_eye_equivalence",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 vehicle/rival rank XYZRHW stereo submission",
+        "expected_behavior": "Both eyes retain the same projected positions, depth/RHW, UV, color and animation as the dense path for every referenced rank vertex."
+      },
+      {
+        "id": "sparse_hint_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "VB/IB missing, corrupt, or dense reference metadata",
+        "expected_behavior": "Unknown or invalid sparse index hints use original dense copying and transform; other HUD, world, input, SkyGlow and R26 rollback remain unchanged."
+      },
+      {
+        "id": "exact_sha_ci",
+        "category": "integrated_validation",
+        "behavior_area": "DX9Ex Windows x86 and host package/Domain/affected source CI gates",
+        "expected_behavior": "One final validation-bearing exact source SHA passes the required R84 game, host, full chain, package, Domain and affected source guard workflows."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "rank_sparse_two_eye_equivalence": "PENDING_BUILD",
+    "sparse_hint_fallback": "PENDING_BUILD",
+    "exact_sha_ci": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "The R84 projected-rank branch ignored validated usedMask/touched sparse reference ownership during its two buffer copies and per-eye vertex transformation.",
+    "source_trace": [
+      "Exact Calc3D2D nodes supply bounded semantic and optional indices.",
+      "R30 copies a complete vertexCount*stride span twice even when only indexed subset is used.",
+      "Projected rank stereo loop visits all vertexCount values instead of known touched list."
+    ],
+    "alternatives_rejected": [
+      "Removing rank stereo would reintroduce detached/headlocked glyphs.",
+      "Modifying shared world/HUD routes would risk unrelated stereo/particles and SkyGlow."
+    ],
+    "fix_evidence": "Dedicated sparse-plan validation feeds existing trusted R30SeedTouchedXyzrhwVertices and a bounded per-eye rank traversal; portable smoke compares both-eye XY to dense baseline.",
+    "eye_ownership": "Both eyes use the same exact producer and decoded indexed mask but independent existing deltaX/deltaY."
+  },
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "note": "Do not claim Windows or HMD result before exact-SHA jobs complete."
+  },
+  "runtime_evidence": "Quest3/VDXR game execution not performed; no FPS measurement or claimed optical acceptance.",
+  "score_delta_this_attempt": 0,
+  "score_once": false
+}

@@ -29,6 +29,7 @@
 #include "../core/stereo_world_scale.hpp"
 #include "../game/render_semantics.hpp"
 #include "../game/projected_rank_stereo.hpp"
+#include "../game/rank_marker_sparse.hpp"
 #include <cstring>
 #include "../state/state_block_tracker.hpp"
 #include "vr_pass_policy.hpp"
@@ -4557,7 +4558,9 @@ namespace OutRunVRStereo
         const R30XyzrhwState& state,
         OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& left,
         OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& right,
-        const std::vector<std::uint8_t>* usedMask) noexcept
+        const std::vector<std::uint8_t>* usedMask,
+        UINT knownUsedCount,
+        const std::vector<std::uint32_t>* touched) noexcept
         {
             if (!source || !vertexCount || stride < 4u * sizeof(float) ||
                 (usedMask && usedMask->size() < vertexCount))
@@ -4575,16 +4578,35 @@ namespace OutRunVRStereo
             {
                 return false;
             }
-            std::memcpy(left.data(), source, bytes);
-            std::memcpy(right.data(), source, bytes);
+
+            // Rank and rival SpriteNodes often draw sparse VB/IB ranges.
+            // The generic HUD path already copies only decoded references,
+            // while this world marker path used to memcpy the entire span
+            // twice and then scan every unreferenced vertex for both eyes.
+            // Preserve the original dense route for any untrusted hint.
+            const auto sparsePlan = OutRunVR::RankMarker::PlanSparseRankVertices(
+                vertexCount, usedMask, touched, knownUsedCount);
+            const bool sparse = sparsePlan.enabled &&
+                R30SeedTouchedXyzrhwVertices(
+                    static_cast<const std::uint8_t*>(source), vertexCount,
+                    stride, left, &right, *usedMask, touched,
+                    sparsePlan.referenced);
+            if (!sparse)
+            {
+                std::memcpy(left.data(), source, bytes);
+                std::memcpy(right.data(), source, bytes);
+            }
             const auto& vp = state.viewport;
             const float requestedScale = Settings::VRHudScale.get();
             if (!std::isfinite(requestedScale))
                 return false;
             const float scale = std::clamp(
                 requestedScale, 0.30f, 1.20f);
-            for (UINT i = 0; i < vertexCount; ++i)
+            const UINT visits = sparse
+                ? static_cast<UINT>(sparsePlan.referenced) : vertexCount;
+            for (UINT visit = 0; visit < visits; ++visit)
             {
+                const UINT i = sparse ? (*touched)[visit] : visit;
                 if (usedMask && !(*usedMask)[i])
                     continue;
                 const auto off = static_cast<std::size_t>(i) * stride;
@@ -4625,7 +4647,7 @@ namespace OutRunVRStereo
             if (state.projectedWorldMarker)
                 return R30TransformProjectedRankXyzrhwStereo(
                     source, vertexCount, stride, state,
-                    left, right, usedMask);
+                    left, right, usedMask, knownUsedCount, touched);
 
             // Fuse both non-indexed and indexed ScreenHud eyes in one CPU walk.
             // Preserve Z/RHW, UV, color and the original asymmetric FOV math;
