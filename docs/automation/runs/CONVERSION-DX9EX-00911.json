@@ -1,0 +1,106 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00911",
+  "production_id": "CONVERSION-DX9EX-00911",
+  "event_id": "CONVERSION-DX9EX-00911-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00911",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "NEEDS_VALIDATION",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "6e48da6acb9d485189d871331ee36ef2ff2fef57",
+  "material_result_sha": "57437f2531a21792d2d7dcf628778cd61d4064cc",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00911.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Preserve original GOAL 0-99% animated result record/title/stage glyph output as one correctly owned stereo ScreenHud image through direct and deferred D3DXSprite GPU draw submission, without changing the final result or unrelated gameplay HUD.",
+    "scope_boundary": "Only the three original 0x975EE, 0x97727 and 0x977FB Sumo_Printf GOAL print E8 parents and existing finite GOAL D3DX batch owner. Do not re-enable crash-prone nineteen B9200 return hooks, or modify gameplay timer, +TIME, rank, SkyGlow, input, FFB, R26_SAFE, DX11 or frozen DXVK.",
+    "trace_stages": [
+      "Canonical three original GOAL Sumo_Printf E8 CALLs enter exact OutRunStagePrintf source with immediately rasterized glyph and newly appended SpriteNode siblings.",
+      "OutRunStagePrintfEnter splits a provably homogeneous previous D3DX batch before selecting ScreenHud, and Leave submits a still-homogeneous GOAL D3DX batch before restoring previous direct source; independently TagAppendedNodes propagates queued siblings.",
+      "VRProjectedD3DXSpriteIsolationR64 preserves the exact OutRunStagePrintf token through queued node transition and D3DX Begin/Draw/Flush/End; R84 R30 per-eye ScreenHud and OpenXR host use unchanged stereo projection; HMD visual confirmation is separate."
+    ],
+    "subcomponents": [
+      "Wire exact three GOAL result Sumo_Printf parent enter/leave C++ to existing fail-closed direct previous-owner and source-exit batch lifetime boundaries, preserving original E8 CALL and no unsafe B9200 detours.",
+      "Expand both finite original GOAL queued-Draw and direct-Flush producer predicates to OutRunStagePrintf, while protecting mixed/other owners with static asserts and portable C++ runtime smoke."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_result_text_stereo_batch",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original GOAL 0-99% Sumo_Printf result stage/title/record glyph producer to R84 binocular screen plane",
+        "expected_behavior": "All three original safe GOAL print producer parents submit their direct homogeneous D3DX glyph draws before their ScreenHud source expires and queue their siblings with identical exact producer identity."
+      },
+      {
+        "id": "batch_safety_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Unrelated/foreign/mixed batch and original GOAL final-result, rank, +TIME, input and FFB protection",
+        "expected_behavior": "D3DX batch promotion rejects different producer, already-active queue, mixed content, late draws and unknown sprite lifecycle; original D3DX Flush/End and all nineteen unsafe B9200 calls remain unchanged."
+      },
+      {
+        "id": "mandatory_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Exact SHA Windows game R84 and R26_SAFE, x64 host, package, Domain, Full Source Impact and HUD Inspector",
+        "expected_behavior": "Mandatory DX9Ex Active Windows host/game/full-chain/package, Domain Isolation, Full Source Impact and EXE HUD Inspector workflows pass on one final validation-bearing SHA, with Quest3 runtime testing reported separately."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_result_text_stereo_batch": "SOURCE_IMPLEMENTED",
+    "batch_safety_fallback": "PORTABLE_STATIC_ASSERTS_IMPLEMENTED",
+    "mandatory_exact_sha_gates": "PENDING"
+  },
+  "diagnosis": {
+    "root_cause": "Three original GOAL Sumo_Printf parent hook scopes already covered direct primitive dispatch and queued SpriteNodes, but an ID3DXSprite::Draw inside the original E8 may defer the physical GPU submission until a later Flush/End after source scope restored. The existing D3DX finite GOAL owner only recognized GoalTime020, GoalTime150 and ResultProgress, not OutRunStagePrintf.",
+    "source_trace": [
+      "GOAL print calls 0x975EE/0x97727/0x977FB have hook enter and leave, direct ScopedExactProducerSemantic, and tagged SpriteNode children.",
+      "ID3DXSprite Draw accumulates a pending batch whose GPU Draw can be submitted by a later Flush or End, after parent scope exits; previous GOAL batch admission omits OutRunStagePrintf.",
+      "New R64 finite GOAL owner and both queue/direct predicates recognize this exact token, and direct GOAL enter/leave flush only trusted homogeneous pending batches under the matching original source."
+    ],
+    "alternatives_rejected": [
+      "Hooking the nineteen original B9200 parents risks confirmed EIP crash at 0x97C5F/0x97E75 and does not prove deferred D3DX ownership.",
+      "Relabeling all ScreenHud or alpha draws to the GOAL plane could damage lens, SkyGlow, world stereo and completed results.",
+      "Flushing every global Draw defeats D3DX batching and allows unrelated sprites to be submitted under the wrong producer."
+    ],
+    "fix_evidence": "Exact original GOAL Sumo_Printf E8 scoped source now splits old D3DX batch before new ScreenHud provenance and drains only its own homogeneous batch before resetting the previous semantic; queue path recognizes the same exact producer.",
+    "negative_test_evidence": "Both semantic batch predicate compile-time static_asserts and portable goal_progress_owner_smoke.cpp cover matched, foreign, mixed, multi-draw after queue select, and nested queue cases. HMD verification remains pending.",
+    "eye_ownership": "OutRunStagePrintf stays ScreenHud only during its proven direct or queued sprite GPU submission, leaving unchanged R84 per-eye transforms, existing result visuals, SkyGlow and non-GOAL world paths.",
+    "original_evidence": "Canonical pinned OutRun 2006 executable identifies original Sumo_Printf GOAL result E8 parents at 0x975EE/0x97727/0x977FB, distinct from known unsafe direct B9200 family."
+  },
+  "ci_evidence": {
+    "material_source_commit": "57437f2531a21792d2d7dcf628778cd61d4064cc",
+    "initial_active_run_id": 38783965786,
+    "initial_policy_failure": "Required exact-task run JSON was absent; C++ compilation had not been attempted by skipped Active jobs. Adding this contract to enable mandated exact-SHA validation under same TASK_ID.",
+    "status": "PENDING_EXACT_SHA",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ]
+  },
+  "runtime_evidence": "No matching OutRun2006 runtime or Quest3/VDXR stereo headset session executed; optical pass and FPS effects unproven.",
+  "score_delta_this_attempt": 0,
+  "score_once": false,
+  "hold_reason": "NEED_HMD_TEST and mandatory final exact SHA CI is pending; do not claim build-verified before all gates."
+}
