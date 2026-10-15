@@ -31,6 +31,8 @@ def linked(source: str) -> bool:
         "D3DRS_ZWRITEENABLE" in helper,
         "D3DRS_STENCILENABLE" in helper,
         "status != D3DERR_NOTFOUND" in helper,
+        "inactive_extra_mrt(true, extraMask)" in helper,
+        "no_main_stencil_write(" in helper,
         "s.clearColor.matches(" in helper,
     ))
 

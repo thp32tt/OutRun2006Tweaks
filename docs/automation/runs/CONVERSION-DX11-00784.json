@@ -1,0 +1,104 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00784",
+  "production_id": "CONVERSION-DX11-00784",
+  "event_id": "CONVERSION-DX11-00784-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:MASKED_MAIN_MRT_READONLY_STENCIL_DRAW_CONTINUITY",
+  "feature_id": "DX11-MAIN-MRT-STENCIL-READONLY-MASKED-SOURCE-CONTINUITY",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "788bbf0bc381a21efa674904c354e7f33c930498",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_no_target_write_draw_00768.py",
+    "tools/test_dx11_x8_alpha_only_game_draw_00770.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_readonly_masked_main_game_00784.cpp",
+    "tools/test_dx11_readonly_masked_main_game_00784.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-MAIN-MRT-STENCIL-READONLY-MASKED-SOURCE-CONTINUITY",
+    "goal": "Keep actual game-authored menu, vehicle and race D3D9 Draw/DrawIndexed full native frame contiguous through pixel-neutral main RT0 calls with color-disabled bound MRTs and read-only stencil, while failing closed on writable/unknown masks, main Z, destination alpha and original gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "main-frame-masked-command-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_D3D9_Draw_DrawIndexed_D3D11_native_full_frame",
+        "expected_behavior": "Precisely absorb real no-write main-backbuffer game commands with zero-write bound RT1..RT3 and read-only stencil before subsequent native Draw/DrawIndexed and same Present."
+      },
+      {
+        "id": "writable-state-safe-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_MRT_stencil_depth_destination_alpha_gamepad",
+        "expected_behavior": "Writable or unknown MRT/stencil, A8 alpha-write, main depth write, missing clear and unsupported state abort optional native publication without changing original D3D9 Present or input."
+      },
+      {
+        "id": "exact-five-sha-build-gate",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "Compiled positive and destructive negative regressions plus all five mandatory GitHub Actions at one exact validation-bearing source SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "D3D9 original GetRenderTarget/GetRenderState MRT and stencil write-mask at live game Draw/DrawIndexed",
+      "pixel-neutral ordinal absorption in real native full-frame GameNativeFrameBatch; later native Draw/Present remains contiguous",
+      "failed proof aborts native batch and original D3D9 Draw/Present/controller unchanged"
+    ],
+    "batch_components": [
+      "live_game_frame_bridge.cpp bound MRT mask plus stencil read-only qualification",
+      "GameNativeOffscreenPass and GameNativeMaskedDraw policy integration through both observe and unavailable Draw paths",
+      "compiled main-frame continuity plus destructive Python link/fallback regressions"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "tools/dx11_readonly_masked_main_game_00784.cpp compiled full native frame ordinals and display batch",
+      "negative_regression": "tools/test_dx11_readonly_masked_main_game_00784.py stencil mutation and source linkage; runtime D3D9 fallback on unsafe state",
+      "component_integration": "D3D9 MRT and stencil states => native no-write acceptance => subsequent menu/race DrawIndexed => safe Present"
+    },
+    "conflict_keys": [
+      "DX11:MASKED_MAIN_MRT_READONLY_STENCIL_DRAW_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Full-frame source candidate; exact SHA CI and Quest3/VDXR runtime pending.",
+    "activation_guard_and_fallback": "Full mode stays opt-in; unsafe MRT/stencil and unknown owner abort native source only. D3D9 game Draw, Present, input/FFB, SkyGlow and DX9Ex fallback untouched; DXVK frozen."
+  },
+  "acceptance_results": {
+    "main-frame-masked-command-continuity": "PENDING_CI",
+    "writable-state-safe-fallback": "PENDING_CI",
+    "exact-five-sha-build-gate": "PENDING_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "HEAD 00783 complete and claim released; disjoint no-write main target source.",
+    "C1_REVIEW": "Main target bound inactive MRT and read-only stencil fail closed despite no output writes.",
+    "C2_IMPLEMENT": "Actual no-write source admission and compiled positive/negative regression.",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "Material source candidate; required 5 Gates not yet verified.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_GATE"
+  },
+  "evidence": {
+    "runtime_testing": "Not performed; original game and Quest3/VDXR UNTESTED"
+  }
+}

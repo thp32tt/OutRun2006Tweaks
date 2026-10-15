@@ -4963,13 +4963,36 @@ bool proven_game_draw_no_target_writes(IDirect3DDevice9* game, const State& s) n
     if (FAILED(game->GetDeviceCaps(&caps)) ||
         !GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs))
         return false;
+    // Menu/car/race main-backbuffer draws may retain live RT1..RT3 bindings
+    // while disabling every channel on those targets. Such draws are still
+    // pixel-neutral if RT0, main Z and stencil are also non-writable. Check
+    // each bound MRT's *own* D3D9 color mask; missing caps/state or any
+    // writable channel keeps original D3D9 Draw/Present and aborts native.
+    constexpr D3DRENDERSTATETYPE kExtraColorMasks[] = {
+        D3DRS_COLORWRITEENABLE1, D3DRS_COLORWRITEENABLE2,
+        D3DRS_COLORWRITEENABLE3
+    };
     for (DWORD i = 1u; i < caps.NumSimultaneousRTs; ++i) {
         ComPtr<IDirect3DSurface9> extra;
         const HRESULT status = game->GetRenderTarget(i, extra.GetAddressOf());
-        // A bound MRT can write with COLORWRITEENABLE1..3 even when RT0
-        // is masked. A failed/unknown query cannot certify a no-op draw.
-        if (status != D3DERR_NOTFOUND) return false;
+        if (status == D3DERR_NOTFOUND) continue;
+        DWORD extraMask = 0xffffffffu;
+        if (status != D3DERR_NOTFOUND &&
+            (FAILED(status) || !extra ||
+             FAILED(game->GetRenderState(kExtraColorMasks[i - 1u], &extraMask)) ||
+             !GameNativeOffscreenPass::inactive_extra_mrt(true, extraMask)))
+            return false;
     }
+    // Stencil test ENABLED does not mean stencil can mutate main Z/S.
+    // A zero write mask is read-only; an unknown or nonzero mask must
+    // never certify a no-write Draw, even if RT0 and MRT masks are zero.
+    DWORD stencilWriteMask = 0xffffffffu;
+    const bool stencilMaskKnown = stencilEnabled == FALSE ||
+        SUCCEEDED(game->GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask));
+    if (!GameNativeOffscreenPass::no_main_stencil_write(
+            stencilEnabled != FALSE, stencilMaskKnown, stencilWriteMask))
+        return false;
+    const bool stencilWrites = stencilEnabled != FALSE && stencilWriteMask != 0u;
     ComPtr<IDirect3DSurface9> target, backbuffer;
     ComPtr<IUnknown> targetIdentity, identity;
     D3DSURFACE_DESC targetDesc{}, backbufferDesc{};
@@ -5000,7 +5023,7 @@ bool proven_game_draw_no_target_writes(IDirect3DDevice9* game, const State& s) n
             static_cast<std::uint32_t>(colorMask),
             backbufferDesc.Format == D3DFMT_A8R8G8B8,
             zEnabled != D3DZB_FALSE, zWrite != FALSE,
-            stencilEnabled != FALSE, false)) return true;
+            stencilWrites, false)) return true;
     // Menu fades and race passes sometimes issue real Draw/DrawIndexed calls
     // with an unconditional D3D9 alpha or Z rejection. They write neither
     // RGB/alpha nor Z even with write masks ON; they must consume a precise
@@ -5013,7 +5036,7 @@ bool proven_game_draw_no_target_writes(IDirect3DDevice9* game, const State& s) n
         return false;
     return GameNativeFragmentReject::no_target_write(
         true, sameClearedGameBackbuffer, true, true,
-        stencilEnabled == FALSE, alphaTest == TRUE,
+        !stencilWrites, alphaTest == TRUE,
         static_cast<std::uint32_t>(alphaFunc),
         zEnabled != D3DZB_FALSE, static_cast<std::uint32_t>(depthFunc));
 }
