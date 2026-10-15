@@ -1,0 +1,106 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00901",
+  "production_id": "CONVERSION-DX9EX-00901",
+  "event_id": "CONVERSION-DX9EX-00901-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00901",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:RANK_MARKERS",
+  "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "phase": "C4_COMMIT",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "8b797725585044f812b41062b90340b3341e7d36",
+  "material_result_sha": "bd66d431468351742a713d3cbf617215aa572caf",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/core/r32_review_api.hpp",
+    "src/vr/game/projected_rank_stereo.hpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/core/r32_review_api.hpp",
+    "src/vr/game/projected_rank_stereo.hpp",
+    "vrhost/tests/r84_rank_marker_stereo_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00901.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:RANK_MARKERS",
+    "symptom_id": "DX9EX:SYMPTOM:RANK_MARKERS",
+    "goal": "Keep exact original Calc3D2D ordinal-rank and rival-car markers attached to each producer vehicle across both stereo eyes in the default R84 game DLL; restore complete pixel shader and native XYZRHW stream paths with per-car child sprite offsets.",
+    "scope_boundary": "Only queue-owned original car/rival rank markers with valid per-vehicle view-space Calc3D2D anchor; do not change NaviPub screen HUD/DispRank text, generic alpha HUD, stage +TIME, GOAL, SkyGlow, world geometry, original FFB/input or R26_SAFE rollback.",
+    "trace_stages": [
+      "Original 0xBAEE2 ordinal Calc3D2D wrapper and 0xBB6F5 rival CALL preserve a per-car view-space point, then TagAppendedNodes attaches exact projected semantic to each SpriteNode.",
+      "Original D3D9 SpriteNode/queue dispatch selects the producer, but default R84 previously lacked R26_SAFE ProjectedWorldMarker2D in the R30 XYZRHW and R32/R33 shader dispatch pathways.",
+      "The new R84 R30 exact projector derives per-eye anchor deltas from original game projection, latched head inverse and relative-eye transforms; R33 physically submits eye-specific VS constants and R30 native XYZRHW UP/VB/IB rerenders per-eye XY, leaving sprite attributes and protected fallback intact."
+    ],
+    "subcomponents": [
+      "Restore exact car/rival projected rank semantic routing through independent R30→R32→R33 shader/c64 screen-pass, including per-eye source matrix and per-sprite anchor.",
+      "Restore original view-space car anchor and child sprite offsets across R84 XYZRHW primitive and indexed UP/VB/IB paths, without promoting ordinary screen HUD or non-vehicle world particles.",
+      "Preserve source XY original glyph spacing, UV/alpha/Z/RHW, fail-closed missing marker/projection/pose/shader/viewport, and verify stereo/unknown-source negative behavior."
+    ],
+    "acceptance_items": [
+      {
+        "id": "rank_exact_original_car_eyes",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Exact Calc3D2D SpriteNode car/rival plus two-eye shader and XYZRHW GPU submission",
+        "expected_behavior": "Source-owned per-car ordinal and rival markers project their individual original view-space anchor to both OpenXR eye FOVs; all same-marker queued children keep relative glyph spacing, unchanged vertex UV alpha and native draw semantics."
+      },
+      {
+        "id": "rank_original_game_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "NaviPub screen rank, generic HUD, missing marker and R26_SAFE native fallback",
+        "expected_behavior": "Missing/foreign/stale/nonfinite view-space point, inconsistent head pose, invalid clip-W, viewport or eye transform cannot acquire projected marker ownership; original game/HUD/SkyGlow/GOAL/input and frozen DXVK remain untouched."
+      },
+      {
+        "id": "rank_r84_exact_sha_quality",
+        "category": "integrated_validation",
+        "behavior_area": "Default R84 Win32 DLL, R26_SAFE, x64 OpenXR host, package and exact SHA CI",
+        "expected_behavior": "The existing DX9Ex Active Windows game+host+package, Domain Isolation and affected Full Source gates succeed at the final validation-bearing source SHA; matching Quest3/VDXR optical acceptance remains UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "The R84 R30ScreenSpaceKind had only None/Hud2D/FlatPerspectiveEffect/ExactLensCentreWorld whereas R26_SAFE had ProjectedWorldMarker2D with R57BuildProjectedMarkerDelta for original Calc3D2D; original per-car producer points are already captured and retained on queue SpriteNode.",
+    "source_trace": [
+      "Original ordinal Calc3D2D_OrdinalExactCall and rival 0xBB6F5 recover per-car finite view-space data in hooks_uiscaling.cpp.",
+      "TagAppendedNodes publishes original producer and ProjectedMarkerInfo through queue and replay to actual drawing scope.",
+      "R84 R30/R32/R33 shader draw and R30 native XYZRHW UP/VB/IB previously classed projected marker as generic HUD/world; R26_SAFE R57 reference matches exact car-specific eye transform."
+    ],
+    "root_cause": "R84 TU split had never carried the exact projected per-vehicle semantic, anchor reprojection and XYZRHW counterpart into the mainline path despite intact original game producer tagging. Normal FOV-only HUD placement loses changing vehicle-relative anchor depth and can detach rank markers.",
+    "alternatives_rejected": [
+      "Do not rebuild or relabel R26_SAFE-only source as the R84 production DLL; do not globally turn all translucent sprites into world billboards or modify original ranked race/UI logic.",
+      "Do not alter NaviPub/DispRank known-good source or put rank digits on fixed head-locked HUD; preserve original per-marker view-space evidence and reject missing/behind-camera anchors."
+    ],
+    "fix_evidence": "Material C++ bd66d431468351742a713d3cbf617215aa572caf in R30 independently compiled owner adds per-car original view projection to both c64 VS and XYZRHW primitive/indexed CPU vertex source paths, explicit R32 enum bridge and portable NDC conversion.",
+    "negative_test_evidence": "Added portable vrhost/tests/r84_rank_marker_stereo_smoke.cpp with stereo eye separation, glyph child-offset continuity and invalid eye/viewport/NaN. Exact Windows CI awaiting run-record repair and code compilation.",
+    "eye_ownership": "Each queue-owned original Calc3D2D marker uses one view-space point and one latched stereo pose. Same original marker's children receive two independent eye-space XY updates before R33/R30 right-eye validation and state restore; missing source returns existing lower path."
+  },
+  "ci_evidence": {
+    "initial_material_sha": "bd66d431468351742a713d3cbf617215aa572caf",
+    "initial_active_run_id": 38746022918,
+    "initial_policy_failure": "Exact-HEAD feature run record absent, before Windows game/host/package; source compile not reached.",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "revalidation": "PENDING_FINAL_SHA"
+  },
+  "runtime_evidence": "No matching Quest3/VDXR real game/optical test; no visual PASS claim.",
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "NEED_EXACT_SHA_CI_AND_HMD"
+}
