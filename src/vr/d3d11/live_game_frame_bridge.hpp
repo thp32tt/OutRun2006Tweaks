@@ -57,10 +57,10 @@ void observe_scene_boundary(IDirect3DDevice9* gameDevice) noexcept;
 void observe_game_surface_mutation(IDirect3DDevice9* gameDevice,
                                    IDirect3DSurface9* destination,
                                    HRESULT originalResult) noexcept;
-// When a completed game ColorFill writes the exact entire Clear-owned main
-// backbuffer, update the native RTV (or pre-Draw clear baseline) instead of
-// discarding menu/vehicle/race native Draw continuity.
-bool preserve_game_full_color_fill(IDirect3DDevice9* gameDevice,
+// Replay verified whole ColorFill as a native clear seed/RTV clear, or a
+// bounded partial ColorFill in an active native frame through D3D11.1 ClearView.
+// Unknown/unsupported writes still invalidate and retain original D3D9 output.
+bool preserve_game_color_fill(IDirect3DDevice9* gameDevice,
                                    IDirect3DSurface9* destination,
                                    const RECT* rect, D3DCOLOR color,
                                    HRESULT originalResult) noexcept;

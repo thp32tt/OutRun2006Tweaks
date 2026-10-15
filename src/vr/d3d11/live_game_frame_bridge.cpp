@@ -52,6 +52,7 @@
 
 #include <Windows.h>
 #include <d3dcompiler.h>
+#include <d3d11_1.h>
 #include <wrl/client.h>
 #include <algorithm>
 #include <array>
@@ -5536,11 +5537,14 @@ void observe_game_surface_mutation(
     }
 }
 
-bool preserve_game_full_color_fill(
+
+bool preserve_game_color_fill(
     IDirect3DDevice9* game, IDirect3DSurface9* destination,
     const RECT* rect, D3DCOLOR color, HRESULT originalResult) noexcept {
-    // Original D3D9 ColorFill is already finished; only a whole, same-owner
-    // main backbuffer operation can be represented as an exact native RTV clear.
+    // Observe the successful original D3D9 write; never replace its HRESULT.
+    // A whole fill updates the initial native clear or clears the live RTV.
+    // A bounded partial fill after native Draw requires D3D11.1 ClearView:
+    // unlike ClearRenderTargetView, it preserves the unfilled menu/race pixels.
     if (nativeOutputUploadDepth != 0u || !diagnostic_enabled() ||
         !env_full_game_opt_in() || !game || !destination ||
         FAILED(originalResult)) return false;
@@ -5549,11 +5553,11 @@ bool preserve_game_full_color_fill(
         if (FAILED(destination->GetDesc(&desc)) ||
             desc.Pool != D3DPOOL_DEFAULT || !desc.Width || !desc.Height ||
             (desc.Format != D3DFMT_A8R8G8B8 &&
-             desc.Format != D3DFMT_X8R8G8B8) ||
-            (rect && (rect->left != 0 || rect->top != 0 ||
-                      rect->right != static_cast<LONG>(desc.Width) ||
-                      rect->bottom != static_cast<LONG>(desc.Height))))
-            return false;
+             desc.Format != D3DFMT_X8R8G8B8)) return false;
+        const bool wholeSurface = !rect ||
+            (rect->left == 0 && rect->top == 0 &&
+             rect->right == static_cast<LONG>(desc.Width) &&
+             rect->bottom == static_cast<LONG>(desc.Height));
         ComPtr<IUnknown> surfaceIdentity;
         if (FAILED(destination->QueryInterface(
                 IID_PPV_ARGS(surfaceIdentity.GetAddressOf()))) ||
@@ -5565,16 +5569,45 @@ bool preserve_game_full_color_fill(
             owner, reinterpret_cast<std::uintptr_t>(surfaceIdentity.Get())) &&
             (s.sourceGameDevice == 0u || s.sourceGameDevice == owner);
         const bool alreadyDrawn = s.frameBatch.submitted != 0u;
-        const bool targetReady = !alreadyDrawn ||
-            (s.backend.ready() && s.backend.color_rtv() &&
-             s.backend.context() && s.nativeWidth == desc.Width &&
-             s.nativeHeight == desc.Height);
+        const bool targetReady = s.backend.ready() && s.backend.color_rtv() &&
+            s.backend.context() && s.nativeWidth == desc.Width &&
+            s.nativeHeight == desc.Height;
+        if (!wholeSurface) {
+            // ClearView is optional on D3D11.0 hardware/runtime. Only mutate
+            // the native target when every admission check passes, otherwise
+            // retire the batch and leave the original D3D9 pixels untouched.
+            if (!rect || !GameNativeSourceMutation::mirrors_partial_color_fill(
+                    true, SUCCEEDED(originalResult), sameGameBackbuffer,
+                    alreadyDrawn && s.pending && !s.frameBatch.stopped,
+                    targetReady,
+                    GameNativeSourceMutation::bounded_color_fill_rect(
+                        rect->left, rect->top, rect->right, rect->bottom,
+                        desc.Width, desc.Height)))
+                return false;
+            ComPtr<ID3D11DeviceContext1> context1;
+            if (FAILED(s.backend.context()->QueryInterface(
+                    IID_PPV_ARGS(context1.GetAddressOf()))) || !context1)
+                return false;
+            constexpr float scale = 1.0f / 255.0f;
+            const float rgba[4] = {
+                float((color >> 16) & 255u) * scale,
+                float((color >> 8) & 255u) * scale,
+                float(color & 255u) * scale,
+                desc.Format == D3DFMT_X8R8G8B8 ? 1.0f :
+                    float((color >> 24) & 255u) * scale
+            };
+            const D3D11_RECT nativeRect{
+                rect->left, rect->top, rect->right, rect->bottom};
+            context1->ClearView(s.backend.color_rtv(), rgba, &nativeRect, 1u);
+            // A partial ColorFill is not a new whole-frame clear baseline.
+            // Keep the original full Clear seed, depth and Draw ordinals.
+            return true;
+        }
+        const bool wholeTargetReady = !alreadyDrawn || targetReady;
         if (!GameNativeSourceMutation::mirrors_full_color_fill(
                 true, SUCCEEDED(originalResult), sameGameBackbuffer,
-                sameGameBackbuffer, true, !s.frameBatch.stopped, targetReady))
-            return false;
-        // X8 cannot store destination alpha: keep native alpha opaque for
-        // game-authored DESTALPHA blending and subsequent real game Draws.
+                sameGameBackbuffer, true, !s.frameBatch.stopped,
+                wholeTargetReady)) return false;
         s.clearColor.argb = color;
         s.clearColor.opaqueDestinationAlpha =
             desc.Format == D3DFMT_X8R8G8B8;
@@ -5585,11 +5618,9 @@ bool preserve_game_full_color_fill(
             s.backend.context()->ClearRenderTargetView(
                 s.backend.color_rtv(), rgba.data());
         }
-        // This color operation is fully replayed: keep native Draw ordinals,
-        // independent depth and original D3D9 Present/controller/FFB semantics.
         return true;
     } catch (...) {
-        return false;
+        return false; // Original D3D9 ColorFill and input always win.
     }
 }
 

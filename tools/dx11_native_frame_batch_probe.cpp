@@ -74,6 +74,36 @@ constexpr bool native_full_color_fill_regression() {
     return frame.publishable_full(true, 1u); // No skipped/extra game Draw.
 }
 static_assert(native_full_color_fill_regression());
+// Active menu/car/race Draw -> bounded partial native RTV ColorFill -> later
+// Draw/Present continuity; no seed-only partial fill, foreign surface, failed
+// D3D9 operation or out-of-bounds write may reuse the native frame.
+constexpr bool native_partial_color_fill_regression() {
+    using M = GameNativeSourceMutation;
+    constexpr auto valid = M::bounded_color_fill_rect(10, 20, 200, 100, 640, 480);
+    if (!valid || M::bounded_color_fill_rect(-1, 20, 200, 100, 640, 480) ||
+        M::bounded_color_fill_rect(10, 20, 641, 100, 640, 480) ||
+        M::bounded_color_fill_rect(10, 20, 10, 100, 640, 480) ||
+        M::bounded_color_fill_rect(10, 20, 200, 20, 640, 480) ||
+        M::bounded_color_fill_rect(0, 0, 0, 0, 0, 0) ||
+        !M::mirrors_partial_color_fill(true, true, true, true, true, valid) ||
+        M::mirrors_partial_color_fill(false, true, true, true, true, valid) ||
+        M::mirrors_partial_color_fill(true, false, true, true, true, valid) ||
+        M::mirrors_partial_color_fill(true, true, false, true, true, valid) ||
+        M::mirrors_partial_color_fill(true, true, true, false, true, valid) ||
+        M::mirrors_partial_color_fill(true, true, true, true, false, valid) ||
+        M::mirrors_partial_color_fill(true, true, true, true, true, false))
+        return false;
+    GameNativeFrameBatch frame{};
+    frame.succeeded(true);
+    frame.record_source_draw(0u);
+    if (!frame.publishable_full(true, 1u)) return false;
+    // ClearView does not add a draw or invalidate the previously seeded Z.
+    if (!M::mirrors_partial_color_fill(true, true, true,
+            !frame.stopped && frame.submitted != 0u, true, valid))
+        return false;
+    return frame.publishable_full(true, 1u);
+}
+static_assert(native_partial_color_fill_regression());
 using outrun::vr::dx11::live_game_frame::GameNativePresentRegion;
 int main() {
     GameNativeFrameBatch b{};
