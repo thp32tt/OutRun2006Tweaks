@@ -1330,10 +1330,17 @@ def check_f11_desktop_vr_geometry_lifecycle() -> None:
         "static bool haveDesktopGeometry = false;",
         "const bool leavingVr = havePreviousLayout && previousVrShell && !externalVrShell;",
         "const bool restoreDesktopGeometry = leavingVr && haveDesktopGeometry;",
-        "const bool layoutChanged = havePreviousLayout && externalVrShell && (",
+        "const bool layoutChanged = havePreviousLayout &&",
+        "(externalVrShell || (leavingVr && !haveDesktopGeometry)) && (",
         "if (restoreDesktopGeometry)",
-        "ImGui::SetNextWindowSize(lastDesktopSize, ImGuiCond_Always);",
-        "ImGui::SetNextWindowPos(lastDesktopPosition, ImGuiCond_Always);",
+        "const ImVec2 fittedSize(",
+        "(std::min)(lastDesktopSize.x, content.width)",
+        "(std::min)(lastDesktopSize.y, content.height)",
+        "const ImVec2 fittedPosition(",
+        "std::clamp(lastDesktopPosition.x, content.x,",
+        "std::clamp(lastDesktopPosition.y, content.y,",
+        "ImGui::SetNextWindowSize(fittedSize, ImGuiCond_Always);",
+        "ImGui::SetNextWindowPos(fittedPosition, ImGuiCond_Always);",
         "ImGui::SetNextWindowSize(windowSize, layoutPlacement);",
         "ImGui::SetNextWindowPos(",
         "const bool shellOpen = ImGui::Begin(",
@@ -1356,7 +1363,7 @@ def check_f11_desktop_vr_geometry_lifecycle() -> None:
         if shell.count(marker) == 1:
             assert marker not in mutant
     assert shell.index("const bool leavingVr") < shell.index("previousVrShell = externalVrShell;")
-    assert shell.index("ImGui::SetNextWindowSize(lastDesktopSize") < shell.index(
+    assert shell.index("ImGui::SetNextWindowSize(fittedSize") < shell.index(
         "ImGui::SetNextWindowSize(windowSize, layoutPlacement);")
     assert shell.index("const bool shellOpen = ImGui::Begin(") < shell.index(
         "const ImVec2 position = ImGui::GetWindowPos();")
@@ -1377,8 +1384,8 @@ def check_f11_desktop_vr_geometry_lifecycle() -> None:
     ):
         leaving = has_prior and previous_vr and not vr
         restoring = leaving and saved is not None
-        changed = has_prior and vr and (previous_vr != vr or
-                                          geometry != saved)
+        changed = has_prior and (vr or (leaving and saved is None)) and (
+            previous_vr != vr or geometry != saved)
         assert restoring is expected_restore
         assert changed is expected_reflow
         if not vr:
@@ -1386,12 +1393,40 @@ def check_f11_desktop_vr_geometry_lifecycle() -> None:
                 assert saved == geometry
             saved = geometry
         previous_vr = vr
+    # Source-driven fallback when the very first F11 was opened in VR.
+    assert "leavingVr && !haveDesktopGeometry" in shell
+    # Preserve exact native drag coordinates when the viewport is unchanged,
+    # but clamp a restored out-of-bounds window after monitor downsizing.
+    for content, rect, expected in (
+        ((0., 0., 1920., 1080.), (280., 170., 800., 520.),
+         (280., 170., 800., 520.)),
+        ((0., 0., 1280., 720.), (1750., 880., 900., 700.),
+         (380., 20., 900., 700.)),
+        ((0., 0., 640., 480.), (-500., -30., 900., 700.),
+         (0., 0., 640., 480.)),
+    ):
+        left, top, width, height = content
+        x, y, w, h = rect
+        fw, fh = min(w, width), min(h, height)
+        fx = max(left, min(x, left + width - fw))
+        fy = max(top, min(y, top + height - fh))
+        assert (fx, fy, fw, fh) == expected
+        assert left <= fx <= left + width - fw
+        assert top <= fy <= top + height - fh
+    for unsafe in (
+        shell.replace("(std::min)(lastDesktopSize.x, content.width)",
+                      "lastDesktopSize.x", 1),
+        shell.replace("std::clamp(lastDesktopPosition.x, content.x,",
+                      "std::max(lastDesktopPosition.x, content.x,", 1),
+    ):
+        assert ("(std::min)(lastDesktopSize.x, content.width)" in unsafe
+                and "std::clamp(lastDesktopPosition.x, content.x," in unsafe) is False
     # The old code recentered on every desktop resize and overwrote a
     # previously dragged desktop shell on the VR->desktop transition.
     broken = shell.replace(
-        "havePreviousLayout && externalVrShell && (",
-        "havePreviousLayout && (", 1)
-    assert required[5] not in broken
+        "(externalVrShell || (leavingVr && !haveDesktopGeometry)) && (",
+        "(externalVrShell) && (", 1)
+    assert required[6] not in broken
     broken = shell.replace(
         "const bool restoreDesktopGeometry = leavingVr && haveDesktopGeometry;",
         "const bool restoreDesktopGeometry = false;", 1)

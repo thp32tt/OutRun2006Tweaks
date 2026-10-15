@@ -158,7 +158,10 @@ void Overlay::render_shell()
 	const bool restoreDesktopGeometry = leavingVr && haveDesktopGeometry;
 	// Only the XR shell owns forced reflow. The native desktop window is
 	// draggable/resizable across mirror changes and retains its saved bounds.
-	const bool layoutChanged = havePreviousLayout && externalVrShell && (
+	// If F11 was first opened in VR there is no native saved rectangle.
+	// On XR exit return that window to a native desktop-sized shell once.
+	const bool layoutChanged = havePreviousLayout &&
+		(externalVrShell || (leavingVr && !haveDesktopGeometry)) && (
 		previousVrShell != externalVrShell ||
 		std::fabs(previousContent.x - content.x) > 0.5f ||
 		std::fabs(previousContent.y - content.y) > 0.5f ||
@@ -182,10 +185,20 @@ void Overlay::render_shell()
 			ImVec2(maxWidth, maxHeight));
 	if (restoreDesktopGeometry)
 	{
-		// Restore both coordinates and interactive hitbox extents together.
-		// No VR-only size constraint is installed on this desktop frame.
-		ImGui::SetNextWindowSize(lastDesktopSize, ImGuiCond_Always);
-		ImGui::SetNextWindowPos(lastDesktopPosition, ImGuiCond_Always);
+		// A headset/mirror resolution change may leave the old native
+		// desktop rectangle offscreen. Retain the exact user coordinates
+		// when visible; otherwise fit BOTH hitbox size and origin to the
+		// current desktop content. Never affect the VR layout itself.
+		const ImVec2 fittedSize(
+			(std::min)(lastDesktopSize.x, content.width),
+			(std::min)(lastDesktopSize.y, content.height));
+		const ImVec2 fittedPosition(
+			std::clamp(lastDesktopPosition.x, content.x,
+				content.x + content.width - fittedSize.x),
+			std::clamp(lastDesktopPosition.y, content.y,
+				content.y + content.height - fittedSize.y));
+		ImGui::SetNextWindowSize(fittedSize, ImGuiCond_Always);
+		ImGui::SetNextWindowPos(fittedPosition, ImGuiCond_Always);
 	}
 	else
 	{
