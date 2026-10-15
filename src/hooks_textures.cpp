@@ -189,6 +189,21 @@ size_t D3DXGetFormatSize(D3DFORMAT fmt, size_t width = 1, size_t height = 1)
 #define D3DX_FILTER_SRGB_OUT             0x00400000
 #define D3DX_FILTER_SRGB                 0x00600000
 
+// Native x86 D3D9 textures use little-endian X8R8G8B8 storage. Source DDS
+// R8G8B8 rows are packed B,G,R (three bytes), not four-byte X8 texels.
+// Expanding the channel triplet explicitly preserves both color and opacity.
+constexpr std::uint32_t OpaqueBgr24Pixel(
+    std::uint8_t blue, std::uint8_t green, std::uint8_t red) noexcept
+{
+    return 0xFF000000u |
+        (static_cast<std::uint32_t>(red) << 16) |
+        (static_cast<std::uint32_t>(green) << 8) | blue;
+}
+static_assert(OpaqueBgr24Pixel(0x11, 0x22, 0x33) == 0xFF332211u,
+    "24-bit UI/car-selector DDS must preserve BGR and supply opaque X8");
+static_assert(OpaqueBgr24Pixel(0x00, 0x00, 0x00) == 0xFF000000u,
+    "24-bit DDS black must not acquire transparent alpha");
+
 // Simplified version of D3DXCreateTextureFromFileInMemoryEx which allows loading textures much faster
 HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	IDirect3DDevice9* pDevice,
@@ -297,6 +312,11 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 		format_orig == D3DFMT_X8B8G8R8)
 		format_present = format_orig == D3DFMT_A8B8G8R8
 			? D3DFMT_A8R8G8B8 : D3DFMT_X8R8G8B8;
+	// R8G8B8 is not a universally supported D3D9 texture allocation format.
+	// Expand each opaque 24-bit car-selector/menu DDS texel into X8R8G8B8,
+	// rather than asking CreateTexture/LockRect for a 3-byte GPU surface.
+	if (format_orig == D3DFMT_R8G8B8)
+		format_present = D3DFMT_X8R8G8B8;
 
 #ifdef _DEBUG
 	spdlog::info("Texture {}x{} mips {} fmt {}", Width, Height, MipLevels, (int)format_orig);
@@ -343,8 +363,12 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 		const size_t rowBytes = mipSize / rows;
 		const size_t sourceRowPitch = hasSourcePitch && mipLevel == 0
 			? declaredSourcePitch : rowBytes;
+		// Converted BGR24 occupies four destination bytes per source pixel.
+		// Validate against the *destination* requirement, never source pitch.
+		const size_t destinationRowBytes = format_orig == D3DFMT_R8G8B8
+			? static_cast<size_t>(mipWidth) * 4u : rowBytes;
 		if (!lockedRect.pBits || lockedRect.Pitch <= 0 ||
-			static_cast<size_t>(lockedRect.Pitch) < rowBytes)
+			static_cast<size_t>(lockedRect.Pitch) < destinationRowBytes)
 		{
 			(*ppTexture)->UnlockRect(mipLevel);
 			(*ppTexture)->Release();
@@ -359,7 +383,19 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 		{
 			const uint8_t* srcRow = srcData + static_cast<size_t>(row) * sourceRowPitch;
 			uint8_t* dstRow = dest + static_cast<size_t>(row) * dstPitch;
-			if (format_orig == D3DFMT_A8B8G8R8 ||
+			if (format_orig == D3DFMT_R8G8B8)
+			{
+				for (UINT x = 0; x < mipWidth; ++x)
+				{
+					const size_t sourcePixel = static_cast<size_t>(x) * 3u;
+					const std::uint32_t opaque = OpaqueBgr24Pixel(
+						srcRow[sourcePixel], srcRow[sourcePixel + 1],
+						srcRow[sourcePixel + 2]);
+					std::memcpy(dstRow + static_cast<size_t>(x) * 4u,
+						&opaque, sizeof(opaque));
+				}
+			}
+			else if (format_orig == D3DFMT_A8B8G8R8 ||
 				format_orig == D3DFMT_X8B8G8R8)
 			{
 				for (UINT x = 0; x < mipWidth; ++x)
