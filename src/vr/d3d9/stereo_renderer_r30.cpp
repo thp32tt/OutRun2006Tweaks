@@ -21,6 +21,7 @@
 #include "r30_indexed_up_bounds.hpp"
 #include "r30_shadow_bytes.hpp"
 #include "r30_shadow_scratch.hpp"
+#include "stereo_completion_gate.hpp"
 #include "lens_centre_source_provenance.hpp"
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
@@ -4530,28 +4531,34 @@ namespace OutRunVRStereo
                         device, savedRt, savedDepth, state.viewport, nullptr, false);
             }
 
-            R29OwnerNoteStableTwoEyeDraw();
-            if (state.worldEffect)
+            // Never publish a completed stereo draw or its pose metadata
+            // before BOTH physical eyes and the game render state are valid.
+            if (OutRunVR::StereoCompletion::CanPublishStereoDraw(
+                    SUCCEEDED(leftHr), SUCCEEDED(rightHr), restoreOk))
             {
-                R30RecordTelemetryCounter(R30XyzrhwWorldEffectDraws);
-                R29OwnerRecordXyzrhwWorldStereoDuplicate(
-                    state.stereo.poseSequence, state.stereo);
-                if (!R30FirstXyzrhwWorldLogged)
+                R29OwnerNoteStableTwoEyeDraw();
+                if (state.worldEffect)
                 {
-                    R30FirstXyzrhwWorldLogged = true;
-                    spdlog::info(
-                        "VR R30.4 XYZRHW WORLD: pre-transformed particle/billboard/decal draws reconstruct clip X/Y/Z/RHW, unproject through the game projection, then reproject into each OpenXR eye; affine RHW fallback retained for unsafe vertices");
+                    R30RecordTelemetryCounter(R30XyzrhwWorldEffectDraws);
+                    R29OwnerRecordXyzrhwWorldStereoDuplicate(
+                        state.stereo.poseSequence, state.stereo);
+                    if (!R30FirstXyzrhwWorldLogged)
+                    {
+                        R30FirstXyzrhwWorldLogged = true;
+                        spdlog::info(
+                            "VR R30.4 XYZRHW WORLD: pre-transformed particle/billboard/decal draws reconstruct clip X/Y/Z/RHW, unproject through the game projection, then reproject into each OpenXR eye; affine RHW fallback retained for unsafe vertices");
+                    }
                 }
-            }
-            else
-            {
-                R29OwnerRecordHudStereoDuplicate();
-                R30RecordTelemetryCounter(R30XyzrhwHudDraws);
-                if (!R30FirstXyzrhwHudLogged)
+                else
                 {
-                    R30FirstXyzrhwHudLogged = true;
-                    spdlog::info(
-                        "VR R30.8 XYZRHW HUD: pre-transformed fixed-function HUD applies source-aspect/eye-FOV X compensation before SBS/DirectGPU projection; circular gauges preserve final HMD aspect ratio");
+                    R29OwnerRecordHudStereoDuplicate();
+                    R30RecordTelemetryCounter(R30XyzrhwHudDraws);
+                    if (!R30FirstXyzrhwHudLogged)
+                    {
+                        R30FirstXyzrhwHudLogged = true;
+                        spdlog::info(
+                            "VR R30.8 XYZRHW HUD: pre-transformed fixed-function HUD applies source-aspect/eye-FOV X compensation before SBS/DirectGPU projection; circular gauges preserve final HMD aspect ratio");
+                    }
                 }
             }
 
@@ -5648,25 +5655,31 @@ namespace OutRunVRStereo
                         device, savedRt, savedDepth, savedViewport, original, true);
             }
 
-            R29OwnerRecordHudStereoDuplicate();
-            R29OwnerNoteStableTwoEyeDraw();
-            R30RecordTelemetryCounter(R30ScreenSpaceFovDraws);
-
-            if (!R30FirstScreenSpaceLogged)
+            // Never publish a completed stereo draw or its pose metadata
+            // before BOTH physical eyes and the game render state are valid.
+            if (OutRunVR::StereoCompletion::CanPublishStereoDraw(
+                    SUCCEEDED(leftHr), SUCCEEDED(rightHr), restoreOk))
             {
-                R30FirstScreenSpaceLogged = true;
-                spdlog::info(
-                    "VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}",
-                    eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
-                    R30HudAspectCompensation(
-                        stereo, frame.width, frame.height));
-            }
-            if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect &&
-                !R30FirstFlatPerspectiveLogged)
-            {
-                R30FirstFlatPerspectiveLogged = true;
-                spdlog::info(
-                    "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane with real head/IPD/FOV transform (no HudScale)");
+                R29OwnerRecordHudStereoDuplicate();
+                R29OwnerNoteStableTwoEyeDraw();
+                R30RecordTelemetryCounter(R30ScreenSpaceFovDraws);
+    
+                if (!R30FirstScreenSpaceLogged)
+                {
+                    R30FirstScreenSpaceLogged = true;
+                    spdlog::info(
+                        "VR R30 HUD: asymmetric-FOV convergence correction ACTIVE; common-centre offset[L/R]={:.4f}/{:.4f} hudScale={:.2f} sourceOverTarget={:.3f}",
+                        eyeOffset[0], eyeOffset[1], R30HudScaleValue(),
+                        R30HudAspectCompensation(
+                            stereo, frame.width, frame.height));
+                }
+                if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect &&
+                    !R30FirstFlatPerspectiveLogged)
+                {
+                    R30FirstFlatPerspectiveLogged = true;
+                    spdlog::info(
+                        "VR R30 FLAT EFFECT: depth-disabled alpha perspective overlay is world-locked on a finite virtual plane with real head/IPD/FOV transform (no HudScale)");
+                }
             }
 
             if (FAILED(rightHr))

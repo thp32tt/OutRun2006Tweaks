@@ -26,6 +26,7 @@
 #include "../state/state_block_recovery.hpp"
 #include "../state/state_block_tracker.hpp"
 #include "gpu_water_profiler.hpp"
+#include "stereo_completion_gate.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -749,12 +750,18 @@ namespace OutRunVRStereo
                     draw.originalConstants, true, depthlessPass, skipSavedViewportRestore);
             }
 
-            R32ReviewRecordWorldStereoDuplicate(
-                draw.poseSequence, *stereo);
-            R32ReviewNoteStableTwoEyeDraw();
-            if (R33TelemetryEnabled())
+            // Never publish a completed stereo draw or its pose metadata
+            // before BOTH physical eyes and the game render state are valid.
+            if (OutRunVR::StereoCompletion::CanPublishStereoDraw(
+                    SUCCEEDED(result.hr), SUCCEEDED(rightHr), restoreOk))
             {
-                R32ReviewNoteDispatchFastWorld();
+                R32ReviewRecordWorldStereoDuplicate(
+                    draw.poseSequence, *stereo);
+                R32ReviewNoteStableTwoEyeDraw();
+                if (R33TelemetryEnabled())
+                {
+                    R32ReviewNoteDispatchFastWorld();
+                }
             }
 
             if (FAILED(rightHr))
@@ -925,12 +932,18 @@ namespace OutRunVRStereo
                     device, savedRt, savedDepth, savedViewport, original, true, depthlessPass, skipSavedViewportRestore);
             }
 
-            R32ReviewRecordHudStereoDuplicate();
-            R32ReviewNoteStableTwoEyeDraw();
-            R32ReviewNoteScreenSpaceFovDraw();
-            if (R33TelemetryEnabled())
+            // Never publish a completed stereo draw or its pose metadata
+            // before BOTH physical eyes and the game render state are valid.
+            if (OutRunVR::StereoCompletion::CanPublishStereoDraw(
+                    SUCCEEDED(result.hr), SUCCEEDED(rightHr), restoreOk))
             {
-                R32ReviewNoteDispatchHud();
+                R32ReviewRecordHudStereoDuplicate();
+                R32ReviewNoteStableTwoEyeDraw();
+                R32ReviewNoteScreenSpaceFovDraw();
+                if (R33TelemetryEnabled())
+                {
+                    R32ReviewNoteDispatchHud();
+                }
             }
 
             if (FAILED(rightHr))
