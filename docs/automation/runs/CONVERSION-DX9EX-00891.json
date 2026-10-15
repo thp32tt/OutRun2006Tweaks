@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
   "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "86093634738ce8a753b078294d74be8dc9e3c4ac",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "eb16c79d1ec900562f406a333a103ffbb71b2a79",
   "source_paths": [
     "src/hooks_textures.cpp"
   ],
@@ -88,6 +88,35 @@
   "runtime_evidence": "No matching Quest3/VDXR or physical game execution performed.",
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "result_commit_ci_skip": false,
-  "hold_reason": "EXACT_SHA_CI_PENDING"
+  "result_commit_ci_skip": true,
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "checkpoint_commit_ci_skip": true,
+  "bookkeeping_ci_skip": true,
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "eb16c79d1ec900562f406a333a103ffbb71b2a79",
+    "material_sha": null,
+    "dx9ex_active": {
+      "run_id": 38716741582,
+      "head_sha": "eb16c79d1ec900562f406a333a103ffbb71b2a79",
+      "conclusion": "SUCCESS",
+      "jobs_passed": "5/5"
+    },
+    "domain_isolation": {
+      "run_id": 38716741667,
+      "head_sha": "eb16c79d1ec900562f406a333a103ffbb71b2a79",
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38716741608,
+      "head_sha": "eb16c79d1ec900562f406a333a103ffbb71b2a79",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38716741626,
+      "head_sha": "eb16c79d1ec900562f406a333a103ffbb71b2a79",
+      "conclusion": "IN_PROGRESS_AT_C6_RECORD"
+    },
+    "runtime": "UNTESTED"
+  }
 }
