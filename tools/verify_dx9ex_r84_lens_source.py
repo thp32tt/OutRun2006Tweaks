@@ -237,7 +237,36 @@ def main():
     for idx, old, new in mutants:
         assert old in values[idx], "negative mutation fixture absent: " + old
         mod = list(values)
-        mod[idx] = mod[idx].replace(old, new, 1)
+        # R84 has a separately source-owned HUD plane ahead of C993.
+        # Whole-file first-occurrence replacement can mutate that HUD
+        # instead, falsely reporting that a broken lens guard survived.
+        if idx == 2 and old in (
+            "QueueRenderActive()",
+            "R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch)",
+            "OutRunVRRenderer::GetLastGameWvpPoseEpoch(),",
+            "R29OwnerTopLevelDrawSerial() + 1u",
+            "sourceProducer == ProducerToken::LensFlareCentre",
+        ):
+            start = mod[2].index("bool R30HasExactLensCentreRawWvp(")
+            end = mod[2].index("R30ScreenSpaceKind R30ClassifyScreenSpacePass(", start)
+            owned = mod[2][start:end]
+            assert old in owned, "C993 provenance mutant missing exact owner: " + old
+            mod[2] = (mod[2][:start] + owned.replace(old, new, 1) +
+                      mod[2][end:])
+        elif idx == 2 and old in (
+            "headPoseSequence != stereo.poseSequence",
+            "std::memcpy(&rawUploadedT, rawGameWvp, sizeof(rawUploadedT))",
+        ):
+            start = mod[2].index(
+                "if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld)")
+            end = mod[2].index(
+                "if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect)", start)
+            owned = mod[2][start:end]
+            assert old in owned, "C993 GPU transform mutant missing: " + old
+            mod[2] = (mod[2][:start] + owned.replace(old, new, 1) +
+                      mod[2][end:])
+        else:
+            mod[idx] = mod[idx].replace(old, new, 1)
         try:
             check(*mod)
         except (AssertionError, ValueError, IndexError):
