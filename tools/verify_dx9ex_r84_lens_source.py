@@ -55,7 +55,7 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         "scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard",
         "CurrentRenderProducerToken() ==",
         # This exact original producer is established by ownedLensCentre
-        // outside the old depth-off-only raster branch.
+        # outside the old depth-off-only raster branch.
         "const bool ownedLensCentre =",
         "ProducerToken::LensFlareCentre;",
         "if (ownedLensCentre)",
