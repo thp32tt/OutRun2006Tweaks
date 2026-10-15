@@ -223,6 +223,22 @@ namespace OutRunVR::GameSemantic
     inline thread_local RenderScope CurrentQueueExactScope = RenderScope::None;
     inline thread_local RenderScope NextDrawScope = RenderScope::None;
     inline thread_local unsigned ExternalOverlaySemanticDepth = 0;
+    // Exact C993 draw can nest ordinary SceneEffect helper scopes. Preserve
+    // its producer through the actual GPU draw, not merely the parent E8.
+    // Queue execution and external F11 overlays retain higher precedence.
+    inline thread_local unsigned ExactLensCentreGpuDrawDepth = 0;
+
+    inline constexpr bool DirectLensCentreOwnsGpuDraw(
+        bool exactCentreActive, bool queueActive, bool externalOverlay) noexcept
+    {
+        return exactCentreActive && !queueActive && !externalOverlay;
+    }
+    static_assert(DirectLensCentreOwnsGpuDraw(true, false, false));
+    static_assert(!DirectLensCentreOwnsGpuDraw(true, true, false));
+    static_assert(!DirectLensCentreOwnsGpuDraw(true, false, true));
+    static_assert(!DirectLensCentreOwnsGpuDraw(false, false, false));
+
+    inline bool ExactLensCentreDrawOwnsSemantic() noexcept;
 
     inline const char* Name(RenderScope scope) noexcept
     {
@@ -308,6 +324,8 @@ namespace OutRunVR::GameSemantic
         // F11 is an external overlay, never a game SpriteNode consumer.
         if (ExternalOverlaySemanticDepth != 0)
             return CurrentScope;
+        if (ExactLensCentreDrawOwnsSemantic())
+            return RenderScope::WorldBillboard;
         if (CurrentQueueExactScope == RenderScope::ScreenHud ||
             CurrentQueueExactScope == RenderScope::WorldBillboard ||
             CurrentQueueExactScope == RenderScope::ProjectedWorldMarker2D)
@@ -326,6 +344,11 @@ namespace OutRunVR::GameSemantic
         // Never let it consume a pending game semantic token.
         if (ExternalOverlaySemanticDepth != 0)
             return CurrentScope;
+        // A nested SceneEffect/one-shot helper must not steal the exact C993
+        // centre's physical Draw. ScopedExactProducerSemantic restores its
+        // pending token after this original draw completes.
+        if (ExactLensCentreDrawOwnsSemantic())
+            return RenderScope::WorldBillboard;
         if (NextDrawScope != RenderScope::None)
         {
             const RenderScope scope = NextDrawScope;
@@ -522,13 +545,44 @@ namespace OutRunVR::GameSemantic
         return CurrentSpriteQueueProducer;
     }
 
+    inline bool ExactLensCentreDrawOwnsSemantic() noexcept
+    {
+        return DirectLensCentreOwnsGpuDraw(
+            ExactLensCentreGpuDrawDepth != 0, SpriteQueueDepth != 0,
+            ExternalOverlaySemanticDepth != 0);
+    }
+
     inline ProducerToken CurrentRenderProducerToken() noexcept
     {
-        // Real SpriteNode replay is authoritative even when a nested
-        // exact source call is on the stack.
-        return SpriteQueueDepth != 0
-            ? CurrentSpriteQueueProducer : CurrentDirectExactProducer;
+        // Queue nodes and external UI never inherit the central sun's
+        // provenance. Within this one C993 draw, a nested SceneEffect or
+        // temporary direct helper cannot rebrand the source c64 upload.
+        if (SpriteQueueDepth != 0)
+            return CurrentSpriteQueueProducer;
+        if (ExactLensCentreDrawOwnsSemantic())
+            return ProducerToken::LensFlareCentre;
+        return CurrentDirectExactProducer;
     }
+
+    class ScopedExactLensCentreGpuDraw final
+    {
+        bool active_ = false;
+    public:
+        explicit ScopedExactLensCentreGpuDraw(bool exactCentre) noexcept
+            : active_(exactCentre && SpriteQueueDepth == 0 &&
+                ExternalOverlaySemanticDepth == 0)
+        {
+            if (active_)
+                ++ExactLensCentreGpuDrawDepth;
+        }
+        ~ScopedExactLensCentreGpuDraw()
+        {
+            if (active_)
+                --ExactLensCentreGpuDrawDepth;
+        }
+        ScopedExactLensCentreGpuDraw(const ScopedExactLensCentreGpuDraw&) = delete;
+        ScopedExactLensCentreGpuDraw& operator=(const ScopedExactLensCentreGpuDraw&) = delete;
+    };
 
     inline const ProjectedMarkerInfo* CurrentProjectedMarker() noexcept
     {

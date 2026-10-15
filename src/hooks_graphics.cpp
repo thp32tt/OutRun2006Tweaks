@@ -450,6 +450,12 @@ class VRLensFlareProjected2D : public Hook
         OutRunVR::GameSemantic::ScopedRenderSemantic centreDrawScope(
             centreScope != OutRunVR::GameSemantic::RenderScope::None
                 ? centreScope : OutRunVR::GameSemantic::CurrentScope);
+        // The original alpha renderer may enter nested SceneEffect helpers
+        // between c64 upload and GPU Draw. Keep this precise C993 source
+        // authoritative until its synchronous original draw returns.
+        // No CABE ring, queued SpriteNode, desktop or external UI is affected.
+        OutRunVR::GameSemantic::ScopedExactLensCentreGpuDraw centreGpuOwner(
+            centreScope != OutRunVR::GameSemantic::RenderScope::None);
         Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);
     }
 
