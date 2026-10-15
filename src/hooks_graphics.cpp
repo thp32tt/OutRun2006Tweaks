@@ -138,6 +138,19 @@ public:
 };
 UseHiDefCharacters UseHiDefCharacters::instance;
 
+// START includes cinematics; only progress 65 is the playable countdown.
+static bool VRDriverSeatGameplayActive() noexcept
+{
+    if (!Game::current_mode)
+        return false;
+    if (*Game::current_mode == STATE_GAME ||
+        *Game::current_mode == STATE_GOAL)
+        return true;
+    return *Game::current_mode == STATE_START &&
+        Game::game_start_progress_code &&
+        *Game::game_start_progress_code == 65;
+}
+
 class VRDriverSeatRenderTest : public Hook
 {
 	constexpr static int PlayerCarRenderState_HookAddr = 0x69764;
@@ -158,8 +171,7 @@ class VRDriverSeatRenderTest : public Hook
 		// changes from turning the car/driver path on and off.
 		if (!Settings::VREnabled || !Settings::VRDriverSeatView)
 			return false;
-		if (!Game::current_mode ||
-			(*Game::current_mode != STATE_GAME && *Game::current_mode != STATE_GOAL))
+		if (!VRDriverSeatGameplayActive())
 			return false;
 		EvWorkCamera* camera = Game::camera();
 		return camera && camera->cam_mode_timer_364 == 0.0f &&
@@ -252,9 +264,15 @@ class RestoreCarBaseShadow : public Hook
 		if (Settings::CarBaseShadowOpacity <= 0.f)
 			return;
 
-		// CalcPeraShadow code from C2C Xbox
+		// The selector also invokes this PC nullsub replacement, but
+		// pl_car() there is not the selected model (or may be null).
+		// Do not borrow a stale gameplay matrix or pass a null matrix.
+		// Until the selector's transform owner is proven, omit its shadow.
+		if (!VRDriverSeatGameplayActive())
+			return;
 		EVWORK_CAR* car = Game::pl_car();
-
+		if (!car)
+			return;
 		Game::mxPushLoadMatrix(&car->matrix_B0);
 		Game::mxTranslate(0.0f, 0.05f, 0.0f);
 
@@ -1432,8 +1450,7 @@ class FixZBufferPrecision : public Hook
 	static bool DriverSeatCameraActive(EvWorkCamera* camera)
 	{
 		return camera && Settings::VREnabled && Settings::VRDriverSeatView &&
-			Game::current_mode &&
-			(*Game::current_mode == STATE_GAME || *Game::current_mode == STATE_GOAL) &&
+			VRDriverSeatGameplayActive() &&
 			camera->cam_mode_timer_364 == 0.0f &&
 			static_cast<int>(camera->cam_mode_34A) == Settings::VRDriverSeatNativeMode.get();
 	}
@@ -1511,10 +1528,16 @@ class FixZBufferPrecision : public Hook
 			// In 6DoF VR the player can move their head through the normal third-
 			// person near plane. Keep the 2D precision fix intact outside VR, but
 			// use the dedicated VR near plane during gameplay/goal rendering.
-			if (Settings::VRPositionalTracking &&
+			if (DriverSeatCameraActive(camera))
+			{
+				// Keep cockpit geometry within 15 cm even during stereo warmup.
+				camera->perspective_znear_BC = std::clamp(
+					Settings::VRNearPlane.get(), 0.05f, 0.15f);
+			}
+			else if (Settings::VRPositionalTracking &&
 				Settings::VRStereo &&
 				OutRunVR::RuntimeEligibility::MayInjectStereo() &&
-				(*Game::current_mode == STATE_GAME || *Game::current_mode == STATE_GOAL))
+				VRDriverSeatGameplayActive())
 			{
 				camera->perspective_znear_BC = Settings::VRNearPlane.get();
 			}
@@ -1640,10 +1663,8 @@ class TransparencySupersampling : public Hook
 			auto* device = Game::D3DDevice();
 			spdlog::debug("TransparencySupersampling: enabling NVIDIA SSAA");
 			device->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, TRUE);
-			device->SetRenderState(D3DRS_ANTIALIASEDLINEENABLE, TRUE);
-			device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-			device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-			device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+			// SSAA support must not silently overwrite the game's cached
+			// alpha, blend or line state at device init/Reset.
 			device->SetRenderState(D3DRS_MULTISAMPLEMASK, 0xFFFFFFFF);
 
 			// TODO: Allow switching between ATOC/SSAA modes, may give better performance for some?
@@ -1841,12 +1862,15 @@ class AnisotropicFiltering : public Hook
 	}
 	static void destination(safetyhook::Context& ctx)
 	{
-		if (Settings::AnisotropicFiltering <= 0 ||
-			PreserveScreenTextureFiltering())
-			return; // preserve exact 2D/sprite filtering
+		if (Settings::AnisotropicFiltering <= 0)
+			return;
 		const int sampler = ctx.ebp;
+		// A prior 3D texture can leave 16x anisotropy on a HUD sampler.
+		// Keep 2D MIN/MAG/MIP unmodified while resetting its max level.
+		const int anisotropy = PreserveScreenTextureFiltering()
+			? 1 : Settings::AnisotropicFiltering.get();
 		Game::D3DDevice()->SetSamplerState(sampler,
-			D3DSAMP_MAXANISOTROPY, Settings::AnisotropicFiltering.get());
+			D3DSAMP_MAXANISOTROPY, anisotropy);
 	}
 
 	// ChangeTexAttribute reads the mip filter from bits 19-20 of the material and

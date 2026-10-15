@@ -492,6 +492,21 @@ namespace OutRunVRStereo
                 return legacyR13Draw();
             }
 
+            // R30 bootstraps depth on HUD/XYZRHW; the R29 world path
+            // must preserve the same right-eye depth/stencil contract.
+            if (TrackedDepthStencil &&
+                (!RightDepthSynchronized || !RightStencilSynchronized))
+            {
+                TryBootstrapRightDepthFromRecentClear(device);
+                if ((!RightDepthSynchronized && DepthTestActive(device)) ||
+                    (!RightStencilSynchronized && StencilTestActive(device)))
+                {
+                    ++R29SafetyFallbackDraws;
+                    R29ArmMonoSafety();
+                    return legacyR13Draw();
+                }
+            }
+
 #if defined(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE)
             // C1/C2 world-correctness path.
             //

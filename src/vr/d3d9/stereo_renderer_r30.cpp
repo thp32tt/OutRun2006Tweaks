@@ -1612,10 +1612,16 @@ namespace OutRunVRStereo
                 restoreOk;
             savedRt->Release();
             if (savedDepth) savedDepth->Release();
-            // Preserve cache on success; discard it on a device-lost or Apply
-            // failure so the next attempt cannot replay a stale game snapshot.
-            if (!restoreOk)
+            // StateBlock::Apply restored physical shader/effect state,
+            // but R29/R31's tracked snapshots predate the private glow pass.
+            if (restoreOk)
+                R29OwnerResynchronizeShaderEpoch(device);
+            else
+            {
                 R30ReleaseCom(R30SkyGlow.savedGameState);
+                R29OwnerInvalidateRendererStateAfterExternalRestore();
+            }
+            R29OwnerInvalidateEffectStateCache();
 
             if (ok && restoreOk)
             {
@@ -2555,6 +2561,11 @@ namespace OutRunVRStereo
             if (!ownedHud && !ownedOverlay && !ownedEffect &&
                 !ownedLensCentre)
                 return R30ScreenSpaceKind::None;
+
+            // Exact source-owned screen passes outrank the leftover
+            // perspective projection state; never flatten HUD overlays.
+            if (ownedHud || ownedOverlay)
+                return R30ScreenSpaceKind::Hud2D;
 
             float m34 = 0.0f;
             float m44 = 0.0f;
