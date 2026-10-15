@@ -1,0 +1,107 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00913",
+  "production_id": "CONVERSION-DX9EX-00913",
+  "event_id": "CONVERSION-DX9EX-00913-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "run_key": "CONVERSION-DX9EX-00913",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "VALIDATION_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "5aff2e36a1347c1f2e171f71a856857b585a9137",
+  "material_result_sha": "ce8e2dfabbc10cee03b4b048363c5b49d5dcc5c5",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stage_extension_eye_plane.hpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stage_extension_eye_plane.hpp",
+    "vrhost/tests/stage_extension_eye_plane_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00913.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve complete stage extension +TIME sprites and numeric glyphs as one recentered finite binocular HUD plane through the R84 direct or deferred D3DX/fixed-function XYZRHW GPU draw path, keeping the existing shader ScreenHud placement, transitions and original animation.",
+    "scope_boundary": "Only exact StageExtensionTime GPU XYZRHW sprites and numerals on R84 per-eye HUD route; exclude GOAL, timer, generic overlays, other screen effects, lens rings, SkyGlow, world, R26_SAFE, FFB, DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Original +TIME stage extension sprite CALL 0x9898E/0x98A36/0x98AC6 and numeric 0x989AD/0x98A89/0x98A10 provide exact StageExtensionTime identity.",
+      "Original producer and queued/deferred sprite tags reach R84 R30 StageExtensionTime classification, selecting the exact XYZRHW/fixed-function per-eye route rather than generic HUD fallback.",
+      "R30 builds finite recentered game-NDC optical plane with matching latched pose and independent eye transforms; OpenXR host composites the two images, with actual visual acceptance pending HMD."
+    ],
+    "subcomponents": [
+      "Reconstruct finite per-eye StageExtensionTime optical plane from original game HUD pixels for exact fixed-function and D3DX XYZRHW sprites, preserving Z RHW UV and texture attributes.",
+      "Use matching latched head inverse, eye offsets, scale and projection for both eyes; fail closed for invalid viewport, pose, projection, unknown producer and non-HUD draw without changing GOAL, game input or SkyGlow."
+    ],
+    "acceptance_items": [
+      {
+        "id": "extension_sprite_numeric_binocular",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Exact +TIME sprite plus numeral submission through R84 per-eye XYZRHW/ScreenHud HUD plane",
+        "expected_behavior": "Both original +TIME artwork and digits use matching recentered optical plane in each eye without headlock or doubled source when eligible; original Z RHW UV texture and ordering remain intact."
+      },
+      {
+        "id": "extension_isolation_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Invalid pose/projection, generic screen overlays, GOAL/time, other effects and original game fallback",
+        "expected_behavior": "Unproven producer, stale pose, invalid viewport, zero clip W or ineligible draw do not borrow +TIME reprojection; other HUD, original input, SkyGlow, world and fallback are isolated."
+      },
+      {
+        "id": "exact_sha_windows_gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX9Ex Active Windows R84/R26_SAFE, x64 OpenXR host, package, Domain, Full Source Impact and HUD Inspector",
+        "expected_behavior": "The final validation-bearing exact SHA passes DX9Ex Active policy/game/host/full-chain/package plus Domain Isolation and affected source/HUD workflows; Quest3 stereo acceptance remains separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "extension_sprite_numeric_binocular": "PENDING_HMD",
+    "extension_isolation_fallback": "PENDING_BUILD",
+    "exact_sha_windows_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "Pinned OutRun 2006 +TIME six original sprite/numeric caller addresses trace the exact stage extension semantic; the existing renderer separately implements shader ScreenHud optical placement.",
+    "source_trace": [
+      "Existing StageExtensionEnter/Leave + D3DX batch semantic restoration provides exact StageExtensionTime producer ownership for both sprites and glyphs.",
+      "Before the source commit, R84 fixed-function/D3DX XYZRHW source pixels did not use the same recentered world-locked optical plane as shader HUD text.",
+      "The new StageExtensionPlane::ProjectPixel and R30BuildStageExtensionXyzrhwEyePlane restore matching per-eye plane from finite source game NDC using matching pose and eye projection."
+    ],
+    "root_cause": "Mixed fixed-function XYZRHW sprite/numeral and shader HUD submission lacked a common recentered per-eye optical-plane reconstruction for the exact StageExtensionTime semantic.",
+    "alternatives_rejected": [
+      "Globally forcing all XYZRHW overlay draws into a HUD plane would misclassify menus, lens and world effects.",
+      "Blindly flushing the whole D3DX queue would alter sprite/number order and promote foreign producer batches."
+    ],
+    "fix_evidence": "Existing material source commit ce8e2df modifies R84 R30 eye-plane admission and introduces a portable homogeneous clip projection helper and binocular smoke without modifying HMD runtime or original GOAL.",
+    "negative_test_evidence": "Portable smoke covers center, corners, opposite eye offsets, zero viewport, zero clip W, NaN source, invalid scale. Targeted CI and Windows builds pending.",
+    "eye_ownership": "Both eyes derive from same latched head-pose epoch and game optical plane but use separate eye-relative projection and offsets; uncertain/unready states reject special XYZRHW conversion."
+  },
+  "ci_evidence": {
+    "material_source_commit": "ce8e2dfabbc10cee03b4b048363c5b49d5dcc5c5",
+    "initial_active_run_id": 38792435110,
+    "initial_policy_failure": "DX9Ex Active policy job failed at verify_vr_feature_unit_policy.py --check-head because the task's run JSON did not exist. Host, game, full-chain and package jobs were skipped; no compiler failure established.",
+    "repair": "Restore missing same-TASK_ID contract record without changing original material C++ or weakening the workflow, and validate new exact-SHA candidate.",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "status": "PENDING_EXACT_SHA",
+    "exact_sha_gate_runs": []
+  },
+  "runtime_evidence": "No OutRun 2006 or Quest3/VDXR hardware was run. Stereo +TIME optical and frame-pacing behavior is not asserted as runtime PASS.",
+  "score_delta_this_attempt": 0,
+  "score_once": false,
+  "hold_reason": "CI_RUN_38792435110_FAILED_MISSING_FEATURE_RECORD; post-repair exact-SHA mandatory Windows workflow validation pending, physical Quest3/VDXR RUNTIME_VALIDATION=UNTESTED."
+}
