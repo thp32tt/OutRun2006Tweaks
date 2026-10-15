@@ -175,7 +175,7 @@ OUTRUN_A_SINGLE_SMOKE_TASK_ID = _outrun_smoke_os.environ.get("OUTRUN_A_SINGLE_SM
         source,
         '    slot = reg.slots[reg.next_slot]\n    if FRESH_CHAT_EACH_RUN:',
         '''    slot = reg.slots[reg.next_slot]
-    if CONTROLLER_MODE == "localization" and _outrun_smoke_os.environ.get("OUTRUN_AB_BATCH_QUEUE", "").lower() == "true":
+    if CONTROLLER_MODE == "localization" and (_outrun_smoke_os.environ.get("OUTRUN_AB_BATCH_QUEUE", "").lower() == "true" or _outrun_smoke_os.environ.get("OUTRUN_AB_TEXT_ROI_QUEUE", "").lower() == "true"):
         previous = pages.get(slot.name)
         if previous is None or previous.is_closed():
             slot.last_result = "PREVIOUS_TAB_UNAVAILABLE"
