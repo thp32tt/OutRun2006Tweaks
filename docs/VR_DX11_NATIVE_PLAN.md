@@ -4,6 +4,21 @@ Baseline: `vr-r70-structure-squash` at `b6c208bbc9a411b9c035be26f9e1e9c014028738
 
 Development branch: `vr-dx11-native-r71`
 
+## 2026-10-16 — full-source-first completion order (latest user instruction)
+
+Stop treating each small working native Draw subcase and its full 5-Gate CI as the conversion's terminal delivery. **Complete the linked native renderer source before real game/Quest 3 tests.** Continue under pre-existing task IDs and source leases; do not multiply independent feature/score events.
+
+| Sequence | Source integration milestone | Completion criterion |
+| --- | --- | --- |
+| S1 | D3D9 real game draw/resources/shaders + full-size D3D11 RT/DS/Present | One coherent native menu, vehicle and race stream; no diagnostic-inset-only success |
+| S2 | All confirmed pipeline blockers | Programmable/fixed shader varying, texture and mutable buffer formats, MRT/stencil/alpha/depth/dirty region, Reset and preservation of original D3D9 input/FFB |
+| S3 | Native stereo output and host handoff | **Real** distinct L/R D3D11 eye renders, GPU-owned textures, source generation, producer fence, host acquire and ACK through OpenXR; CPU readback is fallback only |
+| S4 | Source-complete integrated checkpoint | Final C++/HLSL/host source merged and reconciled at a single exact SHA, then the five unchanged mandatory GitHub CI checks |
+| S5 | Runtime test only after S4 | One matching real-game native test: menu -> car -> race, Quest 3 stereo, HUD/markers/shadows/flare, input/FFB, reset and sustained 72Hz pacing |
+
+Narrow non-HMD compile/static/unit tests may run while writing source to prevent undetected mistakes. Avoid repeated full build/review cycles and no new per-state microtasks. Source-complete is **not** runtime-complete. On an unsupported state, retain original D3D9/DX9Ex fallback. Repository policy changes do not prove that the external controller has adopted this order.
+
+
 ## 2026-10-15 — native-first runtime reset (test packages)
 
 The shipped DX11 evaluation previously set only OUTRUN_DX11_FIRST_GAME_FRAME=1. That

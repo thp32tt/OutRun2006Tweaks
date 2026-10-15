@@ -116,7 +116,9 @@
     "prohibit_repeated_validation_per_micro_edit": true,
     "prohibit_standalone_per_shader_state_work_without_fullframe_dependency": true,
     "defer_nonblocking_performance_until_real_game_frame": true,
-    "require_compact_checkpoint_without_new_score": true
+    "require_compact_checkpoint_without_new_score": true,
+    "require_whole_dx11_source_before_hmd_test": true,
+    "forbid_independent_microtasks_during_source_completion": true
   },
   "required_task_strategy_fields": [
     "work_class",
@@ -234,5 +236,24 @@
     "final_validation": "Once per cohesive integrated capability, require actual exact-SHA DX11 Fast/Backend/Windows Build/OpenXR/HUD gates; repair failures within same TASK_ID. No CI bypass.",
     "runtime_boundary": "Code+CI verification is not game/HMD proof; headset parity and performance remain UNTESTED until exact matching hardware result",
     "external_controller_activation": "GitHub instructions/policy update does not reload or prove adoption by Docker/controller runtime"
+  },
+  "source_completion_directive": {
+    "effective_date_kst": "2026-10-16",
+    "execution_mode": "INTEGRATE_ALL_NATIVE_SOURCE_BEFORE_GAME_HMD_TEST",
+    "source_integration_order": [
+      "native_full_game_monoscopic_draw_present",
+      "complete_live_shader_resource_depth_alpha_reset",
+      "distinct_native_left_right_eye_targets",
+      "direct_gpu_openxr_host_handoff_fence_generation_ack",
+      "final_exact_sha_five_gate_ci",
+      "single_matching_game_quest3_validation"
+    ],
+    "forbid_independent_microtask_dispatch": true,
+    "reuse_existing_unfinished_task_and_owner_lease": true,
+    "source_phase_checks": "targeted compile/static/unit only as necessary; avoid repeated full matrix before integrated code candidate",
+    "terminal_ci": "all five unmodified required DX11 Fast/Backend/Windows Build/OpenXR/HUD checks at one integrated exact SHA",
+    "runtime_hmd": "defer until source integrated and full exact-SHA mandatory CI passes",
+    "preserve": "opt-in, native activation fail-closed, original D3D9/DX9Ex renderer, gamepad, FFB and branch isolation",
+    "external_controller_adoption": "NOT_VERIFIED"
   }
 }
