@@ -2068,7 +2068,7 @@ def main() -> None:
                 "capture.blendDiffuseAlpha ? s.blendDiffuseAlphaPs.Get() :" in code)
     assert stage0_dispatch_with_stage1(submit_section)
     for dispatch in (
-        "capture.stage1Enabled ?",
+        "ctx->PSSetShader(capture.stage1Enabled ?",
         "capture.selectDiffuseTextureAlpha ? s.selectDiffuseTextureAlphaPs.Get() :",
         "capture.blendTextureAlpha ? s.blendTextureAlphaPs.Get() :",
         "capture.blendDiffuseAlpha ? s.blendDiffuseAlphaPs.Get() :",
