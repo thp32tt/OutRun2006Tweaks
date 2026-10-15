@@ -41,8 +41,16 @@ for original, replacement in (
     ('GameNativeOffscreenPass::source_has_no_main_writes(', 'false /* unproved pass */ && GameNativeOffscreenPass::source_has_no_main_writes('),
 ):
     h, b = r9, bridge
-    if original in h: h = h.replace(original, replacement, 1)
-    else: b = b.replace(original, replacement, 1)
+    if original in h:
+        h = h.replace(original, replacement, 1)
+    elif original == 'GetDeviceCaps(&caps)':
+        # Other game-state admission also queries caps: damage this exact
+        # offscreen source predicate rather than an unrelated earlier caller.
+        start = b.index('bool isolated_offscreen_game_draw(')
+        end = b.index('void observe(IDirect3DDevice9* game,', start)
+        b = b[:start] + b[start:end].replace(original, replacement, 1) + b[end:]
+    else:
+        b = b.replace(original, replacement, 1)
     assert not integrated(h, b), original
 assert 'tools/test_dx11_game_offscreen_pass_00765.py' in workflow
 assert 'tools/dx11_game_offscreen_pass_00765.cpp' in workflow
