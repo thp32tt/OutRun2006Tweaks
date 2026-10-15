@@ -1,0 +1,130 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00795",
+  "production_id": "CONVERSION-DX11-00795",
+  "event_id": "CONVERSION-DX11-00795-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_FULLFRAME_PARTIAL_DEPTH_AND_COLOR_Z_CLEAR_CONTINUITY",
+  "feature_id": "DX11-LIVE-PARTIAL-DEPTH-COMBINED-CLEAR-FULLFRAME",
+  "status": "VALIDATING_EXACT_SHA",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "FAILED_PRIOR_SHA_REPAIR_SUBMITTED",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "425d2572cf1d0bcfbd49688fb484fc764f508bac",
+  "material_result_sha": "dae1401ab1010e0a7224f7138d71138b9de0defe",
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/native_game_source_mutation.hpp",
+    "src/vr/d3d9/stereo_renderer.cpp",
+    "tools/dx11_native_frame_batch_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-LIVE-PARTIAL-DEPTH-COMBINED-CLEAR-FULLFRAME",
+    "goal": "Retain already-rendered native menu/vehicle/race full frames across successful live D3D9 partial Z and combined TARGET|Z Clears by verifying main depth owner and forwarding clipped rectangles to D3D11.1 ClearView on corresponding D32 DSV/RTV, without intercepting gamepad/FFB or breaking D3D9 Present fallback.",
+    "acceptance_items": [
+      {
+        "id": "native-partial-main-z-clear",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_R9_depth_Clear_D3D11_D32_DSV",
+        "expected_behavior": "Canonical partial Z Clear clips viewport rectangles and writes only the live native depth attachment while preserving game-authored Draw/DrawIndexed and untouched depth."
+      },
+      {
+        "id": "native-combined-color-z",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_R9_combined_Clear_D3D11_RTV_DSV",
+        "expected_behavior": "TARGET|Z bounded rectangles verify the exact native D32 attachment before any native color/depth change and forward both regions to ClearView without reseeding game frame."
+      },
+      {
+        "id": "unsafe-clear-and-game-input-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_native_source_ownership_input_Present",
+        "expected_behavior": "Unsupported stencil, foreign main Z owner, MRT, invalid bounds, unavailable D3D11.1 or stopped native Draw preserve original D3D9 Clear, Present, gamepad and FFB; no partial native GPU mutation."
+      },
+      {
+        "id": "five-required-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Win32_OpenXR_HUD",
+        "expected_behavior": "DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD all conclude SUCCESS at the same final validation-bearing SHA; runtime HMD/game remains UNTESTED."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Original game D3D9 Clear succeeds after live Draw/DrawIndexed and R9 hook carries flags/color/Z",
+      "Validate live backbuffer viewport, canonical D3D9 main Z identity, D32 native DSV, D3D11.1 context and entire clipped rectangle batch",
+      "Issue same-region D3D11.1 ClearView to native RTV and/or depth-only DSV and retain game source Draw ordinals through original Present"
+    ],
+    "batch_components": [
+      "D3D9 Clear hook forwards original Z with successful result to DX11 native bridge",
+      "DX11 depth owner/DSV/combined color-Z partial ClearView integration",
+      "Portable C++ positive/negative regression on partial depth and clipped region batches"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Existing material commit adds native_live_partial_depth_clear_regression and bounded D3D9 Z/combined color-Z to matching full-frame RTV/DSV.",
+      "negative_regression": "Malformed/offscreen rectangles, mismatched canonical depth, missing context or D3D11.1, unsupported stencil/MRT must not partially mutate native frame; original D3D9 remains authoritative.",
+      "component_integration": "Existing real game Draw/DrawIndexed -> native full-resolution frame -> game-authored Clear(Z or TARGET|Z) -> D3D11 ClearView RTV/DSV -> original D3D9 Present and input fallback."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_FULLFRAME_PARTIAL_DEPTH_AND_COLOR_Z_CLEAR_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_CLEAR_TARGET_OR_Z",
+      "D3D11_NATIVE_DRAW",
+      "D3D11_CLEARVIEW_RTV_DSV",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Full-resolution native source integration is code/CI scoped only; menu/vehicle/race visual and Quest3/VDXR/gamepad parity UNTESTED until actual game/HMD evidence.",
+    "activation_guard_and_fallback": "Existing diagnostic opt-in, no native automatic promotion; fail-closed for unsupported Z/stencil/MRT/context; original D3D9 Present/input/FFB/SkyGlow and DX9Ex fallback retained; DXVK frozen."
+  },
+  "acceptance_results": {
+    "native-partial-main-z-clear": "SOURCE_IMPLEMENTED_CI_PENDING",
+    "native-combined-color-z": "SOURCE_IMPLEMENTED_CI_PENDING",
+    "unsafe-clear-and-game-input-fallback": "SOURCE_IMPLEMENTED_CI_PENDING",
+    "five-required-exact-sha-gates": "PENDING"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Reused existing actual 00795 C++ material commit at dae1401ab; resumed from explicit Backend Conversion Gate failure run 38820167191, not a new task.",
+    "C1_REVIEW": "Failed Backend and Fast checks identify latest run 00794 lacking development_strategy; 00795 material had no run record; policy checks highest-numbered run. This repair publishes 00795 feature acceptance using truthful in-flight status.",
+    "C2_IMPLEMENT": "Existing 00795 material commit implemented partial depth and combined TARGET|Z R9->D3D11.1 native ClearView and portable C++ regressions; this repair modifies no game source and makes no extra feature or score.",
+    "C3_VALIDATE": "Original exact SHA dae1401ab Fast run 38820167173 and Backend run 38820167191 FAILED at policy acceptance; new validation-bearing SHA mandatory; keep game/HMD UNTESTED.",
+    "C4_COMMIT": "Existing source material commit dae1401ab; separate policy-failure repair commit creates reconstructed missing 00795 acceptance record without CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_EXACT_SHA_GATES"
+  },
+  "evidence": {
+    "material_commit": "dae1401ab1010e0a7224f7138d71138b9de0defe",
+    "failed_exact_sha": "dae1401ab1010e0a7224f7138d71138b9de0defe",
+    "failed_runs": {
+      "DX11 Fast Structural Checks": 38820167173,
+      "Backend Conversion Gate": 38820167191
+    },
+    "failure_signature": "DX11 task acceptance FAIL ... CONVERSION-DX11-00794.json: development_strategy missing after structural policy effective date",
+    "cause": "00795 material commit lacked run record, so latest-run check fell back to reconstructed 00794 C6 record; 00794 lacks feature ID and development strategy.",
+    "source_change_in_current_retry": false,
+    "real_game_quest3_test": false
+  },
+  "score": {
+    "run_key": "CONVERSION-DX11-00795",
+    "prior_material_commit_existing": true,
+    "repair_is_not_new_feature": true,
+    "score_change": 0,
+    "duplicate_credit_prohibited": true
+  }
+}
