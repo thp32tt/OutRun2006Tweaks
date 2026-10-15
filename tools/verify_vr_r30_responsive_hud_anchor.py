@@ -441,7 +441,11 @@ shader_begin = code.index("bool R30BuildScreenSpaceEyeConstants(")
 shader_end = code.index("template <typename ActualDraw>", shader_begin)
 shader = code[shader_begin:shader_end]
 assert fixed.count("height * R30PauseMenuVerticalFraction();") == 1
-assert fixed.index("height * R30PauseMenuVerticalFraction();") < fixed.index("for (UINT visit = 0;")
+# Anchor the ESC pause bias to the *ordinary HUD* traversal, not the
+# earlier isolated +TIME/GOAL stage-extension vertex loop.
+normal_hud_loop = "for (UINT visit = 0; visit < hudVisitCount; ++visit)"
+assert fixed.count(normal_hud_loop) == 1
+assert fixed.index("height * R30PauseMenuVerticalFraction();") < fixed.index(normal_hud_loop)
 assert shader.count("clipCorrection._42 = pauseVertical.offset[eye] -") == 1
 assert shader.count("2.0f * R30PauseMenuVerticalFraction();") == 1
 assert "hudScaleY * pauseVertical.scale[eye];" in shader
