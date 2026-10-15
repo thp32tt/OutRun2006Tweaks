@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install C testing requirements
-        run: python -m pip install --disable-pip-version-check -r tools/chat-controller/localization-recovery-v1/c_salvage/requirements.txt
+        run: python -m pip install --disable-pip-version-check -r tools/chat-controller/localization-recovery-v1/c_salvage/requirements.txt PyYAML==6.0.2
       - name: Validate C compositor and DDS safety tests
         run: python tools/chat-controller/localization-recovery-v1/c_salvage/test_c_salvage_compose.py
       - name: Validate C scan/idempotence tests
