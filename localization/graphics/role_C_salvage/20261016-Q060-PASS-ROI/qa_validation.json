@@ -1,0 +1,49 @@
+{
+  "TASK_ID": "C-ROI-SOURCE-Q060-PASS-20261016-0633",
+  "schema": "outrun-hd-text-roi-qa-v1",
+  "status": "TEST_ONLY_REFERENCE_ONLY",
+  "source_kind": "DIRECT_PINNED_GITHUB_PC_HD_ORIGINAL_DDS",
+  "platform": "PC",
+  "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "source_dds_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "dds_dimensions": [
+    4096,
+    2048
+  ],
+  "orientation": "FLIP_TOP_BOTTOM_READABLE",
+  "source_png_sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+  "full_dds_to_png_exact_pixel_equal": true,
+  "full_png_to_roi_exact_pixel_equal": true,
+  "roi_to_4x_lanczos_pixel_equal": true,
+  "original_english": "PASS!!!",
+  "approved_korean": "통과!!!",
+  "official_mapping": "source_full_20261012/transcriptions.jsonl index 60 (transcribed_reviewed)",
+  "bbox_native_xyxy": [
+    3764,
+    505,
+    4065,
+    613
+  ],
+  "native_dimensions": [
+    301,
+    108
+  ],
+  "input_dimensions": [
+    1204,
+    432
+  ],
+  "upscale": 4,
+  "native_png_sha256": "a1a910c85b95337fb3a9dbac7cf19a534b07049e092997f5f33cc4b29200b45a",
+  "imagegen_input_sha256": "1e897e6de04c37602f950ac8ba0eaa9dcb9d5b7bf4b6c33092684182702995af",
+  "visual_review": "COMPLETE_SINGLE_PASS_PHRASE_WITH_STROKE_SHADOW_AND_ORANGE_PLATE; ADJACENT_NUMBER_EXCLUDED; NO_GLYPH_OR_EFFECT_CLIPPING_SEEN",
+  "alpha": "OPAQUE_COMPOSITE_REFERENCE_ONLY",
+  "glyph_layer": "HOLD_REVIEWED_PSD_OR_EXACT_MASK_REQUIRED",
+  "clean_plate": "HOLD_REVIEWED_PSD_OR_EXACT_MASK_REQUIRED",
+  "fit_policy": "RETURN_TO_NATIVE_UI_CELL_UV_SAFE_BOUNDS_PRESERVE_ASPECT_RATIO_ALLOW_DIFFERENT_KOREAN_WIDTH",
+  "ui_cell_uv_safe_bounds": "UNVERIFIED_RUNTIME_FIT_REQUIRED",
+  "imagegen_invocation": "NOT_RUN",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "A_B_EXISTING_QUEUE_STATE": "NOT_TOUCHED"
+}
