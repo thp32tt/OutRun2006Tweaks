@@ -1,9 +1,13 @@
 // Standalone portable regression for the packaged R26+HUD central lens source.
 #include "../../src/vr/d3d9/lens_centre_source_provenance.hpp"
+#include "../../src/vr/game/lens_centre_partial_wvp.hpp"
 #include <cassert>
 int main()
 {
     using namespace OutRunVR::LensCentre;
+    assert(SplitUploadCompletesOwnedWvp());
+    assert(RejectsMixedAndFailedUploads());
+    assert(RejectsCrossDrawAndOverlappingPartialWvp());
     const RawWvpEvidence raw{7, 7, 9, 9, 40, 27, 0x100, 0x100, 11, 11, true, true, true};
     assert(OwnsRawWvp(raw));
     auto relatch = raw;

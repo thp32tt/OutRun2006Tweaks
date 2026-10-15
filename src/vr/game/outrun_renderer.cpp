@@ -1802,7 +1802,8 @@ namespace OutRunVRRenderer
 						startRegister, vector4fCount, constantData,
 						OutRunVR::GameSemantic::CurrentLensCentreCallEpoch,
 						LatchedPoseEpoch, shader, shaderEpoch,
-						reinterpret_cast<std::uintptr_t>(device), true))
+						reinterpret_cast<std::uintptr_t>(device),
+						OutRunVRStereo::GetTopLevelDrawSerial(), true))
 				{
 					// Only now are all four source-owned game registers proved.
 					// Preserve untouched legacy/full-upload rendering semantics.

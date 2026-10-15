@@ -1,0 +1,80 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00920",
+  "production_id": "CONVERSION-DX9EX-00920",
+  "event_id": "CONVERSION-DX9EX-00920-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00920",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "NEEDS_VALIDATION",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "3912f82f983ba2a818587cd38b0075e3a31bf53d",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/lens_centre_partial_wvp.hpp",
+    "src/vr/game/outrun_renderer.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/lens_centre_partial_wvp.hpp",
+    "src/vr/game/outrun_renderer.cpp",
+    "vrhost/tests/lens_centre_pose_epoch_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00920.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Preserve the exact original C993 central sun WVP for binocular R84 rendering across successful split c64 uploads, without mixing portions of different physical Draw submissions or overlapping matrices, while retaining optical fallback until validated on Quest3.",
+    "scope_boundary": "Only exact direct C993 lens-centre partial c64 upload assembly. Do not modify CABE halo discs, GOAL/+TIME, gameplay HUD, F11, SkyGlow, R26_SAFE, DXVK or original input/FFB.",
+    "trace_stages": [
+      "Original D3A5/C993 producer owns source c64 upload under exact lens call epoch and independently latched XR pose.",
+      "R23 SetVertexShaderConstantF collects successful c64-c67 fragments and R29 records physical top-level Draw serial as the submission boundary.",
+      "R84 R30 accepts only completed producer-owned unmodified WVP with matching shader/pose, then builds binocular per-eye matrices or retains original fallback."
+    ],
+    "subcomponents": [
+      "Fence partially assembled original central-sun WVP by actual top-level draw serial in addition to producer, pose, shader and game device.",
+      "Discard overlapping partial upload coverage to avoid constructing an unproven source WVP from two revisions inside the same call.",
+      "Preserve successful nonoverlapping split uploads, device-loss/reset boundaries and the distinct R26_SAFE untouched path; add positive/negative compiled regression."
+    ],
+    "acceptance_items": [
+      {
+        "id": "central_sun_per_draw_source_provenance",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original C993 c64 register upload and physical Draw lifetime",
+        "expected_behavior": "Disjoint c64 fragments from one exact producer and Draw combine; after a new Draw or overlapping rewrite, old rows never grant binocular source ownership."
+      },
+      {
+        "id": "lens_optics_fallback_and_outer_discs",
+        "category": "fallback_regression",
+        "behavior_area": "R84 left/right optical reconstruction and protected fallback",
+        "expected_behavior": "Unproven split matrices take original safe render path; complete source matrices alone can be admitted; outer flare discs, SkyGlow and game control remain untouched."
+      },
+      {
+        "id": "exact_sha_active_source_hud_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 game and OpenXR host full build and release gate",
+        "expected_behavior": "DX9Ex Active/Domain/Full Source/HUD Inspector GitHub Actions pass on one material candidate SHA; Quest3/VDXR optical acceptance stays separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "central_sun_per_draw_source_provenance": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "lens_optics_fallback_and_outer_discs": "SOURCE_IMPLEMENTED_PENDING_CI",
+    "exact_sha_active_source_hud_gate": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "PartialWvpUpload keyed accumulated c64 rows by producer call/pose/shader/device but not by physical top-level Draw serial or overlapping row revisions. Nested draws can therefore create a false complete original centre matrix under unchanged source identity.",
+    "evidence": "R23 SetVertexShaderConstantFDest records a complete split c64 result only when Append covers four rows; R84 R30 trusts that source evidence for stereo; independent R29 physical Draw serial already exists.",
+    "next_action": "Run changed-area portable C++ regression then verify one exact-SHA GitHub Actions gate. HMD central dot/outer rings not yet physically observed."
+  },
+  "score_delta_this_attempt": 0
+}
