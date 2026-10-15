@@ -34,6 +34,7 @@ def check(code: str, header: str) -> list[str]:
         return header[begin:finish] if begin >= 0 and finish > begin else ""
     stage_predicate = predicate("CanFlushD3DXDirectStageAtExit")
     goal_predicate = predicate("CanFlushD3DXDirectGoalAtExit")
+    queued_stage_predicate = predicate("CanArmD3DXQueueStageAfterDraw")
     need("StageExtensionSpraniCalls[]" in source and
          "0x9898E, 0x98A36, 0x98AC6" in source and
          "StageExtensionPrintCalls[]" in source and
@@ -192,6 +193,20 @@ def check(code: str, header: str) -> list[str]:
     # can break the original texture grouping; GOAL stays eager separately.
     stage_draw = hook[hook.find("const bool exactStage = StageOwner(scope, source)"):
                       hook.find("// Preserve HMD-verified R64 rank isolation")]
+    need("queueActive && batchActive && exactSprite" in queued_stage_predicate and
+         "pendingDraws == 1u && homogeneous" in queued_stage_predicate and
+         "pendingScope == RenderScope::ScreenHud" in queued_stage_predicate and
+         "pendingProducer == ProducerToken::StageExtensionTime" in queued_stage_predicate and
+         "currentScope == pendingScope" in queued_stage_predicate and
+         "currentProducer == pendingProducer" in queued_stage_predicate,
+         "late Begin stage rearm must require the first clean exact owner")
+    need("if (exactStage && CanArmD3DXQueueStageAfterDraw(" in stage_draw and
+         "QueueRenderActive(), BatchActive, self == TrackedSprite," in stage_draw and
+         "PendingDraws, PendingHomogeneous, PendingScope, PendingProducer," in stage_draw and
+         "scope, source))\n            StageBoundaryReady = true;" in stage_draw and
+         stage_draw.find("StageBoundaryReady = true;") <
+         stage_draw.find("if (exactStage)\n            return hr;"),
+         "post-queue Begin must rearm exact +TIME flush before source exit")
     need("const bool exactStage = StageOwner(scope, source) && PendingHomogeneous;" in stage_draw and
          "if (exactStage)\n            return hr;" in stage_draw and
          stage_draw.find("if (exactStage)\n            return hr;") <
@@ -280,6 +295,12 @@ def main() -> int:
         "lost-rank-exact-source":
             code.replace("queuedSource == ProducerToken::DispRankClipSprite",
                          "queuedSource == ProducerToken::None", 1),
+        "late-begin-stage-not-rearmed":
+            code.replace("scope, source))\n            StageBoundaryReady = true;",
+                         "scope, source))\n            StageBoundaryReady = false;", 1),
+        "late-begin-stage-foreign-promoted":
+            code.replace("if (exactStage && CanArmD3DXQueueStageAfterDraw(",
+                         "if (exactStage || CanArmD3DXQueueStageAfterDraw(", 1),
         "stage-eager-draw-regression":
             code.replace("if (exactStage)\n            return hr;",
                          "if (false)\n            return hr;", 1),
@@ -366,6 +387,12 @@ def main() -> int:
             "(wasQueueActive || enteringExactStage)", "true", 1),
         "permit-mixed": header.replace(
             "homogeneous && (wasQueueActive", "true && (wasQueueActive", 1),
+        "late-begin-permit-extra-draw": header.replace(
+            "pendingDraws == 1u && homogeneous",
+            "pendingDraws != 0 && homogeneous", 1),
+        "late-begin-permit-no-queue": header.replace(
+            "return queueActive && batchActive && exactSprite &&",
+            "return batchActive && exactSprite &&", 1),
         "permit-wrong-producer": header.replace(
             "pendingProducer == outgoingProducer",
             "pendingProducer != outgoingProducer", 1),

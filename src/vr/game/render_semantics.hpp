@@ -130,6 +130,52 @@ namespace OutRunVR::GameSemantic
         RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
         RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
 
+    // Begin can run after the stage SpriteNode has been selected. Its
+    // initial reset of StageBoundaryReady must not lose the queued Draw's
+    // eventual Flush, but only a clean first StageExtensionTime batch may
+    // rearm that boundary; mixed/foreign state can never become ScreenHud.
+    inline constexpr bool CanArmD3DXQueueStageAfterDraw(
+        bool queueActive, bool batchActive, bool exactSprite,
+        unsigned pendingDraws, bool homogeneous,
+        RenderScope pendingScope, ProducerToken pendingProducer,
+        RenderScope currentScope, ProducerToken currentProducer) noexcept
+    {
+        return queueActive && batchActive && exactSprite &&
+            pendingDraws == 1u && homogeneous &&
+            pendingScope == RenderScope::ScreenHud &&
+            pendingProducer == ProducerToken::StageExtensionTime &&
+            currentScope == pendingScope &&
+            currentProducer == pendingProducer;
+    }
+
+    static_assert(CanArmD3DXQueueStageAfterDraw(true, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanArmD3DXQueueStageAfterDraw(false, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanArmD3DXQueueStageAfterDraw(true, false, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanArmD3DXQueueStageAfterDraw(true, true, false, 1, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanArmD3DXQueueStageAfterDraw(true, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanArmD3DXQueueStageAfterDraw(true, true, true, 1, false,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanArmD3DXQueueStageAfterDraw(true, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(!CanArmD3DXQueueStageAfterDraw(true, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::WorldBillboard, ProducerToken::StageExtensionTime));
+    static_assert(!CanArmD3DXQueueStageAfterDraw(true, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::DispRankFirst));
+
     // A direct GOAL print helper is a distinct source from +TIME and
     // queued SpriteNodes. Close only an owned homogeneous deferred batch
     // while that exact helper remains active, never a foreign/mixed batch.

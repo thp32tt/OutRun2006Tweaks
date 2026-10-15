@@ -2607,6 +2607,14 @@ private:
         // avoidable driver submissions during the stage transition.
         // A mixed/unknown batch remains on the game's normal End path.
         const bool exactStage = StageOwner(scope, source) && PendingHomogeneous;
+        // A new D3DX Begin after SelectSpriteQueueNode resets the previous
+        // stage boundary. Only the first successful, clean, exact-owner Draw
+        // may re-arm the queue-exit GPU submission (never every Draw Flush).
+        if (exactStage && CanArmD3DXQueueStageAfterDraw(
+                QueueRenderActive(), BatchActive, self == TrackedSprite,
+                PendingDraws, PendingHomogeneous, PendingScope, PendingProducer,
+                scope, source))
+            StageBoundaryReady = true;
         if (exactStage)
             return hr;
 
