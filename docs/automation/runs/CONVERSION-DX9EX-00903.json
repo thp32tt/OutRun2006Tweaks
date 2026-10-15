@@ -1,0 +1,103 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00903",
+  "production_id": "CONVERSION-DX9EX-00903",
+  "event_id": "CONVERSION-DX9EX-00903-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00903",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:HOST:DIRECT_GPU_SKIP_ACK_RUN_ISOLATION",
+  "feature_class": "CRITICAL_BLOCKER",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "phase": "C4_COMMIT",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "e0fe0df9904e18f0721411719755a553f2c01c36",
+  "material_result_sha": "fb003de2a53e560514abc3477557509751de6ed5",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "vrhost/src/main_r23.cpp",
+    "vrhost/src/runtime/direct_ring_skip_ack.hpp"
+  ],
+  "changed_files": [
+    "vrhost/src/main_r23.cpp",
+    "vrhost/src/runtime/direct_ring_skip_ack.hpp",
+    "vrhost/tests/test_direct_ring_skip_ack.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00903.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:HOST:DIRECT_GPU_SKIP_ACK_RUN_ISOLATION",
+    "goal": "Keep the DX9Ex R84 DirectGPU OpenXR host producer ring safe across late history publication, skipped unsampled frames, Reset and restarted game processes: release only strictly older frames from the selected same-run stereo source while the newest frame retains GPU-EVENT ACK.",
+    "scope_boundary": "Only R41 skipped-frame early ACK of the R84 DirectGPU host path; never change selected frame GPU completion fencing, copy/sampling path, stereo projection, original game input/FFB, SkyGlow, R26_SAFE fallback or frozen DXVK.",
+    "special_work_evidence": "Confirmed C++ R41 early-ACK loop excluded the selected frame but did not require skipped candidates to precede it or match selected runGeneration/PID; PublishCompletedFrame releases producer slots before D3D11 reads. This is a provable frame-lifetime safety defect, not a measured FPS gain or HMD-proven visual failure.",
+    "trace_stages": [
+      "DX9Ex R84 D3D9 game publishes each DirectGPU frame with frameId, transport generation, game runGeneration, game PID and producer slot to the Frame.v2 ring.",
+      "R23 host ReadHistory and R41 Pick choose one newest eligible presentation frame; the old R41 loop could invoke PublishCompletedFrame on another valid-slot frame sharing only transport generation, without ensuring oldness or run identity.",
+      "The new pure C++ admission helper gates early ACK to strictly older same-run frames beyond last presented cursor; the selected live frame continues its existing D3D11 GPU EVENT ACK and OpenXR per-eye frame submission."
+    ],
+    "subcomponents": [
+      "Enforce selected-frame temporal ordering and selected transport/run/PID identity before publishing skipped-frame producer ACK; exclude current/newer and previous game-run slots.",
+      "Preserve frameId serial wraparound semantics, older-frame high-frequency reclamation, exact selected frame GPU fence and original R26_SAFE/desktop fallback.",
+      "Compile positive and negative helper contract inside actual Windows R23 host and keep independent portable C++ smoke for wraparound, older/newer, stale PID/run, and already displayed frames."
+    ],
+    "acceptance_items": [
+      {
+        "id": "ring_ack_same_run_older_only",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 game published DirectGPU producer frame to R23 host ring selection and GPU-event release",
+        "expected_behavior": "Only an unsampled frame strictly older than the chosen present frame, from the same transport generation, runGeneration and PID, may receive immediate ACK; selected frame retains asynchronous consumption fencing."
+      },
+      {
+        "id": "ring_ack_reset_wrap_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Game restart, stale run PID, frameId wraparound, and duplicate/later producer slots",
+        "expected_behavior": "After game restart old-run slot cannot be released under new-run selection; a newer frame or already-displayed frame is not freed, while safe wraparound older frame remains eligible."
+      },
+      {
+        "id": "ring_ack_exact_sha_host_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Default R84 Windows host, R84 x86 game, R26_SAFE, package and domain isolation",
+        "expected_behavior": "All required DX9Ex Active and Domain Isolation plus affected Full Source GitHub Actions pass on exactly one final validation-bearing SHA; real Quest3 VDXR behavior remains UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Before this source commit the R41 skip loop checked same transport generation, nonselected frame and slot validity but no earlier-than-selected condition or exact selected runGeneration/PID.",
+    "source_trace": [
+      "D3D9 R84 publishes frameId, runGeneration, DirectGeneration and clientPid in SharedRenderFrameState.",
+      "R23 ReadHistory/Pick selects a current frame but old skip loop applied only DirectGeneration/current cursor in its PublishCompletedFrame branch.",
+      "PublishCompletedFrame ACKs producer reuse prior to any further D3D11 rendering of the selected frame; R32 selected frame ACK correctly waits for an EVENT fence."
+    ],
+    "root_cause": "Missing selected-epoch and selected-frame temporal eligibility in the early ACK branch permitted producer slot release of any other eligible same-transport-generation frame rather than strictly older skipped frames.",
+    "alternatives_rejected": [
+      "Do not globally hold all skipped frames: that stalls the producer ring and restores R37 four-frame latency.",
+      "Do not publish selected frame ACK before its D3D11 EVENT: this could recycle textures while the GPU is still sampling them."
+    ],
+    "fix_evidence": "Committed R23 calls OutRunVrDirectRingSkipAck::CanAcknowledge with candidate, selected frame and last displayed frame IDs, matching generation/runGeneration/PID and original serial comparison before PublishCompletedFrame.",
+    "negative_test_evidence": "Portable g++ -std=c++17 -Wall -Wextra -Werror -pedantic smoke PASSED locally for frameId wraparound, future-frame, stale PID/run, already displayed; real R23 includes static_assert compile regression cases.",
+    "eye_ownership": "No stereo eye transform changes; both original DirectGPU eyes keep the selected producer slot protected by the existing GPU EVENT, while only previous unconsumed candidate frames may be released without a GPU read."
+  },
+  "acceptance_results": {
+    "ring_ack_same_run_older_only": "PENDING",
+    "ring_ack_reset_wrap_fallback": "PENDING",
+    "ring_ack_exact_sha_host_ci": "PENDING"
+  },
+  "ci_evidence": {
+    "initial_material_sha": "fb003de2a53e560514abc3477557509751de6ed5",
+    "initial_active_run_id": 38753659613,
+    "initial_policy_failure": "RUN_RECORD_NOT_FOUND before x86 game/x64 host/package jobs",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "revalidation": "PENDING_FINAL_SHA"
+  },
+  "runtime_evidence": "No same-SHA Quest3/VDXR game/HMD test. Renderer and real-world FPS not claimed.",
+  "score_once": false,
+  "score_delta_this_attempt": 0
+}
