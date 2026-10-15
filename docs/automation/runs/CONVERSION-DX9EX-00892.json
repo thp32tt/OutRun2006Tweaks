@@ -8,7 +8,7 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
-  "symptom_id": "DX9EX:SYMPTOM:HUD_PERIPHERAL_EDGE_SNAP",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "status": "SOURCE_IMPLEMENTED_CI_PENDING",
   "phase": "C3_VALIDATE",
@@ -17,7 +17,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "e6ddbe60e8b47dd3aceae4d3b161f5c0be58d83a",
-  "material_result_sha": null,
+  "material_result_sha": "0ccd9d9f414074930dd90565941594c1b1564058",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/d3d9/hud_edge_transition.hpp"
@@ -30,7 +30,7 @@
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
-    "symptom_id": "DX9EX:SYMPTOM:HUD_PERIPHERAL_EDGE_SNAP",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
     "goal": "Preserve smoothly responsive exact-producer gameplay HUD location/size as icons approach and pass the original source-space edge; avoid a discontinuous snap of binocular anchors/zoom while preserving native center and non-gameplay overlays.",
     "scope_boundary": "Exact R84 R30 gameplay HUD peripheral source-space easing only; never change F11/ESC/+TIME/GOAL, world markers, SkyGlow, R26_SAFE, DX11 or DXVK.",
     "trace_stages": [
@@ -47,17 +47,20 @@
       {
         "id": "hud_edge_visual_continuity",
         "category": "end_to_end_behavior",
-        "expected_behavior": "HUD source-space peripheral anchor and boost smoothly transition at both 1.0 and 1.2 NDC, without an abrupt 1.2 exit."
+        "expected_behavior": "HUD source-space peripheral anchor and boost smoothly transition at both 1.0 and 1.2 NDC, without an abrupt 1.2 exit.",
+        "behavior_area": "R84 gameplay speed/time/position peripheral entry, plateau and offscreen return"
       },
       {
         "id": "hud_edge_scope_preservation",
         "category": "fallback_regression",
-        "expected_behavior": "Central/ordinary HUD, native/desktop baselines and non-HUD producers retain original routing."
+        "expected_behavior": "Central/ordinary HUD, native/desktop baselines and non-HUD producers retain original routing.",
+        "behavior_area": "Unmodified central and non-exact HUD, original game native/desktop and sprite/overlay routing"
       },
       {
         "id": "hud_edge_exact_gates",
         "category": "integrated_validation",
-        "expected_behavior": "Exact SHA R84 Active/Domain/affected HUD/Full Source passes, runtime gated on Quest3."
+        "expected_behavior": "Exact SHA R84 Active/Domain/affected HUD/Full Source passes, runtime gated on Quest3.",
+        "behavior_area": "Exact SHA game DLL and OpenXR host plus packaged R84, rollback, Domain, HUD and full impact gates"
       }
     ]
   },
@@ -71,7 +74,17 @@
     "root_cause": "A discontinuous visibility cutoff in exact gameplay HUD peripheral motion rather than an optical FOV or per-eye pose error.",
     "fix_evidence": "Replace cutoff with bounded C1 smooth outgoing envelope over 1.0..1.2; retain central/plateau behavior and strict nonfinite/outside fallback.",
     "negative_test_evidence": "Extend portable C++ smoke and Python source/mutation validator with bidirectional outgoing sweep, boundary and exact neutral cases.",
-    "evidence_limits": "No physical Quest3/VDXR or game test; actual visible defect confirmation requires HMD runtime validation."
+    "evidence_limits": "No physical Quest3/VDXR or game test; actual visible defect confirmation requires HMD runtime validation.",
+    "source_trace": [
+      "OutRunHudPeripheralText original exact producer from hooks_uiscaling.cpp is submitted through the ScreenHud R84 R30 geometry path.",
+      "R30PeripheralAnchor and PeripheralWeight in stereo_renderer_r30.cpp share the original source-space NDC transition and are evaluated for binocular HUD anchor and boost.",
+      "R33 physical stereo draw replays the scoped semantic through left/right WVP and x64 OpenXR host composition; no other game/overlay routing was changed."
+    ],
+    "alternatives_rejected": [
+      "Per-eye XR FOV, source texture decode and scene WVP are not implicated in the verified scalar jump at source-space 1.20; do not alter them.",
+      "An immediate cutoff outside the source boundary is not C1 continuous and contradicts the existing HUD transition easing contract."
+    ],
+    "eye_ownership": "R30 produces source-space HUD anchor and scale for exact peripheral producer, then R33 preserves binocular eye transforms and host; HMD actual presentation remains UNTESTED."
   },
   "runtime_evidence": "No physical Quest3/VDXR game execution in this task.",
   "score_once": false,
