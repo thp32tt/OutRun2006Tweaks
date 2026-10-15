@@ -1,3 +1,33 @@
+## 2026-10-15 14:30 KST — 사용자 최우선 수정: 분할 원본 타일 전체 재조립 선행
+
+**C가 타일 1장만 처리하는 기존 흐름을 중단한다.** 실제 운용 C는
+`localization-controller-recovery-20260928`의 **A/B 기존 컨트롤러 제3 ChatGPT 탭**이고,
+앞서 설계된 별도 오프라인 C 컨테이너는 기본 비활성 선택 사항이다.
+현행 제3탭 C 프롬프트도 전체 원본 atlas 재조립 우선으로 수정됨
+(`tools/chat-controller/localization-recovery-v1/prompts/localization_C.md`).
+
+1. `/home/chatgpt-runner2/work/image-src/inputs/A/HD_EN_TILES_20261014/ALL_TILE_MAPPING.csv`를 읽고
+   `source_png + source_dds_path + source_png_sha256`로 묶는다. **같은 Q 번호라도 플랫폼별
+   DDS가 다르면 섞지 않는다.** 한 그룹에 필요한 타일 전부를 검사한다.
+2. `tools/localization/c_salvage_atlas.py`를 이용해 좌표대로 복원하고 **타일 PNG SHA256,
+   실제 이미지 RGBA 크기, 좌표 중복/겹침/빈 픽셀, 출력 원본 크기**를 검증한다.
+   전체 원본 PNG가 있으면 full-PNG SHA와 픽셀까지 대조한다. 없으면
+   `REFERENCE_FULL_PNG_NOT_STAGED`, DDS 디코드 대조 전에는
+   `DDS_EQUIVALENCE=UNVERIFIED`로 표시한다.
+3. **전체 원본 조립 PASS 그룹만** 해당 타일의 기존 A/B 한글 생성물을 검토하며,
+   하나의 원본 texture/atlas 전체 좌표로 글자층과 CLEAN을 옮겨
+   source-preserving 합성을 시도한다. 타일이 잘렸거나 불투명·글자 마스크가
+   없는 경우 `HOLD`를 남기고 이미지의 나머지 픽셀을 임의 합성하지 않는다.
+4. 한 번의 C 실행 목표는 *타일 하나*가 아니라 **전체 원본 그룹 하나의 재조립**이다.
+   `C1/C3/실게임` 승인과 DDS 정식 승격을 자동 주장하지 않는다.
+   A/B 큐·탭·기존 이미지는 변경하지 않는다.
+
+제3탭의 실제 실행 프롬프트 변경은 Portainer 수동 재빌드·배포 시 반영된다.
+그전에도 C는 GitHub에서 이 최신 계약을 읽고 우선 순서를 준수해야 한다.
+GitHub 코드/문서 변경만으로 운영 컨테이너가 업데이트되었다고 보고하지 않는다.
+
+---
+
 # OutRun 2006 HD GUI — C 복구·중간본 합성 슬롯 (2026-10-15)
 
 Status: **APPROVED DESIGN / NOT DEPLOYED / NO CLAIM OF FINAL DDS**
