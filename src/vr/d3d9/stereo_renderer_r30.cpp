@@ -4297,6 +4297,70 @@ namespace OutRunVRStereo
             return false;
         }
 
+            // Per-vehicle Calc3D2D quad: preserve original Z/RHW, UV,
+        // alpha, animation offsets and sprite ordering, moving only XY
+        // by its own view-space anchor's exact two-eye delta.
+    bool R30TransformProjectedRankXyzrhwStereo(
+        const void* source, UINT vertexCount, UINT stride,
+        const R30XyzrhwState& state,
+        OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& left,
+        OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& right,
+        const std::vector<std::uint8_t>* usedMask) noexcept
+        {
+            if (!source || !vertexCount || stride < 4u * sizeof(float) ||
+                (usedMask && usedMask->size() < vertexCount))
+                return false;
+            const std::size_t bytes =
+                static_cast<std::size_t>(vertexCount) * stride;
+            if (!bytes || bytes > 4u * 1024u * 1024u)
+                return false;
+            try
+            {
+                left.resize(bytes);
+                right.resize(bytes);
+            }
+            catch (...)
+            {
+                return false;
+            }
+            std::memcpy(left.data(), source, bytes);
+            std::memcpy(right.data(), source, bytes);
+            const auto& vp = state.viewport;
+            const float requestedScale = Settings::VRHudScale.get();
+            if (!std::isfinite(requestedScale))
+                return false;
+            const float scale = std::clamp(
+                requestedScale, 0.30f, 1.20f);
+            for (UINT i = 0; i < vertexCount; ++i)
+            {
+                if (usedMask && !(*usedMask)[i])
+                    continue;
+                const auto off = static_cast<std::size_t>(i) * stride;
+                const auto* src = reinterpret_cast<const float*>(
+                    static_cast<const std::uint8_t*>(source) + off);
+                if (!std::isfinite(src[2]) || !std::isfinite(src[3]))
+                    return false;
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    float x = 0.0f, y = 0.0f;
+                    if (!OutRunVR::RankMarker::RemapScreenPoint(
+                            src[0], src[1],
+                            static_cast<float>(vp.X),
+                            static_cast<float>(vp.Y),
+                            static_cast<float>(vp.Width),
+                            static_cast<float>(vp.Height),
+                            scale, state.projectedRank, eye, x, y))
+                        return false;
+                    auto* dst = reinterpret_cast<float*>(
+                        (eye == 0 ? left.data() : right.data()) + off);
+                    dst[0] = x;
+                    dst[1] = y;
+                }
+            }
+            return true;
+        }
+
+
         bool R30TransformXyzrhwStereo(
             const void* source, UINT vertexCount, UINT stride,
             const R30XyzrhwState& state,
@@ -4306,63 +4370,10 @@ namespace OutRunVRStereo
             UINT knownUsedCount = UINT_MAX,
             const std::vector<std::uint32_t>* touched = nullptr) noexcept
         {
-            // Per-vehicle Calc3D2D quad: preserve original Z/RHW, UV,
-            // alpha, animation offsets and sprite ordering, moving only XY
-            // by its own view-space anchor's exact two-eye delta.
             if (state.projectedWorldMarker)
-            {
-                if (!source || !vertexCount || stride < 4u * sizeof(float) ||
-                    (usedMask && usedMask->size() < vertexCount))
-                    return false;
-                const std::size_t bytes =
-                    static_cast<std::size_t>(vertexCount) * stride;
-                if (!bytes || bytes > 4u * 1024u * 1024u)
-                    return false;
-                try
-                {
-                    left.resize(bytes);
-                    right.resize(bytes);
-                }
-                catch (...)
-                {
-                    return false;
-                }
-                std::memcpy(left.data(), source, bytes);
-                std::memcpy(right.data(), source, bytes);
-                const auto& vp = state.viewport;
-                const float requestedScale = Settings::VRHudScale.get();
-                if (!std::isfinite(requestedScale))
-                    return false;
-                const float scale = std::clamp(
-                    requestedScale, 0.30f, 1.20f);
-                for (UINT i = 0; i < vertexCount; ++i)
-                {
-                    if (usedMask && !(*usedMask)[i])
-                        continue;
-                    const auto off = static_cast<std::size_t>(i) * stride;
-                    const auto* src = reinterpret_cast<const float*>(
-                        static_cast<const std::uint8_t*>(source) + off);
-                    if (!std::isfinite(src[2]) || !std::isfinite(src[3]))
-                        return false;
-                    for (int eye = 0; eye < 2; ++eye)
-                    {
-                        float x = 0.0f, y = 0.0f;
-                        if (!OutRunVR::RankMarker::RemapScreenPoint(
-                                src[0], src[1],
-                                static_cast<float>(vp.X),
-                                static_cast<float>(vp.Y),
-                                static_cast<float>(vp.Width),
-                                static_cast<float>(vp.Height),
-                                scale, state.projectedRank, eye, x, y))
-                            return false;
-                        auto* dst = reinterpret_cast<float*>(
-                            (eye == 0 ? left.data() : right.data()) + off);
-                        dst[0] = x;
-                        dst[1] = y;
-                    }
-                }
-                return true;
-            }
+                return R30TransformProjectedRankXyzrhwStereo(
+                    source, vertexCount, stride, state,
+                    left, right, usedMask);
 
             // Fuse both non-indexed and indexed ScreenHud eyes in one CPU walk.
             // Preserve Z/RHW, UV, color and the original asymmetric FOV math;
