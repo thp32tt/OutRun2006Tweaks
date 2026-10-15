@@ -4555,6 +4555,10 @@ namespace OutRunVRStereo
             }
             if (!restoreOk)
             {
+                // A restore failure poisons the CURRENT right-eye frame, not
+                // only future stereo eligibility. Present/SkyGlow must never
+                // publish a partially restored eye as binocularly complete.
+                R29OwnerMarkRightDrawFailed();
                 R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
                 R29OwnerNoteRestoreFailure("R30.2 XYZRHW right-eye draw");
                 R29OwnerArmMonoSafety();
@@ -5657,6 +5661,10 @@ namespace OutRunVRStereo
             }
             if (!restoreOk)
             {
+                // A restore failure poisons the CURRENT right-eye frame, not
+                // only future stereo eligibility. Present/SkyGlow must never
+                // publish a partially restored eye as binocularly complete.
+                R29OwnerMarkRightDrawFailed();
                 R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
                 R29OwnerNoteRestoreFailure("R30 HUD right-eye draw");
                 R29OwnerArmMonoSafety();

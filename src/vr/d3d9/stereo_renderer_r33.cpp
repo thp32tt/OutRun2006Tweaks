@@ -767,6 +767,10 @@ namespace OutRunVRStereo
             }
             if (!restoreOk)
             {
+                // Even a successful right draw is unusable if RT/depth,
+                // viewport or c64 restoration fails on this frame. Keep the
+                // immediate publication veto separate from future mono safety.
+                R32ReviewMarkFrameRightDrawFailed();
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
                 R32ReviewNoteRestoreFailure("R33 fast right-eye draw");
@@ -939,6 +943,10 @@ namespace OutRunVRStereo
             }
             if (!restoreOk)
             {
+                // Even a successful right draw is unusable if RT/depth,
+                // viewport or c64 restoration fails on this frame. Keep the
+                // immediate publication veto separate from future mono safety.
+                R32ReviewMarkFrameRightDrawFailed();
                 R33InvalidateRightForLeftWrite(
                     mayWriteDepth, mayWriteStencil);
                 R32ReviewNoteRestoreFailure("R33 HUD right-eye draw");

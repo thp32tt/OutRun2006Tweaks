@@ -1,0 +1,37 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00881",
+  "production_id": "CONVERSION-DX9EX-00881",
+  "event_id": "CONVERSION-DX9EX-00881-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00881",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:STABILITY:RIGHT_EYE_RESTORE_PUBLICATION",
+  "feature_class": "VR_STEREO_FRAME_CORRECTNESS",
+  "status": "IMPLEMENTED_VALIDATION_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_STATE",
+  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "87a2f5d6740e6c926bf140c9ed96b2c2fd41e067",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_stereo_restore_publication.py",
+    ".github/workflows/vr-dx9ex-active.yml"
+  ],
+  "root_cause": "R84 R30 XYZRHW/screen and R33 fast-world/HUD right-eye restore failure branches armed future mono safety but did not explicitly veto publication of the current frame. Right draw failures already did so.",
+  "acceptance_results": {
+    "right_eye_restore_failure_veto": "SOURCE_IMPLEMENTED",
+    "right_eye_draw_failure_preservation": "SOURCE_PRESERVED",
+    "mutation_test": "SOURCE_ADDED_GATE_PENDING",
+    "exact_sha_windows_host_game_package_domain": "PENDING",
+    "quest3_vdxr_stereo_frame": "UNTESTED"
+  },
+  "score_once": false,
+  "score_delta_this_attempt": 0
+}
