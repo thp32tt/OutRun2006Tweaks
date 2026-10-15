@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_AWAITING_CI",
-  "phase": "C2_IMPLEMENT",
-  "checkpoint": "C2_SOURCE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "132b9578b037dc6def6daac41de76d4bc9443614",
@@ -83,5 +83,7 @@
     "runtime_evidence": "No matching Quest3/VDXR session performed; software source-path correctness does not establish visual fusion or measured headset frame-time."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Run changed-area portable GOAL smoke then mandatory final exact-SHA GitHub Actions; Quest3/VDXR hardware acceptance remains UNTESTED."
+  "next_action": "Exact-SHA GitHub Actions gates SUCCESS; Quest3/VDXR GOAL progress optics remain UNTESTED until an actual HMD session. Do not rerun the already verified build/CI or award duplicate points.",
+  "material_result_sha": "8ada31448dd2c51b43937fcb9d579ffc0f501543",
+  "validation_bearing_result_sha": "8ada31448dd2c51b43937fcb9d579ffc0f501543"
 }
