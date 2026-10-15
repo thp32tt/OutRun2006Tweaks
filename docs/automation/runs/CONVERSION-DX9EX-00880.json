@@ -59,14 +59,14 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "acceptance_results": {
-    "menu-optional-vector-aspect": "SOURCE_REGRESSION_PENDING_CI",
-    "menu-safe-legacy-ownership": "NEGATIVE_MUTATION_PENDING_CI",
-    "menu-exact-windows-ci": "PENDING"
+    "menu-optional-vector-aspect": "PASS_BUILD",
+    "menu-safe-legacy-ownership": "PASS_BUILD",
+    "menu-exact-windows-ci": "PASS_EXACT_SHA"
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
-  "material_result_sha": null,
+  "hold_reason": null,
+  "material_result_sha": "5acb9bd35f485f956f5f979d1eeecd1ef4bc0309",
   "validation_bearing_result_sha": "666f3662076750f63ded0dc1d4c92a004e70762b",
   "diagnosis": {
     "original_evidence": "The current original D3DXMatrixTransformation2D_dest requires pScaling && pTranslation before any source-aspect correction; the D3DX API permits these pointers to be optional independently.",
@@ -97,7 +97,7 @@
     "dx9ex_active": {
       "run_id": 38693216185,
       "conclusion": "SUCCESS",
-      "required_jobs": "policy, game, host, full-chain-compile, package (5/5)"
+      "required_jobs": "policy, host, game, full-chain-compile, package (5/5)"
     },
     "domain_isolation": {
       "run_id": 38693216222,
@@ -109,9 +109,11 @@
     },
     "full_source_impact": {
       "run_id": 38693216179,
-      "conclusion": "IN_PROGRESS",
-      "note": "Separately tracked; not relabeled SUCCESS before GitHub concludes."
-    }
+      "conclusion": "SUCCESS",
+      "required_jobs": "source-cross-domain, msvc-analyze-active-game, msvc-analyze-openxr-host (3/3)"
+    },
+    "runtime": "UNTESTED"
   },
-  "runtime_evidence": "No Quest3/VDXR HMD session performed."
+  "runtime_evidence": "No Quest3/VDXR HMD session performed.",
+  "result_commit_ci_skip": false
 }
