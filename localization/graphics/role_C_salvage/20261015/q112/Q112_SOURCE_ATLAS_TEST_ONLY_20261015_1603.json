@@ -1,0 +1,151 @@
+{
+  "schema": "outrun-c-salvage-atlas-evidence-v1",
+  "branch": "korean-localization-recovery-20260928",
+  "task_id": "OUTRUN-C-ATLAS-Q112-20261015-1603",
+  "q_id": "Q112",
+  "recorded_date_kst": "2026-10-15",
+  "result_status": "TEST_ONLY_SOURCE_REASSEMBLED",
+  "followup_status": "HOLD_PSD_MISMATCH_NATIVE_DDS_GLYPH_MASK",
+  "input_ssot": "/home/chatgpt-runner2/work/image-src/inputs/A/HD_EN_TILES_20261014/ALL_TILE_MAPPING.csv",
+  "source_png": "Q112_D41D0B1_BASE_READABLE_FLIPY.png",
+  "source_png_sha256_declared": "c12daea521b675a6454026575a2a6516382161e5f3ed6fe93796a71f0029a201",
+  "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/D41D0B1_512x64.dds",
+  "dds_equivalence": "UNVERIFIED",
+  "native_dds_present": false,
+  "full_png_comparison": "REFERENCE_FULL_PNG_NOT_STAGED",
+  "output_artifact": {
+    "host_path": "/home/chatgpt-runner2/work/c-salvage-q112-atlas-20261015-1603/atlases/Q112_D41D0B1_BASE_READABLE_FLIPY--18ebe7dedf00/source_reassembled_readable.png",
+    "sha256": "fb8716de3d947c467efa1fcc0c7e89ca2061bdfbb4a19517bea46d333d1fa0f7",
+    "size": [
+      2048,
+      256
+    ],
+    "mode": "RGBA",
+    "size_bytes": 129353,
+    "stage": "TEST_ONLY"
+  },
+  "tiles": [
+    {
+      "name": "Q112_D41D0B1_BASE_READABLE_FLIPY__r01c01__x0_y0__693x256.png",
+      "original_sha256": "60c1a2c947441e7acc117ebf02c5408cb9efed05ba15b47835545284737f334a",
+      "atlas_region_xywh": [
+        0,
+        0,
+        693,
+        256
+      ],
+      "existing_ab_generated": [
+        {
+          "role": "B",
+          "read_only_path": "/home/chatgpt-runner2/work/image-src/ab_batches/candidate_outputs/B/Q112_D41D0B1_BASE_READABLE_FLIPY__r01c01__x0_y0__693x256_k.png",
+          "sha256": "93d272fba33afb1330e5c7d7ecd36ed84a4f66512dbb1106172436acf18f79de",
+          "size": [
+            1259,
+            1249
+          ],
+          "format": "PNG",
+          "mode": "RGBA",
+          "alpha_zero_pixels": 0,
+          "alpha_opaque_pixels": 1572491,
+          "source_tile_same_dimensions": false,
+          "glyph_mask": "NOT_VERIFIED",
+          "usable_for_native_compose": false
+        }
+      ]
+    },
+    {
+      "name": "Q112_D41D0B1_BASE_READABLE_FLIPY__r01c02__x693_y0__672x256.png",
+      "original_sha256": "461a59ecebfd32e88a122d5404fd04c1b1771cbac646842a8b2f0e41ca6db501",
+      "atlas_region_xywh": [
+        693,
+        0,
+        672,
+        256
+      ],
+      "existing_ab_generated": [
+        {
+          "role": "B",
+          "read_only_path": "/home/chatgpt-runner2/work/image-src/ab_batches/candidate_outputs/B/Q112_D41D0B1_BASE_READABLE_FLIPY__r01c02__x693_y0__672x256_k.png",
+          "sha256": "98ec8f972f53c82e93d410b6f784bdb2795dc2db0158e1d714e0c07a72cacedf",
+          "size": [
+            2048,
+            768
+          ],
+          "format": "PNG",
+          "mode": "RGBA",
+          "alpha_zero_pixels": 0,
+          "alpha_opaque_pixels": 1572864,
+          "source_tile_same_dimensions": false,
+          "glyph_mask": "NOT_VERIFIED",
+          "usable_for_native_compose": false
+        }
+      ]
+    },
+    {
+      "name": "Q112_D41D0B1_BASE_READABLE_FLIPY__r01c03__x1365_y0__683x256.png",
+      "original_sha256": "2a5bf52b5cedda8a4549863d90bbc52b2c979c36bf30b5e6b829a43ba04b56a7",
+      "atlas_region_xywh": [
+        1365,
+        0,
+        683,
+        256
+      ],
+      "existing_ab_generated": [
+        {
+          "role": "B",
+          "read_only_path": "/home/chatgpt-runner2/work/image-src/ab_batches/candidate_outputs/B/Q112_D41D0B1_BASE_READABLE_FLIPY__r01c03__x1365_y0__683x256_k.png",
+          "sha256": "a0d210aff4200479906cd3c9f7e1c9e62f39d19227ab9d50c4265c322a229bb2",
+          "size": [
+            2063,
+            762
+          ],
+          "format": "PNG",
+          "mode": "RGBA",
+          "alpha_zero_pixels": 0,
+          "alpha_opaque_pixels": 1572006,
+          "source_tile_same_dimensions": false,
+          "glyph_mask": "NOT_VERIFIED",
+          "usable_for_native_compose": false
+        }
+      ]
+    }
+  ],
+  "tile_count": 3,
+  "coverage": "COMPLETE_NO_GAPS_OVERLAPS_DUPLICATES",
+  "orientation": "FLIP_Y_PREVIEW_PER_SPRITE_VERIFY",
+  "psd": {
+    "catalog_source": "localization/graphics/plate_library/PSD_UPSTREAM_FULL_INDEX.json",
+    "upstream_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "copied_source_path": "localization/graphics/plate_library/upstream_psd/D41D0B1/D41D0B1_512x64.psd",
+    "source_sha256": "a7b9afc8cc9b4884f4d86015d489ea830076af0da63423191796b84141de0440",
+    "source_size": [
+      2048,
+      256
+    ],
+    "recorded_layers": 6,
+    "identity_pixels_with_any_difference": 174438,
+    "source_pixel_count": 524288,
+    "native_pixel_equivalent": false,
+    "english_layer_identification": "UNREVIEWED",
+    "clean_approved": false,
+    "reason": "PSD merged image differs from entire reassembled English atlas; do not assume matching base"
+  },
+  "qa": {
+    "reassembly_geometry": "PASS_NO_OVERLAP_NO_MISSING_PIXELS",
+    "tile_part_sha": "PASS_3_OF_3",
+    "generated_korean_masks": "MISSING_OR_UNREVIEWED",
+    "generated_dimensions": "NOT_NATIVE_MATCH",
+    "candidate_alpha": "ALL_OPAQUE",
+    "source_protected_pixels": "NOT_REVIEWED_FOR_EDIT",
+    "korean_letter_only": "NOT_PRODUCED",
+    "clean": "HOLD",
+    "dds_trial": "NOT_PRODUCED",
+    "C1": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  },
+  "separation": "A_B_QUEUES_TABS_SOURCE_OUTPUTS_UNMODIFIED",
+  "imagegen_calls": 0,
+  "local_manifest": "/home/chatgpt-runner2/work/c-salvage-q112-atlas-20261015-1603/atlases/Q112_D41D0B1_BASE_READABLE_FLIPY--18ebe7dedf00/atlas_manifest.json",
+  "local_probe": "/home/chatgpt-runner2/work/c-salvage-q112-atlas-20261015-1603/Q112_PSD_NATIVE_PIXEL_PROBE.json"
+}
