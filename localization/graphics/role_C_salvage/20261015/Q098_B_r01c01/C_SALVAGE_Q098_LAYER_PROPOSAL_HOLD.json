@@ -1,0 +1,144 @@
+{
+  "schema": "outrun-c-salvage-test-only-evidence-v1",
+  "task_id": "OUTRUN-C-SALVAGE-20261015-Q098-B-R01C01-1333",
+  "date_kst": "2026-10-15",
+  "run_at_kst": "2026-10-15 13:38:58",
+  "repository": "thp32tt/OutRun2006Tweaks",
+  "branch": "korean-localization-recovery-20260928",
+  "queue_id": "Q098",
+  "producer": "B",
+  "tile": "r01c01",
+  "texture_hash": "42E618FD",
+  "final_status": "LAYER_PROPOSAL_REVIEW_REQUIRED__CLEAN_AND_DDS_HOLD",
+  "source_png": {
+    "original_ab_tile_path": "work/image-src/inputs/A/HD_EN_TILES_20261014/Q098_42E618FD_BASE_READABLE_FLIPY__r01c01__x0_y0__683x128.png",
+    "sha256": "9f35c4fc69c81402a49b5ce712c820b262dc278aee46afb5e7f7198e795db2a9",
+    "size_px": [
+      683,
+      128
+    ],
+    "orientation": "BASE_READABLE_FLIPY",
+    "proof": "N100 actual SHA256 + PNG inspected; only source tile, not canonical DDS atlas"
+  },
+  "generated_png": {
+    "original_ab_path": "work/image-src/ab_batches/candidate_outputs/B/Q098_42E618FD_BASE_READABLE_FLIPY__r01c01__x0_y0__683x128_k.png",
+    "sha256": "b5a0feebaf4f281f2d81e49fa0a85d48a4f16b7cade89a1104561457dfeef08f",
+    "size_px": [
+      2172,
+      724
+    ],
+    "mode": "RGBA",
+    "transparent_fraction": 0.809801,
+    "positive_alpha_pixels": 299094,
+    "semantic_visual": "The existing PNG visibly contains Korean 코스 but also has unreviewed alpha outside obvious letter bounds. It is not a source-native full atlas."
+  },
+  "isolated_output": {
+    "root": "/home/chatgpt-runner2/work/c-salvage-q098-isolated-20261015-1333/output/candidates/B-098-b5a0feebaf4f281f-autoalpha-712697c0a454",
+    "file": "lettering_PROPOSAL.png",
+    "sha256": "38c19b831c79eedfd37840e5f444c16a1eb7ef6e9b9b8929d4e879f52cbfbde3",
+    "generated_pixel_bbox": [
+      291,
+      165,
+      2172,
+      682
+    ],
+    "worker": "tools/localization/c_salvage_worker.py",
+    "worker_mode": "OFFLINE_NO_IMAGEGEN_TEST_ONLY",
+    "exact_input_staging": "isolated copies only; live A/B sources and queue unchanged",
+    "output_class": "LAYER_PROPOSAL_NOT_GLYPH_APPROVED",
+    "receipt": "receipt.json"
+  },
+  "original_source_dds": {
+    "expected_texture_path": "textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+    "source_dds_sha256_verified_this_run": null,
+    "historical_qa_reference_sha256": "3b3cdd76b03014e0ba6a47f4e98a187fdf6ae4297314494cbe1d3d4c586f1f59",
+    "historical_fourcc": "DXT5/BC3",
+    "historical_native_size": [
+      2048,
+      128
+    ],
+    "retrieval_attempt": "GitHub content API 404 at localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/42E618FD_512x32.dds",
+    "inspection": "MISSING_ACTUAL_DDS_BYTES_NO_HEADER_OR_DECODE_VERIFICATION"
+  },
+  "psd": {
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "git_blob_sha": "1e376029dffd4ee9ecb1d517d1870d64e7102873",
+    "repo_path": "localization/graphics/plate_library/upstream_psd/42E618FD/42E618FD_512x32.psd",
+    "verified_actual_sha256": "e1444b1bc64bf03a3ede344c8ad85b9c947cd9c63e75b5cf3fb28ef59e29042a",
+    "verified_size_bytes": 2067761,
+    "actual_dimensions": [
+      2048,
+      128
+    ],
+    "channels": 4,
+    "bit_depth": 8,
+    "parsed_layers_unreviewed": [
+      {
+        "index": 0,
+        "name": "Decompressed Image",
+        "bounds": [
+          440,
+          12,
+          1640,
+          116
+        ]
+      },
+      {
+        "index": 1,
+        "name": "Challenge the course record. ??",
+        "bounds": [
+          431,
+          6,
+          1674,
+          123
+        ]
+      },
+      {
+        "index": 2,
+        "name": "Challenge the course record.",
+        "bounds": [
+          445,
+          20,
+          1661,
+          109
+        ]
+      }
+    ],
+    "layer_parser": "PSD_HEADER_AND_PASCAL_LAYERS_ONLY",
+    "psd_tools_status": "UNAVAILABLE_ON_N100",
+    "selected_english_layers": [],
+    "clean_result": "NOT_GENERATED__PSD_LAYER_PIXELS_UNREVIEWED_AND_CANONICAL_DDS_ABSENT"
+  },
+  "mask_and_qa": {
+    "english_removal_mask_sha256": null,
+    "korean_explicit_glyph_mask_sha256": null,
+    "korean_visual_phrase": "코스",
+    "approved_korean_translation": null,
+    "same_native_size": "FAIL_INPUT_DIMENSION_MISMATCH_2172x724_vs_683x128",
+    "source_coordinates_and_orientation": "UNVERIFIED",
+    "protected_icons_pixels": "UNVERIFIED",
+    "overlap_and_crop": "UNVERIFIED",
+    "clipping": "UNVERIFIED_PROPOSAL_ALPHA_BBOX_TOUCHES_X2172_IMAGE_EDGE",
+    "original_english_remnants": "UNVERIFIED_NO_CLEAN",
+    "korean_stroke_corruption": "NOT_APPROVED_FOR_PASS",
+    "slope_and_source_style": "UNVERIFIED",
+    "alpha_behind_letters": "UNVERIFIED",
+    "persisting_DDS_header_mips_codec": "NOT_RUN_DDS_MISSING_AND_BC3_ENCODER_UNSUPPORTED",
+    "independent_C1": "NOT_RUN",
+    "independent_C3": "NOT_RUN",
+    "user_real_game": "NOT_RUN",
+    "machine_worker_result": "LAYER_PROPOSAL_REVIEW_REQUIRED",
+    "overall": "HOLD_FOR_MANUAL_GLYPH_MASK__SOURCE_DDS__INDEPENDENT_PSD_CLEAN_REVIEW"
+  },
+  "created_files_on_isolated_N100": [
+    "lettering_PROPOSAL.png",
+    "receipt.json",
+    "qa_q098_psd_structure.json"
+  ],
+  "generated_new_image_by_ImageGen": false,
+  "published_dds_count": 0,
+  "official_status_advance": false,
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "next_action": "Acquire SHA-pinned actual canonical DDS; C1/manually certify Korean glyph-only mask; inspect PSD layer pixels and compare a native-size CLEAN against RAW/FLIPY source before any intermediate compose. BC3 DDS requires separately verified encoder."
+}
