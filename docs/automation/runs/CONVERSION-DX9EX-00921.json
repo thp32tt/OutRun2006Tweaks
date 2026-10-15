@@ -11,10 +11,10 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "VALIDATING_EXACT_SHA",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_EXACT_GATE_REQUESTED",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "57fea3942dcb9af19804bf8ebfa2a71111868acd",
@@ -65,9 +65,9 @@
     ]
   },
   "acceptance_results": {
-    "goal_progress_and_finish_time_eye_plane": "PENDING_CI",
-    "goal_unknown_and_gameplay_fallback": "PENDING_CI",
-    "exact_sha_game_host_domain_and_inspector": "PENDING_CI"
+    "goal_progress_and_finish_time_eye_plane": "PASS_BUILD",
+    "goal_unknown_and_gameplay_fallback": "PASS_BUILD",
+    "exact_sha_game_host_domain_and_inspector": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "The physical R84 R30 fixed-function XYZRHW path provided finite recentered headset/world plane only to exact StageExtensionTime. The same screen-HUD GOAL 0-99% progress, finish-time helpers and verified stage-result printf paths survived D3DX GPU batching but fell into generic 2D FOV-only placement. Unlike the shader HUD, that path did not reproject game clip coordinates through the latched head/world plane, causing optical disparity/duplicate risk.",
@@ -83,10 +83,55 @@
       "Broad acceptance of alpha, all ScreenHud or generic queue sprites would affect HUD, SkyGlow, world, and existing F11; exact scope+producer predicate prevents it.",
       "Changing timer/GOAL data or disabling an eye does not repair projection ownership; fixed original draw fallbacks remain."
     ],
-    "next_hmd_experiment": "Quest3/VDXR on exact installed R84 SHA: verify GOAL 0-99%, finish-time glyph and stage result text binocular fusion; confirm +TIME, ordinary timer, title, outer lens, F11, rank, SkyGlow, stereo and FPS unchanged."
+    "next_hmd_experiment": "Quest3/VDXR on exact installed R84 SHA: verify GOAL 0-99%, finish-time glyph and stage result text binocular fusion; confirm +TIME, ordinary timer, title, outer lens, F11, rank, SkyGlow, stereo and FPS unchanged.",
+    "fix_evidence": "R84 original GOAL and stage result ScreenHud D3DX physical XYZRHW GPU submission now uses producer-verified per-eye finite recentered HUD plane; exact physical renderer branch was integrated in src/vr/d3d9/stereo_renderer_r30.cpp with source tags in src/vr/game/render_semantics.hpp.",
+    "negative_test_evidence": "Compiler static_assert negative scope/token matrix prohibits unknown B9200 result, generic queue, rank and world producer promotion; tools/verify_vr_stage_extension_d3dx_batch_owner.py exact native producer/renderer checks and mutation tests passed in DX9Ex Active policy job on validation-bearing exact SHA."
   },
   "score_delta_this_attempt": 0,
-  "next_action": "Automated exact-SHA DX9Ex Active/Domain/Full Source/HUD Inspector gates pending after actual C++ GOAL renderer source and regression repair; HMD UNTESTED.",
+  "next_action": "Exactly four mandatory GitHub Actions gates PASS on one validation-bearing SHA, game+host+package BUILD_VERIFIED; Quest3/VDXR GOAL optics need hardware test.",
   "material_result_sha": "7303037ffefa3122b0d90e46e10fec7d11ebef31",
-  "verifier_fix_sha": "11c4995a9f7675e9a9ba918b676d9bf5658fc67f"
+  "verifier_fix_sha": "11c4995a9f7675e9a9ba918b676d9bf5658fc67f",
+  "validation_bearing_result_sha": "915c8d1f66e29f2cba05342711d985f085c96f9b",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "material_sha": "7303037ffefa3122b0d90e46e10fec7d11ebef31",
+    "validation_bearing_result_sha": "915c8d1f66e29f2cba05342711d985f085c96f9b",
+    "required_gates": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38818785704,
+        "sha": "915c8d1f66e29f2cba05342711d985f085c96f9b",
+        "conclusion": "success",
+        "jobs": "5/5"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38818785540,
+        "sha": "915c8d1f66e29f2cba05342711d985f085c96f9b",
+        "conclusion": "success",
+        "jobs": "1/1"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38818785696,
+        "sha": "915c8d1f66e29f2cba05342711d985f085c96f9b",
+        "conclusion": "success",
+        "jobs": "3/3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38818785559,
+        "sha": "915c8d1f66e29f2cba05342711d985f085c96f9b",
+        "conclusion": "success",
+        "jobs": "2/2"
+      }
+    ]
+  },
+  "bookkeeping": {
+    "commit_kind": "C6_RESULT_ONLY",
+    "skip_ci": true,
+    "material_result_sha": "7303037ffefa3122b0d90e46e10fec7d11ebef31",
+    "validation_bearing_result_sha": "915c8d1f66e29f2cba05342711d985f085c96f9b",
+    "no_additional_score": true
+  }
 }
