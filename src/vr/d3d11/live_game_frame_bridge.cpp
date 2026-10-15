@@ -5114,6 +5114,20 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         // mask to the admitted real game Draw source, including fan/indexed
         // variants. Keep the existing validated OM state cache and A8 mask.
         if (fullMode) {
+            // An earlier isolated auxiliary Z/stencil Clear cannot silently
+            // become the native main DSV history when the game rebinds that
+            // auxiliary surface for a later main Draw. Preserve fallback.
+            if (s.clearColor.auxiliaryDepthCleared && output.nativeDepthTest) {
+                ComPtr<IDirect3DSurface9> liveDepth;
+                ComPtr<IUnknown> liveDepthIdentity;
+                if (FAILED(game->GetDepthStencilSurface(liveDepth.GetAddressOf())) ||
+                    !liveDepth || FAILED(liveDepth.As(&liveDepthIdentity)) ||
+                    !liveDepthIdentity || !s.clearColor.main_depth_still_bound(
+                        reinterpret_cast<std::uintptr_t>(liveDepthIdentity.Get()))) {
+                    s.frameBatch.abort();
+                    return;
+                }
+            }
             output.colorWriteMask = s.clearColor.native_write_mask(
                 reinterpret_cast<std::uintptr_t>(game), output.targetIdentity,
                 output.colorWriteMask);
@@ -5263,14 +5277,40 @@ void observe_indexed(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
 
 bool preserve_offscreen_color_only_clear(IDirect3DDevice9* game,
                                          DWORD flags) noexcept {
+    // Legacy hook name retained for callers. Now accepts auxiliary color,
+    // depth, stencil and combined Clears when all affected render surfaces
+    // are proven isolated from the native main color/depth frame.
+    const DWORD clearBits = D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL;
     if (!diagnostic_enabled() || !env_full_game_opt_in() || !game ||
-        flags != D3DCLEAR_TARGET) return false;
+        (flags & clearBits) == 0u || (flags & ~clearBits) != 0u) return false;
     try {
         State& s = state();
         std::lock_guard<std::mutex> lock(s.mutex);
         const auto owner = reinterpret_cast<std::uintptr_t>(game);
         if ((s.sourceGameDevice != 0u && s.sourceGameDevice != owner) ||
             s.frameBatch.stopped || !s.clearColor.valid) return false;
+        D3DCAPS9 caps{};
+        if (FAILED(game->GetDeviceCaps(&caps)) ||
+            !GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs))
+            return false;
+        for (DWORD slot = 1u; slot < caps.NumSimultaneousRTs; ++slot) {
+            ComPtr<IDirect3DSurface9> extra;
+            // A TARGET Clear affects any bound extra MRT, which may alias
+            // the main backbuffer. Unproved slots must not be skipped.
+            if (game->GetRenderTarget(slot, extra.GetAddressOf()) !=
+                D3DERR_NOTFOUND) return false;
+        }
+        const bool clearsDepth = (flags & (D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL)) != 0u;
+        if (clearsDepth) {
+            ComPtr<IDirect3DSurface9> depth;
+            ComPtr<IUnknown> depthIdentity;
+            if (!s.clearColor.mainDepthIdentity ||
+                FAILED(game->GetDepthStencilSurface(depth.GetAddressOf())) || !depth ||
+                FAILED(depth.As(&depthIdentity)) || !depthIdentity ||
+                s.clearColor.main_depth_still_bound(
+                    reinterpret_cast<std::uintptr_t>(depthIdentity.Get())))
+                return false;
+        }
         ComPtr<IDirect3DSurface9> target, backbuffer;
         ComPtr<IUnknown> targetIdentity, backbufferIdentity;
         if (FAILED(game->GetRenderTarget(0, target.GetAddressOf())) || !target ||
@@ -5279,10 +5319,13 @@ bool preserve_offscreen_color_only_clear(IDirect3DDevice9* game,
             FAILED(target.As(&targetIdentity)) ||
             FAILED(backbuffer.As(&backbufferIdentity)) ||
             !targetIdentity || !backbufferIdentity) return false;
-        return s.clearColor.preserves_offscreen_color_only(
-            owner, reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()),
-            reinterpret_cast<std::uintptr_t>(targetIdentity.Get()),
-            true, s.frameBatch.stopped);
+        const bool seeded = s.clearColor.matches(
+            owner, reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()));
+        const bool offscreen = targetIdentity.Get() != backbufferIdentity.Get();
+        const bool safe = GameNativeOffscreenPass::isolated_auxiliary_clear(
+            seeded, offscreen, true, clearsDepth, true, s.frameBatch.stopped);
+        if (safe && clearsDepth) s.clearColor.note_auxiliary_depth_clear();
+        return safe;
     } catch (...) {
         // No unproved native publication may change the original D3D9 game.
         return false;
@@ -5424,10 +5467,18 @@ void observe_game_clear(IDirect3DDevice9* game, DWORD count,
             wholeBackbuffer, s.frameBatch.submitted != 0u, s.pending);
         if (foreignSource && !sourceReacquired) return;
         if (foreignSource) s.clearColor.discard();
+        std::uintptr_t mainDepthIdentity = 0u;
+        if (wholeBackbuffer) {
+            ComPtr<IDirect3DSurface9> mainDepth;
+            ComPtr<IUnknown> canonicalDepth;
+            if (SUCCEEDED(game->GetDepthStencilSurface(mainDepth.GetAddressOf())) &&
+                mainDepth && SUCCEEDED(mainDepth.As(&canonicalDepth)) && canonicalDepth)
+                mainDepthIdentity = reinterpret_cast<std::uintptr_t>(canonicalDepth.Get());
+        }
         s.clearColor.record(sourceDevice,
             reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()),
             static_cast<std::uint32_t>(color), wholeBackbuffer,
-            bbDesc.Format == D3DFMT_X8R8G8B8);
+            bbDesc.Format == D3DFMT_X8R8G8B8, mainDepthIdentity);
         if (wholeBackbuffer && env_full_game_opt_in()) {
             if (sourceReacquired || s.sourceGameDevice == 0u) {
                 // Genuine full game Clear starts a new native source epoch.
