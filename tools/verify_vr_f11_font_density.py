@@ -209,14 +209,26 @@ def check_responsive_font_fit(font: str, fit_header: str) -> None:
         usable_w = max(1.0, width - min(40.0, width * 0.1))
         usable_h = max(1.0, height - min(40.0, height * 0.1))
         raw = min(1.0, usable_w / (1130.0 * density),
-                  usable_h / (600.0 * density))
+                  usable_h / (480.0 * density))
         scale = max(0.25, min(1.0, raw))
         style = max(0.25, min(3.0, density * scale))
         assert 0.25 <= scale <= 1.0
         assert 0.25 <= style <= 3.0
         if 0.25 <= raw <= 1.0:
             assert 1130.0 * density * scale <= usable_w + 1e-4
-            assert 600.0 * density * scale <= usable_h + 1e-4
+            assert 480.0 * density * scale <= usable_h + 1e-4
+    # The scrollable tab body owns overflow; it must not force tiny glyphs
+    # to fit the full 600px-high virtual content into a portrait XR viewport.
+    # The original 600px fitter gave only ~0.78 scale at Quest3 3440x1440;
+    # 480px reserves readable tab controls with child scrolling.
+    assert "const float desiredHeight = 480.0f * density;" in fit_header
+    assert 'ImGui::BeginChild("##tabbody", ImVec2(0, 0))' in shell
+    viewport_h = 1440.0 - min(40.0, 1440.0 * 0.1)
+    quest_density = 3.0
+    before = min(1.0, viewport_h / (600.0 * quest_density))
+    after = min(1.0, viewport_h / (480.0 * quest_density))
+    assert before < 0.80 and after > 0.95
+    assert after > before
     assert "externalVrShell ? responsiveFit.fontScale : 1.0f" in shell
     print("PASS VR F11 live shell glyph/control responsive fit and desktop restore")
 

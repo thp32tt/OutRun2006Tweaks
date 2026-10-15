@@ -27,8 +27,13 @@ namespace OutRunF11ResponsiveFit
         // SetWindowFontScale reduces only the *window's* displayed glyph size;
         // no font rebuild, bitmap upscaling or global IO scale change.
         const float density = std::clamp(requestedDensity, 0.25f, 7.5f);
+        // The shell tab body already scrolls; fitting glyphs against the full
+        // 600px content height downscales the entire high-resolution XR font
+        // before that scrollbar can be used. Reserve 480px for readable
+        // tabs/controls and allow the existing child to scroll long settings.
+        // The outer window stays capped by its actual viewport bounds.
         const float desiredWidth = 1130.0f * density;
-        const float desiredHeight = 600.0f * density;
+        const float desiredHeight = 480.0f * density;
         const float rawFit = (std::min)(1.0f, (std::min)(
             availableWidth / desiredWidth, availableHeight / desiredHeight));
         // A nearly minimized/zero-area output cannot make interactive UI,
