@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "SOURCE_IMPLEMENTED_CI_REPAIR",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_EXACT_SHA_PENDING",
-  "automation_validation": "FIRST_CANDIDATE_FAILED_REVALIDATING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "98d627d3bd8aaa852692e8d7e50434dfc5f1c12e",
   "material_result_sha": "71f4335c5a534e57548d78a6397fb4fb0e2289c7",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "f954e0310c5bd483cd07d3b18d271f9f509be976",
   "source_paths": [
     "src/vr/game/outrun_renderer.cpp",
     "src/vr/game/lens_centre_partial_wvp.hpp"
@@ -88,8 +88,8 @@
   "runtime_evidence": "No original OutRun game, Quest3 or VDXR screen was executed; game-side split-upload actual frequency is not measured, and full visual centre ghost repair is not claimed.",
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "PENDING_EXACT_SHA_CI_AND_HMD",
-  "result_commit_ci_skip": false,
+  "hold_reason": "NEED_HMD_TEST",
+  "result_commit_ci_skip": true,
   "ci_evidence": {
     "source_material_sha": "71f4335c5a534e57548d78a6397fb4fb0e2289c7",
     "required_final_gates": [
@@ -99,7 +99,7 @@
       "DX9Ex Full Source Impact Review"
     ],
     "portable_cpp17_smoke": "PASS",
-    "exact_sha": "PENDING",
+    "exact_sha": "f954e0310c5bd483cd07d3b18d271f9f509be976",
     "runtime": "UNTESTED",
     "failed_first_candidate": {
       "run_id": 38734530311,
@@ -108,6 +108,10 @@
       "reason": "VERIFIER_MUTATION_WRONG_OCCURRENCE",
       "cause": "First-occurrence mutation targeted new exact C993 split-upload guard instead of original aux/render-target early return."
     },
-    "verifier_repair": "Anchor target-owner negative mutation to the actual early-return if condition. No weakening of canonical branch assertions or domain gate."
-  }
+    "verifier_repair": "Anchor target-owner negative mutation to the actual early-return if condition. No weakening of canonical branch assertions or domain gate.",
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_sha": "f954e0310c5bd483cd07d3b18d271f9f509be976",
+    "c6_result": "PASS_EXACT_SHA"
+  },
+  "previous_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
