@@ -1051,8 +1051,29 @@ namespace OutRunVRStereo
                 return R32ReviewRunLowerFailClosed(device,
                     std::forward<LowerR29Draw>(lowerR29Draw));
             };
+            // R33's raster guard may reject an otherwise source-owned C993
+            // sun before any source/WVP classification (mono, lost eye,
+            // auxiliary RT, incomplete StateBlock replay). R29's historical
+            // world route has no authority to reproject this exact producer.
+            // Preserve ONE unmodified original draw in that case; the normal
+            // ready raster path below still attempts exact binocular stereo.
+            const bool directLensCentre =
+                !OutRunVR::GameSemantic::QueueRenderActive() &&
+                OutRunVR::GameSemantic::EffectiveScope() ==
+                    OutRunVR::GameSemantic::RenderScope::WorldBillboard &&
+                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::LensFlareCentre;
             if (!resyncAlreadyFlushed)
+            {
+                if (OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync(
+                        directLensCentre, resyncAlreadyFlushed))
+                {
+                    if (telemetry)
+                        R32ReviewNoteDispatchFallback();
+                    return actualDraw();
+                }
                 return fallbackToR29();
+            }
 
             // Classify exactly once for the physical draw. Flat-perspective
             // effects may require three GetRenderState calls; do not repeat
@@ -1062,12 +1083,6 @@ namespace OutRunVRStereo
             // R30::None is NOT generic-world ownership for the D3A5/C993
             // sun. If the original c64/call/shader/pose proof is missing,
             // bypass both R33 fast world and the R29 cached-WVP fallback.
-            const bool directLensCentre =
-                !OutRunVR::GameSemantic::QueueRenderActive() &&
-                OutRunVR::GameSemantic::EffectiveScope() ==
-                    OutRunVR::GameSemantic::RenderScope::WorldBillboard &&
-                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                    OutRunVR::GameSemantic::ProducerToken::LensFlareCentre;
             const bool provenLensStereo =
                 screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld;
             if (OutRunVR::LensCentre::PreserveOriginalAtUpperDispatch(

@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00912",
+  "production_id": "CONVERSION-DX9EX-00912",
+  "event_id": "CONVERSION-DX9EX-00912-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00912",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "C2_IMPLEMENTED_CI_PENDING",
+  "phase": "C3_VALIDATE",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "42470ad440367326f5dd4670c52eba7ee0816b46",
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "vrhost/tests/lens_centre_pose_epoch_smoke.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "vrhost/tests/lens_centre_pose_epoch_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00912.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Guarantee that the exact original 0xD3A5 to 0xC993 central flare sun retains one unmodified game draw whenever R84's stereo raster replay is ineligible, while source-owned C993 binocular rendering remains active when source, pose, shader and both eye paths are provably ready.",
+    "scope_boundary": "Only early R33 exact central producer fallback and shared original-WVP/early-routing assertions. Do not touch the CABE flare discs, SkyGlow, +TIME/GOAL, HUD, old R26_SAFE, FFB, input, DX11 or frozen DXVK.",
+    "trace_stages": [
+      "Original 0xD3A5 parent, exact 0xC993 DrawObjectAlphaCentre and its LensFlareCentre semantic own the spatial central sun.",
+      "R33 raster guard passes resyncAlreadyFlushed=false for mono/aux/StateBlock or untrusted raster path and historically sent even exact C993 through lower generic R29 world fallback.",
+      "R33 now dispatches one original raw central C993 draw before the R29 route in the unsafe raster case; only raster-ready C993 is eligible for strict R30 original c64 proof and actual R33 per-eye draw."
+    ],
+    "subcomponents": [
+      "Protect original C993 draw from unready raster replay handing central world source to lower cached-WVP R29, while leaving normal world and ring producers untouched.",
+      "Preserve source-proven binocular C993 path and all existing StateBlock, depth, target and pose fail-closed vetoes with portable positive/negative producer and ready/unready regression."
+    ],
+    "acceptance_items": [
+      {
+        "id": "centre_unready_preserves_original",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original centre producer through R84 physical raster guard and fallback",
+        "expected_behavior": "Direct C993 centre on the early unflushed raster path draws exactly once from the original game without entering historical cached-world reprojection."
+      },
+      {
+        "id": "centre_ready_and_outer_effects_isolated",
+        "category": "fallback_regression",
+        "behavior_area": "Source-qualified C993 stereo admission and protected CABE/normal world fallback",
+        "expected_behavior": "Raster-ready centre still takes strict original WVP and physical two-eye path, while queued, ring, noncentre and unrelated world draws use unchanged routing."
+      },
+      {
+        "id": "dx9ex_exact_sha_full_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Windows game/host/rollback/package, Domain, Full Source Impact and HUD Inspector",
+        "expected_behavior": "Final exact SHA passes existing DX9Ex Active x86 R84 and R26_SAFE, x64 host, package, Domain Isolation, Full Source Impact and HUD Inspector workflows; HMD runtime remains independently untested."
+      }
+    ]
+  },
+  "diagnosis": {
+    "root_cause": "R33Dispatch checked the resyncAlreadyFlushed early-bypass flag before inspecting the direct C993 centre producer; on failed raster eligibility, this could invoke R29 historical world fallback despite the later direct-centre safeguard.",
+    "source_trace": [
+      "D3A5 and C993 hooks scope only the exact LensFlareCentre producer as WorldBillboard.",
+      "R33GuardStereoRasterState explicitly invokes dispatch(false) on mono, auxiliary target and StateBlock capture bypass.",
+      "R33Dispatch previously returned fallbackToR29 for false before checking the exact LensFlareCentre producer, whereas its source-owned bypass occurred only after screen-space classification."
+    ],
+    "alternatives_rejected": [
+      "Classifying every depthless lens/alpha draw as WorldBillboard would corrupt CABE rings and SkyGlow.",
+      "Claiming stereo success on raster-unready frames would publish non-binocular or stale graphics; preserve the original draw there instead."
+    ],
+    "fix_evidence": "Move exact direct-centre identity ahead of early resync bypass; choose only its unmodified original draw when raster is ineligible; maintain strict R30 raw c64 plus R33 left/right physical submit for eligible frames.",
+    "eye_ownership": "When stereo raster is ready, the exact C993 world source remains gated by original game c64/shader/pose and per-eye submission; when not ready, neither R29 cached world nor borrowed road matrices can impersonate binocular ownership.",
+    "original_evidence": "Original EXE exact D3A5/C993 sun object 0x570002; distinct CABE rings remain excluded by the direct producer identity.",
+    "negative_test_evidence": "Portable C++ positive and negative guard tests exercise exact/nonexact producer and raster-ready/unready combinations; real Quest3/VDXR still requires validation."
+  },
+  "runtime_evidence": "No actual Quest3/VDXR headset, game or screenshots were executed in this environment; no optical completion or performance claim.",
+  "score_delta_this_attempt": 0,
+  "score_once": false
+}

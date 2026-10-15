@@ -41,6 +41,14 @@ int main()
     assert(!PreserveOriginalAtUpperDispatch(true, true, true));
     assert(!PreserveOriginalAtUpperDispatch(false, false, false));
     assert(!PreserveOriginalAtUpperDispatch(false, true, false));
+    // The early R33 raster bypass has no proof of binocular eligibility.
+    // C993 alone must avoid the R29 cached-WVP/road fallback there; a ready
+    // C993 is still allowed to reach the exact stereo path, and unrelated
+    // world/halo draws keep their historical routing.
+    assert(PreserveOriginalBeforeRasterResync(true, false));
+    assert(!PreserveOriginalBeforeRasterResync(true, true));
+    assert(!PreserveOriginalBeforeRasterResync(false, false));
+    assert(!PreserveOriginalBeforeRasterResync(false, true));
     // Ordinary shader world draw path and CABE outer effect remain unchanged.
     assert(SelectWorldRoute(false, false) ==
         WorldRoute::HistoricalWorld);

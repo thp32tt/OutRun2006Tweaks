@@ -39,6 +39,18 @@ namespace OutRunVR::LensCentre
         return rawOwned ? WorldRoute::ExactCentreStereo
                         : WorldRoute::PreserveOriginal;
     }
+    // R33's early raster-guard bypass must never hand the exact central sun
+    // to the historical R29 world transform. The stereo-ready path still
+    // requires original-c64 proof and physical left/right submission.
+    constexpr bool PreserveOriginalBeforeRasterResync(
+        bool exactDirectCentre, bool rasterReady) noexcept
+    {
+        return exactDirectCentre && !rasterReady;
+    }
+    static_assert(PreserveOriginalBeforeRasterResync(true, false));
+    static_assert(!PreserveOriginalBeforeRasterResync(true, true));
+    static_assert(!PreserveOriginalBeforeRasterResync(false, false));
+
     // When R30 cannot prove the C993 game c64 or R33 cannot submit its
     // precise stereo path, preserve the original draw. Never retry a
     // generic world WVP route with possibly head-injected live constants.
