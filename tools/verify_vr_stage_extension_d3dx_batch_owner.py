@@ -121,9 +121,10 @@ def check(code: str, header: str) -> list[str]:
          "TrackedSprite = nullptr;" in lifecycle,
          "tracked/live D3DX sprite must revoke pending batch on device loss")
     for method, slot in (("LostDevice", 12), ("ResetDevice", 13)):
-        begin = lifecycle.find(f"static HRESULT __stdcall {method}Dest(void* self)")
-        end = lifecycle.find("\n    }", begin)
-        callback = lifecycle[begin:end] if begin >= 0 and end > begin else ""
+        callback_begin = lifecycle.find(f"static HRESULT __stdcall {method}Dest(void* self)")
+        callback_end = lifecycle.find("\n    }", callback_begin)
+        callback = lifecycle[callback_begin:callback_end] if (
+            callback_begin >= 0 and callback_end > callback_begin) else ""
         owner = "const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle("
         live_argument = "self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218));"
         trampoline = f"const HRESULT hr = {method}_hk.stdcall<HRESULT>(self);"
