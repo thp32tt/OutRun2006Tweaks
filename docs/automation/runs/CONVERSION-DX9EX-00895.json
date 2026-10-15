@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:STEREO:COMPLETED_TWO_EYE_ADMISSION",
   "symptom_id": "DX9EX:SYMPTOM:FAILED_RIGHT_EYE_FALSE_COMPLETION",
   "feature_class": "CRITICAL_BLOCKER",
-  "status": "IMPLEMENTED_AWAITING_CI",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "a0c5a771f2ea9540b6a42b2e449654e16a561a94",
   "material_result_sha": "435b0b3fac14c60c55fa8628e3f9cd2b0bfa5199",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "f3bf91eb043453d7e5b19111c84e410e7566c860",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp"
@@ -89,8 +89,8 @@
   "runtime_evidence": "Quest3/VDXR not executed in this task.",
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "PENDING_EXACT_SHA_CI",
-  "result_commit_ci_skip": false,
+  "hold_reason": null,
+  "result_commit_ci_skip": true,
   "ci_evidence": {
     "original_material_sha": "435b0b3fac14c60c55fa8628e3f9cd2b0bfa5199",
     "dx9ex_active_first_attempt": {
@@ -104,6 +104,27 @@
       "Domain Isolation Guard",
       "OutRun EXE HUD Inspector CI",
       "DX9Ex Full Source Impact Review"
-    ]
-  }
+    ],
+    "validation_bearing_sha": "f3bf91eb043453d7e5b19111c84e410e7566c860",
+    "dx9ex_active": {
+      "id": 38728517608,
+      "status": "completed",
+      "conclusion": "success",
+      "sha": "f3bf91eb043453d7e5b19111c84e410e7566c860"
+    },
+    "domain_isolation": {
+      "id": 38728517826,
+      "status": "completed",
+      "conclusion": "success",
+      "sha": "f3bf91eb043453d7e5b19111c84e410e7566c860"
+    },
+    "exact_sha_policy_host_game_full_chain_package": {
+      "check_suite_id": 104948283403,
+      "job_conclusion": "success",
+      "sha": "f3bf91eb043453d7e5b19111c84e410e7566c860"
+    },
+    "inspector_and_full_source_impact": "NOT_TRIGGERED_FOR_VALIDATION_SHA; no independent workflow run shown on this exact SHA",
+    "c6_result": "PASS_EXACT_SHA"
+  },
+  "previous_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
