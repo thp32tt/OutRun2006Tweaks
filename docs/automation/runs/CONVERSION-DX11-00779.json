@@ -1,0 +1,146 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00779",
+  "production_id": "CONVERSION-DX11-00779",
+  "event_id": "CONVERSION-DX11-00779-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_GAME_OFFSCREEN_MASKED_MRT_STENCIL_CONTINUITY",
+  "feature_id": "DX11-FULL-GAME-OFFSCREEN-MASKED-MRT-STENCIL-CONTINUITY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "1f96dc9bccccd2c2b1792c2c79705ccfde56ae4e",
+  "material_result_sha": "d6f44ffb6cc5990f8efc8e3e98e6055da4c50d55",
+  "validation_bearing_result_sha": "d6f44ffb6cc5990f8efc8e3e98e6055da4c50d55",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_offscreen_pass.hpp",
+    "tools/dx11_offscreen_masked_mrt_stencil_00779.cpp",
+    "tools/test_dx11_offscreen_masked_mrt_stencil_00779.py",
+    "tools/test_dx11_auxiliary_depth_draw_00778.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-OFFSCREEN-MASKED-MRT-STENCIL-CONTINUITY",
+    "goal": "Continue actual native full-frame menu, vehicle-selection and race D3D9 Draw/DrawIndexed over isolated offscreen texture passes with a proven zero-write stencil test and zero-color-write bound MRTs while keeping fail-closed original D3D9 input, depth and Present.",
+    "acceptance_items": [
+      {
+        "id": "masked-mrt-readonly-stencil-game-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_D3D9_Draw_DrawIndexed_native_full_frame",
+        "expected_behavior": "Real offscreen texture Draws with separately verified D3D9 stencil zero write-mask and independently verified bound MRT color masks consume exact source ordinals; next main backbuffer native Draw remains publishable."
+      },
+      {
+        "id": "unknown-write-and-original-input-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "depth_stencil_mrt_Clears_DX9Ex_gamepad",
+        "expected_behavior": "Unknown or nonzero per-slot color/stencil write masks and main Z aliasing fail closed; offscreen Clears ignore masks and remain strictly validated; original D3D9 Draw, Present, FFB, SkyGlow and gamepad remain unchanged."
+      },
+      {
+        "id": "exact-sha-integrated-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Win32_OpenXR_HUD",
+        "expected_behavior": "Positive/negative compiled C++ regression and destructive Python source mutation pass in fast Gate plus all five mandatory GitHub workflows at the exact material SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Intercept game-authored D3D9 Draw/DrawIndexed while offscreen menu/vehicle RT0 bound",
+      "Query stencil write mask and all bound MRT slots' individual color write masks with fail-closed unknown results",
+      "Preserve actual source ordinals across no-main-write offscreen passes and proven main depth identity",
+      "Reconnect native D3D11 full-frame Draw/DrawIndexed to guarded same-Present publication; retain D3D9 output/input fallback"
+    ],
+    "batch_components": [
+      "Live game source bridge C++ render-state capture and native-batch source admission",
+      "Native offscreen pass C++ isolated stencil and per-MRT predicates",
+      "Compiled C++ positive/negative frame-continuity test, destructive Python regressions and DX11 Fast integration"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "tools/dx11_offscreen_masked_mrt_stencil_00779.cpp constexpr + runtime compiled game frame continuity",
+      "negative_regression": "tools/test_dx11_offscreen_masked_mrt_stencil_00779.py destructive state-query mutations, compiled unknown/writable MRT+stencil fallback, preserved auxiliary Clear strict path",
+      "component_integration": "Actual D3D9 offscreen Draw/DrawIndexed -> zero-write stencil/MRT masks -> exact source ordinal -> subsequent native main D3D11 Draw -> guarded D3D9 Present; gamepad remains original"
+    },
+    "conflict_keys": [
+      "DX11:FULL_GAME_OFFSCREEN_MASKED_MRT_STENCIL_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Same-SHA source/CI build verified only; actual Quest3/VDXR/menu/race output and performance not observed.",
+    "activation_guard_and_fallback": "NativeDrawPathActive diagnostic opt-in and fail closed; original D3D9 Draw, Present, gamepad, FFB and DX9Ex fallback unchanged; DXVK frozen."
+  },
+  "acceptance_results": {
+    "masked-mrt-readonly-stencil-game-draw": "PASS_BUILD",
+    "unknown-write-and-original-input-fallback": "PASS_BUILD",
+    "exact-sha-integrated-gates": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Checked branch latest HEAD and 00778 completed distinct C6; recovered original code and owner/lease safety.",
+    "C1_REVIEW": "Isolated bound auxiliary MRT colorwrite=0 and stencil test with zero write mask as unsupported source gap.",
+    "C2_IMPLEMENT": "Committed real live-game C++ bridge and predicate changes, compiled and destructive source regressions.",
+    "C3_VALIDATE": "At exact validation-bearing source SHA all five mandatory GitHub Actions SUCCESS; Quest3/VDXR runtime UNTESTED.",
+    "C4_COMMIT": "Material source commit d6f44ffb, no CI skip, non-force fast-forward from 1f96dc9b.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "Separate bookkeeping checkpoint after 5/5 exact-SHA SUCCESS; HMD requires hardware evidence."
+  },
+  "evidence": {
+    "ci_head_sha": "d6f44ffb6cc5990f8efc8e3e98e6055da4c50d55",
+    "gates": {
+      "DX11 Fast": {
+        "workflow_run_id": 38760046543,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38760046543"
+      },
+      "Backend Conversion Gate": {
+        "workflow_run_id": 38760046639,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38760046639"
+      },
+      "Windows Build": {
+        "workflow_run_id": 38760054652,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38760054652"
+      },
+      "OpenXR VR architecture": {
+        "workflow_run_id": 38760046388,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38760046388"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "workflow_run_id": 38760054657,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38760054657"
+      }
+    },
+    "extra_openxr_workflow": {
+      "workflow_run_id": 38760054693,
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38760054693"
+    },
+    "runtime_testing": "Not performed; no user gameplay, HMD or gamepad confirmation."
+  },
+  "c6_record": {
+    "independent_score_event": false,
+    "source_changes": false,
+    "reran_workflows": false,
+    "note": "Bookkeeping is not new development. Exactly one source result and one exact-SHA mandatory CI success unit."
+  }
+}
