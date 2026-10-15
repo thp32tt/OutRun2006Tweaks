@@ -1,9 +1,33 @@
 #include "native_game_frame_batch.hpp"
+#include "native_game_source_mutation.hpp"
 #include "native_game_present_region.hpp"
 #include <cassert>
 #include <cstdint>
 #include <initializer_list>
 using outrun::vr::dx11::live_game_frame::GameNativeFrameBatch;
+using outrun::vr::dx11::live_game_frame::GameNativeSourceMutation;
+constexpr bool native_non_draw_surface_mutation_regression() {
+    using M = GameNativeSourceMutation;
+    // Live menu Draw -> ColorFill/StretchRect/UpdateSurface to the seeded
+    // game backbuffer -> native batch abort -> untouched D3D9 Present.
+    GameNativeFrameBatch frame{};
+    frame.succeeded(true);
+    frame.record_source_draw(0u);
+    if (!frame.publishable_full(true, 1u) ||
+        !M::invalidates_full_game_frame(true, true, true, true, false))
+        return false;
+    frame.abort();
+    if (frame.publishable_full(true, 1u) || frame.accepts_full(1u))
+        return false;
+    // A failed call, foreign device, auxiliary RT or native self-upload
+    // must not discard an otherwise valid native menu/race scene.
+    return !M::invalidates_full_game_frame(true, false, true, true, false) &&
+        !M::invalidates_full_game_frame(true, true, false, true, false) &&
+        !M::invalidates_full_game_frame(true, true, true, false, false) &&
+        !M::invalidates_full_game_frame(true, true, true, true, true) &&
+        !M::invalidates_full_game_frame(false, true, true, true, false);
+}
+static_assert(native_non_draw_surface_mutation_regression());
 using outrun::vr::dx11::live_game_frame::GameNativePresentRegion;
 int main() {
     GameNativeFrameBatch b{};

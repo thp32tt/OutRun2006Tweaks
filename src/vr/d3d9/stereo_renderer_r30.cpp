@@ -74,6 +74,8 @@ namespace OutRunVRStereo
         constexpr std::size_t R30CreateIndexBufferVtableIndex = 27;
         constexpr std::size_t R30UpdateSurfaceVtableIndex = 30;
         constexpr std::size_t R30UpdateTextureVtableIndex = 31;
+        constexpr std::size_t R30StretchRectVtableIndex = 34;
+        constexpr std::size_t R30ColorFillVtableIndex = 35;
         constexpr std::size_t R30BufferReleaseVtableIndex = 2;
         constexpr std::size_t R30TextureReleaseVtableIndex = 2;
         constexpr std::size_t R30BufferLockVtableIndex = 11;
@@ -85,6 +87,8 @@ namespace OutRunVRStereo
         SafetyHookInline R30CreateTextureHook{};
         SafetyHookInline R30UpdateSurfaceHook{};
         SafetyHookInline R30UpdateTextureHook{};
+        SafetyHookInline R30StretchRectHook{};
+        SafetyHookInline R30ColorFillHook{};
         SafetyHookInline R30TextureReleaseHook{};
         SafetyHookInline R30TextureLockRectHook{};
         SafetyHookInline R30TextureUnlockRectHook{};
@@ -645,6 +649,32 @@ namespace OutRunVRStereo
                 device, source, sourceRect, destination, destinationPoint);
             outrun::vr::dx11::observe_update_surface(
                 source, destination, hr);
+            outrun::vr::dx11::live_game_frame::observe_game_surface_mutation(
+                device, destination, hr);
+            return hr;
+        }
+
+        HRESULT __stdcall R30StretchRectDest(
+            IDirect3DDevice9* device,
+            IDirect3DSurface9* source, const RECT* sourceRect,
+            IDirect3DSurface9* destination, const RECT* destRect,
+            D3DTEXTUREFILTERTYPE filter)
+        {
+            const HRESULT hr = R30StretchRectHook.stdcall<HRESULT>(
+                device, source, sourceRect, destination, destRect, filter);
+            outrun::vr::dx11::live_game_frame::observe_game_surface_mutation(
+                device, destination, hr);
+            return hr;
+        }
+
+        HRESULT __stdcall R30ColorFillDest(
+            IDirect3DDevice9* device, IDirect3DSurface9* surface,
+            const RECT* rect, D3DCOLOR color)
+        {
+            const HRESULT hr = R30ColorFillHook.stdcall<HRESULT>(
+                device, surface, rect, color);
+            outrun::vr::dx11::live_game_frame::observe_game_surface_mutation(
+                device, surface, hr);
             return hr;
         }
 
@@ -706,6 +736,14 @@ namespace OutRunVRStereo
                 R30UpdateTextureHook = safetyhook::create_inline(
                     vtable[R30UpdateTextureVtableIndex],
                     R30UpdateTextureDest);
+            if (!R30StretchRectHook)
+                R30StretchRectHook = safetyhook::create_inline(
+                    vtable[R30StretchRectVtableIndex],
+                    R30StretchRectDest);
+            if (!R30ColorFillHook)
+                R30ColorFillHook = safetyhook::create_inline(
+                    vtable[R30ColorFillVtableIndex],
+                    R30ColorFillDest);
             if (!R30CreateVertexBufferHook)
                 R30CreateVertexBufferHook = safetyhook::create_inline(
                     vtable[R30CreateVertexBufferVtableIndex],
@@ -715,7 +753,8 @@ namespace OutRunVRStereo
                     vtable[R30CreateIndexBufferVtableIndex],
                     R30CreateIndexBufferDest);
             if (!R30CreateTextureHook || !R30UpdateSurfaceHook ||
-                !R30UpdateTextureHook ||
+                !R30UpdateTextureHook || !R30StretchRectHook ||
+                !R30ColorFillHook ||
                 !R30CreateVertexBufferHook || !R30CreateIndexBufferHook)
                 spdlog::warn(
                     "VR R30.6 RESOURCE OBSERVER: buffer/texture creation or update hook incomplete; DX11 census remains fail-closed");
@@ -727,6 +766,8 @@ namespace OutRunVRStereo
             // holding a COM reference also holds a shared_ptr acquired from the
             // registry, so clearing the maps cannot invalidate an in-flight
             // shadow object.
+            R30ColorFillHook = {};
+            R30StretchRectHook = {};
             R30UpdateTextureHook = {};
             R30UpdateSurfaceHook = {};
             R30CreateTextureHook = {};

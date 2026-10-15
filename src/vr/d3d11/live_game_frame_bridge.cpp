@@ -30,6 +30,7 @@
 #include "live_game_rgba16_texture.hpp"
 #include "live_game_float_rgba_texture.hpp"
 #include "native_game_frame_batch.hpp"
+#include "native_game_source_mutation.hpp"
 #include "native_game_frame_publication.hpp"
 #include "native_game_frame_upload.hpp"
 #include "native_game_dirty_region.hpp"
@@ -66,6 +67,15 @@
 namespace outrun::vr::dx11::live_game_frame {
 namespace {
 using Microsoft::WRL::ComPtr;
+// The game UpdateSurface detour is also reached when we upload native pixels
+// into its D3D9 backbuffer. Never acquire State::mutex again from that hook.
+thread_local std::uint32_t nativeOutputUploadDepth = 0u;
+struct NativeOutputUploadScope final {
+    NativeOutputUploadScope() noexcept { ++nativeOutputUploadDepth; }
+    ~NativeOutputUploadScope() { --nativeOutputUploadDepth; }
+    NativeOutputUploadScope(const NativeOutputUploadScope&) = delete;
+    NativeOutputUploadScope& operator=(const NativeOutputUploadScope&) = delete;
+};
 static_assert(dynamic_texture::kDefaultPool == D3DPOOL_DEFAULT &&
               dynamic_texture::kDynamicUsage == D3DUSAGE_DYNAMIC,
               "D3D9 DEFAULT/DYNAMIC source texture constants changed");
@@ -5487,6 +5497,45 @@ bool preserve_offscreen_color_only_clear(IDirect3DDevice9* game,
     }
 }
 
+void observe_game_surface_mutation(
+    IDirect3DDevice9* game, IDirect3DSurface9* destination,
+    HRESULT originalResult) noexcept {
+    // Only report a real, successful game-side surface write. This hook
+    // observes but never substitutes the D3D9 HRESULT or changes input/FFB.
+    // Our own native -> game UpdateSurface occurs under State::mutex; bypass
+    // it on the same thread before attempting any COM query or locking.
+    if (nativeOutputUploadDepth != 0u || !diagnostic_enabled() ||
+        !env_full_game_opt_in() || !game || !destination ||
+        FAILED(originalResult)) return;
+    try {
+        ComPtr<IDirect3DSurface9> surface(destination);
+        ComPtr<IUnknown> identity;
+        if (FAILED(surface.As(&identity)) || !identity) return;
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        const auto owner = reinterpret_cast<std::uintptr_t>(game);
+        const bool knownOwner = s.clearColor.valid &&
+            s.clearColor.sourceDevice == owner &&
+            (s.sourceGameDevice == 0u || s.sourceGameDevice == owner);
+        const bool writesGameBackbuffer =
+            s.clearColor.backbufferIdentity != 0u &&
+            reinterpret_cast<std::uintptr_t>(identity.Get()) ==
+                s.clearColor.backbufferIdentity;
+        if (!GameNativeSourceMutation::invalidates_full_game_frame(
+                env_full_game_opt_in(), SUCCEEDED(originalResult),
+                knownOwner, writesGameBackbuffer, false)) return;
+        // The D3D9 ColorFill / StretchRect / UpdateSurface bytes survive.
+        // Native D3D11 has no equivalent command in this frame, so do not
+        // overwrite any part of that original menu/vehicle/race image.
+        s.frameBatch.abort();
+        s.pending = false;
+        s.clearColor.discard();
+        if (++s.outputGeneration == 0u) ++s.outputGeneration;
+    } catch (...) {
+        // Observer failures must never change the original D3D9 result.
+    }
+}
+
 void observe_scene_boundary(IDirect3DDevice9* game) noexcept {
     if (!diagnostic_enabled() || !game) return;
     try {
@@ -6374,6 +6423,11 @@ void before_game_present(IDirect3DDevice9* game,
                                         // dirty source crop. The other backbuffer
                                         // pixels retain the original D3D9 scene.
                                         bool uploaded = false;
+                                        // UpdateSurface goes through the game's
+                                        // R30 observer. It is OUR publication,
+                                        // not another unmirrored game mutation;
+                                        // suppress recursion while State is locked.
+                                        const NativeOutputUploadScope outputUploadScope{};
                                         if (!multiNativeUpload) {
                                             uploaded = SUCCEEDED(game->UpdateSurface(
                                                 s.insetSurface.Get(),

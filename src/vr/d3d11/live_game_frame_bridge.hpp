@@ -51,6 +51,12 @@ bool preserve_offscreen_color_only_clear(IDirect3DDevice9* gameDevice,
 // a frame into incompatible surfaces. Discard the diagnostic batch; keep the
 // original D3D9 Clear, Draw, Present and gamepad dispatch untouched.
 void observe_scene_boundary(IDirect3DDevice9* gameDevice) noexcept;
+// Observe successful non-Draw writes into the seeded game backbuffer.
+// UpdateSurface/StretchRect/ColorFill on the original D3D9 path remain intact;
+// matching writes invalidate native same-Present publication only.
+void observe_game_surface_mutation(IDirect3DDevice9* gameDevice,
+                                   IDirect3DSurface9* destination,
+                                   HRESULT originalResult) noexcept;
 // Preserve a complete live native game color batch across a verified depth-only
 // Clear; return false to use unchanged D3D9 scene-boundary fallback.
 bool observe_game_depth_clear(IDirect3DDevice9* gameDevice, DWORD count,
