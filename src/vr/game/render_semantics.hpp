@@ -130,6 +130,46 @@ namespace OutRunVR::GameSemantic
         RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
         RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
 
+    // A direct GOAL print helper is a distinct source from +TIME and
+    // queued SpriteNodes. Close only an owned homogeneous deferred batch
+    // while that exact helper remains active, never a foreign/mixed batch.
+    inline constexpr bool CanFlushD3DXDirectGoalAtExit(
+        bool queueActive, bool batchActive, bool exactSprite,
+        unsigned pendingDraws, bool homogeneous,
+        RenderScope pendingScope, ProducerToken pendingProducer,
+        RenderScope currentScope, ProducerToken currentProducer) noexcept
+    {
+        return !queueActive && batchActive && exactSprite &&
+            pendingDraws != 0 && homogeneous &&
+            pendingScope == RenderScope::ScreenHud &&
+            (pendingProducer == ProducerToken::GoalTime020 ||
+             pendingProducer == ProducerToken::GoalTime150) &&
+            currentScope == pendingScope &&
+            currentProducer == pendingProducer;
+    }
+
+    static_assert(CanFlushD3DXDirectGoalAtExit(false, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(CanFlushD3DXDirectGoalAtExit(false, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150));
+    static_assert(!CanFlushD3DXDirectGoalAtExit(false, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150));
+    static_assert(!CanFlushD3DXDirectGoalAtExit(false, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanFlushD3DXDirectGoalAtExit(false, true, true, 1, false,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(!CanFlushD3DXDirectGoalAtExit(true, true, true, 1, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(!CanFlushD3DXDirectGoalAtExit(false, true, false, 1, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+
     inline thread_local RenderScope CurrentScope = RenderScope::None;
     // An explicit SpriteNode producer owns its render space through the
     // complete queue draw. Temporary helper scopes must not replace it.

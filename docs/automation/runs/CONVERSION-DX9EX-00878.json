@@ -1,0 +1,55 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00878",
+  "production_id": "CONVERSION-DX9EX-00878",
+  "event_id": "CONVERSION-DX9EX-00878-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00878",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_contract": {
+    "goal": "Keep GOAL direct time/title glyph and queued sprite output under their exact producer through D3DX GPU batch submission, avoiding inherited previous-owner HUD double render.",
+    "scope_boundary": "Original 0xBE020 and 0xBE150 GOAL direct print helper edges, D3DX begin/draw/flush/end owner guard and regression; no global Flush, no result text B9200 changes, preserve +TIME, rank, time logic and unrelated world rendering.",
+    "acceptance_items": [
+      {
+        "id": "goal-direct-exact-batch",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "Both original GOAL direct helpers split a proven prior homogeneous source batch and submit remaining own homogeneous batches before semantic scope exits."
+      },
+      {
+        "id": "goal-native-fallback",
+        "category": "fallback_regression",
+        "expected_behavior": "Unknown, mixed, foreign, queued and failed D3DX batches keep original native End/error behavior."
+      },
+      {
+        "id": "exact-windows-gates",
+        "category": "integrated_validation",
+        "expected_behavior": "R84 main DLL, R26 rollback, host, package and required exact-SHA gates succeed."
+      }
+    ]
+  },
+  "source_parent_sha": "224e6a9cc0a4040801880c35c358449726b8264f",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00878.json"
+  ],
+  "status": "IN_PROGRESS",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "acceptance_results": {
+    "goal-direct-exact-batch": "CODE_IMPLEMENTED_AWAITING_WINDOWS_AND_HMD",
+    "goal-native-fallback": "SOURCE_STATIC_ASSERTS_7_POSITIVE_NEGATIVE",
+    "exact-windows-gates": "PENDING"
+  },
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "EXACT_SHA_CI_PENDING",
+  "result_commit_ci_skip": false
+}

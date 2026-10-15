@@ -61,6 +61,8 @@ namespace
 // ScreenHud ownership, not after its Draw may have submitted old triangles.
 static void FlushD3DXBeforeDirectStageSource() noexcept;
 static void FlushD3DXAtDirectStageSourceExit() noexcept;
+static void FlushD3DXBeforeDirectGoalSource() noexcept;
+static void FlushD3DXAtDirectGoalSourceExit() noexcept;
 
 class UIScaling : public Hook
 {
@@ -1082,11 +1084,21 @@ class UIScaling : public Hook
         // time/title glyph. Active SpriteNode queue ownership outranks us.
         std::optional<OutRunVR::GameSemantic::ScopedExactProducerSemantic>
             goalDirectDrawOwner;
+        // Split a tracked previous-owner D3DX batch before GOAL takes
+        // producer ownership; submit this helper's exact remaining batch
+        // before its original scope is restored. Queued sprites remain
+        // tagged separately by the existing SpriteNode path.
+        const bool directGoal = Settings::VREnabled &&
+            !OutRunVR::GameSemantic::QueueRenderActive();
+        if (directGoal)
+            FlushD3DXBeforeDirectGoalSource();
         if (Settings::VREnabled)
             goalDirectDrawOwner.emplace(
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 nullptr, true, producer);
         original();
+        if (directGoal)
+            FlushD3DXAtDirectGoalSourceExit();
         goalDirectDrawOwner.reset();
 		TagAppendedNodes(before,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud, producer);
@@ -2269,6 +2281,49 @@ public:
         }
     }
 
+    // GOAL print helpers 0xBE020 and 0xBE150 can submit direct D3DX
+    // triangles outside SpriteNode dispatch. Never relabel an existing
+    // unknown, mixed or unrelated buffer with the incoming GOAL token.
+    static void BeforeDirectGoalSource() noexcept
+    {
+        using namespace OutRunVR::GameSemantic;
+        if (QueueRenderActive())
+            return;
+        StageBoundaryReady = false;
+        void* sprite = *Module::exe_ptr<void*>(0x55B218);
+        if (!BatchActive || sprite != TrackedSprite || PendingDraws == 0)
+            return;
+        if (!CanFlushD3DXPreQueueStageBatch(
+                false, true, PendingHomogeneous, PendingScope, PendingProducer,
+                EffectiveScope(), CurrentRenderProducerToken()) ||
+            !FlushTracked(sprite))
+        {
+            GoalFallbacks.fetch_add(1, std::memory_order_relaxed);
+            return;
+        }
+        GoalFlushes.fetch_add(1, std::memory_order_relaxed);
+    }
+
+    static void AfterDirectGoalSource() noexcept
+    {
+        using namespace OutRunVR::GameSemantic;
+        void* sprite = *Module::exe_ptr<void*>(0x55B218);
+        if (!CanFlushD3DXDirectGoalAtExit(
+                QueueRenderActive(), BatchActive,
+                sprite != nullptr && sprite == TrackedSprite,
+                PendingDraws, PendingHomogeneous, PendingScope,
+                PendingProducer, EffectiveScope(),
+                CurrentRenderProducerToken()))
+            return;
+        if (FlushTracked(sprite))
+            GoalFlushes.fetch_add(1, std::memory_order_relaxed);
+        else
+        {
+            StageBoundaryReady = false;
+            GoalFallbacks.fetch_add(1, std::memory_order_relaxed);
+        }
+    }
+
     // Called BEFORE SelectSpriteQueueNode replaces the outgoing producer.
     // Any prior homogeneous batch flushes under its ORIGINAL queue owner;
     // only then may the incoming +TIME owner start a separate batch.
@@ -2535,6 +2590,16 @@ static void FlushD3DXBeforeDirectStageSource() noexcept
 static void FlushD3DXAtDirectStageSourceExit() noexcept
 {
     VRProjectedD3DXSpriteIsolationR64::AfterDirectStageSource();
+}
+
+static void FlushD3DXBeforeDirectGoalSource() noexcept
+{
+    VRProjectedD3DXSpriteIsolationR64::BeforeDirectGoalSource();
+}
+
+static void FlushD3DXAtDirectGoalSourceExit() noexcept
+{
+    VRProjectedD3DXSpriteIsolationR64::AfterDirectGoalSource();
 }
 
 // VR semantic bridge for the game's canonical queued 2D renderer.
