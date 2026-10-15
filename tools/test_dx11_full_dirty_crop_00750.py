@@ -35,7 +35,9 @@ def integrated(source, header):
         "croppedNativeUpload && fullPlacement.valid" in code[bound:queued],
         "boundedPartition &&" in code[gate:bound],
         "(cropDirtyCoverage || partitionCropCoverage) && !fullDirtyCoverage" in code[tiled:bound],
-        "partitionRects);" in code[tiled:bound],
+        "partitionRects) ||" in code[tiled:bound],
+        code.count("GameNativeDirtyRegionCoverage::covers_complete_union(") == 2,
+        "if (reach == y) return false;" in header,
         "const bool partitionCropCoverage = fullMode && backbufferKnown &&" in code[gate:tiled],
         "(!outputNow.hasDirtyRegion || fullDirtyCoverage) &&" in code[bound:queued],
         "croppedNativeUpload ? &uploadSourceCrop : nullptr" in code[submit:submit+360],
@@ -63,8 +65,10 @@ for old,new in (
     ("destination.y = uploadSourceCrop.top;","destination.y = 0;"),
     ("(cropDirtyCoverage || partitionCropCoverage) && !fullDirtyCoverage",
      "cropDirtyCoverage && !fullDirtyCoverage"),
-    ("boundedPartition &&\n            GameNativeDirtyRegionCoverage::covers_partition_crop(",
-     "true /* unsafe partial tiles */ &&\n            GameNativeDirtyRegionCoverage::covers_partition_crop("),
+    ("GameNativeDirtyRegionCoverage::covers_complete_union(",
+     "GameNativeDirtyRegionCoverage::unsafe_union("),
+    ("boundedPartition &&\n            (GameNativeDirtyRegionCoverage::covers_partition_crop(",
+     "true /* unsafe partial tiles */ &&\n            (GameNativeDirtyRegionCoverage::covers_partition_crop("),
 ):
     mutant=SRC.replace(old,new,1)
     assert mutant!=SRC and not integrated(mutant,HDR),old
