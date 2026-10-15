@@ -62,7 +62,7 @@ def check(api, r29, r30, proof, r30api, r32api, r32, workflow):
         "return R30ScreenSpaceKind::FlatPerspectiveEffect;",
     ):
         assert marker in route, "R84 centre classification missing: " + marker
-    assert route.index("R30HasExactLensCentreRawWvp(originalGameWvp)") < (
+    assert (route.index("R30HasExactLensCentreRawWvp(originalGameWvp)") <
         route.index("SelectWorldRoute(true, owned)") <
         route.index("return R30ScreenSpaceKind::ExactLensCentreWorld;") <
         route.rindex("return R30ScreenSpaceKind::None;"))
@@ -95,7 +95,7 @@ def check(api, r29, r30, proof, r30api, r32api, r32, workflow):
         "return false;",
     ):
         assert marker in bld, "exact C993 per-eye transform lost: " + marker
-    assert bld.index("GetVertexShaderConstantF(") < (
+    assert (bld.index("GetVertexShaderConstantF(") <
         bld.index("if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld)") <
         bld.index("R29OwnerTransposeMatrix(rawUploadedT)") <
         bld.index("R29OwnerMultiplyMatrix(stockRawWvp,") <
