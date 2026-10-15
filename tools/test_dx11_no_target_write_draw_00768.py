@@ -42,7 +42,7 @@ def unavailable_scissor_linked(source: str) -> bool:
         "scissorEnabled == TRUE",
         "SUCCEEDED(game->GetViewport(&sourceViewport))",
         "SUCCEEDED(game->GetScissorRect(&sourceScissor))",
-        "GameNativeScissorClip::excludes_viewport(",
+        "                    GameNativeScissorClip::excludes_viewport(",
         "s.frameBatch.absorb_empty_source_draw(",
         "sourceOrdinal, sameSourceFullClear",
         "s.frameBatch.abort();",
