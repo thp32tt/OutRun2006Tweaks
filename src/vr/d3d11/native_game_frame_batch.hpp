@@ -23,6 +23,16 @@ struct GameNativeFrameBatch {
         std::uint64_t ordinal, bool sameSourceFullClear) const noexcept {
         return accepts_full(ordinal) && (submitted != 0u || sameSourceFullClear);
     }
+    // A game may switch RT0 to a vehicle preview or menu offscreen target
+    // without a corresponding native surface. Even after a successful first
+    // GPU draw, every subsequent real Draw/DrawIndexed must still target the
+    // exact backbuffer seeded by the game's full TARGET Clear. Do not splice
+    // offscreen pixels into the native full-resolution Present batch.
+    [[nodiscard]] constexpr bool accepts_full_on_source_target(
+        std::uint64_t ordinal, bool matchesClearedBackbuffer) const noexcept {
+        return matchesClearedBackbuffer &&
+            accepts_full_seeded(ordinal, matchesClearedBackbuffer);
+    }
     // A missing/unsupported D3D9 Draw invalidates the full native scene even
     // after the legacy eight-draw inset cap. In diagnostic batch mode, only
     // incomplete inset batches need invalidation; the original D3D9 path

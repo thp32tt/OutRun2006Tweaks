@@ -4832,11 +4832,15 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         // A full-resolution menu/vehicle/race output needs the original
         // game's verified color baseline, not a synthetic inset background.
         // Verify same device and canonical D3D9 surface on the first Draw.
+        // The first source target match is not enough. A later game Draw
+        // can bind an offscreen/menu RT0 without changing D3D9 device or
+        // vertex topology. Recheck the exact Clear-owned backbuffer for
+        // every native Draw/DrawIndexed; otherwise preserve original D3D9.
+        const bool sameClearedGameTarget = s.clearColor.matches(
+            reinterpret_cast<std::uintptr_t>(game), output.targetIdentity);
         const bool admitted = fullMode
-            ? s.frameBatch.accepts_full_seeded(
-                  sourceOrdinal,
-                  s.clearColor.matches(reinterpret_cast<std::uintptr_t>(game),
-                                       output.targetIdentity))
+            ? s.frameBatch.accepts_full_on_source_target(
+                  sourceOrdinal, sameClearedGameTarget)
             : s.frameBatch.accepts(candidateOrdinal, s.probeSlot,
                                   env_batch_opt_in());
         if (!admitted) {

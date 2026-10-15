@@ -74,7 +74,33 @@ constexpr bool leading_game_empty_draw_contract() noexcept {
 }
 static_assert(leading_game_empty_draw_contract(),
               "Verified full-game Clear must admit leading empty Draw ordinals without a native GPU frame");
+// A source RT0 switch after the first native menu/vehicle/race Draw is
+// observable without HMD: source ordinal continuity alone is insufficient.
+constexpr bool full_game_target_continuity_contract() noexcept {
+    GameNativeFrameBatch game{};
+    if (!game.accepts_full_on_source_target(0u, true) ||
+        game.accepts_full_on_source_target(0u, false)) return false;
+    game.succeeded(false);
+    game.record_source_draw(0u);
+    // Historical seeded admission would accept this ordinal after any RT0
+    // change. New live-game admission must refuse foreign/invalidated RT0.
+    if (!game.accepts_full_seeded(1u, false) ||
+        game.accepts_full_on_source_target(1u, false) ||
+        !game.accepts_full_on_source_target(1u, true)) return false;
+    game.succeeded(true);
+    game.record_source_draw(1u);
+    if (!game.publishable_full(true, 2u)) return false;
+    game.abort(); // Real observer fails closed on rejected target.
+    if (game.publishable_full(true, 2u) ||
+        game.accepts_full_on_source_target(2u, true)) return false;
+    game.reset();
+    return !game.accepts_full_on_source_target(0u, false) &&
+        game.accepts_full_on_source_target(0u, true);
+}
+static_assert(full_game_target_continuity_contract(),
+              "Every native game Draw must match the original Clear-owned RT0");
 int main() {
     return full_game_empty_draw_contract() &&
-        leading_game_empty_draw_contract() ? 0 : 1;
+        leading_game_empty_draw_contract() &&
+        full_game_target_continuity_contract() ? 0 : 1;
 }
