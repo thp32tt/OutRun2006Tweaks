@@ -120,7 +120,11 @@ def main() -> None:
     primitive = observer.find("if (!game_native_primitive_element_count(")
     assert ordinal >= 0 and primitive > ordinal, "bad native primitive must still count as game Draw"
     unavailable = bridge[bridge.find("void observe_unavailable_game_draw("):bridge.find("void before_game_present(")]
-    assert "++s.sourceDrawsThisFrame;" in unavailable
+    # Exact raw-game source ordinal is now passed into offscreen no-pixel
+    # accounting; preserve the ordering and fail-closed abort without matching
+    # an obsolete preincrement spelling.
+    assert "const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;" in unavailable
+    assert unavailable.find("const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++;") < unavailable.find("if (!observe_source_frame_mode(")
     assert "s.frameBatch.abort();" in unavailable
     assert "env_batch_opt_in()" in unavailable
     bad_observer = observer.replace("if (!game_native_primitive_element_count(",
