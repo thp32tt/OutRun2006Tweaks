@@ -11,9 +11,9 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "C3_FINAL_EXACT_SHA_GATES_PENDING",
-  "phase": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "42470ad440367326f5dd4670c52eba7ee0816b46",
@@ -84,7 +84,7 @@
   "score_once": false,
   "material_result_sha": "f790ea9bbea07c4be51a52a911e13f5ba19723da",
   "targeted_validation_repair_sha": "b4f3d6451bd17c98641cb312ec26578dce98c717",
-  "checkpoint": "C3_SINGLE_EXACT_SHA_GATE_INPUT",
+  "checkpoint": "EXACT_SHA_GATES_PASS_RUNTIME_UNTESTED",
   "ci_evidence": {
     "material_source_commit": "f790ea9bbea07c4be51a52a911e13f5ba19723da",
     "initial_active_run_id": 38788130938,
@@ -97,7 +97,54 @@
       "DX9Ex Full Source Impact Review",
       "OutRun EXE HUD Inspector CI"
     ],
-    "status": "WAIT_FINAL_EXACT_SHA"
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "49322b82c10279248c9e3aba4de95a3894f7e2f4",
+    "exact_sha_gate_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38788902237,
+        "sha": "49322b82c10279248c9e3aba4de95a3894f7e2f4",
+        "conclusion": "success",
+        "jobs": "policy/game/host/full-chain-compile/package 5/5"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38788902450,
+        "sha": "49322b82c10279248c9e3aba4de95a3894f7e2f4",
+        "conclusion": "success",
+        "jobs": "domain-isolation 1/1"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38788902076,
+        "sha": "49322b82c10279248c9e3aba4de95a3894f7e2f4",
+        "conclusion": "success",
+        "jobs": "source-cross-domain/msvc-analyze-openxr-host/msvc-analyze-active-game 3/3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38788902124,
+        "sha": "49322b82c10279248c9e3aba4de95a3894f7e2f4",
+        "conclusion": "success",
+        "jobs": "static-exe-analysis/build-hud-inspector 2/2"
+      }
+    ],
+    "verification_note": "Exact-SHA four workflow conclusions checked completed/success; this C6 checkpoint is bookkeeping-only and is deliberately not a new Gate input."
   },
-  "hold_reason": "C3 exact-SHA Win32 game/host/package, Domain, Full Source and HUD gates pending; Quest3/VDXR runtime remains UNTESTED."
+  "hold_reason": "BUILD_VERIFIED for exact C993 unready-raster original-draw safety. Only Quest3/VDXR gameplay can validate one centred spatial lens, binocular correctness, surrounding halos, SkyGlow and other effects; no runtime optical FIXED claim.",
+  "validation_bearing_result_sha": "49322b82c10279248c9e3aba4de95a3894f7e2f4",
+  "acceptance_results": {
+    "centre_unready_preserves_original": "PASS_BUILD",
+    "centre_ready_and_outer_effects_isolated": "PASS_BUILD",
+    "dx9ex_exact_sha_full_gate": "PASS_EXACT_SHA"
+  },
+  "scoreboard": {
+    "repository": "thp32tt/ai-dev-lab",
+    "file": "AI_SCOREBOARD.md",
+    "ai": "AI 2 ChatGPT2",
+    "previous_ai2_score": 1391,
+    "delta": 0,
+    "new_ai2_score": 1391,
+    "reason": "Same previously tracked DX9EX:VIS:LENS_FLARE_CENTRE visual feature, scoped raster-bypass restoration only; no distinct complete HMD-validated feature or new score."
+  }
 }
