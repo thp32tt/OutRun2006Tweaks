@@ -2284,6 +2284,47 @@ UIScaling UIScaling::instance;
 // distinct DrawIndexedPrimitive calls. Keep batch isolation strictly on
 // screen-projected rank markers or the DispRank-specific kind0/kind1
 // original callsites; never flush unrelated menu, GOAL, +TIME or HUD sprites.
+
+namespace DX9ExD3DXSpriteLifetime
+{
+    // ID3DXSprite can outlive the game's global pointer during device loss.
+    // Do not dereference a retained vtable unless the actual live game
+    // sprite is still exactly the object whose Begin/Draws we observed.
+    constexpr bool CanFlush(const void* candidate, const void* tracked,
+        const void* live) noexcept
+    {
+        return candidate != nullptr && candidate == tracked &&
+            candidate == live;
+    }
+
+    // OnLostDevice/OnResetDevice may be invoked on the OLD sprite after
+    // 0x55B218 has already been cleared/replaced. The old tracked object
+    // must still revoke its deferred +TIME/GOAL ownership.
+    constexpr bool OwnsLifecycle(const void* callback, const void* tracked,
+        const void* live) noexcept
+    {
+        return callback != nullptr &&
+            (callback == tracked || callback == live);
+    }
+
+    // Compile-time positive and negative tests for real pointer identity,
+    // including global replacement/null during a pending GPU batch.
+    inline constexpr unsigned char OldSprite = 1;
+    inline constexpr unsigned char NewSprite = 2;
+    inline constexpr unsigned char ForeignSprite = 3;
+    static_assert(CanFlush(&OldSprite, &OldSprite, &OldSprite));
+    static_assert(!CanFlush(&OldSprite, &OldSprite, &NewSprite));
+    static_assert(!CanFlush(&NewSprite, &OldSprite, &NewSprite));
+    static_assert(!CanFlush(&ForeignSprite, &OldSprite, &NewSprite));
+    static_assert(!CanFlush(nullptr, &OldSprite, &OldSprite));
+    static_assert(!CanFlush(&OldSprite, nullptr, &OldSprite));
+    static_assert(OwnsLifecycle(&OldSprite, &OldSprite, nullptr));
+    static_assert(OwnsLifecycle(&OldSprite, &OldSprite, &NewSprite));
+    static_assert(OwnsLifecycle(&NewSprite, &OldSprite, &NewSprite));
+    static_assert(!OwnsLifecycle(&ForeignSprite, &OldSprite, &NewSprite));
+    static_assert(!OwnsLifecycle(nullptr, &OldSprite, &NewSprite));
+}
+
 class VRProjectedD3DXSpriteIsolationR64 : public Hook
 {
     inline static SafetyHookInline Begin_hk{};
@@ -2403,11 +2444,12 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
     // D3D9 Reset. OnLostDevice can fail or arrive without a successful End;
     // neither event proves the prior Draws were submitted. Never let stale
     // +TIME/GOAL ownership trigger a Flush after the device changes.
-    static void InvalidateForDeviceLifecycle(bool wasExactGameSprite) noexcept
+    static void InvalidateForDeviceLifecycle(bool wasTrackedOrExactGameSprite) noexcept
     {
         // The original OnLost/OnReset may replace the global sprite pointer.
-        // Take exact ownership evidence BEFORE invoking the original vtable.
-        if (!wasExactGameSprite)
+        // The callback's object can still be the old tracked batch owner even
+        // when 0x55B218 has already become null or a new sprite instance.
+        if (!wasTrackedOrExactGameSprite)
             return;
         BatchActive = false;
         StageBoundaryReady = false;
@@ -2417,24 +2459,36 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 
     static HRESULT __stdcall LostDeviceDest(void* self)
     {
-        const bool wasExactGameSprite = IsExactSprite(self);
+        const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(
+            self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218));
         const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);
-        InvalidateForDeviceLifecycle(wasExactGameSprite);
+        InvalidateForDeviceLifecycle(ownsBatch);
         return hr;
     }
 
     static HRESULT __stdcall ResetDeviceDest(void* self)
     {
-        const bool wasExactGameSprite = IsExactSprite(self);
+        const bool ownsBatch = DX9ExD3DXSpriteLifetime::OwnsLifecycle(
+            self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218));
         const HRESULT hr = ResetDevice_hk.stdcall<HRESULT>(self);
-        InvalidateForDeviceLifecycle(wasExactGameSprite);
+        InvalidateForDeviceLifecycle(ownsBatch);
         return hr;
     }
 
     static bool FlushTracked(void* self) noexcept
     {
-        if (!BatchActive || self != TrackedSprite)
+        // Queue-end used to call this with TrackedSprite directly. A silent
+        // sprite replacement (or global cleared before OnLostDevice) made
+        // that old pointer potentially freed: never read its vtable.
+        void* liveSprite = *Module::exe_ptr<void*>(0x55B218);
+        if (!BatchActive ||
+            !DX9ExD3DXSpriteLifetime::CanFlush(
+                self, TrackedSprite, liveSprite))
+        {
+            if (self && self == TrackedSprite && self != liveSprite)
+                InvalidateForDeviceLifecycle(true);
             return false;
+        }
         void** vtable = *reinterpret_cast<void***>(self);
         if (!vtable || !vtable[10])
             return false;
