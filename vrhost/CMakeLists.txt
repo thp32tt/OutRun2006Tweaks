@@ -99,6 +99,11 @@ target_include_directories(outrun-vr-protocol-v3-smoke PRIVATE
 )
 target_compile_definitions(outrun-vr-protocol-v3-smoke PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 
+add_executable(outrun-vr-v3-shadow-progress-smoke tests/v3_shadow_progress_smoke.cpp)
+target_include_directories(outrun-vr-v3-shadow-progress-smoke PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}/../src"
+)
+
 add_executable(outrun-vr-core-math-smoke tests/core_math_smoke.cpp)
 target_include_directories(outrun-vr-core-math-smoke PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/../src"
@@ -198,6 +203,7 @@ foreach(target
     outrun-vr-diagnostic
     outrun-vr-shader-smoke
     outrun-vr-protocol-v3-smoke
+    outrun-vr-v3-shadow-progress-smoke
     outrun-vr-core-math-smoke
     outrun-vr-host-state-v3-channel-smoke
     outrun-vr-v2-v3-shadow-conversion-smoke
