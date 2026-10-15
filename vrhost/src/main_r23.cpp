@@ -41,6 +41,7 @@
 #include "runtime/desktop_capture_descriptor_cache.hpp"
 #include "runtime/direct_hold_frame_reuse.hpp"
 #include "runtime/direct_ring_latest.hpp"
+#include "runtime/direct_ring_skip_ack.hpp"
 #include "runtime/direct_run_epoch.hpp"
 #include "runtime/theater_capture_reuse.hpp"
 #include "runtime/menu_projection_slice_copy.hpp"
@@ -2916,17 +2917,23 @@ int main(int argc, char** argv)
                                         frame.reserved[OutRunVR::RenderFrameDirectSlotIndex];
                                     const std::uint32_t generation =
                                         frame.reserved[OutRunVR::RenderFrameDirectGenerationIndex];
-                                    if (!frame.frameId ||
-                                        frame.frameId == selectedDirect.frameId ||
-                                        (lastProcessedStereoFrame != 0 &&
-                                         !R37FrameIdBefore(
-                                             lastProcessedStereoFrame,
-                                             frame.frameId)) ||
-                                        frame.state != OutRunVR::StereoSbsActive ||
+                                    // Never ACK a newer/in-flight frame, or a
+                                    // recycled slot from another PID/run epoch.
+                                    // Only older, unconsumed frames of the
+                                    // selected producer run may be released.
+                                    if (frame.state != OutRunVR::StereoSbsActive ||
                                         (frame.flags & OutRunVR::RenderFramePresentInFlight) != 0 ||
                                         (frame.flags & OutRunVR::RenderFrameDirectGpuTransport) == 0 ||
                                         slot >= OutRunVR::RenderFrameRingSize ||
-                                        generation != currentGeneration)
+                                        !OutRunVrDirectRingSkipAck::CanAcknowledge(
+                                            {frame.frameId, generation,
+                                             frame.reserved[OutRunVR::RenderFrameRunGenerationIndex],
+                                             frame.clientPid},
+                                            {selectedDirect.frameId, currentGeneration,
+                                             selectedDirect.reserved[OutRunVR::RenderFrameRunGenerationIndex],
+                                             selectedDirect.clientPid},
+                                            lastProcessedStereoFrame,
+                                            R37FrameIdBefore))
                                         continue;
 
                                     // No D3D11 draw/copy references this skipped
