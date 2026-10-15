@@ -589,7 +589,8 @@ for token in (
 draw = code[code.index("bool R30TransformXyzrhwStereo("):
             code.index("// This is the high-frequency indexed smoke/sand/decal path:")]
 assert "R30ConstrainHudEdgeToVisibleBounds(" in draw
-assert draw.index("R30ConstrainHudEdgeToVisibleBounds(") < draw.index("for (UINT visit = 0;")
+assert draw.count(normal_hud_loop) == 1
+assert draw.index("R30ConstrainHudEdgeToVisibleBounds(") < draw.index(normal_hud_loop)
 assert "minX, maxX, minY, maxY, true" in code
 
 def visible_fit(box, bounds, scales, biases, wanted, inset=.025):
