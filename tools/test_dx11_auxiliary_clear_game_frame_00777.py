@@ -9,8 +9,10 @@ offscreen = (root / "src/vr/d3d11/native_game_offscreen_pass.hpp").read_text(enc
 workflow = (root / ".github/workflows/dx11-fast-structural.yml").read_text(encoding="utf-8")
 
 def integrated(b, h, c, o):
+    # Isolate only the offscreen Clear function.  Later native Z helpers can
+    # contain identical owner checks and must not mask this negative mutation.
     aux = b.split("bool preserve_offscreen_color_only_clear(", 1)[1].split(
-        "void observe_scene_boundary(", 1)[0]
+        "\n}\n", 1)[0]
     native = b.split("void observe(IDirect3DDevice9* game,", 1)[1].split(
         "bool preserve_offscreen_color_only_clear(", 1)[0]
     seed = b.split("void observe_game_clear(", 1)[1].split(
@@ -65,12 +67,12 @@ for text, orig, fake in (
         # a change to an earlier, unrelated Draw must not satisfy 00777.
         prefix, rest = args["bridge"].split(
             "bool preserve_offscreen_color_only_clear(", 1)
-        region, suffix = rest.split("void observe_scene_boundary(", 1)
+        region, suffix = rest.split("\n}\n", 1)
         assert orig in region
         region = region.replace(orig, fake, 1)
         args["bridge"] = (prefix +
                           "bool preserve_offscreen_color_only_clear(" + region +
-                          "void observe_scene_boundary(" + suffix)
+                          "\n}\n" + suffix)
     else:
         args[text]=args[text].replace(orig, fake, 1)
     assert not integrated(args["bridge"], args["hook"], args["clear"], args["offscreen"]), orig
