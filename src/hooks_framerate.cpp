@@ -4,6 +4,7 @@
 #include "overlay/overlay.hpp"
 #include "interpolation.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/ipc/software_limiter_transition.hpp"
 
 namespace OutRunVRRenderer
 {
@@ -367,6 +368,7 @@ class ReplaceGameUpdateLoop : public Hook
 	// when the wait actually finished, so a wait that runs long is made up by
 	// the next frame instead of pushing every later frame back.
 	inline static double FramelimiterPrevCounter = 0;
+	inline static OutRunVR::FramePacing::SoftwareLimiterTransition LimiterTransition{};
 
 	// Snooze::PreciseSleep spins out the last millisecond or so of a request
 	// itself, so anything shorter than that spins for its whole duration.
@@ -490,6 +492,22 @@ class ReplaceGameUpdateLoop : public Hook
 						}
 					}
 				}
+			}
+		}
+
+		// xrWaitFrame or an unlimited load-screen may own Present for minutes.
+		// Rebase the *first* return to software limiting (or changed cap) to
+		// current QPC; otherwise the stale ideal deadline releases one uncapped
+		// frame before the old catch-up logic notices. Steady capped frames
+		// retain their accumulated deadline and original drift behavior.
+		if (LimiterTransition.Observe(!skipFrameLimiter, effectiveFramerateLimit))
+		{
+			LARGE_INTEGER rebaseCounter{};
+			if (FramelimiterFrequency > 0.0 &&
+				QueryPerformanceCounter(&rebaseCounter))
+			{
+				FramelimiterPrevCounter =
+					double(rebaseCounter.QuadPart) / FramelimiterFrequency;
 			}
 		}
 
