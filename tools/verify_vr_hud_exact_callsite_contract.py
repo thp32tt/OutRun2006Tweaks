@@ -13,7 +13,7 @@ GROUPS = {
     "RankMarkerSubScreenHudCalls": ("BEB98 BED83 BED9E BEDAE", 0xBAD20, "RankMarkerSubSemanticDest"),
     "RankMarker_SpraniCalls": ("BB0FB BB133 BB16C BB1A5", 0x29580, "RankMarker_sprani"),
     "RankMarker_ClipSpriteCalls": ("BB21F BB241 BB271 BB2BC BB2D0", 0x2D280, "RankMarker_putClipSprite"),
-    "OptionArrow_ClipSpriteCalls": ("E358B E35A3 E35CC E35F7 E481B E4833 E485C E4887 EC24C EC277 ED4D4 ED7A3", 0x2D280, "ExactScreenHud_putClipSprite"),
+    "OptionArrow_ClipSpriteCalls": ("E358B E35A3 E35CC E35F7 E481B E4833 E485C E4887 EC24C EC277 ED4D4 ED7A3", 0x2D280, "PauseOptionArrow_putClipSprite"),
     "ExactScreenHud_ClipSpriteCalls": ("460F1 463D6 46410 97BB7 97DA7 BDB0E BDB2D BDB4C BDB8E BE311 BE343 BE3E3 BE424 BE45D", 0x2D280, "ExactScreenHud_putClipSprite"),
     "ExactScreenHudRight_ClipSpriteCalls": ("B9F3A B9F5E B9F81 B9FD0 B9FFC BA01E BA035 BA052 BD32E BD397 BD414 BD472 BE5CD BE603 BE633 BE66D BE690 BE6B5 BE6D5 BE7E8 BE802 BE81C BE8D8 BE915 BE94A BE97A BE9A3", 0x2D280, "ExactScreenHudRight_putClipSprite"),
     "ExactScreenHudLeft_ClipSpriteCalls": ("B9096 B90B3", 0x2D280, "ExactScreenHudLeft_putClipSprite"),
@@ -260,6 +260,24 @@ def check(ui, manifest, fraction_header=None):
     # Sibling expansion in put_clip_sprite must tag *all* original children;
     # a single tail-only tag can make one digit/menu arrow stereo and another
     # generic, despite correct CALL addresses.
+    # The only changed original E8 target is the ESC option-arrow subset.
+    # Reject a bare queued-only wrapper: the synchronous Draw must carry
+    # exactly the same ScreenHud/producer token while the game's original
+    # function and later TagAppendedNodes still execute once.
+    pause_clip = function_body(ui, "static int __cdecl PauseOptionArrow_putClipSprite(")
+    if (pause_clip.count("return ExactScreenHud_putClipSprite(") != 2 or
+        "if (!Settings::VREnabled || !Game::current_mode ||" not in pause_clip or
+        "*Game::current_mode != GameState::STATE_SMPAUSEMENU)" not in pause_clip or
+        "ScopedExactProducerSemantic directArrowOwner(" not in pause_clip or
+        "RenderScope::ScreenHud, nullptr, true," not in pause_clip or
+        "ProducerToken::ExactScreenHudClipSprite" not in pause_clip or
+        "Game::put_clip_sprite(" in pause_clip):
+        fail("ESC option arrows lost exact direct producer and queued sibling path")
+    ordered(pause_clip, "ESC original E8 direct call ownership ordering",
+            "ScopedExactProducerSemantic directArrowOwner(",
+            "ProducerToken::ExactScreenHudClipSprite);")
+    if pause_clip.rfind("return ExactScreenHud_putClipSprite(") < pause_clip.find("ScopedExactProducerSemantic directArrowOwner("):
+        fail("ESC direct source original dispatch no longer scoped")
     exact_clip = function_body(ui, "static int __cdecl ExactScreenHud_putClipSprite(")
     ordered(exact_clip, "exact clip HUD sibling tagging",
             "tailsBefore", "const int result = Game::put_clip_sprite(",
@@ -401,6 +419,18 @@ def test_mutations(ui, manifest):
     must_fail("rank digit CALL duplicate", ui.replace("0xBB21F, 0xBB241", "0xBB21F, 0xBB21F", 1))
     must_fail("arrow group not installed", ui.replace("for (int addr : OptionArrow_ClipSpriteCalls)",
                                                        "for (int addr : RankMarker_ClipSpriteCalls)", 1))
+    must_fail("ESC option arrow retargeted to generic queue-only owner",
+              ui.replace("Module::exe_ptr(addr), PauseOptionArrow_putClipSprite,",
+                         "Module::exe_ptr(addr), ExactScreenHud_putClipSprite,", 1))
+    must_fail("ESC pause exact direct scope removed",
+              ui.replace("ScopedExactProducerSemantic directArrowOwner(",
+                         "ScopedRenderSemantic directArrowOwner(", 1))
+    must_fail("ESC pause source gate accidentally widened to gameplay",
+              ui.replace("*Game::current_mode != GameState::STATE_SMPAUSEMENU)",
+                         "*Game::current_mode != GameState::STATE_GAME)", 1))
+    must_fail("ESC immediate option arrow token erased",
+              ui.replace("ProducerToken::ExactScreenHudClipSprite);\n\t\treturn ExactScreenHud_putClipSprite(",
+                         "ProducerToken::None);\n\t\treturn ExactScreenHud_putClipSprite(", 1))
     must_fail("4th place hooked as HUD", ui.replace("Module::exe_ptr(addr), RankMarker_putClipSprite,",
                                                    "Module::exe_ptr(addr), ExactScreenHud_putClipSprite,", 1))
     must_fail("glyph token drift", ui.replace("ProducerToken::TextGlyphPutSprite",
