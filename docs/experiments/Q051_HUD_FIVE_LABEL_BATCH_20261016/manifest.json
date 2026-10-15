@@ -1,0 +1,148 @@
+{
+  "schema": "outrun-manual-static-batch-sheet-pilot-v1",
+  "batch_id": "Q051_HUD_YELLOW_5_20261016",
+  "created_at_utc": "2026-10-15T23:50:27.333053+00:00",
+  "workflow": "ISOLATED_USER_AUTHORIZED_STATIC_SHEET_TEST_ONLY",
+  "controller_restart": false,
+  "A_B_C_C1_state": "UNCHANGED",
+  "source_policy": "READ_EXISTING_NATIVE_Q051_CROPS_NO_REASSEMBLY_NO_LEGACY_986_TILES",
+  "sheet_canvas": [
+    1280,
+    768
+  ],
+  "sheet_pixels": "Native source ROIs pasted without resize/rotation/transparency extraction",
+  "input_quality": "REFERENCE_ONLY_OPAQUE_SOURCE_CROPS; not approved for CLEAN/DDS",
+  "items": [
+    {
+      "slot": "A1",
+      "index": 1,
+      "english": "TOTAL TIME",
+      "korean_trial_only": "총 시간",
+      "source_filename": "031_Q051_TOTAL_TIME_EN_NATIVE.png",
+      "source_path": "/home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/DELIVERABLE_V3_20261016/031_Q051_TOTAL_TIME_EN_NATIVE.png",
+      "source_png_sha256": "9a0331b65751cbcb2c9428460188434c9ca4efc0557e1ebe8fd915f79f699534",
+      "source_width": 480,
+      "source_height": 127,
+      "slot_xyxy": [
+        80,
+        102,
+        560,
+        229
+      ],
+      "cropped_region_raw_rgba_exact": true,
+      "source_orientation": "unchanged original readable crop",
+      "plate_state": "OPAQUE_SOURCE_ART_INCLUDED_REFERENCE_ONLY",
+      "CLEAN": "NOT_RUN",
+      "edge_neighbor_overlap_visual_review": "PENDING_MANUAL_VISUAL_REVIEW"
+    },
+    {
+      "slot": "A2",
+      "index": 2,
+      "english": "LAP TIME",
+      "korean_trial_only": "랩 타임",
+      "source_filename": "032_Q051_LAP_TIME_EN_NATIVE.png",
+      "source_path": "/home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/DELIVERABLE_V3_20261016/032_Q051_LAP_TIME_EN_NATIVE.png",
+      "source_png_sha256": "ca36d3035b0ca512bcffa1c165d91b41a5a0603eae3fd0882c90200ce633ae71",
+      "source_width": 516,
+      "source_height": 123,
+      "slot_xyxy": [
+        702,
+        104,
+        1218,
+        227
+      ],
+      "cropped_region_raw_rgba_exact": true,
+      "source_orientation": "unchanged original readable crop",
+      "plate_state": "OPAQUE_SOURCE_ART_INCLUDED_REFERENCE_ONLY",
+      "CLEAN": "NOT_RUN",
+      "edge_neighbor_overlap_visual_review": "PENDING_MANUAL_VISUAL_REVIEW"
+    },
+    {
+      "slot": "B1",
+      "index": 3,
+      "english": "HEARTS",
+      "korean_trial_only": "하트",
+      "source_filename": "033_Q051_HEARTS_EN_NATIVE.png",
+      "source_path": "/home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/DELIVERABLE_V3_20261016/033_Q051_HEARTS_EN_NATIVE.png",
+      "source_png_sha256": "734ad04ce371e57e4d4c205f85c909b730acede2353f84db32a1206449a6b47d",
+      "source_width": 299,
+      "source_height": 115,
+      "slot_xyxy": [
+        170,
+        364,
+        469,
+        479
+      ],
+      "cropped_region_raw_rgba_exact": true,
+      "source_orientation": "unchanged original readable crop",
+      "plate_state": "OPAQUE_SOURCE_ART_INCLUDED_REFERENCE_ONLY",
+      "CLEAN": "NOT_RUN",
+      "edge_neighbor_overlap_visual_review": "PENDING_MANUAL_VISUAL_REVIEW"
+    },
+    {
+      "slot": "B2",
+      "index": 4,
+      "english": "SCORE",
+      "korean_trial_only": "점수",
+      "source_filename": "034_Q051_SCORE_HUD_EN_NATIVE.png",
+      "source_path": "/home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/DELIVERABLE_V3_20261016/034_Q051_SCORE_HUD_EN_NATIVE.png",
+      "source_png_sha256": "5103e05e4b9135018c12bd3dec93cd110f77354a54c4a23dceefbe91d301a211",
+      "source_width": 280,
+      "source_height": 115,
+      "slot_xyxy": [
+        820,
+        364,
+        1100,
+        479
+      ],
+      "cropped_region_raw_rgba_exact": true,
+      "source_orientation": "unchanged original readable crop",
+      "plate_state": "OPAQUE_SOURCE_ART_INCLUDED_REFERENCE_ONLY",
+      "CLEAN": "NOT_RUN",
+      "edge_neighbor_overlap_visual_review": "PENDING_MANUAL_VISUAL_REVIEW"
+    },
+    {
+      "slot": "C1",
+      "index": 5,
+      "english": "TIME",
+      "korean_trial_only": "시간",
+      "source_filename": "035_Q051_TIME_HUD_EN_NATIVE.png",
+      "source_path": "/home/chatgpt-runner2/work/c_salvage_text_roi/original_hd_phrase_crops_20261016/DELIVERABLE_V3_20261016/035_Q051_TIME_HUD_EN_NATIVE.png",
+      "source_png_sha256": "9b30ba78746784bb7a981f012cbcfcf7e514b60a194df6df211cf140dee356f1",
+      "source_width": 250,
+      "source_height": 119,
+      "slot_xyxy": [
+        195,
+        618,
+        445,
+        737
+      ],
+      "cropped_region_raw_rgba_exact": true,
+      "source_orientation": "unchanged original readable crop",
+      "plate_state": "OPAQUE_SOURCE_ART_INCLUDED_REFERENCE_ONLY",
+      "CLEAN": "NOT_RUN",
+      "edge_neighbor_overlap_visual_review": "PENDING_MANUAL_VISUAL_REVIEW"
+    }
+  ],
+  "outputs": {
+    "sheet_reference.png": {
+      "path": "/home/chatgpt-runner2/work/c_salvage_text_roi/manual_batch_sheet_pilot_20261016/Q051_HUD_YELLOW_5/sheet_reference.png",
+      "sha256": "9859e7201fe4d4d4c6ffd4c4d3bef11650139a765fce9cfae9a218778cd2db05",
+      "bytes": 119993
+    },
+    "sheet_review.png": {
+      "path": "/home/chatgpt-runner2/work/c_salvage_text_roi/manual_batch_sheet_pilot_20261016/Q051_HUD_YELLOW_5/sheet_review.png",
+      "sha256": "9a60a9d9c118932426fe9a4a513477b62c9688f2fe23dc7c3ccd18b96aa10401",
+      "bytes": 124053
+    },
+    "GENERATION_PROMPT.txt": {
+      "path": "/home/chatgpt-runner2/work/c_salvage_text_roi/manual_batch_sheet_pilot_20261016/Q051_HUD_YELLOW_5/GENERATION_PROMPT.txt",
+      "sha256": "7bf6197d92fcda49a5d277e321693ebdf9a57fb90a7cdcc03f1de54c864c943b",
+      "bytes": 977
+    }
+  },
+  "imagegen": "NOT_RUN",
+  "dds": "NOT_RUN",
+  "C1_C3_QA": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

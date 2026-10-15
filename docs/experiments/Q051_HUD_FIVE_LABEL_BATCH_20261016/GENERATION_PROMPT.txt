@@ -1,0 +1,5 @@
+OutRun 2006 Korean image reference sheet, five independent label slots. Edit the provided IMAGE, not a new imagined image. Replace only the yellow/navy italic English lettering in the five source ROIs with EXACT Hangul:
+upper-left TOTAL TIME -> 총 시간; upper-right LAP TIME -> 랩 타임;
+middle-left HEARTS -> 하트; middle-right SCORE -> 점수;
+lower-left TIME -> 시간.
+Keep all five slots in their respective positions, separated by generous blank spacing. Maintain the yellow italic letter shapes, dark navy outline/shadow, and relative sizes. Never omit, duplicate or reorder a slot, never generate fake Hangul, numbers, icons or unrelated graphics. Do not change neighboring colored backgrounds, borders or protected artwork. Prefer a transparent Korean lettering-only output if reliable, else an obviously marked reference-only sheet for review. This request is a TEST_ONLY trial. Exact original UI dimensions, alphas, DDS and in-game behavior are NOT approved.
