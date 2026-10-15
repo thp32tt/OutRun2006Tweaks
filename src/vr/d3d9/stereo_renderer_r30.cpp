@@ -23,6 +23,7 @@
 #include "r30_shadow_scratch.hpp"
 #include "stereo_completion_gate.hpp"
 #include "lens_centre_source_provenance.hpp"
+#include "stage_extension_eye_plane.hpp"
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
 #include "../core/stereo_world_scale.hpp"
@@ -2825,6 +2826,12 @@ namespace OutRunVRStereo
             bool rhwDepthEvidence = false;
             bool worldEffect = false;
             bool projectedWorldMarker = false;
+            // Exact +TIME D3DX/fixed-function sprites also need the same
+            // recentered finite optical HUD plane used by shader glyphs.
+            // Never enable this on generic ScreenOverlay2D or smoke/world.
+            bool stageExtensionEyePlane = false;
+            float stageExtensionScale = 1.0f;
+            D3DMATRIX stageExtensionClipFromGameNdc[2]{};
             OutRunVR::RankMarker::StereoNdcShift projectedRank{};
         };
 
@@ -3050,6 +3057,90 @@ namespace OutRunVRStereo
                     state.eyeScale, state.eyeOffset))
                 return false;
 
+            return true;
+        }
+
+        bool R30BuildStageExtensionXyzrhwEyePlane(
+            R30XyzrhwState& state, const D3DMATRIX& baseProjection) noexcept
+        {
+            float rawHead[16]{};
+            std::uint32_t headPoseSequence = 0;
+            if (!OutRunVRRenderer::GetLatchedHeadInverse(
+                    rawHead, headPoseSequence) ||
+                headPoseSequence != state.stereo.poseSequence ||
+                !R29OwnerMatrixFinite(baseProjection))
+                return false;
+
+            D3DMATRIX headInverse{}, inverseBase{};
+            std::memcpy(&headInverse, rawHead, sizeof(headInverse));
+            if (!R29OwnerMatrixFinite(headInverse) ||
+                !R29OwnerInvertMatrix(baseProjection, inverseBase))
+                return false;
+
+            // The R84 shader ScreenHud uses this same -2.50 game-view-unit
+            // optical plane. Reconstruct the source clip ray once, not from
+            // the already head-modified live c64 of a previous world draw.
+            constexpr float HudPlaneZ = -2.50f;
+            const float planeW =
+                HudPlaneZ * baseProjection._34 + baseProjection._44;
+            const float planeZ =
+                HudPlaneZ * baseProjection._33 + baseProjection._43;
+            if (!std::isfinite(planeW) || !std::isfinite(planeZ) ||
+                std::fabs(planeW) <= 1.0e-4f)
+                return false;
+            D3DMATRIX depthReset = R29OwnerIdentityMatrix();
+            depthReset._33 = 0.0f;
+            depthReset._43 = planeZ / planeW;
+            const D3DMATRIX viewPlane =
+                R29OwnerMultiplyMatrix(depthReset, inverseBase);
+            const D3DMATRIX headPlane =
+                R29OwnerMultiplyMatrix(viewPlane, headInverse);
+            if (!R29OwnerMatrixFinite(headPlane))
+                return false;
+
+            const float centre[3]{
+                0.5f * (state.stereo.eyeOffset[0][0] +
+                        state.stereo.eyeOffset[1][0]),
+                0.5f * (state.stereo.eyeOffset[0][1] +
+                        state.stereo.eyeOffset[1][1]),
+                0.5f * (state.stereo.eyeOffset[0][2] +
+                        state.stereo.eyeOffset[1][2])
+            };
+            const float identity[4]{0.0f, 0.0f, 0.0f, 1.0f};
+            const float worldScale =
+                Settings::VRWorldScale * Settings::VRStereoDepth;
+            if (!std::isfinite(worldScale) || worldScale <= 0.0f)
+                return false;
+
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                const float relative[3]{
+                    state.stereo.eyeOffset[eye][0] - centre[0],
+                    state.stereo.eyeOffset[eye][1] - centre[1],
+                    state.stereo.eyeOffset[eye][2] - centre[2]
+                };
+                const D3DMATRIX eyePose =
+                    R29OwnerMatrixFromQuaternionTranslation(
+                        identity, relative, worldScale);
+                const D3DMATRIX eyeInverse =
+                    R29OwnerInverseRigid(eyePose);
+                const D3DMATRIX eyeProjection =
+                    R29OwnerProjectionFromFov(
+                        baseProjection, state.stereo.eyeFov[eye]);
+                const D3DMATRIX result =
+                    R29OwnerMultiplyMatrix(
+                        R29OwnerMultiplyMatrix(headPlane, eyeInverse),
+                        eyeProjection);
+                if (!R29OwnerMatrixFinite(result))
+                    return false;
+                state.stageExtensionClipFromGameNdc[eye] = result;
+            }
+
+            const float hudScale = R30HudScaleValue();
+            if (!std::isfinite(hudScale) || hudScale <= 0.0f)
+                return false;
+            state.stageExtensionScale = hudScale;
+            state.stageExtensionEyePlane = true;
             return true;
         }
 
@@ -3352,6 +3443,24 @@ namespace OutRunVRStereo
                 state.projectedWorldMarker = true;
                 state.worldEffect = false;
                 return true;
+            }
+
+            // Unlike a generic fixed-function overlay, the six exact
+            // +TIME E8 parents and their queue/replay children are ScreenHud.
+            // Reproject BOTH sprite and numeric glyph quads through a finite
+            // head/world-locked HUD plane, matching R84's shader HUD path.
+            // Shader-bound glyphs already use R30BuildScreenSpaceEyeConstants.
+            // Missing head pose/projection fails closed to the stock game
+            // draw instead of borrowing any unrelated c64 or classifying
+            // arbitrary smoke, title or GOAL as stage HUD.
+            if (OutRunVR::GameSemantic::CorroboratesHud(
+                    OutRunVR::GameSemantic::EffectiveScope()) &&
+                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime)
+            {
+                return haveBaseProjection &&
+                    R30BuildStageExtensionXyzrhwEyePlane(
+                        state, baseProjection);
             }
 
             // Smoke/sand can redraw a static VB/IB span many times without a
@@ -4598,6 +4707,50 @@ namespace OutRunVRStereo
                     std::memcpy(left.data(), source, bytes);
                     std::memcpy(right.data(), source, bytes);
                 }
+                if (state.stageExtensionEyePlane)
+                {
+                    // D3DXSprite::Draw may have been deferred until Flush/End.
+                    // Its exact producer survives via the queue/batch bridge;
+                    // this is the physical XYZRHW GPU submission and both
+                    // eyes must use the SAME captured scene pose.
+                    // Preserve original colour, UV, depth and RHW. Reject
+                    // the WHOLE candidate if any referenced eye is invalid;
+                    // the caller retains its original one-draw fallback.
+                    for (UINT i = 0; i < vertexCount; ++i)
+                    {
+                        if (usedMask && !(*usedMask)[i])
+                            continue;
+                        const std::size_t offset =
+                            static_cast<std::size_t>(i) * stride;
+                        const auto* src = reinterpret_cast<const float*>(
+                            static_cast<const std::uint8_t*>(source) + offset);
+                        if (!std::isfinite(src[2]) || !std::isfinite(src[3]))
+                            return false;
+                        float leftX = 0.0f, leftY = 0.0f;
+                        float rightX = 0.0f, rightY = 0.0f;
+                        if (!OutRunVR::StageExtensionPlane::ProjectPixel(
+                                reinterpret_cast<const float*>(
+                                    &state.stageExtensionClipFromGameNdc[0]),
+                                src[0], src[1], x0, y0, width, height,
+                                state.stageExtensionScale, leftX, leftY) ||
+                            !OutRunVR::StageExtensionPlane::ProjectPixel(
+                                reinterpret_cast<const float*>(
+                                    &state.stageExtensionClipFromGameNdc[1]),
+                                src[0], src[1], x0, y0, width, height,
+                                state.stageExtensionScale, rightX, rightY))
+                            return false;
+                        auto* leftDst = reinterpret_cast<float*>(
+                            left.data() + offset);
+                        auto* rightDst = reinterpret_cast<float*>(
+                            right.data() + offset);
+                        leftDst[0] = leftX;
+                        leftDst[1] = leftY;
+                        rightDst[0] = rightX;
+                        rightDst[1] = rightY;
+                    }
+                    return true;
+                }
+
                 float hudScaleX = 1.0f;
                 float hudScaleY = 1.0f;
                 R30HudContainScale(state.stereo, hudScaleX, hudScaleY);
