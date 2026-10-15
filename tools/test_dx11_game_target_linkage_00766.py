@@ -10,11 +10,12 @@ build = (root / "CMakeLists.txt").read_text(encoding="utf-8")
 workflow = (root / ".github/workflows/dx11-fast-structural.yml").read_text(encoding="utf-8")
 
 definition = "bool preserve_game_target_transition(IDirect3DDevice9* game) noexcept {"
-closing = "} // namespace\n\nbool preserve_game_target_transition("
+start_comment = "// A successful R9 RT0 switch to/from a verified auxiliary game target"
+
 def linked(source):
-    # The original bug defined this function inside the anonymous namespace:
-    # compile succeeded, but stereo_pipeline.obj could not link the public API.
-    if source.count(definition) != 1 or closing not in source:
+    # The historical implementation was inside the anonymous namespace:
+    # compilation succeeded but stereo_pipeline.obj failed with LNK2019.
+    if source.count(definition) != 1 or start_comment not in source:
         return False
     anonymous_close = source.index("} // namespace", source.index("namespace {"))
     entry = source.index(definition)
@@ -36,17 +37,22 @@ assert "live_game_frame::preserve_game_target_transition(device)" in hook
 assert '"src/vr/d3d11/live_game_frame_bridge.cpp"' in build
 assert "python tools/test_dx11_game_target_linkage_00766.py" in workflow
 
-# Recreate the historical internal-linkage regression: move the exact working
-# implementation above the anonymous-namespace close and require rejection.
-begin = bridge.index("// A successful R9 RT0 switch to/from a verified auxiliary game target")
+# Destructive test 1: recreate internal linkage without removing the function.
+begin = bridge.index(start_comment)
 end = bridge.index("bool diagnostic_enabled() noexcept", begin)
 section = bridge[begin:end]
 source_without = bridge[:begin] + bridge[end:]
 location = source_without.index("} // namespace", source_without.index("namespace {"))
-broken = source_without[:location] + section + source_without[location:]
-assert not linked(broken), "anonymous-namespace linker regression undetected"
-assert not linked(bridge.replace("s.clearColor.matches(owner,", "s.clearColor.matches(0u,", 1) if False else
-    bridge[:bridge.index(definition)] + bridge[bridge.index(definition):].replace(
-        "s.clearColor.matches(owner,", "s.clearColor.matches(0u,", 1)),  # exact-function mutation
-    "foreign owner color seed mutation undetected"
-print("00766 external R9 target-linkage and fail-closed DX9Ex fallback PASS")
+internal_only = source_without[:location] + section + source_without[location:]
+assert not linked(internal_only), "anonymous-namespace linker regression undetected"
+
+# Destructive test 2: a foreign D3D9 device must not inherit the main RT seed.
+entry = bridge.index(definition)
+end = bridge.index("\n}\n", entry) + 3
+body = bridge[entry:end]
+assert "s.clearColor.matches(owner," in body
+unseeded = bridge[:entry] + body.replace(
+    "s.clearColor.matches(owner,", "s.clearColor.matches(0u,", 1) + bridge[end:]
+assert not linked(unseeded), "foreign-owner color-seed regression undetected"
+
+print("00766 external R9 target-linkage + fail-closed DX9Ex fallback PASS")
