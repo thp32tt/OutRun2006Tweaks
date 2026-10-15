@@ -85,14 +85,25 @@ def check(text):
         "D3DSBT_ALL, &R30SkyGlow.savedGameState",
         "else if (FAILED(R30SkyGlow.savedGameState->Capture()))",
         "IDirect3DStateBlock9* const stateBlock = R30SkyGlow.savedGameState;",
-        "if (!restoreOk)",
+        # A successful SkyGlow Apply resynchronizes the shader epoch.
+        # On failure the else arm discards the cached StateBlock and
+        # invalidates renderer ownership; an old '!restoreOk' token is
+        # not required, but the negative failure path is.
+        "if (restoreOk)",
+        "R29OwnerResynchronizeShaderEpoch(device);",
+        "else\n            {\n                R30ReleaseCom(R30SkyGlow.savedGameState);\n"
+        "                R29OwnerInvalidateRendererStateAfterExternalRestore();\n            }",
+        "R29OwnerInvalidateEffectStateCache();",
         "R30ReleaseCom(R30SkyGlow.savedGameState);",
     ):
         assert fragment in apply, "missing SkyGlow captured-state lifetime: " + fragment
     assert apply.count("device->CreateStateBlock(") == 1
     assert "stateBlock->Release();" not in apply, "cached state block released each Present"
     assert apply.index("savedGameState->Capture()") < apply.index("device->GetRenderTarget("), "game state captured after other work"
-    assert apply.index("stateBlock->Apply()") < apply.index("if (!restoreOk)"), "restoration failure did not invalidate block"
+    assert apply.index("stateBlock->Apply()") < apply.index("if (restoreOk)") < apply.index(
+        "R29OwnerInvalidateRendererStateAfterExternalRestore()"), "restoration failure did not invalidate block"
+    assert apply.index("R29OwnerResynchronizeShaderEpoch(device);") < apply.index(
+        "R29OwnerInvalidateEffectStateCache();"), "success shader epoch/caches not resynchronized"
     assert "R30SkyGlow.factor > 1" in apply, "do not change protected vertical blur policy"
     assert "compositeSource = R30SkyGlow.temp[eye];" in apply, "vertical blur source lost"
 
@@ -104,7 +115,9 @@ mutations = (
     ("remove once-per-resource creation gate", "if (!R30SkyGlow.savedGameState)"),
     ("disable per-frame Capture", "else if (FAILED(R30SkyGlow.savedGameState->Capture()))"),
     ("disable D3DSBT_ALL full-state snapshot", "D3DSBT_ALL, &R30SkyGlow.savedGameState"),
-    ("remove Apply-failure invalidation", "if (!restoreOk)"),
+    ("remove Apply-failure invalidation",
+     "else\n            {\n                R30ReleaseCom(R30SkyGlow.savedGameState);\n"
+     "                R29OwnerInvalidateRendererStateAfterExternalRestore();\n            }"),
     ("surfaces not released", "R30ReleaseCom(R30SkyGlow.tempSurface[eye]);"),
     ("missing reduced surface lifetime", "IDirect3DSurface9* reducedSurface[2]{};"),
     ("uncached every-frame setup", "if (!passState.fixedConfigured)"),
