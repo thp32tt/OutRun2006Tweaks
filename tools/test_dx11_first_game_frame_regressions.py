@@ -492,7 +492,8 @@ def main() -> None:
             "D3D11_ASYNC_GETDATA_DONOTFLUSH" in section[poll:first_done],
             "GameNativeFramePublication::retry_same_present_fence(" in section[first_done:map_at],
             "QueryPerformanceCounter(&now)" in section[first_done:map_at],
-            "D3D11_MAP_FLAG_DO_NOT_WAIT" in section[map_at:inset_at],
+            "ctx->Map(oldest.staging.Get(), 0,\n"
+            "                        D3D11_MAP_READ, D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped);" in section[map_at:inset_at],
             "ctx->End(next.fence.Get());" in inset,
             "if (!next.busy)" in inset,
             "++s.droppedCopies;" in inset,
