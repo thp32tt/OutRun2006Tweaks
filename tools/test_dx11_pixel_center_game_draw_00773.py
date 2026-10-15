@@ -94,7 +94,7 @@ with TemporaryDirectory(prefix="dx11-00773-") as d:
         ("clip[3] / viewportWidth","0.0f"),
         ("clip[3] / viewportHeight","0.0f"),
         ("clip[1] - clip[3] / viewportHeight","clip[1] + clip[3] / viewportHeight"),
-        ("viewportWidth <= 0.0f","viewportWidth < 0.0f"),
+        ("viewportWidth <= 0.0f","viewportWidth > 0.0f"),
         ("!std::isfinite(x) || !std::isfinite(y)","false"),
     ):
         assert before in header and not passes(header.replace(before,after,1)), before
