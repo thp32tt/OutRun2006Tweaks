@@ -34,6 +34,7 @@
 #include "native_game_readback_provenance.hpp"
 #include "native_game_present_region.hpp"
 #include "native_game_partial_dirty_upload.hpp"
+#include "native_game_multi_dirty_upload.hpp"
 #include "native_game_clear_color.hpp"
 #include "native_game_clear_coverage.hpp"
 #include "native_game_full_color_depth.hpp"
@@ -5212,6 +5213,20 @@ void before_game_present(IDirect3DDevice9* game,
         const bool partialNativeUpload = fullMode && backbufferKnown &&
             oneBoundedDirtyRect && !fullDirtyCoverage && !croppedNativeUpload &&
             partialDirty.valid;
+        // Disjoint partially dirty tiles are updated individually; publishing
+        // their bounding rectangle would overwrite untouched D3D9 pixels.
+        const auto multiDirty = GameNativeMultiDirtyUpload::select(
+            presentDesc.Width, presentDesc.Height, presentRegion,
+            boundedPartition ? dirtyRegion->rdh.nCount : 0u,
+            boundedPartition ? dirtyRegion->rdh.nRgnSize : 0u,
+            boundedPartition ? dirtyRegion->rdh.rcBound.left : 0,
+            boundedPartition ? dirtyRegion->rdh.rcBound.top : 0,
+            boundedPartition ? dirtyRegion->rdh.rcBound.right : 0,
+            boundedPartition ? dirtyRegion->rdh.rcBound.bottom : 0,
+            boundedPartition ? partitionRects : nullptr);
+        const bool multiNativeUpload = fullMode && backbufferKnown &&
+            boundedPartition && !fullDirtyCoverage && !croppedNativeUpload &&
+            multiDirty.valid;
         if (!s.previousOutput.same(outputNow)) {
             // Also reject earlier GPU readbacks if the Present backbuffer COM identity
             // changed while the device, dimensions and format stayed identical.
@@ -5244,7 +5259,8 @@ void before_game_present(IDirect3DDevice9* game,
             (((!outputNow.hasDirtyRegion || fullDirtyCoverage) &&
               (fullMode ? fullPlacement.valid : insetPlacement.valid)) ||
              (croppedNativeUpload && fullPlacement.valid) ||
-             (partialNativeUpload && fullPlacement.valid)) &&
+             (partialNativeUpload && fullPlacement.valid) ||
+             (multiNativeUpload && fullPlacement.valid)) &&
             bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
             (bb.Format == D3DFMT_A8R8G8B8 ||
              bb.Format == D3DFMT_X8R8G8B8);
@@ -5497,6 +5513,22 @@ void before_game_present(IDirect3DDevice9* game,
                                                  static_cast<std::uint32_t>(partialDirty.source.top),
                                                  static_cast<std::uint32_t>(partialDirty.source.right),
                                                  static_cast<std::uint32_t>(partialDirty.source.bottom))
+                                             : multiNativeUpload
+                                             ? [&]() noexcept {
+                                                 for (std::uint32_t i = 0u; i < multiDirty.count; ++i) {
+                                                     const auto& tile = multiDirty.regions[i];
+                                                     if (!GameNativeFrameUpload::copy_rect(
+                                                             lockRect.pBits, lockRect.Pitch,
+                                                             mapped.pData, mapped.RowPitch,
+                                                             surfaceWidth, surfaceHeight,
+                                                             static_cast<std::uint32_t>(tile.left),
+                                                             static_cast<std::uint32_t>(tile.top),
+                                                             static_cast<std::uint32_t>(tile.right),
+                                                             static_cast<std::uint32_t>(tile.bottom)))
+                                                         return false;
+                                                 }
+                                                 return true;
+                                             }()
                                              : GameNativeFrameUpload::copy_rows(
                                                 lockRect.pBits, lockRect.Pitch,
                                                 mapped.pData, mapped.RowPitch,
@@ -5537,11 +5569,35 @@ void before_game_present(IDirect3DDevice9* game,
                                          // Restrict the GPU upload to the exact
                                         // dirty source crop. The other backbuffer
                                         // pixels retain the original D3D9 scene.
-                                        if (SUCCEEDED(game->UpdateSurface(
+                                        bool uploaded = false;
+                                        if (!multiNativeUpload) {
+                                            uploaded = SUCCEEDED(game->UpdateSurface(
                                                 s.insetSurface.Get(),
                                                 partialNativeUpload ? &partialSourceUpload :
                                                      (croppedNativeUpload ? &uploadSourceCrop : nullptr),
-                                                back.Get(), &destination))) {
+                                                back.Get(), &destination));
+                                        } else {
+                                            // UpdateSurface owns a rectangular source only.
+                                            // Submit each verified disjoint intersection
+                                            // separately, never upload its hole-filled bound.
+                                            uploaded = true;
+                                            for (std::uint32_t i = 0u; i < multiDirty.count; ++i) {
+                                                const auto& tile = multiDirty.regions[i];
+                                                const RECT sourceTile{
+                                                    static_cast<LONG>(tile.left),
+                                                    static_cast<LONG>(tile.top),
+                                                    static_cast<LONG>(tile.right),
+                                                    static_cast<LONG>(tile.bottom)};
+                                                const POINT targetTile{sourceTile.left, sourceTile.top};
+                                                if (FAILED(game->UpdateSurface(
+                                                        s.insetSurface.Get(), &sourceTile,
+                                                        back.Get(), &targetTile))) {
+                                                    uploaded = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (uploaded) {
                                             ++s.visible;
                                             if (!s.logged) {
                                                 spdlog::info("DX11 FIRST_GAME_DRAW_FRAME async game-origin FVF native Draw: {} changed pixels, {}x{} {} output; original D3D9 draw/input untouched; Quest3 UNTESTED",

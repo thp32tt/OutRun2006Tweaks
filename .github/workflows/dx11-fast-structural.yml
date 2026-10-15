@@ -134,6 +134,8 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_visible_source_crop_probe_00752.cpp -o /tmp/dx11_visible_crop_00752 && /tmp/dx11_visible_crop_00752
           python tools/test_dx11_partial_dirty_upload_00753.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_partial_dirty_upload_probe_00753.cpp -o /tmp/dx11_partial_dirty_00753 && /tmp/dx11_partial_dirty_00753
+          python tools/test_dx11_multi_dirty_upload_00754.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_multi_dirty_upload_probe_00754.cpp -o /tmp/dx11_multi_dirty_00754 && /tmp/dx11_multi_dirty_00754
           python tools/test_dx11_full_frame_fallback_00724.py
           python tools/test_dx11_full_frame_same_present_00726.py
           python tools/test_dx11_same_present_fence_00731.py
