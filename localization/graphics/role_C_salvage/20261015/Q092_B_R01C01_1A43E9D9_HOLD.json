@@ -1,0 +1,155 @@
+{
+  "schema": "outrun-c-salvage-audit-v1",
+  "run_key": "OUTRUN-C-SALVAGE-20261015-Q092-B-R01C01-1403",
+  "scope": "HD_GUI_C_SALVAGE_OFFLINE_NO_IMAGEGEN",
+  "recorded_date_kst": "2026-10-15",
+  "status": "HOLD_OPAQUE_GENERATED_REQUIRES_EXPLICIT_GLYPH_MASK",
+  "gate_status": "HOLD",
+  "source": {
+    "queue_id": "Q092",
+    "texture_hash": "1A43E9D9",
+    "role": "B",
+    "tile": "r01c01",
+    "orientation_hint": "FLIP_Y_PREVIEW_PER_SPRITE_VERIFY",
+    "tile_file": "Q092_1A43E9D9_BASE_READABLE_FLIPY__r01c01__x0_y0__683x256.png",
+    "tile_png_sha256": "b9536aabed98fec231d5df060eaa780e12cf3aca057f96dbcb405a63ddad4d33",
+    "tile_actual_size": [
+      683,
+      256
+    ],
+    "full_source_dds_manifest_path": "textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+    "full_source_dds_manifest_sha256_unverified": "d19e5191fb1e084fbeb182b5528738b4ad47ab56bef38fb1e1f027e0b6816774",
+    "full_source_manifest_dimensions_unverified": [
+      2048,
+      256
+    ],
+    "actual_source_dds_present": false,
+    "actual_source_dds_sha256_verified": false,
+    "DDS_header_fourcc_mips_alpha": "NOT_PROBED_NO_CANONICAL_DDS_BYTES",
+    "note": "Source tile real bytes checked. A manifest SHA is not an actual DDS read or verified orientation."
+  },
+  "generated": {
+    "file": "Q092_1A43E9D9_BASE_READABLE_FLIPY__r01c01__x0_y0__683x256_k.png",
+    "sha256": "ffa29ec52986e8458bf98f4017b1e965fb305f392d556409cc802f31196d7183",
+    "actual_size": [
+      2048,
+      768
+    ],
+    "positive_alpha_pixels": 1572864,
+    "transparent_fraction": 0,
+    "observed_korean": "아웃런 모… / 15코스… (partial per-tile view; not a verified complete translation)",
+    "observed_defects": [
+      "All pixels opaque; cannot alpha-isolate lettering",
+      "Korean glyphs span or clip at right tile edge",
+      "Generated dimensions differ 3x from original crop; native atlas mapping not validated"
+    ],
+    "generated_text_mask_sha256": null,
+    "english_removal_mask_sha256": null,
+    "protected_mask_sha256": null,
+    "korean_letter_layer_sha256": null
+  },
+  "psd": {
+    "upstream_repo": "Sonic-TV/OR2006Sprites",
+    "upstream_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "upstream_path": "PSDs, XCFs, SVGs, and other Working Source Assets/1A43E9D9_512x64.psd",
+    "upstream_blob_sha": "0589de5e9a3ac2e2d032ca1943f7502c07890312",
+    "copied_into_asset_branch": true,
+    "path": "localization/graphics/plate_library/upstream_psd/1A43E9D9/1A43E9D9_512x64.psd",
+    "actual_sha256_verified": "ee000ce057b58891a62ecfe419ac50fd798a6d660bf5a2bb47a6870f798b8923",
+    "actual_size_bytes": 938768,
+    "psd_canvas": [
+      2048,
+      256
+    ],
+    "channels": 4,
+    "depth": 8,
+    "layers_unreviewed": [
+      {
+        "index": 0,
+        "name": "Decompressed Image",
+        "bbox": [
+          396,
+          16,
+          1556,
+          240
+        ]
+      },
+      {
+        "index": 1,
+        "name": "OutRun Mode",
+        "bbox": [
+          409,
+          35,
+          1045,
+          110
+        ]
+      },
+      {
+        "index": 2,
+        "name": "15 Continuous Course",
+        "bbox": [
+          540,
+          148,
+          1567,
+          224
+        ]
+      }
+    ],
+    "layer_selection_verified": false,
+    "english_erase_clean_verified": false,
+    "warning": "Layer names and PSD dimension do not prove that removing layers 1-2 yields clean canonical English-free pixels. Decompressed base can contain baked text. No guessed layer selection."
+  },
+  "outputs": {
+    "isolated_n100_root": "work/c-salvage-q092-isolated-20261015-1403",
+    "worker_receipt": "output/candidates/B-092-ffa29ec52986e845-autoalpha-b2e9474b67cd/receipt.json",
+    "layer_structure": "qa_q092_psd_structure.json",
+    "canonical_clean_png": null,
+    "korean_letter_only_png": null,
+    "composite_png": null,
+    "dds_test_file": null,
+    "registered_github_evidence": "localization/graphics/role_C_salvage/20261015/Q092_B_R01C01_1A43E9D9_HOLD.json"
+  },
+  "QA": {
+    "checked": "Actual A/B candidate and source-tile SHA, PNG dimensions/alpha, upstream PSD SHA and layer headers",
+    "unverified": [
+      "Native DDS SHA/format/mips/orientation/alpha",
+      "English text removal mask",
+      "Korean-only glyph segmentation",
+      "Native cell and protected pixels",
+      "CLEAN source identity",
+      "Hangul clipping across tile boundaries",
+      "Final composite pixel diff and readable/raw QA",
+      "Game rendering"
+    ],
+    "fail_closed_reasons": [
+      "Actual canonical HD DDS absent from accessible isolated material; manifest SHA is not evidence",
+      "Opaque generated PNG has no reviewer-approved glyph mask; lettering isolation would copy white backdrop",
+      "Native original English removal and protected masks unavailable",
+      "PSD layer correctness and CLEAN equivalence against canonical DDS not checked",
+      "Generated output clipped by tile boundary, not safe for single-cell placement"
+    ],
+    "worker_processed_new_items": 1,
+    "worker_result": "HOLD_OPAQUE_GENERATED_REQUIRES_EXPLICIT_GLYPH_MASK",
+    "idempotent_rerun_not_required": true,
+    "outside_edit_pixel_diff": "NOT_TESTED",
+    "protected_pixel_diff": "NOT_TESTED",
+    "C1": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "promoted_to_official": false
+  },
+  "isolation": {
+    "A_B_live_queue_modified": false,
+    "A_B_controller_tabs_or_schedule_modified": false,
+    "C1_pass_self_assigned": false,
+    "image_generation_requests": 0,
+    "paid_image_api_requests": 0,
+    "RDC_used": false
+  },
+  "resume_requirements": [
+    "Stage exact canonical HD DDS with matching SHA256 then inspect header, mip count, alpha and native RAW/readable transform",
+    "Compare PSD full/base English artwork to canonical DDS and select real English layers only after checking pre-baked residue",
+    "Provide explicit same-size generated Korean glyph mask across all needed tile boundaries and source English/protected masks",
+    "Then run plate/compose TEST_ONLY, independent C1/C3 and actual game before any promotion"
+  ]
+}
