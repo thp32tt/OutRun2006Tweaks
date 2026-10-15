@@ -27,6 +27,7 @@
 #include "../state/state_block_tracker.hpp"
 #include "gpu_water_profiler.hpp"
 #include "stereo_completion_gate.hpp"
+#include "lens_centre_source_provenance.hpp"
 
 namespace OutRunVRD3D9ExUpgradeR13
 {
@@ -1058,6 +1059,27 @@ namespace OutRunVRStereo
             // that work inside R33TryHud after choosing the HUD route.
             const R32ReviewScreenSpaceKind screenKind =
                 R32ReviewClassifyScreenSpacePass(device);
+            // R30::None is NOT generic-world ownership for the D3A5/C993
+            // sun. If the original c64/call/shader/pose proof is missing,
+            // bypass both R33 fast world and the R29 cached-WVP fallback.
+            const bool directLensCentre =
+                !OutRunVR::GameSemantic::QueueRenderActive() &&
+                OutRunVR::GameSemantic::EffectiveScope() ==
+                    OutRunVR::GameSemantic::RenderScope::WorldBillboard &&
+                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::LensFlareCentre;
+            const bool provenLensStereo =
+                screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld;
+            if (OutRunVR::LensCentre::PreserveOriginalAtUpperDispatch(
+                    directLensCentre, provenLensStereo, false) &&
+                !provenLensStereo)
+            {
+                // The game's exact original draw occurs once; no effect is
+                // suppressed or borrowed road/particle WVP submitted.
+                if (telemetry)
+                    R32ReviewNoteDispatchFallback();
+                return actualDraw();
+            }
             if (screenKind != R32ReviewScreenSpaceKind::None)
             {
                 const auto hud = R33TryHud(device, screenKind,
@@ -1067,6 +1089,15 @@ namespace OutRunVRStereo
                         GpuWaterProbe::DrawRoute::ScreenHud);
                 if (hud.handled)
                     return hud.hr;
+                // A fully source-proven C993 centre whose stereo path was
+                // unavailable must likewise never borrow generic world c64.
+                if (OutRunVR::LensCentre::PreserveOriginalAtUpperDispatch(
+                        directLensCentre, provenLensStereo, hud.handled))
+                {
+                    if (telemetry)
+                        R32ReviewNoteDispatchFallback();
+                    return actualDraw();
+                }
             }
             else
             {

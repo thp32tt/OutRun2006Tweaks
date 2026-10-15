@@ -34,6 +34,13 @@ int main()
         WorldRoute::PreserveOriginal);
     assert(SelectWorldRoute(true, OwnsRawWvp(queued)) ==
         WorldRoute::PreserveOriginal);
+    // R84 renderer upper-dispatch fallback: original only when the exact
+    // central sun has no R30 proof or R33 did not handle binocular draw.
+    assert(PreserveOriginalAtUpperDispatch(true, false, false));
+    assert(PreserveOriginalAtUpperDispatch(true, true, false));
+    assert(!PreserveOriginalAtUpperDispatch(true, true, true));
+    assert(!PreserveOriginalAtUpperDispatch(false, false, false));
+    assert(!PreserveOriginalAtUpperDispatch(false, true, false));
     // Ordinary shader world draw path and CABE outer effect remain unchanged.
     assert(SelectWorldRoute(false, false) ==
         WorldRoute::HistoricalWorld);

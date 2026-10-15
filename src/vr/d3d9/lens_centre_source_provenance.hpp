@@ -39,6 +39,20 @@ namespace OutRunVR::LensCentre
         return rawOwned ? WorldRoute::ExactCentreStereo
                         : WorldRoute::PreserveOriginal;
     }
+    // When R30 cannot prove the C993 game c64 or R33 cannot submit its
+    // precise stereo path, preserve the original draw. Never retry a
+    // generic world WVP route with possibly head-injected live constants.
+    constexpr bool PreserveOriginalAtUpperDispatch(
+        bool exactDirectCentre, bool provenCentreStereo,
+        bool stereoHandled) noexcept
+    {
+        return exactDirectCentre && (!provenCentreStereo || !stereoHandled);
+    }
+    static_assert(PreserveOriginalAtUpperDispatch(true, false, false));
+    static_assert(PreserveOriginalAtUpperDispatch(true, true, false));
+    static_assert(!PreserveOriginalAtUpperDispatch(true, true, true));
+    static_assert(!PreserveOriginalAtUpperDispatch(false, false, false));
+
     static_assert(SelectWorldRoute(true, true) == WorldRoute::ExactCentreStereo);
     static_assert(SelectWorldRoute(true, false) == WorldRoute::PreserveOriginal);
     static_assert(SelectWorldRoute(false, true) == WorldRoute::HistoricalWorld);
