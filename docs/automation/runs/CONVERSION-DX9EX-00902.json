@@ -2,23 +2,23 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00902",
   "production_id": "CONVERSION-DX9EX-00902",
-  "event_id": "CONVERSION-DX9EX-00902-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00902-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "run_key": "CONVERSION-DX9EX-00902",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "e43570ad72443c92fb6eabf58fe100b7ccbec9eb",
+  "validation_bearing_result_sha": "e0fe0df9904e18f0721411719755a553f2c01c36",
   "changed_files": [
     "src/vr/game/render_semantics.hpp",
     "vrhost/tests/semantic_tag_hint_smoke.cpp",
@@ -77,11 +77,49 @@
     "eye_ownership": "Exact per-frame GameSemantic CurrentQueue producer gates R84 c64/XYZRHW per-eye classification; future rank car view depth and +TIME ScreenHud cannot rebind current-frame eye source."
   },
   "acceptance_results": {
-    "hud_frame_ownership": "PENDING",
-    "hud_stereo_negative_generation": "PENDING",
-    "hud_r84_full_ci": "PENDING"
+    "hud_frame_ownership": "PASS_EXACT_SHA",
+    "hud_stereo_negative_generation": "PASS_EXACT_SHA",
+    "hud_r84_full_ci": "PASS_EXACT_SHA"
   },
-  "runtime_evidence": "No real Quest3/VDXR game/headset test at this exact SHA.",
-  "score_once": false,
-  "score_delta_this_attempt": 0
+  "runtime_evidence": "No real Quest3/VDXR headset test on the exact build; HUD optic/stereo acceptance still UNTESTED.",
+  "score_once": true,
+  "score_delta_this_attempt": 1,
+  "source_parent_sha": "7940277c729b4efa1692d87772d1e460560ed2e9",
+  "ci_evidence": {
+    "active_validation": {
+      "run_id": 38752561020,
+      "conclusion": "success",
+      "sha": "e0fe0df9904e18f0721411719755a553f2c01c36",
+      "jobs": "policy, game, host, full-chain-compile, package 5/5"
+    },
+    "domain_isolation": {
+      "run_id": 38752561195,
+      "conclusion": "success",
+      "sha": "e0fe0df9904e18f0721411719755a553f2c01c36"
+    },
+    "hud_inspector": {
+      "run_id": 38751069902,
+      "conclusion": "success",
+      "sha": "e43570ad72443c92fb6eabf58fe100b7ccbec9eb",
+      "note": "source C++ unchanged through later verifier repairs"
+    },
+    "full_source_impact": {
+      "run_id": 38751069901,
+      "conclusion": "success",
+      "sha": "e43570ad72443c92fb6eabf58fe100b7ccbec9eb",
+      "note": "source C++ unchanged through later verifier repairs; 3/3 SUCCESS"
+    },
+    "previous_failures": [
+      38751069956,
+      38751098323,
+      38751535485,
+      38751877000,
+      38752241901
+    ]
+  },
+  "source_paths": [
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "hold_reason": "NEED_HMD_TEST (runtime only)",
+  "scoreboard_commit_sha": "675a98615a8a9734a0f8a842af0f86f5d7ed349c"
 }
