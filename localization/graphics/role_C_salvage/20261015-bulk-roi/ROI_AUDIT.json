@@ -1,0 +1,26 @@
+{
+  "schema": "outrun-text-roi-bulk-audit-v1",
+  "registered_sources": 108,
+  "declared_translation_records": 746,
+  "sources_processed": 85,
+  "candidates": 1540,
+  "count_match": true,
+  "statistics": {
+    "valid_output_pairs": 1540,
+    "unverified_reassembled_source_candidates": 1538,
+    "alpha_touches_crop_boundary": 327,
+    "direct_source_candidates": 2,
+    "output_png_files": 3080
+  },
+  "png_total_bytes": 402114704,
+  "failures": [],
+  "blocked_sources": [
+    {
+      "source": "Q046_AA04D779_BASE_READABLE_FLIPY.png",
+      "reason": "MISSING_COMPLETE_SOURCE"
+    }
+  ],
+  "status": "PIL_RGBA_SHA_DIMENSION_AUDIT_COMPLETE_NOT_SEMANTIC_QA",
+  "approved_imagegen_inputs_from_this_bulk": 0,
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
