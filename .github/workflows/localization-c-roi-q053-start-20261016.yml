@@ -40,7 +40,7 @@ jobs:
           dest.mkdir(parents=True,exist_ok=True)
           source_path=Path('localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds')
           expected_dds='65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813'
-          bbox=[2590,2850,3570,3140]
+          bbox=[2590,2850,3570,3250]
           source_rel='textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds'
           audit={'task_id':'C-ROI-SOURCE-Q053-START-20261016T0233KST',
                  'schema':'outrun-c-roi-source-audit-v1',
@@ -123,12 +123,12 @@ jobs:
               raise RuntimeError('HOLD_NATIVE_PIXEL_MISMATCH')
             if np.any(np.asarray(up)!=np.asarray(crop.resize(up.size,Image.Resampling.LANCZOS))):
               raise RuntimeError('HOLD_UPSCALE_PIXEL_MISMATCH')
-            if native.size!=(980,290) or up.size!=(1960,580):
+            if native.size!=(980,400) or up.size!=(1960,800):
               raise RuntimeError('HOLD_ROI_DIMENSION_MISMATCH')
             audit.update({'status':'ROI_SOURCE_CREATED_TEST_ONLY',
               'source_roi_native_sha256':manifest['native_png_sha256'],
               'source_roi_upscaled_sha256':manifest['imagegen_input_sha256'],
-              'native_size':[980,290],'imagegen_size':[1960,580],
+              'native_size':[980,400],'imagegen_size':[1960,800],
               'native_crop_pixel_mismatches':0,'upscale_pixel_mismatches':0,
               'semantic_visual_review':'UNTESTED',
               'ui_cell_uv_safe_area':'UNREVIEWED',
