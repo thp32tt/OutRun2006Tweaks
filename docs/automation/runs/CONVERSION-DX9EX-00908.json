@@ -1,0 +1,98 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00908",
+  "production_id": "CONVERSION-DX9EX-00908",
+  "event_id": "CONVERSION-DX9EX-00908-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00908",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "EXACT_SHA_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "3e84cbfba188c0728c806b4d542318a7410ad230",
+  "material_result_sha": "a536c7cd0f0fc53fe6956c4d2dd41abd02f60697",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "vrhost/tests/lens_centre_pose_epoch_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00908.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Preserve the original central lens flare dot under exact D3A5/C993 original-WVP uncertainty without accidental extra generic-world stereo reprojection, while allowing genuinely proved binocular centre draws and leaving the original halos, sky and world untouched.",
+    "scope_boundary": "Only R84 upper R33 dispatch for exact unqueued WorldBillboard LensFlareCentre producer following R30 source-WVP admission; no R26_SAFE, original input, FFB, SkyGlow, CABE outer discs, GOAL/+TIME, generic HUD, world or DXVK edits.",
+    "trace_stages": [
+      "The original EXE D3A5 to C980 to C993 central sun has an exact producer token distinct from CABE outer lens discs and normal road world.",
+      "R30 classifies C993 only after precise raw original game c64, shader, draw-age, latched pose and direct-call ownership; it yields None if source proof is absent.",
+      "Before this repair R33 treated R30 None as generic fast-world admission and subsequently R29 fallback, potentially reprojecting a foreign or head-injected live GPU c64; the R84 upper dispatcher now retains the game's original one-pass draw until the exact R33 stereo path handles the centre."
+    ],
+    "subcomponents": [
+      "Prevent unproven C993 raw WVP from entering R33 fast world or R29 cached-WVP fallback by exact direct-producer source gate, preserving the original draw once.",
+      "When R30 has proved exact centre source but R33 optical stereo admission does not handle it, protect the same fallback instead of retrying generic world; add portable positive/negative routing tests for centre vs CABE/road."
+    ],
+    "acceptance_items": [
+      {
+        "id": "centre_source_fallback",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original EXE C993 producer through R30 and R33 eye dispatch",
+        "expected_behavior": "When R30 refuses c64 provenance or R33 cannot handle its exact stereo pass, R84 draws original centre exactly once without generic world fallback or effect suppression; source-proven handled per-eye centre continues unchanged."
+      },
+      {
+        "id": "world_and_halo_isolation",
+        "category": "fallback_regression",
+        "behavior_area": "CABE outer lens discs, road world, HUD, reset and input/FFB rollback",
+        "expected_behavior": "Only direct exact centre producer is eligible for the preserved-original override; unrelated tagged and untagged world, HUD, outer halos and fallback paths retain prior routing, with false/true source and stereo mutation cases."
+      },
+      {
+        "id": "exact_sha_integration",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 x86 game + x64 OpenXR host + package and source/Domain gates",
+        "expected_behavior": "Final SHA of the same C++ repair and necessary CI record passes all DX9Ex Active required jobs, Domain Isolation, Full Source Impact and HUD Inspector where enabled; Quest3/VDXR optics remain untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "centre_source_fallback": "PENDING_EXACT_SHA_CI",
+    "world_and_halo_isolation": "PENDING_EXACT_SHA_CI",
+    "exact_sha_integration": "PENDING_EXACT_SHA_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "R30ClassifyScreenSpacePass returns None for the exact direct C993 centre when original-game raw WVP proof is absent, but R33Dispatch previously branches to R33TryFastWorld on all R30 None results before trying lower R29.",
+    "source_trace": [
+      "D3A5/C993 lens centre producer attaches exact WorldBillboard semantic.",
+      "R30 returns ExactLensCentreWorld only when original raw game c64/shader/pose/source checks pass.",
+      "R33 previously tried generic fast world on None or lower R29 after unhandled exact HUD stereo."
+    ],
+    "root_cause": "The upper R33 generic-world fallback did not retain the R30 source-owner rejection for the original C993 centre; an absent WVP proof could be reinterpreted as authorization for generic spatial stereo.",
+    "alternatives_rejected": [
+      "Suppressing the centre/sun pixel or broadening HUD admission would hide effects or flatten actual 3D geometry.",
+      "Increasing c64 freshness window does not prove the write belonged to the same source call or pose."
+    ],
+    "fix_evidence": "Exact central source and R30 stereo classification now prevent both unproven and unhandled C993 draws from passing into generic world or lower R29; bounded original draw path and static+portable route regressions added.",
+    "negative_test_evidence": "Positive cases preserve exact source when evidence is absent or stereo unhandled; negative cases leave CABE/unrelated world alone and allow successfully handled exact centre to follow existing per-eye implementation."
+  },
+  "ci_evidence": {
+    "initial_material_sha": "a536c7cd0f0fc53fe6956c4d2dd41abd02f60697",
+    "initial_active_run_id": 38772022114,
+    "initial_failure": "Missing exact-head run record in policy Gate; game/host/full-chain/package skipped, not a C++ compiler failure.",
+    "repair": "Add required task feature record for same source result; no weakening of checks.",
+    "status": "PENDING"
+  },
+  "runtime_evidence": "No physical Quest3/VDXR test performed. Binocular optics, central dot depth and FPS not established.",
+  "score_delta_this_attempt": 0,
+  "score_once": false
+}
