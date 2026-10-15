@@ -1,0 +1,61 @@
+{
+  "task_id": "OUTRUN-C-ROI-SOURCE-Q060-EASY-20261016-0533",
+  "schema": "outrun-hd-text-roi-v1",
+  "status": "TEST_ONLY_REFERENCE_ONLY",
+  "source_provenance": "DIRECT_GITHUB_PINNED_PC_HD_DDS_TO_FULL_READABLE_RGBA_PNG",
+  "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "source_dds_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "source_png": "q060_A064FDFC_FLIPY_CHECK_ORIENTATION.png",
+  "source_png_sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+  "original_dimensions": [
+    4096,
+    2048
+  ],
+  "platform": "PC_BASE",
+  "source_orientation": "FLIP_TOP_BOTTOM_DDS_TO_READABLE",
+  "original_dds_to_full_png_pixel_diff": 0,
+  "original_dds_byte_layout": "RGBA32_RGB_MASK_R=0xff_G=0xff00_B=0xff0000_A=0xff000000",
+  "roi_bbox_native_xyxy": [
+    3250,
+    823,
+    3650,
+    980
+  ],
+  "native_dimensions": [
+    400,
+    157
+  ],
+  "native_png_sha256": "c8dbc1b9700278fe121b6a7c5ee985bda4414f673aadd474a3d6749db43f09ae",
+  "imagegen_input_dimensions": [
+    1600,
+    628
+  ],
+  "upscale": 4,
+  "upscale_resampling": "LANCZOS_PRESERVE_ASPECT_RATIO",
+  "imagegen_input_sha256": "2582436436c07c964e1bf2cd58c9038fb698d994f9172e9de81e68ab46a38764",
+  "english": "EASY",
+  "korean": "쉬움",
+  "translation_source": "source_full_20261012/transcriptions.jsonl Q060 transcribed_reviewed",
+  "isolation": "reference_crop",
+  "alpha_isolation_attempt": "HOLD_TEXT_OR_EFFECT_TOUCHES_CROP_EDGE",
+  "alpha_crop_margin_checked": false,
+  "text_mask": "HOLD_REVIEWED_EXACT_MASK_OR_PSD_MISSING",
+  "clean_plate": "HOLD_REVIEWED_EXACT_MASK_OR_PSD_MISSING",
+  "ui_cell_uv_safety": "UNVERIFIED",
+  "restoration_policy": "RESIZE_UNIFORM_ASPECT_PRESERVING_CONTAIN_IN_MEASURED_UI_CELL_AND_UV_SAFE_REGION",
+  "native_artifact": "work/c_roi_q060_easy_20261016_0533_output/Q060-easy/english_text_roi_native.png",
+  "upscaled_artifact": "work/c_roi_q060_easy_20261016_0533_output/Q060-easy/imagegen_input_upscaled.png",
+  "manifest_artifact": "work/c_roi_q060_easy_20261016_0533_output/Q060-easy/roi_manifest.json",
+  "extractor": "tools/localization/text_roi_source_pack.py",
+  "extractor_result": {
+    "ready": 1,
+    "hold": 0
+  },
+  "images_generated": false,
+  "A_B_queue_state": "UNCHANGED",
+  "old_986_tile_input": "NOT_USED",
+  "qa": "TEST_ONLY",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
