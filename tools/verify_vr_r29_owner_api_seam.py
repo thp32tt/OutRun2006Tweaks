@@ -265,7 +265,10 @@ def main() -> None:
         "HostAlive | HostAdapterLuidValid",
         "out = {pid, low, high};",
     ):
-        mutated = identity_header.replace(token, "/* poisoned */", 1)
+        # Some required operands intentionally appear on both sides of an
+        # equality (required flags vs. observed flags). Remove every
+        # occurrence or a remaining copy masks the negative mutation.
+        mutated = identity_header.replace(token, "/* poisoned */")
         assert mutated != identity_header
         try:
             check_host_identity_contract(mutated)
