@@ -211,6 +211,8 @@ on:
       - '.github/workflows/vr-dx9ex-active.yml'
       - '.github/workflows/vr-openxr.yml'
       - '.github/workflows/vr-unified-backends.yml'
+      - '.github/workflows/dx9ex-fullsource-impact-review.yml'
+      - '.github/workflows/outrun-exe-hud-inspector.yml'
       - 'docs/DX9EX_R84_MAINLINE_CONTRACT.md'
 
 concurrency:

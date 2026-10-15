@@ -16,6 +16,8 @@ LAUNCH = ROOT / "tools/START_DX9EX_TEST.cmd"
 SELECT = ROOT / "tools/Select-OutRunVRBackend.ps1"
 OPENXR = ROOT / ".github/workflows/vr-openxr.yml"
 MATRIX = ROOT / ".github/workflows/vr-unified-backends.yml"
+IMPACT = ROOT / ".github/workflows/dx9ex-fullsource-impact-review.yml"
+HUD_INSPECTOR = ROOT / ".github/workflows/outrun-exe-hud-inspector.yml"
 
 _SPLITS = (
     "OUTRUN_VR_REFACTOR_SPLIT_R33_R32",
@@ -32,7 +34,7 @@ _COMPARISONS = (
 
 
 def check(cmake: str, toml: str, ci: str, launcher: str, select: str,
-          openxr: str, manual: str) -> None:
+          openxr: str, manual: str, impact: str, hud_inspector: str) -> None:
     # cmkr is a source, CMakeLists the generated build owner. A build without
     # overrides must compile all five independent R29-R33 game TUs.
     for source in (cmake, toml):
@@ -124,8 +126,31 @@ def check(cmake: str, toml: str, ci: str, launcher: str, select: str,
     assert "P3_R84_MAIN" in manual and "P3_FULL_R34" not in manual
     assert re.search(r'- variant: P3_R84_MAIN\s+flags: ""', manual)
     assert "name: dx9ex-game-P3_R84_MAIN" in manual
+    # All required code-review and HUD diagnostics now analyze the same R84
+    # independent owner as the tested package; R26 is only an explicit control.
+    impact_config = impact.split(
+        "- name: Configure exact R84 MAIN game for MSVC static analysis", 1)[1].split(
+        "- name: Apply same dependency compatibility fixes as DX9Ex Active", 1)[0]
+    assert re.search(
+        r'cmake -S \. -B build-analysis -G "Visual Studio 17 2022" -A Win32 -DCMAKE_CXX_FLAGS=/analyze\s*$',
+        impact_config, re.M)
+    assert "-DOUTRUN_VR_" not in impact_config
+    inspector_config = hud_inspector.split(
+        "- name: Configure Win32 R84 MAIN HUD Inspector DLL", 1)[1].split(
+        "- name: Apply VC2022 dependency workarounds", 1)[0]
+    assert re.search(
+        r'cmake -S \. -B build-game -G "Visual Studio 17 2022" -A Win32\s*$',
+        inspector_config, re.M)
+    assert "-DOUTRUN_VR_" not in inspector_config
+    for split in _SPLITS:
+        assert f"'{split}:BOOL=ON'" in impact_config
+        assert f"'{split}:BOOL=ON'" in inspector_config
+    assert "Set-Content stage/VARIANT_ID.txt 'R84_SPLIT_R33_R32_R31_R30_R29'" in hud_inspector
+
     for trigger in (".github/workflows/vr-openxr.yml",
                     ".github/workflows/vr-unified-backends.yml",
+                    ".github/workflows/dx9ex-fullsource-impact-review.yml",
+                    ".github/workflows/outrun-exe-hud-inspector.yml",
                     "tools/verify_dx9ex_r84_mainline.py"):
         assert trigger in ci, "mainline CI misses build contract change: " + trigger
 
@@ -139,6 +164,8 @@ def main() -> None:
         SELECT.read_text(encoding="utf-8-sig"),
         OPENXR.read_text(encoding="utf-8-sig"),
         MATRIX.read_text(encoding="utf-8-sig"),
+        IMPACT.read_text(encoding="utf-8-sig"),
+        HUD_INSPECTOR.read_text(encoding="utf-8-sig"),
     ]
     check(*originals)
     mutations = [
@@ -156,6 +183,10 @@ def main() -> None:
         (5, "Verify regenerated R84 MAIN independent game graph", "Verify regenerated R26 safe production source graph"),
         (5, "OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=ON", "OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=OFF"),
         (6, 'P3_R84_MAIN', 'P3_FULL_R34'),
+        (7, 'cmake -S . -B build-analysis -G "Visual Studio 17 2022" -A Win32 -DCMAKE_CXX_FLAGS=/analyze',
+            'cmake -S . -B build-analysis -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_R26_HUD_COMPARE=ON -DCMAKE_CXX_FLAGS=/analyze'),
+        (8, 'cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32\n',
+            'cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=ON\n'),
     ]
     for idx, old, new in mutations:
         assert old in originals[idx], "missing negative fixture: " + old
