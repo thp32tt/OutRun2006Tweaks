@@ -1,0 +1,100 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "record_type": "C_SOURCE_HOLD",
+  "run_key": "C-ROI-SOURCE-Q032-TOTAL-RANK-20261016T0333KST",
+  "run_start_kst": "2026-10-16T03:33:00+09:00",
+  "status": "HOLD_FULL_SOURCE_MISSING",
+  "qa_stage": "TEST_ONLY",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "project": "아웃런 한글화 신규",
+  "repo": "thp32tt/OutRun2006Tweaks",
+  "asset_branch": "korean-localization-recovery-20260928",
+  "controller_branch": "localization-controller-recovery-20260928",
+  "source_head_at_inspection": "0b6553d4558014a5d6355c2a3b0669bfbc00168a",
+  "candidate": {
+    "queue_id": "Q032",
+    "source_png_candidate_name": "Q032_DCC7B488_BASE_READABLE_FLIPY.png",
+    "english": "Total Rank",
+    "korean": "종합 랭킹",
+    "translation_evidence": "FULL_HD_108_SOURCE_INVENTORY.json; translation still requires independent official-map check prior to production",
+    "source_dds_path": "textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+    "source_dds_sha256_inventory_only": "ecd0607fd021b6aa0c78700bffa05f70546a4d37da6182edc4a35bc41ab5ee4e",
+    "inventory_source_dimensions": [
+      2048,
+      1024
+    ],
+    "source_dds_actual_bytes_verified": false,
+    "platform_and_native_orientation_verified": false,
+    "actual_source_full_png_path": null,
+    "actual_source_full_png_sha256": null,
+    "approved_native_bbox_xyxy": null,
+    "upscale_multiplier": null,
+    "native_roi_png_sha256": null,
+    "imagegen_input_png_sha256": null
+  },
+  "source_investigation": {
+    "inventory_path": "localization/graphics/role_C_salvage/20261015-text-roi-pilot/FULL_HD_108_SOURCE_INVENTORY.json",
+    "inventory_git_blob_sha": "851011cae682306f96e60640563de93cf1f6a4a9",
+    "inventory_legacy_reconstruction_png_sha256": "bb27c31a54b46dc6127c6e69c410e2cdb8dd53ed8c55eeb99705875154686319",
+    "inventory_legacy_tile_count": 3,
+    "inventory_native_dds_equivalence": "UNVERIFIED",
+    "inventory_automatic_bbox_proposal_unapproved": [
+      43,
+      0,
+      1597,
+      981
+    ],
+    "inventory_automatic_bbox_status": "ROI_PROPOSAL_TEXT_CONTENT_NOT_REVIEWED",
+    "github_checked_canonical_hd_pack_dir": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/",
+    "github_pack_directories": [
+      "spr_etc_xst",
+      "spr_font_xst",
+      "spr_sprani_etc_cvt_Exst",
+      "spr_sprani_fruity_cvt_Exst",
+      "spr_sprani_game_cvt_Exst",
+      "spr_sprani_loading_cvt_Exst",
+      "spr_sprani_selector_cvt_Exst",
+      "spr_sprani_sumo_fe_cvt_Exst"
+    ],
+    "github_checked_q032_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_FLAG_RANK_Exst/DCC7B488_512x256.dds",
+    "github_q032_dds_lookup": "HTTP_404_NOT_FOUND",
+    "n100_fallback_attempts": [
+      "list_dir(.)",
+      "find_files(work,**/*FULL*PNG*)",
+      "file_info(work)",
+      "process_list"
+    ],
+    "n100_fallback_result": "TOOL_INTERNAL_FAILURE; no claim of missing connection or permanent source absence",
+    "conclusion": "No independently verified complete native English full-source PNG/DDS/PSD bytes accessible during this run. The reconstructed old tile image is explicitly prohibited as a substitute."
+  },
+  "production": {
+    "native_roi_created": false,
+    "upscaled_roi_created": false,
+    "imagegen_invoked": false,
+    "external_imagegen_api_invoked": false,
+    "isolated_letter_layer_claimed": false,
+    "clean_plate_claimed": false,
+    "dds_created": false,
+    "C1_review": "NOT_RUN",
+    "C3_review": "NOT_RUN",
+    "user_game_validation": "NOT_RUN",
+    "legacy_986_tiles_used_as_input": false,
+    "ab_batch_or_state_mutated": false,
+    "ab_autosend_activated": false,
+    "portainer_deployed": false
+  },
+  "guardrails": {
+    "queue_asset_blob_sha_before": "a2e427177dcc9d0f4e894fe1852e6a6c68bd29f5",
+    "resume_state_blob_sha_before": "dd35eb23a3f9ec93c1fce0d14fff2c5b9cb0bed9",
+    "older_artifacts_preserved": true,
+    "aspect_ratio_restoration_policy": "Allow different Korean width; preserve proportions and respect measured UI cell/UV safe region after independently verified source/clean plate.",
+    "unverified_mask_compositing": "PROHIBITED"
+  },
+  "unblock_requirements": [
+    "Acquire independent pinned complete original English HD PNG or exact source DDS / reviewable PSD, not the three legacy tiles.",
+    "Verify source bytes SHA256, source DDS path/platform, decoded readable orientation, dimensions and native pixel equivalence.",
+    "Verify exact English text and official Korean mapping, then review complete effect/glyph margins; reject any crop touching source boundary.",
+    "Only then run tools/localization/text_roi_source_pack.py with outrun-hd-text-roi-v1 spec into a separate test-only output directory.",
+    "Keep any future A/B ROI input index/state distinct and require user manual Portainer redeploy."
+  ]
+}
