@@ -14,6 +14,7 @@ constexpr bool full_game_empty_draw_contract() noexcept {
     // The real Draw precedes one or more successful empty Draws.
     if (!game.absorb_empty_source_draw(1u) ||
         !game.absorb_empty_source_draw(2u) ||
+        game.submitted != 1u || game.postDrawEmptySourceDraws != 2u ||
         game.depthDirection != 2u ||
         !game.accepts_full_seeded(3u, false)) return false;
     game.succeeded(true, true);
@@ -58,10 +59,12 @@ constexpr bool leading_game_empty_draw_contract() noexcept {
     if (game.first_draw() || !game.publishable_full(true, 3u) ||
         game.publishable_full(true, 2u) ||
         !game.absorb_empty_source_draw(3u, true) ||
+        game.submitted != 1u || game.postDrawEmptySourceDraws != 1u ||
         !game.publishable_full(true, 4u) ||
         game.absorb_empty_source_draw(5u, true)) return false;
     game.reset();
-    if (game.absorb_empty_source_draw(0u, false) ||
+    if (game.postDrawEmptySourceDraws != 0u ||
+        game.absorb_empty_source_draw(0u, false) ||
         game.publishable_full(true, 0u) ||
         !game.first_draw() ||
         !game.absorb_empty_source_draw(0u, true)) return false;

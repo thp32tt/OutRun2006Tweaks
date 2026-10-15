@@ -27,8 +27,10 @@ def integrated(b: str, h: str) -> bool:
             "if (!accepts_full(ordinal) ||" in h and
             "if (!sameSourceFullClear) return false;" in h and
             "std::uint32_t leadingEmptySourceDraws = 0u;" in h and
+            "std::uint32_t postDrawEmptySourceDraws = 0u;" in h and
             "!accepts_source_draw(ordinal, true)" in h and
-            "succeeded(false);" in h and
+            "++postDrawEmptySourceDraws;" in h and
+            "postDrawEmptySourceDraws = 0u;" in h and
             "++leadingEmptySourceDraws;" in h and
             "leadingEmptySourceDraws = 0u;" in h and
             "record_source_draw(ordinal);" in h)
@@ -37,13 +39,14 @@ assert integrated(bridge,batch), "empty game Draw must preserve source order onl
 for broken_bridge, broken_batch in (
     (bridge.replace("type >= D3DPT_POINTLIST && type <= D3DPT_TRIANGLEFAN",
                     "/* unchecked topology */", 1), batch),
-    (bridge.replace("s.frameBatch.absorb_empty_source_draw(sourceOrdinal)",
-                    "/* no source ordinal */", 1), batch),
+    (bridge.replace("sourceOrdinal, sameSourceFullClear))",
+                    "sourceOrdinal, /* missing clear proof */ false))", 1), batch),
     (bridge, batch.replace("if (!sameSourceFullClear) return false;",
                            "if (true) return false;", 1)),
-    (bridge, batch.replace("succeeded(false); // source ordinal only;",
-                           "/* no ordinal increment */ //", 1)),
+    (bridge, batch.replace("++postDrawEmptySourceDraws; // source order only;",
+                           "/* no post-GPU ordinal increment */ //", 1)),
 ):
+    assert (broken_bridge != bridge or broken_batch != batch), "stale destructive replacement"
     assert not integrated(broken_bridge, broken_batch), "destructive control escaped"
 assert "full_game_empty_draw_contract()" in probe
 assert "leading_game_empty_draw_contract()" in probe

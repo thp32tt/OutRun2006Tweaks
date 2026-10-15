@@ -2,9 +2,9 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00759",
   "production_id": "CONVERSION-DX11-00759",
-  "event_id": "CONVERSION-DX11-00759-E001",
-  "event_type": "dispatch",
-  "attempt": 1,
+  "event_id": "CONVERSION-DX11-00759-E003",
+  "event_type": "retry",
+  "attempt": 2,
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "AI2-ChatGPT2",
@@ -19,7 +19,7 @@
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
   "base_head_sha": "6fe46c683011a3a71003914de2f2dc154218dbef",
-  "material_result_sha": null,
+  "material_result_sha": "1ff91fc3a134632cc0edc53b3caaca1bb2fde709",
   "validation_bearing_result_sha": null,
   "changed_files": [
     "src/vr/d3d11/native_game_frame_batch.hpp",
@@ -28,7 +28,7 @@
     "tools/test_dx11_full_frame_empty_draw_00755.py",
     "docs/automation/runs/CONVERSION-DX11-00759.json"
   ],
-  "change_summary": "Accept real game zero-primitive Draws after verified TARGET Clear, before first nonempty native D3D11 Draw; retain source ordinal and same-device depth-clear continuity, preserve first RTV/DSV clear and D3D9/input fallback. Extend compiled constexpr and destructive source tests.",
+  "change_summary": "Keep real D3D9 full-clear seeded leading and trailing zero-primitive Draw source ordinals without incrementing actual native D3D11 GPU Draw count; preserve first RTV/DSV initialization, same-Present menu/vehicle/race source continuity and original DX9Ex/gamepad fallback. Repair stale destructive test mutations and canonical exact-SHA gate acceptance identifiers.",
   "feature_contract": {
     "feature_id": "DX11-MENU-RACE-LEADING-NOOP-DRAW-CONTINUITY",
     "goal": "Menu/vehicle/race can issue legitimate empty Draw/DrawIndexed between game Clear and first real Draw without preventing a complete native D3D11 full-frame, destroying first-draw clear, or altering D3D9 gamepad fallback.",
@@ -63,9 +63,11 @@
     "milestone_id": "full_resolution_native_game_frame",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
       "REAL_D3D9_CLEAR_AND_EMPTY_DRAW",
-      "NATIVE_D3D11_NONEMPTY_DRAW",
-      "SAME_PRESENT_FULL_FRAME"
+      "D3D11_NATIVE_DRAW",
+      "SAME_PRESENT_FULL_FRAME",
+      "VISIBLE_FRAME_OUTPUT"
     ],
     "visible_frame_acceptance": "Source-ordered native Clear/Draw/DrawIndexed is not prematurely aborted by verified leading no-op menu/race commands; runtime pixel proof deferred.",
     "activation_guard_and_fallback": "Original DX9Ex game Draw/Present/gamepad remains authoritative; optional native full-frame enabled only by diagnostic environment and fail-closed upon unsupported source.",
@@ -88,12 +90,12 @@
     }
   },
   "pipeline": {
-    "C0_RECOVER": "GitHub HEAD 6fe46c683011a3a71003914de2f2dc154218dbef, previous 00758 complete and claim released",
-    "C1_REVIEW": "Confirmed actual game no-op Draw before first nonempty forces abort despite seeded full TARGET Clear; blocked complete source continuity",
-    "C2_IMPLEMENT": "Native source stream + first-draw RTV/DSV preservation with read-only D3D9 fallback; targeted C++ and destructive tests",
-    "C3_VALIDATE": "PENDING exact-SHA five Actions",
-    "C4_COMMIT": "PENDING material SHA",
+    "C0_RECOVER": "Prior 00759 material HEAD 1ff91fc3a134632cc0edc53b3caaca1bb2fde709 had Backend Conversion Gate #38690201583 and DX11 Fast #38690201595 failures at mandatory live_game_draw_path acceptance; no runtime test.",
+    "C1_REVIEW": "Two confirmed issues: stale task acceptance stage identifiers; post-GPU zero-primitive D3D9 Draw incremented native submitted GPU counter, and destructive Python test targeted pre-00759 call syntax.",
+    "C2_IMPLEMENT": "Native batch now accounts post-GPU zero-primitive source ordinals separately from native Draw count, with constexpr and destructive source-order regression tests; repair feature path evidence without weakening validator.",
+    "C3_VALIDATE": "PENDING corrected material exact-SHA GitHub DX11 Fast/Backend/Windows/OpenXR/HUD gates.",
+    "C4_COMMIT": "Previously material SHA 1ff91fc3a134632cc0edc53b3caaca1bb2fde709; validation-bearing repair commit pending.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_CI"
+    "C6_STATE": "IMPLEMENTED_PENDING_EXACT_SHA_GATE; RUNTIME_VALIDATION=UNTESTED"
   }
 }

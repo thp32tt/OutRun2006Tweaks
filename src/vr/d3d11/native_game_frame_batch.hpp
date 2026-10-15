@@ -10,7 +10,8 @@ struct GameNativeFrameBatch {
         // Source ordinals include successful no-op game Draws before the
         // first GPU Draw. They must not suppress the first native RTV clear.
         const std::uint64_t consumed =
-            static_cast<std::uint64_t>(submitted) + leadingEmptySourceDraws;
+            static_cast<std::uint64_t>(submitted) + leadingEmptySourceDraws +
+            postDrawEmptySourceDraws;
         return !stopped && consumed < kMaxFullFrameDraws &&
             ordinal == consumed &&
             (!hasSourceDraw || lastSourceDraw + 1u == ordinal);
@@ -34,8 +35,8 @@ struct GameNativeFrameBatch {
     [[nodiscard]] constexpr bool publishable_full(
         bool pending, std::uint64_t sourceDraws) const noexcept {
         return publishable(pending) && hasSourceDraw &&
-            static_cast<std::uint64_t>(submitted) + leadingEmptySourceDraws ==
-                sourceDraws &&
+            static_cast<std::uint64_t>(submitted) + leadingEmptySourceDraws +
+                postDrawEmptySourceDraws == sourceDraws &&
             lastSourceDraw + 1u == sourceDraws;
     }
     // Game-created native Draws belong to their source D3D9 device. A
@@ -89,9 +90,12 @@ struct GameNativeFrameBatch {
                                  resettingDevice == lastPresentOwner);
     }
     std::uint32_t submitted = 0u;
-    // Exact successful source ordinals before the first nonempty game Draw.
+    // Exact successful source ordinals before the first nonempty GPU Draw.
     // Kept separate because the first real native Draw must still Clear RTV.
     std::uint32_t leadingEmptySourceDraws = 0u;
+    // After a real GPU Draw, D3D9 no-ops still consume source ordinals but
+    // must not inflate the number of actual native Draw/DrawIndexed calls.
+    std::uint32_t postDrawEmptySourceDraws = 0u;
     bool stopped = false;
     bool depthReady = false;
     // Full game Z-only Clear replaces DSV content without discarding RTV color.
@@ -150,7 +154,7 @@ struct GameNativeFrameBatch {
             if (!sameSourceFullClear) return false;
             ++leadingEmptySourceDraws;
         } else {
-            succeeded(false); // source ordinal only; retain depth direction.
+            ++postDrawEmptySourceDraws; // source order only; no D3D11 GPU submission.
         }
         record_source_draw(ordinal);
         return true;
@@ -204,6 +208,7 @@ struct GameNativeFrameBatch {
     constexpr void abort() noexcept { stopped = true; depthClearPending = false; }
     constexpr void reset() noexcept {
         submitted = 0u; leadingEmptySourceDraws = 0u;
+        postDrawEmptySourceDraws = 0u;
         stopped = false; depthReady = false;
         depthClearPending = false; depthClearValue = 1.0f;
         depthDirection = 0u;
