@@ -1,0 +1,120 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00764",
+  "production_id": "CONVERSION-DX11-00764",
+  "event_id": "CONVERSION-DX11-00764-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_FRAME_SCISSOR_CLIPPED_SOURCE_CONTINUITY",
+  "feature_id": "DX11-FULL_FRAME_SCISSOR_CLIPPED_SOURCE_CONTINUITY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "16b46feaaf28abd85837e16c4294db6275134ad0",
+  "source_implementation_sha": "265af1ca955beeea9432c2219ffa996e69be0bed",
+  "material_result_sha": "2b2e23995af4f0ec7dbdc232d748417e859f06c5",
+  "validation_bearing_result_sha": "2b2e23995af4f0ec7dbdc232d748417e859f06c5",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_scissor_clip.hpp",
+    "tools/dx11_game_clipped_draw_00764.cpp",
+    "tools/test_dx11_game_clipped_draw_00764.py",
+    "tools/test_dx11_full_frame_empty_draw_00755.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "change_summary": "Admit only actual D3D9 game Draw/DrawIndexed calls with an enabled, valid, provably fully disjoint scissor as no-pixel native source ordinals across menu/vehicle/race frames; preserve full-Clear source ownership, native submission counts, original D3D9 Draw/Present/gamepad and unsupported/failure fallback.",
+  "feature_contract": {
+    "feature_id": "DX11-FULL_FRAME_SCISSOR_CLIPPED_SOURCE_CONTINUITY",
+    "goal": "Keep full-resolution native D3D11 frame source contiguous across provably zero-pixel game-scissored Draw and DrawIndexed while retaining DX9Ex fallback and real gamepad input.",
+    "acceptance_items": [
+      {
+        "id": "game-scissor-empty-draw-source-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_d3d9_game_Draw_DrawIndexed_native_full_frame",
+        "expected_behavior": "Disjoint scissor source call consumes exactly one successful D3D9 ordinal, no fabricated native GPU draw, valid same-Present full-frame native publication."
+      },
+      {
+        "id": "unproved-scissor-native-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "game_menu_vehicle_race_original_d3d9",
+        "expected_behavior": "Overlapping, malformed, disabled, failed-query and unseeded draws do not skip ordinary native validation; source D3D9/gamepad unchanged."
+      },
+      {
+        "id": "five-workflows-exact-result-sha",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub_dx11_fast_backend_build_openxr_hud",
+        "expected_behavior": "Exactly the same source-bearing result commit passes the five required GitHub Actions gates."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "game-scissor-empty-draw-source-continuity": "PASS",
+    "unproved-scissor-native-fallback": "PASS",
+    "five-workflows-exact-result-sha": "PASS_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "D3D9_SCISSOR_CLIPPED_DRAW",
+      "EXACT_NATIVE_SOURCE_ORDINAL",
+      "D3D11_DRAW_OR_NO_GPU_SUBMISSION",
+      "SAME_PRESENT_FULL_FRAME",
+      "D3D9_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Portable C++ and exact-SHA GitHub Windows gates; Quest3/VDXR menu/vehicle/race observation not yet performed.",
+    "activation_guard_and_fallback": "Explicit OUTRUN_DX11_FULL_GAME_FRAME opt-in; no change to original D3D9 Draw HRESULT, Present or gamepad. Unsupported states follow ordinary native fail-closed path.",
+    "conflict_keys": [
+      "DX11:FULL_FRAME_SCISSOR_CLIPPED_SOURCE_CONTINUITY"
+    ]
+  },
+  "pipeline": {
+    "C0_RECOVER": "Authenticated branch latest HEAD, AGENTS.md, DX11_AUTODEV_EXECUTION_POLICY and prior 00763 native alpha/depth changes.",
+    "C1_REVIEW": "Proved an entirely viewport-disjoint enabled D3D9 game scissor produces zero pixels but native supported_game_state rejected it, breaking full frame Draw/DrawIndexed source continuity.",
+    "C2_IMPLEMENT": "Actual full-mode D3D9 observer wired to checked no-pixel scissor predicate and exact no-op source ordinal absorber; independent portable C++ and destructive Python integration tests.",
+    "C3_VALIDATE": "DX11 Fast 38707511331, Backend 38707511325 (validate and smoke), Build 38707518605, OpenXR 38707518600, HUD 38707518593 all SUCCESS at exact source-bearing SHA.",
+    "C4_COMMIT": "Source material 265af1ca955beeea9432c2219ffa996e69be0bed; source/test validation-bearing 2b2e23995af4f0ec7dbdc232d748417e859f06c5; non-force GitHub updates, no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED; only after real Quest3/VDXR verification.",
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA; RUNTIME_VALIDATION=UNTESTED, NEED_HMD_TEST"
+  },
+  "evidence": {
+    "validation_sha": "2b2e23995af4f0ec7dbdc232d748417e859f06c5",
+    "required_actions": {
+      "dx11_fast": {
+        "run_id": 38707511331,
+        "conclusion": "success"
+      },
+      "backend_conversion": {
+        "run_id": 38707511325,
+        "conclusion": "success",
+        "jobs": [
+          "validate",
+          "DX11 readiness smoke probes"
+        ]
+      },
+      "windows_build": {
+        "run_id": 38707518605,
+        "conclusion": "success"
+      },
+      "openxr": {
+        "run_id": 38707518600,
+        "conclusion": "success"
+      },
+      "hud_inspector": {
+        "run_id": 38707518593,
+        "conclusion": "success"
+      }
+    },
+    "runtime_validation": "UNTESTED",
+    "source_only_limit": "No real Quest3/VDXR HMD, game image, or controller device exercise; hardware deployment/promotion not confirmed."
+  }
+}
