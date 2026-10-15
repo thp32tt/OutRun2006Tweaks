@@ -126,7 +126,7 @@ def _filemap(source_row, ordinal, src, original):
     from PIL import Image
     p = Path(src).resolve()
     filename = source_row["imagegen_input_png"]
-    if Path(filename).name != filename or not re.fullmatch(r"[A-Za-z0-9_.-]+\\.png", filename):
+    if Path(filename).name != filename or not re.fullmatch(r"[A-Za-z0-9_.-]+\.png", filename):
         raise ValueError("ROI_UNSAFE_IMAGE_FILENAME")
     srcpath = p / filename
     if not srcpath.is_file() or srcpath.is_symlink() or not srcpath.resolve().is_relative_to(p):
