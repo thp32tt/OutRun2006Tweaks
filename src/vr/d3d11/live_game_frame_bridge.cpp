@@ -33,6 +33,7 @@
 #include "native_game_dirty_region.hpp"
 #include "native_game_readback_provenance.hpp"
 #include "native_game_present_region.hpp"
+#include "native_game_partial_dirty_upload.hpp"
 #include "native_game_clear_color.hpp"
 #include "native_game_clear_coverage.hpp"
 #include "native_game_full_color_depth.hpp"
@@ -5197,6 +5198,20 @@ void before_game_present(IDirect3DDevice9* game,
         const bool croppedNativeUpload = fullMode && backbufferKnown &&
             presentRegion.partial_backbuffer_source(presentDesc.Width, presentDesc.Height) &&
             (!dirtyRegion || fullDirtyCoverage || provenCroppedDirty);
+        // A verified single partial dirty region carries a complete native
+        // game frame only into pixels visible in D3D9 Present's source crop.
+        const auto partialDirty = GameNativePartialDirtyUpload::select(
+            presentDesc.Width, presentDesc.Height, presentRegion,
+            oneBoundedDirtyRect ? dirtyRegion->rdh.nCount : 0u,
+            oneBoundedDirtyRect ? dirtyRegion->rdh.nRgnSize : 0u,
+            oneBoundedDirtyRect ? dirtyRegion->rdh.rcBound.left : 0,
+            oneBoundedDirtyRect ? dirtyRegion->rdh.rcBound.top : 0,
+            oneBoundedDirtyRect ? dirtyRegion->rdh.rcBound.right : 0,
+            oneBoundedDirtyRect ? dirtyRegion->rdh.rcBound.bottom : 0,
+            dirtyRect.left, dirtyRect.top, dirtyRect.right, dirtyRect.bottom);
+        const bool partialNativeUpload = fullMode && backbufferKnown &&
+            oneBoundedDirtyRect && !fullDirtyCoverage && !croppedNativeUpload &&
+            partialDirty.valid;
         if (!s.previousOutput.same(outputNow)) {
             // Also reject earlier GPU readbacks if the Present backbuffer COM identity
             // changed while the device, dimensions and format stayed identical.
@@ -5228,7 +5243,8 @@ void before_game_present(IDirect3DDevice9* game,
         const bool outputWritable = outputNow.valid() && nativeExtentMatches &&
             (((!outputNow.hasDirtyRegion || fullDirtyCoverage) &&
               (fullMode ? fullPlacement.valid : insetPlacement.valid)) ||
-             (croppedNativeUpload && fullPlacement.valid)) &&
+             (croppedNativeUpload && fullPlacement.valid) ||
+             (partialNativeUpload && fullPlacement.valid)) &&
             bb.MultiSampleType == D3DMULTISAMPLE_NONE &&
             (bb.Format == D3DFMT_A8R8G8B8 ||
              bb.Format == D3DFMT_X8R8G8B8);
@@ -5472,7 +5488,16 @@ void before_game_present(IDirect3DDevice9* game,
                                                 static_cast<std::uint32_t>(presentRegion.top),
                                                 static_cast<std::uint32_t>(presentRegion.right),
                                                 static_cast<std::uint32_t>(presentRegion.bottom))
-                                            : GameNativeFrameUpload::copy_rows(
+                                            : partialNativeUpload
+                                             ? GameNativeFrameUpload::copy_rect(
+                                                 lockRect.pBits, lockRect.Pitch,
+                                                 mapped.pData, mapped.RowPitch,
+                                                 surfaceWidth, surfaceHeight,
+                                                 static_cast<std::uint32_t>(partialDirty.source.left),
+                                                 static_cast<std::uint32_t>(partialDirty.source.top),
+                                                 static_cast<std::uint32_t>(partialDirty.source.right),
+                                                 static_cast<std::uint32_t>(partialDirty.source.bottom))
+                                             : GameNativeFrameUpload::copy_rows(
                                                 lockRect.pBits, lockRect.Pitch,
                                                 mapped.pData, mapped.RowPitch,
                                                 surfaceWidth, surfaceHeight));
@@ -5500,12 +5525,22 @@ void before_game_present(IDirect3DDevice9* game,
                                             destination.x = uploadSourceCrop.left;
                                             destination.y = uploadSourceCrop.top;
                                         }
-                                        // Restrict the GPU upload to the exact
+                                        const RECT partialSourceUpload{
+                                             static_cast<LONG>(partialDirty.source.left),
+                                             static_cast<LONG>(partialDirty.source.top),
+                                             static_cast<LONG>(partialDirty.source.right),
+                                             static_cast<LONG>(partialDirty.source.bottom)};
+                                         if (partialNativeUpload) {
+                                             destination.x = partialSourceUpload.left;
+                                             destination.y = partialSourceUpload.top;
+                                         }
+                                         // Restrict the GPU upload to the exact
                                         // dirty source crop. The other backbuffer
                                         // pixels retain the original D3D9 scene.
                                         if (SUCCEEDED(game->UpdateSurface(
                                                 s.insetSurface.Get(),
-                                                croppedNativeUpload ? &uploadSourceCrop : nullptr,
+                                                partialNativeUpload ? &partialSourceUpload :
+                                                     (croppedNativeUpload ? &uploadSourceCrop : nullptr),
                                                 back.Get(), &destination))) {
                                             ++s.visible;
                                             if (!s.logged) {
