@@ -1,0 +1,98 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00909",
+  "production_id": "CONVERSION-DX9EX-00909",
+  "event_id": "CONVERSION-DX9EX-00909-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00909",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "NEEDS_VALIDATION",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "64881d8d35387c75edf9eef76b33fc25dc397611",
+  "material_result_sha": "4a4cbef6514d0276cde1602d1ca799a3cd45fbbd",
+  "source_paths": [
+    "src/hooks_uiscaling.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00909.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve complete stage-extension +TIME sprite and numeric glyph ownership from six original calls through queued SpriteNodes, batched D3DX GPU submission and R84 stereo eye composition without assigning stale or unrelated sprites to finite screen HUD.",
+    "scope_boundary": "Only exact original +TIME StageExtensionTime producer queue-tail integrity in src/hooks_uiscaling.cpp. Keep rank, GOAL, regular HUD, D3DX sprite batching, FFB/input, SkyGlow, R26_SAFE rollback, DX11 and DXVK untouched.",
+    "trace_stages": [
+      "Original EXE three 0x989xx sprite and three numeric extension E8 calls bracket queue tails and immediate D3DX glyphs.",
+      "The six original StageExtensionEnter/Leave wrappers attach ScreenHud producer tokens to appended SpriteNodes, whose queue membership must be confirmed before reading old tails.",
+      "R84 queue semantics and R30 HUD or fixed-function XYZRHW/D3DX submission pass exact producer identity to physical per-eye stereo, with final HMD judgement separate."
+    ],
+    "subcomponents": [
+      "Guard the six original +TIME calls against stale pre-call SpriteNode tails after nested queue reset/rebuild, preserving legitimate new sibling tags.",
+      "Keep original producer lifetime, direct D3DX batch exit, queue selection and GOAL/other HUD guards unchanged; test positive append, empty queue, orphaned tail, unchanged tail and bounded traversal."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_queue_provenance",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original six +TIME producers and SpriteNode queue",
+        "expected_behavior": "New +TIME sprite siblings retain StageExtensionTime/ScreenHud ownership only when the old pre-call tail and new queue tail are reachable in the same bounded live queue."
+      },
+      {
+        "id": "unrelated_hud_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Ordinary HUD/rank/GOAL and direct D3DX ownership",
+        "expected_behavior": "Orphaned tail is never dereferenced or used to tag unrelated sprites; non-Stage tag path remains fast, original numeric D3DX batch boundary and other HUD/GOAL tags remain unchanged."
+      },
+      {
+        "id": "exact_sha_build",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 DX9Ex game host package and mandatory exact SHA validation",
+        "expected_behavior": "Verify current validation-bearing SHA across DX9Ex Active, Domain Isolation, Full Source Impact and HUD Inspector without CI skips; Quest3/VDXR optics remain untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "stage_queue_provenance": "PORTABLE_CPP17_STATIC_ASSERT_PASS",
+    "unrelated_hud_fallback": "SOURCE_PATH_REVIEWED",
+    "exact_sha_build": "PENDING"
+  },
+  "diagnosis": {
+    "root_cause": "Original post-call TagAppendedNodes dereferenced a previously captured SpriteNode tail without first confirming it remained in the current priority queue; a nested rebuild could orphan the pointer.",
+    "source_trace": [
+      "StageExtensionEnter snapshots all priority tail pointers before each exact E8 source call.",
+      "StageExtensionLeave originally dereferenced before[prio]->next_0 when a different tail was observed.",
+      "The bounded StageFirstAppendedNode now searches the live chain before obtaining the first new node and leaves ordinary HUD/rank producers on their original fast path."
+    ],
+    "alternatives_rejected": [
+      "Global D3DX flush would disturb unrelated batch order and does not repair a stale queued SpriteNode pointer.",
+      "Changing generic world, projected billboard or SkyGlow classification would not validate a source queue tail and risks stereo regressions."
+    ],
+    "fix_evidence": "C++ source committed on GitHub: initial d1fdef6b, follow-on 4a4cbef; constexpr true/false queue fixture compiled successfully locally as a standalone C++17 test.",
+    "negative_test_evidence": "Orphaned old tail, unchanged tail and insufficient traversal bound return no new tag without dereferencing the stale pointer.",
+    "eye_ownership": "Only genuine StageExtensionTime tagged nodes may receive finite ScreenHud stereo routing; effect of this patch on actual Quest3 binocular +TIME visuals is untested."
+  },
+  "ci_evidence": {
+    "source_commit": "4a4cbef6514d0276cde1602d1ca799a3cd45fbbd",
+    "initial_material_sha": "d1fdef6b24d89077d14bf221890b428181a1ff53",
+    "initial_failures": [
+      "DX9Ex Active policy failed because exact run JSON was not yet committed.",
+      "HUD Inspector visual composition test assumed the older direct TagAppendedNodes syntax; follow-on source commit preserves original exact producer call and semantics."
+    ],
+    "validation_bearing_result_sha": null,
+    "status": "PENDING_EXACT_SHA"
+  },
+  "runtime_evidence": "No actual Quest3/VDXR HMD or game screen tested; no confirmed visual resolution, FPS gain or new accepted package.",
+  "score_delta_this_attempt": 0,
+  "score_once": false,
+  "hold_reason": "Required exact SHA CI and Quest3/VDXR optics pending; no repeat score without demonstrated functional success."
+}
