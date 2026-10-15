@@ -10,10 +10,10 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "SOURCE_IMPLEMENTED_NEEDS_CI",
+  "status": "SOURCE_IMPLEMENTED_CI_REPAIR",
   "phase": "C5_VALIDATE",
   "checkpoint": "C5_EXACT_SHA_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "automation_validation": "FIRST_CANDIDATE_FAILED_REVALIDATING",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "98d627d3bd8aaa852692e8d7e50434dfc5f1c12e",
@@ -26,7 +26,8 @@
   "changed_files": [
     "src/vr/game/outrun_renderer.cpp",
     "src/vr/game/lens_centre_partial_wvp.hpp",
-    "docs/automation/runs/CONVERSION-DX9EX-00897.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00897.json",
+    "tools/verify_dx9ex_gpu_visual_20261014.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
@@ -99,6 +100,14 @@
     ],
     "portable_cpp17_smoke": "PASS",
     "exact_sha": "PENDING",
-    "runtime": "UNTESTED"
+    "runtime": "UNTESTED",
+    "failed_first_candidate": {
+      "run_id": 38734530311,
+      "job_id": 116420338048,
+      "conclusion": "failure",
+      "reason": "VERIFIER_MUTATION_WRONG_OCCURRENCE",
+      "cause": "First-occurrence mutation targeted new exact C993 split-upload guard instead of original aux/render-target early return."
+    },
+    "verifier_repair": "Anchor target-owner negative mutation to the actual early-return if condition. No weakening of canonical branch assertions or domain gate."
   }
 }

@@ -57,7 +57,10 @@ assert "return TargetIsBackBuffer() && !AnyAuxRenderTargetActive();" in r23
 verify(g, r, u, s, f)
 for name, gg, rr in (
     ("aux/owner", g, r.replace("!OutRunVRStereo::R23GameWvpTargetEligible()", "false", 1)),
-    ("target owner", g, r.replace("R23GameWvpTargetEligible()", "WrongTargetOwner()", 1)),
+    # Keep this mutation pinned to the actual early-return owner branch,
+    # not the independent exact C993 split-WVP gating expression.
+    ("target owner", g, r.replace("if (!OutRunVRStereo::R23GameWvpTargetEligible())",
+                                  "if (WrongTargetOwner())", 1)),
     ("centre", g.replace("ScopedRenderSemantic centreDrawScope(", "ScopedRenderSemantic lostScope(", 1), r),
     ("MAG", g.replace("if (ctx.edi == D3DSAMP_MINFILTER)\n\t\t\tctx.esi",
                        "if (ctx.edi == D3DSAMP_MINFILTER || ctx.edi == D3DSAMP_MAGFILTER)\n\t\t\tctx.esi", 1), r),
