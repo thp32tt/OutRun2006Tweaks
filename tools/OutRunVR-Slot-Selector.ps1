@@ -6,7 +6,8 @@ $selector=Join-Path $root 'Select-OutRunVRBackend.ps1'
 $runner=Join-Path $root 'Run-OutRunVRTest.ps1'
 
 $slots=[ordered]@{
-    'CURRENT_FOCUS'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='CURRENT FOCUS / CORRECTNESS';Help='최신 통합본. 기본 시점/월드/HUD 전체 확인.'}
+    'CURRENT_FOCUS'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='CURRENT FOCUS / CORRECTNESS';Help='기존 R26+HUD 성능·화질 개선 보호 기준.'}
+    'R84_TEST'=[ordered]@{Backend='d3d9';Profile='CORRECTNESS';Title='R84 TEST / R29-R33 (실험)';Help='독립 렌더러 실기 비교. Quest3 미검증; CURRENT FOCUS로 원복.'}
     'A_CONTROL'=[ordered]@{Backend='d3d9';Profile='CONTROL';Title='A CONTROL / R51 기준';Help='R51 보호 기준 비교.'}
     'B_HUD'=[ordered]@{Backend='d3d9';Profile='HUD_SCREEN';Title='B HUD';Help='6th/6, YES/NO, 시간/랭크 HUD 확인.'}
     'C_FLARE'=[ordered]@{Backend='d3d9';Profile='HUD_WORLD';Title='C FLARE / WORLD';Help='렌즈 플레어/월드 마커 producer 진단.'}
@@ -132,8 +133,10 @@ foreach($slot in $slots.Keys){
     # Enable a button only when its *effective* payload can actually launch.
     $slotPath=Join-Path $root ("slots/"+$slot)
     $backendPath=Join-Path $root 'backends/d3d9'
-    $effectivePath=if($cfg.Backend -eq 'd3d9') {
-        # Same canonical payload the backend selector installs for ALL DX9Ex slots.
+    $effectivePath=if($cfg.Backend -eq 'd3d9' -and $slot -eq 'R84_TEST') {
+        $slotPath
+    } elseif($cfg.Backend -eq 'd3d9') {
+        # Canonical R26 baseline for HUD and performance comparisons.
         $backendPath
     } elseif(Test-Path $slotPath) {
         $slotPath
