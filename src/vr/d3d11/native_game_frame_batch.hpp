@@ -124,6 +124,20 @@ struct GameNativeFrameBatch {
         lastSourceDraw = ordinal;
         hasSourceDraw = true;
     }
+    // D3D9 may successfully submit a zero-primitive Draw between menu,
+    // vehicle and race draws. It writes no pixels, but is still an observed
+    // game command: consume its exact source ordinal without dispatching
+    // a fabricated D3D11 draw or resetting the native color/depth target.
+    // Only an ALREADY established native scene may absorb the empty call;
+    // a leading empty call cannot fabricate the required color Clear seed.
+    [[nodiscard]] constexpr bool absorb_empty_source_draw(
+        std::uint64_t ordinal) noexcept {
+        if (!hasSourceDraw || !accepts_full(ordinal) ||
+            !accepts_source_draw(ordinal, true)) return false;
+        succeeded(false); // source ordinal only; retain depth direction.
+        record_source_draw(ordinal);
+        return true;
+    }
     // Whole game TARGET then separate whole ZBUFFER Clear can initialize DSV
     // before the first native Draw/DrawIndexed. Never cross an unsupported
     // source Draw or a stopped/partial/foreign game scene.

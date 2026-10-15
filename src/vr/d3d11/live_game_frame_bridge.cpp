@@ -4765,6 +4765,18 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         const bool fullMode = env_full_game_opt_in();
         if (!observe_source_frame_mode(s, fullMode)) return;
         const bool multiBatch = fullMode || env_batch_opt_in();
+        // A successful zero-primitive game Draw changes no target pixels.
+        // After at least one real native Draw, keep its position in the
+        // full-size menu/car/race source stream rather than discarding the
+        // entire frame as an unsupported topology. Never invent a native
+        // Draw, accept unknown primitive types, or rescue an unseeded scene.
+        // observe_failed_game_draw() still aborts if D3D9 returned failure.
+        if (fullMode && primitives == 0u &&
+            type >= D3DPT_POINTLIST && type <= D3DPT_TRIANGLEFAN) {
+            if (!s.frameBatch.absorb_empty_source_draw(sourceOrdinal))
+                s.frameBatch.abort();
+            return;
+        }
         UINT expectedElements = 0;
         if (!game_native_primitive_element_count(
                 static_cast<std::uint32_t>(type), primitives, expectedElements)) {
