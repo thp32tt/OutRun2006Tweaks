@@ -14,14 +14,14 @@ services:
     environment:
       TZ: Asia/Seoul
       CONTROLLER_MODE: "localization"
-      AUTO_SEND: "true"
+      AUTO_SEND: "false" # 2026-10-16 user emergency PAUSE, no auto-send
       # Existing A/B native ImageGen slots unchanged; C text-only salvage at :03/:33.
-      SCHEDULE_MINUTES: "0,3,5,10,15,20,25,30,33,35,40,45,50,55"
+      SCHEDULE_MINUTES: "3,33" # C-only reserved; AUTO_SEND=false, no automatic tasks
       CHAT_SLOTS: "3"
       OUTRUN_A_SINGLE_SMOKE_TASK_ID: ""
       OUTRUN_A_TILE_BATCH_QUEUE: "false" # Legacy A-only queue is retained, not used.
       OUTRUN_AB_BATCH_QUEUE: "false"
-      OUTRUN_AB_TEXT_ROI_QUEUE: "true"
+      OUTRUN_AB_TEXT_ROI_QUEUE: "false" # stop A/B ImageGen dispatch
       OUTRUN_AB_BATCH_SIZE: "5"
       OUTRUN_AB_LIBRARY_FOLDER: "아웃런 한글화 신규" # Existing project Library; no separate folder.
       OUTRUN_AB_PROJECT_LIBRARY_NAME: "아웃런 한글화 신규"
