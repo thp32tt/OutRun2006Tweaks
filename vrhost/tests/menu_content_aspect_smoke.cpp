@@ -1,6 +1,19 @@
 #include "runtime/menu_content_aspect.hpp"
+#include "vr/ui/ui_side_spacing.hpp"
 #include <cmath>
 #include <limits>
+
+// Original game HUD side spacing must use the SAME 4:3 min-axis
+// containment as the menu sprite renderer on portrait VDXR eye sizes.
+// Preserve the existing 16:9 and 21:9 OnlineArcade rail widths.
+using OutRunVrUiAspect::ContainedSidePaddingPixels;
+static_assert(ContainedSidePaddingPixels(1920.f, 640.f, 3.f, 2.25f) == 240.f);
+static_assert(ContainedSidePaddingPixels(3440.f, 640.f, 5.375f, 3.f) == 760.f);
+static_assert(ContainedSidePaddingPixels(2064.f, 640.f, 3.225f, 4.6f) == 0.f);
+static_assert(ContainedSidePaddingPixels(2496.f, 640.f, 3.9f, 5.4f) == 0.f);
+// Invalid or narrow dimensions cannot manufacture a negative padding.
+static_assert(ContainedSidePaddingPixels(0.f, 640.f, 1.f, 1.f) == 0.f);
+static_assert(ContainedSidePaddingPixels(1024.f, 640.f, 2.f, 2.f) == 0.f);
 
 using OutRunVrMenuAspect::PlanCenteredContent;
 using OutRunVrMenuAspect::ShouldCropConfiguredMenu;

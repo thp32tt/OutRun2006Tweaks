@@ -4,6 +4,7 @@
 #include "vr/game/render_semantics.hpp"
 #include "vr/game/rank_marker_fraction.hpp"
 #include "vr/hud_semantics.hpp"
+#include "vr/ui/ui_side_spacing.hpp"
 
 #include <algorithm>
 #include <array>
@@ -1403,7 +1404,22 @@ class UIScaling : public Hook
 		ScalingMode mode = ScalingMode(Settings::UIScalingMode.get());
 		if (mode == ScalingMode::OnlineArcade && ScalingType != SpriteScaleType::Disabled)
 		{
-			float spacing = -((Game::screen_scale->y * Game::original_resolution.x) - Game::screen_resolution->x) / 2;
+			// In portrait XR the original height-based padding goes negative:
+			// sy*640 can exceed the eye width (e.g. 2944 > 2064). Use
+			// the SAME min-axis containment as the sprite renderer so only
+			// a genuine free horizontal side rail can move OnlineArcade HUD.
+			if (!Game::screen_scale || !Game::screen_resolution ||
+				!std::isfinite(Game::screen_resolution->x) ||
+				!std::isfinite(Game::screen_scale->x) ||
+				!std::isfinite(Game::screen_scale->y) ||
+				Game::screen_scale->x <= 1.0e-6f ||
+				Game::screen_scale->y <= 1.0e-6f)
+				return;
+			const float spacing = OutRunVrUiAspect::ContainedSidePaddingPixels(
+				Game::screen_resolution->x, Game::original_resolution.x,
+				Game::screen_scale->x, Game::screen_scale->y);
+			if (!std::isfinite(spacing))
+				return;
 
 			// Space out the UI elements if they're on the sides of the screen
 			float* m = *Module::exe_ptr<float*>(0x49B564);
@@ -1570,8 +1586,23 @@ class UIScaling : public Hook
 		if (mode != ScalingMode::OnlineArcade)
 			return;
 
-		float spacing = -((Game::screen_scale->y * Game::original_resolution.x) - Game::screen_resolution->x) / 2;
-		spacing = spacing / Game::screen_scale->x;
+		// The producer's integer/float X is in original UI coordinates.
+		// Never apply a negative "widescreen" rail on a portrait XR eye:
+		// it otherwise pushes the right speed/gear/goal groups inward and
+		// defeats the exact R30 peripheral visibility/scale gates.
+		if (!value || !Game::screen_scale || !Game::screen_resolution ||
+			!std::isfinite(Game::screen_resolution->x) ||
+			!std::isfinite(Game::screen_scale->x) ||
+			!std::isfinite(Game::screen_scale->y) ||
+			Game::screen_scale->x <= 1.0e-6f ||
+			Game::screen_scale->y <= 1.0e-6f)
+			return;
+		float spacing = OutRunVrUiAspect::ContainedSidePaddingPixels(
+			Game::screen_resolution->x, Game::original_resolution.x,
+			Game::screen_scale->x, Game::screen_scale->y);
+		spacing /= Game::screen_scale->x;
+		if (!std::isfinite(spacing))
+			return;
 
 		// round our spacing value to nearest if this is integer, fixes REV indicator light being slightly offset
 		if constexpr (std::is_integral_v<T>)
