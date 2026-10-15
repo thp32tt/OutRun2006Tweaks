@@ -4435,6 +4435,26 @@ namespace OutRunVRStereo
             return true;
         }
 
+        // Mirror R9's exact RT/viewport/WVP restore order while omitting only
+        // the provably redundant null-depth setter. On any uncertain state,
+        // callers use the original complete R29/R9 restoration unchanged.
+        inline bool R30RestoreDepthlessRightPassState(
+            IDirect3DDevice9* device, IDirect3DSurface9* savedRt,
+            const D3DVIEWPORT9& savedViewport,
+            const float* originalConstants, bool restoreWvp) noexcept
+        {
+            bool ok = true;
+            if (savedRt && FAILED(R29OwnerCallOriginalSetRenderTarget(
+                    device, 0u, savedRt)))
+                ok = false;
+            if (FAILED(device->SetViewport(&savedViewport)))
+                ok = false;
+            if (restoreWvp &&
+                !R29OwnerSetWvpOneRegisterAtATime(device, originalConstants))
+                ok = false;
+            return ok;
+        }
+
         template <typename LeftDraw, typename RightDraw>
         HRESULT R30ExecuteXyzrhwStereo(
             IDirect3DDevice9* device, const R30XyzrhwState& state,
@@ -4468,6 +4488,11 @@ namespace OutRunVRStereo
             const auto frame = R29OwnerCaptureFrameSnapshot();
             IDirect3DSurface9* savedRt = R29OwnerBorrowTrackedRenderTarget();
             IDirect3DSurface9* savedDepth = frame.trackedDepthStencil;
+            // R33's proven depthless guard also applies to this R30-owned
+            // stereo draw: live setter/StateBlock coverage and a null tracked
+            // depth attachment must both hold. Unknown state never bypasses.
+            const bool depthlessPass = savedDepth == nullptr &&
+                OutRunVR::State::StateBlockTracker::Reliable();
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
@@ -4476,9 +4501,9 @@ namespace OutRunVRStereo
                 R30ScopedInternalPass guard;
                 rightHr = R29OwnerCallOriginalSetRenderTarget(
                     device, 0u, frame.rightEyeSurface);
-                if (SUCCEEDED(rightHr))
+                if (SUCCEEDED(rightHr) && !depthlessPass)
                     rightHr = R29OwnerCallOriginalSetDepthStencilSurface(
-                        device, frame.trackedDepthStencil ? frame.rightEyeDepth : nullptr);
+                        device, savedDepth ? frame.rightEyeDepth : nullptr);
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&state.viewport);
                 if (SUCCEEDED(rightHr))
@@ -4487,8 +4512,11 @@ namespace OutRunVRStereo
                         OutRunVR::StereoFailureRightDrawFailed;
                     rightHr = rightDraw();
                 }
-                restoreOk = R29OwnerRestoreRightPassState(device,
-                    savedRt, savedDepth, state.viewport, nullptr, false);
+                restoreOk = depthlessPass
+                    ? R30RestoreDepthlessRightPassState(
+                        device, savedRt, state.viewport, nullptr, false)
+                    : R29OwnerRestoreRightPassState(
+                        device, savedRt, savedDepth, state.viewport, nullptr, false);
             }
 
             R29OwnerNoteStableTwoEyeDraw();
@@ -5558,6 +5586,11 @@ namespace OutRunVRStereo
             frame = R29OwnerCaptureFrameSnapshot();
             IDirect3DSurface9* savedRt = R29OwnerBorrowTrackedRenderTarget();
             IDirect3DSurface9* savedDepth = frame.trackedDepthStencil;
+            // R33's proven depthless guard also applies to this R30-owned
+            // stereo draw: live setter/StateBlock coverage and a null tracked
+            // depth attachment must both hold. Unknown state never bypasses.
+            const bool depthlessPass = savedDepth == nullptr &&
+                OutRunVR::State::StateBlockTracker::Reliable();
             HRESULT rightHr = D3D_OK;
             OutRunVR::StereoFailureReason rightFailure =
                 OutRunVR::StereoFailureRightStateFailed;
@@ -5566,10 +5599,10 @@ namespace OutRunVRStereo
                 R30ScopedInternalPass guard;
                 rightHr = R29OwnerCallOriginalSetRenderTarget(
                     device, 0u, frame.rightEyeSurface);
-                if (SUCCEEDED(rightHr))
+                if (SUCCEEDED(rightHr) && !depthlessPass)
                 {
                     rightHr = R29OwnerCallOriginalSetDepthStencilSurface(
-                        device, frame.trackedDepthStencil ? frame.rightEyeDepth : nullptr);
+                        device, savedDepth ? frame.rightEyeDepth : nullptr);
                 }
                 if (SUCCEEDED(rightHr))
                     rightHr = device->SetViewport(&savedViewport);
@@ -5585,8 +5618,11 @@ namespace OutRunVRStereo
                     rightFailure = OutRunVR::StereoFailureRightDrawFailed;
                     rightHr = actualDraw();
                 }
-                restoreOk = R29OwnerRestoreRightPassState(device, savedRt, savedDepth,
-                    savedViewport, original, true);
+                restoreOk = depthlessPass
+                    ? R30RestoreDepthlessRightPassState(
+                        device, savedRt, savedViewport, original, true)
+                    : R29OwnerRestoreRightPassState(
+                        device, savedRt, savedDepth, savedViewport, original, true);
             }
 
             R29OwnerRecordHudStereoDuplicate();
