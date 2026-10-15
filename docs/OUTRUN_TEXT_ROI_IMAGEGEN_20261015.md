@@ -33,3 +33,36 @@
 Existing active A/B controller `ab_batch_queue.py` still reads 986 old tiles. **Do not redeploy or invoke that legacy source queue as the new workflow**. A/B automatic dispatch must migrate to a distinct new ROI manifest/state (not reinterpret legacy 1..986 ordinals). Production sends must remain paused until the ROI staging manifest is verified and the controller is explicitly enabled for this source mode. Changes to GitHub docs/code alone do not update Portainer: user performs manual Pull/redeploy and validates attached PNGs and ChatGPT project identity.
 
 Historical C-SALVAGE full-atlas reassembly and legacy ImageGen tiles are archived/reference only; new C work priority is full-image source -> text ROI extraction -> A/B ImageGen -> independent QA. The controller third tab must not call ImageGen or steal A/B state.
+
+## 2026-10-15 staged full-HD inventory and controller connection
+
+The older `ALL_TILE_MAPPING.csv` is **never** a direct ImageGen input.
+For missing native full PNG backups, C-SALVAGE checked all 986 *English*
+source tile SHA256/coverage/original atlas dimensions and assembled the
+complete English PNGs as intermediate recovery data. The results are not
+automatically proven equivalent to the canonical DDS:
+- 108 intended full source groups, 107 complete-group SHA-pinned reconstructed
+  full-size English PNGs; 1 Q046 corruption HOLD.
+- 759 raw English/Korean translation records; 88 source DDS paths directly
+  associated, 20 platform variation paths held pending source association.
+- 12 text-region alpha crop proposals, all UNREVIEWED; 7 single-phrase
+  automatic margin failures held.
+- Exactly **one** source fully staged for automatic ImageGen:
+  Q104 OutRun Mode -> 아웃런 모드, direct original full-HD PNG reference,
+  alpha-edge verified 976×168 ROI, twofold 1952×336 PNG.
+
+Live artifacts in an isolated workspace:
+`/home/chatgpt-runner2/work/text_roi_bulk_20261015/atlases/`;
+`/home/chatgpt-runner2/work/image-src/text_roi_batches/`.
+Audit index `localization/graphics/role_C_salvage/20261015-text-roi-pilot/FULL_HD_108_SOURCE_INVENTORY.json`.
+Production index `.../TEXT_ROI_PRODUCTION_MANIFEST.json`.
+New independent controller source mode, Git branch
+`localization-controller-recovery-20260928`, is documented at
+`tools/chat-controller/localization-recovery-v1/TEXT_ROI_AUTOPRODUCTION_20261015.md`.
+
+The original 986 tiles and old A/B generated images are preserved for historic
+verification only. The new consumer uses full-HD-derived per-text ROI PNGs,
+never the old arbitrary tiles. The 107 reconstructed sources are not automatically
+approved for ImageGen until independent full-source equivalence/ROI mapping
+holds are lifted. No live Portainer rebuild, new generation, DDS or game test
+is implied by a GitHub commit. `RUNTIME_VALIDATION=UNTESTED`.
