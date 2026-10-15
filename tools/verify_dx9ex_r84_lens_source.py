@@ -1,94 +1,163 @@
 #!/usr/bin/env python3
-"""C993 centre lens original-WVP source: R84 read-only proof regression.
+"""Fail-closed C993 R84 *physical* stereo route contract, not just telemetry.
 
-The exact sun producer must match its own shader, c64 write, call/pose epoch,
-bounded draw age and nonqueued source. Never infer a stock WVP from the already
-head-injected live D3D9 constants. Rendering stays unchanged pending HMD.
+The original game c64 belongs to one exact central sun producer. Only that
+producer may use the R26-proven stock-WVP -> worldView -> head -> eye -> FOV
+chain in the independent R84 R30/R32/R33 renderer. Preserve the CURRENT GPU
+constants separately for restoration. CI compile/link is not HMD acceptance.
 """
 from pathlib import Path
+
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = (
-    ROOT / "src/vr/core/r29_owner_api.hpp",
-    ROOT / "src/vr/d3d9/stereo_renderer_r29.cpp",
-    ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp",
-    ROOT / "src/vr/d3d9/lens_centre_source_provenance.hpp",
-    ROOT / ".github/workflows/vr-dx9ex-active.yml",
+PATHS = (
+    "src/vr/core/r29_owner_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/core/r32_review_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    ".github/workflows/vr-dx9ex-active.yml",
 )
 
-def check(api, r29, r30, evidence, workflow):
+
+def check(api, r29, r30, proof, r30api, r32api, r32, workflow):
     assert "std::uint64_t R29OwnerTopLevelDrawSerial() noexcept;" in api
-    assert "std::uint64_t R29OwnerTopLevelDrawSerial() noexcept" in r29
     assert "return GetTopLevelDrawSerial();" in r29
     assert '#include "lens_centre_source_provenance.hpp"' in r30
-    block = r30.split("bool R30HasExactLensCentreRawWvp(", 1)[1].split(
+    owned = r30.split("bool R30HasExactLensCentreRawWvp(", 1)[1].split(
         "R30ScreenSpaceKind R30ClassifyScreenSpacePass(", 1)[0]
-    for name in (
+    for marker in (
         "QueueRenderActive()",
         "EffectiveScope() != RenderScope::WorldBillboard",
         "CurrentRenderProducerToken() != ProducerToken::LensFlareCentre",
         "GetLastRawGameWvpWrite(",
         "GetLastGameWvpSemanticProvenance(",
-        "R29OwnerCurrentShaderEpoch(",
+        "R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch)",
         "CurrentLensCentreCallEpoch",
         "GetLastGameWvpLensCentreCallEpoch()",
         "GetCurrentLatchedPoseEpoch()",
-        "OutRunVRRenderer::GetLastGameWvpPoseEpoch(),",
+        "GetLastGameWvpPoseEpoch(),",
         "R29OwnerTopLevelDrawSerial() + 1u",
         "sourceScope == RenderScope::WorldBillboard",
         "sourceProducer == ProducerToken::LensFlareCentre",
         "queueNode == nullptr",
         "OutRunVR::LensCentre::OwnsRawWvp({",
     ):
-        assert name in block, "R84 exact C993 evidence lost: " + name
+        assert marker in owned, "C993 producer evidence missing: " + marker
     route = r30.split("R30ScreenSpaceKind R30ClassifyScreenSpacePass(", 1)[1].split(
         "// Only the OpenXR pose/FOV signature affects this affine.", 1)[0]
-    for name in (
-        "if (Settings::VRTelemetry &&",
+    for marker in (
+        "!OutRunVR::GameSemantic::QueueRenderActive()",
+        "scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard",
         "CurrentRenderProducerToken() ==",
         "ProducerToken::LensFlareCentre)",
         "R30HasExactLensCentreRawWvp(originalGameWvp)",
+        "OutRunVR::LensCentre::SelectWorldRoute(true, owned)",
+        "OutRunVR::LensCentre::WorldRoute::ExactCentreStereo",
+        "return R30ScreenSpaceKind::ExactLensCentreWorld;",
+        "return R30ScreenSpaceKind::None;",
         "VR R84 C993 RAW_WVP_SOURCE: {}",
         'owned ? "EXACT_OWNER" : "MISSING_OR_STALE"',
-        "return R30ScreenSpaceKind::None;",
+        "return R30ScreenSpaceKind::FlatPerspectiveEffect;",
     ):
-        assert name in route, "C993 telemetry or fail-closed route lost: " + name
-    assert route.index("R30HasExactLensCentreRawWvp(originalGameWvp)") < route.index(
-        "return R30ScreenSpaceKind::None;", route.index(
-            "R30HasExactLensCentreRawWvp(originalGameWvp)"))
-    assert "return R30ScreenSpaceKind::FlatPerspectiveEffect;" in route
-    assert "e.currentCall == e.writtenCall" in evidence
-    assert "e.currentPoseEpoch == e.writtenPoseEpoch" in evidence
-    assert "e.shaderEpoch == e.writtenShaderEpoch" in evidence
-    assert "e.nextDraw - e.writtenDraw <= 128u" in evidence
-    assert "static_assert(!OwnsRawWvp(" in evidence
+        assert marker in route, "R84 centre classification missing: " + marker
+    assert route.index("R30HasExactLensCentreRawWvp(originalGameWvp)") < (
+        route.index("SelectWorldRoute(true, owned)") <
+        route.index("return R30ScreenSpaceKind::ExactLensCentreWorld;") <
+        route.rindex("return R30ScreenSpaceKind::None;"))
+    # Never require VRTelemetry to perform the stereo route. Telemetry guards
+    # logging only; geometry is driven by authenticated original-game data.
+    assert route.index("R30HasExactLensCentreRawWvp(originalGameWvp)") < (
+        route.index("if (Settings::VRTelemetry)"))
+    assert "if (Settings::VRTelemetry &&" not in route
+
+    bld = r30.split("bool R30BuildScreenSpaceEyeConstants(", 1)[1].split(
+        "template <typename ActualDraw>", 1)[0]
+    for marker in (
+        "R30ScreenSpaceKind::ExactLensCentreWorld",
+        "GetVertexShaderConstantF(",
+        "R30SupportWvpFirstRegister, original",
+        "R30HasExactLensCentreRawWvp(rawGameWvp)",
+        "std::memcpy(&rawUploadedT, rawGameWvp, sizeof(rawUploadedT))",
+        "R29OwnerTransposeMatrix(rawUploadedT)",
+        "R29OwnerInvertMatrix(baseProjection,",
+        "R29OwnerMultiplyMatrix(stockRawWvp,",
+        "R29OwnerMultiplyMatrix(worldView, headInverse)",
+        "headPoseSequence != stereo.poseSequence",
+        "R29OwnerMatrixFromQuaternionTranslation(",
+        "R29OwnerInverseRigid(eyePose)",
+        "R29OwnerProjectionFromFov(baseProjection,",
+        "R29OwnerMultiplyMatrix(",
+        "headRelative, eyeInverse",
+        "R29OwnerMatrixFinite(corrected)",
+        "std::memcpy(eyeConstants[eye], &correctedT",
+        "return false;",
+    ):
+        assert marker in bld, "exact C993 per-eye transform lost: " + marker
+    assert bld.index("GetVertexShaderConstantF(") < (
+        bld.index("if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld)") <
+        bld.index("R29OwnerTransposeMatrix(rawUploadedT)") <
+        bld.index("R29OwnerMultiplyMatrix(stockRawWvp,") <
+        bld.index("R29OwnerMultiplyMatrix(worldView, headInverse)") <
+        bld.index("R29OwnerProjectionFromFov(baseProjection,"))
+    # The original GPU constants are needed to restore the source draw;
+    # replacing `original` with a stock raw WVP would corrupt D3D9 state.
+    assert "std::memcpy(original, rawGameWvp" not in bld
+    assert "std::memcpy(&uploadedT, original" in bld
+
+    for source in (r30api, r32api):
+        assert "ExactLensCentreWorld" in source
+    assert "return R30SupportScreenSpaceKind::ExactLensCentreWorld;" in r30
+    assert "lower = R30ScreenSpaceKind::ExactLensCentreWorld;" in r30
+    assert "return R32ReviewScreenSpaceKind::ExactLensCentreWorld;" in r32
+    assert "lower = R30SupportScreenSpaceKind::ExactLensCentreWorld;" in r32
+    assert "e.currentCall == e.writtenCall" in proof
+    assert "e.currentPoseEpoch == e.writtenPoseEpoch" in proof
+    assert "e.shaderEpoch == e.writtenShaderEpoch" in proof
+    assert "e.nextDraw - e.writtenDraw <= 128u" in proof
+    assert "static_assert(!OwnsRawWvp(" in proof
     assert "run: python tools/verify_dx9ex_r84_lens_source.py" in workflow
 
+
 def main():
-    src = tuple(path.read_text(encoding="utf-8-sig") for path in SOURCES)
-    check(*src)
-    tests = (
-        (0, "std::uint64_t R29OwnerTopLevelDrawSerial() noexcept;", "// no facade"),
+    values = tuple((ROOT / path).read_text(encoding="utf-8-sig")
+                   for path in PATHS)
+    check(*values)
+    mutants = [
+        (0, "std::uint64_t R29OwnerTopLevelDrawSerial() noexcept;", "// removed facade"),
         (1, "return GetTopLevelDrawSerial();", "return 0;"),
         (2, "QueueRenderActive()", "false"),
         (2, "sourceProducer == ProducerToken::LensFlareCentre", "true"),
         (2, "R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch)", "true"),
         (2, "OutRunVRRenderer::GetLastGameWvpPoseEpoch(),", "0,"),
         (2, "R29OwnerTopLevelDrawSerial() + 1u", "0"),
-        (2, "if (Settings::VRTelemetry &&", "if (true &&"),
+        (2, "SelectWorldRoute(true, owned)", "SelectWorldRoute(true, true)"),
+        (2, "return R30ScreenSpaceKind::ExactLensCentreWorld;", "return R30ScreenSpaceKind::None;"),
+        (2, "R30HasExactLensCentreRawWvp(rawGameWvp)", "true /* non-owned GPU c64 */"),
+        (2, "R29OwnerMultiplyMatrix(stockRawWvp,", "R29OwnerMultiplyMatrix(stockWvp,"),
+        (2, "headPoseSequence != stereo.poseSequence", "false"),
+        (2, "R29OwnerMultiplyMatrix(worldView, headInverse)", "R29OwnerMultiplyMatrix(headInverse, worldView)"),
+        (2, "std::memcpy(&rawUploadedT, rawGameWvp, sizeof(rawUploadedT))", "std::memcpy(&rawUploadedT, original, sizeof(rawUploadedT))"),
         (3, "e.nextDraw - e.writtenDraw <= 128u", "true"),
-        (4, "run: python tools/verify_dx9ex_r84_lens_source.py", "run: echo UNTESTED"),
-    )
-    for index, old, new in tests:
-        assert old in src[index], "negative mutation fixture missing: " + old
-        damaged = list(src)
-        damaged[index] = damaged[index].replace(old, new, 1)
+        (4, "None, Hud2D, FlatPerspectiveEffect, ExactLensCentreWorld", "None, Hud2D, FlatPerspectiveEffect"),
+        (5, "ExactLensCentreWorld", "WrongLensMode"),
+        (6, "return R32ReviewScreenSpaceKind::ExactLensCentreWorld;", "return R32ReviewScreenSpaceKind::None;"),
+        (6, "lower = R30SupportScreenSpaceKind::ExactLensCentreWorld;", "lower = R30SupportScreenSpaceKind::None;"),
+        (7, "run: python tools/verify_dx9ex_r84_lens_source.py", "run: echo BYPASS"),
+    ]
+    for idx, old, new in mutants:
+        assert old in values[idx], "negative mutation fixture absent: " + old
+        mod = list(values)
+        mod[idx] = mod[idx].replace(old, new, 1)
         try:
-            check(*damaged)
-        except (AssertionError, IndexError):
+            check(*mod)
+        except (AssertionError, ValueError, IndexError):
             continue
-        raise AssertionError("C993 source ownership mutation escaped: " + old)
-    print(f"R84 C993 lens source proof PASS ({len(tests)} mutations), "
-          "physical renderer unchanged; HMD UNTESTED")
+        raise AssertionError("C993 unsafe world reprojection mutation escaped: " + old)
+    print(f"R84 exact C993 stereo route PASS ({len(mutants)} negative mutations); "
+          "R26-approved matrix order and GPU c64 restore; HMD UNTESTED")
+
 
 if __name__ == "__main__":
     main()
