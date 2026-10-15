@@ -1,0 +1,101 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00776",
+  "production_id": "CONVERSION-DX11-00776",
+  "event_id": "CONVERSION-DX11-00776-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_GAME_OFFSCREEN_READONLY_DEPTH_CONTINUITY",
+  "feature_id": "DX11-FULL-GAME-OFFSCREEN-READONLY-Z-CONTINUITY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "86d72f4c2b0376bb528b316d7a6711f0e095aa68",
+  "material_result_sha": "a6fb0cf29a7b61b78aa5f5804b2811e890058b2a",
+  "validation_bearing_result_sha": "a6fb0cf29a7b61b78aa5f5804b2811e890058b2a",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_offscreen_pass.hpp",
+    "tools/dx11_game_offscreen_pass_00765.cpp",
+    "tools/test_dx11_game_offscreen_pass_00765.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-OFFSCREEN-READONLY-Z-CONTINUITY",
+    "goal": "Preserve actual native full-frame menu, vehicle and race Draw/DrawIndexed continuity across safe D3D9 offscreen read-only-depth texture passes; unsafe depth-writing/stencil/MRT cases abort optional native output while keeping original game and controller input intact.",
+    "acceptance_items": [
+      {
+        "id": "offscreen-readonly-draw-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "live_game_Draw_and_DrawIndexed_full_resolution_batch",
+        "expected_behavior": "An actual offscreen D3D9 source Draw with Z read-only preserves exact source ordinal and the next native main-target GPU Draw remains publishable."
+      },
+      {
+        "id": "unsafe-state-input-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "depth_writes_stencil_MRT_DX9Ex_original_input",
+        "expected_behavior": "Z write, stencil/MRT, or unproven offscreen state cannot be silently elided; original D3D9 gamepad, Draw and Present continue."
+      },
+      {
+        "id": "exact-sha-ci",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Windows_Build_OpenXR_HUD",
+        "expected_behavior": "Linked C++ positive/negative and source tests plus all mandatory GitHub Actions succeed at exact material SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Real D3D9 offscreen source Z-write state captured for live game draw",
+      "Native D3D11 full-frame Draw/DrawIndexed source ordinal continuity",
+      "D3D9 guarded Present and original input-safe fallback"
+    ],
+    "batch_components": [
+      "C++ real bridge ZWRITE state query",
+      "C++ offscreen live-game admission predicate",
+      "C++ positive/negative continuity regression and Python integration mutations"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Compiled read-only Z safe offscreen and exact game source Draw ordinal continuity",
+      "negative_regression": "Depth-writing and unsafe states remain abort/fallback; original D3D9 input unaffected",
+      "component_integration": "live game D3D9 Draw->offscreen safe ordinal->D3D11 main Draw->guarded native Present"
+    },
+    "conflict_keys": [
+      "DX11:FULL_GAME_OFFSCREEN_READONLY_DEPTH_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "GitHub exact-SHA compile/CI only. Full-game output and Quest3/VDXR/gamepad runtime are UNTESTED.",
+    "activation_guard_and_fallback": "Existing full-game opt-in only; unsafe states retain D3D9 output, input and fallback."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read current GitHub head, AGENTS, DX11 policy and adjacent task implementations.",
+    "C1_REVIEW": "Locate missed authentic D3D9 offscreen Z-read-only depth case that canceled source ordinal continuity.",
+    "C2_IMPLEMENT": "Implement ZWRITE-based C++ safe source admission and regression linking full-frame Draw/DrawIndexed.",
+    "C3_VALIDATE": "DX11 Fast, Backend, Windows Release, OpenXR, HUD all SUCCESS on exact source SHA; Quest3/VDXR runtime not run.",
+    "C4_COMMIT": "Material source implementation a6fb0cf29a7b61b78aa5f5804b2811e890058b2a with [AUTO:CONVERSION-DX11-00776] and no CI skip.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA on a6fb0cf29a7b61b78aa5f5804b2811e890058b2a; gameplay/HMD remains UNTESTED."
+  },
+  "acceptance_results": {
+    "offscreen-readonly-draw-continuity": "PASS",
+    "unsafe-state-input-fallback": "PASS",
+    "exact-sha-ci": "PASS_EXACT_SHA"
+  }
+}
