@@ -37,6 +37,7 @@
 #include "native_game_multi_dirty_upload.hpp"
 #include "native_game_clear_color.hpp"
 #include "native_game_masked_draw.hpp"
+#include "native_game_scissor_clip.hpp"
 #include "native_game_clear_coverage.hpp"
 #include "native_game_full_color_depth.hpp"
 #include "native_game_backbuffer_admission.hpp"
@@ -4812,6 +4813,35 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
             if (s.frameBatch.must_abort_unsupported(fullMode, multiBatch))
                 s.frameBatch.abort();
             return;
+        }
+        // A successful game Draw/DrawIndexed whose enabled scissor is wholly
+        // outside the source viewport has no color/depth effect. Preserve its
+        // precise source ordinal in the full native menu->car->race batch
+        // without issuing a fabricated GPU draw or losing original D3D9/input.
+        // Only proved empty rectangles qualify; intersecting, disabled or
+        // failed state queries follow the normal native admission/fallback.
+        if (fullMode) {
+            DWORD scissorEnabled = FALSE;
+            if (SUCCEEDED(game->GetRenderState(D3DRS_SCISSORTESTENABLE, &scissorEnabled)) &&
+                scissorEnabled == TRUE) {
+                D3DVIEWPORT9 sourceViewport{};
+                RECT sourceScissor{};
+                if (SUCCEEDED(game->GetViewport(&sourceViewport)) &&
+                    SUCCEEDED(game->GetScissorRect(&sourceScissor)) &&
+                    GameNativeScissorClip::excludes_viewport(
+                        sourceViewport.X, sourceViewport.Y,
+                        sourceViewport.Width, sourceViewport.Height,
+                        sourceScissor.left, sourceScissor.top,
+                        sourceScissor.right, sourceScissor.bottom)) {
+                    const bool sameSourceFullClear = s.clearColor.valid &&
+                        s.clearColor.sourceDevice ==
+                            reinterpret_cast<std::uintptr_t>(game);
+                    if (!s.frameBatch.absorb_empty_source_draw(
+                            sourceOrdinal, sameSourceFullClear))
+                        s.frameBatch.abort();
+                    return;
+                }
+            }
         }
         D3DVIEWPORT9 vp{};
         GameFvfLayout layout{};
