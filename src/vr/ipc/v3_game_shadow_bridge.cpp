@@ -426,9 +426,18 @@ namespace OutRunVR::IpcV3
                     if (frameWriter && !frameWriter->Ready())
                         frameWriter.reset();
                     if (!clientWriter)
+                    {
                         clientWriter = std::make_unique<ClientStateWriter>();
+                        // A new mapping must receive the complete current state,
+                        // even when v2 client fields have not changed.
+                        havePublishedClient = false;
+                    }
                     if (!frameWriter)
+                    {
                         frameWriter = std::make_unique<FrameRingWriter>();
+                        // Never carry a previous writer's publication cursor.
+                        lastPublishedFrame = {};
+                    }
                     nextWriterRetryMs = loopNow + ShadowRetryMs;
                 }
 
