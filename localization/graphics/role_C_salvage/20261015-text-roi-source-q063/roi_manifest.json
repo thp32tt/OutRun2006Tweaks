@@ -1,0 +1,46 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "queue_id": "Q063",
+  "region_id": "start_top_reference_only",
+  "source_png": "q063_48DEBE77_READABLE_FLIPY_FROM_DIRECT_PINNED_DDS.png",
+  "source_png_sha256": "fef16b9dd7566e5186894991ed1b5cb2ca5154edad9d32c35d54ab6e5e20b0bb",
+  "source_kind": "FULL_HD_PNG_FROM_DIRECT_PINNED_DDS_VERIFIED_BASE",
+  "source_dds_path": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+  "original_dimensions": [
+    512,
+    512
+  ],
+  "bbox_xyxy": [
+    13,
+    112,
+    111,
+    162
+  ],
+  "english": "START",
+  "korean": "출발",
+  "isolation": "reference_crop",
+  "scale": 4,
+  "native_dimensions": [
+    98,
+    50
+  ],
+  "imagegen_dimensions": [
+    392,
+    200
+  ],
+  "native_png_sha256": "ed1f253b56df4093ae46037598f7a86c37caeec5e3be9965bc32d76b04b8fed6",
+  "imagegen_input_sha256": "74b7d40a08b01ca7dc039f58e8e353605d8a2de2fe443e94be5364c5122384f4",
+  "alpha_crop_margin_checked": false,
+  "status": "IMAGEGEN_REFERENCE_TEST_ONLY",
+  "generate_output": "ONE_KOREAN_TEXT_ONLY_TRANSPARENT_PNG",
+  "required_review": [
+    "KOREAN_GLYPHS",
+    "SOURCE_EFFECT",
+    "CLEAN_PLATE",
+    "NATIVE_ROI_FIT",
+    "C1",
+    "C3_IF_REQUIRED",
+    "USER_GAME"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

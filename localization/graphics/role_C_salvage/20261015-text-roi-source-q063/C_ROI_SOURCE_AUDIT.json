@@ -1,0 +1,64 @@
+{
+  "schema": "outrun-c-roi-source-audit-v1",
+  "task_id": "C-ROI-SOURCE-Q063-START-TOP-20261015-1903",
+  "target": "Q063/START top",
+  "status": "HOLD_GLYPH_ISOLATION_AND_ART_SEPARATION",
+  "ab_imagegen_approved": false,
+  "AB_AUTOSEND": false,
+  "source": {
+    "kind": "FULL_HD_DIRECT_DDS_READABLE_FLIPY",
+    "base_platform": "BASE",
+    "original_dds_path": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+    "dds_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+    "source_png_name": "q063_48DEBE77_READABLE_FLIPY_FROM_DIRECT_PINNED_DDS.png",
+    "source_png_sha256": "fef16b9dd7566e5186894991ed1b5cb2ca5154edad9d32c35d54ab6e5e20b0bb",
+    "full_dimensions": [
+      512,
+      512
+    ],
+    "orientation": "DDS_FLIP_TOP_BOTTOM_TO_READABLE",
+    "full_dds_dimensions": [
+      512,
+      512
+    ],
+    "direct_source_provenance": "pinned original DDS 106cc0cb, SHA independently checked; no legacy tile or tile reconstruction input"
+  },
+  "roi": {
+    "native_xyxy": [
+      13,
+      112,
+      111,
+      162
+    ],
+    "english": "START",
+    "korean": "출발",
+    "scale": 4,
+    "native_dimensions": [
+      98,
+      50
+    ],
+    "upscaled_dimensions": [
+      392,
+      200
+    ],
+    "native_sha256": "ed1f253b56df4093ae46037598f7a86c37caeec5e3be9965bc32d76b04b8fed6",
+    "upscaled_sha256": "74b7d40a08b01ca7dc039f58e8e353605d8a2de2fe443e94be5364c5122384f4",
+    "isolation": "reference_crop",
+    "alpha_crop_margin_checked": false,
+    "source_alpha_is_glyph_alpha": false,
+    "nearby_protected_art": "Map/route iconography and red START button plaque are present in crop",
+    "pixel_boundary": "The full START string is visible; no separate reviewed text alpha or clean background mask"
+  },
+  "hold": {
+    "reason": "The source contains red plate and neighboring route art; source transparency is composited sprite alpha, not isolated glyph alpha. Manual mask/PSD text layer and CLEAN are unavailable/unreviewed; cropped image is REFERENCE_ONLY and not an approved standalone ImageGen glyph input.",
+    "remediation": "Acquire reviewed PSD text/effects layer or exact glyph mask and separate clean plate, then re-run source preflight. Preserve UI/UV safe box; allow proportion-preserving Korean fit despite differing width."
+  },
+  "qa": "TEST_ONLY",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "DDS": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "legacy_tiles_used": false,
+  "AB_QUEUE_MODIFIED": false,
+  "notes": "Extractor mirror uses 2048px guard vs current GitHub script 3072px guard; this 392x200 ROI is within both, and extraction/manifest logic otherwise matches."
+}
