@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
   "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "NEEDS_VALIDATION",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_CI_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "82e28877640afc96f011210d7b607334d75dd3dc",
   "material_result_sha": "184a74c069401a67c2f0f01192985e017b5942d5",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "80c3503adbbc57b407d19ba70826c174587f42a0",
   "source_paths": [
     "src/hooks_textures.cpp"
   ],
@@ -64,9 +64,9 @@
     ]
   },
   "acceptance_results": {
-    "selector_opaque_color": "SOURCE_ASSERTS_PRESENT",
-    "dds_fallback_and_isolation": "SOURCE_ISOLATION_REVIEWED",
-    "exact_sha_game_gate": "PENDING"
+    "selector_opaque_color": "PASS_BUILD",
+    "dds_fallback_and_isolation": "PASS_BUILD",
+    "exact_sha_game_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "GetD3DFormatFromPixelFormat recognizes 24-bit R8G8B8 DDS, but the fast loader forwarded this format directly to D3D9 CreateTexture and used packed source 3-byte row size to validate destination LockRect stride rather than converting to a widely supported 32-bit opaque texture.",
@@ -90,11 +90,56 @@
     "initial_policy_failure": "Missing 00910 feature run JSON",
     "initial_hud_failure": "DDS regression probe pinned destination pitch to source rowBytes despite expanded 24-bit output",
     "repair": "Added exact task feature contract and updated target verifier to insist on actual destinationRowBytes plus RGB24 conversion checks; required workflows unchanged.",
-    "validation_bearing_result_sha": null,
-    "status": "PENDING_EXACT_SHA"
+    "validation_bearing_result_sha": "80c3503adbbc57b407d19ba70826c174587f42a0",
+    "status": "PASS_EXACT_SHA",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "exact_sha_gate_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "sha": "80c3503adbbc57b407d19ba70826c174587f42a0",
+        "run_id": 38780354164,
+        "conclusion": "success",
+        "jobs": "policy,host,game,full-chain-compile,package 5/5"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "sha": "80c3503adbbc57b407d19ba70826c174587f42a0",
+        "run_id": 38780354244,
+        "conclusion": "success",
+        "jobs": "1/1"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "sha": "80c3503adbbc57b407d19ba70826c174587f42a0",
+        "run_id": 38780354219,
+        "conclusion": "success",
+        "jobs": "source-cross-domain,msvc-analyze-openxr-host,msvc-analyze-active-game 3/3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "sha": "80c3503adbbc57b407d19ba70826c174587f42a0",
+        "run_id": 38780354162,
+        "conclusion": "success",
+        "jobs": "static-exe-analysis,build-hud-inspector 2/2"
+      }
+    ],
+    "score_once": true
   },
   "runtime_evidence": "Quest3/VDXR and original car-selection screen not run in this environment; no claim that white selection textures or HUD artifacts are fixed.",
-  "score_delta_this_attempt": 0,
-  "score_once": false,
-  "hold_reason": "Awaiting exact-SHA mandatory CI; Quest3/VDXR optical verification separately pending."
+  "score_delta_this_attempt": 1,
+  "score_once": true,
+  "hold_reason": "NEED_HMD_TEST: Actual Quest3/VDXR/car-selection screen not run; optical correctness and runtime selection pixels unknown.",
+  "scoreboard": {
+    "repository": "thp32tt/ai-dev-lab",
+    "file": "AI_SCOREBOARD.md",
+    "commit_sha": "984d37d13fa7714ec442aaa71f932f2cf5e7e6ab",
+    "previous_ai2_score": 1389,
+    "delta": 1,
+    "new_ai2_score": 1390
+  }
 }
