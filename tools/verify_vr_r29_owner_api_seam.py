@@ -148,12 +148,21 @@ def check(r29: str, r30: str, header: str) -> None:
         assert token in extent, f"R29 eye extent guard lost: {token}"
     identity = body(r29, "R29OwnerTryGetDirectTransportIdentity(")
     for token in (
-        "out = {};", "!SharedState || !DirectInteropVerified",
+        "out = {};", "!DirectInteropVerified",
+        "OutRunVR::HostIdentity::Snapshot identity{};",
+        "OutRunVR::HostIdentity::TryRead(SharedState, identity,",
+        "MemoryBarrier();",
+        "out.hostPid = identity.hostPid;",
+        "out.hostAdapterLuidLow = identity.adapterLuidLow;",
+        "out.hostAdapterLuidHigh = identity.adapterLuidHigh;",
+    ):
+        assert token in identity, f"R29 coherent transport identity guard lost: {token}"
+    for forbidden in (
         "out.hostPid = SharedState->hostPid;",
         "out.hostAdapterLuidLow = SharedState->hostAdapterLuidLow;",
         "out.hostAdapterLuidHigh = SharedState->hostAdapterLuidHigh;",
     ):
-        assert token in identity, f"R29 transport identity guard lost: {token}"
+        assert forbidden not in identity, f"R29 regained torn DirectGPU identity read: {forbidden}"
     for api in ("R29OwnerRecommendedEyeExtent",
                 "R29OwnerTryGetDirectTransportIdentity",
                 "R29OwnerTransportIdentity"):
@@ -200,11 +209,70 @@ def check(r29: str, r30: str, header: str) -> None:
         assert interface + "(" in r30, f"R30 does not use {interface}"
 
 
+def check_host_identity_contract(source: str) -> None:
+    # Bound a coherent writer generation at the shared-memory reader, not
+    # merely a syntactic R29 forwarding edge. A missing retry, memory fence,
+    # or host-alive check may silently re-admit a stale DirectGPU resource.
+    for token in (
+        "out = {};",
+        "if (!shared)",
+        "attempt < 4u",
+        "before = shared->sequence;",
+        "if (before & 1u)",
+        "barrier();",
+        "magic = shared->magic;",
+        "protocol = shared->protocolVersion;",
+        "size = shared->structSize;",
+        "pid = shared->hostPid;",
+        "flags = shared->flags;",
+        "low = shared->hostAdapterLuidLow;",
+        "high = shared->hostAdapterLuidHigh;",
+        "after = shared->sequence;",
+        "before != after || (after & 1u)",
+        "magic != SharedMagic",
+        "protocol != SharedProtocolVersion",
+        "size != sizeof(SharedPoseState)",
+        "pid == 0",
+        "HostAlive | HostAdapterLuidValid",
+        "out = {pid, low, high};",
+        "return false;",
+    ):
+        assert token in source, f"DirectGPU coherent host identity rule lost: {token}"
+    assert source.count("barrier();") == 2, (
+        "DirectGPU identity must fence both before and after the snapshot"
+    )
+    assert source.index("before = shared->sequence;") < source.index("magic = shared->magic;")
+    assert source.index("high = shared->hostAdapterLuidHigh;") < source.index("after = shared->sequence;")
+
+
 def main() -> None:
     r29 = (SRC / "stereo_renderer_r29.cpp").read_text(encoding="utf-8")
     r30 = (SRC / "stereo_renderer_r30.cpp").read_text(encoding="utf-8")
     header = (CORE / "r29_owner_api.hpp").read_text(encoding="utf-8")
+    identity_header = (ROOT / "src/vr/ipc/coherent_host_identity.hpp").read_text(
+        encoding="utf-8"
+    )
     check(r29, r30, header)
+    check_host_identity_contract(identity_header)
+    # Poison each actual sequence/header/PID/LUID guard. Every negative case
+    # must be caught in the *new* coherent read owner, not a removed old guard.
+    for token in (
+        "if (before & 1u)",
+        "barrier();",
+        "before != after || (after & 1u)",
+        "size != sizeof(SharedPoseState)",
+        "pid == 0",
+        "HostAlive | HostAdapterLuidValid",
+        "out = {pid, low, high};",
+    ):
+        mutated = identity_header.replace(token, "/* poisoned */", 1)
+        assert mutated != identity_header
+        try:
+            check_host_identity_contract(mutated)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError(f"coherent host negative mutation unexpectedly PASS: {token}")
     for signature, delegation in OWNER_CALLS.items():
         # Mutate the exported owner definition, not an earlier lower-owner
         # call with the same spelling elsewhere in the R29 translation unit.
@@ -234,7 +302,13 @@ def main() -> None:
         ("R29OwnerRecommendedEyeExtent(",
          "SharedState->magic != OutRunVR::SharedMagic"),
         ("R29OwnerTryGetDirectTransportIdentity(",
-         "!SharedState || !DirectInteropVerified"),
+         "!DirectInteropVerified"),
+        ("R29OwnerTryGetDirectTransportIdentity(",
+         "OutRunVR::HostIdentity::TryRead(SharedState, identity,"),
+        ("R29OwnerTryGetDirectTransportIdentity(",
+         "out.hostAdapterLuidLow = identity.adapterLuidLow;"),
+        ("R29OwnerTryGetDirectTransportIdentity(",
+         "out.hostAdapterLuidHigh = identity.adapterLuidHigh;"),
     ):
         pos = r29.find(marker)
         assert pos >= 0
@@ -281,7 +355,7 @@ def main() -> None:
             pass
         else:
             raise AssertionError(f"R30 hook facade mutation unexpectedly PASS: {facade}")
-    print("R29/R30 owner ABI regression PASS (48 negative mutations)")
+    print("R29/R30 owner ABI + coherent DirectGPU identity PASS (additional sequence and forwarding negative mutations)")
 
 
 if __name__ == "__main__":
