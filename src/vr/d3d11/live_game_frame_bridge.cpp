@@ -3526,7 +3526,9 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
             // World-space geometry may straddle the camera plane. D3D11
             // clips homogeneous triangles/lines before perspective division;
             // rejecting one negative-W vertex dropped the *entire* game Draw.
-            // Reject nonfinite and W==0 inputs; preserve D3D9 as fallback.
+            // Preserve finite W==0 camera-plane vertices: homogeneous clipping
+            // of a triangle/line occurs on D3D11 GPU, before perspective divide.
+            // Invalid/fully zero homogeneous vertices retain D3D9 fallback.
             // The game-authored viewport Z range is not necessarily [0,1].
             // Mirror its depth map before D3D11 homogeneous clipping so
             // world/race Draw and DrawIndexed share D3D9 depth ordering.

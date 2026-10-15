@@ -59,7 +59,10 @@ int main() {
     // Both Draw and DrawIndexed submit this same converted NativeVertex span.
     assert(game_native_object_clip_position(V{0.0f, 0.0f,-0.1f,-0.5f}));
     assert(game_native_object_clip_position(V{0.1f, 0.2f, 0.3f, 2.0f}));
-    // No division by zero or undefined coordinates can reach the GPU.
+    // A real race Draw/Indexed triangle can straddle W=0; GPU clips it.
+    assert(game_native_object_clip_position(V{1.0f, 0.0f, 0.0f, 0.0f}));
+    assert(game_native_object_clip_position(V{0.0f, -1.0f, 0.2f, -0.0f}));
+    // A zero homogeneous vector and nonfinite data retain D3D9 fallback.
     assert(!game_native_object_clip_position(V{0.0f, 0.0f, 0.0f, 0.0f}));
     assert(!game_native_object_clip_position(V{0.0f, 0.0f, 0.0f,-0.0f}));
     const float inf = std::numeric_limits<float>::infinity();
@@ -77,8 +80,9 @@ with TemporaryDirectory(prefix="dx11-00685-") as d:
            "-Werror", "-pedantic", str(tmp / "probe.cpp"), "-o", str(tmp / "probe")]
     cases = (
         ("valid clipped world", hdr, True),
-        ("negative W rejected", hdr.replace("clip[3] != 0.0f", "clip[3] > 0.0f"), False),
-        ("zero W admitted", hdr.replace("clip[3] != 0.0f", "true"), False),
+        ("negative W rejected", hdr.replace("(clip[3] != 0.0f || clip[0] != 0.0f ||\n            clip[1] != 0.0f || clip[2] != 0.0f)", "clip[3] > 0.0f"), False),
+        ("camera-plane W rejected", hdr.replace("(clip[3] != 0.0f || clip[0] != 0.0f ||\n            clip[1] != 0.0f || clip[2] != 0.0f)", "clip[3] != 0.0f"), False),
+        ("degenerate W0 admitted", hdr.replace("(clip[3] != 0.0f || clip[0] != 0.0f ||\n            clip[1] != 0.0f || clip[2] != 0.0f)", "true"), False),
         ("invalid W admitted", hdr.replace("std::isfinite(clip[3])", "true"), False),
         ("invalid X admitted", hdr.replace("std::isfinite(clip[0])", "true"), False),
         ("invalid Y admitted", hdr.replace("std::isfinite(clip[1])", "true"), False),
@@ -91,4 +95,4 @@ with TemporaryDirectory(prefix="dx11-00685-") as d:
         if result.returncode == 0:
             result = subprocess.run([str(tmp / "probe")], text=True, capture_output=True)
         assert (result.returncode == 0) == should_pass, (name, result.stderr)
-print("PASS: near-camera live Draw/Indexed WVP, DX9Ex fallback, 5 source + 6 C++ destructive regressions")
+print("PASS: game Draw/Indexed finite W0 near-camera clipping, DX9Ex fallback, 5 source + 7 destructive C++ regressions")

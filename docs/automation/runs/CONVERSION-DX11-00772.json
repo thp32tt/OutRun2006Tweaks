@@ -1,0 +1,104 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00772",
+  "production_id": "CONVERSION-DX11-00772",
+  "event_id": "CONVERSION-DX11-00772-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:LIVE_HOMOGENEOUS_CAMERA_PLANE_DRAW",
+  "feature_id": "DX11-LIVE-CAMERA-PLANE-FRAME",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_object_clip.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_object_clip_draw_00685.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-LIVE-CAMERA-PLANE-FRAME",
+    "goal": "Allow valid game-authored near-camera homogeneous W=0 edge vertices through real native full-resolution menu/vehicle/race Draw and DrawIndexed with D3D11 homogeneous clipping, while rejecting degenerate/nonfinite geometry and keeping D3D9/gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "live-camera-plane-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_WVP_native_geometry_to_full_game_frame",
+        "expected_behavior": "Finite nondegenerate W=0 world/race vertices survive native geometry conversion and remain attached to real game Draw/DrawIndexed and full-size Present."
+      },
+      {
+        "id": "degenerate-clip-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "invalid_world_geometry_and_original_D3D9_input",
+        "expected_behavior": "Zero homogeneous vector, nonfinite coordinates, illegal input and rejected sources keep original D3D9 Draw, Present and gamepad."
+      },
+      {
+        "id": "exact-build-ci",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Win32_Backend_OpenXR_HUD",
+        "expected_behavior": "Portable C++17 positive/negative and destructive source connectivity checks plus five mandatory exact-SHA GitHub Actions gates succeed."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "live-camera-plane-draw": "PENDING",
+    "degenerate-clip-fallback": "PENDING",
+    "exact-build-ci": "PENDING"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Live D3D9 game-authored menu/vehicle/race World*View*Projection geometry preserves zero-W homogeneous camera-plane edge vertices",
+      "D3D11 native vertex upload and hardware homogeneous clipping -> native Draw/DrawIndexed -> guarded full-resolution Present",
+      "Invalid/no-direction W0 vertex falls back to D3D9 rendering, Present and gamepad"
+    ],
+    "batch_components": [
+      "live_game_object_clip.hpp C++ projection validity",
+      "live_game_frame_bridge.cpp real WVP/Draw/Indexed path",
+      "portable C++17 and destructive source integration regression"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "acceptance_proof": {
+      "positive_probe": "Test finite W0 edge with nonzero x/y/z plus signed-W World*View*Projection path for native full-frame Draw/DrawIndexed.",
+      "negative_regression": "Reject all-zero homogeneous vector, nonfinite XYZ/W and deliberate predicate mutations; original D3D9 and gamepad remain unchanged.",
+      "component_integration": "Game source D3D9 FVF WVP -> depth clip map -> zero-W camera-plane admission -> D3D11 IA VS Draw/Indexed and opt-in full-screen Present."
+    },
+    "conflict_keys": [
+      "DX11:LIVE_HOMOGENEOUS_CAMERA_PLANE_DRAW"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Source and exact build only. Actual gameplay camera-plane pixel parity and Quest3/VDXR still UNTESTED.",
+    "activation_guard_and_fallback": "Explicit native full-game opt-in retained, unsupported/degenerate geometry falls back to original D3D9 Draw/Present/gamepad."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read branch c619aee, AGENTS.md, policy, and latest 00771 source; selected disjoint near-camera geometry gate.",
+    "C1_REVIEW": "Existing object clip guard rejected every W=0 world-space vertex despite homogeneous GPU clip capability.",
+    "C2_IMPLEMENT": "Admit finite nondegenerate W=0 camera-plane edge vertex in real bridge source and preserve zero-vector/nonfinite fallbacks; update connected C++/mutation regressions.",
+    "C3_VALIDATE": "Local portable C++17 smoke PASS; GitHub five exact-SHA CI pending.",
+    "C4_COMMIT": "PENDING_BRANCH_COMMIT",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_GATE"
+  },
+  "evidence": {
+    "runtime": "No OutRun game, Quest3, VDXR or gamepad tests were executed; no backend promotion.",
+    "local_probe": "g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic /tmp/dx11_00772_probe.cpp PASS"
+  },
+  "base_head_sha": "c619aee003bf26d22565e2c742be4906b9b70956"
+}
