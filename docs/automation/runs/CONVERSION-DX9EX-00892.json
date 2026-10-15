@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
   "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "e6ddbe60e8b47dd3aceae4d3b161f5c0be58d83a",
   "material_result_sha": "0ccd9d9f414074930dd90565941594c1b1564058",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "f7a94d20043c8f31e51dc2ca9c6f7e020b18cc88",
   "source_paths": [
     "src/vr/d3d9/hud_edge_transition.hpp"
   ],
@@ -89,6 +89,6 @@
   "runtime_evidence": "No physical Quest3/VDXR game execution in this task.",
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "result_commit_ci_skip": false,
-  "hold_reason": "EXACT_SHA_CI_PENDING"
+  "result_commit_ci_skip": true,
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
