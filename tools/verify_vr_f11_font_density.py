@@ -1348,7 +1348,13 @@ def check_f11_desktop_vr_geometry_lifecycle() -> None:
     )
     for marker in required:
         assert shell.count(marker) >= 1, marker
-        assert marker not in shell.replace(marker, "REMOVED", 1)
+        # Some identities (such as SetNextWindowPos and !externalVrShell)
+        # legitimately appear in the VR and desktop branches. Removing
+        # one occurrence must not be confused with deleting both owners.
+        mutant = shell.replace(marker, "REMOVED", 1)
+        assert mutant != shell
+        if shell.count(marker) == 1:
+            assert marker not in mutant
     assert shell.index("const bool leavingVr") < shell.index("previousVrShell = externalVrShell;")
     assert shell.index("ImGui::SetNextWindowSize(lastDesktopSize") < shell.index(
         "ImGui::SetNextWindowSize(windowSize, layoutPlacement);")
