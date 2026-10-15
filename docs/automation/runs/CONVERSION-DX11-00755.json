@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULLGAME_SUCCESSFUL_EMPTY_DRAW_CONTINUITY",
   "feature_id": "DX11-MENU-RACE-EMPTY-DRAW-CONTINUITY",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -20,7 +20,7 @@
   "packaging_status": "NOT_REQUIRED",
   "base_head_sha": "dca697191d1401e48471ca655349106917e1e829",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "5c8dc04ba8fbb709978d874f93d1097bf921cc65",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_frame_batch.hpp",
@@ -92,9 +92,10 @@
     "C0_RECOVER": "PASS fetched authenticated branch and owner-specific 00754/previous commits",
     "C1_REVIEW": "PASS observed zero-primitive source is treated as unsupported and aborts native full scene even when game call writes no pixels",
     "C2_IMPLEMENT": "PASS actual C++ native source continuity and regression tests",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C3_VALIDATE": "PASS_EXACT_SHA: exact validation-bearing commit 5c8dc04ba8fbb709978d874f93d1097bf921cc65; DX11 Fast, Backend Conversion, Windows Build, OpenXR and HUD Inspector GitHub Actions all SUCCESS; runtime UNTESTED.",
     "C4_COMMIT": "source and tests committed together without CI skip",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
-  }
+    "C6_STATE": "PASS_EXACT_SHA: verified exact-SHA CI SUCCESS for 5c8dc04ba8fbb709978d874f93d1097bf921cc65; this separate bookkeeping [skip ci] commit leaves original material source and HMD state unchanged."
+  },
+  "c6_trigger_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
