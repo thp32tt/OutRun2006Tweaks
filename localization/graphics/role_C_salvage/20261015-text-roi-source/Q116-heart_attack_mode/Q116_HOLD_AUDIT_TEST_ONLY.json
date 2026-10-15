@@ -1,0 +1,97 @@
+{
+  "schema": "outrun-c-roi-source-hold-v1",
+  "run_key": "OUTRUN-C-ROI-SOURCE-20261015-Q116-HEARTATTACK",
+  "source_branch": "korean-localization-recovery-20260928",
+  "source_pinned_commit": "106cc0cbb9255f5fa0231a3e3206e592c55e4a41",
+  "result": "HOLD_IMAGEGEN_INPUT_OVER_2048_LIMIT",
+  "ready_count": 0,
+  "hold_count": 1,
+  "qa_scope": "TEST_ONLY",
+  "source": {
+    "platform": "BASE",
+    "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+    "dds_git_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+    "dds_sha256": "ebc2d866597955c6e802de65eff2d07e048f66b4ae2770fffd86b81b61fd5845",
+    "dds_format": "DXT5",
+    "dds_dimensions": [
+      2048,
+      256
+    ],
+    "dds_mipmap_count": 1,
+    "decoded_source_png": "q116_E3FD08BE_READABLE_FLIPY_FROM_DIRECT_PINNED_DDS.png",
+    "decoded_source_png_sha256": "81bb279e1f9f6304bdc286dbeaaa0eac71832bb8b7eeb9e932972dedce5b3248",
+    "source_orientation": "DDS_FLIP_TOP_BOTTOM_TO_READABLE",
+    "provenance": "DIRECT_GITHUB_PINNED_NATIVE_DDS_DECODE",
+    "previous_split_tiles_used": false
+  },
+  "region": {
+    "english": "Heart Attack Mode",
+    "korean": "하트 어택 모드",
+    "translation_source": "OFFICIAL_FULL_HD_SOURCE_INVENTORY_Q116",
+    "native_xyxy": [
+      389,
+      50,
+      1632,
+      204
+    ],
+    "native_wh": [
+      1243,
+      154
+    ],
+    "source_alpha_bbox": [
+      393,
+      54,
+      1628,
+      200
+    ],
+    "source_alpha_margin_ltrb": [
+      4,
+      4,
+      4,
+      4
+    ],
+    "glyph_effect_crop_edges_clear": true,
+    "requested_upscale": 2,
+    "upscaled_wh_if_attempted": [
+      2486,
+      308
+    ],
+    "imagegen_limit_wh": [
+      2048,
+      2048
+    ],
+    "isolation": "alpha",
+    "native_imagegen_inputs_produced": 0
+  },
+  "execution": {
+    "extractor": "tools/localization/text_roi_source_pack.py",
+    "pinned_script_sha256": "03af528db05a466df01cd70016da24bf6fe6147edeb80d8aa8e86a72aa09603a",
+    "input_spec": "roi_source_spec.json",
+    "input_spec_sha256": "d8f730909bfdbc31d84551e29af5eb0743896876d5d012ab87062566d7450753",
+    "result": {
+      "schema": "outrun-hd-text-roi-v1",
+      "status": "TEST_ONLY",
+      "ready": [],
+      "hold": [
+        {
+          "id": "Q116-heart_attack_mode",
+          "reason": "IMAGEGEN_INPUT_OVER_2048_LIMIT"
+        }
+      ]
+    }
+  },
+  "safety": {
+    "imagegen_invoked": false,
+    "external_image_apis_invoked": false,
+    "ab_state_modified": false,
+    "ab_queue_modified": false,
+    "ab_auto_reenabled": false,
+    "existing_artifacts_deleted": false,
+    "clean_plate_generated": false,
+    "dds_composed": false,
+    "C1": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "remediation": "Do not clip English or use scale 1 in place of required 2-4x; keep HOLD unless approved new legal input strategy/limits changes."
+  }
+}

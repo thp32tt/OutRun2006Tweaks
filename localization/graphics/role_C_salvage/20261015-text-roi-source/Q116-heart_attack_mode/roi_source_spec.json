@@ -1,0 +1,27 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "assets": [
+    {
+      "queue_id": "Q116",
+      "source_png": "q116_E3FD08BE_READABLE_FLIPY_FROM_DIRECT_PINNED_DDS.png",
+      "source_sha256": "81bb279e1f9f6304bdc286dbeaaa0eac71832bb8b7eeb9e932972dedce5b3248",
+      "source_kind": "DIRECT_ORIGINAL_DDS_PINNED_GITHUB_REV_106cc0cb",
+      "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/E3FD08BE_512x64.dds",
+      "regions": [
+        {
+          "id": "heart_attack_mode",
+          "english": "Heart Attack Mode",
+          "korean": "하트 어택 모드",
+          "bbox": [
+            389,
+            50,
+            1632,
+            204
+          ],
+          "isolation": "alpha",
+          "scale": 2
+        }
+      ]
+    }
+  ]
+}
