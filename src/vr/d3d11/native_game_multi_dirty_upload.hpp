@@ -7,7 +7,7 @@
 
 namespace outrun::vr::dx11::live_game_frame {
 // A partially dirty D3D9 Present may contain several disjoint updates.
-// Admit at most eight verified, nonoverlapping rectangles; clip each to the
+// Admit up to 32 verified, nonoverlapping rectangles; clip each to the
 // current visible source and keep every untouched D3D9 pixel authoritative.
 struct GameNativeMultiDirtySelection {
     std::array<GameNativePresentRegion, GameNativeDirtyRegionCoverage::kMaxPartitionRects> regions{};

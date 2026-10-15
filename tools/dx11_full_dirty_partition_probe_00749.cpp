@@ -22,7 +22,7 @@ static_assert(!check(overlap,2,32));
 static_assert(!check(overflow,2,32));
 static_assert(!check(horizontal,2,31));
 static_assert(!check(horizontal,2,32,1919));
-static_assert(!check(horizontal,9,144));
+static_assert(!check(horizontal,33,528));
 static_assert(!check(nullptr,2,32));
 static_assert(!GameNativeDirtyRegionCoverage::covers_partition(
     0,1080,2,32,0,0,0,1080,horizontal));

@@ -10,7 +10,7 @@ struct GameNativeDirtyRectangle {
     std::int64_t left = 0, top = 0, right = 0, bottom = 0;
 };
 struct GameNativeDirtyRegionCoverage {
-    static constexpr std::uint32_t kMaxPartitionRects = 8u;
+    static constexpr std::uint32_t kMaxPartitionRects = 32u;
     [[nodiscard]] static constexpr bool covers_full_backbuffer(
         std::uint32_t width, std::uint32_t height,
         std::uint32_t rectangleCount, std::uint32_t bufferBytes,
@@ -60,7 +60,7 @@ struct GameNativeDirtyRegionCoverage {
             rectRight == cropRight && rectBottom == cropBottom;
     }
 
-    // 2..8 non-overlapping dirty tiles may fill the *visible* source crop
+    // 2..32 non-overlapping dirty tiles may fill the *visible* source crop
     // rather than the physical backbuffer. Require exact area and no overlap:
     // a hole must keep the original D3D9 Present pixels and gamepad path.
     [[nodiscard]] static constexpr bool covers_partition_crop(

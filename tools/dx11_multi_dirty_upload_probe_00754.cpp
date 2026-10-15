@@ -25,7 +25,7 @@ constexpr GameNativeDirtyRectangle overlapping[]={{0,0,3,2},{2,1,4,3}};
 static_assert(!GameNativeMultiDirtyUpload::select(6,4,entire,2,32,0,0,4,3,overlapping).valid);
 static_assert(!GameNativeMultiDirtyUpload::select(6,4,entire,2,16,0,0,6,4,tiles).valid);
 static_assert(!GameNativeMultiDirtyUpload::select(6,4,entire,2,32,0,0,5,4,tiles).valid);
-static_assert(!GameNativeMultiDirtyUpload::select(6,4,entire,9,144,0,0,6,4,tiles).valid);
+static_assert(!GameNativeMultiDirtyUpload::select(6,4,entire,33,528,0,0,6,4,tiles).valid);
 constexpr GameNativeDirtyRectangle outOfBounds[]={{0,0,2,2},{4,1,7,4}};
 static_assert(!GameNativeMultiDirtyUpload::select(6,4,entire,2,32,0,0,7,4,outOfBounds).valid);
 int main() {

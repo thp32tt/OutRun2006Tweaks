@@ -5429,7 +5429,7 @@ void before_game_present(IDirect3DDevice9* game,
         // D3D9 can also describe a complete menu/car/race repaint as several
         // disjoint dirty rectangles. Verify exact, nonoverlapping full coverage
         // before native publication, never use a full rcBound as proof by itself.
-        // Limit inspection to eight RECTs and a verified header/buffer extent.
+        // Inspect at most 32 RECTs with verified header/buffer extents.
         GameNativeDirtyRectangle partitionRects[
             GameNativeDirtyRegionCoverage::kMaxPartitionRects]{};
         const bool boundedPartition = fullMode && backbufferKnown && dirtyRegion &&
