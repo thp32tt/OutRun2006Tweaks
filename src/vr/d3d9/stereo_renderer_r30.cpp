@@ -1923,9 +1923,11 @@ namespace OutRunVRStereo
                 // responsive mode retain the legible original 1.0 -> 1.25
                 // effective default without disabling smaller slider values.
                 // External F11, GOAL, world and gameplay HUD remain isolated.
-                const float readable = OutRunVrPauseEye::ResponsiveUserScale(
-                    requested, Settings::VRHudResponsiveLayout.get());
-                return std::clamp(readable, 0.55f, 1.50f);
+                // R84 visual recovery: user HMD evidence shows that
+                // ResponsiveUserScale(1.0)=1.25 followed by an XR portrait
+                // sqrt(aspect) boost magnifies ESC roughly twice. The slider
+                // is the exact requested optical scale; preserve HUD/F11.
+                return std::clamp(requested, 0.55f, 1.50f);
             }
             return R30HudScaleValue();
         }
@@ -1999,9 +2001,10 @@ namespace OutRunVRStereo
             // enlargement before the existing X/Y contain split. Only ESC
             // shell and exact arrows receive this correction; all other
             // world, HUD, menu and external overlay paths stay unchanged.
-            const float opticalScale =
-                OutRunVrPauseEye::ResponsiveMenuScale(
-                    userScale, sourceOverTarget, pauseResponsive);
+            // Apply only the aspect-preserving contain split, not a second
+            // hidden pause enlargement. This is R84-only: the protected R26
+            // rollback owner retains its existing independent implementation.
+            const float opticalScale = userScale;
             if (sourceOverTarget >= 1.0f)
             {
                 scaleX = opticalScale;
@@ -2493,9 +2496,34 @@ namespace OutRunVRStereo
             // A missing anchor must never reuse an earlier vehicle's depth.
             const auto scope = OutRunVR::GameSemantic::EffectiveScope();
             if (OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(scope))
-                return OutRunVR::GameSemantic::CurrentProjectedMarker()
+            {
+                const auto* marker =
+                    OutRunVR::GameSemantic::CurrentProjectedMarker();
+                return marker && marker->valid
                     ? R30ScreenSpaceKind::ProjectedWorldMarker2D
                     : R30ScreenSpaceKind::None;
+            }
+
+            // The R26+HUD HMD comparison build requires source semantics in
+            // addition to D3D state. In R84 an untagged depth-disabled alpha
+            // road/sky/particle draw could be sent through the finite HUD
+            // plane, breaking per-eye world projection and leaving black
+            // regions. No render-state heuristic can grant HUD ownership.
+            const bool ownedHud =
+                OutRunVR::GameSemantic::CorroboratesHud(scope);
+            const bool ownedOverlay =
+                OutRunVR::GameSemantic::CorroboratesScreenOverlay2D(scope);
+            const bool ownedEffect =
+                scope == OutRunVR::GameSemantic::RenderScope::SceneEffect ||
+                OutRunVR::GameSemantic::CorroboratesProjectedScreenEffect(scope);
+            const bool ownedLensCentre =
+                !OutRunVR::GameSemantic::QueueRenderActive() &&
+                scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard &&
+                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::LensFlareCentre;
+            if (!ownedHud && !ownedOverlay && !ownedEffect &&
+                !ownedLensCentre)
+                return R30ScreenSpaceKind::None;
 
             float m34 = 0.0f;
             float m44 = 0.0f;
@@ -2506,7 +2534,9 @@ namespace OutRunVRStereo
                 OutRunVR::PassPolicy::ClassifyProjectionSignature(m34, m44);
             if (projectionClass ==
                 OutRunVR::PassPolicy::ProjectionClass::Orthographic2D)
-                return R30ScreenSpaceKind::Hud2D;
+                return (ownedHud || ownedOverlay)
+                    ? R30ScreenSpaceKind::Hud2D
+                    : R30ScreenSpaceKind::None;
 
             if (projectionClass !=
                 OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
@@ -2533,6 +2563,12 @@ namespace OutRunVRStereo
             if (zEnable == D3DZB_FALSE &&
                 (alphaBlend != FALSE || alphaTest != FALSE))
             {
+                // Depth-disabled particles, glass, road and sky are not
+                // automatically screen overlays. The original R26 route
+                // required positive semantic ownership here.
+                if (!ownedHud && !ownedOverlay && !ownedEffect &&
+                    !ownedLensCentre)
+                    return R30ScreenSpaceKind::None;
                 // Only the explicitly tagged, non-queued centre world billboard
                 // bypasses flat-effects. All other translucent draws keep the
                 // conservative projected-effect classification.
