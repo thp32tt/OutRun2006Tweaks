@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:X8_ALPHA_NO_WRITE_CONTINUITY",
   "feature_id": "DX11-X8-ALPHA-GAME-FRAME-CONTINUITY",
-  "status": "BUILD_VALIDATION_PENDING",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -20,7 +20,7 @@
   "packaging_status": "NOT_REQUIRED",
   "base_head_sha": "2d7df378709698069bb049a462fb50bfdacd86be",
   "material_result_sha": "5b4be863783eb64cc0f23d34df389a69e9c81729",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "6fc78607621c2b98994a87c1e11784addc5a85f3",
   "changed_files": [
     "src/vr/d3d11/native_game_masked_draw.hpp",
     "src/vr/d3d11/live_game_frame_bridge.cpp",
@@ -54,9 +54,9 @@
     ]
   },
   "acceptance_results": {
-    "x8-native-continuity": "PENDING",
-    "a8-z-mrt-fallback": "PENDING",
-    "exact-sha-ci": "PENDING"
+    "x8-native-continuity": "PASS",
+    "a8-z-mrt-fallback": "PASS",
+    "exact-sha-ci": "PASS_EXACT_SHA"
   },
   "development_strategy": {
     "work_class": "integration",
@@ -95,14 +95,24 @@
     "C0_RECOVER": "Checked latest GitHub branch and prior 00769 C6 record; did not duplicate previously completed overlapping dirty upload work.",
     "C1_REVIEW": "Found valid real D3D9 alpha-only Draw/Indexed to an X8 backbuffer falsely classified as unsupported, truncating native source sequence.",
     "C2_IMPLEMENT": "Added exact backbuffer RT0/A8-X8 identity and physical no-write color normalization; real Draw/Indexed and D3D9 fallback linked; portable positive/negative C++ tests.",
-    "C3_VALIDATE": "GitHub first exact SHA 5b4be8 DX11 Fast failed before source probes: latest 00769 C6-only record lacked strategy; 00770 full feature record and 00768 stronger linkage regression added as causal Gate repair.",
-    "C4_COMMIT": "5b4be8 source material; current result SHA will be updated to this repair commit after fast-forward.",
+    "C3_VALIDATE": "Exact validation-bearing SHA 6fc78607621c2b98994a87c1e11784addc5a85f3: DX11 Fast, Backend Conversion, Win32 Release Build, OpenXR VR architecture and OutRun HUD Inspector all SUCCESS. Optional VR PC Fast Test Build skipped.",
+    "C4_COMMIT": "C++ material implementation 5b4be863783eb64cc0f23d34df389a69e9c81729 plus causal test/policy record repair 6fc78607621c2b98994a87c1e11784addc5a85f3 (exact validated).",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED / PASS_EXACT_SHA / RUNTIME_VALIDATION=UNTESTED"
   },
   "evidence": {
     "first_material_sha": "5b4be863783eb64cc0f23d34df389a69e9c81729",
     "first_failure_fast_run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38725967435",
-    "runtime": "No OutRun gamepad, Quest3, VDXR or in-game native output test performed."
+    "runtime": "No matching Quest3/VDXR, OutRun screen or gamepad exercise in this task; source/CI evidence alone does not demonstrate hardware game parity.",
+    "validation_sha": "6fc78607621c2b98994a87c1e11784addc5a85f3",
+    "source_commit_url": "https://github.com/thp32tt/OutRun2006Tweaks/commit/6fc78607621c2b98994a87c1e11784addc5a85f3",
+    "ci_workflow_runs": {
+      "dx11_fast": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38726263051",
+      "backend_conversion": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38726262941",
+      "win32_build": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38726269483",
+      "openxr": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38726269471",
+      "hud_inspector": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38726269595"
+    },
+    "optional_vr_pc_fast_build": "SKIPPED (not among five mandatory Gates)"
   }
 }
