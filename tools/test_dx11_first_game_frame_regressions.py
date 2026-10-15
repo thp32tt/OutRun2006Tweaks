@@ -257,7 +257,7 @@ def main() -> None:
         "s.frameBatch.accepts(candidateOrdinal, s.probeSlot,",
         "env_batch_opt_in());",
         "if (!admitted)",
-        "s.frameBatch.accepts_full_seeded(",
+        "s.frameBatch.accepts_full_on_source_target(",
         "s.frameBatch.must_abort_unsupported(fullMode, multiBatch)",
         "s.probeSlot = GameNativeFrameBatch::next_probe_slot(",
         "s.probeSlot, s.eligibleThisFrame);",
@@ -268,13 +268,13 @@ def main() -> None:
     # The whole game output must not accept the first Draw unless a real
     # successful full TARGET Clear matches the same D3D9 device/backbuffer.
     # Preserve destructive admission testing against the new seeded call.
-    assert "s.clearColor.matches(reinterpret_cast<std::uintptr_t>(game)," in bridge
-    assert "output.targetIdentity))" in bridge
+    assert "const bool sameClearedGameTarget = s.clearColor.matches(" in bridge
+    assert "output.targetIdentity);" in bridge
     broken = bridge.replace("env_batch_opt_in());",
                             "true);", 1)
     assert broken != bridge and sampling[3] not in broken
     # Removing the new full-frame admission must also fail the source contract.
-    missing_full = bridge.replace("s.frameBatch.accepts_full_seeded(",
+    missing_full = bridge.replace("s.frameBatch.accepts_full_on_source_target(",
                                   "false", 1)
     assert missing_full != bridge and sampling[5] not in missing_full
     assert "s.probeSlot = 0;" in bridge
