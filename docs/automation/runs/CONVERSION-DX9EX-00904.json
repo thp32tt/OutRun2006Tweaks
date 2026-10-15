@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00904",
+  "production_id": "CONVERSION-DX9EX-00904",
+  "event_id": "CONVERSION-DX9EX-00904-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00904",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "PENDING_EXACT_SHA_CI",
+  "phase": "C4_COMMIT",
+  "checkpoint": "C4_STATE",
+  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "ab5b1786c4da5a8738a225586017bcd46919e80c",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_dx9ex_r84_lens_source.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00904.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Route source-proven direct C993 centre lens through R84 exact original-WVP stereo regardless of intervening depth/alpha state. Preserve original CABE halos, SkyGlow, and unrelated screen/world passes.",
+    "scope_boundary": "Only original C993 R84 screen-pass classification, with existing strict original-WVP provenance and R33 physical per-eye draw; no world-wide alpha promotion, R26_SAFE override, input/FFB, host, DX11 or frozen DXVK changes.",
+    "trace_stages": [
+      "Original DrawObjectAlphaCentre producer establishes exact call semantics; source records raw c64 tied to call, shader epoch, pose and draw.",
+      "R84 R30 previously allowed ExactLensCentreWorld only inside zEnable==FALSE and alphaBlend/alphaTest TRUE, silently returning lower path if the exact central source used other raster modes.",
+      "R84 R30 now classifies only proven direct C993 before depth/alpha heuristic; R30 original source→head→eye WVP and R33 dual physical draw/restore remain unchanged; missing ownership remains fail-closed."
+    ],
+    "subcomponents": [
+      "Admit direct source-owned C993 in perspective pass before unrelated D3D9 alpha/depth state query.",
+      "Retain CABE outer halos, queued-world/unknown billboard fallback, original matrix and shader pose proof, and R26_SAFE rollback.",
+      "Enforce classification order and missing source guards through changed-area negative mutations; require final exact-SHA full Windows+Domain+source gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "c993_exact_source_stereo",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Direct C993 producer→R30 source proof→R33 physical dual-eye draw",
+        "expected_behavior": "Original-WVP proof, not alpha/depth switches, determines admission; R33 must draw and restore both eyes."
+      },
+      {
+        "id": "c993_unowned_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Unproven lens, CABE outer rings, world particles, SkyGlow, reset, R26_SAFE",
+        "expected_behavior": "Missing call/shader/pose/queue proof still falls back; no generic alpha or WorldBillboard promotion."
+      },
+      {
+        "id": "c993_exact_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Win32 R84 game+R26_SAFE, x64 host, package, Domain, lens source and Full Source gates",
+        "expected_behavior": "Exact validation-bearing SHA PASS; Quest3/VDXR optical acceptance separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "c993_exact_source_stereo": "PENDING_EXACT_SHA_CI",
+    "c993_unowned_fallback": "PENDING_EXACT_SHA_CI",
+    "c993_exact_ci": "PENDING_EXACT_SHA_CI"
+  },
+  "diagnosis": {
+    "source_evidence": "The only ExactLensCentreWorld branch was nested after zEnable==D3DZB_FALSE and alphaBlend||alphaTest, rather than being selected by already-proven direct centre raw WVP.",
+    "hardware_causation": "UNTESTED: user stereo symptoms have not been reproduced with a matching exact-SHA HMD profile.",
+    "protected_paths": [
+      "R84 original scene stereo",
+      "CABE halos",
+      "SkyGlow",
+      "R26_SAFE rollback",
+      "Original input/FFB"
+    ]
+  },
+  "score_delta_this_attempt": 0,
+  "score_once": false,
+  "hold_reason": "EXACT_SHA_CI_PENDING; NEED_HMD_TEST"
+}

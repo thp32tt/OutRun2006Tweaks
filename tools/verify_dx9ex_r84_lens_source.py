@@ -69,6 +69,18 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, seman
         route.index("SelectWorldRoute(true, owned)") <
         route.index("return R30ScreenSpaceKind::ExactLensCentreWorld;") <
         route.rindex("return R30ScreenSpaceKind::None;"))
+    # Source-proven C993 classification precedes alpha and depth queries:
+    # depth-enabled and non-blended variants must still reach R33 stereo.
+    assert route.index("if (ownedLensCentre)") < (
+        route.index("R30HasExactLensCentreRawWvp(originalGameWvp)") <
+        route.index("return R30ScreenSpaceKind::ExactLensCentreWorld;") <
+        route.index("R29OwnerTryGetEffectTelemetrySnapshot(effect)"))
+    assert route.count("R30HasExactLensCentreRawWvp(originalGameWvp)") == 1
+    assert route.index("return R30ScreenSpaceKind::ExactLensCentreWorld;") < (
+        route.index("GetRenderState(D3DRS_ZENABLE"))
+    assert route.index("scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard)") < (
+        route.index("return R30ScreenSpaceKind::FlatPerspectiveEffect;"))
+
     # Never require VRTelemetry to perform the stereo route. Telemetry guards
     # logging only; geometry is driven by authenticated original-game data.
     assert route.index("R30HasExactLensCentreRawWvp(originalGameWvp)") < (
@@ -209,6 +221,7 @@ def main():
         (2, "R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch)", "true"),
         (2, "OutRunVRRenderer::GetLastGameWvpPoseEpoch(),", "0,"),
         (2, "R29OwnerTopLevelDrawSerial() + 1u", "0"),
+        (2, "if (ownedLensCentre)\n            {", "if (false)\n            {"),
         (2, "SelectWorldRoute(true, owned)", "SelectWorldRoute(true, true)"),
         (2, "return R30ScreenSpaceKind::ExactLensCentreWorld;", "return R30ScreenSpaceKind::None;"),
         (2, "R30HasExactLensCentreRawWvp(rawGameWvp)", "true /* non-owned GPU c64 */"),

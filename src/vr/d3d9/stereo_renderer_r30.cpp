@@ -2573,10 +2573,41 @@ namespace OutRunVRStereo
                 OutRunVR::PassPolicy::ProjectionClass::Perspective3D)
                 return R30ScreenSpaceKind::None;
 
-            // R29 already snapshots these exact game render states under
-            // proven StateBlock Apply/recording coverage. Avoid repeating three
-            // synchronous D3D9 driver queries for every perspective UI draw.
-            // A stale/unreliable cache deliberately falls back to live state.
+            // A source-owned direct C993 centre is a spatial WorldBillboard,
+            // not a generic depth-disabled alpha overlay. Its original game
+            // may vary Z/alpha states inside the draw; do not let those states
+            // veto its per-eye transform after exact call/pose/shader/WVP proof.
+            // The original GPU c64 is preserved separately for restoration.
+            if (ownedLensCentre)
+            {
+                float originalGameWvp[16]{};
+                const bool owned =
+                    R30HasExactLensCentreRawWvp(originalGameWvp);
+                if (Settings::VRTelemetry)
+                {
+                    static thread_local bool reportedOwned = false;
+                    static thread_local bool reportedMiss = false;
+                    bool& reported = owned ? reportedOwned : reportedMiss;
+                    if (!reported)
+                    {
+                        reported = true;
+                        spdlog::info(
+                            "VR R84 C993 RAW_WVP_SOURCE: {} "
+                            "(same call/pose/shader/draw; "
+                            "stereo requires exact owned raw game WVP)",
+                            owned ? "EXACT_OWNER" : "MISSING_OR_STALE");
+                    }
+                }
+                if (OutRunVR::LensCentre::SelectWorldRoute(true, owned) ==
+                        OutRunVR::LensCentre::WorldRoute::ExactCentreStereo)
+                    return R30ScreenSpaceKind::ExactLensCentreWorld;
+                // Missing source must not become ScreenHud or borrow a
+                // previously head-injected live shader constant.
+                return R30ScreenSpaceKind::None;
+            }
+
+            // All other tagged overlays/effects retain the conservative
+            // alpha/depth heuristic and StateBlock-aware cached state.
             R29OwnerEffectTelemetrySnapshot effect{};
             const bool haveCachedEffect =
                 R29OwnerTryGetEffectTelemetrySnapshot(effect);
@@ -2594,52 +2625,11 @@ namespace OutRunVRStereo
             if (zEnable == D3DZB_FALSE &&
                 (alphaBlend != FALSE || alphaTest != FALSE))
             {
-                // Depth-disabled particles, glass, road and sky are not
-                // automatically screen overlays. The original R26 route
-                // required positive semantic ownership here.
-                if (!ownedHud && !ownedOverlay && !ownedEffect &&
-                    !ownedLensCentre)
-                    return R30ScreenSpaceKind::None;
-                // Only the explicitly tagged, non-queued centre world billboard
-                // bypasses flat-effects. All other translucent draws keep the
-                // conservative projected-effect classification.
-                const auto scope = OutRunVR::GameSemantic::EffectiveScope();
+                // Do not promote any other direct WorldBillboard, including
+                // nested projected-effect calls, to flat HUD space.
                 if (!OutRunVR::GameSemantic::QueueRenderActive() &&
                     scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard)
-                {
-                    // The exact non-queued C993 centre is allowed to use
-                    // the original game WVP only when call, pose, shader and
-                    // draw provenance agree. Missing evidence keeps R29's
-                    // conservative world route; never borrow live injected c64.
-                    if (OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                            OutRunVR::GameSemantic::ProducerToken::LensFlareCentre)
-                    {
-                        float originalGameWvp[16]{};
-                        const bool owned =
-                            R30HasExactLensCentreRawWvp(originalGameWvp);
-                        if (Settings::VRTelemetry)
-                        {
-                            static thread_local bool reportedOwned = false;
-                            static thread_local bool reportedMiss = false;
-                            bool& reported = owned ? reportedOwned : reportedMiss;
-                            if (!reported)
-                            {
-                                reported = true;
-                                spdlog::info(
-                                    "VR R84 C993 RAW_WVP_SOURCE: {} "
-                                    "(same call/pose/shader/draw; "
-                                    "stereo requires exact owned raw game WVP)",
-                                    owned ? "EXACT_OWNER" : "MISSING_OR_STALE");
-                            }
-                        }
-                        if (OutRunVR::LensCentre::SelectWorldRoute(true, owned) ==
-                                OutRunVR::LensCentre::WorldRoute::ExactCentreStereo)
-                            return R30ScreenSpaceKind::ExactLensCentreWorld;
-                    }
-                    // CABE discs, unrelated alpha and queued billboards
-                    // never enter this path; the previous world route stays.
                     return R30ScreenSpaceKind::None;
-                }
                 return R30ScreenSpaceKind::FlatPerspectiveEffect;
             }
             return R30ScreenSpaceKind::None;
