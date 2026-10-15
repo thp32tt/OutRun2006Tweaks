@@ -60,13 +60,13 @@
     ],
     "eye_ownership": "Texture decoding precedes D3D9 sprite Draw and stereo per-eye composition; this change preserves producer semantic tags and eye ownership rather than remapping either eye."
   },
-  "status": "BUILD_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
-  "runtime_evidence": "No physical Quest 3/VDXR headset test; game colors, FPS and menu correctness remain unverified.",
+  "runtime_evidence": "All required GitHub exact-SHA build, analyzer, HUD DDS and package gates PASS. No Quest3/VDXR physical stereo, visual asset, reset, FPS or HMD acceptance run.",
   "source_parent_sha": "24b7451380cbf0bc7df0c8602aaef4237a33d648",
   "changed_files": [
     "src/hooks_textures.cpp",
@@ -74,23 +74,40 @@
     "docs/automation/runs/CONVERSION-DX9EX-00877.json"
   ],
   "acceptance_results": {
-    "vehicle-dds-row-pitch": "SOURCE_IMPLEMENTED",
-    "invalid-source-native-fallback": "TEST_ADDED",
-    "exact-windows-gates": "PENDING"
+    "vehicle-dds-row-pitch": "PASS",
+    "invalid-source-native-fallback": "PASS",
+    "exact-windows-gates": "PASS"
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "FIRST_CI_FAILED_MISSING_REQUIRED_RUN_RECORD",
-  "result_commit_ci_skip": false,
+  "hold_reason": "QUEST3_VDXR_HARDWARE_RUNTIME_UNTESTED",
+  "result_commit_ci_skip": true,
   "material_result_sha": "a458ed218f04045bb9665ceca78843399cd2f724",
   "ci_evidence": {
-    "status": "RETRY_EXACT_SHA",
-    "first_material_sha": "a458ed218f04045bb9665ceca78843399cd2f724",
-    "failed_dx9ex_active": {
-      "run_id": 38684912778,
-      "failed_job": "policy",
-      "cause": "Missing run record at exact source commit; compilation not executed"
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "d66a828bee43a4a6516129cda3addc78df17ed4c",
+    "material_sha": "a458ed218f04045bb9665ceca78843399cd2f724",
+    "dx9ex_active": {
+      "run_id": 38685052396,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, full-chain-compile R84, game R26_SAFE, host, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38685052343,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38685052820,
+      "conclusion": "SUCCESS",
+      "required_jobs": "source-cross-domain, msvc-analyze-active-game, msvc-analyze-openxr-host (3/3)"
+    },
+    "hud_inspector": {
+      "run_id": 38685052381,
+      "conclusion": "SUCCESS",
+      "dds_source_obligations": 65,
+      "dds_negative_mutations": "48/48"
     },
     "runtime": "UNTESTED"
-  }
+  },
+  "validation_bearing_result_sha": "d66a828bee43a4a6516129cda3addc78df17ed4c"
 }
