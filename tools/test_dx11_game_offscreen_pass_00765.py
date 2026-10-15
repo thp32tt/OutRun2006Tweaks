@@ -40,7 +40,7 @@ for original, replacement in (
     ('GetRenderState(D3DRS_ZENABLE, &zEnabled)', 'GetRenderState(D3DRS_ZWRITEENABLE, &zEnabled)'),
     ('GetDeviceCaps(&caps)', 'GetDeviceCaps(nullptr)'),
     ('for (DWORD i = 1u; i < caps.NumSimultaneousRTs; ++i)', 'for (DWORD i = 1u; i <= 3u; ++i)'),
-    ('GameNativeOffscreenPass::source_has_no_main_writes(', 'false /* unproved pass */ && GameNativeOffscreenPass::source_has_no_main_writes('),
+    ('GameNativeOffscreenPass::source_has_no_main_writes(', 'GameNativeOffscreenPass::unsafe_unproven_main_writes('),
 ):
     h, b = r9, bridge
     if original in h:
