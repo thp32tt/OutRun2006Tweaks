@@ -806,6 +806,13 @@ namespace OutRunVR::GameSemantic
         {
             if (SpriteNodeSemanticTags[i].node != node)
                 continue;
+            // A producer can publish the next frame while the renderer is
+            // draining this SpriteNode walk. A newer tag is NOT evidence for
+            // the old queue node, even if its allocator reuses the pointer.
+            // Keep that tag intact for the next queue walk's cutoff.
+            if (SpriteQueueDepth != 0 &&
+                SpriteNodeSemanticTags[i].serial > SpriteQueueSemanticCutoff)
+                return fallback;
             if (producer)
                 *producer = SpriteNodeSemanticTags[i].producer;
             if (projectedMarker)
@@ -846,6 +853,12 @@ namespace OutRunVR::GameSemantic
         {
             if (SpriteNodeSemanticTags[i].node != node)
                 continue;
+            // Peek and physical queue consumption MUST agree on the same
+            // frame cutoff. Never consume a next-frame +TIME/HUD/world tag
+            // on today's GPU draw or erase its hash hint prematurely.
+            if (SpriteQueueDepth != 0 &&
+                SpriteNodeSemanticTags[i].serial > SpriteQueueSemanticCutoff)
+                return fallback;
             const RenderScope scope = SpriteNodeSemanticTags[i].scope;
             if (exactTag)
                 *exactTag = true;

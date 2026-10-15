@@ -1,0 +1,87 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00902",
+  "production_id": "CONVERSION-DX9EX-00902",
+  "event_id": "CONVERSION-DX9EX-00902-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00902",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_CI_PENDING",
+  "phase": "C4_COMMIT",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "vrhost/tests/semantic_tag_hint_smoke.cpp",
+    "tools/verify_vr_cross_thread_semantic_registry.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00902.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Keep original in-game HUD speed/time/position and exact +TIME/rank SpriteNode semantic ownership attached to the correct visible frame during cross-thread queue production; prevent a future frame's tag from head-locking the current draw.",
+    "scope_boundary": "Only producer-to-queued-D3D9 GPU render-owner generation lifetime for existing HUD and exact rank/+TIME primitives. No broad alpha/ScreenOverlay promotion, SkyGlow, GOAL animation changes, input/FFB, desktop menu/ESC, R26_SAFE fallback or DXVK.",
+    "trace_stages": [
+      "Original source hooks tag speed/time/rank and +TIME SpriteNodes with exact scope and producer on the shared registration thread.",
+      "R23/R64 queue rendering snapshots an immutable tag serial cutoff, but old Peek/Consume paths could read a later producer's tag from an overlapping next-frame registration.",
+      "R84 GPU owner now admits only queue-era tags consistently across D3DX Peek→RenderScope/producer and physical queue Consume; next queue walk retains and uses later owner instead of relabeling the current left/right eye."
+    ],
+    "subcomponents": [
+      "Enforce the existing queue Begin serial fence in both exact producer Peek and Consume, retaining locked registry lifetime and negative-bit hint correctness across frames.",
+      "Preserve already-present HUD/marker +TIME ownership during old queue walk, and guarantee next-frame queued rank and +TIME source declarations cannot leak into previous draw or be lost on End.",
+      "Run native Release/NDEBUG-enabled semantic smoke for current/new tag including XYZRHW vehicle marker depth identity, preserve good queue-end cleanup and cross-thread mutation guard."
+    ],
+    "acceptance_items": [
+      {
+        "id": "hud_frame_ownership",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original source HUD/StageExtension producer→D3DX batch Peek→queue GPU Consume",
+        "expected_behavior": "An original queue start snapshots a finite epoch; subsequent HUD/+TIME tags remain unavailable to both Peek and Consume until the next frame while earlier exact owners remain intact."
+      },
+      {
+        "id": "hud_stereo_negative_generation",
+        "category": "fallback_regression",
+        "behavior_area": "Future rank marker and ordinary ScreenOverlay2D fallback",
+        "expected_behavior": "Next-frame RankMarker source and view-space anchor cannot be promoted for earlier car, generic queued UI stays ScreenOverlay2D, and future hint/anchor remain available after the old frame ends."
+      },
+      {
+        "id": "hud_r84_full_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Windows x86 mainline R84 + rollback R26_SAFE and x64 host package",
+        "expected_behavior": "Final exact-SHA DX9Ex Active Windows game+host+package, Domain Isolation and Full Source Impact passes without skip and no real Quest3/VDXR runtime claim."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Cross-thread shared SpriteNodeSemanticTags read by canonical queue while next-frame producers can publish independently; queue Begin captures serial but Peek and Consume did not check it.",
+    "source_trace": [
+      "Original HUD/StageExtensionTime/RANK tags published under mutex by RegisterSpriteNodeScope with monotonically increasing serial.",
+      "Queue BeginSpriteQueueRender/SelectSpriteQueueNode captures producer serial cutoff, while PeekSpriteNodeScope/ConsumeSpriteNodeScope accepted any exact-pointer tag even from beyond it.",
+      "R84 per-eye GPU draw classifies CurrentRenderProducerToken and EffectiveScope based on that queue tag; wrong generation could select ScreenHud or projected rank on an old current draw."
+    ],
+    "root_cause": "Actual code-path cross-frame semantic-read race: producer future serial passes pointer/tag lookup despite active frame cutoff, yielding wrong HUD/rank per-eye ownership. Hardware symptom linkage remains untested.",
+    "alternatives_rejected": [
+      "Do not clear entire global registry at queue End or relabel world alpha as ScreenHud; existing after-cutoff cleanup already preserves new tags, so read-side admission must respect it."
+    ],
+    "fix_evidence": "Both locked PeekSpriteNodeScope and ConsumeSpriteNodeScope now reject serial greater than current queue cutoff and retain future tag and hint; old tagged sources remain accepted.",
+    "negative_test_evidence": "Changed existing semantic-tag-hint Release smoke to always run EXPECT even under NDEBUG; added old/new +TIME cursor and next-frame rank anchor cases; updated source mutation verifier for both tag-read gates.",
+    "eye_ownership": "Exact per-frame GameSemantic CurrentQueue producer gates R84 c64/XYZRHW per-eye classification; future rank car view depth and +TIME ScreenHud cannot rebind current-frame eye source."
+  },
+  "acceptance_results": {
+    "hud_frame_ownership": "PENDING",
+    "hud_stereo_negative_generation": "PENDING",
+    "hud_r84_full_ci": "PENDING"
+  },
+  "runtime_evidence": "No real Quest3/VDXR game/headset test at this exact SHA.",
+  "score_once": false,
+  "score_delta_this_attempt": 0
+}

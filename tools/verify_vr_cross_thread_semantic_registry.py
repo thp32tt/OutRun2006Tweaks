@@ -197,6 +197,25 @@ for marker in ("std::memory_order_acquire", "has(bits.first) && has(bits.second)
     if marker not in hint:
         fail("invalid two-hash negative-hint contract: " + marker)
 
+# The active queue must not steal tags published for the next frame.
+# Both Peek (D3DX batch-boundary) and Consume (GPU owner) must compare
+# the exact same snapshot epoch before granting any source privilege.
+for name, body in (("peek", peek), ("consume", consume)):
+    required = (
+        "SpriteQueueDepth != 0",
+        "SpriteNodeSemanticTags[i].serial > SpriteQueueSemanticCutoff",
+        "return fallback;",
+    )
+    if any(token not in body for token in required):
+        fail(f"{name}: next-generation queue tag admitted into current draw")
+    # A deleted serial gate must be observable, never hidden by other guards.
+    mutant = body.replace(
+        "SpriteNodeSemanticTags[i].serial > SpriteQueueSemanticCutoff",
+        "false", 1)
+    if "SpriteNodeSemanticTags[i].serial > SpriteQueueSemanticCutoff" in mutant:
+        fail(f"{name}: cutoff mutation was not applied")
+print("VR queue next-generation Peek/Consume source-owner guards PASS")
+
 # Positive and collision/overflow/expiry negative models. Regressions in
 # deletion accounting can cause a real exact HUD/rank tag to be lost.
 def filter_bits(pointer):
