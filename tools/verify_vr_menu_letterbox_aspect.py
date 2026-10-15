@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""DX9Ex main-menu 4:3 sidebars: safe widescreen-only geometry and Reset recovery.
+"""DX9Ex main-menu 4:3 sidebars: side/portrait geometry and Reset recovery.
 
 Static destructive controls and numerical 4:3/16:9/21:9/portrait fixtures.
 This is not a Quest3/VDXR optical PASS.
@@ -8,6 +8,8 @@ from pathlib import Path
 from math import isfinite
 
 src = (Path(__file__).resolve().parents[1] / "src/overlay/hooks_overlay.cpp").read_text()
+menu_bars = (Path(__file__).resolve().parents[1] /
+             "src/vr/ui/menu_letterbox_geometry.hpp").read_text()
 
 def verify(code: str) -> None:
     create = code.split("void CreateLetterboxVertex()\n{", 1)[1].split("\nclass D3DHooks : public Hook", 1)[0]
@@ -19,11 +21,12 @@ def verify(code: str) -> None:
         "std::isfinite(sourceWidth) &&" if False else "!std::isfinite(sourceWidth)",
         "!std::isfinite(sourceHeight)",
         "sourceWidth < 1.0f || sourceHeight < 1.0f",
-        "sourceHeight * (4.0f / 3.0f)",
-        "sourceWidth <= contentWidth",
-        "!std::isfinite(contentWidth)",
-        "(sourceWidth - contentWidth) * 0.5f + 0.5f",
-        "borderWidth >= sourceWidth * 0.5f",
+        "OutRunVR::UI::BuildMenuBarGeometry(",
+        "sourceWidth, sourceHeight);",
+        "layout.axis == OutRunVR::UI::MenuBarAxis::Invalid",
+        "if (!layout.hasBars())",
+        "layout.vertices.size()",
+        "layout.vertices[i].x, layout.vertices[i].y",
         "FAILED(d3ddev->CreateVertexBuffer(",
         "FAILED(candidate->Lock(",
         "candidate->Release();",
@@ -31,8 +34,11 @@ def verify(code: str) -> None:
     ]
     for token in required:
         assert token in create, token
-    assert create.index("sourceWidth <= contentWidth") < create.index(
+    assert create.index("if (!layout.hasBars())") < create.index(
+        "CUSTOMVERTEX vertices[8]{};") < create.index(
         "IDirect3DVertexBuffer9* candidate")
+    assert create.index("OutRunVR::UI::BuildMenuBarGeometry(") < create.index(
+        "if (!layout.hasBars())")
     assert create.index("FAILED(candidate->Lock(") < create.index(
         "LetterboxVertex = candidate;")
     # Create and Unlock now each have independent failed-buffer releases.
@@ -46,6 +52,71 @@ def verify(code: str) -> None:
     assert "d3ddev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 4, 2);" in endscene
 
 verify(src)
+
+# The exact R84 C++ header owns geometry after portrait-menu conversion.
+# Check the compiled header and the live EndScene consumer, not retired
+# widescreen-only arithmetic inside CreateLetterboxVertex.
+def verify_menu_bar_geometry(code: str) -> None:
+    required = (
+        "enum class MenuBarAxis : std::uint8_t { Invalid, None, Sides, TopBottom };",
+        "float sourceWidth, float sourceHeight) noexcept",
+        "sourceWidth >= 1.0f && sourceWidth <= 16384.0f",
+        "sourceHeight >= 1.0f && sourceHeight <= 16384.0f",
+        "const float containWidth = sourceHeight * (4.0f / 3.0f);",
+        "const float containHeight = sourceWidth * (3.0f / 4.0f);",
+        "if (sourceWidth > containWidth + 0.5f)",
+        "else if (sourceHeight > containHeight + 0.5f)",
+        "result.axis = MenuBarAxis::Sides;",
+        "result.axis = MenuBarAxis::TopBottom;",
+        "result.axis = MenuBarAxis::None;",
+        "return axis == MenuBarAxis::Sides ||",
+        "axis == MenuBarAxis::TopBottom;",
+        "static_assert(BuildMenuBarGeometry(640, 480).axis == MenuBarAxis::None);",
+        "static_assert(BuildMenuBarGeometry(1920, 1080).axis == MenuBarAxis::Sides);",
+        "static_assert(BuildMenuBarGeometry(1200, 1600).axis == MenuBarAxis::TopBottom);",
+        "static_assert(BuildMenuBarGeometry(1200, 1600).vertices[2].y == 350.5f);",
+        "static_assert(BuildMenuBarGeometry(1200, 1600).vertices[4].y == 1250.0f);",
+        "static_assert(BuildMenuBarGeometry(1200, 1600).vertices[7].y == 1600.5f);",
+        "static_assert(BuildMenuBarGeometry(0, 1000).axis == MenuBarAxis::Invalid);",
+        "static_assert(BuildMenuBarGeometry(16385, 1000).axis == MenuBarAxis::Invalid);",
+    )
+    for marker in required:
+        assert marker in code, marker
+    assert code.count("result.vertices = {{") == 2
+    assert code.index("result.axis = MenuBarAxis::Sides;") < code.index(
+        "result.axis = MenuBarAxis::TopBottom;") < code.index(
+        "result.axis = MenuBarAxis::None;")
+
+verify_menu_bar_geometry(menu_bars)
+for old, bad in (
+    ("sourceWidth > containWidth + 0.5f", "sourceWidth < containWidth + 0.5f"),
+    ("sourceHeight > containHeight + 0.5f", "sourceHeight < containHeight + 0.5f"),
+    ("result.axis = MenuBarAxis::TopBottom;", "result.axis = MenuBarAxis::None;"),
+    ("result.axis = MenuBarAxis::Sides;", "result.axis = MenuBarAxis::None;"),
+    ("sourceHeight <= 16384.0f", "sourceHeight <= 32768.0f"),
+    ("static_assert(BuildMenuBarGeometry(1200, 1600).vertices[2].y == 350.5f);",
+     "static_assert(BuildMenuBarGeometry(1200, 1600).vertices[2].y == 0.5f);"),
+):
+    assert old in menu_bars, old
+    try:
+        verify_menu_bar_geometry(menu_bars.replace(old, bad, 1))
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("portrait geometry mutation survived: " + old)
+for old, bad in (
+    ("OutRunVR::UI::BuildMenuBarGeometry(", "OutRunVR::UI::BuildLegacySideGeometry("),
+    ("if (!layout.hasBars())", "if (layout.hasBars())"),
+    ("layout.vertices[i].x, layout.vertices[i].y", "0.0f, 0.0f"),
+):
+    assert old in src, old
+    try:
+        verify(src.replace(old, bad, 1))
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("menu source-header wiring mutation survived: " + old)
+print("PASS R84 portrait/landscape geometry, native fallback and 9 destructive controls")
 
 # The 4:3 menu sidebars are also allocated on the promoted D3D9Ex device.
 # D3DPOOL_MANAGED is invalid there; DEFAULT is released before Reset and
@@ -183,7 +254,7 @@ for w, h in ((1024,768), (1920,1080), (3440,1440), (2496,2688),
 assert 2496-(2688*4/3)<0
 mutants = (
     ("if (!d3ddev || !Game::screen_resolution)", "if (!d3ddev)"),
-    ("sourceWidth <= contentWidth", "sourceWidth < 0"),
+    ("if (!layout.hasBars())", "if (layout.hasBars())"),
     ("FAILED(candidate->Lock(", "SUCCEEDED(candidate->Lock("),
     ("candidate->Release();", "// leak on failed lock"),
     ("Settings::UIScalingMode > 0 && LetterboxVertex",
@@ -215,7 +286,7 @@ def verify_live_resize(source: str) -> None:
                   "LetterboxRasterWidth = sourceWidth;",
                   "LetterboxRasterHeight = sourceHeight;"):
         assert token in create, token
-    assert create.index("if (sourceWidth <= contentWidth)") < create.index(
+    assert create.index("if (!layout.hasBars())") < create.index(
         "LetterboxRasterDevice = d3ddev;")
     for token in ("validSource &&",
                   "currentDevice != LetterboxRasterDevice",
@@ -298,14 +369,14 @@ print("PASS live menu 4:3/16:9/21:9/portrait resize, invalid source and 6 destru
 
 
 # D3D9Ex Reset can transiently fail VB Create/Lock/Unlock. A failed
-# widescreen attempt must not be marked as cached: the next EndScene at
-# the same valid source size has to retry. An empty 4:3/portrait result
-# *is* complete and should remain cached without GPU allocations.
+# widescreen OR portrait allocation must not be marked as cached: the
+# next EndScene at the same valid source size has to retry. Only a
+# native 4:3 no-bars result is cached without GPU allocations.
 def verify_transient_ex_menu_retry(code: str) -> None:
     create = code.split("void CreateLetterboxVertex()\n{", 1)[1].split(
         "\nclass D3DHooks : public Hook", 1)[0]
-    empty = create.split("if (sourceWidth <= contentWidth)", 1)[1].split(
-        "const float borderWidth", 1)[0]
+    empty = create.split("if (!layout.hasBars())", 1)[1].split(
+        "CUSTOMVERTEX vertices[8]{};", 1)[0]
     unlock = create.split("if (FAILED(candidate->Unlock()))", 1)[1]
     ready = unlock.split("LetterboxVertex = candidate;", 1)[1]
     assert empty.count("LetterboxRasterDevice = d3ddev;") == 1
@@ -333,7 +404,7 @@ for old, bad in (
     ("if (FAILED(candidate->Unlock()))", "if (SUCCEEDED(candidate->Unlock()))"),
     ("LetterboxVertex = candidate;", "// lost successful GPU buffer"),
     ("LetterboxRasterDevice = d3ddev;",
-     "LetterboxRasterDevice = nullptr;"),  # portrait/4:3 cache must not disappear
+     "LetterboxRasterDevice = nullptr;"),  # native 4:3 cache must survive
     ("LetterboxVertex = candidate;\n\t// Only completed buffers",
      "LetterboxRasterDevice = d3ddev;\n\tLetterboxVertex = candidate;\n\t// Only completed buffers"),
 ):
@@ -350,13 +421,13 @@ for w, h in ((3440, 1440), (1920, 1080), (1024, 768), (2496, 2688)):
     next_size = (7, w, h)
     cached = (None, 0, 0)
     assert should_rebuild(cached, next_size)
-    if w > h * 4 / 3:
+    if w > h * 4 / 3 or h > w * 3 / 4:
         for failed_stage in ("Create", "Lock", "Unlock"):
             # The real code leaves cached untouched on all three failures.
             assert should_rebuild(cached, next_size), failed_stage
-    cached = next_size  # successful widescreen VB or completed empty bars
+    cached = next_size  # side/portrait VB or completed native 4:3
     assert not should_rebuild(cached, next_size)
-print("PASS D3D9Ex transient Create/Lock/Unlock retry, 4:3 no-bars cache, 4 destructive controls")
+print("PASS D3D9Ex side/portrait retry, native 4:3 no-bars cache, 4 destructive controls")
 
 # Issue #119: EndScene menu bars must ignore only inherited game clip masks.
 # Keep the original scissor/stencil states intact for the next scene and F11.
