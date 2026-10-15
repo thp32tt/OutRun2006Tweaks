@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "NEEDS_VALIDATION",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_FINAL_EXACT_SHA_GATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "6e48da6acb9d485189d871331ee36ef2ff2fef57",
   "material_result_sha": "57437f2531a21792d2d7dcf628778cd61d4064cc",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "afcf9ab49e7369405cd0c01fd4994d91c634b2a6",
   "source_paths": [
     "src/hooks_uiscaling.cpp",
     "src/vr/game/render_semantics.hpp"
@@ -67,9 +67,9 @@
     ]
   },
   "acceptance_results": {
-    "goal_result_text_stereo_batch": "SOURCE_IMPLEMENTED",
-    "batch_safety_fallback": "POSITIVE_NEGATIVE_REGRESSION_POLICY_PASS",
-    "mandatory_exact_sha_gates": "PENDING"
+    "goal_result_text_stereo_batch": "PASS_BUILD",
+    "batch_safety_fallback": "PASS_BUILD",
+    "mandatory_exact_sha_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "Three original GOAL Sumo_Printf parent hook scopes already covered direct primitive dispatch and queued SpriteNodes, but an ID3DXSprite::Draw inside the original E8 may defer the physical GPU submission until a later Flush/End after source scope restored. The existing D3DX finite GOAL owner only recognized GoalTime020, GoalTime150 and ResultProgress, not OutRunStagePrintf.",
@@ -92,7 +92,7 @@
     "material_source_commit": "57437f2531a21792d2d7dcf628778cd61d4064cc",
     "initial_active_run_id": 38783965786,
     "initial_policy_failure": "Required exact-task run JSON was absent; C++ compilation had not been attempted by skipped Active jobs. Adding this contract to enable mandated exact-SHA validation under same TASK_ID.",
-    "status": "PENDING_FINAL_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "required_gates": [
       "DX9Ex Active Validation",
       "Domain Isolation Guard",
@@ -104,10 +104,49 @@
     "first_post_record_failure": "Existing mutation goal-direct-before-removed replaced the new Sumo_Printf entry Flush rather than prior progress/helper boundary, but old verifier lacked a separate exact Sumo_Printf guard; static/rule verifier failure, not Windows compile failure.",
     "targeted_regression_repair_sha": "20d270221acdea8b5641259c97b83062e7d243a9",
     "targeted_regression_repair": "Verified OutRunStagePrintf original 3 exact CALLs, first incoming GOAL preflush before producer scope, direct source-exit Flush before restoration, queue and direct finite exact producer predicates independently. Existing destructive mutation tests are not removed.",
-    "regression_gate_after_repair": "DX9Ex Active 38784688997 policy SUCCESS at 20d27022, remaining game/host/full-chain compiling on non-canceling existing run. Full exact-SHA 4-Gate acceptance remains pending."
+    "regression_gate_after_repair": "DX9Ex Active 38784688997 policy SUCCESS at 20d27022, remaining game/host/full-chain compiling on non-canceling existing run. Full exact-SHA 4-Gate acceptance remains pending.",
+    "validation_bearing_result_sha": "afcf9ab49e7369405cd0c01fd4994d91c634b2a6",
+    "exact_sha_gate_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "sha": "afcf9ab49e7369405cd0c01fd4994d91c634b2a6",
+        "run_id": 38785059572,
+        "conclusion": "success",
+        "jobs": "policy,game,full-chain-compile,host,package 5/5"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "sha": "afcf9ab49e7369405cd0c01fd4994d91c634b2a6",
+        "run_id": 38785059555,
+        "conclusion": "success",
+        "jobs": "domain-isolation 1/1"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "sha": "afcf9ab49e7369405cd0c01fd4994d91c634b2a6",
+        "run_id": 38785059748,
+        "conclusion": "success",
+        "jobs": "source-cross-domain,msvc-analyze-openxr-host,msvc-analyze-active-game 3/3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "sha": "afcf9ab49e7369405cd0c01fd4994d91c634b2a6",
+        "run_id": 38785059701,
+        "conclusion": "success",
+        "jobs": "static-exe-analysis,build-hud-inspector 2/2"
+      }
+    ]
   },
-  "runtime_evidence": "No matching OutRun2006 runtime or Quest3/VDXR stereo headset session executed; optical pass and FPS effects unproven.",
-  "score_delta_this_attempt": 0,
-  "score_once": false,
-  "hold_reason": "NEED_HMD_TEST and mandatory final exact SHA CI is pending; do not claim build-verified before all gates."
+  "runtime_evidence": "No real Quest3/VDXR HMD or OutRun2006 menu/vehicle/race GOAL 0–99% screenshots executed. Original D3DX producer/ScreenHud C++ behavior BUILD_VERIFIED only, optical convergence/headlock and GPU frame pacing RUNTIME_VALIDATION=UNTESTED.",
+  "score_delta_this_attempt": 1,
+  "score_once": true,
+  "hold_reason": "NEED_HMD_TEST: Quest3/VDXR GOAL 0-99 record/title/time sprite+number single per-eye, eye alignment, SkyGlow, final result and input/FFB unchanged still require the user's real game/HMD acceptance. No runtime claim.",
+  "scoreboard": {
+    "repository": "thp32tt/ai-dev-lab",
+    "file": "AI_SCOREBOARD.md",
+    "commit_sha": "a64bdea2b367fbf3a9eb2d5ea167d48891913b92",
+    "previous_ai2_score": 1390,
+    "delta": 1,
+    "new_ai2_score": 1391
+  }
 }
