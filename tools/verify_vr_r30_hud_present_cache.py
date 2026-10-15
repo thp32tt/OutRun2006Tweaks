@@ -42,15 +42,17 @@ def verify(source: str) -> None:
         "const bool pauseResponsive = R30IsPauseMenuElement() &&",
         "std::isfinite(Settings::VRPauseMenuScale.get()) &&",
         "R30HudContain.pauseResponsive = pauseResponsive;",
-        "const float opticalScale =",
-        "OutRunVrPauseEye::ResponsiveMenuScale(",
-        "userScale, sourceOverTarget, pauseResponsive);",
+        "const float opticalScale = userScale;",
+        # The HMD-rejected second pause boost must stay absent.
+
         "scaleX = opticalScale;",
         "scaleY = opticalScale / sourceOverTarget;",
         "scaleX = opticalScale * sourceOverTarget;",
         "scaleY = opticalScale;",
     ):
         assert required in body, required
+    assert "OutRunVrPauseEye::ResponsiveMenuScale(" not in body
+    assert body.count("const float opticalScale = userScale;") == 1
     assert body.index("R30HudContain.valid = false;") < body.index(
         "R30HudAspectCompensation(\n                    stereo, frame.width, frame.height, eyeExtent)") < body.index(
         "R30HudContain.valid = true;")
@@ -108,8 +110,8 @@ if __name__ == "__main__":
         ("R30HudContain.valid = true;", "// no publication"),
         ("R30HudContain.pauseResponsive = pauseResponsive;",
          "R30HudContain.pauseResponsive = false;"),
-        ("userScale, sourceOverTarget, pauseResponsive);",
-         "userScale, sourceOverTarget, false);"),
+        ("const float opticalScale = userScale;",
+         "const float opticalScale = 2.0f * userScale;"),
         ("scaleX = opticalScale;", "scaleX = userScale;"),
         ("scaleY = opticalScale / sourceOverTarget;", "scaleY = userScale / sourceOverTarget;"),
         ("scaleX = opticalScale * sourceOverTarget;", "scaleX = userScale * sourceOverTarget;"),
