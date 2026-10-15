@@ -846,11 +846,18 @@ class UIScaling : public Hook
 			// Preserve the fast path for ordinary HUD/rank sprites. The
             // six +TIME sources can run across a nested queue rebuild:
             // only they require proof that the old tail is still live.
-            SpriteNode* node =
-                producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime
-                ? StageFirstAppendedNode(
-                    root, before[prio], tailAfter, Game::SpriteNodeMax)
-                : (before[prio] ? before[prio]->next_0 : root->next_0);
+            SpriteNode* node = nullptr;
+            if (producer == OutRunVR::GameSemantic::ProducerToken::StageExtensionTime)
+            {
+                node = StageFirstAppendedNode(
+                    root, before[prio], tailAfter, Game::SpriteNodeMax);
+            }
+            else
+            {
+                // Unchanged fast path for existing rank, rival, GOAL, and HUD.
+                node = before[prio]
+                    ? before[prio]->next_0 : root->next_0;
+            }
 			for (unsigned guard = 0; node && guard < Game::SpriteNodeMax; ++guard)
 			{
 				OutRunVR::GameSemantic::RegisterSpriteNodeScope(
