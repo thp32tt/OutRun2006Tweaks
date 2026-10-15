@@ -3,6 +3,24 @@
 // without creating an ImGui dependency in this tested decision contract.
 namespace OutRunF11Input
 {
+    // The Windows hardware cursor is a separate OS composition plane, not
+    // part of the D3D9 game backbuffer replayed to the OpenXR stereo eyes.
+    // Rasterize it inside ImGui's draw data only while the F11 shell is
+    // visible during VR gameplay. Native desktop and closed F11 keep their
+    // original hardware-cursor/game-input ownership.
+    constexpr bool ShouldDrawSoftwareCursor(bool f11Visible,
+        bool vrGameplay) noexcept
+    {
+        return f11Visible && vrGameplay;
+    }
+
+    static_assert(ShouldDrawSoftwareCursor(true, true),
+        "Visible VR F11 must submit a backbuffer cursor to both XR eyes");
+    static_assert(!ShouldDrawSoftwareCursor(true, false) &&
+                  !ShouldDrawSoftwareCursor(false, true) &&
+                  !ShouldDrawSoftwareCursor(false, false),
+        "Desktop and closed F11 must not submit the VR cursor");
+
     constexpr bool ShouldForwardToImGui(bool shellVisible,
         bool bindingDialogVisible, bool legacyF11Key, bool focusTransition,
         bool notificationMouseCapture) noexcept

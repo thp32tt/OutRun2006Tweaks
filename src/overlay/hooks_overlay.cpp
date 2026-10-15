@@ -353,6 +353,16 @@ class D3DHooks : public Hook
 		if (overlayInited)
 		{
 			const bool f11VisibleThisFrame = Overlay::will_be_visible_this_frame();
+			const bool vrGameplay = Game::is_vr_gameplay_presentation();
+			// Desktop Duplication and DirectGPU stereo replay do not include
+			// the hardware cursor composited by Windows on the monitor.
+			// Draw ImGui's cursor into the same D3D9 backbuffer as the F11
+			// shell so its screen-space triangles reach both VR eyes.
+			// Set this BEFORE both backend NewFrame calls and ImGui::NewFrame,
+			// including opening/closing edges, to avoid a one-frame mismatch.
+			ImGui::GetIO().MouseDrawCursor =
+				OutRunF11Input::ShouldDrawSoftwareCursor(
+					f11VisibleThisFrame, vrGameplay);
 			// ImGui draws into the desktop-sized D3D9 backbuffer before the
 			// asymmetric portrait XR eye transfer. A source-aspect-sized font
 			// is visually reduced by that transfer. When the F11 shell is open
@@ -364,7 +374,7 @@ class D3DHooks : public Hook
 			// visible frame. Last-frame overlayActive misses legacy F11 release,
 			// while a held bound action incorrectly prewarms the closing frame.
 			// The later render consumes the same edge and still owns the cursor.
-			if (f11VisibleThisFrame && Game::is_vr_gameplay_presentation())
+			if (f11VisibleThisFrame && vrGameplay)
 			{
 				// A zero-sized/stale source publication during Reset is no more
 				// reason to replace a valid Quest3 atlas than a missing eye
@@ -463,7 +473,7 @@ class D3DHooks : public Hook
 			// give it explicit SCREEN_OVERLAY_2D ownership so R30 applies the
 			// established binocular common-ray/FOV correction. Keep front-end/menu
 			// rendering untouched, where the user-observed overlay is already correct.
-			if (overlayActive && Game::is_vr_gameplay_presentation())
+			if (overlayActive && vrGameplay)
 			{
 				OutRunVR::GameSemantic::ScopedExternalOverlaySemantic semantic(
 					OutRunVR::GameSemantic::RenderScope::ScreenOverlay2D);
@@ -549,11 +559,15 @@ class WndprocHook : public Hook
 	inline static SafetyHookInline dest_orig = {};
 	static LRESULT __stdcall destination(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		// The gameplay window hides its cursor, but the F11 ImGui shell must
-		// restore a visible pointer even after an activation/focus transition.
+		// With VR F11 active, ImGui draws the pointer into the stereo
+		// backbuffer. Suppress the OS cursor only on our client area to
+		// prevent a duplicate on the desktop mirror. In desktop mode the
+		// native arrow remains visible and usable as before.
 		if (overlayActive && msg == WM_SETCURSOR && LOWORD(lParam) == HTCLIENT)
 		{
-			SetCursor(LoadCursorA(nullptr, IDC_ARROW));
+			const bool softwareCursor = overlayInited &&
+				ImGui::GetCurrentContext() && ImGui::GetIO().MouseDrawCursor;
+			SetCursor(softwareCursor ? nullptr : LoadCursorA(nullptr, IDC_ARROW));
 			return TRUE;
 		}
 		// The external F11 shell owns ImGui input only while visible. The old

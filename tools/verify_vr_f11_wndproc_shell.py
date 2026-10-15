@@ -25,6 +25,32 @@ for token in (
     assert token in (hook if token.startswith('#include') else wnd), token
 assert wnd.index("ShouldForwardToImGui(") < wnd.index("ImGui_ImplWin32_WndProcHandler(")
 assert wnd.count("ImGui_ImplWin32_WndProcHandler(") == 1
+# VR F11 pointer must be part of ImGui's D3D9 geometry (and therefore
+# stereo-eye replay), not a Windows hardware cursor absent from capture.
+cursor_policy = routing.split("constexpr bool ShouldDrawSoftwareCursor(", 1)[1].split(
+    "static_assert(", 1)[0]
+assert "return f11Visible && vrGameplay;" in cursor_policy
+assert "return f11Visible && vrGameplay;" not in cursor_policy.replace(
+    "return f11Visible && vrGameplay;", "return f11Visible;", 1)
+for f11, vr, drawn in ((True, True, True), (True, False, False),
+                      (False, True, False), (False, False, False)):
+    assert (f11 and vr) is drawn
+cursor_setup = hook.split("const bool f11VisibleThisFrame =", 1)[1].split(
+    "float vrFontMultiplier", 1)[0]
+assert "const bool vrGameplay = Game::is_vr_gameplay_presentation();" in cursor_setup
+assert "ImGui::GetIO().MouseDrawCursor =" in cursor_setup
+assert "OutRunF11Input::ShouldDrawSoftwareCursor(" in cursor_setup
+assert "f11VisibleThisFrame, vrGameplay" in cursor_setup
+assert hook.index("ImGui::GetIO().MouseDrawCursor =") < hook.index(
+    "ImGui_ImplDX9_NewFrame();") < hook.index("overlayActive = Overlay::render();")
+assert "if (overlayActive && vrGameplay)" in hook
+assert "ScopedExternalOverlaySemantic semantic(" in hook
+assert "ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());" in hook
+native_cursor = wnd.split("if (overlayActive && msg == WM_SETCURSOR", 1)[1].split(
+    "return TRUE;", 1)[0]
+assert "ImGui::GetIO().MouseDrawCursor" in native_cursor
+assert "SetCursor(softwareCursor ? nullptr : LoadCursorA(nullptr, IDC_ARROW));" in native_cursor
+assert "SetCursor(LoadCursorA(nullptr, IDC_ARROW));" not in native_cursor
 assert "ImGui::SetNextWindowSizeConstraints(" in shell
 assert shell.index("if (externalVrShell)\n\t\tImGui::SetNextWindowSizeConstraints(") < shell.index(
     "ImGui::SetNextWindowSize(windowSize, layoutPlacement);")
