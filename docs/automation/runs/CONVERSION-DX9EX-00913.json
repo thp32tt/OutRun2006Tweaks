@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_CI_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "5aff2e36a1347c1f2e171f71a856857b585a9137",
   "material_result_sha": "ce8e2dfabbc10cee03b4b048363c5b49d5dcc5c5",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "1ac25b1803f6aaf1b7cb37085470587d744d3c0c",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/d3d9/stage_extension_eye_plane.hpp"
@@ -97,11 +97,31 @@
       "DX9Ex Full Source Impact Review",
       "OutRun EXE HUD Inspector CI"
     ],
-    "status": "PENDING_EXACT_SHA",
-    "exact_sha_gate_runs": []
+    "status": "PASS_EXACT_SHA",
+    "exact_sha_gate_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38793095261,
+        "sha": "1ac25b1803f6aaf1b7cb37085470587d744d3c0c",
+        "conclusion": "success",
+        "jobs": "policy,game,host,full-chain-compile,package 5/5"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38793095047,
+        "sha": "1ac25b1803f6aaf1b7cb37085470587d744d3c0c",
+        "conclusion": "success",
+        "jobs": "domain-isolation 1/1"
+      }
+    ],
+    "validation_bearing_result_sha": "1ac25b1803f6aaf1b7cb37085470587d744d3c0c",
+    "full_source_impact_run_id": 38793095340,
+    "full_source_impact_last_observed": "IN_PROGRESS: source-cross-domain and msvc-analyze-openxr-host SUCCESS; msvc-analyze-active-game incomplete at C6 observation; not counted as PASS",
+    "hud_inspector_note": "No exact validation-bearing SHA HUD Inspector workflow run was present in the retrieved GitHub Actions list; no HUD Inspector success is claimed.",
+    "c6_record_note": "Bookkeeping-only [skip ci] checkpoint after verified exact-SHA Active 5/5 and Domain success; validation SHA stays immutable, acceptance_results unchanged and not promoted to HMD PASS."
   },
   "runtime_evidence": "No OutRun 2006 or Quest3/VDXR hardware was run. Stereo +TIME optical and frame-pacing behavior is not asserted as runtime PASS.",
   "score_delta_this_attempt": 0,
   "score_once": false,
-  "hold_reason": "CI_RUN_38792435110_FAILED_MISSING_FEATURE_RECORD; post-repair exact-SHA mandatory Windows workflow validation pending, physical Quest3/VDXR RUNTIME_VALIDATION=UNTESTED."
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
