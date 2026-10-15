@@ -2,23 +2,23 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00894",
   "production_id": "CONVERSION-DX9EX-00894",
-  "event_id": "CONVERSION-DX9EX-00894-E001",
-  "event_type": "dispatch",
+  "event_id": "CONVERSION-DX9EX-00894-E003",
+  "event_type": "retry",
   "run_key": "CONVERSION-DX9EX-00894",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:RESET:DIRECTGPU_CONTEXT_EPOCH",
   "symptom_id": "DX9EX:SYMPTOM:DIRECTGPU_STALE_CONTEXT",
   "feature_class": "CRITICAL_BLOCKER",
-  "status": "CI_REVALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C2_MATERIAL",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "0121755240a6e3333268634ea988e400d781caa7",
   "material_result_sha": "8c14470d557bb39dc6de1624647c54d0883fc853",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "c0d19c8d2cbd2c20cd198c8b131024a4ed44cbe6",
   "source_paths": [
     "vrhost/src/runtime/direct_ack_device_epoch.hpp",
     "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp",
@@ -67,9 +67,9 @@
     ]
   },
   "acceptance_results": {
-    "context_rebind_resets_directgpu": "SOURCE_IMPLEMENTED",
-    "unchanged_and_recovery_fallback": "SMOKE_ADDED_PENDING_CI",
-    "exact_sha_build_and_smokes": "PENDING_REVALIDATION_AFTER_POLICY_REPAIR"
+    "context_rebind_resets_directgpu": "SOURCE_AND_POLICY_PASS_EXACT_SHA",
+    "unchanged_and_recovery_fallback": "SMOKE_AND_HOST_PASS_EXACT_SHA",
+    "exact_sha_build_and_smokes": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "R32SyncDirectDeviceOwner checks only R32DirectDeviceOwner == OutRunVrFinalTest::Device; no cached immediate context participates, unlike the existing Changed(device,context) helper.",
@@ -82,6 +82,33 @@
   "runtime_evidence": "Not tested in a real Quest 3 / VDXR session.",
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "CI_REVALIDATION_PENDING",
-  "result_commit_ci_skip": false
+  "hold_reason": null,
+  "result_commit_ci_skip": false,
+  "ci_evidence": {
+    "dx9ex_active": {
+      "id": 38725583066,
+      "status": "completed",
+      "conclusion": "success",
+      "sha": "c0d19c8d2cbd2c20cd198c8b131024a4ed44cbe6"
+    },
+    "domain_isolation": {
+      "id": 38725583051,
+      "status": "completed",
+      "conclusion": "success",
+      "sha": "c0d19c8d2cbd2c20cd198c8b131024a4ed44cbe6"
+    },
+    "hud_inspector": {
+      "id": 38725583055,
+      "status": "completed",
+      "conclusion": "success",
+      "sha": "c0d19c8d2cbd2c20cd198c8b131024a4ed44cbe6"
+    },
+    "full_source_impact": {
+      "id": 38725583226,
+      "status": "completed",
+      "conclusion": "success",
+      "sha": "c0d19c8d2cbd2c20cd198c8b131024a4ed44cbe6"
+    }
+  },
+  "c6_bookkeeping_ci_skip": true
 }
