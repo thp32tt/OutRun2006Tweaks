@@ -1,6 +1,8 @@
 // Portable runtime regression for the R26+HUD VB/IB valid-shadow intervals.
 #include "../../src/vr/d3d9/r30_shadow_ranges.hpp"
+#include "../../src/vr/d3d9/r30_shadow_bytes.hpp"
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <vector>
 
@@ -81,6 +83,42 @@ int main()
     ranges.clear();
     if (Contains(ranges, 0, 16))
         return 8;
+    // The actual R26+HUD capture now allocates uninitialized shadow bytes.
+    // Reading is permitted ONLY for ranges copied from game Lock/Unlock,
+    // including after DISCARD and allocator recovery. Never infer validity
+    // from mere allocation or from a previous device generation.
+    OutRunVR::R30ShadowBytes::LazyUninitializedBuffer storage;
+    constexpr std::uint32_t Allocation = 16u * 1024u * 1024u;
+    if (storage.data() || storage.size() != 0)
+        return 9;
+    storage.resize(Allocation);
+    if (!storage.data() || storage.size() != Allocation)
+        return 10;
+    ranges.clear();
+    constexpr std::uint32_t SourceOffset = 4096u;
+    const std::uint8_t captured[] = { 0x10u, 0x22u, 0x30u, 0xFFu };
+    std::memcpy(storage.data() + SourceOffset, captured, sizeof(captured));
+    Merge(ranges, SourceOffset, SourceOffset + sizeof(captured));
+    if (!Contains(ranges, SourceOffset, SourceOffset + sizeof(captured)) ||
+        Contains(ranges, SourceOffset - 1, SourceOffset + sizeof(captured)) ||
+        Contains(ranges, SourceOffset, SourceOffset + sizeof(captured) + 1))
+        return 11;
+    auto* originalAllocation = storage.data();
+    storage.resize(Allocation); // same capacity: no reallocation or zero-fill
+    if (storage.data() != originalAllocation ||
+        std::memcmp(storage.data() + SourceOffset, captured,
+                    sizeof(captured)) != 0)
+        return 12;
+    ranges.clear(); // D3DLOCK_DISCARD invalidates previously copied bytes
+    if (Contains(ranges, SourceOffset, SourceOffset + sizeof(captured)))
+        return 13;
+    storage.clear(); // allocation failure / device lifetime invalidation
+    if (storage.data() || storage.size() != 0)
+        return 14;
+    storage.resize(128);
+    if (!storage.data() || storage.size() != 128 || !ranges.empty())
+        return 15;
+
     std::cout << "R26+HUD dynamic VB/IB shadow range merge/read PASS\n";
     return 0;
 }

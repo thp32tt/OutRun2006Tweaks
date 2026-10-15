@@ -14,6 +14,7 @@
 #include "stereo_renderer_r26.cpp"
 #include "r30_indexed_up_bounds.hpp"
 #include "r30_shadow_ranges.hpp"
+#include "r30_shadow_bytes.hpp"
 #include "lens_centre_source_provenance.hpp"
 #include "r30_early_rhw_shadow.hpp"
 #include "vr/game/render_semantics.hpp"
@@ -343,7 +344,7 @@ namespace OutRunVRStereo
             DWORD usage = 0;
             D3DPOOL pool = D3DPOOL_DEFAULT;
             D3DFORMAT indexFormat = D3DFMT_UNKNOWN;
-            std::vector<std::uint8_t> bytes;
+            OutRunVR::R30ShadowBytes::LazyUninitializedBuffer bytes;
             std::vector<R30ByteRange> valid;
             void* lockPtr = nullptr;
             UINT lockOffset = 0;
