@@ -173,6 +173,12 @@ def _prompt(role, batch_id, tiles, translations):
 
 def next_binding(role, root="/data/imagegen"):
     """Make one immutable batch reservation per role. No implicit retry of sent work."""
+    # 2026-10-15 USER OVERRIDE: equal-width/equal-height source tiles can cut
+    # across English letters. The 986-tile generator is now retired. Never
+    # stage or resend an old tile as a new A/B ImageGen input; preserve active
+    # receipts/state for read-only audits. A separate ROI index and per-phrase
+    # queue are required before the new production route can be enabled.
+    return None, "HOLD_LEGACY_TILES_RETIRED_TEXT_ROI_QUEUE_REQUIRED"
     root = Path(root).resolve()
     if role not in RANGES:
         return None, "INVALID_SLOT"
