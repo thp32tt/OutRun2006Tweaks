@@ -59,13 +59,13 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "acceptance_results": {
-    "f11-font-scroll-layout": "STATIC_SOURCE_AND_NUMERIC_REGRESSION_PENDING_CI",
-    "f11-desktop-small-fallback": "STATIC_NEGATIVE_REGRESSION_PENDING_CI",
-    "f11-exact-windows-gates": "PENDING"
+    "f11-font-scroll-layout": "PASS",
+    "f11-desktop-small-fallback": "PASS",
+    "f11-exact-windows-gates": "PASS"
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "hold_reason": "QUEST3_VDXR_HARDWARE_RUNTIME_UNTESTED",
   "material_result_sha": "2a0662646ca4b377d842d5617b3b54cf4efe2839",
   "diagnosis": {
     "original_evidence": "Source diff at 2a066264 shows F11 height fitting against 600 multiplied by XR density even though ImGui BeginChild tabbody provides independent scrolling; the source 3440x1440 Quest3-mirror numeric case downscaled fonts to about 0.78.",
@@ -103,10 +103,11 @@
     },
     "full_source_impact": {
       "run_id": 38690564446,
-      "conclusion": "IN_PROGRESS_AT_C6_RECORDING"
+      "conclusion": "SUCCESS",
+      "required_jobs": "source-cross-domain, msvc-analyze-active-game, msvc-analyze-openxr-host (3/3)"
     }
   },
   "validation_bearing_result_sha": "58440341a77402f14f1182d98d8e63f043ea3f8a",
   "result_commit_ci_skip": true,
-  "runtime_evidence": "GitHub exact-SHA DX9Ex Active Validation (policy, host, game, full-chain-compile, package 5/5), Domain Isolation Guard and OutRun EXE HUD Inspector CI SUCCESS; physical Quest3/VDXR HMD not executed. Full Source Impact review remained in_progress at C6 recording."
+  "runtime_evidence": "Windows exact SHA 58440341: Active 5/5, Domain, HUD Inspector and Full Source Impact 3/3 SUCCESS; physical Quest3/VDXR gameplay, F11 glyph appearance and device reset not tested."
 }
