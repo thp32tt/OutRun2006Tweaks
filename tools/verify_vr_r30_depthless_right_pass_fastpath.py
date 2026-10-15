@@ -75,7 +75,8 @@ def main():
         ("R29OwnerRestoreRightPassState(", "R29OwnerOmitFallback("),
         ("R29OwnerCallOriginalSetRenderTarget(", "R29OwnerNoRtRestore("),
         ("if (restoreWvp &&", "if (false &&"),
-        ("if (!restoreOk)", "if (false)"),
+        ("if (!restoreOk)\n            {\n                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);",
+         "if (false)\n            {\n                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);"),
         ("savedDepth ? frame.rightEyeDepth : nullptr", "frame.rightEyeDepth"),
     ]
     for n, (old, new) in enumerate(mutations, 1):
