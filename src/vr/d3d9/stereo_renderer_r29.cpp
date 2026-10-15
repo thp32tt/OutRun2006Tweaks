@@ -638,7 +638,7 @@ namespace OutRunVRStereo
                 semanticScope == OutRunVR::GameSemantic::RenderScope::WorldParticle &&
                 R29Effect.zEnable == D3DZB_FALSE &&
                 R29Effect.zWrite == FALSE &&
-                R29Effect.stencilEnable == FALSE)
+                !R29Effect.stencilEnable)
             {
                 const bool originalWvpProven =
                     OutRunVRRenderer::R28PerspectiveWorldSemantic();
