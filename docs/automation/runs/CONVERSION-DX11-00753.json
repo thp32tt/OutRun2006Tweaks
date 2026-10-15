@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:FULLFRAME_SINGLE_PARTIAL_DIRTY_PRESENT",
   "feature_id": "DX11-MENU-CAR-RACE-SINGLE-PARTIAL-DIRTY-PRESENT",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -20,7 +20,7 @@
   "packaging_status": "NOT_REQUIRED",
   "base_head_sha": "f3aba045bc7ddfa3198d49a99f8c44defb185882",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "b6dce917a22d4ac5440e622662125ee5e8b88660",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_partial_dirty_upload.hpp",
@@ -94,9 +94,10 @@
     "C0_RECOVER": "PASS latest GitHub HEAD 00752 C6 exact-SHA",
     "C1_REVIEW": "PASS identified unsupported single partial dirty Present after complete full-frame native game Draw",
     "C2_IMPLEMENT": "PASS C++ integrated source and targeted portable tests",
-    "C3_VALIDATE": "Local standalone C++17 positive/negative pixel prototype PASS, full GitHub exact-SHA gates pending",
+    "C3_VALIDATE": "PASS_EXACT_SHA: exact b6dce917a22d4ac5440e622662125ee5e8b88660 GitHub CI SUCCESS (reported by dispatch); HMD runtime UNTESTED.",
     "C4_COMMIT": "Material source+tests in same non-CI-skip commit; SHA from GitHub",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_GATES"
-  }
+    "C6_STATE": "PASS_EXACT_SHA: verified exact-SHA GitHub CI SUCCESS for b6dce917a22d4ac5440e622662125ee5e8b88660; bookkeeping-only [skip ci], source/build/CI unchanged; HMD RUNTIME_VALIDATION=UNTESTED."
+  },
+  "c6_trigger_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
