@@ -104,6 +104,44 @@ constexpr bool native_partial_color_fill_regression() {
     return frame.publishable_full(true, 1u);
 }
 static_assert(native_partial_color_fill_regression());
+
+constexpr bool native_partial_target_clear_regression() {
+    using M = GameNativeSourceMutation;
+    if (!M::mirrors_partial_target_clear(true,true,true,true,true,true,true) ||
+        M::mirrors_partial_target_clear(false,true,true,true,true,true,true) ||
+        M::mirrors_partial_target_clear(true,false,true,true,true,true,true) ||
+        M::mirrors_partial_target_clear(true,true,false,true,true,true,true) ||
+        M::mirrors_partial_target_clear(true,true,true,false,true,true,true) ||
+        M::mirrors_partial_target_clear(true,true,true,true,false,true,true) ||
+        M::mirrors_partial_target_clear(true,true,true,true,true,false,true) ||
+        M::mirrors_partial_target_clear(true,true,true,true,true,true,false))
+        return false;
+    M::TargetClearRect rect{};
+    if (!M::clipped_target_clear_rect(-50,20,500,300,
+                                     10,30,200,100,640,480,rect) ||
+        rect.left != 10 || rect.top != 30 ||
+        rect.right != 210 || rect.bottom != 130 ||
+        M::clipped_target_clear_rect(500,500,600,600,
+                                     10,30,200,100,640,480,rect) ||
+        M::clipped_target_clear_rect(10,20,200,120,
+                                     600,30,100,100,640,480,rect) ||
+        M::clipped_target_clear_rect(10,20,200,120,
+                                     0,0,0,480,640,480,rect))
+        return false;
+    GameNativeFrameBatch frame{};
+    frame.succeeded(true);
+    frame.record_source_draw(0u);
+    if (!frame.publishable_full(true,1u)) return false;
+    // Preserve the native DSV and exact source ordinals across a TARGET Clear.
+    return M::mirrors_partial_target_clear(
+            true,true,true,true,
+            !frame.stopped && frame.submitted != 0u,true,true) &&
+        frame.submitted == 1u && frame.lastSourceDraw == 0u &&
+        frame.depthReady && frame.accepts_full(1u) &&
+        frame.publishable_full(true,1u) &&
+        M::kMaxPartialTargetClearRects >= 2u;
+}
+static_assert(native_partial_target_clear_regression());
 using outrun::vr::dx11::live_game_frame::GameNativePresentRegion;
 int main() {
     GameNativeFrameBatch b{};

@@ -44,6 +44,37 @@ struct GameNativeSourceMutation {
         return fullMode && succeeded && sameBackbuffer && activeNativeBatch &&
                targetReady && boundedRect;
     }
+
+    // Exact D3D9 TARGET-only Clear region replay in an already live DX11
+    // menu/car/race Draw batch. D3D11.1 ClearView updates only clipped pixels.
+    static constexpr std::uint32_t kMaxPartialTargetClearRects = 32u;
+    struct TargetClearRect { std::int64_t left{}, top{}, right{}, bottom{}; };
+    [[nodiscard]] static constexpr bool mirrors_partial_target_clear(
+        bool full, bool targetOnly, bool sameOwner, bool sameBackbuffer,
+        bool activeBatch, bool targetReady, bool noMrt) noexcept {
+        return full && targetOnly && sameOwner && sameBackbuffer &&
+               activeBatch && targetReady && noMrt;
+    }
+    // D3D9 Clear rectangles are screen-space, intersected with viewport.
+    // Validate the whole batch before touching the GPU, fail closed on gaps.
+    [[nodiscard]] static constexpr bool clipped_target_clear_rect(
+        std::int64_t l, std::int64_t t, std::int64_t r, std::int64_t b,
+        std::uint32_t vx, std::uint32_t vy,
+        std::uint32_t vw, std::uint32_t vh,
+        std::uint32_t width, std::uint32_t height,
+        TargetClearRect& out) noexcept {
+        if (!vw || !vh || !width || !height ||
+            vx >= width || vy >= height ||
+            static_cast<std::uint64_t>(vx) + vw > width ||
+            static_cast<std::uint64_t>(vy) + vh > height)
+            return false;
+        const auto x0 = static_cast<std::int64_t>(vx);
+        const auto y0 = static_cast<std::int64_t>(vy);
+        out = { l > x0 ? l : x0, t > y0 ? t : y0,
+                r < x0 + vw ? r : x0 + vw,
+                b < y0 + vh ? b : y0 + vh };
+        return out.left < out.right && out.top < out.bottom;
+    }
     [[nodiscard]] static constexpr bool invalidates_full_game_frame(
         bool fullMode, bool succeeded, bool gameOwner,
         bool destinationIsClearedBackbuffer, bool selfUpload) noexcept {

@@ -555,15 +555,19 @@ namespace OutRunVRStereo
 			// including full tiled Clears that restart post-Clear native Draws.
 			auto finishNativeClear = [&](HRESULT result) noexcept -> HRESULT {
 				if (SUCCEEDED(result)) {
+                    const bool nativePartialClear =
+                        outrun::vr::dx11::live_game_frame::preserve_game_partial_target_clear(
+                            device, count, rects, flags, color);
 					// Zero-flags Clears do not change game color/depth/stencil.
-					if ((flags & (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |
+					if (!nativePartialClear &&
+                        (flags & (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER |
                         D3DCLEAR_STENCIL)) != 0u &&
                         !outrun::vr::dx11::live_game_frame::observe_game_depth_clear(
                             device, count, rects, flags, z) &&
                         !outrun::vr::dx11::live_game_frame::preserve_offscreen_color_only_clear(
                             device, flags))
                         outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);
-					if (flags & D3DCLEAR_TARGET)
+					if ((flags & D3DCLEAR_TARGET) && !nativePartialClear)
 						outrun::vr::dx11::live_game_frame::observe_game_clear(
 							device, count, rects, flags, color, z);
 				}

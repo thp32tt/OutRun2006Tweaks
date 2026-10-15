@@ -5538,6 +5538,102 @@ void observe_game_surface_mutation(
 }
 
 
+
+bool preserve_game_partial_target_clear(
+    IDirect3DDevice9* game, DWORD count, const D3DRECT* rects,
+    DWORD flags, D3DCOLOR color) noexcept {
+    // Called only AFTER successful original D3D9 Clear; no synthetic Clears.
+    // Do not silently translate depth, stencil, MRT or foreign game surfaces.
+    if (!diagnostic_enabled() || !env_full_game_opt_in() || !game ||
+        flags != D3DCLEAR_TARGET ||
+        count > GameNativeSourceMutation::kMaxPartialTargetClearRects ||
+        (count != 0u && !rects)) return false;
+    try {
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        const auto owner = reinterpret_cast<std::uintptr_t>(game);
+        ComPtr<IDirect3DSurface9> target, backbuffer;
+        D3DSURFACE_DESC targetDesc{}, backbufferDesc{};
+        D3DVIEWPORT9 vp{};
+        if (FAILED(game->GetRenderTarget(0u, target.GetAddressOf())) || !target ||
+            FAILED(game->GetBackBuffer(0u, 0u, D3DBACKBUFFER_TYPE_MONO,
+                                      backbuffer.GetAddressOf())) || !backbuffer ||
+            FAILED(target->GetDesc(&targetDesc)) ||
+            FAILED(backbuffer->GetDesc(&backbufferDesc)) ||
+            FAILED(game->GetViewport(&vp))) return false;
+        ComPtr<IUnknown> rtIdentity, bbIdentity;
+        if (FAILED(target.As(&rtIdentity)) ||
+            FAILED(backbuffer.As(&bbIdentity)) ||
+            !rtIdentity || !bbIdentity) return false;
+        const bool sameBackbuffer = rtIdentity.Get() == bbIdentity.Get() &&
+            s.clearColor.matches(owner,
+                reinterpret_cast<std::uintptr_t>(bbIdentity.Get())) &&
+            targetDesc.Width == backbufferDesc.Width &&
+            targetDesc.Height == backbufferDesc.Height &&
+            targetDesc.MultiSampleType == D3DMULTISAMPLE_NONE &&
+            (backbufferDesc.Format == D3DFMT_A8R8G8B8 ||
+             backbufferDesc.Format == D3DFMT_X8R8G8B8);
+        const bool ready = s.backend.ready() && s.backend.context() &&
+            s.backend.color_rtv() &&
+            s.nativeWidth == backbufferDesc.Width &&
+            s.nativeHeight == backbufferDesc.Height;
+        D3DCAPS9 caps{};
+        if (FAILED(game->GetDeviceCaps(&caps)) ||
+            !GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs))
+            return false;
+        for (DWORD i = 1u; i < caps.NumSimultaneousRTs; ++i) {
+            ComPtr<IDirect3DSurface9> extra;
+            // A TARGET Clear with any bound MRT writes unmirrored color.
+            if (game->GetRenderTarget(i, extra.GetAddressOf()) != D3DERR_NOTFOUND)
+                return false;
+        }
+        if (!GameNativeSourceMutation::mirrors_partial_target_clear(
+                true, true, s.sourceGameDevice == owner, sameBackbuffer,
+                s.pending && !s.frameBatch.stopped &&
+                    s.frameBatch.submitted != 0u, ready, true))
+            return false;
+
+        // Do not enqueue even the first ClearView until every rectangle has
+        // passed clipping. A later malformed rect must keep native fallback.
+        std::array<D3D11_RECT,
+            GameNativeSourceMutation::kMaxPartialTargetClearRects> regions{};
+        const std::uint32_t n = count ? count : 1u;
+        for (std::uint32_t i = 0u; i < n; ++i) {
+            const std::int64_t l = count ? rects[i].x1 : vp.X;
+            const std::int64_t t = count ? rects[i].y1 : vp.Y;
+            const std::int64_t r = count ? rects[i].x2 :
+                static_cast<std::int64_t>(vp.X) + vp.Width;
+            const std::int64_t b = count ? rects[i].y2 :
+                static_cast<std::int64_t>(vp.Y) + vp.Height;
+            GameNativeSourceMutation::TargetClearRect clipped{};
+            if (!GameNativeSourceMutation::clipped_target_clear_rect(
+                    l,t,r,b,vp.X,vp.Y,vp.Width,vp.Height,
+                    backbufferDesc.Width,backbufferDesc.Height,clipped))
+                return false;
+            regions[i] = {
+                static_cast<LONG>(clipped.left),
+                static_cast<LONG>(clipped.top),
+                static_cast<LONG>(clipped.right),
+                static_cast<LONG>(clipped.bottom)};
+        }
+        ComPtr<ID3D11DeviceContext1> ctx1;
+        if (FAILED(s.backend.context()->QueryInterface(
+                IID_PPV_ARGS(ctx1.GetAddressOf()))) || !ctx1)
+            return false; // D3D11.0: leave original D3D9 and input intact.
+        constexpr float scale = 1.0f / 255.0f;
+        const float rgba[4] = {
+            float((color >> 16) & 255u) * scale,
+            float((color >> 8) & 255u) * scale,
+            float(color & 255u) * scale,
+            backbufferDesc.Format == D3DFMT_X8R8G8B8 ? 1.0f :
+                float((color >> 24) & 255u) * scale
+        };
+        ctx1->ClearView(s.backend.color_rtv(), rgba, regions.data(), n);
+        // No Draw ordinal, DSV, original D3D9 Present, FFB or SkyGlow change.
+        return true;
+    } catch (...) { return false; }
+}
+
 bool preserve_game_color_fill(
     IDirect3DDevice9* game, IDirect3DSurface9* destination,
     const RECT* rect, D3DCOLOR color, HRESULT originalResult) noexcept {
