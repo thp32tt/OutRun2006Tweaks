@@ -28,6 +28,30 @@ constexpr bool native_non_draw_surface_mutation_regression() {
         !M::invalidates_full_game_frame(false, true, true, true, false);
 }
 static_assert(native_non_draw_surface_mutation_regression());
+// Device GetBackBuffer -> writable CPU LockRect / GDI GetDC -> the same
+// canonical native batch observer must abort before altered D3D9 Present.
+// Native SYSTEMMEM readback, READONLY, failed acquisition and foreign
+// surfaces preserve original game rendering and FFB/input.
+constexpr bool native_cpu_surface_write_regression() {
+    using M = GameNativeSourceMutation;
+    if (!M::cpu_surface_write_possible(true, false, true) ||
+        M::cpu_surface_write_possible(true, true, true) ||
+        M::cpu_surface_write_possible(false, false, true) ||
+        M::cpu_surface_write_possible(true, false, false))
+        return false;
+    GameNativeFrameBatch frame{};
+    frame.succeeded(true);
+    frame.record_source_draw(0u);
+    if (!frame.publishable_full(true, 1u) ||
+        !M::invalidates_full_game_frame(true, true, true, true, false))
+        return false;
+    frame.abort();
+    return !frame.publishable_full(true, 1u) &&
+        !M::invalidates_full_game_frame(true, true, false, true, false) &&
+        !M::invalidates_full_game_frame(true, true, true, false, false) &&
+        !M::invalidates_full_game_frame(true, true, true, true, true);
+}
+static_assert(native_cpu_surface_write_regression());
 using outrun::vr::dx11::live_game_frame::GameNativePresentRegion;
 int main() {
     GameNativeFrameBatch b{};

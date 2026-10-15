@@ -14,6 +14,7 @@
 #include "stereo_renderer_r29.cpp"
 #include "vr/d3d11/runtime_census.hpp"
 #include "vr/d3d11/live_game_frame_bridge.hpp"
+#include "vr/d3d11/native_game_source_mutation.hpp"
 #include "vr/d3d11/live_game_primitive_span.hpp"
 #include <d3dcompiler.h>
 #include <algorithm>
@@ -69,6 +70,10 @@ namespace OutRunVRStereo
         // Observe the game's own Lock/Unlock writes instead and keep the exact
         // CPU byte ranges that are known current. Draw then consumes only this
         // shadow and fails open to R29 when a range was never observed.
+        // Backbuffer surface CPU/DC writes bypass device Draw/Clear observers.
+        constexpr std::size_t R30GetBackBufferVtableIndex = 18;
+        constexpr std::size_t R30SurfaceLockRectVtableIndex = 13;
+        constexpr std::size_t R30SurfaceGetDCVtableIndex = 15;
         constexpr std::size_t R30CreateTextureVtableIndex = 23;
         constexpr std::size_t R30CreateVertexBufferVtableIndex = 26;
         constexpr std::size_t R30CreateIndexBufferVtableIndex = 27;
@@ -89,6 +94,9 @@ namespace OutRunVRStereo
         SafetyHookInline R30UpdateTextureHook{};
         SafetyHookInline R30StretchRectHook{};
         SafetyHookInline R30ColorFillHook{};
+        SafetyHookInline R30GetBackBufferHook{};
+        SafetyHookInline R30SurfaceLockRectHook{};
+        SafetyHookInline R30SurfaceGetDCHook{};
         SafetyHookInline R30TextureReleaseHook{};
         SafetyHookInline R30TextureLockRectHook{};
         SafetyHookInline R30TextureUnlockRectHook{};
@@ -640,6 +648,82 @@ namespace OutRunVRStereo
             return hr;
         }
 
+        // A game can obtain a lockable swapchain backbuffer and write its
+        // pixels through CPU LockRect or a GDI DC without any device Draw.
+        // Install on the actual returned COM surface implementation. Observe
+        // the successful *writable acquisition* before the client can change
+        // bytes; a failed/READONLY acquisition cannot invalidate a frame.
+        void R30ObserveCpuSurfaceWrite(
+            IDirect3DSurface9* surface, HRESULT hr, bool readOnly)
+        {
+            if (!surface) return;
+            D3DSURFACE_DESC desc{};
+            // Native readback/upload stages use SYSTEMMEM surfaces while the
+            // frame mutex is held. Never recurse into its observer from them.
+            if (FAILED(surface->GetDesc(&desc)) ||
+                !outrun::vr::dx11::live_game_frame::
+                    GameNativeSourceMutation::cpu_surface_write_possible(
+                        SUCCEEDED(hr), readOnly,
+                        desc.Pool == D3DPOOL_DEFAULT))
+                return;
+            IDirect3DDevice9* sourceDevice = nullptr;
+            if (SUCCEEDED(surface->GetDevice(&sourceDevice)) && sourceDevice)
+            {
+                outrun::vr::dx11::live_game_frame::observe_game_surface_mutation(
+                    sourceDevice, surface, hr);
+                sourceDevice->Release();
+            }
+        }
+
+        HRESULT __stdcall R30SurfaceLockRectDest(
+            IDirect3DSurface9* surface, D3DLOCKED_RECT* locked,
+            const RECT* rect, DWORD flags)
+        {
+            const HRESULT hr = R30SurfaceLockRectHook.stdcall<HRESULT>(
+                surface, locked, rect, flags);
+            R30ObserveCpuSurfaceWrite(
+                surface, hr, (flags & D3DLOCK_READONLY) != 0u);
+            return hr;
+        }
+
+        HRESULT __stdcall R30SurfaceGetDCDest(
+            IDirect3DSurface9* surface, HDC* dc)
+        {
+            const HRESULT hr =
+                R30SurfaceGetDCHook.stdcall<HRESULT>(surface, dc);
+            // A successful DC permits writes before ReleaseDC; do not wait
+            // until after the modified pixels could reach Present.
+            R30ObserveCpuSurfaceWrite(surface, hr, false);
+            return hr;
+        }
+
+        bool R30EnsureSurfaceMutationHooks(IDirect3DSurface9* surface)
+        {
+            if (!surface) return false;
+            std::lock_guard<std::mutex> lock(R30ShadowHookMutex);
+            auto** vtable = *reinterpret_cast<void***>(surface);
+            if (!R30SurfaceLockRectHook)
+                R30SurfaceLockRectHook = safetyhook::create_inline(
+                    vtable[R30SurfaceLockRectVtableIndex],
+                    R30SurfaceLockRectDest);
+            if (!R30SurfaceGetDCHook)
+                R30SurfaceGetDCHook = safetyhook::create_inline(
+                    vtable[R30SurfaceGetDCVtableIndex],
+                    R30SurfaceGetDCDest);
+            return R30SurfaceLockRectHook && R30SurfaceGetDCHook;
+        }
+
+        HRESULT __stdcall R30GetBackBufferDest(
+            IDirect3DDevice9* device, UINT swapChain, UINT index,
+            D3DBACKBUFFER_TYPE type, IDirect3DSurface9** out)
+        {
+            const HRESULT hr = R30GetBackBufferHook.stdcall<HRESULT>(
+                device, swapChain, index, type, out);
+            if (SUCCEEDED(hr) && out && *out)
+                R30EnsureSurfaceMutationHooks(*out);
+            return hr;
+        }
+
         HRESULT __stdcall R30UpdateSurfaceDest(
             IDirect3DDevice9* device,
             IDirect3DSurface9* source, const RECT* sourceRect,
@@ -724,6 +808,21 @@ namespace OutRunVRStereo
             if (!device)
                 return;
             auto** vtable = *reinterpret_cast<void***>(device);
+            if (!R30GetBackBufferHook)
+                R30GetBackBufferHook = safetyhook::create_inline(
+                    vtable[R30GetBackBufferVtableIndex],
+                    R30GetBackBufferDest);
+            // The game may have cached RT0 prior to installing these hooks.
+            // Seed the real implementation now and again on post-Reset
+            // GetBackBuffer calls, without modifying original ownership.
+            if (R30GetBackBufferHook)
+            {
+                IDirect3DSurface9* initialBackbuffer = nullptr;
+                if (SUCCEEDED(device->GetBackBuffer(
+                        0, 0, D3DBACKBUFFER_TYPE_MONO,
+                        &initialBackbuffer)) && initialBackbuffer)
+                    initialBackbuffer->Release();
+            }
             if (!R30CreateTextureHook)
                 R30CreateTextureHook = safetyhook::create_inline(
                     vtable[R30CreateTextureVtableIndex],
@@ -766,6 +865,9 @@ namespace OutRunVRStereo
             // holding a COM reference also holds a shared_ptr acquired from the
             // registry, so clearing the maps cannot invalidate an in-flight
             // shadow object.
+            R30GetBackBufferHook = {};
+            R30SurfaceGetDCHook = {};
+            R30SurfaceLockRectHook = {};
             R30ColorFillHook = {};
             R30StretchRectHook = {};
             R30UpdateTextureHook = {};
