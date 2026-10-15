@@ -2933,7 +2933,6 @@ private:
         void* self, IDirect3DTexture9* texture, const RECT* rect,
         const D3DVECTOR* center, const D3DVECTOR* pos, D3DCOLOR color)
     {
-        using namespace OutRunVR::GameSemantic;
         // On a texture/provenance change the native Draw may internally
         // flush the earlier exact +TIME/GOAL batch BEFORE we can tag this
         // incoming Draw. Separate it under its original GPU owner now.
@@ -2944,7 +2943,8 @@ private:
                 DX9ExD3DXSpriteLifetime::CanFlush(
                     self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218)),
                 PendingScope, PendingProducer,
-                EffectiveScope(), CurrentRenderProducerToken()))
+                OutRunVR::GameSemantic::EffectiveScope(),
+                OutRunVR::GameSemantic::CurrentRenderProducerToken()))
         {
             const bool wasStage = StageOwner(PendingScope, PendingProducer);
             if (FlushTracked(self))
