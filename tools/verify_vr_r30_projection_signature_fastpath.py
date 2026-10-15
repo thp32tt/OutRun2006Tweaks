@@ -70,17 +70,26 @@ def source_contract(renderer=RENDERER, r30=R30):
     require(len(depth_off) == 2, "depth-off alpha gate lost")
     depth_off = depth_off[1]
     for token in ("(alphaBlend != FALSE || alphaTest != FALSE)",
-                  "if (!ownedHud && !ownedOverlay && !ownedEffect &&",
                   "if (!OutRunVR::GameSemantic::QueueRenderActive() &&",
                   "scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard)",
                   "return R30ScreenSpaceKind::None;",
                   "return R30ScreenSpaceKind::FlatPerspectiveEffect;"):
         require(token in depth_off, "R84 depth-off semantic gate missing: " + token)
-    require(depth_off.index("if (!ownedHud && !ownedOverlay && !ownedEffect &&") <
-            depth_off.index("if (!OutRunVR::GameSemantic::QueueRenderActive() &&") <
+    require(depth_off.index("if (!OutRunVR::GameSemantic::QueueRenderActive() &&") <
             depth_off.index("scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard)") <
             depth_off.index("return R30ScreenSpaceKind::FlatPerspectiveEffect;"),
-            "unowned alpha must be rejected before any flattening")
+            "unowned WorldBillboard must remain excluded from flat HUD")
+    # An already authenticated C993 centre is NOT an unowned alpha draw.
+    # Exact source admission precedes alpha/depth queries, but the outer
+    # semantic veto and projection classification still apply to all draws.
+    require(cls.index("if (!ownedHud && !ownedOverlay && !ownedEffect &&") <
+            cls.index("if (ownedLensCentre)") <
+            cls.index("R30HasExactLensCentreRawWvp(originalGameWvp)") <
+            cls.index("SelectWorldRoute(true, owned)") <
+            cls.index("return R30ScreenSpaceKind::ExactLensCentreWorld;") <
+            cls.index("R29OwnerTryGetEffectTelemetrySnapshot(effect)") <
+            cls.index("if (zEnable == D3DZB_FALSE &&"),
+            "exact original C993 proof must bypass only the generic raster gate")
     require("CorroboratesWorld(scope)" not in depth_off,
             "world particles cannot authorize HUD/flat effect")
     require("GetLastVerifiedWvp(" not in cls,
@@ -119,7 +128,7 @@ def model_cases():
 
 
 def classify_effect_route(projection, z_enabled, alpha_blend, alpha_test,
-                          scope, queued=False):
+                          scope, queued=False, exact_centre_owned=False):
     """Exact producer-scoped admission, independent of fragile D3D state."""
     hud = scope == "ScreenHud"
     overlay = scope == "ScreenOverlay2D"
@@ -131,6 +140,8 @@ def classify_effect_route(projection, z_enabled, alpha_blend, alpha_test,
         return "hud" if hud or overlay else "none"
     if projection != "perspective":
         return "none"
+    if centre and exact_centre_owned:
+        return "centre"
     if not z_enabled and (alpha_blend or alpha_test):
         return "none" if centre else "flat"
     return "none"
@@ -150,6 +161,24 @@ def effect_scope_model_cases():
                         alpha_blend, alpha_test, scope, queued) == expected,
                         "explicit producer ownership mismatch: " +
                         scope + "/" + str(queued))
+    # Positive original C993 source is a spatial centre, not generic
+    # WorldBillboard: prove depth-enabled/disabled and alpha on/off all
+    # reach the same eye route while queued/unowned/orthographic stay mono.
+    for depth in (False, True):
+        for blend in (False, True):
+            for alpha_test in (False, True):
+                require(classify_effect_route("perspective", depth, blend,
+                        alpha_test, "WorldBillboard", False, True) == "centre",
+                        "exact direct C993 cannot depend on raster switches")
+                require(classify_effect_route("perspective", depth, blend,
+                        alpha_test, "WorldBillboard", True, True) == "none",
+                        "queued billboard is not the original C993 source")
+                require(classify_effect_route("perspective", depth, blend,
+                        alpha_test, "WorldBillboard", False, False) == "none",
+                        "unowned billboard must keep R29 fallback")
+                require(classify_effect_route("orthographic", depth, blend,
+                        alpha_test, "WorldBillboard", False, True) == "none",
+                        "exact producer cannot convert orthographic UI")
     for scope in ("WorldParticle", "WorldBillboard",
                   "ProjectedScreenEffect2D", "ScreenHud", "ScreenOverlay2D"):
         require(classify_effect_route("perspective", True, True, False, scope)
@@ -228,6 +257,11 @@ def negative_mutations():
          mutate_classifier("CorroboratesHud(scope)", "false")),
         ("delete positive screen overlay owner",
          mutate_classifier("CorroboratesScreenOverlay2D(scope)", "false")),
+        ("remove source-proven centre admission",
+         mutate_classifier("if (ownedLensCentre)", "if (false)")),
+        ("allow unowned centre WVP",
+         mutate_classifier("SelectWorldRoute(true, owned)",
+                           "SelectWorldRoute(true, true)")),
         ("remove billboard exception",
          mutate_depth_off(
              "scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard",

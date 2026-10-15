@@ -11,14 +11,14 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "PENDING_EXACT_SHA_CI",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_STATE",
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "status": "CI_REPAIR_PENDING_EXACT_SHA",
+  "phase": "C3_VALIDATE_REPAIR",
+  "checkpoint": "C3_STATE",
+  "automation_validation": "FAILED_EXACT_SHA_ARCHITECTURE_VERIFIER_REPAIRING",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "ab5b1786c4da5a8738a225586017bcd46919e80c",
-  "material_result_sha": null,
+  "material_result_sha": "d5ce11f572b7b3f5a0fe392979f82a63253eecd1",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp"
@@ -26,7 +26,8 @@
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "tools/verify_dx9ex_r84_lens_source.py",
-    "docs/automation/runs/CONVERSION-DX9EX-00904.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00904.json",
+    "tools/verify_vr_r30_projection_signature_fastpath.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
@@ -82,5 +83,13 @@
   },
   "score_delta_this_attempt": 0,
   "score_once": false,
-  "hold_reason": "EXACT_SHA_CI_PENDING; NEED_HMD_TEST"
+  "hold_reason": "REVALIDATE_EXACT_SHA_AFTER_ARCHITECTURE_GATE_REPAIR; NEED_HMD_TEST",
+  "ci_evidence": {
+    "first_attempt_sha": "d5ce11f572b7b3f5a0fe392979f82a63253eecd1",
+    "active_run_id": 38757676538,
+    "policy_failure": "tools/verify_vr_r30_projection_signature_fastpath.py required redundant inner !ownedHud/... veto that C993 source admission correctly moved before alpha/Z raster state; preserve top-level explicit producer veto and original direct WorldBillboard exclusion.",
+    "repair": "Move architecture check to source/owner-before-raster ordering and add 8-mode C993 model and negative mutations. Do not weaken top-level semantic gate, GPU eye restore or required CI.",
+    "active_first_status": "FAIL",
+    "runtime_validation": "UNTESTED"
+  }
 }
