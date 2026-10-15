@@ -1,0 +1,81 @@
+{
+  "schema": "outrun-c-q092-visual-diagnostic-v1",
+  "status": "HOLD_GENERATED_OPAQUE_WRONG_SIZE_AND_CLIPPED",
+  "source_png": "Q092_1A43E9D9_BASE_READABLE_FLIPY.png",
+  "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/1A43E9D9_512x64.dds",
+  "source_full_png_SHA256_declared": "ca1c6c72d958ea9f41b9c9c5e10ab7966c74b0221f99f2887b55d94bf1813197",
+  "source_full_png_comparison": "REFERENCE_FULL_PNG_NOT_STAGED",
+  "output_source_SHA256": "a922f249e44fc045b6c1fcb373058229045e7f73f1dc41686ff9641f7d6898b9",
+  "output_korean_SHA256": "40d3cd97cfc285e18cc47a8db81a34e98f3a6e0af6810b775e21200d7c9b6c92",
+  "output_compare_SHA256": "105f02c3ae7789a482ffa1586efa496e751a4fa9ffea51dbaae32adc6a6c8bf4",
+  "source_size": [
+    2048,
+    256
+  ],
+  "source_tile_count": 3,
+  "source_exact_tile_sha_and_coverage": "PASS",
+  "DDS_EQUIVALENCE": "UNVERIFIED",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "parts": [
+    {
+      "part": "Q092_1A43E9D9_BASE_READABLE_FLIPY__r01c01__x0_y0__683x256.png",
+      "part_sha256": "b9536aabed98fec231d5df060eaa780e12cf3aca057f96dbcb405a63ddad4d33",
+      "translated_file": "Q092_1A43E9D9_BASE_READABLE_FLIPY__r01c01__x0_y0__683x256_k.png",
+      "translated_sha256": "ffa29ec52986e8458bf98f4017b1e965fb305f392d556409cc802f31196d7183",
+      "source_size": [
+        683,
+        256
+      ],
+      "candidate_size": [
+        2048,
+        768
+      ],
+      "alpha_range": [
+        255,
+        255
+      ],
+      "fit_preview": "LANCZOS_RESIZED_NOT_PRODUCTION"
+    },
+    {
+      "part": "Q092_1A43E9D9_BASE_READABLE_FLIPY__r01c02__x683_y0__682x256.png",
+      "part_sha256": "e3bf982d41827273c5cf5ca433ec0f04928815ffe395ab15daeb2433d6d13598",
+      "translated_file": "Q092_1A43E9D9_BASE_READABLE_FLIPY__r01c02__x683_y0__682x256_k.png",
+      "translated_sha256": "1f912858213f12798efbed310bcf4ac4012c309f11e92d56f9a2a4cb39525f17",
+      "source_size": [
+        682,
+        256
+      ],
+      "candidate_size": [
+        2046,
+        768
+      ],
+      "alpha_range": [
+        255,
+        255
+      ],
+      "fit_preview": "LANCZOS_RESIZED_NOT_PRODUCTION"
+    },
+    {
+      "part": "Q092_1A43E9D9_BASE_READABLE_FLIPY__r01c03__x1365_y0__683x256.png",
+      "part_sha256": "2eea622009bf2960694975cb2da86a556dba82fd941e688f29c674f814de6ce3",
+      "translated_file": "Q092_1A43E9D9_BASE_READABLE_FLIPY__r01c03__x1365_y0__683x256_k.png",
+      "translated_sha256": "42b9b9d7beb32bfade7eca469ddb728d13846f7af8ff951acc100246202e7a72",
+      "source_size": [
+        683,
+        256
+      ],
+      "candidate_size": [
+        2048,
+        768
+      ],
+      "alpha_range": [
+        255,
+        255
+      ],
+      "fit_preview": "LANCZOS_RESIZED_NOT_PRODUCTION"
+    }
+  ],
+  "warning": "Diagnostic resizing only. Korean generated tiles have non-source dimensions and opaque white background, so cannot be safely source-preserving composited or used as native DDS."
+}
