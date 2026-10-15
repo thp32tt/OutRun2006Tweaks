@@ -656,6 +656,22 @@ private:
 	}
 };
 
+// Keep compile-time negative cases at namespace scope. A constexpr member
+// called from static_assert inside its still-incomplete class is not a valid
+// constant expression on MSVC/GCC; the owner detours share this pure policy.
+namespace
+{
+	static constexpr bool ShouldApplyUIScale(bool enabled, bool matches) noexcept
+	{
+		return enabled && matches;
+	}
+	static_assert(ShouldApplyUIScale(true, true) &&
+		!ShouldApplyUIScale(false, true) &&
+		!ShouldApplyUIScale(true, false) &&
+		!ShouldApplyUIScale(false, false),
+		"UI replacement scale must follow both the live toggle and source identity");
+}
+
 class TextureReplacement : public Hook
 {
 	inline static std::filesystem::path XmtDumpPath;
@@ -698,18 +714,7 @@ class TextureReplacement : public Hook
 
 	inline static std::unordered_map<int, std::pair<float, float>> sprite_scales;
 
-	// Ratio tables can outlive a live preference toggle. A game sprite must
-	// never inherit a replacement crop when the player switches back to its
-	// original DDS; the exact texture pointer still guards ex2 ownership.
-	static constexpr bool ShouldApplyUIScale(bool enabled, bool matches) noexcept
-	{
-		return enabled && matches;
-	}
-	static_assert(ShouldApplyUIScale(true, true) &&
-		!ShouldApplyUIScale(false, true) &&
-		!ShouldApplyUIScale(true, false) &&
-		!ShouldApplyUIScale(false, false),
-		"UI replacement scale must follow both the live toggle and source identity");
+
 
 	// put_sprite_ex2 usually doesn't have the proper textureId set inside SPRARGS2, only the d3dtexture_ptr_C
 	// we could store each d3dtexture ptr somewhere when they're created, and then check against them later to find the scale
