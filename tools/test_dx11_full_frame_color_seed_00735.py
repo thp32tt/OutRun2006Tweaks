@@ -6,6 +6,28 @@ bridge=(root/"src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
 batch=(root/"src/vr/d3d11/native_game_frame_batch.hpp").read_text()
 hook=(root/"src/vr/d3d9/stereo_renderer.cpp").read_text()
 flow=(root/".github/workflows/dx11-fast-structural.yml").read_text()
+color_hdr=(root/"src/vr/d3d11/native_game_clear_color.hpp").read_text()
+probe=(root/"tools/dx11_full_frame_color_seed_00735.cpp").read_text()
+def retains_verified_offscreen_clear(h: str, p: str) -> bool:
+    return all(token in h for token in (
+        "preserves_offscreen_color_only(",
+        "colorOnly && !batchStopped",
+        "matches(device, backbuffer)",
+        "target != 0u && target != backbuffer",
+    )) and all(token in p for token in (
+        "color.preserves_offscreen_color_only(game, back, 0x300u, true, batch.stopped)",
+        "batch.accepts_full_on_source_target(1u, color.matches(game, back))",
+        "batch.scene_boundary();",
+        "!batch.publishable_full(true, 1u)",
+    ))
+assert retains_verified_offscreen_clear(color_hdr,probe), "offscreen menu/race Clear must retain only verified color-only frame"
+for broken in (
+    color_hdr.replace("colorOnly && !batchStopped", "true", 1),
+    color_hdr.replace("target != 0u && target != backbuffer", "true", 1),
+    color_hdr.replace("matches(device, backbuffer)", "true", 1),
+):
+    assert broken != color_hdr and not retains_verified_offscreen_clear(broken,probe)
+
 def linked(b,h,r):
     clear=r[r.index("HRESULT __stdcall ClearDestR9("):r.index("template <typename ActualDraw, typename LegacyDraw>")]
     boundary=b[b.index("void observe_scene_boundary("):b.index("bool observe_game_depth_clear(")]
