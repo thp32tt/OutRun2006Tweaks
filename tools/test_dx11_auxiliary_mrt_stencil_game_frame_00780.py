@@ -8,7 +8,7 @@ workflow = (root / ".github/workflows/dx11-fast-structural.yml").read_text(encod
 draw = bridge.split("bool isolated_offscreen_game_draw(", 1)[1].split(
     "bool proven_game_draw_no_target_writes(", 1)[0]
 clear = bridge.split("bool preserve_offscreen_color_only_clear(", 1)[1].split(
-    "void observe_scene_boundary(", 1)[0]
+    "void observe_game_surface_mutation(", 1)[0]
 
 def implemented(d, c, h):
     return all((
