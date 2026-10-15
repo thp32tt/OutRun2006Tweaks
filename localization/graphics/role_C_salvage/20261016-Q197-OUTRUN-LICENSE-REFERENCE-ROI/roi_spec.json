@@ -1,0 +1,27 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "assets": [
+    {
+      "queue_id": "Q197",
+      "source_png": "Q197_FULL_SOURCE_DIRECT_DDS_READABLE.png",
+      "source_sha256": "5436e6855b92fff6739e68a9774a9d7aadc95c65f012b4e7c098d36f24db5073",
+      "source_kind": "DIRECT_PINNED_GITHUB_ORIGINAL_HD_DDS_BGRA32_FLIPY",
+      "source_dds_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+      "regions": [
+        {
+          "id": "outrun_license",
+          "english": "OUTRUN LICENSE",
+          "korean": "아웃런 라이선스",
+          "bbox": [
+            26,
+            1266,
+            671,
+            1381
+          ],
+          "isolation": "reference_crop",
+          "scale": 4
+        }
+      ]
+    }
+  ]
+}

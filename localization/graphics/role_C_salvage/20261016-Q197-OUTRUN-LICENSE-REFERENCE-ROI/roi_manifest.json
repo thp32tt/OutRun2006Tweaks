@@ -1,0 +1,46 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "queue_id": "Q197",
+  "region_id": "outrun_license",
+  "source_png": "Q197_FULL_SOURCE_DIRECT_DDS_READABLE.png",
+  "source_png_sha256": "5436e6855b92fff6739e68a9774a9d7aadc95c65f012b4e7c098d36f24db5073",
+  "source_kind": "DIRECT_PINNED_GITHUB_ORIGINAL_HD_DDS_BGRA32_FLIPY",
+  "source_dds_path": "textures/load/spr_sprani_sumo_fe_cvt_Exst/9F060EC1_512x512.dds",
+  "original_dimensions": [
+    2048,
+    2048
+  ],
+  "bbox_xyxy": [
+    26,
+    1266,
+    671,
+    1381
+  ],
+  "english": "OUTRUN LICENSE",
+  "korean": "아웃런 라이선스",
+  "isolation": "reference_crop",
+  "scale": 4,
+  "native_dimensions": [
+    645,
+    115
+  ],
+  "imagegen_dimensions": [
+    2580,
+    460
+  ],
+  "native_png_sha256": "348c9d411a0d8181da7c947134723641afc7ca98890169d7f9c773b602dae6be",
+  "imagegen_input_sha256": "2e213289cd51f76190bd99e97726aab2dcf6d7e7a07f05775562a48786982f72",
+  "alpha_crop_margin_checked": false,
+  "status": "IMAGEGEN_REFERENCE_TEST_ONLY",
+  "generate_output": "ONE_KOREAN_TEXT_ONLY_TRANSPARENT_PNG",
+  "required_review": [
+    "KOREAN_GLYPHS",
+    "SOURCE_EFFECT",
+    "CLEAN_PLATE",
+    "NATIVE_ROI_FIT",
+    "C1",
+    "C3_IF_REQUIRED",
+    "USER_GAME"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
