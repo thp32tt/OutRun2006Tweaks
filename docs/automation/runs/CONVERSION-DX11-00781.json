@@ -109,5 +109,38 @@
     "source_changes": false,
     "reran_workflows": false,
     "note": "C6 bookkeeping does not create additional scored development. Exact SHA preserved."
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Successful original D3D9 main STENCIL or Z|STENCIL Clear on the exact owner, whole-backbuffer footprint and canonical main depth surface",
+      "Admitted native D3D11 menu/vehicle/race Draw and DrawIndexed frame keeps output continuity while only Z Clear seeds DSV",
+      "Original D3D9 Draw, Present and gamepad path remain authoritative when any identity or state proof fails"
+    ],
+    "batch_components": [
+      "Source Clear observer integration in live_game_frame_bridge.cpp and D3D9 stereo_renderer.cpp hook",
+      "Canonical main Z/stencil predicate in native_game_main_stencil_clear.hpp and native game frame batch",
+      "Compiled C++ and destructive Python Z/stencil tests with required Fast/Backend/Win32/OpenXR/HUD exact-SHA workflows"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "tools/dx11_main_stencil_clear_game_frame_00781.cpp whole-main STENCIL and Z|STENCIL with frame continuity",
+      "negative_regression": "tools/test_dx11_main_stencil_clear_game_frame_00781.py and inherited depth Clear source mutation tests",
+      "component_integration": "Actual D3D9 Clear hook -> canonical main RT/Z identities -> native D3D11 DrawIndexed+DSV seed -> guarded D3D9 Present and gamepad fallback"
+    },
+    "conflict_keys": [
+      "DX11:MAIN_BACKBUFFER_STENCIL_CLEAR_FRAME_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Source build and exact-SHA workflow gates succeeded at 0118d718; Quest3/VDXR/real game parity remains UNTESTED.",
+    "activation_guard_and_fallback": "Diagnostic opt-in only, fail-closed to original D3D9 render/input, FFB, SkyGlow and DX9Ex fallback. DXVK frozen."
   }
 }
