@@ -1,0 +1,48 @@
+{
+  "schema": "outrun-hd-text-roi-qa-v1",
+  "TASK_ID": "C-ROI-SOURCE-Q060-TARGET-20261016-0703",
+  "run_key": "C-ROI-SOURCE-Q060-TARGET-20261016-0703",
+  "platform": "PC",
+  "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "source_dds_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "source_png_sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+  "source_dimensions": [
+    4096,
+    2048
+  ],
+  "source_orientation": "READABLE_FLIP_Y_FROM_ORIGINAL_FULL_DDS",
+  "full_source_dds_to_png_pixel_difference": 0,
+  "source_to_native_roi_pixel_difference": 0,
+  "english": "Target",
+  "korean": "목표",
+  "translation_source": "localization/graphics/transcriptions.jsonl index=60",
+  "native_bbox_xyxy": [
+    2898,
+    139,
+    3076,
+    231
+  ],
+  "zoom": 4,
+  "native_dimensions": [
+    178,
+    92
+  ],
+  "imagegen_input_dimensions": [
+    712,
+    368
+  ],
+  "native_png_sha256": "792d3bfb7083caef45748bdc029a849c2804547894d25df03b2e9d6c09d6ce4e",
+  "imagegen_input_sha256": "8ab160471ab213fad038b25dfe65f67695e7bd689bbf9b58b5ad9f3010937657",
+  "complete_phrase_visual_review": "ONE_FULL_TARGET_PHRASE_WITH_OUTLINE_AND_SHADOW; NO ADJACENT NUMERIC, ICON, OR OTHER TEXT",
+  "source_isolation": "OPAQUE_DARK_NAVY_UI_CELL; REFERENCE_CROP_ONLY; NOT_GLYPH_ONLY",
+  "glyph_mask": "HOLD_PSD_OR_REVIEWED_EXACT_MASK_REQUIRED",
+  "clean_plate": "HOLD_PSD_OR_REVIEWED_EXACT_MASK_REQUIRED",
+  "native_return": "ASPECT_RATIO_PRESERVED_WITHIN_REVIEWED_UI_CELL_AND_UV_SAFE_ZONE",
+  "status": "TEST_ONLY_SOURCE_ROI_VALIDATED_REFERENCE_ONLY",
+  "imagegen_call": "NOT_RUN",
+  "ab_queue_state": "NOT_TOUCHED",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "USER_GAME": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
