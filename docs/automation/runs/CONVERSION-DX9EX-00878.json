@@ -17,18 +17,33 @@
       {
         "id": "goal-direct-exact-batch",
         "category": "end_to_end_behavior",
-        "expected_behavior": "Both original GOAL direct helpers split a proven prior homogeneous source batch and submit remaining own homogeneous batches before semantic scope exits."
+        "expected_behavior": "Both original GOAL direct helpers split a proven prior homogeneous source batch and submit remaining own homogeneous batches before semantic scope exits.",
+        "behavior_area": "Original GOAL source and D3DX GPU batching"
       },
       {
         "id": "goal-native-fallback",
         "category": "fallback_regression",
-        "expected_behavior": "Unknown, mixed, foreign, queued and failed D3DX batches keep original native End/error behavior."
+        "expected_behavior": "Unknown, mixed, foreign, queued and failed D3DX batches keep original native End/error behavior.",
+        "behavior_area": "Foreign, mixed and queued D3DX fallback"
       },
       {
         "id": "exact-windows-gates",
         "category": "integrated_validation",
-        "expected_behavior": "R84 main DLL, R26 rollback, host, package and required exact-SHA gates succeed."
+        "expected_behavior": "R84 main DLL, R26 rollback, host, package and required exact-SHA gates succeed.",
+        "behavior_area": "R84 game, R26_SAFE rollback, host and packaging"
       }
+    ],
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "trace_stages": [
+      "Original 0xBE020/0xBE150 GOAL time/title helper calls produce immediate D3DX glyphs or enqueue separately tagged SpriteNodes with exact GOAL tokens.",
+      "The intercepted D3DXSprite Begin/Draw/Flush/End tracks the previously queued homogeneous producer, submits that prior GPU batch before a direct GOAL helper and submits a remaining exact GOAL batch before its source scope expires.",
+      "R84 physical D3D9 draw dispatch then classifies ScreenHud under the restored producer token for each actual GPU draw and composes separate per-eye OpenXR render targets through the existing host pipeline."
+    ],
+    "subcomponents": [
+      "Producer lifetime: bracket both verified GOAL helper callsites with exact direct source ownership while preserving their separately tagged queued siblings and original return path.",
+      "GPU batch lifetime: split only tracked homogeneous preceding GOAL-boundary sprite work and submit any remaining GOAL-owned glyph triangles before changing exact semantic owner; fail closed for mixed/queued/foreign buffers.",
+      "Integrated R84 UI owner: retain the existing D3D9 source semantics through R33 stereo routing and x64 host while preserving R26_SAFE rollback, unrelated effects and protected input."
     ]
   },
   "source_parent_sha": "224e6a9cc0a4040801880c35c358449726b8264f",
@@ -50,6 +65,8 @@
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "EXACT_SHA_CI_PENDING",
-  "result_commit_ci_skip": false
+  "hold_reason": "POLICY_CONTRACT_REPAIRED_EXACT_SHA_REVALIDATION_PENDING",
+  "result_commit_ci_skip": false,
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "6e447e510df6d1ee15a2b0e1f059c4062ffcbb81"
 }
