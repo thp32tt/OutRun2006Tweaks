@@ -1,0 +1,146 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00778",
+  "production_id": "CONVERSION-DX11-00778",
+  "event_id": "CONVERSION-DX11-00778-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:FULL_GAME_OFFSCREEN_AUXILIARY_DEPTH_WRITE_CONTINUITY",
+  "feature_id": "DX11-FULL-GAME-OFFSCREEN-DEPTH-WRITE-CONTINUITY",
+  "feature_id_note": "Reconstructed descriptive identity after confirmed RUN_RECORD_NOT_FOUND; no new production task or scoring event.",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "8203b5a6ae38b3f5c1a1b63a89a22de4a97e2163",
+  "material_result_sha": "098a33da6c2c33a4cbec49098622fd79c8d1d410",
+  "validation_bearing_result_sha": "a89051508cd0cfaa454f0707939302e32411abfa",
+  "source_repair_sha": "a89051508cd0cfaa454f0707939302e32411abfa",
+  "ci_regression_repair_sha": "4ca4b699d2b483f9509ed2a9ac349cd7440ace03",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/native_game_offscreen_pass.hpp",
+    "src/vr/d3d11/native_game_clear_color.hpp",
+    "tools/dx11_auxiliary_depth_draw_00778.cpp",
+    "tools/test_dx11_auxiliary_depth_draw_00778.py",
+    "tools/test_dx11_auxiliary_clear_game_frame_00777.py",
+    ".github/workflows/dx11-fast-structural.yml"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-FULL-GAME-OFFSCREEN-DEPTH-WRITE-CONTINUITY",
+    "goal": "Preserve real full-resolution native D3D11 game Draw/DrawIndexed frame continuity over game-authored menu and vehicle preview render-to-texture passes that write an independently owned D3D9 depth surface, while rejecting main-Z aliasing and retaining original D3D9 Present and gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "offscreen-depth-write-draw-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_D3D9_Draw_DrawIndexed_native_full_frame",
+        "expected_behavior": "When the actual D3D9 offscreen RT0 and its depth COM identity are isolated from the cleared main backbuffer/depth, preserve the source ordinal and continue subsequent full-frame native Draw/DrawIndexed and guarded Present."
+      },
+      {
+        "id": "main-depth-identity-and-input-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "main_depth_COM_identity_stencil_MRT_and_original_game_input",
+        "expected_behavior": "Unproved or shared main Z, stencil or MRT writes abort optional native publication; a safe auxiliary depth write marks depth provenance for later main-Z rebind checks; original D3D9 and gamepad still run."
+      },
+      {
+        "id": "exact-sha-integrated-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Win32_Build_OpenXR_HUD",
+        "expected_behavior": "Compiled C++ positive/negative cases, destructive source regressions and all five mandatory GitHub Actions success are tied to the final validation-bearing source SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Intercept actual game-authored D3D9 offscreen Draw/DrawIndexed during menu/vehicle texture passes",
+      "Check auxiliary render target and canonical main versus bound depth COM identities",
+      "Preserve full native D3D11 Draw stream ordinals and main depth rebind provenance",
+      "Guard D3D9 Present publication while retaining original DX9Ex game input and fallback"
+    ],
+    "batch_components": [
+      "C++ live_game_frame_bridge offscreen actual game draw depth COM isolation",
+      "C++ native_game_offscreen_pass and native_game_clear_color provenance",
+      "C++/Python positive negative mutation tests and DX11 Fast gate linkage"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "tools/dx11_auxiliary_depth_draw_00778.cpp source-continuity positive static and compiled assertions",
+      "negative_regression": "tools/test_dx11_auxiliary_depth_draw_00778.py mutation checks and preserved 00777 auxiliary-Clear mutations",
+      "component_integration": "Original R9 intercepted game D3D9 Draw -> isolated depth-writing pass -> native D3D11 main Draw -> same-Present guarded publication, with original gamepad/D3D9 path unchanged"
+    },
+    "conflict_keys": [
+      "DX11:FULL_GAME_OFFSCREEN_AUXILIARY_DEPTH_WRITE_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Source/CI verified at exact SHA only; no observed full-game/Quest3/VDXR visual or performance parity established.",
+    "activation_guard_and_fallback": "Native path remains diagnostic opt-in and fail-closed; original D3D9 Draw, Present, gamepad, FFB, SkyGlow and DX9Ex fallback not replaced."
+  },
+  "pipeline": {
+    "C0_RECOVER": "Confirmed target GitHub branch, exact result SHA and missing 00778 run record.",
+    "C1_REVIEW": "Confirmed five exact-SHA GitHub mandatory workflow conclusions SUCCESS; no compilation or runtime retrigger.",
+    "C2_IMPLEMENT": "Original material 098a33da; later depth-provenance source repair included in validation-bearing a8905150.",
+    "C3_VALIDATE": "DX11 Fast, Backend Conversion, Build, OpenXR, HUD Inspector all SUCCESS at exact SHA a8905150; HMD UNTESTED.",
+    "C4_COMMIT": "Existing material source and repair commits retained; C6 writes bookkeeping only with [skip ci].",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PASS_EXACT_SHA; terminal BUILD_VERIFIED; HMD/Quest3/VDXR still NEED_HMD_TEST."
+  },
+  "acceptance_results": {
+    "offscreen-depth-write-draw-continuity": "PASS_BUILD",
+    "main-depth-identity-and-input-fallback": "PASS_BUILD",
+    "exact-sha-integrated-gates": "PASS_EXACT_SHA"
+  },
+  "evidence": {
+    "ci_head_sha": "a89051508cd0cfaa454f0707939302e32411abfa",
+    "gates": {
+      "DX11 Fast": {
+        "workflow_run_id": 38755736372,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38755736372"
+      },
+      "Backend Conversion Gate": {
+        "workflow_run_id": 38755736219,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38755736219"
+      },
+      "Windows Build": {
+        "workflow_run_id": 38755746799,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38755746799"
+      },
+      "OpenXR VR architecture": {
+        "workflow_run_id": 38755746897,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38755746897"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "workflow_run_id": 38755746715,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38755746715"
+      }
+    },
+    "runtime_testing": "Not performed; CI is not Quest3/VDXR evidence."
+  },
+  "c6_recovery": {
+    "reason": "RUN_RECORD_NOT_FOUND",
+    "source_changes": false,
+    "reran_workflows": false,
+    "independent_score_event": false,
+    "note": "Original material and later causal source repair kept separate from C6 metadata. No duplicate AI score."
+  }
+}
