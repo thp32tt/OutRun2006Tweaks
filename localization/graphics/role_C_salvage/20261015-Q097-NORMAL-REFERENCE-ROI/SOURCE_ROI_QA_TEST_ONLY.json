@@ -1,0 +1,62 @@
+{
+  "task_id": "OUTRUN-C-ROI-SOURCE-Q097-NORMAL-20261015-2333",
+  "schema": "outrun-hd-text-roi-v1",
+  "status": "TEST_ONLY_REFERENCE_ONLY",
+  "source_original_kind": "DIRECT_GITHUB_HD_DDS_NOT_986_TILES",
+  "source_github_branch": "korean-localization-recovery-20260928",
+  "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_selector_cvt_Exst/411827E_512x512.dds",
+  "source_dds_sha256": "bad9701ac45e4587d8b04afde335951f4857f747ec20fd71fc838be7d86bf364",
+  "source_dds_git_blob": "d488d1a0ccd71b0f38410ece0b90e530e2c8ff71",
+  "source_full_png_sha256": "2ecc253ac9db49a9c1189f1f814d562a45462b660af94877ce1f66737cfe58af",
+  "direct_dds_flipy_pixel_exact_full_png": true,
+  "source_dimensions": [
+    2048,
+    2048
+  ],
+  "english": "NORMAL",
+  "korean": "일반",
+  "translation_provenance": "previously user-prescribed NORMAL→일반; standalone official-mapping CSV not located on inspected branch",
+  "bbox_xyxy": [
+    1260,
+    850,
+    1560,
+    970
+  ],
+  "native_dimensions": [
+    300,
+    120
+  ],
+  "upscale": 4,
+  "upscaled_dimensions": [
+    1200,
+    480
+  ],
+  "native_sha256": "5cc96fdc2b027be4916267251d703157d8695482551fdca43339bae922526407",
+  "upscaled_sha256": "48eb0b637d043f6165319d8dc9b4521fc0ad4de385c9d1ecb5896ef082841760",
+  "exact_native_crop": true,
+  "exact_upscale_lanczos": true,
+  "reference_crop_alpha_edge_counts_top_bottom_left_right": [
+    259,
+    511,
+    153,
+    0
+  ],
+  "alpha_crop_margin_checked": false,
+  "visual_phrase_complete": "MANUAL_REVIEW: NORMAL full text and outline visible, no text/effects crop-edge cut in preview",
+  "opaque_or_plate_coverage": "Green UI plate embedded; alpha is NOT independently identified glyph layer",
+  "hold": [
+    "HOLD_GLYPH_MASK_OR_PSD_TEXT_LAYER_UNREVIEWED",
+    "HOLD_CLEAN_PLATE_UNREVIEWED",
+    "HOLD_UI_CELL_UV_SAFE_BOUNDS_UNMEASURED",
+    "HOLD_OFFICIAL_MAPPING_CSV_RECHECK"
+  ],
+  "imagegen_called": false,
+  "production_queue_modified": false,
+  "ab_state_modified": false,
+  "ready_to_dispatch": false,
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "USER_GAME": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "resize_return_policy": "Preserve Korean result aspect ratio inside verified UI-cell/UV safe area; never reject by width alone; no unreviewed mask compositing"
+}
