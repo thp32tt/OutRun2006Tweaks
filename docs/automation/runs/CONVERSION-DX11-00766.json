@@ -82,7 +82,15 @@
       "positive_probe": "WARP native eye producer acquires increasing frame IDs, signals EVENT, publishes ACK-owned pair, retires valid cumulative ACK and accepts a newer game frame; portable C++ verifies numerical boundaries.",
       "negative_regression": "WARP and destructively mutated source tests reject frame ID reuse, newer-frame cumulative ACK replay, old source/foreign transport while preserving original game frame/input fallback.",
       "component_integration": "D3D11 real game stereo producer -> shared-eye slot acquisition -> GPU Copy/Resolve -> exact producer fence -> OpenXR published handles -> cumulative IPC ACK retirement; distinct DX9Ex Present fallback."
-    }
+    },
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "NATIVE_STEREO_EYE_TRANSFER",
+      "VISIBLE_FRAME_OUTPUT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Monotonic exact-source D3D9 game Draw -> native D3D11 full-resolution color -> fenced L/R stereo eye handoff to OpenXR. Source plus WARP compile coverage only; actual game/Quest3/VDXR visible output remains UNTESTED, no promotion."
   },
   "pipeline": {
     "C0_RECOVER": "Remote GitHub HEAD/00765 pending Fast+Build checked",
