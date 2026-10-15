@@ -18,11 +18,16 @@ constexpr bool menu_vehicle_race_offscreen_depth_draws() {
             true, true, true,
             GameNativeOffscreenPass::no_main_depth_write(true, true, otherDepth),
             true, true, frame.stopped)) return false;
+    main.note_auxiliary_depth_write();
+    if (!main.auxiliaryDepthCleared || !main.main_depth_still_bound(17u) ||
+        main.main_depth_still_bound(19u)) return false;
     if (!frame.absorb_empty_source_draw(1u)) return false;
     if (!frame.accepts_full_on_source_target(2u, true)) return false;
     frame.succeeded(true); frame.record_source_draw(2u);
-    return frame.publishable_full(true, 3u) &&
+    const bool eligible = frame.publishable_full(true, 3u) &&
         main.main_depth_still_bound(17u) && frame.submitted == 2u;
+    main.discard();
+    return eligible && !main.auxiliaryDepthCleared && !main.mainDepthIdentity;
 }
 constexpr bool unsafe_depth_and_mrt_keep_original_fallback() {
     GameNativeClearColor main{};

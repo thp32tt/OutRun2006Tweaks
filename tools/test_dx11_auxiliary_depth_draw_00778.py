@@ -22,6 +22,9 @@ def integrated(source, depth):
         "targetIdentity.Get() != backbufferIdentity.Get()" in source,
         "no_main_depth_write(" in source and "isolatedDepthWrite)" in source,
         "stencilEnabled == FALSE, noExtraRenderTargets" in source,
+        "if (isolated && depthWrites && isolatedDepthWrite)" in source,
+        "s.clearColor.note_auxiliary_depth_write()" in source,
+        "void note_auxiliary_depth_write()" in clear,
         "provenAuxiliaryDepth = false" in depth,
         "!depthEnabled || !depthWritesEnabled || provenAuxiliaryDepth" in depth,
     ))
@@ -38,6 +41,7 @@ for original, fake in (
     ("isolatedDepthWrite = !s.clearColor.main_depth_still_bound(",
      "isolatedDepthWrite = s.clearColor.main_depth_still_bound("),
     ("stencilEnabled == FALSE, noExtraRenderTargets", "true, noExtraRenderTargets"),
+    ("s.clearColor.note_auxiliary_depth_write()", "/* missed auxiliary Z write */"),
     ("targetIdentity.Get() != backbufferIdentity.Get()", "true /* unsafe target alias */"),
 ):
     assert not integrated(offscreen.replace(original, fake, 1), header), original

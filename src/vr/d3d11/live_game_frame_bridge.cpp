@@ -4839,7 +4839,7 @@ bool observe_source_frame_mode(State& s, bool fullMode) noexcept {
 // An offscreen D3D9 Draw must not be counted as a native backbuffer Draw.
 // Check the current COM backbuffer identity, Z/stencil and all extra MRTs;
 // a failed query, shared main RT or depth/stencil write aborts the native batch.
-bool isolated_offscreen_game_draw(IDirect3DDevice9* game, const State& s) noexcept {
+bool isolated_offscreen_game_draw(IDirect3DDevice9* game, State& s) noexcept {
     if (!env_full_game_opt_in() || !game || s.frameBatch.stopped) return false;
     const auto owner = reinterpret_cast<std::uintptr_t>(game);
     DWORD zEnabled = D3DZB_TRUE, zWriteEnabled = TRUE, stencilEnabled = TRUE;
@@ -4887,13 +4887,19 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, const State& s) noexce
             isolatedDepthWrite = !s.clearColor.main_depth_still_bound(
                 reinterpret_cast<std::uintptr_t>(depthIdentity.Get()));
     }
-    return GameNativeOffscreenPass::source_has_no_main_writes(
+    const bool isolated = GameNativeOffscreenPass::source_has_no_main_writes(
         true, s.clearColor.matches(owner, reinterpret_cast<std::uintptr_t>(
             backbufferIdentity.Get())),
         targetIdentity.Get() != backbufferIdentity.Get(),
         GameNativeOffscreenPass::no_main_depth_write(
             zEnabled != D3DZB_FALSE, zWriteEnabled != FALSE, isolatedDepthWrite),
         stencilEnabled == FALSE, noExtraRenderTargets, s.frameBatch.stopped);
+    // The original D3D9 Draw has now changed the auxiliary Z surface. A
+    // subsequent backbuffer depth Draw must rebind the seeded MAIN depth
+    // identity, not reuse the auxiliary depth history as the native DSV.
+    if (isolated && depthWrites && isolatedDepthWrite)
+        s.clearColor.note_auxiliary_depth_write();
+    return isolated;
 }
 
 // Preserve the complete game Draw/DrawIndexed source stream when a successful

@@ -10,8 +10,8 @@ struct GameNativeClearColor {
     // Non-owning identity only; discarded on Present/Reset/new source clear.
     // Unknown main depth rejects auxiliary Z/stencil Clear preservation.
     std::uintptr_t mainDepthIdentity = 0u;
-    // An isolated auxiliary depth Clear is safe only while subsequent
-    // depth-tested main game Draws use this same original depth identity.
+    // An isolated auxiliary depth Clear OR depth-writing offscreen Draw is
+    // safe only while later depth-tested main Draws rebind original main Z.
     bool auxiliaryDepthCleared = false;
     std::uint32_t argb = 0u;
     // D3DFMT_X8R8G8B8 has no destination alpha: native RGBA must
@@ -40,6 +40,11 @@ struct GameNativeClearColor {
         }
     }
     constexpr void note_auxiliary_depth_clear() noexcept {
+        auxiliaryDepthCleared = true;
+    }
+    // Depth-writing render-to-texture game Draws modify auxiliary Z just as
+    // Clears do; share the later main-depth rebind check before native Draw.
+    constexpr void note_auxiliary_depth_write() noexcept {
         auxiliaryDepthCleared = true;
     }
     [[nodiscard]] constexpr bool main_depth_still_bound(
