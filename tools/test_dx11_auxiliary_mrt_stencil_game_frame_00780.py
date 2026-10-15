@@ -45,7 +45,7 @@ for scope, original, replacement in (
     ("clear", "FAILED(extra.As(&extraIdentity))", "false /* unverified alias */"),
     ("clear", "s.clearColor.backbufferIdentity", "0u /* missed main */"),
     ("header", "bound != mainBackbuffer;", "true; /* allowed alias */"),
-    ("header", "provenAuxiliaryDepth;", "true; /* main Z write */"),
+    ("header", "maskKnown && writeMask != 0u &&\n            provenAuxiliaryDepth;", "true; /* main Z write */"),
 ):
     d, c, h = draw, clear, offscreen
     if scope == "draw": d = d.replace(original, replacement, 1)
