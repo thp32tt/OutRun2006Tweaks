@@ -1308,6 +1308,10 @@ namespace OutRunVRStereo
     {
         return GetCurrentShaderEpoch(identity, serial);
     }
+    std::uint64_t R29OwnerTopLevelDrawSerial() noexcept
+    {
+        return GetTopLevelDrawSerial();
+    }
     void R29OwnerResynchronizeShaderEpoch(
         IDirect3DDevice9* device) noexcept
     {

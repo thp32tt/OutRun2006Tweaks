@@ -21,6 +21,7 @@
 #include "r30_indexed_up_bounds.hpp"
 #include "r30_shadow_bytes.hpp"
 #include "r30_shadow_scratch.hpp"
+#include "lens_centre_source_provenance.hpp"
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
 #include "../game/render_semantics.hpp"
@@ -63,6 +64,22 @@ namespace Settings
     extern Setting<float> VRStereoDepth;
     extern Setting<int> SkyGlowFactor;
     extern Setting<bool> SkyGlowTwoStep;
+}
+
+// Original-game source provenance from the common R23 WVP producer.
+namespace OutRunVRRenderer
+{
+    std::uint64_t GetLastGameWvpLensCentreCallEpoch() noexcept;
+    std::uint64_t GetCurrentLatchedPoseEpoch() noexcept;
+    std::uint64_t GetLastGameWvpPoseEpoch() noexcept;
+    bool GetLastRawGameWvpWrite(float outConstants[16],
+        std::uint64_t& writeSerial, std::uint64_t& topLevelDrawSerial,
+        std::uintptr_t& shaderIdentity, std::uint64_t& shaderSerial) noexcept;
+    bool GetLastGameWvpSemanticProvenance(
+        OutRunVR::GameSemantic::RenderScope& semanticScope,
+        std::uint64_t& queueNodeEpoch,
+        const void*& queueNode,
+        OutRunVR::GameSemantic::ProducerToken& producerToken) noexcept;
 }
 
 namespace OutRunVRStereo
@@ -2418,6 +2435,44 @@ namespace OutRunVRStereo
             FlatPerspectiveEffect
         };
 
+        // Strict R84 C993 source proof, ported from the protected R26
+        // comparison owner without changing the actual world renderer.
+        // A possibly head-injected live D3D9 c64 is NOT original-game WVP.
+        bool R30HasExactLensCentreRawWvp(float original[16]) noexcept
+        {
+            using namespace OutRunVR::GameSemantic;
+            if (!original || QueueRenderActive() ||
+                EffectiveScope() != RenderScope::WorldBillboard ||
+                CurrentRenderProducerToken() != ProducerToken::LensFlareCentre)
+                return false;
+            std::uint64_t writeSerial = 0, writeDraw = 0;
+            std::uintptr_t writeShader = 0, currentShader = 0;
+            std::uint64_t writeShaderEpoch = 0, currentShaderEpoch = 0;
+            RenderScope sourceScope = RenderScope::None;
+            std::uint64_t queueEpoch = 0;
+            const void* queueNode = nullptr;
+            ProducerToken sourceProducer = ProducerToken::None;
+            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                    original, writeSerial, writeDraw,
+                    writeShader, writeShaderEpoch) ||
+                !OutRunVRRenderer::GetLastGameWvpSemanticProvenance(
+                    sourceScope, queueEpoch, queueNode, sourceProducer) ||
+                !R29OwnerCurrentShaderEpoch(currentShader, currentShaderEpoch))
+                return false;
+            return OutRunVR::LensCentre::OwnsRawWvp({
+                CurrentLensCentreCallEpoch,
+                OutRunVRRenderer::GetLastGameWvpLensCentreCallEpoch(),
+                OutRunVRRenderer::GetCurrentLatchedPoseEpoch(),
+                OutRunVRRenderer::GetLastGameWvpPoseEpoch(),
+                R29OwnerTopLevelDrawSerial() + 1u, writeDraw,
+                currentShader, writeShader,
+                currentShaderEpoch, writeShaderEpoch,
+                sourceScope == RenderScope::WorldBillboard,
+                sourceProducer == ProducerToken::LensFlareCentre,
+                queueNode == nullptr
+            });
+        }
+
         R30ScreenSpaceKind R30ClassifyScreenSpacePass(
             IDirect3DDevice9* device) noexcept
         {
@@ -2466,7 +2521,32 @@ namespace OutRunVRStereo
                 const auto scope = OutRunVR::GameSemantic::EffectiveScope();
                 if (!OutRunVR::GameSemantic::QueueRenderActive() &&
                     scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard)
+                {
+                    // P0 diagnostic: verify original C993 c64 owns this draw
+                    // before changing lens geometry. This never flattens a
+                    // sun or touches the game's shader/texture/GPU state.
+                    if (Settings::VRTelemetry &&
+                        OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                            OutRunVR::GameSemantic::ProducerToken::LensFlareCentre)
+                    {
+                        float originalGameWvp[16]{};
+                        const bool owned =
+                            R30HasExactLensCentreRawWvp(originalGameWvp);
+                        static thread_local bool reportedOwned = false;
+                        static thread_local bool reportedMiss = false;
+                        bool& reported = owned ? reportedOwned : reportedMiss;
+                        if (!reported)
+                        {
+                            reported = true;
+                            spdlog::info(
+                                "VR R84 C993 RAW_WVP_SOURCE: {} "
+                                "(call/pose/shader/draw owner; "
+                                "physical world renderer unchanged)",
+                                owned ? "EXACT_OWNER" : "MISSING_OR_STALE");
+                        }
+                    }
                     return R30ScreenSpaceKind::None;
+                }
                 return R30ScreenSpaceKind::FlatPerspectiveEffect;
             }
             return R30ScreenSpaceKind::None;

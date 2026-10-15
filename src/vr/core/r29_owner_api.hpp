@@ -119,6 +119,8 @@ namespace OutRunVRStereo
         std::uintptr_t identity) noexcept;
     bool R29OwnerCurrentShaderEpoch(
         std::uintptr_t& identity, std::uint64_t& serial) noexcept;
+    // Expose the physical R23 draw serial through R29, not textual C++.
+    std::uint64_t R29OwnerTopLevelDrawSerial() noexcept;
     void R29OwnerResynchronizeShaderEpoch(
         IDirect3DDevice9* device) noexcept;
     D3DMATRIX R29OwnerIdentityMatrix() noexcept;
