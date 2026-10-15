@@ -60,13 +60,13 @@
     "root_cause": "The per-Draw stage Flush unconditionally fragments a single homogeneous D3DX owner batch into individual submissions, duplicating GPU synchronization work already bounded by queue/direct source exits.",
     "eye_ownership": "The D3DX GPU Draw executes before its exact semantic owner is popped, so the existing R84 per-eye submission can retain ScreenHud provenance. Physical stereo effect remains untested."
   },
-  "status": "IMPLEMENTED_AWAITING_CI",
-  "phase": "C5_COMMIT",
-  "checkpoint": "C5_SOURCE_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
-  "runtime_evidence": "Source mutation checks prepared; actual Win32 compile and Quest3/VDXR game execution not yet established.",
+  "runtime_evidence": "GitHub DX9Ex Active exact-SHA 5/5 SUCCESS; source-impact/HUD inspections SUCCESS on unchanged runtime C++ material commit. Physical Quest3/VDXR not executed.",
   "source_parent_sha": "a6ccc6d4a2fe8a5a02a38a9c8c17d15bca7cbcff",
   "changed_files": [
     "src/hooks_uiscaling.cpp",
@@ -80,8 +80,35 @@
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "CI_PENDING_AND_HMD_UNTESTED",
-  "result_commit_ci_skip": false,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "result_commit_ci_skip": true,
+  "material_result_sha": "8b54a99674fc76847c0eade9e9a8b2a0c202b046",
+  "validation_bearing_result_sha": "6d572069be63dc3da1f7ca7d6b3ed47e0d048e90",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "6d572069be63dc3da1f7ca7d6b3ed47e0d048e90",
+    "dx9ex_active": {
+      "run_id": 38683416353,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, full-chain-compile R84, game R26_SAFE, host, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38683416356,
+      "conclusion": "IN_PROGRESS",
+      "note": "Separate exact-SHA Domain check, not part of DX9Ex Active 5/5 validation."
+    },
+    "full_source_impact": {
+      "run_id": 38683331598,
+      "source_sha": "8b54a99674fc76847c0eade9e9a8b2a0c202b046",
+      "conclusion": "SUCCESS",
+      "note": "3/3 SUCCESS on material SHA; final SHA modifies only existing verifier after source commit."
+    },
+    "hud_inspector": {
+      "run_id": 38683331549,
+      "source_sha": "8b54a99674fc76847c0eade9e9a8b2a0c202b046",
+      "conclusion": "SUCCESS",
+      "note": "2/2 SUCCESS on material SHA; runtime C++ unchanged afterward."
+    },
+    "runtime": "UNTESTED"
+  }
 }
