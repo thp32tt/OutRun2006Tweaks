@@ -52,7 +52,20 @@ for text, orig, fake in (
     ("offscreen", "extraMrtUnbound && !stopped", "true && !stopped"),
 ):
     args={"bridge":bridge, "hook":hook, "clear":clear, "offscreen":offscreen}
-    args[text]=args[text].replace(orig, fake, 1)
+    if text == "bridge" and orig == "s.clearColor.main_depth_still_bound(":
+        # A later DX11 feature also checks main-depth identity in the
+        # offscreen Draw path. Mutate this test's owned auxiliary-Clear
+        # function, not the unrelated earlier Draw check.
+        prefix, rest = args["bridge"].split(
+            "bool preserve_offscreen_color_only_clear(", 1)
+        region, suffix = rest.split("void observe_scene_boundary(", 1)
+        assert orig in region
+        region = region.replace(orig, fake, 1)
+        args["bridge"] = (prefix +
+                          "bool preserve_offscreen_color_only_clear(" + region +
+                          "void observe_scene_boundary(" + suffix)
+    else:
+        args[text]=args[text].replace(orig, fake, 1)
     assert not integrated(args["bridge"], args["hook"], args["clear"], args["offscreen"]), orig
 assert "tools/test_dx11_auxiliary_clear_game_frame_00777.py" in workflow
 assert "tools/dx11_auxiliary_clear_game_frame_00777.cpp" in workflow
