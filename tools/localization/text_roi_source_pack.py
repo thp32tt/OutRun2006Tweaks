@@ -19,7 +19,8 @@ from PIL import Image
 
 SCHEMA = "outrun-hd-text-roi-v1"
 MAX_NATIVE_PIXELS = 4096 * 4096
-MAX_INPUT_PIXELS = 2048 * 2048
+MAX_GENERATOR_SIDE = 3072  # Allow mildly oversize complete-phrase input; model may downsample.
+MAX_INPUT_PIXELS = 3072 * 3072
 
 def sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
@@ -78,8 +79,8 @@ def run(spec: Path, source_root: Path, output_root: Path) -> dict:
                 if type(zoom) is not int or not 1 <= zoom <= 4:
                     raise ValueError("SCALE_MUST_BE_1_TO_4")
                 w, h = x1-x0, y1-y0
-                if w*zoom*h*zoom > MAX_INPUT_PIXELS or w*zoom > 2048 or h*zoom > 2048:
-                    raise ValueError("IMAGEGEN_INPUT_OVER_2048_LIMIT")
+                if w*zoom*h*zoom > MAX_INPUT_PIXELS or w*zoom > MAX_GENERATOR_SIDE or h*zoom > MAX_GENERATOR_SIDE:
+                    raise ValueError("IMAGEGEN_INPUT_OVER_3072_LIMIT")
                 mode = region.get("isolation", "reference_crop")
                 if mode not in ("alpha", "manual_mask", "reference_crop"):
                     raise ValueError("INVALID_ISOLATION")
