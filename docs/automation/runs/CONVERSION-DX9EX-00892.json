@@ -65,9 +65,9 @@
     ]
   },
   "acceptance_results": {
-    "hud_edge_visual_continuity": "SOURCE_IMPLEMENTED",
-    "hud_edge_scope_preservation": "SOURCE_UNCHANGED",
-    "hud_edge_exact_gates": "PENDING"
+    "hud_edge_visual_continuity": "PASS_EXACT_SHA",
+    "hud_edge_scope_preservation": "PASS_EXACT_SHA",
+    "hud_edge_exact_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "At source HEAD, PeripheralWeight holds 1.0 to 1.20 inclusive and returns 0.0 for >1.20, while R30 applies this weight to both anchor and optical boost.",
@@ -89,6 +89,35 @@
   "runtime_evidence": "No physical Quest3/VDXR game execution in this task.",
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "result_commit_ci_skip": true,
-  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
+  "result_commit_ci_skip": false,
+  "hold_reason": "NEED_HMD_TEST",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "f7a94d20043c8f31e51dc2ca9c6f7e020b18cc88",
+    "material_sha": "0ccd9d9f414074930dd90565941594c1b1564058",
+    "dx9ex_active": {
+      "run_id": 38719523773,
+      "head_sha": "f7a94d20043c8f31e51dc2ca9c6f7e020b18cc88",
+      "conclusion": "SUCCESS",
+      "jobs_passed": "5/5"
+    },
+    "domain_isolation": {
+      "run_id": 38719523786,
+      "head_sha": "f7a94d20043c8f31e51dc2ca9c6f7e020b18cc88",
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38719523675,
+      "head_sha": "f7a94d20043c8f31e51dc2ca9c6f7e020b18cc88",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38719523709,
+      "head_sha": "f7a94d20043c8f31e51dc2ca9c6f7e020b18cc88",
+      "conclusion": "SUCCESS"
+    },
+    "runtime": "UNTESTED"
+  },
+  "checkpoint_commit_ci_skip": true,
+  "bookkeeping_ci_skip": true
 }
