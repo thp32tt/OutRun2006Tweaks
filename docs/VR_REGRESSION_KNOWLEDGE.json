@@ -1,0 +1,1029 @@
+{
+  "schemaVersion": 1,
+  "integrationBranch": "vr-d3d9ex-focus",
+  "ledgerIssue": 13,
+  "owner": "D_INTEGRATION_PLANNER",
+  "policy": {
+    "eventHistory": "append-only",
+    "recurrence": "reuse-stable-key-and-reopen",
+    "integrationGate": "all triggered regression cases must be revalidated or explicitly NEED_HMD_TEST before integration",
+    "fixedRequirements": [
+      "durable fix reference",
+      "affected path set",
+      "deterministic verifier or evidence recipe",
+      "validation evidence level"
+    ],
+    "runtimeFixedRequirement": "runtime-visible regressions require matching USER RUNTIME VERIFIED evidence before final DONE",
+    "userRuntimeBaseline": {
+      "mode": "protected-moving-baseline",
+      "advancement": "only matching Quest3/VDXR USER_RUNTIME_VERIFIED evidence may establish or advance the baseline",
+      "buildEvidenceCannotAdvance": true,
+      "failedRuntimeTestPreservesLastKnownGood": true,
+      "candidateRequirement": "BASELINE_DELTA required for runtime-risking candidates",
+      "integrationRequirement": "all triggered protected invariants must pass deterministic revalidation or remain explicitly NEED_HMD_TEST without contradicting a known USER_RUNTIME_VERIFIED invariant"
+    },
+    "visualRepairDirective20261015": {
+      "guide": "docs/DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md",
+      "reviewBaseSha": "837550addbd7ec26bee680c0f39f9abb5077dde9",
+      "knownFailedRuntimeSha": "1d161a18efcfe4ddf3cad318ea6be50102458ac3",
+      "symptomIds": [
+        "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+        "DX9EX:SYMPTOM:EXTENDED_TIME"
+      ],
+      "sourceFindings": [
+        "Active packaging selects R26_HUD_COMPARE=ON; full-chain compile success alone is not deployment evidence.",
+        "R26+HUD WorldBillboard owned-raw-c64 miss can fall through to live c64; exact failing-frame path unproven.",
+        "Direct +TIME RAII ownership alone does not survive deferred batch submission; actual game D3DX route unproven."
+      ],
+      "runtimeStatus": "KNOWN_USER_REPORTED_FAIL_NEW_FIX_NOT_IMPLEMENTED",
+      "counterexample": "docs/automation/reviews/DX9EX_BATCH_OWNER_COUNTEREXAMPLE_20261015.cpp",
+      "noRecurrenceIncrementForSameReport": true
+    }
+  },
+  "cases": [
+    {
+      "key": "VR-STARTUP-WHITE-001",
+      "title": "Logo completes then game remains on white screen",
+      "status": "USER_RUNTIME_VERIFIED_PASS_ON_R50_BASELINE",
+      "severity": "runtime-blocking",
+      "firstKnownWindowKst": "2026-09-20",
+      "lastObservedKst": "2026-09-23",
+      "recurrenceCount": 1,
+      "symptomFingerprint": {
+        "primary": "startup reaches/passes logo then white screen and does not progress into normal game flow",
+        "secondary": [
+          "recenter/input path may still respond while presentation/game progression is stuck"
+        ],
+        "logSignals": [
+          "correlate game/host/watchdog session timeline around first post-logo Present and stereo transport activation"
+        ]
+      },
+      "knownGood": [
+        "a9abb85702925aaa09ca85581423eb9766c2adb3 — logo/menu/car/course/race rendered; later theater-only VR defect remained",
+        "750453f2d2ee357f7ca705e9982907a1578f8fbf — user reached playable road scene; persistent startup white-screen blocker absent in this runtime test"
+      ],
+      "knownBad": [
+        "1f2dcb9848a7142c295f371f0dc91663f174c442 — persistent startup white runtime"
+      ],
+      "rootCause": {
+        "status": "BOUNDED_RECONSTRUCTED",
+        "summary": "D3D9Ex synchronous CreateDevice-thread stereo installation called EnsureStereoResources before the promoted device was returned to OutRun, allocating/mutating private RT/depth resources before fresh-device initialization completed."
+      },
+      "fixReferences": [
+        "986f0d5794476056ef4bea08c6ac3c0d1f5f01d2 — historical protection: defer stereo resources until first successful game Present",
+        "ba402e98351fcf8d215bd7719b6ea56044566ead — historical deterministic deferred-init guard",
+        "341bd8027b9595f43c89e31ae1f9cf8783751faa — integrated current-focus reconstruction plus deterministic guard",
+        "fc636acc9e639a7e280ff66f2d1c86700b4caa91 -> 16c47176868dc600afcd8ca0e05990280aaa21d9 -> 7081b38917aa1b7ec319bea137a88b6f6f07733b — owner-corrected preservation chain"
+      ],
+      "riskPaths": [
+        "src/vr/**",
+        "vrhost/**",
+        "src/hooks_graphics.cpp",
+        "src/hooks_framerate.cpp",
+        "src/hooks_exceptions.cpp",
+        "OutRun2006Tweaks.ini",
+        "tools/*OutRunVR*.ps1",
+        ".github/workflows/vr-dx9ex-active.yml"
+      ],
+      "revalidationTriggers": [
+        "changes to startup/device creation/reset/present flow",
+        "changes to stereo transport/shared-frame eligibility",
+        "changes to host fallback/recovery or first-frame state",
+        "changes to launch/profile/config values affecting VR activation"
+      ],
+      "verifier": {
+        "static": [
+          "build active DX9Ex game DLL and x64 OpenXR host",
+          "run deterministic host smoke tests",
+          "verify deferred stereo resource initialization is absent from CreateDevice pre-exposure path and occurs only after successful game Present",
+          "verify autodev/regression registry contract"
+        ],
+        "runtime": [
+          "launch CORRECTNESS package",
+          "confirm logo transitions into menu/game instead of persistent white frame",
+          "confirm gameplay stereo opens after deferred initialization",
+          "collect standardized OutRun2_VR_ANALYZE_*.zip if failure recurs"
+        ]
+      },
+      "testLevel": 3,
+      "evidenceLevel": "USER_RUNTIME_VERIFIED",
+      "integrationSha": "341bd8027b9595f43c89e31ae1f9cf8783751faa",
+      "validationRun": "35647825229 SUCCESS",
+      "nextAction": "Protect as baseline invariant. Reopen only if a later candidate again fails to reach gameplay or reproduces persistent white screen."
+    },
+    {
+      "key": "VR-R50-WORLD-STEREO-PRESERVE-001",
+      "title": "Preserve R50 correct road/background/vehicle 3D stereo",
+      "status": "USER_RUNTIME_VERIFIED_PROTECTED_INVARIANT",
+      "severity": "regression-protection",
+      "firstKnownWindowKst": "2026-09-23",
+      "lastObservedKst": "2026-09-23",
+      "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+      "evidenceLevel": "USER_RUNTIME_VERIFIED",
+      "runtimeEvidence": [
+        "road renders correctly in 3D",
+        "background/world renders correctly in 3D",
+        "vehicles render correctly in 3D"
+      ],
+      "riskPaths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/hooks_uiscaling.cpp"
+      ],
+      "nextAction": "Any HUD/marker fix must prove it does not broaden HUD ownership into perspective world draws or regress correct world stereo.",
+      "recurrenceCount": 0,
+      "testLevel": 3,
+      "revalidationTriggers": [
+        "changes to R26/R28/R29/R30 world draw ownership, c64..c67 WVP handling or stereo replay",
+        "changes that add or widen SCREEN_HUD/SCREEN_OVERLAY_2D ownership",
+        "changes to world-billboard classification or per-eye projection"
+      ],
+      "verifier": {
+        "static": [
+          "verify perspective/world semantics remain excluded from generic HUD ownership and unknown 3D fails closed",
+          "verify R28 verified-world continuation remains scoped to matching WVP/projection/pose generation and world semantics",
+          "build the active Win32 DX9Ex game DLL and x64 OpenXR host with regression/policy checks"
+        ],
+        "runtime": [
+          "Quest3/VDXR CORRECTNESS: road, background and vehicles remain true stereo without new doubling or head-lock",
+          "compare world/classification/right-eye/restore/pose-mismatch telemetry with the protected runtime baseline"
+        ]
+      }
+    },
+    {
+      "key": "VR-R50-FRAME-STABILITY-PRESERVE-001",
+      "title": "Preserve R50 improved frame stability",
+      "status": "USER_RUNTIME_VERIFIED_PROTECTED_INVARIANT",
+      "severity": "performance-regression-protection",
+      "firstKnownWindowKst": "2026-09-23",
+      "lastObservedKst": "2026-09-23",
+      "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+      "evidenceLevel": "USER_RUNTIME_VERIFIED_SUBJECTIVE",
+      "runtimeEvidence": [
+        "user reports frame rate/frame pacing is more stable than prior tested builds"
+      ],
+      "nextAction": "HUD semantic fixes must avoid large draw amplification/replay regressions; compare counters and frame pacing against R50 baseline.",
+      "recurrenceCount": 0,
+      "testLevel": 3,
+      "riskPaths": [
+        "src/vr/d3d9/**",
+        "src/vr/ipc/**",
+        "vrhost/src/**",
+        "src/hooks_framerate.cpp",
+        "OutRun2006Tweaks.ini"
+      ],
+      "revalidationTriggers": [
+        "changes to draw replay count or world/HUD ownership that can amplify work",
+        "changes to producer/consumer fences, copies, waits or shared-frame lifetime",
+        "changes to frame cadence, interpolation, present interval or OpenXR submission timing"
+      ],
+      "verifier": {
+        "static": [
+          "collect bounded draw, producer-fence, host-copy/fence, render and xrEndFrame timing telemetry before optimization",
+          "verify no render-hot-path forced log flush or unbounded wait was introduced",
+          "build active DX9Ex game and host and run deterministic timing/policy smoke checks"
+        ],
+        "runtime": [
+          "Quest3/VDXR CORRECTNESS or PERFORMANCE comparison on the same scene/profile must not visibly regress pacing from the protected baseline",
+          "capture standardized timing telemetry when a pacing regression is suspected"
+        ]
+      }
+    },
+    {
+      "key": "VR-R50-WHITE-HUD-DIPLOPIA-001",
+      "title": "White HUD/text elements remain doubled and head-locked on R50",
+      "status": "OPEN_USER_RUNTIME_VERIFIED_FAILURE",
+      "severity": "visual-major",
+      "firstKnownWindowKst": "2026-09-23",
+      "lastObservedKst": "2026-09-23",
+      "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+      "symptomFingerprint": {
+        "primary": "white HUD/text appears as two images and follows head movement",
+        "examples": [
+          "6th/6",
+          "exit YES/NO",
+          "end countdown/time record",
+          "white vehicle marker"
+        ],
+        "secondary": [
+          "6th/6 resize is not applied"
+        ]
+      },
+      "hypothesis": "R50 generic SCREEN_OVERLAY_2D common-ray correction is insufficient for exact white HUD producers; exact SCREEN_HUD ownership/scale/world-lock semantics are still missing or not reached.",
+      "evidenceLevel": "USER_RUNTIME_VERIFIED_FAILURE",
+      "nextAction": "Identify exact white HUD producer/caller families without widening generic queue ownership; assign explicit SCREEN_HUD semantics and preserve R50 world-stereo invariant.",
+      "recurrenceCount": 0,
+      "testLevel": 1,
+      "riskPaths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/vr/game/outrun_renderer_r29.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/hud_semantics.hpp",
+        "src/hooks_uiscaling.cpp"
+      ],
+      "revalidationTriggers": [
+        "changes to fixed-function/no-vertex-shader screen ownership",
+        "changes to SCREEN_HUD/SCREEN_OVERLAY_2D semantics, HUD scale or world-lock placement",
+        "changes to white glyph, menu or sprite queue producer tagging"
+      ],
+      "verifier": {
+        "static": [
+          "require exact semantic provenance for any fixed-function screen owner; do not accept unknown 3D by heuristic",
+          "instrument screen fallback reasons including no-VS, missing constants and safety-gate rejection",
+          "verify HUD fixes preserve the protected world-stereo regression case"
+        ],
+        "runtime": [
+          "Quest3/VDXR: 6th/6, exit YES/NO and end-of-run white text render binocularly single and no longer follow head rotation",
+          "confirm intended HUD resize is applied and road/background/vehicles remain unchanged"
+        ]
+      }
+    },
+    {
+      "key": "VR-R50-VEHICLE-RANK-ANCHOR-001",
+      "title": "Vehicle rank markers are not world-anchored to their vehicles",
+      "status": "OPEN_USER_RUNTIME_VERIFIED_FAILURE",
+      "severity": "visual-major",
+      "firstKnownWindowKst": "2026-09-23",
+      "lastObservedKst": "2026-09-23",
+      "sourceSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+      "symptomFingerprint": {
+        "primary": "non-white 1st/2nd/3rd rank marker renders as one image but follows head movement and is not fixed above the corresponding vehicle",
+        "secondary": [
+          "marker appears to live in HUD space and moves independently from vehicle",
+          "white vehicle marker still appears doubled"
+        ]
+      },
+      "hypothesis": "Marker producer is being treated as screen overlay/HUD instead of WORLD_BILLBOARD with vehicle/world anchor transform.",
+      "evidenceLevel": "USER_RUNTIME_VERIFIED_FAILURE",
+      "nextAction": "Recover exact marker producer/vehicle anchor transform; classify spatial rank marker as WORLD_BILLBOARD while leaving generic HUD/overlay path unchanged.",
+      "recurrenceCount": 0,
+      "testLevel": 1,
+      "riskPaths": [
+        "src/vr/game/outrun_renderer_r29.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/hooks_uiscaling.cpp"
+      ],
+      "revalidationTriggers": [
+        "changes to Calc3D2D/rank-marker producer hooks or SpriteNode semantic metadata",
+        "changes to WORLD_BILLBOARD projection or screen-space marker fallback",
+        "changes to put_clip_sprite node tagging for 4th+ markers"
+      ],
+      "verifier": {
+        "static": [
+          "verify rank-marker metadata preserves the original vehicle/world anchor before screen projection",
+          "verify every newly appended 4th+ digit node is boundedly tagged rather than only the final tail node",
+          "verify WORLD_BILLBOARD handling is exact-tag only and cannot widen generic HUD/world ownership"
+        ],
+        "runtime": [
+          "Quest3/VDXR: 1st/2nd/3rd and 4th+ markers remain attached above their corresponding vehicles while the head moves",
+          "confirm marker text is binocularly single without changing ordinary HUD or world stereo"
+        ]
+      }
+    },
+    {
+      "key": "VR-R51-WHITE-HUD-DIPLOPIA-001",
+      "title": "White HUD/text remains doubled and head-following on R51",
+      "status": "OPEN_USER_RUNTIME_VERIFIED_FAILURE",
+      "severity": "visual-correctness",
+      "lastObservedKst": "2026-09-24",
+      "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+      "symptoms": [
+        "6th/6 not resized, doubled, follows head movement",
+        "exit YES/NO doubled and follows head movement",
+        "end-of-run time/countdown/record and other white HUD/text doubled and follows head movement",
+        "white vehicle marker doubled"
+      ],
+      "constraints": [
+        "preserve verified-good R51 road/background/vehicle 3D stereo",
+        "preserve improved frame stability",
+        "do not restore blanket queue-to-HUD ownership"
+      ],
+      "nextAction": "Quest3/VDXR CORRECTNESS-test exact build 4f28c61359c0dc351c6b364cd53058fa45ce55d2 with VRTelemetry enabled. Use exact C64/DRAW producer fingerprints to determine whether ScreenHud producer identity is visible at c64 and survives to the same queued draw. Keep ProducerToken diagnostic-only; do not promote or classify rendering from token identity. RUNTIME_VALIDATION remains UNTESTED until matching HMD evidence exists.",
+      "recurrenceCount": 1,
+      "testLevel": 1,
+      "riskPaths": [
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/vr/game/outrun_renderer_r29.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/hud_semantics.hpp",
+        "src/hooks_uiscaling.cpp"
+      ],
+      "revalidationTriggers": [
+        "changes to fixed-function/no-vertex-shader screen ownership",
+        "changes to queue HUD/world-lock/scale semantics",
+        "changes to white glyph, YES/NO, result/time or rank-marker producer tagging"
+      ],
+      "verifier": {
+        "static": [
+          "permit no-vertex-shader screen correction only for exact queue-owned SCREEN_HUD or exact marker semantics",
+          "record fallback rejection reason counters so zero screen-owner acceptance is diagnosable",
+          "assert no blanket queue-to-HUD ownership and preserve R51 world-epoch continuation"
+        ],
+        "runtime": [
+          "Quest3/VDXR CORRECTNESS: 6th/6, exit YES/NO, result/time/countdown and white rank glyphs are binocularly single and world/recenter locked as intended",
+          "confirm 6th/6 scale change works and R51 road/background/vehicle stereo and frame stability remain intact"
+        ]
+      },
+      "hypothesis": "EXE-map producer tagging is now proven to reach R30 draw ownership (semanticHudAccepted=93681), but renderer c64/WVP ownership still reports semanticOverlayBypass=0. SCREEN_HUD ownership becomes visible too late, after renderer head injection can already occur.",
+      "latestFailedCandidate": {
+        "sha": "8d21824f9502b3354fae679972a90868a0cce562",
+        "branch": "vr-d3d9ex-candidate/VR-R51-HUD-PRODUCER-MAP-20260924",
+        "sessionId": "20260923T164207853Z-2202b186",
+        "logZipSha256": "25be7a39d7daad4073e0b1765e9c6312a13f0b077898a84e4b1a17bf1dfe6731",
+        "packageSha256": "701a57ca5e4a1ba413bcdd75ad6fc6ecc320f6fc3dbb0dbd5a0597cb6ba81d89",
+        "result": "white HUD/position rank HUD still doubled and headset-following; R51 world stereo preserved",
+        "telemetry": "semanticHudAccepted=93681; semanticOverlayBypass=0"
+      },
+      "diagnosticInstrumentation": {
+        "taskId": "CONVERSION-DX9EX-00405",
+        "validationBearingSha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+        "producerTokens": [
+          "RankMarkerSprani",
+          "RankMarkerClipSprite",
+          "ExactScreenHudClipSprite",
+          "RivalMarkerSprani",
+          "TextGlyphPutSprite"
+        ],
+        "evidence": "Exact producer identity now follows already-explicit RenderScope through SpriteNode registration, Sumo replay, queue selection and renderer c64 provenance into draw-time telemetry. ProducerToken is diagnostic-only and does not grant rendering classification authority.",
+        "telemetry": [
+          "VR R51 C64 FINGERPRINT: producer/scope/queueEpoch/drawSerial/shaderSerial",
+          "VR R51 DRAW FINGERPRINT: producer/c64Scope/drawScope/nodeRelation",
+          "R51 producer fingerprint draws/sameNode/otherNode/noNode/scopeMismatch counters"
+        ],
+        "staticValidation": "N100 exact-SHA producer provenance + HUD/cadence + Sumo replay + R31/R32 retirement + architecture + hook graph + refactor contracts PASS; GitHub DX9Ex Active 37271535226 SUCCESS; Domain Isolation 37271535231 SUCCESS.",
+        "runtimeValidation": "UNTESTED"
+      }
+    },
+    {
+      "key": "VR-R51-VEHICLE-RANK-ANCHOR-001",
+      "title": "Vehicle rank markers are not world-anchored on R51",
+      "status": "OPEN_USER_RUNTIME_VERIFIED_FAILURE",
+      "severity": "visual-correctness",
+      "lastObservedKst": "2026-09-24",
+      "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+      "symptoms": [
+        "non-white 1st/2nd/3rd marker appears single",
+        "marker follows head movement",
+        "marker is not fixed above its vehicle and appears to live in HUD space",
+        "white vehicle marker remains doubled"
+      ],
+      "constraints": [
+        "rank marker must use exact WORLD_BILLBOARD/world anchor semantics",
+        "do not flatten rank markers into generic SCREEN_HUD",
+        "preserve verified-good R51 world stereo and frame stability"
+      ],
+      "nextAction": "Quest3/VDXR CORRECTNESS-test exact build 4f28c61359c0dc351c6b364cd53058fa45ce55d2 with VRTelemetry enabled and correlate RankMarker/RivalMarker producer fingerprints from c64 to draw. Use that evidence to separate semantic-lifetime loss from the still-unrecovered vehicle/world anchor transform. Do not treat producer identity as WORLD_BILLBOARD classification authority; RUNTIME_VALIDATION remains UNTESTED.",
+      "recurrenceCount": 1,
+      "testLevel": 1,
+      "riskPaths": [
+        "src/vr/game/outrun_renderer_r29.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        "src/hooks_uiscaling.cpp"
+      ],
+      "revalidationTriggers": [
+        "changes to Calc3D2D rank-marker anchor capture or SpriteNode metadata",
+        "changes to WORLD_BILLBOARD per-eye projection",
+        "changes to sprani_play_ae_auth_alpha or put_clip_sprite rank-marker tagging"
+      ],
+      "verifier": {
+        "static": [
+          "preserve exact vehicle/world anchor metadata from Calc3D2D through queued rank-marker semantics",
+          "tag all newly appended digit nodes with a bounded queue walk",
+          "project the preserved anchor per eye only for exact WORLD_BILLBOARD markers and fail closed otherwise"
+        ],
+        "runtime": [
+          "Quest3/VDXR CORRECTNESS: non-white and white rank markers stay spatially attached to the correct vehicle during head motion",
+          "confirm marker convergence does not regress generic HUD or protected R51 world stereo"
+        ]
+      },
+      "hypothesis": "Exact sibling callsite tagging alone is insufficient. The vehicle/world anchor produced before screen projection is not being preserved/reconstructed through SpriteNode ownership into the per-eye world-billboard draw; the result still behaves as head-following screen content.",
+      "latestFailedCandidate": {
+        "sha": "8d21824f9502b3354fae679972a90868a0cce562",
+        "sessionId": "20260923T164207853Z-2202b186",
+        "result": "vehicle rank labels remain detached from vehicles, move with headset, and affected rank/position elements are doubled",
+        "telemetry": "R30 screen worldBillboard counter remained 0 while r44 spatial reached 5154"
+      },
+      "diagnosticInstrumentation": {
+        "taskId": "CONVERSION-DX9EX-00405",
+        "validationBearingSha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+        "producerTokens": [
+          "RankMarkerSprani",
+          "RankMarkerClipSprite",
+          "ExactScreenHudClipSprite",
+          "RivalMarkerSprani",
+          "TextGlyphPutSprite"
+        ],
+        "evidence": "Exact producer identity now follows already-explicit RenderScope through SpriteNode registration, Sumo replay, queue selection and renderer c64 provenance into draw-time telemetry. ProducerToken is diagnostic-only and does not grant rendering classification authority.",
+        "telemetry": [
+          "VR R51 C64 FINGERPRINT: producer/scope/queueEpoch/drawSerial/shaderSerial",
+          "VR R51 DRAW FINGERPRINT: producer/c64Scope/drawScope/nodeRelation",
+          "R51 producer fingerprint draws/sameNode/otherNode/noNode/scopeMismatch counters"
+        ],
+        "staticValidation": "N100 exact-SHA producer provenance + HUD/cadence + Sumo replay + R31/R32 retirement + architecture + hook graph + refactor contracts PASS; GitHub DX9Ex Active 37271535226 SUCCESS; Domain Isolation 37271535231 SUCCESS.",
+        "runtimeValidation": "UNTESTED",
+        "focus": [
+          "RankMarkerSprani",
+          "RankMarkerClipSprite",
+          "RivalMarkerSprani"
+        ],
+        "note": "This instrumentation identifies producer lifetime/c64 correlation only; it does not reconstruct the missing vehicle/world anchor transform and does not claim the rank-anchor defect fixed."
+      }
+    },
+    {
+      "key": "VR-F11-OVERLAY-DIPLOPIA-001",
+      "title": "F11 Tweaks ImGui overlay doubles after entering gameplay",
+      "status": "USER_REPORTED_PASS_EXACT_BUILD_SHA_UNCONFIRMED",
+      "severity": "visual-correctness",
+      "firstKnownWindowKst": "2026-10-04",
+      "lastObservedKst": "2026-10-09",
+      "evidenceLevel": "USER_DIRECT_RUNTIME_PASS_REPORT__EXACT_PACKAGE_UNPINNED",
+      "symptomFingerprint": {
+        "primary": "F11 OutRun2006Tweaks overlay is normal/single in menus but becomes two images after entering gameplay",
+        "boundary": "front-end/menu rendering is correct; defect begins only when gameplay VR stereo ownership is active"
+      },
+      "hypothesis": "The EndScene ImGui overlay is external UI with no game producer semantic. In the active R26+R30 HUD build, untagged XYZRHW UI can fail the semantic owner gate and fall back below R30 instead of using the established SCREEN_OVERLAY_2D binocular convergence path. It can also consume a pending game NextDrawScope token because it shares the game D3D9 draw hooks.",
+      "constraints": [
+        "leave front-end/menu F11 rendering unchanged",
+        "scope only the open F11 gameplay ImGui submission as SCREEN_OVERLAY_2D",
+        "external UI must not consume pending game semantic tokens",
+        "preserve protected road/background/vehicle stereo and frame stability"
+      ],
+      "recurrenceCount": 0,
+      "testLevel": 1,
+      "riskPaths": [
+        "src/overlay/hooks_overlay.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "src/vr/d3d9/stereo_renderer_r30.cpp"
+      ],
+      "revalidationTriggers": [
+        "changes to ImGui/EndScene overlay submission",
+        "changes to external-overlay semantic scoping or ConsumeForDraw token ownership",
+        "changes to SCREEN_OVERLAY_2D XYZRHW/HUD convergence",
+        "changes to R26/R30 draw ownership that can broaden UI semantics into world draws"
+      ],
+      "verifier": {
+        "static": [
+          "require ScopedExternalOverlaySemantic and ExternalOverlaySemanticDepth in render_semantics",
+          "require gameplay F11 ImGui submission to use RenderScope::ScreenOverlay2D",
+          "require external overlay draws to bypass NextDrawScope consumption while retaining CurrentScope",
+          "verify active R26+R30 path still has semanticOverlay2D/CorroboratesScreenOverlay2D owner route",
+          "build active Win32 DX9Ex game, full-chain compile gate and x64 host"
+        ],
+        "runtime": [
+          "Quest3/VDXR: open F11 in front-end/menu and confirm the already-good single overlay remains unchanged",
+          "enter gameplay, open F11 and confirm one binocularly fused overlay instead of two images",
+          "close/reopen F11 while driving and confirm ordinary HUD, road/background/vehicles and frame pacing remain unchanged"
+        ]
+      },
+      "fixCandidate": {
+        "redVerifierSha": "245bb082652ad50b46ab69e9d8b939a8a4fa8e9f",
+        "sourceSha": "338b534b8f4c72f28b70b864ad87149f0d7f9901",
+        "validationRunId": 37180295864,
+        "artifactId": 11295123103,
+        "artifactDigestSha256": "4ddf370d1de7b3aaf62141e25832f305bc798e3dad2df226fe058560ae2b51aa",
+        "innerPackageSha256": "a9719897662bd5bf5ede74724c1f74bedda95f051213fe586932bd22bdc1aa65"
+      },
+      "nextAction": "Protect F11 known-good gameplay/menu overlay. Do not ask for a standalone repeat F11 test, re-open, or modify its render ownership without fresh regression evidence. Opportunistically correlate source/game DLL identity if the user later supplies a broader exact-package Quest3 test. Other HUD/GOAL/+TIME/rank/lens items are independent.",
+      "userAcceptance20261009": {
+        "reported_result": "F11 is now normal",
+        "source": "direct user statement 2026-10-09 KST",
+        "hardware_context": "prior Quest3/VDXR development; exact tested package SHA not provided in this message",
+        "status": "USER_REPORTED_PASS_PROTECT",
+        "exactBuildSha": null,
+        "noSeparateRetestRequest": true
+      }
+    },
+    {
+      "key": "VR-HUD-SUMO-REPLAY-SEMANTIC-LOSS-001",
+      "title": "Sumo UI replay drops explicit ScreenHud/WorldBillboard semantic ownership",
+      "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+      "severity": "visual-correctness",
+      "firstKnownWindowKst": "2026-10-05",
+      "lastObservedKst": "2026-10-05",
+      "evidenceLevel": "STATIC_BOUNDED_FIX_BUILD_VERIFIED",
+      "symptomFingerprint": {
+        "primary": "On rendered frames without a game simulation tick, SumoUISpriteReplay reconstructs fresh SpriteNodes; exact VR semantic ownership attached to the original node pointer can be lost unless copied explicitly.",
+        "affectedExamples": [
+          "replayed exact ScreenHud UI such as result/time/checkpoint text",
+          "replayed exact WorldBillboard UI where producer ownership must survive queue reconstruction"
+        ]
+      },
+      "rootCause": {
+        "status": "BOUNDED_STATIC",
+        "summary": "SumoUISpriteReplay historically copied priority/kind/SPRARGS/SPRARGS2 only. VR semantic tags are keyed by SpriteNode pointer, so the replay-created node did not inherit the original explicit RenderScope and fell back to generic ScreenOverlay2D."
+      },
+      "constraints": [
+        "preserve only explicit non-None semantic scope from the original node",
+        "do not consume the original semantic tag during capture",
+        "do not blanket-promote untagged replay nodes to ScreenHud or WorldBillboard",
+        "do not change UIScaling coordinates, SkyGlow, lens-flare ownership, world projection or R30 HUD placement math",
+        "preserve protected road/background/vehicle stereo and frame stability"
+      ],
+      "recurrenceCount": 0,
+      "testLevel": 1,
+      "riskPaths": [
+        "src/hooks_framerate.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30.cpp",
+        ".github/workflows/vr-dx9ex-active.yml",
+        "tools/verify_vr_sumo_replay_semantics.py"
+      ],
+      "revalidationTriggers": [
+        "changes to SumoUISpriteReplay capture/replay node reconstruction",
+        "changes to SpriteNode semantic registration/peek/consume ownership",
+        "changes to ScreenHud/WorldBillboard queue fallback or R30 screen-space ownership",
+        "changes to frame interpolation/cadence that alter replay frequency"
+      ],
+      "verifier": {
+        "static": [
+          "run tools/verify_vr_sumo_replay_semantics.py and require non-consuming PeekSpriteNodeScope(node, None)",
+          "require fresh replay node allocation success before payload restore and semantic re-registration",
+          "require exactly one explicit non-None RegisterSpriteNodeScope(node, entry.vrScope) replay path and forbid fixed HUD/world promotion",
+          "run canonical DX9Ex Active policy/host/game/R33 full-chain/package validation and Domain Isolation Guard"
+        ],
+        "runtime": [
+          "Quest3/VDXR CORRECTNESS: reproduce white result/+TIME/checkpoint replay UI and confirm exact HUD ownership no longer drops on non-tick frames",
+          "confirm ordinary HUD/menu content has no new regression",
+          "confirm rival/world markers remain spatially correct rather than being promoted to generic HUD",
+          "confirm frame pacing remains at or above the protected baseline behavior"
+        ]
+      },
+      "fixCandidate": {
+        "sourceSha": "36f0f3949bd18993cba3f46585659874e3d7a89f",
+        "verifierSha": "cded52488c34a6ce1a81a7f83780a1be93fcf5ba",
+        "validationBearingSha": "4183a3bc6970653b5dab60a8f5c64ba1bc01c318",
+        "dx9exActiveRunId": 37267187539,
+        "domainIsolationRunId": 37267187590,
+        "artifactId": 11327231626,
+        "artifactDigestSha256": "44a63e786dbd2a304de8b4a8b248d407aa30e2eb2b3cd4a4520ed5661cf8aa52"
+      },
+      "nextAction": "Quest3/VDXR runtime-test exact build 4f28c61359c0dc351c6b364cd53058fa45ce55d2. Verify replayed exact HUD/world producer fingerprints remain coherent on non-tick frames while ordinary untagged replay stays ScreenOverlay2D. Keep RUNTIME_VALIDATION=UNTESTED and do not mark DONE until matching runtime evidence passes.",
+      "producerProvenanceExtension": {
+        "taskId": "CONVERSION-DX9EX-00405",
+        "validationBearingSha": "4f28c61359c0dc351c6b364cd53058fa45ce55d2",
+        "summary": "SumoUISpriteReplay now snapshots and restores ProducerToken together with the existing explicit RenderScope on fresh replay nodes, preserving diagnostic producer lineage without changing the ScreenOverlay2D fallback or render classification.",
+        "validation": "Exact-SHA static + DX9Ex Active 37271535226 + Domain Isolation 37271535231 PASS",
+        "runtimeValidation": "UNTESTED"
+      }
+    },
+    {
+      "key": "VR-REGRESSION-DIVERGED-HUD-CADENCE-20261005",
+      "title": "Refactor line dropped proven HUD producer bridges and forced stale 60 Hz CORRECTNESS cadence",
+      "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+      "severity": "visual-performance-regression",
+      "firstKnownWindowKst": "2026-10-05",
+      "lastObservedKst": "2026-10-05",
+      "sourceSha": "36f0f3949bd18993cba3f46585659874e3d7a89f",
+      "symptomFingerprint": {
+        "primary": "Exact HUD/world semantics were not observed on the diverged refactor line and CORRECTNESS ran a 60 Hz source against a 90 Hz OpenXR runtime.",
+        "secondary": [
+          "tracked exact HUD/world semantics NOT_OBSERVED with 2097 UNKNOWN trace rows",
+          "R30 accepted generic SCREEN_OVERLAY_2D traffic but zero exact ScreenHud/WorldBillboard ownership",
+          "cached-frame repetition/judder while OpenXR/VDXR ran at 90 Hz"
+        ]
+      },
+      "rootCause": {
+        "status": "BOUNDED_RECONSTRUCTED",
+        "summary": "The refactor line diverged from the previously HMD-tested R65-R74 HUD producer bridges, while the CORRECTNESS profile reverted to 60 Hz with interpolation/unlock/cadence disabled."
+      },
+      "fixReferences": [
+        "526931d985f3b932b5fdb5995e4acb74da10fb91 — restore exact HUD producer ownership and XR cadence",
+        "0c3b01ca385782d8ec79bf6c51a121b0b0f29faf — align runtime-test policy with corrected CORRECTNESS cadence",
+        "bc78913199ce141883f35e93dfe9265e903489be — CONVERSION-DX9EX-00404 fail-closed HUD/cadence recurrence gate"
+      ],
+      "constraints": [
+        "generic SpriteNode fallback remains ScreenOverlay2D; no blanket queue-to-ScreenHud promotion",
+        "rival marker 0xBB796 remains exact WorldBillboard ownership under strict R30 gates",
+        "CONTROL remains the explicit conservative 60 Hz comparison profile",
+        "runtime-visible success requires matching Quest 3/VDXR evidence"
+      ],
+      "riskPaths": [
+        "src/hooks_uiscaling.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "tools/OutRunVR-TestProfiles.ps1",
+        "tools/Test-OutRunVRTestPolicy.ps1",
+        ".github/workflows/vr-dx9ex-active.yml"
+      ],
+      "revalidationTriggers": [
+        "changes to exact option/menu/result/text glyph producer hooks or TimeAttack HUD handoffs",
+        "changes to rival-marker WorldBillboard ownership or generic SpriteNode fallback",
+        "changes to CORRECTNESS framerate/interpolation/unlock/cadence/vsync profile values",
+        "changes to DX9Ex Active path filters or architecture-policy verifier ownership"
+      ],
+      "verifier": {
+        "static": [
+          "python tools/verify_vr_hud_cadence_restore.py",
+          "tools/Test-OutRunVRTestPolicy.ps1",
+          "DX9Ex Active exact-SHA policy/host/game/R33 full-chain/package validation",
+          "Domain Isolation Guard exact-SHA validation"
+        ],
+        "runtime": [
+          "Quest3/VDXR CORRECTNESS: exact HUD producers are observed as ScreenHud and rival marker ownership remains spatial without world regression",
+          "Quest3/VDXR CORRECTNESS: headset-refresh cadence no longer exhibits the known 60-vs-90 cached-frame judder pattern"
+        ]
+      },
+      "testLevel": 3,
+      "recurrenceCount": 1,
+      "evidenceLevel": "USER_RUNTIME_VERIFIED_FAILURE_BUILD_VERIFIED_RESTORATION",
+      "validationRun": "37269804032 SUCCESS",
+      "validationBearingSha": "bc78913199ce141883f35e93dfe9265e903489be",
+      "runtimeValidation": "UNTESTED",
+      "nextAction": "Quest 3/VDXR runtime-test the exact validated build before promoting HUD visual correctness or cadence smoothness to PASS."
+    },
+    {
+      "key": "VR-HUD-R62-FVF142-OWNER-REMOVED-20261009",
+      "title": "Refactor removed HMD-proven R62 fixed-function FVF 0x142 stereo path for 4th/5th and white HUD",
+      "status": "SOURCE_RESTORED_CI_VERIFIED_NEED_HMD_TEST",
+      "testLevel": 3,
+      "recurrenceCount": 1,
+      "evidenceLevel": "USER_HMD_HISTORICAL_PARTIAL_PASS_AND_SOURCE_DIFF",
+      "knownGood": [
+        "R57_03 ordinary HUD optically fused; R57_06 rank 1st–3rd attached under head movement (docs/VR_R58_HMD_FINDINGS_20260926.md)",
+        "R62 fixed-function indexed sprite 4th/5th HMD success historical source SHA 945e4471d6463f757f38b4b39d3eb8e492b2254f"
+      ],
+      "knownBad": [
+        "6e80036fd519 Quest3 user HMD FAIL: ranks and white HUD doubled/head-following, projected[semantic=0]",
+        "Refactored R84 DrawIndexedPrimitiveDestR30 had only external ImGui and XYZRHW, not R62TryFixedFunctionSpriteIndexed"
+      ],
+      "rootCause": {
+        "status": "CODE_DIFFERENCE_CONFIRMED",
+        "summary": "The R84 implementation lost the exact null-vertex-shader D3DXSprite XYZ|DIFFUSE|TEX1 FVF 0x00000142 DrawIndexedPrimitive stereo owner and its dispatch. External F11 ImGui is a different fixed-function owner and cannot replace the game rank/ScreenHud quad transform."
+      },
+      "fixReferences": [
+        "f2153aa263560c6cf24f0faf6b547db6a2e80052 — reintroduce exact R62 owner/call in active R30 after F11, before XYZRHW",
+        "9dd3e61303d7f2550fac90b224bdd25e237f2297 — three distinct regression fault injections",
+        "3f6ab1b18414d5e93e1bcbc4898eff5edf00db31 — DX9Ex Active, HUD Inspector, Domain Isolation exact-SHA successful compiled package, Quest3 UNTESTED"
+      ],
+      "riskPaths": [
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/hooks_uiscaling.cpp",
+        "tools/verify_vr_visual_composition_p0.py",
+        "docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md"
+      ],
+      "revalidationTriggers": [
+        "changes to fixed-function DrawIndexedPrimitive and R30 dispatch including F11 external ImGui",
+        "changes to R62TryFixedFunctionSpriteIndexed, exact no-VS FVF 0x142, game marker/HudScale matrix and projection restore",
+        "changes to Calc3D2D projected rank payload or queue node exact ownership"
+      ],
+      "verifier": {
+        "static": [
+          "python tools/verify_vr_visual_composition_p0.py (includes 3 independent R62 mutation checks)",
+          "python tools/verify_vr_projected_marker_anchor.py",
+          "DX9Ex Active Win32 game, x64 host, R33 full-chain, package; HUD Inspector; Domain Isolation, once per changed SHA"
+        ],
+        "runtime": [
+          "Quest3/VDXR CORRECTNESS exact-SHA: 4th/5th digits single and above matching vehicles while head yaw moves",
+          "6th/6 has one world-locked HUD image and VRHudScale changes visible size; confirm white glyph/menu and 1st–3rd",
+          "preserve user-confirmed OutRun rival marker, menu car-selector DDS, world stereo, F11 during gameplay"
+        ]
+      }
+    },
+    {
+      "key": "VR-HUD-R57-BAEE7-RANK-ANCHOR-EXTRA-GATE-20261009",
+      "title": "R57/R62 rank 1st–3rd exact Calc3D2D anchor suppressed by optional R84 sub-entry detour state",
+      "status": "SOURCE_RESTORED_CI_VERIFIED_NEED_HMD_TEST",
+      "testLevel": 3,
+      "recurrenceCount": 1,
+      "evidenceLevel": "USER_HMD_HISTORICAL_R57_06_PASS_VS_MODERN_SOURCE_DIFF",
+      "knownGood": [
+        "R57_06 real Quest3 head-yaw tracking of rank 1st–3rd; exact 0xBAEE7 rank Calc3D2D returned view point"
+      ],
+      "knownBad": [
+        "6e800 user HMD rank 1st–5th detached, final projected[semantic=0,buildAttempts=0]"
+      ],
+      "rootCause": {
+        "status": "SOURCE_BOUNDARY_MISMATCH",
+        "summary": "Modern source added RankMarkerSubActiveDepth != 0 as another prerequisite to already exact original 0xBAEE7 Calc3D2D return-site capture. If the optional inline sub hook is absent/rejected the payload never reaches valid ProjectedWorldMarker2D despite original caller. Specific observed failed hook at runtime is unproven."
+      },
+      "fixReferences": [
+        "270e7a15f022bfa2f798c2e07a946db075ef62b8 — remove added optional-depth prerequisite, keep screen-HUD suppression",
+        "3f6ab1b18414d5e93e1bcbc4898eff5edf00db31 — exact-SHA compiler/test validation and one-shot rank gate negative verifier"
+      ],
+      "riskPaths": [
+        "src/hooks_uiscaling.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "tools/verify_vr_projected_marker_anchor.py",
+        "docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md"
+      ],
+      "revalidationTriggers": [
+        "changes to Calc3D2D_dest 0xBAEE7 rank and 0xBB6F5 rival producers",
+        "changes to RankMarkerSubDest depth and head inverse / pose correlation",
+        "changes to rank SPRARGS1/SPRARGS2 all sibling tags or no-tick replay"
+      ],
+      "verifier": {
+        "static": [
+          "python tools/verify_vr_projected_marker_anchor.py: fail injected optional-depth gate; finite source-view anchor; rival isolation",
+          "canonical original EXE 0xBAEE7 caller byte/ABI verification",
+          "DX9Ex Active/EXE HUD Inspector and Domain Isolation success on exact material"
+        ],
+        "runtime": [
+          "Quest3/VDXR exact package rank 1st–3rd follow cars in yaw and not head",
+          "4th/5th + rival remain car attached, projected render path nonzero during rank session"
+        ]
+      }
+    },
+    {
+      "key": "VR-HUD-DIAGNOSTIC-SESSION-ANALYZER-PARSER-20261009",
+      "title": "Session analysis PowerShell syntax could fail silently while new ZIP passed HUD static CI",
+      "status": "SOURCE_REPAIRED_POWERSHELL_STATIC_CI_VERIFIED_NEED_FINAL_PACKAGE",
+      "testLevel": 2,
+      "recurrenceCount": 1,
+      "evidenceLevel": "WINDOWS_CI_ACTUAL_SYNTAX_FAILURE",
+      "knownBad": [
+        "HUD Inspector run 37817513231 failed Windows PowerShell helper parser while tool Analyze-OutRunVRSession.ps1 had malformed $gameDllMismatch condition and missing $flags initialization"
+      ],
+      "rootCause": {
+        "status": "CI_COVERAGE_GAP",
+        "summary": "HUD Inspector checked runner/selector/collector PowerShell syntax but not packaged Analyze-OutRunVRSession.ps1 or GUI selector. The malformed analyzer could be shipped while tests examined only static HUD code; collector caught script error and emitted ERROR instead of real flag/summary. After the first regex hotfix, complete source inspection revealed three concatenated duplicate legacy analyzer bodies (four Write-Host footers total); Windows HUD Inspector parser correctly rejected the trailing extra ')'."
+      },
+      "fixReferences": [
+        "cac1c858ed5f38e9b1fd0dfed967cf16f2f49c5f — ACTUAL verified fix removes three duplicate obsolete analysis bodies, leaves one 212-line valid analyzer script",
+        "131216005739ded02f85a247fbbd8061b6a3f148 — preliminary regex/flags hotfix alone did NOT resolve duplicate trailing bodies; superseded by cac1c858",
+        "6856d006cf00c89037b4c1f54b903b30bf4ace4c — HUD Inspector Windows syntax/behavior checks (Analyzer and Slot Selector)",
+        "236c95038ad26dc22ca95d76993bf4b9617cc4e8 — three bounded actual analyzer fixtures (rank zero, stale DLL, healthy control)",
+        "1a959d13a3772d68a335e8124cffe1da0b7653de — DX9Ex Active policy now blocks game/package for invalid PS helpers and false analyzer fixtures",
+        "HUD Inspector static-exe-analysis on exact cac1c858 run 37818356756 SUCCESS; RUNTIME HMD UNTESTED"
+      ],
+      "riskPaths": [
+        "tools/Analyze-OutRunVRSession.ps1",
+        "tools/Collect-OutRunVRLogs.ps1",
+        "tools/Select-OutRunVRBackend.ps1",
+        "tools/OutRunVR-Slot-Selector.ps1",
+        "tools/Test-OutRunVRAnalysisContract.ps1",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "revalidationTriggers": [
+        "modifying any shipped PS session/analyzer/selector helper",
+        "modifying PowerShell CI helper path watch/syntax list",
+        "modifying rank projected telemetry, SESSION_SHA identity, DLL hash attestation or status precedence"
+      ],
+      "verifier": {
+        "static": [
+          "PowerShell Parser::ParseFile on all shipped .ps1 in HUD Inspector",
+          "tools/Test-OutRunVRAnalysisContract.ps1: zero projected exact rank returns HUD_RANK_PROJECTED_PATH_ZERO; stale DLL returns GAME_DLL_SHA256_MISMATCH; positive fixture OK",
+          "DX9Ex Active + HUD Inspector exact material SHA before delivery",
+          "Require analyzer source contains one and only one final analysis report body (historic corruption had four Write-Host footer copies)."
+        ],
+        "runtime": [
+          "Open newest Quest3 session ZIP; verify AUTO_ANALYSIS_SUMMARY.json valid, flags and GAME_DLL_IDENTITY.txt present",
+          "Never interpret analyzer status=OK as HMD optical PASS; HMD visual user verdict is separate"
+        ]
+      }
+    },
+    {
+      "key": "VR-RESULT-THEATER-SBS-MODE-PARITY-20261009",
+      "title": "Game StereoWanted produced SBS in TRYAGAIN/OUTRUNMILES while host treated result/continue states as mono Theater",
+      "status": "SOURCE_PARITY_FIXED_BUT_NOT_USER_GOAL_TIME_ROOT_CAUSE",
+      "testLevel": 3,
+      "recurrenceCount": 1,
+      "evidenceLevel": "CODE_PROVEN_PREDICATE_DIVERGENCE_USER_REPRO_EXCLUDES_2D_RESTART",
+      "rootCause": {
+        "status": "CODE_CONFIRMED",
+        "summary": "Separate source-policy inconsistency: stereo_renderer_r7.inc::GameplayActive originally admitted TRYAGAIN/OUTRUNMILES SBS while OpenXR host chose mono Theater. User explicitly confirms restart/try-again screen is already visually correct in 2D, and doubled clock is displayed beforehand in GOAL/TIMEUP. Therefore this source mismatch is NOT evidence explaining reported pre-restart timer diplopia; host/game parity correction remains preventive only."
+      },
+      "riskPaths": [
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        "src/game_addrs.hpp",
+        "src/vr/game/outrun_renderer.cpp",
+        "src/overlay/hooks_overlay.cpp",
+        "vrhost/src/main_r23.cpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "tools/verify_vr_visual_composition_p0.py",
+        ".github/workflows/outrun-exe-hud-inspector.yml"
+      ],
+      "fixReferences": [
+        "8b4a3b0ee808018284a0d9148d96d04c442871bf — game side checks shared host presentation before old in_game rule",
+        "4df65a1fa2d17e3bc72be2c47373de47f2c8ab0b — two distinct theater stereo state regressions rejected, GOAL/TIMEUP kept",
+        "ac5b742ac17b4daae3a1a0a689cc823dde0d1f36 — lower R7 included in HUD Inspector push/PR watches",
+        "docs/automation/reviews/DX9EX_FULL_SOURCE_RESULT_EXTTIME_AUDIT_20261009.md — source-to-host full pipeline evidence checkpoint 02:59 KST"
+      ],
+      "revalidationTriggers": [
+        "changing either Game::is_in_game or is_vr_gameplay_presentation state sets",
+        "changing GameplayActive/StereoWanted or OpenXR CurrentPresentationMode and host final layer",
+        "changes in goal/result/timeup/tryagain state transitions or F11 overlay predicate"
+      ],
+      "verifier": {
+        "static": [
+          "tools/verify_vr_visual_composition_p0.py host/game presentation parity with two injected state regressions",
+          "DX9Ex Active Win32 game, x64 host, R33 full-chain, package and HUD Inspector and Domain Isolation exact-SHA validation"
+        ],
+        "runtime": [
+          "Quest3 exact build: result and TRYAGAIN/OUTRUNMILES theater appear single, not raw SBS double; GOAL/TIMEUP still render true stereo",
+          "Confirm results/goal/timeup state log and finalLayerKind; car selector textures/OutRun rival marker/world stereo preserved"
+        ]
+      }
+    },
+    {
+      "key": "VR-RESULT-EXTTIME-MISSING-EXACT-PRODUCER-FINGERPRINT-20261009",
+      "title": "R71/R74 GOAL result progress +TIME text and DispRank lacked producer identity at c64/draw sink",
+      "status": "DIAGNOSTIC_SOURCE_RESTORED_CI_PENDING_HMD_UNTESTED",
+      "testLevel": 2,
+      "recurrenceCount": 1,
+      "evidenceLevel": "CODE_PROVEN_MISSING_DIAGNOSTIC_OWNER_NOT_OPTICAL_CAUSATION",
+      "rootCause": {
+        "status": "CODE_CONFIRMED",
+        "summary": "ResultProgress, OutRunStagePrintf, GoalTime_TagHelper, R70 OutRunHudText and DispRankFirst exact ScreenHud parent wrappers registered scope but used ProducerToken::None, so R51 c64/draw fingerprint explicitly ignored them, preventing differentiation of a surviving result node vs stale c64/mono fallback. Existing visual rendering may be correct or fail independently."
+      },
+      "riskPaths": [
+        "src/hooks_uiscaling.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/hooks_framerate.cpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "src/vr/game/outrun_renderer.cpp",
+        "tools/verify_vr_visual_composition_p0.py",
+        "docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md"
+      ],
+      "fixReferences": [
+        "198646f09b0f896a0d29e08a9333a83777b1495b — bounded diagnostic-only result/GOAL/stage/DispRank producer identities",
+        "1557997f2e2e3dac13480941be5d5262ca437459 — exact parent queue children carry original token",
+        "f966af99226595206f11869b5ddd3cb22a15592a — shader route and R62 fixedfn sink emit producer/state/queue proof",
+        "7b148d552701232524df79deba01b5cf22ac8a86 and 11de1a91e1e61b27a00683d0c9cb6beaa0beb926 — three token-loss faults and R30 sink guarded"
+      ],
+      "revalidationTriggers": [
+        "changes to exact 0x975EE/97727/977FB result-stage Sumo calls and result progress 0x97BE4/0x97DEC",
+        "changes to goal 0xBEA5A/0xBEA5F, OutRunHudText 0xBA9D0 or DispRank first 0xB9DA6",
+        "changes to R30 c64, fixedfn FVF 0x142, no-tick Sumo replay or token owner propagation"
+      ],
+      "verifier": {
+        "static": [
+          "tools/verify_vr_visual_composition_p0.py check_result_parent_provenance and three distinct corruption cases",
+          "DX9Ex Active exact-SHA Win32 game/host/R33 package, HUD Inspector, Domain Isolation"
+        ],
+        "runtime": [
+          "Exact Quest3 session: inspect VR P0 RESULT DRAW ROUTE per parent plus VR R51 c64 DRAW FINGERPRINT and VR R62 FIXEDFN KIND0",
+          "Determine result/+TIME optical single-frame binocular correctness independently of telemetry; no optical success claim without HMD"
+        ]
+      }
+    },
+    {
+      "key": "VR-PRE-RESTART-GOAL-TIME-WHITE-TRANSLUCENT-DIPLOPIA-20261009",
+      "title": "Duplicated white/semitransparent time HUD immediately before correct mono restart screen: GOAL/TIMEUP",
+      "status": "USER_HMD_FAILURE_HISTORICAL_WORKING_LINE_NEW_SOURCE_DIAGNOSTIC_HMD_UNTESTED",
+      "testLevel": 3,
+      "recurrenceCount": 1,
+      "evidenceLevel": "USER_EXACT_REPRO_PROVEN_CODE_PATH_HYPOTHESES_UNRESOLVED",
+      "rootCause": {
+        "status": "UNRESOLVED",
+        "summary": "User says time text doubles immediately before a normal single mono 2D restart screen, during race-end GOAL/TIMEUP. Past normal 6th/6 and rank 4/5 were solved; transient +TIME never solved. The actual failing white glyph renderer type (VS c64 vs XYZRHW vs FVF0x142) is not yet confirmed from an exact-source Quest3/HMD frame. Avoid attributing to separate Theater/TRYAGAIN mismatch. Do not infer semantics from alpha."
+      },
+      "riskPaths": [
+        "src/hooks_uiscaling.cpp",
+        "src/hooks_framerate.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        "src/vr/game/outrun_renderer.cpp",
+        "vrhost/src/main_r23.cpp",
+        "tools/verify_vr_visual_composition_p0.py"
+      ],
+      "fixReferences": [
+        "945e4471d6463f757f38b4b39d3eb8e492b2254f — historically HMD-confirmed R62 FVF 0x142 4th/5th fixedfn owner, NOT a blanket GOAL HUD pass",
+        "3eeb5765f93df360d6454b5c0549191013bff33c — read-only GOAL/TIMEUP/LINK_TIMEUP per producer state/route/fvf/alpha telemetry at shader, XYZRHW and R62 fixedfn, not yet optical fix",
+        "40d595f2771c0eec39a80385504e3b58baad726b — three distinct missing-route injected static checks",
+        "docs/automation/reviews/AI2_GOAL_ENDTIME_WHITE_ALPHA_STEREO_CAUSE_REVIEW_20261009.md — full corrective user-repro and R73/R74 source differential",
+        "docs/VR_HUD_KNOWN_GOOD_RESTORE_RUNBOOK.md — 2026-10-09 symptom correction",
+        "e57501f8cb411422b2a7ac6a89fb7459976bed52 — exact orthographic shader HUD original-game WVP fail-closed code path, potential GOAL binocular duplication repair; HMD UNTESTED",
+        "308bf647211f670974fb53ad7d60d398dea4667c — two shader HUD forms provenance+negative mutation tests, policy CI PASS"
+      ],
+      "revalidationTriggers": [
+        "user reports GOAL/TIMEUP pre-restart timer overlapped or head-following (not the succeeding Theater restart page)",
+        "alter original GOAL time 0xBEA5A/0xBEA5F, stage 0x975EE/97727/977FB, result progress 0x97BE4/0x97DEC, original glyph 0x2C808/0x2C9DB",
+        "change shader c64 ownership/age, fixedfn XYZRHW, D3DXSprite FVF0x142, depth/alpha handling, pose capture or queue replay",
+        "change old verified 6th/6, rank car 4th/5th or one-frame transient +TIME scene"
+      ],
+      "verifier": {
+        "static": [
+          "tools/verify_vr_visual_composition_p0.py verify_pre_restart_hud_routes and 3 missing route fault injections",
+          "Exact-SHA DX9Ex Active game/host/R33/package + original EXE HUD inspector + domain isolation"
+        ],
+        "runtime": [
+          "User Quest3/VDXR: GOAL before restart time single aligned versus double; actual render path from VR P0 PRE_RESTART_HUD_FORM across 3 source candidates",
+          "+TIME must be judged separately (historic unresolved), 6th/6 confirmed recovered, car rank 4/5 attached, F11/rival/DDS protected, restart 2D stays single"
+        ]
+      },
+      "candidateFix": {
+        "sourceSha": "e57501f8cb411422b2a7ac6a89fb7459976bed52",
+        "verifierSha": "308bf647211f670974fb53ad7d60d398dea4667c",
+        "status": "SOURCE_CORRECTION_CI_PARTIAL_PASS_HMD_UNTESTED",
+        "finding": "R30 shader Hud2D exact ScreenHud formerly used live GetVertexShaderConstantF without original WVP provenance; unlike PerspectiveHud it could re-consume already stereo-injected c64.",
+        "change": "Hud2D joins bounded original game c64 owner and fails closed after shader-epoch/write-age proof; existing PerspectiveHud, world, rival, FVF0x142, both GOAL original calls and +TIME tick unchanged.",
+        "validation": "DX9Ex policy PASS (37859508332), EXE static analysis PASS (37859508345), Domain Isolation PASS (37859508246); final Windows game/host/HUD inspector package and full source jobs in progress at evidence time.",
+        "runtime": "UNTESTED; no claim that observed GOAL double or +TIME has been optically repaired",
+        "next": "Check exact source CI and package, then one Quest3/VDXR GOAL name + finish-time + separate +TIME optical session with VR P0 RAW_C64_OWNER and PRE_RESTART_HUD_FORM per producer"
+      }
+    },
+    {
+      "key": "VR-HUD-R64-D3DXSPRITE-DRAW-FLUSH-REMOVED-20261009",
+      "title": "R84 refactor removed HMD-proven R64 D3DXSprite per-DispRank/projection Draw->Flush batch isolation",
+      "status": "SOURCE_RESTORED_CI_VERIFIED_NEED_HMD_TEST",
+      "testLevel": 3,
+      "recurrenceCount": 1,
+      "evidenceLevel": "DIRECT_USER_R64_6TH_PASS_AND_SOURCE_PROVEN_DELETED_FUNCTION_RUNTIME_NEW_HMD_UNTESTED",
+      "knownGood": {
+        "sourceSha": "10c73daa037b5cc521b42ce7fb3a7cc1820b1921",
+        "runtimeProfile": "OUTRUN_VR_R57_MODE=6 OUTRUN_VR_HUD_EXPERIMENT_MODE=2 OUTRUN_VR_HUD_PROBE=0 R26_HUD=ON",
+        "asset": "OutRun2_VR_R64_TEXT_DISPRANK_20260927.zip",
+        "actualUserObservation": "R64 Quest3 2026-09-26: 6th/6 single/normal and HUD resize works, menu font normal; option triangles/result time/name/lens still double (NOT all-HUD PASS)"
+      },
+      "knownBad": {
+        "source": "vr-d3d9ex-focus before 87a275de7d02b9509c6881539dec6f65992b242d",
+        "symptom": "R64 hook class VRProjectedD3DXSpriteIsolation and current SpriteNodeOwner::DispRank entirely absent after refactor, allowing independent rank sprites to be batched into one DrawIndexedPrimitive with one marker center; current user reported reintroduced 6th/6 and rank doubles"
+      },
+      "rootCause": {
+        "status": "CODE_CONFIRMED_MISSING_HMD_TESTED_HOOK",
+        "summary": "R62 fixedfn FVF0x142 per-eye GPU draw was restored, but historic R64 added separate ID3DXSprite vtable9 Draw→vtable10 Flush only for projected marker or DispRank source. Entire additional R64 Hook class deleted by R84. Modern exact per-queue source identity cannot be recovered from removed SpriteNodeOwner, so original 8 DispRank right CALLs needed a distinct token. Do not flush whole game/GOAL/+TIME/menus."
+      },
+      "fixReferences": [
+        "0c7fd75e966784bb303d24b7e622c7bfd3922104 — new exact DispRankClipSprite token (not generic HUD)",
+        "2cc66a7cfa223bee1ee8f2a18e49c4742eed14e1 — original exact 8 DispRank E8 children routed to rank-only right wrapper with original spacing and all sibling ScreenHud semantics",
+        "87a275de7d02b9509c6881539dec6f65992b242d — restore old HMD-tested D3DXSprite Draw/Flush with projected marker or DispRank exact owner only",
+        "e4c885b44e1915b2426379ede03f6aeebf56c7d9 — 5 bounded negative checks for lost/widened R64 isolate",
+        "666e6546322b3279e1c4f9151f0032a5f1b266e3 — exact 71 HUD binary CALL contract supports selective 8-RVA rank hook",
+        "e52a793fc0b8570c3bbe88db251ff3ba9540ddeb — cadence restore guard updated to require rank-vs-TimeAttack right-side branch",
+        "11d0732fa2b5f8428079bbf7ad7ed8d72aaebbda — detect exact vtable9 Draw target in negative test",
+        "docs/automation/reviews/DX9EX_DEEP_GOAL_TIMING_MULTIPATH_REVIEW_20261009.md — C5 05:02 KST root-cause and CI evidence",
+        "308bf647211f670974fb53ad7d60d398dea4667c — DX9Ex Active 37859508332 game Win32/host x64/R33/package SUCCESS, EXE HUD Inspector 37859508345 SUCCESS, Domain Isolation 37859508246 SUCCESS; source-fix built, matching Quest3/VDXR RUNTIME_VALIDATION=UNTESTED"
+      ],
+      "riskPaths": [
+        "src/hooks_uiscaling.cpp",
+        "src/vr/game/render_semantics.hpp",
+        "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+        "tools/verify_vr_visual_composition_p0.py",
+        "tools/verify_vr_hud_exact_callsite_contract.py",
+        "tools/verify_vr_hud_cadence_restore.py",
+        "src/hooks_framerate.cpp"
+      ],
+      "revalidationTriggers": [
+        "any refactor of ID3DXSprite::Draw or Flush vtable9/vtable10 or original ID3DXSprite global 0x55B218",
+        "D3DXSprite batch merging for 4th/5th car rank or 6th/6 DispRank composite",
+        "changes to original eight DispRank kind0 calls, first kind1 0xB9DA6, projected marker payload/queue producer lifetime",
+        "changes to TimeAttack/GOAL right-side 15 CALL hooks, F11, unrelated ScreenHud/alpha source routes"
+      ],
+      "verifier": {
+        "static": [
+          "tools/verify_vr_visual_composition_p0.py verifies exact R64 Flush and five independent mutant failures",
+          "tools/verify_vr_hud_exact_callsite_contract.py requires same canonical original 71 E8 CALLs and rank-only selection; no generic right-side sprite target",
+          "DX9Ex Active exact Win32 game, x64 host, R33, package, HUD Inspector, Domain Isolation"
+        ],
+        "runtime": [
+          "Quest3/VDXR matching package: 6th/6 digits single/stationary and VRHudScale works; 4th/5th attached to cars while head yaw, NO extra double on result/time/GOAL/+TIME",
+          "Telemetry VR R64 D3DX ISOLATE RESTORED installed and power-of-two projected-rank/disprank Flush hit; compare FPS if dense HUD",
+          "Confirm menu options/rival/selection DDS, lens five discs, current mono restart unaltered; +TIME remains separately unresolved"
+        ]
+      }
+    }
+  ],
+  "userRuntimeVerifiedBaseline": {
+    "status": "PARTIAL_ACCEPTED_WITH_OPEN_VISUAL_DEFECTS",
+    "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+    "packageSha256": "bf9f5b7c04520f1bf018764f54c1a915e019f4a21b18bf5fab061ce29790fbe7",
+    "profile": "CORRECTNESS",
+    "configHash": null,
+    "sessionId": null,
+    "observedAtKst": "2026-09-24T01:47:00+09:00",
+    "protectedRegressionKeys": [
+      "VR-STARTUP-WHITE-001",
+      "VR-R51-WORLD-STEREO-PRESERVE-001",
+      "VR-R51-FRAME-STABILITY-PRESERVE-001"
+    ],
+    "protectedInvariants": [
+      "Road/background/vehicle world geometry must remain correct 3D stereo.",
+      "Do not regress the improved frame stability while fixing HUD semantics.",
+      "Do not reintroduce broad world-to-HUD/finite-plane ownership."
+    ],
+    "openDefects": [
+      "VR-R51-WHITE-HUD-DIPLOPIA-001",
+      "VR-R51-VEHICLE-RANK-ANCHOR-001"
+    ],
+    "note": "R51 protected partial baseline reaffirmed by original and PC clean rebuild runtime: world/road/vehicles good 3D; white HUD diplopia and vehicle-rank anchoring remain open; candidate 8d21824f failed those fixes without regressing world."
+  },
+  "workingDevelopmentBaseline": {
+    "status": "USER_RUNTIME_PARTIAL_VERIFIED_WORKING_BASELINE",
+    "establishedAtKst": "2026-09-23T02:16:53+09:00",
+    "sourceSha": "17ad376bfdf7939f0851c0c629e4fa094a84f28a",
+    "branch": "vr-d3d9ex-working-baseline",
+    "originCandidateBranch": "vr-d3d9ex-candidate/VR-R51-WORLD-HUD-OWNERSHIP-750453f2",
+    "packageSha256": "bf9f5b7c04520f1bf018764f54c1a915e019f4a21b18bf5fab061ce29790fbe7",
+    "profile": "CORRECTNESS",
+    "evidenceLevel": "USER_RUNTIME_PARTIAL_VERIFIED",
+    "validationRun": 35753905582,
+    "supersedesMistakenBaselineSha": "750453f2d2ee357f7ca705e9982907a1578f8fbf",
+    "protectedGoodBehaviors": [
+      "Road/world/background geometry renders as correct 3D stereo.",
+      "Vehicles render correctly in 3D stereo.",
+      "Frame pacing/stability is improved versus earlier tested builds."
+    ],
+    "knownOpenRuntimeDefects": [
+      "White HUD/text including position/rank HUD remains doubled and headset-following.",
+      "Vehicle rank markers remain detached from vehicles/head-following; affected rank/position elements can appear doubled.",
+      "Dense building scenes still exhibit frame-rate loss and require separate optimization."
+    ],
+    "note": "Corrected baseline identity: the user's described runtime result belongs to R51 exact SHA 17ad376b, not R50 750453f2. Preserve verified-good world stereo/frame stability while fixing only remaining HUD/marker semantics."
+  }
+}

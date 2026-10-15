@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00587",
+  "production_id": "CONVERSION-DX9EX-00587",
+  "event_id": "CONVERSION-DX9EX-00587-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "slot": "C",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "work_key": "DX9EX:P1:R84_R32_DIRECTGPU_PUBLICATION_COPY_FENCE_OWNER",
+  "base_sha": "a520415b7707cd012f98558051ba332a8722635b",
+  "first_material_sha": "38c286041a5202f88b9033dd322ea5cc190c4d34",
+  "validation_bearing_result_sha": "dad4caf970d3007ad4908f064c01c247cd085de3",
+  "result_sha": "dad4caf970d3007ad4908f064c01c247cd085de3",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00587]",
+  "status": "COMPLETE_BOUNDED_R32_DIRECTGPU_OWNER_SEAM_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "source_mode": "CHAT_DIRECT",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r32_runtime_support_seam.py",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py"
+  ],
+  "summary": "R30 now provides a bounded borrowed DirectGPU slot publication snapshot and internally guarded left/right shared-eye StretchRect plus one producer EVENT Issue; R32 no longer directly accesses R13 slot, fence or internal scope. Preserved whole-ring producer poll, single ACK snapshot, correct retirement, fail-close on copy/fence error, post-Present publication. Migrated reset transport verifier to the new actual owner; static negative mutations guard pass scope/eye order/fence. 00587's CI repair was staged on a dedicated WIP branch and final validation-bearing SHA remains dad4caf9. No FFB/DXVK/DX11/Localization source changed.",
+  "phase_trace": {
+    "C0": "Compared latest GitHub focus HEAD and controller E001 periodic checkpoint; preserved finished 00586 CI",
+    "C1": "Read AGENTS, R84 inventory/priority, current work queue and GitHub Issues #13/#14, v0.2 release; bounded nonoverlap",
+    "C2": "Four source/test files implement DirectGPU publication/copy-fence ABI extraction; adjusted reset contract verifier after actual CI failure",
+    "C3": "Relevant static verifiers/negative mutations PASS; exact-SHA GitHub policy Win32 game/host/R33 full-chain compile and Domain CI SUCCESS",
+    "C4": "Validation-bearing material target SHA dad4caf970d3007ad4908f064c01c247cd085de3",
+    "C5": "Package artifact created on exact-SHA CI; user-owned deployment and HMD runtime remain untested",
+    "C6": "Separate result bookkeeping AFTER verified exact-SHA CI; this commit is not validation-bearing"
+  },
+  "validation": {
+    "dx9ex_active": {
+      "run_id": 38044724538,
+      "sha": "dad4caf970d3007ad4908f064c01c247cd085de3",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38044724528,
+      "sha": "dad4caf970d3007ad4908f064c01c247cd085de3",
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38044185446,
+      "sha": "38c286041a5202f88b9033dd322ea5cc190c4d34",
+      "conclusion": "success",
+      "note": "Supplementary full source review on first material C++ SHA, NOT the final exact-SHA Full Source. Required final exact-SHA DX9Ex Active/Domain both passed."
+    }
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_AND_DOMAIN; FULL_SOURCE_PASS_ON_FIRST_CPP_SOURCE_SHA",
+  "package_artifact": {
+    "id": 11667732101,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-dad4caf970d3007ad4908f064c01c247cd085de3",
+    "digest": "sha256:84d5f306b56433fcf6a56bc1332826bad6dfcc636deb229ac373b99631370e0d"
+  },
+  "runtime_validation": "UNTESTED",
+  "hmd_test": "NOT_RUN",
+  "native_120fps": "NOT_MEASURED",
+  "ffb_release": "v0.2",
+  "ffb_source_changed": false,
+  "dxvk_status": "FROZEN",
+  "baseline": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+  "baseline_changed": false,
+  "r84_convergence": "INCOMPLETE_PENDING_R32_R31_R30_R29_TU_AND_CMAKE_CLEANUP",
+  "success_scope": "R32 DirectGPU lower owner API dependency extraction only; not final R84 TU/CMake split, no Quest3 optical or native120FPS runtime claim",
+  "result_identity": {
+    "material_commit_role": "VALIDATION_BEARING_RESULT",
+    "bookkeeping_commit_role": "BOOKKEEPING_ONLY"
+  }
+}

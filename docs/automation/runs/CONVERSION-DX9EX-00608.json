@@ -1,0 +1,103 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00608",
+  "production_id": "CONVERSION-DX9EX-00608",
+  "event_id": "CONVERSION-DX9EX-00608-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:R31_PROJECTION_INVERSE_CACHE_MISS_FASTPATH",
+  "work_key": "DX9EX:R31_PROJECTION_INVERSE_CACHE_MISS_FASTPATH",
+  "material_result_sha": "452e283af6c712b385e91fb9859e61170a3deebf",
+  "result_sha": "452e283af6c712b385e91fb9859e61170a3deebf",
+  "validation_bearing_result_sha": "452e283af6c712b385e91fb9859e61170a3deebf",
+  "material_commits": [
+    "452e283af6c712b385e91fb9859e61170a3deebf"
+  ],
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Eliminate redundant per-world-draw 4x4 projection inversion in the R31 two-eye stereo path by reusing the exact verified projection inverse on eye-tail cache hits.",
+    "acceptance": "Move the inverse calculation after the exact pose/projection/world-scale/per-eye geometry cache-hit check. On cache miss rebuild and publish transactionally, keep Reset/ResetEx invalidation, run R31 negative mutation tests, game/host/full-chain/package, Domain and Full Source Impact exact SHA.",
+    "runtime_metrics": "No Quest3/VDXR p95/p99 CPU/GPU frametime or FPS measurements; structural CPU hot-path optimization only."
+  },
+  "acceptance_results": [
+    {
+      "item": "R31_PROJECTION_INVERSE_CACHE_MISS",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "R31BuildFastWorldConstants no longer inverts verified projection on each eligible draw; R31PrepareEyeTailCache performs inversion on cache miss after exact pose/geometry/projection comparison, retaining transactional finite checks and cached inverse for correctedWorldView."
+    },
+    {
+      "item": "R31_NEGATIVE_MUTATIONS",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "tools/verify_vr_r31_eye_tail_cache.py updated with cache-miss-only inverse, exact projection and snapshot source mutation checks; DX9Ex Active policy job success."
+    },
+    {
+      "item": "WIN32_GAME_HOST_R29_R33_CHAIN_PACKAGE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Active Validation #38149150444 policy, game, host, full-chain-compile, package SUCCESS."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Domain Isolation Guard #38149150437 SUCCESS."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Full Source Impact Review #38149150439 game+host MSVC analyze and cross-domain SUCCESS."
+    },
+    {
+      "item": "QUEST3_VDXR_FRAME_PACING",
+      "status": "UNTESTED",
+      "evidence": "No physical Quest3/VDXR gameplay or frame-time P95/P99 measurement; visual/frame stability not promoted to PASS."
+    }
+  ],
+  "exact_sha_validation": {
+    "target_sha": "452e283af6c712b385e91fb9859e61170a3deebf",
+    "all_conclusion": "SUCCESS",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38149150444,
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "452e283af6c712b385e91fb9859e61170a3deebf",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38149150444"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38149150437,
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "452e283af6c712b385e91fb9859e61170a3deebf",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38149150437"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38149150439,
+        "run_attempt": 1,
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "452e283af6c712b385e91fb9859e61170a3deebf",
+        "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38149150439"
+      }
+    ]
+  },
+  "material_change_evidence": {
+    "source_paths": [
+      "src/vr/d3d9/stereo_renderer_r31.cpp"
+    ],
+    "validation_paths": [
+      "tools/verify_vr_r31_eye_tail_cache.py"
+    ]
+  },
+  "runtime_validation_note": "RUNTIME_VALIDATION=UNTESTED; no physical Quest3/VDXR testing, quantified FPS gain or HMD promotion.",
+  "controller_next_action": "CONVERSION-DX9EX-00608 is COMPLETE_BUILD_VERIFIED; do not redispatch or score twice. Continue independent measured performance work on latest HEAD; DX11 highest overall, DXVK frozen."
+}

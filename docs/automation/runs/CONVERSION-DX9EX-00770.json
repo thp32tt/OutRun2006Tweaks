@@ -1,0 +1,65 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00770",
+  "production_id": "CONVERSION-DX9EX-00770",
+  "event_id": "CONVERSION-DX9EX-00770-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00770",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "e7a7c0cb6cb6e2f837a1458930edd6b9308b1415",
+  "material_result_sha": "e7a7c0cb6cb6e2f837a1458930edd6b9308b1415",
+  "validation_bearing_result_sha": "e7a7c0cb6cb6e2f837a1458930edd6b9308b1415",
+  "result_sha": "e7a7c0cb6cb6e2f837a1458930edd6b9308b1415",
+  "material_commits": [
+    "e7a7c0cb6cb6e2f837a1458930edd6b9308b1415"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119: F11 VR shell and hit-target geometry must follow completed live font-scale edits, not retain a fixed default-2x shell while the glyph atlas grows.",
+    "completed_scope": "In Overlay::render_shell, scale only external gameplay F11 shell density by clamped GlobalFontScale / default 2.0, retaining existing XR eye density and full viewport bounds; preserve default layout and native desktop shell. Add regression source-ownership assertions and font 1x/2x/4x across four XR eye-density cases.",
+    "remaining_acceptance": [
+      "Issue #119 integrated speed/time/position HUD, main menu, ESC, F11 optical acceptance remains unverified on a matching Quest3/VDXR source package.",
+      "Large-font narrow-surface F11 visual fit and readability require physical display A/B evidence; do not assert optical PASS."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_POLICY_AND_COMPILE",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "dx9ex_active": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "full_source_impact": "SUCCESS",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "ci_evidence": {
+    "validation_sha": "e7a7c0cb6cb6e2f837a1458930edd6b9308b1415",
+    "dx9ex_active_run_id": 38384805527,
+    "domain_isolation_run_id": 38384805579,
+    "full_source_impact_run_id": 38384805627,
+    "exact_sha_confirmed": true,
+    "dx9ex_active_jobs": [
+      "policy",
+      "host",
+      "game",
+      "full-chain-compile",
+      "package"
+    ]
+  },
+  "score_delta": 0,
+  "score_reason": "C6 bookkeeping earns no additional score. The unique material result may earn one point only through the authoritative AI_SCOREBOARD.md.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "Three required workflows SUCCESS against exactly the original material commit. No Quest3/VDXR headset or in-game screen test. Preserved validation-bearing SHA and avoided CI-skip on source commit."
+}

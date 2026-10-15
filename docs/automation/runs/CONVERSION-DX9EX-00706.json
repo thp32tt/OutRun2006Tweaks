@@ -1,0 +1,58 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00706",
+  "production_id": "CONVERSION-DX9EX-00706",
+  "event_id": "CONVERSION-DX9EX-00706-C6",
+  "event_type": "C6_RESULT_ONLY",
+  "feature_id": null,
+  "work_key": "DX9EX:R30_STREAMED_VB_IB_SHADOW_TAIL_FASTPATH",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "source_material_sha": "bf6ea2aedea2ec7cda417e58d95854f7b330ff27",
+  "material_result_sha": "bf6ea2aedea2ec7cda417e58d95854f7b330ff27",
+  "result_sha": "bf6ea2aedea2ec7cda417e58d95854f7b330ff27",
+  "validation_bearing_result_sha": "bf6ea2aedea2ec7cda417e58d95854f7b330ff27",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "material_commits": [
+    "bf6ea2aedea2ec7cda417e58d95854f7b330ff27"
+  ],
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_shadow_descriptor_fastpath.py"
+  ],
+  "feature_contract": {
+    "goal": "Reduce streamed dynamic VB/IB shadow-range overhead in DX9Ex R30 by fast-appending or merging writes against the newest interval and using a fast tail read, while preserving correct out-of-order interval coalescing.",
+    "acceptance": "Preserve sorted/coalesced range semantics, tail extension without range shrinkage and earlier-range read fallback; retain deterministic streamed-write and destructive mutation regressions; require exact-SHA GitHub CI success."
+  },
+  "acceptance_results": {
+    "source_implementation": "MATERIAL_COMMITTED",
+    "tail_append_merge_and_latest_read": "SOURCE_COMMITTED",
+    "monotonic_stream_and_negative_mutation_regressions": "SOURCE_COMMITTED_CI_SUCCESS_USER_CONFIRMED",
+    "required_github_ci": "SUCCESS_EXACT_SHA_USER_CONFIRMED",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "ci_evidence": {
+    "head_sha": "bf6ea2aedea2ec7cda417e58d95854f7b330ff27",
+    "conclusion": "SUCCESS",
+    "source": "USER_CONFIRMED_EXACT_SHA_CI_SUCCESS",
+    "workflow_run_ids": "NOT_CAPTURED",
+    "note": "User explicitly confirmed exact-SHA GitHub CI SUCCESS. GitHub combined status and pull-request-filtered run listing did not expose workflow data; no CI rerun or build was performed for this bookkeeping-only C6 step."
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "Quest 3/VDXR hardware gameplay and FPS/p95/p99 were not tested in this C6 step; CI success is not an HMD runtime result.",
+  "hold_reason_resolved": "RUN_RECORD_NOT_FOUND",
+  "attempt": 1,
+  "score_credit_key": "CONVERSION-DX9EX-00706",
+  "score_change": 0,
+  "score_status": "C6_BOOKKEEPING_NO_ADDITIONAL_CREDIT",
+  "notes": "Run record was absent on target branch and validation SHA; this result-only [skip ci] commit creates the missing C6 record based on the validated material commit. The original material/validation-bearing SHA remains unchanged and no duplicate score is awarded."
+}

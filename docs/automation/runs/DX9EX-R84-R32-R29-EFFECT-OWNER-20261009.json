@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-R84-R32-R29-EFFECT-OWNER-20261009",
+  "production_id": "DX9EX-R84-R32-R29-EFFECT-OWNER-20261009",
+  "source_mode": "CHAT_DIRECT",
+  "branch": "vr-d3d9ex-focus",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "selected_work_item": "DX9EX-R84-PORT-SEAMS-001",
+  "base_sha": "6eb8118cd39683b511d72d7a3d8dd6ef99197f9d",
+  "material_result_sha": "7a994353ffcc02f0cc5ff083f2cbed777337e89c",
+  "validation_bearing_result_sha": "7a994353ffcc02f0cc5ff083f2cbed777337e89c",
+  "result_sha": "7a994353ffcc02f0cc5ff083f2cbed777337e89c",
+  "summary": "R32 R29 stable stereo readiness, cached fragile effect classification and once-per-two-eye telemetry now delegate through three explicit R30 owner API functions, preserving original R29 policy and bool& fragile output. Four negative mutation checks protect forced stereo readiness, output loss, telemetry omission and R32 owner bypass.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_refactor_contract.py"
+  ],
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37893034464,
+      "conclusion": "success",
+      "head_sha": "7a994353ffcc02f0cc5ff083f2cbed777337e89c",
+      "jobs": {
+        "policy": 113698010486,
+        "game": 113698107582,
+        "host": 113698107592,
+        "full-chain-compile": 113698107748,
+        "package": 113699541126
+      }
+    },
+    "domain_isolation": {
+      "run_id": 37893034433,
+      "conclusion": "success",
+      "head_sha": "7a994353ffcc02f0cc5ff083f2cbed777337e89c"
+    },
+    "artifact": {
+      "id": 11599581925,
+      "digest": "sha256:3963bec4725bcf8715d01d842a1cdadebae63b52c93c7e3bcf6ea428283a1b44"
+    },
+    "source_review": {
+      "run_id": 37893034398,
+      "status_at_C6": "in_progress",
+      "not_required_for_canonical_gate": true
+    }
+  },
+  "pipeline": {
+    "C0": "GitHub recovered",
+    "C1": "read exact R29 lower policy",
+    "C2": "implemented R30 owner wrappers and R32 delegates",
+    "C3": "policy Win32 game host R33 full-chain package and Domain all SUCCESS",
+    "C4": "real source commit",
+    "C5": "verified exact artifact",
+    "C6": "durable result"
+  },
+  "next_action": "Next R32/R9 read-only main-depth generation+stencil owner query seam. R32/R31 and R31/R30 separate TU, cleanup and R84 closeout remain pending; Quest3/VDXR HMD UNTESTED. Preserve user F11 PASS."
+}

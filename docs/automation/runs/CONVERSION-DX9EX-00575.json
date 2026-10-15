@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00575",
+  "production_id": "CONVERSION-DX9EX-00575",
+  "event_id": "CONVERSION-DX9EX-00575-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "494b11afc9593a70f8afbe69395083c6d920fad5",
+  "result_sha": "3a4d5067f7834fc17f305f4e85767990ad46acc2",
+  "material_result_sha": "3a4d5067f7834fc17f305f4e85767990ad46acc2",
+  "validation_bearing_result_sha": "3a4d5067f7834fc17f305f4e85767990ad46acc2",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00575]",
+  "work_key": "DX9EX:P1:RIGID_POSE_FINITE_FALLBACK",
+  "conflict_keys": [
+    "src/vr/core/matrix.hpp:RigidTransform finite-position/scale and overflow fallback",
+    "vrhost/tests/core_math_smoke.cpp:Release-active rigid pose invalid-value regression"
+  ],
+  "changed_paths": [
+    "src/vr/core/matrix.hpp",
+    "vrhost/tests/core_math_smoke.cpp"
+  ],
+  "summary": "P1 DX9Ex R84/math safety: reject NaN/Inf XR pose translation and unit scale before quaternion matrix construction; fail closed to existing identity fallback if finite operands overflow translation; preserve ordinary valid pose and cover five failure/boundary and one valid Release-active smoke checks. FFB v0.2 released engine untouched.",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "static_validation": "PASS: one focused source contract check and GitHub x64 C++ core_math_smoke executed in DX9Ex Active host job; no HUD 1000/5000 repetition",
+  "automation_validation": "PASS_EXACT_SHA",
+  "ci_runs": {
+    "dx9ex_active": 38029868493,
+    "domain_isolation": 38029868511,
+    "full_source_impact": 38029868445
+  },
+  "ci_jobs": {
+    "dx9ex_policy": "SUCCESS",
+    "dx9ex_host": "SUCCESS",
+    "dx9ex_game": "SUCCESS",
+    "dx9ex_full_chain_compile": "SUCCESS",
+    "dx9ex_package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "full_source_cross_domain": "SUCCESS",
+    "full_source_openxr_host_analyze": "SUCCESS",
+    "full_source_active_game_analyze": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11661014184,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-3a4d5067f7834fc17f305f4e85767990ad46acc2",
+    "digest": "sha256:a67ee190cb775dc0fa1f22af6dc58b39735f80e3fea57979ddbf6cc56bbbb09d",
+    "hmd_approved": false
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_120fps_target": "NOT_MEASURED",
+  "ffb_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "mutated": false,
+    "wheel_runtime_validation": "UNTESTED"
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS remote HEAD 00574 C6 and 00575 dispatch claim/checkpoint, nonduplicate",
+    "C1_REVIEW": "PASS AGENTS/priority/state/queue/issues and released FFB v0.2; independently scoped P1 XR rigid pose math",
+    "C2_IMPLEMENT": "PASS coherent two-file source plus Release-active regression batch",
+    "C3_VALIDATE": "PASS exact source SHA on three mandatory GitHub workflow gates",
+    "C4_COMMIT": "PASS source material commit has exact marker, no CI skip",
+    "C5_PACKAGE": "PASS immutable source SHA CI artifact; Quest3/HMD approval withheld",
+    "C6_RESULT": "PASS durable run record separate from completed exact-SHA validation"
+  },
+  "next_action": "Continue independent P1 R84 seams or P2 runtime recommended per-eye extent; do not repeat 00575. Quest3/VDXR hardware acceptance UNTESTED, DX11 A ACTIVE and DXVK B FROZEN."
+}

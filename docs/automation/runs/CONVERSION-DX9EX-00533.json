@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00533",
+  "production_id": "CONVERSION-DX9EX-00533",
+  "event_id": "CONVERSION-DX9EX-00533-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "selected_work_item": "DX9EX-P0-LEGACY-SCREENHUD-CLIP-BINARY-CONTRACT",
+  "base_sha": "18b87192d0ce6f1de4508972f889cd2e9880d846",
+  "material_result_sha": "352515b74f5dd2da627238015143659d32b90e15",
+  "validation_bearing_result_sha": "352515b74f5dd2da627238015143659d32b90e15",
+  "result_sha": "352515b74f5dd2da627238015143659d32b90e15",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00533]",
+  "summary": "Pinned the final three legacy R65-R74/R73-era ExactScreenHud clip bridges (0x460F1/0x463D6/0x46410) to canonical OR2006C2C.EXE direct-CALL byte contracts and required them in the P0 visual-composition verifier. No runtime render source was changed.",
+  "changed_paths": [
+    "docs/VR_BINARY_CONTRACT.json",
+    "tools/verify_vr_visual_composition_p0.py"
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "dx9ex_active_run_id": 37659416988,
+    "jobs": {
+      "policy": 112922802765,
+      "full_chain_compile": 112922965458,
+      "game": 112922965479,
+      "host": 112922965646,
+      "package": 112924965948
+    },
+    "domain_isolation_run_id": 37659417278,
+    "package_artifact_id": 11500436776,
+    "package_artifact_digest": "sha256:09ef07fee6a38ac0e74c9f1fec808427f44c822f501558c1b03442446e608572",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "exact_screenhud_clip_calls": 14,
+    "uncontracted_exact_screenhud_clip_calls": 0,
+    "contracts_added": [
+      {
+        "rva": "0x000460F1",
+        "expected_bytes": "e88a71feff",
+        "target_rva": "0x0002D280"
+      },
+      {
+        "rva": "0x000463D6",
+        "expected_bytes": "e8a56efeff",
+        "target_rva": "0x0002D280"
+      },
+      {
+        "rva": "0x00046410",
+        "expected_bytes": "e86b6efeff",
+        "target_rva": "0x0002D280"
+      }
+    ]
+  },
+  "protected_boundaries": [
+    "runtime render-path source unchanged",
+    "HUD placement/projection math unchanged",
+    "Reset/Present/OpenXR/DirectGPU behavior unchanged",
+    "no HMD/runtime success claim"
+  ],
+  "next_action": "Continue P0 visual-composition closure from latest focus HEAD. Static callsite ownership is stronger, but runtime visual correctness remains HMD-only and UNTESTED."
+}

@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00438",
+  "production_id": "CONVERSION-DX9EX-00438",
+  "event_id": "CONVERSION-DX9EX-00438-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "216caa00d96efc495b73b22197674818404ba49f",
+  "material_result_sha": "a3d85775f285fa7b91ecabb3c607ce1c552b3238",
+  "validation_bearing_result_sha": "a3d85775f285fa7b91ecabb3c607ce1c552b3238",
+  "result_sha": "a3d85775f285fa7b91ecabb3c607ce1c552b3238",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00438]",
+  "selected_work_item": "VR-REFACTOR-POST1100-CLASSIC-FRESHNESS-RUN-IDENTITY-0021",
+  "summary": "Scope classic fallback freshness to complete producer run identity so restarted low frame IDs cannot inherit an expired prior-run freshness timer.",
+  "changed_paths": [
+    "vrhost/src/runtime/review_hardening.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00438.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered 00437 bookkeeping HEAD 216caa00d96efc495b73b22197674818404ba49f and terminal post-1100 structural chain."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "FreshClassicFallbackAvailable keyed advancement only by frameId; fast producer restart could reuse a low frameId while LastClassicAdvanceMs still belonged to the prior run."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "a3d85775f285fa7b91ecabb3c607ce1c552b3238 adds runGeneration + clientPid freshness identity, fail-closed zero identity, DestroySession resets and verifier coverage."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "DX9Ex Active Validation 37390481200 SUCCESS; Domain Isolation Guard 37390481335 SUCCESS."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "a3d85775f285fa7b91ecabb3c607ce1c552b3238 fix(vr): scope classic freshness to game run [AUTO:CONVERSION-DX9EX-00438]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Artifact 11381401559 digest sha256:f6e5d262ef7acc8146cac77d5b4049b5db1ebf25918481b7a106f6df88ad55d9; CI evidence only."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 6006060546
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37390481200,
+      "conclusion": "success",
+      "exact_sha": "a3d85775f285fa7b91ecabb3c607ce1c552b3238",
+      "jobs": {
+        "policy": 112034094881,
+        "game": 112034204986,
+        "full_chain_compile": 112034205012,
+        "host": 112034205025,
+        "package": 112035317136
+      },
+      "package_artifact_id": 11381401559,
+      "package_artifact_digest": "sha256:f6e5d262ef7acc8146cac77d5b4049b5db1ebf25918481b7a106f6df88ad55d9"
+    },
+    "domain_isolation": {
+      "run_id": 37390481335,
+      "conclusion": "success",
+      "exact_sha": "a3d85775f285fa7b91ecabb3c607ce1c552b3238"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Audit remaining fallback/cache lifetime state for fast producer restart handling.",
+  "completed_at_kst": "2026-10-06T09:04:00+09:00"
+}

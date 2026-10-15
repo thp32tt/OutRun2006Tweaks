@@ -1,0 +1,122 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00886",
+  "production_id": "CONVERSION-DX9EX-00886",
+  "event_id": "CONVERSION-DX9EX-00886-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00886",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "dadee3f87e1ad34d2d9f64605a1449e4b780ee82",
+  "material_result_sha": "2399dccba524284eb401ae33a7e852b6aeb7cfd1",
+  "validation_bearing_result_sha": "be51cc98a21ec114f933f77a06c322dd54e15732",
+  "source_paths": [
+    "src/overlay/hooks_overlay.cpp",
+    "src/vr/ui/menu_letterbox_geometry.hpp"
+  ],
+  "changed_files": [
+    "src/overlay/hooks_overlay.cpp",
+    "src/vr/ui/menu_letterbox_geometry.hpp",
+    "tools/verify_vr_menu_letterbox_aspect.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00886.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Render 4:3 main-menu letterbox bars on landscape and portrait R84 source/mirror geometries without clipping or covering centered menu content, preserving F11 and gameplay drawing state.",
+    "scope_boundary": "Original 4:3 front-end menu and optional UILetterboxing=2 in gameplay only; no game viewport/projection, stereo, SkyGlow, world, FFB, timers or DX11/DXVK owner change.",
+    "trace_stages": [
+      "Original UI matrix now contains 640x480 inside portrait source extent; native overlay previously returned with no bars when width <= height*4/3.",
+      "D3DEndScene draws two black triangle strips from cached D3DPOOL_DEFAULT vertex geometry; original full viewport/state restoration remains unchanged.",
+      "Compute side strips for landscape and top/bottom strips for portrait/square while keeping existing menu source extent and R84/host image ownership."
+    ],
+    "subcomponents": [
+      "Implement four aspect layout and bounded per-orientation black bar geometry (native 4:3, 16:9, 21:9, portrait).",
+      "Keep existing D3D9/Ex vertex buffer Reset/reallocation semantics, fixed-function state, viewport/scissor, F11 presentation and game render side effects unchanged.",
+      "Compile deterministic actual-header positive/negative source/geometry regressions and run exact-SHA Windows Game/Host/Package, Domain and impacted Source gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "portrait_menu_contain",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 frontend 4:3 menu letterbox geometry",
+        "expected_behavior": "Portrait/square source preserves centered menu with black top and bottom strips, while 16:9 and 21:9 continue to draw their original left/right rails."
+      },
+      {
+        "id": "native_and_reset_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Native menu/F11/desktop and D3D9Ex Reset and failed buffer allocation",
+        "expected_behavior": "No bars for 4:3; invalid source rejects vertex geometry; recover/reallocate on source/device switch; preserve prior scene state and overlay."
+      },
+      {
+        "id": "exact_sha_windows_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 x86 game, R26_SAFE rollback, x64 OpenXR host and package",
+        "expected_behavior": "Validation-bearing exact SHA passes Active Game/Host/Package + Domain and affected Full Source Impact, HMD separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "portrait_menu_contain": "SOURCE_IMPLEMENTED",
+    "native_and_reset_fallback": "SOURCE_IMPLEMENTED",
+    "exact_sha_windows_gates": "PASS_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "CreateLetterboxVertex returned early for any sourceWidth <= sourceHeight*(4/3) and cached no vertex buffer; portrait XR source gets UI centering in hooks_uiscaling but lacks its top/bottom black letterbox strips.",
+    "root_cause": "Overlay assumed left/right bars only. The portrait 4:3 contain projection leaves non-content top/bottom raster strips without black masking.",
+    "fix_evidence": "New constexpr BuildMenuBarGeometry composes bounded orientation-specific two-strip vertices. Same cached buffer/DrawPrimitive/state restoration pipeline renders either orientation.",
+    "negative_test_evidence": "Compile-time header asserts include 4:3 none, 16:9 sides, 21:9 side coordinates, 1200x1600 top/bottom strip coordinates, invalid/oversized source and non-overlapping content.",
+    "previous_validation_failure": {
+      "sha": "2399dccba524284eb401ae33a7e852b6aeb7cfd1",
+      "stage": "legacy source anchor (sourceHeight*(4/3) left-right only)",
+      "resolution": "Updated mandatory existing menu source validator to follow new portrait-source shared geometry header with destructive mutations; subsequent exact validation-bearing result SHA passed."
+    }
+  },
+  "runtime_evidence": "No Quest3/VDXR game-screen test; no runtime performance or optical PASS.",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "result_commit_ci_skip": false,
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "bookkeeping_ci_skip": true,
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "be51cc98a21ec114f933f77a06c322dd54e15732",
+    "dx9ex_active": {
+      "run_id": 38706762750,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy,full-chain-compile,game,host,package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38706762778,
+      "conclusion": "SUCCESS"
+    },
+    "material_source_impact": {
+      "source_sha": "2399dccba524284eb401ae33a7e852b6aeb7cfd1",
+      "run_id": 38706144031,
+      "conclusion": "SUCCESS",
+      "required_jobs": "source-cross-domain,msvc-analyze-openxr-host,msvc-analyze-active-game (3/3)"
+    },
+    "material_hud_inspector": {
+      "source_sha": "2399dccba524284eb401ae33a7e852b6aeb7cfd1",
+      "run_id": 38706144117,
+      "conclusion": "SUCCESS",
+      "required_jobs": "build-hud-inspector,static-exe-analysis (2/2)"
+    },
+    "previous_active_failure": {
+      "source_sha": "2399dccba524284eb401ae33a7e852b6aeb7cfd1",
+      "run_id": 38706144089,
+      "conclusion": "FAILURE",
+      "reason": "stale widescreen-only menu regression verifier; repaired in bearing SHA"
+    },
+    "runtime": "UNTESTED"
+  }
+}

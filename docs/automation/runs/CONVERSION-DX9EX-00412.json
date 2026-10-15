@@ -1,0 +1,92 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00412",
+  "production_id": "CONVERSION-DX9EX-00412",
+  "event_id": "CONVERSION-DX9EX-00412-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "daffb7787eac9f7bf2a3de481209a6824ebd7efb",
+  "source_material_sha": "bbae4e903468703984863c0658d267ad79a538bc",
+  "result_sha": "bbae4e903468703984863c0658d267ad79a538bc",
+  "material_result_sha": "bbae4e903468703984863c0658d267ad79a538bc",
+  "validation_bearing_result_sha": "bbae4e903468703984863c0658d267ad79a538bc",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00412]",
+  "selected_work_item": "VR-REFACTOR-POST1100-VIEWPORT-READ-NEUTRAL-OWNER-0017",
+  "summary": "Extracted only the raw IDirect3DDevice9::GetViewport fallback into neutral draw_state_helpers. Preserved R31 tracked-viewport precedence, R32 StateBlock reliability routing, and all right-pass restore/lifecycle ownership.",
+  "changed_paths": [
+    "src/vr/d3d9/draw_state_helpers.hpp",
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r31_r32_retirement_guard.py"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Started from durable post-00411 HEAD daffb7787eac9f7bf2a3de481209a6824ebd7efb."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R31/R32 viewport wrappers contain owner-specific tracked-viewport/StateBlock policy, but their final IDirect3DDevice9::GetViewport fallback is a stateless read primitive."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "b8e22605 added neutral ReadViewport; 68224964 and 7141716d routed R31/R32 fallback reads through it; bbae4e90 added ownership regression guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA bbae4e903468703984863c0658d267ad79a538bc: DX9Ex Active 37347553547 all jobs SUCCESS (policy/game/host/full-chain/package); Domain Isolation 37347553486 SUCCESS. No Quest3/VDXR test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "b8e2260587a502ce38b2019b1b059cd83fdd1284 refactor(vr): extract neutral viewport read primitive [AUTO:CONVERSION-DX9EX-00412]",
+        "682249646892d0d43cf70c5337a7202c3ce3dec7 refactor(vr): route R31 viewport fallback through neutral read [AUTO:CONVERSION-DX9EX-00412]",
+        "7141716dc69dd5d0bfffcfd6fe3e7b7c670e7b32 refactor(vr): route R32 viewport fallback through neutral read [AUTO:CONVERSION-DX9EX-00412]",
+        "bbae4e903468703984863c0658d267ad79a538bc test(vr): guard neutral viewport read ownership [AUTO:CONVERSION-DX9EX-00412]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "OutRun2-VR-DX9EX-ACTIVE-bbae4e903468703984863c0658d267ad79a538bc artifact 11360624512, digest sha256:50ee40dd4b1d280c345ba06671228fce9ec84c7d79fa8efdf603f9fb6ef90084."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37347553547,
+      "conclusion": "success",
+      "exact_sha": "bbae4e903468703984863c0658d267ad79a538bc",
+      "jobs": {
+        "policy": 111889914300,
+        "game": 111890040136,
+        "host": 111890040170,
+        "full_chain_compile": 111890040346,
+        "package": 111892238081
+      },
+      "package_artifact_id": 11360624512,
+      "package_artifact_digest": "sha256:50ee40dd4b1d280c345ba06671228fce9ec84c7d79fa8efdf603f9fb6ef90084",
+      "aggregate_api_note": "Job-level GitHub Actions evidence and package artifact are complete/success; one public aggregate REST fetch remained stale as in_progress after all jobs completed."
+    },
+    "domain_isolation": {
+      "run_id": 37347553486,
+      "conclusion": "success",
+      "exact_sha": "bbae4e903468703984863c0658d267ad79a538bc"
+    },
+    "issue14_comment_id": 5999496588
+  },
+  "next_action": "Perform one terminal dependency census of remaining R33-consumed R31/R32 helpers. If every remaining helper owns telemetry, cache, policy, restore/lifecycle, fail-close, install state, or workload semantics, pin those owner boundaries and close the neutral-helper extraction chain rather than manufacturing another move.",
+  "completed_at_kst": "2026-10-06T02:25:52+09:00"
+}

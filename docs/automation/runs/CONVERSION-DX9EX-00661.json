@@ -1,0 +1,71 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00661",
+  "production_id": "CONVERSION-DX9EX-00661",
+  "event_id": "CONVERSION-DX9EX-00661-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R23_PROJECTION_PAIR_DEFER_FIRST_EYE_UNBIND",
+  "work_key": "DX9EX:R23_PROJECTION_PAIR_DEFER_FIRST_EYE_UNBIND",
+  "base_sha": "d9a6ba109b4b5b34bf4929884f89935d0d744865",
+  "initial_material_sha": "43cce1405a19eeafbd3a96729e4a89ed8301be54",
+  "material_result_sha": "43cce1405a19eeafbd3a96729e4a89ed8301be54",
+  "material_commits": [
+    "43cce1405a19eeafbd3a96729e4a89ed8301be54"
+  ],
+  "result_sha": "43cce1405a19eeafbd3a96729e4a89ed8301be54",
+  "validation_bearing_result_sha": "43cce1405a19eeafbd3a96729e4a89ed8301be54",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Reduce D3D11 driver submission overhead by deferring first-eye SRV and RTV unbind until the immediately adjacent right-eye draw replaces the bindings.",
+    "acceptance": "Only consecutive left(0)->right(1) same nonzero extent projection pair may defer; preserve per-eye independent SRV, RTV, constant-buffer and draw. On second-eye Map/early failure explicitly unbind both resources before releasing OpenXR image. Legacy mono/menu behavior and SkyGlow/world/FFB remain unchanged.",
+    "runtime_metrics": "Quest3/VDXR real HMD and p95/p99 CPU/GPU frame timing not measured; source + CI success does not prove FPS gain."
+  },
+  "acceptance_results": [
+    {
+      "item": "PROJECTION_FIRST_EYE_UNBIND_FASTPATH",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "vrhost/src/main.cpp extends RenderTo with narrowly gated deferred first-eye cleanup; vrhost/src/main_r23.cpp uses the contiguous pair helper and retains full right-eye render."
+    },
+    {
+      "item": "SECOND_EYE_MAP_FAILURE_CLEANUP",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "vrhost/src/main_r23.cpp explicitly nulls PS SRV and OM RTV on failed right-eye submission after deferred successful first eye."
+    },
+    {
+      "item": "RELEASE_NEGATIVE_SMOKE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "vrhost/tests/projection_blit_upload_smoke.cpp adds 9 positive/negative checks for eye order, unequal extents, zero extents; DX9Ex Active x64 host compile and no-HMD smoke SUCCESS."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38203380618 policy/host/game/full-chain-compile/package 5/5 SUCCESS, exact 43cce1405a19eeafbd3a96729e4a89ed8301be54"
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38203380607 SUCCESS exact 43cce1405a19eeafbd3a96729e4a89ed8301be54"
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38203380511 MSVC host/game/source-cross-domain 3/3 SUCCESS exact 43cce1405a19eeafbd3a96729e4a89ed8301be54"
+    },
+    {
+      "item": "QUEST3_VDXR_RUNTIME",
+      "status": "UNTESTED",
+      "evidence": "No actual game/HMD test; stereo optics, p95/p99 and hardware FPS benefit remain unproven."
+    }
+  ],
+  "package_artifact_id": 11726885150,
+  "package_artifact_digest": "sha256:3d89303c507e358b9b62660f02356dbba918bbe359943ccf253935b5d5169ee4",
+  "notes": "C6 record is a separate [skip ci] bookkeeping commit, not a source result or an additional score. Full GitHub Gates passed on the immutable validation-bearing material SHA. RUNTIME_VALIDATION=UNTESTED; DXVK FROZEN, DX11/Localization/FFB untouched."
+}

@@ -1,0 +1,118 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00869",
+  "production_id": "CONVERSION-DX9EX-00869",
+  "event_id": "CONVERSION-DX9EX-00869-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00869",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:RUN:OPENXR_HOST_RECOVERY",
+  "feature_class": "CRITICAL_BLOCKER",
+  "feature_contract": {
+    "feature_id": "DX9EX:RUN:OPENXR_HOST_RECOVERY",
+    "goal": "Request one bounded recovery of a missing OpenXR host while OutRun is running, without claiming that process creation establishes functioning Quest3 VR.",
+    "scope_boundary": "DX9Ex Windows test launcher and packaged validation only. No game rendering, FFB, input, shaders, DX11, or frozen DXVK behavior.",
+    "special_work_evidence": "User's DX9Ex test ZIP recorded gamePid=3728, hostPid=0, hostReason=host-pid-missing and stereoAllowed=0; a launched game had no OpenXR host.",
+    "trace_stages": [
+      "DX9Ex selected backend installs game and host binaries with expected source identity.",
+      "The initial OpenXR host prewarm isolates VR transport flags before launching the game.",
+      "While the game remains alive the process-health loop retries exactly once after confirmed absence.",
+      "The same session captures attempted recovery and real host-process failure without treating HMD optics as verified."
+    ],
+    "subcomponents": [
+      "Host absence gets one bounded matching-configuration retry without forcefully ending the game.",
+      "Recovered or missing host and native-game failures preserve root diagnostics in the archived test session."
+    ],
+    "acceptance_items": [
+      {
+        "id": "retry",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Active DX9Ex host launch",
+        "expected_behavior": "One restart request occurs only after sustained host absence and cannot repeat after a later host loss."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Native game and host failure",
+        "expected_behavior": "The process monitor keeps the game running, permits a bounded recovery grace and records an actual missing host after failure."
+      },
+      {
+        "id": "policy",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Host environment and launch evidence",
+        "expected_behavior": "Recovery uses existing matching OpenXR transport policy, restores parent environment and archives retry outcome."
+      },
+      {
+        "id": "ci",
+        "category": "integrated_validation",
+        "behavior_area": "Exact Windows package integration",
+        "expected_behavior": "PowerShell AST parse, negative launcher mutations, x86 game, x64 host, package and Domain gate pass at the same SHA."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Game PID 3728 but no OpenXR host and stereoAllowed=0 in a real DX9Ex user test.",
+    "root_cause": "The monitored launcher prewarmed once and only reported a missing host; it had no bounded recovery path while the game stayed alive.",
+    "source_trace": [
+      "Selected test launcher copies the correct DX9Ex game/host into the original game directory.",
+      "PowerShell launches an asynchronous host with isolated environment then runs the game.",
+      "The original health loop observed missing host then broke to log collection with no reattempt.",
+      "The revised health loop requests one host restart and then observes the real process for ten seconds."
+    ],
+    "alternatives_rejected": [
+      "No new DXVK path, repeated restart loop, forced exit of running game or unverified HMD/session success claim."
+    ],
+    "fix_evidence": "PowerShell host-health loop now includes exactly one bounded process-restart attempt; archive stores recovery state.",
+    "negative_test_evidence": "Launch verifier has destructive mutations for retry guard, grace timing and missing health evidence plus Windows AST syntax parse."
+  },
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "Quest3/VDXR not executed on this commit; startup retry is not an OpenXR session or binocular proof.",
+  "changed_files": [
+    "tools/Run-OutRunVRTest.ps1",
+    "tools/verify_vr_dx9ex_launch_batch.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00869.json"
+  ],
+  "source_parent_sha": "39576ea5ecd82d1201dde857755564ac87fb7de0",
+  "acceptance_results": {
+    "retry": "PENDING_CI",
+    "fallback": "PENDING_CI",
+    "policy": "PENDING_CI",
+    "ci": "PENDING_CI"
+  },
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "validation_bearing_result_sha": "f53ad2735b6d677e0164124c679fc1ffb1f1143f",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "hold_resolution": "C6_PASS_EXACT_SHA_RECORDED",
+  "material_result_sha": "f53ad2735b6d677e0164124c679fc1ffb1f1143f",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "f53ad2735b6d677e0164124c679fc1ffb1f1143f",
+    "dx9ex_active": {
+      "run_id": 38652283416,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, game, host, full-chain-compile, package"
+    },
+    "domain_isolation": {
+      "run_id": 38652283442,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38652283343,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38652283579,
+      "conclusion": "SUCCESS"
+    },
+    "runtime_caveat": "Quest3/VDXR HMD not executed; RUNTIME_VALIDATION=UNTESTED."
+  },
+  "c6_record_reconciliation": "Resolved prior TERMINAL_STATUS_NOT_COMPLETE hold with exact-SHA required Actions SUCCESS; original feature_contract and C2 acceptance_results snapshot preserved without overwriting per-item pending values. No source rebuild or duplicate score."
+}

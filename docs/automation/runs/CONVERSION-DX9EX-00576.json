@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00576",
+  "production_id": "CONVERSION-DX9EX-00576",
+  "event_id": "CONVERSION-DX9EX-00576-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "0257d4c496fa77dc2fed5be0d4fe5151dd55e3fd",
+  "result_sha": "f148fc74fdf0e5be750102d14a03e717049e29a0",
+  "material_result_sha": "f148fc74fdf0e5be750102d14a03e717049e29a0",
+  "validation_bearing_result_sha": "f148fc74fdf0e5be750102d14a03e717049e29a0",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00576]",
+  "work_key": "DX9EX:P1:INVERSE_RIGID_FINITE_FALLBACK",
+  "conflict_keys": [
+    "src/vr/core/matrix.hpp:InverseRigid finite input and computed output guard",
+    "vrhost/tests/core_math_smoke.cpp:Release-active inverse rigid input and overflow regressions"
+  ],
+  "changed_paths": [
+    "src/vr/core/matrix.hpp",
+    "vrhost/tests/core_math_smoke.cpp"
+  ],
+  "summary": "P1 DX9Ex OpenXR eye transform stability: fail closed nonfinite InverseRigid inputs and finite-input dot-product overflow to the prior identity fallback; four Release-active malformed, overflow and rotated valid round-trip smoke conditions; released FFB v0.2 unmodified.",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "static_validation": "PASS: one focused local source contract inspection; Release-active host core_math_smoke PASS on exact material SHA in DX9Ex Active Validation",
+  "automation_validation": "PASS_EXACT_SHA",
+  "ci_runs": {
+    "dx9ex_active": 38030597217,
+    "domain_isolation": 38030597162,
+    "full_source_impact": 38030597159
+  },
+  "ci_jobs": {
+    "dx9ex_policy": "SUCCESS",
+    "dx9ex_host": "SUCCESS",
+    "dx9ex_game": "SUCCESS",
+    "dx9ex_full_chain_compile": "SUCCESS",
+    "dx9ex_package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "full_source_cross_domain": "SUCCESS",
+    "full_source_openxr_host_analyze": "SUCCESS",
+    "full_source_active_game_analyze": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11662103130,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-f148fc74fdf0e5be750102d14a03e717049e29a0",
+    "digest": "sha256:eb11afe69be6a82a15b5bf745b23175c4e8aa78df509d18cc0cdcbd68cae7a59",
+    "hmd_approved": false
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_120fps_target": "NOT_MEASURED",
+  "ffb_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "mutated": false,
+    "wheel_runtime_validation": "UNTESTED"
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS remote 00575 C6 HEAD, controller checkpoint and nonduplicate 00576",
+    "C1_REVIEW": "PASS AGENTS, DX9Ex priority, state/queue/problems, original FFB release tag, R84 pending seams, Issue #13/#14",
+    "C2_IMPLEMENT": "PASS two-file targeted P1 inverse rigid transform safety+regressions",
+    "C3_VALIDATE": "PASS all three exact material SHA GitHub mandatory gates",
+    "C4_COMMIT": "PASS material commit exact task marker without CI skip",
+    "C5_PACKAGE": "PASS exact source CI package artifact, runtime approval withheld",
+    "C6_RESULT": "PASS C6 distinct bookkeeping record after all gates passed"
+  },
+  "next_action": "Continue independent DX9Ex P1 R84 seam or P2 per-eye XR recommended resolution. DX11 A ACTIVE; DXVK B FROZEN. No same TASK_ID retry."
+}

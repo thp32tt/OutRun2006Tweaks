@@ -1,0 +1,58 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00769",
+  "production_id": "CONVERSION-DX9EX-00769",
+  "event_id": "CONVERSION-DX9EX-00769-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00769",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "fdaaa5b748e6187e3644a83fa37fe977e4c7e57c",
+  "material_result_sha": "fdaaa5b748e6187e3644a83fa37fe977e4c7e57c",
+  "validation_bearing_result_sha": "fdaaa5b748e6187e3644a83fa37fe977e4c7e57c",
+  "result_sha": "fdaaa5b748e6187e3644a83fa37fe977e4c7e57c",
+  "material_commits": [
+    "fdaaa5b748e6187e3644a83fa37fe977e4c7e57c"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 Quest3 4:3 main-menu crop must activate for the game's configured original letterboxed frontend, not require an unadvertised host environment variable.",
+    "completed_scope": "x64 R23 host reads active OutRun executable's own Graphics.UIScalingMode/UILetterboxing configuration and caches a bounded menu decision, applies existing binocular LOCAL UV centered-content crop when configured, preserves explicit environment force-on/force-off and invalid/reset full-client fallback; adds C++ compile-time positive/negative menu policy fixtures.",
+    "remaining_acceptance": [
+      "Issue #119 combined HUD/ESC/F11/main-menu optical acceptance on exact Quest3/VDXR artifact remains unverified.",
+      "Theater states including TRYAGAIN/OUTRUNMILES require physical A/B inspection to rule out incidental crop with letterboxing=1; do not declare user-visible results PASS based only on CI."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_POLICY_AND_COMPILE",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "dx9ex_active": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "full_source_impact": "SUCCESS",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "ci_evidence": {
+    "validation_sha": "fdaaa5b748e6187e3644a83fa37fe977e4c7e57c",
+    "dx9ex_active_run_id": 38383041223,
+    "domain_isolation_run_id": 38383041048,
+    "full_source_impact_run_id": 38383041111,
+    "exact_sha_confirmed": true
+  },
+  "score_delta": 0,
+  "score_reason": "C6 bookkeeping is not separately scored; new material result is accounted by unique RUN_KEY in authoritative AI_SCOREBOARD.md.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "Exact-SHA DX9Ex Active policy/game/host/full-chain/package 5/5 SUCCESS, Domain Isolation SUCCESS, Full Source Impact SUCCESS. No physical Quest3/VDXR test."
+}

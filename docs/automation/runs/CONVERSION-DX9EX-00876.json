@@ -1,0 +1,114 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00876",
+  "production_id": "CONVERSION-DX9EX-00876",
+  "event_id": "CONVERSION-DX9EX-00876-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00876",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Restore complete stage-extension +TIME sprite and numeric rendering under their original exact ScreenHud owners by batching GPU submission at proven queued and direct source boundaries rather than flushing each Draw.",
+    "scope_boundary": "Change only source-level +TIME D3DX batching in the live R84-compatible hooks_uiscaling.cpp and its mutation verifier. Preserve GOAL immediate submission, projected rank, menu, SkyGlow, game timer, R26_SAFE rollback, device loss and native D3DX fallback.",
+    "trace_stages": [
+      "Six canonical original +TIME source calls enter exact StageExtensionEnter for sprite and numeric parent owners.",
+      "Tagged sprites replay through SpriteNode and BeforeQueueNode/BeforeQueueEnd, while immediate digits keep ScopedExactProducerSemantic through StageExtensionLeave.",
+      "D3DXSprite Draw enqueues the GPU work; Flush occurs under the original queue/source owner at the exact boundary and then flows to the R84 R29-R33 stereo eye compositor."
+    ],
+    "subcomponents": [
+      "Replace per-D3DX-Draw forced stage submissions with batching through the already implemented direct numeric source exit and queued SpriteNode owner transitions.",
+      "Maintain exact-identity fail-closed filtering for mixed/foreign batches, preserve the separate GOAL eager source path and prove stage/GOAL isolation with added negative source mutations."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage-sprite-numeric-batch",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Six original +TIME sprite and numeric source paths",
+        "expected_behavior": "Both direct glyph and deferred SpriteNode +TIME GPU work stay under exact ScreenHud producer until source exit or queue transition and do not force one GPU Flush per Draw."
+      },
+      {
+        "id": "no-owner-leak-and-goal",
+        "category": "fallback_regression",
+        "behavior_area": "Foreign/mixed D3DX batches and GOAL/rank fallbacks",
+        "expected_behavior": "Unknown and mixed owner batches remain on native End and GOAL/rank original eager submissions remain guarded; fail-after source mutations reject accidental stage per-draw Flush."
+      },
+      {
+        "id": "dx9ex-exact-ci",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 game, R26_SAFE rollback, x64 host and current package",
+        "expected_behavior": "Exact material commit passes DX9Ex Active x86 game/R84/full host/package, Domain Isolation and affected source impact workflow without any Quest3 runtime claim."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "The already installed R64 DrawDest eagerly calls ID3DXSprite::Flush for every queued +TIME Draw, while BeforeQueueNode and BeforeQueueEnd and StageExtensionLeave already guarantee exact finite GPU submission boundaries for the same stage owner.",
+    "source_trace": [
+      "Six original +TIME E8 source edges enter and leave StageExtension scope and tag deferred nodes with StageExtensionTime.",
+      "The D3DX Sprite owner keeps PendingScope and PendingProducer throughout a homogeneous Begin/Draw buffer.",
+      "BeforeQueueNode flushes on stage transition, BeforeQueueEnd flushes the last stage batch and StageExtensionLeave flushes direct glyph batches before restoring source ownership.",
+      "R84 downstream Draw hooks transform the GPU-submitted render state into left/right stereo eye paths."
+    ],
+    "alternatives_rejected": [
+      "Do not add a global Flush after every stage or suppress D3DX sprites, and do not remove GOAL's separate eager Draw path."
+    ],
+    "root_cause": "The per-Draw stage Flush unconditionally fragments a single homogeneous D3DX owner batch into individual submissions, duplicating GPU synchronization work already bounded by queue/direct source exits.",
+    "eye_ownership": "The D3DX GPU Draw executes before its exact semantic owner is popped, so the existing R84 per-eye submission can retain ScreenHud provenance. Physical stereo effect remains untested."
+  },
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "runtime_evidence": "GitHub DX9Ex Active exact-SHA 5/5 SUCCESS; source-impact/HUD inspections SUCCESS on unchanged runtime C++ material commit. Physical Quest3/VDXR not executed.",
+  "source_parent_sha": "a6ccc6d4a2fe8a5a02a38a9c8c17d15bca7cbcff",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00876.json"
+  ],
+  "acceptance_results": {
+    "stage-sprite-numeric-batch": "SOURCE_IMPLEMENTED",
+    "no-owner-leak-and-goal": "TEST_ADDED",
+    "dx9ex-exact-ci": "PENDING"
+  },
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "result_commit_ci_skip": true,
+  "material_result_sha": "8b54a99674fc76847c0eade9e9a8b2a0c202b046",
+  "validation_bearing_result_sha": "6d572069be63dc3da1f7ca7d6b3ed47e0d048e90",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "6d572069be63dc3da1f7ca7d6b3ed47e0d048e90",
+    "dx9ex_active": {
+      "run_id": 38683416353,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, full-chain-compile R84, game R26_SAFE, host, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38683416356,
+      "conclusion": "IN_PROGRESS",
+      "note": "Separate exact-SHA Domain check, not part of DX9Ex Active 5/5 validation."
+    },
+    "full_source_impact": {
+      "run_id": 38683331598,
+      "source_sha": "8b54a99674fc76847c0eade9e9a8b2a0c202b046",
+      "conclusion": "SUCCESS",
+      "note": "3/3 SUCCESS on material SHA; final SHA modifies only existing verifier after source commit."
+    },
+    "hud_inspector": {
+      "run_id": 38683331549,
+      "source_sha": "8b54a99674fc76847c0eade9e9a8b2a0c202b046",
+      "conclusion": "SUCCESS",
+      "note": "2/2 SUCCESS on material SHA; runtime C++ unchanged afterward."
+    },
+    "runtime": "UNTESTED"
+  }
+}

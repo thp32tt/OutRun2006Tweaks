@@ -1,0 +1,123 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00798",
+  "production_id": "CONVERSION-DX9EX-00798",
+  "event_id": "CONVERSION-DX9EX-00798-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R27_SHADOW_OCCLUSION_EFFECT_ROUTE",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R27_SHADOW_OCCLUSION_EFFECT_ROUTE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00798]",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 1,
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r26.cpp",
+    "tools/verify_vr_r27_shadow_occlusion_fastpath.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00798.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R27_SHADOW_OCCLUSION_EFFECT_ROUTE",
+    "goal": "Reduce CPU-side render-state and WVP/pose inspection on full protected mono-shadow, auxiliary-render-target and occlusion draws without weakening the stereo world/effect route or GPL shader trace.",
+    "scope_boundary": "R27/R28 effect dispatch only; do not alter R9/R13 fail-closed renderer, R23 baseline, HUD/SkyGlow, DX11, DXVK, or input.",
+    "special_work_evidence": "The R27 fallback unconditionally attempted verified-world WVP/pose validation and captured five R13 render states even when both R28 and R27 independently vetoed mono-shadows, auxiliary RT and occlusion; this bypasses redundant upper checks on those draw-heavy scenes. API-work reduction only; real frame-time benefit not measured.",
+    "trace_stages": [
+      "Stock OutRun effect/shadow draws enter R27 upper D3D9 draw dispatcher after R23.",
+      "R27 decides eligibility from existing mono/aux/occlusion state before expensive R28 verification and effect snapshot.",
+      "Original R13 lower draw and R9 per-eye safety ownership remain unchanged for vetoed draws; valid world effects retain existing stereo routing."
+    ],
+    "subcomponents": [
+      "Short-circuit full mono-shadow and auxiliary RT effect families before redundant per-draw R28 WVP, pose and R13 render-state checks.",
+      "Short-circuit active or untrusted occlusion through unchanged R13 fail-closed chain while preserving opt-in GPL shader diagnostics and eligible binocular effect routing.",
+      "Add deterministic 32-input guard model and destructive mutation tests to canonical exact-SHA game/host CI."
+    ],
+    "acceptance_items": [
+      {
+        "id": "R27_VETOED_EFFECT_COST",
+        "category": "end_to_end_behavior",
+        "behavior_area": "shadow_aux_effect_dispatch",
+        "expected_behavior": "Forced mono-shadow or auxiliary RT delegates directly to existing lower R13 draw without any R28 eye candidate or duplicate upper effect read."
+      },
+      {
+        "id": "R27_QUERY_TRACE_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "occlusion_and_shader_trace",
+        "expected_behavior": "Active/lost occlusion delegates unchanged R13 policy; GPL tracing and valid stereo world/effect checks remain unchanged."
+      },
+      {
+        "id": "R27_EXACT_SHA_INTEGRATION",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_host_and_source_impact",
+        "expected_behavior": "Verify destructive mutations and pass exact-SHA DX9Ex Active Win32 game/host/package, Domain Isolation and source-impact Gates."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "R27_VETOED_EFFECT_COST": "PASS",
+    "R27_QUERY_TRACE_FALLBACK": "PASS",
+    "R27_EXACT_SHA_INTEGRATION": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "R27GuardWorldEffect tried R28 and R13 effect snapshot even for forced mono-shadow, aux RT and active/unavailable occlusion that both stereo routes veto.",
+    "root_cause": "Upper R27 effect owner did not short-circuit state-known ineligible draws before expensive candidate/snapshot reads.",
+    "source_trace": [
+      "Original D3D9 effect draw enters R27 hook.",
+      "R28 perspective-WVP proof and R13 effects were re-read before R27 veto.",
+      "R13 lower renderer already conservatively owns mono or occlusion and final draw."
+    ],
+    "alternatives_rejected": [
+      "Do not remove R13 fallback state reading: it remains required for zero-disparity effect/occlusion.",
+      "Do not skip GPL capture even for mono effects: explicit diagnostics require snapshot and shader pair.",
+      "Do not assume query-only proxies are write-free without R26 state proof."
+    ],
+    "fix_evidence": "Short-circuit to unchanged R13 only for existing shared veto predicates when GPL trace disabled.",
+    "negative_test_evidence": "32 boolean decision inputs and six destructive guards registered in exact SHA Windows policy CI; initial verifier counting/scope issue repaired in validation-bearing commit."
+  },
+  "runtime_status": "NEED_QUEST3_VDXR_P95_P99_TEST",
+  "performance_evidence": "Source-level reduction of redundant upper-layer state/WVP checks; no measured p95/p99 data.",
+  "material_result_sha": "b0d672e54e885ba79c30eb51b8095e362f120c94",
+  "validation_bearing_result_sha": "b0da00a3a9a38bee154665883e8d61237abb62f5",
+  "result_sha": "b0da00a3a9a38bee154665883e8d61237abb62f5",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "b0da00a3a9a38bee154665883e8d61237abb62f5",
+    "dx9ex_active": {
+      "run_id": 38461928973,
+      "head_sha": "b0da00a3a9a38bee154665883e8d61237abb62f5",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "game": "SUCCESS",
+        "host": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38461928741,
+      "head_sha": "b0da00a3a9a38bee154665883e8d61237abb62f5",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38461618348,
+      "head_sha": "b0d672e54e885ba79c30eb51b8095e362f120c94",
+      "conclusion": "SUCCESS",
+      "source_tree_unchanged_in_validation_commit": true,
+      "jobs": {
+        "msvc-analyze-active-game": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "source-cross-domain": "SUCCESS"
+      }
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+    "performance_evidence": "Source-level redundant upper-layer routing work bypassed; no measured real headset frame-time delta."
+  },
+  "c6_recorded_at_kst": "2026-10-14 05:26 KST"
+}

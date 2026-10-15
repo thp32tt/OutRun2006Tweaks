@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-R84-R32-RIGHT-DEPTH-OWNER-20261009",
+  "source_mode": "CHAT_DIRECT",
+  "target_branch": "vr-d3d9ex-focus",
+  "selected_work_item": "DX9EX-R84-PORT-SEAMS-001",
+  "controller_terminal": true,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "attempt": 1,
+  "base_sha": "f5e29e93216aed43aa42ae7f5a5746d239ee0391",
+  "material_result_sha": "7d0cf86673f5d8155a6e50d4a5caa3e7c2f239cd",
+  "validation_bearing_result_sha": "7d0cf86673f5d8155a6e50d4a5caa3e7c2f239cd",
+  "result_sha": "7d0cf86673f5d8155a6e50d4a5caa3e7c2f239cd",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "One behavior-neutral R32/R30 lower owner boundary: borrowed R9 right-eye depth pointer accessed via explicit R30SupportBorrowedRightEyeDepth; no AddRef/Release, null guard policy, render/pose/HUD semantics altered. Three negative mutation controls reject color-pointer alias, null replacement, R32 owner bypass.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_refactor_contract.py",
+    "docs/automation/reviews/DX9EX_R84_SESSION_20261009_1852.md"
+  ],
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37914282253,
+      "head_sha": "7d0cf86673f5d8155a6e50d4a5caa3e7c2f239cd",
+      "conclusion": "success",
+      "jobs": {
+        "policy": 113766572913,
+        "game": 113766756410,
+        "host": 113766755954,
+        "full-chain-compile": 113766755951,
+        "package": 113768253378
+      }
+    },
+    "domain": {
+      "run_id": 37914282205,
+      "head_sha": "7d0cf86673f5d8155a6e50d4a5caa3e7c2f239cd",
+      "conclusion": "success"
+    },
+    "package_artifact": {
+      "id": 11608682185,
+      "digest": "sha256:c989f297f4a828013e13b8c10c53b0e4ebd98d75d436c08426777e79398b6b83"
+    },
+    "issue14_comment_id": 6078598370
+  },
+  "pipeline": {
+    "C0": "GitHub HEAD and job/queue recovered",
+    "C1": "R32 direct lower right-depth dependency compared",
+    "C2": "explicit borrowed R30 owner API and 3 mutation controls committed",
+    "C3": "same SHA DX9Ex policy/game/host/full-chain/package and Domain SUCCESS",
+    "C4": "material commit published",
+    "C5": "same-SHA package artifact digest checked",
+    "C6": "durable success record"
+  },
+  "next_action": "Next independent R32/R31 source owner seam: paired left-draw depth/stencil write eligibility, then incremental CMake/independent-TU cleanup. Preserve 30-minute bounded session, ~5min meaningful records, HMD UNTESTED. No duplicate dispatch/score on same TASK_ID."
+}

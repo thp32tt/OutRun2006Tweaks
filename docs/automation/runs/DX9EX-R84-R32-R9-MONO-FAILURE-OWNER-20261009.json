@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-R84-R32-R9-MONO-FAILURE-OWNER-20261009",
+  "source_mode": "CHAT_DIRECT",
+  "target_branch": "vr-d3d9ex-focus",
+  "selected_work_item": "DX9EX-R84-PORT-SEAMS-001",
+  "controller_terminal": true,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "attempt": 1,
+  "base_sha": "7e2c84dd7d24c79bb7ba85a6208d578b949e2514",
+  "material_result_sha": "866e813837f614967cc599c32b129e72162d86c4",
+  "validation_bearing_result_sha": "866e813837f614967cc599c32b129e72162d86c4",
+  "result_sha": "866e813837f614967cc599c32b129e72162d86c4",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R32 fail-closed mono-backup notification and stereo failure poisoning now delegate through R30 to exact original R9 functions. R9 draw count, backup-gap flag, failure reason/site/HRESULT are preserved. Six negative mutation tests and updated legacy R32 owner guard protect the boundary. No runtime/HUD policy change.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_refactor_contract.py",
+    "docs/automation/reviews/DX9EX_R84_SESSION_20261009_1852.md"
+  ],
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37916012519,
+      "head_sha": "866e813837f614967cc599c32b129e72162d86c4",
+      "conclusion": "success",
+      "jobs": {
+        "policy": 113772244068,
+        "game": 113772368102,
+        "host": 113772368143,
+        "full-chain-compile": 113772368112,
+        "package": 113773742980
+      }
+    },
+    "domain": {
+      "run_id": 37916012536,
+      "head_sha": "866e813837f614967cc599c32b129e72162d86c4",
+      "conclusion": "success"
+    },
+    "package_artifact": {
+      "id": 11609259134,
+      "digest": "sha256:b0c71ea0e0eb1cc72fa5ba3b385063509272b7c0cf9aca4ad5a3d3e163fb36ad"
+    },
+    "issue14_comment_id": 6078835034
+  },
+  "pipeline": {
+    "C0": "GitHub HEAD and queue restored",
+    "C1": "R9 original mono-gap and poison side effects inspected",
+    "C2": "R30/32 real source owner API plus 6 negative mutation controls",
+    "C3": "exact material SHA hosted policy/game/host/R33 chain/package and Domain success",
+    "C4": "source commit published",
+    "C5": "package artifact digest verified",
+    "C6": "immutable terminal record"
+  },
+  "next_action": "After bounded session, separate resource/depth support seam: R32ReviewEnsureStereoResources, R32ReviewTryBootstrapRightDepth, R32ReviewDepthTestActive and R32ReviewStencilTestActive, then remaining R32/R31 separate TU and CMake/cleanup gates. Do not claim HMD success. Same TASK_ID is terminal; retry is +0."
+}

@@ -1,0 +1,94 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00628",
+  "production_id": "CONVERSION-DX9EX-00628",
+  "event_id": "CONVERSION-DX9EX-00628-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:R32_VALIDATED_SHARED_DESCRIPTOR_CACHE",
+  "work_key": "DX9EX:R32_VALIDATED_SHARED_DESCRIPTOR_CACHE",
+  "material_result_sha": "51cfb72f40536c6f6d7bda6a173ef0765ff0ea51",
+  "material_commits": [
+    "51cfb72f40536c6f6d7bda6a173ef0765ff0ea51"
+  ],
+  "result_sha": "51cfb72f40536c6f6d7bda6a173ef0765ff0ea51",
+  "validation_bearing_result_sha": "51cfb72f40536c6f6d7bda6a173ef0765ff0ea51",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Remove the redundant per-frame D3D11 GetDesc virtual call when copying a validated, unchanged R32 DirectGPU ring slot to host-owned SafeEye staging.",
+    "acceptance": "Both source eyes' D3D11 descriptors validated on cache miss; metadata published only after validation; slot generation/run/game PID/handle/extent/format identity retained; evictions clear metadata; safe CopyResource/fence/ACK and swap order preserved; new 13-mutation deterministic test included in canonical policy; Win32 active game/full chain/host/package, Domain Guard, Full Source Impact all SUCCESS on exact SHA.",
+    "runtime_metrics": "No measured Quest3/VDXR CPU frame time, FPS or p95/p99 improvements."
+  },
+  "acceptance_results": [
+    {
+      "item": "R32_PER_SLOT_VALIDATED_DESC_REUSE",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Stored immutable D3D11_TEXTURE2D_DESC after both producer-eye GetDesc + declared extent/format/sample checks; CopySharedFrameToSafeEyesR32 reuses validatedDesc without per-frame GetDesc."
+    },
+    {
+      "item": "GENERATION_HANDLE_EVICTION_AND_ACK",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Existing shared slot identity, reset, copy fence, PublishCompletedFrame and SafeEye A/B swap retained without widening eligibility."
+    },
+    {
+      "item": "THIRTEEN_NEGATIVE_MUTATIONS",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "tools/verify_vr_r32_shared_descriptor_cache.py included in DX9Ex Active policy SUCCESS."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Active Validation #38170965769 policy/host/game/full-chain-compile/package 5/5 SUCCESS."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Domain Isolation Guard #38170965709 SUCCESS."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Full Source Impact Review #38170965734 source/game MSVC/host MSVC 3/3 SUCCESS."
+    },
+    {
+      "item": "QUEST3_VDXR_GAME_FPS_VISUAL",
+      "status": "UNTESTED",
+      "evidence": "No Quest3/VDXR HMD session or real gameplay FPS measurement."
+    }
+  ],
+  "exact_sha_validation": {
+    "target_sha": "51cfb72f40536c6f6d7bda6a173ef0765ff0ea51",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38170965769,
+        "head_sha": "51cfb72f40536c6f6d7bda6a173ef0765ff0ea51",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38170965709,
+        "head_sha": "51cfb72f40536c6f6d7bda6a173ef0765ff0ea51",
+        "conclusion": "success",
+        "status": "completed"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38170965734,
+        "head_sha": "51cfb72f40536c6f6d7bda6a173ef0765ff0ea51",
+        "conclusion": "success",
+        "status": "completed"
+      }
+    ]
+  },
+  "runtime_validation_note": "RUNTIME_VALIDATION=UNTESTED. CI success establishes deterministic build and static regression only, not HMD optical/FPS performance. DXVK stays frozen; DX11 remains priority.",
+  "controller_next_action": "Start a new non-overlapping DX9Ex P0 performance improvement with an independent TASK_ID; do not redispatch or rescore 00628."
+}

@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00484",
+  "production_id": "CONVERSION-DX9EX-00484",
+  "event_id": "CONVERSION-DX9EX-00484-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "runtime_behavior_changed": true,
+  "base_sha": "09d6c014e376b2d17d9a1c7d827ec82cb60731a5",
+  "source_material_sha": "3c4424e70dc641e588cc8c0b23263f15142d1c90",
+  "material_result_sha": "ff94725406535793ff7615e69480f55dd4c0ca78",
+  "validation_bearing_result_sha": "ff94725406535793ff7615e69480f55dd4c0ca78",
+  "result_sha": "ff94725406535793ff7615e69480f55dd4c0ca78",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00484]",
+  "selected_work_item": "DX9EX-PERF-CADENCE-PROCESS-HANDLE-CACHE-0067",
+  "summary": "Removed per-render-frame OpenProcess/CloseHandle churn from the OpenXR cadence Present path by caching one SYNCHRONIZE process handle per host PID, with fail-closed replacement/cleanup on PID change, host exit/unusable handle, invalid host state, and game Reset. Cadence token/wait semantics are unchanged.",
+  "checkpoints": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read target HEAD 09d6c014, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, VR_REFACTOR_STATE, VR_AUTODEV_STATE, VR_PROBLEM_HISTORY, VR_REGRESSION_KNOWLEDGE and 00483 durable record. Confirmed structure-refactor chain COMPLETE and general DX9Ex priorities active."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Protected frame-stability invariant requires bounded synchronization changes. Producer-fence timeout was not evidence-backed for modification; cadence liveness instead performed OpenProcess/Wait/Close on every rendered frame, an avoidable kernel hot-path cost with stable host PID."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added CadenceHostProcess/CadenceHostProcessPid, CloseCadenceHostProcess and CadenceHostProcessAlive. WaitForNextCadenceRequest now reuses the cached SYNCHRONIZE handle; invalid host state and NotifyGameReset release it. Extended verify_vr_hud_cadence_restore.py to prevent per-frame handle churn regression."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA ff94725406535793ff7615e69480f55dd4c0ca78 passed DX9Ex Active Validation 37479990940 policy/host/game/full-chain/package."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "ff94725406535793ff7615e69480f55dd4c0ca78",
+      "validation_bearing_result_sha": "ff94725406535793ff7615e69480f55dd4c0ca78",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE",
+      "artifact_id": 11420524136,
+      "digest": "sha256:fe293358e9d541b1c697bd7b42c8448f85d39102bab80e250b95ef9fcea14e11"
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "changed_paths": [
+      "src/vr/game/outrun_renderer.cpp",
+      "tools/verify_vr_hud_cadence_restore.py",
+      "docs/VR_REFACTOR_STATE.json",
+      "docs/automation/runs/CONVERSION-DX9EX-00484.json"
+    ],
+    "performance_effect": {
+      "before": "Every cadence-gated rendered frame opened a SYNCHRONIZE handle to host.hostPid, polled it, then closed it.",
+      "after": "One SYNCHRONIZE handle is reused while host PID is stable; PID change, host exit/unusable handle, invalid host state or game Reset releases the cache.",
+      "unchanged": [
+        "cadence request identity",
+        "xrWaitFrame pacing authority",
+        "cadence timeout budget",
+        "60Hz simulation semantics",
+        "producer fence/copy/ACK policy"
+      ]
+    },
+    "related_regressions": [
+      "VR-R50-FRAME-STABILITY-PRESERVE-001"
+    ],
+    "validation": {
+      "dx9ex_active_run_id": 37479990940,
+      "policy_job_id": 112325342999,
+      "host_job_id": 112325522745,
+      "game_job_id": 112325522800,
+      "full_chain_compile_job_id": 112325522907,
+      "package_job_id": 112328061412,
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11420524136,
+      "digest": "sha256:fe293358e9d541b1c697bd7b42c8448f85d39102bab80e250b95ef9fcea14e11"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR in-game HMD session was performed; actual frame-pacing benefit/regression remains runtime-visible."
+    },
+    "issue14_comment_id": 6018702833,
+    "validation_pr": 107
+  },
+  "next_action": "Keep the structure-refactor chain closed. Continue the general DX9Ex priority list from the latest exact HEAD, favoring low-risk synchronization/resource-lifetime work until the prepared Quest3/VDXR runtime baseline is consumed. Revalidate VR-R50-FRAME-STABILITY-PRESERVE-001 on the next matching HMD session.",
+  "started_at_kst": "2026-10-06T23:24:00+09:00",
+  "completed_at_kst": "2026-10-06T23:40:38+09:00"
+}

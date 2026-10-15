@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00538",
+  "production_id": "CONVERSION-DX9EX-00538",
+  "event_id": "CONVERSION-DX9EX-00538-E002",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "2/3",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-TRANSPORT-READINESS-PREDICATE-FACADE-001",
+  "base_sha": "ff6c1526b341c412b501f276c9714b5b87f466ae",
+  "material_result_sha": "c5a1d9f6b0567dce205c9adf024f6a9af08b9f76",
+  "validation_bearing_result_sha": "ea29a56069e7847541f2ad55e59c767515da1b13",
+  "result_sha": "ea29a56069e7847541f2ad55e59c767515da1b13",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00538]",
+  "summary": "Moved R32 DirectGPU overlay-readiness consumption behind a behavior-neutral R30 support facade and aligned all stale structure/retirement verifiers to the new owner boundary.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r32_review.py",
+    "tools/verify_vr_r32_runtime_support_seam.py",
+    "tools/verify_vr_refactor_contract.py",
+    "tools/verify_vr_r31_r32_retirement_guard.py"
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "failed_candidate_runs": [
+      {
+        "sha": "c5a1d9f6b0567dce205c9adf024f6a9af08b9f76",
+        "run_id": 37676012209,
+        "failure_class": "VERIFIER_DEFECT",
+        "reason": "verify_vr_r32_review.py retained the pre-facade direct R13 readiness requirement"
+      },
+      {
+        "sha": "751da72351f9409267e2df5b99064900d9533906",
+        "run_id": 37676348359,
+        "failure_class": "VERIFIER_DEFECT",
+        "reason": "verify_vr_r31_r32_retirement_guard.py retained the pre-facade direct R13 readiness invariant"
+      }
+    ],
+    "dx9ex_active_run_id": 37676477113,
+    "jobs": {
+      "policy": 112981176655,
+      "game": 112981357871,
+      "full_chain_compile": 112981357977,
+      "host": 112981358054,
+      "package": 112983629525
+    },
+    "package_artifact_id": 11507645254,
+    "package_artifact_digest": "sha256:0778a5355b8910dfa4ce6aea55acb647767573af764118fca3c90e726c720502",
+    "domain_isolation_run_id": 37676477009,
+    "domain_isolation_job_id": 112981176008
+  },
+  "protected_boundaries": [
+    "read-only transport readiness delegation only",
+    "ACK snapshot/slot/fence/publication behavior unchanged",
+    "Reset/Present/OpenXR/HUD behavior unchanged",
+    "no HMD/runtime success claim"
+  ],
+  "next_action": "Continue the active R32 lower-owner seam chain from this validated boundary. Prefer a telemetry/read-only R13 dependency before changing ACK snapshot, slot, fence, or publication semantics."
+}

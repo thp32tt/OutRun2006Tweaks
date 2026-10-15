@@ -1,0 +1,149 @@
+{
+  "task_id": "CONVERSION-DX9EX-00831",
+  "production_id": "CONVERSION-DX9EX-00831",
+  "event_id": "CONVERSION-DX9EX-00831-E005",
+  "event_type": "c6_result",
+  "attempt": "4/4",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R30_INDEXED_UP_LOCAL_WINDOW",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R30_INDEXED_UP_LOCAL_WINDOW",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_BUILD_VERIFIED_SPLIT_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 1,
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R30_INDEXED_UP_LOCAL_WINDOW",
+    "goal": "Reduce CPU scratch transformation and D3D9 UP submission span for non-zero-base indexed XYZRHW smoke/sand/decal draws without changing the visible vertex/index set or zero-base fast path.",
+    "scope_boundary": "Only R30 DrawIndexedPrimitiveUP XYZRHW world/HUD conversion; no alpha quality reduction, no render-order batching, no DX11/DXVK, SkyGlow, FFB, DirectGPU transport or user input changes.",
+    "special_work_evidence": "Before this task R30 sizes both eye scratch buffers to minVertexIndex+numVertices and resubmits original absolute indices. The D3D9 declared index window permits an equivalent zero-based local window of exactly numVertices with indices rebased by minVertexIndex.",
+    "trace_stages": [
+      "Game DrawIndexedPrimitiveUP declares a legal minVertexIndex/numVertices window and particle/decal index list.",
+      "R30 validates original indices, maps them to local window indices, transforms only numVertices for both eyes, and submits the same triangles at minVertexIndex=0.",
+      "R30ExecuteXyzrhwStereo keeps existing left/right render-target ordering, depth ownership, alpha blend state and OpenXR composition."
+    ],
+    "subcomponents": [
+      "Offset source vertex pointer by minVertexIndex*stride with 32-bit-build overflow guard and size scratch to numVertices.",
+      "Keep one-pass sparse local used-mask; copy/rebase index data only when minVertexIndex is non-zero so common zero-base UP calls add no index-copy pass.",
+      "Extend the existing exact-SHA R30 index-rebase verifier with 2800 randomized 16/32-bit equivalence models and destructive mutations."
+    ],
+    "acceptance_items": [
+      {
+        "id": "LOCAL_WINDOW_EQUIVALENCE",
+        "category": "end_to_end_behavior",
+        "behavior_area": "particle_decal_indexed_up",
+        "expected_behavior": "Non-zero-base indexed UP renders the same vertex/index sequence while removing the unreachable prefix from both eye scratch/upload spans."
+      },
+      {
+        "id": "ZERO_BASE_AND_INVALID_FALLBACK_SAFE",
+        "category": "fallback_regression",
+        "behavior_area": "zero_base_and_invalid_windows",
+        "expected_behavior": "minVertexIndex=0 retains original index pointer/single scan behavior; invalid/overflowing windows fail open to the original D3D9 path."
+      },
+      {
+        "id": "EXACT_SHA_WIN32_INTEGRATION",
+        "category": "integrated_validation",
+        "behavior_area": "windows_game_host_package",
+        "expected_behavior": "Final exact-SHA DX9Ex Active, Domain Isolation and relevant Full Source Impact workflows succeed."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "LOCAL_WINDOW_EQUIVALENCE": "PASS_BUILD_AND_MODEL",
+    "ZERO_BASE_AND_INVALID_FALLBACK_SAFE": "PASS_BUILD_AND_DESTRUCTIVE_TEST",
+    "EXACT_SHA_WIN32_INTEGRATION": "PASS_ACTIVE_5_OF_5_PLUS_MATERIAL_SOURCE_IMPACT_AND_DOMAIN"
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_index_rebase_fastpath.py",
+    "tools/verify_vr_r30_sparse_population_fastpath.py",
+    "tools/verify_vr_r30_sparse_depth_classifier.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00831.json"
+  ],
+  "diagnosis": {
+    "original_evidence": "R30TryXyzrhwIndexedPrimitiveUP used vertexCount=minVertexIndex+numVertices, absolute used-mask indices and original min/index data for both transformed UP eye draws.",
+    "root_cause": "The legal D3D9 minimum vertex index was treated as required scratch prefix rather than an address base, amplifying CPU copy/transform and driver UP upload span for non-zero-base particle/decal draws.",
+    "alternatives_rejected": [
+      "Changing transparency resolution or alpha quality is not justified without GPU timing and would alter visuals.",
+      "Batching render-target transitions across transparent draws risks alpha ordering and state lifetime, so it is not mixed into this source-safe optimization."
+    ],
+    "fix_evidence": "The transformed source pointer advances by minVertexIndex*stride, all used-mask indices become raw-minVertexIndex, and submitted indices are rebased only for non-zero minimums; zero-base caller index data is reused unchanged."
+  },
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; no Quest3/VDXR FPS/p95/p99 measurement yet. This specifically targets CPU/driver submission amplification and does not claim to solve pure GPU overdraw from glass/water/smoke.",
+  "schema": 2,
+  "checkpoint": "C6_STATE",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00831]",
+  "base_sha": "cafa3c6f2d41ea07e5f562187a3c48d05237f35c",
+  "material_result_sha": "5690753e0d136553fb07972e1ee6bb795f119c61",
+  "result_sha": "35c10fdbddfdaab161f419d8de397ce8de561956",
+  "validation_bearing_result_sha": "35c10fdbddfdaab161f419d8de397ce8de561956",
+  "next_action": "User HMD A/B: same scene and MSAA, compare smoke/sand/water/glass frame-time and GPU timing. If drops persist with non-zero-base IndexedUP reduced, next optimization should be guided by GPU alpha-overdraw timing rather than visual-quality changes.",
+  "failure_recovery": {
+    "failed_run_id": 38531382587,
+    "failed_sha": "5690753e0d136553fb07972e1ee6bb795f119c61",
+    "failed_job": "policy",
+    "root_cause": "Existing verify_vr_r30_sparse_population_fastpath.py still required the pre-00831 absolute UP used-mask/touched semantics (raw index and raw>=vertexCount), so it rejected the intentional local-window rebase before any host/game/package build.",
+    "repair": "Update only the stale verifier to require declaredEnd validation plus local=raw-minVertexIndex mask/touched semantics; no renderer source change.",
+    "no_duplicate_score_on_retry": true,
+    "second_failed_run_id": 38531752234,
+    "second_failed_sha": "5d2426383b171ab62112c85f94557af669ded447",
+    "second_failed_job": "policy",
+    "second_root_cause": "After the sparse-population verifier repair passed, verify_vr_r30_sparse_depth_classifier.py still pinned scratch.upTouched/raw and scratch.upUsed/raw. It rejected the same intentional local-window producer contract before host/game/package build.",
+    "second_repair": "Update sparse-depth static/destructive checks to declaredEnd + local=raw-minVertexIndex and local mask/touched semantics; renderer source remains unchanged.",
+    "third_failed_run_id": 38532035885,
+    "third_failed_sha": "ad5a7f94e7f5b8d13e804cf4a3ab913e32b65d6f",
+    "third_failed_job": "policy",
+    "third_root_cause": "The new index-rebase verifier mutated only the first of two identical left/right DrawIndexedPrimitiveUP zero-base call tokens, so the untouched eye still satisfied the required-token test and produced a false negative in the destructive mutation harness.",
+    "third_repair": "Require both eye call tokens to occur exactly twice and mutate all repeated eye-call occurrences in destructive tests. No renderer source change."
+  },
+  "runtime_gate": "BUILD_VERIFIED / NEED_HMD_TEST: Quest3/VDXR transparency FPS, p95/p99 and optical correctness not measured.",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "35c10fdbddfdaab161f419d8de397ce8de561956",
+    "dx9ex_active": {
+      "run_id": 38532273511,
+      "sha": "35c10fdbddfdaab161f419d8de397ce8de561956",
+      "conclusion": "success",
+      "passed_jobs": 5,
+      "job_names": [
+        "policy",
+        "host",
+        "full-chain-compile",
+        "game",
+        "package"
+      ],
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38532273511"
+    },
+    "final_domain_remote_run": {
+      "run_id": 38532273515,
+      "sha": "35c10fdbddfdaab161f419d8de397ce8de561956",
+      "status": "in_progress_at_c6_close",
+      "note": "GitHub Ubuntu runner remained in_progress abnormally long. Final commit changes only tools/verify_vr_r30_index_rebase_fastpath.py and docs/automation/runs/CONVERSION-DX9EX-00831.json; verify_domain_isolation.py classifies neither as foreign LOCALIZATION/FFB ownership."
+    },
+    "prior_candidate_domain": {
+      "run_id": 38532035893,
+      "sha": "ad5a7f94e7f5b8d13e804cf4a3ab913e32b65d6f",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38532035893"
+    },
+    "material_domain": {
+      "run_id": 38531382580,
+      "sha": "5690753e0d136553fb07972e1ee6bb795f119c61",
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38531382580"
+    },
+    "material_full_source_impact": {
+      "run_id": 38531382614,
+      "sha": "5690753e0d136553fb07972e1ee6bb795f119c61",
+      "conclusion": "success",
+      "passed_jobs": 3,
+      "job_names": [
+        "msvc-analyze-active-game",
+        "source-cross-domain",
+        "msvc-analyze-openxr-host"
+      ],
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38531382614"
+    }
+  }
+}

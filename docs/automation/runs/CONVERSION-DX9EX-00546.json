@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00546",
+  "production_id": "CONVERSION-DX9EX-00546",
+  "event_id": "CONVERSION-DX9EX-00546-E004",
+  "event_type": "retry",
+  "chat_rollover": 2,
+  "attempt": "3/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "d2b1f46f237204d3cf2786f1eb421734fa2f2127",
+  "material_result_sha": "1c86d479dcd5de97f3bf8bee1abb386b11b2de02",
+  "validation_bearing_result_sha": "1c86d479dcd5de97f3bf8bee1abb386b11b2de02",
+  "result_sha": "1c86d479dcd5de97f3bf8bee1abb386b11b2de02",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00546]",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "resume_reason": "No assistant response was detected before the queue result grace period expired; the conversion lane chat may be stale, hidden, or failed before generation started.",
+  "selected_work_item": "DX9EX-P0-HUD-EXACT-LEFT-RIGHT-OWNER-STATIC-CLOSURE",
+  "selection_authority": "AGENTS.md 2026-10-07 P0 visual-composition override supersedes R84 structural-convergence next action",
+  "summary": "Extend established P0 static HUD proof (71 canonical CALLs) with exact left/right AddSpriteSpacing direction and common ScreenHud owner forwarding, two additional deliberate corruptions (10/10 fail), and protected no-repeat HMD gate. No game/host rendering behavior changes.",
+  "changed_paths": [
+    "tools/verify_vr_hud_exact_callsite_contract.py",
+    "AGENTS.md",
+    "docs/VR_HUD_SEMANTIC_BASELINE.md"
+  ],
+  "deterministic_preflight": {
+    "canonical_exe_and_hud": "PASS: exact 71 canonical HUD CALL sites, CALL target/source bindings, exclusive hook arrays",
+    "negative_mutations": "PASS: HUD Inspector step Reject corrupted HUD producer mutations reports 10/10 intentional defects detected",
+    "p0_visual": "PASS: HUD Inspector P0 visual composition static contract",
+    "left_right": "PASS: exact right AddSpriteSpacing(false) + left AddSpriteSpacing(true) before common ExactScreenHud_putClipSprite path",
+    "hosted_build": "PASS: exact material SHA 1c86d479 host/game/full-chain/HUD Inspector + Domain Isolation"
+  },
+  "validation_runs": {
+    "dx9ex_active": {
+      "id": 37703763263,
+      "head_sha": "1c86d479dcd5de97f3bf8bee1abb386b11b2de02",
+      "event": "push",
+      "latest_observed": "completed/success",
+      "policy_job": 113073336583,
+      "host_job": 113073453102,
+      "game_job": 113073453106,
+      "full_chain_job": 113073453158,
+      "package_job": 113074904565
+    },
+    "domain_isolation": {
+      "id": 37703763317,
+      "head_sha": "1c86d479dcd5de97f3bf8bee1abb386b11b2de02",
+      "latest_observed": "completed/success",
+      "job": 113073154063
+    },
+    "hud_inspector": {
+      "id": 37703763411,
+      "head_sha": "1c86d479dcd5de97f3bf8bee1abb386b11b2de02",
+      "latest_observed": "completed/success",
+      "static_job": 113073154735,
+      "build_job": 113073154461
+    }
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "package_requested": false,
+  "ci_gate_complete": true,
+  "protected_boundaries": [
+    "P0 user 00519 visual FAIL remains unresolved until actual Quest3/VDXR evidence",
+    "No R84 structural port, downstream DX11/DXVK change, or new HMD package",
+    "No runtime changes: only canonical P0 scope lifetime verifier strengthening"
+  ],
+  "next_action": "Preserve P0 known-bad 00519 as NOT_USER_RUNTIME_VERIFIED. Continue independent evidence-first static source analysis for remaining menu texture, rank/rival/YES-NO/+TIME/lens flare symptoms. Do not repackage or re-request unchanged HMD candidates. Queue status IMPLEMENT_NEXT mismatch belongs to separate controller task.",
+  "automation_validation": "PASS",
+  "retry_recovery": {
+    "failure_context": "No authoritative DX9Ex Active Validation run was created for result SHA a56f49f27836071b6ee94150d03f98c780017ee3 after 682s (timeout=600s).",
+    "diagnosis": "a56f49f2 is bookkeeping/checkpoint, not validation-bearing material result. Exact material result 6161c4a2 has successful push-triggered authoritative DX9Ex Active Validation run 37701084321. Controller must resolve validation_bearing_result_sha rather than branch HEAD.",
+    "action": "Recovered existing exact-SHA SUCCESS runs and artifacts; no source reimplementation, new result SHA or HMD test.",
+    "no_duplicate_implementation": true
+  },
+  "package_artifact": {
+    "id": 11519345074,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-1c86d479dcd5de97f3bf8bee1abb386b11b2de02",
+    "digest": "sha256:b984168da4a2c0fa42ad5dc2e800bb7b240a52c29246ffa6b76df0bd8b89c27c",
+    "size_bytes": 2742331
+  },
+  "build_artifacts": [
+    {
+      "id": 11519141083,
+      "name": "dx9ex-active-game",
+      "digest": "sha256:0805247e0fcef08083d351e455817f3ae472868519341e07a45090bcf5e1bf04"
+    },
+    {
+      "id": 11518294195,
+      "name": "dx9ex-active-host",
+      "digest": "sha256:002b69b7e42f620992bd433b3c65e52ec93a6952f1a27445e3b7edf7bcc6763b"
+    }
+  ],
+  "auxiliary_workflow_failure": {
+    "head_sha": "a56f49f27836071b6ee94150d03f98c780017ee3",
+    "run_id": 37701267159,
+    "run_name": "VR Autodev Coordination",
+    "job_id": 113064998918,
+    "status": "failure",
+    "signature": "Invalid queue status IMPLEMENT_NEXT for DX9EX-P0-VISUAL-COMPOSITION-20261007",
+    "classification": "SEPARATE_QUEUE_SCHEMA_DRIFT_NOT_DX9EX_MATERIAL_GATE",
+    "followup": "Reconcile Test-VRAutodevCoordination.ps1 allowed statuses with docs/VR_WORK_QUEUE.json in an independently scoped automation/queue task; do not silently treat as DX9Ex gate success."
+  },
+  "completed_at_kst": "2026-10-08 08:48 KST",
+  "validation_history": [
+    {
+      "material_sha": "6161c4a236922d9260472d1be93fba72a4c11605",
+      "dx9ex_active_run_id": 37701084321,
+      "domain_isolation_run_id": 37701084005,
+      "hud_inspector_run_id": 37701084171,
+      "result": "PASS",
+      "prior_completed_event": "E003"
+    },
+    {
+      "intermediate_sha": "694546f875d08a6d25e98e410bbceaf8ab2111ce",
+      "result": "SUPERSEDED_BY_CORRECTED_MATERIAL_SHA"
+    },
+    {
+      "material_sha": "1c86d479dcd5de97f3bf8bee1abb386b11b2de02",
+      "dx9ex_active_run_id": 37703763263,
+      "domain_isolation_run_id": 37703763317,
+      "hud_inspector_run_id": 37703763411,
+      "result": "PASS",
+      "jobs": {
+        "policy": 113073336583,
+        "host": 113073453102,
+        "game": 113073453106,
+        "full_chain_compile": 113073453158,
+        "package": 113074904565,
+        "static_exe_analysis": 113073154735,
+        "hud_inspector_build": 113073154461
+      }
+    }
+  ],
+  "duplicate_score_policy": "Same TASK_ID E004 extends earlier completed outcome; no second AI score award.",
+  "hmd_test_policy": "Do not ask another Quest3/VDXR HUD test when exact source/upstream/canonical EXE/disassembly/texture-lifetime evidence or static CI could still distinguish symptoms. Only one frozen exact build after static closure; user-runtime evidence remains required."
+}

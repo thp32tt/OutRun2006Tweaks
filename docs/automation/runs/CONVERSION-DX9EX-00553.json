@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00553",
+  "production_id": "CONVERSION-DX9EX-00553",
+  "event_id": "CONVERSION-DX9EX-00553-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "e584fd7fa52467a45c736085b11888d3055c5326",
+  "material_result_sha": "7fa41fa1052e5330e728ad5f435140e91549d46c",
+  "validation_bearing_result_sha": "7fa41fa1052e5330e728ad5f435140e91549d46c",
+  "result_sha": "7fa41fa1052e5330e728ad5f435140e91549d46c",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00553]",
+  "status": "WAIT_EXACT_SHA_CI_CANCELLED_CONCURRENT_CI_ACTIVE",
+  "automation_validation": "PARTIAL_CANCELLED",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "ci_gate_complete": false,
+  "controller_terminal": false,
+  "retry_allowed": false,
+  "retry_note": "Do not blindly rerun while new same-branch DX9Ex Active CI is in progress: workflow concurrency vr-dx9ex-active-${{ github.ref_name }} has cancel-in-progress:true.",
+  "selected_work_item": "DX9EX_P0_DDS_FAST_INVALID_INPUT_STALE_OUTPUT_UINT_SIZE_OVERFLOW",
+  "summary": "Existing material commit fixes fast DDS stale output texture pointer and rejects size_t replacement lengths beyond native D3DX UINT. Dedicated verifier has independent negative mutations. No material reimplementation on retry E004.",
+  "changed_paths": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_hud_dds_loader.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: exact commit 7fa41fa and canceled run 37744112495 recovered; current branch had unrelated newer P0 writes by another worker.",
+    "C1_REVIEW": "PASS: prior partial is GitHub Actions concurrency cancellation, not proven source compile failure.",
+    "C2_IMPLEMENT": "PASS_PREVIOUS_ATTEMPT: material source 7fa41fa contains output-pointer initialization ordering and UINT overflow rejection.",
+    "C3_VALIDATE": "PARTIAL: policy/game/host/full-chain success; package job reports cancelled although upload step succeeded; exact canonical workflow conclusion cancelled.",
+    "C4_COMMIT": "PASS_PREVIOUS_ATTEMPT: existing real material SHA 7fa41fa contains task marker. No duplicate source changes.",
+    "C5_PACKAGE": "ARTIFACT_PRESENT_NOT_RELEASED: exact-SHA package uploaded before cancellation; no runtime packaging promotion.",
+    "C6_RESULT": "PARTIAL_CI_BLOCKED: durable checkpoint records exact gate and no runtime/score promotion."
+  },
+  "ci_runs": {
+    "dx9ex_active": 37744112495,
+    "hud_inspector": 37744112567,
+    "domain_isolation": 37744112562,
+    "full_source_impact": 37744112450
+  },
+  "ci_observed": {
+    "policy": "SUCCESS",
+    "game": "SUCCESS",
+    "host": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "CANCELLED_AFTER_UPLOAD_STEP_SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "supplemental_full_source": "SUCCESS"
+  },
+  "exact_sha_validation": {
+    "material_sha": "7fa41fa1052e5330e728ad5f435140e91549d46c",
+    "active_run_id": 37744112495,
+    "active_result": "cancelled",
+    "package_job_id": 113203092892,
+    "rerun_deferred": "Do not cancel concurrent active exact-SHA run 37745084656"
+  },
+  "package_artifact": {
+    "id": 11535258144,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-7fa41fa1052e5330e728ad5f435140e91549d46c",
+    "size_bytes": 2750069
+  },
+  "policy": {
+    "repeat_1000_5000": false,
+    "dxvk": "FROZEN",
+    "dx11": "PARALLEL_BY_SEPARATE_WORKER"
+  },
+  "score_status": "NO_NEW_AI2_AWARD: previous confirmed cumulative 1222, retry +0, cumulative 1222",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED, 00519 user Quest3/VDXR visual FAIL stays open; no headset visuals certified.",
+  "next_action": "After ongoing DX9Ex Active Validation work quiesces and concurrency is safe, complete exact-SHA gate for 7fa41fa (rerun original cancelled job if supported without cancelling another run), confirm complete GitHub conclusion, then update this record from PARTIAL to COMPLETE and award score only once if all success conditions hold. Otherwise keep partial and advance independently in new TASK_ID.",
+  "recorded_at_utc": "2026-10-08T07:44:54.811Z"
+}

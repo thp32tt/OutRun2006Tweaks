@@ -1,0 +1,97 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00818",
+  "production_id": "CONVERSION-DX9EX-00818",
+  "event_id": "CONVERSION-DX9EX-00818-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:GOAL_PROGRESS",
+  "status": "IMPLEMENTED_PENDING_CI_WHOLE_GOAL_FOLLOWUP",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 0,
+  "base_sha": "0d6b57f1a9ef20e9430f88e0d97cbf94e4fe25ac",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00818]",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "goal": "Protect original GOAL animated percentage and independent title/time glyph producers through direct Draw and SpriteNode queue without affecting final results.",
+    "scope_boundary": "Only 0x97BE4/0x97DEC and 0xBEA5A/0xBEA5F GOAL parents; 19 unsafe result-text B9200 return detours stay disabled.",
+    "acceptance_items": [
+      {
+        "id": "GOAL_IMMEDIATE_PERCENT_TIME",
+        "category": "end_to_end_behavior",
+        "behavior_area": "immediate_percentage_and_two_time_helper_glyph_parents",
+        "expected_behavior": "Progress direct glyph and distinct GOAL title/time keep ScreenHud exact provenance, regardless of prior armed world Draw."
+      },
+      {
+        "id": "GOAL_QUEUE_WORLD_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "deferred_queue_world_cursor_and_original_results",
+        "expected_behavior": "All new GOAL queue siblings keep ScreenHud, active world queue overrides nested helper, pending Draw and original result calls preserved."
+      },
+      {
+        "id": "GOAL_FULL_WIN32_AND_RESULT_TEXT",
+        "category": "integrated_validation",
+        "behavior_area": "full_win32_source_domain_and_result_text",
+        "expected_behavior": "Exact SHA host/game/package and Domain+Impact gates pass, then safely scope all 19 original B9200 text parents with verified ABI (never crash-prone post-CALL midhooks)."
+      }
+    ],
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "trace_stages": [
+      "Original 0x97BE4/0x97DEC animated progress calls and 0xBEA5A/0xBEA5F goal title/time E8 parents",
+      "Direct ScreenHud glyph rasterization and newly enqueued SpriteNode children with separate producer tokens",
+      "R30 fixedfn/VS Draw per-eye classification and OpenXR host composition, preserving world and pending queue ownership"
+    ],
+    "subcomponents": [
+      "Immediate 0-99 progress percent plus both independent original GOAL title/time glyph parents",
+      "Deferred sibling SpriteNode semantic tagging and nested world queue fallback after original producer returns",
+      "Separate nineteen B9200 record result text parents held for verified crash-safe ABI, not falsely declared complete"
+    ]
+  },
+  "acceptance_results": {
+    "GOAL_IMMEDIATE_PERCENT_TIME": "PENDING_CI",
+    "GOAL_QUEUE_WORLD_FALLBACK": "PENDING_CI",
+    "GOAL_FULL_WIN32_AND_RESULT_TEXT": "PENDING_CI_AND_ABI_FOLLOWUP"
+  },
+  "diagnosis": {
+    "original_evidence": "User GOAL 0–99 text double/headlock, original two 0x2D200 progress parents and two exact helper E8s; 19 B9200 result-text parents have known crash when post-CALL midhooked.",
+    "root_cause": "GOAL progress and time helpers defaulted to ScopedExactProducerSemantic(ScreenHud) without pending Draw isolation or immediate producer token, allowing an earlier scene/world pending Draw to steal the current synchronous glyph while post-call nodes receive explicit ScreenHud.",
+    "alternatives_rejected": [
+      "Unconditional global HUD promotion would regress rank/world and F11.",
+      "Duplicate GOAL helper suppression would remove original distinct screen components.",
+      "Reinstalling 19 result-text rva+5 midhooks repeats known EXE+0x97C5F/0x97E75 crashes."
+    ],
+    "trace": [
+      "Original E8 to progress 0x2D200 and time helpers 0xBE020/0xBE150",
+      "ScopedExactProducerSemantic before immediate glyph Draw; TagAppendedNodes for deferred children",
+      "R30 per-eye fixedfn/VS Draw, Sumo replay and host composition left unchanged"
+    ],
+    "failed_gate": "DX9Ex Active run 38501883000 policy: missing symptom_id/trace_stages/subcomponents in feature_contract; cp1252 diagnostic emitted UnicodeEncodeError before reporting errors",
+    "retry_repair": "Align E003 nonterminal GOAL producer work contract to registered symptom and 3-stage/two-subcomponent validation, fix codepage-safe diagnostic and add Windows cp1252 regression assertions.",
+    "second_failed_gate": "DX9Ex Active run 38502219943: verify_vr_producer_provenance.py global first-encounter 'nullptr, true,' mutated earlier GOAL block instead of StageExtensionEnter, falsely escaping +TIME mutation",
+    "second_retry_repair": "Generate +TIME negative mutants against exact StageExtensionEnter or StageExtensionLeave function body so GOAL prior markers cannot alias mutation; source checks still fail for real mutated +TIME.",
+    "third_failed_gate": "DX9Ex Active run 38502407276: visual composition negative test replaced first global ProducerToken::ResultProgress (new direct glyph owner), leaving deferred result parent intact; false pass on intentional corruption",
+    "third_retry_repair": "Restrict result/GOAL parent negative mutants to ResultProgressLeave and GoalTime_TagHelper exact body, preserving unrelated immediate producer and proving queue-token regression would be caught"
+  },
+  "changed_files": [
+    "tools/verify_vr_producer_provenance.py",
+    "src/hooks_uiscaling.cpp",
+    "vrhost/CMakeLists.txt",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "vrhost/tests/goal_progress_owner_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00818.json",
+    "tools/verify_vr_feature_unit_policy.py",
+    "tools/test_vr_feature_unit_policy.py",
+    "tools/verify_vr_visual_composition_p0.py"
+  ],
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "runtime_gate": "Quest3/VDXR matching exact package GOAL 0–99 and time/title legibility, stock race result/GOAL/World preserved; NOT TESTED.",
+  "next_work": "Complete distinct B9200 GOAL text 19 caller ownership with verified call ABI and crash-safe replacements; full feature and HMD optical acceptance remain open."
+}

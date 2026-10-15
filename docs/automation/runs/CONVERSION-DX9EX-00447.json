@@ -1,0 +1,114 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00447",
+  "production_id": "CONVERSION-DX9EX-00447",
+  "event_id": "CONVERSION-DX9EX-00447-E002",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "408bdf2533ea45e31fb0c15fe30b341df10b500a",
+  "source_material_sha": "4f09b517f01145a64f412c1c56b5523d302cca9d",
+  "material_result_sha": "212311d5a341d116627bd3dfe2886cab0305a1a4",
+  "validation_bearing_result_sha": "212311d5a341d116627bd3dfe2886cab0305a1a4",
+  "result_sha": "212311d5a341d116627bd3dfe2886cab0305a1a4",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00447]",
+  "selected_work_item": "VR-DX9EX-RECENTER-IPC-PUBLISH-COHERENCY-0030",
+  "summary": "Publish recenter IPC request identity using a zero-PID in-progress sentinel so host polling does not consume a request while the game is publishing a new requester identity.",
+  "changed_paths": [
+    "src/vr/ipc/recenter_request.hpp",
+    "tools/verify_vr_recenter_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00447.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered 00446 bookkeeping HEAD 408bdf2533ea45e31fb0c15fe30b341df10b500a; structural extraction terminal."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Found requesterPid-before-requestId publication window that could expose mixed old request/new PID identity across process restart."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Publish sets requesterPid=0, advances requestId, then publishes PID; Pending rejects zero sentinel."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Two deterministic verifier false negatives repaired within task. Final exact SHA passed policy/game/host/full-chain/package and Domain Isolation."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "4f09b517f01145a64f412c1c56b5523d302cca9d fix(vr): publish recenter request identity coherently [AUTO:CONVERSION-DX9EX-00447]",
+        "2e23eb3fa5e940e9ffbda8f9971ab584e2787691 test(vr): fix recenter publication order verifier [AUTO:CONVERSION-DX9EX-00447]",
+        "212311d5a341d116627bd3dfe2886cab0305a1a4 test(vr): scope recenter sentinel verifier [AUTO:CONVERSION-DX9EX-00447]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Package artifact 11385055712 digest sha256:e205de279ccaaa1e844c9b0f2b3ae095368c3b25da548655a62cec6e6c6a68b3; CI evidence only."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 6007543673
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "validation_attempts": [
+      {
+        "exact_sha": "4f09b517f01145a64f412c1c56b5523d302cca9d",
+        "run_id": 37399335414,
+        "result": "FAIL",
+        "reason": "Verifier order matcher included repeated markers and reported a false negative before compile jobs."
+      },
+      {
+        "exact_sha": "2e23eb3fa5e940e9ffbda8f9971ab584e2787691",
+        "run_id": 37399417685,
+        "result": "FAIL",
+        "reason": "Verifier matched an earlier return false in Pending instead of the sentinel branch."
+      },
+      {
+        "exact_sha": "212311d5a341d116627bd3dfe2886cab0305a1a4",
+        "run_id": 37399517000,
+        "result": "PASS",
+        "reason": "All required DX9Ex jobs succeeded."
+      }
+    ],
+    "dx9ex_active": {
+      "run_id": 37399517000,
+      "conclusion": "success",
+      "exact_sha": "212311d5a341d116627bd3dfe2886cab0305a1a4",
+      "jobs": {
+        "policy": 112063320862,
+        "game": 112063429145,
+        "host": 112063429170,
+        "full_chain_compile": 112063429346,
+        "package": 112064711480
+      },
+      "package_artifact_id": 11385055712,
+      "package_artifact_digest": "sha256:e205de279ccaaa1e844c9b0f2b3ae095368c3b25da548655a62cec6e6c6a68b3"
+    },
+    "domain_isolation": {
+      "run_id": 37399516939,
+      "conclusion": "success",
+      "exact_sha": "212311d5a341d116627bd3dfe2886cab0305a1a4"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Review recenter IPC Pending snapshot stability across concurrent publication; structural extraction remains terminal.",
+  "completed_at_kst": "2026-10-06T10:36:00+09:00"
+}

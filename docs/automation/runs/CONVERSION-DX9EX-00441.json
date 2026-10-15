@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00441",
+  "production_id": "CONVERSION-DX9EX-00441",
+  "event_id": "CONVERSION-DX9EX-00441-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "c707d57432fa71351ea622aaa3bdae0e3dd82d92",
+  "material_result_sha": "776b07b71036894eb926a9b9fa0d6216f4d55871",
+  "validation_bearing_result_sha": "776b07b71036894eb926a9b9fa0d6216f4d55871",
+  "result_sha": "776b07b71036894eb926a9b9fa0d6216f4d55871",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00441]",
+  "selected_work_item": "VR-DX9EX-R23-BUNDLE-CURRENT-RUN-IDENTITY-0024",
+  "summary": "Require R23 verified bundle fresh reads to belong to the currently published producer run.",
+  "changed_paths": [
+    "vrhost/src/runtime/r23_verified_bundle.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00441.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered 00440 bookkeeping HEAD c707d57432fa71351ea622aaa3bdae0e3dd82d92; structural extraction chain remains terminal."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Verified bundle freshness was bounded by age/internal frame-pose-QPC consistency but not current producer run, allowing a host-surviving restart to retain prior-run authority temporarily."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "776b07b71036894eb926a9b9fa0d6216f4d55871 adds BelongsToCurrentProducerRun and composes it into ReadFresh, preserving same-run grace while failing closed across runGeneration/gamePid changes."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "DX9Ex Active Validation 37393165781 and Domain Isolation Guard 37393165232 both SUCCESS."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "776b07b71036894eb926a9b9fa0d6216f4d55871 fix(vr): scope verified bundle to game run [AUTO:CONVERSION-DX9EX-00441]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Artifact 11381948846 digest sha256:923bed8b04636db97ff3f986fc42afcb4db5d235b7aeedd2e0222932d917ac4f; CI evidence only."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 6006389292
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37393165781,
+      "conclusion": "success",
+      "exact_sha": "776b07b71036894eb926a9b9fa0d6216f4d55871",
+      "jobs": {
+        "policy": 112042783001,
+        "full_chain_compile": 112042870120,
+        "game": 112042870148,
+        "host": 112042870199,
+        "package": 112044357051
+      },
+      "package_artifact_id": 11381948846,
+      "package_artifact_digest": "sha256:923bed8b04636db97ff3f986fc42afcb4db5d235b7aeedd2e0222932d917ac4f"
+    },
+    "domain_isolation": {
+      "run_id": 37393165232,
+      "conclusion": "success",
+      "exact_sha": "776b07b71036894eb926a9b9fa0d6216f4d55871"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Continue from the latest bookkeeping HEAD with the next independent fallback/source-provenance stability unit.",
+  "completed_at_kst": "2026-10-06T09:23:00+09:00"
+}

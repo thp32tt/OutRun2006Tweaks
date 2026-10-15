@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-R84-R32-RT-DS-HOOK-OWNER-20261009",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "material_result_sha": "1f100d8c5b7f19ea8a52b173e52b6baa54116ef7",
+  "validation_bearing_result_sha": "1f100d8c5b7f19ea8a52b173e52b6baa54116ef7",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "change": "Preserved original RT/DS trampoline and D3D9 fallback behind R30 explicit lower API with seven negative regressions.",
+  "ci": {
+    "active_run_id": 37920527590,
+    "domain_run_id": 37920527605,
+    "result": "SUCCESS",
+    "jobs": {
+      "policy": 113787085226,
+      "full-chain-compile": 113787230201,
+      "host": 113787230256,
+      "game": 113787230276,
+      "package": 113788904137
+    }
+  },
+  "artifact": {
+    "id": 11612600875,
+    "digest": "sha256:0d1959957d290215c8748c050c78f5ea0a6d6cceaa388c84e4adeec57d79646d"
+  },
+  "runtime_test_performed": false,
+  "next_action": "Continue distinct raw Draw/Present R32 owner seam. Independent R32/R31 compilation still blocked."
+}

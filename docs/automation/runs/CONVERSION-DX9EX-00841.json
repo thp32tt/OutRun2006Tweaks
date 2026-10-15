@@ -1,0 +1,49 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00841",
+  "production_id": "CONVERSION-DX9EX-00841",
+  "event_type": "c6_result_only",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "material_result_sha": "60da385f2bf26f5111c76d644290b43016b58ec2",
+  "validation_bearing_result_sha": "60da385f2bf26f5111c76d644290b43016b58ec2",
+  "result_sha": "60da385f2bf26f5111c76d644290b43016b58ec2",
+  "feature_contract": null,
+  "acceptance_results": {},
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "tools/verify_vr_f11_font_density.py"
+  ],
+  "ci_evidence": {
+    "exact_sha": {
+      "source_sha": "60da385f2bf26f5111c76d644290b43016b58ec2",
+      "conclusion": "SUCCESS",
+      "provenance": "user_confirmed_existing_GitHub_CI",
+      "rerun_performed": false
+    }
+  },
+  "hold_reason": "RUN_RECORD_NOT_FOUND",
+  "record_recovery": {
+    "source": "validation SHA commit and user-provided CI outcome",
+    "material_sha_basis": "validation SHA contains original R23 source change and verifier regression",
+    "previous_run_record": "NOT_FOUND on target branch, validation SHA and repository default branch",
+    "prior_feature_contract_and_acceptance_results": "UNAVAILABLE_NOT_RECONSTRUCTED",
+    "original_source_modified": false,
+    "build_or_ci_rerun": false
+  },
+  "duplication_guard": {
+    "task_id": "CONVERSION-DX9EX-00841",
+    "run_key": "CONVERSION-DX9EX-00841",
+    "score_once": true,
+    "c6_bookkeeping_only": true,
+    "do_not_reaward": true
+  },
+  "score_delta": 0,
+  "c6_score_delta": 0
+}

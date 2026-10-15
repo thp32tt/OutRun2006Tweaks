@@ -1,0 +1,1076 @@
+name: DX9Ex Active Validation
+
+# Canonical EXE gate: strict pinned identity/signatures; DISCOVER is never an integration pass.
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - vr-d3d9ex-focus
+  push:
+    branches:
+      - vr-d3d9ex-focus
+      - 'vr-d3d9ex-candidate/**'
+    paths:
+      - 'src/**'
+      - 'external/imgui' # Pinned ImGui DX9 F11 runtime code is compiled into the game.
+      - '.gitmodules' # Whole-source changes can affect VR runtime, reset, input and frame pacing.
+      - 'src/hooks_framerate.cpp'
+      - 'src/hooks_bugfixes.cpp'
+      - 'src/hooks_drawdistance.cpp'
+      - 'src/hooks_input.cpp'
+      - 'tools/verify_vr_win32_cross_domain_safety.py'
+      - 'src/hooks_uiscaling.cpp'
+      - 'src/interpolation.cpp'
+      - 'src/hooks_graphics.cpp'
+      - 'src/hooks_exceptions.cpp'
+      - 'src/hooks_textures.cpp'
+      - 'vrhost/**'
+      - 'tools/Start-OutRunVRPacing.ps1'
+      - 'tools/Collect-OutRunVRFramePacing.ps1'
+      - 'tools/Collect-OutRunVREyeExtent.ps1'
+      - 'CMakeLists.txt'
+      - 'cmake.toml'
+      - 'OutRun2006Tweaks.ini'
+      - 'OutRun2006Tweaks.lods.ini'
+      - 'docs/VR_REGRESSION_KNOWLEDGE.json'
+      - 'docs/VR_AUTODEV_PROTOCOL.md'
+      - 'docs/VR_AUTODEV_STATE.json'
+      - 'docs/DX9EX_AUTODEV_PRIORITY_20261010.md' # Actual P0/P1 authority; policy guard must re-run on updates.
+      - 'tools/verify_vr_feature_unit_policy.py'
+      - 'tools/test_vr_feature_unit_policy.py'
+      - 'tools/dx9ex_function_dispatch.py'
+      - 'tools/test_dx9ex_function_dispatch.py'
+      - 'docs/automation/DX9EX_FEATURE_UNIT_POLICY.json'
+      - 'docs/automation/runs/CONVERSION-DX9EX-*.json' # Required per-task feature-unit input must trigger exact-SHA gates.
+      - 'tools/OutRunVR-TestProfiles.ps1'
+      - 'tools/OutRunVR-GPU-Lab.ps1'
+      - 'tools/OutRunVR-GPU-Lab.cmd'
+      - 'tools/OutRunVR-GPU-Lab-Settings.ps1'
+      - 'tools/Test-OutRunVRGpuLab.ps1'
+      - 'tools/Test-OutRunVRTestPolicy.ps1'
+      - 'docs/VR_PROBLEM_HISTORY.md'
+      - 'docs/VR_BINARY_CONTRACT.json'
+      - 'docs/VR_CRASH_SIGNATURES.json'
+      - 'tools/verify_vr_binary_contract.py'
+      - 'tools/verify_vr_architecture.py'
+      - 'tools/verify_vr_r51_runtime_contract.py'
+      - 'tools/verify_vr_r32_review.py'
+      - 'tools/verify_vr_nearplane_active_gate.py'
+      - 'tools/verify_vr_hook_graph.py'
+      - 'tools/verify_vr_refactor_contract.py'
+      - 'tools/verify_vr_r84_focus_inventory.py'
+      - 'tools/verify_dx9ex_r84_mainline.py'
+      - 'tools/verify_dx9ex_r84_lens_source.py'
+      - 'tools/verify_dx9ex_r84_log_identity.py'
+      - 'tools/Collect-OutRunVRLogs.ps1'
+      - 'tools/verify_vr_r29_effect_cache_generation.py'
+      - 'tools/verify_vr_r29_depth_off_probe_fastpath.py'
+      - 'tools/verify_vr_r29_stencil_write_fastpath.py'
+      - 'tools/verify_vr_r29_wvp_envelope_fastpath.py'
+      - 'tools/verify_vr_r29_owner_api_seam.py' # R29 owner fastpath must trigger exact-SHA gate.
+      - 'tools/verify_vr_r29_pose_sequence_fastpath.py'
+      - 'tools/verify_vr_r13_effect_state_read_fastpath.py'
+      - 'tools/verify_vr_r13_ack_fence_fastpath.py'
+      - 'tools/verify_vr_r7_direct_fence_poll.py'
+      - 'tools/verify_vr_r27_effect_fastpath.py'
+      - 'tools/verify_vr_r27_shadow_occlusion_fastpath.py'
+      - 'tools/verify_vr_r21_host_clock_fastpath.py'
+      - 'tools/verify_vr_r23_host_fresh_fastpath.py'
+      - 'tools/verify_vr_qpc_freshness.py'
+      - 'tools/verify_vr_r23_pipeline_aggregation_fastpath.py'
+      - 'tools/verify_vr_r23_direct_ring_read_fastpath.py'
+      - 'tools/verify_vr_r23_shared_eye_cache.py'
+      - 'tools/verify_vr_r23_pixel_probe_optin.py'
+      - 'tools/verify_vr_r23_seeded_clear_fastpath.py'
+      - 'tools/verify_vr_r23_raster_setrt_fastpath.py'
+      - 'tools/verify_vr_r23_stencil_clear_batch.py'
+      - 'tools/verify_vr_gpu_water_profiler.py'
+      - 'src/vr/d3d9/gpu_water_profiler.hpp'
+      - 'tools/verify_vr_r7_stencil_format_cache.py'
+      - 'tools/verify_vr_r32_shadow_fallback_fastpath.py'
+      - 'tools/verify_vr_r32_lazy_source_snapshot.py'
+      - 'tools/verify_vr_r30_support_api_seam.py'
+      - 'tools/verify_vr_r30_eye_affine_fastpath.py'
+      - 'tools/verify_vr_r30_positiont_decl.py'
+      - 'tools/verify_vr_r30_projection_signature_fastpath.py'
+      - 'tools/verify_vr_r30_rhw_perspective_fastpath.py'
+      - 'tools/verify_vr_r30_world_seed_fastpath.py'
+      - 'tools/verify_vr_r30_sparse_population_fastpath.py'
+      - 'tools/verify_vr_r30_hud_sparse_visit.py'
+      - 'tools/verify_vr_r30_depth_signature_memo.py'
+      - 'tools/verify_vr_r30_sparse_depth_classifier.py'
+      - 'tools/verify_vr_r30_world_affine_dual_eye.py'
+      - 'tools/verify_vr_r30_eye_tail_hotpath.py'
+      - 'tools/verify_vr_r30_viewport_reciprocal_hotpath.py'
+      - 'tools/verify_vr_r30_flat_effect_geometry_fastpath.py'
+      - 'tools/verify_vr_r30_hud_contain_draw_fastpath.py'
+      - 'tools/verify_vr_r30_responsive_hud_anchor.py'
+      - 'tools/verify_vr_hud_edge_transition.py'
+      - 'src/vr/d3d9/hud_edge_transition.hpp'
+      - 'vrhost/tests/hud_edge_transition_smoke.cpp'
+      - 'tools/verify_vr_pause_menu_eye_affine.py'
+      - 'src/vr/d3d9/pause_menu_eye_affine.hpp'
+      - 'vrhost/tests/pause_menu_eye_affine_smoke.cpp'
+      - 'tools/verify_vr_r30_hud_present_cache.py'
+      - 'tools/verify_vr_r30_cached_raster_hotpath.py'
+      - 'tools/verify_vr_r30_frame_snapshot_fastpath.py'
+      - 'tools/verify_vr_r30_shadow_descriptor_fastpath.py'
+      - 'tools/verify_vr_r30_shadow_two_way_lookup.py'
+      - 'tools/verify_vr_start_shadow_world_owner.py'
+      - 'tools/verify_vr_r30_index_rebase_fastpath.py'
+      - 'tools/verify_vr_r30_shadow_incremental_copy.py'
+      - 'tools/verify_vr_r30_buffer_hook_install_fastpath.py'
+      - 'tools/verify_vr_r30_telemetry_counter_optout.py'
+      - 'tools/verify_vr_r30_skyglow_fastpath.py'
+      - 'tools/verify_vr_skyglow_capture_boundary.py'
+      - 'tools/verify_dx9ex_hotpath_overhead.py'
+      - 'tools/verify_dx9ex_gpu_visual_20261014.py'
+      - 'tools/verify_vr_r32_runtime_support_seam.py'
+      - 'tools/verify_vr_r31_support_api_seam.py'
+      - 'tools/verify_vr_r31_eye_tail_cache.py'
+      - 'tools/verify_vr_r31_world_wvp_cache.py'
+      - 'tools/verify_vr_policy_alignment.py'
+      - 'tools/verify_vr_r31_live_wvp_consistency.py'
+      - 'tools/verify_vr_r31_window_telemetry.py'
+      - 'tools/verify_vr_r31_r32_telemetry_hotpath.py'
+      - 'tools/verify_vr_r31_r32_off_counters.py'
+      - 'tools/verify_vr_r32_spike_log_backpressure.py'
+      - 'tools/verify_vr_r32_perf_optout_fastpath.py'
+      - 'tools/verify_vr_helper_probe_host_identity.py'
+      - 'tools/verify_vr_ffb_controller_routing.py'
+      - 'tools/verify_vr_ffb_release_ini_contract.py'
+      - 'tools/verify_vr_r32_r31_tu_split.py'
+      - 'tools/verify_vr_r32_review_api_seam.py'
+      - 'tools/verify_vr_r33_r32_tu_split.py'
+      - 'tools/verify_vr_r33_single_classification.py'
+      - 'tools/verify_vr_r33_mono_bypass_xyzrhw_fastpath.py'
+      - 'tools/verify_vr_r33_telemetry_draw_hotpath.py'
+      - 'tools/verify_vr_r33_latched_pose_view.py'
+      - 'tools/verify_vr_r33_stencil_snapshot_fastpath.py' # Exact-SHA R33 policy re-runs on test repairs.
+      - 'tools/verify_vr_r32_depthless_right_pass_fastpath.py'
+      - 'tools/verify_vr_r30_depthless_right_pass_fastpath.py'
+      - 'tools/verify_vr_stereo_restore_publication.py'
+      - 'tools/verify_vr_r33_full_target_viewport.py'
+      - 'tools/verify_dx9ex_dense_scene_perf.py'
+      - 'tools/verify_vr_r29_borrowed_surface_fastpath.py'
+      - 'tools/verify_vr_state_block_resync_fastpath.py'
+      - 'tools/verify_vr_r22_scissor_restore_fastpath.py'
+      - 'src/vr/core/r30_support_api.hpp'
+      - 'src/vr/core/r31_support_api.hpp'
+      - 'src/vr/core/r32_review_api.hpp'
+      - 'docs/automation/r84-port/**'
+      - 'tools/verify_vr_sumo_replay_semantics.py'
+      - 'tools/verify_vr_hud_cadence_restore.py'
+      - 'tools/verify_vr_ui_matrix_safety.py'
+      - 'tools/verify_vr_menu_letterbox_aspect.py'
+      - 'tools/verify_vr_f11_font_density.py'
+      - 'src/overlay/overlay_toggle_frame.hpp'
+      - 'tools/verify_vr_f11_toggle_frame.py'
+      - 'tools/verify_vr_f11_wndproc_shell.py'
+      - 'src/overlay/f11_input_routing.hpp'
+      - 'tools/verify_vr_custom_sprite_descriptor.py'
+      - 'tools/verify_vr_producer_provenance.py'
+      - 'vrhost/tests/stage_extension_direct_owner_smoke.cpp'
+      - 'vrhost/tests/r30_indexed_up_bounds_smoke.cpp'
+      - 'src/vr/d3d9/r30_indexed_up_bounds.hpp'
+      - 'src/vr/d3d9/r30_shadow_ranges.hpp'
+      - 'vrhost/tests/goal_progress_owner_smoke.cpp'
+      - 'tools/verify_vr_cross_thread_semantic_registry.py'
+      - 'tools/verify_vr_projected_marker_anchor.py'
+      - 'tools/verify_vr_projected_marker_telemetry.py'
+      - 'tools/verify_vr_visual_composition_p0.py'
+      - 'tools/verify_vr_stage_extension_d3dx_batch_owner.py'
+      - 'tools/audit_vr_result_full_source.py'
+      - 'tools/verify_vr_hud_dds_loader.py'
+      - 'tools/verify_vr_texture_scene_contract.py'
+      - 'tools/verify_vr_texture_cache_lifetime.py'
+      - 'tools/verify_vr_hud_exact_callsite_contract.py'
+      - 'tools/verify_vr_r31_r32_retirement_guard.py'
+      - 'tools/verify_vr_recenter_contract.py'
+      - 'tools/verify_vr_recenter_publication_snapshot.py'
+      - 'tools/verify_vr_dx9ex_reset_transport_contract.py'
+      - 'tools/verify_vr_session_direct_hold_lifetime.py'
+      - 'tools/verify_vr_direct_hold_desc_fastpath.py'
+      - 'tools/verify_vr_r32_shared_descriptor_cache.py'
+      - 'tools/verify_vr_capture_metadata_fastpath.py'
+      - 'tools/verify_vr_r28_active_frame_pacing.py'
+      - 'tools/verify_vr_r26_occlusion_present_fastpath.py'
+      - 'tools/verify_vr_desktop_capture_reuse.py'
+      - 'tools/verify_vr_theater_capture_once.py'
+      - 'vrhost/src/runtime/theater_capture_reuse.hpp'
+      - 'tools/verify_vr_final_submission_contract.py'
+      - 'docs/VR_REFACTOR_STATE.json'
+      - 'tools/Test-VRRegressionKnowledge.ps1'
+      - 'tools/Select-OutRunVRBackend.ps1'
+      - 'tools/Run-OutRunVRTest.ps1'
+      - 'tools/Collect-OutRunVRLogs.ps1'
+      - 'tools/Analyze-OutRunVRSession.ps1'
+      - 'tools/Test-OutRunVRAnalysisContract.ps1'
+      - 'tools/OutRunVR-Slot-Selector.ps1'
+      - 'tools/verify_vr_dx9ex_launch_paths.py'
+      - 'tools/Test-VRDXVKBackendContract.ps1'
+      - '.github/workflows/outrun-exe-hud-inspector.yml'
+      - '.github/workflows/vr-dx9ex-active.yml'
+      - '.github/workflows/vr-openxr.yml'
+      - '.github/workflows/vr-unified-backends.yml'
+      - '.github/workflows/dx9ex-fullsource-impact-review.yml'
+      - '.github/workflows/outrun-exe-hud-inspector.yml'
+      - 'docs/DX9EX_R84_MAINLINE_CONTRACT.md'
+
+concurrency:
+  group: vr-dx9ex-active-${{ github.ref_name }}
+  # Preserve an already-running exact-SHA Win32 gate on independent commits.
+  # GitHub keeps at most one successor pending in this branch group.
+  cancel-in-progress: false
+
+jobs:
+  policy:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enforce feature-sized DX9Ex autonomous completion
+        shell: pwsh
+        run: |
+          python tools/test_vr_feature_unit_policy.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex feature contract tests failed' }
+          python tools/test_dx9ex_function_dispatch.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex dispatcher tests failed' }
+          python tools/verify_vr_feature_unit_policy.py --check-head
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex exact-HEAD feature record missing or invalid' }
+          python tools/verify_vr_hud_edge_transition.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex HUD edge contract failed' }
+          python tools/verify_vr_r30_positiont_decl.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex R30 POSITIONT input regression failed' }
+          python tools/verify_vr_stage_extension_d3dx_batch_owner.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex +TIME D3DX batch isolation failed' }
+          python tools/verify_vr_skyglow_capture_boundary.py
+          if ($LASTEXITCODE -ne 0) { throw 'DX9Ex R26+HUD world/SkyGlow cutoff regression failed' }
+      - name: Reject broken shipped PowerShell helpers and false HUD reports
+        shell: pwsh
+        run: |
+          $scripts = @(
+            'tools/OutRunVR-Slot-Selector.ps1',
+            'tools/Select-OutRunVRBackend.ps1',
+            'tools/Run-OutRunVRTest.ps1',
+            'tools/Collect-OutRunVRLogs.ps1',
+            'tools/Analyze-OutRunVRSession.ps1',
+            'tools/Test-OutRunVRAnalysisContract.ps1'
+          )
+          foreach ($script in $scripts) {
+            $tokens=$null
+            $errors=$null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path $script), [ref]$tokens, [ref]$errors)
+            if ($errors.Count -gt 0) {
+              $errors | ForEach-Object {
+                Write-Host ("{0}:{1}: {2}" -f $script,
+                  $_.Extent.StartLineNumber, $_.Message)
+              }
+              throw "Packaged PowerShell script is syntactically invalid: $script"
+            }
+          }
+          & ./tools/Test-OutRunVRAnalysisContract.ps1
+      - name: Verify separate GPU lab GUI and A/B override semantics
+        shell: pwsh
+        run: ./tools/Test-OutRunVRGpuLab.ps1
+      - name: Verify runtime-test minimization policy
+        shell: pwsh
+        run: ./tools/Test-OutRunVRTestPolicy.ps1
+      - name: Verify durable regression knowledge
+        shell: pwsh
+        run: ./tools/Test-VRRegressionKnowledge.ps1
+      - name: Verify DXVK selector/backend identity contract
+        shell: pwsh
+        run: ./tools/Test-VRDXVKBackendContract.ps1
+      - name: Verify canonical original-mod EXE binary contract
+        shell: pwsh
+        run: |
+          $contract = Get-Content docs/VR_BINARY_CONTRACT.json -Raw | ConvertFrom-Json
+          $exe = Join-Path $env:RUNNER_TEMP 'OR2006C2C.EXE'
+          Invoke-WebRequest -Uri $contract.canonicalExe.sourceUrl -OutFile $exe
+          python -m pip install --disable-pip-version-check --quiet capstone
+          python tools/verify_vr_binary_contract.py --exe $exe --manifest docs/VR_BINARY_CONTRACT.json --source-root .
+      - name: Verify reconstructed VR architecture boundaries
+        shell: pwsh
+        run: |
+          $verifiers = @(
+            'tools/verify_vr_architecture.py',
+            'tools/verify_vr_r51_runtime_contract.py',
+            'tools/verify_vr_r32_review.py',
+            'tools/verify_vr_hook_graph.py',
+            'tools/verify_vr_refactor_contract.py',
+            'tools/verify_vr_r84_focus_inventory.py',
+            'tools/verify_vr_r29_owner_api_seam.py',
+            'tools/verify_vr_r29_pose_sequence_fastpath.py',
+            'tools/verify_vr_r84_feature_bundle.py',
+            'tools/verify_vr_r29_effect_cache_generation.py',
+            'tools/verify_vr_r29_depth_off_probe_fastpath.py',
+            'tools/verify_vr_r29_stencil_write_fastpath.py',
+            'tools/verify_vr_r29_wvp_envelope_fastpath.py',
+            'tools/verify_vr_r13_effect_state_read_fastpath.py',
+            'tools/verify_vr_r13_ack_fence_fastpath.py',
+            'tools/verify_vr_r7_direct_fence_poll.py',
+            'tools/verify_vr_r27_effect_fastpath.py',
+            'tools/verify_vr_r27_shadow_occlusion_fastpath.py',
+            'tools/verify_vr_r23_host_fresh_fastpath.py',
+            'tools/verify_vr_qpc_freshness.py',
+            'tools/verify_vr_r23_pipeline_aggregation_fastpath.py',
+            'tools/verify_vr_r23_direct_ring_read_fastpath.py',
+            'tools/verify_vr_r23_shared_eye_cache.py',
+            'tools/verify_vr_r23_pixel_probe_optin.py',
+            'tools/verify_vr_r23_seeded_clear_fastpath.py',
+            'tools/verify_vr_r23_raster_setrt_fastpath.py',
+            'tools/verify_vr_r23_stencil_clear_batch.py',
+            'tools/verify_vr_gpu_water_profiler.py',
+            'tools/verify_vr_r7_stencil_format_cache.py',
+            'tools/verify_vr_r32_shadow_fallback_fastpath.py',
+            'tools/verify_vr_r32_lazy_source_snapshot.py',
+            'tools/verify_vr_r30_support_api_seam.py',
+            'tools/verify_vr_r30_eye_affine_fastpath.py',
+            'tools/verify_vr_r30_projection_signature_fastpath.py',
+            'tools/verify_vr_r30_rhw_perspective_fastpath.py',
+            'tools/verify_vr_r30_world_seed_fastpath.py',
+            'tools/verify_vr_r30_sparse_population_fastpath.py',
+            'tools/verify_vr_r30_hud_sparse_visit.py',
+            'tools/verify_vr_r30_depth_signature_memo.py',
+            'tools/verify_vr_r30_sparse_depth_classifier.py',
+            'tools/verify_vr_r30_world_affine_dual_eye.py',
+            'tools/verify_vr_r30_eye_tail_hotpath.py',
+            'tools/verify_vr_r30_viewport_reciprocal_hotpath.py',
+            'tools/verify_vr_r30_flat_effect_geometry_fastpath.py',
+            'tools/verify_vr_r30_hud_contain_draw_fastpath.py',
+            'tools/verify_vr_r30_responsive_hud_anchor.py',
+            'tools/verify_vr_pause_menu_eye_affine.py',
+            'tools/verify_vr_r30_hud_present_cache.py',
+            'tools/verify_vr_r30_cached_raster_hotpath.py',
+            'tools/verify_vr_r30_frame_snapshot_fastpath.py',
+            'tools/verify_vr_r30_shadow_descriptor_fastpath.py',
+            'tools/verify_vr_r30_shadow_two_way_lookup.py',
+            'tools/verify_vr_start_shadow_world_owner.py',
+            'tools/verify_vr_r30_index_rebase_fastpath.py',
+            'tools/verify_vr_r30_shadow_incremental_copy.py',
+            'tools/verify_vr_r30_buffer_hook_install_fastpath.py',
+            'tools/verify_vr_r30_telemetry_counter_optout.py',
+            'tools/verify_vr_r30_skyglow_fastpath.py',
+            'tools/verify_dx9ex_hotpath_overhead.py',
+            'tools/verify_dx9ex_gpu_visual_20261014.py',
+            'tools/verify_vr_r32_runtime_support_seam.py',
+            'tools/verify_vr_r31_support_api_seam.py',
+            'tools/verify_vr_r31_eye_tail_cache.py',
+            'tools/verify_vr_r31_world_wvp_cache.py',
+            'tools/verify_vr_policy_alignment.py',
+            'tools/verify_vr_r31_live_wvp_consistency.py',
+            'tools/verify_vr_r31_window_telemetry.py',
+            'tools/verify_vr_r31_r32_telemetry_hotpath.py',
+            'tools/verify_vr_r31_r32_off_counters.py',
+            'tools/verify_vr_r32_spike_log_backpressure.py',
+            'tools/verify_vr_r32_perf_optout_fastpath.py',
+            'tools/verify_vr_helper_probe_host_identity.py',
+            'tools/verify_vr_ffb_controller_routing.py',
+            'tools/verify_vr_ffb_release_ini_contract.py',
+            'tools/verify_vr_r32_r31_tu_split.py',
+            'tools/verify_vr_r32_review_api_seam.py',
+            'tools/verify_vr_r33_r32_tu_split.py',
+            'tools/verify_vr_r33_single_classification.py',
+            'tools/verify_vr_r33_mono_bypass_xyzrhw_fastpath.py',
+            'tools/verify_vr_r33_telemetry_draw_hotpath.py',
+            'tools/verify_vr_r33_latched_pose_view.py',
+            'tools/verify_vr_r33_stencil_snapshot_fastpath.py',
+            'tools/verify_vr_r32_depthless_right_pass_fastpath.py',
+            'tools/verify_vr_r30_depthless_right_pass_fastpath.py',
+            'tools/verify_vr_stereo_restore_publication.py',
+            'tools/verify_vr_r33_full_target_viewport.py',
+            'tools/verify_dx9ex_dense_scene_perf.py',
+            'tools/verify_vr_r29_borrowed_surface_fastpath.py',
+            'tools/verify_vr_state_block_resync_fastpath.py',
+            'tools/verify_vr_r22_scissor_restore_fastpath.py',
+            'tools/verify_vr_sumo_replay_semantics.py',
+            'tools/verify_vr_hud_cadence_restore.py',
+            'tools/verify_vr_producer_provenance.py',
+            'tools/verify_vr_cross_thread_semantic_registry.py',
+            'tools/verify_vr_projected_marker_anchor.py',
+            'tools/verify_vr_ui_matrix_safety.py',
+            'tools/verify_vr_menu_letterbox_aspect.py',
+            'tools/verify_vr_f11_font_density.py',
+            'tools/verify_vr_f11_toggle_frame.py',
+            'tools/verify_vr_f11_wndproc_shell.py',
+            'tools/verify_vr_custom_sprite_descriptor.py',
+            'tools/verify_vr_projected_marker_telemetry.py',
+            'tools/verify_vr_visual_composition_p0.py',
+            'tools/audit_vr_result_full_source.py',
+            'tools/verify_vr_texture_scene_contract.py',
+            'tools/verify_vr_r31_r32_retirement_guard.py',
+            'tools/verify_vr_recenter_contract.py',
+            'tools/verify_vr_recenter_publication_snapshot.py',
+            'tools/verify_vr_dx9ex_reset_transport_contract.py',
+            'tools/verify_vr_session_direct_hold_lifetime.py',
+            'tools/verify_vr_direct_hold_desc_fastpath.py',
+            'tools/verify_vr_r32_shared_descriptor_cache.py',
+            'tools/verify_vr_capture_metadata_fastpath.py',
+            'tools/verify_vr_r28_active_frame_pacing.py',
+            'tools/verify_vr_r26_occlusion_present_fastpath.py',
+            'tools/verify_vr_r21_host_clock_fastpath.py',
+            'tools/verify_vr_desktop_capture_reuse.py',
+            'tools/verify_vr_theater_capture_once.py',
+            'tools/verify_vr_final_submission_contract.py',
+            'tools/verify_vr_dx9ex_launch_paths.py',
+            'tools/verify_vr_dx9ex_launch_batch.py'
+          )
+          # Parse the REAL installed PowerShell entrypoint, not just markers.
+          $launchScript = Resolve-Path tools/Run-OutRunVRTest.ps1
+          $parseTokens = $null
+          $parseErrors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            $launchScript.Path, [ref]$parseTokens, [ref]$parseErrors) | Out-Null
+          if ($parseErrors.Count -gt 0) {
+            throw ("DX9Ex launch PowerShell syntax invalid: " + ($parseErrors -join '; '))
+          }
+          foreach ($verifier in $verifiers) {
+            python $verifier
+            if ($LASTEXITCODE -ne 0) {
+              throw "$verifier failed with exit code $LASTEXITCODE"
+            }
+          }
+      - name: Verify DX9Ex R84 development/test mainline
+        shell: pwsh
+        run: python tools/verify_dx9ex_r84_mainline.py
+      - name: Verify R84 C993 original-WVP source proof and conservative optics
+        shell: pwsh
+        run: python tools/verify_dx9ex_r84_lens_source.py
+      - name: Verify R84/R26 runtime collector selected DLL identity
+        shell: pwsh
+        run: python tools/verify_dx9ex_r84_log_identity.py
+      - name: Verify near-plane active stereo eligibility
+        shell: pwsh
+        run: python tools/verify_vr_nearplane_active_gate.py
+
+  host:
+    needs: policy
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Build x64 D3D11 OpenXR host and deterministic smoke tests
+        shell: pwsh
+        run: |
+          cmake -S vrhost -B build-host -G "Visual Studio 17 2022" -A x64
+          cmake --build build-host --config Release --target outrun-vr-r30-early-rhw-shadow-smoke outrun-vr-r30-indexed-up-bounds-smoke outrun-vr-r30-shadow-ranges-smoke outrun-vr-host outrun-vr-cadence-presented-wait-smoke outrun-vr-cadence-schedule-smoke outrun-vr-eye-extent-smoke outrun-vr-frame-pacing-smoke outrun-vr-runtime-eligibility-smoke outrun-vr-r23-verified-bundle-smoke outrun-vr-r32-policy-smoke outrun-vr-projection-blit-upload-smoke outrun-vr-menu-projection-copy-smoke outrun-vr-menu-content-aspect-smoke outrun-vr-pause-eye-affine-smoke outrun-vr-stage-extension-owner-smoke outrun-vr-goal-progress-owner-smoke outrun-vr-semantic-tag-hint-smoke outrun-vr-capture-descriptor-smoke outrun-vr-direct-ack-device-epoch-smoke outrun-vr-direct-ring-latest-smoke outrun-vr-protocol-v3-smoke outrun-vr-core-math-smoke outrun-vr-host-state-v3-channel-smoke outrun-vr-v2-v3-shadow-conversion-smoke outrun-vr-host-pose-v3-validation-smoke
+          if (-not (Test-Path build-host/bin/outrun-vr-host.exe)) { throw 'DX9Ex OpenXR host missing' }
+      - name: Run deterministic no-HMD host smoke tests
+        shell: pwsh
+        run: |
+          $tests = @(
+            'outrun-vr-runtime-eligibility-smoke.exe',
+            'outrun-vr-r23-verified-bundle-smoke.exe',
+            'outrun-vr-projection-blit-upload-smoke.exe',
+            'outrun-vr-menu-projection-copy-smoke.exe',
+            'outrun-vr-menu-content-aspect-smoke.exe',
+            'outrun-vr-pause-eye-affine-smoke.exe',
+            'outrun-vr-r30-early-rhw-shadow-smoke.exe',
+             'outrun-vr-r30-indexed-up-bounds-smoke.exe',
+            'outrun-vr-r30-shadow-ranges-smoke.exe',
+            'outrun-vr-stage-extension-owner-smoke.exe',
+            'outrun-vr-goal-progress-owner-smoke.exe',
+            'outrun-vr-semantic-tag-hint-smoke.exe',
+            'outrun-vr-capture-descriptor-smoke.exe',
+            'outrun-vr-direct-ack-device-epoch-smoke.exe',
+            'outrun-vr-direct-ring-latest-smoke.exe',
+            'outrun-vr-cadence-presented-wait-smoke.exe',
+            'outrun-vr-cadence-schedule-smoke.exe',
+            'outrun-vr-r32-policy-smoke.exe',
+            'outrun-vr-protocol-v3-smoke.exe',
+            'outrun-vr-core-math-smoke.exe',
+            'outrun-vr-host-state-v3-channel-smoke.exe',
+            'outrun-vr-v2-v3-shadow-conversion-smoke.exe',
+            'outrun-vr-host-pose-v3-validation-smoke.exe'
+          )
+          foreach ($test in $tests) {
+            $testPath = Join-Path 'build-host/bin' $test
+            if (-not (Test-Path $testPath)) { throw "host smoke missing: $test" }
+            & $testPath
+            if ($LASTEXITCODE -ne 0) { throw "host smoke failed ($LASTEXITCODE): $test" }
+          }
+      - name: 'Feature acceptance: PACING-STAGES'
+        shell: pwsh
+        run: |
+          $env:OUTRUN_VR_PACING_DIAGNOSTICS = '1'
+          & ./build-host/bin/outrun-vr-frame-pacing-smoke.exe --stages
+          if ($LASTEXITCODE -ne 0) { throw "PACING-STAGES regression failed" }
+          Remove-Item Env:OUTRUN_VR_PACING_DIAGNOSTICS -ErrorAction SilentlyContinue
+      - name: 'Feature acceptance: PACING-REGRESSION'
+        shell: pwsh
+        run: |
+          Remove-Item Env:OUTRUN_VR_PACING_DIAGNOSTICS -ErrorAction SilentlyContinue
+          & ./build-host/bin/outrun-vr-frame-pacing-smoke.exe --regression
+          if ($LASTEXITCODE -ne 0) { throw "PACING-REGRESSION failed" }
+      - name: 'Feature acceptance: XR-EYE-SIZING'
+        shell: pwsh
+        run: |
+          & ./build-host/bin/outrun-vr-eye-extent-smoke.exe --sizing
+          if ($LASTEXITCODE -ne 0) { throw 'XR-EYE-SIZING failed' }
+      - name: 'Feature acceptance: XR-EYE-RESET'
+        shell: pwsh
+        run: |
+          & ./build-host/bin/outrun-vr-eye-extent-smoke.exe --reset
+          if ($LASTEXITCODE -ne 0) { throw 'XR-EYE-RESET failed' }
+      - name: Stage host
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force stage-host | Out-Null
+          Copy-Item build-host/bin/outrun-vr-host.exe stage-host/outrun-vr-host.exe
+          Set-Content stage-host/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-active-host
+          path: stage-host/
+          if-no-files-found: error
+
+  game:
+    needs: policy
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure Win32 R26_SAFE fallback (explicit comparison)
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF
+          $fallbackCache = Get-Content build-game/CMakeCache.txt
+          foreach ($entry in @(
+            'OUTRUN_VR_R26_HUD_COMPARE:BOOL=ON',
+            'OUTRUN_VR_REFACTOR_SPLIT_R33_R32:BOOL=OFF',
+            'OUTRUN_VR_REFACTOR_SPLIT_R32_R31:BOOL=OFF',
+            'OUTRUN_VR_REFACTOR_SPLIT_R31_R30:BOOL=OFF',
+            'OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=OFF')) {
+            if ($fallbackCache -notcontains $entry) {
+              throw "DX9Ex R26_SAFE explicit fallback owner drift: $entry"
+            }
+          }
+      - name: Apply VC2022 dependency workarounds
+        shell: pwsh
+        run: |
+          (Get-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-game/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-game/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-game/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-game/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+      - name: Build Win32 active game DLL
+        run: cmake --build build-game --config Release --target outrun2006tweaks
+      - name: Stage active game DLL
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force stage-game | Out-Null
+          $dll = Get-ChildItem build-game -Recurse -Filter dinput8.dll | Where-Object { $_.FullName -match '\\bin\\' } | Select-Object -First 1
+          if (-not $dll) { throw 'dinput8.dll missing' }
+          Copy-Item $dll.FullName stage-game/dinput8.dll
+          Set-Content stage-game/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+          Set-Content stage-game/VARIANT_ID.txt 'ACTIVE_R26_R43_R44' -Encoding ascii
+          Set-Content stage-game/CMAKE_FLAGS.txt '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=ON -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF' -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-active-game
+          path: stage-game/
+          if-no-files-found: error
+
+  full-chain-compile:
+    needs: policy
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Configure Win32 R84 MAIN from option-free CMake
+        shell: pwsh
+        run: |
+          Remove-Item Env:CI -ErrorAction SilentlyContinue
+          # This option-FREE configuration is the canonical development and test
+          # build, not an isolated R84 opt-in compiler probe.
+          cmake -S . -B build-full-chain -G "Visual Studio 17 2022" -A Win32
+          $mainCache = Get-Content build-full-chain/CMakeCache.txt
+          foreach ($entry in @(
+            'OUTRUN_VR_SAFE_DRAW_COMPARE:BOOL=OFF',
+            'OUTRUN_VR_R26_HUD_COMPARE:BOOL=OFF',
+            'OUTRUN_VR_C1_COMPARE:BOOL=OFF',
+            'OUTRUN_VR_C2_COMPARE:BOOL=OFF',
+            'OUTRUN_VR_REFACTOR_SPLIT_R33_R32:BOOL=ON',
+            'OUTRUN_VR_REFACTOR_SPLIT_R32_R31:BOOL=ON',
+            'OUTRUN_VR_REFACTOR_SPLIT_R31_R30:BOOL=ON',
+            'OUTRUN_VR_REFACTOR_SPLIT_R30_R29:BOOL=ON')) {
+            if ($mainCache -notcontains $entry) {
+              throw "DX9Ex unqualified CMake does not select R84 MAIN: $entry"
+            }
+          }
+      - name: Apply VC2022 dependency workarounds for full-chain gate
+        shell: pwsh
+        run: |
+          (Get-Content build-full-chain/_deps/safetyhook-build/src/safetyhook.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-full-chain/_deps/safetyhook-build/src/safetyhook.vcxproj
+          (Get-Content build-full-chain/_deps/zydis-build/Zydis.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-full-chain/_deps/zydis-build/Zydis.vcxproj
+          (Get-Content build-full-chain/_deps/zydis-build/zycore/Zycore.vcxproj) -replace 'ZYCORE_STATIC_BUILD', '_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR;ZYCORE_STATIC_BUILD' | Set-Content build-full-chain/_deps/zydis-build/zycore/Zycore.vcxproj
+          Set-Content -Path build-full-chain/_deps/sdl-src/src/joystick/gdk/SDL_gameinputjoystick.c -Value ''
+          (Get-Content build-full-chain/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h) -replace '#define SDL_JOYSTICK_GAMEINPUT 1', '/* #undef SDL_JOYSTICK_GAMEINPUT */' | Set-Content build-full-chain/_deps/sdl-build/include-config-release/build_config/SDL_build_config.h
+      - name: Build Win32 R84 independent R29-R33 full-chain gate
+        run: cmake --build build-full-chain --config Release --target outrun2006tweaks
+      - name: Stage exact-SHA R84 independently linked x86 game
+        shell: pwsh
+        run: |
+          $dll = Get-ChildItem build-full-chain -Recurse -File -Filter dinput8.dll | Select-Object -First 1
+          if (-not $dll) { throw 'R84 independent full-chain DLL missing' }
+          New-Item -ItemType Directory -Force stage-r84-chain | Out-Null
+          Copy-Item $dll.FullName stage-r84-chain/dinput8.dll
+          Set-Content stage-r84-chain/SOURCE_SHA.txt $env:GITHUB_SHA -Encoding ascii
+          Set-Content stage-r84-chain/BUILD_VARIANT.txt 'R84_SPLIT_R33_R32_R31_R30_R29' -Encoding ascii
+          Set-Content stage-r84-chain/MAINLINE_BUILD_MODE.txt 'R84_DEFAULT_CMAKE_OPTIONS' -Encoding ascii
+          $bytes = [IO.File]::ReadAllBytes((Resolve-Path stage-r84-chain/dinput8.dll))
+          if ($bytes.Length -lt 512 -or $bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) { throw 'R84 Win32 DLL PE header invalid' }
+          $pe = [BitConverter]::ToInt32($bytes,0x3c)
+          if ($pe -lt 0 -or $pe + 6 -gt $bytes.Length -or [BitConverter]::ToUInt16($bytes,$pe+4) -ne 0x14c) { throw 'R84 DLL is not x86 PE32' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dx9ex-r84-independent-full-chain-game
+          path: stage-r84-chain/
+          if-no-files-found: error
+
+  package:
+    needs: [host, game, full-chain-compile]
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dx9ex-active-host
+          path: payload/host
+      - uses: actions/download-artifact@v4
+        with:
+          name: dx9ex-active-game
+          path: payload/game
+      - uses: actions/download-artifact@v4
+        with:
+          name: dx9ex-r84-independent-full-chain-game
+          path: payload/r84
+      - name: Assemble one profile-aware DX9Ex package
+        shell: pwsh
+        run: |
+          $short = $env:GITHUB_SHA.Substring(0,12)
+          $matrixId = "DX9EX-ACTIVE-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd'))-$short"
+          $dir = 'package'
+          $backend = Join-Path $dir 'backends/d3d9'
+          New-Item -ItemType Directory -Force $backend | Out-Null
+          # R84 R29-R33 is now the CURRENT_FOCUS production test renderer.
+          # The previously shipped R26+HUD owner is retained in R26_SAFE.
+          # Both paths use the identical, exact-SHA x64 OpenXR host.
+          Copy-Item payload/r84/dinput8.dll (Join-Path $backend 'dinput8.dll')
+          Copy-Item payload/host/outrun-vr-host.exe (Join-Path $backend 'outrun-vr-host.exe')
+          Set-Content (Join-Path $backend 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
+          Copy-Item payload/r84/BUILD_VARIANT.txt (Join-Path $backend 'VARIANT_ID.txt')
+          Copy-Item payload/r84/BUILD_VARIANT.txt (Join-Path $backend 'BUILD_VARIANT.txt')
+          Copy-Item payload/r84/MAINLINE_BUILD_MODE.txt (Join-Path $backend 'MAINLINE_BUILD_MODE.txt')
+          $r84CmakeFlags = '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=ON -DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=ON -DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=ON -DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON'
+          Set-Content (Join-Path $backend 'CMAKE_FLAGS.txt') $r84CmakeFlags -Encoding ascii
+          $r26 = Join-Path $dir 'slots/R26_SAFE'
+          New-Item -ItemType Directory -Force $r26 | Out-Null
+          Copy-Item payload/game/dinput8.dll (Join-Path $r26 'dinput8.dll')
+          Copy-Item payload/host/outrun-vr-host.exe (Join-Path $r26 'outrun-vr-host.exe')
+          Set-Content (Join-Path $r26 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
+          Copy-Item payload/game/VARIANT_ID.txt (Join-Path $r26 'VARIANT_ID.txt')
+          Copy-Item payload/game/CMAKE_FLAGS.txt (Join-Path $r26 'CMAKE_FLAGS.txt')
+          # Explicit R84_TEST alias remains for A/B comparisons and older guides.
+          $r84 = Join-Path $dir 'slots/R84_TEST'
+          New-Item -ItemType Directory -Force $r84 | Out-Null
+          Copy-Item payload/r84/dinput8.dll (Join-Path $r84 'dinput8.dll')
+          Copy-Item payload/host/outrun-vr-host.exe (Join-Path $r84 'outrun-vr-host.exe')
+          Set-Content (Join-Path $r84 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
+          Copy-Item payload/r84/BUILD_VARIANT.txt (Join-Path $r84 'BUILD_VARIANT.txt')
+          Set-Content (Join-Path $r84 'CMAKE_FLAGS.txt') $r84CmakeFlags -Encoding ascii
+          if ((Get-FileHash (Join-Path $r84 'outrun-vr-host.exe') -Algorithm SHA256).Hash -ne
+              (Get-FileHash (Join-Path $backend 'outrun-vr-host.exe') -Algorithm SHA256).Hash) {
+            throw 'R84 alias host is not identical to the current main host'
+          }
+          if ((Get-FileHash (Join-Path $r26 'outrun-vr-host.exe') -Algorithm SHA256).Hash -ne
+              (Get-FileHash (Join-Path $backend 'outrun-vr-host.exe') -Algorithm SHA256).Hash) {
+            throw 'R26 fallback host is not identical to the current main host'
+          }
+          Copy-Item OutRun2006Tweaks.ini (Join-Path $dir 'OutRun2006Tweaks.ini')
+          Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
+          # Keep one GUI launcher. The slot selector invokes the PowerShell
+          # test runner directly; duplicate batch entrypoints are not needed.
+          foreach ($file in @('OutRunVR-TestProfiles.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-Slot-Selector.ps1','OutRunVR-Slot-Selector.cmd','START_DX9EX_TEST.cmd','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1')) {
+            Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
+          }
+          Copy-Item docs/VR_TEST_STRATEGY.md (Join-Path $dir 'VR_TEST_STRATEGY.md')
+          Copy-Item docs/DX9EX_TEST_LAUNCH_CONTRACT.md (Join-Path $dir 'DX9EX_TEST_LAUNCH_CONTRACT.md')
+          Copy-Item docs/VR_HUD_NIGHT_TEST_20261009.md (Join-Path $dir 'HUD_NIGHT_TEST_GUIDE.md')
+          @(
+            'OUTRUN 2006 VR DX9EX - START HERE / 실행 방법'
+            ''
+            '1. Extract ZIP contents into the folder containing OR2006C2C.EXE.'
+            '   ZIP 내용물을 OR2006C2C.EXE가 있는 게임 폴더에 풀어주세요.'
+            '2. Double-click START_DX9EX_TEST.cmd (visible direct launch; optional GUI selector available).'
+            '   START_DX9EX_TEST.cmd를 더블클릭하세요. 실패 원인과 로그 위치가 표시됩니다.'
+            '3. CURRENT FOCUS / CORRECTNESS loads R84 R29-R33 independent renderer by default.'
+            '   기본 실행은 구조 개편된 R84이며, Quest3/VDXR 시각·성능 검증은 아직 필요합니다.'
+            '   GUI는 OutRunVR-Slot-Selector.cmd에서 선택적으로 사용할 수 있습니다.'
+            '   R26 SAFE 슬롯은 기존 R26+HUD 보호판으로 즉시 복귀하는 옵션입니다.'
+            '   R84 상태로 돌아가려면 CURRENT FOCUS를 선택하세요.'
+            '4. The selector configures the DX9Ex backend and runs OR2006C2C.EXE.'
+            '   설정 후 실제 게임 실행 파일은 OR2006C2C.EXE입니다.'
+            '5. After the game closes, its diagnostic ZIP is auto-collected.'
+            '6. For tonight HUD tests, choose B HUD (HUD_SCREEN) in the selector.'
+            'XR EYE EXTENT: actual OpenXR allocated per-eye extent, not desktop pixels.'
+            'After game exit run Collect-OutRunVREyeExtent.ps1 to compare shared texture allocation.'
+            'Quest3/VDXR visual quality is UNTESTED.'
+            'OPTIONAL PACING: run Start-OutRunVRPacing.ps1 instead of the usual selector.'
+            'After game exit use Collect-OutRunVRFramePacing.ps1 for CSV and SHA summary.'
+            'GPU 상세 진단: 슬롯 선택기에서 GPU 상세 진단 체크 (기본 OFF, DX9Ex 전용).'
+            'GPU timestamps + sampled alpha/depth/stencil/PS + XR/QPC + optional nvidia-smi usage.'
+            'GPU measurement overhead requires OFF/ON A/B; HMD runtime UNTESTED.'
+            'This is CPU/QPC instrumentation when only PACING launcher is used; no Quest3 native FPS conclusion.'
+            '   For the lens centre and projected rank markers choose C FLARE / WORLD.'
+            '   게임 종료 후 진단 로그 ZIP이 자동 생성됩니다.'
+            ''
+            'outrun-vr-host.exe is a helper process, not the user launcher.'
+            'outrun-vr-host.exe는 직접 실행하는 파일이 아닙니다.'
+            'Old CMD files may remain if extracted over an old test folder.'
+            '구버전 CMD가 남아 있다면 이번 패키지 파일이 아니므로 무시하세요.'
+          ) | Set-Content (Join-Path $dir 'START_HERE_실행방법.txt') -Encoding UTF8
+          @(
+            'OUTRUN VR TEST / LOG UPLOAD'
+            ''
+            '1. Run the packaged test normally.'
+            '2. Exit the game to let the collector seal the session.'
+            '3. Upload the generated OutRun2_VR_ANALYZE_*.zip to the OutRun VR project chat.'
+            '4. No additional problem description is required. The ZIP itself is the analysis request.'
+            ''
+            'Optional: add a short symptom note only when you want to provide extra human-observed evidence.'
+          ) | Set-Content (Join-Path $dir 'UPLOAD_LOG_ZIP_ONLY.txt') -Encoding UTF8
+          Set-Content (Join-Path $dir 'BUILD_MATRIX_ID.txt') $matrixId -Encoding ascii
+          $buildInputs = [ordered]@{
+            SchemaVersion = 1
+            BuildMatrixId = $matrixId
+            IntegrationSha = $env:GITHUB_SHA
+            VariantId = 'R84_SPLIT_R33_R32_R31_R30_R29'
+            DefaultRendererSlot = 'CURRENT_FOCUS'
+            DefaultBuildMode = 'R84_DEFAULT_CMAKE_OPTIONS'
+            PreviousR84AliasSlot = 'R84_TEST'
+            FallbackRendererSlot = 'R26_SAFE'
+            FallbackVariantId = 'ACTIVE_R26_R43_R44'
+            R84HmdRuntimeValidation = 'UNTESTED'
+            DefaultTestProfile = 'CORRECTNESS'
+            Profiles = @('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE')
+            RecommendedHudProfile = 'HUD_SCREEN'
+            RecommendedLensAndMarkerProfile = 'HUD_WORLD'
+            UserRuntimeVerified = $false
+            XrEyeExtentPolicy = 'OPENXR_ALLOCATED_COMMON_EYE_EXTENT'
+            XrEyeExtentHmdVerified = $false
+            FramePacingDiagnosticsDefault = 'OFF'
+            FramePacingEnableWith = 'Start-OutRunVRPacing.ps1'
+            GpuDiagnosticsDefault = 'OFF'
+            GpuDiagnosticsMode = 'SLOT_SELECTOR_CHECKBOX'
+            GpuDiagnosticsIncludes = @('D3D9_GPU_TIMESTAMP','SPARSE_ALPHA_DEPTH_STENCIL','GPU_WHOLE_1S_NVIDIA_SMI','XR_CPU_QPC')
+          }
+          $buildInputs | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'BUILD_INPUTS.json') -Encoding UTF8
+          $bad = Get-ChildItem $dir -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
+          if ($bad) { throw "Forbidden backend payload: $($bad.FullName -join ', ')" }
+          Get-ChildItem $dir -Recurse -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
+            "$($_.Hash)  $($_.Path.Substring((Resolve-Path $dir).Path.Length + 1))"
+          } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
+          $zip = "OutRun2_VR_DX9EX_ACTIVE_${short}.zip"
+          Compress-Archive -Path (Join-Path $dir '*') -DestinationPath $zip -Force
+          Get-FileHash $zip -Algorithm SHA256 | Format-List
+      - name: Validate active package
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem -Filter 'OutRun2_VR_DX9EX_ACTIVE_*.zip' | Select-Object -First 1
+          if (-not $zip) { throw 'active DX9Ex ZIP missing' }
+          Expand-Archive $zip.FullName verify
+          foreach ($file in @('START_DX9EX_TEST.cmd','DX9EX_TEST_LAUNCH_CONTRACT.md','OutRunVR-Slot-Selector.cmd','OutRunVR-Slot-Selector.ps1','Select-OutRunVRBackend.ps1','Run-OutRunVRTest.ps1','Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1','OutRunVR-TestProfiles.ps1','Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1','SHA256SUMS.txt','BUILD_INPUTS.json','BUILD_MATRIX_ID.txt','UPLOAD_LOG_ZIP_ONLY.txt','START_HERE_실행방법.txt','HUD_NIGHT_TEST_GUIDE.md')) {
+            if (-not (Test-Path (Join-Path verify $file))) { throw "package missing $file" }
+          }
+          # Both one-click visible and optional GUI launchers are required.
+          $launchers = @(Get-ChildItem verify -Recurse -File | Where-Object { $_.Extension -in @('.cmd','.bat') })
+          if ($launchers.Count -ne 2 -or
+              @($launchers | Where-Object { $_.Name -notin @('START_DX9EX_TEST.cmd','OutRunVR-Slot-Selector.cmd') }).Count -ne 0) {
+            throw "Invalid DX9Ex launchers: $($launchers.Name -join ', ')"
+          }
+          $launcherText = Get-Content (Join-Path verify 'START_DX9EX_TEST.cmd') -Raw
+          foreach ($item in @('pushd "%~dp0"','OR2006C2C.EXE','backends\d3d9\dinput8.dll','backends\d3d9\outrun-vr-host.exe','-Backend d3d9','-VariantId CURRENT_FOCUS','Run-OutRunVRTest.ps1','if errorlevel 1','pause')) {
+            if (-not $launcherText.Contains($item)) { throw "Direct batch launch contract missing $item" }
+          }
+          $guiLauncherText = Get-Content (Join-Path verify 'OutRunVR-Slot-Selector.cmd') -Raw
+          if ($guiLauncherText -notlike '*OutRunVR-Slot-Selector.ps1*') { throw 'Optional GUI launcher invalid' }
+          $slotText = Get-Content (Join-Path verify 'OutRunVR-Slot-Selector.ps1') -Raw
+          foreach ($marker in @('CURRENT_FOCUS','Run-OutRunVRTest.ps1','Start-Slot','설정 + 바로 실행')) {
+            if ($slotText -notlike "*$marker*") { throw "Slot selector marker missing: $marker" }
+          }
+          $collectorText = Get-Content (Join-Path verify 'Collect-OutRunVRLogs.ps1') -Raw
+          foreach ($requiredMarker in @('ANALYSIS_REQUEST.json','AutoAnalyzeOnUpload=$true','RequiresUserDescription=$false','OutRun2_VR_ANALYZE_')) {
+            if ($collectorText -notlike "*$requiredMarker*") { throw "collector missing runtime auto-analysis contract marker: $requiredMarker" }
+          }
+          foreach ($file in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt','VARIANT_ID.txt','CMAKE_FLAGS.txt')) {
+            if (-not (Test-Path (Join-Path 'verify/backends/d3d9' $file))) { throw "backend payload missing $file" }
+          }
+          $r84Dir = 'verify/slots/R84_TEST'
+          $r26Dir = 'verify/slots/R26_SAFE'
+          foreach ($file in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt','VARIANT_ID.txt','CMAKE_FLAGS.txt')) {
+            if (-not (Test-Path (Join-Path $r26Dir $file))) { throw "R26 rollback payload missing $file" }
+          }
+          if ((Get-Content (Join-Path $r26Dir 'SOURCE_SHA.txt') -Raw).Trim() -ne $env:GITHUB_SHA -or
+              (Get-Content (Join-Path $r26Dir 'VARIANT_ID.txt') -Raw).Trim() -ne 'ACTIVE_R26_R43_R44') {
+            throw 'R26 rollback source SHA or build variant mismatch'
+          }
+          if ((Get-Content 'verify/backends/d3d9/MAINLINE_BUILD_MODE.txt' -Raw).Trim() -ne 'R84_DEFAULT_CMAKE_OPTIONS') {
+            throw 'DX9Ex packaged main was not built with the default R84 CMake options'
+          }
+          if ((Get-Content 'verify/backends/d3d9/VARIANT_ID.txt' -Raw).Trim() -ne 'R84_SPLIT_R33_R32_R31_R30_R29' -or
+              (Get-Content 'verify/backends/d3d9/CMAKE_FLAGS.txt' -Raw) -notmatch 'OUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON') {
+            throw 'CURRENT_FOCUS is not the R84 independent full-chain renderer'
+          }
+          foreach ($file in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt','BUILD_VARIANT.txt','CMAKE_FLAGS.txt')) {
+            if (-not (Test-Path (Join-Path $r84Dir $file))) { throw "R84 test payload missing $file" }
+          }
+          if ((Get-Content (Join-Path $r84Dir 'SOURCE_SHA.txt') -Raw).Trim() -ne $env:GITHUB_SHA) {
+            throw 'R84 game source SHA mismatch'
+          }
+          if ((Get-Content (Join-Path $r84Dir 'BUILD_VARIANT.txt') -Raw).Trim() -ne 'R84_SPLIT_R33_R32_R31_R30_R29') {
+            throw 'R84 full-chain build identity missing'
+          }
+          if ((Get-FileHash (Join-Path $r84Dir 'outrun-vr-host.exe') -Algorithm SHA256).Hash -ne
+              (Get-FileHash 'verify/backends/d3d9/outrun-vr-host.exe' -Algorithm SHA256).Hash) {
+            throw 'R84 host must match active exact-SHA host'
+          }
+          # End-to-end smoke: default R84 -> R26_SAFE -> R84_TEST -> R84 main.
+          Copy-Item verify verify-r84-smoke -Recurse
+          & ./verify-r84-smoke/Select-OutRunVRBackend.ps1 -Backend d3d9 -TestProfile CORRECTNESS -VariantId CURRENT_FOCUS
+          if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'default R84 main selection failed' }
+          $mainState = Get-Content verify-r84-smoke/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
+          if ($mainState.RendererBuildVariant -ne 'R84_SPLIT_R33_R32_R31_R30_R29') {
+            throw 'CURRENT_FOCUS installed a non-R84 renderer'
+          }
+          if ((Get-FileHash verify-r84-smoke/dinput8.dll -Algorithm SHA256).Hash -ne
+              (Get-FileHash verify-r84-smoke/backends/d3d9/dinput8.dll -Algorithm SHA256).Hash) {
+            throw 'CURRENT_FOCUS main DLL mismatch'
+          }
+          & ./verify-r84-smoke/Select-OutRunVRBackend.ps1 -Backend d3d9 -TestProfile CORRECTNESS -VariantId R26_SAFE
+          if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'R26_SAFE fallback selector failed' }
+          $safeState = Get-Content verify-r84-smoke/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
+          if ($safeState.RendererBuildVariant -ne 'ACTIVE_R26_R43_R44' -or $safeState.VariantId -ne 'R26_SAFE') {
+            throw 'R26_SAFE fallback identity mismatch'
+          }
+          if ((Get-FileHash verify-r84-smoke/dinput8.dll -Algorithm SHA256).Hash -ne
+              (Get-FileHash verify-r84-smoke/slots/R26_SAFE/dinput8.dll -Algorithm SHA256).Hash) {
+            throw 'R26_SAFE did not install protected R26+HUD DLL'
+          }
+          & ./verify-r84-smoke/Select-OutRunVRBackend.ps1 -Backend d3d9 -TestProfile CORRECTNESS -VariantId R84_TEST
+          if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'R84 selector failed' }
+          $r84State = Get-Content verify-r84-smoke/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
+          if ($r84State.VariantId -ne 'R84_TEST' -or $r84State.RendererBuildVariant -ne 'R84_SPLIT_R33_R32_R31_R30_R29') {
+            throw 'R84 session manifest mismatch'
+          }
+          if ((Get-FileHash verify-r84-smoke/dinput8.dll -Algorithm SHA256).Hash -ne
+              (Get-FileHash verify-r84-smoke/slots/R84_TEST/dinput8.dll -Algorithm SHA256).Hash) {
+            throw 'R84 selection installed wrong DLL'
+          }
+          & ./verify-r84-smoke/Select-OutRunVRBackend.ps1 -Backend d3d9 -TestProfile CORRECTNESS -VariantId CURRENT_FOCUS
+          if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'R84 main restore failed' }
+          if ((Get-FileHash verify-r84-smoke/dinput8.dll -Algorithm SHA256).Hash -ne
+              (Get-FileHash verify-r84-smoke/backends/d3d9/dinput8.dll -Algorithm SHA256).Hash) {
+            throw 'R84 main restore did not install the refactored R29-R33 DLL'
+          }
+
+          # Regression: extracting a new package over an older R71 test folder
+          # must not fail just because the old launcher passes R71_HUD_FLARE.
+          Copy-Item verify verify-legacy -Recurse
+          & ./verify-legacy/Select-OutRunVRBackend.ps1 -Backend d3d9 -TestProfile HUD_WORLD -VariantId R71_HUD_FLARE
+          if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'legacy VariantId migration failed' }
+          $legacyState = Get-Content verify-legacy/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
+          if ($legacyState.VariantId -ne 'C_FLARE') { throw "legacy VariantId mapped incorrectly: $($legacyState.VariantId)" }
+          if ($legacyState.Backend -ne 'd3d9') { throw "legacy VariantId changed backend unexpectedly: $($legacyState.Backend)" }
+          $runnerText = Get-Content (Join-Path verify 'Run-OutRunVRTest.ps1') -Raw
+          $guiText = Get-Content (Join-Path verify 'OutRunVR-Slot-Selector.ps1') -Raw
+          $inputPolicy = Get-Content (Join-Path verify 'BUILD_INPUTS.json') -Raw | ConvertFrom-Json
+          if ($inputPolicy.GpuDiagnosticsDefault -ne 'OFF' -or
+              $inputPolicy.GpuDiagnosticsMode -ne 'SLOT_SELECTOR_CHECKBOX') { throw 'GPU diagnostics manifest gate failed' }
+          foreach ($token in @('GpuDiagnostics','OUTRUN_VR_GPU_PROFILE','OUTRUN_VR_PACING_DIAGNOSTICS','D3D9TimestampQueryRequested','gpu-utilization-status.json')) {
+            if ($runnerText -notlike "*$token*") { throw "GPU diagnostics runner marker missing $token" }
+          }
+          foreach ($token in @('GPU 상세 진단','-GpuDiagnostics','$gpuCheck.Checked')) {
+            if ($guiText -notlike "*$token*") { throw "GPU diagnostics selector marker missing $token" }
+          }
+          if ($runnerText -match '-VariantId\s+\$variant\s+-VariantId') { throw 'runner still passes VariantId twice' }
+
+          $bad = Get-ChildItem verify -Recurse -File | Where-Object { $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe') }
+          if ($bad) { throw 'active package contains forbidden backend payload' }
+      - name: 'Feature acceptance: PACING-BUNDLE'
+        shell: pwsh
+        run: |
+          $base = 'verify'
+          foreach ($file in @(
+            'backends/d3d9/dinput8.dll',
+            'backends/d3d9/outrun-vr-host.exe',
+            'backends/d3d9/SOURCE_SHA.txt',
+            'SHA256SUMS.txt',
+            'BUILD_INPUTS.json',
+            'Start-OutRunVRPacing.ps1',
+            'Collect-OutRunVRFramePacing.ps1',
+            'Collect-OutRunVRLogs.ps1'
+          )) {
+            if (-not (Test-Path (Join-Path $base $file))) {
+              throw "PACING-BUNDLE missing $file"
+            }
+          }
+          $sha = (Get-Content verify/backends/d3d9/SOURCE_SHA.txt -Raw).Trim()
+          if ($sha -ne $env:GITHUB_SHA) { throw "PACING-BUNDLE exact SHA mismatch" }
+          $inputs = Get-Content verify/BUILD_INPUTS.json -Raw | ConvertFrom-Json
+          if ($inputs.IntegrationSha -ne $env:GITHUB_SHA -or
+              $inputs.FramePacingDiagnosticsDefault -ne 'OFF') {
+            throw "PACING-BUNDLE manifest mismatch"
+          }
+          foreach ($helper in @('Start-OutRunVRPacing.ps1','Collect-OutRunVRFramePacing.ps1','Collect-OutRunVREyeExtent.ps1')) {
+            $tokens = $null; $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path (Join-Path verify $helper)), [ref]$tokens, [ref]$errors)
+            if ($errors.Count -ne 0) { throw "Invalid pacing helper: $helper" }
+          }
+          # Exercise the shipped collector against a real two-row CSV, including
+          # cached XR resubmission and invalid/unavailable game CPU samples.
+          $probe = Join-Path $env:RUNNER_TEMP 'dx9ex-pacing-collector-smoke'
+          $probeOut = Join-Path $probe 'export'
+          New-Item -ItemType Directory -Force (Join-Path $probe 'backends/d3d9') | Out-Null
+          Set-Content (Join-Path $probe 'backends/d3d9/SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
+          @(
+            'xrTick,gameRunGeneration,gameFrameId,cached,gameRenderCpuMs,gamePresentCpuMs,gamePresentToHostMs,hostCaptureCpuMs,hostCopyCpuMs,hostRenderCpuMs,xrWaitFrameMs,xrEndFrameMs',
+            '1,8,42,0,6.5,0.8,1.0,1.5,0.3,2.0,0.4,0.1',
+            '2,8,42,1,-1.0,-1,-1,-1,-1,1.4,0.6,0.1'
+          ) | Set-Content (Join-Path $probe 'outrun-vr-frame-pacing.csv') -Encoding ascii
+          & ./verify/Collect-OutRunVRFramePacing.ps1 -Root $probe -Output $probeOut
+          $report = Get-Content (Join-Path $probeOut 'frame-pacing-summary.json') -Raw | ConvertFrom-Json
+          if ($report.SubmissionRows -ne 2 -or $report.CachedProjectionRows -ne 1 -or
+              $report.MissingGameBeginRows -ne 1 -or $report.SourceSha -ne $env:GITHUB_SHA -or
+              $report.HmdRuntimeVerified -or $report.NativeFpsVerified) {
+            throw "PACING-BUNDLE executable collector regression failed"
+          }
+      - name: 'Feature acceptance: XR-EYE-BUNDLE'
+        shell: pwsh
+        run: |
+          foreach ($file in @('backends/d3d9/dinput8.dll',
+              'backends/d3d9/outrun-vr-host.exe','backends/d3d9/SOURCE_SHA.txt',
+              'BUILD_INPUTS.json','SHA256SUMS.txt','Collect-OutRunVRLogs.ps1',
+              'Collect-OutRunVREyeExtent.ps1')) {
+            if (-not (Test-Path (Join-Path verify $file))) {
+              throw "XR-EYE-BUNDLE missing $file"
+            }
+          }
+          $sha = (Get-Content verify/backends/d3d9/SOURCE_SHA.txt -Raw).Trim()
+          $inputs = Get-Content verify/BUILD_INPUTS.json -Raw | ConvertFrom-Json
+          if ($sha -ne $env:GITHUB_SHA -or $inputs.IntegrationSha -ne $env:GITHUB_SHA -or
+              $inputs.XrEyeExtentPolicy -ne 'OPENXR_ALLOCATED_COMMON_EYE_EXTENT' -or
+              $inputs.XrEyeExtentHmdVerified) { throw 'XR-EYE-BUNDLE SHA/policy mismatch' }
+          $tokens=$null; $errors=$null
+          [void][System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path verify/Collect-OutRunVREyeExtent.ps1),[ref]$tokens,[ref]$errors)
+          if ($errors.Count -gt 0) { throw 'XR-EYE-BUNDLE collector parsing failed' }
+          $root = Join-Path $env:RUNNER_TEMP 'xr-eye-regression'
+          $out = Join-Path $root 'out'
+          New-Item -ItemType Directory -Force (Join-Path $root 'backends/d3d9') | Out-Null
+          Set-Content (Join-Path $root 'backends/d3d9/SOURCE_SHA.txt') $env:GITHUB_SHA
+          Set-Content (Join-Path $root 'outrun-vr-eye-extent.log') 'XR_EYE_EXTENT_V1 allocated=2124x2284 recommended0=2016x2240 recommended1=2124x2284 scale=1 hmd_verification=UNTESTED'
+          Set-Content (Join-Path $root 'OutRun2006Tweaks-test.log') 'VR stereo: verified 4-slot D3D9Ex shared eye ring ready 2124x2284 from desktop 3440x1440'
+          & ./verify/Collect-OutRunVREyeExtent.ps1 -Root $root -Output $out
+          $good = Get-Content (Join-Path $out 'eye-extent-summary.json') -Raw | ConvertFrom-Json
+          if ($good.SourceSha -ne $env:GITHUB_SHA -or
+              $good.XrSwapchainEyeWidth -ne 2124 -or $good.XrSwapchainEyeHeight -ne 2284 -or
+              -not $good.GameDirectEyeSizeMatchesXr -or $good.HmdRuntimeVerified) {
+            throw 'XR-EYE-BUNDLE positive fixture failed'
+          }
+          Set-Content (Join-Path $root 'OutRun2006Tweaks-test.log') 'VR stereo: verified 4-slot D3D9Ex shared eye ring ready 2048x2048 from desktop 3440x1440'
+          & ./verify/Collect-OutRunVREyeExtent.ps1 -Root $root -Output $out
+          $bad = Get-Content (Join-Path $out 'eye-extent-summary.json') -Raw | ConvertFrom-Json
+          if ($bad.GameDirectEyeSizeMatchesXr -or -not $bad.GameDirectEyeAllocationObserved) {
+            throw 'XR-EYE-BUNDLE mismatch detection failed'
+          }
+      - name: Assemble separate GUI GPU measurement ZIP
+        shell: pwsh
+        run: |
+          $short = $env:GITHUB_SHA.Substring(0,12)
+          $dir = 'gpu-measurement'
+          Copy-Item package $dir -Recurse
+          # GPU measurement has its own GUI-only entrypoint; keep the primary
+          # DX9Ex direct CMD in the regular Active ZIP, not the special lab ZIP.
+          Remove-Item (Join-Path $dir 'OutRunVR-Slot-Selector.cmd') -Force
+          Remove-Item (Join-Path $dir 'START_DX9EX_TEST.cmd') -Force
+          foreach ($file in @('OutRunVR-GPU-Lab.cmd','OutRunVR-GPU-Lab.ps1','OutRunVR-GPU-Lab-Settings.ps1')) {
+            Copy-Item (Join-Path 'tools' $file) (Join-Path $dir $file)
+          }
+          Copy-Item docs/VR_GPU_LAB_TEST_BUILD.md (Join-Path $dir 'GPU_LAB_GUIDE.md')
+          @(
+            'OUTRUN DX9EX VR - GPU MEASUREMENT SPECIAL BUILD'
+            ''
+            'Extract ZIP into original OR2006C2C.EXE folder.'
+            'Double click OutRunVR-GPU-Lab.cmd, the ONLY GUI launcher.'
+            'Choose A/B/C/D/E or any alpha/reflect/SkyGlow/culling combinations.'
+            'Tag waterfront/sand spray/buildings and click GPU 측정 시작 / 게임 실행.'
+            'After the game exits upload OutRun2_VR_ANALYZE_*.zip.'
+            'No environment-variable entry required. HMD runtime UNTESTED.'
+          ) | Set-Content (Join-Path $dir 'START_HERE_실행방법.txt') -Encoding UTF8
+          [ordered]@{
+            ArtifactKind = 'SEPARATE_GPU_DIAGNOSTIC_ZIP'
+            SourceSha = $env:GITHUB_SHA
+            GuiEntryPoint = 'OutRunVR-GPU-Lab.cmd'
+            DefaultGpuDiagnostics = 'ON_WHILE_MEASURING'
+            OriginalDailyZipUnchanged = $true
+            RuntimeValidation = 'UNTESTED'
+          } | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir 'GPU_LAB_BUILD.json') -Encoding UTF8
+          Remove-Item (Join-Path $dir 'SHA256SUMS.txt')
+          Get-ChildItem $dir -Recurse -File | Get-FileHash -Algorithm SHA256 | ForEach-Object {
+            "$($_.Hash)  $($_.Path.Substring((Resolve-Path $dir).Path.Length + 1))"
+          } | Set-Content (Join-Path $dir 'SHA256SUMS.txt') -Encoding ascii
+          $zip = "OutRun2_VR_GPU_DIAGNOSTIC_${short}.zip"
+          Compress-Archive -Path (Join-Path $dir '*') -DestinationPath $zip -Force
+          Expand-Archive $zip verify-gpu-lab
+          $launchers=@(Get-ChildItem verify-gpu-lab -Recurse -File | Where-Object { $_.Extension -in @('.cmd','.bat') })
+          if($launchers.Count -ne 1 -or $launchers[0].Name -ne 'OutRunVR-GPU-Lab.cmd'){
+            throw "Separate GUI ZIP must have exactly one CMD entrypoint: $($launchers.Name -join ',')"
+          }
+          foreach($file in @('OutRunVR-GPU-Lab.ps1','OutRunVR-GPU-Lab-Settings.ps1',
+              'GPU_LAB_BUILD.json','GPU_LAB_GUIDE.md','Run-OutRunVRTest.ps1',
+              'Collect-OutRunVRLogs.ps1','Analyze-OutRunVRSession.ps1',
+              'backends/d3d9/dinput8.dll','backends/d3d9/outrun-vr-host.exe',
+              'backends/d3d9/SOURCE_SHA.txt','SHA256SUMS.txt')){
+            if(!(Test-Path (Join-Path 'verify-gpu-lab' $file))){throw "Missing GPU lab payload: $file"}
+          }
+          if((Get-Content verify-gpu-lab/backends/d3d9/SOURCE_SHA.txt -Raw).Trim() -ne $env:GITHUB_SHA){
+            throw 'GPU lab exact-SHA payload mismatch'
+          }
+          $meta=Get-Content verify-gpu-lab/GPU_LAB_BUILD.json -Raw | ConvertFrom-Json
+          if($meta.SourceSha -ne $env:GITHUB_SHA -or $meta.RuntimeValidation -ne 'UNTESTED'){
+            throw 'GPU lab metadata mismatch'
+          }
+          $bad=@(Get-ChildItem verify-gpu-lab -Recurse -File | Where-Object {
+              $_.Name -in @('d3d9.dll','multiviewpatcher.dll','outrun-vr-host-dx12.exe')})
+          if($bad.Count){throw "Unexpected provider in GPU lab package: $($bad.Name -join ',')"}
+          Get-FileHash $zip -Algorithm SHA256 | Format-List
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-GPU-DIAGNOSTIC-${{ github.sha }}
+          path: OutRun2_VR_GPU_DIAGNOSTIC_*.zip
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: feature-dx9ex-eye-extent-${{ github.sha }}
+          path: package/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: feature-dx9ex-pacing-${{ github.sha }}
+          path: package/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OutRun2-VR-DX9EX-ACTIVE-${{ github.sha }}
+          path: OutRun2_VR_DX9EX_ACTIVE_*.zip
+          if-no-files-found: error

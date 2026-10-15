@@ -1,0 +1,126 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00810",
+  "production_id": "CONVERSION-DX9EX-00810",
+  "event_id": "CONVERSION-DX9EX-00810-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R30_HUD_SOURCE_ASPECT_COHERENCE",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R30_HUD_SOURCE_ASPECT_COHERENCE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 1,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00810]",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_hud_present_cache.py",
+    "tools/verify_vr_r30_frame_snapshot_fastpath.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00810.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R30_HUD_SOURCE_ASPECT_COHERENCE",
+    "goal": "Keep original OutRun Present source aspect and both-eye HUD containment coherent across Reset and resize while eliminating duplicate R29 state snapshot on cache misses.",
+    "scope_boundary": "DX9Ex R30 HUD cache and source aspect only. World, SkyGlow, menus, FFB, DX11 and DXVK unaffected.",
+    "special_work_evidence": "R30 HUD cache misses capture full frame twice: one read for cache identity and another for aspect. Game resize between reads risks mixed-generation ratio; prior Quest3 trace showed maximum 3929.3 draw calls per Present. FPS benefit unmeasured.",
+    "trace_stages": [
+      "Original OutRun D3D9 backbuffer updates dimensions during Present and Reset.",
+      "R29 HUD frame snapshot publishes cache identity including game source width height and epoch.",
+      "R30 ratio maps game source aspect to both XR eye extents in XYZRHW and shader draw paths."
+    ],
+    "subcomponents": [
+      "Use original cache-key width and height for all R30 aspect calculations and remove redundant second frame capture.",
+      "Preserve per-eye XR extent reevaluation and zero-size/reset fallback rather than freezing VR pose or viewport.",
+      "Extend existing CI HUD verifier with aspect math and five negative source mutations."
+    ],
+    "acceptance_items": [
+      {
+        "id": "R30_SOURCE_EPOCH_PARITY",
+        "category": "end_to_end_behavior",
+        "behavior_area": "present_to_stereo_hud",
+        "expected_behavior": "Cache key and computed aspect refer to identical Present source dimensions."
+      },
+      {
+        "id": "R30_RESET_AND_EXTENT_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "resize_reset_eye_extent",
+        "expected_behavior": "Zero-size frame and Reset reject stale cache while live XR eye-extent/FOV changes remain effective."
+      },
+      {
+        "id": "R30_EXACT_SHA_BUILD",
+        "category": "integrated_validation",
+        "behavior_area": "win32_host_game_package",
+        "expected_behavior": "Existing/new regression scripts and exact-SHA DX9Ex Active, Domain Isolation, Full Source Impact must pass."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "R30_SOURCE_EPOCH_PARITY": "PASS_EXACT_SHA",
+    "R30_RESET_AND_EXTENT_FALLBACK": "PASS_EXACT_SHA",
+    "R30_EXACT_SHA_BUILD": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "R30HudContainScale calls R29OwnerCaptureFrameSnapshot and R30HudAspectCompensation independently called it again.",
+    "root_cause": "A game Reset/resize can interleave reads and persist a new-generation aspect under an old source-dimension cache key.",
+    "source_trace": [
+      "OutRun original D3D9 game RT source and Present epoch",
+      "R29 captured frame for R30 HUD cache identity",
+      "R30 source/eye aspect applied to both stereo HUD render paths"
+    ],
+    "alternatives_rejected": [
+      "Never freeze host XR recommended eye extent when it changes without game Present.",
+      "Never change world draw stereo or SkyGlow effects.",
+      "Never modify menus and F11 external ImGui render source."
+    ],
+    "negative_test_evidence": "Verified on exact-SHA DX9Ex Active policy: 3 source aspect seeds; 5 negative snapshot/cache mutants; amended legacy R30 snapshot owner guard, plus existing comprehensive HUD, world and eye-context regressions.",
+    "fix_evidence": "Forward caller frame dimensions and eliminate second full frame snapshot call."
+  },
+  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+  "initial_material_sha": "1c8af9808358db5f77e5355dd7d393073998c00b",
+  "material_result_sha": "485988407d57ff763a2efe7f75adf0442c038466",
+  "validation_bearing_result_sha": "f541895999d9adf71c2c5cc20224c5734df289a5",
+  "result_sha": "f541895999d9adf71c2c5cc20224c5734df289a5",
+  "runtime_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "c6_recorded_at_utc": "2026-10-14T00:18:48Z",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "f541895999d9adf71c2c5cc20224c5734df289a5",
+    "dx9ex_active": {
+      "run_id": 38488683406,
+      "head_sha": "f541895999d9adf71c2c5cc20224c5734df289a5",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "game": "SUCCESS",
+        "host": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      },
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38488683406"
+    },
+    "domain_isolation": {
+      "run_id": 38488683521,
+      "head_sha": "f541895999d9adf71c2c5cc20224c5734df289a5",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38488683521"
+    },
+    "full_source_impact": {
+      "run_id": 38488640670,
+      "head_sha": "485988407d57ff763a2efe7f75adf0442c038466",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "source-cross-domain": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "msvc-analyze-active-game": "SUCCESS"
+      },
+      "note": "Source-impact review ran on latest C++ material repair SHA. Subsequent validation-bearing change updates only the Python verifier; compiled C++ matches material SHA.",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38488640670"
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  }
+}

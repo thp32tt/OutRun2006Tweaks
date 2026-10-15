@@ -1,0 +1,146 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00823",
+  "production_id": "CONVERSION-DX9EX-00823",
+  "event_id": "CONVERSION-DX9EX-00823-E003",
+  "event_type": "c6_result",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R33_LAZY_DEPTH_STENCIL_READBACK",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R33_LAZY_DEPTH_STENCIL_READBACK",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 1,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00823]",
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R33_LAZY_DEPTH_STENCIL_READBACK",
+    "goal": "Avoid unnecessary synchronous D3D9 render-state driver readback on normal depth-disabled and single-sided-stencil world/HUD stereo rendering while preserving exact right-eye depth and stencil write safety.",
+    "scope_boundary": "R33 final stereo draw owner depth/stencil lazy snapshot and its negative regression verifier only; do not alter drawing, GPU sync, protected SkyGlow, optics, FFB, or other backend branches.",
+    "special_work_evidence": "Static hot-path inspection showed R33 cold-cache refresh always requests ZWRITEENABLE despite disabled Z and three CCW stencil ops despite single-sided mode; optimization removes these unnecessary getter calls during material/stateblock invalidation rebuilds. Actual FPS remains unmeasured.",
+    "trace_stages": [
+      "Original game SetRenderState and StateBlock::Apply drive the authoritative D3D9 state with tracked setter/generation fences.",
+      "R33ReadDepthStencilWriteState rebuilds the per-draw depth/stencil write shadow only when cache invalidated or ownership changed.",
+      "R33GetWriteFlags and R33TryFastWorld/R33TryHud gate right-eye depth/stencil sync, preserving original and per-eye Draw/DrawIndexed behavior."
+    ],
+    "subcomponents": [
+      "Skip ZWRITEENABLE read under disabled Z, invalidate and resample on ZENABLE activation including reset/Apply generations.",
+      "Skip three CCW operation reads under one-sided stencil, invalidate and resample on two-sided enable; retain stencil enable/mask/format and failure fences.",
+      "Extend R33 source contract with destructive mutation tests for both lazy predicates, both invalidation transitions and depth/stencil fail-closed reads."
+    ],
+    "acceptance_items": [
+      {
+        "id": "DEPTH_OFF_LAZY",
+        "category": "end_to_end_behavior",
+        "behavior_area": "depth_disabled_eye_draw",
+        "expected_behavior": "Disabled depth testing skips the ZWRITEENABLE driver read until a tracked depth-enable transition, with no world/HUD stereo write-flag changes."
+      },
+      {
+        "id": "ONE_SIDED_LAZY",
+        "category": "fallback_regression",
+        "behavior_area": "one_two_sided_stencil_transitions",
+        "expected_behavior": "One-sided stencil skips CCW reads, two-sided reenable invalidates stale snapshot, getter failures and StateBlock reset remain fail closed."
+      },
+      {
+        "id": "FULL_WIN32_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_host_package",
+        "expected_behavior": "Negative-mutation source policy, exact-SHA Windows game and OpenXR host builds, package, Domain Isolation and source impact all pass before build acceptance."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "DEPTH_OFF_LAZY": "PASS_BUILD_VERIFIED",
+    "ONE_SIDED_LAZY": "PASS_BUILD_VERIFIED",
+    "FULL_WIN32_GATES": "PASS_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "GitHub HEAD fa0233e35a3f923a3042ae15950b7e60a608b3a9 R33ReadDepthStencilWriteState explicitly called ZWRITEENABLE whenever a depth target was attached and three CCW stencil ops whenever stencil was enabled with a nonzero mask, even if two-sided mode was false. No hardware FPS measurement exists.",
+    "source_trace": [
+      "Original game SetRenderState and StateBlock Apply publish ZENABLE, ZWRITEENABLE and TWOSIDEDSTENCILMODE into the D3D9 tracked state/epoch.",
+      "R33ReadDepthStencilWriteState, invalidated by attachment/Apply/reset generations and state setters, captures live depth/stencil draw-write safety before routing R33TryFastWorld/R33TryHud.",
+      "R33GetWriteFlags protects right-eye depth/stencil content synchronization and R33 final dispatcher duplicates the original Draw per eye without changing shaders, WVP, world or HUD rendering."
+    ],
+    "root_cause": "R33 cold-snapshot rebuild unconditionally read ZWRITEENABLE even when depth was disabled, and three CCW stencil operations even in one-sided mode, causing four avoidable synchronous D3D9 driver getters during high churn in world/HUD particle scenes.",
+    "alternatives_rejected": [
+      "Unconditionally caching ZWRITEENABLE or CCW fields without state transition invalidation would miss later disabled-to-enabled Z or one-to-two-sided stencil transitions and could incorrectly reuse stale depth/stencil write flags.",
+      "Skipping any reads while two-sided stencil or depth testing is active would weaken fail-closed eye-depth content tracking.",
+      "Skipping StateBlock/Reset generation checks or changing actual Draw routes would risk stereo world/overlay correctness and would not solve the cold driver readback bottleneck."
+    ],
+    "fix_evidence": "R33 C++ material SHA ac8b837f3f0d121b97f47fe5b5689adbd576c33c: gate ZWRITEENABLE under nonzero ZENABLE and CCW getters under two-sided stencil, invalidate partial snapshot on reenable; exact-SHA DX9Ex Active 5/5, Domain Isolation, Full Source Impact 3/3 and HUD Inspector 2/2 all SUCCESS.",
+    "negative_test_evidence": "tools/verify_vr_r33_stencil_snapshot_fastpath.py adds disabled-depth and one-sided gating negative mutations, both re-enable invalidation mutations, source readback ordering, failure-close checks and existing protected stencil tests, executed in passed exact-SHA Active policy job."
+  },
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_r33_stencil_snapshot_fastpath.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00823.json"
+  ],
+  "base_sha": "fa0233e35a3f923a3042ae15950b7e60a608b3a9",
+  "runtime_gate": "RUNTIME_VALIDATION=UNTESTED; Quest3/VDXR gameplay/visual pass and actual CPU/FPS improvement are not claimed.",
+  "result_sha": "ac8b837f3f0d121b97f47fe5b5689adbd576c33c",
+  "material_result_sha": "ac8b837f3f0d121b97f47fe5b5689adbd576c33c",
+  "validation_bearing_result_sha": "ac8b837f3f0d121b97f47fe5b5689adbd576c33c",
+  "validation_bearing_sha": "ac8b837f3f0d121b97f47fe5b5689adbd576c33c",
+  "c6_status": "COMPLETE_BUILD_VERIFIED",
+  "validation_gates": {
+    "dx9ex_active": {
+      "run_id": 38511008951,
+      "sha": "ac8b837f3f0d121b97f47fe5b5689adbd576c33c",
+      "status": "SUCCESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38511008951"
+    },
+    "domain_isolation": {
+      "run_id": 38511008887,
+      "sha": "ac8b837f3f0d121b97f47fe5b5689adbd576c33c",
+      "status": "SUCCESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38511008887"
+    },
+    "full_source_impact": {
+      "run_id": 38511008952,
+      "sha": "ac8b837f3f0d121b97f47fe5b5689adbd576c33c",
+      "status": "SUCCESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38511008952"
+    },
+    "hud_inspector": {
+      "run_id": 38511008963,
+      "sha": "ac8b837f3f0d121b97f47fe5b5689adbd576c33c",
+      "status": "SUCCESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38511008963"
+    },
+    "hmd_runtime": {
+      "status": "UNTESTED",
+      "hardware": "Quest3/VDXR",
+      "note": "No live headset/gameplay/FPS measurement was performed"
+    }
+  },
+  "ci_evidence": {
+    "dx9ex_active": {
+      "run_id": 38511008951,
+      "sha": "ac8b837f3f0d121b97f47fe5b5689adbd576c33c",
+      "status": "SUCCESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38511008951"
+    },
+    "domain_isolation": {
+      "run_id": 38511008887,
+      "sha": "ac8b837f3f0d121b97f47fe5b5689adbd576c33c",
+      "status": "SUCCESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38511008887"
+    },
+    "full_source_impact": {
+      "run_id": 38511008952,
+      "sha": "ac8b837f3f0d121b97f47fe5b5689adbd576c33c",
+      "status": "SUCCESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38511008952"
+    },
+    "hud_inspector": {
+      "run_id": 38511008963,
+      "sha": "ac8b837f3f0d121b97f47fe5b5689adbd576c33c",
+      "status": "SUCCESS",
+      "html_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38511008963"
+    }
+  },
+  "hold_resolution": "TERMINAL_STATUS_NOT_COMPLETE resolved: existing exact-SHA GitHub CI SUCCESS; C6 bookkeeping only. Quest3/VDXR runtime validation remains UNTESTED."
+}

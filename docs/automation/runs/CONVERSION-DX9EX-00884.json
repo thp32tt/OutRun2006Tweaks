@@ -1,0 +1,94 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00884",
+  "production_id": "CONVERSION-DX9EX-00884",
+  "event_id": "CONVERSION-DX9EX-00884-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00884",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "a6416ad784e63a308ed12bcee7b42298f024a221",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": "9a5a62985ce44f264de580d2f8d732aac8f9880f",
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00884.json"
+  ],
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "acceptance_results": {
+    "stage_sprite_deferred_batch": "SOURCE_IMPLEMENTED",
+    "source_owner_and_fallback": "SOURCE_IMPLEMENTED",
+    "exact_sha_game_host_package": "PENDING"
+  },
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve a complete stage +TIME transition in a single stereo-owned HUD layer for both queued sprites and immediate numeric glyphs, including delayed D3DX draws when Begin starts after node selection.",
+    "scope_boundary": "Only exact ScreenHud StageExtensionTime producer and first clean queued D3DX Draw; preserve GOAL/rank/F11, native timer, unrelated sprite batches, R84 world/SkyGlow and device recovery.",
+    "trace_stages": [
+      "Six 0x989xx original +TIME sprite and numeric E8 calls publish separate direct and queued StageExtensionTime semantic.",
+      "D3DX Begin can start after SpriteQueueNode selection, clearing StageBoundaryReady; Draw now re-arms only first homogeneous exact-owner batch.",
+      "Queued +TIME GPU triangles flush before queue End/owner change; original R84 eye GPU dispatch and host are unchanged."
+    ],
+    "subcomponents": [
+      "Preserve existing direct +TIME numeric glyph pre/post-scope batch splitting and all six producer hook identities.",
+      "Fix queued +TIME deferred sprite batches by restoring exact submission boundary after a late D3DX Begin.",
+      "Guard scope/texture/Reset/GOAL/rank fallbacks with compile-time assertions and changed-area mutation regression."
+    ],
+    "acceptance_items": [
+      {
+        "id": "stage_sprite_deferred_batch",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Stage +TIME queued sprites and direct numeric glyph producers",
+        "expected_behavior": "Rearm queue-end submission on the first exact +TIME Draw after late D3DX Begin while direct numeric glyphs retain their source-exit submission."
+      },
+      {
+        "id": "source_owner_and_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3DX mixed/foreign source, GOAL, rank, fallback and Reset",
+        "expected_behavior": "Reject invalid queue, batch, sprite, count, producer and scope; preserve original HRESULT, GOAL/DispRank and device lifecycle."
+      },
+      {
+        "id": "exact_sha_game_host_package",
+        "category": "integrated_validation",
+        "behavior_area": "R84 32-bit D3D9 game and 64-bit OpenXR host",
+        "expected_behavior": "Exact validation-bearing source SHA passes DX9Ex Active x86 game/full-chain x64 host package, Domain and affected Source Impact/HUD gates; Quest3 tested separately."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "BeforeQueueNode sets StageBoundaryReady=false when BatchActive is false; later BeginDest also clears this flag. DrawDest previously returned immediately for exactStage without rearming the queue End boundary.",
+    "source_trace": [
+      "Original six source E8 hooks tag +TIME direct numeric and queued SpriteNode producer as StageExtensionTime ScreenHud.",
+      "Canonical SelectSpriteQueueNode may run before D3DX Begin; BeginDest clears StageBoundaryReady after that selection.",
+      "Successful DrawDest records first exact sprite batch but previously returned without rearming the BeforeQueueEnd Flush; GPU submission can outlive the queue's ScreenHud owner."
+    ],
+    "root_cause": "An exact queued +TIME first Draw performed after a late D3DX Begin fails to restore the cleared queue-exit batch boundary.",
+    "alternatives_rejected": [
+      "Do not globally Flush after every Draw or modify the game time tick: it would reorder texture batching and steal unrelated D3DX owners.",
+      "Do not treat GOAL, DispRank or world effects as stage extension sources to hide a missing queue owner."
+    ],
+    "fix_evidence": "CanArmD3DXQueueStageAfterDraw requires live queue, active exact sprite Begin, first homogeneous Draw, and matching StageExtensionTime ScreenHud pending/current source before rearming the queue boundary.",
+    "negative_test_evidence": "Nine constexpr assertions cover first-owned positive and queue/batch/sprite/second-draw/mixed/GOAL/wrong-scope/token negatives; updated mutation verifier rejects bypassed guards and omitted rearm.",
+    "eye_ownership": "R84 R33 stereo composition remains unchanged; stage ScreenHud queue owner now persists through D3DX Flush until its GPU draw occurs."
+  },
+  "runtime_evidence": "No actual Quest3/VDXR game-screen test performed.",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "result_commit_ci_skip": true
+}

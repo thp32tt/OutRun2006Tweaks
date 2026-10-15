@@ -1,0 +1,57 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00766",
+  "production_id": "CONVERSION-DX9EX-00766",
+  "event_id": "CONVERSION-DX9EX-00766-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00766",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "1f1c641ea1abf85ec0029a584931c4c7e962b12a",
+  "material_result_sha": "adf01ad72f62a2610717b8c5ed62262479e9ed47",
+  "validation_bearing_result_sha": "adf01ad72f62a2610717b8c5ed62262479e9ed47",
+  "result_sha": "adf01ad72f62a2610717b8c5ed62262479e9ed47",
+  "material_commits": [
+    "1f1c641ea1abf85ec0029a584931c4c7e962b12a",
+    "adf01ad72f62a2610717b8c5ed62262479e9ed47"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 P0-A: prevent one-eye finite-but-invalid FOV from resizing both XR HUD eye projections on VDXR recenter/resize when recommended eye extents are not a coherent pixel pair.",
+    "completed_scope": "R30HudAspectCompensation accepts only TWO valid FOV eye spans if coherent pixel extents unavailable; neutral mapping on partial eye publication. Existing pixel coherence, desktop and two-eye aspect calculation unchanged. Responsive HUD verifier adds invalid-left/right/both and valid-pair negative numeric cases. Implementation source 1f1c641ea1abf85ec0029a584931c4c7e962b12a; corrected test verifier validation-bearing adf01ad72f62a2610717b8c5ed62262479e9ed47.",
+    "remaining_acceptance": [
+      "Integrated Issue #119 responsive HUD, main menu, ESC/pause and F11 Quest3 visual acceptance is still IN_PROGRESS.",
+      "Exact-build Quest3/VDXR optical, FPS and interaction runtime test remains NEED_HMD_TEST."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_ON_EXACT_SHA_POLICY",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "dx9ex_active": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "ci_evidence": {
+    "validation_sha": "adf01ad72f62a2610717b8c5ed62262479e9ed47",
+    "dx9ex_active_run_id": 38377477381,
+    "domain_isolation_run_id": 38377477326,
+    "exact_sha_confirmed": true
+  },
+  "score_delta": 0,
+  "score_reason": "C6 checkpoint only: any +1 for distinct 00766 material work belongs in AI_SCOREBOARD.md exactly once, not in the bookkeeping commit.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "Validates the final repaired 00766 source/test SHA and not the failed intermediate 1f1c. DX9Ex Active policy, game, host, independent full-chain compile and package succeeded at exact SHA; Domain Isolation also succeeded. No Quest3/VDXR HMD or game screen run. Keep source implementation feature #119 nonterminal."
+}

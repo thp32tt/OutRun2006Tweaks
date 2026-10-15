@@ -1,0 +1,123 @@
+{
+  "task_id": "CONVERSION-DX9EX-00593",
+  "production_id": "CONVERSION-DX9EX-00593",
+  "event_id": "CONVERSION-DX9EX-00593-E001",
+  "lane": "DX9EX",
+  "feature_id": "DX9EX:XR_RECOMMENDED_EYE_EXTENT",
+  "work_key": "DX9EX:XR_RECOMMENDED_EYE_EXTENT",
+  "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00593",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_status": "FEATURE_READY",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "policy_blob_sha": "e8a7c70cf99fd89429173dbbe37a98160dcf528d",
+  "material_result_sha": "34b38fe5eee501145a97c1f807273ec5ebbc94a8",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_acceptance": {
+    "implementation_complete": true,
+    "targeted_checks": [
+      "PR preflight DX9Ex Active Validation #38110509623: policy, host, game, full-chain-compile, package SUCCESS",
+      "Feature acceptance: XR-EYE-SIZING x64 executable --sizing SUCCESS",
+      "Feature acceptance: XR-EYE-RESET x64 executable --reset SUCCESS",
+      "Feature acceptance: XR-EYE-BUNDLE PowerShell collector positive/negative fixtures SUCCESS",
+      "PR preflight Domain Isolation Guard #38110509640 domain-isolation SUCCESS"
+    ],
+    "integration_contract": "Host allocates OpenXR common stereo-array eye extent under both eyes' limits and optional renderScale; both shared IPC eye sizes are published after actual swapchain creation. D3D9Ex DirectGPU eye textures must match this allocated extent, reject device-cap mismatch instead of silently downsizing, preserve desktop backbuffer/HUD/depth ownership and SBS recovery, invalidate resize/ResetEx generations. R23 D3D11 projection swapchain and viewport use the allocated extent. Desktop geometry source resolution is intentionally NOT promoted to native eye geometry without separate verified game RT/viewport/depth redesign; Quest3/VDXR runtime remains UNTESTED."
+  },
+  "acceptance_results": [
+    {
+      "id": "XR-EYE-SIZING",
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/ipc/xr_eye_extent.hpp",
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        "vrhost/src/main.cpp",
+        "vrhost/src/main_r23.cpp",
+        "vrhost/tests/xr_eye_extent_smoke.cpp"
+      ],
+      "validation_command": "build-host/bin/outrun-vr-eye-extent-smoke.exe --sizing",
+      "ci_step": "Feature acceptance: XR-EYE-SIZING",
+      "preflight_run_id": 38110509623
+    },
+    {
+      "id": "XR-EYE-RESET",
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "src/vr/ipc/xr_eye_extent.hpp",
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        "vrhost/tests/xr_eye_extent_smoke.cpp",
+        "tools/verify_vr_dx9ex_reset_transport_contract.py"
+      ],
+      "validation_command": "build-host/bin/outrun-vr-eye-extent-smoke.exe --reset and python tools/verify_vr_dx9ex_reset_transport_contract.py",
+      "ci_step": "Feature acceptance: XR-EYE-RESET",
+      "preflight_run_id": 38110509623
+    },
+    {
+      "id": "XR-EYE-BUNDLE",
+      "status": "PASS_FEATURE_CI",
+      "evidence_paths": [
+        "tools/Collect-OutRunVREyeExtent.ps1",
+        "tools/Collect-OutRunVRLogs.ps1",
+        ".github/workflows/vr-dx9ex-active.yml",
+        "vrhost/src/main.cpp"
+      ],
+      "validation_command": "DX9Ex Active Validation / package / Feature acceptance: XR-EYE-BUNDLE (executed collector fixture positive+negative and SHA package validation)",
+      "ci_step": "Feature acceptance: XR-EYE-BUNDLE",
+      "preflight_run_id": 38110509623
+    }
+  ],
+  "required_gates": [
+    {
+      "name": "DX9Ex Active Validation",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "jobs": [
+        "domain-isolation"
+      ]
+    }
+  ],
+  "artifact_prefix": "feature-dx9ex-eye-extent-",
+  "preflight_validation": {
+    "source_sha": "34b38fe5eee501145a97c1f807273ec5ebbc94a8",
+    "run_id": 38110509623,
+    "domain_run_id": 38110509640,
+    "conclusion": "SUCCESS",
+    "scope": "PR_SYNTHETIC_MERGE_CI_NOT_TARGET_EXACT_SHA"
+  },
+  "next_action": "After this FEATURE_READY commit passes feature CI, compare feature HEAD and target HEAD (behind=0,ahead>0), nonforce expected-SHA fast-forward TARGET; verify target SHA DX9Ex Active and Domain gates and exact artifact; commit separate C6 bookkeeping preserving validation-bearing SHA. Never assert HMD PASS.",
+  "validation_bearing_result_sha": "b02590720fd9f387218af541a71071516c8168db",
+  "exact_sha_validation": {
+    "target_branch": "vr-d3d9ex-focus",
+    "head_sha": "b02590720fd9f387218af541a71071516c8168db",
+    "run_id": 38111291417,
+    "domain_run_id": 38111291405,
+    "dx9ex_jobs": [
+      "policy",
+      "host",
+      "game",
+      "full-chain-compile",
+      "package"
+    ],
+    "domain_job": "domain-isolation",
+    "acceptance_steps": [
+      "Feature acceptance: XR-EYE-SIZING",
+      "Feature acceptance: XR-EYE-RESET",
+      "Feature acceptance: XR-EYE-BUNDLE"
+    ],
+    "artifact_name": "feature-dx9ex-eye-extent-b02590720fd9f387218af541a71071516c8168db",
+    "conclusion": "SUCCESS",
+    "runtime_validation": "UNTESTED",
+    "note": "No Quest3/VDXR headset measurements; safe source/host/build integration only."
+  },
+  "controller_terminal": true,
+  "controller_next_action": "Do not rerun 00593; schedule next independent feature with QUEUE_NEXT_TASK_DELAY_SECONDS=0. Keep validation_bearing_result_sha pinned when bookkeeping HEAD changes."
+}

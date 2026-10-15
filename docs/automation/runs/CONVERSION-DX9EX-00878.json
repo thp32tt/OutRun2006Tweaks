@@ -1,0 +1,130 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00878",
+  "production_id": "CONVERSION-DX9EX-00878",
+  "event_id": "CONVERSION-DX9EX-00878-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00878",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_contract": {
+    "goal": "Keep GOAL direct time/title glyph and queued sprite output under their exact producer through D3DX GPU batch submission, avoiding inherited previous-owner HUD double render.",
+    "scope_boundary": "Original 0xBE020 and 0xBE150 GOAL direct print helper edges, D3DX begin/draw/flush/end owner guard and regression; no global Flush, no result text B9200 changes, preserve +TIME, rank, time logic and unrelated world rendering.",
+    "acceptance_items": [
+      {
+        "id": "goal-direct-exact-batch",
+        "category": "end_to_end_behavior",
+        "expected_behavior": "Both original GOAL direct helpers split a proven prior homogeneous source batch and submit remaining own homogeneous batches before semantic scope exits.",
+        "behavior_area": "Original GOAL source and D3DX GPU batching"
+      },
+      {
+        "id": "goal-native-fallback",
+        "category": "fallback_regression",
+        "expected_behavior": "Unknown, mixed, foreign, queued and failed D3DX batches keep original native End/error behavior.",
+        "behavior_area": "Foreign, mixed and queued D3DX fallback"
+      },
+      {
+        "id": "exact-windows-gates",
+        "category": "integrated_validation",
+        "expected_behavior": "R84 main DLL, R26 rollback, host, package and required exact-SHA gates succeed.",
+        "behavior_area": "R84 game, R26_SAFE rollback, host and packaging"
+      }
+    ],
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "trace_stages": [
+      "Original 0xBE020/0xBE150 GOAL time/title helper calls produce immediate D3DX glyphs or enqueue separately tagged SpriteNodes with exact GOAL tokens.",
+      "The intercepted D3DXSprite Begin/Draw/Flush/End tracks the previously queued homogeneous producer, submits that prior GPU batch before a direct GOAL helper and submits a remaining exact GOAL batch before its source scope expires.",
+      "R84 physical D3D9 draw dispatch then classifies ScreenHud under the restored producer token for each actual GPU draw and composes separate per-eye OpenXR render targets through the existing host pipeline."
+    ],
+    "subcomponents": [
+      "Producer lifetime: bracket both verified GOAL helper callsites with exact direct source ownership while preserving their separately tagged queued siblings and original return path.",
+      "GPU batch lifetime: split only tracked homogeneous preceding GOAL-boundary sprite work and submit any remaining GOAL-owned glyph triangles before changing exact semantic owner; fail closed for mixed/queued/foreign buffers.",
+      "Integrated R84 UI owner: retain the existing D3D9 source semantics through R33 stereo routing and x64 host while preserving R26_SAFE rollback, unrelated effects and protected input."
+    ]
+  },
+  "source_parent_sha": "224e6a9cc0a4040801880c35c358449726b8264f",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "tools/verify_vr_hud_exact_callsite_contract.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00878.json"
+  ],
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "acceptance_results": {
+    "goal-direct-exact-batch": "CODE_IMPLEMENTED_AWAITING_WINDOWS_AND_HMD",
+    "goal-native-fallback": "SOURCE_STATIC_ASSERTS_7_POSITIVE_NEGATIVE",
+    "exact-windows-gates": "PENDING"
+  },
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "result_commit_ci_skip": true,
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "material_result_sha": "6e447e510df6d1ee15a2b0e1f059c4062ffcbb81",
+  "diagnosis": {
+    "original_evidence": "Source inspection at 224e6a9 exposed GOAL original print helper 0xBE020/0xBE150 entering ScopedExactProducerSemantic and immediately returning without a proven D3DXSprite deferred-batch GPU boundary; existing +TIME handled this independently and cannot automatically protect GOAL.",
+    "root_cause": "Original GOAL helper's exact direct producer lifetime ended before a D3DXSprite Draw could be guaranteed submitted through Flush or End; an unrelated outgoing tracked batch also could be submitted under an incoming GOAL source. This is a source ownership defect; whether it caused the user's on-headset duplicated GOAL appearance is unproven.",
+    "source_trace": [
+      "OutRun original BEA5A/BEA5F source E8 calls invoke GoalTime_TagHelper which dispatches the original 0xBE020/0xBE150 direct time/title glyph producer and separately records queued SpriteNode siblings.",
+      "Direct producer must flush a tracked homogeneous prior batch before taking ScreenHud GOAL token and submit any pending homogeneous own D3DX work before RAII restores the prior producer; queued work remains bound to SpriteNode producer at execution.",
+      "Actual D3D9 draw path R84 R33/ScreenHud then transmits each stereo eye through the existing x86-to-x64 OpenXR host; R26_SAFE remains explicit rollback and no generic WorldBillboard or SkyGlow policy is changed."
+    ],
+    "alternatives_rejected": [
+      "Do not globally Flush each sprite or suppress pixels: ID3DXSprite batching is intentional and unrelated rank, SkyGlow, +TIME and alpha effects must remain separate.",
+      "Do not treat a passing static owner predicate or Windows CI as proof of Quest3 per-eye GOAL appearance; runtime remains UNTESTED."
+    ],
+    "eye_ownership": "The exact GOAL token is carried until direct D3DX flush or stored on per-queued SpriteNodes, and stereo physical draw/host paths are untouched; Quest3 convergence remains untested."
+  },
+  "validation_bearing_result_sha": "0602c902fc927a4e3accfec98bf32a3d292c5c3e",
+  "ci_repair_history": [
+    {
+      "sha": "6e447e510df6d1ee15a2b0e1f059c4062ffcbb81",
+      "issue": "initial missing feature-unit contract and HUD mutation anchor after source GOAL change"
+    },
+    {
+      "sha": "bbcd7727c650b671d7abd046302ea3037183f67e",
+      "issue": "whole feature contract repaired, +TIME mutation verifier masked by adjacent GOAL predicate"
+    },
+    {
+      "sha": "c241ee4a00c4ad4952f0784ccd819250ad528ece",
+      "issue": "predicate-scoped +TIME and GOAL negatives repaired, source and Host/Domain policy passed; HUD original-call mutation anchored to obsolete contiguous expression"
+    },
+    {
+      "sha": "dd98102d040b293a8a61bce4283047fd7449ee06",
+      "issue": "HUD original-call mutation verifier repaired at GOAL direct D3DX exit boundary"
+    }
+  ],
+  "runtime_evidence": "GitHub exact-SHA CI SUCCESS; physical HMD/Quest3 stereo runtime not executed.",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "0602c902fc927a4e3accfec98bf32a3d292c5c3e",
+    "dx9ex_active": {
+      "run_id": 38688342022,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, game, full-chain-compile, host, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38688342063,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38688342351,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38688342013,
+      "conclusion": "SUCCESS"
+    },
+    "runtime": "UNTESTED"
+  }
+}

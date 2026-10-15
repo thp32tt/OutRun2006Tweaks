@@ -1,0 +1,128 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00407",
+  "production_id": "CONVERSION-DX9EX-00407",
+  "event_id": "CONVERSION-DX9EX-00407-E003",
+  "event_type": "rollover",
+  "chat_rollover": 2,
+  "rollover_is_retry": false,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "queue_controller_contract": {
+    "path": "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "status": "APPLIED"
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "86ac52ad6c07ef9df6276c10d127fba1887e4d3d",
+  "source_material_sha": "4e7ad58fae536a9e2d18543789b31fc9f6c28a38",
+  "result_sha": "d2872620450dc5e3604f56810721ce13470c99bb",
+  "material_result_sha": "d2872620450dc5e3604f56810721ce13470c99bb",
+  "validation_bearing_result_sha": "d2872620450dc5e3604f56810721ce13470c99bb",
+  "state_commit_sha": "c64ee86e22848993a1ea7cd0dc472ae9782f0cb8",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00407]",
+  "selected_work_item": "DX9EX-FINGERPRINT-SUMO-REPLAY-ONEPASS-001",
+  "summary": "Reduced Sumo replay provenance snapshot overhead without changing rendering semantics: RenderScope and diagnostic ProducerToken are now read from the semantic-tag registry in one non-consuming lookup, and the producer provenance verifier rejects any regression to a second registry scan.",
+  "changed_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_framerate.cpp",
+    "tools/verify_vr_producer_provenance.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/VR_WORK_QUEUE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00407.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered vr-d3d9ex-focus after chat rollover from GitHub SSOT. 00406 was already complete; 00407 run JSON was absent while task-tagged material commits existed. ATTEMPT remained 1/3 because the rollover is not a task retry."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "SumoUISpriteReplay capture performed two linear semantic-tag scans for the same SpriteNode: one for RenderScope and one for ProducerToken. ProducerToken remains diagnostic-only and must not gain rendering authority."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "4e7ad58fae536a9e2d18543789b31fc9f6c28a38 added an optional producer output to PeekSpriteNodeScope; 16173d54a1cfe4920da1cca691c92cddde8b75ac changed Sumo replay capture to the one-pass API; d2872620450dc5e3604f56810721ce13470c99bb strengthened verify_vr_producer_provenance.py to require one lookup and reject PeekSpriteNodeProducerToken(node) in capture."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact-SHA d287262 DX9Ex Active Validation run 37274224163 attempt 2 passed policy/host/game/full-chain-compile/package; Domain Isolation Guard 37274224244 passed. Earlier stale/superseded run activity was not used as completion evidence. No Quest3/VDXR runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "source_material_sha": "4e7ad58fae536a9e2d18543789b31fc9f6c28a38",
+      "result_sha": "d2872620450dc5e3604f56810721ce13470c99bb",
+      "validation_bearing_result_sha": "d2872620450dc5e3604f56810721ce13470c99bb",
+      "task_tagged_commits": [
+        "4e7ad58fae536a9e2d18543789b31fc9f6c28a38 refactor(vr): expose one-pass replay semantic peek [AUTO:CONVERSION-DX9EX-00407]",
+        "16173d54a1cfe4920da1cca691c92cddde8b75ac perf(vr): collapse replay semantic lookup [AUTO:CONVERSION-DX9EX-00407]",
+        "d2872620450dc5e3604f56810721ce13470c99bb test(vr): guard one-pass replay provenance snapshot [AUTO:CONVERSION-DX9EX-00407]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Artifact 11329468257 OutRun2-VR-DX9EX-ACTIVE-d2872620450dc5e3604f56810721ce13470c99bb digest sha256:19fef8046ca47aea14de063899cf92cf14e8e73ed8f9aafeab86ae861ed1241f. Build artifact is not runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "state_commit_sha": "c64ee86e22848993a1ea7cd0dc472ae9782f0cb8",
+      "queue_commit_sha": "1c1649f52f052f9f295614e33545f4afd3e1d972",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37274224163,
+      "run_attempt": 2,
+      "conclusion": "success",
+      "exact_sha": "d2872620450dc5e3604f56810721ce13470c99bb",
+      "jobs": {
+        "policy": 111648506125,
+        "host": 111648505359,
+        "game": 111648504977,
+        "full_chain_compile": 111648505398,
+        "package": 111649624497
+      },
+      "artifact_id": 11329468257,
+      "artifact_digest": "sha256:19fef8046ca47aea14de063899cf92cf14e8e73ed8f9aafeab86ae861ed1241f"
+    },
+    "domain_isolation": {
+      "run_id": 37274224244,
+      "conclusion": "success",
+      "exact_sha": "d2872620450dc5e3604f56810721ce13470c99bb"
+    },
+    "n100_local": {
+      "conclusion": "NOT_USED",
+      "note": "Desktop Commander monthly usage limit was reached, so N100 was unavailable; GitHub exact-SHA CI and branch state were used as completion evidence."
+    }
+  },
+  "next_action": "Quest3/VDXR CORRECTNESS-test exact build d2872620450dc5e3604f56810721ce13470c99bb with VRTelemetry enabled and correlate C64/DRAW producer fingerprints. Do not promote ProducerToken into rendering authority. Keep R31/R32 physical retirement deferred until an atomic replacement preserves all guarded preconditions.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00407",
+    "production_id": "CONVERSION-DX9EX-00407",
+    "event_id": "CONVERSION-DX9EX-00407-E003",
+    "event_type": "rollover",
+    "chat_rollover": 2,
+    "rollover_is_retry": false,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "lane": "DX9EX",
+    "target_branch": "vr-d3d9ex-focus",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE_ROLLOVER",
+    "material_result_sha": "d2872620450dc5e3604f56810721ce13470c99bb",
+    "validation_bearing_result_sha": "d2872620450dc5e3604f56810721ce13470c99bb",
+    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+    "runtime_validation": "UNTESTED"
+  },
+  "validated_at_kst": "2026-10-05T15:56:14+09:00",
+  "completed_at_kst": "2026-10-05T15:56:14+09:00"
+}

@@ -1,0 +1,75 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00598",
+  "production_id": "CONVERSION-DX9EX-00598",
+  "event_id": "CONVERSION-DX9EX-00598-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "feature_id": "DX9EX:XR_SESSION_CADENCE_REPHASE",
+  "work_key": "DX9EX:XR_SESSION_CADENCE_REPHASE",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "074768c96c410f0268c084450b0aa8bced38b6c3",
+  "material_result_sha": "5658d5ed6115163ffc415fe80420d4a7f0b86aed",
+  "result_sha": "5658d5ed6115163ffc415fe80420d4a7f0b86aed",
+  "validation_bearing_result_sha": "5658d5ed6115163ffc415fe80420d4a7f0b86aed",
+  "material_commits": [
+    "5658d5ed6115163ffc415fe80420d4a7f0b86aed"
+  ],
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_acceptance": {
+    "implementation_complete": true,
+    "symptom": "On XR_STOPPING -> READY, R35 cadence retained the previous session's display-time deadline and refresh EWMA/target-rate debounce; when the new XR epoch moved less than one second backwards, the old deadline suppressed the first resumed game-frame request.",
+    "acceptance_items": [
+      {
+        "id": "SESSION-STATE-REPHASE",
+        "status": "PASS",
+        "evidence_paths": [
+          "vrhost/src/runtime/cadence_schedule.hpp",
+          "vrhost/src/main_r23.cpp"
+        ],
+        "details": "Reset all seven session-scoped deadline/refresh/debounce fields on an actual state transition; redundant running state is idempotent; preserve monotonically increasing game request IDs."
+      },
+      {
+        "id": "FIRST-RESUMED-REQUEST",
+        "status": "PASS",
+        "evidence_paths": [
+          "vrhost/tests/cadence_schedule_smoke.cpp"
+        ],
+        "details": "Negative stale phase denies first resumed request on sub-second jump, while transitioned state issues first frame immediately; protects unchanged 90/60 phase and large-gap recovery."
+      },
+      {
+        "id": "WIN64-CADENCE-SMOKE",
+        "status": "PASS",
+        "details": "Exact-SHA host job builds and executes Windows x64 outrun-vr-cadence-schedule-smoke.exe, logging CADENCE-SCHEDULE PASS."
+      },
+      {
+        "id": "GATES-EXACT-SHA",
+        "status": "PASS",
+        "details": "DX9Ex Active 5 jobs SUCCESS; Domain Isolation SUCCESS; Full Source Impact 3 jobs SUCCESS, all on material SHA."
+      }
+    ],
+    "protected_paths": "No DX11, DXVK, Localization, FFB, SkyGlow, lens, HUD or stereo ownership modifications; same game request sequence and existing rate schedule for ongoing session."
+  },
+  "exact_sha_validation": {
+    "target_sha": "5658d5ed6115163ffc415fe80420d4a7f0b86aed",
+    "dx9ex_active_run_id": 38136204652,
+    "dx9ex_active_jobs": [
+      "policy",
+      "host",
+      "game",
+      "full-chain-compile",
+      "package"
+    ],
+    "domain_isolation_run_id": 38136204642,
+    "full_source_impact_run_id": 38136204696,
+    "all_conclusion": "SUCCESS",
+    "host_smoke_step": "CADENCE-SCHEDULE PASS: 90/60 phase, pause, XR epoch reset, overflow"
+  },
+  "runtime_validation_note": "Quest3/VDXR headset runtime, VR pose, optical fidelity, frame pacing and game-controller interaction not directly tested for this SHA; RUNTIME_VALIDATION=UNTESTED.",
+  "controller_next_action": "Do not redispatch or re-score CONVERSION-DX9EX-00598; select a separate non-overlapping implementation. DXVK remains frozen."
+}

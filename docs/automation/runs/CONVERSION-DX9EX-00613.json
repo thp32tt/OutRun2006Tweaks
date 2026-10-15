@@ -1,0 +1,128 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00613",
+  "production_id": "CONVERSION-DX9EX-00613",
+  "event_id": "CONVERSION-DX9EX-00613-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:R30_FLAT_EFFECT_GEOMETRY_FASTPATH",
+  "work_key": "DX9EX:R30_FLAT_EFFECT_GEOMETRY_FASTPATH",
+  "material_result_sha": "8f15e87a6f98a6e77ef0b55c328d9ef98011f0cb",
+  "result_sha": "6ca24333720c321179fd066d2d6f9eed69c81a28",
+  "validation_bearing_result_sha": "6ca24333720c321179fd066d2d6f9eed69c81a28",
+  "material_commits": [
+    "8f15e87a6f98a6e77ef0b55c328d9ef98011f0cb",
+    "55b5fc7b812038b8f9597bfa17bff40f80c069b9",
+    "0942a8914ef306dabbc8a4fc192dbd08ad2cbec1"
+  ],
+  "own_last_commit_sha": "0942a8914ef306dabbc8a4fc192dbd08ad2cbec1",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Eliminate repeated inverse base projection, eye rigid-inverse and per-eye FOV projection matrix work from R30 flat-perspective effect draws; eliminate obsolete D3D9 scissor read and prioritize reliable tracked viewport on HUD draws without changing original stereo scene composition.",
+    "acceptance": "Reuse strict pose/scale/base+head projection/per-eye geometry cache only for identical identity, invalidate on Reset/failure, preserve per-draw live WVP and exact matrix multiplication order; preserve protected SkyGlow pre-HUD snapshot, untouched scissor, fallback original viewport, right-eye state restoration and R29 safety. Verify 12 destructive regressions and exact-SHA DX9Ex Active policy/game/host/full-chain/package, Domain Guard and Full Source Impact.",
+    "runtime_metrics": "Static source hot-path optimization only. No real Quest3/VDXR FPS, GPU utilization, p95/p99 or stereo optical parity measurement."
+  },
+  "acceptance_results": [
+    {
+      "item": "R30_FLAT_EFFECT_PER_EYE_GEOMETRY_CACHE",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Source R30PrepareFlatEffectGeometry uses poseSequence, worldScale, exact base/head projection matrices, full per-eye orientation/offset/FOV; inverse base and per-eye inverse/projection are cache-miss only; live stockWvp per draw and original matrix order retained."
+    },
+    {
+      "item": "R30_HUD_STATE_QUERY_FASTPATH",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Removed never-used scissor read/remap path; tracked viewport with actual GetViewport fallback; SkyGlow scene-before-HUD and original right-eye restore unchanged."
+    },
+    {
+      "item": "R30_INVALIDATION_AND_NEGATIVE_REGRESSION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "tools/verify_vr_r30_flat_effect_geometry_fastpath.py 12 scoped destructive tests with reset/nonfinite/identity checks; initial two test-scope mistakes repaired under same TASK and final DX9Ex Active policy passed."
+    },
+    {
+      "item": "DX9EX_ACTIVE_GAME_HOST_FULLCHAIN_PACKAGE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Active #38155723497 attempt2 has 5/5 SUCCESS at descendant 6ca24333."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Domain Isolation #38155723441 SUCCESS at 6ca24333."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Full Source Impact #38155723421 source/game/host 3/3 SUCCESS at 6ca24333; initial material SHA also #38154999475 3/3 SUCCESS."
+    },
+    {
+      "item": "QUEST3_VDXR_HMD_AND_FPS",
+      "status": "UNTESTED",
+      "evidence": "No headset/game runtime on actual PC; no visual acceptance or measured FPS claim."
+    }
+  ],
+  "exact_sha_validation": {
+    "target_sha": "6ca24333720c321179fd066d2d6f9eed69c81a28",
+    "all_conclusion": "SUCCESS",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38155723497,
+        "run_attempt": 2,
+        "head_sha": "6ca24333720c321179fd066d2d6f9eed69c81a28",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38155723497",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38155723441,
+        "run_attempt": 1,
+        "head_sha": "6ca24333720c321179fd066d2d6f9eed69c81a28",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38155723441",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38155723421,
+        "run_attempt": 1,
+        "head_sha": "6ca24333720c321179fd066d2d6f9eed69c81a28",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38155723421",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "validation_provenance": {
+    "source_material_sha": "8f15e87a6f98a6e77ef0b55c328d9ef98011f0cb",
+    "own_test_repair_shas": [
+      "55b5fc7b812038b8f9597bfa17bff40f80c069b9",
+      "0942a8914ef306dabbc8a4fc192dbd08ad2cbec1"
+    ],
+    "descendant_validation_sha": "6ca24333720c321179fd066d2d6f9eed69c81a28",
+    "descendant_nonowned_commit": "6ca24333720c321179fd066d2d6f9eed69c81a28",
+    "descendant_nonowned_changed_paths": [
+      "src/hooks_misc.cpp",
+      "vrhost/src/main.cpp",
+      "vrhost/src/main_r23.cpp"
+    ],
+    "note": "Independent concurrent OpenXR eye-extent commit fast-forwarded on same branch. Compare confirms it touched none of this task's C++/test/workflow files. Competing workflow reruns/cancel-in-progress cancelled preceding exact-SHA builds; final descendant 6ca24333 PASS validated unchanged R30 material. Do not award this task for concurrent OpenXR changes."
+  },
+  "material_change_evidence": {
+    "source_paths": [
+      "src/vr/d3d9/stereo_renderer_r30.cpp"
+    ],
+    "validation_paths": [
+      "tools/verify_vr_r30_flat_effect_geometry_fastpath.py",
+      ".github/workflows/vr-dx9ex-active.yml"
+    ]
+  },
+  "runtime_validation_note": "RUNTIME_VALIDATION=UNTESTED. CI BUILD_VERIFIED is not Quest3/VDXR HMD PASS or performance confirmation.",
+  "completed_kst": "2026-10-12T01:38:04+09:00",
+  "controller_next_action": "Continue independent measured DX9Ex VR performance feature; do not redispatch or double-score CONVERSION-DX9EX-00613. DX11 Native overall priority, DXVK frozen."
+}

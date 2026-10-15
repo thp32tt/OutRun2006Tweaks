@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00561",
+  "production_id": "CONVERSION-DX9EX-00561",
+  "event_id": "CONVERSION-DX9EX-00561-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "888760fad3df4ba2b31fc47e4408a9b7421af93a",
+  "material_result_sha": "34ec299128d54fae63dc0ed5cbf1c18e9f75434e",
+  "validation_bearing_result_sha": "34ec299128d54fae63dc0ed5cbf1c18e9f75434e",
+  "result_sha": "34ec299128d54fae63dc0ed5cbf1c18e9f75434e",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00561]",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "retry_allowed": false,
+  "controller_terminal": true,
+  "work_key": "DX9EX:R31:live_verified_wvp_original_eye_consistency",
+  "conflict_keys": [
+    "src/vr/d3d9/stereo_renderer_r31.cpp:R31BuildFastWorldConstants:live-wvp-selection",
+    "tools/verify_vr_r31_live_wvp_consistency.py"
+  ],
+  "priority_policy": "docs/DX9EX_AUTODEV_PRIORITY_20261010.md P1 independent stability/refactor; FFB v0.2 imported release files preserved; HMD-dependent acceptance not claimed",
+  "ffb_release_provenance": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "published": "2026-10-07T15:24:35Z",
+    "prior_material_release_blobs_verification": "CONVERSION-DX9EX-00560",
+    "ffb_files_modified": false
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
+  },
+  "summary": "Use the selected validated-live WVP for both original shader constant restoration and per-eye corrected world transform. Previously live was restored after a bounded successful live-vs-verified comparison while stereo transformed the slightly different verified matrix; unsampled fallback and failed-live rejection unchanged.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "tools/verify_vr_r31_live_wvp_consistency.py",
+    ".github/workflows/vr-dx9ex-active.yml"
+  ],
+  "static_contract": {
+    "name": "tools/verify_vr_r31_live_wvp_consistency.py",
+    "dx9ex_active_policy": "SUCCESS",
+    "negative_mutations": 5,
+    "repeated_hud_1000_5000": false
+  },
+  "ci_runs": {
+    "dx9ex_active": 38010727507,
+    "domain_isolation": 38010727422,
+    "full_source_impact": 38010727437,
+    "autodev_coordination": 38010727464
+  },
+  "ci_jobs": {
+    "dx9ex_policy": "SUCCESS",
+    "dx9ex_game": "SUCCESS",
+    "dx9ex_host": "SUCCESS",
+    "dx9ex_full_chain_compile": "SUCCESS",
+    "dx9ex_package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "fullsource_game_analyze": "SUCCESS",
+    "fullsource_host_analyze": "SUCCESS",
+    "fullsource_cross_domain": "SUCCESS",
+    "coordination": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11652074805,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-34ec299128d54fae63dc0ed5cbf1c18e9f75434e",
+    "digest": "sha256:fb4da184bb6018f641b426d76ee75b9b0943b7601e17d94d7f771838979f2c3f"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub focus latest HEAD, AGENTS.md, P0-P3 priority, queue/state/history, Issue #13/#14, 00560 COMPLETE; 00561 absent; work_key independent",
+    "C1_REVIEW": "PASS: official v0.2 FFB release pinned, previous exact nine imported blob identities preserved; new R31 live-vs-verified input drift (different from 00560 eye pose cache) bounded",
+    "C2_IMPLEMENT": "PASS: C++ same WVP source for original constants and per-eye stereo; focused 5-mutation regression verifier and canonical CI wiring; no other backend files changed",
+    "C3_VALIDATE": "PASS: exact material SHA Active 38010727507 (policy/game/host/full-chain/package), Domain 38010727422, Full Source 38010727437",
+    "C4_COMMIT": "PASS: authenticated GitHub material 34ec299128d54fae63dc0ed5cbf1c18e9f75434e with exact [AUTO:CONVERSION-DX9EX-00561] and no CI skip",
+    "C5_PACKAGE": "PASS: exact-SHA CI artifact 11652074805; no actual Quest3/VDXR runtime acceptance",
+    "C6_RESULT": "PASS: bookkeeping result stored separately; material source/validation SHA pinned, task terminal and no duplicate retry"
+  },
+  "parallel_policy": "DX11 A separate active lane; DX9Ex C active; DXVK B FROZEN; baseline preserved; no HMD rollout claimed",
+  "runtime_gate": "NEED_HMD_TEST",
+  "performance_target": "120 native FPS Quest3/VD High/RTX4070 not measured or claimed",
+  "scoreboard": {
+    "ai": "AI2",
+    "previous": 1066,
+    "change": 1,
+    "cumulative": 1067,
+    "run_key": "CONVERSION-DX9EX-00561",
+    "commit": "77f81ecfa7db655407935fed32bccc745621b2cd"
+  },
+  "next_action": "Use a NEW TASK_ID for another non-conflicting DX9Ex P1 R31/R30/TU owner safety item, then P2 automatic OpenXR recommended per-eye extent, P3 independently measured native 120FPS. Do not replay 00561.",
+  "updated_kst": "2026-10-10 09:59 KST"
+}

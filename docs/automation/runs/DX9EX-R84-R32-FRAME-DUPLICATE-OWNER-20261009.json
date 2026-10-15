@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-R84-R32-FRAME-DUPLICATE-OWNER-20261009",
+  "target_branch": "vr-d3d9ex-focus",
+  "selected_work_item": "DX9EX-R84-PORT-SEAMS-001",
+  "source_mode": "CHAT_DIRECT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "base_sha": "b50dbc7f674cabafcbe60b9405810c16daa47ca7",
+  "material_result_sha": "9e4d62314ed4654bd548eb1cc505d21a8bc71d20",
+  "validation_bearing_result_sha": "9e4d62314ed4654bd548eb1cc505d21a8bc71d20",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "summary": "R32 world/HUD stereo duplicated-draw counters and sticky right-draw failure reowned by R30 with original first-pose metadata latch and counters unchanged. 11 fail-closed negative-mutation controls.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_refactor_contract.py"
+  ],
+  "ci": {
+    "active_run_id": 37928148032,
+    "domain_run_id": 37928148362,
+    "result": "SUCCESS",
+    "jobs": {
+      "policy": 113811993157,
+      "game": 113812132955,
+      "host": 113812133138,
+      "full-chain-compile": 113812132997,
+      "package": 113813874672
+    }
+  },
+  "artifact": {
+    "id": 11615615562,
+    "digest": "sha256:4b490b54d0efc35f747b76be369234fac64e66a5f6a8a204f3ff200c2e43fe0b"
+  },
+  "issue14_comment_id": 6080582579,
+  "next_action": "Independent R32 lower hook target pointer/installed-device owner seam, then R32/R31 preflight. Quest3/VDXR HMD remains UNTESTED."
+}

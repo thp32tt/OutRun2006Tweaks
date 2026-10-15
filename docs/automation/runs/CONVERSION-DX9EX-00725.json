@@ -1,0 +1,103 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00725",
+  "production_id": "CONVERSION-DX9EX-00725",
+  "event_id": "CONVERSION-DX9EX-00725-E003",
+  "event_type": "C6_RESULT_ONLY",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "base_sha": "cce2704e9cfe9f996f889281ac98cf7322e8e190",
+  "source_material_sha": "c3a0e58ff66212ec82a51205778c1f6f37cd75d1",
+  "material_result_sha": "c24b004cc8a8e47590bc824e05694a3f49b0c7e3",
+  "validation_bearing_result_sha": "c24b004cc8a8e47590bc824e05694a3f49b0c7e3",
+  "result_sha": "c24b004cc8a8e47590bc824e05694a3f49b0c7e3",
+  "material_commits": [
+    "c3a0e58ff66212ec82a51205778c1f6f37cd75d1",
+    "c24b004cc8a8e47590bc824e05694a3f49b0c7e3"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 integrated responsive HUD, original-aspect main menu, independent ESC menu and legible F11 in Quest3/VDXR.",
+    "completed_scope": "Opt-in 4:3 LOCAL theater menu content crop (4:3,16:9,21:9 smoke) and Win32 F11 shell compiler repair.",
+    "remaining_acceptance": [
+      "Semantic-group adaptive HUD anchors and legible speed/time/rank",
+      "Independent ESC/pause menu positioning",
+      "Actual Quest3/VDXR optics and 120 FPS measurements"
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "host_aspect_smoke": "PASS",
+    "win32_game": "PASS_EXACT_SHA",
+    "win32_full_chain": "PASS_EXACT_SHA",
+    "domain_isolation": "PASS_EXACT_SHA",
+    "full_source_impact": "PASS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL"
+  },
+  "prior_failed_workflow": {
+    "id": 38321899467,
+    "sha": "c3a0e58ff66212ec82a51205778c1f6f37cd75d1",
+    "cause": "MSVC C2589/C2059 in src/overlay/overlay.cpp:67-68 Windows min/max macro expansion"
+  },
+  "repair": "Parenthesized (std::min)/(std::max) in overlay Win32 XR shell; standalone macro-conflict C++ smoke PASS.",
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38322552829,
+      "sha": "c24b004cc8a8e47590bc824e05694a3f49b0c7e3",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    {
+      "id": 38322552867,
+      "sha": "c24b004cc8a8e47590bc824e05694a3f49b0c7e3",
+      "conclusion": "success",
+      "jobs": [
+        "domain-isolation"
+      ]
+    },
+    {
+      "id": 38322552876,
+      "sha": "c24b004cc8a8e47590bc824e05694a3f49b0c7e3",
+      "conclusion": "success",
+      "jobs": [
+        "source-cross-domain",
+        "msvc-analyze-openxr-host",
+        "msvc-analyze-active-game"
+      ]
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_validation_required": "Only actual Quest3/VDXR exact build optics establish menu/HUD function and measured FPS.",
+  "artifacts": {
+    "active": 11779104541,
+    "gpu_diagnostic": 11778474858
+  },
+  "score_delta": 0,
+  "score_awarded": false,
+  "score_policy": "Same TASK_ID retry and incomplete overall feature; no duplicate accounting.",
+  "previous_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "c6_bookkeeping_confirmation": {
+    "validation_sha": "c24b004cc8a8e47590bc824e05694a3f49b0c7e3",
+    "exact_sha_gates": "PASS_EXACT_SHA",
+    "run_record_recovered": true,
+    "source_modified": false,
+    "ci_reexecuted": false,
+    "score_delta": 0
+  }
+}

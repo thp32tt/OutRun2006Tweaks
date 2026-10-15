@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00530",
+  "production_id": "CONVERSION-DX9EX-00530",
+  "event_id": "CONVERSION-DX9EX-00530-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "selected_work_item": "DX9EX-P0-CANONICAL-DISPRANK-CLIP-CALLSITE-CONTRACT",
+  "base_sha": "d35bea5434fdde9cdd8b4c3c2ac9ee6572f98adf",
+  "material_result_sha": "9620c328c52921b5a0c6955e2108295f56edc90f",
+  "validation_bearing_result_sha": "9620c328c52921b5a0c6955e2108295f56edc90f",
+  "result_sha": "9620c328c52921b5a0c6955e2108295f56edc90f",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00530]",
+  "summary": "Pin eight canonical DispRank/POSITION HUD put_clip_sprite direct-CALL producers and require them in the P0 visual-composition verifier. Runtime render code is unchanged.",
+  "changed_paths": [
+    "docs/VR_BINARY_CONTRACT.json",
+    "tools/verify_vr_visual_composition_p0.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00530.json"
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "dx9ex_active_run_id": 37648318106,
+    "jobs": {
+      "policy": 112884777616,
+      "game": 112884929573,
+      "host": 112884929678,
+      "full_chain_compile": 112884929770,
+      "package": 112888523048
+    },
+    "domain_isolation_run_id": 37648318134,
+    "package_artifact_id": 11495667571,
+    "package_artifact_digest": "sha256:b2c489cf287864cf8c534365ab8befa37f0084340cf5de8ff9eb3ca8b0f127a9",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "canonical_calls": [
+      {
+        "rva": "0x000B9F3A",
+        "expected_bytes": "e84133f7ff",
+        "target_rva": "0x0002D280"
+      },
+      {
+        "rva": "0x000B9F5E",
+        "expected_bytes": "e81d33f7ff",
+        "target_rva": "0x0002D280"
+      },
+      {
+        "rva": "0x000B9F81",
+        "expected_bytes": "e8fa32f7ff",
+        "target_rva": "0x0002D280"
+      },
+      {
+        "rva": "0x000B9FD0",
+        "expected_bytes": "e8ab32f7ff",
+        "target_rva": "0x0002D280"
+      },
+      {
+        "rva": "0x000B9FFC",
+        "expected_bytes": "e87f32f7ff",
+        "target_rva": "0x0002D280"
+      },
+      {
+        "rva": "0x000BA01E",
+        "expected_bytes": "e85d32f7ff",
+        "target_rva": "0x0002D280"
+      },
+      {
+        "rva": "0x000BA035",
+        "expected_bytes": "e84632f7ff",
+        "target_rva": "0x0002D280"
+      },
+      {
+        "rva": "0x000BA052",
+        "expected_bytes": "e82932f7ff",
+        "target_rva": "0x0002D280"
+      }
+    ],
+    "issue14_comment_id": 6041669983
+  },
+  "protected_boundaries": [
+    "no runtime render-path source changed",
+    "no HUD placement/projection math changed",
+    "no Reset/Present/OpenXR/DirectGPU behavior changed"
+  ],
+  "next_action": "Continue P0 visual-composition static closure from the latest focus HEAD. Do not request HMD validation until the full exact-SHA closure matrix is green."
+}

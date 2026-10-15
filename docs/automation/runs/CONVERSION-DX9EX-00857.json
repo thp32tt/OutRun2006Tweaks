@@ -1,0 +1,98 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00857",
+  "production_id": "CONVERSION-DX9EX-00857",
+  "event_id": "CONVERSION-DX9EX-00857-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00857",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Preserve the complete authored menu and car-selection image, including content outside the nominal 4:3 centre, at native 4:3/16:9/21:9 aspect while maintaining a comfortable optical size and binocular LOCAL-fixed presentation.",
+    "scope_boundary": "Only OpenXR host menu/client cropping and LOCAL menu optical coverage; never the game UI, stereo gameplay, HUD/F11/ESC, lens/GOAL/+TIME, SkyGlow, input/FFB or DX11/DXVK.",
+    "trace_stages": [
+      "Original game's user-visible main and vehicle-selection sprites plus Graphics letterboxing and scaling configuration.",
+      "Game client and capture UV through R23 full-client aspect, optional original 4:3 crop and clipped fragment geometry.",
+      "R23 shared common FOV tangent optical projection and identical left/right menu quad to the OpenXR compositor."
+    ],
+    "subcomponents": [
+      "Prevent destructive implicit 4:3 UV cropping based solely on a configuration flag; retain opt-in cropped A/B fallback.",
+      "Contain the entire native-aspect wide front-end at the same bounded 0.78 binocular optical coverage as explicit centre crop, without independent horizontal/vertical stretching.",
+      "Preserve full and edge-clipped capture fragment scale/translation and exact source-mode negative regressions."
+    ],
+    "acceptance_items": [
+      {
+        "id": "native_content",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Main menu and vehicle-select content",
+        "expected_behavior": "Default wide native client preserves all authored selection pixels without 4:3 cropping inferred from INI settings; explicit manual 4:3 override still works."
+      },
+      {
+        "id": "optical_scale",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Common-FOV left/right eye projection",
+        "expected_behavior": "Full 21:9, 16:9 and 4:3 menus remain optically centred and uniformly contained at the same 78% coverage; cropped and partially captured fragments retain true placement."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Capture validity and desktop/VR ownership",
+        "expected_behavior": "Unletterboxed and desktop UI, stale UV/invalid extent rejection and stereo game HUD/F11/ESC are unchanged; the prior unsafe automatic crop and full-FOV regression are caught."
+      },
+      {
+        "id": "integration",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA Windows host/game/package gate",
+        "expected_behavior": "DX9Ex Active x86 game, x64 host, package, full-chain compile plus Domain Isolation and affected menu/source regressions pass on the final validation-bearing Git SHA."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Real Quest3/VDXR user-tested A/B at source 1d161a18efcfe4ddf3cad318ea6be50102458ac3 observed wide menu and 4:3 crop clipping the Ferrari/car list outside the centre, irrespective of CLI static assertions.",
+    "source_trace": [
+      "R23GameMenuIsLetterboxed reads configured UILetterboxing/UIScalingMode without checking sampled content pixel margins.",
+      "R23RenderWorldLockedMenuProjection previously equated that config flag with safe 4:3 authored crop, discarding real car-selection columns in both eyes.",
+      "When crop was false the host used opticalCoverage 1.0 and blew the full native client up to FOV limits; both eyes share that same LOCAL-fixed projection."
+    ],
+    "root_cause": "UI configuration flags are not image-content proof and native menu optical sizing was incorrectly conditional on the destructive 4:3 crop choice.",
+    "alternatives_rejected": [
+      "Do not assume every pixels outside original 4:3 are black letterbox rails; Quest3 screenshots showed visible car-selection content.",
+      "Do not modify game's authored menus, desktop output pixels, raw capture or per-eye aspect independently to compensate for the crop."
+    ],
+    "fix_evidence": "The default XR menu path requires an independently verified matte before automatic crop and uniformly reduces full-client/menu optics to 0.78 common tangent-ellipse coverage; explicit reversible centre-crop override remains.",
+    "negative_test_evidence": "Portable C++ verifies config-vs-matte truth table; existing menu geometry/source mutation verifier now rejects auto-crop false-to-true and coverage 0.78-to-1.0, with native/clipped aspect and reset fixtures preserved.",
+    "eye_ownership": "R23 LOCAL-fixed projection uses common FOV, identical 0.78 optical containment and common captured UV in both eyes; no change to gameplay stereo eyes."
+  },
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "No matching Quest3/VDXR session on the new build; visual menu correctness is not yet proven.",
+  "changed_files": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp",
+    "tools/verify_vr_menu_letterbox_aspect.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00857.json"
+  ],
+  "material_result_sha": null,
+  "validation_bearing_result_sha": "51910d56817a25c6c5ab4684b5d37211b5e7e79e",
+  "acceptance_results": {
+    "native_content": "SOURCE_PATCHED",
+    "optical_scale": "SOURCE_PATCHED",
+    "fallback": "TEST_PENDING",
+    "integration": "PENDING_EXACT_SHA"
+  },
+  "ci_evidence": {
+    "status": "SUCCESS",
+    "validation_sha": "51910d56817a25c6c5ab4684b5d37211b5e7e79e",
+    "note": "Exact-SHA GitHub CI SUCCESS per C6 handoff; no build or CI was rerun in this bookkeeping step."
+  },
+  "score_once": false,
+  "phase": "C6_RESULT"
+}

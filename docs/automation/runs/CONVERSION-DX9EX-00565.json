@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00565",
+  "production_id": "CONVERSION-DX9EX-00565",
+  "event_id": "CONVERSION-DX9EX-00565-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "b8922520253041a48bc5ef8b3c980c704f101058",
+  "material_result_sha": "b8ca76a6655d1a22034c9701888b75dd3d14952d",
+  "validation_bearing_result_sha": "b8ca76a6655d1a22034c9701888b75dd3d14952d",
+  "result_sha": "b8ca76a6655d1a22034c9701888b75dd3d14952d",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00565]",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "work_key": "DX9EX:P1:recenter_ipc_publication_snapshot",
+  "conflict_keys": [
+    "src/vr/ipc/recenter_request.hpp:Pending-PID-snapshot",
+    "tools/verify_vr_recenter_publication_snapshot.py"
+  ],
+  "ffb_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "nine_imported_file_blobs": "MATCH_VERIFIED_RELEASE_TAG",
+    "wheel_runtime_validation": "UNTESTED"
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
+  },
+  "summary": "Fail-closed F10 recenter IPC Pending when a restarted publisher clears requesterPid to its in-progress zero sentinel after the host first PID snapshot but before requestId increments. Re-read PID after request sequence validation; reject zero/mismatched PID. No shared ABI, FFB, HUD, DX11, DXVK, or localization modifications.",
+  "changed_paths": [
+    "src/vr/ipc/recenter_request.hpp",
+    "tools/verify_vr_recenter_publication_snapshot.py",
+    ".github/workflows/vr-dx9ex-active.yml"
+  ],
+  "static_contract": {
+    "verifier": "tools/verify_vr_recenter_publication_snapshot.py",
+    "single_focused_check": "PASS",
+    "negative_mutations": 5,
+    "hud_1000_5000_repeated": false
+  },
+  "ci_runs": {
+    "dx9ex_active": 38018736773,
+    "domain_isolation": 38018736777,
+    "full_source_impact": 38018736757,
+    "autodev_coordination": 38018736816
+  },
+  "ci_jobs": {
+    "policy": "SUCCESS",
+    "game": "SUCCESS",
+    "host": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "fullsource_game_analyze": "SUCCESS",
+    "fullsource_host_analyze": "SUCCESS",
+    "fullsource_cross_domain": "SUCCESS",
+    "coordination": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11656994642,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-b8ca76a6655d1a22034c9701888b75dd3d14952d",
+    "digest": "sha256:8e6ccd55f282dcf3a2fa9216c924d2561185a46a9244a06e1949b52558b2d3f2"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: GitHub head/claim/task checkpoint, policy, state, queue, history, issue #13/#14, release v0.2 checked; run record did not exist",
+    "C1_REVIEW": "PASS: independent F10 recenter requester PID sentinel torn-snapshot during game process reconnect; prior 00563 R31 and 00564 helper host PID/LUID unaffected",
+    "C2_IMPLEMENT": "PASS: real C++ recenter guard plus 5-negative-mutation verifier and exact-SHA workflow wiring, three material paths",
+    "C3_VALIDATE": "PASS: exact source SHA b8ca76a6655d1a22034c9701888b75dd3d14952d; Active #38018736773 policy/game/host/full-chain/package; Domain #38018736777; Full Source #38018736757; Coordination #38018736816",
+    "C4_COMMIT": "PASS: material SHA b8ca76a6655d1a22034c9701888b75dd3d14952d required AUTO marker; no CI skip",
+    "C5_PACKAGE": "PASS: exact-SHA artifact 11656994642 published; not user HMD-approved",
+    "C6_RESULT": "PASS: durable post-gate run record separately committed without modifying validation-bearing source"
+  },
+  "runtime_gate": "NEED_HMD_TEST",
+  "native_120fps_target": "NOT_MEASURED",
+  "parallel_policy": "DX11 A ACTIVE independent; DX9Ex C ACTIVE; DXVK B FROZEN; localization untouched",
+  "issue14_comment_id": 6093083529,
+  "next_action": "Continue new independent DX9Ex P1 R84 owner/API structural seam; preserve approved FFB v0.2 and XR/HUD/device reset. No retry of 00565."
+}

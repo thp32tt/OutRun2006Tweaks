@@ -1,0 +1,65 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00665",
+  "production_id": "CONVERSION-DX9EX-00665",
+  "event_id": "CONVERSION-DX9EX-00665-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R30_INDEXED_XYZRHW_FUSED_HUD_STEREO",
+  "work_key": "DX9EX:R30_INDEXED_XYZRHW_FUSED_HUD_STEREO",
+  "base_sha": "db999e921d02ce481e1e3889dd70de41bff7652e",
+  "material_result_sha": "56ac3d75656d99c03c382a54a85d94a365dc3f3f",
+  "material_commits": [
+    "56ac3d75656d99c03c382a54a85d94a365dc3f3f"
+  ],
+  "result_sha": "56ac3d75656d99c03c382a54a85d94a365dc3f3f",
+  "validation_bearing_result_sha": "56ac3d75656d99c03c382a54a85d94a365dc3f3f",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Fuse per-eye CPU validation/transform traversal of indexed XYZRHW ScreenHud draws, retaining sparse referenced vertex copy across both eyes and preserving world effects.",
+    "acceptance": "No per-eye repeated HUD contain/FOV lookup on indexed draws; source mask coverage and finite checks preserved; exact-SHA DX9Ex Active policy/host/game/full-chain/package, Domain Isolation and Full Source Impact all SUCCESS.",
+    "runtime_metrics": "Quest 3/VDXR stereo image, HUD optics, FPS and p95/p99 GPU/CPU frame-time unmeasured."
+  },
+  "acceptance_results": [
+    {
+      "item": "MATERIAL_CPP_INDEXED_FUSED_HUD",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "56ac3d75656d99c03c382a54a85d94a365dc3f3f modifies src/vr/d3d9/stereo_renderer_r30.cpp with a shared indexed ScreenHud vertex traversal and selected-byte copy."
+    },
+    {
+      "item": "FOCUSED_NEGATIVE_REGRESSION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "tools/verify_vr_r30_hud_contain_draw_fastpath.py negative mutant gate passed in canonical policy job."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38207573142 policy/host/game/full-chain-compile/package all 5/5 SUCCESS."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38207573123 SUCCESS."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38207573062 source-cross-domain/MSVC OpenXR host/MSVC Win32 game all 3/3 SUCCESS."
+    },
+    {
+      "item": "QUEST3_VDXR_RUNTIME",
+      "status": "UNTESTED",
+      "evidence": "No real Quest 3/VDXR HMD/game/FPS test performed."
+    }
+  ],
+  "package_artifact_id": 11728092514,
+  "package_artifact_digest": "sha256:1b29929ddda2c4c1158f1b104db9d2ce422f7452c1434c975b2cc80a5a025c31",
+  "notes": "Separate [skip ci] C6 checkpoint after exact-SHA validation; validation-bearing result SHA is immutable material commit. No DX11/DXVK/localization edits; DXVK stays frozen. +0 additional C6 points."
+}

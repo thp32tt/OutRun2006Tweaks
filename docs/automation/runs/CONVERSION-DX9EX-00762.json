@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00762",
+  "production_id": "CONVERSION-DX9EX-00762",
+  "event_id": "CONVERSION-DX9EX-00762-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00762",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "14bd7737935dea51217417e8342b7a8b47aecebc",
+  "material_result_sha": "14bd7737935dea51217417e8342b7a8b47aecebc",
+  "validation_bearing_result_sha": "14bd7737935dea51217417e8342b7a8b47aecebc",
+  "result_sha": "14bd7737935dea51217417e8342b7a8b47aecebc",
+  "material_commits": [
+    "14bd7737935dea51217417e8342b7a8b47aecebc"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 P0-A: retain the Quest3/VDXR F11 overlay's established VR font atlas density through transient invalid or zero-sized game-mirror source resolution on DX9Ex Reset, without changing overlay input ownership, binocular eye extent selection, or desktop font restoration.",
+    "completed_scope": "src/overlay/hooks_overlay.cpp retains the clamped VR font multiplier for the live F11 overlay before validating Game::screen_resolution; only recomputes density when source dimensions and coherent stereo eye extents are valid. tools/verify_vr_f11_font_density.py adds source-size dropout, first-visible/held-overlay and desktop-negative static/numeric regression checks. Material commit 14bd7737935dea51217417e8342b7a8b47aecebc.",
+    "remaining_acceptance": [
+      "Issue #119 full responsive HUD, main menu, ESC and F11 integration remains IN_PROGRESS, not terminal.",
+      "Actual Quest3/VDXR source-size Reset transition, optical F11 legibility, stereo consistency and input behavior still require HMD acceptance."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "F11_XR_ATLAS_RESET_SOURCE_SIZE_GAP_STATIC_NUMERIC_NEGATIVE_REGRESSION_PRESENT_WITH_EXACT_SHA_CI_SUCCESS",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "dx9ex_full_chain": "SUCCESS_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_EXACT_SHA",
+    "hud_inspector": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38369374788,
+      "head_sha": "14bd7737935dea51217417e8342b7a8b47aecebc",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "policy, game, host, full-chain-compile, package: 5/5 SUCCESS"
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38369374735,
+      "head_sha": "14bd7737935dea51217417e8342b7a8b47aecebc",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "domain-isolation: 1/1 SUCCESS"
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38369374756,
+      "head_sha": "14bd7737935dea51217417e8342b7a8b47aecebc",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "msvc-analyze-openxr-host, msvc-analyze-active-game, source-cross-domain: 3/3 SUCCESS"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38369374760,
+      "head_sha": "14bd7737935dea51217417e8342b7a8b47aecebc",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "static-exe-analysis, build-hud-inspector: 2/2 SUCCESS"
+    }
+  ],
+  "score_delta": 0,
+  "score_reason": "C6 run-record recovery/bookkeeping for the already implemented and exact-SHA-validated CONVERSION-DX9EX-00762 material commit; no new implementation or duplicate score.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "RUN_RECORD_NOT_FOUND: target path absent at verified branch HEAD before C6. Created the missing run record, reconstructing material_result_sha and feature_contract/acceptance_results from exact source commit and successful GitHub CI; no prior record was overwritten. Validation-bearing SHA remains unchanged. Separate documentation-only [skip ci] commit; no source change, build/CI rerun, or HMD test. Unrelated VR Evening Unified Test Build and VR PC Fast Test Build were skipped on validation SHA and are not counted as successful validations."
+}

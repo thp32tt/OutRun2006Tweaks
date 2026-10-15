@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00475",
+  "production_id": "CONVERSION-DX9EX-00475",
+  "event_id": "CONVERSION-DX9EX-00475-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "ce92296366505a313cadd6cfef9c006f00ea89ff",
+  "material_result_sha": "f0b7534421afa8447802baf7892f21c999356b3a",
+  "validation_bearing_result_sha": "f0b7534421afa8447802baf7892f21c999356b3a",
+  "result_sha": "f0b7534421afa8447802baf7892f21c999356b3a",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00475]",
+  "selected_work_item": "VR-DX9EX-R23-DESTROY-TRANSACTION-0058",
+  "summary": "Move R23 verified-bundle/final-submission teardown after downstream DestroySession success so failure preserves current-session presentation provenance for retry.",
+  "checkpoints": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered 00474 canonical PASS and latest bookkeeping HEAD ce922963 before starting 00475."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R23 invalidated the verified bundle and reset final-submission state before forwarding to R22/R21/R15/R13/R19/R20, defeating retry preservation when the parent destroy failed."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "R23 now obtains the downstream result first and invalidates verified bundle/final-submission state only on XR_SUCCESS. Deterministic reset/transport verifier pins the ordering."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA passed DX9Ex Active 37430595722 and Domain Isolation 37430595687."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "f0b7534421afa8447802baf7892f21c999356b3a",
+      "validation_bearing_result_sha": "f0b7534421afa8447802baf7892f21c999356b3a",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE",
+      "artifact_id": 11397166992,
+      "digest": "sha256:e54e4d1e76c5ab694c16edd879264758505e26570f5fff4fb186d11cb72b1bbc"
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "changed_paths": [
+      "vrhost/src/runtime/r23_runtime_hardening.hpp",
+      "tools/verify_vr_dx9ex_reset_transport_contract.py",
+      "docs/VR_REFACTOR_STATE.json",
+      "docs/automation/runs/CONVERSION-DX9EX-00475.json"
+    ],
+    "preserved_on_failure": [
+      "R23 verified bundle snapshot/provenance",
+      "LastSubmittedFrameId/Kind/Layer",
+      "SubmissionSerial/final-submission observation continuity"
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "validation": {
+      "dx9ex_active_run_id": 37430595722,
+      "policy_job_id": 112160292058,
+      "full_chain_compile_job_id": 112160421549,
+      "game_job_id": 112160421588,
+      "host_job_id": 112160421606,
+      "package_job_id": 112162045286,
+      "domain_isolation_run_id": 37430595687,
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11397166992,
+      "digest": "sha256:e54e4d1e76c5ab694c16edd879264758505e26570f5fff4fb186d11cb72b1bbc"
+    },
+    "issue14_comment_id": 6011729024
+  },
+  "next_action": "CONVERSION-DX9EX-00476: make R15 review_hardening DestroySession transactional so failed downstream destruction preserves classic fallback frame/run/PID freshness state.",
+  "started_at_kst": "2026-10-06T16:32:00+09:00",
+  "completed_at_kst": "2026-10-06T16:41:00+09:00"
+}

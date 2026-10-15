@@ -1,0 +1,130 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00796",
+  "production_id": "CONVERSION-DX9EX-00796",
+  "event_id": "CONVERSION-DX9EX-00796-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R26_OCCLUSION_AND_PRESENT_CPU_HOTPATH",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R26_OCCLUSION_AND_PRESENT_CPU_HOTPATH",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00796]",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 1,
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r26.cpp",
+    "tools/verify_vr_r26_occlusion_present_fastpath.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00796.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R26_OCCLUSION_AND_PRESENT_CPU_HOTPATH",
+    "goal": "Reduce synchronous D3D9 tracked-state reads during active occlusion queries and stop inactive Present instrumentation overhead without changing stereo replay, diagnostic accuracy or failure isolation.",
+    "scope_boundary": "R26/R27 source-only CPU fast paths and registered negative checks; no HUD, SkyGlow, transport fence/interop, host, DX11/DXVK, or FFB changes.",
+    "special_work_evidence": "Before this source change R26 unconditionally requested all four render states per active occlusion draw, even after a writable color/depth state disproved query-only; disabled VR telemetry still made two QPC calls and floating-point Present statistics each frame. Early proof saves three/two/one tracked reads for color-writing/depth-writing/stencil-disabled cases and bypasses two QPC calls while telemetry is disabled. The number of saved calls is source-derived, not a measured Quest3 FPS improvement.",
+    "trace_stages": [
+      "Game active occlusion query reaches R26 single-execution gate before normal R23 stereo replay, requiring four write-state predicates.",
+      "Fail-closed tracked render-state readers and short-circuit decisions reject color/depth writers early and retain all live checks for potentially writable stencil.",
+      "R27 wraps actual game Present through R23 and samples pacing only while VRTelemetry is enabled, resetting measurement baselines on disable and rearming cleanly on enable.",
+      "Windows x86 game/hook and x64 host/package exact-SHA integrated Actions must preserve R26 draw and R27 Present ABI and working stereo paths."
+    ],
+    "subcomponents": [
+      "Short-circuit D3D9/R22 tracked getter chain at first conclusive color/depth write, and avoid irrelevant stencil write-mask read when stencil testing disabled.",
+      "Keep conservative state-read failures, readable stencil write-mask veto, unchanged underlying R23 draw and Present hook forwarding.",
+      "Remove disabled R27 QPC/double accumulation while invalidating old 5s pacing and thread CPU baselines only on transition, resuming correct first-frame counters.",
+      "Registered positive/negative source and branch-policy regression across 16 writer predicates, getter failures, destructive mutations, and integrated Win32 Gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "OCCLUSION_FAST_REJECT",
+        "category": "end_to_end_behavior",
+        "behavior_area": "active_occlusion_query_stereo_draw_cpu",
+        "expected_behavior": "Known color/depth writing draw fails fast before further tracked driver getters; fully read write-free query draws execute once exactly as before."
+      },
+      {
+        "id": "PRESENT_DIAGNOSTIC_LIFECYCLE",
+        "category": "fallback_regression",
+        "behavior_area": "present_telemetry_enable_disable_and_failed_reads",
+        "expected_behavior": "Disabled VRTelemetry forwards original Present without QPC; transitions reset stale pacing; all relevant unavailable render-state reads reject query-only drawing and telemetry-on sampling retains QPC."
+      },
+      {
+        "id": "EXACT_SHA_WIN32_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_x64_host_package_domain",
+        "expected_behavior": "Exact material commit passes new mutation verifier and full Win32 DX9Ex Active, Domain Isolation and applicable Full Source Impact Gates."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "OCCLUSION_FAST_REJECT": "PASS_SOURCE_AND_WIN32_BUILD",
+    "PRESENT_DIAGNOSTIC_LIFECYCLE": "PASS_NEGATIVE_REGRESSION",
+    "EXACT_SHA_WIN32_GATES": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "R26TrackedOcclusionDrawIsWriteFree always reads COLORWRITEENABLE/ZWRITEENABLE/STENCILENABLE/STENCILWRITEMASK, even after a previous predicate proves a writer; PresentDestR27 always calls QPC twice regardless of Settings::VRTelemetry.",
+    "root_cause": "Boolean filtering occurs only after four tracked reads; R27 optional telemetry flag gates logs but not unconditional QPC and FP-statistics collection.",
+    "source_trace": [
+      "ActiveOcclusionQueries >0 invokes R26GuardTrackedOcclusion before ordinary R23 replay.",
+      "R26 write-free classification reads R22 tracked states and bypasses R23 only if no color/depth/stencil output can be modified.",
+      "R27 Present hook wraps R23 actual Present and previously performs QPC and double-statistics even without active diagnostic use."
+    ],
+    "alternatives_rejected": [
+      "Blindly treating any active occlusion query as write-free can skip required stereo color/depth draw.",
+      "Skipping required mask on stencil-enabled writes risks losing correct stencil coverage.",
+      "Zeroing diagnostic baselines each disabled frame creates avoidable 2.5KB TLS window initialization overhead."
+    ],
+    "fix_evidence": "Early short circuits preserve source state-read fail-closed behavior for consulted predicates; disabled Present hook calls its original lower hook and resets pacing only on enabled-to-disabled transition.",
+    "negative_test_evidence": "CI-registered verifier enumerates 16 render state tuples, every actually consulted getter failure and ten destructive source mutations; Quest3 runtime not executed.",
+    "failed_run_id": 38457132850,
+    "failed_step": "R26 checker destructive mutation incorrectly matched thread_local initialization rather than transition assignment",
+    "repair": "Anchor the disabled transition mutation with its unique 20-space indentation, so the verifier fails on removed edge-trigger reset; negative assertions remain strict. Original C++ material unchanged.",
+    "latest_validation": "R26 mutation verifier now targets both actual Present transition assignments rather than identically named TLS initializers; exact SHA f4b91f2 passes 5/5 DX9Ex Active. No C++ material change after 5eea2307.",
+    "validation_workflow_id": 38457461205
+  },
+  "runtime_status": "NEED_QUEST3_VDXR_P95_P99_TEST",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "required": [
+      "DX9Ex Active",
+      "Domain Isolation Guard",
+      "Full Source Impact where triggered"
+    ],
+    "validation_bearing_result_sha": "f4b91f205b475de827e82c7246bdac958d395a7f",
+    "full_source_impact_material_sha": "5eea23073279810d635cb4d2ee38978cac7c5b64",
+    "runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "id": 38457461205,
+        "head_sha": "f4b91f205b475de827e82c7246bdac958d395a7f",
+        "conclusion": "success",
+        "jobs": [
+          "policy",
+          "game",
+          "host",
+          "full-chain-compile",
+          "package"
+        ]
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "id": 38457461188,
+        "head_sha": "f4b91f205b475de827e82c7246bdac958d395a7f",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "id": 38456906290,
+        "head_sha": "5eea23073279810d635cb4d2ee38978cac7c5b64",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "material_result_sha": "5eea23073279810d635cb4d2ee38978cac7c5b64",
+  "validation_bearing_result_sha": "f4b91f205b475de827e82c7246bdac958d395a7f"
+}

@@ -1,0 +1,88 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00698",
+  "production_id": "CONVERSION-DX9EX-00698",
+  "event_id": "CONVERSION-DX9EX-00698-C6",
+  "event_type": "C6_RESULT_ONLY",
+  "feature_id": "DX9EX:R30_IMMUTABLE_VB_DEPTH_SIGNATURE_MEMO",
+  "work_key": "DX9EX:R30_VB_IB_SHADOWED_XYZRHW_DEPTH_SIGNATURE",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "base_sha": "c1ab867476d6a4055b09d21ce1e54a5a2374cb20",
+  "source_material_sha": "d6436f68d2481084651d34081b8cdf1cc6c0b84c",
+  "material_result_sha": "d6436f68d2481084651d34081b8cdf1cc6c0b84c",
+  "result_sha": "7600d58cbc37449b94ef5c76c8c8addb8feb1934",
+  "validation_bearing_result_sha": "7600d58cbc37449b94ef5c76c8c8addb8feb1934",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "material_commits": [
+    "d6436f68d2481084651d34081b8cdf1cc6c0b84c",
+    "7600d58cbc37449b94ef5c76c8c8addb8feb1934"
+  ],
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_depth_signature_memo.py",
+    ".github/workflows/vr-dx9ex-active.yml"
+  ],
+  "feature_contract": {
+    "goal": "Avoid redundant O(up-to-512) XYZRHW projected-depth classification on repeated immutable CPU-shadowed VB/IB draws while preserving stereo world/HUD semantics.",
+    "acceptance": "Per-VB revision/byte range, optional IB span/mask, vertex count/stride, base projection and viewport depth fences; untracked UP never memoized; negative-mutation regression; Win32 full-chain build plus same-SHA DX9Ex Active/Domain and original-material Full Source Impact. Quest3/VDXR proof separate."
+  },
+  "acceptance_results": {
+    "cpp_depth_signature_memo": "MATERIAL_COMMITTED",
+    "vb_ib_revision_range_projection_viewport_guards": "PASS_EXACT_SHA_POLICY",
+    "up_path_uncached": "PASS_EXACT_SHA_POLICY",
+    "negative_mutations_12": "PASS_EXACT_SHA_POLICY",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_3_OF_3_ON_MATERIAL_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS",
+  "verified_workflows": [
+    {
+      "id": 38274943951,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "7600d58cbc37449b94ef5c76c8c8addb8feb1934",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "game": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38274943942,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "7600d58cbc37449b94ef5c76c8c8addb8feb1934",
+      "conclusion": "success"
+    },
+    {
+      "id": 38274592817,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "d6436f68d2481084651d34081b8cdf1cc6c0b84c",
+      "conclusion": "success",
+      "jobs": {
+        "source-cross-domain": "success",
+        "msvc-analyze-active-game": "success",
+        "msvc-analyze-openxr-host": "success"
+      }
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "No Quest3/VDXR/game runtime or FPS/p95/p99 measurement performed; 72 Hz not asserted.",
+  "attempt": 1,
+  "score_credit_key": "CONVERSION-DX9EX-00698",
+  "score_change": 0,
+  "score_status": "C6_BOOKKEEPING_NO_ADDITIONAL_CREDIT",
+  "notes": "Source material d6436f68; concurrent producer's same-task targeted verifier repair 7600d58c was adopted as GitHub SSOT; exact-SHA Active/Domain success verified. Independent material SHA Full Source Impact success. C6 metadata is [skip ci] and never substituted as a validation-bearing result."
+}

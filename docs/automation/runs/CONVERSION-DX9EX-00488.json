@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00488",
+  "production_id": "CONVERSION-DX9EX-00488",
+  "event_id": "CONVERSION-DX9EX-00488-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "base_sha": "a61dfaefdb201da130f321ceb158f72a4e54f333",
+  "material_result_sha": "cedb2cc9a63ea99a217303bf3165da82cb59d91a",
+  "validation_bearing_result_sha": "cedb2cc9a63ea99a217303bf3165da82cb59d91a",
+  "result_sha": "cedb2cc9a63ea99a217303bf3165da82cb59d91a",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00488]",
+  "selected_work_item": "DX9EX-L3-ACK-MAPPING-RESET-LIFETIME-0071",
+  "summary": "Centralized game-side DirectGPU ACK mapping teardown in R13ReleaseAckState(), routed reopen failures through it, and release the prior transport-run ACK mapping before ResetEx resource teardown.",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "changed_paths": [
+      "src/vr/d3d9/stereo_renderer_r13.cpp",
+      "tools/verify_vr_dx9ex_reset_transport_contract.py"
+    ],
+    "dx9ex_active": {
+      "run_id": 37508745089,
+      "policy_job_id": 112424045956,
+      "host_job_id": 112424237122,
+      "game_job_id": 112424237094,
+      "full_chain_compile_job_id": 112424237198,
+      "package_job_id": 112426943844,
+      "result": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 37508745083,
+      "result": "SUCCESS"
+    },
+    "contract": "DX9Ex reset/transport contract PASS (resource/ACK teardown, monotonic generation, fail-close reset, host complete-run stale ACK rejection)",
+    "package": {
+      "artifact_id": 11434625390,
+      "digest": "sha256:72934d8673212f5c389d2e78f1dc9b710d7b12c344720914a3ff5f1c9286f4a0"
+    },
+    "issue14_comment_id": 6022569783
+  },
+  "next_action": "Continue L3-DX9EX-001 from latest HEAD with another bounded static/source resource-lifetime or stale-transport ownership improvement. HMD behavior remains unverified."
+}

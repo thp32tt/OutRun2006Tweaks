@@ -1,0 +1,63 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00643",
+  "production_id": "CONVERSION-DX9EX-00643",
+  "event_id": "CONVERSION-DX9EX-00643-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "initial_material_sha": "db3951c57f7c749a54f7258bae941cbb12bceb84",
+  "material_result_sha": "db3951c57f7c749a54f7258bae941cbb12bceb84",
+  "material_commits": [
+    "db3951c57f7c749a54f7258bae941cbb12bceb84"
+  ],
+  "verifier_repair_commits": [],
+  "result_sha": "db3951c57f7c749a54f7258bae941cbb12bceb84",
+  "validation_bearing_result_sha": "db3951c57f7c749a54f7258bae941cbb12bceb84",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Avoid nonessential R23 pixel-diagnostic D3D11 GPU staging copies/Map polling on normal OpenXR frames by defaulting the source, projection and theater pixel probes off.",
+    "acceptance": "Gate pixel diagnostic consume, final-submission and scheduling paths behind a once-per-process OUTRUN_VR_R23_PIXEL_PROBE opt-in, preserve explicit 1/true/TRUE behavior, retain diagnostic call sites, and pass exact-SHA policy/host/game/full-chain/package plus domain isolation and destructive mutation guards. HMD hardware performance remains untested.",
+    "runtime_metrics": "No Quest3/VDXR HMD execution or measured frame-time, FPS, GPU synchronization cost or GPU pixel diagnostic overhead reduction; build and source verification only."
+  },
+  "acceptance_results": [
+    {
+      "item": "R23_PIXEL_DIAGNOSTICS_OPT_IN",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Commit db3951c57f7c749a54f7258bae941cbb12bceb84 changes vrhost/src/main_r23.cpp to use a cached OUTRUN_VR_R23_PIXEL_PROBE predicate and early-return in TryConsume, NoteFinalSubmission, ScheduleSource, ScheduleProjection and ScheduleTheater, with opt-in diagnostic functionality retained."
+    },
+    {
+      "item": "NEGATIVE_REGRESSIONS",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Exact-SHA DX9Ex Active policy job in GitHub Actions #38185608632 passed tools/verify_vr_r23_pixel_probe_optin.py, with 8 destructive mutations in the committed verifier."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Exact SHA db3951c57f7c749a54f7258bae941cbb12bceb84, DX9Ex Active Validation run #38185608632: policy, host, game, full-chain-compile, and package all SUCCESS (5/5)."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Domain Isolation Guard run #38185608591 on exact SHA db3951c57f7c749a54f7258bae941cbb12bceb84 SUCCESS."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "IN_PROGRESS_AT_C6_RECORD",
+      "evidence": "Full Source Impact Review #38185608602 exact SHA: source-cross-domain and OpenXR-host MSVC analyze SUCCESS; active-game MSVC analyze was in_progress when checked. No full-source PASS is asserted."
+    },
+    {
+      "item": "QUEST3_VDXR_HARDWARE",
+      "status": "UNTESTED",
+      "evidence": "No local OutRun/Quest3 VDXR gameplay or direct HMD runtime performance validation performed."
+    }
+  ],
+  "notes": "RUN_RECORD_NOT_FOUND was verified on the target branch before creation (GitHub contents 404). This C6 record is reconstructed from the exact material/validation SHA commit and existing GitHub Actions results, not a new source or CI run. The run had no existing feature_contract or acceptance_results in this path to overwrite. Bookkeeping-only [skip ci] commit does not change the validation-bearing SHA or earn an additional AI score. The standalone DX9Ex GPU lab commit after this material SHA is not substituted as validation-bearing result."
+}

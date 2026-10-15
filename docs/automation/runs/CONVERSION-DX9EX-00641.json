@@ -1,0 +1,66 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00641",
+  "production_id": "CONVERSION-DX9EX-00641",
+  "event_id": "CONVERSION-DX9EX-00641-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R30_SKYGLOW_REDUCED_RT_VIEWPORT_FASTPATH",
+  "work_key": "DX9EX_R30_SKYGLOW_VIEWPORT_COALESCE_00641",
+  "initial_material_sha": "632c41b0a9d1377a3468574c2cf8d42131e6e003",
+  "material_result_sha": "632c41b0a9d1377a3468574c2cf8d42131e6e003",
+  "material_commits": [
+    "632c41b0a9d1377a3468574c2cf8d42131e6e003"
+  ],
+  "verifier_repair_commits": [
+    "beebe5667de8d10250792731a658e33ec6abaee6"
+  ],
+  "result_sha": "beebe5667de8d10250792731a658e33ec6abaee6",
+  "validation_bearing_result_sha": "beebe5667de8d10250792731a658e33ec6abaee6",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Reduce redundant D3D9 SetViewport calls in stereo SkyGlow private reduced/blur passes without reducing visual quality.",
+    "acceptance": "Only bypass SetViewport after successful SetRenderTarget on identity-confirmed cached reduced/temp render target surfaces of the exact glow dimensions, keeping explicit viewport configuration for unknown and full-eye composite targets; preserve SkyGlow factor/blur/composite, StateBlock restore and game FFB/input. Destructive 20-mutation regression, exact-SHA DX9Ex Active 5/5, Domain Isolation and material Full Source Impact 3/3.",
+    "runtime_metrics": "Quest3/VDXR FPS, CPU/GPU frame-time, p95/p99 and pixel-comparison evidence not measured; no visual/runtime PASS asserted."
+  },
+  "acceptance_results": [
+    {
+      "item": "R30_STEREO_SKYGLOW_PRIVATE_REDUCED_VIEWPORT",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Actual R30 C++ on material 632c41b0a9d1377a3468574c2cf8d42131e6e003 skips redundant SetViewport for known reduced/temp eye RTs with exact glow extent. Full-size/unknown compositor preserves explicit viewport."
+    },
+    {
+      "item": "NEGATIVE_REGRESSIONS",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "SkyGlow source verifier on beebe5667de8d10250792731a658e33ec6abaee6 passed in policy job of DX9Ex Active #38184188008, including expanded 20 destructive regressions; verifier-only ValueError mutation fix tracked in beebe5667de8d10250792731a658e33ec6abaee6."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "GitHub Actions run #38184188008 on candidate branch vr-d3d9ex-candidate/conversion-dx9ex-00641 had exact commit SHA beebe5667de8d10250792731a658e33ec6abaee6, policy/game/host/full-chain-compile/package 5/5 SUCCESS. Same SHA is present in focus branch history; separate CI branch avoided target concurrency cancel-in-progress."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex focus run #38183001637 on exact validation-bearing SHA beebe5667de8d10250792731a658e33ec6abaee6 SUCCESS."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_MATERIAL_EXACT_SHA",
+      "evidence": "DX9Ex Full Source Impact run #38182930080 on source material 632c41b0a9d1377a3468574c2cf8d42131e6e003 completed source-cross-domain, Win32 MSVC active-game and OpenXR host analysis 3/3 SUCCESS. Source unchanged in subsequent verifier repair."
+    },
+    {
+      "item": "QUEST3_VDXR_HARDWARE",
+      "status": "UNTESTED",
+      "evidence": "No direct Quest3/VDXR headset/actual game-frame or FPS measurement performed; build PASS is not HMD acceptance."
+    }
+  ],
+  "notes": "Initial focus Active #38182930076 policy failed due a destructive verifier mutation raising uncaught ValueError; repaired verifier at validation-bearing SHA. Focus Active #38183001651 was cancelled due simultaneous focus-branch pushes and workflow cancel-in-progress; same exact validation SHA fully passed isolated candidate branch #38184188008. Original code stays on focus branch. This independent C6 [skip ci] bookkeeping adds no performance implementation and must not be treated as result SHA or separately scored. DX11/DXVK/localization untouched."
+}

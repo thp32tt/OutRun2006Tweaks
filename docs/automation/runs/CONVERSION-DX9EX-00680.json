@@ -1,0 +1,96 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00680",
+  "production_id": "CONVERSION-DX9EX-00680",
+  "event_id": "CONVERSION-DX9EX-00680-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX_R13_DIRECTGPU_ACK_FIRST_EVENT",
+  "work_key": "dx9ex.r13.directgpu.fallback.ack-first",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "material_result_sha": "aedf16d9ffad3065ab7ee37278c16ceaf902c2a8",
+  "source_material_sha": "aedf16d9ffad3065ab7ee37278c16ceaf902c2a8",
+  "material_commits": [
+    "aedf16d9ffad3065ab7ee37278c16ceaf902c2a8",
+    "4f72fe9892686cf5176e28b14af17cdcaa8f83c4",
+    "27cd8f276e4de446db42e709ab2c25ec2326dcf9"
+  ],
+  "result_sha": "27cd8f276e4de446db42e709ab2c25ec2326dcf9",
+  "validation_bearing_result_sha": "27cd8f276e4de446db42e709ab2c25ec2326dcf9",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r13.cpp",
+    "tools/verify_vr_r13_ack_fence_fastpath.py",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    ".github/workflows/vr-dx9ex-active.yml"
+  ],
+  "feature_contract": {
+    "goal": "Eliminate redundant D3D9 producer EVENT GetData polling for published R13 fallback DirectGPU slots still waiting on host GPU-completion ACK.",
+    "acceptance": "ACK must be proven before a producer EVENT poll for published slots. No slot can retire or overwrite until both ACK and EVENT prove completion. Preserve S_FALSE/hard-error quarantine, one whole-ring seqlock ACK snapshot and host PID/generation/ResetEx invalidation. Compile Win32 host/game/R29-R33 full-chain and pass exact-SHA DX9Ex Active + Domain Isolation.",
+    "metric_status": "Code-path call avoidance is statically verified; no measured Quest 3/VDXR FPS, frame-time or runtime acceptance."
+  },
+  "acceptance_results": {
+    "ack_before_fence": "PASS_SOURCE_AND_EXACT_SHA_CI",
+    "published_unacked_zero_getdata": "PASS_9_MODEL_CASES_11_NEGATIVE_MUTATIONS",
+    "fence_sfalse_and_error_quarantine": "PASS_SOURCE_AND_EXACT_SHA_CI",
+    "r13_existing_reset_transport": "PASS_EXACT_SHA_CI",
+    "dx9ex_active_validation": "PASS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "PASS_EXACT_SHA",
+    "full_source_impact": "PASS_3_OF_3_ORIGINAL_MATERIAL_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38233151101,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "27cd8f276e4de446db42e709ab2c25ec2326dcf9",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "game": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38233151015,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "27cd8f276e4de446db42e709ab2c25ec2326dcf9",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    {
+      "id": 38232677091,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "aedf16d9ffad3065ab7ee37278c16ceaf902c2a8",
+      "conclusion": "success",
+      "jobs": {
+        "msvc-analyze-openxr-host": "success",
+        "msvc-analyze-active-game": "success",
+        "source-cross-domain": "success"
+      },
+      "note": "Original material SHA only; not claimed as an exact final-verifier-SHA run."
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "Quest 3/VDXR/game input and gameplay FPS not exercised. Static/Win32 CI completion cannot establish headset visual parity, measured frame-pacing or achieved FPS.",
+  "score_credit_key": "CONVERSION-DX9EX-00680",
+  "score_change": 1,
+  "previous_confirmed_score": 1114,
+  "new_confirmed_score": 1115,
+  "scoreboard_commit": "c76549dadaf9d49ffe703476b75349149812db2a",
+  "scoreboard_run_key": "CONVERSION-DX9EX-00680",
+  "notes": "Initial R13 source+new verifier+workflow material commit followed by two policy verifier repairs in SAME TASK; failed early policy runs are not counted or promoted. Last exact-validation SHA passed full five-job Active and Domain; original material SHA passed three-job Full Impact. This C6 record is separate bookkeeping and must not be treated as the validation-bearing result."
+}

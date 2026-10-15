@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00564",
+  "production_id": "CONVERSION-DX9EX-00564",
+  "event_id": "CONVERSION-DX9EX-00564-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "92d38efc00e9dc6575eab242b76786fa76ca3d35",
+  "material_result_sha": "0c4180e9622495410ea0a5e6d16acbc609c95be6",
+  "validation_bearing_result_sha": "0c4180e9622495410ea0a5e6d16acbc609c95be6",
+  "result_sha": "0c4180e9622495410ea0a5e6d16acbc609c95be6",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00564]",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "work_key": "DX9EX:P1:helper_ex_probe_host_reconnect_identity",
+  "conflict_keys": [
+    "src/vr/d3d9/helper_ex_probe.cpp:host-identity-pinning",
+    "tools/verify_vr_helper_probe_host_identity.py"
+  ],
+  "ffb_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "status": "existing finalized integration preserved, no release source modified"
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
+  },
+  "summary": "Host PID and OpenXR adapter LUID are pinned before helper D3D9Ex allocation, rechecked before shared handle publication, through ACK, and before success. Reconnect/stale host ACK no longer yields false-positive probe verdict; handle cleanup remains token-conditional.",
+  "changed_paths": [
+    "src/vr/d3d9/helper_ex_probe.cpp",
+    "tools/verify_vr_helper_probe_host_identity.py",
+    ".github/workflows/vr-dx9ex-active.yml"
+  ],
+  "static_contract": {
+    "verifier": "tools/verify_vr_helper_probe_host_identity.py",
+    "focused_negative_mutations": 5,
+    "policy_job": "SUCCESS",
+    "repeat_hud_1000_5000": false
+  },
+  "ci_runs": {
+    "dx9ex_active": 38018084838,
+    "domain_isolation": 38018084845,
+    "full_source_impact": 38018084880,
+    "autodev_coordination": 38018084830
+  },
+  "ci_jobs": {
+    "policy": "SUCCESS",
+    "game": "SUCCESS",
+    "host": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "fullsource_game_analyze": "SUCCESS",
+    "fullsource_host_analyze": "SUCCESS",
+    "fullsource_cross_domain": "SUCCESS",
+    "coordination": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11657161473,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-0c4180e9622495410ea0a5e6d16acbc609c95be6",
+    "digest": "sha256:f5cadc60042032d858e8f4d88e9ba0ca5ed05d9459c39216560c56276ca8781b"
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS: current GitHub HEAD, controller checkpoint, AGENTS, priority, state/queue/history, Issues 13/14, FFB release v0.2 confirmed; task not previously committed",
+    "C1_REVIEW": "PASS: independent P1 helper-host reconnect stale-ACK risk; 00563 prior R31 work untouched",
+    "C2_IMPLEMENT": "PASS: identity-stable helper publication and ACK C++ guard, focused negative verifier and canonical CI inclusion",
+    "C3_VALIDATE": "PASS: exact-SHA 0c4180e9 DX9Ex Active 38018084838 / Domain 38018084845 / Full Source 38018084880 SUCCESS",
+    "C4_COMMIT": "PASS: GitHub material commit 0c4180e9622495410ea0a5e6d16acbc609c95be6 required AUTO marker, three actual source/test/workflow files; no CI-skip",
+    "C5_PACKAGE": "PASS: exact-SHA artifact 11657161473, HMD/gameplay acceptance NOT claimed",
+    "C6_RESULT": "PASS: post-Gate separate durable run record without further gameplay modifications"
+  },
+  "runtime_gate": "NEED_HMD_TEST",
+  "native_120fps_target": "NOT_MEASURED",
+  "parallel_policy": "DX11 A ACTIVE; DX9Ex C ACTIVE; DXVK B FROZEN; localization untouched",
+  "next_action": "Next new independent DX9Ex C task: P1 R84 CMake textual ownership seam, then P2 runtime-recommended per-eye dimensions; no retry for 00564."
+}

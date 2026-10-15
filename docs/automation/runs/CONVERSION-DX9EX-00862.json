@@ -1,0 +1,128 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00862",
+  "production_id": "CONVERSION-DX9EX-00862",
+  "event_id": "CONVERSION-DX9EX-00862-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00862",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Preserve the exact original C993 centre flare as one source-owned binocular world billboard; prevent prior road/vehicle shader verification or R28 rebind from stealing this sun's c64, and preserve original rendering when exact source evidence fails.",
+    "scope_boundary": "Only D3A5/C993 LensFlareCentre source-specific R26+HUD and lower R28 route; leave outer CABE discs, other WorldBillboard/SceneEffect, menus, SkyGlow, FFB, DX11, DXVK unchanged.",
+    "trace_stages": [
+      "D3A5 owns original 0x570002 central flare object and C993 invokes its direct DrawObjectAlpha; CABE outer discs use different callsites.",
+      "R23 records original raw c64 shader/pose/source call; R30GetExactLensCentreRawWvp matches the same call, pose and shader epoch and rejects queue/other objects.",
+      "R26+HUD R30 now evaluates exact C993 source ownership before historical world WVP and R28 rebind gates; R26 lower rebind independently rejects the central original producer."
+    ],
+    "subcomponents": [
+      "Dedicate the exact central light to its own original raw c64 per-eye path before historical world gates.",
+      "Fail closed to original game draw for missing/stale c64 instead of rebinding a previous road shader.",
+      "Retain regular historical verified-world acceleration for non-centre world draws, including CABE discs and SkyGlow semantics."
+    ],
+    "acceptance_items": [
+      {
+        "id": "centre_source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Exact C993 source and shader/c64 ownership",
+        "expected_behavior": "Matching original centre source bypasses prior world verified/rebind gates and reaches the packaged R26+HUD per-eye reconstruction."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Missing shader/pose/queue provenance and desktop",
+        "expected_behavior": "Unverified centre preserves original game draw without borrowing historical road WVP; positive and negative portable smoke cover source, relatch, shader, ring and queued cases."
+      },
+      {
+        "id": "world_preserve",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Non-centre world and CABE/SkyGlow visual preservation",
+        "expected_behavior": "Other world effects keep existing CurrentDrawMatchesVerifiedWorld/R28 paths, CABE outer rings untouched, SkyGlow classification unaffected."
+      },
+      {
+        "id": "integration",
+        "category": "integrated_validation",
+        "behavior_area": "Final validation-bearing exact GitHub SHA",
+        "expected_behavior": "DX9Ex Active x86 game, x64 host, full-chain, package, Domain, affected HUD/Full Source checks pass; Quest3/VDXR visually verified separately."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "The packaged R26+HUD R30 semanticWorld classifier checked CurrentDrawMatchesVerifiedWorld and R28CanRebindVerifiedWorld before asking R30GetExactLensCentreRawWvp whether the C993 sun itself owned the original c64. The shared lower R26 R28CanRebindVerifiedWorld also admitted WorldBillboard, so a stale prior world owner could supersede the centre-specific route.",
+    "root_cause": "A previous verified world shader/epoch was allowed to select the renderer owner before the exact central sun source proof, despite game raw c64 having different object provenance. This is a code-confirmed ownership-order defect, not a hardware-proven optical symptom.",
+    "alternatives_rejected": [
+      "Do not simply increase c64 draw-age threshold or reuse live already-adjusted GPU constants.",
+      "Do not delete/reclassify outer CABE flares, suppress alpha, change SkyGlow, or loosen all WorldBillboard ownership.",
+      "A static ordering repair and Windows CI do not themselves confirm Quest3 binocular appearance."
+    ],
+    "fix_evidence": "R30 source-owned centre route now precedes historical verified-world and R28 rebind, with lower R26 rebind guard. The existing C993 raw c64 and pose/shader evidence predicate remains intact.",
+    "negative_test_evidence": "Header compile-time route assertions and portable smoke check exact owned, stale pose, shader change, outer ring, and queued fallback; hardware test pending.",
+    "eye_ownership": "Exact owned centre reaches existing R26+HUD headInverse/eyeInverse/eyeProjection pipeline; missing source is left to original game drawing without unrelated old shader rebind."
+  },
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "Quest3/VDXR and actual OutRun game display were not tested; CI alone is insufficient to assert central flare convergence.",
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "src/vr/d3d9/stereo_renderer_r26.cpp",
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "vrhost/tests/lens_centre_pose_epoch_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00862.json"
+  ],
+  "material_result_sha": "7698584d9c93d1e126e7dd378a92a26553746c37",
+  "validation_bearing_result_sha": "7698584d9c93d1e126e7dd378a92a26553746c37",
+  "acceptance_results": {
+    "centre_source": "PASS_BUILD",
+    "fallback": "PASS_BUILD",
+    "world_preserve": "PASS_BUILD",
+    "integration": "PASS_EXACT_SHA"
+  },
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "7698584d9c93d1e126e7dd378a92a26553746c37",
+    "material_sha": "7698584d9c93d1e126e7dd378a92a26553746c37",
+    "dx9ex_active": {
+      "run_id": 38631106143,
+      "conclusion": "SUCCESS",
+      "policy": "SUCCESS",
+      "host": "SUCCESS",
+      "game": "SUCCESS",
+      "full_chain_compile": "SUCCESS",
+      "package": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38631106177,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38631106214,
+      "conclusion": "SUCCESS",
+      "build_hud_inspector": "SUCCESS",
+      "static_exe_analysis": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38631106225,
+      "conclusion": "SUCCESS",
+      "msvc_analyze_active_game": "SUCCESS",
+      "msvc_analyze_openxr_host": "SUCCESS",
+      "source_cross_domain": "SUCCESS"
+    },
+    "runtime_caveat": "No game/Quest3/VDXR visual test; CI cannot confirm stereo optical convergence."
+  },
+  "score_once": true,
+  "score_delta_this_retry": 1,
+  "scoreboard_ai_2_before": 1336,
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1337,
+  "scoreboard_commit_sha": "ea50401f67a24b8bee39ae0f9dd5f2e3c82dd7de",
+  "score_basis": "Distinct real C++ C993 lens ownership correction with four exact SHA GitHub workflow groups success. C6/retry duplicates no additional score."
+}

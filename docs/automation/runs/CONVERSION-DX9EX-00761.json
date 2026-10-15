@@ -1,0 +1,77 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00761",
+  "production_id": "CONVERSION-DX9EX-00761",
+  "event_id": "CONVERSION-DX9EX-00761-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00761",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "d016e6ed5e5436cd6050e0d32e3ee6b42b7fea37",
+  "material_result_sha": "d016e6ed5e5436cd6050e0d32e3ee6b42b7fea37",
+  "validation_bearing_result_sha": "d016e6ed5e5436cd6050e0d32e3ee6b42b7fea37",
+  "result_sha": "d016e6ed5e5436cd6050e0d32e3ee6b42b7fea37",
+  "material_commits": [
+    "d016e6ed5e5436cd6050e0d32e3ee6b42b7fea37"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 P0-A: make the Quest3/VDXR F11 overlay use the intended VR font density from the first visible action frame, without changing input ownership or unrelated HUD/world/desktop drawing.",
+    "completed_scope": "src/overlay/hooks_overlay.cpp checks the newly held bound OverlayToggle action during EndScene font-atlas density selection and includes input_manager.hpp; tools/verify_vr_f11_font_density.py adds static and numeric/destructive regression contract coverage. Material commit d016e6ed5e5436cd6050e0d32e3ee6b42b7fea37.",
+    "remaining_acceptance": [
+      "Issue #119 full responsive HUD, main menu, ESC and F11 integration remains IN_PROGRESS, not terminal.",
+      "Actual Quest3/VDXR first-visible F11 frame, optical legibility, stereo and input acceptance still require HMD testing."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "F11_FIRST_VISIBLE_ACTION_FRAME_STATIC_NUMERIC_CONTRACT_EXACT_SHA_CI_SUCCESS",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "dx9ex_full_chain": "SUCCESS_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38367531287,
+      "head_sha": "d016e6ed5e5436cd6050e0d32e3ee6b42b7fea37",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "policy, full-chain-compile, game, host, package: 5/5 SUCCESS"
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38367531209,
+      "head_sha": "d016e6ed5e5436cd6050e0d32e3ee6b42b7fea37",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "domain-isolation: 1/1 SUCCESS"
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38367530992,
+      "head_sha": "d016e6ed5e5436cd6050e0d32e3ee6b42b7fea37",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "msvc-analyze-active-game, msvc-analyze-openxr-host, source-cross-domain: 3/3 SUCCESS"
+    }
+  ],
+  "score_delta": 0,
+  "score_reason": "C6 is record recovery for the already implemented and exact-SHA-validated CONVERSION-DX9EX-00761 material commit; no duplicate score is credited.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "RUN_RECORD_NOT_FOUND: no prior docs/automation/runs/CONVERSION-DX9EX-00761.json exists on target branch. Reconstructed the existing material_result_sha and feature_contract/acceptance_results from material commit and exact-SHA GitHub Actions; no pre-existing record was overwritten. This separate documentation-only [skip ci] commit is not validation-bearing. No code modification, full build/CI rerun or HMD runtime test."
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00569",
+  "production_id": "CONVERSION-DX9EX-00569",
+  "event_id": "CONVERSION-DX9EX-00569-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "chat_rollover": 0,
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "cbeaa6d525c48479b0fd36e0d0ac4df76576f67f",
+  "checkpoint_branch": "chat-controller-downloads",
+  "checkpoint_path": "tools/chat-controller/checkpoints/vr/CONVERSION-DX9EX-00569/20261010T1345-periodic.json",
+  "material_result_sha": "0ca29f74884f8da067400357666de0f512d2e7e1",
+  "validation_bearing_result_sha": "0ca29f74884f8da067400357666de0f512d2e7e1",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00569]",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_120fps_target": "NOT_MEASURED",
+  "work_key": "DX9EX:P1:HOSTSTATE_V3_STABLE_READER_FAIL_CLOSED",
+  "conflict_keys": [
+    "src/vr/ipc/host_state_v3_reader.hpp:HostStateReader::Read",
+    "vrhost/tests/host_state_v3_channel_smoke.cpp:negative-mapping"
+  ],
+  "changed_paths": [
+    "src/vr/ipc/host_state_v3_reader.hpp",
+    "vrhost/tests/host_state_v3_channel_smoke.cpp"
+  ],
+  "summary": "Prevent stale/partial HostState.v3 caller output when named IPC map unavailable, wire protocol header invalid, or seqlock unstable. Stage stable snapshot then publish on full verification only; add invalid version, odd seqlock and recovery named-mapping negative cases.",
+  "source_review": "FFB v0.2 formal release 0da626463810322a74118d03b10ca0dd195d7cb2 imported by prior task, no upstream file change. R84 P1 independent reader defect; 00568 HostState QPC math and 00567 OpenXR FOV unchanged. No active queue work conflict and 00569 checkpoint was WAIT_CHAT. Protected baseline immutable and separate DX11/DXVK/localization not edited.",
+  "static_validation": "PASS_ONE_RELEVANT_SOURCE_CHANGE_CHECK; exact-SHA x64 host named-mapping smoke PASS",
+  "automation_validation": "PASS_EXACT_SHA",
+  "ci_runs": {
+    "dx9ex_active": 38025447169,
+    "domain_isolation": 38025447103,
+    "full_source_impact": 38025447104
+  },
+  "ci_jobs": {
+    "policy": "SUCCESS",
+    "host": "SUCCESS",
+    "host_state_v3_channel_smoke": "SUCCESS",
+    "game": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "fullsource_cross_domain": "SUCCESS",
+    "fullsource_host_analyze": "SUCCESS",
+    "fullsource_game_analyze": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11659303540,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-0ca29f74884f8da067400357666de0f512d2e7e1",
+    "digest": "sha256:8a1a1fb26557d50dfbf83df9c3402de609eb2c9a1b90a8ea90d99e785c768062",
+    "hmd_approved": false
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS latest branch cbeaa6d5, 00569 periodic checkpoint WAIT_CHAT and no previous result",
+    "C1_REVIEW": "PASS independent HostState.v3 Reader output publication failure and owner paths",
+    "C2_IMPLEMENT": "PASS one coherent two-file source/test batch; no repeated 1000/5000 HUD audits",
+    "C3_VALIDATE": "PASS exact SHA 0ca29f74: DX9Ex Active #38025447169, Domain #38025447103, Full Source Impact #38025447104 SUCCESS",
+    "C4_COMMIT": "PASS material 0ca29f74 remote branch confirmed; exact task marker present; no ci-skip on result",
+    "C5_PACKAGE": "PASS artifact 11659303540 SHA-bound; Quest3/VDXR and wheel UNTESTED",
+    "C6_RESULT": "PASS terminal run record separated from validated material commit; same-task retries/rollovers +0"
+  },
+  "ffb_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "mutated": false,
+    "wheel_runtime_validation": "UNTESTED"
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
+  },
+  "next_action": "Continue next independent P1 R84 compile-unit/textual ownership seam or P2 XR-recommended per-eye extent only under separate new TASK_ID/owner; preserve HMD gates."
+}

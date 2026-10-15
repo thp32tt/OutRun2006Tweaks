@@ -1,0 +1,432 @@
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <Windows.h>
+#include <intrin.h>
+
+#include <atomic>
+#include <cstdint>
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
+#include <iterator>
+#include <mutex>
+#include <string_view>
+#include <unordered_map>
+
+#include "hook_mgr.hpp"
+#include "plugin.hpp"
+#include "game_addrs.hpp"
+#include "../hud_semantics.hpp"
+
+namespace Settings
+{
+    Setting<bool> VRHudInspector{
+        "VR", "HudInspector", false,
+        "Passive HUD/sprite reverse-engineering trace. Records unique sprite call sites, IDs and coordinates with EXE RVAs so static EXE analysis can map them back to game functions."
+    };
+}
+
+namespace OutRunVRHudInspector
+{
+    namespace
+    {
+        enum class EventKind : std::uint32_t
+        {
+            PutSprite = 1,
+            SpriteAnim = 2,
+            ClipSprite = 3,
+            PutSprite2 = 4
+        };
+
+        SafetyHookInline SpriteAnimHook{};
+        SafetyHookInline ClipSpriteHook{};
+
+        std::mutex TraceMutex;
+        std::ofstream TraceFile;
+        std::ofstream XstMapFile;
+        std::unordered_map<std::uint64_t, std::uint32_t> Seen;
+        std::atomic<bool> InspectorActive{false};
+        bool SemanticIdentityVerified = false;
+        std::uint64_t TraceLines = 0;
+        ULONGLONG StartMs = 0;
+
+        std::uint32_t ExeSizeOfImage() noexcept
+        {
+            if (!Module::ExeHandle)
+                return 0;
+            const auto* base = reinterpret_cast<const std::uint8_t*>(Module::ExeHandle);
+            const auto* dos = reinterpret_cast<const IMAGE_DOS_HEADER*>(base);
+            if (dos->e_magic != IMAGE_DOS_SIGNATURE)
+                return 0;
+            const auto* nt = reinterpret_cast<const IMAGE_NT_HEADERS*>(base + dos->e_lfanew);
+            if (nt->Signature != IMAGE_NT_SIGNATURE)
+                return 0;
+            return nt->OptionalHeader.SizeOfImage;
+        }
+
+        std::uint32_t ToExeRva(const void* address) noexcept
+        {
+            const auto base = reinterpret_cast<std::uintptr_t>(Module::ExeHandle);
+            const auto value = reinterpret_cast<std::uintptr_t>(address);
+            const auto size = static_cast<std::uintptr_t>(ExeSizeOfImage());
+            if (!base || !value || value < base || !size || value >= base + size)
+                return 0;
+            return static_cast<std::uint32_t>(value - base);
+        }
+
+        std::string CsvEscape(const char* value)
+        {
+            std::string out = value ? value : "";
+            std::size_t pos = 0;
+            while ((pos = out.find('"', pos)) != std::string::npos)
+            {
+                out.insert(pos, 1, '"');
+                pos += 2;
+            }
+            return """ + out + """;
+        }
+
+        std::uint64_t MakeKey(EventKind kind, std::uint32_t callRva,
+            std::uint32_t arg0, std::uint32_t arg1,
+            int mode, int stage) noexcept
+        {
+            std::uint64_t h = 1469598103934665603ull;
+            auto mix = [&h](std::uint32_t v) {
+                h ^= v;
+                h *= 1099511628211ull;
+            };
+            mix(static_cast<std::uint32_t>(kind));
+            mix(callRva);
+            mix(arg0);
+            mix(arg1);
+            mix(static_cast<std::uint32_t>(mode));
+            mix(static_cast<std::uint32_t>(stage));
+            return h;
+        }
+
+        bool ShouldWrite(std::uint64_t key, std::uint32_t& count)
+        {
+            count = ++Seen[key];
+            return count == 1 || (count <= 1024 && (count & (count - 1)) == 0);
+        }
+
+        int CurrentMode() noexcept
+        {
+            return Game::current_mode ? static_cast<int>(*Game::current_mode) : -1;
+        }
+
+        int CurrentStage() noexcept
+        {
+            return Game::stg_stage_num ? static_cast<int>(*Game::stg_stage_num) : -1;
+        }
+
+        void WriteEvent(EventKind kind, const char* eventName,
+            const void* returnAddress,
+            std::uint32_t arg0, std::uint32_t arg1,
+            double arg2 = 0.0, double arg3 = 0.0,
+            double arg4 = 0.0, double arg5 = 0.0,
+            double arg6 = 0.0, double arg7 = 0.0)
+        {
+            if (!InspectorActive.load(std::memory_order_acquire) || !TraceFile)
+                return;
+
+            const std::uint32_t returnRva = ToExeRva(returnAddress);
+            const std::uint32_t leafCallRva =
+                returnRva >= 5 ? returnRva - 5 : returnRva;
+            std::uint32_t callRva = leafCallRva;
+            auto semantic = SemanticIdentityVerified
+                ? OutRunVRHudSemantics::ClassifyCaller(callRva)
+                : OutRunVRHudSemantics::UnknownInfo();
+
+            // The inline put_sprite hooks are reached through common EXE sprite
+            // wrappers, so _ReturnAddress() alone often resolves only to
+            // 0x02xxxx helper code instead of DispRank/REV/TimeAttack/etc.
+            // Walk the current stack and promote the first verified EXE caller
+            // that lands inside the UIScaling-derived semantic ranges. This
+            // turns the original mod's reverse-engineered HUD addresses into
+            // runtime evidence instead of leaving every row UNKNOWN.
+            if (SemanticIdentityVerified &&
+                semantic.space == OutRunVRHudSemantics::SpacePolicy::Unknown)
+            {
+                void* frames[24]{};
+                const USHORT frameCount = RtlCaptureStackBackTrace(
+                    0, static_cast<DWORD>(std::size(frames)),
+                    frames, nullptr);
+                for (USHORT depth = 0; depth < frameCount; ++depth)
+                {
+                    const std::uint32_t frameReturnRva =
+                        ToExeRva(frames[depth]);
+                    if (!frameReturnRva)
+                        continue;
+                    const std::uint32_t candidateRva =
+                        frameReturnRva >= 5
+                        ? frameReturnRva - 5
+                        : frameReturnRva;
+                    const auto candidate =
+                        OutRunVRHudSemantics::ClassifyCaller(candidateRva);
+                    if (candidate.space ==
+                        OutRunVRHudSemantics::SpacePolicy::Unknown)
+                        continue;
+                    callRva = candidateRva;
+                    semantic = candidate;
+                    break;
+                }
+            }
+
+            const int mode = CurrentMode();
+            const int stage = CurrentStage();
+            const std::uint64_t key =
+                MakeKey(kind, callRva, arg0, arg1, mode, stage);
+
+            std::lock_guard lock(TraceMutex);
+            std::uint32_t count = 0;
+            if (!ShouldWrite(key, count))
+                return;
+
+            TraceFile
+                << (GetTickCount64() - StartMs) << ','
+                << eventName << ','
+                << "0x" << std::hex << std::setw(8) << std::setfill('0') << returnRva << ','
+                << "0x" << std::setw(8) << callRva << std::dec << ','
+                << semantic.area << ','
+                << semantic.semantic << ','
+                << OutRunVRHudSemantics::SpacePolicyName(semantic.space) << ','
+                << mode << ','
+                << stage << ','
+                << arg0 << ','
+                << arg1 << ','
+                << arg2 << ','
+                << arg3 << ','
+                << arg4 << ','
+                << arg5 << ','
+                << arg6 << ','
+                << arg7 << ','
+                << count << '\n';
+
+            ++TraceLines;
+            // HUD inspector is diagnostic-only and rate-limited. Make each
+            // acknowledged row durable so an unhandled-crash ZIP cannot lose
+            // the most recent HUD evidence in an unflushed stream tail.
+            TraceFile.flush();
+        }
+
+        int __cdecl SpriteAnimDest(std::uint32_t spriteId, float x, float y,
+            int a4, int a5, float alpha)
+        {
+            WriteEvent(EventKind::SpriteAnim, "sprani_play_ae_auth_alpha",
+                _ReturnAddress(), spriteId,
+                static_cast<std::uint32_t>(a4),
+                x, y, static_cast<double>(a5), alpha);
+            return SpriteAnimHook.unsafe_ccall<int>(
+                spriteId, x, y, a4, a5, alpha);
+        }
+
+        int __cdecl ClipSpriteDest(int xstnum, int x, int y,
+            std::uint32_t flags, float priority, std::uint32_t color)
+        {
+            WriteEvent(EventKind::ClipSprite, "put_clip_sprite",
+                _ReturnAddress(),
+                static_cast<std::uint32_t>(xstnum), flags,
+                static_cast<double>(x), static_cast<double>(y),
+                priority, static_cast<double>(color));
+            return ClipSpriteHook.unsafe_ccall<int>(
+                xstnum, x, y, flags, priority, color);
+        }
+
+        bool OpenTrace()
+        {
+            InspectorActive.store(false, std::memory_order_release);
+            try
+            {
+                const auto path =
+                    Module::DllPath.parent_path() /
+                    "OutRun2006Tweaks-hudtrace.csv";
+                const bool empty =
+                    !std::filesystem::exists(path) ||
+                    std::filesystem::file_size(path) == 0;
+
+                TraceFile.open(path, std::ios::out | std::ios::app);
+                if (!TraceFile)
+                    return false;
+
+                const auto xstPath =
+                    Module::DllPath.parent_path() /
+                    "OutRun2006Tweaks-xstmap.csv";
+                const bool xstEmpty =
+                    !std::filesystem::exists(xstPath) ||
+                    std::filesystem::file_size(xstPath) == 0;
+                XstMapFile.open(xstPath, std::ios::out | std::ios::app);
+                if (!XstMapFile)
+                    return false;
+
+                StartMs = GetTickCount64();
+                char semanticVerified[8]{};
+                SemanticIdentityVerified =
+                    GetEnvironmentVariableA(
+                        "OUTRUN_VR_EXE_SEMANTICS_VERIFIED",
+                        semanticVerified,
+                        static_cast<DWORD>(sizeof(semanticVerified))) > 0 &&
+                    semanticVerified[0] == '1';
+                if (empty)
+                {
+                    TraceFile
+                        << "# schema=outrun-hudtrace-v2\n"
+                        << "# exe_timestamp="
+                        << Util::GetModuleTimestamp(Module::ExeHandle) << "\n"
+                        << "# exe_size_of_image=" << ExeSizeOfImage() << "\n"
+                        << "# module_base=runtime-only; all addresses below are ASLR-safe RVAs\n"
+                        << "# semantic_identity_gate=runtime-verified-reference-sha256\n"
+                        << "elapsed_ms,event,return_rva,call_rva,known_area,semantic,space_policy,mode,stage,"
+                           "arg0,arg1,arg2,arg3,arg4,arg5,arg6,arg7,count\n";
+                    TraceFile.flush();
+                }
+                TraceFile
+                    << "# session_semantic_identity="
+                    << (SemanticIdentityVerified
+                        ? "VERIFIED_REFERENCE_SHA256"
+                        : "UNVERIFIED_UNKNOWN")
+                    << "\n";
+                TraceFile.flush();
+                if (xstEmpty)
+                {
+                    XstMapFile
+                        << "# schema=outrun-xstmap-v1\n"
+                        << "elapsed_ms,xstset_index,filename\n";
+                    XstMapFile.flush();
+                }
+                return true;
+            }
+            catch (const std::exception& e)
+            {
+                spdlog::warn("VR HUD INSPECTOR: failed to open trace: {}", e.what());
+                return false;
+            }
+        }
+
+        void ResetHooks() noexcept
+        {
+            ClipSpriteHook = {};
+            SpriteAnimHook = {};
+        }
+
+        void ResetTraceState() noexcept
+        {
+            InspectorActive.store(false, std::memory_order_release);
+            try
+            {
+                std::lock_guard lock(TraceMutex);
+                if (TraceFile)
+                {
+                    TraceFile.flush();
+                    TraceFile.close();
+                }
+                if (XstMapFile)
+                {
+                    XstMapFile.flush();
+                    XstMapFile.close();
+                }
+                Seen.clear();
+                TraceLines = 0;
+                SemanticIdentityVerified = false;
+            }
+            catch (...) {}
+        }
+
+    }
+
+    // Feed points used by the existing texture hooks. Keeping put_sprite_ex on
+    // its already-established hook avoids stacking two inline detours on the
+    // same game function and preserves the real game caller return address.
+    void TracePutSprite(SPRARGS* sprargs, float priority,
+        const void* returnAddress)
+    {
+        if (!sprargs)
+            return;
+        WriteEvent(EventKind::PutSprite, "put_sprite_ex", returnAddress,
+            sprargs->xstnum_0, sprargs->top_4,
+            sprargs->left_8, sprargs->bottom_C,
+            sprargs->right_10, sprargs->scaleX,
+            sprargs->scaleY, priority);
+    }
+
+    void TracePutSprite2(SPRARGS2* sprargs, float priority,
+        const void* returnAddress)
+    {
+        if (!sprargs)
+            return;
+        WriteEvent(EventKind::PutSprite2, "put_sprite_ex2", returnAddress,
+            sprargs->xstnum_0, sprargs->child_B4 ? 1u : 0u,
+            sprargs->color_4,
+            sprargs->TopLeft_54.x, sprargs->TopLeft_54.y,
+            sprargs->BottomRight_78.x, sprargs->BottomRight_78.y,
+            priority);
+    }
+
+    void TraceXstSet(int xstsetIndex, const char* filename)
+    {
+        if (!InspectorActive.load(std::memory_order_acquire) ||
+            !filename || !*filename || !XstMapFile)
+            return;
+        std::lock_guard lock(TraceMutex);
+        XstMapFile
+            << (GetTickCount64() - StartMs) << ','
+            << xstsetIndex << ','
+            << CsvEscape(filename) << '\n';
+        XstMapFile.flush();
+    }
+
+    namespace
+    {
+        class VRHudInspectorHook : public Hook
+        {
+        public:
+            std::string_view description() override
+            {
+                return "OpenXRVRHudInspector";
+            }
+
+            bool validate() override
+            {
+                return Settings::VREnabled.get() &&
+                    Settings::VRHudInspector.get();
+            }
+
+            void declare_settings() override
+            {
+                Settings::VRHudInspector.needs_restart();
+            }
+
+            bool apply() override
+            {
+                if (!OpenTrace())
+                {
+                    ResetTraceState();
+                    return false;
+                }
+
+                SpriteAnimHook = safetyhook::create_inline(
+                    Game::sprani_play_ae_auth_alpha, SpriteAnimDest);
+                ClipSpriteHook = safetyhook::create_inline(
+                    Game::put_clip_sprite, ClipSpriteDest);
+
+                if (!SpriteAnimHook || !ClipSpriteHook)
+                {
+                    spdlog::error(
+                        "VR HUD INSPECTOR: one or more sprite hooks failed; disabling inspector");
+                    ResetHooks();
+                    ResetTraceState();
+                    return false;
+                }
+
+                InspectorActive.store(true, std::memory_order_release);
+                spdlog::info(
+                    "VR HUD INSPECTOR: semantic HUD tracing active; verified EXE callers are stack-resolved through UIScaling-derived ranges before UNKNOWN fallback; context-aware rate limiting and durable row flush enabled; output=OutRun2006Tweaks-hudtrace.csv + OutRun2006Tweaks-xstmap.csv");
+                return true;
+            }
+
+            static VRHudInspectorHook instance;
+        };
+
+        VRHudInspectorHook VRHudInspectorHook::instance;
+    }
+}

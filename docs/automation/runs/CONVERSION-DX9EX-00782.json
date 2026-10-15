@@ -1,0 +1,149 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00782",
+  "production_id": "CONVERSION-DX9EX-00782",
+  "event_id": "CONVERSION-DX9EX-00782-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "work_key": "DX9EX:VIS:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00782]",
+  "material_result_sha": "257799c2761d7b2ed678df25f02021d75bec0ba3",
+  "validation_bearing_result_sha": "48660263be3230a74d135b3937deb9c5badcda49",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "score_delta": 1,
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_uiscaling.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_responsive_hud_anchor.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00782.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Restore complete source-time and deferred-frame periphery geometry ownership for native original OutRun speed/time/rank HUD text without affecting protected center/GOAL/+TIME/world/menu producers.",
+    "scope_boundary": "Only original exact BA9D0 HUD text renderer and its two canonical clip/sprani append sites plus R30 semantic consumer; excludes GOAL, +TIME, ESC, F11, main-menu, lens, DX11, DXVK, SkyGlow and input.",
+    "trace_stages": [
+      "Canonical 0xBA9D0 C++ inline hook resolves exact calling RVA for OutRun HUD peripheral versus protected result/GOAL siblings.",
+      "Original immediate raster can draw before BA9D0's exact clip/sprani calls append SpriteNodes, therefore stale queue token cannot identify the direct glyph.",
+      "New bounded scoped exact owner advertises only the active direct token and restores nested state; queue-selected SpriteNode identity stays authoritative.",
+      "R30 finite binocular XYZRHW viewport/FOV/per-eye mapping uses active producer from direct or queue while protected compositing and desktop fallback remain unchanged."
+    ],
+    "subcomponents": [
+      "Source-time direct glyph semantic and exact producer owner with scoped state restoration, narrow VR predicate and preserved original call.",
+      "Queued clip and sprani children retain prior append tags, explicit effective producer selects live queue token over direct token in replay.",
+      "Integrated source regression protects destructive mutations of direct/queue precedence, domain boundaries and full Win32 DX9Ex build."
+    ],
+    "acceptance_items": [
+      {
+        "id": "HUD_SOURCE_AND_QUEUE_PARITY",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_text_direct_and_deferred",
+        "expected_behavior": "BA9D0 immediate speed/rank/time text is ScreenHud and eligible for existing R30 responsive anchors, while its clip/sprani deferred children keep exact prior queue producer."
+      },
+      {
+        "id": "HUD_NO_SEMANTIC_LEAK",
+        "category": "fallback_regression",
+        "behavior_area": "nested_queue_and_unrelated_producers",
+        "expected_behavior": "Queue depth wins over direct source token, nested direct producers restore previous token, desktop game/GOAL/+TIME/world/F11/menu semantics remain unchanged."
+      },
+      {
+        "id": "HUD_EXACT_SHA_BUILD",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_host_package_and_domain",
+        "expected_behavior": "Python focused source/negative regression and exact validation-bearing SHA DX9Ex Active game/host/package, Domain Isolation and Full Source Impact GitHub Actions success; HMD separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "HUD_SOURCE_AND_QUEUE_PARITY": "PASS_EXACT_SHA",
+    "HUD_NO_SEMANTIC_LEAK": "PASS_EXACT_SHA",
+    "HUD_EXACT_SHA_BUILD": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "Quest3 user HUD positioned too centrally and tiny at 3440x1440 desktop and 2496x2688 XR eye; OutRunHudTextProducer_dest emitted exact queue tokens but lacked a scoped token for synchronous glyph submission.",
+    "root_cause": "The queue-only CurrentSpriteQueueProducer token could not identify direct glyph draw submissions before SpriteNode append; scoped screen ownership alone cannot trigger narrow responsive peripheral grouping.",
+    "alternatives_rejected": [
+      "Do not infer edge alignment from arbitrary screen coordinates or promote GOAL/+TIME/world sprites to screen-peripheral.",
+      "Do not overwrite the queue producer globally because stale nodes and nested original draws require distinct authority."
+    ],
+    "source_trace": [
+      "Original BA9D0 source-callsite classifier recognizes three peripheral ranges and excludes the GOAL/result source map.",
+      "Original clip and sprani wrappers register all deferred nodes with exact ScreenHud producer provenance.",
+      "Scoped direct source owner now carries producer identity only outside queue; R30 picks active producer before source XYZRHW per-eye placement."
+    ],
+    "eye_ownership": "Viewport, FOV containment, symmetric horizontal displacement and bilateral bounds protection remain in R30; new selector changes only exact source ownership for qualifying original glyph draws.",
+    "fix_evidence": "Material C++ SHA 257799c2 carries BA9D0 immediate and queued producer attribution; policy/run-record repair bc5e0d2 and exact test correction 48660263 passed all Win32 integration gates; Quest3 remains untested.",
+    "negative_test_evidence": "Source verifier explicitly checks all three BA9D0 producer sites, one direct token, nested queue precedence, protected GOAL/+TIME, negative mutants, aspect/FOV fixtures. Exact-head Active #38415796852 5/5 SUCCESS, Domain #38415796689 SUCCESS; source SHA 257799c2 HUD #38415136814 and Full Impact #38415136196 SUCCESS.",
+    "unresolved": "Real Quest3/VDXR optical parity, legibility and game-frame pacing not established by source CI. Inspect matching build on HMD.",
+    "retry_failure_cause": "Active Validation 38415136734 policy failed because mandatory run record was missing on C++ material SHA 257799c2. Second Active 38415483223 policy failed because source verifier incorrectly expected two occurrences of the producer per owner/direct slice; actual source has three across direct+clip+sprani, one in the direct slice.",
+    "retry_resolution": "Commit bc5e0d2 added the full-feature run contract. Commit 48660263 repaired the original whole-owner 3-versus-direct-owner 1 exact identity negative tests without modifying C++ source. Exact-head Active and Domain Gates passed; material source HUD Inspector and Full Source Impact passed."
+  },
+  "blocked_reason": null,
+  "ci_evidence": {
+    "exact_sha": "48660263be3230a74d135b3937deb9c5badcda49",
+    "material_source_sha": "257799c2761d7b2ed678df25f02021d75bec0ba3",
+    "dx9ex_active": {
+      "run_id": 38415796852,
+      "result": "SUCCESS",
+      "jobs": [
+        "policy",
+        "full-chain-compile",
+        "host",
+        "game",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38415796689,
+      "result": "SUCCESS",
+      "exact_sha": "48660263be3230a74d135b3937deb9c5badcda49"
+    },
+    "hud_inspector": {
+      "run_id": 38415136814,
+      "result": "SUCCESS",
+      "source_sha": "257799c2761d7b2ed678df25f02021d75bec0ba3"
+    },
+    "full_source_impact": {
+      "run_id": 38415136196,
+      "result": "SUCCESS",
+      "source_sha": "257799c2761d7b2ed678df25f02021d75bec0ba3",
+      "jobs": [
+        "msvc-analyze-openxr-host",
+        "msvc-analyze-active-game",
+        "source-cross-domain"
+      ]
+    },
+    "package": {
+      "run_id": 38415796852,
+      "artifact_id": 11823394057,
+      "name": "OutRun2-VR-DX9EX-ACTIVE-48660263be3230a74d135b3937deb9c5badcda49"
+    },
+    "runtime": "UNTESTED"
+  },
+  "validation_evidence": {
+    "exact_sha": "48660263be3230a74d135b3937deb9c5badcda49",
+    "required_jobs": "5/5 SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "source_hud_inspector": "SUCCESS",
+    "source_full_impact": "SUCCESS",
+    "runtime": "UNTESTED"
+  },
+  "material_repair_shas": [
+    "bc5e0d2ff7868ef9bf67ba8aca03d1ada715dc84",
+    "48660263be3230a74d135b3937deb9c5badcda49"
+  ],
+  "scoreboard_commit": "b353054b2fea0beca657fcc16a96decd44315662",
+  "scoreboard_run_key": "CONVERSION-DX9EX-00782"
+}

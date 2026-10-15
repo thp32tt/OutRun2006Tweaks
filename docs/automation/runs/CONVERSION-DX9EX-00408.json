@@ -1,0 +1,172 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00408",
+  "production_id": "CONVERSION-DX9EX-00408",
+  "event_id": "CONVERSION-DX9EX-00408-E005",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "48745de334266ca2b550e53a5a90f17e1334c2e4",
+  "material_result_sha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+  "validation_bearing_result_sha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+  "queue_commit_sha": "03fda5f576996f9a968877fee4025d28df1b4b65",
+  "state_commit_sha": "239d0f503a6ea538c89631a7b98a3b23f0bc4146",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00408]",
+  "selected_work_item": "DX9EX-HUD-TELEMETRY-HOTPATH-COUNTER-GUARD + VR-HOST-002-POST-REVIEW-A-B-C",
+  "summary": "Removed the telemetry-off R51 semantic-HUD acceptance-counter write from the existing VRTelemetry branch, pinned that hot-path invariant in the producer-provenance verifier, and completed the concurrent VR-HOST-002 A/B/C post-review by pinning Frame.v2 run identity/stale-run/DirectGPU/gameplay-handoff/fallback-reader contracts. Rendering classification, projection, world ownership, transport policy, and synchronization semantics are unchanged; runtime/HMD behavior remains untested.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "tools/verify_vr_producer_provenance.py",
+    "tools/verify_vr_architecture.py",
+    "docs/VR_WORK_QUEUE.json",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00408.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered authoritative base 48745de334266ca2b550e53a5a90f17e1334c2e4 after CONVERSION-DX9EX-00407. VR_REFACTOR_STATE remains cycle 1100 with physical R31/R32 retirement DEFERRED, so the next safe maintenance/static units were selected without repeating 0..1100."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R51VsSemanticHudAccepted had exactly one hot-path increment and was read only by VRTelemetry logging, so telemetry-off draws performed an unnecessary 64-bit write. In parallel, VR-HOST-002 source safety fixes were present but lacked direct canonical architecture-verifier coverage."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "8e000f8505d5b171b4356b2c1e8ae9e130f8742d moved R51VsSemanticHudAccepted under the existing VRTelemetry guard; ce117a51414689314d3b839b03e21343a42183b2 made the producer-provenance verifier fail closed if that counter escapes the telemetry guard; 3c0ee50ba8893e94b42a5213ea36640864834553 added Frame.v2 run-identity/stale-run/DirectGPU/gameplay-handoff/fallback-reader architecture guards."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 3c0ee50ba8893e94b42a5213ea36640864834553: DX9Ex Active Validation run 37275931018 attempt 2 SUCCESS (policy 111654335208, host 111654335829, game 111654334696, full-chain-compile 111654334742, package 111656238951). Policy log includes VR producer provenance contract PASS and VR reconstructed architecture PASS. Domain Isolation Guard 37275930952 SUCCESS. No Quest3/VDXR or in-game runtime test was performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "source_material_sha": "8e000f8505d5b171b4356b2c1e8ae9e130f8742d",
+      "result_sha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+      "material_result_sha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+      "validation_bearing_result_sha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+      "task_tagged_commits": [
+        "8e000f8505d5b171b4356b2c1e8ae9e130f8742d perf(vr): gate semantic HUD telemetry counter [AUTO:CONVERSION-DX9EX-00408]",
+        "ce117a51414689314d3b839b03e21343a42183b2 test(vr): guard semantic HUD telemetry counter [AUTO:CONVERSION-DX9EX-00408]",
+        "3c0ee50ba8893e94b42a5213ea36640864834553 test(vr): pin Frame.v2 run-identity post-review contract [AUTO:CONVERSION-DX9EX-00408]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "OutRun2-VR-DX9EX-ACTIVE-3c0ee50ba8893e94b42a5213ea36640864834553 artifact 11330134178, digest sha256:990cb69ce501641c21c6d20f3ec79a267f3e5637ec54df922bc7c4576d0204c6. Build artifact is not runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "queue_commit_sha": "03fda5f576996f9a968877fee4025d28df1b4b65",
+      "state_commit_sha": "239d0f503a6ea538c89631a7b98a3b23f0bc4146",
+      "runtime_validation": "UNTESTED",
+      "metadata_correction": "Current user dispatch E001 is authoritative; the provisional E003 rollover metadata was superseded without changing material/result SHA."
+    }
+  },
+  "post_review": {
+    "A": "PASS_ARCHITECTURE",
+    "B": "PASS_RENDER_RUNTIME_CONTRACT",
+    "C": "PASS_PERFORMANCE_NO_RENDERING_DELTA"
+  },
+  "n100": {
+    "status": "NOT_USED",
+    "reason": "Desktop Commander monthly usage limit reached; do not retry or reconnect."
+  },
+  "next_action": "Proceed to the next non-HMD actionable DX9Ex queue item. Quest3/VDXR is still required before claiming runtime visual/performance correctness.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00408",
+    "production_id": "CONVERSION-DX9EX-00408",
+    "event_id": "CONVERSION-DX9EX-00408-E005",
+    "event_type": "retry",
+    "lane": "DX9EX",
+    "target_branch": "vr-d3d9ex-focus",
+    "attempt": "2/3",
+    "source": "CURRENT_USER_QUEUE_RETRY",
+    "material_result_sha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+    "validation_bearing_result_sha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+    "runtime_validation": "UNTESTED"
+  },
+  "completed_at_kst": "2026-10-06T01:10:23+09:00",
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+  "source_material_sha": "8e000f8505d5b171b4356b2c1e8ae9e130f8742d",
+  "result_sha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+  "hot_path": {
+    "scope": "TELEMETRY_COUNTER_ONLY",
+    "telemetry_off_change": "R51VsSemanticHudAccepted no longer increments when VRTelemetry is disabled",
+    "rendering_behavior_changed": false,
+    "runtime_diagnostic_behavior_changed": true
+  },
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37275931018,
+      "run_attempt": 2,
+      "conclusion": "success",
+      "exact_sha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+      "jobs": {
+        "policy": 111654335208,
+        "host": 111654335829,
+        "game": 111654334696,
+        "full_chain_compile": 111654334742,
+        "package": 111656238951
+      },
+      "package_artifact_id": 11330134178,
+      "package_artifact_digest": "sha256:990cb69ce501641c21c6d20f3ec79a267f3e5637ec54df922bc7c4576d0204c6"
+    },
+    "domain_isolation": {
+      "run_id": 37275930952,
+      "conclusion": "success",
+      "exact_sha": "3c0ee50ba8893e94b42a5213ea36640864834553"
+    },
+    "superseded_initial_gate": {
+      "run_id": 37275707328,
+      "conclusion": "cancelled",
+      "classification": "SUPERSEDED_BY_NEWER_SAME_TASK_COMMIT"
+    },
+    "n100": {
+      "status": "NOT_USED",
+      "reason": "Desktop Commander monthly usage limit reached; not used as completion authority."
+    }
+  },
+  "validated_at_kst": "2026-10-05T16:19:38+09:00",
+  "metadata_correction": {
+    "reason": "E005 retry repaired controller result identity after fda94135 bookkeeping HEAD was incorrectly treated as Gate-owning result. Exact material/validation-bearing SHA 3c0ee50b already has authoritative successful DX9Ex Active and Domain Isolation gates.",
+    "superseded_event_id": "CONVERSION-DX9EX-00408-E003",
+    "current_event_id": "CONVERSION-DX9EX-00408-E005",
+    "current_event_type": "retry",
+    "attempt": "2/3",
+    "validation_bearing_result_sha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+    "bookkeeping_sha_not_result": "fda9413593d3e1b79ab45cd73269d368d3a16f6c"
+  },
+  "failure_context": {
+    "supplied": "No authoritative DX9Ex Active Validation run was created for result SHA fda9413593d3e1b79ab45cd73269d368d3a16f6c after 32245s (timeout=600s). Treating the missing run as a repairable automation failure instead of waiting forever.",
+    "classification": "BOOKKEEPING_SHA_MISIDENTIFIED_AS_VALIDATION_BEARING_RESULT",
+    "failed_sha": "fda9413593d3e1b79ab45cd73269d368d3a16f6c",
+    "failed_sha_role": "BOOKKEEPING_ONLY",
+    "repairable": true,
+    "actions_failure": false
+  },
+  "retry_repair": {
+    "event_id": "CONVERSION-DX9EX-00408-E005",
+    "attempt": "2/3",
+    "repaired_stage": "C3_VALIDATE/C6_STATE_RESULT_IDENTITY",
+    "authoritative_validation_bearing_result_sha": "3c0ee50ba8893e94b42a5213ea36640864834553",
+    "authoritative_dx9ex_active_run_id": 37275931018,
+    "authoritative_dx9ex_active_conclusion": "success",
+    "authoritative_domain_isolation_run_id": 37275930952,
+    "authoritative_domain_isolation_conclusion": "success",
+    "misidentified_bookkeeping_sha": "fda9413593d3e1b79ab45cd73269d368d3a16f6c",
+    "rule": "A later bookkeeping/checkpoint SHA does not replace an already recorded validation_bearing_result_sha.",
+    "new_material_change": false,
+    "rerun_required": false,
+    "runtime_validation": "UNTESTED"
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00834",
+  "production_id": "CONVERSION-DX9EX-00834",
+  "event_id": "CONVERSION-DX9EX-00834-E004",
+  "event_type": "result",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "3/3",
+  "feature_id": "DX9EX:CRITICAL:R23_QPC_HOST_FRESHNESS",
+  "feature_class": "CRITICAL_BLOCKER",
+  "work_key": "DX9EX:CRITICAL:R23_QPC_HOST_FRESHNESS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 1,
+  "feature_contract": {
+    "feature_id": "DX9EX:CRITICAL:R23_QPC_HOST_FRESHNESS",
+    "goal": "Preserve the entire R23 DirectGPU host sample freshness decision from the original seqlock publication through millisecond age conversion and safe stale/invalid fallback even after long uptime and with extremely high QPC frequencies.",
+    "scope_boundary": "Only R23 host freshness QPC conversion and its pure C++ regression tests; no semantic HUD, outer lens flare, SkyGlow, FFB, world stereo, DX11 or DXVK changes.",
+    "special_work_evidence": "Pre-fix R23 multiplied arbitrary nonnegative QPC delta by 1000 in signed int64 and overflowed after days at GHz frequencies; the first candidate also used floating point above INT64_MAX/1000, which can round a below-boundary age upward on MSVC's 64-bit long double and alter stale/fresh decisions.",
+    "trace_stages": [
+      "Host XR frame seqlock publishes latest DirectGPU host sampleQpc/frequency/transport status.",
+      "R23DiagnoseHostFreshness validates host flags, current QPC monotonicity and computes signed age milliseconds without QPC integer overflow.",
+      "Stale/invalid/fresh classification chooses safe transport fallback while preserving existing OpenXR binocular frame and device-reset behavior."
+    ],
+    "subcomponents": [
+      "Replace R23 signed elapsedTicks*1000 conversion with saturation-safe whole-seconds plus exact fractional remainder path.",
+      "Keep common QPC age arithmetic one integer multiply/divide; avoid floating-point rounding near millisecond decision boundaries for the extreme-frequency case.",
+      "Cover zero/negative/disordered clocks, multi-day high-frequency ages, exact boundaries, saturation and destructive verifier cases through C++ and Python smoke."
+    ],
+    "acceptance_items": [
+      {
+        "id": "HOST_QPC_AGE_EXACT",
+        "category": "end_to_end_behavior",
+        "behavior_area": "r23_directgpu_freshness",
+        "expected_behavior": "R23 exact millisecond age is monotonic and free from overflow or floating-point boundary rounding before stale/fresh selection."
+      },
+      {
+        "id": "INVALID_STALE_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "ipc_host_fallback",
+        "expected_behavior": "Invalid QPC order/frequency preserves qpc-invalid fallback; long stale samples do not become fresh, and QPC values saturate safely."
+      },
+      {
+        "id": "FINAL_EXACT_SHA_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "game_host_package",
+        "expected_behavior": "Exact validation-bearing SHA must pass full DX9Ex Active Win32 x86 game/x64 host/package, Domain Isolation, and Full Source Impact when applicable."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "HOST_QPC_AGE_EXACT": "PASS_EXACT_SHA",
+    "INVALID_STALE_FALLBACK": "PASS_EXACT_SHA",
+    "FINAL_EXACT_SHA_GATES": "PASS_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "At material 7119ed3 R23 originally converted (now-sample)*1000 in signed 64-bit; run 38537820149 then failed policy on absent 00834 run record before compilation. The first R23 QPC helper still used floating-point fallback for huge frequencies.",
+    "source_trace": [
+      "XR R23 host shared QPC publication/flags and seqlock snapshot",
+      "R23DiagnoseHostFreshness computes ElapsedQpcMilliseconds sampleQpc age",
+      "R23 frame routing evaluates sample-stale versus qpc-invalid versus fresh before XR display"
+    ],
+    "root_cause": "Multiplying elapsed QPC ticks by 1000 overflows long-uptime 64-bit math; the initial high-frequency fallback uses long double, which has 53-bit mantissa on MSVC and may round an age just below millisecond boundary upward.",
+    "alternatives_rejected": [
+      "Floating-point multiplication is not exact on 64-bit long double implementations at 9e18 tick frequencies.",
+      "Always iterating 1000 modular additions would degrade normal per-Present QPC path; only the extraordinary branch uses bounded iteration."
+    ],
+    "fix_evidence": "Existing integer quotient/remainder protects ordinary and multi-day QPC. Additional extraordinary-frequency modular accumulation preserves floor(remainder*1000/frequency) without overflow or floating-point rounding.",
+    "negative_test_evidence": "Standalone C++20 -fsanitize=undefined and -Werror smoke passed full old cases plus 9e18 Hz below/exact 2ms boundary; GitHub exact-SHA smoke and verifier remain pending."
+  },
+  "base_sha": "fef43241e10a68bfa81a166f6194f3565e357134",
+  "material_result_sha": "7119ed3680645a5bcbf6b34309fdec6a05f5c213",
+  "changed_files": [
+    "src/vr/ipc/qpc_freshness.hpp",
+    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "vrhost/tests/qpc_freshness_smoke.cpp",
+    "tools/verify_vr_qpc_freshness.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00834.json"
+  ],
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED: no actual Quest3/VDXR game/HMD test or Windows host timing capture.",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "ec19ce68d784c09bb07d34970e9579a7430e50aa",
+    "failed_initial_run": {
+      "run_id": 38537820149,
+      "failed_job": "policy",
+      "root_cause": "Missing docs/automation/runs/CONVERSION-DX9EX-00834.json"
+    },
+    "failed_first_repair_run": {
+      "run_id": 38538513621,
+      "attempt": 1,
+      "failed_job": "policy",
+      "root_cause": "Transient upstream GitHub release download connection timeout; no binary identity validation bypass"
+    },
+    "dx9ex_active": {
+      "run_id": 38538513621,
+      "attempt": 2,
+      "conclusion": "success",
+      "passed_jobs": 5,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38538513621"
+    },
+    "domain_isolation": {
+      "run_id": 38538513629,
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38538513629"
+    },
+    "full_source_impact": {
+      "run_id": 38538513679,
+      "conclusion": "success",
+      "passed_jobs": 3,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38538513679"
+    },
+    "local_cpp20_smoke": {
+      "conclusion": "pass",
+      "scope": "Reconstructed exact helper logic compiled with local g++ -std=c++20 -Wall -Wextra -Werror -fsanitize=undefined; original smoke and high-frequency edge cases"
+    },
+    "local_property_reference": {
+      "conclusion": "pass",
+      "scope": "300,000 randomized QPC samples checked against independent __int128 millisecond reference under UBSan"
+    }
+  },
+  "next_action": "Quest3/VDXR original game/HMD runtime check remains untested. Next independent DX9Ex feature work uses a new TASK_ID; do not rerun 00834 or award additional points.",
+  "validation_bearing_result_sha": "ec19ce68d784c09bb07d34970e9579a7430e50aa",
+  "result_sha": "ec19ce68d784c09bb07d34970e9579a7430e50aa",
+  "complete_build_verified_at_kst": "2026-10-14T18:04:06+09:00"
+}

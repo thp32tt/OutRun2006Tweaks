@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00532",
+  "production_id": "CONVERSION-DX9EX-00532",
+  "event_id": "CONVERSION-DX9EX-00532-E001",
+  "event_type": "rollover",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "selected_work_item": "DX9EX-P0-REMAINING-SCREENHUD-CLIP-CALLSITE-CONTRACT",
+  "base_sha": "f662b54354b62b71de80101bfa4138daf7e301ae",
+  "material_result_sha": "7b8718547ca59ff23ca67d014d4b70327f6c0aef",
+  "validation_bearing_result_sha": "7b8718547ca59ff23ca67d014d4b70327f6c0aef",
+  "result_sha": "7b8718547ca59ff23ca67d014d4b70327f6c0aef",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00532]",
+  "summary": "Closed the remaining 15 source-only canonical ScreenHud put_clip_sprite producer contracts for REV/gear, C2C slipstream/GF warning, Ghost/You/Diff, and pre-result TimeAttack HUD without changing runtime render source.",
+  "changed_paths": [
+    "docs/VR_BINARY_CONTRACT.json",
+    "tools/verify_vr_visual_composition_p0.py"
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "dx9ex_active_run_id": 37658267536,
+    "jobs": {
+      "policy": 112918897081,
+      "host": 112919038878,
+      "full_chain_compile": 112919038930,
+      "game": 112919038937,
+      "package": 112921441648
+    },
+    "domain_isolation_run_id": 37658267435,
+    "package_artifact_id": 11499552982,
+    "package_artifact_digest": "sha256:3c4348fa364b0d81c83a7b1f11bf0c6b0b78c02591cf3a79db0efd5815621e8d",
+    "canonical_exe_sha256": "68ceb386829066f8455b9d027320af962584321f3e2e8a79c72841495a6134c3",
+    "contracts_added": 15
+  },
+  "protected_boundaries": [
+    "runtime render-path source unchanged",
+    "HUD placement/projection math unchanged",
+    "Reset/Present/OpenXR/DirectGPU behavior unchanged"
+  ],
+  "next_action": "Continue P0 visual-composition exact producer closure from the latest focus HEAD; do not claim HMD/runtime success without Quest3/VDXR evidence."
+}

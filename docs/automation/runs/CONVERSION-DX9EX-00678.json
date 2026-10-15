@@ -1,0 +1,98 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00678",
+  "production_id": "CONVERSION-DX9EX-00678",
+  "event_id": "CONVERSION-DX9EX-00678-E001",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R29_EFFECT_POLICY_MEMOIZATION",
+  "work_key": "DX9EX-GAME-R29-STEREO-EFFECT-POLICY-MEMO",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "base_sha": "d696784d18a5ed8e006ff07e9cf86fdab1265f22",
+  "source_material_sha": "0fe21852eb530fafb5ebe86c26c1fda0f298cb26",
+  "material_commits": [
+    "0fe21852eb530fafb5ebe86c26c1fda0f298cb26"
+  ],
+  "result_sha": "0fe21852eb530fafb5ebe86c26c1fda0f298cb26",
+  "validation_bearing_result_sha": "0fe21852eb530fafb5ebe86c26c1fda0f298cb26",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "tools/verify_vr_r29_effect_cache_generation.py"
+  ],
+  "feature_contract": {
+    "goal": "Reduce redundant alpha/depth/cull R13-compatible stereo-effect policy classification work on each stable R29 stereo draw.",
+    "acceptance": "Refresh memoized fragile-world classification on live six-field state sync and relevant successful tracked SetRenderState transitions; preserve StateBlock recording/Apply generation reliability fences, conservative reader fallback, HUD force-zero precedence and depth/stencil write guards. Add 10 destructive mutations; require exact-SHA DX9Ex Active five jobs, Domain, Full Source Impact and HUD workflows to succeed.",
+    "metric_status": "No Quest3/VDXR actual FPS, p95/p99, CPU/GPU frame-time, binocular effect, gameplay or input measurement; source and CI verified only."
+  },
+  "acceptance_results": {
+    "live_state_policy_refresh": "PASS_EXACT_SHA_CI",
+    "setter_state_policy_refresh": "PASS_EXACT_SHA_CI",
+    "stateblock_hud_stereo_depth_stencil_regression": "PASS_EXACT_SHA_CI",
+    "negative_mutations": "PASS_10_NEW_DESTRUCTIVE_TESTS_EXACT_SHA_CI",
+    "dx9ex_active_validation": "PASS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "PASS_EXACT_SHA",
+    "full_source_impact": "PASS_3_OF_3_EXACT_SHA",
+    "hud_inspector": "PASS_2_OF_2_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38228230131,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "0fe21852eb530fafb5ebe86c26c1fda0f298cb26",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "game": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38228230273,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "0fe21852eb530fafb5ebe86c26c1fda0f298cb26",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    {
+      "id": 38228230361,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "0fe21852eb530fafb5ebe86c26c1fda0f298cb26",
+      "conclusion": "success",
+      "jobs": {
+        "source-cross-domain": "success",
+        "msvc-analyze-active-game": "success",
+        "msvc-analyze-openxr-host": "success"
+      }
+    },
+    {
+      "id": 38228230230,
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "head_sha": "0fe21852eb530fafb5ebe86c26c1fda0f298cb26",
+      "conclusion": "success",
+      "jobs": {
+        "build-hud-inspector": "success",
+        "static-exe-analysis": "success"
+      }
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "No Quest 3 / VDXR physical runtime validation was executed. Build/CI passes do not prove FPS/frame-time or optical improvement.",
+  "score_credit_key": "CONVERSION-DX9EX-00678",
+  "score_change": 0,
+  "notes": "Separate C6 bookkeeping [skip ci]; validation-bearing result remains immutable material SHA above. No duplicate score for C6 or validation repetition. Only DX9Ex branch source and targeted verifier changed, DXVK frozen."
+}

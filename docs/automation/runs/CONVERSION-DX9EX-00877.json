@@ -1,0 +1,113 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00877",
+  "production_id": "CONVERSION-DX9EX-00877",
+  "event_id": "CONVERSION-DX9EX-00877-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00877",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+    "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+    "goal": "Preserve complete vehicle-selection sprites and their real colors by correctly decoding valid padded-row DDS data through the original fast texture replacement path, without white/missing selection textures or unrelated HUD changes.",
+    "scope_boundary": "Only shared UI and vehicle-select DDS loader source row-stride handling, source bound checks, and its existing mutation verifier. Preserve original Direct3D9 native loader fallback, R84 stereo route, all good textures, SkyGlow, game input/FFB and DX11/DXVK isolation.",
+    "trace_stages": [
+      "Original game and selected UI vehicle sprites load native/replacement DDS bytes through the intercepted D3DX file-in-memory Ex API.",
+      "Fast DDS decoding now derives the file source stride from DDSD_PITCH for a valid uncompressed single-mip texture, preflights all rows before allocating or locking D3D9 texture, and correctly interprets every pixel.",
+      "D3D9 destination LockRect receives independent device pitch; the unchanged sprite owner, R84 stereo submission, and OpenXR host then composite the uploaded car-selection atlas under original draw ownership."
+    ],
+    "subcomponents": [
+      "Fix the source-level mismatch between declared DDS file row pitch and wrongly assumed tight-row source offsets, including exact source bounds/advance for one-mip opaque and alpha UI payloads.",
+      "Fail safely to existing native D3DX when source pitch is undersized, truncated, signed-invalid or an ambiguous padded multi-mip chain, and expand the existing fail-after static mutation suite while leaving destination pitch and texture replacement rollback intact."
+    ],
+    "acceptance_items": [
+      {
+        "id": "vehicle-dds-row-pitch",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original vehicle-selection producer to D3D9 DDS texture upload",
+        "expected_behavior": "Valid padded-row DDS source payload is decoded with declared source row pitch and a separate device destination pitch so car-selection pixel channels remain intact and unshifted."
+      },
+      {
+        "id": "invalid-source-native-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Malformed and ambiguous DDS input with original UI texture fallback",
+        "expected_behavior": "Truncated, nonpositive, undersized or ambiguous multi-mip source pitches are rejected before allocation while existing original D3DX and sprite scale rollback remain available."
+      },
+      {
+        "id": "exact-windows-gates",
+        "category": "integrated_validation",
+        "behavior_area": "Default R84 Win32 game, R26_SAFE rollback, x64 OpenXR host and DX9Ex package",
+        "expected_behavior": "Validation-bearing exact SHA passes DX9Ex Active five-job build and package, Domain Isolation, Full Source Impact and HUD Inspector including DDS negative mutation checks."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "At parent HEAD 24b7451, D3DXCreateTextureFromFileInMemoryEx_Custom checks only packed D3DXGetFormatSize bytes and uses srcRow = srcData + row*rowBytes unconditionally; this ignores DDSURFACEDESC2 lPitch when DDSD_PITCH declares padded file rows.",
+    "source_trace": [
+      "Vehicle UI source bytes and optional DDS replacement enter the shared intercepted D3DX memory loader.",
+      "DDS_FILE header has DDSD_PITCH and lPitch; pre-existing code used only the calculated rowBytes and advanced by packed mipSize even when file stride was larger.",
+      "Fast-path texture upload fills managed IDirect3DTexture9 independent device LockRect rows, then the sprite and R84 stereo renderer consume uploaded texels."
+    ],
+    "root_cause": "For noncompressed DDS with file row padding, the fast loader interpreted each source row from a tightly packed offset despite its own DDSD_PITCH metadata, causing subsequent rows to start inside preceding padding or pixel data.",
+    "alternatives_rejected": [
+      "Do not alter the R84 geometry/stereo or force universal D3D9 row pitch; source and destination row pitches are independent.",
+      "Do not guess unknown alignment on padded multi-level DDS: keep the original native D3DX trampoline as the fail-closed decoder."
+    ],
+    "eye_ownership": "Texture decoding precedes D3D9 sprite Draw and stereo per-eye composition; this change preserves producer semantic tags and eye ownership rather than remapping either eye."
+  },
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "runtime_evidence": "All required GitHub exact-SHA build, analyzer, HUD DDS and package gates PASS. No Quest3/VDXR physical stereo, visual asset, reset, FPS or HMD acceptance run.",
+  "source_parent_sha": "24b7451380cbf0bc7df0c8602aaef4237a33d648",
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_hud_dds_loader.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00877.json"
+  ],
+  "acceptance_results": {
+    "vehicle-dds-row-pitch": "PASS",
+    "invalid-source-native-fallback": "PASS",
+    "exact-windows-gates": "PASS"
+  },
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "QUEST3_VDXR_HARDWARE_RUNTIME_UNTESTED",
+  "result_commit_ci_skip": true,
+  "material_result_sha": "a458ed218f04045bb9665ceca78843399cd2f724",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "d66a828bee43a4a6516129cda3addc78df17ed4c",
+    "material_sha": "a458ed218f04045bb9665ceca78843399cd2f724",
+    "dx9ex_active": {
+      "run_id": 38685052396,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, full-chain-compile R84, game R26_SAFE, host, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38685052343,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38685052820,
+      "conclusion": "SUCCESS",
+      "required_jobs": "source-cross-domain, msvc-analyze-active-game, msvc-analyze-openxr-host (3/3)"
+    },
+    "hud_inspector": {
+      "run_id": 38685052381,
+      "conclusion": "SUCCESS",
+      "dds_source_obligations": 65,
+      "dds_negative_mutations": "48/48"
+    },
+    "runtime": "UNTESTED"
+  },
+  "validation_bearing_result_sha": "d66a828bee43a4a6516129cda3addc78df17ed4c"
+}

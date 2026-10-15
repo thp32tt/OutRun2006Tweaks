@@ -1,0 +1,119 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00872",
+  "production_id": "CONVERSION-DX9EX-00872",
+  "event_id": "CONVERSION-DX9EX-00872-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00872",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R26_CPU_SHADOW_LAZY_ALLOCATION",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R26_CPU_SHADOW_LAZY_ALLOCATION",
+    "goal": "Remove redundant eager full-buffer zero initialization during R26+HUD VB/IB CPU shadow's first small Lock/Unlock write while preserving all valid-byte and stereo fallback correctness.",
+    "scope_boundary": "Shipped R26+HUD dynamic VB/IB CPU shadow backing storage and its portable regression smoke; no producer/sprite/GOAL/lens/FFB/graphics effects, shader, DX11 or DXVK mutation.",
+    "special_work_evidence": "Original R26+HUD source used std::vector<uint8_t>::resize(desc.Size) before memcpy of a much smaller observed write; this value-initializes up to 16 MiB even though per-byte valid interval checks disallow the untouched memory. Source-confirmed elimination of full-size first-write zeroing, without claiming measured hardware FPS.",
+    "trace_stages": [
+      "Original D3D9 game dynamic vertex/index buffer Lock and Unlock provide only an observed write offset and byte span to the R26+HUD CPU shadow.",
+      "Game capture allocates backing byte storage and copies observed Lock/Unlock bytes, independently registering only those valid intervals and clearing them on DISCARD.",
+      "R26+HUD stereo draw-time readback checks the interval coverage before reading shadow bytes; absent or invalid bytes force unchanged game rendering fallback.",
+      "Active package compiles stereo_renderer_r30_r26_safe.cpp, and Windows host smoke covers allocation, partial copy, DISCARD and restoration without using HMD as compile proof."
+    ],
+    "subcomponents": [
+      "Replace first-write vector zero-fill for both shipped VB and IB CPU shadow with a lazy uninitialized buffer, preserving size/data/clear/resize interfaces and fallible allocation behavior.",
+      "Keep exact valid byte range gating on both vertex and index reads, non-overlapping copy boundaries, DISCARD invalidation and device lifecycle release unaffected.",
+      "Run portable Windows host executable with captured partial-byte payload, gap negatives, allocation reuse and clear/discard recovery plus existing 16k-range differential regression."
+    ],
+    "acceptance_items": [
+      {
+        "id": "allocation",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Shipped R26+HUD vertex and index shadow initial capture",
+        "expected_behavior": "A partial Lock/Unlock copies only observed bytes into an allocated backing buffer without eager full-size zero initialization, while later same-size writes reuse storage."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Shadow validity, DISCARD and device-lifetime recovery",
+        "expected_behavior": "Allocation does not imply readable bytes: non-covered gaps always reject, discarded ranges are invalidated, and cleared backing memory cannot inherit prior coverage."
+      },
+      {
+        "id": "ci",
+        "category": "integrated_validation",
+        "behavior_area": "Packaged Windows game and x64 host integration",
+        "expected_behavior": "The exact validation-bearing SHA passes DX9Ex Active host/game/package, Domain Isolation, Full Source Impact and HUD Inspector where applicable with portable regression target."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "In selected packaged R26+HUD owner, R30FinishObservedLock resizes vector<uint8_t> to full D3D9 buffer size on first observed lock and immediately overwrites only [lockOffset, lockOffset+lockSize).",
+    "root_cause": "std::vector<uint8_t>::resize value-initializes all unobserved elements on first capture (up to 16 MiB), producing unnecessary CPU bandwidth/memory cache work unrelated to stereo validity.",
+    "source_trace": [
+      "Vertex/index Lock hooks capture observed pointer, source offset and effective size for game-owned write before Unlock.",
+      "R30FinishObservedLock allocates backing bytes and memcpy writes partial buffer, then merges valid interval coverage independently from backing byte allocation.",
+      "R30CopyVertexShadow/R30CopyIndexShadow reject any read not covered by valid intervals; R30 stereo eye replay falls back on rejected reads."
+    ],
+    "alternatives_rejected": [
+      "Do not assume unobserved bytes can be read or remove coverage checks; do not resize the shadow to only the last observed region because later offset-based copies need full-address backing; do not change GPU draw admission or shaders."
+    ],
+    "fix_evidence": "The packaged R26+HUD R30BufferShadow bytes now use LazyUninitializedBuffer::resize(new uint8_t[size]) and preserve data, size, reuse and clear, while existing Merge/Contains validity and draw fallback remain untouched.",
+    "negative_test_evidence": "New host smoke asserts untouched interval gaps rejected, DISCARD removes coverage, same-capacity reuse preserves observed payload, clear drops pointer and size and fresh allocation starts invalid; original random differential intervals remain."
+  },
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "No Quest3/VDXR or same-scene hardware FPS measurement. Automated smoke and Windows compile are not VR acceptance.",
+  "source_parent_sha": "290ace9f7502dfde22ee2819a5c6f21f892fb55b",
+  "changed_files": [
+    "src/vr/d3d9/r30_shadow_bytes.hpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "vrhost/tests/r30_shadow_ranges_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00872.json"
+  ],
+  "acceptance_results": {
+    "allocation": "PASS",
+    "fallback": "PASS",
+    "ci": "PASS_EXACT_SHA"
+  },
+  "score_once": true,
+  "score_delta_this_attempt": 1,
+  "hold_reason": "QUEST3_VDXR_HARDWARE_RUNTIME_UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "material_result_sha": "49723bd0e1262e051a3d2a6fceb8a3d6ea27f69a",
+  "validation_bearing_result_sha": "b29a8ef4e356d0c6e6dc4b1f6a132f640d4c0993",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "previous_failed_sha": "49723bd0e1262e051a3d2a6fceb8a3d6ea27f69a",
+    "previous_failed_gate": "DX9Ex Active policy missing run record",
+    "runtime": "UNTESTED",
+    "exact_sha": "b29a8ef4e356d0c6e6dc4b1f6a132f640d4c0993",
+    "dx9ex_active": {
+      "run_id": 38658108648,
+      "conclusion": "SUCCESS",
+      "jobs_passed": "5/5 policy/game/host/full-chain-compile/package"
+    },
+    "domain_isolation": {
+      "run_id": 38658108720,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38658108776,
+      "conclusion": "SUCCESS",
+      "required_jobs": "msvc-analyze-active-game/source-cross-domain/msvc-analyze-openxr-host (3/3)"
+    },
+    "hud_inspector": {
+      "run_id": 38657778874,
+      "source_sha": "49723bd0e1262e051a3d2a6fceb8a3d6ea27f69a",
+      "conclusion": "SUCCESS",
+      "note": "HUD inspector was triggered by original C++ material commit; final SHA adds tests and documentation only"
+    }
+  },
+  "result_commit_ci_skip": false,
+  "validation_record_kind": "C6_BOOKKEEPING_SKIP_CI",
+  "c6_bookkeeping_ci_skip": true,
+  "scoreboard_commit": "0916557406d82c20ca90698f8e694b2ef08e451e"
+}

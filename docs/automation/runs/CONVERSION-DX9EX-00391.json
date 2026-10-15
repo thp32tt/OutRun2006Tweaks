@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00391",
+  "production_id": "CONVERSION-DX9EX-00391",
+  "event_id": "CONVERSION-DX9EX-00391-E002",
+  "event_type": "rollover",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "queue_controller_contract": {
+    "requested_path": "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "status": "ABSENT_AT_TASK_END",
+    "evidence": "GitHub contents lookup returned 404. Applied AGENTS.md C0-C6 and docs/automation/RUN_RECORD_TEMPLATE.json durable-record rules without inventing a replacement contract."
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_STRUCTURAL",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "1f1efb64d806a1bcd9a21c8f658e39f90b348d5f",
+  "red_guard_shas": [
+    "a9a94968d69c65f2d637d3eb78c1438d5d065c04",
+    "c01cd01df67bac8828e4ecfe9748e47eb31fb458"
+  ],
+  "result_sha": "eaddb4da311c8942b57a5caed7706b96a3f55c4e",
+  "material_result_sha": "eaddb4da311c8942b57a5caed7706b96a3f55c4e",
+  "validation_bearing_result_sha": "eaddb4da311c8942b57a5caed7706b96a3f55c4e",
+  "state_commit_sha": "c4c7021c5b50d30ebb9cad2caafb749e81d2630a",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00391]",
+  "selected_work_item": "VR-REFACTOR-POST1000-R34-OBSERVER-RETIREMENT-0006",
+  "summary": "Retired the last obsolete R34 compatibility observer/status alias after the R34 source shim, worker, physical hooks, and compile ownership were already retired. R33 now publishes only OpenXRVRStereoR33Dispatch terminal readiness; VRStereoR34ResetGuardHook, R33InstallStatus(), and OpenXRVRStereoR34ResetGuard publication are removed. R33-owned ResetEx replay-health/raster behavior is unchanged.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_r32_review.py",
+    "tools/verify_vr_refactor_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00391.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered GitHub vr-d3d9ex-focus directly. Initial resumed remote HEAD was a9a94968d69c65f2d637d3eb78c1438d5d065c04 with the first 00391 RED guard and no run JSON. Before a duplicate implementation push, CAS-style ls-remote detected concurrent advancement through c01cd01df67bac8828e4ecfe9748e47eb31fb458 to material eaddb4da311c8942b57a5caed7706b96a3f55c4e, so duplicate work was discarded and validation resumed from the authoritative remote material."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "00388 had already retired stereo_renderer_r34.cpp and all R34 physical/build ownership. The remaining OpenXRVRStereoR34ResetGuard Hook/status alias in R33 was compatibility-only and duplicated final readiness publication; the exact R33 replay-health/raster responsibilities remained independently owned by R33."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "RED guards a9a94968 and c01cd01d require the R34 observer/status alias and R33InstallStatus self-query to remain absent. Material eaddb4da removes VRStereoR34ResetGuardHook, R33InstallStatus(), and duplicate OpenXRVRStereoR34ResetGuard async publication while preserving R33 dispatch and reset replay-health/raster code."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_STRUCTURAL",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA eaddb4da311c8942b57a5caed7706b96a3f55c4e: DX9Ex Active Validation 37238918151 policy/full-chain-compile/host/game/package SUCCESS; Domain Isolation Guard 37238918252 SUCCESS; OutRun EXE HUD Inspector CI 37238918123 SUCCESS. N100 py_compile, architecture, R51 runtime contract, R32 review, hook graph, refactor contract, near-plane gate, workflow YAML parse, and git diff --check all PASS. No HMD/game runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "eaddb4da311c8942b57a5caed7706b96a3f55c4e",
+      "validation_bearing_result_sha": "eaddb4da311c8942b57a5caed7706b96a3f55c4e",
+      "message": "refactor(vr): retire R34 compatibility observer alias [AUTO:CONVERSION-DX9EX-00391]",
+      "ci_skip": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "DX9Ex Active package artifact 11316702996, name OutRun2-VR-DX9EX-ACTIVE-eaddb4da311c8942b57a5caed7706b96a3f55c4e, digest sha256:5ed689ef85d5a07dbc5eb89f2e4115a38de4e9f752f62cc57f7f084cc5287840, size 2730714 bytes. Artifact is build/package evidence only, not Quest3/VDXR runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "state_commit_sha": "c4c7021c5b50d30ebb9cad2caafb749e81d2630a",
+      "runtime_validation": "UNTESTED",
+      "issue14_validation_comment_id": 5985037688,
+      "issue13_update": "NOT_REQUIRED_NO_RUNTIME_REGRESSION_STATUS_CHANGE"
+    }
+  },
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37238918151,
+      "conclusion": "success",
+      "exact_sha": "eaddb4da311c8942b57a5caed7706b96a3f55c4e",
+      "jobs": {
+        "policy": 111543495810,
+        "full_chain_compile": 111543557405,
+        "host": 111543557413,
+        "game": 111543557441,
+        "package": 111544497141
+      },
+      "artifact_id": 11316702996,
+      "artifact_digest": "sha256:5ed689ef85d5a07dbc5eb89f2e4115a38de4e9f752f62cc57f7f084cc5287840"
+    },
+    "domain_isolation": {
+      "run_id": 37238918252,
+      "conclusion": "success",
+      "exact_sha": "eaddb4da311c8942b57a5caed7706b96a3f55c4e"
+    },
+    "hud_inspector": {
+      "run_id": 37238918123,
+      "conclusion": "success",
+      "exact_sha": "eaddb4da311c8942b57a5caed7706b96a3f55c4e",
+      "artifact_id": 11317170113,
+      "artifact_digest": "sha256:3647fcf190613a6f6b1f08b4c8361b982e31d39e5b885c48c0893a95b97c4414"
+    },
+    "n100_local": {
+      "conclusion": "success",
+      "checks": [
+        "python3 -m py_compile modified verifiers",
+        "verify_vr_architecture.py",
+        "verify_vr_r51_runtime_contract.py",
+        "verify_vr_r32_review.py",
+        "verify_vr_hook_graph.py",
+        "verify_vr_refactor_contract.py",
+        "verify_vr_nearplane_active_gate.py",
+        "workflow YAML parse",
+        "git diff --check"
+      ]
+    }
+  },
+  "next_action": "Do not repeat CONVERSION-DX9EX-00391 or restore any R34 source/observer/status alias. Preserve R33 as the sole final stereo dispatcher/status owner. Under a new task, take only the next bounded post-1000 structural successor supported by current source/static evidence; if none exists, return to explicit DX9Ex runtime/general maintenance. Runtime claims remain gated on Quest3/VDXR evidence.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00391",
+    "production_id": "CONVERSION-DX9EX-00391",
+    "event_id": "CONVERSION-DX9EX-00391-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "eaddb4da311c8942b57a5caed7706b96a3f55c4e",
+    "validation_bearing_result_sha": "eaddb4da311c8942b57a5caed7706b96a3f55c4e",
+    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_HUD_INSPECTOR_LOCAL_STRUCTURAL",
+    "runtime_validation": "UNTESTED",
+    "chat_rollover": 2,
+    "resume_reason": "Retry persisted after one recovery attempt",
+    "rollover_is_retry": false
+  },
+  "validated_at_kst": "2026-10-05T07:16:15+09:00",
+  "chat_rollover": 2,
+  "resume_reason": "Retry persisted after one recovery attempt",
+  "rollover_is_retry": false
+}

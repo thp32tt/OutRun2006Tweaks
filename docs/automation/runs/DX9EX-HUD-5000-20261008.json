@@ -1,0 +1,1047 @@
+{
+  "schema": 1,
+  "run_key": "DX9EX-HUD-5000-20261008",
+  "git_authority": "thp32tt/OutRun2006Tweaks",
+  "branch": "vr-d3d9ex-focus",
+  "validation_bearing_result_sha": "61aaf128aea5951abd6ef3495c6d51733ad0d3ec",
+  "result_sha": "61aaf128aea5951abd6ef3495c6d51733ad0d3ec",
+  "run_id": 37709294500,
+  "run_url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/37709294500",
+  "run_status": "completed",
+  "run_conclusion": "success",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "source_digest": "35db8038a1da65ca9ef6e9c8a062a6ea0862cbcddf67f0c8a98988da9511e719",
+  "source_audit": {
+    "iterations": 5000,
+    "families": 10,
+    "per_family_probes": 500,
+    "original_call_contract": "71 CALL sites",
+    "dds_loader_contract": "verify_vr_hud_dds_loader.py",
+    "checkpoints_count": 167,
+    "checkpoint_interval": 30,
+    "final_partial_interval": 20,
+    "checkpoint_ranges": [
+      {
+        "from": 1,
+        "to": 30,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0030.json"
+      },
+      {
+        "from": 31,
+        "to": 60,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0060.json"
+      },
+      {
+        "from": 61,
+        "to": 90,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0090.json"
+      },
+      {
+        "from": 91,
+        "to": 120,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0120.json"
+      },
+      {
+        "from": 121,
+        "to": 150,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0150.json"
+      },
+      {
+        "from": 151,
+        "to": 180,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0180.json"
+      },
+      {
+        "from": 181,
+        "to": 210,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0210.json"
+      },
+      {
+        "from": 211,
+        "to": 240,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0240.json"
+      },
+      {
+        "from": 241,
+        "to": 270,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0270.json"
+      },
+      {
+        "from": 271,
+        "to": 300,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0300.json"
+      },
+      {
+        "from": 301,
+        "to": 330,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0330.json"
+      },
+      {
+        "from": 331,
+        "to": 360,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0360.json"
+      },
+      {
+        "from": 361,
+        "to": 390,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0390.json"
+      },
+      {
+        "from": 391,
+        "to": 420,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0420.json"
+      },
+      {
+        "from": 421,
+        "to": 450,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0450.json"
+      },
+      {
+        "from": 451,
+        "to": 480,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0480.json"
+      },
+      {
+        "from": 481,
+        "to": 510,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0510.json"
+      },
+      {
+        "from": 511,
+        "to": 540,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0540.json"
+      },
+      {
+        "from": 541,
+        "to": 570,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0570.json"
+      },
+      {
+        "from": 571,
+        "to": 600,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0600.json"
+      },
+      {
+        "from": 601,
+        "to": 630,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0630.json"
+      },
+      {
+        "from": 631,
+        "to": 660,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0660.json"
+      },
+      {
+        "from": 661,
+        "to": 690,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0690.json"
+      },
+      {
+        "from": 691,
+        "to": 720,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0720.json"
+      },
+      {
+        "from": 721,
+        "to": 750,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0750.json"
+      },
+      {
+        "from": 751,
+        "to": 780,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0780.json"
+      },
+      {
+        "from": 781,
+        "to": 810,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0810.json"
+      },
+      {
+        "from": 811,
+        "to": 840,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0840.json"
+      },
+      {
+        "from": 841,
+        "to": 870,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0870.json"
+      },
+      {
+        "from": 871,
+        "to": 900,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0900.json"
+      },
+      {
+        "from": 901,
+        "to": 930,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0930.json"
+      },
+      {
+        "from": 931,
+        "to": 960,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0960.json"
+      },
+      {
+        "from": 961,
+        "to": 990,
+        "result": "PASS",
+        "artifact_path": "checkpoint-0990.json"
+      },
+      {
+        "from": 991,
+        "to": 1020,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1020.json"
+      },
+      {
+        "from": 1021,
+        "to": 1050,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1050.json"
+      },
+      {
+        "from": 1051,
+        "to": 1080,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1080.json"
+      },
+      {
+        "from": 1081,
+        "to": 1110,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1110.json"
+      },
+      {
+        "from": 1111,
+        "to": 1140,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1140.json"
+      },
+      {
+        "from": 1141,
+        "to": 1170,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1170.json"
+      },
+      {
+        "from": 1171,
+        "to": 1200,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1200.json"
+      },
+      {
+        "from": 1201,
+        "to": 1230,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1230.json"
+      },
+      {
+        "from": 1231,
+        "to": 1260,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1260.json"
+      },
+      {
+        "from": 1261,
+        "to": 1290,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1290.json"
+      },
+      {
+        "from": 1291,
+        "to": 1320,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1320.json"
+      },
+      {
+        "from": 1321,
+        "to": 1350,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1350.json"
+      },
+      {
+        "from": 1351,
+        "to": 1380,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1380.json"
+      },
+      {
+        "from": 1381,
+        "to": 1410,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1410.json"
+      },
+      {
+        "from": 1411,
+        "to": 1440,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1440.json"
+      },
+      {
+        "from": 1441,
+        "to": 1470,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1470.json"
+      },
+      {
+        "from": 1471,
+        "to": 1500,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1500.json"
+      },
+      {
+        "from": 1501,
+        "to": 1530,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1530.json"
+      },
+      {
+        "from": 1531,
+        "to": 1560,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1560.json"
+      },
+      {
+        "from": 1561,
+        "to": 1590,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1590.json"
+      },
+      {
+        "from": 1591,
+        "to": 1620,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1620.json"
+      },
+      {
+        "from": 1621,
+        "to": 1650,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1650.json"
+      },
+      {
+        "from": 1651,
+        "to": 1680,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1680.json"
+      },
+      {
+        "from": 1681,
+        "to": 1710,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1710.json"
+      },
+      {
+        "from": 1711,
+        "to": 1740,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1740.json"
+      },
+      {
+        "from": 1741,
+        "to": 1770,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1770.json"
+      },
+      {
+        "from": 1771,
+        "to": 1800,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1800.json"
+      },
+      {
+        "from": 1801,
+        "to": 1830,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1830.json"
+      },
+      {
+        "from": 1831,
+        "to": 1860,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1860.json"
+      },
+      {
+        "from": 1861,
+        "to": 1890,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1890.json"
+      },
+      {
+        "from": 1891,
+        "to": 1920,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1920.json"
+      },
+      {
+        "from": 1921,
+        "to": 1950,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1950.json"
+      },
+      {
+        "from": 1951,
+        "to": 1980,
+        "result": "PASS",
+        "artifact_path": "checkpoint-1980.json"
+      },
+      {
+        "from": 1981,
+        "to": 2010,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2010.json"
+      },
+      {
+        "from": 2011,
+        "to": 2040,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2040.json"
+      },
+      {
+        "from": 2041,
+        "to": 2070,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2070.json"
+      },
+      {
+        "from": 2071,
+        "to": 2100,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2100.json"
+      },
+      {
+        "from": 2101,
+        "to": 2130,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2130.json"
+      },
+      {
+        "from": 2131,
+        "to": 2160,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2160.json"
+      },
+      {
+        "from": 2161,
+        "to": 2190,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2190.json"
+      },
+      {
+        "from": 2191,
+        "to": 2220,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2220.json"
+      },
+      {
+        "from": 2221,
+        "to": 2250,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2250.json"
+      },
+      {
+        "from": 2251,
+        "to": 2280,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2280.json"
+      },
+      {
+        "from": 2281,
+        "to": 2310,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2310.json"
+      },
+      {
+        "from": 2311,
+        "to": 2340,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2340.json"
+      },
+      {
+        "from": 2341,
+        "to": 2370,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2370.json"
+      },
+      {
+        "from": 2371,
+        "to": 2400,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2400.json"
+      },
+      {
+        "from": 2401,
+        "to": 2430,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2430.json"
+      },
+      {
+        "from": 2431,
+        "to": 2460,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2460.json"
+      },
+      {
+        "from": 2461,
+        "to": 2490,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2490.json"
+      },
+      {
+        "from": 2491,
+        "to": 2520,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2520.json"
+      },
+      {
+        "from": 2521,
+        "to": 2550,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2550.json"
+      },
+      {
+        "from": 2551,
+        "to": 2580,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2580.json"
+      },
+      {
+        "from": 2581,
+        "to": 2610,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2610.json"
+      },
+      {
+        "from": 2611,
+        "to": 2640,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2640.json"
+      },
+      {
+        "from": 2641,
+        "to": 2670,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2670.json"
+      },
+      {
+        "from": 2671,
+        "to": 2700,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2700.json"
+      },
+      {
+        "from": 2701,
+        "to": 2730,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2730.json"
+      },
+      {
+        "from": 2731,
+        "to": 2760,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2760.json"
+      },
+      {
+        "from": 2761,
+        "to": 2790,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2790.json"
+      },
+      {
+        "from": 2791,
+        "to": 2820,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2820.json"
+      },
+      {
+        "from": 2821,
+        "to": 2850,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2850.json"
+      },
+      {
+        "from": 2851,
+        "to": 2880,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2880.json"
+      },
+      {
+        "from": 2881,
+        "to": 2910,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2910.json"
+      },
+      {
+        "from": 2911,
+        "to": 2940,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2940.json"
+      },
+      {
+        "from": 2941,
+        "to": 2970,
+        "result": "PASS",
+        "artifact_path": "checkpoint-2970.json"
+      },
+      {
+        "from": 2971,
+        "to": 3000,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3000.json"
+      },
+      {
+        "from": 3001,
+        "to": 3030,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3030.json"
+      },
+      {
+        "from": 3031,
+        "to": 3060,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3060.json"
+      },
+      {
+        "from": 3061,
+        "to": 3090,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3090.json"
+      },
+      {
+        "from": 3091,
+        "to": 3120,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3120.json"
+      },
+      {
+        "from": 3121,
+        "to": 3150,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3150.json"
+      },
+      {
+        "from": 3151,
+        "to": 3180,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3180.json"
+      },
+      {
+        "from": 3181,
+        "to": 3210,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3210.json"
+      },
+      {
+        "from": 3211,
+        "to": 3240,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3240.json"
+      },
+      {
+        "from": 3241,
+        "to": 3270,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3270.json"
+      },
+      {
+        "from": 3271,
+        "to": 3300,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3300.json"
+      },
+      {
+        "from": 3301,
+        "to": 3330,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3330.json"
+      },
+      {
+        "from": 3331,
+        "to": 3360,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3360.json"
+      },
+      {
+        "from": 3361,
+        "to": 3390,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3390.json"
+      },
+      {
+        "from": 3391,
+        "to": 3420,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3420.json"
+      },
+      {
+        "from": 3421,
+        "to": 3450,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3450.json"
+      },
+      {
+        "from": 3451,
+        "to": 3480,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3480.json"
+      },
+      {
+        "from": 3481,
+        "to": 3510,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3510.json"
+      },
+      {
+        "from": 3511,
+        "to": 3540,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3540.json"
+      },
+      {
+        "from": 3541,
+        "to": 3570,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3570.json"
+      },
+      {
+        "from": 3571,
+        "to": 3600,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3600.json"
+      },
+      {
+        "from": 3601,
+        "to": 3630,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3630.json"
+      },
+      {
+        "from": 3631,
+        "to": 3660,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3660.json"
+      },
+      {
+        "from": 3661,
+        "to": 3690,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3690.json"
+      },
+      {
+        "from": 3691,
+        "to": 3720,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3720.json"
+      },
+      {
+        "from": 3721,
+        "to": 3750,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3750.json"
+      },
+      {
+        "from": 3751,
+        "to": 3780,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3780.json"
+      },
+      {
+        "from": 3781,
+        "to": 3810,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3810.json"
+      },
+      {
+        "from": 3811,
+        "to": 3840,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3840.json"
+      },
+      {
+        "from": 3841,
+        "to": 3870,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3870.json"
+      },
+      {
+        "from": 3871,
+        "to": 3900,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3900.json"
+      },
+      {
+        "from": 3901,
+        "to": 3930,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3930.json"
+      },
+      {
+        "from": 3931,
+        "to": 3960,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3960.json"
+      },
+      {
+        "from": 3961,
+        "to": 3990,
+        "result": "PASS",
+        "artifact_path": "checkpoint-3990.json"
+      },
+      {
+        "from": 3991,
+        "to": 4020,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4020.json"
+      },
+      {
+        "from": 4021,
+        "to": 4050,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4050.json"
+      },
+      {
+        "from": 4051,
+        "to": 4080,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4080.json"
+      },
+      {
+        "from": 4081,
+        "to": 4110,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4110.json"
+      },
+      {
+        "from": 4111,
+        "to": 4140,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4140.json"
+      },
+      {
+        "from": 4141,
+        "to": 4170,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4170.json"
+      },
+      {
+        "from": 4171,
+        "to": 4200,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4200.json"
+      },
+      {
+        "from": 4201,
+        "to": 4230,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4230.json"
+      },
+      {
+        "from": 4231,
+        "to": 4260,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4260.json"
+      },
+      {
+        "from": 4261,
+        "to": 4290,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4290.json"
+      },
+      {
+        "from": 4291,
+        "to": 4320,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4320.json"
+      },
+      {
+        "from": 4321,
+        "to": 4350,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4350.json"
+      },
+      {
+        "from": 4351,
+        "to": 4380,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4380.json"
+      },
+      {
+        "from": 4381,
+        "to": 4410,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4410.json"
+      },
+      {
+        "from": 4411,
+        "to": 4440,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4440.json"
+      },
+      {
+        "from": 4441,
+        "to": 4470,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4470.json"
+      },
+      {
+        "from": 4471,
+        "to": 4500,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4500.json"
+      },
+      {
+        "from": 4501,
+        "to": 4530,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4530.json"
+      },
+      {
+        "from": 4531,
+        "to": 4560,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4560.json"
+      },
+      {
+        "from": 4561,
+        "to": 4590,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4590.json"
+      },
+      {
+        "from": 4591,
+        "to": 4620,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4620.json"
+      },
+      {
+        "from": 4621,
+        "to": 4650,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4650.json"
+      },
+      {
+        "from": 4651,
+        "to": 4680,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4680.json"
+      },
+      {
+        "from": 4681,
+        "to": 4710,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4710.json"
+      },
+      {
+        "from": 4711,
+        "to": 4740,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4740.json"
+      },
+      {
+        "from": 4741,
+        "to": 4770,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4770.json"
+      },
+      {
+        "from": 4771,
+        "to": 4800,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4800.json"
+      },
+      {
+        "from": 4801,
+        "to": 4830,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4830.json"
+      },
+      {
+        "from": 4831,
+        "to": 4860,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4860.json"
+      },
+      {
+        "from": 4861,
+        "to": 4890,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4890.json"
+      },
+      {
+        "from": 4891,
+        "to": 4920,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4920.json"
+      },
+      {
+        "from": 4921,
+        "to": 4950,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4950.json"
+      },
+      {
+        "from": 4951,
+        "to": 4980,
+        "result": "PASS",
+        "artifact_path": "checkpoint-4980.json"
+      },
+      {
+        "from": 4981,
+        "to": 5000,
+        "result": "PASS",
+        "artifact_path": "checkpoint-5000.json"
+      }
+    ],
+    "mutation_rejection": "PASS",
+    "new_static_contract_findings": 0
+  },
+  "artifact": {
+    "id": 11521435315,
+    "name": "dx9ex-hud-5000-static-review-61aaf128aea5951abd6ef3495c6d51733ad0d3ec",
+    "digest": "sha256:2e504d9e16fced43e8f71dcb20c07f7bbc9da8c79153e321be61ed6a340e1350",
+    "size_bytes": 260173,
+    "retention_days": 90
+  },
+  "open_evidence": [
+    "F1 rank sprani multi-node assumption not proven on canonical producer",
+    "F2 ScreenOverlay2D finite-plane vs FOV-only policy not reconciled",
+    "F3 actual DDS visual pixels, alpha and menu/car runtime replacement not proven",
+    "Quest 3 / VDXR known historical 00519 visual regressions remain unverified after code changes"
+  ],
+  "limitations": "5000 deterministic repeated source/mutation checks are not 5000 unique code reviews or proof of headset visual correctness. Previous exact material DDS fix is separate SHA 01f742749c414679cca210d6a275c55e778db3de. This task changes test code only.",
+  "next_action": "Investigate remaining source/binary/asset gaps before requesting one exact-SHA integrated Quest 3 runtime trial; do not repeat equivalent hardware tests."
+}

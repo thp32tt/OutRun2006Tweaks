@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00440",
+  "production_id": "CONVERSION-DX9EX-00440",
+  "event_id": "CONVERSION-DX9EX-00440-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "c5e3fabff83954bbd36c79c64f606161d8525b63",
+  "material_result_sha": "4e55afb95b74f32b5f79520b70c1c52ed7b1614c",
+  "validation_bearing_result_sha": "4e55afb95b74f32b5f79520b70c1c52ed7b1614c",
+  "result_sha": "4e55afb95b74f32b5f79520b70c1c52ed7b1614c",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00440]",
+  "selected_work_item": "VR-DX9EX-R19-STEREO-CACHE-RUN-IDENTITY-0023",
+  "summary": "Invalidate R19's cached complete stereo frame as soon as any Frame.v2 from a different producer run is observed.",
+  "changed_paths": [
+    "vrhost/src/runtime/sbs_capture_override.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00440.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered 00439 bookkeeping HEAD c5e3fabff83954bbd36c79c64f606161d8525b63; structural extraction chain remains terminal."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R19 LastStereoFrame gameplay grace was time/frame based only; host-surviving fast restart could keep the prior run complete frame authoritative until 500ms expiry while the new run published incomplete frames."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "4e55afb95b74f32b5f79520b70c1c52ed7b1614c adds producer-run identity helpers, invalidates stale/zero-identity cache before FrameComplete acceptance, centralizes cache reset, and adds deterministic verifier coverage."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "DX9Ex Active Validation 37392336892 and Domain Isolation Guard 37392336922 both SUCCESS."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "4e55afb95b74f32b5f79520b70c1c52ed7b1614c fix(vr): scope R19 stereo cache to game run [AUTO:CONVERSION-DX9EX-00440]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Artifact 11382136467 digest sha256:24e667af826c03a4cb354cdc630bccd8b31f079f19abc790e491b7a420839538; CI evidence only."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 6006226638
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37392336892,
+      "conclusion": "success",
+      "exact_sha": "4e55afb95b74f32b5f79520b70c1c52ed7b1614c",
+      "jobs": {
+        "policy": 112040101272,
+        "game": 112040189490,
+        "host": 112040189563,
+        "full_chain_compile": 112040189591,
+        "package": 112041679954
+      },
+      "package_artifact_id": 11382136467,
+      "package_artifact_digest": "sha256:24e667af826c03a4cb354cdc630bccd8b31f079f19abc790e491b7a420839538"
+    },
+    "domain_isolation": {
+      "run_id": 37392336922,
+      "conclusion": "success",
+      "exact_sha": "4e55afb95b74f32b5f79520b70c1c52ed7b1614c"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Continue from latest exact HEAD with the next independent host fallback source/cache lifetime stability unit.",
+  "completed_at_kst": "2026-10-06T09:13:00+09:00"
+}

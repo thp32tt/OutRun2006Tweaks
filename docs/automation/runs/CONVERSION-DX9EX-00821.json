@@ -1,0 +1,112 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00821",
+  "production_id": "CONVERSION-DX9EX-00821",
+  "event_id": "CONVERSION-DX9EX-00821-E002",
+  "event_type": "retry",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:DDS_CACHE_HIT_MISS_LOCK",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:DDS_CACHE_HIT_MISS_LOCK",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 1,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00821]",
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:DDS_CACHE_HIT_MISS_LOCK",
+    "goal": "Avoid redundant exclusive file-request locking for already resident replacement DDS textures while preserving cache-miss preload race safety, bounded LRU source lifetime and Win32 game's native fallback.",
+    "scope_boundary": "Only FileDataCache::getFileData lock scheduling and targeted source regression verifier; no DDS bytes, formats, scene/HUD scale, FFB, DX11/DXVK or localization changes.",
+    "special_work_evidence": "getFileData acquires mtx2 before the first LRU lookup despite mtx1 independently protecting all LRU operations and shared_ptr returning a call-scoped owner. The unnecessary serializing acquisition occurs even on hits; no unmeasured FPS gain is claimed.",
+    "trace_stages": [
+      "Original game requests UI/vehicle or stage DDS through D3DX texture-replacement loader.",
+      "FileDataCache returns shared-owned source bytes; cache hits use mtx1 alone, misses serialize disk read with mtx2 and recheck after racing preload.",
+      "Both fast and native D3D9 texture upload paths retain the same buffer across the D3DX call; resulting graphics are unchanged in XR host composition."
+    ],
+    "subcomponents": [
+      "Cache-hit read path bypasses mtx2 but retains LRU mutex and shared_ptr ownership.",
+      "Miss path double-checks after taking mtx2, loading exactly once or retaining oversized transient DDS through upload.",
+      "Source and destructive mutation verifier plus exact SHA Win32 host/game/package/domain/source impact validation."
+    ],
+    "acceptance_items": [
+      {
+        "id": "DDS_HIT_FASTPATH",
+        "category": "end_to_end_behavior",
+        "behavior_area": "resident_texture_reads",
+        "expected_behavior": "A present DDS gets the same shared byte owner and updates LRU with no mtx2 acquisition."
+      },
+      {
+        "id": "DDS_MISS_RACE_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "concurrent_miss_preload_and_large_dds",
+        "expected_behavior": "A real miss acquires mtx2, rechecks after waiting, avoids duplicate cacheFile I/O and retains the transient fallback across D3DX."
+      },
+      {
+        "id": "DDS_EXACT_SHA_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "win32_host_game_package_and_domain",
+        "expected_behavior": "Source mutation verifier and exact-SHA DX9Ex Active, Domain Isolation and Full Source Impact must all succeed without claiming HMD FPS."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "DDS_HIT_FASTPATH": "PASS_EXACT_SHA",
+    "DDS_MISS_RACE_FALLBACK": "PASS_EXACT_SHA",
+    "DDS_EXACT_SHA_GATES": "PASS_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "Unconditional mtx2 lock was acquired before every cache lookup, serializing shared-owner LRU hits which need only the existing mtx1 protection.",
+    "alternatives_rejected": [
+      "Do not remove mtx1 around cache/LRU publication or return bare evictable data.",
+      "Do not eliminate mtx2 on misses: native oversized transient and competing disk loads still require serialization.",
+      "Do not change texture formats, mip uploads, sampler state or protected visual content."
+    ],
+    "fix_evidence": "Use deferred unique_lock for mtx2, acquire only after first LRU miss, recheck after acquiring and before loading; preserve original call-scoped owner and disk-fallback lifetime.",
+    "negative_test_evidence": "Existing cache lifetime verifier extended for hit-before-lock, post-lock double check, oversized transient protection and destructive mutations.",
+    "first_failed_gate": "OutRun EXE HUD Inspector static analysis #38507105336 found source verifier false negative in post-lock double-check predicate: substring search began inside first `auto owner = ...` occurrence instead of after fileRequestLock.lock(), so valid source was rejected.",
+    "retry_repair": "Anchor second lookup search after the actual deferred fileRequestLock.lock() call, retaining original three source ownership lookups and all negative mutants. No game C++ changes."
+  },
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_texture_cache_lifetime.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00821.json"
+  ],
+  "base_sha": "f14d83045a2703a6679a40f17684b35f8e255f71",
+  "validation_bearing_result_sha": "c6164f7a779b30d0c98f6694ae1b6b8eb2af14f9",
+  "material_result_sha": "5ee9233e6f5f1c8ab6566315a998852f6d169ca2",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "c6164f7a779b30d0c98f6694ae1b6b8eb2af14f9",
+    "original_material_sha": "5ee9233e6f5f1c8ab6566315a998852f6d169ca2",
+    "DX9Ex Active Validation": {
+      "run_id": 38507203912,
+      "head_sha": "c6164f7a779b30d0c98f6694ae1b6b8eb2af14f9",
+      "status": "SUCCESS",
+      "jobs": "5/5 SUCCESS"
+    },
+    "Domain Isolation Guard": {
+      "run_id": 38507203829,
+      "head_sha": "c6164f7a779b30d0c98f6694ae1b6b8eb2af14f9",
+      "status": "SUCCESS"
+    },
+    "OutRun EXE HUD Inspector CI": {
+      "run_id": 38507204168,
+      "head_sha": "c6164f7a779b30d0c98f6694ae1b6b8eb2af14f9",
+      "status": "SUCCESS",
+      "jobs": "2/2 SUCCESS",
+      "dds_verifier": "26 source ownership obligations and 20/20 negative mutations PASS"
+    },
+    "DX9Ex Full Source Impact Review": {
+      "run_id": 38507105283,
+      "head_sha": "5ee9233e6f5f1c8ab6566315a998852f6d169ca2",
+      "status": "SUCCESS",
+      "jobs": "3/3 SUCCESS",
+      "note": "Original game C++ material commit, subsequent same-TASK retry changes only verifier and run record."
+    }
+  },
+  "runtime_gate": "Quest 3/VDXR exact package texture correctness and per-frame timing untested.",
+  "hold_resolution": "All four scoped Gate families SUCCESS on specified exact source/validation SHAs; no HMD or gameplay FPS test performed."
+}

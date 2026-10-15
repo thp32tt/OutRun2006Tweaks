@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00436",
+  "production_id": "CONVERSION-DX9EX-00436",
+  "event_id": "CONVERSION-DX9EX-00436-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "33f3367f446cd5726f7143a0ce5018fe242bd6d4",
+  "material_result_sha": "8640959e4b946a2051664e4e210f266663eb67f3",
+  "validation_bearing_result_sha": "8640959e4b946a2051664e4e210f266663eb67f3",
+  "result_sha": "8640959e4b946a2051664e4e210f266663eb67f3",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00436]",
+  "selected_work_item": "VR-REFACTOR-POST1100-SAFEEYE-IDENTITY-OWNER-0019",
+  "summary": "Centralize complete SafeEye cache identity in SafeEyesOwnFrame(frame), with legacy EnsureSafeFrame, R32 A/B staging, R23 committed-direct reuse and R24 direct-safe projection all delegating to the same owner predicate.",
+  "changed_paths": [
+    "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp",
+    "vrhost/src/runtime/d3d9ex_direct_passthrough_r32.hpp",
+    "vrhost/src/runtime/r23_runtime_hardening.hpp",
+    "vrhost/src/runtime/r24_black_screen_guard.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00436.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {"status":"COMPLETE","evidence":"Recovered 00435 exact material 0f8106283050766668bd757ad44e915aa128600d and C6 bookkeeping 33f3367f446cd5726f7143a0ce5018fe242bd6d4. Post-1100 R31/R32 hook-retirement chain remains terminal."},
+    "C1_REVIEW": {"status":"COMPLETE","evidence":"00435 carried the same complete SafeEye run-identity predicate in four consumers, leaving structural drift risk despite identical behavior."},
+    "C2_IMPLEMENT": {"status":"COMPLETE","evidence":"8640959e4b946a2051664e4e210f266663eb67f3 adds SafeEyesOwnFrame(frame) as the owner predicate, delegates all four consumers to it, updates the canonical verifier to require owner delegation and forbid duplicated partial predicates, and records successor 0019 in VR_REFACTOR_STATE."},
+    "C3_VALIDATE": {"status":"COMPLETE","automation_validation":"PASS","runtime_validation":"UNTESTED","evidence":"Exact SHA 8640959e4b946a2051664e4e210f266663eb67f3: DX9Ex Active Validation 37388705425 SUCCESS; policy 112028361156, full-chain-compile 112028464247, game 112028464270, host 112028464296, package 112030023081 all SUCCESS. Domain Isolation Guard 37388705508 SUCCESS."},
+    "C4_COMMIT": {"status":"COMPLETE","task_tagged_commits":["8640959e4b946a2051664e4e210f266663eb67f3 refactor(vr): centralize SafeEye run identity [AUTO:CONVERSION-DX9EX-00436]"],"ci_skip_on_validation_bearing_result":false},
+    "C5_PACKAGE": {"status":"COMPLETE_AUTOMATION_ARTIFACT_ONLY","evidence":"Artifact 11380845227 OutRun2-VR-DX9EX-ACTIVE-8640959e4b946a2051664e4e210f266663eb67f3 digest sha256:3008eee3daa77dea4f7af5df291f3488ab978ce4706bf7f6a4319e3ed65e135e. CI evidence only; not HMD proof."},
+    "C6_STATE": {"status":"COMPLETE","runtime_validation":"UNTESTED","issue14_comment_id":6005514452}
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {"run_id":37388705425,"conclusion":"success","exact_sha":"8640959e4b946a2051664e4e210f266663eb67f3","jobs":{"policy":112028361156,"full_chain_compile":112028464247,"game":112028464270,"host":112028464296,"package":112030023081},"package_artifact_id":11380845227,"package_artifact_digest":"sha256:3008eee3daa77dea4f7af5df291f3488ab978ce4706bf7f6a4319e3ed65e135e"},
+    "domain_isolation": {"run_id":37388705508,"conclusion":"success","exact_sha":"8640959e4b946a2051664e4e210f266663eb67f3"},
+    "runtime": {"status":"UNTESTED","reason":"No Quest3/VDXR or in-game HMD session was performed."}
+  },
+  "next_action": "Continue from latest exact HEAD with the next independently executable DX9Ex stability/lifecycle unit.",
+  "completed_at_kst": "2026-10-06T08:36:00+09:00"
+}

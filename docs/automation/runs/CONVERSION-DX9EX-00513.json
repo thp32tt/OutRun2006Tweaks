@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00513",
+  "production_id": "CONVERSION-DX9EX-00513",
+  "target_branch": "vr-d3d9ex-focus",
+  "status": "BLOCKED",
+  "attempt": "3/3",
+  "failed_result_sha": "22f9682e0340245d8b7718a33a0fdc0b6aa9b086",
+  "validation_bearing_result_sha": "22f9682e0340245d8b7718a33a0fdc0b6aa9b086",
+  "automation_validation": "FAIL",
+  "runtime_validation": "UNTESTED",
+  "failed_run_id": 37603476477,
+  "failed_job_id": 112733404581,
+  "failure_classification": "EXPECTED_COMPILE_OWNERSHIP_DEPENDENCY_DISCOVERY",
+  "summary": "R31/R30 split preflight exposed remaining lower textual-chain dependencies in R31 and R32. The bounded task exhausted its retry budget before a safe owner-facade extraction could be validated.",
+  "blocker": "R31 still consumed private lower runtime/math/cache/renderer state, while R32 independently still depends on lower R30/R29/Reset/Present/DirectGPU symbols. Do not keep the incomplete split enabled in the canonical full-chain gate.",
+  "preserved_progress": [
+    "OUTRUN_VR_REFACTOR_SPLIT_R31_R30 preflight option remains available",
+    "exact failure evidence is preserved in DX9Ex Active Validation run 37603476477",
+    "R31/R32 and R33/R32 previously validated owner seams remain intact"
+  ],
+  "next_action": "Use a new bounded task to extract one owner facade at a time; first remove R31 private lower dependencies, then address R32 lower dependencies before re-enabling the R31/R30 split gate."
+}

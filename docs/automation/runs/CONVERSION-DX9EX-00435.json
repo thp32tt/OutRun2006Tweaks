@@ -1,0 +1,51 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00435",
+  "production_id": "CONVERSION-DX9EX-00435",
+  "event_id": "CONVERSION-DX9EX-00435-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "3dfa54a970ea5e105758296d9b16f9edc3859820",
+  "material_result_sha": "0f8106283050766668bd757ad44e915aa128600d",
+  "validation_bearing_result_sha": "0f8106283050766668bd757ad44e915aa128600d",
+  "result_sha": "0f8106283050766668bd757ad44e915aa128600d",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00435]",
+  "selected_work_item": "L3-DX9EX-001 / SafeEye consumer complete Frame.v2 run identity",
+  "summary": "R23 and R24 host-owned SafeEye reuse bypasses now require frame ID + DirectGPU transport generation + Frame.v2 run generation + game PID, matching the underlying SafeEye cache identity and rejecting prior-run eye reuse after a fast producer restart.",
+  "changed_paths": [
+    "vrhost/src/runtime/r23_runtime_hardening.hpp",
+    "vrhost/src/runtime/r24_black_screen_guard.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00435.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {"status":"COMPLETE","evidence":"Recovered latest branch material 3dfa54a970ea5e105758296d9b16f9edc3859820 from 00434; post-1100 structural hook retirement remained terminal, so the active DirectGPU lifetime/cache successor was selected."},
+    "C1_REVIEW": {"status":"COMPLETE","evidence":"00433/00434 had complete run identity on SafeEye/shared-resource caches, but R23 RenderCommittedDirect and R24 TryBuildDirectSafeProjection still allowed already-owned SafeEye reuse using only frameId + transport generation."},
+    "C2_IMPLEMENT": {"status":"COMPLETE","evidence":"0f8106283050766668bd757ad44e915aa128600d adds runGeneration + gamePid checks to both owned-cache reuse predicates and extends the canonical reset/transport verifier to fail closed if either consumer regresses."},
+    "C3_VALIDATE": {"status":"COMPLETE","automation_validation":"PASS","runtime_validation":"UNTESTED","evidence":"Exact SHA 0f8106283050766668bd757ad44e915aa128600d: DX9Ex Active Validation 37388011236 SUCCESS; policy 112026107873, host 112026221482, game 112026221648, full-chain-compile 112026221697, package 112027418235 all SUCCESS. Domain Isolation Guard 37388011403 SUCCESS."},
+    "C4_COMMIT": {"status":"COMPLETE","task_tagged_commits":["0f8106283050766668bd757ad44e915aa128600d fix(vr): bind SafeEye reuse to game run [AUTO:CONVERSION-DX9EX-00435]"],"ci_skip_on_validation_bearing_result":false},
+    "C5_PACKAGE": {"status":"COMPLETE_AUTOMATION_ARTIFACT_ONLY","evidence":"Artifact 11378989182 OutRun2-VR-DX9EX-ACTIVE-0f8106283050766668bd757ad44e915aa128600d digest sha256:c338cc7d318fb3274c51ec4a0ef406da91e530403890e516fbc24b9ba4d2a935. CI evidence only; not HMD proof."},
+    "C6_STATE": {"status":"COMPLETE","runtime_validation":"UNTESTED","issue14_comment_id":6005378566}
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37388011236,
+      "conclusion": "success",
+      "exact_sha": "0f8106283050766668bd757ad44e915aa128600d",
+      "jobs": {"policy":112026107873,"host":112026221482,"game":112026221648,"full_chain_compile":112026221697,"package":112027418235},
+      "package_artifact_id": 11378989182,
+      "package_artifact_digest": "sha256:c338cc7d318fb3274c51ec4a0ef406da91e530403890e516fbc24b9ba4d2a935"
+    },
+    "domain_isolation": {"run_id":37388011403,"conclusion":"success","exact_sha":"0f8106283050766668bd757ad44e915aa128600d"},
+    "runtime": {"status":"UNTESTED","reason":"No Quest3/VDXR or in-game HMD session was performed."}
+  },
+  "next_action": "Centralize complete SafeEye frame-identity matching behind the SafeEye owner so R23/R24/R32 cannot drift into duplicated partial identity predicates.",
+  "completed_at_kst": "2026-10-06T08:25:58+09:00"
+}

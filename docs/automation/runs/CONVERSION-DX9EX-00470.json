@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00470",
+  "production_id": "CONVERSION-DX9EX-00470",
+  "event_id": "CONVERSION-DX9EX-00470-E003",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "3/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "fded89050fcafea09353f6675975fdb1e37c42c3",
+  "source_material_sha": "f385ab8e9ae689f5905ecb2059683c9a3654f618",
+  "material_result_sha": "4dcbc04bd99627700f3a6297986856f12a3c0054",
+  "validation_bearing_result_sha": "4dcbc04bd99627700f3a6297986856f12a3c0054",
+  "result_sha": "4dcbc04bd99627700f3a6297986856f12a3c0054",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00470]",
+  "selected_work_item": "VR-DX9EX-SESSION-DESTROY-TRANSACTION-0053",
+  "summary": "R19 parent-session teardown retains local swapchain state across a failed parent destroy and releases local child ownership only after xrDestroySession succeeds.",
+  "automation_validation": "PASS",
+  "evidence": {
+    "failure_context": [
+      "37425105153: expected RED verifier failure before PrepareForParentSessionDestroy existed.",
+      "37425352955: verifier-only false negative from duplicate return true ordering; source implementation compiled far enough for Domain Isolation PASS."
+    ],
+    "validation": {
+      "dx9ex_active_run_id": 37425658979,
+      "policy_job_id": 112144589841,
+      "game_job_id": 112144687988,
+      "full_chain_compile_job_id": 112144688053,
+      "host_job_id": 112144688075,
+      "package_job_id": 112146257273,
+      "domain_isolation_run_id": 37425658964,
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11395123099,
+      "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-4dcbc04bd99627700f3a6297986856f12a3c0054",
+      "digest": "sha256:c2ba146129db987a7ec0cbdf922f40b9eac28aedc8230b2b34d857e7b6297845"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Continue with CONVERSION-DX9EX-00471: make the inner OpenXR compatibility DestroySession transactional so failure does not release D3D11 graphics binding or discard LOCAL-space/session state before the runtime result.",
+  "completed_at_kst": "2026-10-06T15:52:00+09:00"
+}

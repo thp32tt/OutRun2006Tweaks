@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00581",
+  "production_id": "CONVERSION-DX9EX-00581",
+  "event_id": "CONVERSION-DX9EX-00581-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "b35e39f7011d7234bfb8fd2d7cc95057cf511e70",
+  "first_material_sha": "23f0b9f352dc00bba6427e7a172f98d089078f2f",
+  "repair_sha": "34a25dcece954619362b9e4c562a39aeccf68977",
+  "result_sha": "34a25dcece954619362b9e4c562a39aeccf68977",
+  "validation_bearing_result_sha": "34a25dcece954619362b9e4c562a39aeccf68977",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00581]",
+  "work_key": "DX9EX:P0:VR_SDL_TO_XINPUT_RUMBLE_EXCLUSIVE",
+  "changed_paths": [
+    "src/hooks_forcefeedback.cpp",
+    "tools/verify_vr_ffb_controller_routing.py"
+  ],
+  "summary": "Preserve released FFB v0.2 payload and make VR SDL/XInput rumble mutually exclusive. On SDL->XInput handoff stop timed SDL rumble, clear SDL state on wheel output ownership and vibration disable. Negative mutations now fail closed instead of raising IndexError when the wheel-owner branch is deliberately removed.",
+  "initial_failure": {
+    "run_id": 38035318100,
+    "head_sha": "23f0b9f352dc00bba6427e7a172f98d089078f2f",
+    "job": "policy",
+    "reason": "Python IndexError in deliberately deleted wheel-owner branch negative mutation",
+    "not_runtime_failure": true
+  },
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "automation_validation": "PASS_EXACT_SHA",
+  "static_validation": "PASS: policy Python verifier and routing/lifetime negative mutation tests on repaired material SHA",
+  "ci_runs": {
+    "dx9ex_active": 38035379682,
+    "domain_isolation": 38035379693,
+    "full_source_impact_initial_source_sha": 38035318052
+  },
+  "ci_results": [
+    {
+      "gate": "dx9ex_active",
+      "id": 38035379682,
+      "head_sha": "34a25dcece954619362b9e4c562a39aeccf68977",
+      "conclusion": "success"
+    },
+    {
+      "gate": "domain_isolation",
+      "id": 38035379693,
+      "head_sha": "34a25dcece954619362b9e4c562a39aeccf68977",
+      "conclusion": "success"
+    },
+    {
+      "gate": "full_source_impact",
+      "id": 38035318052,
+      "head_sha": "23f0b9f352dc00bba6427e7a172f98d089078f2f",
+      "conclusion": "success",
+      "note": "Previous C++ source-bearing material; final repair only changed Python verifier, so this is not an exact-SHA run for the final repair"
+    }
+  ],
+  "ci_jobs": {
+    "dx9ex_policy": "SUCCESS",
+    "dx9ex_host": "SUCCESS",
+    "dx9ex_game": "SUCCESS",
+    "dx9ex_full_chain_compile": "SUCCESS",
+    "dx9ex_package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "initial_full_source": "SUCCESS"
+  },
+  "package": {
+    "artifact_id": 11664096554,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-34a25dcece954619362b9e4c562a39aeccf68977",
+    "digest": "sha256:8190498c3e43ee4f12b0d7b8336438f6de9040346f7793b933c8e23e6cf6b3e2",
+    "hmd_approved": false
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "ffb_wheel_hardware_validation": "UNTESTED",
+  "native_120fps_target": "NOT_MEASURED",
+  "pinned_ffb_release": {
+    "tag": "v0.2",
+    "sha": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "modified": false
+  },
+  "baseline": {
+    "sha": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "modified": false
+  },
+  "lane_policy": {
+    "dx11": "ACTIVE_INDEPENDENT",
+    "dxvk": "FROZEN",
+    "localization": "UNMODIFIED"
+  },
+  "bookkeeping_note": "C6 record is not a material validation-bearing source SHA; keep result_sha pinned to repaired code commit."
+}

@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00419",
+  "production_id": "CONVERSION-DX9EX-00419",
+  "event_id": "CONVERSION-DX9EX-00419-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "fc0550d2780fb059e7cc45776286ee91d72a5457",
+  "red_contract_sha": "f679cc983d6ddec241d43a70b261e5148ac558b7",
+  "material_result_sha": "2e32a04edbf9eb77e31d204d0ea6e80ca3aaba1d",
+  "validation_bearing_result_sha": "2e32a04edbf9eb77e31d204d0ea6e80ca3aaba1d",
+  "result_sha": "2e32a04edbf9eb77e31d204d0ea6e80ca3aaba1d",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00419]",
+  "selected_work_item": "L3-DX9EX-001",
+  "summary": "Centralized D3D9Ex interop probe publication retirement into one R7 helper so Reset and R32 host-identity invalidation share the same token-before-handle ordering and cannot drift independently.",
+  "changed_paths": [
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00419.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered completed 00418 exact SHA and refactor cycle 1100 terminal owner-census state."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "00417 and 00418 fixed the same publication-order invariant in two separate call sites, leaving duplicate lifecycle ownership that could regress independently."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "TDD RED f679cc98 required a single RetireDirectInteropProbePublication owner and failed because it did not exist. 95911eff added the helper and Reset routing; 2e32a04e routed R32 invalidation through the same helper."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 2e32a04edbf9eb77e31d204d0ea6e80ca3aaba1d: DX9Ex Active Validation 37360183550 SUCCESS (policy 111932560116, game 111932775575, host 111932775621, full-chain-compile 111932775653, package 111934846194); Domain Isolation Guard 37360183573 SUCCESS."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "f679cc983d6ddec241d43a70b261e5148ac558b7 test(vr): require single interop publication owner [AUTO:CONVERSION-DX9EX-00419]",
+        "95911effe6aae532c6279ab01cd252b204dc9b6c refactor(vr): centralize interop publication retirement [AUTO:CONVERSION-DX9EX-00419]",
+        "2e32a04edbf9eb77e31d204d0ea6e80ca3aaba1d refactor(vr): route R32 through interop publication owner [AUTO:CONVERSION-DX9EX-00419]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "OutRun2-VR-DX9EX-ACTIVE-2e32a04edbf9eb77e31d204d0ea6e80ca3aaba1d artifact 11366905812 digest sha256:3429273358191d7db589cf9637b45fbfcc13c9e1946a5dbb8cec2e831de7bca1. CI evidence only, not HMD proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+  "evidence": {
+    "expected_red": {
+      "sha": "f679cc983d6ddec241d43a70b261e5148ac558b7",
+      "run_id": 37360036640,
+      "conclusion": "failure",
+      "failure": "DX9Ex reset/transport contract FAILED: missing function marker: void RetireDirectInteropProbePublication() noexcept",
+      "classification": "EXPECTED_TDD_RED_NOT_REPAIR_FAILURE"
+    },
+    "dx9ex_active": {
+      "run_id": 37360183550,
+      "conclusion": "success",
+      "exact_sha": "2e32a04edbf9eb77e31d204d0ea6e80ca3aaba1d",
+      "jobs": {
+        "policy": 111932560116,
+        "game": 111932775575,
+        "host": 111932775621,
+        "full_chain_compile": 111932775653,
+        "package": 111934846194
+      },
+      "package_artifact_id": 11366905812,
+      "package_artifact_digest": "sha256:3429273358191d7db589cf9637b45fbfcc13c9e1946a5dbb8cec2e831de7bca1"
+    },
+    "domain_isolation": {
+      "run_id": 37360183573,
+      "conclusion": "success",
+      "exact_sha": "2e32a04edbf9eb77e31d204d0ea6e80ca3aaba1d"
+    }
+  },
+  "next_action": "Interop probe publication retirement is now single-owner and statically gated. Runtime remains UNTESTED; select the next independent DX9Ex lifecycle/synchronization improvement.",
+  "completed_at_kst": "2026-10-06T04:06:04+09:00"
+}

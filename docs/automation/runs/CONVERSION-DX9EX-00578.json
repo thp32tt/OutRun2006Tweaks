@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00578",
+  "production_id": "CONVERSION-DX9EX-00578",
+  "event_id": "CONVERSION-DX9EX-00578-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "eb17f46dd0c1ae03d83c1be4831abe659c56bafc",
+  "first_material_sha": "2c35f7be9584a48cb08a279b3f1d645915ec4932",
+  "repair_sha": "8816c82626fd05f131c9721b4856afc3c38f3c68",
+  "result_sha": "beca6507814f317eaf0aae9cee03f5fe39afc357",
+  "material_result_sha": "beca6507814f317eaf0aae9cee03f5fe39afc357",
+  "validation_bearing_result_sha": "beca6507814f317eaf0aae9cee03f5fe39afc357",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00578]",
+  "work_key": "DX9EX:P1:SHADOW_LATEST_FRAME_FAIL_CLOSED",
+  "conflict_keys": [
+    "src/vr/ipc/shadow_legacy_v2.hpp:LatestFrame transactional output",
+    "vrhost/tests/v2_v3_shadow_conversion_smoke.cpp:Release-active LatestFrame cases",
+    "tools/verify_vr_architecture.py:LatestFrame candidate publication contract"
+  ],
+  "changed_paths": [
+    "src/vr/ipc/shadow_legacy_v2.hpp",
+    "vrhost/tests/v2_v3_shadow_conversion_smoke.cpp",
+    "tools/verify_vr_architecture.py"
+  ],
+  "summary": "P1 legacy v2->v3 frame-ring LatestFrame avoids stale outputs and producer-slot alias corruption, validates a staged candidate before publication, adds eight Release-active success/failure regression cases, and strengthens the architecture contract for candidate run identity. Initial old-verifier policy failure fixed in later material SHA; all mandatory gates succeeded on the final exact SHA.",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "static_validation": "PASS: scoped source contract and eight focused Release-active smoke cases; host CI SUCCESS on exact SHA",
+  "automation_validation": "PASS_EXACT_SHA",
+  "ci_runs": {
+    "dx9ex_active": 38032385723,
+    "domain_isolation": 38032385795,
+    "full_source_impact": 38032385740
+  },
+  "ci_jobs": {
+    "dx9ex_policy": "SUCCESS",
+    "dx9ex_host": "SUCCESS",
+    "dx9ex_game": "SUCCESS",
+    "dx9ex_full_chain_compile": "SUCCESS",
+    "dx9ex_package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "full_source_cross_domain": "SUCCESS",
+    "full_source_openxr_host_analyze": "SUCCESS",
+    "full_source_active_game_analyze": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11663271309,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-beca6507814f317eaf0aae9cee03f5fe39afc357",
+    "digest": "sha256:cc0588abedae0871433fd8d12b71cd85cf487bbaf8f6436f56636c6b0328ac5c",
+    "hmd_approved": false
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "native_120fps_target": "NOT_MEASURED",
+  "ffb_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "all_nine_imported_file_blobs_identical": true,
+    "mutated": false,
+    "wheel_runtime_validation": "UNTESTED"
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub remote HEAD/checkpoint; unique TASK_ID",
+    "C1_REVIEW": "PASS AGENTS, priority, state/queue, history, Issue 13/14, HUD Inspector, v0.2 release",
+    "C2_IMPLEMENT": "PASS staged LatestFrame publication + architecture validator + eight Release-host smoke cases",
+    "C3_VALIDATE": "PASS three exact material-SHA GitHub Gates",
+    "C4_COMMIT": "PASS final material commit with exact marker and no CI skip",
+    "C5_PACKAGE": "PASS CI-built artifact, not HMD approved",
+    "C6_RESULT": "PASS independent documentation commit after immutable three-gate success"
+  }
+}

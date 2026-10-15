@@ -1,0 +1,130 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00777",
+  "production_id": "CONVERSION-DX9EX-00777",
+  "event_id": "CONVERSION-DX9EX-00777-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:GOAL_PROGRESS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_status": "IN_PROGRESS_UNSAFE_B9200_TEXT_OWNER_OR_HMD_TEST",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00777]",
+  "material_result_sha": "3f912a9ef189f48b9fab29a8d0a6bdef0381d912",
+  "validation_bearing_result_sha": "00c92d6f182ada51355391fcacb81bb8d4f8cc4f",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "score_delta": 0,
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_visual_composition_p0.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00777.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Make original GOAL 0-99 progress percentage, stage record glyph and time/title exact E8 producers render in coherent finite binocular HUD scope whether emitted synchronously or through SpriteNode queues.",
+    "scope_boundary": "Only established safe 0x97BE4/0x97DEC 0x2D200 progress, three 0x975EE/0x97727/0x977FB Sumo_Printf and two 0xBEA5A/0xBEA5F GOAL helper CALLs; all nineteen 0x97xxx B9200 source E8 remain unchanged because 0x97C5F/0x97E75 minidumps prove their rva+5 hooks crash.",
+    "trace_stages": [
+      "Original exact GOAL Sumo_Printf, 0x2D200 percentage and pair of GOAL time helper E8 entry",
+      "Immediate font or animated percentage Draw can precede SpriteNode append; stale CurrentQueueExactScope can override CurrentScope",
+      "ScopedExactProducerSemantic protects nonqueue immediate source then TagAppendedNodes labels all queued siblings",
+      "R30 fixedfn/VS per-eye finite ScreenHud and host composition retain protected world and results"
+    ],
+    "subcomponents": [
+      "Scope immediate Sumo_Printf stage/result glyph raster",
+      "Scope original progress percentage as both direct and queued",
+      "Scope two original GOAL time/title helpers with direct and queued siblings while preserving every original function call"
+    ],
+    "acceptance_items": [
+      {
+        "id": "GOAL_ALL_SAFE_DIRECT_PRODUCERS",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_goal_percentage_and_title_time",
+        "expected_behavior": "Each safe GOAL progress/print/time helper direct call temporarily owns finite ScreenHud without replay cursor leak."
+      },
+      {
+        "id": "GOAL_ALL_QUEUED_SIBLINGS",
+        "category": "end_to_end_behavior",
+        "behavior_area": "sprite_node_stereo_queue",
+        "expected_behavior": "All original SpriteNode children retain exact ScreenHud provenance after parent returns."
+      },
+      {
+        "id": "GOAL_FALLBACK_AND_OLD_CRASH_GUARD",
+        "category": "fallback_regression",
+        "behavior_area": "desktop_queue_and_unsafe_exe",
+        "expected_behavior": "Desktop/VR toggles, nested original calls, original game timing and all nineteen unsafe B9200 E8 remain untouched; protect final results/world."
+      },
+      {
+        "id": "GOAL_EXACT_SHA_WIN32",
+        "category": "integrated_validation",
+        "behavior_area": "game_host_package_ci",
+        "expected_behavior": "Exact source/result SHA DX9Ex Active Win32 game/host/full-chain/package, Domain Isolation, Full Source Impact pass; Quest3 separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "GOAL_ALL_SAFE_DIRECT_PRODUCERS": "PASS_EXACT_SHA",
+    "GOAL_ALL_QUEUED_SIBLINGS": "PASS_EXACT_SHA",
+    "GOAL_FALLBACK_AND_OLD_CRASH_GUARD": "PASS_EXACT_SHA",
+    "GOAL_EXACT_SHA_WIN32": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "Quest3 GOAL 93% duplicate progress/title/time observed; prior original EXE 19 B9200 parents crashed when post-CALL midhooked (0x97C5F and 0x97E75).",
+    "source_trace": [
+      "Original 0x2D200 and Sumo_Printf parents only tagged appended queued nodes.",
+      "The GOAL two original helper wrappers likewise only tagged queued nodes after original() returned.",
+      "Queue cursor scope can survive from previous SpriteNode; EffectiveScope uses it before CurrentScope, so immediate source-owned raster may be incorrectly classified."
+    ],
+    "root_cause": "Safe GOAL parents lacked source-time direct semantic owner; all-sibling post-call tagging cannot correct a raster already submitted during the original CALL.",
+    "alternatives_rejected": [
+      "Do not restore unsafe 19 B9200 original EXE rva+5 midhooks: crash dump proves branch into E9 displacement.",
+      "Do not globally reclassify unknown white glyph alpha, suppress duplicate GOAL helper, or alter game progress/time."
+    ],
+    "fix_evidence": "Use ScopedExactProducerSemantic only at the five established hook/wrapper families (2 progress, 3 Sumo_Printf, 2 GOAL helper callsites); preserve tags and desktop fallback.",
+    "negative_test_evidence": "New source structural positive and five mutated failure regressions for exact original caller scoping, queue tagging and restore; GitHub exact-SHA required.",
+    "eye_ownership": "Direct safe GOAL source-time ScreenHud scope provides finite per-eye HUD handling; each appended SpriteNode retains its exact ScreenHud semantic and queue scope restores on exit. The remaining 19 B9200 E8 callsites are unhooked because source minidumps show return-address patch crashes."
+  },
+  "notes": "C6 standalone [skip ci] bookkeeping confirms exact-SHA 00c92d6f182ada51355391fcacb81bb8d4f8cc4f DX9Ex Active 5/5, Domain Isolation and HUD Inspector SUCCESS. Prior hold: TERMINAL_STATUS_NOT_COMPLETE; task-level terminal status is now COMPLETE_BUILD_VERIFIED. Safe Sumo_Printf, 0x2D200 progress and paired GOAL helper source-time and queued ScreenHud paths were implemented at material SHA; this bookkeeping commit makes no source changes. Full GOAL optical correction is NOT established: nineteen unsafe B9200 original E8 parent sources remain deliberately unhooked after minidump-proven crashes (0x97C5F/0x97E75). Feature-level state remains IN_PROGRESS_UNSAFE_B9200_TEXT_OWNER_OR_HMD_TEST; additional source-safe ownership work is still possible under the same feature, Quest3/VDXR HMD remains UNTESTED, and no score credit is claimed.",
+  "controller_terminal": true,
+  "ci_evidence": {
+    "validation_bearing_sha": "00c92d6f182ada51355391fcacb81bb8d4f8cc4f",
+    "dx9ex_active": {
+      "run_id": 38399500597,
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "game",
+        "host",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38399500232,
+      "conclusion": "success"
+    },
+    "hud_inspector": {
+      "run_id": 38399501159,
+      "conclusion": "success"
+    },
+    "material_full_source_impact": {
+      "sha": "3f912a9ef189f48b9fab29a8d0a6bdef0381d912",
+      "run_id": 38399293452,
+      "conclusion": "success"
+    }
+  },
+  "validation_runs": [
+    38399500597,
+    38399500232,
+    38399501159,
+    38399293452
+  ]
+}

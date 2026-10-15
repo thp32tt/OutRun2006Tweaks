@@ -1,0 +1,148 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00400",
+  "production_id": "CONVERSION-DX9EX-00400",
+  "event_id": "CONVERSION-DX9EX-00400-E003",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "queue_controller_contract": {
+    "path": "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "status": "APPLIED",
+    "evidence": "Inspected explicit FAILURE_CONTEXT run 37249044356. It was a cancelled Gate on intermediate SHA 6ac569b7 and was superseded by later successful 00400 material/Gates, so no rollback/repetition was performed. Current retry then advanced the next bounded post-1000 successor."
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "74d14a7223933aaf012ea2c10f53f4349a2b45f8",
+  "source_material_sha": "3d371018c8908042cbae9ffb2b1b2163e7cd1d95",
+  "result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+  "material_result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+  "validation_bearing_result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+  "state_commit_sha": "ccd5553122a64aad2648b53f4b3093b646820ec3",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00400]",
+  "selected_work_item": "VR-REFACTOR-POST1000-R9-RIGHT-DEPTH-STENCIL-SYNC-READ-OWNERSHIP-0010",
+  "summary": "Continued the post-1000 R33 final-dispatch ownership cleanup by encapsulating R33 reads of R9-owned RightDepthSynchronized/RightStencilSynchronized behind R9IsRightDepthInSync()/R9IsRightStencilInSync(). Both world and HUD readiness gates preserve their exact bootstrap, depth-test and stencil-test conditions while direct R33 reads are now forbidden by the refactor verifier. No projection, HUD semantic, Present ordering, resource allocation, wait, lock, D3D getter, or new synchronization operation was introduced.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer.cpp",
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_refactor_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00400.json"
+  ],
+  "failure_context": {
+    "run_id": 37249044356,
+    "head_sha": "6ac569b733fbfa35898cf88cdac4fad21804823f",
+    "conclusion": "cancelled",
+    "classification": "SUPERSEDED",
+    "reason": "The cancelled run belonged to an intermediate 00400 SHA and was superseded by later pushes and successful exact-SHA validation. It is not the validation-bearing result of E003."
+  },
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read current branch HEAD, AGENTS.md, queue contract, VR_REFACTOR_STATE, VR_AUTODEV_STATE, VR_PROBLEM_HISTORY, VR_REGRESSION_KNOWLEDGE, VR_RUN_STATE/VR_REVIEW_FINDINGS, recent refactor/test commits, current 00400 record, and explicit cancelled run 37249044356. Current user dispatch is E003 retry, ATTEMPT=2/3."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "00400 E002 moved R33 right depth/stencil sync writes behind R9InvalidateRightDepthStencilSync(), but R33 still directly read RightDepthSynchronized/RightStencilSynchronized in both world and HUD readiness paths. The next bounded successor is read ownership encapsulation with exact conditions preserved."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "e7ab024b adds R9IsRightDepthInSync()/R9IsRightStencilInSync(); 3d371018 replaces the six direct read expressions across both R33 readiness paths; 778fe8b1 adds verifier guards requiring the owner queries and rejecting raw R33 sync-state reads."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact validation-bearing SHA 778fe8b1882ffdb14eddca54191a6ce431cee91d: DX9Ex Active Validation 37250263373 SUCCESS with policy 111576304334, host 111576363304, game 111576363275, full-chain-compile 111576363300, package 111577342886; Domain Isolation Guard 37250263384 SUCCESS. N100 detached exact-SHA architecture/R51/R32-R34/hook-graph/refactor/near-plane suite PASS. No HMD/game runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "source_material_sha": "3d371018c8908042cbae9ffb2b1b2163e7cd1d95",
+      "result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+      "validation_bearing_result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+      "messages": [
+        "refactor(vr): expose R9 depth sync readiness queries [AUTO:CONVERSION-DX9EX-00400]",
+        "refactor(vr): route R33 depth sync reads through R9 [AUTO:CONVERSION-DX9EX-00400]",
+        "test(vr): guard R33 depth sync readiness ownership [AUTO:CONVERSION-DX9EX-00400]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "DX9Ex Active package artifact 11320364280, name OutRun2-VR-DX9EX-ACTIVE-778fe8b1882ffdb14eddca54191a6ce431cee91d, digest sha256:0a4df85dc378156c8bf495194daf76c9a011e55c704e80e336615490de6c5be1, size 2730711 bytes. Build artifact is not runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "state_commit_sha": "ccd5553122a64aad2648b53f4b3093b646820ec3",
+      "issue14_update": "RECORDED",
+      "issue13_update": "NOT_REQUIRED_NO_RUNTIME_PROBLEM_STATUS_CHANGE",
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 5986466286
+    }
+  },
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37250263373,
+      "conclusion": "success",
+      "exact_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+      "jobs": {
+        "policy": 111576304334,
+        "host": 111576363304,
+        "game": 111576363275,
+        "full_chain_compile": 111576363300,
+        "package": 111577342886
+      },
+      "artifact_id": 11320364280,
+      "artifact_digest": "sha256:0a4df85dc378156c8bf495194daf76c9a011e55c704e80e336615490de6c5be1"
+    },
+    "domain_isolation": {
+      "run_id": 37250263384,
+      "conclusion": "success",
+      "exact_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d"
+    },
+    "n100_local": {
+      "conclusion": "AUXILIARY_EXACT_SHA_STATIC_PASS",
+      "exact_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+      "checks": [
+        "py_compile refactor verifier",
+        "architecture",
+        "R51 runtime contract",
+        "R32-R34 compatibility/Present",
+        "hook graph",
+        "refactor contract",
+        "near-plane active gate"
+      ]
+    }
+  },
+  "prior_event_snapshot": {
+    "event_id": "CONVERSION-DX9EX-00400-E002",
+    "event_type": "rollover",
+    "attempt": "1/3",
+    "material_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+    "validation_bearing_result_sha": "4bccdc9ea361d6c2a70693d9d0a1b33980236b35",
+    "status": "COMPLETE"
+  },
+  "next_action": "Do not repeat E003. Preserve R9IsRightDepthInSync()/R9IsRightStencilInSync() as R9 read-owner boundaries and keep R33 free of direct RightDepthSynchronized/RightStencilSynchronized access. Continue only the next bounded post-1000 structural successor supported by source/static evidence.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00400",
+    "production_id": "CONVERSION-DX9EX-00400",
+    "event_id": "CONVERSION-DX9EX-00400-E003",
+    "event_type": "retry",
+    "lane": "DX9EX",
+    "target_branch": "vr-d3d9ex-focus",
+    "attempt": "2/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+    "source_material_sha": "3d371018c8908042cbae9ffb2b1b2163e7cd1d95",
+    "validation_bearing_result_sha": "778fe8b1882ffdb14eddca54191a6ce431cee91d",
+    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
+    "runtime_validation": "UNTESTED"
+  },
+  "validated_at_kst": "2026-10-05T10:14:30+09:00",
+  "completed_at_kst": "2026-10-05T10:15:23+09:00"
+}

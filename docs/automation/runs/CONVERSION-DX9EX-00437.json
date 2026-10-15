@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00437",
+  "production_id": "CONVERSION-DX9EX-00437",
+  "event_id": "CONVERSION-DX9EX-00437-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "180a5c57d8b8ea21909cb7940b286a7b2d64a516",
+  "material_result_sha": "3a7f4566841f280e9a0bef6fa53cd70f726bcdc0",
+  "validation_bearing_result_sha": "3a7f4566841f280e9a0bef6fa53cd70f726bcdc0",
+  "result_sha": "3a7f4566841f280e9a0bef6fa53cd70f726bcdc0",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00437]",
+  "selected_work_item": "VR-REFACTOR-POST1100-SAFEEYE-FLAT-RUN-GUARD-0020",
+  "summary": "Bind R24 DirectFlat SafeEye recovery to the currently live DirectGPU transport/game run while preserving same-run older-frame recovery.",
+  "changed_paths": [
+    "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp",
+    "vrhost/src/runtime/r24_black_screen_guard.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00437.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {"status":"COMPLETE","evidence":"Recovered 00436 bookkeeping HEAD 180a5c57d8b8ea21909cb7940b286a7b2d64a516 and exact validation-bearing SHA 8640959e4b946a2051664e4e210f266663eb67f3."},
+    "C1_REVIEW": {"status":"COMPLETE","evidence":"R24 direct-safe projection reuse was complete-run scoped, but RenderDirectFlatFallback still sampled SafeEye solely from presence/size state."},
+    "C2_IMPLEMENT": {"status":"COMPLETE","evidence":"3a7f4566841f280e9a0bef6fa53cd70f726bcdc0 adds SafeEyesBelongToTransportRun(frame), composes SafeEyesOwnFrame(frame) on it, and requires live DirectGPU transport + latest complete direct Frame.v2 + matching run identity before DirectFlat SafeEye sampling."},
+    "C3_VALIDATE": {"status":"COMPLETE","automation_validation":"PASS","runtime_validation":"UNTESTED","evidence":"Exact SHA 3a7f4566841f280e9a0bef6fa53cd70f726bcdc0: DX9Ex Active Validation 37389661262 SUCCESS; policy 112031466665, game 112031577195, host 112031577220, full-chain-compile 112031577238, package 112033083995 all SUCCESS. Domain Isolation Guard 37389660929 SUCCESS."},
+    "C4_COMMIT": {"status":"COMPLETE","task_tagged_commits":["3a7f4566841f280e9a0bef6fa53cd70f726bcdc0 fix(vr): scope DirectFlat SafeEye to live run [AUTO:CONVERSION-DX9EX-00437]"],"ci_skip_on_validation_bearing_result":false},
+    "C5_PACKAGE": {"status":"COMPLETE_AUTOMATION_ARTIFACT_ONLY","evidence":"Artifact 11381060879 OutRun2-VR-DX9EX-ACTIVE-3a7f4566841f280e9a0bef6fa53cd70f726bcdc0 digest sha256:4a193f47d8c4b45e9c58899fbbdd7b3cb790ce381034c5cd5ea642f2103c02d5. CI evidence only; not HMD proof."},
+    "C6_STATE": {"status":"COMPLETE","runtime_validation":"UNTESTED","issue14_comment_id":6005692687}
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {"run_id":37389661262,"conclusion":"success","exact_sha":"3a7f4566841f280e9a0bef6fa53cd70f726bcdc0","jobs":{"policy":112031466665,"game":112031577195,"host":112031577220,"full_chain_compile":112031577238,"package":112033083995},"package_artifact_id":11381060879,"package_artifact_digest":"sha256:4a193f47d8c4b45e9c58899fbbdd7b3cb790ce381034c5cd5ea642f2103c02d5"},
+    "domain_isolation": {"run_id":37389660929,"conclusion":"success","exact_sha":"3a7f4566841f280e9a0bef6fa53cd70f726bcdc0"},
+    "runtime": {"status":"UNTESTED","reason":"No Quest3/VDXR or in-game HMD session was performed."}
+  },
+  "next_action": "Audit remaining fallback freshness caches for fast-run restart handling, prioritizing classic fallback freshness and released-image cache ownership.",
+  "completed_at_kst": "2026-10-06T08:44:00+09:00"
+}

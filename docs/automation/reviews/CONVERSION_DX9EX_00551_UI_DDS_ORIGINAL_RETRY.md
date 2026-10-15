@@ -1,0 +1,11 @@
+# CONVERSION-DX9EX-00551 — fail-closed UI DDS original retry
+
+- Date: 2026-10-08 KST
+- Branch: `vr-d3d9ex-focus`; source base: `30ff1d7baed6a9db919850e7ac2a4efafb91c117`.
+- Task/event: `CONVERSION-DX9EX-00551` / `CONVERSION-DX9EX-00551-E003`; rollover 2, attempt **1/3 unchanged**.
+- Verified preceding `00550`: immutable material `6d9041ed5abcf2275809db289cd8614c99369cda`, DX9Ex Active / HUD Inspector / Domain Isolation / full-source CI successful. It is complete; no new cycle on its PASS.
+- Confirmed code path: `HandleTexture` installs a replacement DDS header in original game-owned data and updates `sprite_scales` **before** `D3DX` creates a texture. Previously, if both selected-replacement fast and native decode failed, neither UI allocator branch restored original bytes or scale and neither tried the unmodified game DDS. This may produce missing UI/car-selection textures when an optional replacement cannot be decoded, but headset cause remains unproven.
+- Material fix: `UiDdsOriginalState` snapshots original header, pointer, size and any previous sprite-scale entry before `HandleTexture`; the fast allocator first attempts selected DDS fast/native, then upon both failures and proven pointer replacement restores original header and sprite scale (or erases new entry) and retries the original DDS with the same native D3DX Ex arguments. Original allocator applies the same original retry on native failure. Valid replacement success remains unchanged.
+- Source negative gate: `tools/verify_vr_hud_dds_loader.py --self-test` now requires original pointer/size use, rollback and scale cleanup in **both** UI branches and detects deliberate defects. The existing P0 composition verifier imports it; no 1000/5000 loop.
+- Scope: **UI DDS** only. Scene/cube texture replacement success/failure and actual original caller-memory behavior require separate evidence. No changes to texture file assets, sprite world ownership, c64 timing, rank projection, F11, lens flare or renderer.
+- Risk and limits: this is a static/source fix; actual replacement decode and menu/car-selection pixel content have not been HMD-tested. CI must be tied to this material SHA; `RUNTIME_VALIDATION=UNTESTED` until Quest 3/VDXR test. Known user 00519 visual FAIL remains active.

@@ -1,0 +1,142 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00865",
+  "production_id": "CONVERSION-DX9EX-00865",
+  "event_id": "CONVERSION-DX9EX-00865-E002",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "run_key": "CONVERSION-DX9EX-00865",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Keep all classified native BA9D0 gameplay HUD text glyphs attached to their exact ScreenHud producer through synchronous draw and queued sprite paths, without a stale world/rank pending Draw hijacking their binocular ownership.",
+    "scope_boundary": "Exact BA9D0 classified HUD text producer only; do not change unknown callers, existing queued SpriteNode priority, +TIME, rank world markers, F11/ESC, SkyGlow, lens, FFB, DX11 or frozen DXVK.",
+    "trace_stages": [
+      "BA9D0 original canonical caller identifies native gameplay HUD text and may rasterize synchronously before the clip/sprani SpriteNode queue exists.",
+      "OutRunHudTextProducer_dest sets exact ScreenHud and direct text producer while ScopedExactProducerSemantic owns and restores an earlier pending world/marker Draw token.",
+      "Already tagged queue children remain governed by SpriteNode ownership; R26+HUD selected native game DLL uses existing per-eye screen-HUD planes and projective shader/fixed-function branches."
+    ],
+    "subcomponents": [
+      "ScreenHud-only direct BA9D0 source lifetime isolates NextDrawScope before original game rasterization and restores it afterward, excluding unclassified/world callers.",
+      "Preserve peripheral/non-peripheral gameplay HUD text producer token and existing child queue replay, then assert synchronous owner restoration and queue-priority using Windows host smoke plus negative mutation."
+    ],
+    "acceptance_items": [
+      {
+        "id": "exact_hud",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Game BA9D0 direct HUD sprite and glyph ownership",
+        "expected_behavior": "Native classified ScreenHud BA9D0 text cannot consume the preceding world/rank pending Draw and retains the original correct producer token and call result."
+      },
+      {
+        "id": "queue",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Existing ScreenHud SpriteNode queue and per-eye R26+HUD owner",
+        "expected_behavior": "Classified peripheral/non-peripheral HUD siblings retain their queue identity and render path, and an active SpriteNode always outranks nested direct producers."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Original unknown callers, negative mutations and desktop/game fallback",
+        "expected_behavior": "Unclassified callers and already active queue remain unmodified; source ownership is restored; verifier rejects removed isolation and producer identity."
+      },
+      {
+        "id": "integration",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA Windows game host package and domain",
+        "expected_behavior": "DX9Ex Active policy, Windows 32-bit game, x64 host, full-chain and package, Domain, HUD Inspector and Full Source Impact complete on final same SHA before BUILD_VERIFIED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "Live BA9D0 source used ScopedExactProducerSemantic(ScreenHud, nullptr, false, token) even though ConsumeForDraw prioritizes any previously armed NextDrawScope; earlier world marker or SceneEffect Draw can therefore replace the exact HUD text semantic.",
+    "source_trace": [
+      "Canonical OutRunHudTextCallerRva and OutRunVRHudSemantics::ClassifyCaller determine the exact ScreenHud source; no change to unknown or world classification.",
+      "The original BA9D0 hook can draw before put_clip_sprite/sprani nodes and uses ScopedExactProducerSemantic; the previous isolatePendingDraw=false left an older pending world draw in NextDrawScope.",
+      "ConsumeForDraw takes NextDrawScope before EffectiveScope, so the pending world token could win; R26+HUD per-eye transform follows the incorrectly selected scope, while queued nodes retain their own authority."
+    ],
+    "root_cause": "The exact BA9D0 synchronous ScreenHud producer did not opt into existing ScopedExactProducerSemantic pending-draw shielding; a preceding world/marker semantic token could be consumed by a valid game HUD glyph.",
+    "alternatives_rejected": [
+      "Do not override all text or force global ScreenHud classification; unknown/GOAL and world producers have distinct owners.",
+      "Do not weaken SpriteNode queue precedence, flush all D3DX, remove world effects or alter SkyGlow and HUD layout sizing."
+    ],
+    "fix_evidence": "The native game BA9D0 direct text scope now opts into RAII pending-draw isolation, preserving original registered ScreenHud and both exact HUD text producer tokens; queued sprites still have priority and the original hook is called unchanged.",
+    "negative_test_evidence": "Changed-area producer verifier validates the exact classified glyph source and mutates pending isolation and token; host goal/HUD owner smoke covers ordinary and peripheral HUD texts with prior world Draw and restores saved token.",
+    "eye_ownership": "Existing compiled R26+HUD renderer constructs per-eye HUD planes from trusted source; this change only fixes original ScreenHud selection, not a user-observed Quest3 display result."
+  },
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "Exact GitHub Windows game/host/full-chain/package and affected static workflows passed. No OR2006C2C.EXE/Quest3/VDXR optical/HUD/runtime test; screen correction still NEED_HMD_TEST.",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp",
+    "tools/verify_vr_producer_provenance.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00865.json",
+    "tools/verify_vr_r30_responsive_hud_anchor.py"
+  ],
+  "material_result_sha": "508955a4e63edd86bf5b76bdd8484ec81df2beba",
+  "material_followup_shas": [
+    "fecda429f711d1d534ceb862a1c938910ee28ef9",
+    "2d78792ee3ef19b13c9bf5c2801006ddf7d2ccc5"
+  ],
+  "validation_bearing_result_sha": "427bf891dadcff6c7aa1e4fed2917ab0ac3a8f91",
+  "acceptance_results": {
+    "exact_hud": "PASS_BUILD",
+    "queue": "PASS_BUILD",
+    "fallback": "PASS_BUILD",
+    "integration": "PASS_EXACT_SHA"
+  },
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "427bf891dadcff6c7aa1e4fed2917ab0ac3a8f91",
+    "material_sha": "508955a4e63edd86bf5b76bdd8484ec81df2beba",
+    "dx9ex_active": {
+      "run_id": 38642325214,
+      "conclusion": "SUCCESS",
+      "policy": "SUCCESS",
+      "host": "SUCCESS",
+      "game": "SUCCESS",
+      "full_chain_compile": "SUCCESS",
+      "package": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38642325063,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38642325283,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38642325249,
+      "conclusion": "SUCCESS"
+    },
+    "prior_failed_runs": [
+      {
+        "run_id": 38641595662,
+        "sha": "fecda429f711d1d534ceb862a1c938910ee28ef9",
+        "cause": "Missing per-task feature JSON (policy gate)"
+      },
+      {
+        "run_id": 38641938581,
+        "sha": "1e38974f85e102f830a921c54f1e4fc94a9d8a70",
+        "cause": "Outdated responsive-HUD source verifier expected prior nullptr,false,token exact call; corrected test to new strict source isolation and destructive negative check"
+      }
+    ],
+    "runtime_caveat": "No original game/Quest3/VDXR binocular verification; Windows CI proves compilation and deterministic static regressions only."
+  },
+  "score_once": true,
+  "score_delta_this_retry": 1,
+  "scoreboard_ai_2_before": 1342,
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1343,
+  "scoreboard_commit_sha": "a6bfb788d73b09bb29f89ce9cc585134fd561340",
+  "score_basis": "One distinct source-level BA9D0 ScreenHud direct glyph pending-world Draw ownership repair, changed-area negative regressions and four exact SHA required GitHub Actions groups success. Retry and C6 counted once."
+}

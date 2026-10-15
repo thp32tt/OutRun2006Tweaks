@@ -1,0 +1,79 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00731",
+  "production_id": "CONVERSION-DX9EX-00731",
+  "event_id": "CONVERSION-DX9EX-00731-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "previous_hold_reason": "EXACT_SHA_DX9EX_ACTIVE_POLICY_FAILURE_38329729918",
+  "hold_resolution": "REPAIRED_INVALID_VERIFIER_FUNCTION_BOUNDARY_AND_PASSED_NEW_EXACT_SHA_GATES",
+  "source_material_sha": "ab06f8fbef2cee5fce3813bdf107d90512e4d905",
+  "material_result_sha": "914ed997deaef61f2f6b3e3ccdac38b33f20a013",
+  "validation_bearing_result_sha": "914ed997deaef61f2f6b3e3ccdac38b33f20a013",
+  "result_sha": "914ed997deaef61f2f6b3e3ccdac38b33f20a013",
+  "material_commits": [
+    "ab06f8fbef2cee5fce3813bdf107d90512e4d905",
+    "914ed997deaef61f2f6b3e3ccdac38b33f20a013"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 Quest3/VDXR responsive HUD position and legibility, unstretched main-menu aspect, independently scaled and centered ESC/pause menu, readable F11 ImGui",
+    "completed_scope": "Implemented signed bounded ESC/pause vertical viewport fraction through independently owned original pause ScreenOverlay2D, in both XYZRHW fixed-function and shader/HLSL post-projection paths; new VR.PauseMenuVerticalOffset with positive-down behavior. Preserves F11, world billboards, gameplay HUD, GOAL/+TIME and menus through semantic gating, and 4 source/eye numeric fixtures and destructive guards. Fixed test's non-existent C++ function section delimiter after exact-SHA failure.",
+    "remaining_acceptance": [
+      "Integrate overall Issue #119 responsive HUD/menu/F11 optical behavior and any separate unresolved source issues",
+      "Matched-build Quest3/VDXR visual, reset/resolution and real 120 FPS p95/p99 validation"
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_POLICY",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38329837821,
+      "head_sha": "914ed997deaef61f2f6b3e3ccdac38b33f20a013",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38329837822,
+      "head_sha": "914ed997deaef61f2f6b3e3ccdac38b33f20a013",
+      "conclusion": "success"
+    }
+  ],
+  "failed_prior_run": {
+    "run_id": 38329729918,
+    "sha": "ab06f8fbef2cee5fce3813bdf107d90512e4d905",
+    "failed_step": "Verify reconstructed VR architecture boundaries",
+    "error": "ValueError: substring not found, verifier looked for non-existent R30TransformXyzrhwVertices near fixed-function transform"
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_validation_required": "Actual Quest3/VDXR test against exact build is pending, no claimed live optics or FPS result.",
+  "score_delta": 1,
+  "score_awarded": true,
+  "scoreboard_commit": "3a7e8ad6a61162e0a06f2b005f882ac6f9f0096f",
+  "score_run_key": "CONVERSION-DX9EX-00731",
+  "summary": "Original HUD vertical placement material and follow-up validator repair now passed all exact-SHA mandatory GitHub gates. C6 checkpoint and AI2 score awarded once, no HMD test. Full Issue #119 UI feature remains open; schedule another distinct functional source item without redispatching this TASK_ID."
+}

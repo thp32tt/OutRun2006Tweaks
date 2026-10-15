@@ -1,0 +1,400 @@
+# Reference: https://build-cpp.github.io/cmkr/cmake-toml
+# to build:
+# > cmake -B build
+# > cmake --build build --config Release
+[project]
+name = "outrun2006tweaks-proj"
+cmake-after = """
+set_source_files_properties(src/hooks_wheel_ffb.cpp PROPERTIES HEADER_FILE_ONLY TRUE)
+# R33/R14 keep the validated R32/R31/R30/R29/R26/R23/R22/R21/R20/R13/R9/R12
+# implementation chains intact and compile only the final game/stereo/Ex wrapper
+# TUs. Included implementation files are header-only here so no hook body is
+# linked twice.
+set(OUTRUN_VR_INCLUDED_IMPL_TUS
+    src/vr/d3d9/ex_device_upgrade.cpp
+    src/vr/d3d9/ex_device_upgrade_r13.cpp
+    src/vr/d3d9/stereo_renderer.cpp
+    src/vr/d3d9/stereo_renderer_r13.cpp
+    src/vr/d3d9/stereo_renderer_r20.cpp
+    src/vr/d3d9/stereo_renderer_r21.cpp
+    src/vr/d3d9/stereo_renderer_r22.cpp
+    src/vr/d3d9/stereo_renderer_r23.cpp
+    src/vr/d3d9/stereo_renderer_r26.cpp
+    src/vr/d3d9/stereo_renderer_r29.cpp
+    src/vr/d3d9/stereo_renderer_r30.cpp
+    src/vr/d3d9/stereo_renderer_r31.cpp
+    src/vr/d3d9/stereo_renderer_r32.cpp
+    src/vr/game/outrun_renderer.cpp
+    src/vr/game/outrun_renderer_r13.cpp
+    src/vr/game/outrun_renderer_r23.cpp)
+set_source_files_properties(${OUTRUN_VR_INCLUDED_IMPL_TUS}
+    PROPERTIES HEADER_FILE_ONLY TRUE)
+
+# Keep cmake.toml as the single source of truth for the active wrapper graph.
+# A regenerated CMakeLists must compile exactly these final TUs while every
+# implementation TU above remains include-only. Fail configure immediately if
+# a later overlay accidentally flips either side of that contract.
+set(OUTRUN_VR_FINAL_TUS
+    src/vr/d3d9/ex_device_upgrade_r14.cpp
+    src/vr/d3d9/stereo_renderer_r33.cpp
+    src/vr/game/outrun_renderer_r29.cpp)
+foreach(_vr_source IN LISTS OUTRUN_VR_INCLUDED_IMPL_TUS OUTRUN_VR_FINAL_TUS)
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_vr_source}")
+        message(FATAL_ERROR "VR source graph references missing TU: ${_vr_source}")
+    endif()
+endforeach()
+foreach(_vr_source IN LISTS OUTRUN_VR_INCLUDED_IMPL_TUS)
+    get_source_file_property(_vr_header_only "${_vr_source}" HEADER_FILE_ONLY)
+    if(NOT _vr_header_only)
+        message(FATAL_ERROR "VR included implementation TU must be HEADER_FILE_ONLY: ${_vr_source}")
+    endif()
+endforeach()
+foreach(_vr_source IN LISTS OUTRUN_VR_FINAL_TUS)
+    get_source_file_property(_vr_header_only "${_vr_source}" HEADER_FILE_ONLY)
+    if(_vr_header_only)
+        message(FATAL_ERROR "VR final wrapper TU must compile normally: ${_vr_source}")
+    endif()
+endforeach()
+unset(_vr_source)
+unset(_vr_header_only)
+
+# R15 remains the post-review device correctness overlay. The stereo full
+# chain terminates directly at the R33 final dispatcher. The obsolete R34
+# source shim is retired; its historical compatibility status stays in R33.
+set(OUTRUN_VR_POST_REVIEW_FINAL_TUS
+    src/vr/d3d9/ex_device_upgrade_r15.cpp
+    src/vr/d3d9/stereo_renderer_r33.cpp)
+foreach(_vr_source IN LISTS OUTRUN_VR_POST_REVIEW_FINAL_TUS)
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_vr_source}")
+        message(FATAL_ERROR "VR post-review final TU missing: ${_vr_source}")
+    endif()
+endforeach()
+set_source_files_properties(
+    src/vr/d3d9/ex_device_upgrade_r14.cpp
+    PROPERTIES HEADER_FILE_ONLY TRUE)
+unset(_vr_source)
+
+# DX9Ex development/production mainline: R84 independently compiled R29-R33.
+# R26/R23 old renderer remains an EXPLICIT comparison/rollback only.
+option(OUTRUN_VR_SAFE_DRAW_COMPARE "Opt-in R26/R23 historical stereo fallback" OFF)
+set_source_files_properties(
+    src/vr/d3d9/stereo_renderer_r26_compare.cpp
+    src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp
+    PROPERTIES HEADER_FILE_ONLY TRUE)
+option(OUTRUN_VR_R26_HUD_COMPARE "Build R26-safe world path with R30 HUD/XYZRHW/SkyGlow overlay" OFF)
+if(OUTRUN_VR_SAFE_DRAW_COMPARE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r33.cpp
+        PROPERTIES HEADER_FILE_ONLY TRUE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r26_compare.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    # Renderer R29 depends on R31 StateBlock exports. For this regression
+    # comparison, use the R23 renderer owner that paired with the known-good
+    # R26 stereo path instead of introducing fake R31 stubs.
+    set_source_files_properties(
+        src/vr/game/outrun_renderer_r29.cpp
+        PROPERTIES HEADER_FILE_ONLY TRUE)
+    set_source_files_properties(
+        src/vr/game/outrun_renderer_r23.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_SAFE_DRAW_COMPARE=1)
+    message(STATUS "OutRun VR safe-draw comparison: R26 final stereo chain enabled")
+endif()
+
+# C1/C2 regression-isolation builds. These keep current R15/transport/texture
+# work and renderer R29 installation, but compile a shorter stereo owner chain.
+# C1 = R29 fast L+R + restored R23/R27/R28 perspective-world classification.
+# C2 = C1 + R30 asymmetric-FOV HUD correction. R31-R33 stay excluded in both.
+option(OUTRUN_VR_C1_COMPARE "Build C1: R29 fast L+R with R27/R28 classification" OFF)
+option(OUTRUN_VR_C2_COMPARE "Build C2: C1 plus R30 HUD correction" OFF)
+# Fresh, option-free CMake = R84 mainline. Explicit comparison builds
+# automatically disable all four split owners on first configure, so preserved
+# R26_SAFE/C1/C2 validation jobs never compile two owners.
+set(OUTRUN_VR_R84_MAIN_DEFAULT ON)
+if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_R26_HUD_COMPARE OR
+   OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
+    set(OUTRUN_VR_R84_MAIN_DEFAULT OFF)
+endif()
+option(OUTRUN_VR_REFACTOR_SPLIT_R33_R32 "R84 mainline: independently compile R33/R32" ${OUTRUN_VR_R84_MAIN_DEFAULT})
+if(OUTRUN_VR_REFACTOR_SPLIT_R33_R32)
+    if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_R26_HUD_COMPARE OR
+       OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
+        message(FATAL_ERROR "R33/R32 refactor split requires all comparison builds OFF")
+    endif()
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r32.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R33_R32=1)
+    message(STATUS "OutRun VR refactor gate: R32 + R33 separate translation units")
+endif()
+option(OUTRUN_VR_REFACTOR_SPLIT_R32_R31 "Compile R31 independently below R32" ${OUTRUN_VR_R84_MAIN_DEFAULT})
+if(OUTRUN_VR_REFACTOR_SPLIT_R32_R31)
+    if(NOT OUTRUN_VR_REFACTOR_SPLIT_R33_R32)
+        message(FATAL_ERROR "R32/R31 split requires the R33/R32 interface boundary")
+    endif()
+    if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_R26_HUD_COMPARE OR
+       OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
+        message(FATAL_ERROR "R32/R31 split requires comparison builds OFF")
+    endif()
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r31.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R32_R31=1)
+    message(STATUS "OutRun VR refactor: R33/R32/R31 separate translation units")
+endif()
+# Compile all independent R29-R33 owners for normal development/test. Never
+# compile R29 both standalone and as a textual include inside R30.
+if(OUTRUN_VR_REFACTOR_SPLIT_R31_R30 AND
+   NOT OUTRUN_VR_REFACTOR_SPLIT_R32_R31)
+    message(FATAL_ERROR
+        "Combined R31/R30 extraction requires the R32/R31 support boundary")
+endif()
+option(OUTRUN_VR_REFACTOR_SPLIT_R31_R30 "Refactor gate: compile R30 separately from the R31 textual chain" ${OUTRUN_VR_R84_MAIN_DEFAULT})
+if(OUTRUN_VR_REFACTOR_SPLIT_R31_R30)
+    if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_R26_HUD_COMPARE OR
+       OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
+        message(FATAL_ERROR "R31/R30 refactor split requires all comparison builds OFF")
+    endif()
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r30.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R31_R30=1)
+    message(STATUS "OutRun VR refactor gate: R30 compiled separately below R31")
+endif()
+# R84 production graph: R29 owns the lower renderer, R30 consumes its public
+# ABI; R31/R32/R33 are independent translation units by default.
+option(OUTRUN_VR_REFACTOR_SPLIT_R30_R29 "Compile R29 separately from R30" ${OUTRUN_VR_R84_MAIN_DEFAULT})
+if(OUTRUN_VR_REFACTOR_SPLIT_R30_R29)
+    if(NOT OUTRUN_VR_REFACTOR_SPLIT_R31_R30 OR
+       NOT OUTRUN_VR_REFACTOR_SPLIT_R32_R31 OR
+       NOT OUTRUN_VR_REFACTOR_SPLIT_R33_R32)
+        message(FATAL_ERROR "R30/R29 split requires the complete R33-R30 owner chain")
+    endif()
+    if(OUTRUN_VR_SAFE_DRAW_COMPARE OR OUTRUN_VR_R26_HUD_COMPARE OR
+       OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
+        message(FATAL_ERROR "R30/R29 split requires comparison builds OFF")
+    endif()
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r29.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_REFACTOR_SPLIT_R30_R29=1)
+    message(STATUS "OutRun VR R84: R33/R32/R31/R30/R29 independently compiled")
+endif()
+set_source_files_properties(
+    src/vr/d3d9/stereo_renderer_r29_c1_compare.cpp
+    src/vr/d3d9/stereo_renderer_r30_c2_compare.cpp
+    PROPERTIES HEADER_FILE_ONLY TRUE)
+
+set(OUTRUN_VR_COMPARE_COUNT 0)
+foreach(_vr_option
+    OUTRUN_VR_SAFE_DRAW_COMPARE
+    OUTRUN_VR_R26_HUD_COMPARE
+    OUTRUN_VR_C1_COMPARE
+    OUTRUN_VR_C2_COMPARE)
+    if(${_vr_option})
+        math(EXPR OUTRUN_VR_COMPARE_COUNT
+            "${OUTRUN_VR_COMPARE_COUNT} + 1")
+    endif()
+endforeach()
+if(OUTRUN_VR_COMPARE_COUNT GREATER 1)
+    message(FATAL_ERROR "Choose only one VR comparison build option")
+endif()
+unset(_vr_option)
+
+if(OUTRUN_VR_R26_HUD_COMPARE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r33.cpp
+        src/vr/d3d9/stereo_renderer_r26_compare.cpp
+        PROPERTIES HEADER_FILE_ONLY TRUE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    set_source_files_properties(
+        src/vr/game/outrun_renderer_r29.cpp
+        PROPERTIES HEADER_FILE_ONLY TRUE)
+    set_source_files_properties(
+        src/vr/game/outrun_renderer_r23.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_R26_HUD_COMPARE=1)
+    message(STATUS "OutRun VR R26+HUD comparison: safe R26 world + R30 HUD/SkyGlow")
+endif()
+
+if(OUTRUN_VR_C1_COMPARE OR OUTRUN_VR_C2_COMPARE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r33.cpp
+        PROPERTIES HEADER_FILE_ONLY TRUE)
+    add_compile_definitions(OUTRUN_VR_R29_R28_CLASSIFICATION_COMPARE=1)
+endif()
+
+if(OUTRUN_VR_C1_COMPARE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r29_c1_compare.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_C1_COMPARE=1)
+    message(STATUS "OutRun VR C1 comparison: R29 fast L+R + R27/R28 classification")
+elseif(OUTRUN_VR_C2_COMPARE)
+    set_source_files_properties(
+        src/vr/d3d9/stereo_renderer_r30_c2_compare.cpp
+        PROPERTIES HEADER_FILE_ONLY FALSE)
+    add_compile_definitions(OUTRUN_VR_C2_COMPARE=1)
+    message(STATUS "OutRun VR C2 comparison: C1 + R30 HUD correction")
+endif()
+
+# Re-evaluate ownership after every comparison option has mutated
+# HEADER_FILE_ONLY. The configured graph must compile exactly one stereo owner
+# and exactly one renderer owner.
+set(_vr_stereo_owner_candidates
+    src/vr/d3d9/stereo_renderer_r33.cpp
+    src/vr/d3d9/stereo_renderer_r26_compare.cpp
+    src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp
+    src/vr/d3d9/stereo_renderer_r29_c1_compare.cpp
+    src/vr/d3d9/stereo_renderer_r30_c2_compare.cpp)
+set(_vr_renderer_owner_candidates
+    src/vr/game/outrun_renderer_r29.cpp
+    src/vr/game/outrun_renderer_r23.cpp)
+set(_vr_stereo_owner_count 0)
+set(_vr_renderer_owner_count 0)
+foreach(_vr_source IN LISTS _vr_stereo_owner_candidates)
+    get_source_file_property(_vr_header_only "${_vr_source}" HEADER_FILE_ONLY)
+    if(NOT _vr_header_only)
+        math(EXPR _vr_stereo_owner_count
+            "${_vr_stereo_owner_count} + 1")
+    endif()
+endforeach()
+foreach(_vr_source IN LISTS _vr_renderer_owner_candidates)
+    get_source_file_property(_vr_header_only "${_vr_source}" HEADER_FILE_ONLY)
+    if(NOT _vr_header_only)
+        math(EXPR _vr_renderer_owner_count
+            "${_vr_renderer_owner_count} + 1")
+    endif()
+endforeach()
+if(NOT _vr_stereo_owner_count EQUAL 1)
+    message(FATAL_ERROR
+        "VR final graph must have exactly one stereo owner; got ${_vr_stereo_owner_count}")
+endif()
+if(NOT _vr_renderer_owner_count EQUAL 1)
+    message(FATAL_ERROR
+        "VR final graph must have exactly one renderer owner; got ${_vr_renderer_owner_count}")
+endif()
+unset(_vr_source)
+unset(_vr_header_only)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+
+set(ASMJIT_STATIC ON CACHE BOOL "" FORCE)
+
+# disable unneeded FLAC stuff
+set(INSTALL_MANPAGES OFF CACHE BOOL "" FORCE)
+set(BUILD_CXXLIBS OFF CACHE BOOL "" FORCE)
+set(BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(BUILD_PROGRAMS OFF CACHE BOOL "" FORCE)
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(UPNPC_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(UPNPC_BUILD_SAMPLE OFF CACHE BOOL "" FORCE)
+set(UPNPC_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+set(JSONCPP_STATIC_WINDOWS_RUNTIME OFF CACHE BOOL "" FORCE)
+set(JSONCPP_WITH_TESTS OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(BUILD_STATIC_LIBS ON CACHE BOOL "" FORCE)
+set(BUILD_OBJECT_LIBS ON CACHE BOOL "" FORCE)
+set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
+
+option(ZYDIS_BUILD_TOOLS "" OFF)
+option(ZYDIS_BUILD_EXAMPLES "" OFF)
+option(JSONCPP_WITH_TESTS "" OFF)
+option(JSONCPP_STATIC_WINDOWS_RUNTIME "" OFF)
+
+if ("${CMAKE_BUILD_TYPE}" MATCHES "Release")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MT")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MT")
+
+    # Statically compile runtime
+    string(REGEX REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    string(REGEX REPLACE "/MD" "/MT" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    string(REGEX REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+    string(REGEX REPLACE "/MD" "/MT" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+    message(NOTICE "Building in Release mode")
+endif()
+"""
+
+[target.spdlog]
+type = "static"
+sources = ["external/spdlog/src/*.cpp"]
+include-directories = ["external/spdlog/include"]
+compile-definitions = ["SPDLOG_COMPILED_LIB", "_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR"]
+compile-options = ["/utf-8"]
+
+[fetch-content]
+ogg = { git = "https://github.com/xiph/ogg", tag = "v1.3.6" }
+flac = { git = "https://github.com/xiph/flac", tag = "1.5.0" }
+miniupnpc = { git = "https://github.com/miniupnp/miniupnp", tag = "miniupnpd_2_3_10", subdir = "miniupnpc" }
+jsoncpp = { git = "https://github.com/open-source-parsers/jsoncpp.git", tag = "1.9.8" }
+zlib = { git = "https://github.com/madler/zlib", tag = "v1.3.2" }
+sdl = { git = "https://github.com/libsdl-org/SDL", tag = "release-3.4.12" }
+
+[fetch-content.safetyhook]
+git = "https://github.com/cursey/safetyhook"
+tag = "f44cc070a8340f2f26649553c49533475417304d"
+cmake-before="""
+set(SAFETYHOOK_FETCH_ZYDIS ON)
+"""
+
+[target.outrun2006tweaks]
+type = "shared"
+sources = ["*.ini", "src/**.cpp", "src/**.c", "src/**.def", "src/Resource.rc",
+    "external/ModUtils/Patterns.cpp",
+    "external/xxHash/xxhash.c",
+    "external/miniz/miniz.c",
+    "external/imgui/backends/imgui_impl_win32.cpp",
+    "external/imgui/backends/imgui_impl_dx9.cpp",
+    "external/imgui/imgui.cpp",
+    "external/imgui/imgui_demo.cpp",
+    "external/imgui/imgui_draw.cpp",
+    "external/imgui/imgui_tables.cpp",
+    "external/imgui/imgui_widgets.cpp",
+    "external/IXWebSocket/ixwebsocket/**"
+]
+headers = ["src/**.hpp", "src/**.h", "external/ModUtils/Patterns.h", "external/ModUtils/MemoryMgr.h", "external/xxHash/xxhash.h", "external/miniz/miniz.h", "external/ini-cpp/ini/ini.h"]
+include-directories = ["shared/", "src/", "include/", 
+    "external/ModUtils/",
+    "external/ini-cpp/ini/",
+    "external/xxHash/",
+    "external/miniz/",
+    "external/imgui/",
+    "external/IXWebSocket/"
+]
+compile-options = ["/GS", "/bigobj", "/EHa", "/MP", "/utf-8"]
+link-options = ["/DEBUG", "/OPT:REF", "/OPT:ICF"]
+compile-features = ["cxx_std_20"]
+compile-definitions = ["_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING", "_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR", "DIRECTINPUT_VERSION=0x0800"]
+link-libraries = [
+    "spdlog",
+    "safetyhook",
+    "ogg",
+    "FLAC",
+    "jsoncpp_static",
+    "version.lib",
+    "xinput9_1_0.lib",
+    "Hid.lib",
+    "libminiupnpc-static",
+    "SDL3-static",
+    "Winmm.lib",
+    "Setupapi.lib",
+    "Crypt32.lib",
+    "d3dcompiler.lib"
+]
+
+[target.outrun2006tweaks.properties]
+OUTPUT_NAME = "dinput8"
+SUFFIX = ".dll"
+RUNTIME_OUTPUT_DIRECTORY_RELEASE = "${CMAKE_BINARY_DIR}/bin/${CMKR_TARGET}"
+RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO = "${CMAKE_BINARY_DIR}/bin/${CMKR_TARGET}"
+LIBRARY_OUTPUT_DIRECTORY_RELEASE = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
+LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
+ARCHIVE_OUTPUT_DIRECTORY_RELEASE = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"
+ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO = "${CMAKE_BINARY_DIR}/lib/${CMKR_TARGET}"

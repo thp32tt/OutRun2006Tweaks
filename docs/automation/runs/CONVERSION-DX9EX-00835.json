@@ -1,0 +1,117 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00835",
+  "production_id": "CONVERSION-DX9EX-00835",
+  "event_id": "CONVERSION-DX9EX-00835-E002",
+  "event_type": "result",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:MAIN_MENU",
+  "status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 1,
+  "material_result_sha": "73d9feb842edaa6b41d5342c3229a5146efae291",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_ui_matrix_safety.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Preserve full 4:3/16:9/21:9 main-menu and car-selection sprite proportions while preventing half-published or non-finite custom-matrix sprite geometry from reaching the DX9Ex draw path during resize/reset.",
+    "scope_boundary": "Original custom-matrix four-vertex sprite geometry, UI matrix native-containment and existing menu regressions only; gameplay HUD, F11, ESC, world effects, SkyGlow, FFB, DX11 and DXVK remain unchanged.",
+    "trace_stages": [
+      "Original game custom-matrix SPRARGS2 provides four transformed menu/car-selection positions and texture UVs.",
+      "Game D3DXVec4Transform and desktop/portrait containment calculate all 28 position, color, RHW and texture-stream fields before atomic publication.",
+      "Original D3D9 DrawPrimitiveUP consumes complete validated game buffer, then DX9Ex stereo per-eye and OpenXR host composition follow existing ownership."
+    ],
+    "subcomponents": [
+      "Stage all four custom-matrix corners and original packed color/texture addressing into one complete fixed 28-float draw candidate.",
+      "Validate device lifetime and every vertex XYZ/UV before writing the globally shared sprite buffer; preserve valid pixel positions and all existing native-aspect multi-sprite paths."
+    ],
+    "acceptance_items": [
+      {
+        "id": "MAIN_MENU_COMPLETE_QUAD",
+        "category": "end_to_end_behavior",
+        "behavior_area": "native_menu_car_select_geometry",
+        "expected_behavior": "Valid original menu/car-select matrices retain original projected pixels and texture data while complete four-corner screen geometry is published before original D3D9 DrawPrimitiveUP."
+      },
+      {
+        "id": "RESET_NONFINITE_ATOMIC_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "device_reset_nonfinite_sprite_fallback",
+        "expected_behavior": "Failed texture/device state or any nonfinite corner/UV returns without corrupting the original shared vertex stream or issuing poisoned DrawPrimitiveUP; mutation coverage rejects missing checks."
+      },
+      {
+        "id": "FINAL_INTEGRATED_EXACT_SHA",
+        "category": "integrated_validation",
+        "behavior_area": "dx9ex_host_game_package",
+        "expected_behavior": "Exact validation-bearing SHA passes DX9Ex Active full Win32 x86 game/x64 OpenXR host/package, Domain Isolation, HUD Inspector and affected-file Full Source Impact as applicable; HMD acceptance separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "MAIN_MENU_COMPLETE_QUAD": "PASS_EXACT_SHA",
+    "RESET_NONFINITE_ATOMIC_FALLBACK": "PASS_EXACT_SHA",
+    "FINAL_INTEGRATED_EXACT_SHA": "PASS_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "At GitHub material parent, original src/hooks_uiscaling.cpp draw_sprite_custom_matrix_mid wrote four transformed vertices incrementally to global g_spriteVertexStream and then issued DrawPrimitiveUP with no complete-quad finite validation.",
+    "source_trace": [
+      "Exact original custom-matrix texture-desc and D3DXMatrix transformation callback constructs four SPRARGS2 corners.",
+      "Shared g_spriteVertexStream indices 0-27 are overwritten progressively as each transformed corner is computed.",
+      "Game DrawPrimitiveUP receives the shared stream; DX9Ex screen-space stereo applies existing per-eye mapping."
+    ],
+    "root_cause": "A malformed intermediate corner or UV after device reset could leave partial content in the original shared quad or submit nonfinite D3D9 screen geometry; existing checks covered input scale and texture descriptor but not all generated corners before publish.",
+    "alternatives_rejected": [
+      "Changing OpenXR per-eye FOV mapping would not prevent a nonfinite pre-Draw game vertex stream and risks world stereo.",
+      "Rewriting already-correct multi-sprite aspect modes is unnecessary for the independent custom-matrix publish failure."
+    ],
+    "fix_evidence": "Material SHA 73d9feb842ed stages four corners in std::array<float, 28>, preserves D3DCOLOR and original quad offsets, checks all XYZ/UV and device, copies into shared stream only after complete validation.",
+    "negative_test_evidence": "Active UI matrix regression test now asserts complete staging and four negative mutations for shared copy omission, Y/UV finite checks, and incorrect 28-float capacity.",
+    "eye_ownership": "Scope stays entirely within the original D3D9 menu producer; no changes to R30 semantic ownership, per-eye affine, headset host or stereo world matrices."
+  },
+  "ci_evidence": {
+    "material_result_sha": "73d9feb842edaa6b41d5342c3229a5146efae291",
+    "validation_bearing_result_sha": "6a5b484406602728f14f915104ffcc62dfaf8b80",
+    "dx9ex_active": {
+      "run_id": 38543658807,
+      "conclusion": "SUCCESS",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ],
+      "success_jobs": 5,
+      "total_jobs": 5
+    },
+    "domain_isolation": {
+      "run_id": 38543658855,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38543658836,
+      "conclusion": "SUCCESS",
+      "success_jobs": 3,
+      "total_jobs": 3
+    },
+    "hud_inspector": {
+      "run_id": 38543658828,
+      "conclusion": "SUCCESS"
+    },
+    "exact_sha_confirmed": true,
+    "runtime_validation": "UNTESTED"
+  },
+  "remaining": "Source and static Win32/host/package gates passed at the exact SHA; main-menu/car-selection visual appearance and any white-texture symptom still NEED_HMD_TEST on Quest3/VDXR. No hardware visual PASS or backend promotion is asserted.",
+  "checkpoint": "C6_STATE",
+  "validation_bearing_result_sha": "6a5b484406602728f14f915104ffcc62dfaf8b80",
+  "result_notes": "The four-vertex D3D9 custom-matrix menu producer now stages/validates the entire XYZ/UV quad and device before touching the shared buffer. Three verifier corrections repaired obsolete early-write, weak mutation, and Draw owner expectations. The source change is independently material; all four required workflow groups confirmed SUCCESS."
+}

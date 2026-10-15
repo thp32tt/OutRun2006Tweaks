@@ -1,0 +1,114 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00833",
+  "production_id": "CONVERSION-DX9EX-00833",
+  "event_id": "CONVERSION-DX9EX-00833-E006",
+  "event_type": "result",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "feature_id": "DX9EX:RESET:HOST_R32_ASYNC_ACK_CONTEXT_EPOCH",
+  "feature_class": "CRITICAL_BLOCKER",
+  "work_key": "DX9EX:RESET:HOST_R32_ASYNC_ACK_CONTEXT_EPOCH",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 1,
+  "feature_contract": {
+    "feature_id": "DX9EX:RESET:HOST_R32_ASYNC_ACK_CONTEXT_EPOCH",
+    "goal": "Prevent R32 host final asynchronous DirectGPU consumption ACK queries and published slot acknowledgments from surviving a D3D11 device or immediate-context replacement within one OpenXR session, while retaining ordinary zero-wait presentation.",
+    "scope_boundary": "Final OpenXR host R32 EVENT/ACK owner only, separate from existing SafeEye source device-cache ownership; no D3D9 producer, world/HUD, SkyGlow, FFB, DX11 or DXVK changes.",
+    "special_work_evidence": "The final R32 direct-submit owner previously released EVENT queries only on xrDestroySession and keyed cached acknowledgments by producer generation/PID; host D3D11 device/context can rebind without ending the XR session, making old GetData/End calls unsafe. Existing 00829 fixed SafeEye resource ownership in a DIFFERENT R32 host cache, not this final submission ACK owner.",
+    "trace_stages": [
+      "D3D9Ex producer presents its frame to the shared DirectGPU ring with slot, frame, transport generation, run generation and PID.",
+      "Host R32 final OpenXR projection samples producer textures and issues D3D11 EVENT through its current immediate context before asynchronous ACK.",
+      "After host device/context Reset, old completion queries must be forgotten without publishing old ACKs; new final projection uses new device-bound EVENT while other eye/source fallbacks remain unchanged."
+    ],
+    "subcomponents": [
+      "Keep AddRef/Release paired strong ownership of active host device and immediate context at the final async ACK layer, dropping old pending queries/ACK caches on either pointer transition.",
+      "Fence both EndFrame completion polling and ArmConsumptionFence same-frame/ACK reuse behind rebind synchronization, including null-owner SafeEye fallback.",
+      "Compile and execute a real no-HMD C++ host owner-epoch smoke on exact GitHub Actions SHA with positive, null, independent device/context replacement and idempotent-stable cases."
+    ],
+    "acceptance_items": [
+      {
+        "id": "CONTEXT_REBIND_CLEARS_OLD_ACK",
+        "category": "end_to_end_behavior",
+        "behavior_area": "directgpu_async_ack",
+        "expected_behavior": "Old D3D11 EVENT queries and pending ACKs never cross a changed host device or immediate-context identity and the next projection can arm a new owner."
+      },
+      {
+        "id": "NULL_STABLE_AND_FALLBACK_SAFE",
+        "category": "fallback_regression",
+        "behavior_area": "reset_and_safeeye_fallback",
+        "expected_behavior": "Null devices/contexts reject fast-submit; stable identity does not erase a valid pending fence; teardown releases strong COM references and preserves existing fallback."
+      },
+      {
+        "id": "EXACT_SHA_WIN32_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "host_game_package",
+        "expected_behavior": "Final exact-SHA DX9Ex Active full x64 host/x86 game/package and smoke plus Domain Isolation and Full Source Impact gates succeed."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "CONTEXT_REBIND_CLEARS_OLD_ACK": "PASS_EXACT_SHA",
+    "NULL_STABLE_AND_FALLBACK_SAFE": "PASS_EXACT_SHA",
+    "EXACT_SHA_WIN32_GATES": "PASS_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "R32 direct-submit Pending per-slot D3D11Query and AckedFrame cache were reset by DestroySession only; neither EndFrame polling nor same-frame ArmConsumptionFence guarded current host D3D11 device/context epoch.",
+    "source_trace": [
+      "Game D3D9Ex ring frame and generation publication",
+      "Host R32 EVENT GetData and ArmConsumptionFence from OutRunVrFinalTest::Context",
+      "OpenXR EndFrame projects eyes then publishes producer ACK when queued D3D11 sampling completes"
+    ],
+    "root_cause": "The final R32 host async ACK fence owner assumed one device/context for the lifetime of an OpenXR session and could poll or rearm an old-device EVENT after host graphics reinitialization.",
+    "alternatives_rejected": [
+      "Existing R32 SafeEye device epoch covers its own opened shared textures, but not the separate final-submit Pending[] EVENT query pool.",
+      "Resetting ACK state only on XR DestroySession misses same-session host D3D11 device/context recovery."
+    ],
+    "fix_evidence": "AddRef-pinned device/context identity is reconciled before EndFrame Poll and ArmConsumptionFence; transitions release old queries without ACK publication and null owners force the established fallback.",
+    "negative_test_evidence": "New native C++ epoch-policy smoke covers device-only, context-only, pair changes, null, stable and rebind behavior."
+  },
+  "base_sha": "d5ded11781dea1597dcf9af0567fac40270fa7ab",
+  "material_result_sha": "c7a7a96d971e3b9a5b72c7ee8f739ff93e8f0918",
+  "validation_bearing_result_sha": "c7a7a96d971e3b9a5b72c7ee8f739ff93e8f0918",
+  "result_sha": "c7a7a96d971e3b9a5b72c7ee8f739ff93e8f0918",
+  "changed_files": [
+    "vrhost/src/runtime/direct_ack_device_epoch.hpp",
+    "vrhost/src/runtime/r32_direct_submit.hpp",
+    "vrhost/tests/direct_ack_device_epoch_smoke.cpp",
+    "vrhost/CMakeLists.txt",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00833.json"
+  ],
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED: no Quest3/VDXR gameplay or host D3D11 runtime swap hardware validation. Static/pure C++ and Win32 compile cannot prove HMD correctness.",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "c7a7a96d971e3b9a5b72c7ee8f739ff93e8f0918",
+    "dx9ex_active": {
+      "run_id": 38535002635,
+      "conclusion": "success",
+      "passed_jobs": 5,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38535002635"
+    },
+    "domain_isolation": {
+      "run_id": 38535002620,
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38535002620"
+    },
+    "full_source_impact": {
+      "run_id": 38535002594,
+      "conclusion": "success",
+      "passed_jobs": 3,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38535002594"
+    },
+    "local_cpp20_smoke": {
+      "conclusion": "pass",
+      "scope": "Independent reconstructed pure epoch helper check using local g++; exact-source Win32 host smoke also passed in DX9Ex Active."
+    }
+  },
+  "complete_build_verified_at_kst": "2026-10-14T17:34:25+09:00",
+  "next_action": "Quest3/VDXR game/runtime check when user tests matching deployed build; continue independent future new feature work without reusing 00833 TASK_ID."
+}

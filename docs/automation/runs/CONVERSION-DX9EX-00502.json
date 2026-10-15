@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00502",
+  "production_id": "CONVERSION-DX9EX-00502",
+  "event_id": "CONVERSION-DX9EX-00502-E002",
+  "event_type": "rollover",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "base_sha": "94c1cb4dbb4aa9bf36bc28e1d5e7501192556f77",
+  "source_material_sha": "c19141ddd1b718546010d6077ce8fe3824c68ec2",
+  "validation_bearing_result_sha": "4fca88adc5b7ddb05dbc7c101edd29936eb7c9a6",
+  "result_sha": "4fca88adc5b7ddb05dbc7c101edd29936eb7c9a6",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00502]",
+  "selected_work_item": "DX9EX-PERF-DIRECTGPU-ACK-STALE-ONLY-RETRY-0084",
+  "summary": "Classified R13 whole-ring ACK snapshot reads as Ready/Unavailable/RetryAfterRebind so the bounded second snapshot occurs only after a stable wrong-host snapshot actually retires the stale mapping; generic seqlock and run/generation identity failures now remain fail-closed without repeating the whole-ring read.",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "changed_paths": [
+      "src/vr/d3d9/stereo_renderer_r13.cpp",
+      "tools/verify_vr_dx9ex_reset_transport_contract.py"
+    ],
+    "canonical_gate": {
+      "dx9ex_active_run_id": 37552157988,
+      "result": "SUCCESS",
+      "head_sha": "4fca88adc5b7ddb05dbc7c101edd29936eb7c9a6"
+    },
+    "domain_isolation": {
+      "run_id": 37552157902,
+      "result": "SUCCESS",
+      "head_sha": "4fca88adc5b7ddb05dbc7c101edd29936eb7c9a6"
+    },
+    "package_artifact_id": 11453425851,
+    "package_artifact_digest": "sha256:d68d12017f9d6ec6095b125bf16bcd05c448a01776170b50b71d3163a11bd91a",
+    "repair_note": "An intermediate policy failure at b237b1412d3c1611e9b01d5a14dbf7ed278861da was verifier-order scoping only; source behavior was unchanged and the corrected exact SHA 4fca88adc5b7ddb05dbc7c101edd29936eb7c9a6 passed the canonical gate."
+  },
+  "next_action": "Continue with one bounded DX9Ex DirectGPU/resource-lifetime/frame-pacing invariant from latest HEAD. Runtime/HMD behavior remains UNTESTED."
+}

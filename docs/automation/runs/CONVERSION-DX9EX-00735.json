@@ -1,0 +1,105 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00735",
+  "production_id": "CONVERSION-DX9EX-00735",
+  "event_id": "CONVERSION-DX9EX-00735-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "e2ce73a76b2f0d88fbc2f4493f33e26e911695c4",
+  "material_result_sha": "e2ce73a76b2f0d88fbc2f4493f33e26e911695c4",
+  "validation_bearing_result_sha": "88973619bfc049306740fc346063c95cbd499072",
+  "result_sha": "88973619bfc049306740fc346063c95cbd499072",
+  "material_commits": [
+    "e2ce73a76b2f0d88fbc2f4493f33e26e911695c4",
+    "a6e52b2730632168ff92123c58ba9918a8a67f8b",
+    "88973619bfc049306740fc346063c95cbd499072"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 Quest3/VDXR adaptive HUD placement/legibility, unstretched main menu, independent ESC pause, readable F11 ImGui",
+    "completed_scope": "DX9Ex R30 exact producer HUD bounding box reused from existing single source traversal; enlarged edge HUD constrained to viewport safe inset via shared correction across both stereo eyes, preserving disparity and unknown/offscreen producer fallback. 4 viewport sizes, independent eyes, 4 destructive mutants; two policy verifier false positives repaired within same task.",
+    "remaining_acceptance": [
+      "Full Issue #119 integrated VR UI optical acceptance across driving HUD, main menu, ESC, F11 remains pending matching hardware test",
+      "Live headset 72/90/120Hz frame-pacing or optical results were not measured by this task."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_POLICY",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38334189466,
+      "head_sha": "88973619bfc049306740fc346063c95cbd499072",
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38334189377,
+      "head_sha": "88973619bfc049306740fc346063c95cbd499072",
+      "conclusion": "success",
+      "jobs": [
+        "domain-isolation"
+      ]
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38333970611,
+      "head_sha": "e2ce73a76b2f0d88fbc2f4493f33e26e911695c4",
+      "conclusion": "success",
+      "jobs": [
+        "msvc-analyze-openxr-host",
+        "msvc-analyze-active-game",
+        "source-cross-domain"
+      ],
+      "note": "C++ material SHA; descendant validation SHA only changes the source-bound test verifier"
+    }
+  ],
+  "previous_failures": [
+    {
+      "run_id": 38333970552,
+      "head_sha": "e2ce73a76b2f0d88fbc2f4493f33e26e911695c4",
+      "failed_job": "policy",
+      "failed_verifier": "tools/verify_vr_r30_responsive_hud_anchor.py",
+      "repair_sha": "a6e52b2730632168ff92123c58ba9918a8a67f8b"
+    },
+    {
+      "run_id": 38334089467,
+      "head_sha": "a6e52b2730632168ff92123c58ba9918a8a67f8b",
+      "failed_job": "policy",
+      "failed_verifier": "tools/verify_vr_r30_responsive_hud_anchor.py",
+      "repair_sha": "88973619bfc049306740fc346063c95cbd499072"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_validation_required": "Matched Quest3/VDXR hardware validation of actual HUD safe areas, binocular alignment, other Issue #119 UI surfaces and frame pacing.",
+  "score_delta": 1,
+  "score_awarded": true,
+  "scoreboard_commit": "0765559023eb73dd3da2c6fa700856eb1d91aa96",
+  "score_run_key": "CONVERSION-DX9EX-00735",
+  "score_previous": 1192,
+  "score_cumulative": 1193,
+  "summary": "HUD binocular safe-inset C++ and destructive regression; policy failure repaired across retries; exact validation SHA Active 5/5 and Domain SUCCESS, source SHA Impact 3/3 SUCCESS. Feature not optically complete without HMD."
+}

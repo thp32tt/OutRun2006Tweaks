@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00504",
+  "production_id": "CONVERSION-DX9EX-00504",
+  "event_id": "CONVERSION-DX9EX-00504-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "base_sha": "57b86aa9b52eb33a3ddc20fcaf3291e7003ebe92",
+  "source_material_sha": "c04e0cd5c7507efe1f4088f464316dd9465ba743",
+  "validation_bearing_result_sha": "c04e0cd5c7507efe1f4088f464316dd9465ba743",
+  "result_sha": "c04e0cd5c7507efe1f4088f464316dd9465ba743",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00504]",
+  "selected_work_item": "DX9EX-PERF-R13-REJECTED-HOTPATH-SHORTCIRCUIT-0086",
+  "summary": "Moved the R13 fallback DirectGPU quarantine check ahead of EnsureDirectTransportResources so an already rejected path returns fail-closed without re-entering resource validation on every resolve. frameId validation remains first and ResetEx remains the recovery boundary.",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "changed_paths": [
+      "src/vr/d3d9/stereo_renderer_r13.cpp",
+      "tools/verify_vr_dx9ex_reset_transport_contract.py"
+    ],
+    "tdd_red": {
+      "sha": "b16be3023dadb3120bfde871307893071b06551c",
+      "run_id": 37553930724,
+      "result": "EXPECTED_FAILURE",
+      "signature": "R13 fallback rejected hot path must short-circuit before resource validation"
+    },
+    "canonical_gate": {
+      "run_id": 37553989248,
+      "result": "SUCCESS",
+      "head_sha": "c04e0cd5c7507efe1f4088f464316dd9465ba743"
+    },
+    "domain_isolation": {
+      "run_id": 37553989305,
+      "result": "SUCCESS",
+      "head_sha": "c04e0cd5c7507efe1f4088f464316dd9465ba743"
+    },
+    "package_artifact_id": 11453707793,
+    "package_artifact_digest": "sha256:01495e3040c9bba6e5488ac2297dac6693023bac8f813abe467d69fd40f5747d"
+  },
+  "next_action": "Continue one bounded statically provable DirectGPU/resource-lifetime/frame-pacing improvement from latest HEAD. RUNTIME_VALIDATION remains UNTESTED."
+}

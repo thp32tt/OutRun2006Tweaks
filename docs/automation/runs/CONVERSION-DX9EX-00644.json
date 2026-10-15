@@ -1,0 +1,68 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00644",
+  "production_id": "CONVERSION-DX9EX-00644",
+  "event_id": "CONVERSION-DX9EX-00644-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "initial_material_sha": "873eb6ac1e96bdd59d8679b9007bf1d707cb4d0c",
+  "material_result_sha": "873eb6ac1e96bdd59d8679b9007bf1d707cb4d0c",
+  "material_commits": [
+    "873eb6ac1e96bdd59d8679b9007bf1d707cb4d0c"
+  ],
+  "verifier_repair_commits": [],
+  "result_sha": "873eb6ac1e96bdd59d8679b9007bf1d707cb4d0c",
+  "validation_bearing_result_sha": "873eb6ac1e96bdd59d8679b9007bf1d707cb4d0c",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Reduce CPU per-vertex XYZRHW stereoscopic reprojection cost in smoke/sand/particles and decal-heavy scenes by precomposing R30 eyeInverse*eyeProjection per eye at Draw configuration.",
+    "acceptance": "Implement an actual source hotpath eliminating one 4x4 eye matrix-vector multiply per world-effect vertex, preserve existing depth/RHW, behind-eye W, unusual-projection inverse reconstruction and bilateral affine fallback, add destructive regression and mathematical order/parity checks, pass exact-SHA DX9Ex Active policy/game/host/R29-R33 full-chain/package, Domain Isolation and Full Source Impact CI.",
+    "runtime_metrics": "No Quest3/VDXR game or measured GPU/CPU frametime/FPS performance validation; code math/source and exact-SHA Windows builds only."
+  },
+  "acceptance_results": [
+    {
+      "item": "R30_PARTICLE_EYE_TAIL_HOTPATH",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Material SHA 873eb6ac1e96bdd59d8679b9007bf1d707cb4d0c modifies src/vr/d3d9/stereo_renderer_r30.cpp to compute state.eyeTail[eye] = R29OwnerMultiplyMatrix(state.eyeInverse[eye], state.eyeProjection[eye]) once per eye/Draw and use restoredView * eyeTail per XYZRHW world-particle vertex, removing a redundant separate per-vertex eye-view 4x4 multiplication."
+    },
+    {
+      "item": "NEGATIVE_REGRESSIONS_AND_MATRIX_PARITY",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Exact-SHA DX9Ex Active policy job #38186394402 runs tools/verify_vr_r30_eye_tail_hotpath.py: 10 destructive mutations rejected, 300 ordered matrix-multiplication parity comparisons passed. Verifier wired into DX9Ex policy and workflow path filters."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Exact SHA 873eb6ac1e96bdd59d8679b9007bf1d707cb4d0c, DX9Ex Active Validation #38186394402 five SUCCESS jobs: policy, game, host, full-chain-compile, package."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Exact SHA 873eb6ac1e96bdd59d8679b9007bf1d707cb4d0c, Domain Isolation Guard #38186394433 SUCCESS."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Exact SHA 873eb6ac1e96bdd59d8679b9007bf1d707cb4d0c, DX9Ex Full Source Impact Review #38186394420 SUCCESS: source-cross-domain, msvc-analyze-openxr-host, msvc-analyze-active-game (3/3)."
+    },
+    {
+      "item": "PROTECTED_VISUAL_AND_STEREO_PATHS",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Protected SkyGlow, game normal road/vehicle stereo, HUD ownership, R23 DirectGPU GPU-completion ACK, and session DirectGPU hold remain unmodified; unusual projection and full-draw/bilateral fallback retained."
+    },
+    {
+      "item": "QUEST3_VDXR_HARDWARE",
+      "status": "UNTESTED",
+      "evidence": "No direct Quest 3/VDXR OutRun gameplay, frame-time, visual inspection, FPS or runtime stability measurement. Hardware normal operation not asserted."
+    }
+  ],
+  "notes": "C6 completion checkpoint is bookkeeping-only, separate from the exact-SHA CI-bearing material commit; [skip ci] applies only to this record commit. Existing run path was not found (GitHub 404) before creation. No new game source changes, validation SHA changes, extra CI dispatch, or AI2 rescore for this checkpoint. AI scoreboard RUN_KEY CONVERSION-DX9EX-00644 is counted exactly once (+1 from 1053 to 1054, SSOT ai-dev-lab commit ad1bb30e5746a9407a4b46309390c43d9e6ed721)."
+}

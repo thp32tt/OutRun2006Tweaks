@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00428",
+  "production_id": "CONVERSION-DX9EX-00428",
+  "event_id": "CONVERSION-DX9EX-00428-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "8214dca73b23310d056486085f79e1957ad1f9bd",
+  "material_result_sha": "2be02ee21122c62003246cdc02e01c88c25e7a17",
+  "validation_bearing_result_sha": "2be02ee21122c62003246cdc02e01c88c25e7a17",
+  "result_sha": "2be02ee21122c62003246cdc02e01c88c25e7a17",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00428]",
+  "selected_work_item": "L3-DX9EX-001 / dedicated per-slot ACK cross-run lifetime",
+  "summary": "Reject superseded-game-run host completions before they can publish a stale transport generation or completed frame into the dedicated DirectGpuAck mapping.",
+  "changed_paths": [
+    "vrhost/src/runtime/d3d9ex_direct_passthrough.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00428.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {"status":"COMPLETE","evidence":"Recovered 00427 and exact branch state; post-1100 structural chain was already terminal at 00414."},
+    "C1_REVIEW": {"status":"COMPLETE","evidence":"Found the same late old-run completion class could mutate generation-scoped DirectGpuAckState before the legacy ACK bridge was reached."},
+    "C2_IMPLEMENT": {"status":"COMPLETE","evidence":"2be02ee21122c62003246cdc02e01c88c25e7a17 requires the completed Frame.v2 snapshot to match the live Frame.v2 run identity before any dedicated ACK write begins."},
+    "C3_VALIDATE": {"status":"COMPLETE","automation_validation":"PASS","runtime_validation":"UNTESTED","evidence":"Exact SHA 2be02ee21122c62003246cdc02e01c88c25e7a17: DX9Ex Active Validation 37381197502 SUCCESS; policy 112003342930, host 112003476813, full-chain-compile 112003476845, game 112003477013, package 112005360543 all SUCCESS. Domain Isolation Guard 37381197464 SUCCESS."},
+    "C4_COMMIT": {"status":"COMPLETE","task_tagged_commits":["2be02ee21122c62003246cdc02e01c88c25e7a17 fix(vr): reject stale-run dedicated DirectGPU ACKs [AUTO:CONVERSION-DX9EX-00428]"],"ci_skip_on_validation_bearing_result":false},
+    "C5_PACKAGE": {"status":"COMPLETE_AUTOMATION_ARTIFACT_ONLY","evidence":"Artifact 11376110037 OutRun2-VR-DX9EX-ACTIVE-2be02ee21122c62003246cdc02e01c88c25e7a17 digest sha256:270b6fa1e2761a13dabce4fc6e4337c53b9439b28d4a1e5afb131ea380a0a780. CI evidence only; not HMD proof."},
+    "C6_STATE": {"status":"COMPLETE","runtime_validation":"UNTESTED"}
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37381197502,
+      "conclusion": "success",
+      "exact_sha": "2be02ee21122c62003246cdc02e01c88c25e7a17",
+      "jobs": {
+        "policy": 112003342930,
+        "host": 112003476813,
+        "full_chain_compile": 112003476845,
+        "game": 112003477013,
+        "package": 112005360543
+      },
+      "package_artifact_id": 11376110037,
+      "package_artifact_digest": "sha256:270b6fa1e2761a13dabce4fc6e4337c53b9439b28d4a1e5afb131ea380a0a780"
+    },
+    "domain_isolation": {
+      "run_id": 37381197464,
+      "conclusion": "success",
+      "exact_sha": "2be02ee21122c62003246cdc02e01c88c25e7a17"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Continue the next independent DirectGPU ACK lifetime unit by making the dedicated ACK contract explicitly game-run-scoped rather than relying only on pre-write live-ring validation.",
+  "completed_at_kst": "2026-10-06T07:20:34+09:00"
+}

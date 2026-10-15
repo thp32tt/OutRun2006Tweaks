@@ -1,0 +1,108 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00415",
+  "production_id": "CONVERSION-DX9EX-00415",
+  "event_id": "CONVERSION-DX9EX-00415-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "7e1211cde8510f2d07ef6441846d5433e15a5d42",
+  "source_material_sha": "65bebeacbf8be1e8374ca16456f51514ee434216",
+  "material_result_sha": "651cadc05fb463eea2574abd548d8cd390f2ded0",
+  "validation_bearing_result_sha": "651cadc05fb463eea2574abd548d8cd390f2ded0",
+  "result_sha": "651cadc05fb463eea2574abd548d8cd390f2ded0",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00415]",
+  "selected_work_item": "L1-RECENTER-001",
+  "summary": "Added and canonically gated a deterministic recenter lifecycle contract covering application-LOCAL recreation and old-space retirement, reference-space cache invalidation, focus/game request synthesis, pose/view locate ordering, head-locked fallback rejection, and fresh-visible completion semantics. Final runtime source behavior is unchanged; verifier-only plus workflow integration.",
+  "changed_paths": [
+    "tools/verify_vr_recenter_contract.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/VR_WORK_QUEUE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00415.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered post-1100 refactor-complete HEAD 7e1211cd and selected L1-RECENTER-001 after visual/HUD items remained HMD-gated."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Reviewed active host recenter path in main_r23, r26_recenter_hardening, r32_direct_submit and openxr_api_compat. Found no canonical static contract guarding lifecycle ordering and completion semantics."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added tools/verify_vr_recenter_contract.py and wired it into the fail-closed DX9Ex Active policy. Two verifier-only corrections removed scope/comment false positives without runtime-source changes."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 651cadc05fb463eea2574abd548d8cd390f2ded0: DX9Ex Active 37351916333 SUCCESS (policy 111904594531, host 111904720507, game 111904720623, full-chain-compile 111904720620, package 111906894729); Domain Isolation 37351916312 SUCCESS."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "65bebeacbf8be1e8374ca16456f51514ee434216 test(vr): add recenter lifecycle contract [AUTO:CONVERSION-DX9EX-00415]",
+        "2774291c88e7f713997d6cda5727231d8a671f5a ci(vr): gate recenter lifecycle contract [AUTO:CONVERSION-DX9EX-00415]",
+        "c9ef11340db76d692a950dc458aecb93f38fb003 test(vr): scope focus recenter verifier block [AUTO:CONVERSION-DX9EX-00415]",
+        "651cadc05fb463eea2574abd548d8cd390f2ded0 test(vr): ignore recenter rationale comments in gate [AUTO:CONVERSION-DX9EX-00415]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "OutRun2-VR-DX9EX-ACTIVE-651cadc05fb463eea2574abd548d8cd390f2ded0 artifact 11363411148 digest sha256:1f28a20cc8dc340574059e2c5d76aa858364af824e02cbdb0545e3f7db0a4350. Artifact is CI evidence only, not HMD proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 6000160417
+    }
+  },
+  "verifier_repair": {
+    "failed_candidates": [
+      {
+        "sha": "2774291c88e7f713997d6cda5727231d8a671f5a",
+        "run_id": 37351704495,
+        "classification": "VERIFIER_FALSE_POSITIVE_FOCUS_BLOCK_SCOPE"
+      },
+      {
+        "sha": "c9ef11340db76d692a950dc458aecb93f38fb003",
+        "run_id": 37351795638,
+        "classification": "VERIFIER_FALSE_POSITIVE_COMMENT_TOKEN"
+      }
+    ],
+    "final_sha": "651cadc05fb463eea2574abd548d8cd390f2ded0",
+    "runtime_source_changed_during_repairs": false
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37351916333,
+      "conclusion": "success",
+      "exact_sha": "651cadc05fb463eea2574abd548d8cd390f2ded0",
+      "jobs": {
+        "policy": 111904594531,
+        "host": 111904720507,
+        "game": 111904720623,
+        "full_chain_compile": 111904720620,
+        "package": 111906894729
+      },
+      "package_artifact_id": 11363411148,
+      "package_artifact_digest": "sha256:1f28a20cc8dc340574059e2c5d76aa858364af824e02cbdb0545e3f7db0a4350"
+    },
+    "domain_isolation": {
+      "run_id": 37351916312,
+      "conclusion": "success",
+      "exact_sha": "651cadc05fb463eea2574abd548d8cd390f2ded0"
+    },
+    "issue14_comment_id": 6000160417
+  },
+  "next_action": "Treat recenter lifecycle ordering as statically guarded. Keep runtime/HMD acceptance UNTESTED and continue the next executable DX9Ex quality/stability item; reopen L1-RECENTER-001 only if the verifier fails or new Quest3/VDXR evidence shows a regression.",
+  "completed_at_kst": "2026-10-06T03:00:54+09:00"
+}

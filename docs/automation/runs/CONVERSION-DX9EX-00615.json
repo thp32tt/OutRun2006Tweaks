@@ -1,0 +1,92 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00615",
+  "production_id": "CONVERSION-DX9EX-00615",
+  "event_id": "CONVERSION-DX9EX-00615-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:R30_XYZRHW_SHADOW_DESCRIPTOR_FASTPATH",
+  "work_key": "DX9EX:R30_XYZRHW_SHADOW_DESCRIPTOR_FASTPATH",
+  "material_result_sha": "d2784be3b96fc4d2a98930d21efc2cb9772e56b4",
+  "material_commits": [
+    "d2784be3b96fc4d2a98930d21efc2cb9772e56b4"
+  ],
+  "result_sha": "d2784be3b96fc4d2a98930d21efc2cb9772e56b4",
+  "validation_bearing_result_sha": "d2784be3b96fc4d2a98930d21efc2cb9772e56b4",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Eliminate per-draw D3D9 GetDesc calls for R30 XYZRHW stereo VB/IB while retaining descriptor and buffer-shadow correctness.",
+    "acceptance": "Read stable VB size and IB size/format once at shadow registration; pass held shadow pointers directly to observed Lock/Unlock range copies; preserve unsigned bounds, missing-shadow fail-open, reset/Release removal and untouched stereo/SkyGlow/FFB semantics. Exact-SHA Active, Domain, Full Source Impact pass.",
+    "runtime_metrics": "Quest3/VDXR gameplay, GPU frame-time, p95/p99 and FPS not measured; no visual or performance uplift asserted."
+  },
+  "acceptance_results": [
+    {
+      "item": "PER_DRAW_GETDESC_ELIMINATION",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "R30 VB/IB XYZRHW draw paths use R30EnsureVertexShadow/IndexShadow immutable size/indexFormat metadata; draw-time GetDesc removed."
+    },
+    {
+      "item": "SHADOW_RANGE_AND_LIFETIME",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Held R30ShadowPtr avoids duplicate registry lookup; observed Lock/Unlock validity, checked size subtraction, Release/Reset registration lifetime and E_NOTIMPL fallback preserved."
+    },
+    {
+      "item": "NEGATIVE_MUTATION_REGRESSIONS",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Active policy log: PASS R30 immutable VB/IB shadow descriptor fastpath; 11 negative mutations."
+    },
+    {
+      "item": "DX9EX_ACTIVE_POLICY_GAME_HOST_FULLCHAIN_PACKAGE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "GitHub DX9Ex Active Validation #38157705879 5/5 SUCCESS: policy, game, host, full-chain-compile, package."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "GitHub Domain Isolation Guard #38157705977 SUCCESS."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "GitHub DX9Ex Full Source Impact Review #38157705897 3/3 SUCCESS."
+    },
+    {
+      "item": "QUEST3_VDXR_FRAME_TIME_VISUAL",
+      "status": "UNTESTED",
+      "evidence": "No hardware HMD gameplay/visual/FPS testing."
+    }
+  ],
+  "exact_sha_validation": {
+    "target_sha": "d2784be3b96fc4d2a98930d21efc2cb9772e56b4",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38157705879,
+        "head_sha": "d2784be3b96fc4d2a98930d21efc2cb9772e56b4",
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38157705977,
+        "head_sha": "d2784be3b96fc4d2a98930d21efc2cb9772e56b4",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38157705897,
+        "head_sha": "d2784be3b96fc4d2a98930d21efc2cb9772e56b4",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "runtime_validation_note": "RUNTIME_VALIDATION=UNTESTED. Build/CI pass is not Quest3/VDXR/FPS proof.",
+  "completed_kst": "2026-10-12T02:07:57.700+09:00",
+  "controller_next_action": "Continue a separate new DX9Ex P0 measured-performance item without rescoring/repeating TASK_ID CONVERSION-DX9EX-00615; DX11 remains globally first priority, DXVK frozen."
+}

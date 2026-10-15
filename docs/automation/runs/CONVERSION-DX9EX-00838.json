@@ -1,0 +1,108 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00838",
+  "production_id": "CONVERSION-DX9EX-00838",
+  "event_id": "CONVERSION-DX9EX-00838-E002",
+  "event_type": "c6_result_only",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "feature_id": "DX9EX:VIS:F11_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:F11_MENU",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 1,
+  "changed_files": [
+    "src/overlay/overlay.cpp",
+    "src/overlay/f11_responsive_fit.hpp",
+    "tools/verify_vr_f11_font_density.py"
+  ],
+  "feature_contract": {
+    "goal": "Fit the complete F11 external overlay tab shell, text and interactive control spacing together to a smaller/portrait VR mirror without losing sharp XR atlas or game input and without changing native desktop F11.",
+    "scope_boundary": "F11 external ImGui only; no gameplay HUD, ESC, SkyGlow, XR eye ownership, world stereo or DX11/DXVK modifications.",
+    "trace_stages": [
+      "VR gameplay and published XR eye extents set F11 Segoe atlas density in hooks_overlay.cpp",
+      "Overlay::render_shell caps the F11 viewport and computes the new responsive glyph/control budget",
+      "ImGui::SetWindowFontScale and scoped F11 style metrics affect tab labels, controls, child layout and native desktop restoration"
+    ],
+    "acceptance_items": [
+      {
+        "id": "F11_RESPONSIVE_FIT",
+        "category": "end_to_end_behavior",
+        "behavior_area": "font_and_usable_tab_shell",
+        "expected_behavior": "Asymmetric/portrait/minimized live VR mirror caps both high-resolution font display and interactive hit spacing coherently; steady-state F11 remains editable."
+      },
+      {
+        "id": "F11_DESKTOP_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "vr_to_desktop_input_and_hud",
+        "expected_behavior": "VR exit explicitly restores 1x F11 per-window font, full XR atlas remains sharp, desktop F11 scaling/persistence, HUD/FFB/stereo/normal gameplay are untouched."
+      },
+      {
+        "id": "DX9EX_EXACT_WINDOWS",
+        "category": "integrated_validation",
+        "behavior_area": "policy_host_game_fullchain_package",
+        "expected_behavior": "Exact material SHA DX9Ex Active 5/5, Domain Isolation and Full Source Impact 3/3 SUCCESS, HMD acceptance withheld until Quest3/VDXR test."
+      }
+    ]
+  },
+  "diagnosis": {
+    "root_cause": "F11 shell width/height were capped to current mirror, but live VR glyphs retained full XR eye density and style spacing was clamped to at least 1x even when the shell budget was smaller; controls and tabs could clip.",
+    "source_fix": "Bound both displayed F11 glyph scale and style density by the same mirror width/height budget while preserving source eye-density font atlas and native desktop 1x restoration.",
+    "negative_test_evidence": "F11 density verifier checks helper presence, font and style owner bindings, desktop restore, numerical Quest3/portrait/compact cases and focused negative mutations. Exact-SHA policy, Win32 host/game/full-chain/package, Domain and MSVC analysis succeeded.",
+    "runtime_note": "No user Quest3/VDXR/game screen/FFB test; BUILD_VERIFIED is not runtime PASS."
+  },
+  "material_result_sha": "67d6be6b335aa11ddea1ae23c534794c0daddd55",
+  "validation_bearing_result_sha": "67d6be6b335aa11ddea1ae23c534794c0daddd55",
+  "result_sha": "67d6be6b335aa11ddea1ae23c534794c0daddd55",
+  "acceptance_results": {
+    "F11_RESPONSIVE_FIT": "PASS_AUTOMATED_NO_HMD",
+    "F11_DESKTOP_FALLBACK": "PASS_AUTOMATED_NO_HMD",
+    "DX9EX_EXACT_WINDOWS": "PASS_EXACT_SHA"
+  },
+  "ci_evidence": {
+    "dx9ex_active": {
+      "run_id": 38554082385,
+      "conclusion": "SUCCESS",
+      "success_jobs": 5,
+      "total_jobs": 5,
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38554082316,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38554082309,
+      "conclusion": "SUCCESS",
+      "success_jobs": 3,
+      "total_jobs": 3,
+      "jobs": [
+        "source-cross-domain",
+        "msvc-analyze-active-game",
+        "msvc-analyze-openxr-host"
+      ]
+    }
+  },
+  "remaining": "NEED_HMD_TEST for Quest3/VDXR F11 legibility, tabs, focus/input, portrait mirror and FPS; no claim of actual headset PASS.",
+  "duplication_guard": {
+    "task_id": "CONVERSION-DX9EX-00838",
+    "run_key": "CONVERSION-DX9EX-00838",
+    "score_once": true,
+    "c6_bookkeeping_only": true,
+    "no_ci_suppression_on_result": true
+  },
+  "checkpoint": "C6_STATE",
+  "hold_reason": "C6_NOT_COMPLETE",
+  "c6_score_delta": 0
+}

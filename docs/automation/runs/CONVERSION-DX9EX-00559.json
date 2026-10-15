@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00559",
+  "production_id": "CONVERSION-DX9EX-00559",
+  "event_id": "CONVERSION-DX9EX-00559-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "0e92d6e437bee517811fc33d2240455c19a346dd",
+  "material_result_sha": "25669f9048323f9daf4cc9e53a3cccfc0461829f",
+  "validation_bearing_result_sha": "25669f9048323f9daf4cc9e53a3cccfc0461829f",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "work_key": "DX9EX:UIScaling:custom_matrix_getleveldesc_reset_guard",
+  "conflict_keys": [
+    "src/hooks_uiscaling.cpp:draw_sprite_custom_matrix_mid",
+    "tools/verify_vr_custom_sprite_descriptor.py"
+  ],
+  "summary": "Guard original per-sprite D3D9 GetLevelDesc HRESULT, null source texture and zero-size texel dimensions before computing half-texel UVs, and fail closed on reset-invalid screen scale without editing world/HUD semantics.",
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_custom_sprite_descriptor.py",
+    ".github/workflows/vr-dx9ex-active.yml"
+  ],
+  "static_contract": {
+    "name": "tools/verify_vr_custom_sprite_descriptor.py",
+    "one_changed_source_pass": true,
+    "negative_mutations": 4,
+    "legacy_hud_1000_5000": false
+  },
+  "ci_runs": {
+    "dx9ex_active": 37941002249,
+    "domain_isolation": 37941002147,
+    "exe_hud_inspector": 37941002060,
+    "full_source_impact": 37941002153
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS authenticated branch HEAD, AGENTS/queue/state/problem history, source, Issue13/14 and prior 00558 terminal record",
+    "C1_REVIEW": "PASS original emoose custom sprite midhook ignores texture descriptor HRESULT and may divide by zero; current focus preserved same path",
+    "C2_IMPLEMENT": "PASS exact C++ draw-level pointer/descriptor and screen-scale safety, preserved normal path, one verifier with 4 negative controls and CI wiring",
+    "C3_VALIDATE": "PASS exact material SHA DX9Ex Active 37941002249 policy/game/x64-host/R33/package; Domain 37941002147; Inspector 37941002060; Impact 37941002153",
+    "C4_COMMIT": "PASS [AUTO:CONVERSION-DX9EX-00559] actual material commit 25669f9048323f9daf4cc9e53a3cccfc0461829f; no CI skip",
+    "C5_PACKAGE": "PASS artifact 11621019436 exact SHA; no real Quest3/VDXR claim",
+    "C6_RESULT": "COMPLETE_BUILD_VERIFIED; original material SHA held immutable; runtime UNTESTED; AI2 scored once; documentation checkpoint separated"
+  },
+  "parallel_policy": "DX11 A independent ACTIVE, DX9EX C ACTIVE, DXVK B FROZEN; no DX11/DXVK/localization touched",
+  "next_action": "Do not rerun this completed TASK_ID or re-score. Next independent work must have a new TASK_ID/claim and fresh material SHA. Quest3 HMD optical check needed for visual acceptance.",
+  "result_sha": "25669f9048323f9daf4cc9e53a3cccfc0461829f",
+  "ci_jobs": {
+    "policy": "SUCCESS",
+    "game": "SUCCESS",
+    "host": "SUCCESS",
+    "r33_full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "full_source_impact_game": "SUCCESS",
+    "full_source_impact_host": "SUCCESS",
+    "full_source_impact_source_cross_domain": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11621019436,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-25669f9048323f9daf4cc9e53a3cccfc0461829f",
+    "artifact_digest": "sha256:2cb55dd509554de0b434982a30d3a9ee3830a55b529010cbd267c3fd357966a2"
+  },
+  "scoreboard": {
+    "ai": "AI2",
+    "prior": 1273,
+    "change": 1,
+    "cumulative": 1274,
+    "run_key": "CONVERSION-DX9EX-00559",
+    "commit": "1c8a311d6ce050c49e2b6e2db898414efe9b68d9"
+  },
+  "updated_kst": "2026-10-09 23:10 KST"
+}

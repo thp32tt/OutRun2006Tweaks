@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00580",
+  "production_id": "CONVERSION-DX9EX-00580",
+  "event_id": "CONVERSION-DX9EX-00580-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "ac7e36a5e3eca7283321907582b920eb0ddd49ec",
+  "first_material_sha": "5ba7c33ee477c81e8d0f75bd099b811fdfc87587",
+  "repair_sha": "779ff96361c70a70709e8f36c38680b13c78e646",
+  "result_sha": "779ff96361c70a70709e8f36c38680b13c78e646",
+  "material_result_sha": "779ff96361c70a70709e8f36c38680b13c78e646",
+  "validation_bearing_result_sha": "779ff96361c70a70709e8f36c38680b13c78e646",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00580]",
+  "work_key": "DX9EX:P0:FFB_V02_XINPUT_TO_SDL_STALE_RUMBLE_HANDOFF",
+  "changed_paths": [
+    "src/hooks_forcefeedback.cpp",
+    "tools/verify_vr_ffb_controller_routing.py"
+  ],
+  "summary": "P0 finalized v0.2 FFB VR bridge: preserve legacy XInput output stop on gamepad->SDL UseNewInput transition and disabled/ownership changes, including original first-disabled legacy stop. Preserve immutable pinned 9-file FFB source; add four independent negative mutation routing cases.",
+  "status": "COMPLETE_BUILD_VERIFIED_RUNTIME_UNTESTED",
+  "controller_terminal": true,
+  "retry_allowed": false,
+  "static_validation": "PASS: targeted source-contract preflight and DX9Ex policy Python verifier with ten routing and two SDL lifetime negative mutations",
+  "automation_validation": "PASS_EXACT_SHA",
+  "ci_runs": {
+    "dx9ex_active": 38034625458,
+    "domain_isolation": 38034625492,
+    "full_source_impact": 38034625521
+  },
+  "ci_results": [
+    {
+      "gate": "dx9ex_active",
+      "id": 38034625458,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "779ff96361c70a70709e8f36c38680b13c78e646"
+    },
+    {
+      "gate": "domain_isolation",
+      "id": 38034625492,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "779ff96361c70a70709e8f36c38680b13c78e646"
+    },
+    {
+      "gate": "full_source_impact",
+      "id": 38034625521,
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "779ff96361c70a70709e8f36c38680b13c78e646"
+    }
+  ],
+  "ci_jobs": {
+    "dx9ex_policy": "SUCCESS",
+    "dx9ex_host": "SUCCESS",
+    "dx9ex_game": "SUCCESS",
+    "dx9ex_full_chain_compile": "SUCCESS",
+    "dx9ex_package": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "full_source_cross_domain": "SUCCESS",
+    "full_source_openxr_host_analyze": "SUCCESS",
+    "full_source_active_game_analyze": "SUCCESS"
+  },
+  "package": {
+    "status": "PUBLISHED_CI_VERIFIED_NOT_RUNTIME_APPROVED",
+    "artifact_id": 11663840398,
+    "artifact_name": "OutRun2-VR-DX9EX-ACTIVE-779ff96361c70a70709e8f36c38680b13c78e646",
+    "digest": "sha256:4d8c313fd0443bdaed8a467caeb4a76feb312dd7c423bc5386bb4a1ba4012f94",
+    "hmd_approved": false
+  },
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "ffb_wheel_hardware_validation": "UNTESTED",
+  "native_120fps_target": "NOT_MEASURED",
+  "ffb_release": {
+    "tag": "v0.2",
+    "commit": "0da626463810322a74118d03b10ca0dd195d7cb2",
+    "mutated": false
+  },
+  "baseline": {
+    "branch": "dx9ex-baseline-20261010",
+    "commit": "fcd18ddd89f6dd40a8246fcf8591f086811149f1",
+    "mutated": false
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS GitHub HEAD/checkpoint and existing records verified",
+    "C1_REVIEW": "PASS AGENTS, priority, state/queue, Issue13/14, history, HUD Inspector, released FFB v0.2",
+    "C2_IMPLEMENT": "PASS real P0 source bridge+four negative mutation tests and safety repair",
+    "C3_VALIDATE": "PASS exact final material SHA 3 required GitHub Gates",
+    "C4_COMMIT": "PASS final material source commit with exact AUTO marker and no CI skip",
+    "C5_PACKAGE": "PASS CI artifact; not HMD/wheel approved",
+    "C6_RESULT": "PASS independent ledger/bookkeeping record after all exact-SHA gates"
+  }
+}

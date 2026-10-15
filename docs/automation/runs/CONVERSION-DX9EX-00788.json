@@ -1,0 +1,121 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00788",
+  "production_id": "CONVERSION-DX9EX-00788",
+  "event_id": "CONVERSION-DX9EX-00788-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:MAIN_MENU",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00788]",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "changed_files": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/src/main_r23.cpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp",
+    "tools/verify_vr_menu_letterbox_aspect.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00788.json"
+  ],
+  "score_delta": 1,
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Correct the complete 4:3 front-end main/car-select menu's optical content crop, centering and scale on 4:3, 16:9, 21:9 and portrait Quest capture, including window-output-edge clipping.",
+    "scope_boundary": "R23 LOCAL fixed menu composition and source XY UV only. Excludes gameplay HUD, ESC/F11, world stereo, SkyGlow, DX11, DXVK and FFB.",
+    "trace_stages": [
+      "Original game draws authored 4:3 main/car selection menu with 2D UI scaling and black bar matte on both landscape and portrait clients.",
+      "R23 Desktop Duplication source UV intersects visible output with original client-space 4:3 content rectangle in X and Y.",
+      "R23 stereo projection maps the preserved UV fragment to common-tangent optically centered LOCAL plane in both eyes."
+    ],
+    "subcomponents": [
+      "Detect and remove both landscape side bars and portrait top/bottom bars from game capture UV, preserving native authored 4:3 ratio.",
+      "Project clipped surviving menu fragments without inventing missing pixels, handle resolution/Reset changes and invalid UV with fail-closed baseline."
+    ],
+    "acceptance_items": [
+      {
+        "id": "MENU_43_PORTRAIT_AND_LANDSCAPE",
+        "category": "end_to_end_behavior",
+        "behavior_area": "client_capture_uv",
+        "expected_behavior": "Portrait and 4:3/16:9/21:9 captured menu uses the full correct 4:3 authored rectangle with XY crop and no stretched image."
+      },
+      {
+        "id": "CLIPPED_WINDOW_RESET_DESKTOP_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "output_clipping_and_reset",
+        "expected_behavior": "Partially clipped X/Y capture retains source fragment's original optical position and dimensions; invalid publication is not cropped and ordinary 4:3 fallback unchanged."
+      },
+      {
+        "id": "FULL_WIN32_HOST_GAME_PACKAGE_DOMAIN",
+        "category": "integrated_validation",
+        "behavior_area": "win32_host_game_package",
+        "expected_behavior": "Exact-SHA full DX9Ex Active Windows host/game/package, Domain Isolation and Full Source Impact checks complete before build verified; HMD remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "MENU_43_PORTRAIT_AND_LANDSCAPE": "PASS",
+    "CLIPPED_WINDOW_RESET_DESKTOP_FALLBACK": "PASS",
+    "FULL_WIN32_HOST_GAME_PACKAGE_DOMAIN": "PASS",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "User reported cropped giant 4:3 menu and black shifted lower image on Quest. R23 current source exclusively removes horizontal side rails from already-letterboxed captured games.",
+    "root_cause": "PlanCenteredContent rejects portrait sourceAspect<=intendedAspect, and PlanVisibleCenteredContent computes Y crop only against full client rather than authored 4:3 content, leaving portrait black matte in eye texture.",
+    "source_trace": [
+      "Game UI 2496x2688 portrait client contains centered 2496x1872 authored content.",
+      "R23 Desktop Duplication returns client/output crop UV and PlanVisibleCenteredContent computes game-space visible content.",
+      "R23 projection samples UV and maps fragment offsets to both LOCAL eye images; unchanged Y crops reproduce black bars and aspect mismatch."
+    ],
+    "alternatives_rejected": [
+      "Not a gameplay stereo or SkyGlow FOV problem; do not modify game-world geometry.",
+      "OpticalCoverage constant does not solve wrong capture rectangle.",
+      "Never recenter off-screen clipped output as if a full menu were present."
+    ],
+    "eye_ownership": "R23 HOST LOCAL plane projects the same captured source UV into both eyes and copies a completed first-eye raster; UV cropping must match original authored menu geometry for both.",
+    "fix_evidence": "C++ centered 4:3 intersection extends crop into source Y UV and height while preserving per-axis fragment scales; host applies both axes before submitting the common optical projection.",
+    "negative_test_evidence": "C++ smoke covers portrait full/moved output/invalid UV and existing wide/off-edge cases; Python destructive controls enforce Y crop propagation and contentHeight denominators."
+  },
+  "ci_evidence": {
+    "status": "SUCCESS",
+    "material_sha": "805cd85fe2ec7e1a80cf9fe41709268d247b06e6",
+    "validation_bearing_sha": "805cd85fe2ec7e1a80cf9fe41709268d247b06e6",
+    "dx9ex_active": {
+      "run_id": 38434681896,
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "game",
+        "host",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38434681937,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38434681806,
+      "conclusion": "success"
+    },
+    "coordination": {
+      "run_id": 38434681846,
+      "conclusion": "success"
+    },
+    "source_regression": "R23 portrait+desktop main-menu XY capture-plan C++ smoke and Python destructive mutation gate, exact-SHA Windows host/game/package",
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR"
+  },
+  "runtime_status": "NEED_QUEST3_VDXR_TEST",
+  "material_result_sha": "805cd85fe2ec7e1a80cf9fe41709268d247b06e6",
+  "validation_bearing_result_sha": "805cd85fe2ec7e1a80cf9fe41709268d247b06e6",
+  "result_sha": "805cd85fe2ec7e1a80cf9fe41709268d247b06e6",
+  "material_sha": "805cd85fe2ec7e1a80cf9fe41709268d247b06e6",
+  "c6_result": "PASS_EXACT_SHA"
+}

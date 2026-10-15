@@ -1,0 +1,124 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00885",
+  "production_id": "CONVERSION-DX9EX-00885",
+  "event_id": "CONVERSION-DX9EX-00885-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00885",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "907e7f808c9afe6f22172bc6fdd545f61262b9e1",
+  "material_result_sha": "9c32c3b3a403a1249448ae7341e1b4b11be7fb44",
+  "validation_bearing_result_sha": "f681a3df6decbba5d425a59c8b1997e6d372f98b",
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_stereo_restore_publication.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00885.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Ensure the complete R84 game HUD two-eye failure path never presents a stale right eye after left drawing or shader-constant rollback failures across fixed-function XYZRHW and shader HUD geometry.",
+    "scope_boundary": "R30 physical two-eye HUD/XZYRHW drawing and failed original WVP restoration only. Ordinary successful render, lower R29 bypass, F11, GOAL, stage +TIME, world, SkyGlow, depth and legacy R26_SAFE must remain unchanged.",
+    "trace_stages": [
+      "Original game fixed-function/XYZRHW or shader HUD draw enters the independent R84 R30 two-eye dispatcher.",
+      "R30 left eye can fail after a depth/stencil write or during c64 rollback, before submitting current right-eye draws.",
+      "R29 frame-right-failed state feeds R84 Present/host publication safety; affected eye invalidation precedes future mono recovery."
+    ],
+    "subcomponents": [
+      "Protect R30ExecuteXyzrhwStereo left HRESULT failure with present-frame veto and right depth/stencil invalidation.",
+      "Protect R30TryScreenSpaceFovDraw left HRESULT failure with the same current-frame veto after its c64 restore.",
+      "Protect failed initial left c64 rollback while retaining original healthy E_NOTIMPL fallback; enforce source-scoped negative mutations."
+    ],
+    "acceptance_items": [
+      {
+        "id": "left_hud_failure_veto",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 GPU HUD two-eye drawing in XYZRHW and shader/VS routes",
+        "expected_behavior": "Any failed left Draw marks this frame's right eye failed and invalidates left-written depth before future mono recovery."
+      },
+      {
+        "id": "wvp_rollback_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Initial c64 upload rollback and successful original HUD rendering",
+        "expected_behavior": "A successful rollback preserves the R29 E_NOTIMPL fallback, a failed rollback vetoes current Present, and successful HUD output, GOAL and SkyGlow remain unchanged."
+      },
+      {
+        "id": "exact_sha_windows_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Win32 x86 game and 64-bit OpenXR host/active ZIP",
+        "expected_behavior": "Validation-bearing SHA passes complete Active Game/Host/Package, Domain Isolation and affected Full Source Impact gates, with HMD separately UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "left_hud_failure_veto": "PASS",
+    "wvp_rollback_fallback": "PASS",
+    "exact_sha_windows_gates": "PASS"
+  },
+  "diagnosis": {
+    "original_evidence": "R33 already poisons current-eye publication on left Draw failure, but both R30ExecuteXyzrhwStereo and R30TryScreenSpaceFovDraw previously returned after logging/arming future mono safety without marking current right-eye failed.",
+    "root_cause": "R30 left-eye early failure path lacked a same-frame right-eye publication veto and potential right depth/stencil invalidation; a failed shader c64 rollback could likewise leave an incomplete present frame.",
+    "source_trace": [
+      "R30 CPU-transformed XYZRHW left raw Draw can fail after stereo-draw-no-mono-backup was recorded.",
+      "R30 shader HUD left vertex constants upload and original rollback can fail before or after physical left Draw.",
+      "R29OwnerMarkRightDrawFailed sets FrameRightDrawFailed read by R84 Present; R29OwnerInvalidateRightDepthStencilIfLeftMayWrite blocks reusing unmatched right-eye content."
+    ],
+    "alternatives_rejected": [
+      "Do not force a redundant right-eye draw after failed left Draw or submit stale historical mono backup; preserve successful R29 fallback if the initial left c64 rollback succeeds.",
+      "Do not disable stencil/depth or alter game 2D HUD positioning, SkyGlow, GOAL, +TIME or unrelated world effects."
+    ],
+    "fix_evidence": "Both R30 left failure branches now mark same-frame right-eye failure and invalidate right depth/stencil before reporting, while failed c64 rollback alone poisons the frame and still preserves the healthy E_NOTIMPL fallback.",
+    "negative_test_evidence": "Extended existing mandatory verify_vr_stereo_restore_publication.py with 9 left-failure/rollback scoped negative mutations plus existing 8 right-restore mutants.",
+    "eye_ownership": "R84 R29FrameRightDrawFailed is the existing present-time publication veto; this new material updates both R30 physical submissions without changing R33 per-eye state or OpenXR host."
+  },
+  "runtime_evidence": "No Quest3/VDXR HMD, game-screen or runtime evidence was acquired.",
+  "hold_reason": "NEED_HMD_TEST",
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "f681a3df6decbba5d425a59c8b1997e6d372f98b",
+    "dx9ex_active": {
+      "run_id": 38704103203,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, host, game, full-chain-compile, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38704103328,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38704103318,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38704103303,
+      "conclusion": "SUCCESS",
+      "required_jobs": "msvc-analyze-active-game, msvc-analyze-openxr-host, source-cross-domain (3/3)"
+    },
+    "previous_failure": {
+      "status": "INITIAL_POLICY_FAIL_MISSING_RECORD",
+      "failed_sha": "9c32c3b3a403a1249448ae7341e1b4b11be7fb44",
+      "run_id": 38703843367,
+      "failed_step": "Enforce feature-sized DX9Ex autonomous completion",
+      "reason": "docs/automation/runs/CONVERSION-DX9EX-00885.json missing",
+      "runtime": "UNTESTED"
+    },
+    "runtime": "UNTESTED"
+  },
+  "result_commit_ci_skip": false,
+  "bookkeeping_ci_skip": true
+}

@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00483",
+  "production_id": "CONVERSION-DX9EX-00483",
+  "event_id": "CONVERSION-DX9EX-00483-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "runtime_behavior_changed": false,
+  "base_sha": "bd866c5df2eb8663e6e8bd352b15eba448e238c1",
+  "initial_validation_candidate_sha": "567e9adbcce4bec4c696e92b475b4987277d0aab",
+  "first_repair_sha": "0448ec6fdf48002d6e650b9e0fe46f7709b63727",
+  "source_material_sha": "a52ecb9550130c76b0004c988edffbea7f6ad30a",
+  "material_result_sha": "dceb12ce3b8925aa31bc5c5e92aa1df202e57b11",
+  "validation_bearing_result_sha": "dceb12ce3b8925aa31bc5c5e92aa1df202e57b11",
+  "result_sha": "dceb12ce3b8925aa31bc5c5e92aa1df202e57b11",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00483]",
+  "selected_work_item": "VR-REFACTOR-POST1100-TERMINAL-HARDENING-GUARD-0066",
+  "summary": "Completed the terminal post-R34/R33 structural census. No equivalence-safe runtime owner remained to flatten; reconciled the generic OpenXR hardening workflow with the current R21/R23 owner-query, R31 StateBlock consumer, hook-free R32 helper, final R33 dispatcher, R23 host safe-eye, and SBS parent-session teardown contracts, and pinned them in the deterministic refactor verifier.",
+  "checkpoints": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read target HEAD bd866c5d, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, VR_REFACTOR_STATE, 00482 durable record, production ledger and current scoreboard. Reconfirmed R31 owns real StateBlock consumer/recovery initialization, R32 has zero physical hooks and no async install shim, and R33 is final dispatcher."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Terminal owner/dependency census found no further equivalence-safe runtime flattening. Repeated generic OpenXR architecture failures were traced to stale hardening markers left behind by completed owner migrations."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Updated .github/workflows/vr-openxr.yml to current R21/R23 install-owner queries, R31/R32/R33 terminal contracts, R23 host SafeEyesOwnFrame/EnsureSafeFrame ownership and SBS parent-session prepare/forget teardown. Extended verify_vr_refactor_contract.py to reject retired markers and require current contracts."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Initial 567e9adb exposed stale R23 IsFailed(R22InstallState). First repair 0448ec6f exposed stale R23 host SafeTransportGeneration. Final dceb12ce passed canonical DX9Ex Active plus the formerly red generic OpenXR architecture workflow, Domain Isolation and Build."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "dceb12ce3b8925aa31bc5c5e92aa1df202e57b11",
+      "validation_bearing_result_sha": "dceb12ce3b8925aa31bc5c5e92aa1df202e57b11",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE",
+      "artifact_id": 11419747152,
+      "digest": "sha256:3f30f749a787a3a2d12ec8a7a295f1f686ad4a4d2c42f727c2d392814a1bc398"
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "structure_refactor_chain": "COMPLETE"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "changed_paths": [
+      ".github/workflows/vr-openxr.yml",
+      "tools/verify_vr_refactor_contract.py",
+      "docs/VR_REFACTOR_STATE.json",
+      "docs/automation/runs/CONVERSION-DX9EX-00483.json"
+    ],
+    "terminal_census": {
+      "r31": "RETAIN_REAL_INITIALIZER",
+      "r32": "HOOK_FREE_FUNCTIONAL_OWNER_NO_ASYNC_INSTALL_SHIM",
+      "r33": "FINAL_RESET_PRESENT_DIRECTGPU_DRAW_DISPATCHER",
+      "further_equivalence_safe_runtime_flattening": false,
+      "structure_refactor_chain": "COMPLETE"
+    },
+    "repaired_stale_guards": [
+      "R21 IsFailed(R20InstallState) -> R20InstallStatus()/R21InstallStatus()",
+      "R23 IsFailed(R22InstallState) -> R22InstallStatus()",
+      "R31StateBlockTrackingReliable / old rollback text -> LifecycleHooksReady/EventConsumerReady/fail-closed no-fallback contract",
+      "R32ResetR22Hook/ResetDestR22/VR R32 REVIEW2 -> hook-free lifecycle/helper contract",
+      "R30DrawPrimitiveR29Hook/R33ResetR32Hook -> final R33 R30/R22/R13 hook ownership",
+      "SBS Preserve acquiredImage/Release(Projection/Theater) -> parent-session prepare/forget teardown",
+      "R23 host SafeTransportGeneration -> SafeEyesOwnFrame(frame)/EnsureSafeFrame(frame.frameId)"
+    ],
+    "validation": {
+      "dx9ex_active_run_id": 37476535871,
+      "policy_job_id": 112313626082,
+      "host_job_id": 112314959532,
+      "game_job_id": 112314959619,
+      "full_chain_compile_job_id": 112314959773,
+      "package_job_id": 112317904398,
+      "openxr_architecture_run_id": 37476536036,
+      "domain_isolation_run_id": 37476535870,
+      "build_run_id": 37476536131,
+      "result": "SUCCESS"
+    },
+    "validation_repairs": [
+      {
+        "sha": "567e9adbcce4bec4c696e92b475b4987277d0aab",
+        "failure": "generic hardening stale src/vr/d3d9/stereo_renderer_r23.cpp :: IsFailed(R22InstallState)"
+      },
+      {
+        "sha": "0448ec6fdf48002d6e650b9e0fe46f7709b63727",
+        "failure": "generic hardening stale vrhost/src/runtime/r23_runtime_hardening.hpp :: SafeTransportGeneration"
+      },
+      {
+        "sha": "dceb12ce3b8925aa31bc5c5e92aa1df202e57b11",
+        "result": "PASS"
+      }
+    ],
+    "package": {
+      "artifact_id": 11419747152,
+      "digest": "sha256:3f30f749a787a3a2d12ec8a7a295f1f686ad4a4d2c42f727c2d392814a1bc398"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR in-game HMD session was performed; this task changes validation/workflow contracts only."
+    },
+    "issue14_comment_id": 6018309126,
+    "validation_pr": 106
+  },
+  "next_action": "Post-R34/R33 structure-refactor chain is complete. Future DX9Ex automation should use the general maintenance/correctness priority list and must not recreate retired R31/R32 physical hooks, the R32 async install relay, or stale generic hardening markers. Runtime-visible HUD/frame-pacing changes remain HMD-evidence-sensitive.",
+  "started_at_kst": "2026-10-06T22:53:00+09:00",
+  "completed_at_kst": "2026-10-06T23:19:52+09:00"
+}

@@ -1,0 +1,122 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00800",
+  "production_id": "CONVERSION-DX9EX-00800",
+  "event_id": "CONVERSION-DX9EX-00800-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R30_LARGE_SPARSE_PROJECTED_DEPTH",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "work_key": "DX9EX:PERF:R30_LARGE_SPARSE_PROJECTED_DEPTH",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00800]",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 1,
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_sparse_depth_classifier.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00800.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R30_LARGE_SPARSE_PROJECTED_DEPTH",
+    "goal": "Reduce full-span CPU depth-signature scanning for large sparse indexed world-particle buffers while retaining identical ascending first-512 world-versus-HUD classification and binocular protected rendering.",
+    "scope_boundary": "Only R30 depth-signature read selection; preserve vertex XYZ/RHW writes, both-eye geometry, HUD scope, menu/F11, world shader, SkyGlow, FFB, DX11 and DXVK.",
+    "special_work_evidence": "R30 original fast touched sample was capped at 512 references; a >512 touched count forced one mask visit for every vertex in large VB index windows. A bounded 513-2048 unique sparse list sorted once yields the exact first 512 selected vertices without the often much larger O(vertexCount) scan. No Quest3 frame-time or FPS uplift has yet been measured.",
+    "trace_stages": [
+      "Original OutRun indexed-UP/VB render producers supply selected index masks and touched-list alongside source vertex range.",
+      "R30 per-draw projected-depth classifier resolves the first 512 valid selected indices in original ascending order to decide world particle vs HUD.",
+      "R30 world/flat-effects per-eye routing and safe D3D9 original draw fallback are unaffected by equivalent depth classification."
+    ],
+    "subcomponents": [
+      "Preserve existing direct small sparse path and use a bounded sorted path for large sparse producer-owned masks, never for dense draws.",
+      "Reject duplicate, out-of-range, non-mask or allocation-failed sorted hints before classification with original dense fallback.",
+      "Extend deterministic HUD/world/invalid parity and destructive negative regression guards in exact-SHA DX9Ex Active policy CI."
+    ],
+    "acceptance_items": [
+      {
+        "id": "LARGE_SPARSE_DEPTH_PARITY",
+        "category": "end_to_end_behavior",
+        "behavior_area": "large_indexed_world_particle_depth",
+        "expected_behavior": "513-2048 sparse selected vertices avoid full-span iteration while preserving ascending first-512 projected depth classification in both stereo eyes."
+      },
+      {
+        "id": "SMALL_DENSE_BAD_HINT_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "small_dense_invalid_mask_no_regression",
+        "expected_behavior": "Existing <=512 unique direct lists and dense indexed buffers are unchanged; invalid or duplicated large hints use the original dense mask scan."
+      },
+      {
+        "id": "R30_EXACT_SHA_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "windows_game_host_package",
+        "expected_behavior": "Destructive mutation and differential parity smoke plus exact SHA Win32 DX9Ex game/host/package and Domain Isolation complete successfully."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "LARGE_SPARSE_DEPTH_PARITY": "PASS",
+    "SMALL_DENSE_BAD_HINT_FALLBACK": "PASS",
+    "R30_EXACT_SHA_GATES": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "Original R30 source switches to dense [0,vertexCount) traversal for >512 touched references, even when most vertices are not referenced by the current draw.",
+    "root_cause": "Depth classifier only optimized small producer touched lists; full sparse 513-2048 counts were rejected despite exact mask/index provenance.",
+    "source_trace": [
+      "Indexed game Draw publishes touched indices and usedMask.",
+      "R30HasProjectedDepthSignature samples an ordered first-512 valid subset.",
+      "R30Stereo per-eye read reuses classifier result or original D3D9 fallback."
+    ],
+    "alternatives_rejected": [
+      "Unsorted >512 touched order can change the original first-512 world/HUD decision.",
+      "Copying every source vertex or enlarging the low-count fast path risks protected per-eye geometry.",
+      "Dense draw lists do not justify heap/sort overhead and must use the original scan."
+    ],
+    "fix_evidence": "Bounded sorted unique/index membership path with heap-allocation failure fallback and identical ascending first-512 sampling.",
+    "negative_test_evidence": "Local contract source guard and randomized reference-mask parity with order reversal, duplicate-hint negative cases plus destructive guard mutations."
+  },
+  "runtime_status": "NEED_QUEST3_VDXR_SCENE_MATCHED_P95_P99",
+  "performance_evidence": "Source-level reduction in mask probes for large sparse VB windows only; no hardware FPS asserted.",
+  "material_result_sha": "65175bcd90b0e45bcbd72e0d0b6c6ba36b707426",
+  "validation_bearing_result_sha": "e1289d17d18ce8a4b9e764ca9baeeacb1762cbed",
+  "result_sha": "e1289d17d18ce8a4b9e764ca9baeeacb1762cbed",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "e1289d17d18ce8a4b9e764ca9baeeacb1762cbed",
+    "dx9ex_active": {
+      "run_id": 38466951557,
+      "head_sha": "e1289d17d18ce8a4b9e764ca9baeeacb1762cbed",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "host": "SUCCESS",
+        "game": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      }
+    },
+    "domain_isolation": {
+      "run_id": 38466951490,
+      "head_sha": "e1289d17d18ce8a4b9e764ca9baeeacb1762cbed",
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38466448692,
+      "head_sha": "65175bcd90b0e45bcbd72e0d0b6c6ba36b707426",
+      "conclusion": "SUCCESS",
+      "source_tree_unchanged_in_validation_commits": true,
+      "jobs": {
+        "msvc-analyze-active-game": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "source-cross-domain": "SUCCESS"
+      }
+    },
+    "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+    "performance_evidence": "No HMD p95/p99 measurements or FPS gain proven"
+  },
+  "c6_recorded_at_kst": "2026-10-14 06:06 KST"
+}

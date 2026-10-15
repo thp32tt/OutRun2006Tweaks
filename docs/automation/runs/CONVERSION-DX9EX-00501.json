@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00501",
+  "production_id": "CONVERSION-DX9EX-00501",
+  "event_id": "CONVERSION-DX9EX-00501-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "base_sha": "7e601d6d090812514e8c99b31988a02b9a172eb0",
+  "source_material_sha": "3ca996646d7f643342d4ea3aaeae5fede1ba9105",
+  "validation_bearing_result_sha": "181a6947c240bb7ce158641b9ca5c16d2509e138",
+  "result_sha": "181a6947c240bb7ce158641b9ca5c16d2509e138",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00501]",
+  "selected_work_item": "DX9EX-STRUCT-DIRECTGPU-ACK-OWNER-CENTRALIZE-0083",
+  "summary": "Centralized bounded ACK snapshot reopen/retry policy in the R13 ACK-mapping owner, made both R32 final-owner and R13 fallback scans reuse one whole-ring snapshot, and retired the legacy per-slot ACK compatibility API.",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "changed_paths": [
+      "src/vr/d3d9/stereo_renderer_r13.cpp",
+      "src/vr/d3d9/stereo_renderer_r32.cpp",
+      "tools/verify_vr_dx9ex_reset_transport_contract.py",
+      "tools/verify_vr_refactor_contract.py"
+    ],
+    "initial_candidate": {
+      "sha": "3ca996646d7f643342d4ea3aaeae5fede1ba9105",
+      "run_id": 37544704160,
+      "policy_job_id": 112545799585,
+      "result": "FAIL_STALE_R32_RETRY_VERIFIER",
+      "signature": "R32 final-owner free-slot scan missing ordered markers: if (!ackSnapshotValid)"
+    },
+    "repair_1": {
+      "sha": "3d0cb3cc252f2f983cd6b936238ac3516054a194",
+      "run_id": 37544780787,
+      "policy_job_id": 112546053480,
+      "result": "FAIL_UNSCOPED_R13_RETIREMENT_ORDER_VERIFIER",
+      "signature": "R13 base DirectGPU whole-ring ACK scan order changed"
+    },
+    "repair_2": {
+      "sha": "181a6947c240bb7ce158641b9ca5c16d2509e138",
+      "dx9ex_active_run_id": 37544878521,
+      "domain_isolation_run_id": 37544878509,
+      "jobs": {
+        "policy": 112546373533,
+        "full_chain_compile": 112546497396,
+        "game": 112546497434,
+        "host": 112546497454,
+        "package": 112547636152
+      },
+      "result": "SUCCESS"
+    },
+    "package_artifact_id": 11450716269,
+    "package_artifact_digest": "sha256:6d01fd6e1c155f1f96a8a957effa09564710cc6cbcddd4b179457365f1442b5d",
+    "static_census": {
+      "r13_legacy_per_slot_api_count": 0,
+      "r32_legacy_per_slot_api_count": 0,
+      "r32_whole_ring_snapshot_call_sites": 1
+    }
+  },
+  "next_action": "No additional work is required for TASK_ID CONVERSION-DX9EX-00501. Runtime/HMD behavior remains UNTESTED."
+}

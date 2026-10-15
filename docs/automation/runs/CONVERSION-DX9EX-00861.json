@@ -1,0 +1,143 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00861",
+  "production_id": "CONVERSION-DX9EX-00861",
+  "event_id": "CONVERSION-DX9EX-00861-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
+  "run_key": "CONVERSION-DX9EX-00861",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve one scene-correct binocular HUD ownership for all original stage-extension +TIME sprite and numeric producers across queued and direct D3DX submissions, without introducing misplaced/doubled numeric glyphs or changing time, GOAL or ordinary overlays.",
+    "scope_boundary": "Only exact stage-extension +TIME outgoing D3DX batch boundary before direct E8 glyph ScreenHud scope; retain original queued +TIME, GOAL, rank, effects, SkyGlow and DX11/DXVK independent behavior.",
+    "trace_stages": [
+      "Original +TIME sprite E8 callsites 0x9898E/0x98A36/0x98AC6 and numeric 0x989AD/0x98A10/0x98A89 are scoped and individually tagged in hooks_uiscaling.cpp.",
+      "R64 ID3DXSprite Begin/Draw/Flush/End tracks the owner and homogeneity of batched work so the preexisting Draw batch can be submitted under its outgoing source before direct numeric producer takeover.",
+      "StageExtensionEnter now invokes BeforeDirectStageSource before ScreenHud direct ownership, and queue producer submission retains strict exact +TIME separation and downstream R26/R30 per-eye HUD classification."
+    ],
+    "subcomponents": [
+      "Before direct +TIME numeric ScreenHud activation, conditionally flush only an already tracked, matching-sprite, homogeneous prior D3DX batch under its previous owner.",
+      "Retain fail-closed mixed/unknown batches, original Draw HRESULT and nested queue scope handling; preserve existing queue enter/leave and numeric StageExtensionTime source hooks with changed-area mutation regression."
+    ],
+    "acceptance_items": [
+      {
+        "id": "direct_batch_order",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Direct numeric source and D3DX GPU submission",
+        "expected_behavior": "A proven preceding D3DX batch is submitted under its original semantic before the direct numeric +TIME ScreenHud producer assumes ownership; +TIME glyph producers remain unchanged."
+      },
+      {
+        "id": "mixed_batch_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Unknown or mixed sprite source ownership",
+        "expected_behavior": "Unknown, nonhomogeneous or mismatched sprite batches are never forcibly promoted into +TIME and do not trigger unconditional global Flush or alter other effects."
+      },
+      {
+        "id": "queued_compatibility",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Queued stage sprites plus GOAL and rank",
+        "expected_behavior": "The existing six exact +TIME edges, priority queue selection, GOAL and rank GPU batch semantics are preserved without any DX11/DXVK changes."
+      },
+      {
+        "id": "integration",
+        "category": "integrated_validation",
+        "behavior_area": "Validation bearing GitHub SHA and shipped owner",
+        "expected_behavior": "Exact-SHA DX9Ex Active policy, Win32 game, x64 host, full-chain and package, Domain Isolation and affected tests pass, while Quest3 runtime remains separately untested."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "ID3DXSprite Draw may queue work until Flush or End; StageExtensionEnter originally acquired ScreenHud direct producer owner before isolating a pending previous producer batch. The original direct E8 numeric +TIME path is separate from queued SpriteNodes.",
+    "root_cause": "At a direct +TIME producer boundary a preexisting homogeneous tracked D3DX batch could be flushed as the first numeric glyph is enqueued, under the incoming ScreenHud scope rather than the outgoing producer. This is a source-proven ownership ordering risk, not yet a hardware-proven cause of observed visual double rendering.",
+    "source_trace": [
+      "hooks_uiscaling.cpp StageExtensionEnter calls FlushD3DXBeforeDirectStageSource before StageExtensionDirectDrawOwner.emplace, preserving original direct E8 callsite logic.",
+      "VRProjectedD3DXSpriteIsolationR64::BeforeDirectStageSource checks queue state, live sprite identity and PendingDraws before CanFlushD3DXPreQueueStageBatch verifies old-scope/outgoing producer homogeneity.",
+      "The wrapper delegates to FlushTracked(sprite) under the outgoing owner; existing D3DX Draw/Flush/End hooks and queue BeforeQueueNode/BeforeQueueEnd own subsequent per-eye semantics."
+    ],
+    "alternatives_rejected": [
+      "Do not flush every D3DX Draw or unconditionally at incoming +TIME glyph entry, because that can relabel other producers and change batching order.",
+      "Do not globally classify generic sprites ScreenHud, suppress Lens/SkyGlow, or change game time ticks; they are not bounded by the exact direct stage call.",
+      "Do not claim new Quest3 visual correctness from a static mutation guard or passing Windows CI."
+    ],
+    "eye_ownership": "Exact StageExtensionTime producer remains ScreenHud for downstream R26+HUD eye mapping, while preexisting batch is flushed under its saved original owner. Real optical single-image acceptance remains untested.",
+    "fix_evidence": "Material source commit 47750dd2896872569624e7a9f5dfe23bf09d8809 changes hooks_uiscaling.cpp and extends tools/verify_vr_stage_extension_d3dx_batch_owner.py mutation checks for direct old-batch ordering and mixed-batch fallback.",
+    "negative_test_evidence": "Changed-area verifier rejects omitted direct preflush, ownership acquisition before flush, and forced homogeneous promotion; these are static mutation regressions, not a real D3D/Quest3 execution."
+  },
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "No Quest3/VDXR/gameplay optical test was performed for this task; Windows CI alone cannot establish +TIME HUD stereo single image.",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00861.json"
+  ],
+  "material_result_sha": "47750dd2896872569624e7a9f5dfe23bf09d8809",
+  "validation_bearing_result_sha": "2bd349ab95c055af9f00876a9d3ddc72df64e554",
+  "acceptance_results": {
+    "direct_batch_order": "PASS_BUILD",
+    "mixed_batch_fallback": "PASS_BUILD",
+    "queued_compatibility": "PASS_BUILD",
+    "integration": "PASS_EXACT_SHA"
+  },
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "material_sha": "47750dd2896872569624e7a9f5dfe23bf09d8809",
+    "exact_sha": "2bd349ab95c055af9f00876a9d3ddc72df64e554",
+    "failed_predecessors": [
+      {
+        "sha": "47750dd2896872569624e7a9f5dfe23bf09d8809",
+        "run_id": 38628543145,
+        "reason": "missing feature run JSON; no game/host/package attempted"
+      },
+      {
+        "sha": "864e08f005d159e53e707832cb0ff0b3705f55cb",
+        "run_id": 38628882784,
+        "reason": "static mutation false negative in direct batch outgoing producer proof; corrected"
+      }
+    ],
+    "exact_sha_workflows": {
+      "dx9ex_active": {
+        "run_id": 38629146802,
+        "conclusion": "success",
+        "policy": "SUCCESS",
+        "host": "SUCCESS",
+        "game": "SUCCESS",
+        "full_chain_compile": "SUCCESS",
+        "package": "SUCCESS"
+      },
+      "domain_isolation": {
+        "run_id": 38629146796,
+        "conclusion": "success"
+      }
+    },
+    "affected_material_sha_workflows": {
+      "full_source_impact": {
+        "run_id": 38628543162,
+        "conclusion": "success",
+        "sha": "47750dd2896872569624e7a9f5dfe23bf09d8809"
+      },
+      "hud_inspector": {
+        "run_id": 38628543228,
+        "conclusion": "success",
+        "sha": "47750dd2896872569624e7a9f5dfe23bf09d8809"
+      }
+    },
+    "runtime_caveat": "No real Quest3/VDXR gameplay visual test. Static/Windows CI is not optical evidence for single +TIME or stable stereo.",
+    "source_material_changes": [
+      "src/hooks_uiscaling.cpp",
+      "tools/verify_vr_stage_extension_d3dx_batch_owner.py"
+    ],
+    "duplicate_score_prevention_key": "CONVERSION-DX9EX-00861"
+  },
+  "score_once": true,
+  "score_delta_this_retry": 1
+}

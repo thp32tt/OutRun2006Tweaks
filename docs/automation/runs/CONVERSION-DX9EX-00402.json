@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00402",
+  "production_id": "CONVERSION-DX9EX-00402",
+  "event_id": "CONVERSION-DX9EX-00402-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "queue_controller_contract": {
+    "path": "docs/automation/QUEUE_CONTROLLER_CONTRACT.md",
+    "status": "APPLIED"
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "c355165d2e23210019d1bbbdd7be4e3326b6d819",
+  "source_material_sha": "cded52488c34a6ce1a81a7f83780a1be93fcf5ba",
+  "result_sha": "4183a3bc6970653b5dab60a8f5c64ba1bc01c318",
+  "material_result_sha": "4183a3bc6970653b5dab60a8f5c64ba1bc01c318",
+  "validation_bearing_result_sha": "4183a3bc6970653b5dab60a8f5c64ba1bc01c318",
+  "state_commit_sha": "dffaef60296d4358f5106f67af4cd9349c11825f",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00402]",
+  "selected_work_item": "VR-HUD-SUMO-REPLAY-SEMANTIC-LOSS-001-CI-GUARD",
+  "summary": "Cycle 1100 structural review explicitly deferred physical R31/R32 hook-layer retirement until a separate bounded equivalence proof exists, so this task did not force that risky refactor. It selected the highest-priority executable regression-maintenance item already integrated but BUILD_PENDING: Sumo UI replay semantic ownership. Added a deterministic verifier that requires non-consuming PeekSpriteNodeScope capture, fresh-node-success ordering, and explicit non-None scope re-registration without blanket ScreenHud/WorldBillboard promotion; wired the verifier into the canonical DX9Ex Active policy gate and path trigger. No runtime source behavior was broadened by 00402.",
+  "changed_paths": [
+    "tools/verify_vr_sumo_replay_semantics.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/VR_PROBLEM_HISTORY.md",
+    "docs/VR_REGRESSION_KNOWLEDGE.json",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00402.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read latest branch HEAD, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, VR_REFACTOR_STATE cycle 1100, VR_AUTODEV_STATE, VR_PROBLEM_HISTORY, VR_REGRESSION_KNOWLEDGE, recent refactor/test commits, Issue #13 and Issue #14. Latest GitHub branch state was treated as SSOT."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "finding": "Cycle 1100 declares R31/R32 physical hook retirement unsafe without a separate equivalence proof preserving install fallback, Reset/Present lifecycle, StateBlock coverage and lower R29 fallback. The next executable maintenance target was VR-HUD-SUMO-REPLAY-SEMANTIC-LOSS-001: source candidate 36f0f394 already existed but was BUILD_PENDING and lacked a deterministic registry/gate contract."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "cded5248 adds tools/verify_vr_sumo_replay_semantics.py; 4183a3bc wires it into vr-dx9ex-active path filtering and policy execution. The guard verifies PeekSpriteNodeScope is non-consuming, replay waits for successful fresh-node linkage, restores the captured payload first, and re-registers exactly the captured explicit non-None scope without fixed HUD/world promotion."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact validation-bearing SHA 4183a3bc6970653b5dab60a8f5c64ba1bc01c318: DX9Ex Active Validation 37267187539 SUCCESS (policy 111626371669, host 111626438295, game 111626438290, full-chain-compile 111626438298, package 111627846176); Domain Isolation Guard 37267187590 SUCCESS. N100 exact-SHA new verifier + architecture/R51/R32-R34/hook-graph/refactor/near-plane + workflow YAML suite PASS. No HMD/game runtime test performed."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "source_material_sha": "cded52488c34a6ce1a81a7f83780a1be93fcf5ba",
+      "result_sha": "4183a3bc6970653b5dab60a8f5c64ba1bc01c318",
+      "validation_bearing_result_sha": "4183a3bc6970653b5dab60a8f5c64ba1bc01c318",
+      "task_tagged_commits": [
+        "cded52488c34a6ce1a81a7f83780a1be93fcf5ba test(vr): add Sumo replay semantic verifier [AUTO:CONVERSION-DX9EX-00402]",
+        "4183a3bc6970653b5dab60a8f5c64ba1bc01c318 ci(vr): gate Sumo replay semantic ownership [AUTO:CONVERSION-DX9EX-00402]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Artifact 11327231626 OutRun2-VR-DX9EX-ACTIVE-4183a3bc6970653b5dab60a8f5c64ba1bc01c318 digest sha256:44a63e786dbd2a304de8b4a8b248d407aa30e2eb2b3cd4a4520ed5661cf8aa52 size 2730667 bytes. Build artifact is not runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "state_persisted": true,
+      "state_commit_sha": "dffaef60296d4358f5106f67af4cd9349c11825f",
+      "structural_cycle": "UNCHANGED_1100",
+      "issue13_update": "RECORDED_BUILD_VERIFIED_NEED_HMD_TEST",
+      "issue13_comment_id": 5988675278,
+      "issue14_update": "RECORDED",
+      "issue14_comment_id": 5988675623,
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "evidence": {
+    "source_candidate": {
+      "sha": "36f0f3949bd18993cba3f46585659874e3d7a89f",
+      "status": "ALREADY_IN_BRANCH_BEFORE_00402"
+    },
+    "dx9ex_active": {
+      "run_id": 37267187539,
+      "conclusion": "success",
+      "exact_sha": "4183a3bc6970653b5dab60a8f5c64ba1bc01c318",
+      "jobs": {
+        "policy": 111626371669,
+        "host": 111626438295,
+        "game": 111626438290,
+        "full_chain_compile": 111626438298,
+        "package": 111627846176
+      },
+      "artifact_id": 11327231626,
+      "artifact_digest": "sha256:44a63e786dbd2a304de8b4a8b248d407aa30e2eb2b3cd4a4520ed5661cf8aa52"
+    },
+    "domain_isolation": {
+      "run_id": 37267187590,
+      "conclusion": "success",
+      "exact_sha": "4183a3bc6970653b5dab60a8f5c64ba1bc01c318"
+    },
+    "n100_local": {
+      "conclusion": "AUXILIARY_EXACT_SHA_STATIC_PASS",
+      "exact_sha": "4183a3bc6970653b5dab60a8f5c64ba1bc01c318",
+      "checks": [
+        "py_compile Sumo replay semantic verifier",
+        "Sumo replay semantic contract",
+        "architecture",
+        "R51 runtime contract",
+        "R32-R34 compatibility/Present",
+        "hook graph",
+        "refactor contract",
+        "near-plane active gate",
+        "workflow YAML parse",
+        "git diff check"
+      ]
+    }
+  },
+  "next_action": "Do not claim the replay semantic runtime defect fixed from build evidence alone. Quest3/VDXR runtime-test exact result 4183a3bc with CORRECTNESS, checking replayed white result/+TIME/checkpoint UI, ordinary HUD/menu, rival/world-marker anchoring and frame pacing. Structural cycle remains 1100; physical R31/R32 hook retirement remains deferred until a bounded equivalence proof exists.",
+  "controller_dispatch": {
+    "task_id": "CONVERSION-DX9EX-00402",
+    "production_id": "CONVERSION-DX9EX-00402",
+    "event_id": "CONVERSION-DX9EX-00402-E001",
+    "event_type": "dispatch",
+    "lane": "DX9EX",
+    "target_branch": "vr-d3d9ex-focus",
+    "attempt": "1/3",
+    "source": "CURRENT_USER_QUEUE",
+    "material_result_sha": "4183a3bc6970653b5dab60a8f5c64ba1bc01c318",
+    "validation_bearing_result_sha": "4183a3bc6970653b5dab60a8f5c64ba1bc01c318",
+    "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION_WITH_N100_EXACT_STATIC",
+    "runtime_validation": "UNTESTED"
+  },
+  "validated_at_kst": "2026-10-05T14:25:17+09:00",
+  "completed_at_kst": "2026-10-05T14:29:32+09:00"
+}

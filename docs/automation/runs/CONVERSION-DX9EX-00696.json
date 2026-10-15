@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00696",
+  "production_id": "CONVERSION-DX9EX-00696",
+  "event_id": "CONVERSION-DX9EX-00696-C6",
+  "event_type": "C6_RESULT_ONLY",
+  "feature_id": null,
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "source_material_sha": "6e0898fc144e655bfa740ca0179c28ce2b815625",
+  "material_result_sha": "6e0898fc144e655bfa740ca0179c28ce2b815625",
+  "result_sha": "6e0898fc144e655bfa740ca0179c28ce2b815625",
+  "validation_bearing_result_sha": "6e0898fc144e655bfa740ca0179c28ce2b815625",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "material_commits": [
+    "6e0898fc144e655bfa740ca0179c28ce2b815625"
+  ],
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r33.cpp",
+    "tools/verify_vr_r32_depthless_right_pass_fastpath.py"
+  ],
+  "feature_contract": {
+    "goal": "Reuse the authoritative saved post-left-draw R33 depth attachment for right-eye depth bind, depthless decision, and restore across fast-world and HUD stereo primitives, avoiding redundant cross-TU tracked-depth lookups.",
+    "acceptance": "Preserve unreliable StateBlock fallback, failed-bind restoration, and stereo depth/viewport handling; add bounded negative-mutation regression checks; verify the exact material SHA with DX9Ex Active Validation 5/5, Domain Isolation Guard, and DX9Ex Full Source Impact Review. Quest3/VDXR runtime remains UNTESTED."
+  },
+  "acceptance_results": {
+    "r33_saved_post_left_depth_reuse": "MATERIAL_COMMITTED",
+    "r33_fast_world_hud_right_eye_depth_binding": "MATERIAL_COMMITTED",
+    "r33_depthless_and_failed_bind_restoration_guard": "PASS_EXACT_SHA_POLICY",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_EXACT_SHA",
+    "hud_inspector": "SUCCESS_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38270787270,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "6e0898fc144e655bfa740ca0179c28ce2b815625",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "game": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38270787211,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "6e0898fc144e655bfa740ca0179c28ce2b815625",
+      "conclusion": "success"
+    },
+    {
+      "id": 38270787360,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "6e0898fc144e655bfa740ca0179c28ce2b815625",
+      "conclusion": "success"
+    },
+    {
+      "id": 38270787358,
+      "workflow": "OutRun EXE HUD Inspector CI",
+      "head_sha": "6e0898fc144e655bfa740ca0179c28ce2b815625",
+      "conclusion": "success"
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "No HMD/Quest3/VDXR game runtime or headset rendering/performance measurements were performed in this C6 result-only step.",
+  "prior_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "prior_hold_resolution": "CREATED_MISSING_C6_RUN_RECORD_FROM_EXISTING_MATERIAL_COMMIT_AND_EXACT_SHA_CI",
+  "score_credit_key": "CONVERSION-DX9EX-00696",
+  "score_change": 0,
+  "score_status": "C6_BOOKKEEPING_NO_ADDITIONAL_CREDIT",
+  "notes": "The requested run record was absent at the validation-bearing branch head, so this file is created without changing source or the validated SHA. Feature contract and acceptance fields reflect the original material commit and observed exact-SHA CI; no prior same-path record existed to overwrite. C6 is a separate [skip ci] bookkeeping-only commit. No CI was rerun; no duplicate scoring."
+}

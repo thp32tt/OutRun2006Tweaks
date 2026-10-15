@@ -1,0 +1,85 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00745",
+  "production_id": "CONVERSION-DX9EX-00745",
+  "event_id": "CONVERSION-DX9EX-00745-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00745",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "704cde425cdfdab8631275e8b57946dbf8af74e3",
+  "material_result_sha": "704cde425cdfdab8631275e8b57946dbf8af74e3",
+  "validation_bearing_result_sha": "1106e779efd4eb7cdd98f04fcda4a5ace6f133b7",
+  "result_sha": "1106e779efd4eb7cdd98f04fcda4a5ace6f133b7",
+  "material_commits": [
+    "704cde425cdfdab8631275e8b57946dbf8af74e3",
+    "1106e779efd4eb7cdd98f04fcda4a5ace6f133b7"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119: ensure 4:3 menu sidebars ignore inherited game scissor and stencil while preserving the prior render state for subsequent game and F11 draws.",
+    "completed_scope": "Source commit 704cde42 snapshots scissor/stencil state, bypasses both clip tests only around two sidebar draws, and restores both states. Repair commit 1106e779 fixes the CI-owned order check to start after clipStateReady declaration because EndScene's live-resize path intentionally contains the same game/menu predicate earlier; seven negative mutations remain detected.",
+    "remaining_acceptance": [
+      "Issue #119 integrated responsive gameplay HUD, menu and ESC placement plus F11 text legibility require matching Quest3/VDXR runtime optical evidence.",
+      "Source CI confirms the test and build, not binocular visual PASS or measured headset FPS improvement."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_POLICY_7_MUTANTS",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_SOURCE_SHA_704cde42",
+    "hud_inspector": "SUCCESS_SOURCE_SHA_704cde42",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38345975852,
+      "head_sha": "1106e779efd4eb7cdd98f04fcda4a5ace6f133b7",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "5/5 SUCCESS"
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38345975831,
+      "head_sha": "1106e779efd4eb7cdd98f04fcda4a5ace6f133b7",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38345740584,
+      "head_sha": "704cde425cdfdab8631275e8b57946dbf8af74e3",
+      "status": "completed",
+      "conclusion": "success",
+      "note": "Original game-source SHA; only CI verifier script changed afterward."
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38345740670,
+      "head_sha": "704cde425cdfdab8631275e8b57946dbf8af74e3",
+      "status": "completed",
+      "conclusion": "success",
+      "note": "Original game-source SHA; only CI verifier script changed afterward."
+    }
+  ],
+  "score_delta": 0,
+  "score_reason": "Retry E003 of the same TASK_ID/work_key; technical repair and build checkpoint, not independent fully completed Quest3 feature. Do not duplicate score.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "C6 bookkeeping only [skip ci]. Material game code SHA 704cde42, final validation-bearing/result SHA 1106e779. Earlier DX9Ex run 38345740662 failed from a verifier false-negative and was superseded by exact-SHA SUCCESS 38345975852. Keep source-only Full Impact/HUD evidence distinguished from final exact-SHA required gates."
+}

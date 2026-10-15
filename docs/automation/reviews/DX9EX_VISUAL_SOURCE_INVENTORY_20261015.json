@@ -1,0 +1,241 @@
+{
+  "review_base_sha": "837550addbd7ec26bee680c0f39f9abb5077dde9",
+  "git_tree_entries": 1112,
+  "source_files_fetched_and_searched": 56,
+  "scope_limit": "Inventory/search of relevant source graph; not a claim of line-by-line whole-repository review.",
+  "sources": [
+    {
+      "path": "src/game.hpp",
+      "blob_sha": "a03568d56eee1080a4b4d6da57d168fb20a46d22"
+    },
+    {
+      "path": "src/hooks_audio.cpp",
+      "blob_sha": "4791dfa2b0a09aec2892594e8ca86c76ac984ae5"
+    },
+    {
+      "path": "src/hooks_bugfixes.cpp",
+      "blob_sha": "c95b2aea27604a3955effa1c9e637176d9df051d"
+    },
+    {
+      "path": "src/hooks_drawdistance.cpp",
+      "blob_sha": "e17e5f2559e9160ff4bbb1e37b8eeb1e512d4c8c"
+    },
+    {
+      "path": "src/hooks_exceptions.cpp",
+      "blob_sha": "3752f862585add5e6735716476ab6b9c62442004"
+    },
+    {
+      "path": "src/hooks_flac.cpp",
+      "blob_sha": "3fb4f5ba3039b3ec729e05e255990cd8545c5835"
+    },
+    {
+      "path": "src/hooks_forcefeedback.cpp",
+      "blob_sha": "44e9fc4d477408564f4f460e2ee07da1d9dbfc59"
+    },
+    {
+      "path": "src/hooks_framerate.cpp",
+      "blob_sha": "ab6c8aeeea2fb6b22e4d1c3d3671054bd705124a"
+    },
+    {
+      "path": "src/hooks_graphics.cpp",
+      "blob_sha": "886cfd6a0221a44d54ec0f287dd9e4c345c7e85b"
+    },
+    {
+      "path": "src/hooks_input.cpp",
+      "blob_sha": "d9c29bdba43245d780fc27fb81efacf134d43a8f"
+    },
+    {
+      "path": "src/hooks_misc.cpp",
+      "blob_sha": "28a74c7ebaf71a22ee64d9695e838ce47ef28a0b"
+    },
+    {
+      "path": "src/hooks_textures.cpp",
+      "blob_sha": "d9e2b0dc1245fae88d5ddb9b6b7cccb8e97efdf7"
+    },
+    {
+      "path": "src/hooks_uiscaling.cpp",
+      "blob_sha": "6b0fc50f5cb095ec6592137c29af1af6ebf21c12"
+    },
+    {
+      "path": "src/hooks_wheel_ffb.cpp",
+      "blob_sha": "3042d5ef4abafbe71f3f21443175ed68ce6704d3"
+    },
+    {
+      "path": "src/hooks_wheel_ffb_build.cpp",
+      "blob_sha": "713257433cdbf11ace6e99998825c12fe29b95b5"
+    },
+    {
+      "path": "src/vr/d3d9/device_probe.cpp",
+      "blob_sha": "40ddceb9a3c1ae7f64e120c49f3c1cb36a8f6205"
+    },
+    {
+      "path": "src/vr/d3d9/draw_state_helpers.hpp",
+      "blob_sha": "ecba2ba01d1c1af135567a8ac94c45aa39ff5e6c"
+    },
+    {
+      "path": "src/vr/d3d9/ex_device_upgrade.cpp",
+      "blob_sha": "82feae7ef99c10c173d1abcc56c21fdd17f609bd"
+    },
+    {
+      "path": "src/vr/d3d9/ex_device_upgrade_r13.cpp",
+      "blob_sha": "80ce04900a7699aaefb7e040e25cab4a01618dbe"
+    },
+    {
+      "path": "src/vr/d3d9/ex_device_upgrade_r14.cpp",
+      "blob_sha": "f358877a6b907f51f0cfa5b8d48355eb28e28b63"
+    },
+    {
+      "path": "src/vr/d3d9/ex_device_upgrade_r15.cpp",
+      "blob_sha": "db37726470322c6815cec7d547aebe73f17029ac"
+    },
+    {
+      "path": "src/vr/d3d9/gpu_water_profiler.hpp",
+      "blob_sha": "6041c1ad3e1ff3537ebba71f8816ba0cfd77d3e7"
+    },
+    {
+      "path": "src/vr/d3d9/helper_ex_probe.cpp",
+      "blob_sha": "3d836f3e67af46d7c219a0bbcf4c6d6c63408e7a"
+    },
+    {
+      "path": "src/vr/d3d9/hud_edge_transition.hpp",
+      "blob_sha": "a6d5684b259a504bcc6d88647f32b29a5e12de90"
+    },
+    {
+      "path": "src/vr/d3d9/pause_menu_eye_affine.hpp",
+      "blob_sha": "5365aae0092886c9f3ca8cb7e2c9cc500eede583"
+    },
+    {
+      "path": "src/vr/d3d9/r13_bridge.hpp",
+      "blob_sha": "c31f773e8176fc7a82e3401e7c68055af14dfae9"
+    },
+    {
+      "path": "src/vr/d3d9/r32_policy.hpp",
+      "blob_sha": "4f077829206fb08da4d87489c780208a22eb0f22"
+    },
+    {
+      "path": "src/vr/d3d9/shader_fingerprint_gpl.hpp",
+      "blob_sha": "35d59f7af9884c02ab0b05e13384639306387459"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_backend.hpp",
+      "blob_sha": "24933b53e69ccfd8356cd47eca86e4e2a5663195"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer.cpp",
+      "blob_sha": "eef48e799d75925a08eaefe21478dc40f9b718a3"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r13.cpp",
+      "blob_sha": "dd343bb8e9c9db7b9c84f73e353e36bc0b84e1ea"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r20.cpp",
+      "blob_sha": "1d71a0cf892b73d5dfec36f433d36479a67c37df"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r21.cpp",
+      "blob_sha": "29960e1901168a5be5ecde59a63ab02561f7bd48"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r22.cpp",
+      "blob_sha": "dd1cbed902f468166dcf93598ca0b24043584dad"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r23.cpp",
+      "blob_sha": "a05e082a9cba4d8ac7234e962c046a0e7226f8f8"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r26.cpp",
+      "blob_sha": "29ca3863533cfba689dc1017548036fdec6db851"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r26_compare.cpp",
+      "blob_sha": "72fce08c507316b5e1e8a048ab710a166235e4cb"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r29.cpp",
+      "blob_sha": "3b6022fcd5107260a56cec5338b853dcda8dd655"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r29_c1_compare.cpp",
+      "blob_sha": "eba3ec451c3db41c6f36c31dc9f1829b2e0d509f"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r30.cpp",
+      "blob_sha": "48c7f001e24876c001c75b1d639dfb96ca0a146f"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r30_c2_compare.cpp",
+      "blob_sha": "93d6c06fb9507217173f1e0066d6cd67d7b57af8"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+      "blob_sha": "78ada527de17edc97c78e164488ea18cf4bcc028"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r31.cpp",
+      "blob_sha": "cc0941a1506fbb633cb40fcae0536ced466b817c"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r32.cpp",
+      "blob_sha": "19eef3aeac74af819673ffe97770222e6d8e41a7"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r33.cpp",
+      "blob_sha": "9e925ea611724ee22ee4ec9e8f195bedf62d3410"
+    },
+    {
+      "path": "src/vr/d3d9/stereo_renderer_r7.inc",
+      "blob_sha": "9e0620738df75f688924eabfb2f10aca7273f0df"
+    },
+    {
+      "path": "src/vr/d3d9/vr_pass_policy.hpp",
+      "blob_sha": "54e6a2cad3c2f60853fc74a72865148df1cf4690"
+    },
+    {
+      "path": "src/vr/game/game_adapter.hpp",
+      "blob_sha": "358ca021a23cf14db2c74aa20ba171a1c896f7cb"
+    },
+    {
+      "path": "src/vr/game/outrun_renderer.cpp",
+      "blob_sha": "f6f355718864d02ff9b9735edeaa4591f0f71896"
+    },
+    {
+      "path": "src/vr/game/outrun_renderer_r13.cpp",
+      "blob_sha": "7eb7fea82bc263fe81912ef565e287a2e7712177"
+    },
+    {
+      "path": "src/vr/game/outrun_renderer_r23.cpp",
+      "blob_sha": "f352a9d72e4ec9c1f763965b6a48289b44d30034"
+    },
+    {
+      "path": "src/vr/game/outrun_renderer_r29.cpp",
+      "blob_sha": "5b7cc2105f92883fc860f9e6c6f0a39a1c8ec279"
+    },
+    {
+      "path": "src/vr/game/render_semantics.hpp",
+      "blob_sha": "01019d016cb36e11724ecc07e13a46f0581cdcc7"
+    },
+    {
+      "path": "src/vr/hud_semantics.hpp",
+      "blob_sha": "5ba35477b84d8066c933ec002fa21587944a419c"
+    },
+    {
+      "path": "vrhost/src/main_r23.cpp",
+      "blob_sha": "93821baf6e5fc3359ec592561f8886803298f9a4"
+    },
+    {
+      "path": "vrhost/src/runtime/menu_content_aspect.hpp",
+      "blob_sha": "0cd506ad1dff7a43cf9d5b58f2b1f92c4b839266"
+    }
+  ],
+  "concurrent_source_changes": [
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00851.json",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_dx9ex_dense_scene_perf.py",
+    "tools/verify_vr_r30_positiont_decl.py"
+  ],
+  "counterexample_result": "COUNTEREXAMPLE_REPRODUCED; actual game batch route UNPROVEN",
+  "runtime_validation": "UNTESTED"
+}

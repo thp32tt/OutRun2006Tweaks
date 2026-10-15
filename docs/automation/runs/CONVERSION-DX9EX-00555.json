@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00555",
+  "production_id": "CONVERSION-DX9EX-00555",
+  "event_id": "CONVERSION-DX9EX-00555-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "4f277a1785e1dabdc88f91dd8e7b9d1de2edd05f",
+  "material_result_sha": "b13cc088462e6335b06c5ef10cf5c605a46599b9",
+  "validation_bearing_result_sha": "b13cc088462e6335b06c5ef10cf5c605a46599b9",
+  "result_sha": "b13cc088462e6335b06c5ef10cf5c605a46599b9",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00555]",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "retry_allowed": false,
+  "ci_gate_complete": true,
+  "controller_terminal": true,
+  "selected_work_item": "DX9EX-P0-HUD-DDS-FAST-EXPLICIT-DIMENSIONS-NATIVE-FALLBACK",
+  "summary": "Fix the fast DDS row-byte/source-pitch mismatch for explicitly resized D3DX calls before GPU upload. Reject nonintrinsic Width or Height after DDS descriptor verification and delegate resampling to existing original D3DX fallback. Add exact source contract guards and two distinct negative mutants; preserve original world/texture/HUD/SkyGlow/pose semantics.",
+  "changed_paths": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_hud_dds_loader.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated GitHub target HEAD/remote branch, AGENTS.md, DX9Ex state/queue/history, Issue 13/14, original emoose texture/UIScaling code, P0 visual and DDS verifiers examined. No existing task 00555 record or conflicting work-key claim found. Existing 00554 material already complete and not rerun.",
+    "C1_REVIEW": "PASS: original fast D3DX DDS loader clamps explicit requested Width/Height but uses source packed row length from these dimensions without resampling. The scene Ex wrapper already safely dispatches unsupported cases to native D3DX. This is a bounded independent texture integrity repair; no unsupported runtime-causality claims.",
+    "C2_IMPLEMENT": "PASS: source now refuses explicit width/height unequal to DDS header before row/mip decoding; test harness pins early size contract plus two distinct width/height corruption mutations. Exactly two material paths and no HUD repeat 1000/5000 cycles.",
+    "C3_VALIDATE": "PASS: exact-SHA DX9Ex Active 37747986400 policy/host/game/R33 full-chain/package SUCCESS, EXE HUD Inspector 37747986465 both jobs SUCCESS, Domain Isolation 37747986399 SUCCESS, Full Source Impact 37747986421 three jobs SUCCESS.",
+    "C4_COMMIT": "PASS: real C++ loader plus Python verification source commit b13cc088462e6335b06c5ef10cf5c605a46599b9 on vr-d3d9ex-focus includes exact [AUTO:CONVERSION-DX9EX-00555] and no CI skip; remote SHA verified. Bookkeeping commit follows only after completion of all checked Actions.",
+    "C5_PACKAGE": "PASS: exact-SHA GitHub DX9Ex Active package artifact 11537192529 uploaded; no user deployment, runtime acceptance or baseline promotion authorized.",
+    "C6_RESULT": "PASS: Issue #14 production change event 6055729306 and durable GitHub runs JSON pinned to material SHA independent of checkpoint HEAD. AI 2 scoreboard RUN_KEY CONVERSION-DX9EX-00555-E001 once updated from 1224 to 1225; no duplicate attempt award."
+  },
+  "static_contract": {
+    "focused_preflight": "PASS",
+    "size_guard": {
+      "explicit_width_mismatch": "FAIL_CLOSED_TO_NATIVE_D3DX",
+      "explicit_height_mismatch": "FAIL_CLOSED_TO_NATIVE_D3DX",
+      "matching_or_default_dimensions": "FAST_LOADER_UNCHANGED"
+    },
+    "new_distinct_mutations": 2,
+    "ci_hud_inspector": "SUCCESS",
+    "hud_1000_5000_repeat": false
+  },
+  "ci_runs": {
+    "dx9ex_active": 37747986400,
+    "hud_inspector": 37747986465,
+    "domain_isolation": 37747986399,
+    "full_source_impact_supplemental": 37747986421
+  },
+  "ci_observed": {
+    "policy": "SUCCESS",
+    "game": "SUCCESS",
+    "host": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "canonical_exe_hud_analysis": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "full_source_impact": "SUCCESS"
+  },
+  "exact_sha_validation": {
+    "material_sha": "b13cc088462e6335b06c5ef10cf5c605a46599b9",
+    "active_run_id": 37747986400,
+    "active_result": "success",
+    "hud_run_id": 37747986465,
+    "hud_result": "success",
+    "domain_run_id": 37747986399,
+    "domain_result": "success",
+    "full_source_impact_run_id": 37747986421,
+    "full_source_impact_result": "success"
+  },
+  "package_artifact": {
+    "id": 11537192529,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-b13cc088462e6335b06c5ef10cf5c605a46599b9",
+    "size_bytes": 2749565,
+    "digest": "sha256:d1c1c12bbe6396b4335a6dd2c39d8838266348d2928691ac2bf9f0bb9ddea6de"
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "comment_id": 6055729306
+  },
+  "runtime_note": "No Quest 3/VDXR gameplay test for this SHA. Previous 00519 visual/HUD/rank/lens performance symptoms remain OPEN and require HMD. Static/CI build PASS is not runtime visual acceptance.",
+  "parallel_policy": "DX11 Native A and DX9Ex C concurrently active; DXVK B frozen. No DX11/DXVK/localization source changes.",
+  "score_status": "AWARDED_AI2_ONCE_CONVERSION-DX9EX-00555-E001",
+  "scoreboard_commit": "0593a27c5efd2ddda2a2884ee6505f3d71418db6",
+  "score_calculation": "AI2 previous confirmed 1224 + new material/source/CI outcome 1 = cumulative 1225, retry/rollover +0",
+  "next_action": "Mark CONVERSION-DX9EX-00555 done; do not rerun this TASK_ID. Continue a different independent DX9Ex stabilization source task, keeping HMD-gated findings NEED_HMD_TEST and runtime UNTESTED."
+}

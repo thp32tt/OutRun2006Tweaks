@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "task_id": "DX9EX-R84-R32-POSE-SEQ-OWNER-20261009",
+  "production_id": "DX9EX-R84-R32-POSE-SEQ-OWNER-20261009",
+  "source_mode": "CHAT_DIRECT",
+  "branch": "vr-d3d9ex-focus",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "selected_work_item": "DX9EX-R84-PORT-SEAMS-001",
+  "base_sha": "1f8df94422597705aa19ca77f2b8b4ac37d326b2",
+  "material_result_sha": "cf7e41af29b3a344360e39161e3485cc705b2e68",
+  "validation_bearing_result_sha": "52252466307813913bacc5ba208b6205651da81b",
+  "result_sha": "52252466307813913bacc5ba208b6205651da81b",
+  "summary": "Removed R32 direct FrameStereoPoseSequence read by adding R30SupportFrameStereoPoseSequence getter with exact original lower value. Added fail-closed refactor source verifier; corrected only its raw-regex escaping after original CI policy reported the verifier defect.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_refactor_contract.py"
+  ],
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "validation_history": [
+    {
+      "sha": "cf7e41af29b3a344360e39161e3485cc705b2e68",
+      "run": 37892255288,
+      "conclusion": "failure",
+      "classification": "SOURCE_VERIFIER_REGEX_ESCAPE_DEFECT",
+      "material_source_semantics_unchanged_in_successor": true
+    },
+    {
+      "sha": "52252466307813913bacc5ba208b6205651da81b",
+      "run": 37892353101,
+      "conclusion": "success",
+      "domain": 37892353086
+    }
+  ],
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37892353101,
+      "conclusion": "success",
+      "jobs": "policy+game+host+full-chain-compile+package all success",
+      "head_sha": "52252466307813913bacc5ba208b6205651da81b"
+    },
+    "domain": {
+      "run_id": 37892353086,
+      "conclusion": "success",
+      "head_sha": "52252466307813913bacc5ba208b6205651da81b"
+    },
+    "artifact": {
+      "id": 11599171847,
+      "digest": "sha256:9eb3d1e818950dd88c658780c8925548977408f603e47a59ae22eac90db5120a"
+    }
+  },
+  "pipeline": {
+    "C0": "GitHub source recovered",
+    "C1": "R32 direct pose read located",
+    "C2": "C++ owner facade changed",
+    "C3": "policy+Win32 game+host+R33 full-chain+package+domain CI SUCCESS",
+    "C4": "commits on focus",
+    "C5": "artifact confirmed",
+    "C6": "this durable result"
+  },
+  "next_action": "One independently bounded R29 effect-state owner facade for R32, then other lower dependencies. Do not mark CMake TU split or HMD PASS. User F11 normal protected.",
+  "score_policy": "Count only once after exact-SHA validation; intermediate retries and checkpoint comments add zero."
+}

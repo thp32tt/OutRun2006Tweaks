@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00458",
+  "production_id": "CONVERSION-DX9EX-00458",
+  "event_id": "CONVERSION-DX9EX-00458-E002",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "eff1a91a5416bd5b7c828395b879316dbee88d92",
+  "material_result_sha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
+  "validation_bearing_result_sha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
+  "result_sha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00458]",
+  "selected_work_item": "VR-DX9EX-SWAPCHAIN-GPU-WORK-PROVENANCE-0041",
+  "summary": "Track whether an R19 swapchain has actually submitted Draw work, skip the D3D11 completion fence only for never-submitted fresh/partially initialized swapchains, and preserve the existing bounded fail-closed drain for every rendered swapchain.",
+  "changed_paths": [
+    "vrhost/src/runtime/sbs_capture_override.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00458.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered bookkeeping HEAD eff1a91a5416bd5b7c828395b879316dbee88d92 after CONVERSION-DX9EX-00457 PASS. Structural extraction remains terminal."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "R19 Destroy always created/polled a D3D11 completion query when handle != null, including fresh swapchains that failed during image/RTV initialization before any Draw. OpenXR 1.1.63 requires completion only for submitted graphics commands referring to the swapchain, so the never-submitted path can safely avoid the drain and its 250ms/device-loss failure surface."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added per-swapchain gpuWorkSubmitted, set it immediately after Draw in RenderTo, route Projection/Theater through the owner-aware RenderTo signature, bypass the drain only while false, and reset the flag only after destruction ownership resolves."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Retry exact SHA passed DX9Ex Active Validation and Domain Isolation after fixing source-level call compatibility."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "ci_skip_on_validation_bearing_result": false,
+      "result_sha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
+      "source_runtime_sha": "2e37d30581f40d7de6210ab5fe946346d0698ee3"
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE",
+      "artifact_id": 11387984834,
+      "digest": "sha256:9008297ac9eb2a72eb8288d79ce2d8b431ce0abc3458498243965ad8b65f3627"
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "red_review": {
+      "base_sha": "eff1a91a5416bd5b7c828395b879316dbee88d92",
+      "result": "FAIL_AS_EXPECTED",
+      "missing_contract": "Destroy unconditionally required a D3D11 event-query drain for every non-null swapchain handle, even when initialization failed before any Draw command ever referenced a swapchain RTV."
+    },
+    "standards": [
+      "OpenXR 1.1.63 xrDestroySwapchain requires all submitted graphics API commands referring to the swapchain to have completed before destroy; with no submitted commands there is no completion dependency to prove."
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "initial_failed_gate": {
+      "run_id": 37409448465,
+      "head_sha": "2e37d30581f40d7de6210ab5fe946346d0698ee3",
+      "host_job_id": 112094440413,
+      "result": "FAIL",
+      "classification": "SOURCE_COMPILE_REGRESSION",
+      "reason": "R19 RenderTo signature was changed from four arguments to a Swapchain& first parameter, breaking existing four-argument consumers in d3d9ex_direct_passthrough.hpp and r24_black_screen_guard.hpp."
+    },
+    "retry_repair": {
+      "event_id": "CONVERSION-DX9EX-00458-E002",
+      "attempt": "2/3",
+      "source_runtime_change": true,
+      "source_change": "Restore the original four-argument RenderTo ABI and add an optional trailing Swapchain* owner used only by R19 Projection/Theater paths to mark gpuWorkSubmitted."
+    },
+    "dx9ex_active": {
+      "run_id": 37409670128,
+      "head_sha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
+      "result": "SUCCESS",
+      "jobs": {
+        "policy": 112095102895,
+        "game": 112095192451,
+        "full_chain_compile": 112095192487,
+        "host": 112095192511,
+        "package": 112096489758
+      }
+    },
+    "domain_isolation": {
+      "run_id": 37409670208,
+      "job_id": 112095035766,
+      "head_sha": "4df0dab3a947ace0b938a8216b934786e79a06b5",
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11387984834,
+      "digest": "sha256:9008297ac9eb2a72eb8288d79ce2d8b431ce0abc3458498243965ad8b65f3627"
+    }
+  },
+  "next_action": "Continue from the latest exact HEAD with the next independently provable DX9Ex stability/resource-lifetime unit; preserve 4df0dab3a947ace0b938a8216b934786e79a06b5 as CONVERSION-DX9EX-00458 validation-bearing result.",
+  "started_at_kst": "2026-10-06T12:30:00+09:00",
+  "source_material_sha": "2e37d30581f40d7de6210ab5fe946346d0698ee3",
+  "retry_started_at_kst": "2026-10-06T12:35:07+09:00",
+  "completed_at_kst": "2026-10-06T12:42:30+09:00"
+}

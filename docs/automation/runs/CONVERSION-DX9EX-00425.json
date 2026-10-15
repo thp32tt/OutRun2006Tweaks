@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00425",
+  "production_id": "CONVERSION-DX9EX-00425",
+  "event_id": "CONVERSION-DX9EX-00425-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "cc1d11bb5fdbbc30649b74b0f714c519d094d900",
+  "material_result_sha": "3671c985d51bd6d1f2f4517420f4e9cad180ccf4",
+  "validation_bearing_result_sha": "3671c985d51bd6d1f2f4517420f4e9cad180ccf4",
+  "result_sha": "3671c985d51bd6d1f2f4517420f4e9cad180ccf4",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00425]",
+  "selected_work_item": "L3-DX9EX-001",
+  "summary": "Reset the legacy R7 DirectGPU global consumed-frame ACK when the game claims a new Frame.v2 run generation, preventing a host-retained high ACK from a previous game process from making restarted frame IDs look already consumed.",
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r7.inc",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00425.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered vr-d3d9ex-focus HEAD cc1d11bb5fdbbc30649b74b0f714c519d094d900 after 00424 bookkeeping; reread AGENTS.md, VR_REFACTOR_STATE, latest refactor(vr)/test(vr), prior run record and Issue #14. Post-1100 structure chain remains complete."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Caller/consumer/generation review found legacy R7 ResolveDirectTransport still consumes SharedPose.hostDirectConsumedFrameId without a transport generation. SharedPose can persist across a fast game restart while StereoFrameCounter restarts from 1, so an old high ACK could falsely satisfy new-run frame IDs."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "3671c985d51bd6d1f2f4517420f4e9cad180ccf4 clears hostDirectConsumedFrameId to 0 during ClaimRenderFrameRingForCurrentRun(), after the new Frame.v2 generation is installed and before RenderFrameRingClaimed becomes true. Existing verifier now pins this cross-run ACK reset ordering."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 3671c985d51bd6d1f2f4517420f4e9cad180ccf4: DX9Ex Active Validation 37375709298 SUCCESS; policy 111983795485, full-chain-compile 111983955749, host 111983955753, game 111983955756, package 111986005564 all SUCCESS. Domain Isolation Guard 37375709258 SUCCESS."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "3671c985d51bd6d1f2f4517420f4e9cad180ccf4 fix(vr): reset legacy DirectGPU ACK on new game run [AUTO:CONVERSION-DX9EX-00425]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "Artifact 11372301113 OutRun2-VR-DX9EX-ACTIVE-3671c985d51bd6d1f2f4517420f4e9cad180ccf4 digest sha256:3017021e78308808f7919c67c62d5d217fc89099a510b303abc2bce215629c4c. CI evidence only; not HMD proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37375709298,
+      "conclusion": "success",
+      "exact_sha": "3671c985d51bd6d1f2f4517420f4e9cad180ccf4",
+      "jobs": {
+        "policy": 111983795485,
+        "full_chain_compile": 111983955749,
+        "host": 111983955753,
+        "game": 111983955756,
+        "package": 111986005564
+      },
+      "package_artifact_id": 11372301113,
+      "package_artifact_digest": "sha256:3017021e78308808f7919c67c62d5d217fc89099a510b303abc2bce215629c4c"
+    },
+    "domain_isolation": {
+      "run_id": 37375709258,
+      "conclusion": "success",
+      "exact_sha": "3671c985d51bd6d1f2f4517420f4e9cad180ccf4"
+    },
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Continue the next independent DX9Ex DirectGPU lifecycle/compatibility unit from the latest branch HEAD. Recheck the legacy global ACK producer/consumer bridge before assuming fallback compatibility.",
+  "completed_at_kst": "2026-10-06T06:30:58+09:00"
+}

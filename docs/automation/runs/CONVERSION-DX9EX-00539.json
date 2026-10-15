@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00539",
+  "production_id": "CONVERSION-DX9EX-00539",
+  "event_id": "CONVERSION-DX9EX-00539-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "selected_work_item": "DX9EX-R84-PORT-SEAM-R32-ACK-BACKPRESSURE-TELEMETRY-FACADE-001",
+  "base_sha": "54bfe9801c4a74f2c138ea3fb3ca193da8cc8c5e",
+  "material_result_sha": "0ae99e0e103f6e5c268186c9ec91cf51de5fd490",
+  "validation_bearing_result_sha": "0ae99e0e103f6e5c268186c9ec91cf51de5fd490",
+  "result_sha": "0ae99e0e103f6e5c268186c9ec91cf51de5fd490",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00539]",
+  "summary": "Moved the R32 DirectGPU ACK-backpressure telemetry notification behind an R30 support facade while preserving ACK snapshot/rebind, slot scan, producer fence, publication and fallback behavior.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r32.cpp",
+    "tools/verify_vr_r32_runtime_support_seam.py",
+    "tools/verify_vr_refactor_contract.py"
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "evidence": {
+    "dx9ex_active_run_id": 37677504450,
+    "jobs": {
+      "policy": 112984680769,
+      "game": 112984834286,
+      "full_chain_compile": 112984834392,
+      "host": 112984834431,
+      "package": 112986588659
+    },
+    "package_artifact_id": 11507449657,
+    "package_artifact_digest": "sha256:218ed4ff5d295c9803a1c3ce5ea4f43eaac2750619b3d8ed6a6bfbde967ed0f3",
+    "domain_isolation_run_id": 37677504342,
+    "domain_isolation_job_id": 112984680354
+  },
+  "protected_boundaries": [
+    "ACK snapshot/rebind behavior unchanged",
+    "DirectTransportSlots/fence/publication behavior unchanged",
+    "Reset/Present/OpenXR/HUD behavior unchanged",
+    "no HMD/runtime success claim"
+  ],
+  "next_action": "Continue the active R32 lower-owner seam chain. The remaining direct R13 ACK snapshot/rebind dependency is the next explicit boundary candidate and must be isolated without changing its one-snapshot-per-resolve semantics."
+}

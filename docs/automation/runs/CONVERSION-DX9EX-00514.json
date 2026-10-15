@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00514",
+  "production_id": "CONVERSION-DX9EX-00514",
+  "event_id": "CONVERSION-DX9EX-00514-E002",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "selected_work_item": "DX9EX-R84-PORT-SEAM-R31-R30-LOWER-SUPPORT-API-001",
+  "base_sha": "22f9682e0340245d8b7718a33a0fdc0b6aa9b086",
+  "material_result_sha": "b893b39a65c74588030f2184581198f8c028966e",
+  "validation_bearing_result_sha": "b893b39a65c74588030f2184581198f8c028966e",
+  "result_sha": "b893b39a65c74588030f2184581198f8c028966e",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00514]",
+  "summary": "Extracted a behavior-neutral R30/lower-owner support API for R31, removing R31 private lower runtime/math/cache/renderer-state dependencies while leaving the textual R31->R30 include in place until remaining R32 lower dependencies are extracted. Restored the canonical full-chain gate by removing the incomplete R31/R30 split flag.",
+  "changed_paths": [
+    "src/vr/core/r30_support_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stereo_renderer_r31.cpp",
+    "tools/verify_vr_r30_support_api_seam.py",
+    "tools/verify_vr_architecture.py",
+    "tools/verify_vr_r31_support_api_seam.py",
+    "tools/verify_vr_r31_r32_retirement_guard.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00513.json"
+  ],
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "validation_history": [
+    {
+      "sha": "b893b39a65c74588030f2184581198f8c028966e",
+      "dx9ex_active_run_id": 37605749640,
+      "domain_isolation_run_id": 37605749686,
+      "result": "PASS",
+      "jobs": {
+        "policy": 112740673582,
+        "game": 112740802027,
+        "full_chain_compile": 112740802064,
+        "host": 112740802116,
+        "package": 112742514058
+      }
+    }
+  ],
+  "package_artifact": {
+    "id": 11475346277,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-b893b39a65c74588030f2184581198f8c028966e",
+    "digest": "sha256:41e806cf964a82978bbe83df7269d20adeaf25e25bf460903316c9dff9cb6502"
+  },
+  "next_action": "Extract the next bounded R32 lower-owner dependency subset before re-enabling the R31/R30 separate-TU compile gate."
+}

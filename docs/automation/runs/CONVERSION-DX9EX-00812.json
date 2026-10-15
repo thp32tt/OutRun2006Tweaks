@@ -1,0 +1,129 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00812",
+  "production_id": "CONVERSION-DX9EX-00812",
+  "event_id": "CONVERSION-DX9EX-00812-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:ESC_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:ESC_MENU",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 1,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00812]",
+  "changed_files": [
+    "src/vr/d3d9/pause_menu_eye_affine.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "vrhost/tests/pause_menu_eye_affine_smoke.cpp",
+    "tools/verify_vr_pause_menu_eye_affine.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00812.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:ESC_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:ESC_MENU",
+    "goal": "Restore the complete VR ESC/pause menu shell and option arrows to readable binocular optical size across 4:3, 16:9, 21:9 source images and Quest3 portrait eyes while retaining centered native shape and original pause navigation.",
+    "scope_boundary": "Only the exact native ESC pause sprite owner when responsive HUD is enabled; exclude gameplay HUD, F11 external overlay, original main/car-select menus, world stereo, SkyGlow, lens rings, FFB and all DX11/DXVK/localization branches.",
+    "trace_stages": [
+      "The original OutRun ESC pause/menu state emits shell and option-arrow sprite geometry independently of F11 and the gameplay HUD.",
+      "The R30IsPauseMenuElement semantic predicate classifies the exact pause Draw owner and R30HudContainScale caches optical containment per Present.",
+      "R30HudAspectCompensation maps the native source aspect into live OpenXR per-eye recommended extents and applies equal optical magnification without stretching the menu or changing other Draw owners."
+    ],
+    "subcomponents": [
+      "Add finite bounded geometric-mean portrait-eye magnification to the single shared pause shell-and-arrows optical scale with existing source/eye ratio compensation.",
+      "Include pause semantic ownership in the per-Present HUD containment cache identity so rapid ESC entry/exit cannot borrow ordinary HUD scale.",
+      "Exercise 4:3, 16:9, 21:9, Quest3 extents, desktop/legacy opt-out and broken path negative mutations using existing C++ smoke and Python source guard."
+    ],
+    "acceptance_items": [
+      {
+        "id": "ESC_OPTICAL_READABILITY",
+        "category": "end_to_end_behavior",
+        "behavior_area": "esc_shell_arrows_per_eye",
+        "expected_behavior": "Native ESC pause shell and arrows receive one bounded portrait-eye optical enlargement, retain matching X/Y aspect and are sized on both eyes without adopting gameplay HUD scale."
+      },
+      {
+        "id": "ESC_OWNER_DESKTOP_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "pause_owner_cache_and_legacy_navigation",
+        "expected_behavior": "Responsive opt-out, original desktop/UI, F11, world and gameplay HUD retain their existing transforms, while pause-owner cache identity prevents stale menu scale reuse across ESC changes."
+      },
+      {
+        "id": "ESC_EXACT_SHA_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "win32_game_host_package_and_domain",
+        "expected_behavior": "Focused C++ smoke, destructive regression mutations, DX9Ex Active policy/game/host/full-chain/package and Domain Isolation on the same validation-bearing source SHA succeed; HMD visual acceptance remains separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "ESC_OPTICAL_READABILITY": "PASS_EXACT_SHA",
+    "ESC_OWNER_DESKTOP_FALLBACK": "PASS_EXACT_SHA",
+    "ESC_EXACT_SHA_GATES": "PASS_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "User's Quest3/VDXR 2026-10-13 test of exact build 75ef9c91 reports the native ESC pause menu much too small and upward shifted at 3440x1440 source, XR recommended per-eye 2496x2688.",
+    "source_trace": [
+      "Native OutRun pause-state producer emits ESC shell and arrows rather than the external ImGui F11 owner.",
+      "R30IsPauseMenuElement gates the pause sprite semantic while R30HudContainScale derives shared binocular scale and memoizes per-Present state.",
+      "Source/eye aspect compensation, original sprite screen position and OpenXR host composition determine visible left/right-eye pause extent."
+    ],
+    "root_cause": "Original HUD source-to-eye contain shrinks native pause controls on portrait eye displays and reuses common scaling even though the pause menu needs independent optical-size ownership; pause semantics were not previously a containment cache key.",
+    "alternatives_rejected": [
+      "A global R30 HudScale increase would also magnify gameplay HUD and F11 and risk the known-good world/UI paths.",
+      "Separate X and Y arbitrary scaling would distort the shell and arrow layout and worsen navigation hitbox correspondence.",
+      "Changing SkyGlow and world projection cannot fix a native ESC sprite-only geometric issue."
+    ],
+    "eye_ownership": "Only responsive native ESC sprite owner and its associated option arrows may use the enlarged but aspect-preserving common binocular optical containment; leave per-eye world projections and F11 external draws unchanged.",
+    "negative_test_evidence": "Existing smoke adds Quest3 3440x1440→2496x2688 and 4:3/16:9/21:9 bounded monotonic expectations; Python source guard performs independent cache/owner/scaling destructive mutations and preserves legacy opt-out.",
+    "fix_evidence": "Existing task material SHA 0b8d84ff54cec5bd6da5fe254c37ae71ac6d9829 modifies native pause scaling helper, R30 Draw containment and focused C++/Python tests.",
+    "repair_evidence": "Prior DX9Ex Active 38491931096 failed solely in policy: missing docs/automation/runs/CONVERSION-DX9EX-00812.json prevented game/host/full-chain/package stages. This resumed run restores required feature record for policy verification. Final original material 279488cf adds finite/positive ESC setting gating; validation-bearing 09a4373b fixes old responsive/contain/F11 source test assertions. Exact SHA DX9Ex Active 38492968313 all 5 jobs SUCCESS, Domain 38492968312 SUCCESS; original C++ material Full Impact 38492390036 all 3 SUCCESS."
+  },
+  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+  "runtime_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "base_sha": "7dd572b9e025430722ea7b09d24304e6ef11a8ac",
+  "material_result_sha": "279488cf54ca4ddc9e7a5ea9d8301daaa6362efd",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "09a4373b8b04330621c9be508bdab45165350eef",
+    "material_result_sha": "279488cf54ca4ddc9e7a5ea9d8301daaa6362efd",
+    "dx9ex_active": {
+      "run_id": 38492968313,
+      "head_sha": "09a4373b8b04330621c9be508bdab45165350eef",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "host": "SUCCESS",
+        "game": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      },
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38492968313"
+    },
+    "domain_isolation": {
+      "run_id": 38492968312,
+      "head_sha": "09a4373b8b04330621c9be508bdab45165350eef",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38492968312"
+    },
+    "full_source_impact": {
+      "run_id": 38492390036,
+      "head_sha": "279488cf54ca4ddc9e7a5ea9d8301daaa6362efd",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "msvc-analyze-openxr-host": "SUCCESS",
+        "source-cross-domain": "SUCCESS",
+        "msvc-analyze-active-game": "SUCCESS"
+      },
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38492390036"
+    },
+    "runtime_validation": "UNTESTED"
+  },
+  "validation_bearing_result_sha": "09a4373b8b04330621c9be508bdab45165350eef",
+  "result_sha": "09a4373b8b04330621c9be508bdab45165350eef",
+  "c6_recorded_at_utc": "2026-10-14T01:07:00Z"
+}

@@ -1,0 +1,101 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00856",
+  "production_id": "CONVERSION-DX9EX-00856",
+  "event_id": "CONVERSION-DX9EX-00856-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00856",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Ensure complete stage +TIME sprite and numeric glyphs retain their original exact D3DX owner from six source CALLs to delayed GPU submission and R26+HUD eye projection, including the first queued sprite after a direct buffer.",
+    "scope_boundary": "Only six original +TIME 0x989xx source calls, immediate/queued D3DX owner and true GPU submission; no global Flush, generic HUD ownership, GOAL/rank rewrites, timer changes, SkyGlow or other backends.",
+    "trace_stages": [
+      "Six canonical +TIME sprani and numeric CALL parents bracket scoped direct glyph raster and tag the exact appended SpriteNodes.",
+      "D3DX Begin/Draw provenance and pre-queue transition isolate a homogeneous old direct batch before selecting the first +TIME queue owner; matching queued or direct +TIME submits before semantic lifetime ends.",
+      "R26+HUD packaged stereo renderer and x64 host process the exact ScreenHud draw into both eye projections; optical correctness requires later Quest3/VDXR testing."
+    ],
+    "subcomponents": [
+      "Restore the first-node direct-to-stage D3DX GPU batch boundary without stealing the previous owner's scope.",
+      "Cover all six original +TIME source and numeric paths plus mixed, stale, unrelated first queue and GOAL/rank negative cases.",
+      "Keep R26+HUD packaged eye ownership, normal clock, input, SkyGlow and original desktop fallback with exact-SHA integration gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "sources",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Six original E8 source and GPU batch",
+        "expected_behavior": "Three +TIME sprani plus three numeric CALLs keep the original semantic scope until actual direct and queued D3DX submission including first queue transition."
+      },
+      {
+        "id": "stereo",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R26 HUD and eye projection",
+        "expected_behavior": "Previous homogeneous direct batch flushes before a new stage queue tag; Stage ScreenHud drives both eye paths while original ownership is preserved."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Unrelated, mixed, GOAL and rank",
+        "expected_behavior": "Mixed, mismatched or untracked buffers never inherit +TIME; GOAL, rank and original timer/FFB behavior remain protected."
+      },
+      {
+        "id": "integration",
+        "category": "integrated_validation",
+        "behavior_area": "Final GitHub exact-SHA Windows build and package",
+        "expected_behavior": "Active x86 game, x64 OpenXR host, full-chain, packaged R26 owner and Domain/impact gates pass at final validation-bearing SHA."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "StageExtensionEnter/Leave and six original CALLs, queued replay and D3DX Draw/Flush hooks already exist; queue's first node is still rejected by !QueueRenderActive when an otherwise homogeneous previous direct buffer is pending.",
+    "source_trace": [
+      "0x9898E/0x98A36/0x98AC6 decorated source and 0x989AD/0x98A10/0x98A89 numeric parent tags.",
+      "BeforeQueueNode runs before SelectSpriteQueueNode and must flush a proven old direct D3DX buffer before replacing the source.",
+      "DrawDest and packaged R26+HUD fixedfn/VS renderer submit stage HUD through both eyes and OpenXR host."
+    ],
+    "root_cause": "A homogeneous directly sourced buffer pending at first StageExtensionTime queue node previously disabled StageBoundaryReady solely because QueueRenderActive was false, leaving later D3DX End outside producer scope.",
+    "alternatives_rejected": [
+      "No missing E8 producer or extra generic HUD hook: six exact original calls and queue replay already exist; an unproven mixed or different-owner buffer still must not be promoted."
+    ],
+    "fix_evidence": "Shared C++ predicate allows first-node isolation only when entering exact StageExtensionTime and pending old source/scope match live outgoing original owner, with existing queue rules otherwise unchanged.",
+    "negative_test_evidence": "C++ static asserts and Python destructive checks for first queued +TIME, stale/mixed/mismatched, unrelated first queue, original GOAL/rank hooks.",
+    "eye_ownership": "The previous direct batch stays with the old eye scope until flushed; only the subsequent producer-authenticated +TIME queue draws receive ScreenHud stereo presentation."
+  },
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "No Quest3/VDXR gameplay test; binocular image and FPS not proven.",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "vrhost/tests/stage_extension_direct_owner_smoke.cpp"
+  ],
+  "material_result_sha": "d23309b6f589d38cd10cb1760b79324358f91663",
+  "validation_bearing_result_sha": "bd393929446c19755282014d7f6accaf70d69d97",
+  "acceptance_results": {
+    "sources": "SOURCE_PATCHED",
+    "stereo": "BUILD_PENDING",
+    "fallback": "TEST_PENDING",
+    "integration": "PENDING_EXACT_SHA"
+  },
+  "ci_evidence": {
+    "status": "SUCCESS_EXACT_SHA",
+    "previous_material_sha": "d23309b6f589d38cd10cb1760b79324358f91663",
+    "previous_test_repair_sha": "6e24f30988aba3551ae7adc94f989b6a3016a103",
+    "note": "Original material policy failed due stale inline-guard verifier; second SHA policy SUCCESS but affected Full Source/HUD also require integrated same-SHA matrix; do not count score until all exact gates pass.",
+    "exact_sha": "bd393929446c19755282014d7f6accaf70d69d97",
+    "c6_evidence_source": "USER_CONFIRMED_GITHUB_CI_SUCCESS",
+    "c6_note": "Exact-SHA GitHub CI SUCCESS asserted by user; existing workflows not rerun. Quest3/VDXR HMD runtime untested."
+  },
+  "score_once": false,
+  "phase": "C6_RESULT",
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
+}

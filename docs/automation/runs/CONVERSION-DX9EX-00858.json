@@ -1,0 +1,121 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00858",
+  "production_id": "CONVERSION-DX9EX-00858",
+  "event_id": "CONVERSION-DX9EX-00858-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00858",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Keep the original C993 central sun raw c64 in the same live renderer pose generation before binocular world-billboard reprojection; preserve outer CABE rings, SkyGlow and original fallback.",
+    "scope_boundary": "Exact D3A5/C993 central source and R26+HUD raw c64 lifecycle only; no outer CABE rings, generic HUD, input, FFB, DX11 or DXVK.",
+    "trace_stages": [
+      "Original D3A5->C980->C993 exact central producer; unrelated CABE outer disc draws remain separate.",
+      "R23 game upload records source/shader/draw and new latched-pose generation; reset/recenter/failed BeginScene invalidates prior original c64.",
+      "Packaged R26+HUD accepts c64 only for exact centre call, same shader epoch and identical pose generation; conservative fallback preserves original game draw."
+    ],
+    "subcomponents": [
+      "Bind exact central raw-WVP c64 to the pose generation during game producer upload.",
+      "Invalidate prior raw c64 upon new scene-pose generation, including failed BeginScene with no intervening Present.",
+      "Verify same call, pose, bounded draw age and shader; reject different CABE/queue/old pose before per-eye transform."
+    ],
+    "acceptance_items": [
+      {
+        "id": "source",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Lens centre c64 source/pose lifetime",
+        "expected_behavior": "C993's original WVP is never accepted from a different latched pose generation; only raw game uploads of same centre call can enter packaged R26 transform."
+      },
+      {
+        "id": "eye",
+        "category": "end_to_end_behavior",
+        "behavior_area": "OpenXR binocular central lens rendering",
+        "expected_behavior": "Both eyes use one same-pose original spatial WVP through existing R26 transform; only matching Quest3 evidence can prove optical single-dot placement."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Outer flare/Reset/queue/shader",
+        "expected_behavior": "Source predicate rejects previous pose, unknown epoch, switched shader and CABE rings without suppressing game Draw or changing SkyGlow."
+      },
+      {
+        "id": "integration",
+        "category": "integrated_validation",
+        "behavior_area": "Exact-SHA game/host/package and impact gates",
+        "expected_behavior": "Final SHA must pass Windows game/host/package DX9Ex Active, Domain Isolation and applicable affected source/HUD gates."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "R23 ResetFrameState increments LatchedPoseEpoch but previously retained LastGameWvpWriteValid; R26's exact C993 RawWvpEvidence checked source call, shader and draw age but not the current latched pose generation.",
+    "root_cause": "A previously captured original c64 can survive a failed BeginScene or interim scene re-latch before the next Present, allowing same-shader raw WVP reuse with a newer head pose.",
+    "alternatives_rejected": [
+      "Increasing the existing 128 draw age does not prove pose generation.",
+      "Reading a live injected GPU c64 is unsafe; original c64 must be retained and bounded by the same producer and pose.",
+      "Changing outer halo or SkyGlow classifications cannot fix central-source provenance."
+    ],
+    "fix_evidence": "C++ now stamps the original game raw c64 with LatchedPoseEpoch; R26+HUD's central-source predicate compares current epoch to recorded epoch and ResetFrameState invalidates stale c64.",
+    "negative_test_evidence": "Compile-time constexpr positive/negative cases and portable smoke for same epoch, relatch, reset, shader and unrelated rings/queue.",
+    "eye_ownership": "No new eye pose transform was added; packaged R26+HUD continues existing headInverse/eyeInverse eye projections only for same-pose original c64. Optical confirmation still requires Quest3."
+  },
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "No matching Quest3/VDXR game and HMD test. Central lens appearance, outer rings and FPS not runtime-verified.",
+  "changed_files": [
+    "src/vr/game/outrun_renderer.cpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "src/vr/d3d9/lens_centre_source_provenance.hpp",
+    "vrhost/tests/lens_centre_pose_epoch_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00858.json"
+  ],
+  "material_result_sha": "76273e26f6daa4b400d315b99a0c8553a1f6f7f7",
+  "validation_bearing_result_sha": "76273e26f6daa4b400d315b99a0c8553a1f6f7f7",
+  "acceptance_results": {
+    "source": "PASS_SOURCE_AND_BUILD",
+    "eye": "BUILD_VERIFIED_NEED_HMD_TEST",
+    "fallback": "PASS_PORTABLE_AND_WINDOWS",
+    "integration": "PASS_EXACT_SHA"
+  },
+  "score_once": true,
+  "ci_evidence": {
+    "status": "SUCCESS_EXACT_SHA",
+    "exact_sha": "76273e26f6daa4b400d315b99a0c8553a1f6f7f7",
+    "dx9ex_active_run_id": 38620752409,
+    "dx9ex_active": {
+      "policy": "SUCCESS",
+      "game": "SUCCESS",
+      "full_chain_compile": "SUCCESS",
+      "host": "SUCCESS",
+      "package": "SUCCESS"
+    },
+    "domain_isolation_run_id": 38620752377,
+    "domain_isolation": "SUCCESS",
+    "hud_inspector_run_id": 38620752430,
+    "hud_inspector": {
+      "build_hud_inspector": "SUCCESS",
+      "static_exe_analysis": "SUCCESS"
+    },
+    "full_source_impact_run_id": 38620752431,
+    "full_source_impact": {
+      "msvc_analyze_active_game": "SUCCESS",
+      "msvc_analyze_openxr_host": "SUCCESS",
+      "source_cross_domain": "SUCCESS"
+    },
+    "runtime_caveat": "Quest3/VDXR runtime evidence absent; binocular lens convergence and real hardware FPS not asserted."
+  },
+  "resolved_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "scoreboard_ai_2_before": 1330,
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1331,
+  "scoreboard_commit_sha": "9f68834237d15fa34923fe127c7691cd77125d4c",
+  "score_basis": "New independent functional C++ implementation, exact-SHA four required workflow groups SUCCESS. Same TASK_ID retries, C6 and bookkeeping yield +0 additional."
+}

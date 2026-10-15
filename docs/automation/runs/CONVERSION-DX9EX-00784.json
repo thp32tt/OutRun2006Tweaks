@@ -1,0 +1,115 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00784",
+  "production_id": "CONVERSION-DX9EX-00784",
+  "event_id": "CONVERSION-DX9EX-00784-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:F11_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+  "work_key": "DX9EX:VIS:F11_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00784]",
+  "material_result_sha": "53c2ed2a510024b8b76512fbd76589be7599190f",
+  "validation_bearing_result_sha": "1e9b72b597381ad4a517aef0a43ef5a374f89adc",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "score_delta": 1,
+  "changed_files": [
+    "src/overlay/overlay.hpp",
+    "src/overlay/overlay.cpp",
+    "src/overlay/overlay_settings_ui.cpp",
+    "tools/verify_vr_f11_font_density.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00784.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:F11_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
+    "goal": "Make the complete Quest3 F11 settings panel readable and usable across keyboard, gamepad and mouse, preserving real font density, safe layout, focus and all preferences across tab switching, interrupted edits, device reset and window close.",
+    "scope_boundary": "Only existing F11 overlay shell/atlas/edit lifetime and ImGui preference-save owner; leaves gameplay HUD, ESC, main menu, world rendering, SkyGlow, DX11, DXVK and FFB untouched.",
+    "trace_stages": [
+      "F11 frame input and ImGui SliderFloat/Combo/Checkbox edits in native OverlaySettingsWindow tab and first-run shell.",
+      "Tab render owns immediate controls but may stop running with pending settings when focus switches or visibility closes; shared Overlay::render finalizes after all active windows.",
+      "FontsDirty regenerates atlas next EndScene while settings_write persists once with retry after write failure; external F11 semantic preserves R30 binocular screen-plane ownership."
+    ],
+    "subcomponents": [
+      "Move all general F11 preference edits to a frame-lifetime dirty state with deferred, retry-safe persistence and coalesced writes.",
+      "Unify font slider frame finalization with settings persistence without resizing atlas within active ImGui frame.",
+      "Protect tabs, controller/mouse focus, close/reopen, failed INI save, desktop fallback and HMD quality via exact source and destructive regression."
+    ],
+    "acceptance_items": [
+      {
+        "id": "F11_SETTINGS_ALL_TABS",
+        "category": "end_to_end_behavior",
+        "behavior_area": "F11_edit_input_persistence",
+        "expected_behavior": "Theme, opacity, notifications and chat changes persist after mouse drag, keyboard/gamepad focus changes, tab switch and F11 close without per-frame disk writes."
+      },
+      {
+        "id": "F11_FONTS_AND_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "F11_atlas_and_saved_ini",
+        "expected_behavior": "Font slider commits once, device font rebuild remains out of active ImGui frame, failed INI writes retry, VR gameplay and desktop/menu external presentation remain isolated."
+      },
+      {
+        "id": "F11_FULL_WIN32_GATE",
+        "category": "integrated_validation",
+        "behavior_area": "exact_sha_game_host_package",
+        "expected_behavior": "Existing F11 density/style/projection destructive tests plus all-preference save test and exact-SHA DX9Ex Active full Win32 game/host/package and Domain Isolation success; Quest3 runtime separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "F11_SETTINGS_ALL_TABS": "PASS_EXACT_SHA",
+    "F11_FONTS_AND_FALLBACK": "PASS_EXACT_SHA",
+    "F11_FULL_WIN32_GATE": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "Quest3 F11 difficult to read on 75ef9c91; independent static defect: per-tab settingsDirty outlives active edit while tab no longer renders, dropping non-font preference writes on tab changes/close.",
+    "source_trace": [
+      "OverlaySettingsWindow::render sets a per-tab dirty flag after appearance/notification/chat changes.",
+      "Overlay::render always finalizes the F11 frame even if that tab is no longer active or the shell was closed.",
+      "Overlay::settings_write persists all fields to Overlay.ini while FontScalePending invalidates atlas for the next safe DX9 frame."
+    ],
+    "root_cause": "Non-font F11 pending preference persistence was scoped to conditional Overlay tab rendering, unlike existing frame-scoped font commit; lost focus/tab/visibility prevented the original save code from running.",
+    "alternatives_rejected": [
+      "Do not save on every slider frame or migrate to game/global settings, to avoid render-thread disk stalls.",
+      "Do not rebuild DX9 ImGui atlas during an active frame or change established single-image F11 semantic/projection."
+    ],
+    "fix_evidence": "Source change makes frame-wide SettingsDirtyPending authority, retries failed settings_write and coalesces font/non-font changes.",
+    "negative_test_evidence": "First attempt 38421627717 failed tools/verify_vr_f11_font_density.py:962 mutation precondition after canCommitSettings moved before font finalizer; repaired source-mutant anchors at 1e9b72b5. Exact 1e9b72b5 DX9Ex Active attempt 2 and Domain Isolation both SUCCESS.",
+    "eye_ownership": "Existing external ScreenOverlay2D RAII, R30 per-eye common-ray scaling, actual XR eye-aware atlas density remain untouched; this patch fixes input-state persistence, not Quest3 optical hardware acceptance."
+  },
+  "notes": "C6 build-verified at exact SHA 1e9b72b597381ad4a517aef0a43ef5a374f89adc (DX9Ex Active #38422166211 attempt 2 policy/host/game/full-chain/package 5/5 SUCCESS; Domain #38422166087 SUCCESS). Material C++ result remains 53c2ed2a510024b8b76512fbd76589be7599190f. Quest3/VDXR optical behavior untested; no HMD PASS. Scoreboard credit handled separately to avoid duplicate RUN_KEY.",
+  "validation_evidence": {
+    "validation_bearing_result_sha": "1e9b72b597381ad4a517aef0a43ef5a374f89adc",
+    "dx9ex_active": {
+      "run_id": 38422166211,
+      "attempt": 2,
+      "conclusion": "success",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "domain_isolation": {
+      "run_id": 38422166087,
+      "conclusion": "success"
+    },
+    "hmd": "UNTESTED"
+  },
+  "score_run_key": "CONVERSION-DX9EX-00784",
+  "scoreboard_commit_sha": "bd1cc063d043a7d7b2616ef74b6a10d70861dadf",
+  "scoreboard_previous": 1239,
+  "scoreboard_cumulative": 1240,
+  "score_duplication_policy": "Single +1 for original material + failed gate repair + retry + C6; no additional credit for this bookkeeping reconciliation."
+}

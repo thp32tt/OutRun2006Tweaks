@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00499",
+  "production_id": "CONVERSION-DX9EX-00499",
+  "event_id": "CONVERSION-DX9EX-00499-E002",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "base_sha": "bd6740196815b51e6388129e589a828010906073",
+  "source_material_sha": "88ebd4b8cbf7051b24662e0041aa140a981c0abf",
+  "validation_bearing_result_sha": "2db80d661f0d7d572f09eca77119bbf3f3e13e76",
+  "result_sha": "2db80d661f0d7d572f09eca77119bbf3f3e13e76",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00499]",
+  "selected_work_item": "DX9EX-PERF-DIRECTGPU-ACK-RING-SNAPSHOT-0081",
+  "summary": "Batched steady-state DirectGPU host ACK reads into one seqlock-protected whole-ring snapshot per R32 resolve scan, retaining the proven per-slot ACK reader as the invalid/stale snapshot slow-path fallback; retry 2/3 reconciled the canonical run-identity verifier with the new snapshot owner.",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "repair_attempts_used": 1,
+  "evidence": {
+    "changed_paths": [
+      "src/vr/d3d9/stereo_renderer_r13.cpp",
+      "src/vr/d3d9/stereo_renderer_r32.cpp",
+      "tools/verify_vr_dx9ex_reset_transport_contract.py"
+    ],
+    "initial_candidate": {
+      "sha": "88ebd4b8cbf7051b24662e0041aa140a981c0abf",
+      "run_id": 37541419224,
+      "policy_job_id": 112535072110,
+      "result": "FAIL_STALE_VERIFIER_OWNER_LOCATION",
+      "signature": "R13 stale-host ACK mapping retirement missing ordered markers"
+    },
+    "repair_1": {
+      "sha": "3adce88b7ecc39f706d5b63178e9539732aa9172",
+      "run_id": 37541504581,
+      "policy_job_id": 112535348754,
+      "result": "FAIL_VERIFIER_ORDER_ASSUMPTION",
+      "signature": "R32 final-owner free-slot scan order changed"
+    },
+    "repair_2": {
+      "sha": "fc719396037117ee10b859cecafd3d9088e1c191",
+      "run_id": 37541572026,
+      "policy_job_id": 112535570427,
+      "result": "FAIL_VERIFIER_AMBIGUOUS_MEMCPY_MARKER",
+      "signature": "R13 whole-ring ACK stable snapshot order changed"
+    },
+    "repair_3": {
+      "sha": "5d0a005d7dc67bd6a15e3204bd1785db21dc9626",
+      "run_id": 37541650820,
+      "policy_job_id": 112535826263,
+      "result": "FAIL_REMAINING_ACK_IDENTITY_VERIFIER_EXPECTATION",
+      "signature": "game dedicated ACK complete run-identity validation missing: DirectGpuAckRunGenerationIndex"
+    },
+    "domain_isolation": {
+      "run_id": 37541650793,
+      "result": "SUCCESS"
+    },
+    "host_game_full_chain_package": "SKIPPED_AFTER_POLICY_FAILURE",
+    "retry_2": {
+      "failure_context_reconciled": "Controller reported missing run for 5d0a005d..., but exact-SHA DX9Ex Active run 37541650820 existed and failed policy; retry resumed from the real failure instead of treating it as missing.",
+      "repair_sha": "2db80d661f0d7d572f09eca77119bbf3f3e13e76",
+      "dx9ex_active_run_id": 37542820962,
+      "domain_isolation_run_id": 37542821020,
+      "jobs": {
+        "policy": 112539632572,
+        "host": 112539840666,
+        "game": 112539840712,
+        "full_chain_compile": 112539840749,
+        "package": 112540997762
+      },
+      "package_artifact_id": 11449691693,
+      "package_artifact_digest": "sha256:1ef99f74a046e9d334bed6c0798b9919f98f97038ae4c666f7357a7b43579d6a",
+      "result": "SUCCESS"
+    }
+  },
+  "blocker": null,
+  "next_action": "No further work is required for TASK_ID CONVERSION-DX9EX-00499. Runtime/HMD behavior remains UNTESTED; do not infer visual or pacing proof from CI."
+}

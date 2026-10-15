@@ -1,0 +1,106 @@
+{
+  "task_id": "CONVERSION-DX9EX-00828",
+  "production_id": "CONVERSION-DX9EX-00828",
+  "event_id": "CONVERSION-DX9EX-00828-E001",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+  "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:HUD_GAMEPLAY",
+    "symptom_id": "DX9EX:SYMPTOM:HUD_GAMEPLAY",
+    "goal": "Keep both-eye gameplay HUD geometry steady through XR extent publication, recenter and desktop fallback without mixing old and new eye sizes.",
+    "scope_boundary": "Only gameplay HUD XR extent publication snapshot, not unrelated F11, menu producer, SkyGlow, world or FFB pipelines.",
+    "trace_stages": [
+      "OpenXR host state_->recommendedWidth/Height published between Begin/End",
+      "R29 game-side SharedPoseState reader and coherent binocular cached dimensions",
+      "R30 HUD containment geometry, producer-specific XYZRHW/per-eye mapping and stereo composition"
+    ],
+    "subcomponents": [
+      "Coherent atomic four-value binocular extent read in game DX9Ex R29 owner",
+      "R30 HUD aspect cache invalidation and safe FOV-only fallback during host resize/recenter"
+    ],
+    "acceptance_items": [
+      {
+        "id": "XR_BINOCULAR_HUD_SIZE",
+        "category": "end_to_end_behavior",
+        "behavior_area": "hud_binocular_resize",
+        "expected_behavior": "At 4:3/16:9/21:9 source and Quest3 eye extents, both HUD eyes consume one host seqlock generation."
+      },
+      {
+        "id": "RESET_RESTART_FOV_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "host_recenter_reset",
+        "expected_behavior": "An odd/busy or incomplete extent publication yields all-zero pair and FOV-only safe fallback; desktop unaffected."
+      },
+      {
+        "id": "EXACT_SHA_WIN32_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "win32_host_game_ci",
+        "expected_behavior": "Same material SHA passes DX9Ex Active Win32 host/game/package, Domain Isolation and Full Source Impact."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "XR_BINOCULAR_HUD_SIZE": "PASS_EXACT_SHA",
+    "RESET_RESTART_FOV_FALLBACK": "PASS_EXACT_SHA",
+    "EXACT_SHA_WIN32_GATES": "PASS_EXACT_SHA"
+  },
+  "changed_files": [
+    "src/vr/core/r29_owner_api.hpp",
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_hud_present_cache.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00828.json"
+  ],
+  "runtime_validation": "UNTESTED",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED; CI establishes static verification, Win32 build/link and packaging only, not physical Quest3/VDXR HUD/eye quality or FPS.",
+  "diagnosis": {
+    "original_evidence": "Host publishes both recommendedWidth/Height arrays under one SharedPoseState Begin/End seqlock; prior R30 did two unsynchronized R29OwnerRecommendedEyeExtent per-eye calls.",
+    "source_trace": [
+      "OpenXR host allocation source publishes two equal eye dimensions under odd/even sequence.",
+      "R29 reads separate four dimension fields without shared generation validation.",
+      "R30 compares aspect/cache and draws per-eye XYZRHW hud, risking short-term mismatched aspect near resize."
+    ],
+    "root_cause": "Four individual reads were not guaranteed to belong to the same host publication while XR extent changes.",
+    "alternatives_rejected": [
+      "Existing 10% left/right dimension comparison cannot catch a cross-generation mix for small resizing.",
+      "Existing FOV fallback handles invalid extent but cannot detect a plausible nonzero mixed snapshot."
+    ],
+    "fix_evidence": "R29 consumes one coherent four-field seqlock snapshot; R30 caches or falls back as a unit.",
+    "negative_test_evidence": "Verifier adds odd/changed sequence, partial right eye, invalid header, reset and 7 destructive mutation checks.",
+    "eye_ownership": "R30 HUD containment applies a synchronized extent to each eye without changing unrelated game-world projection."
+  },
+  "phase": "C6_RESULT",
+  "material_result_sha": "105d88259120fa0f44878ff4d0cafdeb30b2f140",
+  "validation_bearing_result_sha": "105d88259120fa0f44878ff4d0cafdeb30b2f140",
+  "result_sha": "105d88259120fa0f44878ff4d0cafdeb30b2f140",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "105d88259120fa0f44878ff4d0cafdeb30b2f140",
+    "dx9ex_active": {
+      "run_id": 38518433153,
+      "conclusion": "success",
+      "passed_jobs": 5,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38518433153"
+    },
+    "domain_isolation": {
+      "run_id": 38518433148,
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38518433148"
+    },
+    "full_source_impact": {
+      "run_id": 38518433102,
+      "conclusion": "success",
+      "passed_jobs": 3,
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38518433102"
+    },
+    "hud_inspector": {
+      "run_id": 38518433226,
+      "conclusion": "success",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38518433226"
+    }
+  }
+}

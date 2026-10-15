@@ -1,0 +1,121 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00866",
+  "production_id": "CONVERSION-DX9EX-00866",
+  "event_id": "CONVERSION-DX9EX-00866-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00866",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Preserve complete original GOAL and stage-result text presentation: the three synchronous Sumo_Printf parents and their queued glyph sprites must retain one exact ScreenHud source across prior world Draws, without changing the 0-99 progress or GOAL time helper outputs.",
+    "scope_boundary": "Only the exact 0x975EE/0x97727/0x977FB result Sumo_Printf E8 parents; no unsafe B9200 return hooks, broad text promotion, rank/world, +TIME, lens, F11, SkyGlow, FFB, DX11 or DXVK changes.",
+    "trace_stages": [
+      "Original game three exact result Sumo_Printf E8 producer calls into synchronous text rasterization before SpriteNode allocation.",
+      "ScopedExactProducerSemantic shields a previous NextDrawScope and annotates original source c64 with OutRunStagePrintf; existing per-priority appended SpriteNode tagging carries the same producer.",
+      "Selected R26+HUD game DLL uses existing queue and direct semantic owner to select original c64 and reconstruct left/right ScreenHud eyes; downstream OpenXR host composition is unchanged."
+    ],
+    "subcomponents": [
+      "Prevent prior world/rank NextDrawScope or stale direct producer from taking the three exact synchronous result text glyph draws; preserve the caller HRESULT/ABI and RAII restore.",
+      "Keep post-call sibling SpriteNode queue and replay owner consistent with the direct OutRunStagePrintf provenance, plus negative-mutated verifier and compiled direct/queue smoke; preserve existing percentage, title/time and final result helpers."
+    ],
+    "acceptance_items": [
+      {
+        "id": "direct_result",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original synchronous GOAL stage/result Sumo_Printf glyphs",
+        "expected_behavior": "All three exact result print parents isolate earlier world Draw, retain ScreenHud and OutRunStagePrintf producer through immediate glyph submission."
+      },
+      {
+        "id": "queue_result",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Deferred SpriteNode result glyphs and per-eye owner",
+        "expected_behavior": "New appended sibling nodes keep exact ScreenHud/OutRunStagePrintf; queue-selected world node remains authoritative and R26+HUD selected binary consumes this owner."
+      },
+      {
+        "id": "fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Unknown world/rank, desktop, nested queue and original game result",
+        "expected_behavior": "Prior pending Draw, scope and per-vehicle anchor restore; old GOAL progress, title/time, +TIME, original no-hook B9200 and other producers remain unchanged; mutations fail verification."
+      },
+      {
+        "id": "integration",
+        "category": "integrated_validation",
+        "behavior_area": "GitHub exact SHA Windows game host package and domain",
+        "expected_behavior": "Required exact SHA DX9Ex Active policy/host/game/full-chain/package, Domain Isolation, HUD Inspector and Full Source Impact as applicable all succeed before BUILD_VERIFIED; physical Quest3 remains independently UNTESTED."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "In current source OutRunStagePrintfEnter used ScopedExactProducerSemantic(ScreenHud) without isolatePendingDraw and direct producer token; ConsumeForDraw first takes prior NextDrawScope, and c64 source capture sees ProducerToken::None even though appended nodes carry OutRunStagePrintf.",
+    "source_trace": [
+      "Original three 0x975EE/0x97727/0x977FB Sumo_Printf E8 callers enter before their result glyphs are produced.",
+      "Original direct RAII owner previously changed CurrentScope only, while ConsumeForDraw checks NextDrawScope first; original c64 recorder captures CurrentRenderProducerToken.",
+      "Existing TagAppendedNodes gives later SpriteNodes ScreenHud/OutRunStagePrintf and existing R26+HUD reconstructs per-eye HUD from selected scope and original c64."
+    ],
+    "root_cause": "Source-confirmed mismatch between synchronous original result text and deferred sibling provenance permits stale world Draw selection and missing direct producer identity; optical contribution to GOAL double-render remains to be proven by Quest3.",
+    "alternatives_rejected": [
+      "Do not reinstall all nineteen B9200 post-call E9 midhooks because original branch targets hit jump displacement causing confirmed 0x97C5F/0x97E75 crashes.",
+      "Do not globally classify all glyph or alpha Draws as ScreenHud, suppress result effect, flush unrelated D3DX batches or alter GOAL timer/progress."
+    ],
+    "fix_evidence": "Direct exact result Sumo_Printf now uses ScopedExactProducerSemantic(ScreenHud,nullptr,true,OutRunStagePrintf); original queue sibling tags and source ABI preserved.",
+    "negative_test_evidence": "Verifier checks original three E8 parents, source/direct token, appended queue/RAII unwind and negative mutation of pending guard and producer; C++ host smoke adds OutRunStagePrintf pending-world restoration/queue priority.",
+    "eye_ownership": "Selected R26+HUD game build routes exact ScreenHud through existing per-eye HUD projection; no claim about actual Quest3 visual correction without HMD."
+  },
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "phase": "C6_RESULT",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_evidence": "Exact-SHA GitHub Windows game/host/package and three affected workflow groups passed. No local OR2006C2C.EXE or Quest3/VDXR visual/optical test: original GOAL 0–99, stage/result white text and all other screen faults require HMD verification. Source-derived repair is not optical PASS.",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp",
+    "tools/verify_vr_producer_provenance.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00866.json"
+  ],
+  "acceptance_results": {
+    "direct_result": "PASS_BUILD",
+    "queue_result": "PASS_BUILD",
+    "fallback": "PASS_BUILD",
+    "integration": "PASS_EXACT_SHA"
+  },
+  "material_result_sha": "cb67efc36f6b7124fe27884fbced012d95e83104",
+  "validation_bearing_result_sha": "cb67efc36f6b7124fe27884fbced012d95e83104",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "cb67efc36f6b7124fe27884fbced012d95e83104",
+    "dx9ex_active": {
+      "run_id": 38645396774,
+      "conclusion": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38645396640,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38645396654,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38645397025,
+      "conclusion": "SUCCESS"
+    },
+    "runtime_caveat": "No physical HMD / original game runtime verification. RUNTIME_VALIDATION=UNTESTED."
+  },
+  "score_once": true,
+  "score_delta_this_attempt": 1,
+  "source_parent_sha": "45297566922b8b1d1d797b45816cd65a0c424e68",
+  "scoreboard_ai_2_before": 1343,
+  "scoreboard_ai_2_delta": 1,
+  "scoreboard_ai_2_after": 1344,
+  "scoreboard_commit_sha": "a204ffcecb3c9d4b354f8189c199c7fce5b1e766",
+  "score_basis": "One distinct original GOAL stage-result synchronous/queued source ownership fix, compiled regression, mutation verifier and four exact-SHA required workflow groups success; retry/C6 no duplicate.",
+  "c6_prior_hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
+}

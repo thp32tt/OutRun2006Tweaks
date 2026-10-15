@@ -1,0 +1,71 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00660",
+  "production_id": "CONVERSION-DX9EX-00660",
+  "event_id": "CONVERSION-DX9EX-00660-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R23_LOCAL_FIXED_MENU_STEREO_PAIR_UNIFORM_PIPELINE_REUSE",
+  "work_key": "DX9EX:R23_LOCAL_FIXED_MENU_STEREO_PAIR_UNIFORM_PIPELINE_REUSE",
+  "base_sha": "c92e6934e296bf434ca911d176fc4b573e8b2993",
+  "initial_material_sha": "6882f71b22883c7f6fa55ae6cb38e690f8154286",
+  "material_result_sha": "6882f71b22883c7f6fa55ae6cb38e690f8154286",
+  "material_commits": [
+    "6882f71b22883c7f6fa55ae6cb38e690f8154286"
+  ],
+  "result_sha": "6882f71b22883c7f6fa55ae6cb38e690f8154286",
+  "validation_bearing_result_sha": "6882f71b22883c7f6fa55ae6cb38e690f8154286",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Reduce R23 LOCAL-fixed menu second-eye GPU-driver submissions by reusing the immediately prior successful eye's identical UV/HDR/clip constant buffers, viewport, topology, shaders, VS constant-buffer bind and sampler.",
+    "acceptance": "Keep independent per-eye ClearRenderTargetView, RTV/SRV/PS constant buffer binds, Draw, SRV/RTV cleanup and OpenXR projection submission; reject failed first eye, changed UV/clip, interrupted pair, mismatched or zero extents, incorrect eye order; retain legacy head-projected menu full upload and bind path.",
+    "runtime_metrics": "Quest3/VDXR frame time p95/p99 and optical single-image/menus not measured; no actual FPS improvement or runtime PASS claimed."
+  },
+  "acceptance_results": [
+    {
+      "item": "R23_MENU_SECOND_EYE_UNIFORM_AND_PIPELINE_REUSE",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "vrhost/src/main_r23.cpp two-eye LOCAL-fixed menu uses shared clip/UV and only requests reuse after successful left draw; main.cpp skips two WRITE_DISCARD Map/Unmaps and fixed D3D11 binds solely for approved second eye."
+    },
+    {
+      "item": "PER_EYE_OUTPUT_AND_LEGACY_FALLBACK",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "Per-eye clear, RTV/SRV, PS constant binding, Draw and resource unbind remain; legacy head-projected menu RenderMenuProjection uses default full state setup; failed left eye does not submit unverified right eye."
+    },
+    {
+      "item": "MENU_REUSE_RELEASE_NEGATIVE_SMOKE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "vrhost/src/runtime/menu_projection_pair.hpp and vrhost/tests/projection_blit_upload_smoke.cpp cover positive and negative first-eye failure, changed/shared params, interruption, reverse order, size mismatch, zero size; DX9Ex Active host job SUCCESS in Release."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38202554550 at exact material SHA: policy, host, game, full-chain-compile, package all SUCCESS."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38202554548 SUCCESS at exact material SHA."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38202554551 active-game, OpenXR-host and source-cross-domain 3/3 SUCCESS at exact material SHA."
+    },
+    {
+      "item": "QUEST3_VDXR_RUNTIME",
+      "status": "UNTESTED",
+      "evidence": "No headset/game session. Need menu binocular optics and p95/p99 CPU/GPU frame-time comparison; no FPS gain claim."
+    }
+  ],
+  "package_artifact_id": 11725549969,
+  "package_artifact_digest": "sha256:118c6d977ff375380efac6a9606d4d112114d566b69ddfaba128a53591f64468",
+  "notes": "C6 [skip ci] bookkeeping is separate from passed validation-bearing material SHA, +0 score for bookkeeping. Preserve SkyGlow/world, FFB and DX11/DXVK/localization branch isolation. HMD proof remains pending."
+}

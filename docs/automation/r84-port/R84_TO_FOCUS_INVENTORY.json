@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00506",
+  "queue_item": "DX9EX-R84-PORT-INVENTORY-001",
+  "target_branch": "vr-d3d9ex-focus",
+  "focus_base_sha": "cd94b8751540fce0a493374fc3e841dd8475aa32",
+  "donor_branch": "vr-refactor-r84-2000c-20261001",
+  "donor_sha": "40e998500fc758dd3b078d9df2ecc2a57a19bc5d",
+  "gate0": {
+    "status": "DONE",
+    "validation_bearing_sha": "cd94b8751540fce0a493374fc3e841dd8475aa32",
+    "dx9ex_active_run_id": 37576055744,
+    "conclusion": "success",
+    "rationale": "00505 post-Present unresolved-slot ownership repair plus verifier scoping are green at exact current focus HEAD."
+  },
+  "allowed_dispositions": [
+    "APPLIED_EQUIVALENT",
+    "PORT_REQUIRED",
+    "SUPERSEDED",
+    "DEFERRED_RUNTIME_RISK"
+  ],
+  "items": [
+    {
+      "id": "R84-R34-R33-FINAL-DISPATCH",
+      "area": "core dispatch/final",
+      "disposition": "APPLIED_EQUIVALENT",
+      "evidence": [
+        "focus removes src/vr/d3d9/stereo_renderer_r34.cpp",
+        "focus R33 owns final Reset/Present/DirectGPU/draw dispatch",
+        "focus R33 folds ResetEx replay-health/raster guard responsibilities formerly in donor R34",
+        "tools/verify_vr_refactor_contract.py fails if retired R34 source returns"
+      ],
+      "next_action": "Do not port donor R34 physical hook layer."
+    },
+    {
+      "id": "R84-R33-R32-REVIEW-DISPATCH",
+      "area": "R33/R32 review and dispatch-support boundary",
+      "disposition": "APPLIED_EQUIVALENT",
+      "evidence": [
+        "focus R32 is hook-free functional review/telemetry/reset/direct-transport owner",
+        "focus R33 directly hooks R22 Reset, R13 Present/DirectGPU, R29 render-state, and R30 draw boundaries",
+        "focus refactor contract prevents R32/R31 from regaining lower physical hook ownership"
+      ],
+      "next_action": "Preserve current runtime ownership; textual compilation ownership is tracked separately."
+    },
+    {
+      "id": "R84-R32-R31-SUPPORT-STATE",
+      "area": "R32/R31 support/state boundary",
+      "disposition": "APPLIED_EQUIVALENT",
+      "evidence": [
+        "focus R31 owns StateBlock event-consumer/recovery initialization and cache state",
+        "focus R32 consumes R31 as functional support without physical hook ownership",
+        "structureRefactorChain is durably COMPLETE at post-1100 terminal hardening"
+      ],
+      "next_action": "No donor runtime policy port."
+    },
+    {
+      "id": "R84-R31-R30-SCREEN-SPACE",
+      "area": "R31/R30 screen-space boundary",
+      "disposition": "APPLIED_EQUIVALENT",
+      "evidence": [
+        "focus R30 exposes lower-draw owner APIs and install-status owner query",
+        "focus R31 is StateBlock/cache-only and no longer submits physical world/HUD draws",
+        "focus verifier requires R33, not R31, to consume R30 lower-draw owner APIs"
+      ],
+      "next_action": "Preserve functional seam; compile-unit split is tracked by CMAKE-TEXTUAL-OWNERSHIP."
+    },
+    {
+      "id": "R84-R30-R29-STEREO-BASE",
+      "area": "R30/R29 stereo-base boundary",
+      "disposition": "APPLIED_EQUIVALENT",
+      "evidence": [
+        "focus R30 owns ScreenHud/XYZRHW handling and delegates exact lower draw families through R29 hook storage",
+        "focus verifier checks every R30CallLowerDraw* wrapper delegates to matching R29 hook storage",
+        "focus R30 install state is exposed through acquire-load owner query"
+      ],
+      "next_action": "No stale donor HUD/effect policy port."
+    },
+    {
+      "id": "R84-HUD-XYZRHW-INTERFACES",
+      "area": "screen-space/HUD/XYZRHW interfaces",
+      "disposition": "SUPERSEDED",
+      "evidence": [
+        "focus contains newer exact producer semantics, cross-thread semantic registry, projected-marker anchors, Sumo replay semantic preservation, and current R30 HUD/XYZRHW corrections",
+        "R84 donor predates current runtime-derived HUD recovery chain"
+      ],
+      "next_action": "Use current focus/upstream-first HUD evidence; never back-port donor classification heuristics wholesale."
+    },
+    {
+      "id": "R84-STEREO-RUNTIME-MATH-FACADES",
+      "area": "stereo runtime/math facades",
+      "disposition": "SUPERSEDED",
+      "evidence": [
+        "focus has later pose/recenter/session/runtime contracts and current protected stereo baseline",
+        "donor math/runtime abstractions are design evidence only where current owner APIs do not already exist"
+      ],
+      "next_action": "Re-open only for a concrete missing owner API proven against current focus."
+    },
+    {
+      "id": "R84-FRAME-LIFECYCLE-RECOVERY",
+      "area": "frame lifecycle/recovery APIs",
+      "disposition": "SUPERSEDED",
+      "evidence": [
+        "focus accumulated later Reset/ResetEx replay-health, final-submission, swapchain teardown, recenter lifecycle, and fail-closed recovery fixes",
+        "current regression contracts are newer than donor R84 lifecycle state"
+      ],
+      "next_action": "Do not replace current lifecycle semantics with donor snapshots."
+    },
+    {
+      "id": "R84-STATEBLOCK-RASTER-DEPTH",
+      "area": "StateBlock/raster/depth ownership",
+      "disposition": "APPLIED_EQUIVALENT",
+      "evidence": [
+        "focus has state_block_tracker/recovery/events owner modules",
+        "R31 is current event consumer and recovery initializer",
+        "R33 final raster guard and depth/stencil cache use current owner APIs",
+        "refactor verifier rejects private lower-layer state ownership regressions"
+      ],
+      "next_action": "Keep current owner modules; no donor physical-hook layer."
+    },
+    {
+      "id": "R84-DIRECTGPU-FACADES",
+      "area": "DirectGPU transport runtime/facades",
+      "disposition": "SUPERSEDED",
+      "evidence": [
+        "focus contains later full-ring slot selection, ACK mapping generation/lifetime, quarantine, ResetEx release, fail-closed query handling, and 00505 unresolved post-Present ownership fixes",
+        "donor R84 predates these transport correctness changes"
+      ],
+      "next_action": "Never port donor DirectGPU runtime policy over current focus."
+    },
+    {
+      "id": "R84-PERF-DISPATCH-TELEMETRY",
+      "area": "performance/dispatch telemetry",
+      "disposition": "SUPERSEDED",
+      "evidence": [
+        "focus R32/R33 contain later frame workload, timing, draw-route, transport, and diagnostic counters",
+        "runtime-visible performance conclusions remain HMD/scene dependent"
+      ],
+      "next_action": "Use donor telemetry ideas only if a current measured gap is identified."
+    },
+    {
+      "id": "R84-CMAKE-TEXTUAL-OWNERSHIP",
+      "area": "CMake split gates and HEADER_FILE_ONLY/textual implementation ownership",
+      "disposition": "PORT_REQUIRED",
+      "evidence": [
+        "focus cmake.toml still marks R9/R13/R20/R21/R22/R23/R26/R29/R30/R31/R32 as HEADER_FILE_ONLY implementation TUs",
+        "focus R33 textually includes stereo_renderer_r32.cpp; R32 includes R31; R31 includes R30; R30 includes R29",
+        "donor R84 had explicit split-compile compatibility boundaries intended to remove cross-layer textual ownership"
+      ],
+      "next_action": "After inventory, create one bounded compile-ownership child task; split only one seam at a time and require exact full-chain compile before advancing."
+    },
+    {
+      "id": "R84-REFACTOR-VERIFIER-COVERAGE",
+      "area": "verify_vr_refactor_contract.py coverage",
+      "disposition": "APPLIED_EQUIVALENT",
+      "evidence": [
+        "focus verifier is substantially newer and pins post-1100 owner boundaries, retired R34, lower-draw wrappers, StateBlock owner APIs, and direct-state encapsulation",
+        "00506 adds a separate inventory verifier rather than replacing current refactor coverage"
+      ],
+      "next_action": "Extend only alongside each future compile-ownership seam."
+    },
+    {
+      "id": "R84-DEFERRED-RUNTIME-RISK",
+      "area": "behavior-changing donor-only experiments",
+      "disposition": "DEFERRED_RUNTIME_RISK",
+      "evidence": [
+        "any donor-only behavior that would change HUD/effects/stereo/Reset/DirectGPU semantics cannot be called behavior-neutral against the current HMD-unverified focus baseline"
+      ],
+      "next_action": "Do not schedule during structural convergence unless a concrete current defect plus exact static evidence justifies it."
+    }
+  ],
+  "classification_complete": true,
+  "unclassified_count": 0,
+  "next_queue_action": "Create the first bounded PORT_REQUIRED compile-ownership child under DX9EX-R84-PORT-SEAMS/CLEANUP without changing runtime semantics.",
+  "runtime_validation": "UNTESTED"
+}

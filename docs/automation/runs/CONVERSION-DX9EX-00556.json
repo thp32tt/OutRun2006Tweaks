@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00556",
+  "production_id": "CONVERSION-DX9EX-00556",
+  "event_id": "CONVERSION-DX9EX-00556-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "fd4ce1bb5461eb500cc8287cfce67091f7a439ae",
+  "material_result_sha": "65057d26267c18a654b6e18aeaadb83ef139c76a",
+  "validation_bearing_result_sha": "65057d26267c18a654b6e18aeaadb83ef139c76a",
+  "result_sha": "65057d26267c18a654b6e18aeaadb83ef139c76a",
+  "commit_marker": "[AUTO:CONVERSION-DX9EX-00556]",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "automation_validation": "PASS",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "retry_allowed": false,
+  "ci_gate_complete": true,
+  "controller_terminal": true,
+  "selected_work_item": "DX9EX-P0-RANK-MARKER-TRUNCATE-NONFINITE-FRACTION-GUARD",
+  "summary": "At canonical original 0xBB046 rank truncate hook, reject nonfinite raw/computed offset before writing sibling glyph fractions; retain valid upstream arithmetic. Add two distinct fault-injection verifier mutants, no repeated identical HUD audits.",
+  "changed_paths": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_projected_marker_anchor.py"
+  ],
+  "pipeline": {
+    "C0_RECOVER": "PASS: authenticated target HEAD, AGENTS, DX9Ex state/queue/problem history, original emoose UIScaling producer, HUD semantic baseline, exact contract verifiers and Issue #13/#14 examined; no 00556 record or active conflict at dispatch.",
+    "C1_REVIEW": "PASS: original rank truncate 0xBB046 derived fractional offsets directly from stack floats, which could forward nonfinite bad values to every rank-marker sibling if original projected producer emits invalid intermediate data. Exact rank/rival CALL and finite-view guards preserved.",
+    "C2_IMPLEMENT": "PASS: real C++ fractional-offset fail-closed guard and focused Python verifier with two distinct single-step corruption mutations; normal original finite arithmetic unchanged. No DX11/DXVK/localization modifications.",
+    "C3_VALIDATE": "PASS exact material SHA: DX9Ex Active Validation 37749430357 (policy/game/host/full-chain/package SUCCESS), EXE HUD Inspector 37749430467 (analysis+inspector SUCCESS), Domain Isolation Guard 37749430396 SUCCESS, Full Source Impact Review 37749430504 SUCCESS.",
+    "C4_COMMIT": "PASS actual 65057d26267c18a654b6e18aeaadb83ef139c76a source+test commit contains exact [AUTO:CONVERSION-DX9EX-00556] and no CI-skip; CAS fast-forward remote validated; bookkeeping separate.",
+    "C5_PACKAGE": "PASS GitHub artifact 11537735562 uploaded for exact source SHA; user deployment/HMD visual acceptance not performed.",
+    "C6_RESULT": "PASS Issue #14 event 6055956845 and run record pinned to validation-bearing material SHA; AI2 score RUN_KEY awarded once from 1225 to 1226, GitHub commit b02a81e478c66ff75c623726258c75e546e67c2b."
+  },
+  "static_contract": {
+    "focused_preflight": "PASS",
+    "canonical_exe_producer": "OR2006C2C.EXE RVA 0xBB046",
+    "rank_fraction_bad_stack": "ZERO_FRACTION",
+    "rank_fraction_overflow": "ZERO_FRACTION",
+    "valid_finite_path": "PRESERVED",
+    "new_distinct_mutations": 2,
+    "hud_repeat_1000_5000": false
+  },
+  "ci_runs": {
+    "dx9ex_active": 37749430357,
+    "hud_inspector": 37749430467,
+    "domain_isolation": 37749430396,
+    "full_source_impact": 37749430504
+  },
+  "ci_observed": {
+    "policy": "SUCCESS",
+    "game": "SUCCESS",
+    "host": "SUCCESS",
+    "full_chain_compile": "SUCCESS",
+    "package": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "canonical_exe_hud_analysis": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "full_source_impact": "SUCCESS"
+  },
+  "exact_sha_validation": {
+    "material_sha": "65057d26267c18a654b6e18aeaadb83ef139c76a",
+    "active_run_id": 37749430357,
+    "active_result": "success",
+    "hud_run_id": 37749430467,
+    "hud_result": "success",
+    "domain_run_id": 37749430396,
+    "domain_result": "success",
+    "full_source_impact_run_id": 37749430504,
+    "full_source_impact_result": "success"
+  },
+  "package_artifact": {
+    "id": 11537735562,
+    "name": "OutRun2-VR-DX9EX-ACTIVE-65057d26267c18a654b6e18aeaadb83ef139c76a",
+    "size_bytes": 2749465,
+    "digest": "sha256:b1a2fadd17f230de3534ae99d5a9f519f5ff829149c7cf5ff5d407b55286837b"
+  },
+  "production_change_ledger": {
+    "issue": 14,
+    "comment_id": 6055956845
+  },
+  "runtime_note": "Quest3/VDXR real gameplay remains UNTESTED; old 00519 doubled/headlocked HUD, rank marker, lens flare and pacing symptoms remain OPEN, no claim of visual fix.",
+  "parallel_policy": "DX11 A active, DX9Ex C active; DXVK B FROZEN. Only C lane source and its focused verifier changed.",
+  "score_status": "AWARDED_AI2_ONCE_CONVERSION-DX9EX-00556-E001",
+  "scoreboard_commit": "b02a81e478c66ff75c623726258c75e546e67c2b",
+  "score_calculation": "AI2 previous 1225 + new source/CI outcome 1 = cumulative 1226, retry/rollover +0",
+  "next_action": "Do not rerun task 00556. Continue distinct independent DX9Ex visual stabilization source work without touching DXVK or a concurrent worker claim. Preserve HMD gate."
+}

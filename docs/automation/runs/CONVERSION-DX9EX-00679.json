@@ -1,0 +1,90 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00679",
+  "production_id": "CONVERSION-DX9EX-00679",
+  "event_id": "CONVERSION-DX9EX-00679-E001",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "material_result_sha": "1e6bf2ac4581c701796aa8be1efb0a5a0c44340a",
+  "source_material_sha": "1e6bf2ac4581c701796aa8be1efb0a5a0c44340a",
+  "material_commits": [
+    "1e6bf2ac4581c701796aa8be1efb0a5a0c44340a",
+    "71e1b3e8b8e81b20321cede82cec4a8f01200067"
+  ],
+  "result_sha": "71e1b3e8b8e81b20321cede82cec4a8f01200067",
+  "validation_bearing_result_sha": "71e1b3e8b8e81b20321cede82cec4a8f01200067",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r22.cpp",
+    "src/vr/d3d9/stereo_renderer_r23.cpp",
+    "tools/verify_vr_r23_host_fresh_fastpath.py",
+    "tools/verify_vr_r23_seeded_clear_fastpath.py"
+  ],
+  "feature_contract": {
+    "goal": "Reduce avoidable DX9Ex R23 per-draw raster state snapshot work and per-Present host pose-prefix memory work.",
+    "acceptance": "Use R22 raster-shadow validity flags directly in the reliable seeded Clear / top-level Draw fast paths; retain StateBlock reliability and authoritative live/fail-closed raster fallback. Read only the coherent 40-byte host-freshness prefix at Present while preserving layout checks, seqlock and host lifecycle semantics. Keep destructive verifier coverage and pass the exact-validation-SHA DX9Ex Active five-job and Domain Isolation checks.",
+    "metric_status": "No Quest 3 / VDXR measured FPS, p95/p99 CPU/GPU frame time, binocular optics, gameplay or input validation; source and CI verified only."
+  },
+  "acceptance_results": {
+    "raster_shadow_validity_fastpath": "PASS_SOURCE_AND_EXACT_SHA_CI",
+    "host_freshness_40_byte_prefix": "PASS_SOURCE_AND_EXACT_SHA_CI",
+    "live_fallback_and_stateblock_reliability": "PASS_SOURCE_AND_EXACT_SHA_CI",
+    "verifier_regression_repair": "PASS_EXACT_SHA_CI",
+    "dx9ex_active_validation": "PASS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "PASS_EXACT_SHA",
+    "full_source_impact": "PASS_3_OF_3_ORIGINAL_MATERIAL_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38230694875,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "71e1b3e8b8e81b20321cede82cec4a8f01200067",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "game": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38230694810,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "71e1b3e8b8e81b20321cede82cec4a8f01200067",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    {
+      "id": 38230488351,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "1e6bf2ac4581c701796aa8be1efb0a5a0c44340a",
+      "conclusion": "success",
+      "jobs": {
+        "msvc-analyze-openxr-host": "success",
+        "msvc-analyze-active-game": "success",
+        "source-cross-domain": "success"
+      },
+      "note": "Original C++ material SHA only; not asserted as an exact-validation-SHA run."
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "No Quest 3 / VDXR physical HMD runtime validation. Build/CI pass does not prove optics, FPS or gameplay input.",
+  "score_credit_key": "CONVERSION-DX9EX-00679",
+  "score_change": 0,
+  "prior_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "notes": "Canonical task run JSON was absent at the supplied validation SHA. Reconstructed the C6 record using the original C++ material commit and distinct exact-SHA verifier-repair commit, without changing either SHA. New documentation-only [skip ci] bookkeeping, no source edits, no build/CI rerun, no feature score addition or duplicate credit."
+}

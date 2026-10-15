@@ -1,0 +1,63 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00652",
+  "production_id": "CONVERSION-DX9EX-00652",
+  "event_id": "CONVERSION-DX9EX-00652-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R30_XYZRHW_PARTICLE_RECIPROCAL_HOTPATH",
+  "initial_material_sha": "b49626814d3212dd7bf7328f4cb30b833822d069",
+  "material_result_sha": "b49626814d3212dd7bf7328f4cb30b833822d069",
+  "material_commits": [
+    "b49626814d3212dd7bf7328f4cb30b833822d069"
+  ],
+  "verifier_repair_commits": [],
+  "result_sha": "b49626814d3212dd7bf7328f4cb30b833822d069",
+  "validation_bearing_result_sha": "b49626814d3212dd7bf7328f4cb30b833822d069",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Remove avoidable per-vertex floating division in stereo XYZRHW projected particle/sand/smoke transforms.",
+    "acceptance": "Hoist guarded perspective Z, determinant and viewport depth reciprocal values; retain depth/RHW/finite/eye fallback; run 17 destructive regression checks and same-SHA Active, Domain and Full Impact gates.",
+    "runtime_metrics": "Quest3/VDXR gameplay FPS and frame-time were not measured; no runtime speedup claim."
+  },
+  "acceptance_results": [
+    {
+      "item": "R30_RECIPROCAL_MATERIAL",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "b49626814d3212dd7bf7328f4cb30b833822d069: avoid repeated perspective Z/determinant/depth normalization per-vertex divides; preserve original fallback."
+    },
+    {
+      "item": "R30_NEGATIVE_MUTATIONS",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "17 destructive source mutations passed canonical policy job, together with retained R30 bilateral-fallback checks."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38194195385 policy, host, game, full-chain-compile, package 5/5 SUCCESS on b49626814d3212dd7bf7328f4cb30b833822d069."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38194195352 SUCCESS on b49626814d3212dd7bf7328f4cb30b833822d069."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38194195313 host/game MSVC analysis and source-cross-domain 3/3 SUCCESS on b49626814d3212dd7bf7328f4cb30b833822d069."
+    },
+    {
+      "item": "QUEST3_VDXR_RUNTIME",
+      "status": "UNTESTED",
+      "evidence": "No HMD gameplay, optic acceptance or frame-time captures."
+    }
+  ],
+  "notes": "Bookkeeping follows exact-SHA gate in a separate commit and is not another material task or scored outcome. Preserve b4962681 as the validation-bearing result. DXVK remains frozen; DX11, localization and FFB unchanged."
+}

@@ -1,0 +1,86 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00747",
+  "production_id": "CONVERSION-DX9EX-00747",
+  "event_id": "CONVERSION-DX9EX-00747-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00747",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "49e09e61b97c59f5f2c76b1ec31634c8d7501c27",
+  "material_result_sha": "49e09e61b97c59f5f2c76b1ec31634c8d7501c27",
+  "validation_bearing_result_sha": "49e09e61b97c59f5f2c76b1ec31634c8d7501c27",
+  "result_sha": "49e09e61b97c59f5f2c76b1ec31634c8d7501c27",
+  "material_commits": [
+    "49e09e61b97c59f5f2c76b1ec31634c8d7501c27"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 P0-A: make 4:3 main-menu sidebars remain visible despite inherited game alpha-test/color-write states without breaking F11/game state.",
+    "completed_scope": "D3DEndScene obtains exact prior alpha-test and render-target colour-write mask before drawing menu letterbox geometry; disables alpha test, enables RGBA writing for two opaque bar draws, then restores both original states. Eight independent destructive mutation cases added to the existing DX9Ex policy verifier.",
+    "remaining_acceptance": [
+      "Issue #119 overall responsive HUD/main/menu/ESC/F11 optical and interaction acceptance remains IN_PROGRESS; existing material is not optical proof.",
+      "Matching Quest3/VDXR session still required to confirm menu bars, HUD, pause and F11 legibility and no optical regressions."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_POLICY_8_DESTRUCTIVE_MUTANTS",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "dx9ex_full_chain": "SUCCESS_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_EXACT_SHA",
+    "hud_inspector": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38347789573,
+      "head_sha": "49e09e61b97c59f5f2c76b1ec31634c8d7501c27",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "policy SUCCESS, full-chain-compile SUCCESS, host SUCCESS, game SUCCESS, package SUCCESS"
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38347789545,
+      "head_sha": "49e09e61b97c59f5f2c76b1ec31634c8d7501c27",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "domain-isolation SUCCESS"
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38347789543,
+      "head_sha": "49e09e61b97c59f5f2c76b1ec31634c8d7501c27",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "msvc-analyze-active-game SUCCESS, source-cross-domain SUCCESS, msvc-analyze-openxr-host SUCCESS"
+    },
+    {
+      "name": "OutRun EXE HUD Inspector CI",
+      "run_id": 38347789627,
+      "head_sha": "49e09e61b97c59f5f2c76b1ec31634c8d7501c27",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "static-exe-analysis SUCCESS, build-hud-inspector SUCCESS"
+    }
+  ],
+  "score_delta": 0,
+  "score_reason": "Issue #119 remains one integrated responsive-UI feature; this material code checkpoint is not separate whole-feature completion and must not double-count earlier results.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "Post-validation [skip ci] bookkeeping only. GitHub CI completed on the separate exact material/validation-bearing SHA. Runtime optical acceptance remains pending; use validation_bearing_result_sha for automated gate evidence."
+}

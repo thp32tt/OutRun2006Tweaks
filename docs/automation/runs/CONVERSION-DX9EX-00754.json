@@ -1,0 +1,77 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00754",
+  "production_id": "CONVERSION-DX9EX-00754",
+  "event_id": "CONVERSION-DX9EX-00754-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00754",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "0b9565ecab57995185f8a349f72b7e4e44ebf3cb",
+  "material_result_sha": "0b9565ecab57995185f8a349f72b7e4e44ebf3cb",
+  "validation_bearing_result_sha": "0b9565ecab57995185f8a349f72b7e4e44ebf3cb",
+  "result_sha": "0b9565ecab57995185f8a349f72b7e4e44ebf3cb",
+  "material_commits": [
+    "0b9565ecab57995185f8a349f72b7e4e44ebf3cb"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119: prevent the VR F11 ImGui shell from reverting to desktop window placement and style when the headset remains active at 1x XR font atlas density or during VR-to-desktop transitions.",
+    "completed_scope": "Key original F11 initial window placement and ImGui style by live VR presentation instead of font density; remember prior VR mode to reflow on genuine mode changes without disturbing steady user layout or desktop/front-end UI. Extend owning regression with 4 destructive mutations and multi-aspect 1x/2.75x entry/exit fixtures.",
+    "remaining_acceptance": [
+      "Full Issue #119 responsive HUD, game/main-menu aspect, independent ESC and F11 legibility remains IN_PROGRESS as one integrated feature.",
+      "Matched Quest 3 / VDXR real-game UI readability, stereo and performance acceptance NEED_HMD_TEST."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_F11_VR_MODE_1X_TRANSITION_4_DESTRUCTIVE_MUTANTS",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "dx9ex_full_chain": "SUCCESS_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38355768474,
+      "head_sha": "0b9565ecab57995185f8a349f72b7e4e44ebf3cb",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "policy, host, game, full-chain-compile, package: 5/5 SUCCESS"
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38355768471,
+      "head_sha": "0b9565ecab57995185f8a349f72b7e4e44ebf3cb",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "domain-isolation SUCCESS"
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38355768475,
+      "head_sha": "0b9565ecab57995185f8a349f72b7e4e44ebf3cb",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "source-cross-domain, msvc-analyze-openxr-host, msvc-analyze-active-game: 3/3 SUCCESS"
+    }
+  ],
+  "score_delta": 0,
+  "score_reason": "Issue #119 remains one unfinished whole integrated feature; do not duplicate credit for a build-verified sub-feature or C6 bookkeeping.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "Separate bookkeeping-only [skip ci] commit is not validation-bearing. Source commit 0b9565ecab57995185f8a349f72b7e4e44ebf3cb has no CI-skip instruction; all required GitHub Actions succeeded on that immutable exact SHA."
+}

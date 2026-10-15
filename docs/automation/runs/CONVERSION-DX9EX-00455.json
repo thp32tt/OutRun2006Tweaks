@@ -1,0 +1,125 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00455",
+  "production_id": "CONVERSION-DX9EX-00455",
+  "event_id": "CONVERSION-DX9EX-00455-E002",
+  "event_type": "retry",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "2/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "c12e56ebd9395c9b8f66fc59ce52513470918b49",
+  "material_result_sha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+  "validation_bearing_result_sha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+  "result_sha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00455]",
+  "selected_work_item": "VR-DX9EX-SWAPCHAIN-GPU-DRAIN-BOUNDED-0038",
+  "summary": "Bound the R19 D3D11 event-query GPU completion wait to 250 ms and exit early on device removal so swapchain teardown cannot hang indefinitely on a stalled/lost GPU while preserving the normal completion-fence path.",
+  "changed_paths": [
+    "vrhost/src/runtime/sbs_capture_override.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00455.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered bookkeeping HEAD c12e56ebd9395c9b8f66fc59ce52513470918b49 after CONVERSION-DX9EX-00454 PASS. Structural extraction remains terminal; 00454 introduced the event-query completion fence and explicitly queued bounded device-loss/stall handling next."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "WaitForSwapchainGpuIdleBeforeDestroy looped while GetData returned S_FALSE with no time or device-loss exit. On a stalled/removed GPU this could block session/reset teardown indefinitely. Existing bounded OpenXR wait policy already uses a 250 ms recovery budget."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added SwapchainGpuDrainBudgetMs=250, GetDeviceRemovedReason early exit, elapsed-time cutoff, and verifier assertions while retaining normal End->Flush->GetData-until-S_OK completion ordering."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Retry exact SHA passed DX9Ex Active and Domain Isolation; initial policy failure was verifier-only."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "ci_skip_on_validation_bearing_result": false,
+      "result_sha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+      "source_runtime_sha": "60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a"
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE",
+      "artifact_id": 11386998671,
+      "digest": "sha256:ff35bc0cc243abae4304414f0f825d7a89fa12848d00a046b1e0cb0598c41f96"
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "red_review": {
+      "base_sha": "c12e56ebd9395c9b8f66fc59ce52513470918b49",
+      "result": "FAIL_AS_EXPECTED",
+      "missing_contract": "00454 event-query wait had no bounded exit for persistent S_FALSE and no explicit D3D11 device-removal escape."
+    },
+    "references": [
+      "Microsoft ID3D11DeviceContext::GetData returns S_FALSE while query data is unavailable and must be polled until available on the normal path.",
+      "Microsoft ID3D11DeviceContext::Flush is asynchronous; the event query remains the normal completion proof."
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    },
+    "initial_failed_gate": {
+      "run_id": 37406784043,
+      "head_sha": "60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a",
+      "policy_job_id": 112086008594,
+      "result": "FAIL",
+      "classification": "VERIFIER_FALSE_NEGATIVE",
+      "reason": "Namespace-level SwapchainGpuDrainBudgetMs constant was asserted against sbs_gpu_drain function-body slice."
+    },
+    "initial_domain_isolation": {
+      "run_id": 37406784051,
+      "head_sha": "60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a",
+      "status": "completed",
+      "result": "success"
+    },
+    "retry_repair": {
+      "event_id": "CONVERSION-DX9EX-00455-E002",
+      "attempt": "2/3",
+      "source_runtime_change": false,
+      "verifier_change": "Check SwapchainGpuDrainBudgetMs on host_sbs and keep helper-local device-loss/timeout references checked on sbs_gpu_drain."
+    },
+    "dx9ex_active": {
+      "run_id": 37406897470,
+      "head_sha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+      "result": "SUCCESS",
+      "jobs": {
+        "policy": 112086348806,
+        "host": 112086478448,
+        "game": 112086478350,
+        "full_chain_compile": 112086478304,
+        "package": 112087716734
+      }
+    },
+    "domain_isolation": {
+      "run_id": 37406897447,
+      "job_id": 112086348549,
+      "head_sha": "ac32589324fbc76b4d2fcd4321f31415f0ef5a39",
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11386998671,
+      "digest": "sha256:ff35bc0cc243abae4304414f0f825d7a89fa12848d00a046b1e0cb0598c41f96"
+    }
+  },
+  "next_action": "Review fail-closed swapchain destruction when GPU completion cannot be proven; preserve ac32589324fbc76b4d2fcd4321f31415f0ef5a39 as CONVERSION-DX9EX-00455 validation-bearing result.",
+  "started_at_kst": "2026-10-06T11:57:38+09:00",
+  "retry_started_at_kst": "2026-10-06T11:59:47+09:00",
+  "source_material_sha": "60b7ccc94bc2fffce6b1e1bcc0ebce660fc3223a",
+  "completed_at_kst": "2026-10-06T12:06:47+09:00"
+}

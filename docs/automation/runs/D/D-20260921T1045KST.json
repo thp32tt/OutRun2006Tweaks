@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 2,
+  "role": "D",
+  "runId": "D-20260921T1045KST",
+  "startedKst": "2026-09-21T10:45:17+09:00",
+  "baseSha": "8cca78df85fef21a38e66f20fcf9ae867c4779cb",
+  "status": "EARLY_FINISH_CAPABILITY_BLOCKED",
+  "execution_units_completed": 15,
+  "reviewerLedgerGate": {
+    "dedicatedBranchesRequested": ["vr-d3d9ex-review-a", "vr-d3d9ex-review-b", "vr-d3d9ex-review-c"],
+    "dedicatedBranchesFound": [],
+    "legacyBranchFound": "vr-d3d9ex-review",
+    "disposition": "Do not trust legacy 100/100 summaries as new dedicated-ledger COMPLETE evidence; only concrete persisted finding/handoff evidence was consumed."
+  },
+  "findingsTouched": [
+    "DX9EX-RESET-STATEBLOCK-001",
+    "DX9EX-TEST-HOST-SMOKES-CI-001",
+    "DX9EX-PERF-PRODUCER-FENCE-001"
+  ],
+  "mandatoryRealChange": {
+    "attempted": true,
+    "finding": "DX9EX-RESET-STATEBLOCK-001",
+    "target": "src/vr/d3d9/ex_device_upgrade_r15.cpp",
+    "existingPatch": "docs/automation/patches/DX9EX-RESET-STATEBLOCK-001.patch",
+    "result": "CAPABILITY_BLOCKED",
+    "reason": "GitHub connector exposes whole-file replacement but no range/apply-patch operation. Exact source is 23,773 bytes; connector retrieval can be paged for review but cannot be materialized into the execution filesystem, and outbound raw GitHub fetch from the local container is unavailable. Whole-file manual reconstruction was rejected as unsafe."
+  },
+  "executionUnits": [
+    "verified integration ref and immutable HEAD",
+    "checked requested dedicated reviewer branch namespace",
+    "identified repository still has only legacy shared review branch",
+    "read durable autodev state and coordination policy",
+    "read persisted review findings",
+    "verified reset-stateblock B handoff commit",
+    "verified staged reset-stateblock patch contents",
+    "confirmed active R15 stateblock capture path",
+    "confirmed active R15 pre-Reset StateBlock Apply path",
+    "attempted safe source materialization/edit route and recorded blocker",
+    "confirmed candidate-capable branch-scoped DX9Ex workflow trigger",
+    "confirmed host smoke tests are not executed by active validation workflow",
+    "confirmed integration CI run 35548649441 completed successfully for 8cca78df",
+    "touched producer-fence performance finding as next independent runtime candidate requiring instrumentation before behavior change",
+    "published this durable D run record with partial-invalidation metadata"
+  ],
+  "partialInvalidation": {
+    "integrationRuntimeChanged": false,
+    "carriedForward": "All source-dependent review coverage remains content-valid at 8cca78df.",
+    "invalidated": [],
+    "docsOnlyCommitExpected": true
+  },
+  "validation": {
+    "integrationCiRunId": 35548649441,
+    "integrationCiConclusion": "success",
+    "integrationCiSha": "8cca78df85fef21a38e66f20fcf9ae867c4779cb",
+    "userRuntimeVerified": false
+  },
+  "needsPostReview": [],
+  "blockers": [
+    "Dedicated vr-d3d9ex-review-a/b/c branches or canonical equivalents are not present; legacy vr-d3d9ex-review exists but cannot satisfy the new independent-ledger trust gate.",
+    "Safe production source edit for the 23KB R15 file is blocked by lack of apply-patch/range-edit/materialization capability in this Chat execution."
+  ],
+  "nextActions": [
+    "Establish independent reviewer branches/ledgers without sharing a writable branch.",
+    "Apply DX9EX-RESET-STATEBLOCK-001 on an isolated candidate once safe patch/range editing is available, then run DX9Ex Active Validation and route exact SHA to A state/lifetime, B rendering/stereo, C synchronization/testability post-review.",
+    "Add existing vrhost no-HMD smoke executables to candidate validation as a low-risk infrastructure candidate.",
+    "Instrument producer-fence wait duration/count before attempting synchronization behavior changes."
+  ]
+}

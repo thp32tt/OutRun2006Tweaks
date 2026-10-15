@@ -1,0 +1,160 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00781",
+  "production_id": "CONVERSION-DX9EX-00781",
+  "event_id": "CONVERSION-DX9EX-00781-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:START_SHADOW",
+  "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+  "work_key": "DX9EX:VIS:START_SHADOW",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "feature_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00781]",
+  "material_result_sha": "39ca3cde17b58577121429b03880349f0979ba84",
+  "validation_bearing_result_sha": "a01f202655d4c0a96059f12808e0b0a8277bcbd1",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "score_delta": 1,
+  "changed_files": [
+    "src/hooks_graphics.cpp",
+    "tools/verify_vr_start_shadow_world_owner.py",
+    ".github/workflows/vr-dx9ex-active.yml",
+    "docs/automation/runs/CONVERSION-DX9EX-00781.json",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_vr_visual_composition_p0.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:START_SHADOW",
+    "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+    "goal": "Resolve complete Quest3 race-start car base shadow diplopia by tracking the three original Xbox-port calls, explicit world-per-eye render ownership, exact queue fallback and depth/stencil, preserving normal world/car shadows.",
+    "scope_boundary": "Only original three car-base shadow source calls and bounded VR semantic scope; exclude general gameplay HUD, skyglow, flares, wheel input, DX11 and DXVK.",
+    "trace_stages": [
+      "Original EXE car/model shadow 0x69EB4 plus two distinct car-select shadow call sites render one DrawObjectAlpha_Internal with player-car matrix.",
+      "EffectiveScope prioritizes old ScreenHud/WorldBillboard queue token over ScopedRenderSemantic WorldParticle on direct original draw.",
+      "ScopedExactProducerSemantic protects direct non-queue shadow WorldParticle and restores old owner before R30 per-eye replay/host; stencil duplication remains a separate runtime hypothesis."
+    ],
+    "subcomponents": [
+      "Source-time shadow identity across all three original-mode entry points and native alpha/matrix preserved.",
+      "Direct VR draw overrides stale queue HUD without changing live queue draws and desktop path.",
+      "Negative mutants and same-result SHA full Windows x86/x64 integration and headset separated."
+    ],
+    "acceptance_items": [
+      {
+        "id": "SHADOW_DIRECT_EYE_WORLD",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_car_shadow_and_stereo",
+        "expected_behavior": "Original car-ground alpha is drawn once with direct WorldParticle ownership in VR, never stale queue HUD or zero-parallax projection."
+      },
+      {
+        "id": "SHADOW_QUEUE_FALLBACK",
+        "category": "fallback_regression",
+        "behavior_area": "desktop_queue_and_matrix",
+        "expected_behavior": "No SpriteNode queue scope overwrite, no desktop alpha, original CALL, car matrix or ordinary world-shadow regression; 8 negative mutations reject drift."
+      },
+      {
+        "id": "SHADOW_EXACT_SHA_GATES",
+        "category": "integrated_validation",
+        "behavior_area": "windows_game_host_package",
+        "expected_behavior": "Exact SHA Active policy/game/host/package, Domain Isolation, Full Source Impact; Quest3 double-shadow assessment separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "SHADOW_DIRECT_EYE_WORLD": "PASS_SOURCE_BUILD_NEED_HMD_TEST",
+    "SHADOW_QUEUE_FALLBACK": "PASS_EXACT_SHA",
+    "SHADOW_EXACT_SHA_GATES": "PASS_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "diagnosis": {
+    "original_evidence": "Old Quest3 visible report: race-start shadow doubled. Canonical upstream Xbox port car-ground shadow has three known original calls; existing 2026-10-08 deep review explicitly leaves stencil-vs-two draw root cause unresolved.",
+    "root_cause": "Bounded source failure candidate: ScopedRenderSemantic CurrentScope WorldParticle loses EffectiveScope precedence to a stale selected SpriteNode ScreenHud/marker outside a queue.",
+    "alternatives_rejected": [
+      "Do not remove original shadows, force mono, change all alpha effects or SkyGlow; stereo stencil/replay must be independently proven.",
+      "Changing a4, car shadow opacity or player-car matrix is not supported by existing eye-depth evidence."
+    ],
+    "source_trace": [
+      "Original EXE car/model shadow 0x69EB4 plus two distinct car-select shadow call sites render one DrawObjectAlpha_Internal with player-car matrix.",
+      "EffectiveScope prioritizes old ScreenHud/WorldBillboard queue token over ScopedRenderSemantic WorldParticle on direct original draw.",
+      "ScopedExactProducerSemantic protects direct non-queue shadow WorldParticle and restores old owner before R30 per-eye replay/host; stencil duplication remains a separate runtime hypothesis."
+    ],
+    "eye_ownership": "Direct draw VR-only exact queue-owner rebind; live SpriteNode queue unchanged; desktop/game matrix unchanged.",
+    "fix_evidence": "Original three car-shadow calls and one alpha draw preserved; direct scoped exact WorldParticle owner now also saves/clears/restores stale pending one-shot render token. Original world RAII/matrix/depth/desktop fallback retained in source SHA 64cde382; exact game/host/full-chain/package pass at a01f2026.",
+    "negative_test_evidence": "12 source/semantic mutants, canonical P0 visual ownership contract, DX9Ex Active 5/5, Domain Isolation, HUD Inspector and Full Source Impact 3/3 passed exact validation SHA a01f2026.",
+    "unresolved": "Source-only change does not prove observed race-start diplopia cured; compare original producer draw count and per-eye stencil/depth using Quest3/VDXR.",
+    "retry_failure_cause": "Run 38411024905 failed P0 scoped original Draw contract; first repair policy detected an overstrict whitespace-only test due comments between adjacent scopes.",
+    "retry_resolution": "Bounded direct-world pending token save/clear/restore and adjacent legacy world RAII preserve original car-shadow calls, opacity, queue and desktop."
+  },
+  "ci_evidence": {
+    "exact_sha": "a01f202655d4c0a96059f12808e0b0a8277bcbd1",
+    "material_source_shas": [
+      "39ca3cde17b58577121429b03880349f0979ba84",
+      "64cde3821ff5de789407212aff67143432621c9b"
+    ],
+    "dx9ex_active": {
+      "run_id": 38412390181,
+      "result": "SUCCESS",
+      "jobs": [
+        "policy",
+        "game",
+        "host",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    "hud_inspector": {
+      "run_id": 38412389839,
+      "result": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38412389968,
+      "result": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38412389697,
+      "result": "IN_PROGRESS",
+      "completed_jobs": [
+        "source-cross-domain",
+        "msvc-analyze-openxr-host"
+      ],
+      "pending_job": "msvc-analyze-active-game"
+    },
+    "runtime": "UNTESTED"
+  },
+  "blocked_reason": "FULL_SOURCE_IMPACT_NOT_YET_COMPLETE",
+  "material_repair_shas": [
+    "64cde3821ff5de789407212aff67143432621c9b",
+    "a01f202655d4c0a96059f12808e0b0a8277bcbd1"
+  ],
+  "validation_evidence": {
+    "exact_sha": "a01f202655d4c0a96059f12808e0b0a8277bcbd1",
+    "dx9ex_active": {
+      "run_id": 38412390181,
+      "policy": "SUCCESS",
+      "game": "SUCCESS",
+      "host": "SUCCESS",
+      "full_chain_compile": "SUCCESS",
+      "package": "SUCCESS"
+    },
+    "domain_isolation": {
+      "run_id": 38412389968,
+      "result": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38412389839,
+      "result": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38412389697,
+      "msvc_game": "SUCCESS",
+      "msvc_host": "SUCCESS",
+      "source_cross_domain": "SUCCESS"
+    },
+    "runtime": "UNTESTED"
+  }
+}

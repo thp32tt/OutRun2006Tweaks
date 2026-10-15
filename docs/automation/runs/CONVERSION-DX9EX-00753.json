@@ -1,0 +1,77 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00753",
+  "production_id": "CONVERSION-DX9EX-00753",
+  "event_id": "CONVERSION-DX9EX-00753-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "run_key": "CONVERSION-DX9EX-00753",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "source_material_sha": "3e90b70c5138fef0a70b9ddf830c18204d402969",
+  "material_result_sha": "3e90b70c5138fef0a70b9ddf830c18204d402969",
+  "validation_bearing_result_sha": "3e90b70c5138fef0a70b9ddf830c18204d402969",
+  "result_sha": "3e90b70c5138fef0a70b9ddf830c18204d402969",
+  "material_commits": [
+    "3e90b70c5138fef0a70b9ddf830c18204d402969"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119: keep the active VR external F11 ImGui shell on the full source backbuffer even during source/eye resize or 1x XR font-atlas density, without changing game menus and desktop F11.",
+    "completed_scope": "Remove VrFontMultiplier > 1 gate from the original external VR F11 canvas ownership check. Keep active VR gameplay semantic ownership, finite source checks, original front-end and desktop letterbox; add source-owner, font-density transition and negative mutation regressions to existing F11/menu verifiers.",
+    "remaining_acceptance": [
+      "The integrated Issue #119 responsive in-game HUD, original main-menu aspect, independent ESC layout and F11 optical function remains IN_PROGRESS as a whole feature.",
+      "Quest3/VDXR matched-game/menu/F11 HMD optical/legibility and FPS acceptance NEED_HMD_TEST."
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_EXACT_SHA_DX9EX_POLICY_SOURCE_OWNER_FONT_DENSITY_TRANSITION_AND_NEGATIVE_TESTS",
+    "github_ci": "SUCCESS_EXACT_SHA",
+    "dx9ex_full_chain": "SUCCESS_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_EXACT_SHA",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "name": "DX9Ex Active Validation",
+      "run_id": 38354545483,
+      "head_sha": "3e90b70c5138fef0a70b9ddf830c18204d402969",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "policy, host, game, full-chain-compile, package: 5/5 SUCCESS"
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "run_id": 38354545399,
+      "head_sha": "3e90b70c5138fef0a70b9ddf830c18204d402969",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "domain-isolation SUCCESS"
+    },
+    {
+      "name": "DX9Ex Full Source Impact Review",
+      "run_id": 38354545387,
+      "head_sha": "3e90b70c5138fef0a70b9ddf830c18204d402969",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": "source-cross-domain, msvc-analyze-active-game, msvc-analyze-openxr-host: 3/3 SUCCESS"
+    }
+  ],
+  "score_delta": 0,
+  "score_reason": "Whole Issue #119 integrated feature remains IN_PROGRESS; this is one source/build checkpoint, not independently completed whole feature and not duplicate score credit.",
+  "runtime_validation": "UNTESTED",
+  "runtime_status": "NEED_HMD_TEST",
+  "c6_notes": "Original source validation-bearing SHA is immutable and has no CI skip; required GitHub Actions gates completed success on exact SHA. Separate [skip ci] C6 bookkeeping commit is not validation-bearing and does not supersede it."
+}

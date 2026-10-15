@@ -1,0 +1,66 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00651",
+  "production_id": "CONVERSION-DX9EX-00651",
+  "event_id": "CONVERSION-DX9EX-00651-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R33_DISABLED_STENCIL_SNAPSHOT_SHORT_CIRCUIT",
+  "initial_material_sha": "a6569ee25e49f77cfb0095dde0e1ea6bec3d6901",
+  "material_result_sha": "a6569ee25e49f77cfb0095dde0e1ea6bec3d6901",
+  "material_commits": [
+    "a6569ee25e49f77cfb0095dde0e1ea6bec3d6901"
+  ],
+  "verifier_repair_commits": [
+    "e4677262413c9469f43212625a9e71674cd2ea3a",
+    "aafe932b3fec68c3ff6c486b43b3d21d0a9a673e"
+  ],
+  "result_sha": "aafe932b3fec68c3ff6c486b43b3d21d0a9a673e",
+  "validation_bearing_result_sha": "aafe932b3fec68c3ff6c486b43b3d21d0a9a673e",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Reduce driver GetRenderState overhead for R33 stereo depth/stencil snapshots on stencil-disabled and zero-write-mask draws, preserving state transitions and fail-closed device/state-block recovery.",
+    "acceptance": "Keep required depth reads and skip stencil-op reads when disabled or write-mask zero; cache invalidation on enable/mask transitions; pass 11 destructive source mutations and exact-SHA DX9Ex Active, Domain Isolation and Full Source Impact.",
+    "runtime_metrics": "Quest3/VDXR scene FPS, frame-time, optics and physical device playback not measured."
+  },
+  "acceptance_results": [
+    {
+      "item": "R33_STENCIL_READBACK_MATERIAL",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "a6569ee25e49f77cfb0095dde0e1ea6bec3d6901: skip eight disabled-stencil getters; read mask only when enabled; skip seven ops when zero mask; preserve replay guards."
+    },
+    {
+      "item": "NEGATIVE_MUTATIONS_AND_VERIFIER_REPAIR",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Initial policy #38193024411 failed on legitimate untracked-depth early cache publication. e4677262 scoped checked publication to tracked reads; aafe932b added workflow push.path coverage. Exact aafe932b policy passes 11 negative mutations."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38193336732 policy/host/game/full-chain-compile/package 5/5 SUCCESS on aafe932b3fec68c3ff6c486b43b3d21d0a9a673e"
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38193336765 SUCCESS on aafe932b3fec68c3ff6c486b43b3d21d0a9a673e"
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38193336690 cross-domain + game/host MSVC analyze 3/3 SUCCESS on aafe932b3fec68c3ff6c486b43b3d21d0a9a673e"
+    },
+    {
+      "item": "QUEST3_VDXR_RUNTIME",
+      "status": "UNTESTED",
+      "evidence": "No headset test, optics acceptance or CPU/GPU FPS capture; do not claim runtime benefit."
+    }
+  ],
+  "notes": "C6 follows exact SHA verification as separate [skip ci] bookkeeping; use validation_bearing_result_sha, not C6 SHA, for controller result. Score this TASK once only; retry, verifier repair and C6 +0 incremental. DXVK remains frozen; DX11/Localization/FFB unchanged."
+}

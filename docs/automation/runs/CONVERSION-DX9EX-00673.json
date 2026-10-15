@@ -1,0 +1,71 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00673",
+  "production_id": "CONVERSION-DX9EX-00673",
+  "event_id": "CONVERSION-DX9EX-00673-E001",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "R29_PARTIAL_WVP_ENVELOPE_ZERO_FILL_ELIMINATION",
+  "work_key": "DX9EX-GAME-R29-COHERENT-PARTIAL-WVP-SCRATCH-CPU-HOTPATH",
+  "stage": "C6_RESULT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "base_sha": "6f43fe135b2d0b230cdca9b22da4ab473d02e4a3",
+  "source_material_sha": "1849826bc3224e8532a545e25f80ac550df68905",
+  "material_commits": [
+    "1849826bc3224e8532a545e25f80ac550df68905"
+  ],
+  "result_sha": "1849826bc3224e8532a545e25f80ac550df68905",
+  "validation_bearing_result_sha": "1849826bc3224e8532a545e25f80ac550df68905",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Avoid both 4KiB temporary zero-initializations in the R29 game render-thread partial WVP upload path while preserving exact D3D9 register payloads and protected eye/HUD/FFB behavior.",
+    "acceptance": "Explicit intersection/size/range bound; all WVP/prefix/suffix envelope registers initialized; deterministic 32920 modeled interval cases, 8 destructive source mutations, active Win32 game/host/full-chain/package, domain isolation, Full Source Impact exact-SHA workflows success.",
+    "metric_status": "No Quest3/VDXR CPU/GPU frame-time, p95/p99, FPS or optical runtime measurement; source-level redundant-zero-write removal only."
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38219453758,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "1849826bc3224e8532a545e25f80ac550df68905",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "game": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38219453708,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "1849826bc3224e8532a545e25f80ac550df68905",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    {
+      "id": 38219453788,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "1849826bc3224e8532a545e25f80ac550df68905",
+      "conclusion": "success",
+      "jobs": {
+        "msvc-analyze-active-game": "success",
+        "msvc-analyze-openxr-host": "success",
+        "source-cross-domain": "success"
+      }
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "Quest3/VDXR was not run; no HMD optics, framerate or hardware performance claims.",
+  "score_credit_key": "CONVERSION-DX9EX-00673",
+  "notes": "C6-only checkpoint [skip ci], CI-skip absent from compiled C++ validation-bearing result. Future 00673 retries/reporting should not receive more score."
+}

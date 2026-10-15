@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "task_id": "CONVERSION-DX9EX-00486",
+  "production_id": "CONVERSION-DX9EX-00486",
+  "event_id": "CONVERSION-DX9EX-00486-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "c3a1b3036f72c4c11a9ed4d776af7bb0dbddf876",
+  "red_guard_sha": "f52b46cbafbdb9ff312938d87a33e954e44ccdde",
+  "material_result_sha": "371d201666f1a92dbf840c386f52dbf3d6887187",
+  "validation_bearing_result_sha": "371d201666f1a92dbf840c386f52dbf3d6887187",
+  "result_sha": "371d201666f1a92dbf840c386f52dbf3d6887187",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00486]",
+  "selected_work_item": "DX9EX-CORRECTNESS-PROJECTED-MARKER-ANCHOR-0069",
+  "summary": "Restored the HMD-proven ProjectedMarkerInfo/Calc3D2D rank/rival view-space anchor path on the current R31/R32/R33 architecture. Exact rank/rival anchors are captured at proven Calc3D2D returns, carried through the shared semantic registry and Sumo replay, and reprojected per eye only under explicit ProjectedWorldMarker2D ownership. Existing WorldBillboard fallback, ProducerToken diagnostics, generic ScreenOverlay2D, cadence/fence authority and dispatcher ownership remain unchanged.",
+  "checkpoints": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Read target HEAD c3a1b303, AGENTS.md, QUEUE_CONTROLLER_CONTRACT, VR_REFACTOR_STATE, 00485 durable record, regression/problem history, Issue #13 runtime evidence and current scoreboard. Structure-refactor chain remained COMPLETE; 00485 explicitly named projected marker anchor restoration as the next bounded correctness unit."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "Compared current source with HMD-proven 902a89ea lineage. Confirmed current refactor retained exact rank/rival ProducerToken/WorldBillboard tags but had removed ProjectedMarkerInfo, Calc3D2D rank/rival view-point recovery, Sumo projected payload preservation and R30 per-eye projected-marker reprojection."
+    },
+    "C2_RED": {
+      "status": "COMPLETE",
+      "sha": "f52b46cbafbdb9ff312938d87a33e954e44ccdde",
+      "evidence": "Added and wired tools/verify_vr_projected_marker_anchor.py before implementation. DX9Ex Active 37500712481 policy job 112396689386 failed the new projected-marker contract as expected."
+    },
+    "C3_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Added explicit ProjectedWorldMarker2D and ProjectedMarkerInfo to the current shared semantic registry while preserving ProducerToken. Calc3D2D exact return 0xBAEE7 recovers rank anchor and 0xBB6F5 recovers rival anchor. Rank/rival producers attach projected payload when valid and retain WorldBillboard fallback. Sumo replay preserves payload. R30 requires explicit projected semantic plus payload and reprojects the recovered view-space point using matching latched head inverse, relative eye pose and eye FOV."
+    },
+    "C4_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Final exact SHA 371d201666f1a92dbf840c386f52dbf3d6887187 passed DX9Ex Active 37501890269 policy/host/game/full-chain/package. Intermediate candidate failures after source implementation were verifier parser defects only and were corrected before the final validation-bearing SHA."
+    },
+    "C5_COMMIT": {
+      "status": "COMPLETE",
+      "result_sha": "371d201666f1a92dbf840c386f52dbf3d6887187",
+      "validation_bearing_result_sha": "371d201666f1a92dbf840c386f52dbf3d6887187",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C6_PACKAGE": {
+      "status": "COMPLETE",
+      "artifact_id": 11430925881,
+      "digest": "sha256:602cf4b8e27ec735dc6a047a1a002d3ac1f3ba8de4cf6ff5c0dc8271ea30304c"
+    },
+    "C7_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PASS",
+  "evidence": {
+    "changed_paths": [
+      ".github/workflows/vr-dx9ex-active.yml",
+      "src/vr/game/render_semantics.hpp",
+      "src/hooks_uiscaling.cpp",
+      "src/hooks_framerate.cpp",
+      "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+      "tools/verify_vr_projected_marker_anchor.py"
+    ],
+    "regression_keys": [
+      "VR-R51-VEHICLE-RANK-ANCHOR-001",
+      "VR-REGRESSION-DIVERGED-HUD-CADENCE-20261005"
+    ],
+    "red_validation": {
+      "sha": "f52b46cbafbdb9ff312938d87a33e954e44ccdde",
+      "dx9ex_active_run_id": 37500712481,
+      "policy_job_id": 112396689386,
+      "result": "EXPECTED_FAILURE"
+    },
+    "validation_repairs": [
+      {
+        "sha": "47bf1d95bee51b5164640c703030be839adfd351",
+        "result": "SOURCE_IMPLEMENTED; verifier parser false-red"
+      },
+      {
+        "sha": "c07ff5e7f0234cfde066380f2d06bf1a69142c91",
+        "result": "verifier tag-block parser repaired"
+      },
+      {
+        "sha": "6d0e8038f53f938d7820d7f227b1d93801fde915",
+        "result": "verifier inline-signature parser repaired"
+      },
+      {
+        "sha": "371d201666f1a92dbf840c386f52dbf3d6887187",
+        "result": "final verifier replay parser repaired and full green"
+      }
+    ],
+    "green_validation": {
+      "sha": "371d201666f1a92dbf840c386f52dbf3d6887187",
+      "dx9ex_active_run_id": 37501890269,
+      "policy_job_id": 112400708582,
+      "host_job_id": 112400877237,
+      "game_job_id": 112400876869,
+      "full_chain_compile_job_id": 112400876972,
+      "package_job_id": 112403111409,
+      "result": "SUCCESS"
+    },
+    "package": {
+      "artifact_id": 11430925881,
+      "digest": "sha256:602cf4b8e27ec735dc6a047a1a002d3ac1f3ba8de4cf6ff5c0dc8271ea30304c"
+    },
+    "scope_boundary": "Exact rank/rival projected-anchor recovery only. No lens-flare path change. Generic untagged queue remains ScreenOverlay2D. ProducerToken remains diagnostic-only. Cadence/fence authority, DirectGPU transport and R31/R32/R33 owner graph are unchanged.",
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR session was executed for the 00486 exact build."
+    },
+    "issue14_comment_id": 6021623282,
+    "issue13_comment_id": 6021624141
+  },
+  "next_action": "Run one Quest3/VDXR CORRECTNESS session on the exact 00486 build. Verify 00485 restored exact semantic observation and 00486 keeps rank/rival markers attached above the same cars during head rotation/translation, including binocular coherence of 4th/5th rank digits. If visual correctness passes, protect the combined semantic-lifetime/projected-anchor path as a baseline invariant. Keep performance investigation separate unless frame pacing still regresses in the same scene.",
+  "started_at_kst": "2026-10-07T01:56:00+09:00",
+  "completed_at_kst": "2026-10-07T02:19:51+09:00"
+}

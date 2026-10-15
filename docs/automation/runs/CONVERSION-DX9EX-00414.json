@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00414",
+  "production_id": "CONVERSION-DX9EX-00414",
+  "event_id": "CONVERSION-DX9EX-00414-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "COMPLETE",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "4e8a3f67b0eb40ddb940b2b3abb1954253c3bdff",
+  "source_material_sha": "8b72853bb775ef77fbe1474da824e5cb513d3c78",
+  "material_result_sha": "8b72853bb775ef77fbe1474da824e5cb513d3c78",
+  "validation_bearing_result_sha": "8b72853bb775ef77fbe1474da824e5cb513d3c78",
+  "result_sha": "8b72853bb775ef77fbe1474da824e5cb513d3c78",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00414]",
+  "selected_work_item": "VR-REFACTOR-POST1100-R31-R32-OWNER-CENSUS-COMPLETION-0018",
+  "summary": "Closed the post-1100 R31/R32 neutral-helper extraction chain by requiring the terminal 15-call R33 owner allow-list and a complete owner-evidence map to have identical keys, then validating each retained helper still carries its cache/pose, telemetry, policy, StateBlock, install-state, fail-close, workload, right-pass restore, or telemetry-preserving wrapper ownership evidence.",
+  "changed_paths": [
+    "tools/verify_vr_r31_r32_retirement_guard.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/VR_WORK_QUEUE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00414.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered 00413 exact HEAD 4e8a3f67... with terminal 15-call census; canonical DX9Ex Active 37348716854 and Domain Isolation 37348716877 succeeded."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "00413 proved the remaining R33->R31/R32 call set is owner-specific. Review found the allow-list could still be edited independently from several helper-body ownership proofs."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "8b72853b added owner_evidence covering all 15 terminal calls and an exact key-set equality guard, with per-helper body markers proving retained ownership."
+    },
+    "C3_VALIDATE": {
+      "status": "COMPLETE",
+      "automation_validation": "PASS",
+      "runtime_validation": "UNTESTED",
+      "evidence": "Exact SHA 8b72853bb775ef77fbe1474da824e5cb513d3c78: DX9Ex Active 37349813274 SUCCESS (policy 111897513680, host 111897653383, game 111897653304, full-chain-compile 111897653093, package 111900206915). Domain Isolation 37349813314 SUCCESS. Policy log directly reports VR R31/R32 draw-retirement guard PASS."
+    },
+    "C4_COMMIT": {
+      "status": "COMPLETE",
+      "task_tagged_commits": [
+        "8b72853bb775ef77fbe1474da824e5cb513d3c78 test(vr): close post-1100 owner-census contract [AUTO:CONVERSION-DX9EX-00414]"
+      ],
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "COMPLETE_AUTOMATION_ARTIFACT_ONLY",
+      "evidence": "OutRun2-VR-DX9EX-ACTIVE-8b72853bb775ef77fbe1474da824e5cb513d3c78 artifact 11362750851 digest sha256:8dc1101258290f76a2c323ce6f3a3dd325bb72c4d445239baaf566c587b200bb. Artifact is automation evidence, not runtime proof."
+    },
+    "C6_STATE": {
+      "status": "COMPLETE",
+      "runtime_validation": "UNTESTED",
+      "issue14_comment_id": 5999892417
+    }
+  },
+  "automation_validation": "PASS_EXACT_SHA_DX9EX_ACTIVE_DOMAIN_ISOLATION",
+  "evidence": {
+    "dx9ex_active": {
+      "run_id": 37349813274,
+      "conclusion": "success",
+      "exact_sha": "8b72853bb775ef77fbe1474da824e5cb513d3c78",
+      "jobs": {
+        "policy": 111897513680,
+        "host": 111897653383,
+        "game": 111897653304,
+        "full_chain_compile": 111897653093,
+        "package": 111900206915
+      },
+      "package_artifact_id": 11362750851,
+      "package_artifact_digest": "sha256:8dc1101258290f76a2c323ce6f3a3dd325bb72c4d445239baaf566c587b200bb"
+    },
+    "domain_isolation": {
+      "run_id": 37349813314,
+      "conclusion": "success",
+      "exact_sha": "8b72853bb775ef77fbe1474da824e5cb513d3c78"
+    },
+    "issue14_comment_id": 5999892417
+  },
+  "next_action": "Post-1100 neutral-helper extraction chain is complete. Keep DX11/DXVK and HMD-matrix work frozen; subsequent DX9Ex tasks may return to the highest executable general quality/performance/stability item while preserving the terminal owner-census guard.",
+  "completed_at_kst": "2026-10-06T02:44:24+09:00"
+}

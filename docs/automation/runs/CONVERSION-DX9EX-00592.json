@@ -1,0 +1,112 @@
+{
+  "task_id": "CONVERSION-DX9EX-00592",
+  "production_id": "CONVERSION-DX9EX-00592",
+  "event_id": "CONVERSION-DX9EX-00592-E001",
+  "feature_id": "DX9EX:FRAME_PACING_DIAGNOSTICS",
+  "lane": "DX9EX",
+  "work_key": "DX9EX:FRAME_PACING_DIAGNOSTICS",
+  "feature_branch": "vr-d3d9ex-review-feature-dx9ex-00592",
+  "target_branch": "vr-d3d9ex-focus",
+  "base_sha": "c8cde7d627e8c35a2de60548101c90524ef116d9",
+  "policy_blob_sha": "7d4daeef8bad52982674da7cba08692bfca211e8",
+  "material_result_sha": "e9431196afdbf02288d24545eb1a5f637801cb25",
+  "feature_status": "FEATURE_READY",
+  "checkpoint": "FEATURE_READY_PENDING_CONTROLLER_EXACT_SHA",
+  "status": "PENDING_CONTROLLER_PROMOTION",
+  "automation_validation": "PENDING_TARGET_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_acceptance": {
+    "implementation_complete": true,
+    "targeted_checks": [
+      {
+        "ci_step": "Feature acceptance: PACING-STAGES",
+        "result": "SUCCESS",
+        "preflight_run_id": 38101786536
+      },
+      {
+        "ci_step": "Feature acceptance: PACING-REGRESSION",
+        "result": "SUCCESS",
+        "preflight_run_id": 38101786536
+      },
+      {
+        "ci_step": "Feature acceptance: PACING-BUNDLE",
+        "result": "SUCCESS",
+        "preflight_run_id": 38101786536
+      }
+    ],
+    "integration_contract": "The opt-in game BeginScene/Present QPC fields, immutable frame ID/run generation and host verified-bundle actual XR submission identity are correlated only for diagnostics. Default-disabled instrumentation never selects frames or changes D3D9Ex/host GPU ACK, OpenXR ordering, synchronization or rendering ownership. Cached XR submissions do not count as new game frames. Missing/invalid timings are -1; QPC CPU durations are not native FPS evidence. Controller alone fast-forwards TARGET_BRANCH after the final feature candidate has passed preflight, then checks exact target SHA gate jobs/steps and downloadable game/host/collector artifact before C6."
+  },
+  "acceptance_results": [
+    {
+      "id": "PACING-STAGES",
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/ipc/frame_pacing_diagnostics.hpp",
+        "src/vr/game/outrun_renderer.cpp",
+        "src/vr/d3d9/stereo_renderer_r7.inc",
+        "src/vr/d3d9/stereo_renderer.cpp",
+        "vrhost/src/main_r23.cpp",
+        "vrhost/tests/frame_pacing_diagnostics_smoke.cpp"
+      ],
+      "validation_command": "OUTRUN_VR_PACING_DIAGNOSTICS=1 build-host/bin/outrun-vr-frame-pacing-smoke.exe --stages",
+      "ci_step": "Feature acceptance: PACING-STAGES",
+      "preflight_run_id": 38101786536
+    },
+    {
+      "id": "PACING-REGRESSION",
+      "status": "PASS",
+      "evidence_paths": [
+        "src/vr/ipc/frame_pacing_diagnostics.hpp",
+        "vrhost/tests/frame_pacing_diagnostics_smoke.cpp",
+        "vrhost/CMakeLists.txt"
+      ],
+      "validation_command": "build-host/bin/outrun-vr-frame-pacing-smoke.exe --regression (without OUTRUN_VR_PACING_DIAGNOSTICS)",
+      "ci_step": "Feature acceptance: PACING-REGRESSION",
+      "preflight_run_id": 38101786536
+    },
+    {
+      "id": "PACING-BUNDLE",
+      "status": "PASS",
+      "evidence_paths": [
+        ".github/workflows/vr-dx9ex-active.yml",
+        "tools/Start-OutRunVRPacing.ps1",
+        "tools/Collect-OutRunVRFramePacing.ps1",
+        "tools/Collect-OutRunVRLogs.ps1",
+        "vrhost/src/main_r23.cpp"
+      ],
+      "validation_command": "GitHub Actions: DX9Ex Active Validation / package / Feature acceptance: PACING-BUNDLE",
+      "ci_step": "Feature acceptance: PACING-BUNDLE",
+      "preflight_run_id": 38101786536
+    }
+  ],
+  "required_gates": [
+    {
+      "name": "DX9Ex Active Validation",
+      "jobs": [
+        "policy",
+        "host",
+        "game",
+        "full-chain-compile",
+        "package"
+      ]
+    },
+    {
+      "name": "Domain Isolation Guard",
+      "jobs": [
+        "domain-isolation"
+      ]
+    }
+  ],
+  "artifact_prefix": "feature-dx9ex-pacing-",
+  "preflight_validation": {
+    "run_id": 38101786536,
+    "head_sha": "e9431196afdbf02288d24545eb1a5f637801cb25",
+    "synthetic_pr_merge_sha": "00a42653338ac220cf397b5f36459fbde9b9a76f",
+    "conclusion": "SUCCESS",
+    "domain_run_id": 38101786548,
+    "domain_conclusion": "SUCCESS",
+    "scope": "PR_PREFLIGHT_ONLY_NOT_TARGET_EXACT_SHA"
+  },
+  "runtime_validation_note": "Quest3/VDXR HMD has not been exercised; no claim of 72/90/120 native FPS or frame-rate improvement.",
+  "controller_next_action": "On final FEATURE_BRANCH candidate, rerun/inspect preflight after collector smoke enhancement. Fast-forward TARGET_BRANCH only if ownership/claim and ancestry permit. Verify DX9Ex Active (policy,host,game,full-chain-compile,package), Domain Isolation (domain-isolation), PACING-STAGES/REGRESSION/BUNDLE steps and feature-dx9ex-pacing-<targetSha> artifact all SUCCESS on the identical TARGET SHA. Then write C6 COMPLETE_BUILD_VERIFIED, automation_validation=PASS_EXACT_SHA, validation_bearing_result_sha=<exact target SHA>, preserve material_result_sha and acceptance_results; RUNTIME_VALIDATION=UNTESTED."
+}

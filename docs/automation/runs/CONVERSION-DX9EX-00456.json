@@ -1,0 +1,75 @@
+{
+  "schema_version": 2,
+  "task_id": "CONVERSION-DX9EX-00456",
+  "production_id": "CONVERSION-DX9EX-00456",
+  "event_id": "CONVERSION-DX9EX-00456-E001",
+  "event_type": "dispatch",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "attempt": "1/3",
+  "status": "VALIDATING",
+  "runtime_validation": "UNTESTED",
+  "runtime_test_performed": false,
+  "runtime_claim": "NONE",
+  "base_sha": "fe3136b452f4fa5f9cbb04129a306e2d710576b9",
+  "material_result_sha": "PENDING_SELF",
+  "validation_bearing_result_sha": "PENDING_SELF",
+  "result_sha": "PENDING_SELF",
+  "result_marker": "[AUTO:CONVERSION-DX9EX-00456]",
+  "selected_work_item": "VR-DX9EX-SWAPCHAIN-DESTROY-FAIL-CLOSED-0039",
+  "summary": "Fail closed when R19 cannot prove GPU completion: live swapchain recreate aborts without xrDestroySwapchain, while session teardown defers child-handle cleanup to xrDestroySession, which destroys session children.",
+  "changed_paths": [
+    "vrhost/src/runtime/sbs_capture_override.hpp",
+    "tools/verify_vr_dx9ex_reset_transport_contract.py",
+    "docs/VR_REFACTOR_STATE.json",
+    "docs/automation/runs/CONVERSION-DX9EX-00456.json"
+  ],
+  "stages": {
+    "C0_RECOVER": {
+      "status": "COMPLETE",
+      "evidence": "Recovered bookkeeping HEAD fe3136b452f4fa5f9cbb04129a306e2d710576b9 after CONVERSION-DX9EX-00455 PASS. Structural extraction remains terminal; state explicitly queued fail-closed destroy ownership next."
+    },
+    "C1_REVIEW": {
+      "status": "COMPLETE",
+      "evidence": "OpenXR 1.1.63 requires all submitted graphics commands referring to a swapchain to have completed before xrDestroySwapchain. 00455 bounded the wait but still called xrDestroySwapchain on timeout/device-removal. xrDestroySession destroys all child handles, giving a safe parent-cleanup path for session teardown."
+    },
+    "C2_IMPLEMENT": {
+      "status": "COMPLETE",
+      "evidence": "Swapchain::Destroy now returns bool and blocks live destroy/recreate when GPU completion is unproven; EnsureSwapchain aborts before xrCreateSwapchain. Session teardown calls ResetAll(true), which relinquishes local child handles on unproven completion and delegates cleanup to parent xrDestroySession."
+    },
+    "C3_VALIDATE": {
+      "status": "PENDING",
+      "automation_validation": "PENDING",
+      "runtime_validation": "UNTESTED"
+    },
+    "C4_COMMIT": {
+      "status": "PENDING",
+      "ci_skip_on_validation_bearing_result": false
+    },
+    "C5_PACKAGE": {
+      "status": "PENDING"
+    },
+    "C6_STATE": {
+      "status": "PENDING",
+      "runtime_validation": "UNTESTED"
+    }
+  },
+  "automation_validation": "PENDING",
+  "evidence": {
+    "red_review": {
+      "base_sha": "fe3136b452f4fa5f9cbb04129a306e2d710576b9",
+      "result": "FAIL_AS_EXPECTED",
+      "missing_contract": "00455 bounded timeout/device-loss wait but still invoked xrDestroySwapchain when GPU completion was not proven."
+    },
+    "standards": [
+      "OpenXR 1.1.63 xrDestroySwapchain requires submitted graphics commands referring to the swapchain to have completed before the call.",
+      "OpenXR 1.1.63 xrDestroySession destroys all handles that are children of the XrSession."
+    ],
+    "runtime": {
+      "status": "UNTESTED",
+      "reason": "No Quest3/VDXR or in-game HMD session was performed."
+    }
+  },
+  "next_action": "Validate the exact material SHA with canonical DX9Ex Active Validation and Domain Isolation; then finalize bookkeeping while preserving validation_bearing_result_sha.",
+  "started_at_kst": "2026-10-06T12:09:17+09:00"
+}

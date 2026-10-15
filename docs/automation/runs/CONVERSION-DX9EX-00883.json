@@ -1,0 +1,115 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00883",
+  "production_id": "CONVERSION-DX9EX-00883",
+  "event_id": "CONVERSION-DX9EX-00883-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00883",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "71ea0b8354de211f86d7d327579288be4149c1d1",
+  "material_result_sha": "453680b15bc1676db24fb6960845ba340e46ff53",
+  "validation_bearing_result_sha": "ac0052b74bd328eb2bb2f3d9c21c9a5113d2e311",
+  "source_paths": [
+    "src/hooks_uiscaling.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00883.json",
+    "tools/verify_vr_ui_matrix_safety.py"
+  ],
+  "acceptance_results": {
+    "pivoted_2d_matrix": "PASS",
+    "fallback_pivot_isolation": "PASS",
+    "exact_sha_game_host_package": "PASS"
+  },
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Preserve un-stretched title and car selection menu sprites on desktop wide and portrait XR viewports, including non-origin rotation/scale pivots and complete matrix translation.",
+    "scope_boundary": "Only front-end 2D D3DX menu/car-selection matrix transformation under KeepCentered/OnlineArcade; leave gameplay HUD, world draw, F11, flare, SkyGlow, original pointer/return and Vanilla unchanged.",
+    "trace_stages": [
+      "Original main/title/car-selection producer passes 2D pivot and scale to D3DXMatrixTransformation2D.",
+      "Game UI scaler composes min-axis containment with the complete resulting transform, preserving rotation and pivot offsets.",
+      "The source D3D9 sprite matrix drives menu draw and stereo HUD/eye presentation without unrelated scope widening."
+    ],
+    "subcomponents": [
+      "Post-D3DX affine composition for pivoted and rotated title/menu/car-selection sprites across width/height.",
+      "Keep existing nonpivoted full/partial input-vector paths, Vanilla and non-front-end exact owners isolated with finite fail-closed fallback.",
+      "Compile-time multi-axis rotation/translation/native-aspect regression assertions and exact-SHA Win32 gate."
+    ],
+    "acceptance_items": [
+      {
+        "id": "pivoted_2d_matrix",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Game title and car-select original D3DX sprite matrix",
+        "expected_behavior": "Rotated or pivoted sprites use one min-axis aspect containment on both transformed axes, including offset and rotation center."
+      },
+      {
+        "id": "fallback_pivot_isolation",
+        "category": "fallback_regression",
+        "behavior_area": "Nonpivot and unrelated game/VR render ownership",
+        "expected_behavior": "Native 4:3 remains identity; Vanilla, world/HUD/F11 and nonpivoted paths retain their original behavior, and invalid matrix preserves original."
+      },
+      {
+        "id": "exact_sha_game_host_package",
+        "category": "integrated_validation",
+        "behavior_area": "DX9Ex R84 Win32 game and OpenXR host",
+        "expected_behavior": "Exact validation-bearing source SHA succeeds in Active game/full-chain/host/package, Domain and affected Source Impact gates; headset proof separate."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "The original D3DXMatrixTransformation2D hook rescales input pScaling and pTranslation independently, but forwards unscaled pScalingCenter and pRotationCenter whenever supplied.",
+    "root_cause": "Input-only viewport containment does not compose the entire D3DX 2D transform when a source sprite has scaling or rotation pivots, leaving pivot-origin translation on mismatched axes.",
+    "source_trace": [
+      "Original title/car-selection sprites call hooked D3DXMatrixTransformation2D with nullable scale, translation and pivot parameters.",
+      "Source method previously rewrote only scale/translation before D3DX computed the pivoted affine matrix.",
+      "D3D9 uses that affine matrix for source UI sprite placement; R84 per-eye ownership is downstream and not changed."
+    ],
+    "alternatives_rejected": [
+      "Do not globally alter render-target viewport, eye projection, F11 glyph atlas, or world WVP to correct a front-end-only producer transform."
+    ],
+    "fix_evidence": "For pivoted menu geometry, call original D3DX first then compose output matrix with min-axis aspect scaling plus X/Y centering; retain all nonpivot paths.",
+    "negative_test_evidence": "C++ static_asserts cover rotated X/Y matrix coefficients and native 4:3 identity, and conditional gating excludes Vanilla/gameplay/HUD.",
+    "eye_ownership": "The original 2D menu sprite matrix is corrected before the existing R84 per-eye compositor; no per-eye world or SkyGlow owner changes."
+  },
+  "runtime_evidence": "No Quest3/VDXR headset or game-screen execution was performed in this run.",
+  "hold_reason": "NEED_HMD_TEST",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "ac0052b74bd328eb2bb2f3d9c21c9a5113d2e311",
+    "dx9ex_active": {
+      "run_id": 38699519678,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, game, host, full-chain-compile, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38699519449,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38699519512,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38699519454,
+      "conclusion": "SUCCESS",
+      "required_jobs": "msvc-analyze-active-game, msvc-analyze-openxr-host, source-cross-domain (3/3)"
+    },
+    "runtime": "UNTESTED"
+  },
+  "result_commit_ci_skip": false,
+  "bookkeeping_ci_skip": true
+}

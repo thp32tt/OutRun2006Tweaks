@@ -1,0 +1,145 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00814",
+  "production_id": "CONVERSION-DX9EX-00814",
+  "event_id": "CONVERSION-DX9EX-00814-E004",
+  "event_type": "retry",
+  "attempt": "3/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "work_key": "DX9EX:VIS:MAIN_MENU",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "score_delta": 1,
+  "result_commit_tag": "[AUTO:CONVERSION-DX9EX-00814]",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_ui_matrix_safety.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00814.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Restore original four-vertex custom-matrix main-menu and car-selection sprite proportions on 4:3, 16:9, 21:9 and portrait screens by applying one contain transform to both X and Y axes, without disturbing game world, Vanilla, desktop F11 or device-loss fallback.",
+    "scope_boundary": "Only main and car-selection custom-matrix multi-quad scale and center ownership in src/hooks_uiscaling.cpp; exclude external ImGui F11, ESC gameplay pause, speed/time/rank gameplay HUD, SkyGlow, world stereo, FFB, DX11, DXVK, Localization.",
+    "trace_stages": [
+      "Original OutRun 2006 game custom-matrix multi-sprite producers create four-vertex menu and selection quads with stride 9, 11 and 13 projected into stretched source screen pixel coordinates.",
+      "UIScaling custom-matrix mid hooks preserve original matrices and detect OnlineArcade/KeepCentered modes, then CenterMultiSpriteQuad transforms source pixel X and Y into centered native contain geometry.",
+      "The D3D9Ex original game Draw path and active VR stereo renderer transfer menu geometry to binocular headset compositor; unchanged world and external F11 draws retain separate ownership."
+    ],
+    "subcomponents": [
+      "Implement shared finite X/Y contain geometry across all three original four-vertex multi-menu layout strides, including portrait top and bottom margins.",
+      "Reject malformed/nonfinite scale and vertex data atomically and preserve Vanilla/desktop F11 plus source-size/reset geometry fallbacks.",
+      "Exercise 4:3, 16:9, 21:9 and portrait compile-time coordinate assertions and full Win32 game/host/package and Domain Isolation exact-SHA gates."
+    ],
+    "acceptance_items": [
+      {
+        "id": "MULTI_MENU_ASPECT",
+        "category": "end_to_end_behavior",
+        "behavior_area": "original_menu_and_selection_quad_geometry",
+        "expected_behavior": "All three original custom-matrix quad variants transform X and Y by the same aspect-preserving contain factor and correctly center 4:3/16:9/21:9/portrait native menu geometry."
+      },
+      {
+        "id": "MODE_RESET_PROTECTION",
+        "category": "fallback_regression",
+        "behavior_area": "vanilla_game_and_invalid_geometry",
+        "expected_behavior": "Vanilla and unrelated game world/F11 drawing remain untouched while invalid source scale, nonfinite vertices or Reset transients never partially mutate an original menu quad."
+      },
+      {
+        "id": "EXACT_SHA_INTEGRATION",
+        "category": "integrated_validation",
+        "behavior_area": "win32_host_game_package_isolation",
+        "expected_behavior": "One identical validation-bearing SHA passes the complete canonical DX9Ex Active policy, Win32 host/game/full-chain/package, Domain Isolation and source impact checks as required; Quest3 optical validation stays separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "MULTI_MENU_ASPECT": "PASS_EXACT_SHA",
+    "MODE_RESET_PROTECTION": "PASS_EXACT_SHA",
+    "EXACT_SHA_INTEGRATION": "PASS_EXACT_SHA"
+  },
+  "diagnosis": {
+    "original_evidence": "User Quest3/VDXR capture reports main and selection menu stretched; four original OutRun custom-matrix quad sources used a widened Y scale after legacy center hooks only remapped X.",
+    "source_trace": [
+      "Original game draws multi-sprite quads through stride 9/11/13 callsites selected by draw_sprite_custom_matrix_multi callbacks.",
+      "UI scaling hooks intercept native game producer vertices and historically centered only X despite independent width/height screen scales.",
+      "Renderer consumes the corrected game draw vertices on active left/right binocular passes while device Reset/Vanilla and ImGui F11 retain independent paths."
+    ],
+    "root_cause": "The old center handlers transformed only horizontal coordinates and left vertical coordinates at anisotropic source screen scaling. On portrait or nonnative aspect they produced malformed menu proportions.",
+    "alternatives_rejected": [
+      "Changing global VR HUD scale would also distort gameplay HUD and ESC controls and cannot correct original quad anisotropy.",
+      "Changing world projection or native OpenXR eye size is unrelated to original 2D menu vertex geometry.",
+      "Using width-only centering again cannot repair portrait letterboxing and would retain the known vertical stretch."
+    ],
+    "eye_ownership": "Only original custom-matrix main-menu/selection UI quads use shared contain geometry before per-eye stereo composition; world, original D3D9 scene, external ImGui F11 and pause/game HUD owners do not use this transform.",
+    "fix_evidence": "Source material 355ca708ae22ef67fafb64d7896d2f0f92d316dd adds finite, all-or-nothing four-vertex X/Y contain normalization for three strides. MSVC compilation repair 60984e40d64d08aaf5e356d192b585b3f151fa5f places constexpr and assertions at namespace scope.",
+    "negative_test_evidence": "Full original menu quad geometry at 4:3, 16:9, 21:9 and portrait checked. Source contract has nine destructive mutations for X/Y axis, stride/mode ownership, native identity and atomic invalid-geometry fallback.",
+    "repair_evidence": "Earlier DX9Ex Active #38495302584 and #38495354295 failed during policy before Win32 jobs because docs/automation/runs/CONVERSION-DX9EX-00814.json was absent; this commit restores the canonical record. No CI/HMD PASS has been claimed. Exact source material 5dc0c3b7 adds a uniform-native geometry identity fastpath. DX9Ex Active 38495853879 then detected a false negative in the three-UI-hook mutation verifier; final test repair 36b8ad98 enforces all three stride mode gates. All required Win32 and isolation gates passed."
+  },
+  "base_sha": "355ca708ae22ef67fafb64d7896d2f0f92d316dd",
+  "material_result_sha": "5dc0c3b717240bb49ed007cb3b549fe9502393fe",
+  "runtime_evidence": "NOT_TESTED_QUEST3_VDXR",
+  "runtime_status": "BUILD_VERIFIED_NEED_HMD_TEST",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "material_result_sha": "5dc0c3b717240bb49ed007cb3b549fe9502393fe",
+    "validation_bearing_result_sha": "36b8ad98c76131793e2dfdf32934b24119277576",
+    "dx9ex_active": {
+      "run_id": 38496313013,
+      "head_sha": "36b8ad98c76131793e2dfdf32934b24119277576",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "policy": "SUCCESS",
+        "host": "SUCCESS",
+        "game": "SUCCESS",
+        "full-chain-compile": "SUCCESS",
+        "package": "SUCCESS"
+      },
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38496313013",
+      "package_artifact_id": 11863683468,
+      "package_artifact_digest": "sha256:2f077ac3107c3ddaf4fc8b0278ad8a89a8f746bbfe504e1d6b52f6bd9d0d1020"
+    },
+    "domain_isolation": {
+      "run_id": 38496313035,
+      "head_sha": "36b8ad98c76131793e2dfdf32934b24119277576",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38496313035"
+    },
+    "full_source_impact": {
+      "run_id": 38495853886,
+      "head_sha": "5dc0c3b717240bb49ed007cb3b549fe9502393fe",
+      "conclusion": "SUCCESS",
+      "jobs": {
+        "source-cross-domain": "SUCCESS",
+        "msvc-analyze-active-game": "SUCCESS",
+        "msvc-analyze-openxr-host": "SUCCESS"
+      },
+      "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38495853886"
+    },
+    "failed_predecessors": [
+      {
+        "run_id": 38495302584,
+        "stage": "policy",
+        "reason": "missing run record"
+      },
+      {
+        "run_id": 38495354295,
+        "stage": "policy",
+        "reason": "missing run record"
+      },
+      {
+        "run_id": 38495853879,
+        "stage": "architecture policy",
+        "reason": "single-owner UI-mode mutation escaped"
+      }
+    ],
+    "runtime_validation": "UNTESTED"
+  },
+  "validation_bearing_result_sha": "36b8ad98c76131793e2dfdf32934b24119277576",
+  "result_sha": "36b8ad98c76131793e2dfdf32934b24119277576"
+}

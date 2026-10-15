@@ -1,0 +1,94 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00726",
+  "production_id": "CONVERSION-DX9EX-00726",
+  "event_id": "CONVERSION-DX9EX-00726-E003",
+  "event_type": "C6_RESULT_ONLY",
+  "attempt": "2/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": null,
+  "work_key": "DX9EX-QUEST3-RESPONSIVE-UI-20261013",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "IN_PROGRESS",
+  "controller_terminal": false,
+  "previous_hold_reason": "RUN_RECORD_NOT_FOUND",
+  "base_sha": "35721bbda51b8ce0b9f433d8a3ae473b599fe580",
+  "source_material_sha": "018af3f7f6b6e5103c4fae159d825dedb91a93a1",
+  "material_result_sha": "769f5896e4da598156bd383647a21f663560e53b",
+  "validation_bearing_result_sha": "769f5896e4da598156bd383647a21f663560e53b",
+  "result_sha": "769f5896e4da598156bd383647a21f663560e53b",
+  "material_commits": [
+    "018af3f7f6b6e5103c4fae159d825dedb91a93a1",
+    "769f5896e4da598156bd383647a21f663560e53b"
+  ],
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "feature_contract": {
+    "goal": "Issue #119 integrated Quest3/VDXR responsive HUD, original-aspect main menu, independent ESC menu and legible F11.",
+    "completed_scope": "Opt-in producer-proven OutRunHudText source-space bounding-box periphery anchoring, then O(touched) sparse indexed HUD fast path and exact eye-bias regression repair. Default-off mapping preserves the original centre and non-text/world/menu/ESC/GOAL paths.",
+    "remaining_acceptance": [
+      "Independent ESC/pause menu positioning and overall Issue #119 integrated completion",
+      "Quest3/VDXR in-HMD optics and measured 120 FPS performance"
+    ]
+  },
+  "acceptance_results": {
+    "material_source": "IMPLEMENTED",
+    "targeted_regression": "PASS_DX9EX_ACTIVE_EXACT_SHA",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "IN_PROGRESS_AT_RECORDING_NOT_CLAIMED_SUCCESS",
+    "overall_issue119": "PARTIAL_NOT_TERMINAL",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38324155655,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "769f5896e4da598156bd383647a21f663560e53b",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "game": "success",
+        "host": "success",
+        "full-chain-compile": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38324155417,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "769f5896e4da598156bd383647a21f663560e53b",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    }
+  ],
+  "observed_nonterminal_workflows": [
+    {
+      "id": 38324155458,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "769f5896e4da598156bd383647a21f663560e53b",
+      "status": "in_progress",
+      "conclusion": null
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_validation_required": "Quest3/VDXR in-HMD stereo HUD/menus and 120 FPS frame-time testing have not been run for this C6 record.",
+  "score_delta": 0,
+  "score_awarded": false,
+  "score_policy": "C6 result-only recovery; no new material achievement and no duplicate points for the existing TASK_ID.",
+  "summary": "Reconstructed missing C6 run record from two existing same-TASK material commits and exact-SHA successful DX9Ex Active and Domain Isolation workflow runs. No source modification or CI rerun.",
+  "c6_bookkeeping_confirmation": {
+    "validation_sha": "769f5896e4da598156bd383647a21f663560e53b",
+    "exact_sha_gates": "PASS_EXACT_SHA",
+    "run_record_recovered": true,
+    "source_modified": false,
+    "ci_reexecuted": false,
+    "score_delta": 0
+  }
+}

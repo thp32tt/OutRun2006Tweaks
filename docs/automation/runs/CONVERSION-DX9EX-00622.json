@@ -1,0 +1,94 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00622",
+  "production_id": "CONVERSION-DX9EX-00622",
+  "event_id": "CONVERSION-DX9EX-00622-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:R30_STEREO_OWNER_FRAME_SNAPSHOT_HOTPATH",
+  "work_key": "DX9EX:R30_STEREO_OWNER_FRAME_SNAPSHOT_HOTPATH",
+  "material_result_sha": "6a3d81acbd1129d8b99299e499327a2d64f5aeb5",
+  "material_commits": [
+    "2f23e3e615bca69c833ecb7c1f2cc7c7a3481f77",
+    "6a3d81acbd1129d8b99299e499327a2d64f5aeb5"
+  ],
+  "result_sha": "b08dffadeda9b25f807b9adf956f2dbb898693cd",
+  "validation_bearing_result_sha": "b08dffadeda9b25f807b9adf956f2dbb898693cd",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "controller_terminal": true,
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "feature_contract": {
+    "goal": "Remove redundant R29 owner frame-snapshot assembly from nine R30 CPU stereo draw, SkyGlow, HUD aspect, XYZRHW, and Present hot paths without changing stereo optical state, per-eye synchronization, or device lifetime.",
+    "acceptance": "Coalesce 63 owner-snapshot call sites to 12 across nine R30 functions; retain depth-bootstrap recapture and left-eye draw boundary recapture; protect SkyGlow source/blur, right-eye RT/depth restoration, and per-Present correctness. Pass destructive-mutation policy, Win32 game/full-chain, x64 host/package, Domain Isolation and Full Source Impact.",
+    "runtime_metrics": "Quest3/VDXR HMD FPS, p95/p99 frame time, and image were not measured; no runtime speedup or visual PASS inferred."
+  },
+  "acceptance_results": [
+    {
+      "item": "R30_FRAME_OWNER_HOTPATH",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "src/vr/d3d9/stereo_renderer_r30.cpp shares phase-stable R29 POD snapshots in nine functions; from 63 to 12 call sites. Material commit 2f23e3e and 6a3d81a."
+    },
+    {
+      "item": "DEPTH_BOOTSTRAP_AND_RIGHT_EYE_RECAPTURE",
+      "status": "PASS_SOURCE_AND_BUILD",
+      "evidence": "R30ConfigureXyzrhwWorldEffect and R30TryScreenSpaceFovDraw refresh after depth bootstrap; R30ExecuteXyzrhwStereo and screen FOV preserve post-left-draw right-eye bindings and original restore logic."
+    },
+    {
+      "item": "R30_NINE_DESTRUCTIVE_MUTATIONS",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "tools/verify_vr_r30_frame_snapshot_fastpath.py integrated into DX9Ex Active policy; policy passed on b08dffad."
+    },
+    {
+      "item": "DX9EX_ACTIVE",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "DX9Ex Active Validation run 38165348036 attempt 2: policy/game/full-chain-compile/host/package all SUCCESS for b08dffadeda9b25f807b9adf956f2dbb898693cd. Attempt 1 cancelled by concurrent new task, not treated as failure/PASS."
+    },
+    {
+      "item": "DOMAIN_ISOLATION",
+      "status": "PASS_EXACT_SHA",
+      "evidence": "Domain Isolation Guard run 38165347951 SUCCESS for b08dffadeda9b25f807b9adf956f2dbb898693cd."
+    },
+    {
+      "item": "FULL_SOURCE_IMPACT",
+      "status": "PASS_MATERIAL_SHA",
+      "evidence": "DX9Ex Full Source Impact Review run 38165189399 3/3 SUCCESS for final material C++ SHA 6a3d81acbd1129d8b99299e499327a2d64f5aeb5. Subsequent commits only adjusted Python verifier."
+    },
+    {
+      "item": "QUEST3_VDXR_FPS_VISUALS",
+      "status": "UNTESTED",
+      "evidence": "No physical Quest3/VDXR gameplay or FPS/frametime measurements by assistant. RUNTIME_VALIDATION=UNTESTED."
+    }
+  ],
+  "exact_sha_validation": {
+    "target_sha": "b08dffadeda9b25f807b9adf956f2dbb898693cd",
+    "required_workflows": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38165348036,
+        "attempt": 2,
+        "head_sha": "b08dffadeda9b25f807b9adf956f2dbb898693cd",
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38165347951,
+        "head_sha": "b08dffadeda9b25f807b9adf956f2dbb898693cd",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38165189399,
+        "head_sha": "6a3d81acbd1129d8b99299e499327a2d64f5aeb5",
+        "conclusion": "success",
+        "scope": "final_material_cpp_sha"
+      }
+    ]
+  },
+  "runtime_validation_note": "RUNTIME_VALIDATION=UNTESTED; source CI does not prove Quest3/VDXR frame-time, stereo optical or FPS improvement.",
+  "controller_next_action": "Do not redispatch/rescore CONVERSION-DX9EX-00622. Continue a different independent DX9Ex C++ performance feature; DX11 native first priority and DXVK frozen."
+}

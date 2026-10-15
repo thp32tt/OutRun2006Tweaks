@@ -1,0 +1,89 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00700",
+  "production_id": "CONVERSION-DX9EX-00700",
+  "event_id": "CONVERSION-DX9EX-00700-C6",
+  "event_type": "C6_RESULT_ONLY",
+  "feature_id": null,
+  "work_key": "DX9EX:R30_SKYGLOW_STATEBLOCK_SNAPSHOT_REUSE",
+  "lane": "DX9EX",
+  "branch": "vr-d3d9ex-focus",
+  "target_branch": "vr-d3d9ex-focus",
+  "stage": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "feature_status": "DONE_BUILD_VERIFIED",
+  "controller_terminal": true,
+  "base_sha": "c5aafcb850bcc0c75e7a7f28e7f5862d48f0bbde",
+  "source_material_sha": "d01e9d301153da129ffc653890e52a747a4f64b8",
+  "material_result_sha": "d01e9d301153da129ffc653890e52a747a4f64b8",
+  "result_sha": "d01e9d301153da129ffc653890e52a747a4f64b8",
+  "validation_bearing_result_sha": "d01e9d301153da129ffc653890e52a747a4f64b8",
+  "result_commit_contains_ci_skip": false,
+  "bookkeeping_is_validation_bearing": false,
+  "material_commits": [
+    "d01e9d301153da129ffc653890e52a747a4f64b8"
+  ],
+  "changed_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_r30_skyglow_fastpath.py"
+  ],
+  "feature_contract": {
+    "goal": "Reuse a single full-state D3D9 SkyGlow StateBlock snapshot across Presents within a resource epoch to avoid repeated allocation while preserving stereo post-processing and D3D9 state restoration.",
+    "acceptance": "Capture the cached D3DSBT_ALL state before each private stereo post chain; invalidate on Reset/resize, capture/apply failure, mono or disabled SkyGlow; preserve per-eye blur, render-target/depth/viewport restoration and SkyGlow defaults; canonical SkyGlow regression including lifecycle and 27 destructive guards; exact-SHA GitHub DX9Ex Active Validation, Domain Isolation Guard and Full Source Impact success. Quest3/VDXR runtime test remains separate."
+  },
+  "acceptance_results": {
+    "skyglow_stateblock_epoch_reuse": "MATERIAL_COMMITTED",
+    "skyglow_capture_invalidation_restore": "PASS_EXACT_SHA_POLICY",
+    "canonical_skyglow_regression_27_destructive_guards": "PASS_EXACT_SHA_POLICY",
+    "dx9ex_active_validation": "SUCCESS_5_OF_5_EXACT_SHA",
+    "domain_isolation": "SUCCESS_EXACT_SHA",
+    "full_source_impact": "SUCCESS_3_OF_3_EXACT_SHA",
+    "runtime_validation": "UNTESTED"
+  },
+  "automation_validation": "PASS_EXACT_SHA",
+  "verified_workflows": [
+    {
+      "id": 38277961199,
+      "workflow": "DX9Ex Active Validation",
+      "head_sha": "d01e9d301153da129ffc653890e52a747a4f64b8",
+      "conclusion": "success",
+      "jobs": {
+        "policy": "success",
+        "host": "success",
+        "full-chain-compile": "success",
+        "game": "success",
+        "package": "success"
+      }
+    },
+    {
+      "id": 38277961122,
+      "workflow": "Domain Isolation Guard",
+      "head_sha": "d01e9d301153da129ffc653890e52a747a4f64b8",
+      "conclusion": "success",
+      "jobs": {
+        "domain-isolation": "success"
+      }
+    },
+    {
+      "id": 38277961226,
+      "workflow": "DX9Ex Full Source Impact Review",
+      "head_sha": "d01e9d301153da129ffc653890e52a747a4f64b8",
+      "conclusion": "success",
+      "jobs": {
+        "source-cross-domain": "success",
+        "msvc-analyze-active-game": "success",
+        "msvc-analyze-openxr-host": "success"
+      }
+    }
+  ],
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "runtime_note": "RUNTIME_VALIDATION=UNTESTED. No Quest3/VDXR/gameplay HMD or real-world FPS/frame-time proof; CI build success does not imply runtime acceptance.",
+  "attempt": 1,
+  "recovery_reason": "RUN_RECORD_NOT_FOUND",
+  "score_credit_key": "CONVERSION-DX9EX-00700",
+  "score_change": 0,
+  "score_status": "C6_BOOKKEEPING_NO_ADDITIONAL_CREDIT",
+  "notes": "Run record was absent at C6 recovery. Material SHA, changed paths and contract reconstructed from exact source commit; acceptance evidence was read from already-completed GitHub Actions at the exact SHA. This [skip ci] bookkeeping file does not modify source, rerun CI, or replace the validation-bearing result SHA."
+}
