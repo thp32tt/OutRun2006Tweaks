@@ -70,6 +70,20 @@ def check(code: str, header: str) -> list[str]:
          "BatchActive = false" in hook and
          "ForgetBatch();" in hook,
          "Begin/End/failed-Flush state invalidation missing")
+    # A successful explicit native D3DX Flush terminates the preceding
+    # queue's GPU submission lifetime. It must reset the boundary as well
+    # as PendingDraws so that no next producer inherits that old permission.
+    native_flush_begin = hook.find("static HRESULT __stdcall FlushDest(")
+    native_flush_end = hook.find("static HRESULT __stdcall EndDest(", native_flush_begin)
+    native_flush = hook[native_flush_begin:native_flush_end] if (
+        native_flush_begin >= 0 and native_flush_end > native_flush_begin) else ""
+    need("if (SUCCEEDED(hr))\n            {" in native_flush and
+         "ForgetBatch();\n                StageBoundaryReady = false;" in native_flush and
+         native_flush.find("ForgetBatch();") <
+         native_flush.find("StageBoundaryReady = false;") and
+         "BatchActive = false;" in native_flush and
+         "return hr;" in native_flush,
+         "successful native D3DX Flush must retire old +TIME/GOAL queue boundary")
     # Failure-injection contract for the original ID3DXSprite lifecycle:
     # a rejected nested Begin does NOT terminate the previous active batch.
     # A failed Draw has unknown internal submission progress and must revoke
@@ -407,6 +421,10 @@ def main() -> int:
                 1),
         "stale-shared-batch":
             code.replace("PendingHomogeneous = false;", "PendingHomogeneous = true;", 1),
+        "native-flush-keeps-stale-queue-boundary":
+            code.replace(
+                "ForgetBatch();\n                StageBoundaryReady = false;",
+                "ForgetBatch();\n                StageBoundaryReady = true;", 1),
         "missing-old-owner-proof":
             code.replace(
                 "false, true, PendingHomogeneous,\n"

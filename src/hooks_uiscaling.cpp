@@ -2801,20 +2801,10 @@ private:
             }
             return hr;
         }
-        using namespace OutRunVR::GameSemantic;
-        if (D3DXSpriteFailedDrawQuarantinesExactBatch(
-                BatchActive, self == TrackedSprite, SUCCEEDED(hr)))
-        {
-            // D3DX rejected this Draw. It did not prove a new triangle was
-            // enqueued; a partial device failure also does not prove that
-            // an existing native batch is still homogeneous. Let the game's
-            // own End/Flush decide, never submit it under +TIME/GOAL by force.
-            PendingHomogeneous = false;
-            StageBoundaryReady = false;
-        }
-        if (FAILED(hr) || !self)
+        if (!self)
             return hr;
 
+        using namespace OutRunVR::GameSemantic;
         const auto scope = EffectiveScope();
         const auto source = CurrentRenderProducerToken();
         if (BatchActive && self == TrackedSprite)
