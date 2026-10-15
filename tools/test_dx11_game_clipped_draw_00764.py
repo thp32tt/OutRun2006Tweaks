@@ -19,14 +19,23 @@ def wired(src, predicate):
         "scissorEnabled == TRUE",
         "SUCCEEDED(game->GetViewport(&sourceViewport))",
         "SUCCEEDED(game->GetScissorRect(&sourceScissor))",
+        "&& GameNativeScissorClip::excludes_viewport(",
         "GameNativeScissorClip::excludes_viewport(",
         "s.frameBatch.absorb_empty_source_draw(",
         "s.frameBatch.abort();",
         "return;",
         "if (!supported_game_state("
     ]
-    positions = [body.find(s) for s in sequence]
-    if not all(p >= 0 for p in positions) or positions != sorted(positions):
+    # The zero-primitive path and topology-error branch legitimately contain
+    # their own ordinal/abort calls. Verify the NEW clipped path sequentially,
+    # never accept a matching helper from an earlier Draw branch.
+    cursor = 0
+    for token in sequence:
+        pos = body.find(token, cursor)
+        if pos < 0:
+            return False
+        cursor = pos + len(token)
+    if "if (!s.frameBatch.absorb_empty_source_draw(\\n                            sourceOrdinal, sameSourceFullClear))" not in body:
         return False
     return all(t in predicate for t in (
         "viewportWidth == 0u || viewportHeight == 0u",
@@ -40,7 +49,8 @@ assert wired(bridge,header), "scissor no-op Draw/DrawIndexed path not connected"
 for old,new in (
     ("scissorEnabled == TRUE", "scissorEnabled == FALSE"),
     ("GameNativeScissorClip::excludes_viewport(", "false /* skip scissor */ && GameNativeScissorClip::excludes_viewport("),
-    ("s.frameBatch.absorb_empty_source_draw(", "false /* source ordinal not preserved */ && s.frameBatch.absorb_empty_source_draw("),
+    ("if (!s.frameBatch.absorb_empty_source_draw(\\n                            sourceOrdinal, sameSourceFullClear))",
+     "if (false /* no clipped ordinal */ && !s.frameBatch.absorb_empty_source_draw(\\n                            sourceOrdinal, sameSourceFullClear))"),
 ):
     bad = bridge.replace(old,new,1)
     assert bad != bridge and not wired(bad,header), old

@@ -20,7 +20,7 @@ def integrated(b: str, h: str) -> bool:
     return (0 <= section.find("const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++")
             < valid_type < consume < before_span and
             "if (fullMode && primitives == 0u &&" in section and
-            "sourceOrdinal, sameSourceFullClear))" in section and
+            "sourceOrdinal, sameSourceFullClear))" in section[consume:before_span] and
             "s.clearColor.sourceDevice ==" in section and
             "s.frameBatch.abort();" in section[consume:before_span] and
             "s.frameBatch.abort();" in b[failed:present] and
