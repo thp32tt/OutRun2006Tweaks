@@ -1,0 +1,101 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00783",
+  "production_id": "CONVERSION-DX11-00783",
+  "event_id": "CONVERSION-DX11-00783-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:GAME_4K_ATLAS_MIP_TO_NATIVE_DRAW",
+  "feature_id": "DX11-GAME-LARGE-ATLAS-FULL-MIP-NATIVE-DRAW",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "6220f54c8b4d4c8cbf04afe65620ec9d1b86366d",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/native_game_texture_atlas_budget.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_game_texture_atlas_00699.py",
+    "docs/automation/runs/CONVERSION-DX11-00783.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-GAME-LARGE-ATLAS-FULL-MIP-NATIVE-DRAW",
+    "goal": "Carry actual D3D9 game-authored large rectangular and compressed 4K menu, vehicle and race atlas through native D3D11 shader resource mip uploads to Draw and DrawIndexed, while rejecting invalid/oversize mips and preserving D3D9 Present/input on rejection.",
+    "acceptance_items": [
+      {
+        "id": "full-native-game-atlas-binding",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_game_texture_source_D3D11_SRV_Draw_DrawIndexed",
+        "expected_behavior": "Accept byte-budgeted 4K game atlas with up to thirteen natural mips and bind native GPU PS texture for actual live menu/vehicle/race draw paths."
+      },
+      {
+        "id": "bounded-atlas-original-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_game_resource_bounds_1K_live_RT_input",
+        "expected_behavior": "Reject 2K thirteen-level fake mips, 4K uncompressed overbudget, larger than 4K, and retain 1K live render-target bound, original D3D9 Draw, Present and gamepad/FFB."
+      },
+      {
+        "id": "same-sha-gate",
+        "category": "integrated_validation",
+        "behavior_area": "Fast_Backend_Windows_OpenXR_HUD",
+        "expected_behavior": "Run compiled 2K/4K atlas regression and structural linkage plus all five unchanged required GitHub Actions on single exact source SHA."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Actual D3D9 menu/car/race texture GetLevelCount/GetLevelDesc and mip layout",
+      "Native DXGI texture upload budget + format decode -> CreateTexture2D SRV",
+      "PSSetShaderResources -> real D3D11 Draw/DrawIndexed -> full-size game image; unsupported mips/RT preserve original D3D9"
+    ],
+    "batch_components": [
+      "Native texture upload budget and natural mip-chain validation",
+      "Live D3D9 mirror_texture source admission + SRV linkage",
+      "Compiled positive/negative mip and memory regression in existing Fast gate"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "tools/test_dx11_game_texture_atlas_00699.py 4K native SRV source compilation",
+      "negative_regression": "same compiled C++ rejects 2K 13 levels and >24MiB source plus destructive live linkage",
+      "component_integration": "D3D9 texture snapshot => D3D11 SRV => live game Draw/DrawIndexed with fallback"
+    },
+    "conflict_keys": [
+      "DX11:GAME_4K_ATLAS_MIP_TO_NATIVE_DRAW"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Exact SHA automated build pending. Quest3/VDXR live output UNTESTED.",
+    "activation_guard_and_fallback": "NativeFullMode still opt-in; original D3D9 Draw/Present/gamepad/FFB/SkyGlow and DX9Ex remain, DXVK frozen."
+  },
+  "acceptance_results": {
+    "full-native-game-atlas-binding": "PENDING",
+    "bounded-atlas-original-fallback": "PENDING",
+    "same-sha-gate": "PENDING"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Confirmed HEAD and 00782 CI success; selected nonoverlapping texture-mirror scope.",
+    "C1_REVIEW": "2K dimension/12-level cap rejected valid 4K D3D9 game atlas before native SRV and Draw.",
+    "C2_IMPLEMENT": "4K/13 levels with natural-mip/24MiB bounds + legacy D3D9 fallback.",
+    "C3_VALIDATE": "Existing 00699 compiled game-native regression extended; final exact SHA CI pending.",
+    "C4_COMMIT": "Source/test commit with task marker and no CI skip",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_RESULT": "PENDING"
+  }
+}

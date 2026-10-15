@@ -15,7 +15,7 @@ def integrated(src, budget):
     mirror = src.split("bool mirror_texture(", 1)[1].split("bool submit(", 1)[0]
     return all((
         '#include "native_game_texture_atlas_budget.hpp"' in src,
-        "sourceLevels > 12u" in mirror,
+        "sourceLevels > kMaxNativeGameAtlasMipLevels" in mirror,
         "base.Width > kMaxNativeGameAtlasDimension" in mirror,
         "base.Height > kMaxNativeGameAtlasDimension" in mirror,
         "if (gpuRenderTarget && (base.Width > 1024u || base.Height > 1024u))" in mirror,
@@ -39,6 +39,9 @@ def integrated(src, budget):
         "before_game_present(" in src and "s.frameBatch.publishable(s.pending)" in src,
         "observe_unavailable_game_draw(device);" in r30,
         "kMaxNativeGameAtlasUploadBytes = 24ull * 1024ull * 1024ull" in budget,
+        "kMaxNativeGameAtlasDimension = 4096u" in budget,
+        "kMaxNativeGameAtlasMipLevels = 13u" in budget,
+        "if (levels > possibleLevels) return 0u;" in budget,
     ))
 
 assert integrated(bridge, header)
@@ -66,8 +69,17 @@ static_assert(native_game_texture_upload_bytes(2048, 2048, 12, 0, 8) > 0);
 static_assert(native_game_texture_upload_bytes(2048, 2048, 12, 0, 16) > 0);
 static_assert(native_game_texture_upload_bytes(2048, 2048, 1, 8, 0) == 0);
 static_assert(native_game_texture_upload_bytes(2048, 2048, 12, 16, 0) == 0);
-static_assert(native_game_texture_upload_bytes(4096, 512, 1, 4, 0) == 0);
-static_assert(native_game_texture_upload_bytes(512, 4096, 1, 4, 0) == 0);
+// Game authored 4K rectangular menu/vehicle atlas reaches native VS/PS SRV
+// through mirror_texture, rather than aborting the complete full-size frame.
+static_assert(native_game_texture_upload_bytes(4096, 512, 1, 4, 0) == 4096ull*512ull*4ull);
+static_assert(native_game_texture_upload_bytes(512, 4096, 1, 4, 0) == 512ull*4096ull*4ull);
+static_assert(native_game_texture_upload_bytes(4096, 1024, 13, 4, 0) > 0);
+static_assert(native_game_texture_upload_bytes(4096, 4096, 13, 0, 8) > 0);
+static_assert(native_game_texture_upload_bytes(4096, 4096, 13, 0, 16) > 0);
+static_assert(native_game_texture_upload_bytes(4096, 4096, 13, 4, 0) == 0);
+static_assert(native_game_texture_upload_bytes(4096, 2048, 13, 4, 0) == 0);
+static_assert(native_game_texture_upload_bytes(4096, 1024, 14, 4, 0) == 0);
+static_assert(native_game_texture_upload_bytes(8192, 512, 1, 0, 8) == 0);
 static_assert(native_game_texture_upload_bytes(2048, 2048, 13, 4, 0) == 0);
 static_assert(native_game_texture_upload_bytes(0, 2048, 1, 4, 0) == 0);
 static_assert(native_game_texture_upload_bytes(2048, 0, 1, 4, 0) == 0);
@@ -88,4 +100,4 @@ with TemporaryDirectory(prefix="dx11-00699-") as temp:
         capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert subprocess.run([str(path / "probe")]).returncode == 0
-print("PASS 00699: game 2K texture atlas native SRV/Draw/IndexedDraw, capped mip memory, RT DX9Ex fallback")
+print("PASS 00699/00783: game 2K/4K atlas native SRV/Draw/IndexedDraw, natural mip cap, 24MiB budget, 1K live RT and D3D9 fallback")

@@ -2,10 +2,11 @@
 #include <cstdint>
 
 namespace outrun::vr::dx11::live_game_frame {
-// Conservative per-Draw staging budget for game-authored 2K menu/car atlases.
+// Conservative per-Draw staging budget for game-authored 2K/4K menu/car atlases.
 // It bounds the *converted* native mip payload, not the smaller D3D9 source
 // palette/packed payload. The source D3D9 Draw/input always run on rejection.
-inline constexpr std::uint32_t kMaxNativeGameAtlasDimension = 2048u;
+inline constexpr std::uint32_t kMaxNativeGameAtlasDimension = 4096u;
+inline constexpr std::uint32_t kMaxNativeGameAtlasMipLevels = 13u;
 inline constexpr std::uint64_t kMaxNativeGameAtlasUploadBytes = 24ull * 1024ull * 1024ull;
 
 // A compressed texture supplies exactly one BC block byte width (8/16),
@@ -14,7 +15,7 @@ inline constexpr std::uint64_t kMaxNativeGameAtlasUploadBytes = 24ull * 1024ull 
 [[nodiscard]] constexpr std::uint64_t native_game_texture_upload_bytes(
     std::uint32_t width, std::uint32_t height, std::uint32_t levels,
     std::uint32_t nativeTexelBytes, std::uint32_t blockBytes) noexcept {
-    if (!width || !height || !levels || levels > 12u ||
+    if (!width || !height || !levels || levels > kMaxNativeGameAtlasMipLevels ||
         width > kMaxNativeGameAtlasDimension ||
         height > kMaxNativeGameAtlasDimension ||
         ((blockBytes != 0u) == (nativeTexelBytes != 0u)) ||
@@ -22,6 +23,13 @@ inline constexpr std::uint64_t kMaxNativeGameAtlasUploadBytes = 24ull * 1024ull 
         (nativeTexelBytes && nativeTexelBytes != 4u &&
          nativeTexelBytes != 8u && nativeTexelBytes != 16u))
         return 0u;
+    // D3D9's mip chain cannot contain repeated 1x1 terminal levels.
+    // 4K needs 13 levels; a 2K resource still has at most 12.
+    std::uint32_t possibleLevels = 1u;
+    for (std::uint32_t largest = width > height ? width : height;
+         largest > 1u; largest >>= 1u)
+        ++possibleLevels;
+    if (levels > possibleLevels) return 0u;
     std::uint64_t total = 0u;
     for (std::uint32_t level = 0; level < levels; ++level) {
         const std::uint64_t w = (width >> level) ? (width >> level) : 1u;

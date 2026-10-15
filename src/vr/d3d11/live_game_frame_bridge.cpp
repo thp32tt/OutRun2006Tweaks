@@ -3646,8 +3646,9 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     ComPtr<ID3D11SamplerState>& sampler) noexcept {
     if (!dev || !capture.enabled || !capture.texture) return false;
     const UINT sourceLevels = capture.texture->GetLevelCount();
-    // A complete 2048x2048 menu/vehicle atlas has twelve mip levels.
-    if (sourceLevels == 0 || sourceLevels > 12u) return false;
+    // A 4K menu/vehicle atlas may use thirteen distinct mip levels;
+    // actual source extents and converted-byte budget are checked below.
+    if (sourceLevels == 0 || sourceLevels > kMaxNativeGameAtlasMipLevels) return false;
     D3DSURFACE_DESC base{};
     if (FAILED(capture.texture->GetLevelDesc(0, &base)) ||
         base.Width == 0 || base.Height == 0 ||
@@ -3673,7 +3674,7 @@ bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
     const bool gpuRenderTarget = base.Pool == D3DPOOL_DEFAULT &&
         (base.Usage & D3DUSAGE_RENDERTARGET) != 0u &&
         native_rt_readback::sampleable(rtLayout, capture.srgbTexture);
-    // A 2K immutable atlas is manageable, but a 2K live render target would
+    // Large immutable atlases are byte-budgeted, but a live render target would
     // synchronously GetRenderTargetData in every game Draw: retain the prior
     // 1K GPU-source bound to protect menu/race input and frame pacing.
     if (gpuRenderTarget && (base.Width > 1024u || base.Height > 1024u))
