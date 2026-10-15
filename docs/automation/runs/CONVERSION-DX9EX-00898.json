@@ -9,15 +9,15 @@
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:STEREO:LEFT_EYE_FRAME_VETO",
   "feature_class": "CRITICAL_BLOCKER",
-  "status": "IMPLEMENTED_VALIDATION_PENDING",
-  "phase": "C2_IMPLEMENT",
-  "checkpoint": "C2_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "c813d2480cbbbfce08789475e3778f0491ba7c14",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "49faa56bffda30daa38f42e7aca019a0cd924646",
+  "validation_bearing_result_sha": "49faa56bffda30daa38f42e7aca019a0cd924646",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r33.cpp"
   ],
@@ -63,9 +63,9 @@
     ]
   },
   "acceptance_results": {
-    "fast_world_current_frame_veto": "SOURCE_IMPLEMENTED",
-    "hud_failure_and_clean_fallback": "SOURCE_IMPLEMENTED",
-    "exact_sha_integrated_active": "PENDING"
+    "fast_world_current_frame_veto": "PASS_EXACT_SHA",
+    "hud_failure_and_clean_fallback": "PASS_EXACT_SHA",
+    "exact_sha_integrated_active": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "The R30 HUD lower stereo failure route marks current FrameRightDrawFailed before both failed-left Draw and unrecoverable WVP rollback; R33FastWorld and R33Hud did not set this flag on those same failure paths.",
@@ -85,8 +85,13 @@
   },
   "ci_evidence": {
     "workflow": "DX9Ex Active Validation",
-    "status": "PENDING",
-    "head": null
+    "status": "PASS_EXACT_SHA",
+    "head": null,
+    "validation_sha": "49faa56bffda30daa38f42e7aca019a0cd924646",
+    "active_run_id": 38736827010,
+    "domain_run_id": 38736827248,
+    "hud_inspector_run_id": 38736827053,
+    "full_source_impact_run_id": 38736827070
   },
   "score_delta": 0
 }
