@@ -38,7 +38,7 @@ def integrated(source, header):
         "partitionRects);" in code[tiled:bound],
         "const bool partitionCropCoverage = fullMode && backbufferKnown &&" in code[gate:tiled],
         "(!outputNow.hasDirtyRegion || fullDirtyCoverage) &&" in code[bound:queued],
-        "croppedNativeUpload ? &uploadSourceCrop : nullptr" in code[submit:submit+220],
+        "croppedNativeUpload ? &uploadSourceCrop : nullptr" in code[submit:submit+360],
         "destination.y = uploadSourceCrop.top;" in code[crop:submit],
         "s.insetSurface.Get()" in code[submit:submit+220],
         "cropRight > static_cast<std::int64_t>(width)" in single_hdr,
