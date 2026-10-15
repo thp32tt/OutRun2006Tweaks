@@ -1,0 +1,98 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00757",
+  "production_id": "CONVERSION-DX11-00757",
+  "event_id": "CONVERSION-DX11-00757-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:REAL_GAME_DRAW_GPU_BUFFER_OWNER_BINDING",
+  "feature_id": "DX11-MENU-RACE-GPU-IA-BINDING",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "04c5ec18b00ccea9c6554b8b8b0aa44ff9f49cce",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/test_dx11_game_source_buffer_binding_00757.py",
+    ".github/workflows/dx11-fast-structural.yml",
+    "docs/automation/runs/CONVERSION-DX11-00757.json"
+  ],
+  "change_summary": "Restore the real D3D9 game-authored Draw/DrawIndexed native VB/IB buffer object chain through D3D11 IA for bounded diagnostic and full-resolution paths; ensure fail-closed on missing GPU owner with original D3D9 render and gamepad preserved.",
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-GPU-IA-BINDING",
+    "goal": "Menu, vehicle selection and race native Draw/DrawIndexed use actual populated GPU VB/IB across full-resolution and fallback diagnostic modes instead of null shadowed COM owners, preserving original D3D9 when native binding fails.",
+    "acceptance_items": [
+      {
+        "id": "real-game-ia-source-ownership",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_live_game_geometry_to_d3d11_ia_draw",
+        "expected_behavior": "Both real native full-frame and bounded fallback Draw/DrawIndexed routes bind the exact D3D11 vertex and index buffers populated from game-authored data."
+      },
+      {
+        "id": "failed-buffer-d3d9-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "gamepad_and_original_d3d9_hresult",
+        "expected_behavior": "Missing native VB or required IB fails closed before IA/Draw and does not change original D3D9 Draw, Present HRESULT or gamepad path."
+      },
+      {
+        "id": "exact-sha-integration",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_fast_windows_openxr_hud_backend",
+        "expected_behavior": "Destructive source mutation checks and exact-SHA Fast, Backend, Win32, OpenXR and HUD GitHub Actions all succeed; game and HMD validation remain separate."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "real-game-ia-source-ownership": "PENDING_EXACT_SHA",
+    "failed-buffer-d3d9-fallback": "PENDING_EXACT_SHA",
+    "exact-sha-integration": "PENDING_EXACT_SHA"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT"
+    ],
+    "visible_frame_acceptance": "A real full-resolution game VB/IB, populated through native GPU uploads and independently through legacy diagnostics, is bound to its exact IA slot immediately before native game Draw/DrawIndexed; actual game/HMD pixels not asserted.",
+    "activation_guard_and_fallback": "Native Draw remains opt-in disabled by default; any absent source VB/IB returns failure before submission, while D3D9 Draw and input path stay authoritative.",
+    "conflict_keys": [
+      "DX11:REAL_GAME_DRAW_GPU_BUFFER_OWNER_BINDING"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "integration_path": [
+      "R30 intercepted game VB/IB/UP Draw -> native full-frame upload or bounded diagnostic GPU CreateBuffer -> shared ComPtr source ownership",
+      "Shared D3D11 IASetVertexBuffers/IASetIndexBuffer -> Draw/DrawIndexed -> guarded same-Present native frame or original D3D9 fallback"
+    ],
+    "batch_components": [
+      "Live game D3D11 GPU buffer creation and shared IA object binding repair in C++ bridge",
+      "Destructive positive/negative real-source ownership regression executed by exact-SHA Fast workflow plus Windows source compile"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Both buffer creation paths retain their D3D11 COM objects until the shared real GPU IA binding and Draw/DrawIndexed.",
+      "negative_regression": "Destructively reintroducing either scoped VB/IB shadow or removing the buffer admission guard fails source test; D3D9/gamepad unaffected.",
+      "component_integration": "R30 game Draw capture -> D3D11 actual vertex/index buffer creation and upload -> shared IA -> native GPU Draw -> fenced original-Present frame boundary."
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "PASS latest head 04c5ec18 and 00756 C6",
+    "C1_REVIEW": "PASS actual fallback buffer-owner shadowing confirmed in production live submit",
+    "C2_IMPLEMENT": "PASS production C++ shared VB/IB ownership and fail-closed binding",
+    "C3_VALIDATE": "PENDING_EXACT_SHA",
+    "C4_COMMIT": "PENDING",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_5_GATE_CI"
+  }
+}

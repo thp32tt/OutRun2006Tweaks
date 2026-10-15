@@ -4114,9 +4114,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     bd.Usage = D3D11_USAGE_IMMUTABLE;
     D3D11_SUBRESOURCE_DATA initial{};
     initial.pSysMem = vertices.data();
-    ComPtr<ID3D11Buffer> vb;
     if (FAILED(dev->CreateBuffer(&bd, &initial, vb.GetAddressOf()))) return false;
-    ComPtr<ID3D11Buffer> ib;
     if (indices && indexCount) {
         bd.ByteWidth = indexCount * sizeof(std::uint32_t);
         bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -4567,6 +4565,11 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         ID3D11Buffer* combiner = stage1Constants.Get();
         ctx->PSSetConstantBuffers(1, 1, &combiner);
     }
+    // Both source modes must bind the exact buffers populated above. In
+    // particular, the bounded D3D9 diagnostic fallback must not shadow these
+    // owners with short-lived local ComPtrs and submit with a null IA vertex
+    // stream. A failed native binding never changes the original D3D9 Draw.
+    if (!vb || (indices && indexCount && !ib)) return false;
     const UINT stride = sizeof(NativeVertex), offset = 0;
     ID3D11Buffer* boundVB = vb.Get();
     ctx->IASetInputLayout(s.layout.Get());
