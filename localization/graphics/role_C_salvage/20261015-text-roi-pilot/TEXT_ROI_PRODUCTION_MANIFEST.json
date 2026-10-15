@@ -1,0 +1,29 @@
+{
+  "schema": "outrun-text-roi-production-v1",
+  "source_manifest": "SOURCE_MANIFEST_108.csv",
+  "workflow": "verified full HD source → text ROI → independent ImageGen → QA",
+  "legacy_tiles_disabled": true,
+  "items": [
+    {
+      "id": "Q104_OutRunMode_fullhd",
+      "role": "A",
+      "queue_index": "104",
+      "status": "ROI_APPROVED_FOR_IMAGEGEN",
+      "source_provenance": "DIRECT_FULL_HD_PNG",
+      "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+      "source_dds_sha256": "f0a8491585dd4f225c4707b63bd61ae43869cb9d243d9de881258add023c06e2",
+      "source_png_sha256": "09c6604f41083ed6c8bf020b1600c6aef5190a42918f9cdf358473aecb1bd929",
+      "bbox_xyxy": [
+        386,
+        42,
+        1362,
+        210
+      ],
+      "imagegen_input_png": "Q104_OutRunMode_FullHD_TextROI_2x.png",
+      "imagegen_input_sha256": "69b94a31fed5533acb2e08b678befe03996587d25c1ad9d0fd764c598d788555",
+      "alpha_crop_margin_checked": true,
+      "english": "OutRun Mode",
+      "korean": "아웃런 모드"
+    }
+  ]
+}
