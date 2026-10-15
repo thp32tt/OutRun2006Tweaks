@@ -89,8 +89,18 @@ namespace OutRunVrMenuAspect
         const float d0 = std::tan(down0), u0 = std::tan(up0);
         const float l1 = std::tan(left1), r1 = std::tan(right1);
         const float d1 = std::tan(down1), u1 = std::tan(up1);
-        if (!(r0 - l0 > 0.05f && r1 - l1 > 0.05f &&
-              u0 - d0 > 0.05f && u1 - d1 > 0.05f))
+        // Both published eyes must describe finite, physically bounded
+        // tangent rectangles. A transient near-pole eye can be below the
+        // angle guard (1.55 rad) yet span tens of tangent units, distorting
+        // the *shared* optical menu for both eyes during recenter/Reset.
+        // Fail closed before averaging: do not let one invalid eye drag the
+        // other eye's centered menu or 4:3 aspect out of its authored plane.
+        const float spanX0 = r0 - l0, spanX1 = r1 - l1;
+        const float spanY0 = u0 - d0, spanY1 = u1 - d1;
+        if (!(spanX0 > 0.05f && spanX0 <= 10.0f &&
+              spanX1 > 0.05f && spanX1 <= 10.0f &&
+              spanY0 > 0.05f && spanY0 <= 10.0f &&
+              spanY1 > 0.05f && spanY1 <= 10.0f))
             return {};
 
         const float left = 0.5f * (l0 + l1);

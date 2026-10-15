@@ -1,0 +1,81 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00893",
+  "production_id": "CONVERSION-DX9EX-00893",
+  "event_id": "CONVERSION-DX9EX-00893-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00893",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU_XR_INVALID_FOV",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_VALIDATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "efaef61d445d922a9632f956bed379974d6abc63",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "vrhost/src/runtime/menu_content_aspect.hpp"
+  ],
+  "changed_files": [
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "vrhost/tests/menu_content_aspect_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00893.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU_XR_INVALID_FOV",
+    "goal": "Prevent a transient near-pole or outlier OpenXR eye FOV from distorting the entire forward-centered native OutRun menu across both eyes; preserve legitimate asymmetric Quest FOV and 4:3/full-width car-selection content.",
+    "scope_boundary": "Only LOCAL menu shared tangent FOV planning (R23 host); no automatic 4:3 crop, car selection content removal, game HUD/F11/ESC, graphics world stereo, R26_SAFE, DX11 or DXVK.",
+    "trace_stages": [
+      "R23 host menu obtains both eye FOVs; PlanCommonFovTangents transforms each per-eye angle to tangent space and averages them.",
+      "An eye with ±1.50 rad aperture previously passed the <1.55 angle pole guard and span>0.05 check but its ~28-unit tangent span contaminated the shared menu aspect.",
+      "Reject any single out-of-bounds 10-tangent-unit horizontal/vertical span before combining the eyes; valid shared FOV retains exact original arithmetic and downstream optical/UV placement."
+    ],
+    "subcomponents": [
+      "Reject impossible per-eye horizontal and vertical spans before the common menu tangent projection.",
+      "Retain tested asymmetric Quest left/right values, original content UV, desktop/full-car selection and reset reentry behavior.",
+      "Require exact-SHA DX9Ex Active R84 game/host/package, R26_SAFE, Domain and impacted Full Source/Host gates before build-complete; HMD separately untested."
+    ],
+    "acceptance_items": [
+      {
+        "id": "menu_invalid_eye_fov_rejection",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R23 LOCAL menu shared eye optical extent during transient XR recenter",
+        "expected_behavior": "A near-pole eye with >10 tangent span cannot distort the other eye; menu uses safe invalid-FOV fallback."
+      },
+      {
+        "id": "menu_normal_and_native_content_preserved",
+        "category": "fallback_regression",
+        "behavior_area": "Quest3 asymmetric optics, 4:3/16:9/21:9 car selection crop and reset transitions",
+        "expected_behavior": "Normal asymmetric FOV stays valid, full native menu side content and all unchanged non-menu stereo and fallback paths remain intact."
+      },
+      {
+        "id": "menu_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 x86 game / R26_SAFE rollback / x64 OpenXR host / deployment ZIP, Domain/Full Source",
+        "expected_behavior": "All required final exact-source-SHA GitHub actions pass before calling it build-verified; Quest3 HMD remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "menu_invalid_eye_fov_rejection": "SOURCE_IMPLEMENTED",
+    "menu_normal_and_native_content_preserved": "SOURCE_UNCHANGED",
+    "menu_exact_sha_gates": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "The pre-change R23 menu helper accepted ±1.50 rad per-eye horizontal/vertical bounds because abs(angle)<1.55 even though tan(+1.50)-tan(-1.50) is about 28, exceeding the already bounded pause-menu tangent-extent contract.",
+    "root_cause": "Shared two-eye menu FOV was composed before checking each eye's usable tangent span, allowing a single near-pole publication to change the other eye's authored menu aspect.",
+    "fix_evidence": "Check both per-eye tangent spans against 0.05..10.0 before averaging; retain all normal asymmetric FOV and 4:3/21:9 menu paths.",
+    "negative_test_evidence": "Portable menu_content_aspect_smoke now includes near-pole single-eye horizontal and vertical negatives in addition to asymmetric positive and recenter recovery cases.",
+    "evidence_limits": "No user Quest3/VDXR playback or measured performance data. Normal FOV unchanged."
+  },
+  "runtime_evidence": "No actual Quest3/VDXR session or OutRun game render execution for this task.",
+  "score_once": false,
+  "score_delta_this_attempt": 0
+}

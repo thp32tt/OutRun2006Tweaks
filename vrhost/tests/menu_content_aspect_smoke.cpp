@@ -346,6 +346,18 @@ int main()
         PlanCommonFovTangents(l0, r0, d0, u0, l1, r1, d1,
             std::numeric_limits<float>::quiet_NaN()).valid)
         return 5;
+    // Prior near-pole positive/inverted-free FOVs passed the individual
+    // angle guard: one eye's >10 tangent span can still stretch the common
+    // menu rectangle in both eyes. Reject per-eye X/Y before averaging.
+    // Retain legitimate asymmetric Quest FOV above and reset restoration.
+    const auto invalidHorizontal = PlanCommonFovTangents(
+        -1.5f, 1.5f, d0, u0, l1, r1, d1, u1);
+    const auto invalidVertical = PlanCommonFovTangents(
+        l0, r0, d0, u0, l1, r1, -1.5f, 1.5f);
+    if (invalidHorizontal.valid || invalidVertical.valid ||
+        OutRunVrMenuAspect::PlanOpticallyCenteredClip(invalidHorizontal, 4.f / 3.f).valid ||
+        OutRunVrMenuAspect::PlanOpticallyCenteredClip(invalidVertical, 4.f / 3.f).valid)
+        return 34;
 
     // After Reset/recenter a new full eye pair must immediately restore
     // the shared aspect; the routine carries no stale state or UV.
