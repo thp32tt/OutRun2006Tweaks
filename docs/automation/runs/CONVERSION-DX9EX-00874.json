@@ -62,15 +62,15 @@
       "Do not revisit already completed 00873 source/index scratch improvements."
     ],
     "fix_evidence": "Output eye buffers use already validated write-only scratch with full-source copy and viewport early reject.",
-    "negative_test_evidence": "Host smoke covers independent eyes, untouched indexed/texture attributes, resizing without stale reuse, original clone rollback, clear; exact-SHA Windows gate pending."
+    "negative_test_evidence": "Exact material SHA 5540b089: Active host deterministic no-HMD r30-shadow-ranges smoke and negative/source-recopy/independent-eyes conditions PASS, DX9Ex Active 5/5, Full Source Impact 3/3, Domain and HUD Inspector all SUCCESS. Quest3 visual and same-scene FPS remain UNTESTED."
   },
-  "status": "IMPLEMENTED_PENDING_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING_GATES",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
-  "runtime_evidence": "No physical Quest3/VDXR/gameplay performance measurement.",
+  "runtime_evidence": "Exact source verified on GitHub Windows host/game and package only. No physical Quest3/VDXR or same-scene FPS evidence.",
   "source_parent_sha": "998e79578002769f831a03c6084b8ce66ca11171",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
@@ -78,14 +78,37 @@
     "docs/automation/runs/CONVERSION-DX9EX-00874.json"
   ],
   "acceptance_results": {
-    "eye-copy": "PENDING_EXACT_SHA",
-    "fallback": "PENDING_EXACT_SHA",
-    "ci": "PENDING_EXACT_SHA"
+    "eye-copy": "PASS",
+    "fallback": "PASS",
+    "ci": "PASS_EXACT_SHA"
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "PENDING_EXACT_SHA_AND_HMD",
-  "result_commit_ci_skip": false,
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null
+  "hold_reason": "QUEST3_VDXR_HARDWARE_RUNTIME_UNTESTED",
+  "result_commit_ci_skip": true,
+  "material_result_sha": "5540b089c3e3fddb801ed33adb5f7af8075fca8a",
+  "validation_bearing_result_sha": "5540b089c3e3fddb801ed33adb5f7af8075fca8a",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "5540b089c3e3fddb801ed33adb5f7af8075fca8a",
+    "dx9ex_active": {
+      "run_id": 38661311021,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, host, game, full-chain-compile, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38661311025,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38661311061,
+      "conclusion": "SUCCESS",
+      "required_jobs": "source-cross-domain, msvc-analyze-active-game, msvc-analyze-openxr-host (3/3)"
+    },
+    "hud_inspector": {
+      "run_id": 38661311011,
+      "conclusion": "SUCCESS"
+    },
+    "runtime": "UNTESTED"
+  }
 }
