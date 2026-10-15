@@ -1,0 +1,27 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "assets": [
+    {
+      "queue_id": "Q012",
+      "source_png": "Q012_from_original_READABLE_FLIPY.png",
+      "source_sha256": "48cedd9621577ce8a5d97227150105a0d2f5092c8109abdfe4f25f0ac14c8ad5",
+      "source_kind": "DIRECT_HD_DDS_DECODE_FROM_GITHUB_PINNED_1e2bd13_FLIPY",
+      "source_dds_path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+      "regions": [
+        {
+          "id": "continue_question",
+          "english": "Continue?",
+          "korean": "계속?",
+          "bbox": [
+            4,
+            16,
+            252,
+            58
+          ],
+          "isolation": "alpha",
+          "scale": 4
+        }
+      ]
+    }
+  ]
+}

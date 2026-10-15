@@ -1,0 +1,66 @@
+{
+  "schema": "outrun-hd-text-roi-source-qa-v1",
+  "run_id": "C-ROI-SOURCE-Q012-CONTINUE-20261015-2003",
+  "source_repo": "thp32tt/OutRun2006Tweaks",
+  "source_branch": "korean-localization-recovery-20260928",
+  "source_commit_pinned": "1e2bd13e968fe180ede9cb8aeb9e1210ed5d073c",
+  "canonical_dds_repo_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+  "dds_sha256": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+  "dds_size_bytes": 65664,
+  "source_png_sha256": "48cedd9621577ce8a5d97227150105a0d2f5092c8109abdfe4f25f0ac14c8ad5",
+  "source_orientation": "FLIP_TOP_BOTTOM_to_READABLE",
+  "dds_to_png_pixel_identical": true,
+  "source_png_dimensions": [
+    256,
+    64
+  ],
+  "native_bbox_xyxy": [
+    4,
+    16,
+    252,
+    58
+  ],
+  "native_png_sha256": "29ff1062c24f21921ad82045df7d392783ae91e133b69f4dc2b68fb90e191fea",
+  "input_png_sha256": "fb947c8226f3191a6966b7b3af869bd87dbf02b42cd46fed7b53e0f8abcb52d8",
+  "native_dimensions": [
+    248,
+    42
+  ],
+  "imagegen_dimensions": [
+    992,
+    168
+  ],
+  "alpha_nonzero_bbox_local_xyxy": [
+    4,
+    4,
+    244,
+    38
+  ],
+  "alpha_margin_left_top_right_bottom_px": [
+    4,
+    4,
+    4,
+    4
+  ],
+  "crop_pixel_exact": true,
+  "one_phrase_visible_manual_review": "Continue? only; alpha of letters/effects, no buttons, border, or background",
+  "translation": {
+    "english": "Continue?",
+    "korean": "계속?",
+    "source": "FULL_HD_108_SOURCE_INVENTORY.json Q012"
+  },
+  "source_roi_mechanical_qa": "PASS_TEST_ONLY",
+  "source_roi_visual_review": "PASS_SOURCE_ONLY",
+  "ui_cell_uv_fit": "PENDING_KOREAN_COMPOSITION",
+  "imagegen_call": "NOT_RUN",
+  "korean_output": "NOT_CREATED",
+  "clean_plate": "NOT_CREATED",
+  "dds_export": "NOT_RUN",
+  "independent_C1": "NOT_RUN",
+  "independent_C3": "NOT_RUN",
+  "user_ingsame": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "status": "IMAGEGEN_REFERENCE_TEST_ONLY",
+  "queue_or_state_mutation": "NONE",
+  "native_recomposition_note": "Generated Korean may differ in text width; preserve aspect ratio when placing within independently measured UI cell/UV safe area. Do not guess clean mask or remove original English without reviewed PSD/mask."
+}
