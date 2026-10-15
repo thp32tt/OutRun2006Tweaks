@@ -8,6 +8,24 @@ root=Path(__file__).resolve().parents[1]
 src=(root/"src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
 header=(root/"src/vr/d3d11/native_game_frame_batch.hpp").read_text()
 region=(root/"src/vr/d3d11/native_game_present_region.hpp").read_text()
+mutation=(root/"src/vr/d3d11/native_game_source_mutation.hpp").read_text()
+observer_header=(root/"src/vr/d3d11/live_game_frame_bridge.hpp").read_text()
+r30=(root/"src/vr/d3d9/stereo_renderer_r30.cpp").read_text()
+# 00789: original D3D9 non-Draw writes must terminate only a native
+# seeded-backbuffer batch. The game still gets its original HRESULT/input.
+assert "GameNativeSourceMutation::invalidates_full_game_frame(" in src
+assert "s.frameBatch.abort();" in src.split("void observe_game_surface_mutation(", 1)[1].split(
+    "void observe_scene_boundary(", 1)[0]
+assert "nativeOutputUploadDepth != 0u" in src
+assert "NativeOutputUploadScope outputUploadScope{};" in src
+assert "void observe_game_surface_mutation(" in observer_header
+for hook in ("R30UpdateSurfaceDest(", "R30StretchRectDest(", "R30ColorFillDest("):
+    body=r30.split("HRESULT __stdcall "+hook,1)[1].split(
+        "HRESULT __stdcall ",1)[0]
+    assert "live_game_frame::observe_game_surface_mutation(" in body, hook
+for symbol in ("R30UpdateSurfaceHook = {};","R30StretchRectHook = {};",
+               "R30ColorFillHook = {};"):
+    assert symbol in r30, symbol
 for marker in ('#include "native_game_frame_batch.hpp"',
  'OUTRUN_DX11_FRAME_BATCH', 's.frameBatch.accepts(candidateOrdinal, s.probeSlot,',
  'if (s.frameBatch.first_draw()) {',
@@ -60,6 +78,9 @@ probe=(root/"tools/dx11_native_frame_batch_probe.cpp").read_text()
 with TemporaryDirectory(prefix="dx11-native-frame-") as work:
     folder=Path(work)
     (folder/"probe.cpp").write_text(probe)
+    # Portable probes are compiled against temporary mutated headers, not
+    # the repository include tree; carry every legitimate new dependency.
+    (folder/"native_game_source_mutation.hpp").write_text(mutation)
     for tag,text,region_text,passes in (("positive",header,region,True),
                             ("negative_mutant",header.replace("kMaxDraws = 8u","kMaxDraws = 1u"),region,False),
                             ("full_limit_mutant",header.replace("kMaxFullFrameDraws = 4096u","kMaxFullFrameDraws = 8u"),region,False),
