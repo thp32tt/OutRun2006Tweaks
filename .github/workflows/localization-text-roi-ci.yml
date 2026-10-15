@@ -1,0 +1,46 @@
+name: OutRun HD Text ROI source and A/B queue smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [localization-controller-recovery-20260928]
+    paths:
+      - 'tools/chat-controller/localization-recovery-v1/**'
+      - '.github/workflows/localization-text-roi-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  roi-queue-and-controller-patches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install smoke dependencies
+        run: python -m pip install 'Pillow>=10,<12'
+      - name: Strict source-bound queue tests
+        run: python tools/chat-controller/localization-recovery-v1/tests/test_text_roi_queue.py
+      - name: Reproduce controller Docker patch/AST checks (no deployment)
+        shell: bash
+        run: |
+          python - <<'PY'
+          import ast, sys
+          from pathlib import Path
+          root=Path("tools/chat-controller/localization-recovery-v1")
+          sys.path.insert(0,str(root.resolve()))
+          import patch_controller_png_upload as ab,patch_controller_c_slot as c
+          source="".join((root/"src"/f"controller.py.part{i:02d}").read_text() for i in range(4))
+          ast.parse(source)
+          patched=ab.patch(source)
+          ast.parse(patched)
+          with_c=c.patch(patched)
+          ast.parse(with_c)
+          assert "OUTRUN_AB_TEXT_ROI_QUEUE" in with_c
+          assert 'LOCALIZATION_SLOT_NAMES = ("A", "B", "C")' in with_c
+          assert c.patch(with_c)==with_c and ab.patch(with_c)==with_c
+          print("TEXT_ROI_CONTROLLER_C_PATCH_STATIC_PASS; RUNTIME_VALIDATION=UNTESTED")
+          PY
