@@ -62,7 +62,7 @@ with TemporaryDirectory(prefix="dx11-native-frame-") as work:
     for tag,text,region_text,passes in (("positive",header,region,True),
                             ("negative_mutant",header.replace("kMaxDraws = 8u","kMaxDraws = 1u"),region,False),
                             ("full_limit_mutant",header.replace("kMaxFullFrameDraws = 4096u","kMaxFullFrameDraws = 8u"),region,False),
-                            ("full_contiguity_mutant",header.replace("ordinal == submitted","ordinal >= submitted"),region,False),
+                            ("full_contiguity_mutant",header.replace("ordinal == consumed","ordinal >= consumed"),region,False),
                             ("full_unsupported_mutant",header.replace("return fullMode ||","return (fullMode && false) ||"),region,False),
                             ("cropped_native_disabled",header,region.replace("return {0u, 0u, true};","return {};"),False),
                             ("cropped_native_wrong_extent",header,region.replace(
@@ -71,6 +71,8 @@ with TemporaryDirectory(prefix="dx11-native-frame-") as work:
                             ("cropped_native_out_of_bounds",header,region.replace(
                                 "right > static_cast<std::int64_t>(backbufferWidth) ||\n            bottom > static_cast<std::int64_t>(backbufferHeight))",
                                 "false ||\n            bottom > static_cast<std::int64_t>(backbufferHeight))"),False)):
+        if tag == "full_contiguity_mutant":
+            assert text != header, "full contiguity mutant must modify the current source predicate"
         (folder/"native_game_frame_batch.hpp").write_text(text)
         (folder/"native_game_present_region.hpp").write_text(region_text)
         binary=folder/tag
