@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:START_SHADOW",
   "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING_EXACT_SHA",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "2ab53f33c025c03a0c7cf7f42fe014c8ad35dcfd",
   "material_result_sha": "94c91bcfd400e99f5b4e19d3b3d436a290f3d02a",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "1515f00b8c16a48facadec1a4efa3bcc3c6576d4",
   "source_paths": [
     "src/vr/game/render_semantics.hpp",
     "src/hooks_graphics.cpp",
@@ -71,9 +71,9 @@
     ]
   },
   "acceptance_results": {
-    "shadow_source_to_eye": "PENDING_CI",
-    "preserve_foreign_alpha": "PENDING_CI",
-    "exact_sha_gate": "PENDING_CI"
+    "shadow_source_to_eye": "PASS_BUILD",
+    "preserve_foreign_alpha": "PASS_BUILD",
+    "exact_sha_gate": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "The existing R29 fragile alpha branch zeroes disparity on depth-disabled effects even when the original CalcPeraShadow draws player world geometry. The semantic owner only said WorldParticle and could not safely differentiate this exception. This remains a source-level candidate pending HMD.",
@@ -90,7 +90,7 @@
     "eye_ownership": "Existing R29 R7 left/right GPU physical replay and conservative R13 recovery remain in force; only a proven player contact-shadow changes disparity decision.",
     "negative_test_evidence": "Portable C++ guard rejects foreign tokens, queues, HUD, central lens, missing WVP, depth writes, stencil writes and forced zero disparity."
   },
-  "next_action": "Use this single final result/feature-record commit as exact input for four required DX9Ex Active, Domain Isolation, Full Source Impact and HUD Inspector Gates; do not claim C6 until all four SUCCESS; preserve original source material SHA. HMD UNTESTED.",
+  "next_action": "Record the independent source-implemented, exact-SHA-CI-validated result once in AI2 scoreboard; Quest3/VDXR actual game optical behavior requires HMD test, no backend promotion from build alone.",
   "score_delta_this_attempt": 0,
   "source_candidate_sha": "38f243818335ee42885b101ae909c71274aaa0f4",
   "ci_repair_history": [
@@ -109,5 +109,51 @@
       "repair": "Preserve unchanged equivalent stencil zero condition and extend exact source-regression pattern to require CarBaseShadow with negative wrong-owner mutation; DX9Ex policy and Domain Guard confirmed PASS.",
       "run_id": 38807317348
     }
-  ]
+  ],
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "1515f00b8c16a48facadec1a4efa3bcc3c6576d4",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "exact_sha_gate_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38807924722,
+        "sha": "1515f00b8c16a48facadec1a4efa3bcc3c6576d4",
+        "conclusion": "success",
+        "jobs": "policy/full-chain-compile/host/game/package 5/5"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38807924644,
+        "sha": "1515f00b8c16a48facadec1a4efa3bcc3c6576d4",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38807924645,
+        "sha": "1515f00b8c16a48facadec1a4efa3bcc3c6576d4",
+        "conclusion": "success",
+        "jobs": "source-cross-domain/msvc-analyze-openxr-host/msvc-analyze-active-game 3/3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38807924879,
+        "sha": "1515f00b8c16a48facadec1a4efa3bcc3c6576d4",
+        "conclusion": "success",
+        "jobs": "static-exe-analysis/build-hud-inspector 2/2"
+      }
+    ],
+    "notes": "Win32 game + R84 full-chain and x64 host compile PASS at exact result SHA, source-level bounded car shadow and fallback C++ smoke. Quest3/VDXR real HMD image, timing and geometry UNTESTED; no live VR promotion."
+  },
+  "bookkeeping": {
+    "commit_kind": "C6_RESULT_ONLY",
+    "validation_bearing_result_sha": "1515f00b8c16a48facadec1a4efa3bcc3c6576d4",
+    "skip_ci": true,
+    "no_additional_score": true
+  }
 }
