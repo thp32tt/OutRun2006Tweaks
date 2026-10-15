@@ -66,14 +66,26 @@ if (-not (Test-Path $buildVariantFile)) { $buildVariantFile = Join-Path $src "VA
 $rendererBuildVariant = if (Test-Path $buildVariantFile) { (Get-Content $buildVariantFile -Raw).Trim() } else { "unknown" }
 $cmakeFlagsFile = Join-Path $src "CMAKE_FLAGS.txt"
 $rendererCmakeFlags = if (Test-Path $cmakeFlagsFile) { (Get-Content $cmakeFlagsFile -Raw).Trim() } else { "unknown" }
-if ($Backend -eq "d3d9") {
-    # Every DX9Ex payload must come from the package exact-SHA build.
-    # CURRENT_FOCUS is R84, while R26_SAFE is the explicit protected rollback.
+# A real released ZIP always has BUILD_INPUTS.json. Keep legacy/manual
+# synthetic backend identity checks usable without pretending they are an
+# exact-SHA release; opt-in R26/R84 slots always require real provenance.
+$packageInputsFile = Join-Path $root 'BUILD_INPUTS.json'
+$enforceReleaseIdentity = (Test-Path $packageInputsFile) -or
+    $variant -eq "R26_SAFE" -or $variant -eq "R84_TEST"
+if ($Backend -eq "d3d9" -and $enforceReleaseIdentity) {
     $baselineShaFile = Join-Path $backendPayload "SOURCE_SHA.txt"
     if (-not (Test-Path $baselineShaFile) -or
         $sourceSha -notmatch '^[0-9a-fA-F]{40}$' -or
         $sourceSha -ne (Get-Content $baselineShaFile -Raw).Trim()) {
         throw "DX9Ex renderer exact-SHA mismatch; refusing stale or unsafe payload."
+    }
+    if (Test-Path $packageInputsFile) {
+        $buildInputs = Get-Content $packageInputsFile -Raw | ConvertFrom-Json
+        if (-not $buildInputs.IntegrationSha -or
+            $sourceSha -ne [string]$buildInputs.IntegrationSha -or
+            [string]$buildInputs.VariantId -ne "R84_SPLIT_R33_R32_R31_R30_R29") {
+            throw "DX9Ex release manifest does not identify the R84 main and exact source SHA."
+        }
     }
     $expectedVariant = if ($variant -eq "R26_SAFE") {
         "ACTIVE_R26_R43_R44"
