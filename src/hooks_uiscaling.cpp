@@ -55,6 +55,30 @@ namespace
     static_assert(CenterMultiSpriteAxis(0.0f, 2.5f, 1.25f, 1200.0f, 480.0f) == 300.0f);
     static_assert(CenterMultiSpriteAxis(1200.0f, 2.5f, 1.25f, 1200.0f, 480.0f) == 900.0f);
 
+
+    // Compose the matrix AFTER D3DX applies scaling/rotation pivots.
+    // Changing only pScaling/pTranslation uses a different pivot basis and
+    // distorts rotated menu art at portrait and ultrawide aspect ratios.
+    struct UiMatrix2DRows { float m11, m12, m21, m22, tx, ty; };
+    constexpr UiMatrix2DRows ContainUiMatrixRows(
+        UiMatrix2DRows m, float sx, float sy,
+        float shiftX, float shiftY) noexcept
+    {
+        return {m.m11 * sx, m.m12 * sy,
+            m.m21 * sx, m.m22 * sy,
+            m.tx * sx + shiftX, m.ty * sy + shiftY};
+    }
+    // Rotation, translation and native 4:3 identity: actual source-header
+    // compile-time regressions, not telemetry or a string-only verifier.
+    static_assert(ContainUiMatrixRows(
+        {0, 4, -4, 0, 48, 80}, 1, 0.5f, 0, 120).m12 == 2);
+    static_assert(ContainUiMatrixRows(
+        {0, 4, -4, 0, 48, 80}, 1, 0.5f, 0, 120).m21 == -4);
+    static_assert(ContainUiMatrixRows(
+        {0, 4, -4, 0, 48, 80}, 1, 0.5f, 0, 120).ty == 160);
+    static_assert(ContainUiMatrixRows(
+        {2, 0, 0, 2, 16, 20}, 1, 1, 0, 0).tx == 16);
+
 }
 
 // The exact D3DX sprite hook is declared below the original +TIME source.
@@ -232,10 +256,25 @@ class UIScaling : public Hook
 		D3DXVECTOR2* forwardedScaling = pScaling;
 		D3DXVECTOR2* forwardedTranslation = pTranslation;
 
+
+        // Complete 2D composition is required when the game supplies a
+        // non-origin scale/rotation pivot. Only title/menu/car-selection
+        // producers take this path; other visual owners remain unchanged.
+        const bool frontEndPivot = Game::current_mode &&
+            (*Game::current_mode == GameState::STATE_TITLE ||
+             *Game::current_mode == GameState::STATE_MENU ||
+             *Game::current_mode == GameState::STATE_SELECTOR ||
+             *Game::current_mode == GameState::STATE_SELEXIT ||
+             *Game::current_mode == GameState::STATE_SELRESET) &&
+            (pScaling || pTranslation) &&
+            (pScalingCenter || pRotationCenter ||
+             pScalingRotation != 0.0f || Rotation != 0.0f) &&
+            (mode == ScalingMode::KeepCentered ||
+             mode == ScalingMode::OnlineArcade);
 		// D3DX allows optional 2D scaling/translation inputs. During resolution
 		// or device reset the game scale may also be invalid. Preserve input
 		// values and forward the original call when reprojection is unsafe.
-		if ((mode == ScalingMode::KeepCentered ||
+        if (!frontEndPivot && (mode == ScalingMode::KeepCentered ||
 		     mode == ScalingMode::OnlineArcade) &&
 		    pScaling && pTranslation &&
 		    Game::screen_scale && Game::screen_resolution)
@@ -293,7 +332,7 @@ class UIScaling : public Hook
              *Game::current_mode == GameState::STATE_SELECTOR ||
              *Game::current_mode == GameState::STATE_SELEXIT ||
              *Game::current_mode == GameState::STATE_SELRESET);
-        if (partialFrontEndMenu &&
+        if (!frontEndPivot && partialFrontEndMenu &&
             (mode == ScalingMode::KeepCentered ||
              mode == ScalingMode::OnlineArcade) &&
             ((pScaling == nullptr) != (pTranslation == nullptr)) &&
@@ -338,8 +377,52 @@ class UIScaling : public Hook
             }
         }
 
-		return D3DXMatrixTransformation2D.stdcall<int>(pOut, pScalingCenter, pScalingRotation,
-			forwardedScaling, pRotationCenter, Rotation, forwardedTranslation);
+        const int result = D3DXMatrixTransformation2D.stdcall<int>(
+            pOut, pScalingCenter, pScalingRotation,
+            forwardedScaling, pRotationCenter, Rotation, forwardedTranslation);
+        if (frontEndPivot && result && pOut &&
+            Game::screen_scale && Game::screen_resolution)
+        {
+            const float sx = Game::screen_scale->x;
+            const float sy = Game::screen_scale->y;
+            const float width = Game::screen_resolution->x;
+            const float height = Game::screen_resolution->y;
+            const float sourceWidth = Game::original_resolution.x;
+            const float sourceHeight = Game::original_resolution.y;
+            if (std::isfinite(sx) && std::isfinite(sy) &&
+                std::isfinite(width) && std::isfinite(height) &&
+                std::isfinite(sourceWidth) && std::isfinite(sourceHeight) &&
+                sx > 1.0e-6f && sy > 1.0e-6f &&
+                width > 0.0f && height > 0.0f &&
+                sourceWidth > 0.0f && sourceHeight > 0.0f)
+            {
+                const float contain = (std::min)(sx, sy);
+                const float ratioX = contain / sx;
+                const float ratioY = contain / sy;
+                const float offsetX = (width - sourceWidth * contain) * 0.5f;
+                const float offsetY = (height - sourceHeight * contain) * 0.5f;
+                const UiMatrix2DRows raw{pOut->_11, pOut->_12,
+                    pOut->_21, pOut->_22, pOut->_41, pOut->_42};
+                const auto mapped = ContainUiMatrixRows(
+                    raw, ratioX, ratioY, offsetX, offsetY);
+                // Publish the entire corrected sprite matrix atomically;
+                // unknown/projective or non-finite states retain the original.
+                if (std::isfinite(mapped.m11) && std::isfinite(mapped.m12) &&
+                    std::isfinite(mapped.m21) && std::isfinite(mapped.m22) &&
+                    std::isfinite(mapped.tx) && std::isfinite(mapped.ty) &&
+                    pOut->_44 == 1.0f && pOut->_14 == 0.0f &&
+                    pOut->_24 == 0.0f)
+                {
+                    pOut->_11 = mapped.m11;
+                    pOut->_12 = mapped.m12;
+                    pOut->_21 = mapped.m21;
+                    pOut->_22 = mapped.m22;
+                    pOut->_41 = mapped.tx;
+                    pOut->_42 = mapped.ty;
+                }
+            }
+        }
+        return result;
 	}
 
 	static inline SafetyHookMid draw_sprite_custom_matrix_hk = {};
