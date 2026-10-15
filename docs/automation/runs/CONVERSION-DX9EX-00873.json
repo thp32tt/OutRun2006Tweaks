@@ -58,10 +58,10 @@
     "negative_test_evidence": "Host smoke checks shrink/expand pointer reuse, complete per-draw overwrite, growth, 16-bit and 32-bit index slots, clear and independent gap rejection.",
     "first_ci_failure": "DX9Ex Active policy gate at 151fc73b failed: missing feature_contract.special_work_evidence required by whole-feature policy; added source-based evidence without claiming hardware FPS."
   },
-  "status": "IN_PROGRESS",
-  "phase": "C5_COMMIT",
-  "checkpoint": "C5_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "runtime_evidence": "No actual Quest3/VDXR or same-scene CPU/GPU FPS measurement; source-confirmed redundant memory initialization, no hardware speedup claim.",
@@ -79,7 +79,8 @@
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "PENDING_EXACT_SHA_GITHUB_ACTIONS",
-  "result_commit_ci_skip": false,
-  "material_result_sha": "151fc73b50a59c0a18de3f7c677c446518078ec5"
+  "hold_reason": "QUEST3_VDXR_HARDWARE_RUNTIME_UNTESTED",
+  "result_commit_ci_skip": true,
+  "material_result_sha": "151fc73b50a59c0a18de3f7c677c446518078ec5",
+  "validation_bearing_result_sha": "399baa944e8db7774d6facb1fdc5bbff746e0cec"
 }
