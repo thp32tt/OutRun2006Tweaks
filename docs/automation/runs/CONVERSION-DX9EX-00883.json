@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_NEEDS_VALIDATION",
-  "phase": "C4_MATERIAL_COMMIT",
-  "checkpoint": "C4_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "71ea0b8354de211f86d7d327579288be4149c1d1",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "ac0052b74bd328eb2bb2f3d9c21c9a5113d2e311",
   "source_paths": [
     "src/hooks_uiscaling.cpp"
   ],
@@ -84,5 +84,14 @@
     "negative_test_evidence": "C++ static_asserts cover rotated X/Y matrix coefficients and native 4:3 identity, and conditional gating excludes Vanilla/gameplay/HUD.",
     "eye_ownership": "The original 2D menu sprite matrix is corrected before the existing R84 per-eye compositor; no per-eye world or SkyGlow owner changes."
   },
-  "runtime_evidence": "No Quest3/VDXR HMD verification in this run."
+  "runtime_evidence": "No Quest3/VDXR HMD verification in this run.",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "ac0052b74bd328eb2bb2f3d9c21c9a5113d2e311",
+    "conclusion": "SUCCESS",
+    "source": "USER_CONFIRMED_EXACT_SHA_CI",
+    "runtime": "UNTESTED"
+  },
+  "result_commit_ci_skip": true
 }
