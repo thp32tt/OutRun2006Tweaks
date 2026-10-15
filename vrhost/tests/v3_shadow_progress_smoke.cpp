@@ -1,5 +1,8 @@
 #include "vr/ipc/shadow_progress.hpp"
 
+#ifdef NDEBUG
+#undef NDEBUG // Keep smoke assertions active in Windows Release CI.
+#endif
 #include <cassert>
 #include <cstdint>
 
