@@ -1,0 +1,66 @@
+{
+  "schema": "outrun-c-roi-source-audit-v1",
+  "task_id": "C-ROI-SOURCE-Q053-START-20261016T0233KST",
+  "status": "HOLD_ORIGINAL_ALPHA_TOUCHES_CROP_EDGE_EXTEND_ROI",
+  "basis": "GitHub Actions job 116578396693, run 38780286626; source extraction phase success, git sparse stage failed before publication. Run 38780506577 had a subsequent audit-format syntax issue; neither was a PASS.",
+  "scope": "OutRun 2006 Korean localization only",
+  "source": {
+    "kind": "PINNED_PC_HD_DDS_DIRECT_DECODE",
+    "source_repo": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-recovery-20260928",
+    "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+    "expected_source_dds_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+    "source_dds_sha_verified_in_job": true,
+    "platform": "PC HD OR2-HD-GUI-v0.25.10a",
+    "full_dimensions": [
+      4096,
+      4096
+    ],
+    "readable_orientation": "FLIP_Y",
+    "full_dds_decode_png_pixel_equivalence_in_job": "0 mismatches",
+    "full_png_sha256": "NOT_PERSISTED_AFTER_HOLD",
+    "direct_source_bytes_compared_to_legacy_tiles": false
+  },
+  "roi": {
+    "english": "START",
+    "korean": "시작",
+    "mapping": "localization/graphics/transcriptions.jsonl index 53",
+    "candidate_native_xyxy": [
+      2590,
+      2850,
+      3570,
+      3140
+    ],
+    "candidate_dimensions": [
+      980,
+      290
+    ],
+    "proposed_scale": 2,
+    "proposed_upscaled_dimensions": [
+      1960,
+      580
+    ],
+    "source_kind": "ALPHA_CANDIDATE",
+    "edge_status": "2px alpha touches at least one crop border; precise side count was not persisted by first run",
+    "action": "Expand ROI after reviewing neighboring phrase artwork; rerun extractor on complete source. Never send clipped ROI."
+  },
+  "output": {
+    "english_text_roi_native": "WITHHELD_INVALID_BORDER",
+    "imagegen_input_upscaled": "WITHHELD_INVALID_BORDER",
+    "clean_plate": "NOT_CREATED",
+    "mask": "NOT_CREATED",
+    "manifest_schema": "outrun-hd-text-roi-v1",
+    "test_only": true
+  },
+  "controls": {
+    "previous_986_tiles_as_input": false,
+    "previous_AB_outputs_reused": false,
+    "previous_AB_queue_state_modified": false,
+    "portainer_deployed": false,
+    "ImageGen": "NOT_RUN",
+    "C1": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "game": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  }
+}
