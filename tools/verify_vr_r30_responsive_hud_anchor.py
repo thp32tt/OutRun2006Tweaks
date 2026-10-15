@@ -367,9 +367,16 @@ arrow_begin = code.index("bool R30IsPauseMenuExactArrow() noexcept")
 pause_begin = code.index("float R30PauseMenuVerticalFraction() noexcept")
 arrow_scope = code[arrow_begin:pause_begin]
 for marker in ("RenderScope::ScreenHud",
-               "CurrentSpriteQueueProducer",
+               "CurrentRenderProducerToken()",
+               "OutRunVrPauseEye::ExactArrowOwner(",
                "ProducerToken::ExactScreenHudClipSprite"):
     assert marker in arrow_scope, marker
+assert "CurrentSpriteQueueProducer ==" not in arrow_scope
+# An active queued node wins over the exact direct E8 caller; on a
+# synchronous original call, that same semantic API supplies direct owner.
+semantic_src = (root / "src/vr/game/render_semantics.hpp").read_text()
+assert "SpriteQueueDepth != 0" in semantic_src
+assert "? CurrentSpriteQueueProducer : CurrentDirectExactProducer;" in semantic_src
 for original, corrupt in (
     ("RenderScope::ScreenHud", "RenderScope::WorldBillboard"),
     ("ProducerToken::ExactScreenHudClipSprite",
@@ -379,8 +386,18 @@ for original, corrupt in (
     assert original not in mutant
 producer = (root / "src/hooks_uiscaling.cpp").read_text()
 assert "OptionArrow_ClipSpriteCalls[]" in producer
-assert "Module::exe_ptr(addr), ExactScreenHud_putClipSprite" in producer
+assert "Module::exe_ptr(addr), PauseOptionArrow_putClipSprite" in producer
 assert "ProducerToken::ExactScreenHudClipSprite" in producer
+arrow_hook = producer[producer.index("static int __cdecl PauseOptionArrow_putClipSprite("):
+                      producer.index("static int __cdecl RivalMarker_sprani(")]
+for token in ("GameState::STATE_SMPAUSEMENU",
+              "ScopedExactProducerSemantic directArrowOwner(",
+              "RenderScope::ScreenHud, nullptr, true,",
+              "ProducerToken::ExactScreenHudClipSprite",
+              "return ExactScreenHud_putClipSprite("):
+    assert token in arrow_hook, token
+assert arrow_hook.index("ScopedExactProducerSemantic directArrowOwner(") < \
+       arrow_hook.rfind("return ExactScreenHud_putClipSprite(")
 
 pause_end = code.index("float R30HudScopeScale() noexcept", pause_begin)
 pause_func = code[code.index("bool R30IsPauseMenuElement() noexcept"):pause_end]
