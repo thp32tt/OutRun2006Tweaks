@@ -61,16 +61,16 @@
       "Do not change unrelated VR rendering, alter input/FFB/World/SkyGlow, or treat a stable snapshot as proof of headset visual acceptance."
     ],
     "fix_evidence": "Material SHA 3bdd86a62ef52c10f9cb3eba68d5c39354a9f1b9 adds coherent_host_identity.hpp, changes R29 to use its bounded SharedPoseState seqlock reader, and adds race/reconnect/invalid-state behavior tests in vrhost/tests/xr_eye_extent_smoke.cpp.",
-    "negative_test_evidence": "Source-level portable smoke cases added for odd sequence, concurrent new PID/LUID publication, permanently unstable sequence, invalid version/structSize, unavailable host PID, and missing HostAlive. Host binary execution is pending exact-SHA Windows CI.",
+    "negative_test_evidence": "Source-level portable smoke cases added for odd sequence, concurrent new PID/LUID publication, permanently unstable sequence, invalid version/structSize, unavailable host PID, and missing HostAlive. Host binary execution is pending exact-SHA Windows CI. Exact validation SHA dc04ce5e: DX9Ex Active host job and all 5 required jobs SUCCESS; Domain SUCCESS. No HMD session.",
     "first_ci_failure": "DX9Ex Active run 38681252225 at original material SHA 3bdd86a62 failed only in policy job at verify_vr_feature_unit_policy.py --check-head because this exact run record was absent; all downstream package/game/host/full-chain jobs were skipped (not compiler failures)."
   },
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "phase": "C4_COMMITTED_C5_VALIDATION",
-  "checkpoint": "C5_WAIT_EXACT_SHA",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
-  "runtime_evidence": "No matching Quest3/VDXR HMD session was executed for this new material change.",
+  "runtime_evidence": "Win32 build, x64 host smoke, production package and Domain pass on validation SHA; physical Quest3/VDXR game/optics/frame-pacing not executed.",
   "source_parent_sha": "f8c4e100feb574aac1ea43a173a6658484ea427b",
   "changed_files": [
     "src/vr/d3d9/stereo_renderer_r29.cpp",
@@ -79,20 +79,40 @@
     "docs/automation/runs/CONVERSION-DX9EX-00875.json"
   ],
   "acceptance_results": {
-    "coherent-host-owner": "IMPLEMENTED_NEEDS_BUILD",
-    "invalid-and-race-fallback": "IMPLEMENTED_NEEDS_BUILD",
-    "integration-ci": "PENDING_EXACT_SHA"
+    "coherent-host-owner": "PASS",
+    "invalid-and-race-fallback": "PASS",
+    "integration-ci": "PASS_EXACT_SHA"
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "EXACT_SHA_POLICY_FAILURE_MISSING_RUN_RECORD_REPAIRED_PENDING_CI",
-  "result_commit_ci_skip": false,
+  "hold_reason": "QUEST3_VDXR_HARDWARE_RUNTIME_UNTESTED",
+  "result_commit_ci_skip": true,
   "material_result_sha": "3bdd86a62ef52c10f9cb3eba68d5c39354a9f1b9",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "dc04ce5e4243cfb0c37553b6893c5a12655897fb",
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
-    "previous_failed_run": 38681252225,
-    "previous_failure_step": "policy: verify_vr_feature_unit_policy.py --check-head (run record missing)",
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "dc04ce5e4243cfb0c37553b6893c5a12655897fb",
+    "dx9ex_active": {
+      "run_id": 38682158487,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, host, game R26_SAFE, full-chain-compile R84, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38682158432,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38681946509,
+      "source_sha": "a509b44ba0c8107a663cdb4f871d2a0204d5fc8e",
+      "conclusion": "SUCCESS",
+      "note": "Source and host runtime code identical to final validation SHA; later commits update R29 Python verifier only. Not exact final SHA."
+    },
+    "hud_inspector": {
+      "run_id": 38681946516,
+      "source_sha": "a509b44ba0c8107a663cdb4f871d2a0204d5fc8e",
+      "conclusion": "SUCCESS",
+      "note": "Earlier exact SHA; no runtime C++ edits afterward."
+    },
     "runtime": "UNTESTED"
   }
 }
