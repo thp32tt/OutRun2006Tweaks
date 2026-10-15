@@ -2442,6 +2442,49 @@ namespace DX9ExD3DXSpriteLifetime
             (callback == tracked || callback == live);
     }
 
+    // D3DXSprite::Draw is a CPU-side registration: a later game Flush/End
+    // can rasterize it after its original +TIME caller or SpriteNode queue
+    // has returned. Rebind ONLY an exclusively observed exact-owner batch
+    // on the unchanged live sprite, and never while another queue is active.
+    constexpr bool CanRestoreDeferredResultOwner(
+        bool batchActive, bool queueActive, bool homogeneous,
+        unsigned pendingDraws, bool exactLiveSprite,
+        OutRunVR::GameSemantic::RenderScope scope,
+        OutRunVR::GameSemantic::ProducerToken producer) noexcept
+    {
+        return batchActive && !queueActive && homogeneous &&
+            pendingDraws != 0u && exactLiveSprite &&
+            OutRunVR::GameSemantic::CanReprojectFiniteResultHudPlane(
+                scope, producer);
+    }
+
+    using OutRunVR::GameSemantic::RenderScope;
+    using OutRunVR::GameSemantic::ProducerToken;
+    static_assert(CanRestoreDeferredResultOwner(
+        true,false,true,3,true,RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime));
+    static_assert(CanRestoreDeferredResultOwner(
+        true,false,true,1,true,RenderScope::ScreenHud,
+        ProducerToken::GoalTime020));
+    static_assert(!CanRestoreDeferredResultOwner(
+        true,true,true,1,true,RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime)); // live queue owns its own token
+    static_assert(!CanRestoreDeferredResultOwner(
+        true,false,false,2,true,RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime)); // unrelated triangles mixed
+    static_assert(!CanRestoreDeferredResultOwner(
+        true,false,true,0,true,RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime)); // no queued Draw
+    static_assert(!CanRestoreDeferredResultOwner(
+        true,false,true,2,false,RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime)); // replaced/lost sprite
+    static_assert(!CanRestoreDeferredResultOwner(
+        true,false,true,2,true,RenderScope::ScreenHud,
+        ProducerToken::ResultTextB9200)); // unverified result parent
+    static_assert(!CanRestoreDeferredResultOwner(
+        true,false,true,2,true,RenderScope::WorldBillboard,
+        ProducerToken::StageExtensionTime)); // world must remain spatial
+
     // Compile-time positive and negative tests for real pointer identity,
     // including global replacement/null during a pending GPU batch.
     inline constexpr unsigned char OldSprite = 1;
@@ -2548,7 +2591,26 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 
     static HRESULT __stdcall FlushDest(void* self)
     {
-        const HRESULT hr = Flush_hk.stdcall<HRESULT>(self);
+        using namespace OutRunVR::GameSemantic;
+        // The game's normal Flush is allowed to occur after the original
+        // +TIME/GOAL source leaves. Recover the proven producer for the
+        // physical GPU draw, not merely the earlier CPU Draw registration.
+        // Unknown, mixed, foreign, Reset, and live-queue batches remain
+        // untouched. ScopedExactProducerSemantic restores every prior scope
+        // (including a pending marker) even when the game Flush fails.
+        const bool restore = DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner(
+            BatchActive, QueueRenderActive(), PendingHomogeneous,
+            PendingDraws,
+            DX9ExD3DXSpriteLifetime::CanFlush(
+                self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218)),
+            PendingScope, PendingProducer);
+        HRESULT hr;
+        {
+            ScopedExactProducerSemantic owned(
+                restore ? PendingScope : RenderScope::None, nullptr, restore,
+                restore ? PendingProducer : ProducerToken::None);
+            hr = Flush_hk.stdcall<HRESULT>(self);
+        }
         if (self == TrackedSprite)
         {
             if (SUCCEEDED(hr))
@@ -2573,7 +2635,24 @@ class VRProjectedD3DXSpriteIsolationR64 : public Hook
 
     static HRESULT __stdcall EndDest(void* self)
     {
-        const HRESULT hr = End_hk.stdcall<HRESULT>(self);
+        using namespace OutRunVR::GameSemantic;
+        // ID3DXSprite::End may be the first physical submission when neither
+        // a source-exit nor a queue boundary was able to flush safely.
+        // Preserve the exact homogeneous producer only until End returns;
+        // the native HRESULT and normal batch teardown are unchanged.
+        const bool restore = DX9ExD3DXSpriteLifetime::CanRestoreDeferredResultOwner(
+            BatchActive, QueueRenderActive(), PendingHomogeneous,
+            PendingDraws,
+            DX9ExD3DXSpriteLifetime::CanFlush(
+                self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218)),
+            PendingScope, PendingProducer);
+        HRESULT hr;
+        {
+            ScopedExactProducerSemantic owned(
+                restore ? PendingScope : RenderScope::None, nullptr, restore,
+                restore ? PendingProducer : ProducerToken::None);
+            hr = End_hk.stdcall<HRESULT>(self);
+        }
         if (self == TrackedSprite)
         {
             BatchActive = false;
