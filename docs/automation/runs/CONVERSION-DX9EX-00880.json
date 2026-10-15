@@ -52,10 +52,10 @@
     "tools/verify_vr_ui_matrix_safety.py",
     "docs/automation/runs/CONVERSION-DX9EX-00880.json"
   ],
-  "status": "BUILD_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_MUTATION_TEST_REPAIR",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "acceptance_results": {
@@ -65,9 +65,9 @@
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "EXACT_SHA_CI_RETRY",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "666f3662076750f63ded0dc1d4c92a004e70762b",
   "diagnosis": {
     "original_evidence": "The current original D3DXMatrixTransformation2D_dest requires pScaling && pTranslation before any source-aspect correction; the D3DX API permits these pointers to be optional independently.",
     "root_cause": "Partial optional native menu matrix inputs skip 4:3 containment and inherit game widescreen anisotropy or off-center translation, unlike the existing two-vector path.",
@@ -84,7 +84,7 @@
     "eye_ownership": "The original 2D sprite coordinates change only before R84 physical stereo handling; exact per-eye renderer/hmd optical acceptance remains separate."
   },
   "ci_evidence": {
-    "status": "REVALIDATION_PENDING",
+    "status": "PASS_EXACT_SHA",
     "failed_initial_sha": "5acb9bd35f485f956f5f979d1eeecd1ef4bc0309",
     "failed_run": 38692708718,
     "failed_job": "policy",
@@ -92,7 +92,26 @@
     "syntax_repair": "Restored missing close-parenthesis on new branch after disambiguating original-path mutation verifier; same RUN_KEY; game compiler CI still pending.",
     "retry_validation_sha": "e9c208e52b3c7a473ea86465ace93e975f542822",
     "retry_failed_run_id": 38693050911,
-    "retry_failure": "New negative mutation changed only X projection; generic CenterMultiSpriteAxis marker still matched Y projection. Test now verifies exact X and Y calls independently."
+    "retry_failure": "New negative mutation changed only X projection; generic CenterMultiSpriteAxis marker still matched Y projection. Test now verifies exact X and Y calls independently.",
+    "exact_sha": "666f3662076750f63ded0dc1d4c92a004e70762b",
+    "dx9ex_active": {
+      "run_id": 38693216185,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, game, host, full-chain-compile, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38693216222,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38693216286,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38693216179,
+      "conclusion": "IN_PROGRESS",
+      "note": "Separately tracked; not relabeled SUCCESS before GitHub concludes."
+    }
   },
   "runtime_evidence": "No Quest3/VDXR HMD session performed."
 }
