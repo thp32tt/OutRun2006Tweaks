@@ -1,0 +1,151 @@
+name: "C ROI source Q053 START one-shot"
+on:
+  push:
+    branches: [korean-localization-recovery-20260928]
+    paths:
+      - ".github/workflows/localization-c-roi-q053-start-20261016.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: c-roi-q053-start-20261016
+  cancel-in-progress: false
+jobs:
+  source-roi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout pinned original DDS, official mapping and extractor only
+        uses: actions/checkout@v4
+        with:
+          ref: korean-localization-recovery-20260928
+          sparse-checkout: |
+            localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds
+            localization/graphics/transcriptions.jsonl
+            tools/localization/text_roi_source_pack.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: true
+      - name: Install offline image processing requirements
+        run: python -m pip install pillow numpy
+      - name: Derive one ROI from pinned original, or record exact HOLD
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, importlib.util, json, sys, traceback
+          from pathlib import Path
+          import numpy as np
+          from PIL import Image
+          root=Path.cwd()
+          dest=root/'localization/graphics/role_C_salvage/20261016-Q053-START-DIRECT-ROI'
+          dest.mkdir(parents=True,exist_ok=True)
+          source_path=Path('localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds')
+          expected_dds='65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813'
+          bbox=[2590,2850,3570,3140]
+          source_rel='textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds'
+          audit={'task_id':'C-ROI-SOURCE-Q053-START-20261016T0233KST',
+                 'schema':'outrun-c-roi-source-audit-v1',
+                 'scope':'OutRun 2006 Korean localization ONLY',
+                 'platform':'PC HD OR2-HD-GUI-v0.25.10a',
+                 'source_dds_path':str(source_path),
+                 'source_dds_sha256_expected':expected_dds,
+                 'source_xyxy':bbox,'english':'START','korean':'시작',
+                 'original_map':'localization/graphics/transcriptions.jsonl index 53',
+                 'previous_crop_reference':'20261016-original-hd-phrase-crops/crop_manifest.json Q053-START; preliminary crop not source',
+                 'legacy_986_tiles_used':False,'previous_AB_queue_state_modified':False,
+                 'imagegen':'NOT_RUN','C1':'NOT_RUN','C3':'NOT_RUN',
+                 'clean_plate':'NOT_CREATED','RUNTIME_VALIDATION':'UNTESTED',
+                 'status':'HOLD_PENDING_SOURCE_PROOF'}
+          hashit=lambda b:hashlib.sha256(b).hexdigest()
+          try:
+            if not source_path.is_file(): raise RuntimeError('HOLD_FULL_ORIGINAL_DDS_MISSING_FROM_GITHUB_CHECKOUT')
+            sha=hashit(source_path.read_bytes());audit['source_dds_sha256_actual']=sha
+            if sha!=expected_dds:raise RuntimeError('HOLD_SOURCE_DDS_SHA_MISMATCH')
+            records=[json.loads(s) for s in Path('localization/graphics/transcriptions.jsonl').read_text(encoding='utf-8').splitlines() if s.strip()]
+            q=next(x for x in records if x.get('index')==53 and x.get('path')==source_rel)
+            if not any(s.get('source')=='START' and s.get('korean')=='시작' for s in q['segments']):
+              raise RuntimeError('HOLD_OFFICIAL_MAPPING_CHANGED')
+            with Image.open(source_path) as dds:
+              audit['dds_format_detected']=dds.format
+              if dds.size!=(4096,4096): raise RuntimeError('HOLD_DDS_DIMENSION_UNEXPECTED')
+              full=dds.convert('RGBA').transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+            # The full English source originates ONLY from the pinned original DDS.
+            # The pre-existing split tiles are deliberately never checked out.
+            base=root/'_c_roi_source_Q053_START'
+            src=base/'source'
+            out=base/'outputs'
+            src.mkdir(parents=True,exist_ok=True)
+            full_file=src/'Q053_ORIGINAL_DDS_READABLE_FLIPY_FULL_RGBA.png'
+            full.save(full_file)
+            with Image.open(full_file) as verify:
+              if verify.mode!='RGBA' or verify.size!=(4096,4096):
+                raise RuntimeError('HOLD_FULL_PNG_REOPEN_FAILED')
+              if np.any(np.asarray(verify)!=np.asarray(full)):
+                raise RuntimeError('HOLD_DDS_FULL_PNG_PIXEL_MISMATCH')
+            audit['full_png_sha256']=hashit(full_file.read_bytes())
+            audit['full_png_size']=[4096,4096]
+            audit['dds_vs_new_full_png_rgba_mismatch_pixels']=0
+            crop=full.crop(tuple(bbox))
+            a=np.asarray(crop.getchannel('A'))
+            if not np.any(a): raise RuntimeError('HOLD_SOURCE_REGION_ALPHA_EMPTY')
+            # Text isolation must not be claimed on an opaque plate or on touching alpha.
+            if np.all(a==255): raise RuntimeError('HOLD_OPAQUE_PLATE_NO_REVIEWED_TEXT_MASK')
+            if any(np.any(e) for e in (a[:2],a[-2:],a[:,:2],a[:,-2:])):
+              raise RuntimeError('HOLD_ORIGINAL_ALPHA_TOUCHES_CROP_EDGE_EXTEND_ROI')
+            audit['edge_2px_alpha_pixels']=0
+            audit['source_isolation']='alpha'
+            spec={'schema':'outrun-hd-text-roi-v1','assets':[{
+              'queue_id':'Q053','source_png':full_file.name,
+              'source_sha256':audit['full_png_sha256'],
+              'source_kind':'DIRECT_GITHUB_PINNED_PC_HD_DDS_DECODE_FLIPY_NO_TILES',
+              'source_dds_path':str(source_path),
+              'regions':[{'id':'start_complete_phrase_original_english',
+              'english':'START','korean':'시작','bbox':bbox,'scale':2,'isolation':'alpha'}]}]}
+            specpath=base/'spec.json'
+            specpath.write_text(json.dumps(spec,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+            sys.path.insert(0,str(root/'tools/localization'))
+            from text_roi_source_pack import run
+            result=run(specpath,src,out)
+            if len(result['ready'])!=1 or result['hold']:
+              raise RuntimeError('HOLD_EXTRACTOR_'+str(result['hold']))
+            source_output=out/'Q053-start_complete_phrase_original_english'
+            for name in ('english_text_roi_native.png','imagegen_input_upscaled.png','roi_manifest.json','imagegen_prompt.txt'):
+              (dest/name).write_bytes((source_output/name).read_bytes())
+            (dest/'source_spec.json').write_text(json.dumps(spec,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+            manifest=json.loads((dest/'roi_manifest.json').read_text(encoding='utf-8'))
+            native=Image.open(dest/'english_text_roi_native.png').convert('RGBA')
+            up=Image.open(dest/'imagegen_input_upscaled.png').convert('RGBA')
+            if np.any(np.asarray(native)!=np.asarray(crop)):
+              raise RuntimeError('HOLD_NATIVE_PIXEL_MISMATCH')
+            if np.any(np.asarray(up)!=np.asarray(crop.resize(up.size,Image.Resampling.LANCZOS))):
+              raise RuntimeError('HOLD_UPSCALE_PIXEL_MISMATCH')
+            if native.size!=(980,290) or up.size!=(1960,580):
+              raise RuntimeError('HOLD_ROI_DIMENSION_MISMATCH')
+            audit.update({'status':'ROI_SOURCE_CREATED_TEST_ONLY',
+              'source_roi_native_sha256':manifest['native_png_sha256'],
+              'source_roi_upscaled_sha256':manifest['imagegen_input_sha256'],
+              'native_size':[980,290],'imagegen_size':[1960,580],
+              'native_crop_pixel_mismatches':0,'upscale_pixel_mismatches':0,
+              'semantic_visual_review':'UNTESTED',
+              'ui_cell_uv_safe_area':'UNREVIEWED',
+              'isolated_source_text':'ALPHA_CROP_MECHANICAL_ONLY_NEEDS_VISUAL_REVIEW',
+              'publication':'SEPARATE_C_SOURCE_INPUT_CANDIDATE_ONLY'})
+          except Exception as e:
+            audit['status']='HOLD'
+            audit['hold_reason']=str(e)
+            audit['error_type']=type(e).__name__
+            # No incomplete or unsafe ROI is published.
+            for name in ('english_text_roi_native.png','imagegen_input_upscaled.png','roi_manifest.json','imagegen_prompt.txt','source_spec.json'):
+              (dest/name).unlink(missing_ok=True)
+          (dest/'C_ROI_SOURCE_AUDIT.json').write_text(json.dumps(audit,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print(json.dumps({'status':audit['status'],'reason':audit.get('hold_reason'),'output':str(dest)},ensure_ascii=False))
+          PY
+      - name: Commit ONLY isolated C ROI evidence (not A/B state)
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add localization/graphics/role_C_salvage/20261016-Q053-START-DIRECT-ROI/
+          if ! git diff --cached --quiet; then
+            git commit -m "localization: Q053 START direct full DDS ROI or explicit hold [skip ci]"
+            git push origin HEAD:korean-localization-recovery-20260928
+          fi
