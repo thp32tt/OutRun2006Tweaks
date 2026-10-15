@@ -1632,11 +1632,17 @@ namespace OutRunVRStereo
     }
     void R29OwnerSetActiveDirectTransportSlot(std::uint32_t slot) noexcept
     {
+        // Exported DirectGPU owner must not publish an invalid ring slot.
+        if (slot >= OutRunVR::RenderFrameRingSize)
+            return;
         ActiveDirectTransportSlot = slot;
     }
     void R29OwnerMarkDirectTransportSlotPending(
         std::uint32_t slot, std::uint32_t frameId) noexcept
     {
+        // Guard R29 independently of the normally bounded R32 caller.
+        if (slot >= OutRunVR::RenderFrameRingSize || frameId == 0u)
+            return;
         auto& target = DirectTransportSlots[slot];
         target.producerPending = true;
         target.pendingFrameId = frameId;
@@ -1655,6 +1661,8 @@ namespace OutRunVRStereo
     HRESULT R29OwnerPollDirectTransportSlotProducer(
         std::uint32_t slot) noexcept
     {
+        if (slot >= OutRunVR::RenderFrameRingSize)
+            return D3DERR_INVALIDCALL;
         auto& target = DirectTransportSlots[slot];
         if (!target.producerPending)
             return S_OK;
@@ -1672,6 +1680,8 @@ namespace OutRunVRStereo
     void R29OwnerRetireDirectTransportSlotPublication(
         std::uint32_t slot) noexcept
     {
+        if (slot >= OutRunVR::RenderFrameRingSize)
+            return;
         auto& target = DirectTransportSlots[slot];
         target.frameId = 0;
         target.published = false;

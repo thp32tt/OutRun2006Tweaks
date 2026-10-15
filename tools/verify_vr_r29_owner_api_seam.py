@@ -245,6 +245,35 @@ def check_host_identity_contract(source: str) -> None:
     assert source.index("high = shared->hostAdapterLuidHigh;") < source.index("after = shared->sequence;")
 
 
+
+# Every exported R29 DirectGPU slot operation owns its own ring bounds guard.
+# The R32 four-slot scan is not a substitute for an owner API invariant.
+DIRECT_SLOT_GUARDS = {
+    "void R29OwnerSetActiveDirectTransportSlot(": (
+        "if (slot >= OutRunVR::RenderFrameRingSize)", "return;",
+        "ActiveDirectTransportSlot = slot;"),
+    "void R29OwnerMarkDirectTransportSlotPending(": (
+        "if (slot >= OutRunVR::RenderFrameRingSize || frameId == 0u)",
+        "return;", "DirectTransportSlots[slot]"),
+    "HRESULT R29OwnerPollDirectTransportSlotProducer(": (
+        "if (slot >= OutRunVR::RenderFrameRingSize)",
+        "return D3DERR_INVALIDCALL;", "DirectTransportSlots[slot]"),
+    "void R29OwnerRetireDirectTransportSlotPublication(": (
+        "if (slot >= OutRunVR::RenderFrameRingSize)",
+        "return;", "DirectTransportSlots[slot]"),
+}
+
+
+def check_slot_range_guards(r29: str) -> None:
+    for signature, (guard, invalid_return, dereference) in DIRECT_SLOT_GUARDS.items():
+        implementation = body(r29, signature)
+        assert guard in implementation, f"missing DirectGPU bounds check: {signature}"
+        assert invalid_return in implementation, f"missing invalid-slot exit: {signature}"
+        assert dereference in implementation, f"missing normal slot operation: {signature}"
+        assert implementation.index(guard) < implementation.index(invalid_return) < implementation.index(dereference), (
+            f"DirectGPU slot access before validation: {signature}"
+        )
+
 def main() -> None:
     r29 = (SRC / "stereo_renderer_r29.cpp").read_text(encoding="utf-8")
     r30 = (SRC / "stereo_renderer_r30.cpp").read_text(encoding="utf-8")
@@ -253,6 +282,7 @@ def main() -> None:
         encoding="utf-8"
     )
     check(r29, r30, header)
+    check_slot_range_guards(r29)
     check_host_identity_contract(identity_header)
     # Poison each actual sequence/header/PID/LUID guard. Every negative case
     # must be caught in the *new* coherent read owner, not a removed old guard.
@@ -276,6 +306,17 @@ def main() -> None:
             pass
         else:
             raise AssertionError(f"coherent host negative mutation unexpectedly PASS: {token}")
+    for signature, (guard, _, __) in DIRECT_SLOT_GUARDS.items():
+        pos = r29.find(signature)
+        assert pos >= 0
+        altered = r29[:pos] + r29[pos:].replace(guard, "if (false)", 1)
+        assert altered != r29
+        try:
+            check_slot_range_guards(altered)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError(f"R29 DirectGPU guard mutation escaped: {signature}")
     for signature, delegation in OWNER_CALLS.items():
         # Mutate the exported owner definition, not an earlier lower-owner
         # call with the same spelling elsewhere in the R29 translation unit.
