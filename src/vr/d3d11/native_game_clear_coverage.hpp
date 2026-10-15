@@ -61,7 +61,7 @@ struct GameNativeClearCoverage {
                         r.x1 <= x && r.x2 > nextX)
                         nextX = r.x2;
                 }
-                if (nextX == x) return false;
+                if (nextX==x) return false;
                 x = nextX;
             }
             y = nextY;

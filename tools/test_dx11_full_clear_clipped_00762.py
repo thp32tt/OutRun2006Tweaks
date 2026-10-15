@@ -18,7 +18,7 @@ def linked(h, b, d, r, p, w):
     return all((
         "clipped[validCount++] = c;" in h,
         "if (c.x1 >= c.x2 || c.y1 >= c.y2) continue;" in h,
-        "if (nextX == x) return false;" in h,
+        "if (nextX==x) return false;" in h,
         "if (validCount == 0u) return false;" in h,
         "if (r.x1 >= r.x2 || r.y1 >= r.y2) return false;" in h,
         "GameNativeClearCoverage::covers_whole(" in color,
@@ -40,7 +40,7 @@ def linked(h, b, d, r, p, w):
 assert linked(coverage,bridge,batch,hook,probe,workflow)
 for old,new in (
     ("clipped[validCount++] = c;", "/* clipped RT union disabled */"),
-    ("if (nextX == x) return false;", "if (false) return false;"),
+    ("if (nextX==x) return false;", "if (false) return false;"),
     ("if (validCount == 0u) return false;", "if (false) return false;"),
     ("if (r.x1 >= r.x2 || r.y1 >= r.y2) return false;", "if (false) return false;"),
 ):
