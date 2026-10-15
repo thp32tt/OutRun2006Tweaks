@@ -5283,10 +5283,29 @@ namespace OutRunVRStereo
                 const D3DMATRIX worldView =
                     R29OwnerMultiplyMatrix(stockRawWvp,
                         inverseBaseProjection);
+                if (!R29OwnerMatrixFinite(worldView))
+                    return false;
+                // R26 R44's proven 3D-affine billboard admission. A tagged
+                // sun alone does not prove the game source is a spatial WVP:
+                // reject flat screen/near-clip shapes instead of applying a
+                // second head/eye transform to projected 2D geometry.
+                const float affineError =
+                    std::fabs(worldView._14) +
+                    std::fabs(worldView._24) +
+                    std::fabs(worldView._34) +
+                    std::fabs(worldView._44 - 1.0f);
+                const float viewDepth = std::fabs(worldView._43);
+                const float clipW =
+                    worldView._43 * baseProjection._34 + baseProjection._44;
+                if (!std::isfinite(affineError) ||
+                    !std::isfinite(viewDepth) || !std::isfinite(clipW) ||
+                    affineError > 0.02f ||
+                    viewDepth < 1.25f || viewDepth >= 1000000.0f ||
+                    clipW <= 0.05f)
+                    return false;
                 const D3DMATRIX headRelative =
                     R29OwnerMultiplyMatrix(worldView, headInverse);
-                if (!R29OwnerMatrixFinite(worldView) ||
-                    !R29OwnerMatrixFinite(headRelative))
+                if (!R29OwnerMatrixFinite(headRelative))
                     return false;
                 for (int eye = 0; eye < 2; ++eye)
                 {
