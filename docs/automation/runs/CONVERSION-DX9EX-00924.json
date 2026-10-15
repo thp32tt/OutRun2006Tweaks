@@ -1,0 +1,100 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00924",
+  "production_id": "CONVERSION-DX9EX-00924",
+  "event_id": "CONVERSION-DX9EX-00924-E003",
+  "event_type": "retry",
+  "attempt": 2,
+  "run_key": "CONVERSION-DX9EX-00924",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:SPARSE_STAGE_RESULT_EYE_VERTICES",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "status": "VALIDATION_PENDING",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_GATE_PENDING",
+  "automation_validation": "FAILED_POLICY_RECORD_MISSING",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "427a83aae7972e935deeae265ba5a16e53d5242f",
+  "source_paths": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stage_extension_eye_plane.hpp"
+  ],
+  "changed_files": [
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "src/vr/d3d9/stage_extension_eye_plane.hpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00924.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:SPARSE_STAGE_RESULT_EYE_VERTICES",
+    "goal": "Reduce real R84 +TIME and GOAL indexed stage-result CPU vertex traversal for both eyes by using only a fully verified referenced vertex sequence, while preserving binocular optical geometry, native desktop fallback, and all non-stage rendering behavior.",
+    "scope_boundary": "Only previously tagged finite stage-result eye-plane projection for exact indexed +TIME/GOAL R84 ScreenHud paths; exclude generic HUD, rank, lenses, scene shadows, SkyGlow, input and FFB, R26_SAFE, DX11, and frozen DXVK.",
+    "special_work_evidence": "Direct source operation-count evidence: for a 128-vertex indexed span with eight verified references, the new sparse path visits eight rather than 128 vertices while retaining the dense fallback when reference coverage is untrusted. This is an algorithmic reduction, not a measured headset FPS improvement.",
+    "trace_stages": [
+      "Original game +TIME/GOAL sprite and numeric producers retain exact ScreenHud owner through queued or native D3DX physical draw into R84 R30 XYZRHW.",
+      "R30 obtains decoded indexed usedMask and touched list, checks sparse eligibility, seeds both eye scratch buffers from the source with R30SeedTouchedXyzrhwVertices, otherwise preserving existing dense or contiguous-mask copy.",
+      "R30 stageExtensionEyePlane reprojection transforms only those validated touched vertices in both eye matrices; untouched source data, original Z/RHW/UV/colour and protected native mono/device fallback remain unchanged."
+    ],
+    "subcomponents": [
+      "Gate sparse GPU-eye visitation on the same authoritative touched list and successful prior scratch seed rather than unproved mask-only or dense spans.",
+      "Carry per-eye geometry conversion through the bounded sparse indices with explicit out-of-range and mask mismatch rejection, preserving existing dense copy/visit behavior for all other submissions.",
+      "Enforce positive and negative source-compiled constexpr matrix for trusted, missing, unseeded and dense cases; preserve final exact-SHA Windows game, host and package CI requirements."
+    ],
+    "acceptance_items": [
+      {
+        "id": "r84_stage_result_sparse_two_eye_transform",
+        "category": "end_to_end_behavior",
+        "behavior_area": "R84 stage +TIME and GOAL indexed fixed-function binocular eye geometry",
+        "expected_behavior": "After trusted touched-mask seed copies original indexed vertices for both eyes, the finite stage-result eye-plane transform visits only the validated referenced vertex list, retaining per-eye projection and original Z/RHW/UV/colour."
+      },
+      {
+        "id": "dense_unknown_and_mono_rejection",
+        "category": "fallback_regression",
+        "behavior_area": "R30 mask validation, unindexed/dense draws and untouched native input or stereo effects",
+        "expected_behavior": "Missing touched list, unseeded or untrusted sparse hint, empty indices, and dense draws remain on the existing masked/full-range traversal; corrupted references fail closed without modifying FFB, SkyGlow or source game control."
+      },
+      {
+        "id": "r84_windows_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 x86 game and x64 OpenXR host plus package, Domain, Full Source and HUD Inspector",
+        "expected_behavior": "The final validation-bearing SHA passes all required Windows game, OpenXR host, package and domain/source/HUD workflow checks before BUILD_VERIFIED is claimed; Quest3/VDXR and actual FPS remain untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "r84_stage_result_sparse_two_eye_transform": "SOURCE_IMPLEMENTED",
+    "dense_unknown_and_mono_rejection": "SOURCE_IMPLEMENTED",
+    "r84_windows_exact_sha_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "The R84 stage extension per-eye CPU transform walked the entire vertexCount even for an indexed +TIME/GOAL draw whose original buffer copy had already verified a much smaller referenced vertex list; this duplicated unnecessary CPU visits in both-eye stage projection.",
+    "original_evidence": "The original R84 stage-extension ownership is limited to exact +TIME/GOAL native producer paths, while the existing usedMask/touched indexed list and copy seed are available at R30 physical XYZRHW draw time.",
+    "eye_ownership": "Both left and right transformed scratch buffers are projected using the same stageExtensionEyePlane state and independent left/right clip matrices; no stereo-eye reduction or mono promotion occurs.",
+    "source_trace": [
+      "src/vr/d3d9/stereo_renderer_r30.cpp: indexed source usedMask/touched and R30SeedTouchedXyzrhwVertices prepare both eye scratch copies.",
+      "src/vr/d3d9/stage_extension_eye_plane.hpp: CanUseVerifiedTouchedVertices allows indexed visitation only for a fully validated scratch-source mask and touched sequence.",
+      "src/vr/d3d9/stereo_renderer_r30.cpp: stageExtensionEyePlane projects validated touched indices for both eyes and retains full-span traversal otherwise."
+    ],
+    "alternatives_rejected": [
+      "Unconditionally iterating touched would trust absent or stale index evidence and risk missing source geometry; only a successful seed authorizes the sparse branch.",
+      "Skipping the R30 eye-plane path or removing one eye would sacrifice binocular reprojection and is not a valid performance optimization."
+    ],
+    "fix_evidence": "Source material commit 0b94aa293fc5c31902a52aaaff6cb5d1ae8fe468 modifies actual R84 C++ source and adds positive/negative constexpr assertions; the policy record was absent from that material commit.",
+    "negative_test_evidence": "C++ static_assert rejects unseeded mask-only, missing mask, missing touched list, dense (>1/4) vertex coverage and empty index spans; mask mismatch and out-of-bounds index in the R30 stage visit return false.",
+    "runtime_evidence": "No Quest3/VDXR execution or same-scene frame pacing measurements performed; runtime correctness and actual FPS improvement are not established.",
+    "next_hmd_experiment": "On user-controlled Quest3/VDXR compare exact R84 build on +TIME and GOAL scenes for eyes/scale/FPS versus known-good build; confirm SkyGlow, normal road/car stereo, FFB and fallback unchanged."
+  },
+  "failed_ci_evidence": {
+    "run_id": 38825438793,
+    "head_sha": "0b94aa293fc5c31902a52aaaff6cb5d1ae8fe468",
+    "job_id": 116731698986,
+    "step": "Enforce feature-sized DX9Ex autonomous completion",
+    "cause": "Missing docs/automation/runs/CONVERSION-DX9EX-00924.json blocked policy job before x86 game, x64 host and package jobs.",
+    "game_host_package": "SKIPPED_BY_POLICY"
+  },
+  "material_result_sha": "0b94aa293fc5c31902a52aaaff6cb5d1ae8fe468",
+  "validation_bearing_result_sha": null,
+  "score_delta_this_attempt": 0,
+  "next_action": "Run required GitHub Actions on record-bearing successor SHA; do not claim BUILD_VERIFIED until all required exact-SHA workflows complete. Continue same TASK_ID only for actual failed gates; HMD remains UNTESTED."
+}
