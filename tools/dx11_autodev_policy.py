@@ -236,7 +236,7 @@ def validate_task(task: dict, policy: dict) -> list[str]:
                 if status.startswith(("COMPLETE", "PASS")):
                     results = task.get("acceptance_results") or {}
                     if not isinstance(results, dict) or any(
-                        results.get(item_id) not in {"PASS", "PASS_EXACT_SHA"} for item_id in ids
+                        results.get(item_id) not in {"PASS", "PASS_BUILD", "PASS_EXACT_SHA"} for item_id in ids
                     ):
                         errors.append("complete feature has unverified acceptance items")
                     sha = task.get("validation_bearing_result_sha")

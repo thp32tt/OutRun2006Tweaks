@@ -136,6 +136,21 @@ for label, mutate in (
 complete = copy.deepcopy(feature)
 complete.update(status="COMPLETE_BUILD_VERIFIED", automation_validation="PASS_EXACT_SHA", validation_bearing_result_sha="a"*40, changed_files=["src/vr/d3d11/live_game_frame_bridge.cpp"], acceptance_results={"end2end":"PASS", "fallback":"PASS", "gates":"PASS_EXACT_SHA"})
 assert not validate_task(complete, p), validate_task(complete, p)
+# Build-verifiable gameplay and fallback acceptance is distinct from HMD
+# runtime proof. The preceding legacy feature-unit check already accepts
+# PASS_BUILD; its newer duplicate check must not reject the same evidence.
+build_verified = copy.deepcopy(complete)
+build_verified["acceptance_results"]["end2end"] = "PASS_BUILD"
+build_verified["acceptance_results"]["fallback"] = "PASS_BUILD"
+build_verified["runtime_validation"] = "UNTESTED"
+assert not validate_task(build_verified, p), validate_task(build_verified, p)
+unverified_build = copy.deepcopy(build_verified)
+unverified_build["acceptance_results"]["fallback"] = "UNTESTED"
+assert validate_task(unverified_build, p), "unknown fallback improperly completed"
+failed_gate = copy.deepcopy(build_verified)
+failed_gate["acceptance_results"]["gates"] = "FAIL"
+assert validate_task(failed_gate, p), "failing exact-SHA Gate improperly completed"
+
 run = latest_dx11_run()
 assert run is not None, "expected durable DX11 run records"
 print("DX11 auto-development policy: 11 legacy + 9 gameplay negative mutations, 3 positive classes, pre-policy compatibility PASS")
