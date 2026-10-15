@@ -25,6 +25,8 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check numpy==2.3.5 Pillow==12.3.0
+      - name: C complete-source-atlas reconstruction synthetic QA
+        run: python tools/localization/test_c_salvage_atlas.py
       - name: C compositor synthetic QA only
         run: python tools/localization/test_c_salvage_compose.py
       - name: C worker synthetic QA only
