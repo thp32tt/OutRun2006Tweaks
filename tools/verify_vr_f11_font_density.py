@@ -362,8 +362,8 @@ def check_projection(renderer: str, semantic: str) -> None:
     # part of the contain cache identity across the same Present.
     assert "const bool pauseResponsive = R30IsPauseMenuElement() &&" in contain
     assert "R30HudContain.pauseResponsive == pauseResponsive" in contain
-    assert "OutRunVrPauseEye::ResponsiveMenuScale(" in contain
-    assert "userScale, sourceOverTarget, pauseResponsive);" in contain
+    assert "OutRunVrPauseEye::ResponsiveMenuScale(" not in contain
+    assert "const float opticalScale = userScale;" in contain
     assert "scaleY = opticalScale / sourceOverTarget;" in contain
     assert "scaleX = opticalScale * sourceOverTarget;" in contain
     for marker in (
@@ -386,8 +386,8 @@ def check_projection_mutations(renderer: str, semantic: str) -> None:
          "R30HudContain.userScale == 1.0f"),
         ("R30HudContain.pauseResponsive == pauseResponsive",
          "R30HudContain.pauseResponsive == true"),
-        ("userScale, sourceOverTarget, pauseResponsive);",
-         "userScale, sourceOverTarget, true);"),
+        ("const float opticalScale = userScale;",
+         "const float opticalScale = userScale * 2.0f;"),
     )
     # Mutate the owning function, never an earlier unrelated occurrence
     # of a generic token (e.g. 'return 1.0f;' in the aspect helper).
