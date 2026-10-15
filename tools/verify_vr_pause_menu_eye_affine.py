@@ -12,6 +12,14 @@ def check(s: str, h: str) -> None:
     assert 'ExternalOverlaySemanticDepth == 0' in s
     assert 'GameState::STATE_SMPAUSEMENU' in s
     assert 'R30IsPauseMenuExactArrow()' in s
+    arrow = s[s.index('bool R30IsPauseMenuExactArrow()'):s.index('bool R30IsPauseMenuElement()')]
+    assert 'OutRunVrPauseEye::ExactArrowOwner(' in arrow
+    assert 'GameSemantic::CurrentRenderProducerToken()' in arrow
+    assert 'CurrentSpriteQueueProducer ==' not in arrow
+    assert 'constexpr bool ExactArrowOwner(bool screenHud, bool exactProducer)' in h
+    assert 'return screenHud && exactProducer;' in h
+    assert 'ExactArrowOwner(true, true)' in tests
+    assert 'ExactArrowOwner(true, false)' in tests
     assert s.count('R30PauseMenuVerticalAffine(') == 4
     for required in (
         'hudScaleY * pauseVertical.scale[eye] * ndcY',
@@ -65,6 +73,10 @@ def check(s: str, h: str) -> None:
 
 check(source, helper)
 for mutant in (
+    source.replace('GameSemantic::CurrentRenderProducerToken() ==',
+                   'GameSemantic::CurrentQueueProducerToken() ==', 1),
+    source.replace('return OutRunVrPauseEye::ExactArrowOwner(',
+                   'return OutRunVrPauseEye::ShaderHorizontalScale(', 1),
     source.replace('hudScaleX, eyeScale[eye], pauseOwned);',
                    'hudScaleX, eyeScale[eye], false);', 1),
     source.replace('const bool pauseOwned = R30IsPauseMenuElement();',

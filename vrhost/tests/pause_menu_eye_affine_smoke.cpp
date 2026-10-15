@@ -104,6 +104,12 @@ int main()
         !(ResponsiveMenuScale(1.5f, 9.0f, true) >
           ResponsiveMenuScale(1.25f, 9.0f, true)))
         return 11;
+    // Direct original E8 arrows and queued SpriteNodes use the same
+    // pause-only ownership. Foreign queue nodes / ordinary HUD reject.
+    if (!ExactArrowOwner(true, true) || ExactArrowOwner(true, false) ||
+        ExactArrowOwner(false, true) || ExactArrowOwner(false, false))
+        return 18;
+
     // ESC shell (VS) and original YES/NO arrows (XYZRHW) must agree in
     // both eyes even when the headset's horizontal FOV differs per eye.
     const float eyeScale[2]{0.87f, 1.14f};

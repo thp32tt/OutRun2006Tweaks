@@ -1410,6 +1410,25 @@ class UIScaling : public Hook
 		return result;
 	}
 
+	// Exact original ESC arrow E8 sources may synchronously submit D3DX
+	// triangles before SpriteNodes are appended/tagged. Isolate only these
+	// pause-state calls: deferred nodes keep the existing exact queue owner,
+	// while direct Draw observes the same producer and R84 eye transform.
+	static int __cdecl PauseOptionArrow_putClipSprite(
+		int xstnum, int x, int y, uint32_t flags,
+		float priority, uint32_t color)
+	{
+		if (!Settings::VREnabled || !Game::current_mode ||
+			*Game::current_mode != GameState::STATE_SMPAUSEMENU)
+			return ExactScreenHud_putClipSprite(
+				xstnum, x, y, flags, priority, color);
+		OutRunVR::GameSemantic::ScopedExactProducerSemantic directArrowOwner(
+			OutRunVR::GameSemantic::RenderScope::ScreenHud, nullptr, true,
+			OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite);
+		return ExactScreenHud_putClipSprite(
+			xstnum, x, y, flags, priority, color);
+	}
+
 	static int __cdecl RivalMarker_sprani(
 		uint32_t spriteId, float x, float y, int a4, int a5, float alpha)
 	{
@@ -1957,7 +1976,7 @@ public:
 			Memory::VP::InjectHook(Module::exe_ptr(addr), RankMarker_putClipSprite, Memory::HookType::Call);
 		for (int addr : OptionArrow_ClipSpriteCalls)
 			Memory::VP::InjectHook(
-				Module::exe_ptr(addr), ExactScreenHud_putClipSprite,
+				Module::exe_ptr(addr), PauseOptionArrow_putClipSprite,
 				Memory::HookType::Call);
 		for (int addr : ExactScreenHud_ClipSpriteCalls)
 			Memory::VP::InjectHook(

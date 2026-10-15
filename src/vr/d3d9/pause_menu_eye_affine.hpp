@@ -6,6 +6,14 @@
 // eyes fall back to the original neutral transform on invalid publications.
 namespace OutRunVrPauseEye
 {
+    // Source identity is supplied by CurrentRenderProducerToken: an active
+    // SpriteNode wins over nested direct calls. Only exact ScreenHud arrows
+    // may share the paused ESC shell's per-eye optical placement.
+    constexpr bool ExactArrowOwner(bool screenHud, bool exactProducer) noexcept
+    {
+        return screenHud && exactProducer;
+    }
+
     struct VerticalAffine
     {
         float scale[2]{1.0f, 1.0f};

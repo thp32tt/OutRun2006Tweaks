@@ -1850,10 +1850,14 @@ namespace OutRunVRStereo
         // to promote unrelated ScreenHud or world/GOAL draws.
         bool R30IsPauseMenuExactArrow() noexcept
         {
-            return OutRunVR::GameSemantic::EffectiveScope() ==
-                    OutRunVR::GameSemantic::RenderScope::ScreenHud &&
-                OutRunVR::GameSemantic::CurrentSpriteQueueProducer ==
-                    OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite;
+            // Prefer a selected SpriteNode over any nested caller; when
+            // no queue is active accept the exact original ESC E8 owner.
+            // R30IsPauseMenuElement still gates the game state and F11.
+            return OutRunVrPauseEye::ExactArrowOwner(
+                OutRunVR::GameSemantic::EffectiveScope() ==
+                    OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::ExactScreenHudClipSprite);
         }
 
         // The source game draws the ESC shell as generic overlay and its
