@@ -14,6 +14,24 @@ constexpr auto strict = GameNativeMultiDirtyUpload::select(
 constexpr auto admitted = GameNativeMultiDirtyUpload::select(
     8,6,crop,2,32,0,0,6,5,tiles,true);
 static_assert(!strict.valid);
+// A complete overlapping dirty union must continue menu -> vehicle -> race
+// native Present; rcBound with an uncovered hole remains D3D9-owned.
+constexpr GameNativeDirtyRectangle completeFull[]{{0,0,4,6},{2,0,8,6}};
+constexpr GameNativeDirtyRectangle completeCrop[]{{1,1,4,4},{3,1,5,4}};
+constexpr GameNativeDirtyRectangle fullGap[]{{0,0,3,6},{5,0,8,6},{2,0,6,2}};
+static_assert(GameNativeDirtyRegionCoverage::covers_complete_union(
+    8,6,2,32,0,0,8,6,0,0,8,6,completeFull));
+static_assert(GameNativeDirtyRegionCoverage::covers_complete_union(
+    8,6,2,32,1,1,5,4,1,1,5,4,completeCrop));
+static_assert(!GameNativeDirtyRegionCoverage::covers_complete_union(
+    8,6,3,48,0,0,8,6,0,0,8,6,fullGap));
+static_assert(!GameNativeDirtyRegionCoverage::covers_complete_union(
+    8,6,2,16,0,0,8,6,0,0,8,6,completeFull));
+static_assert(!GameNativeDirtyRegionCoverage::covers_complete_union(
+    8,6,2,32,0,0,8,6,0,0,7,6,completeFull));
+static_assert(!GameNativeDirtyRegionCoverage::covers_complete_union(
+    8,6,2,32,1,1,5,4,1,1,5,4,completeFull));
+
 static_assert(admitted.valid && admitted.count == 2 &&
     admitted.regions[0].left == 1 && admitted.regions[0].right == 4 &&
     admitted.regions[1].left == 2 && admitted.regions[1].right == 5 &&

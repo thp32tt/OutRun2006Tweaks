@@ -5895,12 +5895,19 @@ void before_game_present(IDirect3DDevice9* game,
                   dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
                   dirtyRect.left, dirtyRect.top, dirtyRect.right, dirtyRect.bottom)) ||
              (boundedPartition &&
-              GameNativeDirtyRegionCoverage::covers_partition(
+              (GameNativeDirtyRegionCoverage::covers_partition(
                   presentDesc.Width, presentDesc.Height,
                   dirtyRegion->rdh.nCount, dirtyRegion->rdh.nRgnSize,
                   dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top,
                   dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
-                  partitionRects)));
+                  partitionRects) ||
+               GameNativeDirtyRegionCoverage::covers_complete_union(
+                   presentDesc.Width, presentDesc.Height,
+                   dirtyRegion->rdh.nCount, dirtyRegion->rdh.nRgnSize,
+                   0, 0, presentDesc.Width, presentDesc.Height,
+                   dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top,
+                   dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
+                   partitionRects))));
         // A cropped menu/car/race Present may dirty its *entire visible*
         // source RECT without dirtying the rest of the physical backbuffer.
         // Publish only inside that crop; never replace untouched D3D9 pixels.
@@ -5919,14 +5926,24 @@ void before_game_present(IDirect3DDevice9* game,
         // continue through untouched D3D9 drawing, Present and input.
         const bool partitionCropCoverage = fullMode && backbufferKnown &&
             boundedPartition &&
-            GameNativeDirtyRegionCoverage::covers_partition_crop(
+            (GameNativeDirtyRegionCoverage::covers_partition_crop(
                 presentDesc.Width, presentDesc.Height,
                 dirtyRegion->rdh.nCount, dirtyRegion->rdh.nRgnSize,
                 presentRegion.left, presentRegion.top,
                 presentRegion.right, presentRegion.bottom,
                 dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top,
                 dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
-                partitionRects);
+                partitionRects) ||
+             (presentRegion.partial_backbuffer_source(
+                  presentDesc.Width, presentDesc.Height) &&
+              GameNativeDirtyRegionCoverage::covers_complete_union(
+                  presentDesc.Width, presentDesc.Height,
+                  dirtyRegion->rdh.nCount, dirtyRegion->rdh.nRgnSize,
+                  presentRegion.left, presentRegion.top,
+                  presentRegion.right, presentRegion.bottom,
+                  dirtyRegion->rdh.rcBound.left, dirtyRegion->rdh.rcBound.top,
+                  dirtyRegion->rdh.rcBound.right, dirtyRegion->rdh.rcBound.bottom,
+                  partitionRects)));
         // A cropped D3D9 menu/vehicle/race Present only exposes its source
         // rectangle. Native pixels outside it must never replace D3D9 pixels,
         // even when the dirty region is absent or covers the whole backbuffer.

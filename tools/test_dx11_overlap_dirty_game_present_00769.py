@@ -8,9 +8,10 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[1]
 bridge = (ROOT / "src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
 header = (ROOT / "src/vr/d3d11/native_game_multi_dirty_upload.hpp").read_text()
+coverage = (ROOT / "src/vr/d3d11/native_game_dirty_region.hpp").read_text()
 workflow = (ROOT / ".github/workflows/dx11-fast-structural.yml").read_text()
 
-def integrated(s, h):
+def integrated(s, h, u):
     p = s.split("void before_game_present(", 1)[-1].split(
         "void before_game_reset(", 1)[0]
     select = p.find("const auto multiDirty = GameNativeMultiDirtyUpload::select(")
@@ -20,6 +21,10 @@ def integrated(s, h):
     bound = p.find("const auto& bounds = multiDirty.uploadBounds;", copies)
     upload = p.find("game->UpdateSurface(", bound)
     return all((
+        p.count("GameNativeDirtyRegionCoverage::covers_complete_union(") == 2,
+        "0, 0, presentDesc.Width, presentDesc.Height" in p,
+        "if (reach == y) return false;" in u,
+        "boundLeft != areaLeft || boundTop != areaTop" in u,
         "bool allowOverlap = false" in h,
         "if (!allowOverlap)" in h,
         "r.left < p.right && p.left < r.right" in h,
@@ -36,7 +41,15 @@ def integrated(s, h):
         "if (!copied || FAILED(unlockStatus))" in p,
     ))
 
-assert integrated(bridge, header), "live game native overlap-to-Present disconnected"
+assert integrated(bridge, header, coverage), "live game native overlap-to-Present disconnected"
+for before, after in (
+    ("GameNativeDirtyRegionCoverage::covers_complete_union(", "GameNativeDirtyRegionCoverage::covers_partition("),
+    ("0, 0, presentDesc.Width, presentDesc.Height", "0, 0, 1, 1"),
+):
+    mutant = bridge.replace(before, after, 1)
+    assert mutant != bridge and not integrated(mutant, header, coverage), before
+mutant_coverage = coverage.replace("if (reach == y) return false;", "if (false) return false;", 1)
+assert mutant_coverage != coverage and not integrated(bridge, header, mutant_coverage)
 for before, after in (
     ("true /* overlapping game dirty tiles are identical native pixels */",
      "false /* no overlap */"),
@@ -46,14 +59,14 @@ for before, after in (
     ("back.Get(), &targetTiles", "back.Get(), &destination"),
 ):
     mutant = bridge.replace(before, after, 1)
-    assert mutant != bridge and not integrated(mutant, header), before
+    assert mutant != bridge and not integrated(mutant, header, coverage), before
 for before, after in (
     ("if (!allowOverlap)", "if (true)"),
     ("bool allowOverlap = false", "bool allowOverlap = true"),
     ("minX != boundLeft || minY != boundTop", "false /* bounds bypass */"),
 ):
     mutant = header.replace(before, after, 1)
-    assert mutant != header and not integrated(bridge, mutant), before
+    assert mutant != header and not integrated(bridge, mutant, coverage), before
 assert "python tools/test_dx11_overlap_dirty_game_present_00769.py" in workflow
 assert "tools/dx11_overlap_dirty_game_present_00769.cpp" in workflow
 

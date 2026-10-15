@@ -11,6 +11,64 @@ struct GameNativeDirtyRectangle {
 };
 struct GameNativeDirtyRegionCoverage {
     static constexpr std::uint32_t kMaxPartitionRects = 32u;
+    // Exact union of 2..32 game dirty rectangles, including overlap.
+    // Sweep X boundaries and prove full Y coverage on each strip. A region
+    // whose rcBound hides any pixel gap must never replace the original
+    // D3D9 menu, vehicle or race frame.
+    [[nodiscard]] static constexpr bool covers_complete_union(
+        std::uint32_t width, std::uint32_t height,
+        std::uint32_t rectangleCount, std::uint32_t bufferBytes,
+        std::int64_t areaLeft, std::int64_t areaTop,
+        std::int64_t areaRight, std::int64_t areaBottom,
+        std::int64_t boundLeft, std::int64_t boundTop,
+        std::int64_t boundRight, std::int64_t boundBottom,
+        const GameNativeDirtyRectangle* rectangles) noexcept {
+        if (!rectangles || !width || !height ||
+            width > static_cast<std::uint32_t>((std::numeric_limits<std::int32_t>::max)()) ||
+            height > static_cast<std::uint32_t>((std::numeric_limits<std::int32_t>::max)()) ||
+            rectangleCount < 2u || rectangleCount > kMaxPartitionRects ||
+            bufferBytes < rectangleCount * 16u ||
+            areaLeft < 0 || areaTop < 0 || areaRight <= areaLeft ||
+            areaBottom <= areaTop || areaRight > static_cast<std::int64_t>(width) ||
+            areaBottom > static_cast<std::int64_t>(height) ||
+            boundLeft != areaLeft || boundTop != areaTop ||
+            boundRight != areaRight || boundBottom != areaBottom)
+            return false;
+        for (std::uint32_t i = 0u; i < rectangleCount; ++i) {
+            const auto& r = rectangles[i];
+            if (r.left < areaLeft || r.top < areaTop ||
+                r.right <= r.left || r.bottom <= r.top ||
+                r.right > areaRight || r.bottom > areaBottom)
+                return false;
+        }
+        std::int64_t x = areaLeft;
+        while (x < areaRight) {
+            std::int64_t nextX = areaRight;
+            for (std::uint32_t i = 0u; i < rectangleCount; ++i) {
+                const auto& r = rectangles[i];
+                if (r.left > x && r.left < nextX) nextX = r.left;
+                if (r.right > x && r.right < nextX) nextX = r.right;
+            }
+            if (nextX <= x) return false;
+            std::int64_t y = areaTop;
+            for (std::uint32_t step = 0u;
+                 step < rectangleCount && y < areaBottom; ++step) {
+                std::int64_t reach = y;
+                for (std::uint32_t i = 0u; i < rectangleCount; ++i) {
+                    const auto& r = rectangles[i];
+                    if (r.left <= x && r.right >= nextX &&
+                        r.top <= y && r.bottom > reach)
+                        reach = r.bottom;
+                }
+                if (reach == y) return false;
+                y = reach;
+            }
+            if (y != areaBottom) return false;
+            x = nextX;
+        }
+        return true;
+    }
+
     [[nodiscard]] static constexpr bool covers_full_backbuffer(
         std::uint32_t width, std::uint32_t height,
         std::uint32_t rectangleCount, std::uint32_t bufferBytes,
