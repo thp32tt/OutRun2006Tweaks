@@ -6180,12 +6180,47 @@ void before_game_present(IDirect3DDevice9* game,
                     if (!fullMode) s.readSlot = (s.readSlot + 1u) % kReadbackSlots;
                 } else if (ready == S_OK) {
                     D3D11_MAPPED_SUBRESOURCE mapped{};
-                    const HRESULT mapStatus = ctx->Map(oldest.staging.Get(), 0,
+                    HRESULT mapStatus = ctx->Map(oldest.staging.Get(), 0,
                         D3D11_MAP_READ, D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped);
-                    const auto mapResult = GameNativeFramePublication::classify_map(
+                    auto mapResult = GameNativeFramePublication::classify_map(
                         static_cast<std::int32_t>(mapStatus),
                         static_cast<std::int32_t>(DXGI_ERROR_WAS_STILL_DRAWING),
                         mapped.pData != nullptr, surfaceWidth, mapped.RowPitch);
+                    // The same-Present EVENT is complete, yet a nonblocking
+                    // CPU staging Map can still return WAS_STILL_DRAWING.
+                    // Give ONLY this freshly queued full game frame a bounded
+                    // second chance to reach native menu/vehicle/race Present.
+                    // Never wait on an older frame, Map a failed result again,
+                    // change D3D9 Draw/Present or delay original gamepad input.
+                    if (fullMode && fullQueued &&
+                        mapResult == GameNativeReadbackMap::Pending) {
+                        LARGE_INTEGER mapFrequency{}, startedMap{}, nowMap{};
+                        if (QueryPerformanceFrequency(&mapFrequency) &&
+                            mapFrequency.QuadPart > 0 &&
+                            QueryPerformanceCounter(&startedMap)) {
+                            std::uint64_t mapElapsedTicks = 0u;
+                            for (std::uint32_t retry = 0u;
+                                 GameNativeFramePublication::retry_same_present_map(
+                                     fullMode, fullQueued,
+                                     mapResult == GameNativeReadbackMap::Pending,
+                                     retry, mapElapsedTicks,
+                                     static_cast<std::uint64_t>(mapFrequency.QuadPart));
+                                 ++retry) {
+                                mapped = {};
+                                mapStatus = ctx->Map(oldest.staging.Get(), 0,
+                                    D3D11_MAP_READ, D3D11_MAP_FLAG_DO_NOT_WAIT, &mapped);
+                                mapResult = GameNativeFramePublication::classify_map(
+                                    static_cast<std::int32_t>(mapStatus),
+                                    static_cast<std::int32_t>(DXGI_ERROR_WAS_STILL_DRAWING),
+                                    mapped.pData != nullptr, surfaceWidth, mapped.RowPitch);
+                                if (mapResult != GameNativeReadbackMap::Pending) break;
+                                if (!QueryPerformanceCounter(&nowMap) ||
+                                    nowMap.QuadPart < startedMap.QuadPart) break;
+                                mapElapsedTicks = static_cast<std::uint64_t>(
+                                    nowMap.QuadPart - startedMap.QuadPart);
+                            }
+                        }
+                    }
                     if (mapResult == GameNativeReadbackMap::Ready) {
                         // A complete same-Present full-resolution frame is
                         // valid even when its pixels match the old debug clear

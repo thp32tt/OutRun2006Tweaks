@@ -29,6 +29,17 @@ def integrated(src, hdr):
         "status == stillDrawingStatus" in hdr,
         "status == 0 && hasPixels && valid_readback_pitch(width, rowPitch)" in hdr,
         "GameNativeReadbackMap::Failed" in hdr,
+        "if (fullMode && fullQueued &&" in body[mapping:ready],
+        "mapResult == GameNativeReadbackMap::Pending" in body[mapping:ready],
+        "GameNativeFramePublication::retry_same_present_map(" in body[mapping:ready],
+        "QueryPerformanceCounter(&startedMap)" in body[mapping:ready],
+        "QueryPerformanceCounter(&nowMap)" in body[mapping:ready],
+        "mapStatus = ctx->Map(oldest.staging.Get()" in body[mapping:ready],
+        "D3D11_MAP_FLAG_DO_NOT_WAIT" in body[mapping:ready],
+        "mapResult != GameNativeReadbackMap::Pending) break;" in body[mapping:ready],
+        "fullMode && queuedNow && mapPending &&" in hdr,
+        "extraPolls < kMaxSamePresentMapExtraPolls" in hdr,
+        "elapsedTicks < frequencyTicks / kSamePresentMapBudgetDivisor" in hdr,
     ))
 
 assert integrated(SRC, HDR), "failed Map must not recycle staging or touch D3D9 upload"
@@ -44,6 +55,23 @@ for old, new in (
     ("status == stillDrawingStatus", "status != stillDrawingStatus"),
     ("status == 0 && hasPixels && valid_readback_pitch(width, rowPitch)",
      "status >= 0 && hasPixels"),
+):
+    mutant = HDR.replace(old, new, 1)
+    assert mutant != HDR and not integrated(SRC, mutant), old
+
+# Destructive source/contract checks: never turn a pending Map into a
+# blocking wait, reuse stale frames or remove the original D3D9 fallback.
+for old, new in (
+    ("mapStatus = ctx->Map(oldest.staging.Get()", "mapStatus = S_OK; /* forced */ (oldest.staging.Get()"),
+    ("mapResult == GameNativeReadbackMap::Pending", "mapResult != GameNativeReadbackMap::Pending"),
+    ("QueryPerformanceCounter(&nowMap)", "false /* no deadline */"),
+):
+    mutant = SRC.replace(old, new, 1)
+    assert mutant != SRC and not integrated(mutant, HDR), old
+for old, new in (
+    ("fullMode && queuedNow && mapPending &&", "fullMode || queuedNow || mapPending ||"),
+    ("extraPolls < kMaxSamePresentMapExtraPolls", "true"),
+    ("elapsedTicks < frequencyTicks / kSamePresentMapBudgetDivisor", "true"),
 ):
     mutant = HDR.replace(old, new, 1)
     assert mutant != HDR and not integrated(SRC, mutant), old

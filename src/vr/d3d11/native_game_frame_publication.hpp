@@ -73,6 +73,22 @@ struct GameNativeFramePublication {
             frequencyTicks >= kSamePresentBudgetDivisor &&
             elapsedTicks < frequencyTicks / kSamePresentBudgetDivisor;
     }
+    // A completed D3D11 EVENT can briefly precede a nonblocking staging Map.
+    // Allow only the just-submitted full-size game frame to reattempt its
+    // current-Present Map; older/inset frames never extend their lifetime.
+    // A 0.25 ms / 128-attempt ceiling protects the original D3D9 gamepad
+    // latency even when the GPU or driver cannot make readback progress.
+    static constexpr std::uint32_t kMaxSamePresentMapExtraPolls = 128u;
+    static constexpr std::uint64_t kSamePresentMapBudgetDivisor = 4000u;
+    [[nodiscard]] static constexpr bool retry_same_present_map(
+        bool fullMode, bool queuedNow, bool mapPending,
+        std::uint32_t extraPolls, std::uint64_t elapsedTicks,
+        std::uint64_t frequencyTicks) noexcept {
+        return fullMode && queuedNow && mapPending &&
+            extraPolls < kMaxSamePresentMapExtraPolls &&
+            frequencyTicks >= kSamePresentMapBudgetDivisor &&
+            elapsedTicks < frequencyTicks / kSamePresentMapBudgetDivisor;
+    }
     [[nodiscard]] static constexpr bool valid_readback_pitch(
         std::uint32_t width, std::uint32_t rowPitch) noexcept {
         return width != 0u &&
