@@ -54,10 +54,10 @@
     "tools/verify_vr_hud_exact_callsite_contract.py",
     "docs/automation/runs/CONVERSION-DX9EX-00878.json"
   ],
-  "status": "IN_PROGRESS",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "acceptance_results": {
@@ -67,8 +67,8 @@
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "LATEST_EXACT_SHA_GAME_HOST_PACKAGE_DOMAIN_HUD_FULL_SOURCE_VALIDATION_PENDING",
-  "result_commit_ci_skip": false,
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "result_commit_ci_skip": true,
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "material_result_sha": "6e447e510df6d1ee15a2b0e1f059c4062ffcbb81",
   "diagnosis": {
@@ -85,7 +85,7 @@
     ],
     "eye_ownership": "The exact GOAL token is carried until direct D3DX flush or stored on per-queued SpriteNodes, and stereo physical draw/host paths are untouched; Quest3 convergence remains untested."
   },
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "0602c902fc927a4e3accfec98bf32a3d292c5c3e",
   "ci_repair_history": [
     {
       "sha": "6e447e510df6d1ee15a2b0e1f059c4062ffcbb81",
@@ -103,5 +103,28 @@
       "sha": "dd98102d040b293a8a61bce4283047fd7449ee06",
       "issue": "HUD original-call mutation verifier repaired at GOAL direct D3DX exit boundary"
     }
-  ]
+  ],
+  "runtime_evidence": "GitHub exact-SHA CI SUCCESS; physical HMD/Quest3 stereo runtime not executed.",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "0602c902fc927a4e3accfec98bf32a3d292c5c3e",
+    "dx9ex_active": {
+      "run_id": 38688342022,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, game, full-chain-compile, host, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38688342063,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38688342351,
+      "conclusion": "SUCCESS"
+    },
+    "full_source_impact": {
+      "run_id": 38688342013,
+      "conclusion": "SUCCESS"
+    },
+    "runtime": "UNTESTED"
+  }
 }
