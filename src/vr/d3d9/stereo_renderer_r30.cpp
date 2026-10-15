@@ -4352,7 +4352,13 @@ namespace OutRunVRStereo
             LeftDraw&& leftDraw, RightDraw&& rightDraw,
             const char* site)
         {
-            if (!state.worldEffect)
+            // R26+HUD protected the lens centre from prematurely freezing
+            // the pre-HUD SkyGlow source. The independent R84 renderer must
+            // obey the same exact producer boundary rather than inferring UI
+            // from alpha/depth or XYZRHW shape alone.
+            if (!state.worldEffect &&
+                OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(
+                    OutRunVR::GameSemantic::EffectiveScope()))
                 R30CaptureSkyGlowSceneBeforeHud(device);
 
             R29OwnerNoteStereoDrawWithoutMonoBackup();
@@ -5311,10 +5317,13 @@ namespace OutRunVRStereo
             // reading it on every HUD draw causes unnecessary D3D9 driver
             // queries. No SetScissorRect is performed by this path.
 
-            // Capture the completed world eyes before the first recognized HUD
-            // draw. Present then extracts glow from this snapshot, so bright HUD
-            // text/icons are never themselves bloom sources.
-            R30CaptureSkyGlowSceneBeforeHud(device);
+            // Capture only before an actual tagged HUD/2D overlay. A
+            // depth-disabled scene effect or world lens billboard is not a
+            // valid bloom cutoff even when it looks screen-space in D3D9.
+            // The shared semantic predicate is already used by R26+HUD.
+            if (OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(
+                    OutRunVR::GameSemantic::EffectiveScope()))
+                R30CaptureSkyGlowSceneBeforeHud(device);
 
             // From this point the draw is owned by R30. The steady-state frame
             // intentionally has no complete independent mono history.

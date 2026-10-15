@@ -43,3 +43,36 @@ for bad_r,bad_s in mutations:
         continue
     raise AssertionError("SkyGlow semantic boundary mutation escaped")
 print("PASS R26+HUD SkyGlow screen cutoff, world lens preservation, 4 negative mutations")
+
+
+# R84 main must preserve the same pre-HUD bloom ownership as R26+HUD.
+# This checks the two R84 draw paths directly: screen-space shader and
+# XYZRHW stereo. A world lens may never freeze the source early.
+R84_RENDER = ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp"
+r84 = R84_RENDER.read_text(encoding="utf-8")
+
+def check_r84(renderer: str) -> None:
+    fov = renderer.split("HRESULT R30TryScreenSpaceFovDraw(", 1)[1].split("// From this point the draw is owned by R30.", 1)[0]
+    xyz = renderer.split("HRESULT R30ExecuteXyzrhwStereo(", 1)[1].split("R29OwnerNoteStereoDrawWithoutMonoBackup()", 1)[0]
+    boundary = "OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary("
+    scope = "OutRunVR::GameSemantic::EffectiveScope()"
+    capture = "R30CaptureSkyGlowSceneBeforeHud(device);"
+    assert fov.count(boundary) == 1 and fov.count(scope) == 1 and fov.count(capture) == 1
+    assert fov.index(boundary) < fov.index(capture)
+    assert xyz.count(boundary) == 1 and xyz.count(scope) == 1 and xyz.count(capture) == 1
+    assert xyz.index("!state.worldEffect") < xyz.index(boundary) < xyz.index(capture)
+
+check_r84(r84)
+bad_variants = [
+    r84.replace("if (OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(\n                    OutRunVR::GameSemantic::EffectiveScope()))", "if (true)", 1),
+    r84.replace("if (!state.worldEffect &&\n                OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(", "if (!state.worldEffect &&\n                true /* unsafe bloom */ && (", 1),
+    r84.replace("if (OutRunVR::GameSemantic::IsSkyGlowPreHudBoundary(\n                    OutRunVR::GameSemantic::EffectiveScope()))\n                R30CaptureSkyGlowSceneBeforeHud(device);", "R30CaptureSkyGlowSceneBeforeHud(device);", 1),
+]
+for mutated in bad_variants:
+    assert mutated != r84, "R84 bloom mutation fixture missing"
+    try:
+        check_r84(mutated)
+    except (AssertionError, IndexError, ValueError):
+        continue
+    raise AssertionError("R84 pre-HUD SkyGlow mutation escaped")
+print("PASS R84 main SkyGlow screen-only cutoff and three negative mutations; HMD UNTESTED")
