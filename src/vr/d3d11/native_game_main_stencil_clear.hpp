@@ -8,6 +8,13 @@ namespace outrun::vr::dx11::live_game_frame {
 // Never infer safety from RT0 alone: both original backbuffer and Z/S owner
 // identities must be verified before retaining a menu/car/race batch.
 struct GameNativeMainStencilClear {
+    // Original game Clear has succeeded before this observation. Stencil-only
+    // Clear has no native DSV depth effect; Z-containing Clear does.
+    // Caller must independently prove the canonical main Z/S COM identity.
+    [[nodiscard]] static constexpr bool preserves_clear_coverage(
+        bool clearsDepth, bool coversWholeDepth) noexcept {
+        return !clearsDepth || coversWholeDepth;
+    }
     [[nodiscard]] static constexpr bool may_ignore(
         bool nativeFullFrame, bool originalMainColorSeed,
         bool sameMainDepthStencil, bool fullClearCoverage,

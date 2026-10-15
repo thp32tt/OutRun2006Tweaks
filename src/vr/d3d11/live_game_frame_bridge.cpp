@@ -5473,21 +5473,31 @@ bool observe_game_depth_clear(IDirect3DDevice9* game, DWORD count,
             rtDesc.Width != bbDesc.Width || rtDesc.Height != bbDesc.Height ||
             dsDesc.Width != bbDesc.Width || dsDesc.Height != bbDesc.Height ||
             bbDesc.MultiSampleType != D3DMULTISAMPLE_NONE ||
-            dsDesc.MultiSampleType != D3DMULTISAMPLE_NONE ||
-            !GameNativeClearCoverage::covers_whole(
-                bbDesc.Width, bbDesc.Height, vp.X, vp.Y, vp.Width, vp.Height,
-                count, rects)) return false;
-        if (clearStencil) {
-            ComPtr<IUnknown> depthIdentity;
-            if (FAILED(depth.As(&depthIdentity)) || !depthIdentity ||
-                !GameNativeMainStencilClear::may_ignore(
-                    true, s.clearColor.matches(owner,
-                        reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get())),
-                    s.clearColor.main_depth_still_bound(
-                        reinterpret_cast<std::uintptr_t>(depthIdentity.Get())),
-                    true, !s.frameBatch.stopped))
-                return false;
-        }
+            dsDesc.MultiSampleType != D3DMULTISAMPLE_NONE) return false;
+        // Original successful D3D9 STENCIL-only Clears cannot affect native
+        // color/Z (admitted native game Draws never read stencil). Cropped
+        // stencil rectangles may therefore preserve menu-to-race continuity.
+        // A Z Clear must still cover the entire native depth surface.
+        const bool coversDepth = GameNativeClearCoverage::covers_whole(
+            bbDesc.Width, bbDesc.Height, vp.X, vp.Y, vp.Width, vp.Height,
+            count, rects);
+        const bool compatibleCoverage =
+            GameNativeMainStencilClear::preserves_clear_coverage(clearZ, coversDepth);
+        // Same RT0 does not imply same Z. Menu/vehicle previews may bind an
+        // auxiliary Z surface while restoring the game main backbuffer.
+        ComPtr<IUnknown> depthIdentity;
+        if (FAILED(depth.As(&depthIdentity)) || !depthIdentity) return false;
+        const bool sameMainDepthStencil = s.clearColor.main_depth_still_bound(
+            reinterpret_cast<std::uintptr_t>(depthIdentity.Get()));
+        if (!sameMainDepthStencil || (clearZ && !compatibleCoverage))
+            return false;
+        if (clearStencil &&
+            !GameNativeMainStencilClear::may_ignore(
+                true, s.clearColor.matches(owner,
+                    reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get())),
+                sameMainDepthStencil, compatibleCoverage,
+                !s.frameBatch.stopped))
+            return false;
         // Prove the same canonical D3D9 backbuffer/color Clear before
         // admitting a separate full Z Clear with zero native game Draws.
         // This covers menu->vehicle->race startup where TARGET and ZBUFFER
