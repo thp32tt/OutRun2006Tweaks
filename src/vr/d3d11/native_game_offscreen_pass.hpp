@@ -40,6 +40,20 @@ struct GameNativeOffscreenPass {
         return sourceSeeded && offscreenRt0 && extraMrtUnbound && !stopped &&
             (!depthOrStencilClear || separateDepth);
     }
+    // Enabled D3D9 stencil testing alone does not write stencil. With the
+    // *entire* stencil write mask zero, front/back ops cannot mutate main Z/S.
+    // A failed mask query must never reach this predicate as a zero mask.
+    [[nodiscard]] static constexpr bool no_main_stencil_write(
+        bool stencilEnabled, bool maskKnown, std::uint32_t writeMask) noexcept {
+        return !stencilEnabled || (maskKnown && writeMask == 0u);
+    }
+    // A bound auxiliary MRT writes no main color only if its own D3D9
+    // COLORWRITEENABLEn mask was successfully read and is exactly zero.
+    // Unlike Draw, Clear ignores COLORWRITEENABLEn and stays strict.
+    [[nodiscard]] static constexpr bool inactive_extra_mrt(
+        bool maskKnown, std::uint32_t writeMask) noexcept {
+        return maskKnown && writeMask == 0u;
+    }
     [[nodiscard]] static constexpr bool source_has_no_main_writes(
         bool fullMode, bool wholeBackbufferSeeded, bool targetIsOffscreen,
         bool noMainDepthWrites, bool stencilDisabled, bool noExtraRenderTargets,

@@ -4847,6 +4847,13 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, State& s) noexcept {
         FAILED(game->GetRenderState(D3DRS_ZWRITEENABLE, &zWriteEnabled)) ||
         FAILED(game->GetRenderState(D3DRS_STENCILENABLE, &stencilEnabled)))
         return false;
+    // Preserve game render-to-texture stencil TESTS with zero writable bits,
+    // not just STENCILENABLE=FALSE. Unknown readback or a nonzero mask
+    // still invalidates the optional native full-frame stream.
+    DWORD stencilWriteMask = 0xffffffffu;
+    const bool stencilMaskKnown = stencilEnabled == FALSE ||
+        SUCCEEDED(game->GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask));
+    if (!stencilMaskKnown) return false;
     ComPtr<IDirect3DSurface9> target, backbuffer;
     ComPtr<IUnknown> targetIdentity, backbufferIdentity;
     if (FAILED(game->GetRenderTarget(0, target.GetAddressOf())) || !target ||
@@ -4863,12 +4870,24 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, State& s) noexcept {
     if (FAILED(game->GetDeviceCaps(&caps)) ||
         !GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs))
         return false;
+    // Some real menu/vehicle previews leave extra MRT slots bound with every
+    // channel disabled. Such Draw/DrawIndexed calls cannot write those RTs,
+    // even when an extra slot aliases the seeded main backbuffer. Validate
+    // the exact per-slot game write mask; an unknown binding/mask fails closed.
+    // Offscreen Clears remain stricter because Clear ignores color masks.
+    constexpr D3DRENDERSTATETYPE extraColorMasks[] = {
+        D3DRS_COLORWRITEENABLE1, D3DRS_COLORWRITEENABLE2,
+        D3DRS_COLORWRITEENABLE3
+    };
     bool noExtraRenderTargets = true;
     for (DWORD i = 1u; i < caps.NumSimultaneousRTs; ++i) {
         ComPtr<IDirect3DSurface9> extra;
         const HRESULT hr = game->GetRenderTarget(i, extra.GetAddressOf());
-        if ((SUCCEEDED(hr) && extra) ||
-            (FAILED(hr) && hr != D3DERR_NOTFOUND)) {
+        if (hr == D3DERR_NOTFOUND) continue;
+        DWORD mask = 0xffffffffu;
+        const bool maskKnown = SUCCEEDED(hr) && extra &&
+            SUCCEEDED(game->GetRenderState(extraColorMasks[i - 1u], &mask));
+        if (!GameNativeOffscreenPass::inactive_extra_mrt(maskKnown, mask)) {
             noExtraRenderTargets = false;
             break;
         }
@@ -4893,7 +4912,9 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, State& s) noexcept {
         targetIdentity.Get() != backbufferIdentity.Get(),
         GameNativeOffscreenPass::no_main_depth_write(
             zEnabled != D3DZB_FALSE, zWriteEnabled != FALSE, isolatedDepthWrite),
-        stencilEnabled == FALSE, noExtraRenderTargets, s.frameBatch.stopped);
+        GameNativeOffscreenPass::no_main_stencil_write(
+            stencilEnabled != FALSE, stencilMaskKnown, stencilWriteMask),
+        noExtraRenderTargets, s.frameBatch.stopped);
     // The original D3D9 Draw has now changed the auxiliary Z surface. A
     // subsequent backbuffer depth Draw must rebind the seeded MAIN depth
     // identity, not reuse the auxiliary depth history as the native DSV.
