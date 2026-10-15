@@ -1014,6 +1014,8 @@ namespace OutRunVRStereo
             return R32ReviewScreenSpaceKind::Hud2D;
         case R30SupportScreenSpaceKind::FlatPerspectiveEffect:
             return R32ReviewScreenSpaceKind::FlatPerspectiveEffect;
+        case R30SupportScreenSpaceKind::ExactLensCentreWorld:
+            return R32ReviewScreenSpaceKind::ExactLensCentreWorld;
         default:
             return R32ReviewScreenSpaceKind::None;
         }
@@ -1029,6 +1031,8 @@ namespace OutRunVRStereo
             lower = R30SupportScreenSpaceKind::Hud2D;
         else if (kind == R32ReviewScreenSpaceKind::FlatPerspectiveEffect)
             lower = R30SupportScreenSpaceKind::FlatPerspectiveEffect;
+        else if (kind == R32ReviewScreenSpaceKind::ExactLensCentreWorld)
+            lower = R30SupportScreenSpaceKind::ExactLensCentreWorld;
         return lower != R30SupportScreenSpaceKind::None &&
             R30SupportBuildScreenSpaceEyeConstants(
                 d, s, lower, original, eyeConstants, eyeScale, eyeOffset);

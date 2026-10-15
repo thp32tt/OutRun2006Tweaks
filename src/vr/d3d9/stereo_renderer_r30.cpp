@@ -2432,7 +2432,8 @@ namespace OutRunVRStereo
         {
             None,
             Hud2D,
-            FlatPerspectiveEffect
+            FlatPerspectiveEffect,
+            ExactLensCentreWorld
         };
 
         // Strict R84 C993 source proof, ported from the protected R26
@@ -2522,29 +2523,37 @@ namespace OutRunVRStereo
                 if (!OutRunVR::GameSemantic::QueueRenderActive() &&
                     scope == OutRunVR::GameSemantic::RenderScope::WorldBillboard)
                 {
-                    // P0 diagnostic: verify original C993 c64 owns this draw
-                    // before changing lens geometry. This never flattens a
-                    // sun or touches the game's shader/texture/GPU state.
-                    if (Settings::VRTelemetry &&
-                        OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    // The exact non-queued C993 centre is allowed to use
+                    // the original game WVP only when call, pose, shader and
+                    // draw provenance agree. Missing evidence keeps R29's
+                    // conservative world route; never borrow live injected c64.
+                    if (OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
                             OutRunVR::GameSemantic::ProducerToken::LensFlareCentre)
                     {
                         float originalGameWvp[16]{};
                         const bool owned =
                             R30HasExactLensCentreRawWvp(originalGameWvp);
-                        static thread_local bool reportedOwned = false;
-                        static thread_local bool reportedMiss = false;
-                        bool& reported = owned ? reportedOwned : reportedMiss;
-                        if (!reported)
+                        if (Settings::VRTelemetry)
                         {
-                            reported = true;
-                            spdlog::info(
-                                "VR R84 C993 RAW_WVP_SOURCE: {} "
-                                "(call/pose/shader/draw owner; "
-                                "physical world renderer unchanged)",
-                                owned ? "EXACT_OWNER" : "MISSING_OR_STALE");
+                            static thread_local bool reportedOwned = false;
+                            static thread_local bool reportedMiss = false;
+                            bool& reported = owned ? reportedOwned : reportedMiss;
+                            if (!reported)
+                            {
+                                reported = true;
+                                spdlog::info(
+                                    "VR R84 C993 RAW_WVP_SOURCE: {} "
+                                    "(same call/pose/shader/draw; "
+                                    "stereo requires exact owned raw game WVP)",
+                                    owned ? "EXACT_OWNER" : "MISSING_OR_STALE");
+                            }
                         }
+                        if (OutRunVR::LensCentre::SelectWorldRoute(true, owned) ==
+                                OutRunVR::LensCentre::WorldRoute::ExactCentreStereo)
+                            return R30ScreenSpaceKind::ExactLensCentreWorld;
                     }
+                    // CABE discs, unrelated alpha and queued billboards
+                    // never enter this path; the previous world route stays.
                     return R30ScreenSpaceKind::None;
                 }
                 return R30ScreenSpaceKind::FlatPerspectiveEffect;
@@ -5237,6 +5246,79 @@ namespace OutRunVRStereo
             if (!R29OwnerMatrixFinite(stockWvp))
                 return false;
 
+            if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld)
+            {
+                // Original GPU c64 was saved in `original` for exact state
+                // restore. It is NOT source-owned game WVP and might already
+                // be head-injected. Keep those values completely separate.
+                float rawGameWvp[16]{};
+                if (!R30HasExactLensCentreRawWvp(rawGameWvp))
+                    return false;
+                D3DMATRIX rawUploadedT{};
+                std::memcpy(&rawUploadedT, rawGameWvp, sizeof(rawUploadedT));
+                const D3DMATRIX stockRawWvp =
+                    R29OwnerTransposeMatrix(rawUploadedT);
+                float baseRaw[16]{};
+                float headRaw[16]{};
+                std::uint32_t headPoseSequence = 0;
+                if (!R29OwnerMatrixFinite(stockRawWvp) ||
+                    !OutRunVRRenderer::GetRendererBaseProjection(baseRaw) ||
+                    !OutRunVRRenderer::GetLatchedHeadInverse(
+                        headRaw, headPoseSequence) ||
+                    headPoseSequence != stereo.poseSequence)
+                    return false;
+                D3DMATRIX baseProjection{}, headInverse{};
+                std::memcpy(&baseProjection, baseRaw,
+                    sizeof(baseProjection));
+                std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+                D3DMATRIX inverseBaseProjection{};
+                if (!R29OwnerMatrixFinite(baseProjection) ||
+                    !R29OwnerMatrixFinite(headInverse) ||
+                    !R29OwnerInvertMatrix(baseProjection,
+                        inverseBaseProjection))
+                    return false;
+                // Preserve the proven R26 spatial billboard association:
+                // stock WVP -> world view -> head inverse -> eye inverse ->
+                // asymmetric eye projection. No depth flattening/alpha edit.
+                const D3DMATRIX worldView =
+                    R29OwnerMultiplyMatrix(stockRawWvp,
+                        inverseBaseProjection);
+                const D3DMATRIX headRelative =
+                    R29OwnerMultiplyMatrix(worldView, headInverse);
+                if (!R29OwnerMatrixFinite(worldView) ||
+                    !R29OwnerMatrixFinite(headRelative))
+                    return false;
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    const D3DMATRIX eyePose =
+                        R29OwnerMatrixFromQuaternionTranslation(
+                            stereo.eyeOrientation[eye],
+                            stereo.eyeOffset[eye],
+                            Settings::VRWorldScale *
+                                Settings::VRStereoDepth);
+                    const D3DMATRIX eyeInverse =
+                        R29OwnerInverseRigid(eyePose);
+                    const D3DMATRIX eyeProjection =
+                        R29OwnerProjectionFromFov(baseProjection,
+                            stereo.eyeFov[eye]);
+                    if (!R29OwnerMatrixFinite(eyeInverse) ||
+                        !R29OwnerMatrixFinite(eyeProjection))
+                        return false;
+                    const D3DMATRIX corrected =
+                        R29OwnerMultiplyMatrix(
+                            R29OwnerMultiplyMatrix(
+                                headRelative, eyeInverse),
+                            eyeProjection);
+                    if (!R29OwnerMatrixFinite(corrected))
+                        return false;
+                    const D3DMATRIX correctedT =
+                        R29OwnerTransposeMatrix(corrected);
+                    std::memcpy(eyeConstants[eye], &correctedT,
+                        sizeof(correctedT));
+                }
+                return true;
+            }
+
             if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect)
             {
                 float baseRaw[16]{};
@@ -5826,6 +5908,8 @@ namespace OutRunVRStereo
             return R30SupportScreenSpaceKind::Hud2D;
         case R30ScreenSpaceKind::FlatPerspectiveEffect:
             return R30SupportScreenSpaceKind::FlatPerspectiveEffect;
+        case R30ScreenSpaceKind::ExactLensCentreWorld:
+            return R30SupportScreenSpaceKind::ExactLensCentreWorld;
         default:
             return R30SupportScreenSpaceKind::None;
         }
@@ -5846,6 +5930,9 @@ namespace OutRunVRStereo
             break;
         case R30SupportScreenSpaceKind::FlatPerspectiveEffect:
             lower = R30ScreenSpaceKind::FlatPerspectiveEffect;
+            break;
+        case R30SupportScreenSpaceKind::ExactLensCentreWorld:
+            lower = R30ScreenSpaceKind::ExactLensCentreWorld;
             break;
         default:
             return false;
