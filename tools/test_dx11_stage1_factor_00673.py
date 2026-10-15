@@ -25,7 +25,7 @@ def integrated(source):
         "s.stage1DiffusePs.GetAddressOf()",
         "s.stage1AddPs.GetAddressOf()",
         "ctx->PSSetConstantBuffers(1, 1, &combiner)",
-        "capture.stage1Enabled ?",
+        "ctx->PSSetShader(capture.stage1Enabled ?",
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
     ))
@@ -41,7 +41,7 @@ for label, snippet in (
     ("alpha source", "!stage1_alpha_supported(alphaOp, alpha1, alpha2)"),
     ("shader append", "static const std::string stage1ShaderSource = shaderSource + kStage1FactorShader;"),
     ("shader compilation", "D3DCompile(stage1ShaderSource.data(), stage1ShaderSource.size(),"),
-    ("independent stage1 PS", "capture.stage1Enabled ?"),
+    ("independent stage1 PS", "ctx->PSSetShader(capture.stage1Enabled ?"),
     ("constant bound", "ctx->PSSetConstantBuffers(1, 1, &combiner)"),
     ("indexed GPU draw", "ctx->DrawIndexed(indexCount, 0, 0);"),
     ("linear GPU draw", "ctx->Draw(static_cast<UINT>(vertices.size()), 0);"),
