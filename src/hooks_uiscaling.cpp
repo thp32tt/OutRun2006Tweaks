@@ -136,6 +136,26 @@ namespace
     static_assert(TestStageFirstAppendedNode(),
         "+TIME must not read or relabel a stale source queue tail");
 
+    // Multi-child rank and GOAL producers can append several queue nodes.
+    // Retain both live siblings without consulting a detached old tail.
+    constexpr bool TestExactRankGoalSiblingTailProof() noexcept
+    {
+        StageTailFixture root{}, old{}, first{}, second{}, stale{};
+        root.next_0 = &old;
+        old.next_0 = &first;
+        first.next_0 = &second;
+        if (StageFirstAppendedNode(&root, &old, &second, 4) != &first ||
+            StageFirstAppendedNode(&root, &stale, &second, 4))
+            return false;
+        // A nested producer replaced the original priority-list chain.
+        root.next_0 = &first;
+        return StageFirstAppendedNode(&root, &old, &second, 3) == nullptr &&
+            StageFirstAppendedNode<StageTailFixture>(
+                &root, nullptr, &second, 3) == &first;
+    }
+    static_assert(TestExactRankGoalSiblingTailProof(),
+        "Exact GOAL/rank producers must not tag a rebuilt foreign queue");
+
     // Compose the matrix AFTER D3DX applies scaling/rotation pivots.
     // Changing only pScaling/pTranslation uses a different pivot basis and
     // distorts rotated menu art at portrait and ultrawide aspect ratios.
