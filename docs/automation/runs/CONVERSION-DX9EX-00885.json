@@ -64,9 +64,9 @@
     ]
   },
   "acceptance_results": {
-    "left_hud_failure_veto": "SOURCE_IMPLEMENTED",
-    "wvp_rollback_fallback": "SOURCE_IMPLEMENTED",
-    "exact_sha_windows_gates": "PENDING"
+    "left_hud_failure_veto": "PASS",
+    "wvp_rollback_fallback": "PASS",
+    "exact_sha_windows_gates": "PASS"
   },
   "diagnosis": {
     "original_evidence": "R33 already poisons current-eye publication on left Draw failure, but both R30ExecuteXyzrhwStereo and R30TryScreenSpaceFovDraw previously returned after logging/arming future mono safety without marking current right-eye failed.",
@@ -85,7 +85,7 @@
     "eye_ownership": "R84 R29FrameRightDrawFailed is the existing present-time publication veto; this new material updates both R30 physical submissions without changing R33 per-eye state or OpenXR host."
   },
   "runtime_evidence": "No Quest3/VDXR HMD, game-screen or runtime evidence was acquired.",
-  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "hold_reason": "NEED_HMD_TEST",
   "score_once": false,
   "score_delta_this_attempt": 0,
   "ci_evidence": {
@@ -106,7 +106,8 @@
     },
     "full_source_impact": {
       "run_id": 38704103303,
-      "conclusion": "IN_PROGRESS_AT_C6"
+      "conclusion": "SUCCESS",
+      "required_jobs": "msvc-analyze-active-game, msvc-analyze-openxr-host, source-cross-domain (3/3)"
     },
     "previous_failure": {
       "status": "INITIAL_POLICY_FAIL_MISSING_RECORD",
