@@ -48,8 +48,8 @@ def check(s: str, h: str) -> None:
     assert 'inline float ResponsiveUserScale(' in h
     assert '0.55f + (bounded - 0.55f) * (0.70f / 0.45f)' in h
     assert '1.25f + (bounded - 1.0f) * 0.50f' in h
-    assert 'const float readable = OutRunVrPauseEye::ResponsiveUserScale(' in s
-    assert 'requested, Settings::VRHudResponsiveLayout.get());' in s
+    assert 'const float readable = OutRunVrPauseEye::ResponsiveUserScale(' not in s
+    assert 'return std::clamp(requested, 0.55f, 1.50f);' in s
     assert 'return shoulder + headroom * excess / (headroom + excess);' in h
     assert 'const float smallOptical = ResponsiveMenuScale(' in tests
     assert 'defaultOptical < largeOptical && largeOptical < 2.25f' in tests
@@ -62,8 +62,9 @@ def check(s: str, h: str) -> None:
     assert 'Settings::VRPauseMenuScale.get() > 0.0f;' in s
     assert 'R30HudContain.pauseResponsive == pauseResponsive' in s
     assert 'R30HudContain.pauseResponsive = pauseResponsive;' in s
-    assert 'OutRunVrPauseEye::ResponsiveMenuScale(' in s
-    assert 'userScale, sourceOverTarget, pauseResponsive);' in s
+    # User's R84 HMD regression: do not multiply pause size twice in XR.
+    assert 'OutRunVrPauseEye::ResponsiveMenuScale(' not in s
+    assert 'const float opticalScale = userScale;' in s
     assert 'scaleX = opticalScale;' in s
     assert 'scaleY = opticalScale / sourceOverTarget;' in s
     assert 'scaleX = opticalScale * sourceOverTarget;' in s
@@ -83,10 +84,10 @@ for mutant in (
                    'const bool pauseOwned = false;', 1),
     source.replace('clipCorrection._11 = OutRunVrPauseEye::ShaderHorizontalScale(',
                    'clipCorrection._11 = (', 1),
-    source.replace('const float readable = OutRunVrPauseEye::ResponsiveUserScale(',
-                   'const float readable = (std::max)(', 1),
-    source.replace('requested, Settings::VRHudResponsiveLayout.get());',
-                   'requested, 1.25f);', 1),
+    source.replace('return std::clamp(requested, 0.55f, 1.50f);',
+                   'return std::clamp(requested * 1.25f, 0.55f, 1.50f);', 1),
+    source.replace('const float opticalScale = userScale;',
+                   'const float opticalScale = 2.0f * userScale;', 1),
     source.replace('hudScaleY * pauseVertical.scale[eye] * ndcY',
                    'hudScaleY * ndcY', 1),
     source.replace('rightDst[1] = transformedRightY;',
@@ -105,10 +106,10 @@ for mutant in (
                    'R30HudContain.pauseResponsive == false', 1),
     source.replace('R30HudContain.pauseResponsive = pauseResponsive;',
                    'R30HudContain.pauseResponsive = false;', 1),
-    source.replace('userScale, sourceOverTarget, pauseResponsive);',
-                   'userScale, sourceOverTarget, false);', 1),
+    source.replace('const float opticalScale = userScale;',
+                   'const float opticalScale = OutRunVrPauseEye::ResponsiveMenuScale(userScale, sourceOverTarget, pauseResponsive);', 1),
     source.replace('scaleY = opticalScale / sourceOverTarget;',
-                   'scaleY = userScale / sourceOverTarget;', 1),
+                   'scaleY = opticalScale;', 1),
 ):
     try:
         check(mutant, helper)
