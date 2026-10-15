@@ -52,10 +52,13 @@ for text, orig, fake in (
     ("offscreen", "extraMrtUnbound && !stopped", "true && !stopped"),
 ):
     args={"bridge":bridge, "hook":hook, "clear":clear, "offscreen":offscreen}
-    if text == "bridge" and orig == "s.clearColor.main_depth_still_bound(":
-        # A later DX11 feature also checks main-depth identity in the
-        # offscreen Draw path. Mutate this test's owned auxiliary-Clear
-        # function, not the unrelated earlier Draw check.
+    if text == "bridge" and orig in (
+        "s.clearColor.main_depth_still_bound(",
+        "GetRenderTarget(slot, extra.GetAddressOf())",
+    ):
+        # Main Draw admission and offscreen Draws now inspect live MRTs/Z.
+        # Destructively mutate only this test's auxiliary-Clear function:
+        # a change to an earlier, unrelated Draw must not satisfy 00777.
         prefix, rest = args["bridge"].split(
             "bool preserve_offscreen_color_only_clear(", 1)
         region, suffix = rest.split("void observe_scene_boundary(", 1)
