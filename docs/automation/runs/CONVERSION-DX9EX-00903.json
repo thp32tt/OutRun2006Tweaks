@@ -27,7 +27,9 @@
     "vrhost/src/main_r23.cpp",
     "vrhost/src/runtime/direct_ring_skip_ack.hpp",
     "vrhost/tests/test_direct_ring_skip_ack.cpp",
-    "docs/automation/runs/CONVERSION-DX9EX-00903.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00903.json",
+    "vrhost/CMakeLists.txt",
+    "tools/verify_vr_architecture.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:HOST:DIRECT_GPU_SKIP_ACK_RUN_ISOLATION",
@@ -95,7 +97,10 @@
       "Domain Isolation Guard",
       "DX9Ex Full Source Impact Review"
     ],
-    "revalidation": "PENDING_FINAL_SHA"
+    "revalidation": "PENDING_FINAL_VALIDATION_BEARING_SHA",
+    "initial_policy_repair": "Corrected obsolete R37 literal invariant to strict R41 same-run temporal ACK checks and built the portable regression as a Windows host-smoke CMake target.",
+    "second_active_run_id": 38754004023,
+    "second_policy_failure": "Architecture verifier looked for removed !R37FrameIdBefore literal instead of stronger direct-ring skip ACK helper."
   },
   "runtime_evidence": "No same-SHA Quest3/VDXR game/HMD test. Renderer and real-world FPS not claimed.",
   "score_once": false,

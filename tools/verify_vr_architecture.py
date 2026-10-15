@@ -499,7 +499,7 @@ require(
     "R37FrameIdBefore",
     "DirectGPU latest-frame-wins active",
     "PublishCompletedFrame(frame)",
-    "!R37FrameIdBefore(",
+    "OutRunVrDirectRingSkipAck::CanAcknowledge(",
     "lastProcessedStereoFrame",
     "allowInitialWarmupWait",
     "theater-only fallback",
@@ -560,6 +560,18 @@ if _remaining_new:
     raise SystemExit(
         f"R41 direct stale-frame rewind model regressed: {_remaining_new}"
     )
+
+# R41 skips can only ACK an older frame from the selected exact game-run
+# identity. Verify this is the real host admission path, not a weakened
+# replacement that merely renames the old frame-id cursor check.
+require(
+    "vrhost/src/runtime/direct_ring_skip_ack.hpp",
+    "candidate.generation == selected.generation",
+    "candidate.runGeneration == selected.runGeneration",
+    "candidate.gamePid == selected.gamePid",
+    "before(candidate.frameId, selected.frameId)",
+    "before(lastDisplayed, candidate.frameId)",
+)
 
 # New regressions are required in the host build graph.
 require(

@@ -152,6 +152,8 @@ add_executable(outrun-vr-direct-ack-device-epoch-smoke tests/direct_ack_device_e
 target_include_directories(outrun-vr-direct-ack-device-epoch-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
 add_executable(outrun-vr-direct-ring-latest-smoke tests/direct_ring_latest_smoke.cpp)
 target_include_directories(outrun-vr-direct-ring-latest-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
+# Exact R41 skipped-frame ACK time/run isolation (no HMD or driver required).
+add_executable(outrun-vr-direct-ring-skip-ack-smoke tests/test_direct_ring_skip_ack.cpp)
 add_executable(outrun-vr-projection-blit-upload-smoke tests/projection_blit_upload_smoke.cpp)
 add_executable(outrun-vr-menu-projection-copy-smoke tests/menu_projection_slice_copy_smoke.cpp)
 target_include_directories(outrun-vr-menu-projection-copy-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/src")
@@ -212,6 +214,7 @@ foreach(target
     outrun-vr-direct-hold-reuse-smoke
     outrun-vr-direct-ack-device-epoch-smoke
     outrun-vr-direct-ring-latest-smoke
+    outrun-vr-direct-ring-skip-ack-smoke
     outrun-vr-projection-blit-upload-smoke
     outrun-vr-menu-projection-copy-smoke
     outrun-vr-menu-content-aspect-smoke
