@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "efaef61d445d922a9632f956bed379974d6abc63",
   "material_result_sha": "bad3298087887276c19d69181c43cd97d6cc048e",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "7873d74936b4c4f7338bfea77dacb55485a5c923",
   "source_paths": [
     "vrhost/src/runtime/menu_content_aspect.hpp"
   ],
@@ -78,5 +78,18 @@
   },
   "runtime_evidence": "No actual Quest3/VDXR session or OutRun game render execution for this task.",
   "score_once": false,
-  "score_delta_this_attempt": 0
+  "score_delta_this_attempt": 0,
+  "hold_reason": "NEED_HMD_TEST",
+  "c6_trigger_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "result_commit_ci_skip": false,
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "7873d74936b4c4f7338bfea77dacb55485a5c923",
+    "material_sha": "bad3298087887276c19d69181c43cd97d6cc048e",
+    "reported_conclusion": "SUCCESS",
+    "evidence_source": "user_confirmed_exact_sha_ci",
+    "runtime": "UNTESTED"
+  },
+  "checkpoint_commit_ci_skip": true,
+  "bookkeeping_ci_skip": true
 }
