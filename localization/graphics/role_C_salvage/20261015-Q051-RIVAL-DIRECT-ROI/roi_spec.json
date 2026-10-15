@@ -1,0 +1,27 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "assets": [
+    {
+      "queue_id": "Q051",
+      "source_png": "q051_FF2462BB_FLIPY_CHECK_ORIENTATION.png",
+      "source_sha256": "2da1b6f01219356ddc6ea925bd8fcd4afd37d9040eb48081a40861cc649da6f0",
+      "source_kind": "FULL_HD_PNG_PIXEL_EXACT_PINNED_GITHUB_ORIGINAL_DDS_FLIPY",
+      "source_dds_path": "textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+      "regions": [
+        {
+          "id": "rival",
+          "english": "Rival",
+          "korean": "라이벌",
+          "bbox": [
+            2325,
+            520,
+            2478,
+            608
+          ],
+          "isolation": "alpha",
+          "scale": 4
+        }
+      ]
+    }
+  ]
+}

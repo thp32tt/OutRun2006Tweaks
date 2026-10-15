@@ -1,0 +1,54 @@
+{
+  "schema": "outrun-hd-text-roi-test-only-qa-v1",
+  "task_id": "C-ROI-Q051-RIVAL-20261015-2303",
+  "status": "TEST_ONLY",
+  "source_validation": "PASS_EXACT_DDS_PIXEL_MATCH_AFTER_FLIP_Y",
+  "source_dds_repo_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_etc_cvt_Exst/FF2462BB_1024x512.dds",
+  "source_dds_sha256": "5b029de75fa10ed00e547ef2c5d9df9691e8e5d8b9f2622fee62bc4972c7ae67",
+  "source_png_sha256": "2da1b6f01219356ddc6ea925bd8fcd4afd37d9040eb48081a40861cc649da6f0",
+  "platform": "BASE_PC",
+  "source_orientation": "READABLE_FLIPY",
+  "original_pixels_compared": 8388608,
+  "original_different_pixels": 0,
+  "native_source_crop_byte_equal": true,
+  "native_bbox_xyxy": [
+    2325,
+    520,
+    2478,
+    608
+  ],
+  "native_dimensions": [
+    153,
+    88
+  ],
+  "upscaled_dimensions": [
+    612,
+    352
+  ],
+  "upscale_factor": 4,
+  "native_2px_alpha_edge": {
+    "top": 0,
+    "bottom": 0,
+    "left": 0,
+    "right": 0
+  },
+  "upscaled_2px_alpha_edge": {
+    "top": 0,
+    "bottom": 0,
+    "left": 0,
+    "right": 0
+  },
+  "text": "Rival",
+  "translation": "라이벌",
+  "isolation": "alpha",
+  "source_opaque_background_claim": false,
+  "clean_plate_status": "NOT_RUN",
+  "imagegen_status": "NOT_RUN",
+  "independent_C1_status": "NOT_RUN",
+  "C3_status": "NOT_RUN",
+  "real_game_status": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "AB_legacy_queue_modified": false,
+  "qa_scope": "source input crop and pixel validation only",
+  "note": "One independent complete phrase ROI from original full-HD PNG; no old tiles, generated Korean files, image API or reconstruction used."
+}
