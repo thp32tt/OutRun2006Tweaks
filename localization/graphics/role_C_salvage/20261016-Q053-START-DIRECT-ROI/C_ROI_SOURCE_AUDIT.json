@@ -9,7 +9,7 @@
     2590,
     2850,
     3570,
-    3140
+    3250
   ],
   "english": "START",
   "korean": "시작",
@@ -33,7 +33,7 @@
   "dds_vs_new_full_png_rgba_mismatch_pixels": 0,
   "alpha_edge_2px_nonzero_counts": {
     "top": 0,
-    "bottom": 1197,
+    "bottom": 1335,
     "left": 0,
     "right": 0
   },
