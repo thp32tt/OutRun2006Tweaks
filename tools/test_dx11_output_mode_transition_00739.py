@@ -29,7 +29,8 @@ def connected(code: str) -> bool:
         "bool sourceModeKnown = false;" in code,
         "bool sourceWasFullMode = false;" in code,
         "if (!observe_source_frame_mode(s, fullMode)) return;" in draw,
-        "if (!observe_source_frame_mode(s, env_full_game_opt_in())) return;" in unavailable,
+        "const bool fullMode = env_full_game_opt_in();" in unavailable,
+        "if (!observe_source_frame_mode(s, fullMode)) return;" in unavailable,
         "const bool fullMode = env_full_game_opt_in();" in present,
         "outputNow.nativeFullFrame = fullMode;" in present,
         0 <= signature_pos < generation_pos,
@@ -53,7 +54,7 @@ assert connected(SRC), "native game Draw/Present/source-mode/resize fallback dis
 for bad, replacement in (
     ("outputNow.nativeFullFrame = fullMode;", "/* source mode omitted */"),
     ("if (!observe_source_frame_mode(s, fullMode)) return;", "/* mixed source mode */"),
-    ("if (!observe_source_frame_mode(s, env_full_game_opt_in())) return;", "/* missing source mode */"),
+    ("if (!observe_source_frame_mode(s, fullMode)) return;", "/* missing source mode */"),
     ("GameNativeFramePublication::source_mode_contiguous(", "GameNativeFramePublication::ignored_source_mode("),
     ("s.insetSurfaceWidth = surfaceWidth;", "/* width cache omitted */"),
     ("s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;", "/* stale upload dimensions */"),
@@ -63,6 +64,12 @@ for bad, replacement in (
     if bad == "s.insetSurfaceWidth = s.insetSurfaceHeight = 0u;":
         offset = SRC.index("void before_game_present(")
         changed = SRC[:offset] + SRC[offset:].replace(bad, replacement)
+    elif replacement == "/* missing source mode */":
+        # Source mode is captured once for the unavailable Draw branch, with
+        # exact source ordinal accounting. Mutate that branch, not the first
+        # occurrence in the ordinary Draw observer.
+        start = SRC.index("void observe_unavailable_game_draw(")
+        changed = SRC[:start] + SRC[start:].replace(bad, replacement, 1)
     else:
         changed = SRC.replace(bad, replacement, 1)
     assert changed != SRC and not connected(changed), bad
