@@ -47,5 +47,6 @@ for old,new in (
     assert old in coverage and not linked(coverage.replace(old,new,1),bridge,batch,hook,probe,workflow)
 assert not linked(coverage,bridge.replace("GameNativeClearCoverage::covers_whole(", "/* native full color clear removed */",1),batch,hook,probe,workflow)
 assert not linked(coverage,bridge,batch.replace("return matchesClearedBackbuffer &&","return true &&",1),hook,probe,workflow)
-assert not linked(coverage,bridge,batch,hook.replace("observe_scene_boundary(device)","/* boundary bypass */",1),probe,workflow)
+clear_hook_start = hook.index("HRESULT __stdcall ClearDestR9(")
+assert not linked(coverage,bridge,batch,hook[:clear_hook_start] + hook[clear_hook_start:].replace("observe_scene_boundary(device)","/* boundary bypass */",1),probe,workflow)
 print("PASS 00762 clipped D3D9 whole-target color/depth Clear -> native full Draw/Indexed + fallback (source only)")
