@@ -9,7 +9,11 @@ flow=(root/".github/workflows/dx11-fast-structural.yml").read_text()
 color_hdr=(root/"src/vr/d3d11/native_game_clear_color.hpp").read_text()
 probe=(root/"tools/dx11_full_frame_color_seed_00735.cpp").read_text()
 def retains_verified_offscreen_clear(h: str, p: str) -> bool:
-    return all(token in h for token in (
+    start = h.find("constexpr bool preserves_offscreen_color_only(")
+    end = h.find("// Disable writes to the absent X8 alpha plane",start)
+    if start < 0 or end < 0: return False
+    method = h[start:end]
+    return all(token in method for token in (
         "preserves_offscreen_color_only(",
         "colorOnly && !batchStopped",
         "matches(device, backbuffer)",
