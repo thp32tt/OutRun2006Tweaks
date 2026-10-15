@@ -89,7 +89,7 @@
     "C0_RECOVER": "HEAD c08878760a1131bf2fdae7e74981a197dd5dc225 and AGENTS/policy/00772 reviewed",
     "C1_REVIEW": "Native Draw XYZRHW/WVP had uncorrected D3D9 integer vs D3D11 half-integer raster pixel centers.",
     "C2_IMPLEMENT": "Shared live FVF bridge homogeneous half-pixel correction with helper and compiled destructive test.",
-    "C3_VALIDATE": "DX11 Fast CI failed: invalid literal game path. Corrected policy stage and strengthened native Present integration regression.",
+    "C3_VALIDATE": "GitHub exact-SHA DX11 Fast 7b11315 FAILED in new destructive regression: first-occurrence viewport Width mutation targeted old XYZRHW expression, leaving added pixel center correction intact. Fix all-occurrence mutation; preserve positive helper and original game source.",
     "C4_COMMIT": "This material source commit, no skip-ci.",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING exact-SHA CI, HMD UNTESTED."

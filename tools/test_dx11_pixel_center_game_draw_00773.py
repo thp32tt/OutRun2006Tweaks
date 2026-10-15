@@ -37,7 +37,10 @@ for token in ('#include "live_game_pixel_center.hpp"',
               "static_cast<float>(vp.Height)",
               "s.frameBatch.publishable_full(s.pending, s.sourceDrawsThisFrame)",
               "GameNativeFrameUpload::copy_rows(", "game->UpdateSurface("):
-    mutated = source.replace(token, "/* stripped for negative regression */", 1)
+    # Mutate all occurrences: XYZRHW has an earlier viewport Width/Height
+    # use and UpdateSurface has full/partial dirty branches. A first-only
+    # edit would leave the tested live native integration path untouched.
+    mutated = source.replace(token, "/* stripped for negative regression */")
     assert mutated != source and not integrated(mutated), token
 
 probe = r"""
