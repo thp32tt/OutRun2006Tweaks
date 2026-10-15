@@ -75,13 +75,13 @@
     "docs/automation/runs/CONVERSION-DX9EX-00872.json"
   ],
   "acceptance_results": {
-    "allocation": "PENDING_EXACT_SHA",
-    "fallback": "PENDING_EXACT_SHA",
-    "ci": "PENDING_EXACT_SHA"
+    "allocation": "PASS",
+    "fallback": "PASS",
+    "ci": "PASS_EXACT_SHA"
   },
-  "score_once": false,
-  "score_delta_this_attempt": 0,
-  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "score_once": true,
+  "score_delta_this_attempt": 1,
+  "hold_reason": "QUEST3_VDXR_HARDWARE_RUNTIME_UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "material_result_sha": "49723bd0e1262e051a3d2a6fceb8a3d6ea27f69a",
   "validation_bearing_result_sha": "b29a8ef4e356d0c6e6dc4b1f6a132f640d4c0993",
@@ -102,10 +102,18 @@
     },
     "full_source_impact": {
       "run_id": 38658108776,
-      "conclusion": "IN_PROGRESS_AT_C6_WRITE"
+      "conclusion": "SUCCESS",
+      "required_jobs": "msvc-analyze-active-game/source-cross-domain/msvc-analyze-openxr-host (3/3)"
+    },
+    "hud_inspector": {
+      "run_id": 38657778874,
+      "source_sha": "49723bd0e1262e051a3d2a6fceb8a3d6ea27f69a",
+      "conclusion": "SUCCESS",
+      "note": "HUD inspector was triggered by original C++ material commit; final SHA adds tests and documentation only"
     }
   },
   "result_commit_ci_skip": false,
   "validation_record_kind": "C6_BOOKKEEPING_SKIP_CI",
-  "c6_bookkeeping_ci_skip": true
+  "c6_bookkeeping_ci_skip": true,
+  "scoreboard_commit": "0916557406d82c20ca90698f8e694b2ef08e451e"
 }
