@@ -2,6 +2,18 @@
 #include "../src/vr/d3d11/native_game_frame_batch.hpp"
 #include <cassert>
 using namespace outrun::vr::dx11::live_game_frame;
+constexpr bool hardware_mrt_slot_boundaries() {
+    if (GameNativeOffscreenPass::valid_mrt_count(0u) ||
+        GameNativeOffscreenPass::valid_mrt_count(5u)) return false;
+    for (std::uint32_t count = 1u; count <= 4u; ++count) {
+        if (!GameNativeOffscreenPass::valid_mrt_count(count)) return false;
+        // Slot zero is the active RT; all actual extra slots fit [1,count).
+        std::uint32_t queried = 0u;
+        for (std::uint32_t i = 1u; i < count; ++i) ++queried;
+        if (queried != count - 1u) return false;
+    }
+    return true;
+}
 constexpr bool game_offscreen_interleave() {
     GameNativeFrameBatch batch{};
     if (!batch.accepts_full_on_source_target(0u, true)) return false;
@@ -41,10 +53,12 @@ constexpr bool unsupported_writes_fallback() {
     return !batch.absorb_empty_source_draw(1u) &&
         !batch.publishable_full(true, 2u);
 }
+static_assert(hardware_mrt_slot_boundaries());
 static_assert(game_offscreen_interleave());
 static_assert(leading_offscreen_then_game());
 static_assert(unsupported_writes_fallback());
 int main() {
+    assert(hardware_mrt_slot_boundaries());
     assert(game_offscreen_interleave());
     assert(leading_offscreen_then_game());
     assert(unsupported_writes_fallback());

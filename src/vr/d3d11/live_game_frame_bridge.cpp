@@ -4813,8 +4813,16 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, const State& s) noexce
         FAILED(target.As(&targetIdentity)) ||
         FAILED(backbuffer.As(&backbufferIdentity)) ||
         !targetIdentity || !backbufferIdentity) return false;
+    // Query only MRT slots the actual D3D9 adapter exposes. Asking for
+    // nonexistent slots returns INVALIDCALL on one/two-target hardware,
+    // previously aborting otherwise isolated menu and vehicle passes.
+    // Unknown or out-of-range caps still fail closed before native admission.
+    D3DCAPS9 caps{};
+    if (FAILED(game->GetDeviceCaps(&caps)) ||
+        !GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs))
+        return false;
     bool noExtraRenderTargets = true;
-    for (DWORD i = 1u; i <= 3u; ++i) {
+    for (DWORD i = 1u; i < caps.NumSimultaneousRTs; ++i) {
         ComPtr<IDirect3DSurface9> extra;
         const HRESULT hr = game->GetRenderTarget(i, extra.GetAddressOf());
         if ((SUCCEEDED(hr) && extra) ||

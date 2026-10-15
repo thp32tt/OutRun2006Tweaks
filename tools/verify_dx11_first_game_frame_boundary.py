@@ -162,7 +162,7 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "env_batch_opt_in());" in code and
             "if (!admitted)" in code and
             "s.frameBatch.must_abort_unsupported(fullMode, multiBatch)" in code and
-            "env_full_game_opt_in(), env_batch_opt_in()))" in code and
+            "s.frameBatch.must_abort_unsupported(fullMode, env_batch_opt_in())" in code and
             'GetEnvironmentVariableW(L"OUTRUN_DX11_FULL_GAME_FRAME"' in code and
             "s.frameBatch.accepts_full_on_source_target(" in code and
             "const bool sameClearedGameTarget = s.clearColor.matches(" in code and

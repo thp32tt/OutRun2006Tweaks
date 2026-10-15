@@ -65,17 +65,33 @@
     "milestone_id": "full_resolution_native_game_frame",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
-      "D3D9_SCISSOR_CLIPPED_DRAW",
-      "EXACT_NATIVE_SOURCE_ORDINAL",
-      "D3D11_DRAW_OR_NO_GPU_SUBMISSION",
-      "SAME_PRESENT_FULL_FRAME",
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_DISJOINT_SCISSOR_DRAW",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
       "D3D9_INPUT_FALLBACK"
     ],
     "visible_frame_acceptance": "Portable C++ and exact-SHA GitHub Windows gates; Quest3/VDXR menu/vehicle/race observation not yet performed.",
     "activation_guard_and_fallback": "Explicit OUTRUN_DX11_FULL_GAME_FRAME opt-in; no change to original D3D9 Draw HRESULT, Present or gamepad. Unsupported states follow ordinary native fail-closed path.",
     "conflict_keys": [
       "DX11:FULL_FRAME_SCISSOR_CLIPPED_SOURCE_CONTINUITY"
-    ]
+    ],
+    "integration_path": [
+      "Observe original D3D9 Draw and DrawIndexed with enabled source scissor and full viewport",
+      "Absorb proved disjoint zero-pixel game source ordinals without fabricated D3D11 draw",
+      "Preserve native full game frame publication while unsupported sources abort into original D3D9 fallback"
+    ],
+    "batch_components": [
+      "Live game D3D9 scissor state and viewport capture integrated into DX11 observer",
+      "Source ordinal batch continuity and no-native-GPU-submit preservation",
+      "Portable positive/negative scissor regression tests and exact-source CI"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Verified disjoint, enabled scissor game Draw/DrawIndexed retains exact ordinals and native full-frame continuity without GPU submission.",
+      "negative_regression": "Intersecting, missing, malformed or unknown scissor source remains subject to ordinary fail-closed native admission and D3D9 Present/gamepad.",
+      "component_integration": "Live D3D9 scissor+viewport through no-op source batch into guarded D3D11 frame publishing and original D3D9 fallback."
+    },
+    "full_gate_plan": "one_validation_bearing_sha"
   },
   "pipeline": {
     "C0_RECOVER": "Authenticated branch latest HEAD, AGENTS.md, DX11_AUTODEV_EXECUTION_POLICY and prior 00763 native alpha/depth changes.",

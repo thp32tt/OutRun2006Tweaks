@@ -20,6 +20,9 @@ def integrated(hook, body):
         'GameNativeOffscreenPass::preserve_transition(' in body and
         'GetRenderState(D3DRS_ZENABLE, &zEnabled)' in body and
         'GetRenderState(D3DRS_STENCILENABLE, &stencilEnabled)' in body and
+        'GetDeviceCaps(&caps)' in body and
+        'GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs)' in body and
+        'for (DWORD i = 1u; i < caps.NumSimultaneousRTs; ++i)' in body and
         'GetRenderTarget(i, extra.GetAddressOf())' in body and
         'GameNativeOffscreenPass::source_has_no_main_writes(' in body and
         'isolated_offscreen_game_draw(game, s)' in normal and
@@ -33,6 +36,8 @@ for original, replacement in (
     ('!outrun::vr::dx11::live_game_frame::preserve_game_target_transition(device)',
      'false /* break RT continuity */'),
     ('GetRenderState(D3DRS_ZENABLE, &zEnabled)', 'GetRenderState(D3DRS_ZWRITEENABLE, &zEnabled)'),
+    ('GetDeviceCaps(&caps)', 'GetDeviceCaps(nullptr)'),
+    ('for (DWORD i = 1u; i < caps.NumSimultaneousRTs; ++i)', 'for (DWORD i = 1u; i <= 3u; ++i)'),
     ('GameNativeOffscreenPass::source_has_no_main_writes(', 'false /* unproved pass */ && GameNativeOffscreenPass::source_has_no_main_writes('),
 ):
     h, b = r9, bridge

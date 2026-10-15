@@ -2,14 +2,14 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00765",
   "production_id": "CONVERSION-DX11-00765",
-  "event_id": "CONVERSION-DX11-00765-E001",
-  "event_type": "dispatch",
-  "attempt": 1,
+  "event_id": "CONVERSION-DX11-00765-E003",
+  "event_type": "retry",
+  "attempt": 2,
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "AI2-ChatGPT2",
-  "work_key": "DX11:FULL_GAME_OFFSCREEN_RT_CONTINUITY",
-  "feature_id": "DX11-FULL_GAME_OFFSCREEN_RT_CONTINUITY",
+  "work_key": "DX11:FULL_FRAME_OFFSCREEN_RT_CONTINUITY",
+  "feature_id": "DX11-FULL_FRAME_OFFSCREEN_RT_CONTINUITY",
   "status": "BUILD_VALIDATION_PENDING",
   "checkpoint": "C3_VALIDATE",
   "automation_validation": "PENDING_EXACT_SHA",
@@ -18,97 +18,94 @@
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
-  "base_head_sha": "1195efdd51d7a219717444871f7cbdf2c7967c67",
-  "source_implementation_sha": "886bbe6292a256752abbd313bf9d3d7e90e5b171",
-  "material_result_sha": "886bbe6292a256752abbd313bf9d3d7e90e5b171",
+  "base_head_sha": "f598860980a19e7fcb03cf8001e162fce6350800",
+  "source_implementation_sha": "f598860980a19e7fcb03cf8001e162fce6350800",
+  "material_result_sha": "f598860980a19e7fcb03cf8001e162fce6350800",
   "validation_bearing_result_sha": null,
   "changed_files": [
-    "src/vr/d3d11/native_game_offscreen_pass.hpp",
     "src/vr/d3d11/live_game_frame_bridge.cpp",
-    "src/vr/d3d11/live_game_frame_bridge.hpp",
-    "src/vr/d3d9/stereo_renderer.cpp",
+    "src/vr/d3d11/native_game_offscreen_pass.hpp",
     "tools/dx11_game_offscreen_pass_00765.cpp",
     "tools/test_dx11_game_offscreen_pass_00765.py",
-    ".github/workflows/dx11-fast-structural.yml",
-    "tools/verify_dx11_first_game_frame_boundary.py"
+    "tools/verify_dx11_first_game_frame_boundary.py",
+    "docs/automation/runs/CONVERSION-DX11-00764.json"
   ],
-  "change_summary": "Integrate actual menu/vehicle auxiliary render-target transitions and depth/stencil/MRT-isolated offscreen Draw/DrawIndexed and missing-CPU-shadow ordinals with native full-resolution same-Present game output while retaining original D3D9 gamepad and unsupported-state fallback.",
+  "change_summary": "Continue real menu/vehicle render-to-texture game Draw source continuity: honor actual D3D9 NumSimultaneousRTs for MRT probes, rejecting caps ambiguity; correct strict source-graph acceptance for the established fail-closed unsupported-draw path, retain exact native full-frame source and D3D9 fallback.",
   "feature_contract": {
-    "feature_id": "DX11-FULL_GAME_OFFSCREEN_RT_CONTINUITY",
-    "goal": "Preserve one correctly ordered full-resolution native game frame across verified D3D9 offscreen render-to-texture passes between real menu, vehicle selection and race Draw/DrawIndexed, including safe original D3D9 fallback.",
+    "feature_id": "DX11-FULL_FRAME_OFFSCREEN_RT_CONTINUITY",
+    "goal": "Preserve full-resolution native menu/vehicle/race game Draw and DrawIndexed frame continuity through actual isolated offscreen render-to-texture work without overriding original DX9Ex output or controller input.",
     "acceptance_items": [
       {
-        "id": "game-offscreen-rt-real-ordinal",
+        "id": "game-offscreen-source-native-continuity",
         "category": "end_to_end_behavior",
-        "behavior_area": "d3d9_rt0_hook_and_native_game_draw_indexed",
-        "expected_behavior": "Verified auxiliary RT0 transition plus color-only Z/stencil-disabled Draw and missing shadow consume exact source ordinal without corrupting native backbuffer; resumed real game Draw persists same-Present full frame."
+        "behavior_area": "D3D9_live_game_RT0_MRT_to_D3D11_Draw_frame",
+        "expected_behavior": "Interleaved game-created offscreen Draws retain exact source ordinals on adapters exposing one to four valid MRT slots."
       },
       {
-        "id": "unproved-offscreen-original-gamepad",
+        "id": "offscreen-depth-mrt-fail-closed",
         "category": "fallback_regression",
-        "behavior_area": "native_frame_fail_closed_and_gamepad_input",
-        "expected_behavior": "Foreign owner, missing clear, MRT, depth/stencil writes, failed COM queries or unsupported main-game states abort only native output; game D3D9 HRESULT, Present and controller input unchanged."
+        "behavior_area": "D3D9_original_Present_gamepad_fallback",
+        "expected_behavior": "Unknown caps, bound extra MRT, depth or stencil, unsupported main Draw, foreign/failed source all reject silent native publication while game input survives."
       },
       {
-        "id": "five-workflows-exact-sha",
+        "id": "same-sha-five-actions",
         "category": "integrated_validation",
-        "behavior_area": "github_dx11_fast_backend_windows_openxr_hud",
-        "expected_behavior": "A single validation-bearing material source/test commit passes all mandatory DX11 Fast, Backend, Win32 Build, OpenXR and HUD inspector jobs; HMD remains untested."
+        "behavior_area": "GitHub_DX11_Fast_Backend_Build_OpenXR_HUD",
+        "expected_behavior": "All mandatory workflows finish success for one exact source-bearing result SHA; actual Quest3 and VDXR game evidence is separate."
       }
     ]
   },
   "acceptance_results": {
-    "game-offscreen-rt-real-ordinal": "PENDING",
-    "unproved-offscreen-original-gamepad": "PENDING",
-    "five-workflows-exact-sha": "PENDING"
+    "game-offscreen-source-native-continuity": "PENDING",
+    "offscreen-depth-mrt-fail-closed": "PENDING",
+    "same-sha-five-actions": "PENDING"
   },
   "development_strategy": {
     "work_class": "integration",
     "milestone_id": "full_resolution_native_game_frame",
     "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
     "live_game_draw_path": [
-      "LIVE_D3D9_RT0_SWITCH",
-      "ISOLATED_OFFSCREEN_DRAW_OR_INDEXED",
-      "EXACT_SOURCE_ORDINAL",
-      "MAIN_BACKBUFFER_NATIVE_DRAW_OR_INDEXED",
-      "SAME_PRESENT_FULL_FRAME",
-      "D3D9_GAMEPAD_FALLBACK"
+      "LIVE_D3D9_CALLSITE",
+      "D3D9_R9_OFFSCREEN_RT_DRAW",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "DX9EX_INPUT_FALLBACK"
     ],
-    "visible_frame_acceptance": "Real game Draw ordinal/RT continuation plus same-Present native publication and exact SHA compilation, distinct from unperformed Quest3/VDXR game/HMD observation.",
-    "activation_guard_and_fallback": "Requires explicit OUTRUN_DX11_FIRST_GAME_FRAME and OUTRUN_DX11_FULL_GAME_FRAME opt-in; unknown states abort native publication without replacing D3D9 drawing, Present or gamepad.",
+    "visible_frame_acceptance": "Exact game Draw ordinals and live RT switch integrated with full-screen D3D11 frame bridge; Quest3/VDXR parity is untested.",
+    "activation_guard_and_fallback": "Exact OUTRUN_DX11_FIRST_GAME_FRAME and OUTRUN_DX11_FULL_GAME_FRAME opt-in; unsupported/caps-missing sources abort native publication without changing real D3D9 Draw/Present/controller.",
     "integration_path": [
-      "R9 RT0 COM-identity checked render-target lifecycle",
-      "Live menu/vehicle offscreen Draw/DrawIndexed and unavailable VB/IB shadow isolated against main backbuffer Z/stencil/MRT",
-      "Source ordinal continuity into native full-resolution game backbuffer Draw and same-Present publication",
-      "Original D3D9 Draw/Present/controller fallback when any proof fails"
+      "Real successful D3D9 Draw/DrawIndexed and R9 RT0 transition with adapter-supported MRT binding checks",
+      "Guarded source ordinal absorption for truly isolated texture-only game Draw, native D3D11 backbuffer Draw retained",
+      "Same Present full-resolution native output and fail-closed D3D9/input fallback"
     ],
     "batch_components": [
-      "Real R9 SetRenderTarget hook and authoritative D3D9 Clear-based source owner",
-      "C++ native full game Draw/DrawIndexed and unavailable shadow ordinal accounting",
-      "Native no-main-write admission plus standalone C++ and destructive Python regression probes",
-      "Exact-SHA Win32/OpenXR/HUD/Backend/Fast mandatory Actions integration"
+      "Live D3D9 adapter MRT capability queried in native game Draw observer with bounded no-extra-RT checks",
+      "Portable C++ slot-boundary admission and destructive Python source regression plus source graph invariant",
+      "Existing live game R9 RT transition/native batch and exact-SHA Fast/Backend/Windows/OpenXR/HUD suite"
     ],
     "acceptance_proof": {
-      "positive_probe": "Portable C++ tests real-main/offscreen/main full-game source ordinal continuity and leading offscreen Draw, plus mandatory GitHub Windows build.",
-      "negative_regression": "Depth, stencil, extra MRT, foreign target owner, absent whole Clear, stopped frame and failed original D3D9 Draw remain fail-closed while gamepad unaffected.",
-      "component_integration": "R9 SetRenderTarget callback -> real D3D9 offscreen Draw/Indexed capture or unavailable shadow -> source order -> main native D3D11 Draw/Indexed -> guarded same-Present backbuffer."
+      "positive_probe": "C++ static_assert and runtime asserts: MRT counts 1..4 accepted and isolated live game offscreen draw exact ordinal preserved.",
+      "negative_regression": "Zero/overflow MRT count, occupied MRT, enabled depth/stencil and unsupported backbuffer writes continue abort/fallback; destructively mutate cap or slot loop.",
+      "component_integration": "Real R9 game D3D9 GetDeviceCaps+GetRenderTarget -> offscreen source-only draw accounting -> subsequent native D3D11 Draw/DrawIndexed -> full frame guarded Present."
     },
     "conflict_keys": [
-      "DX11:FULL_GAME_OFFSCREEN_RT_CONTINUITY"
+      "DX11:FULL_FRAME_OFFSCREEN_RT_CONTINUITY"
     ],
     "full_gate_plan": "one_validation_bearing_sha"
   },
   "pipeline": {
-    "C0_RECOVER": "Branch 1195efdd was the verified 00764 C6 HEAD; no active overlapping RT0 or offscreen work owner in recent commits.",
-    "C1_REVIEW": "R9 SetRenderTargetDestR9 aborted native frame on all RT0 changes even though bridge already preserves color-only offscreen Clears, preventing menu and vehicle render-to-texture continuity.",
-    "C2_IMPLEMENT": "R9 RT transition bridge + isolated color-only offscreen game Draw/Indexed and unavailable-shadow ordinal consumers, fail-closed on unsafe states; portable C++ and Python integration tests.",
-    "C3_VALIDATE": "Exact validation-bearing SHA mandatory workflows executing; first material SHA failed preexisting 00764 latest-record gate and overly coupled submit regex, same task causal repair applied.",
-    "C4_COMMIT": "Material source SHA 886bbe6292a256752abbd313bf9d3d7e90e5b171; validation-bearing repair SHA pending.",
-    "C5_PACKAGE": "NOT_REQUIRED until actual Quest3/VDXR candidate.",
-    "C6_STATE": "PENDING_EXACT_SHA"
+    "C0_RECOVER": "Existing 00765 material SHA 886bbe and failing Backend 38710874591, DX11 Fast 38710874569, Build 38710881512.",
+    "C1_REVIEW": "Backend/Fast rejected historical 00764 incomplete strategy; Build rejected obsolete source-text assertion; actual D3D9 MRT probe over-queries adapters with fewer than four RT slots.",
+    "C2_IMPLEMENT": "Full game offscreen Draw checks query actual caps slot range, portable MRT test matrix; restore 00764 strategy contract and native bridge fail-closed source-graph acceptance.",
+    "C3_VALIDATE": "New exact-SHA five-workflow CI pending; local HMD/game not exercised.",
+    "C4_COMMIT": "Existing 00765 material commit plus current integrated C++ repair awaiting SHA.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "AWAIT_EXACT_SHA"
   },
   "evidence": {
+    "failure_run_id": 38710874591,
+    "failure_code": "00764 missing strategy; stale bounded activation string",
     "runtime_validation": "UNTESTED",
-    "source_only_limit": "No real Quest3/VDXR or hardware gamepad exercise. Native full-game opt-in remains diagnostic, not promoted."
+    "source_only_limit": "No actual Quest3/VDXR, in-game menu/vehicle/race or gamepad test performed."
   }
 }
