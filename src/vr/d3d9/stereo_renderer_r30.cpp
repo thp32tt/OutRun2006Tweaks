@@ -20,6 +20,7 @@
 // Needed by independent R30 TU as well as textual R29/R30 owner.
 #include "r30_indexed_up_bounds.hpp"
 #include "r30_shadow_bytes.hpp"
+#include "r30_shadow_scratch.hpp"
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
 #include "../game/render_semantics.hpp"
@@ -307,8 +308,10 @@ namespace OutRunVRStereo
             R30ShadowCopyCache indexCopy;
             R30IndexDecodeCache indexDecode;
             R30XyzrhwDepthSignatureCache depthSignature;
-            std::vector<std::uint8_t> source;
-            std::vector<std::uint8_t> indexSource;
+            // Port R26+HUD's 00873 write-only scratch to the R84 chain.
+            // Revision and covered-byte checks still gate every shadow copy.
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch source;
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch indexSource;
             std::vector<std::uint8_t> left;
             std::vector<std::uint8_t> right;
             std::vector<std::uint8_t> used;
@@ -599,7 +602,7 @@ namespace OutRunVRStereo
         // a second write generation or a different buffer/span.
         bool R30TryIncrementalShadowCopy(
             const R30ShadowPtr& entry, UINT offset, UINT size,
-            std::vector<std::uint8_t>& out,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out,
             R30ShadowCopyCache& cache) noexcept
         {
             if (cache.entry != entry ||
@@ -627,7 +630,8 @@ namespace OutRunVRStereo
         }
 
         bool R30CopyVertexShadow(const R30ShadowPtr& entry,
-            UINT offset, UINT size, std::vector<std::uint8_t>& out,
+            UINT offset, UINT size,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out,
             R30ShadowCopyCache& cache)
         {
             if (!entry)
@@ -693,7 +697,8 @@ namespace OutRunVRStereo
         }
 
         bool R30CopyIndexShadow(const R30ShadowPtr& entry,
-            UINT offset, UINT size, std::vector<std::uint8_t>& out,
+            UINT offset, UINT size,
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out,
             R30ShadowCopyCache& cache)
         {
             if (!entry)
