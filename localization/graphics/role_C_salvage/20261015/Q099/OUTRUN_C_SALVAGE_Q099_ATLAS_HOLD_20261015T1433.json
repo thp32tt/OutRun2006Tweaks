@@ -1,0 +1,221 @@
+{
+  "schema": "outrun-c-salvage-q099-atlas-hold-v1",
+  "task_id": "OUTRUN-C-SALVAGE-Q099-ATLAS-20261015-1433",
+  "Q_ID": "Q099",
+  "source_texture": "4F68708E",
+  "status": "HOLD_GENERATED_CLIPPING_GLYPH_MASK_UNREVIEWED_CANONICAL_DDS_MISSING",
+  "source_tile": {
+    "filename": "Q099_4F68708E_BASE_READABLE_FLIPY__r01c01__x0_y0__683x256.png",
+    "sha256": "3d8f7e465a518ce7e5f9f075eb6ca3edc8af375fe8e133d9db2629d10d536f14",
+    "width": 683,
+    "height": 256,
+    "transparent_fraction": 0.882795
+  },
+  "source_atlas": {
+    "path": "/home/chatgpt-runner2/work/c-salvage-q099-isolated-20261015-1433/output/atlases/Q099_4F68708E_BASE_READABLE_FLIPY--6ca5f64a4116/source_reassembled_readable.png",
+    "sha256": "fecfe3ba00658e64acec228482dbd2dcd68c885efbc069edd42607d8f7ff3bd0",
+    "size": [
+      2048,
+      256
+    ],
+    "tile_coverage": "FULL_3_TILE_SHA_VERIFIED",
+    "source_full_png_expected_sha256": "754a5bcfc564b73a02ee640c580cb65f7af48831466d34240e8a183f6e6a91f9",
+    "source_full_png_staged": false
+  },
+  "source_dds": {
+    "expected_repository_path": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "sha256": null,
+    "status": "NOT_STAGED_N100_AND_GITHUB_EXACT_PATH_404",
+    "format": null,
+    "mip_count": null
+  },
+  "generated_korean": {
+    "filename": "Q099_4F68708E_BASE_READABLE_FLIPY__r01c01__x0_y0__683x256_k.png",
+    "sha256": "c43cb5d0dd95fcefe361fb5f7bd4438ab52706072d9cb505ddeee449746a3463",
+    "width": 2048,
+    "height": 768,
+    "high_alpha_pixel_fraction_ge_240": 0.045599,
+    "visible_alpha_fraction": 0.128684,
+    "maximum_alpha": 254,
+    "near_white_last_column_pixels": 165,
+    "near_white_last_8_columns_pixels": 1004,
+    "visual_review": "KOREAN_LETTERS_AND_BLUE_EFFECT_CROPPED_BY_RIGHT_CANVAS_EDGE; full-scene output not pure glyph alpha"
+  },
+  "generated_text_mask": {
+    "path": null,
+    "sha256": null,
+    "status": "NO_EXPLICIT_GLYPH_MASK_ALPHA_NOT_CLASSIFIED"
+  },
+  "psd": {
+    "sha256": "b16da54d9aee12014b7e732cb345b27410f964332fd575a86597b2d65d7906ba",
+    "pinned_upstream_git_blob": "2438e4cfd3e370ca3fe0b9fda4502484941b9cc7",
+    "upstream_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+    "header": {
+      "signature": "8BPS",
+      "version": 1,
+      "channels": 4,
+      "height": 256,
+      "width": 2048,
+      "depth": 8,
+      "color_mode": 3
+    },
+    "layers_unreviewed": [
+      {
+        "index_unreviewed": 0,
+        "name": "Decompressed Image",
+        "bbox": [
+          516,
+          32,
+          1608,
+          216
+        ],
+        "opacity": 255,
+        "blend": "norm",
+        "flags": 10
+      },
+      {
+        "index_unreviewed": 1,
+        "name": "◊È 1 øΩ±¥",
+        "bbox": [
+          514,
+          37,
+          1614,
+          217
+        ],
+        "opacity": 255,
+        "blend": "norm",
+        "flags": 40
+      },
+      {
+        "index_unreviewed": 2,
+        "name": "</Layer group>",
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "opacity": 255,
+        "blend": "norm",
+        "flags": 24
+      },
+      {
+        "index_unreviewed": 3,
+        "name": "Drive against the Ghost Car",
+        "bbox": [
+          547,
+          51,
+          1340,
+          117
+        ],
+        "opacity": 255,
+        "blend": "norm",
+        "flags": 40
+      },
+      {
+        "index_unreviewed": 4,
+        "name": "and challenge for the course re",
+        "bbox": [
+          527,
+          137,
+          1601,
+          203
+        ],
+        "opacity": 255,
+        "blend": "norm",
+        "flags": 40
+      },
+      {
+        "index_unreviewed": 5,
+        "name": "◊È 1",
+        "bbox": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "opacity": 255,
+        "blend": "norm",
+        "flags": 24
+      }
+    ],
+    "layer_approved": false,
+    "psd_tools_inventory_status": "BLOCKED_N100_PSD_TOOLS_NOT_INSTALLED"
+  },
+  "korean_layer_sha256": null,
+  "clean_candidate_sha256": null,
+  "composite_sha256": null,
+  "DDS_test_sha256": null,
+  "qa": {
+    "reassembly": "PASS_TEST_ONLY",
+    "source_DDS_exact_match": "UNTESTED",
+    "generated_text_clipping": "FAIL",
+    "generated_mask": "HOLD",
+    "PSD_English_layer_classification": "UNTESTED",
+    "protect_icons": "UNTESTED",
+    "original_slope_alignment": "UNTESTED",
+    "overlap": "UNTESTED",
+    "generated_alpha": "TRANSPARENT_PARTIAL_BUT_KOREAN_TEXT_CLIPPED_NOT_USABLE",
+    "native_atlas_composite": "NOT_ATTEMPTED",
+    "DDS_encode": "NOT_ATTEMPTED"
+  },
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "promotion": false,
+  "next": "Provide exact canonical DDS SHA/bytes; manually select validated Korean glyph-only layer without clipping; classify PSD English layers and compare native-aligned PSD against DDS before CLEAN",
+  "A_B_state_modified": false,
+  "reassembly_manifest": {
+    "schema": "outrun-c-source-atlas-reassembly-v1",
+    "status": "REASSEMBLED_READABLE_SOURCE_TEST_ONLY_DDS_NOT_VERIFIED",
+    "original_full_png_comparison": "REFERENCE_FULL_PNG_NOT_STAGED",
+    "source_png": "Q099_4F68708E_BASE_READABLE_FLIPY.png",
+    "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/4F68708E_512x64.dds",
+    "source_png_sha256_declared": "754a5bcfc564b73a02ee640c580cb65f7af48831466d34240e8a183f6e6a91f9",
+    "orientation": "FLIP_Y_PREVIEW_PER_SPRITE_VERIFY",
+    "source_size": [
+      2048,
+      256
+    ],
+    "tile_count": 3,
+    "tiles": [
+      {
+        "tile": "Q099_4F68708E_BASE_READABLE_FLIPY__r01c01__x0_y0__683x256.png",
+        "tile_sha256": "3d8f7e465a518ce7e5f9f075eb6ca3edc8af375fe8e133d9db2629d10d536f14",
+        "bbox": [
+          0,
+          0,
+          683,
+          256
+        ]
+      },
+      {
+        "tile": "Q099_4F68708E_BASE_READABLE_FLIPY__r01c02__x683_y0__682x256.png",
+        "tile_sha256": "100f4310ba166c5d7723a8e2cacfe876ff403eef76fe7777e0d834bc455421f4",
+        "bbox": [
+          683,
+          0,
+          1365,
+          256
+        ]
+      },
+      {
+        "tile": "Q099_4F68708E_BASE_READABLE_FLIPY__r01c03__x1365_y0__683x256.png",
+        "tile_sha256": "878cbe036ce33d546c0c49a06873de4c838fa1114dd5808d3bcdec02710a9adb",
+        "bbox": [
+          1365,
+          0,
+          2048,
+          256
+        ]
+      }
+    ],
+    "output_sha256": "fecfe3ba00658e64acec228482dbd2dcd68c885efbc069edd42607d8f7ff3bd0",
+    "C1": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED",
+    "DDS_EQUIVALENCE": "UNVERIFIED"
+  },
+  "source_evidence_host": "N100 isolated workspace: work/c-salvage-q099-isolated-20261015-1433/output/",
+  "evidence_policy": "TEST_ONLY/HOLD ONLY; no binary promotion, no A/B changes"
+}
