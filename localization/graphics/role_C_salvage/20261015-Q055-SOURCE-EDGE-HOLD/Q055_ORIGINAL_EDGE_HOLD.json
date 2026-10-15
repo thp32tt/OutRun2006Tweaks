@@ -1,0 +1,29 @@
+{
+  "schema": "out-run-original-text-boundary-check-v1",
+  "asset": "Q055",
+  "english": "NEXT ROUND",
+  "korean": "다음 라운드",
+  "source_kind": "DIRECT_UPSTREAM_PC_ORIGINAL_NON_HD",
+  "upstream_commit": "3ce344e7ed6b1b535f5e4d34c1192071ff7afbe6",
+  "upstream_path": "Original (PC)/Original (Tweaks dumps)/spr_sprani_game_cvt_Exst/2EA557B4_512x64.dds",
+  "source_dds_sha256": "076519d7d713d2485b0190d51fc5c1a8304be91d5288d5ca39831bf4878ac9b5",
+  "source_readable_png_sha256": "fdc828f4b1b259544a0e827f36b100f902c2a0d84f17b16a17185967aea82f2e",
+  "dds_dimensions": [
+    512,
+    64
+  ],
+  "alpha_bbox_xyxy": [
+    3,
+    28,
+    301,
+    64
+  ],
+  "visible_on_bottom_edge": 68,
+  "visible_on_top_edge": 0,
+  "vertical_margin_required_pixels": 2,
+  "crop_status": "HOLD_TEXT_EFFECT_TOUCHES_SOURCE_BOTTOM_EDGE_NO_RESCUE_BY_PADDING",
+  "source_hd_dds_equivalence": "UNVERIFIED",
+  "output_imagegen_approved": false,
+  "notes": "Adding blank canvas cannot restore potentially clipped source strokes. Do not treat the upstream low-res source as the canonical HD 2048x256 PNG.",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
