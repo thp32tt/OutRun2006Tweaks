@@ -172,7 +172,13 @@ def _prompt(role, batch_id, tiles, translations):
     return prompt
 
 def next_binding(role, root="/data/imagegen"):
-    """Make one immutable batch reservation per role. No implicit retry of sent work."""
+    """Delegate new HD text ROI queue; keep legacy source tiles retired."""
+    if os.getenv("OUTRUN_AB_TEXT_ROI_QUEUE", "false").lower() == "true":
+        try:
+            from app.text_roi_queue import next_binding as roi_next
+        except ModuleNotFoundError:
+            from text_roi_queue import next_binding as roi_next
+        return roi_next(role, root)
     # 2026-10-15 USER OVERRIDE: equal-width/equal-height source tiles can cut
     # across English letters. The 986-tile generator is now retired. Never
     # stage or resend an old tile as a new A/B ImageGen input; preserve active
@@ -262,6 +268,12 @@ def next_binding(role, root="/data/imagegen"):
         return None, "AB_QUEUE_INPUT_ERROR:" + str(exc)[:150]
 
 def stage_submission(role, task_id, root="/data/imagegen"):
+    if os.getenv("OUTRUN_AB_TEXT_ROI_QUEUE", "false").lower() == "true":
+        try:
+            from app.text_roi_queue import stage_submission as roi_stage
+        except ModuleNotFoundError:
+            from text_roi_queue import stage_submission as roi_stage
+        return roi_stage(role, task_id, root)
     root = Path(root)
     st = _state(root, role)
     active = st["active"]
@@ -275,6 +287,12 @@ def stage_submission(role, task_id, root="/data/imagegen"):
     return "SUBMITTING"
 
 def record_chat_url(role, task_id, url, root="/data/imagegen"):
+    if os.getenv("OUTRUN_AB_TEXT_ROI_QUEUE", "false").lower() == "true":
+        try:
+            from app.text_roi_queue import record_chat_url as roi_record
+        except ModuleNotFoundError:
+            from text_roi_queue import record_chat_url as roi_record
+        return roi_record(role, task_id, url, root)
     if not re.fullmatch(r"https://chatgpt\.com/(?:g/[^?#]+/)?c/[a-zA-Z0-9-]+",url):
         return "CHAT_URL_UNVERIFIED"
     st = _state(root,role)
@@ -433,6 +451,12 @@ async def export_unapproved_k_candidates(page, active, root):
 
 
 async def inspect_slot(role, page, root="/data/imagegen"):
+    if os.getenv("OUTRUN_AB_TEXT_ROI_QUEUE", "false").lower() == "true":
+        try:
+            from app.text_roi_queue import inspect_slot as roi_inspect
+        except ModuleNotFoundError:
+            from text_roi_queue import inspect_slot as roi_inspect
+        return await roi_inspect(role, page, root)
     """Probe only previous active batch; never resend or open a fresh chat here.
 
     Result is (can_start_new_batch, status). Library save must be positively
