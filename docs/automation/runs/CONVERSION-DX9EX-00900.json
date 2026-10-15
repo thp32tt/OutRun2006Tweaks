@@ -2,24 +2,24 @@
   "schema": 2,
   "task_id": "CONVERSION-DX9EX-00900",
   "production_id": "CONVERSION-DX9EX-00900",
-  "event_id": "CONVERSION-DX9EX-00900-E001",
-  "event_type": "dispatch",
-  "attempt": "1/3",
+  "event_id": "CONVERSION-DX9EX-00900-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
   "run_key": "CONVERSION-DX9EX-00900",
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
   "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "C5_VALIDATING",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "58453945bafb272651393c5745c009ca8633b5ce",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "a59b375cc081c23afcc0163b3f49e8dd40492724",
+  "validation_bearing_result_sha": "288c53a381168f50f00efc497c9d00021714707f",
   "source_paths": [
     "src/hooks_textures.cpp",
     "src/vr/game/texture_pack_cursor.hpp"
@@ -68,9 +68,9 @@
     ]
   },
   "acceptance_results": {
-    "vehicle_select_indexed_dds_owner": "SOURCE_PENDING_CI",
-    "native_texture_rollback_unchanged": "SOURCE_PENDING_CI",
-    "exact_sha_win32_r84": "PENDING_CI"
+    "vehicle_select_indexed_dds_owner": "PASS_EXACT_SHA",
+    "native_texture_rollback_unchanged": "PASS_EXACT_SHA",
+    "exact_sha_win32_r84": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "LoadXstsetSprite_dest and LoadXmtsetObject_dest both reset one shared CurrentTextureIdx; HandleTexture increments it regardless of isUITexture; scene PrevXmtName compares two char* addresses, not path content. XMT index belongs to objects, XST eax is an xstset slot.",
@@ -82,8 +82,38 @@
     "negative_test_evidence": "Five source contract mutations cover shared-index leak, scene object-index reset, UI slot alias, pointer identity and off-by-one ordinal reset.",
     "eye_ownership": "Texture binding remains original game D3D9; R84 stereo render path unchanged."
   },
-  "runtime_evidence": "No Quest3/VDXR test.",
+  "runtime_evidence": "No Quest3/VDXR real game session; source+CI only.",
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "AWAIT_EXACT_SHA_CI"
+  "hold_reason": "NEED_HMD_TEST",
+  "ci_evidence": {
+    "active_validation": {
+      "run_id": 38742909911,
+      "conclusion": "success",
+      "sha": "288c53a381168f50f00efc497c9d00021714707f"
+    },
+    "domain_isolation": {
+      "run_id": 38742909960,
+      "conclusion": "success",
+      "sha": "288c53a381168f50f00efc497c9d00021714707f"
+    },
+    "hud_inspector": {
+      "run_id": 38742416530,
+      "conclusion": "success",
+      "sha": "a59b375cc081c23afcc0163b3f49e8dd40492724",
+      "note": "previous same functional C++ source; not rerun on validation-bearing SHA"
+    },
+    "full_source_impact": {
+      "run_id": 38742416686,
+      "conclusion": "success",
+      "sha": "a59b375cc081c23afcc0163b3f49e8dd40492724",
+      "note": "previous same functional C++ source; not rerun on validation-bearing SHA"
+    },
+    "failed_ci_fixed": {
+      "run_id": 38742416616,
+      "conclusion": "failure",
+      "reason": "mutation 5 targeted member initialization instead of pack-switch ordinal reset",
+      "repair_sha": "288c53a381168f50f00efc497c9d00021714707f"
+    }
+  }
 }
