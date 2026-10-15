@@ -1014,22 +1014,6 @@ struct ReadbackSlot {
     bool completeFullFrame = false;
     GameReadbackProvenance provenance{};
 };
-// GPU-only per-stage scratch ownership. Source D3D9 pixels are re-read each Draw.
-// Stage 0 and stage 1 cannot overwrite one another before a shared Draw.
-struct NativeGameTextureScratch {
-    ComPtr<ID3D11Texture2D> texture;
-    ComPtr<ID3D11ShaderResourceView> view;
-    UINT width = 0u, height = 0u, levels = 0u;
-    DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
-    [[nodiscard]] bool matches(UINT w, UINT h, UINT mips, DXGI_FORMAT fmt) const noexcept {
-        return texture && view && width == w && height == h && levels == mips && format == fmt;
-    }
-    void reset() noexcept {
-        texture.Reset(); view.Reset();
-        width = height = levels = 0u;
-        format = DXGI_FORMAT_UNKNOWN;
-    }
-};
 struct State {
     std::mutex mutex;
     // Non-owning identity only: reset at every Present/Reset. Never retain a
@@ -1039,8 +1023,12 @@ struct State {
     GameNativeClearColor clearColor{};
     std::uint64_t outputGeneration = 0u;
     NativeBackend backend;
-    // No cached D3D9 COM object; reused D3D11 allocations are source-neutral.
-    std::array<NativeGameTextureScratch, 2> liveTextureSlots{};
+    // Persistent native D3D11 upload buffers for a whole real game frame.
+    // Re-upload every Draw to preserve game-authored mutable VB/IB content.
+    ComPtr<ID3D11Buffer> fullGameVertexUpload;
+    ComPtr<ID3D11Buffer> fullGameIndexUpload;
+    UINT fullGameVertexCapacity = 0u;
+    UINT fullGameIndexCapacity = 0u;
     UINT nativeWidth = 0u, nativeHeight = 0u;
     // Diagnostic-only depth is never shared with the original D3D9 renderer.
     ComPtr<ID3D11Texture2D> diagnosticDepth;
@@ -1508,7 +1496,10 @@ bool ensure_pipeline(State& s, UINT width, UINT height) noexcept {
     for (auto& depthState : s.diagnosticDepthAlwaysStates) depthState.Reset();
     for (auto& depthState : s.diagnosticDepthEqualityStates) depthState.Reset();
     for (auto& depthState : s.diagnosticDepthOrderingStates) depthState.Reset();
-    for (auto& slot : s.liveTextureSlots) slot.reset();
+    // These buffers are owned by the exact D3D11 device generation.
+    s.fullGameVertexUpload.Reset();
+    s.fullGameIndexUpload.Reset();
+    s.fullGameVertexCapacity = s.fullGameIndexCapacity = 0u;
     s.backend.shutdown();
     s.nativeWidth = s.nativeHeight = 0u;
     s.vs.Reset(); s.ps.Reset(); s.sampledPs.Reset();
@@ -3571,11 +3562,10 @@ bool create_game_sampler(ID3D11Device* dev, const TextureCapture& capture,
     return SUCCEEDED(dev->CreateSamplerState(&state, sampler.GetAddressOf()));
 }
 
-bool mirror_texture(ID3D11Device* dev, ID3D11DeviceContext* ctx,
-                    NativeGameTextureScratch& scratch, const TextureCapture& capture,
+bool mirror_texture(ID3D11Device* dev, const TextureCapture& capture,
                     ComPtr<ID3D11ShaderResourceView>& view,
                     ComPtr<ID3D11SamplerState>& sampler) noexcept {
-    if (!dev || !ctx || !capture.enabled || !capture.texture) return false;
+    if (!dev || !capture.enabled || !capture.texture) return false;
     const UINT sourceLevels = capture.texture->GetLevelCount();
     // A complete 2048x2048 menu/vehicle atlas has twelve mip levels.
     if (sourceLevels == 0 || sourceLevels > 12u) return false;
@@ -3952,44 +3942,53 @@ bool mirror_texture(ID3D11Device* dev, ID3D11DeviceContext* ctx,
         if (FAILED(unlockResult)) return false;
         if (!readable) return false;
     }
+    std::vector<D3D11_SUBRESOURCE_DATA> initial(levels);
+    for (UINT level = 0; level < levels; ++level) {
+        initial[level].pSysMem = copied[level].data();
+        initial[level].SysMemPitch = pitches[level];
+    }
     D3D11_TEXTURE2D_DESC desc{};
     desc.Width = base.Width; desc.Height = base.Height;
     desc.MipLevels = levels; desc.ArraySize = 1;
     desc.Format = nativeFormat;
     desc.SampleDesc.Count = 1;
-    // Keep GPU allocations resident but NEVER reuse source contents. A game
-    // texture may be modified between any two Draw/DrawIndexed submissions.
-    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.Usage = D3D11_USAGE_IMMUTABLE;
     desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    ComPtr<ID3D11Texture2D> candidate;
-    ComPtr<ID3D11ShaderResourceView> candidateView;
-    const bool reuse = scratch.matches(desc.Width, desc.Height,
-                                       desc.MipLevels, desc.Format);
-    ID3D11Texture2D* target = scratch.texture.Get();
-    if (!reuse) {
-        if (FAILED(dev->CreateTexture2D(&desc, nullptr, candidate.GetAddressOf())) ||
-            FAILED(dev->CreateShaderResourceView(candidate.Get(), nullptr,
-                                                candidateView.GetAddressOf())))
-            return false;
-        target = candidate.Get();
-    }
-    // UpdateSubresource on the immediate context is ordered before Draw.
-    // Stage 0 and stage 1 have independent targets for the same draw.
-    for (UINT level = 0; level < levels; ++level)
-        ctx->UpdateSubresource(target, level, nullptr, copied[level].data(),
-                               pitches[level], 0u);
-    if (FAILED(dev->GetDeviceRemovedReason())) return false;
-    // Do not replace the prior resource until the replacement is fully ready.
-    if (!reuse) {
-        scratch.texture = std::move(candidate);
-        scratch.view = std::move(candidateView);
-        scratch.width = desc.Width;
-        scratch.height = desc.Height;
-        scratch.levels = desc.MipLevels;
-        scratch.format = desc.Format;
-    }
-    view = scratch.view;
+    ComPtr<ID3D11Texture2D> texture;
+    if (FAILED(dev->CreateTexture2D(&desc, initial.data(), texture.GetAddressOf())) ||
+        FAILED(dev->CreateShaderResourceView(texture.Get(), nullptr, view.GetAddressOf())))
+        return false;
     return create_game_sampler(dev, capture, levels, sampler);
+}
+
+// Reuse geometric growth buffers for the thousands of game-owned VB/IB
+// Draws in native full-frame mode. Uploads are submitted on the SAME
+// immediate context, preserving each Draw's source content and ordering.
+// Never retain a D3D9 COM reference or assume that game vertices are static.
+bool ensure_full_game_upload_buffer(ID3D11Device* dev,
+                                    ComPtr<ID3D11Buffer>& resource,
+                                    UINT& capacity, UINT required,
+                                    UINT bindFlags) noexcept {
+    if (!dev || required == 0u ||
+        (bindFlags != D3D11_BIND_VERTEX_BUFFER &&
+         bindFlags != D3D11_BIND_INDEX_BUFFER)) return false;
+    if (resource && capacity >= required) return true;
+    UINT allocation = 256u;
+    while (allocation < required) {
+        if (allocation > (std::numeric_limits<UINT>::max)() / 2u)
+            return false;
+        allocation *= 2u;
+    }
+    D3D11_BUFFER_DESC desc{};
+    desc.ByteWidth = allocation;
+    desc.BindFlags = bindFlags;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    ComPtr<ID3D11Buffer> candidate;
+    if (FAILED(dev->CreateBuffer(&desc, nullptr, candidate.GetAddressOf())) ||
+        !candidate) return false;
+    resource = std::move(candidate);
+    capacity = allocation;
+    return true;
 }
 
 bool submit(State& s, const std::vector<NativeVertex>& vertices,
@@ -4003,8 +4002,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
     ComPtr<ID3D11ShaderResourceView> sampledView;
     ComPtr<ID3D11SamplerState> sampledSampler;
     if (capture.enabled &&
-        !mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,
-                         sampledView, sampledSampler)) return false;
+        !mirror_texture(dev, capture, sampledView, sampledSampler)) return false;
     ComPtr<ID3D11ShaderResourceView> stage1View;
     ComPtr<ID3D11SamplerState> stage1Sampler;
     if (capture.stage1SeparateTexture) {
@@ -4040,8 +4038,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
             if (!create_game_sampler(dev, second, mirroredLevels, stage1Sampler))
                 return false;
             stage1View = sampledView;
-        } else if (!mirror_texture(dev, ctx, s.liveTextureSlots[1], second,
-                               stage1View, stage1Sampler))
+        } else if (!mirror_texture(dev, second, stage1View, stage1Sampler))
             return false;
     }
     // Stage-1 combiner is an isolated game-authored PS constant (b1).
@@ -4080,6 +4077,37 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         if (FAILED(dev->CreateBuffer(&cb, &data, stage1Constants.GetAddressOf())))
             return false;
     }
+    ComPtr<ID3D11Buffer> vb, ib;
+    if (env_full_game_opt_in()) {
+        // Full-scene Draws normally share a pair of D3D11 GPU allocations;
+        // only their *contents* change. Preserve VB/IB ownership across
+        // complete menus, vehicle selection and racing, not an inset sample.
+        const std::size_t vertexBytes = vertices.size() * sizeof(NativeVertex);
+        if (vertexBytes == 0u ||
+            vertexBytes > (std::numeric_limits<UINT>::max)()) return false;
+        const UINT vertexSize = static_cast<UINT>(vertexBytes);
+        if (!ensure_full_game_upload_buffer(dev, s.fullGameVertexUpload,
+                                            s.fullGameVertexCapacity, vertexSize,
+                                            D3D11_BIND_VERTEX_BUFFER)) return false;
+        const D3D11_BOX vertexRange{0u, 0u, 0u, vertexSize, 1u, 1u};
+        ctx->UpdateSubresource(s.fullGameVertexUpload.Get(), 0u,
+                               &vertexRange, vertices.data(), 0u, 0u);
+        vb = s.fullGameVertexUpload;
+        if (indices && indexCount) {
+            if (indexCount > (std::numeric_limits<UINT>::max)() / sizeof(std::uint32_t))
+                return false;
+            const UINT indexSize = indexCount * sizeof(std::uint32_t);
+            if (!ensure_full_game_upload_buffer(dev, s.fullGameIndexUpload,
+                                                s.fullGameIndexCapacity, indexSize,
+                                                D3D11_BIND_INDEX_BUFFER)) return false;
+            const D3D11_BOX indexRange{0u, 0u, 0u, indexSize, 1u, 1u};
+            ctx->UpdateSubresource(s.fullGameIndexUpload.Get(), 0u,
+                                   &indexRange, indices, 0u, 0u);
+            ib = s.fullGameIndexUpload;
+        }
+        if (FAILED(dev->GetDeviceRemovedReason())) return false;
+    } else {
+        // Preserve the original bounded diagnostic path byte-for-byte.
     D3D11_BUFFER_DESC bd{};
     bd.ByteWidth = static_cast<UINT>(vertices.size() * sizeof(NativeVertex));
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -4094,6 +4122,7 @@ bool submit(State& s, const std::vector<NativeVertex>& vertices,
         bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
         initial.pSysMem = indices;
         if (FAILED(dev->CreateBuffer(&bd, &initial, ib.GetAddressOf()))) return false;
+    }
     }
 
     // Pixel shader alpha test and OM alpha blend are bound to this same
@@ -5827,7 +5856,10 @@ void before_game_reset(IDirect3DDevice9* game) noexcept {
     s.stage1TextureOnlyPs.Reset(); s.stage1AddPs.Reset();
     s.textureOnlyPs.Reset(); s.selectTextureDiffuseAlphaPs.Reset(); s.selectTextureModulateAlphaPs.Reset(); s.selectTextureModulate2XAlphaPs.Reset(); s.selectTextureModulate4XAlphaPs.Reset(); s.selectTextureAddAlphaPs.Reset(); s.selectTextureSubtractAlphaPs.Reset(); s.selectDiffuseTextureAlphaPs.Reset(); s.selectDiffuseModulateAlphaPs.Reset(); s.selectDiffuseAddAlphaPs.Reset(); s.selectDiffuseSubtractAlphaPs.Reset(); s.selectDiffuseModulate2XAlphaPs.Reset(); s.selectDiffuseModulate4XAlphaPs.Reset(); s.selectTextureAddSmoothAlphaPs.Reset(); s.selectDiffuseAddSmoothAlphaPs.Reset(); s.selectTextureFactorAlphaPs.Reset(); s.selectTextureTfactorAlphaPs.Reset(); s.selectDiffuseFactorAlphaPs.Reset(); s.selectDiffuseTfactorAlphaPs.Reset(); s.selectTextureBlendTextureAlphaPs.Reset(); s.selectDiffuseBlendTextureAlphaPs.Reset(); s.selectTextureBlendDiffuseAlphaPs.Reset(); s.selectDiffuseBlendDiffuseAlphaPs.Reset(); s.additivePs.Reset(); s.subtractPs.Reset(); s.addSmoothPs.Reset();
     s.subtractTextureAlphaPs.Reset(); s.subtractDiffuseAlphaPs.Reset(); s.subtractModulateAlphaPs.Reset(); s.modulate2xPs.Reset(); s.modulate4xPs.Reset(); s.modulate2xTextureAlphaPs.Reset(); s.modulate2xDiffuseAlphaPs.Reset(); s.modulate4xTextureAlphaPs.Reset(); s.modulate4xDiffuseAlphaPs.Reset(); s.mixedTextureAlphaPs.Reset(); s.mixedDiffuseAlphaPs.Reset(); s.mixedAddTextureAlphaPs.Reset(); s.mixedAddDiffuseAlphaPs.Reset(); s.blendTextureAlphaPs.Reset(); s.blendTextureAlphaPmPs.Reset(); s.blendTextureAlphaPmTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseTextureAlphaPs.Reset(); s.blendTextureAlphaPmInverseDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmFactorAlphaPs.Reset(); s.blendTextureAlphaPmSignedFactorAlphaPs.Reset(); s.blendTextureAlphaPmSigned2XFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateFactorAlphaPs.Reset(); s.blendTextureAlphaPmModulateAlphaPs.Reset(); s.blendTextureAlphaPmAddAlphaPs.Reset(); s.blendTextureAlphaPmSubtractAlphaPs.Reset(); s.blendTextureAlphaPmModulate2XAlphaPs.Reset(); s.blendTextureAlphaPmModulate4XAlphaPs.Reset(); s.blendTextureAlphaPmAddSignedAlphaPs.Reset(); s.blendTextureAlphaPmAddSigned2XAlphaPs.Reset(); s.blendTextureAlphaPmBlendTextureAlphaPs.Reset(); s.blendTextureAlphaPmBlendDiffuseAlphaPs.Reset(); s.blendTextureAlphaPmBlendCurrentFactorAlphaPs.Reset(); s.blendTextureAlphaPmBlendFactorAlphaPs.Reset(); s.blendTextureAlphaPmAddSmoothAlphaPs.Reset(); s.blendDiffuseAlphaPs.Reset(); s.blendTextureSelectedTextureAlphaPs.Reset(); s.blendTextureSelectedDiffuseAlphaPs.Reset(); s.blendDiffuseSelectedTextureAlphaPs.Reset(); s.blendDiffuseSelectedDiffuseAlphaPs.Reset(); s.blendTextureModulateAlphaPs.Reset(); s.blendDiffuseModulateAlphaPs.Reset(); s.blendTextureModulate2XAlphaPs.Reset(); s.blendTextureModulate4XAlphaPs.Reset(); s.blendDiffuseModulate2XAlphaPs.Reset(); s.blendDiffuseModulate4XAlphaPs.Reset(); s.blendTextureAddAlphaPs.Reset(); s.blendDiffuseAddAlphaPs.Reset(); s.blendTextureSubtractAlphaPs.Reset(); s.blendDiffuseSubtractAlphaPs.Reset(); s.blendTextureAddSmoothAlphaPs.Reset(); s.blendDiffuseAddSmoothAlphaPs.Reset(); s.blendFactorAlphaPs.Reset(); s.blendFactorTextureAlphaPs.Reset(); s.blendFactorModulateAlphaPs.Reset(); s.blendFactorDiffuseAlphaPs.Reset(); s.blendFactorAddAlphaPs.Reset(); s.blendFactorSubtractAlphaPs.Reset(); s.blendFactorAddSmoothAlphaPs.Reset(); s.blendFactorModulate2XAlphaPs.Reset(); s.blendFactorModulate4XAlphaPs.Reset(); s.addSmoothTextureAlphaPs.Reset(); s.addSmoothDiffuseAlphaPs.Reset(); s.vs.Reset();
-    for (auto& slot : s.liveTextureSlots) slot.reset();
+    // These buffers are owned by the exact D3D11 device generation.
+    s.fullGameVertexUpload.Reset();
+    s.fullGameIndexUpload.Reset();
+    s.fullGameVertexCapacity = s.fullGameIndexCapacity = 0u;
     s.backend.shutdown();
     s.nativeWidth = s.nativeHeight = 0u;
 }

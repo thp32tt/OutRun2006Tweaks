@@ -47,14 +47,14 @@ def connected(s: str) -> bool:
             "capture.mipFilter != D3DTEXF_LINEAR",
             "const UINT levels = usesMips ? sourceLevels : 1u;",
             "capture.texture->LockRect(level, &lock, nullptr, D3DLOCK_READONLY)",
-            "ctx->UpdateSubresource(target, level, nullptr, copied[level].data(),",
+            "initial[level].pSysMem = copied[level].data();",
             "if (capture.minFilter == D3DTEXF_ANISOTROPIC)",
             "state.Filter = D3D11_FILTER_ANISOTROPIC;",
             "state.MaxAnisotropy = capture.minFilter == D3DTEXF_ANISOTROPIC ?",
             "capture.maxAnisotropy : 1u;",
             "dev->CreateSamplerState(&state, sampler.GetAddressOf())"))
         and all(x in draw for x in (
-            "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "ctx->PSSetSamplers(0, 1, &boundSampler);",
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);")))
@@ -78,7 +78,7 @@ def main() -> None:
         ("capture.maxAnisotropy > D3D11_REQ_MAXANISOTROPY", "capture.maxAnisotropy > 255u"),
         ("state.Filter = D3D11_FILTER_ANISOTROPIC;", "state.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;"),
         ("capture.maxAnisotropy : 1u;", "1u : 1u;"),
-        ("mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,", "false"),
+        ("mirror_texture(dev, capture, sampledView, sampledSampler)", "false"),
         ("ctx->PSSetSamplers(0, 1, &boundSampler);", "ctx->PSSetSamplers(0, 0, &boundSampler);"),
         ("ctx->DrawIndexed(indexCount, 0, 0);", "ctx->DrawIndexed(0, 0, 0);"),
         ("ctx->Draw(static_cast<UINT>(vertices.size()), 0);", "ctx->Draw(0, 0);"),

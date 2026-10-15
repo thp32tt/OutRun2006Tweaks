@@ -582,7 +582,7 @@ def main() -> None:
             "state.MinLOD = usesMips ? static_cast<float>(capture.maxMipLevel) : 0.0f;", "state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;",
             "dev->CreateSamplerState(",
         )) and all(x in submit for x in (
-            "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "ctx->PSSetShaderResources(0, 1, &boundView)",
             "ctx->PSSetSamplers(0, 1, &boundSampler)",
             "s.sampledPs.Get()",
@@ -1266,12 +1266,12 @@ def main() -> None:
             "static_cast<std::size_t>(uploadPitch) * rows",
             "static_cast<std::size_t>(y) * lock.Pitch",
             "static_cast<std::size_t>(y) * uploadPitch",
-            "pitches[level], 0u);",
+            "initial[level].SysMemPitch = pitches[level];",
             "desc.Format = nativeFormat;",
             "capture.texture->UnlockRect(level);",
             "dev->CreateShaderResourceView(",
         )) and all(token in draw for token in (
-            "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "ctx->PSSetShaderResources(0, 1, &boundView)",
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
@@ -1288,7 +1288,7 @@ def main() -> None:
         ("const UINT rows = compressed ? (std::max)(1u, (desc.Height + 3u) / 4u) : desc.Height;", "rows = desc.Height;"),
         ("dynamic_texture::readable_pitch(lock.Pitch, rowBytes)",
          "static_cast<UINT>(lock.Pitch) > 0"),
-        ("pitches[level], 0u);", "initial[level].SysMemPitch = desc.Width * 4u;"),
+        ("initial[level].SysMemPitch = pitches[level];", "initial[level].SysMemPitch = desc.Width * 4u;"),
         ("desc.Format = nativeFormat;", "desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;"),
     ):
         broken = bridge.replace(source, wrong, 1)
@@ -1328,7 +1328,7 @@ def main() -> None:
             "desc.Width * 4u : rowBytes;",
             "dynamic_texture::readable_pitch(lock.Pitch, rowBytes)",
             "packed_texture16::unpack_row(",
-            "pitches[level], 0u);",
+            "initial[level].SysMemPitch = pitches[level];",
             "dev->CreateShaderResourceView(",
             "capture.texture->UnlockRect(level);",
         )) and all(x in helper for x in (
@@ -1339,7 +1339,7 @@ def main() -> None:
             "source[x * 2u + 1u]",
             "bgra[x * 4u + 3u] = pixel.a;",
         )) and all(x in consumer for x in (
-            "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "ctx->PSSetShaderResources(0, 1, &boundView)",
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
@@ -1354,7 +1354,7 @@ def main() -> None:
         ("desc.Width * sourceTexelBytes", "desc.Width * 4u"),
         ("const UINT uploadPitch = ((packed16 || luminance) || rgb24", "const UINT uploadPitch = (luminance) ?"),
         ("packed_texture16::unpack_row(", "/* no 16-bit conversion */("),
-        ("pitches[level], 0u);", "/* wrong upload pitch */"),
+        ("initial[level].SysMemPitch = pitches[level];", "/* wrong upload pitch */"),
     ):
         # 00692 inserted equivalent format tokens in the earlier
         # game-created DEFAULT RT admission. This legacy regression owns
@@ -2032,7 +2032,7 @@ def main() -> None:
     assert "alphaArg2 == D3DTA_DIFFUSE || alphaArg2 == D3DTA_CURRENT" in state_section
     assert "alphaArg1 != D3DTA_TEXTURE" in state_section
     assert "AlphaGate(c.a); return c;" in shader_section
-    assert "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture," in submit_section
+    assert "mirror_texture(dev, capture, sampledView, sampledSampler)" in submit_section
     # Stage 1 is an opt-in first shader, not a replacement for stage 0.
     # Both the stage-1 branch and legacy stage-0 alpha blend dispatch must
     # remain connected to the native Draw/DrawIndexed submission.
@@ -2090,7 +2090,7 @@ def main() -> None:
         "s.addSmoothPs.Reset();",
         "s.addSmoothPs && s.modulate2xPs",
         "capture.addSmooth ? s.addSmoothPs.Get() :",
-        "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,",
+        "mirror_texture(dev, capture, sampledView, sampledSampler)",
         "ctx->DrawIndexed(indexCount, 0, 0);",
         "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
     )
@@ -2153,8 +2153,8 @@ def main() -> None:
         "if (!native_rt_readback::unpack_row(",
         "source, destination, desc.Width, rtLayout)",
         "readbackSurface->UnlockRect() : capture.texture->UnlockRect(level);",
-        "desc.Usage = D3D11_USAGE_DEFAULT;",
-        "dev->CreateShaderResourceView(candidate.Get(), nullptr,",
+        "desc.Usage = D3D11_USAGE_IMMUTABLE;",
+        "dev->CreateShaderResourceView(texture.Get(), nullptr,",
     )
     def rt_game_native_connected(code: str) -> bool:
         mirror = code[code.find("bool mirror_texture("):code.find("bool submit(")]
@@ -2162,7 +2162,7 @@ def main() -> None:
         return (all(token in mirror for token in rt_tokens)
                 and "if (FAILED(lockResult)) return false;" in mirror
                 and "dynamic_texture::readable_pitch(lock.Pitch, rowBytes)" in mirror
-                and "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture," in draw
+                and "mirror_texture(dev, capture, sampledView, sampledSampler)" in draw
                 and "ctx->PSSetShaderResources(0, 1, &boundView)" in draw
                 and "ctx->DrawIndexed(indexCount, 0, 0);" in draw
                 and "ctx->Draw(static_cast<UINT>(vertices.size()), 0);" in draw)
@@ -2229,7 +2229,7 @@ def main() -> None:
             "state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;",
             "dev->CreateSamplerState(&state, sampler.GetAddressOf())",
         )) and all(token in submit for token in (
-            "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "ctx->PSSetSamplers(0, 1, &boundSampler)",
             "ctx->PSSetShaderResources(0, 1, &boundView)",
             "ctx->DrawIndexed(indexCount, 0, 0);",
@@ -2517,7 +2517,7 @@ def main() -> None:
                 code.count("s.addSmoothDiffuseAlphaPs.Reset();") == 2 and
                 "GetTextureStageState(0, D3DTSS_ALPHAOP, &alphaOp)" in intake and
                 "alphaArg2Diffuse" in intake and
-                "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture," in draw)
+                "mirror_texture(dev, capture, sampledView, sampledSampler)" in draw)
     assert smooth_mixed_connected(bridge)
     for link in smooth_mixed_links[:-2]:
         damaged = bridge.replace(link, "/* detached stage0 native flow */")
@@ -2557,7 +2557,7 @@ def main() -> None:
             "!modulate4xTextureAlpha && !modulate4xDiffuseAlpha",
             "!modulate2xDiffuseAlpha && !modulate4xDiffuseAlpha",
             "modulate2xDiffuseAlpha || modulate4xDiffuseAlpha",
-            "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
         )
@@ -2627,7 +2627,7 @@ def main() -> None:
             "capture.subtractDiffuseAlpha = subtractDiffuseAlpha;",
         )): return False
         if not all(x in submit for x in (
-            "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "ctx->PSSetShader(",
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
@@ -2823,7 +2823,7 @@ def main() -> None:
             "!blendTextureModulateAlpha && !blendDiffuseModulateAlpha &&",
             "alphaNeedsDiffuse && !alphaArg2Diffuse",
             "alphaArg1 != D3DTA_TEXTURE",
-            "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
             "game->UpdateSurface(",
@@ -2909,7 +2909,7 @@ def main() -> None:
             "!blendTextureAddAlpha && !blendDiffuseAddAlpha &&",
             "alphaNeedsDiffuse && !alphaArg2Diffuse",
             "alphaArg1 != D3DTA_TEXTURE",
-            "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
             "game->UpdateSurface(",
@@ -2998,7 +2998,7 @@ def main() -> None:
         ):
             if token not in intake: return False
         for token in (
-            "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
             "game->UpdateSurface(",
@@ -3085,7 +3085,7 @@ def main() -> None:
             "alphaNeedsDiffuse && !alphaArg2Diffuse", "alphaArg1 != D3DTA_TEXTURE",
         )): return False
         if not all(x in code for x in (
-            "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
             "game->UpdateSurface(", 'GetEnvironmentVariableW(L"OUTRUN_DX11_FIRST_GAME_FRAME"',
@@ -3175,7 +3175,7 @@ def main() -> None:
             "!blendFactorSubtractAlpha && !blendFactorAddSmoothAlpha &&",
             "alphaNeedsDiffuse && !alphaArg2Diffuse",
             "alphaArg1 != D3DTA_TEXTURE",
-            "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,",
+            "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "game->UpdateSurface(",
             "ctx->DrawIndexed(indexCount, 0, 0);",
             "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
@@ -3275,7 +3275,7 @@ def main() -> None:
             if token not in gate: return False
         for token in ("ctx->DrawIndexed(indexCount, 0, 0);",
                       "ctx->Draw(static_cast<UINT>(vertices.size()), 0);",
-                      "mirror_texture(dev, ctx, s.liveTextureSlots[0], capture,"):
+                      "mirror_texture(dev, capture, sampledView, sampledSampler)"):
             if token not in draw: return False
         for mode, scale in (("2X", "2.0f"), ("4X", "4.0f")):
             flag = f"blendFactorModulate{mode}Alpha"
