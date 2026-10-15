@@ -1,0 +1,61 @@
+# OutRun 2006 C — N100 original HD English crop only (2026-10-16)
+
+## Latest user override and emergency pause
+
+**All existing OutRun Korean-localization A/B/C/C1 production, sending, recomposition,
+ImageGen and related browser automation are stopped.**
+The OutRun Korean-localization controller was stopped on N100 and its Docker restart
+policy disabled. The N100 `outrun-kor-chrome-hourly.timer` was disabled.
+This is a PAUSED runtime, **not** an automatic rollout of a new C process.
+Other projects (especially VR) are out of scope.
+
+**C's future role replaces C-ROI-SOURCE, C-SALVAGE and all ImageGen input production:**
+crop the complete English text phrase **as original unmodified pixels** only from
+the real original HD full-image PNGs available on N100, retaining original image
+size, RGB/RGBA channels and orientation. For each English phrase use one native
+XYXY rectangle including full text, outline, shadow and any effects; no sliced
+letters and no neighboring unrelated phrase. Review the crop for cut edges.
+Do not make 2x/3x/4x ImageGen inputs, masks, transparency removal, CLEAN,
+reassembly, translated Korean images, DDS edits or game patches.
+
+## Authorized source and output boundaries
+
+- Source: `/home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012/`
+  `q*_*.png` **only after** confirming each file is a genuine native
+  original-HD **complete** English atlas, not any of 986 previous tiles,
+  generated Korean files or tile reassembly. Pin full PNG SHA256, full dimensions,
+  originating original DDS path/platform/SHA if available. Hold any unverified source.
+- Existing completed earlier crop archive:
+  `work/c_salvage_text_roi/original_hd_phrase_crops_20261016/`.
+  Preserve it. Do not overwrite, re-export, or recount the same crops.
+- Future isolated C-only output under `work/c_salvage_text_roi/c_original_hd_crop_only/`
+  with one native `english_original_native_crop.png` and
+  `crop_manifest.json` per **new** English phrase. Do not put crops into
+  ImageGen's A/B `inputs`, queues, or automatic dispatch.
+- Official English transcription table may identify the phrase. Translation
+  outputs are not a C operation; music/product/brand text remains unmodified.
+- Record `source_full_png_sha256`, DDS provenance, native xyxy,
+  crop SHA256, exact English source text and visual HOLD if unclear.
+  `CROP_TEST_ONLY_REVIEW_REQUIRED`, `RUNTIME_VALIDATION=UNTESTED`.
+
+## One-shot helper, no scheduling
+
+```bash
+python3 tools/localization/c_n100_original_hd_crop_only.py \
+  --spec path/to/new_unique_crop_spec.json \
+  --source-root /home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012 \
+  --output-root /home/chatgpt-runner2/work/c_salvage_text_roi/c_original_hd_crop_only
+```
+
+Schema `outrun-c-n100-hd-original-crop-v1`. Provide original full PNG name/SHA,
+source dimensions, `queue_id`, optional original DDS path/SHA and
+`regions: [{id,english,bbox_xyxy:[x0,y0,x1,y1]}]`.
+Source kind must be `N100_PINNED_FULL_ORIGINAL_HD_PNG` or
+`N100_DDS_VERIFIED_READABLE_FULL_HD_PNG`. The helper never authorizes a fake
+full-source provenance: perform original-versus-DDS proof separately.
+If source, translation, borders or orientation are uncertain, **HOLD**, not
+pretend cropping is game QA.
+
+A/B state and historic SHA/evidence must not be consumed or changed.
+Future restart requires a **new explicit user instruction**, and then separate
+Portainer manual deployment. No GitHub push alone starts any container.
