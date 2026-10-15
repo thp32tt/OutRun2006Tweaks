@@ -35,7 +35,7 @@ assert not linked(bridge.replace(
 assert not linked(bridge.replace(
     "status != D3DERR_NOTFOUND", "false"))
 assert not linked(bridge.replace(
-    "s.clearColor.matches(", "true || s.clearColor.matches("))
+    "s.clearColor.matches(", "bypassed_clear("))
 assert "python tools/test_dx11_no_target_write_draw_00768.py" in workflow
 
 cxx = shutil.which("g++") or shutil.which("clang++")
