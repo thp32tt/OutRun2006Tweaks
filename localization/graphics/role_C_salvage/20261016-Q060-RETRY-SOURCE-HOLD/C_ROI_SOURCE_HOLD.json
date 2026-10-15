@@ -1,0 +1,82 @@
+{
+  "schema": "outrun-c-roi-source-audit-v1",
+  "task_id": "C-ROI-SOURCE-Q060-RETRY-20261016T0303KST",
+  "date_kst": "2026-10-16",
+  "status": "HOLD_ORIGINAL_SOURCE_BYTES_UNAVAILABLE_THIS_RUN",
+  "review_stage": "TEST_ONLY",
+  "source": {
+    "repository": "thp32tt/OutRun2006Tweaks",
+    "branch": "korean-localization-recovery-20260928",
+    "platform": "PC-HD",
+    "source_kind": "ORIGINAL_FULL_HD_DDS_REPOSITORY_PRESENT_NOT_DECODED_THIS_RUN",
+    "dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+    "dds_git_blob_sha": "9c0e3bf47ec433cfc115eacd0836268581f0579e",
+    "dds_size_bytes": 33554560,
+    "dds_sha256_from_prior_verified_audit": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+    "dds_format_from_prior_audit": "RGB32",
+    "dds_mipmap_count_from_prior_audit": 1,
+    "dimensions_from_prior_audit": [
+      4096,
+      2048
+    ],
+    "original_readable_png": "q060_A064FDFC_FLIPY_CHECK_ORIENTATION.png",
+    "readable_png_sha256_from_prior_verified_audit": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+    "prior_dds_to_flipy_png_mismatched_pixels": 0,
+    "prior_audit_path": "localization/graphics/role_C_salvage/20261016-Q060-STAGE-CLEAR-REFERENCE-ROI/C_ROI_SOURCE_AUDIT.json",
+    "sha256_recomputed_this_run": false,
+    "direct_source_decoded_this_run": false,
+    "full_png_read_this_run": false
+  },
+  "phrase": {
+    "english": "RETRY",
+    "korean": "재도전",
+    "mapping_provenance": "localization/graphics/role_C_salvage/20261015-text-roi-pilot/FULL_HD_108_SOURCE_INVENTORY.json Q060",
+    "candidate_bbox_xyxy_unreviewed": [
+      1145,
+      615,
+      2110,
+      790
+    ],
+    "candidate_bbox_provenance": "localization/graphics/role_C_salvage/20261016-original-hd-phrase-crops/crop_manifest.json Q060-RETRY",
+    "candidate_native_dimensions": [
+      965,
+      175
+    ],
+    "candidate_scale": 2,
+    "candidate_upscaled_dimensions_if_verified": [
+      1930,
+      350
+    ],
+    "crop_and_effect_alpha_margin_qa": "NOT_RUN",
+    "text_bounding_box_visual_review": "NOT_RUN",
+    "source_png_exact_sha_check": "NOT_RUN",
+    "extractor": "tools/localization/text_roi_source_pack.py",
+    "extractor_run_this_execution": false,
+    "output_native_png": "NOT_CREATED",
+    "output_imagegen_input_png": "NOT_CREATED",
+    "manifest_schema_if_released": "outrun-hd-text-roi-v1",
+    "isolation": "UNDETERMINED_REFERENCE_ONLY_UNTIL_MASK_OR_ALPHA_VERIFIED",
+    "clean_plate": "NOT_CREATED",
+    "output_fit_policy": "PRESERVE_ASPECT_RATIO_IN_REVIEWED_UI_CELL_UV_SAFE_AREA; WIDTH_DIFFERENCE_ALONE_NOT_REJECT"
+  },
+  "hold": {
+    "reason": "Original DDS exists in pinned GitHub source branch, but full original image bytes could not be decoded or revalidated during this run. N100 MCP read/list attempt failed (tunnel-client did not poll / internal tool error); local GitHub network lookup failed (DNS resolution). Do not substitute legacy 986 tiles, existing crop ZIP or other generated Korean assets for direct full-source validation.",
+    "classified_as_full_source_missing": false,
+    "next_gate": "Acquire original pinned DDS or complete English full PNG, recompute SHA256, validate readable flip orientation and exact platform, visually inspect complete RETRY effects and 2px transparent alpha boundary (or hold as reference-only if background is opaque), then run extractor in isolated new directory.",
+    "no_approved_input": true
+  },
+  "protection": {
+    "legacy_986_tiles_as_new_imagegen_input": false,
+    "existing_AB_batch_queue_changed": false,
+    "existing_AB_state_changed": false,
+    "old_SHA_artifacts_deleted": false,
+    "imagegen_called": false,
+    "external_imagegen_api_called": false,
+    "new_AB_dispatch_enabled": false,
+    "portainer_deployment": "NOT_RUN",
+    "C1": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "user_game": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  }
+}
