@@ -11,9 +11,9 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "C2_IMPLEMENTED_CI_PENDING",
+  "status": "C3_FINAL_EXACT_SHA_GATES_PENDING",
   "phase": "C3_VALIDATE",
-  "automation_validation": "PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "42470ad440367326f5dd4670c52eba7ee0816b46",
@@ -81,5 +81,23 @@
   },
   "runtime_evidence": "No actual Quest3/VDXR headset, game or screenshots were executed in this environment; no optical completion or performance claim.",
   "score_delta_this_attempt": 0,
-  "score_once": false
+  "score_once": false,
+  "material_result_sha": "f790ea9bbea07c4be51a52a911e13f5ba19723da",
+  "targeted_validation_repair_sha": "b4f3d6451bd17c98641cb312ec26578dce98c717",
+  "checkpoint": "C3_SINGLE_EXACT_SHA_GATE_INPUT",
+  "ci_evidence": {
+    "material_source_commit": "f790ea9bbea07c4be51a52a911e13f5ba19723da",
+    "initial_active_run_id": 38788130938,
+    "initial_policy_failure": "Legacy R33 mono/aux source verifier required obsolete unbraced return fallbackToR29 and did not recognize the exact C993 conditional original-draw bypass. Policy failure only; initial full-chain Windows build was skipped.",
+    "targeted_verifier_repair_sha": "b4f3d6451bd17c98641cb312ec26578dce98c717",
+    "repair": "Retained the R29 fallback and added scoped exact-centre positive assertions and 10 destructive negative mutations in the existing source verifier, without deleting any mandatory Gate.",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "status": "WAIT_FINAL_EXACT_SHA"
+  },
+  "hold_reason": "C3 exact-SHA Win32 game/host/package, Domain, Full Source and HUD gates pending; Quest3/VDXR runtime remains UNTESTED."
 }
