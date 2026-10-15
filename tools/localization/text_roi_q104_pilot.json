@@ -1,0 +1,27 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "assets": [
+    {
+      "queue_id": "Q104",
+      "source_png": "q104_62BEBF33_READABLE_FLIPY.png",
+      "source_sha256": "09c6604f41083ed6c8bf020b1600c6aef5190a42918f9cdf358473aecb1bd929",
+      "source_kind": "FULL_HD_PNG_FROM_PINNED_GITHUB_MANUAL_PACK",
+      "source_dds_path": "textures/load/spr_sprani_selector_cvt_Exst/62BEBF33_512x64.dds",
+      "regions": [
+        {
+          "id": "outrun_mode",
+          "english": "OutRun Mode",
+          "korean": "아웃런 모드",
+          "bbox": [
+            386,
+            42,
+            1362,
+            210
+          ],
+          "isolation": "alpha",
+          "scale": 2
+        }
+      ]
+    }
+  ]
+}
