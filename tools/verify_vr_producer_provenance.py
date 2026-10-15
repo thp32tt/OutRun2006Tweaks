@@ -135,12 +135,34 @@ if "node, entry.vrScope, entry.vrProducer" not in replay:
 # direct original producer. The renderer must save the selected queue token
 # before a direct token, but a queue-free central sun has no queue token.
 producer_selector = function_body(semantics, "inline ProducerToken CurrentRenderProducerToken()")
-if not re.search(
-    r"return\s+SpriteQueueDepth\s*!=\s*0\s*\?\s*"
-    r"CurrentSpriteQueueProducer\s*:\s*CurrentDirectExactProducer\s*;",
-    producer_selector,
+# Exact C993 lens draws interpose a short-lived middle branch between
+# queued SpriteNodes and direct glyph producers. Validate executable branch
+# priority rather than a removed three-token conditional expression.
+producer_priority = (
+    "if (SpriteQueueDepth != 0)",
+    "return CurrentSpriteQueueProducer;",
+    "if (ExactLensCentreDrawOwnsSemantic())",
+    "return ProducerToken::LensFlareCentre;",
+    "return CurrentDirectExactProducer;",
+)
+if any(marker not in producer_selector for marker in producer_priority):
+    fail("render producer selector lost queue/centre/direct fallback")
+if [producer_selector.index(marker) for marker in producer_priority] != sorted(
+    producer_selector.index(marker) for marker in producer_priority
 ):
-    fail("render producer selector lost queue priority or direct fallback")
+    fail("render producer selector reordered queue/centre/direct priority")
+# Mutations in either selected source or the lens interposition must be
+# rejected without granting the centre owner to queued HUD/world nodes.
+for origin, corrupt in (
+    ("if (SpriteQueueDepth != 0)", "if (false)"),
+    ("return CurrentSpriteQueueProducer;", "return CurrentDirectExactProducer;"),
+    ("if (ExactLensCentreDrawOwnsSemantic())", "if (false)"),
+    ("return ProducerToken::LensFlareCentre;", "return ProducerToken::None;"),
+    ("return CurrentDirectExactProducer;", "return ProducerToken::None;"),
+):
+    mutant = producer_selector.replace(origin, corrupt, 1)
+    if mutant == producer_selector or all(p in mutant for p in producer_priority):
+        fail("producer priority mutation was not detected: " + origin)
 record = function_body(renderer, "void RecordGameWvpWrite(")
 for marker in (
     "CurrentRenderProducerToken()",
