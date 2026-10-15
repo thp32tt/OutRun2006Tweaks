@@ -9,12 +9,14 @@
 #include <backends/imgui_impl_dx9.h>
 #include "overlay.hpp"
 #include "f11_input_routing.hpp"
+#include "vr/ui/menu_letterbox_geometry.hpp"
 #include "input_manager.hpp"
 #include "vr/game/render_semantics.hpp"
 #include "vr/core/r23_eye_extent_api.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <cstddef>
 
 namespace Settings
 {
@@ -45,8 +47,8 @@ float LetterboxRasterHeight = 0.0f;
 void CreateLetterboxVertex()
 {
 	// The menu is authored for a 4:3 source. Draw side bars only when the
-	// current source backbuffer is wider; 4:3 and portrait XR/mirror sources
-	// have no valid left/right bar geometry. A Reset may invalidate all of the
+	// current source backbuffer is wider; 4:3 sources have no bar geometry. Portrait XR/mirror sources
+	// use top/bottom strips while widescreen sources use side strips. A Reset may invalidate all of the
 	// previous dimensions and the old vertex buffer.
 	if (LetterboxVertex)
 	{
@@ -65,36 +67,28 @@ void CreateLetterboxVertex()
 	if (!std::isfinite(sourceWidth) || !std::isfinite(sourceHeight) ||
 		sourceWidth < 1.0f || sourceHeight < 1.0f)
 		return;
-	const float contentWidth = sourceHeight * (4.0f / 3.0f);
-	if (!std::isfinite(contentWidth))
+	const auto layout = OutRunVR::UI::BuildMenuBarGeometry(
+		sourceWidth, sourceHeight);
+	if (layout.axis == OutRunVR::UI::MenuBarAxis::Invalid)
 		return;
-	// No GPU bars are needed for a 4:3/portrait source. Cache that successful
-	// empty result, but defer caching a widescreen size/device until its VB
-	// has actually been created, locked, filled and unlocked. Otherwise a
-	// transient D3D9Ex Reset allocation failure permanently hides menu bars.
-	if (sourceWidth <= contentWidth)
+	if (!layout.hasBars())
 	{
+		// Cache valid native 4:3/no-bar dimensions, but retry a failed
+		// D3D9Ex allocation rather than caching a missing vertex buffer.
 		LetterboxRasterDevice = d3ddev;
 		LetterboxRasterWidth = sourceWidth;
 		LetterboxRasterHeight = sourceHeight;
 		return;
 	}
-	const float borderWidth = (sourceWidth - contentWidth) * 0.5f + 0.5f;
-	if (!std::isfinite(borderWidth) || borderWidth >= sourceWidth * 0.5f)
-		return;
-	const float screenWidth = sourceWidth + 0.5f;
-	const float screenHeight = sourceHeight + 0.5f;
-	CUSTOMVERTEX vertices[]
+
+	CUSTOMVERTEX vertices[8]{};
+	for (std::size_t i = 0; i < layout.vertices.size(); ++i)
 	{
-		{ -0.5f, -0.5f, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
-		{ borderWidth, -0.5f, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
-		{ -0.5f, screenHeight, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
-		{ borderWidth, screenHeight, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
-		{ (screenWidth - borderWidth), -0.5f, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
-		{ screenWidth, -0.5f, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
-		{ (screenWidth - borderWidth), screenHeight, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) },
-		{ screenWidth, screenHeight, 0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0) }
-	};
+		vertices[i] = {
+			layout.vertices[i].x, layout.vertices[i].y,
+			0.0f, 1.0f, D3DCOLOR_XRGB(0, 0, 0)
+		};
+	}
 
 	IDirect3DVertexBuffer9* candidate = nullptr;
 	if (FAILED(d3ddev->CreateVertexBuffer(sizeof(vertices), 0, CUSTOMFVF,
