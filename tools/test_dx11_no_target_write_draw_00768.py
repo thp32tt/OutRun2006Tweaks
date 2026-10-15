@@ -16,8 +16,12 @@ def linked(source: str) -> bool:
         "} // namespace", 1)[0]
     helper = source.split("bool proven_game_draw_no_target_writes(", 1)[-1].split(
         "void observe(IDirect3DDevice9* game,", 1)[0]
+    unavailable = source.split("void observe_unavailable_game_draw(", 1)[-1].split(
+        "void observe_failed_game_draw(", 1)[0]
     return all((
         "if (fullMode && proven_game_draw_no_target_writes(game, s))" in draw,
+        "if (fullMode && proven_game_draw_no_target_writes(game, s))" in unavailable,
+        "s.frameBatch.absorb_empty_source_draw(" in unavailable,
         "s.frameBatch.absorb_empty_source_draw(" in draw,
         "sourceOrdinal, sameSourceFullClear" in draw,
         "GameNativeMaskedDraw::no_target_write_source_draw(" in helper,

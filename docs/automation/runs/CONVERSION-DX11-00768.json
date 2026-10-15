@@ -19,7 +19,7 @@
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
   "base_head_sha": "b6da8b46ebe36091115a8e45f7fb552418d9a029",
-  "material_result_sha": null,
+  "material_result_sha": "0f1a7126b399b96179c09251442df426fe007b7c",
   "validation_bearing_result_sha": null,
   "changed_files": [
     "src/vr/d3d11/native_game_masked_draw.hpp",
@@ -67,9 +67,9 @@
       "Publish eligible full-size scene to D3D9 Present and preserve original Draw/input fallback on unverified states"
     ],
     "batch_components": [
-      "D3D9 source render-state and bounded active MRT interrogation in live_game_frame_bridge.cpp",
-      "GameNativeMaskedDraw pixel-neutral capability and GameNativeFrameBatch ordinal continuation",
-      "Destructive C++17 sequence and real-source graph regression in DX11 Fast"
+      "D3D9 pixel-neutral state/MRT proof in actual live Draw/Indexed source admission",
+      "Both supported geometry and unavailable VB/IB Draw/Indexed paths consume exact source ordinals",
+      "GameNativeMaskedDraw C++ eligibility, GameNativeFrameBatch continuation, destructive DX11 Fast positive/negative regression"
     ],
     "acceptance_proof": {
       "positive_probe": "C++ seeded frame with masked game Draw, live Draw, masked game DrawIndexed, live DrawIndexed passes full-frame publication with exact source ordinals.",
@@ -84,7 +84,7 @@
     "live_game_draw_path": [
       "LIVE_D3D9_CALLSITE",
       "D3D11_NATIVE_DRAW",
-      "NATIVE_FULL_FRAME_OUTPUT",
+      "VISIBLE_FRAME_OUTPUT",
       "D3D9_PRESENT",
       "DX9EX_INPUT_FALLBACK"
     ],
@@ -93,13 +93,15 @@
   "pipeline": {
     "C0_RECOVER": "Branch HEAD/policy/00767 material inspected, selected disjoint source path",
     "C1_REVIEW": "Pixel-neutral nonzero primitive source Draw could abort a valid full native game frame",
-    "C2_IMPLEMENT": "Masked nonwrite source admission, live D3D9 state interrogation, C++ source-frame regression",
-    "C3_VALIDATE": "GitHub Actions exact source SHA pending",
+    "C2_IMPLEMENT": "Live native-eligible and VB/IB-unavailable Draw/Indexed both preserve verified no-write source ordinals without native output.",
+    "C3_VALIDATE": "Repair exact-SHA validation: original record path lacked VISIBLE_FRAME_OUTPUT; full GitHub Gates must rerun for corrected source SHA.",
     "C4_COMMIT": "Material source plus compiled/destructive DX11 Fast tests in one commit",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_EXACT_SHA"
   },
   "evidence": {
-    "runtime": "No OutRun gamepad/Quest3/VDXR test performed; no runtime promotion."
+    "runtime": "No OutRun gamepad/Quest3/VDXR test performed; no runtime promotion.",
+    "material_first_source_sha": "0f1a7126b399b96179c09251442df426fe007b7c",
+    "test_repair_sha": "e147cc14de93d9146019c39af205336efb01fede"
   }
 }

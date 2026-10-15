@@ -5397,6 +5397,19 @@ void observe_unavailable_game_draw(IDirect3DDevice9* game) noexcept {
                 s.frameBatch.abort();
             return;
         }
+        // Missing VB/IB shadows are not a visual gap when the actual D3D9
+        // command cannot write RT0, any MRT, Z or stencil. Preserve this
+        // unavailable Draw/DrawIndexed ordinal just like a supported
+        // pixel-neutral source call; all unproved writers still abort.
+        if (fullMode && proven_game_draw_no_target_writes(game, s)) {
+            const bool sameSourceFullClear = s.clearColor.valid &&
+                s.clearColor.sourceDevice ==
+                    reinterpret_cast<std::uintptr_t>(game);
+            if (!s.frameBatch.absorb_empty_source_draw(
+                    sourceOrdinal, sameSourceFullClear))
+                s.frameBatch.abort();
+            return;
+        }
         if (s.frameBatch.must_abort_unsupported(fullMode, env_batch_opt_in()))
             s.frameBatch.abort();
     } catch (...) {
