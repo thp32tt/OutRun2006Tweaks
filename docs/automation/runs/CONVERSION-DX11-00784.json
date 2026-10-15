@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:MASKED_MAIN_MRT_READONLY_STENCIL_DRAW_CONTINUITY",
   "feature_id": "DX11-MAIN-MRT-STENCIL-READONLY-MASKED-SOURCE-CONTINUITY",
-  "status": "IN_PROGRESS",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -81,24 +81,40 @@
       "D3D9_PRESENT",
       "DX9EX_INPUT_FALLBACK"
     ],
-    "visible_frame_acceptance": "Full-frame source candidate; exact SHA CI and Quest3/VDXR runtime pending.",
+    "visible_frame_acceptance": "Exact source-bearing SHA 76e530a1cc9a automated Fast/Backend/Windows/OpenXR/HUD 5/5 success. Actual game scene/Quest3 runtime UNTESTED.",
     "activation_guard_and_fallback": "Full mode stays opt-in; unsafe MRT/stencil and unknown owner abort native source only. D3D9 game Draw, Present, input/FFB, SkyGlow and DX9Ex fallback untouched; DXVK frozen."
   },
   "acceptance_results": {
-    "main-frame-masked-command-continuity": "PENDING_CI",
-    "writable-state-safe-fallback": "PENDING_CI",
-    "exact-five-sha-build-gate": "PENDING_EXACT_SHA"
+    "main-frame-masked-command-continuity": "PASS_BUILD",
+    "writable-state-safe-fallback": "PASS_BUILD",
+    "exact-five-sha-build-gate": "PASS_EXACT_SHA"
   },
   "pipeline": {
     "C0_RECOVER": "HEAD 00783 complete and claim released; disjoint no-write main target source.",
     "C1_REVIEW": "Main target bound inactive MRT and read-only stencil fail closed despite no output writes.",
     "C2_IMPLEMENT": "Actual no-write source admission and compiled positive/negative regression.",
-    "C3_VALIDATE": "PENDING_EXACT_SHA",
-    "C4_COMMIT": "Material source candidate; required 5 Gates not yet verified.",
+    "C3_VALIDATE": "Exact validation-bearing material SHA 76e530a1cc9a: DX11 Fast #38780428871, Backend #38780429041, Windows Build #38780436163, OpenXR #38780429022, HUD #38780435883 all SUCCESS. Actual Quest3/VDXR/gamepad untested.",
+    "C4_COMMIT": "Material/validation-bearing SHA 76e530a1cc9ab5ef1960ff3f498dcd6d6c8be157; no CI skip. C6 result recorded separately after five successful exact-SHA workflows.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_GATE"
+    "C6_STATE": "COMPLETE_BUILD_VERIFIED; mandatory GitHub Actions 5/5 exact-SHA SUCCESS, Quest3/VDXR/gamepad UNTESTED. Separate bookkeeping commit is not a second C2 feature or score."
   },
   "evidence": {
-    "runtime_testing": "Not performed; original game and Quest3/VDXR UNTESTED"
-  }
+    "runtime_testing": "Not performed; original game and Quest3/VDXR UNTESTED",
+    "material_commit": "76e530a1cc9ab5ef1960ff3f498dcd6d6c8be157",
+    "validation_bearing_result_sha": "76e530a1cc9ab5ef1960ff3f498dcd6d6c8be157",
+    "fast_gate_run_id": 38780428871,
+    "backend_gate_run_id": 38780429041,
+    "windows_build_run_id": 38780436163,
+    "openxr_gate_run_id": 38780429022,
+    "hud_gate_run_id": 38780435883,
+    "fast_gate_conclusion": "success",
+    "backend_gate_conclusion": "success",
+    "windows_build_conclusion": "success",
+    "openxr_gate_conclusion": "success",
+    "hud_gate_conclusion": "success",
+    "same_sha_verified": true,
+    "quest3_vdxr": "UNTESTED"
+  },
+  "material_result_sha": "76e530a1cc9ab5ef1960ff3f498dcd6d6c8be157",
+  "validation_bearing_result_sha": "76e530a1cc9ab5ef1960ff3f498dcd6d6c8be157"
 }
