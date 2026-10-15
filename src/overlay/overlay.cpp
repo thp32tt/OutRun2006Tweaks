@@ -17,6 +17,7 @@
 #include "input_manager.hpp"
 #include "overlay_toggle_frame.hpp"
 #include "f11_responsive_fit.hpp"
+#include "vr/ui/menu_letterbox_geometry.hpp"
 
 Notifications Notifications::instance;
 
@@ -59,23 +60,22 @@ Overlay::ContentRect Overlay::content_rect()
 	if (externalVrShell)
 		return { 0.f, 0.f, screen.x, screen.y };
 
-	// Match D3DEndScene's actual letterbox draw gate, including mode 2
-	// (always) and the UIScalingMode switch. Only a wider-than-4:3 source
-	// has sidebars; portrait and exact 4:3 must use the entire viewport.
-	float border = 0.f;
+
+	// Share the exact source-space 4:3 content rectangle with the D3D9Ex
+	// letterbox vertices. Portrait/square screens now draw TOP/BOTTOM bars:
+	// putting the F11 window at y=0 would hide its tabs and controls.
+	// Only original frontend or explicit mode-2 letterboxing uses these
+	// bounds; XR gameplay's independently rasterised F11 remains full-screen.
 	if (Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0 &&
 		(Settings::UILetterboxing == 2 || !Game::is_in_game()))
 	{
-		const float contentWidth = screen.y * (4.f / 3.f);
-		if (std::isfinite(contentWidth) && screen.x > contentWidth)
-		{
-			const float candidate = (screen.x - contentWidth) * 0.5f + 0.5f;
-			if (std::isfinite(candidate) && candidate < screen.x * 0.5f)
-				border = candidate;
-		}
+		const auto content = OutRunVR::UI::BuildMenuContentBounds(
+			screen.x, screen.y);
+		if (!content.valid())
+			return { 0.f, 0.f, 0.f, 0.f };
+		return { content.x, content.y, content.width, content.height };
 	}
-
-	return { border, 0.f, screen.x - (border * 2.f), screen.y };
+	return { 0.f, 0.f, screen.x, screen.y };
 }
 
 const std::vector<OverlayWindow*>& Overlay::windows()

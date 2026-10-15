@@ -160,115 +160,110 @@ overlay = (Path(__file__).resolve().parents[1] / "src/overlay/overlay.cpp").read
 def verify_shell_rect(code: str) -> None:
     shell = code.split("Overlay::ContentRect Overlay::content_rect()", 1)[1].split(
         "const std::vector<OverlayWindow*>& Overlay::windows()", 1)[0]
-    gate = [
-        "!std::isfinite(screen.x)", "!std::isfinite(screen.y)",
-        "screen.x <= 0.f || screen.y <= 0.f",
+    for required in (
+        '#include "vr/ui/menu_letterbox_geometry.hpp"',
+        "const bool externalVrShell = Game::is_vr_gameplay_presentation();",
+        "if (externalVrShell)",
+        "return { 0.f, 0.f, screen.x, screen.y };",
         "Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0",
         "(Settings::UILetterboxing == 2 || !Game::is_in_game())",
-        "screen.y * (4.f / 3.f)",
-        "std::isfinite(contentWidth) && screen.x > contentWidth",
-        "(screen.x - contentWidth) * 0.5f + 0.5f",
-        "std::isfinite(candidate) && candidate < screen.x * 0.5f",
-        "screen.x - (border * 2.f)",
-    ]
-    for marker in gate:
-        assert marker in shell, marker
-    assert shell.index("screen.x <= 0.f") < shell.index("float border = 0.f;")
-    assert shell.index("screen.x > contentWidth") < shell.index("border = candidate;")
-    assert "const bool externalVrShell = Game::is_vr_gameplay_presentation();" in shell
+        "OutRunVR::UI::BuildMenuContentBounds(",
+        "screen.x, screen.y);",
+        "if (!content.valid())",
+        "return { content.x, content.y, content.width, content.height };",
+    ):
+        assert required in (code if required.startswith("#include") else shell), required
+    assert shell.index("if (externalVrShell)") < shell.index(
+        "OutRunVR::UI::BuildMenuContentBounds(")
     assert "VrFontMultiplier > 1.0f" not in shell
-    assert "Game::is_vr_gameplay_presentation();" in shell
-    assert "if (externalVrShell)" in shell
-    assert shell.index("return { 0.f, 0.f, screen.x, screen.y };") < shell.index("float border = 0.f;")
-    # Destructive regression: reinstating the old font-density gate would
-    # clip F11 at the 1.0x threshold during a live XR resolution transition.
-    gated = shell.replace(
-        "const bool externalVrShell = Game::is_vr_gameplay_presentation();",
-        "const bool externalVrShell = VrFontMultiplier > 1.0f && Game::is_vr_gameplay_presentation();",
-        1)
-    assert "const bool externalVrShell = Game::is_vr_gameplay_presentation();" not in gated
-    assert "VrFontMultiplier > 1.0f" in gated
-    # The UI and GPU need exactly the same mode-2 / gameplay decision.
+    assert "screen.y * (4.f / 3.f)" not in shell  # old side-only duplicate
     gpu = src.split("static void D3DEndScene(", 1)[1].split(
         "if (overlayInited)", 1)[0]
     assert "Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0 && LetterboxVertex" in gpu
     assert "Settings::UILetterboxing == 2" in gpu
-    assert "!Game::is_in_game()" in gpu
+
+def verify_shared_content_bounds(header: str) -> None:
+    for required in (
+        "constexpr MenuContentBounds BuildMenuContentBounds(",
+        "const auto bars = BuildMenuBarGeometry(sourceWidth, sourceHeight);",
+        "if (bars.axis == MenuBarAxis::Invalid)",
+        "if (bars.axis == MenuBarAxis::Sides)",
+        "const float left = bars.vertices[1].x;",
+        "const float right = bars.vertices[4].x;",
+        "if (bars.axis == MenuBarAxis::TopBottom)",
+        "const float top = bars.vertices[2].y;",
+        "const float bottom = bars.vertices[4].y;",
+        "return { 0.0f, top, sourceWidth, bottom - top };",
+        "static_assert(BuildMenuContentBounds(1200, 1600).y == 350.5f);",
+        "static_assert(BuildMenuContentBounds(1200, 1600).height == 899.5f);",
+        "static_assert(!BuildMenuContentBounds(16385, 1600).valid());",
+    ):
+        assert required in header, required
 
 verify_shell_rect(overlay)
-
-def shell_rect(w, h, letterbox, ui_scaling, gameplay):
-    if not isfinite(w) or not isfinite(h) or w <= 0 or h <= 0:
-        return 0, 0
-    enabled = letterbox > 0 and ui_scaling > 0 and (letterbox == 2 or not gameplay)
-    content = h * (4/3)
-    border = (w - content)*0.5+0.5 if enabled and w > content else 0
-    return border, w - 2*border
-
-for w, h in ((1024,768), (1920,1080), (3440,1440), (2496,2688),
-             (1280,1024), (2560,1080)):
-    for letterbox in (0, 1, 2):
-        for ui_scaling in (0, 1):
-            for gameplay in (False, True):
-                border, inner = shell_rect(w,h,letterbox,ui_scaling,gameplay)
-                draw_bars = letterbox > 0 and ui_scaling > 0 and (
-                    letterbox == 2 or not gameplay) and w > h*(4/3)
-                assert (border > 0) == draw_bars
-                assert 0 <= border < w/2 and 0 < inner <= w
-                if draw_bars:
-                    assert abs(inner - (h*(4/3)-1)) < 1e-4
-                else:
-                    assert inner == w
-for size in ((0,768), (1920,0), (float("nan"),768), (1920,float("inf"))):
-    assert shell_rect(*size, 2, 1, False) == (0,0)
-
+verify_shared_content_bounds(menu_bars)
 for old, bad in (
-    ("Settings::UILetterboxing > 0", "Settings::UILetterboxing == 1"),
-    ("Settings::UIScalingMode > 0", "Settings::UIScalingMode < 0"),
+    ("OutRunVR::UI::BuildMenuContentBounds(", "OutRunVR::UI::BuildLegacySideRect("),
+    ("return { content.x, content.y, content.width, content.height };",
+     "return { content.x, 0.f, content.width, screen.y };"),
+    ("if (externalVrShell)", "if (!externalVrShell)"),
     ("Settings::UILetterboxing == 2 || !Game::is_in_game()",
      "Settings::UILetterboxing == 1 && !Game::is_in_game()"),
-    ("screen.x > contentWidth", "screen.x < contentWidth"),
-    ("std::isfinite(candidate) && candidate < screen.x * 0.5f",
-     "std::isfinite(candidate)"),
-    ("screen.x <= 0.f || screen.y <= 0.f",
-     "screen.x < 0.f || screen.y < 0.f"),
+    ("if (!content.valid())", "if (content.valid())"),
 ):
     assert old in overlay, old
     try:
         verify_shell_rect(overlay.replace(old, bad, 1))
-    except AssertionError:
+    except (AssertionError, ValueError):
         pass
     else:
-        raise AssertionError("F11 content-rect mutant survived: " + old)
-
-for w, h in ((1024,768), (1920,1080), (3440,1440), (2496,2688),
-             (1280,1024), (2560,1080)):
-    inner = h * (4/3)
-    width = ((w - inner)*0.5+0.5) if w > inner else 0
-    if w <= inner:
-        assert width == 0
-    else:
-        assert isfinite(width) and 0 < width < w/2
-        assert abs(((w+0.5-width)-width)-(inner-0.5)) < 1e-5
-# The old code divided and generated negative bars in portrait mode.
-assert 2496-(2688*4/3)<0
-mutants = (
-    ("if (!d3ddev || !Game::screen_resolution)", "if (!d3ddev)"),
-    ("if (!layout.hasBars())", "if (layout.hasBars())"),
-    ("FAILED(candidate->Lock(", "SUCCEEDED(candidate->Lock("),
-    ("candidate->Release();", "// leak on failed lock"),
-    ("Settings::UIScalingMode > 0 && LetterboxVertex",
-     "Settings::UIScalingMode > 0"),
-)
-for old, bad in mutants:
-    assert old in src
+        raise AssertionError("F11 portrait rect mutation survived: " + old)
+for old, bad in (
+    ("const float top = bars.vertices[2].y;", "const float top = 0.0f;"),
+    ("const float bottom = bars.vertices[4].y;", "const float bottom = sourceHeight;"),
+    ("const auto bars = BuildMenuBarGeometry(sourceWidth, sourceHeight);",
+     "const auto bars = BuildLegacySideGeometry(sourceWidth, sourceHeight);"),
+):
+    assert old in menu_bars, old
     try:
-        verify(src.replace(old,bad,1))
-    except AssertionError:
+        verify_shared_content_bounds(menu_bars.replace(old, bad, 1))
+    except (AssertionError, ValueError):
         pass
     else:
-        raise AssertionError("mutant survived: " + old)
-print("PASS menu/F11 letterbox shared rect, portrait/reset/mode-2, 11 destructive controls")
+        raise AssertionError("Shared menu geometry mutation survived: " + old)
+
+def content_bounds(w, h, enabled):
+    if not isfinite(w) or not isfinite(h) or w < 1 or h < 1 or w > 16384 or h > 16384:
+        return (0, 0, 0, 0)
+    if not enabled:
+        return (0, 0, w, h)
+    if w > h * (4/3) + .5:
+        e = (w - h * (4/3)) * .5 + .5
+        return (e, 0, w - 2*e + .5, h)
+    if h > w * .75 + .5:
+        e = (h - w * .75) * .5 + .5
+        return (0, e, w, h - 2*e + .5)
+    return (0, 0, w, h)
+
+assert content_bounds(1200, 1600, True) == (0, 350.5, 1200, 899.5)
+assert content_bounds(1920, 1080, True) == (240.5, 0, 1439.5, 1080)
+assert content_bounds(640, 480, True) == (0, 0, 640, 480)
+for w, h in ((1920,1080), (3440,1440), (2496,2688),
+             (1200,1600), (1280,1024), (1024,768)):
+    for letterbox in (0, 1, 2):
+        for scaling in (0, 1):
+            for in_game in (False, True):
+                enabled = letterbox > 0 and scaling > 0 and (
+                    letterbox == 2 or not in_game)
+                x, y, iw, ih = content_bounds(w, h, enabled)
+                assert 0 <= x < w and 0 <= y < h and 0 < iw <= w and 0 < ih <= h
+                assert x + iw <= w + .51 and y + ih <= h + .51
+                if not enabled:
+                    assert (x, y, iw, ih) == (0, 0, w, h)
+for w, h in ((0,1600), (1200,0), (float("nan"),768),
+             (1920,float("inf")), (16385,1080)):
+    assert content_bounds(w, h, True) == (0, 0, 0, 0)
+print("PASS F11 portrait/top-bottom and widescreen shared menu content, 8 destructive controls")
 
 # A frontend resize can update the source aspect without the game's
 # temporary-resource callbacks. The old vertex buffer must never be reused.

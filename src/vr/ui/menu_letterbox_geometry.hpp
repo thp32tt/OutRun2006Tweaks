@@ -63,6 +63,49 @@ namespace OutRunVR::UI
         return result;
     }
 
+
+    // F11's frontend shell must occupy exactly the uncovered menu pixels.
+    // Reuse the same geometry as the GPU side/top-bottom black strips, rather
+    // than independently assuming every output is landscape.
+    struct MenuContentBounds
+    {
+        float x = 0.0f, y = 0.0f, width = 0.0f, height = 0.0f;
+        constexpr bool valid() const noexcept
+        {
+            return width > 0.0f && height > 0.0f;
+        }
+    };
+
+    constexpr MenuContentBounds BuildMenuContentBounds(
+        float sourceWidth, float sourceHeight) noexcept
+    {
+        const auto bars = BuildMenuBarGeometry(sourceWidth, sourceHeight);
+        if (bars.axis == MenuBarAxis::Invalid)
+            return {};
+        if (bars.axis == MenuBarAxis::Sides)
+        {
+            const float left = bars.vertices[1].x;
+            const float right = bars.vertices[4].x;
+            return { left, 0.0f, right - left, sourceHeight };
+        }
+        if (bars.axis == MenuBarAxis::TopBottom)
+        {
+            const float top = bars.vertices[2].y;
+            const float bottom = bars.vertices[4].y;
+            return { 0.0f, top, sourceWidth, bottom - top };
+        }
+        return { 0.0f, 0.0f, sourceWidth, sourceHeight };
+    }
+
+    static_assert(BuildMenuContentBounds(640, 480).width == 640.0f);
+    static_assert(BuildMenuContentBounds(1920, 1080).x == 240.5f);
+    static_assert(BuildMenuContentBounds(1920, 1080).width == 1439.5f);
+    static_assert(BuildMenuContentBounds(1200, 1600).x == 0.0f);
+    static_assert(BuildMenuContentBounds(1200, 1600).y == 350.5f);
+    static_assert(BuildMenuContentBounds(1200, 1600).height == 899.5f);
+    static_assert(!BuildMenuContentBounds(0, 1600).valid());
+    static_assert(!BuildMenuContentBounds(16385, 1600).valid());
+
     // Compile as part of the real x86 game binary: native, widescreen,
     // ultrawide and XR portrait must retain distinct, bounded bar geometry.
     static_assert(BuildMenuBarGeometry(640, 480).axis == MenuBarAxis::None);
