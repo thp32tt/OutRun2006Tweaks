@@ -225,7 +225,14 @@ def main() -> None:
             "GetRenderState(D3DRS_FILLMODE, &fillMode)",
             "const DWORD legalMask = D3DCOLORWRITEENABLE_RED |",
             "const DWORD visibleMask = D3DCOLORWRITEENABLE_RED |",
-            "if ((colorMask & ~legalMask) || !(colorMask & visibleMask)) return false;",
+            // 00763: RGB-only remains mandatory for the inset; full-size
+            // game Draw/DrawIndexed may write only destination alpha (A8)
+            // or DSV depth. Unknown masks still fail closed.
+            "if ((colorMask & ~legalMask) ||",
+            "(!(colorMask & visibleMask) &&",
+            "!GameNativeMaskedDraw::accepts_source_mask(",
+            "colorMask, fullFrame, sourceDesc.Format == D3DFMT_A8R8G8B8,",
+            "output.nativeDepthTest && output.nativeDepthWrite",
             "game_native_cull_admission(",
             "fillMode != D3DFILL_SOLID",
         ))
@@ -238,8 +245,13 @@ def main() -> None:
          "GetRenderState(D3DRS_CULLMODE, &fillMode)"),
         ("GetRenderState(D3DRS_FILLMODE, &fillMode)",
          "GetRenderState(D3DRS_FILLMODE, &colorMask)"),
-        ("if ((colorMask & ~legalMask) || !(colorMask & visibleMask)) return false;",
-         "if (false) return false;"),
+        ("if ((colorMask & ~legalMask) ||", "if (false ||"),
+        ("(!(colorMask & visibleMask) &&", "(false &&"),
+        ("!GameNativeMaskedDraw::accepts_source_mask(", "!unverified_game_mask("),
+        ("colorMask, fullFrame, sourceDesc.Format == D3DFMT_A8R8G8B8,",
+         "colorMask, true, true,"),
+        ("output.nativeDepthTest && output.nativeDepthWrite",
+         "true /* unchecked depth */"),
         ("game_native_cull_admission(", "game_native_cull_unchecked("),
         ("fillMode != D3DFILL_SOLID", "fillMode == D3DFILL_SOLID"),
     ):
@@ -247,6 +259,27 @@ def main() -> None:
         assert bad != bridge and not exact_raster_output_gate(bad), (
             "untranslated native raster/output state was not rejected: " + original
         )
+
+    # The native helper must implement a genuine fail-closed full-mode
+    # exception, not a blanket RGB-only bypass or accidental inset opt-in.
+    native_mask = (ROOT / "src/vr/d3d11/native_game_masked_draw.hpp").read_text()
+    def exact_masked_game_admission(helper: str) -> bool:
+        return all(token in helper for token in (
+            "if ((d3d9Mask & ~kAll) != 0u) return false;",
+            "if ((d3d9Mask & kRgb) != 0u) return true;",
+            "return fullFrame &&",
+            "targetHasAlpha && (d3d9Mask & kAlpha) != 0u",
+            "|| nativeDepthWrite",
+        ))
+    assert exact_masked_game_admission(native_mask)
+    for original, replacement in (
+        ("if ((d3d9Mask & ~kAll) != 0u) return false;", "if (false) return false;"),
+        ("return fullFrame &&", "return true ||"),
+        ("targetHasAlpha && (d3d9Mask & kAlpha) != 0u", "true /* unverified alpha */"),
+        ("|| nativeDepthWrite", "|| true /* unverified depth */"),
+    ):
+        unsafe = native_mask.replace(original, replacement, 1)
+        assert unsafe != native_mask and not exact_masked_game_admission(unsafe), original
 
     # Default diagnostic samples one rotating real game Draw. The cursor must
     # reach late menu/car/race draws (>64) without enlarging the opt-in GPU
