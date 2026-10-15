@@ -74,6 +74,63 @@ services:
           create_host_path: false
       - outrun_chat_localization_recovery_logs:/logs
 
+
+  # Offline C salvage runs independently of two-tab ChatGPT A/B ImageGen.
+  # Binds source image-src read-only; never deploys localized DDS or approves QA.
+  # This service only starts when the user manually redeploys the Portainer Git stack.
+  outrun-c-salvage-offline:
+    build:
+      context: ./c_salvage
+      dockerfile: Dockerfile
+    image: outrun-kor-c-salvage:20261015
+    pull_policy: build
+    container_name: outrun-c-salvage-offline
+    restart: unless-stopped
+    init: true
+    cpus: 0.5
+    mem_limit: 512m
+    read_only: true
+    network_mode: "none"
+    user: "1002:1002"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    volumes:
+      - type: bind
+        source: /home/chatgpt-runner2/work/image-src
+        target: /data/image-src
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /home/chatgpt-runner2/work/c-salvage-production
+        target: /data/c-salvage
+        bind:
+          create_host_path: false
+    command:
+      - --input-root
+      - /data/image-src
+      - --output-root
+      - /data/c-salvage
+      - --repo-root
+      - /opt/c-salvage
+      - --plate-jobs-dir
+      - /data/c-salvage/plate_jobs
+      - --recipes-dir
+      - /data/c-salvage/recipes
+      - --bundle-root
+      - /data/c-salvage/bundles
+      - --masks-dir
+      - /data/c-salvage/masks
+      - --max-per-cycle
+      - "10"
+      - --interval-seconds
+      - "1800"
+      - --loop
+
 volumes:
   outrun_chat_localization_recovery_data:
     name: outrun_chat_localization_recovery_data
