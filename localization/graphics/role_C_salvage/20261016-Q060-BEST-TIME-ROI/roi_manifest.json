@@ -1,0 +1,46 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "queue_id": "Q060",
+  "region_id": "best-time",
+  "source_png": "q060_A064FDFC_FLIPY_CHECK_ORIENTATION.png",
+  "source_png_sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+  "source_kind": "PIXEL_EXACT_FLIPY_OF_GITHUB_PINNED_FULL_HD_DDS",
+  "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "original_dimensions": [
+    4096,
+    2048
+  ],
+  "bbox_xyxy": [
+    2150,
+    338,
+    3120,
+    478
+  ],
+  "english": "BEST TIME:",
+  "korean": "최고 기록:",
+  "isolation": "reference_crop",
+  "scale": 3,
+  "native_dimensions": [
+    970,
+    140
+  ],
+  "imagegen_dimensions": [
+    2910,
+    420
+  ],
+  "native_png_sha256": "2df6766b3083113d14707f35138bb733bf1777acf15b8da82de99a1e61ad837b",
+  "imagegen_input_sha256": "1272ad1390a593c7b6225e55d8ecdaac10180ebfa11b382feea40b769204dfeb",
+  "alpha_crop_margin_checked": false,
+  "status": "IMAGEGEN_REFERENCE_TEST_ONLY",
+  "generate_output": "ONE_KOREAN_TEXT_ONLY_TRANSPARENT_PNG",
+  "required_review": [
+    "KOREAN_GLYPHS",
+    "SOURCE_EFFECT",
+    "CLEAN_PLATE",
+    "NATIVE_ROI_FIT",
+    "C1",
+    "C3_IF_REQUIRED",
+    "USER_GAME"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

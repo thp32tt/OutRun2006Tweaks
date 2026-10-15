@@ -1,0 +1,46 @@
+{
+  "schema": "outrun-hd-text-roi-qa-v1",
+  "TASK_ID": "C-ROI-SOURCE-Q060-BEST-TIME-20261016-0603",
+  "source": "GITHUB_PINNED_PC_HD_DDS_FLIPY",
+  "platform": "PC",
+  "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_game_cvt_Exst/A064FDFC_1024x512.dds",
+  "source_dds_sha256": "6a33c7307e33337af085f0fffea081de8659ed1806f4ef4d2a8809d4120cadbc",
+  "dds_dimensions": [
+    4096,
+    2048
+  ],
+  "source_png_sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+  "source_orientation": "READABLE_FLIP_Y_CONFIRMED_FOR_THIS_PHRASE",
+  "full_source_dds_to_png_pixel_difference": 0,
+  "source_to_native_roi_pixel_difference": 0,
+  "source_text": "BEST TIME:",
+  "approved_korean": "최고 기록:",
+  "bbox_xyxy": [
+    2150,
+    338,
+    3120,
+    478
+  ],
+  "scale": 3,
+  "native_dimensions": [
+    970,
+    140
+  ],
+  "upscaled_dimensions": [
+    2910,
+    420
+  ],
+  "native_png_sha256": "2df6766b3083113d14707f35138bb733bf1777acf15b8da82de99a1e61ad837b",
+  "imagegen_input_sha256": "1272ad1390a593c7b6225e55d8ecdaac10180ebfa11b382feea40b769204dfeb",
+  "complete_phrase_visual_review": "ONE_PHRASE_WITH_OUTLINE_AND_SHADOW_NO_CLIP",
+  "isolation": "OPAQUE_OR_COMPOSITE_REFERENCE_CROP_NOT_GLYPH_ONLY",
+  "glyph_alpha_isolation": "HOLD_REVIEWED_PSD_OR_EXACT_MASK_REQUIRED",
+  "clean_plate": "HOLD_REVIEWED_PSD_OR_EXACT_MASK_REQUIRED",
+  "uv_fit_policy": "PRESERVE_ASPECT_RATIO_AND_REVIEW_NATIVE_UI_CELL_SAFE_BOUNDS",
+  "status": "TEST_ONLY",
+  "imagegen_invocation": "NOT_RUN",
+  "existing_A_B_queue_state": "NOT_TOUCHED",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED"
+}
