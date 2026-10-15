@@ -2110,7 +2110,14 @@ verify_direct_producer_restore(sem)
 for bad in ('CurrentQueueExactScope = savedQueueScope_;',
             'CurrentQueueProjectedMarker = savedProjectedMarker_;',
             'SpriteQueueDepth == 0'):
-    corrupt = sem.replace(bad, '/* removed immediate semantic guard */', 1)
+    # Mutate the selected original direct-producer RAII owner. C993 now has
+    # another independent queue guard earlier in the same header; replacing
+    # the first global match would silently test the wrong function.
+    direct = function_body(sem, 'class ScopedExactProducerSemantic final')
+    if direct.count(bad) != 1:
+        raise SystemExit('direct-producer mutation source ambiguous: ' + bad)
+    corrupt = sem.replace(direct,
+        direct.replace(bad, '/* removed immediate semantic guard */', 1), 1)
     try:
         verify_direct_producer_restore(corrupt)
     except SystemExit:
