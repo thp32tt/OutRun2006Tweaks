@@ -34,7 +34,13 @@ assert "inline static bool s_toggleCaptureValid = false;" in header
 assert "inline static bool s_togglePending = false;" in header
 assert hook.index("const bool f11VisibleThisFrame = Overlay::will_be_visible_this_frame();") < hook.index("float vrFontMultiplier = 1.0f;")
 assert hook.index("float vrFontMultiplier = 1.0f;") < hook.index("Overlay::rebuild_fonts();") < hook.index("overlayActive = Overlay::render();")
-assert "if (f11VisibleThisFrame && Game::is_vr_gameplay_presentation())" in hook
+# The cursor and font atlas share one same-frame gameplay predicate.
+# Preserve its actual source binding and ordering (not old inlined syntax).
+assert "const bool vrGameplay = Game::is_vr_gameplay_presentation();" in hook
+assert "if (f11VisibleThisFrame && vrGameplay)" in hook
+assert (hook.index("const bool vrGameplay = Game::is_vr_gameplay_presentation();")
+        < hook.index("if (f11VisibleThisFrame && vrGameplay)")
+        < hook.index("Overlay::rebuild_fonts();"))
 
 # Source-level model checks open->hold->release->close, legacy input,
 # bound action with dialog and the desktop negative. The C++ header is
