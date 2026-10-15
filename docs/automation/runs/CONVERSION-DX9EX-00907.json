@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:MAIN_MENU",
   "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "POLICY_GATE_REPAIR",
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "c1ab5e655ba3fc066f5a68a0265c8f4c3f43ea6a",
   "material_result_sha": "5577a923d3a9912afa000e686be403a39a0f1ad4",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "d7133ba9158d6138adb3e00df95e375536515131",
   "source_paths": [
     "vrhost/src/main_r23.cpp",
     "vrhost/src/runtime/menu_content_aspect.hpp"
@@ -28,7 +28,8 @@
     "vrhost/src/main_r23.cpp",
     "vrhost/src/runtime/menu_content_aspect.hpp",
     "tools/verify_vr_menu_letterbox_aspect.py",
-    "docs/automation/runs/CONVERSION-DX9EX-00907.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00907.json",
+    "vrhost/tests/menu_content_aspect_smoke.cpp"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:MAIN_MENU",
@@ -67,9 +68,9 @@
     ]
   },
   "acceptance_results": {
-    "menu_eye_overlap": "PENDING_EXACT_SHA_CI",
-    "menu_native_fallback": "PENDING_EXACT_SHA_CI",
-    "menu_integrated_ci": "PENDING_EXACT_SHA_CI"
+    "menu_eye_overlap": "PASS_EXACT_SHA",
+    "menu_native_fallback": "PASS_EXACT_SHA",
+    "menu_integrated_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "Source code at material SHA shows two eye tangent extremes were averaged in PlanCommonFovTangents despite one shared physical local-fixed menu quad; intersection is the necessary common visible tangent range.",
@@ -84,7 +85,7 @@
       "Expanding raster or changing game HUD/native source crop cannot repair the common projection exceeding one eye's real FOV."
     ],
     "fix_evidence": "Original material SHA 5577a923 implements max(left/down) and min(right/up) with overlap guard, preserves atan conversion and the old mono fallback.",
-    "negative_test_evidence": "tools/verify_vr_menu_letterbox_aspect.py adds symmetric/asymmetric/disjoint and four destructive extrema mutations; pending final exact-SHA Actions."
+    "negative_test_evidence": "Compiled Windows x64 host smoke: corrected shared-eye max(left/down), min(right/up) expectations, preserved angle reconstruction and native 4:3/16:9/21:9 cases, and added negative disjoint horizontal and vertical eye checks. No HMD performed."
   },
   "ci_evidence": {
     "initial_material_sha": "5577a923d3a9912afa000e686be403a39a0f1ad4",
@@ -96,9 +97,66 @@
       "Domain Isolation Guard",
       "DX9Ex Full Source Impact Review",
       "OutRun EXE HUD Inspector CI"
+    ],
+    "validation_bearing_result_sha": "d7133ba9158d6138adb3e00df95e375536515131",
+    "exact_sha_gate_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "sha": "d7133ba9158d6138adb3e00df95e375536515131",
+        "run_id": 38769456399,
+        "conclusion": "success",
+        "jobs": "policy,game,host,full-chain-compile,package 5/5"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "sha": "d7133ba9158d6138adb3e00df95e375536515131",
+        "run_id": 38769456764,
+        "conclusion": "success",
+        "jobs": "1/1"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "sha": "d7133ba9158d6138adb3e00df95e375536515131",
+        "run_id": 38769456289,
+        "conclusion": "success",
+        "jobs": "3/3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "sha": "e0ada7d386316a112e1e2996ed710ef428be9677",
+        "run_id": 38768374671,
+        "conclusion": "success",
+        "jobs": "2/2; material source unchanged since this run"
+      }
+    ],
+    "repair_history": [
+      {
+        "sha": "e0ada7d386316a112e1e2996ed710ef428be9677",
+        "cause": "Policy Gate missing task feature contract",
+        "fix": "Added same TASK_ID record"
+      },
+      {
+        "sha": "b6c27e1027668aa9d53727adfa9b7a559d28cce1",
+        "cause": "Python binocular verifier referenced menu_geometry before declaration",
+        "fix": "Moved binocular block after source header load"
+      },
+      {
+        "sha": "d7133ba9158d6138adb3e00df95e375536515131",
+        "cause": "Host C++ smoke expected averaged tangent FOV instead of new intersection",
+        "fix": "Corrected four expectations, disjoint fallback cases and exact SHA revalidated"
+      }
     ]
   },
   "runtime_evidence": "No physical Quest3/VDXR test performed on the material or validation-bearing SHA; binocular appearance and performance are not claimed.",
-  "score_delta_this_attempt": 0,
-  "score_once": false
+  "score_delta_this_attempt": 1,
+  "score_once": true,
+  "hold_reason": "NEED_HMD_TEST: HMD optics and live FPS not verified",
+  "scoreboard": {
+    "repository": "thp32tt/ai-dev-lab",
+    "file": "AI_SCOREBOARD.md",
+    "commit_sha": "fd33bcba7513da49b2c205f89230bf1afebffa4a",
+    "previous_ai2_score": 1384,
+    "delta": 1,
+    "new_ai2_score": 1385
+  }
 }
