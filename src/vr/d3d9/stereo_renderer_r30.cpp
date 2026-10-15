@@ -2525,6 +2525,61 @@ namespace OutRunVRStereo
                 nextDraw - writeDrawSerial <= 12u;
         }
 
+        // The protected R26 renderer distinguishes a spatial scene-effect
+        // WVP from a screen-facing effect by recovering original game c64 and
+        // removing the base projection. R84 previously flattened every
+        // source-tagged depth-disabled SceneEffect, including world billboards.
+        // The veto below requires original c64, current shader + pose and
+        // a short draw window; no stale/live head-injected GPU c64 is trusted.
+        bool R30SpatialSceneEffectNeedsWorldRouting() noexcept
+        {
+            using namespace OutRunVR::GameSemantic;
+            if (EffectiveScope() != RenderScope::SceneEffect)
+                return false;
+            float raw[16]{};
+            std::uint64_t writeSerial = 0, writeDraw = 0;
+            std::uintptr_t writeShader = 0, currentShader = 0;
+            std::uint64_t writeEpoch = 0, currentEpoch = 0;
+            if (!OutRunVRRenderer::GetLastRawGameWvpWrite(
+                    raw, writeSerial, writeDraw, writeShader, writeEpoch) ||
+                !R29OwnerCurrentShaderEpoch(currentShader, currentEpoch) ||
+                !writeShader || writeShader != currentShader ||
+                !writeEpoch || writeEpoch != currentEpoch ||
+                !OutRunVRRenderer::GetCurrentLatchedPoseEpoch() ||
+                OutRunVRRenderer::GetLastGameWvpPoseEpoch() !=
+                    OutRunVRRenderer::GetCurrentLatchedPoseEpoch())
+                return false;
+            const auto nextDraw = R29OwnerTopLevelDrawSerial() + 1u;
+            if (nextDraw <= writeDraw || nextDraw - writeDraw > 12u)
+                return false;
+            float baseRaw[16]{};
+            if (!OutRunVRRenderer::GetRendererBaseProjection(baseRaw))
+                return false;
+            D3DMATRIX rawUploadedT{}, baseProjection{}, inverseProjection{};
+            std::memcpy(&rawUploadedT, raw, sizeof(rawUploadedT));
+            std::memcpy(&baseProjection, baseRaw, sizeof(baseProjection));
+            const D3DMATRIX gameWvp = R29OwnerTransposeMatrix(rawUploadedT);
+            if (!R29OwnerMatrixFinite(gameWvp) ||
+                !R29OwnerMatrixFinite(baseProjection) ||
+                !R29OwnerInvertMatrix(baseProjection, inverseProjection))
+                return false;
+            const D3DMATRIX worldView =
+                R29OwnerMultiplyMatrix(gameWvp, inverseProjection);
+            if (!R29OwnerMatrixFinite(worldView))
+                return false;
+            const float affineError =
+                std::fabs(worldView._14) + std::fabs(worldView._24) +
+                std::fabs(worldView._34) +
+                std::fabs(worldView._44 - 1.0f);
+            const float depth = std::fabs(worldView._43);
+            const float clipW =
+                worldView._43 * baseProjection._34 + baseProjection._44;
+            return std::isfinite(affineError) &&
+                std::isfinite(depth) && std::isfinite(clipW) &&
+                affineError <= 0.02f && depth >= 1.25f &&
+                depth < 1000000.0f && clipW > 0.05f;
+        }
+
         R30ScreenSpaceKind R30ClassifyScreenSpacePass(
             IDirect3DDevice9* device) noexcept
         {
@@ -2650,6 +2705,12 @@ namespace OutRunVRStereo
             if (zEnable == D3DZB_FALSE &&
                 (alphaBlend != FALSE || alphaTest != FALSE))
             {
+                // A SceneEffect carrying a proved original affine world WVP
+                // is not a flat HUD, irrespective of its alpha/depth state.
+                // Leave it to the lower verified-world owner; never apply
+                // an eye HUD plane to road/sky/spatial effect geometry.
+                if (R30SpatialSceneEffectNeedsWorldRouting())
+                    return R30ScreenSpaceKind::None;
                 // Do not promote any other direct WorldBillboard, including
                 // nested projected-effect calls, to flat HUD space.
                 if (!OutRunVR::GameSemantic::QueueRenderActive() &&
