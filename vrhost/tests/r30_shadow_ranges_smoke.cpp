@@ -103,11 +103,23 @@ int main()
         Contains(ranges, SourceOffset - 1, SourceOffset + sizeof(captured)) ||
         Contains(ranges, SourceOffset, SourceOffset + sizeof(captured) + 1))
         return 11;
+    // Two separated GPU-write observations must retain different payloads
+    // with the gap still denied. No unobserved byte's value is inspected.
+    constexpr std::uint32_t OtherOffset = SourceOffset + 128u;
+    const std::uint8_t other[] = { 0x7Fu, 0x55u, 0x01u };
+    std::memcpy(storage.data() + OtherOffset, other, sizeof(other));
+    Merge(ranges, OtherOffset, OtherOffset + sizeof(other));
+    if (ranges.size() != 2 ||
+        !Contains(ranges, OtherOffset, OtherOffset + sizeof(other)) ||
+        Contains(ranges, SourceOffset + sizeof(captured), OtherOffset))
+        return 16;
     auto* originalAllocation = storage.data();
     storage.resize(Allocation); // same capacity: no reallocation or zero-fill
     if (storage.data() != originalAllocation ||
         std::memcmp(storage.data() + SourceOffset, captured,
-                    sizeof(captured)) != 0)
+                    sizeof(captured)) != 0 ||
+        std::memcmp(storage.data() + OtherOffset, other,
+                    sizeof(other)) != 0)
         return 12;
     ranges.clear(); // D3DLOCK_DISCARD invalidates previously copied bytes
     if (Contains(ranges, SourceOffset, SourceOffset + sizeof(captured)))
