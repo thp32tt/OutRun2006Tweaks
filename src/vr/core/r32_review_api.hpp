@@ -90,7 +90,8 @@ namespace OutRunVRStereo
         None,
         Hud2D,
         FlatPerspectiveEffect,
-        ExactLensCentreWorld
+        ExactLensCentreWorld,
+        ProjectedWorldMarker2D
     };
 
     class R32ReviewInternalStereoPassScope final

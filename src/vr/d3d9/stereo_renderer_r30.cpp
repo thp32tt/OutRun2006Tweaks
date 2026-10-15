@@ -27,6 +27,7 @@
 #include "../core/r30_support_api.hpp"
 #include "../core/stereo_world_scale.hpp"
 #include "../game/render_semantics.hpp"
+#include "../game/projected_rank_stereo.hpp"
 #include <cstring>
 #include "../state/state_block_tracker.hpp"
 #include "vr_pass_policy.hpp"
@@ -2439,7 +2440,8 @@ namespace OutRunVRStereo
             None,
             Hud2D,
             FlatPerspectiveEffect,
-            ExactLensCentreWorld
+            ExactLensCentreWorld,
+            ProjectedWorldMarker2D
         };
 
         // Strict R84 C993 source proof, ported from the protected R26
@@ -2485,6 +2487,15 @@ namespace OutRunVRStereo
         {
             if (!device || !R29OwnerTargetIsBackBuffer())
                 return R30ScreenSpaceKind::None;
+
+            // This exact car/rival rank SpriteNode carries its own original
+            // Calc3D2D view-space anchor; it is not generic screen HUD.
+            // A missing anchor must never reuse an earlier vehicle's depth.
+            const auto scope = OutRunVR::GameSemantic::EffectiveScope();
+            if (OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(scope))
+                return OutRunVR::GameSemantic::CurrentProjectedMarker()
+                    ? R30ScreenSpaceKind::ProjectedWorldMarker2D
+                    : R30ScreenSpaceKind::None;
 
             float m34 = 0.0f;
             float m44 = 0.0f;
@@ -2646,6 +2657,95 @@ namespace OutRunVRStereo
             return true;
         }
 
+        // R84 mainline counterpart of the HMD-tested R26_SAFE R57 route.
+        // The point is produced by an exact Calc3D2D game CALL, not inferred
+        // from alpha/RHW or another car's most recent shader constants.
+        bool R30ProjectRankAnchor(
+            const OutRunVR::GameSemantic::ProjectedMarkerInfo& marker,
+            const D3DMATRIX& transform, float& x, float& y) noexcept
+        {
+            if (!marker.valid || !std::isfinite(marker.viewX) ||
+                !std::isfinite(marker.viewY) || !std::isfinite(marker.viewZ) ||
+                !R29OwnerMatrixFinite(transform))
+                return false;
+            const float clipX = marker.viewX * transform._11 +
+                marker.viewY * transform._21 + marker.viewZ * transform._31 +
+                transform._41;
+            const float clipY = marker.viewX * transform._12 +
+                marker.viewY * transform._22 + marker.viewZ * transform._32 +
+                transform._42;
+            const float clipW = marker.viewX * transform._14 +
+                marker.viewY * transform._24 + marker.viewZ * transform._34 +
+                transform._44;
+            if (!std::isfinite(clipX) || !std::isfinite(clipY) ||
+                !std::isfinite(clipW) || clipW <= 1.0e-6f)
+                return false;
+            x = clipX / clipW;
+            y = clipY / clipW;
+            return std::isfinite(x) && std::isfinite(y);
+        }
+
+        bool R30BuildProjectedRankDelta(
+            const OutRunVRRenderer::LatchedStereoFrame& stereo,
+            const D3DMATRIX& baseProjection,
+            OutRunVR::RankMarker::StereoNdcShift& shift) noexcept
+        {
+            const auto* marker =
+                OutRunVR::GameSemantic::CurrentProjectedMarker();
+            if (!marker || !marker->valid ||
+                !R29OwnerMatrixFinite(baseProjection) ||
+                !R30ProjectRankAnchor(*marker, baseProjection,
+                    shift.baseX, shift.baseY))
+                return false;
+
+            float headRaw[16]{};
+            std::uint32_t headSequence = 0;
+            if (!OutRunVRRenderer::GetLatchedHeadInverse(
+                    headRaw, headSequence) ||
+                headSequence != stereo.poseSequence)
+                return false;
+            D3DMATRIX headInverse{};
+            std::memcpy(&headInverse, headRaw, sizeof(headInverse));
+            if (!R29OwnerMatrixFinite(headInverse))
+                return false;
+
+            const float center[3]{
+                0.5f * (stereo.eyeOffset[0][0] + stereo.eyeOffset[1][0]),
+                0.5f * (stereo.eyeOffset[0][1] + stereo.eyeOffset[1][1]),
+                0.5f * (stereo.eyeOffset[0][2] + stereo.eyeOffset[1][2])
+            };
+            const float identity[4]{0.0f, 0.0f, 0.0f, 1.0f};
+            for (int eye = 0; eye < 2; ++eye)
+            {
+                const float relative[3]{
+                    stereo.eyeOffset[eye][0] - center[0],
+                    stereo.eyeOffset[eye][1] - center[1],
+                    stereo.eyeOffset[eye][2] - center[2]
+                };
+                const D3DMATRIX eyePose =
+                    R29OwnerMatrixFromQuaternionTranslation(
+                        identity, relative,
+                        Settings::VRWorldScale * Settings::VRStereoDepth);
+                const D3DMATRIX eyeTransform = R29OwnerMultiplyMatrix(
+                    R29OwnerMultiplyMatrix(
+                        headInverse, R29OwnerInverseRigid(eyePose)),
+                    R29OwnerProjectionFromFov(
+                        baseProjection, stereo.eyeFov[eye]));
+                float projectedX = 0.0f, projectedY = 0.0f;
+                if (!R30ProjectRankAnchor(
+                        *marker, eyeTransform, projectedX, projectedY))
+                    return false;
+                shift.deltaX[eye] = projectedX - shift.baseX;
+                shift.deltaY[eye] = projectedY - shift.baseY;
+                if (!std::isfinite(shift.deltaX[eye]) ||
+                    !std::isfinite(shift.deltaY[eye]) ||
+                    std::fabs(shift.deltaX[eye]) > 2.0f ||
+                    std::fabs(shift.deltaY[eye]) > 2.0f)
+                    return false;
+            }
+            return true;
+        }
+
         struct R30XyzrhwState
         {
             OutRunVRRenderer::LatchedStereoFrame stereo{};
@@ -2670,6 +2770,8 @@ namespace OutRunVRStereo
             bool depthTestEnabled = false;
             bool rhwDepthEvidence = false;
             bool worldEffect = false;
+            bool projectedWorldMarker = false;
+            OutRunVR::RankMarker::StereoNdcShift projectedRank{};
         };
 
         // R30 XYZRHW world smoke/decal geometry has a latched pose and a
@@ -3093,6 +3195,21 @@ namespace OutRunVRStereo
                 OutRunVRRenderer::GetRendererBaseProjection(projectionRaw);
             if (haveBaseProjection)
                 std::memcpy(&baseProjection, projectionRaw, sizeof(baseProjection));
+
+            // Queue-owned exact vehicle markers bypass particle Z/RHW
+            // heuristics. Reproject each original view-space car anchor
+            // without modifying other HUD, sky, alpha or world geometry.
+            if (OutRunVR::GameSemantic::CorroboratesProjectedWorldMarker(
+                    OutRunVR::GameSemantic::EffectiveScope()))
+            {
+                if (!haveBaseProjection ||
+                    !R30BuildProjectedRankDelta(
+                        state.stereo, baseProjection, state.projectedRank))
+                    return false;
+                state.projectedWorldMarker = true;
+                state.worldEffect = false;
+                return true;
+            }
 
             // Smoke/sand can redraw a static VB/IB span many times without a
             // single game write. Copy caches already pin those exact revisions;
@@ -4189,6 +4306,64 @@ namespace OutRunVRStereo
             UINT knownUsedCount = UINT_MAX,
             const std::vector<std::uint32_t>* touched = nullptr) noexcept
         {
+            // Per-vehicle Calc3D2D quad: preserve original Z/RHW, UV,
+            // alpha, animation offsets and sprite ordering, moving only XY
+            // by its own view-space anchor's exact two-eye delta.
+            if (state.projectedWorldMarker)
+            {
+                if (!source || !vertexCount || stride < 4u * sizeof(float) ||
+                    (usedMask && usedMask->size() < vertexCount))
+                    return false;
+                const std::size_t bytes =
+                    static_cast<std::size_t>(vertexCount) * stride;
+                if (!bytes || bytes > 4u * 1024u * 1024u)
+                    return false;
+                try
+                {
+                    left.resize(bytes);
+                    right.resize(bytes);
+                }
+                catch (...)
+                {
+                    return false;
+                }
+                std::memcpy(left.data(), source, bytes);
+                std::memcpy(right.data(), source, bytes);
+                const auto& vp = state.viewport;
+                const float requestedScale = Settings::VRHudScale.get();
+                if (!std::isfinite(requestedScale))
+                    return false;
+                const float scale = std::clamp(
+                    requestedScale, 0.30f, 1.20f);
+                for (UINT i = 0; i < vertexCount; ++i)
+                {
+                    if (usedMask && !(*usedMask)[i])
+                        continue;
+                    const auto off = static_cast<std::size_t>(i) * stride;
+                    const auto* src = reinterpret_cast<const float*>(
+                        static_cast<const std::uint8_t*>(source) + off);
+                    if (!std::isfinite(src[2]) || !std::isfinite(src[3]))
+                        return false;
+                    for (int eye = 0; eye < 2; ++eye)
+                    {
+                        float x = 0.0f, y = 0.0f;
+                        if (!OutRunVR::RankMarker::RemapScreenPoint(
+                                src[0], src[1],
+                                static_cast<float>(vp.X),
+                                static_cast<float>(vp.Y),
+                                static_cast<float>(vp.Width),
+                                static_cast<float>(vp.Height),
+                                scale, state.projectedRank, eye, x, y))
+                            return false;
+                        auto* dst = reinterpret_cast<float*>(
+                            (eye == 0 ? left.data() : right.data()) + off);
+                        dst[0] = x;
+                        dst[1] = y;
+                    }
+                }
+                return true;
+            }
+
             // Fuse both non-indexed and indexed ScreenHud eyes in one CPU walk.
             // Preserve Z/RHW, UV, color and the original asymmetric FOV math;
             // world/particle reprojection stays on the bilateral fallback.
@@ -5296,6 +5471,41 @@ namespace OutRunVRStereo
             if (!R29OwnerMatrixFinite(stockWvp))
                 return false;
 
+            if (screenKind == R30ScreenSpaceKind::ProjectedWorldMarker2D)
+            {
+                float baseRaw[16]{};
+                if (!OutRunVRRenderer::GetRendererBaseProjection(baseRaw))
+                    return false;
+                D3DMATRIX baseProjection{};
+                std::memcpy(&baseProjection, baseRaw, sizeof(baseProjection));
+                OutRunVR::RankMarker::StereoNdcShift shift{};
+                if (!R30BuildProjectedRankDelta(
+                        stereo, baseProjection, shift))
+                    return false;
+                const float requestedScale = Settings::VRHudScale.get();
+                if (!std::isfinite(requestedScale))
+                    return false;
+                const float markerScale =
+                    std::clamp(requestedScale, 0.30f, 1.20f);
+                for (int eye = 0; eye < 2; ++eye)
+                {
+                    D3DMATRIX clipShift = R29OwnerIdentityMatrix();
+                    clipShift._11 = markerScale;
+                    clipShift._22 = markerScale;
+                    clipShift._41 = shift.deltaX[eye] +
+                        (1.0f - markerScale) * shift.baseX;
+                    clipShift._42 = shift.deltaY[eye] +
+                        (1.0f - markerScale) * shift.baseY;
+                    const D3DMATRIX corrected =
+                        R29OwnerMultiplyMatrix(stockWvp, clipShift);
+                    if (!R29OwnerMatrixFinite(corrected))
+                        return false;
+                    const D3DMATRIX t = R29OwnerTransposeMatrix(corrected);
+                    std::memcpy(eyeConstants[eye], &t, sizeof(t));
+                }
+                return true;
+            }
+
             if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld)
             {
                 // Original GPU c64 was saved in `original` for exact state
@@ -6005,6 +6215,8 @@ namespace OutRunVRStereo
             return R30SupportScreenSpaceKind::FlatPerspectiveEffect;
         case R30ScreenSpaceKind::ExactLensCentreWorld:
             return R30SupportScreenSpaceKind::ExactLensCentreWorld;
+        case R30ScreenSpaceKind::ProjectedWorldMarker2D:
+            return R30SupportScreenSpaceKind::ProjectedWorldMarker2D;
         default:
             return R30SupportScreenSpaceKind::None;
         }
@@ -6028,6 +6240,9 @@ namespace OutRunVRStereo
             break;
         case R30SupportScreenSpaceKind::ExactLensCentreWorld:
             lower = R30ScreenSpaceKind::ExactLensCentreWorld;
+            break;
+        case R30SupportScreenSpaceKind::ProjectedWorldMarker2D:
+            lower = R30ScreenSpaceKind::ProjectedWorldMarker2D;
             break;
         default:
             return false;

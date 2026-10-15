@@ -32,7 +32,8 @@ namespace OutRunVRStereo
     // Stable R30-owned render routing, not the anonymous R30 private enum.
     enum class R30SupportScreenSpaceKind : std::uint8_t
     {
-        None, Hud2D, FlatPerspectiveEffect, ExactLensCentreWorld
+        None, Hud2D, FlatPerspectiveEffect, ExactLensCentreWorld,
+        ProjectedWorldMarker2D
     };
     R30SupportScreenSpaceKind R30SupportClassifyScreenSpacePass(
         IDirect3DDevice9* device) noexcept;
