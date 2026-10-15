@@ -74,6 +74,9 @@ def check(api, r29, r30, proof, r30api, r32api, r32, workflow):
 
     bld = r30.split("bool R30BuildScreenSpaceEyeConstants(", 1)[1].split(
         "template <typename ActualDraw>", 1)[0]
+    lens = bld.split(
+        "if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld)", 1)[1].split(
+        "if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect)", 1)[0]
     for marker in (
         "R30ScreenSpaceKind::ExactLensCentreWorld",
         "GetVertexShaderConstantF(",
@@ -94,7 +97,11 @@ def check(api, r29, r30, proof, r30api, r32api, r32, workflow):
         "std::memcpy(eyeConstants[eye], &correctedT",
         "return false;",
     ):
-        assert marker in bld, "exact C993 per-eye transform lost: " + marker
+        assert marker in bld if marker in (
+            "GetVertexShaderConstantF(",
+            "R30SupportWvpFirstRegister, original",
+            "R30ScreenSpaceKind::ExactLensCentreWorld",
+        ) else marker in lens, "exact C993 per-eye transform lost: " + marker
     assert (bld.index("GetVertexShaderConstantF(") <
         bld.index("if (screenKind == R30ScreenSpaceKind::ExactLensCentreWorld)") <
         bld.index("R29OwnerTransposeMatrix(rawUploadedT)") <
@@ -103,6 +110,8 @@ def check(api, r29, r30, proof, r30api, r32api, r32, workflow):
         bld.index("R29OwnerProjectionFromFov(baseProjection,"))
     # The original GPU constants are needed to restore the source draw;
     # replacing `original` with a stock raw WVP would corrupt D3D9 state.
+    assert "headPoseSequence != stereo.poseSequence" in lens
+    assert "R29OwnerProjectionFromFov(baseProjection," in lens
     assert "std::memcpy(original, rawGameWvp" not in bld
     assert "std::memcpy(&uploadedT, original" in bld
 
