@@ -136,6 +136,8 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_partial_dirty_upload_probe_00753.cpp -o /tmp/dx11_partial_dirty_00753 && /tmp/dx11_partial_dirty_00753
           python tools/test_dx11_multi_dirty_upload_00754.py
           python tools/test_dx11_full_frame_empty_draw_00755.py
+          python tools/test_dx11_zero_source_hook_00756.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_zero_source_hook_probe_00756.cpp -o /tmp/dx11_zero_hook_00756 && /tmp/dx11_zero_hook_00756
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_full_frame_empty_draw_probe_00755.cpp -o /tmp/dx11_empty_draw_00755 && /tmp/dx11_empty_draw_00755
           python tools/test_dx11_full_game_geometry_upload.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_multi_dirty_upload_probe_00754.cpp -o /tmp/dx11_multi_dirty_00754 && /tmp/dx11_multi_dirty_00754

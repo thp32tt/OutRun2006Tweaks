@@ -20,6 +20,11 @@ void observe_indexed(IDirect3DDevice9* gameDevice, D3DPRIMITIVETYPE topology,
                      UINT vertexCount, const std::uint32_t* rebasedIndices,
                      UINT indexCount) noexcept;
 
+// A supported zero-count Draw has no CPU VB/IB/UP shadow. Observe its source
+// ordinal; after the real D3D9 call, failed HRESULT still aborts native output.
+void observe_empty_game_draw(IDirect3DDevice9* gameDevice,
+                             D3DPRIMITIVETYPE topology) noexcept;
+
 // An existing game VB/IB/UP Draw whose CPU snapshot cannot be mirrored still
 // advances the raw source stream. Multi-Draw inset publication fails closed;
 // this never alters the original D3D9 HRESULT or input path.

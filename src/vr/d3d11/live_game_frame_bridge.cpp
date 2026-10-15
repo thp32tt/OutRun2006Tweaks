@@ -4915,8 +4915,26 @@ bool diagnostic_enabled() noexcept {
     return optedIn;
 }
 
+void observe_empty_game_draw(IDirect3DDevice9* game,
+                             D3DPRIMITIVETYPE type) noexcept {
+    // No fabricated GPU Draw: only an already seeded actual game frame
+    // absorbs this source ordinal; original D3D9 Draw/input stay authoritative.
+    if (!game_native_empty_primitive_type(static_cast<std::uint32_t>(type))) {
+        observe_unavailable_game_draw(game);
+        return;
+    }
+    observe(game, type, 0u, nullptr, 0u, 0u, nullptr, 0u);
+}
+
 void observe_linear(IDirect3DDevice9* game, D3DPRIMITIVETYPE type,
                     UINT primitives, const void* vertices, UINT stride) noexcept {
+    // DrawPrimitiveUP with no vertices is a real source call, not a missing
+    // shadow. Preserve its ordinal between full-size menu/car/race native Draws.
+    if (primitives == 0u &&
+        game_native_empty_primitive_type(static_cast<std::uint32_t>(type))) {
+        observe_empty_game_draw(game, type);
+        return;
+    }
     UINT nativeElements = 0;
     if (!game_native_primitive_element_count(static_cast<std::uint32_t>(type),
                                              primitives, nativeElements)) {

@@ -28,6 +28,13 @@ constexpr bool game_primitive_element_count(bool triangleStrip,
     return true;
 }
  
+// A successful zero-count Draw has no vertex or index buffer bytes to read.
+// Unknown D3D9 topologies still break the native full-frame source stream.
+[[nodiscard]] constexpr bool game_native_empty_primitive_type(
+    std::uint32_t d3d9Type) noexcept {
+    return d3d9Type >= 1u && d3d9Type <= 6u;
+}
+
 // D3DPRIMITIVETYPE values (1..6) are defined by D3D9. Keep this span
 // validator independent of Windows headers for deterministic Linux probes.
 constexpr bool game_native_primitive_element_count(

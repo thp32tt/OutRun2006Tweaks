@@ -3182,6 +3182,16 @@ namespace OutRunVRStereo
             namespace live = outrun::vr::dx11::live_game_frame;
             if (!live::diagnostic_enabled() || !device) return;
             R30NativeGameSourceGuard nativeSource{device};
+            // Successful zero-count game draws have no VB/IB/UP bytes to
+            // snapshot. Record their exact native source slot before D3D9
+            // executes; failed original HRESULT still aborts at completion.
+            if (primitiveCount == 0u &&
+                live::game_native_empty_primitive_type(
+                    static_cast<std::uint32_t>(topology))) {
+                nativeSource.forwarded = true;
+                live::observe_empty_game_draw(device, topology);
+                return;
+            }
             UINT nativeElements = 0;
             if (
                 (topology != D3DPT_POINTLIST &&
@@ -3229,6 +3239,16 @@ namespace OutRunVRStereo
             namespace live = outrun::vr::dx11::live_game_frame;
             if (!live::diagnostic_enabled() || !device) return;
             R30NativeGameSourceGuard nativeSource{device};
+            // Successful zero-count game draws have no VB/IB/UP bytes to
+            // snapshot. Record their exact native source slot before D3D9
+            // executes; failed original HRESULT still aborts at completion.
+            if (primitiveCount == 0u &&
+                live::game_native_empty_primitive_type(
+                    static_cast<std::uint32_t>(topology))) {
+                nativeSource.forwarded = true;
+                live::observe_empty_game_draw(device, topology);
+                return;
+            }
             UINT nativeElements = 0;
             if (
                 (topology != D3DPT_POINTLIST &&
@@ -3352,6 +3372,16 @@ namespace OutRunVRStereo
             namespace live = outrun::vr::dx11::live_game_frame;
             if (!live::diagnostic_enabled() || !device) return;
             R30NativeGameSourceGuard nativeSource{device};
+            // Successful zero-count game draws have no VB/IB/UP bytes to
+            // snapshot. Record their exact native source slot before D3D9
+            // executes; failed original HRESULT still aborts at completion.
+            if (primitiveCount == 0u &&
+                live::game_native_empty_primitive_type(
+                    static_cast<std::uint32_t>(topology))) {
+                nativeSource.forwarded = true;
+                live::observe_empty_game_draw(device, topology);
+                return;
+            }
             UINT nativeElements = 0;
             if (
                 (topology != D3DPT_POINTLIST &&
