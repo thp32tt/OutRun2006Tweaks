@@ -146,7 +146,14 @@ def verify_source_aspect_snapshot(source: str) -> None:
     # A one-time HUD diagnostic log is also compiled into the independent
     # R29-R33 Win32 TU. It must follow the widened signature and reuse the
     # already-captured frame rather than leaving an orphan one-arg call.
-    # Diagnostic indentation changes when stereo-success publication is\n    # guarded, but the SAME frame snapshot must remain the argument owner.\n    import re\n    assert re.search(\n        r"R30HudAspectCompensation\\s*\\(\\s*stereo\\s*,\\s*"\n        r"frame\\.width\\s*,\\s*frame\\.height\\s*\\)\\s*\\);",\n        source\n    ) is not None
+    # Diagnostic indentation changes when stereo-success publication is
+    # guarded, but the SAME frame snapshot must remain the argument owner.
+    import re
+    assert re.search(
+        r"R30HudAspectCompensation\s*\(\s*stereo\s*,\s*"
+        r"frame\.width\s*,\s*frame\.height\s*\)\s*\);",
+        source
+    ) is not None
     assert "R30HudAspectCompensation(stereo)" not in source
 
 if __name__ == "__main__":
