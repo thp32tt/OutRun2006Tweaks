@@ -239,19 +239,36 @@ function Copy-Required([string]$name) {
     # the runnable x86 DLL or x64 host. The old executable survives a failed
     # write/hash check, and the game/host running guard is enforced above.
     $staged = Join-Path $root (".$name.stage.$PID.$([guid]::NewGuid().ToString('N'))")
+    # Windows File.Replace requires a nonempty backup pathname. Preserve the
+    # prior complete DLL/host until the newly installed hash has been checked.
+    $backup = Join-Path $root (".$name.rollback.$PID.$([guid]::NewGuid().ToString('N'))")
+    $verifiedInstall = $false
     try {
         Copy-Item -LiteralPath $p -Destination $staged -Force
         if ((Get-Sha256Lower $p) -ne (Get-Sha256Lower $staged)) {
             throw "Staged $name hash mismatch; existing installation preserved."
         }
         if (Test-Path -LiteralPath $installed) {
-            [System.IO.File]::Replace($staged, $installed, $null, $true)
+            [System.IO.File]::Replace($staged, $installed, $backup, $true)
         } else {
             [System.IO.File]::Move($staged, $installed)
         }
+        if ((Get-Sha256Lower $p) -ne (Get-Sha256Lower $installed)) {
+            # A complete prior executable is kept in the backup and can be
+            # restored on disk without exposing a partially copied DLL.
+            if (Test-Path -LiteralPath $backup) {
+                [System.IO.File]::Replace(
+                    $backup, $installed, ($backup + '.rejected'), $true)
+            }
+            throw "Installed $name hash mismatch; previous executable restored if present."
+        }
+        $verifiedInstall = $true
     } finally {
         if (Test-Path -LiteralPath $staged) {
             Remove-Item -LiteralPath $staged -Force
+        }
+        if ($verifiedInstall -and (Test-Path -LiteralPath $backup)) {
+            Remove-Item -LiteralPath $backup -Force
         }
     }
 }
