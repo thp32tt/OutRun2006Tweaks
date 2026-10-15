@@ -56,6 +56,22 @@ constexpr bool game_fvf_untextured_stage0(
                    (alphaOp == 3u && (alpha2 == 0u || alpha2 == 1u));
     return rgb && a;
 }
+// A TEX1..8 vertex may carry UVs and a stale bound texture even when the
+// actual stage-0 combiner uses only vertex DIFFUSE for both RGB and alpha.
+// Require the next stage to be disabled: otherwise CURRENT/TEMP or stage-1
+// texture operations could still consume the game-owned binding.
+constexpr bool game_fvf_diffuse_only_inactive_texture(
+    std::uint32_t op, std::uint32_t arg1, std::uint32_t arg2,
+    std::uint32_t alphaOp, std::uint32_t alpha1, std::uint32_t alpha2,
+    std::uint32_t nextOp, bool diffuse) noexcept {
+    return nextOp == 1u &&
+        game_fvf_untextured_stage0(op, arg1, arg2, alphaOp, alpha1,
+                                   alpha2, nextOp, diffuse);
+}
+static_assert(game_fvf_diffuse_only_inactive_texture(
+    1u, ~0u, ~0u, 4u, ~0u, ~0u, 1u, true));
+static_assert(!game_fvf_diffuse_only_inactive_texture(
+    2u, 2u, 0u, 2u, 0u, 0u, 1u, true));
 static_assert(game_fvf_untextured_stage0(1, ~0u, ~0u, 4, ~0u, ~0u, 1, true));
 static_assert(!game_fvf_untextured_stage0(1, 0, 0, 4, 0, 0, 4, true));
 struct GameFvfLayout {

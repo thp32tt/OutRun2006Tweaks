@@ -1,0 +1,88 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00771",
+  "production_id": "CONVERSION-DX11-00771",
+  "event_id": "CONVERSION-DX11-00771-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:REAL_GAME_DIFFUSE_ONLY_TEXTURE_BYPASS",
+  "feature_id": "DX11-LIVE-DIFFUSE-ONLY-TEX-FRAME",
+  "status": "IN_PROGRESS",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_fvf_layout.hpp",
+    ".github/workflows/dx11-fast-structural.yml",
+    "tools/dx11_inactive_texture_game_frame_00771.cpp",
+    "tools/test_dx11_inactive_texture_game_frame_00771.py"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-LIVE-DIFFUSE-ONLY-TEX-FRAME",
+    "goal": "Keep real full-resolution menu, vehicle-selection and race game-authored Draw/DrawIndexed in native D3D11 when TEX1..8 FVF and bound D3D9 texture are inactive because fixed-function stage0 reads DIFFUSE only; maintain exact FVF geometry, untextured pixel shader, Present and DX9Ex/gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "diffuse-only-real-draw",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_TEXn_FVF_native_geometry_and_shader",
+        "expected_behavior": "Verified unused stale texture is bypassed without dropping UV-layout vertices, allowing game-created menu/vehicle/race Draw/DrawIndexed to reach untextured D3D11 PS and full Present."
+      },
+      {
+        "id": "texture-needed-safe-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "texture_stage1_and_original_D3D9_input",
+        "expected_behavior": "RGB/alpha sampling, active following stage, missing DIFFUSE and unsupported state stay on original D3D9 Draw/Present/gamepad; no accidental native promotion."
+      },
+      {
+        "id": "integrated-exact-ci",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Win32_Backend_OpenXR_HUD",
+        "expected_behavior": "Portable C++17 positive/negative and destructive integration tests plus final same-SHA five required GitHub Actions gates succeed."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "diffuse-only-real-draw": "PENDING",
+    "texture-needed-safe-fallback": "PENDING",
+    "integrated-exact-ci": "PENDING"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Real D3D9 Draw/DrawIndexed captures live texture combiner and FVF layout",
+      "Native D3D11 geometry and untextured PS use DIFFUSE while inactive TEXn bypass retains full vertex byte offsets",
+      "Full-resolution Present remains opt-in, with original D3D9 rendering/input fail-closed"
+    ],
+    "batch_components": [
+      "live_game_frame_bridge.cpp",
+      "live_game_fvf_layout.hpp",
+      "DX11 Fast portable C++ and destructive linkage gate"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha"
+  },
+  "pipeline": {
+    "C0_RECOVER": "Read GitHub head, policy, 00770 C6 and real source code; confirmed 00770 complete.",
+    "C1_REVIEW": "Found TEX1..8/FVF with disabled or diffuse-only fixed-function stage 0 was incorrectly forced through texture mirror and rejected even when D3D9 bound texture was stale.",
+    "C2_IMPLEMENT": "Branched live Draw capture to diffuse-only path; preserved full FVF geometry and native untextured PS with strict stage1/input fallback; added C++ and integration tests.",
+    "C3_VALIDATE": "PENDING_GITHUB_EXACT_SHA",
+    "C4_COMMIT": "PENDING_GITHUB_RESULT",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_GATE"
+  },
+  "evidence": {
+    "runtime": "No actual game, gamepad, Quest3 or VDXR test performed. No runtime promotion."
+  },
+  "base_head_sha": "eb49822662d4b06a92e3ab38b9561fcc212b49bf"
+}

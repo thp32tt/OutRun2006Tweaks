@@ -832,6 +832,10 @@ struct NativeVertex {
 // draws. Any unmirrored texture, sampler, alpha or stage state fails closed.
 struct TextureCapture {
     bool enabled = false;
+    // Source FVF contains UVs, but the verified stage-0 RGB/alpha shader
+    // consumes DIFFUSE only and stage 1 is disabled. Never sample the stale
+    // D3D9 texture; keep physical VB/IB byte offsets from the full FVF.
+    bool inactiveStage0TextureBypass = false;
     bool stage1Enabled = false;
     bool stage1TextureOperands = false; // Stage1 D3DTA_TEXTURE in actual RGB/alpha operands.
     ComPtr<IDirect3DTexture9> stage1SeparateTexture; // Independent live D3D9 texture/sampler -> native t1/s1.
@@ -2137,7 +2141,28 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     if (!game_fvf_layout(fvf, layout)) return false;
     // FVF PSIZE alters point rasterization, so point-specific admission below
     // rejects it. For lines/triangles the field only shifts COLOR/UV offsets.
-    capture.enabled = layout.textured;
+    // Decide from the LIVE fixed-function combiner, not from TEXCOORD count.
+    // Menus and vehicle previews may retain TEX1..8 UVs and an old bound
+    // texture while COLOROP/ALPHAOP select only DIFFUSE. Such Draws require
+    // the native untextured PS; genuinely sampled state still takes the
+    // original texture mirror or safe D3D9 fallback.
+    DWORD stage0Op = 0u, stage0Arg1 = 0u, stage0Arg2 = 0u;
+    DWORD stage0AlphaOp = 0u, stage0Alpha1 = 0u, stage0Alpha2 = 0u;
+    DWORD followingColorOp = 0u;
+    if (FAILED(game->GetTextureStageState(0, D3DTSS_COLOROP, &stage0Op)) ||
+        FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG1, &stage0Arg1)) ||
+        FAILED(game->GetTextureStageState(0, D3DTSS_COLORARG2, &stage0Arg2)) ||
+        FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAOP, &stage0AlphaOp)) ||
+        FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAARG1, &stage0Alpha1)) ||
+        FAILED(game->GetTextureStageState(0, D3DTSS_ALPHAARG2, &stage0Alpha2)) ||
+        FAILED(game->GetTextureStageState(1, D3DTSS_COLOROP, &followingColorOp)))
+        return false;
+    const bool diffuseOnly = game_fvf_diffuse_only_inactive_texture(
+        stage0Op, stage0Arg1, stage0Arg2,
+        stage0AlphaOp, stage0Alpha1, stage0Alpha2,
+        followingColorOp, layout.hasDiffuse);
+    capture.inactiveStage0TextureBypass = diffuseOnly && layout.textured;
+    capture.enabled = layout.textured && !diffuseOnly;
     // Native VS has no additive specular interpolant. Object-space NORMAL
     // is valid only when D3DRS_LIGHTING is disabled below.
     if (layout.hasSpecular) {
@@ -2159,8 +2184,9 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
     if (capture.enabled) {
         if (!tex || tex->GetType() != D3DRTYPE_TEXTURE ||
             FAILED(tex.As(&capture.texture))) return false;
-    } else if (tex) {
-        // No texture source is consumed by the diffuse-only shader.
+    } else if (tex && !diffuseOnly) {
+        // A game-authored texture binding is ignored only after proving the
+        // complete live RGB/alpha/next-stage combiner reads vertex DIFFUSE.
         return false;
     }
     DWORD blend=TRUE, alpha=TRUE, stencil=TRUE, depth=TRUE, clip=TRUE;
@@ -3400,7 +3426,9 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
                         std::vector<NativeVertex>& output) {
     if (!input || stride < layout.minStride || stride > 512u ||
         count == 0 || count > kMaxVertices ||
-        capture.enabled != layout.textured)
+        (capture.enabled != layout.textured &&
+         !(layout.textured && !capture.enabled &&
+           capture.inactiveStage0TextureBypass)))
         return false;
     output.resize(count);
     const auto* src = static_cast<const std::uint8_t*>(input);
