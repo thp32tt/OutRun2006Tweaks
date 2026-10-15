@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Regression: actual D3D9 color+Z backbuffer Clear feeds D3D11 full game Draw."""
 from pathlib import Path
+import re
 p=Path(__file__).resolve().parents[1]
 c=(p/"src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
 h=(p/"src/vr/d3d11/live_game_frame_bridge.hpp").read_text()
@@ -16,7 +17,11 @@ def valid(cpp,hook,policy):
    "D3DCOLOR color, float z) noexcept" in h,
    "D3DCOLOR color, float z) noexcept" in s,
    "live_game_frame::observe_game_clear(" in hook,
-   "device, count, rects, flags, color, z);" in hook,
+   # Verify each exact hooked callee with its own z argument.  Searching for
+   # the unqualified argument list can match the *other* Clear call and
+   # accidentally accept a dropped Z in observe_game_clear.
+   re.search(r"live_game_frame::observe_game_clear\(\s*device,\s*count,\s*rects,\s*flags,\s*color,\s*z\);", hook) is not None,
+   re.search(r"live_game_frame::preserve_game_partial_target_clear\(\s*device,\s*count,\s*rects,\s*flags,\s*color,\s*z\);", hook) is not None,
    "if (SUCCEEDED(result)) {" in hook,
    "if (wholeBackbuffer && env_full_game_opt_in())" in s,
    "s.frameBatch.reset();" in s,
@@ -51,7 +56,11 @@ for old,new in (
  i=c.index("void observe_game_clear(");j=c.index("void observe_unavailable_game_draw(",i)
  s=c[i:j];assert old in s
  assert not valid(c[:i]+s.replace(old,new,1)+c[j:],r,helper),old
-assert not valid(c,r.replace("device, count, rects, flags, color, z);","device, count, rects, flags, color);",1),helper)
+for callee in ("observe_game_clear", "preserve_game_partial_target_clear"):
+ pattern = (rf"(live_game_frame::{callee}\(\s*device,\s*count,\s*rects,\s*flags,\s*color),\s*z(\s*\);)")
+ mutated, count = re.subn(pattern, r"\1\2", r, count=1)
+ assert count == 1, f"missing exact {callee} callsite for destructive Z mutation"
+ assert not valid(c, mutated, helper), f"Z argument omission escaped: {callee}"
 assert not valid(c,r,helper.replace("!stencilCleared","stencilCleared"))
 assert not valid(c,r,helper.replace("z >= 0.0f && z <= 1.0f","true"))
 print("00733 full-resolution game color+Z Clear native depth/fallback PASS")
