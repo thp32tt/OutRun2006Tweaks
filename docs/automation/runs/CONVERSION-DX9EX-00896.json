@@ -1,0 +1,109 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00896",
+  "production_id": "CONVERSION-DX9EX-00896",
+  "event_id": "CONVERSION-DX9EX-00896-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00896",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+  "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_AWAITING_CI",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_STATE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "23d7441432afda5b500d5e348f33895d71274f1a",
+  "material_result_sha": "ae74b18e95c928077e8a8e079669c14c02511952",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00896.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:EXTENDED_TIME",
+    "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
+    "goal": "Preserve original +TIME sprites and numeric glyph batches through transient D3DX failed Begin/Draw while keeping exact queued and direct HUD submission ownership and native fallback.",
+    "scope_boundary": "Original six +TIME producers, exact ID3DXSprite callbacks and separate GOAL regression protection; no generic Flush, no world/hud geometry, SkyGlow, R26-only, DX11 or frozen DXVK change.",
+    "trace_stages": [
+      "Original six StageExtension E8 sprani and glyph calls select StageExtensionTime ScreenHud or queue-node exact producer provenance.",
+      "D3DX ID3DXSprite Begin/Draw batches delay actual GPU rasterization until Flush/End; a failed nested Begin previously cleared valid tracked provenance despite preserving native active batch.",
+      "Under R84 R30/R33 GPU ownership and per-eye host composition, keep a still-active batch after rejected Begin and revoke untrusted ownership after failed Draw before later Flush/End."
+    ],
+    "subcomponents": [
+      "Retain active homogeneous outgoing +TIME/GOAL provenance when a nested Begin is rejected without closing the existing D3DX batch.",
+      "Fail closed on failed Draw with uncertain internal GPU submission, while leaving normal Begin, batching, producer FIFO, alpha, original HRESULT and device-reset path untouched.",
+      "Add source-location-specific regression checks and destructive mutation negatives for both failure cases before exact SHA game/host/package validation."
+    ],
+    "acceptance_items": [
+      {
+        "id": "exact_stage_batch_begin_lifetime",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original StageExtension E8 to direct/queue GPU D3DX Begin/Draw/Flush/End",
+        "expected_behavior": "A failed nested Begin cannot erase a still-active original +TIME homogeneous batch before its correct semantic Flush/End, preserving original Draw output and game HRESULT."
+      },
+      {
+        "id": "failed_draw_fallback_scope",
+        "category": "fallback_regression",
+        "behavior_area": "Untrusted D3DX draw submission and GOAL/rank/game/native fallback",
+        "expected_behavior": "A failed Draw revokes stale tracked +TIME/GOAL GPU batch promotion, while ordinary Draw, unrelated queue, legacy rank and original D3DX game error propagation stay unchanged."
+      },
+      {
+        "id": "exact_sha_dx9ex_batch_gate",
+        "category": "integrated_validation",
+        "behavior_area": "R84 game x86, R26_SAFE rollback, host x64, HUD/Full Source and Domain gates",
+        "expected_behavior": "Changed-area source mutation assertions and final exact-SHA Windows Active, Domain, HUD and Full Source gates pass before BUILD_VERIFIED; HMD separately untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "exact_stage_batch_begin_lifetime": "SOURCE_IMPLEMENTED",
+    "failed_draw_fallback_scope": "SOURCE_IMPLEMENTED",
+    "exact_sha_dx9ex_batch_gate": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "VRProjectedD3DXSpriteIsolationR64::BeginDest always called ForgetBatch and set BatchActive=SUCCEEDED(hr), even when a failed nested Begin did not close the previously active original ID3DXSprite batching session.",
+    "root_cause": "An unsuccessful nested Begin was wrongly treated as a successful transition to a new batch, deleting StageExtensionTime/GOAL source provenance. Failed Draw similarly lacked an explicit uncertain-batch fail-closed transition.",
+    "fix_evidence": "Preserve exact still-active tracked batch across failed nested Begin; after failed Draw on the tracked sprite, invalidate BatchActive, StageBoundaryReady and pending provenance while returning the original HRESULT. Normal batching unmodified.",
+    "negative_test_evidence": "tools/verify_vr_stage_extension_d3dx_batch_owner.py tests nested Begin and failed Draw scope; two source mutation negatives reject removal of the failure guards.",
+    "evidence_limits": "No physical Quest3/VDXR test or D3DX native failed-call injection; general +TIME optical visual outcome remains open.",
+    "source_trace": [
+      "Six original extension-time sprani/print callsites enter direct ScreenHud producer scopes and queue-node tags.",
+      "The R64 ID3DXSprite Begin/Draw/Flush/End hook tracks homogeneous batch ownership across producer boundaries; error-state transitions are now safe for exact producer scope.",
+      "R84 R30/R33 consumes the ownership at real draw time for left and right GPU targets, then the x64 OpenXR host composes eye images; actual HMD acceptance remains untested."
+    ],
+    "alternatives_rejected": [
+      "Do not insert per-Draw global Flush, disable stage effects, change alpha, alter optical matrix assumptions or assume failed D3DX calls submitted no triangles."
+    ],
+    "eye_ownership": "Direct+queued source semantic must survive until the physical GPU Draw consumed by R84 R30/R33 per-eye processing; failure invalidates source claims, not original game raster submission."
+  },
+  "runtime_evidence": "Quest3/VDXR and original-game D3DX fault injection not executed.",
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "NEED_HMD_TEST",
+  "result_commit_ci_skip": false,
+  "ci_evidence": {
+    "status": "PENDING_EXACT_SHA",
+    "source_material_sha": "ae74b18e95c928077e8a8e079669c14c02511952",
+    "failed_first_candidate": {
+      "id": 38731320516,
+      "conclusion": "failure",
+      "reason": "RUN_RECORD_NOT_FOUND"
+    },
+    "required_final_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "OutRun EXE HUD Inspector CI",
+      "DX9Ex Full Source Impact Review"
+    ],
+    "runtime": "UNTESTED"
+  }
+}

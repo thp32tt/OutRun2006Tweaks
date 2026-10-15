@@ -69,6 +69,29 @@ def check(code: str, header: str) -> list[str]:
          "BatchActive = false" in hook and
          "ForgetBatch();" in hook,
          "Begin/End/failed-Flush state invalidation missing")
+    # Failure-injection contract for the original ID3DXSprite lifecycle:
+    # a rejected nested Begin does NOT terminate the previous active batch.
+    # A failed Draw has unknown internal submission progress and must revoke
+    # its +TIME/GOAL ownership rather than presenting stale state at Flush/End.
+    begin_pos = hook.find("static HRESULT __stdcall BeginDest(")
+    flush_pos = hook.find("static HRESULT __stdcall FlushDest(", begin_pos)
+    begin_path = hook[begin_pos:flush_pos] if begin_pos >= 0 else ""
+    draw_pos = hook.find("static HRESULT __stdcall DrawDest(")
+    install_pos = hook.find("static DWORD WINAPI InstallThread(", draw_pos)
+    draw_path = hook[draw_pos:install_pos] if draw_pos >= 0 else ""
+    need("const bool existingBatch =" in begin_path and
+         "BatchActive && self == TrackedSprite && IsExactSprite(self)" in begin_path and
+         "if (FAILED(hr) && existingBatch)\n                return hr;" in begin_path and
+         begin_path.find("if (FAILED(hr) && existingBatch)") <
+         begin_path.find("ForgetBatch();"),
+         "failed nested D3DX Begin must keep existing exact sprite provenance")
+    need("if (FAILED(hr))\n        {" in draw_path and
+         "if (self && self == TrackedSprite)\n            {" in draw_path and
+         "BatchActive = false;" in draw_path and
+         "StageBoundaryReady = false;" in draw_path and
+         "ForgetBatch();" in draw_path and
+         draw_path.find("if (FAILED(hr))") < draw_path.find("using namespace OutRunVR::GameSemantic;"),
+         "failed D3DX Draw must invalidate untrusted +TIME/GOAL batch ownership")
     lifecycle_start = hook.find("static void InvalidateForDeviceLifecycle(")
     lifecycle_end = hook.find("static bool FlushTracked(", lifecycle_start)
     lifecycle = hook[lifecycle_start:lifecycle_end] if (
@@ -356,6 +379,12 @@ def main() -> int:
                 "        FlushD3DXAtDirectGoalSourceExit();\n"
                 "        ResultProgressDirectDrawOwner.reset();",
                 "        ResultProgressDirectDrawOwner.reset();", 1),
+        "failed-nested-begin-wipes-pending-owner":
+            code.replace("if (FAILED(hr) && existingBatch)\n                return hr;",
+                         "if (FAILED(hr) && false)\n                return hr;", 1),
+        "failed-draw-keeps-old-owner":
+            code.replace("if (self && self == TrackedSprite)\n            {\n                BatchActive = false;",
+                         "if (self && false)\n            {\n                BatchActive = false;", 1),
         "lost-device-invalidates-no-batch":
             code.replace(
                 "const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);\n"
