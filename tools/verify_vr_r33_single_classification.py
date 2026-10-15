@@ -183,10 +183,28 @@ def check_mono_aux_fastpath(text: str) -> None:
     assert "if (telemetry)" in body and "R32ReviewNoteDispatchFallback();" in body
     assert "R32ReviewRunLowerFailClosed(device," in body
     assert "std::forward<LowerR29Draw>(lowerR29Draw)" in body
-    bypass = "if (!resyncAlreadyFlushed)\n                return fallbackToR29();"
-    assert bypass in dispatch, "mono/aux still pays for R33 classification"
+    bypass = "if (!resyncAlreadyFlushed)\n            {"
+    assert bypass in dispatch, "mono/aux must bypass classification"
     assert dispatch.index("StateBlockTracker::Recording()") < dispatch.index(bypass)
     assert dispatch.index(bypass) < dispatch.index("R32ReviewClassifyScreenSpacePass(device)")
+    # An unflushed original C993 centre has no stereo raster proof. It must
+    # bypass generic R29 cached-world reprojection, unlike ordinary mono,
+    # auxiliary, noncentre and outer CABE draws, which keep the R29 fallback.
+    early = dispatch.split(bypass, 1)[1].split(
+        "// Classify exactly once", 1
+    )[0]
+    centre = "OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync("
+    assert centre in early, "unready exact C993 must preserve original"
+    assert "directLensCentre, resyncAlreadyFlushed)" in early, (
+        "early raster helper must require both exact producer and raster state"
+    )
+    assert re.search(r"if\s*\(" + re.escape(centre) +
+                     r".*?\)\s*\{\s*if\s*\(telemetry\)\s*"
+                     r"R32ReviewNoteDispatchFallback\(\);\s*"
+                     r"return actualDraw\(\);\s*\}\s*"
+                     r"return fallbackToR29\(\);", early, re.S), (
+        "only exact C993 may use raw original before R29 fallback"
+    )
     assert dispatch.rfind("return fallbackToR29();") > dispatch.index(
         "R33TryFastWorld(device,"), "stereo fallback must use identical R29 policy"
 
@@ -200,38 +218,50 @@ def mutate_dispatch(src: str, before: str, after: str) -> str:
 
 
 def negative_mono_aux_fastpath(src: str) -> None:
-    bypass = "if (!resyncAlreadyFlushed)\n                return fallbackToR29();"
+    # Keep original R29 fallback, and reject any loss of direct C993 identity
+    # or substitution of the raw call for all mono/aux draws.
+    bypass = "if (!resyncAlreadyFlushed)\n            {"
+    exact = "if (OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync("
+    early_raw = ("return actualDraw();\n"
+                 "                }\n"
+                 "                return fallbackToR29();")
     cases = [
-        (bypass, "if (false)\n                return fallbackToR29();"),
-        (bypass, "if (resyncAlreadyFlushed)\n                return fallbackToR29();"),
+        (bypass, "if (false)\n            {"),
+        (bypass, "if (resyncAlreadyFlushed)\n            {"),
+        (exact, "if (false && OutRunVR::LensCentre::PreserveOriginalBeforeRasterResync("),
+        ("directLensCentre, resyncAlreadyFlushed)",
+         "false, resyncAlreadyFlushed)"),
+        (early_raw, "return actualDraw();\n"
+                    "                }\n"
+                    "                return actualDraw();"),
+        (early_raw, "return fallbackToR29();\n"
+                    "                }\n"
+                    "                return fallbackToR29();"),
         ("return R32ReviewRunLowerFailClosed(device,",
          "return R32ReviewCallRawDrawPrimitive(device,"),
-        ("R32ReviewDiscardUnreliableDrawCaches();", "/* removed */"),
+        ("R32ReviewDiscardUnreliableDrawCaches();",
+         "/* removed */"),
         ("R32ReviewDiscardUnreliableDrawCaches();\n"
          "                if (telemetry)\n"
          "                    R32ReviewNoteDispatchFallback();",
          "R32ReviewDiscardUnreliableDrawCaches();\n"
          "                if (telemetry)\n"
          "                    /* removed */"),
-        ("if (!resyncAlreadyFlushed)\n                return fallbackToR29();",
-         "if (!resyncAlreadyFlushed)\n                return actualDraw();"),
-        ("return fallbackToR29();\n        }\n\n        HRESULT" ,
+        ("return fallbackToR29();\n        }\n\n        HRESULT",
          "return actualDraw();\n        }\n\n        HRESULT"),
     ]
-    # Last mutation spans the dispatch function boundary: handle separately.
     for index, (before, after) in enumerate(cases, 1):
         if index == len(cases):
             assert before in src
             mutant = src.replace(before, after, 1)
         else:
             mutant = mutate_dispatch(src, before, after)
-        assert mutant != src, f"mutation fixture {index} did not alter source"
+        assert mutant != src, f"mono/aux negative fixture {index} did not alter source"
         try:
             check_mono_aux_fastpath(mutant)
         except (AssertionError, ValueError):
             continue
         raise AssertionError(f"mono/aux negative mutation {index} escaped")
-
 
 
 def check_write_flags_cached(src: str) -> None:
