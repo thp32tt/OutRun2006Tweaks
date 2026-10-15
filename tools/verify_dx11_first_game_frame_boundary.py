@@ -140,7 +140,7 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
             "native device and render target ownership missing")
     # Explicit native Draw dispatch permitted only inside the submit body.
     # Unrelated code must never obtain implicit native promotion.
-    match = re.search(r"bool submit\s*\(.*?\) noexcept \{(.*?)\n\}\n\nvoid observe\(", code, re.S)
+    match = re.search(r"bool submit\s*\(.*?\) noexcept \{(.*?)\n\}\n\nbool observe_source_device\(", code, re.S)
     require(match is not None, "isolated submit function missing")
     dispatch = re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", code)
     scoped = re.findall(r"(?:->|\.)\s*Draw(?:Indexed)?\s*\(", match.group(1))
