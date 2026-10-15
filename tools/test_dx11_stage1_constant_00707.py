@@ -23,14 +23,21 @@ def integrated(h,b):
    "if ((source & 32) != 0) value = value.aaaa;",
    "if ((source & 16) != 0) value = 1.0f - value;",
    "Stage1ThreeSource(stage0, diffuse, specular, stage1Ops.y,")) and
-  all(x in submit for x in ("float stageConstant[4];","sizeof(Stage1Upload) == 80u",
+  all(x in b for x in ("float stageConstant[4];",
+   "static_assert(sizeof(Stage1Upload) == 80u &&",
+   "constants.ByteWidth = sizeof(Stage1Upload);")) and
+  all(x in submit for x in ("ctx->UpdateSubresource(s.stage1Constants.Get(), 0u, nullptr,",
    "payload.stageConstant);","ctx->PSSetConstantBuffers(1, 1, &combiner)",
    "ctx->DrawIndexed(indexCount, 0, 0);","ctx->Draw(static_cast<UINT>(vertices.size()), 0);")))
 assert integrated(h,b)
 for t in ("needsStageConstant &&","GetTextureStageState(1,D3DTSS_CONSTANT,&stageConstant)",
  "capture.stage1Constant = {","float4 stage1Constant;",
  "if ((source & 15) == 6) value = stage1Constant;","payload.stageConstant);",
- "ctx->PSSetConstantBuffers(1, 1, &combiner)"):
+ "ctx->PSSetConstantBuffers(1, 1, &combiner)",
+ "float stageConstant[4];",
+ "static_assert(sizeof(Stage1Upload) == 80u &&",
+ "constants.ByteWidth = sizeof(Stage1Upload);",
+ "ctx->UpdateSubresource(s.stage1Constants.Get(), 0u, nullptr,"):
  assert not integrated(h,b.replace(t,"",1)),t
 assert "pairs!=400u" in p and "triadic!=16000u" in p
 assert "python tools/test_dx11_stage1_constant_00707.py" in w

@@ -25,8 +25,7 @@ hlsl = ("int4 stage1ArgZero;", "Stage1Source(stage0, diffuse, specular, arg0)",
         "stage1ArgZero.x, stage1Args.x, stage1Args.y",
         "stage1ArgZero.y, stage1Args.z, stage1Args.w",
         "AlphaGate(result.a);")
-uploads = ("static_assert(sizeof(Stage1Upload) == 80u);",
-           "payload.argZero[i] = static_cast<std::int32_t>(capture.stage1ArgZero[i]);",
+uploads = ("payload.argZero[i] = static_cast<std::int32_t>(capture.stage1ArgZero[i]);",
            "float stageConstant[4];", # The triadic arg0 offsets remain intact after new RGBA CB field.
            "payload.stageConstant);",
            "ctx->PSSetConstantBuffers(1, 1, &combiner)",
@@ -34,6 +33,8 @@ uploads = ("static_assert(sizeof(Stage1Upload) == 80u);",
            "ctx->Draw(static_cast<UINT>(vertices.size()), 0);")
 def valid(header,bridge,capture,ps,submission):
     return (all(s in bridge for s in sdk) and
+            "static_assert(sizeof(Stage1Upload) == 80u &&" in bridge and
+            "constants.ByteWidth = sizeof(Stage1Upload);" in bridge and
             all(s in capture for s in checks) and
             all(s in ps for s in hlsl) and
             all(s in submission for s in uploads) and
@@ -41,6 +42,11 @@ def valid(header,bridge,capture,ps,submission):
             "!stage1_combiner_supported" in header and
             "before_game_present(" in bridge)
 assert valid(h,b,cap,shader,submit)
+# Stage1Upload now belongs to device state before submit, while game-b1
+# arguments still arrive inside the actual Draw/DrawIndexed submit.
+for token in ("static_assert(sizeof(Stage1Upload) == 80u &&",
+              "constants.ByteWidth = sizeof(Stage1Upload);"):
+    assert not valid(h,b.replace(token,"",1),cap,shader,submit),token
 for item in checks:
     assert not valid(h,b,cap.replace(item,"",1),shader,submit),item
 for item in hlsl:
