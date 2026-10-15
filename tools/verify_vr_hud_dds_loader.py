@@ -32,7 +32,7 @@ def verify(text):
         (loader,"header->data.dwSize != sizeof(DDSURFACEDESC2)","malformed fast DDS surface descriptor rejected"),
         (loader,"header->data.ddpfPixelFormat.dwSize != sizeof(DDPIXELFORMAT)","malformed fast DDS pixel descriptor rejected"),
         (loader,"*ppTexture = nullptr;","released output cleared"),
-        (loader,"bytes > remainingSourceBytes","mip source bounded"),
+        (loader,"sourceRowPitch > remainingSourceBytes / mipRows","mip source stride bounded"),
         (loader,"Width > 16384","oversized DDS rejected"),
         (loader,"Width != D3DX_DEFAULT && Width != header->data.dwWidth","explicit resized DDS width rejected before packed row copy"),
         (loader,"Height != D3DX_DEFAULT && Height != header->data.dwHeight","explicit resized DDS height rejected before packed row copy"),
@@ -40,8 +40,14 @@ def verify(text):
         (loader,"? D3DLOCK_DISCARD : 0;","MANAGED static lock uses zero flags"),
         (loader,"LockRect(mipLevel, &lockedRect, nullptr, lockFlags)","safe lock flag passed"),
         (loader,"static_cast<size_t>(lockedRect.Pitch) < rowBytes","pitch bounded"),
-        (loader,"srcRow = srcData + static_cast<size_t>(row) * rowBytes","packed source row"),
+        (loader,"srcRow = srcData + static_cast<size_t>(row) * sourceRowPitch","file-pitched source row"),
         (loader,"dstRow = dest + static_cast<size_t>(row) * dstPitch","destination pitched row"),
+        (loader,"(header->data.dwFlags & DDSD_PITCH) != 0","DDS pitched source detected"),
+        (loader,"header->data.lPitch > 0","signed pitch validated"),
+        (loader,"declaredSourcePitch != topRowBytes && MipLevels > 1","ambiguous pitched mip chain falls back"),
+        (loader,"sourceRowPitch < rowBytes","undersized source pitch rejected"),
+        (loader,"remainingSourceBytes -= sourceRowPitch * mipRows","padded row count preflight"),
+        (loader,"srcData += sourceRowPitch * rows;","padded source mip advance"),
         (loader,"memcpy(dstRow, srcRow, rowBytes)","row copy instead of pitched-blind bulk copy"),
         (handle,"*pSrcDataSize < sizeof(DDS_FILE)","original header bounds"),
         (handle,"!header->data.dwWidth || !header->data.dwHeight","nonzero original dimensions before sprite ratio"),
@@ -102,6 +108,10 @@ def verify(text):
         raise ValueError("unconditional DISCARD lock")
     if "memcpy(lockedRect.pBits, srcData, mipSize)" in loader:
         raise ValueError("unpitched bulk copy returned")
+    if loader.index("sourceRowPitch > remainingSourceBytes / mipRows") > loader.index("pDevice->CreateTexture("):
+        raise ValueError("padded DDS source bounds must be checked before texture allocation")
+    if loader.count("? declaredSourcePitch : rowBytes;") != 2:
+        raise ValueError("preflight and upload must use the same DDS source pitch")
     # The optional fast decoder is not feature-equivalent to legacy D3DX.
     # Preserve the original Ex trampoline and the exact original arguments
     # when the fast DDS path cannot decode a menu/car-selection texture.
@@ -201,13 +211,19 @@ def negatives(text):
         "size <= static_cast<size_t>(UINT_MAX)",
         "header->data.dwSize != sizeof(DDSURFACEDESC2)",
         "header->data.ddpfPixelFormat.dwSize != sizeof(DDPIXELFORMAT)",
-        "bytes > remainingSourceBytes",
+        "sourceRowPitch > remainingSourceBytes / mipRows",
+        "(header->data.dwFlags & DDSD_PITCH) != 0",
+        "header->data.lPitch > 0",
+        "declaredSourcePitch != topRowBytes && MipLevels > 1",
+        "sourceRowPitch < rowBytes",
+        "remainingSourceBytes -= sourceRowPitch * mipRows",
+        "srcData += sourceRowPitch * rows;",
         "Width != D3DX_DEFAULT && Width != header->data.dwWidth",
         "Height != D3DX_DEFAULT && Height != header->data.dwHeight",
         "dynamicTexture && mipLevel == 0",
         "LockRect(mipLevel, &lockedRect, nullptr, lockFlags)",
         "static_cast<size_t>(lockedRect.Pitch) < rowBytes",
-        "srcRow = srcData + static_cast<size_t>(row) * rowBytes",
+        "srcRow = srcData + static_cast<size_t>(row) * sourceRowPitch",
         "*pSrcDataSize < sizeof(DDS_FILE)",
         "!header->data.dwWidth || !header->data.dwHeight",
         "newhead->data.dwSize == sizeof(DDSURFACEDESC2)",

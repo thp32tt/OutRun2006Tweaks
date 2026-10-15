@@ -256,15 +256,38 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 	if (format_orig == D3DFMT_UNKNOWN)
 		return E_FAIL;
 
-	// Check requested mip source byte ranges *before* allocating any D3D texture.
+	// DDSD_PITCH describes the *file's* row stride for uncompressed DDS,
+	// not the destination D3D9 LockRect pitch. A padded source must not be
+	// decoded with tightly packed offsets (car-selection/UI corruption).
+	const bool compressedSource = format_orig == D3DFMT_DXT1 ||
+		format_orig == D3DFMT_DXT3 || format_orig == D3DFMT_DXT5;
+	const bool hasSourcePitch = !compressedSource &&
+		(header->data.dwFlags & DDSD_PITCH) != 0;
+	const size_t declaredSourcePitch = hasSourcePitch && header->data.lPitch > 0
+		? static_cast<size_t>(header->data.lPitch) : 0;
+	if (hasSourcePitch && !declaredSourcePitch)
+		return E_FAIL;
+	// DDS supplies only the top-level pitch. For padded multi-mip sources,
+	// alignment of subsequent mip rows is unknowable; native D3DX owns those.
+	const size_t topRowBytes = D3DXGetFormatSize(format_orig, Width, Height) / Height;
+	if (hasSourcePitch && declaredSourcePitch != topRowBytes && MipLevels > 1)
+		return E_FAIL;
+
+	// Preflight real source row strides *before* any D3D texture allocation.
 	size_t remainingSourceBytes = dataSize - sizeof(DDS_FILE);
 	for (UINT level = 0; level < MipLevels; ++level)
 	{
-		const size_t bytes = D3DXGetFormatSize(format_orig,
-			max(1U, Width >> level), max(1U, Height >> level));
-		if (!bytes || bytes > remainingSourceBytes)
+		const UINT mipWidth = max(1U, Width >> level);
+		const UINT mipHeight = max(1U, Height >> level);
+		const size_t bytes = D3DXGetFormatSize(format_orig, mipWidth, mipHeight);
+		const UINT mipRows = compressedSource ? max(1U, (mipHeight + 3) / 4) : mipHeight;
+		const size_t rowBytes = bytes / mipRows;
+		const size_t sourceRowPitch = hasSourcePitch && level == 0
+			? declaredSourcePitch : rowBytes;
+		if (!bytes || sourceRowPitch < rowBytes ||
+			sourceRowPitch > remainingSourceBytes / mipRows)
 			return E_FAIL;
-		remainingSourceBytes -= bytes;
+		remainingSourceBytes -= sourceRowPitch * mipRows;
 	}
 	D3DFORMAT format_present = format_orig;
 	// The same channel-order correction is needed for opaque X8B8G8R8
@@ -317,6 +340,8 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 			format_orig == D3DFMT_DXT3 || format_orig == D3DFMT_DXT5;
 		const UINT rows = compressed ? max(1U, (mipHeight + 3) / 4) : mipHeight;
 		const size_t rowBytes = mipSize / rows;
+		const size_t sourceRowPitch = hasSourcePitch && mipLevel == 0
+			? declaredSourcePitch : rowBytes;
 		if (!lockedRect.pBits || lockedRect.Pitch <= 0 ||
 			static_cast<size_t>(lockedRect.Pitch) < rowBytes)
 		{
@@ -331,7 +356,7 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 		const size_t dstPitch = static_cast<size_t>(lockedRect.Pitch);
 		for (UINT row = 0; row < rows; ++row)
 		{
-			const uint8_t* srcRow = srcData + static_cast<size_t>(row) * rowBytes;
+			const uint8_t* srcRow = srcData + static_cast<size_t>(row) * sourceRowPitch;
 			uint8_t* dstRow = dest + static_cast<size_t>(row) * dstPitch;
 			if (format_orig == D3DFMT_A8B8G8R8 ||
 				format_orig == D3DFMT_X8B8G8R8)
@@ -355,7 +380,7 @@ HRESULT D3DXCreateTextureFromFileInMemoryEx_Custom(
 			*ppTexture = nullptr;
 			return hr;
 		}
-		srcData += mipSize;
+		srcData += sourceRowPitch * rows;
 	}
 
 	// Texture creation is not a rendering operation. Never change global
