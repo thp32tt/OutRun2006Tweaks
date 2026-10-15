@@ -38,9 +38,10 @@ def validate(source: str) -> None:
     assert "R29OwnerProjectionFromFov(" in cache
     assert "R29OwnerMatrixFinite(next.eyeInverse[eye])" in cache
     assert "R29OwnerMatrixFinite(next.eyeProjection[eye])" in cache
-    assert "R29OwnerInvertMatrix(" not in draw
-    assert "R29OwnerInverseRigid(" not in draw
-    assert "R29OwnerProjectionFromFov(" not in draw
+    # R84 now reconstructs a strictly owned C993 spatial centre in its
+    # separate eye path; that branch legitimately inverts the original
+    # projection once. The *flat-effect hotpath* must still reuse cached
+    # geometry without repeating inversions/pose/projection work per draw.
     assert "geometry->inverseBaseProjection" in draw
     assert "geometry->planeNdcZ" in draw
     assert "geometry->eyeInverse[eye]" in draw
@@ -54,6 +55,9 @@ def validate(source: str) -> None:
     flat = draw.split(
         "if (screenKind == R30ScreenSpaceKind::FlatPerspectiveEffect)", 1
     )[1].split("if (screenKind != R30ScreenSpaceKind::Hud2D)", 1)[0]
+    assert "R29OwnerInvertMatrix(" not in flat
+    assert "R29OwnerInverseRigid(" not in flat
+    assert "R29OwnerProjectionFromFov(" not in flat
     assert flat.count("R29OwnerMultiplyMatrix(commonViewPlane, headInverse)") == 1
     assert flat.index("const D3DMATRIX headRelativePlane") < flat.index(
         "for (int eye = 0; eye < 2; ++eye)"
