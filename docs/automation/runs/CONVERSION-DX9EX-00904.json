@@ -14,7 +14,7 @@
   "status": "CI_REPAIR_PENDING_EXACT_SHA",
   "phase": "C3_VALIDATE_REPAIR",
   "checkpoint": "C3_STATE",
-  "automation_validation": "FAILED_EXACT_SHA_ARCHITECTURE_VERIFIER_REPAIRING",
+  "automation_validation": "FAILED_EXACT_SHA_NEGATIVE_MUTATION_HANDLING_REPAIRING",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "ab5b1786c4da5a8738a225586017bcd46919e80c",
@@ -90,6 +90,10 @@
     "policy_failure": "tools/verify_vr_r30_projection_signature_fastpath.py required redundant inner !ownedHud/... veto that C993 source admission correctly moved before alpha/Z raster state; preserve top-level explicit producer veto and original direct WorldBillboard exclusion.",
     "repair": "Move architecture check to source/owner-before-raster ordering and add 8-mode C993 model and negative mutations. Do not weaken top-level semantic gate, GPU eye restore or required CI.",
     "active_first_status": "FAIL",
-    "runtime_validation": "UNTESTED"
+    "runtime_validation": "UNTESTED",
+    "second_attempt_sha": "9687a746d7c9b7cd9d81c5754405e80ee9d0e564",
+    "second_active_run_id": 38758151723,
+    "second_failure": "New architecture verifier negative mutation intentionally removed C993 admission token, but .index raised ValueError rather than the expected AssertionError; add explicit require before ordered index assertion, retain mutation.",
+    "third_repair": "Add precise assertion on positive C993 markers before ordered index verification; negative mutation now exercises fail-closed assertion rather than Python exception leak."
   }
 }

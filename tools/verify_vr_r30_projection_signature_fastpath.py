@@ -82,6 +82,11 @@ def source_contract(renderer=RENDERER, r30=R30):
     # An already authenticated C993 centre is NOT an unowned alpha draw.
     # Exact source admission precedes alpha/depth queries, but the outer
     # semantic veto and projection classification still apply to all draws.
+    for marker in ("if (ownedLensCentre)",
+                   "R30HasExactLensCentreRawWvp(originalGameWvp)",
+                   "SelectWorldRoute(true, owned)",
+                   "return R30ScreenSpaceKind::ExactLensCentreWorld;"):
+        require(marker in cls, "exact centre source admission missing: " + marker)
     require(cls.index("if (!ownedHud && !ownedOverlay && !ownedEffect &&") <
             cls.index("if (ownedLensCentre)") <
             cls.index("R30HasExactLensCentreRawWvp(originalGameWvp)") <
