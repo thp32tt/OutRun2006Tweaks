@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
   "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_PENDING_EXACT_SHA",
-  "automation_validation": "FAILED_PRIOR_SHA_POLICY_RECORD_MISSING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "c58bcbc4c5e85f06186596e230741a1b453cbf3c",
   "material_result_sha": "c30a67fba979b4f53ada99e7b31f9e6b12a501f8",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "625a4136973c65baac0393277f995d5f89f9a00a",
   "source_paths": [
     "src/hooks_uiscaling.cpp",
     "src/vr/game/render_semantics.hpp"
@@ -67,9 +67,9 @@
     ]
   },
   "acceptance_results": {
-    "goal_first_queue_owned_gpu_submission": "SOURCE_IMPLEMENTED",
-    "goal_stage_and_unknown_fallback": "SOURCE_IMPLEMENTED",
-    "r84_final_exact_sha_integrated": "PENDING"
+    "goal_first_queue_owned_gpu_submission": "PASS_EXACT_SHA",
+    "goal_stage_and_unknown_fallback": "PASS_EXACT_SHA",
+    "r84_final_exact_sha_integrated": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "GOAL queue-node selection precedes D3DXSprite Begin in a supported path; BeginDest resets StageBoundaryReady so the first otherwise-homogeneous queued GOAL Draw cannot enter the prior eager Flush guard. Source commit c30a67f corrects that boundary.",
@@ -97,10 +97,23 @@
       "OutRun EXE HUD Inspector CI",
       "DX9Ex Full Source Impact Review"
     ],
-    "revalidation_state": "PENDING_PUSH"
+    "revalidation_state": "PENDING_PUSH",
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_sha": "625a4136973c65baac0393277f995d5f89f9a00a",
+    "source_material_sha": "c30a67fba979b4f53ada99e7b31f9e6b12a501f8",
+    "dx9ex_active_run_id": 38739322734,
+    "domain_run_id": 38739322846,
+    "hud_inspector_run_id": 38739322529,
+    "full_source_impact_run_id": 38739322544,
+    "dx9ex_active": "SUCCESS",
+    "domain_isolation": "SUCCESS",
+    "hud_inspector": "SUCCESS",
+    "full_source_impact": "SUCCESS",
+    "runtime": "UNTESTED",
+    "c6_result": "PASS_EXACT_SHA"
   },
   "runtime_evidence": "No Quest3/VDXR hardware run or matching original game visual capture in this retry.",
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "EXACT_SHA_CI_PENDING"
+  "hold_reason": "NEED_HMD_TEST"
 }
