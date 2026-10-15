@@ -12,6 +12,7 @@ def integrated(hook, body):
     normal = body.split("void observe(IDirect3DDevice9* game,", 1)[1]
     normal = normal.split("bool preserve_offscreen_color_only_clear(", 1)[0]
     offscreen = body.split("bool isolated_offscreen_game_draw(", 1)[1].split(
+        "bool proven_game_draw_no_target_writes(", 1)[0].split(
         "void observe(IDirect3DDevice9* game,", 1)[0]
     absent = body.split("void observe_unavailable_game_draw(", 1)[1]
     absent = absent.split("void observe_failed_game_draw(", 1)[0]
