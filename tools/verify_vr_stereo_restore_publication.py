@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""R84: failed right-eye state restoration must poison the current Present.
+"""R84: failed per-eye submissions/restores must veto this Present.
 
-Validate both R30 and both R33 *physical* per-eye submission functions.
-Other restore paths (e.g. SkyGlow) have distinct ownership and must not be
-mistaken for these four current-frame draw guards.
+Validate R30 left Draw/left c64 rollback as well as both R30/R33 right
+restore paths. SkyGlow and unrelated failure sites cannot supply the proof.
 """
 from pathlib import Path
 import re
@@ -49,7 +48,83 @@ def check(source: str, functions: tuple[str, ...],
            guards[0].index(arm) for guards in blocks)
 
 
+
+def scoped_guard(source: str, signature: str) -> str:
+    """Return the exact guard body, including nested state-restoration scopes."""
+    start = source.index("{", source.index(signature))
+    depth = 0
+    for pos in range(start, len(source)):
+        depth += (source[pos] == "{") - (source[pos] == "}")
+        if depth == 0:
+            return source[start:pos + 1]
+    raise AssertionError(f"unterminated guard: {signature}")
+
+
+def check_r30_left(source: str) -> bool:
+    try:
+        for signature in ("HRESULT R30ExecuteXyzrhwStereo(",
+                          "HRESULT R30TryScreenSpaceFovDraw("):
+            fn = function_block(source, signature)
+            guard = scoped_guard(fn, "if (FAILED(leftHr))")
+            required = (
+                "R29OwnerMarkRightDrawFailed();",
+                "R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);",
+                "R29OwnerReportStereoFailure(",
+                "R29OwnerArmMonoSafety();",
+                "return leftHr;",
+            )
+            position = -1
+            for token in required:
+                position = guard.index(token, position + 1)
+        # A failed c64 upload may safely fall through to R29 only when
+        # original c64 rollback succeeded. Failure must poison the same eye
+        # frame rather than presenting it with an unknown game WVP.
+        fov = function_block(source, "HRESULT R30TryScreenSpaceFovDraw(")
+        upload = scoped_guard(fov, "if (!leftWvpOk)")
+        rollback = scoped_guard(upload, "if (!restored)")
+        required = ("R29OwnerMarkRightDrawFailed();",
+                    "R29OwnerReportStereoFailure(",
+                    "R29OwnerArmMonoSafety();", "return E_FAIL;")
+        position = -1
+        for token in required:
+            position = rollback.index(token, position + 1)
+        assert "return E_NOTIMPL;" in upload
+        return True
+    except (ValueError, AssertionError):
+        return False
+
+
+def check_left_mutations(source: str) -> None:
+    functions = ("HRESULT R30ExecuteXyzrhwStereo(",
+                 "HRESULT R30TryScreenSpaceFovDraw(")
+    assert check_r30_left(source), "R30 left-eye publication veto is missing"
+    cases = 0
+    for signature in functions:
+        fn = function_block(source, signature)
+        guard = scoped_guard(fn, "if (FAILED(leftHr))")
+        for token in ("R29OwnerMarkRightDrawFailed();",
+                      "R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);",
+                      "R29OwnerReportStereoFailure("):
+            mutant = source.replace(fn, fn.replace(
+                guard, guard.replace(token, "/* removed */", 1), 1), 1)
+            assert not check_r30_left(mutant), (signature, token)
+            cases += 1
+        mutant = source.replace(fn, fn.replace(
+            "if (FAILED(leftHr))", "if (SUCCEEDED(leftHr))", 1), 1)
+        assert not check_r30_left(mutant), (signature, "inverted guard")
+        cases += 1
+    fov = function_block(source, functions[1])
+    upload = scoped_guard(fov, "if (!leftWvpOk)")
+    rollback = scoped_guard(upload, "if (!restored)")
+    mutant = source.replace(fov, fov.replace(
+        rollback, rollback.replace(
+            "R29OwnerMarkRightDrawFailed();", "/* removed */", 1), 1), 1)
+    assert not check_r30_left(mutant), "failed c64 rollback mutation survived"
+    cases += 1
+    print(f"R84 R30 left draw + c64 rollback current-frame veto: PASS ({cases} negative mutations)")
+
 def main() -> None:
+    check_left_mutations((ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8"))
     for path, functions, marker, invalidate, arm in GUARDS:
         source = (ROOT / path).read_text(encoding="utf-8")
         assert check(source, functions, marker, invalidate, arm), path

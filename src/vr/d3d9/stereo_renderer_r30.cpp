@@ -4480,6 +4480,11 @@ namespace OutRunVRStereo
             const HRESULT leftHr = leftDraw();
             if (FAILED(leftHr))
             {
+                // The left draw was already submitted but did not complete.
+                // There is no valid same-frame right eye to publish at Present,
+                // even if the following fallback/recovery path is successful.
+                R29OwnerMarkRightDrawFailed();
+                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
                 R29OwnerReportStereoFailure(OutRunVR::StereoFailureLeftDrawFailed,
                     site, leftHr);
                 R29OwnerArmMonoSafety();
@@ -5562,6 +5567,9 @@ namespace OutRunVRStereo
                 }
                 if (!restored)
                 {
+                    // No HUD primitive was drawn yet, but failed c64 rollback
+                    // still leaves the current eye submission unusable.
+                    R29OwnerMarkRightDrawFailed();
                     R29OwnerReportStereoFailure(OutRunVR::StereoFailureRestoreFailed,
                         "R30/HUD-left-WVP-rollback", E_FAIL);
                     R29OwnerArmMonoSafety();
@@ -5575,6 +5583,11 @@ namespace OutRunVRStereo
 
             if (FAILED(leftHr))
             {
+                // A failed left-eye HUD draw must veto THIS frame's right-eye
+                // publication; future-only mono safety cannot repair a stale
+                // binocular pair. Invalidate any left-written depth/stencil.
+                R29OwnerMarkRightDrawFailed();
+                R29OwnerInvalidateRightDepthStencilIfLeftMayWrite(device);
                 bool restored = false;
                 {
                     R30ScopedInternalPass guard;
