@@ -35,8 +35,16 @@ def verify(source: str) -> None:
     for token in ("R32ResetDirectCaches();", "ResetSafeEyes();",
                   "ResetSharedEyeCache();", "ReleaseCom(CopyFence);"):
         assert token in synchronized, "old-device resource survived epoch: " + token
-    assert synchronized.index("R32ResetDirectCaches();") < synchronized.index("R32DirectDeviceOwner = current;")
-    assert "R32DirectDeviceOwner == current" in synchronized
+    # A same-device, new-context rebind must retire all cached resources.
+    # Verify the live R32 path owns a typed two-pointer epoch and uses it
+    # BEFORE any SafeEye/copy-fence reuse, rather than matching just Device.
+    assert '#include "direct_ack_device_epoch.hpp"' in source
+    assert "OutRunVrDirectAckDeviceEpoch::Binding<" in source
+    assert "ID3D11Device, ID3D11DeviceContext> R32DirectBinding" in source
+    assert "if (!R32DirectBinding.Rebind(" in synchronized
+    assert "OutRunVrFinalTest::Device, OutRunVrFinalTest::Context" in synchronized
+    assert synchronized.index("R32DirectBinding.Rebind(") < synchronized.index("R32ResetDirectCaches();")
+    assert synchronized.index("R32ResetDirectCaches();") < synchronized.index("ReleaseCom(CopyFence);")
     assert fastpath.index("R32SyncDirectDeviceOwner();") < fastpath.index("SafeEyesOwnFrame(frame)")
     assert copied.index("R32SyncDirectDeviceOwner();") < copied.index("EnsureCopyFence()")
     assert "if (!OutRunVrFinalTest::Device)" in fastpath
@@ -97,6 +105,12 @@ def main() -> None:
         ("ignore_slot_device", "cache.device == OutRunVrFinalTest::Device", "true"),
         ("ignore_inactive_device", "R32InactiveDevice == OutRunVrFinalTest::Device", "true"),
         ("keep_fence_after_reset", "ReleaseCom(CopyFence);", "/* stale D3D11 fence */"),
+        ("ignore_context_rebind", "OutRunVrFinalTest::Device, OutRunVrFinalTest::Context",
+            "OutRunVrFinalTest::Device, nullptr"),
+        ("skip_rebind_invalidation", "if (!R32DirectBinding.Rebind(",
+            "if (R32DirectBinding.Rebind("),
+        ("erase_binding_owner", "ID3D11Device, ID3D11DeviceContext> R32DirectBinding",
+            "ID3D11Device, ID3D11DeviceContext> UnusedDirectBinding"),
         ("keep_active_pair_after_reset", "ResetSafeEyes();", "/* stale active pair */"),
         ("keep_slot_cache_after_reset", "R32ResetDirectCaches();", "/* stale producer slots */"),
         ("accept_old_safeeye_frame", "R32SyncDirectDeviceOwner();\n        if (!OutRunVrFinalTest::Device)", "if (!OutRunVrFinalTest::Device)"),
