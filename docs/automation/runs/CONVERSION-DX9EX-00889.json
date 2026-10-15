@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_MATERIAL",
-  "automation_validation": "IN_PROGRESS",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "14781b6291ccd58cc48acd2bc632cb8fb3391e21",
   "material_result_sha": "60bafc15ce02d864d18d187286e936750bf32c95",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "ac9c2eca608f9bec8cc076d05f3d1b1e1a291958",
   "source_paths": [
     "src/hooks_graphics.cpp",
     "src/vr/game/render_semantics.hpp"
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "lens_exact_c993_gpu_scope": "SOURCE_IMPLEMENTED",
-    "lens_queue_outer_fallback": "SOURCE_IMPLEMENTED",
-    "lens_final_exact_sha_gates": "PENDING"
+    "lens_exact_c993_gpu_scope": "PASS",
+    "lens_queue_outer_fallback": "PASS",
+    "lens_final_exact_sha_gates": "PASS"
   },
   "diagnosis": {
     "original_evidence": "Existing 0xD3A5 enter and C993 DrawObjectAlphaCentre set WorldBillboard with ScopedRenderSemantic; EffectiveScope returned the most recently nested SceneEffect CurrentScope and CurrentRenderProducerToken returned a temporary direct producer. Raw c64 recorder uses both, so a nested helper can cause a strict same-source centre ownership miss.",
@@ -82,13 +82,54 @@
       "No blanket shader age extension, no stale raw c64 fallback or flattened HUD overlay; these would create unrelated world/outer-disc regressions.",
       "No unconditional flush or alpha/timer intervention; C993 original draw remains once and the R84 strict source proof remains required."
     ],
-    "fix_evidence": "ScopedExactLensCentreGpuDraw brackets only the exact original C993 synchronous GPU call and wins temporary direct SceneEffect scopes while active, but yields to active SpriteNode and external F11. Source mutation verifier covers missing scope, queue precedence, producer forced fallback and guard balance.",
-    "negative_test_evidence": "Header constexpr positive and negative owner policy asserts plus expanded R84 exact C993 verifier mutants. Exact SHA Windows and HMD remain pending.",
+    "fix_evidence": "ScopedExactLensCentreGpuDraw brackets only the exact original C993 synchronous GPU call and wins temporary direct SceneEffect scopes while active, but yields to active SpriteNode and external F11. Source mutation verifier covers missing scope, queue precedence, producer forced fallback and guard balance. Final exact SHA policy+host+game+full-chain+package 5/5 SUCCESS; R84 central source P0 static HUD inspector PASS.",
+    "negative_test_evidence": "Exact ac9c2eca DX9Ex Active 5/5, Domain SUCCESS and HUD Inspector 2/2 SUCCESS. Lens source identical e82dd5b3 Full Source Impact 3/3 SUCCESS; exact ac9 Full Source was CANCELLED, not claimed. New C993 nested-scope guard, queue precedence and headlocked/sprite fallback covered with source-bound mutants. Quest3 HMD UNTESTED.",
     "eye_ownership": "R84 existing ExactLensCentreWorld branch uses game-owned raw matrix, original projection inverse and one headInverse/eyeInverse/eyeProjection chain for both eyes; R33 owns both physical Draw calls.",
     "evidence_limits": "Source-proven possible nested ownership gap repaired, but actual headset recurrence and whether nested source happened in a reported failed frame are not measured."
   },
-  "runtime_evidence": "Quest3/VDXR hardware and Windows game were not run in this transaction.",
-  "score_once": false,
-  "score_delta_this_attempt": 0,
-  "result_commit_ci_skip": false
+  "runtime_evidence": "Quest3/VDXR and Windows game optical render were NOT performed; build and code-source CI only. Lens centre user-visible correction remains NEED_HMD_TEST.",
+  "score_once": true,
+  "score_delta_this_attempt": 1,
+  "result_commit_ci_skip": false,
+  "hold_reason": "NEED_HMD_TEST",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "ac9c2eca608f9bec8cc076d05f3d1b1e1a291958",
+    "material_sha": "60bafc15ce02d864d18d187286e936750bf32c95",
+    "dx9ex_active": {
+      "run_id": 38713439193,
+      "head_sha": "ac9c2eca608f9bec8cc076d05f3d1b1e1a291958",
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy/host/full-chain-compile/game/package 5/5"
+    },
+    "domain_isolation": {
+      "run_id": 38713439172,
+      "head_sha": "ac9c2eca608f9bec8cc076d05f3d1b1e1a291958",
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38713439160,
+      "head_sha": "ac9c2eca608f9bec8cc076d05f3d1b1e1a291958",
+      "conclusion": "SUCCESS",
+      "required_jobs": "static-exe-analysis/build-hud-inspector 2/2"
+    },
+    "full_source_impact": {
+      "run_id": 38712230049,
+      "head_sha": "e82dd5b342d0bf6ce537b3a36c1c1b2c770df491",
+      "conclusion": "SUCCESS",
+      "required_jobs": "MSVC active game/MSVC OpenXR host/source-cross-domain 3/3",
+      "source_difference": "Lens-related C++ identical since source material 60bafc15. Later exact result contains separate GOAL scope C++ from independently assigned TASK 00890 and Python verifier repairs. Full-source Impact exact ac9c2eca was CANCELLED by concurrent workflow; never claim exact-SHA Full Source on final."
+    },
+    "runtime": "UNTESTED",
+    "scoreboard": {
+      "repo": "thp32tt/ai-dev-lab",
+      "file": "AI_SCOREBOARD.md",
+      "commit_sha": "2b642f37dd381c35dbeaf4493e0beb6b12e19d16",
+      "previous": 1367,
+      "delta": 1,
+      "total": 1368
+    }
+  },
+  "checkpoint_commit_ci_skip": true,
+  "bookkeeping_ci_skip": true
 }
