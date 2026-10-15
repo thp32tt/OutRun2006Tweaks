@@ -39,6 +39,8 @@ def integrated(b, h, c, o):
         "mainDepthIdentity = 0u;" in c,
         "auxiliaryDepthCleared = false;" in c,
         "bool isolated_auxiliary_clear(" in o,
+        "sourceSeeded && offscreenRt0 && extraMrtUnbound && !stopped" in o,
+        "(!depthOrStencilClear || separateDepth)" in o,
     ))
 assert integrated(bridge, hook, clear, offscreen)
 for text, orig, fake in (
