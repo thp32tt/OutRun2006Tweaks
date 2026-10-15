@@ -18,6 +18,7 @@
 #include "../ipc/coherent_host_identity.hpp"
 #include "../state/state_block_tracker.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/car_base_shadow_stereo.hpp"
 namespace OutRunVRRenderer
 {
     void R29InvalidateRawWvpGeneration() noexcept;
@@ -622,6 +623,33 @@ namespace OutRunVRStereo
             {
                 fragile = false;
                 ++R29FragileWorldRetries;
+            }
+
+            // The original player contact shadow was submitted with a live
+            // game world matrix but the generic Z-disabled alpha route flattens
+            // both eyes. Only exact direct ownership plus the independent R28
+            // original-perspective-WVP proof can lift zero disparity.
+            // Other effects, queue nodes, depth/stencil writes and unsafe
+            // stereo recovery keep the old conservative path.
+            if (fragile && !forceZeroDisparity &&
+                !OutRunVR::GameSemantic::QueueRenderActive() &&
+                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+                    OutRunVR::GameSemantic::ProducerToken::CarBaseShadow &&
+                semanticScope == OutRunVR::GameSemantic::RenderScope::WorldParticle &&
+                R29Effect.zEnable == D3DZB_FALSE &&
+                R29Effect.zWrite == FALSE &&
+                R29Effect.stencilEnable == FALSE)
+            {
+                const bool originalWvpProven =
+                    OutRunVRRenderer::R28PerspectiveWorldSemantic();
+                if (OutRunVR::CarShadowStereo::CanUseSpatialShadow(
+                        OutRunVR::GameSemantic::CurrentRenderProducerToken(),
+                        semanticScope, false, originalWvpProven,
+                        true, false, false, false))
+                {
+                    fragile = false;
+                    ++R29FragileWorldRetries;
+                }
             }
 
             return R29DirectTwoEye(device,

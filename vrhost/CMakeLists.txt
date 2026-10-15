@@ -164,6 +164,8 @@ add_executable(outrun-vr-rank-marker-fraction-smoke tests/rank_marker_fraction_s
 add_executable(outrun-vr-r30-early-rhw-shadow-smoke tests/r30_early_rhw_shadow_smoke.cpp)
 add_executable(outrun-vr-r30-indexed-up-bounds-smoke tests/r30_indexed_up_bounds_smoke.cpp)
 add_executable(outrun-vr-r30-shadow-ranges-smoke tests/r30_shadow_ranges_smoke.cpp)
+add_executable(outrun-vr-car-base-shadow-stereo-smoke tests/car_base_shadow_stereo_smoke.cpp)
+target_include_directories(outrun-vr-car-base-shadow-stereo-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 target_include_directories(outrun-vr-r30-early-rhw-shadow-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 target_include_directories(outrun-vr-rank-marker-fraction-smoke PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../src")
 add_executable(outrun-vr-goal-progress-owner-smoke tests/goal_progress_owner_smoke.cpp)

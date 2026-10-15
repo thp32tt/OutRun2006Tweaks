@@ -81,6 +81,7 @@ namespace OutRunVR::GameSemantic
         // Append-only: retain existing numeric producer tokens in IPC/debug logs.
         OutRunHudPeripheralText,
         LensFlareCentre, // Exact D3A5 -> C993 central sun, never CABE discs.
+        CarBaseShadow, // Direct original player-car contact shadow.
     };
 
     // Previous direct D3DX triangles must be submitted under their OLD
@@ -360,6 +361,7 @@ namespace OutRunVR::GameSemantic
         case ProducerToken::GoalTime150: return "GOAL_TIME_HELPER_150";
         case ProducerToken::DispRankClipSprite: return "DISPRANK_KIND0_CLIP";
         case ProducerToken::LensFlareCentre: return "LENS_FLARE_CENTRE_C993";
+        case ProducerToken::CarBaseShadow: return "CAR_BASE_SHADOW_WORLD";
         default: return "NONE";
         }
     }

@@ -291,7 +291,8 @@ class RestoreCarBaseShadow : public Hook
 			// Keep the legacy RAII world scope immediately around the draw.
 			// This also preserves the original live-queue/desktop fallback.
 			OutRunVR::GameSemantic::ScopedExactProducerSemantic directWorld(
-				directWorldScope, nullptr, true);
+				directWorldScope, nullptr, true,
+				OutRunVR::GameSemantic::ProducerToken::CarBaseShadow);
 			OutRunVR::GameSemantic::ScopedRenderSemantic semantic(
 				OutRunVR::GameSemantic::RenderScope::WorldParticle);
 			Game::DrawObjectAlpha_Internal(

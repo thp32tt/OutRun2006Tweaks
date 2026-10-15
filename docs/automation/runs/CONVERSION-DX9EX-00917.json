@@ -1,0 +1,95 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00917",
+  "production_id": "CONVERSION-DX9EX-00917",
+  "event_id": "CONVERSION-DX9EX-00917-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00917",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:START_SHADOW",
+  "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING_EXACT_SHA",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "2ab53f33c025c03a0c7cf7f42fe014c8ad35dcfd",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_graphics.cpp",
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "src/vr/game/car_base_shadow_stereo.hpp"
+  ],
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/hooks_graphics.cpp",
+    "src/vr/d3d9/stereo_renderer_r29.cpp",
+    "vrhost/CMakeLists.txt",
+    "src/vr/game/car_base_shadow_stereo.hpp",
+    "vrhost/tests/car_base_shadow_stereo_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00917.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:START_SHADOW",
+    "symptom_id": "DX9EX:SYMPTOM:START_SHADOW",
+    "goal": "Restore intended spatial stereo for the original race-start player contact shadow by carrying its exact world-matrix producer to R29 and using independent original WVP proof instead of generic flat alpha classification.",
+    "scope_boundary": "Only direct CalcPeraShadow player contact alpha world source; preserve lens, SkyGlow, smoke, GOAL/HUD, original depth and stencil, FFB, input, R26_SAFE, independent DX11 and frozen DXVK.",
+    "trace_stages": [
+      "Original DispCarModel_Common CalcPeraShadow receives the player matrix_B0 and calls DrawObjectAlpha_Internal exactly once.",
+      "The game semantic direct source tags only this nonqueued player-car world submission, protecting its pending token and the legacy desktop path.",
+      "R29 verifies the original perspective WVP plus safe depth/stencil before physical R7 left/right submission; uncertain paths preserve existing flat alpha and R13 fallback."
+    ],
+    "subcomponents": [
+      "Give the exact original direct player contact-shadow matrix call a unique producer token without changing its alpha, queue, or desktop geometry.",
+      "Require independent world-WVP evidence before spatial R29 alpha stereo, preserving nonplayer and unsafe fallback with integrated positive-negative compiled tests."
+    ],
+    "acceptance_items": [
+      {
+        "id": "shadow_source_to_eye",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original player car contact shadow and per-eye replay",
+        "expected_behavior": "The exact direct player shadow may retain spatial left/right only when the original R28 perspective world WVP and nonwriting raster state are proven."
+      },
+      {
+        "id": "preserve_foreign_alpha",
+        "category": "fallback_regression",
+        "behavior_area": "Other alpha, queue, fallback and stencil safety",
+        "expected_behavior": "Unproven WVP, queued content, lens, SkyGlow, ordinary road and stencil/depth-writing effects keep existing conservative rendering."
+      },
+      {
+        "id": "exact_sha_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 x86 and OpenXR x64 integration",
+        "expected_behavior": "Required DX9Ex Active, Domain Isolation, Full Source Impact and HUD Inspector workflows pass on the final exact SHA including compiled positive and negative C++ smoke."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "shadow_source_to_eye": "PENDING_CI",
+    "preserve_foreign_alpha": "PENDING_CI",
+    "exact_sha_gate": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "The existing R29 fragile alpha branch zeroes disparity on depth-disabled effects even when the original CalcPeraShadow draws player world geometry. The semantic owner only said WorldParticle and could not safely differentiate this exception. This remains a source-level candidate pending HMD.",
+    "original_evidence": "Original-mod DispCarModel_Common player CalcPeraShadow derives matrix_B0 with a fixed ground-contact translate and performs one DrawObjectAlpha_Internal; selection calls are excluded.",
+    "source_trace": [
+      "hooks_graphics restores a player-world contact-shadow draw but records no unique direct producer.",
+      "R29 fragile alpha heuristic executes a zero-disparity physical left/right path when Z is disabled.",
+      "The new exact game producer and independent R28 perspective-WVP admission keep world parallax only on the verified original source."
+    ],
+    "alternatives_rejected": [
+      "Do not flatten or drop the shadow by disabling its opacity.",
+      "Do not alter every smoke, lens or WorldParticle alpha draw without exact original WVP proof."
+    ],
+    "eye_ownership": "Existing R29 R7 left/right GPU physical replay and conservative R13 recovery remain in force; only a proven player contact-shadow changes disparity decision.",
+    "negative_test_evidence": "Portable C++ guard rejects foreign tokens, queues, HUD, central lens, missing WVP, depth writes, stencil writes and forced zero disparity."
+  },
+  "next_action": "Inspect mandatory GitHub Actions at final SHA; repair only real failures and then record C6. Quest3/VDXR runtime remains UNTESTED.",
+  "score_delta_this_attempt": 0
+}
