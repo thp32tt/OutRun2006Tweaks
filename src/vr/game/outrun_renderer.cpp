@@ -20,6 +20,7 @@
 #include "vr/ipc/cadence_v1.hpp"
 #include "vr/ipc/frame_pacing_diagnostics.hpp"
 #include "vr/game/render_semantics.hpp"
+#include "vr/game/lens_centre_partial_wvp.hpp"
 #include "../core/r23_target_owner_api.hpp"
 
 // Authoritative renderer-side OpenXR head-pose injector for OutRun 2006.
@@ -173,6 +174,9 @@ namespace OutRunVRRenderer
 		float LastGameWvpWrite[16]{};
 		float LastRawGameWvpWrite[16]{};
 		bool LastGameWvpWriteValid = false;
+		// Only the exact, direct C993 owner may assemble split original c64 writes.
+		// Never seed it from a prior game matrix or stereo-injected GPU state.
+		thread_local OutRunVR::LensCentre::PartialWvpUpload LensCentrePartialWvp{};
 		std::uint64_t LastGameWvpWriteSerial = 0;
 		std::uint64_t LastGameWvpTopLevelDrawSerial = 0;
 		std::uint64_t LastGameWvpPoseEpoch = 0;
@@ -1733,6 +1737,7 @@ namespace OutRunVRRenderer
 			// it before returning control to post-scene game code.
 			RestoreCullingCamera();
 			const HRESULT result = EndSceneHook.stdcall<HRESULT>(device);
+			LensCentrePartialWvp.Reset(); // never span a scene boundary
 
 			std::uint32_t publishedFlags = FrameTelemetryFlags;
 			if (SUCCEEDED(result))
@@ -1773,9 +1778,43 @@ namespace OutRunVRRenderer
 			InvalidateGameWvpWrite();
 			if (!UploadContainsOutRunWvp(startRegister, vector4fCount))
 			{
-				return SetVertexShaderConstantFHook.stdcall<HRESULT>(
+				// A split original C993 WVP previously lost source ownership:
+				// each 1..3 register write invalidated the previous evidence,
+				// and no subsequent complete c64..c67 upload re-armed it.
+				// Accumulate only successful writes from the same exact direct
+				// centre, shader epoch, pose and game device. All other partial
+				// uploads retain the original mono/injection fallback.
+				std::uintptr_t shader = 0;
+				std::uint64_t shaderEpoch = 0;
+				const bool exactCentre =
+					OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
+						OutRunVR::GameSemantic::ProducerToken::LensFlareCentre &&
+					OutRunVR::GameSemantic::EffectiveScope() ==
+						OutRunVR::GameSemantic::RenderScope::WorldBillboard &&
+					!OutRunVR::GameSemantic::QueueRenderActive() &&
+					OutRunVR::GameSemantic::CurrentLensCentreCallEpoch != 0 &&
+					OutRunVRStereo::R23GameWvpTargetEligible() &&
+					OutRunVRStereo::GetCurrentShaderEpoch(shader, shaderEpoch);
+				const HRESULT result = SetVertexShaderConstantFHook.stdcall<HRESULT>(
 					device, startRegister, constantData, vector4fCount);
+				if (SUCCEEDED(result) && exactCentre &&
+					LensCentrePartialWvp.Append(
+						startRegister, vector4fCount, constantData,
+						OutRunVR::GameSemantic::CurrentLensCentreCallEpoch,
+						LatchedPoseEpoch, shader, shaderEpoch,
+						reinterpret_cast<std::uintptr_t>(device), true))
+				{
+					// Only now are all four source-owned game registers proved.
+					// Preserve untouched legacy/full-upload rendering semantics.
+					RecordGameWvpWrite(
+						LensCentrePartialWvp.raw, LensCentrePartialWvp.raw);
+					LensCentrePartialWvp.Reset();
+				}
+				else if (FAILED(result) || !exactCentre)
+					LensCentrePartialWvp.Reset();
+				return result;
 			}
+			LensCentrePartialWvp.Reset();
 
 			// Only the main game backbuffer receives head-tracked WVP. Auxiliary
 			// cubemap/reflection/unknown targets preserve unmodified game c64.
@@ -1977,6 +2016,7 @@ namespace OutRunVRRenderer
 		MarkCadencePresented();
 		PresentPoseLocked = false;
 		InvalidateVerifiedWvp();
+		LensCentrePartialWvp.Reset();
 		InvalidateGameWvpWrite();
 		RestoreCullingCamera();
 		WaitForNextCadenceRequest();
@@ -1991,6 +2031,7 @@ namespace OutRunVRRenderer
 		CadenceTimedOutRequestId = 0;
 		CloseCadenceHostProcess();
 		PresentPoseLocked = false;
+		LensCentrePartialWvp.Reset();
 		InvalidateGameWvpWrite();
 		RestoreCullingCamera();
 		ResetFrameState();
