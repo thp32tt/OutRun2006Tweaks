@@ -22,7 +22,11 @@ def valid(bridge,hook,guard):
       "mainDepthIdentity != 0u" in color,
       "if ((clearStencil && !ignoreStencil) ||" in color,
       "s.frameBatch.abort(); // failed proof: original D3D9 lives" in color,
-      "stencil || !clip || fog" in raster,
+      "GetRenderState(D3DRS_STENCILFUNC, &stencilFunc)" in raster,
+      "GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask)" in raster,
+      "GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)" in raster,
+      "stencil_equivalent_to_disabled(" in raster,
+      "!clip || fog || fillMode != D3DFILL_SOLID)" in raster,
       "live_game_frame::observe_game_depth_clear(" in hook,
       "live_game_frame::observe_game_clear(" in hook,
       "nativeFullFrame && originalMainColorSeed &&" in guard,
@@ -47,6 +51,10 @@ for scope,old,new in (
  ("color","s.frameBatch.abort(); // failed proof: original D3D9 lives","s.frameBatch.reset(); // fail open"),
 ):
     assert not valid(mutant(scope,old,new),h,g),old
+# Losing the new live source-side stencil proof must also fail this Clear
+# regression: original D3D9 Draw, not a native scene, wins on conditional Z/S.
+assert not valid(b.replace("stencil_equivalent_to_disabled(",
+                           "stencil_unconditionally_ignored(",1),h,g)
 assert not valid(b,h,g.replace("sameMainDepthStencil && fullClearCoverage && nativeBatchOpen;","true; /* unproved */"))
 assert not valid(b,h.replace("live_game_frame::observe_game_depth_clear(","live_game_frame::skip_clear(",1),g)
 print("00781 real game main STENCIL, Z|STENCIL, menu-race Draw+Present fallback PASS")
