@@ -56,6 +56,45 @@ namespace
     static_assert(CenterMultiSpriteAxis(1200.0f, 2.5f, 1.25f, 1200.0f, 480.0f) == 900.0f);
 
 
+    // The six +TIME caller tails are snapshots, not owned queue pointers.
+    // Validate both boundaries against the live chain before dereferencing
+    // any old tail (which may have been freed by a nested queue rebuild).
+    template<class Node>
+    constexpr Node* StageFirstAppendedNode(
+        Node* root, Node* oldTail, Node* newTail, unsigned bound) noexcept
+    {
+        if (!root || !newTail || newTail == oldTail || bound == 0)
+            return nullptr;
+        Node* first = oldTail ? nullptr : root->next_0;
+        for (Node* node = root->next_0;
+             node && bound != 0; node = node->next_0, --bound)
+        {
+            if (node == oldTail)
+                first = node->next_0;
+            if (node == newTail)
+                return first;
+        }
+        return nullptr;
+    }
+
+    struct StageTailFixture { StageTailFixture* next_0 = nullptr; };
+    constexpr bool TestStageFirstAppendedNode() noexcept
+    {
+        StageTailFixture root{}, first{}, old{}, newest{}, stale{};
+        root.next_0 = &first;
+        first.next_0 = &old;
+        old.next_0 = &newest;
+        return StageFirstAppendedNode(&root, &old, &newest, 4) == &newest &&
+            StageFirstAppendedNode<StageTailFixture>(
+                &root, nullptr, &newest, 4) == &first &&
+            StageFirstAppendedNode(&root, &stale, &newest, 4) == nullptr &&
+            StageFirstAppendedNode(&root, &old, &old, 4) == nullptr &&
+            StageFirstAppendedNode(&root, &old, &newest, 2) == nullptr &&
+            StageFirstAppendedNode(&root, &old, &newest, 3) == &newest;
+    }
+    static_assert(TestStageFirstAppendedNode(),
+        "+TIME must not read or relabel a stale source queue tail");
+
     // Compose the matrix AFTER D3DX applies scaling/rotation pivots.
     // Changing only pScaling/pTranslation uses a different pivot basis and
     // distorts rotated menu art at portrait and ultrawide aspect ratios.
@@ -818,7 +857,32 @@ class UIScaling : public Hook
 	}
 
 
-	// Exact FUN_004BA9D0 caller identity is lost after the child E8 CALLs.
+	    // +TIME only: validate the old tail against the current queue before
+    // tagging new sprites. Ordinary high-frequency HUD/rank producers retain
+    // their existing fast O(new nodes) TagAppendedNodes() implementation.
+    static void TagStageExtensionAppendedNodes(
+        const std::array<SpriteNode*, Game::SpritePriorityCount>& before)
+    {
+        for (int prio = 0; prio < Game::SpritePriorityCount; ++prio)
+        {
+            SpriteNode* root = Game::sprite_prio_root[prio];
+            SpriteNode* tailAfter = root ? root->tail_4 : nullptr;
+            SpriteNode* node = StageFirstAppendedNode(
+                root, before[prio], tailAfter, Game::SpriteNodeMax);
+            for (unsigned guard = 0;
+                 node && guard < Game::SpriteNodeMax; ++guard)
+            {
+                OutRunVR::GameSemantic::RegisterSpriteNodeScope(
+                    node, OutRunVR::GameSemantic::RenderScope::ScreenHud,
+                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime);
+                if (node == tailAfter)
+                    break;
+                node = node->next_0;
+            }
+        }
+    }
+
+    // Exact FUN_004BA9D0 caller identity is lost after the child E8 CALLs.
 	// Restore the historical source-map bridge, but persist semantics on the
 	// actual newly queued sprite nodes, not in retired ScopedProducerSemantic.
 	static std::uint32_t OutRunHudTextCallerRva(const void* address) noexcept
@@ -1133,9 +1197,7 @@ class UIScaling : public Hook
     {
         if (!StageExtensionDepth || --StageExtensionDepth != 0)
             return;
-        TagAppendedNodes(StageExtensionBefore,
-            OutRunVR::GameSemantic::RenderScope::ScreenHud,
-            OutRunVR::GameSemantic::ProducerToken::StageExtensionTime);
+        TagStageExtensionAppendedNodes(StageExtensionBefore);
         // D3DX Draw can defer triangles beyond the original numeric CALL.
         // Close only a still-homogeneous +TIME batch while the exact direct
         // source is alive, before restoring the previous shader/HUD owner.
