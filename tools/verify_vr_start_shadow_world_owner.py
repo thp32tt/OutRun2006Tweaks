@@ -22,6 +22,7 @@ def check(code, sem):
         "ScopedRenderSemantic semantic(",
         "ScopedExactProducerSemantic directWorld(",
         "directWorldScope, nullptr, true",
+        "ProducerToken::CarBaseShadow",
         "Settings::VREnabled &&\n\t\t\t\t!OutRunVR::GameSemantic::QueueRenderActive()",
         "? OutRunVR::GameSemantic::RenderScope::WorldParticle",
         ": OutRunVR::GameSemantic::RenderScope::None",
@@ -35,7 +36,8 @@ def check(code, sem):
     import re
     assert re.search(
         r"ScopedExactProducerSemantic directWorld\(\s*"
-        r"directWorldScope, nullptr, true\s*\);\s*"
+        r"directWorldScope, nullptr, true,\s*"
+        r"OutRunVR::GameSemantic::ProducerToken::CarBaseShadow\s*\);\s*"
         r"OutRunVR::GameSemantic::ScopedRenderSemantic semantic\(\s*"
         r"OutRunVR::GameSemantic::RenderScope::WorldParticle\s*\);\s*"
         r"Game::DrawObjectAlpha_Internal\(\s*a1,\s*"
@@ -68,6 +70,7 @@ def verify_mutations(code, sem):
         ("Game::DrawObjectAlpha_Internal(", "Game::IncorrectObjectDraw("),
         ("ScopedRenderSemantic semantic(", "ScopedRenderSemantic escaped("),
         ("directWorldScope, nullptr, true", "directWorldScope, nullptr, false"),
+        ("ProducerToken::CarBaseShadow", "ProducerToken::None"),
     )
     for original, mutant in probes:
         assert original in code, original
