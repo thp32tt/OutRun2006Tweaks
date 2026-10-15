@@ -33,7 +33,9 @@ int main() {
     assert(!color.preserves_offscreen_color_only(game, back, 0x300u, true, batch.stopped));
     assert(!batch.publishable_full(true, 1u));
     batch.reset();
-    assert(batch.accepts_full_seeded(1u,false)); // already seeded, contiguous
+    color.record(game, back, 0xff334455u, true);
+    batch.succeeded(false); batch.record_source_draw(0u);
+    assert(batch.accepts_full_seeded(1u,false)); // new full game Clear re-seeded
     assert(!batch.accepts_full_seeded(2u,true)); // no skipped Draw
     batch.scene_boundary();
     assert(!batch.accepts_full_seeded(1u,true));
