@@ -10,17 +10,17 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:HOST_DIRECTGPU_GENERATION_AWARE_OPENXR_GAME_FRAME_HANDOFF",
   "feature_id": "DX11-HOST-GENERATION-SAFE-NATIVE-EYE-CONSUMPTION",
-  "status": "VALIDATING_EXACT_SHA",
-  "checkpoint": "C4_COMMIT",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
   "gamepad_test_performed": false,
   "packaging_status": "NOT_REQUIRED",
   "base_sha": "ec07aa12a5f3598d17b8e8ddb8ec4d4f4cb24592",
-  "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "material_result_sha": "e3e2c786cc98493f0b72374f0faa45869b4ec075",
+  "validation_bearing_result_sha": "991622557c8c0761a11f56df1ea30b206b266712",
   "changed_files": [
     "vrhost/src/runtime/native_stereo_source_route.hpp",
     "vrhost/src/main.cpp",
@@ -93,19 +93,19 @@
     "activation_guard_and_fallback": "Current DirectGPU opt-in only, no promotion; original SBS/D3D9 input FFB SkyGlow remain, DXVK frozen."
   },
   "acceptance_results": {
-    "native-latest-cross-generation": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "native-current-generation-publish": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "classic-gameplay-input-safe": "SOURCE_IMPLEMENTED_CI_PENDING",
-    "all-five-exact-sha-gates": "PENDING"
+    "native-latest-cross-generation": "PASS_BUILD",
+    "native-current-generation-publish": "PASS_BUILD",
+    "classic-gameplay-input-safe": "PASS_BUILD",
+    "all-five-exact-sha-gates": "PASS_EXACT_SHA"
   },
   "pipeline": {
     "C0_RECOVER": "GitHub current HEAD and completed 00795 exact-SHA verified; distinct x64 host consumption files isolated.",
     "C1_REVIEW": "R41 chooses DirectGPU generation by largest numerical frame ID across generations and ReadFrame lacked exact generation filter.",
     "C2_IMPLEMENT": "Generation-aware OpenXR host native game frame selection and exact generation reread; host C++ smoke cases.",
-    "C3_VALIDATE": "CI_REPAIR_CANDIDATE: previous exact SHA Backend/Fast failed on missing visible output integration stage; repair plus same-generation native eye frame ordering regression; final mandatory five exact SHA checks pending",
-    "C4_COMMIT": "MATERIAL_REPAIR_PENDING",
+    "C3_VALIDATE": "Exact SHA 991622557c8c0761a11f56df1ea30b206b266712 mandatory GitHub Actions SUCCESS 5/5: Fast #38823716900, Backend #38823717149, Win32 Build #38823721857, OpenXR #38823721853, HUD #38823721949. Host source and smoke tests compile; no actual Quest3/VDXR/game/gamepad runtime test.",
+    "C4_COMMIT": "Meaningful host C++ material result e3e2c786cc98493f0b72374f0faa45869b4ec075; source-preserving policy error and additional same-generation C++ ordering repair validation-bearing result 991622557c8c0761a11f56df1ea30b206b266712. C6 separate [skip ci] bookkeeping only.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_EXACT_SHA_GATES"
+    "C6_STATE": "PASS_EXACT_SHA; COMPLETE_BUILD_VERIFIED; runtime UNTESTED and HMD needs real user test."
   },
   "evidence": {
     "real_game_quest3_test": false,
@@ -121,11 +121,26 @@
       38823397147
     ],
     "failure_cause": "DX11 acceptance missing VISIBLE_FRAME_OUTPUT between native Draw and OpenXR projection",
-    "runtime_visual_status": "NOT_OBSERVED"
+    "runtime_visual_status": "NOT_OBSERVED",
+    "material_commit": "e3e2c786cc98493f0b72374f0faa45869b4ec075",
+    "validation_bearing_result_sha": "991622557c8c0761a11f56df1ea30b206b266712",
+    "source_repair_sha": "991622557c8c0761a11f56df1ea30b206b266712",
+    "ci_runs": {
+      "DX11 Fast": 38823716900,
+      "Backend Conversion": 38823717149,
+      "Windows Build": 38823721857,
+      "OpenXR": 38823721853,
+      "HUD Inspector": 38823721949
+    },
+    "mandatory_gate_count": 5,
+    "mandatory_gate_success": 5
   },
   "score": {
     "run_key": "CONVERSION-DX11-00796",
-    "score_change": 0,
-    "award_only_after_exact_sha_build_success": true
+    "score_change": 1,
+    "scoreboard_commit_sha": "2db85baff5b445c70618053ccf438b033ce69a28",
+    "scoreboard_verified_ai2": 1405,
+    "duplicate_credit_prohibited": true,
+    "score_award_reason": "one substantive host source feature + exact 5/5 SHA; C6 and retries not separately scored"
   }
 }
