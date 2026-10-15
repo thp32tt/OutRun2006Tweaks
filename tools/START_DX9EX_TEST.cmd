@@ -8,7 +8,7 @@ if errorlevel 1 (
   pause
   exit /b 2
 )
-echo === DX9Ex CURRENT_FOCUS CORRECTNESS ===
+echo === DX9Ex CURRENT_FOCUS R84 R29-R33 CORRECTNESS ===
 echo Folder: "%CD%"
 if not exist "OR2006C2C.EXE" (
  echo [ERROR] OR2006C2C.EXE not found. Extract ZIP directly into game folder.

@@ -611,23 +611,38 @@ jobs:
           $dir = 'package'
           $backend = Join-Path $dir 'backends/d3d9'
           New-Item -ItemType Directory -Force $backend | Out-Null
-          Copy-Item payload/game/dinput8.dll (Join-Path $backend 'dinput8.dll')
+          # R84 R29-R33 is now the CURRENT_FOCUS production test renderer.
+          # The previously shipped R26+HUD owner is retained in R26_SAFE.
+          # Both paths use the identical, exact-SHA x64 OpenXR host.
+          Copy-Item payload/r84/dinput8.dll (Join-Path $backend 'dinput8.dll')
           Copy-Item payload/host/outrun-vr-host.exe (Join-Path $backend 'outrun-vr-host.exe')
           Set-Content (Join-Path $backend 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
-          Copy-Item payload/game/VARIANT_ID.txt (Join-Path $backend 'VARIANT_ID.txt')
-          Copy-Item payload/game/CMAKE_FLAGS.txt (Join-Path $backend 'CMAKE_FLAGS.txt')
-          # Preserve the latest protected R26+HUD package; stage independent
-          # R29-R33 under a separate opt-in slot with the SAME exact-SHA host.
+          Copy-Item payload/r84/BUILD_VARIANT.txt (Join-Path $backend 'VARIANT_ID.txt')
+          Copy-Item payload/r84/BUILD_VARIANT.txt (Join-Path $backend 'BUILD_VARIANT.txt')
+          $r84CmakeFlags = '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=ON -DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=ON -DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=ON -DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON'
+          Set-Content (Join-Path $backend 'CMAKE_FLAGS.txt') $r84CmakeFlags -Encoding ascii
+          $r26 = Join-Path $dir 'slots/R26_SAFE'
+          New-Item -ItemType Directory -Force $r26 | Out-Null
+          Copy-Item payload/game/dinput8.dll (Join-Path $r26 'dinput8.dll')
+          Copy-Item payload/host/outrun-vr-host.exe (Join-Path $r26 'outrun-vr-host.exe')
+          Set-Content (Join-Path $r26 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
+          Copy-Item payload/game/VARIANT_ID.txt (Join-Path $r26 'VARIANT_ID.txt')
+          Copy-Item payload/game/CMAKE_FLAGS.txt (Join-Path $r26 'CMAKE_FLAGS.txt')
+          # Explicit R84_TEST alias remains for A/B comparisons and older guides.
           $r84 = Join-Path $dir 'slots/R84_TEST'
           New-Item -ItemType Directory -Force $r84 | Out-Null
           Copy-Item payload/r84/dinput8.dll (Join-Path $r84 'dinput8.dll')
           Copy-Item payload/host/outrun-vr-host.exe (Join-Path $r84 'outrun-vr-host.exe')
           Set-Content (Join-Path $r84 'SOURCE_SHA.txt') $env:GITHUB_SHA -Encoding ascii
           Copy-Item payload/r84/BUILD_VARIANT.txt (Join-Path $r84 'BUILD_VARIANT.txt')
-          Set-Content (Join-Path $r84 'CMAKE_FLAGS.txt') '-DOUTRUN_VR_SAFE_DRAW_COMPARE=OFF -DOUTRUN_VR_R26_HUD_COMPARE=OFF -DOUTRUN_VR_C1_COMPARE=OFF -DOUTRUN_VR_C2_COMPARE=OFF -DOUTRUN_VR_REFACTOR_SPLIT_R33_R32=ON -DOUTRUN_VR_REFACTOR_SPLIT_R32_R31=ON -DOUTRUN_VR_REFACTOR_SPLIT_R31_R30=ON -DOUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON' -Encoding ascii
+          Set-Content (Join-Path $r84 'CMAKE_FLAGS.txt') $r84CmakeFlags -Encoding ascii
           if ((Get-FileHash (Join-Path $r84 'outrun-vr-host.exe') -Algorithm SHA256).Hash -ne
               (Get-FileHash (Join-Path $backend 'outrun-vr-host.exe') -Algorithm SHA256).Hash) {
-            throw 'R84 host is not identical to the R26 baseline host'
+            throw 'R84 alias host is not identical to the current main host'
+          }
+          if ((Get-FileHash (Join-Path $r26 'outrun-vr-host.exe') -Algorithm SHA256).Hash -ne
+              (Get-FileHash (Join-Path $backend 'outrun-vr-host.exe') -Algorithm SHA256).Hash) {
+            throw 'R26 fallback host is not identical to the current main host'
           }
           Copy-Item OutRun2006Tweaks.ini (Join-Path $dir 'OutRun2006Tweaks.ini')
           Copy-Item OutRun2006Tweaks.lods.ini (Join-Path $dir 'OutRun2006Tweaks.lods.ini')
@@ -646,10 +661,11 @@ jobs:
             '   ZIP 내용물을 OR2006C2C.EXE가 있는 게임 폴더에 풀어주세요.'
             '2. Double-click START_DX9EX_TEST.cmd (visible direct launch; optional GUI selector available).'
             '   START_DX9EX_TEST.cmd를 더블클릭하세요. 실패 원인과 로그 위치가 표시됩니다.'
-            '3. CURRENT FOCUS / CORRECTNESS (R26+HUD) is selected automatically.'
+            '3. CURRENT FOCUS / CORRECTNESS loads R84 R29-R33 independent renderer by default.'
+            '   기본 실행은 구조 개편된 R84이며, Quest3/VDXR 시각·성능 검증은 아직 필요합니다.'
             '   GUI는 OutRunVR-Slot-Selector.cmd에서 선택적으로 사용할 수 있습니다.'
-            '   R84 TEST 버튼은 독립 R29-R33 시험용 (Quest3 실기 미검증)입니다.'
-            '   이후 CURRENT FOCUS 선택으로 기존 HUD/성능 개선 경로로 복귀합니다.'
+            '   R26 SAFE 슬롯은 기존 R26+HUD 보호판으로 즉시 복귀하는 옵션입니다.'
+            '   R84 상태로 돌아가려면 CURRENT FOCUS를 선택하세요.'
             '4. The selector configures the DX9Ex backend and runs OR2006C2C.EXE.'
             '   설정 후 실제 게임 실행 파일은 OR2006C2C.EXE입니다.'
             '5. After the game closes, its diagnostic ZIP is auto-collected.'
@@ -686,10 +702,12 @@ jobs:
             SchemaVersion = 1
             BuildMatrixId = $matrixId
             IntegrationSha = $env:GITHUB_SHA
-            VariantId = 'ACTIVE_R26_R43_R44'
-            OptionalR84VariantId = 'R84_SPLIT_R33_R32_R31_R30_R29'
-            OptionalR84Slot = 'R84_TEST'
-            OptionalR84RuntimeValidation = 'UNTESTED'
+            VariantId = 'R84_SPLIT_R33_R32_R31_R30_R29'
+            DefaultRendererSlot = 'CURRENT_FOCUS'
+            PreviousR84AliasSlot = 'R84_TEST'
+            FallbackRendererSlot = 'R26_SAFE'
+            FallbackVariantId = 'ACTIVE_R26_R43_R44'
+            R84HmdRuntimeValidation = 'UNTESTED'
             DefaultTestProfile = 'CORRECTNESS'
             Profiles = @('CONTROL','CORRECTNESS','HUD_SCREEN','HUD_MENU','HUD_WORLD','PERFORMANCE')
             RecommendedHudProfile = 'HUD_SCREEN'
@@ -745,6 +763,18 @@ jobs:
             if (-not (Test-Path (Join-Path 'verify/backends/d3d9' $file))) { throw "backend payload missing $file" }
           }
           $r84Dir = 'verify/slots/R84_TEST'
+          $r26Dir = 'verify/slots/R26_SAFE'
+          foreach ($file in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt','VARIANT_ID.txt','CMAKE_FLAGS.txt')) {
+            if (-not (Test-Path (Join-Path $r26Dir $file))) { throw "R26 rollback payload missing $file" }
+          }
+          if ((Get-Content (Join-Path $r26Dir 'SOURCE_SHA.txt') -Raw).Trim() -ne $env:GITHUB_SHA -or
+              (Get-Content (Join-Path $r26Dir 'VARIANT_ID.txt') -Raw).Trim() -ne 'ACTIVE_R26_R43_R44') {
+            throw 'R26 rollback source SHA or build variant mismatch'
+          }
+          if ((Get-Content 'verify/backends/d3d9/VARIANT_ID.txt' -Raw).Trim() -ne 'R84_SPLIT_R33_R32_R31_R30_R29' -or
+              (Get-Content 'verify/backends/d3d9/CMAKE_FLAGS.txt' -Raw) -notmatch 'OUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON') {
+            throw 'CURRENT_FOCUS is not the R84 independent full-chain renderer'
+          }
           foreach ($file in @('dinput8.dll','outrun-vr-host.exe','SOURCE_SHA.txt','BUILD_VARIANT.txt','CMAKE_FLAGS.txt')) {
             if (-not (Test-Path (Join-Path $r84Dir $file))) { throw "R84 test payload missing $file" }
           }
@@ -758,8 +788,28 @@ jobs:
               (Get-FileHash 'verify/backends/d3d9/outrun-vr-host.exe' -Algorithm SHA256).Hash) {
             throw 'R84 host must match active exact-SHA host'
           }
-          # End-to-end installer A/B smoke: real R84 DLL then protected R26 rollback.
+          # End-to-end smoke: default R84 -> R26_SAFE -> R84_TEST -> R84 main.
           Copy-Item verify verify-r84-smoke -Recurse
+          & ./verify-r84-smoke/Select-OutRunVRBackend.ps1 -Backend d3d9 -TestProfile CORRECTNESS -VariantId CURRENT_FOCUS
+          if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'default R84 main selection failed' }
+          $mainState = Get-Content verify-r84-smoke/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
+          if ($mainState.RendererBuildVariant -ne 'R84_SPLIT_R33_R32_R31_R30_R29') {
+            throw 'CURRENT_FOCUS installed a non-R84 renderer'
+          }
+          if ((Get-FileHash verify-r84-smoke/dinput8.dll -Algorithm SHA256).Hash -ne
+              (Get-FileHash verify-r84-smoke/backends/d3d9/dinput8.dll -Algorithm SHA256).Hash) {
+            throw 'CURRENT_FOCUS main DLL mismatch'
+          }
+          & ./verify-r84-smoke/Select-OutRunVRBackend.ps1 -Backend d3d9 -TestProfile CORRECTNESS -VariantId R26_SAFE
+          if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'R26_SAFE fallback selector failed' }
+          $safeState = Get-Content verify-r84-smoke/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
+          if ($safeState.RendererBuildVariant -ne 'ACTIVE_R26_R43_R44' -or $safeState.VariantId -ne 'R26_SAFE') {
+            throw 'R26_SAFE fallback identity mismatch'
+          }
+          if ((Get-FileHash verify-r84-smoke/dinput8.dll -Algorithm SHA256).Hash -ne
+              (Get-FileHash verify-r84-smoke/slots/R26_SAFE/dinput8.dll -Algorithm SHA256).Hash) {
+            throw 'R26_SAFE did not install protected R26+HUD DLL'
+          }
           & ./verify-r84-smoke/Select-OutRunVRBackend.ps1 -Backend d3d9 -TestProfile CORRECTNESS -VariantId R84_TEST
           if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'R84 selector failed' }
           $r84State = Get-Content verify-r84-smoke/CURRENT_VR_SESSION.json -Raw | ConvertFrom-Json
@@ -771,10 +821,10 @@ jobs:
             throw 'R84 selection installed wrong DLL'
           }
           & ./verify-r84-smoke/Select-OutRunVRBackend.ps1 -Backend d3d9 -TestProfile CORRECTNESS -VariantId CURRENT_FOCUS
-          if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'R84 rollback failed' }
+          if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw 'R84 main restore failed' }
           if ((Get-FileHash verify-r84-smoke/dinput8.dll -Algorithm SHA256).Hash -ne
               (Get-FileHash verify-r84-smoke/backends/d3d9/dinput8.dll -Algorithm SHA256).Hash) {
-            throw 'R84 rollback did not restore protected R26+HUD DLL'
+            throw 'R84 main restore did not install the refactored R29-R33 DLL'
           }
 
           # Regression: extracting a new package over an older R71 test folder

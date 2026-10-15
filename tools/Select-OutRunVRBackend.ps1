@@ -24,7 +24,7 @@ $defaultVariant = switch ($Backend) {
 # new package is extracted over an existing game directory. Never let stale
 # metadata prevent a current build from launching.
 $canonicalVariants = @(
-    "AUTO","CONTROL_2D","CURRENT_FOCUS","R84_TEST","A_CONTROL","B_HUD","C_FLARE","D_PERF",
+    "AUTO","CONTROL_2D","CURRENT_FOCUS","R84_TEST","R26_SAFE","A_CONTROL","B_HUD","C_FLARE","D_PERF",
     "E_DXVK_SAFE","E_DXVK_MULTIVIEW","F_DX12_STRICT","G_COCKPIT"
 )
 $legacyVariantAliases = @{
@@ -43,12 +43,12 @@ $variant = if ($requestedVariant -eq "AUTO") { $defaultVariant } else { $request
 
 $slotPayload = Join-Path $root ("slots/" + $variant)
 $backendPayload = Join-Path $backendRoot $payloadBackend
-# The ACTIVE ZIP ships one canonical DX9Ex game/host pair for ALL current
-# profiles. Ignore stale slots/B_HUD, slots/D_PERF, etc. left from old ZIPs:
-# choosing one would silently install a different dinput8.dll/host.
-$src = if ($Backend -eq "d3d9" -and $variant -eq "R84_TEST") {
-    # Do not silently fall back to R26 when the R84 experiment is requested.
-    if (-not (Test-Path $slotPayload)) { throw "R84_TEST payload missing: $slotPayload" }
+# CURRENT_FOCUS is now R84 R29-R33; all other normal DX9Ex profiles
+# use that same canonical DLL. Only explicitly requested R26_SAFE or
+# R84_TEST may use a dedicated slot. Never load stale HUD/perf slots.
+$src = if ($Backend -eq "d3d9" -and ($variant -eq "R26_SAFE" -or $variant -eq "R84_TEST")) {
+    # An unavailable fallback must never silently select a different DLL.
+    if (-not (Test-Path $slotPayload)) { throw "R26_SAFE/R84_TEST payload missing: $slotPayload" }
     $slotPayload
 } elseif ($Backend -eq "d3d9") {
     $backendPayload
@@ -66,21 +66,33 @@ if (-not (Test-Path $buildVariantFile)) { $buildVariantFile = Join-Path $src "VA
 $rendererBuildVariant = if (Test-Path $buildVariantFile) { (Get-Content $buildVariantFile -Raw).Trim() } else { "unknown" }
 $cmakeFlagsFile = Join-Path $src "CMAKE_FLAGS.txt"
 $rendererCmakeFlags = if (Test-Path $cmakeFlagsFile) { (Get-Content $cmakeFlagsFile -Raw).Trim() } else { "unknown" }
-if ($Backend -eq "d3d9" -and $variant -eq "R84_TEST") {
+if ($Backend -eq "d3d9") {
+    # Every DX9Ex payload must come from the package exact-SHA build.
+    # CURRENT_FOCUS is R84, while R26_SAFE is the explicit protected rollback.
     $baselineShaFile = Join-Path $backendPayload "SOURCE_SHA.txt"
     if (-not (Test-Path $baselineShaFile) -or
         $sourceSha -notmatch '^[0-9a-fA-F]{40}$' -or
-        $sourceSha -ne (Get-Content $baselineShaFile -Raw).Trim() -or
-        $rendererBuildVariant -ne "R84_SPLIT_R33_R32_R31_R30_R29" -or
-        $rendererCmakeFlags -notmatch 'OUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON') {
-        throw "R84_TEST SHA/build mismatch; refusing stale or unsafe payload."
+        $sourceSha -ne (Get-Content $baselineShaFile -Raw).Trim()) {
+        throw "DX9Ex renderer exact-SHA mismatch; refusing stale or unsafe payload."
+    }
+    $expectedVariant = if ($variant -eq "R26_SAFE") {
+        "ACTIVE_R26_R43_R44"
+    } else {
+        "R84_SPLIT_R33_R32_R31_R30_R29"
+    }
+    if ($rendererBuildVariant -ne $expectedVariant -or
+        ($variant -ne "R26_SAFE" -and
+         $rendererCmakeFlags -notmatch 'OUTRUN_VR_REFACTOR_SPLIT_R30_R29=ON') -or
+        ($variant -eq "R26_SAFE" -and
+         $rendererCmakeFlags -notmatch 'OUTRUN_VR_R26_HUD_COMPARE=ON')) {
+        throw "DX9Ex selected renderer build variant mismatch: $variant."
     }
     foreach ($name in @('dinput8.dll','outrun-vr-host.exe')) {
-        if (-not (Test-Path (Join-Path $src $name))) { throw "R84_TEST missing $name" }
+        if (-not (Test-Path (Join-Path $src $name))) { throw "DX9Ex missing $name" }
     }
     if ((Get-FileHash (Join-Path $src 'outrun-vr-host.exe') -Algorithm SHA256).Hash -ne
         (Get-FileHash (Join-Path $backendPayload 'outrun-vr-host.exe') -Algorithm SHA256).Hash) {
-        throw "R84_TEST host is not the matching exact-SHA host."
+        throw "DX9Ex selected host is not the matching exact-SHA host."
     }
 }
 
