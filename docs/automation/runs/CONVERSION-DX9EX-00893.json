@@ -8,7 +8,7 @@
   "lane": "DX9EX",
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:VIS:MAIN_MENU",
-  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU_XR_INVALID_FOV",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "status": "SOURCE_IMPLEMENTED_CI_PENDING",
   "phase": "C3_VALIDATE",
@@ -17,7 +17,7 @@
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "efaef61d445d922a9632f956bed379974d6abc63",
-  "material_result_sha": null,
+  "material_result_sha": "bad3298087887276c19d69181c43cd97d6cc048e",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "vrhost/src/runtime/menu_content_aspect.hpp"
@@ -29,7 +29,7 @@
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:MAIN_MENU",
-    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU_XR_INVALID_FOV",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
     "goal": "Prevent a transient near-pole or outlier OpenXR eye FOV from distorting the entire forward-centered native OutRun menu across both eyes; preserve legitimate asymmetric Quest FOV and 4:3/full-width car-selection content.",
     "scope_boundary": "Only LOCAL menu shared tangent FOV planning (R23 host); no automatic 4:3 crop, car selection content removal, game HUD/F11/ESC, graphics world stereo, R26_SAFE, DX11 or DXVK.",
     "trace_stages": [
@@ -73,7 +73,8 @@
     "root_cause": "Shared two-eye menu FOV was composed before checking each eye's usable tangent span, allowing a single near-pole publication to change the other eye's authored menu aspect.",
     "fix_evidence": "Check both per-eye tangent spans against 0.05..10.0 before averaging; retain all normal asymmetric FOV and 4:3/21:9 menu paths.",
     "negative_test_evidence": "Portable menu_content_aspect_smoke now includes near-pole single-eye horizontal and vertical negatives in addition to asymmetric positive and recenter recovery cases.",
-    "evidence_limits": "No user Quest3/VDXR playback or measured performance data. Normal FOV unchanged."
+    "evidence_limits": "No user Quest3/VDXR playback or measured performance data. Normal FOV unchanged.",
+    "policy_ci_failure": "Initial material SHA bad3298087887276c19d69181c43cd97d6cc048e Active Policy Gate failed because task/feature symptom identifier used a non-catalog suffix; canonical identifier corrected here; source code and positive/negative test remain unchanged."
   },
   "runtime_evidence": "No actual Quest3/VDXR session or OutRun game render execution for this task.",
   "score_once": false,
