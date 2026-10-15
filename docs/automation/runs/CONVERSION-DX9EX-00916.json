@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:F11_MENU",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "phase": "C5_VALIDATE",
-  "checkpoint": "C5_PENDING_EXACT_SHA",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "d2bf7aa6b95ecf432d3f5dcf8f7f1ddadb1c5a75",
   "material_result_sha": "bcd37290762eefcefd6a55bf9a27e6b4db71bd4c",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "3c52c8c6be1f89641ac90ee7666d5d7ef4fffd7c",
   "source_paths": [
     "src/overlay/overlay.cpp"
   ],
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "vr_shell_reflow": "PENDING_CI",
-    "desktop_drag_restore": "PENDING_CI",
-    "exact_sha_ci": "PENDING_CI"
+    "vr_shell_reflow": "PASS_BUILD",
+    "desktop_drag_restore": "PASS_BUILD",
+    "exact_sha_ci": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "The original unified layoutChanged predicate treated desktop mirror resolution changes and the VR->desktop transition as permission to apply ImGuiCond_Always centring, destroying desktop drag placement and discarding its independent interactive window size.",
@@ -85,6 +85,49 @@
     ],
     "eye_ownership": "External VR shell continues using the existing R84 ScreenOverlay2D binocular submission; this change affects ImGui surface and hitbox geometry before per-eye compositing, not the world or gameplay HUD."
   },
-  "next_action": "Require four exact-SHA CI jobs (DX9Ex Active, Domain Isolation, Full Source Impact, EXE HUD Inspector); preserve original material source bcd3729; Quest3/VDXR remains UNTESTED.",
-  "source_candidate_sha": "80b3b5a078985a71d21af31837d38be48fcc6dda"
+  "next_action": "C6 exact-SHA build verified; await real Quest3/VDXR F11 optical, cursor and original desktop/VR live behavior before any HMD acceptance or backend promotion.",
+  "source_candidate_sha": "80b3b5a078985a71d21af31837d38be48fcc6dda",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "validation_bearing_result_sha": "3c52c8c6be1f89641ac90ee7666d5d7ef4fffd7c",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "exact_sha_gate_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38804478678,
+        "sha": "3c52c8c6be1f89641ac90ee7666d5d7ef4fffd7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38804478542,
+        "sha": "3c52c8c6be1f89641ac90ee7666d5d7ef4fffd7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38804478393,
+        "sha": "3c52c8c6be1f89641ac90ee7666d5d7ef4fffd7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38804478666,
+        "sha": "3c52c8c6be1f89641ac90ee7666d5d7ef4fffd7c",
+        "conclusion": "success"
+      }
+    ],
+    "notes": "Exact SHA 3c52c8 includes tested F11 native geometry changes and canonical feature input. Active policy/game/host/R84 full-chain/package, Domain, Full Source Impact, EXE Inspector all SUCCESS; no user Quest3/VDXR acceptance."
+  },
+  "bookkeeping": {
+    "commit_kind": "C6_RESULT_ONLY",
+    "validation_bearing_result_sha": "3c52c8c6be1f89641ac90ee7666d5d7ef4fffd7c",
+    "skip_ci": true,
+    "no_additional_score": true
+  }
 }
