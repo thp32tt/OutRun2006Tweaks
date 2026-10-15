@@ -10,15 +10,15 @@
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:HOST:DIRECT_GPU_SKIP_ACK_RUN_ISOLATION",
   "feature_class": "CRITICAL_BLOCKER",
-  "status": "IMPLEMENTED_CI_PENDING",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_MATERIAL",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "e0fe0df9904e18f0721411719755a553f2c01c36",
   "material_result_sha": "fb003de2a53e560514abc3477557509751de6ed5",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "2debc4a5c89c8ee6e5a340efc96722380737eb49",
   "source_paths": [
     "vrhost/src/main_r23.cpp",
     "vrhost/src/runtime/direct_ring_skip_ack.hpp"
@@ -97,7 +97,7 @@
       "Domain Isolation Guard",
       "DX9Ex Full Source Impact Review"
     ],
-    "revalidation": "PENDING_FINAL_VALIDATION_BEARING_SHA",
+    "revalidation": "PASS_EXACT_SHA",
     "initial_policy_repair": "Corrected obsolete R37 literal invariant to strict R41 same-run temporal ACK checks and built the portable regression as a Windows host-smoke CMake target.",
     "second_active_run_id": 38754004023,
     "second_policy_failure": "Architecture verifier looked for removed !R37FrameIdBefore literal instead of stronger direct-ring skip ACK helper."
