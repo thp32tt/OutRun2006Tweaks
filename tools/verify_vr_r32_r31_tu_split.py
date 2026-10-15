@@ -44,8 +44,18 @@ for label, body in (("CMakeLists.txt", cmake), ("cmake.toml", cmkr)):
             errors.append(f"{label} {option} missing compile-definition isolation")
     if "R32/R31 split is blocked until" in body:
         errors.append(f"{label} retained obsolete R32/R31 FATAL gate")
-    if "Combined R33/R32/R31/R30 ownership" not in body:
-        errors.append(f"{label} lacks integrated TU ownership constraint")
+    # The option-free production build now compiles the full R29-R33 chain.
+    # Validate its real default guard, not the wording of an obsolete comment.
+    if ("set(OUTRUN_VR_R84_MAIN_DEFAULT ON)" not in body or
+            'option(OUTRUN_VR_SAFE_DRAW_COMPARE "Opt-in R26/R23 historical stereo fallback" OFF)' not in body or
+            any(f"option({name} " not in body or
+                f"${{OUTRUN_VR_R84_MAIN_DEFAULT}})" not in body
+                for name in (
+                    "OUTRUN_VR_REFACTOR_SPLIT_R33_R32",
+                    "OUTRUN_VR_REFACTOR_SPLIT_R32_R31",
+                    "OUTRUN_VR_REFACTOR_SPLIT_R31_R30",
+                    "OUTRUN_VR_REFACTOR_SPLIT_R30_R29"))):
+        errors.append(f"{label} lacks R84-default integrated TU ownership")
 
 for feature in ("OUTRUN_VR_REFACTOR_SPLIT_R33_R32", "OUTRUN_VR_REFACTOR_SPLIT_R32_R31", "OUTRUN_VR_REFACTOR_SPLIT_R31_R30", "OUTRUN_VR_REFACTOR_SPLIT_R30_R29"):
     if "-D" + feature + "=ON" not in workflow:
