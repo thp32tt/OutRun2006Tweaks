@@ -1,0 +1,27 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "assets": [
+    {
+      "queue_id": "Q012",
+      "source_png": "q012_D6DC1380_FLIPY_CHECK_ORIENTATION.png",
+      "source_sha256": "18e5d04843a182708ee70fcc4dee3dba1b126da2fec10b41a235e2326d3085fc",
+      "source_kind": "FULL_HD_PNG_FROM_PINNED_GITHUB_MANUAL_PACK_ORIENTATION_VISUAL",
+      "source_dds_path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+      "regions": [
+        {
+          "id": "continue_question",
+          "english": "Continue?",
+          "korean": "계속?",
+          "bbox": [
+            4,
+            12,
+            252,
+            60
+          ],
+          "isolation": "alpha",
+          "scale": 4
+        }
+      ]
+    }
+  ]
+}

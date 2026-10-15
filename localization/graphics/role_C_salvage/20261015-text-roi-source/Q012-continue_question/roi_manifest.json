@@ -1,0 +1,46 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "queue_id": "Q012",
+  "region_id": "continue_question",
+  "source_png": "q012_D6DC1380_FLIPY_CHECK_ORIENTATION.png",
+  "source_png_sha256": "18e5d04843a182708ee70fcc4dee3dba1b126da2fec10b41a235e2326d3085fc",
+  "source_kind": "FULL_HD_PNG_FROM_PINNED_GITHUB_MANUAL_PACK_ORIENTATION_VISUAL",
+  "source_dds_path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+  "original_dimensions": [
+    256,
+    64
+  ],
+  "bbox_xyxy": [
+    4,
+    12,
+    252,
+    60
+  ],
+  "english": "Continue?",
+  "korean": "계속?",
+  "isolation": "alpha",
+  "scale": 4,
+  "native_dimensions": [
+    248,
+    48
+  ],
+  "imagegen_dimensions": [
+    992,
+    192
+  ],
+  "native_png_sha256": "42870a588b58ce6e36708a3622397f57f1d05ef2ac793a6db71fecde621e031f",
+  "imagegen_input_sha256": "e73a4915d8048bf08a57b9d7f927c99b09ce1871ad4bbd38e4644acfd1e3576c",
+  "alpha_crop_margin_checked": true,
+  "status": "IMAGEGEN_REFERENCE_TEST_ONLY",
+  "generate_output": "ONE_KOREAN_TEXT_ONLY_TRANSPARENT_PNG",
+  "required_review": [
+    "KOREAN_GLYPHS",
+    "SOURCE_EFFECT",
+    "CLEAN_PLATE",
+    "NATIVE_ROI_FIT",
+    "C1",
+    "C3_IF_REQUIRED",
+    "USER_GAME"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

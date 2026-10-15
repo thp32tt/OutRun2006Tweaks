@@ -1,0 +1,75 @@
+{
+  "schema": "outrun-hd-text-roi-source-audit-v1",
+  "task_id": "OUTRUN-C-ROI-SOURCE-20261015-Q012-CONTINUE",
+  "run_slot": "C",
+  "run_time_local": "2026-10-15 18:03 KST",
+  "source_archive": "OUTRUN_HD_PNG_MANUAL_20261012.zip",
+  "source_archive_sha256": "0ebd9046c0dbfb9f4da3b00bf977cff287626205c99b3181366b0d9f907a7bd1",
+  "source_png": "q012_D6DC1380_FLIPY_CHECK_ORIENTATION.png",
+  "source_png_sha256": "18e5d04843a182708ee70fcc4dee3dba1b126da2fec10b41a235e2326d3085fc",
+  "source_full_dimensions": [
+    256,
+    64
+  ],
+  "source_contains_complete_english_phrase": true,
+  "source_png_provenance": "DIRECT_FULL_PNG_FROM_PINNED_MANUAL_PACKAGE_NOT_LEGACY_TILE",
+  "source_dds_path": "textures/load/spr_etc_xst/D6DC1380_256x64.dds",
+  "source_dds_sha256_as_recorded_in_GitHub_inventory": "42aa10e021f9170247612b2e8231be43458abc3cda1011595db2fe2902df4352",
+  "source_platform": "BASE",
+  "source_png_to_dds_identity_check": "PATH_HASH_FAMILY_DIMENSIONS_MAPPING_CORRESPOND; DDS_DIRECT_PIXEL_EQUIVALENCE_NOT_RETESTED",
+  "dds_direct_bytes_available_in_this_run": false,
+  "raw_dds_orientation_validation": "UNTESTED; supplied PNG has visually upright Continue?; manual transcription notes raw orientation normal",
+  "english": "Continue?",
+  "korean": "계속?",
+  "translation_index": 12,
+  "translation_status": "transcribed_reviewed",
+  "source_alpha_nonzero_bbox_xyxy": [
+    8,
+    20,
+    248,
+    54
+  ],
+  "source_alpha_nonzero_count": 6154,
+  "native_bbox_xyxy": [
+    4,
+    12,
+    252,
+    60
+  ],
+  "native_transparent_margins_px": {
+    "left": 4,
+    "top": 8,
+    "right": 4,
+    "bottom": 6
+  },
+  "native_dimensions": [
+    248,
+    48
+  ],
+  "upscale_multiplier": 4,
+  "imagegen_dimensions": [
+    992,
+    192
+  ],
+  "native_png_sha256": "42870a588b58ce6e36708a3622397f57f1d05ef2ac793a6db71fecde621e031f",
+  "upscaled_png_sha256": "e73a4915d8048bf08a57b9d7f927c99b09ce1871ad4bbd38e4644acfd1e3576c",
+  "status": "IMAGEGEN_REFERENCE_TEST_ONLY_SOURCE_DDS_EQUIVALENCE_UNTESTED",
+  "imagegen_invoked": false,
+  "any_external_image_api_invoked": false,
+  "old_986_tile_inputs_used": false,
+  "old_AB_queue_or_state_modified": false,
+  "alpha_isolation": "SOURCE_RGBA_NATIVE_ALPHA",
+  "opaque_clean_and_mask": "NOT_APPLICABLE_TO_THIS_TRANSPARENT_PHRASE; NO CLEAN CREATED",
+  "fit_policy": "PRESERVE_ASPECT_RATIO_WITHIN_ORIGINAL_UI_CELL_UV_SAFE_REGION; Korean width mismatch not automatic FAIL",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "user_game": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "separate_hold": {
+    "id": "Q102-time_attack_mode",
+    "reason": "TEXT_OR_EFFECT_TOUCHES_CROP_EDGE: neighboring phrase/effects overlap; no independently reviewed mask/PSD",
+    "source_png_sha256": "566a4b1cc36a672e7890b29c07e2014376e931bcfec4a95898e60bb1d9b9741c",
+    "status": "HOLD_TEXT_EFFECT_NEIGHBOR_OVERLAP"
+  },
+  "deployment": "NOT_PERFORMED; User manually deploys Portainer after separate source-index and A/B state migration"
+}
