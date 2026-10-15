@@ -233,6 +233,36 @@ def check(code: str, header: str) -> list[str]:
     for token in ("GoalTime020", "GoalTime150", "ResultProgress"):
         need(f"source == ProducerToken::{token}" in hook,
              f"GOAL token {token} missing")
+    # The original three safe Sumo_Printf GOAL text parents use the same
+    # finite producer as their appended SpriteNodes. Check their entry and
+    # return boundaries *independently* of the progress/helper parents;
+    # otherwise a global replacement mutation can hit this first call
+    # without invalidating either of the old GOAL tests.
+    printf_start = source.find("static void OutRunStagePrintfEnter(")
+    printf_exit_start = source.find("static void OutRunStagePrintfLeave(", printf_start)
+    printf_end = source.find("// R74 exact result-progress CALL boundaries",
+                             printf_exit_start)
+    printf_enter = source[printf_start:printf_exit_start] if (
+        0 <= printf_start < printf_exit_start) else ""
+    printf_exit = source[printf_exit_start:printf_end] if (
+        0 <= printf_exit_start < printf_end) else ""
+    need("0x975EE, 0x97727, 0x977FB" in source and
+         "FlushD3DXBeforeDirectGoalSource();" in printf_enter and
+         "!OutRunVR::GameSemantic::QueueRenderActive()" in printf_enter and
+         "ProducerToken::OutRunStagePrintf" in printf_enter and
+         printf_enter.find("FlushD3DXBeforeDirectGoalSource();") <
+         printf_enter.find("OutRunStagePrintfDirectDrawOwner.emplace("),
+         "three GOAL Sumo_Printf direct parents must split old D3DX batch before source takeover")
+    need("TagAppendedNodes(OutRunStagePrintfBefore" in printf_exit and
+         "FlushD3DXAtDirectGoalSourceExit();" in printf_exit and
+         printf_exit.find("TagAppendedNodes(OutRunStagePrintfBefore") <
+         printf_exit.find("FlushD3DXAtDirectGoalSourceExit();") <
+         printf_exit.find("OutRunStagePrintfDirectDrawOwner.reset();"),
+         "three GOAL Sumo_Printf parents must submit their own D3DX draw before source restoration")
+    need("source == ProducerToken::OutRunStagePrintf" in hook and
+         "pendingProducer == ProducerToken::OutRunStagePrintf" in queued_goal_predicate and
+         "pendingProducer == ProducerToken::OutRunStagePrintf" in goal_predicate,
+         "direct and queued GOAL D3DX admission must retain exact Sumo_Printf source")
     # GOAL time/title helper batching is independent of the +TIME owner.
     # Prove both original CALL boundaries and the exact producer limitation
     # survive refactors, while accepting eager native GOAL Flush behavior.
