@@ -15,17 +15,22 @@ def integrated(b: str, h: str) -> bool:
     if min(a, z, failed, present) < 0: return False
     section = b[a:z]
     before_span = section.find("game_native_primitive_element_count(")
-    consume = section.find("s.frameBatch.absorb_empty_source_draw(sourceOrdinal)")
+    consume = section.find("s.frameBatch.absorb_empty_source_draw(")
     valid_type = section.find("type >= D3DPT_POINTLIST && type <= D3DPT_TRIANGLEFAN")
     return (0 <= section.find("const std::uint64_t sourceOrdinal = s.sourceDrawsThisFrame++")
             < valid_type < consume < before_span and
             "if (fullMode && primitives == 0u &&" in section and
-            "if (!s.frameBatch.absorb_empty_source_draw(sourceOrdinal))" in section and
+            "sourceOrdinal, sameSourceFullClear))" in section and
+            "s.clearColor.sourceDevice ==" in section and
             "s.frameBatch.abort();" in section[consume:before_span] and
             "s.frameBatch.abort();" in b[failed:present] and
-            "if (!hasSourceDraw || !accepts_full(ordinal) ||" in h and
+            "if (!accepts_full(ordinal) ||" in h and
+            "if (!sameSourceFullClear) return false;" in h and
+            "std::uint32_t leadingEmptySourceDraws = 0u;" in h and
             "!accepts_source_draw(ordinal, true)" in h and
             "succeeded(false);" in h and
+            "++leadingEmptySourceDraws;" in h and
+            "leadingEmptySourceDraws = 0u;" in h and
             "record_source_draw(ordinal);" in h)
 
 assert integrated(bridge,batch), "empty game Draw must preserve source order only after actual native Draw"
@@ -34,13 +39,15 @@ for broken_bridge, broken_batch in (
                     "/* unchecked topology */", 1), batch),
     (bridge.replace("s.frameBatch.absorb_empty_source_draw(sourceOrdinal)",
                     "/* no source ordinal */", 1), batch),
-    (bridge, batch.replace("!hasSourceDraw || !accepts_full(ordinal)",
-                           "!accepts_full(ordinal)", 1)),
+    (bridge, batch.replace("if (!sameSourceFullClear) return false;",
+                           "if (true) return false;", 1)),
     (bridge, batch.replace("succeeded(false); // source ordinal only;",
                            "/* no ordinal increment */ //", 1)),
 ):
     assert not integrated(broken_bridge, broken_batch), "destructive control escaped"
 assert "full_game_empty_draw_contract()" in probe
+assert "leading_game_empty_draw_contract()" in probe
+assert "can_seed_pre_draw_depth(true, false)" in probe
 assert "test_dx11_full_frame_empty_draw_00755.py" in workflow
 assert "dx11_full_frame_empty_draw_probe_00755.cpp" in workflow
-print("PASS 00755: real game Draw -> native full-frame successful empty source ordinal; failed/unsupported Draw fallback (static only)")
+print("PASS 00755+00759: leading/post-game empty Draws preserve first GPU Draw, depth clear, full-frame source order and D3D9 fallback (static only)")

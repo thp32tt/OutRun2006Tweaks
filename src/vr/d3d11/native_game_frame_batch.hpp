@@ -7,9 +7,13 @@ struct GameNativeFrameBatch {
     // Complete game-source coverage, independent of the bounded diagnostic inset.
     static constexpr std::uint32_t kMaxFullFrameDraws = 4096u;
     [[nodiscard]] constexpr bool accepts_full(std::uint64_t ordinal) const noexcept {
-        return !stopped && submitted < kMaxFullFrameDraws &&
-            ordinal == submitted &&
-            (submitted == 0u || (hasSourceDraw && lastSourceDraw + 1u == ordinal));
+        // Source ordinals include successful no-op game Draws before the
+        // first GPU Draw. They must not suppress the first native RTV clear.
+        const std::uint64_t consumed =
+            static_cast<std::uint64_t>(submitted) + leadingEmptySourceDraws;
+        return !stopped && consumed < kMaxFullFrameDraws &&
+            ordinal == consumed &&
+            (!hasSourceDraw || lastSourceDraw + 1u == ordinal);
     }
     // A full-resolution image cannot start from a synthetic diagnostic
     // background; require a successful D3D9 full TARGET Clear from the
@@ -30,7 +34,9 @@ struct GameNativeFrameBatch {
     [[nodiscard]] constexpr bool publishable_full(
         bool pending, std::uint64_t sourceDraws) const noexcept {
         return publishable(pending) && hasSourceDraw &&
-            submitted == sourceDraws && lastSourceDraw + 1u == sourceDraws;
+            static_cast<std::uint64_t>(submitted) + leadingEmptySourceDraws ==
+                sourceDraws &&
+            lastSourceDraw + 1u == sourceDraws;
     }
     // Game-created native Draws belong to their source D3D9 device. A
     // foreign Present cannot close the owner's frame or consume its GPU
@@ -83,6 +89,9 @@ struct GameNativeFrameBatch {
                                  resettingDevice == lastPresentOwner);
     }
     std::uint32_t submitted = 0u;
+    // Exact successful source ordinals before the first nonempty game Draw.
+    // Kept separate because the first real native Draw must still Clear RTV.
+    std::uint32_t leadingEmptySourceDraws = 0u;
     bool stopped = false;
     bool depthReady = false;
     // Full game Z-only Clear replaces DSV content without discarding RTV color.
@@ -128,13 +137,21 @@ struct GameNativeFrameBatch {
     // vehicle and race draws. It writes no pixels, but is still an observed
     // game command: consume its exact source ordinal without dispatching
     // a fabricated D3D11 draw or resetting the native color/depth target.
-    // Only an ALREADY established native scene may absorb the empty call;
-    // a leading empty call cannot fabricate the required color Clear seed.
+    // Leading no-op source calls may follow a verified real D3D9 full Clear;
+    // preserve their ordinals without claiming a native GPU Draw or frame.
     [[nodiscard]] constexpr bool absorb_empty_source_draw(
-        std::uint64_t ordinal) noexcept {
-        if (!hasSourceDraw || !accepts_full(ordinal) ||
+        std::uint64_t ordinal, bool sameSourceFullClear = false) noexcept {
+        if (!accepts_full(ordinal) ||
             !accepts_source_draw(ordinal, true)) return false;
-        succeeded(false); // source ordinal only; retain depth direction.
+        if (submitted == 0u) {
+            // A successful whole-backbuffer D3D9 Clear is required even for
+            // leading empty calls. These consume source order, NOT a GPU
+            // submission or the first-draw native Clear/DSV initialization.
+            if (!sameSourceFullClear) return false;
+            ++leadingEmptySourceDraws;
+        } else {
+            succeeded(false); // source ordinal only; retain depth direction.
+        }
         record_source_draw(ordinal);
         return true;
     }
@@ -143,8 +160,13 @@ struct GameNativeFrameBatch {
     // source Draw or a stopped/partial/foreign game scene.
     [[nodiscard]] constexpr bool can_seed_pre_draw_depth(
         bool sameSourceFullColorClear, bool noSourceDraws) const noexcept {
-        return sameSourceFullColorClear && noSourceDraws && !stopped &&
-            submitted == 0u && !hasSourceDraw;
+        // Successful leading no-op game Draws write no depth/color. A separate
+        // full Z Clear can still seed the first native race Draw after them.
+        const bool onlyLeadingEmpty =
+            submitted == 0u && leadingEmptySourceDraws != 0u && hasSourceDraw;
+        return sameSourceFullColorClear &&
+            (noSourceDraws || onlyLeadingEmpty) && !stopped &&
+            submitted == 0u && !depthReady;
     }
     // An aborted batch must never reach the GPU readback/inset presenter,
     // even if one or more of its D3D11 Draw calls already ran.
@@ -181,7 +203,8 @@ struct GameNativeFrameBatch {
     }
     constexpr void abort() noexcept { stopped = true; depthClearPending = false; }
     constexpr void reset() noexcept {
-        submitted = 0u; stopped = false; depthReady = false;
+        submitted = 0u; leadingEmptySourceDraws = 0u;
+        stopped = false; depthReady = false;
         depthClearPending = false; depthClearValue = 1.0f;
         depthDirection = 0u;
         lastSourceDraw = 0u; hasSourceDraw = false;

@@ -40,4 +40,38 @@ constexpr bool full_game_empty_draw_contract() noexcept {
 }
 static_assert(full_game_empty_draw_contract(),
               "Live full-frame successful empty Draws must keep contiguous game-source order");
-int main() { return full_game_empty_draw_contract() ? 0 : 1; }
+// Real menu/car/race streams may contain successful empty calls after the
+// full TARGET Clear but BEFORE the first nonempty Draw. They advance source
+// order without generating pixels or suppressing the first native RTV clear.
+constexpr bool leading_game_empty_draw_contract() noexcept {
+    GameNativeFrameBatch game{};
+    if (game.absorb_empty_source_draw(0u) ||
+        !game.absorb_empty_source_draw(0u, true) ||
+        !game.absorb_empty_source_draw(1u, true) ||
+        !game.first_draw() || game.publishable_full(true, 2u) ||
+        !game.can_seed_pre_draw_depth(true, false) ||
+        game.can_seed_pre_draw_depth(false, false) ||
+        game.accepts_full_seeded(2u, false) ||
+        !game.accepts_full_seeded(2u, true)) return false;
+    game.succeeded(true);
+    game.record_source_draw(2u);
+    if (game.first_draw() || !game.publishable_full(true, 3u) ||
+        game.publishable_full(true, 2u) ||
+        !game.absorb_empty_source_draw(3u, true) ||
+        !game.publishable_full(true, 4u) ||
+        game.absorb_empty_source_draw(5u, true)) return false;
+    game.reset();
+    if (game.absorb_empty_source_draw(0u, false) ||
+        game.publishable_full(true, 0u) ||
+        !game.first_draw() ||
+        !game.absorb_empty_source_draw(0u, true)) return false;
+    game.abort();
+    return !game.absorb_empty_source_draw(1u, true) &&
+        !game.publishable_full(true, 1u);
+}
+static_assert(leading_game_empty_draw_contract(),
+              "Verified full-game Clear must admit leading empty Draw ordinals without a native GPU frame");
+int main() {
+    return full_game_empty_draw_contract() &&
+        leading_game_empty_draw_contract() ? 0 : 1;
+}

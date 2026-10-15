@@ -1,0 +1,99 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00759",
+  "production_id": "CONVERSION-DX11-00759",
+  "event_id": "CONVERSION-DX11-00759-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:MENU_RACE_LEADING_NOOP_DRAW_CONTINUITY",
+  "feature_id": "DX11-MENU-RACE-LEADING-NOOP-DRAW-CONTINUITY",
+  "status": "IMPLEMENTED_PENDING_CI",
+  "checkpoint": "C4_COMMIT",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_head_sha": "6fe46c683011a3a71003914de2f2dc154218dbef",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "changed_files": [
+    "src/vr/d3d11/native_game_frame_batch.hpp",
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "tools/dx11_full_frame_empty_draw_probe_00755.cpp",
+    "tools/test_dx11_full_frame_empty_draw_00755.py",
+    "docs/automation/runs/CONVERSION-DX11-00759.json"
+  ],
+  "change_summary": "Accept real game zero-primitive Draws after verified TARGET Clear, before first nonempty native D3D11 Draw; retain source ordinal and same-device depth-clear continuity, preserve first RTV/DSV clear and D3D9/input fallback. Extend compiled constexpr and destructive source tests.",
+  "feature_contract": {
+    "feature_id": "DX11-MENU-RACE-LEADING-NOOP-DRAW-CONTINUITY",
+    "goal": "Menu/vehicle/race can issue legitimate empty Draw/DrawIndexed between game Clear and first real Draw without preventing a complete native D3D11 full-frame, destroying first-draw clear, or altering D3D9 gamepad fallback.",
+    "acceptance_items": [
+      {
+        "id": "leading-empty-draw-native-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "d3d9_source_draw_sequence_to_d3d11_native_frame",
+        "expected_behavior": "Admit verified-color-Clear leading zero-primitive game commands, keep first nonempty native Draw as first RTV GPU submission, and publish only complete source sequence."
+      },
+      {
+        "id": "game-clear-depth-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "device_owned_color_clear_z_clear_gamepad",
+        "expected_behavior": "Allow independent full Z Clear after admitted no-op game Draws; reject unseeded, skipped/failed, foreign or aborted game source calls without changing D3D9 Present/input."
+      },
+      {
+        "id": "exact-sha-integrated-validation",
+        "category": "integrated_validation",
+        "behavior_area": "dx11_fast_backend_windows_openxr_hud",
+        "expected_behavior": "Compile constexpr state cases, destructive source check, then require five exact-SHA GitHub gates; Quest3/VDXR remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "leading-empty-draw-native-continuity": "PENDING",
+    "game-clear-depth-fallback": "PENDING",
+    "exact-sha-integrated-validation": "PENDING"
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "live_game_draw_path": [
+      "REAL_D3D9_CLEAR_AND_EMPTY_DRAW",
+      "NATIVE_D3D11_NONEMPTY_DRAW",
+      "SAME_PRESENT_FULL_FRAME"
+    ],
+    "visible_frame_acceptance": "Source-ordered native Clear/Draw/DrawIndexed is not prematurely aborted by verified leading no-op menu/race commands; runtime pixel proof deferred.",
+    "activation_guard_and_fallback": "Original DX9Ex game Draw/Present/gamepad remains authoritative; optional native full-frame enabled only by diagnostic environment and fail-closed upon unsupported source.",
+    "conflict_keys": [
+      "DX11:MENU_RACE_LEADING_NOOP_DRAW_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "integration_path": [
+      "D3D9 full TARGET Clear -> zero-primitive game Draw source ordinal -> optional full Z Clear",
+      "First real Draw/DrawIndexed native RTV/DSV Clear and submission -> all-source Present publication -> DX9Ex fallback"
+    ],
+    "batch_components": [
+      "Native D3D11 live game observation/first-draw state and contiguous empty ordinals",
+      "Compile-time C++ source-order/depth-clear tests plus destructive source-hook tests"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Static-assert compiled C++ verified-clear leading no-op Draw followed by actual native Draw and published complete game stream.",
+      "negative_regression": "Unseeded empty, source ordinal gap, aborted sequence and unverified Z Clear rejected; original D3D9 Draw/input untouched.",
+      "component_integration": "Actual live D3D9 hook observation->native game frame batch->D3D11 first nonempty Draw->full frame Present."
+    }
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD 6fe46c683011a3a71003914de2f2dc154218dbef, previous 00758 complete and claim released",
+    "C1_REVIEW": "Confirmed actual game no-op Draw before first nonempty forces abort despite seeded full TARGET Clear; blocked complete source continuity",
+    "C2_IMPLEMENT": "Native source stream + first-draw RTV/DSV preservation with read-only D3D9 fallback; targeted C++ and destructive tests",
+    "C3_VALIDATE": "PENDING exact-SHA five Actions",
+    "C4_COMMIT": "PENDING material SHA",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "PENDING_CI"
+  }
+}
