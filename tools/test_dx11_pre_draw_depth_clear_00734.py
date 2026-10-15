@@ -34,8 +34,9 @@ def linked(b, h, r):
         "s.frameBatch.note_full_depth_clear(z);" in observer,
         "s.frameBatch.depth_clear_value(output.nativeDepthOrderingMode != 0u)" in draw,
         "s.frameBatch.consume_depth_clear();" in draw,
-        "return sameSourceFullColorClear && noSourceDraws && !stopped &&" in h,
-        "submitted == 0u && !hasSourceDraw;" in h,
+        "return sameSourceFullColorClear &&" in h,
+        "(noSourceDraws || onlyLeadingEmpty) && !stopped &&" in h,
+        "submitted == 0u && !depthReady;" in h,
     ))
 
 assert linked(bridge, batch, hook), "TARGET -> separate full Z -> real Draw disconnected"
@@ -53,9 +54,10 @@ for old, new in (
     assert old in segment, old
     mutated = bridge[:a] + segment.replace(old, new, 1) + bridge[z:]
     assert not linked(mutated, batch, hook), old
+assert "(noSourceDraws || onlyLeadingEmpty) && !stopped &&" in batch
 assert not linked(bridge, batch.replace(
-    "sameSourceFullColorClear && noSourceDraws && !stopped &&",
-    "sameSourceFullColorClear && !stopped &&"), hook)
+    "(noSourceDraws || onlyLeadingEmpty) && !stopped &&",
+    "(!noSourceDraws && !onlyLeadingEmpty) && !stopped &&"), hook)
 assert not linked(bridge, batch, hook.replace(
     "live_game_frame::observe_game_depth_clear(",
     "live_game_frame::ignored_depth_clear(", 1))
