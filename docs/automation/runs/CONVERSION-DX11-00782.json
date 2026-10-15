@@ -10,9 +10,9 @@
   "owner_id": "AI2-ChatGPT2",
   "work_key": "DX11:MAIN_PARTIAL_STENCIL_CANONICAL_DEPTH_FRAME_CONTINUITY",
   "feature_id": "DX11-MAIN-STENCIL-PARTIAL-CLEAR-CANONICAL-Z-CONTINUITY",
-  "status": "IMPLEMENTED_AWAITING_EXACT_SHA_GATE",
-  "checkpoint": "C3_VALIDATE",
-  "automation_validation": "PENDING",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_gate": "NEED_HMD_TEST",
   "hmd_test_performed": false,
@@ -20,7 +20,7 @@
   "packaging_status": "NOT_REQUIRED",
   "base_sha": "cfa5e2a3ca6a500f15acb6d9089d3a5dc4014487",
   "material_result_sha": "3bfb0bfdf9e2321e5e88cfbc6ddf74ca9b485661",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "7b0808bdfa534fd7015ce23b584d1835ed762c86",
   "changed_files": [
     "src/vr/d3d11/live_game_frame_bridge.cpp",
     "src/vr/d3d11/native_game_main_stencil_clear.hpp",
@@ -82,28 +82,62 @@
       "D3D9_PRESENT",
       "DX9EX_INPUT_FALLBACK"
     ],
-    "visible_frame_acceptance": "Source/CI build parity pending; actual Quest3/VDXR menu, selection and race output not tested.",
+    "visible_frame_acceptance": "Source and 5/5 exact-SHA GitHub Action gates PASS; actual Quest3/VDXR menu, car-select, race and gamepad/FFB parity still UNTESTED.",
     "activation_guard_and_fallback": "NativeDrawPathActive opt-in remains off by default; original D3D9 Draw, Present, gamepad, FFB, SkyGlow and DX9Ex fallback unchanged; DXVK frozen."
   },
   "acceptance_results": {
-    "partial-main-stencil-draw-continuity": "PENDING",
-    "foreign-and-partial-z-fallback": "PENDING",
-    "exact-sha-five-gate": "PENDING"
+    "partial-main-stencil-draw-continuity": "PASS_BUILD",
+    "foreign-and-partial-z-fallback": "PASS_BUILD",
+    "exact-sha-five-gate": "PASS_EXACT_SHA"
   },
   "pipeline": {
     "C0_RECOVER": "Read latest DX11 HEAD and active owner; preserved concurrent 00781 C6 documentation.",
     "C1_REVIEW": "Found original main Z-only Clear identity omission and partial stencil-only false rejection.",
     "C2_IMPLEMENT": "Source changes and compiled/destructive regressions in material SHA 3bfb0bf.",
-    "C3_VALIDATE": "First exact SHA fast/backend failed because preceding 00781 C6 record lacked mandatory development_strategy; repair newest 00782 run selection without weakening tests. Runtime untested.",
-    "C4_COMMIT": "Material source SHA 3bfb0bf; no forced push or CI-skip.",
+    "C3_VALIDATE": "At exact final validation-bearing SHA 7b0808bd, DX11 Fast, Backend, Windows Build, OpenXR, HUD Inspector all SUCCESS. HMD and gamepad UNTESTED.",
+    "C4_COMMIT": "Actual source material SHA 3bfb0bf (five files); causal inherited run-contract repair and validation-bearing SHA 7b0808bd. No forced push, no CI skip on either.",
     "C5_PACKAGE": "NOT_REQUIRED",
-    "C6_STATE": "PENDING_VERIFIED_GATE"
+    "C6_STATE": "After completed exact 5/5 gates, recorded single result. C6 bookkeeping is not a new score or second source feature."
   },
   "evidence": {
     "preliminary_ci_sha": "3bfb0bfdf9e2321e5e88cfbc6ddf74ca9b485661",
     "fast_failed_run_id": 38771979404,
     "backend_failed_run_id": 38771979410,
     "gate_failure_cause": "Previous 00781 C6 run record missing development_strategy, exact workflow policy check fails before running new test; this record restores newest run contract without bypass.",
-    "runtime_testing": "Not performed; HMD/gamepad parity UNTESTED."
+    "runtime_testing": "Not performed; HMD/gamepad parity UNTESTED.",
+    "ci_head_sha": "7b0808bdfa534fd7015ce23b584d1835ed762c86",
+    "gates": {
+      "DX11 Fast": {
+        "workflow_run_id": 38773694946,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38773694946"
+      },
+      "Backend Conversion Gate": {
+        "workflow_run_id": 38773695008,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38773695008"
+      },
+      "Windows Build": {
+        "workflow_run_id": 38773701782,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38773701782"
+      },
+      "OpenXR VR architecture": {
+        "workflow_run_id": 38773701741,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38773701741"
+      },
+      "OutRun EXE HUD Inspector CI": {
+        "workflow_run_id": 38773701815,
+        "conclusion": "success",
+        "url": "https://github.com/thp32tt/OutRun2006Tweaks/actions/runs/38773701815"
+      }
+    }
+  },
+  "c6_record": {
+    "independent_score_event": false,
+    "source_changes": false,
+    "reran_workflows": false,
+    "notes": "Preserves original 3bfb source and exact validation-bearing 7b0808bd; actual Quest3/VDXR gameplay untested."
   }
 }
