@@ -62,9 +62,9 @@
     ]
   },
   "acceptance_results": {
-    "limiter_owner_handoff_pacing": "SOURCE_IMPLEMENTED",
-    "xr_fastload_cap_fallback": "SOURCE_IMPLEMENTED",
-    "exact_sha_full_dx9ex_gates": "PENDING_EXACT_SHA"
+    "limiter_owner_handoff_pacing": "PASS_EXACT_SHA",
+    "xr_fastload_cap_fallback": "PASS_EXACT_SHA",
+    "exact_sha_full_dx9ex_gates": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "root_cause": "Legacy ideal deadline used FramelimiterPrevCounter from a prior software-owned frame even after unlimited or XR-owned Present pauses, so the first capped frame after re-entry can run without pacing.",
@@ -89,5 +89,28 @@
   "material_result_sha": "e44593c917243ddc46ea71dba41d4297b4b3932e",
   "validation_bearing_result_sha": "e58d8ed504f20240e35d1f9565ced85102d43b86",
   "score_delta_this_attempt": 0,
-  "next_action": "C6 exact-SHA GitHub Actions gates SUCCESS; Quest3/VDXR runtime HMD remains UNTESTED. Do not rerun validated build/CI or award duplicate score on this retry."
+  "next_action": "Exact validation SHA e58d8ed5 passed all GitHub Gates; preserve source material e44593c9. Quest3/VDXR and real in-game FPS/visual correctness remain UNTESTED; no duplicate score/CI for C6 repair.",
+  "ci_evidence": {
+    "validation_bearing_result_sha": "e58d8ed504f20240e35d1f9565ced85102d43b86",
+    "dx9ex_active": {
+      "run_id": 38823442971,
+      "conclusion": "success",
+      "jobs": "5/5"
+    },
+    "domain_isolation": {
+      "run_id": 38823443215,
+      "conclusion": "success"
+    },
+    "full_source_impact": {
+      "run_id": 38823442941,
+      "conclusion": "success",
+      "jobs": "3/3"
+    },
+    "hud_inspector": {
+      "run_id": 38823443078,
+      "conclusion": "success",
+      "jobs": "2/2"
+    },
+    "evidence_scope": "Exact-SHA source build/static gates only; no game/HMD execution proof"
+  }
 }
