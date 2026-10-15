@@ -19,10 +19,12 @@ PATHS = (
     "src/vr/d3d9/stereo_renderer_r32.cpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp",
     ".github/workflows/vr-dx9ex-active.yml",
+    "src/hooks_graphics.cpp",
+    "src/vr/game/render_semantics.hpp",
 )
 
 
-def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow):
+def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow, hooks, semantic):
     assert "std::uint64_t R29OwnerTopLevelDrawSerial() noexcept;" in api
     assert "return GetTopLevelDrawSerial();" in r29
     assert '#include "lens_centre_source_provenance.hpp"' in r30
@@ -149,6 +151,46 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow):
     assert "e.nextDraw - e.writtenDraw <= 128u" in proof
     assert "static_assert(!OwnsRawWvp(" in proof
     assert "run: python tools/verify_dx9ex_r84_lens_source.py" in workflow
+    # The original C993 game draw can enter inner SceneEffect helper scopes
+    # after its parent producer was tagged. The GPU submission and c64
+    # provenance must keep the exact centre identity for the whole call.
+    c993 = hooks.split("static void __cdecl DrawObjectAlphaCentre(", 1)[1].split(
+        "public:", 1)[0]
+    for marker in (
+        "objectId == 0x570002",
+        "!OutRunVR::GameSemantic::QueueRenderActive()",
+        "ScopedExactProducerSemantic semantic(",
+        "ScopedExactLensCentreGpuDraw centreGpuOwner(",
+        "Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);",
+    ):
+        assert marker in c993, "exact original C993 GPU lifetime lost: " + marker
+    assert (c993.index("ScopedExactProducerSemantic semantic(") <
+            c993.index("ScopedExactLensCentreGpuDraw centreGpuOwner(") <
+            c993.index("Game::DrawObjectAlpha_Internal(objectId, alpha, work, flags);"))
+    for marker in (
+        "DirectLensCentreOwnsGpuDraw(",
+        "static_assert(!DirectLensCentreOwnsGpuDraw(true, true, false))",
+        "static_assert(!DirectLensCentreOwnsGpuDraw(true, false, true))",
+        "if (ExactLensCentreDrawOwnsSemantic())",
+        "return RenderScope::WorldBillboard;",
+        "return ProducerToken::LensFlareCentre;",
+        "if (SpriteQueueDepth != 0)",
+        "return CurrentSpriteQueueProducer;",
+        "class ScopedExactLensCentreGpuDraw final",
+        "++ExactLensCentreGpuDrawDepth;",
+        "--ExactLensCentreGpuDrawDepth;",
+    ):
+        assert marker in semantic, "exact C993 scope lifecycle lost: " + marker
+    effective = semantic.split("inline RenderScope EffectiveScope()", 1)[1].split(
+        "inline void ArmNextDraw", 1)[0]
+    producer = semantic.split("inline ProducerToken CurrentRenderProducerToken()", 1)[1].split(
+        "class ScopedExactLensCentreGpuDraw", 1)[0]
+    assert effective.index("if (ExternalOverlaySemanticDepth != 0)") < (
+        effective.index("if (ExactLensCentreDrawOwnsSemantic())")) < (
+        effective.index("if (CurrentQueueExactScope =="))
+    assert producer.index("if (SpriteQueueDepth != 0)") < (
+        producer.index("if (ExactLensCentreDrawOwnsSemantic())"))
+    assert "return CurrentDirectExactProducer;" in producer
 
 
 def main():
@@ -181,6 +223,12 @@ def main():
         (7, "SUCCEEDED(rightHr) && restoreOk", "true"),
         (7, "screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld", "screenKind == R32ReviewScreenSpaceKind::Hud2D"),
         (8, "run: python tools/verify_dx9ex_r84_lens_source.py", "run: echo BYPASS"),
+        (9, "ScopedExactLensCentreGpuDraw centreGpuOwner(", "/*lost owner*/ centreGpuOwner("),
+        (10, "if (ExactLensCentreDrawOwnsSemantic())", "if (false)"),
+        (10, "return ProducerToken::LensFlareCentre;", "return ProducerToken::None;"),
+        (10, "if (SpriteQueueDepth != 0)", "if (false)"),
+        (10, "++ExactLensCentreGpuDrawDepth;", "/*forgot to arm*/"),
+        (10, "--ExactLensCentreGpuDrawDepth;", "/*scope leaked*/"),
     ]
     for idx, old, new in mutants:
         assert old in values[idx], "negative mutation fixture absent: " + old

@@ -1,0 +1,94 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00889",
+  "production_id": "CONVERSION-DX9EX-00889",
+  "event_id": "CONVERSION-DX9EX-00889-E001",
+  "event_type": "dispatch",
+  "run_key": "CONVERSION-DX9EX-00889",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+  "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "SOURCE_IMPLEMENTED_CI_PENDING",
+  "phase": "C4_COMMIT",
+  "checkpoint": "C4_MATERIAL",
+  "automation_validation": "IN_PROGRESS",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "14781b6291ccd58cc48acd2bc632cb8fb3391e21",
+  "material_result_sha": "60bafc15ce02d864d18d187286e936750bf32c95",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_graphics.cpp",
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_graphics.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "tools/verify_dx9ex_r84_lens_source.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00889.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
+    "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
+    "goal": "Preserve the original central sun 0x570002 world ownership from the exact parent EXE D3A5 and C993 DrawObjectAlpha source through nested game SceneEffect helpers, raw c64 provenance, R84 per-eye draw and x64 host while retaining outer halo discs, correct alpha and native fallback.",
+    "scope_boundary": "Only the synchronous original C993 0x570002 direct GPU lifetime, game semantic producer selection and R84 existing exact raw-source check; do not reclassify CABE outer halo discs, +TIME, menus, queued SpriteNodes, F11, SkyGlow, generic world or other backend branches.",
+    "trace_stages": [
+      "Original D3A5 entry and exact C993 0x570002 DrawObjectAlpha_Internal source use scoped world semantic and lens epoch, including nested SceneEffect render helper calls.",
+      "OutRun game GPU c64 RecordGameWvpWrite observes EffectiveScope and CurrentRenderProducerToken, then R84 R30 authenticates call, shader, pose and bounded top-level draw serial.",
+      "R84 R29–R33 independent per-eye WVP and two-eye GPU draw applies a single head/eye transform then OpenXR host composition; headset optical acceptance is separate."
+    ],
+    "subcomponents": [
+      "Guard the entire synchronous centre GPU submission with nested lifetime-aware exact semantic ownership, not merely the outer E8 or a one-shot token.",
+      "Retain strict queue and external F11 precedence, return to prior parent state on exit, and maintain exact R84 c64/raw-WVP per-eye transform restrictions.",
+      "Add mutated source regressions for original C993 hook lifetime, CurrentRenderProducerToken, EffectiveScope and guard balance."
+    ],
+    "acceptance_items": [
+      {
+        "id": "lens_exact_c993_gpu_scope",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Exact source C993 and original c64 to R84 physical left/right GPU draws",
+        "expected_behavior": "Nested SceneEffect temporary scopes do not relabel exact central sun c64 or GPU submission; R84 stereo is admitted only after strict original game WVP evidence."
+      },
+      {
+        "id": "lens_queue_outer_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Queue/external overlay/CABE halo and invalid-source fallback",
+        "expected_behavior": "Active SpriteNode and external F11 preserve precedence, unrelated halo rings and SkyGlow keep previous classifications, stale or unowned raw c64 is never promoted."
+      },
+      {
+        "id": "lens_final_exact_sha_gates",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 x86 game plus x64 host and rollback plus source guards",
+        "expected_behavior": "Pass exact-SHA DX9Ex Active host/game/full-chain/package, Domain Isolation, Full Source and EXE Inspector; actual Quest3/VDXR central-dot test remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "lens_exact_c993_gpu_scope": "SOURCE_IMPLEMENTED",
+    "lens_queue_outer_fallback": "SOURCE_IMPLEMENTED",
+    "lens_final_exact_sha_gates": "PENDING"
+  },
+  "diagnosis": {
+    "original_evidence": "Existing 0xD3A5 enter and C993 DrawObjectAlphaCentre set WorldBillboard with ScopedRenderSemantic; EffectiveScope returned the most recently nested SceneEffect CurrentScope and CurrentRenderProducerToken returned a temporary direct producer. Raw c64 recorder uses both, so a nested helper can cause a strict same-source centre ownership miss.",
+    "root_cause": "Producer call scope lifetime did not guarantee that nested original game helper scopes preserved the same semantic and source identity through the actual GPU draw; strict R84 raw WVP validation can then safely reject the correct central draw.",
+    "source_trace": [
+      "hooks_graphics.cpp D3A5/C993 objectId 0x570002 and exact invocation of original DrawObjectAlpha_Internal.",
+      "render_semantics.hpp ScopedRenderSemantic originally replaces CurrentScope for nested original helpers; Read EffectiveScope and CurrentRenderProducerToken feed game c64 producer provenance.",
+      "outrun_renderer.cpp RecordGameWvpWrite records the current effective semantic and producer; R84 stereo_renderer_r30.cpp R30HasExactLensCentreRawWvp demands both identities before R33 eye submission."
+    ],
+    "alternatives_rejected": [
+      "No blanket shader age extension, no stale raw c64 fallback or flattened HUD overlay; these would create unrelated world/outer-disc regressions.",
+      "No unconditional flush or alpha/timer intervention; C993 original draw remains once and the R84 strict source proof remains required."
+    ],
+    "fix_evidence": "ScopedExactLensCentreGpuDraw brackets only the exact original C993 synchronous GPU call and wins temporary direct SceneEffect scopes while active, but yields to active SpriteNode and external F11. Source mutation verifier covers missing scope, queue precedence, producer forced fallback and guard balance.",
+    "negative_test_evidence": "Header constexpr positive and negative owner policy asserts plus expanded R84 exact C993 verifier mutants. Exact SHA Windows and HMD remain pending.",
+    "eye_ownership": "R84 existing ExactLensCentreWorld branch uses game-owned raw matrix, original projection inverse and one headInverse/eyeInverse/eyeProjection chain for both eyes; R33 owns both physical Draw calls.",
+    "evidence_limits": "Source-proven possible nested ownership gap repaired, but actual headset recurrence and whether nested source happened in a reported failed frame are not measured."
+  },
+  "runtime_evidence": "Quest3/VDXR hardware and Windows game were not run in this transaction.",
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "result_commit_ci_skip": false
+}
