@@ -46,7 +46,7 @@ def integrated(src, budget):
 
 assert integrated(bridge, header)
 # Destructive source proof: no source limit/real upload/real draw is optional.
-for old in ("sourceLevels > 12u", "if (!native_game_texture_upload_bytes(",
+for old in ("sourceLevels > kMaxNativeGameAtlasMipLevels", "if (!native_game_texture_upload_bytes(",
             "mirror_texture(dev, capture, sampledView, sampledSampler)",
             "ctx->PSSetShaderResources(0, 1, &boundView);",
             "if (ib) ctx->DrawIndexed(indexCount, 0, 0);"):

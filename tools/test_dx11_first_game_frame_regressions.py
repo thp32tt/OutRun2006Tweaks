@@ -641,7 +641,7 @@ def main() -> None:
             "nextColorOp != D3DTOP_DISABLE",
         )) and "return create_game_sampler(dev, capture, levels, sampler);" in mirror and all(x in mirror for x in (
             "if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;",
-            "sourceLevels == 0 || sourceLevels > 12u",
+            "sourceLevels == 0 || sourceLevels > kMaxNativeGameAtlasMipLevels",
             "D3DFMT_A8R8G8B8", "D3DFMT_X8R8G8B8",
             "LockRect(level, &lock, nullptr, D3DLOCK_READONLY)",
             "capture.texture->UnlockRect(level)",
@@ -683,7 +683,7 @@ def main() -> None:
          "const bool alphaArg2Diffuse = alphaArg2 == D3DTA_DIFFUSE;"),
         ("if (sourceRoute == dynamic_texture::SourceRoute::unsupported) return false;",
          "if (base.Pool == D3DPOOL_SYSTEMMEM && !gpuRenderTarget) return false;"),
-        ("sourceLevels == 0 || sourceLevels > 12u", "sourceLevels != 1u"),
+        ("sourceLevels == 0 || sourceLevels > kMaxNativeGameAtlasMipLevels", "sourceLevels != 1u"),
         ("state.MaxLOD = usesMips ? static_cast<float>(levels - 1u) : 0.0f;", "state.MaxLOD = D3D11_FLOAT32_MAX;"),
         ("return create_game_sampler(dev, capture, levels, sampler);",
          "return false;"),
