@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:PERF:RANK_MARKER_SPARSE_STEREO",
   "feature_class": "MEASURED_PERFORMANCE",
   "symptom_id": "DX9EX:PERF:SPARSE_RANK_STEREO_CPU_COPY",
-  "status": "IMPLEMENTED_VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_CI_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "fa72ddd6a0890d5b7fec3cace3260cd28b87b34d",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "53d066318dcfc730602f582aafac0389f0a29185",
   "source_paths": [
     "src/vr/d3d9/stereo_renderer_r30.cpp",
     "src/vr/game/rank_marker_sparse.hpp"
@@ -86,16 +86,47 @@
     "eye_ownership": "Both eyes use the same exact producer and decoded indexed mask but independent existing deltaX/deltaY."
   },
   "ci_evidence": {
-    "status": "PENDING_EXACT_SHA",
+    "status": "PASS_EXACT_SHA",
     "required_gates": [
       "DX9Ex Active Validation",
       "Domain Isolation Guard",
       "DX9Ex Full Source Impact Review",
       "OutRun EXE HUD Inspector CI"
     ],
-    "note": "Do not claim Windows or HMD result before exact-SHA jobs complete."
+    "note": "Required exact-SHA GitHub CI gates verified SUCCESS at source commit; HMD/runtime and measured FPS remain UNTESTED.",
+    "validation_bearing_result_sha": "53d066318dcfc730602f582aafac0389f0a29185",
+    "exact_sha_gate_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "run_id": 38795690320,
+        "sha": "53d066318dcfc730602f582aafac0389f0a29185",
+        "conclusion": "success",
+        "jobs": "policy,full-chain-compile,game,host,package 5/5"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "run_id": 38795690228,
+        "sha": "53d066318dcfc730602f582aafac0389f0a29185",
+        "conclusion": "success"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "run_id": 38795690314,
+        "sha": "53d066318dcfc730602f582aafac0389f0a29185",
+        "conclusion": "success",
+        "jobs": "source-cross-domain,msvc-analyze-active-game,msvc-analyze-openxr-host 3/3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "run_id": 38795690248,
+        "sha": "53d066318dcfc730602f582aafac0389f0a29185",
+        "conclusion": "success"
+      }
+    ],
+    "c6_record_note": "C6 bookkeeping-only [skip ci] result after exact-SHA CI success; source SHA immutable; material_result_sha, feature_contract and acceptance_results preserved; no score changes."
   },
   "runtime_evidence": "Quest3/VDXR game execution not performed; no FPS measurement or claimed optical acceptance.",
   "score_delta_this_attempt": 0,
-  "score_once": false
+  "score_once": false,
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE"
 }
