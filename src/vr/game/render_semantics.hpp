@@ -176,8 +176,9 @@ namespace OutRunVR::GameSemantic
         RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
         RenderScope::ScreenHud, ProducerToken::DispRankFirst));
 
-    // A direct GOAL print helper is a distinct source from +TIME and
-    // queued SpriteNodes. Close only an owned homogeneous deferred batch
+    // Direct GOAL time helpers and the separate 0-99% progress source
+    // are distinct from +TIME and queued SpriteNodes. Only submit owned,
+    // homogeneous deferred batches while the original caller is alive.
     // while that exact helper remains active, never a foreign/mixed batch.
     inline constexpr bool CanFlushD3DXDirectGoalAtExit(
         bool queueActive, bool batchActive, bool exactSprite,
@@ -189,7 +190,8 @@ namespace OutRunVR::GameSemantic
             pendingDraws != 0 && homogeneous &&
             pendingScope == RenderScope::ScreenHud &&
             (pendingProducer == ProducerToken::GoalTime020 ||
-             pendingProducer == ProducerToken::GoalTime150) &&
+             pendingProducer == ProducerToken::GoalTime150 ||
+             pendingProducer == ProducerToken::ResultProgress) &&
             currentScope == pendingScope &&
             currentProducer == pendingProducer;
     }
@@ -200,6 +202,15 @@ namespace OutRunVR::GameSemantic
     static_assert(CanFlushD3DXDirectGoalAtExit(false, true, true, 1, true,
         RenderScope::ScreenHud, ProducerToken::GoalTime150,
         RenderScope::ScreenHud, ProducerToken::GoalTime150));
+    static_assert(CanFlushD3DXDirectGoalAtExit(false, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress));
+    static_assert(!CanFlushD3DXDirectGoalAtExit(false, true, true, 2, false,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress));
+    static_assert(!CanFlushD3DXDirectGoalAtExit(false, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
     static_assert(!CanFlushD3DXDirectGoalAtExit(false, true, true, 1, true,
         RenderScope::ScreenHud, ProducerToken::GoalTime020,
         RenderScope::ScreenHud, ProducerToken::GoalTime150));

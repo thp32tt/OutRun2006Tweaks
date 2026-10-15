@@ -1020,10 +1020,17 @@ class UIScaling : public Hook
         // siblings. Shield stale world Draws; reentrant live queues retain
         // their semantic authority, and old pending state is restored.
         if (Settings::VREnabled)
+        {
+            // An existing homogeneous D3DX buffer belongs to its outgoing
+            // producer. Split it BEFORE the exact 0-99% progress E8 takes
+            // ScreenHud ownership. The SpriteNode queue has its own boundary.
+            if (!OutRunVR::GameSemantic::QueueRenderActive())
+                FlushD3DXBeforeDirectGoalSource();
             ResultProgressDirectDrawOwner.emplace(
                 OutRunVR::GameSemantic::RenderScope::ScreenHud,
                 nullptr, true,
                 OutRunVR::GameSemantic::ProducerToken::ResultProgress);
+        }
 	}
 	static void ResultProgressLeave(safetyhook::Context&)
 	{
@@ -1049,6 +1056,11 @@ class UIScaling : public Hook
 		TagAppendedNodes(ResultProgressTailsBefore,
 			OutRunVR::GameSemantic::RenderScope::ScreenHud,
 			OutRunVR::GameSemantic::ProducerToken::ResultProgress);
+        // D3DXSprite::Draw can defer submission past this original E8.
+        // Submit only a proven homogeneous ResultProgress batch while its
+        // exact source is live, before restoring the previous semantic.
+        // Unknown/mixed buffers retain native D3DX End/Flush behavior.
+        FlushD3DXAtDirectGoalSourceExit();
         ResultProgressDirectDrawOwner.reset();
         const std::uint64_t hits = ++ResultProgressCompletedCalls;
         if (Settings::VRTelemetry && (hits & (hits - 1u)) == 0)

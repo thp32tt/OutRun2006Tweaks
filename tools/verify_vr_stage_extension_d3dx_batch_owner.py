@@ -181,9 +181,31 @@ def check(code: str, header: str) -> list[str]:
          "VRProjectedD3DXSpriteIsolationR64::BeforeDirectGoalSource();" in code and
          "VRProjectedD3DXSpriteIsolationR64::AfterDirectGoalSource();" in code,
          "GOAL direct owner hooks must reach actual D3DX batch submission")
+    progress_start = source.find("static void ResultProgressEnter(")
+    progress_end = source.find("static void ResultProgressLeave(", progress_start)
+    progress_enter = source[progress_start:progress_end] if (
+        progress_start >= 0 and progress_end > progress_start) else ""
+    progress_exit_start = source.find("static void ResultProgressLeave(")
+    progress_exit_end = source.find("inline static SafetyHookMid StageExtensionEnterHooks[",
+                                     progress_exit_start)
+    progress_exit = source[progress_exit_start:progress_exit_end] if (
+        progress_exit_start >= 0 and progress_exit_end > progress_exit_start) else ""
+    need("QueueRenderActive()" in progress_enter and
+         "FlushD3DXBeforeDirectGoalSource();" in progress_enter and
+         "ProducerToken::ResultProgress" in progress_enter and
+         progress_enter.find("FlushD3DXBeforeDirectGoalSource();") <
+         progress_enter.find("ResultProgressDirectDrawOwner.emplace("),
+         "GOAL 0-99% must flush proven outgoing direct batch before acquiring ScreenHud")
+    need("TagAppendedNodes(ResultProgressTailsBefore" in progress_exit and
+         "FlushD3DXAtDirectGoalSourceExit();" in progress_exit and
+         progress_exit.find("TagAppendedNodes(ResultProgressTailsBefore") <
+         progress_exit.find("FlushD3DXAtDirectGoalSourceExit();") <
+         progress_exit.find("ResultProgressDirectDrawOwner.reset();"),
+         "GOAL 0-99% direct D3DX GPU batch must flush under original progress owner")
     need("pendingDraws != 0 && homogeneous" in goal_predicate and
          "pendingProducer == ProducerToken::GoalTime020" in goal_predicate and
          "pendingProducer == ProducerToken::GoalTime150" in goal_predicate and
+         "pendingProducer == ProducerToken::ResultProgress" in goal_predicate and
          "currentScope == pendingScope" in goal_predicate and
          "currentProducer == pendingProducer" in goal_predicate and
          "!queueActive && batchActive && exactSprite" in goal_predicate,
@@ -325,6 +347,15 @@ def main() -> int:
         "goal-progress-owner-lost":
             code.replace("source == ProducerToken::ResultProgress",
                          "source == ProducerToken::None", 1),
+        "progress-preflush-lost":
+            code.replace(
+                "                FlushD3DXBeforeDirectGoalSource();",
+                "                // missing result progress old-batch split", 1),
+        "progress-exit-flush-lost":
+            code.replace(
+                "        FlushD3DXAtDirectGoalSourceExit();\n"
+                "        ResultProgressDirectDrawOwner.reset();",
+                "        ResultProgressDirectDrawOwner.reset();", 1),
         "lost-device-invalidates-no-batch":
             code.replace(
                 "const HRESULT hr = LostDevice_hk.stdcall<HRESULT>(self);\n"
@@ -413,6 +444,8 @@ def main() -> int:
          "pendingDraws != 0 && true"),
         ("goal-permit-foreign", "pendingProducer == ProducerToken::GoalTime020",
          "pendingProducer != ProducerToken::GoalTime020"),
+        ("progress-owner-lost", "pendingProducer == ProducerToken::ResultProgress",
+         "pendingProducer == ProducerToken::None"),
         ("goal-permit-owner-swap", "currentProducer == pendingProducer",
          "true"),
     ):
