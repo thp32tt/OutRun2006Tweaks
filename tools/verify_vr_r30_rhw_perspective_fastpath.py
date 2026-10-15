@@ -211,8 +211,11 @@ def fused_world_contract(source: str) -> None:
     """Retain the exact per-eye fallback while preventing silent fused math regressions."""
     import random
     import math
+    # The independent R84 projected-car marker helper lives between the
+    # fused-world projector and the generic XYZRHW dispatcher. Exclude it
+    # from the fused-world guards/counts rather than weakening mutations.
     block = source.split("bool R30TryFusedWorldXyzrhwProjection(", 1)[1].split(
-        "bool R30TransformXyzrhwStereo(", 1)[0]
+        "bool R30TransformProjectedRankXyzrhwStereo(", 1)[0]
     stereo = source.split("bool R30TransformXyzrhwStereo(", 1)[1].split(
         "template <typename LeftDraw,", 1)[0]
 
