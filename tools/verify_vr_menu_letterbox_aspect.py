@@ -327,10 +327,11 @@ for seq in (
                     (1, 3440, float("inf")), (1, 0, 768)):
         assert not should_rebuild(cached, invalid)
 assert should_rebuild((1, 3440, 1440), (1, 2496, 2688))
-# Switching from widescreen to portrait must retire prior bars rather
-# than rendering a stale 21:9 left/right cover.
-assert shell_rect(3440, 1440, 1, 1, False)[0] > 0
-assert shell_rect(2496, 2688, 1, 1, False)[0] == 0
+# Switching from widescreen to portrait must retire prior side rails
+# and bound F11 below the new TOP strip, rather than keeping a stale left rail.
+assert content_bounds(3440, 1440, True)[0] > 0
+assert content_bounds(2496, 2688, True)[0] == 0
+assert content_bounds(2496, 2688, True)[1] > 0
 for good, bad in (
         ("currentSize->x != LetterboxRasterWidth", "currentSize->x == LetterboxRasterWidth"),
         ("currentSize->y != LetterboxRasterHeight", "currentSize->y == LetterboxRasterHeight"),
