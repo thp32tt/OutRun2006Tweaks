@@ -725,8 +725,7 @@ def check_external_vr_f11_canvas(font: str) -> None:
     required = (
         "const bool externalVrShell = Game::is_vr_gameplay_presentation();",
         "Game::is_vr_gameplay_presentation();",
-        "if (externalVrShell)",
-        "return { 0.f, 0.f, screen.x, screen.y };",
+        "if (externalVrShell)\n\t\treturn { 0.f, 0.f, screen.x, screen.y };",
         "Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0",
         "(Settings::UILetterboxing == 2 || !Game::is_in_game())",
         "OutRunVR::UI::BuildMenuContentBounds(",
@@ -775,8 +774,8 @@ def check_external_vr_f11_canvas(font: str) -> None:
          "const bool externalVrShell = VrFontMultiplier > 1.0f && Game::is_vr_gameplay_presentation();"),
         ("Game::is_vr_gameplay_presentation();", "Game::is_in_game();"),
         ("if (externalVrShell)", "if (false)"),
-        ("return { 0.f, 0.f, screen.x, screen.y };",
-         "return { 0.f, 0.f, screen.y * 4.f / 3.f, screen.y };"),
+        ("if (externalVrShell)\n\t\treturn { 0.f, 0.f, screen.x, screen.y };",
+         "if (externalVrShell)\n\t\treturn { 0.f, 0.f, screen.y * 4.f / 3.f, screen.y };"),
     ):
         assert shell.count(original) == 1, original
         changed = shell.replace(original, bad, 1)
