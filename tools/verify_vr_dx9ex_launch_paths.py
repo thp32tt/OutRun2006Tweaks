@@ -20,7 +20,7 @@ def check(src):
         (selector, r'if\s*\(-not\s*\(Test-Path\s+\$slotPayload\)\)\s*\{\s*throw', "absent R26 fallback must fail closed"),
         (selector, r'\$expectedVariant\s*=\s*if\s*\(\$variant\s*-eq\s*"R26_SAFE"\)\s*\{\s*"ACTIVE_R26_R43_R44"\s*\}\s*else\s*\{\s*"R84_SPLIT_R33_R32_R31_R30_R29"', "default and fallback build variants must be distinct"),
         (selector, r'\$sourceSha\s*-ne\s*\(Get-Content\s+\$baselineShaFile', "all variants must use the same source SHA"),
-        (selector, r'\\[System\.IO\.File\]::Replace\(\$staged, \$installed, \$backup, \$true\)', "DLL/host change must replace an already-installed file atomically"),
+        (selector, r'\[System\.IO\.File\]::Replace\(\$staged, \$installed, \$backup, \$true\)', "DLL/host change must replace an already-installed file atomically"),
         (selector, r'\[System\.IO\.File\]::Move\(\$staged, \$installed\)', "first install must move fully staged file"),
         (selector, r'\$staged\s*=\s*Join-Path\s+\$root', "executable staging must use the same volume"),
         (selector, r'Get-Sha256Lower \$p\) -ne \(Get-Sha256Lower \$staged', "staged executable must be SHA-checked before replacement"),
