@@ -119,53 +119,6 @@ for old, bad in (
 print("PASS R84 portrait/landscape geometry, native fallback and 9 destructive controls")
 
 
-# Binocular LOCAL-fixed menu visibility: independent eye projections may
-# overlap less than their averaged tangents (Quest asymmetric view pair).
-# The shared raster must be confined to their actual tangent intersection.
-def verify_shared_fov(code):
-    owner = code.split("inline CommonFovTangents PlanCommonFovTangents(", 1)[1].split(
-        "    // A 2D quad centered", 1)[0]
-    for exact in (
-        "const float left = (std::max)(l0, l1);",
-        "const float right = (std::min)(r0, r1);",
-        "const float down = (std::max)(d0, d1);",
-        "const float up = (std::min)(u0, u1);",
-        "right - left <= 0.05f || up - down <= 0.05f",
-    ):
-        assert exact in owner, exact
-    assert "0.5f * (l0 + l1)" not in owner
-    assert "0.5f * (r0 + r1)" not in owner
-verify_shared_fov(menu_geometry)
-for original, wrong in (
-    ("(std::max)(l0, l1)", "(std::min)(l0, l1)"),
-    ("(std::min)(r0, r1)", "(std::max)(r0, r1)"),
-    ("(std::max)(d0, d1)", "(std::min)(d0, d1)"),
-    ("(std::min)(u0, u1)", "(std::max)(u0, u1)"),
-):
-    try:
-        verify_shared_fov(menu_geometry.replace(original, wrong, 1))
-    except AssertionError:
-        pass
-    else:
-        raise AssertionError("eye-overlap mutation survived: " + original)
-def common_visible(a,b):
-    x0,x1 = max(a[0],b[0]),min(a[1],b[1])
-    y0,y1 = max(a[2],b[2]),min(a[3],b[3])
-    return (x0,x1,y0,y1) if x1-x0>0.05 and y1-y0>0.05 else None
-for a,b,expected in (
-    ((-1.,1.,-.8,.8),(-1.,1.,-.8,.8),(-1.,1.,-.8,.8)),
-    ((-1.,.65,-.9,.7),(-.65,1.,-.7,.9),(-.65,.65,-.7,.7)),
-    ((-.9,.8,-.8,1.),(-.8,.9,-1.,.8),(-.8,.8,-.8,.8)),
-):
-    c=common_visible(a,b)
-    assert c==expected,(c,expected)
-    for e in (a,b):
-        assert e[0]<=c[0]<c[1]<=e[1]
-        assert e[2]<=c[2]<c[3]<=e[3]
-assert common_visible((-1.,-.2,-.8,.8),(.2,1.,-.8,.8)) is None
-assert common_visible((-.8,.8,-1.,-.2),(-.8,.8,.2,1.)) is None
-print("PASS binocular menu frustum: symmetric/asymmetric, disjoint X/Y and 4 mutants")
-
 # The 4:3 menu sidebars are also allocated on the promoted D3D9Ex device.
 # D3DPOOL_MANAGED is invalid there; DEFAULT is released before Reset and
 # rebuilt after Reset or a live source-size/device switch.
@@ -801,6 +754,54 @@ print("PASS user clip plane menu isolation; 3 destructive controls")
 r23 = (Path(__file__).resolve().parents[1] / "vrhost/src/main_r23.cpp").read_text()
 menu_geometry = (Path(__file__).resolve().parents[1] /
                  "vrhost/src/runtime/menu_content_aspect.hpp").read_text()
+
+# Binocular LOCAL-fixed menu visibility: independent eye projections may
+# overlap less than their averaged tangents (Quest asymmetric view pair).
+# The shared raster must be confined to their actual tangent intersection.
+def verify_shared_fov(code):
+    owner = code.split("inline CommonFovTangents PlanCommonFovTangents(", 1)[1].split(
+        "    // A 2D quad centered", 1)[0]
+    for exact in (
+        "const float left = (std::max)(l0, l1);",
+        "const float right = (std::min)(r0, r1);",
+        "const float down = (std::max)(d0, d1);",
+        "const float up = (std::min)(u0, u1);",
+        "right - left <= 0.05f || up - down <= 0.05f",
+    ):
+        assert exact in owner, exact
+    assert "0.5f * (l0 + l1)" not in owner
+    assert "0.5f * (r0 + r1)" not in owner
+verify_shared_fov(menu_geometry)
+for original, wrong in (
+    ("(std::max)(l0, l1)", "(std::min)(l0, l1)"),
+    ("(std::min)(r0, r1)", "(std::max)(r0, r1)"),
+    ("(std::max)(d0, d1)", "(std::min)(d0, d1)"),
+    ("(std::min)(u0, u1)", "(std::max)(u0, u1)"),
+):
+    try:
+        verify_shared_fov(menu_geometry.replace(original, wrong, 1))
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("eye-overlap mutation survived: " + original)
+def common_visible(a,b):
+    x0,x1 = max(a[0],b[0]),min(a[1],b[1])
+    y0,y1 = max(a[2],b[2]),min(a[3],b[3])
+    return (x0,x1,y0,y1) if x1-x0>0.05 and y1-y0>0.05 else None
+for a,b,expected in (
+    ((-1.,1.,-.8,.8),(-1.,1.,-.8,.8),(-1.,1.,-.8,.8)),
+    ((-1.,.65,-.9,.7),(-.65,1.,-.7,.9),(-.65,.65,-.7,.7)),
+    ((-.9,.8,-.8,1.),(-.8,.9,-1.,.8),(-.8,.8,-.8,.8)),
+):
+    c=common_visible(a,b)
+    assert c==expected,(c,expected)
+    for e in (a,b):
+        assert e[0]<=c[0]<c[1]<=e[1]
+        assert e[2]<=c[2]<c[3]<=e[3]
+assert common_visible((-1.,-.2,-.8,.8),(.2,1.,-.8,.8)) is None
+assert common_visible((-.8,.8,-1.,-.2),(-.8,.8,.2,1.)) is None
+print("PASS binocular menu frustum: symmetric/asymmetric, disjoint X/Y and 4 mutants")
+
 
 def verify_visible_menu_fragment(code: str) -> None:
     body = code.split("bool cropCentered43 = OutRunVrMenuAspect::ShouldAutoCropVerifiedFourThree(", 1)[1].split(
