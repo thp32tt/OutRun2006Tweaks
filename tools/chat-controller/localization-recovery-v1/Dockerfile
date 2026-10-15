@@ -30,6 +30,13 @@ RUN python /tmp/patch_controller_png_upload.py /opt/outrun/app/controller.py \
  && python -m py_compile /opt/outrun/app/controller.py /opt/outrun/app/controller_png_attach.py /opt/outrun/app/ab_batch_queue.py /opt/outrun/app/tile_orientation_policy.py /opt/outrun/app/project_library_gate.py \
  && rm -f /tmp/patch_controller_png_upload.py
 
+# Add the third logical C tab to the SAME controller after A/B native PNG wiring.
+# This does not spawn a second service; runtime deployment remains operator-manual.
+COPY patch_controller_c_slot.py /tmp/patch_controller_c_slot.py
+RUN python /tmp/patch_controller_c_slot.py /opt/outrun/app/controller.py \
+ && python -m py_compile /opt/outrun/app/controller.py \
+ && rm -f /tmp/patch_controller_c_slot.py
+
 COPY entrypoint.sh /opt/outrun/entrypoint.sh
 COPY prompts/localization_A.md /opt/outrun/prompts/localization_A.md
 COPY prompts/localization_B.md /opt/outrun/prompts/localization_B.md
