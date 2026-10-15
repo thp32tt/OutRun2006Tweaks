@@ -84,6 +84,44 @@ namespace OutRunVR::GameSemantic
         CarBaseShadow, // Direct original player-car contact shadow.
     };
 
+    // The GOAL 0-99% progress, its two exact time helpers and the three
+    // verified stage-result printf parents have the SAME physical XYZRHW
+    // submission risk as +TIME: the source may finish before D3DX Flush.
+    // Admit only their exact producer identities to the recentered finite
+    // binocular HUD plane. The 19 separate B9200 result-text parents have
+    // no proven D3DX batch ownership and deliberately keep the old route.
+    inline constexpr bool CanReprojectFiniteResultHudPlane(
+        RenderScope scope, ProducerToken producer) noexcept
+    {
+        return scope == RenderScope::ScreenHud &&
+            (producer == ProducerToken::StageExtensionTime ||
+             producer == ProducerToken::GoalTime020 ||
+             producer == ProducerToken::GoalTime150 ||
+             producer == ProducerToken::ResultProgress ||
+             producer == ProducerToken::OutRunStagePrintf);
+    }
+
+    static_assert(CanReprojectFiniteResultHudPlane(
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(CanReprojectFiniteResultHudPlane(
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(CanReprojectFiniteResultHudPlane(
+        RenderScope::ScreenHud, ProducerToken::GoalTime150));
+    static_assert(CanReprojectFiniteResultHudPlane(
+        RenderScope::ScreenHud, ProducerToken::ResultProgress));
+    static_assert(CanReprojectFiniteResultHudPlane(
+        RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf));
+    static_assert(!CanReprojectFiniteResultHudPlane(
+        RenderScope::ScreenHud, ProducerToken::ResultTextB9200));
+    static_assert(!CanReprojectFiniteResultHudPlane(
+        RenderScope::ScreenHud, ProducerToken::DispRankClipSprite));
+    static_assert(!CanReprojectFiniteResultHudPlane(
+        RenderScope::ScreenOverlay2D, ProducerToken::ResultProgress));
+    static_assert(!CanReprojectFiniteResultHudPlane(
+        RenderScope::WorldBillboard, ProducerToken::GoalTime020));
+    static_assert(!CanReprojectFiniteResultHudPlane(
+        RenderScope::ScreenHud, ProducerToken::None));
+
     // Previous direct D3DX triangles must be submitted under their OLD
     // owner before the first exact +TIME SpriteNode becomes current.
     // This is never permission to relabel an unknown or mixed batch.

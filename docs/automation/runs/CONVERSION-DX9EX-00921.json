@@ -1,0 +1,78 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00921",
+  "production_id": "CONVERSION-DX9EX-00921",
+  "event_id": "CONVERSION-DX9EX-00921-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00921",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_AWAITING_CI",
+  "phase": "C2_IMPLEMENT",
+  "checkpoint": "C2_SOURCE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "57fea3942dcb9af19804bf8ebfa2a71111868acd",
+  "source_paths": [
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp"
+  ],
+  "changed_files": [
+    "src/vr/game/render_semantics.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00921.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Route complete original GOAL progress, finish-time glyphs and stage-result printf D3DX physical XYZRHW draws through the finite binocular R84 ScreenHud plane instead of generic FOV-only 2D placement, without changing game timing.",
+    "scope_boundary": "Only exact R84 GOAL 0-99%/time-helper/three stage-result printf +TIME sprite families at physical fixed-function submission; never general B9200 text, ordinary HUD, menu, lenses, SkyGlow, original FFB/input or R26_SAFE.",
+    "trace_stages": [
+      "Canonical original GOAL 0x97BE4/0x97DEC progress callers, 0xBEA5A/0xBEA5F glyph helpers and three OutRunStagePrintf calls are tagged by hooks_uiscaling.",
+      "GameSemantic producer survives Sumo queue/replay and deferred D3DX Begin/Draw/Flush batch ownership to physical fixed-function XYZRHW draw.",
+      "R84 R30 receives producer-scoped ScreenHud, reconstructs two-eye finite plane using latched head pose and eye FOV, then host composes frame without altering shader/other classes."
+    ],
+    "subcomponents": [
+      "Admit all four verified GOAL producer tokens alongside six existing StageExtensionTime calls to same pose-locked finite HUD plane at physical draw.",
+      "Preserve the unproved 19 B9200 text, regular 2D HUD, F11, rank and world paths via exact source and semantic vetoes; fail closed when XR pose/projection is absent.",
+      "Lock original producer identity and actual renderer path with C++ positive/negative static assertions and changed-area source-path mutation guard."
+    ],
+    "acceptance_items": [
+      {
+        "id": "goal_progress_and_finish_time_eye_plane",
+        "category": "end_to_end_behavior",
+        "behavior_area": "GOAL 0-99% sprite, time and stage result physical two-eye replay",
+        "expected_behavior": "Exact GOAL producer-owned XYZRHW sprite and numbers reuse finite world-locked ScreenHud plane on both eyes under one validated latched pose."
+      },
+      {
+        "id": "goal_unknown_and_gameplay_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "B9200 unknown D3DX, normal HUD/world, missing XR projection",
+        "expected_behavior": "Unproved result text, rank, world and generic overlays retain their original draw routes; no pose or projection preserves stock draw without widening ownership."
+      },
+      {
+        "id": "exact_sha_game_host_domain_and_inspector",
+        "category": "integrated_validation",
+        "behavior_area": "Windows R84 x86 main game plus x64 host and full-source gate",
+        "expected_behavior": "Exact material SHA passes DX9Ex Active Windows game and host package, Domain, Full Source and HUD Inspector required workflows; Quest3 remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "goal_progress_and_finish_time_eye_plane": "PENDING_CI",
+    "goal_unknown_and_gameplay_fallback": "PENDING_CI",
+    "exact_sha_game_host_domain_and_inspector": "PENDING_CI"
+  },
+  "diagnosis": {
+    "root_cause": "Exact +TIME already branches to finite HUD eye plane in R84 R30 while exact GOAL progress/time/stage-printf ScreenHud source takes generic XYZRHW 2D path at physical deferred D3DX submission.",
+    "evidence": "Read canonical GOAL producer tags and R64 GPU-owner hook; R30 XYZRHw exact-stage branch matches only StageExtensionTime, leaving four proven GOAL D3DX producers unhandled."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Commit integrated C++ GOAL stereo route and exact producer regression, check required exact SHA GitHub CI; HMD visual acceptance separately."
+}

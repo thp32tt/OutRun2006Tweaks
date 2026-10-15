@@ -2871,7 +2871,7 @@ namespace OutRunVRStereo
             bool rhwDepthEvidence = false;
             bool worldEffect = false;
             bool projectedWorldMarker = false;
-            // Exact +TIME D3DX/fixed-function sprites also need the same
+            // Exact +TIME and GOAL-owned D3DX/fixed-function sprites need the
             // recentered finite optical HUD plane used by shader glyphs.
             // Never enable this on generic ScreenOverlay2D or smoke/world.
             bool stageExtensionEyePlane = false;
@@ -3490,18 +3490,20 @@ namespace OutRunVRStereo
                 return true;
             }
 
-            // Unlike a generic fixed-function overlay, the six exact
-            // +TIME E8 parents and their queue/replay children are ScreenHud.
-            // Reproject BOTH sprite and numeric glyph quads through a finite
-            // head/world-locked HUD plane, matching R84's shader HUD path.
-            // Shader-bound glyphs already use R30BuildScreenSpaceEyeConstants.
-            // Missing head pose/projection fails closed to the stock game
-            // draw instead of borrowing any unrelated c64 or classifying
-            // arbitrary smoke, title or GOAL as stage HUD.
-            if (OutRunVR::GameSemantic::CorroboratesHud(
-                    OutRunVR::GameSemantic::EffectiveScope()) &&
-                OutRunVR::GameSemantic::CurrentRenderProducerToken() ==
-                    OutRunVR::GameSemantic::ProducerToken::StageExtensionTime)
+            // Exact +TIME, GOAL progress (0-99%), original GOAL-time
+            // helpers and the verified Sumo_Printf stage-result parents may
+            // submit their fixed-function sprites only at a later D3DX
+            // Flush/End. Their producer token is retained by the direct/queue
+            // batch bridge, but unlike shader ScreenHud these XYZRHW draws
+            // previously fell through to generic 2D eye-FOV placement.
+            // Reproject the FULL exact result sprite/glyph family through
+            // the same finite, pose-locked HUD plane as shader ScreenHud.
+            // Keep B9200 unknown-batch result text, ordinary timer, F11,
+            // menu, rank, smoke, world effects and SkyGlow on their existing
+            // paths. Missing projection/head pose preserves original Draw.
+            if (OutRunVR::GameSemantic::CanReprojectFiniteResultHudPlane(
+                    OutRunVR::GameSemantic::EffectiveScope(),
+                    OutRunVR::GameSemantic::CurrentRenderProducerToken()))
             {
                 return haveBaseProjection &&
                     R30BuildStageExtensionXyzrhwEyePlane(
@@ -4775,8 +4777,8 @@ namespace OutRunVRStereo
                 }
                 if (state.stageExtensionEyePlane)
                 {
-                    // D3DXSprite::Draw may have been deferred until Flush/End.
-                    // Its exact producer survives via the queue/batch bridge;
+                    // Exact +TIME/GOAL D3DXSprite::Draw can be deferred to
+                    // Flush/End. Its producer survives the queue/batch bridge;
                     // this is the physical XYZRHW GPU submission and both
                     // eyes must use the SAME captured scene pose.
                     // Preserve original colour, UV, depth and RHW. Reject

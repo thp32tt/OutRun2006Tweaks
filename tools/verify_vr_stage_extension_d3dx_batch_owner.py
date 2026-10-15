@@ -404,10 +404,43 @@ def check(code: str, header: str) -> list[str]:
     return errors
 
 
+def check_exact_goal_xyzrhw_plane(renderer: str, semantics: str) -> list[str]:
+    """Source-path and mutation guard for exact GOAL physical XYZRHW draws.
+
+    The C++ static_asserts exercise positive and protected negative tokens;
+    this additionally requires that the R84 physical draw actually calls
+    that exact predicate BEFORE the generic 2D/fog depth classifier.
+    """
+    errors: list[str] = []
+    begin = renderer.find("bool R30PrepareXyzrhwState(")
+    # The actual draw branch follows its state-preparation helper.
+    physical = renderer.find("CorroboratesProjectedWorldMarker(", begin)
+    generic = renderer.find("// Smoke/sand can redraw", physical)
+    section = renderer[physical:generic] if 0 <= begin < physical < generic else ""
+    predicate = semantics[semantics.find("inline constexpr bool CanReprojectFiniteResultHudPlane("):
+                          semantics.find("// Previous direct D3DX triangles must be submitted")]
+    required = ("StageExtensionTime", "GoalTime020", "GoalTime150",
+                "ResultProgress", "OutRunStagePrintf")
+    if not all(("producer == ProducerToken::" + token) in predicate for token in required):
+        errors.append("exact stage/GOAL source family missing from C++ predicate")
+    if ("scope == RenderScope::ScreenHud" not in predicate or
+            "ProducerToken::ResultTextB9200" in predicate or
+            "ProducerToken::DispRankClipSprite" in predicate):
+        errors.append("GOAL plane admits unsafe non-owned result/rank draws")
+    if ("CanReprojectFiniteResultHudPlane(" not in section or
+            "CurrentRenderProducerToken()" not in section or
+            "R30BuildStageExtensionXyzrhwEyePlane(" not in section or
+            "return haveBaseProjection &&" not in section):
+        errors.append("physical R84 XYZRHW draw bypasses exact GOAL eye plane")
+    return errors
+
+
 def main() -> int:
     code = SOURCE.read_text(encoding="utf-8")
     header = SEMANTICS.read_text(encoding="utf-8")
     errors = check(code, header)
+    renderer = (ROOT / "src/vr/d3d9/stereo_renderer_r30.cpp").read_text(encoding="utf-8")
+    errors.extend(check_exact_goal_xyzrhw_plane(renderer, header))
     if errors:
         print("DX9Ex +TIME D3DX FAIL: " + "; ".join(errors))
         return 1
