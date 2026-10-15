@@ -20,7 +20,7 @@ def connected(s,h):
     return all((
         '#include "native_game_multi_dirty_upload.hpp"' in s,
         0<=select<admit<bound<copy<unlock<upload<tiles,
-        "boundedPartition && !fullDirtyCoverage && !croppedNativeUpload &&" in p[admit:bound],
+        "fullMode && backbufferKnown &&" in p[admit:bound],
         "multiDirty.valid" in p[admit:bound],
         "(multiNativeUpload && fullPlacement.valid)" in p[bound:copy],
         "GameNativeFrameUpload::copy_rect(" in p[copy:unlock],
@@ -41,8 +41,8 @@ assert connected(src,hdr),"multi dirty game frame/Present integration broken"
 for before,after in (
     ("multiDirty.valid;","true /* unchecked */;"),
     ("(multiNativeUpload && fullPlacement.valid)","false /* dropped */"),
-    ("boundedPartition && !fullDirtyCoverage && !croppedNativeUpload &&",
-     "true /* ignore region */ &&"),
+    ("const bool multiNativeUpload = fullMode && backbufferKnown &&",
+     "const bool multiNativeUpload = true /* unchecked */ &&"),
     ("back.Get(), &targetTile","back.Get(), &destination"),
     ("if (FAILED(game->UpdateSurface(","if (false /* upload bypassed */ && FAILED(game->UpdateSurface("),
     ("!copied || FAILED(unlockStatus)","FAILED(unlockStatus)"),

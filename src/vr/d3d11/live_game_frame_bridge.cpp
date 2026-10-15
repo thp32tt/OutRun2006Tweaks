@@ -5225,7 +5225,7 @@ void before_game_present(IDirect3DDevice9* game,
             boundedPartition ? dirtyRegion->rdh.rcBound.bottom : 0,
             boundedPartition ? partitionRects : nullptr);
         const bool multiNativeUpload = fullMode && backbufferKnown &&
-            boundedPartition && !fullDirtyCoverage && !croppedNativeUpload &&
+            !fullDirtyCoverage && !croppedNativeUpload &&
             multiDirty.valid;
         if (!s.previousOutput.same(outputNow)) {
             // Also reject earlier GPU readbacks if the Present backbuffer COM identity
