@@ -1,4 +1,5 @@
 #include "vr/core/matrix.hpp"
+#include "vr/core/stereo_world_scale.hpp"
 #include "vr/input/rumble_amplitude.hpp"
 
 #include <cmath>
@@ -198,6 +199,17 @@ int main()
         for (int c = 0; c < 4; ++c)
             if (!Near(roundTrip[r][c], r == c ? 1.0f : 0.0f))
                 return 33;
+
+    // R84 regression: FastWorld must share the R30 particle/effect IPD
+    // translation scale, including non-default VRStereoDepth. This is
+    // independent of the Game/Host, safe for the portable core-math smoke.
+    using OutRunVR::Core::EffectiveStereoWorldScale;
+    if (!Near(EffectiveStereoWorldScale(1.0f, 1.0f), 1.0f) ||
+        !Near(EffectiveStereoWorldScale(1.25f, 0.8f), 1.0f) ||
+        !Near(EffectiveStereoWorldScale(1.0f, 0.5f), 0.5f) ||
+        !Near(EffectiveStereoWorldScale(2.0f, 1.5f), 3.0f) ||
+        !Near(EffectiveStereoWorldScale(1.0f, 0.0f), 0.0f))
+        return 34;
 
     return 0;
 }

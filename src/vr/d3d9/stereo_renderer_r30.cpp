@@ -24,6 +24,7 @@
 #include "lens_centre_source_provenance.hpp"
 #include "../core/r29_owner_api.hpp"
 #include "../core/r30_support_api.hpp"
+#include "../core/stereo_world_scale.hpp"
 #include "../game/render_semantics.hpp"
 #include <cstring>
 #include "../state/state_block_tracker.hpp"
@@ -3168,7 +3169,8 @@ namespace OutRunVRStereo
             state.baseProjection = baseProjection;
             auto& geometryCache = R30XyzrhwWorldGeometry;
             const float worldScale =
-                Settings::VRWorldScale * Settings::VRStereoDepth;
+                OutRunVR::Core::EffectiveStereoWorldScale(
+                    Settings::VRWorldScale, Settings::VRStereoDepth);
             const bool geometryCacheHit = geometryCache.valid &&
                 geometryCache.worldScale == worldScale &&
                 geometryCache.geometry.stereo.poseSequence == state.stereo.poseSequence &&
@@ -6507,7 +6509,11 @@ namespace OutRunVRStereo
 
     float R30SupportWorldScale() noexcept
     {
-        return Settings::VRWorldScale;
+        // R31's FastWorld eye-tail cache consumes this scale. Match R30's
+        // billboard/particle and flat-effect translation, including stereo
+        // depth; otherwise cars/road and effects diverge when depth != 1.
+        return OutRunVR::Core::EffectiveStereoWorldScale(
+            Settings::VRWorldScale, Settings::VRStereoDepth);
     }
 
     D3DMATRIX R30SupportMatrixFromQuaternionTranslation(
