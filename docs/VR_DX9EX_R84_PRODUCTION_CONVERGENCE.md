@@ -1,3 +1,9 @@
+## 2026-10-15 — R84 MAINLINE DEFAULT (supersedes the historical separate R84 artifact policy)
+
+The completed R84 structural extraction is now integrated into `vr-d3d9ex-focus` normal **development and test** defaults, not just compiled as a secondary artifact: `cmake.toml` and `CMakeLists.txt` option-free Win32 compile the full independent R29–R33 graph; `.github/workflows/vr-dx9ex-active.yml` configures the main game with no `-DOUTRUN_VR` overrides, stages `CURRENT_FOCUS=R84`, and builds `R26_SAFE` only as an explicit same-SHA rollback. Guard: `tools/verify_dx9ex_r84_mainline.py`.
+
+The 2026-10-11 `CONVERSION-DX9EX-00591` structural closeout remains immutable and is not double-counted. Later R84 mainline cutover is a package/build ownership change. Actual Quest3/VDXR/HUD/72Hz frame pacing still `RUNTIME_VALIDATION=UNTESTED`; `docs/VR_ARCH_V3_MIGRATION_PLAN.md` v3 live IPC authority remains HMD-gated. Detailed source/build/rollback acceptance: `docs/DX9EX_R84_MAINLINE_CONTRACT.md`.
+
 ## Final closeout — 2026-10-11 (supersedes ACTIVE plan below)
 
 **R84 production convergence: SUPERSEDED_BY_DX9EX_FOCUS / COMPLETE_BUILD_VERIFIED.** One stable TASK_ID `CONVERSION-DX9EX-00591` delivered full R29–R33 independent translation units and explicit interfaces; Win32 compile/link and x64 host, protected safe game, package, policy and domain all passed on target SHA `074768c96c410f0268c084450b0aa8bced38b6c3`. Exact GitHub DX9Ex Active #38135749653, Domain Isolation #38135749604, Full Source Impact #38135749550 each SUCCESS. Separate R84 x86 DLL artifact #11701023307; unchanged safe package #11701106196. Quest3/VDXR runtime UNTESTED. No further structural R84 tasks, score duplicates, or misleading ACTIVE status. Remaining P0 HUD/optics and performance work proceeds separately.

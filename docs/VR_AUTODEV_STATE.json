@@ -4,10 +4,22 @@
   "branch": "vr-d3d9ex-focus",
   "publicationMode": "github-fast-forward-cas",
   "frozen": false,
-  "phase": "DX9Ex C ACTIVE P0-P3 alongside first-priority DX11 Native A; R84 P1 only; HMD runtime acceptance distinct",
+  "phase": "DX9Ex C R84 R29-R33 INDEPENDENT MAINLINE P0-P3 alongside DX11 Native A; R26_SAFE rollback only; HMD runtime acceptance distinct",
   "checkpoint": "R84_SUPERSEDED_BY_DX9EX_FOCUS",
   "policy": {
-    "primaryBackend": "DX9Ex C ACTIVE parallel to first-priority DX11 A; DXVK B FROZEN. C priority P0 unresolved optics/HUD + P1 finite R84 (non-overlapping work keys) -> P2 XR per-eye -> P3 measured native performance; FFB v0.2 frozen.",
+    "dx9exR84Mainline": {
+      "authority": "docs/DX9EX_R84_MAINLINE_CONTRACT.md",
+      "branch": "vr-d3d9ex-focus",
+      "mainRenderer": "R84_INDEPENDENT_R33_R32_R31_R30_R29",
+      "developmentBuild": "CMAKE_OPTION_FREE_R84_DEFAULT",
+      "testBuild": "DX9EX_ACTIVE_CURRENT_FOCUS_R84",
+      "legacyFallback": "R26_SAFE_EXPLICIT_ONLY",
+      "requires": "EXACT_SHA_ACTIVE_AND_DOMAIN_CI_PLUS_REAL_QUEST3_HMD_ACCEPTANCE",
+      "runtimeValidation": "UNTESTED",
+      "scope": "DX9EX_C_ONLY_DX11_A_INDEPENDENT_DXVK_B_FROZEN",
+      "autoDeveloperRule": "All new DX9Ex changes and regressions must target actual R29-R33 independent R84 owners/shared runtime; R26-only patch does not complete a feature. Existing feature lease/ID remains."
+    },
+    "primaryBackend": "DX9Ex C MAIN R84 R29-R33 for future source development, default CMake and Active game tests; R26_SAFE rollback only. DX11 A independent, DXVK B frozen; P0 optics/HUD and measured P0-B performance retained.",
     "blockedBackends": [
       "DXVK_B_NEW_DEVELOPMENT_BUILD_RELEASE_PROMOTION",
       "DX12_D3D9ON12_REFERENCE_ONLY"
@@ -138,11 +150,11 @@
         "ARCH-V3-007",
         "ARCH-V3-008"
       ],
-      "currentStatus": "WAITING_FOR_R84_PRODUCTION_CONVERGENCE_THEN_HMD_GATE",
+      "currentStatus": "R84_MAINLINE_ACTIVE_HMD_ENTRY_GATE_PENDING",
       "currentAuthority": "IPC v2 live; IPC v3 test/shadow only until gate opens",
       "autoTransitionRule": "After an exact Quest3/VDXR DX9Ex baseline is accepted and blocking P0 lifecycle/resource/reset/recenter/direct-transport regressions are cleared, promote ARCH-V3-001 to READY and execute the sequence in order. Do not manufacture filler if only HMD-gated work remains.",
       "downstreamRule": "DX9Ex Architecture v3 HMD acceptance gates only DX9Ex live IPC migration/handoff; DX11 Native A independently ACTIVE; DXVK B frozen until explicit user decision.",
-      "precondition": "DX9EX-R84-CONVERGENCE-CLOSEOUT-001 DONE before ARCH-V3-GATE-001 may advance live migration."
+      "precondition": "R84 production structural closeout remains complete; ARCH-V3-GATE-001 requires exact Quest3/VDXR runtime acceptance before v3 live authority migration."
     },
     "r84ProductionConvergence": {
       "status": "SUPERSEDED_BY_DX9EX_FOCUS",
@@ -240,7 +252,7 @@
     "DirectGPU transport is not the current HUD root cause: direct frames=13187, fallbacks=4, fenceTimeout=0, stereo/right-draw failures=0 in the failed HUD candidate session.",
     "Dense-scene performance remains separate; observed peak drawsPerPresent≈3929.3 and lower-Present max≈16.639 ms in this session."
   ],
-  "nextAction": "R84 full independent R29-R33 Win32 source/build complete. Do not redispatch 00591. Continue P0 HUD/optics, P2 XR per-eye, P3 measured FPS. HMD runtime UNTESTED.",
+  "nextAction": "Use R84 independent R29-R33 MAIN for all DX9Ex C development and CURRENT_FOCUS test runs; R26_SAFE is explicit rollback. Keep original feature/TASK lease, implement P0 optical/HUD and measured performance on R84; exact Quest3/VDXR HMD acceptance and Architecture v3 live migration remain gated/UNTESTED. Do not rescore 00591.",
   "scheduledRunHistory": {
     "path": "docs/VR_SCHEDULED_RUN_HISTORY.md",
     "lastRunId": "RUN-0001",

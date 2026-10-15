@@ -1,6 +1,8 @@
 # VR Architecture v3 Migration Plan
 
 Status: PLANNED / HMD-GATED
+
+2026-10-15 scope distinction: normal DX9Ex game development and `CURRENT_FOCUS` testing now use independent R84 R29–R33, but the `IGameAdapter/IStereoBackend/IFrameProducer/IFrameConsumer/IVrRuntime/IPC v3` live-authority cutover described **below** remains HMD-GATED. No change to the v2 live compatibility authority until ARCH-V3-GATE-001 passes.
 Integration branch: `vr-d3d9ex-focus`
 Authority: `docs/VR_ARCHITECTURE.md` + this phase plan + `docs/VR_WORK_QUEUE.json`
 

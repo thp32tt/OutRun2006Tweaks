@@ -4,6 +4,18 @@
   "owner": "D_INTEGRATION_PLANNER",
   "updatedKst": "2026-10-15T01:36:52+09:00",
   "policy": {
+    "dx9exR84Mainline": {
+      "authority": "docs/DX9EX_R84_MAINLINE_CONTRACT.md",
+      "branch": "vr-d3d9ex-focus",
+      "mainRenderer": "R84_INDEPENDENT_R33_R32_R31_R30_R29",
+      "developmentBuild": "CMAKE_OPTION_FREE_R84_DEFAULT",
+      "testBuild": "DX9EX_ACTIVE_CURRENT_FOCUS_R84",
+      "legacyFallback": "R26_SAFE_EXPLICIT_ONLY",
+      "requires": "EXACT_SHA_ACTIVE_AND_DOMAIN_CI_PLUS_REAL_QUEST3_HMD_ACCEPTANCE",
+      "runtimeValidation": "UNTESTED",
+      "scope": "DX9EX_C_ONLY_DX11_A_INDEPENDENT_DXVK_B_FROZEN",
+      "autoDeveloperRule": "All new DX9Ex changes and regressions must target actual R29-R33 independent R84 owners/shared runtime; R26-only patch does not complete a feature. Existing feature lease/ID remains."
+    },
     "maxIndependentUnvalidatedRuntimeCandidates": 3,
     "maxMateriallyDifferentFixAttempts": 2,
     "productionWriter": "D_INTEGRATION_PLANNER",
@@ -11,7 +23,7 @@
     "queueWriter": "D_INTEGRATION_PLANNER",
     "runtimeTruthRequiresQuest3Vdxr": true,
     "skipUnchangedCompletedInputs": true,
-    "primaryBackend": "DX11 A active; DX9Ex C separate functional visual-feature queue with whole-feature root cause and fix; measured performance P0-B nonoverlap; DXVK frozen.",
+    "primaryBackend": "DX11 A independent; DX9Ex C R84 independent R29-R33 MAIN for all new development and test, R26_SAFE only opt-in rollback; P0 optical/HUD and measured P0-B performance; DXVK frozen.",
     "regressionKnowledge": {
       "registry": "docs/VR_REGRESSION_KNOWLEDGE.json",
       "ledgerIssue": 13,
@@ -55,7 +67,7 @@
       "disabledReason": "Historical evening HMD matrix disabled, not active A/C source execution."
     },
     "automationCycle": {
-      "mode": "DX9EX_C_UI_P0A_PERFORMANCE_P0B_PARALLEL_DX11_A_INDEPENDENT",
+      "mode": "DX9EX_R84_MAINLINE_UI_P0A_PERFORMANCE_P0B_PARALLEL_DX11_A_INDEPENDENT",
       "executionEnvironment": "EXTERNAL_DOCKER_QUEUE_CONTROLLER",
       "cadenceAuthority": "EXTERNAL_DOCKER",
       "repositorySsot": [
@@ -99,13 +111,13 @@
     "architectureV3Transition": {
       "enabled": true,
       "plan": "docs/VR_ARCH_V3_MIGRATION_PLAN.md",
-      "status": "WAITING_FOR_R84_PRODUCTION_CONVERGENCE_THEN_HMD_GATE",
+      "status": "R84_MAINLINE_ACTIVE_HMD_ENTRY_GATE_PENDING",
       "entryGateItem": "ARCH-V3-GATE-001",
       "firstMigrationItem": "ARCH-V3-001",
       "autoTransition": true,
       "rule": "Keep DX9Ex stabilization authoritative until ARCH-V3-GATE-001 is satisfied by exact Quest3/VDXR baseline evidence. Then D promotes ARCH-V3-001 to READY and executes ARCH-V3-001..008 in dependency order. IPC v2 remains live authority until staged v3 cutover evidence permits promotion.",
       "downstreamPortGate": "DX9Ex live IPC v3 promotion gated by exact HMD; independent DX11 A continues, DXVK B remains user-frozen.",
-      "precondition": "Complete DX9EX-R84 production convergence closeout first, then satisfy ARCH-V3-GATE-001 with exact Quest3/VDXR baseline evidence."
+      "precondition": "R84 independent R29-R33 structural production integration is complete; exact Quest3/VDXR accepted baseline and ARCH-V3-GATE-001 are still required for v3 live authority."
     },
     "r84ProductionConvergence": {
       "plan": "docs/VR_DX9EX_R84_PRODUCTION_CONVERGENCE.md",

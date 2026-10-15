@@ -1,3 +1,7 @@
+# 2026-10-15 — DX9Ex R84 MAINLINE FIRST (overrides historical R26-default language)
+
+GitHub `vr-d3d9ex-focus` R84 R29~R33 independent TU chain is now the **only normal DX9Ex implementation/build/test owner**, from unqualified `cmake -S .` to the `CURRENT_FOCUS` standalone launcher and Active ZIP. R26+HUD stays **R26_SAFE rollback slot only** (same SHA/host). Treat all pre-2026-10-15 references to the "current R26+HUD Active package" as historical. If source is changed in `stereo_renderer_r30_r26_safe.cpp`, copy/verify any required *functional* improvement in the R84 path; do not silently restore removed broad WorldParticle fast paths or precomputed WVP arithmetic that caused flicker. The P0 optical/HUD producer→R84→host acceptance, P0-B performance measurements and feature lease policies remain mandatory. R84 structural split compiled/build-verified is distinct from HMD acceptance and from still-gated Architecture v3 live IPC migration. Full contract: `docs/DX9EX_R84_MAINLINE_CONTRACT.md`.
+
 # 2026-10-15 01:36 KST — USER LENS CENTRE / +TIME WHOLE-PATH REPAIR DIRECTIVE
 
 Read `docs/DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md` before the next DX9Ex visual repair. User explicitly requests actionable fixes for all screen faults, especially lens centre and stage +TIME, with whole-source-path review where necessary. Next available P0-A dispatch prioritizes existing `DX9EX:VIS:LENS_FLARE_CENTRE` and `DX9EX:VIS:EXTENDED_TIME`; keep the original TASK_ID/lease and do not interrupt active exact-SHA CI or steal shared renderer ownership.
