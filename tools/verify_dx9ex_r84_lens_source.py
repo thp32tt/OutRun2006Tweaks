@@ -140,11 +140,9 @@ def check(api, r29, r30, proof, r30api, r32api, r32, r33, workflow):
         "stereo->poseSequence",
     ):
         assert marker in physical, "R33 C993 physical draw proof lost: " + marker
-    assert physical.index("const HRESULT", physical.index("R32ReviewOwnedResult result")) if False else True
-    assert physical.index("R32ReviewOwnedResult result{ true, actualDraw() };") < (
+    assert (physical.index("R32ReviewOwnedResult result{ true, actualDraw() };") <
         physical.index("if (screenKind == R32ReviewScreenSpaceKind::ExactLensCentreWorld") <
-        physical.index('VR R84 C993 EXACT_STEREO_DRAW: {}')
-    )
+        physical.index('VR R84 C993 EXACT_STEREO_DRAW: {}'))
     assert "e.currentCall == e.writtenCall" in proof
     assert "e.currentPoseEpoch == e.writtenPoseEpoch" in proof
     assert "e.shaderEpoch == e.writtenShaderEpoch" in proof
