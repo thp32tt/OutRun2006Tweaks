@@ -9,15 +9,15 @@
   "target_branch": "vr-d3d9ex-focus",
   "feature_id": "DX9EX:STABILITY:HOST_PREWARM_PROFILE_PARITY",
   "feature_class": "CRITICAL_BLOCKER",
-  "status": "IMPLEMENTED_VALIDATION_PENDING",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "C3_STATE",
-  "automation_validation": "PENDING_EXACT_SHA_GATES",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "fd3a8a14d7a2455a8074fa825722a8b96fa22034",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "5daaa03595cc7ee342205ebe9a40e844d4be950d",
   "source_paths": [
     "tools/Run-OutRunVRTest.ps1",
     "tools/verify_vr_dx9ex_launch_batch.py"
@@ -84,5 +84,31 @@
     "fix_evidence": "Resolved ordered final gameArgs before environment construction and used it for prewarm and retry.",
     "negative_test_evidence": "Mutation verifier rejects ignoring overrides, dropped argument parsing, and broken assignment.",
     "eye_ownership": "DX9Ex host launch parity protects the already-implemented per-eye transport selection without modifying GPU draw or optical math."
-  }
+  },
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "ci_evidence": {
+    "status": "PASS_EXACT_SHA",
+    "exact_sha": "5daaa03595cc7ee342205ebe9a40e844d4be950d",
+    "dx9ex_active": {
+      "run_id": 38696552170,
+      "conclusion": "SUCCESS",
+      "required_jobs": "policy, host, game, full-chain-compile, package (5/5)"
+    },
+    "domain_isolation": {
+      "run_id": 38696552135,
+      "conclusion": "SUCCESS"
+    },
+    "hud_inspector": {
+      "run_id": 38696552225,
+      "conclusion": "SUCCESS"
+    },
+    "check_runs": {
+      "total": 11,
+      "success": 9,
+      "skipped": 2
+    },
+    "runtime": "UNTESTED"
+  },
+  "runtime_evidence": "No Quest 3/VDXR HMD runtime test performed.",
+  "result_commit_ci_skip": true
 }
