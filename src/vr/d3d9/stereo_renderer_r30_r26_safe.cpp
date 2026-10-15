@@ -15,6 +15,7 @@
 #include "r30_indexed_up_bounds.hpp"
 #include "r30_shadow_ranges.hpp"
 #include "r30_shadow_bytes.hpp"
+#include "r30_shadow_scratch.hpp"
 #include "lens_centre_source_provenance.hpp"
 #include "r30_early_rhw_shadow.hpp"
 #include "vr/game/render_semantics.hpp"
@@ -375,8 +376,11 @@ namespace OutRunVRStereo
 
         struct R30ScratchBuffers
         {
-            std::vector<std::uint8_t> source;
-            std::vector<std::uint8_t> indexSource;
+            // All bytes are filled from a validated game shadow or exact UP index
+            // loop before use. Retain capacity across variable draw sizes without
+            // zeroing previously unused scratch bytes every stereo draw.
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch source;
+            OutRunVR::R30ScratchBytes::WriteOnlyByteScratch indexSource;
             std::vector<std::uint8_t> left;
             std::vector<std::uint8_t> right;
             std::vector<std::uint8_t> used;
@@ -551,7 +555,7 @@ namespace OutRunVRStereo
         }
 
         bool R30CopyVertexShadow(IDirect3DVertexBuffer9* buffer,
-            UINT offset, UINT size, std::vector<std::uint8_t>& out)
+            UINT offset, UINT size, OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out)
         {
             const auto entry = R30FindVertexShadow(buffer);
             if (!entry)
@@ -587,7 +591,7 @@ namespace OutRunVRStereo
         }
 
         bool R30CopyIndexShadow(IDirect3DIndexBuffer9* buffer,
-            UINT offset, UINT size, std::vector<std::uint8_t>& out)
+            UINT offset, UINT size, OutRunVR::R30ScratchBytes::WriteOnlyByteScratch& out)
         {
             const auto entry = R30FindIndexShadow(buffer);
             if (!entry)

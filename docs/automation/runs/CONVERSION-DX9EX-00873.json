@@ -1,0 +1,82 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00873",
+  "production_id": "CONVERSION-DX9EX-00873",
+  "event_id": "CONVERSION-DX9EX-00873-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00873",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:PERF:R26_STEREO_SHADOW_SCRATCH",
+  "feature_class": "MEASURED_PERFORMANCE",
+  "feature_contract": {
+    "feature_id": "DX9EX:PERF:R26_STEREO_SHADOW_SCRATCH",
+    "goal": "Eliminate value-initialization and repeated reallocation of shipped R26+HUD stereo source/index staging during variable-sized VB/IB and IndexedPrimitiveUP draws; preserve exact range admission and original render fallback.",
+    "scope_boundary": "Only R26+HUD R30 CPU scratch used for validated VB/IB readback and UP local index rebase. No renderer routing/eye projection, shader, SkyGlow, lens, +TIME, FFB, DX11, or DXVK edits.",
+    "trace_stages": [
+      "Game Lock/Unlock populates independent CPU shadow and valid-byte intervals.",
+      "R30CopyVertexShadow/R30CopyIndexShadow first validate full requested range and then memcpy every staging byte.",
+      "R30 per-eye transforms read the fully copied temporary source; IndexedPrimitiveUP writes every rebased index slot before either eye draw.",
+      "Exact-SHA Active game builds R26+HUD owner; host smoke verifies capacity/reuse, 16/32 index and fallback coverage."
+    ],
+    "subcomponents": [
+      "Replace zero-initialized std::vector<uint8_t> stereo readback source/indexSource with destructive, reusable uninitialized scratch, preserving size/data contracts.",
+      "Retain separate valid coverage on CPU shadow and fail-original-render behavior when data unavailable or allocation throws.",
+      "Exercise portable positive and negative staging regressions in the existing exact-SHA Windows smoke workflow."
+    ],
+    "acceptance_items": [
+      {
+        "id": "staging",
+        "category": "end_to_end_behavior",
+        "behavior_area": "VB/IB stereo shadow readback",
+        "expected_behavior": "All bytes copied from validated CPU shadow before transforms; reused capacity requires no zero fill on subsequent draws."
+      },
+      {
+        "id": "indexed",
+        "category": "fallback_regression",
+        "behavior_area": "IndexedPrimitiveUP and original draw fallback",
+        "expected_behavior": "16/32-bit index rebasing fully overwrites staging; gaps/failures never admit unobserved game shadow data."
+      },
+      {
+        "id": "ci",
+        "category": "integrated_validation",
+        "behavior_area": "DX9Ex packaged Win32 game/host",
+        "expected_behavior": "Exact-SHA Active game, host smoke, package, Domain and affected Full Source Impact succeed without HMD claims."
+      }
+    ]
+  },
+  "diagnosis": {
+    "original_evidence": "R26+HUD R30ScratchBuffers.source/indexSource were std::vector<uint8_t>; R30Copy*Shadow and index rebase invoke resize on varying requested byte counts even though all bytes are immediately overwritten.",
+    "root_cause": "std::vector<uint8_t>::resize value-initializes newly enlarged logical spans in the draw-time source/index staging hot path, creating redundant CPU writes distinct from the previously fixed persistent CPU shadow backing.",
+    "alternatives_rejected": [
+      "Do not bypass independent valid-range admission, skip CPU copy, reduce eye draw coverage, or reuse stale previously copied source/index data.",
+      "Do not alter the already-completed 00871/00872 CPU shadow interval/write allocation and its safety checks."
+    ],
+    "fix_evidence": "New write-only staging buffer retains capacity, default-initializes uint8_t[capacity] without clearing, and drops previous payload on growth; readback and UP index loops already overwrite every logical byte before use.",
+    "negative_test_evidence": "Host smoke checks shrink/expand pointer reuse, complete per-draw overwrite, growth, 16-bit and 32-bit index slots, clear and independent gap rejection."
+  },
+  "status": "IN_PROGRESS",
+  "phase": "C5_COMMIT",
+  "checkpoint": "C5_MATERIAL",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "runtime_evidence": "No actual Quest3/VDXR or same-scene CPU/GPU FPS measurement; source-confirmed redundant memory initialization, no hardware speedup claim.",
+  "source_parent_sha": "a332b01e5d9a3bc1c9229e092e101c33eed3c021",
+  "changed_files": [
+    "src/vr/d3d9/r30_shadow_scratch.hpp",
+    "src/vr/d3d9/stereo_renderer_r30_r26_safe.cpp",
+    "vrhost/tests/r30_shadow_ranges_smoke.cpp",
+    "docs/automation/runs/CONVERSION-DX9EX-00873.json"
+  ],
+  "acceptance_results": {
+    "staging": "PENDING_EXACT_SHA",
+    "indexed": "PENDING_EXACT_SHA",
+    "ci": "PENDING_EXACT_SHA"
+  },
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "PENDING_EXACT_SHA_GITHUB_ACTIONS",
+  "result_commit_ci_skip": false
+}

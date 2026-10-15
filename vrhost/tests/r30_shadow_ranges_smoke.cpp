@@ -1,6 +1,7 @@
 // Portable runtime regression for the R26+HUD VB/IB valid-shadow intervals.
 #include "../../src/vr/d3d9/r30_shadow_ranges.hpp"
 #include "../../src/vr/d3d9/r30_shadow_bytes.hpp"
+#include "../../src/vr/d3d9/r30_shadow_scratch.hpp"
 #include <cstdint>
 #include <cstring>
 #include <iostream>
@@ -131,6 +132,87 @@ int main()
     if (!storage.data() || storage.size() != 128 || !ranges.empty())
         return 15;
 
-    std::cout << "R26+HUD dynamic VB/IB shadow range merge/read PASS\n";
+    // Separate shipped stereo READBACK/UP-rebase staging from persistent
+    // validity-gated CPU shadow. All requested staging bytes must be written.
+    using OutRunVR::R30ScratchBytes::WriteOnlyByteScratch;
+    WriteOnlyByteScratch vertexScratch;
+    WriteOnlyByteScratch indexScratch;
+    vertexScratch.resize(1024);
+    if (!vertexScratch.data() || vertexScratch.size() != 1024 ||
+        vertexScratch.capacity() < 1024)
+        return 17;
+    auto* firstScratch = vertexScratch.data();
+    std::uint8_t filled[1024]{};
+    for (std::size_t k = 0; k < sizeof(filled); ++k)
+        filled[k] = static_cast<std::uint8_t>(k & 255u);
+    std::memcpy(vertexScratch.data(), filled, sizeof(filled));
+    if (std::memcmp(vertexScratch.data(), filled, sizeof(filled)) != 0)
+        return 18;
+    vertexScratch.resize(16);
+    vertexScratch.resize(sizeof(filled));  // varying draw sizes reuse storage
+    if (vertexScratch.data() != firstScratch ||
+        vertexScratch.size() != sizeof(filled))
+        return 19;
+    // Reusing storage is NOT reusing payload. Entire next draw is copied
+    // again before any vertex transform or per-eye GPU draw.
+    std::memset(vertexScratch.data(), 0xA5, vertexScratch.size());
+    for (std::size_t k = 0; k < vertexScratch.size(); ++k)
+        if (vertexScratch.data()[k] != 0xA5)
+            return 20;
+    vertexScratch.resize(4096); // growth never requires previous payload
+    if (!vertexScratch.data() || vertexScratch.size() != 4096 ||
+        vertexScratch.capacity() < 4096)
+        return 21;
+    std::memset(vertexScratch.data(), 0x42, vertexScratch.size());
+    if (vertexScratch.data()[0] != 0x42 ||
+        vertexScratch.data()[4095] != 0x42)
+        return 22;
+    // Both 16-bit and 32-bit IndexedPrimitiveUP paths fill every local
+    // index slot; same exact-owned source replays to both eyes.
+    for (unsigned bytesPerIndex : {2u, 4u})
+    {
+        indexScratch.resize(16u * bytesPerIndex);
+        for (std::uint32_t k = 0; k < 16; ++k)
+        {
+            const std::uint32_t local = k + 4u;
+            if (bytesPerIndex == 2u)
+            {
+                const auto shortIndex = static_cast<std::uint16_t>(local);
+                std::memcpy(indexScratch.data() + k * bytesPerIndex,
+                    &shortIndex, bytesPerIndex);
+            }
+            else
+                std::memcpy(indexScratch.data() + k * bytesPerIndex,
+                    &local, bytesPerIndex);
+        }
+        for (std::uint32_t k = 0; k < 16; ++k)
+        {
+            std::uint32_t actual = 0;
+            if (bytesPerIndex == 2u)
+            {
+                std::uint16_t shortIndex = 0;
+                std::memcpy(&shortIndex, indexScratch.data() +
+                    k * bytesPerIndex, bytesPerIndex);
+                actual = shortIndex;
+            }
+            else
+                std::memcpy(&actual, indexScratch.data() +
+                    k * bytesPerIndex, bytesPerIndex);
+            if (actual != k + 4u)
+                return 23;
+        }
+    }
+    vertexScratch.clear();
+    indexScratch.clear();
+    if (vertexScratch.data() || vertexScratch.size() ||
+        vertexScratch.capacity() || indexScratch.data() ||
+        indexScratch.size() || indexScratch.capacity())
+        return 24;
+    // Unobserved gaps remain rejected by the independent validity map;
+    // the scratch class never participates in interval admission.
+    if (Contains(ranges, 12, 16))
+        return 25;
+
+    std::cout << "R26+HUD dynamic VB/IB shadow and stereo scratch PASS\n";
     return 0;
 }
