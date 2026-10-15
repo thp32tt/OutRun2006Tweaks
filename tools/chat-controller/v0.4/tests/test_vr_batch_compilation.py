@@ -86,6 +86,13 @@ class BatchCompilePolicy(unittest.TestCase):
                 self.assertIn("DEVELOPMENT_FIRST_20261015", prompt)
                 self.assertIn("필수 GitHub Actions 전체 Gate", prompt)
 
+    def test_development_first_is_not_dependent_on_30m_mode(self):
+        for lane in ("DX11", "DX9EX"):
+            text = prefix(lane, continuous=False)
+            self.assertIn("DEVELOPMENT_FIRST_20261015=ON", text)
+            self.assertIn("필수 GitHub Actions 전체 Gate", text)
+            self.assertIn("이미 PASS인 동일 SHA", text)
+
     def test_development_first_does_not_activate_frozen_dxvk(self):
         self.assertNotIn("DEVELOPMENT_FIRST_20261015=ON", prefix("DXVK", continuous=True))
         self.assertNotIn("DEVELOPMENT_FIRST_20261015=ON", prefix("LOCALIZATION_A", continuous=True))
