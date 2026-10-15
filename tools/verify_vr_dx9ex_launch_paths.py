@@ -94,7 +94,7 @@ if __name__ == "__main__":
         (0, '"ACTIVE_R26_R43_R44"', '"NONEXISTENT"'),
         (0, '"R84_SPLIT_R33_R32_R31_R30_R29"', '"NONEXISTENT"'),
         (0, '$sourceSha -ne (Get-Content $baselineShaFile', '$sourceSha -eq (Get-Content $baselineShaFile'),
-        (0, "R84_TEST host is not the matching exact-SHA host.", "R84_TEST host unknown"),
+        (0, "DX9Ex selected host is not the matching exact-SHA host.", "DX9Ex selected host unverified"),
         (1, "$effectivePath=if($cfg.Backend -eq 'd3d9' -and ($slot -eq 'R84_TEST' -or $slot -eq 'R26_SAFE'))", "$effectivePath=if($slot -eq 'CURRENT_FOCUS')"),
         (1, "'R26_SAFE'=[ordered]", "'NO_ROLLBACK'=[ordered]"),
         (1, '$quotedRunner = \'"\' + $runner + \'"\'', '$quotedRunner = $runner'),
