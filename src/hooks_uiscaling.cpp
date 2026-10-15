@@ -2460,6 +2460,47 @@ namespace DX9ExD3DXSpriteLifetime
 
     using OutRunVR::GameSemantic::RenderScope;
     using OutRunVR::GameSemantic::ProducerToken;
+
+    // D3DXSprite may implicitly submit the PREVIOUS texture batch as soon
+    // as the next unrelated Draw arrives. Drain only a proven outgoing exact
+    // +TIME/GOAL batch *before* the new Draw can trigger that submission.
+    // This is one flush per exact owner transition, never one per sprite.
+    constexpr bool CanDrainDeferredResultBeforeForeignDraw(
+        bool batchActive, bool queueActive, bool homogeneous,
+        unsigned pendingDraws, bool exactLiveSprite,
+        RenderScope pendingScope, ProducerToken pendingProducer,
+        RenderScope incomingScope, ProducerToken incomingProducer) noexcept
+    {
+        return CanRestoreDeferredResultOwner(
+            batchActive, queueActive, homogeneous, pendingDraws,
+            exactLiveSprite, pendingScope, pendingProducer) &&
+            (pendingScope != incomingScope ||
+             pendingProducer != incomingProducer);
+    }
+    static_assert(CanDrainDeferredResultBeforeForeignDraw(
+        true,false,true,2,true,RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime,
+        RenderScope::None,ProducerToken::None));
+    static_assert(CanDrainDeferredResultBeforeForeignDraw(
+        true,false,true,1,true,RenderScope::ScreenHud,
+        ProducerToken::GoalTime150,
+        RenderScope::ScreenHud,ProducerToken::GoalTime020));
+    static_assert(!CanDrainDeferredResultBeforeForeignDraw(
+        true,false,true,2,true,RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud,ProducerToken::StageExtensionTime));
+    static_assert(!CanDrainDeferredResultBeforeForeignDraw(
+        true,true,true,2,true,RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime,
+        RenderScope::None,ProducerToken::None));
+    static_assert(!CanDrainDeferredResultBeforeForeignDraw(
+        true,false,false,2,true,RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime,
+        RenderScope::None,ProducerToken::None));
+    static_assert(!CanDrainDeferredResultBeforeForeignDraw(
+        true,false,true,2,false,RenderScope::ScreenHud,
+        ProducerToken::StageExtensionTime,
+        RenderScope::None,ProducerToken::None));
     static_assert(CanRestoreDeferredResultOwner(
         true,false,true,3,true,RenderScope::ScreenHud,
         ProducerToken::StageExtensionTime));
@@ -2892,6 +2933,32 @@ private:
         void* self, IDirect3DTexture9* texture, const RECT* rect,
         const D3DVECTOR* center, const D3DVECTOR* pos, D3DCOLOR color)
     {
+        using namespace OutRunVR::GameSemantic;
+        // On a texture/provenance change the native Draw may internally
+        // flush the earlier exact +TIME/GOAL batch BEFORE we can tag this
+        // incoming Draw. Separate it under its original GPU owner now.
+        // Queued, mixed and foreign buffers remain untouched/fail-closed.
+        if (DX9ExD3DXSpriteLifetime::CanDrainDeferredResultBeforeForeignDraw(
+                BatchActive, QueueRenderActive(), PendingHomogeneous,
+                PendingDraws,
+                DX9ExD3DXSpriteLifetime::CanFlush(
+                    self, TrackedSprite, *Module::exe_ptr<void*>(0x55B218)),
+                PendingScope, PendingProducer,
+                EffectiveScope(), CurrentRenderProducerToken()))
+        {
+            const bool wasStage = StageOwner(PendingScope, PendingProducer);
+            if (FlushTracked(self))
+            {
+                (wasStage ? StageFlushes : GoalFlushes).fetch_add(
+                    1, std::memory_order_relaxed);
+            }
+            else
+            {
+                StageBoundaryReady = false;
+                (wasStage ? StageFallbacks : GoalFallbacks).fetch_add(
+                    1, std::memory_order_relaxed);
+            }
+        }
         const HRESULT hr = Draw_hk.stdcall<HRESULT>(
             self, texture, rect, center, pos, color);
         if (FAILED(hr))
