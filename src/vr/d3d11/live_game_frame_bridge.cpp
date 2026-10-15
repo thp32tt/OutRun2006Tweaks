@@ -4823,7 +4823,7 @@ bool proven_game_draw_no_target_writes(IDirect3DDevice9* game, const State& s) n
     if (!game || !env_full_game_opt_in() || s.frameBatch.stopped) return false;
     DWORD colorMask = 0xffffffffu;
     if (FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
-        colorMask != 0u) return false;
+        (colorMask & ~0x0fu) != 0u || (colorMask & 0x07u) != 0u) return false;
     DWORD zEnabled = D3DZB_TRUE, zWrite = TRUE, stencilEnabled = TRUE;
     if (FAILED(game->GetRenderState(D3DRS_ZENABLE, &zEnabled)) ||
         FAILED(game->GetRenderState(D3DRS_ZWRITEENABLE, &zWrite)) ||
@@ -4840,20 +4840,35 @@ bool proven_game_draw_no_target_writes(IDirect3DDevice9* game, const State& s) n
         // is masked. A failed/unknown query cannot certify a no-op draw.
         if (status != D3DERR_NOTFOUND) return false;
     }
-    ComPtr<IDirect3DSurface9> backbuffer;
-    ComPtr<IUnknown> identity;
-    if (FAILED(game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,
+    ComPtr<IDirect3DSurface9> target, backbuffer;
+    ComPtr<IUnknown> targetIdentity, identity;
+    D3DSURFACE_DESC targetDesc{}, backbufferDesc{};
+    if (FAILED(game->GetRenderTarget(0, target.GetAddressOf())) || !target ||
+        FAILED(game->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO,
                                    backbuffer.GetAddressOf())) || !backbuffer ||
-        FAILED(backbuffer.As(&identity)) || !identity)
+        FAILED(target->GetDesc(&targetDesc)) ||
+        FAILED(backbuffer->GetDesc(&backbufferDesc)) ||
+        FAILED(target.As(&targetIdentity)) || !targetIdentity ||
+        FAILED(backbuffer.As(&identity)) || !identity ||
+        targetIdentity.Get() != identity.Get() ||
+        targetDesc.Format != backbufferDesc.Format ||
+        (backbufferDesc.Format != D3DFMT_A8R8G8B8 &&
+         backbufferDesc.Format != D3DFMT_X8R8G8B8))
         return false;
-    return GameNativeMaskedDraw::no_target_write_source_draw(
+    // On X8 the game's ALPHA-only mask cannot change RT0 color. On A8
+    // it is a real destination-alpha update, including later DESTALPHA
+    // blending, and must never be dropped. No speculative native Draw is
+    // issued for the proved X8 no-write call; the original D3D9 draw and
+    // gamepad path remain completely unchanged.
+    return GameNativeMaskedDraw::no_visible_target_write_source_draw(
         true,
         s.clearColor.matches(reinterpret_cast<std::uintptr_t>(game),
                              reinterpret_cast<std::uintptr_t>(identity.Get())),
-        static_cast<std::uint32_t>(colorMask), zEnabled != D3DZB_FALSE,
-        zWrite != FALSE, stencilEnabled != FALSE, false);
+        static_cast<std::uint32_t>(colorMask),
+        backbufferDesc.Format == D3DFMT_A8R8G8B8,
+        zEnabled != D3DZB_FALSE, zWrite != FALSE,
+        stencilEnabled != FALSE, false);
 }
-
 void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
              const void* bytes, UINT stride, UINT vertexCount,
              const std::uint32_t* indices, UINT indexCount) noexcept {

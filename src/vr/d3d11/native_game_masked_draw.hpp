@@ -38,5 +38,23 @@ struct GameNativeMaskedDraw {
         return static_cast<std::uint8_t>(
             d3d9Mask & (targetHasAlpha ? 0x0fu : 0x07u));
     }
+    // D3D9 can issue an alpha-only menu/vehicle Draw into a physical X8
+    // backbuffer. There is no destination alpha plane to write, so (only
+    // after exact RT0/clear ownership, Z/stencil and MRT proof) this source
+    // call consumes an ordinal without an artificial D3D11 GPU draw.
+    // An A8 alpha-only pass and every real depth/stencil/MRT write still
+    // require native rendering or the original D3D9 fallback.
+    [[nodiscard]] static constexpr bool no_visible_target_write_source_draw(
+        bool fullMode, bool clearedGameBackbuffer, std::uint32_t d3d9Mask,
+        bool targetHasAlpha, bool depthEnabled, bool depthWriteEnabled,
+        bool stencilEnabled, bool extraRenderTargetBound) noexcept {
+        constexpr std::uint32_t kLegalChannels = 0x0fu;
+        return (d3d9Mask & ~kLegalChannels) == 0u &&
+            no_target_write_source_draw(
+                fullMode, clearedGameBackbuffer,
+                effective_native_mask(d3d9Mask, targetHasAlpha),
+                depthEnabled, depthWriteEnabled, stencilEnabled,
+                extraRenderTargetBound);
+    }
 };
 } // namespace outrun::vr::dx11::live_game_frame
