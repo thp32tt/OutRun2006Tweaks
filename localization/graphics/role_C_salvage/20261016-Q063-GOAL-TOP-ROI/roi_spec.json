@@ -1,0 +1,27 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "assets": [
+    {
+      "queue_id": "Q063",
+      "source_png": "q063_48DEBE77_READABLE_FLIPY_FROM_DIRECT_PINNED_DDS.png",
+      "source_sha256": "fef16b9dd7566e5186894991ed1b5cb2ca5154edad9d32c35d54ab6e5e20b0bb",
+      "source_kind": "DIRECT_PINNED_PC_ORIGINAL_DDS_READABLE_FLIPY",
+      "source_dds_path": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+      "regions": [
+        {
+          "id": "goal_top_reference_only_20261016_0433",
+          "english": "GOAL",
+          "korean": "골",
+          "bbox": [
+            392,
+            0,
+            479,
+            40
+          ],
+          "isolation": "reference_crop",
+          "scale": 4
+        }
+      ]
+    }
+  ]
+}

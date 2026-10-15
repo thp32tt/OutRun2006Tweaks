@@ -1,0 +1,46 @@
+{
+  "schema": "outrun-hd-text-roi-v1",
+  "queue_id": "Q063",
+  "region_id": "goal_top_reference_only_20261016_0433",
+  "source_png": "q063_48DEBE77_READABLE_FLIPY_FROM_DIRECT_PINNED_DDS.png",
+  "source_png_sha256": "fef16b9dd7566e5186894991ed1b5cb2ca5154edad9d32c35d54ab6e5e20b0bb",
+  "source_kind": "DIRECT_PINNED_PC_ORIGINAL_DDS_READABLE_FLIPY",
+  "source_dds_path": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+  "original_dimensions": [
+    512,
+    512
+  ],
+  "bbox_xyxy": [
+    392,
+    0,
+    479,
+    40
+  ],
+  "english": "GOAL",
+  "korean": "골",
+  "isolation": "reference_crop",
+  "scale": 4,
+  "native_dimensions": [
+    87,
+    40
+  ],
+  "imagegen_dimensions": [
+    348,
+    160
+  ],
+  "native_png_sha256": "12a7e3299b3aa2312b50eaf20cb5a50a81a541febfa4812f24c4c72e29bc65a0",
+  "imagegen_input_sha256": "fd50302738aea584d5d5aaa4f480a6c3157460ccaaa50ea37ede5faa321d25fe",
+  "alpha_crop_margin_checked": false,
+  "status": "IMAGEGEN_REFERENCE_TEST_ONLY",
+  "generate_output": "ONE_KOREAN_TEXT_ONLY_TRANSPARENT_PNG",
+  "required_review": [
+    "KOREAN_GLYPHS",
+    "SOURCE_EFFECT",
+    "CLEAN_PLATE",
+    "NATIVE_ROI_FIT",
+    "C1",
+    "C3_IF_REQUIRED",
+    "USER_GAME"
+  ],
+  "RUNTIME_VALIDATION": "UNTESTED"
+}

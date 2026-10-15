@@ -1,0 +1,63 @@
+{
+  "task_id": "OUTRUN-C-ROI-Q063-GOAL-TOP-20261016-0433",
+  "schema": "outrun-hd-text-roi-v1",
+  "status": "TEST_ONLY_REFERENCE_ONLY",
+  "source_provenance": "DIRECT_PINNED_PC_ORIGINAL_DDS",
+  "source_dds": "textures/load/spr_sprani_loading_cvt_Exst/48DEBE77_512x512.dds",
+  "source_dds_sha256": "5f6cc66875fd2c03678f7c893ae242eacd0bda6e56ee8d0b2a56e7578895e635",
+  "source_png_sha256": "fef16b9dd7566e5186894991ed1b5cb2ca5154edad9d32c35d54ab6e5e20b0bb",
+  "native_source_size": [
+    512,
+    512
+  ],
+  "orientation": "FLIP_TOP_BOTTOM",
+  "full_source_pixel_diff_count": 0,
+  "roi_pixel_diff_count": 0,
+  "roi_bbox_native_xyxy": [
+    392,
+    0,
+    479,
+    40
+  ],
+  "roi_non_background_bbox_relative_xyxy": [
+    11,
+    2,
+    73,
+    25
+  ],
+  "non_background_border_margins_px": {
+    "left": 11,
+    "top": 2,
+    "right": 14,
+    "bottom": 15
+  },
+  "background_color_rgb": [
+    0,
+    10,
+    56
+  ],
+  "roi_size": [
+    87,
+    40
+  ],
+  "upscaled_size": [
+    348,
+    160
+  ],
+  "resize": "LANCZOS_4X_UNIFORM",
+  "input_upscaled_sha256": "fd50302738aea584d5d5aaa4f480a6c3157460ccaaa50ea37ede5faa321d25fe",
+  "native_sha256": "12a7e3299b3aa2312b50eaf20cb5a50a81a541febfa4812f24c4c72e29bc65a0",
+  "english": "GOAL",
+  "korean": "골",
+  "official_mapping_from": "source_full_20261012/transcriptions.jsonl index 63",
+  "isolation": "REFERENCE_CROP_OPAQUE_BACKGROUND",
+  "CLEAN_PLATE": "HOLD_EXACT_MASK_OR_REVIEWED_PSD_MISSING",
+  "GLYPH_LAYER": "HOLD_EXACT_MASK_OR_REVIEWED_PSD_MISSING",
+  "UV_SAFE_REGION": "UNVERIFIED",
+  "scale_back_policy": "PRESERVE_ASPECT_RATIO_CONTAIN_UI_CELL_UV_SAFE",
+  "imagegen": "NOT_RUN",
+  "C1": "NOT_RUN",
+  "C3": "NOT_RUN",
+  "RUNTIME_VALIDATION": "UNTESTED",
+  "AB_queue_state": "UNMODIFIED"
+}
