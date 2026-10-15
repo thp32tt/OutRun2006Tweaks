@@ -57,6 +57,13 @@ void observe_scene_boundary(IDirect3DDevice9* gameDevice) noexcept;
 void observe_game_surface_mutation(IDirect3DDevice9* gameDevice,
                                    IDirect3DSurface9* destination,
                                    HRESULT originalResult) noexcept;
+// When a completed game ColorFill writes the exact entire Clear-owned main
+// backbuffer, update the native RTV (or pre-Draw clear baseline) instead of
+// discarding menu/vehicle/race native Draw continuity.
+bool preserve_game_full_color_fill(IDirect3DDevice9* gameDevice,
+                                   IDirect3DSurface9* destination,
+                                   const RECT* rect, D3DCOLOR color,
+                                   HRESULT originalResult) noexcept;
 // Preserve a complete live native game color batch across a verified depth-only
 // Clear; return false to use unchanged D3D9 scene-boundary fallback.
 bool observe_game_depth_clear(IDirect3DDevice9* gameDevice, DWORD count,

@@ -17,6 +17,15 @@ struct GameNativeSourceMutation {
         bool succeeded, bool readOnly, bool defaultPool) noexcept {
         return succeeded && !readOnly && defaultPool;
     }
+    // Mirror a successful *whole* main D3D9 ColorFill on the native RTV;
+    // unproved, partial, foreign or failed operations keep D3D9 fallback.
+    [[nodiscard]] static constexpr bool mirrors_full_color_fill(
+        bool fullMode, bool succeeded, bool gameOwner,
+        bool canonicalBackbuffer, bool wholeSurface,
+        bool activeOrPreDraw, bool nativeTargetReady) noexcept {
+        return fullMode && succeeded && gameOwner && canonicalBackbuffer &&
+               wholeSurface && activeOrPreDraw && nativeTargetReady;
+    }
     [[nodiscard]] static constexpr bool invalidates_full_game_frame(
         bool fullMode, bool succeeded, bool gameOwner,
         bool destinationIsClearedBackbuffer, bool selfUpload) noexcept {

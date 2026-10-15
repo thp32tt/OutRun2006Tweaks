@@ -52,6 +52,28 @@ constexpr bool native_cpu_surface_write_regression() {
         !M::invalidates_full_game_frame(true, true, true, true, true);
 }
 static_assert(native_cpu_surface_write_regression());
+// The same seeded menu/vehicle/race native frame can absorb an exact
+// whole-backbuffer D3D9 ColorFill as an RTV clear without losing Draw history.
+constexpr bool native_full_color_fill_regression() {
+    using M = GameNativeSourceMutation;
+    if (!M::mirrors_full_color_fill(true, true, true, true, true, true, true) ||
+        M::mirrors_full_color_fill(false, true, true, true, true, true, true) ||
+        M::mirrors_full_color_fill(true, false, true, true, true, true, true) ||
+        M::mirrors_full_color_fill(true, true, false, true, true, true, true) ||
+        M::mirrors_full_color_fill(true, true, true, false, true, true, true) ||
+        M::mirrors_full_color_fill(true, true, true, true, false, true, true) ||
+        M::mirrors_full_color_fill(true, true, true, true, true, false, true) ||
+        M::mirrors_full_color_fill(true, true, true, true, true, true, false))
+        return false;
+    GameNativeFrameBatch frame{};
+    frame.succeeded(true);
+    frame.record_source_draw(0u);
+    if (!frame.publishable_full(true, 1u) ||
+        !M::mirrors_full_color_fill(true, true, true, true, true,
+                                    !frame.stopped, true)) return false;
+    return frame.publishable_full(true, 1u); // No skipped/extra game Draw.
+}
+static_assert(native_full_color_fill_regression());
 using outrun::vr::dx11::live_game_frame::GameNativePresentRegion;
 int main() {
     GameNativeFrameBatch b{};

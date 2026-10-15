@@ -757,8 +757,12 @@ namespace OutRunVRStereo
         {
             const HRESULT hr = R30ColorFillHook.stdcall<HRESULT>(
                 device, surface, rect, color);
-            outrun::vr::dx11::live_game_frame::observe_game_surface_mutation(
-                device, surface, hr);
+            // Mirror whole game backbuffer fills to the native full-frame
+            // RTV; fallback remains authoritative for partial/foreign writes.
+            if (!outrun::vr::dx11::live_game_frame::preserve_game_full_color_fill(
+                    device, surface, rect, color, hr))
+                outrun::vr::dx11::live_game_frame::observe_game_surface_mutation(
+                    device, surface, hr);
             return hr;
         }
 

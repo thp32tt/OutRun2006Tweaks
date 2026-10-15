@@ -5536,6 +5536,63 @@ void observe_game_surface_mutation(
     }
 }
 
+bool preserve_game_full_color_fill(
+    IDirect3DDevice9* game, IDirect3DSurface9* destination,
+    const RECT* rect, D3DCOLOR color, HRESULT originalResult) noexcept {
+    // Original D3D9 ColorFill is already finished; only a whole, same-owner
+    // main backbuffer operation can be represented as an exact native RTV clear.
+    if (nativeOutputUploadDepth != 0u || !diagnostic_enabled() ||
+        !env_full_game_opt_in() || !game || !destination ||
+        FAILED(originalResult)) return false;
+    try {
+        D3DSURFACE_DESC desc{};
+        if (FAILED(destination->GetDesc(&desc)) ||
+            desc.Pool != D3DPOOL_DEFAULT || !desc.Width || !desc.Height ||
+            (desc.Format != D3DFMT_A8R8G8B8 &&
+             desc.Format != D3DFMT_X8R8G8B8) ||
+            (rect && (rect->left != 0 || rect->top != 0 ||
+                      rect->right != static_cast<LONG>(desc.Width) ||
+                      rect->bottom != static_cast<LONG>(desc.Height))))
+            return false;
+        ComPtr<IUnknown> surfaceIdentity;
+        if (FAILED(destination->QueryInterface(
+                IID_PPV_ARGS(surfaceIdentity.GetAddressOf()))) ||
+            !surfaceIdentity) return false;
+        State& s = state();
+        std::lock_guard<std::mutex> lock(s.mutex);
+        const auto owner = reinterpret_cast<std::uintptr_t>(game);
+        const bool sameGameBackbuffer = s.clearColor.matches(
+            owner, reinterpret_cast<std::uintptr_t>(surfaceIdentity.Get())) &&
+            (s.sourceGameDevice == 0u || s.sourceGameDevice == owner);
+        const bool alreadyDrawn = s.frameBatch.submitted != 0u;
+        const bool targetReady = !alreadyDrawn ||
+            (s.backend.ready() && s.backend.color_rtv() &&
+             s.backend.context() && s.nativeWidth == desc.Width &&
+             s.nativeHeight == desc.Height);
+        if (!GameNativeSourceMutation::mirrors_full_color_fill(
+                true, SUCCEEDED(originalResult), sameGameBackbuffer,
+                sameGameBackbuffer, true, !s.frameBatch.stopped, targetReady))
+            return false;
+        // X8 cannot store destination alpha: keep native alpha opaque for
+        // game-authored DESTALPHA blending and subsequent real game Draws.
+        s.clearColor.argb = color;
+        s.clearColor.opaqueDestinationAlpha =
+            desc.Format == D3DFMT_X8R8G8B8;
+        if (alreadyDrawn) {
+            const auto rgba = s.clearColor.native_color(
+                owner, reinterpret_cast<std::uintptr_t>(surfaceIdentity.Get()),
+                kBackground);
+            s.backend.context()->ClearRenderTargetView(
+                s.backend.color_rtv(), rgba.data());
+        }
+        // This color operation is fully replayed: keep native Draw ordinals,
+        // independent depth and original D3D9 Present/controller/FFB semantics.
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
 void observe_scene_boundary(IDirect3DDevice9* game) noexcept {
     if (!diagnostic_enabled() || !game) return;
     try {
