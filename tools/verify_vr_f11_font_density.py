@@ -729,16 +729,18 @@ def check_external_vr_f11_canvas(font: str) -> None:
         "return { 0.f, 0.f, screen.x, screen.y };",
         "Settings::UILetterboxing > 0 && Settings::UIScalingMode > 0",
         "(Settings::UILetterboxing == 2 || !Game::is_in_game())",
-        "return { border, 0.f, screen.x - (border * 2.f), screen.y };",
+        "OutRunVR::UI::BuildMenuContentBounds(",
+        "return { content.x, content.y, content.width, content.height };",
     )
     for token in required:
         assert token in shell, token
     assert shell.index("screen.x <= 0.f || screen.y <= 0.f") < (
         shell.index("const bool externalVrShell"))
+    # External VR bypasses menu geometry before side or portrait masks.
     assert shell.index("return { 0.f, 0.f, screen.x, screen.y };") < (
-        shell.index("float border = 0.f;"))
-    assert shell.index("float border = 0.f;") < (
-        shell.index("return { border, 0.f,"))
+        shell.index("OutRunVR::UI::BuildMenuContentBounds("))
+    assert shell.index("OutRunVR::UI::BuildMenuContentBounds(") < (
+        shell.index("return { content.x, content.y, content.width, content.height };"))
     assert "VrFontMultiplier > 1.0f" not in shell
 
     # A real VR F11 window may use the side-rail pixels, but the original
