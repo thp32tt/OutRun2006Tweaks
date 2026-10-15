@@ -29,6 +29,20 @@ int main() {
     batch.reset();
     batch.record_source_draw(0u);
     assert(!batch.can_seed_pre_draw_depth(color.matches(game, back), true));
+    assert(!batch.can_seed_pre_draw_depth(color.matches(game, back), false));
+    batch.reset();
+    // A successful game-authored empty Draw after a full TARGET Clear is
+    // distinct from an unrelated/unaccounted prior Draw. Seed native DSV
+    // only for the former, without fabricating a native GPU submission.
+    assert(batch.absorb_empty_source_draw(0u, true));
+    assert(!batch.can_seed_pre_draw_depth(color.matches(game, back), true));
+    assert(batch.can_seed_pre_draw_depth(color.matches(game, back), false));
+    assert(!batch.can_seed_pre_draw_depth(false, false));
+    batch.note_full_depth_clear(0.125f);
+    assert(batch.first_draw() && batch.depth_clear_value(false) == 0.125f);
+    assert(batch.accepts_full_seeded(1u, true));
+    batch.succeeded(true); batch.record_source_draw(1u);
+    assert(batch.publishable_full(true, 2u));
     batch.reset();
     batch.succeeded(false);
     assert(!batch.can_seed_pre_draw_depth(color.matches(game, back), true));

@@ -169,7 +169,10 @@ struct GameNativeFrameBatch {
         const bool onlyLeadingEmpty =
             submitted == 0u && leadingEmptySourceDraws != 0u && hasSourceDraw;
         return sameSourceFullColorClear &&
-            (noSourceDraws || onlyLeadingEmpty) && !stopped &&
+            // Do not trust a no-draws claim when the actual source ordinal
+            // tracker already observed an unrelated/unsupported Draw.
+            ((noSourceDraws && !hasSourceDraw) ||
+             (!noSourceDraws && onlyLeadingEmpty)) && !stopped &&
             submitted == 0u && !depthReady;
     }
     // An aborted batch must never reach the GPU readback/inset presenter,
