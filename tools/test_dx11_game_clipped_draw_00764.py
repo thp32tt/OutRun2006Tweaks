@@ -19,7 +19,7 @@ def wired(src, predicate):
         "scissorEnabled == TRUE",
         "SUCCEEDED(game->GetViewport(&sourceViewport))",
         "SUCCEEDED(game->GetScissorRect(&sourceScissor))",
-        "&& GameNativeScissorClip::excludes_viewport(",
+        "                    GameNativeScissorClip::excludes_viewport(",
         "s.frameBatch.absorb_empty_source_draw(",
         "s.frameBatch.abort();",
         "return;",
