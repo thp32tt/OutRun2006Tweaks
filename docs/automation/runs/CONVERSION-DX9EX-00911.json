@@ -13,7 +13,7 @@
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "status": "NEEDS_VALIDATION",
   "phase": "C3_VALIDATE",
-  "checkpoint": "C3_CI_PENDING",
+  "checkpoint": "C3_FINAL_EXACT_SHA_GATE",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
@@ -28,7 +28,8 @@
     "src/hooks_uiscaling.cpp",
     "src/vr/game/render_semantics.hpp",
     "vrhost/tests/goal_progress_owner_smoke.cpp",
-    "docs/automation/runs/CONVERSION-DX9EX-00911.json"
+    "docs/automation/runs/CONVERSION-DX9EX-00911.json",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py"
   ],
   "feature_contract": {
     "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
@@ -67,7 +68,7 @@
   },
   "acceptance_results": {
     "goal_result_text_stereo_batch": "SOURCE_IMPLEMENTED",
-    "batch_safety_fallback": "PORTABLE_STATIC_ASSERTS_IMPLEMENTED",
+    "batch_safety_fallback": "POSITIVE_NEGATIVE_REGRESSION_POLICY_PASS",
     "mandatory_exact_sha_gates": "PENDING"
   },
   "diagnosis": {
@@ -91,13 +92,19 @@
     "material_source_commit": "57437f2531a21792d2d7dcf628778cd61d4064cc",
     "initial_active_run_id": 38783965786,
     "initial_policy_failure": "Required exact-task run JSON was absent; C++ compilation had not been attempted by skipped Active jobs. Adding this contract to enable mandated exact-SHA validation under same TASK_ID.",
-    "status": "PENDING_EXACT_SHA",
+    "status": "PENDING_FINAL_EXACT_SHA",
     "required_gates": [
       "DX9Ex Active Validation",
       "Domain Isolation Guard",
       "DX9Ex Full Source Impact Review",
       "OutRun EXE HUD Inspector CI"
-    ]
+    ],
+    "policy_record_sha": "af904400190601d54799a6a823072a6e5b40f4b4",
+    "policy_record_gate_id": 38784444454,
+    "first_post_record_failure": "Existing mutation goal-direct-before-removed replaced the new Sumo_Printf entry Flush rather than prior progress/helper boundary, but old verifier lacked a separate exact Sumo_Printf guard; static/rule verifier failure, not Windows compile failure.",
+    "targeted_regression_repair_sha": "20d270221acdea8b5641259c97b83062e7d243a9",
+    "targeted_regression_repair": "Verified OutRunStagePrintf original 3 exact CALLs, first incoming GOAL preflush before producer scope, direct source-exit Flush before restoration, queue and direct finite exact producer predicates independently. Existing destructive mutation tests are not removed.",
+    "regression_gate_after_repair": "DX9Ex Active 38784688997 policy SUCCESS at 20d27022, remaining game/host/full-chain compiling on non-canceling existing run. Full exact-SHA 4-Gate acceptance remains pending."
   },
   "runtime_evidence": "No matching OutRun2006 runtime or Quest3/VDXR stereo headset session executed; optical pass and FPS effects unproven.",
   "score_delta_this_attempt": 0,
