@@ -22,12 +22,12 @@ def linked(b,h,r):
         "if (!ownsDraw && !ownsPreDrawColor) return;" in boundary,
         "if (ownsPreDrawColor && s.frameBatch.submitted == 0u)" in boundary,
         "s.frameBatch.abort();" in boundary,
-        "s.frameBatch.accepts_full_seeded(" in obs,
-        "s.clearColor.matches(reinterpret_cast<std::uintptr_t>(game)," in obs,
-        "output.targetIdentity))" in obs,
+        "s.frameBatch.accepts_full_on_source_target(" in obs,
+        "const bool sameClearedGameTarget = s.clearColor.matches(" in obs,
+        "output.targetIdentity);" in obs,
         "if (fullMode) s.frameBatch.abort();" in obs,
         "s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)" in b,
-        "return accepts_full(ordinal) && (submitted != 0u || sameSourceFullClear);" in h,
+        "return matchesClearedBackbuffer &&" in h,
         "python tools/test_dx11_full_frame_color_seed_00735.py" in flow,
         "tools/dx11_full_frame_color_seed_00735.cpp" in flow,
     ))
@@ -36,12 +36,12 @@ for token,mut in (
     ("s.clearColor.valid && s.clearColor.sourceDevice == owner","false"),
     ("if (!ownsDraw && !ownsPreDrawColor) return;","if (!ownsDraw) return;"),
     ("if (ownsPreDrawColor && s.frameBatch.submitted == 0u)","if (false)"),
-    ("s.frameBatch.accepts_full_seeded(","s.frameBatch.accepts_full("),
-    ("s.clearColor.matches(reinterpret_cast<std::uintptr_t>(game),","s.clearColor.matches(0u,"),
+    ("s.frameBatch.accepts_full_on_source_target(","s.frameBatch.accepts_full("),
+    ("const bool sameClearedGameTarget = s.clearColor.matches(","const bool sameClearedGameTarget = false && s.clearColor.matches("),
 ):
     assert token in bridge
     assert not linked(bridge.replace(token,mut,1),batch,hook),token
-assert not linked(bridge,batch.replace("return accepts_full(ordinal) && (submitted != 0u || sameSourceFullClear);","return accepts_full(ordinal);"),hook)
+assert not linked(bridge,batch.replace("return matchesClearedBackbuffer &&","return true &&",1),hook)
 clear_start=hook.index("HRESULT __stdcall ClearDestR9(")
 clear_end=hook.index("template <typename ActualDraw, typename LegacyDraw>",clear_start)
 clear_section=hook[clear_start:clear_end]

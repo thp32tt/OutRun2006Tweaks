@@ -37,9 +37,10 @@ assert src.count("s.backend.begin_frame(env_full_game_opt_in()") == 1
 assert src.count("s.clearColor.native_color(s.sourceGameDevice, output.targetIdentity, kBackground)") == 1
 assert src.count("ctx->ClearDepthStencilView(s.diagnosticDepthView.Get(),") == 1
 assert header.count("kMaxDraws = 8u") == 1
-for marker in ("OUTRUN_DX11_FULL_GAME_FRAME", "s.frameBatch.accepts_full_seeded(",
-               "s.clearColor.matches(reinterpret_cast<std::uintptr_t>(game),",
-               "output.targetIdentity))",
+for marker in ("OUTRUN_DX11_FULL_GAME_FRAME", "s.frameBatch.accepts_full_on_source_target(",
+               "const bool sameClearedGameTarget = s.clearColor.matches(",
+               "output.targetIdentity);",
+               "sourceOrdinal, sameClearedGameTarget)",
                "publishable_full(s.pending, s.sourceDrawsThisFrame)",
                "ensure_pipeline(s, output.nativeWidth, output.nativeHeight)",
                "depthDesc.Width = s.nativeWidth", "next.completeFullFrame = fullMode",
