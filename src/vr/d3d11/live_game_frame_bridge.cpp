@@ -4,6 +4,7 @@
 #include "live_game_cull_state.hpp"
 #include "live_game_fvf_layout.hpp"
 #include "live_game_object_clip.hpp"
+#include "live_game_pixel_center.hpp"
 #include "live_game_viewport_depth.hpp"
 #include "live_game_stage0_blend.hpp"
 #include "live_game_stage1_factor.hpp"
@@ -3537,9 +3538,13 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
                 return false;
             std::copy(clip.begin(), clip.end(), v.clip);
         }
-        if (!std::isfinite(v.clip[0]) || !std::isfinite(v.clip[1]) ||
-            !std::isfinite(v.clip[2]))
-            return false;
+        // D3D9 uses integer pixel centers; D3D11 samples at pixel +0.5.
+        // Convert BOTH menu XYZRHW and world WVP vertices without dividing
+        // by homogeneous W. The same output reaches live Draw/DrawIndexed.
+        // Failed correction keeps original game D3D9 Draw/Present/input.
+        if (!game_native_d3d9_raster_center(
+                v.clip, static_cast<float>(vp.Width),
+                static_cast<float>(vp.Height))) return false;
         v.diffuse[0] = static_cast<float>((diffuse >> 16) & 255) / 255.0f;
         v.diffuse[1] = static_cast<float>((diffuse >> 8) & 255) / 255.0f;
         v.diffuse[2] = static_cast<float>(diffuse & 255) / 255.0f;
