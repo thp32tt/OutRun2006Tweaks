@@ -382,3 +382,68 @@ for good, bad in (
     else:
         raise AssertionError("unsafe custom matrix mutation escaped: " + bad)
 print("DX9Ex custom matrix complete quad publishing PASS (4 negative controls)")
+
+
+# 00880: D3DX specifies optional scaling and translation independently.
+# Front-end sprites supplying only one must still get aspect containment,
+# while gameplay/HUD and both-present/both-absent original routes stay intact.
+def require_partial_menu_vectors(code: str) -> None:
+    body = code.split("const bool partialFrontEndMenu =", 1)[1].split(
+        "return D3DXMatrixTransformation2D.stdcall<int>", 1)[0]
+    for required in (
+        "GameState::STATE_TITLE", "GameState::STATE_MENU",
+        "GameState::STATE_SELECTOR", "GameState::STATE_SELEXIT",
+        "GameState::STATE_SELRESET",
+        "((pScaling == nullptr) != (pTranslation == nullptr))",
+        "Game::screen_scale && Game::screen_resolution",
+        "pScaling ? pScaling->x : 1.0f",
+        "pTranslation ? pTranslation->x : 0.0f",
+        "CenterMultiSpriteAxis(",
+        "forwardedScaling = &localScaling;",
+        "forwardedTranslation = &localTranslation;",
+    ):
+        assert required in body, "partial menu matrix path missing: " + required
+    assert body.index("sourceSx > 1.0e-6f") < body.index(
+        "inputSx / sourceSx") < body.index("forwardedScaling = &localScaling;")
+
+require_partial_menu_vectors(text)
+for old, bad in (
+    ("GameState::STATE_SELECTOR", "GameState::STATE_GOAL"),
+    ("((pScaling == nullptr) != (pTranslation == nullptr))",
+     "(pScaling == nullptr && pTranslation == nullptr)"),
+    ("pScaling ? pScaling->x : 1.0f", "pScaling->x"),
+    ("pTranslation ? pTranslation->x : 0.0f", "pTranslation->x"),
+    ("nextTx = CenterMultiSpriteAxis(", "nextTx = inputTx + ("),
+):
+    assert old in text
+    try:
+        require_partial_menu_vectors(text.replace(old, bad, 1))
+    except (AssertionError, ValueError):
+        pass
+    else:
+        raise AssertionError("Optional menu D3DX mutant escaped: " + bad)
+
+def partial_contain(viewport, scaling=None, translation=None):
+    width, height = viewport
+    sx, sy = width / 640.0, height / 480.0
+    contain = min(sx, sy)
+    ix, iy = (1.0, 1.0) if scaling is None else scaling
+    tx, ty = (0.0, 0.0) if translation is None else translation
+    return ((ix/sx*contain, iy/sy*contain),
+            (tx/sx*contain+(width-640*contain)/2.0,
+             ty/sy*contain+(height-480*contain)/2.0))
+
+for viewport in ((640,480),(1920,1080),(3440,1440),(2496,2688)):
+    for supplied_scale, supplied_translation in (
+        ((1.25,0.75), None), (None,(120.0,70.0))):
+        got=partial_contain(viewport,supplied_scale,supplied_translation)
+        reference=partial_contain(viewport,
+            supplied_scale if supplied_scale is not None else (1.0,1.0),
+            supplied_translation if supplied_translation is not None else (0.0,0.0))
+        assert got == reference
+        assert all(isfinite(x) for pair in got for x in pair)
+    if viewport[0]/viewport[1] > 640/480:
+        scale, offset = partial_contain(viewport,(1.0,1.0),None)
+        assert scale[0] == scale[1] or scale[0] < scale[1]
+        assert offset[0] >= 0.0
+print("PASS optional front-end D3DX scale/translation containment and five destructive controls")

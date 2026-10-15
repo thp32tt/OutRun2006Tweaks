@@ -1,0 +1,91 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00880",
+  "production_id": "CONVERSION-DX9EX-00880",
+  "event_id": "CONVERSION-DX9EX-00880-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00880",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Correct aspect-preserving original main-menu and vehicle-selection sprite matrix output when the D3DX producer supplies independently optional scaling or translation, without altering normal gameplay or existing complete-vector paths.",
+    "scope_boundary": "Only original title/menu/car-select partially nullable D3DXMatrixTransformation2D producer vectors and deterministic source-matrix regression; no HUD, ESC, F11, world/particles, SkyGlow, projection transport or DX11/DXVK edits.",
+    "trace_stages": [
+      "Original OutRun front-end sprites issue D3DXMatrixTransformation2D with either optional scale or translation omitted, an API-legal request.",
+      "The existing UI containment hook skipped the entire aspect transform when exactly one vector is absent, forwarding anisotropic screen-space source while DrawPrimitiveUP later presents menu geometry.",
+      "Title/menu/vehicle-select partial inputs now synthesize identity defaults, stage both finite vectors, and preserve native menu proportions before R84 R33 stereo submission and host presentation."
+    ],
+    "subcomponents": [
+      "Restore 4:3/16:9/21:9 and portrait XR containment for scaling-without-translation and translation-without-scaling native front-end sprite matrices.",
+      "Keep the complete-vector path unchanged and reject both-absent, invalid, desktop/gameplay HUD, GOAL, ESC, F11 and nonfinite partial inputs without exposing caller-vector mutations."
+    ],
+    "acceptance_items": [
+      {
+        "id": "menu-optional-vector-aspect",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original menu and car-select D3DX matrix producer",
+        "expected_behavior": "Either missing optional input vector retains centered uniform 4:3 content dimensions across widescreen and portrait output."
+      },
+      {
+        "id": "menu-safe-legacy-ownership",
+        "category": "fallback_regression",
+        "behavior_area": "Desktop gameplay and unrelated UI producer isolation",
+        "expected_behavior": "Both-vector original path and non-menu, nil-vector or nonfinite input use prior output semantics, with input pointers unmodified."
+      },
+      {
+        "id": "menu-exact-windows-ci",
+        "category": "integrated_validation",
+        "behavior_area": "R84 Win32 main DLL and R26_SAFE rollback, x64 host, package and domain gate",
+        "expected_behavior": "All mandatory GitHub exact-SHA automation gates pass without CI skipping; matching Quest3 optics remain UNTESTED."
+      }
+    ]
+  },
+  "source_parent_sha": "423cc0e32bc958f825bd129a1316f212c35b6cff",
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "tools/verify_vr_ui_matrix_safety.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00880.json"
+  ],
+  "status": "BUILD_PENDING",
+  "phase": "C2_IMPLEMENT",
+  "checkpoint": "C2_MATERIAL_RESULT",
+  "automation_validation": "PENDING",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "acceptance_results": {
+    "menu-optional-vector-aspect": "SOURCE_REGRESSION_PENDING_CI",
+    "menu-safe-legacy-ownership": "NEGATIVE_MUTATION_PENDING_CI",
+    "menu-exact-windows-ci": "PENDING"
+  },
+  "score_once": false,
+  "score_delta_this_attempt": 0,
+  "hold_reason": "EXACT_SHA_CI_PENDING",
+  "material_result_sha": null,
+  "validation_bearing_result_sha": null,
+  "diagnosis": {
+    "original_evidence": "The current original D3DXMatrixTransformation2D_dest requires pScaling && pTranslation before any source-aspect correction; the D3DX API permits these pointers to be optional independently.",
+    "root_cause": "Partial optional native menu matrix inputs skip 4:3 containment and inherit game widescreen anisotropy or off-center translation, unlike the existing two-vector path.",
+    "source_trace": [
+      "menu/car-select original D3DX transform vector options",
+      "UI scaling hook staged geometry before game DrawPrimitiveUP",
+      "R84 stereo renderer and host menu plane receive the resulting transformed sprite"
+    ],
+    "alternatives_rejected": [
+      "Do not crop captured 21:9 car-selection content indiscriminately or stretch X/Y separately; do not broaden to GOAL/ESC/F11 gameplay."
+    ],
+    "fix_evidence": "Constrain correction to title/menu/car-select and synthesize absent identity vector before transactional aspect containment, retaining existing complete-vector path.",
+    "negative_test_evidence": "Targeted Python source/mutation and numerical fixtures cover two independent optional vectors, five state/guard mutations, widescreen, portrait and source defaults.",
+    "eye_ownership": "The original 2D sprite coordinates change only before R84 physical stereo handling; exact per-eye renderer/hmd optical acceptance remains separate."
+  },
+  "ci_evidence": {
+    "status": "PENDING",
+    "exact_sha": null
+  },
+  "runtime_evidence": "No Quest3/VDXR HMD session performed."
+}

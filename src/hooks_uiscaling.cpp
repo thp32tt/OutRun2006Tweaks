@@ -278,6 +278,65 @@ class UIScaling : public Hook
 			}
 		}
 
+
+        // D3DX accepts independent nullable scale/translation vectors.
+        // The full-vector path above is deliberately unchanged. In title/menu
+        // and car selection, one absent vector used to bypass 4:3 containment
+        // entirely: preserve the supplied input, treat the missing one as the
+        // documented identity (scale=1, translation=0), then stage BOTH output
+        // vectors so only these partial front-end draws gain containment.
+        // Never widen this path into gameplay HUD, GOAL/+TIME, F11 or pause.
+        const bool partialFrontEndMenu = Game::current_mode &&
+            (*Game::current_mode == GameState::STATE_TITLE ||
+             *Game::current_mode == GameState::STATE_MENU ||
+             *Game::current_mode == GameState::STATE_SELECTOR ||
+             *Game::current_mode == GameState::STATE_SELEXIT ||
+             *Game::current_mode == GameState::STATE_SELRESET);
+        if (partialFrontEndMenu &&
+            (mode == ScalingMode::KeepCentered ||
+             mode == ScalingMode::OnlineArcade) &&
+            ((pScaling == nullptr) != (pTranslation == nullptr)) &&
+            Game::screen_scale && Game::screen_resolution)
+        {
+            const float sourceSx = Game::screen_scale->x;
+            const float sourceSy = Game::screen_scale->y;
+            const float srcWidth = Game::original_resolution.x;
+            const float srcHeight = Game::original_resolution.y;
+            const float dstWidth = Game::screen_resolution->x;
+            const float dstHeight = Game::screen_resolution->y;
+            const float inputSx = pScaling ? pScaling->x : 1.0f;
+            const float inputSy = pScaling ? pScaling->y : 1.0f;
+            const float inputTx = pTranslation ? pTranslation->x : 0.0f;
+            const float inputTy = pTranslation ? pTranslation->y : 0.0f;
+            if (std::isfinite(sourceSx) && std::isfinite(sourceSy) &&
+                sourceSx > 1.0e-6f && sourceSy > 1.0e-6f &&
+                std::isfinite(srcWidth) && std::isfinite(srcHeight) &&
+                srcWidth > 0.0f && srcHeight > 0.0f &&
+                std::isfinite(dstWidth) && std::isfinite(dstHeight) &&
+                dstWidth > 0.0f && dstHeight > 0.0f &&
+                std::isfinite(inputSx) && std::isfinite(inputSy) &&
+                std::isfinite(inputTx) && std::isfinite(inputTy))
+            {
+                const float contain = (std::min)(sourceSx, sourceSy);
+                const float nextSx = inputSx / sourceSx * contain;
+                const float nextSy = inputSy / sourceSy * contain;
+                const float nextTx = CenterMultiSpriteAxis(
+                    inputTx, sourceSx, contain, dstWidth, srcWidth);
+                const float nextTy = CenterMultiSpriteAxis(
+                    inputTy, sourceSy, contain, dstHeight, srcHeight);
+                if (std::isfinite(nextSx) && std::isfinite(nextSy) &&
+                    std::isfinite(nextTx) && std::isfinite(nextTy))
+                {
+                    localScaling.x = nextSx;
+                    localScaling.y = nextSy;
+                    localTranslation.x = nextTx;
+                    localTranslation.y = nextTy;
+                    forwardedScaling = &localScaling;
+                    forwardedTranslation = &localTranslation;
+                }
+            }
+        }
+
 		return D3DXMatrixTransformation2D.stdcall<int>(pOut, pScalingCenter, pScalingRotation,
 			forwardedScaling, pRotationCenter, Rotation, forwardedTranslation);
 	}
