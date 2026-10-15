@@ -39,7 +39,11 @@ def verify(text):
         (loader,"dynamicTexture && mipLevel == 0","only dynamic top mip discards"),
         (loader,"? D3DLOCK_DISCARD : 0;","MANAGED static lock uses zero flags"),
         (loader,"LockRect(mipLevel, &lockedRect, nullptr, lockFlags)","safe lock flag passed"),
-        (loader,"static_cast<size_t>(lockedRect.Pitch) < rowBytes","pitch bounded"),
+        (loader,"static_cast<size_t>(lockedRect.Pitch) < destinationRowBytes","pitch bounded against actual destination bytes"),
+        (loader,"const size_t destinationRowBytes = format_orig == D3DFMT_R8G8B8","24-bit source computes 32-bit GPU destination pitch"),
+        (loader,"? static_cast<size_t>(mipWidth) * 4u : rowBytes","opaque RGB24 destination expands to four bytes"),
+        (loader,"format_present = D3DFMT_X8R8G8B8;","RGB24 uses supported opaque D3D9 texture format"),
+        (loader,"std::memcpy(dstRow + static_cast<size_t>(x) * 4u","per-pixel BGR24 conversion uses destination pitch"),
         (loader,"srcRow = srcData + static_cast<size_t>(row) * sourceRowPitch","file-pitched source row"),
         (loader,"dstRow = dest + static_cast<size_t>(row) * dstPitch","destination pitched row"),
         (loader,"(header->data.dwFlags & DDSD_PITCH) != 0","DDS pitched source detected"),
@@ -62,6 +66,11 @@ def verify(text):
         (handle,"file && size >= sizeof(DDS_FILE)","replacement header bounds"),
         (handle,"firstMipSize <= size - sizeof(DDS_FILE)","replacement first mip source bounds"),
     ]
+    # Both 24-bit opaque BGR rows and 32-bit XRGB must preserve their own
+    # row pitch, channel order and explicit opaque target format.
+    if ("static_assert(OpaqueBgr24Pixel(0x11, 0x22, 0x33) == 0xFF332211u" not in text or
+            "static_assert(OpaqueBgr24Pixel(0x00, 0x00, 0x00) == 0xFF000000u" not in text):
+        raise ValueError("24-bit BGR channel mapping / opaque alpha regression removed")
     # Car-selection DDS commonly uses 32-bit opaque RGB (no alpha mask).
     # It must be recognized without treating transparent A8 textures as X8.
     # X8B8 and A8B8 both need the same per-mip byte-order fix, but with
@@ -253,7 +262,11 @@ def negatives(text):
         "Height != D3DX_DEFAULT && Height != header->data.dwHeight",
         "dynamicTexture && mipLevel == 0",
         "LockRect(mipLevel, &lockedRect, nullptr, lockFlags)",
-        "static_cast<size_t>(lockedRect.Pitch) < rowBytes",
+        "static_cast<size_t>(lockedRect.Pitch) < destinationRowBytes",
+        "const size_t destinationRowBytes = format_orig == D3DFMT_R8G8B8",
+        "? static_cast<size_t>(mipWidth) * 4u : rowBytes",
+        "format_present = D3DFMT_X8R8G8B8;",
+        "std::memcpy(dstRow + static_cast<size_t>(x) * 4u",
         "srcRow = srcData + static_cast<size_t>(row) * sourceRowPitch",
         "*pSrcDataSize < sizeof(DDS_FILE)",
         "!header->data.dwWidth || !header->data.dwHeight",

@@ -11,6 +11,8 @@
 #include <unordered_set>
 #include <array>
 #include <climits>
+#include <cstdint>
+#include <cstring>
 #include <new>
 #include <memory>
 #include <intrin.h>

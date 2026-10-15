@@ -1,0 +1,100 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00910",
+  "production_id": "CONVERSION-DX9EX-00910",
+  "event_id": "CONVERSION-DX9EX-00910-E001",
+  "event_type": "dispatch",
+  "attempt": "1/3",
+  "run_key": "CONVERSION-DX9EX-00910",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+  "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "NEEDS_VALIDATION",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "C3_CI_PENDING",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "82e28877640afc96f011210d7b607334d75dd3dc",
+  "material_result_sha": "184a74c069401a67c2f0f01192985e017b5942d5",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "src/hooks_textures.cpp"
+  ],
+  "changed_files": [
+    "src/hooks_textures.cpp",
+    "tools/verify_vr_hud_dds_loader.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00910.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:VEHICLE_SELECT",
+    "symptom_id": "DX9EX:SYMPTOM:VEHICLE_SELECT",
+    "goal": "Preserve the complete visible car-selector and frontend menu texture upload for original opaque 24-bit BGR DDS images, including correct color and opacity across all mip levels and padded source rows, without affecting other alpha textures or the original fallback renderer.",
+    "scope_boundary": "Only shared game D3D9 fast UI DDS loader in src/hooks_textures.cpp and its targeted regression. No R84 world/eye stereo reprojection, GOAL, +TIME, lens, normal UI layout, original game input, FFB, SkyGlow, R26_SAFE rollback, DX11 or frozen DXVK source modification.",
+    "trace_stages": [
+      "Original UI DDS 24-bit RGB bitmasks map packed BGR pixels and possibly padded DDSD_PITCH rows to D3DFMT_R8G8B8 in GetD3DFormatFromPixelFormat.",
+      "Fast D3DXCreateTextureFromFileInMemoryEx_Custom previously requested a D3D9 R8G8B8 surface and assumed source/destination row byte count identity even though supported opaque GPU storage is X8R8G8B8.",
+      "Transform every original BGR24 texel and mip row to native X8R8G8B8 with explicit 0xFF opaque high byte before game sprite Draw; preserve original D3DX retry when CreateTexture or preflight fails and let existing R84 per-eye UI composition operate unchanged."
+    ],
+    "subcomponents": [
+      "Convert genuine 24-bit DDS data into supported opaque X8R8G8B8 surface with correct BGR ordering and explicit nontransparent high byte, including each mip level.",
+      "Separate padded three-byte source row pitch from expanded four-byte GPU row size; validate the destination LockRect pitch while retaining source payload preflight and original-D3DX fallback, and extend targeted negative regression guards."
+    ],
+    "acceptance_items": [
+      {
+        "id": "selector_opaque_color",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original vehicle-select/menu RGB24 DDS through D3D9 GPU texture creation and sprite draw",
+        "expected_behavior": "24-bit source BGR triples convert into X8R8G8B8 pixels with preserved B/G/R and fully opaque X byte on every packed or padded mip row, avoiding an unsupported 24-bit D3D texture upload."
+      },
+      {
+        "id": "dds_fallback_and_isolation",
+        "category": "fallback_regression",
+        "behavior_area": "Existing D3D9 A8/X8 textures, original DDS replacement retry and R84 optical/input boundaries",
+        "expected_behavior": "RGBA and existing 32-bit opaque swizzle remain byte-for-byte unchanged; malformed, truncated, unsupported or pitch-invalid DDS still defer to original D3DX and no global sampler, stereo, FFB, input or SkyGlow changes occur."
+      },
+      {
+        "id": "exact_sha_game_gate",
+        "category": "integrated_validation",
+        "behavior_area": "Exact SHA Win32 R84 game loader, fallback x86, x64 OpenXR host, Active package, HUD and source domain workflows",
+        "expected_behavior": "The validation-bearing final SHA passes mandatory DX9Ex Active policy/game/host/full-chain/package, Domain Isolation, HUD Inspector and Full Source Impact; real Quest3 screenshot acceptance remains untested."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "selector_opaque_color": "SOURCE_ASSERTS_PRESENT",
+    "dds_fallback_and_isolation": "SOURCE_ISOLATION_REVIEWED",
+    "exact_sha_game_gate": "PENDING"
+  },
+  "diagnosis": {
+    "root_cause": "GetD3DFormatFromPixelFormat recognizes 24-bit R8G8B8 DDS, but the fast loader forwarded this format directly to D3D9 CreateTexture and used packed source 3-byte row size to validate destination LockRect stride rather than converting to a widely supported 32-bit opaque texture.",
+    "source_trace": [
+      "DDS input accepts R8G8B8 masks and computes three bytes per source pixel.",
+      "Fast loader previously preserved format_orig as format_present except A8B8G8R8/X8B8G8R8 swizzle, so R8G8B8 allocated three-byte GPU target or failed.",
+      "New fast path allocates X8R8G8B8 and converts each pitched source row to four-byte opaque GPU rows for all mip levels."
+    ],
+    "alternatives_rejected": [
+      "Globally treating 24-bit RGB as A8 alpha-bearing changes opaque sprites and can create incorrect transparency.",
+      "Changing the R84 stereo owner or menu aspect would not fix an unsupported source DDS pixel format at texture upload.",
+      "Global packed memory copy violates DDSD_PITCH and D3D LockRect row-stride contracts."
+    ],
+    "fix_evidence": "Source code expands BGR24 to native X8R8G8B8 with constexpr asserted channel and alpha identity, checks GPU destination pitch and preserves source pitch, existing A8/X8 swizzle and original D3DX retry.",
+    "negative_test_evidence": "Existing HUD DDS loader self-test includes deliberate mutated source/pitch/fallback checks; extended guard checks for RG24 to X8 destination, output row size and conversion write; exact CI pending.",
+    "eye_ownership": "Only game-owned texture data changes before Draw; R84 screen HUD stereo eye routing, host compositor, head pose and presentation are untouched."
+  },
+  "ci_evidence": {
+    "initial_material_sha": "184a74c069401a67c2f0f01192985e017b5942d5",
+    "initial_active_run_id": 38779907530,
+    "initial_policy_failure": "Missing 00910 feature run JSON",
+    "initial_hud_failure": "DDS regression probe pinned destination pitch to source rowBytes despite expanded 24-bit output",
+    "repair": "Added exact task feature contract and updated target verifier to insist on actual destinationRowBytes plus RGB24 conversion checks; required workflows unchanged.",
+    "validation_bearing_result_sha": null,
+    "status": "PENDING_EXACT_SHA"
+  },
+  "runtime_evidence": "Quest3/VDXR and original car-selection screen not run in this environment; no claim that white selection textures or HUD artifacts are fixed.",
+  "score_delta_this_attempt": 0,
+  "score_once": false,
+  "hold_reason": "Awaiting exact-SHA mandatory CI; Quest3/VDXR optical verification separately pending."
+}
