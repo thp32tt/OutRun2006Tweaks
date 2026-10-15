@@ -38,7 +38,9 @@ def integrated(r,b,h,p):
             linear.find("observe_empty_game_draw(game, type);") <
             linear.find("game_native_primitive_element_count(") and
             "observe(game, type, 0u, nullptr, 0u, 0u, nullptr, 0u);" in zero and
-            "s.frameBatch.absorb_empty_source_draw(sourceOrdinal)" in source and
+            ("s.frameBatch.absorb_empty_source_draw(" in source and
+             "sourceOrdinal, sameSourceFullClear))" in source and
+             "s.clearColor.sourceDevice ==" in source) and
             "live_game_frame::observe_failed_game_draw(device)" in complete and
             hooks.count("R30CompleteNativeGameSource(device,")>=4 and
             "live_game_frame::observe_linear(" in hooks)
