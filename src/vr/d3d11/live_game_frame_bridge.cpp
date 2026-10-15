@@ -3444,6 +3444,15 @@ bool translate_vertices(const void* input, UINT count, UINT stride,
         // TEXCOORDSIZE1(0..7) U-only streams get V=0; later UV sets
         // retain packed game byte offsets through native Draw/DrawIndexed.
         // TEX2..8 select UV1..7 from game bytes; absent slots fail closed.
+        // An inactive stage-0 texture still uses the full game FVF stride,
+        // but does not consume any TEXn coordinates. The same vertex upload
+        // storage is reused across Draw and DrawIndexed within a frame: zero
+        // unused native UVs instead of inheriting stale values from a prior
+        // textured game draw. Malformed or NaN unused UVs never become samples.
+        if (!capture.enabled) {
+            output[i].uv[0] = 0.0f;
+            output[i].uv[1] = 0.0f;
+        }
         if (capture.enabled &&
             !game_fvf_select_uv(decoded, layout, capture.coordIndex, output[i].uv))
             return false;

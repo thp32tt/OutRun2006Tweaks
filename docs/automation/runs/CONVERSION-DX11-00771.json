@@ -2,9 +2,9 @@
   "schema_version": 3,
   "task_id": "CONVERSION-DX11-00771",
   "production_id": "CONVERSION-DX11-00771",
-  "event_id": "CONVERSION-DX11-00771-E001",
-  "event_type": "dispatch",
-  "attempt": 1,
+  "event_id": "CONVERSION-DX11-00771-E003",
+  "event_type": "retry",
+  "attempt": 2,
   "lane": "DX11",
   "target_branch": "vr-dx11-native-r71",
   "owner_id": "AI2-ChatGPT2",
@@ -70,19 +70,38 @@
       "live_game_fvf_layout.hpp",
       "DX11 Fast portable C++ and destructive linkage gate"
     ],
-    "full_gate_plan": "one_validation_bearing_sha"
+    "full_gate_plan": "one_validation_bearing_sha",
+    "acceptance_proof": {
+      "positive_probe": "00771 portable C++ verifies live FVF TEX1..8 diffuse-only stage and stale NaN UV byte offsets; source integration proves D3D9 Draw/DrawIndexed -> native vertex upload -> untextured PS -> full frame Present with reused UV slots zeroed.",
+      "negative_regression": "Active texture operands, active stage1, missing diffuse, invalid stage combiner, source mirror failures and unsupported states return to original D3D9 Draw/Present with unchanged gamepad; destructive source rewrites fail 00771 regression.",
+      "component_integration": "Live D3D9 fixed-function stage and FVF -> safely bypass inactive texture mirror -> D3D11 VS/PS real Draw/Indexed geometry -> native full-resolution same Present, opt-in and DX9Ex/input fallback."
+    },
+    "conflict_keys": [
+      "DX11:REAL_GAME_DIFFUSE_ONLY_TEXTURE_BYPASS"
+    ],
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "D3D11_NATIVE_DRAW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Source-level exact full-frame Draw/Indexed and same-Present integration with portable C++ positive/negative tests and mandatory five-Gate exact-SHA build; actual menu/race/HMD/gamepad frame output remains UNTESTED.",
+    "activation_guard_and_fallback": "Native full-frame remains explicitly opt-in, NativeDrawPathActive not promoted; unsupported stage0/stage1, invalid FVF and texture-dependent game output retain original D3D9 Draw, Present and gamepad."
   },
   "pipeline": {
     "C0_RECOVER": "Read GitHub head, policy, 00770 C6 and real source code; confirmed 00770 complete.",
     "C1_REVIEW": "Found TEX1..8/FVF with disabled or diffuse-only fixed-function stage 0 was incorrectly forced through texture mirror and rejected even when D3D9 bound texture was stale.",
     "C2_IMPLEMENT": "Branched live Draw capture to diffuse-only path; preserved full FVF geometry and native untextured PS with strict stage1/input fallback; added C++ and integration tests.",
-    "C3_VALIDATE": "PENDING_GITHUB_EXACT_SHA",
-    "C4_COMMIT": "PENDING_GITHUB_RESULT",
+    "C3_VALIDATE": "Previous Backend Conversion Gate run 38728470674 failed only missing required strategy acceptance metadata; corrected for new exact-SHA gate. Portable 00771 C++ added nonfinite unused-UV geometry probe; subsequent GitHub compile/Gates pending.",
+    "C4_COMMIT": "Material repair of live Draw/Indexed inactive TEXn UV reuse, C++ positive/negative source regression, and acceptance metadata; await new exact result SHA.",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_GATE"
   },
   "evidence": {
-    "runtime": "No actual game, gamepad, Quest3 or VDXR test performed. No runtime promotion."
+    "runtime": "No actual game, gamepad, Quest3 or VDXR test performed. No runtime promotion.",
+    "prior_failed_gate_run_id": 38728470674,
+    "prior_failed_gate_cause": "Integration-first acceptance metadata omitted acceptance_proof, conflict_keys, live_game_draw_path, visible_frame_acceptance, activation_guard_and_fallback."
   },
   "base_head_sha": "eb49822662d4b06a92e3ab38b9561fcc212b49bf"
 }

@@ -29,6 +29,18 @@ def joined(b):
         "s.frameBatch.record_source_draw(sourceOrdinal);" in draw,
     ))
 assert joined(bridge), "real-game source/geometry/shader/Draw/Indexed continuity disconnected"
+# The live full-frame vertex upload buffer is reused between sampled and
+# inactive TEXn Draws. Verify the unsampled shader's UVs cannot inherit the
+# previous textured draw's coordinates (nor malformed unused source UVs).
+decode=bridge.split("bool translate_vertices(",1)[1].split("bool mirror_texture(",1)[0]
+uv_zero='''if (!capture.enabled) {
+            output[i].uv[0] = 0.0f;
+            output[i].uv[1] = 0.0f;
+        }'''
+assert uv_zero in decode, "inactive texture must zero reused native UV registers"
+assert decode.index(uv_zero) < decode.index("output[i].uvStage1[0] = output[i].uv[0]"), "stage1 initialized from a stale UV"
+assert uv_zero not in decode.replace(uv_zero,"",1)
+
 assert "python tools/test_dx11_inactive_texture_game_frame_00771.py" in workflow
 for old, replacement in (
     ("capture.enabled = layout.textured && !diffuseOnly;",

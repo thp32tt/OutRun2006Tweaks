@@ -1,6 +1,8 @@
 // Real OutRun TEX1..8 menu/vehicle/race diffuse-only stage with a stale
 // D3D9 texture: use the same native Draw/Indexed geometry, not a texture SRV.
 #include "../src/vr/d3d11/live_game_fvf_layout.hpp"
+#include <limits>
+#include <cmath>
 using namespace outrun::vr::dx11::live_game_frame;
 constexpr bool bypass(unsigned op,unsigned a1,unsigned a2,unsigned ao,
                       unsigned aa1,unsigned aa2,unsigned next,bool diff=true) {
@@ -26,5 +28,22 @@ int main() {
     if (!game_fvf_layout(kGameFvfXyzRhw | kGameFvfTex1,noDiffuse)
         || noDiffuse.hasDiffuse || bypass(1,0,0,1,0,0,1,noDiffuse.hasDiffuse))
         return 3;
+
+    // Draw->Indexed continuation: an inactive TEX1 stage must not read
+    // nonfinite unused UVs as color or move the source DIFFUSE offset.
+    // The native bridge zeros unsampled UV registers before GPU submission.
+    std::uint8_t vertex[28]{};
+    const float xyzw[4] = {12.f, 20.f, 0.5f, 1.f};
+    const std::uint32_t color = 0xaabbccddU;
+    const float staleUv[2] = {std::numeric_limits<float>::quiet_NaN(), 8.f};
+    std::memcpy(vertex, xyzw, sizeof(xyzw));
+    std::memcpy(vertex + menu.diffuseOffset, &color, sizeof(color));
+    std::memcpy(vertex + menu.texcoordOffset, staleUv, sizeof(staleUv));
+    GameFvfSample source{};
+    if (!game_fvf_decode_vertex(vertex, sizeof(vertex), menu, source) ||
+        source.diffuse != color || !std::isnan(source.uv[0]))
+        return 4;
+    if (!bypass(2, 0u, 2u, 2, 1u, 2u, 1u))
+        return 5; // inactive TEXn still selects native diffuse-only PS
     return 0;
 }
