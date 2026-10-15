@@ -11,15 +11,15 @@
   "feature_id": "DX9EX:VIS:LENS_FLARE_CENTRE",
   "symptom_id": "DX9EX:SYMPTOM:LENS_FLARE_CENTRE",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
-  "phase": "C3_VALIDATE",
-  "checkpoint": "EXACT_SHA_CI_PENDING",
-  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "3e84cbfba188c0728c806b4d542318a7410ad230",
   "material_result_sha": "a536c7cd0f0fc53fe6956c4d2dd41abd02f60697",
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "c573a937a91fd3caf91e75a4be6d0cc7de1fae6d",
   "source_paths": [
     "src/vr/d3d9/lens_centre_source_provenance.hpp",
     "src/vr/d3d9/stereo_renderer_r33.cpp"
@@ -66,9 +66,9 @@
     ]
   },
   "acceptance_results": {
-    "centre_source_fallback": "PENDING_EXACT_SHA_CI",
-    "world_and_halo_isolation": "PENDING_EXACT_SHA_CI",
-    "exact_sha_integration": "PENDING_EXACT_SHA_CI"
+    "centre_source_fallback": "PASS_BUILD",
+    "world_and_halo_isolation": "PASS_BUILD",
+    "exact_sha_integration": "PASS_EXACT_SHA"
   },
   "diagnosis": {
     "original_evidence": "R30ClassifyScreenSpacePass returns None for the exact direct C993 centre when original-game raw WVP proof is absent, but R33Dispatch previously branches to R33TryFastWorld on all R30 None results before trying lower R29.",
@@ -83,16 +83,64 @@
       "Increasing c64 freshness window does not prove the write belonged to the same source call or pose."
     ],
     "fix_evidence": "Exact central source and R30 stereo classification now prevent both unproven and unhandled C993 draws from passing into generic world or lower R29; bounded original draw path and static+portable route regressions added.",
-    "negative_test_evidence": "Positive cases preserve exact source when evidence is absent or stereo unhandled; negative cases leave CABE/unrelated world alone and allow successfully handled exact centre to follow existing per-eye implementation."
+    "negative_test_evidence": "Positive cases preserve exact source when evidence is absent or stereo unhandled; negative cases leave CABE/unrelated world alone and allow successfully handled exact centre to follow existing per-eye implementation.",
+    "eye_ownership": "R30 accepts exact source-owned game WVP for the direct C993 centre; R33 owns the physical left and right submissions only when exact stereo is handled. Otherwise one original game draw is preserved instead of using unowned cached per-eye world WVP."
   },
   "ci_evidence": {
     "initial_material_sha": "a536c7cd0f0fc53fe6956c4d2dd41abd02f60697",
     "initial_active_run_id": 38772022114,
-    "initial_failure": "Missing exact-head run record in policy Gate; game/host/full-chain/package skipped, not a C++ compiler failure.",
-    "repair": "Add required task feature record for same source result; no weakening of checks.",
-    "status": "PENDING"
+    "initial_failure": "Missing exact-HEAD run JSON caused policy gate failure before game/host/compile/package; source not implicated.",
+    "repair": "Required feature run record added on same 00908 task without CI-skip or weakening checks.",
+    "validation_bearing_result_sha": "c573a937a91fd3caf91e75a4be6d0cc7de1fae6d",
+    "status": "PASS_EXACT_SHA",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ],
+    "exact_sha_gate_runs": [
+      {
+        "name": "DX9Ex Active Validation",
+        "sha": "c573a937a91fd3caf91e75a4be6d0cc7de1fae6d",
+        "run_id": 38772271880,
+        "conclusion": "success",
+        "jobs": "policy,game,host,full-chain-compile,package 5/5"
+      },
+      {
+        "name": "Domain Isolation Guard",
+        "sha": "c573a937a91fd3caf91e75a4be6d0cc7de1fae6d",
+        "run_id": 38772271658,
+        "conclusion": "success",
+        "jobs": "1/1"
+      },
+      {
+        "name": "DX9Ex Full Source Impact Review",
+        "sha": "c573a937a91fd3caf91e75a4be6d0cc7de1fae6d",
+        "run_id": 38772271617,
+        "conclusion": "success",
+        "jobs": "source-cross-domain,msvc-analyze-openxr-host,msvc-analyze-active-game 3/3"
+      },
+      {
+        "name": "OutRun EXE HUD Inspector CI",
+        "sha": "c573a937a91fd3caf91e75a4be6d0cc7de1fae6d",
+        "run_id": 38772271739,
+        "conclusion": "success",
+        "jobs": "validate,build-hud-inspector 2/2"
+      }
+    ],
+    "score_once": true
   },
   "runtime_evidence": "No physical Quest3/VDXR test performed. Binocular optics, central dot depth and FPS not established.",
-  "score_delta_this_attempt": 0,
-  "score_once": false
+  "score_delta_this_attempt": 1,
+  "score_once": true,
+  "hold_reason": "NEED_HMD_TEST: Quest3/VDXR binocular centre-dot, world attachment and FPS have not been tested on the exact SHA.",
+  "scoreboard": {
+    "repository": "thp32tt/ai-dev-lab",
+    "file": "AI_SCOREBOARD.md",
+    "commit_sha": "ecef040c941c993a1c869e759f64fd1d1f041f84",
+    "previous_ai2_score": 1385,
+    "delta": 1,
+    "new_ai2_score": 1386
+  }
 }
