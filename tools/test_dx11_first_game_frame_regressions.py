@@ -79,6 +79,31 @@ def main() -> None:
                     success not in section or
                     section.index("nativeSource.forwarded = true;") > section.index(success)):
                 return False
+            # 00756: the live VB/IB/IndexedUP paths now have a separate
+            # zero-primitive forwarding branch *before* CPU shadow capture.
+            # The original nonzero-path forwarding remains mandatory. The
+            # destructive mutation below removes the first forwarding token;
+            # it must still fail by testing the zero branch explicitly.
+            if "live::observe_empty_game_draw(device, topology);" in section:
+                empty_start = section.find("if (primitiveCount == 0u &&")
+                empty_end = section.find(
+                    "live::observe_empty_game_draw(device, topology);", empty_start)
+                if (empty_start < 0 or empty_end < 0 or
+                        "nativeSource.forwarded = true;" not in
+                        section[empty_start:empty_end]):
+                    return False
+                # A zero-only forwarding guard must not mask the original
+                # successful CPU shadow capture. Validate both branches.
+                required_nonempty = (
+                    "if (valid) nativeSource.forwarded = true;"
+                    if "R30ObserveNativeLinearVB(" in section
+                    else "if (ok) nativeSource.forwarded = true;"
+                    if "R30ObserveNativeIndexedVB(" in section
+                    else "nativeSource.forwarded = true;"
+                )
+                if required_nonempty not in section[empty_end:] or (
+                    section.count("nativeSource.forwarded = true;") < 2):
+                    return False
         return True
 
     for renderer in RENDERERS:
