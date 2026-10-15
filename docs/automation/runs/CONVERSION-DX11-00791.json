@@ -80,6 +80,7 @@
     ],
     "full_gate_plan": "one_validation_bearing_sha",
     "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
       "LIVE_D3D9_COLORFILL",
       "D3D11_NATIVE_RTV_CLEAR",
       "D3D11_NATIVE_DRAW",
