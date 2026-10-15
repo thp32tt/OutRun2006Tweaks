@@ -54,6 +54,24 @@ struct GameNativeOffscreenPass {
         bool maskKnown, std::uint32_t writeMask) noexcept {
         return maskKnown && writeMask == 0u;
     }
+    // A bound game MRT may write during a vehicle/menu render-to-texture pass
+    // without modifying the seeded main frame, but only when its actual
+    // IUnknown surface identity is distinct from the main backbuffer.
+    // A disabled color mask is independently sufficient for Draws, never Clear.
+    [[nodiscard]] static constexpr bool distinct_auxiliary_mrt(
+        std::uintptr_t bound, std::uintptr_t mainBackbuffer) noexcept {
+        return bound != 0u && mainBackbuffer != 0u &&
+            bound != mainBackbuffer;
+    }
+    // A writable stencil mask on a game offscreen Draw is safe only when
+    // the bound Z/stencil surface has a proven identity distinct from the
+    // canonical main depth surface. Unknown write masks always fail closed.
+    [[nodiscard]] static constexpr bool isolated_auxiliary_stencil_write(
+        bool stencilEnabled, bool maskKnown, std::uint32_t writeMask,
+        bool provenAuxiliaryDepth) noexcept {
+        return stencilEnabled && maskKnown && writeMask != 0u &&
+            provenAuxiliaryDepth;
+    }
     [[nodiscard]] static constexpr bool source_has_no_main_writes(
         bool fullMode, bool wholeBackbufferSeeded, bool targetIsOffscreen,
         bool noMainDepthWrites, bool stencilDisabled, bool noExtraRenderTargets,

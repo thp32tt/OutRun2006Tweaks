@@ -173,6 +173,8 @@ jobs:
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_auxiliary_depth_draw_00778.cpp -o /tmp/dx11_aux_depth_00778 && /tmp/dx11_aux_depth_00778
           python tools/test_dx11_offscreen_masked_mrt_stencil_00779.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_offscreen_masked_mrt_stencil_00779.cpp -o /tmp/dx11_offscreen_00779 && /tmp/dx11_offscreen_00779
+          python tools/test_dx11_auxiliary_mrt_stencil_game_frame_00780.py
+          g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_auxiliary_mrt_stencil_game_frame_00780.cpp -o /tmp/dx11_aux_mrt_stencil_00780 && /tmp/dx11_aux_mrt_stencil_00780
           python tools/test_dx11_game_clipped_draw_00764.py
           g++ -std=c++17 -O2 -Wall -Wextra -Werror -pedantic tools/dx11_game_clipped_draw_00764.cpp -o /tmp/dx11_clipped_game_00764 && /tmp/dx11_clipped_game_00764
           python tools/test_dx11_full_game_masked_draw_00763.py

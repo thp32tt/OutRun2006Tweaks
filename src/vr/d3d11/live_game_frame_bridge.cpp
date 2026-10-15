@@ -4888,8 +4888,19 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, State& s) noexcept {
         const bool maskKnown = SUCCEEDED(hr) && extra &&
             SUCCEEDED(game->GetRenderState(extraColorMasks[i - 1u], &mask));
         if (!GameNativeOffscreenPass::inactive_extra_mrt(maskKnown, mask)) {
-            noExtraRenderTargets = false;
-            break;
+            // A live, writable MRT can be part of the game's own auxiliary
+            // menu/vehicle texture pass. Preserve main-frame source ordinals
+            // only after proving that THIS surface cannot alias main RT0.
+            ComPtr<IUnknown> extraIdentity;
+            const bool distinctExtra = SUCCEEDED(hr) && extra &&
+                SUCCEEDED(extra.As(&extraIdentity)) && extraIdentity &&
+                GameNativeOffscreenPass::distinct_auxiliary_mrt(
+                    reinterpret_cast<std::uintptr_t>(extraIdentity.Get()),
+                    reinterpret_cast<std::uintptr_t>(backbufferIdentity.Get()));
+            if (!distinctExtra) {
+                noExtraRenderTargets = false;
+                break;
+            }
         }
     }
     // A real game menu/vehicle render-to-texture Draw can write its OWN Z
@@ -4897,8 +4908,10 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, State& s) noexcept {
     // both COM identities before absorbing the original source ordinal:
     // matching/unknown main Z must still abort native full-frame output.
     const bool depthWrites = zEnabled != D3DZB_FALSE && zWriteEnabled != FALSE;
+    const bool stencilWrites = stencilEnabled != FALSE && stencilWriteMask != 0u;
     bool isolatedDepthWrite = false;
-    if (depthWrites && s.clearColor.mainDepthIdentity != 0u) {
+    if ((depthWrites && s.clearColor.mainDepthIdentity != 0u) ||
+        (stencilWrites && s.clearColor.mainDepthIdentity != 0u)) {
         ComPtr<IDirect3DSurface9> boundDepth;
         ComPtr<IUnknown> depthIdentity;
         if (SUCCEEDED(game->GetDepthStencilSurface(boundDepth.GetAddressOf())) &&
@@ -4912,13 +4925,18 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, State& s) noexcept {
         targetIdentity.Get() != backbufferIdentity.Get(),
         GameNativeOffscreenPass::no_main_depth_write(
             zEnabled != D3DZB_FALSE, zWriteEnabled != FALSE, isolatedDepthWrite),
-        GameNativeOffscreenPass::no_main_stencil_write(
-            stencilEnabled != FALSE, stencilMaskKnown, stencilWriteMask),
+        (GameNativeOffscreenPass::no_main_stencil_write(
+            stencilEnabled != FALSE, stencilMaskKnown, stencilWriteMask) ||
+         GameNativeOffscreenPass::isolated_auxiliary_stencil_write(
+            stencilEnabled != FALSE, stencilMaskKnown, stencilWriteMask,
+            isolatedDepthWrite)),
         noExtraRenderTargets, s.frameBatch.stopped);
     // The original D3D9 Draw has now changed the auxiliary Z surface. A
     // subsequent backbuffer depth Draw must rebind the seeded MAIN depth
     // identity, not reuse the auxiliary depth history as the native DSV.
     if (isolated && depthWrites && isolatedDepthWrite)
+        s.clearColor.note_auxiliary_depth_write();
+    if (isolated && stencilWrites && isolatedDepthWrite)
         s.clearColor.note_auxiliary_depth_write();
     return isolated;
 }
@@ -5334,12 +5352,22 @@ bool preserve_offscreen_color_only_clear(IDirect3DDevice9* game,
         if (FAILED(game->GetDeviceCaps(&caps)) ||
             !GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs))
             return false;
-        for (DWORD slot = 1u; slot < caps.NumSimultaneousRTs; ++slot) {
-            ComPtr<IDirect3DSurface9> extra;
-            // A TARGET Clear affects any bound extra MRT, which may alias
-            // the main backbuffer. Unproved slots must not be skipped.
-            if (game->GetRenderTarget(slot, extra.GetAddressOf()) !=
-                D3DERR_NOTFOUND) return false;
+        // D3DCLEAR_TARGET ignores COLORWRITEENABLEn: a bound MRT must be
+        // proven independent of the seeded main backbuffer, even when its
+        // color mask is zero. Z/stencil-only Clears do not touch color MRTs.
+        if ((flags & D3DCLEAR_TARGET) != 0u) {
+            for (DWORD slot = 1u; slot < caps.NumSimultaneousRTs; ++slot) {
+                ComPtr<IDirect3DSurface9> extra;
+                const HRESULT hr = game->GetRenderTarget(slot, extra.GetAddressOf());
+                if (hr == D3DERR_NOTFOUND) continue;
+                ComPtr<IUnknown> extraIdentity;
+                if (FAILED(hr) || !extra ||
+                    FAILED(extra.As(&extraIdentity)) || !extraIdentity ||
+                    !GameNativeOffscreenPass::distinct_auxiliary_mrt(
+                        reinterpret_cast<std::uintptr_t>(extraIdentity.Get()),
+                        s.clearColor.backbufferIdentity))
+                    return false;
+            }
         }
         const bool clearsDepth = (flags & (D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL)) != 0u;
         if (clearsDepth) {
