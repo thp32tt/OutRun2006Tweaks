@@ -252,10 +252,15 @@ int main()
     require(!ring.validate_publication_snapshot(publication),
             "ACK retirement invalidates published handoff snapshot");
     std::uint32_t recycledSlot = 99;
-    require(ring.try_acquire_slot(d3d.context, 5, nullptr, recycledSlot) &&
-            ring.cancel_acquired_slot(recycledSlot, 5) &&
+    require(!ring.try_acquire_slot(d3d.context, 5, nullptr, recycledSlot) &&
+            recycledSlot == OutRunVR::RenderFrameRingSize && ring.all_slots_idle(),
+            "retired frame ID cannot be replayed in a transport lifetime");
+    require(!ring.try_acquire_slot(d3d.context, 6, &exactAck, recycledSlot) &&
             ring.all_slots_idle(),
-            "ACK retirement permits frame-id reuse without stale ownership");
+            "delayed cumulative ACK cannot retire a new eye pair");
+    require(ring.try_acquire_slot(d3d.context, 6, nullptr, recycledSlot) &&
+            ring.cancel_acquired_slot(recycledSlot, 6) && ring.all_slots_idle(),
+            "new frame ID still permits input-safe cancellation");
 
     slot = 99;
     require(ring.try_acquire_slot(d3d.context, 9, nullptr, slot),
@@ -267,6 +272,12 @@ int main()
     require(ring.retire_acknowledged(cumulativeAck) &&
             ring.all_slots_idle(),
             "same-generation cumulative ACK may release older frame");
+    require(!ring.try_acquire_slot(d3d.context, 10, nullptr, rejectedSlot) &&
+            !ring.try_acquire_slot(d3d.context, 9, nullptr, rejectedSlot),
+            "cumulative ACK high watermark rejects old or already ACKed frame");
+    require(ring.try_acquire_slot(d3d.context, 11, nullptr, recycledSlot) &&
+            ring.cancel_acquired_slot(recycledSlot, 11),
+            "frame newer than cumulative ACK can be reserved and cancelled");
 
     slot = 99;
     require(ring.try_acquire_slot(d3d.context, 12, nullptr, slot),

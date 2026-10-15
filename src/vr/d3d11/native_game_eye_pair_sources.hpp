@@ -20,6 +20,18 @@ namespace outrun::vr::dx11 {
 // mismatched eye sample modes and missing format resolve support before any
 // GPU commands, leaving the acquired slot and original D3D9 frame intact.
 enum class NativeGameEyeTransfer : std::uint8_t { Reject, Copy, Resolve };
+// Same-generation cumulative ACKs may retire frames with lower frame IDs.
+// Disallow frame-ID reuse or a new ID already covered by a supplied ACK:
+// otherwise a delayed ACK could retire newly published OpenXR eyes.
+[[nodiscard]] constexpr bool native_game_eye_frame_id_admitted(
+    std::uint64_t next, std::uint64_t highWatermark,
+    std::uint64_t sameLifetimeAck) noexcept {
+    return next != 0u && next > highWatermark && next > sameLifetimeAck;
+}
+[[nodiscard]] constexpr std::uint64_t native_game_eye_frame_high_watermark(
+    std::uint64_t previous, std::uint64_t observed) noexcept {
+    return previous < observed ? observed : previous;
+}
 // A slot with either eye GPU write already enqueued is not safely cancelable.
 // This preserves original DX9Ex rendering and avoids aliasing late OpenXR eyes.
 [[nodiscard]] constexpr bool native_game_eye_copy_cancelable(bool copyQueued) noexcept {

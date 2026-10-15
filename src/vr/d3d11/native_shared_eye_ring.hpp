@@ -166,6 +166,9 @@ namespace outrun::vr::dx11
         std::uint32_t width_{};
         std::uint32_t height_{};
         DXGI_FORMAT format_ = DXGI_FORMAT_UNKNOWN;
+        // Reserved and cumulatively acknowledged frame IDs never regress
+        // within this producer/consumer transport generation.
+        std::uint64_t frame_id_high_watermark_ = 0u;
         bool ready_ = false;
         // Any unexpected GetData result leaves GPU completion unknowable.
         // Quarantine the allocation until shutdown() recreates the resources.

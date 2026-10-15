@@ -106,6 +106,7 @@ namespace outrun::vr::dx11
     void NativeSharedEyeRing::shutdown() noexcept
     {
         identity_ = {};
+        frame_id_high_watermark_ = 0u;
         for (auto& slot : slots_)
         {
             reset_slot_lifetime(slot);
@@ -164,6 +165,7 @@ namespace outrun::vr::dx11
             return false;
 
         identity_ = next;
+        frame_id_high_watermark_ = 0u;
         return true;
     }
 
@@ -235,6 +237,12 @@ namespace outrun::vr::dx11
         if (!activation_ready() || !same_producer_context(context) ||
             frame_id == 0)
             return false;
+        const std::uint64_t ackCursor =
+            ack && OutRunVR::Core::TransportAckIdentityMatches(*ack, identity_)
+                ? ack->frameId : 0u;
+        if (!native_game_eye_frame_id_admitted(
+                frame_id, frame_id_high_watermark_, ackCursor))
+            return false;
 
         // One transport frame has one slot owner. A duplicate acquisition
         // could advertise the same frame in two slots, leaving one consumer ACK
@@ -270,6 +278,8 @@ namespace outrun::vr::dx11
                     !OutRunVR::Core::TransportAckReleasesFrame(
                         *ack, identity_, index, slot.frame_id))
                     continue;
+                frame_id_high_watermark_ = native_game_eye_frame_high_watermark(
+                    frame_id_high_watermark_, ack->frameId);
                 reset_slot_lifetime(slot);
             }
 
@@ -279,6 +289,8 @@ namespace outrun::vr::dx11
 
             slot.frame_id = frame_id;
             slot.state = SharedEyeSlotState::Acquired;
+            frame_id_high_watermark_ = native_game_eye_frame_high_watermark(
+                frame_id_high_watermark_, frame_id);
             out_slot = index;
             return true;
         }
@@ -551,6 +563,8 @@ namespace outrun::vr::dx11
                 ack, identity_, ack.slot, entry.frame_id))
             return false;
 
+        frame_id_high_watermark_ = native_game_eye_frame_high_watermark(
+            frame_id_high_watermark_, ack.frameId);
         reset_slot_lifetime(entry);
         return true;
     }
