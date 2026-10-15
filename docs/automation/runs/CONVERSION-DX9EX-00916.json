@@ -12,13 +12,13 @@
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
   "symptom_id": "DX9EX:SYMPTOM:F11_MENU",
   "status": "IMPLEMENTED_AWAITING_EXACT_SHA_CI",
-  "phase": "C4_COMMIT",
-  "checkpoint": "C4_MATERIAL",
+  "phase": "C5_VALIDATE",
+  "checkpoint": "C5_PENDING_EXACT_SHA",
   "automation_validation": "PENDING_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "d2bf7aa6b95ecf432d3f5dcf8f7f1ddadb1c5a75",
-  "material_result_sha": null,
+  "material_result_sha": "bcd37290762eefcefd6a55bf9a27e6b4db71bd4c",
   "validation_bearing_result_sha": null,
   "source_paths": [
     "src/overlay/overlay.cpp"
@@ -41,7 +41,8 @@
     "subcomponents": [
       "Save a valid final desktop F11 window rectangle separately from XR compositor-driven centering and resizing.",
       "Force centering and size reflow on real VR layout changes only; restore both desktop position and hitbox size once on leaving VR.",
-      "Preserve normal native ImGui user dragging/resizing across desktop resolution changes and ensure no invalid/zero-sized geometry is cached."
+      "Preserve normal native ImGui user dragging/resizing across desktop resolution changes and ensure no invalid/zero-sized geometry is cached.",
+      "On VR exit after a smaller monitor/mirror resize clamp the restored F11 window and hitbox within native content; when no prior desktop F11 snapshot exists, establish native placement once."
     ],
     "acceptance_items": [
       {
@@ -54,7 +55,7 @@
         "id": "desktop_drag_restore",
         "category": "fallback_regression",
         "behavior_area": "Desktop input and saved F11 position",
-        "expected_behavior": "Preserve native desktop F11 manual drag and size across XR entry/exit and ordinary desktop resize without a forced recenter; reject invalid zero-sized snapshots."
+        "expected_behavior": "Preserve native desktop F11 manual drag and size across XR entry/exit and ordinary desktop resize without a forced recenter; reject invalid zero-sized snapshots. With a smaller monitor, restore a bounded native window and hitboxes entirely inside the available content; with no previous desktop shell, use original desktop placement."
       },
       {
         "id": "exact_sha_ci",
@@ -75,7 +76,7 @@
       "Do not change XR HUD vertex transforms or D3DX game sprite projection: F11 is authored as independent ImGui window geometry.",
       "Do not change native input/FFB or disable user-driven ImGui resize; preserve the original external shell compositor."
     ],
-    "fix_evidence": "ImGui shell C++ lifecycle now saves desktop rectangle and restores it atomically across XR entry/exit; focused Python positive, negative and destructive source-mutation regression is integrated with canonical F11 verifier.",
+    "fix_evidence": "ImGui shell C++ lifecycle now saves desktop rectangle and restores it atomically across XR entry/exit; focused Python positive, negative and destructive source-mutation regression is integrated with canonical F11 verifier. Final preflight source 80b3b5a clamps native ImGui hitbox to content extents and handles first-ever F11 opened in VR; mutation and numeric resolution regressions added.",
     "original_evidence": "Original F11 render_shell derived layoutChanged from prior content, density and XR state without restricting it to VR; it used ImGuiCond_Always and a new centered window for both VR and desktop changes.",
     "source_trace": [
       "Original user mouse drag/resize writes ImGui F11 window geometry during desktop render_shell.",
@@ -84,5 +85,6 @@
     ],
     "eye_ownership": "External VR shell continues using the existing R84 ScreenOverlay2D binocular submission; this change affects ImGui surface and hitbox geometry before per-eye compositing, not the world or gameplay HUD."
   },
-  "next_action": "Wait for exact-SHA mandatory Windows and Domain plus source inspection results. Matching Quest3/VDXR F11 optical and pointer behavior remain untested."
+  "next_action": "Require four exact-SHA CI jobs (DX9Ex Active, Domain Isolation, Full Source Impact, EXE HUD Inspector); preserve original material source bcd3729; Quest3/VDXR remains UNTESTED.",
+  "source_candidate_sha": "80b3b5a078985a71d21af31837d38be48fcc6dda"
 }
