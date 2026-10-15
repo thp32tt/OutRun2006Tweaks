@@ -1886,6 +1886,50 @@ namespace OutRunVRStereo
                  R30IsPauseMenuExactArrow());
         }
 
+        // Match the exact ESC arrows on the finite-world HUD shader plane
+        // to the original pause shell on the XYZRHW path. The old shader
+        // branch used the *gameplay* HudScale and silently lost the pause
+        // vertical position while its sibling triangles used both controls.
+        // Keep the identity fallback for every non-ESC producer.
+        constexpr float R30PauseShaderPlaneScale(
+            bool exactPauseOwner, float gameplayScale,
+            float requestedPauseScale) noexcept
+        {
+            if (!exactPauseOwner || !(requestedPauseScale > 0.0f))
+                return gameplayScale;
+            return requestedPauseScale < 0.55f ? 0.55f :
+                requestedPauseScale > 1.50f ? 1.50f : requestedPauseScale;
+        }
+
+        constexpr float R30PauseShaderPlaneNdcShift(
+            bool exactPauseOwner, float verticalFraction) noexcept
+        {
+            if (!exactPauseOwner)
+                return 0.0f;
+            const float bounded = verticalFraction < -0.25f ? -0.25f :
+                verticalFraction > 0.25f ? 0.25f : verticalFraction;
+            // Screen Y grows downwards; a positive requested fraction
+            // moves the shader-backed ESC sprite down like XYZRHW.
+            return -2.0f * bounded;
+        }
+
+        static_assert(R30PauseShaderPlaneScale(
+            false, 0.55f, 1.40f) == 0.55f);
+        static_assert(R30PauseShaderPlaneScale(
+            true, 0.55f, 1.00f) == 1.00f);
+        static_assert(R30PauseShaderPlaneScale(
+            true, 0.55f, 0.30f) == 0.55f);
+        static_assert(R30PauseShaderPlaneScale(
+            true, 0.55f, 2.00f) == 1.50f);
+        static_assert(R30PauseShaderPlaneScale(
+            true, 0.55f, 0.00f) == 0.55f);
+        static_assert(R30PauseShaderPlaneNdcShift(
+            false, 0.20f) == 0.0f);
+        static_assert(R30PauseShaderPlaneNdcShift(
+            true, 0.20f) < 0.0f);
+        static_assert(R30PauseShaderPlaneNdcShift(
+            true, -0.80f) == 0.50f);
+
         float R30PauseMenuVerticalFraction() noexcept
         {
             if (!R30IsPauseMenuElement())
@@ -5893,9 +5937,26 @@ namespace OutRunVRStereo
                 // optical scale. Do not apply a second source/portrait
                 // aspect compensation to text/gauges on this world plane.
                 D3DMATRIX hudScale = R29OwnerIdentityMatrix();
-                const float userScale = R30HudScaleValue();
+                const bool exactPauseShaderOwner =
+                    R30IsPauseMenuElement();
+                const float rawPauseScale =
+                    Settings::VRPauseMenuScale.get();
+                const float pauseScale = std::isfinite(rawPauseScale)
+                    ? rawPauseScale : 0.0f;
+                // Game HUD still uses the HMD-proven uniform HudScale.
+                // Only the actual paused ESC shell/exact arrow owner uses
+                // the independent user-selected pause optical size. The
+                // signed viewport shift is applied to the ORIGINAL clip
+                // plane *before* head/eye reprojection, not a second time
+                // in each eye. Queued GOAL/+TIME and ordinary game HUD
+                // never inherit the adjustment.
+                const float userScale = R30PauseShaderPlaneScale(
+                    exactPauseShaderOwner, R30HudScaleValue(), pauseScale);
+                const float pauseClipShift = R30PauseShaderPlaneNdcShift(
+                    exactPauseShaderOwner, R30PauseMenuVerticalFraction());
                 hudScale._11 = userScale;
                 hudScale._22 = userScale;
+                hudScale._42 = pauseClipShift;
                 const D3DMATRIX scaledClip =
                     R29OwnerMultiplyMatrix(hudWvp, hudScale);
                 constexpr float HudPlaneZ = -2.50f;
