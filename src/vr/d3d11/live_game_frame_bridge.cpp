@@ -5485,6 +5485,13 @@ void before_game_present(IDirect3DDevice9* game,
                                     GameNativeFramePublication::matching_upload_extent(
                                         s.insetSurfaceWidth, s.insetSurfaceHeight,
                                         surfaceWidth, surfaceHeight) &&
+                                    // A multi-tile UpdateSurface loop can commit early
+                                    // tiles before a later failure, leaking a partial native
+                                    // frame. Seed every untouched gap from the *current*
+                                    // original D3D9 backbuffer, then publish once. If the
+                                    // backbuffer cannot be read, keep D3D9/input unchanged.
+                                    (!multiNativeUpload || SUCCEEDED(game->GetRenderTargetData(
+                                        back.Get(), s.insetSurface.Get()))) &&
                                     SUCCEEDED(s.insetSurface->LockRect(&lockRect, nullptr, 0))) {
                                     // Refuse malformed D3D9 lock pitches
                                     // before copying a full game backbuffer.
@@ -5577,25 +5584,21 @@ void before_game_present(IDirect3DDevice9* game,
                                                      (croppedNativeUpload ? &uploadSourceCrop : nullptr),
                                                 back.Get(), &destination));
                                         } else {
-                                            // UpdateSurface owns a rectangular source only.
-                                            // Submit each verified disjoint intersection
-                                            // separately, never upload its hole-filled bound.
-                                            uploaded = true;
-                                            for (std::uint32_t i = 0u; i < multiDirty.count; ++i) {
-                                                const auto& tile = multiDirty.regions[i];
-                                                const RECT sourceTile{
-                                                    static_cast<LONG>(tile.left),
-                                                    static_cast<LONG>(tile.top),
-                                                    static_cast<LONG>(tile.right),
-                                                    static_cast<LONG>(tile.bottom)};
-                                                const POINT targetTile{sourceTile.left, sourceTile.top};
-                                                if (FAILED(game->UpdateSurface(
-                                                        s.insetSurface.Get(), &sourceTile,
-                                                        back.Get(), &targetTile))) {
-                                                    uploaded = false;
-                                                    break;
-                                                }
-                                            }
+                                            // The SYSTEMMEM surface contains the original
+                                            // D3D9 backbuffer plus only the verified native
+                                            // tiles. One bounded UpdateSurface preserves all
+                                            // holes and cannot leave a prefix of tiles behind
+                                            // when a later upload fails.
+                                            const auto& bounds = multiDirty.uploadBounds;
+                                            const RECT sourceTiles{
+                                                static_cast<LONG>(bounds.left),
+                                                static_cast<LONG>(bounds.top),
+                                                static_cast<LONG>(bounds.right),
+                                                static_cast<LONG>(bounds.bottom)};
+                                            const POINT targetTiles{sourceTiles.left, sourceTiles.top};
+                                            uploaded = SUCCEEDED(game->UpdateSurface(
+                                                s.insetSurface.Get(), &sourceTiles,
+                                                back.Get(), &targetTiles));
                                         }
                                         if (uploaded) {
                                             ++s.visible;

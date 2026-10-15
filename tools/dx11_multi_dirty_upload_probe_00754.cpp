@@ -9,9 +9,13 @@ constexpr GameNativePresentRegion entire{0,0,6,4};
 constexpr GameNativePresentRegion crop{1,1,5,3};
 constexpr auto full=GameNativeMultiDirtyUpload::select(6,4,entire,2,32,0,0,6,4,tiles);
 constexpr auto clipped=GameNativeMultiDirtyUpload::select(6,4,crop,2,32,0,0,6,4,tiles);
-static_assert(full.valid && full.count==2 && full.regions[1].left==4);
+static_assert(full.valid && full.count==2 && full.regions[1].left==4 &&
+              full.uploadBounds.left==0 && full.uploadBounds.top==0 &&
+              full.uploadBounds.right==6 && full.uploadBounds.bottom==4);
 static_assert(clipped.valid && clipped.count==2 && clipped.regions[0].left==1 &&
-              clipped.regions[1].right==5 && clipped.regions[1].bottom==3);
+              clipped.regions[1].right==5 && clipped.regions[1].bottom==3 &&
+              clipped.uploadBounds.left==1 && clipped.uploadBounds.top==1 &&
+              clipped.uploadBounds.right==5 && clipped.uploadBounds.bottom==3);
 constexpr GameNativeDirtyRectangle offscreen[]={{0,0,1,1},{1,0,2,1}};
 constexpr auto omitted=GameNativeMultiDirtyUpload::select(6,4,crop,2,32,0,0,2,1,offscreen);
 static_assert(!omitted.valid);
@@ -41,6 +45,20 @@ int main() {
             static_cast<std::uint32_t>(r.left),static_cast<std::uint32_t>(r.top),
             static_cast<std::uint32_t>(r.right),static_cast<std::uint32_t>(r.bottom)));
     }
+    // D3D9 GetRenderTargetData seeded untouched holes with original pixels.
+    // Simulate a failed atomic UpdateSurface: game backbuffer is unmodified.
+    std::array<std::uint8_t,writePitch*height> original{};
+    original.fill(0x31);
+    auto failedCommit=original;
+    assert(failedCommit==original);
+    // Success publishes the full verified bounding crop in one operation;
+    // pixels in its holes still come from the D3D9 snapshot.
+    auto published=original;
+    for(std::int64_t y=clipped.uploadBounds.top;y<clipped.uploadBounds.bottom;++y)
+        for(std::int64_t x=clipped.uploadBounds.left;x<clipped.uploadBounds.right;++x)
+            for(std::uint32_t c=0;c<4;++c)
+                published[static_cast<std::size_t>(y)*writePitch+static_cast<std::size_t>(x)*4+c]=
+                    target[static_cast<std::size_t>(y)*writePitch+static_cast<std::size_t>(x)*4+c];
     for (std::uint32_t y=0;y<height;++y)
         for (std::uint32_t x=0;x<width;++x) {
             bool covered=false;
@@ -50,6 +68,8 @@ int main() {
             }
             for(std::uint32_t c=0;c<4;++c)
                 assert(target[y*writePitch+x*4+c]==
+                    (covered?source[y*readPitch+x*4+c]:0x31));
+                assert(published[y*writePitch+x*4+c]==
                     (covered?source[y*readPitch+x*4+c]:0x31));
         }
     for (std::uint32_t y=0;y<height;++y)

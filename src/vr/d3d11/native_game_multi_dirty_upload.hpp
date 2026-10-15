@@ -12,6 +12,9 @@ namespace outrun::vr::dx11::live_game_frame {
 struct GameNativeMultiDirtySelection {
     std::array<GameNativePresentRegion, GameNativeDirtyRegionCoverage::kMaxPartitionRects> regions{};
     std::uint32_t count = 0u;
+    // Single atomic D3D9 upload spans all verified tiles. The untouched
+    // holes must be seeded from the current original game backbuffer first.
+    GameNativePresentRegion uploadBounds{};
     bool valid = false;
 };
 struct GameNativeMultiDirtyUpload {
@@ -52,6 +55,18 @@ struct GameNativeMultiDirtyUpload {
         }
         if (minX != boundLeft || minY != boundTop ||
             maxX != boundRight || maxY != boundBottom || !out.count) return {};
+        std::int64_t uploadLeft = out.regions[0].left;
+        std::int64_t uploadTop = out.regions[0].top;
+        std::int64_t uploadRight = out.regions[0].right;
+        std::int64_t uploadBottom = out.regions[0].bottom;
+        for (std::uint32_t i = 1u; i < out.count; ++i) {
+            const auto& tile = out.regions[i];
+            if (tile.left < uploadLeft) uploadLeft = tile.left;
+            if (tile.top < uploadTop) uploadTop = tile.top;
+            if (tile.right > uploadRight) uploadRight = tile.right;
+            if (tile.bottom > uploadBottom) uploadBottom = tile.bottom;
+        }
+        out.uploadBounds = {uploadLeft, uploadTop, uploadRight, uploadBottom};
         out.valid = true;
         return out;
     }

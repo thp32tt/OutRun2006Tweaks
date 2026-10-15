@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""00754 verifies game-origin multi-RECT Present upload and unchanged D3D9/gamepad fallback."""
+"""Multi-dirty full-game output requires D3D9 gap seed + single atomic upload."""
 from pathlib import Path
 root=Path(__file__).resolve().parents[1]
 src=(root/"src/vr/d3d11/live_game_frame_bridge.cpp").read_text()
@@ -13,50 +13,58 @@ def connected(s,h):
     select=p.find("const auto multiDirty = GameNativeMultiDirtyUpload::select(")
     admit=p.find("const bool multiNativeUpload =",select)
     bound=p.find("const bool outputWritable =",admit)
-    copy=p.find("for (std::uint32_t i = 0u; i < multiDirty.count; ++i)",bound)
+    snapshot=p.find("game->GetRenderTargetData(\n",bound)
+    locked=p.find("SUCCEEDED(s.insetSurface->LockRect(",snapshot)
+    copy=p.find("for (std::uint32_t i = 0u; i < multiDirty.count; ++i)",locked)
     unlock=p.find("const HRESULT unlockStatus",copy)
-    upload=p.find("if (!multiNativeUpload)",unlock)
-    tiles=p.find("for (std::uint32_t i = 0u; i < multiDirty.count; ++i)",upload)
+    branch=p.find("if (!multiNativeUpload)",unlock)
+    gpu=p.find("const auto& bounds = multiDirty.uploadBounds;",branch)
+    single=p.find("uploaded = SUCCEEDED(game->UpdateSurface(",gpu)
     return all((
         '#include "native_game_multi_dirty_upload.hpp"' in s,
-        0<=select<admit<bound<copy<unlock<upload<tiles,
+        0<=select<admit<bound<snapshot<locked<copy<unlock<branch<gpu<single,
         "fullMode && backbufferKnown &&" in p[admit:bound],
         "multiDirty.valid" in p[admit:bound],
-        "(multiNativeUpload && fullPlacement.valid)" in p[bound:copy],
+        "(multiNativeUpload && fullPlacement.valid)" in p[bound:snapshot],
+        "(!multiNativeUpload || SUCCEEDED(game->GetRenderTargetData(" in p[bound:locked],
         "GameNativeFrameUpload::copy_rect(" in p[copy:unlock],
-        "!copied || FAILED(unlockStatus)" in p[unlock:upload],
-        "uploaded = SUCCEEDED(game->UpdateSurface(" in p[upload:tiles],
-        "if (FAILED(game->UpdateSurface(" in p[tiles:],
-        "s.insetSurface.Get(), &sourceTile," in p[tiles:],
-        "back.Get(), &targetTile" in p[tiles:],
-        "if (uploaded)" in p[tiles:],
+        "!copied || FAILED(unlockStatus)" in p[unlock:branch],
+        "s.insetSurface.Get(), &sourceTiles," in p[single:],
+        "back.Get(), &targetTiles" in p[single:],
+        p.count("game->UpdateSurface(")==2,
+        "if (uploaded)" in p[single:],
         "r.left < p.right && p.left < r.right" in h,
         "r.top < p.bottom && p.top < r.bottom" in h,
         "bufferBytes < rectangleCount * 16u" in h,
         "minX != boundLeft || minY != boundTop" in h,
         "!out.count" in h,
         "out.regions[out.count++] = {left, top, right, bottom};" in h,
+        "out.uploadBounds = {uploadLeft, uploadTop, uploadRight, uploadBottom};" in h,
     ))
-assert connected(src,hdr),"multi dirty game frame/Present integration broken"
+assert connected(src,hdr), "multi-dirty atomic game frame/Present contract broken"
 for before,after in (
     ("multiDirty.valid;","true /* unchecked */;"),
     ("(multiNativeUpload && fullPlacement.valid)","false /* dropped */"),
     ("const bool multiNativeUpload = fullMode && backbufferKnown &&",
      "const bool multiNativeUpload = true /* unchecked */ &&"),
-    ("back.Get(), &targetTile","back.Get(), &destination"),
-    ("if (FAILED(game->UpdateSurface(","if (false /* upload bypassed */ && FAILED(game->UpdateSurface("),
+    ("game->GetRenderTargetData(","game->DisabledReadback("),
+    ("const auto& bounds = multiDirty.uploadBounds;","const auto& bounds = presentRegion;"),
+    ("back.Get(), &targetTiles","back.Get(), &destination"),
+    ("s.insetSurface.Get(), &sourceTiles,","s.insetSurface.Get(), nullptr,"),
     ("!copied || FAILED(unlockStatus)","FAILED(unlockStatus)"),
 ):
     variant=src.replace(before,after,1)
-    assert variant!=src and not connected(variant,hdr),before
+    assert variant!=src and not connected(variant,hdr), before
 for before,after in (
     ("r.left < p.right && p.left < r.right","false /* overlap */"),
     ("bufferBytes < rectangleCount * 16u","false /* unchecked buffer */"),
     ("minX != boundLeft || minY != boundTop","false /* forged bbox */"),
     ("!out.count","false /* empty */"),
+    ("out.uploadBounds = {uploadLeft, uploadTop, uploadRight, uploadBottom};",
+     "out.uploadBounds = {};"),
 ):
     variant=hdr.replace(before,after,1)
     assert variant!=hdr and not connected(src,variant),before
 assert "python tools/test_dx11_multi_dirty_upload_00754.py" in wf
 assert "tools/dx11_multi_dirty_upload_probe_00754.cpp" in wf
-print("00754 native multi-dirty game Draw/Present with hole-safe D3D9/gamepad fallback PASS")
+print("DX11 atomic multi-dirty Present: original D3D9 gaps and one native commit PASS")
