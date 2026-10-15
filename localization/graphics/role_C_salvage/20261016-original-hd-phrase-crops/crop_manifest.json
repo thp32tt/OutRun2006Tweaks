@@ -1,0 +1,283 @@
+{
+  "schema": "outrun-original-full-hd-phrase-crop-v1",
+  "date_kst": "2026-10-16",
+  "source_kind": "MANUAL_ORIGINAL_FULL_HD_READABLE_PNG_20261012",
+  "input_policy": "NEVER_USE_LEGACY_986_TILES_OR_KOREAN_GENERATED_IMAGES",
+  "source_files": {
+    "q053_568D3696_FLIPY_CHECK_ORIENTATION.png": {
+      "sha256": "0893c0676397aee9cdf12b436f8d1e18eff55eccac55f1e4349e744c34b0478f",
+      "source": "/home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012/q053_568D3696_FLIPY_CHECK_ORIENTATION.png"
+    },
+    "q057_39229D64_FLIPY_CHECK_ORIENTATION.png": {
+      "sha256": "c3cb4c0198ea80904f926e8ef6e9a1df8ef0439bffdf771d0716139304a08997",
+      "source": "/home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012/q057_39229D64_FLIPY_CHECK_ORIENTATION.png"
+    },
+    "q060_A064FDFC_FLIPY_CHECK_ORIENTATION.png": {
+      "sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+      "source": "/home/chatgpt-runner2/work/c_salvage_text_roi/source_full_20261012/q060_A064FDFC_FLIPY_CHECK_ORIENTATION.png"
+    }
+  },
+  "count": 10,
+  "items": [
+    {
+      "id": "Q053-END",
+      "filename": "001_Q053_END_EN_NATIVE.png",
+      "source": "q053_568D3696_FLIPY_CHECK_ORIENTATION.png",
+      "source_size": [
+        4096,
+        4096
+      ],
+      "source_sha256": "0893c0676397aee9cdf12b436f8d1e18eff55eccac55f1e4349e744c34b0478f",
+      "bbox_xyxy": [
+        900,
+        2470,
+        1740,
+        2795
+      ],
+      "roi_size": [
+        840,
+        325
+      ],
+      "roi_sha256": "924c8b93a82994a726efd9d13da5628fca3a7bbad973df04af5c02aa3c6f13a4",
+      "operation": "PIXEL_EXACT_CROP_NO_BACKGROUND_REMOVAL",
+      "quality": "CROP_DONE_PENDING_VISUAL_REVIEW",
+      "translation": "NOT_ASSIGNED",
+      "imagegen": "NOT_RUN",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "id": "Q053-ANSWER",
+      "filename": "002_Q053_ANSWER_EN_NATIVE.png",
+      "source": "q053_568D3696_FLIPY_CHECK_ORIENTATION.png",
+      "source_size": [
+        4096,
+        4096
+      ],
+      "source_sha256": "0893c0676397aee9cdf12b436f8d1e18eff55eccac55f1e4349e744c34b0478f",
+      "bbox_xyxy": [
+        1900,
+        2520,
+        3420,
+        2785
+      ],
+      "roi_size": [
+        1520,
+        265
+      ],
+      "roi_sha256": "3e455d45d8bd60aef098f73c185101244da43a238211dc3a86e0a812403475ce",
+      "operation": "PIXEL_EXACT_CROP_NO_BACKGROUND_REMOVAL",
+      "quality": "CROP_DONE_PENDING_VISUAL_REVIEW",
+      "translation": "NOT_ASSIGNED",
+      "imagegen": "NOT_RUN",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "id": "Q053-QUESTION",
+      "filename": "003_Q053_QUESTION_EN_NATIVE.png",
+      "source": "q053_568D3696_FLIPY_CHECK_ORIENTATION.png",
+      "source_size": [
+        4096,
+        4096
+      ],
+      "source_sha256": "0893c0676397aee9cdf12b436f8d1e18eff55eccac55f1e4349e744c34b0478f",
+      "bbox_xyxy": [
+        780,
+        2850,
+        2180,
+        3140
+      ],
+      "roi_size": [
+        1400,
+        290
+      ],
+      "roi_sha256": "6b9df5fa74aa4d2df508a343f720b1d24318fda0a886f1de6ea0daafc497c8b3",
+      "operation": "PIXEL_EXACT_CROP_NO_BACKGROUND_REMOVAL",
+      "quality": "CROP_DONE_PENDING_VISUAL_REVIEW",
+      "translation": "NOT_ASSIGNED",
+      "imagegen": "NOT_RUN",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "id": "Q053-START",
+      "filename": "004_Q053_START_EN_NATIVE.png",
+      "source": "q053_568D3696_FLIPY_CHECK_ORIENTATION.png",
+      "source_size": [
+        4096,
+        4096
+      ],
+      "source_sha256": "0893c0676397aee9cdf12b436f8d1e18eff55eccac55f1e4349e744c34b0478f",
+      "bbox_xyxy": [
+        2590,
+        2850,
+        3570,
+        3140
+      ],
+      "roi_size": [
+        980,
+        290
+      ],
+      "roi_sha256": "a77d22c8098948ca778470d0ff969f5f192cfc901caac8e2550b75c8cc9f7058",
+      "operation": "PIXEL_EXACT_CROP_NO_BACKGROUND_REMOVAL",
+      "quality": "CROP_DONE_PENDING_VISUAL_REVIEW",
+      "translation": "NOT_ASSIGNED",
+      "imagegen": "NOT_RUN",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "id": "Q057-MISSION_CLEARED",
+      "filename": "005_Q057_MISSION_CLEARED_EN_NATIVE.png",
+      "source": "q057_39229D64_FLIPY_CHECK_ORIENTATION.png",
+      "source_size": [
+        4096,
+        4096
+      ],
+      "source_sha256": "c3cb4c0198ea80904f926e8ef6e9a1df8ef0439bffdf771d0716139304a08997",
+      "bbox_xyxy": [
+        125,
+        268,
+        1750,
+        825
+      ],
+      "roi_size": [
+        1625,
+        557
+      ],
+      "roi_sha256": "6ad4c924b1556ee0baa613689a3d42aac2be2bdda6387fdc3662b7d4ab127c39",
+      "operation": "PIXEL_EXACT_CROP_NO_BACKGROUND_REMOVAL",
+      "quality": "CROP_DONE_PENDING_VISUAL_REVIEW",
+      "translation": "NOT_ASSIGNED",
+      "imagegen": "NOT_RUN",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "id": "Q057-MISSION_FAILED",
+      "filename": "006_Q057_MISSION_FAILED_EN_NATIVE.png",
+      "source": "q057_39229D64_FLIPY_CHECK_ORIENTATION.png",
+      "source_size": [
+        4096,
+        4096
+      ],
+      "source_sha256": "c3cb4c0198ea80904f926e8ef6e9a1df8ef0439bffdf771d0716139304a08997",
+      "bbox_xyxy": [
+        1900,
+        1270,
+        3330,
+        1835
+      ],
+      "roi_size": [
+        1430,
+        565
+      ],
+      "roi_sha256": "64d7b15b79e5e00bf9811aaaafef8e96ea66f60f76ab27bbd56cc9f58423b009",
+      "operation": "PIXEL_EXACT_CROP_NO_BACKGROUND_REMOVAL",
+      "quality": "CROP_DONE_PENDING_VISUAL_REVIEW",
+      "translation": "NOT_ASSIGNED",
+      "imagegen": "NOT_RUN",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "id": "Q060-CONTINUE_QUESTION",
+      "filename": "007_Q060_CONTINUE_QUESTION_EN_NATIVE.png",
+      "source": "q060_A064FDFC_FLIPY_CHECK_ORIENTATION.png",
+      "source_size": [
+        4096,
+        2048
+      ],
+      "source_sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+      "bbox_xyxy": [
+        0,
+        615,
+        1130,
+        790
+      ],
+      "roi_size": [
+        1130,
+        175
+      ],
+      "roi_sha256": "9f133c651f8bb8694a3b882ce009731fac868d14f8d27ab04c4b548f59f5dec5",
+      "operation": "PIXEL_EXACT_CROP_NO_BACKGROUND_REMOVAL",
+      "quality": "CROP_DONE_PENDING_VISUAL_REVIEW",
+      "translation": "NOT_ASSIGNED",
+      "imagegen": "NOT_RUN",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "id": "Q060-RETRY",
+      "filename": "008_Q060_RETRY_EN_NATIVE.png",
+      "source": "q060_A064FDFC_FLIPY_CHECK_ORIENTATION.png",
+      "source_size": [
+        4096,
+        2048
+      ],
+      "source_sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+      "bbox_xyxy": [
+        1145,
+        615,
+        2110,
+        790
+      ],
+      "roi_size": [
+        965,
+        175
+      ],
+      "roi_sha256": "61efb778c801d76f4847a7c6ef6f084be98e73b760778aace48d30a5bb58d412",
+      "operation": "PIXEL_EXACT_CROP_NO_BACKGROUND_REMOVAL",
+      "quality": "CROP_DONE_PENDING_VISUAL_REVIEW",
+      "translation": "NOT_ASSIGNED",
+      "imagegen": "NOT_RUN",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "id": "Q060-PLEASE_WAIT",
+      "filename": "009_Q060_PLEASE_WAIT_EN_NATIVE.png",
+      "source": "q060_A064FDFC_FLIPY_CHECK_ORIENTATION.png",
+      "source_size": [
+        4096,
+        2048
+      ],
+      "source_sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+      "bbox_xyxy": [
+        2370,
+        615,
+        3670,
+        790
+      ],
+      "roi_size": [
+        1300,
+        175
+      ],
+      "roi_sha256": "795944766e384fc2a5305ceb08c37845cfe4620619c668ad3ad67dbaaab522a3",
+      "operation": "PIXEL_EXACT_CROP_NO_BACKGROUND_REMOVAL",
+      "quality": "CROP_DONE_PENDING_VISUAL_REVIEW",
+      "translation": "NOT_ASSIGNED",
+      "imagegen": "NOT_RUN",
+      "runtime_validation": "UNTESTED"
+    },
+    {
+      "id": "Q060-TRY_AGAIN_QUESTION",
+      "filename": "010_Q060_TRY_AGAIN_QUESTION_EN_NATIVE.png",
+      "source": "q060_A064FDFC_FLIPY_CHECK_ORIENTATION.png",
+      "source_size": [
+        4096,
+        2048
+      ],
+      "source_sha256": "c9600e9c77067b64b6e57d67ceb8e1ab58359479b5520fcdb44a042be5d19731",
+      "bbox_xyxy": [
+        0,
+        785,
+        1315,
+        990
+      ],
+      "roi_size": [
+        1315,
+        205
+      ],
+      "roi_sha256": "a86e9b6f6fd024a80acf1aed0b5071e7f3e60dba191ba761121a6e9be4c634b5",
+      "operation": "PIXEL_EXACT_CROP_NO_BACKGROUND_REMOVAL",
+      "quality": "CROP_DONE_PENDING_VISUAL_REVIEW",
+      "translation": "NOT_ASSIGNED",
+      "imagegen": "NOT_RUN",
+      "runtime_validation": "UNTESTED"
+    }
+  ]
+}
