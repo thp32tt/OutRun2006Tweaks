@@ -24,7 +24,7 @@ def integrated(source, header):
         "croppedNativeUpload\n                                            ? GameNativeFrameUpload::copy_rect(" in code[copy:crop+70],
         "static_cast<std::uint32_t>(presentRegion.left)" in code[crop:rows],
         "static_cast<std::uint32_t>(presentRegion.bottom)" in code[crop:rows],
-        "croppedNativeUpload ? &uploadSourceCrop : nullptr" in code[surface:surface+250],
+        "croppedNativeUpload ? &uploadSourceCrop : nullptr" in code[surface:surface+360],
         "const bool copied =" in code[copy:unlock],
         "!copied || FAILED(unlockStatus)" in code[unlock:surface],
         "left >= right || top >= bottom || right > frameWidth || bottom > frameHeight" in header,

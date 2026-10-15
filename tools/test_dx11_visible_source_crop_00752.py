@@ -21,7 +21,7 @@ def integrated(src,hdr):
         "(!dirtyRegion || fullDirtyCoverage || provenCroppedDirty)" in select,
         "(cropDirtyCoverage || partitionCropCoverage) && !fullDirtyCoverage" in code[code.find("const bool provenCroppedDirty ="):gate],
         "croppedNativeUpload && fullPlacement.valid" in code[output:copy],
-        "croppedNativeUpload ? &uploadSourceCrop : nullptr" in code[update:update+260],
+        "croppedNativeUpload ? &uploadSourceCrop : nullptr" in code[update:update+360],
         "destination.x = uploadSourceCrop.left;" in code[copy:update],
         "destination.y = uploadSourceCrop.top;" in code[copy:update],
         "partial_backbuffer_source(" in hdr,
