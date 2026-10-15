@@ -1,0 +1,79 @@
+{
+  "schema": "outrun-c-roi-source-audit-v1",
+  "task_id": "C-ROI-SOURCE-Q053-END-20261016T0103KST",
+  "status": "REFERENCE_ROI_CREATED_TEST_ONLY_GLYPH_ISOLATION_HOLD",
+  "source": {
+    "kind": "DIRECT_GITHUB_DDS_PIXEL_EXACT_FLIPY_FULL_HD_PNG",
+    "platform": "PC HD OR2-HD-GUI-v0.25.10a",
+    "pinned_git_source_commit": "e680f79e7d04c0a38fab1c5d5d72ac3307305288",
+    "source_dds_path": "localization/graphics/hd_source/OR2-HD-GUI-v0.25.10a/textures/load/spr_sprani_fruity_cvt_Exst/568D3696_1024x1024.dds",
+    "source_dds_sha256": "65bc5e88e7b01f8148bcbbb2dc4b2225bf53c8501801e329c51ecb274e8cd813",
+    "dds_dimensions": [
+      4096,
+      4096
+    ],
+    "dds_format": "DXT5",
+    "dds_mipmaps": 13,
+    "original_readable_png": "q053_568D3696_FLIPY_CHECK_ORIENTATION.png",
+    "original_png_sha256": "0893c0676397aee9cdf12b436f8d1e18eff55eccac55f1e4349e744c34b0478f",
+    "source_dds_png_direct_equivalence": {
+      "basis": "Q053-ANSWER direct-original full-HD audit, exact same PNG and DDS SHA, 2026-10-16",
+      "readable_orientation": "FLIP_Y",
+      "rgba_mismatched_pixels": 0,
+      "pixels_compared": 16777216
+    }
+  },
+  "roi": {
+    "english": "END",
+    "korean": "종료",
+    "mapping": "localization/graphics/transcriptions.jsonl index 53 (transcribed_reviewed)",
+    "bbox_native_xyxy": [
+      910,
+      2500,
+      1570,
+      2830
+    ],
+    "native_dimensions": [
+      660,
+      330
+    ],
+    "scale": 2,
+    "imagegen_dimensions": [
+      1320,
+      660
+    ],
+    "isolation": "reference_crop",
+    "source_has_colored_red_plate": true,
+    "edge_review": "EN lettering, glow, outline intact in visual native review; plate/background extends to crop boundaries; NOT alpha-isolated glyph mask",
+    "pixel_exact_native_crop": {
+      "reference": "source full-HD original at pinned SHA, fixed ROI crop separately",
+      "changed_pixels": 0
+    },
+    "native_png_sha256": "0a675871eb25a9ab2e8dcc6f8daa48c2d8a54e2c542253ce03e0fbc6d3163742",
+    "imagegen_input_sha256": "0f1514475e7b90695d4243567fbdb41f5129fd45be2af49ccd917e22f7a0aa7d",
+    "source_glyph_layer_status": "HOLD_PLATE_MASK_UNVERIFIED",
+    "clean_plate_status": "NOT_CREATED",
+    "future_fit": "PRESERVE_ASPECT_RATIO_FIT_INSIDE_REVIEWED_UI_CELL_UV_SAFE_AREA",
+    "ui_safe_cell": "UNREVIEWED"
+  },
+  "controls": {
+    "imagegen": "NOT_RUN",
+    "new_input_mode": "SEPARATE_C_SOURCE_REFERENCE_CANDIDATE_ONLY",
+    "old_986_tiles_used": false,
+    "old_ab_batch_queue_modified": false,
+    "old_ab_state_modified": false,
+    "old_ab_browser_dispatch_modified": false,
+    "legacy_sha_artifacts_deleted": false,
+    "portainer": "NOT_DEPLOYED"
+  },
+  "qa": {
+    "source_phrase": "VISUALLY_READABLE_END",
+    "reference_crop": "TEST_ONLY",
+    "glyph_mask": "HOLD_NO_REVIEWED_MASK_OR_PSD",
+    "isolated_transparent_text": "NOT_PROVEN",
+    "C1": "NOT_RUN",
+    "C3": "NOT_RUN",
+    "game": "NOT_RUN",
+    "RUNTIME_VALIDATION": "UNTESTED"
+  }
+}
