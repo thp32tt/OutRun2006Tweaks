@@ -44,6 +44,7 @@ services:
       - /data/c-salvage/masks
       - --max-per-cycle
       - "10"
+      - --require-atlas
       - --interval-seconds
       - "1800"
       - --loop
