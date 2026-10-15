@@ -7,7 +7,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-def prefix(lane):
+def prefix(lane, continuous=False):
     file = ROOT / "src-vr-v2" / "controller.py.part00"
     mod = ast.parse(file.read_text(encoding="utf-8"))
     fn = next(n for n in mod.body if isinstance(n, ast.FunctionDef)
@@ -27,7 +27,7 @@ def prefix(lane):
         },
         "json": json, "re": re,
         "MAX_TASK_ATTEMPTS": 3,
-        "VR_CONTINUOUS_30M_ENABLED": False,  # legacy contract-specific test context
+        "VR_CONTINUOUS_30M_ENABLED": continuous,
         "LOCALIZATION_EXECUTION_POLICY": "LOCALIZATION_EXECUTION_POLICY_ONLY",
     }
     exec(compile(ast.Module(body=[fn], type_ignores=[]), str(file), "exec"), context)
@@ -72,6 +72,23 @@ class BatchCompilePolicy(unittest.TestCase):
             self.assertIn("exact-SHA Gate", content)
             self.assertIn("CI-skip 지시어를 넣지 마", content)
             self.assertIn("RUNTIME_VALIDATION=UNTESTED", content)
+
+    def test_development_first_applies_to_both_live_conversion_lanes(self):
+        for lane in ("DX11", "DX9EX"):
+            with self.subTest(lane=lane):
+                content = prefix(lane, continuous=True)
+                for marker in ("DEVELOPMENT_FIRST_20261015=ON", "C2 최우선",
+                               "같은 TASK_ID/FEATURE_ID", "validation-bearing exact SHA",
+                               "RUNTIME_VALIDATION=UNTESTED", "DXVK 동결"):
+                    self.assertIn(marker, content)
+                prompt = (ROOT / ("conversion_continuous_dx11.md" if lane == "DX11"
+                                  else "conversion_continuous_dx9ex.md")).read_text(encoding="utf-8")
+                self.assertIn("DEVELOPMENT_FIRST_20261015", prompt)
+                self.assertIn("필수 GitHub Actions 전체 Gate", prompt)
+
+    def test_development_first_does_not_activate_frozen_dxvk(self):
+        self.assertNotIn("DEVELOPMENT_FIRST_20261015=ON", prefix("DXVK", continuous=True))
+        self.assertNotIn("DEVELOPMENT_FIRST_20261015=ON", prefix("LOCALIZATION_A", continuous=True))
 
     def test_source_syntax(self):
         source = (ROOT / "src-vr-v2" / "controller.py.part00").read_text(encoding="utf-8")
