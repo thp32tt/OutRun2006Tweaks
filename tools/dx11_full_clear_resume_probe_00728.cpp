@@ -10,17 +10,22 @@ constexpr bool test() {
     constexpr Rect horizontal[]{{0,0,640,240},{0,240,640,480}};
     constexpr Rect tile[]{{0,0,320,240},{320,0,640,240},{0,240,320,480},{320,240,640,480}};
     constexpr Rect hole[]{{0,0,319,480},{320,0,640,480}};
-    constexpr Rect invalid{-1,0,640,480};
+    // D3D9 clamps Clear rectangles to the target viewport, so a slightly
+    // out-of-bounds rectangle can still cover the entire game backbuffer.
+    // Reversed extents remain invalid and must never seed a native frame.
+    constexpr Rect clipped{-1,0,640,480};
+    constexpr Rect reversed{320,0,319,480};
     using C=GameNativeClearCoverage;
     if (!C::covers_whole(640,480,0,0,640,480,0,static_cast<const Rect*>(nullptr)) ||
         !C::covers_whole(640,480,0,0,640,480,1,&full) ||
         !C::covers_whole(640,480,0,0,640,480,2,vertical) ||
         !C::covers_whole(640,480,0,0,640,480,2,horizontal) ||
-        !C::covers_whole(640,480,0,0,640,480,4,tile)) return false;
+        !C::covers_whole(640,480,0,0,640,480,4,tile) ||
+        !C::covers_whole(640,480,0,0,640,480,1,&clipped)) return false;
     if (C::covers_whole(640,480,0,0,640,480,2,hole) ||
         C::covers_whole(640,480,0,0,640,480,1,&half) ||
         C::covers_whole(640,480,1,0,639,480,1,&full) ||
-        C::covers_whole(640,480,0,0,640,480,1,&invalid) ||
+        C::covers_whole(640,480,0,0,640,480,1,&reversed) ||
         C::covers_whole(640,480,0,0,640,480,1,static_cast<const Rect*>(nullptr)) ||
         C::covers_whole(640,480,0,0,640,480,17,&full)) return false;
     // The live Clear hook resets an aborted pre-Clear scene only when

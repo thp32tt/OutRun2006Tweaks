@@ -32,7 +32,16 @@ def validate(code: str, caller: str, header: str, native: str) -> None:
     fvf = (ROOT / "src/vr/d3d11/live_game_fvf_layout.hpp").read_text(
         encoding="utf-8")
     require("if (!game_fvf_layout(fvf, layout)) return false;" in code and
-            "capture.enabled = layout.textured;" in code and
+            # Texture coordinates still define the physical FVF vertex
+            # stride when fixed-function stage 0 selects DIFFUSE only.
+            # That state must bypass a stale sampler, but any real texture
+            # operand or active following stage still needs native mirror or
+            # DX9Ex fallback. Do NOT regress to unconditional TEXn admission.
+            "game_fvf_diffuse_only_inactive_texture(" in code and
+            "followingColorOp, layout.hasDiffuse);" in code and
+            "capture.enabled = layout.textured && !diffuseOnly;" in code and
+            "capture.inactiveStage0TextureBypass = diffuseOnly && layout.textured;" in code and
+            "else if (tex && !diffuseOnly)" in code and
             "if (!layout.hasDiffuse && !selectTexture) return false;" in code and
             "if (!game_fvf_decode_vertex(data, stride, layout, decoded))" in code and
             "kGameFvfPositionMask == D3DFVF_POSITION_MASK" in code and

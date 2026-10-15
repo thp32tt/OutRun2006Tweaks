@@ -25,7 +25,9 @@
     "src/vr/d3d11/live_game_fvf_layout.hpp",
     ".github/workflows/dx11-fast-structural.yml",
     "tools/dx11_inactive_texture_game_frame_00771.cpp",
-    "tools/test_dx11_inactive_texture_game_frame_00771.py"
+    "tools/test_dx11_inactive_texture_game_frame_00771.py",
+    "tools/verify_dx11_first_game_frame_boundary.py",
+    "tools/dx11_full_clear_resume_probe_00728.cpp"
   ],
   "feature_contract": {
     "feature_id": "DX11-LIVE-DIFFUSE-ONLY-TEX-FRAME",
@@ -93,15 +95,20 @@
     "C0_RECOVER": "Read GitHub head, policy, 00770 C6 and real source code; confirmed 00770 complete.",
     "C1_REVIEW": "Found TEX1..8/FVF with disabled or diffuse-only fixed-function stage 0 was incorrectly forced through texture mirror and rejected even when D3D9 bound texture was stale.",
     "C2_IMPLEMENT": "Branched live Draw capture to diffuse-only path; preserved full FVF geometry and native untextured PS with strict stage1/input fallback; added C++ and integration tests.",
-    "C3_VALIDATE": "Previous Backend Conversion Gate run 38728470674 failed only missing required strategy acceptance metadata; corrected for new exact-SHA gate. Portable 00771 C++ added nonfinite unused-UV geometry probe; subsequent GitHub compile/Gates pending.",
-    "C4_COMMIT": "Material repair of live Draw/Indexed inactive TEXn UV reuse, C++ positive/negative source regression, and acceptance metadata; await new exact result SHA.",
+    "C3_VALIDATE": "00771 portable positive/negative C++ test passed in DX11 Fast source-only checks on f4294fa5; source graph verifier and 00728 static fixture failed. Corrected real stage0/stage1 guarded admission checks and D3D9 clipped full-Clear fixture, new exact-SHA Gates pending.",
+    "C4_COMMIT": "Integrated first source fix f4294fa5 and specific exact-SHA Gate repair for stale activation verifier + legacy clipped-clear fixture.",
     "C5_PACKAGE": "NOT_REQUIRED",
     "C6_STATE": "PENDING_GATE"
   },
   "evidence": {
     "runtime": "No actual game, gamepad, Quest3 or VDXR test performed. No runtime promotion.",
     "prior_failed_gate_run_id": 38728470674,
-    "prior_failed_gate_cause": "Integration-first acceptance metadata omitted acceptance_proof, conflict_keys, live_game_draw_path, visible_frame_acceptance, activation_guard_and_fallback."
+    "prior_failed_gate_cause": "Integration-first acceptance metadata omitted acceptance_proof, conflict_keys, live_game_draw_path, visible_frame_acceptance, activation_guard_and_fallback.",
+    "followup_failed_exact_sha": "f4294fa5d5097407ad017bec51e3c5719e80731a",
+    "followup_failed_fast_run_id": 38729171110,
+    "followup_failed_backend_run_id": 38729171271,
+    "followup_failed_win32_run_id": 38729175646,
+    "followup_gate_cause": "Legacy activation-source verifier demanded unconditional capture.enabled=layout.textured even after safe diffuse-only TEXn bypass; 00728 pre-clipping fixture rejected an out-of-bounds full-cover Clear even though current coverage logic clips D3DRECTs."
   },
   "base_head_sha": "eb49822662d4b06a92e3ab38b9561fcc212b49bf"
 }
