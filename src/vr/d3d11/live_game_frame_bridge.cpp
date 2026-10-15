@@ -5606,8 +5606,9 @@ void before_game_present(IDirect3DDevice9* game,
         const bool partialNativeUpload = fullMode && backbufferKnown &&
             oneBoundedDirtyRect && !fullDirtyCoverage && !croppedNativeUpload &&
             partialDirty.valid;
-        // Disjoint partially dirty tiles are updated individually; publishing
-        // their bounding rectangle would overwrite untouched D3D9 pixels.
+        // Partially dirty game tiles, including overlaps, are copied from one
+        // native frame into D3D9-backbuffer-seeded SYSTEMMEM. Their single
+        // bounded upload preserves all untouched original D3D9 pixels.
         const auto multiDirty = GameNativeMultiDirtyUpload::select(
             presentDesc.Width, presentDesc.Height, presentRegion,
             boundedPartition ? dirtyRegion->rdh.nCount : 0u,
@@ -5616,7 +5617,8 @@ void before_game_present(IDirect3DDevice9* game,
             boundedPartition ? dirtyRegion->rdh.rcBound.top : 0,
             boundedPartition ? dirtyRegion->rdh.rcBound.right : 0,
             boundedPartition ? dirtyRegion->rdh.rcBound.bottom : 0,
-            boundedPartition ? partitionRects : nullptr);
+            boundedPartition ? partitionRects : nullptr,
+            true /* overlapping game dirty tiles are identical native pixels */);
         const bool multiNativeUpload = fullMode && backbufferKnown &&
             !fullDirtyCoverage && !croppedNativeUpload &&
             multiDirty.valid;

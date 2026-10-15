@@ -24,7 +24,8 @@ struct GameNativeMultiDirtyUpload {
         std::uint32_t rectangleCount, std::uint32_t bufferBytes,
         std::int64_t boundLeft, std::int64_t boundTop,
         std::int64_t boundRight, std::int64_t boundBottom,
-        const GameNativeDirtyRectangle* rects) noexcept {
+        const GameNativeDirtyRectangle* rects,
+        bool allowOverlap = false) noexcept {
         GameNativeMultiDirtySelection out{};
         if (!rects || !visible.full_frame_placement(width, height, width, height).valid ||
             rectangleCount < 2u || rectangleCount > GameNativeDirtyRegionCoverage::kMaxPartitionRects ||
@@ -37,10 +38,15 @@ struct GameNativeMultiDirtyUpload {
             if (r.left < 0 || r.top < 0 || r.right <= r.left || r.bottom <= r.top ||
                 r.right > static_cast<std::int64_t>(width) ||
                 r.bottom > static_cast<std::int64_t>(height)) return {};
-            for (std::uint32_t j = 0u; j < i; ++j) {
-                const auto& p = rects[j];
-                if (r.left < p.right && p.left < r.right &&
-                    r.top < p.bottom && p.top < r.bottom) return {};
+            // Full-coverage callers reject overlapping rectangles by default.
+            // Actual partial Present can copy intersecting tiles from the same
+            // native game frame into one backbuffer-seeded atomic upload.
+            if (!allowOverlap) {
+                for (std::uint32_t j = 0u; j < i; ++j) {
+                    const auto& p = rects[j];
+                    if (r.left < p.right && p.left < r.right &&
+                        r.top < p.bottom && p.top < r.bottom) return {};
+                }
             }
             if (r.left < minX) minX = r.left;
             if (r.top < minY) minY = r.top;
