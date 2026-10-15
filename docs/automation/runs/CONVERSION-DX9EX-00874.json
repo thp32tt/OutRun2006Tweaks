@@ -84,7 +84,7 @@
   },
   "score_once": false,
   "score_delta_this_attempt": 0,
-  "hold_reason": "QUEST3_VDXR_HARDWARE_RUNTIME_UNTESTED",
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
   "result_commit_ci_skip": true,
   "material_result_sha": "5540b089c3e3fddb801ed33adb5f7af8075fca8a",
   "validation_bearing_result_sha": "5540b089c3e3fddb801ed33adb5f7af8075fca8a",
