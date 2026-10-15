@@ -140,6 +140,7 @@ jobs:
           python tools/test_dx11_multi_dirty_upload_00754.py
           python tools/test_dx11_extended_dirty_batch_00767.py
           python tools/test_dx11_readonly_masked_main_game_00784.py
+          python tools/test_dx11_inert_stencil_mrt_main_game_00785.py
           python tools/test_dx11_no_target_write_draw_00768.py
           python tools/test_dx11_x8_alpha_only_game_draw_00770.py
           python tools/test_dx11_inactive_texture_game_frame_00771.py

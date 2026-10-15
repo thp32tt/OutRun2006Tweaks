@@ -42,6 +42,7 @@
 #include "native_game_fragment_reject.hpp"
 #include "native_game_scissor_clip.hpp"
 #include "native_game_offscreen_pass.hpp"
+#include "native_game_inert_stencil_mrt.hpp"
 #include "native_game_clear_coverage.hpp"
 #include "native_game_full_color_depth.hpp"
 #include "native_game_main_stencil_clear.hpp"
@@ -2210,8 +2211,46 @@ bool supported_game_state(IDirect3DDevice9* game, D3DPRIMITIVETYPE topology,
         FAILED(game->GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)) ||
         FAILED(game->GetRenderState(D3DRS_CULLMODE, &cullMode)) ||
         FAILED(game->GetRenderState(D3DRS_FILLMODE, &fillMode)) ||
-        stencil || !clip || fog || fillMode != D3DFILL_SOLID)
+        !clip || fog || fillMode != D3DFILL_SOLID)
         return false;
+    // The live game's stencil-enabled Draw can still write real main color:
+    // ALWAYS + a zero write mask + one-sided stencil is pixel-equivalent to
+    // disabled stencil for every D3D11 fragment (no stencil dependency/write).
+    // Do not merely drop stencil for an unproved comparison or CCW mode.
+    DWORD stencilFunc = 0u, stencilWriteMask = 0xffffffffu, twoSided = TRUE;
+    const bool stencilKnown = stencil == FALSE ||
+        (SUCCEEDED(game->GetRenderState(D3DRS_STENCILFUNC, &stencilFunc)) &&
+         SUCCEEDED(game->GetRenderState(D3DRS_STENCILWRITEMASK, &stencilWriteMask)) &&
+         SUCCEEDED(game->GetRenderState(D3DRS_TWOSIDEDSTENCILMODE, &twoSided)));
+    if (!GameNativeInertStencilMrt::stencil_equivalent_to_disabled(
+            stencil != FALSE, stencilKnown, stencilFunc,
+            stencilWriteMask, twoSided != FALSE))
+        return false;
+    if (fullFrame) {
+        // Live menu/vehicle/race Draws can leave MRT1..3 bound with their
+        // independent masks at zero. D3D11's one-RT native frame may mirror
+        // RT0 in that case. A writable or unknown MRT would be lost, so cancel
+        // the optional native frame and preserve actual D3D9 output instead.
+        D3DCAPS9 caps{};
+        if (FAILED(game->GetDeviceCaps(&caps)) ||
+            !GameNativeOffscreenPass::valid_mrt_count(caps.NumSimultaneousRTs))
+            return false;
+        constexpr D3DRENDERSTATETYPE extraColorMasks[] = {
+            D3DRS_COLORWRITEENABLE1, D3DRS_COLORWRITEENABLE2,
+            D3DRS_COLORWRITEENABLE3
+        };
+        for (DWORD slot = 1u; slot < caps.NumSimultaneousRTs; ++slot) {
+            ComPtr<IDirect3DSurface9> extra;
+            const HRESULT hr = game->GetRenderTarget(slot, extra.GetAddressOf());
+            if (hr == D3DERR_NOTFOUND) continue;
+            DWORD extraMask = 0xffffffffu;
+            if (FAILED(hr) || !extra ||
+                FAILED(game->GetRenderState(extraColorMasks[slot - 1u],
+                                            &extraMask)) ||
+                !GameNativeInertStencilMrt::extra_target_inert(true, extraMask))
+                return false;
+        }
+    }
     GameNativeCullAdmission admittedCull{};
     if (!game_native_cull_admission(
             cullMode, static_cast<std::uint32_t>(topology), admittedCull))
@@ -5186,6 +5225,22 @@ void observe(IDirect3DDevice9* game, D3DPRIMITIVETYPE type, UINT primitives,
         if (!s.frameBatch.accepts_source_draw(sourceOrdinal, multiBatch)) {
             s.frameBatch.abort();
             return;
+        }
+        // A vehicle/menu pass can rebind a foreign Z surface without a
+        // corresponding Clear. Even an accepted main-RT color Draw cannot
+        // reuse that depth history as the native full-resolution DSV.
+        // Require the same seeded main D3D9 Z identity on every depth Draw.
+        if (fullMode && output.nativeDepthTest) {
+            ComPtr<IDirect3DSurface9> boundDepth;
+            ComPtr<IUnknown> boundDepthIdentity;
+            if (FAILED(game->GetDepthStencilSurface(boundDepth.GetAddressOf())) ||
+                !boundDepth || FAILED(boundDepth.As(&boundDepthIdentity)) ||
+                !boundDepthIdentity ||
+                !s.clearColor.main_depth_still_bound(
+                    reinterpret_cast<std::uintptr_t>(boundDepthIdentity.Get()))) {
+                s.frameBatch.abort();
+                return;
+            }
         }
         // A second depth draw with reversed Z direction cannot share the
         // previous native diagnostic DSV; fail closed, original D3D9 survives.
