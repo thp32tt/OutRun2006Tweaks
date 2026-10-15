@@ -98,8 +98,8 @@
     "C6_STATE": "PASS_EXACT_SHA; CI SUCCESS for exact validation-bearing SHA 972203d60c3c8f0e9181f016fef27be4c28b7312; Quest3/VDXR/gamepad UNTESTED."
   },
   "acceptance_results": {
-    "live-menu-race-vb-and-ib": "PASS_BUILD",
-    "failed-native-upload-fallback": "PASS_BUILD",
+    "live-menu-race-vb-and-ib": "PASS",
+    "failed-native-upload-fallback": "PASS",
     "exact-sha-ci": "PASS_EXACT_SHA"
   }
 }
