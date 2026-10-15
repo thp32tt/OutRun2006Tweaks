@@ -7,6 +7,7 @@ source/build profiles and CI packaging, NOT Quest3 optical/runtime correctness.
 """
 from pathlib import Path
 import re
+import json
 
 ROOT = Path(__file__).resolve().parents[1]
 CMAKE = ROOT / "CMakeLists.txt"
@@ -18,6 +19,8 @@ OPENXR = ROOT / ".github/workflows/vr-openxr.yml"
 MATRIX = ROOT / ".github/workflows/vr-unified-backends.yml"
 IMPACT = ROOT / ".github/workflows/dx9ex-fullsource-impact-review.yml"
 HUD_INSPECTOR = ROOT / ".github/workflows/outrun-exe-hud-inspector.yml"
+WORK_QUEUE = ROOT / "docs/VR_WORK_QUEUE.json"
+VISUAL_GUIDE = ROOT / "docs/DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md"
 
 _SPLITS = (
     "OUTRUN_VR_REFACTOR_SPLIT_R33_R32",
@@ -34,7 +37,8 @@ _COMPARISONS = (
 
 
 def check(cmake: str, toml: str, ci: str, launcher: str, select: str,
-          openxr: str, manual: str, impact: str, hud_inspector: str) -> None:
+          openxr: str, manual: str, impact: str, hud_inspector: str,
+          queue: str, visual_guide: str) -> None:
     # cmkr is a source, CMakeLists the generated build owner. A build without
     # overrides must compile all five independent R29-R33 game TUs.
     for source in (cmake, toml):
@@ -154,6 +158,24 @@ def check(cmake: str, toml: str, ci: str, launcher: str, select: str,
                     "tools/verify_dx9ex_r84_mainline.py"):
         assert trigger in ci, "mainline CI misses build contract change: " + trigger
 
+    # A P0 correction implemented only in R26_SAFE can never close an R84
+    # mainline feature. Validate the existing queue jobs and direct-dev guide.
+    jobs = json.loads(queue)
+    assert jobs["policy"]["dx9exR84Mainline"]["mainRenderer"] == (
+        "R84_INDEPENDENT_R33_R32_R31_R30_R29"), "R84 queue authority drift"
+    targets = {"DX9EX-FEATURE-LENS_FLARE_CENTRE",
+               "DX9EX-FEATURE-EXTENDED_TIME"}
+    selected = {j["id"]: j for j in jobs["items"] if j["id"] in targets}
+    assert set(selected) == targets, "P0 lens/+TIME queue items missing"
+    for task in selected.values():
+        assert any("CURRENT_FOCUS main DLL" in rule and "R26_SAFE" in rule
+                   for rule in task["requiredStaticClosure"]), (
+                   "P0 visual item no longer tests actual packaged R84 source")
+    assert "main R84 R29-R33 DLL" in selected["DX9EX-FEATURE-LENS_FLARE_CENTRE"]["nextAction"]
+    assert "옵션 없는 CMake" in visual_guide
+    assert "R84 독립 R29~R33" in visual_guide and "R26_SAFE" in visual_guide
+    assert "full-chain-compile" in visual_guide
+
 
 def main() -> None:
     originals = [
@@ -166,6 +188,8 @@ def main() -> None:
         MATRIX.read_text(encoding="utf-8-sig"),
         IMPACT.read_text(encoding="utf-8-sig"),
         HUD_INSPECTOR.read_text(encoding="utf-8-sig"),
+        WORK_QUEUE.read_text(encoding="utf-8-sig"),
+        VISUAL_GUIDE.read_text(encoding="utf-8-sig"),
     ]
     check(*originals)
     mutations = [
@@ -187,6 +211,9 @@ def main() -> None:
             'cmake -S . -B build-analysis -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_R26_HUD_COMPARE=ON -DCMAKE_CXX_FLAGS=/analyze'),
         (8, 'cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32\n',
             'cmake -S . -B build-game -G "Visual Studio 17 2022" -A Win32 -DOUTRUN_VR_SAFE_DRAW_COMPARE=ON\n'),
+        (9, '"R84_INDEPENDENT_R33_R32_R31_R30_R29"', '"R26_SAFE"'),
+        (9, "main R84 R29-R33 DLL", "R26 default DLL"),
+        (10, "옵션 없는 CMake", "R26 전용 CMake"),
     ]
     for idx, old, new in mutations:
         assert old in originals[idx], "missing negative fixture: " + old

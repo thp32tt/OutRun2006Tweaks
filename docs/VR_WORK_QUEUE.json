@@ -1106,7 +1106,7 @@
         "per-eye perspective/depth, camera and host stereo"
       ],
       "requiredStaticClosure": [
-        "Prove selected packaged DLL compile owner/flags matches changed source; distinguish R26+HUD artifact from full-chain compile-only gate.",
+        "Prove that changed R84 R29-R33 source is compiled into the exact-SHA CURRENT_FOCUS main DLL; R26_SAFE is an explicit same-SHA rollback, not the release default.",
         "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
         "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
         "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",
@@ -1122,7 +1122,7 @@
         "DX9EX:SHARED_R30_HUD_RENDERER",
         "DX9EX:SYMPTOM:LENS_FLARE_CENTRE"
       ],
-      "nextAction": "Confirm packaged R26+HUD vs full-chain owner; preserve existing D3A5/C993 exact centre hook. Trace same-object raw c64 provenance and 12-draw fallback before any single head/eye transform. Follow guide section 3; preserve CABE outer discs and SkyGlow. Reconcile existing live claim; same feature/task across retry; no optical DONE from source-only evidence.",
+      "nextAction": "Confirm main R84 R29-R33 DLL and same-SHA R26_SAFE fallback. Trace exact D3A5/C993 raw c64, producer/shader/call/pose epochs through R84 R29/R30 and OpenXR host; use R26-only safe provenance as reference, preserve CABE discs/SkyGlow. Same feature/TASK_ID lease across retries; HMD optical evidence needed.",
       "developmentGuide": "docs/DX9EX_VISUAL_REPAIR_LENS_EXTTIME_20261015.md"
     },
     {
@@ -1145,7 +1145,7 @@
         "stereo screen-HUD layer vs world and host composition"
       ],
       "requiredStaticClosure": [
-        "Prove selected packaged DLL compile owner/flags matches changed source; distinguish R26+HUD artifact from full-chain compile-only gate.",
+        "Prove that changed R84 R29-R33 source is compiled into the exact-SHA CURRENT_FOCUS main DLL; R26_SAFE is an explicit same-SHA rollback, not the release default.",
         "Original-mod / canonical EXE vs current fork source or native ImGui origin, if applicable",
         "Evidence-backed whole producer→queue/c64/Draw→both-eye/host root cause, rule out alternatives",
         "Complete source fix and negative/mutation/repro regressions preserving unrelated visual systems",

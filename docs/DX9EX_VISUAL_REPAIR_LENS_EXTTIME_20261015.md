@@ -14,17 +14,13 @@ RUNTIME_VALIDATION=UNTESTED. 이 문서는 렌즈/+TIME 수정 완료나 새 DLL
 문서/카운터/문자열 검증만으로 DONE 또는 점수를 부여하지 않는다. HMD 실패가 반복되면 같은 증상으로 이어서 수정한다.
 새 파이프라인을 통째로 교체하거나 모든 alpha draw/WorldBillboard/HUD의 분류를 바꾸는 방식은 금지한다.
 
-## 2. 가장 먼저 확인할 확정 사실: 수정한 코드가 배포되는가
-검토 SHA의 .github/workflows/vr-dx9ex-active.yml:
-- game: SAFE_DRAW_COMPARE=OFF, R26_HUD_COMPARE=ON, C1/C2=OFF. stage-game의 dinput8.dll이 dx9ex-active-game으로 업로드된다.
-- full-chain-compile: R26_HUD_COMPARE=OFF 및 R33→R29 split=ON. 별도 전체 체인 컴파일 검사다.
-- package: payload/game/dinput8.dll을 backends/d3d9/dinput8.dll로 복사한다. full-chain 빌드 산출물을 자동 선택하지 않는다.
-CMakeLists.txt는 R26_HUD_COMPARE=ON일 때 stereo_renderer_r30_r26_safe.cpp 및 outrun_renderer_r23.cpp를 실제 owner로 선택한다.
-따라서 stereo_renderer_r30.cpp만 수정하고 full-chain 컴파일에 성공해도 기본 Active ZIP의 렌더링 변경을 입증하지 못한다.
-이 사실은 현재 소스의 패키징 계약이다. 사용자가 실제 설치한 모든 DLL의 옵션을 추정하는 근거로 쓰지 않는다.
-필수: SOURCE_SHA + CMAKE_FLAGS/BUILD_CONTRACT + 실제 설치 DLL SHA256 + 선택한 backend + shader/fixedfn route를 함께 고정한다.
-변경한 함수가 해당 옵션에서 컴파일/링크되는지 확인한다. 필요하면 두 owner에 같은 수정 의도를 각각 이식하고 양쪽을 검증한다.
-검토 중 동시 작업 CONVERSION-DX9EX-00851은 일반 R30 POSITIONT 경로 수정/검증 중이었다. 이를 렌즈/+TIME 완료로 합치지 않는다.
+## 2. 실제 배포되는 기본 렌더러 — 2026-10-15 R84 메인 전환 반영
+**본 절이 검토 SHA의 옛 R26 기본 패키지 판단을 대체한다.** `vr-d3d9ex-focus`의 옵션 없는 CMake, `DX9Ex Active Validation` 및 `CURRENT_FOCUS` 게임 DLL은 모두 **R84 독립 R29~R33** 기본 경로다. 검증 SHA `2465fe644fd17e0422ad0ce041612b62c1d114d9`: Active #38671905763 / Domain #38671905693 / Full Source #38671905747 SUCCESS.
+- `full-chain-compile` x86 DLL이 `backends/d3d9/dinput8.dll`로 배포된다. `game` x86 작업은 **`R26_SAFE` 명시적 롤백 슬롯**에만 들어간다. 동일 정확 SHA x64 OpenXR 호스트를 사용한다.
+- 렌즈/+TIME 수정은 **`stereo_renderer_r29/r30/r31/r32/r33.cpp`와 공유 game/host** 소스에서 실제 작동하는지 확인한다. `stereo_renderer_r30_r26_safe.cpp` 전용 변경은 R84 메인 개선이 아니다.
+- `BUILD_INPUTS.json`, `MAINLINE_BUILD_MODE.txt`, `SOURCE_SHA.txt`, 실행 세션 변형, DLL/호스트 SHA256과 shader/XYZRHW/원본 producer를 확인한다. HMD 정상과 CI 빌드 통과를 구분한다.
+- R26 전용 C993 원본 WVP/중앙 렌즈/+TIME 보호는 이식 참고다. 자동 복사나 모든 alpha draw의 광범위 분류 변경 대신 R84에서 원본 생성자→제출→렌더러→양안 경계를 직접 증명한다.
+- 이전 `CONVERSION-DX9EX-00851`은 별도 작업이며 이 검토로 렌즈/+TIME 해결을 주장하지 않는다.
 
 ## 3. 렌즈 플레어 중심점: 원본 호출 재설치가 아닌 행렬 소유 경계 수정
 ### 확인된 소스
@@ -107,7 +103,7 @@ StageExtensionTime/ScreenHud scope 안에서 등록 → scope 종료 → 지연 
 - 위의 가설 중 적어도 하나를 실소스/호출 순서 증거로 채택하고 다른 원인을 배제한다.
 - 실제 배포 DLL에 수정 함수가 들어감, Windows x86 game+x64 host+package / Domain / 해당 Full Source Impact+EXE Inspector 통과.
 - 테스트 코드가 수정 전 실패/후 성공하며 원본 source 의미 보존과 부정 조건을 검사. 문자열만 존재하는 테스트는 동작 증거의 대체가 아니다.
-- full-chain 검사와 R26+HUD 배포본 검사를 구분하고 최종 SHA 한 번의 통합 검증을 사용.
+- 실제 기본 R84 독립 R29~R33 Active DLL 검증과 R26_SAFE 롤백 빌드를 별도로 확인한다. 최종 SHA CI 통합 검증 후 Quest3 실기 광학 결과를 기다린다.
 - 새로운 HMD 광학 확인 전 상태는 BUILD_VERIFIED + NEED_HMD_TEST. 이번 문서 반영에는 실게임 해결/성능 점수 없음.
 - GitHub 지침 변경은 Docker/Portainer가 실제 로드했다는 증거가 아니다. 재시작/배포 여부는 별도 실측.
 
