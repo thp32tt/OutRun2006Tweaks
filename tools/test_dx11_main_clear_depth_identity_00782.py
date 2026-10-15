@@ -13,7 +13,14 @@ def valid(s,g,h):
         "GameNativeMainStencilClear::preserves_clear_coverage(clearZ, coversDepth)" in s,
         "FAILED(depth.As(&depthIdentity)) || !depthIdentity" in s,
         "s.clearColor.main_depth_still_bound(" in s,
-        "if (!sameMainDepthStencil || (clearZ && !compatibleCoverage))" in s,
+        # Full-Z requires the original coverage proof; the newly supported
+        # partial-Z branch has independent D32/native/context validation.
+        "const bool partialDepth = clearZ && !coversDepth;" in s,
+        "if (!sameMainDepthStencil ||" in s,
+        "(clearZ && !compatibleCoverage && !partialDepth))" in s,
+        "if (partialDepth) {" in s,
+        "if (clearStencil || !continuingFullNativeDraw ||" in s,
+        "native_game_partial_depth_ready(" in s,
         "sameMainDepthStencil, compatibleCoverage," in s,
         "if (clearZ) s.frameBatch.note_full_depth_clear(z);" in s,
         "return !clearsDepth || coversWholeDepth;" in g,
@@ -25,7 +32,11 @@ def valid(s,g,h):
     ))
 assert valid(scope,guard,hook)
 for old,new in (
-    ("if (!sameMainDepthStencil || (clearZ && !compatibleCoverage))","if (false)"),
+    ("if (!sameMainDepthStencil ||", "if (false ||"),
+    ("(clearZ && !compatibleCoverage && !partialDepth))", "(false))"),
+    ("const bool partialDepth = clearZ && !coversDepth;",
+     "const bool partialDepth = true;"),
+    ("native_game_partial_depth_ready(", "skip_native_D32_ownership_check("),
     ("FAILED(depth.As(&depthIdentity)) || !depthIdentity","false"),
     ("GameNativeMainStencilClear::preserves_clear_coverage(clearZ, coversDepth)","true"),
     ("if (clearZ) s.frameBatch.note_full_depth_clear(z);","/* discard depth */"),
