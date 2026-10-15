@@ -529,7 +529,8 @@ namespace OutRunVRStereo
 			}
 			++R9RtCalls;
 			const HRESULT hr = R9SetRenderTargetCallbackHook.stdcall<HRESULT>(device, index, surface);
-			if (SUCCEEDED(hr) && nativeTargetChanged)
+			if (SUCCEEDED(hr) && nativeTargetChanged &&
+                !outrun::vr::dx11::live_game_frame::preserve_game_target_transition(device))
 				outrun::vr::dx11::live_game_frame::observe_scene_boundary(device);
 			if (!IsGameDevice(device) || InternalStereoPass || FAILED(hr) || index != 0)
 				return hr;

@@ -39,6 +39,11 @@ void observe_failed_game_draw(IDirect3DDevice9* gameDevice) noexcept;
 // RT0, with a still-verified same-device main-backbuffer color seed. This
 // color-only operation must not abort menu/car/race native Draw continuity.
 // Unknown surface, depth or stencil state continues to fail closed.
+// A verified same-owner backbuffer Clear survives an R9 RT0 transition
+// to/from an auxiliary target. Later offscreen Draws are separately checked
+// for depth, stencil and MRT effects; unsupported states abort native output.
+bool preserve_game_target_transition(IDirect3DDevice9* gameDevice) noexcept;
+
 bool preserve_offscreen_color_only_clear(IDirect3DDevice9* gameDevice,
                                          DWORD flags) noexcept;
 
