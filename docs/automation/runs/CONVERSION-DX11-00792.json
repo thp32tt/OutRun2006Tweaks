@@ -1,0 +1,135 @@
+{
+  "schema_version": 3,
+  "task_id": "CONVERSION-DX11-00792",
+  "production_id": "CONVERSION-DX11-00792",
+  "event_id": "CONVERSION-DX11-00792-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "lane": "DX11",
+  "target_branch": "vr-dx11-native-r71",
+  "owner_id": "AI2-ChatGPT2",
+  "work_key": "DX11:NATIVE_FULLFRAME_PARTIAL_COLORFILL_CLEARVIEW_CONTINUITY",
+  "feature_id": "DX11-LIVE-GAME-PARTIAL-COLORFILL-RTV-MIRROR",
+  "status": "BUILD_VERIFIED_SOURCE_INCOMPLETE",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_gate": "NEED_HMD_TEST",
+  "hmd_test_performed": false,
+  "gamepad_test_performed": false,
+  "packaging_status": "NOT_REQUIRED",
+  "base_sha": "d64150f2d8074e479c61e1c10652a3b4bfa08b37",
+  "changed_files": [
+    "src/vr/d3d11/live_game_frame_bridge.cpp",
+    "src/vr/d3d11/live_game_frame_bridge.hpp",
+    "src/vr/d3d11/native_game_source_mutation.hpp",
+    "src/vr/d3d9/stereo_renderer_r30.cpp",
+    "tools/dx11_native_frame_batch_probe.cpp"
+  ],
+  "feature_contract": {
+    "feature_id": "DX11-LIVE-GAME-PARTIAL-COLORFILL-RTV-MIRROR",
+    "goal": "Replay successful bounded partial D3D9 game backbuffer ColorFill in the active full-resolution native D3D11 menu/car/race Draw frame with D3D11.1 ClearView, preserving untouched pixels, native depth and game source ordinals with safe original D3D9/input fallback.",
+    "acceptance_items": [
+      {
+        "id": "partial-colorfill-native-subrect",
+        "category": "end_to_end_behavior",
+        "behavior_area": "D3D9_ColorFill_partial_D3D11_ClearView_RTV",
+        "expected_behavior": "After real Draw/DrawIndexed, bounded ColorFill on same canonical backbuffer clears only requested D3D11.1 RTV rectangle and keeps other native game pixels."
+      },
+      {
+        "id": "native-frame-and-original-input-continuity",
+        "category": "end_to_end_behavior",
+        "behavior_area": "game_menu_vehicle_race_D3D11_Draw_continuity",
+        "expected_behavior": "Source frame Draw ordinals and previous full Clear/depth are preserved without changing original D3D9 Present, gamepad, FFB or SkyGlow."
+      },
+      {
+        "id": "unsupported-partial-fallback",
+        "category": "fallback_regression",
+        "behavior_area": "D3D9_ColorFill_and_DX9Ex_safe_original_fallback",
+        "expected_behavior": "Failed, foreign, pre-Draw, out-of-bounds or D3D11.0-only partial fills abort native batch and retain original game pixels and input."
+      },
+      {
+        "id": "five-required-exact-sha-gates",
+        "category": "integrated_validation",
+        "behavior_area": "DX11_Fast_Backend_Win32_OpenXR_HUD",
+        "expected_behavior": "Final validation-bearing SHA has unchanged required five GitHub Actions Gate success; Quest3/VDXR HMD evidence separate."
+      }
+    ]
+  },
+  "development_strategy": {
+    "work_class": "integration",
+    "milestone_id": "full_resolution_native_game_frame",
+    "gameplay_delivery_target": "FULL_RESOLUTION_GAME_FRAME",
+    "integration_path": [
+      "Actual game D3D9 R30 ColorFill hook observes completed source call and canonical main backbuffer identity",
+      "D3D11 live game frame bridge gates exact active native Draw batch, bounded RECT, device generation and optional D3D11.1 ClearView RTV",
+      "Native full-resolution Draw/DrawIndexed scene continues with original D3D9 Present, gamepad/FFB/SkyGlow and fail-closed DX9Ex fallback"
+    ],
+    "batch_components": [
+      "R30 D3D9 ColorFill live hook native mirror-or-invalidate integration",
+      "Actual D3D11.1 ClearView partial native RTV update with unchanged depth and Draw ordinals",
+      "Portable C++ positive/negative bounded rectangle/native batch continuity regression"
+    ],
+    "acceptance_proof": {
+      "positive_probe": "Bounded canonical D3D9 ColorFill after native Draw invokes D3D11.1 ClearView for one exact RTV rectangle, preserving pending native batch.",
+      "negative_regression": "No ClearView for unsupported context, before Draw, failed, foreign, reversed/outside RECT, unavailable RTV/owner; D3D9 original survives.",
+      "component_integration": "D3D9 ColorFill hook -> verified native same-owner Draw RTV -> D3D11.1 ClearView -> real game full-size Present and unchanged input fallback."
+    },
+    "conflict_keys": [
+      "DX11:NATIVE_FULLFRAME_PARTIAL_COLORFILL_CLEARVIEW_CONTINUITY"
+    ],
+    "full_gate_plan": "one_validation_bearing_sha",
+    "live_game_draw_path": [
+      "LIVE_D3D9_CALLSITE",
+      "LIVE_D3D9_COLORFILL",
+      "D3D11_NATIVE_DRAW",
+      "D3D11_NATIVE_RTV_CLEARVIEW",
+      "VISIBLE_FRAME_OUTPUT",
+      "D3D9_PRESENT",
+      "DX9EX_INPUT_FALLBACK"
+    ],
+    "visible_frame_acceptance": "Exact-SHA build gates required before BUILD_VERIFIED; Quest3/VDXR actual game HMD and gamepad output remains UNTESTED.",
+    "activation_guard_and_fallback": "NativeDrawPathActive/whole game remains diagnostic opt-in; ClearView requires live supported D3D11.1 after Draw, otherwise native frame aborted and original D3D9 gamepad/Present and DX9Ex fallback remain authoritative; DXVK frozen."
+  },
+  "acceptance_results": {
+    "partial-colorfill-native-subrect": "PASS_BUILD",
+    "native-frame-and-original-input-continuity": "PASS_BUILD",
+    "unsupported-partial-fallback": "PASS_BUILD",
+    "five-required-exact-sha-gates": "PASS_EXACT_SHA"
+  },
+  "pipeline": {
+    "C0_RECOVER": "GitHub HEAD d64150f2 (00791 C6) whole native ColorFill already implemented; partial backbuffer ColorFill still aborts native frame.",
+    "C1_REVIEW": "Need real bounded subrect update after native Draw; D3D11.1 ClearView offers regional RTV fill without erasing other menu/race pixels.",
+    "C2_IMPLEMENT": "R30 live D3D9 ColorFill -> exact owner active native batch -> D3D11.1 partial RTV ClearView, unchanged full fill pre-draw and D3D9 fallback; positive/negative C++ tests.",
+    "C3_VALIDATE": "Exact validation-bearing SHA 5cc13b65c40f40c31bbeecfbe2a0768114e5ba77: DX11 Fast #38811805057, Backend #38811804958, Windows Build #38811812467, OpenXR #38811812476, HUD #38811812478 all SUCCESS. Prior 911d7c7 Fast/Backend false-negative due 00791 callsite-path record repaired at 5cc13b65c40f40c31bbeecfbe2a0768114e5ba77; old Windows/OpenXR/HUD canceled by concurrent source-first policy commit, not counted as successful. Quest3/VDXR real game and gamepad UNTESTED.",
+    "C4_COMMIT": "Actual C++ material source 911d7c73727b676391cd8ba5d194eae12c0b1816 with [AUTO:CONVERSION-DX11-00792]; CI repair/result-bearing 5cc13b65c40f40c31bbeecfbe2a0768114e5ba77 with same task marker, no CI-skip for either.",
+    "C5_PACKAGE": "NOT_REQUIRED",
+    "C6_STATE": "Required five GitHub Actions at exact validation-bearing 5cc13b65c40f40c31bbeecfbe2a0768114e5ba77 confirmed SUCCESS; separate bookkeeping only, no new source or score event; renderer overall stereo/host still SOURCE_INCOMPLETE, real game/HMD/FFB/72Hz UNTESTED."
+  },
+  "evidence": {
+    "material_commit": "911d7c73727b676391cd8ba5d194eae12c0b1816",
+    "validation_bearing_result_sha": "5cc13b65c40f40c31bbeecfbe2a0768114e5ba77",
+    "ci_repairs": [
+      "Inherited 00791 JSON live_game_draw_path lacked LIVE_D3D9_CALLSITE; actual D3D9 ColorFill hook exists. Nonfunctional record repair 5cc13b65 followed 2026-10-16 source-first policy c373d385; 00792 source unchanged.",
+      "Initial 911d7c7 Fast and Backend policy failures not credited. Exact final five Gate runs are those on 5cc13b65."
+    ],
+    "runtime_testing": "No real Quest3/VDXR or gamepad runtime test executed",
+    "same_sha_verified": true,
+    "quest3_vdxr": "UNTESTED",
+    "fast_gate_run_id": 38811805057,
+    "backend_gate_run_id": 38811804958,
+    "windows_build_run_id": 38811812467,
+    "openxr_gate_run_id": 38811812476,
+    "hud_gate_run_id": 38811812478,
+    "fast_gate_conclusion": "success",
+    "backend_gate_conclusion": "success",
+    "windows_build_conclusion": "success",
+    "openxr_gate_conclusion": "success",
+    "hud_gate_conclusion": "success",
+    "source_integration": "INCOMPLETE: distinct L/R native GPU stereo to OpenXR host/fence/ACK not established by this partial ColorFill change"
+  },
+  "material_result_sha": "911d7c73727b676391cd8ba5d194eae12c0b1816",
+  "validation_bearing_result_sha": "5cc13b65c40f40c31bbeecfbe2a0768114e5ba77",
+  "overall_dx11_conversion_complete": false,
+  "native_stereo_openxr_source_integrated": false
+}
