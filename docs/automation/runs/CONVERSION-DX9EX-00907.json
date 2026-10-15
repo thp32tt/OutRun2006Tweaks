@@ -1,0 +1,104 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00907",
+  "production_id": "CONVERSION-DX9EX-00907",
+  "event_id": "CONVERSION-DX9EX-00907-E003",
+  "event_type": "retry",
+  "attempt": "2/3",
+  "run_key": "CONVERSION-DX9EX-00907",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:MAIN_MENU",
+  "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_PENDING_EXACT_SHA_CI",
+  "phase": "C3_VALIDATE",
+  "checkpoint": "POLICY_GATE_REPAIR",
+  "automation_validation": "PENDING_EXACT_SHA_CI",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "c1ab5e655ba3fc066f5a68a0265c8f4c3f43ea6a",
+  "material_result_sha": "5577a923d3a9912afa000e686be403a39a0f1ad4",
+  "validation_bearing_result_sha": null,
+  "source_paths": [
+    "vrhost/src/main_r23.cpp",
+    "vrhost/src/runtime/menu_content_aspect.hpp"
+  ],
+  "changed_files": [
+    "vrhost/src/main_r23.cpp",
+    "vrhost/src/runtime/menu_content_aspect.hpp",
+    "tools/verify_vr_menu_letterbox_aspect.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00907.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:MAIN_MENU",
+    "symptom_id": "DX9EX:SYMPTOM:MAIN_MENU",
+    "goal": "Keep main-menu and vehicle-select native-aspect content entirely in a common physical OpenXR binocular view under asymmetric eye fields of view without stretching, lost selection columns, or newly altered desktop aspect handling.",
+    "scope_boundary": "Only the R84 OpenXR host's shared LOCAL-fixed menu projection tangent extents, corresponding common angular projection, and the existing menu geometry regression. Preserve original native 4:3/16:9/21:9 crop, World draws, HUD/GOAL/flare, R26_SAFE, DirectInput FFB, SkyGlow and DXVK freeze.",
+    "trace_stages": [
+      "Original game produces menu and vehicle-selection sprites into the R84 D3D9Ex 2D source surface with native aspect and content crop.",
+      "R23 host PlanCommonFovTangents previously averaged independent left/right and up/down eye boundaries; the average can lie outside one eye's true view and clip menu/vehicle selection pixels.",
+      "The R23 common menu quad and per-eye OpenXR angular projection now use the intersection of tangent-space eye frusta, rejecting disjoint or malformed pairs and falling back to the established mono path."
+    ],
+    "subcomponents": [
+      "Compute common horizontal and vertical tangent bounds by intersection, not arithmetic mean, before forming the same binocular raster projection.",
+      "Keep conversion to angular XrFovf synchronized to that intersected tangent projection and preserve the existing native-aspect crop, fallback when overlap degenerates, and unchanged R26_SAFE game route.",
+      "Cover symmetric and independently asymmetric horizontal/vertical eye pairs, disjoint eye frusta, and four destructive extrema mutations in the exact renderer menu-aspect verifier."
+    ],
+    "acceptance_items": [
+      {
+        "id": "menu_eye_overlap",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original menu and car selection to LOCAL-fixed binocular compositor",
+        "expected_behavior": "An asymmetric left/right or up/down Quest view pair never widens the menu common projection outside either physical eye tangent field and keeps the entire centered menu aspect-crop inside their shared visible overlap."
+      },
+      {
+        "id": "menu_native_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Desktop 4:3/16:9/21:9, equal-eye and disjoint invalid XR FOV fallback",
+        "expected_behavior": "Equal-eye geometry remains identical, disjoint/degenerate eye pair fails closed to mono, and no R26_SAFE/SkyGlow/world/HUD or original input/FFB paths are altered."
+      },
+      {
+        "id": "menu_integrated_ci",
+        "category": "integrated_validation",
+        "behavior_area": "Exact SHA R84 DX9Ex Windows x86 game, x64 OpenXR host, package and independent guard workflows",
+        "expected_behavior": "DX9Ex Active policy/game/host/full-chain/package and required Domain, Full Source/Inspector gates pass for the final validation-bearing SHA while Quest3 VDXR remains UNTESTED."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "menu_eye_overlap": "PENDING_EXACT_SHA_CI",
+    "menu_native_fallback": "PENDING_EXACT_SHA_CI",
+    "menu_integrated_ci": "PENDING_EXACT_SHA_CI"
+  },
+  "diagnosis": {
+    "original_evidence": "Source code at material SHA shows two eye tangent extremes were averaged in PlanCommonFovTangents despite one shared physical local-fixed menu quad; intersection is the necessary common visible tangent range.",
+    "source_trace": [
+      "Game menu sprites are captured in source dimensions and native crop.",
+      "R23 PlanCommonFovTangents computes shared local-fixed projection for eye pair.",
+      "OpenXR host uses atan(common edges) for menu projection and the R84 host submits it to both eyes."
+    ],
+    "root_cause": "Arithmetic mean of eye FOV tangent edges can exceed either eye's frustum on opposite sides, cropping native menu or car selector despite a mathematically centered shared quad.",
+    "alternatives_rejected": [
+      "Mean XrFovf angles are not valid tangent-space projection bounds and do not ensure binocular intersection.",
+      "Expanding raster or changing game HUD/native source crop cannot repair the common projection exceeding one eye's real FOV."
+    ],
+    "fix_evidence": "Original material SHA 5577a923 implements max(left/down) and min(right/up) with overlap guard, preserves atan conversion and the old mono fallback.",
+    "negative_test_evidence": "tools/verify_vr_menu_letterbox_aspect.py adds symmetric/asymmetric/disjoint and four destructive extrema mutations; pending final exact-SHA Actions."
+  },
+  "ci_evidence": {
+    "initial_material_sha": "5577a923d3a9912afa000e686be403a39a0f1ad4",
+    "initial_active_run_id": 38767934311,
+    "initial_failure": "policy job: missing exact-head docs/automation/runs/CONVERSION-DX9EX-00907.json. Subsequent host/game/full-chain/package jobs skipped before compilation.",
+    "repair": "Add mandatory exact-HEAD run contract for the same already-committed source feature. Do not alter or falsely PASS the validation gate.",
+    "required_gates": [
+      "DX9Ex Active Validation",
+      "Domain Isolation Guard",
+      "DX9Ex Full Source Impact Review",
+      "OutRun EXE HUD Inspector CI"
+    ]
+  },
+  "runtime_evidence": "No physical Quest3/VDXR test performed on the material or validation-bearing SHA; binocular appearance and performance are not claimed.",
+  "score_delta_this_attempt": 0,
+  "score_once": false
+}
