@@ -20,9 +20,13 @@ struct GameNativeOffscreenPass {
         return fullMode && wholeBackbufferSeeded && sameOwner &&
             !stopped && targetKnown;
     }
+    // A depth-writing offscreen Draw may still be isolated: it writes an
+    // independently owned auxiliary D3D9 Z surface, not the main DSV.
+    // The caller must prove a different canonical COM identity first.
     [[nodiscard]] static constexpr bool no_main_depth_write(
-        bool depthEnabled, bool depthWritesEnabled) noexcept {
-        return !depthEnabled || !depthWritesEnabled;
+        bool depthEnabled, bool depthWritesEnabled,
+        bool provenAuxiliaryDepth = false) noexcept {
+        return !depthEnabled || !depthWritesEnabled || provenAuxiliaryDepth;
     }
     // Preserve actual menu/vehicle offscreen Clear calls only when neither
     // the canonical main RT0, any extra MRT, nor the seeded main depth can

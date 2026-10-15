@@ -4873,12 +4873,26 @@ bool isolated_offscreen_game_draw(IDirect3DDevice9* game, const State& s) noexce
             break;
         }
     }
+    // A real game menu/vehicle render-to-texture Draw can write its OWN Z
+    // surface without changing the seeded main game's depth history. Prove
+    // both COM identities before absorbing the original source ordinal:
+    // matching/unknown main Z must still abort native full-frame output.
+    const bool depthWrites = zEnabled != D3DZB_FALSE && zWriteEnabled != FALSE;
+    bool isolatedDepthWrite = false;
+    if (depthWrites && s.clearColor.mainDepthIdentity != 0u) {
+        ComPtr<IDirect3DSurface9> boundDepth;
+        ComPtr<IUnknown> depthIdentity;
+        if (SUCCEEDED(game->GetDepthStencilSurface(boundDepth.GetAddressOf())) &&
+            boundDepth && SUCCEEDED(boundDepth.As(&depthIdentity)) && depthIdentity)
+            isolatedDepthWrite = !s.clearColor.main_depth_still_bound(
+                reinterpret_cast<std::uintptr_t>(depthIdentity.Get()));
+    }
     return GameNativeOffscreenPass::source_has_no_main_writes(
         true, s.clearColor.matches(owner, reinterpret_cast<std::uintptr_t>(
             backbufferIdentity.Get())),
         targetIdentity.Get() != backbufferIdentity.Get(),
         GameNativeOffscreenPass::no_main_depth_write(
-            zEnabled != D3DZB_FALSE, zWriteEnabled != FALSE),
+            zEnabled != D3DZB_FALSE, zWriteEnabled != FALSE, isolatedDepthWrite),
         stencilEnabled == FALSE, noExtraRenderTargets, s.frameBatch.stopped);
 }
 
