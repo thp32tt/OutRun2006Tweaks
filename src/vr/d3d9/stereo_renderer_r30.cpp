@@ -2657,6 +2657,54 @@ namespace OutRunVRStereo
             return true;
         }
 
+        struct R30XyzrhwState
+        {
+            OutRunVRRenderer::LatchedStereoFrame stereo{};
+            D3DVIEWPORT9 viewport{};
+            float eyeScale[2]{};
+            float eyeOffset[2]{};
+            float worldScaleX[2]{};
+            float worldOffsetX[2]{};
+            float worldScaleY[2]{};
+            float worldOffsetY[2]{};
+            float parallaxPerRhwX[2]{};
+            float parallaxPerRhwY[2]{};
+            D3DMATRIX baseProjection{};
+            D3DMATRIX inverseBaseProjection{};
+            D3DMATRIX eyeProjection[2]{};
+            D3DMATRIX eyeInverse[2]{};
+            // OutRun's CPU-projected smoke/decal vertices use the same
+            // eyeInverse * eyeProjection for every referenced vertex. Cache
+            // that complete row-vector tail once per draw/eye.
+            D3DMATRIX eyeTail[2]{};
+            bool fullWorldReprojection = false;
+            bool depthTestEnabled = false;
+            bool rhwDepthEvidence = false;
+            bool worldEffect = false;
+            bool projectedWorldMarker = false;
+            OutRunVR::RankMarker::StereoNdcShift projectedRank{};
+        };
+
+        // R30 XYZRHW world smoke/decal geometry has a latched pose and a
+        // fixed game projection across multiple CPU-projected draws.  Cache
+        // only projection-derived math, never per-draw evidence/viewport data.
+        struct R30XyzrhwWorldGeometryCache
+        {
+            bool valid = false;
+            float worldScale = 0.0f;
+            R30XyzrhwState geometry{};
+        };
+        thread_local R30XyzrhwWorldGeometryCache R30XyzrhwWorldGeometry{};
+
+        void R30InvalidateXyzrhwWorldGeometry() noexcept
+        {
+            R30XyzrhwWorldGeometry = {};
+        }
+
+        // GetFVF is zero for valid declaration-only fixed-function layouts.
+        // Accept only an exact float4 POSITIONT header at byte zero: all
+        // stereo decoders read the first four floats as X/Y/Z/RHW.
+        // Unknown streams, offsets and overlapping attributes fail closed.
         // R84 mainline counterpart of the HMD-tested R26_SAFE R57 route.
         // The point is produced by an exact Calc3D2D game CALL, not inferred
         // from alpha/RHW or another car's most recent shader constants.
@@ -2746,54 +2794,6 @@ namespace OutRunVRStereo
             return true;
         }
 
-        struct R30XyzrhwState
-        {
-            OutRunVRRenderer::LatchedStereoFrame stereo{};
-            D3DVIEWPORT9 viewport{};
-            float eyeScale[2]{};
-            float eyeOffset[2]{};
-            float worldScaleX[2]{};
-            float worldOffsetX[2]{};
-            float worldScaleY[2]{};
-            float worldOffsetY[2]{};
-            float parallaxPerRhwX[2]{};
-            float parallaxPerRhwY[2]{};
-            D3DMATRIX baseProjection{};
-            D3DMATRIX inverseBaseProjection{};
-            D3DMATRIX eyeProjection[2]{};
-            D3DMATRIX eyeInverse[2]{};
-            // OutRun's CPU-projected smoke/decal vertices use the same
-            // eyeInverse * eyeProjection for every referenced vertex. Cache
-            // that complete row-vector tail once per draw/eye.
-            D3DMATRIX eyeTail[2]{};
-            bool fullWorldReprojection = false;
-            bool depthTestEnabled = false;
-            bool rhwDepthEvidence = false;
-            bool worldEffect = false;
-            bool projectedWorldMarker = false;
-            OutRunVR::RankMarker::StereoNdcShift projectedRank{};
-        };
-
-        // R30 XYZRHW world smoke/decal geometry has a latched pose and a
-        // fixed game projection across multiple CPU-projected draws.  Cache
-        // only projection-derived math, never per-draw evidence/viewport data.
-        struct R30XyzrhwWorldGeometryCache
-        {
-            bool valid = false;
-            float worldScale = 0.0f;
-            R30XyzrhwState geometry{};
-        };
-        thread_local R30XyzrhwWorldGeometryCache R30XyzrhwWorldGeometry{};
-
-        void R30InvalidateXyzrhwWorldGeometry() noexcept
-        {
-            R30XyzrhwWorldGeometry = {};
-        }
-
-        // GetFVF is zero for valid declaration-only fixed-function layouts.
-        // Accept only an exact float4 POSITIONT header at byte zero: all
-        // stereo decoders read the first four floats as X/Y/Z/RHW.
-        // Unknown streams, offsets and overlapping attributes fail closed.
         bool R30HasXyzrhwInputLayout(IDirect3DDevice9* device) noexcept
         {
             DWORD fvf = 0;
