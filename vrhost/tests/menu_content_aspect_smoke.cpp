@@ -309,18 +309,34 @@ int main()
         return 27;
 
     using OutRunVrMenuAspect::PlanCommonFovTangents;
-    // Two asymmetric Quest-style FOVs must average the actual tangent
-    // plane. tan(mean angle) causes a different apparent menu aspect.
+    // Two asymmetric Quest-style FOVs must intersect both eyes' actual
+    // tangent planes. Averaging their edges would expose pixels outside
+    // one physical eye and clip the shared menu or vehicle selection.
     const float l0 = -0.72f, r0 = 0.81f, d0 = -0.65f, u0 = 0.83f;
     const float l1 = -1.06f, r1 = 0.91f, d1 = -0.87f, u1 = 0.76f;
     const auto shared = PlanCommonFovTangents(
         l0, r0, d0, u0, l1, r1, d1, u1);
     if (!shared.valid ||
-        std::fabs(shared.left - 0.5f * (std::tan(l0) + std::tan(l1))) > 1e-6f ||
-        std::fabs(shared.right - 0.5f * (std::tan(r0) + std::tan(r1))) > 1e-6f ||
-        std::fabs(shared.down - 0.5f * (std::tan(d0) + std::tan(d1))) > 1e-6f ||
-        std::fabs(shared.up - 0.5f * (std::tan(u0) + std::tan(u1))) > 1e-6f)
+        std::fabs(shared.left - (std::max)(std::tan(l0), std::tan(l1))) > 1e-6f ||
+        std::fabs(shared.right - (std::min)(std::tan(r0), std::tan(r1))) > 1e-6f ||
+        std::fabs(shared.down - (std::max)(std::tan(d0), std::tan(d1))) > 1e-6f ||
+        std::fabs(shared.up - (std::min)(std::tan(u0), std::tan(u1))) > 1e-6f)
         return 2;
+    // Per-axis disjoint or vanishing binocular overlap is not an eye pair.
+    // Fail closed to the existing mono-menu fallback without stretching
+    // either HMD eye. Keep the optical plan invalid for rejected pairs.
+    const auto disjointHorizontal = PlanCommonFovTangents(
+        -1.1f, -0.4f, -0.6f, 0.6f,
+         0.4f,  1.1f, -0.6f, 0.6f);
+    const auto disjointVertical = PlanCommonFovTangents(
+        -0.6f, 0.6f, -1.1f, -0.4f,
+        -0.6f, 0.6f,  0.4f,  1.1f);
+    if (disjointHorizontal.valid || disjointVertical.valid ||
+        OutRunVrMenuAspect::PlanOpticallyCenteredClip(
+            disjointHorizontal, 4.f / 3.f).valid ||
+        OutRunVrMenuAspect::PlanOpticallyCenteredClip(
+            disjointVertical, 4.f / 3.f).valid)
+        return 35;
     // The same reconstructed common FOV must be published in each
     // XrCompositionLayerProjectionView, otherwise the shared menu raster
     // would be warped again by OpenXR's per-eye projection.
