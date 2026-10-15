@@ -280,6 +280,59 @@ namespace OutRunVR::GameSemantic
     // are distinct from +TIME and queued SpriteNodes. Only submit owned,
     // homogeneous deferred batches while the original caller is alive.
     // while that exact helper remains active, never a foreign/mixed batch.
+    // R84 GOAL can issue multiple D3DXSprite Draw calls for one exact
+    // queued progress/glyph producer. The original GPU batch must remain
+    // under that producer until BeforeQueueNode/BeforeQueueEnd flush it.
+    // Deferring a clean batch avoids a driver submission per glyph; an
+    // unarmed, direct, mixed, foreign or untracked batch is NEVER deferred.
+    inline constexpr bool CanDeferD3DXQueueGoalBatch(
+        bool queueActive, bool batchActive, bool exactSprite,
+        bool boundaryReady, unsigned pendingDraws, bool homogeneous,
+        RenderScope pendingScope, ProducerToken pendingProducer,
+        RenderScope currentScope, ProducerToken currentProducer) noexcept
+    {
+        return queueActive && batchActive && exactSprite &&
+            boundaryReady && pendingDraws != 0 && homogeneous &&
+            pendingScope == RenderScope::ScreenHud &&
+            (pendingProducer == ProducerToken::GoalTime020 ||
+             pendingProducer == ProducerToken::GoalTime150 ||
+             pendingProducer == ProducerToken::ResultProgress ||
+             pendingProducer == ProducerToken::OutRunStagePrintf) &&
+            currentScope == pendingScope &&
+            currentProducer == pendingProducer;
+    }
+
+    static_assert(CanDeferD3DXQueueGoalBatch(true, true, true, true, 3, true,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress));
+    static_assert(CanDeferD3DXQueueGoalBatch(true, true, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(CanDeferD3DXQueueGoalBatch(true, true, true, true, 4, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150));
+    static_assert(CanDeferD3DXQueueGoalBatch(true, true, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf,
+        RenderScope::ScreenHud, ProducerToken::OutRunStagePrintf));
+    static_assert(!CanDeferD3DXQueueGoalBatch(false, true, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress));
+    static_assert(!CanDeferD3DXQueueGoalBatch(true, true, true, false, 1, true,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress,
+        RenderScope::ScreenHud, ProducerToken::ResultProgress));
+    static_assert(!CanDeferD3DXQueueGoalBatch(true, true, true, true, 2, false,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150));
+    static_assert(!CanDeferD3DXQueueGoalBatch(true, true, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::GoalTime150,
+        RenderScope::ScreenHud, ProducerToken::GoalTime020));
+    static_assert(!CanDeferD3DXQueueGoalBatch(true, true, true, true, 2, true,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime,
+        RenderScope::ScreenHud, ProducerToken::StageExtensionTime));
+    static_assert(!CanDeferD3DXQueueGoalBatch(true, true, true, true, 2, true,
+        RenderScope::WorldBillboard, ProducerToken::GoalTime020,
+        RenderScope::WorldBillboard, ProducerToken::GoalTime020));
+
     inline constexpr bool CanFlushD3DXDirectGoalAtExit(
         bool queueActive, bool batchActive, bool exactSprite,
         unsigned pendingDraws, bool homogeneous,

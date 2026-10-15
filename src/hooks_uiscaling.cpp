@@ -2843,9 +2843,9 @@ private:
         if (exactStage)
             return hr;
 
-        // GOAL is a different source family: its direct/queued parents do
-        // not share +TIME's explicit StageExtensionLeave batch boundary.
-        // Keep its existing eager, narrowly proven submission unchanged.
+        // GOAL direct sources retain the proven eager/parent-exit behavior.
+        // Queued exact GOAL sources are submitted once on owner transition
+        // or queue end; uncertain/mixed buffers keep the old fallback.
         const bool queuedStageIsolated =
             QueueRenderActive() && StageBoundaryReady;
         const bool directStageIsolated =
@@ -2861,6 +2861,19 @@ private:
                 PendingDraws, PendingHomogeneous, PendingScope, PendingProducer,
                 scope, source))
             StageBoundaryReady = true;
+        // The queued original GOAL progress, both finish-time helpers and
+        // three verified Sumo_Printf parents share the same exact GPU owner
+        // until the NEXT queue node or queue end. Keep their D3DX Draw batch
+        // intact: the two existing queue boundaries submit under the outgoing
+        // owner before SelectSpriteQueueNode / EndSpriteQueueRender.
+        // Direct GOAL continues using the proven per-Draw/parent-exit path;
+        // mixed/unarmed batches retain the existing fail-closed fallback.
+        if (CanDeferD3DXQueueGoalBatch(
+                QueueRenderActive(), BatchActive,
+                self == TrackedSprite, StageBoundaryReady,
+                PendingDraws, PendingHomogeneous, PendingScope,
+                PendingProducer, scope, source))
+            return hr;
         if ((queuedStageIsolated || directStageIsolated ||
                 (QueueRenderActive() && StageBoundaryReady)) &&
             BatchActive && self == TrackedSprite &&

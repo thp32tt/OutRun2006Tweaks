@@ -1,0 +1,87 @@
+{
+  "schema": 2,
+  "task_id": "CONVERSION-DX9EX-00922",
+  "production_id": "CONVERSION-DX9EX-00922",
+  "event_id": "CONVERSION-DX9EX-00922-E001",
+  "event_type": "dispatch",
+  "attempt": 1,
+  "run_key": "CONVERSION-DX9EX-00922",
+  "lane": "DX9EX",
+  "target_branch": "vr-d3d9ex-focus",
+  "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+  "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+  "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
+  "status": "IMPLEMENTED_AWAITING_CI",
+  "phase": "C2_IMPLEMENT",
+  "checkpoint": "C2_SOURCE",
+  "automation_validation": "PENDING_EXACT_SHA",
+  "runtime_validation": "UNTESTED",
+  "runtime_hmd_status": "NEED_HMD_TEST",
+  "source_parent_sha": "132b9578b037dc6def6daac41de76d4bc9443614",
+  "source_paths": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp"
+  ],
+  "changed_files": [
+    "src/hooks_uiscaling.cpp",
+    "src/vr/game/render_semantics.hpp",
+    "vrhost/tests/goal_progress_owner_smoke.cpp",
+    "tools/verify_vr_stage_extension_d3dx_batch_owner.py",
+    "docs/automation/runs/CONVERSION-DX9EX-00922.json"
+  ],
+  "feature_contract": {
+    "feature_id": "DX9EX:VIS:GOAL_PROGRESS",
+    "symptom_id": "DX9EX:SYMPTOM:GOAL_PROGRESS",
+    "goal": "Render complete GOAL progress percentage, finish-time helpers and original Sumo_Printf sprites in exact binocular R84 GPU batches rather than causing one expensive D3DX Flush per glyph, without losing producer identity, source lifetime, or original optical placement.",
+    "scope_boundary": "Only the four verified GOAL ScreenHud D3DX producers while a canonical SpriteNode queue is active; preserve existing direct helper exit, untrusted B9200, +TIME, rank/vehicle, F11, SkyGlow, R26_SAFE and original game/FFB.",
+    "trace_stages": [
+      "Original result progress, GOAL time helpers and stage Sumo_Printf exact E8 sources tag their ScreenHud producer and append SpriteNodes.",
+      "R64 native D3DX Begin/Draw tracks a homogeneous same-producer GPU batch and arms canonical queue exit / producer-switch submission.",
+      "BeforeQueueNode and BeforeQueueEnd flush the outgoing GPU batch while its game semantic remains current, preserving binocular R84 ScreenHud XYZRHW at the physical GPU Draw."
+    ],
+    "subcomponents": [
+      "Defer a verified queued GOAL D3DX Draw batch until source transition or queue-end rather than submitting every glyph independently.",
+      "Preserve direct helper/printf, mixed, unknown, failed, lifecycle and untracked sprite fallbacks with C++ positive and negative execution gates and source-verifier coverage.",
+      "Integrate exact R84 game, host, release package, Domain, Full Source and HUD Inspector Actions validation at a single final SHA."
+    ],
+    "acceptance_items": [
+      {
+        "id": "whole_goal_queue_gpu_batch",
+        "category": "end_to_end_behavior",
+        "behavior_area": "Original four GOAL D3DX producer groups and native queue submit",
+        "expected_behavior": "A sequence of glyph Draw calls under one verified queued original GOAL producer is submitted once under that owner on canonical queue exit or producer switch, preserving binocular R84 eye placement."
+      },
+      {
+        "id": "direct_mixed_lifecycle_fallback",
+        "category": "fallback_regression",
+        "behavior_area": "Direct original GOAL, mixed D3DX, lifecycle and protected world sources",
+        "expected_behavior": "Direct GOAL keeps original synchronous parent-exit or per-Draw behavior; unknown/mixed, failed, pre-queue and lost-device batches never acquire deferred GOAL GPU ownership."
+      },
+      {
+        "id": "exact_sha_r84_windows_all_gates",
+        "category": "integrated_validation",
+        "behavior_area": "R84 source-built Windows x86 game, x64 OpenXR host, rollback package and CI",
+        "expected_behavior": "DX9Ex Active 5/5, Domain Isolation, Full Source Impact and HUD Inspector mandatory Gates pass on one validation-bearing exact SHA, without claiming Quest3/HMD success."
+      }
+    ]
+  },
+  "acceptance_results": {
+    "whole_goal_queue_gpu_batch": "SOURCE_IMPLEMENTED",
+    "direct_mixed_lifecycle_fallback": "SOURCE_IMPLEMENTED",
+    "exact_sha_r84_windows_all_gates": "PENDING_EXACT_SHA"
+  },
+  "diagnosis": {
+    "root_cause": "R64 DrawDest eagerly calls ID3DXSprite::Flush on each exact GOAL Draw even when the same homogeneous queue-owned producer has already armed a safe BeforeQueueNode/BeforeQueueEnd submission boundary; this fragments glyph batches into extra GPU submissions.",
+    "source_trace": [
+      "Original hooked ResultProgress / GoalTime020 / GoalTime150 / OutRunStagePrintf producers emit scoped queued D3DX Draws.",
+      "R64 DrawDest increments PendingDraws and kept eager Flush even though clean queued owner stayed live.",
+      "R64 BeforeQueueNode and BeforeQueueEnd synchronously FlushTracked before SelectSpriteQueueNode/EndSpriteQueueRender and R84 uses same explicit ScreenHud owner for both eyes."
+    ],
+    "alternatives_rejected": [
+      "Global Flush removal would defer unknown or direct buffers to unsafe GPU owners; exact source, active queue and live batch evidence are all prerequisites."
+    ],
+    "runtime_evidence": "No matching Quest3/VDXR session performed; software source-path correctness does not establish visual fusion or measured headset frame-time."
+  },
+  "score_delta_this_attempt": 0,
+  "next_action": "Run changed-area portable GOAL smoke then mandatory final exact-SHA GitHub Actions; Quest3/VDXR hardware acceptance remains UNTESTED."
+}

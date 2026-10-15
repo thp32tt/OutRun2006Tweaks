@@ -55,9 +55,60 @@ static bool CheckStagePrintfBatch()
         !CanArmD3DXQueueGoalAfterDraw(
             false, true, true, 1, true, hud, result, hud, result);
 }
+static bool CheckQueuedGoalBatch()
+{
+    constexpr auto hud = RenderScope::ScreenHud;
+    for (const auto producer : {
+            ProducerToken::ResultProgress,
+            ProducerToken::GoalTime020,
+            ProducerToken::GoalTime150,
+            ProducerToken::OutRunStagePrintf})
+    {
+        // 1..N sibling D3DX Draws stay in ONE proven owner batch.
+        for (unsigned draws = 1; draws < 9; ++draws)
+            if (!CanDeferD3DXQueueGoalBatch(
+                    true, true, true, true, draws, true,
+                    hud, producer, hud, producer))
+                return false;
+        // Before queue owner is selected, after End/Reset, on a failed
+        // Draw or mixed producer, the native fallback must still submit.
+        if (CanDeferD3DXQueueGoalBatch(
+                false, true, true, true, 2, true,
+                hud, producer, hud, producer) ||
+            CanDeferD3DXQueueGoalBatch(
+                true, false, true, true, 2, true,
+                hud, producer, hud, producer) ||
+            CanDeferD3DXQueueGoalBatch(
+                true, true, false, true, 2, true,
+                hud, producer, hud, producer) ||
+            CanDeferD3DXQueueGoalBatch(
+                true, true, true, false, 2, true,
+                hud, producer, hud, producer) ||
+            CanDeferD3DXQueueGoalBatch(
+                true, true, true, true, 0, true,
+                hud, producer, hud, producer) ||
+            CanDeferD3DXQueueGoalBatch(
+                true, true, true, true, 2, false,
+                hud, producer, hud, producer) ||
+            CanDeferD3DXQueueGoalBatch(
+                true, true, true, true, 2, true,
+                hud, producer, hud, ProducerToken::None))
+            return false;
+    }
+    return !CanDeferD3DXQueueGoalBatch(
+        true, true, true, true, 2, true,
+        hud, ProducerToken::StageExtensionTime,
+        hud, ProducerToken::StageExtensionTime) &&
+        !CanDeferD3DXQueueGoalBatch(
+            true, true, true, true, 2, true,
+            RenderScope::WorldBillboard, ProducerToken::GoalTime020,
+            RenderScope::WorldBillboard, ProducerToken::GoalTime020);
+}
+
 int main()
 {
     if (!CheckStagePrintfBatch()) return 4;
+    if (!CheckQueuedGoalBatch()) return 5;
     if (!CheckDirectGoal(ProducerToken::ResultProgress) ||
         !CheckDirectGoal(ProducerToken::GoalTime020) ||
         !CheckDirectGoal(ProducerToken::GoalTime150) ||

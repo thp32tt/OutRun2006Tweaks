@@ -263,6 +263,14 @@ def check(code: str, header: str) -> list[str]:
          "if (exactGoal && CanArmD3DXQueueGoalAfterDraw(" in hook and
          "(QueueRenderActive() && StageBoundaryReady)" in hook,
          "late GOAL queue Begin must rearm exact original GOAL GPU submission")
+    # A clean queued GOAL family can now batch all of its glyphs until
+    # BeforeQueueNode/End submits under the previous exact producer.
+    # Do not silently regress into per-Draw native Flush while the GOAL
+    # source still has its own queue boundary and proven ownership.
+    need("if (CanDeferD3DXQueueGoalBatch(" in hook and
+         "StageBoundaryReady,\n                PendingDraws, PendingHomogeneous" in hook and
+         "if (FlushTracked(self))" in hook,
+         "exact queued GOAL GPU batch must defer to owned queue boundary")
     need("GoalOwner(scope, source) && PendingHomogeneous" in hook and
          "exactGoal &&\n            PendingScope == scope" in hook and
          "GoalFlushes" in hook and "GoalFallbacks" in hook,
