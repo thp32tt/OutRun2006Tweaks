@@ -388,8 +388,10 @@ print("DX9Ex custom matrix complete quad publishing PASS (4 negative controls)")
 # Front-end sprites supplying only one must still get aspect containment,
 # while gameplay/HUD and both-present/both-absent original routes stay intact.
 def require_partial_menu_vectors(code: str) -> None:
+    # Constrain the check to this path, not the earlier pivot branch or
+    # unrelated D3DX sprite consumers. The hook now saves the result first.
     body = code.split("const bool partialFrontEndMenu =", 1)[1].split(
-        "return D3DXMatrixTransformation2D.stdcall<int>", 1)[0]
+        "const int result = D3DXMatrixTransformation2D.stdcall<int>", 1)[0]
     for required in (
         "GameState::STATE_TITLE", "GameState::STATE_MENU",
         "GameState::STATE_SELECTOR", "GameState::STATE_SELEXIT",
@@ -404,6 +406,8 @@ def require_partial_menu_vectors(code: str) -> None:
         "forwardedTranslation = (&localTranslation);",
     ):
         assert required in body, "partial menu matrix path missing: " + required
+    assert "GameState::STATE_GOAL" not in body, "GOAL must not become a menu owner"
+    assert "GameState::STATE_RACE" not in body, "Gameplay must not become a menu owner"
     assert body.index("sourceSx > 1.0e-6f") < body.index(
         "inputSx / sourceSx") < body.index("forwardedScaling = (&localScaling);")
 
@@ -416,13 +420,81 @@ for old, bad in (
     ("pTranslation ? pTranslation->x : 0.0f", "pTranslation->x"),
     ("nextTx = CenterMultiSpriteAxis(", "nextTx = inputTx + ("),
 ):
-    assert old in text
+    # Mutate the exact producer under test. Global replace used to hit
+    # frontEndPivot first after 00883 introduced its own state list, making
+    # this negative test report a false failure on an unchanged partial path.
+    prefix, rest = text.split("const bool partialFrontEndMenu =", 1)
+    path_body, suffix = rest.split(
+        "const int result = D3DXMatrixTransformation2D.stdcall<int>", 1)
+    assert old in path_body, "missing scoped mutation anchor: " + old
+    mutant = (prefix + "const bool partialFrontEndMenu =" +
+              path_body.replace(old, bad, 1) +
+              "const int result = D3DXMatrixTransformation2D.stdcall<int>" +
+              suffix)
     try:
-        require_partial_menu_vectors(text.replace(old, bad, 1))
+        require_partial_menu_vectors(mutant)
     except (AssertionError, ValueError):
         pass
     else:
         raise AssertionError("Optional menu D3DX mutant escaped: " + bad)
+
+# 00883: rotated/pivoted front-end matrices are corrected only AFTER the
+# original D3DX call. Pin the actual output rows, atomic finite publish and
+# the specific title/car-selection state boundary independently of partial
+# nullable vector staging.
+def require_pivot_containment(source: str) -> None:
+    block = source.split("const bool frontEndPivot =", 1)[1].split(
+        "static inline SafetyHookMid draw_sprite_custom_matrix_hk", 1)[0]
+    guard = block.split("if (!frontEndPivot", 1)[0]
+    body = block.split("const int result = D3DXMatrixTransformation2D.stdcall<int>", 1)[1]
+    for state in ("STATE_TITLE", "STATE_MENU", "STATE_SELECTOR",
+                  "STATE_SELEXIT", "STATE_SELRESET"):
+        assert "GameState::" + state in guard, "pivot owner missing: " + state
+    for excluded in ("STATE_GOAL", "STATE_RACE"):
+        assert "GameState::" + excluded not in guard, "pivot owner leaked: " + excluded
+    for required in (
+        "if (frontEndPivot && result && pOut &&",
+        "const float ratioX = contain / sx;",
+        "const float ratioY = contain / sy;",
+        "const UiMatrix2DRows raw{pOut->_11, pOut->_12,",
+        "const auto mapped = ContainUiMatrixRows(",
+        "std::isfinite(mapped.m11) && std::isfinite(mapped.m12)",
+        "std::isfinite(mapped.tx) && std::isfinite(mapped.ty)",
+        "pOut->_11 = mapped.m11;",
+        "pOut->_12 = mapped.m12;",
+        "pOut->_21 = mapped.m21;",
+        "pOut->_22 = mapped.m22;",
+        "pOut->_41 = mapped.tx;",
+        "pOut->_42 = mapped.ty;",
+    ):
+        assert required in body, "pivot containment path missing: " + required
+    assert body.index("std::isfinite(mapped.m11)") < body.index("pOut->_11 =")
+    assert body.index("const float ratioY =") < body.index("pOut->_42 =")
+
+
+require_pivot_containment(text)
+for old, bad in (
+    ("GameState::STATE_SELECTOR", "GameState::STATE_GOAL"),
+    ("const float ratioY = contain / sy;", "const float ratioY = contain / sx;"),
+    ("pOut->_12 = mapped.m12;", "pOut->_12 = mapped.m11;"),
+    ("std::isfinite(mapped.tx) && std::isfinite(mapped.ty)",
+     "std::isfinite(mapped.tx) || std::isfinite(mapped.ty)"),
+):
+    prefix, rest = text.split("const bool frontEndPivot =", 1)
+    path_body, suffix = rest.split(
+        "static inline SafetyHookMid draw_sprite_custom_matrix_hk", 1)
+    assert old in path_body, "pivot scoped mutation anchor missing: " + old
+    mutant = (prefix + "const bool frontEndPivot =" +
+              path_body.replace(old, bad, 1) +
+              "static inline SafetyHookMid draw_sprite_custom_matrix_hk" +
+              suffix)
+    try:
+        require_pivot_containment(mutant)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("Pivot containment mutant escaped: " + bad)
+
 
 def partial_contain(viewport, scaling=None, translation=None):
     width, height = viewport
