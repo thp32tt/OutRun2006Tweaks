@@ -10,15 +10,15 @@
   "feature_id": "DX9EX:VIS:EXTENDED_TIME",
   "symptom_id": "DX9EX:SYMPTOM:EXTENDED_TIME",
   "feature_class": "USER_VISIBLE_VISUAL_DEFECT",
-  "status": "IMPLEMENTED_GATE_PENDING",
-  "phase": "C5_COMMIT",
-  "checkpoint": "C5_STATE",
-  "automation_validation": "PENDING_EXACT_SHA",
+  "status": "COMPLETE_BUILD_VERIFIED",
+  "phase": "C6_RESULT",
+  "checkpoint": "C6_STATE",
+  "automation_validation": "PASS_EXACT_SHA",
   "runtime_validation": "UNTESTED",
   "runtime_hmd_status": "NEED_HMD_TEST",
   "source_parent_sha": "a6416ad784e63a308ed12bcee7b42298f024a221",
   "material_result_sha": null,
-  "validation_bearing_result_sha": null,
+  "validation_bearing_result_sha": "9a5a62985ce44f264de580d2f8d732aac8f9880f",
   "source_paths": [
     "src/hooks_uiscaling.cpp",
     "src/vr/game/render_semantics.hpp"
@@ -89,6 +89,6 @@
     "eye_ownership": "R84 R33 stereo composition remains unchanged; stage ScreenHud queue owner now persists through D3DX Flush until its GPU draw occurs."
   },
   "runtime_evidence": "No actual Quest3/VDXR game-screen test performed.",
-  "hold_reason": "EXACT_SHA_CI_PENDING",
-  "result_commit_ci_skip": false
+  "hold_reason": "TERMINAL_STATUS_NOT_COMPLETE",
+  "result_commit_ci_skip": true
 }
