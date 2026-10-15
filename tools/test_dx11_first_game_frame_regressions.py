@@ -1251,7 +1251,11 @@ def main() -> None:
         consumer = code[code.find("bool submit("):code.find("void observe(")]
         return all(x in producer for x in (
             "GetRenderState(D3DRS_COLORWRITEENABLE, &colorMask)",
-            "if ((colorMask & ~legalMask) || !(colorMask & visibleMask)) return false;",
+            "if ((colorMask & ~legalMask) ||",
+            "(!(colorMask & visibleMask) &&",
+            "!GameNativeMaskedDraw::accepts_source_mask(",
+            "colorMask, fullFrame, sourceDesc.Format == D3DFMT_A8R8G8B8,",
+            "output.nativeDepthTest && output.nativeDepthWrite",
             "output.colorWriteMask = static_cast<std::uint8_t>(",
             "D3DCOLORWRITEENABLE_RED) ? D3D11_COLOR_WRITE_ENABLE_RED",
             "D3DCOLORWRITEENABLE_GREEN) ? D3D11_COLOR_WRITE_ENABLE_GREEN",
@@ -1301,6 +1305,24 @@ def main() -> None:
             native_mask = sum(channel for channel in (RED, GREEN, BLUE, ALPHA) if mask & channel)
             assert native_mask == mask
             assert ((16 if (mask & ALPHA) else 0) + mask) < 32
+    # The historical RGB mask truth table applies to the small diagnostic
+    # inset. Full-size gameplay additionally requires A8 alpha-only passes
+    # and depth-writing prepasses to remain in the same Draw/DrawIndexed batch.
+    for mask in range(32):
+        valid = (mask & ~15) == 0
+        rgb_visible = (mask & 7) != 0
+        a8_alpha = (mask & 8) != 0
+        for depth_writes in (False, True):
+            expected_full = valid and (rgb_visible or a8_alpha or depth_writes)
+            expected_inset = valid and rgb_visible
+            assert expected_full == (valid and bool((mask & 7) or
+                                                     ((mask & 8) or depth_writes)))
+            if mask == 8 and not depth_writes:
+                assert expected_full and not expected_inset
+            if mask == 0 and depth_writes:
+                assert expected_full and not expected_inset
+            if mask == 16:
+                assert not expected_full and not expected_inset
     # Live fixed-function DXT textures must use compressed block pitches and
     # bind BC1/2/3 SRVs to the existing native textured Draw path. This is
     # source/CPU contract evidence, not a game/WARP pixel or HMD validation.
