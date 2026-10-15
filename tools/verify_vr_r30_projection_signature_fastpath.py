@@ -99,6 +99,29 @@ def source_contract(renderer=RENDERER, r30=R30):
             "world particles cannot authorize HUD/flat effect")
     require("GetLastVerifiedWvp(" not in cls,
             "stale WVP shader epoch must never become world ownership")
+    # The 2026-10-16 HMD capture displayed a black horizon and eye-dependent
+    # world/HUD overlap. Queue fallback ScreenOverlay2D is not permission to
+    # reinterpret a perspective world draw as Hud2D.
+    projection_gate = cls.index("ClassifyProjectionSignature(m34, m44)")
+    require(cls.index("if (ownedHud)") > projection_gate,
+            "exact HUD must not bypass projection signature sanity")
+    require(cls.index("if (ownedOverlay)") > projection_gate,
+            "generic 2D queue must not bypass projection signature")
+    require("if (ownedOverlay)\n                return R30ScreenSpaceKind::None;" in cls,
+            "perspective generic overlay must not become HUD")
+    require("if (R30SpatialSceneEffectNeedsWorldRouting())" in depth_off,
+            "spatial original SceneEffect WVP must veto flattening")
+    helper = r30.split("bool R30SpatialSceneEffectNeedsWorldRouting()", 1)
+    require(len(helper) == 2, "source-scoped spatial effect check missing")
+    helper = helper[1].split("R30ScreenSpaceKind R30ClassifyScreenSpacePass(", 1)[0]
+    for token in ("EffectiveScope() != RenderScope::SceneEffect",
+                  "GetLastRawGameWvpWrite(", "R29OwnerCurrentShaderEpoch(",
+                  "GetLastGameWvpPoseEpoch()", "R29OwnerTopLevelDrawSerial() + 1u",
+                  "nextDraw - writeDraw > 12u", "R29OwnerInvertMatrix(",
+                  "R29OwnerMultiplyMatrix(gameWvp, inverseProjection)",
+                  "affineError <= 0.02f", "depth >= 1.25f",
+                  "clipW > 0.05f"):
+        require(token in helper, "source-owned spatial veto missing: " + token)
 
 
 def classify(m34, m44):
@@ -133,7 +156,8 @@ def model_cases():
 
 
 def classify_effect_route(projection, z_enabled, alpha_blend, alpha_test,
-                          scope, queued=False, exact_centre_owned=False):
+                          scope, queued=False, exact_centre_owned=False,
+                          spatial_scene_wvp=False):
     """Exact producer-scoped admission, independent of fragile D3D state."""
     hud = scope == "ScreenHud"
     overlay = scope == "ScreenOverlay2D"
@@ -145,8 +169,14 @@ def classify_effect_route(projection, z_enabled, alpha_blend, alpha_test,
         return "hud" if hud or overlay else "none"
     if projection != "perspective":
         return "none"
+    if hud:
+        return "hud"
+    if overlay:
+        return "none"
     if centre and exact_centre_owned:
         return "centre"
+    if effect and scope == "SceneEffect" and spatial_scene_wvp:
+        return "none"
     if not z_enabled and (alpha_blend or alpha_test):
         return "none" if centre else "flat"
     return "none"
@@ -159,9 +189,10 @@ def effect_scope_model_cases():
         for queued in (False, True):
             for alpha_blend, alpha_test in (
                     (True, False), (False, True), (True, True)):
-                expected = ("flat" if scope in (
-                    "ScreenHud", "ScreenOverlay2D",
-                    "ProjectedScreenEffect2D", "SceneEffect") else "none")
+                expected = ("hud" if scope == "ScreenHud" else
+                            "flat" if scope in (
+                                "ProjectedScreenEffect2D", "SceneEffect")
+                            else "none")
                 require(classify_effect_route("perspective", False,
                         alpha_blend, alpha_test, scope, queued) == expected,
                         "explicit producer ownership mismatch: " +
@@ -187,7 +218,8 @@ def effect_scope_model_cases():
     for scope in ("WorldParticle", "WorldBillboard",
                   "ProjectedScreenEffect2D", "ScreenHud", "ScreenOverlay2D"):
         require(classify_effect_route("perspective", True, True, False, scope)
-                == "none", "depth-enabled effect may not enter flat HUD")
+                == ("hud" if scope == "ScreenHud" else "none"),
+                "only producer-authenticated HUD can override depth")
         require(classify_effect_route("orthographic", False, True, False, scope)
                 == ("hud" if scope in ("ScreenHud", "ScreenOverlay2D")
                     else "none"),
@@ -195,6 +227,14 @@ def effect_scope_model_cases():
     require(classify_effect_route("unknown", False, True, False,
                                   "ScreenHud") == "none",
             "unknown projection must stay conservative")
+    for depth in (False, True):
+        for alpha in (False, True):
+            require(classify_effect_route("perspective", depth, alpha, True,
+                    "ScreenOverlay2D", True) == "none",
+                    "unverified queue fallback must not become perspective HUD")
+            require(classify_effect_route("perspective", depth, alpha, True,
+                    "SceneEffect", False, False, True) == "none",
+                    "spatial scene effect must never be flattened into HUD")
 
 
 def mutate_classifier(old, new):
